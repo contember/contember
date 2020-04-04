@@ -1,4 +1,4 @@
-import { BaseEditor } from '../../essentials'
+import { BaseEditor } from '../../../baseEditor'
 
 export const anchorElementType = 'anchor' as const
 

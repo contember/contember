@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../essentials'
+import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
 import { AnchorElement } from './AnchorElement'
 
 export interface WithAnchors<E extends WithAnotherNodeType<BaseEditor, AnchorElement>> {

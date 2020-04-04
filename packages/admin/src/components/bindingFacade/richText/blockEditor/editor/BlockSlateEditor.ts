@@ -1,12 +1,6 @@
 import { Node } from 'slate'
-import {
-	BaseEditor,
-	EditorWithAnchors,
-	EditorWithBasicFormatting,
-	EditorWithHeadings,
-	EditorWithParagraphs,
-	WithAnotherNodeType,
-} from '../../plugins'
+import { BaseEditor, WithAnotherNodeType } from '../../baseEditor'
+import { EditorWithAnchors, EditorWithBasicFormatting, EditorWithHeadings, EditorWithParagraphs } from '../../plugins'
 import { ContemberBlockElement, ContemberContentPlaceholderElement, ContemberFieldElement } from '../elements'
 
 export type BlockEditorElements = ContemberBlockElement | ContemberFieldElement | ContemberContentPlaceholderElement

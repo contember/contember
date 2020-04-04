@@ -1,11 +1,5 @@
-import {
-	createEditorWithEssentials,
-	paragraphElementType,
-	withAnchors,
-	withBasicFormatting,
-	withHeadings,
-	withParagraphs,
-} from '../../plugins'
+import { createEditorWithEssentials } from '../../baseEditor'
+import { paragraphElementType, withAnchors, withBasicFormatting, withHeadings, withParagraphs } from '../../plugins'
 import { isContemberBlockElement, isContemberContentPlaceholderElement, isContemberFieldElement } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'

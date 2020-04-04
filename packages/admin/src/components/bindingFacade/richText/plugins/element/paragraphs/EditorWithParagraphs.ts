@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../essentials'
+import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
 import { ParagraphElement } from './ParagraphElement'
 
 export interface WithParagraphs<E extends WithAnotherNodeType<BaseEditor, ParagraphElement>> {

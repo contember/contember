@@ -1,5 +1,5 @@
 import { Element as SlateElement, Node as SlateNode } from 'slate'
-import { ElementNode, ElementSpecifics } from '../plugins'
+import { ElementNode, ElementSpecifics } from '../baseEditor'
 
 export const isElementType = <Element extends ElementNode>(
 	element: SlateNode | ElementNode,

@@ -1,4 +1,4 @@
-import { TextNode } from '../../essentials'
+import { TextNode } from '../../../baseEditor'
 
 export type RichTextBooleanMarkNames = {
 	[M in keyof Required<RichTextNode>]: RichTextNode[M] extends boolean | undefined ? M : never

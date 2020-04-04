@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../essentials'
+import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { HeadingElement } from './HeadingElement'
 
 export interface WithHeadings<E extends WithAnotherNodeType<BaseEditor, HeadingElement>> {

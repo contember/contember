@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Editor, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../essentials'
+import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
 import { AnchorElement } from './AnchorElement'
 import { AnchorRenderer, AnchorRendererProps } from './AnchorRenderer'
 import { EditorWithAnchors, WithAnchors } from './EditorWithAnchors'

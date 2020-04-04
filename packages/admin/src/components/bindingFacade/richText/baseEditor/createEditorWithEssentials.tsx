@@ -7,6 +7,7 @@ import { BaseEditor } from './BaseEditor'
 import { DefaultElement } from './DefaultElement'
 import { DefaultLeaf } from './DefaultLeaf'
 import { ElementNode, ElementSpecifics, TextNode, TextSpecifics, UnderlyingEditor } from './Node'
+import { overrideDeleteBackward } from './overrides'
 
 export const createEditorWithEssentials = (defaultElementType: string): BaseEditor => {
 	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor())) as BaseEditor
@@ -44,6 +45,8 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 	editorWithEssentials.onKeyDown = () => {}
 	editorWithEssentials.onFocus = () => {}
 	editorWithEssentials.onBlur = () => {}
+
+	overrideDeleteBackward(editorWithEssentials)
 
 	return editorWithEssentials as BaseEditor
 }

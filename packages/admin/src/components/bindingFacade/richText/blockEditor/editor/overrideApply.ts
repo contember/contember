@@ -17,7 +17,7 @@ import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideApplyOptions {
-	batchUpdates: EntityAccessor['batchUpdates']
+	batchUpdatesRef: React.MutableRefObject<EntityAccessor['batchUpdates']>
 	desugaredEntityList: RelativeEntityList
 	discriminationField: RelativeSingleField
 	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
@@ -37,7 +37,7 @@ export interface OverrideApplyOptions {
 export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {
 	const { apply } = editor
 	const {
-		batchUpdates,
+		batchUpdatesRef,
 		desugaredEntityList,
 		discriminationField,
 		fieldElementCache,
@@ -76,7 +76,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			return
 		}
 
-		batchUpdates(getAccessor => {
+		batchUpdatesRef.current(getAccessor => {
 			const { path } = operation
 			const sortedEntities = sortedEntitiesRef.current
 			const [topLevelIndex] = path

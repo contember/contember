@@ -2,7 +2,7 @@ import { BindingError, EntityAccessor, FieldAccessor, FieldValue, RelativeSingle
 import * as React from 'react'
 import { Element as SlateElement } from 'slate'
 import { NormalizedBlock } from '../../blocks'
-import { createEditor } from './editor'
+import { BlockSlateEditor, createEditor } from './editor'
 import {
 	ContemberBlockElement,
 	contemberBlockElementType,
@@ -15,7 +15,7 @@ import {
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 
 export interface UseSlateNodesOptions {
-	editor: ReturnType<typeof createEditor>
+	editor: BlockSlateEditor
 	blocks: NormalizedBlock[]
 	discriminationField: RelativeSingleField
 	contemberFieldElementCache: WeakMap<FieldAccessor, SlateElement>

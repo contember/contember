@@ -3,8 +3,6 @@ import { paragraphElementType, withAnchors, withBasicFormatting, withHeadings, w
 import { isContemberBlockElement, isContemberContentPlaceholderElement, isContemberFieldElement } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
-import { overrideDeleteBackward } from './overrideDeleteBackward'
-import { overrideInsertBreak } from './overrideInsertBreak'
 import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
@@ -21,6 +19,7 @@ export const createEditor = (options: CreateEditorOptions) => {
 		addMark,
 		deleteForward,
 		deleteFragment,
+		insertBreak,
 		insertData,
 		insertFragment,
 		insertNode,
@@ -31,32 +30,31 @@ export const createEditor = (options: CreateEditorOptions) => {
 		undo,
 	} = editor
 
-	const { batchUpdates } = options
+	const { batchUpdatesRef } = options
 
 	editor.isContemberBlockElement = isContemberBlockElement
 	editor.isContemberContentPlaceholderElement = isContemberContentPlaceholderElement
 	editor.isContemberFieldElement = isContemberFieldElement
 
-	editor.addMark = (key, value) => batchUpdates(() => addMark(key, value))
-	editor.deleteForward = unit => batchUpdates(() => deleteForward(unit))
-	editor.deleteFragment = () => batchUpdates(() => deleteFragment())
-	editor.insertFragment = fragment => batchUpdates(() => insertFragment(fragment))
-	editor.insertNode = node => batchUpdates(() => insertNode(node))
-	editor.insertText = text => batchUpdates(() => insertText(text))
-	editor.normalizeNode = entry => batchUpdates(() => normalizeNode(entry))
-	editor.removeMark = key => batchUpdates(() => removeMark(key))
+	editor.addMark = (key, value) => batchUpdatesRef.current(() => addMark(key, value))
+	editor.deleteForward = unit => batchUpdatesRef.current(() => deleteForward(unit))
+	editor.deleteFragment = () => batchUpdatesRef.current(() => deleteFragment())
+	editor.insertFragment = fragment => batchUpdatesRef.current(() => insertFragment(fragment))
+	editor.insertNode = node => batchUpdatesRef.current(() => insertNode(node))
+	editor.insertText = text => batchUpdatesRef.current(() => insertText(text))
+	editor.insertBreak = () => batchUpdatesRef.current(() => insertBreak())
+	editor.normalizeNode = entry => batchUpdatesRef.current(() => normalizeNode(entry))
+	editor.removeMark = key => batchUpdatesRef.current(() => removeMark(key))
 
-	editor.insertData = data => batchUpdates(() => insertData(data))
-	editor.redo = () => batchUpdates(() => redo())
-	editor.undo = () => batchUpdates(() => undo())
+	editor.insertData = data => batchUpdatesRef.current(() => insertData(data))
+	editor.redo = () => batchUpdatesRef.current(() => redo())
+	editor.undo = () => batchUpdatesRef.current(() => undo())
 
 	overrideIsVoid(editor)
 
 	overrideApply(editor, options)
-	overrideDeleteBackward(editor, options)
-	overrideInsertBreak(editor, options)
-	overrideInsertNode(editor, options)
 	overrideRenderElement(editor, options)
+	overrideInsertNode(editor)
 
 	return editor
 }

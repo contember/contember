@@ -16,7 +16,6 @@ import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
-import { usePreviousValue } from '@contember/react-utils'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
 import { createEditor } from './editor'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
@@ -71,7 +70,6 @@ export const BlockEditorInner = React.memo(
 		trailingFieldBackedElements,
 	}: BlockEditorInnerProps) => {
 		const renderCountRef = React.useRef(0)
-		const dataTreeIdRef = React.useRef(0)
 
 		const isMutating = useMutationState()
 		const environment = useEnvironment()
@@ -79,12 +77,6 @@ export const BlockEditorInner = React.memo(
 		const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
 		const desugaredTextBlockField = useDesugaredRelativeSingleField(textBlockField)
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
-
-		const previousEntityListAccessor = usePreviousValue(entityListAccessor)
-
-		// If this is true, we're rendering for other reasons than that entityListAccessor has changed.
-		const isDataBasedRender =
-			previousEntityListAccessor === undefined || previousEntityListAccessor !== entityListAccessor
 
 		const { entities, moveEntity, appendNew } = useSortedEntities(entityListAccessor, sortableBy)
 
@@ -105,6 +97,7 @@ export const BlockEditorInner = React.memo(
 		const [textElementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())
 		const [contemberBlockElementCache] = React.useState(() => new Map<string, Element>())
 
+		const batchUpdatesRef = React.useRef(batchUpdates)
 		const entityListAccessorRef = React.useRef(entityListAccessor)
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedEntitiesRef = React.useRef(entities)
@@ -113,44 +106,34 @@ export const BlockEditorInner = React.memo(
 		const normalizedTrailingFieldsRef = React.useRef(trailingFieldBackedElements)
 
 		React.useLayoutEffect(() => {
+			batchUpdatesRef.current = batchUpdates
 			entityListAccessorRef.current = entityListAccessor
 			isMutatingRef.current = isMutating
 			sortedEntitiesRef.current = entities
 			normalizedLeadingFieldsRef.current = leadingFieldBackedElements
 			normalizedTrailingFieldsRef.current = trailingFieldBackedElements
+
+			renderCountRef.current++
 		}) // Deliberately no deps array
 
-		const editor = React.useMemo(
-			() =>
-				createEditor({
-					batchUpdates,
-					desugaredEntityList,
-					entityListAccessorRef,
-					fieldElementCache: contemberFieldElementCache,
-					isMutatingRef,
-					sortedEntitiesRef,
-					normalizedBlocksRef,
-					normalizedLeadingFieldsRef,
-					normalizedTrailingFieldsRef,
-					textBlockDiscriminant,
-					discriminationField: desugaredDiscriminationField,
-					sortableByField: desugaredSortableByField,
-					textBlockField: desugaredTextBlockField,
-					textElementCache,
-					removalType,
-				}),
-			[
-				// These are here just so that the linter is happy. In practice, they shouldn't change. Ever.
-				batchUpdates,
-				contemberFieldElementCache,
+		const [editor] = React.useState(() =>
+			createEditor({
 				desugaredEntityList,
-				desugaredDiscriminationField,
-				desugaredSortableByField,
-				desugaredTextBlockField,
-				removalType,
+				entityListAccessorRef,
+				fieldElementCache: contemberFieldElementCache,
+				batchUpdatesRef,
+				isMutatingRef,
+				sortedEntitiesRef,
+				normalizedBlocksRef,
+				normalizedLeadingFieldsRef,
+				normalizedTrailingFieldsRef,
 				textBlockDiscriminant,
+				discriminationField: desugaredDiscriminationField,
+				sortableByField: desugaredSortableByField,
+				textBlockField: desugaredTextBlockField,
 				textElementCache,
-			],
+				removalType,
+			}),
 		)
 
 		const nodes = useSlateNodes({
@@ -168,26 +151,9 @@ export const BlockEditorInner = React.memo(
 			trailingFieldBackedElements,
 		})
 
-		React.useEffect(() => {
-			// This is a horrific hotfix and a hack. For some reason, the editor and the DOM get out of sync in some way
-			// after a persist. That starts causing caret jumping that I suspect are similar to the problems described in
-			// https://www.mutuallyhuman.com/blog/the-curious-case-of-cursor-jumping/
-			// While this still needs more investigation as it clearly points to a more fundamental problem, it appears that
-			// for the time being, we can just get around the problem by re-mounting the whole sub-tree through use of
-			// the key prop.
-			// This is not only hacky in in the sense that we perform any re-mounting at all, but also in the way we decide
-			// when to do that. This whole thing needs changed.
-			if (isMutating && !isDataBasedRender) {
-				dataTreeIdRef.current++
-			}
-		}, [isDataBasedRender, isMutating])
-
 		// TODO label?
 		return (
-			<ContemberElementRefreshContext.Provider
-				key={dataTreeIdRef.current} // See the effect above
-				value={(renderCountRef.current += Number(isDataBasedRender))} // No need to force the re-render if the data hasn't changed.
-			>
+			<ContemberElementRefreshContext.Provider value={renderCountRef.current}>
 				<Slate editor={editor} value={nodes} onChange={noop}>
 					<EditorCanvas
 						underlyingComponent={Editable}

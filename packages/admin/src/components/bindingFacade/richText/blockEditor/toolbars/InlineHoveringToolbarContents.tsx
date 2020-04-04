@@ -1,9 +1,7 @@
+import { useForceRender } from '@contember/react-utils'
 import { Button, Icon } from '@contember/ui'
 import * as React from 'react'
 import { useSlate } from 'slate-react'
-import { useForceRender } from '@contember/react-utils'
-import { RichTextBooleanMarkNames } from '../../plugins'
-import { BlockSlateEditor } from '../editor'
 
 export interface InlineHoveringToolbarContentsProps {}
 
@@ -12,16 +10,16 @@ const onMouseDownCommon = (e: React.MouseEvent) => {
 	e.nativeEvent.stopPropagation() // This is a bit of a hack ‒ so that we don't register this click as a start of a new selection
 }
 
-const toggleMark = (editor: any, mark: RichTextBooleanMarkNames, e: React.MouseEvent) => {
+const toggleMark = (editor: any, mark: string, e: React.MouseEvent) => {
 	onMouseDownCommon(e)
-	editor.toggleRichTextNodeMark(editor, mark)
+	editor.toggleMarks({ [mark]: true })
 }
 
 export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringToolbarContentsProps) => {
 	const editor = useSlate() as any
 	const forceRender = useForceRender()
 
-	const isBold = editor.isBold(editor)
+	const isBold = editor.hasMarks({ isBold: true })
 	const toggleBold = React.useCallback(
 		(e: React.MouseEvent) => {
 			toggleMark(editor, 'isBold', e)
@@ -30,7 +28,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor, forceRender],
 	)
 
-	const isItalic = editor.isItalic(editor)
+	const isItalic = editor.hasMarks({ isItalic: true })
 	const toggleItalic = React.useCallback(
 		(e: React.MouseEvent) => {
 			toggleMark(editor, 'isItalic', e)
@@ -39,7 +37,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor, forceRender],
 	)
 
-	const isUnderlined = editor.isUnderlined(editor)
+	const isUnderlined = editor.hasMarks({ isUnderlined: true })
 	const toggleUnderlined = React.useCallback(
 		(e: React.MouseEvent) => {
 			toggleMark(editor, 'isUnderlined', e)
@@ -48,7 +46,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor, forceRender],
 	)
 
-	const isStruckThrough = editor.isStruckThrough(editor)
+	const isStruckThrough = editor.hasMarks({ isStruckThrough: true })
 	const toggleStruckThrough = React.useCallback(
 		(e: React.MouseEvent) => {
 			toggleMark(editor, 'isStruckThrough', e)
@@ -70,7 +68,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor],
 	)
 
-	const isCode = editor.isCode(editor)
+	const isCode = editor.hasMarks({ isCode: true })
 	const toggleCode = React.useCallback(
 		(e: React.MouseEvent) => {
 			toggleMark(editor, 'isCode', e)
@@ -99,22 +97,22 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 
 	return (
 		<>
-			{editor.canSetBold(editor) && (
+			{editor.canToggleMarks({ isBold: true }) && (
 				<Button key="bold" isActive={isBold} onMouseDown={toggleBold}>
 					<Icon blueprintIcon="bold" />
 				</Button>
 			)}
-			{editor.canSetItalic(editor) && (
+			{editor.canToggleMarks({ isItalic: true }) && (
 				<Button key="italic" isActive={isItalic} onMouseDown={toggleItalic}>
 					<Icon blueprintIcon="italic" />
 				</Button>
 			)}
-			{editor.canSetUnderlined(editor) && (
+			{editor.canToggleMarks({ isUnderlined: true }) && (
 				<Button key="underlined" isActive={isUnderlined} onMouseDown={toggleUnderlined}>
 					<Icon blueprintIcon="underline" />
 				</Button>
 			)}
-			{editor.canSetStruckThrough(editor) && (
+			{editor.canToggleMarks({ isStruckThrough: true }) && (
 				<Button key="strikethrough" isActive={isStruckThrough} onMouseDown={toggleStruckThrough}>
 					<Icon blueprintIcon="strikethrough" />
 				</Button>
@@ -122,7 +120,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 			<Button key="link" isActive={isAnchor} onMouseDown={toggleAnchor}>
 				<Icon blueprintIcon="link" />
 			</Button>
-			{editor.canSetCode(editor) && (
+			{editor.canToggleMarks({ isCode: true }) && (
 				<Button key="code" isActive={isCode} onMouseDown={toggleCode}>
 					<Icon blueprintIcon="code" />
 				</Button>

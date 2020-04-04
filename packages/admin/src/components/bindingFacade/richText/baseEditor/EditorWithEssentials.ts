@@ -9,8 +9,9 @@ export interface WithEssentials<E extends EditorNode> {
 	isDefaultElement: (element: SlateElement) => boolean
 	createDefaultElement: (children: SlateElement['children']) => SlateElement
 
-	canToggleMark: (markName: string, markValue?: unknown) => boolean
+	canToggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => boolean
 	hasMarks: <T extends TextNode>(marks: TextSpecifics<T>) => boolean
+	toggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => void
 
 	canToggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
 	isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
@@ -20,6 +21,7 @@ export interface WithEssentials<E extends EditorNode> {
 	onDOMBeforeInput: (event: Event) => void
 	renderElement: (props: RenderElementProps) => React.ReactElement
 	renderLeaf: (props: RenderLeafProps) => React.ReactElement
+	renderLeafChildren: (props: Omit<RenderLeafProps, 'attributes'>) => React.ReactElement
 	onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
 	onFocus: (event: React.FocusEvent<HTMLDivElement>) => void
 	onBlur: (event: React.FocusEvent<HTMLDivElement>) => void

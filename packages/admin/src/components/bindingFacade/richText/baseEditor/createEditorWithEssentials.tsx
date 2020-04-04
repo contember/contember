@@ -1,11 +1,10 @@
 import React from 'react'
-import { createEditor } from 'slate'
+import { createEditor, Editor } from 'slate'
 import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
 import { BaseEditor } from './BaseEditor'
 import { DefaultElement } from './DefaultElement'
-import { DefaultLeaf } from './DefaultLeaf'
 import { ElementNode, ElementSpecifics, TextNode, TextSpecifics, UnderlyingEditor } from './Node'
 import { overrideDeleteBackward } from './overrides'
 
@@ -21,9 +20,8 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		children,
 	})
 
-	// Default to restrictive
-	editorWithEssentials.canToggleMark = () => false
-	editorWithEssentials.canToggleElement = <E extends ElementNode>() => false
+	editorWithEssentials.canToggleMarks = () => true
+	editorWithEssentials.canToggleElement = <E extends ElementNode>() => true
 
 	editorWithEssentials.hasMarks = <T extends TextNode>(marks: TextSpecifics<T>) =>
 		ContemberEditor.hasMarks(editorWithEssentials, marks)
@@ -32,13 +30,28 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		suchThat?: ElementSpecifics<E>,
 	) => false // TODO
 
+	editorWithEssentials.toggleMarks = <T extends TextNode>(marks: TextSpecifics<T>) => {
+		if (!editorWithEssentials.canToggleMarks(marks)) {
+			return
+		}
+		const isActive = editorWithEssentials.hasMarks(marks)
+		if (isActive) {
+			ContemberEditor.removeMarks(editorWithEssentials, marks)
+			return false
+		}
+		ContemberEditor.addMarks(editorWithEssentials, marks)
+		return true
+	}
 	editorWithEssentials.toggleElement = <E extends ElementNode>(
 		elementType: E['type'],
 		suchThat?: ElementSpecifics<E>,
 	) => {} // TODO
 
 	editorWithEssentials.renderElement = props => React.createElement(DefaultElement, props)
-	editorWithEssentials.renderLeaf = props => React.createElement(DefaultLeaf, props)
+
+	editorWithEssentials.renderLeafChildren = props => props.children
+	editorWithEssentials.renderLeaf = props =>
+		React.createElement('span', props.attributes, editorWithEssentials.renderLeafChildren(props))
 
 	// Just noop functions so that other plugins can safely bubble-call
 	editorWithEssentials.onDOMBeforeInput = () => {}

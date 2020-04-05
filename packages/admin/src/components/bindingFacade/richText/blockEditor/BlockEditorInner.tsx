@@ -22,7 +22,7 @@ import { createBlockEditor } from './editor'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { ContemberElementRefreshContext } from './renderers'
 import { HoveringToolbar, HoveringToolbarProps } from './toolbars'
-import { useSlateNodes } from './useSlateNodes'
+import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 
 export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 	children: React.ReactNode
@@ -144,7 +144,7 @@ export const BlockEditorInner = React.memo(
 			}),
 		)
 
-		const nodes = useSlateNodes({
+		const nodes = useBlockEditorSlateNodes({
 			placeholder: label,
 			editor,
 			discriminationField: desugaredDiscriminationField,

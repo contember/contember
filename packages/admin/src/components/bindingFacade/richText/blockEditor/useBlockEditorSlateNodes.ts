@@ -14,7 +14,7 @@ import {
 } from './elements'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 
-export interface UseSlateNodesOptions {
+export interface UseBlockEditorSlateNodesOptions {
 	editor: BlockSlateEditor
 	blocks: NormalizedBlock[]
 	discriminationField: RelativeSingleField
@@ -29,7 +29,7 @@ export interface UseSlateNodesOptions {
 	placeholder: React.ReactNode
 }
 
-export const useSlateNodes = ({
+export const useBlockEditorSlateNodes = ({
 	editor,
 	blocks,
 	discriminationField,
@@ -42,7 +42,7 @@ export const useSlateNodes = ({
 	leadingFieldBackedElements,
 	//trailingFieldBackedElements,
 	placeholder,
-}: UseSlateNodesOptions): SlateElement[] => {
+}: UseBlockEditorSlateNodesOptions): SlateElement[] => {
 	const adjacentAccessorsToElements = (
 		elements: NormalizedFieldBackedElement[],
 		position: ContemberFieldElementPosition,

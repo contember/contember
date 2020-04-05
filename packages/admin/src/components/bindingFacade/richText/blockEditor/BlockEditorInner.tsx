@@ -17,13 +17,14 @@ import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
+import { CreateEditorPublicOptions } from '../editorFactory'
 import { createBlockEditor } from './editor'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { ContemberElementRefreshContext } from './renderers'
 import { HoveringToolbar, HoveringToolbarProps } from './toolbars'
 import { useSlateNodes } from './useSlateNodes'
 
-export interface BlockEditorInnerPublicProps {
+export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 	children: React.ReactNode
 	label: React.ReactNode
 	removalType?: RemovalType
@@ -68,6 +69,10 @@ export const BlockEditorInner = React.memo(
 		otherBlockButtons,
 		//trailingFieldBackedElements
 		leadingFieldBackedElements,
+
+		plugins,
+		augmentEditor,
+		augmentEditorBuiltins,
 	}: BlockEditorInnerProps) => {
 		const renderCountRef = React.useRef(0)
 
@@ -118,6 +123,9 @@ export const BlockEditorInner = React.memo(
 
 		const [editor] = React.useState(() =>
 			createBlockEditor({
+				plugins,
+				augmentEditor,
+				augmentEditorBuiltins,
 				desugaredEntityList,
 				entityListAccessorRef,
 				fieldElementCache: contemberFieldElementCache,

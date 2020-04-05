@@ -72,6 +72,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 		return (
 			<BlockEditorInner
 				{...props}
+				environment={environment}
 				batchUpdates={entity.batchUpdates}
 				desugaredEntityList={desugaredEntityList}
 				entityListAccessor={entityListAccessor}

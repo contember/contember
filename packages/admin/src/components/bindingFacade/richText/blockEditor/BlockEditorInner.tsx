@@ -2,16 +2,17 @@ import {
 	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
+	Environment,
 	FieldAccessor,
 	RelativeEntityList,
 	RemovalType,
 	SugaredRelativeSingleField,
 	useDesugaredRelativeSingleField,
-	useEnvironment,
 	useMutationState,
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
+import { noop } from '@contember/react-utils'
 import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
 import { Element } from 'slate'
@@ -47,16 +48,17 @@ export interface BlockEditorInnerInternalProps {
 	batchUpdates: EntityAccessor['batchUpdates']
 	desugaredEntityList: RelativeEntityList
 	entityListAccessor: EntityListAccessor
+	environment: Environment
 }
 
 export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInnerInternalProps
 
-const noop = () => {}
 export const BlockEditorInner = React.memo(
 	({
 		batchUpdates,
 		desugaredEntityList,
 		entityListAccessor,
+		environment,
 		children,
 		discriminationField,
 		sortableBy,
@@ -77,7 +79,6 @@ export const BlockEditorInner = React.memo(
 		const renderCountRef = React.useRef(0)
 
 		const isMutating = useMutationState()
-		const environment = useEnvironment()
 
 		const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
 		const desugaredTextBlockField = useDesugaredRelativeSingleField(textBlockField)

@@ -12,57 +12,51 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor())) as BaseEditor
 	const editorWithEssentials = underlyingEditor as BaseEditor
 
-	editorWithEssentials.formatVersion = 0
-	editorWithEssentials.defaultElementType = defaultElementType
-	editorWithEssentials.isDefaultElement = element => element.type === defaultElementType
-	editorWithEssentials.createDefaultElement = children => ({
-		type: defaultElementType,
-		children,
+	Object.assign<BaseEditor, Partial<BaseEditor>>(editorWithEssentials, {
+		formatVersion: 0,
+		defaultElementType,
+		isDefaultElement: element => element.type === defaultElementType,
+		createDefaultElement: children => ({
+			type: defaultElementType,
+			children,
+		}),
+
+		canToggleMarks: () => true,
+		canToggleElement: <E extends ElementNode>() => true,
+
+		hasMarks: <T extends TextNode>(marks: TextSpecifics<T>) => ContemberEditor.hasMarks(editorWithEssentials, marks),
+		isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => false, // TODO
+
+		toggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => {
+			if (!editorWithEssentials.canToggleMarks(marks)) {
+				return
+			}
+			const isActive = editorWithEssentials.hasMarks(marks)
+			if (isActive) {
+				ContemberEditor.removeMarks(editorWithEssentials, marks)
+				return false
+			}
+			ContemberEditor.addMarks(editorWithEssentials, marks)
+			return true
+		},
+		toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {}, // TODO
+
+		serializeElements: (elements, errorMessage) =>
+			ContemberEditor.serializeElements(editorWithEssentials, elements, errorMessage),
+		deserializeElements: (serializedElement, errorMessage) =>
+			ContemberEditor.deserializeElements(editorWithEssentials, serializedElement, errorMessage),
+
+		renderElement: props => React.createElement(DefaultElement, props),
+
+		renderLeafChildren: props => props.children,
+		renderLeaf: props => React.createElement('span', props.attributes, editorWithEssentials.renderLeafChildren(props)),
+
+		// Just noop functions so that other plugins can safely bubble-call
+		onDOMBeforeInput: () => {},
+		onKeyDown: () => {},
+		onFocus: () => {},
+		onBlur: () => {},
 	})
-
-	editorWithEssentials.canToggleMarks = () => true
-	editorWithEssentials.canToggleElement = <E extends ElementNode>() => true
-
-	editorWithEssentials.hasMarks = <T extends TextNode>(marks: TextSpecifics<T>) =>
-		ContemberEditor.hasMarks(editorWithEssentials, marks)
-	editorWithEssentials.isElementActive = <E extends ElementNode>(
-		elementType: E['type'],
-		suchThat?: ElementSpecifics<E>,
-	) => false // TODO
-
-	editorWithEssentials.toggleMarks = <T extends TextNode>(marks: TextSpecifics<T>) => {
-		if (!editorWithEssentials.canToggleMarks(marks)) {
-			return
-		}
-		const isActive = editorWithEssentials.hasMarks(marks)
-		if (isActive) {
-			ContemberEditor.removeMarks(editorWithEssentials, marks)
-			return false
-		}
-		ContemberEditor.addMarks(editorWithEssentials, marks)
-		return true
-	}
-	editorWithEssentials.toggleElement = <E extends ElementNode>(
-		elementType: E['type'],
-		suchThat?: ElementSpecifics<E>,
-	) => {} // TODO
-
-	editorWithEssentials.serializeElements = (elements, errorMessage) =>
-		ContemberEditor.serializeElements(editorWithEssentials, elements, errorMessage)
-	editorWithEssentials.deserializeElements = (serializedElement, errorMessage) =>
-		ContemberEditor.deserializeElements(editorWithEssentials, serializedElement, errorMessage)
-
-	editorWithEssentials.renderElement = props => React.createElement(DefaultElement, props)
-
-	editorWithEssentials.renderLeafChildren = props => props.children
-	editorWithEssentials.renderLeaf = props =>
-		React.createElement('span', props.attributes, editorWithEssentials.renderLeafChildren(props))
-
-	// Just noop functions so that other plugins can safely bubble-call
-	editorWithEssentials.onDOMBeforeInput = () => {}
-	editorWithEssentials.onKeyDown = () => {}
-	editorWithEssentials.onFocus = () => {}
-	editorWithEssentials.onBlur = () => {}
 
 	overrideDeleteBackward(editorWithEssentials)
 

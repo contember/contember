@@ -10,16 +10,16 @@ import * as React from 'react'
 import { Node as SlateNode } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { SerializableEditorNode } from '../baseEditor'
-import { HoveringToolbar } from '../blockEditor/toolbars'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins/element/paragraphs'
+import { RichEditor } from '../RichEditor'
+import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
 import { useRichTextFieldEditorNode } from './useRichTextFieldEditorNode'
 
 export interface RichTextFieldInnerPublicProps
 	extends Omit<FormGroupProps, 'children' | 'errors'>,
-		CreateEditorPublicOptions {
-	// TODO configurable toolbars
-}
+		CreateEditorPublicOptions,
+		HoveringToolbarsProps {}
 
 export interface RichTextFieldInnerInternalProps {
 	batchUpdates: EntityAccessor['batchUpdates']
@@ -29,6 +29,12 @@ export interface RichTextFieldInnerInternalProps {
 }
 
 export interface RichTextFieldInnerProps extends RichTextFieldInnerPublicProps, RichTextFieldInnerInternalProps {}
+
+const RB = RichEditor.buttons
+const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
+	[RB.bold, RB.italic, RB.underline, RB.anchor],
+	[RB.strikeThrough, RB.code],
+]
 
 export const RichTextFieldInner = React.memo(
 	({
@@ -40,6 +46,9 @@ export const RichTextFieldInner = React.memo(
 		desugaredField,
 		fieldAccessor,
 		environment,
+
+		blockButtons,
+		inlineButtons = defaultInlineButtons,
 
 		description,
 		label,
@@ -115,7 +124,7 @@ export const RichTextFieldInner = React.memo(
 							onDOMBeforeInput: editor.onDOMBeforeInput,
 						}}
 					>
-						<HoveringToolbar />
+						<HoveringToolbars blockButtons={blockButtons} inlineButtons={inlineButtons} />
 					</EditorCanvas>
 				</Slate>
 			</FormGroup>

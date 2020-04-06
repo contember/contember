@@ -20,6 +20,7 @@ export const withBatching = <E extends BaseEditor>(editor: E, batchUpdatesRef: B
 		redo,
 		removeMark,
 		toggleElement,
+		toggleMarks,
 		undo,
 	} = editor
 
@@ -38,6 +39,7 @@ export const withBatching = <E extends BaseEditor>(editor: E, batchUpdatesRef: B
 	editor.undo = () => batchUpdatesRef.current(() => undo())
 
 	editor.toggleElement = (elementType, suchThat) => batchUpdatesRef.current(() => toggleElement(elementType, suchThat))
+	editor.toggleMarks = marks => batchUpdatesRef.current(() => toggleMarks(marks))
 
 	return editor
 }

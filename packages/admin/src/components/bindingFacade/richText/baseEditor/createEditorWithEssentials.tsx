@@ -1,11 +1,18 @@
 import React from 'react'
-import { createEditor, Editor } from 'slate'
+import { createEditor, Editor, Element as SlateElement } from 'slate'
 import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
 import { BaseEditor } from './BaseEditor'
 import { DefaultElement } from './DefaultElement'
-import { ElementNode, ElementSpecifics, TextNode, TextSpecifics, UnderlyingEditor } from './Node'
+import {
+	ElementNode,
+	ElementSpecifics,
+	SerializableEditorNode,
+	TextNode,
+	TextSpecifics,
+	UnderlyingEditor,
+} from './Node'
 import { overrideDeleteBackward } from './overrides'
 
 export const createEditorWithEssentials = (defaultElementType: string): BaseEditor => {
@@ -46,6 +53,28 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		elementType: E['type'],
 		suchThat?: ElementSpecifics<E>,
 	) => {} // TODO
+
+	editorWithEssentials.serializeElements = (elements, errorMessage) => {
+		try {
+			const serialized: SerializableEditorNode = {
+				formatVersion: editorWithEssentials.formatVersion,
+				children: elements,
+			}
+			return JSON.stringify(serialized)
+		} catch (e) {
+			throw new Error(errorMessage || `Editor: serialization error`)
+		}
+	}
+	editorWithEssentials.deserializeElements = (serializedElement, errorMessage) => {
+		try {
+			const elementCandidate: SerializableEditorNode | SlateElement = JSON.parse(serializedElement)
+			return 'formatVersion' in elementCandidate
+				? (elementCandidate as SerializableEditorNode).children
+				: [elementCandidate]
+		} catch (e) {
+			throw new Error(errorMessage || `Editor: deserialization error`)
+		}
+	}
 
 	editorWithEssentials.renderElement = props => React.createElement(DefaultElement, props)
 

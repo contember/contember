@@ -17,6 +17,9 @@ export interface WithEssentials<E extends EditorNode> {
 	isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
 	toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => void
 
+	serializeElements: (elements: ElementNode[], errorMessage?: string) => string
+	deserializeElements: (serializedElement: string, errorMessage?: string) => ElementNode[]
+
 	// <Editable> props
 	onDOMBeforeInput: (event: Event) => void
 	renderElement: (props: RenderElementProps) => React.ReactElement

@@ -2,7 +2,8 @@ import { BindingError, EntityAccessor, FieldAccessor, FieldValue, RelativeSingle
 import * as React from 'react'
 import { Element as SlateElement } from 'slate'
 import { NormalizedBlock } from '../../blocks'
-import { BlockSlateEditor, createBlockEditor } from './editor'
+import { SerializableEditorNode } from '../baseEditor'
+import { BlockSlateEditor } from './editor'
 import {
 	ContemberBlockElement,
 	contemberBlockElementType,
@@ -61,19 +62,16 @@ export const useBlockEditorSlateNodes = ({
 			if (fieldValue === null || fieldValue === '' || normalizedElement.format === 'plainText') {
 				const fieldElement: ContemberFieldElement = {
 					type: contemberFieldElementType,
-					children: [{ text: fieldValue || '' }],
+					children: [{ text: '' }],
 					position,
 					index,
 				}
 				element = fieldElement
 			} else {
-				try {
-					element = JSON.parse(fieldValue)
-				} catch (_) {
-					throw new BindingError(
-						`BlockEditor: The ${position} field backed element at index '${index}' contains invalid JSON.`,
-					)
-				}
+				element = editor.deserializeElements(
+					fieldValue,
+					`BlockEditor: The ${position} field backed element at index '${index}' contains invalid JSON.`,
+				)[0]
 			}
 			contemberFieldElementCache.set(normalizedElement.accessor, element)
 			return element
@@ -102,11 +100,10 @@ export const useBlockEditorSlateNodes = ({
 					} else if (typeof textAccessor.currentValue !== 'string') {
 						throw new BindingError(`BlockEditor: The 'textBlockField' does not contain a string value.`)
 					} else {
-						try {
-							element = JSON.parse(textAccessor.currentValue)
-						} catch (_) {
-							throw new BindingError(`BlockEditor: The 'textBlockField' contains invalid JSON.`)
-						}
+						element = editor.deserializeElements(
+							textAccessor.currentValue,
+							`BlockEditor: The 'textBlockField' contains invalid JSON.`,
+						)[0]
 					}
 					textElementCache.set(entity, element)
 					return element

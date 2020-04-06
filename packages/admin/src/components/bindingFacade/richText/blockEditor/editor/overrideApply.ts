@@ -130,7 +130,9 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				if (isLeadingElement(elementIndex) || isTrailingElement(elementIndex)) {
 					const normalizedField = getNormalizedFieldBackedElement(elementIndex)
 					const targetValue =
-						normalizedField.format === 'editorJSON' ? JSON.stringify(targetElement) : SlateNode.string(targetElement)
+						normalizedField.format === 'editorJSON'
+							? editor.serializeElements([targetElement])
+							: SlateNode.string(targetElement)
 					getAccessor()
 						.getRelativeSingleField(normalizedField.field)
 						.updateValue?.(targetValue)
@@ -140,7 +142,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					if (!entity) {
 						entity = getFreshContentEntityAccessor(sortedEntityIndex)
 					}
-					entity.getRelativeSingleField(textBlockField).updateValue?.(JSON.stringify(targetElement))
+					entity.getRelativeSingleField(textBlockField).updateValue?.(editor.serializeElements([targetElement]))
 					const updatedEntity = getFreshContentEntityAccessor(sortedEntityIndex)
 					textElementCache.set(updatedEntity, targetElement)
 				}

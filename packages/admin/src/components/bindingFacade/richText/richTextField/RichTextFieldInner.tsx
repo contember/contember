@@ -9,12 +9,12 @@ import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { Node as SlateNode } from 'slate'
 import { Editable, Slate } from 'slate-react'
-import { SerializableEditorNode } from '../baseEditor'
+import { ElementNode, SerializableEditorNode } from '../baseEditor'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins/element/paragraphs'
 import { RichEditor } from '../RichEditor'
 import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
-import { useRichTextFieldEditorNode } from './useRichTextFieldEditorNode'
+import { useRichTextFieldNodes } from './useRichTextFieldNodes'
 
 export interface RichTextFieldInnerPublicProps
 	extends Omit<FormGroupProps, 'children' | 'errors'>,
@@ -58,9 +58,7 @@ export const RichTextFieldInner = React.memo(
 		useLabelElement,
 	}: RichTextFieldInnerProps) => {
 		// The cache is questionable, really.
-		const [contemberFieldElementCache] = React.useState(
-			() => new WeakMap<FieldAccessor<string>, SerializableEditorNode>(),
-		)
+		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
 		const isMutating = useMutationState()
 
 		const batchUpdatesRef = React.useRef(batchUpdates)
@@ -82,23 +80,19 @@ export const RichTextFieldInner = React.memo(
 			})
 		})
 
-		const editorNode = useRichTextFieldEditorNode({
+		const valueNodes = useRichTextFieldNodes({
 			editor,
 			fieldAccessor,
 			contemberFieldElementCache,
 		})
 
+		const serialize = editor.serializeElements
 		const onChange = React.useCallback(
 			(value: SlateNode[]) => {
-				// TODO this runs unnecessarily even for selection changes
-				const serializableEditor: SerializableEditorNode = {
-					formatVersion: editor.formatVersion,
-					children: value,
-				}
-				contemberFieldElementCache.set(fieldAccessorRef.current, serializableEditor)
-				fieldAccessorRef.current.updateValue?.(JSON.stringify(serializableEditor))
+				contemberFieldElementCache.set(fieldAccessorRef.current, value as ElementNode[])
+				fieldAccessorRef.current.updateValue?.(serialize(value as ElementNode[]))
 			},
-			[contemberFieldElementCache, editor.formatVersion],
+			[contemberFieldElementCache, serialize],
 		)
 
 		return (
@@ -111,7 +105,7 @@ export const RichTextFieldInner = React.memo(
 				useLabelElement={useLabelElement}
 				errors={fieldAccessor.errors}
 			>
-				<Slate editor={editor} value={editorNode.children} onChange={onChange}>
+				<Slate editor={editor} value={valueNodes} onChange={onChange}>
 					<EditorCanvas
 						underlyingComponent={Editable}
 						componentProps={{

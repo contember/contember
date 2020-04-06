@@ -196,6 +196,7 @@ export const BlockEditorInner = React.memo(
 								onBlurCapture: editor.onBlur,
 								onDOMBeforeInput: editor.onDOMBeforeInput,
 							}}
+							size="large"
 						>
 							<HoveringToolbar blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
 						</EditorCanvas>

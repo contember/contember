@@ -16,8 +16,8 @@
 		display: block
 
 	&-canvas
-		min-height: 32em
-		padding: 2em
+		padding: .75em
+		min-height: 2em
 		cursor: text
 
 		h1, h2, h3, h4
@@ -35,3 +35,8 @@
 
 		::selection
 			background-color: #BFE4FF
+
+	&.view-large &
+		&-canvas
+			min-height: 32em
+			padding: 2em

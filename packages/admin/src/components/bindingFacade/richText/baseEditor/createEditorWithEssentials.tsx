@@ -19,7 +19,7 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor())) as BaseEditor
 	const editorWithEssentials = underlyingEditor as BaseEditor
 
-	editorWithEssentials.formatVersion = '0.0.0'
+	editorWithEssentials.formatVersion = 0
 	editorWithEssentials.defaultElementType = defaultElementType
 	editorWithEssentials.isDefaultElement = element => element.type === defaultElementType
 	editorWithEssentials.createDefaultElement = children => ({

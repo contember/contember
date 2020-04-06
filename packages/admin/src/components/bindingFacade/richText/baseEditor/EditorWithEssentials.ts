@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { Element as SlateElement } from 'slate'
 import { RenderElementProps, RenderLeafProps } from 'slate-react'
-import { EditorNode, ElementNode, ElementSpecifics, TextNode, TextSpecifics } from './Node'
+import { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
 
 export interface WithEssentials<E extends EditorNode> {
-	formatVersion: string
+	formatVersion: SerializableEditorNode['formatVersion']
 	defaultElementType: string
 	isDefaultElement: (element: SlateElement) => boolean
 	createDefaultElement: (children: SlateElement['children']) => SlateElement

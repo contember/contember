@@ -9,7 +9,7 @@ import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { Node as SlateNode } from 'slate'
 import { Editable, Slate } from 'slate-react'
-import { ElementNode, SerializableEditorNode } from '../baseEditor'
+import { ElementNode } from '../baseEditor'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins/element/paragraphs'
 import { RichEditor } from '../RichEditor'
@@ -62,11 +62,9 @@ export const RichTextFieldInner = React.memo(
 		const isMutating = useMutationState()
 
 		const batchUpdatesRef = React.useRef(batchUpdates)
-		const fieldAccessorRef = React.useRef(fieldAccessor)
 
 		React.useLayoutEffect(() => {
 			batchUpdatesRef.current = batchUpdates
-			fieldAccessorRef.current = fieldAccessor
 		}) // Deliberately no deps array
 
 		const [editor] = React.useState(() => {
@@ -89,10 +87,19 @@ export const RichTextFieldInner = React.memo(
 		const serialize = editor.serializeElements
 		const onChange = React.useCallback(
 			(value: SlateNode[]) => {
-				contemberFieldElementCache.set(fieldAccessorRef.current, value as ElementNode[])
-				fieldAccessorRef.current.updateValue?.(serialize(value as ElementNode[]))
+				batchUpdates(getAccessor => {
+					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
+
+					if (SlateNode.string({ children: value }) === '') {
+						fieldAccessor.updateValue?.(fieldAccessor.persistedValue === null ? null : '')
+						return
+					}
+
+					fieldAccessor.updateValue?.(serialize(value as ElementNode[]))
+					contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as ElementNode[])
+				})
 			},
-			[contemberFieldElementCache, serialize],
+			[batchUpdates, contemberFieldElementCache, desugaredField, serialize],
 		)
 
 		return (

@@ -94,7 +94,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 
 	const buttons: ToolbarButton[] = []
 
-	if (editor.canSetBold(editor)) {
+	if (editor.canToggleMarks({ isBold: true })) {
 		buttons.push({
 			isActive: isBold,
 			onClick: toggleBold,
@@ -103,7 +103,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		})
 	}
 
-	if (editor.canSetItalic(editor)) {
+	if (editor.canToggleMarks({ isItalic: true })) {
 		buttons.push({
 			isActive: isItalic,
 			onClick: toggleItalic,
@@ -112,7 +112,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		})
 	}
 
-	if (editor.canSetUnderlined(editor)) {
+	if (editor.canToggleMarks({ isUnderlined: true })) {
 		buttons.push({
 			isActive: isUnderlined,
 			onClick: toggleUnderlined,
@@ -121,7 +121,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		})
 	}
 
-	if (editor.canSetStruckThrough(editor)) {
+	if (editor.canToggleMarks({ isStruckThrough: true })) {
 		buttons.push({
 			isActive: isStruckThrough,
 			onClick: toggleStruckThrough,
@@ -137,7 +137,7 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		blueprintIcon: 'link',
 	})
 
-	if (editor.canSetCode(editor)) {
+	if (editor.canToggleMarks({ isCode: true })) {
 		buttons.push({
 			isActive: isCode,
 			onClick: toggleCode,

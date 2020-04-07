@@ -3,7 +3,7 @@ import { Element, Node } from 'slate'
 type ContemberFieldElementType = '__contember_field__'
 export const contemberFieldElementType: ContemberFieldElementType = '__contember_field__'
 
-export type ContemberFieldElementPosition = 'leading' | 'trailing'
+export type ContemberFieldElementPosition = 'leading' //| 'trailing'
 
 export interface ContemberFieldElement extends Element {
 	type: ContemberFieldElementType

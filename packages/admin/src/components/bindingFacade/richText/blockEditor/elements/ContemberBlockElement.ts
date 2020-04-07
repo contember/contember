@@ -7,7 +7,7 @@ export const contemberBlockElementType: ContemberBlockElementType = '__contember
 export interface ContemberBlockElement extends Element {
 	type: ContemberBlockElementType
 	blockType: FieldValue
-	entityKey: string // TODO this could probably be feasibly replaced by an index of the entities array
+	entityKey: string
 }
 
 export const isContemberBlockElement = (node: Node): node is ContemberBlockElement =>

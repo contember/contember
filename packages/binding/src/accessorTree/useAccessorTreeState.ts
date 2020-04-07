@@ -1,9 +1,9 @@
 import { GraphQlClient } from '@contember/client'
+import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
-import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { useEnvironment } from '../accessorRetrievers'
-import { Accessor, RootAccessor } from '../accessors'
+import { RootAccessor } from '../accessors'
 import {
 	AccessorTreeGenerator,
 	DirtinessChecker,
@@ -82,7 +82,7 @@ export const useAccessorTreeState = ({
 			type: AccessorTreeStateActionType.ResolveRequestWithError,
 			error,
 		})
-		return Promise.reject(error)
+		return error
 	}, [])
 
 	const triggerPersistRef = React.useRef<(() => Promise<SuccessfulPersistResult>) | undefined>(undefined)
@@ -190,7 +190,7 @@ export const useAccessorTreeState = ({
 				})
 			}
 		} catch (metadata) {
-			return rejectFailedRequest(metadata)
+			return Promise.reject(rejectFailedRequest(metadata))
 		}
 	}
 

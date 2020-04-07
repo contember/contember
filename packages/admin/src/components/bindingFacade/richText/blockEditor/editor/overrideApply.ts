@@ -17,7 +17,7 @@ import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideApplyOptions {
-	batchUpdates: EntityAccessor['batchUpdates']
+	batchUpdatesRef: React.MutableRefObject<EntityAccessor['batchUpdates']>
 	desugaredEntityList: RelativeEntityList
 	discriminationField: RelativeSingleField
 	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
@@ -25,7 +25,7 @@ export interface OverrideApplyOptions {
 	isMutatingRef: React.MutableRefObject<boolean>
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
+	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	removalType: RemovalType
 	sortableByField: RelativeSingleField
 	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
@@ -37,12 +37,12 @@ export interface OverrideApplyOptions {
 export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {
 	const { apply } = editor
 	const {
-		batchUpdates,
+		batchUpdatesRef,
 		desugaredEntityList,
 		discriminationField,
 		fieldElementCache,
 		normalizedLeadingFieldsRef,
-		normalizedTrailingFieldsRef,
+		//normalizedTrailingFieldsRef,
 		removalType,
 		sortableByField,
 		sortedEntitiesRef,
@@ -55,7 +55,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		[Key in ContemberFieldElementPosition]: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	} = {
 		leading: normalizedLeadingFieldsRef,
-		trailing: normalizedTrailingFieldsRef,
+		//trailing: normalizedTrailingFieldsRef,
 	}
 
 	const firstContentIndex = options.normalizedLeadingFieldsRef.current.length
@@ -76,7 +76,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			return
 		}
 
-		batchUpdates(getAccessor => {
+		batchUpdatesRef.current(getAccessor => {
 			const { path } = operation
 			const sortedEntities = sortedEntitiesRef.current
 			const [topLevelIndex] = path
@@ -130,7 +130,9 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				if (isLeadingElement(elementIndex) || isTrailingElement(elementIndex)) {
 					const normalizedField = getNormalizedFieldBackedElement(elementIndex)
 					const targetValue =
-						normalizedField.format === 'editorJSON' ? JSON.stringify(targetElement) : SlateNode.string(targetElement)
+						normalizedField.format === 'editorJSON'
+							? editor.serializeElements([targetElement])
+							: SlateNode.string(targetElement)
 					getAccessor()
 						.getRelativeSingleField(normalizedField.field)
 						.updateValue?.(targetValue)
@@ -140,7 +142,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					if (!entity) {
 						entity = getFreshContentEntityAccessor(sortedEntityIndex)
 					}
-					entity.getRelativeSingleField(textBlockField).updateValue?.(JSON.stringify(targetElement))
+					entity.getRelativeSingleField(textBlockField).updateValue?.(editor.serializeElements([targetElement]))
 					const updatedEntity = getFreshContentEntityAccessor(sortedEntityIndex)
 					textElementCache.set(updatedEntity, targetElement)
 				}

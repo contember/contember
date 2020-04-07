@@ -1,12 +1,5 @@
 import { Node } from 'slate'
-import {
-	BaseEditor,
-	EditorWithAnchors,
-	EditorWithBasicFormatting,
-	EditorWithHeadings,
-	EditorWithParagraphs,
-	WithAnotherNodeType,
-} from '../../plugins'
+import { BaseEditor, WithAnotherNodeType } from '../../baseEditor'
 import { ContemberBlockElement, ContemberContentPlaceholderElement, ContemberFieldElement } from '../elements'
 
 export type BlockEditorElements = ContemberBlockElement | ContemberFieldElement | ContemberContentPlaceholderElement
@@ -20,6 +13,4 @@ export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, Blo
 export type EditorWithBlockElements<E extends BaseEditor> = WithAnotherNodeType<E, BlockEditorElements> &
 	WithBlockElements<WithAnotherNodeType<E, BlockEditorElements>>
 
-export type BlockSlateEditor = EditorWithBlockElements<
-	EditorWithHeadings<EditorWithParagraphs<EditorWithAnchors<EditorWithBasicFormatting<BaseEditor>>>>
->
+export type BlockSlateEditor = EditorWithBlockElements<BaseEditor>

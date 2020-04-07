@@ -10,17 +10,17 @@
 	width: 100%
 	padding: 0
 
-	&::after
+	//&::after
 		+size(100% 2em)
 		content: ''
 		display: block
 
 	&-canvas
-		min-height: 32em
-		padding: 2em
+		padding: .75em
+		min-height: 2em
 		cursor: text
 
-		h1, h2, h3, h4
+		h1, h2, h3, h4, h5, h6
 			margin: 0
 		& > :first-child
 			margin-top: 0
@@ -35,3 +35,7 @@
 
 		::selection
 			background-color: #BFE4FF
+
+	&.view-large > &-canvas
+		min-height: 32em
+		padding: 2em

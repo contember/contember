@@ -4,4 +4,4 @@ export * from './renderers'
 
 export * from './BlockEditor'
 export * from './BlockEditorInner'
-export * from './useSlateNodes'
+export * from './useBlockEditorSlateNodes'

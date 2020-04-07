@@ -1,4 +1,5 @@
 export * from './emptyArray'
+export * from './emptyObject'
 export * from './identityFunction'
 export * from './noop'
 export * from './returnFalse'

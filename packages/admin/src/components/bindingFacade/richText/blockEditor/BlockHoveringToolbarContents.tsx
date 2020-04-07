@@ -3,7 +3,7 @@ import { GraphQlBuilder } from '@contember/client'
 import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import * as React from 'react'
 import { ReactEditor, useEditor } from 'slate-react'
-import { ContemberBlockElement, contemberBlockElementType } from '../elements'
+import { ContemberBlockElement, contemberBlockElementType } from './elements'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	title?: string

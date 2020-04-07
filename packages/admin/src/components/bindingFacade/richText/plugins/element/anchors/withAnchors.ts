@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Editor, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
-import { AnchorElement } from './AnchorElement'
+import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import { AnchorElement, anchorElementType } from './AnchorElement'
 import { AnchorRenderer, AnchorRendererProps } from './AnchorRenderer'
 import { EditorWithAnchors, WithAnchors } from './EditorWithAnchors'
 import { isUrl } from './isUrl'
@@ -10,9 +10,9 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 	type BaseAnchorEditor = WithAnotherNodeType<E, AnchorElement>
 
 	const e: E & Partial<WithAnchors<BaseAnchorEditor>> = editor
-	const { isInline, insertText, insertData, renderElement } = editor
+	const { isInline, insertText, insertData, renderElement, toggleElement, isElementActive } = editor
 
-	const isAnchor = (element: SlateNode | ElementNode): element is AnchorElement => element.type === 'anchor'
+	const isAnchor = (element: SlateNode | ElementNode): element is AnchorElement => element.type === anchorElementType
 	const isAnchorActive = (editor: BaseAnchorEditor) => {
 		const [link] = Editor.nodes(editor, { match: isAnchor })
 		return !!link
@@ -42,9 +42,34 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 	}
 
 	e.isAnchor = isAnchor
-	e.isAnchorActive = isAnchorActive
-	e.wrapAnchor = wrapAnchor
-	e.unwrapAnchor = unwrapAnchor
+
+	e.isElementActive = (elementType, suchThat) => {
+		if (elementType === anchorElementType) {
+			// TODO this includes waay too many false positives
+			const [link] = Editor.nodes(editor, { match: isAnchor })
+			return !!link
+		}
+		return isElementActive(elementType, suchThat)
+	}
+
+	// TODO
+	e.toggleElement = (elementType, suchThat) => {
+		if (elementType === anchorElementType) {
+			if (e.isElementActive(elementType, suchThat)) {
+				unwrapAnchor(e)
+			} else {
+				const href =
+					((suchThat as unknown) as ElementSpecifics<AnchorElement> | undefined)?.href ?? prompt('Insert the URL:')
+
+				if (!href) {
+					return
+				}
+				wrapAnchor(e, href)
+			}
+		}
+		return toggleElement(elementType, suchThat)
+	}
+
 	e.renderElement = props => {
 		if (isAnchor(props.element)) {
 			return React.createElement(AnchorRenderer, props as AnchorRendererProps)

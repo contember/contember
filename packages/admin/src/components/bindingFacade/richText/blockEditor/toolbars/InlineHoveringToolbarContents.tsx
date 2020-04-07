@@ -55,15 +55,11 @@ export const InlineHoveringToolbarContents = React.memo((props: InlineHoveringTo
 		[editor, forceRender],
 	)
 
-	const isAnchor = editor.isAnchorActive(editor)
+	const isAnchor = editor.isElementActive('anchor')
 	const toggleAnchor = React.useCallback(
 		(e: React.SyntheticEvent) => {
 			e.preventDefault()
-			const url = prompt('Insert the URL:')
-			if (!url) {
-				return
-			}
-			editor.wrapAnchor(editor, url)
+			editor.toggleElement('anchor')
 		},
 		[editor],
 	)

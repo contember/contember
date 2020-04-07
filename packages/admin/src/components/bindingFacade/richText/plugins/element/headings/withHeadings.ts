@@ -9,7 +9,7 @@ import { HeadingRenderer, HeadingRendererProps } from './HeadingRenderer'
 
 export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeadings<E> => {
 	const e: E & Partial<WithHeadings<WithAnotherNodeType<E, HeadingElement>>> = editor
-	const { renderElement, insertBreak } = editor
+	const { renderElement, insertBreak, isElementActive, toggleElement } = editor
 
 	const isHeading = (
 		element: SlateNode | ElementNode,
@@ -59,32 +59,39 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 
 	// TODO in the following two functions, we need to conditionally trim the selection so that it doesn't potentially
 	// include empty strings at the edges of top-level elements.
-	e.isWithinHeading = suchThat =>
-		Array.from(ContemberEditor.topLevelNodes(e)).every(([node]) => isHeading(node, suchThat))
-	e.toggleHeading = suchThat => {
-		SlateEditor.withoutNormalizing(e, () => {
-			const topLevelNodes = Array.from(ContemberEditor.topLevelNodes(e))
+	e.isElementActive = (elementType, suchThat) => {
+		if (elementType === headingElementType) {
+			return Array.from(ContemberEditor.topLevelNodes(e)).every(([node]) => isHeading(node, suchThat))
+		}
+		return isElementActive(elementType, suchThat)
+	}
+	e.toggleElement = (elementType, suchThat) => {
+		if (elementType === headingElementType) {
+			SlateEditor.withoutNormalizing(e, () => {
+				const topLevelNodes = Array.from(ContemberEditor.topLevelNodes(e))
 
-			if (topLevelNodes.every(([node]) => isHeading(node, suchThat))) {
-				for (const [, path] of topLevelNodes) {
-					ejectHeading(path)
-				}
-			} else {
-				for (const [node, path] of topLevelNodes) {
-					if (isHeading(node, suchThat)) {
-						continue
+				if (topLevelNodes.every(([node]) => isHeading(node, suchThat))) {
+					for (const [, path] of topLevelNodes) {
+						ejectHeading(path)
 					}
-					ContemberEditor.ejectElement(e, path)
-					const newProps: Partial<HeadingElement> = {
-						...suchThat,
-						type: headingElementType,
+				} else {
+					for (const [node, path] of topLevelNodes) {
+						if (isHeading(node, suchThat)) {
+							continue
+						}
+						ContemberEditor.ejectElement(e, path)
+						const newProps: Partial<HeadingElement> = {
+							...suchThat,
+							type: headingElementType,
+						}
+						Transforms.setNodes(e, newProps, {
+							at: path,
+						})
 					}
-					Transforms.setNodes(e, newProps, {
-						at: path,
-					})
 				}
-			}
-		})
+			})
+		}
+		return toggleElement(elementType, suchThat)
 	}
 
 	e.renderElement = props => {

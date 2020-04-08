@@ -10,7 +10,7 @@ import {
 	RemovalType,
 } from '@contember/binding'
 import * as React from 'react'
-import { Editor, Element as SlateElement, Node as SlateNode, Operation } from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
 import { NormalizedBlock } from '../../../blocks'
 import { contemberContentPlaceholderType, ContemberFieldElementPosition } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
@@ -186,7 +186,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			console.log('op', operation)
 			apply(operation)
 
-			if (path.length > 1) {
+			if (path.length > 1 && operation.type !== 'move_node') {
 				saveElementAt(topLevelIndex)
 			} else {
 				switch (operation.type) {
@@ -266,11 +266,31 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						break
 					}
 					case 'move_node': {
-						const newTopLevel = operation.newPath[0]
-						if (topLevelIndex !== newTopLevel) {
-							removeElementAt(topLevelIndex)
+						const sourcePath = operation.path
+						const targetPathBefore = operation.newPath
+						const targetPathAfter = SlatePath.transform(operation.path, operation)!
+
+						const sourceTopLevelIndex = sourcePath[0]
+						const targetPathBeforeTopLevelIndex = targetPathBefore[0]
+						const targetPathAfterTopLevelIndex = targetPathAfter[0]
+
+						if (
+							sourceTopLevelIndex === targetPathBeforeTopLevelIndex ||
+							SlatePath.equals(targetPathBefore, targetPathAfter)
+						) {
+							saveElementAt(sourceTopLevelIndex)
+						} else {
+							if (sourcePath.length === 1) {
+								removeElementAt(sourceTopLevelIndex)
+							} else {
+								saveElementAt(sourceTopLevelIndex)
+							}
+							if (targetPathAfter.length === 1) {
+								addNewTextElementAt(targetPathAfterTopLevelIndex)
+							} else {
+								saveElementAt(targetPathAfterTopLevelIndex)
+							}
 						}
-						saveElementAt(newTopLevel + (topLevelIndex < newTopLevel ? -1 : 0))
 						break
 					}
 				}

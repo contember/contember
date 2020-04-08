@@ -1,6 +1,6 @@
 {
 	"name": "@contember/binding",
-	"version": "0.4.20-alpha.3",
+	"version": "0.4.20",
 	"main": "index.js",
 	"type": "module",
 	"typings": "dist/src/index.d.ts",
@@ -9,10 +9,10 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/client": "^0.4.20-alpha.3",
-		"@contember/react-client": "^0.4.20-alpha.3",
-		"@contember/react-multipass-rendering": "^0.4.20-alpha.3",
-		"@contember/react-utils": "^0.4.20-alpha.3",
+		"@contember/client": "^0.4.20",
+		"@contember/react-client": "^0.4.20",
+		"@contember/react-multipass-rendering": "^0.4.20",
+		"@contember/react-utils": "^0.4.20",
 		"@contember/schema": "0.7.2",
 		"chevrotain": "6.5.0"
 	},

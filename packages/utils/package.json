@@ -1,6 +1,6 @@
 {
 	"name": "@contember/utils",
-	"version": "0.4.20-alpha.3",
+	"version": "0.4.20",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},

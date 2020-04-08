@@ -9,6 +9,8 @@ export type BatchUpdatesRef = React.MutableRefObject<
 export const withBatching = <E extends BaseEditor>(editor: E, batchUpdatesRef: BatchUpdatesRef): E => {
 	const {
 		addMark,
+		apply,
+		deleteBackward,
 		deleteForward,
 		deleteFragment,
 		insertBreak,
@@ -25,6 +27,8 @@ export const withBatching = <E extends BaseEditor>(editor: E, batchUpdatesRef: B
 	} = editor
 
 	editor.addMark = (key, value) => batchUpdatesRef.current(() => addMark(key, value))
+	editor.apply = operation => batchUpdatesRef.current(() => apply(operation))
+	editor.deleteBackward = unit => batchUpdatesRef.current(() => deleteBackward(unit))
 	editor.deleteForward = unit => batchUpdatesRef.current(() => deleteForward(unit))
 	editor.deleteFragment = () => batchUpdatesRef.current(() => deleteFragment())
 	editor.insertFragment = fragment => batchUpdatesRef.current(() => insertFragment(fragment))

@@ -152,6 +152,7 @@ export const BlockEditorInner = React.memo(
 				textBlockField: desugaredTextBlockField,
 				textElementCache,
 				removalType,
+				placeholder: label,
 			}),
 		)
 

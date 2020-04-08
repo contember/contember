@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Editor, Element as SlateElement, Transforms } from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
 import { BaseEditor } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
@@ -8,7 +8,7 @@ import { OrderedListElement, orderedListElementType } from './OrderedListElement
 import { UnorderedListElement, unorderedListElementType } from './UnorderedListElement'
 
 export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> => {
-	const { renderElement, insertBreak, deleteBackward, isElementActive, toggleElement } = editor
+	const { renderElement, insertBreak, deleteBackward, normalizeNode, isElementActive, toggleElement } = editor
 
 	const e = (editor as any) as EditorWithLists<E>
 
@@ -50,8 +50,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			if (elementType !== unorderedListElementType && elementType !== orderedListElementType) {
 				return toggleElement(elementType, suchThat)
 			}
-			const otherKindOfList =
-				elementType === orderedListElementType ? unorderedListElementType : unorderedListElementType
+			const otherKindOfList = elementType === orderedListElementType ? unorderedListElementType : orderedListElementType
 
 			if (e.isElementActive(elementType, suchThat) || e.isElementActive(otherKindOfList, suchThat)) {
 				return // TODO nope. Just delete the list. :D
@@ -89,6 +88,24 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				}
 				Transforms.wrapNodes(e, emptyList)
 			})
+		},
+		normalizeNode: entry => {
+			const [node, path] = entry
+
+			if (
+				SlateElement.isElement(node) &&
+				(node.type === unorderedListElementType || node.type === orderedListElementType)
+			) {
+				for (const [child, childPath] of SlateNode.children(editor, path)) {
+					if (SlateElement.isElement(child) && child.type !== listItemElementType) {
+						ContemberEditor.ejectElement(editor, childPath)
+						Transforms.setNodes(editor, { type: listItemElementType }, { at: childPath })
+						return
+					}
+				}
+			}
+
+			normalizeNode(entry)
 		},
 	})
 

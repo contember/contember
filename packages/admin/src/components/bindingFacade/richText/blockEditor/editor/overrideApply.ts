@@ -10,9 +10,13 @@ import {
 	RemovalType,
 } from '@contember/binding'
 import * as React from 'react'
-import { Editor, Element as SlateElement, Node as SlateNode, Operation } from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
 import { NormalizedBlock } from '../../../blocks'
-import { contemberContentPlaceholderType, ContemberFieldElementPosition } from '../elements'
+import {
+	ContemberContentPlaceholderElement,
+	contemberContentPlaceholderType,
+	ContemberFieldElementPosition,
+} from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
@@ -32,6 +36,7 @@ export interface OverrideApplyOptions {
 	textBlockDiscriminant: FieldValue
 	textBlockField: RelativeSingleField
 	textElementCache: WeakMap<EntityAccessor, SlateElement>
+	placeholder: ContemberContentPlaceholderElement['placeholder']
 }
 
 export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {
@@ -49,6 +54,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		textBlockDiscriminant,
 		textBlockField,
 		textElementCache,
+		placeholder,
 	} = options
 
 	const fieldBackedElementRefs: {
@@ -94,12 +100,12 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				}
 				return fieldBackedElementRefs[fieldBackedElement.position].current[fieldBackedElement.index]
 			}
-			const setTopLevelElementType = (elementIndex: number, type: string) => {
+			const setTopLevelNode = (elementIndex: number, properties: object) => {
 				apply({
 					type: 'set_node',
 					path: [elementIndex],
-					newProperties: { type },
-					properties: { type },
+					newProperties: properties,
+					properties,
 				})
 			}
 			const getFreshFieldAccessor = (position: ContemberFieldElementPosition, normalizedFieldIndex: number) =>
@@ -180,13 +186,16 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			}
 
 			if (editor.isContemberContentPlaceholderElement(editor.children[topLevelIndex])) {
-				setTopLevelElementType(topLevelIndex, 'paragraph')
+				setTopLevelNode(topLevelIndex, {
+					type: editor.defaultElementType,
+					placeholder: null,
+				})
 				addNewTextElementAt(topLevelIndex)
 			}
-			console.log('op', operation)
 			apply(operation)
+			//console.log('op', operation, editor.children)
 
-			if (path.length > 1) {
+			if (path.length > 1 && operation.type !== 'move_node') {
 				saveElementAt(topLevelIndex)
 			} else {
 				switch (operation.type) {
@@ -210,20 +219,10 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						}
 						if (isLeadingElement(topLevelIndex)) {
 							for (let i = topLevelIndex; i < firstContentIndex; i++) {
-								apply({
-									type: 'set_node',
-									path: [i],
-									newProperties: { index: i },
-									properties: { index: i },
-								})
+								setTopLevelNode(i, { index: i })
 								saveElementAt(i)
 							}
-							apply({
-								type: 'set_node',
-								path: [firstContentIndex],
-								newProperties: { type: 'paragraph', index: null, position: null },
-								properties: { type: 'paragraph', index: null, position: null },
-							})
+							setTopLevelNode(firstContentIndex, { type: editor.defaultElementType, index: null, position: null })
 							addNewTextElementAt(firstContentIndex)
 						} else {
 							saveElementAt(topLevelIndex)
@@ -266,11 +265,33 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						break
 					}
 					case 'move_node': {
-						const newTopLevel = operation.newPath[0]
-						if (topLevelIndex !== newTopLevel) {
-							removeElementAt(topLevelIndex)
+						const sourcePath = operation.path
+						const targetPathBefore = operation.newPath
+						const targetPathAfter = SlatePath.transform(operation.path, operation)!
+
+						const sourceTopLevelIndex = sourcePath[0]
+						const targetPathBeforeTopLevelIndex = targetPathBefore[0]
+						const targetPathAfterTopLevelIndex = targetPathAfter[0]
+
+						if (sourceTopLevelIndex === targetPathBeforeTopLevelIndex) {
+							if (targetPathAfter.length === 1) {
+								addNewTextElementAt(sourceTopLevelIndex)
+								saveElementAt(sourceTopLevelIndex + 1)
+							} else {
+								saveElementAt(sourceTopLevelIndex)
+							}
+						} else {
+							if (sourcePath.length === 1) {
+								removeElementAt(sourceTopLevelIndex)
+							} else {
+								saveElementAt(sourceTopLevelIndex)
+							}
+							if (targetPathAfter.length === 1) {
+								addNewTextElementAt(targetPathAfterTopLevelIndex)
+							} else {
+								saveElementAt(targetPathAfterTopLevelIndex)
+							}
 						}
-						saveElementAt(newTopLevel + (topLevelIndex < newTopLevel ? -1 : 0))
 						break
 					}
 				}
@@ -279,7 +300,10 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				const soleElement = editor.children[firstContentIndex] as SlateElement
 
 				if (editor.isDefaultElement(soleElement) && SlateNode.string(soleElement) === '') {
-					setTopLevelElementType(firstContentIndex, contemberContentPlaceholderType)
+					setTopLevelNode(firstContentIndex, {
+						type: contemberContentPlaceholderType,
+						placeholder,
+					})
 					removeElementAt(firstContentIndex)
 				}
 			}

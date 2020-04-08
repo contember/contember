@@ -273,10 +273,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						const targetPathBeforeTopLevelIndex = targetPathBefore[0]
 						const targetPathAfterTopLevelIndex = targetPathAfter[0]
 
-						if (
-							sourceTopLevelIndex === targetPathBeforeTopLevelIndex ||
-							SlatePath.equals(targetPathBefore, targetPathAfter)
-						) {
+						if (sourceTopLevelIndex === targetPathBeforeTopLevelIndex) {
 							if (targetPathAfter.length === 1) {
 								addNewTextElementAt(sourceTopLevelIndex)
 								saveElementAt(sourceTopLevelIndex + 1)

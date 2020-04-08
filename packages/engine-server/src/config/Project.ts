@@ -7,7 +7,6 @@ type Project = {
 	readonly name: string
 	readonly stages: Array<Project.Stage>
 	readonly db: DatabaseCredentials
-	readonly ignoreMigrations?: boolean
 } & Record<string, unknown>
 
 namespace Project {

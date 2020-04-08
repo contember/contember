@@ -43,7 +43,7 @@ import { ConfigProcessor } from '@contember/engine-plugins'
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
 	}
-	server = await run(debug, config, projectsDir, undefined, plugins)
+	server = await run(debug, config, projectsDir, plugins)
 })().catch(e => {
 	console.log(e)
 	process.exit(1)

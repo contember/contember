@@ -39,7 +39,6 @@ const createContainer = (debug: boolean) =>
 			},
 		},
 		getExampleProjectDirectory(),
-		undefined,
 		[],
 	)
 

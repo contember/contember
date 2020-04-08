@@ -51,18 +51,11 @@ export interface MasterContainer {
 }
 
 class CompositionRoot {
-	createMasterContainer(
-		debug: boolean,
-		config: Config,
-		projectsDirectory: string,
-		projectSchemas: undefined | { [name: string]: Schema },
-		plugins: Plugin[],
-	): MasterContainer {
+	createMasterContainer(debug: boolean, config: Config, projectsDirectory: string, plugins: Plugin[]): MasterContainer {
 		const projectContainers = this.createProjectContainers(
 			debug,
 			Object.values(config.projects),
 			projectsDirectory,
-			projectSchemas,
 			plugins,
 		)
 
@@ -181,7 +174,6 @@ class CompositionRoot {
 		debug: boolean,
 		projects: Array<Project>,
 		projectsDir: string,
-		schemas: undefined | Record<string, Schema>,
 		plugins: Plugin[],
 	): Record<string, ProjectContainer> {
 		const containers = Object.values(projects).map((project: Project): [string, ProjectContainer] => {
@@ -190,7 +182,6 @@ class CompositionRoot {
 				.addService('project', () => project)
 				.addService('projectsDir', () => projectsDir)
 				.addService('graphqlObjectsFactory', () => graphqlObjectFactories)
-				.addService('schema', ({ project }) => (schemas ? schemas[project.slug] : undefined))
 				.addService('connection', ({ project }) => {
 					return new Connection(
 						{

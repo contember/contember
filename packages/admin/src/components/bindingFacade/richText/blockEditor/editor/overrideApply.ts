@@ -183,8 +183,8 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				setTopLevelElementType(topLevelIndex, 'paragraph')
 				addNewTextElementAt(topLevelIndex)
 			}
-			console.log('op', operation)
 			apply(operation)
+			//console.log('op', operation, editor.children)
 
 			if (path.length > 1 && operation.type !== 'move_node') {
 				saveElementAt(topLevelIndex)
@@ -278,7 +278,12 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							sourceTopLevelIndex === targetPathBeforeTopLevelIndex ||
 							SlatePath.equals(targetPathBefore, targetPathAfter)
 						) {
-							saveElementAt(sourceTopLevelIndex)
+							if (targetPathAfter.length === 1) {
+								addNewTextElementAt(sourceTopLevelIndex)
+								saveElementAt(sourceTopLevelIndex + 1)
+							} else {
+								saveElementAt(sourceTopLevelIndex)
+							}
 						} else {
 							if (sourcePath.length === 1) {
 								removeElementAt(sourceTopLevelIndex)

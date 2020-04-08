@@ -50,8 +50,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			if (elementType !== unorderedListElementType && elementType !== orderedListElementType) {
 				return toggleElement(elementType, suchThat)
 			}
-			const otherKindOfList =
-				elementType === orderedListElementType ? unorderedListElementType : unorderedListElementType
+			const otherKindOfList = elementType === orderedListElementType ? unorderedListElementType : orderedListElementType
 
 			if (e.isElementActive(elementType, suchThat) || e.isElementActive(otherKindOfList, suchThat)) {
 				return // TODO nope. Just delete the list. :D

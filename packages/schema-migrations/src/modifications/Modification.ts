@@ -8,6 +8,9 @@ export interface ModificationDescription {
 	failureWarning?: string
 }
 
+export const emptyModificationDescriptionContext: ModificationDescriptionContext = { createdEntities: [] }
+export type ModificationDescriptionContext = { createdEntities: string[] }
+
 export interface Modification<Data> {
 	createSql(builder: MigrationBuilder): void | Promise<void>
 
@@ -15,5 +18,5 @@ export interface Modification<Data> {
 
 	transformEvents(events: ContentEvent[]): ContentEvent[] | Promise<ContentEvent[]>
 
-	describe(context: { createdEntities: string[] }): ModificationDescription
+	describe(context: ModificationDescriptionContext): ModificationDescription
 }

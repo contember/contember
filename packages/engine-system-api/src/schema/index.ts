@@ -73,10 +73,54 @@ export enum EventType {
 	RunMigration = 'RUN_MIGRATION',
 }
 
+export type MigrateError = {
+	readonly __typename?: 'MigrateError'
+	readonly code: MigrateErrorCode
+	readonly migration: Scalars['String']
+	readonly message: Scalars['String']
+}
+
+export enum MigrateErrorCode {
+	MustFollowLatest = 'MUST_FOLLOW_LATEST',
+	AlreadyExecuted = 'ALREADY_EXECUTED',
+	InvalidFormat = 'INVALID_FORMAT',
+	InvalidSchema = 'INVALID_SCHEMA',
+	MigrationFailed = 'MIGRATION_FAILED',
+}
+
+export type MigrateResponse = {
+	readonly __typename?: 'MigrateResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<MigrateError>
+	readonly result?: Maybe<MigrateResult>
+}
+
+export type MigrateResult = {
+	readonly __typename?: 'MigrateResult'
+	readonly message: Scalars['String']
+}
+
+export type Migration = {
+	readonly version: Scalars['String']
+	readonly name: Scalars['String']
+	readonly formatVersion: Scalars['Int']
+	readonly modifications: ReadonlyArray<Modification>
+}
+
+export type Modification = {
+	readonly modification: Scalars['String']
+	readonly data: Scalars['String']
+}
+
 export type Mutation = {
 	readonly __typename?: 'Mutation'
+	readonly migrate: MigrateResponse
 	readonly release: ReleaseResponse
 	readonly rebaseAll: RebaseAllResponse
+}
+
+export type MutationMigrateArgs = {
+	migrations: ReadonlyArray<Migration>
 }
 
 export type MutationReleaseArgs = {
@@ -224,6 +268,13 @@ export type ResolversTypes = {
 	Event: ResolverTypeWrapper<Event>
 	EventType: EventType
 	Mutation: ResolverTypeWrapper<{}>
+	Migration: Migration
+	Int: ResolverTypeWrapper<Scalars['Int']>
+	Modification: Modification
+	MigrateResponse: ResolverTypeWrapper<MigrateResponse>
+	MigrateError: ResolverTypeWrapper<MigrateError>
+	MigrateErrorCode: MigrateErrorCode
+	MigrateResult: ResolverTypeWrapper<MigrateResult>
 	ReleaseResponse: ResolverTypeWrapper<ReleaseResponse>
 	ReleaseErrorCode: ReleaseErrorCode
 	RebaseAllResponse: ResolverTypeWrapper<RebaseAllResponse>
@@ -246,6 +297,13 @@ export type ResolversParentTypes = {
 	Event: Event
 	EventType: EventType
 	Mutation: {}
+	Migration: Migration
+	Int: Scalars['Int']
+	Modification: Modification
+	MigrateResponse: MigrateResponse
+	MigrateError: MigrateError
+	MigrateErrorCode: MigrateErrorCode
+	MigrateResult: MigrateResult
 	ReleaseResponse: ReleaseResponse
 	ReleaseErrorCode: ReleaseErrorCode
 	RebaseAllResponse: RebaseAllResponse
@@ -319,10 +377,44 @@ export type EventResolvers<
 	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
 }
 
+export type MigrateErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MigrateError'] = ResolversParentTypes['MigrateError']
+> = {
+	code?: Resolver<ResolversTypes['MigrateErrorCode'], ParentType, ContextType>
+	migration?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	message?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
+export type MigrateResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MigrateResponse'] = ResolversParentTypes['MigrateResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['MigrateError']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['MigrateResult']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
+export type MigrateResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MigrateResult'] = ResolversParentTypes['MigrateResult']
+> = {
+	message?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
 export type MutationResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = {
+	migrate?: Resolver<
+		ResolversTypes['MigrateResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<MutationMigrateArgs, 'migrations'>
+	>
 	release?: Resolver<
 		ResolversTypes['ReleaseResponse'],
 		ParentType,
@@ -406,6 +498,9 @@ export type Resolvers<ContextType = any> = {
 	DiffResponse?: DiffResponseResolvers<ContextType>
 	DiffResult?: DiffResultResolvers<ContextType>
 	Event?: EventResolvers
+	MigrateError?: MigrateErrorResolvers<ContextType>
+	MigrateResponse?: MigrateResponseResolvers<ContextType>
+	MigrateResult?: MigrateResultResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
 	RebaseAllResponse?: RebaseAllResponseResolvers<ContextType>

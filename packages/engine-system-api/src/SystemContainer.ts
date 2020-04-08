@@ -7,6 +7,7 @@ import TableReferencingResolver from './model/events/TableReferencingResolver'
 import ResolverFactory from './resolvers/ResolverFactory'
 import ReleaseMutationResolver from './resolvers/mutation/ReleaseMutationResolver'
 import {
+	MigrationDescriber,
 	MigrationFilesManager,
 	MigrationsResolver,
 	ModificationHandlerFactory,
@@ -42,6 +43,7 @@ import { Connection, DatabaseCredentials } from '@contember/database'
 import { ResolverContextFactory } from './resolvers'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { DatabaseContextFactory, systemMigrationsDirectory } from './index'
+import { MigrateMutationResolver } from './resolvers/mutation/MigrateMutationResolver'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -113,6 +115,10 @@ export class SystemContainerFactory {
 				'migrationExecutor',
 				({ modificationHandlerFactory }) => new MigrationExecutor(modificationHandlerFactory),
 			)
+			.addService(
+				'migrationDescriber',
+				({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory),
+			)
 
 			.addService('tableReferencingResolver', () => new TableReferencingResolver())
 			.addService(
@@ -166,8 +172,14 @@ export class SystemContainerFactory {
 			)
 			.addService(
 				'projectMigrator',
-				({ stageTree, modificationHandlerFactory, rebaseExecutor, schemaVersionBuilder }) =>
-					new ProjectMigrator(stageTree, modificationHandlerFactory, rebaseExecutor, schemaVersionBuilder),
+				({ stageTree, migrationDescriber, rebaseExecutor, schemaVersionBuilder, executedMigrationsResolver }) =>
+					new ProjectMigrator(
+						stageTree,
+						migrationDescriber,
+						rebaseExecutor,
+						schemaVersionBuilder,
+						executedMigrationsResolver,
+					),
 			)
 
 			.addService(
@@ -192,13 +204,24 @@ export class SystemContainerFactory {
 				({ rebaseExecutor, project }) => new RebeaseAllMutationResolver(rebaseExecutor, project),
 			)
 			.addService(
+				'migrateMutationResolver',
+				({ project, projectMigrator }) => new MigrateMutationResolver(project, projectMigrator),
+			)
+			.addService(
 				'systemResolvers',
-				({ systemStagesQueryResolver, systemDiffQueryResolver, releaseMutationResolver, rebaseMutationResolver }) =>
+				({
+					systemStagesQueryResolver,
+					systemDiffQueryResolver,
+					releaseMutationResolver,
+					rebaseMutationResolver,
+					migrateMutationResolver,
+				}) =>
 					new ResolverFactory(
 						systemStagesQueryResolver,
 						systemDiffQueryResolver,
 						releaseMutationResolver,
 						rebaseMutationResolver,
+						migrateMutationResolver,
 					).create(),
 			)
 			.addService('connection', () => container.connection)

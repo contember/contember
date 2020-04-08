@@ -23,6 +23,7 @@ import {
 	MigrationsCreateCommand,
 } from './commands'
 import { Application } from './cli'
+import { MigrationExecuteCommand } from './commands/migrations/MigrationExecuteCommand'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -36,6 +37,7 @@ import { Application } from './cli'
 		['migrations:diff']: diffCommandFactory,
 		['migrations:describe']: migrationsDescribeFactory,
 		['migrations:create']: () => new MigrationsCreateCommand(),
+		['migrations:execute']: () => new MigrationExecuteCommand(),
 		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),

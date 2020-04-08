@@ -4,10 +4,10 @@ import { setupSystemVariables } from '../../SystemVariablesSetupHelper'
 import { UuidProvider } from '../../utils/uuid'
 import { CommandBus } from '../commands/CommandBus'
 
-export interface DatabaseContext {
-	client: Client
+export interface DatabaseContext<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> {
+	client: Client<ConnectionType>
 	queryHandler: QueryHandler<DatabaseQueryable>
-	transaction: <T>(cb: (db: DatabaseContext) => Promise<T> | T) => Promise<T>
+	transaction: <T>(cb: (db: DatabaseContext<Connection.TransactionLike>) => Promise<T> | T) => Promise<T>
 	commandBus: CommandBus
 }
 
@@ -19,11 +19,11 @@ export class DatabaseContextFactory {
 	}
 }
 
-const createDatabaseContext = (
-	client: Client,
+const createDatabaseContext = <ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike>(
+	client: Client<ConnectionType>,
 	identityId: string | undefined,
 	providers: UuidProvider,
-): DatabaseContext => ({
+): DatabaseContext<ConnectionType> => ({
 	client,
 	queryHandler: client.createQueryHandler(),
 	transaction: cb =>

@@ -12,19 +12,22 @@ export class SchemaVersionBuilder {
 		private readonly schemaMigrator: SchemaMigrator,
 	) {}
 
-	async buildSchemaForStage(db: DatabaseContext, stageSlug: string, after?: VersionedSchema): Promise<Schema> {
+	async buildSchemaForStage(db: DatabaseContext, stageSlug: string, after?: VersionedSchema): Promise<VersionedSchema> {
 		const schema = await this.buildSchema(db, after)
 		return this.filterSchemaByStage(schema, stageSlug)
 	}
 
-	async buildSchema(db: DatabaseContext, after?: VersionedSchema): Promise<Schema> {
+	async buildSchema(db: DatabaseContext, after?: VersionedSchema): Promise<VersionedSchema> {
 		return (await this.executedMigrationsResolver.getMigrations(db, after?.version)).reduce(
-			(schema, migr) => this.schemaMigrator.applyModifications(schema, migr.modifications, migr.formatVersion),
-			after || emptySchema,
+			(schema, migr) => ({
+				...this.schemaMigrator.applyModifications(schema, migr.modifications, migr.formatVersion),
+				version: migr.version,
+			}),
+			after || { ...emptySchema, version: '' },
 		)
 	}
 
-	private filterSchemaByStage(schema: Schema, stageSlug: string) {
+	private filterSchemaByStage(schema: VersionedSchema, stageSlug: string) {
 		return {
 			...schema,
 			acl: {

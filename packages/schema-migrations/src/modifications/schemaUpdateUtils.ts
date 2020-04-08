@@ -1,4 +1,5 @@
 import { Acl, Model, Schema } from '@contember/schema'
+import { SchemaUpdateError } from './exceptions'
 
 type Updater<T> = (value: T) => T
 export type SchemaUpdater = Updater<Schema>
@@ -93,13 +94,18 @@ export const updateModel = (...modelUpdate: (ModelUpdater | undefined)[]): Schem
 		.reduce((model, updater) => updater(model), schema.model),
 })
 
-export const updateEntity = (name: string, entityUpdate: EntityUpdater): ModelUpdater => model => ({
-	...model,
-	entities: {
-		...model.entities,
-		[name]: entityUpdate(model.entities[name]),
-	},
-})
+export const updateEntity = (name: string, entityUpdate: EntityUpdater): ModelUpdater => model => {
+	if (!model.entities[name]) {
+		throw new SchemaUpdateError(`Entity ${name} not found`)
+	}
+	return {
+		...model,
+		entities: {
+			...model.entities,
+			[name]: entityUpdate(model.entities[name]),
+		},
+	}
+}
 
 export const updateEveryEntity = (entityUpdate: EntityUpdater): ModelUpdater => model => ({
 	...model,
@@ -109,23 +115,30 @@ export const updateEveryEntity = (entityUpdate: EntityUpdater): ModelUpdater => 
 export const updateField = <T extends Model.AnyField = Model.AnyField>(
 	name: string,
 	fieldUpdater: FieldUpdater<T>,
-): EntityUpdater => entity => ({
-	...entity,
-	fields: {
-		...entity.fields,
-		[name]: fieldUpdater(entity.fields[name] as T, entity),
-	},
-})
+): EntityUpdater => entity => {
+	if (!entity.fields[name]) {
+		throw new SchemaUpdateError(`Field ${entity.name}::${name} not found`)
+	}
+	return {
+		...entity,
+		fields: {
+			...entity.fields,
+			[name]: fieldUpdater(entity.fields[name] as T, entity),
+		},
+	}
+}
 
 export const updateEveryField = (fieldUpdater: FieldUpdater<Model.AnyField>): EntityUpdater => entity => ({
 	...entity,
 	fields: Object.fromEntries(Object.entries(entity.fields).map(([name, field]) => [name, fieldUpdater(field, entity)])),
 })
 
-export const addField = (field: Model.AnyField): EntityUpdater => entity => ({
-	...entity,
-	fields: {
-		...entity.fields,
-		[field.name]: field,
-	},
-})
+export const addField = (field: Model.AnyField): EntityUpdater => entity => {
+	return {
+		...entity,
+		fields: {
+			...entity.fields,
+			[field.name]: field,
+		},
+	}
+}

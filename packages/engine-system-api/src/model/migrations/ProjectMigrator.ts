@@ -1,7 +1,6 @@
 import StageTree from '../stages/StageTree'
-import { Migration, Modification, ModificationHandlerFactory } from '@contember/schema-migrations'
-import { createMigrationBuilder } from '@contember/database-migrations'
-import { Client, DatabaseQueryable, wrapIdentifier } from '@contember/database'
+import { Migration, MigrationDescriber, Modification } from '@contember/schema-migrations'
+import { Client, ConnectionError, DatabaseQueryable, wrapIdentifier } from '@contember/database'
 import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
 import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
@@ -12,26 +11,33 @@ import { QueryHandler } from '@contember/queryable'
 import { DiffQuery } from '../queries'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import RecreateContentEvent from '../commands/RecreateContentEvent'
-import { UuidProvider } from '../../utils/uuid'
 import { assertEveryIsContentEvent } from '../events/eventUtils'
 import { SaveMigrationCommand } from '../commands/SaveMigrationCommand'
 import RebaseExecutor from '../events/RebaseExecutor'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import { DatabaseContext } from '../database/DatabaseContext'
-import { VERSION_INITIAL } from '@contember/schema-migrations/dist/src/modifications/ModificationVersions'
+import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
+import { MigrateErrorCode } from '../../schema'
 
 type StageEventsMap = Record<string, ContentEvent[]>
 
 export default class ProjectMigrator {
 	constructor(
 		private readonly stageTree: StageTree,
-		private readonly modificationHandlerFactory: ModificationHandlerFactory,
+		private readonly migrationDescriber: MigrationDescriber,
 		private readonly rebaseExecutor: RebaseExecutor,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 	) {}
 
 	public async migrate(db: DatabaseContext, migrationsToExecute: Migration[], progressCb: (version: string) => void) {
-		let schema = await this.schemaVersionBuilder.buildSchema(db)
+		if (migrationsToExecute.length === 0) {
+			return
+		}
+		let { version, ...schema } = await this.schemaVersionBuilder.buildSchema(db)
+		await this.validateMigrations(db, schema, version, migrationsToExecute)
+
+		const sorted = [...migrationsToExecute].sort((a, b) => a.version.localeCompare(b.version))
 
 		await this.rebaseExecutor.rebaseAll(db)
 		const rootStage = this.stageTree.getRoot()
@@ -39,7 +45,7 @@ export default class ProjectMigrator {
 		let stageEvents = await this.fetchStageEvents(db.queryHandler, commonEventsMatrix, rootStage)
 
 		let previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
-		for (const migration of migrationsToExecute) {
+		for (const migration of sorted) {
 			progressCb(migration.version)
 			const formatVersion = migration.formatVersion
 
@@ -50,6 +56,7 @@ export default class ProjectMigrator {
 					stageEvents,
 					modification,
 					formatVersion,
+					migration.version,
 				)
 			}
 
@@ -70,30 +77,54 @@ export default class ProjectMigrator {
 		await this.reCreateEvents(db, { ...rootStage, event_id: previousId }, stageEvents)
 	}
 
+	private async validateMigrations(
+		db: DatabaseContext,
+		schema: Schema,
+		version: string,
+		migrationsToExecute: Migration[],
+	) {
+		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
+		for (const migration of migrationsToExecute) {
+			if (executedMigrations.find(it => it.version === migration.version)) {
+				throw new AlreadyExecutedMigrationError(migration.version, `Migration is already executed`)
+			}
+			if (migration.version < version) {
+				throw new MustFollowLatestMigrationError(migration.version, `Must follow latest executed migration ${version}`)
+			}
+			const described = await this.migrationDescriber.describeModifications(schema, migration)
+			if (described.length === 0) {
+				continue
+			}
+			const latestModification = described[described.length - 1]
+			schema = latestModification.schema
+			if (latestModification.errors.length > 0) {
+				throw new InvalidSchemaError(
+					migration.version,
+					'Migration generates invalid schema: \n' +
+						latestModification.errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
+				)
+			}
+		}
+	}
+
 	private async applyModification(
 		db: Client,
 		schema: Schema,
 		events: StageEventsMap,
 		modification: Migration.Modification,
 		formatVersion: number,
+		migrationVersion: string,
 	): Promise<[Schema, StageEventsMap]> {
 		const stage = this.stageTree.getRoot()
-		const builder = createMigrationBuilder()
-		const modificationHandler = this.modificationHandlerFactory.create(
-			modification.modification,
-			modification,
+		const { sql, schema: newSchema, handler } = await this.migrationDescriber.describeModification(
 			schema,
+			modification,
 			formatVersion,
 		)
-		await modificationHandler.createSql(builder)
-		const sql = builder.getSql()
-		await this.executeOnStage(db, stage, sql)
+		await this.executeOnStage(db, stage, sql, migrationVersion)
 
-		const newEvents = await this.applyOnChildren(db, stage, modificationHandler, events, sql)
-
-		schema = modificationHandler.getSchemaUpdater()(schema)
-
-		return [schema, newEvents]
+		const newEvents = await this.applyOnChildren(db, stage, handler, events, sql, migrationVersion)
+		return [newSchema, newEvents]
 	}
 
 	private async applyOnChildren(
@@ -102,23 +133,37 @@ export default class ProjectMigrator {
 		modificationHandler: Modification<any>,
 		events: StageEventsMap,
 		sql: string,
+		migrationVersion: string,
 	): Promise<StageEventsMap> {
 		for (const childStage of this.stageTree.getChildren(stage)) {
 			const stageEvents = events[childStage.slug]
 
-			const transformedEvents = await modificationHandler.transformEvents(stageEvents)
-			if (stageEvents !== transformedEvents) {
-				events = { ...events, [childStage.slug]: transformedEvents }
+			try {
+				const transformedEvents = await modificationHandler.transformEvents(stageEvents)
+				if (stageEvents !== transformedEvents) {
+					events = { ...events, [childStage.slug]: transformedEvents }
+				}
+			} catch (e) {
+				console.error(e)
+				throw new MigrationFailedError(migrationVersion, e.message)
 			}
-			await this.executeOnStage(db, childStage, sql)
-			events = await this.applyOnChildren(db, childStage, modificationHandler, events, sql)
+			await this.executeOnStage(db, childStage, sql, migrationVersion)
+			events = await this.applyOnChildren(db, childStage, modificationHandler, events, sql, migrationVersion)
 		}
 		return events
 	}
 
-	private async executeOnStage(db: Client, stage: StageWithoutEvent, sql: string) {
+	private async executeOnStage(db: Client, stage: StageWithoutEvent, sql: string, migrationVersion: string) {
 		await db.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
-		await db.query(sql)
+		try {
+			await db.query(sql)
+		} catch (e) {
+			if (e instanceof ConnectionError) {
+				console.error(e)
+				throw new MigrationFailedError(migrationVersion, e.message)
+			}
+			throw e
+		}
 	}
 
 	private async fetchStageEvents(
@@ -158,4 +203,28 @@ export default class ProjectMigrator {
 			await this.reCreateEvents(db, { ...childStage, event_id: previousId }, events)
 		}
 	}
+}
+
+export abstract class MigrationError extends Error {
+	public abstract code: MigrateErrorCode
+
+	constructor(public readonly version: string, public readonly migrationError: string) {
+		super(`${version}: ${migrationError}`)
+	}
+}
+
+export class MustFollowLatestMigrationError extends MigrationError {
+	code = MigrateErrorCode.MustFollowLatest
+}
+
+export class AlreadyExecutedMigrationError extends MigrationError {
+	code = MigrateErrorCode.AlreadyExecuted
+}
+
+export class MigrationFailedError extends MigrationError {
+	code = MigrateErrorCode.MigrationFailed
+}
+
+export class InvalidSchemaError extends MigrationError {
+	code = MigrateErrorCode.InvalidSchema
 }

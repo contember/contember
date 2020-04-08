@@ -20,12 +20,20 @@ import { Editable, Slate } from 'slate-react'
 import { assertNever } from '../../../../utils'
 import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
 import { CreateEditorPublicOptions } from '../editorFactory'
+import { RichEditor } from '../RichEditor'
+import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
+import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
 import { createBlockEditor } from './editor'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { BlockEditorGetEntityByKeyContext, BlockEditorGetNormalizedFieldBackedElementContext } from './renderers'
-import { HoveringToolbar, HoveringToolbarProps } from './toolbars'
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 
+const RB = RichEditor.buttons
+const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
+	[RB.bold, RB.italic, RB.underline, RB.anchor],
+	[RB.headingOne, RB.headingTwo],
+	[RB.strikeThrough, RB.code],
+]
 export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 	children: React.ReactNode
 	label: React.ReactNode
@@ -36,11 +44,11 @@ export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 	textBlockField: string | SugaredRelativeSingleField
 	textBlockDiscriminatedBy?: LiteralBasedBlockProps['discriminateBy']
 	textBlockDiscriminatedByScalar?: ScalarBasedBlockProps['discriminateByScalar']
-	// TODO configure marks
-	// TODO configure elements
 
-	blockButtons?: HoveringToolbarProps['blockButtons']
-	otherBlockButtons?: HoveringToolbarProps['otherBlockButtons']
+	// TODO
+	inlineButtons?: HoveringToolbarsProps['inlineButtons']
+	blockButtons?: BlockHoveringToolbarContentsProps['blockButtons']
+	otherBlockButtons?: BlockHoveringToolbarContentsProps['otherBlockButtons']
 }
 
 export interface BlockEditorInnerInternalProps {
@@ -68,6 +76,7 @@ export const BlockEditorInner = React.memo(
 		textBlockDiscriminatedBy,
 		textBlockDiscriminatedByScalar,
 		textBlockField,
+		inlineButtons = defaultInlineButtons,
 		blockButtons,
 		otherBlockButtons,
 		//trailingFieldBackedElements
@@ -198,7 +207,12 @@ export const BlockEditorInner = React.memo(
 							}}
 							size="large"
 						>
-							<HoveringToolbar blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
+							<HoveringToolbars
+								inlineButtons={inlineButtons}
+								blockButtons={
+									<BlockHoveringToolbarContents blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
+								}
+							/>
 						</EditorCanvas>
 					</Slate>
 				</BlockEditorGetNormalizedFieldBackedElementContext.Provider>

@@ -183,6 +183,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				setTopLevelElementType(topLevelIndex, 'paragraph')
 				addNewTextElementAt(topLevelIndex)
 			}
+			console.log('op', operation)
 			apply(operation)
 
 			if (path.length > 1) {
@@ -264,9 +265,14 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						removeElementAt(topLevelIndex)
 						break
 					}
-					case 'move_node':
-						// TODO Not even slate-react supports this at the moment
+					case 'move_node': {
+						const newTopLevel = operation.newPath[0]
+						if (topLevelIndex !== newTopLevel) {
+							removeElementAt(topLevelIndex)
+						}
+						saveElementAt(newTopLevel + (topLevelIndex < newTopLevel ? -1 : 0))
 						break
+					}
 				}
 			}
 			if (sortedEntities.length === 1) {

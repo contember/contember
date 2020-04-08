@@ -6,6 +6,7 @@ import {
 	withCode,
 	withHeadings,
 	withItalic,
+	withLists,
 	withParagraphs,
 	withStrikeThrough,
 	withUnderline,
@@ -20,6 +21,7 @@ const pluginAugmenters: {
 	anchor: withAnchors,
 	paragraph: withParagraphs,
 	heading: withHeadings,
+	list: withLists,
 
 	bold: withBold,
 	code: withCode,

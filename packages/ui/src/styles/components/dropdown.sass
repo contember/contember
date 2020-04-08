@@ -10,7 +10,7 @@
 		color: $cui-dropdown-content-color
 		z-index: $cui-dropdown-zIndex
 
-		&-in
+		&-in:not(.view-unstyled)
 			margin-top: $cui-dropdown-button-content-gap-size
 			border-radius: $cui-dropdown-content-border-radius
 			background: $cui-dropdown-content-background
@@ -24,6 +24,8 @@
 
 		&[data-placement^="right"] &-in
 			margin-left: $cui-dropdown-button-content-gap-size
+
+		&.view-unstyled &-in
 
 	&-contentContainer
 		//

@@ -9,8 +9,10 @@ import {
 	headingThreeToolbarButton,
 	headingTwoToolbarButton,
 	italicToolbarButton,
+	orderedListToolbarButton,
 	strikeThroughToolbarButton,
 	underlineToolbarButton,
+	unorderedListToolbarButton,
 } from './plugins'
 
 export namespace RichEditor {
@@ -22,6 +24,8 @@ export namespace RichEditor {
 		headingFour: headingFourToolbarButton,
 		headingFive: headingFiveToolbarButton,
 		headingSix: headingSixToolbarButton,
+		orderedList: orderedListToolbarButton,
+		unorderedList: unorderedListToolbarButton,
 
 		bold: boldToolbarButton,
 		code: codeToolbarButton,

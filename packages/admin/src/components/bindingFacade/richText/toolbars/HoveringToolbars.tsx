@@ -5,7 +5,7 @@ import { HoveringToolbarContents, HoveringToolbarContentsProps } from './Hoverin
 
 export interface HoveringToolbarsProps {
 	inlineButtons?: HoveringToolbarContentsProps['buttons']
-	blockButtons?: HoveringToolbarContentsProps['buttons']
+	blockButtons?: HoveringToolbarContentsProps['buttons'] | React.ReactElement // TODO this is NASTY
 }
 
 export const HoveringToolbars = React.memo((props: HoveringToolbarsProps) => {
@@ -22,7 +22,8 @@ export const HoveringToolbars = React.memo((props: HoveringToolbarsProps) => {
 			</Portal>
 			{props.blockButtons && (
 				<UIToolbar isActive={blockToolbarActive}>
-					<HoveringToolbarContents buttons={props.blockButtons} />
+					{Array.isArray(props.blockButtons) && <HoveringToolbarContents buttons={props.blockButtons} />}
+					{Array.isArray(props.blockButtons) || props.blockButtons}
 				</UIToolbar>
 			)}
 		</>

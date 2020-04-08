@@ -1,4 +1,5 @@
 import { IconSourceSpecification } from '@contember/ui'
+import * as React from 'react'
 import { ElementNode, ElementSpecifics, TextNode, TextSpecifics } from '../baseEditor'
 
 export interface MarkSpecificToolbarButton<T extends TextNode> {
@@ -11,7 +12,8 @@ export interface ElementSpecificToolbarButton<E extends ElementNode> {
 }
 
 export interface CommonToolbarButton extends IconSourceSpecification {
-	title?: string // TODO add tooltip support
+	label: React.ReactNode
+	title?: string
 }
 
 export type ElementToolbarButton<E extends ElementNode> = CommonToolbarButton & ElementSpecificToolbarButton<E>

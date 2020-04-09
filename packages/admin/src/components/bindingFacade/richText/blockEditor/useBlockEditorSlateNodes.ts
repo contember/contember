@@ -62,7 +62,7 @@ export const useBlockEditorSlateNodes = ({
 			if (fieldValue === null || fieldValue === '' || normalizedElement.format === 'plainText') {
 				const fieldElement: ContemberFieldElement = {
 					type: contemberFieldElementType,
-					children: [{ text: '' }],
+					children: [{ text: fieldValue || '' }],
 					position,
 					index,
 				}

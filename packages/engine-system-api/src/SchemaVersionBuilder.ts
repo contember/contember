@@ -14,6 +14,9 @@ export class SchemaVersionBuilder {
 
 	async buildSchemaForStage(db: DatabaseContext, stageSlug: string, after?: VersionedSchema): Promise<VersionedSchema> {
 		const schema = await this.buildSchema(db, after)
+		if (schema === after) {
+			return schema
+		}
 		return this.filterSchemaByStage(schema, stageSlug)
 	}
 

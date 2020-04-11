@@ -1,4 +1,4 @@
-import { Literal, ObjectBuilder, QueryBuilder } from '../graphQlBuilder'
+import { Literal, ObjectBuilder, QueryBuilder } from '../../graphQlBuilder'
 
 class GenerateUploadUrlMutationBuilder {
 	private static generateUploadUrlFields = new ObjectBuilder()

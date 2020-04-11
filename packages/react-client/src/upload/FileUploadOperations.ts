@@ -1,14 +1,9 @@
-import { FileId } from './FileId'
+import { FileUploader } from '@contember/client'
 
-export type StartUpload = (
-	files: Array<{
-		id: FileId
-		file: File
-	}>,
-) => void
-export type CancelUpload = (fileIds: FileId[]) => void
+export type StartUpload = (files: Iterable<File>, uploader?: FileUploader) => void
+export type AbortUpload = (files: Iterable<File>) => void
 
 export interface FileUploadOperations {
 	startUpload: StartUpload
-	cancelUpload: CancelUpload
+	abortUpload: AbortUpload
 }

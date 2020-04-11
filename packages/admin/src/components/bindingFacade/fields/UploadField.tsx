@@ -8,7 +8,7 @@ import {
 	useMutationState,
 	useRelativeSingleField,
 } from '@contember/binding'
-import { FileUploadReadyState, FileUploadState, useFileUpload } from '@contember/react-client'
+import { FileUploadReadyState, SingleFileUploadState, useFileUpload } from '@contember/react-client'
 import { Box, Button, FormGroup } from '@contember/ui'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
@@ -22,7 +22,7 @@ import {
 
 export interface UploadFieldMetadata {
 	accessor: FieldAccessor<string>
-	uploadState: FileUploadState | undefined
+	uploadState: SingleFileUploadState | undefined
 	emptyText?: React.ReactNode
 }
 
@@ -45,14 +45,11 @@ export const UploadField = Component<UploadFieldProps>(
 
 		entityRef.current = entity
 
+		const stateArray = Array.from(uploadState)
+		const singleFileUploadState = stateArray.length ? stateArray[stateArray.length - 1][1] : undefined
 		const onDrop = React.useCallback(
-			async (files: File[]) => {
-				startUpload([
-					{
-						id: 0,
-						file: files[0],
-					},
-				])
+			([file]: File[]) => {
+				startUpload([file])
 			},
 			[startUpload],
 		)
@@ -66,20 +63,17 @@ export const UploadField = Component<UploadFieldProps>(
 		const metadata: UploadFieldMetadata = React.useMemo(
 			() => ({
 				emptyText: props.emptyText,
-				uploadState: uploadState[0],
+				uploadState: singleFileUploadState,
 				accessor,
 			}),
-			[accessor, props.emptyText, uploadState],
+			[accessor, props.emptyText, singleFileUploadState],
 		)
 		let file: File | undefined = undefined
 		let previewUrl: string | undefined = undefined
 
-		if (0 in uploadState) {
-			const state = uploadState[0]
-			if (state.file && state.previewUrl) {
-				file = state.file
-				previewUrl = state.previewUrl
-			}
+		if (singleFileUploadState) {
+			file = singleFileUploadState.file
+			previewUrl = singleFileUploadState.previewUrl
 		}
 
 		React.useEffect(() => {
@@ -153,14 +147,14 @@ const Inner = React.memo((props: InnerProps) => {
 		if (
 			uploadState &&
 			uploadState.readyState === FileUploadReadyState.Success &&
-			uploadState.fileUrl !== accessor.currentValue
+			uploadState.result.fileUrl !== accessor.currentValue
 		) {
-			accessor.updateValue?.(uploadState.fileUrl)
+			accessor.updateValue?.(uploadState.result.fileUrl)
 		}
 	}, [uploadState, accessor])
 
 	const renderPreview = () => {
-		if (uploadState && uploadState.readyState !== FileUploadReadyState.Uninitialized && uploadState.previewUrl) {
+		if (uploadState) {
 			return props.children(uploadState.previewUrl)
 		}
 		if (accessor.currentValue) {
@@ -168,8 +162,8 @@ const Inner = React.memo((props: InnerProps) => {
 		}
 		return <span className="fileInput-empty">{emptyText}</span>
 	}
-	const renderUploadStatusMessage = (uploadState?: FileUploadState) => {
-		if (!uploadState || uploadState.readyState === FileUploadReadyState.Uninitialized) {
+	const renderUploadStatusMessage = (uploadState?: SingleFileUploadState) => {
+		if (!uploadState) {
 			return (
 				<>
 					<Button size="small">Select a file to upload</Button>
@@ -178,10 +172,12 @@ const Inner = React.memo((props: InnerProps) => {
 			)
 		}
 		switch (uploadState.readyState) {
-			case FileUploadReadyState.Initializing:
-				return `Starting upload`
 			case FileUploadReadyState.Uploading:
+				if (uploadState.progress === undefined) {
+					return `Starting upload`
+				}
 				return `Upload progress: ${(uploadState.progress * 100).toFixed()}%`
+			case FileUploadReadyState.Aborted:
 			case FileUploadReadyState.Error:
 				return `Upload failed`
 			case FileUploadReadyState.Success:

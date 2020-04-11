@@ -1,139 +1,94 @@
-import { GenerateUploadUrlMutationBuilder } from '@contember/client'
+import { FileUploaderInitializeOptions, S3FileUploader, UploadedFileMetadata } from '@contember/client'
 import * as React from 'react'
 import { useSessionToken } from '../auth'
 import { useCurrentContentGraphQlClient } from '../content'
-import { FileId } from './FileId'
+import { FileUploadAction } from './FileUploadAction'
 import { FileUploadActionType } from './FileUploadActionType'
 import { FileUploadCompoundState } from './FileUploadCompoundState'
-import { CancelUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
-import { FileUploadReadyState } from './FileUploadReadyState'
+import { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
+import { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
-import { readAsArrayBuffer } from './utils'
+import { InternalFileMetadata } from './InternalFileMetadata'
 
 export type FileUpload = [FileUploadCompoundState, FileUploadOperations]
 
 export interface FileUploadOptions {
 	maxUpdateFrequency?: number // This does NOT apply to all kinds of updates.
-	fileExpiration?: GenerateUploadUrlMutationBuilder.FileParameters['expiration']
-	filePrefix?: GenerateUploadUrlMutationBuilder.FileParameters['prefix']
-	fileAcl?: GenerateUploadUrlMutationBuilder.FileParameters['acl']
 }
 
 export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 250
 
 	const client = useCurrentContentGraphQlClient()
-	const apiToken = useSessionToken()
+	const contentApiToken = useSessionToken()
 
 	const updateTimeoutRef = React.useRef<number | undefined>(undefined)
 	const isFirstRenderRef = React.useRef(true)
 
-	const [uploadRequests] = React.useState(() => new Map<FileId, XMLHttpRequest>())
 	const [multiTemporalState, dispatch] = React.useReducer(fileUploadReducer, undefined, initializeFileUploadState)
 
-	const cancelUpload = React.useCallback<CancelUpload>(
-		fileIds => {
-			for (const fileId of fileIds) {
-				if (uploadRequests.has(fileId)) {
-					uploadRequests.get(fileId)!.abort()
-					uploadRequests.delete(fileId)
-				}
-			}
-			dispatch({
-				type: FileUploadActionType.Uninitialize,
-				fileIds,
-			})
-		},
-		[uploadRequests],
-	)
+	const abortUpload = React.useCallback<AbortUpload>(files => {
+		dispatch({
+			type: FileUploadActionType.Abort,
+			files,
+		})
+	}, [])
 	const startUpload = React.useCallback<StartUpload>(
-		async files => {
-			const existingIds: FileId[] = files.map(file => file.id).filter(id => id in multiTemporalState.liveState)
-
-			if (existingIds.length) {
-				cancelUpload(existingIds)
-			}
-
-			dispatch({
-				type: FileUploadActionType.Initialize,
-				filesWithMetadata: files.map(file => ({
-					id: file.id,
-					file: file.file,
-					previewUrl: URL.createObjectURL(file.file),
-				})),
-			})
-			const parameters: GenerateUploadUrlMutationBuilder.MutationParameters = {}
-			const fileIds: FileId[] = []
-			const aliasPrefix = 'file'
+		(files, uploader = new S3FileUploader()) => {
+			const filesWithInternalMetadata = new Map<File, InternalFileMetadata>()
+			const filesWithMetadata = new Map<File, UploadedFileMetadata>()
 
 			for (const file of files) {
-				parameters[`${aliasPrefix}${file.id}`] = {
-					contentType: file.file.type,
-					prefix: options?.filePrefix,
-					expiration: options?.fileExpiration,
-					acl: options?.fileAcl,
-				}
-				fileIds.push(file.id)
-			}
-
-			const mutation = GenerateUploadUrlMutationBuilder.buildQuery(parameters)
-			try {
-				const response = await client.sendRequest(mutation, {}, apiToken)
-				const responseData: GenerateUploadUrlMutationBuilder.MutationResponse = response.data
-
-				dispatch({
-					type: FileUploadActionType.StartUploading,
-					fileIds,
+				const abortController = new AbortController()
+				filesWithInternalMetadata.set(file, {
+					previewUrl: URL.createObjectURL(file),
+					abortController,
+					uploader,
 				})
-				for (const file of files) {
-					const datumBody = responseData[`${aliasPrefix}${file.id}`]
-					const uploadRequestBody = await readAsArrayBuffer(file.file)
-					const xhr = new XMLHttpRequest()
-					uploadRequests.set(file.id, xhr)
-
-					xhr.open(datumBody.method, datumBody.url)
-
-					for (const header of datumBody.headers) {
-						xhr.setRequestHeader(header.key, header.value)
-					}
-					xhr.addEventListener('load', () => {
-						dispatch({
-							type: FileUploadActionType.FinishSuccessfully,
-							fileId: file.id,
-							fileUrl: datumBody.publicUrl,
-						})
-					})
-					xhr.addEventListener('error', () => {
-						dispatch({
-							type: FileUploadActionType.FinishWithError,
-							fileIds: [file.id],
-						})
-					})
-					xhr.upload?.addEventListener('progress', e => {
-						dispatch({
-							type: FileUploadActionType.UpdateUploadProgress,
-							fileId: file.id,
-							progress: e.loaded / e.total,
-						})
-					})
-					xhr.send(uploadRequestBody)
-				}
-			} catch (error) {
-				dispatch({
-					type: FileUploadActionType.FinishWithError,
-					fileIds,
+				filesWithMetadata.set(file, {
+					abortSignal: abortController.signal,
 				})
 			}
+
+			dispatch({
+				type: FileUploadActionType.StartUploading,
+				files: filesWithInternalMetadata,
+			})
+
+			const options: FileUploaderInitializeOptions = {
+				onProgress: progress => {
+					dispatch({
+						type: FileUploadActionType.UpdateUploadProgress,
+						progress,
+					})
+				},
+				onSuccess: result => {
+					dispatch({
+						type: FileUploadActionType.FinishSuccessfully,
+						result,
+					})
+				},
+				onError: error => {
+					dispatch({
+						type: FileUploadActionType.FinishWithError,
+						error,
+					})
+				},
+				contentApiToken,
+				client,
+			}
+
+			uploader.upload(filesWithMetadata, options)
 		},
-		[apiToken, cancelUpload, client, multiTemporalState.liveState, options, uploadRequests],
+		[client, contentApiToken],
 	)
 
 	const operations = React.useMemo<FileUploadOperations>(
 		() => ({
 			startUpload,
-			cancelUpload,
+			abortUpload,
 		}),
-		[cancelUpload, startUpload],
+		[abortUpload, startUpload],
 	)
 
 	React.useEffect(() => {
@@ -170,10 +125,8 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 
 	React.useEffect(
 		() => () => {
-			for (const fileId in multiTemporalState.liveState) {
-				const state = multiTemporalState.liveState[fileId]
-
-				if (state.readyState !== FileUploadReadyState.Uninitialized && state.previewUrl !== undefined) {
+			for (const [, state] of multiTemporalState.liveState) {
+				if (state !== undefined) {
 					URL.revokeObjectURL(state.previewUrl)
 				}
 			}

@@ -1,6 +1,3 @@
-import { FileId } from './FileId'
-import { FileUploadState } from './FileUploadState'
+import { SingleFileUploadState } from './SingleFileUploadState'
 
-export type FileUploadCompoundState = {
-	[fileId in FileId]: FileUploadState
-}
+export type FileUploadCompoundState = Map<File, SingleFileUploadState>

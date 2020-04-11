@@ -1,34 +1,28 @@
-import { FileId } from './FileId'
+import { FileUploadProgress } from '@contember/client'
+import { InternalFileMetadata } from './InternalFileMetadata'
 import { FileUploadActionType } from './FileUploadActionType'
-import { FileWithMetadata } from './FileWithMetadata'
 
 export type FileUploadAction =
 	| {
 			type: FileUploadActionType.PublishNewestState
 	  }
 	| {
-			type: FileUploadActionType.Uninitialize
-			fileIds: FileId[]
-	  }
-	| {
-			type: FileUploadActionType.Initialize
-			filesWithMetadata: FileWithMetadata[]
-	  }
-	| {
 			type: FileUploadActionType.StartUploading
-			fileIds: FileId[]
+			files: Iterable<[File, InternalFileMetadata]>
 	  }
 	| {
 			type: FileUploadActionType.UpdateUploadProgress
-			fileId: FileId
-			progress: number
+			progress: Iterable<[File, FileUploadProgress]>
 	  }
 	| {
 			type: FileUploadActionType.FinishSuccessfully
-			fileId: FileId
-			fileUrl: string
+			result: Iterable<[File, any]>
 	  }
 	| {
 			type: FileUploadActionType.FinishWithError
-			fileIds: FileId[]
+			error: Iterable<[File, any]>
+	  }
+	| {
+			type: FileUploadActionType.Abort
+			files: Iterable<File>
 	  }

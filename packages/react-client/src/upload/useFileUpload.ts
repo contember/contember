@@ -2,10 +2,8 @@ import { FileUploaderInitializeOptions, S3FileUploader, UploadedFileMetadata } f
 import * as React from 'react'
 import { useSessionToken } from '../auth'
 import { useCurrentContentGraphQlClient } from '../content'
-import { FileUploadAction } from './FileUploadAction'
 import { FileUploadActionType } from './FileUploadActionType'
 import { FileUploadCompoundState } from './FileUploadCompoundState'
-import { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 import { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
 import { InternalFileMetadata } from './InternalFileMetadata'
@@ -17,7 +15,7 @@ export interface FileUploadOptions {
 }
 
 export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
-	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 250
+	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 100
 
 	const client = useCurrentContentGraphQlClient()
 	const contentApiToken = useSessionToken()
@@ -78,7 +76,14 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 				client,
 			}
 
-			uploader.upload(filesWithMetadata, options)
+			try {
+				uploader.upload(filesWithMetadata, options)
+			} catch (_) {
+				dispatch({
+					type: FileUploadActionType.FinishWithError,
+					error: Array.from(filesWithMetadata).map(([file]) => [file, undefined]), // TODO this is crap.
+				})
+			}
 		},
 		[client, contentApiToken],
 	)

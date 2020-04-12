@@ -3,7 +3,7 @@ import { FileUploadProgress } from './FileUploadProgress'
 import { UploadedFileMetadata } from './UploadedFileMetadata'
 
 export interface FileUploader {
-	upload: (files: Map<File, UploadedFileMetadata>, options: FileUploaderInitializeOptions) => void
+	upload: (files: Map<File, UploadedFileMetadata>, options: FileUploaderInitializeOptions) => Promise<void>
 }
 
 export interface FileUploaderInitializeOptions {

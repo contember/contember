@@ -1,12 +1,10 @@
 import { EntityAccessor } from '@contember/binding'
 import { DesugaredAggregateUploadProps } from './AggregateUploadProps'
-import { isAudio } from './isAudio'
-import { isImage } from './isImage'
-import { isVideo } from './isVideo'
 import { populateAudioFileMetadataFields } from './populateAudioFileMetadataFields'
 import { populateGenericFileMetadataFields } from './populateGenericFileMetadataFields'
 import { populateImageFileMetadataFields } from './populateImageFileMetadataFields'
 import { populateVideoFileMetadataFields } from './populateVideoFileMetadataFields'
+import { isAudio, isImage, isVideo } from './utils'
 
 export type FileMetadataFieldsPopulator = (parentEntity: EntityAccessor) => void
 

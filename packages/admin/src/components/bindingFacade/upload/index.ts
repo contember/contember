@@ -1,10 +1,9 @@
+export * from './utils'
+
 export * from './AggregateUploadProps'
 export * from './AudioFileUploadProps'
 export * from './GenericFileUploadProps'
 export * from './ImageFileUploadProps'
-export * from './isAudio'
-export * from './isImage'
-export * from './isVideo'
 export * from './getAggregateFileMetadataFieldsPopulator'
 export * from './populateAudioFileMetadataFields'
 export * from './populateGenericFileMetadataFields'

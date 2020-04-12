@@ -8,6 +8,7 @@ import {
 	useMutationState,
 	useRelativeSingleField,
 } from '@contember/binding'
+import { FileUploader } from '@contember/client'
 import { FileUploadReadyState, SingleFileUploadState, useFileUpload } from '@contember/react-client'
 import { Box, Button, FormGroup } from '@contember/ui'
 import { assertNever } from '@contember/utils'
@@ -30,6 +31,7 @@ export type UploadFieldProps = {
 	accept?: string
 	children: (url: string) => React.ReactNode
 	emptyText?: React.ReactNode
+	uploader?: FileUploader
 } & SimpleRelativeSingleFieldProps &
 	AggregateUploadProps
 
@@ -49,9 +51,11 @@ export const UploadField = Component<UploadFieldProps>(
 		const singleFileUploadState = stateArray.length ? stateArray[stateArray.length - 1][1] : undefined
 		const onDrop = React.useCallback(
 			([file]: File[]) => {
-				startUpload([file])
+				startUpload([file], {
+					uploader: props.uploader,
+				})
 			},
-			[startUpload],
+			[props.uploader, startUpload],
 		)
 		const { getRootProps, getInputProps, isDragActive } = useDropzone({
 			onDrop,

@@ -1,1 +1,6 @@
+export * from './AudioFileMetadataPopulator'
 export * from './FileDataPopulator'
+export * from './FileUrlDataPopulator'
+export * from './GenericFileMetadataPopulator'
+export * from './ImageFileMetadataPopulator'
+export * from './VideoFileMetadataPopulator'

@@ -1,4 +1,4 @@
-import { FileUploaderInitializeOptions, S3FileUploader, UploadedFileMetadata } from '@contember/client'
+import { S3FileUploader, UploadedFileMetadata } from '@contember/client'
 import * as React from 'react'
 import { useSessionToken } from '../auth'
 import { useCurrentContentGraphQlClient } from '../content'
@@ -32,7 +32,8 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 		})
 	}, [])
 	const startUpload = React.useCallback<StartUpload>(
-		(files, uploader = new S3FileUploader()) => {
+		(files, options = {}) => {
+			const { uploader = new S3FileUploader() } = options
 			const filesWithInternalMetadata = new Map<File, InternalFileMetadata>()
 			const filesWithMetadata = new Map<File, UploadedFileMetadata>()
 
@@ -53,31 +54,29 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 				files: filesWithInternalMetadata,
 			})
 
-			const options: FileUploaderInitializeOptions = {
-				onProgress: progress => {
-					dispatch({
-						type: FileUploadActionType.UpdateUploadProgress,
-						progress,
-					})
-				},
-				onSuccess: result => {
-					dispatch({
-						type: FileUploadActionType.FinishSuccessfully,
-						result,
-					})
-				},
-				onError: error => {
-					dispatch({
-						type: FileUploadActionType.FinishWithError,
-						error,
-					})
-				},
-				contentApiToken,
-				client,
-			}
-
 			try {
-				uploader.upload(filesWithMetadata, options)
+				uploader.upload(filesWithMetadata, {
+					onProgress: progress => {
+						dispatch({
+							type: FileUploadActionType.UpdateUploadProgress,
+							progress,
+						})
+					},
+					onSuccess: result => {
+						dispatch({
+							type: FileUploadActionType.FinishSuccessfully,
+							result,
+						})
+					},
+					onError: error => {
+						dispatch({
+							type: FileUploadActionType.FinishWithError,
+							error,
+						})
+					},
+					contentApiToken,
+					client,
+				})
 			} catch (_) {
 				dispatch({
 					type: FileUploadActionType.FinishWithError,
@@ -131,9 +130,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	React.useEffect(
 		() => () => {
 			for (const [, state] of multiTemporalState.liveState) {
-				if (state !== undefined) {
-					URL.revokeObjectURL(state.previewUrl)
-				}
+				URL.revokeObjectURL(state.previewUrl)
 			}
 		},
 		[multiTemporalState.liveState],

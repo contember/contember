@@ -4,11 +4,11 @@ import { Schema } from '@contember/schema'
 export class ContentSchemaResolver {
 	private schemaCache: { [stage: string]: VersionedSchema } = {}
 
-	constructor(private readonly schemaVersionBuilder: SchemaVersionBuilder, private readonly db: DatabaseContext) {}
+	constructor(private readonly schemaVersionBuilder: SchemaVersionBuilder) {}
 
-	public async getSchema(stage: string): Promise<Schema> {
+	public async getSchema(db: DatabaseContext, stage: string): Promise<Schema> {
 		const cachedSchema = this.schemaCache[stage]
-		const newSchema = await this.schemaVersionBuilder.buildSchemaForStage(this.db, stage, cachedSchema)
+		const newSchema = await this.schemaVersionBuilder.buildSchemaForStage(db, stage, cachedSchema)
 		this.schemaCache[stage] = newSchema
 		return newSchema
 	}

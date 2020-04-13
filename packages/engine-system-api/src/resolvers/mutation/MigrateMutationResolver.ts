@@ -10,14 +10,14 @@ import { ProjectMigrator } from '../../model/migrations'
 import { AlreadyExecutedMigrationError, MigrationError } from '../../model/migrations/ProjectMigrator'
 
 export class MigrateMutationResolver implements MutationResolver<'migrate'> {
-	constructor(private readonly project: ProjectConfig, private readonly projectMigrator: ProjectMigrator) {}
+	constructor(private readonly projectMigrator: ProjectMigrator) {}
 	async migrate(
 		parent: any,
 		args: MutationMigrateArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<MigrateResponse> {
-		await context.requireAccess(new ProjectScope(this.project), Actions.PROJECT_MIGRATE)
+		await context.requireAccess(new ProjectScope(context.project), Actions.PROJECT_MIGRATE)
 		const migrations: Migration[] = []
 		for (const { formatVersion, name, version, modifications } of args.migrations) {
 			migrations.push({
@@ -30,7 +30,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 
 		return context.db.transaction(async trx => {
 			try {
-				await this.projectMigrator.migrate(trx, migrations, () => null)
+				await this.projectMigrator.migrate(trx, context.project, migrations, () => null)
 			} catch (e) {
 				if (e instanceof MigrationError) {
 					await trx.client.connection.rollback()

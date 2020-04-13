@@ -5,32 +5,34 @@ import { ContentEvent } from '@contember/engine-common'
 import DependencyBuilder from './DependencyBuilder'
 import EventApplier from './EventApplier'
 import EventsRebaser from './EventsRebaser'
-import StageTree from '../stages/StageTree'
+import { StageTree, createStageTree } from '../stages/StageTree'
 import { ImplementationException } from '../../utils/exceptions'
 import { assertEveryIsContentEvent } from './eventUtils'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import { Schema } from '@contember/schema'
 import { DatabaseContext } from '../database/DatabaseContext'
+import { ProjectConfig } from '../../types'
 
 class RebaseExecutor {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
-		private readonly stageTree: StageTree,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
-	public async rebaseAll(db: DatabaseContext) {
-		const root = this.stageTree.getRoot()
+	public async rebaseAll(db: DatabaseContext, project: ProjectConfig) {
+		const stageTree = createStageTree(project)
+		const root = stageTree.getRoot()
 		const commonEvents = await db.queryHandler.fetch(new StageCommonEventsMatrixQuery())
-		for (const stage of this.stageTree.getChildren(root)) {
-			await this.rebase(db, commonEvents, stage, root)
+		for (const stage of stageTree.getChildren(root)) {
+			await this.rebase(db, stageTree, commonEvents, stage, root)
 		}
 	}
 
 	private async rebase(
 		db: DatabaseContext,
+		stageTree: StageTree,
 		eventsInfoMatrix: StageCommonEventsMatrixQuery.Result,
 		stage: StageWithoutEvent,
 		base: StageWithoutEvent,
@@ -81,8 +83,16 @@ class RebaseExecutor {
 			)
 		}
 
-		for (const childStage of this.stageTree.getChildren(stage)) {
-			await this.rebase(db, eventsInfoMatrix, childStage, stage, [...prevEventsToApply, ...eventsToApply], newHead)
+		for (const childStage of stageTree.getChildren(stage)) {
+			await this.rebase(
+				db,
+				stageTree,
+				eventsInfoMatrix,
+				childStage,
+				stage,
+				[...prevEventsToApply, ...eventsToApply],
+				newHead,
+			)
 		}
 	}
 

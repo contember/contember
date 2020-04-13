@@ -3,46 +3,31 @@ import DbQueriesExtension from '../../core/graphql/DbQueriesExtension'
 import { Context, ExecutionContainerFactory, flattenVariables } from '@contember/engine-content-api'
 import { GraphQLSchema } from 'graphql'
 import { KoaContext } from '../../core/koa'
-import { ProjectMemberMiddlewareFactory } from '../project-common'
-import { ContentApolloMiddlewareFactory } from './ContentApolloMiddlewareFactory'
-import LRUCache from 'lru-cache'
+import { ProjectMemberMiddlewareState } from '../project-common'
 import { getArgumentValues } from 'graphql/execution/values'
-import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 import { setupSystemVariables } from '@contember/engine-system-api'
-import { TimerMiddlewareFactory } from '../TimerMiddlewareFactory'
 import uuid from 'uuid'
 import { GraphQLExtension } from 'graphql-extensions'
 import { Acl, Schema } from '@contember/schema'
 import { ErrorContextProvider, ErrorHandlerExtension } from '../../core/graphql/ErrorHandlerExtension'
-import { AssignDbMiddlewareState } from './ContentMiddlewareFactory'
+import { ContentServerMiddlewareState } from './ContentServerMiddleware'
+import { AuthMiddlewareState, TimerMiddlewareState } from '../common'
 
 type InputKoaContext = KoaContext<
-	ProjectMemberMiddlewareFactory.KoaState &
-		AssignDbMiddlewareState &
-		ContentApolloMiddlewareFactory.KoaState &
-		TimerMiddlewareFactory.KoaState &
-		AuthMiddlewareFactory.KoaState
+	ProjectMemberMiddlewareState & ContentServerMiddlewareState & TimerMiddlewareState & AuthMiddlewareState
 >
 
 type ExtendedGraphqlContext = Context & { errorContextProvider: ErrorContextProvider }
 class ContentApolloServerFactory {
-	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
-		max: 100,
-	})
-
 	constructor(private readonly projectName: string, private readonly debug: boolean) {}
 
 	public create(permissions: Acl.Permissions, schema: Schema, dataSchema: GraphQLSchema): ApolloServer {
-		const server = this.cache.get(dataSchema)
-		if (server) {
-			return server
-		}
 		const extensions: Array<() => GraphQLExtension> = []
 		extensions.push(() => new ErrorHandlerExtension(this.projectName, 'content'))
 		if (this.debug) {
 			extensions.push(() => new DbQueriesExtension())
 		}
-		const newServer = new ApolloServer({
+		return new ApolloServer({
 			uploads: false,
 			playground: false,
 			introspection: true,
@@ -51,8 +36,6 @@ class ContentApolloServerFactory {
 			schema: dataSchema,
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createGraphqlContext(permissions, schema, ctx),
 		})
-		this.cache.set(dataSchema, newServer)
-		return newServer
 	}
 
 	private createGraphqlContext(

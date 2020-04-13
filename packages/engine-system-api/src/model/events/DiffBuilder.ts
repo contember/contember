@@ -7,6 +7,7 @@ import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
 import { assertEveryIsContentEvent } from './eventUtils'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import { DatabaseContext } from '../database/DatabaseContext'
+import { ProjectConfig } from '../../types'
 
 class DiffBuilder {
 	constructor(
@@ -17,6 +18,7 @@ class DiffBuilder {
 
 	public async build(
 		db: DatabaseContext,
+		project: ProjectConfig,
 		permissionContext: EventsPermissionsVerifier.Context,
 		baseStage: Stage,
 		headStage: Stage,
@@ -38,7 +40,14 @@ class DiffBuilder {
 		assertEveryIsContentEvent(events)
 		const schema = await this.schemaVersionBuilder.buildSchema(db)
 		const dependencies = await this.dependencyBuilder.build(schema, events)
-		const permissions = await this.permissionsVerifier.verify(db, permissionContext, headStage, baseStage, events)
+		const permissions = await this.permissionsVerifier.verify(
+			db,
+			project,
+			permissionContext,
+			headStage,
+			baseStage,
+			events,
+		)
 
 		return {
 			ok: true,

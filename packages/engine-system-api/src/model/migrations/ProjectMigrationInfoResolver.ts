@@ -1,18 +1,28 @@
 import { ProjectConfig } from '../../types'
-import { calculateMigrationChecksum, Migration, MigrationsResolver } from '@contember/schema-migrations'
+import {
+	calculateMigrationChecksum,
+	Migration,
+	MigrationFilesManager,
+	MigrationsResolver,
+} from '@contember/schema-migrations'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { ExecutedMigration } from '../dtos/ExecutedMigration'
 import { DatabaseContext } from '../database/DatabaseContext'
 
 class ProjectMigrationInfoResolver {
 	constructor(
-		private readonly project: ProjectConfig,
-		private readonly migrationsResolver: MigrationsResolver,
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
+		private readonly projectsDir: string,
 	) {}
 
-	public async getMigrationsInfo(db: DatabaseContext): Promise<ProjectMigrationInfoResolver.Result> {
-		const allMigrations = await this.migrationsResolver.getMigrations()
+	public async getMigrationsInfo(
+		db: DatabaseContext,
+		project: ProjectConfig,
+	): Promise<ProjectMigrationInfoResolver.Result> {
+		const migrationsResolver = new MigrationsResolver(
+			MigrationFilesManager.createForProject(this.projectsDir, project.directory || project.slug),
+		)
+		const allMigrations = await migrationsResolver.getMigrations()
 		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
 		const latestMigration = executedMigrations.reduce<string | null>(
 			(latest, migration) => (!latest || migration.version > latest ? migration.version : latest),
@@ -54,7 +64,7 @@ class ProjectMigrationInfoResolver {
 		}
 
 		return {
-			migrationsDirectory: this.migrationsResolver.directory,
+			migrationsDirectory: migrationsResolver.directory,
 			migrationsToExecute,
 			allMigrations,
 			currentVersion: latestMigration,

@@ -33,7 +33,6 @@ export interface ContentPermissionVerifier {
 
 class EventsPermissionsVerifier {
 	constructor(
-		private readonly project: ProjectConfig,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly authorizator: Authorizator,
 		private readonly contentPermissionVerifier: ContentPermissionVerifier,
@@ -41,6 +40,7 @@ class EventsPermissionsVerifier {
 
 	public async verify(
 		db: DatabaseContext,
+		project: ProjectConfig,
 		permissionContext: EventsPermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
@@ -56,11 +56,12 @@ class EventsPermissionsVerifier {
 			return events.map(it => it.id).reduce((acc, id) => ({ ...acc, [id]: true }), {})
 		}
 
-		return this.verifyPermissions(db, permissionContext, sourceStage, targetStage, events)
+		return this.verifyPermissions(db, project, permissionContext, sourceStage, targetStage, events)
 	}
 
 	private async verifyPermissions(
 		db: DatabaseContext,
+		project: ProjectConfig,
 		context: EventsPermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
@@ -80,7 +81,7 @@ class EventsPermissionsVerifier {
 		const eventsByTable = this.groupEventsByTable(contentEvents)
 
 		const permissionContext = {
-			projectRoles: await context.identity.getProjectRoles(this.project.slug),
+			projectRoles: await context.identity.getProjectRoles(project.slug),
 			variables: context.variables,
 		}
 		const sourceSchema = await this.schemaVersionBuilder.buildSchemaForStage(db, sourceStage.slug)

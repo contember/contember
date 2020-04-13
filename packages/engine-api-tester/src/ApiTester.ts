@@ -1,6 +1,7 @@
 import 'jasmine'
 import {
 	CreateInitEventCommand,
+	DatabaseContextFactory,
 	ProjectConfig,
 	SystemContainer,
 	SystemContainerFactory,
@@ -8,7 +9,7 @@ import {
 	typeDefs as systemTypeDefs,
 	unnamedIdentity,
 } from '@contember/engine-system-api'
-import { MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
+import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import {
 	GraphQlSchemaBuilderFactory,
 	PermissionsByIdentityFactory,
@@ -32,6 +33,7 @@ export class ApiTester {
 
 	constructor(
 		public readonly client: Client,
+		public readonly databaseContextFactory: DatabaseContextFactory,
 		public readonly systemContainer: SystemContainer,
 		public readonly content: ContentApiTester,
 		public readonly system: SystemApiTester,
@@ -54,6 +56,8 @@ export class ApiTester {
 		await connection.end()
 
 		const projectConnection = createConnection(dbName)
+		const providers = { uuid: createUuidGenerator('a452') }
+		const databaseContextFactory = new DatabaseContextFactory(projectConnection.createClient('system'), providers)
 
 		// await setupSystemVariables(projectDb, unnamedIdentity, { uuid: createUuidGenerator('a450') })
 
@@ -62,24 +66,16 @@ export class ApiTester {
 
 		const systemContainerFactory = new SystemContainerFactory()
 		let systemContainerBuilder = systemContainerFactory.createBuilder({
-			connection: projectConnection,
 			projectsDir: ApiTester.getMigrationsDir(),
-			project: { ...ApiTester.project, ...(options.project || {}) },
 			contentPermissionsVerifier: new PermissionsVerifier(new PermissionsByIdentityFactory()),
 			modificationHandlerFactory,
-			providers: { uuid: createUuidGenerator('a452') },
+			providers: providers,
 		})
 		if (options.systemContainerHook) {
 			systemContainerBuilder = options.systemContainerHook(systemContainerBuilder)
 		}
-		if (options.migrationsResolver) {
-			systemContainerBuilder = systemContainerBuilder.replaceService(
-				'migrationsResolver',
-				() => options.migrationsResolver!,
-			)
-		}
 		const systemContainer = systemContainerBuilder.build()
-		const db = systemContainer.systemDatabaseContextFactory.create(unnamedIdentity)
+		const db = databaseContextFactory.create(unnamedIdentity)
 
 		await db.commandBus.execute(new CreateInitEventCommand())
 
@@ -94,13 +90,17 @@ export class ApiTester {
 				},
 			},
 		})
+		const projectSlug = options.project?.slug || ApiTester.project.slug
+		const migrationFilesManager = MigrationFilesManager.createForProject(ApiTester.getMigrationsDir(), projectSlug)
+		const migrationsResolver = new MigrationsResolver(migrationFilesManager)
 
+		const projectConfig = { ...options.project, ...ApiTester.project }
 		const stageManager = new TesterStageManager(
-			options.project ? options.project.stages || [] : [],
+			projectConfig,
 			db,
 			systemContainer.stageCreator,
 			systemContainer.projectMigrator,
-			systemContainer.migrationsResolver,
+			migrationsResolver,
 		)
 
 		const contentApiTester = new ContentApiTester(
@@ -109,13 +109,20 @@ export class ApiTester {
 			stageManager,
 			systemContainer.schemaVersionBuilder,
 		)
-		const systemApiTester = new SystemApiTester(db, systemContainer.releaseExecutor, systemSchema, systemContainer)
+		const systemApiTester = new SystemApiTester(
+			db,
+			projectConfig,
+			systemContainer.releaseExecutor,
+			systemSchema,
+			systemContainer,
+		)
 		const sequenceTester = new SequenceTester(db.client.createQueryHandler(), contentApiTester, systemApiTester)
 
 		let closed = false
 
 		return new ApiTester(
 			db.client,
+			databaseContextFactory,
 			systemContainer,
 			contentApiTester,
 			systemApiTester,

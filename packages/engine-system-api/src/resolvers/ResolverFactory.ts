@@ -5,7 +5,7 @@ import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
 import { GraphQLResolveInfo } from 'graphql'
 import ReleaseMutationResolver from './mutation/ReleaseMutationResolver'
-import RebeaseAllMutationResolver from './mutation/RebeaseAllMutationResolver'
+import RebaseAllMutationResolver from './mutation/RebaseAllMutationResolver'
 import { MigrateMutationResolver } from './mutation/MigrateMutationResolver'
 
 class ResolverFactory {
@@ -13,7 +13,7 @@ class ResolverFactory {
 		private readonly stagesQueryResolver: StagesQueryResolver,
 		private readonly diffQueryResolver: DiffQueryResolver,
 		private readonly releaseMutationResolver: ReleaseMutationResolver,
-		private readonly rebaseMutationResolver: RebeaseAllMutationResolver,
+		private readonly rebaseMutationResolver: RebaseAllMutationResolver,
 		private readonly migrateMutationResolver: MigrateMutationResolver,
 	) {}
 

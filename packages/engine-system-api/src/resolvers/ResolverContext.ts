@@ -3,19 +3,23 @@ import { Identity } from '@contember/engine-common'
 import { Acl } from '@contember/schema'
 import { ForbiddenError } from 'apollo-server-errors'
 import { DatabaseContext, DatabaseContextFactory } from '../model'
+import { ProjectConfig } from '../types'
 
 export class ResolverContextFactory {
-	constructor(
-		private readonly systemDbContext: DatabaseContextFactory,
-		private readonly authorizator: Authorizator<Identity>,
-	) {}
+	constructor(private readonly authorizator: Authorizator<Identity>) {}
 
-	public create(identity: Identity, variables: Acl.VariablesMap): ResolverContext {
+	public create(
+		systemDbContext: DatabaseContext,
+		project: ProjectConfig,
+		identity: Identity,
+		variables: Acl.VariablesMap,
+	): ResolverContext {
 		return {
+			project,
 			identity,
 			variables,
 			authorizator: this.authorizator,
-			db: this.systemDbContext.create(identity.id),
+			db: systemDbContext,
 			isAllowed: async (scope, action) => await this.authorizator.isAllowed(identity, scope, action),
 			requireAccess: async (scope, action, message?) => {
 				if (!(await this.authorizator.isAllowed(identity, scope, action))) {
@@ -27,6 +31,7 @@ export class ResolverContextFactory {
 }
 
 export interface ResolverContext {
+	readonly project: ProjectConfig
 	readonly identity: Identity
 	readonly db: DatabaseContext
 	readonly variables: Acl.VariablesMap

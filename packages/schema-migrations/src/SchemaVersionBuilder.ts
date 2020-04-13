@@ -2,7 +2,6 @@ import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { SchemaMigrator } from './SchemaMigrator'
 import { MigrationsResolver } from './MigrationsResolver'
-import { VERSION_INITIAL } from './modifications/ModificationVersions'
 
 export class SchemaVersionBuilder {
 	constructor(

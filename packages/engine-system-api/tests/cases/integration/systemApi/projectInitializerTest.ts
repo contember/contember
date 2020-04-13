@@ -1,41 +1,30 @@
 import 'jasmine'
 import { ApiTester, createCreateEvent, createRunMigrationEvent, GQL } from '@contember/engine-api-tester'
-import { createMock } from '../../../src/utils'
-import StageTree from '../../../../src/model/stages/StageTree'
-import { StageWithoutEvent } from '../../../../src/model/dtos/Stage'
 import { Migration, VERSION_LATEST } from '@contember/schema-migrations'
 import { createMigrationResolver } from '@contember/engine-api-tester/dist/src/migrationResolver'
 import { TIMEOUT } from '../../../src/constants'
+import { ProjectConfig, StageConfig } from '../../../../src'
 
 describe('project initializer', () => {
 	it(
 		'create preview stage',
 		async () => {
-			const prodStage: StageWithoutEvent = {
+			const prodStage: StageConfig = {
 				name: 'Prod',
 				slug: 'prod',
 			}
-			const stages: Record<string, StageWithoutEvent[]> = {}
-
-			const stageTree = createMock<StageTree>({
-				getRoot(): StageWithoutEvent {
-					return prodStage
-				},
-				getChildren(stage: StageWithoutEvent): StageWithoutEvent[] {
-					return stages[stage.slug] || []
-				},
-			})
+			const project: ProjectConfig = {
+				slug: 'test',
+				stages: [prodStage],
+			}
 
 			const tester = await ApiTester.create({
 				project: {
 					stages: [prodStage],
 				},
-				systemContainerHook: container => {
-					return container.replaceService('stageTree', () => stageTree)
-				},
 			})
 
-			await tester.systemContainer.projectInitializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project)
 			const createdStagesA = await tester.stages.refreshCreatedStages()
 			expect(createdStagesA).toContain('prod')
 			expect(createdStagesA).not.toContain('preview')
@@ -51,14 +40,19 @@ describe('project initializer', () => {
       }`,
 			)
 
-			stages['prod'] = [
-				{
-					name: 'Preview',
-					slug: 'preview',
-				},
-			]
+			const project2: ProjectConfig = {
+				slug: 'test',
+				stages: [
+					prodStage,
+					{
+						name: 'Preview',
+						slug: 'preview',
+						base: 'prod',
+					},
+				],
+			}
 
-			await tester.systemContainer.projectInitializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project2)
 			await tester.stages.refreshCreatedStages()
 
 			const createdStagesB = await tester.stages.refreshCreatedStages()
@@ -84,42 +78,31 @@ describe('project initializer', () => {
 	it(
 		'creates second preview stage',
 		async () => {
-			const prodStage: StageWithoutEvent = {
+			const prodStage: StageConfig = {
 				name: 'Prod',
 				slug: 'prod',
 			}
-			const previewStage: StageWithoutEvent = {
+			const previewStage: StageConfig = {
 				name: 'Preview',
 				slug: 'preview',
+				base: 'prod',
 			}
-			const preview2Stage: StageWithoutEvent = {
+			const preview2Stage: StageConfig = {
 				name: 'Preview 2',
 				slug: 'preview2',
+				base: 'preview',
 			}
 
-			const stages: Record<string, StageWithoutEvent[]> = {
-				prod: [previewStage],
+			const config1: ProjectConfig = {
+				slug: 'test',
+				stages: [prodStage, previewStage],
 			}
-
-			const stageTree = createMock<StageTree>({
-				getRoot(): StageWithoutEvent {
-					return prodStage
-				},
-				getChildren(stage: StageWithoutEvent): StageWithoutEvent[] {
-					return stages[stage.slug] || []
-				},
-			})
 
 			const tester = await ApiTester.create({
-				project: {
-					stages: [prodStage, previewStage],
-				},
-				systemContainerHook: container => {
-					return container.replaceService('stageTree', () => stageTree)
-				},
+				project: config1,
 			})
 
-			await tester.systemContainer.projectInitializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, config1)
 			const createdStagesA = await tester.stages.refreshCreatedStages()
 
 			expect(createdStagesA).toContain('prod')
@@ -161,9 +144,12 @@ describe('project initializer', () => {
 				},
 			)
 
-			stages['preview'] = [preview2Stage]
+			const config2: ProjectConfig = {
+				slug: 'test',
+				stages: [prodStage, previewStage, preview2Stage],
+			}
 
-			await tester.systemContainer.projectInitializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, config2)
 
 			await tester.stages.refreshCreatedStages()
 
@@ -193,17 +179,19 @@ describe('project initializer', () => {
 	it(
 		'migrate stages with rebase',
 		async () => {
-			const prodStage: StageWithoutEvent = {
+			const prodStage: StageConfig = {
 				name: 'Prod',
 				slug: 'prod',
 			}
-			const previewStage: StageWithoutEvent = {
+			const previewStage: StageConfig = {
 				name: 'Preview',
 				slug: 'preview',
+				base: 'prod',
 			}
 
-			const stages: Record<string, StageWithoutEvent[]> = {
-				prod: [previewStage],
+			const project: ProjectConfig = {
+				slug: 'test',
+				stages: [prodStage, previewStage],
 			}
 
 			const migrations: Migration[] = [
@@ -246,15 +234,6 @@ describe('project initializer', () => {
 				},
 			]
 
-			const stageTree = createMock<StageTree>({
-				getRoot(): StageWithoutEvent {
-					return prodStage
-				},
-				getChildren(stage: StageWithoutEvent): StageWithoutEvent[] {
-					return stages[stage.slug] || []
-				},
-			})
-
 			const migrationsResolver = createMigrationResolver(migrations)
 
 			const tester = await ApiTester.create({
@@ -262,12 +241,9 @@ describe('project initializer', () => {
 					stages: [prodStage, previewStage],
 				},
 				migrationsResolver,
-				systemContainerHook: container => {
-					return container.replaceService('stageTree', () => stageTree)
-				},
 			})
 
-			await tester.systemContainer.projectInitializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project)
 			await tester.stages.refreshCreatedStages()
 
 			const response = await tester.content.queryContent(
@@ -306,7 +282,7 @@ describe('project initializer', () => {
 				],
 			})
 
-			await tester.systemContainer.projectInitializer.initialize()
+			await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project)
 			await tester.stages.refreshCreatedStages()
 
 			await tester.sequences.verifySequence(

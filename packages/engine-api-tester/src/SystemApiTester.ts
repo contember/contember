@@ -4,6 +4,7 @@ import { GQL } from './tags'
 import { Identity } from '@contember/engine-common'
 import {
 	DatabaseContext,
+	ProjectConfig,
 	Schema,
 	setupSystemVariables,
 	StageBySlugQuery,
@@ -18,6 +19,7 @@ export class SystemApiTester {
 
 	constructor(
 		private readonly db: DatabaseContext,
+		private readonly project: ProjectConfig,
 		private readonly releaseExecutor: ReleaseExecutor,
 		private readonly systemSchema: GraphQLSchema,
 		private readonly systemContainer: SystemContainer,
@@ -38,7 +40,7 @@ export class SystemApiTester {
 			new Identity.StaticIdentity(testUuid(888), options.roles || [], {
 				[project.slug]: options.projectRoles || [Identity.ProjectRole.ADMIN],
 			})
-		const context = this.systemContainer.resolverContextFactory.create(identity, {})
+		const context = this.systemContainer.resolverContextFactory.create(this.db, this.project, identity, {})
 
 		return await graphql(this.systemSchema, gql, null, context, variables)
 	}
@@ -99,6 +101,7 @@ export class SystemApiTester {
 
 		await this.releaseExecutor.execute(
 			this.db,
+			this.project,
 			{
 				identity: new Identity.StaticIdentity(testUuid(666), [], {
 					[project.slug]: [Identity.ProjectRole.ADMIN],

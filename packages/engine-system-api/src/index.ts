@@ -12,5 +12,6 @@ export * from './ProjectInitializer'
 export { default as typeDefs } from './schema/system.graphql'
 export * from './utils/providers'
 export { Schema }
+export * from './SystemServerContainer'
 
 export const systemMigrationsDirectory = __dirname + '/../../migrations'

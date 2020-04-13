@@ -1,22 +1,12 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
-import StagesQueryResolver from './resolvers/query/StagesQueryResolver'
-import DiffResponseBuilder from './model/events/DiffResponseBuilder'
-import DiffQueryResolver from './resolvers/query/DiffQueryResolver'
 import { Builder, Container } from '@contember/dic'
 import TableReferencingResolver from './model/events/TableReferencingResolver'
-import ResolverFactory from './resolvers/ResolverFactory'
-import ReleaseMutationResolver from './resolvers/mutation/ReleaseMutationResolver'
 import {
 	MigrationDescriber,
-	MigrationFilesManager,
-	MigrationsResolver,
 	ModificationHandlerFactory,
 	SchemaDiffer,
 	SchemaMigrator,
-	SchemaVersionBuilder as MigrationsSchemaVersionBuiler,
 } from '@contember/schema-migrations'
-import { ProjectConfig } from './types'
-import RebeaseAllMutationResolver from './resolvers/mutation/RebeaseAllMutationResolver'
 import { Resolvers } from './schema'
 import PermissionsFactory from './model/authorization/PermissionsFactory'
 import { ContentPermissionVerifier, EventsPermissionsVerifier } from './model/events/EventsPermissionsVerifier'
@@ -29,37 +19,39 @@ import SameRowDependencyBuilder from './model/events/dependency/SameRowDependenc
 import TransactionDependencyBuilder from './model/events/dependency/TransactionDependencyBuilder'
 import DeletedRowReferenceDependencyBuilder from './model/events/dependency/DeletedRowReferenceDependencyBuilder'
 import CreatedRowReferenceDependencyBuilder from './model/events/dependency/CreatedRowReferenceDependencyBuilder'
-import DiffBuilder from './model/events/DiffBuilder'
 import EventApplier from './model/events/EventApplier'
 import EventsRebaser from './model/events/EventsRebaser'
-import StageTree from './model/stages/StageTree'
 import RebaseExecutor from './model/events/RebaseExecutor'
-import ReleaseExecutor from './model/events/ReleaseExecutor'
 import ProjectMigrator from './model/migrations/ProjectMigrator'
 import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
 import StageCreator from './model/stages/StageCreator'
 import { ProjectInitializer } from './ProjectInitializer'
-import { Connection, DatabaseCredentials } from '@contember/database'
+import { DatabaseCredentials } from '@contember/database'
 import { ResolverContextFactory } from './resolvers'
 import { MigrationsRunner } from '@contember/database-migrations'
-import { DatabaseContextFactory, systemMigrationsDirectory } from './index'
+import { systemMigrationsDirectory } from './index'
+import DiffBuilder from './model/events/DiffBuilder'
+import ReleaseExecutor from './model/events/ReleaseExecutor'
+import StagesQueryResolver from './resolvers/query/StagesQueryResolver'
+import DiffResponseBuilder from './model/events/DiffResponseBuilder'
+import DiffQueryResolver from './resolvers/query/DiffQueryResolver'
+import ReleaseMutationResolver from './resolvers/mutation/ReleaseMutationResolver'
+import RebaseAllMutationResolver from './resolvers/mutation/RebaseAllMutationResolver'
 import { MigrateMutationResolver } from './resolvers/mutation/MigrateMutationResolver'
+import ResolverFactory from './resolvers/ResolverFactory'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
 	authorizator: Authorizator
 	resolverContextFactory: ResolverContextFactory
 	schemaVersionBuilder: SchemaVersionBuilder
-	systemDatabaseContextFactory: DatabaseContextFactory
 	projectInitializer: ProjectInitializer
-	systemDbMigrationsRunner: MigrationsRunner
+	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials) => MigrationsRunner
 }
 
 type Args = {
-	connection: Connection
 	projectsDir: string
 	providers: UuidProvider
-	project: ProjectConfig & { directory?: string }
 	contentPermissionsVerifier: ContentPermissionVerifier
 	modificationHandlerFactory: ModificationHandlerFactory
 }
@@ -73,17 +65,14 @@ export class SystemContainerFactory {
 				'authorizator',
 				'resolverContextFactory',
 				'schemaVersionBuilder',
-				'systemDatabaseContextFactory',
 				'projectInitializer',
-				'systemDbMigrationsRunner',
+				'systemDbMigrationsRunnerFactory',
 			)
 	}
 	public createBuilder(container: Args) {
 		return new Builder({})
-			.addService(
-				'systemDbMigrationsRunner',
-				() =>
-					new MigrationsRunner(container.connection.config as DatabaseCredentials, 'system', systemMigrationsDirectory),
+			.addService('systemDbMigrationsRunnerFactory', () => (db: DatabaseCredentials) =>
+				new MigrationsRunner(db, 'system', systemMigrationsDirectory),
 			)
 
 			.addService('modificationHandlerFactory', () => container.modificationHandlerFactory)
@@ -95,22 +84,12 @@ export class SystemContainerFactory {
 				({ executedMigrationsResolver, schemaMigrator }) =>
 					new SchemaVersionBuilder(executedMigrationsResolver, schemaMigrator),
 			)
-			.addService('project', () => container.project)
 			.addService('providers', () => container.providers)
 			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
 			.addService('authorizator', ({ accessEvaluator }): Authorizator => new Authorizator.Default(accessEvaluator))
 
-			.addService('migrationFilesManager', ({ project }) =>
-				MigrationFilesManager.createForProject(container.projectsDir, project.directory || project.slug),
-			)
-			.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-
 			.addService('schemaDiffer', ({ schemaMigrator }) => new SchemaDiffer(schemaMigrator))
-			.addService(
-				'schemaVersionBuilderInternal',
-				({ schemaMigrator, migrationsResolver }) =>
-					new MigrationsSchemaVersionBuiler(migrationsResolver, schemaMigrator),
-			)
+
 			.addService(
 				'migrationExecutor',
 				({ modificationHandlerFactory }) => new MigrationExecutor(modificationHandlerFactory),
@@ -133,18 +112,8 @@ export class SystemContainerFactory {
 			)
 			.addService(
 				'permissionVerifier',
-				({ schemaVersionBuilder, authorizator, project }) =>
-					new EventsPermissionsVerifier(
-						project,
-						schemaVersionBuilder,
-						authorizator,
-						container.contentPermissionsVerifier,
-					),
-			)
-			.addService(
-				'diffBuilder',
-				({ dependencyBuilder, permissionVerifier, schemaVersionBuilder }) =>
-					new DiffBuilder(dependencyBuilder, permissionVerifier, schemaVersionBuilder),
+				({ schemaVersionBuilder, authorizator }) =>
+					new EventsPermissionsVerifier(schemaVersionBuilder, authorizator, container.contentPermissionsVerifier),
 			)
 			.addService(
 				'eventApplier',
@@ -152,42 +121,36 @@ export class SystemContainerFactory {
 					new EventApplier(migrationExecutor, executedMigrationsResolver),
 			)
 			.addService('eventsRebaser', () => new EventsRebaser())
-			.addService('stageTree', ({ project }) => new StageTree.Factory().create(project))
 			.addService(
 				'rebaseExecutor',
-				({ dependencyBuilder, eventApplier, eventsRebaser, stageTree, schemaVersionBuilder }) =>
-					new RebaseExecutor(dependencyBuilder, eventApplier, eventsRebaser, stageTree, schemaVersionBuilder),
-			)
-			.addService(
-				'releaseExecutor',
-				({ dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, stageTree, schemaVersionBuilder }) =>
-					new ReleaseExecutor(
-						dependencyBuilder,
-						permissionVerifier,
-						eventApplier,
-						eventsRebaser,
-						stageTree,
-						schemaVersionBuilder,
-					),
+				({ dependencyBuilder, eventApplier, eventsRebaser, schemaVersionBuilder }) =>
+					new RebaseExecutor(dependencyBuilder, eventApplier, eventsRebaser, schemaVersionBuilder),
 			)
 			.addService(
 				'projectMigrator',
-				({ stageTree, migrationDescriber, rebaseExecutor, schemaVersionBuilder, executedMigrationsResolver }) =>
-					new ProjectMigrator(
-						stageTree,
-						migrationDescriber,
-						rebaseExecutor,
-						schemaVersionBuilder,
-						executedMigrationsResolver,
-					),
+				({ migrationDescriber, rebaseExecutor, schemaVersionBuilder, executedMigrationsResolver }) =>
+					new ProjectMigrator(migrationDescriber, rebaseExecutor, schemaVersionBuilder, executedMigrationsResolver),
 			)
 
 			.addService(
 				'projectMigrationInfoResolver',
-				({ migrationsResolver, project, executedMigrationsResolver }) =>
-					new ProjectMigrationInfoResolver(project, migrationsResolver, executedMigrationsResolver),
+				({ executedMigrationsResolver }) =>
+					new ProjectMigrationInfoResolver(executedMigrationsResolver, container.projectsDir),
 			)
-			.addService('stageCreator', ({ eventApplier, providers }) => new StageCreator(eventApplier))
+			.addService('stageCreator', ({ eventApplier }) => new StageCreator(eventApplier))
+
+			.addService(
+				'diffBuilder',
+				({ dependencyBuilder, permissionVerifier, schemaVersionBuilder }) =>
+					new DiffBuilder(dependencyBuilder, permissionVerifier, schemaVersionBuilder),
+			)
+
+			.addService(
+				'releaseExecutor',
+				({ dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, schemaVersionBuilder }) =>
+					new ReleaseExecutor(dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, schemaVersionBuilder),
+			)
+
 			.addService('systemStagesQueryResolver', () => new StagesQueryResolver())
 
 			.addService('systemDiffResponseBuilder', () => new DiffResponseBuilder())
@@ -199,14 +162,8 @@ export class SystemContainerFactory {
 				'releaseMutationResolver',
 				({ rebaseExecutor, releaseExecutor }) => new ReleaseMutationResolver(rebaseExecutor, releaseExecutor),
 			)
-			.addService(
-				'rebaseMutationResolver',
-				({ rebaseExecutor, project }) => new RebeaseAllMutationResolver(rebaseExecutor, project),
-			)
-			.addService(
-				'migrateMutationResolver',
-				({ project, projectMigrator }) => new MigrateMutationResolver(project, projectMigrator),
-			)
+			.addService('rebaseMutationResolver', ({ rebaseExecutor }) => new RebaseAllMutationResolver(rebaseExecutor))
+			.addService('migrateMutationResolver', ({ projectMigrator }) => new MigrateMutationResolver(projectMigrator))
 			.addService(
 				'systemResolvers',
 				({
@@ -224,27 +181,11 @@ export class SystemContainerFactory {
 						migrateMutationResolver,
 					).create(),
 			)
-			.addService('connection', () => container.connection)
-			.addService('systemDbClient', ({ connection }) => connection.createClient('system'))
-			.addService(
-				'systemDatabaseContextFactory',
-				({ systemDbClient, providers }) => new DatabaseContextFactory(systemDbClient, providers),
-			)
-			.addService(
-				'resolverContextFactory',
-				({ systemDatabaseContextFactory, authorizator }) =>
-					new ResolverContextFactory(systemDatabaseContextFactory, authorizator),
-			)
+			.addService('resolverContextFactory', ({ authorizator }) => new ResolverContextFactory(authorizator))
 			.addService(
 				'projectInitializer',
-				({ systemDatabaseContextFactory, stageTree, projectMigrator, projectMigrationInfoResolver, stageCreator }) =>
-					new ProjectInitializer(
-						systemDatabaseContextFactory,
-						stageTree,
-						projectMigrator,
-						projectMigrationInfoResolver,
-						stageCreator,
-					),
+				({ projectMigrator, projectMigrationInfoResolver, stageCreator }) =>
+					new ProjectInitializer(projectMigrator, projectMigrationInfoResolver, stageCreator),
 			)
 	}
 }

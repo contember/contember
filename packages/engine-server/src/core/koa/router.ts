@@ -13,9 +13,22 @@ type ContextWithRequest = KoaContext<KoaRequestState>
 function createRoutingMiddleware(
 	method: string | undefined,
 	mask: string,
-	app: Koa | Koa.Middleware,
+	middleware: Koa.Middleware,
 ): compose.Middleware<ContextWithRequest> {
-	const downstream = app instanceof Koa ? compose(app.middleware) : app
+	const downstream = middleware
+	const exact = mask.slice(-1) === '$'
+	const normalizedMask = exact ? mask.slice(0, -1) : mask + ':__path(.*)'
+
+	const keys: pathToRegexp.Key[] = []
+	const regexp: RegExp = pathToRegexp(normalizedMask, keys)
+
+	const match = function(url: string): Params | null {
+		const match = regexp.exec(url)
+		if (match) {
+			return match.slice(1).reduce((acc, value, i) => ({ ...acc, [keys[i].name]: value }), {})
+		}
+		return null
+	}
 
 	return async (ctx: ContextWithRequest, upstream) => {
 		const prev = ctx.path
@@ -23,8 +36,7 @@ function createRoutingMiddleware(
 			return await upstream()
 		}
 
-		const exact = mask.slice(-1) === '$'
-		const params = matchesPath(exact ? mask.slice(0, -1) : mask + ':__path(.*)', prev)
+		const params = match(prev)
 		if (params === null) {
 			return await upstream()
 		}
@@ -43,26 +55,16 @@ function createRoutingMiddleware(
 	}
 }
 
-function matchesPath(path: string, url: string): Params | null {
-	let keys: pathToRegexp.Key[] = []
-	let regexp: RegExp = pathToRegexp(path, keys)
-	const match = regexp.exec(url)
-	if (match) {
-		return match.slice(1).reduce((acc, value, i) => ({ ...acc, [keys[i].name]: value }), {})
-	}
-	return null
+function route(mask: string, middleware: Koa.Middleware): compose.Middleware<ContextWithRequest> {
+	return createRoutingMiddleware(undefined, mask, middleware)
 }
 
-function route(mask: string, appOrMiddleWare: Koa | Koa.Middleware): compose.Middleware<ContextWithRequest> {
-	return createRoutingMiddleware(undefined, mask, appOrMiddleWare)
+function get(mask: string, middleware: Koa.Middleware): compose.Middleware<ContextWithRequest> {
+	return createRoutingMiddleware('GET', mask, middleware)
 }
 
-function get(mask: string, appOrMiddleWare: Koa | Koa.Middleware): compose.Middleware<ContextWithRequest> {
-	return createRoutingMiddleware('GET', mask, appOrMiddleWare)
-}
-
-function post(mask: string, appOrMiddleWare: Koa | Koa.Middleware): compose.Middleware<ContextWithRequest> {
-	return createRoutingMiddleware('POST', mask, appOrMiddleWare)
+function post(mask: string, middleware: Koa.Middleware): compose.Middleware<ContextWithRequest> {
+	return createRoutingMiddleware('POST', mask, middleware)
 }
 
 export { route, get, post, ContextWithRequest, KoaRequestState }

@@ -5,10 +5,11 @@ import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
 import EventApplier from './EventApplier'
 import EventsRebaser from './EventsRebaser'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import StageTree from '../stages/StageTree'
+import { createStageTree, StageTree } from '../stages/StageTree'
 import { assertEveryIsContentEvent } from './eventUtils'
 import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import { DatabaseContext } from '../database/DatabaseContext'
+import { ProjectConfig } from '../../types'
 
 class ReleaseExecutor {
 	constructor(
@@ -16,12 +17,12 @@ class ReleaseExecutor {
 		private readonly permissionsVerifier: EventsPermissionsVerifier,
 		private readonly eventApplier: EventApplier,
 		private readonly eventsRebaser: EventsRebaser,
-		private readonly stageTree: StageTree,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async execute(
 		db: DatabaseContext,
+		project: ProjectConfig,
 		permissionContext: EventsPermissionsVerifier.Context,
 		targetStage: Stage,
 		sourceStage: Stage,
@@ -30,6 +31,7 @@ class ReleaseExecutor {
 		if (eventsToApply.length === 0) {
 			return
 		}
+		const stageTree = createStageTree(project)
 		const allEvents = await db.queryHandler.fetch(new DiffQuery(targetStage.event_id, sourceStage.event_id))
 		assertEveryIsContentEvent(allEvents)
 		const allEventsIds = new Set(allEvents.map(it => it.id))
@@ -45,7 +47,14 @@ class ReleaseExecutor {
 		const eventsSet = new Set(eventsToApply)
 		const events = allEvents.filter(it => eventsSet.has(it.id))
 
-		const permissions = this.permissionsVerifier.verify(db, permissionContext, sourceStage, targetStage, events)
+		const permissions = this.permissionsVerifier.verify(
+			db,
+			project,
+			permissionContext,
+			sourceStage,
+			targetStage,
+			events,
+		)
 		if (Object.values(permissions).filter(it => !it).length) {
 			throw new Error() // todo
 		}
@@ -65,12 +74,13 @@ class ReleaseExecutor {
 				new UpdateStageEventCommand(targetStage.slug, eventsToApply[eventsToApply.length - 1]),
 			)
 		} else {
-			await this.rebaseRecursive(db, sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)
+			await this.rebaseRecursive(db, stageTree, sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)
 		}
 	}
 
 	private async rebaseRecursive(
 		db: DatabaseContext,
+		stageTree: StageTree,
 		rebasedStage: Stage,
 		oldBase: string,
 		newBase: string,
@@ -84,9 +94,9 @@ class ReleaseExecutor {
 			newBase,
 			droppedEvents,
 		)
-		for (const child of this.stageTree.getChildren(rebasedStage)) {
+		for (const child of stageTree.getChildren(rebasedStage)) {
 			const childWithEvent = await db.queryHandler.fetch(new StageBySlugQuery(child.slug))
-			await this.rebaseRecursive(db, childWithEvent!, rebasedStage.event_id, newHead, [])
+			await this.rebaseRecursive(db, stageTree, childWithEvent!, rebasedStage.event_id, newHead, [])
 		}
 	}
 

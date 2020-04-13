@@ -2,6 +2,7 @@ import { SelectBuilder } from '@contember/database'
 import {
 	DatabaseContext,
 	MigrationsResolver,
+	ProjectConfig,
 	ProjectMigrator,
 	StageConfig,
 	StageCreator,
@@ -12,7 +13,7 @@ export class TesterStageManager {
 	private createdStages = new Set<string>()
 
 	constructor(
-		private readonly stages: StageConfig[],
+		private readonly project: ProjectConfig,
 		private readonly db: DatabaseContext,
 		private readonly stageCreator: StageCreator,
 		private readonly projectMigrator: ProjectMigrator,
@@ -39,7 +40,7 @@ export class TesterStageManager {
 	}
 
 	public async createAll(): Promise<void> {
-		for (const stage of this.stages) {
+		for (const stage of this.project.stages) {
 			await this.createStage(stage.slug)
 		}
 	}
@@ -60,11 +61,11 @@ export class TesterStageManager {
 			}
 			migration = resolvedMigration
 		}
-		await this.projectMigrator.migrate(this.db, [migration], () => null)
+		await this.projectMigrator.migrate(this.db, this.project, [migration], () => null)
 	}
 
 	private getStageInternal(slug: string): StageConfig {
-		const stage = this.stages.find(it => it.slug === slug)
+		const stage = this.project.stages.find(it => it.slug === slug)
 		if (!stage) {
 			throw new Error(`Unknown stage ${slug}`)
 		}

@@ -1,31 +1,24 @@
-import { KoaMiddleware } from '../../core/koa'
-import { KoaRequestState } from '../../core/koa'
-import { ProjectResolveMiddlewareFactory } from '../project-common'
+import { KoaMiddleware, KoaRequestState } from '../../core/koa'
+import { ProjectResolveMiddlewareState } from '../project-common'
 import Project from '../../config/Project'
 
-type InputState = StageResolveMiddlewareFactory.KoaState & ProjectResolveMiddlewareFactory.KoaState & KoaRequestState
+type KoaState = StageResolveMiddlewareState & ProjectResolveMiddlewareState & KoaRequestState
 
-class StageResolveMiddlewareFactory {
-	public create(): KoaMiddleware<InputState> {
-		const stageResolve: KoaMiddleware<InputState> = async (ctx, next) => {
-			const project = ctx.state.projectContainer.project
+export const createStageResolveMiddleware = (): KoaMiddleware<KoaState> => {
+	const stageResolve: KoaMiddleware<KoaState> = (ctx, next) => {
+		const project = ctx.state.projectContainer.project
 
-			const stage = project.stages.find(stage => stage.slug === ctx.state.params.stageSlug)
+		const stage = project.stages.find(stage => stage.slug === ctx.state.params.stageSlug)
 
-			if (stage === undefined) {
-				return ctx.throw(404, `Stage ${ctx.state.params.stageSlug} NOT found`)
-			}
-			ctx.state.stage = stage
-			await next()
+		if (stage === undefined) {
+			return ctx.throw(404, `Stage ${ctx.state.params.stageSlug} NOT found`)
 		}
-		return stageResolve
+		ctx.state.stage = stage
+		return next()
 	}
+	return stageResolve
 }
 
-namespace StageResolveMiddlewareFactory {
-	export interface KoaState {
-		stage: Project.Stage
-	}
+export interface StageResolveMiddlewareState {
+	stage: Project.Stage
 }
-
-export { StageResolveMiddlewareFactory }

@@ -1,31 +1,32 @@
 import { KoaMiddleware, KoaRequestState } from '../../core/koa'
-import { ProjectContainer, ProjectContainerResolver } from '../../ProjectContainer'
-import { ErrorResponseMiddlewareState } from '../ErrorResponseMiddlewareFactory'
+import { ProjectContainer } from '../../ProjectContainer'
+import Project from '../../config/Project'
+import { ErrorResponseMiddlewareState } from '../common'
+import { ProjectContainerResolverState } from '../services'
+import { ProvidersState } from '../services/ProvidersState'
 
-type InputState = ProjectResolveMiddlewareFactory.KoaState & KoaRequestState & ErrorResponseMiddlewareState
+type KoaState = ProjectResolveMiddlewareState &
+	KoaRequestState &
+	ErrorResponseMiddlewareState &
+	ProvidersState &
+	ProjectContainerResolverState
 
-class ProjectResolveMiddlewareFactory {
-	constructor(private readonly projectContainerResolver: ProjectContainerResolver) {}
+export const createProjectResolveMiddleware = () => {
+	const projectResolve: KoaMiddleware<KoaState> = async (ctx, next) => {
+		const projectSlug = ctx.state.params.projectSlug
+		const projectContainer = ctx.state.projectContainerResolver(projectSlug, true)
 
-	public create(): KoaMiddleware<InputState> {
-		const projectResolve: KoaMiddleware<InputState> = async (ctx, next) => {
-			const projectSlug = ctx.state.params.projectSlug
-			const projectContainer = this.projectContainerResolver(projectSlug, true)
-
-			if (projectContainer === undefined) {
-				return ctx.state.fail.projectNotFound(projectSlug)
-			}
-			ctx.state.projectContainer = projectContainer
-			await next()
+		if (projectContainer === undefined) {
+			return ctx.state.fail.projectNotFound(projectSlug)
 		}
-		return projectResolve
+		ctx.state.projectContainer = projectContainer
+		ctx.state.project = projectContainer.project
+		await next()
 	}
+	return projectResolve
 }
 
-namespace ProjectResolveMiddlewareFactory {
-	export interface KoaState {
-		projectContainer: ProjectContainer
-	}
+export interface ProjectResolveMiddlewareState {
+	project: Project
+	projectContainer: ProjectContainer
 }
-
-export { ProjectResolveMiddlewareFactory }

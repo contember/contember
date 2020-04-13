@@ -27,10 +27,11 @@ export default class ReleaseMutationResolver implements MutationResolver<'releas
 				}
 			}
 
-			await this.rebaseExecutor.rebaseAll(db)
+			await this.rebaseExecutor.rebaseAll(db, context.project)
 
 			await this.releaseExecutor.execute(
 				db,
+				context.project,
 				{
 					variables: context.variables,
 					identity: context.identity,

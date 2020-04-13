@@ -7,7 +7,7 @@
 	"scripts": {},
 	"devDependencies": {
 		"@types/js-yaml": "^3.12.1",
-		"@types/node": "^12.11.7",
+		"@types/node": "^13.11.1",
 		"typescript": "^3.7.4"
 	},
 	"dependencies": {

@@ -1,34 +1,29 @@
 import { Builder, Container } from '@contember/dic'
 import { Connection } from '@contember/database'
 import Project from './config/Project'
-import { ContentServerProvider } from './http/content/ContentServerProvider'
 import { DatabaseContextFactory, SchemaVersionBuilder } from '@contember/engine-system-api'
-import { graphqlObjectFactories, providers } from './utils'
-import { ContentApolloServerFactory, ContentSchemaResolver, GraphQlSchemaFactory } from './http/content'
+import { logSentryError } from './utils'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
-
-export type ProjectContainer = Container<{
-	systemDatabaseContextFactory: DatabaseContextFactory
-	project: Project
-	connection: Connection
-	contentServerProvider: ContentServerProvider
-}>
-
-export type ProjectContainerResolver = (slug: string, aliasFallback?: boolean) => ProjectContainer | undefined
+import {
+	ContentApolloServerFactory,
+	ContentSchemaResolver,
+	GraphQlSchemaFactory,
+	ContentServerProvider,
+	providers,
+	graphqlObjectFactories,
+} from '@contember/engine-http'
 
 export const createProjectContainer = (
 	debug: boolean,
 	project: Project,
-	projectsDir: string,
 	plugins: Plugin[],
 	schemaVersionBuilder: SchemaVersionBuilder,
 ) => {
 	const projectContainer = new Builder({})
 		.addService('providers', () => providers)
 		.addService('project', () => project)
-		.addService('projectsDir', () => projectsDir)
 		.addService('graphqlObjectsFactory', () => graphqlObjectFactories)
 		.addService('connection', ({ project }) => {
 			return new Connection(
@@ -58,7 +53,7 @@ export const createProjectContainer = (
 				return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
 			},
 		)
-		.addService('apolloServerFactory', () => new ContentApolloServerFactory(project.slug, debug))
+		.addService('apolloServerFactory', () => new ContentApolloServerFactory(project.slug, debug, logSentryError))
 		.addService('contentSchemaResolver', () => new ContentSchemaResolver(schemaVersionBuilder))
 		.addService(
 			'contentServerProvider',

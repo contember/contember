@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readConfig, run } from '@contember/api'
+import { readConfig, run } from '@contember/engine-server'
 import * as path from 'path'
 ;(async () => {
 	const configFile = path.join(__dirname, '../../src/config/config.yaml')

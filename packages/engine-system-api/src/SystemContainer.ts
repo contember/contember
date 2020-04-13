@@ -46,11 +46,13 @@ export interface SystemContainer {
 	resolverContextFactory: ResolverContextFactory
 	schemaVersionBuilder: SchemaVersionBuilder
 	projectInitializer: ProjectInitializer
-	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials) => MigrationsRunner
+	systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory
 }
 
+export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials) => MigrationsRunner
+
 type Args = {
-	projectsDir: string
+	projectsDir: string | undefined
 	providers: UuidProvider
 	contentPermissionsVerifier: ContentPermissionVerifier
 	modificationHandlerFactory: ModificationHandlerFactory
@@ -132,10 +134,10 @@ export class SystemContainerFactory {
 					new ProjectMigrator(migrationDescriber, rebaseExecutor, schemaVersionBuilder, executedMigrationsResolver),
 			)
 
-			.addService(
-				'projectMigrationInfoResolver',
-				({ executedMigrationsResolver }) =>
-					new ProjectMigrationInfoResolver(executedMigrationsResolver, container.projectsDir),
+			.addService('projectMigrationInfoResolver', ({ executedMigrationsResolver }) =>
+				container.projectsDir
+					? new ProjectMigrationInfoResolver(executedMigrationsResolver, container.projectsDir)
+					: undefined,
 			)
 			.addService('stageCreator', ({ eventApplier }) => new StageCreator(eventApplier))
 

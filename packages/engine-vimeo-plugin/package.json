@@ -9,7 +9,7 @@
 		"@contember/engine-common": "^0.7.4",
 		"@contember/engine-plugins": "^0.7.4",
 		"@contember/schema": "^0.7.4",
-		"@types/node": "^12.11.7",
+		"@types/node": "^13.11.1",
 		"apollo-server-errors": "^2.3.4",
 		"node-fetch": "^2.6.0"
 	},

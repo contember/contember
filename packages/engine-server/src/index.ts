@@ -4,11 +4,8 @@ import { Config, readConfig } from './config/config'
 import { Server } from 'http'
 import { initSentry } from './utils'
 import { Plugin } from '@contember/engine-plugins'
-import * as http from './http'
 
 export { CompositionRoot, Project, readConfig }
-
-export { http }
 
 export async function run(
 	debug: boolean,

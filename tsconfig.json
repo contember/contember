@@ -14,6 +14,7 @@
 		{ "path": "./packages/engine-api-tester" },
 		{ "path": "./packages/engine-common" },
 		{ "path": "./packages/engine-content-api" },
+		{ "path": "./packages/engine-http" },
 		{ "path": "./packages/engine-plugins" },
 		{ "path": "./packages/engine-s3-plugin" },
 		{ "path": "./packages/engine-vimeo-plugin" },

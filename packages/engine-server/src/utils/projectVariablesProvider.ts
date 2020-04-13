@@ -1,12 +1,12 @@
-import { ProjectContainerResolver } from '../ProjectContainer'
 import { ProjectVariablesResolver, RoleVariablesDefinition, VariableDefinition } from '@contember/engine-tenant-api'
 import { SchemaVersionBuilder } from '@contember/engine-system-api'
+import { ProjectContainerResolver } from '@contember/engine-http'
 
 export const projectVariablesResolver = (
 	projectContainerResolver: ProjectContainerResolver,
 	schemaVersionBuilder: SchemaVersionBuilder,
 ): ProjectVariablesResolver => async slug => {
-	const container = projectContainerResolver(slug)
+	const container = await projectContainerResolver(slug)
 	if (!container) {
 		return undefined
 	}

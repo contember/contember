@@ -13,7 +13,7 @@ export class StageTree {
 	}
 }
 
-export const createStageTree = (project: ProjectConfig): StageTree => {
+export const createStageTree = (project: Pick<ProjectConfig, 'stages'>): StageTree => {
 	const rootStages = project.stages.filter(it => !it.base)
 	if (rootStages.length !== 1) {
 		throw new Error(`Exactly 1 root stage expected, ${rootStages.length} found`)

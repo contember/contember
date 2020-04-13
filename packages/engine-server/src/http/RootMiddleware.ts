@@ -1,12 +1,19 @@
-import { compose, route } from '../core/koa'
-import { createErrorResponseMiddleware, createTimerMiddleware } from './common'
-import { createHomepageMiddleware, createPlaygroundMiddleware } from './misc'
-import { createContentMiddleware } from './content'
-import { createTenantMiddleware } from './tenant'
-import { createSystemMiddleware } from './system'
-import { createServicesProviderMiddleware, ServicesState } from './services/ServicesProviderMiddleware'
+import {
+	compose,
+	createContentMiddleware,
+	createErrorResponseMiddleware,
+	createHomepageMiddleware,
+	createPlaygroundMiddleware,
+	createServicesProviderMiddleware,
+	createSystemMiddleware,
+	createTenantMiddleware,
+	createTimerMiddleware,
+	route,
+	ServicesState,
+	KoaMiddleware,
+} from '@contember/engine-http'
 
-export const createRootMiddleware = (services: ServicesState) => {
+export const createRootMiddleware = (services: ServicesState): KoaMiddleware<any> => {
 	return compose([
 		createServicesProviderMiddleware(services),
 		createErrorResponseMiddleware(),

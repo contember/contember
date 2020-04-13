@@ -1,8 +1,8 @@
-import { ProjectContainer } from '../ProjectContainer'
 import { ProjectManager } from '@contember/engine-tenant-api'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { ProjectInitializer } from '@contember/engine-system-api'
 import { DatabaseCredentials } from '@contember/database'
+import { ProjectContainer } from '@contember/engine-http'
 
 export class Initializer {
 	constructor(

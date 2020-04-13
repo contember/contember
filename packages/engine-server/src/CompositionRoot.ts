@@ -1,4 +1,3 @@
-import Koa from 'koa'
 import { PermissionsByIdentityFactory, PermissionsVerifier } from '@contember/engine-content-api'
 import { SchemaVersionBuilder, SystemContainerFactory } from '@contember/engine-system-api'
 import {
@@ -7,15 +6,22 @@ import {
 	TenantContainer,
 } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
-import { SystemServerProvider, TenantApolloServerFactory } from './http'
 import { Config, Project, TenantConfig } from './config/config'
-import { projectVariablesResolver, providers, tuple } from './utils'
+import { logSentryError, projectVariablesResolver, tuple } from './utils'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer, ServerRunner } from './bootstrap'
-import { createProjectContainer, ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
+import { createProjectContainer } from './ProjectContainer'
 import { Plugin } from '@contember/engine-plugins'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { createRootMiddleware } from './http/RootMiddleware'
+import {
+	ProjectContainer,
+	ProjectContainerResolver,
+	providers,
+	SystemServerProvider,
+	TenantApolloServerFactory,
+	Koa,
+} from '@contember/engine-http'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -43,19 +49,20 @@ class CompositionRoot {
 		const projectContainers = this.createProjectContainers(
 			debug,
 			Object.values(config.projects),
-			projectsDirectory,
 			plugins,
 			systemContainer.schemaVersionBuilder,
 		)
 
 		const containerList = Object.values(projectContainers)
 		const projectContainerResolver: ProjectContainerResolver = (slug, aliasFallback = false) =>
-			projectContainers[slug] ||
-			(aliasFallback
-				? containerList.find(function(it) {
-						return it.project.alias && it.project.alias.includes(slug)
-				  })
-				: undefined)
+			Promise.resolve(
+				projectContainers[slug] ||
+					(aliasFallback
+						? containerList.find(function(it) {
+								return it.project.alias && it.project.alias.includes(slug)
+						  })
+						: undefined),
+			)
 
 		const tenantContainer = this.createTenantContainer(
 			config.tenant,
@@ -70,11 +77,20 @@ class CompositionRoot {
 			.addService('projectContainerResolver', () => projectContainerResolver)
 
 			.addService('tenantApolloServer', ({ tenantContainer }) =>
-				new TenantApolloServerFactory(tenantContainer.resolvers, tenantContainer.resolverContextFactory).create(),
+				new TenantApolloServerFactory(
+					tenantContainer.resolvers,
+					tenantContainer.resolverContextFactory,
+					logSentryError,
+				).create(),
 			)
 			.addService(
 				'systemServerProvider',
-				() => new SystemServerProvider(systemContainer.systemResolvers, systemContainer.resolverContextFactory),
+				() =>
+					new SystemServerProvider(
+						systemContainer.systemResolvers,
+						systemContainer.resolverContextFactory,
+						logSentryError,
+					),
 			)
 
 			.addService(
@@ -120,12 +136,11 @@ class CompositionRoot {
 	createProjectContainers(
 		debug: boolean,
 		projects: Array<Project>,
-		projectsDir: string,
 		plugins: Plugin[],
 		schemaVersionBuilder: SchemaVersionBuilder,
 	): Record<string, ProjectContainer> {
 		const containers = Object.values(projects).map((project: Project): [string, ProjectContainer] => {
-			const projectContainer = createProjectContainer(debug, project, projectsDir, plugins, schemaVersionBuilder)
+			const projectContainer = createProjectContainer(debug, project, plugins, schemaVersionBuilder)
 			return tuple(project.slug, projectContainer)
 		})
 		return Object.fromEntries(containers)

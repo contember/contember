@@ -12,7 +12,7 @@ import { createStageTree } from './model/stages/StageTree'
 export class ProjectInitializer {
 	constructor(
 		private readonly projectMigrator: ProjectMigrator,
-		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver,
+		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver | undefined,
 		private readonly stageCreator: StageCreator,
 	) {}
 
@@ -61,6 +61,9 @@ export class ProjectInitializer {
 	}
 
 	private async runMigrations(db: DatabaseContext, project: ProjectConfig) {
+		if (!this.projectMigrationInfoResolver) {
+			return
+		}
 		const {
 			migrationsToExecute,
 			migrationsDirectory,
@@ -89,6 +92,9 @@ export class ProjectInitializer {
 	}
 
 	private async upgradeSchemaMigrations(db: DatabaseContext, project: ProjectConfig, stage: string) {
+		if (!this.projectMigrationInfoResolver) {
+			return
+		}
 		const migrationEvents = await db.queryHandler.fetch(new MigrationEventsQuery(stage))
 		const { allMigrations, executedMigrations } = await this.projectMigrationInfoResolver.getMigrationsInfo(db, project)
 		if (executedMigrations.length > 0 || migrationEvents.length === 0) {

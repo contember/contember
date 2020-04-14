@@ -2,10 +2,14 @@ import { Component } from '@contember/binding'
 import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { FileUrlFieldView } from '../../fieldViews'
-import { GenericFileUploadProps } from '../GenericFileUploadProps'
+import {
+	FileUrlDataPopulator,
+	GenericFileMetadataPopulator,
+	GenericFileMetadataPopulatorProps,
+} from '../fileDataPopulators'
 import { UploadField } from './UploadField'
 
-export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileUploadProps
+export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileMetadataPopulatorProps
 
 // TODO this is super temporary
 export const FileUploadField = Component<FileUploadFieldProps>(
@@ -13,6 +17,10 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 		<UploadField
 			{...props}
 			fileUrlField={props.field}
+			fileDataPopulators={[
+				new FileUrlDataPopulator({ fileUrlField: props.field }),
+				new GenericFileMetadataPopulator(props),
+			]}
 			renderFilePreview={(file, previewUrl) => (
 				<a
 					style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'rtl' }}

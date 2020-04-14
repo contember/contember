@@ -1,12 +1,19 @@
+import { Component } from '@contember/binding'
 import * as React from 'react'
-import { Component, Field } from '@contember/binding'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { VideoFieldView } from '../../fieldViews'
-import { VideoFileUploadProps } from '../VideoFileUploadProps'
-import { GenericFileUploadProps } from '../GenericFileUploadProps'
+import {
+	FileUrlDataPopulator,
+	GenericFileMetadataPopulator,
+	GenericFileMetadataPopulatorProps,
+	VideoFileMetadataPopulator,
+	VideoFileMetadataPopulatorProps,
+} from '../fileDataPopulators'
 import { UploadField } from './UploadField'
 
-export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileUploadProps & VideoFileUploadProps
+export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps &
+	VideoFileMetadataPopulatorProps &
+	GenericFileMetadataPopulatorProps
 
 export const VideoUploadField = Component<VideoUploadFieldProps>(
 	props => (
@@ -14,6 +21,11 @@ export const VideoUploadField = Component<VideoUploadFieldProps>(
 			{...props}
 			fileUrlField={props.field}
 			accept="video/*"
+			fileDataPopulators={[
+				new FileUrlDataPopulator({ fileUrlField: props.field }),
+				new GenericFileMetadataPopulator(props),
+				new VideoFileMetadataPopulator(props),
+			]}
 			renderFile={() => <VideoFieldView srcField={props.field} />}
 			renderFilePreview={(file, previewUrl) => <video src={previewUrl} controls />}
 		/>

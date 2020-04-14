@@ -1,8 +1,8 @@
 import {
 	Component,
 	EntityAccessor,
+	Environment,
 	Field,
-	FieldAccessor,
 	useEntityContext,
 	useEnvironment,
 	useMutationState,
@@ -11,20 +11,25 @@ import {
 import { FileUploader } from '@contember/client'
 import { FileUploadReadyState, SingleFileUploadState, useFileUpload } from '@contember/react-client'
 import { Box, Button, FormGroup } from '@contember/ui'
-import { assertNever } from '@contember/utils'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import {
-	AggregateUploadProps,
-	getAggregateFileMetadataFieldsPopulator,
-	useDesugaredAggregateUploadProps,
+	AggregateDataPopulatorProps,
+	AudioFileMetadataPopulator,
+	FileDataPopulator,
+	FileUrlDataPopulator,
+	GenericFileMetadataPopulator,
+	ImageFileMetadataPopulator,
+	VideoFileMetadataPopulator,
 } from '../upload'
 
 export interface UploadFieldMetadata {
-	accessor: FieldAccessor<string>
+	entityAccessor: EntityAccessor
+	environment: Environment
 	uploadState: SingleFileUploadState | undefined
 	emptyText?: React.ReactNode
+	populators: FileDataPopulator[]
 }
 
 export type UploadFieldProps = {
@@ -33,25 +38,38 @@ export type UploadFieldProps = {
 	emptyText?: React.ReactNode
 	uploader?: FileUploader
 } & SimpleRelativeSingleFieldProps &
-	AggregateUploadProps
+	({ fileDataPopulators: Iterable<FileDataPopulator> } | AggregateDataPopulatorProps)
 
+const createPopulatorsFromProps = (props: UploadFieldProps): FileDataPopulator[] => {
+	if ('fileDataPopulators' in props) {
+		return Array.from(props.fileDataPopulators)
+	}
+	return [
+		new AudioFileMetadataPopulator(props),
+		new FileUrlDataPopulator(props),
+		new GenericFileMetadataPopulator(props),
+		new ImageFileMetadataPopulator(props),
+		new VideoFileMetadataPopulator(props),
+	]
+}
+
+const staticFileId = 'file'
 export const UploadField = Component<UploadFieldProps>(
 	props => {
 		const [uploadState, { startUpload }] = useFileUpload()
 		const environment = useEnvironment()
 		const entity = useEntityContext()
 		const isMutating = useMutationState()
-		const accessor = useRelativeSingleField<string>(props)
-		const aggregateUploadProps = useDesugaredAggregateUploadProps(props)
-		const entityRef = React.useRef<EntityAccessor>(entity)
 
-		entityRef.current = entity
+		const singleFileUploadState = uploadState.get(staticFileId)
+		const normalizedStateArray = [singleFileUploadState]
 
-		const stateArray = Array.from(uploadState)
-		const singleFileUploadState = stateArray.length ? stateArray[stateArray.length - 1][1] : undefined
+		const populators = React.useMemo<FileDataPopulator[]>(() => createPopulatorsFromProps(props), [props])
+
 		const onDrop = React.useCallback(
 			([file]: File[]) => {
-				startUpload([file], {
+				const fileById: [string, File] = [staticFileId, file]
+				startUpload([fileById], {
 					uploader: props.uploader,
 				})
 			},
@@ -64,37 +82,13 @@ export const UploadField = Component<UploadFieldProps>(
 			multiple: false,
 			noKeyboard: true, // This would normally be absolutely henious but there is a keyboard-focusable button inside.
 		})
-		const metadata: UploadFieldMetadata = React.useMemo(
-			() => ({
-				emptyText: props.emptyText,
-				uploadState: singleFileUploadState,
-				accessor,
-			}),
-			[accessor, props.emptyText, singleFileUploadState],
-		)
-		let file: File | undefined = undefined
-		let previewUrl: string | undefined = undefined
-
-		if (singleFileUploadState) {
-			file = singleFileUploadState.file
-			previewUrl = singleFileUploadState.previewUrl
-		}
-
-		React.useEffect(() => {
-			let isMounted = true
-			const createPopulator = async () => {
-				if (previewUrl && file) {
-					const populate = await getAggregateFileMetadataFieldsPopulator(file, previewUrl, aggregateUploadProps)
-					if (isMounted) {
-						populate(entityRef.current)
-					}
-				}
-			}
-			createPopulator()
-			return () => {
-				isMounted = false
-			}
-		}, [aggregateUploadProps, file, previewUrl])
+		const metadata: UploadFieldMetadata[] = normalizedStateArray.map(state => ({
+			emptyText: props.emptyText,
+			uploadState: state,
+			entityAccessor: entity,
+			environment,
+			populators,
+		}))
 
 		return (
 			<FormGroup
@@ -102,7 +96,6 @@ export const UploadField = Component<UploadFieldProps>(
 				labelDescription={props.labelDescription}
 				labelPosition={props.labelPosition}
 				description={props.description}
-				errors={accessor.errors}
 				// Hotfix double browser window prompt. Apparently it's meant to be fixed already
 				// (https://github.com/react-dropzone/react-dropzone/issues/182) but it appears that their fix relies on the
 				// label being *inside* dropzone which, however, would ruin our margins. This will have to do for now.
@@ -114,26 +107,22 @@ export const UploadField = Component<UploadFieldProps>(
 					})}
 				>
 					<input {...getInputProps()} />
-					<Inner metadata={metadata} {...props}>
-						{props.children}
-					</Inner>
+					{metadata.map((metadata, i) => (
+						<Inner metadata={metadata} {...props} key={i}>
+							{props.children}
+						</Inner>
+					))}
 				</div>
 			</FormGroup>
 		)
 	},
-	props => (
+	(props, environment) => (
 		<>
 			<Field field={props.field} />
 
-			{props.sizeField && <Field field={props.sizeField} isNonbearing />}
-			{props.typeField && <Field field={props.typeField} isNonbearing />}
-			{props.fileNameField && <Field field={props.fileNameField} isNonbearing />}
-			{props.lastModifiedField && <Field field={props.lastModifiedField} isNonbearing />}
-
-			{props.widthField && <Field field={props.widthField} isNonbearing />}
-			{props.heightField && <Field field={props.heightField} isNonbearing />}
-
-			{props.durationField && <Field field={props.durationField} isNonbearing />}
+			{createPopulatorsFromProps(props).map((item, i) => (
+				<React.Fragment key={i}>{item.getStaticFields(environment)}</React.Fragment>
+			))}
 		</>
 	),
 	'UploadField',
@@ -145,29 +134,114 @@ type InnerProps = SimpleRelativeSingleFieldProps & {
 	children: (url: string) => React.ReactNode
 }
 
+type PopulatorDataState =
+	| {
+			name: 'uninitialized'
+			data?: never
+	  }
+	| {
+			name: 'ready'
+			data: any[]
+	  }
+	| {
+			name: 'error'
+			data?: never
+	  }
+
 const Inner = React.memo((props: InnerProps) => {
-	const { uploadState, accessor, emptyText } = props.metadata
+	const { uploadState, emptyText, entityAccessor, environment, populators } = props.metadata
+
+	const temporaryDesugaredField = useRelativeSingleField<string>(props)
+
+	const uploadStateRef = React.useRef(uploadState)
+	const [preparedPopulatorData, setPreparedPopulatorData] = React.useState<PopulatorDataState>({
+		name: 'uninitialized',
+	})
+	const uploadedFile = uploadState?.file
+	const readyState = uploadState?.readyState
+	const batchUpdates = entityAccessor.batchUpdates
+
+	const relevantPopulators = React.useMemo(
+		() => (uploadedFile ? populators.filter(populator => populator.canHandleFile(uploadedFile)) : []),
+		[populators, uploadedFile],
+	)
+
+	React.useEffect(() => {
+		uploadStateRef.current = uploadState
+	}, [uploadState])
+
+	React.useEffect(() => {
+		let isMounted = true
+
+		const currentUploadState = uploadStateRef.current
+		if (readyState === FileUploadReadyState.Uploading && currentUploadState) {
+			const dataPromises = relevantPopulators.map(populator =>
+				populator.prepareFileData
+					? populator.prepareFileData(currentUploadState.file, currentUploadState.previewUrl)
+					: Promise.resolve(undefined),
+			)
+			setPreparedPopulatorData({ name: 'uninitialized' })
+			Promise.all(dataPromises).then(data => {
+				if (!isMounted) {
+					return
+				}
+				setPreparedPopulatorData({
+					name: 'ready',
+					data,
+				})
+			})
+		}
+
+		return () => {
+			isMounted = false
+		}
+	}, [readyState, relevantPopulators])
+
 	React.useEffect(() => {
 		if (
-			uploadState &&
-			uploadState.readyState === FileUploadReadyState.Success &&
-			uploadState.result.fileUrl !== accessor.currentValue
+			uploadState?.readyState !== FileUploadReadyState.Success ||
+			preparedPopulatorData.name !== 'ready' ||
+			!batchUpdates
 		) {
-			accessor.updateValue?.(uploadState.result.fileUrl)
+			return
 		}
-	}, [uploadState, accessor])
+
+		for (let i = 0; i < relevantPopulators.length; i++) {
+			const populator = relevantPopulators[i]
+			const preparedData = preparedPopulatorData.data[i]
+
+			populator.populateFileData(
+				{
+					uploadResult: uploadState.result,
+					file: uploadState.file,
+					previewUrl: uploadState.previewUrl,
+					environment,
+					batchUpdates,
+				},
+				preparedData,
+			)
+		}
+	}, [
+		batchUpdates,
+		environment,
+		preparedPopulatorData.data,
+		preparedPopulatorData.name,
+		relevantPopulators,
+		uploadState,
+	])
 
 	const renderPreview = () => {
 		if (uploadState) {
 			return props.children(uploadState.previewUrl)
 		}
-		if (accessor.currentValue) {
-			return props.children(accessor.currentValue)
+		if (temporaryDesugaredField.currentValue) {
+			return props.children(temporaryDesugaredField.currentValue)
 		}
 		return <span className="fileInput-empty">{emptyText}</span>
 	}
 	const renderUploadStatusMessage = (uploadState?: SingleFileUploadState) => {
-		if (!uploadState) {
+		console.log('us', uploadState, preparedPopulatorData)
+		if (!uploadState || uploadState.readyState === FileUploadReadyState.Aborted) {
 			return (
 				<>
 					<Button size="small">Select a file to upload</Button>
@@ -175,20 +249,16 @@ const Inner = React.memo((props: InnerProps) => {
 				</>
 			)
 		}
-		switch (uploadState.readyState) {
-			case FileUploadReadyState.Uploading:
-				if (uploadState.progress === undefined) {
-					return `Starting upload`
-				}
-				return `Upload progress: ${(uploadState.progress * 100).toFixed()}%`
-			case FileUploadReadyState.Aborted:
-			case FileUploadReadyState.Error:
-				return `Upload failed`
-			case FileUploadReadyState.Success:
-				return `Upload has finished successfully`
-			default:
-				assertNever(uploadState)
+		if (uploadState.readyState === FileUploadReadyState.Error || preparedPopulatorData.name === 'error') {
+			return `Upload failed`
 		}
+		if (uploadState.readyState === FileUploadReadyState.Success && preparedPopulatorData.name === 'ready') {
+			return `Upload has finished successfully`
+		}
+		if (uploadState.readyState === FileUploadReadyState.Uploading && uploadState.progress !== undefined) {
+			return `Upload progress: ${(uploadState.progress * 100).toFixed()}%`
+		}
+		return `Uploading…`
 	}
 	return (
 		<Box distinction="seamlessIfNested">

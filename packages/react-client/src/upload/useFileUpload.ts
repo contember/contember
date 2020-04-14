@@ -16,7 +16,7 @@ export interface FileUploadOptions {
 }
 
 export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
-	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 50
+	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 250
 
 	const client = useCurrentContentGraphQlClient()
 	const contentApiToken = useSessionToken()
@@ -102,9 +102,9 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 		if (isFirstRenderRef.current) {
 			return
 		}
-		if (multiTemporalState.publicState !== multiTemporalState.liveState) {
+		if (multiTemporalState.isLiveStateDirty) {
 			const now = Date.now()
-			const timeDelta = now - multiTemporalState.lastUpdateTime
+			const timeDelta = Math.max(now - multiTemporalState.lastUpdateTime, 0) // The max is just a sanity check
 			if (timeDelta > maxUpdateFrequency) {
 				if (updateTimeoutRef.current !== undefined) {
 					clearTimeout(updateTimeoutRef.current)
@@ -113,17 +113,19 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 					type: FileUploadActionType.PublishNewestState,
 				})
 			} else {
-				if (updateTimeoutRef.current === undefined) {
-					updateTimeoutRef.current = window.setTimeout(() => {
-						dispatch({
-							type: FileUploadActionType.PublishNewestState,
-						})
-						updateTimeoutRef.current = undefined
-					}, timeDelta)
+				if (updateTimeoutRef.current !== undefined) {
+					return
 				}
+				updateTimeoutRef.current = window.setTimeout(() => {
+					dispatch({
+						type: FileUploadActionType.PublishNewestState,
+					})
+					updateTimeoutRef.current = undefined
+				}, maxUpdateFrequency - timeDelta)
 			}
 		}
 	}, [
+		multiTemporalState.isLiveStateDirty,
 		multiTemporalState.lastUpdateTime,
 		multiTemporalState.liveState,
 		multiTemporalState.publicState,

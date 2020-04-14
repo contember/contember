@@ -2,7 +2,6 @@ import { assertNever } from '../utils'
 import { FileId } from './FileId'
 import { FileUploadAction } from './FileUploadAction'
 import { FileUploadActionType } from './FileUploadActionType'
-import { FileUploadCompoundState } from './FileUploadCompoundState'
 import { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 import { FileUploadReadyState } from './FileUploadReadyState'
 
@@ -12,6 +11,7 @@ export const initializeFileUploadState = (): FileUploadMultiTemporalState => ({
 	fileIdByFile: new WeakMap<File, FileId>(),
 	liveState: new Map(),
 	publicState: new Map(),
+	isLiveStateDirty: false,
 })
 
 export const fileUploadReducer = (
@@ -19,12 +19,21 @@ export const fileUploadReducer = (
 	action: FileUploadAction,
 ): FileUploadMultiTemporalState => {
 	let newStockFileIdSeed = previousState.stockFileIdSeed
-	const publishNewLiveState = (liveState: FileUploadCompoundState): FileUploadMultiTemporalState => ({
-		publicState: liveState,
+	const publishNewState = (): FileUploadMultiTemporalState => ({
+		publicState: previousState.liveState,
 		stockFileIdSeed: newStockFileIdSeed,
 		fileIdByFile: previousState.fileIdByFile,
+		lastUpdateTime: previousState.lastUpdateTime,
+		isLiveStateDirty: false,
+
+		// Immediately make the live state referentially unequal so that this doesn't have to happen during each action
+		// several times between two publishes.
+		liveState: new Map(previousState.liveState),
+	})
+	const getNewDirtyState = (): FileUploadMultiTemporalState => ({
+		...previousState,
+		isLiveStateDirty: true,
 		lastUpdateTime: Date.now(),
-		liveState,
 	})
 	const toFileId = (fileOrId: File | FileId) => {
 		if (fileOrId instanceof File) {
@@ -34,11 +43,9 @@ export const fileUploadReducer = (
 	}
 	switch (action.type) {
 		case FileUploadActionType.PublishNewestState: {
-			return publishNewLiveState(new Map(previousState.liveState))
+			return publishNewState()
 		}
 		case FileUploadActionType.StartUploading: {
-			const newLiveState: FileUploadCompoundState = new Map(previousState.liveState)
-
 			for (const [fileWithMaybeId, metadata] of action.files) {
 				let file: File
 				let fileId: FileId
@@ -50,9 +57,9 @@ export const fileUploadReducer = (
 					;[fileId, file] = fileWithMaybeId
 				}
 
-				// Deliberately allowing starting a new upoad with the same id
+				// Deliberately allowing starting a new upload with the same id
 
-				newLiveState.set(fileId, {
+				previousState.liveState.set(fileId, {
 					readyState: FileUploadReadyState.Uploading,
 					abortController: metadata.abortController,
 					previewUrl: metadata.previewUrl,
@@ -61,17 +68,16 @@ export const fileUploadReducer = (
 				})
 				previousState.fileIdByFile.set(file, fileId)
 			}
-			return publishNewLiveState(newLiveState)
+			return publishNewState() // Making the feedback about started upload immediate
 		}
 		case FileUploadActionType.FinishSuccessfully: {
-			const newLiveState: FileUploadCompoundState = new Map(previousState.liveState)
 			for (const [fileOrId, result] of action.result) {
 				const fileId = toFileId(fileOrId)
-				const previousFileState = newLiveState.get(fileId)
+				const previousFileState = previousState.liveState.get(fileId)
 				if (previousFileState === undefined || previousFileState.readyState !== FileUploadReadyState.Uploading) {
 					continue
 				}
-				newLiveState.set(fileId, {
+				previousState.liveState.set(fileId, {
 					readyState: FileUploadReadyState.Success,
 					previewUrl: previousFileState.previewUrl,
 					uploader: previousFileState.uploader,
@@ -79,17 +85,16 @@ export const fileUploadReducer = (
 					result,
 				})
 			}
-			return publishNewLiveState(newLiveState)
+			return getNewDirtyState()
 		}
 		case FileUploadActionType.FinishWithError: {
-			const newLiveState: FileUploadCompoundState = new Map(previousState.liveState)
 			for (const [fileOrId, error] of action.error) {
 				const fileId = toFileId(fileOrId)
-				const previousFileState = newLiveState.get(fileId)
+				const previousFileState = previousState.liveState.get(fileId)
 				if (previousFileState === undefined || previousFileState.readyState !== FileUploadReadyState.Uploading) {
 					continue
 				}
-				newLiveState.set(fileId, {
+				previousState.liveState.set(fileId, {
 					readyState: FileUploadReadyState.Error,
 					previewUrl: previousFileState.previewUrl,
 					uploader: previousFileState.uploader,
@@ -97,20 +102,18 @@ export const fileUploadReducer = (
 					error,
 				})
 			}
-			return publishNewLiveState(newLiveState)
+			return getNewDirtyState()
 		}
 		case FileUploadActionType.Abort: {
-			const newLiveState: FileUploadCompoundState = new Map(previousState.liveState)
 			for (const fileOrId of action.files) {
-				newLiveState.delete(toFileId(fileOrId))
+				previousState.liveState.delete(toFileId(fileOrId))
 			}
-			return publishNewLiveState(newLiveState)
+			return getNewDirtyState()
 		}
 		case FileUploadActionType.UpdateUploadProgress: {
-			const newLiveState: FileUploadCompoundState = new Map(previousState.liveState)
 			for (const [fileOrId, { progress }] of action.progress) {
 				const fileId = toFileId(fileOrId)
-				const previousFileState = newLiveState.get(fileId)
+				const previousFileState = previousState.liveState.get(fileId)
 				if (
 					progress === undefined ||
 					previousFileState === undefined ||
@@ -118,7 +121,7 @@ export const fileUploadReducer = (
 				) {
 					continue
 				}
-				newLiveState.set(fileId, {
+				previousState.liveState.set(fileId, {
 					readyState: FileUploadReadyState.Uploading,
 					file: previousFileState.file,
 					uploader: previousFileState.uploader,
@@ -127,7 +130,7 @@ export const fileUploadReducer = (
 					progress,
 				})
 			}
-			return { ...previousState, liveState: newLiveState }
+			return getNewDirtyState()
 		}
 	}
 	assertNever(action)

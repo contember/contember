@@ -25,7 +25,10 @@ export class GenericFileMetadataPopulator implements FileDataPopulator {
 
 	public canHandleFile(file: File) {
 		return (
-			!!this.props.fileNameField || !!this.props.lastModifiedField || !!this.props.fileSizeField || !!this.props.fileTypeField
+			!!this.props.fileNameField ||
+			!!this.props.lastModifiedField ||
+			!!this.props.fileSizeField ||
+			!!this.props.fileTypeField
 		)
 	}
 

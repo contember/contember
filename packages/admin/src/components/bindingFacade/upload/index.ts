@@ -1,6 +1,5 @@
 export * from './fields'
 export * from './fileDataPopulators'
-export * from './fileRenderers'
 export * from './utils'
 
 export * from './AggregateUploadProps'

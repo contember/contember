@@ -10,7 +10,7 @@ import {
 } from '@contember/binding'
 import { FileUploader } from '@contember/client'
 import { FileUploadReadyState, SingleFileUploadState, useFileUpload } from '@contember/react-client'
-import { Box, Button, FormGroup } from '@contember/ui'
+import { Box, Button, FormGroup, Spinner } from '@contember/ui'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
@@ -27,11 +27,14 @@ export interface UploadFieldMetadata {
 	uploadState: SingleFileUploadState | undefined
 	emptyText?: React.ReactNode
 	populators: FileDataPopulator[]
+	renderFile?: () => React.ReactNode
+	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
 }
 
 export type UploadFieldProps = {
 	accept?: string
-	children: (url: string) => React.ReactNode
+	renderFile?: () => React.ReactNode
+	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
 	emptyText?: React.ReactNode
 	uploader?: FileUploader
 } & SimpleRelativeSingleFieldProps &
@@ -69,6 +72,8 @@ export const UploadField = Component<UploadFieldProps>(
 			emptyText: props.emptyText,
 			uploadState: state,
 			entityAccessor: entity,
+			renderFile: props.renderFile,
+			renderFilePreview: props.renderFilePreview,
 			environment,
 			populators,
 		}))
@@ -91,9 +96,7 @@ export const UploadField = Component<UploadFieldProps>(
 				>
 					<input {...getInputProps()} />
 					{metadata.map((metadata, i) => (
-						<Inner metadata={metadata} {...props} key={i}>
-							{props.children}
-						</Inner>
+						<Inner metadata={metadata} {...props} key={i} />
 					))}
 				</div>
 			</FormGroup>
@@ -114,7 +117,6 @@ export const UploadField = Component<UploadFieldProps>(
 type InnerProps = SimpleRelativeSingleFieldProps & {
 	metadata: UploadFieldMetadata
 	emptyText?: React.ReactNode
-	children: (url: string) => React.ReactNode
 }
 
 type PopulatorDataState =
@@ -132,7 +134,15 @@ type PopulatorDataState =
 	  }
 
 const Inner = React.memo((props: InnerProps) => {
-	const { uploadState, emptyText, entityAccessor, environment, populators } = props.metadata
+	const {
+		uploadState,
+		emptyText,
+		entityAccessor,
+		environment,
+		populators,
+		renderFile,
+		renderFilePreview,
+	} = props.metadata
 
 	const temporaryDesugaredField = useRelativeSingleField<string>(props)
 
@@ -215,15 +225,17 @@ const Inner = React.memo((props: InnerProps) => {
 
 	const renderPreview = () => {
 		if (uploadState) {
-			return props.children(uploadState.previewUrl)
+			if (renderFilePreview) {
+				return renderFilePreview(uploadState.file, uploadState.previewUrl)
+			}
+			return <Spinner />
 		}
-		if (temporaryDesugaredField.currentValue) {
-			return props.children(temporaryDesugaredField.currentValue)
+		if (renderFile) {
+			return renderFile()
 		}
-		return <span className="fileInput-empty">{emptyText}</span>
+		return null
 	}
 	const renderUploadStatusMessage = (uploadState?: SingleFileUploadState) => {
-		console.log('us', uploadState, preparedPopulatorData)
 		if (!uploadState || uploadState.readyState === FileUploadReadyState.Aborted) {
 			return (
 				<>

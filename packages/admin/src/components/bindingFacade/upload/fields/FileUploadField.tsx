@@ -1,6 +1,7 @@
+import { Component } from '@contember/binding'
 import * as React from 'react'
-import { Component, Field } from '@contember/binding'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
+import { FileUrlFieldView } from '../../fieldViews'
 import { GenericFileUploadProps } from '../GenericFileUploadProps'
 import { UploadField } from './UploadField'
 
@@ -9,29 +10,22 @@ export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileU
 // TODO this is super temporary
 export const FileUploadField = Component<FileUploadFieldProps>(
 	props => (
-		<UploadField {...props} fileUrlField={props.field} emptyText="No file selected">
-			{url => (
-				<span
-					onClick={e => {
-						e.stopPropagation()
-					}}
+		<UploadField
+			{...props}
+			fileUrlField={props.field}
+			renderFilePreview={(file, previewUrl) => (
+				<a
 					style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'rtl' }}
+					href={previewUrl}
+					target="_blank"
+					rel="noopener"
 				>
-					<a href={url} target="_blank" rel="noopener">
-						{url.substring(Math.max(0, url.lastIndexOf('/') + 1))}
-					</a>
-				</span>
+					{previewUrl.substring(Math.max(0, previewUrl.lastIndexOf('/') + 1))}
+				</a>
 			)}
-		</UploadField>
+			renderFile={() => <FileUrlFieldView fileUrlField={props.field} />}
+			emptyText="No file selected"
+		/>
 	),
-	(props, environment) =>
-		UploadField.generateSyntheticChildren(
-			{
-				...props,
-				fileUrlField: props.field,
-				children: () => null,
-			},
-			environment,
-		),
 	'FileUploadField',
 )

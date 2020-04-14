@@ -1,3 +1,4 @@
+export * from './AggregateDataPopulatorProps'
 export * from './AudioFileMetadataPopulator'
 export * from './FileDataPopulator'
 export * from './FileUrlDataPopulator'

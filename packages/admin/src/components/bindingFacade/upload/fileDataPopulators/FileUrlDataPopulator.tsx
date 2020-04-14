@@ -7,15 +7,15 @@ export interface FileUrlDataPopulatorProps {
 	field: SugaredFieldProps['field']
 }
 
-export class FileUrlDataPopulator implements FileDataPopulator<never, S3FileUploader.SuccessMetadata> {
+export class FileUrlDataPopulator implements FileDataPopulator<any, S3FileUploader.SuccessMetadata> {
 	public constructor(public readonly props: FileUrlDataPopulatorProps) {}
 
 	public getStaticFields() {
 		return <SugaredField field={this.props.field} />
 	}
 
-	public canHandleFile(file: File, uploadResult: S3FileUploader.SuccessMetadata) {
-		return 'fileUrl' in uploadResult && typeof uploadResult.fileUrl === 'string'
+	public canHandleFile(file: File) {
+		return true
 	}
 
 	public populateFileData(options: FileDataPopulatorOptions<S3FileUploader.SuccessMetadata>) {

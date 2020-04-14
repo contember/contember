@@ -1,7 +1,7 @@
 import { EntityAccessor, Environment } from '@contember/binding'
 import * as React from 'react'
 
-export interface FileDataPopulatorOptions<UploadResult = never> {
+export interface FileDataPopulatorOptions<UploadResult = any> {
 	file: File
 	previewUrl: string
 	uploadResult: UploadResult
@@ -9,9 +9,9 @@ export interface FileDataPopulatorOptions<UploadResult = never> {
 	environment: Environment
 }
 
-export interface FileDataPopulator<FileData = never, UploadResult = never> {
+export interface FileDataPopulator<FileData = any, UploadResult = any> {
 	getStaticFields: (environment: Environment) => React.ReactNode
-	canHandleFile: (file: File, uploadResult: UploadResult) => boolean
+	canHandleFile: (file: File) => boolean
 	prepareFileData?: (file: File, previewUrl: string) => Promise<FileData>
 	populateFileData: (options: FileDataPopulatorOptions<UploadResult>, fileData: FileData) => void
 }

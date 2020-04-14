@@ -52,7 +52,7 @@ export const fileUploadReducer = (
 
 				if (fileWithMaybeId instanceof File) {
 					file = fileWithMaybeId
-					fileId = `file-${newStockFileIdSeed++}`
+					fileId = `__contember__file-${newStockFileIdSeed++}`
 				} else {
 					;[fileId, file] = fileWithMaybeId
 				}

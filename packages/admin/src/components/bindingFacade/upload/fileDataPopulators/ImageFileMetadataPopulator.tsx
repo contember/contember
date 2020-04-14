@@ -1,8 +1,6 @@
 import { QueryLanguage, SugaredField, SugaredFieldProps } from '@contember/binding'
 import * as React from 'react'
-import { populateGenericFileMetadataFields } from '../populateGenericFileMetadataFields'
-import { populateImageFileMetadataFields } from '../populateImageFileMetadataFields'
-import { isAudio, isImage } from '../utils'
+import { isImage } from '../utils'
 import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
 
 export interface ImageFileMetadataPopulatorProps {

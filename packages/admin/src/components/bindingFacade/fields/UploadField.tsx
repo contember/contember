@@ -162,7 +162,7 @@ const Inner = React.memo((props: InnerProps) => {
 	const batchUpdates = entityAccessor.batchUpdates
 
 	const relevantPopulators = React.useMemo(
-		() => (uploadedFile ? populators.filter(populator => populator.canHandleFile(uploadedFile)) : []),
+		() => (uploadedFile ? populators.filter(populator => populator.canHandleFile?.(uploadedFile) ?? true) : []),
 		[populators, uploadedFile],
 	)
 

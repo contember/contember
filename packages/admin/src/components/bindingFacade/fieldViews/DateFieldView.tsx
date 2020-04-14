@@ -1,8 +1,8 @@
-import { Component, Field, FieldProps, useRelativeSingleField } from '@contember/binding'
+import { Component, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 
 export interface DateFieldViewProps {
-	field: FieldProps['field']
+	field: SugaredFieldProps['field']
 	format?: Intl.DateTimeFormatOptions | ((date: Date) => React.ReactNode)
 	fallback?: React.ReactNode
 }
@@ -29,7 +29,7 @@ export const DateFieldView = Component<DateFieldViewProps>(
 	},
 	props => (
 		<>
-			<Field field={props.field} />
+			<SugaredField field={props.field} />
 			{props.fallback}
 		</>
 	),

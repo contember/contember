@@ -8,26 +8,23 @@ import {
 } from '@contember/binding'
 import * as React from 'react'
 
-export interface ImageFieldViewProps<SrcField extends FieldValue = string>
-	extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+export interface VideoFieldViewProps<SrcField extends FieldValue = string>
+	extends Omit<React.VideoHTMLAttributes<HTMLVideoElement>, 'src'> {
 	srcField: SugaredFieldProps['field']
-	altField?: SugaredFieldProps['field']
 	titleField?: SugaredFieldProps['field']
 	formatUrl?: (srcFieldValue: SrcField) => string
 	fallback?: React.ReactNode
 }
 
-export const ImageFieldView = Component(
+export const VideoFieldView = Component(
 	<SrcField extends FieldValue = string>({
 		srcField,
-		altField,
 		titleField,
 		formatUrl,
 		fallback,
-		...imgProps
-	}: ImageFieldViewProps<SrcField>) => {
+		...videoProps
+	}: VideoFieldViewProps<SrcField>) => {
 		const srcAccessor = useRelativeSingleField<SrcField>(srcField)
-		const altAccessor = useOptionalRelativeSingleField<string>(altField)
 		const titleAccessor = useOptionalRelativeSingleField<string>(titleField)
 
 		if (!srcAccessor.currentValue) {
@@ -35,20 +32,19 @@ export const ImageFieldView = Component(
 		}
 		return (
 			// The spread intentionally comes after alt and title so that it's possible to provide just static string values.
-			<img
+			<video
 				src={formatUrl ? formatUrl(srcAccessor.currentValue) : (srcAccessor.currentValue as string)}
-				alt={altAccessor?.currentValue || undefined}
 				title={titleAccessor?.currentValue || undefined}
-				{...imgProps}
+				controls
+				{...videoProps}
 			/>
 		)
 	},
-	({ altField, srcField, titleField }) => (
+	({ srcField, titleField }) => (
 		<>
 			<SugaredField field={srcField} />
-			{altField && <SugaredField field={altField} />}
 			{titleField && <SugaredField field={titleField} />}
 		</>
 	),
-	'ImageFieldView',
-) as <SrcField extends FieldValue = string>(props: ImageFieldViewProps<SrcField>) => React.ReactElement
+	'VideoFieldView',
+) as <SrcField extends FieldValue = string>(props: VideoFieldViewProps<SrcField>) => React.ReactElement

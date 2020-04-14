@@ -1,6 +1,7 @@
 import { FileUploader } from '@contember/client'
 
-export interface InternalFileMetadata {
+export interface FileWithMetadata {
+	file: File
 	abortController: AbortController
 	previewUrl: string
 	uploader: FileUploader

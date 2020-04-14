@@ -1,6 +1,7 @@
 import { FileUploadProgress } from '@contember/client'
-import { InternalFileMetadata } from './InternalFileMetadata'
+import { FileId } from './FileId'
 import { FileUploadActionType } from './FileUploadActionType'
+import { FileWithMetadata } from './FileWithMetadata'
 
 export type FileUploadAction =
 	| {
@@ -8,21 +9,21 @@ export type FileUploadAction =
 	  }
 	| {
 			type: FileUploadActionType.StartUploading
-			files: Iterable<[File, InternalFileMetadata]>
+			files: Iterable<[[FileId, File] | File, FileWithMetadata]>
 	  }
 	| {
 			type: FileUploadActionType.UpdateUploadProgress
-			progress: Iterable<[File, FileUploadProgress]>
+			progress: Iterable<[File | FileId, FileUploadProgress]>
 	  }
 	| {
 			type: FileUploadActionType.FinishSuccessfully
-			result: Iterable<[File, any]>
+			result: Iterable<[File | FileId, any]>
 	  }
 	| {
 			type: FileUploadActionType.FinishWithError
-			error: Iterable<[File, any]>
+			error: Iterable<[File | FileId, any]>
 	  }
 	| {
 			type: FileUploadActionType.Abort
-			files: Iterable<File>
+			files: Iterable<File | FileId>
 	  }

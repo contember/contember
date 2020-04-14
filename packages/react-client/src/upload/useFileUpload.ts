@@ -2,11 +2,12 @@ import { S3FileUploader, UploadedFileMetadata } from '@contember/client'
 import * as React from 'react'
 import { useSessionToken } from '../auth'
 import { useCurrentContentGraphQlClient } from '../content'
+import { FileId } from './FileId'
 import { FileUploadActionType } from './FileUploadActionType'
 import { FileUploadCompoundState } from './FileUploadCompoundState'
 import { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
-import { InternalFileMetadata } from './InternalFileMetadata'
+import { FileWithMetadata } from './FileWithMetadata'
 
 export type FileUpload = [FileUploadCompoundState, FileUploadOperations]
 
@@ -15,7 +16,7 @@ export interface FileUploadOptions {
 }
 
 export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
-	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 100
+	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 50
 
 	const client = useCurrentContentGraphQlClient()
 	const contentApiToken = useSessionToken()
@@ -34,15 +35,17 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	const startUpload = React.useCallback<StartUpload>(
 		(files, options = {}) => {
 			const { uploader = new S3FileUploader() } = options
-			const filesWithInternalMetadata = new Map<File, InternalFileMetadata>()
+			const fileWithMetadataByFileConfig = new Map<[FileId, File] | File, FileWithMetadata>()
 			const filesWithMetadata = new Map<File, UploadedFileMetadata>()
 
-			for (const file of files) {
+			for (const fileWithMaybeId of files) {
 				const abortController = new AbortController()
-				filesWithInternalMetadata.set(file, {
+				const file = fileWithMaybeId instanceof File ? fileWithMaybeId : fileWithMaybeId[1]
+				fileWithMetadataByFileConfig.set(fileWithMaybeId, {
 					previewUrl: URL.createObjectURL(file),
 					abortController,
 					uploader,
+					file,
 				})
 				filesWithMetadata.set(file, {
 					abortSignal: abortController.signal,
@@ -51,7 +54,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 
 			dispatch({
 				type: FileUploadActionType.StartUploading,
-				files: filesWithInternalMetadata,
+				files: fileWithMetadataByFileConfig,
 			})
 
 			try {

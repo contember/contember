@@ -9,7 +9,7 @@ export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps & ImageFileUp
 
 export const ImageUploadField = Component<ImageUploadFieldProps>(
 	props => (
-		<UploadField {...props} accept="image/*" emptyText={'No image'}>
+		<UploadField {...props} fileUrlField={props.field} accept="image/*" emptyText={'No image'}>
 			{url => <img src={url} />}
 		</UploadField>
 	),
@@ -17,6 +17,7 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 		UploadField.generateSyntheticChildren(
 			{
 				...props,
+				fileUrlField: props.field,
 				children: () => null,
 			},
 			environment,

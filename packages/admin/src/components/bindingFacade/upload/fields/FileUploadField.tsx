@@ -9,7 +9,7 @@ export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileU
 // TODO this is super temporary
 export const FileUploadField = Component<FileUploadFieldProps>(
 	props => (
-		<UploadField {...props} emptyText="No file selected">
+		<UploadField {...props} fileUrlField={props.field} emptyText="No file selected">
 			{url => (
 				<span
 					onClick={e => {
@@ -28,6 +28,7 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 		UploadField.generateSyntheticChildren(
 			{
 				...props,
+				fileUrlField: props.field,
 				children: () => null,
 			},
 			environment,

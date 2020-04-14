@@ -15,13 +15,10 @@ import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import {
-	AggregateDataPopulatorProps,
-	AudioFileMetadataPopulator,
 	FileDataPopulator,
-	FileUrlDataPopulator,
-	GenericFileMetadataPopulator,
-	ImageFileMetadataPopulator,
-	VideoFileMetadataPopulator,
+	ResolvablePopulatorProps,
+	resolvePopulators,
+	useResolvedPopulators,
 } from '../fileDataPopulators'
 
 export interface UploadFieldMetadata {
@@ -38,20 +35,7 @@ export type UploadFieldProps = {
 	emptyText?: React.ReactNode
 	uploader?: FileUploader
 } & SimpleRelativeSingleFieldProps &
-	({ fileDataPopulators: Iterable<FileDataPopulator> } | AggregateDataPopulatorProps)
-
-const createPopulatorsFromProps = (props: UploadFieldProps): FileDataPopulator[] => {
-	if ('fileDataPopulators' in props) {
-		return Array.from(props.fileDataPopulators)
-	}
-	return [
-		new AudioFileMetadataPopulator(props),
-		new FileUrlDataPopulator(props),
-		new GenericFileMetadataPopulator(props),
-		new ImageFileMetadataPopulator(props),
-		new VideoFileMetadataPopulator(props),
-	]
-}
+	ResolvablePopulatorProps
 
 const staticFileId = 'file'
 export const UploadField = Component<UploadFieldProps>(
@@ -63,8 +47,7 @@ export const UploadField = Component<UploadFieldProps>(
 
 		const singleFileUploadState = uploadState.get(staticFileId)
 		const normalizedStateArray = [singleFileUploadState]
-
-		const populators = React.useMemo<FileDataPopulator[]>(() => createPopulatorsFromProps(props), [props])
+		const populators = useResolvedPopulators(props)
 
 		const onDrop = React.useCallback(
 			([file]: File[]) => {
@@ -120,7 +103,7 @@ export const UploadField = Component<UploadFieldProps>(
 		<>
 			<Field field={props.field} />
 
-			{createPopulatorsFromProps(props).map((item, i) => (
+			{resolvePopulators(props).map((item, i) => (
 				<React.Fragment key={i}>{item.getStaticFields(environment)}</React.Fragment>
 			))}
 		</>

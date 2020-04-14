@@ -9,7 +9,7 @@ export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFile
 
 export const VideoUploadField = Component<VideoUploadFieldProps>(
 	props => (
-		<UploadField {...props} accept="video/*">
+		<UploadField {...props} fileUrlField={props.field} accept="video/*">
 			{url => <video src={url} controls />}
 		</UploadField>
 	),
@@ -17,6 +17,7 @@ export const VideoUploadField = Component<VideoUploadFieldProps>(
 		UploadField.generateSyntheticChildren(
 			{
 				...props,
+				fileUrlField: props.field,
 				children: () => null,
 			},
 			environment,

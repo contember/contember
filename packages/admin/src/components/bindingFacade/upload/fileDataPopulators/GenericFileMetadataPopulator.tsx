@@ -5,8 +5,8 @@ import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator
 export interface GenericFileMetadataPopulatorProps {
 	fileNameField?: SugaredFieldProps['field']
 	lastModifiedField?: SugaredFieldProps['field']
-	sizeField?: SugaredFieldProps['field']
-	typeField?: SugaredFieldProps['field']
+	fileSizeField?: SugaredFieldProps['field']
+	fileTypeField?: SugaredFieldProps['field']
 }
 
 export class GenericFileMetadataPopulator implements FileDataPopulator {
@@ -17,15 +17,15 @@ export class GenericFileMetadataPopulator implements FileDataPopulator {
 			<>
 				{!!this.props.fileNameField && <SugaredField field={this.props.fileNameField} />}
 				{!!this.props.lastModifiedField && <SugaredField field={this.props.lastModifiedField} />}
-				{!!this.props.sizeField && <SugaredField field={this.props.sizeField} />}
-				{!!this.props.typeField && <SugaredField field={this.props.typeField} />}
+				{!!this.props.fileSizeField && <SugaredField field={this.props.fileSizeField} />}
+				{!!this.props.fileTypeField && <SugaredField field={this.props.fileTypeField} />}
 			</>
 		)
 	}
 
 	public canHandleFile(file: File) {
 		return (
-			!!this.props.fileNameField || !!this.props.lastModifiedField || !!this.props.sizeField || !!this.props.typeField
+			!!this.props.fileNameField || !!this.props.lastModifiedField || !!this.props.fileSizeField || !!this.props.fileTypeField
 		)
 	}
 
@@ -46,16 +46,16 @@ export class GenericFileMetadataPopulator implements FileDataPopulator {
 					.getRelativeSingleField<number>(lastModifiedField)
 					.updateValue?.(options.file.lastModified)
 			}
-			if (this.props.sizeField) {
-				const sizeField = QueryLanguage.desugarRelativeSingleField(this.props.sizeField, options.environment)
+			if (this.props.fileSizeField) {
+				const fileSizeField = QueryLanguage.desugarRelativeSingleField(this.props.fileSizeField, options.environment)
 				getAccessor()
-					.getRelativeSingleField<number>(sizeField)
+					.getRelativeSingleField<number>(fileSizeField)
 					.updateValue?.(options.file.size)
 			}
-			if (this.props.typeField) {
-				const typeField = QueryLanguage.desugarRelativeSingleField(this.props.typeField, options.environment)
+			if (this.props.fileTypeField) {
+				const fileTypeField = QueryLanguage.desugarRelativeSingleField(this.props.fileTypeField, options.environment)
 				getAccessor()
-					.getRelativeSingleField<string>(typeField)
+					.getRelativeSingleField<string>(fileTypeField)
 					.updateValue?.(options.file.type)
 			}
 		})

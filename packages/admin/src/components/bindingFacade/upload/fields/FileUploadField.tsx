@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Component, Field } from '@contember/binding'
-import { SimpleRelativeSingleFieldProps } from '../auxiliary'
-import { GenericFileUploadProps } from '../upload'
+import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
+import { GenericFileUploadProps } from '../GenericFileUploadProps'
 import { UploadField } from './UploadField'
 
 export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileUploadProps

@@ -13,7 +13,7 @@ import { FileUploadReadyState, SingleFileUploadState, useFileUpload } from '@con
 import { Box, Button, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
-import { SimpleRelativeSingleFieldProps } from '../auxiliary'
+import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import {
 	AggregateDataPopulatorProps,
 	AudioFileMetadataPopulator,
@@ -22,7 +22,7 @@ import {
 	GenericFileMetadataPopulator,
 	ImageFileMetadataPopulator,
 	VideoFileMetadataPopulator,
-} from '../upload'
+} from '../fileDataPopulators'
 
 export interface UploadFieldMetadata {
 	entityAccessor: EntityAccessor

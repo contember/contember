@@ -1,8 +1,8 @@
 import {
 	Component,
-	Field,
-	FieldProps,
 	FieldValue,
+	SugaredField,
+	SugaredFieldProps,
 	useOptionalRelativeSingleField,
 	useRelativeSingleField,
 } from '@contember/binding'
@@ -10,9 +10,9 @@ import * as React from 'react'
 
 export interface ImageFieldViewProps<SrcField extends FieldValue = string>
 	extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
-	srcField: FieldProps['field']
-	altField?: FieldProps['field']
-	titleField?: FieldProps['field']
+	srcField: SugaredFieldProps['field']
+	altField?: SugaredFieldProps['field']
+	titleField?: SugaredFieldProps['field']
 	formatUrl?: (srcFieldValue: SrcField) => string
 	fallback?: React.ReactNode
 }
@@ -45,9 +45,9 @@ export const ImageFieldView = Component(
 	},
 	({ altField, srcField, titleField }) => (
 		<>
-			<Field field={srcField} />
-			{altField && <Field field={altField} />}
-			{titleField && <Field field={titleField} />}
+			<SugaredField field={srcField} />
+			{altField && <SugaredField field={altField} />}
+			{titleField && <SugaredField field={titleField} />}
 		</>
 	),
 	'ImageFieldView',

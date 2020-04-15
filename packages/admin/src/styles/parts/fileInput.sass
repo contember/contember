@@ -1,44 +1,28 @@
 @import '../common'
 
 .fileInput
+	$previewWidth: em(150px)
+
 	width: 100%
+	height: $previewWidth
 	display: flex
 
-	&-input
-		+absolute
-		+size(rem(.1px))
-		opacity: 0
-		z-index: -1
-		overflow: hidden
-
 	&-preview
+		width: $previewWidth
+	&-preview ~ &-dropZone
+		margin-left: em(10px)
+
+	&-dropZone
+		flex-grow: 1
 		display: flex
 		justify-content: center
 		align-items: center
-		width: 40%
-		height: rem(100px)
-		background: #FFF
-		padding: rem(5px)
-		border: $cui-control-border-width solid $cui-control-view-default-border-color
-		border-radius: $cui-control-border-radius
-		text-align: center
+		flex-direction: column
+		height: 100%
 
-		> *
-			max-width: 100%
-			max-height: 100%
-
-	&-message
-		display: block
-		align-self: center
-		margin-left: rem(10px)
-		flex-grow: 1
-		text-align: center
-	&-drop
-		display: block
-		color: $c-text-light
-		font-size: $fs-small
-		text-align: center
-	&-empty
-		color: $c-text-light
-		font-style: italic
-		font-size: $fs-small
+	&-cta
+		&-label
+			display: block
+			color: $c-text-light
+			font-size: $fs-small
+			text-align: center

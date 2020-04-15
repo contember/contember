@@ -1,0 +1,9 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}fileDropZone
+	border-radius: em(10px)
+	border: em(1px) dashed $cui-fileDropZone-border-color
+	transition: border-color .2s
+
+	&.is-active
+		border-color: $cui-fileDropZone-active-border-color

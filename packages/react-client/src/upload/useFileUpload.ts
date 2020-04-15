@@ -1,148 +1,127 @@
-import { GenerateUploadUrlMutationBuilder } from '@contember/client'
+import { S3FileUploader, UploadedFileMetadata } from '@contember/client'
 import * as React from 'react'
 import { useSessionToken } from '../auth'
 import { useCurrentContentGraphQlClient } from '../content'
 import { FileId } from './FileId'
 import { FileUploadActionType } from './FileUploadActionType'
 import { FileUploadCompoundState } from './FileUploadCompoundState'
-import { CancelUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
-import { FileUploadReadyState } from './FileUploadReadyState'
+import { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
-import { readAsArrayBuffer } from './utils'
+import { FileWithMetadata } from './FileWithMetadata'
+import { toFileId } from './toFileId'
 
 export type FileUpload = [FileUploadCompoundState, FileUploadOperations]
 
 export interface FileUploadOptions {
 	maxUpdateFrequency?: number // This does NOT apply to all kinds of updates.
-	fileExpiration?: GenerateUploadUrlMutationBuilder.FileParameters['expiration']
-	filePrefix?: GenerateUploadUrlMutationBuilder.FileParameters['prefix']
-	fileAcl?: GenerateUploadUrlMutationBuilder.FileParameters['acl']
 }
 
 export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 250
 
 	const client = useCurrentContentGraphQlClient()
-	const apiToken = useSessionToken()
+	const contentApiToken = useSessionToken()
 
 	const updateTimeoutRef = React.useRef<number | undefined>(undefined)
 	const isFirstRenderRef = React.useRef(true)
 
-	const [uploadRequests] = React.useState(() => new Map<FileId, XMLHttpRequest>())
 	const [multiTemporalState, dispatch] = React.useReducer(fileUploadReducer, undefined, initializeFileUploadState)
+	const multiTemporalStateRef = React.useRef(multiTemporalState)
 
-	const cancelUpload = React.useCallback<CancelUpload>(
-		fileIds => {
-			for (const fileId of fileIds) {
-				if (uploadRequests.has(fileId)) {
-					uploadRequests.get(fileId)!.abort()
-					uploadRequests.delete(fileId)
-				}
-			}
-			dispatch({
-				type: FileUploadActionType.Uninitialize,
-				fileIds,
-			})
-		},
-		[uploadRequests],
-	)
+	React.useEffect(() => {
+		multiTemporalStateRef.current = multiTemporalState
+	})
+
+	const abortUpload = React.useCallback<AbortUpload>(files => {
+		dispatch({
+			type: FileUploadActionType.Abort,
+			files,
+		})
+	}, [])
 	const startUpload = React.useCallback<StartUpload>(
-		async files => {
-			const existingIds: FileId[] = files.map(file => file.id).filter(id => id in multiTemporalState.liveState)
+		(files, options = {}) => {
+			const newFileIds = new Set<FileId>()
+			const { uploader = new S3FileUploader() } = options
+			const fileWithMetadataByFileConfig = new Map<[FileId, File] | File, FileWithMetadata>()
+			const filesWithMetadata = new Map<File, UploadedFileMetadata>()
 
-			if (existingIds.length) {
-				cancelUpload(existingIds)
-			}
-
-			dispatch({
-				type: FileUploadActionType.Initialize,
-				filesWithMetadata: files.map(file => ({
-					id: file.id,
-					file: file.file,
-					previewUrl: URL.createObjectURL(file.file),
-				})),
-			})
-			const parameters: GenerateUploadUrlMutationBuilder.MutationParameters = {}
-			const fileIds: FileId[] = []
-			const aliasPrefix = 'file'
-
-			for (const file of files) {
-				parameters[`${aliasPrefix}${file.id}`] = {
-					contentType: file.file.type,
-					prefix: options?.filePrefix,
-					expiration: options?.fileExpiration,
-					acl: options?.fileAcl,
-				}
-				fileIds.push(file.id)
-			}
-
-			const mutation = GenerateUploadUrlMutationBuilder.buildQuery(parameters)
-			try {
-				const response = await client.sendRequest(mutation, {}, apiToken)
-				const responseData: GenerateUploadUrlMutationBuilder.MutationResponse = response.data
-
-				dispatch({
-					type: FileUploadActionType.StartUploading,
-					fileIds,
+			for (const fileWithMaybeId of files) {
+				const abortController = new AbortController()
+				const file = fileWithMaybeId instanceof File ? fileWithMaybeId : fileWithMaybeId[1]
+				fileWithMetadataByFileConfig.set(fileWithMaybeId, {
+					previewUrl: URL.createObjectURL(file),
+					abortController,
+					uploader,
+					file,
 				})
-				for (const file of files) {
-					const datumBody = responseData[`${aliasPrefix}${file.id}`]
-					const uploadRequestBody = await readAsArrayBuffer(file.file)
-					const xhr = new XMLHttpRequest()
-					uploadRequests.set(file.id, xhr)
+				filesWithMetadata.set(file, {
+					abortSignal: abortController.signal,
+				})
 
-					xhr.open(datumBody.method, datumBody.url)
+				const fileId: FileId | undefined = Array.isArray(fileWithMaybeId)
+					? fileWithMaybeId[0]
+					: toFileId(multiTemporalStateRef.current, file)
+				fileId && newFileIds.add(fileId)
+			}
 
-					for (const header of datumBody.headers) {
-						xhr.setRequestHeader(header.key, header.value)
-					}
-					xhr.addEventListener('load', () => {
-						dispatch({
-							type: FileUploadActionType.FinishSuccessfully,
-							fileId: file.id,
-							fileUrl: datumBody.publicUrl,
-						})
-					})
-					xhr.addEventListener('error', () => {
-						dispatch({
-							type: FileUploadActionType.FinishWithError,
-							fileIds: [file.id],
-						})
-					})
-					xhr.upload?.addEventListener('progress', e => {
+			newFileIds.size &&
+				dispatch({
+					type: FileUploadActionType.Abort,
+					files: newFileIds,
+				})
+			dispatch({
+				type: FileUploadActionType.StartUploading,
+				files: fileWithMetadataByFileConfig,
+			})
+
+			try {
+				uploader.upload(filesWithMetadata, {
+					onProgress: progress => {
 						dispatch({
 							type: FileUploadActionType.UpdateUploadProgress,
-							fileId: file.id,
-							progress: e.loaded / e.total,
+							progress,
 						})
-					})
-					xhr.send(uploadRequestBody)
-				}
-			} catch (error) {
+					},
+					onSuccess: result => {
+						dispatch({
+							type: FileUploadActionType.FinishSuccessfully,
+							result,
+						})
+					},
+					onError: error => {
+						dispatch({
+							type: FileUploadActionType.FinishWithError,
+							error,
+						})
+					},
+					contentApiToken,
+					client,
+				})
+			} catch (_) {
 				dispatch({
 					type: FileUploadActionType.FinishWithError,
-					fileIds,
+					error: Array.from(filesWithMetadata).map(([file]) => [file, undefined]), // TODO this is crap.
 				})
 			}
 		},
-		[apiToken, cancelUpload, client, multiTemporalState.liveState, options, uploadRequests],
+		[client, contentApiToken],
 	)
 
 	const operations = React.useMemo<FileUploadOperations>(
 		() => ({
 			startUpload,
-			cancelUpload,
+			abortUpload,
 		}),
-		[cancelUpload, startUpload],
+		[abortUpload, startUpload],
 	)
 
 	React.useEffect(() => {
 		if (isFirstRenderRef.current) {
 			return
 		}
-		if (multiTemporalState.publicState !== multiTemporalState.liveState) {
+		if (multiTemporalState.isLiveStateDirty) {
 			const now = Date.now()
-			const timeDelta = now - multiTemporalState.lastUpdateTime
+			const timeDelta = Math.max(now - multiTemporalState.lastUpdateTime, 0) // The max is just a sanity check
 			if (timeDelta > maxUpdateFrequency) {
 				if (updateTimeoutRef.current !== undefined) {
 					clearTimeout(updateTimeoutRef.current)
@@ -151,17 +130,19 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 					type: FileUploadActionType.PublishNewestState,
 				})
 			} else {
-				if (updateTimeoutRef.current === undefined) {
-					updateTimeoutRef.current = window.setTimeout(() => {
-						dispatch({
-							type: FileUploadActionType.PublishNewestState,
-						})
-						updateTimeoutRef.current = undefined
-					}, timeDelta)
+				if (updateTimeoutRef.current !== undefined) {
+					return
 				}
+				updateTimeoutRef.current = window.setTimeout(() => {
+					dispatch({
+						type: FileUploadActionType.PublishNewestState,
+					})
+					updateTimeoutRef.current = undefined
+				}, maxUpdateFrequency - timeDelta)
 			}
 		}
 	}, [
+		multiTemporalState.isLiveStateDirty,
 		multiTemporalState.lastUpdateTime,
 		multiTemporalState.liveState,
 		multiTemporalState.publicState,
@@ -170,12 +151,8 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 
 	React.useEffect(
 		() => () => {
-			for (const fileId in multiTemporalState.liveState) {
-				const state = multiTemporalState.liveState[fileId]
-
-				if (state.readyState !== FileUploadReadyState.Uninitialized && state.previewUrl !== undefined) {
-					URL.revokeObjectURL(state.previewUrl)
-				}
+			for (const [, state] of multiTemporalState.liveState) {
+				URL.revokeObjectURL(state.previewUrl)
 			}
 		},
 		[multiTemporalState.liveState],

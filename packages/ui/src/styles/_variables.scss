@@ -628,4 +628,8 @@ $cui-topBar-right-safeSpace: 14em;
 
 // ProgressBar
 $cui-progressBar-background-color: #444444;
-$cui-progressBar-foreground-color: #85ff00;
+$cui-progressBar-foreground-color: #85FF00;
+
+// FileDropZone
+$cui-fileDropZone-border-color: #DFDFDF;
+$cui-fileDropZone-active-border-color: $cui-box-active-color;

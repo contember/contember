@@ -1,7 +1,7 @@
 import { Component } from '@contember/binding'
 import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
-import { ImageFieldView } from '../../fieldViews'
+import { ImageFieldView, ImageFieldViewProps } from '../../fieldViews'
 import {
 	FileUrlDataPopulator,
 	GenericFileMetadataPopulator,
@@ -13,7 +13,11 @@ import { UploadField } from './UploadField'
 
 export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
 	ImageFileMetadataPopulatorProps &
-	GenericFileMetadataPopulatorProps
+	GenericFileMetadataPopulatorProps & {
+		formatPreviewUrl?: ImageFieldViewProps['formatUrl']
+		previewAlt?: string
+		previewTitle?: string
+	}
 
 export const ImageUploadField = Component<ImageUploadFieldProps>(
 	props => (
@@ -26,8 +30,17 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 				new GenericFileMetadataPopulator(props),
 				new ImageFileMetadataPopulator(props),
 			]}
-			renderFile={() => <ImageFieldView srcField={props.field} />}
-			renderFilePreview={(file, previewUrl) => <img src={previewUrl} />}
+			renderFile={() => (
+				<ImageFieldView
+					srcField={props.field}
+					formatUrl={props.formatPreviewUrl}
+					alt={props.previewAlt}
+					title={props.previewTitle}
+				/>
+			)}
+			renderFilePreview={(file, previewUrl) => (
+				<img src={previewUrl} alt={props.previewAlt} title={props.previewTitle} />
+			)}
 		/>
 	),
 	'ImageUploadField',

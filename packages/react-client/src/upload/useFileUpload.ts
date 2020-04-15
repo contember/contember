@@ -8,6 +8,7 @@ import { FileUploadCompoundState } from './FileUploadCompoundState'
 import { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
 import { FileWithMetadata } from './FileWithMetadata'
+import { toFileId } from './toFileId'
 
 export type FileUpload = [FileUploadCompoundState, FileUploadOperations]
 
@@ -25,6 +26,11 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	const isFirstRenderRef = React.useRef(true)
 
 	const [multiTemporalState, dispatch] = React.useReducer(fileUploadReducer, undefined, initializeFileUploadState)
+	const multiTemporalStateRef = React.useRef(multiTemporalState)
+
+	React.useEffect(() => {
+		multiTemporalStateRef.current = multiTemporalState
+	})
 
 	const abortUpload = React.useCallback<AbortUpload>(files => {
 		dispatch({
@@ -34,6 +40,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	}, [])
 	const startUpload = React.useCallback<StartUpload>(
 		(files, options = {}) => {
+			const newFileIds = new Set<FileId>()
 			const { uploader = new S3FileUploader() } = options
 			const fileWithMetadataByFileConfig = new Map<[FileId, File] | File, FileWithMetadata>()
 			const filesWithMetadata = new Map<File, UploadedFileMetadata>()
@@ -50,8 +57,18 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 				filesWithMetadata.set(file, {
 					abortSignal: abortController.signal,
 				})
+
+				const fileId: FileId | undefined = Array.isArray(fileWithMaybeId)
+					? fileWithMaybeId[0]
+					: toFileId(multiTemporalStateRef.current, file)
+				fileId && newFileIds.add(fileId)
 			}
 
+			newFileIds.size &&
+				dispatch({
+					type: FileUploadActionType.Abort,
+					files: newFileIds,
+				})
 			dispatch({
 				type: FileUploadActionType.StartUploading,
 				files: fileWithMetadataByFileConfig,

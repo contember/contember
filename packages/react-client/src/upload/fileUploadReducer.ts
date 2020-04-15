@@ -4,6 +4,7 @@ import { FileUploadAction } from './FileUploadAction'
 import { FileUploadActionType } from './FileUploadActionType'
 import { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 import { FileUploadReadyState } from './FileUploadReadyState'
+import { toFileId } from './toFileId'
 
 export const initializeFileUploadState = (): FileUploadMultiTemporalState => ({
 	lastUpdateTime: 0,
@@ -35,12 +36,6 @@ export const fileUploadReducer = (
 		isLiveStateDirty: true,
 		lastUpdateTime: Date.now(),
 	})
-	const toFileId = (fileOrId: File | FileId) => {
-		if (fileOrId instanceof File) {
-			return previousState.fileIdByFile.get(fileOrId)! // Should we throw instead of the yolo "!"?
-		}
-		return fileOrId
-	}
 	switch (action.type) {
 		case FileUploadActionType.PublishNewestState: {
 			return publishNewState()
@@ -72,7 +67,7 @@ export const fileUploadReducer = (
 		}
 		case FileUploadActionType.FinishSuccessfully: {
 			for (const [fileOrId, result] of action.result) {
-				const fileId = toFileId(fileOrId)
+				const fileId = toFileId(previousState, fileOrId)
 				const previousFileState = previousState.liveState.get(fileId)
 				if (previousFileState === undefined || previousFileState.readyState !== FileUploadReadyState.Uploading) {
 					continue
@@ -89,7 +84,7 @@ export const fileUploadReducer = (
 		}
 		case FileUploadActionType.FinishWithError: {
 			for (const [fileOrId, error] of action.error) {
-				const fileId = toFileId(fileOrId)
+				const fileId = toFileId(previousState, fileOrId)
 				const previousFileState = previousState.liveState.get(fileId)
 				if (previousFileState === undefined || previousFileState.readyState !== FileUploadReadyState.Uploading) {
 					continue
@@ -105,14 +100,28 @@ export const fileUploadReducer = (
 			return getNewDirtyState()
 		}
 		case FileUploadActionType.Abort: {
+			let atLeastOneAborted = false
 			for (const fileOrId of action.files) {
-				previousState.liveState.delete(toFileId(fileOrId))
+				const fileId = toFileId(previousState, fileOrId)
+				const fileState = previousState.liveState.get(fileId)
+
+				if (fileState === undefined) {
+					continue
+				}
+				atLeastOneAborted = true
+				if (fileState.readyState === FileUploadReadyState.Uploading) {
+					fileState.abortController.abort() // This is a bit naughty… We shouldn't do this from here.
+				}
+				previousState.liveState.delete(fileId)
 			}
-			return getNewDirtyState()
+			if (atLeastOneAborted) {
+				return getNewDirtyState()
+			}
+			return previousState
 		}
 		case FileUploadActionType.UpdateUploadProgress: {
 			for (const [fileOrId, { progress }] of action.progress) {
-				const fileId = toFileId(fileOrId)
+				const fileId = toFileId(previousState, fileOrId)
 				const previousFileState = previousState.liveState.get(fileId)
 				if (
 					progress === undefined ||

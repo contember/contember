@@ -12,7 +12,7 @@ storiesOf('ProgressBar', module).add('simple', () => {
 	})
 
 	return (
-		<div style={{ width: '150px', fontSize: '5rem', margin: '2rem auto' }}>
+		<div style={{ width: '250px', fontSize: '3rem', margin: '2rem auto' }}>
 			<ProgressBar progress={progress} />
 		</div>
 	)

@@ -1,35 +1,12 @@
-import {
-	Component,
-	EntityAccessor,
-	Environment,
-	Field,
-	useEntityContext,
-	useEnvironment,
-	useMutationState,
-	useRelativeSingleField,
-} from '@contember/binding'
+import { Component, Field, useEntityContext, useEnvironment, useMutationState } from '@contember/binding'
 import { FileUploader } from '@contember/client'
-import { FileUploadReadyState, SingleFileUploadState, useFileUpload } from '@contember/react-client'
-import { Box, Button, FormGroup, Spinner } from '@contember/ui'
+import { useFileUpload } from '@contember/react-client'
+import { Box, Button, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
-import {
-	FileDataPopulator,
-	ResolvablePopulatorProps,
-	resolvePopulators,
-	useResolvedPopulators,
-} from '../fileDataPopulators'
-
-export interface UploadFieldMetadata {
-	entityAccessor: EntityAccessor
-	environment: Environment
-	uploadState: SingleFileUploadState | undefined
-	emptyText?: React.ReactNode
-	populators: FileDataPopulator[]
-	renderFile?: () => React.ReactNode
-	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
-}
+import { ResolvablePopulatorProps, resolvePopulators, useResolvedPopulators } from '../fileDataPopulators'
+import { UploadedFilePreview, UploadedFilePreviewProps } from './UploadedFilePreview'
 
 export type UploadFieldProps = {
 	accept?: string
@@ -68,10 +45,10 @@ export const UploadField = Component<UploadFieldProps>(
 			multiple: false,
 			noKeyboard: true, // This would normally be absolutely henious but there is a keyboard-focusable button inside.
 		})
-		const metadata: UploadFieldMetadata[] = normalizedStateArray.map(state => ({
+		const previewProps: UploadedFilePreviewProps[] = normalizedStateArray.map(state => ({
 			emptyText: props.emptyText,
 			uploadState: state,
-			entityAccessor: entity,
+			batchUpdates: entity.batchUpdates,
 			renderFile: props.renderFile,
 			renderFilePreview: props.renderFilePreview,
 			environment,
@@ -95,9 +72,19 @@ export const UploadField = Component<UploadFieldProps>(
 					})}
 				>
 					<input {...getInputProps()} />
-					{metadata.map((metadata, i) => (
-						<Inner metadata={metadata} {...props} key={i} />
-					))}
+					<Box distinction="seamlessIfNested">
+						<span className="fileInput">
+							<span className="fileInput-preview">
+								{previewProps.map((item, i) => (
+									<UploadedFilePreview {...item} key={i} />
+								))}
+							</span>
+							<span className="fileInput-message">
+								<Button size="small">Select a file to upload</Button>
+								<span className="fileInput-drop">or drag & drop</span>
+							</span>
+						</span>
+					</Box>
 				</div>
 			</FormGroup>
 		)
@@ -113,154 +100,3 @@ export const UploadField = Component<UploadFieldProps>(
 	),
 	'UploadField',
 )
-
-type InnerProps = SimpleRelativeSingleFieldProps & {
-	metadata: UploadFieldMetadata
-	emptyText?: React.ReactNode
-}
-
-type PopulatorDataState =
-	| {
-			name: 'uninitialized'
-			data?: never
-	  }
-	| {
-			name: 'ready'
-			data: any[]
-	  }
-	| {
-			name: 'error'
-			data?: never
-	  }
-
-const Inner = React.memo((props: InnerProps) => {
-	const {
-		uploadState,
-		emptyText,
-		entityAccessor,
-		environment,
-		populators,
-		renderFile,
-		renderFilePreview,
-	} = props.metadata
-
-	const temporaryDesugaredField = useRelativeSingleField<string>(props)
-
-	const uploadStateRef = React.useRef(uploadState)
-	const [preparedPopulatorData, setPreparedPopulatorData] = React.useState<PopulatorDataState>({
-		name: 'uninitialized',
-	})
-	const uploadedFile = uploadState?.file
-	const readyState = uploadState?.readyState
-	const batchUpdates = entityAccessor.batchUpdates
-
-	const relevantPopulators = React.useMemo(
-		() => (uploadedFile ? populators.filter(populator => populator.canHandleFile?.(uploadedFile) ?? true) : []),
-		[populators, uploadedFile],
-	)
-
-	React.useEffect(() => {
-		uploadStateRef.current = uploadState
-	}, [uploadState])
-
-	React.useEffect(() => {
-		let isMounted = true
-
-		const currentUploadState = uploadStateRef.current
-		if (readyState === FileUploadReadyState.Uploading && currentUploadState) {
-			const dataPromises = relevantPopulators.map(populator =>
-				populator.prepareFileData
-					? populator.prepareFileData(currentUploadState.file, currentUploadState.previewUrl)
-					: Promise.resolve(undefined),
-			)
-			setPreparedPopulatorData({ name: 'uninitialized' })
-			Promise.all(dataPromises).then(data => {
-				if (!isMounted) {
-					return
-				}
-				setPreparedPopulatorData({
-					name: 'ready',
-					data,
-				})
-			})
-		}
-
-		return () => {
-			isMounted = false
-		}
-	}, [readyState, relevantPopulators])
-
-	React.useEffect(() => {
-		if (
-			uploadState?.readyState !== FileUploadReadyState.Success ||
-			preparedPopulatorData.name !== 'ready' ||
-			!batchUpdates
-		) {
-			return
-		}
-
-		for (let i = 0; i < relevantPopulators.length; i++) {
-			const populator = relevantPopulators[i]
-			const preparedData = preparedPopulatorData.data[i]
-
-			populator.populateFileData(
-				{
-					uploadResult: uploadState.result,
-					file: uploadState.file,
-					previewUrl: uploadState.previewUrl,
-					environment,
-					batchUpdates,
-				},
-				preparedData,
-			)
-		}
-	}, [
-		batchUpdates,
-		environment,
-		preparedPopulatorData.data,
-		preparedPopulatorData.name,
-		relevantPopulators,
-		uploadState,
-	])
-
-	const renderPreview = () => {
-		if (uploadState) {
-			if (renderFilePreview) {
-				return renderFilePreview(uploadState.file, uploadState.previewUrl)
-			}
-			return <Spinner />
-		}
-		if (renderFile) {
-			return renderFile()
-		}
-		return null
-	}
-	const renderUploadStatusMessage = (uploadState?: SingleFileUploadState) => {
-		if (!uploadState || uploadState.readyState === FileUploadReadyState.Aborted) {
-			return (
-				<>
-					<Button size="small">Select a file to upload</Button>
-					<span className={'fileInput-drop'}>or drag & drop</span>
-				</>
-			)
-		}
-		if (uploadState.readyState === FileUploadReadyState.Error || preparedPopulatorData.name === 'error') {
-			return `Upload failed`
-		}
-		if (uploadState.readyState === FileUploadReadyState.Success && preparedPopulatorData.name === 'ready') {
-			return `Upload has finished successfully`
-		}
-		if (uploadState.readyState === FileUploadReadyState.Uploading && uploadState.progress !== undefined) {
-			return `Upload progress: ${(uploadState.progress * 100).toFixed()}%`
-		}
-		return `Uploading…`
-	}
-	return (
-		<Box distinction="seamlessIfNested">
-			<span className="fileInput">
-				<span className="fileInput-preview">{renderPreview()}</span>
-				<span className="fileInput-message">{renderUploadStatusMessage(props.metadata.uploadState)}</span>
-			</span>
-		</Box>
-	)
-})

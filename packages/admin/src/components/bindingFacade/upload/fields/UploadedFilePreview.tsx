@@ -90,21 +90,23 @@ export const UploadedFilePreview = React.memo(
 				return
 			}
 
-			for (let i = 0; i < relevantPopulators.length; i++) {
-				const populator = relevantPopulators[i]
-				const preparedData = preparedPopulatorData.data[i]
+			batchUpdates(() => {
+				for (let i = 0; i < relevantPopulators.length; i++) {
+					const populator = relevantPopulators[i]
+					const preparedData = preparedPopulatorData.data[i]
 
-				populator.populateFileData(
-					{
-						uploadResult: uploadState.result,
-						file: uploadState.file,
-						previewUrl: uploadState.previewUrl,
-						environment,
-						batchUpdates,
-					},
-					preparedData,
-				)
-			}
+					populator.populateFileData(
+						{
+							uploadResult: uploadState.result,
+							file: uploadState.file,
+							previewUrl: uploadState.previewUrl,
+							environment,
+							batchUpdates,
+						},
+						preparedData,
+					)
+				}
+			})
 		}, [
 			batchUpdates,
 			environment,

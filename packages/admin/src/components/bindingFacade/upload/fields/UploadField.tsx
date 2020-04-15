@@ -1,7 +1,7 @@
 import { Component, Field, useEntityContext, useEnvironment, useMutationState } from '@contember/binding'
 import { FileUploader } from '@contember/client'
 import { useFileUpload } from '@contember/react-client'
-import { Box, Button, FormGroup } from '@contember/ui'
+import { Button, FileDropZone, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
@@ -45,7 +45,7 @@ export const UploadField = Component<UploadFieldProps>(
 			multiple: false,
 			noKeyboard: true, // This would normally be absolutely henious but there is a keyboard-focusable button inside.
 		})
-		const previewProps: UploadedFilePreviewProps[] = normalizedStateArray.map(state => ({
+		const previewProps: UploadedFilePreviewProps = normalizedStateArray.map(state => ({
 			emptyText: props.emptyText,
 			uploadState: state,
 			batchUpdates: entity.batchUpdates,
@@ -53,7 +53,7 @@ export const UploadField = Component<UploadFieldProps>(
 			renderFilePreview: props.renderFilePreview,
 			environment,
 			populators,
-		}))
+		}))[0]
 
 		return (
 			<FormGroup
@@ -66,25 +66,23 @@ export const UploadField = Component<UploadFieldProps>(
 				// label being *inside* dropzone which, however, would ruin our margins. This will have to do for now.
 				useLabelElement={false}
 			>
-				<div
-					{...getRootProps({
-						style: {},
-					})}
-				>
-					<input {...getInputProps()} />
-					<Box distinction="seamlessIfNested">
-						<span className="fileInput">
-							<span className="fileInput-preview">
-								{previewProps.map((item, i) => (
-									<UploadedFilePreview {...item} key={i} />
-								))}
-							</span>
-							<span className="fileInput-message">
-								<Button size="small">Select a file to upload</Button>
-								<span className="fileInput-drop">or drag & drop</span>
-							</span>
-						</span>
-					</Box>
+				<div className="fileInput">
+					<div className="fileInput-preview">
+						<UploadedFilePreview {...previewProps} />
+					</div>
+					<FileDropZone
+						isActive={isDragActive}
+						{...getRootProps({
+							style: {},
+						})}
+						className="fileInput-dropZone"
+					>
+						<input {...getInputProps()} />
+						<div className="fileInput-cta">
+							<Button size="small">Select a file to upload</Button>
+							<span className="fileInput-cta-label">or drag & drop</span>
+						</div>
+					</FileDropZone>
 				</div>
 			</FormGroup>
 		)

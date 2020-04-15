@@ -1,31 +1,28 @@
 @import '../common'
 
 .fileInput
+	$previewWidth: em(150px)
+
 	width: 100%
+	height: $previewWidth
 	display: flex
 
-	&-input
-		+absolute
-		+size(rem(.1px))
-		opacity: 0
-		z-index: -1
-		overflow: hidden
-
 	&-preview
-		width: 25%
+		width: $previewWidth
+	&-preview ~ &-dropZone
+		margin-left: em(10px)
 
-	&-message
-		display: block
-		align-self: center
-		margin-left: rem(10px)
+	&-dropZone
 		flex-grow: 1
-		text-align: center
-	&-drop
-		display: block
-		color: $c-text-light
-		font-size: $fs-small
-		text-align: center
-	&-empty
-		color: $c-text-light
-		font-style: italic
-		font-size: $fs-small
+		display: flex
+		justify-content: center
+		align-items: center
+		flex-direction: column
+		height: 100%
+
+	&-cta
+		&-label
+			display: block
+			color: $c-text-light
+			font-size: $fs-small
+			text-align: center

@@ -1,4 +1,12 @@
-import { Component, Field, useEntityContext, useEnvironment, useMutationState } from '@contember/binding'
+import {
+	Component,
+	EntityAccessor,
+	Environment,
+	Field,
+	useEntityContext,
+	useEnvironment,
+	useMutationState,
+} from '@contember/binding'
 import { FileUploader } from '@contember/client'
 import { useFileUpload } from '@contember/react-client'
 import { Button, FileDropZone, FormGroup } from '@contember/ui'
@@ -10,6 +18,7 @@ import { UploadedFilePreview, UploadedFilePreviewProps } from './UploadedFilePre
 
 export type UploadFieldProps = {
 	accept?: string
+	hasPersistedFile?: (entity: EntityAccessor, environment: Environment) => boolean
 	renderFile?: () => React.ReactNode
 	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
 	uploader?: FileUploader
@@ -53,6 +62,8 @@ export const UploadField = Component<UploadFieldProps>(
 			populators,
 		}))[0]
 
+		const shouldDisplayPreview =
+			!!previewProps.uploadState || (props.hasPersistedFile ? props.hasPersistedFile(entity, environment) : true)
 		return (
 			<FormGroup
 				label={environment.applySystemMiddleware('labelMiddleware', props.label)}
@@ -65,9 +76,11 @@ export const UploadField = Component<UploadFieldProps>(
 				useLabelElement={false}
 			>
 				<div className="fileInput">
-					<div className="fileInput-preview">
-						<UploadedFilePreview {...previewProps} />
-					</div>
+					{shouldDisplayPreview && (
+						<div className="fileInput-preview">
+							<UploadedFilePreview {...previewProps} />
+						</div>
+					)}
 					<FileDropZone
 						isActive={isDragActive}
 						{...getRootProps({

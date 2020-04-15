@@ -7,6 +7,7 @@ import {
 	GenericFileMetadataPopulator,
 	GenericFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
+import { getIsFieldFilled } from './getIsFieldFilled'
 import { UploadField } from './UploadField'
 
 export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileMetadataPopulatorProps
@@ -17,6 +18,7 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 		<UploadField
 			{...props}
 			fileUrlField={props.field}
+			hasPersistedFile={getIsFieldFilled(props.field)}
 			fileDataPopulators={[
 				new FileUrlDataPopulator({ fileUrlField: props.field }),
 				new GenericFileMetadataPopulator(props),

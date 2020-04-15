@@ -9,6 +9,7 @@ import {
 	VideoFileMetadataPopulator,
 	VideoFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
+import { getIsFieldFilled } from './getIsFieldFilled'
 import { UploadField } from './UploadField'
 
 export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps &
@@ -20,6 +21,7 @@ export const VideoUploadField = Component<VideoUploadFieldProps>(
 		<UploadField
 			{...props}
 			fileUrlField={props.field}
+			hasPersistedFile={getIsFieldFilled(props.field)}
 			accept="video/*"
 			fileDataPopulators={[
 				new FileUrlDataPopulator({ fileUrlField: props.field }),

@@ -1,0 +1,16 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}progressBar
+	$height: em(4px)
+	$borderWidth: em(1px)
+	height: $height
+	background: $cui-progressBar-background-color
+	border: $borderWidth solid $cui-progressBar-background-color
+	border-radius: ($height / 2)
+	overflow: hidden
+
+	&-bar
+		background: $cui-progressBar-foreground-color
+		height: ($height - 2*$borderWidth)
+		transform-origin: left center
+		transition: transform ease-out .1s

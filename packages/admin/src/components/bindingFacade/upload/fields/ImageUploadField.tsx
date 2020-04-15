@@ -9,7 +9,6 @@ import {
 	ImageFileMetadataPopulator,
 	ImageFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
-import { getIsFieldFilled } from './getIsFieldFilled'
 import { UploadField } from './UploadField'
 
 export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
@@ -21,7 +20,6 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 		<UploadField
 			{...props}
 			fileUrlField={props.field}
-			hasPersistedFile={getIsFieldFilled(props.field)}
 			accept="image/*"
 			fileDataPopulators={[
 				new FileUrlDataPopulator({ fileUrlField: props.field }),

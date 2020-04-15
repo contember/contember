@@ -6,6 +6,7 @@ import {
 	useEntityContext,
 	useEnvironment,
 	useMutationState,
+	useOptionalRelativeSingleField,
 } from '@contember/binding'
 import { FileUploader } from '@contember/client'
 import { useFileUpload } from '@contember/react-client'
@@ -13,7 +14,12 @@ import { Button, FileDropZone, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
-import { ResolvablePopulatorProps, resolvePopulators, useResolvedPopulators } from '../fileDataPopulators'
+import {
+	FileUrlDataPopulator,
+	ResolvablePopulatorProps,
+	resolvePopulators,
+	useResolvedPopulators,
+} from '../fileDataPopulators'
 import { UploadedFilePreview, UploadedFilePreviewProps } from './UploadedFilePreview'
 
 export type UploadFieldProps = {
@@ -36,6 +42,16 @@ export const UploadField = Component<UploadFieldProps>(
 		const singleFileUploadState = uploadState.get(staticFileId)
 		const normalizedStateArray = [singleFileUploadState]
 		const populators = useResolvedPopulators(props)
+
+		// We're giving the FileUrlDataPopulator special treatment here since it's going to be by far the most used one.
+		// Other populators pay the price of an additional hook which isn't that big of a deal.
+		const fileUrlField = useOptionalRelativeSingleField(
+			populators.find(populator => populator instanceof FileUrlDataPopulator) && 'fileUrlField' in props
+				? props.fileUrlField
+				: undefined,
+		)
+		const hasPersistedFile =
+			props.hasPersistedFile || (fileUrlField ? () => fileUrlField.currentValue !== null : undefined)
 
 		const onDrop = React.useCallback(
 			([file]: File[]) => {
@@ -63,7 +79,7 @@ export const UploadField = Component<UploadFieldProps>(
 		}))[0]
 
 		const shouldDisplayPreview =
-			!!previewProps.uploadState || (props.hasPersistedFile ? props.hasPersistedFile(entity, environment) : true)
+			!!previewProps.uploadState || (hasPersistedFile ? hasPersistedFile(entity, environment) : true)
 		return (
 			<FormGroup
 				label={environment.applySystemMiddleware('labelMiddleware', props.label)}

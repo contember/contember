@@ -93,25 +93,25 @@ export const UploadField = Component<UploadFieldProps>(
 				// label being *inside* dropzone which, however, would ruin our margins. This will have to do for now.
 				useLabelElement={false}
 			>
-				<div className="fileInput">
-					{shouldDisplayPreview && (
-						<div className="fileInput-preview">
-							<UploadedFilePreview {...previewProps} />
-						</div>
-					)}
-					<FileDropZone
-						isActive={isDragActive}
-						{...getRootProps({
-							style: {},
-						})}
-						className="fileInput-dropZone"
-					>
-						<input {...getInputProps()} />
-						<div className="fileInput-cta">
-							<Button size="small">Select a file to upload</Button>
-							<span className="fileInput-cta-label">or drag & drop</span>
-						</div>
-					</FileDropZone>
+				<div
+					{...getRootProps({
+						style: {},
+					})}
+				>
+					<input {...getInputProps()} />
+					<div className="fileInput">
+						{shouldDisplayPreview && (
+							<div className="fileInput-preview">
+								<UploadedFilePreview {...previewProps} />
+							</div>
+						)}
+						<FileDropZone isActive={isDragActive} className="fileInput-dropZone">
+							<div className="fileInput-cta">
+								<Button size="small">Select a file to upload</Button>
+								<span className="fileInput-cta-label">or drag & drop</span>
+							</div>
+						</FileDropZone>
+					</div>
 				</div>
 			</FormGroup>
 		)

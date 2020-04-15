@@ -27,6 +27,7 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 					href={previewUrl}
 					target="_blank"
 					rel="noopener"
+					onClick={e => e.stopPropagation()}
 				>
 					{previewUrl.substring(Math.max(0, previewUrl.lastIndexOf('/') + 1))}
 				</a>

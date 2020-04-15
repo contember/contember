@@ -32,7 +32,6 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 				</a>
 			)}
 			renderFile={() => <FileUrlFieldView fileUrlField={props.field} />}
-			emptyText="No file selected"
 		/>
 	),
 	'FileUploadField',

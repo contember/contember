@@ -12,7 +12,6 @@ export type UploadFieldProps = {
 	accept?: string
 	renderFile?: () => React.ReactNode
 	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
-	emptyText?: React.ReactNode
 	uploader?: FileUploader
 } & SimpleRelativeSingleFieldProps &
 	ResolvablePopulatorProps
@@ -46,7 +45,6 @@ export const UploadField = Component<UploadFieldProps>(
 			noKeyboard: true, // This would normally be absolutely henious but there is a keyboard-focusable button inside.
 		})
 		const previewProps: UploadedFilePreviewProps = normalizedStateArray.map(state => ({
-			emptyText: props.emptyText,
 			uploadState: state,
 			batchUpdates: entity.batchUpdates,
 			renderFile: props.renderFile,

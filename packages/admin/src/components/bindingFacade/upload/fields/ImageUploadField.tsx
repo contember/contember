@@ -21,7 +21,6 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 			{...props}
 			fileUrlField={props.field}
 			accept="image/*"
-			emptyText={'No image'}
 			fileDataPopulators={[
 				new FileUrlDataPopulator({ fileUrlField: props.field }),
 				new GenericFileMetadataPopulator(props),

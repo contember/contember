@@ -8,7 +8,6 @@ export interface UploadedFilePreviewProps {
 	batchUpdates: EntityAccessor['batchUpdates']
 	environment: Environment
 	uploadState: SingleFileUploadState | undefined
-	emptyText?: React.ReactNode
 	populators: FileDataPopulator[]
 	renderFile?: () => React.ReactNode
 	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
@@ -29,15 +28,7 @@ type PopulatorDataState =
 	  }
 
 export const UploadedFilePreview = React.memo(
-	({
-		uploadState,
-		//emptyText,
-		batchUpdates,
-		environment,
-		populators,
-		renderFile,
-		renderFilePreview,
-	}: UploadedFilePreviewProps) => {
+	({ uploadState, batchUpdates, environment, populators, renderFile, renderFilePreview }: UploadedFilePreviewProps) => {
 		const uploadStateRef = React.useRef(uploadState)
 		const [preparedPopulatorData, setPreparedPopulatorData] = React.useState<PopulatorDataState>({
 			name: 'uninitialized',

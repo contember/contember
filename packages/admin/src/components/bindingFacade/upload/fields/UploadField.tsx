@@ -34,7 +34,9 @@ export type UploadFieldProps = {
 const staticFileId = 'file'
 export const UploadField = Component<UploadFieldProps>(
 	props => {
-		const [uploadState, { startUpload }] = useFileUpload()
+		const [uploadState, { startUpload }] = useFileUpload({
+			maxUpdateFrequency: 100,
+		})
 		const environment = useEnvironment()
 		const entity = useEntityContext()
 		const isMutating = useMutationState()

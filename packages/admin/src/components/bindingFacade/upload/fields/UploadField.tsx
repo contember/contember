@@ -82,6 +82,18 @@ export const UploadField = Component<UploadFieldProps>(
 
 		const shouldDisplayPreview =
 			!!previewProps.uploadState || (hasPersistedFile ? hasPersistedFile(entity, environment) : true)
+
+		// This doesn't actually work well: the urlField could be something like 'mainFile.url' where the 'url' field is
+		// non-nullable. We cannot easily detect from here what exactly to set to null, remove or disconnect.
+
+		// const clearField = React.useMemo<undefined | React.MouseEventHandler>(() => {
+		// 	return fileUrlField && fileUrlField.currentValue !== null
+		// 		? e => {
+		// 				e.stopPropagation()
+		// 				fileUrlField.updateValue?.(null)
+		// 		  }
+		// 		: undefined
+		// }, [fileUrlField])
 		return (
 			<FormGroup
 				label={environment.applySystemMiddleware('labelMiddleware', props.label)}
@@ -102,6 +114,9 @@ export const UploadField = Component<UploadFieldProps>(
 					<div className="fileInput">
 						{shouldDisplayPreview && (
 							<div className="fileInput-preview">
+								{/*<ActionableBox onRemove={clearField}>*/}
+								{/*	<UploadedFilePreview {...previewProps} />*/}
+								{/*</ActionableBox>*/}
 								<UploadedFilePreview {...previewProps} />
 							</div>
 						)}

@@ -2,17 +2,20 @@ import * as React from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { Dropdown } from './Dropdown'
 import { Button, ButtonProps } from './forms'
-import { Icon } from './Icon'
+import { Icon, IconProps } from './Icon'
 
 export interface ActionableBoxProps {
 	editContents?: React.ReactNode
-	onRemove?: () => void
+	onRemove?: (e: React.MouseEvent<HTMLButtonElement>) => void
 	children: React.ReactNode
 }
 
 const commonButtonProps: ButtonProps = {
 	size: 'small',
 	flow: 'circular',
+}
+const commonIconProps: IconProps = {
+	size: 'small',
 }
 
 export const ActionableBox = React.memo(({ children, editContents, onRemove }: ActionableBoxProps) => {
@@ -31,7 +34,7 @@ export const ActionableBox = React.memo(({ children, editContents, onRemove }: A
 						<Dropdown
 							buttonProps={{
 								...commonButtonProps,
-								children: <Icon contemberIcon="pencil" />,
+								children: <Icon {...commonIconProps} contemberIcon="pencil" />,
 							}}
 						>
 							<>{editContents}</>
@@ -41,7 +44,7 @@ export const ActionableBox = React.memo(({ children, editContents, onRemove }: A
 				{onRemove && (
 					<li className={`${prefix}actionableBox-action`}>
 						<Button {...commonButtonProps} onClick={onRemove}>
-							<Icon blueprintIcon="trash" />
+							<Icon {...commonIconProps} blueprintIcon="trash" />
 						</Button>
 					</li>
 				)}

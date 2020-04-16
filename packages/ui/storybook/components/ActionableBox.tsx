@@ -8,7 +8,9 @@ const loremIpsum =
 	'tpraesentium.'
 
 storiesOf('ActionableBox', module).add('simple', () => (
-	<ActionableBox editContents={<>{loremIpsum}</>} onRemove={() => alert('Removed!')}>
-		<div style={{ border: '1px dashed grey', width: '200px', minHeight: '200px' }}>{loremIpsum}</div>
-	</ActionableBox>
+	<div style={{ border: '1px dashed grey', width: '200px', minHeight: '200px' }}>
+		<ActionableBox editContents={<>{loremIpsum}</>} onRemove={() => alert('Removed!')}>
+			{loremIpsum}
+		</ActionableBox>
+	</div>
 ))

@@ -2,7 +2,6 @@
 
 .#{$cui-conf-globalPrefix}actionableBox
 	position: relative
-	display: inline-block
 
 	&-contents
 		//
@@ -12,7 +11,23 @@
 		display: inline-flex
 		flex-direction: column
 		z-index: 0
+		margin: 0
+		padding: 0
+		transition-property: opacity, visibility, pointer-events, transform
+		transition-duration: .15s
+		visibility: hidden
+		opacity: 0
+		pointer-events: none
+		transform: translateY(em(-10px))
 	&-action
 		margin: 0
+		padding: 0
 		& + &
 			margin-top: em(5px)
+
+	&:hover &
+		&-actions
+			visibility: visible
+			opacity: 1
+			pointer-events: all
+			transform: translateY(0)

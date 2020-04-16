@@ -1,0 +1,18 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}actionableBox
+	position: relative
+	display: inline-block
+
+	&-contents
+		//
+	&-actions
+		+absolute(em(10px) em(-5px) null null)
+		list-style-type: none
+		display: inline-flex
+		flex-direction: column
+		z-index: 0
+	&-action
+		margin: 0
+		& + &
+			margin-top: em(5px)

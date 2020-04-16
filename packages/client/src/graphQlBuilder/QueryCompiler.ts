@@ -48,7 +48,7 @@ export class QueryCompiler {
 
 	private formatArgs(args: any, level: number): string {
 		if (args === null) {
-			return 'NULL'
+			return 'null'
 		}
 
 		if (typeof args === 'number') {

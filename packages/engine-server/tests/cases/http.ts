@@ -16,6 +16,12 @@ const dbCredentials = (dbName: string) => {
 let authKey = ''
 let loginToken = ''
 
+// Used to allow prettier formatting of GraphQL queries
+const gql = (strings: TemplateStringsArray) => {
+	assert.strictEqual(strings.length, 1)
+	return strings[0]
+}
+
 const createContainer = (debug: boolean) =>
 	new CompositionRoot().createMasterContainer(
 		debug,
@@ -58,14 +64,16 @@ const executeGraphql = (
 
 const signIn = async (email: string, password: string): Promise<string> => {
 	const response2 = await executeGraphql(
-		`mutation($email: String!, $password: String!) {
-  signIn(email: $email, password: $password ) {
-    ok
-    result {
-      token
-    }
-  }
-}`,
+		gql`
+			mutation($email: String!, $password: String!) {
+				signIn(email: $email, password: $password) {
+					ok
+					result {
+						token
+					}
+				}
+			}
+		`,
 		{
 			variables: { email, password },
 			authorizationToken: loginToken,
@@ -84,23 +92,25 @@ beforeAll(async () => {
 	await createContainer(false).initializer.initialize()
 
 	const response = await executeGraphql(
-		`mutation {
-  setup(superadmin: { email: "admin@example.com", password: "123456" }) {
-    ok
-    result {
-      superadmin {
-        id
-      }
-      loginKey {
-        id
-        token
-        identity {
-          id
-        }
-      }
-    }
-  }
-}`,
+		gql`
+			mutation {
+				setup(superadmin: { email: "admin@example.com", password: "123456" }) {
+					ok
+					result {
+						superadmin {
+							id
+						}
+						loginKey {
+							id
+							token
+							identity {
+								id
+							}
+						}
+					}
+				}
+			}
+		`,
 		{
 			path: '/tenant',
 			authorizationToken: '12345123451234512345',
@@ -119,11 +129,15 @@ describe('http tests', () => {
 	})
 
 	it('creates & read tag', async () => {
-		await executeGraphql(`mutation {
-		createTag(data: {label: "graphql"})  {
-			ok
-		}
-}`)
+		await executeGraphql(
+			gql`
+				mutation {
+					createTag(data: { label: "graphql" }) {
+						ok
+					}
+				}
+			`,
+		)
 			.expect(response => {
 				assert.deepStrictEqual(response.body.data, {
 					createTag: {
@@ -133,11 +147,15 @@ describe('http tests', () => {
 			})
 			.expect(200)
 
-		await executeGraphql(`query {
-		listTag(filter: {label: {eq: "graphql"}}) {
-			label
-		}
-}`)
+		await executeGraphql(
+			gql`
+				query {
+					listTag(filter: { label: { eq: "graphql" } }) {
+						label
+					}
+				}
+			`,
+		)
 			.expect(response => {
 				assert.deepStrictEqual(response.body.data, {
 					listTag: [
@@ -151,17 +169,25 @@ describe('http tests', () => {
 	})
 
 	it('handles "not modified"', async () => {
-		await executeGraphql(`mutation {
-		createTag(data: {label: "typescript"})  {
-			ok
-		}
-}`).expect(200)
+		await executeGraphql(
+			gql`
+				mutation {
+					createTag(data: { label: "typescript" }) {
+						ok
+					}
+				}
+			`,
+		).expect(200)
 
-		const response = await executeGraphql(`query {
-		listTag(filter: {label: {eq: "typescript"}}) {
-			label
-		}
-}`)
+		const response = await executeGraphql(
+			gql`
+				query {
+					listTag(filter: { label: { eq: "typescript" } }) {
+						label
+					}
+				}
+			`,
+		)
 			.set('X-Contember-Ref', 'None')
 			.expect(response => {
 				assert.deepStrictEqual(response.body.data, {
@@ -174,30 +200,42 @@ describe('http tests', () => {
 			})
 			.expect(200)
 		const eventKey = response.get('X-Contember-Ref')
-		await executeGraphql(`query {
-		listTag {
-			label
-		}
-}`)
+		await executeGraphql(
+			gql`
+				query {
+					listTag {
+						label
+					}
+				}
+			`,
+		)
 			.set('X-Contember-Ref', eventKey)
 			.expect(304)
 
 		// ignored for mutation
-		await executeGraphql(`mutation {
-		createTag(data: {label: "typescript"})  {
-			ok
-		}
-}`)
+		await executeGraphql(
+			gql`
+				mutation {
+					createTag(data: { label: "typescript" }) {
+						ok
+					}
+				}
+			`,
+		)
 			.set('X-Contember-Ref', eventKey)
 			.expect(200)
 	})
 
 	it('returns proper error for invalid schema', async () => {
-		await executeGraphql(`mutation {
-		createFoo(data: {label: "graphql"})  {
-			ok
-		}
-}`)
+		await executeGraphql(
+			gql`
+				mutation {
+					createFoo(data: { label: "graphql" }) {
+						ok
+					}
+				}
+			`,
+		)
 			.expect(400)
 			.expect(response => {
 				assert.equal(
@@ -209,18 +247,20 @@ describe('http tests', () => {
 
 	it('sign up, add to a project and check project access', async () => {
 		const signUpResponse = await executeGraphql(
-			`mutation {
-  signUp(email: "john@doe.com", password: "123456") {
-    ok
-    result {
-      person {
-        identity {
-          id
-        }
-      }
-    }
-  }
-}`,
+			gql`
+				mutation {
+					signUp(email: "john@doe.com", password: "123456") {
+						ok
+						result {
+							person {
+								identity {
+									id
+								}
+							}
+						}
+					}
+				}
+			`,
 			{ path: '/tenant' },
 		).expect(200)
 
@@ -228,22 +268,26 @@ describe('http tests', () => {
 
 		const authKey = await signIn('john@doe.com', '123456')
 		await executeGraphql(
-			`query {
-		listTag {
-			id
-		}
-}`,
+			gql`
+				query {
+					listTag {
+						id
+					}
+				}
+			`,
 			{ authorizationToken: authKey },
 		)
 			.expect(404)
 			.expect({ errors: [{ message: 'Project test NOT found', code: 404 }] })
 
 		await executeGraphql(
-			`query {
-		listTag {
-			id
-		}
-}`,
+			gql`
+				query {
+					listTag {
+						id
+					}
+				}
+			`,
 			{ authorizationToken: authKey, debug: true },
 		)
 			.expect(403)
@@ -253,11 +297,17 @@ describe('http tests', () => {
 			})
 
 		await executeGraphql(
-			`mutation($identity: String!) {
-  addProjectMember(identityId: $identity, projectSlug: "test", memberships: [{role: "admin", variables: []}]) {
-    ok
-  }
-}`,
+			gql`
+				mutation($identity: String!) {
+					addProjectMember(
+						identityId: $identity
+						projectSlug: "test"
+						memberships: [{ role: "admin", variables: [] }]
+					) {
+						ok
+					}
+				}
+			`,
 			{ path: '/tenant', variables: { identity: identityId } },
 		)
 			.expect(200)
@@ -266,11 +316,13 @@ describe('http tests', () => {
 			})
 
 		await executeGraphql(
-			`query {
-		listAuthor {
-			id
-		}
-}`,
+			gql`
+				query {
+					listAuthor {
+						id
+					}
+				}
+			`,
 			{ authorizationToken: authKey },
 		)
 			.expect(response => {

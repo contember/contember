@@ -9,7 +9,7 @@ import {
 	ImageFileMetadataPopulator,
 	ImageFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
-import { UploadField } from './UploadField'
+import { UploadField } from '../core'
 
 export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
 	ImageFileMetadataPopulatorProps &

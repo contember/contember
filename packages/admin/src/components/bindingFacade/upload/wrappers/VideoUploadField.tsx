@@ -9,7 +9,7 @@ import {
 	VideoFileMetadataPopulator,
 	VideoFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
-import { UploadField } from './UploadField'
+import { UploadField } from '../core'
 
 export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps &
 	VideoFileMetadataPopulatorProps &

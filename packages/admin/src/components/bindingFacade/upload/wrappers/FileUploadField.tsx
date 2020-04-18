@@ -7,7 +7,7 @@ import {
 	GenericFileMetadataPopulator,
 	GenericFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
-import { UploadField } from './UploadField'
+import { UploadField } from '../core'
 
 export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileMetadataPopulatorProps
 

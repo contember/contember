@@ -3,6 +3,7 @@ import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { VideoFieldView } from '../../fieldViews'
 import {
+	FileDataPopulator,
 	FileUrlDataPopulator,
 	GenericFileMetadataPopulator,
 	GenericFileMetadataPopulatorProps,
@@ -13,7 +14,9 @@ import { UploadField } from '../core'
 
 export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps &
 	VideoFileMetadataPopulatorProps &
-	GenericFileMetadataPopulatorProps
+	GenericFileMetadataPopulatorProps & {
+		additionalFileDataPopulators?: Iterable<FileDataPopulator>
+	}
 
 export const VideoUploadField = Component<VideoUploadFieldProps>(
 	props => (
@@ -22,6 +25,7 @@ export const VideoUploadField = Component<VideoUploadFieldProps>(
 			fileUrlField={props.field}
 			accept="video/*"
 			fileDataPopulators={[
+				...(props.additionalFileDataPopulators || []),
 				new FileUrlDataPopulator({ fileUrlField: props.field }),
 				new GenericFileMetadataPopulator(props),
 				new VideoFileMetadataPopulator(props),

@@ -3,6 +3,7 @@ import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { ImageFieldView, ImageFieldViewProps } from '../../fieldViews'
 import {
+	FileDataPopulator,
 	FileUrlDataPopulator,
 	GenericFileMetadataPopulator,
 	GenericFileMetadataPopulatorProps,
@@ -14,6 +15,7 @@ import { UploadField } from '../core'
 export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
 	ImageFileMetadataPopulatorProps &
 	GenericFileMetadataPopulatorProps & {
+		additionalFileDataPopulators?: Iterable<FileDataPopulator>
 		formatPreviewUrl?: ImageFieldViewProps['formatUrl']
 		previewAlt?: string
 		previewTitle?: string
@@ -26,6 +28,7 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 			fileUrlField={props.field}
 			accept="image/*"
 			fileDataPopulators={[
+				...(props.additionalFileDataPopulators || []),
 				new FileUrlDataPopulator({ fileUrlField: props.field }),
 				new GenericFileMetadataPopulator(props),
 				new ImageFileMetadataPopulator(props),

@@ -3,13 +3,17 @@ import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { FileUrlFieldView } from '../../fieldViews'
 import {
+	FileDataPopulator,
 	FileUrlDataPopulator,
 	GenericFileMetadataPopulator,
 	GenericFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
 import { UploadField } from '../core'
 
-export type FileUploadFieldProps = SimpleRelativeSingleFieldProps & GenericFileMetadataPopulatorProps
+export type FileUploadFieldProps = SimpleRelativeSingleFieldProps &
+	GenericFileMetadataPopulatorProps & {
+		additionalFileDataPopulators?: Iterable<FileDataPopulator>
+	}
 
 // TODO this is super temporary
 export const FileUploadField = Component<FileUploadFieldProps>(
@@ -18,6 +22,7 @@ export const FileUploadField = Component<FileUploadFieldProps>(
 			{...props}
 			fileUrlField={props.field}
 			fileDataPopulators={[
+				...(props.additionalFileDataPopulators || []),
 				new FileUrlDataPopulator({ fileUrlField: props.field }),
 				new GenericFileMetadataPopulator(props),
 			]}

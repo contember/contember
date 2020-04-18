@@ -33,8 +33,8 @@ export const UploadingFilePreview = React.memo(
 		const [preparedPopulatorData, setPreparedPopulatorData] = React.useState<PopulatorDataState>({
 			name: 'uninitialized',
 		})
-		const uploadedFile = uploadState?.file
-		const readyState = uploadState?.readyState
+		const uploadedFile = uploadState.file
+		const readyState = uploadState.readyState
 
 		const { deferrablePopulators } = React.useMemo(() => getPartitionedRelevantPopulators(populators, uploadedFile), [
 			populators,

@@ -1,13 +1,10 @@
 import {
 	Component,
-	EntityAccessor,
-	Environment,
 	useEntityContext,
 	useEnvironment,
 	useMutationState,
 	useOptionalRelativeSingleField,
 } from '@contember/binding'
-import { FileUploader } from '@contember/client'
 import { useFileUpload } from '@contember/react-client'
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
@@ -18,18 +15,15 @@ import {
 	resolvePopulators,
 	useResolvedPopulators,
 } from '../fileDataPopulators'
+import { SingleFileUploadProps } from './SingleFileUploadProps'
+import { UploadConfigProps } from './UploadConfigProps'
 import { UploadedFilePreview } from './UploadedFilePreview'
 import { UploadingFilePreview } from './UploadingFilePreview'
 
-export interface UploadConfigProps {
-	accept?: string
-	hasPersistedFile?: (entity: EntityAccessor, environment: Environment) => boolean
-	renderFile?: () => React.ReactNode
-	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
-	uploader?: FileUploader
-}
-
-export type UploadFieldProps = UploadConfigProps & Omit<FormGroupProps, 'children'> & ResolvablePopulatorProps
+export type UploadFieldProps = UploadConfigProps &
+	SingleFileUploadProps &
+	Omit<FormGroupProps, 'children'> &
+	ResolvablePopulatorProps
 
 const staticFileId = 'file'
 export const UploadField = Component<UploadFieldProps>(

@@ -8,8 +8,10 @@ export interface BlockCommonProps {
 	children: React.ReactNode
 }
 
+export type SugaredDiscriminateBy = GraphQlBuilder.Literal | VariableLiteral | string
+
 export interface LiteralBasedBlockProps extends BlockCommonProps {
-	discriminateBy: GraphQlBuilder.Literal | VariableLiteral | string
+	discriminateBy: SugaredDiscriminateBy
 }
 export interface ScalarBasedBlockProps extends BlockCommonProps {
 	discriminateByScalar: Scalar

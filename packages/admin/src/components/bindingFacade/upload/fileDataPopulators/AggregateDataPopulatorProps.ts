@@ -1,4 +1,5 @@
 import { AudioFileMetadataPopulatorProps } from './AudioFileMetadataPopulator'
+import { FileDataPopulator } from './FileDataPopulator'
 import { FileUrlDataPopulatorProps } from './FileUrlDataPopulator'
 import { GenericFileMetadataPopulatorProps } from './GenericFileMetadataPopulator'
 import { ImageFileMetadataPopulatorProps } from './ImageFileMetadataPopulator'
@@ -9,4 +10,6 @@ export interface AggregateDataPopulatorProps
 		FileUrlDataPopulatorProps,
 		GenericFileMetadataPopulatorProps,
 		ImageFileMetadataPopulatorProps,
-		VideoFileMetadataPopulatorProps {}
+		VideoFileMetadataPopulatorProps {
+	additionalFileDataPopulators?: Iterable<FileDataPopulator>
+}

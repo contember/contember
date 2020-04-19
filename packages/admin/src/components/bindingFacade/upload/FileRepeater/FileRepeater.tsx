@@ -36,8 +36,10 @@ type FileRepeaterProps = Omit<
 // TODO configurable container/item components
 export const FileRepeater = Component<FileRepeaterProps>(
 	props => {
+		const fileUrlField = 'fileUrlField' in props ? props.fileUrlField : undefined
+
 		const fileDataPopulators = useResolvedPopulators(props)
-		const fileKinds = useResolvedFileKinds(props)
+		const fileKinds = useResolvedFileKinds(props, fileUrlField)
 
 		// Using Required and exclamation marks to make sure we don't forget any props. This is still sound though.
 		const containerExtraProps = React.useMemo((): Required<

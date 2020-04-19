@@ -15,7 +15,7 @@ import {
 	FileRepeaterContainerPublicProps,
 } from './FileRepeaterContainer'
 import { StockFileKindProps } from './StockFileKindProps'
-import { useResolvedFileKinds } from './useResolvedFileKinds'
+import { resolveFileKinds, useResolvedFileKinds } from './useResolvedFileKinds'
 
 type FileRepeaterProps = Omit<
 	RepeaterProps<never, never>,
@@ -81,6 +81,9 @@ export const FileRepeater = Component<FileRepeaterProps>(
 			<>
 				{resolvePopulators(props).map((item, i) => (
 					<React.Fragment key={i}>{item.getStaticFields(environment)}</React.Fragment>
+				))}
+				{Array.from(resolveFileKinds(props, undefined)).map((item, i) => (
+					<React.Fragment key={i}>{item.renderFile?.()}</React.Fragment>
 				))}
 				{props.discriminationField && <SugaredField field={props.discriminationField} />}
 

@@ -52,7 +52,7 @@ export const useResolvedFileKinds = (
 // If you change *ANY* props access from now on, you *MUST* also update the dependency array above
 // See also useResolvedPopulators.ts for further explanation.
 // !!!!!!!! WARNING !!!!!!!!
-const resolveFileKinds = (
+export const resolveFileKinds = (
 	props: ResolvableFileKindProps,
 	fileUrlField: SugaredFieldProps['field'] | undefined,
 ): Iterable<DiscriminatedFileUploadProps> => {
@@ -65,8 +65,11 @@ const resolveFileKinds = (
 const getResolvedStockFileKinds = (
 	props: StockFileKindProps,
 	fileUrlField: SugaredFieldProps['field'] | undefined,
-): Iterable<DiscriminatedFileUploadProps> => {
-	const discriminatedProps: DiscriminatedFileUploadProps[] = emptyArray
+): DiscriminatedFileUploadProps[] => {
+	const discriminatedProps: DiscriminatedFileUploadProps[] = props.additionalFileKinds
+		? Array.from(props.additionalFileKinds)
+		: emptyArray
+	let overridePresent = false
 
 	if (
 		('discriminateAudioBy' in props && props.discriminateAudioBy) ||
@@ -80,6 +83,7 @@ const getResolvedStockFileKinds = (
 			discriminateBy: 'discriminateAudioBy' in props ? props.discriminateAudioBy : undefined,
 			discriminateByScalar: 'discriminateAudioByScalar' in props ? props.discriminateAudioByScalar : undefined,
 		})
+		overridePresent = true
 	}
 
 	if (
@@ -94,6 +98,7 @@ const getResolvedStockFileKinds = (
 			discriminateBy: 'discriminateGenericBy' in props ? props.discriminateGenericBy : undefined,
 			discriminateByScalar: 'discriminateGenericByScalar' in props ? props.discriminateGenericByScalar : undefined,
 		})
+		overridePresent = true
 	}
 
 	if (
@@ -108,6 +113,7 @@ const getResolvedStockFileKinds = (
 			discriminateBy: 'discriminateImageBy' in props ? props.discriminateImageBy : undefined,
 			discriminateByScalar: 'discriminateImageByScalar' in props ? props.discriminateImageByScalar : undefined,
 		})
+		overridePresent = true
 	}
 
 	if (
@@ -122,9 +128,10 @@ const getResolvedStockFileKinds = (
 			discriminateBy: 'discriminateVideoBy' in props ? props.discriminateVideoBy : undefined,
 			discriminateByScalar: 'discriminateVideoByScalar' in props ? props.discriminateVideoByScalar : undefined,
 		})
+		overridePresent = true
 	}
 
-	if (discriminatedProps.length === 0) {
+	if (!overridePresent) {
 		discriminatedProps.push(getGenericFileDefaults(fileUrlField))
 	}
 

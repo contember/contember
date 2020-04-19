@@ -71,7 +71,7 @@ export const FileRepeaterContainer = React.memo(
 		return (
 			<Box isActive={isDragActive} heading={label}>
 				<div {...getRootProps()}>
-					{enableAddingNew || <input {...getInputProps()} />}
+					{enableAddingNew && <input {...getInputProps()} />}
 					{isEmpty && (
 						<EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>
 					)}

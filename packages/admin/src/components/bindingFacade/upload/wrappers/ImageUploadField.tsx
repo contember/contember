@@ -11,6 +11,7 @@ import {
 	ImageFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
 import { UploadField } from '../core'
+import { getImageFileDefaults } from '../stockFileKindDefaults'
 
 export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
 	ImageFileMetadataPopulatorProps &
@@ -21,12 +22,13 @@ export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
 		previewTitle?: string
 	}
 
-export const ImageUploadField = Component<ImageUploadFieldProps>(
-	props => (
+export const ImageUploadField = Component<ImageUploadFieldProps>(props => {
+	const defaults = getImageFileDefaults(props.field)
+	return (
 		<UploadField
 			{...props}
 			fileUrlField={props.field}
-			accept="image/*"
+			accept={defaults.accept}
 			fileDataPopulators={[
 				...(props.additionalFileDataPopulators || []),
 				new FileUrlDataPopulator({ fileUrlField: props.field }),
@@ -45,6 +47,5 @@ export const ImageUploadField = Component<ImageUploadFieldProps>(
 				<img src={previewUrl} alt={props.previewAlt} title={props.previewTitle} />
 			)}
 		/>
-	),
-	'ImageUploadField',
-)
+	)
+}, 'ImageUploadField')

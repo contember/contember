@@ -131,6 +131,7 @@ export const UploadField = Component<UploadFieldProps>(
 			{resolvePopulators(props).map((item, i) => (
 				<React.Fragment key={i}>{item.getStaticFields(environment)}</React.Fragment>
 			))}
+			{props.renderFile?.()}
 		</>
 	),
 	'UploadField',

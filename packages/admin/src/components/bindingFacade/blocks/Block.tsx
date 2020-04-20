@@ -5,6 +5,7 @@ import { Component, FieldValue, Scalar, VariableLiteral } from '@contember/bindi
 export interface BlockCommonProps {
 	label?: React.ReactNode
 	description?: React.ReactNode
+	alternate?: React.ReactNode
 	children: React.ReactNode
 }
 
@@ -40,4 +41,13 @@ export type NormalizedBlocks =
 			blocks: Map<Scalar, NormalizedScalarBasedBlock>
 	  }
 
-export const Block = Component<BlockProps>(props => <>{props.children}</>, 'Block')
+export const Block = Component<BlockProps>(
+	props => <>{props.children}</>,
+	props => (
+		<>
+			{props.alternate}
+			{props.children}
+		</>
+	),
+	'Block',
+)

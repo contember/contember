@@ -1,5 +1,5 @@
 import { BindingError, Entity, EntityAccessor, RelativeSingleField, RemovalType } from '@contember/binding'
-import { Box } from '@contember/ui'
+import { ActionableBox, Box } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
@@ -44,21 +44,23 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 	if (!selectedBlock) {
 		throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
 	}
+
+	const alternate = selectedBlock.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
+
 	return (
 		<div {...props.attributes}>
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
 				<Entity accessor={props.entity}>
 					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
-					<Box
-						heading={selectedBlock.label}
-						isActive={selected}
-						actions={!selected && <RemoveEntityButton removalType={props.removalType} />}
-						onClick={onContainerClick}
-						style={{ margin: '0' }}
+					<ActionableBox
+						editContents={alternate}
+						onRemove={selected ? undefined : () => props.entity.remove?.(props.removalType)}
 					>
-						{selectedBlock.children}
-					</Box>
+						<Box heading={selectedBlock.label} isActive={selected} onClick={onContainerClick} style={{ margin: '0' }}>
+							{selectedBlock.children}
+						</Box>
+					</ActionableBox>
 					<div onClick={() => addDefaultElement(1)} style={{ height: '1em' }} />
 				</Entity>
 			</div>

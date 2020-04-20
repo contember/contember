@@ -8,20 +8,19 @@ import {
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { ExecutedMigration } from '../dtos/ExecutedMigration'
 import { DatabaseContext } from '../database/DatabaseContext'
+import { MigrationsResolverFactory } from './MigrationsResolverFactory'
 
 class ProjectMigrationInfoResolver {
 	constructor(
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
-		private readonly projectsDir: string,
+		private readonly migrationsResolverFactory: MigrationsResolverFactory,
 	) {}
 
 	public async getMigrationsInfo(
 		db: DatabaseContext,
 		project: ProjectConfig,
 	): Promise<ProjectMigrationInfoResolver.Result> {
-		const migrationsResolver = new MigrationsResolver(
-			MigrationFilesManager.createForProject(this.projectsDir, project.directory || project.slug),
-		)
+		const migrationsResolver = this.migrationsResolverFactory(project)
 		const allMigrations = await migrationsResolver.getMigrations()
 		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
 		const latestMigration = executedMigrations.reduce<string | null>(

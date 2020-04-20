@@ -14,7 +14,7 @@ describe('project initializer', () => {
 				slug: 'prod',
 			}
 			const project: ProjectConfig = {
-				slug: 'test',
+				slug: 'example-project',
 				stages: [prodStage],
 			}
 
@@ -41,7 +41,7 @@ describe('project initializer', () => {
 			)
 
 			const project2: ProjectConfig = {
-				slug: 'test',
+				slug: 'example-project',
 				stages: [
 					prodStage,
 					{
@@ -94,7 +94,7 @@ describe('project initializer', () => {
 			}
 
 			const config1: ProjectConfig = {
-				slug: 'test',
+				slug: 'example-project',
 				stages: [prodStage, previewStage],
 			}
 
@@ -190,7 +190,7 @@ describe('project initializer', () => {
 			}
 
 			const project: ProjectConfig = {
-				slug: 'test',
+				slug: 'example-project',
 				stages: [prodStage, previewStage],
 			}
 

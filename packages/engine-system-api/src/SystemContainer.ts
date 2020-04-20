@@ -39,6 +39,7 @@ import ReleaseMutationResolver from './resolvers/mutation/ReleaseMutationResolve
 import RebaseAllMutationResolver from './resolvers/mutation/RebaseAllMutationResolver'
 import { MigrateMutationResolver } from './resolvers/mutation/MigrateMutationResolver'
 import ResolverFactory from './resolvers/ResolverFactory'
+import { MigrationsResolverFactory } from './model/migrations/MigrationsResolverFactory'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -52,10 +53,10 @@ export interface SystemContainer {
 export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials) => MigrationsRunner
 
 type Args = {
-	projectsDir: string | undefined
 	providers: UuidProvider
 	contentPermissionsVerifier: ContentPermissionVerifier
 	modificationHandlerFactory: ModificationHandlerFactory
+	migrationsResolverFactory: MigrationsResolverFactory | undefined
 }
 
 export class SystemContainerFactory {
@@ -135,8 +136,8 @@ export class SystemContainerFactory {
 			)
 
 			.addService('projectMigrationInfoResolver', ({ executedMigrationsResolver }) =>
-				container.projectsDir
-					? new ProjectMigrationInfoResolver(executedMigrationsResolver, container.projectsDir)
+				container.migrationsResolverFactory
+					? new ProjectMigrationInfoResolver(executedMigrationsResolver, container.migrationsResolverFactory)
 					: undefined,
 			)
 			.addService('stageCreator', ({ eventApplier }) => new StageCreator(eventApplier))

@@ -8,19 +8,19 @@ import {
 import { Builder } from '@contember/dic'
 import { Config, Project, TenantConfig } from './config/config'
 import { logSentryError, projectVariablesResolver, tuple } from './utils'
-import { ModificationHandlerFactory } from '@contember/schema-migrations'
+import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer, ServerRunner } from './bootstrap'
 import { createProjectContainer } from './ProjectContainer'
 import { Plugin } from '@contember/engine-plugins'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { createRootMiddleware } from './http/RootMiddleware'
 import {
+	Koa,
 	ProjectContainer,
 	ProjectContainerResolver,
 	providers,
 	SystemServerProvider,
 	TenantApolloServerFactory,
-	Koa,
 } from '@contember/engine-http'
 
 export interface MasterContainer {
@@ -33,7 +33,11 @@ class CompositionRoot {
 	createMasterContainer(debug: boolean, config: Config, projectsDirectory: string, plugins: Plugin[]): MasterContainer {
 		const systemContainerDependencies = new Builder({})
 			.addService('providers', () => providers)
-			.addService('projectsDir', () => projectsDirectory)
+			.addService('migrationsResolverFactory', () => (project: Pick<Project, 'slug' | 'directory'>) =>
+				new MigrationsResolver(
+					MigrationFilesManager.createForProject(projectsDirectory, project.directory || project.slug),
+				),
+			)
 			.addService(
 				'modificationHandlerFactory',
 				() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),

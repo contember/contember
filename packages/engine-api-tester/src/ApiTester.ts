@@ -65,8 +65,11 @@ export class ApiTester {
 		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories)
 
 		const systemContainerFactory = new SystemContainerFactory()
+		const projectSlug = options.project?.slug || ApiTester.project.slug
+		const migrationFilesManager = MigrationFilesManager.createForProject(ApiTester.getMigrationsDir(), projectSlug)
+		const migrationsResolver = options.migrationsResolver || new MigrationsResolver(migrationFilesManager)
 		let systemContainerBuilder = systemContainerFactory.createBuilder({
-			projectsDir: ApiTester.getMigrationsDir(),
+			migrationsResolverFactory: project => migrationsResolver,
 			contentPermissionsVerifier: new PermissionsVerifier(new PermissionsByIdentityFactory()),
 			modificationHandlerFactory,
 			providers: providers,
@@ -90,11 +93,8 @@ export class ApiTester {
 				},
 			},
 		})
-		const projectSlug = options.project?.slug || ApiTester.project.slug
-		const migrationFilesManager = MigrationFilesManager.createForProject(ApiTester.getMigrationsDir(), projectSlug)
-		const migrationsResolver = new MigrationsResolver(migrationFilesManager)
 
-		const projectConfig = { ...options.project, ...ApiTester.project }
+		const projectConfig = { ...ApiTester.project, ...options.project }
 		const stageManager = new TesterStageManager(
 			projectConfig,
 			db,

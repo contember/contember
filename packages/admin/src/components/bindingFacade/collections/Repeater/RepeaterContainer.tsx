@@ -1,10 +1,11 @@
 import { Box, BoxSection } from '@contember/ui'
 import * as React from 'react'
-import { EntityListAccessor } from '@contember/binding'
+import { EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { AddNewEntityButton, AddNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 
 export interface RepeaterContainerPrivateProps {
 	entityList: EntityListAccessor
+	entities: EntityAccessor[]
 	isEmpty: boolean
 	label: React.ReactNode
 	addNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void

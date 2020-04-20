@@ -1,16 +1,14 @@
 import { Scalar } from '@contember/binding'
-import * as React from 'react'
 import { SugaredDiscriminateBy } from '../../blocks'
+import { SingleFileUploadProps } from '../core'
 
-export type DiscriminatedGenericFileUploadProps = {
-	acceptGeneric?: string | string[]
-	renderGenericFile?: () => React.ReactNode
-	renderGenericFilePreview?: (file: File, previewUrl: string) => React.ReactNode
+export type DiscriminatedGenericFileUploadProps = SingleFileUploadProps & {
+	accept?: string | string[]
 } & (
-	| {
-			discriminateGenericBy?: SugaredDiscriminateBy
-	  }
-	| {
-			discriminateGenericByScalar?: Scalar
-	  }
-)
+		| {
+				discriminateGenericBy?: SugaredDiscriminateBy
+		  }
+		| {
+				discriminateGenericByScalar?: Scalar
+		  }
+	)

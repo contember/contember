@@ -1,5 +1,8 @@
 import {
+	BindingError,
 	Component,
+	EntityAccessor,
+	Environment,
 	useEntityContext,
 	useEnvironment,
 	useMutationState,
@@ -23,7 +26,9 @@ import { UploadingFilePreview } from './UploadingFilePreview'
 export type UploadFieldProps = UploadConfigProps &
 	SingleFileUploadProps &
 	Omit<FormGroupProps, 'children'> &
-	ResolvablePopulatorProps
+	ResolvablePopulatorProps & {
+		hasPersistedFile?: (entity: EntityAccessor, environment: Environment) => boolean
+	}
 
 const staticFileId = 'file'
 export const UploadField = Component<UploadFieldProps>(
@@ -37,6 +42,12 @@ export const UploadField = Component<UploadFieldProps>(
 
 		const singleFileUploadState = uploadState.get(staticFileId)
 		const populators = useResolvedPopulators(props)
+
+		if (__DEV_MODE__) {
+			if ('imageFileUrlField' in props || 'audioFileUrlField' in props || 'videoFileUrlField' in props) {
+				throw new BindingError(`UploadField: specify the file url only using the fileUrlField prop.`)
+			}
+		}
 
 		// We're giving the FileUrlDataPopulator special treatment here since it's going to be by far the most used one.
 		// Other populators pay the price of an additional hook which isn't that big of a deal.

@@ -1,10 +1,12 @@
 import { Component, SugaredField, SugaredFieldProps } from '@contember/binding'
+import { emptyObject } from '@contember/react-utils'
 import * as React from 'react'
 import { DiscriminatedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../../collections'
 import {
 	AggregateDataPopulatorProps,
 	CustomDataPopulatorProps,
+	FileUrlDataPopulatorProps,
 	resolvePopulators,
 	useResolvedPopulators,
 } from '../fileDataPopulators'
@@ -36,22 +38,27 @@ type FileRepeaterProps = Omit<
 // TODO configurable container/item components
 export const FileRepeater = Component<FileRepeaterProps>(
 	props => {
-		const fileUrlField = 'fileUrlField' in props ? props.fileUrlField : undefined
+		const fileUrlProps = props as Partial<FileUrlDataPopulatorProps>
 
 		const fileDataPopulators = useResolvedPopulators(props)
-		const fileKinds = useResolvedFileKinds(props, fileUrlField)
+		const fileKinds = useResolvedFileKinds(props, fileUrlProps)
 
 		// Using Required and exclamation marks to make sure we don't forget any props. This is still sound though.
 		const containerExtraProps = React.useMemo((): Required<
 			FileRepeaterContainerPublicProps & FileRepeaterContainerPrivateProps
 		> => {
 			return {
-				accept: props.accept!,
 				uploader: props.uploader!,
-				hasPersistedFile: props.hasPersistedFile!,
 
 				renderFile: props.renderFile!,
 				renderFilePreview: props.renderFilePreview!,
+
+				discriminationField: props.discriminationField!,
+
+				fileUrlField: fileUrlProps.fileUrlField!,
+				audioFileUrlField: fileUrlProps.audioFileUrlField!,
+				imageFileUrlField: fileUrlProps.imageFileUrlField!,
+				videoFileUrlField: fileUrlProps.videoFileUrlField!,
 
 				fileKinds,
 				fileDataPopulators,
@@ -59,8 +66,11 @@ export const FileRepeater = Component<FileRepeaterProps>(
 		}, [
 			fileDataPopulators,
 			fileKinds,
-			props.accept,
-			props.hasPersistedFile,
+			fileUrlProps.audioFileUrlField,
+			fileUrlProps.fileUrlField,
+			fileUrlProps.imageFileUrlField,
+			fileUrlProps.videoFileUrlField,
+			props.discriminationField,
 			props.renderFile,
 			props.renderFilePreview,
 			props.uploader,
@@ -69,20 +79,24 @@ export const FileRepeater = Component<FileRepeaterProps>(
 		return (
 			<Repeater
 				{...props}
+				initialRowCount={0}
+				//useDragHandle={false}
 				containerComponent={FileRepeaterContainer}
 				containerComponentExtraProps={containerExtraProps}
+				unstable__sortAxis="xy"
 			>
 				<></>
 			</Repeater>
 		)
 	},
 	(props, environment) => {
+		const fileKinds = Array.from(resolveFileKinds(props, props as Partial<FileUrlDataPopulatorProps>))
 		let normalizedChildren: React.ReactNode = (
 			<>
 				{resolvePopulators(props).map((item, i) => (
 					<React.Fragment key={i}>{item.getStaticFields(environment)}</React.Fragment>
 				))}
-				{Array.from(resolveFileKinds(props, undefined)).map((item, i) => (
+				{fileKinds.map((item, i) => (
 					<React.Fragment key={i}>{item.renderFile?.()}</React.Fragment>
 				))}
 				{props.discriminationField && <SugaredField field={props.discriminationField} />}
@@ -108,7 +122,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 		}
 
 		return (
-			<Repeater {...props} initialRowCount={0} useDragHandle={false}>
+			<Repeater {...props} initialRowCount={0}>
 				{normalizedChildren}
 			</Repeater>
 		)

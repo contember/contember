@@ -5,5 +5,5 @@ import { SingleFileUploadProps } from '../core'
 export type DiscriminatedFileUploadProps = SingleFileUploadProps & {
 	discriminateBy?: SugaredDiscriminateBy
 	discriminateByScalar?: Scalar
-	accept: string | string[]
+	accept: string | string[] | undefined
 }

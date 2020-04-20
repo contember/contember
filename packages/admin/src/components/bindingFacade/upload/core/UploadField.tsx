@@ -1,35 +1,34 @@
 import {
+	BindingError,
 	Component,
 	EntityAccessor,
 	Environment,
-	Field,
 	useEntityContext,
 	useEnvironment,
 	useMutationState,
 	useOptionalRelativeSingleField,
 } from '@contember/binding'
-import { FileUploader } from '@contember/client'
 import { useFileUpload } from '@contember/react-client'
-import { Button, FileDropZone, FormGroup } from '@contember/ui'
+import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
-import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import {
 	FileUrlDataPopulator,
 	ResolvablePopulatorProps,
 	resolvePopulators,
 	useResolvedPopulators,
 } from '../fileDataPopulators'
-import { UploadedFilePreview, UploadedFilePreviewProps } from './UploadedFilePreview'
+import { SingleFileUploadProps } from './SingleFileUploadProps'
+import { UploadConfigProps } from './UploadConfigProps'
+import { UploadedFilePreview } from './UploadedFilePreview'
+import { UploadingFilePreview } from './UploadingFilePreview'
 
-export type UploadFieldProps = {
-	accept?: string
-	hasPersistedFile?: (entity: EntityAccessor, environment: Environment) => boolean
-	renderFile?: () => React.ReactNode
-	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
-	uploader?: FileUploader
-} & SimpleRelativeSingleFieldProps &
-	ResolvablePopulatorProps
+export type UploadFieldProps = UploadConfigProps &
+	SingleFileUploadProps &
+	Omit<FormGroupProps, 'children'> &
+	ResolvablePopulatorProps & {
+		hasPersistedFile?: (entity: EntityAccessor, environment: Environment) => boolean
+	}
 
 const staticFileId = 'file'
 export const UploadField = Component<UploadFieldProps>(
@@ -42,8 +41,13 @@ export const UploadField = Component<UploadFieldProps>(
 		const isMutating = useMutationState()
 
 		const singleFileUploadState = uploadState.get(staticFileId)
-		const normalizedStateArray = [singleFileUploadState]
 		const populators = useResolvedPopulators(props)
+
+		if (__DEV_MODE__) {
+			if ('imageFileUrlField' in props || 'audioFileUrlField' in props || 'videoFileUrlField' in props) {
+				throw new BindingError(`UploadField: specify the file url only using the fileUrlField prop.`)
+			}
+		}
 
 		// We're giving the FileUrlDataPopulator special treatment here since it's going to be by far the most used one.
 		// Other populators pay the price of an additional hook which isn't that big of a deal.
@@ -71,17 +75,21 @@ export const UploadField = Component<UploadFieldProps>(
 			multiple: false,
 			noKeyboard: true, // This would normally be absolutely henious but there is a keyboard-focusable button inside.
 		})
-		const previewProps: UploadedFilePreviewProps = normalizedStateArray.map(state => ({
-			uploadState: state,
-			batchUpdates: entity.batchUpdates,
-			renderFile: props.renderFile,
-			renderFilePreview: props.renderFilePreview,
-			environment,
-			populators,
-		}))[0]
 
 		const shouldDisplayPreview =
-			!!previewProps.uploadState || (hasPersistedFile ? hasPersistedFile(entity, environment) : true)
+			!!singleFileUploadState || (hasPersistedFile ? hasPersistedFile(entity, environment) : true)
+
+		// This doesn't actually work well: the urlField could be something like 'mainFile.url' where the 'url' field is
+		// non-nullable. We cannot easily detect from here what exactly to set to null, remove or disconnect.
+
+		// const clearField = React.useMemo<undefined | React.MouseEventHandler>(() => {
+		// 	return fileUrlField && fileUrlField.currentValue !== null
+		// 		? e => {
+		// 				e.stopPropagation()
+		// 				fileUrlField.updateValue?.(null)
+		// 		  }
+		// 		: undefined
+		// }, [fileUrlField])
 		return (
 			<FormGroup
 				label={environment.applySystemMiddleware('labelMiddleware', props.label)}
@@ -102,7 +110,20 @@ export const UploadField = Component<UploadFieldProps>(
 					<div className="fileInput">
 						{shouldDisplayPreview && (
 							<div className="fileInput-preview">
-								<UploadedFilePreview {...previewProps} />
+								{singleFileUploadState ? (
+									<UploadingFilePreview
+										uploadState={singleFileUploadState}
+										batchUpdates={entity.batchUpdates}
+										renderFilePreview={props.renderFilePreview}
+										environment={environment}
+										populators={populators}
+									/>
+								) : (
+									<UploadedFilePreview renderFile={props.renderFile} />
+									// <ActionableBox onRemove={clearField}>
+									// <UploadedFilePreview renderFile={props.renderFile} />
+									// </ActionableBox>
+								)}
 							</div>
 						)}
 						<FileDropZone isActive={isDragActive} className="fileInput-dropZone">
@@ -118,11 +139,10 @@ export const UploadField = Component<UploadFieldProps>(
 	},
 	(props, environment) => (
 		<>
-			<Field field={props.field} />
-
 			{resolvePopulators(props).map((item, i) => (
 				<React.Fragment key={i}>{item.getStaticFields(environment)}</React.Fragment>
 			))}
+			{props.renderFile?.()}
 		</>
 	),
 	'UploadField',

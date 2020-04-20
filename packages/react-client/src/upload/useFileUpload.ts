@@ -63,6 +63,9 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 					: toFileId(multiTemporalStateRef.current, file)
 				fileId && newFileIds.add(fileId)
 			}
+			if (fileWithMetadataByFileConfig.size === 0) {
+				return
+			}
 
 			newFileIds.size &&
 				dispatch({
@@ -151,11 +154,14 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 
 	React.useEffect(
 		() => () => {
-			for (const [, state] of multiTemporalState.liveState) {
+			for (const [, state] of multiTemporalStateRef.current.liveState) {
+				URL.revokeObjectURL(state.previewUrl)
+			}
+			for (const [, state] of multiTemporalStateRef.current.publicState) {
 				URL.revokeObjectURL(state.previewUrl)
 			}
 		},
-		[multiTemporalState.liveState],
+		[],
 	)
 
 	// For this to work, this effect must be the last one to run.

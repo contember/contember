@@ -1,34 +1,38 @@
 import { Component } from '@contember/binding'
 import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
-import { VideoFieldView } from '../../fieldViews'
+import { UploadField } from '../core'
 import {
+	FileDataPopulator,
 	FileUrlDataPopulator,
 	GenericFileMetadataPopulator,
 	GenericFileMetadataPopulatorProps,
 	VideoFileMetadataPopulator,
 	VideoFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
-import { UploadField } from './UploadField'
+import { getVideoFileDefaults } from '../stockFileKindDefaults'
 
 export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps &
 	VideoFileMetadataPopulatorProps &
-	GenericFileMetadataPopulatorProps
+	GenericFileMetadataPopulatorProps & {
+		additionalFileDataPopulators?: Iterable<FileDataPopulator>
+	}
 
-export const VideoUploadField = Component<VideoUploadFieldProps>(
-	props => (
+export const VideoUploadField = Component<VideoUploadFieldProps>(props => {
+	const defaults = getVideoFileDefaults(props.field)
+	return (
 		<UploadField
 			{...props}
 			fileUrlField={props.field}
-			accept="video/*"
+			accept={defaults.accept}
 			fileDataPopulators={[
+				...(props.additionalFileDataPopulators || []),
 				new FileUrlDataPopulator({ fileUrlField: props.field }),
 				new GenericFileMetadataPopulator(props),
 				new VideoFileMetadataPopulator(props),
 			]}
-			renderFile={() => <VideoFieldView srcField={props.field} />}
-			renderFilePreview={(file, previewUrl) => <video src={previewUrl} controls />}
+			renderFile={defaults.renderFile}
+			renderFilePreview={defaults.renderFilePreview}
 		/>
-	),
-	'VideoUploadField',
-)
+	)
+}, 'VideoUploadField')

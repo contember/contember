@@ -11,7 +11,7 @@ export interface FileDataPopulatorOptions<UploadResult = any> {
 
 export interface FileDataPopulator<FileData = any, UploadResult = any> {
 	getStaticFields: (environment: Environment) => React.ReactNode
-	canHandleFile?: (file: File) => boolean
+	canHandleFile?: (file: File) => boolean // Considered true if the method is absent
 	prepareFileData?: (file: File, previewUrl: string) => Promise<FileData>
 	populateFileData: (options: FileDataPopulatorOptions<UploadResult>, fileData: FileData) => void
 }

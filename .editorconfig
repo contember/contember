@@ -3,18 +3,10 @@ root = true
 [*]
 charset = utf-8
 end_of_line = lf
-indent_size = 4
+indent_size = 2
 indent_style = tab
 insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.{yml,yaml}]
 indent_style = space
-indent_size = 2
-
-[nginx.conf]
-indent_style = space
-
-# Frontend stuff
-[*.{sass,scss,latte,ts,tsx,js,es6}]
-indent_size = 2

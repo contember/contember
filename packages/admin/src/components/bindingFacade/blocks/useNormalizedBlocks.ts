@@ -1,39 +1,50 @@
-import { BindingError, useEnvironment, VariableInputTransformer } from '@contember/binding'
+import { BindingError, Scalar, useEnvironment, VariableInputTransformer } from '@contember/binding'
 import * as React from 'react'
-import { BlockCommonProps, NormalizedBlock, NormalizedLiteralBasedBlock, NormalizedScalarBasedBlock } from './Block'
+import { BlockCommonProps, NormalizedBlocks, NormalizedLiteralBasedBlock, NormalizedScalarBasedBlock } from './Block'
 import { useBlockProps } from './useBlockProps'
 
-export const useNormalizedBlocks = (children: React.ReactNode): NormalizedBlock[] => {
+export const useNormalizedBlocks = (children: React.ReactNode): NormalizedBlocks => {
 	const environment = useEnvironment()
 	const propList = useBlockProps(children)
-	return React.useMemo(() => {
-		const literalBased: NormalizedLiteralBasedBlock[] = []
-		const scalarBased: NormalizedScalarBasedBlock[] = []
+	return React.useMemo<NormalizedBlocks>(() => {
+		const literalBased: Map<string, NormalizedLiteralBasedBlock> = new Map()
+		const scalarBased: Map<Scalar, NormalizedScalarBasedBlock> = new Map()
 
 		if (propList.length === 0) {
-			return literalBased
+			return {
+				discriminationKind: 'literal',
+				blocks: literalBased,
+			}
 		}
 
 		for (const props of propList) {
 			const commonProps: BlockCommonProps = props
 			if ('discriminateBy' in props) {
-				literalBased.push({
+				const literal = VariableInputTransformer.transformVariableLiteral(props.discriminateBy, environment)
+				literalBased.set(literal.value, {
 					...commonProps,
-					discriminateBy: VariableInputTransformer.transformVariableLiteral(props.discriminateBy, environment),
+					discriminateBy: literal,
 				})
 			} else if ('discriminateByScalar' in props) {
-				scalarBased.push({
+				const scalar = VariableInputTransformer.transformVariableScalar(props.discriminateByScalar, environment)
+				scalarBased.set(scalar, {
 					...commonProps,
-					discriminateBy: VariableInputTransformer.transformVariableScalar(props.discriminateByScalar, environment),
+					discriminateBy: scalar,
 				})
 			}
 		}
 
-		if (scalarBased.length && literalBased.length === 0) {
-			return scalarBased
+		if (scalarBased.size && literalBased.size === 0) {
+			return {
+				discriminationKind: 'scalar',
+				blocks: scalarBased,
+			}
 		}
-		if (literalBased.length && scalarBased.length === 0) {
-			return literalBased
+		if (literalBased.size && scalarBased.size === 0) {
+			return {
+				discriminationKind: 'literal',
+				blocks: literalBased,
+			}
 		}
 
 		throw new BindingError(

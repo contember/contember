@@ -1,9 +1,9 @@
 import { BindingError, Entity, EntityAccessor, RelativeSingleField, RemovalType } from '@contember/binding'
-import { Box } from '@contember/ui'
+import { ActionableBox, Box } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
-import { NormalizedBlock } from '../../../blocks'
+import { getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
 import { RemoveEntityButton } from '../../../collections/helpers'
 import { BlockSlateEditor } from '../editor'
 import { ContemberBlockElement } from '../elements'
@@ -13,7 +13,7 @@ export interface ContemberBlockElementRendererProps extends RenderElementProps {
 	entity: EntityAccessor
 	removalType: RemovalType
 	discriminationField: RelativeSingleField
-	normalizedBlocks: NormalizedBlock[]
+	normalizedBlocks: NormalizedBlocks
 }
 
 export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockElementRendererProps) => {
@@ -22,7 +22,7 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 
 	// TODO remove button, dragHandle, etc.
 	const discriminationField = props.entity.getRelativeSingleField(props.discriminationField)
-	const selectedBlock = props.normalizedBlocks.find(block => discriminationField.hasValue(block.discriminateBy))
+	const selectedBlock = getDiscriminatedBlock(props.normalizedBlocks, discriminationField)
 	const onContainerClick = React.useCallback(
 		(e: React.MouseEvent<HTMLElement>) => {
 			if (e.target === e.currentTarget) {
@@ -44,21 +44,23 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 	if (!selectedBlock) {
 		throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
 	}
+
+	const alternate = selectedBlock.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
+
 	return (
 		<div {...props.attributes}>
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
 				<Entity accessor={props.entity}>
 					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
-					<Box
-						heading={selectedBlock.label}
-						isActive={selected}
-						actions={!selected && <RemoveEntityButton removalType={props.removalType} />}
-						onClick={onContainerClick}
-						style={{ margin: '0' }}
+					<ActionableBox
+						editContents={alternate}
+						onRemove={selected ? undefined : () => props.entity.remove?.(props.removalType)}
 					>
-						{selectedBlock.children}
-					</Box>
+						<Box heading={selectedBlock.label} isActive={selected} onClick={onContainerClick} style={{ margin: '0' }}>
+							{selectedBlock.children}
+						</Box>
+					</ActionableBox>
 					<div onClick={() => addDefaultElement(1)} style={{ height: '1em' }} />
 				</Entity>
 			</div>

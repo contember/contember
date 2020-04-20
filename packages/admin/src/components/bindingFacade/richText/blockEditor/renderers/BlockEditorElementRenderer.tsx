@@ -2,7 +2,7 @@ import { RelativeSingleField, RemovalType } from '@contember/binding'
 import { EditorPlaceholder } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
-import { NormalizedBlock } from '../../../blocks'
+import { NormalizedBlocks } from '../../../blocks'
 import { isContemberBlockElement, isContemberContentPlaceholderElement, isContemberFieldElement } from '../elements'
 import { ContemberBlockElementRenderer } from './ContemberBlockElementRenderer'
 import {
@@ -12,7 +12,7 @@ import {
 import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
 
 export interface BlockEditorElementRendererProps extends RenderElementProps {
-	normalizedBlocks: NormalizedBlock[]
+	normalizedBlocks: NormalizedBlocks
 	discriminationField: RelativeSingleField
 	removalType: RemovalType
 	fallbackRenderer: (props: RenderElementProps) => React.ReactElement

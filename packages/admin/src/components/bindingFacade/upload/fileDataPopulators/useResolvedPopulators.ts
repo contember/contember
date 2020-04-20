@@ -29,6 +29,9 @@ export const useResolvedPopulators = (props: ResolvablePopulatorProps): FileData
 		p.fileSizeField,
 		p.fileTypeField,
 		p.fileUrlField,
+		p.imageFileUrlField,
+		p.videoFileUrlField,
+		p.audioFileUrlField,
 		p.imageHeightField,
 		p.imageWidthField,
 		p.lastModifiedField,
@@ -36,5 +39,6 @@ export const useResolvedPopulators = (props: ResolvablePopulatorProps): FileData
 		p.videoHeightField,
 		p.videoWidthField,
 		p.fileDataPopulators,
+		p.additionalFileDataPopulators,
 	])
 }

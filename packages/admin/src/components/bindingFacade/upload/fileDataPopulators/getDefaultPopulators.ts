@@ -11,11 +11,15 @@ import { VideoFileMetadataPopulator } from './VideoFileMetadataPopulator'
 // useResolvedPopulators
 // !!!!!!!! WARNING !!!!!!!!
 export const getDefaultPopulators = (props: AggregateDataPopulatorProps): FileDataPopulator[] => [
+	...(props.additionalFileDataPopulators || []),
 	new AudioFileMetadataPopulator({
 		audioDurationField: props.audioDurationField,
 	}),
 	new FileUrlDataPopulator({
 		fileUrlField: props.fileUrlField,
+		imageFileUrlField: props.imageFileUrlField,
+		videoFileUrlField: props.videoFileUrlField,
+		audioFileUrlField: props.audioFileUrlField,
 	}),
 	new GenericFileMetadataPopulator({
 		lastModifiedField: props.lastModifiedField,

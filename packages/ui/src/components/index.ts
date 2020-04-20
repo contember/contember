@@ -1,6 +1,7 @@
 export * from './editor'
 export * from './forms'
 
+export * from './ActionableBox'
 export * from './Aether'
 export * from './Box'
 export * from './Breadcrumbs'

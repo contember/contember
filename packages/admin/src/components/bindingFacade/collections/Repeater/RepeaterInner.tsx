@@ -1,6 +1,7 @@
 import {
 	Component,
 	Entity,
+	EntityListAccessor,
 	Field,
 	SugaredRelativeSingleField,
 	useMutationState,
@@ -8,7 +9,7 @@ import {
 } from '@contember/binding'
 import * as React from 'react'
 import { Axis, SortEndHandler } from 'react-sortable-hoc'
-import { RepeaterContainer, RepeaterContainerProps } from './RepeaterContainer'
+import { RepeaterContainer, RepeaterContainerProps, RepeaterContainerPublicProps } from './RepeaterContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'
 import { SortableRepeaterItem } from './SortableRepeaterItem'
@@ -16,8 +17,10 @@ import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
 
 // TODO alt content for collapsing
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
-	extends Omit<RepeaterContainerProps, 'children' | 'entities' | 'addNew' | 'isEmpty'>,
+	extends RepeaterContainerPublicProps,
 		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
+	entityList: EntityListAccessor
+	label: React.ReactNode
 	initialRowCount?: number
 	children: React.ReactNode
 
@@ -33,6 +36,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	itemComponentExtraProps?: ItemExtraProps
 
 	unstable__sortAxis?: Axis
+	useDragHandle?: boolean
 }
 
 export const RepeaterInner = Component(
@@ -65,7 +69,13 @@ export const RepeaterInner = Component(
 
 		if (props.sortableBy === undefined) {
 			return (
-				<Container {...props.containerComponentExtraProps!} {...props} isEmpty={isEmpty} addNew={appendNew}>
+				<Container
+					{...props.containerComponentExtraProps!}
+					{...props}
+					isEmpty={isEmpty}
+					addNew={appendNew}
+					entities={entities}
+				>
 					{entities.map(entity => (
 						<Entity accessor={entity} key={entity.key}>
 							<Item
@@ -91,10 +101,16 @@ export const RepeaterInner = Component(
 				helperClass="is-active"
 				lockToContainerEdges={true}
 				useWindowAsScrollContainer={true}
-				useDragHandle={true}
+				useDragHandle={props.useDragHandle ?? true}
 				onSortEnd={onSortEnd}
 			>
-				<Container {...props.containerComponentExtraProps!} {...props} isEmpty={isEmpty} addNew={appendNew}>
+				<Container
+					{...props.containerComponentExtraProps!}
+					{...props}
+					isEmpty={isEmpty}
+					addNew={appendNew}
+					entities={entities}
+				>
 					{entities.map((entity, i) => (
 						<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
 							<Entity accessor={entity}>
@@ -102,7 +118,7 @@ export const RepeaterInner = Component(
 									{...props.itemComponentExtraProps!}
 									removalType={props.removalType}
 									canBeRemoved={itemRemovingEnabled}
-									dragHandleComponent={sortableHandle}
+									dragHandleComponent={props.useDragHandle ? sortableHandle : undefined}
 								>
 									{props.children}
 								</Item>

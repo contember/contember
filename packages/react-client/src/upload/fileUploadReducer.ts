@@ -80,6 +80,7 @@ export const fileUploadReducer = (
 					result,
 				})
 			}
+			// return publishNewState() // Making the feedback about successful upload immediate.
 			return getNewDirtyState()
 		}
 		case FileUploadActionType.FinishWithError: {
@@ -97,7 +98,7 @@ export const fileUploadReducer = (
 					error,
 				})
 			}
-			return getNewDirtyState()
+			return getNewDirtyState() // Bad news can wait.
 		}
 		case FileUploadActionType.Abort: {
 			let atLeastOneAborted = false

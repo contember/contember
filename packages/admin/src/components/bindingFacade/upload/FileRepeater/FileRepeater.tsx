@@ -1,5 +1,4 @@
 import { Component, SugaredField, SugaredFieldProps } from '@contember/binding'
-import { emptyObject } from '@contember/react-utils'
 import * as React from 'react'
 import { DiscriminatedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../../collections'

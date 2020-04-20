@@ -1,24 +1,21 @@
 @import '../common'
 
 .fileInput
-	$previewWidth: em(150px)
-
 	width: 100%
-	height: $previewWidth
-	display: flex
-
-	&-preview
-		width: $previewWidth
-	&-preview ~ &-dropZone
-		margin-left: em(10px)
+	display: grid
+	grid-template-columns: repeat(auto-fill, minmax(em(130px), 1fr) )
+	grid-gap: em(10px)
 
 	&-dropZone
-		flex-grow: 1
+		min-height: em(130px)
 		display: flex
 		justify-content: center
 		align-items: center
 		flex-direction: column
 		height: 100%
+
+	&-dropZone:nth-child(2)
+		grid-column: 2 / -1
 
 	&-cta
 		&-label

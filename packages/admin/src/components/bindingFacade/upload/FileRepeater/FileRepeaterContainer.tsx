@@ -9,7 +9,7 @@ import {
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
 import { FileId } from '@contember/react-client/dist/src/upload/FileId'
-import { ActionableBox, Box, Button, FileDropZone, Icon } from '@contember/ui'
+import { ActionableBox, Box, Button, FileDropZone, FormGroup, Icon } from '@contember/ui'
 import attrAccept from 'attr-accept'
 import * as React from 'react'
 import { DropEvent, useDropzone } from 'react-dropzone'
@@ -201,7 +201,7 @@ export const FileRepeaterContainer = React.memo(
 		}
 
 		return (
-			<Box isActive={isDragActive} heading={label}>
+			<FormGroup label={label}>
 				<div className="fileInput">
 					{isEmpty && (
 						<EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>
@@ -222,7 +222,7 @@ export const FileRepeaterContainer = React.memo(
 						</FileDropZone>
 					)}
 				</div>
-			</Box>
+			</FormGroup>
 		)
 	},
 )

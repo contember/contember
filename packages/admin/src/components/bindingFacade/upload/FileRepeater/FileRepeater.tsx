@@ -1,6 +1,6 @@
 import { Component, SugaredField, SugaredFieldProps } from '@contember/binding'
 import * as React from 'react'
-import { DiscriminatedBlocks } from '../../blocks'
+import { DiscriminatedBlocks, useNormalizedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../../collections'
 import {
 	AggregateDataPopulatorProps,
@@ -41,6 +41,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 
 		const fileDataPopulators = useResolvedPopulators(props)
 		const fileKinds = useResolvedFileKinds(props, fileUrlProps)
+		const normalizedBlocks = useNormalizedBlocks(props.children)
 
 		// Using Required and exclamation marks to make sure we don't forget any props. This is still sound though.
 		const containerExtraProps = React.useMemo((): Required<
@@ -64,10 +65,12 @@ export const FileRepeater = Component<FileRepeaterProps>(
 
 				fileKinds,
 				fileDataPopulators,
+				normalizedBlocks,
 			}
 		}, [
 			fileDataPopulators,
 			fileKinds,
+			normalizedBlocks,
 			fileUrlProps.audioFileUrlField,
 			fileUrlProps.fileUrlField,
 			fileUrlProps.imageFileUrlField,

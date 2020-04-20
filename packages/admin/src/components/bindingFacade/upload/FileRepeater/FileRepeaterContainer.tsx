@@ -9,10 +9,11 @@ import {
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
 import { FileId } from '@contember/react-client/dist/src/upload/FileId'
-import { ActionableBox, Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
+import { ActionableBox, Box, Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import attrAccept from 'attr-accept'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
+import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
 import { RepeaterContainerProps, SortableRepeaterItem } from '../../collections'
 import { EmptyMessage } from '../../collections/helpers'
 import { SingleFileUploadProps, UploadConfigProps } from '../core'
@@ -25,7 +26,9 @@ import { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
 
 export type FileRepeaterContainerPrivateProps = CustomDataPopulatorProps &
 	CustomFileKindProps &
-	Partial<FileUrlDataPopulatorProps>
+	Partial<FileUrlDataPopulatorProps> & {
+		normalizedBlocks: NormalizedBlocks
+	}
 
 export type FileRepeaterContainerPublicProps = Omit<UploadConfigProps, 'accept'> &
 	SingleFileUploadProps &
@@ -54,6 +57,7 @@ export const FileRepeaterContainer = React.memo(
 		audioFileUrlField,
 		imageFileUrlField,
 		videoFileUrlField,
+		normalizedBlocks,
 		renderFile,
 		renderFilePreview,
 		uploader,
@@ -154,6 +158,7 @@ export const FileRepeaterContainer = React.memo(
 		for (const [i, entity] of entities.entries()) {
 			const uploadingState = uploadState.get(entity.key)
 			let resolvedFileKind: Partial<DiscriminatedFileUploadProps> = defaultFileKind
+			let editContents: React.ReactNode = undefined
 
 			if (desugaredDiscriminant) {
 				const discriminantField = entity.getRelativeSingleField(desugaredDiscriminant)
@@ -167,6 +172,16 @@ export const FileRepeaterContainer = React.memo(
 				)
 				if (acceptingFileKind) {
 					resolvedFileKind = acceptingFileKind
+				}
+
+				const relevantBlock = getDiscriminatedBlock(normalizedBlocks, discriminantField)
+
+				if (relevantBlock !== undefined) {
+					editContents = (
+						<div>
+							<Box heading={relevantBlock.label}>{relevantBlock.children}</Box>
+						</div>
+					)
 				}
 			}
 
@@ -194,6 +209,7 @@ export const FileRepeaterContainer = React.memo(
 									e.stopPropagation()
 									entity.remove?.('delete') // TODO
 								}}
+								editContents={editContents}
 							>
 								{preview}
 							</ActionableBox>

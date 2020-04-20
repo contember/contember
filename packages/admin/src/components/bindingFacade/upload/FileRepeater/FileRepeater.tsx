@@ -59,6 +59,9 @@ export const FileRepeater = Component<FileRepeaterProps>(
 				imageFileUrlField: fileUrlProps.imageFileUrlField!,
 				videoFileUrlField: fileUrlProps.videoFileUrlField!,
 
+				description: props.description!,
+				labelDescription: props.labelDescription!,
+
 				fileKinds,
 				fileDataPopulators,
 			}
@@ -69,7 +72,9 @@ export const FileRepeater = Component<FileRepeaterProps>(
 			fileUrlProps.fileUrlField,
 			fileUrlProps.imageFileUrlField,
 			fileUrlProps.videoFileUrlField,
+			props.description,
 			props.discriminationField,
+			props.labelDescription,
 			props.renderFile,
 			props.renderFilePreview,
 			props.uploader,

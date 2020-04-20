@@ -9,7 +9,7 @@ import {
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
 import { FileId } from '@contember/react-client/dist/src/upload/FileId'
-import { ActionableBox, Button, FileDropZone, FormGroup } from '@contember/ui'
+import { ActionableBox, Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import attrAccept from 'attr-accept'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
@@ -28,7 +28,8 @@ export type FileRepeaterContainerPrivateProps = CustomDataPopulatorProps &
 	Partial<FileUrlDataPopulatorProps>
 
 export type FileRepeaterContainerPublicProps = Omit<UploadConfigProps, 'accept'> &
-	SingleFileUploadProps & {
+	SingleFileUploadProps &
+	Pick<FormGroupProps, 'description' | 'labelDescription'> & {
 		discriminationField?: SugaredFieldProps['field']
 	}
 
@@ -64,6 +65,8 @@ export const FileRepeaterContainer = React.memo(
 		entities,
 		isEmpty,
 		label,
+		description,
+		labelDescription,
 	}: FileRepeaterContainerProps) => {
 		const [uploadState, { startUpload, abortUpload }] = useFileUpload()
 		const isMutating = useMutationState()
@@ -201,7 +204,7 @@ export const FileRepeaterContainer = React.memo(
 		}
 
 		return (
-			<FormGroup label={label} useLabelElement={false}>
+			<FormGroup label={label} useLabelElement={false} description={description} labelDescription={labelDescription}>
 				<div className="fileInput">
 					{isEmpty && (
 						<EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>

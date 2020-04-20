@@ -12,7 +12,9 @@ type Args = {
 	instance?: string
 }
 
-type Options = {}
+type Options = {
+	['remote-project']?: string
+}
 
 export class MigrationExecuteCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
@@ -23,6 +25,10 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 			.argument('instance')
 			.optional()
 			.description('Local instance name or remote Contember API URL')
+		configuration
+			.option('remote-project')
+			.valueRequired()
+			.description('Specify this when remote project name does not match local project name.')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
@@ -39,7 +45,8 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		}
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(input)
 		const apiToken = await interactiveResolveApiToken({ instance })
-		const client = SystemClient.create(instance.baseUrl, projectName, apiToken)
+		const remoteProject = input.getOption('remote-project') || projectName
+		const client = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
 		const result = await client.migrate([migration])
 		if (result.ok) {
 			console.log('Migration executed')

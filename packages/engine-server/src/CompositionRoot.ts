@@ -102,7 +102,7 @@ class CompositionRoot {
 				({ tenantApolloServer, projectContainerResolver, tenantContainer, providers, systemServerProvider }) => {
 					const app = new Koa()
 					app.use(
-						createRootMiddleware({
+						createRootMiddleware(debug, {
 							tenantApolloServer,
 							projectContainerResolver,
 							apiKeyManager: tenantContainer.apiKeyManager,

@@ -11,10 +11,12 @@ import {
 	route,
 	ServicesState,
 	KoaMiddleware,
+	createDebugInfoMiddleware,
 } from '@contember/engine-http'
 
-export const createRootMiddleware = (services: ServicesState): KoaMiddleware<any> => {
+export const createRootMiddleware = (debug: boolean, services: ServicesState): KoaMiddleware<any> => {
 	return compose([
+		createDebugInfoMiddleware(debug),
 		createServicesProviderMiddleware(services),
 		createErrorResponseMiddleware(),
 		createTimerMiddleware(),

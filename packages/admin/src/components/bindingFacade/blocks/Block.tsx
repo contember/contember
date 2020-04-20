@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { Component, Scalar, VariableLiteral } from '@contember/binding'
+import { Component, FieldValue, Scalar, VariableLiteral } from '@contember/binding'
 
 export interface BlockCommonProps {
 	label?: React.ReactNode
@@ -19,13 +19,25 @@ export interface ScalarBasedBlockProps extends BlockCommonProps {
 
 export type BlockProps = LiteralBasedBlockProps | ScalarBasedBlockProps
 
-export interface NormalizedLiteralBasedBlock extends BlockCommonProps {
+export interface NormalizedBlockCommonProps extends BlockCommonProps {
+	discriminateBy: FieldValue
+}
+
+export interface NormalizedLiteralBasedBlock extends NormalizedBlockCommonProps {
 	discriminateBy: GraphQlBuilder.Literal
 }
-export interface NormalizedScalarBasedBlock extends BlockCommonProps {
+export interface NormalizedScalarBasedBlock extends NormalizedBlockCommonProps {
 	discriminateBy: Scalar
 }
 
-export type NormalizedBlock = NormalizedLiteralBasedBlock | NormalizedScalarBasedBlock
+export type NormalizedBlocks =
+	| {
+			discriminationKind: 'literal'
+			blocks: Map<string, NormalizedLiteralBasedBlock>
+	  }
+	| {
+			discriminationKind: 'scalar'
+			blocks: Map<Scalar, NormalizedScalarBasedBlock>
+	  }
 
 export const Block = Component<BlockProps>(props => <>{props.children}</>, 'Block')

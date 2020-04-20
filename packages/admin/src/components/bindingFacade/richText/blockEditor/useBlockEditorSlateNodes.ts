@@ -1,7 +1,7 @@
 import { BindingError, EntityAccessor, FieldAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 import { Element as SlateElement } from 'slate'
-import { NormalizedBlock } from '../../blocks'
+import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
 import { SerializableEditorNode } from '../baseEditor'
 import { BlockSlateEditor } from './editor'
 import {
@@ -17,7 +17,7 @@ import { NormalizedFieldBackedElement } from './FieldBackedElement'
 
 export interface UseBlockEditorSlateNodesOptions {
 	editor: BlockSlateEditor
-	blocks: NormalizedBlock[]
+	blocks: NormalizedBlocks
 	discriminationField: RelativeSingleField
 	contemberFieldElementCache: WeakMap<FieldAccessor, SlateElement>
 	textElementCache: WeakMap<EntityAccessor, SlateElement>
@@ -108,7 +108,7 @@ export const useBlockEditorSlateNodes = ({
 					textElementCache.set(entity, element)
 					return element
 				} else {
-					const selectedBlock = blocks.find(block => blockType.hasValue(block.discriminateBy))
+					const selectedBlock = getDiscriminatedBlock(blocks, blockType)
 
 					if (selectedBlock === undefined) {
 						throw new BindingError(`BlockEditor: Encountered an entity without a corresponding block definition.`)

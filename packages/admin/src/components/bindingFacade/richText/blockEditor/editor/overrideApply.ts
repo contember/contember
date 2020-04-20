@@ -11,7 +11,7 @@ import {
 } from '@contember/binding'
 import * as React from 'react'
 import { Editor, Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
-import { NormalizedBlock } from '../../../blocks'
+import { NormalizedBlocks } from '../../../blocks'
 import {
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
@@ -27,7 +27,7 @@ export interface OverrideApplyOptions {
 	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
 	fieldElementCache: WeakMap<FieldAccessor, SlateElement>
 	isMutatingRef: React.MutableRefObject<boolean>
-	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
+	normalizedBlocksRef: React.MutableRefObject<NormalizedBlocks>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	removalType: RemovalType

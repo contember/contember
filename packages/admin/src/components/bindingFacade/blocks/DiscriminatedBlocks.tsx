@@ -1,8 +1,8 @@
-import { Component, SugaredRelativeSingleField } from '@contember/binding'
+import { Component, FieldValue, Scalar, SugaredRelativeSingleField } from '@contember/binding'
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { NormalizedStaticOption, SelectFieldInner, StaticChoiceField, useStaticChoiceField } from '../fields'
-import { NormalizedBlock } from './Block'
+import { NormalizedBlockCommonProps, NormalizedBlocks } from './Block'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 
 export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children'>, SugaredRelativeSingleField {
@@ -12,15 +12,19 @@ export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children
 
 export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 	props => {
-		const normalizedBlockList = useNormalizedBlocks(props.children)
+		const normalizedBlocks = useNormalizedBlocks(props.children)
+		const blocksArray = React.useMemo(
+			() => Array.from(normalizedBlocks.blocks as Map<Scalar, NormalizedBlockCommonProps>),
+			[normalizedBlocks.blocks],
+		)
 		const transformedBlockList = React.useMemo<NormalizedStaticOption[]>(
 			() =>
-				(normalizedBlockList as NormalizedBlock[]).map(item => ({
+				blocksArray.map(([, item]) => ({
 					...item,
 					label: item.label,
 					value: item.discriminateBy,
 				})),
-			[normalizedBlockList],
+			[blocksArray],
 		)
 		const metadata = useStaticChoiceField({
 			...props,
@@ -41,7 +45,7 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 						isMutating={metadata.isMutating}
 					/>
 				)}
-				{metadata.currentValue in normalizedBlockList && normalizedBlockList[metadata.currentValue].children}
+				{metadata.currentValue in blocksArray && blocksArray[metadata.currentValue][1].children}
 			</>
 		)
 	},

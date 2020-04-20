@@ -1,13 +1,13 @@
 import { RelativeSingleField, RemovalType } from '@contember/binding'
 import * as React from 'react'
-import { NormalizedBlock } from '../../../blocks'
+import { NormalizedBlocks } from '../../../blocks'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
 import { BlockEditorElementRenderer } from '../renderers'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideRenderElementOptions {
 	discriminationField: RelativeSingleField
-	normalizedBlocksRef: React.MutableRefObject<NormalizedBlock[]>
+	normalizedBlocksRef: React.MutableRefObject<NormalizedBlocks>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	removalType: RemovalType

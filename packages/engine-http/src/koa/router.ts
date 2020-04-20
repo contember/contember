@@ -22,7 +22,6 @@ function createRoutingMiddleware(
 	const regexp: RegExp = pathToRegexp(normalizedMask, keys)
 
 	const match = function(url: string): Params | null {
-		console.log(url)
 		const match = regexp.exec(url)
 		if (match) {
 			return match.slice(1).reduce((acc, value, i) => ({ ...acc, [keys[i].name]: value }), {})

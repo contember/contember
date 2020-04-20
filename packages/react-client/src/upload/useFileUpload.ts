@@ -63,6 +63,9 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 					: toFileId(multiTemporalStateRef.current, file)
 				fileId && newFileIds.add(fileId)
 			}
+			if (fileWithMetadataByFileConfig.size === 0) {
+				return
+			}
 
 			newFileIds.size &&
 				dispatch({

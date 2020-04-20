@@ -191,11 +191,6 @@ export const FileRepeaterContainer = React.memo(
 									e.stopPropagation()
 									entity.remove?.('delete') // TODO
 								}}
-								dragHandle={
-									<SortableRepeaterItemHandle>
-										<Icon blueprintIcon="move" />
-									</SortableRepeaterItemHandle>
-								}
 							>
 								{preview}
 							</ActionableBox>

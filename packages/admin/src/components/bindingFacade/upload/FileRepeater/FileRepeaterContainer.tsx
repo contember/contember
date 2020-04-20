@@ -1,6 +1,6 @@
 import {
-	Entity,
 	EntityAccessor,
+	RemovalType,
 	SugaredFieldProps,
 	useEnvironment,
 	useMutationState,
@@ -9,20 +9,19 @@ import {
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
 import { FileId } from '@contember/react-client/dist/src/upload/FileId'
-import { ActionableBox, Box, Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
+import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import attrAccept from 'attr-accept'
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
-import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
+import { NormalizedBlocks } from '../../blocks'
 import { RepeaterContainerProps, SortableRepeaterItem } from '../../collections'
 import { EmptyMessage } from '../../collections/helpers'
 import { SingleFileUploadProps, UploadConfigProps } from '../core'
-import { UploadedFilePreview } from '../core/UploadedFilePreview'
-import { UploadingFilePreview } from '../core/UploadingFilePreview'
 import { CustomDataPopulatorProps, FileUrlDataPopulatorProps } from '../fileDataPopulators'
 import { getGenericFileDefaults } from '../stockFileKindDefaults'
 import { CustomFileKindProps } from './CustomFileKindProps'
 import { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
+import { FileRepeaterItem } from './FileRepeaterItem'
 
 export type FileRepeaterContainerPrivateProps = CustomDataPopulatorProps &
 	CustomFileKindProps &
@@ -34,6 +33,7 @@ export type FileRepeaterContainerPublicProps = Omit<UploadConfigProps, 'accept'>
 	SingleFileUploadProps &
 	Pick<FormGroupProps, 'description' | 'labelDescription'> & {
 		discriminationField?: SugaredFieldProps['field']
+		removalType?: RemovalType
 	}
 
 export type FileRepeaterContainerProps = FileRepeaterContainerPublicProps &
@@ -58,6 +58,7 @@ export const FileRepeaterContainer = React.memo(
 		imageFileUrlField,
 		videoFileUrlField,
 		normalizedBlocks,
+		removalType,
 		renderFile,
 		renderFilePreview,
 		uploader,
@@ -157,64 +158,22 @@ export const FileRepeaterContainer = React.memo(
 
 		for (const [i, entity] of entities.entries()) {
 			const uploadingState = uploadState.get(entity.key)
-			let resolvedFileKind: Partial<DiscriminatedFileUploadProps> = defaultFileKind
-			let editContents: React.ReactNode = undefined
 
-			if (desugaredDiscriminant) {
-				const discriminantField = entity.getRelativeSingleField(desugaredDiscriminant)
-				const acceptingFileKind: DiscriminatedFileUploadProps | undefined = fileKinds.find(
-					fileKind =>
-						(fileKind.discriminateBy !== undefined &&
-							discriminantField.hasValue(
-								VariableInputTransformer.transformVariableLiteral(fileKind.discriminateBy, environment),
-							)) ||
-						(fileKind.discriminateByScalar !== undefined && discriminantField.hasValue(fileKind.discriminateByScalar)),
-				)
-				if (acceptingFileKind) {
-					resolvedFileKind = acceptingFileKind
-				}
-
-				const relevantBlock = getDiscriminatedBlock(normalizedBlocks, discriminantField)
-
-				if (relevantBlock !== undefined) {
-					editContents = (
-						<div>
-							<Box heading={relevantBlock.label}>{relevantBlock.children}</Box>
-						</div>
-					)
-				}
-			}
-
-			const preview = uploadingState ? (
-				<UploadingFilePreview
-					uploadState={uploadingState}
-					batchUpdates={entity.batchUpdates}
-					renderFilePreview={resolvedFileKind.renderFilePreview || defaultFileKind.renderFilePreview}
-					environment={environment}
-					populators={fileDataPopulators}
-				/>
-			) : (
-				<UploadedFilePreview renderFile={resolvedFileKind.renderFile || defaultFileKind.renderFile} />
-			)
-
-			// removalType={props.removalType}
-			// canBeRemoved={itemRemovingEnabled}
 			// dragHandleComponent={props.useDragHandle ? sortableHandle : undefined}
 			previews.push(
 				<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
-					<div className="fileInput-preview">
-						<Entity accessor={entity}>
-							<ActionableBox
-								onRemove={e => {
-									e.stopPropagation()
-									entity.remove?.('delete') // TODO
-								}}
-								editContents={editContents}
-							>
-								{preview}
-							</ActionableBox>
-						</Entity>
-					</div>
+					<FileRepeaterItem
+						canBeRemoved={true}
+						defaultFileKind={defaultFileKind}
+						desugaredDiscriminant={desugaredDiscriminant}
+						entity={entity}
+						environment={environment}
+						fileDataPopulators={fileDataPopulators}
+						fileKinds={fileKinds}
+						normalizedBlocks={normalizedBlocks}
+						removalType={removalType}
+						uploadingState={uploadingState}
+					/>
 				</SortableRepeaterItem>,
 			)
 		}

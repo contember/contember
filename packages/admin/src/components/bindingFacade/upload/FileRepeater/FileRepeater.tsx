@@ -54,6 +54,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 				renderFilePreview: props.renderFilePreview!,
 
 				discriminationField: props.discriminationField!,
+				removalType: props.removalType!,
 
 				fileUrlField: fileUrlProps.fileUrlField!,
 				audioFileUrlField: fileUrlProps.audioFileUrlField!,
@@ -68,19 +69,20 @@ export const FileRepeater = Component<FileRepeaterProps>(
 				normalizedBlocks,
 			}
 		}, [
-			fileDataPopulators,
 			fileKinds,
+			fileDataPopulators,
 			normalizedBlocks,
-			fileUrlProps.audioFileUrlField,
-			fileUrlProps.fileUrlField,
-			fileUrlProps.imageFileUrlField,
-			fileUrlProps.videoFileUrlField,
-			props.description,
-			props.discriminationField,
-			props.labelDescription,
+			props.uploader,
 			props.renderFile,
 			props.renderFilePreview,
-			props.uploader,
+			props.discriminationField,
+			props.removalType,
+			props.description,
+			props.labelDescription,
+			fileUrlProps.fileUrlField,
+			fileUrlProps.audioFileUrlField,
+			fileUrlProps.imageFileUrlField,
+			fileUrlProps.videoFileUrlField,
 		])
 
 		return (

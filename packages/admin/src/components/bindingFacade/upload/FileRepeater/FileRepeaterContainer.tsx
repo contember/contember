@@ -9,11 +9,11 @@ import {
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
 import { FileId } from '@contember/react-client/dist/src/upload/FileId'
-import { ActionableBox, Box, Button, FileDropZone, FormGroup, Icon } from '@contember/ui'
+import { ActionableBox, Button, FileDropZone, FormGroup } from '@contember/ui'
 import attrAccept from 'attr-accept'
 import * as React from 'react'
-import { DropEvent, useDropzone } from 'react-dropzone'
-import { RepeaterContainerProps, SortableRepeaterItem, SortableRepeaterItemHandle } from '../../collections'
+import { useDropzone } from 'react-dropzone'
+import { RepeaterContainerProps, SortableRepeaterItem } from '../../collections'
 import { EmptyMessage } from '../../collections/helpers'
 import { SingleFileUploadProps, UploadConfigProps } from '../core'
 import { UploadedFilePreview } from '../core/UploadedFilePreview'
@@ -201,7 +201,7 @@ export const FileRepeaterContainer = React.memo(
 		}
 
 		return (
-			<FormGroup label={label}>
+			<FormGroup label={label} useLabelElement={false}>
 				<div className="fileInput">
 					{isEmpty && (
 						<EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>

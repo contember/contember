@@ -3,13 +3,13 @@ import { FileUploadReadyState, SingleFileUploadState } from '@contember/react-cl
 import { FilePreview, UploadProgress } from '@contember/ui'
 import * as React from 'react'
 import { FileDataPopulator } from '../fileDataPopulators'
-import { getPartitionedRelevantPopulators } from './getPartitionedRelevantPopulators'
+import { getRelevantPopulators } from './getRelevantPopulators'
 
 export interface UploadingFilePreviewProps {
 	batchUpdates: EntityAccessor['batchUpdates']
 	environment: Environment
 	uploadState: SingleFileUploadState
-	populators: FileDataPopulator[]
+	populators: Iterable<FileDataPopulator>
 	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
 }
 
@@ -35,42 +35,45 @@ export const UploadingFilePreview = React.memo(
 		})
 		const uploadedFile = uploadState.file
 		const readyState = uploadState.readyState
+		const isMountedRef = React.useRef(true)
 
-		const { deferrablePopulators } = React.useMemo(() => getPartitionedRelevantPopulators(populators, uploadedFile), [
+		const relevantPopulators = React.useMemo(() => getRelevantPopulators(populators, uploadedFile), [
 			populators,
 			uploadedFile,
 		])
 
-		React.useEffect(() => {
+		React.useLayoutEffect(() => {
 			uploadStateRef.current = uploadState
 		}, [uploadState])
 
 		React.useEffect(() => {
-			let isMounted = true
-
 			const currentUploadState = uploadStateRef.current
-			if (readyState === FileUploadReadyState.Uploading && currentUploadState) {
-				const dataPromises = deferrablePopulators.map(populator =>
-					populator.prepareFileData
-						? populator.prepareFileData(currentUploadState.file, currentUploadState.previewUrl)
-						: Promise.resolve(undefined),
-				)
-				setPreparedPopulatorData({ name: 'uninitialized' })
-				Promise.all(dataPromises).then(data => {
-					if (!isMounted) {
-						return
+			const preparePopulators = async () => {
+				if (readyState === FileUploadReadyState.Uploading && currentUploadState) {
+					const dataPromises = relevantPopulators.map(populator =>
+						populator.prepareFileData
+							? populator.prepareFileData(currentUploadState.file, currentUploadState.previewUrl)
+							: Promise.resolve(),
+					)
+					setPreparedPopulatorData({ name: 'uninitialized' })
+					try {
+						const data = await Promise.all(dataPromises)
+						if (!isMountedRef.current) {
+							return
+						}
+						setPreparedPopulatorData({
+							name: 'ready',
+							data,
+						})
+					} catch (e) {
+						setPreparedPopulatorData({
+							name: 'error',
+						})
 					}
-					setPreparedPopulatorData({
-						name: 'ready',
-						data,
-					})
-				})
+				}
 			}
-
-			return () => {
-				isMounted = false
-			}
-		}, [readyState, deferrablePopulators])
+			preparePopulators()
+		}, [readyState, relevantPopulators])
 
 		React.useEffect(() => {
 			if (
@@ -82,8 +85,8 @@ export const UploadingFilePreview = React.memo(
 			}
 
 			batchUpdates(() => {
-				for (let i = 0; i < deferrablePopulators.length; i++) {
-					const populator = deferrablePopulators[i]
+				for (let i = 0; i < relevantPopulators.length; i++) {
+					const populator = relevantPopulators[i]
 					const preparedData = preparedPopulatorData.data[i]
 
 					populator.populateFileData(
@@ -103,9 +106,16 @@ export const UploadingFilePreview = React.memo(
 			environment,
 			preparedPopulatorData.data,
 			preparedPopulatorData.name,
-			deferrablePopulators,
+			relevantPopulators,
 			uploadState,
 		])
+
+		React.useEffect(
+			() => () => {
+				isMountedRef.current = false
+			},
+			[],
+		)
 
 		const getOverlay = (): React.ReactNode => {
 			if (

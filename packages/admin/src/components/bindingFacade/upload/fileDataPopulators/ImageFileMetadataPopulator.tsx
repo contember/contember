@@ -30,8 +30,8 @@ export class ImageFileMetadataPopulator implements FileDataPopulator<HTMLImageEl
 			image.addEventListener('load', () => {
 				resolve(image)
 			})
-			image.addEventListener('error', () => {
-				reject()
+			image.addEventListener('error', e => {
+				reject(e.message)
 			})
 			image.src = previewUrl
 		})

@@ -17,6 +17,9 @@ export const getDefaultPopulators = (props: AggregateDataPopulatorProps): FileDa
 	}),
 	new FileUrlDataPopulator({
 		fileUrlField: props.fileUrlField,
+		imageFileUrlField: props.imageFileUrlField,
+		videoFileUrlField: props.videoFileUrlField,
+		audioFileUrlField: props.audioFileUrlField,
 	}),
 	new GenericFileMetadataPopulator({
 		lastModifiedField: props.lastModifiedField,

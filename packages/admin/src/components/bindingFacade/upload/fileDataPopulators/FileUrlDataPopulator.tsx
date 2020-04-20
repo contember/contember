@@ -1,7 +1,7 @@
 import { BindingError, QueryLanguage, SugaredField, SugaredFieldProps } from '@contember/binding'
 import { S3FileUploader } from '@contember/client'
 import * as React from 'react'
-import { isAudio, isImage } from '../utils'
+import { isAudio, isImage, isVideo } from '../utils'
 import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
 
 export interface FileUrlDataPopulatorProps {
@@ -41,7 +41,7 @@ export class FileUrlDataPopulator implements FileDataPopulator<any, S3FileUpload
 			targetField = this.props.imageFileUrlField
 		} else if (this.props.audioFileUrlField && isAudio(options.file)) {
 			targetField = this.props.audioFileUrlField
-		} else if (this.props.videoFileUrlField && isAudio(options.file)) {
+		} else if (this.props.videoFileUrlField && isVideo(options.file)) {
 			targetField = this.props.videoFileUrlField
 		} else if (this.props.fileUrlField) {
 			targetField = this.props.fileUrlField

@@ -118,6 +118,9 @@ export const UploadingFilePreview = React.memo(
 		)
 
 		const getOverlay = (): React.ReactNode => {
+			if (uploadState.readyState === FileUploadReadyState.Error && uploadState.error?.endUserMessage) {
+				return uploadState.error.endUserMessage
+			}
 			if (
 				uploadState.readyState === FileUploadReadyState.Error ||
 				preparedPopulatorData.name === 'error' ||

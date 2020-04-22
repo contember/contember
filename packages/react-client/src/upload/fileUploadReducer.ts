@@ -84,7 +84,17 @@ export const fileUploadReducer = (
 			return getNewDirtyState()
 		}
 		case FileUploadActionType.FinishWithError: {
-			for (const [fileOrId, error] of action.error) {
+			for (const errorSpec of action.error) {
+				let fileOrId: File | FileId
+				let error: any
+
+				if (Array.isArray(errorSpec)) {
+					;[fileOrId, error] = errorSpec
+				} else {
+					fileOrId = errorSpec
+					error = undefined
+				}
+
 				const fileId = toFileId(previousState, fileOrId)
 				const previousFileState = previousState.liveState.get(fileId)
 				if (previousFileState === undefined || previousFileState.readyState !== FileUploadReadyState.Uploading) {

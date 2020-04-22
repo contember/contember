@@ -1,7 +1,7 @@
-import { FileUploader } from '@contember/client'
+import { FileUploader, FileUploadError } from '@contember/client'
 import { FileUploadReadyState } from './FileUploadReadyState'
 
-export type SingleFileUploadState<Result = any, Error = any> =
+export type SingleFileUploadState<Result = any, Error extends FileUploadError = FileUploadError> =
 	| {
 			readyState: FileUploadReadyState.Uploading
 			file: File
@@ -22,7 +22,7 @@ export type SingleFileUploadState<Result = any, Error = any> =
 			file: File
 			uploader: FileUploader
 			previewUrl: string
-			error: Error
+			error: Error | undefined
 	  }
 	| {
 			readyState: FileUploadReadyState.Aborted

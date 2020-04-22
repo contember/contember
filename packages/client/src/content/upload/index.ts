@@ -1,4 +1,5 @@
 export * from './FileUploader'
+export * from './FileUploadError'
 export * from './FileUploadProgress'
 export * from './GenerateUploadUrlMutationBuilder'
 export * from './UploadedFileMetadata'

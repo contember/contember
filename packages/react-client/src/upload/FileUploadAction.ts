@@ -21,7 +21,7 @@ export type FileUploadAction =
 	  }
 	| {
 			type: FileUploadActionType.FinishWithError
-			error: Iterable<[File | FileId, any]>
+			error: Iterable<(File | FileId) | [File | FileId, any]>
 	  }
 	| {
 			type: FileUploadActionType.Abort

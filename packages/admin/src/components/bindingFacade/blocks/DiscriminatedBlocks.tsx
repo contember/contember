@@ -1,8 +1,8 @@
-import { Component, FieldValue, Scalar, SugaredRelativeSingleField } from '@contember/binding'
+import { Component, Scalar, SugaredRelativeSingleField } from '@contember/binding'
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { NormalizedStaticOption, SelectFieldInner, StaticChoiceField, useStaticChoiceField } from '../fields'
-import { NormalizedBlockCommonProps, NormalizedBlocks } from './Block'
+import { NormalizedBlockCommonProps } from './Block'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 
 export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children'>, SugaredRelativeSingleField {

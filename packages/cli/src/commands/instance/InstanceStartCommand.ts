@@ -64,7 +64,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		const mainServices = ['api', ...(!withAdmin || nodeAdminRuntime ? [] : ['admin'])]
 
 		const exit = async () => {
-			await dockerCompose.run(['down']).output
+			await dockerCompose.run(['down'], { detached: true }).output
 			process.exit(0)
 		}
 		let terminating = false

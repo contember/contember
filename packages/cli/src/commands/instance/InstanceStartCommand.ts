@@ -22,6 +22,7 @@ type Options = {
 	['ports']?: string
 	host?: string[]
 	['save-ports']?: boolean
+	['detach']?: boolean
 }
 
 export class InstanceStartCommand extends Command<Args, Options> {
@@ -31,6 +32,10 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		configuration.option('host').valueArray()
 		configuration.option('save-ports').valueNone()
 		configuration.option('ports').valueRequired()
+		configuration
+			.option('detach')
+			.valueNone()
+			.shortcut('d')
 		configuration
 			.option('admin-runtime')
 			.valueRequired()
@@ -174,6 +179,10 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 		printNodeAdminStatus()
 		await printInstanceStatus({ instanceDirectory })
+
+		if (input.getOption('detach')) {
+			return
+		}
 
 		const { child, output } = dockerCompose.run(['logs', '-f', ...mainServices])
 

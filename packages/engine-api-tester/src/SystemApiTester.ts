@@ -37,8 +37,7 @@ export class SystemApiTester {
 	): Promise<any> {
 		await setupSystemVariables(this.db.client, unnamedIdentity, { uuid: this.uuidGenerator })
 		const identity =
-			options.identity ||
-			new Identity(testUuid(888), options.roles || [], options.projectRoles || [ProjectRole.ADMIN])
+			options.identity || new Identity(testUuid(888), options.roles || [], options.projectRoles || [ProjectRole.ADMIN])
 
 		const context = this.systemContainer.resolverContextFactory.create(this.db, this.project, identity, {})
 

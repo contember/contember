@@ -1,6 +1,6 @@
 {
 	"name": "@contember/database",
-	"version": "0.7.4",
+	"version": "0.7.5",
 	"license": "Apache-2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
@@ -8,11 +8,11 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/queryable": "^0.7.4",
+		"@contember/queryable": "^0.7.5",
 		"pg": "^7.17.1"
 	},
 	"devDependencies": {
-		"@contember/database-tester": "^0.7.4",
+		"@contember/database-tester": "^0.7.5",
 		"@types/jasmine": "^3.4.5",
 		"@types/node": "^12.11.7",
 		"@types/pg": "^7.14.1",

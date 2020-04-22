@@ -1,14 +1,17 @@
-import { ProjectContainerResolver } from '../ProjectContainer'
 import { ProjectVariablesResolver, RoleVariablesDefinition, VariableDefinition } from '@contember/engine-tenant-api'
+import { SchemaVersionBuilder } from '@contember/engine-system-api'
+import { ProjectContainerResolver } from '@contember/engine-http'
 
 export const projectVariablesResolver = (
 	projectContainerResolver: ProjectContainerResolver,
+	schemaVersionBuilder: SchemaVersionBuilder,
 ): ProjectVariablesResolver => async slug => {
-	const container = projectContainerResolver(slug)
+	const container = await projectContainerResolver(slug)
 	if (!container) {
 		return undefined
 	}
-	const schema = await container.schemaVersionBuilder.buildSchema()
+	const db = container.systemDatabaseContextFactory.create(undefined)
+	const schema = await schemaVersionBuilder.buildSchema(db)
 	return {
 		roles: Object.entries(schema.acl.roles).reduce<RoleVariablesDefinition[]>(
 			(acc, [role, def]) => [

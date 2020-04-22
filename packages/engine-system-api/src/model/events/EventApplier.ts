@@ -1,56 +1,72 @@
-import { AnyEvent, CreateEvent, DeleteEvent, RunMigrationEvent, UpdateEvent } from '@contember/engine-common'
+import {
+	AnyEvent,
+	ContentEvent,
+	CreateEvent,
+	DeleteEvent,
+	EventType,
+	RunMigrationEvent,
+	UpdateEvent,
+} from '@contember/engine-common'
 import { Stage } from '../dtos/Stage'
-import { EventType } from '@contember/engine-common'
 import { assertNever } from '../../utils'
 import { Client, DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'
-import { formatSchemaName } from '../helpers/stageHelpers'
+import { formatSchemaName } from '../helpers'
 import MigrationExecutor from '../migrations/MigrationExecutor'
-import { MigrationsResolver } from '@contember/schema-migrations'
-import StageBySlugQuery from '../queries/StageBySlugQuery'
+import { StageBySlugQuery } from '../queries'
+import { ExecutedMigrationsResolver } from '../migrations/ExecutedMigrationsResolver'
+import { Schema } from '@contember/schema'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 class EventApplier {
 	constructor(
-		private readonly db: Client,
 		private readonly migrationExecutor: MigrationExecutor,
-		private readonly migrationResolver: MigrationsResolver,
+		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 	) {}
 
-	public async applyEvents(stage: Stage, events: AnyEvent[]): Promise<void> {
+	public async applyEvents(db: DatabaseContext, stage: Stage, events: ContentEvent[]): Promise<void>
+	public async applyEvents(db: DatabaseContext, stage: Stage, events: AnyEvent[], schema: Schema): Promise<void>
+	public async applyEvents(db: DatabaseContext, stage: Stage, events: AnyEvent[], schema?: Schema): Promise<void> {
 		let trxId: string | null = null
 		for (let event of events) {
 			if (event.transactionId !== trxId) {
-				await this.db.query('SET CONSTRAINTS ALL IMMEDIATE')
-				await this.db.query('SET CONSTRAINTS ALL DEFERRED')
+				await db.client.query('SET CONSTRAINTS ALL IMMEDIATE')
+				await db.client.query('SET CONSTRAINTS ALL DEFERRED')
 				trxId = event.transactionId
 			}
-			await this.applyEvent(stage, event)
+			if (schema) {
+				schema = await this.applyEvent(db, stage, event, schema)
+			} else {
+				await this.applyEvent(db, stage, event as ContentEvent)
+			}
 		}
-		await this.db.query('SET CONSTRAINTS ALL IMMEDIATE')
+		await db.client.query('SET CONSTRAINTS ALL IMMEDIATE')
 	}
 
-	private async applyEvent(stage: Stage, event: AnyEvent): Promise<void> {
+	private async applyEvent(db: DatabaseContext, stage: Stage, event: ContentEvent): Promise<undefined>
+	private async applyEvent(db: DatabaseContext, stage: Stage, event: AnyEvent, schema: Schema): Promise<Schema>
+	private async applyEvent(db: DatabaseContext, stage: Stage, event: AnyEvent, schema?: Schema) {
 		switch (event.type) {
 			case EventType.create:
-				return this.applyCreate(stage, event)
+				return this.applyCreate(db, stage, event)
 			case EventType.update:
-				return this.applyUpdate(stage, event)
+				return this.applyUpdate(db, stage, event)
 			case EventType.delete:
-				return this.applyDelete(stage, event)
+				return this.applyDelete(db, stage, event)
 			case EventType.runMigration:
-				return this.applyRunMigration(stage, event)
+				return this.applyRunMigration(db, schema!, stage, event)
 			default:
 				assertNever(event)
 		}
 	}
 
-	private async applyCreate(stage: Stage, event: CreateEvent): Promise<void> {
+	private async applyCreate(db: DatabaseContext, stage: Stage, event: CreateEvent): Promise<void> {
 		await InsertBuilder.create()
 			.into(event.tableName)
 			.values({ ...event.values, id: event.rowId })
-			.execute(this.db.forSchema(formatSchemaName(stage)))
+			.execute(db.client.forSchema(formatSchemaName(stage)))
 	}
 
-	private async applyUpdate(stage: Stage, event: UpdateEvent): Promise<void> {
+	private async applyUpdate(db: DatabaseContext, stage: Stage, event: UpdateEvent): Promise<void> {
 		if (Object.values(event.values).length === 0) {
 			return
 		}
@@ -58,20 +74,28 @@ class EventApplier {
 			.table(event.tableName)
 			.where({ id: event.rowId })
 			.values(event.values)
-			.execute(this.db.forSchema(formatSchemaName(stage)))
+			.execute(db.client.forSchema(formatSchemaName(stage)))
 	}
 
-	private async applyDelete(stage: Stage, event: DeleteEvent): Promise<void> {
+	private async applyDelete(db: DatabaseContext, stage: Stage, event: DeleteEvent): Promise<void> {
 		await DeleteBuilder.create()
 			.from(event.tableName)
 			.where({ id: event.rowId })
-			.execute(this.db.forSchema(formatSchemaName(stage)))
+			.execute(db.client.forSchema(formatSchemaName(stage)))
 	}
 
-	private async applyRunMigration(stage: Stage, event: RunMigrationEvent): Promise<void> {
-		const event_id = (await this.db.createQueryHandler().fetch(new StageBySlugQuery(stage.slug)))!.event_id
-		const files = (await this.migrationResolver.getMigrations()).filter(({ version }) => version === event.version)
-		await this.migrationExecutor.execute(this.db, { ...stage, event_id }, files, () => null)
+	private async applyRunMigration(
+		db: DatabaseContext,
+		schema: Schema,
+		stage: Stage,
+		event: RunMigrationEvent,
+	): Promise<Schema> {
+		const event_id = (await db.queryHandler.fetch(new StageBySlugQuery(stage.slug)))!.event_id
+		const migration = await this.executedMigrationsResolver.getMigrationByVersion(db, event.version)
+		if (!migration) {
+			throw new Error(`Migration ${event.version} not found`)
+		}
+		return await this.migrationExecutor.execute(db, schema, { ...stage, event_id }, migration)
 	}
 }
 

@@ -6,7 +6,7 @@ import {
 	resolveParameters,
 	UndefinedParameterError,
 } from '@contember/config-loader'
-import { DatabaseCredentials } from '@contember/engine-common'
+import { DatabaseCredentials } from '@contember/database'
 import { tuple, upperCaseFirst } from '../utils'
 import { MailerOptions } from '@contember/engine-tenant-api'
 import { ConfigProcessor } from '@contember/engine-plugins'

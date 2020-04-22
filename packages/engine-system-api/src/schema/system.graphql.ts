@@ -13,6 +13,7 @@ const schema: DocumentNode = gql`
 	}
 
 	type Mutation {
+		migrate(migrations: [Migration!]!): MigrateResponse!
 		release(baseStage: String!, headStage: String!, events: [String!]!): ReleaseResponse!
 		rebaseAll: RebaseAllResponse!
 	}
@@ -40,6 +41,43 @@ const schema: DocumentNode = gql`
 		base: Stage!
 		head: Stage!
 		events: [Event!]!
+	}
+
+	# === migrate ===
+
+	input Migration {
+		version: String!
+		name: String!
+		formatVersion: Int!
+		modifications: [Modification!]!
+	}
+	input Modification {
+		modification: String!
+		data: String!
+	}
+
+	enum MigrateErrorCode {
+		MUST_FOLLOW_LATEST
+		ALREADY_EXECUTED
+		INVALID_FORMAT
+		INVALID_SCHEMA
+		MIGRATION_FAILED
+	}
+
+	type MigrateError {
+		code: MigrateErrorCode!
+		migration: String!
+		message: String!
+	}
+
+	type MigrateResponse {
+		ok: Boolean!
+		errors: [MigrateError!]!
+		result: MigrateResult
+	}
+
+	type MigrateResult {
+		message: String!
 	}
 
 	# === release ===

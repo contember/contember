@@ -3,11 +3,11 @@ import { basename, join } from 'path'
 import { resourcesDir } from '../pathUtils'
 import { promises as fs } from 'fs'
 import { listDirectories, replaceFileContent } from './fs'
-import { InstanceEnvironment, validateInstanceName } from './instance'
 import { updateYaml } from './yaml'
 import { projectNameToEnvName } from '@contember/engine-common'
 import { workspaceHasAdmin } from './workspace'
 import { installTemplate } from './template'
+import { InstanceLocalEnvironment, validateInstanceName } from './instance'
 
 export const validateProjectName = (name: string) => {
 	if (!name.match(/^[a-z][-a-z0-9]*$/)) {
@@ -31,7 +31,7 @@ export const createProject = async (args: { workspaceDirectory: string; projectN
 export const registerProjectToInstance = async (
 	args: {
 		projectName: string
-	} & InstanceEnvironment,
+	} & InstanceLocalEnvironment,
 ) => {
 	validateInstanceName(args.instanceName)
 	validateProjectName(args.projectName)

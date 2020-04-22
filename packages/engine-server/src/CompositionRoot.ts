@@ -1,58 +1,27 @@
-import Koa from 'koa'
-import { Connection } from '@contember/database'
-import {
-	GraphQlSchemaBuilderFactory,
-	PermissionsByIdentityFactory,
-	PermissionsVerifier,
-} from '@contember/engine-content-api'
-import {
-	getSystemMigrationsDirectory,
-	MigrationsResolver,
-	SchemaMigrator,
-	SchemaVersionBuilder,
-	SystemContainerFactory,
-} from '@contember/engine-system-api'
-import {
-	MigrationFilesManager,
-	ModificationHandlerFactory,
-	SchemaVersionBuilder as SchemaVersionBuilderInternal,
-} from '@contember/schema-migrations'
+import { PermissionsByIdentityFactory, PermissionsVerifier } from '@contember/engine-content-api'
+import { SchemaVersionBuilder, SystemContainerFactory } from '@contember/engine-system-api'
 import {
 	getTenantMigrationsDirectory,
 	Providers as TenantProviders,
 	TenantContainer,
 } from '@contember/engine-tenant-api'
-import { Schema } from '@contember/schema'
-import { Builder, mergeContainers } from '@contember/dic'
-import {
-	AuthMiddlewareFactory,
-	ContentApolloMiddlewareFactory,
-	ContentApolloServerFactory,
-	ContentMiddlewareFactory,
-	DatabaseTransactionMiddlewareFactory,
-	GraphQlSchemaFactory,
-	HomepageMiddlewareFactory,
-	MiddlewareStackFactory,
-	NotModifiedMiddlewareFactory,
-	ProjectMemberMiddlewareFactory,
-	ProjectResolveMiddlewareFactory,
-	SetupSystemVariablesMiddlewareFactory,
-	StageResolveMiddlewareFactory,
-	SystemApolloServerFactory,
-	SystemMiddlewareFactory,
-	TenantApolloServerFactory,
-	TenantMiddlewareFactory,
-	TimerMiddlewareFactory,
-} from './http'
+import { Builder } from '@contember/dic'
 import { Config, Project, TenantConfig } from './config/config'
-import { providers } from './utils/providers'
-import { graphqlObjectFactories } from './utils/graphqlObjectFactories'
-import { projectVariablesResolver } from './utils/projectVariablesProvider'
-import { Initializer, MigrationsRunner, ServerRunner } from './bootstrap'
-import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
-import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
-import { tuple } from './utils'
-import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
+import { logSentryError, projectVariablesResolver, tuple } from './utils'
+import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
+import { Initializer, ServerRunner } from './bootstrap'
+import { createProjectContainer } from './ProjectContainer'
+import { Plugin } from '@contember/engine-plugins'
+import { MigrationsRunner } from '@contember/database-migrations'
+import { createRootMiddleware } from './http/RootMiddleware'
+import {
+	Koa,
+	ProjectContainer,
+	ProjectContainerResolver,
+	providers,
+	SystemServerProvider,
+	TenantApolloServerFactory,
+} from '@contember/engine-http'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -61,131 +30,91 @@ export interface MasterContainer {
 }
 
 class CompositionRoot {
-	createMasterContainer(
-		debug: boolean,
-		config: Config,
-		projectsDirectory: string,
-		projectSchemas: undefined | { [name: string]: Schema },
-		plugins: Plugin[],
-	): MasterContainer {
+	createMasterContainer(debug: boolean, config: Config, projectsDirectory: string, plugins: Plugin[]): MasterContainer {
+		const systemContainerDependencies = new Builder({})
+			.addService('providers', () => providers)
+			.addService('migrationsResolverFactory', () => (project: Pick<Project, 'slug' | 'directory'>) =>
+				new MigrationsResolver(
+					MigrationFilesManager.createForProject(projectsDirectory, project.directory || project.slug),
+				),
+			)
+			.addService(
+				'modificationHandlerFactory',
+				() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
+			)
+			.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
+			.addService(
+				'contentPermissionsVerifier',
+				({ permissionsByIdentityFactory }) => new PermissionsVerifier(permissionsByIdentityFactory),
+			)
+			.build()
+		const systemContainer = new SystemContainerFactory().create(systemContainerDependencies)
+
 		const projectContainers = this.createProjectContainers(
 			debug,
 			Object.values(config.projects),
-			projectsDirectory,
-			projectSchemas,
 			plugins,
+			systemContainer.schemaVersionBuilder,
 		)
 
 		const containerList = Object.values(projectContainers)
 		const projectContainerResolver: ProjectContainerResolver = (slug, aliasFallback = false) =>
-			projectContainers[slug] ||
-			(aliasFallback
-				? containerList.find(function(it) {
-						return it.project.alias && it.project.alias.includes(slug)
-				  })
-				: undefined)
+			Promise.resolve(
+				projectContainers[slug] ||
+					(aliasFallback
+						? containerList.find(function(it) {
+								return it.project.alias && it.project.alias.includes(slug)
+						  })
+						: undefined),
+			)
 
-		const tenantContainer = this.createTenantContainer(config.tenant, providers, projectContainerResolver)
+		const tenantContainer = this.createTenantContainer(
+			config.tenant,
+			providers,
+			projectContainerResolver,
+			systemContainer.schemaVersionBuilder,
+		)
 
 		const masterContainer = new Builder({})
 			.addService('providers', () => providers)
 			.addService('tenantContainer', () => tenantContainer)
 			.addService('projectContainerResolver', () => projectContainerResolver)
 
-			.addService('homepageMiddlewareFactory', () => new HomepageMiddlewareFactory())
-
-			.addService(
-				'authMiddlewareFactory',
-				({ tenantContainer }) => new AuthMiddlewareFactory(tenantContainer.apiKeyManager),
-			)
-			.addService(
-				'projectMemberMiddlewareFactory',
-				({ tenantContainer }) => new ProjectMemberMiddlewareFactory(tenantContainer.projectMemberManager),
-			)
-			.addService(
-				'projectResolveMiddlewareFactory',
-				({ projectContainerResolver }) => new ProjectResolveMiddlewareFactory(projectContainerResolver),
-			)
-			.addService('stageResolveMiddlewareFactory', () => new StageResolveMiddlewareFactory())
-			.addService('databaseTransactionMiddlewareFactory', () => {
-				return new DatabaseTransactionMiddlewareFactory()
-			})
 			.addService('tenantApolloServer', ({ tenantContainer }) =>
-				new TenantApolloServerFactory(tenantContainer.resolvers, tenantContainer.resolverContextFactory).create(),
+				new TenantApolloServerFactory(
+					tenantContainer.resolvers,
+					tenantContainer.resolverContextFactory,
+					logSentryError,
+				).create(),
 			)
 			.addService(
-				'tenantMiddlewareFactory',
-				({ tenantApolloServer, authMiddlewareFactory }) =>
-					new TenantMiddlewareFactory(tenantApolloServer, authMiddlewareFactory),
-			)
-			.addService(
-				'setupSystemVariablesMiddlewareFactory',
-				({ providers }) => new SetupSystemVariablesMiddlewareFactory(providers),
-			)
-			.addService('notModifiedMiddlewareFactory', () => new NotModifiedMiddlewareFactory())
-			.addService(
-				'contentMiddlewareFactory',
-				({
-					authMiddlewareFactory,
-					projectMemberMiddlewareFactory,
-					projectResolveMiddlewareFactory,
-					stageResolveMiddlewareFactory,
-					notModifiedMiddlewareFactory,
-				}) =>
-					new ContentMiddlewareFactory(
-						projectResolveMiddlewareFactory,
-						stageResolveMiddlewareFactory,
-						authMiddlewareFactory,
-						projectMemberMiddlewareFactory,
-						notModifiedMiddlewareFactory,
-					),
-			)
-			.addService(
-				'systemMiddlewareFactory',
-				({
-					projectResolveMiddlewareFactory,
-					authMiddlewareFactory,
-					projectMemberMiddlewareFactory,
-					databaseTransactionMiddlewareFactory,
-					setupSystemVariablesMiddlewareFactory,
-				}) =>
-					new SystemMiddlewareFactory(
-						projectResolveMiddlewareFactory,
-						authMiddlewareFactory,
-						projectMemberMiddlewareFactory,
-						databaseTransactionMiddlewareFactory,
-						setupSystemVariablesMiddlewareFactory,
-					),
-			)
-			.addService('timerMiddlewareFactory', () => new TimerMiddlewareFactory())
-			.addService('errorResponseMiddlewareFactory', () => new ErrorResponseMiddlewareFactory(debug))
-
-			.addService(
-				'middlewareStackFactory',
-				({
-					timerMiddlewareFactory,
-					homepageMiddlewareFactory,
-					contentMiddlewareFactory,
-					tenantMiddlewareFactory,
-					systemMiddlewareFactory,
-					errorResponseMiddlewareFactory,
-				}) =>
-					new MiddlewareStackFactory(
-						timerMiddlewareFactory,
-						errorResponseMiddlewareFactory,
-						homepageMiddlewareFactory,
-						contentMiddlewareFactory,
-						tenantMiddlewareFactory,
-						systemMiddlewareFactory,
+				'systemServerProvider',
+				() =>
+					new SystemServerProvider(
+						systemContainer.systemResolvers,
+						systemContainer.resolverContextFactory,
+						logSentryError,
 					),
 			)
 
-			.addService('koa', ({ middlewareStackFactory }) => {
-				const app = new Koa()
-				app.use(middlewareStackFactory.create())
+			.addService(
+				'koa',
+				({ tenantApolloServer, projectContainerResolver, tenantContainer, providers, systemServerProvider }) => {
+					const app = new Koa()
+					app.use(
+						createRootMiddleware(debug, {
+							tenantApolloServer,
+							projectContainerResolver,
+							apiKeyManager: tenantContainer.apiKeyManager,
+							projectMemberManager: tenantContainer.projectMemberManager,
+							providers,
+							systemServerProvider,
+						}),
+					)
 
-				return app
-			})
+					return app
+				},
+			)
 			.addService(
 				'tenantMigrationsRunner',
 				() => new MigrationsRunner(config.tenant.db, 'tenant', getTenantMigrationsDirectory()),
@@ -193,7 +122,13 @@ class CompositionRoot {
 			.addService(
 				'initializer',
 				({ tenantMigrationsRunner }) =>
-					new Initializer(tenantMigrationsRunner, tenantContainer.projectManager, containerList),
+					new Initializer(
+						tenantMigrationsRunner,
+						tenantContainer.projectManager,
+						systemContainer.projectInitializer,
+						systemContainer.systemDbMigrationsRunnerFactory,
+						containerList,
+					),
 			)
 			.addService('serverRunner', ({ koa }) => new ServerRunner(koa, config))
 
@@ -205,126 +140,12 @@ class CompositionRoot {
 	createProjectContainers(
 		debug: boolean,
 		projects: Array<Project>,
-		projectsDir: string,
-		schemas: undefined | Record<string, Schema>,
 		plugins: Plugin[],
+		schemaVersionBuilder: SchemaVersionBuilder,
 	): Record<string, ProjectContainer> {
-		const containers = Object.values(projects).map((project: Project) => {
-			const projectContainer = new Builder({})
-				.addService('providers', () => providers)
-				.addService('project', () => project)
-				.addService('graphqlObjectsFactory', () => graphqlObjectFactories)
-				.addService('schema', ({ project }) => (schemas ? schemas[project.slug] : undefined))
-				.addService('connection', ({ project }) => {
-					return new Connection(
-						{
-							host: project.db.host,
-							port: project.db.port,
-							user: project.db.user,
-							password: project.db.password,
-							database: project.db.database,
-						},
-						{ timing: true },
-					)
-				})
-				.addService(
-					'systemDbMigrationsRunner',
-					() => new MigrationsRunner(project.db, 'system', getSystemMigrationsDirectory()),
-				)
-				.addService('migrationFilesManager', ({ project }) =>
-					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug),
-				)
-				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-				.addService('systemDbClient', ({ connection }) => connection.createClient('system'))
-				.addService('systemQueryHandler', ({ systemDbClient }) => systemDbClient.createQueryHandler())
-				.addService(
-					'modificationHandlerFactory',
-					() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
-				)
-				.addService(
-					'schemaMigrator',
-					({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory),
-				)
-				.addService(
-					'schemaVersionBuilder',
-					({ systemQueryHandler, migrationsResolver, schemaMigrator }) =>
-						new SchemaVersionBuilder(
-							systemQueryHandler,
-							new SchemaVersionBuilderInternal(migrationsResolver, schemaMigrator),
-						),
-				)
-				.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory(graphqlObjectFactories))
-				.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
-				.addService(
-					'contentPermissionsVerifier',
-					({ permissionsByIdentityFactory }) => new PermissionsVerifier(permissionsByIdentityFactory),
-				)
-				.addService('graphQlSchemaFactory', container => {
-					const contributors = plugins
-						.map(it => (it.getSchemaContributor ? it.getSchemaContributor(container) : null))
-						.filter((it): it is GraphQLSchemaContributor => !!it)
-					return new GraphQlSchemaFactory(
-						container.graphQlSchemaBuilderFactory,
-						container.permissionsByIdentityFactory,
-						contributors,
-					)
-				})
-				.addService('apolloServerFactory', ({ project }) => new ContentApolloServerFactory(project.slug, debug))
-				.addService(
-					'contentApolloMiddlewareFactory',
-					({ project, schemaVersionBuilder, graphQlSchemaFactory, apolloServerFactory, schema }) =>
-						new ContentApolloMiddlewareFactory(
-							project,
-							schemaVersionBuilder,
-							graphQlSchemaFactory,
-							apolloServerFactory,
-							schema,
-						),
-				)
-				.build()
-
-			const systemContainer = new SystemContainerFactory().create(
-				projectContainer.pick(
-					'project',
-					'migrationsResolver',
-					'migrationFilesManager',
-					'contentPermissionsVerifier',
-					'modificationHandlerFactory',
-					'schemaVersionBuilder',
-					'providers',
-				),
-			)
-
-			const systemIntermediateContainer = new Builder({})
-				.addService(
-					'systemApolloServerFactory',
-					() =>
-						new SystemApolloServerFactory(
-							systemContainer.systemResolvers,
-							systemContainer.authorizator,
-							systemContainer.systemExecutionContainerFactory,
-							project.slug,
-						),
-				)
-				.build()
-
-			const projectServices = projectContainer.pick(
-				'project',
-				'contentApolloMiddlewareFactory',
-				'systemDbClient',
-				'systemQueryHandler',
-				'connection',
-				'systemDbMigrationsRunner',
-				'schemaVersionBuilder',
-			)
-
-			return tuple(
-				project.slug,
-				mergeContainers(
-					mergeContainers(projectServices, systemIntermediateContainer),
-					systemContainer.pick('systemExecutionContainerFactory'),
-				),
-			)
+		const containers = Object.values(projects).map((project: Project): [string, ProjectContainer] => {
+			const projectContainer = createProjectContainer(debug, project, plugins, schemaVersionBuilder)
+			return tuple(project.slug, projectContainer)
 		})
 		return Object.fromEntries(containers)
 	}
@@ -333,12 +154,13 @@ class CompositionRoot {
 		tenantConfig: TenantConfig,
 		providers: TenantProviders,
 		projectContainerResolver: ProjectContainerResolver,
+		schemaVersionBuilder: SchemaVersionBuilder,
 	) {
 		return new TenantContainer.Factory().create(
 			tenantConfig.db,
 			tenantConfig.mailer,
 			providers,
-			projectVariablesResolver(projectContainerResolver),
+			projectVariablesResolver(projectContainerResolver, schemaVersionBuilder),
 		)
 	}
 }

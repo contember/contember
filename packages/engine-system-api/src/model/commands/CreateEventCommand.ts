@@ -1,17 +1,16 @@
-import { Client, InsertBuilder } from '@contember/database'
+import { InsertBuilder } from '@contember/database'
 import { EventType } from '@contember/engine-common'
-import { UuidProvider } from '../../utils/uuid'
+import { Command } from './Command'
 
-class CreateEventCommand {
+class CreateEventCommand implements Command<string> {
 	constructor(
 		private readonly type: EventType,
 		private readonly data: any,
 		private readonly previousId: string | null,
-		private readonly providers: UuidProvider,
 	) {}
 
-	public async execute(db: Client): Promise<string> {
-		const id = this.providers.uuid()
+	public async execute({ db, providers }: Command.Args): Promise<string> {
+		const id = providers.uuid()
 		await InsertBuilder.create()
 			.into('event')
 			.values({

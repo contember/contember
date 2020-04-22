@@ -2,20 +2,18 @@ import { Client } from '@contember/database'
 import CreateOrUpdateStageCommand from '../commands/CreateOrUpdateStageCommand'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
 import EventApplier from '../events/EventApplier'
-import DiffQuery from '../queries/DiffQuery'
-import StageBySlugQuery from '../queries/StageBySlugQuery'
+import { DiffQuery, StageBySlugQuery } from '../queries'
 import { StageConfig } from '../../types'
 import { UuidProvider } from '../../utils/uuid'
+import { Schema } from '@contember/schema'
+import { emptySchema } from '@contember/schema-utils'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 class StageCreator {
-	constructor(
-		private readonly db: Client,
-		private readonly eventApplier: EventApplier,
-		private readonly providers: UuidProvider,
-	) {}
+	constructor(private readonly eventApplier: EventApplier) {}
 
-	public async createStage(parent: StageConfig | null, stage: StageConfig): Promise<boolean> {
-		const created = await new CreateOrUpdateStageCommand(stage, this.providers).execute(this.db)
+	public async createStage(db: DatabaseContext, parent: StageConfig | null, stage: StageConfig): Promise<boolean> {
+		const created = await db.commandBus.execute(new CreateOrUpdateStageCommand(stage))
 		if (!created) {
 			return false
 		}
@@ -23,7 +21,7 @@ class StageCreator {
 			return true
 		}
 
-		const queryHandler = this.db.createQueryHandler()
+		const queryHandler = db.client.createQueryHandler()
 
 		const newStage = (await queryHandler.fetch(new StageBySlugQuery(stage.slug)))!
 		const parentStage = (await queryHandler.fetch(new StageBySlugQuery(parent.slug)))!
@@ -34,9 +32,9 @@ class StageCreator {
 		}
 
 		const events = await queryHandler.fetch(new DiffQuery(newStage.event_id, parentStage.event_id))
-		await this.eventApplier.applyEvents(newStage, events)
+		await this.eventApplier.applyEvents(db, newStage, events, emptySchema)
 
-		await new UpdateStageEventCommand(newStage.slug, parentStage.event_id).execute(this.db)
+		await db.commandBus.execute(new UpdateStageEventCommand(newStage.slug, parentStage.event_id))
 
 		return true
 	}

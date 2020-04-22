@@ -65,7 +65,6 @@ class MigrationFilesManager {
 		const filesWithContent = files.map(async filename => ({
 			filename: filename,
 			path: `${this.directory}/${filename}`,
-			version: MigrationVersionHelper.extractVersion(filename),
 			content: await readFile(`${this.directory}/${filename}`, { encoding: 'utf8' }),
 		}))
 
@@ -82,7 +81,6 @@ namespace MigrationFilesManager {
 	export type MigrationFile = {
 		filename: string
 		path: string
-		version: string
 		content: string
 	}
 }

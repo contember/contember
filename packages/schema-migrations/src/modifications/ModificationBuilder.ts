@@ -1,7 +1,7 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import CreateModificationFieldVisitor from '../CreateModificationFieldVisitor'
-import Migration from '../Migration'
+import { Migration } from '../Migration'
 import PatchAclSchemaModification from './acl/PatchAclSchemaModification'
 import { Operation } from 'rfc6902'
 import UpdateAclSchemaModification from './acl/UpdateAclSchemaModification'

@@ -1,10 +1,12 @@
 import { Client } from '@contember/database'
 import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 class EventsRebaser {
-	constructor(private readonly db: Client) {}
+	constructor() {}
 
 	public async rebaseStageEvents(
+		db: DatabaseContext,
 		stageSlug: string,
 		headEvent: string,
 		oldBase: string,
@@ -17,7 +19,7 @@ class EventsRebaser {
 
 		const result: {
 			rows: { old_id: string; new_id: string }[]
-		} = await this.db.query('SELECT * FROM system.rebase_events_unsafe(?::UUID, ?::UUID, ?::UUID, ?::UUID[]) AS t', [
+		} = await db.client.query('SELECT * FROM system.rebase_events_unsafe(?::UUID, ?::UUID, ?::UUID, ?::UUID[]) AS t', [
 			headEvent,
 			oldBase,
 			newBase,
@@ -28,7 +30,7 @@ class EventsRebaser {
 
 		console.log('New head: ' + newHead)
 
-		await new UpdateStageEventCommand(stageSlug, newHead).execute(this.db)
+		await db.commandBus.execute(new UpdateStageEventCommand(stageSlug, newHead))
 
 		return newHead
 		// return result.rows.reduce((result, row) => ({ ...result, [row.old_id]: row.new_id }), {})

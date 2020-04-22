@@ -98,12 +98,14 @@ export class SequenceTester {
 			id: {},
 			transactionId: {},
 			createdAt: {},
+			identityId: {},
 			...restExpected
 		} = expected
 		let {
 			id: {},
 			transactionId: {},
 			createdAt: {},
+			identityId: {},
 			...restActual
 		} = actual
 		expect(restActual).toEqual(restExpected)

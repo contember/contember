@@ -7,6 +7,9 @@
 	},
 	"references": [
 		{
+			"path": "../../database-migrations/src"
+		},
+		{
 			"path": "../../engine-common/src"
 		},
 		{

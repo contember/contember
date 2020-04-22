@@ -1,17 +1,6 @@
-import pgMigrate, { ClientConfig } from 'node-pg-migrate'
+import { MigrationsRunner, DatabaseCredentials } from '@contember/database-migrations'
 
-export async function migrate({ db, schema, dir }: { db: ClientConfig; schema: string; dir: string }) {
-	await pgMigrate({
-		databaseUrl: db,
-		dir: dir,
-		schema: schema,
-		migrationsTable: 'migrations',
-		checkOrder: true,
-		direction: 'up',
-		count: Infinity,
-		ignorePattern: '^\\..*$',
-		createSchema: true,
-		singleTransaction: true,
-		log: () => null,
-	})
+export async function migrate({ db, schema, dir }: { db: DatabaseCredentials; schema: string; dir: string }) {
+	const runner = new MigrationsRunner(db, schema, dir)
+	await runner.migrate(false)
 }

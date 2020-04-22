@@ -10,6 +10,10 @@ export class MigrationVersionHelper {
 		return `${MigrationVersionHelper.createTimePrefix()}-${name}`
 	}
 
+	public static extractName(filename: string): string {
+		return filename.substring(0, filename.lastIndexOf('.'))
+	}
+
 	private static createTimePrefix(): string {
 		const now = new Date()
 		const year = now.getFullYear()

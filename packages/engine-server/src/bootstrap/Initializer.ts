@@ -1,11 +1,15 @@
-import { ProjectContainer } from '../ProjectContainer'
 import { ProjectManager } from '@contember/engine-tenant-api'
-import { MigrationsRunner } from './MigrationsRunner'
+import { MigrationsRunner } from '@contember/database-migrations'
+import { ProjectInitializer } from '@contember/engine-system-api'
+import { DatabaseCredentials } from '@contember/database'
+import { ProjectContainer } from '@contember/engine-http'
 
 export class Initializer {
 	constructor(
 		private readonly tenantDbMigrationsRunner: MigrationsRunner,
 		private readonly projectManager: ProjectManager,
+		private readonly projectInitializer: ProjectInitializer,
+		private readonly systemDbMigrationRunnerFactory: (db: DatabaseCredentials) => MigrationsRunner,
 		private readonly projectContainers: ProjectContainer[],
 	) {}
 
@@ -27,15 +31,11 @@ export class Initializer {
 			console.groupEnd()
 
 			console.group(`Executing system schema migration`)
-			await container.systemDbMigrationsRunner.migrate()
+			await this.systemDbMigrationRunnerFactory(project.db).migrate()
 			console.groupEnd()
 
-			await container.systemDbClient.transaction(async trx => {
-				const executionContainer = container.systemExecutionContainerFactory.create(trx)
-
-				const init = executionContainer.projectIntializer
-				await init.initialize()
-			})
+			const init = this.projectInitializer
+			await init.initialize(container.systemDatabaseContextFactory, project)
 
 			console.groupEnd()
 		}

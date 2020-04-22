@@ -1,27 +1,36 @@
 import { Schema } from '@contember/schema'
-import { tuple } from './utils'
+import { SchemaMigrator } from '@contember/schema-migrations'
+import { ExecutedMigrationsResolver } from './model/migrations/ExecutedMigrationsResolver'
 import { emptySchema } from '@contember/schema-utils'
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
-import LatestMigrationByStageQuery from './model/queries/LatestMigrationByStageQuery'
-import LatestMigrationByEventQuery from './model/queries/LatestMigrationByEventQuery'
-import { SchemaVersionBuilder as SchemaVersionBuilderInternal } from '@contember/schema-migrations'
+import { DatabaseContext } from './model/database/DatabaseContext'
+
+export type VersionedSchema = Schema & { version: string }
 
 export class SchemaVersionBuilder {
 	constructor(
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
-		private readonly internalBuilder: SchemaVersionBuilderInternal,
+		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
+		private readonly schemaMigrator: SchemaMigrator,
 	) {}
 
-	async buildSchemaForStage(stageSlug: string): Promise<Schema> {
-		const currentMigration = await this.queryHandler.fetch(new LatestMigrationByStageQuery(stageSlug))
-		const currentVersion = currentMigration ? currentMigration.data.version : null
-		if (!currentVersion) {
-			return emptySchema
+	async buildSchemaForStage(db: DatabaseContext, stageSlug: string, after?: VersionedSchema): Promise<VersionedSchema> {
+		const schema = await this.buildSchema(db, after)
+		if (schema === after) {
+			return schema
 		}
+		return this.filterSchemaByStage(schema, stageSlug)
+	}
 
-		const schema = await this.buildSchema(currentVersion)
+	async buildSchema(db: DatabaseContext, after?: VersionedSchema): Promise<VersionedSchema> {
+		return (await this.executedMigrationsResolver.getMigrations(db, after?.version)).reduce(
+			(schema, migr) => ({
+				...this.schemaMigrator.applyModifications(schema, migr.modifications, migr.formatVersion),
+				version: migr.version,
+			}),
+			after || { ...emptySchema, version: '' },
+		)
+	}
 
+	private filterSchemaByStage(schema: VersionedSchema, stageSlug: string) {
 		return {
 			...schema,
 			acl: {
@@ -34,27 +43,5 @@ export class SchemaVersionBuilder {
 				),
 			},
 		}
-	}
-
-	async buildSchemaForEvent(eventId: string): Promise<[Schema, string | null]> {
-		const currentMigration = await this.queryHandler.fetch(new LatestMigrationByEventQuery(eventId))
-		const currentVersion = currentMigration ? currentMigration.data.version : null
-		if (!currentVersion) {
-			return tuple(emptySchema, null)
-		}
-
-		return tuple(await this.buildSchema(currentVersion), currentVersion)
-	}
-
-	async buildSchema(targetVersion?: string): Promise<Schema> {
-		return this.internalBuilder.buildSchema(targetVersion)
-	}
-
-	async buildSchemaUntil(targetVersion: string): Promise<Schema> {
-		return this.internalBuilder.buildSchemaUntil(targetVersion)
-	}
-
-	async continue(schema: Schema, previousVersion: string | null, targetVersion: string): Promise<Schema> {
-		return this.internalBuilder.continue(schema, previousVersion, targetVersion)
 	}
 }

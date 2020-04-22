@@ -22,7 +22,7 @@ describe('system api - diff', () => {
 				},
 			})
 			await tester.stages.createAll()
-			await tester.stages.migrate('2019-02-01-163923-init')
+			await tester.stages.migrate('2019-02-01-163923')
 
 			const response = await tester.content.queryContent(
 				'preview',
@@ -85,7 +85,7 @@ describe('system api - diff', () => {
 			})
 			await tester.stages.createAll()
 
-			await tester.stages.migrate('2019-02-01-163923-init')
+			await tester.stages.migrate('2019-02-01-163923')
 
 			await tester.content.queryContent(
 				'preview',

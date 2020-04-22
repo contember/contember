@@ -3,7 +3,7 @@ import { Schema } from '@contember/schema'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 import { SchemaDiffer } from './SchemaDiffer'
 import { VERSION_LATEST } from './modifications/ModificationVersions'
-import Migration from './Migration'
+import { Migration } from './Migration'
 import { MigrationVersionHelper } from './MigrationVersionHelper'
 
 export class MigrationCreator {
@@ -36,7 +36,7 @@ export class MigrationCreator {
 
 		const jsonDiff = MigrationCreator.createContent(modifications)
 		const version = MigrationVersionHelper.createVersion(migrationName)
-		const migration: Migration = { formatVersion: VERSION_LATEST, modifications, version }
+		const migration: Migration = { formatVersion: VERSION_LATEST, modifications, version, name: migrationName }
 
 		const filename = await this.migrationFilesManager.createFile(jsonDiff, version, 'json')
 		return { filename, initialSchema, migration }

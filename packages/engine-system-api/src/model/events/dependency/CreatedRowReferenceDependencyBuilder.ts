@@ -1,7 +1,8 @@
-import { AnyEvent, EventType } from '@contember/engine-common'
+import { AnyEvent, ContentEvent, EventType } from '@contember/engine-common'
 import DependencyBuilder from '../DependencyBuilder'
 import TableReferencingResolver from '../TableReferencingResolver'
 import { SchemaVersionBuilder } from '../../../SchemaVersionBuilder'
+import { Schema } from '@contember/schema'
 
 /**
  * Events that references a row depends on creation of such event (or its following update)
@@ -16,33 +17,19 @@ import { SchemaVersionBuilder } from '../../../SchemaVersionBuilder'
  *
  */
 class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
-	constructor(
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-		private readonly tableReferencingResolver: TableReferencingResolver,
-	) {}
+	constructor(private readonly tableReferencingResolver: TableReferencingResolver) {}
 
-	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
 		if (events.length === 0) {
 			return {}
 		}
 
-		let [schema, schemaVersion] = await this.schemaVersionBuilder.buildSchemaForEvent(events[0].id)
 		let tableReferencing: TableReferencingResolver.Result | null = null
 
 		const dependencies: DependencyBuilder.Dependencies = {}
 		const createdRows: { [id: string]: string } = {}
 
 		for (const event of events) {
-			if (event.type === EventType.runMigration) {
-				const newVersion = event.version
-
-				schema = await this.schemaVersionBuilder.continue(schema, schemaVersion, newVersion)
-				schemaVersion = newVersion
-				tableReferencing = null
-
-				continue
-			}
-
 			if (event.type === EventType.create) {
 				createdRows[event.rowId] = event.id
 			} else if (createdRows[event.rowId]) {

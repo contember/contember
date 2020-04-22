@@ -1,7 +1,7 @@
 import { Config } from '../config/config'
-import Koa from 'koa'
 import { Server } from 'http'
 import { success } from '../core/console/messages'
+import { Koa } from '@contember/engine-http'
 
 export class ServerRunner {
 	constructor(private readonly koa: Koa, private readonly config: Config) {}

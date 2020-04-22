@@ -5,14 +5,16 @@ import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
 import { GraphQLResolveInfo } from 'graphql'
 import ReleaseMutationResolver from './mutation/ReleaseMutationResolver'
-import RebeaseAllMutationResolver from './mutation/RebeaseAllMutationResolver'
+import RebaseAllMutationResolver from './mutation/RebaseAllMutationResolver'
+import { MigrateMutationResolver } from './mutation/MigrateMutationResolver'
 
 class ResolverFactory {
 	public constructor(
 		private readonly stagesQueryResolver: StagesQueryResolver,
 		private readonly diffQueryResolver: DiffQueryResolver,
 		private readonly releaseMutationResolver: ReleaseMutationResolver,
-		private readonly rebaseMutationResolver: RebeaseAllMutationResolver,
+		private readonly rebaseMutationResolver: RebaseAllMutationResolver,
+		private readonly migrateMutationResolver: MigrateMutationResolver,
 	) {}
 
 	create(): Resolvers {
@@ -47,6 +49,8 @@ class ResolverFactory {
 					this.releaseMutationResolver.release(parent, args, context, info),
 				rebaseAll: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.rebaseMutationResolver.rebaseAll(parent, args, context, info),
+				migrate: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.migrateMutationResolver.migrate(parent, args, context, info),
 			},
 		}
 	}

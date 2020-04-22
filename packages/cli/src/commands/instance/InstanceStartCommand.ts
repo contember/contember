@@ -110,7 +110,6 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 			const server = `http://127.0.0.1:${portsMapping.api[0].hostPort}`
 			const { loginToken } = await interactiveSetup(server)
-			console.log('Superadmin account created.')
 
 			if (withAdmin) {
 				await updateOverrideConfig(instanceDirectory, (config, { merge }) =>

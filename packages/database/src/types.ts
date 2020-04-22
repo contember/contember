@@ -14,3 +14,11 @@ export interface Raw {
 	sql: string
 	bindings: Value[]
 }
+
+export interface DatabaseCredentials {
+	readonly host: string
+	readonly port: number
+	readonly user: string
+	readonly password: string
+	readonly database: string
+}

@@ -1,6 +1,6 @@
 import { Model, Schema } from '@contember/schema'
 import { acceptRelationTypeVisitor, NamingHelper } from '@contember/schema-utils'
-import { MigrationBuilder } from 'node-pg-migrate'
+import { MigrationBuilder } from '@contember/database-migrations'
 import { ContentEvent } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'

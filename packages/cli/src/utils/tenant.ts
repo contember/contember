@@ -1,22 +1,7 @@
 import prompts from 'prompts'
 import { GraphQLClient } from 'graphql-request'
-import { Input } from '../cli'
-import {
-	getInstanceStatus,
-	InstanceEnvironment,
-	listInstances,
-	readInstanceConfig,
-	resolveInstanceEnvironment,
-} from './instance'
+import { InstanceApiEnvironment, readInstanceConfig } from './instance'
 
-export type TenantInstanceEnvironment = {
-	url: string
-} & (
-	| ({
-			type: 'local'
-	  } & InstanceEnvironment)
-	| { type: 'remote' }
-)
 export const createTenantApiUrl = (url: string) => {
 	if (url.endsWith('/')) {
 		url = url.substring(0, url.length - 1)
@@ -27,46 +12,7 @@ export const createTenantApiUrl = (url: string) => {
 	return url + '/tenant'
 }
 
-export const interactiveResolveTenantInstanceEnvironmentFromInput = async (
-	inputCommand: Input<{
-		instance?: string
-	}>,
-): Promise<TenantInstanceEnvironment> => {
-	const workspaceDirectory = process.cwd()
-	let [instanceName] = [inputCommand.getArgument('instance') || process.env.CONTEMBER_INSTANCE]
-	if (!instanceName) {
-		const instances = await listInstances({ workspaceDirectory })
-		;({ instanceName } = await prompts({
-			type: 'select',
-			message: 'Instance',
-			name: 'instanceName',
-			choices: [...instances.map(it => ({ value: it, title: it })), { value: '__remote', title: 'Remote API' }],
-		}))
-		if (instanceName === '__remote') {
-			;({ instanceName } = await prompts({
-				type: 'text',
-				message: 'Remote API URL',
-				name: 'instanceName',
-			}))
-		}
-		if (!instanceName) {
-			throw 'Please specify an instance'
-		}
-	}
-	if (instanceName.includes('://')) {
-		return { type: 'remote', url: createTenantApiUrl(instanceName) }
-	}
-	const instanceEnv = await resolveInstanceEnvironment({ workspaceDirectory, instanceName })
-	const instanceStatus = await getInstanceStatus(instanceEnv)
-	const runningApi = instanceStatus.find(it => it.name === 'api' && it.running)
-	if (!runningApi) {
-		throw `Instance ${instanceName} is not running. Run instance:up first.`
-	}
-	const apiServer = `http://127.0.0.1:${runningApi.ports[0].hostPort}`
-	return { type: 'local', ...instanceEnv, url: createTenantApiUrl(apiServer) }
-}
-
-export const interactiveResolveLoginToken = async (instance: TenantInstanceEnvironment) => {
+export const interactiveResolveLoginToken = async (instance: InstanceApiEnvironment) => {
 	if (process.env.CONTEMBER_LOGIN_TOKEN) {
 		return process.env.CONTEMBER_LOGIN_TOKEN
 	}
@@ -84,13 +30,6 @@ export const interactiveResolveLoginToken = async (instance: TenantInstanceEnvir
 	return loginToken
 }
 
-const createClient = (url: string, token: string): GraphQLClient =>
-	new GraphQLClient(createTenantApiUrl(url), {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
-
 export const interactiveSignIn = async ({
 	apiUrl,
 	loginToken,
@@ -99,7 +38,7 @@ export const interactiveSignIn = async ({
 	apiUrl: string
 	loginToken: string
 	expiration?: number
-}): Promise<string> => {
+}): Promise<{ sessionToken: string }> => {
 	const { email, password } = await prompts([
 		{
 			type: 'text',
@@ -121,25 +60,8 @@ export const interactiveSignIn = async ({
 			initial: 3600 * 365,
 		}))
 	}
-
-	const query = `mutation($email: String!, $password: String!, $expiration: Int!) {
-  signIn(email: $email, password: $password, expiration: $expiration) {
-    ok
-    errors {
-      code
-    }
-    result {
-      token
-    }
-  }
-}`
-
-	const client = createClient(apiUrl, loginToken)
-	const result = await client.request(query, { email, password, expiration })
-	if (!result.signIn.ok) {
-		throw result.signIn.errors.map((it: any) => it.code)
-	}
-	return result.signIn.result.token
+	const client = TenantClient.create(apiUrl, loginToken)
+	return await client.signIn(email, password, expiration || 3600)
 }
 
 export const interactiveSetup = async (apiUrl: string): Promise<{ loginToken: string }> => {
@@ -157,29 +79,17 @@ export const interactiveSetup = async (apiUrl: string): Promise<{ loginToken: st
 		},
 	])
 
-	const query = `mutation($email: String!, $password: String!) {
-  setup(superadmin: {email: $email, password: $password}) {
-    ok
-    result {
-      loginKey {
-        token
-      }
-    }
-  }
-}`
-
-	const client = createClient(apiUrl, '12345123451234512345')
-	const result = await client.request(query, { email, password })
+	const client = TenantClient.create(apiUrl, '12345123451234512345')
+	const response = await client.setup(email, password)
 	console.log('Superadmin created.')
-	console.log('Login token:')
-	const loginToken = result.setup.result.loginKey.token
-	return { loginToken }
+	console.log('Login token: ' + response.loginToken)
+	return response
 }
 
 export const interactiveResolveApiToken = async ({
 	instance,
 }: {
-	instance: TenantInstanceEnvironment
+	instance: InstanceApiEnvironment
 }): Promise<string> => {
 	if (process.env.CONTEMBER_API_TOKEN) {
 		return process.env.CONTEMBER_API_TOKEN
@@ -201,7 +111,8 @@ export const interactiveResolveApiToken = async ({
 	})
 	if (strategy === 'signin') {
 		const loginToken = await interactiveResolveLoginToken(instance)
-		return await interactiveSignIn({ apiUrl: instance.url, loginToken, expiration: 60 * 5 })
+		return (await interactiveSignIn({ apiUrl: createTenantApiUrl(instance.baseUrl), loginToken, expiration: 60 * 5 }))
+			.sessionToken
 	}
 	const { token } = await prompts({
 		type: 'text',
@@ -348,7 +259,12 @@ export class TenantClient {
 	constructor(private readonly apiClient: GraphQLClient) {}
 
 	public static create(url: string, apiToken: string): TenantClient {
-		return new TenantClient(createClient(url, apiToken))
+		const graphqlClient = new GraphQLClient(createTenantApiUrl(url), {
+			headers: {
+				Authorization: `Bearer ${apiToken}`,
+			},
+		})
+		return new TenantClient(graphqlClient)
 	}
 
 	public async createApiKey(
@@ -410,5 +326,41 @@ export class TenantClient {
 }`)
 
 		return response.me.projects.map((it: any) => it.project)
+	}
+
+	public async signIn(email: string, password: string, expiration: number): Promise<{ sessionToken: string }> {
+		const query = `mutation($email: String!, $password: String!, $expiration: Int!) {
+  signIn(email: $email, password: $password, expiration: $expiration) {
+    ok
+    errors {
+      code
+    }
+    result {
+      token
+    }
+  }
+}`
+
+		const result = await this.apiClient.request(query, { email, password, expiration })
+		if (!result.signIn.ok) {
+			throw result.signIn.errors.map((it: any) => it.code)
+		}
+		return { sessionToken: result.signIn.result.token }
+	}
+
+	public async setup(email: string, password: string): Promise<{ loginToken: string }> {
+		const query = `mutation($email: String!, $password: String!) {
+  setup(superadmin: {email: $email, password: $password}) {
+    ok
+    result {
+      loginKey {
+        token
+      }
+    }
+  }
+}`
+		const result = await this.apiClient.request(query, { email, password })
+		const loginToken = result.setup.result.loginKey.token
+		return { loginToken }
 	}
 }

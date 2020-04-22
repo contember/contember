@@ -3,7 +3,7 @@ import { acceptFieldVisitor, SchemaValidator, ValidationError } from '@contember
 import { isIt } from './utils/isIt'
 import { SchemaMigrator } from './SchemaMigrator'
 import ModificationBuilder from './modifications/ModificationBuilder'
-import Migration from './Migration'
+import { Migration } from './Migration'
 import { createPatch } from 'rfc6902'
 import deepEqual from 'fast-deep-equal'
 import deepCopy from './utils/deepCopy'

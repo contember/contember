@@ -1,0 +1,39 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src"
+	},
+	"references": [
+
+		{
+			"path": "../../config-loader/src"
+		},
+		{
+			"path": "../../schema/src"
+		},
+		{
+			"path": "../../schema-utils/src"
+		},
+		{
+			"path": "../../schema-definition/src"
+		},
+		{
+			"path": "../../database/src"
+		},
+		{
+			"path": "../../engine-common/src"
+		},
+		{
+			"path": "../../engine-tenant-api/src"
+		},
+		{
+			"path": "../../engine-system-api/src"
+		},
+		{
+			"path": "../../engine-content-api/src"
+		},
+		{
+			"path": "../../engine-plugins/src"
+		}
+	]
+}

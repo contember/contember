@@ -1,7 +1,7 @@
-import { AnyEvent, EventType } from '@contember/engine-common'
+import { ContentEvent, EventType } from '@contember/engine-common'
 import DependencyBuilder from '../DependencyBuilder'
 import TableReferencingResolver from '../TableReferencingResolver'
-import { SchemaVersionBuilder } from '../../../SchemaVersionBuilder'
+import { Schema } from '@contember/schema'
 
 /**
  * Delete event depends on all previous events which references this row
@@ -14,17 +14,13 @@ import { SchemaVersionBuilder } from '../../../SchemaVersionBuilder'
  *
  */
 class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
-	constructor(
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-		private readonly tableReferencingResolver: TableReferencingResolver,
-	) {}
+	constructor(private readonly tableReferencingResolver: TableReferencingResolver) {}
 
-	async build(events: AnyEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
 		if (events.length === 0) {
 			return {}
 		}
 
-		let [schema, schemaVersion] = await this.schemaVersionBuilder.buildSchemaForEvent(events[0].id)
 		let tableReferencing: TableReferencingResolver.Result | null = null
 
 		const dependencies: DependencyBuilder.Dependencies = {}
@@ -38,16 +34,6 @@ class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 		}
 
 		for (const event of events) {
-			if (event.type === EventType.runMigration) {
-				const newVersion = event.version
-
-				schema = await this.schemaVersionBuilder.continue(schema, schemaVersion, newVersion)
-				schemaVersion = newVersion
-				tableReferencing = null
-
-				continue
-			}
-
 			if (event.type !== EventType.create && event.type !== EventType.update) {
 				continue
 			}

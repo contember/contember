@@ -10,7 +10,7 @@
 		"start": "./run.sh"
 	},
 	"dependencies": {
-		"@contember/api": "^0.7.4",
+		"@contember/engine-server": "^0.7.4",
 		"@contember/schema": "^0.7.4",
 		"@contember/schema-definition": "^0.7.4",
 		"autocannon": "^3.2.1",

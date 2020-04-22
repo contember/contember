@@ -9,6 +9,7 @@ import Actions from '../authorization/Actions'
 import { ProjectConfig } from '../../types'
 import { Client } from '@contember/database'
 import { isContentEvent } from '@contember/engine-common'
+import { DatabaseContext } from '../database/DatabaseContext'
 
 type PermissionsByRow = { [rowId: string]: boolean }
 type PermissionsByTable = { [tableName: string]: PermissionsByRow }
@@ -32,14 +33,14 @@ export interface ContentPermissionVerifier {
 
 class EventsPermissionsVerifier {
 	constructor(
-		private readonly project: ProjectConfig,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
-		private readonly db: Client,
 		private readonly authorizator: Authorizator,
 		private readonly contentPermissionVerifier: ContentPermissionVerifier,
 	) {}
 
 	public async verify(
+		db: DatabaseContext,
+		project: ProjectConfig,
 		permissionContext: EventsPermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
@@ -55,10 +56,12 @@ class EventsPermissionsVerifier {
 			return events.map(it => it.id).reduce((acc, id) => ({ ...acc, [id]: true }), {})
 		}
 
-		return this.verifyPermissions(permissionContext, sourceStage, targetStage, events)
+		return this.verifyPermissions(db, project, permissionContext, sourceStage, targetStage, events)
 	}
 
-	public async verifyPermissions(
+	private async verifyPermissions(
+		db: DatabaseContext,
+		project: ProjectConfig,
 		context: EventsPermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
@@ -78,19 +81,21 @@ class EventsPermissionsVerifier {
 		const eventsByTable = this.groupEventsByTable(contentEvents)
 
 		const permissionContext = {
-			projectRoles: await context.identity.getProjectRoles(this.project.slug),
+			projectRoles: await context.identity.getProjectRoles(project.slug),
 			variables: context.variables,
 		}
+		const sourceSchema = await this.schemaVersionBuilder.buildSchemaForStage(db, sourceStage.slug)
 		const readPermissions = await this.contentPermissionVerifier.verifyReadPermissions({
-			db: this.db.forSchema(formatSchemaName(sourceStage)),
+			db: db.client.forSchema(formatSchemaName(sourceStage)),
 			eventsByTable,
-			schema: await this.schemaVersionBuilder.buildSchemaForStage(sourceStage.slug),
+			schema: sourceSchema,
 			permissionContext,
 		})
+		const targetSchema = await this.schemaVersionBuilder.buildSchemaForStage(db, targetStage.slug)
 		const writePermissions = await this.contentPermissionVerifier.verifyWritePermissions({
-			db: this.db.forSchema(formatSchemaName(targetStage)),
+			db: db.client.forSchema(formatSchemaName(targetStage)),
 			eventsByTable,
-			schema: await this.schemaVersionBuilder.buildSchemaForStage(targetStage.slug),
+			schema: targetSchema,
 			permissionContext,
 		})
 

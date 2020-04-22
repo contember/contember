@@ -97,4 +97,4 @@ SELECT * FROM events ORDER BY index DESC
 	}
 }
 
-export default DiffQuery
+export { DiffQuery }

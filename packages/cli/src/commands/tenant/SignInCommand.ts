@@ -1,11 +1,7 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import {
-	interactiveResolveLoginToken,
-	interactiveSignIn,
-	interactiveResolveTenantInstanceEnvironmentFromInput,
-} from '../../utils/tenant'
+import { interactiveResolveLoginToken, interactiveSignIn } from '../../utils/tenant'
 import prompt from 'prompts'
-import { updateInstanceLocalConfig } from '../../utils/instance'
+import { interactiveResolveInstanceEnvironmentFromInput, updateInstanceLocalConfig } from '../../utils/instance'
 
 type Args = {
 	instance?: string
@@ -26,11 +22,11 @@ export class SignInCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const instance = await interactiveResolveTenantInstanceEnvironmentFromInput(input)
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(input)
 		const loginToken = await interactiveResolveLoginToken(instance)
-		const token = await interactiveSignIn({ apiUrl: instance.url, loginToken })
+		const { sessionToken } = await interactiveSignIn({ apiUrl: instance.baseUrl, loginToken })
 		console.log('Session token:')
-		console.log(token)
+		console.log(sessionToken)
 		if (instance.type === 'local') {
 			const { save } = await prompt({
 				type: 'confirm',
@@ -41,7 +37,7 @@ export class SignInCommand extends Command<Args, Options> {
 			if (save) {
 				await updateInstanceLocalConfig({
 					instanceDirectory: instance.instanceDirectory,
-					updater: json => ({ ...json, apiToken: token }),
+					updater: json => ({ ...json, apiToken: sessionToken }),
 				})
 			}
 		}

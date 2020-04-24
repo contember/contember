@@ -1,4 +1,4 @@
-import { StageWithoutEvent } from '../dtos/Stage'
+import { StageWithoutEvent } from '../dtos'
 import { ProjectConfig, StageConfig } from '../../types'
 
 export class StageTree {

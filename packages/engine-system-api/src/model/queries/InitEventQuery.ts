@@ -1,5 +1,4 @@
-import { DatabaseQuery, SelectBuilder } from '@contember/database'
-import { DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 
 class InitEventQuery extends DatabaseQuery<InitEventQuery.InitEvent> {
 	async fetch(queryable: DatabaseQueryable): Promise<InitEventQuery.InitEvent> {

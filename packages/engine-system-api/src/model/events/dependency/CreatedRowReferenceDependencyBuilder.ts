@@ -1,7 +1,6 @@
-import { AnyEvent, ContentEvent, EventType } from '@contember/engine-common'
-import DependencyBuilder from '../DependencyBuilder'
-import TableReferencingResolver from '../TableReferencingResolver'
-import { SchemaVersionBuilder } from '../../../SchemaVersionBuilder'
+import { ContentEvent, EventType } from '@contember/engine-common'
+import { DependencyBuilder, EventsDependencies } from '../DependencyBuilder'
+import { TableReferencingResolver, TableReferencingResolverResult } from '../TableReferencingResolver'
 import { Schema } from '@contember/schema'
 
 /**
@@ -16,17 +15,17 @@ import { Schema } from '@contember/schema'
  * A1 A2 B1 B2
  *
  */
-class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
+export class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 	constructor(private readonly tableReferencingResolver: TableReferencingResolver) {}
 
-	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
 		if (events.length === 0) {
 			return {}
 		}
 
-		let tableReferencing: TableReferencingResolver.Result | null = null
+		let tableReferencing: TableReferencingResolverResult | null = null
 
-		const dependencies: DependencyBuilder.Dependencies = {}
+		const dependencies: EventsDependencies = {}
 		const createdRows: { [id: string]: string } = {}
 
 		for (const event of events) {
@@ -58,5 +57,3 @@ class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 		return dependencies
 	}
 }
-
-export default CreatedRowReferenceDependencyBuilder

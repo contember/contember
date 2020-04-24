@@ -1,5 +1,4 @@
-import { DatabaseQuery } from '@contember/database'
-import { DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
 
 class StageCommonEventsMatrixQuery extends DatabaseQuery<StageCommonEventsMatrixQuery.Result> {
 	constructor() {
@@ -71,4 +70,4 @@ namespace StageCommonEventsMatrixQuery {
 	}
 }
 
-export default StageCommonEventsMatrixQuery
+export { StageCommonEventsMatrixQuery }

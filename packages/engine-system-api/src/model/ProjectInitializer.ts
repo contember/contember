@@ -1,13 +1,10 @@
-import CreateInitEventCommand from './model/commands/CreateInitEventCommand'
-import { unnamedIdentity } from './SystemVariablesSetupHelper'
-import { ProjectConfig, StageConfig } from './types'
-import ProjectMigrator from './model/migrations/ProjectMigrator'
-import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
-import StageCreator from './model/stages/StageCreator'
-import { MigrationEventsQuery } from './model/queries'
-import { SaveMigrationCommand } from './model/commands/SaveMigrationCommand'
-import { DatabaseContext, DatabaseContextFactory } from './model'
-import { createStageTree } from './model/stages/StageTree'
+import { CreateInitEventCommand, SaveMigrationCommand } from './commands'
+import { unnamedIdentity } from './helpers'
+import { ProjectConfig, StageConfig } from '../types'
+import { ProjectMigrationInfoResolver, ProjectMigrator } from './migrations'
+import { createStageTree, StageCreator } from './stages'
+import { MigrationEventsQuery } from './queries'
+import { DatabaseContext, DatabaseContextFactory } from './database'
 
 export class ProjectInitializer {
 	constructor(

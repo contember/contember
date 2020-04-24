@@ -1,6 +1,5 @@
-import { DatabaseQuery, SelectBuilder } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { Stage } from '../../schema'
-import { DatabaseQueryable } from '@contember/database'
 
 class StagesQuery extends DatabaseQuery<Stage[]> {
 	async fetch(queryable: DatabaseQueryable): Promise<Stage[]> {

@@ -1,15 +1,19 @@
-import DependencyBuilder from './DependencyBuilder'
+import { DependencyBuilder } from './DependencyBuilder'
 import { DiffErrorCode } from '../../schema'
-import { Stage } from '../dtos/Stage'
+import { Stage } from '../dtos'
 import { AnyEvent } from '@contember/engine-common'
 import { DiffCountQuery, DiffQuery } from '../queries'
-import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
+import {
+	EventPermission,
+	EventsPermissionsVerifier,
+	EventsPermissionsVerifierContext,
+} from './EventsPermissionsVerifier'
 import { assertEveryIsContentEvent } from './eventUtils'
-import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { DatabaseContext } from '../database'
 import { ProjectConfig } from '../../types'
+import { SchemaVersionBuilder } from '../migrations'
 
-class DiffBuilder {
+export class DiffBuilder {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly permissionsVerifier: EventsPermissionsVerifier,
@@ -18,10 +22,10 @@ class DiffBuilder {
 
 	public async build(
 		db: DatabaseContext,
-		permissionContext: EventsPermissionsVerifier.Context,
+		permissionContext: EventsPermissionsVerifierContext,
 		baseStage: Stage,
 		headStage: Stage,
-	): Promise<DiffBuilder.Response> {
+	): Promise<DiffBuilderResponseResponse> {
 		const count = await db.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
 
 		if (count.ok === false) {
@@ -52,25 +56,21 @@ class DiffBuilder {
 	}
 }
 
-namespace DiffBuilder {
-	export type Response = OkResponse | ErrorResponse
+export type DiffBuilderResponseResponse = DiffBuilderOkResponse | DiffBuilderErrorResponse
 
-	export class ErrorResponse {
-		public readonly ok: false = false
+export class DiffBuilderErrorResponse {
+	public readonly ok: false = false
 
-		constructor(public readonly errors: DiffErrorCode[]) {}
-	}
-
-	export class OkResponse {
-		public readonly ok: true = true
-
-		constructor(
-			public readonly events: (AnyEvent & {
-				dependencies: string[]
-				permission: EventsPermissionsVerifier.EventPermission
-			})[],
-		) {}
-	}
+	constructor(public readonly errors: DiffErrorCode[]) {}
 }
 
-export default DiffBuilder
+export class DiffBuilderOkResponse {
+	public readonly ok: true = true
+
+	constructor(
+		public readonly events: (AnyEvent & {
+			dependencies: string[]
+			permission: EventPermission
+		})[],
+	) {}
+}

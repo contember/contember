@@ -1,9 +1,9 @@
 import { Model } from '@contember/schema'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 
-class TableReferencingResolver {
-	public getTableReferencing(schema: Model.Schema): TableReferencingResolver.Result {
-		const result: TableReferencingResolver.Result = {}
+export class TableReferencingResolver {
+	public getTableReferencing(schema: Model.Schema): TableReferencingResolverResult {
+		const result: TableReferencingResolverResult = {}
 
 		for (let entity of Object.values(schema.entities)) {
 			const referencing = acceptEveryFieldVisitor(
@@ -52,8 +52,4 @@ class TableReferencingResolver {
 	}
 }
 
-namespace TableReferencingResolver {
-	export type Result = { [tableName: string]: { [column: string]: string } }
-}
-
-export default TableReferencingResolver
+export type TableReferencingResolverResult = { [tableName: string]: { [column: string]: string } }

@@ -2,7 +2,7 @@ import { InsertBuilder } from '@contember/database'
 import { EventType } from '@contember/engine-common'
 import { Command } from './Command'
 
-class CreateEventCommand implements Command<string> {
+export class CreateEventCommand implements Command<string> {
 	constructor(
 		private readonly type: EventType,
 		private readonly data: any,
@@ -23,5 +23,3 @@ class CreateEventCommand implements Command<string> {
 		return id
 	}
 }
-
-export default CreateEventCommand

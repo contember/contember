@@ -1,8 +1,8 @@
 import { Client, Connection, DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
-import { setupSystemVariables } from '../../SystemVariablesSetupHelper'
-import { UuidProvider } from '../../utils/uuid'
-import { CommandBus } from '../commands/CommandBus'
+import { UuidProvider } from '../../utils'
+import { CommandBus } from '../commands'
+import { setupSystemVariables } from '../helpers'
 
 export interface DatabaseContext<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	client: Client<ConnectionType>

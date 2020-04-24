@@ -2,11 +2,9 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
 import { MutationReleaseArgs, ReleaseResponse } from '../../schema'
-import { createStageQuery } from '../../model/queries/StageQueryHelper'
-import RebaseExecutor from '../../model/events/RebaseExecutor'
-import ReleaseExecutor from '../../model/events/ReleaseExecutor'
+import { createStageQuery, RebaseExecutor, ReleaseExecutor } from '../../model'
 
-export default class ReleaseMutationResolver implements MutationResolver<'release'> {
+export class ReleaseMutationResolver implements MutationResolver<'release'> {
 	constructor(private readonly rebaseExecutor: RebaseExecutor, private readonly releaseExecutor: ReleaseExecutor) {}
 
 	async release(

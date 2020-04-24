@@ -1,6 +1,6 @@
 import { ContentEvent, EventType } from '@contember/engine-common'
-import DependencyBuilder from '../DependencyBuilder'
-import TableReferencingResolver from '../TableReferencingResolver'
+import { DependencyBuilder, EventsDependencies } from '../DependencyBuilder'
+import { TableReferencingResolver, TableReferencingResolverResult } from '../TableReferencingResolver'
 import { Schema } from '@contember/schema'
 
 /**
@@ -13,17 +13,17 @@ import { Schema } from '@contember/schema'
  * A1 A2 X1
  *
  */
-class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
+export class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 	constructor(private readonly tableReferencingResolver: TableReferencingResolver) {}
 
-	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
 		if (events.length === 0) {
 			return {}
 		}
 
-		let tableReferencing: TableReferencingResolver.Result | null = null
+		let tableReferencing: TableReferencingResolverResult | null = null
 
-		const dependencies: DependencyBuilder.Dependencies = {}
+		const dependencies: EventsDependencies = {}
 		const deletedRows: { [rowId: string]: string } = {}
 
 		for (const event of events) {
@@ -55,5 +55,3 @@ class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 		return dependencies
 	}
 }
-
-export default DeletedRowReferenceDependencyBuilder

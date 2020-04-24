@@ -7,17 +7,16 @@ import {
 	RunMigrationEvent,
 	UpdateEvent,
 } from '@contember/engine-common'
-import { Stage } from '../dtos/Stage'
+import { Stage } from '../dtos'
 import { assertNever } from '../../utils'
-import { Client, DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'
+import { DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'
 import { formatSchemaName } from '../helpers'
-import MigrationExecutor from '../migrations/MigrationExecutor'
+import { ExecutedMigrationsResolver, MigrationExecutor } from '../migrations'
 import { StageBySlugQuery } from '../queries'
-import { ExecutedMigrationsResolver } from '../migrations/ExecutedMigrationsResolver'
 import { Schema } from '@contember/schema'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { DatabaseContext } from '../database'
 
-class EventApplier {
+export class EventApplier {
 	constructor(
 		private readonly migrationExecutor: MigrationExecutor,
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
@@ -98,5 +97,3 @@ class EventApplier {
 		return await this.migrationExecutor.execute(db, schema, { ...stage, event_id }, migration)
 	}
 }
-
-export default EventApplier

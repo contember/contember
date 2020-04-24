@@ -1,31 +1,38 @@
-import { Providers, ResolverContextFactory, SchemaVersionBuilder } from './index'
-import { ExecutedMigrationsResolver } from './model/migrations/ExecutedMigrationsResolver'
-import PermissionsFactory from './model/authorization/PermissionsFactory'
-import MigrationExecutor from './model/migrations/MigrationExecutor'
-import TableReferencingResolver from './model/events/TableReferencingResolver'
-import DependencyBuilder from './model/events/DependencyBuilder'
-import SameRowDependencyBuilder from './model/events/dependency/SameRowDependencyBuilder'
-import TransactionDependencyBuilder from './model/events/dependency/TransactionDependencyBuilder'
-import DeletedRowReferenceDependencyBuilder from './model/events/dependency/DeletedRowReferenceDependencyBuilder'
-import CreatedRowReferenceDependencyBuilder from './model/events/dependency/CreatedRowReferenceDependencyBuilder'
-import { ContentPermissionVerifier, EventsPermissionsVerifier } from './model/events/EventsPermissionsVerifier'
-import DiffBuilder from './model/events/DiffBuilder'
-import EventApplier from './model/events/EventApplier'
-import EventsRebaser from './model/events/EventsRebaser'
-import RebaseExecutor from './model/events/RebaseExecutor'
-import ReleaseExecutor from './model/events/ReleaseExecutor'
-import ProjectMigrator from './model/migrations/ProjectMigrator'
-import StageCreator from './model/stages/StageCreator'
-import StagesQueryResolver from './resolvers/query/StagesQueryResolver'
-import DiffResponseBuilder from './model/events/DiffResponseBuilder'
-import DiffQueryResolver from './resolvers/query/DiffQueryResolver'
-import ReleaseMutationResolver from './resolvers/mutation/ReleaseMutationResolver'
-import RebaseAllMutationResolver from './resolvers/mutation/RebaseAllMutationResolver'
-import { MigrateMutationResolver } from './resolvers/mutation/MigrateMutationResolver'
-import ResolverFactory from './resolvers/ResolverFactory'
+import {
+	ContentPermissionVerifier,
+	CreatedRowReferenceDependencyBuilder,
+	DeletedRowReferenceDependencyBuilder,
+	DependencyBuilderList,
+	DiffBuilder,
+	DiffResponseBuilder,
+	EventApplier,
+	EventsPermissionsVerifier,
+	EventsRebaser,
+	ExecutedMigrationsResolver,
+	MigrationExecutor,
+	PermissionsFactory,
+	ProjectMigrator,
+	RebaseExecutor,
+	ReleaseExecutor,
+	SameRowDependencyBuilder,
+	SchemaVersionBuilder,
+	StageCreator,
+	TableReferencingResolver,
+	TransactionDependencyBuilder,
+} from './model'
+import {
+	DiffQueryResolver,
+	MigrateMutationResolver,
+	RebaseAllMutationResolver,
+	ReleaseMutationResolver,
+	ResolverContextFactory,
+	ResolverFactory,
+	StagesQueryResolver,
+} from './resolvers'
 import { MigrationDescriber, ModificationHandlerFactory, SchemaMigrator } from '@contember/schema-migrations'
 import { Builder } from '@contember/dic'
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
+import { Providers } from './utils'
 
 export class SystemServerContainerFactory {
 	constructor(
@@ -64,7 +71,7 @@ export class SystemServerContainerFactory {
 			.addService(
 				'dependencyBuilder',
 				({ tableReferencingResolver }) =>
-					new DependencyBuilder.DependencyBuilderList([
+					new DependencyBuilderList([
 						new SameRowDependencyBuilder(),
 						new TransactionDependencyBuilder(),
 						new DeletedRowReferenceDependencyBuilder(tableReferencingResolver),

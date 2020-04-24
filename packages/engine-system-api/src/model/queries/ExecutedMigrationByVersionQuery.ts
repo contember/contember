@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { ExecutedMigration } from '../dtos/ExecutedMigration'
+import { ExecutedMigration } from '../dtos'
 import { createExecutedMigrationDto, createExecutedMigrationQueryBuilder } from './ExecutedMigrationsQueryHelper'
 
 export class ExecutedMigrationByVersionQuery extends DatabaseQuery<ExecutedMigration | null> {

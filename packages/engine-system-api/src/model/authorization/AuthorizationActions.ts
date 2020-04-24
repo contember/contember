@@ -1,6 +1,6 @@
 import { Authorizator } from '@contember/authorization'
 
-namespace Actions {
+export namespace AuthorizationActions {
 	export enum Resources {
 		project = 'project',
 	}
@@ -9,5 +9,3 @@ namespace Actions {
 	export const PROJECT_REBASE_ALL = Authorizator.createAction(Resources.project, 'rebaseAll')
 	export const PROJECT_MIGRATE = Authorizator.createAction(Resources.project, 'migrate')
 }
-
-export default Actions

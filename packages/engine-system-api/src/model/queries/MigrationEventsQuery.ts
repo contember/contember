@@ -1,5 +1,4 @@
-import { DatabaseQuery } from '@contember/database'
-import { DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
 
 class MigrationEventsQuery extends DatabaseQuery<MigrationEventsQuery.Result> {
 	constructor(private readonly stageSlug: string) {

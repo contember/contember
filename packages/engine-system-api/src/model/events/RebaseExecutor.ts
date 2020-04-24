@@ -1,19 +1,18 @@
-import { StageWithoutEvent } from '../dtos/Stage'
-import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
-import { DiffQuery } from '../queries/DiffQuery'
+import { StageWithoutEvent } from '../dtos'
+import { DiffQuery, StageCommonEventsMatrixQuery } from '../queries'
 import { ContentEvent } from '@contember/engine-common'
-import DependencyBuilder from './DependencyBuilder'
-import EventApplier from './EventApplier'
-import EventsRebaser from './EventsRebaser'
-import { StageTree, createStageTree } from '../stages/StageTree'
-import { ImplementationException } from '../../utils/exceptions'
+import { DependencyBuilder } from './DependencyBuilder'
+import { EventApplier } from './EventApplier'
+import { EventsRebaser } from './EventsRebaser'
+import { createStageTree, StageTree } from '../stages'
+import { ImplementationException } from '../../utils'
 import { assertEveryIsContentEvent } from './eventUtils'
-import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
 import { Schema } from '@contember/schema'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { DatabaseContext } from '../database'
 import { ProjectConfig } from '../../types'
+import { SchemaVersionBuilder } from '../migrations'
 
-class RebaseExecutor {
+export class RebaseExecutor {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly eventApplier: EventApplier,
@@ -111,5 +110,3 @@ class RebaseExecutor {
 		)
 	}
 }
-
-export default RebaseExecutor

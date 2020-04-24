@@ -2,11 +2,9 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { QueryResolver } from '../Resolver'
 import { DiffErrorCode, DiffResponse, QueryDiffArgs } from '../../schema'
-import DiffResponseBuilder from '../../model/events/DiffResponseBuilder'
-import { createStageQuery } from '../../model/queries/StageQueryHelper'
-import DiffBuilder from '../../model/events/DiffBuilder'
+import { createStageQuery, DiffBuilder, DiffResponseBuilder } from '../../model'
 
-export default class DiffQueryResolver implements QueryResolver<'diff'> {
+export class DiffQueryResolver implements QueryResolver<'diff'> {
 	constructor(private readonly diffResponseBuilder: DiffResponseBuilder, private readonly diffBuilder: DiffBuilder) {}
 
 	async diff(

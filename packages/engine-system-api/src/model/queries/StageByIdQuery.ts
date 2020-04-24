@@ -1,7 +1,5 @@
-import { DatabaseQuery } from '@contember/database'
-import { DatabaseQueryable } from '@contember/database'
-import { SelectBuilder, LockType } from '@contember/database'
-import { StageWithId } from '../dtos/Stage'
+import { DatabaseQuery, DatabaseQueryable, LockType, SelectBuilder } from '@contember/database'
+import { StageWithId } from '../dtos'
 import { prepareStageQueryBuilder } from './StageQueryFactory'
 
 class StageByIdQuery extends DatabaseQuery<StageByIdQuery.Result> {

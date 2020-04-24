@@ -1,28 +1,29 @@
-import { createStageTree, StageTree } from '../stages/StageTree'
+import { createStageTree, StageTree } from '../stages'
 import { Migration, MigrationDescriber, Modification } from '@contember/schema-migrations'
 import { Client, ConnectionError, DatabaseQueryable, wrapIdentifier } from '@contember/database'
-import StageCommonEventsMatrixQuery from '../queries/StageCommonEventsMatrixQuery'
+import { DiffQuery, StageCommonEventsMatrixQuery } from '../queries'
 import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
-import CreateEventCommand from '../commands/CreateEventCommand'
+import {
+	CreateEventCommand,
+	RecreateContentEvent,
+	RecreateContentEventTransactionContext,
+	SaveMigrationCommand,
+	UpdateStageEventCommand,
+} from '../commands'
 import { ContentEvent, EventType } from '@contember/engine-common'
-import { Stage, StageWithoutEvent } from '../dtos/Stage'
+import { Stage, StageWithoutEvent } from '../dtos'
 import { QueryHandler } from '@contember/queryable'
-import { DiffQuery } from '../queries'
-import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import RecreateContentEvent from '../commands/RecreateContentEvent'
-import { assertEveryIsContentEvent } from '../events/eventUtils'
-import { SaveMigrationCommand } from '../commands/SaveMigrationCommand'
-import RebaseExecutor from '../events/RebaseExecutor'
-import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { assertEveryIsContentEvent, RebaseExecutor } from '../events'
+import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
 import { ProjectConfig } from '../../types'
+import { SchemaVersionBuilder } from './SchemaVersionBuilder'
 
 type StageEventsMap = Record<string, ContentEvent[]>
 
-export default class ProjectMigrator {
+export class ProjectMigrator {
 	constructor(
 		private readonly migrationDescriber: MigrationDescriber,
 		private readonly rebaseExecutor: RebaseExecutor,
@@ -210,7 +211,7 @@ export default class ProjectMigrator {
 	): Promise<void> {
 		for (const childStage of stageTree.getChildren(stage)) {
 			let previousId = stage.event_id
-			const transactionContext = new RecreateContentEvent.TransactionContext()
+			const transactionContext = new RecreateContentEventTransactionContext()
 			for (const event of events[childStage.slug]) {
 				previousId = await db.commandBus.execute(new RecreateContentEvent(event, previousId, transactionContext))
 			}

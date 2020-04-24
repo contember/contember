@@ -1,8 +1,8 @@
 import { Schema } from '@contember/schema'
 import { SchemaMigrator } from '@contember/schema-migrations'
-import { ExecutedMigrationsResolver } from './model/migrations/ExecutedMigrationsResolver'
 import { emptySchema } from '@contember/schema-utils'
-import { DatabaseContext } from './model/database/DatabaseContext'
+import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
+import { DatabaseContext } from '../database'
 
 export type VersionedSchema = Schema & { version: string }
 

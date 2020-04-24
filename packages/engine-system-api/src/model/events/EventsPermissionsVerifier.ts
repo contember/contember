@@ -1,15 +1,13 @@
 import { AuthorizationScope, Authorizator } from '@contember/authorization'
 import { Acl, Schema } from '@contember/schema'
-import { Stage } from '../dtos/Stage'
-import { AnyEvent, ContentEvent } from '@contember/engine-common'
 import { formatSchemaName } from '../helpers/stageHelpers'
-import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
-import Actions from '../authorization/Actions'
-import { ProjectConfig } from '../../types'
+import { AnyEvent, ContentEvent, isContentEvent } from '@contember/engine-common'
+import { Stage } from '../dtos'
+import { AuthorizationActions } from '../authorization'
 import { Client } from '@contember/database'
-import { isContentEvent } from '@contember/engine-common'
-import { DatabaseContext } from '../database/DatabaseContext'
 import { Identity } from '../authorization/Identity'
+import { DatabaseContext } from '../database'
+import { SchemaVersionBuilder } from '../migrations'
 
 type PermissionsByRow = { [rowId: string]: boolean }
 type PermissionsByTable = { [tableName: string]: PermissionsByRow }
@@ -31,7 +29,7 @@ export interface ContentPermissionVerifier {
 	verifyWritePermissions(args: Args): Promise<PermissionsByTable>
 }
 
-class EventsPermissionsVerifier {
+export class EventsPermissionsVerifier {
 	constructor(
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly authorizator: Authorizator,
@@ -40,16 +38,16 @@ class EventsPermissionsVerifier {
 
 	public async verify(
 		db: DatabaseContext,
-		permissionContext: EventsPermissionsVerifier.Context,
+		permissionContext: EventsPermissionsVerifierContext,
 		sourceStage: Stage,
 		targetStage: Stage,
 		events: AnyEvent[],
-	): Promise<EventsPermissionsVerifier.Result> {
+	): Promise<EventsPermissionsVerifierResult> {
 		if (
 			await this.authorizator.isAllowed(
 				permissionContext.identity,
 				new AuthorizationScope.Global(),
-				Actions.PROJECT_RELEASE_ANY,
+				AuthorizationActions.PROJECT_RELEASE_ANY,
 			)
 		) {
 			return events.map(it => it.id).reduce((acc, id) => ({ ...acc, [id]: true }), {})
@@ -60,11 +58,11 @@ class EventsPermissionsVerifier {
 
 	private async verifyPermissions(
 		db: DatabaseContext,
-		context: EventsPermissionsVerifier.Context,
+		context: EventsPermissionsVerifierContext,
 		sourceStage: Stage,
 		targetStage: Stage,
 		events: AnyEvent[],
-	): Promise<EventsPermissionsVerifier.Result> {
+	): Promise<EventsPermissionsVerifierResult> {
 		const contentEvents: ContentEvent[] = []
 
 		for (const event of events) {
@@ -97,7 +95,7 @@ class EventsPermissionsVerifier {
 			permissionContext,
 		})
 
-		const permissionsResult: EventsPermissionsVerifier.Result = {}
+		const permissionsResult: EventsPermissionsVerifierResult = {}
 
 		for (let event of events) {
 			if (isContentEvent(event)) {
@@ -105,13 +103,9 @@ class EventsPermissionsVerifier {
 				const canWrite = (writePermissions[event.tableName] || {})[event.rowId] || false
 
 				permissionsResult[event.id] =
-					canRead && canWrite
-						? EventsPermissionsVerifier.EventPermission.canApply
-						: canRead
-						? EventsPermissionsVerifier.EventPermission.canView
-						: EventsPermissionsVerifier.EventPermission.forbidden
+					canRead && canWrite ? EventPermission.canApply : canRead ? EventPermission.canView : EventPermission.forbidden
 			} else {
-				permissionsResult[event.id] = EventsPermissionsVerifier.EventPermission.forbidden
+				permissionsResult[event.id] = EventPermission.forbidden
 			}
 		}
 
@@ -126,19 +120,15 @@ class EventsPermissionsVerifier {
 	}
 }
 
-namespace EventsPermissionsVerifier {
-	export type Result = { [eventId: string]: EventPermission }
+export type EventsPermissionsVerifierResult = { [eventId: string]: EventPermission }
 
-	export type Context = {
-		variables: Acl.VariablesMap
-		identity: Identity
-	}
-
-	export enum EventPermission {
-		forbidden = 'forbidden',
-		canView = 'canView',
-		canApply = 'canApply',
-	}
+export type EventsPermissionsVerifierContext = {
+	variables: Acl.VariablesMap
+	identity: Identity
 }
 
-export { EventsPermissionsVerifier }
+export enum EventPermission {
+	forbidden = 'forbidden',
+	canView = 'canView',
+	canApply = 'canApply',
+}

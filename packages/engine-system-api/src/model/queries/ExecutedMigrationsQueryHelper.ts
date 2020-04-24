@@ -1,5 +1,5 @@
 import { SelectBuilder } from '@contember/database'
-import { ExecutedMigration } from '../dtos/ExecutedMigration'
+import { ExecutedMigration } from '../dtos'
 import { VERSION_INITIAL } from '@contember/schema-migrations'
 
 type ExecutedMigrationRow = { name: string; migration: any; checksum: string; executed_at: Date }

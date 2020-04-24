@@ -1,12 +1,9 @@
-import StagesQueryResolver from './query/StagesQueryResolver'
-import DiffQueryResolver from './query/DiffQueryResolver'
+import { DiffQueryResolver, StagesQueryResolver } from './query'
 import { Event, EventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
 import { GraphQLResolveInfo } from 'graphql'
-import ReleaseMutationResolver from './mutation/ReleaseMutationResolver'
-import RebaseAllMutationResolver from './mutation/RebaseAllMutationResolver'
-import { MigrateMutationResolver } from './mutation/MigrateMutationResolver'
+import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
 
 class ResolverFactory {
 	public constructor(
@@ -62,4 +59,4 @@ namespace ResolverFactory {
 	}
 }
 
-export default ResolverFactory
+export { ResolverFactory }

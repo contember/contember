@@ -2,12 +2,9 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
 import { RebaseAllResponse } from '../../schema'
-import Actions from '../../model/authorization/Actions'
-import { ProjectScope } from '../../model/authorization/ProjectScope'
-import RebaseExecutor from '../../model/events/RebaseExecutor'
-import { ProjectConfig } from '../../types'
+import { AuthorizationActions, ProjectScope, RebaseExecutor } from '../../model'
 
-export default class RebaseAllMutationResolver implements MutationResolver<'rebaseAll'> {
+export class RebaseAllMutationResolver implements MutationResolver<'rebaseAll'> {
 	constructor(private readonly rebaseExecutor: RebaseExecutor) {}
 	async rebaseAll(
 		parent: any,
@@ -16,7 +13,7 @@ export default class RebaseAllMutationResolver implements MutationResolver<'reba
 		info: GraphQLResolveInfo,
 	): Promise<RebaseAllResponse> {
 		return context.db.transaction(async db => {
-			await context.requireAccess(new ProjectScope(context.project), Actions.PROJECT_REBASE_ALL)
+			await context.requireAccess(new ProjectScope(context.project), AuthorizationActions.PROJECT_REBASE_ALL)
 
 			await this.rebaseExecutor.rebaseAll(db, context.project)
 

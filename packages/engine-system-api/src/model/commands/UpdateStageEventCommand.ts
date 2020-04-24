@@ -1,7 +1,7 @@
-import { Client, UpdateBuilder } from '@contember/database'
+import { UpdateBuilder } from '@contember/database'
 import { Command } from './Command'
 
-class UpdateStageEventCommand implements Command<void> {
+export class UpdateStageEventCommand implements Command<void> {
 	constructor(private readonly stageSlug: string, private readonly eventId: string) {}
 
 	public async execute({ db }: Command.Args) {
@@ -14,5 +14,3 @@ class UpdateStageEventCommand implements Command<void> {
 			.execute(db)
 	}
 }
-
-export default UpdateStageEventCommand

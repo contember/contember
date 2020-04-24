@@ -1,5 +1,4 @@
-import { DatabaseQuery } from '@contember/database'
-import { DatabaseQueryable } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
 import { DiffErrorCode } from '../../schema'
 
 class DiffCountQuery extends DatabaseQuery<DiffCountQuery.Response> {

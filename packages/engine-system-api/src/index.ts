@@ -1,17 +1,33 @@
-import * as Schema from './schema'
-import { UuidProvider } from './utils/uuid'
-
-export * from './SchemaVersionBuilder'
 export { SchemaMigrator, MigrationsResolver } from '@contember/schema-migrations'
+
+import * as Schema from './schema'
+
+export { Schema }
+export { default as typeDefs } from './schema/system.graphql'
+
+export {
+	Identity,
+	ReleaseExecutor,
+	RebaseExecutor,
+	DatabaseContext,
+	setupSystemVariables,
+	StageBySlugQuery,
+	unnamedIdentity,
+	SchemaVersionBuilder,
+	formatSchemaName,
+	VersionedSchema,
+	ProjectInitializer,
+	LatestEventIdByStageQuery,
+	DatabaseContextFactory,
+	DiffQuery,
+	InitEventQuery,
+	ProjectMigrator,
+	StageCreator,
+	CreateInitEventCommand,
+} from './model'
 export * from './SystemContainer'
 export * from './resolvers'
-export * from './SystemVariablesSetupHelper'
-export * from './model'
 export * from './types'
-export * from './ProjectInitializer'
-export { default as typeDefs } from './schema/system.graphql'
-export * from './utils/providers'
-export { Schema }
+export * from './utils'
 export * from './SystemServerContainer'
-
-export const systemMigrationsDirectory = __dirname + '/../../migrations'
+export * from './MigrationsDirectory'

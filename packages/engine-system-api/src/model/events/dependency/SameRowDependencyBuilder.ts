@@ -1,5 +1,5 @@
 import { ContentEvent } from '@contember/engine-common'
-import DependencyBuilder from '../DependencyBuilder'
+import { DependencyBuilder, EventsDependencies } from '../DependencyBuilder'
 import { Schema } from '@contember/schema'
 
 /**
@@ -11,10 +11,10 @@ import { Schema } from '@contember/schema'
  * A1 B1 A2 B2 A3
  *    ^-----^
  */
-class SameRowDependencyBuilder implements DependencyBuilder {
-	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
+export class SameRowDependencyBuilder implements DependencyBuilder {
+	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
 		const rows: { [id: string]: string[] } = {}
-		const dependencies: DependencyBuilder.Dependencies = {}
+		const dependencies: EventsDependencies = {}
 		for (const event of events) {
 			if (!rows[event.rowId]) {
 				rows[event.rowId] = []
@@ -32,5 +32,3 @@ class SameRowDependencyBuilder implements DependencyBuilder {
 		return dependencies
 	}
 }
-
-export default SameRowDependencyBuilder

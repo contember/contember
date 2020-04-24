@@ -1,4 +1,4 @@
-import { isUuid } from '../../utils/uuid'
+import { isUuid } from '../../utils'
 import { StageByIdQuery } from './StageByIdQuery'
 import { StageBySlugQuery } from './StageBySlugQuery'
 

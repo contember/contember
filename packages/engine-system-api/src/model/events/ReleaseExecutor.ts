@@ -1,17 +1,17 @@
-import { Stage } from '../dtos/Stage'
+import { Stage } from '../dtos'
 import { DiffQuery, StageBySlugQuery } from '../queries'
-import DependencyBuilder from './DependencyBuilder'
-import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
-import EventApplier from './EventApplier'
-import EventsRebaser from './EventsRebaser'
-import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import { createStageTree, StageTree } from '../stages/StageTree'
+import { DependencyBuilder, EventsDependencies } from './DependencyBuilder'
+import { EventsPermissionsVerifier, EventsPermissionsVerifierContext } from './EventsPermissionsVerifier'
+import { EventApplier } from './EventApplier'
+import { EventsRebaser } from './EventsRebaser'
+import { UpdateStageEventCommand } from '../commands'
+import { createStageTree, StageTree } from '../stages'
 import { assertEveryIsContentEvent } from './eventUtils'
-import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { DatabaseContext } from '../database'
 import { ProjectConfig } from '../../types'
+import { SchemaVersionBuilder } from '../migrations'
 
-class ReleaseExecutor {
+export class ReleaseExecutor {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
 		private readonly permissionsVerifier: EventsPermissionsVerifier,
@@ -23,7 +23,7 @@ class ReleaseExecutor {
 	public async execute(
 		db: DatabaseContext,
 		project: ProjectConfig,
-		permissionContext: EventsPermissionsVerifier.Context,
+		permissionContext: EventsPermissionsVerifierContext,
 		targetStage: Stage,
 		sourceStage: Stage,
 		eventsToApply: string[],
@@ -111,7 +111,7 @@ class ReleaseExecutor {
 		return true
 	}
 
-	private verifyDependencies(eventsToApply: string[], dependencies: DependencyBuilder.Dependencies): boolean {
+	private verifyDependencies(eventsToApply: string[], dependencies: EventsDependencies): boolean {
 		const checked = new Set<string>()
 		const eventsSet = new Set(eventsToApply)
 		const verify = (id: string): boolean => {
@@ -137,5 +137,3 @@ class ReleaseExecutor {
 		return true
 	}
 }
-
-export default ReleaseExecutor

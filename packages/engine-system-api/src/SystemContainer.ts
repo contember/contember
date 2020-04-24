@@ -1,45 +1,50 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { Builder, Container } from '@contember/dic'
-import TableReferencingResolver from './model/events/TableReferencingResolver'
 import {
 	MigrationDescriber,
 	ModificationHandlerFactory,
 	SchemaDiffer,
 	SchemaMigrator,
 } from '@contember/schema-migrations'
-import { Resolvers } from './schema'
-import PermissionsFactory from './model/authorization/PermissionsFactory'
-import { ContentPermissionVerifier, EventsPermissionsVerifier } from './model/events/EventsPermissionsVerifier'
-import { UuidProvider } from './utils/uuid'
-import { ExecutedMigrationsResolver } from './model/migrations/ExecutedMigrationsResolver'
-import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import MigrationExecutor from './model/migrations/MigrationExecutor'
-import DependencyBuilder from './model/events/DependencyBuilder'
-import SameRowDependencyBuilder from './model/events/dependency/SameRowDependencyBuilder'
-import TransactionDependencyBuilder from './model/events/dependency/TransactionDependencyBuilder'
-import DeletedRowReferenceDependencyBuilder from './model/events/dependency/DeletedRowReferenceDependencyBuilder'
-import CreatedRowReferenceDependencyBuilder from './model/events/dependency/CreatedRowReferenceDependencyBuilder'
-import EventApplier from './model/events/EventApplier'
-import EventsRebaser from './model/events/EventsRebaser'
-import RebaseExecutor from './model/events/RebaseExecutor'
-import ProjectMigrator from './model/migrations/ProjectMigrator'
-import ProjectMigrationInfoResolver from './model/migrations/ProjectMigrationInfoResolver'
-import StageCreator from './model/stages/StageCreator'
-import { ProjectInitializer } from './ProjectInitializer'
-import { DatabaseCredentials } from '@contember/database'
-import { ResolverContextFactory } from './resolvers'
 import { MigrationsRunner } from '@contember/database-migrations'
-import { systemMigrationsDirectory } from './index'
-import DiffBuilder from './model/events/DiffBuilder'
-import ReleaseExecutor from './model/events/ReleaseExecutor'
-import StagesQueryResolver from './resolvers/query/StagesQueryResolver'
-import DiffResponseBuilder from './model/events/DiffResponseBuilder'
-import DiffQueryResolver from './resolvers/query/DiffQueryResolver'
-import ReleaseMutationResolver from './resolvers/mutation/ReleaseMutationResolver'
-import RebaseAllMutationResolver from './resolvers/mutation/RebaseAllMutationResolver'
-import { MigrateMutationResolver } from './resolvers/mutation/MigrateMutationResolver'
-import ResolverFactory from './resolvers/ResolverFactory'
-import { MigrationsResolverFactory } from './model/migrations/MigrationsResolverFactory'
+import { DatabaseCredentials } from '@contember/database'
+import {
+	ContentPermissionVerifier,
+	CreatedRowReferenceDependencyBuilder,
+	DeletedRowReferenceDependencyBuilder,
+	DependencyBuilderList,
+	DiffBuilder,
+	DiffResponseBuilder,
+	EventApplier,
+	EventsPermissionsVerifier,
+	EventsRebaser,
+	ExecutedMigrationsResolver,
+	MigrationExecutor,
+	MigrationsResolverFactory,
+	PermissionsFactory,
+	ProjectInitializer,
+	ProjectMigrationInfoResolver,
+	ProjectMigrator,
+	RebaseExecutor,
+	ReleaseExecutor,
+	SameRowDependencyBuilder,
+	SchemaVersionBuilder,
+	StageCreator,
+	TableReferencingResolver,
+	TransactionDependencyBuilder,
+} from './model'
+import { Resolvers } from './schema'
+import { UuidProvider } from './utils'
+import {
+	DiffQueryResolver,
+	MigrateMutationResolver,
+	RebaseAllMutationResolver,
+	ReleaseMutationResolver,
+	ResolverContextFactory,
+	ResolverFactory,
+	StagesQueryResolver,
+} from './resolvers'
+import { systemMigrationsDirectory } from './MigrationsDirectory'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -106,7 +111,7 @@ export class SystemContainerFactory {
 			.addService(
 				'dependencyBuilder',
 				({ tableReferencingResolver }) =>
-					new DependencyBuilder.DependencyBuilderList([
+					new DependencyBuilderList([
 						new SameRowDependencyBuilder(),
 						new TransactionDependencyBuilder(),
 						new DeletedRowReferenceDependencyBuilder(tableReferencingResolver),

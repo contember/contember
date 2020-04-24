@@ -1,13 +1,9 @@
-import { Client } from '@contember/database'
-import CreateOrUpdateStageCommand from '../commands/CreateOrUpdateStageCommand'
-import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import EventApplier from '../events/EventApplier'
+import { CreateOrUpdateStageCommand, UpdateStageEventCommand } from '../commands'
+import { EventApplier } from '../events'
 import { DiffQuery, StageBySlugQuery } from '../queries'
 import { StageConfig } from '../../types'
-import { UuidProvider } from '../../utils/uuid'
-import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { DatabaseContext } from '../database'
 
 class StageCreator {
 	constructor(private readonly eventApplier: EventApplier) {}
@@ -40,4 +36,4 @@ class StageCreator {
 	}
 }
 
-export default StageCreator
+export { StageCreator }

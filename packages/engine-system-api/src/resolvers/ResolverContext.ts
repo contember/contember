@@ -1,7 +1,7 @@
 import { AuthorizationScope, Authorizator } from '@contember/authorization'
 import { Acl } from '@contember/schema'
 import { ForbiddenError } from 'apollo-server-errors'
-import { DatabaseContext, DatabaseContextFactory } from '../model'
+import { DatabaseContext } from '../model'
 import { ProjectConfig } from '../types'
 import { Identity } from '../model/authorization'
 

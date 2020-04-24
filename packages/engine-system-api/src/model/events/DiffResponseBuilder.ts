@@ -1,12 +1,12 @@
 import { AnyEvent, EventType } from '@contember/engine-common'
 import { Event as ApiEvent, EventType as ApiEventType } from '../../schema'
 import { assertNever } from '../../utils'
-import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
+import { EventPermission } from './EventsPermissionsVerifier'
 
-type EventWithMeta = AnyEvent & { dependencies: string[]; permission: EventsPermissionsVerifier.EventPermission }
+type EventWithMeta = AnyEvent & { dependencies: string[]; permission: EventPermission }
 type EventFilter = { entity: string; id: string }
 
-class DiffResponseBuilder {
+export class DiffResponseBuilder {
 	public buildResponse(events: EventWithMeta[], filter: ReadonlyArray<EventFilter> | null): ApiEvent[] {
 		if (filter !== null) {
 			if (filter.length === 0) {
@@ -23,7 +23,7 @@ class DiffResponseBuilder {
 		}
 
 		return events.map(it => ({
-			allowed: it.permission === EventsPermissionsVerifier.EventPermission.canApply,
+			allowed: it.permission === EventPermission.canApply,
 			dependencies: it.dependencies,
 			id: it.id,
 			type: apiEventTypeMapping[it.type],
@@ -32,7 +32,7 @@ class DiffResponseBuilder {
 	}
 
 	private formatDescription(event: EventWithMeta): string {
-		if (event.permission === EventsPermissionsVerifier.EventPermission.forbidden) {
+		if (event.permission === EventPermission.forbidden) {
 			return 'Forbidden'
 		}
 
@@ -75,5 +75,3 @@ class DiffResponseBuilder {
 		return events.filter(it => eventIds.has(it.id))
 	}
 }
-
-export default DiffResponseBuilder

@@ -42,8 +42,8 @@ export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 	discriminationField: SugaredFieldProps['field']
 
 	textBlockField: SugaredFieldProps['field']
-	textBlockDiscriminatedBy?: SugaredDiscriminateBy
-	textBlockDiscriminatedByScalar?: SugaredDiscriminateByScalar
+	textBlockDiscriminateBy?: SugaredDiscriminateBy
+	textBlockDiscriminateByScalar?: SugaredDiscriminateByScalar
 
 	// TODO
 	inlineButtons?: HoveringToolbarsProps['inlineButtons']
@@ -73,8 +73,8 @@ export const BlockEditorInner = React.memo(
 		sortableBy,
 		label,
 		removalType = 'disconnect',
-		textBlockDiscriminatedBy,
-		textBlockDiscriminatedByScalar,
+		textBlockDiscriminateBy,
+		textBlockDiscriminateByScalar,
 		textBlockField,
 		inlineButtons = defaultInlineButtons,
 		blockButtons,
@@ -97,17 +97,17 @@ export const BlockEditorInner = React.memo(
 		const { entities, moveEntity, appendNew } = useSortedEntities(entityListAccessor, sortableBy)
 
 		const textBlockDiscriminant = React.useMemo(() => {
-			if (textBlockDiscriminatedBy !== undefined) {
-				return VariableInputTransformer.transformVariableLiteral(textBlockDiscriminatedBy, environment)
+			if (textBlockDiscriminateBy !== undefined) {
+				return VariableInputTransformer.transformVariableLiteral(textBlockDiscriminateBy, environment)
 			}
-			if (textBlockDiscriminatedByScalar !== undefined) {
-				return VariableInputTransformer.transformVariableScalar(textBlockDiscriminatedByScalar, environment)
+			if (textBlockDiscriminateByScalar !== undefined) {
+				return VariableInputTransformer.transformVariableScalar(textBlockDiscriminateByScalar, environment)
 			}
 			throw new BindingError(
-				`BlockEditor: undiscriminated text blocks. You must supply either the 'textBlockDiscriminatedBy' or the ` +
-					`'textBlockDiscriminatedByScalar' props.`,
+				`BlockEditor: undiscriminated text blocks. You must supply either the 'textBlockDiscriminateBy' or the ` +
+					`'textBlockDiscriminateByScalar' props.`,
 			)
-		}, [environment, textBlockDiscriminatedBy, textBlockDiscriminatedByScalar])
+		}, [environment, textBlockDiscriminateBy, textBlockDiscriminateByScalar])
 		const normalizedBlocks = useNormalizedBlocks(children)
 		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor, Element>())
 		const [textElementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())

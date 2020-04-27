@@ -82,10 +82,10 @@ export const BlockEditor = Component<BlockEditorProps>(
 		)
 	},
 	props => {
-		if (props.textBlockDiscriminatedBy !== undefined && props.textBlockDiscriminatedByScalar !== undefined) {
+		if (props.textBlockDiscriminateBy !== undefined && props.textBlockDiscriminateByScalar !== undefined) {
 			throw new BindingError(
 				`BlockEditor: the text block cannot be simultaneously discriminated by a literal and a scalar.\n` +
-					`Both the 'textBlockDiscriminatedBy' and the 'textBlockDiscriminatedByScalar' supplied.`,
+					`Both the 'textBlockDiscriminateBy' and the 'textBlockDiscriminateByScalar' supplied.`,
 			)
 		}
 		const field = <SugaredField field={props.textBlockField} />
@@ -99,9 +99,9 @@ export const BlockEditor = Component<BlockEditorProps>(
 				))*/}
 				<BlockRepeater {...props}>
 					{props.children}
-					{props.textBlockDiscriminatedBy && <Block discriminateBy={props.textBlockDiscriminatedBy}>{field}</Block>}
-					{props.textBlockDiscriminatedByScalar && (
-						<Block discriminateByScalar={props.textBlockDiscriminatedByScalar}>{field}</Block>
+					{props.textBlockDiscriminateBy && <Block discriminateBy={props.textBlockDiscriminateBy}>{field}</Block>}
+					{props.textBlockDiscriminateByScalar && (
+						<Block discriminateByScalar={props.textBlockDiscriminateByScalar}>{field}</Block>
 					)}
 				</BlockRepeater>
 			</>

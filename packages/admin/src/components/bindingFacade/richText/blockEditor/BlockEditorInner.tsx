@@ -6,7 +6,7 @@ import {
 	FieldAccessor,
 	RelativeEntityList,
 	RemovalType,
-	SugaredRelativeSingleField,
+	SugaredFieldProps,
 	useDesugaredRelativeSingleField,
 	useMutationState,
 	useSortedEntities,
@@ -18,7 +18,7 @@ import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { assertNever } from '../../../../utils'
-import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
+import { SugaredDiscriminateBy, SugaredDiscriminateByScalar, useNormalizedBlocks } from '../../blocks'
 import { CreateEditorPublicOptions } from '../editorFactory'
 import { RichEditor } from '../RichEditor'
 import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
@@ -38,12 +38,12 @@ export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 	children: React.ReactNode
 	label: React.ReactNode
 	removalType?: RemovalType
-	sortableBy: SugaredRelativeSingleField['field']
+	sortableBy: SugaredFieldProps['field']
+	discriminationField: SugaredFieldProps['field']
 
-	discriminationField: string | SugaredRelativeSingleField
-	textBlockField: string | SugaredRelativeSingleField
-	textBlockDiscriminatedBy?: LiteralBasedBlockProps['discriminateBy']
-	textBlockDiscriminatedByScalar?: ScalarBasedBlockProps['discriminateByScalar']
+	textBlockField: SugaredFieldProps['field']
+	textBlockDiscriminatedBy?: SugaredDiscriminateBy
+	textBlockDiscriminatedByScalar?: SugaredDiscriminateByScalar
 
 	// TODO
 	inlineButtons?: HoveringToolbarsProps['inlineButtons']
@@ -60,7 +60,7 @@ export interface BlockEditorInnerInternalProps {
 	environment: Environment
 }
 
-export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInnerInternalProps
+export interface BlockEditorInnerProps extends BlockEditorInnerPublicProps, BlockEditorInnerInternalProps {}
 
 export const BlockEditorInner = React.memo(
 	({

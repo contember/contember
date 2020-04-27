@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { Component, FieldValue, Scalar, VariableLiteral } from '@contember/binding'
+import { Component, FieldValue, Scalar, VariableLiteral, VariableScalar } from '@contember/binding'
 
 export interface BlockCommonProps {
 	label?: React.ReactNode
@@ -10,12 +10,13 @@ export interface BlockCommonProps {
 }
 
 export type SugaredDiscriminateBy = GraphQlBuilder.Literal | VariableLiteral | string
+export type SugaredDiscriminateByScalar = Scalar | VariableScalar
 
 export interface LiteralBasedBlockProps extends BlockCommonProps {
 	discriminateBy: SugaredDiscriminateBy
 }
 export interface ScalarBasedBlockProps extends BlockCommonProps {
-	discriminateByScalar: Scalar
+	discriminateByScalar: SugaredDiscriminateByScalar
 }
 
 export type BlockProps = LiteralBasedBlockProps | ScalarBasedBlockProps

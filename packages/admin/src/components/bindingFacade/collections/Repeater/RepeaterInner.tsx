@@ -2,8 +2,8 @@ import {
 	Component,
 	Entity,
 	EntityListAccessor,
-	Field,
-	SugaredRelativeSingleField,
+	SugaredField,
+	SugaredFieldProps,
 	useMutationState,
 	useSortedEntities,
 } from '@contember/binding'
@@ -24,7 +24,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	initialRowCount?: number
 	children: React.ReactNode
 
-	sortableBy?: SugaredRelativeSingleField['field']
+	sortableBy?: SugaredFieldProps['field']
 
 	enableRemoving?: boolean
 	enableRemovingLast?: boolean
@@ -133,7 +133,7 @@ export const RepeaterInner = Component(
 		props, // TODO emptyMessage, etc.
 	) => (
 		<>
-			{props.sortableBy && <Field field={props.sortableBy} isNonbearing={true} />}
+			{props.sortableBy && <SugaredField field={props.sortableBy} isNonbearing={true} />}
 			{props.children}
 		</>
 	),

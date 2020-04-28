@@ -93,6 +93,7 @@ export const RepeaterInner = Component(
 		}
 
 		const axis = props.unstable__sortAxis || 'y'
+		const useDragHandle = props.useDragHandle ?? true
 
 		return (
 			<SortableRepeaterContainer
@@ -101,7 +102,7 @@ export const RepeaterInner = Component(
 				helperClass="is-active"
 				lockToContainerEdges={true}
 				useWindowAsScrollContainer={true}
-				useDragHandle={props.useDragHandle ?? true}
+				useDragHandle={useDragHandle}
 				onSortEnd={onSortEnd}
 			>
 				<Container
@@ -118,7 +119,7 @@ export const RepeaterInner = Component(
 									{...props.itemComponentExtraProps!}
 									removalType={props.removalType}
 									canBeRemoved={itemRemovingEnabled}
-									dragHandleComponent={props.useDragHandle ? sortableHandle : undefined}
+									dragHandleComponent={useDragHandle ? sortableHandle : undefined}
 								>
 									{props.children}
 								</Item>

@@ -11,6 +11,7 @@ import * as React from 'react'
 import { Axis, SortEndHandler } from 'react-sortable-hoc'
 import { RepeaterContainer, RepeaterContainerProps, RepeaterContainerPublicProps } from './RepeaterContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
+import { shouldCancelStart } from './shouldCancelStart'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'
 import { SortableRepeaterItem } from './SortableRepeaterItem'
 import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
@@ -104,6 +105,7 @@ export const RepeaterInner = Component(
 				useWindowAsScrollContainer={true}
 				useDragHandle={useDragHandle}
 				onSortEnd={onSortEnd}
+				shouldCancelStart={shouldCancelStart}
 			>
 				<Container
 					{...props.containerComponentExtraProps!}

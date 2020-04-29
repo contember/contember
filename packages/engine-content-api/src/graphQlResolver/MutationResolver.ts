@@ -19,7 +19,6 @@ export default class MutationResolver {
 		private readonly db: Client,
 		private readonly mapperFactory: Mapper.Factory,
 		private readonly systemVariablesSetup: (db: Client) => Promise<void>,
-		private readonly uniqueWhereExpander: UniqueWhereExpander,
 		private readonly inputValidator: InputPreValidator,
 		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
 	) {}
@@ -179,8 +178,7 @@ export default class MutationResolver {
 			return { ok: false, validation: { valid: true, errors: [] }, errors }
 		}
 
-		const whereExpanded = this.uniqueWhereExpander.expand(entity, input.by)
-		const nodes = await this.resolveResultNodes(mapper, entity, whereExpanded, queryAst)
+		const nodes = await this.resolveResultNodes(mapper, entity, input.by, queryAst)
 		return {
 			ok: true,
 			validation: {
@@ -241,7 +239,7 @@ export default class MutationResolver {
 			throw new ImplementationException('MutationResolver::resolveCreateInternal does not handle result properly')
 		}
 
-		const nodes = await this.resolveResultNodes(mapper, entity, { [entity.primary]: { eq: primary } }, queryAst)
+		const nodes = await this.resolveResultNodes(mapper, entity, { [entity.primary]: primary }, queryAst)
 		return {
 			ok: true,
 			validation: {
@@ -269,9 +267,8 @@ export default class MutationResolver {
 		queryAst: ObjectNode<Input.DeleteInput>,
 	): Promise<WithoutNode<Result.DeleteResult>> {
 		const input = queryAst.args
-		const whereExpanded = this.uniqueWhereExpander.expand(entity, input.by)
 
-		const nodes = await this.resolveResultNodes(mapper, entity, whereExpanded, queryAst)
+		const nodes = await this.resolveResultNodes(mapper, entity, input.by, queryAst)
 
 		const result = await mapper.delete(entity, queryAst.args.by)
 		if (result.length === 1 && result[0].result === MutationResultType.ok) {
@@ -291,7 +288,7 @@ export default class MutationResolver {
 	private async resolveResultNodes(
 		mapper: Mapper,
 		entity: Model.Entity,
-		where: Input.Where,
+		where: Input.UniqueWhere,
 		queryAst: ObjectNode,
 	): Promise<Record<string, Value.Object>> {
 		const nodeQuery = queryAst.findFieldByName('node')
@@ -300,8 +297,8 @@ export default class MutationResolver {
 			if (!(singleNodeQuery instanceof ObjectNode)) {
 				throw new Error('MutationResolver: expected ObjectNode')
 			}
-			const objectWithArgs = singleNodeQuery.withArgs({ filter: where })
-			nodes[singleNodeQuery.alias] = (await mapper.select(entity, objectWithArgs))[0] || null
+			const objectWithArgs = singleNodeQuery.withArgs({ by: where })
+			nodes[singleNodeQuery.alias] = await mapper.selectUnique(entity, objectWithArgs)
 		}
 		return nodes
 	}

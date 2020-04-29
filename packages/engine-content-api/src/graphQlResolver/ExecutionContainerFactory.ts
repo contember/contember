@@ -202,15 +202,8 @@ export class ExecutionContainerFactory {
 			)
 			.addService(
 				'mutationResolver',
-				({ db, mapperFactory, uniqueWhereExpander, inputPreValidator, queryAstFactory }) =>
-					new MutationResolver(
-						db,
-						mapperFactory,
-						this.setupSystemVariables,
-						uniqueWhereExpander,
-						inputPreValidator,
-						queryAstFactory,
-					),
+				({ db, mapperFactory, inputPreValidator, queryAstFactory }) =>
+					new MutationResolver(db, mapperFactory, this.setupSystemVariables, inputPreValidator, queryAstFactory),
 			)
 			.addService(
 				'validationResolver',

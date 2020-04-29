@@ -6,13 +6,7 @@ import { Client, DeleteBuilder, ForeignKeyViolationError, SelectBuilder } from '
 import Path from '../select/Path'
 import PredicateFactory from '../../acl/PredicateFactory'
 import UpdateBuilderFactory from '../update/UpdateBuilderFactory'
-import {
-	MutationNoResultError,
-	MutationEntryNotFoundError,
-	ModificationType,
-	MutationResultList,
-	MutationDeleteOk,
-} from '../Result'
+import { MutationDeleteOk, MutationEntryNotFoundError, MutationNoResultError, MutationResultList } from '../Result'
 import Mapper from '../Mapper'
 
 type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwnerRelation]

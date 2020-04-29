@@ -1,13 +1,12 @@
 import { Model } from '@contember/schema'
 import { InputValidation as validation, SchemaBuilder } from '@contember/schema-definition'
 import 'jasmine'
-import ObjectNode from '../../../src/graphQlResolver/ObjectNode'
-import FieldNode from '../../../src/graphQlResolver/FieldNode'
 import DependencyCollector from '../../../src/input-validation/dependencies/DependencyCollector'
 import QueryAstFactory from '../../../src/input-validation/QueryAstFactory'
 import DependencyMerger from '../../../src/input-validation/dependencies/DependencyMerger'
 import { evaluateValidation } from '../../../src/input-validation/ValidationEvaluation'
 import ValidationContext from '../../../src/input-validation/ValidationContext'
+import { FieldNode, ObjectNode } from '../../../src/inputProcessing'
 
 describe('input validation', () => {
 	it('evaluates rule', () => {

@@ -1,16 +1,15 @@
 import { Input, Model, Result, Value } from '@contember/schema'
-import ObjectNode from './ObjectNode'
-import UniqueWhereExpander from './UniqueWhereExpander'
 import Mapper from '../sql/Mapper'
 import ValidationResolver from './ValidationResolver'
-import { GraphQLObjectType, GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo } from 'graphql'
 import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
 import { ImplementationException } from '../exception'
 import { Client, Connection, SerializationFailureError } from '@contember/database'
 import { Operation, readOperationMeta } from '../graphQLSchema/OperationExtension'
 import { assertNever } from '../utils'
-import { ConstraintType, getInsertPrimary, InputErrorKind, MutationResultType, MutationResultList } from '../sql/Result'
+import { ConstraintType, getInsertPrimary, InputErrorKind, MutationResultList, MutationResultType } from '../sql/Result'
 import { InputPreValidator } from '../input-validation/preValidation/InputPreValidator'
+import { ObjectNode } from '../inputProcessing'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 

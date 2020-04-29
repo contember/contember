@@ -1,6 +1,6 @@
 import { Input } from '@contember/schema'
 import { QueryBuilder, ConditionBuilder as SqlConditionBuilder, Operator } from '@contember/database'
-import { UserError } from '../../graphQlResolver'
+import { UserError } from '../../exception'
 
 export default class ConditionBuilder {
 	public build(

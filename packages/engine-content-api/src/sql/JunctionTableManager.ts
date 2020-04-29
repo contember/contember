@@ -1,6 +1,5 @@
 import { getEntity } from '@contember/schema-utils'
 import Path from './select/Path'
-import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import WhereBuilder from './select/WhereBuilder'
 import PredicateFactory from '../acl/PredicateFactory'
 import {

@@ -1,13 +1,12 @@
 import { Acl, Input, Model, Value } from '@contember/schema'
-import ObjectNode from '../../../graphQlResolver/ObjectNode'
 import SelectHydrator from '../SelectHydrator'
 import Mapper from '../../Mapper'
-import FieldNode from '../../../graphQlResolver/FieldNode'
 import JunctionFetcher from '../JunctionFetcher'
 import SelectExecutionHandler from '../SelectExecutionHandler'
 import PredicateFactory from '../../../acl/PredicateFactory'
 import WhereBuilder from '../WhereBuilder'
 import { OrderByHelper } from '../OrderByHelper'
+import { FieldNode, ObjectNode } from '../../../inputProcessing'
 
 class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(

@@ -1,10 +1,9 @@
-import FieldNode from '../../graphQlResolver/FieldNode'
 import Path from './Path'
-import ObjectNode from '../../graphQlResolver/ObjectNode'
 import { Input, Model } from '@contember/schema'
 import SelectHydrator from './SelectHydrator'
 import { SelectBuilder } from '@contember/database'
 import Mapper from '../Mapper'
+import { FieldNode, ObjectNode } from '../../inputProcessing'
 
 interface SelectExecutionHandler<MetaArgs> {
 	process(context: SelectExecutionHandler.Context): void

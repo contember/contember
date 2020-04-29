@@ -1,4 +1,4 @@
-export default class FieldNode {
+export class FieldNode {
 	constructor(
 		public readonly name: string,
 		public readonly alias: string,

@@ -1,6 +1,6 @@
-import FieldNode from './FieldNode'
+import { FieldNode } from './FieldNode'
 
-export default class ObjectNode<Args = any> {
+export class ObjectNode<Args = any> {
 	constructor(
 		public readonly name: string,
 		public readonly alias: string,

@@ -3,7 +3,7 @@ import { Input, Model } from '@contember/schema'
 import { CreateInputProcessor } from './CreateInputProcessor'
 import * as Context from './InputContext'
 import { filterObject } from '../utils/object'
-import { UserError } from '../graphQlResolver'
+import { UserError } from '../exception'
 import { ImplementationException } from '../exception'
 
 export class CreateInputVisitor<Result>

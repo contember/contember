@@ -1,11 +1,9 @@
 import { Input, Model } from '@contember/schema'
-import { Accessor, isIt } from '../../utils'
+import { isIt } from '../../utils'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import SelectExecutionHandler from '../../sql/select/SelectExecutionHandler'
-import Mapper from '../../sql/Mapper'
-import ObjectNode from '../../graphQlResolver/ObjectNode'
-import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 import { ImplementationException } from '../../exception'
+import { ObjectNode, UniqueWhereExpander } from '../../inputProcessing'
 
 class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {
 	constructor(private readonly schema: Model.Schema, private readonly uniqueWhereExpander: UniqueWhereExpander) {}

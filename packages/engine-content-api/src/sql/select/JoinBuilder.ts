@@ -2,7 +2,7 @@ import Path from './Path'
 import { acceptRelationTypeVisitor, getTargetEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import JoinVisitor from './JoinVisitor'
-import { ConditionBuilder, Operator } from '@contember/database'
+import { Operator } from '@contember/database'
 import { SelectBuilder } from '@contember/database'
 
 export default class JoinBuilder {

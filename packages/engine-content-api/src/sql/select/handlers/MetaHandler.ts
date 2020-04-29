@@ -1,9 +1,9 @@
 import SelectExecutionHandler from '../SelectExecutionHandler'
 import Path from '../Path'
-import ObjectNode from '../../../graphQlResolver/ObjectNode'
 import { Acl, Input } from '@contember/schema'
 import PredicateFactory from '../../../acl/PredicateFactory'
 import WhereBuilder from '../WhereBuilder'
+import { ObjectNode } from '../../../inputProcessing'
 
 class MetaHandler implements SelectExecutionHandler<{}> {
 	constructor(private readonly whereBuilder: WhereBuilder, private readonly predicateFactory: PredicateFactory) {}

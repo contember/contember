@@ -2,8 +2,7 @@ import { Input, Model } from '@contember/schema'
 import { filterObject, isIt } from '../utils'
 import { UpdateInputProcessor } from './UpdateInputProcessor'
 import * as Context from './InputContext'
-import { UserError } from '../graphQlResolver'
-import { ImplementationException } from '../exception'
+import { ImplementationException, UserError } from '../exception'
 
 export class UpdateInputVisitor<Result>
 	implements

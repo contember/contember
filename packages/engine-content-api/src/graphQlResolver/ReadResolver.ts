@@ -1,5 +1,4 @@
 import { Input, Model } from '@contember/schema'
-import ObjectNode from './ObjectNode'
 import Mapper from '../sql/Mapper'
 import { GraphQLObjectType, GraphQLResolveInfo } from 'graphql'
 import GraphQlQueryAstFactory from './GraphQlQueryAstFactory'
@@ -7,6 +6,7 @@ import { ImplementationException } from '../exception'
 import { Client, Connection } from '@contember/database'
 import { Operation, readOperationMeta } from '../graphQLSchema/OperationExtension'
 import { assertNever } from '../utils'
+import { ObjectNode } from '../inputProcessing'
 
 export default class ReadResolver {
 	constructor(

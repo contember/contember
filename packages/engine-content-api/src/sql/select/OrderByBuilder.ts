@@ -4,7 +4,7 @@ import JoinBuilder from './JoinBuilder'
 import { QueryBuilder } from '@contember/database'
 import { getColumnName, getTargetEntity } from '@contember/schema-utils'
 import { SelectBuilder } from '@contember/database'
-import { UserError } from '../../graphQlResolver/UserError'
+import { UserError } from '../../exception'
 
 class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}

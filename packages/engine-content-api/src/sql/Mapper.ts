@@ -1,12 +1,10 @@
 import { Input, Model } from '@contember/schema'
 import { getColumnName } from '@contember/schema-utils'
-import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import Path from './select/Path'
 import * as database from '@contember/database'
 import { Client, SelectBuilder } from '@contember/database'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
-import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
@@ -16,6 +14,7 @@ import { Updater } from './update/Updater'
 import { Inserter } from './insert/Inserter'
 import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select/OrderByHelper'
+import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 
 class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}

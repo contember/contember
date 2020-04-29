@@ -1,8 +1,8 @@
 import { Input, Model } from '@contember/schema'
 import { getTargetEntity, getUniqueConstraints } from '@contember/schema-utils'
-import { UserError } from './UserError'
+import { UserError } from '../exception'
 
-export default class UniqueWhereExpander {
+export class UniqueWhereExpander {
 	constructor(private readonly schema: Model.Schema) {}
 
 	expand(entity: Model.Entity, where: Input.UniqueWhere, path: string[] = []): Input.Where {

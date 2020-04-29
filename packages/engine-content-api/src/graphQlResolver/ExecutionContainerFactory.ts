@@ -10,7 +10,6 @@ import { Context } from '../types'
 import PredicatesInjector from '../acl/PredicatesInjector'
 import VariableInjector from '../acl/VariableInjector'
 import PredicateFactory from '../acl/PredicateFactory'
-import UniqueWhereExpander from './UniqueWhereExpander'
 import ReadResolver from './ReadResolver'
 import MutationResolver from './MutationResolver'
 import JunctionTableManager from '../sql/JunctionTableManager'
@@ -37,6 +36,7 @@ import { Inserter } from '../sql/insert/Inserter'
 import { ColumnValueResolver } from '../input-validation/ColumnValueResolver'
 import { EntityRulesResolver } from '../input-validation/EntityRulesResolver'
 import { InputPreValidator } from '../input-validation/preValidation/InputPreValidator'
+import { UniqueWhereExpander } from '../inputProcessing'
 
 export interface ExecutionContainer {
 	readResolver: ReadResolver

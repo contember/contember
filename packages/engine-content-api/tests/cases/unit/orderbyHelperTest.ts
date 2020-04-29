@@ -1,7 +1,7 @@
 import 'jasmine'
-import ObjectNode from '../../../src/graphQlResolver/ObjectNode'
 import { Input, Model } from '@contember/schema'
 import { OrderByHelper } from '../../../src/sql/select/OrderByHelper'
+import { ObjectNode } from '../../../src/inputProcessing'
 
 const entity: Model.Entity = {
 	name: 'Foo',

@@ -21,7 +21,7 @@ const commonIconProps: IconProps = {
 export const ActionableBox = React.memo(({ children, editContents, onRemove }: ActionableBoxProps) => {
 	const prefix = useClassNamePrefix()
 
-	if (!editContents && !onRemove) {
+	if (editContents === undefined && onRemove === undefined) {
 		return <>{children}</>
 	}
 

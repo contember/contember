@@ -3,6 +3,7 @@ import {
 	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
+	Environment,
 	FieldAccessor,
 	FieldValue,
 	RelativeEntityList,
@@ -10,7 +11,7 @@ import {
 	RemovalType,
 } from '@contember/binding'
 import * as React from 'react'
-import { Editor, Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
+import { Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
 import { NormalizedBlocks } from '../../../blocks'
 import {
 	ContemberContentPlaceholderElement,
@@ -24,7 +25,10 @@ export interface OverrideApplyOptions {
 	batchUpdatesRef: React.MutableRefObject<EntityAccessor['batchUpdates']>
 	desugaredEntityList: RelativeEntityList
 	discriminationField: RelativeSingleField
+	embedBlockDiscriminant: FieldValue | undefined
+	embeddedContentDiscriminationField: RelativeSingleField | undefined
 	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
+	environmentRef: React.MutableRefObject<Environment>
 	fieldElementCache: WeakMap<FieldAccessor, SlateElement>
 	isMutatingRef: React.MutableRefObject<boolean>
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlocks>
@@ -45,6 +49,9 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		batchUpdatesRef,
 		desugaredEntityList,
 		discriminationField,
+		embedBlockDiscriminant,
+		embeddedContentDiscriminationField,
+		environmentRef,
 		fieldElementCache,
 		normalizedLeadingFieldsRef,
 		//normalizedTrailingFieldsRef,
@@ -162,7 +169,11 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					sortedEntities.splice(sortedEntityIndex, 1)
 				}
 			}
-			const addNewDiscriminatedEntityAt = (elementIndex: number, blockDiscriminant: FieldValue): EntityAccessor => {
+			const addNewDiscriminatedEntityAt = (
+				elementIndex: number,
+				blockDiscriminant: FieldValue,
+				preprocess?: EntityAccessor.BatchUpdates,
+			): EntityAccessor => {
 				const normalizedElementIndex = Math.max(
 					firstContentIndex,
 					Math.min(elementIndex, sortedEntities.length + firstContentIndex),
@@ -175,6 +186,9 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					(getInnerAccessor, newEntityKey) => {
 						const newEntity = getInnerAccessor().getByKey(newEntityKey) as EntityAccessor
 						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
+						if (preprocess) {
+							;(getInnerAccessor().getByKey(newEntityKey) as EntityAccessor).batchUpdates(preprocess)
+						}
 						sortedEntities.splice(sortedEntityIndex, 0, getInnerAccessor().getByKey(newEntityKey) as EntityAccessor)
 					},
 				)
@@ -253,7 +267,27 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						if (editor.isContemberBlockElement(node)) {
 							blockType = node.blockType
 							// TODO cache?
-							sortedEntities[topLevelIndex - firstContentIndex] = addNewDiscriminatedEntityAt(topLevelIndex, blockType)
+							addNewDiscriminatedEntityAt(topLevelIndex, blockType)
+						} else if (editor.isContemberEmbedElement(node)) {
+							if (embedBlockDiscriminant === undefined) {
+								throw new BindingError() // TODO message
+							}
+							if (embeddedContentDiscriminationField === undefined) {
+								throw new BindingError() // TODO message
+							}
+							const embedHandler = node.embedHandler
+							const embeddedContentType = embedHandler.discriminateBy
+							addNewDiscriminatedEntityAt(topLevelIndex, embedBlockDiscriminant, getAccessor => {
+								getAccessor()
+									.getRelativeSingleField(embeddedContentDiscriminationField)
+									.updateValue?.(embeddedContentType)
+								embedHandler.data.populateEmbedData({
+									embedArtifacts: node.embedArtifacts,
+									source: node.source,
+									batchUpdates: getAccessor().batchUpdates,
+									environment: environmentRef.current,
+								})
+							})
 						} else {
 							addNewTextElementAt(topLevelIndex)
 						}

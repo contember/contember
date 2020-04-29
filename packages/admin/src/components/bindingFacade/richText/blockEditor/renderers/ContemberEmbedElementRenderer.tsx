@@ -4,19 +4,18 @@ import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
-import { RemoveEntityButton } from '../../../collections/helpers'
 import { BlockSlateEditor } from '../editor'
-import { ContemberBlockElement } from '../elements'
+import { ContemberEmbedElement } from '../elements'
 
-export interface ContemberBlockElementRendererProps extends RenderElementProps {
-	element: ContemberBlockElement
+export interface ContemberEmbedElementRendererProps extends RenderElementProps {
+	element: ContemberEmbedElement
 	entity: EntityAccessor
 	removalType: RemovalType
 	discriminationField: RelativeSingleField
 	normalizedBlocks: NormalizedBlocks
 }
 
-export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockElementRendererProps) => {
+export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedElementRendererProps) => {
 	const editor = useEditor() as BlockSlateEditor
 	const selected = useSelected()
 
@@ -41,12 +40,12 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 		Transforms.select(editor, targetPath)
 	}
 
-	if (!discriminatedBlock) {
-		throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
-	}
+	//if (!discriminatedBlock) {
+	//	throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
+	//}
 
-	const selectedBlock = discriminatedBlock.data
-	const alternate = selectedBlock.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
+	//const selectedBlock = discriminatedBlock.data
+	//const alternate = selectedBlock.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 	return (
 		<div {...props.attributes}>
@@ -54,14 +53,29 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 			<div contentEditable={false} data-slate-editor={false}>
 				<Entity accessor={props.entity}>
 					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
-					<ActionableBox
-						editContents={alternate}
-						onRemove={selected ? undefined : () => props.entity.remove?.(props.removalType)}
-					>
-						<Box heading={selectedBlock.label} isActive={selected} onClick={onContainerClick} style={{ margin: '0' }}>
-							{selectedBlock.children}
-						</Box>
-					</ActionableBox>
+					<div style={{ display: 'flex', justifyContent: 'center' }}>
+						<ActionableBox
+							//editContents={alternate}
+							editContents={null}
+							onRemove={selected ? undefined : () => props.entity.remove?.(props.removalType)}
+						>
+							<Box
+								/*heading={selectedBlock.label}*/
+								isActive={selected}
+								onClick={onContainerClick}
+							>
+								<div
+									// This is a bit of a hack to avoid rendering any whitespace
+									style={{ display: 'flex' }}
+								>
+									{/*{selectedBlock.children}*/}
+									{props.element.embedHandler.data.renderEmbed({
+										entity: props.entity,
+									})}
+								</div>
+							</Box>
+						</ActionableBox>
+					</div>
 					<div onClick={() => addDefaultElement(1)} style={{ height: '1em' }} />
 				</Entity>
 			</div>
@@ -69,4 +83,4 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 		</div>
 	)
 })
-ContemberBlockElementRenderer.displayName = 'ContemberBlockElementRenderer'
+ContemberEmbedElementRenderer.displayName = 'ContemberEmbedElementRenderer'

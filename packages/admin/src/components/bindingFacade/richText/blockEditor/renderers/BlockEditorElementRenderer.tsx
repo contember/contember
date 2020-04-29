@@ -3,12 +3,18 @@ import { EditorPlaceholder } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlocks } from '../../../blocks'
-import { isContemberBlockElement, isContemberContentPlaceholderElement, isContemberFieldElement } from '../elements'
+import {
+	isContemberBlockElement,
+	isContemberContentPlaceholderElement,
+	isContemberEmbedElement,
+	isContemberFieldElement,
+} from '../elements'
 import { ContemberBlockElementRenderer } from './ContemberBlockElementRenderer'
 import {
 	BlockEditorGetEntityByKeyContext,
 	BlockEditorGetNormalizedFieldBackedElementContext,
 } from './ContemberElementRefreshContext'
+import { ContemberEmbedElementRenderer } from './ContemberEmbedElementRenderer'
 import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
 
 export interface BlockEditorElementRendererProps extends RenderElementProps {
@@ -50,6 +56,24 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 					/>
 				)}
 			</BlockEditorGetNormalizedFieldBackedElementContext.Consumer>
+		)
+	}
+	if (isContemberEmbedElement(props.element)) {
+		const element = props.element
+		return (
+			<BlockEditorGetEntityByKeyContext.Consumer>
+				{getEntityByKey => (
+					<ContemberEmbedElementRenderer
+						attributes={props.attributes}
+						children={props.children}
+						element={element}
+						entity={getEntityByKey(element.entityKey)}
+						normalizedBlocks={props.normalizedBlocks}
+						removalType={props.removalType}
+						discriminationField={props.discriminationField}
+					/>
+				)}
+			</BlockEditorGetEntityByKeyContext.Consumer>
 		)
 	}
 	if (isContemberContentPlaceholderElement(props.element)) {

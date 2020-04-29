@@ -1,15 +1,22 @@
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
-import { isContemberBlockElement, isContemberContentPlaceholderElement, isContemberFieldElement } from '../elements'
+import {
+	isContemberBlockElement,
+	isContemberContentPlaceholderElement,
+	isContemberEmbedElement,
+	isContemberFieldElement,
+} from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
 import { overrideInsertNode } from './overrideInsertNode'
+import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData'
 import { overrideIsVoid } from './overrideIsVoid'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 
 export interface CreateEditorOptions
 	extends OverrideApplyOptions,
 		OverrideRenderElementOptions,
+		OverrideInsertDataOptions,
 		CreateEditorPublicOptions {}
 
 export const createBlockEditor = (options: CreateEditorOptions) => {
@@ -27,6 +34,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			const e = editor as BlockSlateEditor
 			e.isContemberBlockElement = isContemberBlockElement
 			e.isContemberContentPlaceholderElement = isContemberContentPlaceholderElement
+			e.isContemberEmbedElement = isContemberEmbedElement
 			e.isContemberFieldElement = isContemberFieldElement
 
 			overrideIsVoid(e)
@@ -34,6 +42,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			overrideApply(e, options)
 			overrideRenderElement(e, options)
 			overrideInsertNode(e)
+			overrideInsertData(e, options)
 
 			return e
 		},

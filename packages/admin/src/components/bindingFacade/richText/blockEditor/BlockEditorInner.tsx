@@ -20,7 +20,7 @@ import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { assertNever } from '../../../../utils'
-import { useNormalizedBlocks } from '../../blocks'
+import { getDiscriminatedBlock, NormalizedBlocks, useNormalizedBlocks } from '../../blocks'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../discrimination'
 import { CreateEditorPublicOptions } from '../editorFactory'
 import { RichEditor } from '../RichEditor'
@@ -51,8 +51,8 @@ export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 
 	embedBlockDiscriminateBy?: SugaredDiscriminateBy
 	embedBlockDiscriminateByScalar?: SugaredDiscriminateByScalar
-	embedBlockDiscriminationField?: SugaredFieldProps['field']
-	embedHandlers: NormalizedEmbedHandlers
+	embedContentDiscriminationField?: SugaredFieldProps['field']
+
 	// TODO
 	inlineButtons?: HoveringToolbarsProps['inlineButtons']
 	blockButtons?: BlockHoveringToolbarContentsProps['blockButtons']
@@ -66,6 +66,7 @@ export interface BlockEditorInnerInternalProps {
 	desugaredEntityList: RelativeEntityList
 	entityListAccessor: EntityListAccessor
 	environment: Environment
+	embedHandlers: NormalizedEmbedHandlers
 }
 
 export interface BlockEditorInnerProps extends BlockEditorInnerPublicProps, BlockEditorInnerInternalProps {}
@@ -87,7 +88,7 @@ export const BlockEditorInner = React.memo(
 
 		embedBlockDiscriminateBy,
 		embedBlockDiscriminateByScalar,
-		embedBlockDiscriminationField,
+		embedContentDiscriminationField,
 		embedHandlers,
 
 		inlineButtons = defaultInlineButtons,
@@ -107,8 +108,8 @@ export const BlockEditorInner = React.memo(
 		const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
 		const desugaredTextBlockField = useDesugaredRelativeSingleField(textBlockField)
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
-		const desugaredEmbeddedContentDiscriminationField = useOptionalDesugaredRelativeSingleField(
-			embedBlockDiscriminationField,
+		const desugaredEmbedContentDiscriminationField = useOptionalDesugaredRelativeSingleField(
+			embedContentDiscriminationField,
 		)
 
 		const { entities, moveEntity, appendNew } = useSortedEntities(entityListAccessor, sortableBy)
@@ -133,6 +134,12 @@ export const BlockEditorInner = React.memo(
 		}, [embedBlockDiscriminateBy, embedBlockDiscriminateByScalar, environment])
 
 		const normalizedBlocks = useNormalizedBlocks(children)
+		const embedSubBlocks = useNormalizedBlocks(
+			embedBlockDiscriminant !== undefined
+				? getDiscriminatedBlock(normalizedBlocks, embedBlockDiscriminant)?.data.children
+				: undefined, // TODO this may crash
+		)
+
 		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor, Element>())
 		const [textElementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())
 		const [contemberBlockElementCache] = React.useState(() => new Map<string, Element>())
@@ -164,7 +171,8 @@ export const BlockEditorInner = React.memo(
 				augmentEditor,
 				augmentEditorBuiltins,
 				desugaredEntityList,
-				embeddedContentDiscriminationField: desugaredEmbeddedContentDiscriminationField,
+				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
+				embedSubBlocks,
 				embedBlockDiscriminant,
 				entityListAccessorRef,
 				embedHandlers,
@@ -194,7 +202,7 @@ export const BlockEditorInner = React.memo(
 			contemberFieldElementCache,
 			contemberBlockElementCache,
 			textBlockField: desugaredTextBlockField,
-			embeddedContentDiscriminationField: desugaredEmbeddedContentDiscriminationField,
+			embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
 			embedBlockDiscriminant,
 			embedHandlers,
 			blocks: normalizedBlocks,

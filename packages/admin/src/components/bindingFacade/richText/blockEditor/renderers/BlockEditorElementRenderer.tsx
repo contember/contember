@@ -20,6 +20,8 @@ import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
 export interface BlockEditorElementRendererProps extends RenderElementProps {
 	normalizedBlocks: NormalizedBlocks
 	discriminationField: RelativeSingleField
+	embedContentDiscriminationField: RelativeSingleField | undefined
+	embedSubBlocks: NormalizedBlocks
 	removalType: RemovalType
 	fallbackRenderer: (props: RenderElementProps) => React.ReactElement
 }
@@ -68,9 +70,9 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 						children={props.children}
 						element={element}
 						entity={getEntityByKey(element.entityKey)}
-						normalizedBlocks={props.normalizedBlocks}
+						embedSubBlocks={props.embedSubBlocks}
+						embedContentDiscriminationField={props.embedContentDiscriminationField!}
 						removalType={props.removalType}
-						discriminationField={props.discriminationField}
 					/>
 				)}
 			</BlockEditorGetEntityByKeyContext.Consumer>

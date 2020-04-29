@@ -20,7 +20,7 @@ import { BlockEditorInner, BlockEditorInnerPublicProps } from './BlockEditorInne
 import { EmbedHandler } from './embed'
 import { FieldBackedElement, NormalizedFieldBackedElement } from './FieldBackedElement'
 
-export interface BlockEditorProps extends HasManyProps, Omit<BlockEditorInnerPublicProps, 'embedHandlers'> {
+export interface BlockEditorProps extends HasManyProps, BlockEditorInnerPublicProps {
 	leadingFieldBackedElements?: FieldBackedElement[]
 	//trailingFieldBackedElements?: FieldBackedElement[]
 
@@ -110,11 +110,11 @@ export const BlockEditor = Component<BlockEditorProps>(
 				)
 			}
 			if (props.embedBlockDiscriminateBy !== undefined || props.embedBlockDiscriminateByScalar !== undefined) {
-				if (props.embedBlockDiscriminationField === undefined) {
+				if (props.embedContentDiscriminationField === undefined) {
 					throw new BindingError(
 						`BlockEditor: You enabled embed blocks by supplying the 'embedBlockDiscriminateBy(Scalar)' prop but then ` +
-							`failed to also supply the 'embedBlockDiscriminationField'. Without it, the editor would not be able to ` +
-							`distinguish between the kinds of embedded content.`,
+							`failed to also supply the 'embedContentDiscriminationField'. Without it, the editor would not be ` +
+							`able to distinguish between the kinds of embedded content.`,
 					)
 				}
 				if (embedHandlers.length === 0) {
@@ -137,9 +137,9 @@ export const BlockEditor = Component<BlockEditorProps>(
 				<BlockRepeater {...props}>
 					<SugaredField field={props.textBlockField} />
 					{props.children}
-					{props.embedBlockDiscriminationField && (
+					{props.embedContentDiscriminationField && (
 						<>
-							<SugaredField field={props.embedBlockDiscriminationField} />
+							<SugaredField field={props.embedContentDiscriminationField} />
 							{embedHandlers.map((handler, i) => (
 								<React.Fragment key={i}>{handler.getStaticFields(environment)}</React.Fragment>
 							))}

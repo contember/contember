@@ -27,7 +27,7 @@ export interface UseBlockEditorSlateNodesOptions {
 	contemberBlockElementCache: Map<string, SlateElement>
 	textBlockField: RelativeSingleField
 	textBlockDiscriminant: FieldValue
-	embeddedContentDiscriminationField: RelativeSingleField | undefined
+	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedBlockDiscriminant: FieldValue | undefined
 	embedHandlers: NormalizedEmbedHandlers
 	entities: EntityAccessor[]
@@ -45,7 +45,7 @@ export const useBlockEditorSlateNodes = ({
 	contemberBlockElementCache,
 	textBlockField,
 	textBlockDiscriminant,
-	embeddedContentDiscriminationField,
+	embedContentDiscriminationField,
 	embedBlockDiscriminant,
 	embedHandlers,
 	entities,
@@ -120,8 +120,8 @@ export const useBlockEditorSlateNodes = ({
 				if (embedBlockDiscriminant !== undefined && blockType.hasValue(embedBlockDiscriminant)) {
 					// This is an embed block.
 
-					const embeddedContentType = entity.getRelativeSingleField(embeddedContentDiscriminationField!)
-					const embedHandler = getDiscriminatedDatum(embedHandlers, embeddedContentType)
+					const embedContentType = entity.getRelativeSingleField(embedContentDiscriminationField!)
+					const embedHandler = getDiscriminatedDatum(embedHandlers, embedContentType)
 
 					if (embedHandler === undefined) {
 						throw new BindingError() // TODO message

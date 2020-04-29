@@ -11,8 +11,8 @@ export interface ContemberEmbedElementRendererProps extends RenderElementProps {
 	element: ContemberEmbedElement
 	entity: EntityAccessor
 	removalType: RemovalType
-	discriminationField: RelativeSingleField
-	normalizedBlocks: NormalizedBlocks
+	embedContentDiscriminationField: RelativeSingleField
+	embedSubBlocks: NormalizedBlocks
 }
 
 export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedElementRendererProps) => {
@@ -20,8 +20,8 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 	const selected = useSelected()
 
 	// TODO remove button, dragHandle, etc.
-	const discriminationField = props.entity.getRelativeSingleField(props.discriminationField)
-	const discriminatedBlock = getDiscriminatedBlock(props.normalizedBlocks, discriminationField)
+	const discriminant = props.entity.getRelativeSingleField(props.embedContentDiscriminationField)
+	const discriminatedBlock = getDiscriminatedBlock(props.embedSubBlocks, discriminant)
 	const onContainerClick = React.useCallback(
 		(e: React.MouseEvent<HTMLElement>) => {
 			if (e.target === e.currentTarget) {
@@ -40,12 +40,8 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 		Transforms.select(editor, targetPath)
 	}
 
-	//if (!discriminatedBlock) {
-	//	throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
-	//}
-
-	//const selectedBlock = discriminatedBlock.data
-	//const alternate = selectedBlock.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
+	const selectedBlock = discriminatedBlock?.data
+	const alternate = selectedBlock?.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 	return (
 		<div {...props.attributes}>
@@ -53,17 +49,12 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 			<div contentEditable={false} data-slate-editor={false}>
 				<Entity accessor={props.entity}>
 					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
-					<div style={{ display: 'flex', justifyContent: 'center' }}>
+					<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
 						<ActionableBox
-							//editContents={alternate}
-							editContents={null}
+							editContents={alternate || null}
 							onRemove={selected ? undefined : () => props.entity.remove?.(props.removalType)}
 						>
-							<Box
-								/*heading={selectedBlock.label}*/
-								isActive={selected}
-								onClick={onContainerClick}
-							>
+							<Box heading={selectedBlock?.label} isActive={selected} onClick={onContainerClick}>
 								<div
 									// This is a bit of a hack to avoid rendering any whitespace
 									style={{ display: 'flex' }}

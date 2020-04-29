@@ -26,7 +26,7 @@ export interface OverrideApplyOptions {
 	desugaredEntityList: RelativeEntityList
 	discriminationField: RelativeSingleField
 	embedBlockDiscriminant: FieldValue | undefined
-	embeddedContentDiscriminationField: RelativeSingleField | undefined
+	embedContentDiscriminationField: RelativeSingleField | undefined
 	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
 	environmentRef: React.MutableRefObject<Environment>
 	fieldElementCache: WeakMap<FieldAccessor, SlateElement>
@@ -50,7 +50,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		desugaredEntityList,
 		discriminationField,
 		embedBlockDiscriminant,
-		embeddedContentDiscriminationField,
+		embedContentDiscriminationField,
 		environmentRef,
 		fieldElementCache,
 		normalizedLeadingFieldsRef,
@@ -272,15 +272,15 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							if (embedBlockDiscriminant === undefined) {
 								throw new BindingError() // TODO message
 							}
-							if (embeddedContentDiscriminationField === undefined) {
+							if (embedContentDiscriminationField === undefined) {
 								throw new BindingError() // TODO message
 							}
 							const embedHandler = node.embedHandler
-							const embeddedContentType = embedHandler.discriminateBy
+							const embedContentType = embedHandler.discriminateBy
 							addNewDiscriminatedEntityAt(topLevelIndex, embedBlockDiscriminant, getAccessor => {
 								getAccessor()
-									.getRelativeSingleField(embeddedContentDiscriminationField)
-									.updateValue?.(embeddedContentType)
+									.getRelativeSingleField(embedContentDiscriminationField)
+									.updateValue?.(embedContentType)
 								embedHandler.data.populateEmbedData({
 									embedArtifacts: node.embedArtifacts,
 									source: node.source,

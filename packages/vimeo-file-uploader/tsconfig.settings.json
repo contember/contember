@@ -1,0 +1,7 @@
+{
+	"extends": "../../tsconfig.settings.json",
+	"compilerOptions": {
+		"target": "ES2018",
+		"module": "esnext"
+	}
+}

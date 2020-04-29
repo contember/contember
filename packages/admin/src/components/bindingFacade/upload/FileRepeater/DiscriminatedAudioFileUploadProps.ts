@@ -1,6 +1,6 @@
 import { Scalar } from '@contember/binding'
 import * as React from 'react'
-import { SugaredDiscriminateBy } from '../../blocks'
+import { SugaredDiscriminateBy } from '../../discrimination'
 
 export type DiscriminatedAudioFileUploadProps = {
 	acceptAudio?: string | string[]

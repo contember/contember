@@ -2,8 +2,8 @@ import {
 	Component,
 	Entity,
 	EntityListAccessor,
-	Field,
-	SugaredRelativeSingleField,
+	SugaredField,
+	SugaredFieldProps,
 	useMutationState,
 	useSortedEntities,
 } from '@contember/binding'
@@ -11,6 +11,7 @@ import * as React from 'react'
 import { Axis, SortEndHandler } from 'react-sortable-hoc'
 import { RepeaterContainer, RepeaterContainerProps, RepeaterContainerPublicProps } from './RepeaterContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
+import { shouldCancelStart } from './shouldCancelStart'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'
 import { SortableRepeaterItem } from './SortableRepeaterItem'
 import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
@@ -24,7 +25,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	initialRowCount?: number
 	children: React.ReactNode
 
-	sortableBy?: SugaredRelativeSingleField['field']
+	sortableBy?: SugaredFieldProps['field']
 
 	enableRemoving?: boolean
 	enableRemovingLast?: boolean
@@ -93,6 +94,7 @@ export const RepeaterInner = Component(
 		}
 
 		const axis = props.unstable__sortAxis || 'y'
+		const useDragHandle = props.useDragHandle ?? true
 
 		return (
 			<SortableRepeaterContainer
@@ -101,8 +103,9 @@ export const RepeaterInner = Component(
 				helperClass="is-active"
 				lockToContainerEdges={true}
 				useWindowAsScrollContainer={true}
-				useDragHandle={props.useDragHandle ?? true}
+				useDragHandle={useDragHandle}
 				onSortEnd={onSortEnd}
+				shouldCancelStart={shouldCancelStart}
 			>
 				<Container
 					{...props.containerComponentExtraProps!}
@@ -118,7 +121,7 @@ export const RepeaterInner = Component(
 									{...props.itemComponentExtraProps!}
 									removalType={props.removalType}
 									canBeRemoved={itemRemovingEnabled}
-									dragHandleComponent={props.useDragHandle ? sortableHandle : undefined}
+									dragHandleComponent={useDragHandle ? sortableHandle : undefined}
 								>
 									{props.children}
 								</Item>
@@ -133,7 +136,7 @@ export const RepeaterInner = Component(
 		props, // TODO emptyMessage, etc.
 	) => (
 		<>
-			{props.sortableBy && <Field field={props.sortableBy} isNonbearing={true} />}
+			{props.sortableBy && <SugaredField field={props.sortableBy} isNonbearing={true} />}
 			{props.children}
 		</>
 	),

@@ -1,12 +1,22 @@
 import { Node } from 'slate'
 import { BaseEditor, WithAnotherNodeType } from '../../baseEditor'
-import { ContemberBlockElement, ContemberContentPlaceholderElement, ContemberFieldElement } from '../elements'
+import {
+	ContemberBlockElement,
+	ContemberContentPlaceholderElement,
+	ContemberEmbedElement,
+	ContemberFieldElement,
+} from '../elements'
 
-export type BlockEditorElements = ContemberBlockElement | ContemberFieldElement | ContemberContentPlaceholderElement
+export type BlockEditorElements =
+	| ContemberBlockElement
+	| ContemberFieldElement
+	| ContemberEmbedElement
+	| ContemberContentPlaceholderElement
 
 export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, BlockEditorElements>> {
 	isContemberBlockElement: (node: Node) => node is ContemberBlockElement
 	isContemberContentPlaceholderElement: (node: Node) => node is ContemberContentPlaceholderElement
+	isContemberEmbedElement: (node: Node) => node is ContemberEmbedElement
 	isContemberFieldElement: (node: Node) => node is ContemberFieldElement
 }
 

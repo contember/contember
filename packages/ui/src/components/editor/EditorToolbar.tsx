@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
-import { Dropdown2 } from '../Dropdown'
+import { Dropdown, DropdownProps } from '../Dropdown'
 import { EditorToolbarButton, ToolbarButton, ToolbarButtonLayout } from './EditorToolbarButton'
 
 export enum EditorToolbarLayout {
@@ -39,32 +39,34 @@ export interface EditorToolbarProps {
 
 function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 	const className = useComponentClassName('editorToolbar-button')
+	const renderToggle = React.useCallback<Exclude<DropdownProps['renderToggle'], undefined>>(
+		({ ref, onClick }) => {
+			return (
+				<EditorToolbarButton
+					layout={props.layout}
+					label={props.label}
+					showLabel={props.showLabel}
+					contemberIcon={props.contemberIcon}
+					blueprintIcon={props.blueprintIcon}
+					customIcon={props.customIcon}
+					onClick={onClick}
+					ref={ref}
+				/>
+			)
+		},
+		[props.blueprintIcon, props.contemberIcon, props.customIcon, props.label, props.layout, props.showLabel],
+	)
 	if (props.groups) {
 		return (
-			<Dropdown2
-				ButtonComponent={EditorToolbarButton}
-				buttonProps={
-					{
-						layout: props.layout,
-						label: props.label,
-						showLabel: props.showLabel,
-						contemberIcon: props.contemberIcon,
-						blueprintIcon: props.blueprintIcon,
-						customIcon: props.customIcon,
-					} as any
-				}
-				alignment="center"
-			>
-				{props.groups && (
-					<EditorToolbar
-						isActive
-						groups={props.groups}
-						scope={props.popup.scope}
-						layout={props.popup.layout}
-						showLabels={props.popup.showLabels}
-					/>
-				)}
-			</Dropdown2>
+			<Dropdown renderToggle={renderToggle} alignment="center" styledContent={false}>
+				<EditorToolbar
+					isActive
+					groups={props.groups}
+					scope={props.popup.scope}
+					layout={props.popup.layout}
+					showLabels={props.popup.showLabels}
+				/>
+			</Dropdown>
 		)
 	}
 	const { onClick, ...rest } = props

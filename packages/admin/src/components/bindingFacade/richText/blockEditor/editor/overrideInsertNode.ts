@@ -5,7 +5,8 @@ export const overrideInsertNode = <E extends BlockSlateEditor>(editor: E) => {
 	const { insertNode } = editor
 
 	editor.insertNode = node => {
-		if (!editor.isContemberBlockElement(node)) {
+		// TODO maybe introduce some sort of a systemic handling for top-level-only elements like this.
+		if (!editor.isContemberBlockElement(node) && !editor.isContemberEmbedElement(node)) {
 			return insertNode(node)
 		}
 

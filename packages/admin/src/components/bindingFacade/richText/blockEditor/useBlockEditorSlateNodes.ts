@@ -2,17 +2,20 @@ import { BindingError, EntityAccessor, FieldAccessor, FieldValue, RelativeSingle
 import * as React from 'react'
 import { Element as SlateElement } from 'slate'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
-import { SerializableEditorNode } from '../baseEditor'
+import { getDiscriminatedDatum } from '../../discrimination'
 import { BlockSlateEditor } from './editor'
 import {
 	ContemberBlockElement,
 	contemberBlockElementType,
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
+	ContemberEmbedElement,
+	contemberEmbedElementType,
 	ContemberFieldElement,
 	ContemberFieldElementPosition,
 	contemberFieldElementType,
 } from './elements'
+import { NormalizedEmbedHandlers } from './embed'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 
 export interface UseBlockEditorSlateNodesOptions {
@@ -24,6 +27,9 @@ export interface UseBlockEditorSlateNodesOptions {
 	contemberBlockElementCache: Map<string, SlateElement>
 	textBlockField: RelativeSingleField
 	textBlockDiscriminant: FieldValue
+	embedContentDiscriminationField: RelativeSingleField | undefined
+	embedBlockDiscriminant: FieldValue | undefined
+	embedHandlers: NormalizedEmbedHandlers
 	entities: EntityAccessor[]
 	leadingFieldBackedElements: NormalizedFieldBackedElement[]
 	//trailingFieldBackedElements: NormalizedFieldBackedElement[]
@@ -39,6 +45,9 @@ export const useBlockEditorSlateNodes = ({
 	contemberBlockElementCache,
 	textBlockField,
 	textBlockDiscriminant,
+	embedContentDiscriminationField,
+	embedBlockDiscriminant,
+	embedHandlers,
 	entities,
 	leadingFieldBackedElements,
 	//trailingFieldBackedElements,
@@ -107,26 +116,50 @@ export const useBlockEditorSlateNodes = ({
 					}
 					textElementCache.set(entity, element)
 					return element
-				} else {
-					const selectedBlock = getDiscriminatedBlock(blocks, blockType)
-
-					if (selectedBlock === undefined) {
-						throw new BindingError(`BlockEditor: Encountered an entity without a corresponding block definition.`)
-					}
-					const contemberBlock: ContemberBlockElement = {
-						type: contemberBlockElementType,
-						children: [{ text: '' }],
-						entityKey,
-						blockType: selectedBlock.discriminateBy,
-					}
-					/*
-						TODO This is a memory leak as we don't ever remove the blocks from the map. They're tiny objects though and
-						we're not expecting the user to create thousands and thousands of them so it's not that big of a deal but it's
-						still far from ideal. How do we fix this though? 🤔
-					 */
-					contemberBlockElementCache.set(entityKey, contemberBlock)
-					return contemberBlock
 				}
+				if (embedBlockDiscriminant !== undefined && blockType.hasValue(embedBlockDiscriminant)) {
+					// This is an embed block.
+
+					const embedContentType = entity.getRelativeSingleField(embedContentDiscriminationField!)
+					const embedHandler = getDiscriminatedDatum(embedHandlers, embedContentType)
+
+					if (embedHandler === undefined) {
+						throw new BindingError() // TODO message
+					}
+
+					const embedBlock: ContemberEmbedElement = {
+						type: contemberEmbedElementType,
+						children: [{ text: '' }],
+						embedArtifacts: undefined,
+						source: undefined,
+						embedHandler,
+						entityKey,
+					}
+					// TODO same as below: this is a memory leak.
+					contemberBlockElementCache.set(entityKey, embedBlock)
+					return embedBlock
+				}
+
+				// If we make it to here, this is a regular contember block.
+
+				const selectedBlock = getDiscriminatedBlock(blocks, blockType)
+
+				if (selectedBlock === undefined) {
+					throw new BindingError(`BlockEditor: Encountered an entity without a corresponding block definition.`)
+				}
+				const contemberBlock: ContemberBlockElement = {
+					type: contemberBlockElementType,
+					children: [{ text: '' }],
+					entityKey,
+					blockType: selectedBlock.discriminateBy,
+				}
+				/*
+				TODO This is a memory leak as we don't ever remove the blocks from the map. They're tiny objects though and
+					we're not expecting the user to create thousands and thousands of them so it's not that big of a deal but it's
+					still far from ideal. How do we fix this though? 🤔
+				*/
+				contemberBlockElementCache.set(entityKey, contemberBlock)
+				return contemberBlock
 		  })
 		: [
 				{

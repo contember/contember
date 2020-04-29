@@ -22,7 +22,7 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 
 	// TODO remove button, dragHandle, etc.
 	const discriminationField = props.entity.getRelativeSingleField(props.discriminationField)
-	const selectedBlock = getDiscriminatedBlock(props.normalizedBlocks, discriminationField)
+	const discriminatedBlock = getDiscriminatedBlock(props.normalizedBlocks, discriminationField)
 	const onContainerClick = React.useCallback(
 		(e: React.MouseEvent<HTMLElement>) => {
 			if (e.target === e.currentTarget) {
@@ -41,10 +41,11 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 		Transforms.select(editor, targetPath)
 	}
 
-	if (!selectedBlock) {
+	if (!discriminatedBlock) {
 		throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
 	}
 
+	const selectedBlock = discriminatedBlock.data
 	const alternate = selectedBlock.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 	return (

@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { useOptionalDesugaredRelativeSingleField } from '../accessorRetrievers'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
-import { RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
+import { SugaredFieldProps } from '../helperComponents'
+import { RelativeSingleField } from '../treeParameters'
 import { addNewEntityAtIndex } from './addNewEntityAtIndex'
 import { throwNonWritableError, throwNoopError } from './errors'
 import { moveEntity } from './moveEntity'
@@ -38,7 +39,7 @@ const addNewAtIndexImplementation = (
 
 export const useSortedEntities = (
 	entityList: EntityListAccessor,
-	sortableByField: SugaredRelativeSingleField['field'] | undefined,
+	sortableByField: SugaredFieldProps['field'] | undefined,
 ): SortedEntities => {
 	const desugaredSortableByField = useOptionalDesugaredRelativeSingleField(sortableByField)
 	const sortedEntities = React.useMemo(() => {

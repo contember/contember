@@ -1,5 +1,5 @@
 import { Scalar } from '@contember/binding'
-import { SugaredDiscriminateBy } from '../../blocks'
+import { SugaredDiscriminateBy } from '../../discrimination'
 import { SingleFileUploadProps } from '../core'
 
 export type DiscriminatedFileUploadProps = SingleFileUploadProps & {

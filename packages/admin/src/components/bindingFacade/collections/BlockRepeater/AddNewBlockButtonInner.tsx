@@ -1,7 +1,7 @@
-import { EntityAccessor, Scalar, SugaredRelativeSingleField, useDesugaredRelativeSingleField } from '@contember/binding'
+import { EntityAccessor, SugaredRelativeSingleField, useDesugaredRelativeSingleField } from '@contember/binding'
 import { Button, ButtonGroup, DropdownRenderProps } from '@contember/ui'
 import * as React from 'react'
-import { NormalizedBlockCommonProps, NormalizedBlocks } from '../../blocks'
+import { NormalizedBlocks } from '../../blocks'
 import { AddNewEntityButtonProps } from '../helpers'
 
 export interface AddNewBlockButtonInnerProps extends DropdownRenderProps, AddNewEntityButtonProps {
@@ -14,7 +14,7 @@ export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(pr
 	const desugaredDiscriminationField = useDesugaredRelativeSingleField(props.discriminationField)
 	return (
 		<ButtonGroup orientation="vertical">
-			{Array.from(props.normalizedBlocks.blocks as Map<Scalar, NormalizedBlockCommonProps>).map(([, blockProps], i) => (
+			{Array.from(props.normalizedBlocks.data.values()).map(({ discriminateBy, data: blockProps }, i) => (
 				<Button
 					key={i}
 					distinction="seamless"
@@ -22,7 +22,7 @@ export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(pr
 					disabled={props.isMutating}
 					onClick={() => {
 						props.requestClose()
-						const targetValue = blockProps.discriminateBy
+						const targetValue = discriminateBy
 
 						props.addNew?.((getAccessor, newKey) => {
 							const accessor = getAccessor()

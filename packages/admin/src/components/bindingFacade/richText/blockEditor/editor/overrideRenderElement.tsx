@@ -11,6 +11,8 @@ export interface OverrideRenderElementOptions {
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	removalType: RemovalType
+	embedContentDiscriminationField: RelativeSingleField | undefined
+	embedSubBlocks: NormalizedBlocks
 }
 
 export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, options: OverrideRenderElementOptions) => {
@@ -25,6 +27,8 @@ export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, opt
 			attributes={props.attributes}
 			children={props.children}
 			discriminationField={options.discriminationField}
+			embedContentDiscriminationField={options.embedContentDiscriminationField}
+			embedSubBlocks={options.embedSubBlocks}
 		/>
 	)
 }

@@ -11,7 +11,7 @@ interface S3UploadState {
 class S3FileUploader implements FileUploader {
 	private readonly uploadState: WeakMap<File, S3UploadState>
 
-	public constructor(public readonly options: S3FileUploader.S3UploadHandlerOptions = {}) {
+	public constructor(public readonly options: S3FileUploader.Options = {}) {
 		this.uploadState = new WeakMap()
 	}
 
@@ -29,7 +29,7 @@ class S3FileUploader implements FileUploader {
 		{ client, contentApiToken, onSuccess, onError, onProgress }: FileUploaderInitializeOptions,
 	) {
 		if (!client) {
-			return onError?.(Array.from(files).map(([file]) => [file, undefined]))
+			return onError?.(files.keys())
 		}
 
 		const parameters: GenerateUploadUrlMutationBuilder.MutationParameters = {}
@@ -84,8 +84,8 @@ class S3FileUploader implements FileUploader {
 					onSuccess([[file, successMetadata]])
 				})
 				onError &&
-					xhr.addEventListener('error', () => {
-						onError([[file, undefined]])
+					xhr.addEventListener('error', e => {
+						onError([file])
 					})
 				onProgress &&
 					xhr.upload?.addEventListener('progress', e => {
@@ -111,7 +111,7 @@ namespace S3FileUploader {
 		fileUrl: string
 	}
 
-	export interface S3UploadHandlerOptions {
+	export interface Options {
 		getUploadOptions?: (file: File) => S3UploadOptions
 	}
 

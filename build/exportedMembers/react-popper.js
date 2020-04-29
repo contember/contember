@@ -1,1 +1,1 @@
-export const reactPopperExportedMembers = ['Manager', 'Popper', 'Reference']
+export const reactPopperExportedMembers = ['usePopper']

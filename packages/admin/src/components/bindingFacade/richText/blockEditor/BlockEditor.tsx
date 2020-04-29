@@ -12,16 +12,19 @@ import {
 	useEntityContext,
 	useEnvironment,
 } from '@contember/binding'
-import * as React from 'react'
 import { emptyArray, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
-import { Block } from '../../blocks'
+import * as React from 'react'
 import { BlockRepeater } from '../../collections'
+import { useDiscriminatedData } from '../../discrimination'
 import { BlockEditorInner, BlockEditorInnerPublicProps } from './BlockEditorInner'
+import { EmbedHandler } from './embed'
 import { FieldBackedElement, NormalizedFieldBackedElement } from './FieldBackedElement'
 
 export interface BlockEditorProps extends HasManyProps, BlockEditorInnerPublicProps {
 	leadingFieldBackedElements?: FieldBackedElement[]
 	//trailingFieldBackedElements?: FieldBackedElement[]
+
+	embedHandlers?: Iterable<EmbedHandler>
 }
 
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
@@ -69,6 +72,8 @@ export const BlockEditor = Component<BlockEditorProps>(
 		//	props.trailingFieldBackedElements,
 		//)
 
+		const embedHandlers = useDiscriminatedData<EmbedHandler, EmbedHandler>(props.embedHandlers || emptyArray)
+
 		return (
 			<BlockEditorInner
 				{...props}
@@ -78,17 +83,49 @@ export const BlockEditor = Component<BlockEditorProps>(
 				entityListAccessor={entityListAccessor}
 				leadingFieldBackedElements={normalizedLeading}
 				//trailingFieldBackedElements={normalizedTrailing}
+				embedHandlers={embedHandlers}
 			/>
 		)
 	},
-	props => {
-		if (props.textBlockDiscriminatedBy !== undefined && props.textBlockDiscriminatedByScalar !== undefined) {
-			throw new BindingError(
-				`BlockEditor: the text block cannot be simultaneously discriminated by a literal and a scalar.\n` +
-					`Both the 'textBlockDiscriminatedBy' and the 'textBlockDiscriminatedByScalar' supplied.`,
-			)
+	(props, environment) => {
+		const embedHandlers = Array.from(props.embedHandlers || [])
+		if (__DEV_MODE__) {
+			if (props.textBlockDiscriminateBy !== undefined && props.textBlockDiscriminateByScalar !== undefined) {
+				throw new BindingError(
+					`BlockEditor: You cannot simultaneously use the 'textBlockDiscriminateBy' and the ` +
+						`'textBlockDiscriminateByScalar' prop at the same time. Choose exactly one.`,
+				)
+			}
+			if (props.textBlockDiscriminateBy === undefined && props.textBlockDiscriminateByScalar === undefined) {
+				throw new BindingError(
+					`BlockEditor: undiscriminated text blocks. You must supply either the 'textBlockDiscriminateBy' or the ` +
+						`'textBlockDiscriminateByScalar' props. The editor needs to be able to tell which blocks are to be ` +
+						`treated as text.`,
+				)
+			}
+			if (props.embedBlockDiscriminateBy !== undefined && props.embedBlockDiscriminateByScalar !== undefined) {
+				throw new BindingError(
+					`BlockEditor: You cannot simultaneously use the 'embedBlockDiscriminateBy' and the ` +
+						`'embedBlockDiscriminateByScalar' prop at the same time. Choose exactly one.`,
+				)
+			}
+			if (props.embedBlockDiscriminateBy !== undefined || props.embedBlockDiscriminateByScalar !== undefined) {
+				if (props.embedContentDiscriminationField === undefined) {
+					throw new BindingError(
+						`BlockEditor: You enabled embed blocks by supplying the 'embedBlockDiscriminateBy(Scalar)' prop but then ` +
+							`failed to also supply the 'embedContentDiscriminationField'. Without it, the editor would not be ` +
+							`able to distinguish between the kinds of embedded content.`,
+					)
+				}
+				if (embedHandlers.length === 0) {
+					throw new BindingError(
+						`BlockEditor: You enabled embed blocks by supplying the 'embedBlockDiscriminateBy(Scalar)' prop but then ` +
+							`failed to also supply any embed handlers. Without them, the editor would not be able to ` +
+							`recognize any embedded content.`,
+					)
+				}
+			}
 		}
-		const field = <SugaredField field={props.textBlockField} />
 		return (
 			<>
 				{props.leadingFieldBackedElements?.map((item, i) => (
@@ -98,10 +135,15 @@ export const BlockEditor = Component<BlockEditorProps>(
 					<SugaredField field={item.field} key={`trailing_${i}`} />
 				))*/}
 				<BlockRepeater {...props}>
+					<SugaredField field={props.textBlockField} />
 					{props.children}
-					{props.textBlockDiscriminatedBy && <Block discriminateBy={props.textBlockDiscriminatedBy}>{field}</Block>}
-					{props.textBlockDiscriminatedByScalar && (
-						<Block discriminateByScalar={props.textBlockDiscriminatedByScalar}>{field}</Block>
+					{props.embedContentDiscriminationField && (
+						<>
+							<SugaredField field={props.embedContentDiscriminationField} />
+							{embedHandlers.map((handler, i) => (
+								<React.Fragment key={i}>{handler.getStaticFields(environment)}</React.Fragment>
+							))}
+						</>
 					)}
 				</BlockRepeater>
 			</>

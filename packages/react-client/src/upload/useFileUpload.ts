@@ -17,7 +17,7 @@ export interface FileUploadOptions {
 }
 
 export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
-	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 250
+	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 100
 
 	const client = useCurrentContentGraphQlClient()
 	const contentApiToken = useSessionToken()

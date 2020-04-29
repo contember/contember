@@ -89,7 +89,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 			<Repeater
 				{...props}
 				initialRowCount={0}
-				//useDragHandle={false}
+				useDragHandle={false}
 				containerComponent={FileRepeaterContainer}
 				containerComponentExtraProps={containerExtraProps}
 				unstable__sortAxis="xy"

@@ -4,11 +4,13 @@ import {
 	EntityListAccessor,
 	Environment,
 	FieldAccessor,
+	FieldValue,
 	RelativeEntityList,
 	RemovalType,
-	SugaredRelativeSingleField,
+	SugaredFieldProps,
 	useDesugaredRelativeSingleField,
 	useMutationState,
+	useOptionalDesugaredRelativeSingleField,
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
@@ -18,12 +20,14 @@ import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { assertNever } from '../../../../utils'
-import { LiteralBasedBlockProps, ScalarBasedBlockProps, useNormalizedBlocks } from '../../blocks'
+import { getDiscriminatedBlock, NormalizedBlocks, useNormalizedBlocks } from '../../blocks'
+import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../discrimination'
 import { CreateEditorPublicOptions } from '../editorFactory'
 import { RichEditor } from '../RichEditor'
 import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
 import { createBlockEditor } from './editor'
+import { NormalizedEmbedHandlers } from './embed'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 import { BlockEditorGetEntityByKeyContext, BlockEditorGetNormalizedFieldBackedElementContext } from './renderers'
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
@@ -38,12 +42,16 @@ export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 	children: React.ReactNode
 	label: React.ReactNode
 	removalType?: RemovalType
-	sortableBy: SugaredRelativeSingleField['field']
+	sortableBy: SugaredFieldProps['field']
+	discriminationField: SugaredFieldProps['field']
 
-	discriminationField: string | SugaredRelativeSingleField
-	textBlockField: string | SugaredRelativeSingleField
-	textBlockDiscriminatedBy?: LiteralBasedBlockProps['discriminateBy']
-	textBlockDiscriminatedByScalar?: ScalarBasedBlockProps['discriminateByScalar']
+	textBlockField: SugaredFieldProps['field']
+	textBlockDiscriminateBy?: SugaredDiscriminateBy
+	textBlockDiscriminateByScalar?: SugaredDiscriminateByScalar
+
+	embedBlockDiscriminateBy?: SugaredDiscriminateBy
+	embedBlockDiscriminateByScalar?: SugaredDiscriminateByScalar
+	embedContentDiscriminationField?: SugaredFieldProps['field']
 
 	// TODO
 	inlineButtons?: HoveringToolbarsProps['inlineButtons']
@@ -58,9 +66,10 @@ export interface BlockEditorInnerInternalProps {
 	desugaredEntityList: RelativeEntityList
 	entityListAccessor: EntityListAccessor
 	environment: Environment
+	embedHandlers: NormalizedEmbedHandlers
 }
 
-export type BlockEditorInnerProps = BlockEditorInnerPublicProps & BlockEditorInnerInternalProps
+export interface BlockEditorInnerProps extends BlockEditorInnerPublicProps, BlockEditorInnerInternalProps {}
 
 export const BlockEditorInner = React.memo(
 	({
@@ -73,9 +82,15 @@ export const BlockEditorInner = React.memo(
 		sortableBy,
 		label,
 		removalType = 'disconnect',
-		textBlockDiscriminatedBy,
-		textBlockDiscriminatedByScalar,
+		textBlockDiscriminateBy,
+		textBlockDiscriminateByScalar,
 		textBlockField,
+
+		embedBlockDiscriminateBy,
+		embedBlockDiscriminateByScalar,
+		embedContentDiscriminationField,
+		embedHandlers,
+
 		inlineButtons = defaultInlineButtons,
 		blockButtons,
 		otherBlockButtons,
@@ -93,28 +108,45 @@ export const BlockEditorInner = React.memo(
 		const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
 		const desugaredTextBlockField = useDesugaredRelativeSingleField(textBlockField)
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
+		const desugaredEmbedContentDiscriminationField = useOptionalDesugaredRelativeSingleField(
+			embedContentDiscriminationField,
+		)
 
 		const { entities, moveEntity, appendNew } = useSortedEntities(entityListAccessor, sortableBy)
 
-		const textBlockDiscriminant = React.useMemo(() => {
-			if (textBlockDiscriminatedBy !== undefined) {
-				return VariableInputTransformer.transformVariableLiteral(textBlockDiscriminatedBy, environment)
+		const textBlockDiscriminant = React.useMemo<FieldValue>(() => {
+			if (textBlockDiscriminateBy !== undefined) {
+				return VariableInputTransformer.transformVariableLiteral(textBlockDiscriminateBy, environment)
 			}
-			if (textBlockDiscriminatedByScalar !== undefined) {
-				return VariableInputTransformer.transformVariableScalar(textBlockDiscriminatedByScalar, environment)
+			if (textBlockDiscriminateByScalar !== undefined) {
+				return VariableInputTransformer.transformVariableScalar(textBlockDiscriminateByScalar, environment)
 			}
-			throw new BindingError(
-				`BlockEditor: undiscriminated text blocks. You must supply either the 'textBlockDiscriminatedBy' or the ` +
-					`'textBlockDiscriminatedByScalar' props.`,
-			)
-		}, [environment, textBlockDiscriminatedBy, textBlockDiscriminatedByScalar])
+			return null
+		}, [environment, textBlockDiscriminateBy, textBlockDiscriminateByScalar])
+		const embedBlockDiscriminant = React.useMemo<FieldValue | undefined>(() => {
+			if (embedBlockDiscriminateBy !== undefined) {
+				return VariableInputTransformer.transformVariableLiteral(embedBlockDiscriminateBy, environment)
+			}
+			if (embedBlockDiscriminateByScalar !== undefined) {
+				return VariableInputTransformer.transformVariableScalar(embedBlockDiscriminateByScalar, environment)
+			}
+			return undefined
+		}, [embedBlockDiscriminateBy, embedBlockDiscriminateByScalar, environment])
+
 		const normalizedBlocks = useNormalizedBlocks(children)
+		const embedSubBlocks = useNormalizedBlocks(
+			embedBlockDiscriminant !== undefined
+				? getDiscriminatedBlock(normalizedBlocks, embedBlockDiscriminant)?.data.children
+				: undefined, // TODO this may crash
+		)
+
 		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor, Element>())
 		const [textElementCache] = React.useState(() => new WeakMap<EntityAccessor, Element>())
 		const [contemberBlockElementCache] = React.useState(() => new Map<string, Element>())
 
 		const batchUpdatesRef = React.useRef(batchUpdates)
 		const entityListAccessorRef = React.useRef(entityListAccessor)
+		const environmentRef = React.useRef(environment)
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedEntitiesRef = React.useRef(entities)
 		const normalizedBlocksRef = React.useRef(normalizedBlocks)
@@ -124,6 +156,7 @@ export const BlockEditorInner = React.memo(
 		React.useLayoutEffect(() => {
 			batchUpdatesRef.current = batchUpdates
 			entityListAccessorRef.current = entityListAccessor
+			environmentRef.current = environment
 			isMutatingRef.current = isMutating
 			sortedEntitiesRef.current = entities
 			normalizedLeadingFieldsRef.current = leadingFieldBackedElements
@@ -138,7 +171,12 @@ export const BlockEditorInner = React.memo(
 				augmentEditor,
 				augmentEditorBuiltins,
 				desugaredEntityList,
+				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
+				embedSubBlocks,
+				embedBlockDiscriminant,
 				entityListAccessorRef,
+				embedHandlers,
+				environmentRef,
 				fieldElementCache: contemberFieldElementCache,
 				batchUpdatesRef,
 				isMutatingRef,
@@ -164,6 +202,9 @@ export const BlockEditorInner = React.memo(
 			contemberFieldElementCache,
 			contemberBlockElementCache,
 			textBlockField: desugaredTextBlockField,
+			embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
+			embedBlockDiscriminant,
+			embedHandlers,
 			blocks: normalizedBlocks,
 			textBlockDiscriminant,
 			entities,

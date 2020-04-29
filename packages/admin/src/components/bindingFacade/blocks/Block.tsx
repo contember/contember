@@ -6,7 +6,7 @@ export interface BlockCommonProps {
 	label?: React.ReactNode
 	description?: React.ReactNode
 	alternate?: React.ReactNode
-	children: React.ReactNode
+	children?: React.ReactNode
 }
 
 export interface LiteralBasedBlockProps extends BlockCommonProps {

@@ -1,14 +1,14 @@
 import { Client, SelectBuilder } from '@contember/database'
-import { assertNever } from '../utils'
+import { assertNever } from '../../utils'
 import { Acl, Model, Schema } from '@contember/schema'
-import PermissionsByIdentityFactory from './PermissionsByIdentityFactory'
-import PredicateFactory from './PredicateFactory'
-import VariableInjector from './VariableInjector'
-import WhereBuilder from '../sql/select/WhereBuilder'
-import JoinBuilder from '../sql/select/JoinBuilder'
-import Path from '../sql/select/Path'
+import PermissionsByIdentityFactory from '../../acl/PermissionsByIdentityFactory'
+import PredicateFactory from '../../acl/PredicateFactory'
+import VariableInjector from '../../acl/VariableInjector'
+import WhereBuilder from '../../sql/select/WhereBuilder'
+import JoinBuilder from '../../sql/select/JoinBuilder'
+import Path from '../../sql/select/Path'
 import { getColumnName } from '@contember/schema-utils'
-import ConditionBuilder from '../sql/select/ConditionBuilder'
+import ConditionBuilder from '../../sql/select/ConditionBuilder'
 
 interface PermissionContext {
 	projectRoles: string[]

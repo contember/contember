@@ -49,10 +49,12 @@ export default class QueryProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },
 			resolve: (parent, args, context, info) => {
-				if (parent && info.path) {
-					return parent[info.path.key]
-				}
-				return context.executionContainer.get('readResolver').resolveGetQuery(entity, info)
+				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+					if (parent && info.path) {
+						return parent[info.path.key]
+					}
+					return context.executionContainer.get('readResolver').resolveGetQuery(entity, info)
+				})
 			},
 		}
 	}
@@ -76,10 +78,12 @@ export default class QueryProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },
 			resolve: (parent, args, context, info) => {
-				if (parent && info.path) {
-					return parent[info.path.key]
-				}
-				return context.executionContainer.get('readResolver').resolveListQuery(entity, info)
+				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+					if (parent && info.path) {
+						return parent[info.path.key]
+					}
+					return context.executionContainer.get('readResolver').resolveListQuery(entity, info)
+				})
 			},
 		}
 	}
@@ -124,10 +128,12 @@ export default class QueryProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.paginate, entity) },
 			resolve: (parent, args, context, info) => {
-				if (parent && info.path) {
-					return parent[info.path.key]
-				}
-				return context.executionContainer.get('readResolver').resolvePaginationQuery(entity, info)
+				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+					if (parent && info.path) {
+						return parent[info.path.key]
+					}
+					return context.executionContainer.get('readResolver').resolvePaginationQuery(entity, info)
+				})
 			},
 		}
 	}

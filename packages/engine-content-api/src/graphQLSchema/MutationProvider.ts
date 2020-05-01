@@ -49,10 +49,12 @@ export default class MutationProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.create, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				if (parent && info.path) {
-					return parent[info.path.key]
-				}
-				return context.executionContainer.get('mutationResolver').resolveCreate(entity, info)
+				return context.timer(`GraphQL.mutation.${info.fieldName}`, () => {
+					if (parent && info.path) {
+						return parent[info.path.key]
+					}
+					return context.executionContainer.get('mutationResolver').resolveCreate(entity, info)
+				})
 			},
 		}
 	}
@@ -71,10 +73,12 @@ export default class MutationProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.delete, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				if (parent && info.path) {
-					return parent[info.path.key]
-				}
-				return context.executionContainer.get('mutationResolver').resolveDelete(entity, info)
+				return context.timer(`GraphQL.mutation.${info.fieldName}`, () => {
+					if (parent && info.path) {
+						return parent[info.path.key]
+					}
+					return context.executionContainer.get('mutationResolver').resolveDelete(entity, info)
+				})
 			},
 		}
 	}
@@ -96,10 +100,12 @@ export default class MutationProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.update, entity) },
 			resolve: (parent, args, context: Context, info) => {
-				if (parent && info.path) {
-					return parent[info.path.key]
-				}
-				return context.executionContainer.get('mutationResolver').resolveUpdate(entity, info)
+				return context.timer(`GraphQL.${info.fieldName}`, () => {
+					if (parent && info.path) {
+						return parent[info.path.key]
+					}
+					return context.executionContainer.get('mutationResolver').resolveUpdate(entity, info)
+				})
 			},
 		}
 	}

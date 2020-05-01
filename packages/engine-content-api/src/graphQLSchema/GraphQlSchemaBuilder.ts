@@ -41,7 +41,9 @@ export default class GraphQlSchemaBuilder {
 					}),
 				),
 				resolve: async (parent, args, context: Context, info) => {
-					return await context.executionContainer.mutationResolver.resolveTransaction(info)
+					return context.timer(`GraphQL.mutation.${info.fieldName}`, () =>
+						context.executionContainer.mutationResolver.resolveTransaction(info),
+					)
 				},
 			}
 		}
@@ -60,7 +62,9 @@ export default class GraphQlSchemaBuilder {
 					fields: { ...queries },
 				}),
 				resolve: async (parent, args, context: Context, info) => {
-					return await context.executionContainer.readResolver.resolveTransaction(info)
+					return context.timer(`GraphQL.query.${info.fieldName}`, () =>
+						context.executionContainer.readResolver.resolveTransaction(info),
+					)
 				},
 			}
 		}

@@ -1,12 +1,17 @@
 import { ApiKeyManager } from '@contember/engine-tenant-api'
 import { KoaContext, KoaMiddleware } from '../core/koa'
 import { ErrorResponseMiddlewareState } from './ErrorResponseMiddlewareFactory'
+import { TimerMiddlewareFactory } from './TimerMiddlewareFactory'
 
 class AuthMiddlewareFactory {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
-	create(): KoaMiddleware<ErrorResponseMiddlewareState & AuthMiddlewareFactory.KoaState> {
-		const auth: KoaMiddleware<ErrorResponseMiddlewareState & AuthMiddlewareFactory.KoaState> = async (ctx, next) => {
+	create(): KoaMiddleware<
+		ErrorResponseMiddlewareState & AuthMiddlewareFactory.KoaState & TimerMiddlewareFactory.KoaState
+	> {
+		const auth: KoaMiddleware<ErrorResponseMiddlewareState &
+			AuthMiddlewareFactory.KoaState &
+			TimerMiddlewareFactory.KoaState> = async (ctx, next) => {
 			const authHeader = ctx.request.get('Authorization')
 			if (typeof authHeader !== 'string' || authHeader === '') {
 				return ctx.state.fail.authorizationFailure(`Authorization header is missing`)
@@ -19,7 +24,7 @@ class AuthMiddlewareFactory {
 				return ctx.state.fail.authorizationFailure(`invalid Authorization header format`)
 			}
 			const [, token] = match
-			const authResult = await this.apiKeyManager.verifyAndProlong(token)
+			const authResult = await ctx.state.timer('Auth', () => this.apiKeyManager.verifyAndProlong(token))
 			if (!authResult.valid) {
 				return ctx.state.fail.authorizationFailure(authResult.error)
 			}

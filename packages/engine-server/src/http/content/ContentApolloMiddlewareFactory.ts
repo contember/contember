@@ -42,13 +42,15 @@ class ContentApolloMiddlewareFactory {
 			}
 			const schema = this.schemaCache[stage.slug]
 
-			const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {
-				projectRoles: ctx.state.projectMemberships.map(it => it.role),
+			const server = await ctx.state.timer('GraphQLServerCreate', async () => {
+				const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {
+					projectRoles: ctx.state.projectMemberships.map(it => it.role),
+				})
+
+				return this.apolloServerFactory.create(permissions, schema, dataSchema)
 			})
 
-			const server = this.apolloServerFactory.create(permissions, schema, dataSchema)
-
-			await ctx.state.timer('exec graphql', () => graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next))
+			await ctx.state.timer('GraphQL', () => graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next))
 		}
 	}
 

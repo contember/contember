@@ -2,8 +2,9 @@ import { ApiKeyManager } from '@contember/engine-tenant-api'
 import { KoaMiddleware } from '../koa'
 import { ErrorResponseMiddlewareState } from './ErrorResponseMiddleware'
 import { ApiKeyManagerState } from '../services'
+import { TimerMiddlewareState } from './TimerMiddleware'
 
-type InputState = ErrorResponseMiddlewareState & ApiKeyManagerState
+type InputState = ErrorResponseMiddlewareState & ApiKeyManagerState & TimerMiddlewareState
 
 type KoaState = InputState & AuthMiddlewareState
 
@@ -21,7 +22,7 @@ export const createAuthMiddleware = (): KoaMiddleware<KoaState> => {
 			return ctx.state.fail.authorizationFailure(`invalid Authorization header format`)
 		}
 		const [, token] = match
-		const authResult = await ctx.state.apiKeyManager.verifyAndProlong(token)
+		const authResult = await ctx.state.timer('Auth', () => ctx.state.apiKeyManager.verifyAndProlong(token))
 		if (!authResult.valid) {
 			return ctx.state.fail.authorizationFailure(authResult.error)
 		}

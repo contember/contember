@@ -10,18 +10,15 @@ import { createContentServerMiddleware } from './ContentServerMiddleware'
 export const createContentMiddleware = (): KoaMiddleware<KoaRequestState> => {
 	return route(
 		'/content/:projectSlug/:stageSlug$',
-		compose(
-			[
-				corsMiddleware(),
-				bodyParser(),
-				createAuthMiddleware(),
-				createProjectResolveMiddleware(),
-				createStageResolveMiddleware(),
-				createNotModifiedMiddleware(),
-				createProjectMemberMiddleware(),
-				createContentServerMiddleware(),
-			],
-			true,
-		),
+		compose([
+			corsMiddleware(),
+			bodyParser(),
+			createAuthMiddleware(),
+			createProjectResolveMiddleware(),
+			createStageResolveMiddleware(),
+			createNotModifiedMiddleware(),
+			createProjectMemberMiddleware(),
+			createContentServerMiddleware(),
+		]),
 	)
 }

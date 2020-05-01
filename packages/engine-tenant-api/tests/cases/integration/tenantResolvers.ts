@@ -375,9 +375,10 @@ where "project"."id" in (select "project_id" from "tenant"."project_membership" 
 						response: { rows: [{ id: testUuid(10), name: 'Foo', slug: 'foo' }] },
 					},
 					{
-						sql: SQL`with "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" group by "membership_id")
-select "role", coalesce(variables, '[]'::json) as "variables"
-from "tenant"."project_membership" left join "variables" on "project_membership"."id" = "variables"."membership_id" where "identity_id" = ? and "project_id" = ?`,
+						sql: SQL`with
+     "memberships" as (select "project_membership"."id", "project_membership"."role" from "tenant"."project_membership" where "identity_id" = ? and "project_id" = ?),
+     "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" inner join "memberships" on "project_membership_variable"."membership_id" = "memberships"."id" group by "membership_id")
+	select "role", coalesce(variables, '[]'::json) as "variables" from "memberships" left join "variables" on "memberships"."id" = "variables"."membership_id"`,
 						parameters: [testUuid(2), testUuid(10)],
 						response: { rows: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }] },
 					},
@@ -869,10 +870,10 @@ on conflict ("project_id", "identity_id", "role") do update set "role" = ? retur
 						},
 					},
 					{
-						sql: SQL`with "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" group by "membership_id")
-select "role", coalesce(variables, '[]'::json) as "variables"
-from "tenant"."project_membership" left join "variables" on "project_membership"."id" = "variables"."membership_id"
-where "identity_id" = ? and "project_id" = ?`,
+						sql: SQL`with
+     "memberships" as (select "project_membership"."id", "project_membership"."role" from "tenant"."project_membership" where "identity_id" = ? and "project_id" = ?),
+     "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables" from "tenant"."project_membership_variable" inner join "memberships" on "project_membership_variable"."membership_id" = "memberships"."id" group by "membership_id")
+	select "role", coalesce(variables, '[]'::json) as "variables" from "memberships" left join "variables" on "memberships"."id" = "variables"."membership_id"`,
 						parameters: [testUuid(1), testUuid(6)],
 						response: { rows: [{ role: 'editor', variables: [{ name: 'language', value: ['cs'] }] }] },
 					},

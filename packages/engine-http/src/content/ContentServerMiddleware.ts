@@ -22,13 +22,11 @@ export const createContentServerMiddleware = (): KoaMiddleware<KoaState> => {
 		const dbContextFactory = ctx.state.projectContainer.systemDatabaseContextFactory
 		const dbClient = projectContainer.connection.createClient(formatSchemaName(stage))
 		ctx.state.db = dbClient
-		const server = await projectContainer.contentServerProvider.get(
-			dbContextFactory.create(unnamedIdentity),
-			stage,
-			projectRoles,
+		const server = await ctx.state.timer('GraphQLServerCreate', () =>
+			projectContainer.contentServerProvider.get(dbContextFactory.create(unnamedIdentity), stage, projectRoles),
 		)
 
-		await ctx.state.timer('exec graphql', () => graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next))
+		await ctx.state.timer('GraphQL', () => graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next))
 	}
 	return contentServer
 }

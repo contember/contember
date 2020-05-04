@@ -1,5 +1,5 @@
 import { Schema } from '@contember/schema'
-import { ProjectRole } from '@contember/engine-common'
+import { ProjectRole } from '@contember/schema'
 import { AllowAllPermissionFactory } from '@contember/schema-definition'
 
 export const normalizeSchema = (schema: Schema) => {

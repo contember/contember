@@ -14,9 +14,9 @@ import { ProjectMembersQuery } from '../queries/ProjectMembersQuery'
 import { AddProjectMemberErrorCode } from '../../schema'
 import { ProjectRolesByIdentityQuery } from '../queries'
 import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
-import { ProjectRole } from '@contember/engine-common'
 import { indexListBy, notEmpty } from '../../utils/array'
 import { createSetMembershipVariables } from './membershipUtils'
+import { ProjectRole } from '@contember/schema'
 
 class ProjectMemberManager {
 	constructor(

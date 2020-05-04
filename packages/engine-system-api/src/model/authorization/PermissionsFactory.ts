@@ -1,5 +1,5 @@
 import { Permissions } from '@contember/authorization'
-import { ProjectRole } from '@contember/engine-common'
+import { ProjectRole } from '@contember/schema'
 
 export class PermissionsFactory {
 	public create(): Permissions {

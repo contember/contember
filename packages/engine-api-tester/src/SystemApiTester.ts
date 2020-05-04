@@ -13,7 +13,7 @@ import {
 	ReleaseExecutor,
 } from '@contember/engine-system-api'
 import { project } from './project'
-import { ProjectRole } from '@contember/engine-common'
+import { ProjectRole } from '@contember/schema'
 
 export class SystemApiTester {
 	private readonly uuidGenerator = createUuidGenerator('a454')

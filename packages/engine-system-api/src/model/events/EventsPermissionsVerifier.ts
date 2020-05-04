@@ -1,6 +1,5 @@
 import { AuthorizationScope, Authorizator } from '@contember/authorization'
 import { Acl, Schema } from '@contember/schema'
-import { Identity } from '@contember/engine-common'
 import { Stage } from '../dtos/Stage'
 import { AnyEvent, ContentEvent } from '@contember/engine-common'
 import { formatSchemaName } from '../helpers/stageHelpers'
@@ -10,6 +9,7 @@ import { ProjectConfig } from '../../types'
 import { Client } from '@contember/database'
 import { isContentEvent } from '@contember/engine-common'
 import { DatabaseContext } from '../database/DatabaseContext'
+import { Identity } from '../authorization/Identity'
 
 type PermissionsByRow = { [rowId: string]: boolean }
 type PermissionsByTable = { [tableName: string]: PermissionsByRow }
@@ -40,7 +40,6 @@ class EventsPermissionsVerifier {
 
 	public async verify(
 		db: DatabaseContext,
-		project: ProjectConfig,
 		permissionContext: EventsPermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
@@ -56,12 +55,11 @@ class EventsPermissionsVerifier {
 			return events.map(it => it.id).reduce((acc, id) => ({ ...acc, [id]: true }), {})
 		}
 
-		return this.verifyPermissions(db, project, permissionContext, sourceStage, targetStage, events)
+		return this.verifyPermissions(db, permissionContext, sourceStage, targetStage, events)
 	}
 
 	private async verifyPermissions(
 		db: DatabaseContext,
-		project: ProjectConfig,
 		context: EventsPermissionsVerifier.Context,
 		sourceStage: Stage,
 		targetStage: Stage,
@@ -81,7 +79,7 @@ class EventsPermissionsVerifier {
 		const eventsByTable = this.groupEventsByTable(contentEvents)
 
 		const permissionContext = {
-			projectRoles: await context.identity.getProjectRoles(project.slug),
+			projectRoles: await context.identity.projectRoles,
 			variables: context.variables,
 		}
 		const sourceSchema = await this.schemaVersionBuilder.buildSchemaForStage(db, sourceStage.slug)

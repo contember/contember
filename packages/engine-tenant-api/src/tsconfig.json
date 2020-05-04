@@ -19,6 +19,9 @@
 		},
 		{
 			"path": "../../dic/src"
+		},
+		{
+			"path": "../../schema/src"
 		}
 	]
 }

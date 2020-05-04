@@ -1,8 +1,8 @@
 import { Command } from '../Command'
-import { Membership } from '../../type/Membership'
-import { CreateOrUpdateProjectMembershipsCommand } from './CreateOrUpdateProjectMembershipsCommand'
+import { CreateOrUpdateProjectMembershipCommand } from './CreateOrUpdateProjectMembershipCommand'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 import { SelectBuilder } from '@contember/database'
+import { MembershipInput } from './types'
 
 type CommandResponse = Response<undefined, AddProjectMemberCommandError>
 
@@ -10,7 +10,7 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
-		private readonly memberships: readonly Membership[],
+		private readonly memberships: readonly MembershipInput[],
 	) {}
 
 	async execute({ db, providers, bus }: Command.Args): Promise<CommandResponse> {
@@ -27,9 +27,9 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 		}
 
 		try {
-			await bus.execute(
-				new CreateOrUpdateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships, false),
-			)
+			for (const membership of this.memberships) {
+				await bus.execute(new CreateOrUpdateProjectMembershipCommand(this.projectId, this.identityId, membership))
+			}
 			return new ResponseOk(undefined)
 		} catch (e) {
 			switch (e.constraint) {

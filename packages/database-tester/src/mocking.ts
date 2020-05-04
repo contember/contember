@@ -33,8 +33,8 @@ ${JSON.stringify(parameters)}
 				throw new Error()
 			}
 
-			const actualSql = sql.replace(/\s+/g, ' ')
-			const expectedSql = expected.sql.replace(/\s+/g, ' ')
+			const actualSql = sql.replace(/\s+/g, ' ').toLowerCase()
+			const expectedSql = expected.sql.replace(/\s+/g, ' ').toLowerCase()
 			assertFunction(expectedSql, actualSql)
 
 			if (expected.parameters) {

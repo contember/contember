@@ -61,8 +61,19 @@ namespace Acl {
 	export type AnyStage = '*'
 	export type StagesDefinition = AnyStage | string[]
 
+	export type TenantManagePermissions = {
+		[role: string]: {
+			variables: Record<string, string> // target variable => source variable
+		}
+	}
+	export interface TenantPermissions {
+		invite: boolean
+		manage: TenantManagePermissions
+	}
+
 	export type RolePermissions = {
 		inherits?: string[]
+		tenant?: TenantPermissions
 		variables: Acl.Variables
 		stages: StagesDefinition
 		entities: Permissions

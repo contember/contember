@@ -30,6 +30,7 @@ const schema: DocumentNode = gql`
 			memberships: [MembershipInput!]!
 		): AddProjectMemberResponse
 		removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
+
 		updateProjectMember(
 			projectSlug: String!
 			identityId: String!
@@ -163,7 +164,9 @@ const schema: DocumentNode = gql`
 
 	enum InviteErrorCode {
 		PROJECT_NOT_FOUND
+		ROLE_NOT_FOUND
 		VARIABLE_NOT_FOUND
+		VARIABLE_EMPTY
 		ALREADY_MEMBER
 	}
 
@@ -188,6 +191,8 @@ const schema: DocumentNode = gql`
 	enum AddProjectMemberErrorCode {
 		PROJECT_NOT_FOUND
 		IDENTITY_NOT_FOUND
+		ROLE_NOT_FOUND
+		VARIABLE_EMPTY
 		VARIABLE_NOT_FOUND
 		ALREADY_MEMBER
 	}
@@ -208,6 +213,8 @@ const schema: DocumentNode = gql`
 	enum UpdateProjectMemberErrorCode {
 		PROJECT_NOT_FOUND
 		VARIABLE_NOT_FOUND
+		ROLE_NOT_FOUND
+		VARIABLE_EMPTY
 		NOT_MEMBER
 	}
 
@@ -246,6 +253,8 @@ const schema: DocumentNode = gql`
 	enum CreateApiKeyErrorCode {
 		PROJECT_NOT_FOUND
 		VARIABLE_NOT_FOUND
+		ROLE_NOT_FOUND
+		VARIABLE_EMPTY
 	}
 
 	type CreateApiKeyResult {

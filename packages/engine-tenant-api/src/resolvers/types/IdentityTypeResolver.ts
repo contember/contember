@@ -1,11 +1,22 @@
 import { Identity, IdentityProjectRelation, IdentityResolvers, Maybe, Person } from '../../schema'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
-import { PersonQuery, ProjectManager } from '../../model'
+import { PersonRow, ProjectManager } from '../../model'
 import { ResolverContext } from '../ResolverContext'
 import { ProjectMemberManager } from '../../model/service'
+import { indexBy, notEmpty } from '../../utils/array'
+import { createBatchLoader } from '../../utils/batchQuery'
+import { PersonByIdentityBatchQuery } from '../../model/queries/person/PersonByIdentityBatchQuery'
 
 export class IdentityTypeResolver implements IdentityResolvers {
+	private personLoader = createBatchLoader<string, Record<string, PersonRow>, PersonRow>(
+		async ids => {
+			const persons = await this.queryHandler.fetch(new PersonByIdentityBatchQuery(ids))
+			return indexBy(persons, 'identity_id')
+		},
+		(id, result) => result[id],
+	)
+
 	constructor(
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly projectMemberManager: ProjectMemberManager,
@@ -13,7 +24,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 	) {}
 
 	async person(parent: Identity): Promise<Maybe<Person>> {
-		const person = await this.queryHandler.fetch(PersonQuery.byIdentity(parent.id))
+		const person = await this.personLoader(parent.id)
 		if (!person) {
 			return null
 		}
@@ -32,15 +43,31 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		if (parent.projects.length > 0) {
 			return parent.projects
 		}
-		const roles = parent.id === context.identity.id ? context.identity.roles : []
+		const isSelf = parent.id === context.identity.id
+		const roles = isSelf ? context.identity.roles : []
 		const projects = await this.projectManager.getProjectsByIdentity(parent.id, context.permissionContext)
-		return await Promise.all(
-			projects.map(
-				async (it): Promise<IdentityProjectRelation> => ({
-					project: { ...it, members: [], roles: [] },
-					memberships: await this.projectMemberManager.getProjectMemberships(it.id, { id: parent.id, roles }),
-				}),
-			),
-		)
+		return (
+			await Promise.all(
+				projects.map(
+					async (it): Promise<IdentityProjectRelation | null> => {
+						const verifier = isSelf
+							? undefined
+							: context.permissionContext.createAccessVerifier(await context.permissionContext.createProjectScope(it))
+						const memberships = await this.projectMemberManager.getProjectMemberships(
+							{ id: it.id },
+							{ id: parent.id, roles },
+							verifier,
+						)
+						if (memberships.length === 0) {
+							return null
+						}
+						return {
+							project: { ...it, members: [], roles: [] },
+							memberships: memberships,
+						}
+					},
+				),
+			)
+		).filter(notEmpty)
 	}
 }

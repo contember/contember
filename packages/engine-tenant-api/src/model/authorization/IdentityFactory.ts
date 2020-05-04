@@ -1,6 +1,5 @@
 import { ProjectMemberManager } from '../service'
-import { Identity } from '@contember/engine-common'
-import { ProjectAwareIdentity } from './ProjectAwareIdentity'
+import { Identity, ProjectAwareIdentity } from './Identity'
 
 export class IdentityFactory {
 	constructor(private readonly projectMemberManager: ProjectMemberManager) {}

@@ -2,9 +2,15 @@ import { InviteErrorCode, InviteResponse, MutationInviteArgs, MutationResolvers 
 import { ResolverContext } from '../../ResolverContext'
 import { PermissionActions, ProjectManager, ProjectScope } from '../../../model'
 import { InviteManager } from '../../../model/service/InviteManager'
+import { createMembershipValidationErrorResult } from '../../utils'
+import { MembershipValidator } from '../../../model/service/MembershipValidator'
 
 export class InviteMutationResolver implements MutationResolvers {
-	constructor(private readonly inviteManager: InviteManager, private readonly projectManager: ProjectManager) {}
+	constructor(
+		private readonly inviteManager: InviteManager,
+		private readonly projectManager: ProjectManager,
+		private readonly membershipValidator: MembershipValidator,
+	) {}
 
 	async invite(
 		parent: any,
@@ -13,8 +19,8 @@ export class InviteMutationResolver implements MutationResolvers {
 	): Promise<InviteResponse> {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
 		await context.requireAccess({
-			scope: new ProjectScope(project),
-			action: PermissionActions.PERSON_INVITE,
+			scope: await context.permissionContext.createProjectScope(project),
+			action: PermissionActions.PERSON_INVITE(memberships),
 			message: 'You are not allowed to invite a person',
 		})
 		if (!project) {
@@ -23,7 +29,13 @@ export class InviteMutationResolver implements MutationResolvers {
 				errors: [{ code: InviteErrorCode.ProjectNotFound }],
 			}
 		}
-
+		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
+		if (validationResult.length > 0) {
+			return {
+				ok: false,
+				errors: createMembershipValidationErrorResult(validationResult),
+			}
+		}
 		const result = await this.inviteManager.invite(email, project, memberships)
 
 		if (!result.ok) {

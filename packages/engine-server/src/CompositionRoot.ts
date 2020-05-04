@@ -7,7 +7,7 @@ import {
 } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
 import { Config, Project, TenantConfig } from './config/config'
-import { logSentryError, projectVariablesResolver, tuple } from './utils'
+import { logSentryError, projectSchemaResolver, tuple } from './utils'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer, ServerRunner } from './bootstrap'
 import { createProjectContainer } from './ProjectContainer'
@@ -160,7 +160,7 @@ class CompositionRoot {
 			tenantConfig.db,
 			tenantConfig.mailer,
 			providers,
-			projectVariablesResolver(projectContainerResolver, schemaVersionBuilder),
+			projectSchemaResolver(projectContainerResolver, schemaVersionBuilder),
 		)
 	}
 }

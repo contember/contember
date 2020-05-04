@@ -488,4 +488,55 @@ describe('permission merger', () => {
 			},
 		})
 	})
+
+	it('prefixes inherited variables', () => {
+		execute({
+			acl: {
+				roles: {
+					role1: {
+						variables: {
+							foo: { entityName: 'Test', type: Acl.VariableType.entity },
+						},
+						stages: '*',
+						entities: {
+							Entity2: {
+								predicates: {
+									foo: { xyz: { lorem: 'foo' } },
+								},
+								operations: {
+									read: {
+										title: 'foo',
+									},
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {},
+						inherits: ['role1'],
+						stages: '*',
+					},
+				},
+			},
+			roles: ['role2'],
+			result: {
+				Entity2: {
+					operations: {
+						read: {
+							title: 'foo',
+							id: 'foo',
+						},
+					},
+					predicates: {
+						foo: {
+							xyz: {
+								lorem: 'role2__foo',
+							},
+						},
+					},
+				},
+			},
+		})
+	})
 })

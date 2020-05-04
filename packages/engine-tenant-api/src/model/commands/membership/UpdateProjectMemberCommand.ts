@@ -1,15 +1,15 @@
 import { Command } from '../Command'
 import { UpdateProjectMemberErrorCode } from '../../../schema'
-import { Membership } from '../../type/Membership'
-import { CreateOrUpdateProjectMembershipsCommand } from './CreateOrUpdateProjectMembershipsCommand'
-import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipCommand'
+import { CreateOrUpdateProjectMembershipCommand } from './CreateOrUpdateProjectMembershipCommand'
 import { SelectBuilder } from '@contember/database'
+import { MembershipUpdateInput } from './types'
+import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipsCommand'
 
 class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
-		private readonly memberships: readonly Membership[],
+		private readonly memberships: readonly MembershipUpdateInput[],
 	) {}
 
 	async execute({ db, bus, providers }: Command.Args): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
@@ -26,16 +26,15 @@ class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.U
 		}
 
 		try {
-			await bus.execute(
-				new CreateOrUpdateProjectMembershipsCommand(this.projectId, this.identityId, this.memberships, true),
-			)
-			await bus.execute(
-				new RemoveProjectMembershipCommand(
-					this.projectId,
-					this.identityId,
-					this.memberships.map(it => it.role),
-				),
-			)
+			for (const membershipUpdate of this.memberships) {
+				if (membershipUpdate.operation === 'remove') {
+					await bus.execute(new RemoveProjectMembershipCommand(this.projectId, this.identityId, membershipUpdate.role))
+				} else {
+					await bus.execute(
+						new CreateOrUpdateProjectMembershipCommand(this.projectId, this.identityId, membershipUpdate),
+					)
+				}
+			}
 
 			return new UpdateProjectMemberCommand.UpdateProjectMemberResponseOk()
 		} catch (e) {

@@ -17,6 +17,7 @@ import { CommandBus } from '../commands/CommandBus'
 import { Membership } from '../type/Membership'
 import { TenantRole } from '../authorization/Roles'
 import { ApiKeyByTokenQuery } from '../queries'
+import { createSetMembershipVariables } from './membershipUtils'
 
 class ApiKeyManager {
 	constructor(
@@ -81,7 +82,9 @@ class ApiKeyManager {
 			const identityId = await bus.execute(new CreateIdentityCommand([], description))
 			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
 
-			const addMemberResult = await bus.execute(new AddProjectMemberCommand(projectId, identityId, memberships))
+			const addMemberResult = await bus.execute(
+				new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
+			)
 			if (!addMemberResult.ok) {
 				bus.client.connection.rollback()
 				switch (addMemberResult.error) {

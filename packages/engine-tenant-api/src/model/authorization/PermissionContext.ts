@@ -1,9 +1,19 @@
-import { Identity } from '@contember/engine-common'
-import { AuthorizationScope, Authorizator } from '@contember/authorization'
+import { AccessNode, AuthorizationScope, Authorizator } from '@contember/authorization'
 import { ForbiddenError } from 'apollo-server-errors'
+import { ProjectScopeFactory } from './ProjectScopeFactory'
+import { Project } from '../type'
+import { Identity } from './Identity'
+
+export type AccessVerifier = (action: Authorizator.Action) => Promise<boolean>
 
 export class PermissionContext {
-	constructor(public readonly identity: Identity, public readonly authorizator: Authorizator<Identity>) {}
+	private projectScopes: Record<string, AuthorizationScope<Identity>> = {}
+
+	constructor(
+		public readonly identity: Identity,
+		public readonly authorizator: Authorizator<Identity>,
+		private readonly projectScopeFactory: ProjectScopeFactory,
+	) {}
 
 	public async isAllowed({
 		scope,
@@ -13,6 +23,10 @@ export class PermissionContext {
 		action: Authorizator.Action
 	}): Promise<boolean> {
 		return await this.authorizator.isAllowed(this.identity, scope || new AuthorizationScope.Global(), action)
+	}
+
+	public createAccessVerifier(scope: AuthorizationScope<Identity>): AccessVerifier {
+		return action => this.isAllowed({ scope, action })
 	}
 
 	public async requireAccess({
@@ -27,5 +41,15 @@ export class PermissionContext {
 		if (!(await this.isAllowed({ scope, action }))) {
 			throw new ForbiddenError(message || 'Forbidden')
 		}
+	}
+
+	public async createProjectScope(project: Pick<Project, 'slug'> | null): Promise<AuthorizationScope<Identity>> {
+		if (!project) {
+			return new AuthorizationScope.Fixed(AccessNode.Fixed.denied())
+		}
+		if (!this.projectScopes[project.slug]) {
+			this.projectScopes[project.slug] = await this.projectScopeFactory.create(project)
+		}
+		return this.projectScopes[project.slug]
 	}
 }

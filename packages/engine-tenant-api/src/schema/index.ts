@@ -21,6 +21,8 @@ export type AddProjectMemberError = {
 export enum AddProjectMemberErrorCode {
 	ProjectNotFound = 'PROJECT_NOT_FOUND',
 	IdentityNotFound = 'IDENTITY_NOT_FOUND',
+	RoleNotFound = 'ROLE_NOT_FOUND',
+	VariableEmpty = 'VARIABLE_EMPTY',
 	VariableNotFound = 'VARIABLE_NOT_FOUND',
 	AlreadyMember = 'ALREADY_MEMBER',
 }
@@ -77,6 +79,8 @@ export type CreateApiKeyError = {
 export enum CreateApiKeyErrorCode {
 	ProjectNotFound = 'PROJECT_NOT_FOUND',
 	VariableNotFound = 'VARIABLE_NOT_FOUND',
+	RoleNotFound = 'ROLE_NOT_FOUND',
+	VariableEmpty = 'VARIABLE_EMPTY',
 }
 
 export type CreateApiKeyResponse = {
@@ -131,7 +135,9 @@ export type InviteError = {
 
 export enum InviteErrorCode {
 	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	RoleNotFound = 'ROLE_NOT_FOUND',
 	VariableNotFound = 'VARIABLE_NOT_FOUND',
+	VariableEmpty = 'VARIABLE_EMPTY',
 	AlreadyMember = 'ALREADY_MEMBER',
 }
 
@@ -415,6 +421,8 @@ export type UpdateProjectMemberError = {
 export enum UpdateProjectMemberErrorCode {
 	ProjectNotFound = 'PROJECT_NOT_FOUND',
 	VariableNotFound = 'VARIABLE_NOT_FOUND',
+	RoleNotFound = 'ROLE_NOT_FOUND',
+	VariableEmpty = 'VARIABLE_EMPTY',
 	NotMember = 'NOT_MEMBER',
 }
 

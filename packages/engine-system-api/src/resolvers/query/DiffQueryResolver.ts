@@ -32,7 +32,6 @@ export default class DiffQueryResolver implements QueryResolver<'diff'> {
 
 			const diff = await this.diffBuilder.build(
 				db,
-				context.project,
 				{
 					variables: context.variables,
 					identity: context.identity,

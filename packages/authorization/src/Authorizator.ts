@@ -9,10 +9,23 @@ interface Authorizator<Identity extends Authorizator.Identity = Authorizator.Ide
 namespace Authorizator {
 	export type Resource = string
 	export type Privilege = string
-	export type Action = { resource: Resource; privilege: Privilege }
+	export type Action<Meta = undefined> = Meta extends undefined
+		? { resource: Resource; privilege: Privilege }
+		: { resource: Resource; privilege: Privilege; meta: Meta }
 
-	export const createAction = (resource: Resource, privilege: Privilege): Action => ({ resource, privilege })
+	type ActionCreator =
+		| ((resource: Resource, privilege: Privilege) => Action)
+		| (<Meta>(resource: Resource, privilege: Privilege, meta: Meta) => Action<Meta>)
 
+	export function createAction(resource: Resource, privilege: Privilege): Action<undefined>
+	export function createAction<Meta>(resource: Resource, privilege: Privilege, meta: Meta): Action<Meta>
+	export function createAction<Meta>(resource: Resource, privilege: Privilege, meta?: Meta) {
+		return {
+			resource,
+			privilege,
+			meta,
+		}
+	}
 	export class Default<Identity extends Authorizator.Identity> implements Authorizator<Identity> {
 		constructor(private readonly accessEvaluator: AccessEvaluator) {}
 

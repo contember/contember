@@ -1,5 +1,5 @@
 export * from './AddProjectMemberCommand'
 export * from './RemoveProjectMemberCommand'
-export * from './RemoveProjectMembershipVariablesCommand'
 export * from './UpdateProjectMemberCommand'
-export * from './UpdateProjectMembershipVariablesCommand'
+export * from './variables/PatchProjectMembershipVariablesCommand'
+export * from './types'

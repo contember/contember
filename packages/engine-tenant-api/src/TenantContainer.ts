@@ -1,5 +1,5 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
-import { DatabaseCredentials } from '@contember/engine-common'
+import { DatabaseCredentials } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
 import { Connection, DatabaseQueryable } from '@contember/database'
 import { Builder } from '@contember/dic'

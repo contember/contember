@@ -12,7 +12,6 @@
 		"@contember/authorization": "^0.8.0-alpha.0",
 		"@contember/database": "^0.8.0-alpha.0",
 		"@contember/dic": "^0.8.0-alpha.0",
-		"@contember/engine-common": "^0.8.0-alpha.0",
 		"@contember/queryable": "^0.8.0-alpha.0",
 		"@contember/schema": "^0.8.0-alpha.0",
 		"apollo-server-core": "^2.9.1",

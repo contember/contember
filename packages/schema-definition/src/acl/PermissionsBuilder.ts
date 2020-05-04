@@ -1,5 +1,5 @@
 import { Acl, Model } from '@contember/schema'
-import AllowAllPermissionFactory from './AllowAllPermissionFactory'
+import { AllowAllPermissionFactory } from '@contember/schema-utils'
 import PermissionOverrider from './PermissionOverrider'
 import EntitySelector from './EntitySelector'
 import EntityPermissionsBuilder from './EntityPermissionsBuilder'

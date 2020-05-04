@@ -1,7 +1,7 @@
 import 'jasmine'
 import { Acl, Model, Schema, Validation } from '@contember/schema'
 import GraphQlSchemaBuilderFactory from '../../src/graphQLSchema/GraphQlSchemaBuilderFactory'
-import { AllowAllPermissionFactory } from '@contember/schema-definition'
+import { AllowAllPermissionFactory } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'

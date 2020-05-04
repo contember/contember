@@ -1,6 +1,6 @@
 import { Acl, Model } from '@contember/schema'
 
-export default class AllowAllPermissionFactory {
+export class AllowAllPermissionFactory {
 	constructor(
 		private readonly operations: Acl.Operation[] = [
 			Acl.Operation.read,

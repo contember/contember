@@ -1,8 +1,7 @@
-import { Schema } from '@contember/schema'
-import { ProjectRole } from '@contember/schema'
-import { AllowAllPermissionFactory } from '@contember/schema-definition'
+import { ProjectRole, Schema } from '@contember/schema'
+import { AllowAllPermissionFactory } from './acl'
 
-export const normalizeSchema = (schema: Schema) => {
+export const normalizeSchema = <S extends Schema>(schema: S): S => {
 	if (!schema.acl.roles[ProjectRole.ADMIN]) {
 		schema = {
 			...schema,

@@ -15,7 +15,7 @@
 			"path": "../../schema-utils/src"
 		},
 		{
-			"path": "../../schema-definition/src"
+			"path": "../../schema-utils/src"
 		},
 		{
 			"path": "../../database/src"

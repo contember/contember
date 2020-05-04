@@ -8,6 +8,7 @@ import { Client } from '@contember/database'
 import { Identity } from '../authorization/Identity'
 import { DatabaseContext } from '../database'
 import { SchemaVersionBuilder } from '../migrations'
+import { filterSchemaByStage } from '@contember/schema-utils'
 
 type PermissionsByRow = { [rowId: string]: boolean }
 type PermissionsByTable = { [tableName: string]: PermissionsByRow }
@@ -80,14 +81,15 @@ export class EventsPermissionsVerifier {
 			projectRoles: await context.identity.projectRoles,
 			variables: context.variables,
 		}
-		const sourceSchema = await this.schemaVersionBuilder.buildSchemaForStage(db, sourceStage.slug)
+		const schema = await this.schemaVersionBuilder.buildSchema(db)
+		const sourceSchema = filterSchemaByStage(schema, sourceStage.slug)
 		const readPermissions = await this.contentPermissionVerifier.verifyReadPermissions({
 			db: db.client.forSchema(formatSchemaName(sourceStage)),
 			eventsByTable,
 			schema: sourceSchema,
 			permissionContext,
 		})
-		const targetSchema = await this.schemaVersionBuilder.buildSchemaForStage(db, targetStage.slug)
+		const targetSchema = filterSchemaByStage(schema, targetStage.slug)
 		const writePermissions = await this.contentPermissionVerifier.verifyWritePermissions({
 			db: db.client.forSchema(formatSchemaName(targetStage)),
 			eventsByTable,

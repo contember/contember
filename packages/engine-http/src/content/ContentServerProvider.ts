@@ -6,7 +6,6 @@ import { ApolloServer } from 'apollo-server-koa'
 import LRUCache from 'lru-cache'
 import { GraphQLSchema } from 'graphql'
 import { DatabaseContext } from '@contember/engine-system-api'
-import { normalizeSchema } from '../schemaNormalizer'
 
 export class ContentServerProvider {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
@@ -20,7 +19,7 @@ export class ContentServerProvider {
 	) {}
 
 	async get(db: DatabaseContext, stage: Project.Stage, projectRoles: string[]): Promise<ApolloServer> {
-		const schema = normalizeSchema(await this.contentSchemaFactory.getSchema(db, stage.slug))
+		const schema = await this.contentSchemaFactory.getSchema(db, stage.slug)
 
 		const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {
 			projectRoles: projectRoles,

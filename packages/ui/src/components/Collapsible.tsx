@@ -8,6 +8,7 @@ export interface CollapsibleProps {
 	expanded: boolean
 	transition?: CollapsibleTransition
 	children?: React.ReactNode
+	onTransitionEnd?: () => void
 }
 
 export const Collapsible = React.memo((props: CollapsibleProps) => {
@@ -19,6 +20,7 @@ export const Collapsible = React.memo((props: CollapsibleProps) => {
 	const onTransitionEnd = () => {
 		setContentHeight('auto')
 		setIsTransitioning(false)
+		props.onTransitionEnd?.()
 	}
 
 	const updateContentHeight = () => {

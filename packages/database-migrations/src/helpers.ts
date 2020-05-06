@@ -1,8 +1,8 @@
 import { MigrationBuilder } from 'node-pg-migrate'
 
-export function createMigrationBuilder(): MigrationBuilder & { getSql: () => string } {
+export function createMigrationBuilder(): MigrationBuilder & { getSql: () => string; getSqlSteps: () => string[] } {
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
-	const builderClass = require('node-pg-migrate/dist/migration-builder')
+	const builderClass = require('node-pg-migrate/dist/migration-builder').default
 	return new builderClass(
 		{},
 		{

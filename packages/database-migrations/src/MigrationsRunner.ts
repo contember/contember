@@ -1,4 +1,5 @@
 import { DatabaseCredentials, Connection, wrapIdentifier } from '@contember/database'
+import migrate from './runner'
 
 export class MigrationsRunner {
 	constructor(
@@ -9,20 +10,15 @@ export class MigrationsRunner {
 
 	public async migrate(log: boolean = true) {
 		await this.createDatabaseIfNotExists()
-		const pgMigrate = (await import('node-pg-migrate')).default
-		await pgMigrate({
+		await migrate({
 			databaseUrl: this.db,
 			dir: this.dir,
 			schema: this.schema,
 			migrationsTable: 'migrations',
-			checkOrder: true,
-			direction: 'up',
-			count: Infinity,
 			ignorePattern: '^\\..*$',
 			createSchema: true,
-			singleTransaction: true,
 			log: (msg: string) => {
-				log && msg.startsWith('> ') && console.log(msg.substring(2))
+				log && console.log(msg)
 			},
 		})
 	}

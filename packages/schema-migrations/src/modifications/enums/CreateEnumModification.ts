@@ -12,7 +12,7 @@ class CreateEnumModification implements Modification<CreateEnumModification.Data
 		const joinedValues = this.data.values.map(it => `'${escapeSqlString(it)}'`).join(',')
 		builder.createDomain(this.data.enumName, 'text', {
 			check: `VALUE IN(${joinedValues})`,
-			constraintName: `${this.data.enumName}_check`,
+			constraintName: `${this.data.enumName}_check`.toLowerCase(),
 		})
 	}
 

@@ -699,7 +699,7 @@ describe('Diff schemas', () => {
 				},
 			},
 		]
-		const sql = SQL`CREATE DOMAIN "postStatus" AS text CONSTRAINT postStatus_check CHECK (VALUE IN('publish','draft','auto-draft'));
+		const sql = SQL`CREATE DOMAIN "postStatus" AS text CONSTRAINT "poststatus_check" CHECK (VALUE IN('publish','draft','auto-draft'));
 				ALTER TABLE "post" ADD "status" "postStatus";`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)

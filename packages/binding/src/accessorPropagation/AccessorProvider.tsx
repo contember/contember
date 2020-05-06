@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { EntityAccessor, EntityForRemovalAccessor } from '../accessors'
-import { AccessorContext } from './AccessorContext'
+import { EntityKeyContext } from './EntityKeyContext'
 
 export interface EntityProviderProps {
 	value: undefined | EntityAccessor | EntityForRemovalAccessor
@@ -8,5 +8,5 @@ export interface EntityProviderProps {
 }
 
 export function AccessorProvider(props: EntityProviderProps) {
-	return React.createElement(AccessorContext.Provider, props)
+	return <EntityKeyContext.Provider value={props.value?.key}>{props.children}</EntityKeyContext.Provider>
 }

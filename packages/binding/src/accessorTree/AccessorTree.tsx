@@ -1,3 +1,4 @@
+import { GetEntityByKeyProvider } from '../accessorPropagation'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import * as React from 'react'
 import { AccessorTreeStateContext } from './AccessorTreeStateContext'
@@ -28,7 +29,9 @@ export const AccessorTree = React.memo(({ state, children }: AccessorTreeProps) 
 			}
 		>
 			<MutationStateContext.Provider value={state.name === AccessorTreeStateName.Mutating}>
-				<AccessorTreeStateContext.Provider value={state}>{children}</AccessorTreeStateContext.Provider>
+				<AccessorTreeStateContext.Provider value={state}>
+					<GetEntityByKeyProvider getEntityByKey={state.getEntityByKey}>{children}</GetEntityByKeyProvider>
+				</AccessorTreeStateContext.Provider>
 			</MutationStateContext.Provider>
 		</DirtinessContext.Provider>
 	</TriggerPersistContext.Provider>

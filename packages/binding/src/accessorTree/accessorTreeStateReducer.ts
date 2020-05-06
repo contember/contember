@@ -23,12 +23,14 @@ export const accessorTreeStateReducer = (
 					...actionData,
 					name: AccessorTreeStateName.Interactive,
 					isDirty: previousState.name === AccessorTreeStateName.Uninitialized,
+					getEntityByKey: actionData.getEntityByKey || previousState.getEntityByKey,
 				}
 			}
 			if (previousState.name === AccessorTreeStateName.Mutating) {
 				return {
 					...actionData,
 					name: AccessorTreeStateName.Interactive,
+					getEntityByKey: previousState.getEntityByKey,
 					isDirty: false,
 				}
 			}
@@ -44,6 +46,7 @@ export const accessorTreeStateReducer = (
 		case AccessorTreeStateActionType.InitializeQuery:
 			return {
 				name: AccessorTreeStateName.Querying,
+				getEntityByKey: previousState.getEntityByKey,
 			}
 		case AccessorTreeStateActionType.InitializeMutation:
 			if (previousState.name === AccessorTreeStateName.Interactive) {
@@ -57,10 +60,12 @@ export const accessorTreeStateReducer = (
 			return {
 				name: AccessorTreeStateName.RequestError,
 				error: action.error,
+				getEntityByKey: previousState.getEntityByKey,
 			}
 		case AccessorTreeStateActionType.Uninitialize:
 			return {
 				name: AccessorTreeStateName.Uninitialized,
+				getEntityByKey: previousState.getEntityByKey,
 			}
 	}
 }

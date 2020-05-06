@@ -146,7 +146,7 @@ class EntityAccessor extends Accessor implements Errorable {
 
 		if (!(accessor instanceof FieldAccessor)) {
 			throw new BindingError(
-				`Trying to access the field '${field}'${
+				`Trying to access the field '${fieldName}'${
 					nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
 				} but it does not exist.`,
 			)

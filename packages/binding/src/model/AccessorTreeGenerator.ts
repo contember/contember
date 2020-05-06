@@ -15,6 +15,7 @@ import {
 import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
+import * as ReactDOM from 'react-dom'
 
 type AddEntityEventListener = EntityAccessor['addEventListener']
 type AddEntityListEventListener = EntityListAccessor['addEventListener']
@@ -53,13 +54,16 @@ interface InternalEntityListState {
 		[Type in EntityListAccessor.EntityEventType]?: Set<EntityListAccessor.EntityEventListenerMap[Type]>
 	}
 	accessor: EntityListAccessor | undefined
-	childStates: Map<string, InternalEntityState>
+	childIds: Set<string>
 }
 
 class AccessorTreeGenerator {
 	private persistedData: ReceivedDataTree<undefined> | undefined
 	private initialData: RootAccessor | ReceivedDataTree<undefined> | undefined
 	private errorTreeRoot?: ErrorsPreprocessor.ErrorTreeRoot
+	private entityStore: Map<string, InternalEntityState> = new Map()
+	private readonly getEntityByKey: (key: string) => EntityAccessor | EntityForRemovalAccessor | undefined = key =>
+		this.entityStore.get(key)?.accessor
 
 	public constructor(private tree: MarkerTreeRoot) {}
 
@@ -69,6 +73,7 @@ class AccessorTreeGenerator {
 		updateData: AccessorTreeGenerator.UpdateData,
 		errors?: MutationDataResponse,
 	): void {
+		this.entityStore = new Map()
 		const preprocessor = new ErrorsPreprocessor(errors)
 
 		this.errorTreeRoot = preprocessor.preprocess()
@@ -77,20 +82,23 @@ class AccessorTreeGenerator {
 		this.persistedData = persistedData
 		this.initialData = initialData
 
-		updateData(
-			this.generateSubTree(
-				this.tree,
-				initialData instanceof EntityAccessor ||
-					initialData instanceof EntityListAccessor ||
-					initialData instanceof EntityForRemovalAccessor
-					? initialData
-					: initialData === undefined
-					? undefined
-					: initialData[this.tree.id],
-				updateData,
-				this.errorTreeRoot,
-			),
-		)
+		ReactDOM.unstable_batchedUpdates(() => {
+			updateData(
+				this.generateSubTree(
+					this.tree,
+					initialData instanceof EntityAccessor ||
+						initialData instanceof EntityListAccessor ||
+						initialData instanceof EntityForRemovalAccessor
+						? initialData
+						: initialData === undefined
+						? undefined
+						: initialData[this.tree.id],
+					updateData,
+					this.errorTreeRoot,
+				),
+				this.getEntityByKey,
+			)
+		})
 	}
 
 	private generateSubTree(
@@ -107,7 +115,7 @@ class AccessorTreeGenerator {
 				updatedData instanceof EntityForRemovalAccessor ||
 				updatedData instanceof EntityListAccessor
 			) {
-				return updateData(updatedData)
+				return updateData(updatedData, this.getEntityByKey)
 			}
 			return this.rejectInvalidAccessorTree()
 		}
@@ -118,6 +126,7 @@ class AccessorTreeGenerator {
 	}
 
 	private updateFields(
+		id: string | EntityAccessor.UnpersistedEntityId,
 		data: AccessorTreeGenerator.InitialEntityData,
 		fields: EntityFields,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
@@ -130,11 +139,6 @@ class AccessorTreeGenerator {
 		const fieldData: EntityAccessor.FieldData = new Map()
 		// In the grand scheme of things, sub trees are actually fairly rare, and so we only initialize them if necessary
 		let subTreeData: EntityAccessor.SubTreeData | undefined = undefined
-		const id = data
-			? data instanceof EntityAccessor || data instanceof EntityForRemovalAccessor
-				? data.runtimeId
-				: data[PRIMARY_KEY_NAME]
-			: new EntityAccessor.UnpersistedEntityId()
 		const typename = data ? (data instanceof Accessor ? data.typename : data[TYPENAME_KEY_NAME]) : undefined
 
 		for (const [placeholderName, field] of fields) {
@@ -204,7 +208,9 @@ class AccessorTreeGenerator {
 							: undefined
 
 					const getOnReferenceUpdate = (placeholderName: string) => (newValue: EntityAccessor.FieldDatum) => {
-						onUpdate(placeholderName, newValue)
+						ReactDOM.unstable_batchedUpdates(() => {
+							onUpdate(placeholderName, newValue)
+						})
 					}
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (Array.isArray(fieldDatum) || fieldDatum instanceof EntityListAccessor) {
@@ -309,18 +315,20 @@ class AccessorTreeGenerator {
 						if (newValue === this.currentValue) {
 							return
 						}
-						onUpdate(
-							placeholderName,
-							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
+						ReactDOM.unstable_batchedUpdates(() => {
+							onUpdate(
 								placeholderName,
-								newValue,
-								persistedValue,
-								field.defaultValue,
-								isTouchedBy,
-								fieldErrors,
-								onChange,
-							),
-						)
+								new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
+									placeholderName,
+									newValue,
+									persistedValue,
+									field.defaultValue,
+									isTouchedBy,
+									fieldErrors,
+									onChange,
+								),
+							)
+						})
 					}
 					let fieldValue: FieldValue
 					if (fieldDatum === undefined) {
@@ -368,8 +376,17 @@ class AccessorTreeGenerator {
 		persistedData: AccessorTreeGenerator.InitialEntityData,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		parentOnUpdate: OnUpdate,
-		entityState: InternalEntityState = this.createEmptyEntityState(),
+		id?: string | EntityAccessor.UnpersistedEntityId,
 	): EntityAccessor {
+		// TODO We need to merge different entities with the same id!
+
+		if (id === undefined) {
+			id = this.getEntityId(persistedData)
+		}
+		const entityKey = typeof id === 'string' ? id : id.value
+		const entityState = this.createEmptyEntityState()
+		this.entityStore.set(entityKey, entityState)
+
 		const performUpdate = () => {
 			if (entityState.isFrozenWhileUpdating) {
 				throw new BindingError(
@@ -377,16 +394,18 @@ class AccessorTreeGenerator {
 						`changes, use the 'beforeUpdate' event so that it is possible to avoid thrashing.`,
 				)
 			}
-			entityState.isFrozenWhileUpdating = true
-			parentOnUpdate(entityState.accessor)
-			if (entityState.eventListeners.afterUpdate === undefined) {
+			ReactDOM.unstable_batchedUpdates(() => {
+				entityState.isFrozenWhileUpdating = true
+				parentOnUpdate(entityState.accessor)
+				if (entityState.eventListeners.afterUpdate === undefined) {
+					entityState.isFrozenWhileUpdating = false
+					return
+				}
+				for (const handler of entityState.eventListeners.afterUpdate) {
+					handler(entityState.accessor)
+				}
 				entityState.isFrozenWhileUpdating = false
-				return
-			}
-			for (const handler of entityState.eventListeners.afterUpdate) {
-				handler(entityState.accessor)
-			}
-			entityState.isFrozenWhileUpdating = false
+			})
 		}
 		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
 			batchUpdates(getAccessor => {
@@ -467,6 +486,7 @@ class AccessorTreeGenerator {
 			}
 		}
 		return (entityState.accessor = this.updateFields(
+			id,
 			persistedData,
 			entityFields,
 			errors,
@@ -495,12 +515,14 @@ class AccessorTreeGenerator {
 		const entityListState = this.createEmptyEntityListState()
 
 		const updateAccessorInstance = () => {
+			const accessor = entityListState.accessor!
 			return (entityListState.accessor = new EntityListAccessor(
-				entityListState.childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
-				entityListState.accessor!.errors,
-				entityListState.accessor!.addEventListener,
-				entityListState.accessor!.batchUpdates,
-				entityListState.accessor!.addNew,
+				this.getEntityByKey,
+				entityListState.childIds,
+				accessor.errors,
+				accessor.addEventListener,
+				accessor.batchUpdates,
+				accessor.addNew,
 			))
 		}
 		const performUpdate = () => {
@@ -510,16 +532,18 @@ class AccessorTreeGenerator {
 						`changes, use the 'beforeUpdate' event so that it is possible to avoid thrashing.`,
 				)
 			}
-			entityListState.isFrozenWhileUpdating = true
-			parentOnUpdate(updateAccessorInstance())
-			if (entityListState.eventListeners.afterUpdate === undefined) {
+			ReactDOM.unstable_batchedUpdates(() => {
+				entityListState.isFrozenWhileUpdating = true
+				parentOnUpdate(updateAccessorInstance())
+				if (entityListState.eventListeners.afterUpdate === undefined) {
+					entityListState.isFrozenWhileUpdating = false
+					return
+				}
+				for (const handler of entityListState.eventListeners.afterUpdate) {
+					handler(entityListState.accessor)
+				}
 				entityListState.isFrozenWhileUpdating = false
-				return
-			}
-			for (const handler of entityListState.eventListeners.afterUpdate) {
-				handler(entityListState.accessor)
-			}
-			entityListState.isFrozenWhileUpdating = false
+			})
 		}
 		const batchUpdates: BatchEntityListUpdates = performUpdates => {
 			entityListState.batchUpdateDepth++
@@ -533,7 +557,7 @@ class AccessorTreeGenerator {
 
 		const onUpdateProxy = (key: string, newValue: EntityAccessor.FieldDatum) => {
 			batchUpdates(getAccessor => {
-				const childState = entityListState.childStates.get(key)
+				const childState = this.entityStore.get(key)
 				if (childState === undefined) {
 					this.rejectInvalidAccessorTree()
 				}
@@ -548,9 +572,10 @@ class AccessorTreeGenerator {
 					throw new BindingError(`Illegal entity list value.`)
 				}
 				if (newValue === undefined) {
-					entityListState.childStates.delete(key)
+					entityListState.childIds.delete(key)
+					this.entityStore.delete(key)
 				} else {
-					childState.accessor = newValue
+					//childState.accessor = newValue
 				}
 				updateAccessorInstance()
 
@@ -593,11 +618,12 @@ class AccessorTreeGenerator {
 				}
 			}
 		}
-		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData): EntityAccessor => {
-			let key: string
+		const generateNewAccessor = (
+			datum: AccessorTreeGenerator.InitialEntityData,
+			id: string | EntityAccessor.UnpersistedEntityId,
+		): EntityAccessor => {
+			const key = typeof id === 'string' ? id : id.value
 			let childErrors
-
-			const entityState = this.createEmptyEntityState()
 
 			if (errors && datum) {
 				const errorKey =
@@ -610,19 +636,20 @@ class AccessorTreeGenerator {
 			}
 
 			const onUpdate: OnUpdate = newValue => onUpdateProxy(key, newValue)
-			const accessor = this.generateEntityAccessor(entityFields, datum, childErrors, onUpdate, entityState)
-			key = accessor.key
-			entityListState.childStates.set(key, entityState)
+			const accessor = this.generateEntityAccessor(entityFields, datum, childErrors, onUpdate, id)
+			entityListState.childIds.add(key)
 
 			return accessor
 		}
 		entityListState.accessor = new EntityListAccessor(
-			entityListState.childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
+			this.getEntityByKey,
+			entityListState.childIds,
 			errors ? errors.errors : emptyArray,
 			addEventListener,
 			batchUpdates,
 			newEntity => {
-				const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity)
+				const newId = new EntityAccessor.UnpersistedEntityId()
+				const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity, newId)
 
 				if (typeof newEntity === 'function') {
 					entityListState.accessor!.batchUpdates(getAccessor => {
@@ -647,7 +674,7 @@ class AccessorTreeGenerator {
 		}
 
 		for (const sourceDatum of sourceData) {
-			generateNewAccessor(sourceDatum)
+			generateNewAccessor(sourceDatum, this.getEntityId(sourceDatum))
 		}
 
 		return entityListState.accessor
@@ -729,13 +756,24 @@ class AccessorTreeGenerator {
 			accessor: undefined,
 			batchUpdateDepth: 0,
 			eventListeners: {},
-			childStates: new Map(),
+			childIds: new Set(),
 		}
+	}
+
+	private getEntityId(data: AccessorTreeGenerator.InitialEntityData): string | EntityAccessor.UnpersistedEntityId {
+		return data
+			? data instanceof EntityAccessor || data instanceof EntityForRemovalAccessor
+				? data.runtimeId
+				: data[PRIMARY_KEY_NAME]
+			: new EntityAccessor.UnpersistedEntityId()
 	}
 }
 
 namespace AccessorTreeGenerator {
-	export type UpdateData = (newData: RootAccessor) => void
+	export type UpdateData = (
+		newData: RootAccessor,
+		getEntityByKey: (key: string) => EntityAccessor | EntityForRemovalAccessor | undefined,
+	) => void
 
 	export type InitialEntityData = ReceivedEntityData<undefined> | EntityAccessor | EntityForRemovalAccessor
 }

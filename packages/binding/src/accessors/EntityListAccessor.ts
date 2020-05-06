@@ -52,13 +52,16 @@ namespace EntityListAccessor {
 	}
 
 	export type BatchUpdates = (getAccessor: () => EntityListAccessor) => void
+	export type AfterUpdate = (accessor: undefined | EntityListAccessor) => void
 
 	export interface EntityEventListenerMap {
 		beforeUpdate: BatchUpdates
+		afterUpdate: AfterUpdate
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
 	export interface AddEntityEventListener {
-		(type: EntityEventType & 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+		(type: 'afterUpdate', listener: EntityEventListenerMap['afterUpdate']): () => void
 	}
 }
 

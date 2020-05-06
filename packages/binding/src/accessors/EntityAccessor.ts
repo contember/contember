@@ -205,13 +205,16 @@ namespace EntityAccessor {
 	export type SubTreeData = Map<SubTreeIdentifier, SubTreeDatum> | undefined
 
 	export type BatchUpdates = (getAccessor: () => EntityAccessor) => void
+	export type AfterUpdate = (accessor: undefined | EntityAccessor | EntityForRemovalAccessor) => void
 
 	export interface EntityEventListenerMap {
 		beforeUpdate: BatchUpdates
+		afterUpdate: AfterUpdate
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
 	export interface AddEntityEventListener {
-		(type: EntityEventType & 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+		(type: 'afterUpdate', listener: EntityEventListenerMap['afterUpdate']): () => void
 	}
 }
 

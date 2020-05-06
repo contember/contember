@@ -38,11 +38,22 @@ type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
 const BEFORE_UPDATE_SETTLE_LIMIT = 100
 
 interface InternalEntityState {
+	isFrozenWhileUpdating: boolean
 	batchUpdateDepth: number
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]?: Set<EntityAccessor.EntityEventListenerMap[Type]>
 	}
 	accessor: EntityAccessor | EntityForRemovalAccessor | undefined
+}
+
+interface InternalEntityListState {
+	isFrozenWhileUpdating: boolean
+	batchUpdateDepth: number
+	eventListeners: {
+		[Type in EntityListAccessor.EntityEventType]?: Set<EntityListAccessor.EntityEventListenerMap[Type]>
+	}
+	accessor: EntityListAccessor | undefined
+	childStates: Map<string, InternalEntityState>
 }
 
 class AccessorTreeGenerator {
@@ -359,7 +370,24 @@ class AccessorTreeGenerator {
 		parentOnUpdate: OnUpdate,
 		entityState: InternalEntityState = this.createEmptyEntityState(),
 	): EntityAccessor {
-		const performUpdate = () => parentOnUpdate(entityState.accessor)
+		const performUpdate = () => {
+			if (entityState.isFrozenWhileUpdating) {
+				throw new BindingError(
+					`Trying to perform an update while the whole accessor tree is already updating. If you wish to react to ` +
+						`changes, use the 'beforeUpdate' event so that it is possible to avoid thrashing.`,
+				)
+			}
+			entityState.isFrozenWhileUpdating = true
+			parentOnUpdate(entityState.accessor)
+			if (entityState.eventListeners.afterUpdate === undefined) {
+				entityState.isFrozenWhileUpdating = false
+				return
+			}
+			for (const handler of entityState.eventListeners.afterUpdate) {
+				handler(entityState.accessor)
+			}
+			entityState.isFrozenWhileUpdating = false
+		}
 		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
 			batchUpdates(getAccessor => {
 				entityState.accessor = newValue
@@ -425,7 +453,7 @@ class AccessorTreeGenerator {
 			listener: EntityAccessor.EntityEventListenerMap[typeof type],
 		) => {
 			if (entityState.eventListeners[type] === undefined) {
-				entityState.eventListeners[type] = new Set()
+				entityState.eventListeners[type] = new Set<never>()
 			}
 			entityState.eventListeners[type]!.add(listener as any)
 			return () => {
@@ -464,37 +492,48 @@ class AccessorTreeGenerator {
 				`The error tree structure does not correspond to the marker tree. This should never happen.`,
 			)
 		}
-
-		let batchUpdateDepth = 0
-		const eventListeners: {
-			[Type in EntityListAccessor.EntityEventType]?: Set<EntityListAccessor.EntityEventListenerMap[Type]>
-		} = {}
-		const childStates: Map<string, InternalEntityState> = new Map()
-		let listAccessor: EntityListAccessor
+		const entityListState = this.createEmptyEntityListState()
 
 		const updateAccessorInstance = () => {
-			return (listAccessor = new EntityListAccessor(
-				childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
-				listAccessor.errors,
-				listAccessor.addEventListener,
-				listAccessor.batchUpdates,
-				listAccessor.addNew,
+			return (entityListState.accessor = new EntityListAccessor(
+				entityListState.childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
+				entityListState.accessor!.errors,
+				entityListState.accessor!.addEventListener,
+				entityListState.accessor!.batchUpdates,
+				entityListState.accessor!.addNew,
 			))
 		}
-		const performUpdate = () => parentOnUpdate(updateAccessorInstance())
+		const performUpdate = () => {
+			if (entityListState.isFrozenWhileUpdating) {
+				throw new BindingError(
+					`Trying to perform an update while the whole accessor tree is already updating. If you wish to react to ` +
+						`changes, use the 'beforeUpdate' event so that it is possible to avoid thrashing.`,
+				)
+			}
+			entityListState.isFrozenWhileUpdating = true
+			parentOnUpdate(updateAccessorInstance())
+			if (entityListState.eventListeners.afterUpdate === undefined) {
+				entityListState.isFrozenWhileUpdating = false
+				return
+			}
+			for (const handler of entityListState.eventListeners.afterUpdate) {
+				handler(entityListState.accessor)
+			}
+			entityListState.isFrozenWhileUpdating = false
+		}
 		const batchUpdates: BatchEntityListUpdates = performUpdates => {
-			batchUpdateDepth++
-			const accessorBeforeUpdates = listAccessor
-			performUpdates(() => listAccessor)
-			batchUpdateDepth--
-			if (batchUpdateDepth === 0 && accessorBeforeUpdates !== listAccessor) {
+			entityListState.batchUpdateDepth++
+			const accessorBeforeUpdates = entityListState.accessor
+			performUpdates(() => entityListState.accessor!)
+			entityListState.batchUpdateDepth--
+			if (entityListState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityListState.accessor) {
 				performUpdate()
 			}
 		}
 
 		const onUpdateProxy = (key: string, newValue: EntityAccessor.FieldDatum) => {
 			batchUpdates(getAccessor => {
-				const childState = childStates.get(key)
+				const childState = entityListState.childStates.get(key)
 				if (childState === undefined) {
 					this.rejectInvalidAccessorTree()
 				}
@@ -509,21 +548,24 @@ class AccessorTreeGenerator {
 					throw new BindingError(`Illegal entity list value.`)
 				}
 				if (newValue === undefined) {
-					childStates.delete(key)
+					entityListState.childStates.delete(key)
 				} else {
 					childState.accessor = newValue
 				}
 				updateAccessorInstance()
 
-				if (eventListeners.beforeUpdate === undefined || eventListeners.beforeUpdate.size === 0) {
+				if (
+					entityListState.eventListeners.beforeUpdate === undefined ||
+					entityListState.eventListeners.beforeUpdate.size === 0
+				) {
 					return
 				}
 
 				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
-					for (const listener of eventListeners.beforeUpdate) {
+					for (const listener of entityListState.eventListeners.beforeUpdate) {
 						listener(getAccessor)
 					}
-					if (listAccessor === getAccessor()) {
+					if (entityListState.accessor === getAccessor()) {
 						return
 					}
 				}
@@ -533,18 +575,21 @@ class AccessorTreeGenerator {
 				)
 			})
 		}
-		const addEventListener: AddEntityListEventListener = (type, listener) => {
-			if (eventListeners[type] === undefined) {
-				eventListeners[type] = new Set()
+		const addEventListener: AddEntityListEventListener = (
+			type: EntityListAccessor.EntityEventType,
+			listener: EntityListAccessor.EntityEventListenerMap[typeof type],
+		) => {
+			if (entityListState.eventListeners[type] === undefined) {
+				entityListState.eventListeners[type] = new Set<never>()
 			}
-			eventListeners[type]!.add(listener as any)
+			entityListState.eventListeners[type]!.add(listener as any)
 			return () => {
-				if (eventListeners[type] === undefined) {
+				if (entityListState.eventListeners[type] === undefined) {
 					return // Throw an error? This REALLY should not happen.
 				}
-				eventListeners[type]!.delete(listener as any)
-				if (eventListeners[type]!.size === 0) {
-					eventListeners[type] = undefined
+				entityListState.eventListeners[type]!.delete(listener as any)
+				if (entityListState.eventListeners[type]!.size === 0) {
+					entityListState.eventListeners[type] = undefined
 				}
 			}
 		}
@@ -567,12 +612,12 @@ class AccessorTreeGenerator {
 			const onUpdate: OnUpdate = newValue => onUpdateProxy(key, newValue)
 			const accessor = this.generateEntityAccessor(entityFields, datum, childErrors, onUpdate, entityState)
 			key = accessor.key
-			childStates.set(key, entityState)
+			entityListState.childStates.set(key, entityState)
 
 			return accessor
 		}
-		listAccessor = new EntityListAccessor(
-			childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
+		entityListState.accessor = new EntityListAccessor(
+			entityListState.childStates as Map<string, EntityListAccessor.ChildWithMetadata>,
 			errors ? errors.errors : emptyArray,
 			addEventListener,
 			batchUpdates,
@@ -580,7 +625,7 @@ class AccessorTreeGenerator {
 				const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity)
 
 				if (typeof newEntity === 'function') {
-					listAccessor.batchUpdates(getAccessor => {
+					entityListState.accessor!.batchUpdates(getAccessor => {
 						onUpdateProxy(newAccessor.key, newAccessor)
 						newEntity(getAccessor, newAccessor.key)
 					})
@@ -605,7 +650,7 @@ class AccessorTreeGenerator {
 			generateNewAccessor(sourceDatum)
 		}
 
-		return listAccessor
+		return entityListState.accessor
 	}
 
 	private withUpdatedField(
@@ -671,9 +716,20 @@ class AccessorTreeGenerator {
 
 	private createEmptyEntityState(): InternalEntityState {
 		return {
+			isFrozenWhileUpdating: false,
 			accessor: undefined,
 			batchUpdateDepth: 0,
 			eventListeners: {},
+		}
+	}
+
+	private createEmptyEntityListState(): InternalEntityListState {
+		return {
+			isFrozenWhileUpdating: false,
+			accessor: undefined,
+			batchUpdateDepth: 0,
+			eventListeners: {},
+			childStates: new Map(),
 		}
 	}
 }

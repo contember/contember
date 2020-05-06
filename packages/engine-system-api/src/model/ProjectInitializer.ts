@@ -5,15 +5,27 @@ import { ProjectMigrationInfoResolver, ProjectMigrator } from './migrations'
 import { createStageTree, StageCreator } from './stages'
 import { MigrationEventsQuery } from './queries'
 import { DatabaseContext, DatabaseContextFactory } from './database'
+import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
+import { DatabaseCredentials } from '@contember/database'
 
 export class ProjectInitializer {
 	constructor(
 		private readonly projectMigrator: ProjectMigrator,
 		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver | undefined,
 		private readonly stageCreator: StageCreator,
+		private readonly systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory,
 	) {}
 
-	public async initialize(databaseContextFactory: DatabaseContextFactory, project: ProjectConfig) {
+	public async initialize(
+		databaseContextFactory: DatabaseContextFactory,
+		project: ProjectConfig & { db?: DatabaseCredentials },
+	) {
+		if (project.db) {
+			// todo: use databaseContextFactory
+			console.group(`Executing system schema migration`)
+			await this.systemDbMigrationsRunnerFactory(project.db).migrate()
+			console.groupEnd()
+		}
 		return databaseContextFactory.create(unnamedIdentity).transaction(async trx => {
 			await this.createInitEvent(trx)
 			await this.initStages(trx, project)

@@ -192,8 +192,13 @@ export class SystemContainerFactory {
 			.addService('resolverContextFactory', ({ authorizator }) => new ResolverContextFactory(authorizator))
 			.addService(
 				'projectInitializer',
-				({ projectMigrator, projectMigrationInfoResolver, stageCreator }) =>
-					new ProjectInitializer(projectMigrator, projectMigrationInfoResolver, stageCreator),
+				({ projectMigrator, projectMigrationInfoResolver, stageCreator, systemDbMigrationsRunnerFactory }) =>
+					new ProjectInitializer(
+						projectMigrator,
+						projectMigrationInfoResolver,
+						stageCreator,
+						systemDbMigrationsRunnerFactory,
+					),
 			)
 	}
 }

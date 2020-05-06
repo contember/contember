@@ -126,7 +126,6 @@ class CompositionRoot {
 						tenantMigrationsRunner,
 						tenantContainer.projectManager,
 						systemContainer.projectInitializer,
-						systemContainer.systemDbMigrationsRunnerFactory,
 						containerList,
 					),
 			)

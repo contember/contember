@@ -1,7 +1,6 @@
 import { ProjectManager } from '@contember/engine-tenant-api'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { ProjectInitializer } from '@contember/engine-system-api'
-import { DatabaseCredentials } from '@contember/database'
 import { ProjectContainer } from '@contember/engine-http'
 
 export class Initializer {
@@ -9,7 +8,6 @@ export class Initializer {
 		private readonly tenantDbMigrationsRunner: MigrationsRunner,
 		private readonly projectManager: ProjectManager,
 		private readonly projectInitializer: ProjectInitializer,
-		private readonly systemDbMigrationRunnerFactory: (db: DatabaseCredentials) => MigrationsRunner,
 		private readonly projectContainers: ProjectContainer[],
 	) {}
 
@@ -30,12 +28,7 @@ export class Initializer {
 			await this.projectManager.createOrUpdateProject(project)
 			console.groupEnd()
 
-			console.group(`Executing system schema migration`)
-			await this.systemDbMigrationRunnerFactory(project.db).migrate()
-			console.groupEnd()
-
-			const init = this.projectInitializer
-			await init.initialize(container.systemDatabaseContextFactory, project)
+			await this.projectInitializer.initialize(container.systemDatabaseContextFactory, project)
 
 			console.groupEnd()
 		}

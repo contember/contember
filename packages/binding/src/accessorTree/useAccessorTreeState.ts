@@ -46,6 +46,8 @@ export const useAccessorTreeState = ({
 		normalizedEnvironment,
 		nodeTree,
 	])
+
+	// TODO this REALLY should be useState.
 	const accessorTreeGenerator = React.useMemo(() => new AccessorTreeGenerator(markerTree), [markerTree])
 	const query = React.useMemo(() => new QueryGenerator(markerTree).getReadQuery(), [markerTree])
 	const [state, dispatch] = React.useReducer(accessorTreeStateReducer, initialState)

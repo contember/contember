@@ -1,8 +1,6 @@
-import { assertNever } from '@contember/utils'
-import * as React from 'react'
 import {
-	Component,
 	BindingError,
+	Component,
 	EntityAccessor,
 	EntityListAccessor,
 	EntityListDataProvider,
@@ -20,10 +18,12 @@ import {
 	SugaredQualifiedFieldList,
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
-	useEntityContext,
+	useEntityAccessor,
 	useEnvironment,
 	useMutationState,
 } from '@contember/binding'
+import { assertNever } from '@contember/utils'
+import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export type BaseDynamicChoiceFieldProps =
@@ -56,7 +56,7 @@ const computeSubTreeIdentifier = (field: DynamicChoiceFieldProps['field']) => JS
 export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.ChoiceArity>(
 	props: DynamicChoiceFieldProps,
 ): ChoiceFieldData.MetadataByArity[DynamicArity] => {
-	const parentEntity = useEntityContext()
+	const parentEntity = useEntityAccessor()
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 	const subTreeIdentifier = React.useMemo(() => computeSubTreeIdentifier(props.field), [props.field])

@@ -9,7 +9,7 @@ import {
 	RelativeSingleField,
 	SugaredField,
 	useDesugaredRelativeEntityList,
-	useEntityContext,
+	useEntityAccessor,
 	useEnvironment,
 } from '@contember/binding'
 import { emptyArray, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
@@ -30,7 +30,7 @@ export interface BlockEditorProps extends HasManyProps, BlockEditorInnerPublicPr
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
 export const BlockEditor = Component<BlockEditorProps>(
 	props => {
-		const entity = useEntityContext()
+		const entity = useEntityAccessor()
 		const environment = useEnvironment()
 
 		useConstantLengthInvariant(

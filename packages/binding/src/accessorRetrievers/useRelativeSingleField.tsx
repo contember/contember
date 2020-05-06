@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
-import { useEntityContext } from './useEntityContext'
+import { useEntityAccessor } from '../accessorPropagation'
 
 export const useRelativeSingleField = <
 	Persisted extends FieldValue = FieldValue,
@@ -9,7 +9,7 @@ export const useRelativeSingleField = <
 >(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
 ) => {
-	const entity = useEntityContext()
+	const entity = useEntityAccessor()
 	const relativeSingleField = useDesugaredRelativeSingleField(sugaredRelativeSingleField)
 	return React.useMemo(() => entity.getRelativeSingleField<Persisted, Produced>(relativeSingleField), [
 		entity,

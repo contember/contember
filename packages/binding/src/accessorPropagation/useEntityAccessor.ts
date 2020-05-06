@@ -3,7 +3,7 @@ import { EntityAccessor } from '../accessors'
 import { BindingError } from '../BindingError'
 import { AccessorContext } from './AccessorContext'
 
-export const useEntityContext = (): EntityAccessor => {
+export const useEntityAccessor = (): EntityAccessor => {
 	const data = React.useContext(AccessorContext)
 
 	if (!(data instanceof EntityAccessor)) {

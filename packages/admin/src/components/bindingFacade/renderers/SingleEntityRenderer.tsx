@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {
-	AccessorContext,
+	AccessorProvider,
 	AccessorTreeStateWithDataContext,
 	Component,
 	EntityAccessor,
@@ -31,7 +31,7 @@ export const SingleEntityRenderer = Component<SingleEntityRendererProps>(
 			return null
 		}
 
-		return <AccessorContext.Provider value={root}>{children}</AccessorContext.Provider>
+		return <AccessorProvider value={root}>{children}</AccessorProvider>
 	},
 	props => props.children,
 	'SingleEntityRenderer',

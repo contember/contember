@@ -1,7 +1,7 @@
 import { IncreaseHeadingDepth, TitleBar, TitleBarProps } from '@contember/ui'
 import * as React from 'react'
 import {
-	AccessorContext,
+	AccessorProvider,
 	AccessorTreeStateWithDataContext,
 	Component,
 	EntityAccessor,
@@ -51,7 +51,7 @@ const ImmutableContentLayoutRendererInner = Component<ImmutableContentLayoutRend
 		return (
 			<>
 				<LayoutInner>
-					<AccessorContext.Provider value={treeStateRoot}>{titleBar}</AccessorContext.Provider>
+					<AccessorProvider value={treeStateRoot}>{titleBar}</AccessorProvider>
 					{content}
 				</LayoutInner>
 				{side && <LayoutSide>{side}</LayoutSide>}

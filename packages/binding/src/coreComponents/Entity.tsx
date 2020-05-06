@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AccessorContext } from '../accessorRetrievers'
+import { AccessorProvider } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
 
 export interface EntityProps {
@@ -9,5 +9,5 @@ export interface EntityProps {
 
 // TODO this allows for some errors to never be rendered.
 export const Entity = React.memo((props: EntityProps) => (
-	<AccessorContext.Provider value={props.accessor}>{props.children}</AccessorContext.Provider>
+	<AccessorProvider value={props.accessor}>{props.children}</AccessorProvider>
 ))

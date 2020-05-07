@@ -26,7 +26,7 @@ export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(pr
 
 						props.addNew?.((getAccessor, newKey) => {
 							const accessor = getAccessor()
-							const newlyAdded = accessor.getByKey(newKey) as EntityAccessor
+							const newlyAdded = accessor.getEntityByKey(newKey) as EntityAccessor
 							const discriminationField = newlyAdded.getRelativeSingleField(desugaredDiscriminationField)
 							discriminationField.updateValue?.(targetValue)
 						})

@@ -15,7 +15,7 @@ export const addNewEntityAtIndex = (
 	}
 	const sortedEntities = sortEntities(entityList.getFilteredEntities(), sortableByField)
 	entityList.addNew((getListAccessor, newKey) => {
-		let newlyAdded = getListAccessor().getByKey(newKey)
+		let newlyAdded = getListAccessor().getEntityByKey(newKey)
 
 		if (!(newlyAdded instanceof EntityAccessor)) {
 			return
@@ -25,7 +25,7 @@ export const addNewEntityAtIndex = (
 
 		if (sortableField.updateValue) {
 			sortableField.updateValue(index)
-			newlyAdded = getListAccessor().getByKey(newKey)
+			newlyAdded = getListAccessor().getEntityByKey(newKey)
 
 			if (!(newlyAdded instanceof EntityAccessor)) {
 				return

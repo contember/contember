@@ -517,7 +517,7 @@ class AccessorTreeGenerator {
 		const updateAccessorInstance = () => {
 			const accessor = entityListState.accessor!
 			return (entityListState.accessor = new EntityListAccessor(
-				this.getEntityByKey,
+				accessor.getEntityByKey,
 				entityListState.childIds,
 				accessor.errors,
 				accessor.addEventListener,
@@ -641,8 +641,14 @@ class AccessorTreeGenerator {
 
 			return accessor
 		}
+		const getChildEntityByKey = (key: string) => {
+			if (!entityListState.childIds.has(key)) {
+				return undefined
+			}
+			return this.getEntityByKey(key)
+		}
 		entityListState.accessor = new EntityListAccessor(
-			this.getEntityByKey,
+			getChildEntityByKey,
 			entityListState.childIds,
 			errors ? errors.errors : emptyArray,
 			addEventListener,

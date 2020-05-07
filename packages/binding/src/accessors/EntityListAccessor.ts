@@ -9,7 +9,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 	private _filteredEntities: EntityAccessor[] | undefined
 
 	public constructor(
-		private readonly getEntityByKey: GetEntityByKey,
+		public readonly getEntityByKey: GetEntityByKey,
 		private readonly entityIds: Set<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityListAccessor.AddEntityEventListener,
@@ -32,10 +32,6 @@ class EntityListAccessor extends Accessor implements Errorable {
 			)
 		}
 		return [...this._filteredEntities]
-	}
-
-	public getByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {
-		return this.getEntityByKey(key)
 	}
 
 	public *[Symbol.iterator](): Generator<EntityAccessor | EntityForRemovalAccessor> {

@@ -126,7 +126,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				const oldEntityKey = sortedEntities[sortedEntityIndex].key
 				const newEntity = getAccessor()
 					.getRelativeEntityList(desugaredEntityList)
-					.getByKey(oldEntityKey)
+					.getEntityByKey(oldEntityKey)
 				if (!(newEntity instanceof EntityAccessor)) {
 					throw new BindingError(`Corrupted data`)
 				}
@@ -184,12 +184,16 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					sortableByField,
 					sortedEntityIndex,
 					(getInnerAccessor, newEntityKey) => {
-						const newEntity = getInnerAccessor().getByKey(newEntityKey) as EntityAccessor
+						const newEntity = getInnerAccessor().getEntityByKey(newEntityKey) as EntityAccessor
 						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
 						if (preprocess) {
-							;(getInnerAccessor().getByKey(newEntityKey) as EntityAccessor).batchUpdates(preprocess)
+							;(getInnerAccessor().getEntityByKey(newEntityKey) as EntityAccessor).batchUpdates(preprocess)
 						}
-						sortedEntities.splice(sortedEntityIndex, 0, getInnerAccessor().getByKey(newEntityKey) as EntityAccessor)
+						sortedEntities.splice(
+							sortedEntityIndex,
+							0,
+							getInnerAccessor().getEntityByKey(newEntityKey) as EntityAccessor,
+						)
 					},
 				)
 				return sortedEntities[sortedEntityIndex]

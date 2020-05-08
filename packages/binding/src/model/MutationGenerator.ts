@@ -191,7 +191,6 @@ export class MutationGenerator {
 		entityFields: EntityFields,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		const allData = currentData.fieldData
 		const nonbearingFields: Array<{
 			placeholderName: string
 			value: FieldValue
@@ -203,7 +202,7 @@ export class MutationGenerator {
 				continue
 			}
 			if (marker instanceof FieldMarker) {
-				const accessor = allData.get(placeholderName)
+				const accessor = currentData.getFieldByPlaceholder(placeholderName)
 				if (accessor instanceof FieldAccessor) {
 					const resolvedValue = accessor.resolvedValue
 
@@ -229,7 +228,7 @@ export class MutationGenerator {
 
 				for (const referencePlaceholder in references) {
 					const reference = references[referencePlaceholder]
-					const accessor = allData.get(reference.placeholderName)
+					const accessor = currentData.getFieldByPlaceholder(reference.placeholderName)
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (accessor instanceof EntityAccessor) {
@@ -326,14 +325,12 @@ export class MutationGenerator {
 		persistedData: ReceivedEntityData<undefined>,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
-		const allData = currentData.fieldData
-
 		for (const [placeholderName, marker] of entityFields) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}
 			if (marker instanceof FieldMarker) {
-				const accessor = allData.get(placeholderName)
+				const accessor = currentData.getFieldByPlaceholder(placeholderName)
 				const persistedValue = persistedData ? persistedData[placeholderName] : undefined
 
 				if (accessor instanceof FieldAccessor && persistedValue !== undefined) {
@@ -354,7 +351,7 @@ export class MutationGenerator {
 
 				for (const referencePlaceholder in references) {
 					const reference = references[referencePlaceholder]
-					const accessor = allData.get(reference.placeholderName)
+					const accessor = currentData.getFieldByPlaceholder(reference.placeholderName)
 					const persistedField = persistedData ? persistedData[reference.placeholderName] : undefined
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {

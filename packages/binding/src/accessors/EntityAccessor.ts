@@ -27,7 +27,7 @@ class EntityAccessor extends Accessor implements Errorable {
 	public constructor(
 		key: string | EntityAccessor.UnpersistedEntityId,
 		public readonly typename: string | undefined,
-		public readonly fieldData: EntityAccessor.FieldData,
+		private readonly fieldData: EntityAccessor.FieldData,
 		public readonly subTreeData: EntityAccessor.SubTreeData,
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
@@ -51,24 +51,30 @@ class EntityAccessor extends Accessor implements Errorable {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
 	}
 
-	public getField(fieldName: FieldName): EntityAccessor.FieldDatum
+	public *[Symbol.iterator](): Generator<[FieldName, EntityAccessor.NestedAccessor]> {
+		for (const [placeholderName, fieldDatum] of this.fieldData) {
+			yield [placeholderName, fieldDatum.accessor]
+		}
+	}
+
+	public getField(fieldName: FieldName): EntityAccessor.NestedAccessor
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
-	): EntityAccessor.FieldDatum | undefined
+	): EntityAccessor.NestedAccessor | undefined
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
 		reducedBy: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.FieldDatum | undefined
+	): EntityAccessor.NestedAccessor | undefined
 	public getField(
 		fieldName: FieldName,
 		expectedCount?: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter?: ReferenceMarker.ReferenceConstraints['filter'],
 		reducedBy?: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.FieldDatum | undefined {
+	): EntityAccessor.NestedAccessor | undefined {
 		let placeholder: FieldName
 
 		if (expectedCount !== undefined) {
@@ -81,7 +87,7 @@ class EntityAccessor extends Accessor implements Errorable {
 			placeholder = PlaceholderGenerator.getFieldPlaceholder(fieldName)
 		}
 
-		return this.fieldData.get(placeholder)
+		return this.getFieldByPlaceholder(placeholder)
 	}
 
 	public getTreeRoot(identifier: SubTreeIdentifier): RootAccessor | undefined {
@@ -182,6 +188,13 @@ class EntityAccessor extends Accessor implements Errorable {
 		}
 		return field
 	}
+
+	/**
+	 * @internal
+	 */
+	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor | undefined {
+		return this.fieldData.get(placeholderName)?.accessor
+	}
 }
 
 namespace EntityAccessor {
@@ -198,7 +211,10 @@ namespace EntityAccessor {
 		}
 	}
 
-	export type FieldDatum = undefined | EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | FieldAccessor
+	export interface FieldDatum {
+		accessor: NestedAccessor
+	}
+	export type NestedAccessor = EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | FieldAccessor
 	export type SubTreeDatum = RootAccessor
 
 	export type FieldData = Map<FieldName, FieldDatum>

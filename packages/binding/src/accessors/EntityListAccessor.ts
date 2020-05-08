@@ -46,10 +46,6 @@ class EntityListAccessor extends Accessor implements Errorable {
 }
 
 namespace EntityListAccessor {
-	export interface ChildWithMetadata {
-		readonly accessor: EntityAccessor | EntityForRemovalAccessor
-	}
-
 	export type BatchUpdates = (getAccessor: () => EntityListAccessor) => void
 	export type AfterUpdate = (accessor: undefined | EntityListAccessor) => void
 

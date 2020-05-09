@@ -53,6 +53,9 @@ class EntityAccessor extends Accessor implements Errorable {
 
 	public *[Symbol.iterator](): Generator<[FieldName, EntityAccessor.NestedAccessor]> {
 		for (const [placeholderName, fieldDatum] of this.fieldData) {
+			if (fieldDatum.accessor === undefined) {
+				continue
+			}
 			yield [placeholderName, fieldDatum.accessor]
 		}
 	}
@@ -212,7 +215,7 @@ namespace EntityAccessor {
 	}
 
 	export interface FieldDatum {
-		accessor: NestedAccessor
+		accessor: NestedAccessor | undefined
 	}
 	export type NestedAccessor = EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | FieldAccessor
 	export type SubTreeDatum = RootAccessor

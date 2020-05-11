@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
-import { emptyArray, returnFalse } from '@contember/react-utils'
+import { emptyArray, noop, returnFalse } from '@contember/react-utils'
 import { assertNever } from '../utils'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
@@ -45,7 +45,7 @@ interface InternalEntityState {
 	isFrozenWhileUpdating: boolean
 	batchUpdateDepth: number
 	eventListeners: {
-		[Type in EntityAccessor.EntityEventType]?: Set<EntityAccessor.EntityEventListenerMap[Type]>
+		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
 	isDirty: boolean
 	dirtyChildFields: Set<FieldName> | undefined
@@ -57,7 +57,7 @@ interface InternalEntityListState {
 	isFrozenWhileUpdating: boolean
 	batchUpdateDepth: number
 	eventListeners: {
-		[Type in EntityListAccessor.EntityEventType]?: Set<EntityListAccessor.EntityEventListenerMap[Type]>
+		[Type in EntityListAccessor.EntityEventType]: Set<EntityListAccessor.EntityEventListenerMap[Type]> | undefined
 	}
 	accessor: EntityListAccessor
 	isDirty: boolean
@@ -68,7 +68,9 @@ interface InternalEntityListState {
 interface InternalFieldState {
 	touchLog: Map<string, boolean> | undefined
 	accessor: FieldAccessor
-	// TODO events?
+	eventListeners: {
+		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
+	}
 }
 
 class AccessorTreeGenerator {
@@ -87,7 +89,7 @@ class AccessorTreeGenerator {
 		updateData: AccessorTreeGenerator.UpdateData,
 		errors?: MutationDataResponse,
 	): void {
-		this.entityStore = new Map()
+		//this.entityStore = new Map()
 		const preprocessor = new ErrorsPreprocessor(errors)
 
 		this.errorTreeRoot = preprocessor.preprocess()
@@ -117,7 +119,7 @@ class AccessorTreeGenerator {
 			this.errorTreeRoot,
 		)
 
-		updateData(subTreeState.accessor!, this.getEntityByKey)
+		updateDataWithEvents(subTreeState.accessor!)
 	}
 
 	private generateSubTree(
@@ -143,7 +145,7 @@ class AccessorTreeGenerator {
 		const subTreeState =
 			Array.isArray(data) || data === undefined || data instanceof EntityListAccessor
 				? this.generateEntityListAccessor(tree.fields, data, errorNode, onUpdate)
-				: this.generateEntityAccessor(tree.fields, data, errorNode, onUpdate)
+				: this.generateEntityAccessor(tree.fields, data, errorNode, onUpdate, undefined)
 
 		return subTreeState
 	}
@@ -176,8 +178,12 @@ class AccessorTreeGenerator {
 						undefined,
 						returnFalse, // IDs cannot be updated, and thus they cannot be touched either
 						emptyArray, // There cannot be errors associated with the id, right? If so, we should probably handle them at the Entity level.
+						() => noop, // It won't ever fire but at the same time it makes other code simpler.
 						undefined, // IDs cannot be updated
 					),
+					eventListeners: {
+						afterUpdate: undefined,
+					},
 					touchLog: undefined,
 				})
 				continue
@@ -250,6 +256,7 @@ class AccessorTreeGenerator {
 									fieldDatum || undefined,
 									referenceError,
 									getOnReferenceUpdate(referencePlaceholder),
+									undefined,
 								),
 							)
 						} else {
@@ -346,6 +353,7 @@ class AccessorTreeGenerator {
 								field.defaultValue,
 								isTouchedBy,
 								fieldErrors,
+								() => noop, // TODO
 								onChange,
 							),
 						)
@@ -365,6 +373,7 @@ class AccessorTreeGenerator {
 						field.defaultValue,
 						isTouchedBy,
 						fieldErrors,
+						() => noop, // TODO
 						onChange,
 					)
 					fieldStates.set(placeholderName, fieldState)
@@ -397,7 +406,7 @@ class AccessorTreeGenerator {
 		persistedData: AccessorTreeGenerator.InitialEntityData,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		parentOnUpdate: OnUpdate,
-		id?: string | EntityAccessor.UnpersistedEntityId,
+		id: undefined | string | EntityAccessor.UnpersistedEntityId,
 	): InternalEntityState {
 		// TODO We need to merge different entities with the same id!
 
@@ -405,8 +414,17 @@ class AccessorTreeGenerator {
 			id = this.resolveOrCreateEntityId(persistedData)
 		}
 		const entityKey = typeof id === 'string' ? id : id.value
-		const entityState = this.createEmptyEntityState()
-		this.entityStore.set(entityKey, entityState)
+
+		let entityState: InternalEntityState
+		const existingState = this.entityStore.get(entityKey)
+
+		if (existingState === undefined) {
+			this.entityStore.set(entityKey, (entityState = this.createEmptyEntityState()))
+		} else {
+			entityState = existingState
+			entityState.isDirty = true
+			entityState.dirtyChildFields = new Set(entityState.fields.keys())
+		}
 
 		const performUpdate = () => {
 			entityState.isDirty = true
@@ -740,6 +758,9 @@ class AccessorTreeGenerator {
 	private createEmptyFieldState(): InternalFieldState {
 		return {
 			accessor: (undefined as any) as FieldAccessor,
+			eventListeners: {
+				afterUpdate: undefined,
+			},
 			touchLog: undefined,
 		}
 	}
@@ -749,22 +770,28 @@ class AccessorTreeGenerator {
 			accessor: undefined,
 			batchUpdateDepth: 0,
 			dirtyChildFields: undefined,
-			eventListeners: {},
+			eventListeners: {
+				afterUpdate: undefined,
+				beforeUpdate: undefined,
+			},
 			fields: new Map(),
-			isDirty: false,
+			isDirty: true,
 			isFrozenWhileUpdating: false,
 		}
 	}
 
 	private createEmptyEntityListState(): InternalEntityListState {
 		return {
-			isFrozenWhileUpdating: false,
 			accessor: (undefined as any) as EntityListAccessor,
 			batchUpdateDepth: 0,
-			eventListeners: {},
-			isDirty: false,
-			dirtyChildIds: undefined,
 			childIds: new Set(),
+			dirtyChildIds: undefined,
+			eventListeners: {
+				afterUpdate: undefined,
+				beforeUpdate: undefined,
+			},
+			isDirty: true,
+			isFrozenWhileUpdating: false,
 		}
 	}
 
@@ -783,6 +810,7 @@ class AccessorTreeGenerator {
 		const agenda: Array<InternalEntityState | InternalEntityListState> = [rootState]
 
 		for (const state of agenda) {
+			console.log(state)
 			if (!state.isDirty) {
 				continue
 			}

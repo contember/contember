@@ -35,7 +35,7 @@ export const useEntityAccessor = (): EntityAccessor => {
 
 	let accessor = state.accessor
 
-	if (state.entityKey !== entityKey || getEntityByKey !== getEntityByKey) {
+	if (state.entityKey !== entityKey || state.getEntityByKey !== getEntityByKey) {
 		const newAccessor = getEntityByKey(entityKey)
 
 		if (!(newAccessor instanceof EntityAccessor)) {
@@ -51,7 +51,7 @@ export const useEntityAccessor = (): EntityAccessor => {
 	}
 
 	const addEventListener = accessor.addEventListener // The identity of this function is guaranteed to be stable
-	React.useLayoutEffect(() => {
+	React.useEffect(() => {
 		let isMounted = true
 
 		const unsubscribe = addEventListener('afterUpdate', accessor => {

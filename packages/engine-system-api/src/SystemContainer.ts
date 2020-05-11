@@ -44,7 +44,9 @@ import {
 	ResolverFactory,
 	StagesQueryResolver,
 } from './resolvers'
-import { systemMigrationsDirectory } from './MigrationsDirectory'
+import { systemMigrationsDirectory } from './migrations'
+import { EntitiesSelector } from './model/content/EntitiesSelector'
+import { ClientBase } from 'pg'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -55,7 +57,7 @@ export interface SystemContainer {
 	systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory
 }
 
-export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials) => MigrationsRunner
+export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner
 
 type Args = {
 	providers: UuidProvider
@@ -79,8 +81,8 @@ export class SystemContainerFactory {
 	}
 	public createBuilder(container: Args) {
 		return new Builder({})
-			.addService('systemDbMigrationsRunnerFactory', () => (db: DatabaseCredentials) =>
-				new MigrationsRunner(db, 'system', systemMigrationsDirectory),
+			.addService('systemDbMigrationsRunnerFactory', () => (db: DatabaseCredentials, dbClient: ClientBase) =>
+				new MigrationsRunner(db, 'system', systemMigrationsDirectory, dbClient),
 			)
 
 			.addService('modificationHandlerFactory', () => container.modificationHandlerFactory)
@@ -192,12 +194,19 @@ export class SystemContainerFactory {
 			.addService('resolverContextFactory', ({ authorizator }) => new ResolverContextFactory(authorizator))
 			.addService(
 				'projectInitializer',
-				({ projectMigrator, projectMigrationInfoResolver, stageCreator, systemDbMigrationsRunnerFactory }) =>
+				({
+					projectMigrator,
+					projectMigrationInfoResolver,
+					stageCreator,
+					systemDbMigrationsRunnerFactory,
+					schemaVersionBuilder,
+				}) =>
 					new ProjectInitializer(
 						projectMigrator,
 						projectMigrationInfoResolver,
 						stageCreator,
 						systemDbMigrationsRunnerFactory,
+						schemaVersionBuilder,
 					),
 			)
 	}

@@ -24,10 +24,11 @@ export {
 	ProjectMigrator,
 	StageCreator,
 	CreateInitEventCommand,
+	getJunctionTables,
 } from './model'
 export * from './SystemContainer'
 export * from './resolvers'
 export * from './types'
 export * from './utils'
 export * from './SystemServerContainer'
-export * from './MigrationsDirectory'
+export * from './migrations'

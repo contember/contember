@@ -17,6 +17,10 @@ export class DatabaseContextFactory {
 	public create(identityId: string | undefined): DatabaseContext {
 		return createDatabaseContext(this.client, identityId, this.providers)
 	}
+
+	public withClient(client: Client) {
+		return new DatabaseContextFactory(client, this.providers)
+	}
 }
 
 const createDatabaseContext = <ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike>(

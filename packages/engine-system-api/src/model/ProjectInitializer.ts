@@ -1,12 +1,14 @@
 import { CreateInitEventCommand, SaveMigrationCommand } from './commands'
 import { unnamedIdentity } from './helpers'
 import { ProjectConfig, StageConfig } from '../types'
-import { ProjectMigrationInfoResolver, ProjectMigrator } from './migrations'
+import { ProjectMigrationInfoResolver, ProjectMigrator, SchemaVersionBuilder } from './migrations'
 import { createStageTree, StageCreator } from './stages'
 import { MigrationEventsQuery } from './queries'
 import { DatabaseContext, DatabaseContextFactory } from './database'
 import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
-import { DatabaseCredentials } from '@contember/database'
+import { DatabaseCredentials, EventManagerImpl, SingleConnection } from '@contember/database'
+import { MigrationArgs } from '../migrations'
+import { createPgClient } from '@contember/database-migrations'
 
 export class ProjectInitializer {
 	constructor(
@@ -14,19 +16,33 @@ export class ProjectInitializer {
 		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver | undefined,
 		private readonly stageCreator: StageCreator,
 		private readonly systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
 	public async initialize(
 		databaseContextFactory: DatabaseContextFactory,
 		project: ProjectConfig & { db?: DatabaseCredentials },
 	) {
+		const dbContext = databaseContextFactory.create(unnamedIdentity)
 		if (project.db) {
-			// todo: use databaseContextFactory
+			// todo: use dbContext
 			console.group(`Executing system schema migration`)
-			await this.systemDbMigrationsRunnerFactory(project.db).migrate()
+			const pgClient = createPgClient(project.db)
+			await pgClient.connect()
+			const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)
+			const dbContextMigrations = databaseContextFactory
+				.withClient(singleConnection.createClient('system'))
+				.create(unnamedIdentity)
+
+			const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
+			await this.systemDbMigrationsRunnerFactory(project.db, pgClient).migrate<MigrationArgs>(true, {
+				schemaResolver,
+				project,
+			})
+			await pgClient.end()
 			console.groupEnd()
 		}
-		return databaseContextFactory.create(unnamedIdentity).transaction(async trx => {
+		return dbContext.transaction(async trx => {
 			await this.createInitEvent(trx)
 			await this.initStages(trx, project)
 		})

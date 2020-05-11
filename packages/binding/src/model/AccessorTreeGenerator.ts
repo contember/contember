@@ -47,7 +47,7 @@ interface InternalEntityState {
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
-	isDirty: boolean
+	hasPendingUpdate: boolean
 	dirtyChildFields: Set<FieldName> | undefined
 	fields: InternalEntityFields
 	accessor: EntityAccessor | EntityForRemovalAccessor | undefined
@@ -60,7 +60,7 @@ interface InternalEntityListState {
 		[Type in EntityListAccessor.EntityEventType]: Set<EntityListAccessor.EntityEventListenerMap[Type]> | undefined
 	}
 	accessor: EntityListAccessor
-	isDirty: boolean
+	hasPendingUpdate: boolean
 	dirtyChildIds: Set<string> | undefined
 	childIds: Set<string>
 }
@@ -101,8 +101,8 @@ class AccessorTreeGenerator {
 		const updateDataWithEvents = (newData: RootAccessor) => {
 			ReactDOM.unstable_batchedUpdates(() => {
 				updateData(newData, this.getEntityByKey)
-				subTreeState.isDirty = true
-				this.flushDirtyAccessors(subTreeState)
+				subTreeState.hasPendingUpdate = true
+				this.flushPendingAccessorUpdates(subTreeState)
 			})
 		}
 
@@ -136,7 +136,7 @@ class AccessorTreeGenerator {
 				updatedData instanceof EntityForRemovalAccessor ||
 				updatedData instanceof EntityListAccessor
 			) {
-				subTreeState.isDirty = true
+				subTreeState.hasPendingUpdate = true
 				return updateData(updatedData)
 			}
 			return this.rejectInvalidAccessorTree()
@@ -422,12 +422,12 @@ class AccessorTreeGenerator {
 			this.entityStore.set(entityKey, (entityState = this.createEmptyEntityState()))
 		} else {
 			entityState = existingState
-			entityState.isDirty = true
+			entityState.hasPendingUpdate = true
 			entityState.dirtyChildFields = new Set(entityState.fields.keys())
 		}
 
 		const performUpdate = () => {
-			entityState.isDirty = true
+			entityState.hasPendingUpdate = true
 			parentOnUpdate(entityState.accessor)
 		}
 		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
@@ -570,7 +570,7 @@ class AccessorTreeGenerator {
 
 		const updateAccessorInstance = () => {
 			const accessor = entityListState.accessor!
-			entityListState.isDirty = true
+			entityListState.hasPendingUpdate = true
 			return (entityListState.accessor = new EntityListAccessor(
 				accessor.getEntityByKey,
 				entityListState.childIds,
@@ -775,7 +775,7 @@ class AccessorTreeGenerator {
 				beforeUpdate: undefined,
 			},
 			fields: new Map(),
-			isDirty: true,
+			hasPendingUpdate: true,
 			isFrozenWhileUpdating: false,
 		}
 	}
@@ -790,7 +790,7 @@ class AccessorTreeGenerator {
 				afterUpdate: undefined,
 				beforeUpdate: undefined,
 			},
-			isDirty: true,
+			hasPendingUpdate: true,
 			isFrozenWhileUpdating: false,
 		}
 	}
@@ -805,13 +805,13 @@ class AccessorTreeGenerator {
 			: new EntityAccessor.UnpersistedEntityId()
 	}
 
-	private flushDirtyAccessors(rootState: InternalEntityState | InternalEntityListState) {
+	private flushPendingAccessorUpdates(rootState: InternalEntityState | InternalEntityListState) {
 		// It is *CRUCIAL* that this is a BFS so that we update the components in top-down order.
 		const agenda: Array<InternalEntityState | InternalEntityListState> = [rootState]
 
 		for (const state of agenda) {
 			console.log(state)
-			if (!state.isDirty) {
+			if (!state.hasPendingUpdate) {
 				continue
 			}
 			state.isFrozenWhileUpdating = true
@@ -856,7 +856,7 @@ class AccessorTreeGenerator {
 				}
 			}
 			state.isFrozenWhileUpdating = false
-			state.isDirty = false
+			state.hasPendingUpdate = false
 		}
 	}
 }

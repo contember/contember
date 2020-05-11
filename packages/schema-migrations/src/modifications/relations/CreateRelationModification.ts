@@ -73,14 +73,13 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 			},
 			visitOneHasOneInversed: () => {},
 			visitManyHasManyOwner: ({}, relation, {}, _) => {
+				const primaryColumns = [
+					relation.joiningTable.joiningColumn.columnName,
+					relation.joiningTable.inverseJoiningColumn.columnName,
+				]
 				builder.createTable(
 					relation.joiningTable.tableName,
 					{
-						id: {
-							primaryKey: true,
-							type: 'uuid',
-							notNull: true,
-						},
 						[relation.joiningTable.joiningColumn.columnName]: {
 							type: getPrimaryType(entity),
 							notNull: true,
@@ -96,14 +95,11 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 					},
 					{
 						constraints: {
-							unique: [
-								relation.joiningTable.joiningColumn.columnName,
-								relation.joiningTable.inverseJoiningColumn.columnName,
-							],
+							primaryKey: primaryColumns,
 						},
 					},
 				)
-				createEventTrigger(builder, relation.joiningTable.tableName)
+				createEventTrigger(builder, relation.joiningTable.tableName, primaryColumns)
 			},
 			visitManyHasManyInversed: () => {},
 		})

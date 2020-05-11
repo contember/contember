@@ -31,7 +31,7 @@ export class UpdateEvent implements Event {
 		public readonly createdAt: Date,
 		public readonly identityId: string,
 		public readonly transactionId: string,
-		public readonly rowId: string,
+		public readonly rowId: string[],
 		public readonly tableName: string,
 		public readonly values: { [column: string]: any },
 	) {}
@@ -45,7 +45,7 @@ export class CreateEvent implements Event {
 		public readonly createdAt: Date,
 		public readonly identityId: string,
 		public readonly transactionId: string,
-		public readonly rowId: string,
+		public readonly rowId: string[],
 		public readonly tableName: string,
 		public readonly values: { [column: string]: any },
 	) {}
@@ -59,7 +59,7 @@ export class DeleteEvent implements Event {
 		public readonly createdAt: Date,
 		public readonly identityId: string,
 		public readonly transactionId: string,
-		public readonly rowId: string,
+		public readonly rowId: string[],
 		public readonly tableName: string,
 	) {}
 }

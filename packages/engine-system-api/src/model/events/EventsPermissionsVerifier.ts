@@ -9,6 +9,8 @@ import { Identity } from '../authorization/Identity'
 import { DatabaseContext } from '../database'
 import { SchemaVersionBuilder } from '../migrations'
 import { filterSchemaByStage } from '@contember/schema-utils'
+import { getJunctionTables } from '../helpers/modelHelpers'
+import assert from 'assert'
 
 type PermissionsByRow = { [rowId: string]: boolean }
 type PermissionsByTable = { [tableName: string]: PermissionsByRow }
@@ -99,13 +101,24 @@ export class EventsPermissionsVerifier {
 
 		const permissionsResult: EventsPermissionsVerifierResult = {}
 
+		const junctionTables = new Set(getJunctionTables(schema.model).map(it => it.tableName))
 		for (let event of events) {
 			if (isContentEvent(event)) {
-				const canRead = (readPermissions[event.tableName] || {})[event.rowId] || false
-				const canWrite = (writePermissions[event.tableName] || {})[event.rowId] || false
+				if (junctionTables.has(event.tableName)) {
+					// fixme!
+					permissionsResult[event.id] = EventPermission.canApply
+				} else {
+					assert.equal(event.rowId.length, 1)
+					const canRead = (readPermissions[event.tableName] || {})[event.rowId[0]] || false
+					const canWrite = (writePermissions[event.tableName] || {})[event.rowId[0]] || false
 
-				permissionsResult[event.id] =
-					canRead && canWrite ? EventPermission.canApply : canRead ? EventPermission.canView : EventPermission.forbidden
+					permissionsResult[event.id] =
+						canRead && canWrite
+							? EventPermission.canApply
+							: canRead
+							? EventPermission.canView
+							: EventPermission.forbidden
+				}
 			} else {
 				permissionsResult[event.id] = EventPermission.forbidden
 			}

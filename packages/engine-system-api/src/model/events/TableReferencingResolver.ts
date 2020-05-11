@@ -6,16 +6,22 @@ export class TableReferencingResolver {
 		const result: TableReferencingResolverResult = {}
 
 		for (let entity of Object.values(schema.entities)) {
-			const referencing = acceptEveryFieldVisitor(
+			acceptEveryFieldVisitor(
 				schema,
 				entity,
-				new (class implements Model.RelationByTypeVisitor<{ [column: string]: string }> {
+				new (class implements Model.RelationByTypeVisitor<void> {
 					visitManyHasOne({}, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity) {
-						return { [relation.joiningColumn.columnName]: targetEntity.tableName }
+						result[entity.tableName] = {
+							...(result[entity.tableName] || {}),
+							[relation.joiningColumn.columnName]: targetEntity.tableName,
+						}
 					}
 
 					visitOneHasOneOwner({}, relation: Model.OneHasOneOwnerRelation, targetEntity: Model.Entity) {
-						return { [relation.joiningColumn.columnName]: targetEntity.tableName }
+						result[entity.tableName] = {
+							...(result[entity.tableName] || {}),
+							[relation.joiningColumn.columnName]: targetEntity.tableName,
+						}
 					}
 
 					visitManyHasManyOwner(
@@ -23,30 +29,21 @@ export class TableReferencingResolver {
 						relation: Model.ManyHasManyOwnerRelation,
 						targetEntity: Model.Entity,
 					) {
-						return {
+						result[relation.joiningTable.tableName] = {
 							[relation.joiningTable.joiningColumn.columnName]: entity.tableName,
 							[relation.joiningTable.inverseJoiningColumn.columnName]: targetEntity.tableName,
 						}
 					}
 
-					visitColumn() {
-						return {}
-					}
+					visitColumn() {}
 
-					visitManyHasManyInversed() {
-						return {}
-					}
+					visitManyHasManyInversed() {}
 
-					visitOneHasMany() {
-						return {}
-					}
+					visitOneHasMany() {}
 
-					visitOneHasOneInversed() {
-						return {}
-					}
+					visitOneHasOneInversed() {}
 				})(),
 			)
-			result[entity.tableName] = Object.values(referencing).reduce((acc, val) => ({ ...acc, ...val }), {})
 		}
 		return result
 	}

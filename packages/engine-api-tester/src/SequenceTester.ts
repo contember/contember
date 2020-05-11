@@ -79,7 +79,7 @@ export class SequenceTester {
 					case 'event':
 						const expectedEvent =
 							eventsMap[sequenceItem.number] ||
-							createCreateEvent((event as CreateEvent).rowId, 'entry', { number: sequenceItem.number })
+							createCreateEvent((event as CreateEvent).rowId[0], 'entry', { number: sequenceItem.number })
 
 						this.assertEventEquals(expectedEvent, event)
 						break

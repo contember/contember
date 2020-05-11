@@ -21,7 +21,7 @@ export class MigrationsRunner {
 			dir: this.dir,
 			schema: this.schema,
 			migrationsTable: 'migrations',
-			ignorePattern: '(\\..*)|(.+\\.ts)|tsconfig\\..+|.+\\.map',
+			ignorePattern: '(\\..*)|(.+\\.ts)|tsconfig\\..+|.+\\.map|.+\\.test\\.js',
 			createSchema: true,
 			migrationArgs,
 			log: (msg: string) => {

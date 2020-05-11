@@ -67,10 +67,12 @@ export class RebaseExecutor {
 			}
 
 			const stageEventId = eventsInfoMatrix[stage.slug][stage.slug].stageAEventId
-			await this.eventApplier.applyEvents(db, { ...stage, event_id: stageEventId }, [
-				...prevEventsToApply,
-				...eventsToApply,
-			])
+			await this.eventApplier.applyEvents(
+				db,
+				{ ...stage, event_id: stageEventId },
+				[...prevEventsToApply, ...eventsToApply],
+				schema,
+			)
 
 			newHead = await this.eventsRebaser.rebaseStageEvents(
 				db,

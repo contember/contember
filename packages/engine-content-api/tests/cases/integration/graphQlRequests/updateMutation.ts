@@ -2161,10 +2161,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(3) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2), testUuid(3)],
+							parameters: [testUuid(2), testUuid(3)],
 							response: { rowCount: 1 },
 						},
 					]),
@@ -2222,10 +2222,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
 					]),
@@ -2371,10 +2371,10 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
 					]),
@@ -2427,10 +2427,10 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
 					]),
@@ -2481,10 +2481,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(2), testUuid(1)],
+							parameters: [testUuid(2), testUuid(1)],
 							response: { rowCount: 1 },
 						},
 					]),
@@ -2535,10 +2535,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-							values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+							values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)],
 							response: 1,
 						},
 					]),
@@ -2598,10 +2598,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)],
 							response: 1,
 						},
 					]),
@@ -2747,10 +2747,10 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)],
 							response: 1,
 						},
 					]),
@@ -2801,10 +2801,10 @@ describe('update', () => {
 							response: { rowCount: 1 },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(1), testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)],
 							response: 1,
 						},
 					]),
@@ -2853,10 +2853,10 @@ describe('update', () => {
 							response: { rows: [{ id: testUuid(1) }] },
 						},
 						{
-							sql: SQL`insert into "public"."post_categories" ("id", "post_id", "category_id")
-              values (?, ?, ?)
+							sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+              values (?, ?)
               on conflict do nothing`,
-							parameters: [testUuid(2), testUuid(1), testUuid(2)],
+							parameters: [testUuid(1), testUuid(2)],
 							response: 1,
 						},
 					]),
@@ -3077,9 +3077,8 @@ describe('update', () => {
              where "owning"."name" in (?, ?) and "owning"."id" = ? and "inversed"."name" in (?, ?) and
                    "inversed"."id" = ?),
 								"insert" as
-              (insert into "public"."post_categories" ("id", "post_id", "category_id")
+              (insert into "public"."post_categories" ("post_id", "category_id")
                 select
-                  ?,
                   "data"."post_id",
                   "data"."category_id"
                 from "data"
@@ -3090,7 +3089,7 @@ describe('update', () => {
               coalesce(insert.inserted, false) as "inserted"
             from (values (null)) as "t" left join "data" as "data" on true
               left join "insert" as "insert" on true`,
-						parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(2), testUuid(1)],
+						parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(2)],
 						response: {
 							rows: [{ selected: true, inserted: true }],
 						},

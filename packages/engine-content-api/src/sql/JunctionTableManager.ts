@@ -142,8 +142,6 @@ namespace JunctionTableManager {
 	}
 
 	export class JunctionConnectHandler implements JunctionHandler {
-		constructor(private readonly providers: { uuid: () => string }) {}
-
 		async executeSimple({
 			db,
 			joiningTable,
@@ -154,7 +152,6 @@ namespace JunctionTableManager {
 			const result = await InsertBuilder.create()
 				.into(joiningTable.tableName)
 				.values({
-					id: this.providers.uuid(),
 					[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(ownerPrimary),
 					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimary),
 				})
@@ -172,7 +169,6 @@ namespace JunctionTableManager {
 			const insert = InsertBuilder.create()
 				.into(joiningTable.tableName)
 				.values({
-					id: expr => expr.selectValue(this.providers.uuid()),
 					[joiningTable.joiningColumn.columnName]: expr => expr.select(['data', joiningTable.joiningColumn.columnName]),
 					[joiningTable.inverseJoiningColumn.columnName]: expr =>
 						expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),

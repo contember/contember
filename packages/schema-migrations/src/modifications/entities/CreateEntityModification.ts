@@ -18,7 +18,7 @@ class CreateEntityModification implements Modification<CreateEntityModification.
 				notNull: true,
 			},
 		})
-		createEventTrigger(builder, entity.tableName)
+		createEventTrigger(builder, entity.tableName, [entity.primaryColumn])
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {

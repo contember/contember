@@ -90,7 +90,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		.addService('insertBuilderFactory', ({ whereBuilder }) => new InsertBuilderFactory(schema.model, whereBuilder))
 		.addService('updateBuilderFactory', ({ whereBuilder }) => new UpdateBuilderFactory(schema.model, whereBuilder))
 
-		.addService('connectJunctionHandler', ({ providers }) => new JunctionTableManager.JunctionConnectHandler(providers))
+		.addService('connectJunctionHandler', () => new JunctionTableManager.JunctionConnectHandler())
 		.addService('disconnectJunctionHandler', ({}) => new JunctionTableManager.JunctionDisconnectHandler())
 		.addService(
 			'junctionTableManager',

@@ -52,7 +52,7 @@ export class ReleaseExecutor {
 			throw new Error() // todo
 		}
 
-		await this.eventApplier.applyEvents(db, targetStage, events)
+		await this.eventApplier.applyEvents(db, targetStage, events, schema)
 		const newBase = await db.queryHandler.fetch(new StageBySlugQuery(targetStage.slug))
 		if (!newBase) {
 			throw new Error('should not happen')

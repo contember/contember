@@ -9,6 +9,7 @@ import JoinBuilder from '../../sql/select/JoinBuilder'
 import Path from '../../sql/select/Path'
 import { getColumnName } from '@contember/schema-utils'
 import ConditionBuilder from '../../sql/select/ConditionBuilder'
+import assert from 'assert'
 
 interface PermissionContext {
 	projectRoles: string[]
@@ -27,11 +28,11 @@ type EventTypes = typeof DeleteType | typeof CreateType | typeof UpdateType
 
 type TableEvent =
 	| {
-			rowId: string
+			rowId: string[]
 			type: typeof DeleteType
 	  }
 	| {
-			rowId: string
+			rowId: string[]
 			type: typeof CreateType | typeof UpdateType
 			values: { [column: string]: any }
 	  }
@@ -110,7 +111,10 @@ export class PermissionsVerifier {
 	): Promise<PermissionsByRow> {
 		const rowAffectedColumns = this.getAffectedColumnsByRow(events)
 
-		const ids = events.map(it => it.rowId)
+		const ids = events.map(it => {
+			assert.equal(it.rowId.length, 1)
+			return it.rowId[0]
+		})
 		let qb: SelectBuilder<SelectBuilder.Result, any> = this.createBaseSelectBuilder(entity, ids)
 
 		qb = this.buildPredicates(db, qb, Acl.Operation.read, rowAffectedColumns, entity, predicateFactory, schema)
@@ -130,7 +134,10 @@ export class PermissionsVerifier {
 		events: TableEvent[],
 		predicateFactory: PredicateFactory,
 	): Promise<PermissionsByRow> {
-		const ids = events.map(it => it.rowId)
+		const ids = events.map(it => {
+			assert.equal(it.rowId.length, 1)
+			return it.rowId[0]
+		})
 
 		const affectedColumnsByType: { [type: string]: AffectedColumnsByRow } = {}
 		let qb: SelectBuilder<SelectBuilder.Result, 'select' | 'from' | 'where' | 'join'> = this.createBaseSelectBuilder(
@@ -221,11 +228,13 @@ export class PermissionsVerifier {
 
 	private getAffectedColumnsByRow(events: TableEvent[]): AffectedColumnsByRow {
 		return events.reduce<AffectedColumnsByRow>((result, event) => {
-			const currentFields = result[event.rowId] || []
+			assert.equal(event.rowId.length, 1)
+
+			const currentFields = result[event.rowId[0]] || []
 			const eventFields = event.type === 'delete' ? ['id'] : Object.keys(event.values)
 
 			const newFields = [...currentFields, ...eventFields.filter(it => currentFields.indexOf(it) < 0)]
-			return { ...result, [event.rowId]: newFields }
+			return { ...result, [event.rowId[0]]: newFields }
 		}, {})
 	}
 

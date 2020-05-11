@@ -1,21 +1,22 @@
 import { GraphQlBuilder } from '@contember/client'
 import { emptyArray, noop, returnFalse } from '@contember/react-utils'
-import { assertNever } from '../utils'
-import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { BindingError } from '../BindingError'
+import * as ReactDOM from 'react-dom'
 import {
 	Accessor,
 	EntityAccessor,
 	EntityForRemovalAccessor,
 	EntityListAccessor,
 	FieldAccessor,
+	GetSubTreeRoot,
 	RootAccessor,
 } from '../accessors'
+import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
+import { BindingError } from '../BindingError'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
-import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
+import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar, SubTreeIdentifier } from '../treeParameters'
+import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
-import * as ReactDOM from 'react-dom'
 
 type AddEntityEventListener = EntityAccessor['addEventListener']
 type AddEntityListEventListener = EntityListAccessor['addEventListener']
@@ -163,8 +164,10 @@ class AccessorTreeGenerator {
 		onUnlink?: OnUnlink,
 	): EntityAccessor {
 		// In the grand scheme of things, sub trees are actually fairly rare, and so we only initialize them if necessary
-		let subTreeData: EntityAccessor.SubTreeData | undefined = undefined
+		let subTreeData: Map<SubTreeIdentifier, RootAccessor> | undefined = undefined
 		const typename = data ? (data instanceof Accessor ? data.typename : data[TYPENAME_KEY_NAME]) : undefined
+
+		const getSubTreeRoot: GetSubTreeRoot = identifier => subTreeData?.get(identifier)
 
 		for (const [placeholderName, field] of entityMarkers) {
 			if (placeholderName === PRIMARY_KEY_NAME) {
@@ -392,7 +395,7 @@ class AccessorTreeGenerator {
 			// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 			// keep in sync two copies of the same data. TS hides the extra info anyway.
 			fieldStates,
-			subTreeData,
+			getSubTreeRoot,
 			errors ? errors.errors : emptyArray,
 			addEventListener,
 			batchUpdates,
@@ -472,7 +475,7 @@ class AccessorTreeGenerator {
 					entityAccessor.runtimeId,
 					entityAccessor.typename,
 					entityState.fields,
-					entityAccessor.subTreeData,
+					entityAccessor.getSubTreeRoot,
 					entityAccessor.errors,
 					entityAccessor.addEventListener,
 					entityAccessor.batchUpdates,
@@ -740,7 +743,7 @@ class AccessorTreeGenerator {
 			replacement.runtimeId,
 			blueprint.typename,
 			original.fields,
-			replacement.subTreeData,
+			replacement.getSubTreeRoot,
 			blueprint.errors,
 			blueprint.addEventListener,
 			blueprint.batchUpdates,
@@ -848,6 +851,12 @@ class AccessorTreeGenerator {
 							throw new BindingError()
 						}
 						if (dirtyChildState.accessor instanceof FieldAccessor) {
+							const fieldState = dirtyChildState as InternalFieldState
+							if (fieldState.eventListeners.afterUpdate !== undefined) {
+								for (const handler of fieldState.eventListeners.afterUpdate) {
+									handler(fieldState.accessor)
+								}
+							}
 							continue
 						}
 						agenda.push(dirtyChildState as InternalEntityState | InternalEntityListState)

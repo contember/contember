@@ -61,7 +61,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	const isMutating = useMutationState()
 	const subTreeIdentifier = React.useMemo(() => computeSubTreeIdentifier(props.field), [props.field])
 	const subTreeData = React.useMemo(() => {
-		const subTree = parentEntity.getTreeRoot(subTreeIdentifier)
+		const subTree = parentEntity.getSubTreeRoot(subTreeIdentifier)
 
 		if (!(subTree instanceof EntityListAccessor)) {
 			throw new BindingError(`Something went horribly wrong. The options of a dynamic choice field are not a list.`)

@@ -1,5 +1,5 @@
 import { BindingError } from '../BindingError'
-import { MarkerTreeRoot, PlaceholderGenerator, ReferenceMarker } from '../markers'
+import { PlaceholderGenerator, ReferenceMarker } from '../markers'
 import {
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
@@ -11,7 +11,6 @@ import {
 	RelativeSingleEntity,
 	RelativeSingleField,
 	RemovalType,
-	SubTreeIdentifier,
 } from '../treeParameters'
 import { Accessor } from './Accessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
@@ -19,7 +18,7 @@ import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
-import { RootAccessor } from './RootAccessor'
+import { GetSubTreeRoot } from './GetSubTreeRoot'
 
 class EntityAccessor extends Accessor implements Errorable {
 	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
@@ -28,7 +27,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		key: string | EntityAccessor.UnpersistedEntityId,
 		public readonly typename: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
-		public readonly subTreeData: EntityAccessor.SubTreeData,
+		public readonly getSubTreeRoot: GetSubTreeRoot,
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: (performUpdates: EntityAccessor.BatchUpdates) => void,
@@ -91,10 +90,6 @@ class EntityAccessor extends Accessor implements Errorable {
 		}
 
 		return this.getFieldByPlaceholder(placeholder)
-	}
-
-	public getTreeRoot(identifier: SubTreeIdentifier): RootAccessor | undefined {
-		return this.subTreeData?.get(identifier)
 	}
 
 	/**
@@ -218,10 +213,8 @@ namespace EntityAccessor {
 		accessor: NestedAccessor | undefined
 	}
 	export type NestedAccessor = EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | FieldAccessor
-	export type SubTreeDatum = RootAccessor
 
 	export type FieldData = Map<FieldName, FieldDatum>
-	export type SubTreeData = Map<SubTreeIdentifier, SubTreeDatum> | undefined
 
 	export type BatchUpdates = (getAccessor: () => EntityAccessor) => void
 	export type AfterUpdate = (accessor: undefined | EntityAccessor | EntityForRemovalAccessor) => void

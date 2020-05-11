@@ -47,7 +47,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 
 namespace EntityListAccessor {
 	export type BatchUpdates = (getAccessor: () => EntityListAccessor) => void
-	export type AfterUpdate = (accessor: undefined | EntityListAccessor) => void
+	export type AfterUpdate = (accessor: EntityListAccessor) => void
 
 	export interface EntityEventListenerMap {
 		beforeUpdate: BatchUpdates

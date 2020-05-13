@@ -46,17 +46,19 @@ export class EventsPermissionsVerifier {
 		targetStage: Stage,
 		events: AnyEvent[],
 	): Promise<EventsPermissionsVerifierResult> {
-		if (
-			await this.authorizator.isAllowed(
-				permissionContext.identity,
-				new AuthorizationScope.Global(),
-				AuthorizationActions.PROJECT_RELEASE_ANY,
+		const isAllowed = await this.authorizator.isAllowed(
+			permissionContext.identity,
+			new AuthorizationScope.Global(),
+			AuthorizationActions.PROJECT_RELEASE_ANY,
+		)
+		return events
+			.map(it => it.id)
+			.reduce<EventsPermissionsVerifierResult>(
+				(acc, id) => ({ ...acc, [id]: isAllowed ? EventPermission.canApply : EventPermission.forbidden }),
+				{},
 			)
-		) {
-			return events.map(it => it.id).reduce((acc, id) => ({ ...acc, [id]: true }), {})
-		}
 
-		return this.verifyPermissions(db, permissionContext, sourceStage, targetStage, events)
+		// return this.verifyPermissions(db, permissionContext, sourceStage, targetStage, events)
 	}
 
 	private async verifyPermissions(

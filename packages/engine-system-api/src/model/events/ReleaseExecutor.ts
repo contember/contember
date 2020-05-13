@@ -1,7 +1,11 @@
 import { Stage } from '../dtos'
 import { DiffQuery, StageBySlugQuery } from '../queries'
 import { DependencyBuilder, EventsDependencies } from './DependencyBuilder'
-import { EventsPermissionsVerifier, EventsPermissionsVerifierContext } from './EventsPermissionsVerifier'
+import {
+	EventPermission,
+	EventsPermissionsVerifier,
+	EventsPermissionsVerifierContext,
+} from './EventsPermissionsVerifier'
 import { EventApplier } from './EventApplier'
 import { EventsRebaser } from './EventsRebaser'
 import { UpdateStageEventCommand } from '../commands'
@@ -35,20 +39,22 @@ export class ReleaseExecutor {
 		const allEvents = await db.queryHandler.fetch(new DiffQuery(targetStage.event_id, sourceStage.event_id))
 		assertEveryIsContentEvent(allEvents)
 		const allEventsIds = new Set(allEvents.map(it => it.id))
-		if (!this.allEventsExists(eventsToApply, allEventsIds)) {
-			throw new Error() //todo
+
+		const nonExistingEvents = this.getNonExistingEvents(eventsToApply, allEventsIds)
+		if (nonExistingEvents.length !== 0) {
+			throw new Error(`Following events were not found: ${nonExistingEvents.join(', ')}`)
 		}
 		const schema = await this.schemaVersionBuilder.buildSchema(db)
 		const dependencies = await this.dependencyBuilder.build(schema, allEvents)
 		if (!this.verifyDependencies(eventsToApply, dependencies)) {
-			throw new Error() //todo
+			throw new Error(`Some dependencies are missing`)
 		}
 
 		const eventsSet = new Set(eventsToApply)
 		const events = allEvents.filter(it => eventsSet.has(it.id))
 
-		const permissions = this.permissionsVerifier.verify(db, permissionContext, sourceStage, targetStage, events)
-		if (Object.values(permissions).filter(it => !it).length) {
+		const permissions = await this.permissionsVerifier.verify(db, permissionContext, sourceStage, targetStage, events)
+		if (Object.values(permissions).filter(it => it !== EventPermission.canApply).length) {
 			throw new Error() // todo
 		}
 
@@ -102,13 +108,8 @@ export class ReleaseExecutor {
 		return true
 	}
 
-	private allEventsExists(eventsToApply: string[], existingEvents: Set<string>): boolean {
-		for (const event of eventsToApply) {
-			if (!existingEvents.has(event)) {
-				return false
-			}
-		}
-		return true
+	private getNonExistingEvents(eventsToApply: string[], existingEvents: Set<string>): string[] {
+		return eventsToApply.filter(id => !existingEvents.has(id))
 	}
 
 	private verifyDependencies(eventsToApply: string[], dependencies: EventsDependencies): boolean {

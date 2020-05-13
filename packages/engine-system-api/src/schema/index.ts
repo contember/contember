@@ -1,5 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql'
-
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
 	{ [P in K]-?: NonNullable<T[P]> }
@@ -10,28 +9,27 @@ export type Scalars = {
 	Boolean: boolean
 	Int: number
 	Float: number
+	DateTime: Date
 }
 
 export type CreateEvent = Event & {
 	readonly __typename?: 'CreateEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
-	readonly type?: Maybe<EventType>
+	readonly type: EventType
 	readonly description: Scalars['String']
 	readonly allowed: Scalars['Boolean']
-	readonly entity: Scalars['String']
-	readonly rowId: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
 }
 
 export type DeleteEvent = Event & {
 	readonly __typename?: 'DeleteEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
-	readonly type?: Maybe<EventType>
+	readonly type: EventType
 	readonly description: Scalars['String']
 	readonly allowed: Scalars['Boolean']
-	readonly entity: Scalars['String']
-	readonly rowId: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
 }
 
 export enum DiffErrorCode {
@@ -42,7 +40,13 @@ export enum DiffErrorCode {
 
 export type DiffFilter = {
 	readonly entity: Scalars['String']
+	readonly relations?: Maybe<ReadonlyArray<DiffFilterRelation>>
 	readonly id: Scalars['String']
+}
+
+export type DiffFilterRelation = {
+	readonly name: Scalars['String']
+	readonly relations: ReadonlyArray<DiffFilterRelation>
 }
 
 export type DiffResponse = {
@@ -64,7 +68,8 @@ export type Event = {
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly description: Scalars['String']
 	readonly allowed: Scalars['Boolean']
-	readonly type?: Maybe<EventType>
+	readonly createdAt: Scalars['DateTime']
+	readonly type: EventType
 }
 
 export enum EventType {
@@ -163,10 +168,10 @@ export type RunMigrationEvent = Event & {
 	readonly __typename?: 'RunMigrationEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
-	readonly type?: Maybe<EventType>
+	readonly type: EventType
 	readonly description: Scalars['String']
 	readonly allowed: Scalars['Boolean']
-	readonly version: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
 }
 
 export type Stage = {
@@ -180,12 +185,10 @@ export type UpdateEvent = Event & {
 	readonly __typename?: 'UpdateEvent'
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
-	readonly type?: Maybe<EventType>
+	readonly type: EventType
 	readonly description: Scalars['String']
 	readonly allowed: Scalars['Boolean']
-	readonly entity: Scalars['String']
-	readonly rowId: Scalars['String']
-	readonly fields: ReadonlyArray<Scalars['String']>
+	readonly createdAt: Scalars['DateTime']
 }
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
@@ -262,11 +265,13 @@ export type ResolversTypes = {
 	Stage: ResolverTypeWrapper<Stage>
 	String: ResolverTypeWrapper<Scalars['String']>
 	DiffFilter: DiffFilter
+	DiffFilterRelation: DiffFilterRelation
 	DiffResponse: ResolverTypeWrapper<DiffResponse>
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	DiffErrorCode: DiffErrorCode
 	DiffResult: ResolverTypeWrapper<DiffResult>
 	Event: ResolverTypeWrapper<Event>
+	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
 	EventType: EventType
 	Mutation: ResolverTypeWrapper<{}>
 	Migration: Migration
@@ -291,11 +296,13 @@ export type ResolversParentTypes = {
 	Stage: Stage
 	String: Scalars['String']
 	DiffFilter: DiffFilter
+	DiffFilterRelation: DiffFilterRelation
 	DiffResponse: DiffResponse
 	Boolean: Scalars['Boolean']
 	DiffErrorCode: DiffErrorCode
 	DiffResult: DiffResult
 	Event: Event
+	DateTime: Scalars['DateTime']
 	EventType: EventType
 	Mutation: {}
 	Migration: Migration
@@ -320,12 +327,15 @@ export type CreateEventResolvers<
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+	name: 'DateTime'
 }
 
 export type DeleteEventResolvers<
@@ -334,11 +344,10 @@ export type DeleteEventResolvers<
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
@@ -375,7 +384,8 @@ export type EventResolvers<
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 }
 
 export type MigrateErrorResolvers<
@@ -461,10 +471,10 @@ export type RunMigrationEventResolvers<
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
@@ -484,17 +494,16 @@ export type UpdateEventResolvers<
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	fields?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type Resolvers<ContextType = any> = {
 	CreateEvent?: CreateEventResolvers<ContextType>
+	DateTime?: GraphQLScalarType
 	DeleteEvent?: DeleteEventResolvers<ContextType>
 	DiffResponse?: DiffResponseResolvers<ContextType>
 	DiffResult?: DiffResultResolvers<ContextType>

@@ -3,6 +3,8 @@ schema:
 documents: []
 config:
   immutableTypes: "1"
+  scalars:
+    DateTime: Date
 generates:
   ./src/schema/index.ts:
     config:

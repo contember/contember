@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { QueryResolver } from '../Resolver'
-import { DiffErrorCode, DiffResponse, QueryDiffArgs } from '../../schema'
+import { DiffErrorCode, DiffFilterRelation, DiffResponse, QueryDiffArgs } from '../../schema'
 import { createStageQuery, DiffBuilder, DiffResponseBuilder } from '../../model'
 
 export class DiffQueryResolver implements QueryResolver<'diff'> {
@@ -28,6 +28,7 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 				}
 			}
 
+			const filter = args.filter ? args.filter.map(it => ({ ...it, relations: it.relations || [] })) : null
 			const diff = await this.diffBuilder.build(
 				db,
 				{
@@ -36,6 +37,7 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 				},
 				baseStage,
 				headStage,
+				filter,
 			)
 			if (!diff.ok) {
 				return diff
@@ -47,7 +49,7 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 				result: {
 					base: baseStage,
 					head: headStage,
-					events: this.diffResponseBuilder.buildResponse(diff.events, args.filter || null),
+					events: this.diffResponseBuilder.buildResponse(diff.events),
 				},
 			}
 		})

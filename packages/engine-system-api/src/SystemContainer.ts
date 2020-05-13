@@ -45,8 +45,8 @@ import {
 	StagesQueryResolver,
 } from './resolvers'
 import { systemMigrationsDirectory } from './migrations'
-import { EntitiesSelector } from './model/content/EntitiesSelector'
 import { ClientBase } from 'pg'
+import { EntitiesSelector } from './model/content/EntitiesSelector'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -64,6 +64,7 @@ type Args = {
 	contentPermissionsVerifier: ContentPermissionVerifier
 	modificationHandlerFactory: ModificationHandlerFactory
 	migrationsResolverFactory: MigrationsResolverFactory | undefined
+	entitiesSelector: EntitiesSelector
 }
 
 export class SystemContainerFactory {
@@ -148,11 +149,10 @@ export class SystemContainerFactory {
 					: undefined,
 			)
 			.addService('stageCreator', ({ eventApplier }) => new StageCreator(eventApplier))
-
 			.addService(
 				'diffBuilder',
 				({ dependencyBuilder, permissionVerifier, schemaVersionBuilder }) =>
-					new DiffBuilder(dependencyBuilder, permissionVerifier, schemaVersionBuilder),
+					new DiffBuilder(dependencyBuilder, permissionVerifier, schemaVersionBuilder, container.entitiesSelector),
 			)
 
 			.addService(

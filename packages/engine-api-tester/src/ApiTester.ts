@@ -12,6 +12,9 @@ import {
 } from '@contember/engine-system-api'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import {
+	createMapperContainer,
+	EntitiesSelector,
+	EntitiesSelectorMapperFactory,
 	GraphQlSchemaBuilderFactory,
 	PermissionsByIdentityFactory,
 	PermissionsVerifier,
@@ -53,7 +56,7 @@ export class ApiTester {
 		const dbName = String(process.env.TEST_DB_NAME)
 
 		const projectConnection = createConnection(dbName)
-		const providers = { uuid: createUuidGenerator('a452') }
+		const providers = { uuid: createUuidGenerator('a452'), now: () => new Date('2019-09-04 12:00') }
 		const databaseContextFactory = new DatabaseContextFactory(projectConnection.createClient('system'), providers)
 
 		// await setupSystemVariables(projectDb, unnamedIdentity, { uuid: createUuidGenerator('a450') })
@@ -65,9 +68,13 @@ export class ApiTester {
 		const projectSlug = options.project?.slug || ApiTester.project.slug
 		const migrationFilesManager = MigrationFilesManager.createForProject(ApiTester.getMigrationsDir(), projectSlug)
 		const migrationsResolver = options.migrationsResolver || new MigrationsResolver(migrationFilesManager)
+		const permissionsByIdentityFactory = new PermissionsByIdentityFactory()
+		const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
+			createMapperContainer({ schema, identityVariables, permissions, providers }).mapperFactory(db)
 		let systemContainerBuilder = systemContainerFactory.createBuilder({
 			migrationsResolverFactory: project => migrationsResolver,
-			contentPermissionsVerifier: new PermissionsVerifier(new PermissionsByIdentityFactory()),
+			contentPermissionsVerifier: new PermissionsVerifier(permissionsByIdentityFactory),
+			entitiesSelector: new EntitiesSelector(mapperFactory, permissionsByIdentityFactory),
 			modificationHandlerFactory,
 			providers: providers,
 		})

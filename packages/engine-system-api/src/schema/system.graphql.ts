@@ -2,6 +2,8 @@ import { gql } from 'apollo-server-core'
 import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
+	scalar DateTime
+
 	schema {
 		query: Query
 		mutation: Mutation
@@ -22,7 +24,13 @@ const schema: DocumentNode = gql`
 
 	input DiffFilter {
 		entity: String!
+		relations: [DiffFilterRelation!]
 		id: String!
+	}
+
+	input DiffFilterRelation {
+		name: String!
+		relations: [DiffFilterRelation!]!
 	}
 
 	enum DiffErrorCode {
@@ -103,7 +111,8 @@ const schema: DocumentNode = gql`
 		dependencies: [String!]!
 		description: String!
 		allowed: Boolean!
-		type: EventType
+		createdAt: DateTime!
+		type: EventType!
 	}
 
 	enum EventType {
@@ -116,41 +125,37 @@ const schema: DocumentNode = gql`
 	type UpdateEvent implements Event {
 		id: String!
 		dependencies: [String!]!
-		type: EventType
+		type: EventType!
 		description: String!
 		allowed: Boolean!
-		entity: String!
-		rowId: String!
-		fields: [String!]!
+		createdAt: DateTime!
 	}
 
 	type DeleteEvent implements Event {
 		id: String!
 		dependencies: [String!]!
-		type: EventType
+		type: EventType!
 		description: String!
 		allowed: Boolean!
-		entity: String!
-		rowId: String!
+		createdAt: DateTime!
 	}
 
 	type CreateEvent implements Event {
 		id: String!
 		dependencies: [String!]!
-		type: EventType
+		type: EventType!
 		description: String!
 		allowed: Boolean!
-		entity: String!
-		rowId: String!
+		createdAt: DateTime!
 	}
 
 	type RunMigrationEvent implements Event {
 		id: String!
 		dependencies: [String!]!
-		type: EventType
+		type: EventType!
 		description: String!
 		allowed: Boolean!
-		version: String!
+		createdAt: DateTime!
 	}
 
 	# === stage ===

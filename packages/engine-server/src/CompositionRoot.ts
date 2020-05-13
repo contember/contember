@@ -1,4 +1,10 @@
-import { PermissionsByIdentityFactory, PermissionsVerifier } from '@contember/engine-content-api'
+import {
+	createMapperContainer,
+	EntitiesSelector,
+	EntitiesSelectorMapperFactory,
+	PermissionsByIdentityFactory,
+	PermissionsVerifier,
+} from '@contember/engine-content-api'
 import { SchemaVersionBuilder, SystemContainerFactory } from '@contember/engine-system-api'
 import {
 	getTenantMigrationsDirectory,
@@ -47,6 +53,16 @@ class CompositionRoot {
 				'contentPermissionsVerifier',
 				({ permissionsByIdentityFactory }) => new PermissionsVerifier(permissionsByIdentityFactory),
 			)
+			.addService('entitiesSelector', ({ permissionsByIdentityFactory }) => {
+				const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
+					createMapperContainer({
+						schema,
+						identityVariables,
+						permissions,
+						providers,
+					}).mapperFactory(db)
+				return new EntitiesSelector(mapperFactory, permissionsByIdentityFactory)
+			})
 			.build()
 		const systemContainer = new SystemContainerFactory().create(systemContainerDependencies)
 

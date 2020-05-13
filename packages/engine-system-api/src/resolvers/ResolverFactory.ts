@@ -2,7 +2,7 @@ import { DiffQueryResolver, StagesQueryResolver } from './query'
 import { Event, EventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
-import { GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo, GraphQLScalarType, Kind } from 'graphql'
 import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
 
 class ResolverFactory {
@@ -16,6 +16,22 @@ class ResolverFactory {
 
 	create(): Resolvers {
 		return {
+			DateTime: new GraphQLScalarType({
+				name: 'DateTime',
+				description: 'DateTime custom scalar type',
+				serialize(value) {
+					return value instanceof Date ? value.toISOString() : null
+				},
+				parseValue(value) {
+					return new Date(value)
+				},
+				parseLiteral(ast) {
+					if (ast.kind === Kind.STRING) {
+						return new Date(ast.value)
+					}
+					return null
+				},
+			}),
 			Event: {
 				__resolveType: (obj: Event) => {
 					switch (obj.type) {

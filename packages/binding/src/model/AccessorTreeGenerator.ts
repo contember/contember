@@ -43,7 +43,6 @@ type InternalStateNode = InternalEntityState | InternalEntityListState | Interna
 type InternalEntityFields = Map<FieldName, InternalStateNode>
 
 interface InternalEntityState {
-	isFrozenWhileUpdating: boolean
 	batchUpdateDepth: number
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
@@ -55,7 +54,6 @@ interface InternalEntityState {
 }
 
 interface InternalEntityListState {
-	isFrozenWhileUpdating: boolean
 	batchUpdateDepth: number
 	eventListeners: {
 		[Type in EntityListAccessor.EntityEventType]: Set<EntityListAccessor.EntityEventListenerMap[Type]> | undefined
@@ -90,7 +88,8 @@ class AccessorTreeGenerator {
 		updateData: AccessorTreeGenerator.UpdateData,
 		errors?: MutationDataResponse,
 	): void {
-		//this.entityStore = new Map()
+		let isFrozenWhileUpdating = false
+		this.entityStore = new Map()
 		const preprocessor = new ErrorsPreprocessor(errors)
 
 		this.errorTreeRoot = preprocessor.preprocess()
@@ -100,10 +99,20 @@ class AccessorTreeGenerator {
 		this.initialData = initialData
 
 		const updateDataWithEvents = (newData: RootAccessor) => {
+			if (isFrozenWhileUpdating) {
+				throw new BindingError(
+					`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
+						`by updating the accessor tree during rendering or in the 'afterUpdate' event handler. That is a no-op. ` +
+						`If you wish to react to changes, use the 'beforeUpdate' event handler.`,
+				)
+			}
+
 			ReactDOM.unstable_batchedUpdates(() => {
+				isFrozenWhileUpdating = true
 				updateData(newData, this.getEntityByKey)
 				subTreeState.hasPendingUpdate = true
 				this.flushPendingAccessorUpdates(subTreeState)
+				isFrozenWhileUpdating = false
 			})
 		}
 
@@ -340,6 +349,11 @@ class AccessorTreeGenerator {
 						newValue: Scalar | GraphQlBuilder.Literal,
 						{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
 					) {
+						if (this !== fieldState.accessor) {
+							throw new BindingError(
+								`Trying to update a field value via a stale FieldAccessor. Perhaps you're dealing with stale props?`,
+							)
+						}
 						if (fieldState.touchLog === undefined) {
 							fieldState.touchLog = new Map()
 						}
@@ -421,13 +435,16 @@ class AccessorTreeGenerator {
 		let entityState: InternalEntityState
 		const existingState = this.entityStore.get(entityKey)
 
-		if (existingState === undefined) {
-			this.entityStore.set(entityKey, (entityState = this.createEmptyEntityState()))
-		} else {
-			entityState = existingState
-			entityState.hasPendingUpdate = true
-			entityState.dirtyChildFields = new Set(entityState.fields.keys())
-		}
+		// if (existingState === undefined) {
+		// 	//this.entityStore.set(entityKey, (entityState = this.createEmptyEntityState()))
+		// } else {
+		// 	//console.log('id', id)
+		// 	//return existingState // TODO YOLO for now
+		// 	//entityState = existingState
+		// 	//entityState.hasPendingUpdate = true
+		// 	//entityState.dirtyChildFields = new Set(entityState.fields.keys())
+		// }
+		this.entityStore.set(entityKey, (entityState = this.createEmptyEntityState()))
 
 		const performUpdate = () => {
 			entityState.hasPendingUpdate = true
@@ -592,7 +609,7 @@ class AccessorTreeGenerator {
 			performUpdates(() => entityListState.accessor!)
 			entityListState.batchUpdateDepth--
 			if (entityListState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityListState.accessor) {
-				performUpdate()
+				parentOnUpdate(entityListState.accessor)
 			}
 		}
 
@@ -779,7 +796,6 @@ class AccessorTreeGenerator {
 			},
 			fields: new Map(),
 			hasPendingUpdate: true,
-			isFrozenWhileUpdating: false,
 		}
 	}
 
@@ -794,7 +810,6 @@ class AccessorTreeGenerator {
 				beforeUpdate: undefined,
 			},
 			hasPendingUpdate: true,
-			isFrozenWhileUpdating: false,
 		}
 	}
 
@@ -817,7 +832,6 @@ class AccessorTreeGenerator {
 			if (!state.hasPendingUpdate) {
 				continue
 			}
-			state.isFrozenWhileUpdating = true
 			if (state.accessor instanceof EntityListAccessor) {
 				const listState = state as InternalEntityListState
 
@@ -864,7 +878,6 @@ class AccessorTreeGenerator {
 					entityState.dirtyChildFields = undefined
 				}
 			}
-			state.isFrozenWhileUpdating = false
 			state.hasPendingUpdate = false
 		}
 	}

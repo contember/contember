@@ -1,8 +1,16 @@
-export * from './AccessorProvider'
 // export * from './EntityKeyContext' // Deliberately not exporting it
-export * from './EntityKeyProvider'
 // export * from './GetEntityByKeyContext' // Deliberately not exporting it
+export * from './AccessorProvider'
+export * from './EntityKeyProvider'
+export * from './EnvironmentContext'
 export * from './GetEntityByKeyProvider'
+export * from './useDesugaredRelativeEntityList'
+export * from './useDesugaredRelativeSingleEntity'
+export * from './useDesugaredRelativeSingleField'
 export * from './useEntityAccessor'
 export * from './useEntityKey'
+export * from './useEnvironment'
 export * from './useGetEntityByKey'
+export * from './useRelativeEntityList'
+export * from './useRelativeSingleEntity'
+export * from './useRelativeSingleField'

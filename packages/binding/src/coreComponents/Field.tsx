@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { useRelativeSingleField } from '../accessorRetrievers'
+import { useRelativeSingleField } from '../accessorPropagation'
 import { MarkerFactory } from '../queryLanguage'
 import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 import { Component } from './Component'

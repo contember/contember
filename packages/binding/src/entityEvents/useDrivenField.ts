@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDesugaredRelativeSingleField } from '../accessorRetrievers'
+import { useDesugaredRelativeSingleField } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
 import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 import { useEntityBeforeUpdate } from './useEntityBeforeUpdate'

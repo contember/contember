@@ -2,7 +2,7 @@ import { GraphQlClient } from '@contember/client'
 import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
-import { useEnvironment } from '../accessorRetrievers'
+import { useEnvironment } from '../accessorPropagation'
 import { GetEntityByKey, RootAccessor } from '../accessors'
 import {
 	AccessorTreeGenerator,

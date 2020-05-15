@@ -1,5 +1,4 @@
 export * from './accessorPropagation'
-export * from './accessorRetrievers'
 export * from './accessors'
 export * from './accessorSorting'
 export * from './accessorTree'

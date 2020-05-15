@@ -1,7 +1,7 @@
 import { AuthorizationScope, Authorizator } from '@contember/authorization'
-import { Acl } from '@contember/schema'
+import { Schema, Acl } from '@contember/schema'
 import { ForbiddenError } from 'apollo-server-errors'
-import { DatabaseContext } from '../model'
+import { DatabaseContext, SchemaVersionBuilder } from '../model'
 import { ProjectConfig } from '../types'
 import { Identity } from '../model/authorization'
 
@@ -21,8 +21,8 @@ export class ResolverContextFactory {
 			authorizator: this.authorizator,
 			db: systemDbContext,
 			isAllowed: async (scope, action) => await this.authorizator.isAllowed(identity, scope, action),
-			requireAccess: async (scope, action, message?) => {
-				if (!(await this.authorizator.isAllowed(identity, scope, action))) {
+			requireAccess: async (action, message?) => {
+				if (!(await this.authorizator.isAllowed(identity, new AuthorizationScope.Global(), action))) {
 					throw new ForbiddenError(message || 'Forbidden')
 				}
 			},
@@ -37,9 +37,5 @@ export interface ResolverContext {
 	readonly variables: Acl.VariablesMap
 	readonly authorizator: Authorizator<Identity>
 	readonly isAllowed: (scope: AuthorizationScope<Identity>, action: Authorizator.Action) => Promise<boolean>
-	readonly requireAccess: (
-		scope: AuthorizationScope<Identity>,
-		action: Authorizator.Action,
-		message?: string,
-	) => Promise<void>
+	readonly requireAccess: (action: Authorizator.Action, message?: string) => Promise<void>
 }

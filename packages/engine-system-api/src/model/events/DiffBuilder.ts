@@ -127,7 +127,7 @@ export class DiffBuilder {
 							db: db.client.forSchema(formatSchemaName(stage)),
 							schema: filterSchemaByStage(schema, stage.slug),
 							identityVariables: permissionContext.variables,
-							projectRoles: await permissionContext.identity.projectRoles,
+							roles: permissionContext.identity.roles,
 						},
 						it,
 					),

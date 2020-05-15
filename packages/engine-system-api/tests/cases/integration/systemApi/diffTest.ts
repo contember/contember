@@ -112,8 +112,7 @@ describe('system api - diff', () => {
       }`,
 				{},
 				{
-					roles: [],
-					projectRoles: ['viewer'],
+					roles: ['viewer'],
 				},
 			)
 

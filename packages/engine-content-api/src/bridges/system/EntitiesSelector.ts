@@ -14,7 +14,7 @@ export interface EntitiesSelectorContext {
 	db: Client
 	schema: Schema
 	identityVariables: Acl.VariablesMap
-	projectRoles: string[]
+	roles: string[]
 }
 
 export interface EntitiesSelectorInput {
@@ -31,7 +31,7 @@ export class EntitiesSelector {
 
 	async getEntities(context: EntitiesSelectorContext, input: EntitiesSelectorInput): Promise<EntitiesResult | null> {
 		const { permissions } = this.permissionsByIdentityFactory.createPermissions(context.schema, {
-			projectRoles: context.projectRoles,
+			projectRoles: context.roles,
 		})
 		const mapper = this.mapperFactory(context.db, context.schema, context.identityVariables, permissions)
 		const entity = getEntity(context.schema.model, input.entity)

@@ -18,7 +18,7 @@ type ContentEventsByTable = { [tableName: string]: ContentEvent[] }
 
 interface Args {
 	permissionContext: {
-		projectRoles: string[]
+		roles: string[]
 		variables: Acl.VariablesMap
 	}
 	db: Client
@@ -82,7 +82,7 @@ export class EventsPermissionsVerifier {
 		const eventsByTable = this.groupEventsByTable(contentEvents)
 
 		const permissionContext = {
-			projectRoles: await context.identity.projectRoles,
+			roles: await context.identity.roles,
 			variables: context.variables,
 		}
 		const schema = await this.schemaVersionBuilder.buildSchema(db)

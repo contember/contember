@@ -3,7 +3,7 @@ import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
 import { MigrateResponse, MutationMigrateArgs } from '../../schema'
 import { Migration } from '@contember/schema-migrations'
-import { AuthorizationActions, MigrationError, ProjectMigrator, ProjectScope } from '../../model'
+import { AuthorizationActions, MigrationError, ProjectMigrator } from '../../model'
 
 export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	constructor(private readonly projectMigrator: ProjectMigrator) {}
@@ -13,7 +13,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<MigrateResponse> {
-		await context.requireAccess(new ProjectScope(context.project), AuthorizationActions.PROJECT_MIGRATE)
+		await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE)
 		const migrations: Migration[] = []
 		for (const { formatVersion, name, version, modifications } of args.migrations) {
 			migrations.push({

@@ -12,7 +12,7 @@ import ConditionBuilder from '../../sql/select/ConditionBuilder'
 import assert from 'assert'
 
 interface PermissionContext {
-	projectRoles: string[]
+	roles: string[]
 	variables: Acl.VariablesMap
 }
 
@@ -63,7 +63,7 @@ export class PermissionsVerifier {
 		type: 'read' | 'write',
 	): Promise<PermissionsByTable> {
 		const { permissions } = this.permissionsByIdentityFactory.createPermissions(schema, {
-			projectRoles: permissionContext.projectRoles,
+			projectRoles: permissionContext.roles,
 		})
 
 		const predicateFactory = new PredicateFactory(

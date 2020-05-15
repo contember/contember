@@ -41,7 +41,6 @@ class SystemServerProvider {
 	private createContext(ctx: InputKoaContext): ExtendedGraphqlContext {
 		const identity = new Identity(
 			ctx.state.authResult.identityId,
-			ctx.state.authResult.roles,
 			ctx.state.projectMemberships.map(it => it.role),
 		)
 		const dbContextFactory = ctx.state.projectContainer.systemDatabaseContextFactory

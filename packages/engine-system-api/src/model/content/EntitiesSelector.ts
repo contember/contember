@@ -10,7 +10,7 @@ export interface EntitiesSelectorContext {
 	db: Client
 	schema: Schema
 	identityVariables: Acl.VariablesMap
-	projectRoles: string[]
+	roles: string[]
 }
 
 export interface EntitiesSelectorInput {

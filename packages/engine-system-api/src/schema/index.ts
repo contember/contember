@@ -111,6 +111,7 @@ export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly migrate: MigrateResponse
 	readonly release: ReleaseResponse
+	readonly releaseTree: ReleaseTreeResponse
 	readonly rebaseAll: RebaseAllResponse
 }
 
@@ -121,6 +122,11 @@ export type MutationMigrateArgs = {
 export type MutationReleaseArgs = {
 	stage: Scalars['String']
 	events: ReadonlyArray<Scalars['String']>
+}
+
+export type MutationReleaseTreeArgs = {
+	stage: Scalars['String']
+	tree: ReadonlyArray<TreeFilter>
 }
 
 export type Query = {
@@ -151,6 +157,19 @@ export type ReleaseResponse = {
 	readonly __typename?: 'ReleaseResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<ReleaseErrorCode>
+}
+
+export enum ReleaseTreeErrorCode {
+	StageNotFound = 'STAGE_NOT_FOUND',
+	MissingBase = 'MISSING_BASE',
+	Forbidden = 'FORBIDDEN',
+	NotRebased = 'NOT_REBASED',
+}
+
+export type ReleaseTreeResponse = {
+	readonly __typename?: 'ReleaseTreeResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<ReleaseTreeErrorCode>
 }
 
 export type RunMigrationEvent = Event & {
@@ -284,6 +303,8 @@ export type ResolversTypes = {
 	MigrateResult: ResolverTypeWrapper<MigrateResult>
 	ReleaseResponse: ResolverTypeWrapper<ReleaseResponse>
 	ReleaseErrorCode: ReleaseErrorCode
+	ReleaseTreeResponse: ResolverTypeWrapper<ReleaseTreeResponse>
+	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: ResolverTypeWrapper<RebaseAllResponse>
 	UpdateEvent: ResolverTypeWrapper<UpdateEvent>
 	DeleteEvent: ResolverTypeWrapper<DeleteEvent>
@@ -315,6 +336,8 @@ export type ResolversParentTypes = {
 	MigrateResult: MigrateResult
 	ReleaseResponse: ReleaseResponse
 	ReleaseErrorCode: ReleaseErrorCode
+	ReleaseTreeResponse: ReleaseTreeResponse
+	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: RebaseAllResponse
 	UpdateEvent: UpdateEvent
 	DeleteEvent: DeleteEvent
@@ -433,6 +456,12 @@ export type MutationResolvers<
 		ContextType,
 		RequireFields<MutationReleaseArgs, 'stage' | 'events'>
 	>
+	releaseTree?: Resolver<
+		ResolversTypes['ReleaseTreeResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<MutationReleaseTreeArgs, 'stage' | 'tree'>
+	>
 	rebaseAll?: Resolver<ResolversTypes['RebaseAllResponse'], ParentType, ContextType>
 }
 
@@ -458,6 +487,15 @@ export type ReleaseResponseResolvers<
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ReleaseErrorCode']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
+export type ReleaseTreeResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ReleaseTreeResponse'] = ResolversParentTypes['ReleaseTreeResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['ReleaseTreeErrorCode']>, ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
@@ -511,6 +549,7 @@ export type Resolvers<ContextType = any> = {
 	Query?: QueryResolvers<ContextType>
 	RebaseAllResponse?: RebaseAllResponseResolvers<ContextType>
 	ReleaseResponse?: ReleaseResponseResolvers<ContextType>
+	ReleaseTreeResponse?: ReleaseTreeResponseResolvers<ContextType>
 	RunMigrationEvent?: RunMigrationEventResolvers<ContextType>
 	Stage?: StageResolvers<ContextType>
 	UpdateEvent?: UpdateEventResolvers<ContextType>

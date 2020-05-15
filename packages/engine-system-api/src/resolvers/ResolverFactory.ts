@@ -4,6 +4,7 @@ import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
 import { GraphQLResolveInfo, GraphQLScalarType, Kind } from 'graphql'
 import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
+import { ReleaseTreeMutationResolver } from './mutation/ReleaseTreeMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -12,6 +13,7 @@ class ResolverFactory {
 		private readonly releaseMutationResolver: ReleaseMutationResolver,
 		private readonly rebaseMutationResolver: RebaseAllMutationResolver,
 		private readonly migrateMutationResolver: MigrateMutationResolver,
+		private readonly releaseTreeMutationResolver: ReleaseTreeMutationResolver,
 	) {}
 
 	create(): Resolvers {
@@ -60,6 +62,8 @@ class ResolverFactory {
 			Mutation: {
 				release: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.releaseMutationResolver.release(parent, args, context, info),
+				releaseTree: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.releaseTreeMutationResolver.releaseTree(parent, args, context, info),
 				rebaseAll: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.rebaseMutationResolver.rebaseAll(parent, args, context, info),
 				migrate: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>

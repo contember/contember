@@ -2,7 +2,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { QueryResolver } from '../Resolver'
 import { DiffErrorCode, DiffResponse, QueryDiffArgs } from '../../schema'
-import { DiffBuilder, DiffResponseBuilder } from '../../model'
+import { DiffBuilder, DiffBuilderErrorCode, DiffResponseBuilder } from '../../model'
 import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
 export class DiffQueryResolver implements QueryResolver<'diff'> {
@@ -42,7 +42,15 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 				filter,
 			)
 			if (!diff.ok) {
-				return diff
+				return {
+					ok: false,
+					errors: diff.errors.map(
+						it =>
+							({
+								[DiffBuilderErrorCode.notRebased]: DiffErrorCode.NotRebased,
+							}[it]),
+					),
+				}
 			}
 
 			return {

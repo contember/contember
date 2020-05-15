@@ -34,7 +34,15 @@ export class DiffBuilder {
 		const count = await db.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
 
 		if (count.ok === false) {
-			return count
+			return {
+				ok: false,
+				errors: count.errors.map(
+					it =>
+						({
+							[DiffCountQuery.ErrorCode.notRebased]: DiffBuilderErrorCode.notRebased,
+						}[it]),
+				),
+			}
 		}
 
 		if (count.diff === 0) {
@@ -154,10 +162,14 @@ export class DiffBuilder {
 
 export type DiffBuilderResponseResponse = DiffBuilderOkResponse | DiffBuilderErrorResponse
 
+export enum DiffBuilderErrorCode {
+	notRebased = 'notRebased',
+}
+
 export class DiffBuilderErrorResponse {
 	public readonly ok: false = false
 
-	constructor(public readonly errors: DiffErrorCode[]) {}
+	constructor(public readonly errors: DiffBuilderErrorCode[]) {}
 }
 
 export type EventWithMeta = ContentEvent & { dependencies: string[]; permission: EventPermission }

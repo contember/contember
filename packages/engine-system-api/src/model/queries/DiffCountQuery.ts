@@ -23,7 +23,7 @@ SELECT index from events where events.id = ?
 		)
 
 		return diff.rows.length === 0
-			? new DiffCountQuery.ErrorResponse([DiffErrorCode.NotRebased])
+			? new DiffCountQuery.ErrorResponse([DiffCountQuery.ErrorCode.notRebased])
 			: new DiffCountQuery.OkResponse(diff.rows[0].index)
 	}
 }
@@ -31,10 +31,14 @@ SELECT index from events where events.id = ?
 namespace DiffCountQuery {
 	export type Response = OkResponse | ErrorResponse
 
+	export enum ErrorCode {
+		notRebased = 'notRebased',
+	}
+
 	export class ErrorResponse {
 		public readonly ok: false = false
 
-		constructor(public readonly errors: DiffErrorCode[]) {}
+		constructor(public readonly errors: ErrorCode[]) {}
 	}
 
 	export class OkResponse {

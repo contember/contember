@@ -17,6 +17,7 @@ const schema: DocumentNode = gql`
 	type Mutation {
 		migrate(migrations: [Migration!]!): MigrateResponse!
 		release(stage: String!, events: [String!]!): ReleaseResponse!
+		releaseTree(stage: String!, tree: [TreeFilter!]!): ReleaseTreeResponse!
 		rebaseAll: RebaseAllResponse!
 	}
 
@@ -100,6 +101,20 @@ const schema: DocumentNode = gql`
 	type ReleaseResponse {
 		ok: Boolean!
 		errors: [ReleaseErrorCode!]!
+	}
+
+	# === releaseTree ===
+
+	enum ReleaseTreeErrorCode {
+		STAGE_NOT_FOUND
+		MISSING_BASE
+		FORBIDDEN
+		NOT_REBASED
+	}
+
+	type ReleaseTreeResponse {
+		ok: Boolean!
+		errors: [ReleaseTreeErrorCode!]!
 	}
 
 	# === rebase ===

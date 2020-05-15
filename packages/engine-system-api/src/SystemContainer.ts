@@ -47,6 +47,7 @@ import {
 import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
 import { EntitiesSelector } from './model/content/EntitiesSelector'
+import { ReleaseTreeMutationResolver } from './resolvers/mutation/ReleaseTreeMutationResolver'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -172,6 +173,11 @@ export class SystemContainerFactory {
 				'releaseMutationResolver',
 				({ rebaseExecutor, releaseExecutor }) => new ReleaseMutationResolver(rebaseExecutor, releaseExecutor),
 			)
+			.addService(
+				'releaseTreeMutationResolver',
+				({ rebaseExecutor, releaseExecutor, diffBuilder }) =>
+					new ReleaseTreeMutationResolver(rebaseExecutor, releaseExecutor, diffBuilder),
+			)
 			.addService('rebaseMutationResolver', ({ rebaseExecutor }) => new RebaseAllMutationResolver(rebaseExecutor))
 			.addService('migrateMutationResolver', ({ projectMigrator }) => new MigrateMutationResolver(projectMigrator))
 			.addService(
@@ -182,6 +188,7 @@ export class SystemContainerFactory {
 					releaseMutationResolver,
 					rebaseMutationResolver,
 					migrateMutationResolver,
+					releaseTreeMutationResolver,
 				}) =>
 					new ResolverFactory(
 						systemStagesQueryResolver,
@@ -189,6 +196,7 @@ export class SystemContainerFactory {
 						releaseMutationResolver,
 						rebaseMutationResolver,
 						migrateMutationResolver,
+						releaseTreeMutationResolver,
 					).create(),
 			)
 			.addService('resolverContextFactory', ({ authorizator }) => new ResolverContextFactory(authorizator))

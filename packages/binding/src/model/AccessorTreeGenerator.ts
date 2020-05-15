@@ -200,15 +200,13 @@ class AccessorTreeGenerator {
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
 	): EntityAccessor {
-		// In the grand scheme of things, sub trees are actually fairly rare, and so we only initialize them if necessary
-		let subTreeData: Map<SubTreeIdentifier, RootAccessor> | undefined = undefined
 		const typename = entityState.persistedData
 			? entityState.persistedData instanceof Accessor
 				? entityState.persistedData.typename
 				: entityState.persistedData[TYPENAME_KEY_NAME]
 			: undefined
 
-		const getSubTreeRoot: GetSubTreeRoot = identifier => subTreeData?.get(identifier)
+		const getSubTreeRoot: GetSubTreeRoot = identifier => entityState.subTrees?.get(identifier)
 
 		for (const [placeholderName, field] of entityState.fieldMarkers) {
 			if (placeholderName === PRIMARY_KEY_NAME) {
@@ -253,11 +251,11 @@ class AccessorTreeGenerator {
 					initialData = this.initialData[field.id]
 				}
 
-				if (subTreeData === undefined) {
-					subTreeData = new Map()
+				if (entityState.subTrees === undefined) {
+					entityState.subTrees = new Map()
 				}
 
-				subTreeData.set(
+				entityState.subTrees.set(
 					field.subTreeIdentifier || field.id,
 					this.generateSubTree(field, initialData, () => undefined, undefined).accessor!,
 				)
@@ -880,7 +878,9 @@ class AccessorTreeGenerator {
 				existingState.dirtyChildIds.add(childId)
 			}
 		}
-		existingState.childIds.clear() // TODO This is kind of crap. We should resolve child ids from here.
+		// TODO This is kind of crap. We should resolve child ids from here.
+		// 	It's also a memory leak in the entity store.
+		existingState.childIds.clear()
 		return existingState
 	}
 

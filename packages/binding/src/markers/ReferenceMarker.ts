@@ -1,7 +1,7 @@
 import { assertNever } from '../utils'
 import { BindingError } from '../BindingError'
 import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
-import { EntityFields } from './EntityFields'
+import { EntityFieldMarkers } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 // TODO unify with EntityListTreeConstraints / SingleEntityTreeConstraints
@@ -23,7 +23,7 @@ class ReferenceMarker {
 	public constructor(
 		fieldName: FieldName,
 		expectedCount: ExpectedEntityCount,
-		fields: EntityFields,
+		fields: EntityFieldMarkers,
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
@@ -32,7 +32,7 @@ class ReferenceMarker {
 	public constructor(
 		fieldName: FieldName,
 		decider: ExpectedEntityCount | ReferenceMarker.References,
-		fields?: EntityFields,
+		fields?: EntityFieldMarkers,
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
@@ -103,7 +103,7 @@ namespace ReferenceMarker {
 	}
 
 	export interface Reference extends ReferenceConstraints {
-		fields: EntityFields
+		fields: EntityFieldMarkers
 		preferences: ReferencePreferences
 		placeholderName: string
 	}

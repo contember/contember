@@ -13,7 +13,7 @@ import {
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar, SubTreeIdentifier } from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
@@ -46,7 +46,7 @@ type InternalEntityFields = Map<FieldName, InternalStateNode>
 type OnEntityUpdate = (accessor: EntityAccessor | EntityForRemovalAccessor | undefined) => void
 interface InternalEntityState {
 	id: string | EntityAccessor.UnpersistedEntityId
-	fieldMarkers: EntityFields
+	fieldMarkers: EntityFieldMarkers
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	persistedData: AccessorTreeGenerator.InitialEntityData
 	onUpdate: OnEntityUpdate | Set<OnEntityUpdate>
@@ -182,7 +182,7 @@ class AccessorTreeGenerator {
 		id: string | EntityAccessor.UnpersistedEntityId,
 		data: AccessorTreeGenerator.InitialEntityData,
 		fieldStates: InternalEntityFields,
-		entityMarkers: EntityFields,
+		entityMarkers: EntityFieldMarkers,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		onUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | undefined) => void,
 		onReplace: OnReplace,
@@ -572,7 +572,7 @@ class AccessorTreeGenerator {
 
 	private generateEntityListAccessor(
 		entityListState: InternalEntityListState,
-		entityFields: EntityFields,
+		entityFieldMarkers: EntityFieldMarkers,
 		fieldData: ReceivedEntityData<undefined>[] | EntityListAccessor | undefined,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		parentOnUpdate: OnUpdate,
@@ -699,7 +699,7 @@ class AccessorTreeGenerator {
 				this.resolveOrCreateEntityState(
 					id,
 					this.getExistingEntityState(id),
-					entityFields,
+					entityFieldMarkers,
 					onUpdate,
 					datum,
 					childErrors,
@@ -795,7 +795,7 @@ class AccessorTreeGenerator {
 	private resolveOrCreateEntityState(
 		id: string | EntityAccessor.UnpersistedEntityId,
 		existingState: InternalEntityState | undefined,
-		fieldMarkers: EntityFields,
+		fieldMarkers: EntityFieldMarkers,
 		onUpdate: OnEntityUpdate,
 		persistedData: AccessorTreeGenerator.InitialEntityData,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,

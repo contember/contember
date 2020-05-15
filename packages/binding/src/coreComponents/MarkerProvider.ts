@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Environment } from '../dao'
-import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 
 export interface EnvironmentDeltaProvider<P extends {} = any> {
 	generateEnvironment: (props: P, oldEnvironment: Environment) => Environment
@@ -12,7 +12,7 @@ export interface EnvironmentDeltaProvider<P extends {} = any> {
 
 export interface FieldMarkerProvider<P extends {} = any> {
 	// It may also return a ReferenceMarker so as to facilitate implementation of conditionally nested fields
-	generateFieldMarker: (props: P, environment: Environment) => FieldMarker | ReferenceMarker | EntityFields
+	generateFieldMarker: (props: P, environment: Environment) => FieldMarker | ReferenceMarker | EntityFieldMarkers
 }
 
 export interface MarkerTreeRootProvider<P extends {} = any> {
@@ -20,7 +20,7 @@ export interface MarkerTreeRootProvider<P extends {} = any> {
 		props: P,
 		fields: MarkerTreeRoot['fields'],
 		environment: Environment,
-	) => MarkerTreeRoot | EntityFields
+	) => MarkerTreeRoot | EntityFieldMarkers
 }
 
 export interface ReferenceMarkerProvider<P extends {} = any> {
@@ -28,12 +28,15 @@ export interface ReferenceMarkerProvider<P extends {} = any> {
 		props: P,
 		fields: ReferenceMarker.Reference['fields'],
 		environment: Environment,
-	) => ReferenceMarker | EntityFields
+	) => ReferenceMarker | EntityFieldMarkers
 }
 
 export interface ConnectionMarkerProvider<P extends {} = any> {
 	// It may also return a ReferenceMarker so as to facilitate implementation of conditionally nested connections
-	generateConnectionMarker: (props: P, environment: Environment) => ConnectionMarker | ReferenceMarker | EntityFields
+	generateConnectionMarker: (
+		props: P,
+		environment: Environment,
+	) => ConnectionMarker | ReferenceMarker | EntityFieldMarkers
 }
 
 export interface SyntheticChildrenProvider<P extends {} = any> {

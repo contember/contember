@@ -3,7 +3,7 @@ import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAcce
 import { ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { ExpectedEntityCount } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 
@@ -36,7 +36,7 @@ export class DirtinessChecker {
 	}
 
 	private isEntityDirty(
-		fields: EntityFields,
+		fields: EntityFieldMarkers,
 		persistedData: ReceivedEntityData<undefined>,
 		node: EntityAccessor | EntityForRemovalAccessor,
 	): boolean {
@@ -133,7 +133,7 @@ export class DirtinessChecker {
 	}
 
 	private isEntityListDirty(
-		fields: EntityFields,
+		fields: EntityFieldMarkers,
 		persistedData: ReceivedEntityData<undefined>[] | undefined | null,
 		accessor: EntityListAccessor,
 	): boolean {

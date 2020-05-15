@@ -6,7 +6,7 @@ import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { BindingError } from '../BindingError'
 import {
 	ConnectionMarker,
-	EntityFields,
+	EntityFieldMarkers,
 	FieldMarker,
 	MarkerTreeParameters,
 	MarkerTreeRoot,
@@ -42,7 +42,7 @@ export class MutationGenerator {
 
 	private addSubMutation(
 		data: ReceivedData<undefined>,
-		entityFields: EntityFields,
+		entityFieldMarkers: EntityFieldMarkers,
 		entity: RootAccessor,
 		alias: string,
 		parameters: MarkerTreeParameters,
@@ -54,9 +54,9 @@ export class MutationGenerator {
 
 		if (entity instanceof EntityAccessor) {
 			if (!entity.isPersisted) {
-				queryBuilder = this.addCreateMutation(entity, entityFields, alias, parameters, queryBuilder)
+				queryBuilder = this.addCreateMutation(entity, entityFieldMarkers, alias, parameters, queryBuilder)
 			} else if (data && !Array.isArray(data)) {
-				queryBuilder = this.addUpdateMutation(entity, entityFields, data, alias, parameters, queryBuilder)
+				queryBuilder = this.addUpdateMutation(entity, entityFieldMarkers, data, alias, parameters, queryBuilder)
 			}
 		} else if (entity instanceof EntityForRemovalAccessor) {
 			queryBuilder = this.addDeleteMutation(entity, alias, parameters, queryBuilder)
@@ -67,7 +67,7 @@ export class MutationGenerator {
 				for (const currentEntity of entity) {
 					queryBuilder = this.addSubMutation(
 						data[i++], // Deliberately using that this may evaluate to undefined
-						entityFields,
+						entityFieldMarkers,
 						currentEntity,
 						AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(currentEntity)),
 						parameters,
@@ -111,7 +111,7 @@ export class MutationGenerator {
 
 	private addUpdateMutation(
 		entity: EntityAccessor,
-		entityFields: EntityFields,
+		entityFieldMarkers: EntityFieldMarkers,
 		data: ReceivedEntityData<undefined>,
 		alias: string,
 		parameters: MarkerTreeParameters,
@@ -136,7 +136,7 @@ export class MutationGenerator {
 				}
 
 				return builder
-					.data(builder => this.registerUpdateMutationPart(entity, entityFields, data, builder))
+					.data(builder => this.registerUpdateMutationPart(entity, entityFieldMarkers, data, builder))
 					.by({ ...where, [PRIMARY_KEY_NAME]: runtimeId })
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.ok()
@@ -148,7 +148,7 @@ export class MutationGenerator {
 
 	private addCreateMutation(
 		entity: EntityAccessor,
-		entityFields: EntityFields,
+		entityFieldMarkers: EntityFieldMarkers,
 		alias: string,
 		parameters: MarkerTreeParameters,
 		queryBuilder?: QueryBuilder,
@@ -162,7 +162,7 @@ export class MutationGenerator {
 			builder => {
 				let writeBuilder = this.registerCreateMutationPart(
 					entity,
-					entityFields,
+					entityFieldMarkers,
 					new CrudQueryBuilder.WriteDataBuilder(),
 				)
 				if (
@@ -188,7 +188,7 @@ export class MutationGenerator {
 
 	private registerCreateMutationPart(
 		currentData: EntityAccessor,
-		entityFields: EntityFields,
+		entityFieldMarkers: EntityFieldMarkers,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
 		const nonbearingFields: Array<{
@@ -197,7 +197,7 @@ export class MutationGenerator {
 		}> = []
 		const nonbearingConnections: ConnectionMarker[] = []
 
-		for (const [placeholderName, marker] of entityFields) {
+		for (const [placeholderName, marker] of entityFieldMarkers) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}
@@ -321,11 +321,11 @@ export class MutationGenerator {
 
 	private registerUpdateMutationPart(
 		currentData: EntityAccessor,
-		entityFields: EntityFields,
+		entityFieldMarkers: EntityFieldMarkers,
 		persistedData: ReceivedEntityData<undefined>,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
-		for (const [placeholderName, marker] of entityFields) {
+		for (const [placeholderName, marker] of entityFieldMarkers) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}

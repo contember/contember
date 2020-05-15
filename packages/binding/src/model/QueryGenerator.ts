@@ -2,9 +2,8 @@ import { CrudQueryBuilder } from '@contember/client'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	ConnectionMarker,
-	EntityFields,
+	EntityFieldMarkers,
 	FieldMarker,
-	Marker,
 	MarkerTreeRoot,
 	ReferenceMarker,
 	TaggedQualifiedEntityList,
@@ -109,7 +108,7 @@ export class QueryGenerator {
 		)
 	}
 
-	private *registerQueryPart(fields: EntityFields, builder: ReadBuilder): Generator<MarkerTreeRoot, ReadBuilder> {
+	private *registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): Generator<MarkerTreeRoot, ReadBuilder> {
 		builder = builder.column(PRIMARY_KEY_NAME)
 		builder = builder.column(TYPENAME_KEY_NAME)
 

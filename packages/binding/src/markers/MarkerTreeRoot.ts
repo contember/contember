@@ -4,7 +4,7 @@ import {
 	SubTreeIdentifier,
 	UnconstrainedQualifiedEntityList,
 } from '../treeParameters'
-import { EntityFields } from './EntityFields'
+import { EntityFieldMarkers } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 export interface TaggedQualifiedSingleEntity extends QualifiedSingleEntity {
@@ -30,7 +30,7 @@ class MarkerTreeRoot<C extends MarkerTreeParameters = MarkerTreeParameters> {
 	public constructor(
 		idSeed: number,
 		public readonly parameters: C,
-		public readonly fields: EntityFields,
+		public readonly fields: EntityFieldMarkers,
 		public readonly subTreeIdentifier?: SubTreeIdentifier,
 	) {
 		this.id = `treeRoot${idSeed.toFixed(0)}`

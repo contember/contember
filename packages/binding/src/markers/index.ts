@@ -1,5 +1,5 @@
 export * from './ConnectionMarker'
-export * from './EntityFields'
+export * from './EntityFieldMarkers'
 export * from './FieldMarker'
 export * from './Marker'
 export * from './MarkerTreeRoot'

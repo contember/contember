@@ -4,11 +4,11 @@ import * as React from 'react'
 import { MarkerProvider } from '../coreComponents'
 import { Environment } from '../dao'
 import { BindingError } from '../BindingError'
-import { ConnectionMarker, EntityFields, FieldMarker, Marker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { ConnectionMarker, EntityFieldMarkers, FieldMarker, Marker, MarkerTreeRoot, ReferenceMarker } from '../markers'
 import { FieldName } from '../treeParameters'
 import { Hashing } from '../utils'
 
-type Fragment = EntityFields
+type Fragment = EntityFieldMarkers
 type Terminals = FieldMarker | ConnectionMarker | Fragment
 type Nonterminals = MarkerTreeRoot | ReferenceMarker | Fragment
 
@@ -35,8 +35,10 @@ export class MarkerTreeGenerator {
 		return this.reportInvalidTreeError(processed)
 	}
 
-	private static mapNodeResultToEntityFields(result: RawNodeRepresentation<Terminals, Nonterminals>): EntityFields {
-		const fields: EntityFields = new Map()
+	private static mapNodeResultToEntityFields(
+		result: RawNodeRepresentation<Terminals, Nonterminals>,
+	): EntityFieldMarkers {
+		const fields: EntityFieldMarkers = new Map()
 
 		if (!result) {
 			return fields
@@ -145,7 +147,7 @@ export class MarkerTreeGenerator {
 		assertNever(original)
 	}
 
-	private static mergeEntityFields(original: EntityFields, fresh: EntityFields): EntityFields {
+	private static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers {
 		for (const [placeholderName, freshMarker] of fresh) {
 			original.set(
 				placeholderName,

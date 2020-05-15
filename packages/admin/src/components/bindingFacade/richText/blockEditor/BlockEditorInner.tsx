@@ -10,7 +10,6 @@ import {
 	SugaredFieldProps,
 	useDesugaredRelativeSingleField,
 	useMutationState,
-	useOptionalDesugaredRelativeSingleField,
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
@@ -108,9 +107,7 @@ export const BlockEditorInner = React.memo(
 		const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
 		const desugaredTextBlockField = useDesugaredRelativeSingleField(textBlockField)
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
-		const desugaredEmbedContentDiscriminationField = useOptionalDesugaredRelativeSingleField(
-			embedContentDiscriminationField,
-		)
+		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
 
 		const { entities, moveEntity, appendNew } = useSortedEntities(entityListAccessor, sortableBy)
 

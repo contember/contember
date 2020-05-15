@@ -1,12 +1,25 @@
 import * as React from 'react'
 import { QueryLanguage } from '../queryLanguage'
-import { SugaredRelativeSingleField } from '../treeParameters'
+import { RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
 
-export const useDesugaredRelativeSingleField = (sugaredRelativeSingleField: string | SugaredRelativeSingleField) => {
+function useDesugaredRelativeSingleField(
+	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
+): RelativeSingleField
+function useDesugaredRelativeSingleField(
+	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
+): RelativeSingleField | undefined
+function useDesugaredRelativeSingleField(
+	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
+): RelativeSingleField | undefined {
 	const environment = useEnvironment()
-	return React.useMemo(() => QueryLanguage.desugarRelativeSingleField(sugaredRelativeSingleField, environment), [
-		environment,
-		sugaredRelativeSingleField,
-	])
+	return React.useMemo(
+		() =>
+			sugaredRelativeSingleField !== undefined
+				? QueryLanguage.desugarRelativeSingleField(sugaredRelativeSingleField, environment)
+				: sugaredRelativeSingleField,
+		[environment, sugaredRelativeSingleField],
+	)
 }
+
+export { useDesugaredRelativeSingleField }

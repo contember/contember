@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useOptionalDesugaredRelativeSingleField } from '../accessorRetrievers'
+import { useDesugaredRelativeSingleField } from '../accessorRetrievers'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { SugaredFieldProps } from '../helperComponents'
 import { RelativeSingleField } from '../treeParameters'
@@ -41,7 +41,7 @@ export const useSortedEntities = (
 	entityList: EntityListAccessor,
 	sortableByField: SugaredFieldProps['field'] | undefined,
 ): SortedEntities => {
-	const desugaredSortableByField = useOptionalDesugaredRelativeSingleField(sortableByField)
+	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableByField)
 	const sortedEntities = React.useMemo(() => {
 		const filteredEntities = entityList.getFilteredEntities()
 		return sortEntities(filteredEntities, desugaredSortableByField)

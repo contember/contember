@@ -4,7 +4,7 @@ import {
 	SugaredFieldProps,
 	useEnvironment,
 	useMutationState,
-	useOptionalDesugaredRelativeSingleField,
+	useDesugaredRelativeSingleField,
 	VariableInputTransformer,
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
@@ -76,7 +76,7 @@ export const FileRepeaterContainer = React.memo(
 		const [uploadState, { startUpload, abortUpload }] = useFileUpload()
 		const isMutating = useMutationState()
 		const batchUpdates = entityList.batchUpdates
-		const desugaredDiscriminant = useOptionalDesugaredRelativeSingleField(discriminationField)
+		const desugaredDiscriminant = useDesugaredRelativeSingleField(discriminationField)
 		const environment = useEnvironment()
 		const fileKinds = React.useMemo(() => Array.from(iterableFileKinds), [iterableFileKinds])
 		const resolvedAccept = React.useMemo<string[] | undefined>(() => {

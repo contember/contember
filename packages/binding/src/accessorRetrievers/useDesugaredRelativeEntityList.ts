@@ -1,12 +1,25 @@
 import * as React from 'react'
 import { QueryLanguage } from '../queryLanguage'
-import { SugaredRelativeEntityList } from '../treeParameters'
+import { RelativeEntityList, SugaredRelativeEntityList } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
 
-export const useDesugaredRelativeEntityList = (sugaredRelativeEntityList: string | SugaredRelativeEntityList) => {
+function useDesugaredRelativeEntityList(
+	sugaredRelativeEntityList: string | SugaredRelativeEntityList,
+): RelativeEntityList
+function useDesugaredRelativeEntityList(
+	sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined,
+): RelativeEntityList | undefined
+function useDesugaredRelativeEntityList(
+	sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined,
+): RelativeEntityList | undefined {
 	const environment = useEnvironment()
-	return React.useMemo(() => QueryLanguage.desugarRelativeEntityList(sugaredRelativeEntityList, environment), [
-		environment,
-		sugaredRelativeEntityList,
-	])
+	return React.useMemo(
+		() =>
+			sugaredRelativeEntityList !== undefined
+				? QueryLanguage.desugarRelativeEntityList(sugaredRelativeEntityList, environment)
+				: sugaredRelativeEntityList,
+		[environment, sugaredRelativeEntityList],
+	)
 }
+
+export { useDesugaredRelativeEntityList }

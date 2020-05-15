@@ -1,8 +1,9 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
-import { MutationReleaseArgs, ReleaseResponse } from '../../schema'
+import { DiffErrorCode, MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse } from '../../schema'
 import { createStageQuery, RebaseExecutor, ReleaseExecutor } from '../../model'
+import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
 export class ReleaseMutationResolver implements MutationResolver<'release'> {
 	constructor(private readonly rebaseExecutor: RebaseExecutor, private readonly releaseExecutor: ReleaseExecutor) {}
@@ -14,16 +15,20 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 		info: GraphQLResolveInfo,
 	): Promise<ReleaseResponse> {
 		return context.db.transaction(async db => {
-			const [baseStage, headStage] = await Promise.all([
-				db.queryHandler.fetch(createStageQuery(args.baseStage)),
-				db.queryHandler.fetch(createStageQuery(args.headStage)),
-			])
-			if (!baseStage || !headStage) {
+			const stagesResult = await fetchStages(args.stage, db, context.project)
+			if (!stagesResult.ok) {
 				return {
 					ok: false,
-					errors: [], //todo
+					errors: stagesResult.errors.map(
+						it =>
+							({
+								[FetchStageErrors.missingBase]: ReleaseErrorCode.MissingBase,
+								[FetchStageErrors.headNotFound]: ReleaseErrorCode.StageNotFound,
+							}[it]),
+					),
 				}
 			}
+			const { head, base } = stagesResult
 
 			await this.rebaseExecutor.rebaseAll(db, context.project)
 
@@ -34,8 +39,8 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 					variables: context.variables,
 					identity: context.identity,
 				},
-				baseStage,
-				headStage,
+				base,
+				head,
 				[...args.events],
 			)
 

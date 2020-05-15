@@ -11,31 +11,32 @@ const schema: DocumentNode = gql`
 
 	type Query {
 		stages: [Stage!]!
-		diff(baseStage: String!, headStage: String!, filter: [DiffFilter!]): DiffResponse!
+		diff(stage: String!, filter: [TreeFilter!]): DiffResponse!
 	}
 
 	type Mutation {
 		migrate(migrations: [Migration!]!): MigrateResponse!
-		release(baseStage: String!, headStage: String!, events: [String!]!): ReleaseResponse!
+		release(stage: String!, events: [String!]!): ReleaseResponse!
 		rebaseAll: RebaseAllResponse!
+	}
+
+	# === tree filter ==
+	input TreeFilter {
+		entity: String!
+		relations: [TreeFilterRelation!]
+		id: String!
+	}
+
+	input TreeFilterRelation {
+		name: String!
+		relations: [TreeFilterRelation!]!
 	}
 
 	# === diff ===
 
-	input DiffFilter {
-		entity: String!
-		relations: [DiffFilterRelation!]
-		id: String!
-	}
-
-	input DiffFilterRelation {
-		name: String!
-		relations: [DiffFilterRelation!]!
-	}
-
 	enum DiffErrorCode {
-		BASE_NOT_FOUND
-		HEAD_NOT_FOUND
+		STAGE_NOT_FOUND
+		MISSING_BASE
 		NOT_REBASED
 	}
 
@@ -90,6 +91,8 @@ const schema: DocumentNode = gql`
 
 	# === release ===
 	enum ReleaseErrorCode {
+		STAGE_NOT_FOUND
+		MISSING_BASE
 		MISSING_DEPENDENCY
 		FORBIDDEN
 	}
@@ -98,7 +101,8 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 		errors: [ReleaseErrorCode!]!
 	}
-	# === release ===
+
+	# === rebase ===
 
 	type RebaseAllResponse {
 		ok: Boolean!

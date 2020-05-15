@@ -33,20 +33,9 @@ export type DeleteEvent = Event & {
 }
 
 export enum DiffErrorCode {
-	BaseNotFound = 'BASE_NOT_FOUND',
-	HeadNotFound = 'HEAD_NOT_FOUND',
+	StageNotFound = 'STAGE_NOT_FOUND',
+	MissingBase = 'MISSING_BASE',
 	NotRebased = 'NOT_REBASED',
-}
-
-export type DiffFilter = {
-	readonly entity: Scalars['String']
-	readonly relations?: Maybe<ReadonlyArray<DiffFilterRelation>>
-	readonly id: Scalars['String']
-}
-
-export type DiffFilterRelation = {
-	readonly name: Scalars['String']
-	readonly relations: ReadonlyArray<DiffFilterRelation>
 }
 
 export type DiffResponse = {
@@ -130,8 +119,7 @@ export type MutationMigrateArgs = {
 }
 
 export type MutationReleaseArgs = {
-	baseStage: Scalars['String']
-	headStage: Scalars['String']
+	stage: Scalars['String']
 	events: ReadonlyArray<Scalars['String']>
 }
 
@@ -142,9 +130,8 @@ export type Query = {
 }
 
 export type QueryDiffArgs = {
-	baseStage: Scalars['String']
-	headStage: Scalars['String']
-	filter?: Maybe<ReadonlyArray<DiffFilter>>
+	stage: Scalars['String']
+	filter?: Maybe<ReadonlyArray<TreeFilter>>
 }
 
 export type RebaseAllResponse = {
@@ -154,6 +141,8 @@ export type RebaseAllResponse = {
 
 /** === release === */
 export enum ReleaseErrorCode {
+	StageNotFound = 'STAGE_NOT_FOUND',
+	MissingBase = 'MISSING_BASE',
 	MissingDependency = 'MISSING_DEPENDENCY',
 	Forbidden = 'FORBIDDEN',
 }
@@ -179,6 +168,18 @@ export type Stage = {
 	readonly id: Scalars['String']
 	readonly name: Scalars['String']
 	readonly slug: Scalars['String']
+}
+
+/** === tree filter == */
+export type TreeFilter = {
+	readonly entity: Scalars['String']
+	readonly relations?: Maybe<ReadonlyArray<TreeFilterRelation>>
+	readonly id: Scalars['String']
+}
+
+export type TreeFilterRelation = {
+	readonly name: Scalars['String']
+	readonly relations: ReadonlyArray<TreeFilterRelation>
 }
 
 export type UpdateEvent = Event & {
@@ -264,8 +265,8 @@ export type ResolversTypes = {
 	Query: ResolverTypeWrapper<{}>
 	Stage: ResolverTypeWrapper<Stage>
 	String: ResolverTypeWrapper<Scalars['String']>
-	DiffFilter: DiffFilter
-	DiffFilterRelation: DiffFilterRelation
+	TreeFilter: TreeFilter
+	TreeFilterRelation: TreeFilterRelation
 	DiffResponse: ResolverTypeWrapper<DiffResponse>
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	DiffErrorCode: DiffErrorCode
@@ -295,8 +296,8 @@ export type ResolversParentTypes = {
 	Query: {}
 	Stage: Stage
 	String: Scalars['String']
-	DiffFilter: DiffFilter
-	DiffFilterRelation: DiffFilterRelation
+	TreeFilter: TreeFilter
+	TreeFilterRelation: TreeFilterRelation
 	DiffResponse: DiffResponse
 	Boolean: Scalars['Boolean']
 	DiffErrorCode: DiffErrorCode
@@ -430,7 +431,7 @@ export type MutationResolvers<
 		ResolversTypes['ReleaseResponse'],
 		ParentType,
 		ContextType,
-		RequireFields<MutationReleaseArgs, 'baseStage' | 'headStage' | 'events'>
+		RequireFields<MutationReleaseArgs, 'stage' | 'events'>
 	>
 	rebaseAll?: Resolver<ResolversTypes['RebaseAllResponse'], ParentType, ContextType>
 }
@@ -440,12 +441,7 @@ export type QueryResolvers<
 	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = {
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
-	diff?: Resolver<
-		ResolversTypes['DiffResponse'],
-		ParentType,
-		ContextType,
-		RequireFields<QueryDiffArgs, 'baseStage' | 'headStage'>
-	>
+	diff?: Resolver<ResolversTypes['DiffResponse'], ParentType, ContextType, RequireFields<QueryDiffArgs, 'stage'>>
 }
 
 export type RebaseAllResponseResolvers<

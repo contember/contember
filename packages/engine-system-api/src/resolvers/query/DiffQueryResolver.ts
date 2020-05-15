@@ -1,8 +1,9 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { QueryResolver } from '../Resolver'
-import { DiffErrorCode, DiffFilterRelation, DiffResponse, QueryDiffArgs } from '../../schema'
-import { createStageQuery, DiffBuilder, DiffResponseBuilder } from '../../model'
+import { DiffErrorCode, DiffResponse, QueryDiffArgs } from '../../schema'
+import { DiffBuilder, DiffResponseBuilder } from '../../model'
+import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
 export class DiffQueryResolver implements QueryResolver<'diff'> {
 	constructor(private readonly diffResponseBuilder: DiffResponseBuilder, private readonly diffBuilder: DiffBuilder) {}
@@ -14,19 +15,20 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 		info: GraphQLResolveInfo,
 	): Promise<DiffResponse> {
 		return context.db.transaction(async db => {
-			const [baseStage, headStage] = await Promise.all([
-				db.queryHandler.fetch(createStageQuery(args.baseStage)),
-				db.queryHandler.fetch(createStageQuery(args.headStage)),
-			])
-			if (!baseStage || !headStage) {
+			const stagesResult = await fetchStages(args.stage, db, context.project)
+			if (!stagesResult.ok) {
 				return {
 					ok: false,
-					errors: [
-						!baseStage ? DiffErrorCode.BaseNotFound : null,
-						!headStage ? DiffErrorCode.HeadNotFound : null,
-					].filter((it): it is DiffErrorCode => !!it),
+					errors: stagesResult.errors.map(
+						it =>
+							({
+								[FetchStageErrors.missingBase]: DiffErrorCode.MissingBase,
+								[FetchStageErrors.headNotFound]: DiffErrorCode.StageNotFound,
+							}[it]),
+					),
 				}
 			}
+			const { head, base } = stagesResult
 
 			const filter = args.filter ? args.filter.map(it => ({ ...it, relations: it.relations || [] })) : null
 			const diff = await this.diffBuilder.build(
@@ -35,8 +37,8 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 					variables: context.variables,
 					identity: context.identity,
 				},
-				baseStage,
-				headStage,
+				base,
+				head,
 				filter,
 			)
 			if (!diff.ok) {
@@ -47,8 +49,8 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 				ok: true,
 				errors: [],
 				result: {
-					base: baseStage,
-					head: headStage,
+					base,
+					head,
 					events: this.diffResponseBuilder.buildResponse(diff.events),
 				},
 			}

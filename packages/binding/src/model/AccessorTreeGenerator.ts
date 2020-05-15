@@ -61,11 +61,17 @@ interface InternalEntityState {
 	accessor: EntityAccessor | EntityForRemovalAccessor | undefined
 }
 
+type OnEntityListUpdate = (accessor: EntityListAccessor) => void
 interface InternalEntityListState {
 	batchUpdateDepth: number
 	eventListeners: {
 		[Type in EntityListAccessor.EntityEventType]: Set<EntityListAccessor.EntityEventListenerMap[Type]> | undefined
 	}
+	onUpdate: OnEntityListUpdate
+	fieldMarkers: EntityFieldMarkers
+	initialData: ReceivedEntityData<undefined>[] | Array<EntityAccessor | EntityForRemovalAccessor>
+	errors: ErrorsPreprocessor.ErrorNode | undefined
+	preferences: ReferenceMarker.ReferencePreferences
 	accessor: EntityListAccessor
 	hasPendingUpdate: boolean
 	dirtyChildIds: Set<string> | undefined
@@ -166,8 +172,15 @@ class AccessorTreeGenerator {
 
 		if (Array.isArray(data) || data === undefined || data instanceof EntityListAccessor) {
 			const existingState = this.treeRootStates.get(tree) as InternalEntityListState
-			const resolvedState = this.resolveOrCreateEntityListState(existingState)
-			subTreeState = this.generateEntityListAccessor(resolvedState, tree.fields, data, errorNode, onUpdate)
+			const resolvedState = this.resolveOrCreateEntityListState(
+				existingState,
+				tree.fields,
+				onUpdate,
+				data,
+				errorNode,
+				undefined,
+			)
+			subTreeState = this.generateEntityListAccessor(resolvedState)
 		} else {
 			const existingState = this.treeRootStates.get(tree) as InternalEntityState
 			const id = this.resolveOrCreateEntityId(data)
@@ -302,18 +315,13 @@ class AccessorTreeGenerator {
 						if (fieldDatum === undefined || Array.isArray(fieldDatum) || fieldDatum instanceof EntityListAccessor) {
 							const referenceEntityListState = this.resolveOrCreateEntityListState(
 								entityState.fields.get(referencePlaceholder) as InternalEntityListState | undefined,
+								reference.fields,
+								getOnReferenceUpdate(referencePlaceholder),
+								fieldDatum,
+								referenceError,
+								reference.preferences,
 							)
-							entityState.fields.set(
-								referencePlaceholder,
-								this.generateEntityListAccessor(
-									referenceEntityListState,
-									reference.fields,
-									fieldDatum,
-									referenceError,
-									getOnReferenceUpdate(referencePlaceholder),
-									reference.preferences,
-								),
-							)
+							entityState.fields.set(referencePlaceholder, this.generateEntityListAccessor(referenceEntityListState))
 						} else if (typeof fieldDatum === 'object') {
 							// Intentionally allowing `fieldDatum === null` here as well since this should only happen when a *hasOne
 							// relation is unlinked, e.g. a Person does not have a linked Nationality.
@@ -567,17 +575,8 @@ class AccessorTreeGenerator {
 		return entityState
 	}
 
-	private generateEntityListAccessor(
-		entityListState: InternalEntityListState,
-		entityFieldMarkers: EntityFieldMarkers,
-		fieldData: ReceivedEntityData<undefined>[] | EntityListAccessor | undefined,
-		errors: ErrorsPreprocessor.ErrorNode | undefined,
-		parentOnUpdate: OnUpdate,
-		preferences: ReferenceMarker.ReferencePreferences = ReferenceMarker.defaultReferencePreferences[
-			ExpectedEntityCount.PossiblyMany
-		],
-	): InternalEntityListState {
-		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
+	private generateEntityListAccessor(entityListState: InternalEntityListState): InternalEntityListState {
+		if (entityListState.errors && entityListState.errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 			throw new BindingError(
 				`The error tree structure does not correspond to the marker tree. This should never happen.`,
 			)
@@ -601,7 +600,7 @@ class AccessorTreeGenerator {
 			performUpdates(() => entityListState.accessor!)
 			entityListState.batchUpdateDepth--
 			if (entityListState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityListState.accessor) {
-				parentOnUpdate(entityListState.accessor)
+				entityListState.onUpdate(entityListState.accessor)
 			}
 		}
 
@@ -677,12 +676,12 @@ class AccessorTreeGenerator {
 			const key = typeof id === 'string' ? id : id.value
 			let childErrors
 
-			if (errors && datum) {
+			if (entityListState.errors && datum) {
 				const errorKey =
 					datum instanceof EntityAccessor || datum instanceof EntityForRemovalAccessor
 						? datum.key
 						: datum[PRIMARY_KEY_NAME]
-				childErrors = errors.children[errorKey]
+				childErrors = (entityListState.errors as ErrorsPreprocessor.KeyIndexedErrorNode).children[errorKey]
 			} else {
 				childErrors = undefined
 			}
@@ -693,7 +692,7 @@ class AccessorTreeGenerator {
 				this.resolveOrCreateEntityState(
 					id,
 					this.getExistingEntityState(id),
-					entityFieldMarkers,
+					entityListState.fieldMarkers,
 					onUpdate,
 					datum,
 					childErrors,
@@ -711,25 +710,14 @@ class AccessorTreeGenerator {
 			return this.getEntityByKey(key)
 		}
 
-		let sourceData = fieldData instanceof EntityListAccessor ? Array.from(fieldData) : fieldData || []
-		if (
-			sourceData.length === 0 ||
-			sourceData.every(
-				(datum: ReceivedEntityData<undefined> | EntityAccessor | EntityForRemovalAccessor | undefined) =>
-					datum === undefined,
-			)
-		) {
-			sourceData = Array(preferences.initialEntityCount).map(() => undefined)
-		}
-
-		for (const sourceDatum of sourceData) {
+		for (const sourceDatum of entityListState.initialData) {
 			generateNewAccessor(sourceDatum)
 		}
 
 		entityListState.accessor = new EntityListAccessor(
 			getChildEntityByKey,
 			entityListState.childIds,
-			errors ? errors.errors : emptyArray,
+			entityListState.errors ? entityListState.errors.errors : emptyArray,
 			addEventListener,
 			batchUpdates,
 			newEntity => {
@@ -841,9 +829,34 @@ class AccessorTreeGenerator {
 		return this.entityStore.get(typeof id === 'string' ? id : id.value)
 	}
 
-	private resolveOrCreateEntityListState(existingState: InternalEntityListState | undefined): InternalEntityListState {
+	private resolveOrCreateEntityListState(
+		existingState: InternalEntityListState | undefined,
+		fieldMarkers: EntityFieldMarkers,
+		onUpdate: OnEntityListUpdate,
+		initialData: ReceivedEntityData<undefined>[] | EntityListAccessor | undefined,
+		errors: ErrorsPreprocessor.ErrorNode | undefined,
+		preferences: ReferenceMarker.ReferencePreferences | undefined,
+	): InternalEntityListState {
+		preferences = preferences || ReferenceMarker.defaultReferencePreferences[ExpectedEntityCount.PossiblyMany]
+
+		let sourceData = initialData instanceof EntityListAccessor ? Array.from(initialData) : initialData || []
+		if (
+			sourceData.length === 0 ||
+			sourceData.every(
+				(datum: ReceivedEntityData<undefined> | EntityAccessor | EntityForRemovalAccessor | undefined) =>
+					datum === undefined,
+			)
+		) {
+			sourceData = Array(preferences.initialEntityCount).map(() => undefined)
+		}
+
 		if (existingState === undefined) {
 			return {
+				errors,
+				fieldMarkers,
+				onUpdate,
+				preferences,
+				initialData: sourceData,
 				accessor: (undefined as any) as EntityListAccessor,
 				batchUpdateDepth: 0,
 				childIds: new Set(),
@@ -858,7 +871,7 @@ class AccessorTreeGenerator {
 
 		existingState.batchUpdateDepth = 0
 		existingState.hasPendingUpdate = true
-		// existingState.persistedData = persistedData // TODO!
+		existingState.initialData = sourceData
 
 		if (existingState.dirtyChildIds === undefined) {
 			existingState.dirtyChildIds = new Set(existingState.childIds)
@@ -867,6 +880,7 @@ class AccessorTreeGenerator {
 				existingState.dirtyChildIds.add(childId)
 			}
 		}
+		existingState.childIds.clear() // TODO This is kind of crap. We should resolve child ids from here.
 		return existingState
 	}
 

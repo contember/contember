@@ -49,19 +49,7 @@ export class MarkerTreeGenerator {
 		}
 
 		for (const marker of result) {
-			if (
-				marker instanceof FieldMarker ||
-				marker instanceof ReferenceMarker ||
-				marker instanceof ConnectionMarker ||
-				marker instanceof MarkerTreeRoot
-			) {
-				const placeholderName = marker.placeholderName
-
-				fields.set(
-					placeholderName,
-					fields.has(placeholderName) ? MarkerTreeGenerator.mergeMarkers(fields.get(placeholderName)!, marker) : marker,
-				)
-			} else {
+			if (marker instanceof Map) {
 				for (const [placeholderName, innerMarker] of marker) {
 					fields.set(
 						placeholderName,
@@ -70,6 +58,13 @@ export class MarkerTreeGenerator {
 							: innerMarker,
 					)
 				}
+			} else {
+				const placeholderName = marker.placeholderName
+
+				fields.set(
+					placeholderName,
+					fields.has(placeholderName) ? MarkerTreeGenerator.mergeMarkers(fields.get(placeholderName)!, marker) : marker,
+				)
 			}
 		}
 

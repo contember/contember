@@ -1,5 +1,4 @@
 import { DependencyBuilder } from './DependencyBuilder'
-import { DiffErrorCode } from '../../schema'
 import { Stage } from '../dtos'
 import { ContentEvent } from '@contember/engine-common'
 import { DiffCountQuery, DiffQuery } from '../queries'

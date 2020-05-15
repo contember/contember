@@ -17,7 +17,6 @@ import {
 	EntitiesSelectorMapperFactory,
 	GraphQlSchemaBuilderFactory,
 	PermissionsByIdentityFactory,
-	PermissionsVerifier,
 } from '@contember/engine-content-api'
 import { makeExecutableSchema } from 'graphql-tools'
 import { ContentApiTester } from './ContentApiTester'
@@ -73,7 +72,6 @@ export class ApiTester {
 			createMapperContainer({ schema, identityVariables, permissions, providers }).mapperFactory(db)
 		let systemContainerBuilder = systemContainerFactory.createBuilder({
 			migrationsResolverFactory: project => migrationsResolver,
-			contentPermissionsVerifier: new PermissionsVerifier(permissionsByIdentityFactory),
 			entitiesSelector: new EntitiesSelector(mapperFactory, permissionsByIdentityFactory),
 			modificationHandlerFactory,
 			providers: providers,

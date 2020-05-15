@@ -3,7 +3,6 @@ import {
 	EntitiesSelector,
 	EntitiesSelectorMapperFactory,
 	PermissionsByIdentityFactory,
-	PermissionsVerifier,
 } from '@contember/engine-content-api'
 import { SchemaVersionBuilder, SystemContainerFactory } from '@contember/engine-system-api'
 import {
@@ -49,10 +48,6 @@ class CompositionRoot {
 				() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
 			)
 			.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
-			.addService(
-				'contentPermissionsVerifier',
-				({ permissionsByIdentityFactory }) => new PermissionsVerifier(permissionsByIdentityFactory),
-			)
 			.addService('entitiesSelector', ({ permissionsByIdentityFactory }) => {
 				const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
 					createMapperContainer({

@@ -9,7 +9,6 @@ import {
 import { MigrationsRunner } from '@contember/database-migrations'
 import { DatabaseCredentials } from '@contember/database'
 import {
-	ContentPermissionVerifier,
 	CreatedRowReferenceDependencyBuilder,
 	DeletedRowReferenceDependencyBuilder,
 	DependencyBuilderList,
@@ -62,7 +61,6 @@ export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient
 
 type Args = {
 	providers: UuidProvider
-	contentPermissionsVerifier: ContentPermissionVerifier
 	modificationHandlerFactory: ModificationHandlerFactory
 	migrationsResolverFactory: MigrationsResolverFactory | undefined
 	entitiesSelector: EntitiesSelector
@@ -122,11 +120,7 @@ export class SystemContainerFactory {
 						new CreatedRowReferenceDependencyBuilder(tableReferencingResolver),
 					]),
 			)
-			.addService(
-				'permissionVerifier',
-				({ schemaVersionBuilder, authorizator }) =>
-					new EventsPermissionsVerifier(schemaVersionBuilder, authorizator, container.contentPermissionsVerifier),
-			)
+			.addService('permissionVerifier', ({ authorizator }) => new EventsPermissionsVerifier(authorizator))
 			.addService(
 				'eventApplier',
 				({ migrationExecutor, executedMigrationsResolver }) =>

@@ -18,7 +18,7 @@ import {
 	SugaredQualifiedFieldList,
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
-	useEntityAccessor,
+	useParentEntityAccessor,
 	useEnvironment,
 	useMutationState,
 } from '@contember/binding'
@@ -56,7 +56,7 @@ const computeSubTreeIdentifier = (field: DynamicChoiceFieldProps['field']) => JS
 export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.ChoiceArity>(
 	props: DynamicChoiceFieldProps,
 ): ChoiceFieldData.MetadataByArity[DynamicArity] => {
-	const parentEntity = useEntityAccessor()
+	const parentEntity = useParentEntityAccessor()
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 	const subTreeIdentifier = React.useMemo(() => computeSubTreeIdentifier(props.field), [props.field])

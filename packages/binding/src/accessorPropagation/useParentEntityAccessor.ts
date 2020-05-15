@@ -5,7 +5,7 @@ import { EntityKeyContext } from './EntityKeyContext'
 import { useGetEntityByKey } from './useGetEntityByKey'
 
 // This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
-export const useEntityAccessor = (): EntityAccessor => {
+export const useParentEntityAccessor = (): EntityAccessor => {
 	const entityKey = React.useContext(EntityKeyContext)
 
 	if (entityKey === undefined) {

@@ -4,7 +4,7 @@ import {
 	EntityAccessor,
 	Environment,
 	SugaredRelativeSingleField,
-	useEntityAccessor,
+	useParentEntityAccessor,
 	useEnvironment,
 	useRelativeSingleField,
 } from '@contember/binding'
@@ -35,7 +35,7 @@ export type SimpleRelativeSingleFieldProxyProps = Omit<SimpleRelativeSingleField
 	SugaredRelativeSingleField
 
 export const SimpleRelativeSingleFieldProxy = React.memo((props: SimpleRelativeSingleFieldProxyProps) => {
-	const immediateParentEntity = useEntityAccessor()
+	const immediateParentEntity = useParentEntityAccessor()
 	const environment = useEnvironment()
 	const field = useRelativeSingleField(props)
 

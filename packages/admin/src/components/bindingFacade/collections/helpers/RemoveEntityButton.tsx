@@ -1,6 +1,6 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
 import * as React from 'react'
-import { EntityAccessor, RemovalType, useEntityAccessor, useMutationState } from '@contember/binding'
+import { EntityAccessor, RemovalType, useParentEntityAccessor, useMutationState } from '@contember/binding'
 import { useTriggerPersistWithFeedback } from '../../../ui'
 
 export type RemoveEntityButtonProps = ButtonProps & {
@@ -11,7 +11,7 @@ export type RemoveEntityButtonProps = ButtonProps & {
 
 export const RemoveEntityButton = React.memo((props: RemoveEntityButtonProps) => {
 	const { removalType, children, immediatePersist, ...rest } = props
-	const value = useEntityAccessor()
+	const value = useParentEntityAccessor()
 	const triggerPersist = useTriggerPersistWithFeedback()
 	const isMutating = useMutationState()
 	const onClick = React.useCallback(() => {

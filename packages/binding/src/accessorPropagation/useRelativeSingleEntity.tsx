@@ -2,7 +2,7 @@ import * as React from 'react'
 import { EntityAccessor } from '../accessors'
 import { SugaredRelativeSingleEntity } from '../treeParameters'
 import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity'
-import { useEntityAccessor } from '../accessorPropagation'
+import { useParentEntityAccessor } from '../accessorPropagation'
 
 function useRelativeSingleEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity): EntityAccessor
 function useRelativeSingleEntity(
@@ -11,7 +11,7 @@ function useRelativeSingleEntity(
 function useRelativeSingleEntity(
 	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined,
 ): EntityAccessor | undefined {
-	const entity = useEntityAccessor()
+	const entity = useParentEntityAccessor()
 	const relativeSingleEntity = useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity)
 	return React.useMemo(
 		() => (relativeSingleEntity ? entity.getRelativeSingleEntity(relativeSingleEntity) : relativeSingleEntity),

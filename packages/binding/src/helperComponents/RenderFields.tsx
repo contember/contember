@@ -1,6 +1,6 @@
 import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useEntityAccessor } from '../accessorPropagation'
+import { useParentEntityAccessor } from '../accessorPropagation'
 import { useEnvironment } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { Component } from '../coreComponents'
@@ -31,7 +31,7 @@ export const RenderFields = Component<RenderFieldsProps>(
 			`The number of fields in the 'fields' prop of the 'RenderFields' must remain constant between renders!`,
 		)
 
-		const entityAccessor = useEntityAccessor()
+		const entityAccessor = useParentEntityAccessor()
 		const environment = useEnvironment()
 
 		const desugarField = React.useCallback((rsf: SRSF) => QueryLanguage.desugarRelativeSingleField(rsf, environment), [

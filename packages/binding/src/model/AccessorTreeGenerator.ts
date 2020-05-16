@@ -21,6 +21,7 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
 type AddEntityEventListener = EntityAccessor['addEventListener']
 type AddEntityListEventListener = EntityListAccessor['addEventListener']
+type AddFieldEventListener = FieldAccessor['addEventListener']
 type OnUpdate = (updatedData: EntityAccessor.NestedAccessor | undefined) => void
 type OnReplace = EntityAccessor['replaceBy']
 type OnUnlink = EntityAccessor['remove']
@@ -52,6 +53,7 @@ interface InternalEntityState {
 	persistedData: AccessorTreeGenerator.InitialEntityData
 	onUpdate: OnEntityUpdate | Set<OnEntityUpdate>
 	batchUpdateDepth: number
+	addEventListener: AddEntityEventListener
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
@@ -65,6 +67,7 @@ interface InternalEntityState {
 type OnEntityListUpdate = (accessor: EntityListAccessor) => void
 interface InternalEntityListState {
 	batchUpdateDepth: number
+	addEventListener: AddEntityListEventListener
 	eventListeners: {
 		[Type in EntityListAccessor.EntityEventType]: Set<EntityListAccessor.EntityEventListenerMap[Type]> | undefined
 	}
@@ -90,6 +93,7 @@ interface InternalFieldState {
 	errors: ErrorAccessor[]
 	placeholderName: FieldName
 	hasPendingUpdate: boolean
+	addEventListener: AddFieldEventListener
 	eventListeners: {
 		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
 	}
@@ -204,7 +208,6 @@ class AccessorTreeGenerator {
 		entityState: InternalEntityState,
 		onUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | undefined) => void,
 		onReplace: OnReplace,
-		addEventListener: AddEntityEventListener,
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
 	): EntityAccessor {
@@ -231,6 +234,7 @@ class AccessorTreeGenerator {
 						() => noop, // It won't ever fire but at the same time it makes other code simpler.
 						undefined, // IDs cannot be updated
 					),
+					addEventListener: () => noop,
 					eventListeners: {
 						afterUpdate: undefined,
 					},
@@ -408,7 +412,7 @@ class AccessorTreeGenerator {
 			entityState.fields,
 			getSubTreeRoot,
 			entityState.errors ? entityState.errors.errors : emptyArray,
-			addEventListener,
+			entityState.addEventListener,
 			batchUpdates,
 			onReplace,
 			onUnlink,
@@ -515,25 +519,7 @@ class AccessorTreeGenerator {
 				performUpdate()
 			}
 		}
-		const addEventListener: EntityAccessor.AddEntityEventListener = (
-			type: EntityAccessor.EntityEventType,
-			listener: EntityAccessor.EntityEventListenerMap[typeof type],
-		) => {
-			if (entityState.eventListeners[type] === undefined) {
-				entityState.eventListeners[type] = new Set<never>()
-			}
-			entityState.eventListeners[type]!.add(listener as any)
-			return () => {
-				if (entityState.eventListeners[type] === undefined) {
-					return // Throw an error? This REALLY should not happen.
-				}
-				entityState.eventListeners[type]!.delete(listener as any)
-				if (entityState.eventListeners[type]!.size === 0) {
-					entityState.eventListeners[type] = undefined
-				}
-			}
-		}
-		entityState.accessor = this.updateFields(entityState, onUpdate, onReplace, addEventListener, batchUpdates, onRemove)
+		entityState.accessor = this.updateFields(entityState, onUpdate, onReplace, batchUpdates, onRemove)
 		return entityState
 	}
 
@@ -615,24 +601,6 @@ class AccessorTreeGenerator {
 				)
 			})
 		}
-		const addEventListener: AddEntityListEventListener = (
-			type: EntityListAccessor.EntityEventType,
-			listener: EntityListAccessor.EntityEventListenerMap[typeof type],
-		) => {
-			if (entityListState.eventListeners[type] === undefined) {
-				entityListState.eventListeners[type] = new Set<never>()
-			}
-			entityListState.eventListeners[type]!.add(listener as any)
-			return () => {
-				if (entityListState.eventListeners[type] === undefined) {
-					return // Throw an error? This REALLY should not happen.
-				}
-				entityListState.eventListeners[type]!.delete(listener as any)
-				if (entityListState.eventListeners[type]!.size === 0) {
-					entityListState.eventListeners[type] = undefined
-				}
-			}
-		}
 		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData): EntityAccessor => {
 			const id = this.resolveOrCreateEntityId(datum)
 			const key = typeof id === 'string' ? id : id.value
@@ -680,7 +648,7 @@ class AccessorTreeGenerator {
 			getChildEntityByKey,
 			entityListState.childIds,
 			entityListState.errors ? entityListState.errors.errors : emptyArray,
-			addEventListener,
+			entityListState.addEventListener,
 			batchUpdates,
 			newEntity => {
 				const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity)
@@ -710,7 +678,7 @@ class AccessorTreeGenerator {
 				fieldState.fieldMarker.defaultValue,
 				isTouchedBy,
 				fieldState.errors,
-				() => noop, // TODO
+				fieldState.addEventListener,
 				onChange,
 			)
 		const onChange = function(
@@ -730,6 +698,7 @@ class AccessorTreeGenerator {
 			if (newValue === this.currentValue) {
 				return
 			}
+			fieldState.hasPendingUpdate = true
 			fieldState.onUpdate(fieldState.placeholderName, createNewInstance(newValue))
 		}
 
@@ -785,13 +754,14 @@ class AccessorTreeGenerator {
 		const persistedValue =
 			initialData instanceof FieldAccessor ? initialData.persistedValue : initialData === undefined ? null : initialData
 		if (existingState === undefined) {
-			return {
+			const state: InternalFieldState = {
 				errors,
 				fieldMarker,
 				onUpdate,
 				placeholderName,
 				persistedValue,
 				initialData,
+				addEventListener: undefined as any,
 				accessor: (undefined as any) as FieldAccessor,
 				eventListeners: {
 					afterUpdate: undefined,
@@ -799,6 +769,8 @@ class AccessorTreeGenerator {
 				touchLog: undefined,
 				hasPendingUpdate: true,
 			}
+			state.addEventListener = this.getAddEventListener(state)
+			return state
 		}
 
 		existingState.errors = errors
@@ -830,6 +802,7 @@ class AccessorTreeGenerator {
 				accessor: undefined,
 				batchUpdateDepth: 0,
 				dirtyChildFields: undefined,
+				addEventListener: undefined as any,
 				eventListeners: {
 					afterUpdate: undefined,
 					beforeUpdate: undefined,
@@ -838,6 +811,7 @@ class AccessorTreeGenerator {
 				fields: new Map(),
 				hasPendingUpdate: true,
 			}
+			entityState.addEventListener = this.getAddEventListener(entityState)
 			this.entityStore.set(entityKey, entityState)
 			return entityState
 		}
@@ -885,11 +859,12 @@ class AccessorTreeGenerator {
 		}
 
 		if (existingState === undefined) {
-			return {
+			const state: InternalEntityListState = {
 				errors,
 				fieldMarkers,
 				onUpdate,
 				preferences,
+				addEventListener: undefined as any,
 				initialData: sourceData,
 				accessor: (undefined as any) as EntityListAccessor,
 				batchUpdateDepth: 0,
@@ -901,6 +876,8 @@ class AccessorTreeGenerator {
 				},
 				hasPendingUpdate: true,
 			}
+			state.addEventListener = this.getAddEventListener(state)
+			return state
 		}
 
 		existingState.batchUpdateDepth = 0
@@ -930,6 +907,28 @@ class AccessorTreeGenerator {
 				? data.runtimeId
 				: data[PRIMARY_KEY_NAME]
 			: new EntityAccessor.UnpersistedEntityId()
+	}
+
+	private getAddEventListener(state: {
+		eventListeners: {
+			[eventType: string]: Set<Function> | undefined
+		}
+	}) {
+		return (type: string, listener: Function) => {
+			if (state.eventListeners[type] === undefined) {
+				state.eventListeners[type] = new Set<never>()
+			}
+			state.eventListeners[type]!.add(listener as any)
+			return () => {
+				if (state.eventListeners[type] === undefined) {
+					return // Throw an error? This REALLY should not happen.
+				}
+				state.eventListeners[type]!.delete(listener as any)
+				if (state.eventListeners[type]!.size === 0) {
+					state.eventListeners[type] = undefined
+				}
+			}
+		}
 	}
 
 	private flushPendingAccessorUpdates(rootState: InternalEntityState | InternalEntityListState) {

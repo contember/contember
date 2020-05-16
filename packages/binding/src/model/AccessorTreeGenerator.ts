@@ -6,11 +6,18 @@ import {
 	EntityAccessor,
 	EntityForRemovalAccessor,
 	EntityListAccessor,
+	ErrorAccessor,
 	FieldAccessor,
 	GetSubTreeRoot,
 	RootAccessor,
 } from '../accessors'
-import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
+import {
+	MutationDataResponse,
+	ReceivedData,
+	ReceivedDataTree,
+	ReceivedEntityData,
+	ReceivedFieldData,
+} from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
@@ -78,9 +85,16 @@ interface InternalEntityListState {
 	childIds: Set<string>
 }
 
+type OnFieldUpdate = (placeholderName: FieldName, accessor: FieldAccessor) => void
 interface InternalFieldState {
 	touchLog: Map<string, boolean> | undefined
 	accessor: FieldAccessor
+	initialData: Scalar | undefined | FieldAccessor
+	persistedValue: FieldValue
+	fieldMarker: FieldMarker
+	onUpdate: OnFieldUpdate
+	errors: ErrorAccessor[]
+	placeholderName: FieldName
 	hasPendingUpdate: boolean
 	eventListeners: {
 		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
@@ -226,8 +240,14 @@ class AccessorTreeGenerator {
 					eventListeners: {
 						afterUpdate: undefined,
 					},
+					placeholderName,
+					fieldMarker: field as FieldMarker,
+					initialData: idValue,
+					onUpdate: noop,
+					errors: emptyArray,
 					touchLog: undefined,
 					hasPendingUpdate: false,
+					persistedValue: idValue,
 				})
 				continue
 			}
@@ -360,71 +380,21 @@ class AccessorTreeGenerator {
 							`Perhaps you wanted to use <HasOne />?`,
 					)
 				} else {
-					const fieldState = (entityState.fields.get(placeholderName) ||
-						this.createEmptyFieldState()) as InternalFieldState
-					fieldState.hasPendingUpdate = true
-					const fieldErrors =
+					const fieldErrors: ErrorAccessor[] =
 						entityState.errors &&
 						entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
 						field.fieldName in entityState.errors.children
 							? entityState.errors.children[field.fieldName].errors
 							: emptyArray
-					const persistedValue =
-						fieldDatum instanceof FieldAccessor
-							? fieldDatum.persistedValue
-							: fieldDatum === undefined
-							? null
-							: fieldDatum
-					const isTouchedBy = (agent: string) =>
-						fieldState.touchLog === undefined ? false : fieldState.touchLog.get(agent) || false
-					const onChange = function(
-						this: FieldAccessor,
-						newValue: Scalar | GraphQlBuilder.Literal,
-						{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
-					) {
-						if (this !== fieldState.accessor) {
-							throw new BindingError(
-								`Trying to update a field value via a stale FieldAccessor. Perhaps you're dealing with stale props?`,
-							)
-						}
-						if (fieldState.touchLog === undefined) {
-							fieldState.touchLog = new Map()
-						}
-						fieldState.touchLog.set(agent, true)
-						if (newValue === this.currentValue) {
-							return
-						}
-						onUpdate(
+					const fieldState = this.generateFieldAccessor(
+						this.resolveOrCreateFieldState(
 							placeholderName,
-							new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
-								placeholderName,
-								newValue,
-								persistedValue,
-								field.defaultValue,
-								isTouchedBy,
-								fieldErrors,
-								() => noop, // TODO
-								onChange,
-							),
-						)
-					}
-					let fieldValue: FieldValue
-					if (fieldDatum === undefined) {
-						// `fieldDatum` will be `undefined` when a repeater creates a clone based on no data or when we're creating
-						// a new entity
-						fieldValue = field.defaultValue === undefined ? null : field.defaultValue
-					} else {
-						fieldValue = fieldDatum instanceof FieldAccessor ? fieldDatum.currentValue : fieldDatum
-					}
-					fieldState.accessor = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
-						placeholderName,
-						fieldValue,
-						persistedValue,
-						field.defaultValue,
-						isTouchedBy,
-						fieldErrors,
-						() => noop, // TODO
-						onChange,
+							entityState.fields.get(placeholderName) as InternalFieldState | undefined,
+							field,
+							onUpdate,
+							fieldDatum,
+							fieldErrors,
+						),
 					)
 					entityState.fields.set(placeholderName, fieldState)
 				}
@@ -735,6 +705,54 @@ class AccessorTreeGenerator {
 		return entityListState
 	}
 
+	private generateFieldAccessor(fieldState: InternalFieldState): InternalFieldState {
+		const isTouchedBy = (agent: string) =>
+			fieldState.touchLog === undefined ? false : fieldState.touchLog.get(agent) || false
+		const createNewInstance = (value: FieldValue) =>
+			new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
+				fieldState.placeholderName,
+				value,
+				fieldState.persistedValue,
+				fieldState.fieldMarker.defaultValue,
+				isTouchedBy,
+				fieldState.errors,
+				() => noop, // TODO
+				onChange,
+			)
+		const onChange = function(
+			this: FieldAccessor,
+			newValue: Scalar | GraphQlBuilder.Literal,
+			{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
+		) {
+			if (this !== fieldState.accessor) {
+				throw new BindingError(
+					`Trying to update a field value via a stale FieldAccessor. Perhaps you're dealing with stale props?`,
+				)
+			}
+			if (fieldState.touchLog === undefined) {
+				fieldState.touchLog = new Map()
+			}
+			fieldState.touchLog.set(agent, true)
+			if (newValue === this.currentValue) {
+				return
+			}
+			fieldState.onUpdate(fieldState.placeholderName, createNewInstance(newValue))
+		}
+
+		let fieldValue: FieldValue
+		if (fieldState.initialData === undefined) {
+			// `initialData` will be `undefined` when a repeater creates a clone based on no data or when we're creating
+			// a new entity
+			fieldValue = fieldState.fieldMarker.defaultValue === undefined ? null : fieldState.fieldMarker.defaultValue
+		} else {
+			fieldValue =
+				fieldState.initialData instanceof FieldAccessor ? fieldState.initialData.currentValue : fieldState.initialData
+		}
+		fieldState.accessor = createNewInstance(fieldValue)
+
+		return fieldState
+	}
+
 	private replaceEntity(
 		original: InternalEntityState,
 		replacement: EntityAccessor,
@@ -762,15 +780,40 @@ class AccessorTreeGenerator {
 		)
 	}
 
-	private createEmptyFieldState(): InternalFieldState {
-		return {
-			accessor: (undefined as any) as FieldAccessor,
-			eventListeners: {
-				afterUpdate: undefined,
-			},
-			touchLog: undefined,
-			hasPendingUpdate: true,
+	private resolveOrCreateFieldState(
+		placeholderName: FieldName,
+		existingState: InternalFieldState | undefined,
+		fieldMarker: FieldMarker,
+		onUpdate: OnFieldUpdate,
+		initialData: Scalar | undefined | FieldAccessor,
+		errors: ErrorAccessor[],
+	): InternalFieldState {
+		const persistedValue =
+			initialData instanceof FieldAccessor ? initialData.persistedValue : initialData === undefined ? null : initialData
+		if (existingState === undefined) {
+			return {
+				errors,
+				fieldMarker,
+				onUpdate,
+				placeholderName,
+				persistedValue,
+				initialData,
+				accessor: (undefined as any) as FieldAccessor,
+				eventListeners: {
+					afterUpdate: undefined,
+				},
+				touchLog: undefined,
+				hasPendingUpdate: true,
+			}
 		}
+
+		existingState.errors = errors
+		existingState.onUpdate = onUpdate
+		existingState.initialData = initialData
+		existingState.persistedValue = persistedValue
+		existingState.hasPendingUpdate = true
+
+		return existingState
 	}
 
 	private resolveOrCreateEntityState(

@@ -11,13 +11,7 @@ import {
 	GetSubTreeRoot,
 	RootAccessor,
 } from '../accessors'
-import {
-	MutationDataResponse,
-	ReceivedData,
-	ReceivedDataTree,
-	ReceivedEntityData,
-	ReceivedFieldData,
-} from '../accessorTree'
+import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
@@ -848,11 +842,10 @@ class AccessorTreeGenerator {
 			return entityState
 		}
 
-		// TODO errors
-		// TODO onUpdate!!!
 		// TODO use entity fields?
 		existingState.batchUpdateDepth = 0
 		existingState.hasPendingUpdate = true
+		existingState.errors = errors
 		existingState.onUpdate = onUpdate
 		existingState.persistedData = persistedData
 
@@ -912,6 +905,8 @@ class AccessorTreeGenerator {
 
 		existingState.batchUpdateDepth = 0
 		existingState.hasPendingUpdate = true
+		existingState.errors = errors
+		existingState.onUpdate = onUpdate
 		existingState.initialData = sourceData
 
 		if (existingState.dirtyChildIds === undefined) {

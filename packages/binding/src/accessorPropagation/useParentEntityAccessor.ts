@@ -1,20 +1,19 @@
 import * as React from 'react'
 import { EntityAccessor, GetEntityByKey } from '../accessors'
 import { BindingError } from '../BindingError'
-import { EntityKeyContext } from './EntityKeyContext'
+import { useEntityKey } from './useEntityKey'
 import { useGetEntityByKey } from './useGetEntityByKey'
 
 // This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
 export const useParentEntityAccessor = (): EntityAccessor => {
-	const entityKey = React.useContext(EntityKeyContext)
+	const entityKey = useEntityKey()
+	const getEntityByKey = useGetEntityByKey()
 
 	if (entityKey === undefined) {
 		throw new BindingError(
 			`Trying to use a data bound component outside a correct parent. Perhaps you forgot to use a data provider?`,
 		)
 	}
-
-	const getEntityByKey = useGetEntityByKey()
 
 	const [state, setState] = React.useState<{
 		entityKey: string
@@ -24,7 +23,7 @@ export const useParentEntityAccessor = (): EntityAccessor => {
 		const accessor = getEntityByKey(entityKey)
 
 		if (!(accessor instanceof EntityAccessor)) {
-			throw new BindingError('AAA')
+			throw new BindingError(`Corrupted data: trying to render a non-existent entity.`)
 		}
 		return {
 			entityKey,

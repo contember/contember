@@ -12,7 +12,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 		public readonly getEntityByKey: GetEntityByKey,
 		private readonly entityIds: Set<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
-		public readonly addEventListener: EntityListAccessor.AddEntityEventListener,
+		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: (performUpdates: EntityListAccessor.BatchUpdates) => void,
 		public readonly addNew:
 			| ((newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newKey: string) => void)) => void)
@@ -49,14 +49,14 @@ namespace EntityListAccessor {
 	export type BatchUpdates = (getAccessor: () => EntityListAccessor) => void
 	export type AfterUpdate = (accessor: EntityListAccessor) => void
 
-	export interface EntityEventListenerMap {
+	export interface EntityListEventListenerMap {
 		beforeUpdate: BatchUpdates
 		afterUpdate: AfterUpdate
 	}
-	export type EntityEventType = keyof EntityEventListenerMap
-	export interface AddEntityEventListener {
-		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
-		(type: 'afterUpdate', listener: EntityEventListenerMap['afterUpdate']): () => void
+	export type EntityListEventType = keyof EntityListEventListenerMap
+	export interface AddEntityListEventListener {
+		(type: 'beforeUpdate', listener: EntityListEventListenerMap['beforeUpdate']): () => void
+		(type: 'afterUpdate', listener: EntityListEventListenerMap['afterUpdate']): () => void
 	}
 }
 

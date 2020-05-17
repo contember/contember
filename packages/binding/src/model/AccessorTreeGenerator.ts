@@ -73,7 +73,9 @@ interface InternalEntityListState {
 	dirtyChildIds: Set<string> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
-		[Type in EntityListAccessor.EntityEventType]: Set<EntityListAccessor.EntityEventListenerMap[Type]> | undefined
+		[Type in EntityListAccessor.EntityListEventType]:
+			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>
+			| undefined
 	}
 	fieldMarkers: EntityFieldMarkers
 	hasPendingUpdate: boolean

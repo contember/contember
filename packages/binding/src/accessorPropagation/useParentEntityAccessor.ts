@@ -26,8 +26,8 @@ export const useParentEntityAccessor = (): EntityAccessor => {
 			throw new BindingError(`Corrupted data: trying to render a non-existent entity.`)
 		}
 		return {
-			entityKey,
 			accessor,
+			entityKey,
 			getEntityByKey,
 		}
 	})
@@ -43,13 +43,13 @@ export const useParentEntityAccessor = (): EntityAccessor => {
 
 		accessor = newAccessor
 		setState({
-			entityKey,
 			accessor,
+			entityKey,
 			getEntityByKey,
 		})
 	}
 
-	const addEventListener = accessor.addEventListener // The identity of this function is guaranteed to be stable
+	const addEventListener = accessor.addEventListener
 	React.useEffect(() => {
 		let isMounted = true
 
@@ -67,7 +67,11 @@ export const useParentEntityAccessor = (): EntityAccessor => {
 					return prevState
 				}
 
-				return { ...prevState, accessor }
+				return {
+					accessor,
+					entityKey,
+					getEntityByKey,
+				}
 			})
 		})
 

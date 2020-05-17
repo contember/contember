@@ -28,7 +28,7 @@ import { QueryRequestResponse, ReceivedDataTree } from './QueryRequestResponse'
 
 const initialState: AccessorTreeState = {
 	name: AccessorTreeStateName.Uninitialized,
-	getEntityByKey: () => undefined,
+	getEntityByKey: () => null,
 }
 
 export const useAccessorTreeState = ({

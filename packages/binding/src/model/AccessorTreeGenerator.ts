@@ -22,7 +22,7 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 type AddEntityEventListener = EntityAccessor['addEventListener']
 type AddEntityListEventListener = EntityListAccessor['addEventListener']
 type AddFieldEventListener = FieldAccessor['addEventListener']
-type OnUpdate = (updatedData: EntityAccessor.NestedAccessor | undefined) => void
+type OnUpdate = (updatedData: EntityAccessor.NestedAccessor | null) => void
 type OnReplace = EntityAccessor['replaceBy']
 type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = EntityAccessor['batchUpdates']
@@ -45,9 +45,9 @@ type InternalRootStateNode = InternalEntityState | InternalEntityListState
 type InternalStateNode = InternalEntityState | InternalEntityListState | InternalFieldState
 type InternalEntityFields = Map<FieldName, InternalStateNode>
 
-type OnEntityUpdate = (accessor: EntityAccessor | EntityForRemovalAccessor | undefined) => void
+type OnEntityUpdate = (accessor: EntityAccessor | EntityForRemovalAccessor | null) => void
 interface InternalEntityState {
-	accessor: EntityAccessor | EntityForRemovalAccessor | undefined
+	accessor: EntityAccessor | EntityForRemovalAccessor | null
 	addEventListener: AddEntityEventListener
 	batchUpdateDepth: number
 	dirtyChildFields: Set<FieldName> | undefined
@@ -104,8 +104,14 @@ class AccessorTreeGenerator {
 	private initialData: RootAccessor | ReceivedDataTree<undefined> | undefined
 	private errorTreeRoot?: ErrorsPreprocessor.ErrorTreeRoot
 	private entityStore: Map<string, InternalEntityState> = new Map()
-	private readonly getEntityByKey: (key: string) => EntityAccessor | EntityForRemovalAccessor | undefined = key =>
-		this.entityStore.get(key)?.accessor
+	private readonly getEntityByKey = (key: string) => {
+		const entity = this.entityStore.get(key)
+
+		if (entity === undefined) {
+			throw new BindingError(`Trying to retrieve a non-existant entity.`)
+		}
+		return entity.accessor
+	}
 
 	private treeRootStates: WeakMap<MarkerTreeRoot, InternalRootStateNode> = new WeakMap()
 
@@ -206,7 +212,7 @@ class AccessorTreeGenerator {
 
 	private updateFields(
 		entityState: InternalEntityState,
-		onUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | undefined) => void,
+		onUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | null) => void,
 		onReplace: OnReplace,
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
@@ -299,9 +305,8 @@ class AccessorTreeGenerator {
 							  undefined
 							: undefined
 
-					const getOnReferenceUpdate = (placeholderName: string) => (
-						newValue: EntityAccessor.NestedAccessor | undefined,
-					) => onUpdate(placeholderName, newValue)
+					const getOnReferenceUpdate = (placeholderName: string) => (newValue: EntityAccessor.NestedAccessor | null) =>
+						onUpdate(placeholderName, newValue)
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (Array.isArray(fieldDatum) || fieldDatum instanceof EntityListAccessor) {
 							throw new BindingError(
@@ -430,7 +435,7 @@ class AccessorTreeGenerator {
 				}
 			}
 		}
-		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | undefined) => {
+		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | null) => {
 			batchUpdates(getAccessor => {
 				entityState.accessor = newValue
 
@@ -455,7 +460,7 @@ class AccessorTreeGenerator {
 				)
 			})
 		}
-		const onUpdate = (updatedField: FieldName, updatedData: EntityAccessor.NestedAccessor | undefined) => {
+		const onUpdate = (updatedField: FieldName, updatedData: EntityAccessor.NestedAccessor | null) => {
 			const entityAccessor = entityState.accessor
 			if (entityAccessor instanceof EntityAccessor) {
 				const currentFieldState = entityState.fields.get(updatedField)
@@ -498,8 +503,10 @@ class AccessorTreeGenerator {
 				entityState.persistedData instanceof EntityForRemovalAccessor ||
 				!(entityState.accessor instanceof EntityAccessor)
 			) {
-				this.entityStore.delete(entityState.accessor?.key!)
-				return onUpdateProxy(undefined)
+				// TODO it isn't safe to just delete it as the entity may be linked from other places too.
+				//		Just leaving it is a memory leak though.
+				//this.entityStore.delete(entityState.accessor?.key!)
+				return onUpdateProxy(null)
 			}
 
 			onUpdateProxy(new EntityForRemovalAccessor(entityState.accessor, entityState.accessor.replaceBy, removalType))
@@ -552,7 +559,7 @@ class AccessorTreeGenerator {
 			}
 		}
 
-		const onUpdateProxy = (key: string, newValue: EntityAccessor.NestedAccessor | undefined) => {
+		const onUpdateProxy = (key: string, newValue: EntityAccessor.NestedAccessor | null) => {
 			batchUpdates(getAccessor => {
 				if (
 					!(
@@ -635,9 +642,13 @@ class AccessorTreeGenerator {
 		}
 		const getChildEntityByKey = (key: string) => {
 			if (!entityListState.childIds.has(key)) {
-				return undefined
+				throw new BindingError(`Corrupted data`)
 			}
-			return this.getEntityByKey(key)
+			const entity = this.getEntityByKey(key)
+			if (entity === null) {
+				throw new BindingError(`Corrupted data`)
+			}
+			return entity
 		}
 
 		for (const sourceDatum of entityListState.initialData) {
@@ -799,7 +810,7 @@ class AccessorTreeGenerator {
 				persistedData,
 				fieldMarkers,
 				onUpdate,
-				accessor: undefined,
+				accessor: null,
 				batchUpdateDepth: 0,
 				dirtyChildFields: undefined,
 				addEventListener: undefined as any,
@@ -983,7 +994,7 @@ class AccessorTreeGenerator {
 namespace AccessorTreeGenerator {
 	export type UpdateData = (
 		newData: RootAccessor,
-		getEntityByKey: (key: string) => EntityAccessor | EntityForRemovalAccessor | undefined,
+		getEntityByKey: (key: string) => EntityAccessor | EntityForRemovalAccessor | null,
 	) => void
 
 	export type InitialEntityData = ReceivedEntityData<undefined> | EntityAccessor | EntityForRemovalAccessor

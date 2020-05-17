@@ -52,7 +52,7 @@ class EntityAccessor extends Accessor implements Errorable {
 
 	public *[Symbol.iterator](): Generator<[FieldName, EntityAccessor.NestedAccessor]> {
 		for (const [placeholderName, fieldDatum] of this.fieldData) {
-			if (fieldDatum.accessor === undefined) {
+			if (fieldDatum.accessor === null) {
 				continue
 			}
 			yield [placeholderName, fieldDatum.accessor]
@@ -64,19 +64,19 @@ class EntityAccessor extends Accessor implements Errorable {
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
-	): EntityAccessor.NestedAccessor | undefined
+	): EntityAccessor.NestedAccessor | null
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
 		reducedBy: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.NestedAccessor | undefined
+	): EntityAccessor.NestedAccessor | null
 	public getField(
 		fieldName: FieldName,
 		expectedCount?: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter?: ReferenceMarker.ReferenceConstraints['filter'],
 		reducedBy?: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.NestedAccessor | undefined {
+	): EntityAccessor.NestedAccessor | null {
 		let placeholder: FieldName
 
 		if (expectedCount !== undefined) {
@@ -190,8 +190,12 @@ class EntityAccessor extends Accessor implements Errorable {
 	/**
 	 * @internal
 	 */
-	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor | undefined {
-		return this.fieldData.get(placeholderName)?.accessor
+	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor | null {
+		const record = this.fieldData.get(placeholderName)
+		if (record === undefined) {
+			throw new BindingError('EntityAccessor: unknown field')
+		}
+		return record.accessor
 	}
 }
 
@@ -210,7 +214,7 @@ namespace EntityAccessor {
 	}
 
 	export interface FieldDatum {
-		accessor: NestedAccessor | undefined
+		accessor: NestedAccessor | null
 	}
 	export type NestedAccessor = EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | FieldAccessor
 

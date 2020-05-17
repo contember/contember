@@ -244,7 +244,7 @@ class AccessorTreeGenerator {
 					),
 					addEventListener: () => noop,
 					eventListeners: {
-						afterUpdate: undefined,
+						update: undefined,
 					},
 					placeholderName,
 					fieldMarker: field as FieldMarker,
@@ -777,7 +777,7 @@ class AccessorTreeGenerator {
 				addEventListener: undefined as any,
 				accessor: (undefined as any) as FieldAccessor,
 				eventListeners: {
-					afterUpdate: undefined,
+					update: undefined,
 				},
 				touchLog: undefined,
 				hasPendingUpdate: true,
@@ -817,7 +817,7 @@ class AccessorTreeGenerator {
 				dirtyChildFields: undefined,
 				addEventListener: undefined as any,
 				eventListeners: {
-					afterUpdate: undefined,
+					update: undefined,
 					beforeUpdate: undefined,
 				},
 				subTrees: undefined,
@@ -884,7 +884,7 @@ class AccessorTreeGenerator {
 				childIds: new Set(),
 				dirtyChildIds: undefined,
 				eventListeners: {
-					afterUpdate: undefined,
+					update: undefined,
 					beforeUpdate: undefined,
 				},
 				hasPendingUpdate: true,
@@ -953,8 +953,8 @@ class AccessorTreeGenerator {
 			if (!state.hasPendingUpdate) {
 				continue
 			}
-			if (state.eventListeners.afterUpdate !== undefined) {
-				for (const handler of state.eventListeners.afterUpdate) {
+			if (state.eventListeners.update !== undefined) {
+				for (const handler of state.eventListeners.update) {
 					// TS can't quite handle the polymorphism here but this is fine.
 					state.accessor && handler(state.accessor as any)
 				}

@@ -55,7 +55,7 @@ namespace FieldAccessor {
 		agent?: string
 	}
 
-	export type AfterUpdate<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted> = (
+	export type UpdateListener<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted> = (
 		accessor: FieldAccessor<Persisted, Produced>,
 	) => void
 
@@ -63,14 +63,14 @@ namespace FieldAccessor {
 		Persisted extends FieldValue = FieldValue,
 		Produced extends Persisted = Persisted
 	> {
-		afterUpdate: AfterUpdate<Persisted, Produced>
+		update: UpdateListener<Persisted, Produced>
 	}
 	export type FieldEventType = keyof FieldEventListenerMap
 	export interface AddFieldEventListener<
 		Persisted extends FieldValue = FieldValue,
 		Produced extends Persisted = Persisted
 	> {
-		(type: 'afterUpdate', listener: FieldEventListenerMap<Persisted, Produced>['afterUpdate']): () => void
+		(type: 'update', listener: FieldEventListenerMap<Persisted, Produced>['update']): () => void
 	}
 }
 

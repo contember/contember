@@ -221,16 +221,16 @@ namespace EntityAccessor {
 	export type FieldData = Map<FieldName, FieldDatum>
 
 	export type BatchUpdates = (getAccessor: () => EntityAccessor) => void
-	export type AfterUpdate = (accessor: undefined | EntityAccessor | EntityForRemovalAccessor) => void
+	export type UpdateListener = (accessor: null | EntityAccessor | EntityForRemovalAccessor) => void
 
 	export interface EntityEventListenerMap {
 		beforeUpdate: BatchUpdates
-		afterUpdate: AfterUpdate
+		update: UpdateListener
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
 	export interface AddEntityEventListener {
 		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
-		(type: 'afterUpdate', listener: EntityEventListenerMap['afterUpdate']): () => void
+		(type: 'update', listener: EntityEventListenerMap['update']): () => void
 	}
 }
 

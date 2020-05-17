@@ -53,7 +53,7 @@ export const useParentEntityAccessor = (): EntityAccessor => {
 	React.useEffect(() => {
 		let isMounted = true
 
-		const unsubscribe = addEventListener('afterUpdate', accessor => {
+		const unsubscribe = addEventListener('update', accessor => {
 			if (!isMounted || !(accessor instanceof EntityAccessor)) {
 				return
 			}

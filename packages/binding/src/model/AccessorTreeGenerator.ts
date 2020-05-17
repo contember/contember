@@ -22,11 +22,12 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 type AddEntityEventListener = EntityAccessor['addEventListener']
 type AddEntityListEventListener = EntityListAccessor['addEventListener']
 type AddFieldEventListener = FieldAccessor['addEventListener']
-type OnUpdate = (updatedData: EntityAccessor.NestedAccessor | null) => void
 type OnReplace = EntityAccessor['replaceBy']
 type OnUnlink = EntityAccessor['remove']
 type BatchEntityUpdates = EntityAccessor['batchUpdates']
 type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
+
+// This only applies to the 'beforeUpdate' event:
 
 // If the listeners mutate the sub-tree, other listeners may want to respond to that, which in turn may trigger
 // further responses, etc. We don't want the order of addition of event listeners to matter and we don't have
@@ -34,7 +35,7 @@ type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
 // though.
 
 // To get around all this, we just trigger all event listeners repeatedly until things settle and they stop
-// mutating the entity. If, however, that doesn't happen until some number of iterations (I think the limit
+// mutating the accessor. If, however, that doesn't happen until some number of iterations (I think the limit
 // is actually fairly generous), we conclude that there is an infinite feedback loop and just shut things down.
 
 // Notice also that we effectively shift the responsibility to check whether an update concerns them to the
@@ -43,7 +44,6 @@ const BEFORE_UPDATE_SETTLE_LIMIT = 100
 
 type InternalRootStateNode = InternalEntityState | InternalEntityListState
 type InternalStateNode = InternalEntityState | InternalEntityListState | InternalFieldState
-type InternalEntityFields = Map<FieldName, InternalStateNode>
 
 type OnEntityUpdate = (accessor: EntityAccessor | EntityForRemovalAccessor | null) => void
 interface InternalEntityState {
@@ -56,7 +56,7 @@ interface InternalEntityState {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
 	fieldMarkers: EntityFieldMarkers
-	fields: InternalEntityFields
+	fields: Map<FieldName, InternalStateNode>
 	hasPendingUpdate: boolean
 	id: string | EntityAccessor.UnpersistedEntityId
 	onUpdate: OnEntityUpdate | Set<OnEntityUpdate>
@@ -110,7 +110,7 @@ class AccessorTreeGenerator {
 		const entity = this.entityStore.get(key)
 
 		if (entity === undefined) {
-			throw new BindingError(`Trying to retrieve a non-existant entity.`)
+			throw new BindingError(`Trying to retrieve a non-existent entity.`)
 		}
 		return entity.accessor
 	}
@@ -176,7 +176,7 @@ class AccessorTreeGenerator {
 	): InternalRootStateNode {
 		const errorNode = errors === undefined ? undefined : errors[tree.id]
 
-		const onUpdate: OnUpdate = updatedData => {
+		const onUpdate = (updatedData: EntityAccessor.NestedAccessor | null) => {
 			if (
 				updatedData instanceof EntityAccessor ||
 				updatedData instanceof EntityForRemovalAccessor ||
@@ -625,7 +625,7 @@ class AccessorTreeGenerator {
 				childErrors = undefined
 			}
 
-			const onUpdate: OnUpdate = newValue => onUpdateProxy(key, newValue)
+			const onUpdate = (newValue: EntityAccessor.NestedAccessor | null) => onUpdateProxy(key, newValue)
 
 			const entityState = this.generateEntityAccessor(
 				this.resolveOrCreateEntityState(

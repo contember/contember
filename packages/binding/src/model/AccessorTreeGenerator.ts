@@ -47,56 +47,56 @@ type InternalEntityFields = Map<FieldName, InternalStateNode>
 
 type OnEntityUpdate = (accessor: EntityAccessor | EntityForRemovalAccessor | undefined) => void
 interface InternalEntityState {
-	id: string | EntityAccessor.UnpersistedEntityId
-	fieldMarkers: EntityFieldMarkers
-	errors: ErrorsPreprocessor.ErrorNode | undefined
-	persistedData: AccessorTreeGenerator.InitialEntityData
-	onUpdate: OnEntityUpdate | Set<OnEntityUpdate>
-	batchUpdateDepth: number
+	accessor: EntityAccessor | EntityForRemovalAccessor | undefined
 	addEventListener: AddEntityEventListener
+	batchUpdateDepth: number
+	dirtyChildFields: Set<FieldName> | undefined
+	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
-	hasPendingUpdate: boolean
-	dirtyChildFields: Set<FieldName> | undefined
-	subTrees: Map<SubTreeIdentifier, RootAccessor> | undefined
+	fieldMarkers: EntityFieldMarkers
 	fields: InternalEntityFields
-	accessor: EntityAccessor | EntityForRemovalAccessor | undefined
+	hasPendingUpdate: boolean
+	id: string | EntityAccessor.UnpersistedEntityId
+	onUpdate: OnEntityUpdate | Set<OnEntityUpdate>
+	persistedData: AccessorTreeGenerator.InitialEntityData
+	subTrees: Map<SubTreeIdentifier, RootAccessor> | undefined
 }
 
 type OnEntityListUpdate = (accessor: EntityListAccessor) => void
 interface InternalEntityListState {
-	batchUpdateDepth: number
+	accessor: EntityListAccessor
 	addEventListener: AddEntityListEventListener
+	batchUpdateDepth: number
+	childIds: Set<string>
+	dirtyChildIds: Set<string> | undefined
+	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityListAccessor.EntityEventType]: Set<EntityListAccessor.EntityEventListenerMap[Type]> | undefined
 	}
-	onUpdate: OnEntityListUpdate
 	fieldMarkers: EntityFieldMarkers
-	initialData: ReceivedEntityData<undefined>[] | Array<EntityAccessor | EntityForRemovalAccessor>
-	errors: ErrorsPreprocessor.ErrorNode | undefined
-	preferences: ReferenceMarker.ReferencePreferences
-	accessor: EntityListAccessor
 	hasPendingUpdate: boolean
-	dirtyChildIds: Set<string> | undefined
-	childIds: Set<string>
+	initialData: ReceivedEntityData<undefined>[] | Array<EntityAccessor | EntityForRemovalAccessor>
+	onUpdate: OnEntityListUpdate
+	preferences: ReferenceMarker.ReferencePreferences
 }
 
 type OnFieldUpdate = (placeholderName: FieldName, accessor: FieldAccessor) => void
 interface InternalFieldState {
-	touchLog: Map<string, boolean> | undefined
 	accessor: FieldAccessor
-	initialData: Scalar | undefined | FieldAccessor
-	persistedValue: FieldValue
-	fieldMarker: FieldMarker
-	onUpdate: OnFieldUpdate
-	errors: ErrorAccessor[]
-	placeholderName: FieldName
-	hasPendingUpdate: boolean
 	addEventListener: AddFieldEventListener
+	errors: ErrorAccessor[]
 	eventListeners: {
 		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
 	}
+	fieldMarker: FieldMarker
+	hasPendingUpdate: boolean
+	initialData: Scalar | undefined | FieldAccessor
+	onUpdate: OnFieldUpdate
+	persistedValue: FieldValue
+	placeholderName: FieldName
+	touchLog: Map<string, boolean> | undefined
 }
 
 class AccessorTreeGenerator {

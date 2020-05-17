@@ -13,7 +13,6 @@ import { SimpleRelativeSingleFieldInner, SimpleRelativeSingleFieldInnerProps } f
 
 const contextualizeNode = (
 	node: React.ReactNode,
-	parentEntity: EntityAccessor,
 	environment: Environment,
 	middlewareName?: Environment.SystemMiddlewareName,
 ) => {
@@ -28,29 +27,28 @@ const contextualizeNode = (
 	if (isScalar(node)) {
 		return node
 	}
-	return <Entity accessor={parentEntity}>{node}</Entity>
+	return node
 }
 
 export type SimpleRelativeSingleFieldProxyProps = Omit<SimpleRelativeSingleFieldInnerProps, 'field'> &
 	SugaredRelativeSingleField
 
 export const SimpleRelativeSingleFieldProxy = React.memo((props: SimpleRelativeSingleFieldProxyProps) => {
-	const immediateParentEntity = useParentEntityAccessor()
 	const environment = useEnvironment()
 	const field = useRelativeSingleField(props)
 
-	const normalizedLabel = React.useMemo(
-		() => contextualizeNode(props.label, immediateParentEntity, environment, 'labelMiddleware'),
-		[environment, immediateParentEntity, props.label],
-	)
-	const normalizedLabelDescription = React.useMemo(
-		() => contextualizeNode(props.labelDescription, immediateParentEntity, environment),
-		[environment, immediateParentEntity, props.labelDescription],
-	)
-	const normalizedDescription = React.useMemo(
-		() => contextualizeNode(props.description, immediateParentEntity, environment),
-		[environment, immediateParentEntity, props.description],
-	)
+	const normalizedLabel = React.useMemo(() => contextualizeNode(props.label, environment, 'labelMiddleware'), [
+		environment,
+		props.label,
+	])
+	const normalizedLabelDescription = React.useMemo(() => contextualizeNode(props.labelDescription, environment), [
+		environment,
+		props.labelDescription,
+	])
+	const normalizedDescription = React.useMemo(() => contextualizeNode(props.description, environment), [
+		environment,
+		props.description,
+	])
 
 	return (
 		<SimpleRelativeSingleFieldInner

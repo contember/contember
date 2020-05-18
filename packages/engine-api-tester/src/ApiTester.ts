@@ -78,6 +78,11 @@ export class ApiTester {
 			modificationHandlerFactory,
 			providers: providers,
 			eventApplier: new ContentEventApplier(new ContentApplyDependenciesFactoryImpl()),
+			identityFetcher: {
+				fetchIdentities: (ids: string[]) => {
+					return Promise.resolve([])
+				},
+			},
 		})
 		if (options.systemContainerHook) {
 			systemContainerBuilder = options.systemContainerHook(systemContainerBuilder)

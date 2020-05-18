@@ -15,6 +15,9 @@ export type Scalars = {
 export type CreateEvent = Event & {
 	readonly __typename?: 'CreateEvent'
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type: EventType
 	readonly description: Scalars['String']
@@ -24,6 +27,9 @@ export type CreateEvent = Event & {
 export type DeleteEvent = Event & {
 	readonly __typename?: 'DeleteEvent'
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type: EventType
 	readonly description: Scalars['String']
@@ -52,6 +58,9 @@ export type DiffResult = {
 
 export type Event = {
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityDescription: Scalars['String']
+	readonly identityId: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly description: Scalars['String']
 	readonly createdAt: Scalars['DateTime']
@@ -172,6 +181,9 @@ export type ReleaseTreeResponse = {
 export type RunMigrationEvent = Event & {
 	readonly __typename?: 'RunMigrationEvent'
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type: EventType
 	readonly description: Scalars['String']
@@ -200,6 +212,9 @@ export type TreeFilterRelation = {
 export type UpdateEvent = Event & {
 	readonly __typename?: 'UpdateEvent'
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type: EventType
 	readonly description: Scalars['String']
@@ -345,6 +360,9 @@ export type CreateEventResolvers<
 	ParentType extends ResolversParentTypes['CreateEvent'] = ResolversParentTypes['CreateEvent']
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -361,6 +379,9 @@ export type DeleteEventResolvers<
 	ParentType extends ResolversParentTypes['DeleteEvent'] = ResolversParentTypes['DeleteEvent']
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -398,6 +419,9 @@ export type EventResolvers<
 		ContextType
 	>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
@@ -496,6 +520,9 @@ export type RunMigrationEventResolvers<
 	ParentType extends ResolversParentTypes['RunMigrationEvent'] = ResolversParentTypes['RunMigrationEvent']
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -518,6 +545,9 @@ export type UpdateEventResolvers<
 	ParentType extends ResolversParentTypes['UpdateEvent'] = ResolversParentTypes['UpdateEvent']
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>

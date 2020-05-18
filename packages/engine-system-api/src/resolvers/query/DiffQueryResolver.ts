@@ -59,7 +59,7 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 				result: {
 					base,
 					head,
-					events: this.diffResponseBuilder.buildResponse(diff.events),
+					events: await this.diffResponseBuilder.buildResponse(diff.events),
 				},
 			}
 		})

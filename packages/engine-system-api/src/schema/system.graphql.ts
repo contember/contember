@@ -127,6 +127,9 @@ const schema: DocumentNode = gql`
 
 	interface Event {
 		id: String!
+		transactionId: String!
+		identityDescription: String!
+		identityId: String!
 		dependencies: [String!]!
 		description: String!
 		createdAt: DateTime!
@@ -142,6 +145,9 @@ const schema: DocumentNode = gql`
 
 	type UpdateEvent implements Event {
 		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
 		dependencies: [String!]!
 		type: EventType!
 		description: String!
@@ -150,6 +156,9 @@ const schema: DocumentNode = gql`
 
 	type DeleteEvent implements Event {
 		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
 		dependencies: [String!]!
 		type: EventType!
 		description: String!
@@ -158,6 +167,9 @@ const schema: DocumentNode = gql`
 
 	type CreateEvent implements Event {
 		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
 		dependencies: [String!]!
 		type: EventType!
 		description: String!
@@ -166,6 +178,9 @@ const schema: DocumentNode = gql`
 
 	type RunMigrationEvent implements Event {
 		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
 		dependencies: [String!]!
 		type: EventType!
 		description: String!

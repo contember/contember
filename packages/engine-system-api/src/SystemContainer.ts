@@ -47,6 +47,7 @@ import {
 import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
 import { ReleaseTreeMutationResolver } from './resolvers/mutation/ReleaseTreeMutationResolver'
+import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -65,6 +66,7 @@ type Args = {
 	migrationsResolverFactory: MigrationsResolverFactory | undefined
 	entitiesSelector: EntitiesSelector
 	eventApplier: ContentEventsApplier
+	identityFetcher: IdentityFetcher
 }
 
 export class SystemContainerFactory {
@@ -158,7 +160,7 @@ export class SystemContainerFactory {
 
 			.addService('systemStagesQueryResolver', () => new StagesQueryResolver())
 
-			.addService('systemDiffResponseBuilder', () => new DiffResponseBuilder())
+			.addService('systemDiffResponseBuilder', () => new DiffResponseBuilder(container.identityFetcher))
 			.addService(
 				'systemDiffQueryResolver',
 				({ systemDiffResponseBuilder, diffBuilder }) => new DiffQueryResolver(systemDiffResponseBuilder, diffBuilder),

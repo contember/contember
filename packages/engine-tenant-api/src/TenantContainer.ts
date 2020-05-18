@@ -45,6 +45,7 @@ import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 import { ProjectScopeFactory } from './model/authorization/ProjectScopeFactory'
 import { AclSchemaEvaluatorFactory } from './model/authorization/AclSchemaEvaluatorFactory'
 import { MembershipValidator } from './model/service/MembershipValidator'
+import { IdentityFetcher } from './bridges/system/IdentityFetcher'
 
 interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -54,6 +55,7 @@ interface TenantContainer {
 	resolvers: Schema.Resolvers
 	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
+	identityFetcher: IdentityFetcher
 }
 
 namespace TenantContainer {
@@ -74,6 +76,7 @@ namespace TenantContainer {
 					'resolvers',
 					'authorizator',
 					'resolverContextFactory',
+					'identityFetcher',
 				)
 		}
 
@@ -135,6 +138,7 @@ namespace TenantContainer {
 				)
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
 				.addService('inviteManager', ({ db, providers, userMailer }) => new InviteManager(db, providers, userMailer))
+				.addService('identityFetcher', ({ db }) => new IdentityFetcher(db))
 				.addService(
 					'identityTypeResolver',
 					({ queryHandler, projectMemberManager, projectManager }) =>

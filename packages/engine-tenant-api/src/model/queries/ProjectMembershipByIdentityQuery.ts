@@ -16,6 +16,7 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 				qb
 					.select(['project_membership', 'id'])
 					.select(['project_membership', 'role'])
+					.select(['project_membership', 'identity_id'])
 					.where(expr => expr.in('identity_id', this.identityId))
 					.from('project_membership')
 					.match(qb =>
@@ -38,6 +39,7 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 			)
 			.select('role')
 			.select(expr => expr.raw("coalesce(variables, '[]'::json)"), 'variables')
+			.select('identity_id', 'identityId')
 			.from('memberships')
 			.leftJoin('variables', undefined, expr => expr.columnsEq(['memberships', 'id'], ['variables', 'membership_id']))
 

@@ -129,7 +129,6 @@ const schema: DocumentNode = gql`
 		id: String!
 		dependencies: [String!]!
 		description: String!
-		allowed: Boolean!
 		createdAt: DateTime!
 		type: EventType!
 	}
@@ -146,7 +145,6 @@ const schema: DocumentNode = gql`
 		dependencies: [String!]!
 		type: EventType!
 		description: String!
-		allowed: Boolean!
 		createdAt: DateTime!
 	}
 
@@ -155,7 +153,6 @@ const schema: DocumentNode = gql`
 		dependencies: [String!]!
 		type: EventType!
 		description: String!
-		allowed: Boolean!
 		createdAt: DateTime!
 	}
 
@@ -164,7 +161,6 @@ const schema: DocumentNode = gql`
 		dependencies: [String!]!
 		type: EventType!
 		description: String!
-		allowed: Boolean!
 		createdAt: DateTime!
 	}
 
@@ -173,7 +169,6 @@ const schema: DocumentNode = gql`
 		dependencies: [String!]!
 		type: EventType!
 		description: String!
-		allowed: Boolean!
 		createdAt: DateTime!
 	}
 

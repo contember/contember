@@ -2,23 +2,23 @@ import { DependencyBuilder } from './DependencyBuilder'
 import { Stage } from '../dtos'
 import { ContentEvent } from '@contember/engine-common'
 import { DiffCountQuery, DiffQuery } from '../queries'
-import {
-	EventPermission,
-	EventsPermissionsVerifier,
-	EventsPermissionsVerifierContext,
-} from './EventsPermissionsVerifier'
 import { assertEveryIsContentEvent } from './eventUtils'
 import { DatabaseContext } from '../database'
 import { SchemaVersionBuilder } from '../migrations'
 import { EntitiesResult, EntitiesSelector, EntitiesSelectorInput } from '../content/EntitiesSelector'
-import { Schema } from '@contember/schema'
+import { Acl, Schema } from '@contember/schema'
 import { formatSchemaName } from '../helpers'
 import { filterSchemaByStage } from '@contember/schema-utils'
+import { Identity } from '../authorization'
+
+export type EventsPermissionsVerifierContext = {
+	variables: Acl.VariablesMap
+	identity: Identity
+}
 
 export class DiffBuilder {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
-		private readonly permissionsVerifier: EventsPermissionsVerifier,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly entitiesSelector: EntitiesSelector,
 	) {}
@@ -65,20 +65,9 @@ export class DiffBuilder {
 				? await this.filterEvents(eventsWithDependencies, permissionContext, db, schema, baseStage, headStage, filter)
 				: eventsWithDependencies
 
-		const permissions = await this.permissionsVerifier.verify(
-			db,
-			permissionContext,
-			headStage,
-			baseStage,
-			filteredEvents,
-		)
-
 		return {
 			ok: true,
-			events: filteredEvents.map(event => ({
-				...event,
-				permission: permissions[event.id],
-			})),
+			events: filteredEvents,
 		}
 	}
 
@@ -171,13 +160,12 @@ export class DiffBuilderErrorResponse {
 	constructor(public readonly errors: DiffBuilderErrorCode[]) {}
 }
 
-export type EventWithMeta = ContentEvent & { dependencies: string[]; permission: EventPermission }
 export type EventWithDependencies = ContentEvent & { dependencies: string[] }
 
 export class DiffBuilderOkResponse {
 	public readonly ok: true = true
 
-	constructor(public readonly events: EventWithMeta[]) {}
+	constructor(public readonly events: EventWithDependencies[]) {}
 }
 
 export type EventFilter = EntitiesSelectorInput

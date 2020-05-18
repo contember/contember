@@ -1,12 +1,6 @@
 import { Stage } from '../dtos'
 import { DiffQuery, StageBySlugQuery } from '../queries'
 import { DependencyBuilder, EventsDependencies } from './DependencyBuilder'
-import {
-	EventPermission,
-	EventsPermissionsVerifier,
-	EventsPermissionsVerifierContext,
-} from './EventsPermissionsVerifier'
-import { EventApplier } from './EventApplier'
 import { EventsRebaser } from './EventsRebaser'
 import { UpdateStageEventCommand } from '../commands'
 import { createStageTree, StageTree } from '../stages'
@@ -14,12 +8,15 @@ import { assertEveryIsContentEvent } from './eventUtils'
 import { DatabaseContext } from '../database'
 import { ProjectConfig } from '../../types'
 import { SchemaVersionBuilder } from '../migrations'
+import { ContentEventsApplier } from '../content/ContentEventsApplier'
+import { formatSchemaName } from '../helpers'
+import { Identity } from '../authorization'
+import { Acl } from '@contember/schema'
 
 export class ReleaseExecutor {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
-		private readonly permissionsVerifier: EventsPermissionsVerifier,
-		private readonly eventApplier: EventApplier,
+		private readonly eventApplier: ContentEventsApplier,
 		private readonly eventsRebaser: EventsRebaser,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
@@ -27,13 +24,16 @@ export class ReleaseExecutor {
 	public async execute(
 		db: DatabaseContext,
 		project: ProjectConfig,
-		permissionContext: EventsPermissionsVerifierContext,
+		permissionContext: {
+			variables: Acl.VariablesMap
+			identity: Identity
+		},
 		targetStage: Stage,
 		sourceStage: Stage,
 		eventsToApply: string[],
-	): Promise<void> {
+	): Promise<ReleaseExecutorResult> {
 		if (eventsToApply.length === 0) {
-			return
+			return new ReleaseExecutorOkResult()
 		}
 		const stageTree = createStageTree(project)
 		const allEvents = await db.queryHandler.fetch(new DiffQuery(targetStage.event_id, sourceStage.event_id))
@@ -53,12 +53,19 @@ export class ReleaseExecutor {
 		const eventsSet = new Set(eventsToApply)
 		const events = allEvents.filter(it => eventsSet.has(it.id))
 
-		const permissions = await this.permissionsVerifier.verify(db, permissionContext, sourceStage, targetStage, events)
-		if (Object.values(permissions).filter(it => it !== EventPermission.canApply).length) {
-			throw new Error() // todo
+		const result = await this.eventApplier.apply(
+			{
+				db: db.client.forSchema(formatSchemaName(targetStage)),
+				schema,
+				identityVariables: permissionContext.variables,
+				roles: permissionContext.identity.roles,
+			},
+			events,
+		)
+		if (!result.ok) {
+			return new ReleaseExecutorErrorResult([ReleaseExecutorErrorCode.forbidden])
 		}
 
-		await this.eventApplier.applyEvents(db, targetStage, events, schema)
 		const newBase = await db.queryHandler.fetch(new StageBySlugQuery(targetStage.slug))
 		if (!newBase) {
 			throw new Error('should not happen')
@@ -75,6 +82,7 @@ export class ReleaseExecutor {
 		} else {
 			await this.rebaseRecursive(db, stageTree, sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)
 		}
+		return new ReleaseExecutorOkResult()
 	}
 
 	private async rebaseRecursive(
@@ -138,3 +146,18 @@ export class ReleaseExecutor {
 		return true
 	}
 }
+
+export class ReleaseExecutorOkResult {
+	public readonly ok = true
+}
+
+export enum ReleaseExecutorErrorCode {
+	forbidden = 'forbidden',
+}
+
+export class ReleaseExecutorErrorResult {
+	public readonly ok = false
+	constructor(public readonly errors: ReleaseExecutorErrorCode[]) {}
+}
+
+export type ReleaseExecutorResult = ReleaseExecutorOkResult | ReleaseExecutorErrorResult

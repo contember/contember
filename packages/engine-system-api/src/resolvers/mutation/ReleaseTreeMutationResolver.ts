@@ -10,7 +10,14 @@ import {
 	ReleaseTreeErrorCode,
 	ReleaseTreeResponse,
 } from '../../schema'
-import { createStageQuery, DiffBuilder, DiffBuilderErrorCode, RebaseExecutor, ReleaseExecutor } from '../../model'
+import {
+	createStageQuery,
+	DiffBuilder,
+	DiffBuilderErrorCode,
+	RebaseExecutor,
+	ReleaseExecutor,
+	ReleaseExecutorErrorCode,
+} from '../../model'
 import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
 export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTree'> {
@@ -67,7 +74,7 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 			}
 
 			// todo: avoid unnecessary checks (like fetching events again etc.)
-			await this.releaseExecutor.execute(
+			const result = await this.releaseExecutor.execute(
 				db,
 				context.project,
 				{
@@ -78,6 +85,18 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 				head,
 				[...diff.events.map(it => it.id)],
 			)
+			if (!result.ok) {
+				await db.client.connection.rollback()
+				return {
+					ok: false,
+					errors: result.errors.map(
+						it =>
+							({
+								[ReleaseExecutorErrorCode.forbidden]: ReleaseTreeErrorCode.Forbidden,
+							}[it]),
+					),
+				}
+			}
 
 			return {
 				ok: true,

@@ -18,7 +18,6 @@ export type CreateEvent = Event & {
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type: EventType
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
 	readonly createdAt: Scalars['DateTime']
 }
 
@@ -28,7 +27,6 @@ export type DeleteEvent = Event & {
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type: EventType
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
 	readonly createdAt: Scalars['DateTime']
 }
 
@@ -56,7 +54,6 @@ export type Event = {
 	readonly id: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
 	readonly createdAt: Scalars['DateTime']
 	readonly type: EventType
 }
@@ -178,7 +175,6 @@ export type RunMigrationEvent = Event & {
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type: EventType
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
 	readonly createdAt: Scalars['DateTime']
 }
 
@@ -207,7 +203,6 @@ export type UpdateEvent = Event & {
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly type: EventType
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
 	readonly createdAt: Scalars['DateTime']
 }
 
@@ -353,7 +348,6 @@ export type CreateEventResolvers<
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
@@ -370,7 +364,6 @@ export type DeleteEventResolvers<
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
@@ -407,7 +400,6 @@ export type EventResolvers<
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 }
@@ -507,7 +499,6 @@ export type RunMigrationEventResolvers<
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
@@ -530,7 +521,6 @@ export type UpdateEventResolvers<
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }

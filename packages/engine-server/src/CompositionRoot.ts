@@ -1,4 +1,6 @@
 import {
+	ContentApplyDependenciesFactoryImpl,
+	ContentEventApplier,
 	createMapperContainer,
 	EntitiesSelector,
 	EntitiesSelectorMapperFactory,
@@ -57,6 +59,9 @@ class CompositionRoot {
 						providers,
 					}).mapperFactory(db)
 				return new EntitiesSelector(mapperFactory, permissionsByIdentityFactory)
+			})
+			.addService('eventApplier', () => {
+				return new ContentEventApplier(new ContentApplyDependenciesFactoryImpl())
 			})
 			.build()
 		const systemContainer = new SystemContainerFactory().create(systemContainerDependencies)

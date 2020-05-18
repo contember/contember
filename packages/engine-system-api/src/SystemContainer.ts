@@ -15,7 +15,6 @@ import {
 	DiffBuilder,
 	DiffResponseBuilder,
 	EventApplier,
-	EventsPermissionsVerifier,
 	EventsRebaser,
 	ExecutedMigrationsResolver,
 	MigrationExecutor,
@@ -47,6 +46,7 @@ import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
 import { EntitiesSelector } from './model/content/EntitiesSelector'
 import { ReleaseTreeMutationResolver } from './resolvers/mutation/ReleaseTreeMutationResolver'
+import { ContentEventsApplier } from './model/content/ContentEventsApplier'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -64,6 +64,7 @@ type Args = {
 	modificationHandlerFactory: ModificationHandlerFactory
 	migrationsResolverFactory: MigrationsResolverFactory | undefined
 	entitiesSelector: EntitiesSelector
+	eventApplier: ContentEventsApplier
 }
 
 export class SystemContainerFactory {
@@ -120,7 +121,6 @@ export class SystemContainerFactory {
 						new CreatedRowReferenceDependencyBuilder(tableReferencingResolver),
 					]),
 			)
-			.addService('permissionVerifier', ({ authorizator }) => new EventsPermissionsVerifier(authorizator))
 			.addService(
 				'eventApplier',
 				({ migrationExecutor, executedMigrationsResolver }) =>
@@ -146,14 +146,14 @@ export class SystemContainerFactory {
 			.addService('stageCreator', ({ eventApplier }) => new StageCreator(eventApplier))
 			.addService(
 				'diffBuilder',
-				({ dependencyBuilder, permissionVerifier, schemaVersionBuilder }) =>
-					new DiffBuilder(dependencyBuilder, permissionVerifier, schemaVersionBuilder, container.entitiesSelector),
+				({ dependencyBuilder, schemaVersionBuilder }) =>
+					new DiffBuilder(dependencyBuilder, schemaVersionBuilder, container.entitiesSelector),
 			)
 
 			.addService(
 				'releaseExecutor',
-				({ dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, schemaVersionBuilder }) =>
-					new ReleaseExecutor(dependencyBuilder, permissionVerifier, eventApplier, eventsRebaser, schemaVersionBuilder),
+				({ dependencyBuilder, eventsRebaser, schemaVersionBuilder }) =>
+					new ReleaseExecutor(dependencyBuilder, container.eventApplier, eventsRebaser, schemaVersionBuilder),
 			)
 
 			.addService('systemStagesQueryResolver', () => new StagesQueryResolver())

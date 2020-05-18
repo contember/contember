@@ -2,7 +2,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
 import { DiffErrorCode, MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse } from '../../schema'
-import { createStageQuery, RebaseExecutor, ReleaseExecutor } from '../../model'
+import { createStageQuery, RebaseExecutor, ReleaseExecutor, ReleaseExecutorErrorCode } from '../../model'
 import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
 export class ReleaseMutationResolver implements MutationResolver<'release'> {
@@ -32,7 +32,7 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 
 			await this.rebaseExecutor.rebaseAll(db, context.project)
 
-			await this.releaseExecutor.execute(
+			const result = await this.releaseExecutor.execute(
 				db,
 				context.project,
 				{
@@ -43,6 +43,18 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 				head,
 				[...args.events],
 			)
+			if (!result.ok) {
+				await db.client.connection.rollback()
+				return {
+					ok: false,
+					errors: result.errors.map(
+						it =>
+							({
+								[ReleaseExecutorErrorCode.forbidden]: ReleaseErrorCode.Forbidden,
+							}[it]),
+					),
+				}
+			}
 
 			return {
 				ok: true,

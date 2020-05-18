@@ -580,16 +580,14 @@ class AccessorTreeGenerator {
 		const onUpdateProxy = (key: string, newValue: EntityAccessor.NestedAccessor | null) => {
 			batchUpdates(getAccessor => {
 				if (
-					!(
-						newValue instanceof EntityAccessor ||
-						newValue instanceof EntityForRemovalAccessor ||
-						newValue === undefined
-					)
+					!(newValue instanceof EntityAccessor || newValue instanceof EntityForRemovalAccessor || newValue === null)
 				) {
 					throw new BindingError(`Illegal entity list value.`)
 				}
-				if (newValue === undefined) {
+				if (newValue === null) {
+					entityListState.dirtyChildIds?.delete(key)
 					entityListState.childIds.delete(key)
+					// TODO delete the entity from the store
 				} else {
 					const childState = this.entityStore.get(key)
 					if (childState === undefined) {

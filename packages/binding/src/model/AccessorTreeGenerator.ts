@@ -55,12 +55,14 @@ interface InternalEntityState {
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
-	fieldMarkers: EntityFieldMarkers
 	fields: Map<FieldName, InternalStateNode>
 	hasPendingUpdate: boolean
 	id: string | EntityAccessor.UnpersistedEntityId
-	onUpdate: OnEntityUpdate | Set<OnEntityUpdate>
 	persistedData: AccessorTreeGenerator.InitialEntityData
+
+	// Entity realms solve the fact that a single particular entity may appear several times throughout the tree in
+	// completely different contexts. Even with different fields.
+	realms: Map<EntityFieldMarkers, OnEntityUpdate>
 	subTrees: Map<SubTreeIdentifier, RootAccessor> | undefined
 }
 
@@ -116,6 +118,7 @@ class AccessorTreeGenerator {
 	}
 
 	private treeRootStates: WeakMap<MarkerTreeRoot, InternalRootStateNode> = new WeakMap()
+	private treeWideBatchUpdateDepth = 0
 
 	public constructor(private tree: MarkerTreeRoot) {}
 
@@ -135,6 +138,10 @@ class AccessorTreeGenerator {
 		this.initialData = initialData
 
 		const updateDataWithEvents = (newData: RootAccessor) => {
+			if (this.treeWideBatchUpdateDepth > 0) {
+				return
+			}
+
 			if (isFrozenWhileUpdating) {
 				throw new BindingError(
 					`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
@@ -205,7 +212,7 @@ class AccessorTreeGenerator {
 			const existingState = this.treeRootStates.get(tree) as InternalEntityState
 			const id = this.resolveOrCreateEntityId(data)
 			const resolvedState = this.resolveOrCreateEntityState(id, existingState, tree.fields, onUpdate, data, errorNode)
-			subTreeState = this.generateEntityAccessor(resolvedState)
+			subTreeState = this.generateEntityAccessor(resolvedState, tree.fields)
 		}
 		this.treeRootStates.set(tree, subTreeState)
 
@@ -214,6 +221,7 @@ class AccessorTreeGenerator {
 
 	private updateFields(
 		entityState: InternalEntityState,
+		markers: EntityFieldMarkers,
 		onUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | null) => void,
 		onReplace: OnReplace,
 		batchUpdates: BatchEntityUpdates,
@@ -227,8 +235,13 @@ class AccessorTreeGenerator {
 
 		const getSubTreeRoot: GetSubTreeRoot = identifier => entityState.subTrees?.get(identifier)
 
-		for (const [placeholderName, field] of entityState.fieldMarkers) {
+		// We're overwriting existing states in entityState.fields which could already be there from a different
+		// entity realm. Most of the time this results in an equivalent accessor instance, and so for those cases this
+		// is rather inefficient. However, there are cases where we do want to do this. (E.g. refresh after a persist)
+		// or when a reference further down the tree would introduce more fields.
+		for (const [placeholderName, field] of markers) {
 			if (placeholderName === PRIMARY_KEY_NAME) {
+				// TODO get rid of this verbose monstrosity and handle ids properly.
 				// Falling back to null since that's what fields do. Arguably, we could also stringify the unpersisted entity id. Which is better?
 				const idValue = typeof entityState.id === 'string' ? entityState.id : null
 				entityState.fields.set(placeholderName, {
@@ -326,6 +339,7 @@ class AccessorTreeGenerator {
 									fieldDatum || undefined,
 									referenceError,
 								),
+								reference.fields,
 							)
 							entityState.fields.set(referencePlaceholder, referenceEntityState)
 						} else {
@@ -426,15 +440,17 @@ class AccessorTreeGenerator {
 		)
 	}
 
-	private generateEntityAccessor(entityState: InternalEntityState): InternalEntityState {
+	private generateEntityAccessor(entityState: InternalEntityState, markers: EntityFieldMarkers): InternalEntityState {
 		const performUpdate = () => {
 			entityState.hasPendingUpdate = true
-			if (typeof entityState.onUpdate === 'function') {
-				entityState.onUpdate(entityState.accessor)
-			} else {
-				for (const onUpdate of entityState.onUpdate) {
-					onUpdate(entityState.accessor)
+			this.treeWideBatchUpdateDepth++
+			const realmCount = entityState.realms.size
+			let i = 1
+			for (const [, onUpdate] of entityState.realms) {
+				if (i++ === realmCount) {
+					this.treeWideBatchUpdateDepth--
 				}
+				onUpdate(entityState.accessor)
 			}
 		}
 		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | null) => {
@@ -528,7 +544,7 @@ class AccessorTreeGenerator {
 				performUpdate()
 			}
 		}
-		entityState.accessor = this.updateFields(entityState, onUpdate, onReplace, batchUpdates, onRemove)
+		entityState.accessor = this.updateFields(entityState, markers, onUpdate, onReplace, batchUpdates, onRemove)
 		return entityState
 	}
 
@@ -636,6 +652,7 @@ class AccessorTreeGenerator {
 					datum,
 					childErrors,
 				),
+				entityListState.fieldMarkers,
 			)
 
 			entityListState.childIds.add(key)
@@ -807,22 +824,21 @@ class AccessorTreeGenerator {
 
 		if (existingState === undefined) {
 			const entityState: InternalEntityState = {
-				id,
-				errors,
-				persistedData,
-				fieldMarkers,
-				onUpdate,
 				accessor: null,
+				addEventListener: undefined as any,
 				batchUpdateDepth: 0,
 				dirtyChildFields: undefined,
-				addEventListener: undefined as any,
+				errors,
 				eventListeners: {
 					update: undefined,
 					beforeUpdate: undefined,
 				},
-				subTrees: undefined,
 				fields: new Map(),
 				hasPendingUpdate: true,
+				id,
+				persistedData,
+				realms: new Map([[fieldMarkers, onUpdate]]),
+				subTrees: undefined,
 			}
 			entityState.addEventListener = this.getAddEventListener(entityState)
 			this.entityStore.set(entityKey, entityState)
@@ -833,8 +849,8 @@ class AccessorTreeGenerator {
 		existingState.batchUpdateDepth = 0
 		existingState.hasPendingUpdate = true
 		existingState.errors = errors
-		existingState.onUpdate = onUpdate
 		existingState.persistedData = persistedData
+		existingState.realms.set(fieldMarkers, onUpdate)
 
 		if (existingState.dirtyChildFields === undefined) {
 			existingState.dirtyChildFields = new Set(existingState.fields.keys())
@@ -949,7 +965,7 @@ class AccessorTreeGenerator {
 		const agenda: Array<InternalEntityState | InternalEntityListState | InternalFieldState> = [rootState]
 
 		for (const state of agenda) {
-			console.log(state)
+			//console.log(state)
 			if (!state.hasPendingUpdate) {
 				continue
 			}

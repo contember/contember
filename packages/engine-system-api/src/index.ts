@@ -25,6 +25,8 @@ export {
 	StageCreator,
 	CreateInitEventCommand,
 	getJunctionTables,
+	EventApplier,
+	UpdateStageEventCommand,
 } from './model'
 export * from './SystemContainer'
 export * from './resolvers'

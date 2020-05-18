@@ -44,34 +44,21 @@ describe('system api - release', () => {
 			}`,
 			)
 
-			const diff = await tester.system.querySystem(GQL`query {
-			diff(baseStage: "prod", headStage: "preview") {
-				result {
-					events {
-						id
-						dependencies
-						description
-						allowed
-						type
-					}
-				}
-			}
-		}`)
+			const diff = await tester.system.diff('preview')
 
-			expect(diff.data.diff.result.events.length).toEqual(2)
-			expect(diff.data.diff.result.events[0].type).toEqual('CREATE')
-			expect(diff.data.diff.result.events[1].type).toEqual('CREATE')
+			expect(diff.events.length).toEqual(2)
+			expect(diff.events[0].type).toEqual('CREATE')
+			expect(diff.events[1].type).toEqual('CREATE')
 
 			const result = await tester.system.querySystem(
-				GQL`mutation ($baseStage: String!, $headStage: String!, $events: [String!]!) {
-				release(baseStage: $baseStage, headStage: $headStage, events: $events) {
+				GQL`mutation ($stage: String!, $events: [String!]!) {
+				release(stage: $stage, events: $events) {
 					ok
 				}
 			}`,
 				{
-					baseStage: 'prod',
-					headStage: 'preview',
-					events: [diff.data.diff.result.events[1].id],
+					stage: 'preview',
+					events: [diff.events[1].id],
 				},
 			)
 
@@ -90,7 +77,7 @@ describe('system api - release', () => {
 				listAuthor: [{ name: 'Jack Black' }],
 			})
 
-			const diff2 = await tester.system.diff('prod', 'preview')
+			const diff2 = await tester.system.diff('preview')
 
 			expect(diff2.events.length).toBe(1)
 			expect(diff2.events[0].type).toBe(EventType.Create)
@@ -122,33 +109,20 @@ describe('system api - release', () => {
 
 			await tester.sequences.runSequence(eventsSequence)
 
-			const diff = await tester.system.querySystem(GQL`query {
-			diff(baseStage: "a", headStage: "b") {
-				result {
-					events {
-						id
-						dependencies
-						description
-						allowed
-						type
-					}
-				}
-			}
-		}`)
+			const diff = await tester.system.diff('b')
 
-			expect(diff.data.diff.result.events.length).toBe(2)
-			expect(diff.data.diff.result.events[0].type).toBe('CREATE')
+			expect(diff.events.length).toBe(2)
+			expect(diff.events[0].type).toBe('CREATE')
 
 			const result = await tester.system.querySystem(
-				GQL`mutation ($baseStage: String!, $headStage: String!, $events: [String!]!) {
-				release(baseStage: $baseStage, headStage: $headStage, events: $events) {
+				GQL`mutation ($stage: String!, $events: [String!]!) {
+				release(stage: $stage, events: $events) {
 					ok
 				}
 			}`,
 				{
-					baseStage: 'a',
-					headStage: 'b',
-					events: [diff.data.diff.result.events[1].id],
+					stage: 'b',
+					events: [diff.events[1].id],
 				},
 			)
 

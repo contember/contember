@@ -6,22 +6,17 @@ export class TableReferencingResolver {
 		const result: TableReferencingResolverResult = {}
 
 		for (let entity of Object.values(schema.entities)) {
+			result[entity.tableName] = {}
 			acceptEveryFieldVisitor(
 				schema,
 				entity,
 				new (class implements Model.RelationByTypeVisitor<void> {
 					visitManyHasOne({}, relation: Model.ManyHasOneRelation, targetEntity: Model.Entity) {
-						result[entity.tableName] = {
-							...(result[entity.tableName] || {}),
-							[relation.joiningColumn.columnName]: targetEntity.tableName,
-						}
+						result[entity.tableName][relation.joiningColumn.columnName] = targetEntity.tableName
 					}
 
 					visitOneHasOneOwner({}, relation: Model.OneHasOneOwnerRelation, targetEntity: Model.Entity) {
-						result[entity.tableName] = {
-							...(result[entity.tableName] || {}),
-							[relation.joiningColumn.columnName]: targetEntity.tableName,
-						}
+						result[entity.tableName][relation.joiningColumn.columnName] = targetEntity.tableName
 					}
 
 					visitManyHasManyOwner(

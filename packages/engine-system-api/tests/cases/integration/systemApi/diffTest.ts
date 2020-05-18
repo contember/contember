@@ -23,11 +23,12 @@ describe('system api - diff', () => {
 			})
 			await tester.stages.createAll()
 			await tester.stages.migrate('2019-02-01-163923')
+			await tester.stages.migrate('2019-11-04-130244')
 
 			const response = await tester.content.queryContent(
 				'preview',
 				GQL`mutation {
-          createAuthor(data: {name: "John Doe"}) {
+          createAuthor(data: {name: "John Doe", contact: {create: {email: "john@example.org"}}}) {
               node {
                   id
               }
@@ -37,88 +38,54 @@ describe('system api - diff', () => {
 
 			await tester.content.queryContent(
 				'preview',
+				GQL`mutation($author: UUID!) {
+				createPost(data: {title: "abc", content: "xyz", author: {connect: {id: $author}}}) {
+					ok
+				}
+			}`,
+				{ author: response.createAuthor.node.id },
+			)
+
+			await tester.content.queryContent(
+				'preview',
 				GQL`mutation {
-          createAuthor(data: {name: "Jack Black"}) {
+          createAuthor(data: {name: "Jack Black", contact: {create: {email: "jack@example.org"}}}) {
               ok
           }
       }`,
 			)
 
 			const diff = await tester.system.querySystem(GQL`query {
-			diff(baseStage: "prod", headStage: "preview", filter: [{entity: "Author", id: "${response.createAuthor.node.id}"}]) {
+			diff(stage: "preview", filter: [{entity: "Author", id: "${response.createAuthor.node.id}"}]) {
 				result {
 					events {
 						id
 						dependencies
 						description
-						allowed
 						type
 					}
 				}
 			}
 		}`)
 
-			expect(diff.data.diff.result.events.length).toBe(1)
+			expect(diff.data.diff.result.events.length).toBe(2)
 			expect(diff.data.diff.result.events[0].type).toBe('CREATE')
-			await tester.cleanup()
-		},
-		TIMEOUT,
-	)
 
-	it(
-		'diff permissions - cannot write',
-		async () => {
-			const tester = await ApiTester.create({
-				project: {
-					stages: [
-						{
-							name: 'Prod',
-							slug: 'prod',
-						},
-						{
-							name: 'Preview',
-							slug: 'preview',
-							base: 'prod',
-						},
-					],
-				},
-			})
-			await tester.stages.createAll()
+			const diffWithRelations = await tester.system.querySystem(GQL`query {
+			diff(stage: "preview", filter: [{entity: "Author", id: "${response.createAuthor.node.id}", relations: [{name: "posts", relations: []}]}]) {
+				result {
+					events {
+						id
+						dependencies
+						description
+						type
+					}
+				}
+			}
+		}`)
 
-			await tester.stages.migrate('2019-02-01-163923')
-
-			await tester.content.queryContent(
-				'preview',
-				GQL`mutation {
-          createAuthor(data: {name: "John Doe"}) {
-              ok
-          }
-      }`,
-			)
-
-			const diff = await tester.system.querySystem(
-				GQL`query {
-        diff(baseStage: "prod", headStage: "preview") {
-          result {
-            events {
-              id
-              dependencies
-              description
-              allowed
-              type
-            }
-          }
-        }
-      }`,
-				{},
-				{
-					roles: ['viewer'],
-				},
-			)
-
-			expect(diff.data.diff.result.events.length).toBe(1)
-			expect(diff.data.diff.result.events[0].type).toBe('CREATE')
-			expect(diff.data.diff.result.events[0].allowed).toBe(false)
+			expect(diffWithRelations.data.diff.result.events.length).toBe(3)
+			expect(diffWithRelations.data.diff.result.events[0].type).toBe('CREATE')
 			await tester.cleanup()
 		},
 		TIMEOUT,

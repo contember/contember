@@ -143,7 +143,7 @@ export class ApiTester {
 		const systemApiTester = new SystemApiTester(
 			db,
 			projectConfig,
-			systemContainer.releaseExecutor,
+			systemContainer.eventApplier,
 			systemSchema,
 			systemContainer,
 		)

@@ -1,6 +1,7 @@
 export * from './authorization'
 export * from './commands'
 export * from './database'
+export * from './dependencies'
 export * from './dtos'
 export * from './events'
 export * from './helpers'

@@ -9,11 +9,13 @@ import {
 import { MigrationsRunner } from '@contember/database-migrations'
 import { DatabaseCredentials } from '@contember/database'
 import {
+	ContentEventsApplier,
 	CreatedRowReferenceDependencyBuilder,
 	DeletedRowReferenceDependencyBuilder,
 	DependencyBuilderList,
 	DiffBuilder,
 	DiffResponseBuilder,
+	EntitiesSelector,
 	EventApplier,
 	EventsRebaser,
 	ExecutedMigrationsResolver,
@@ -44,9 +46,7 @@ import {
 } from './resolvers'
 import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
-import { EntitiesSelector } from './model/content/EntitiesSelector'
 import { ReleaseTreeMutationResolver } from './resolvers/mutation/ReleaseTreeMutationResolver'
-import { ContentEventsApplier } from './model/content/ContentEventsApplier'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers

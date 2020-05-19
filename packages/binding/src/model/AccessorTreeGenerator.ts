@@ -466,11 +466,13 @@ class AccessorTreeGenerator {
 					return
 				}
 
+				let currentAccessor: EntityAccessor
 				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
+					currentAccessor = getAccessor()
 					for (const listener of entityState.eventListeners.beforeUpdate) {
 						listener(getAccessor)
 					}
-					if (entityState.accessor === getAccessor()) {
+					if (currentAccessor === getAccessor()) {
 						return
 					}
 				}
@@ -545,6 +547,10 @@ class AccessorTreeGenerator {
 				entityState.dirtySubTrees = new Set()
 			}
 			entityState.dirtySubTrees.add(subTreeIdentifier)
+
+			if (entityState.hasPendingUpdate) {
+				return
+			}
 			onUpdateProxy(newAccessor)
 		}
 		const onReplace: OnReplace = replacement => onUpdateProxy(this.replaceEntity(entityState, replacement, onRemove))
@@ -654,11 +660,13 @@ class AccessorTreeGenerator {
 					return
 				}
 
+				let currentAccessor: EntityListAccessor
 				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
+					currentAccessor = getAccessor()
 					for (const listener of entityListState.eventListeners.beforeUpdate) {
 						listener(getAccessor)
 					}
-					if (entityListState.accessor === getAccessor()) {
+					if (currentAccessor === getAccessor()) {
 						return
 					}
 				}

@@ -51,6 +51,7 @@ interface InternalEntityState {
 	addEventListener: AddEntityEventListener
 	batchUpdateDepth: number
 	dirtyChildFields: Set<FieldName> | undefined
+	dirtySubTrees: Set<SubTreeIdentifier> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
@@ -63,7 +64,7 @@ interface InternalEntityState {
 	// Entity realms solve the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.
 	realms: Map<EntityFieldMarkers, OnEntityUpdate>
-	subTrees: Map<SubTreeIdentifier, RootAccessor> | undefined
+	subTrees: Map<SubTreeIdentifier, InternalRootStateNode> | undefined
 }
 
 type OnEntityListUpdate = (accessor: EntityListAccessor) => void
@@ -222,7 +223,8 @@ class AccessorTreeGenerator {
 	private updateFields(
 		entityState: InternalEntityState,
 		markers: EntityFieldMarkers,
-		onUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | null) => void,
+		onFieldUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | null) => void,
+		onSubTreeUpdate: (subTreeIdentifier: SubTreeIdentifier, updatedRoot: RootAccessor) => void,
 		onReplace: OnReplace,
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
@@ -233,7 +235,7 @@ class AccessorTreeGenerator {
 				: entityState.persistedData[TYPENAME_KEY_NAME]
 			: undefined
 
-		const getSubTreeRoot: GetSubTreeRoot = identifier => entityState.subTrees?.get(identifier)
+		const getSubTreeRoot: GetSubTreeRoot = identifier => entityState.subTrees?.get(identifier)?.accessor || null
 
 		// We're overwriting existing states in entityState.fields which could already be there from a different
 		// entity realm. Most of the time this results in an equivalent accessor instance, and so for those cases this
@@ -294,10 +296,10 @@ class AccessorTreeGenerator {
 					entityState.subTrees = new Map()
 				}
 
-				entityState.subTrees.set(
-					field.subTreeIdentifier || field.id,
-					this.generateSubTree(field, initialData, () => undefined, undefined).accessor!,
-				)
+				const identifier = field.subTreeIdentifier ?? field.id
+				const onThisSubTreeUpdate = (newRoot: RootAccessor) => onSubTreeUpdate(identifier, newRoot)
+
+				entityState.subTrees.set(identifier, this.generateSubTree(field, initialData, onThisSubTreeUpdate, undefined))
 			} else if (field instanceof ReferenceMarker) {
 				for (const referencePlaceholder in field.references) {
 					const reference = field.references[referencePlaceholder]
@@ -321,7 +323,7 @@ class AccessorTreeGenerator {
 							: undefined
 
 					const getOnReferenceUpdate = (placeholderName: string) => (newValue: EntityAccessor.NestedAccessor | null) =>
-						onUpdate(placeholderName, newValue)
+						onFieldUpdate(placeholderName, newValue)
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (Array.isArray(fieldDatum) || fieldDatum instanceof EntityListAccessor) {
 							throw new BindingError(
@@ -410,7 +412,7 @@ class AccessorTreeGenerator {
 							placeholderName,
 							entityState.fields.get(placeholderName) as InternalFieldState | undefined,
 							field,
-							onUpdate,
+							onFieldUpdate,
 							fieldDatum,
 							fieldErrors,
 						),
@@ -478,38 +480,72 @@ class AccessorTreeGenerator {
 				)
 			})
 		}
-		const onUpdate = (updatedField: FieldName, updatedData: EntityAccessor.NestedAccessor | null) => {
+		const onFieldUpdate = (updatedField: FieldName, updatedData: EntityAccessor.NestedAccessor | null) => {
 			const entityAccessor = entityState.accessor
-			if (entityAccessor instanceof EntityAccessor) {
-				const currentFieldState = entityState.fields.get(updatedField)
-				if (
-					!(entityAccessor instanceof EntityAccessor) ||
-					currentFieldState === undefined //||
-					//currentFieldState.accessor === updatedData
-					// TODO this shouldn't be necessary to comment out. Something's super fishy with hasOne relations.
-				) {
-					return
-				}
-				currentFieldState.accessor = updatedData
-				const newAccessor = new EntityAccessor(
-					entityAccessor.runtimeId,
-					entityAccessor.typename,
-					entityState.fields,
-					entityAccessor.getSubTreeRoot,
-					entityAccessor.errors,
-					entityAccessor.addEventListener,
-					entityAccessor.batchUpdates,
-					entityAccessor.replaceBy,
-					entityAccessor.remove,
-				)
-
-				if (entityState.dirtyChildFields === undefined) {
-					entityState.dirtyChildFields = new Set()
-				}
-				entityState.dirtyChildFields.add(updatedField)
-				return onUpdateProxy(newAccessor)
+			if (!(entityAccessor instanceof EntityAccessor)) {
+				return this.rejectInvalidAccessorTree()
 			}
-			return this.rejectInvalidAccessorTree()
+			const currentFieldState = entityState.fields.get(updatedField)
+			if (
+				currentFieldState === undefined //||
+				//currentFieldState.accessor === updatedData
+				// TODO this shouldn't be necessary to comment out. Something's super fishy with hasOne relations.
+			) {
+				return
+			}
+			currentFieldState.accessor = updatedData
+			const newAccessor = new EntityAccessor(
+				entityAccessor.runtimeId,
+				entityAccessor.typename,
+				entityState.fields,
+				entityAccessor.getSubTreeRoot,
+				entityAccessor.errors,
+				entityAccessor.addEventListener,
+				entityAccessor.batchUpdates,
+				entityAccessor.replaceBy,
+				entityAccessor.remove,
+			)
+
+			if (entityState.dirtyChildFields === undefined) {
+				entityState.dirtyChildFields = new Set()
+			}
+			entityState.dirtyChildFields.add(updatedField)
+			return onUpdateProxy(newAccessor)
+		}
+		const onSubTreeUpdate = (subTreeIdentifier: SubTreeIdentifier, updatedRoot: RootAccessor) => {
+			const entityAccessor = entityState.accessor
+			if (!(entityAccessor instanceof EntityAccessor)) {
+				return this.rejectInvalidAccessorTree()
+			}
+			if (entityState.subTrees === undefined) {
+				entityState.subTrees = new Map()
+			}
+			const subTreeState = entityState.subTrees.get(subTreeIdentifier)
+			if (
+				subTreeState === undefined //||
+				//currentFieldState.accessor === updatedData
+				// TODO this shouldn't be necessary to comment out. Something's super fishy with hasOne relations.
+			) {
+				return
+			}
+			subTreeState.accessor = updatedRoot
+			const newAccessor = new EntityAccessor(
+				entityAccessor.runtimeId,
+				entityAccessor.typename,
+				entityState.fields,
+				entityAccessor.getSubTreeRoot,
+				entityAccessor.errors,
+				entityAccessor.addEventListener,
+				entityAccessor.batchUpdates,
+				entityAccessor.replaceBy,
+				entityAccessor.remove,
+			)
+
+			if (entityState.dirtySubTrees === undefined) {
+				entityState.dirtySubTrees = new Set()
+			}
+			entityState.dirtySubTrees.add(subTreeIdentifier)
+			onUpdateProxy(newAccessor)
 		}
 		const onReplace: OnReplace = replacement => onUpdateProxy(this.replaceEntity(entityState, replacement, onRemove))
 		const onRemove = (removalType: RemovalType) => {
@@ -544,7 +580,15 @@ class AccessorTreeGenerator {
 				performUpdate()
 			}
 		}
-		entityState.accessor = this.updateFields(entityState, markers, onUpdate, onReplace, batchUpdates, onRemove)
+		entityState.accessor = this.updateFields(
+			entityState,
+			markers,
+			onFieldUpdate,
+			onSubTreeUpdate,
+			onReplace,
+			batchUpdates,
+			onRemove,
+		)
 		return entityState
 	}
 
@@ -826,6 +870,7 @@ class AccessorTreeGenerator {
 				addEventListener: undefined as any,
 				batchUpdateDepth: 0,
 				dirtyChildFields: undefined,
+				dirtySubTrees: undefined,
 				errors,
 				eventListeners: {
 					update: undefined,
@@ -855,6 +900,15 @@ class AccessorTreeGenerator {
 		} else {
 			for (const [fieldName] of existingState.fields) {
 				existingState.dirtyChildFields.add(fieldName)
+			}
+		}
+		if (existingState.subTrees) {
+			if (existingState.dirtySubTrees === undefined) {
+				existingState.dirtySubTrees = new Set(existingState.subTrees.keys())
+			} else {
+				for (const [subTreeIdentifier] of existingState.subTrees) {
+					existingState.dirtySubTrees.add(subTreeIdentifier)
+				}
 			}
 		}
 		return existingState
@@ -998,6 +1052,16 @@ class AccessorTreeGenerator {
 							throw new BindingError()
 						}
 						agenda.push(dirtyChildState)
+					}
+					entityState.dirtyChildFields = undefined
+				}
+				if (entityState.dirtySubTrees !== undefined && entityState.subTrees !== undefined) {
+					for (const dirtySubTreeIdentifier of entityState.dirtySubTrees) {
+						const dirtySubTree = entityState.subTrees.get(dirtySubTreeIdentifier)
+						if (dirtySubTree === undefined) {
+							throw new BindingError()
+						}
+						agenda.push(dirtySubTree)
 					}
 					entityState.dirtyChildFields = undefined
 				}

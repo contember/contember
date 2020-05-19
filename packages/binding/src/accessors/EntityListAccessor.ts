@@ -3,13 +3,12 @@ import { EntityAccessor } from './EntityAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
-import { GetEntityByKey } from './GetEntityByKey'
 
 class EntityListAccessor extends Accessor implements Errorable {
 	private _filteredEntities: EntityAccessor[] | undefined
 
 	public constructor(
-		public readonly getEntityByKey: GetEntityByKey,
+		public readonly getEntityByKey: (key: string) => EntityAccessor | EntityForRemovalAccessor,
 		private readonly entityIds: Set<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
@@ -36,11 +35,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 
 	public *[Symbol.iterator](): Generator<EntityAccessor | EntityForRemovalAccessor> {
 		for (const id of this.entityIds) {
-			const accessor = this.getEntityByKey(id)
-			if (!accessor) {
-				continue
-			}
-			yield accessor
+			yield this.getEntityByKey(id)
 		}
 	}
 }

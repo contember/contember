@@ -50,15 +50,6 @@ class EntityAccessor extends Accessor implements Errorable {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
 	}
 
-	public *[Symbol.iterator](): Generator<[FieldName, EntityAccessor.NestedAccessor]> {
-		for (const [placeholderName, fieldDatum] of this.fieldData) {
-			if (fieldDatum.accessor === null) {
-				continue
-			}
-			yield [placeholderName, fieldDatum.accessor]
-		}
-	}
-
 	public getField(fieldName: FieldName): EntityAccessor.NestedAccessor
 	public getField(
 		fieldName: FieldName,

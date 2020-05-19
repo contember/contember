@@ -40,7 +40,7 @@ type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
 
 // Notice also that we effectively shift the responsibility to check whether an update concerns them to the
 // listeners.
-const BEFORE_UPDATE_SETTLE_LIMIT = 100
+const BEFORE_UPDATE_SETTLE_LIMIT = 20
 
 type InternalRootStateNode = InternalEntityState | InternalEntityListState
 type InternalStateNode = InternalEntityState | InternalEntityListState | InternalFieldState

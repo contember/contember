@@ -1,17 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
+import { MutationReleaseTreeArgs, ReleaseTreeErrorCode, ReleaseTreeResponse } from '../../schema'
 import {
-	DiffErrorCode,
-	MutationReleaseArgs,
-	MutationReleaseTreeArgs,
-	ReleaseErrorCode,
-	ReleaseResponse,
-	ReleaseTreeErrorCode,
-	ReleaseTreeResponse,
-} from '../../schema'
-import {
-	createStageQuery,
 	DiffBuilder,
 	DiffBuilderErrorCode,
 	RebaseExecutor,

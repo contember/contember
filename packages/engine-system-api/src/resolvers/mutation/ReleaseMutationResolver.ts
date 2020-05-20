@@ -1,8 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
-import { DiffErrorCode, MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse } from '../../schema'
-import { createStageQuery, RebaseExecutor, ReleaseExecutor, ReleaseExecutorErrorCode } from '../../model'
+import { MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse } from '../../schema'
+import { RebaseExecutor, ReleaseExecutor, ReleaseExecutorErrorCode } from '../../model'
 import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
 export class ReleaseMutationResolver implements MutationResolver<'release'> {

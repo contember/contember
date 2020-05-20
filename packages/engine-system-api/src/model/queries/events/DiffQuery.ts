@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
 import { AnyEvent, CreateEvent, DeleteEvent, EventType, RunMigrationEvent, UpdateEvent } from '@contember/engine-common'
-import { assertNever } from '../../utils'
+import { assertNever } from '../../../utils'
 
 class DiffQuery extends DatabaseQuery<AnyEvent[]> {
 	constructor(private readonly baseEvent: string, private readonly headEvent: string) {

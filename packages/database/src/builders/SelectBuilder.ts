@@ -10,15 +10,10 @@ import { LockType } from './LockType'
 import { columnExpressionToLiteral, toFqnWrap } from './utils'
 import { createSubQueryLiteralFactory, SubQueryExpression, SubQueryLiteralFactory } from './internal/Subqueries'
 
-export type SelectBuilderSpecification<OutputOptions extends keyof SelectBuilder.Options> = <
-	Result,
-	InputOptions extends keyof SelectBuilder.Options
->(
-	qb: SelectBuilder<Result, InputOptions>,
-) => SelectBuilder<Result, InputOptions | OutputOptions>
+export type SelectBuilderSpecification = <Result>(qb: SelectBuilder<Result>) => SelectBuilder<Result>
 
-class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBuilder.Options = never>
-	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result, Filled | 'orderBy'>>, QueryBuilder {
+class SelectBuilder<Result = SelectBuilder.Result>
+	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result>>, QueryBuilder {
 	constructor(public readonly options: SelectBuilder.Options) {}
 
 	public static create<Result = SelectBuilder.Result>() {
@@ -38,38 +33,34 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		})
 	}
 
-	public with(alias: string, expression: SubQueryExpression): SelectBuilder<Result, Filled | 'with'> {
+	public with(alias: string, expression: SubQueryExpression): SelectBuilder<Result> {
 		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression), false))
 	}
 
-	public withRecursive(
-		alias: string,
-		expression: SubQueryExpression,
-		columns?: string[],
-	): SelectBuilder<Result, Filled | 'with'> {
+	public withRecursive(alias: string, expression: SubQueryExpression, columns?: string[]): SelectBuilder<Result> {
 		return this.withOption(
 			'with',
 			this.options.with.withCte(alias, createSubQueryLiteralFactory(expression), true, columns),
 		)
 	}
 
-	public unionAll(expression: SubQueryExpression): SelectBuilder<Result, Filled | 'union'> {
+	public unionAll(expression: SubQueryExpression): SelectBuilder<Result> {
 		return this.withOption('union', {
 			type: 'all',
 			literal: createSubQueryLiteralFactory(expression),
 		})
 	}
 
-	public from(tableName: string | Literal, alias?: string): SelectBuilder<Result, Filled | 'from'> {
+	public from(tableName: string | Literal, alias?: string): SelectBuilder<Result> {
 		return this.withOption('from', [...(this.options.from || []), [tableName, alias]])
 	}
 
-	public select(columnName: QueryBuilder.ColumnIdentifier, alias?: string): SelectBuilder<Result, Filled | 'select'>
-	public select(callback: QueryBuilder.ColumnExpression, alias?: string): SelectBuilder<Result, Filled | 'select'>
+	public select(columnName: QueryBuilder.ColumnIdentifier, alias?: string): SelectBuilder<Result>
+	public select(callback: QueryBuilder.ColumnExpression, alias?: string): SelectBuilder<Result>
 	public select(
 		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression,
 		alias?: string,
-	): SelectBuilder<Result, Filled | 'select'> {
+	): SelectBuilder<Result> {
 		let raw = columnExpressionToLiteral(expr)
 		if (raw === undefined) {
 			return this
@@ -77,33 +68,22 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		return this.withOption('select', [...this.options.select, aliasLiteral(raw, alias)])
 	}
 
-	public where(where: Where.Expression): SelectBuilder<Result, Filled | 'where'> {
+	public where(where: Where.Expression): SelectBuilder<Result> {
 		return this.withOption('where', this.options.where.withWhere(where))
 	}
 
-	public orderBy(
-		columnName: QueryBuilder.ColumnIdentifier,
-		direction: 'asc' | 'desc' = 'asc',
-	): SelectBuilder<Result, Filled | 'orderBy'> {
+	public orderBy(columnName: QueryBuilder.ColumnIdentifier, direction: 'asc' | 'desc' = 'asc'): SelectBuilder<Result> {
 		return this.withOption('orderBy', [...this.options.orderBy, [new Literal(toFqnWrap(columnName)), direction]])
 	}
 
-	public join(
-		table: string,
-		alias?: string,
-		condition?: SelectBuilder.JoinCondition,
-	): SelectBuilder<Result, Filled | 'join'> {
+	public join(table: string, alias?: string, condition?: SelectBuilder.JoinCondition): SelectBuilder<Result> {
 		return this.withOption('join', [
 			...this.options.join,
 			{ type: 'inner', table, alias, condition: this.joinConditionToLiteral(condition) },
 		])
 	}
 
-	public leftJoin(
-		table: string,
-		alias?: string,
-		condition?: SelectBuilder.JoinCondition,
-	): SelectBuilder<Result, Filled | 'join'> {
+	public leftJoin(table: string, alias?: string, condition?: SelectBuilder.JoinCondition): SelectBuilder<Result> {
 		return this.withOption('join', [
 			...this.options.join,
 			{ type: 'left', table, alias, condition: this.joinConditionToLiteral(condition) },
@@ -119,11 +99,9 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		return builder.getSql() || undefined
 	}
 
-	public groupBy(columnName: QueryBuilder.ColumnIdentifier): SelectBuilder<Result, Filled | 'grouping'>
-	public groupBy(callback: QueryBuilder.ColumnExpression): SelectBuilder<Result, Filled | 'grouping'>
-	public groupBy(
-		expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression,
-	): SelectBuilder<Result, Filled | 'grouping'> {
+	public groupBy(columnName: QueryBuilder.ColumnIdentifier): SelectBuilder<Result>
+	public groupBy(callback: QueryBuilder.ColumnExpression): SelectBuilder<Result>
+	public groupBy(expr: QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression): SelectBuilder<Result> {
 		let raw = columnExpressionToLiteral(expr)
 		if (raw === undefined) {
 			return this
@@ -134,21 +112,19 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		})
 	}
 
-	public limit(limit: number, offset?: number): SelectBuilder<Result, Filled | 'limit'> {
+	public limit(limit: number, offset?: number): SelectBuilder<Result> {
 		return this.withOption('limit', [limit, offset || 0])
 	}
 
-	public lock(type: LockType): SelectBuilder<Result, Filled | 'lock'> {
+	public lock(type: LockType): SelectBuilder<Result> {
 		return this.withOption('lock', type)
 	}
 
-	public meta(key: string, value: any): SelectBuilder<Result, Filled | 'meta'> {
+	public meta(key: string, value: any): SelectBuilder<Result> {
 		return this.withOption('meta', { ...this.options.meta, [key]: value })
 	}
 
-	public match<AdditionalOptions extends keyof SelectBuilder.Options>(
-		spec: SelectBuilderSpecification<AdditionalOptions>,
-	): SelectBuilder<Result, Filled | AdditionalOptions> {
+	public match(spec: SelectBuilderSpecification): SelectBuilder<Result> {
 		return spec(this)
 	}
 
@@ -171,13 +147,13 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	protected withOption<K extends keyof SelectBuilder.Options, V extends SelectBuilder.Options[K]>(
 		key: K,
 		value: V,
-	): SelectBuilder<Result, Filled | K> {
-		return new SelectBuilder<Result, Filled | K>({ ...this.options, [key]: value }) as SelectBuilder<Result, Filled | K>
+	): SelectBuilder<Result> {
+		return new SelectBuilder<Result>({ ...this.options, [key]: value })
 	}
 }
 
 namespace SelectBuilder {
-	export type Callback = (qb: SelectBuilder<any, any>) => SelectBuilder<any, any>
+	export type Callback = (qb: SelectBuilder<any>) => SelectBuilder<any>
 
 	export type Result = { [columnName: string]: any }
 

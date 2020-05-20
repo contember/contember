@@ -9,11 +9,10 @@ import { resolveValues } from './utils'
 import { ConflictActionType } from './ConflictActionType'
 import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
-class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
-	implements With.Aware, QueryBuilder {
+class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.Aware, QueryBuilder {
 	private constructor(private readonly options: InsertBuilder.Options) {}
 
-	public static create(): InsertBuilder.NewInsertBuilder {
+	public static create(): InsertBuilder<InsertBuilder.AffectedRows> {
 		return new InsertBuilder({
 			into: undefined,
 			with: new With.Statement({}),
@@ -21,21 +20,18 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 			onConflict: undefined,
 			returning: new Returning(),
 			from: undefined,
-		}) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
+		})
 	}
 
-	public with(
-		alias: string,
-		expression: SubQueryExpression,
-	): InsertBuilder.InsertBuilderState<Result, Filled | 'with'> {
+	public with(alias: string, expression: SubQueryExpression): InsertBuilder<Result> {
 		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression)))
 	}
 
-	public into(intoTable: string): InsertBuilder.InsertBuilderState<Result, Filled | 'into'> {
+	public into(intoTable: string): InsertBuilder<Result> {
 		return this.withOption('into', intoTable)
 	}
 
-	public values(columns: QueryBuilder.Values): InsertBuilder.InsertBuilderState<Result, Filled | 'values'> {
+	public values(columns: QueryBuilder.Values): InsertBuilder<Result> {
 		return this.withOption('values', resolveValues(columns))
 	}
 
@@ -43,16 +39,13 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		type: ConflictActionType.update,
 		target: InsertBuilder.ConflictTarget,
 		values: QueryBuilder.Values,
-	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
-	public onConflict(
-		type: ConflictActionType.doNothing,
-		target?: InsertBuilder.ConflictTarget,
-	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'>
+	): InsertBuilder<Result>
+	public onConflict(type: ConflictActionType.doNothing, target?: InsertBuilder.ConflictTarget): InsertBuilder<Result>
 	public onConflict(
 		type: ConflictActionType,
 		target?: InsertBuilder.ConflictTarget,
 		values?: QueryBuilder.Values,
-	): InsertBuilder.InsertBuilderState<Result, Filled | 'onConflict'> {
+	): InsertBuilder<Result> {
 		let conflictAction: InsertBuilder.ConflictAction
 		if (type === ConflictActionType.update && values && target) {
 			conflictAction = { type, values: resolveValues(values), target }
@@ -64,16 +57,11 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		return this.withOption('onConflict', conflictAction)
 	}
 
-	public returning(
-		column: string | Literal,
-	): InsertBuilder.InsertBuilderState<Returning.Result[], Filled | 'returning'> {
-		return this.withOption('returning', new Returning(column)) as InsertBuilder.InsertBuilderState<
-			Returning.Result[],
-			Filled | 'returning'
-		>
+	public returning(column: string | Literal): InsertBuilder<Returning.Result[]> {
+		return this.withOption('returning', new Returning(column)) as InsertBuilder<Returning.Result[]>
 	}
 
-	public from(from: SelectBuilder.Callback): InsertBuilder.InsertBuilderState<Result, Filled | 'from'> {
+	public from(from: SelectBuilder.Callback): InsertBuilder<Result> {
 		return this.withOption('from', from)
 	}
 
@@ -88,7 +76,7 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		let from: Literal | undefined
 
 		if (this.options.from !== undefined) {
-			let queryBuilder: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create()
+			let queryBuilder: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 			queryBuilder = Object.values(values).reduce((qb, raw) => qb.select(raw), queryBuilder)
 			queryBuilder = this.options.from(queryBuilder)
 			from = queryBuilder.createQuery(context.withAlias(...this.options.with.getAliases()))
@@ -108,11 +96,8 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 	private withOption<K extends keyof InsertBuilder.Options, V extends InsertBuilder.Options[K]>(
 		key: K,
 		value: V,
-	): InsertBuilder.InsertBuilderState<Result, Filled | K> {
-		return new InsertBuilder<Result, Filled | K>({ ...this.options, [key]: value }) as InsertBuilder.InsertBuilderState<
-			Result,
-			Filled | K
-		>
+	): InsertBuilder<Result> {
+		return new InsertBuilder<Result>({ ...this.options, [key]: value })
 	}
 }
 
@@ -133,19 +118,6 @@ namespace InsertBuilder {
 		into: Exclude<Options['into'], undefined>
 		values: Exclude<Options['values'], undefined>
 	}
-
-	export type InsertBuilderWithoutExecute<
-		Result extends InsertResult,
-		Filled extends keyof InsertBuilder<Result, Filled>
-	> = Pick<InsertBuilder<Result, Filled>, Exclude<keyof InsertBuilder<Result, Filled>, 'execute' | 'createQuery'>>
-
-	export type InsertBuilderState<Result extends InsertResult, Filled extends keyof InsertBuilder<Result, Filled>> =
-		| 'into'
-		| 'values' extends Filled
-		? InsertBuilder<Result, Filled>
-		: InsertBuilderWithoutExecute<Result, Filled>
-
-	export type NewInsertBuilder = InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
 
 	export type ConflictAction =
 		| { type: ConflictActionType.doNothing; target?: ConflictTarget }

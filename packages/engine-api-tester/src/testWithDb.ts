@@ -79,10 +79,7 @@ export const executeDbTest = async (test: Test) => {
 		const qb = SelectBuilder.create().from(table)
 
 		const columns = Object.keys((test.expectDatabase || {})[table][0] || { id: null })
-		const qbWithSelect = columns.reduce<SelectBuilder<Record<string, any>, 'from' | 'select'>>(
-			(qb, column) => qb.select(column),
-			qb,
-		)
+		const qbWithSelect = columns.reduce<SelectBuilder<Record<string, any>>>((qb, column) => qb.select(column), qb)
 		dbData[table] = await qbWithSelect.getResult(tester.client.forSchema('stage_prod'))
 	}
 	expect(dbData).toEqual(test.expectDatabase!)

@@ -19,7 +19,7 @@ namespace SelectExecutionHandler {
 		entity: Model.Entity
 
 		addColumn: (
-			queryCallback: (qb: SelectBuilder<SelectBuilder.Result, any>) => SelectBuilder<SelectBuilder.Result, any>,
+			queryCallback: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>,
 			path?: Path,
 		) => void
 		addData: (parentField: string, cb: DataCallback, defaultValue?: SelectHydrator.NestedDefaultValue) => void

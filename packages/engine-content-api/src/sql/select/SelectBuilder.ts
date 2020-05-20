@@ -25,7 +25,7 @@ export default class SelectBuilder {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderByBuilder: OrderByBuilder,
 		private readonly metaHandler: MetaHandler,
-		private qb: DbSelectBuilder<DbSelectBuilder.Result, any>,
+		private qb: DbSelectBuilder<DbSelectBuilder.Result>,
 		private readonly hydrator: SelectHydrator,
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
 		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> },

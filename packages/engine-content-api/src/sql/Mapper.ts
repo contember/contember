@@ -60,7 +60,7 @@ class Mapper {
 		indexBy?: string,
 	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = SelectBuilder.create()
+		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 		let indexByAlias: string | null = null
 		if (indexBy) {
 			const path = new Path([])
@@ -88,7 +88,7 @@ class Mapper {
 		relation: Model.JoiningColumnRelation & Model.Relation,
 	) {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = SelectBuilder.create()
+		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 		const path = new Path([])
 		const groupingKey = '__grouping_key'
 		qb = qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)
@@ -97,9 +97,9 @@ class Mapper {
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 
-	private async selectRows<Filled extends keyof SelectBuilder.Options>(
+	private async selectRows(
 		hydrator: SelectHydrator,
-		qb: SelectBuilder<SelectBuilder.Result, Filled>,
+		qb: SelectBuilder<SelectBuilder.Result>,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		groupBy?: string,

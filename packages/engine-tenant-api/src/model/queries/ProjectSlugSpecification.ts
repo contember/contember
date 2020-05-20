@@ -1,6 +1,6 @@
 import { ConditionBuilder, SelectBuilderSpecification } from '@contember/database'
 
-export const byProjectSlug = (slug: string): SelectBuilderSpecification<'where' | 'with' | 'join'> => qb =>
+export const byProjectSlug = (slug: string): SelectBuilderSpecification => qb =>
 	qb
 		.where((expr: ConditionBuilder) => expr.columnsEq('project_id', ['project', 'id']))
 		.with('project', qb =>

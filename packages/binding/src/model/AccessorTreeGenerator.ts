@@ -160,7 +160,7 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		const subTreeState = this.generateSubTree(
+		const subTreeState = this.initializeSubTree(
 			this.tree,
 			initialData instanceof EntityAccessor ||
 				initialData instanceof EntityListAccessor ||
@@ -176,7 +176,7 @@ class AccessorTreeGenerator {
 		updateDataWithEvents(subTreeState.accessor!)
 	}
 
-	private generateSubTree(
+	private initializeSubTree(
 		tree: MarkerTreeRoot,
 		data: ReceivedData<undefined> | RootAccessor,
 		updateData: (newData: RootAccessor) => void,
@@ -208,12 +208,12 @@ class AccessorTreeGenerator {
 				errorNode,
 				undefined,
 			)
-			subTreeState = this.generateEntityListAccessor(resolvedState)
+			subTreeState = this.initializeEntityListAccessor(resolvedState)
 		} else {
 			const existingState = this.treeRootStates.get(tree) as InternalEntityState
 			const id = this.resolveOrCreateEntityId(data)
 			const resolvedState = this.resolveOrCreateEntityState(id, existingState, tree.fields, onUpdate, data, errorNode)
-			subTreeState = this.generateEntityAccessor(resolvedState, tree.fields)
+			subTreeState = this.initializeEntityAccessor(resolvedState, tree.fields)
 		}
 		this.treeRootStates.set(tree, subTreeState)
 
@@ -299,7 +299,7 @@ class AccessorTreeGenerator {
 				const identifier = field.subTreeIdentifier ?? field.id
 				const onThisSubTreeUpdate = (newRoot: RootAccessor) => onSubTreeUpdate(identifier, newRoot)
 
-				entityState.subTrees.set(identifier, this.generateSubTree(field, initialData, onThisSubTreeUpdate, undefined))
+				entityState.subTrees.set(identifier, this.initializeSubTree(field, initialData, onThisSubTreeUpdate, undefined))
 			} else if (field instanceof ReferenceMarker) {
 				for (const referencePlaceholder in field.references) {
 					const reference = field.references[referencePlaceholder]
@@ -332,7 +332,7 @@ class AccessorTreeGenerator {
 							)
 						} else if (fieldDatum === null || typeof fieldDatum === 'object' || fieldDatum === undefined) {
 							const entityId = this.resolveOrCreateEntityId(fieldDatum || undefined)
-							const referenceEntityState = this.generateEntityAccessor(
+							const referenceEntityState = this.initializeEntityAccessor(
 								this.resolveOrCreateEntityState(
 									entityId,
 									this.getExistingEntityState(entityId),
@@ -360,7 +360,7 @@ class AccessorTreeGenerator {
 								referenceError,
 								reference.preferences,
 							)
-							entityState.fields.set(referencePlaceholder, this.generateEntityListAccessor(referenceEntityListState))
+							entityState.fields.set(referencePlaceholder, this.initializeEntityListAccessor(referenceEntityListState))
 						} else if (typeof fieldDatum === 'object') {
 							// Intentionally allowing `fieldDatum === null` here as well since this should only happen when a *hasOne
 							// relation is unlinked, e.g. a Person does not have a linked Nationality.
@@ -407,7 +407,7 @@ class AccessorTreeGenerator {
 						field.fieldName in entityState.errors.children
 							? entityState.errors.children[field.fieldName].errors
 							: emptyArray
-					const fieldState = this.generateFieldAccessor(
+					const fieldState = this.initializeFieldAccessor(
 						this.resolveOrCreateFieldState(
 							placeholderName,
 							entityState.fields.get(placeholderName) as InternalFieldState | undefined,
@@ -442,7 +442,7 @@ class AccessorTreeGenerator {
 		)
 	}
 
-	private generateEntityAccessor(entityState: InternalEntityState, markers: EntityFieldMarkers): InternalEntityState {
+	private initializeEntityAccessor(entityState: InternalEntityState, markers: EntityFieldMarkers): InternalEntityState {
 		const performUpdate = () => {
 			entityState.hasPendingUpdate = true
 			this.treeWideBatchUpdateDepth++
@@ -598,7 +598,7 @@ class AccessorTreeGenerator {
 		return entityState
 	}
 
-	private generateEntityListAccessor(entityListState: InternalEntityListState): InternalEntityListState {
+	private initializeEntityListAccessor(entityListState: InternalEntityListState): InternalEntityListState {
 		if (entityListState.errors && entityListState.errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 			throw new BindingError(
 				`The error tree structure does not correspond to the marker tree. This should never happen.`,
@@ -693,7 +693,7 @@ class AccessorTreeGenerator {
 
 			const onUpdate = (newValue: EntityAccessor.NestedAccessor | null) => onUpdateProxy(key, newValue)
 
-			const entityState = this.generateEntityAccessor(
+			const entityState = this.initializeEntityAccessor(
 				this.resolveOrCreateEntityState(
 					id,
 					this.getExistingEntityState(id),
@@ -747,7 +747,7 @@ class AccessorTreeGenerator {
 		return entityListState
 	}
 
-	private generateFieldAccessor(fieldState: InternalFieldState): InternalFieldState {
+	private initializeFieldAccessor(fieldState: InternalFieldState): InternalFieldState {
 		const isTouchedBy = (agent: string) =>
 			fieldState.touchLog === undefined ? false : fieldState.touchLog.get(agent) || false
 		const createNewInstance = (value: FieldValue) =>

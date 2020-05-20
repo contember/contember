@@ -5,6 +5,7 @@ import { Compiler } from './Compiler'
 import { QueryBuilder } from './QueryBuilder'
 import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>>
 	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
@@ -20,8 +21,8 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 		}) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
 	}
 
-	with(alias: string, expression: With.Expression): DeleteBuilder.DeleteBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
+	with(alias: string, expression: SubQueryExpression): DeleteBuilder.DeleteBuilderState<Result, Filled | 'with'> {
+		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression)))
 	}
 
 	public from(tableName: string): DeleteBuilder.DeleteBuilderState<Result, Filled | 'from'> {

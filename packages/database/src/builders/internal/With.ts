@@ -1,14 +1,11 @@
 import { wrapIdentifier } from '../../utils'
 import { Literal } from '../../Literal'
-import { QueryBuilder } from '../QueryBuilder'
-import { SelectBuilder } from '../SelectBuilder'
 import { Compiler } from '../Compiler'
-
-type LiteralFactory = (context: Compiler.Context) => Literal
+import { SubQueryExpression, SubQueryLiteralFactory } from './Subqueries'
 
 namespace With {
 	export class Statement {
-		constructor(public readonly ctes: { [alias: string]: LiteralFactory }) {}
+		constructor(public readonly ctes: { [alias: string]: SubQueryLiteralFactory }) {}
 
 		public compile(context: Compiler.Context): [Literal, Compiler.Context] {
 			const ctes = Object.entries(this.ctes)
@@ -26,7 +23,7 @@ namespace With {
 			return [literal, context]
 		}
 
-		public withCte(alias: string, expression: LiteralFactory): Statement {
+		public withCte(alias: string, expression: SubQueryLiteralFactory): Statement {
 			return new Statement({ ...this.ctes, [alias]: expression })
 		}
 
@@ -43,20 +40,8 @@ namespace With {
 		with: Statement
 	}
 
-	export type Expression = SelectBuilder.Callback | Literal | QueryBuilder
-
 	export interface Aware {
-		with(alias: string, expression: Expression): any
-	}
-
-	export function createLiteral(expr: Expression): LiteralFactory {
-		if (typeof expr === 'function') {
-			return ctx => expr(SelectBuilder.create()).createQuery(ctx)
-		} else if (((expr: any): expr is QueryBuilder => 'createQuery' in expr)(expr)) {
-			return ctx => expr.createQuery(ctx)
-		} else {
-			return () => expr
-		}
+		with(alias: string, expression: SubQueryExpression): any
 	}
 }
 

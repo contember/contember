@@ -8,6 +8,7 @@ import { Literal } from '../Literal'
 import { ConditionBuilder, ConditionCallback } from './ConditionBuilder'
 import { LockType } from './LockType'
 import { columnExpressionToLiteral, toFqnWrap } from './utils'
+import { createSubQueryLiteralFactory, SubQueryExpression, SubQueryLiteralFactory } from './internal/Subqueries'
 
 export type SelectBuilderSpecification<OutputOptions extends keyof SelectBuilder.Options> = <
 	Result,
@@ -37,8 +38,15 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 		})
 	}
 
-	public with(alias: string, expression: With.Expression): SelectBuilder<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
+	public with(alias: string, expression: SubQueryExpression): SelectBuilder<Result, Filled | 'with'> {
+		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression)))
+	}
+
+	public unionAll(expression: SubQueryExpression): SelectBuilder<Result, Filled | 'union'> {
+		return this.withOption('union', {
+			type: 'all',
+			literal: createSubQueryLiteralFactory(expression),
+		})
 	}
 
 	public from(tableName: string | Literal, alias?: string): SelectBuilder<Result, Filled | 'from'> {
@@ -180,6 +188,10 @@ namespace SelectBuilder {
 				}
 				lock?: LockType
 				meta: Record<string, any>
+				union?: {
+					type: 'all' | 'distinct'
+					literal: SubQueryLiteralFactory
+				}
 			}
 	>
 

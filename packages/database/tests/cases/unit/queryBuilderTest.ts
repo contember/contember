@@ -145,8 +145,8 @@ describe('query builder', () => {
 				await builder.execute(wrapper)
 			},
 			sql: SQL`
-				with "root_" as (select ? :: text as "title", ? :: int as "id", ? :: text as "content") 
-				insert into "public"."author" ("id", "title") 
+				with "root_" as (select ? :: text as "title", ? :: int as "id", ? :: text as "content")
+				insert into "public"."author" ("id", "title")
 					select "id", "title" from "root_"
         on conflict do nothing returning "id"`,
 			parameters: ['Hello', 1, null],
@@ -284,10 +284,10 @@ describe('query builder', () => {
 					.returning('xyz')
 				await qb.execute(wrapper)
 			},
-			sql: SQL`with "data" as 
-			(select * from "public"."abc") 
-			delete from "public"."bar" 
-			using "data" as "data" 
+			sql: SQL`with "data" as
+			(select * from "public"."abc")
+			delete from "public"."bar"
+			using "data" as "data"
 			where "data"."a" >= ? returning "xyz"`,
 			parameters: [1],
 		})
@@ -329,10 +329,10 @@ describe('query builder', () => {
 					3,
 				).getResult(qb, wrapper)
 			},
-			sql: SQL`with "data" as 
-			(select "foo"."bar", 
-				 row_number() over(partition by "foo"."lorem" order by "foo"."ipsum" asc) as "rowNumber_" 
-			 from "public"."foo" order by "foo"."ipsum" asc) 
+			sql: SQL`with "data" as
+			(select "foo"."bar",
+				 row_number() over(partition by "foo"."lorem" order by "foo"."ipsum" asc) as "rowNumber_"
+			 from "public"."foo" order by "foo"."ipsum" asc)
 			select "data".* from "data" where "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?`,
 			parameters: [1, 4],
 		})
@@ -350,6 +350,22 @@ describe('query builder', () => {
 				await qb.getResult(wrapper)
 			},
 			sql: SQL`select "id" from "public"."foo" for no key update`,
+			parameters: [],
+		})
+	})
+
+	it('select union', async () => {
+		await execute({
+			query: async wrapper => {
+				const qb = wrapper
+					.selectBuilder()
+					.select('id')
+					.from('foo')
+					.unionAll(qb => qb.select('id').from('bar'))
+
+				await qb.getResult(wrapper)
+			},
+			sql: SQL`select "id" from "public"."foo" union all ( select "id" from "public"."bar")`,
 			parameters: [],
 		})
 	})

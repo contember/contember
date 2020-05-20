@@ -7,6 +7,7 @@ import { Literal } from '../Literal'
 import { SelectBuilder } from './SelectBuilder'
 import { resolveValues } from './utils'
 import { ConflictActionType } from './ConflictActionType'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends keyof InsertBuilder<Result, never>>
 	implements With.Aware, QueryBuilder {
@@ -23,8 +24,11 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult, Filled extends ke
 		}) as InsertBuilder.InsertBuilderState<InsertBuilder.AffectedRows, never>
 	}
 
-	public with(alias: string, expression: With.Expression): InsertBuilder.InsertBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
+	public with(
+		alias: string,
+		expression: SubQueryExpression,
+	): InsertBuilder.InsertBuilderState<Result, Filled | 'with'> {
+		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression)))
 	}
 
 	public into(intoTable: string): InsertBuilder.InsertBuilderState<Result, Filled | 'into'> {

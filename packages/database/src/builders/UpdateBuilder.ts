@@ -7,6 +7,7 @@ import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
 import { SelectBuilder } from './SelectBuilder'
 import { resolveValues } from './utils'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
 class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends keyof UpdateBuilder<Result, never>>
 	implements With.Aware, Where.Aware, QueryBuilder {
@@ -23,8 +24,11 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		}) as UpdateBuilder.UpdateBuilderState<UpdateBuilder.AffectedRows, never>
 	}
 
-	public with(alias: string, expression: With.Expression): UpdateBuilder.UpdateBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
+	public with(
+		alias: string,
+		expression: SubQueryExpression,
+	): UpdateBuilder.UpdateBuilderState<Result, Filled | 'with'> {
+		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression)))
 	}
 
 	public table(name: string): UpdateBuilder.UpdateBuilderState<Result, Filled | 'table'> {

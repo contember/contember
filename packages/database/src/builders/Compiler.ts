@@ -20,6 +20,7 @@ class Compiler {
 				.append(this.compileJoin(options.join, namespaceContextFinal))
 				.append(options.where.compile())
 				.append(this.compileGrouping(options.grouping))
+				.append(this.compileUnion(options.union, namespaceContextFinal))
 				.append(this.compileOrderBy(options.orderBy))
 				.append(this.compileLimit(options.limit))
 				.append(this.compileLock(options.lock)),
@@ -117,6 +118,13 @@ class Compiler {
 			return Literal.empty
 		}
 		return new Literal(' group by ').appendAll(grouping.groupingElement, ', ')
+	}
+
+	private compileUnion(grouping: SelectBuilder.Options['union'], namespaceContext: Compiler.Context): Literal {
+		if (!grouping) {
+			return Literal.empty
+		}
+		return new Literal(` union ${grouping.type} (`).append(grouping.literal(namespaceContext)).appendString(')')
 	}
 
 	private compileLock(lock?: SelectBuilder.Options['lock']): Literal {

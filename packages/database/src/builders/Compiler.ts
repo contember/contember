@@ -179,8 +179,10 @@ class Compiler {
 		if (!fromExpr) {
 			return Literal.empty
 		}
-		const [from, alias] = fromExpr
-		return new Literal(' from ').append(aliasLiteral(this.prependSchema(from, namespaceContext), alias))
+		return new Literal(' from ').appendAll(
+			fromExpr.map(([from, alias]) => aliasLiteral(this.prependSchema(from, namespaceContext), alias)),
+			', ',
+		)
 	}
 
 	private compileIntoStatement(

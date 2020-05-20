@@ -369,4 +369,36 @@ describe('query builder', () => {
 			parameters: [],
 		})
 	})
+
+	it('select with recursive', async () => {
+		await execute({
+			query: async wrapper => {
+				const qb = wrapper
+					.selectBuilder()
+					.withRecursive('recent_events', qb =>
+						qb
+							.select('id')
+							.from('events')
+							.where({ id: '123' })
+							.unionAll(qb =>
+								qb
+									.select('id')
+									.from('events')
+									.from('recent_events')
+									.where(expr => expr.columnsEq(['events', 'id'], ['recent_events', 'previous_id'])),
+							),
+					)
+					.select('id')
+					.from('recent_events')
+
+				await qb.getResult(wrapper)
+			},
+			sql: SQL`
+			with recursive
+     			"recent_events" as (select "id" from "public"."events" where "id" = ?
+					union all ( select "id" from "public"."events", "recent_events" where "events"."id" = "recent_events"."previous_id"))
+			select "id" from "recent_events"`,
+			parameters: ['123'],
+		})
+	})
 })

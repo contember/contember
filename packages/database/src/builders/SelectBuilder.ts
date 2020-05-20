@@ -39,7 +39,18 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	}
 
 	public with(alias: string, expression: SubQueryExpression): SelectBuilder<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression)))
+		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression), false))
+	}
+
+	public withRecursive(
+		alias: string,
+		expression: SubQueryExpression,
+		columns?: string[],
+	): SelectBuilder<Result, Filled | 'with'> {
+		return this.withOption(
+			'with',
+			this.options.with.withCte(alias, createSubQueryLiteralFactory(expression), true, columns),
+		)
 	}
 
 	public unionAll(expression: SubQueryExpression): SelectBuilder<Result, Filled | 'union'> {
@@ -50,7 +61,7 @@ class SelectBuilder<Result = SelectBuilder.Result, Filled extends keyof SelectBu
 	}
 
 	public from(tableName: string | Literal, alias?: string): SelectBuilder<Result, Filled | 'from'> {
-		return this.withOption('from', [tableName, alias])
+		return this.withOption('from', [...(this.options.from || []), [tableName, alias]])
 	}
 
 	public select(columnName: QueryBuilder.ColumnIdentifier, alias?: string): SelectBuilder<Result, Filled | 'select'>
@@ -175,7 +186,7 @@ namespace SelectBuilder {
 			Where.Options & {
 				select: Literal[]
 				limit: undefined | [number, number]
-				from: undefined | [Literal | string, string | undefined]
+				from: undefined | [Literal | string, string | undefined][]
 				orderBy: [Literal, 'asc' | 'desc'][]
 				join: {
 					type: 'inner' | 'left'

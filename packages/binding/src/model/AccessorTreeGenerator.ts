@@ -45,11 +45,22 @@ const BEFORE_UPDATE_SETTLE_LIMIT = 20
 type InternalRootStateNode = InternalEntityState | InternalEntityListState
 type InternalStateNode = InternalEntityState | InternalEntityListState | InternalFieldState
 
+// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
+// completely different contexts. Even with different fields.
+interface EntityRealm {
+	depth: number
+	onUpdate: OnEntityUpdate
+}
+
+interface InternalContainerState {
+	batchUpdateDepth: number
+	hasPendingUpdate: boolean
+}
+
 type OnEntityUpdate = (accessor: EntityAccessor | EntityForRemovalAccessor | null) => void
-interface InternalEntityState {
+interface InternalEntityState extends InternalContainerState {
 	accessor: EntityAccessor | EntityForRemovalAccessor | null
 	addEventListener: AddEntityEventListener
-	batchUpdateDepth: number
 	dirtyChildFields: Set<FieldName> | undefined
 	dirtySubTrees: Set<SubTreeIdentifier> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
@@ -57,21 +68,16 @@ interface InternalEntityState {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
 	fields: Map<FieldName, InternalStateNode>
-	hasPendingUpdate: boolean
 	id: string | EntityAccessor.UnpersistedEntityId
 	persistedData: AccessorTreeGenerator.InitialEntityData
-
-	// Entity realms solve the fact that a single particular entity may appear several times throughout the tree in
-	// completely different contexts. Even with different fields.
-	realms: Map<EntityFieldMarkers, OnEntityUpdate>
+	realms: Map<EntityFieldMarkers, EntityRealm>
 	subTrees: Map<SubTreeIdentifier, InternalRootStateNode> | undefined
 }
 
 type OnEntityListUpdate = (accessor: EntityListAccessor) => void
-interface InternalEntityListState {
+interface InternalEntityListState extends InternalContainerState {
 	accessor: EntityListAccessor
 	addEventListener: AddEntityListEventListener
-	batchUpdateDepth: number
 	childIds: Set<string>
 	dirtyChildIds: Set<string> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
@@ -81,7 +87,6 @@ interface InternalEntityListState {
 			| undefined
 	}
 	fieldMarkers: EntityFieldMarkers
-	hasPendingUpdate: boolean
 	initialData: ReceivedEntityData<undefined>[] | Array<EntityAccessor | EntityForRemovalAccessor>
 	onUpdate: OnEntityListUpdate
 	preferences: ReferenceMarker.ReferencePreferences
@@ -448,7 +453,7 @@ class AccessorTreeGenerator {
 			this.treeWideBatchUpdateDepth++
 			const realmCount = entityState.realms.size
 			let i = 1
-			for (const [, onUpdate] of entityState.realms) {
+			for (const [, { onUpdate }] of entityState.realms) {
 				if (i++ === realmCount) {
 					this.treeWideBatchUpdateDepth--
 				}
@@ -888,7 +893,15 @@ class AccessorTreeGenerator {
 				hasPendingUpdate: true,
 				id,
 				persistedData,
-				realms: new Map([[fieldMarkers, onUpdate]]),
+				realms: new Map([
+					[
+						fieldMarkers,
+						{
+							depth: 0, // TODO
+							onUpdate,
+						},
+					],
+				]),
 				subTrees: undefined,
 			}
 			entityState.addEventListener = this.getAddEventListener(entityState)
@@ -901,7 +914,10 @@ class AccessorTreeGenerator {
 		existingState.hasPendingUpdate = true
 		existingState.errors = errors
 		existingState.persistedData = persistedData
-		existingState.realms.set(fieldMarkers, onUpdate)
+		existingState.realms.set(fieldMarkers, {
+			depth: 0, // TODO
+			onUpdate,
+		})
 
 		if (existingState.dirtyChildFields === undefined) {
 			existingState.dirtyChildFields = new Set(existingState.fields.keys())

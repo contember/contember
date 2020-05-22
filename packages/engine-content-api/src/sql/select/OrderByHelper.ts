@@ -1,6 +1,6 @@
-import ObjectNode from '../../graphQlResolver/ObjectNode'
 import { Input } from '@contember/schema'
 import Model from '@contember/schema/dist/src/schema/model'
+import { ObjectNode } from '../../inputProcessing'
 
 export class OrderByHelper {
 	public static appendDefaultOrderBy(

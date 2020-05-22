@@ -5,7 +5,7 @@ export interface IgnoreIndex {
 	[key: string]: any
 }
 
-export default interface Resolver extends IResolvers {
+export interface Resolver extends IResolvers {
 	Query: Schema.QueryResolvers & IgnoreIndex
 	Mutation: Schema.MutationResolvers & IgnoreIndex
 }

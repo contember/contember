@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
 	{ [P in K]-?: NonNullable<T[P]> }
@@ -9,39 +9,37 @@ export type Scalars = {
 	Boolean: boolean
 	Int: number
 	Float: number
+	DateTime: Date
 }
 
 export type CreateEvent = Event & {
 	readonly __typename?: 'CreateEvent'
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
-	readonly type?: Maybe<EventType>
+	readonly type: EventType
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
-	readonly entity: Scalars['String']
-	readonly rowId: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
 }
 
 export type DeleteEvent = Event & {
 	readonly __typename?: 'DeleteEvent'
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
-	readonly type?: Maybe<EventType>
+	readonly type: EventType
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
-	readonly entity: Scalars['String']
-	readonly rowId: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
 }
 
 export enum DiffErrorCode {
-	BaseNotFound = 'BASE_NOT_FOUND',
-	HeadNotFound = 'HEAD_NOT_FOUND',
+	StageNotFound = 'STAGE_NOT_FOUND',
+	MissingBase = 'MISSING_BASE',
 	NotRebased = 'NOT_REBASED',
-}
-
-export type DiffFilter = {
-	readonly entity: Scalars['String']
-	readonly id: Scalars['String']
 }
 
 export type DiffResponse = {
@@ -60,10 +58,13 @@ export type DiffResult = {
 
 export type Event = {
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityDescription: Scalars['String']
+	readonly identityId: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
-	readonly type?: Maybe<EventType>
+	readonly createdAt: Scalars['DateTime']
+	readonly type: EventType
 }
 
 export enum EventType {
@@ -71,6 +72,27 @@ export enum EventType {
 	Delete = 'DELETE',
 	Create = 'CREATE',
 	RunMigration = 'RUN_MIGRATION',
+}
+
+export enum HistoryErrorCode {
+	StageNotFound = 'STAGE_NOT_FOUND',
+}
+
+export type HistoryFilter = {
+	readonly entity: Scalars['String']
+	readonly id: Scalars['String']
+}
+
+export type HistoryResponse = {
+	readonly __typename?: 'HistoryResponse'
+	readonly ok?: Maybe<Scalars['Boolean']>
+	readonly errors: ReadonlyArray<HistoryErrorCode>
+	readonly result?: Maybe<HistoryResult>
+}
+
+export type HistoryResult = {
+	readonly __typename?: 'HistoryResult'
+	readonly events: ReadonlyArray<Event>
 }
 
 export type MigrateError = {
@@ -116,6 +138,7 @@ export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly migrate: MigrateResponse
 	readonly release: ReleaseResponse
+	readonly releaseTree: ReleaseTreeResponse
 	readonly rebaseAll: RebaseAllResponse
 }
 
@@ -124,21 +147,30 @@ export type MutationMigrateArgs = {
 }
 
 export type MutationReleaseArgs = {
-	baseStage: Scalars['String']
-	headStage: Scalars['String']
+	stage: Scalars['String']
 	events: ReadonlyArray<Scalars['String']>
+}
+
+export type MutationReleaseTreeArgs = {
+	stage: Scalars['String']
+	tree: ReadonlyArray<TreeFilter>
 }
 
 export type Query = {
 	readonly __typename?: 'Query'
 	readonly stages: ReadonlyArray<Stage>
 	readonly diff: DiffResponse
+	readonly history: HistoryResponse
 }
 
 export type QueryDiffArgs = {
-	baseStage: Scalars['String']
-	headStage: Scalars['String']
-	filter?: Maybe<ReadonlyArray<DiffFilter>>
+	stage: Scalars['String']
+	filter?: Maybe<ReadonlyArray<TreeFilter>>
+}
+
+export type QueryHistoryArgs = {
+	stage: Scalars['String']
+	filter?: Maybe<ReadonlyArray<HistoryFilter>>
 }
 
 export type RebaseAllResponse = {
@@ -148,6 +180,8 @@ export type RebaseAllResponse = {
 
 /** === release === */
 export enum ReleaseErrorCode {
+	StageNotFound = 'STAGE_NOT_FOUND',
+	MissingBase = 'MISSING_BASE',
 	MissingDependency = 'MISSING_DEPENDENCY',
 	Forbidden = 'FORBIDDEN',
 }
@@ -158,14 +192,29 @@ export type ReleaseResponse = {
 	readonly errors: ReadonlyArray<ReleaseErrorCode>
 }
 
+export enum ReleaseTreeErrorCode {
+	StageNotFound = 'STAGE_NOT_FOUND',
+	MissingBase = 'MISSING_BASE',
+	Forbidden = 'FORBIDDEN',
+	NotRebased = 'NOT_REBASED',
+}
+
+export type ReleaseTreeResponse = {
+	readonly __typename?: 'ReleaseTreeResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<ReleaseTreeErrorCode>
+}
+
 export type RunMigrationEvent = Event & {
 	readonly __typename?: 'RunMigrationEvent'
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
-	readonly type?: Maybe<EventType>
+	readonly type: EventType
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
-	readonly version: Scalars['String']
+	readonly createdAt: Scalars['DateTime']
 }
 
 export type Stage = {
@@ -175,16 +224,28 @@ export type Stage = {
 	readonly slug: Scalars['String']
 }
 
+/** === tree filter == */
+export type TreeFilter = {
+	readonly entity: Scalars['String']
+	readonly relations?: Maybe<ReadonlyArray<TreeFilterRelation>>
+	readonly id: Scalars['String']
+}
+
+export type TreeFilterRelation = {
+	readonly name: Scalars['String']
+	readonly relations: ReadonlyArray<TreeFilterRelation>
+}
+
 export type UpdateEvent = Event & {
 	readonly __typename?: 'UpdateEvent'
 	readonly id: Scalars['String']
+	readonly transactionId: Scalars['String']
+	readonly identityId: Scalars['String']
+	readonly identityDescription: Scalars['String']
 	readonly dependencies: ReadonlyArray<Scalars['String']>
-	readonly type?: Maybe<EventType>
+	readonly type: EventType
 	readonly description: Scalars['String']
-	readonly allowed: Scalars['Boolean']
-	readonly entity: Scalars['String']
-	readonly rowId: Scalars['String']
-	readonly fields: ReadonlyArray<Scalars['String']>
+	readonly createdAt: Scalars['DateTime']
 }
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
@@ -260,13 +321,19 @@ export type ResolversTypes = {
 	Query: ResolverTypeWrapper<{}>
 	Stage: ResolverTypeWrapper<Stage>
 	String: ResolverTypeWrapper<Scalars['String']>
-	DiffFilter: DiffFilter
+	TreeFilter: TreeFilter
+	TreeFilterRelation: TreeFilterRelation
 	DiffResponse: ResolverTypeWrapper<DiffResponse>
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	DiffErrorCode: DiffErrorCode
 	DiffResult: ResolverTypeWrapper<DiffResult>
 	Event: ResolverTypeWrapper<Event>
+	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
 	EventType: EventType
+	HistoryFilter: HistoryFilter
+	HistoryResponse: ResolverTypeWrapper<HistoryResponse>
+	HistoryErrorCode: HistoryErrorCode
+	HistoryResult: ResolverTypeWrapper<HistoryResult>
 	Mutation: ResolverTypeWrapper<{}>
 	Migration: Migration
 	Int: ResolverTypeWrapper<Scalars['Int']>
@@ -277,6 +344,8 @@ export type ResolversTypes = {
 	MigrateResult: ResolverTypeWrapper<MigrateResult>
 	ReleaseResponse: ResolverTypeWrapper<ReleaseResponse>
 	ReleaseErrorCode: ReleaseErrorCode
+	ReleaseTreeResponse: ResolverTypeWrapper<ReleaseTreeResponse>
+	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: ResolverTypeWrapper<RebaseAllResponse>
 	UpdateEvent: ResolverTypeWrapper<UpdateEvent>
 	DeleteEvent: ResolverTypeWrapper<DeleteEvent>
@@ -289,13 +358,19 @@ export type ResolversParentTypes = {
 	Query: {}
 	Stage: Stage
 	String: Scalars['String']
-	DiffFilter: DiffFilter
+	TreeFilter: TreeFilter
+	TreeFilterRelation: TreeFilterRelation
 	DiffResponse: DiffResponse
 	Boolean: Scalars['Boolean']
 	DiffErrorCode: DiffErrorCode
 	DiffResult: DiffResult
 	Event: Event
+	DateTime: Scalars['DateTime']
 	EventType: EventType
+	HistoryFilter: HistoryFilter
+	HistoryResponse: HistoryResponse
+	HistoryErrorCode: HistoryErrorCode
+	HistoryResult: HistoryResult
 	Mutation: {}
 	Migration: Migration
 	Int: Scalars['Int']
@@ -306,6 +381,8 @@ export type ResolversParentTypes = {
 	MigrateResult: MigrateResult
 	ReleaseResponse: ReleaseResponse
 	ReleaseErrorCode: ReleaseErrorCode
+	ReleaseTreeResponse: ReleaseTreeResponse
+	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: RebaseAllResponse
 	UpdateEvent: UpdateEvent
 	DeleteEvent: DeleteEvent
@@ -318,13 +395,18 @@ export type CreateEventResolvers<
 	ParentType extends ResolversParentTypes['CreateEvent'] = ResolversParentTypes['CreateEvent']
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+	name: 'DateTime'
 }
 
 export type DeleteEventResolvers<
@@ -332,12 +414,13 @@ export type DeleteEventResolvers<
 	ParentType extends ResolversParentTypes['DeleteEvent'] = ResolversParentTypes['DeleteEvent']
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
@@ -371,10 +454,31 @@ export type EventResolvers<
 		ContextType
 	>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
+}
+
+export type HistoryResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['HistoryResponse'] = ResolversParentTypes['HistoryResponse']
+> = {
+	ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['HistoryErrorCode']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['HistoryResult']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
+export type HistoryResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['HistoryResult'] = ResolversParentTypes['HistoryResult']
+> = {
+	events?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type MigrateErrorResolvers<
@@ -419,7 +523,13 @@ export type MutationResolvers<
 		ResolversTypes['ReleaseResponse'],
 		ParentType,
 		ContextType,
-		RequireFields<MutationReleaseArgs, 'baseStage' | 'headStage' | 'events'>
+		RequireFields<MutationReleaseArgs, 'stage' | 'events'>
+	>
+	releaseTree?: Resolver<
+		ResolversTypes['ReleaseTreeResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<MutationReleaseTreeArgs, 'stage' | 'tree'>
 	>
 	rebaseAll?: Resolver<ResolversTypes['RebaseAllResponse'], ParentType, ContextType>
 }
@@ -429,11 +539,12 @@ export type QueryResolvers<
 	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = {
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
-	diff?: Resolver<
-		ResolversTypes['DiffResponse'],
+	diff?: Resolver<ResolversTypes['DiffResponse'], ParentType, ContextType, RequireFields<QueryDiffArgs, 'stage'>>
+	history?: Resolver<
+		ResolversTypes['HistoryResponse'],
 		ParentType,
 		ContextType,
-		RequireFields<QueryDiffArgs, 'baseStage' | 'headStage'>
+		RequireFields<QueryHistoryArgs, 'stage'>
 	>
 }
 
@@ -454,16 +565,27 @@ export type ReleaseResponseResolvers<
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
+export type ReleaseTreeResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ReleaseTreeResponse'] = ResolversParentTypes['ReleaseTreeResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['ReleaseTreeErrorCode']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
 export type RunMigrationEventResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['RunMigrationEvent'] = ResolversParentTypes['RunMigrationEvent']
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
@@ -482,22 +604,25 @@ export type UpdateEventResolvers<
 	ParentType extends ResolversParentTypes['UpdateEvent'] = ResolversParentTypes['UpdateEvent']
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	dependencies?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<Maybe<ResolversTypes['EventType']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	allowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	entity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	rowId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	fields?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	__isTypeOf?: isTypeOfResolverFn<ParentType>
 }
 
 export type Resolvers<ContextType = any> = {
 	CreateEvent?: CreateEventResolvers<ContextType>
+	DateTime?: GraphQLScalarType
 	DeleteEvent?: DeleteEventResolvers<ContextType>
 	DiffResponse?: DiffResponseResolvers<ContextType>
 	DiffResult?: DiffResultResolvers<ContextType>
 	Event?: EventResolvers
+	HistoryResponse?: HistoryResponseResolvers<ContextType>
+	HistoryResult?: HistoryResultResolvers<ContextType>
 	MigrateError?: MigrateErrorResolvers<ContextType>
 	MigrateResponse?: MigrateResponseResolvers<ContextType>
 	MigrateResult?: MigrateResultResolvers<ContextType>
@@ -505,6 +630,7 @@ export type Resolvers<ContextType = any> = {
 	Query?: QueryResolvers<ContextType>
 	RebaseAllResponse?: RebaseAllResponseResolvers<ContextType>
 	ReleaseResponse?: ReleaseResponseResolvers<ContextType>
+	ReleaseTreeResponse?: ReleaseTreeResponseResolvers<ContextType>
 	RunMigrationEvent?: RunMigrationEventResolvers<ContextType>
 	Stage?: StageResolvers<ContextType>
 	UpdateEvent?: UpdateEventResolvers<ContextType>

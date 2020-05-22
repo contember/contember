@@ -1,12 +1,10 @@
 import { Input, Model } from '@contember/schema'
 import { getColumnName } from '@contember/schema-utils'
-import ObjectNode from '../graphQlResolver/ObjectNode'
 import SelectHydrator from './select/SelectHydrator'
 import Path from './select/Path'
 import * as database from '@contember/database'
 import { Client, SelectBuilder } from '@contember/database'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
-import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import PredicatesInjector from '../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
@@ -16,6 +14,7 @@ import { Updater } from './update/Updater'
 import { Inserter } from './insert/Inserter'
 import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select/OrderByHelper'
+import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 
 class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
@@ -61,7 +60,7 @@ class Mapper {
 		indexBy?: string,
 	): Promise<SelectHydrator.ResultObjects | SelectHydrator.IndexedResultObjects> {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = SelectBuilder.create()
+		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 		let indexByAlias: string | null = null
 		if (indexBy) {
 			const path = new Path([])
@@ -89,7 +88,7 @@ class Mapper {
 		relation: Model.JoiningColumnRelation & Model.Relation,
 	) {
 		const hydrator = new SelectHydrator()
-		let qb: SelectBuilder<SelectBuilder.Result, 'select'> = SelectBuilder.create()
+		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 		const path = new Path([])
 		const groupingKey = '__grouping_key'
 		qb = qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)
@@ -98,9 +97,9 @@ class Mapper {
 		return await hydrator.hydrateGroups(rows, groupingKey)
 	}
 
-	private async selectRows<Filled extends keyof SelectBuilder.Options>(
+	private async selectRows(
 		hydrator: SelectHydrator,
-		qb: SelectBuilder<SelectBuilder.Result, Filled>,
+		qb: SelectBuilder<SelectBuilder.Result>,
 		entity: Model.Entity,
 		input: ObjectNode<Input.ListQueryInput>,
 		groupBy?: string,
@@ -110,13 +109,9 @@ class Mapper {
 		const augmentedBuilder = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
-		const selectPromise = selector.select(
-			this,
-			entity,
-			inputWithOrder.withArg('filter', this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {})),
-			path,
-			groupBy,
-		)
+		const filterWithPredicates = this.predicatesInjector.inject(entity, inputWithOrder.args.filter || {})
+		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
+		const selectPromise = selector.select(this, entity, inputWithPredicates, path, groupBy)
 		const rows = await selector.execute(this.db)
 		await selectPromise
 

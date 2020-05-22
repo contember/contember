@@ -5,44 +5,40 @@ import { Compiler } from './Compiler'
 import { QueryBuilder } from './QueryBuilder'
 import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
-class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends keyof DeleteBuilder<Result, never>>
+class DeleteBuilder<Result extends DeleteBuilder.DeleteResult>
 	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
 	private constructor(private readonly options: DeleteBuilder.Options) {}
 
-	public static create(): DeleteBuilder.NewDeleteBuilder {
+	public static create(): DeleteBuilder<DeleteBuilder.AffectedRows> {
 		return new DeleteBuilder({
 			from: undefined,
 			with: new With.Statement({}),
 			returning: new Returning(),
 			using: {},
 			where: new Where.Statement([]),
-		}) as DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
+		})
 	}
 
-	with(alias: string, expression: With.Expression): DeleteBuilder.DeleteBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
+	with(alias: string, expression: SubQueryExpression): DeleteBuilder<Result> {
+		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression)))
 	}
 
-	public from(tableName: string): DeleteBuilder.DeleteBuilderState<Result, Filled | 'from'> {
+	public from(tableName: string): DeleteBuilder<Result> {
 		return this.withOption('from', tableName)
 	}
 
-	public where(where: Where.Expression): DeleteBuilder.DeleteBuilderState<Result, Filled | 'where'> {
+	public where(where: Where.Expression): DeleteBuilder<Result> {
 		return this.withOption('where', this.options.where.withWhere(where))
 	}
 
-	public using(tableName: string, alias?: string): DeleteBuilder.DeleteBuilderState<Result, Filled | 'using'> {
+	public using(tableName: string, alias?: string): DeleteBuilder<Result> {
 		return this.withOption('using', { ...this.options.using, [alias || tableName]: tableName })
 	}
 
-	public returning(
-		column: QueryBuilder.ColumnIdentifier | Literal,
-	): DeleteBuilder.DeleteBuilderState<Returning.Result[], Filled | 'returning'> {
-		return this.withOption('returning', new Returning(column)) as DeleteBuilder.DeleteBuilderState<
-			Returning.Result[],
-			Filled | 'returning'
-		>
+	public returning(column: QueryBuilder.ColumnIdentifier | Literal): DeleteBuilder<Returning.Result[]> {
+		return this.withOption('returning', new Returning(column)) as DeleteBuilder<Returning.Result[]>
 	}
 
 	public createQuery(context: Compiler.Context): Literal {
@@ -60,11 +56,11 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult, Filled extends ke
 	protected withOption<K extends keyof DeleteBuilder.Options, V extends DeleteBuilder.Options[K]>(
 		key: K,
 		value: V,
-	): DeleteBuilder.DeleteBuilderState<Result, Filled | K> {
-		return new DeleteBuilder<Result, Filled | K>({
+	): DeleteBuilder<Result> {
+		return new DeleteBuilder<Result>({
 			...this.options,
 			[key]: value,
-		}) as DeleteBuilder.DeleteBuilderState<Result, Filled | K>
+		}) as DeleteBuilder<Result>
 	}
 }
 
@@ -78,18 +74,6 @@ namespace DeleteBuilder {
 		using: { [alias: string]: string }
 	} & With.Options &
 		Where.Options
-
-	export type DeleteBuilderWithoutExecute<
-		Result extends DeleteResult,
-		Filled extends keyof DeleteBuilder<Result, Filled>
-	> = Pick<DeleteBuilder<Result, Filled>, Exclude<keyof DeleteBuilder<Result, Filled>, 'execute' | 'createQuery'>>
-
-	export type DeleteBuilderState<
-		Result extends DeleteResult,
-		Filled extends keyof DeleteBuilder<Result, Filled>
-	> = 'from' extends Filled ? DeleteBuilder<Result, Filled> : DeleteBuilderWithoutExecute<Result, Filled>
-
-	export type NewDeleteBuilder = DeleteBuilder.DeleteBuilderState<DeleteBuilder.AffectedRows, never>
 }
 
 export { DeleteBuilder }

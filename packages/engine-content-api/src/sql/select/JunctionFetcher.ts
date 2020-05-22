@@ -3,12 +3,11 @@ import Mapper from '../Mapper'
 import WhereBuilder from '../select/WhereBuilder'
 import { Client, Operator } from '@contember/database'
 import { Input, Model, Value } from '@contember/schema'
-import { ConditionBuilder } from '@contember/database'
 import OrderByBuilder from './OrderByBuilder'
-import ObjectNode from '../../graphQlResolver/ObjectNode'
 import PredicatesInjector from '../../acl/PredicatesInjector'
 import { LimitByGroupWrapper } from '@contember/database'
 import { SelectBuilder } from '@contember/database'
+import { ObjectNode } from '../../inputProcessing'
 
 class JunctionFetcher {
 	constructor(
@@ -28,7 +27,7 @@ class JunctionFetcher {
 		const joiningTable = relation.joiningTable
 
 		const whereColumn = column.sourceColumn.columnName
-		let qb: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create()
+		let qb = SelectBuilder.create()
 			.from(joiningTable.tableName, 'junction_')
 			.select(['junction_', joiningTable.inverseJoiningColumn.columnName])
 			.select(['junction_', joiningTable.joiningColumn.columnName])

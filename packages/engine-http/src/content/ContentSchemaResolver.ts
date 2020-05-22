@@ -1,5 +1,6 @@
 import { DatabaseContext, SchemaVersionBuilder, VersionedSchema } from '@contember/engine-system-api'
 import { Schema } from '@contember/schema'
+import { filterSchemaByStage } from '@contember/schema-utils'
 
 export class ContentSchemaResolver {
 	private schemaCache: { [stage: string]: VersionedSchema } = {}
@@ -8,7 +9,10 @@ export class ContentSchemaResolver {
 
 	public async getSchema(db: DatabaseContext, stage: string): Promise<Schema> {
 		const cachedSchema = this.schemaCache[stage]
-		const newSchema = await this.schemaVersionBuilder.buildSchemaForStage(db, stage, cachedSchema)
+		let newSchema = await this.schemaVersionBuilder.buildSchema(db, cachedSchema)
+		if (newSchema !== cachedSchema) {
+			newSchema = filterSchemaByStage(newSchema, stage)
+		}
 		this.schemaCache[stage] = newSchema
 		return newSchema
 	}

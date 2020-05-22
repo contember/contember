@@ -1,13 +1,9 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
-import { MigrateErrorCode, MigrateResponse, MutationMigrateArgs } from '../../schema'
+import { MigrateResponse, MutationMigrateArgs } from '../../schema'
 import { Migration } from '@contember/schema-migrations'
-import { ProjectScope } from '../../model/authorization/ProjectScope'
-import Actions from '../../model/authorization/Actions'
-import { ProjectConfig } from '../../types'
-import { ProjectMigrator } from '../../model/migrations'
-import { AlreadyExecutedMigrationError, MigrationError } from '../../model/migrations/ProjectMigrator'
+import { AuthorizationActions, createStageTree, MigrationError, ProjectMigrator } from '../../model'
 
 export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	constructor(private readonly projectMigrator: ProjectMigrator) {}
@@ -17,7 +13,8 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<MigrateResponse> {
-		await context.requireAccess(new ProjectScope(context.project), Actions.PROJECT_MIGRATE)
+		const rootStageSlug = createStageTree(context.project).getRoot().slug
+		await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, rootStageSlug)
 		const migrations: Migration[] = []
 		for (const { formatVersion, name, version, modifications } of args.migrations) {
 			migrations.push({

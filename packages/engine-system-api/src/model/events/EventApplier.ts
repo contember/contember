@@ -7,25 +7,45 @@ import {
 	RunMigrationEvent,
 	UpdateEvent,
 } from '@contember/engine-common'
-import { Stage } from '../dtos/Stage'
+import { Stage } from '../dtos'
 import { assertNever } from '../../utils'
-import { Client, DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'
-import { formatSchemaName } from '../helpers'
-import MigrationExecutor from '../migrations/MigrationExecutor'
+import { DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'
+import { formatSchemaName, getJunctionTables } from '../helpers'
+import { ExecutedMigrationsResolver, MigrationExecutor } from '../migrations'
 import { StageBySlugQuery } from '../queries'
-import { ExecutedMigrationsResolver } from '../migrations/ExecutedMigrationsResolver'
 import { Schema } from '@contember/schema'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { DatabaseContext } from '../database'
+import assert from 'assert'
 
-class EventApplier {
+type TablesPrimaryColumns = Record<string, string[]>
+
+const buildPrimaryMap = (primaryColumns: string[], ids: string[]): Record<string, string> => {
+	assert.equal(primaryColumns.length, ids.length)
+	return Object.fromEntries(primaryColumns.map((col, index) => [col, ids[index]]))
+}
+
+export class EventApplier {
 	constructor(
 		private readonly migrationExecutor: MigrationExecutor,
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 	) {}
 
-	public async applyEvents(db: DatabaseContext, stage: Stage, events: ContentEvent[]): Promise<void>
-	public async applyEvents(db: DatabaseContext, stage: Stage, events: AnyEvent[], schema: Schema): Promise<void>
-	public async applyEvents(db: DatabaseContext, stage: Stage, events: AnyEvent[], schema?: Schema): Promise<void> {
+	public async applyEvents(db: DatabaseContext, stage: Stage, events: AnyEvent[], schema: Schema): Promise<void> {
+		let primaryColumns: TablesPrimaryColumns = {}
+		const buildPrimaryColumns = () => {
+			primaryColumns = {}
+			for (const entity of Object.values(schema.model.entities)) {
+				primaryColumns[entity.tableName] = [entity.primaryColumn]
+			}
+			for (const junction of getJunctionTables(schema.model)) {
+				primaryColumns[junction.tableName] = [
+					junction.joiningColumn.columnName,
+					junction.inverseJoiningColumn.columnName,
+				]
+			}
+		}
+		buildPrimaryColumns()
+
 		let trxId: string | null = null
 		for (let event of events) {
 			if (event.transactionId !== trxId) {
@@ -33,54 +53,79 @@ class EventApplier {
 				await db.client.query('SET CONSTRAINTS ALL DEFERRED')
 				trxId = event.transactionId
 			}
-			if (schema) {
-				schema = await this.applyEvent(db, stage, event, schema)
-			} else {
-				await this.applyEvent(db, stage, event as ContentEvent)
+			const oldSchema = schema
+			schema = await this.applyEvent(db, stage, event, schema, primaryColumns)
+			if (schema !== oldSchema) {
+				buildPrimaryColumns()
 			}
 		}
 		await db.client.query('SET CONSTRAINTS ALL IMMEDIATE')
 	}
 
-	private async applyEvent(db: DatabaseContext, stage: Stage, event: ContentEvent): Promise<undefined>
-	private async applyEvent(db: DatabaseContext, stage: Stage, event: AnyEvent, schema: Schema): Promise<Schema>
-	private async applyEvent(db: DatabaseContext, stage: Stage, event: AnyEvent, schema?: Schema) {
+	private async applyEvent(
+		db: DatabaseContext,
+		stage: Stage,
+		event: AnyEvent,
+		schema: Schema,
+		primaryColumns: TablesPrimaryColumns,
+	): Promise<Schema> {
 		switch (event.type) {
 			case EventType.create:
-				return this.applyCreate(db, stage, event)
+				await this.applyCreate(db, stage, event, primaryColumns)
+				return schema
 			case EventType.update:
-				return this.applyUpdate(db, stage, event)
+				await this.applyUpdate(db, stage, event, primaryColumns)
+				return schema
 			case EventType.delete:
-				return this.applyDelete(db, stage, event)
+				await this.applyDelete(db, stage, event, primaryColumns)
+				return schema
 			case EventType.runMigration:
-				return this.applyRunMigration(db, schema!, stage, event)
+				return await this.applyRunMigration(db, schema!, stage, event)
 			default:
 				assertNever(event)
 		}
 	}
 
-	private async applyCreate(db: DatabaseContext, stage: Stage, event: CreateEvent): Promise<void> {
+	private async applyCreate(
+		db: DatabaseContext,
+		stage: Stage,
+		event: CreateEvent,
+		primaryColumns: TablesPrimaryColumns,
+	): Promise<void> {
+		const primary = buildPrimaryMap(primaryColumns[event.tableName], event.rowId)
 		await InsertBuilder.create()
 			.into(event.tableName)
-			.values({ ...event.values, id: event.rowId })
+			.values({ ...event.values, ...primary })
 			.execute(db.client.forSchema(formatSchemaName(stage)))
 	}
 
-	private async applyUpdate(db: DatabaseContext, stage: Stage, event: UpdateEvent): Promise<void> {
+	private async applyUpdate(
+		db: DatabaseContext,
+		stage: Stage,
+		event: UpdateEvent,
+		primaryColumns: TablesPrimaryColumns,
+	): Promise<void> {
 		if (Object.values(event.values).length === 0) {
 			return
 		}
+		const primary = buildPrimaryMap(primaryColumns[event.tableName], event.rowId)
 		await UpdateBuilder.create()
 			.table(event.tableName)
-			.where({ id: event.rowId })
+			.where(primary)
 			.values(event.values)
 			.execute(db.client.forSchema(formatSchemaName(stage)))
 	}
 
-	private async applyDelete(db: DatabaseContext, stage: Stage, event: DeleteEvent): Promise<void> {
+	private async applyDelete(
+		db: DatabaseContext,
+		stage: Stage,
+		event: DeleteEvent,
+		primaryColumns: TablesPrimaryColumns,
+	): Promise<void> {
+		const primary = buildPrimaryMap(primaryColumns[event.tableName], event.rowId)
 		await DeleteBuilder.create()
 			.from(event.tableName)
-			.where({ id: event.rowId })
+			.where(primary)
 			.execute(db.client.forSchema(formatSchemaName(stage)))
 	}
 
@@ -98,5 +143,3 @@ class EventApplier {
 		return await this.migrationExecutor.execute(db, schema, { ...stage, event_id }, migration)
 	}
 }
-
-export default EventApplier

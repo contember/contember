@@ -2,10 +2,9 @@ import { ConflictActionType, InsertBuilder, wrapIdentifier } from '@contember/da
 import { formatSchemaName } from '../helpers'
 import { InitEventQuery } from '../queries'
 import { StageConfig } from '../../types'
-import { UuidProvider } from '../../utils/uuid'
 import { Command } from './Command'
 
-class CreateOrUpdateStageCommand implements Command<boolean> {
+export class CreateOrUpdateStageCommand implements Command<boolean> {
 	constructor(private readonly stage: StageConfig) {}
 
 	public async execute({ db, providers }: Command.Args): Promise<boolean> {
@@ -30,5 +29,3 @@ class CreateOrUpdateStageCommand implements Command<boolean> {
 		return result.length === 1 && result[0] === initEvent.id
 	}
 }
-
-export default CreateOrUpdateStageCommand

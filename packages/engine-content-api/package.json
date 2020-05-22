@@ -13,7 +13,6 @@
 		"@contember/dic": "^0.8.0-alpha.0",
 		"@contember/engine-common": "^0.8.0-alpha.0",
 		"@contember/schema": "^0.8.0-alpha.0",
-		"@contember/schema-definition": "^0.8.0-alpha.0",
 		"@contember/schema-utils": "^0.8.0-alpha.0",
 		"apollo-server-core": "^2.9.1",
 		"graphql": "^14.6.0",
@@ -21,6 +20,7 @@
 	},
 	"devDependencies": {
 		"@contember/database-tester": "^0.8.0-alpha.0",
+		"@contember/schema-definition": "^0.8.0-alpha.0",
 		"@contember/engine-api-tester": "^0.8.0-alpha.0",
 		"@types/jasmine": "^3.5.10",
 		"@types/node": "^13.11.1",

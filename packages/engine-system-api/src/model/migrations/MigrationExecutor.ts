@@ -1,16 +1,14 @@
 import { EventType } from '@contember/engine-common'
-import { Client, wrapIdentifier } from '@contember/database'
+import { wrapIdentifier } from '@contember/database'
 import { Schema } from '@contember/schema'
 import { Migration, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { Stage } from '../dtos/Stage'
-import CreateEventCommand from '../commands/CreateEventCommand'
-import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import { formatSchemaName } from '../helpers/stageHelpers'
-import { UuidProvider } from '../../utils/uuid'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { Stage } from '../dtos'
+import { CreateEventCommand, UpdateStageEventCommand } from '../commands'
+import { formatSchemaName } from '../helpers'
+import { DatabaseContext } from '../database'
 
-class MigrationExecutor {
+export class MigrationExecutor {
 	constructor(private readonly modificationHandlerFactory: ModificationHandlerFactory) {}
 
 	public async execute(db: DatabaseContext, schema: Schema, stage: Stage, migration: Migration): Promise<Schema> {
@@ -48,5 +46,3 @@ class MigrationExecutor {
 		return schema
 	}
 }
-
-export default MigrationExecutor

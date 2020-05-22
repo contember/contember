@@ -2,6 +2,8 @@ import { gql } from 'apollo-server-core'
 import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
+	scalar DateTime
+
 	schema {
 		query: Query
 		mutation: Mutation
@@ -9,25 +11,57 @@ const schema: DocumentNode = gql`
 
 	type Query {
 		stages: [Stage!]!
-		diff(baseStage: String!, headStage: String!, filter: [DiffFilter!]): DiffResponse!
+		diff(stage: String!, filter: [TreeFilter!]): DiffResponse!
+		history(stage: String!, filter: [HistoryFilter!]): HistoryResponse!
 	}
 
 	type Mutation {
 		migrate(migrations: [Migration!]!): MigrateResponse!
-		release(baseStage: String!, headStage: String!, events: [String!]!): ReleaseResponse!
+		release(stage: String!, events: [String!]!): ReleaseResponse!
+		releaseTree(stage: String!, tree: [TreeFilter!]!): ReleaseTreeResponse!
 		rebaseAll: RebaseAllResponse!
 	}
 
-	# === diff ===
+	# === history filter ===
 
-	input DiffFilter {
+	input HistoryFilter {
 		entity: String!
 		id: String!
 	}
 
+	# === tree filter ==
+	input TreeFilter {
+		entity: String!
+		relations: [TreeFilterRelation!]
+		id: String!
+	}
+
+	input TreeFilterRelation {
+		name: String!
+		relations: [TreeFilterRelation!]!
+	}
+
+	# === history ===
+
+	enum HistoryErrorCode {
+		STAGE_NOT_FOUND
+	}
+
+	type HistoryResponse {
+		ok: Boolean
+		errors: [HistoryErrorCode!]!
+		result: HistoryResult
+	}
+
+	type HistoryResult {
+		events: [Event!]!
+	}
+
+	# === diff ===
+
 	enum DiffErrorCode {
-		BASE_NOT_FOUND
-		HEAD_NOT_FOUND
+		STAGE_NOT_FOUND
+		MISSING_BASE
 		NOT_REBASED
 	}
 
@@ -82,6 +116,8 @@ const schema: DocumentNode = gql`
 
 	# === release ===
 	enum ReleaseErrorCode {
+		STAGE_NOT_FOUND
+		MISSING_BASE
 		MISSING_DEPENDENCY
 		FORBIDDEN
 	}
@@ -90,7 +126,22 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 		errors: [ReleaseErrorCode!]!
 	}
-	# === release ===
+
+	# === releaseTree ===
+
+	enum ReleaseTreeErrorCode {
+		STAGE_NOT_FOUND
+		MISSING_BASE
+		FORBIDDEN
+		NOT_REBASED
+	}
+
+	type ReleaseTreeResponse {
+		ok: Boolean!
+		errors: [ReleaseTreeErrorCode!]!
+	}
+
+	# === rebase ===
 
 	type RebaseAllResponse {
 		ok: Boolean!
@@ -100,10 +151,13 @@ const schema: DocumentNode = gql`
 
 	interface Event {
 		id: String!
+		transactionId: String!
+		identityDescription: String!
+		identityId: String!
 		dependencies: [String!]!
 		description: String!
-		allowed: Boolean!
-		type: EventType
+		createdAt: DateTime!
+		type: EventType!
 	}
 
 	enum EventType {
@@ -115,42 +169,46 @@ const schema: DocumentNode = gql`
 
 	type UpdateEvent implements Event {
 		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
 		dependencies: [String!]!
-		type: EventType
+		type: EventType!
 		description: String!
-		allowed: Boolean!
-		entity: String!
-		rowId: String!
-		fields: [String!]!
+		createdAt: DateTime!
 	}
 
 	type DeleteEvent implements Event {
 		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
 		dependencies: [String!]!
-		type: EventType
+		type: EventType!
 		description: String!
-		allowed: Boolean!
-		entity: String!
-		rowId: String!
+		createdAt: DateTime!
 	}
 
 	type CreateEvent implements Event {
 		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
 		dependencies: [String!]!
-		type: EventType
+		type: EventType!
 		description: String!
-		allowed: Boolean!
-		entity: String!
-		rowId: String!
+		createdAt: DateTime!
 	}
 
 	type RunMigrationEvent implements Event {
 		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
 		dependencies: [String!]!
-		type: EventType
+		type: EventType!
 		description: String!
-		allowed: Boolean!
-		version: String!
+		createdAt: DateTime!
 	}
 
 	# === stage ===

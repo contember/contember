@@ -22,19 +22,19 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 		)
 	}
 
-	selectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result, never> {
+	selectBuilder<Result = SelectBuilder.Result>(): SelectBuilder<Result> {
 		return SelectBuilder.create<Result>()
 	}
 
-	insertBuilder(): InsertBuilder.NewInsertBuilder {
+	insertBuilder(): InsertBuilder<InsertBuilder.AffectedRows> {
 		return InsertBuilder.create()
 	}
 
-	updateBuilder(): UpdateBuilder.NewUpdateBuilder {
+	updateBuilder(): UpdateBuilder<UpdateBuilder.AffectedRows> {
 		return UpdateBuilder.create()
 	}
 
-	deleteBuilder(): DeleteBuilder.NewDeleteBuilder {
+	deleteBuilder(): DeleteBuilder<DeleteBuilder.AffectedRows> {
 		return DeleteBuilder.create()
 	}
 

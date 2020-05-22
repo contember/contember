@@ -5,6 +5,8 @@ export * from './model'
 export * from './acl'
 export * from './dataUtils'
 export * from './validation'
+export * from './schemaNormalizer'
+export * from './schemaFilter'
 
 export const emptySchema: Schema = {
 	model: emptyModelSchema,

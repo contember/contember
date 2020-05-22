@@ -1,33 +1,46 @@
 import { wrapIdentifier } from '../../utils'
 import { Literal } from '../../Literal'
-import { QueryBuilder } from '../QueryBuilder'
-import { SelectBuilder } from '../SelectBuilder'
 import { Compiler } from '../Compiler'
-
-type LiteralFactory = (context: Compiler.Context) => Literal
+import { SubQueryExpression, SubQueryLiteralFactory } from './Subqueries'
 
 namespace With {
+	type CteOptions = {
+		literalFactory: SubQueryLiteralFactory
+		recursive: boolean
+		columns?: string[]
+	}
+
 	export class Statement {
-		constructor(public readonly ctes: { [alias: string]: LiteralFactory }) {}
+		constructor(public readonly ctes: { [alias: string]: CteOptions }) {}
 
 		public compile(context: Compiler.Context): [Literal, Compiler.Context] {
 			const ctes = Object.entries(this.ctes)
+			const hasRecursive = ctes.some(([, { recursive }]) => recursive)
 			if (ctes.length === 0) {
 				return [new Literal(''), context]
 			}
-			const literal = new Literal('with ').appendAll(
-				ctes.map(([alias, expr]) => {
-					const literal = expr(context)
-					context = context.withAlias(alias)
-					return new Literal(wrapIdentifier(alias) + ' as (' + literal.sql + ')', literal.parameters)
+			if (hasRecursive) {
+				context = context.withAlias(...Object.keys(this.ctes))
+			}
+			const literal = new Literal(hasRecursive ? 'with recursive ' : 'with ').appendAll(
+				ctes.map(([alias, { literalFactory, columns }]) => {
+					const literal = literalFactory(context)
+					context = !hasRecursive ? context.withAlias(alias) : context
+					const columnsStr = columns ? '(' + columns.map(wrapIdentifier).join(', ') + ')' : ''
+					return new Literal(wrapIdentifier(alias) + columnsStr + ' as (' + literal.sql + ')', literal.parameters)
 				}),
 				', ',
 			)
 			return [literal, context]
 		}
 
-		public withCte(alias: string, expression: LiteralFactory): Statement {
-			return new Statement({ ...this.ctes, [alias]: expression })
+		public withCte(
+			alias: string,
+			literalFactory: SubQueryLiteralFactory,
+			recursive: boolean = false,
+			columns?: string[],
+		): Statement {
+			return new Statement({ ...this.ctes, [alias]: { literalFactory, recursive, columns } })
 		}
 
 		public includes(alias: string): boolean {
@@ -43,20 +56,8 @@ namespace With {
 		with: Statement
 	}
 
-	export type Expression = SelectBuilder.Callback | Literal | QueryBuilder
-
 	export interface Aware {
-		with(alias: string, expression: Expression): any
-	}
-
-	export function createLiteral(expr: Expression): LiteralFactory {
-		if (typeof expr === 'function') {
-			return ctx => expr(SelectBuilder.create()).createQuery(ctx)
-		} else if (((expr: any): expr is QueryBuilder => 'createQuery' in expr)(expr)) {
-			return ctx => expr.createQuery(ctx)
-		} else {
-			return () => expr
-		}
+		with(alias: string, expression: SubQueryExpression): any
 	}
 }
 

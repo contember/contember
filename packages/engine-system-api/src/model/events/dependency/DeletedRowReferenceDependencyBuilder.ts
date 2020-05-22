@@ -1,7 +1,9 @@
 import { ContentEvent, EventType } from '@contember/engine-common'
-import DependencyBuilder from '../DependencyBuilder'
-import TableReferencingResolver from '../TableReferencingResolver'
+import { DependencyBuilder, EventsDependencies } from '../DependencyBuilder'
+import { TableReferencingResolver, TableReferencingResolverResult } from '../TableReferencingResolver'
 import { Schema } from '@contember/schema'
+import { getJunctionTables } from '../../helpers/modelHelpers'
+import assert from 'assert'
 
 /**
  * Delete event depends on all previous events which references this row
@@ -13,23 +15,29 @@ import { Schema } from '@contember/schema'
  * A1 A2 X1
  *
  */
-class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
+export class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 	constructor(private readonly tableReferencingResolver: TableReferencingResolver) {}
 
-	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
+	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
 		if (events.length === 0) {
 			return {}
 		}
 
-		let tableReferencing: TableReferencingResolver.Result | null = null
+		const tableReferencing: TableReferencingResolverResult = this.tableReferencingResolver.getTableReferencing(
+			schema.model,
+		)
 
-		const dependencies: DependencyBuilder.Dependencies = {}
+		const dependencies: EventsDependencies = {}
 		const deletedRows: { [rowId: string]: string } = {}
+		const junctionTables = new Set(getJunctionTables(schema.model).map(it => it.tableName))
 
 		for (const event of events) {
-			if (event.type === EventType.delete) {
-				dependencies[event.id] = []
-				deletedRows[event.rowId] = event.id
+			if (!junctionTables.has(event.tableName)) {
+				assert.equal(event.rowId.length, 1)
+				if (event.type === EventType.delete) {
+					dependencies[event.id] = []
+					deletedRows[event.rowId[0]] = event.id
+				}
 			}
 		}
 
@@ -39,9 +47,6 @@ class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 			}
 
 			for (let column in event.values) {
-				if (tableReferencing === null) {
-					tableReferencing = this.tableReferencingResolver.getTableReferencing(schema.model)
-				}
 				const referencedTable = tableReferencing[event.tableName][column]
 				if (!referencedTable) {
 					continue
@@ -55,5 +60,3 @@ class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 		return dependencies
 	}
 }
-
-export default DeletedRowReferenceDependencyBuilder

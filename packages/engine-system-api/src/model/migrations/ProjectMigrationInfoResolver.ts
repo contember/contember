@@ -1,13 +1,8 @@
 import { ProjectConfig } from '../../types'
-import {
-	calculateMigrationChecksum,
-	Migration,
-	MigrationFilesManager,
-	MigrationsResolver,
-} from '@contember/schema-migrations'
+import { calculateMigrationChecksum, Migration } from '@contember/schema-migrations'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
-import { ExecutedMigration } from '../dtos/ExecutedMigration'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { ExecutedMigration } from '../dtos'
+import { DatabaseContext } from '../database'
 import { MigrationsResolverFactory } from './MigrationsResolverFactory'
 
 class ProjectMigrationInfoResolver {
@@ -85,4 +80,4 @@ namespace ProjectMigrationInfoResolver {
 	}
 }
 
-export default ProjectMigrationInfoResolver
+export { ProjectMigrationInfoResolver }

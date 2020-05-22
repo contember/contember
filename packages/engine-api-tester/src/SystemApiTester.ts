@@ -10,10 +10,13 @@ import {
 	StageBySlugQuery,
 	SystemContainer,
 	unnamedIdentity,
-	ReleaseExecutor,
+	InitEventQuery,
+	DiffQuery,
+	EventApplier,
+	UpdateStageEventCommand,
 } from '@contember/engine-system-api'
-import { project } from './project'
-import { ProjectRole } from '@contember/engine-common'
+import { ProjectRole } from '@contember/schema'
+import { AnyEvent } from '@contember/engine-common'
 
 export class SystemApiTester {
 	private readonly uuidGenerator = createUuidGenerator('a454')
@@ -21,7 +24,7 @@ export class SystemApiTester {
 	constructor(
 		private readonly db: DatabaseContext,
 		private readonly project: ProjectConfig,
-		private readonly releaseExecutor: ReleaseExecutor,
+		private readonly eventApplier: EventApplier,
 		private readonly systemSchema: GraphQLSchema,
 		private readonly systemContainer: SystemContainer,
 	) {}
@@ -32,22 +35,25 @@ export class SystemApiTester {
 		options: {
 			identity?: Identity
 			roles?: string[]
-			projectRoles?: string[]
 		} = {},
 	): Promise<any> {
 		await setupSystemVariables(this.db.client, unnamedIdentity, { uuid: this.uuidGenerator })
-		const identity =
-			options.identity || new Identity(testUuid(888), options.roles || [], options.projectRoles || [ProjectRole.ADMIN])
+		const identity = options.identity || new Identity(testUuid(888), options.roles || [ProjectRole.ADMIN])
 
-		const context = this.systemContainer.resolverContextFactory.create(this.db, this.project, identity, {})
+		const context = await this.systemContainer.resolverContextFactory.create(this.db, this.project, identity, {})
 
-		return await graphql(this.systemSchema, gql, null, context, variables)
+		const result = await graphql(this.systemSchema, gql, null, context, variables)
+		if (result.errors) {
+			throw result.errors.length === 1 ? result.errors[0] : result.errors
+		}
+
+		return result
 	}
 
-	public async diff(baseStage: string, headStage: string): Promise<Schema.DiffResult> {
+	public async diff(stage: string): Promise<Schema.DiffResult> {
 		const result = await this.querySystem(
-			GQL`query($baseStage: String!, $headStage: String!) {
-        diff(baseStage: $baseStage, headStage: $headStage) {
+			GQL`query($stage: String!) {
+        diff(stage: $stage) {
           ok
           errors
           result {
@@ -55,13 +61,12 @@ export class SystemApiTester {
               id
               dependencies
               description
-              allowed
               type
             }
           }
         }
       }`,
-			{ baseStage, headStage },
+			{ stage: stage },
 		)
 
 		if (!result.data.diff.ok) {
@@ -71,45 +76,26 @@ export class SystemApiTester {
 		return result.data.diff.result
 	}
 
-	public async releaseForward(baseStage: string, headStage: string, eventsCount?: number): Promise<void> {
-		const diff = await this.querySystem(
-			GQL`query($headStage: String!, $baseStage: String!) {
-        diff(baseStage: $baseStage, headStage: $headStage) {
-          ok
-          errors
-          result {
-            events {
-              id
-            }
-          }
-        }
-      }`,
-			{
-				headStage,
-				baseStage,
-			},
-		)
-		if (!diff.data.diff.ok) {
-			throw diff.data.diff.errors
+	public async releaseForward(headStage: string, baseStage: string, eventsCount?: number): Promise<void> {
+		const baseEvents = await this.fetchEvents(baseStage)
+		const headEvents = await this.fetchEvents(headStage)
+		if (!baseEvents.every((it, i) => headEvents[i] && it.id === headEvents[i].id)) {
+			throw new Error('cannot release forward')
 		}
+		const events = headEvents.slice(baseEvents.length, eventsCount ? baseEvents.length + eventsCount : undefined)
+		const baseStageObj = await this.db.queryHandler.fetch(new StageBySlugQuery(baseStage))
+		if (!baseStageObj) {
+			throw new Error()
+		}
+		const schema = await this.systemContainer.schemaVersionBuilder.buildSchema(this.db)
+		await this.eventApplier.applyEvents(this.db, baseStageObj, events, schema)
+		await this.db.commandBus.execute(new UpdateStageEventCommand(baseStage, events[events.length - 1].id))
+	}
 
-		const [baseStageObj, headStageObj] = await Promise.all([
-			this.db.queryHandler.fetch(new StageBySlugQuery(baseStage)),
-			this.db.queryHandler.fetch(new StageBySlugQuery(headStage)),
-		])
+	public async fetchEvents(stage: string): Promise<AnyEvent[]> {
+		const initEvent = await this.db.queryHandler.fetch(new InitEventQuery())
+		const stageHead = (await this.db.queryHandler.fetch(new StageBySlugQuery(stage)))!.event_id
 
-		await this.releaseExecutor.execute(
-			this.db,
-			this.project,
-			{
-				identity: new Identity(testUuid(666), [], [ProjectRole.ADMIN]),
-				variables: {},
-			},
-			baseStageObj!,
-			headStageObj!,
-			(diff.data.diff.result.events as any[])
-				.slice(0, eventsCount || diff.data.diff.result.events.length)
-				.map(it => it.id),
-		)
+		return await this.db.queryHandler.fetch(new DiffQuery(initEvent.id, stageHead))
 	}
 }

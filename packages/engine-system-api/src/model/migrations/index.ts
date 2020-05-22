@@ -1,1 +1,6 @@
-export { default as ProjectMigrator } from './ProjectMigrator'
+export * from './ExecutedMigrationsResolver'
+export * from './MigrationExecutor'
+export * from './MigrationsResolverFactory'
+export * from './ProjectMigrationInfoResolver'
+export * from './ProjectMigrator'
+export * from './SchemaVersionBuilder'

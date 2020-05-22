@@ -5,6 +5,8 @@ import Validation from './schema/validation'
 import Value from './schema/value'
 import Result from './schema/result'
 
+export * from './ProjectRole'
+
 type Schema = {
 	model: Model.Schema
 	acl: Acl.Schema

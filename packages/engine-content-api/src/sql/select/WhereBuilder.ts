@@ -13,8 +13,8 @@ class WhereBuilder {
 		private readonly conditionBuilder: ConditionBuilder,
 	) {}
 
-	public build<Filled extends keyof SelectBuilder.Options>(
-		qb: SelectBuilder<SelectBuilder.Result, Filled>,
+	public build(
+		qb: SelectBuilder<SelectBuilder.Result>,
 		entity: Model.Entity,
 		path: Path,
 		where: Input.Where,
@@ -23,19 +23,17 @@ class WhereBuilder {
 		return this.buildAdvanced(entity, path, where, cb => qb.where(clause => cb(clause)), allowManyJoin)
 	}
 
-	public buildAdvanced<Filled extends keyof SelectBuilder.Options>(
+	public buildAdvanced(
 		entity: Model.Entity,
 		path: Path,
 		where: Input.Where,
-		callback: (
-			clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder,
-		) => SelectBuilder<SelectBuilder.Result, Filled>,
+		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>,
 		allowManyJoin: boolean = false,
 	) {
 		const joinList: WhereBuilder.JoinDefinition[] = []
 
 		const qbWithWhere = callback(clause => this.buildInternal(clause, entity, path, where, allowManyJoin, joinList))
-		return joinList.reduce<SelectBuilder<SelectBuilder.Result, Filled | 'join'>>(
+		return joinList.reduce<SelectBuilder<SelectBuilder.Result>>(
 			(qb, { path, entity, relationName }) => this.joinBuilder.join(qb, path, entity, relationName),
 			qbWithWhere,
 		)
@@ -176,14 +174,14 @@ class WhereBuilder {
 		return conditionBuilder
 	}
 
-	private createManyHasManySubquery<Filled extends keyof SelectBuilder.Options>(
-		qb: SelectBuilder<SelectBuilder.Result, Filled>,
+	private createManyHasManySubquery(
+		qb: SelectBuilder<SelectBuilder.Result>,
 		relationWhere: Input.Where,
 		targetEntity: Model.Entity,
 		joiningTable: Model.JoiningTable,
 		fromSide: 'owner' | 'inversed',
 	) {
-		let augmentedBuilder: SelectBuilder<SelectBuilder.Result, Filled | 'select' | 'from' | 'join'> = qb
+		let augmentedBuilder: SelectBuilder<SelectBuilder.Result> = qb
 		const fromColumn =
 			fromSide === 'owner' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
 		const toColumn =

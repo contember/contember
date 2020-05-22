@@ -20,6 +20,7 @@ class Compiler {
 				.append(this.compileJoin(options.join, namespaceContextFinal))
 				.append(options.where.compile())
 				.append(this.compileGrouping(options.grouping))
+				.append(this.compileUnion(options.union, namespaceContextFinal))
 				.append(this.compileOrderBy(options.orderBy))
 				.append(this.compileLimit(options.limit))
 				.append(this.compileLock(options.lock)),
@@ -119,6 +120,13 @@ class Compiler {
 		return new Literal(' group by ').appendAll(grouping.groupingElement, ', ')
 	}
 
+	private compileUnion(grouping: SelectBuilder.Options['union'], namespaceContext: Compiler.Context): Literal {
+		if (!grouping) {
+			return Literal.empty
+		}
+		return new Literal(` union ${grouping.type} (`).append(grouping.literal(namespaceContext)).appendString(')')
+	}
+
 	private compileLock(lock?: SelectBuilder.Options['lock']): Literal {
 		if (!lock) {
 			return Literal.empty
@@ -171,8 +179,10 @@ class Compiler {
 		if (!fromExpr) {
 			return Literal.empty
 		}
-		const [from, alias] = fromExpr
-		return new Literal(' from ').append(aliasLiteral(this.prependSchema(from, namespaceContext), alias))
+		return new Literal(' from ').appendAll(
+			fromExpr.map(([from, alias]) => aliasLiteral(this.prependSchema(from, namespaceContext), alias)),
+			', ',
+		)
 	}
 
 	private compileIntoStatement(

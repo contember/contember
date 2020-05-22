@@ -1,6 +1,6 @@
 import { Connection } from './Connection'
 import { EventManager } from './EventManager'
-import { PoolClient } from 'pg'
+import { ClientBase, PoolClient } from 'pg'
 import { wrapIdentifier } from '../utils'
 import { executeQuery } from './execution'
 
@@ -16,7 +16,7 @@ export class Transaction implements Connection.TransactionLike {
 	}
 
 	constructor(
-		private readonly pgClient: PoolClient,
+		private readonly pgClient: ClientBase,
 		public readonly eventManager: EventManager,
 		private readonly config: Connection.QueryConfig,
 	) {}
@@ -62,8 +62,22 @@ export class Transaction implements Connection.TransactionLike {
 		await this.close('ROLLBACK')
 	}
 
+	async rollbackUnclosed(): Promise<void> {
+		if (this.isClosed) {
+			return
+		}
+		await this.rollback()
+	}
+
 	async commit(): Promise<void> {
 		await this.close('COMMIT')
+	}
+
+	async commitUnclosed(): Promise<void> {
+		if (this.isClosed) {
+			return
+		}
+		await this.commit()
 	}
 
 	private async close(command: string) {
@@ -86,7 +100,7 @@ class SavePoint implements Connection.TransactionLike {
 	constructor(
 		public readonly savepointName: string,
 		private readonly transactionInst: Transaction,
-		private readonly pgClient: PoolClient,
+		private readonly pgClient: ClientBase,
 	) {}
 
 	async transaction<Result>(

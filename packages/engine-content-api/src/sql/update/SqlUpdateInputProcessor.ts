@@ -1,4 +1,4 @@
-import { Input, Model, Value } from '@contember/schema'
+import { Input, Value } from '@contember/schema'
 import Mapper from '../Mapper'
 import UpdateBuilder from './UpdateBuilder'
 import { UpdateInputProcessor } from '../../inputProcessing'
@@ -12,7 +12,6 @@ import {
 	MutationResultList,
 	MutationResultType,
 	NothingToDoReason,
-	prependPath,
 } from '../Result'
 import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
 import { AbortUpdate } from './Updater'

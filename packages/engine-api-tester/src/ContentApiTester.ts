@@ -4,7 +4,7 @@ import {
 	SchemaVersionBuilder,
 	setupSystemVariables,
 } from '@contember/engine-system-api'
-import { AllowAllPermissionFactory } from '@contember/schema-definition'
+import { AllowAllPermissionFactory } from '@contember/schema-utils'
 import { Client } from '@contember/database'
 import {
 	Context as ContentContext,

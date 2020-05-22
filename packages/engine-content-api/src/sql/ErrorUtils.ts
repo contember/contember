@@ -4,11 +4,10 @@ import {
 	MutationConstraintViolationError,
 	MutationInputError,
 	MutationResult,
-	ModificationType,
 	MutationResultList,
 } from './Result'
 import * as Database from '@contember/database'
-import { UniqueWhereError } from '../graphQlResolver/UniqueWhereExpander'
+import { UniqueWhereError } from '../inputProcessing'
 
 export const convertError = (e: any): null | MutationResult => {
 	if (e instanceof Database.NotNullViolationError) {

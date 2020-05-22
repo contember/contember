@@ -1,28 +1,31 @@
 import { DatabaseCredentials, Connection, wrapIdentifier } from '@contember/database'
+import migrate from './runner'
+import { ClientBase } from 'pg'
+import { RunnerOptionClient, RunnerOptionUrl } from 'node-pg-migrate/dist/types'
 
 export class MigrationsRunner {
 	constructor(
 		private readonly db: DatabaseCredentials,
 		private readonly schema: string,
 		private readonly dir: string,
+		private readonly dbClient?: ClientBase,
 	) {}
 
-	public async migrate(log: boolean = true) {
+	public async migrate<MigrationArgs>(log: boolean = true, migrationArgs?: MigrationArgs) {
 		await this.createDatabaseIfNotExists()
-		const pgMigrate = (await import('node-pg-migrate')).default
-		await pgMigrate({
-			databaseUrl: this.db,
+		const dbParams: RunnerOptionClient | RunnerOptionUrl = this.dbClient
+			? { dbClient: this.dbClient }
+			: { databaseUrl: this.db }
+		await migrate({
+			...dbParams,
 			dir: this.dir,
 			schema: this.schema,
 			migrationsTable: 'migrations',
-			checkOrder: true,
-			direction: 'up',
-			count: Infinity,
-			ignorePattern: '^\\..*$',
+			ignorePattern: '(\\..*)|(.+\\.ts)|tsconfig\\..+|.+\\.map|.+\\.test\\.js',
 			createSchema: true,
-			singleTransaction: true,
+			migrationArgs,
 			log: (msg: string) => {
-				log && msg.startsWith('> ') && console.log(msg.substring(2))
+				log && console.log(msg)
 			},
 		})
 	}

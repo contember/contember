@@ -1,8 +1,7 @@
-import { Client } from '@contember/database'
-import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { UpdateStageEventCommand } from '../commands'
+import { DatabaseContext } from '../database'
 
-class EventsRebaser {
+export class EventsRebaser {
 	constructor() {}
 
 	public async rebaseStageEvents(
@@ -36,5 +35,3 @@ class EventsRebaser {
 		// return result.rows.reduce((result, row) => ({ ...result, [row.old_id]: row.new_id }), {})
 	}
 }
-
-export default EventsRebaser

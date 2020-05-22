@@ -10,7 +10,6 @@
 		"target": "es2018",
 		"moduleResolution": "node",
 		"module": "commonjs",
-		"outDir": "dist",
 
 		"strict": true,
 		"incremental": true,

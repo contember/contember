@@ -1,11 +1,10 @@
 import { AccessNode, AuthorizationScope } from '@contember/authorization'
 import { Project } from '../type'
 import { TenantRole } from './Roles'
-import { Acl } from '@contember/schema'
+import { Acl, ProjectRole } from '@contember/schema'
 import { SwitchEvaluatorNode } from './SwitchEvaluatorNode'
 import { AclSchemaEvaluatorFactory } from './AclSchemaEvaluatorFactory'
 import { Identity } from './Identity'
-import { ProjectRole } from '@contember/engine-common'
 import { MembershipAwareAccessNode } from './MembershipAwareAccessNode'
 
 export class ProjectScope implements AuthorizationScope<Identity> {

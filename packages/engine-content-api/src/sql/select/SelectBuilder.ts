@@ -1,5 +1,4 @@
 import { Input, Model } from '@contember/schema'
-import ObjectNode from '../../graphQlResolver/ObjectNode'
 import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import SelectHydrator from './SelectHydrator'
 import Path from './Path'
@@ -9,9 +8,9 @@ import OrderByBuilder from './OrderByBuilder'
 import FieldsVisitorFactory from './handlers/FieldsVisitorFactory'
 import { LimitByGroupWrapper } from '@contember/database'
 import SelectExecutionHandler from './SelectExecutionHandler'
-import FieldNode from '../../graphQlResolver/FieldNode'
 import MetaHandler from './handlers/MetaHandler'
 import Mapper from '../Mapper'
+import { FieldNode, ObjectNode } from '../../inputProcessing'
 
 export default class SelectBuilder {
 	private resolver: (value: SelectHydrator.Rows) => void = () => {
@@ -26,7 +25,7 @@ export default class SelectBuilder {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderByBuilder: OrderByBuilder,
 		private readonly metaHandler: MetaHandler,
-		private qb: DbSelectBuilder<DbSelectBuilder.Result, any>,
+		private qb: DbSelectBuilder<DbSelectBuilder.Result>,
 		private readonly hydrator: SelectHydrator,
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
 		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> },

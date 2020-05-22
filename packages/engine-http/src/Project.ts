@@ -1,4 +1,4 @@
-import { DatabaseCredentials } from '@contember/engine-common'
+import { DatabaseCredentials } from '@contember/database'
 
 type Project = {
 	readonly slug: string

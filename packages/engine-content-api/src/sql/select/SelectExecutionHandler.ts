@@ -1,10 +1,9 @@
-import FieldNode from '../../graphQlResolver/FieldNode'
 import Path from './Path'
-import ObjectNode from '../../graphQlResolver/ObjectNode'
 import { Input, Model } from '@contember/schema'
 import SelectHydrator from './SelectHydrator'
 import { SelectBuilder } from '@contember/database'
 import Mapper from '../Mapper'
+import { FieldNode, ObjectNode } from '../../inputProcessing'
 
 interface SelectExecutionHandler<MetaArgs> {
 	process(context: SelectExecutionHandler.Context): void
@@ -20,7 +19,7 @@ namespace SelectExecutionHandler {
 		entity: Model.Entity
 
 		addColumn: (
-			queryCallback: (qb: SelectBuilder<SelectBuilder.Result, any>) => SelectBuilder<SelectBuilder.Result, any>,
+			queryCallback: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>,
 			path?: Path,
 		) => void
 		addData: (parentField: string, cb: DataCallback, defaultValue?: SelectHydrator.NestedDefaultValue) => void

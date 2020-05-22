@@ -1,13 +1,21 @@
-import { PermissionsByIdentityFactory, PermissionsVerifier } from '@contember/engine-content-api'
+import {
+	ContentApplyDependenciesFactoryImpl,
+	ContentEventApplier,
+	createMapperContainer,
+	EntitiesSelector,
+	EntitiesSelectorMapperFactory,
+	PermissionsByIdentityFactory,
+} from '@contember/engine-content-api'
 import { SchemaVersionBuilder, SystemContainerFactory } from '@contember/engine-system-api'
 import {
 	getTenantMigrationsDirectory,
+	ProjectSchemaResolver,
 	Providers as TenantProviders,
 	TenantContainer,
 } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
 import { Config, Project, TenantConfig } from './config/config'
-import { logSentryError, projectSchemaResolver, tuple } from './utils'
+import { logSentryError, tuple } from './utils'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer, ServerRunner } from './bootstrap'
 import { createProjectContainer } from './ProjectContainer'
@@ -31,6 +39,13 @@ export interface MasterContainer {
 
 class CompositionRoot {
 	createMasterContainer(debug: boolean, config: Config, projectsDirectory: string, plugins: Plugin[]): MasterContainer {
+		let projectSchemaResolverInner: ProjectSchemaResolver = () => {
+			throw new Error('called too soon')
+		}
+		const projectSchemaResolver: ProjectSchemaResolver = slug => projectSchemaResolverInner(slug)
+
+		const tenantContainer = this.createTenantContainer(config.tenant, providers, projectSchemaResolver)
+
 		const systemContainerDependencies = new Builder({})
 			.addService('providers', () => providers)
 			.addService('migrationsResolverFactory', () => (project: Pick<Project, 'slug' | 'directory'>) =>
@@ -43,10 +58,20 @@ class CompositionRoot {
 				() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
 			)
 			.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
-			.addService(
-				'contentPermissionsVerifier',
-				({ permissionsByIdentityFactory }) => new PermissionsVerifier(permissionsByIdentityFactory),
-			)
+			.addService('entitiesSelector', ({ permissionsByIdentityFactory }) => {
+				const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
+					createMapperContainer({
+						schema,
+						identityVariables,
+						permissions,
+						providers,
+					}).mapperFactory(db)
+				return new EntitiesSelector(mapperFactory, permissionsByIdentityFactory)
+			})
+			.addService('identityFetcher', () => tenantContainer.identityFetcher)
+			.addService('eventApplier', () => {
+				return new ContentEventApplier(new ContentApplyDependenciesFactoryImpl())
+			})
 			.build()
 		const systemContainer = new SystemContainerFactory().create(systemContainerDependencies)
 
@@ -68,12 +93,14 @@ class CompositionRoot {
 						: undefined),
 			)
 
-		const tenantContainer = this.createTenantContainer(
-			config.tenant,
-			providers,
-			projectContainerResolver,
-			systemContainer.schemaVersionBuilder,
-		)
+		projectSchemaResolverInner = async slug => {
+			const container = await projectContainerResolver(slug)
+			if (!container) {
+				return undefined
+			}
+			const db = container.systemDatabaseContextFactory.create(undefined)
+			return await systemContainer.schemaVersionBuilder.buildSchema(db)
+		}
 
 		const masterContainer = new Builder({})
 			.addService('providers', () => providers)
@@ -126,7 +153,6 @@ class CompositionRoot {
 						tenantMigrationsRunner,
 						tenantContainer.projectManager,
 						systemContainer.projectInitializer,
-						systemContainer.systemDbMigrationsRunnerFactory,
 						containerList,
 					),
 			)
@@ -153,15 +179,9 @@ class CompositionRoot {
 	createTenantContainer(
 		tenantConfig: TenantConfig,
 		providers: TenantProviders,
-		projectContainerResolver: ProjectContainerResolver,
-		schemaVersionBuilder: SchemaVersionBuilder,
+		projectSchemaResolver: ProjectSchemaResolver,
 	) {
-		return new TenantContainer.Factory().create(
-			tenantConfig.db,
-			tenantConfig.mailer,
-			providers,
-			projectSchemaResolver(projectContainerResolver, schemaVersionBuilder),
-		)
+		return new TenantContainer.Factory().create(tenantConfig.db, tenantConfig.mailer, providers, projectSchemaResolver)
 	}
 }
 

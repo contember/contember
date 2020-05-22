@@ -9,14 +9,14 @@ class LimitByGroupWrapper {
 		private readonly orderByCallback:
 			| (<Orderable extends QueryBuilder.Orderable<any>>(
 					orderable: Orderable,
-					qb: SelectBuilder<any, any>,
-			  ) => [Orderable, SelectBuilder<any, any>])
+					qb: SelectBuilder<any>,
+			  ) => [Orderable, SelectBuilder<any>])
 			| undefined,
 		private readonly skip: number | undefined,
 		private readonly limit: number | undefined,
 	) {}
 
-	public async getResult<R>(qb: SelectBuilder<R, any>, db: Client): Promise<R[]> {
+	public async getResult<R>(qb: SelectBuilder<R>, db: Client): Promise<R[]> {
 		if (this.limit !== undefined || this.skip !== undefined) {
 			qb = qb.select(
 				expr =>
@@ -42,7 +42,7 @@ class LimitByGroupWrapper {
 				;[qb] = this.orderByCallback(qb, qb)
 			}
 
-			let wrapperQb: SelectBuilder<R, any> = SelectBuilder.create<R>()
+			let wrapperQb: SelectBuilder<R> = SelectBuilder.create<R>()
 				.with('data', qb)
 				.from('data')
 				.select(['data', '*'])

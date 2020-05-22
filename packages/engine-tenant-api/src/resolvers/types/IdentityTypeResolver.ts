@@ -4,7 +4,7 @@ import { DatabaseQueryable } from '@contember/database'
 import { PersonRow, ProjectManager } from '../../model'
 import { ResolverContext } from '../ResolverContext'
 import { ProjectMemberManager } from '../../model/service'
-import { indexBy, notEmpty } from '../../utils/array'
+import { notEmpty } from '../../utils/array'
 import { createBatchLoader } from '../../utils/batchQuery'
 import { PersonByIdentityBatchQuery } from '../../model/queries/person/PersonByIdentityBatchQuery'
 
@@ -12,7 +12,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = createBatchLoader<string, Record<string, PersonRow>, PersonRow>(
 		async ids => {
 			const persons = await this.queryHandler.fetch(new PersonByIdentityBatchQuery(ids))
-			return indexBy(persons, 'identity_id')
+			return Object.fromEntries(persons.map(it => [it.identity_id, it]))
 		},
 		(id, result) => result[id],
 	)

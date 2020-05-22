@@ -9,6 +9,9 @@
 			"path": "../src"
 		},
 		{
+			"path": "../migrations"
+		},
+		{
 			"path": "../../engine-api-tester/src"
 		}
 	]

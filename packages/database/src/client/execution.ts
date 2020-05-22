@@ -1,4 +1,4 @@
-import { PoolClient } from 'pg'
+import { ClientBase } from 'pg'
 import { EventManager } from './EventManager'
 import { Connection } from './Connection'
 import {
@@ -15,7 +15,7 @@ function prepareSql(sql: string) {
 }
 
 export async function executeQuery<Row extends Record<string, any>>(
-	pgClient: PoolClient,
+	pgClient: ClientBase,
 	eventManager: EventManager,
 	{ sql, parameters, meta, timing }: Connection.Query & Connection.QueryConfig,
 	context: Connection.QueryContext,

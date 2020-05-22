@@ -130,7 +130,7 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL`CREATE TABLE "author" ( "id" uuid PRIMARY KEY NOT NULL );
-			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "author" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
+			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "author" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
 			  ALTER TABLE "author" ADD "name" text;
 			  ALTER TABLE "author" ADD "email" text;
 			  ALTER TABLE "author" ADD "registered_at" date;
@@ -205,7 +205,7 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL`CREATE TABLE "post" ( "id" uuid PRIMARY KEY NOT NULL );
-			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
+			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
 			ALTER TABLE "post" ADD "title" text;
 			ALTER TABLE "post" ADD "author_id" uuid;
 			ALTER TABLE "post" ADD CONSTRAINT "fk_post_author_id_87ef9a" FOREIGN KEY ("author_id") REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
@@ -319,7 +319,7 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL`CREATE TABLE "post_locale" ( "id" uuid PRIMARY KEY NOT NULL );
-			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_locale" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
+			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_locale" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
 			ALTER TABLE "post_locale" ADD "title" text;
 			ALTER TABLE "post_locale" ADD "locale" text;
 			ALTER TABLE "post_locale" ADD "post_id" uuid NOT NULL;
@@ -498,15 +498,14 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL`CREATE TABLE "category" ( "id" uuid PRIMARY KEY NOT NULL );
-			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "category" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
+			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "category" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
 			  ALTER TABLE "category" ADD "title" text;
 			  CREATE TABLE "post_categories" (
-				"id"          uuid PRIMARY KEY NOT NULL,
 				"post_id"     uuid NOT NULL REFERENCES "post"("id") ON DELETE CASCADE,
 				"category_id" uuid NOT NULL REFERENCES "category"("id") ON DELETE CASCADE,
-				CONSTRAINT "post_categories_uniq_post_id_category_id" UNIQUE ("post_id", "category_id")
+				CONSTRAINT "post_categories_pkey" PRIMARY KEY ("post_id", "category_id")
 			  );
-			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_categories" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();`
+			  CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "post_categories" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pg1$post_id$pg1$, $pg1$category_id$pg1$);`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)
 		})
@@ -613,9 +612,9 @@ describe('Diff schemas', () => {
 			},
 		]
 		const sql = SQL`CREATE TABLE "site" ( "id" uuid PRIMARY KEY NOT NULL );
-			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
+			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
 			CREATE TABLE "site_setting" ( "id" uuid PRIMARY KEY NOT NULL );
-			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site_setting" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"();
+			CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "site_setting" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
 			ALTER TABLE "site" ADD "name" text;
 			ALTER TABLE "site_setting" ADD "url" text;
 			ALTER TABLE "site" ADD "setting_id" uuid;
@@ -699,7 +698,7 @@ describe('Diff schemas', () => {
 				},
 			},
 		]
-		const sql = SQL`CREATE DOMAIN "postStatus" AS text CONSTRAINT postStatus_check CHECK (VALUE IN('publish','draft','auto-draft'));
+		const sql = SQL`CREATE DOMAIN "postStatus" AS text CONSTRAINT "poststatus_check" CHECK (VALUE IN('publish','draft','auto-draft'));
 				ALTER TABLE "post" ADD "status" "postStatus";`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)

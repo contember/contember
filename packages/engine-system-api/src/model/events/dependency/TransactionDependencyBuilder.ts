@@ -1,5 +1,5 @@
 import { AnyEvent, ContentEvent } from '@contember/engine-common'
-import DependencyBuilder from '../DependencyBuilder'
+import { DependencyBuilder, EventsDependencies } from '../DependencyBuilder'
 import { Schema } from '@contember/schema'
 
 /**
@@ -10,11 +10,11 @@ import { Schema } from '@contember/schema'
  * A1 A2 B1 B2 B3
  *
  */
-class TransactionDependencyBuilder implements DependencyBuilder {
-	async build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies> {
+export class TransactionDependencyBuilder implements DependencyBuilder {
+	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
 		let trxId = null
 		let eventsInTrx: AnyEvent[] = []
-		let dependencies: DependencyBuilder.Dependencies = {}
+		let dependencies: EventsDependencies = {}
 
 		for (const event of events) {
 			if (trxId !== event.transactionId) {
@@ -34,10 +34,8 @@ class TransactionDependencyBuilder implements DependencyBuilder {
 		return dependencies
 	}
 
-	private buildTransactionReferences(events: AnyEvent[]): DependencyBuilder.Dependencies {
+	private buildTransactionReferences(events: AnyEvent[]): EventsDependencies {
 		const ids = events.map(it => it.id)
 		return ids.reduce((result, id) => ({ ...result, [id]: ids }), {})
 	}
 }
-
-export default TransactionDependencyBuilder

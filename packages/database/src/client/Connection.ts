@@ -28,16 +28,12 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 		try {
 			const result = await callback(transaction)
 
-			if (!transaction.isClosed) {
-				await transaction.commit()
-			}
+			await transaction.commitUnclosed()
 			client.release()
 
 			return result
 		} catch (e) {
-			if (!transaction.isClosed) {
-				await transaction.rollback()
-			}
+			await transaction.rollbackUnclosed()
 			client.release(e)
 			throw e
 		}

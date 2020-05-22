@@ -2,7 +2,6 @@ import {
 	collectResults,
 	MutationCreateOk,
 	MutationNoResultError,
-	ModificationType,
 	MutationResultList,
 	RowValues,
 	MutationNothingToDo,

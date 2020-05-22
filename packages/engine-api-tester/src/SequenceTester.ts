@@ -30,31 +30,36 @@ export class SequenceTester {
 	}
 
 	private async executeSingleSequence(sequence: EventSequence): Promise<void> {
+		let follow: number | null = 0
+		const releaseForward = async () => {
+			if (follow) {
+				await this.systemApiTester.releaseForward(sequence.baseStage!, sequence.stage, follow)
+			}
+			follow = null
+		}
 		for (const event of sequence.sequence) {
 			switch (event.type) {
 				case 'event':
+					await releaseForward()
 					await this.contentApiTester.queryContent(
 						sequence.stage,
 						GQL`mutation ($number: Int!) {
-              createEntry(data: {number: $number}) {
-                ok
-              }
-            }`,
+							createEntry(data: {number: $number}) {
+								ok
+              				}
+						}`,
 						{ number: event.number },
 					)
 					break
 				case 'follow':
-					await this.systemApiTester.releaseForward(sequence.stage, sequence.baseStage!, 1)
+					if (follow === null) {
+						throw new Error('cannot follow after custom event')
+					}
+					follow++
 					break
 			}
 		}
-	}
-
-	public async fetchEvents(stage: string): Promise<AnyEvent[]> {
-		const initEvent = await this.queryHandler.fetch(new InitEventQuery())
-		const stageHead = (await this.queryHandler.fetch(new StageBySlugQuery(stage)))!.event_id
-
-		return await this.queryHandler.fetch(new DiffQuery(initEvent.id, stageHead))
+		await releaseForward()
 	}
 
 	public async verifySequence(
@@ -65,7 +70,7 @@ export class SequenceTester {
 
 		const events: Record<string, AnyEvent[]> = {}
 		for (const sequence of sequenceSet) {
-			events[sequence.stage] = await this.fetchEvents(sequence.stage)
+			events[sequence.stage] = await this.systemApiTester.fetchEvents(sequence.stage)
 		}
 
 		for (const sequence of sequenceSet) {
@@ -79,7 +84,7 @@ export class SequenceTester {
 					case 'event':
 						const expectedEvent =
 							eventsMap[sequenceItem.number] ||
-							createCreateEvent((event as CreateEvent).rowId, 'entry', { number: sequenceItem.number })
+							createCreateEvent((event as CreateEvent).rowId[0], 'entry', { number: sequenceItem.number })
 
 						this.assertEventEquals(expectedEvent, event)
 						break

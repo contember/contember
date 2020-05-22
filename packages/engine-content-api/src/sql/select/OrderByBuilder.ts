@@ -4,31 +4,31 @@ import JoinBuilder from './JoinBuilder'
 import { QueryBuilder } from '@contember/database'
 import { getColumnName, getTargetEntity } from '@contember/schema-utils'
 import { SelectBuilder } from '@contember/database'
-import { UserError } from '../../graphQlResolver/UserError'
+import { UserError } from '../../exception'
 
 class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}
 
-	public build<Orderable extends QueryBuilder.Orderable<any>, Filled extends keyof SelectBuilder.Options>(
-		qb: SelectBuilder<SelectBuilder.Result, Filled>,
+	public build<Orderable extends QueryBuilder.Orderable<any>>(
+		qb: SelectBuilder<SelectBuilder.Result>,
 		orderable: Orderable,
 		entity: Model.Entity,
 		path: Path,
 		orderBy: Input.OrderBy[],
-	): [SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable] {
-		return orderBy.reduce<[SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable]>(
+	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
+		return orderBy.reduce<[SelectBuilder<SelectBuilder.Result>, Orderable]>(
 			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy),
 			[qb, orderable],
 		)
 	}
 
-	private buildOne<Orderable extends QueryBuilder.Orderable<any>, Filled extends keyof SelectBuilder.Options>(
-		qb: SelectBuilder<SelectBuilder.Result, Filled>,
+	private buildOne<Orderable extends QueryBuilder.Orderable<any>>(
+		qb: SelectBuilder<SelectBuilder.Result>,
 		orderable: Orderable,
 		entity: Model.Entity,
 		path: Path,
 		orderBy: Input.FieldOrderBy,
-	): [SelectBuilder<SelectBuilder.Result, Filled | 'join'>, Orderable] {
+	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
 			const fields = entries.join(', ')

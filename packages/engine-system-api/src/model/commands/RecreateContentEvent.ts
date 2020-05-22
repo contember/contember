@@ -1,14 +1,13 @@
-import { UuidProvider } from '../../utils/uuid'
-import { Client, InsertBuilder } from '@contember/database'
+import { InsertBuilder } from '@contember/database'
 import { ContentEvent, EventType } from '@contember/engine-common'
 import { assertNever, Providers } from '../../utils'
 import { Command } from './Command'
 
-class RecreateContentEvent implements Command<string> {
+export class RecreateContentEvent implements Command<string> {
 	constructor(
 		private readonly event: ContentEvent,
 		private readonly previousId: string,
-		private readonly transactionContext: RecreateContentEvent.TransactionContext,
+		private readonly transactionContext: RecreateContentEventTransactionContext,
 	) {}
 
 	public async execute({ db, providers }: Command.Args) {
@@ -41,17 +40,13 @@ class RecreateContentEvent implements Command<string> {
 	}
 }
 
-namespace RecreateContentEvent {
-	export class TransactionContext {
-		private idRemap: Record<string, string> = {}
+export class RecreateContentEventTransactionContext {
+	private idRemap: Record<string, string> = {}
 
-		public getNewId(oldId: string, providers: Providers): string {
-			if (!this.idRemap[oldId]) {
-				this.idRemap[oldId] = providers.uuid()
-			}
-			return this.idRemap[oldId]
+	public getNewId(oldId: string, providers: Providers): string {
+		if (!this.idRemap[oldId]) {
+			this.idRemap[oldId] = providers.uuid()
 		}
+		return this.idRemap[oldId]
 	}
 }
-
-export default RecreateContentEvent

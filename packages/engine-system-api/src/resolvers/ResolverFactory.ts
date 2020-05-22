@@ -1,24 +1,41 @@
-import StagesQueryResolver from './query/StagesQueryResolver'
-import DiffQueryResolver from './query/DiffQueryResolver'
+import { DiffQueryResolver, StagesQueryResolver } from './query'
 import { Event, EventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
-import { GraphQLResolveInfo } from 'graphql'
-import ReleaseMutationResolver from './mutation/ReleaseMutationResolver'
-import RebaseAllMutationResolver from './mutation/RebaseAllMutationResolver'
-import { MigrateMutationResolver } from './mutation/MigrateMutationResolver'
+import { GraphQLResolveInfo, GraphQLScalarType, Kind } from 'graphql'
+import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
+import { ReleaseTreeMutationResolver } from './mutation/ReleaseTreeMutationResolver'
+import { HistoryQueryResolver } from './query/HistoryQueryResolver'
 
 class ResolverFactory {
 	public constructor(
 		private readonly stagesQueryResolver: StagesQueryResolver,
 		private readonly diffQueryResolver: DiffQueryResolver,
+		private readonly historyQueryResolver: HistoryQueryResolver,
 		private readonly releaseMutationResolver: ReleaseMutationResolver,
 		private readonly rebaseMutationResolver: RebaseAllMutationResolver,
 		private readonly migrateMutationResolver: MigrateMutationResolver,
+		private readonly releaseTreeMutationResolver: ReleaseTreeMutationResolver,
 	) {}
 
 	create(): Resolvers {
 		return {
+			DateTime: new GraphQLScalarType({
+				name: 'DateTime',
+				description: 'DateTime custom scalar type',
+				serialize(value) {
+					return value instanceof Date ? value.toISOString() : null
+				},
+				parseValue(value) {
+					return new Date(value)
+				},
+				parseLiteral(ast) {
+					if (ast.kind === Kind.STRING) {
+						return new Date(ast.value)
+					}
+					return null
+				},
+			}),
 			Event: {
 				__resolveType: (obj: Event) => {
 					switch (obj.type) {
@@ -43,10 +60,14 @@ class ResolverFactory {
 					this.stagesQueryResolver.stages(parent, args, context, info),
 				diff: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.diffQueryResolver.diff(parent, args, context, info),
+				history: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.historyQueryResolver.history(parent, args, context, info),
 			},
 			Mutation: {
 				release: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.releaseMutationResolver.release(parent, args, context, info),
+				releaseTree: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.releaseTreeMutationResolver.releaseTree(parent, args, context, info),
 				rebaseAll: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.rebaseMutationResolver.rebaseAll(parent, args, context, info),
 				migrate: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
@@ -62,4 +83,4 @@ namespace ResolverFactory {
 	}
 }
 
-export default ResolverFactory
+export { ResolverFactory }

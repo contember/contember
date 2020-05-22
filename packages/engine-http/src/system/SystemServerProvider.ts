@@ -38,15 +38,14 @@ class SystemServerProvider {
 		}))
 	}
 
-	private createContext(ctx: InputKoaContext): ExtendedGraphqlContext {
+	private async createContext(ctx: InputKoaContext): Promise<ExtendedGraphqlContext> {
 		const identity = new Identity(
 			ctx.state.authResult.identityId,
-			ctx.state.authResult.roles,
 			ctx.state.projectMemberships.map(it => it.role),
 		)
 		const dbContextFactory = ctx.state.projectContainer.systemDatabaseContextFactory
 		const variables = flattenVariables(ctx.state.projectMemberships)
-		const systemContext = this.resolverContextFactory.create(
+		const systemContext = await this.resolverContextFactory.create(
 			dbContextFactory.create(identity.id),
 			ctx.state.project,
 			identity,

@@ -1,8 +1,7 @@
-import ObjectNode from '../graphQlResolver/ObjectNode'
-import FieldNode from '../graphQlResolver/FieldNode'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import DependencyCollector from './dependencies/DependencyCollector'
+import { FieldNode, ObjectNode } from '../inputProcessing'
 
 class QueryAstFactory {
 	constructor(private readonly model: Model.Schema) {}

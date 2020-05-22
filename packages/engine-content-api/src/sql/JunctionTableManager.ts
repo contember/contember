@@ -1,6 +1,5 @@
 import { getEntity } from '@contember/schema-utils'
 import Path from './select/Path'
-import UniqueWhereExpander from '../graphQlResolver/UniqueWhereExpander'
 import WhereBuilder from './select/WhereBuilder'
 import PredicateFactory from '../acl/PredicateFactory'
 import {
@@ -17,6 +16,7 @@ import {
 	MutationJunctionUpdateOk,
 	MutationNoResultError,
 	MutationNothingToDo,
+	MutationResult,
 	MutationResultList,
 	NothingToDoReason,
 } from './Result'
@@ -39,14 +39,16 @@ class JunctionTableManager {
 		ownerUnique: Input.PrimaryValue,
 		inversedUnique: Input.PrimaryValue,
 	): Promise<MutationResultList> {
-		return await this.executeJunctionModification(
-			db,
-			owningEntity,
-			relation,
-			ownerUnique,
-			inversedUnique,
-			this.connectJunctionHandler,
-		)
+		return [
+			await this.executeJunctionModification(
+				db,
+				owningEntity,
+				relation,
+				ownerUnique,
+				inversedUnique,
+				this.connectJunctionHandler,
+			),
+		]
 	}
 
 	public async disconnectJunction(
@@ -56,14 +58,16 @@ class JunctionTableManager {
 		ownerUnique: Input.PrimaryValue,
 		inversedUnique: Input.PrimaryValue,
 	): Promise<MutationResultList> {
-		return await this.executeJunctionModification(
-			db,
-			owningEntity,
-			relation,
-			ownerUnique,
-			inversedUnique,
-			this.disconnectJunctionHandler,
-		)
+		return [
+			await this.executeJunctionModification(
+				db,
+				owningEntity,
+				relation,
+				ownerUnique,
+				inversedUnique,
+				this.disconnectJunctionHandler,
+			),
+		]
 	}
 
 	private async executeJunctionModification(
@@ -73,7 +77,7 @@ class JunctionTableManager {
 		ownerPrimary: Input.PrimaryValue,
 		inversedPrimary: Input.PrimaryValue,
 		handler: JunctionTableManager.JunctionHandler,
-	): Promise<MutationResultList> {
+	): Promise<MutationResult> {
 		const joiningTable = relation.joiningTable
 		const inversedEntity = getEntity(this.schema, relation.target)
 
@@ -137,31 +141,31 @@ namespace JunctionTableManager {
 	}
 
 	export interface JunctionHandler {
-		executeSimple(args: JunctionSimpleExecutionArgs): Promise<MutationResultList>
+		executeSimple(args: JunctionSimpleExecutionArgs): Promise<MutationResult>
 
-		executeComplex(args: JunctionComplexExecutionArgs): Promise<MutationResultList>
+		executeComplex(args: JunctionComplexExecutionArgs): Promise<MutationResult>
 	}
 
 	export class JunctionConnectHandler implements JunctionHandler {
-		constructor(private readonly providers: { uuid: () => string }) {}
-
 		async executeSimple({
 			db,
 			joiningTable,
 			ownerPrimary,
 			inversedPrimary,
 			okResultFactory,
-		}: JunctionSimpleExecutionArgs): Promise<MutationResultList> {
+		}: JunctionSimpleExecutionArgs): Promise<MutationResult> {
 			const result = await InsertBuilder.create()
 				.into(joiningTable.tableName)
 				.values({
-					id: this.providers.uuid(),
 					[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(ownerPrimary),
 					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimary),
 				})
 				.onConflict(ConflictActionType.doNothing)
 				.execute(db)
-			return result === 0 ? [new MutationNothingToDo([], NothingToDoReason.alreadyExists)] : [okResultFactory()]
+			if (result === 0) {
+				return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
+			}
+			return okResultFactory()
 		}
 
 		async executeComplex({
@@ -169,11 +173,10 @@ namespace JunctionTableManager {
 			joiningTable,
 			dataCallback,
 			okResultFactory,
-		}: JunctionComplexExecutionArgs): Promise<MutationResultList> {
+		}: JunctionComplexExecutionArgs): Promise<MutationResult> {
 			const insert = InsertBuilder.create()
 				.into(joiningTable.tableName)
 				.values({
-					id: expr => expr.selectValue(this.providers.uuid()),
 					[joiningTable.joiningColumn.columnName]: expr => expr.select(['data', joiningTable.joiningColumn.columnName]),
 					[joiningTable.inverseJoiningColumn.columnName]: expr =>
 						expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),
@@ -193,12 +196,12 @@ namespace JunctionTableManager {
 
 			const result = await qb.getResult(db)
 			if (result[0]['selected'] === false) {
-				return [new MutationNoResultError([])]
+				return new MutationNoResultError([])
 			}
 			if (result[0]['inserted'] === false) {
-				return [new MutationNothingToDo([], NothingToDoReason.alreadyExists)]
+				return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
 			}
-			return [okResultFactory()]
+			return okResultFactory()
 		}
 	}
 
@@ -209,14 +212,17 @@ namespace JunctionTableManager {
 			ownerPrimary,
 			inversedPrimary,
 			okResultFactory,
-		}: JunctionSimpleExecutionArgs): Promise<MutationResultList> {
+		}: JunctionSimpleExecutionArgs): Promise<MutationResult> {
 			const qb = DeleteBuilder.create()
 				.from(joiningTable.tableName)
 				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, Operator.eq, ownerPrimary))
 				.where(cond => cond.compare(joiningTable.inverseJoiningColumn.columnName, Operator.eq, inversedPrimary))
 
 			const result = await qb.execute(db)
-			return result === 0 ? [new MutationNothingToDo([], NothingToDoReason.alreadyExists)] : [okResultFactory()]
+			if (result === 0) {
+				return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
+			}
+			return okResultFactory()
 		}
 
 		public async executeComplex({
@@ -224,7 +230,7 @@ namespace JunctionTableManager {
 			joiningTable,
 			dataCallback,
 			okResultFactory,
-		}: JunctionComplexExecutionArgs): Promise<MutationResultList> {
+		}: JunctionComplexExecutionArgs): Promise<MutationResult> {
 			const deleteQb = DeleteBuilder.create()
 				.from(joiningTable.tableName)
 				.using('data')
@@ -253,12 +259,12 @@ namespace JunctionTableManager {
 
 			const result = await qb.getResult(db)
 			if (result[0]['selected'] === false) {
-				return [new MutationNoResultError([])]
+				return new MutationNoResultError([])
 			}
 			if (result[0]['inserted'] === false) {
-				return [new MutationNothingToDo([], NothingToDoReason.alreadyExists)]
+				return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
 			}
-			return [okResultFactory()]
+			return okResultFactory()
 		}
 	}
 }

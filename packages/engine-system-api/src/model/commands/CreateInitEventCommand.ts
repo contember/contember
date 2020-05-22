@@ -1,9 +1,8 @@
-import { Client, ConflictActionType, InsertBuilder } from '@contember/database'
-import { UuidProvider } from '../../utils/uuid'
+import { ConflictActionType, InsertBuilder } from '@contember/database'
 import { EventType } from '@contember/engine-common'
 import { Command } from './Command'
 
-class CreateInitEventCommand implements Command<number> {
+export class CreateInitEventCommand implements Command<number> {
 	public async execute({ db, providers }: Command.Args): Promise<number> {
 		return await InsertBuilder.create()
 			.into('event')
@@ -17,5 +16,3 @@ class CreateInitEventCommand implements Command<number> {
 			.execute(db)
 	}
 }
-
-export default CreateInitEventCommand

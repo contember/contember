@@ -66,9 +66,9 @@ export class ConditionBuilder {
 		return this.with(new Literal(`${toFqnWrap(columnName1)} ${operator} ${toFqnWrap(columnName2)}`))
 	}
 
-	in<Filled extends keyof SelectBuilder.Options>(
+	in(
 		columnName: QueryBuilder.ColumnIdentifier,
-		values: Value[] | SelectBuilder<SelectBuilder.Result, Filled>,
+		values: Value[] | SelectBuilder<SelectBuilder.Result>,
 	): ConditionBuilder {
 		if (!Array.isArray(values)) {
 			// todo: replace placeholder with some kind of callback

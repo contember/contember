@@ -2,14 +2,14 @@ import Path from './Path'
 import { acceptRelationTypeVisitor, getTargetEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import JoinVisitor from './JoinVisitor'
-import { ConditionBuilder, Operator } from '@contember/database'
+import { Operator } from '@contember/database'
 import { SelectBuilder } from '@contember/database'
 
 export default class JoinBuilder {
 	constructor(private readonly schema: Model.Schema) {}
 
 	join<Filled extends keyof SelectBuilder.Options>(
-		qb: SelectBuilder<SelectBuilder.Result, Filled>,
+		qb: SelectBuilder<SelectBuilder.Result>,
 		path: Path,
 		entity: Model.Entity,
 		relationName: string,
@@ -21,7 +21,7 @@ export default class JoinBuilder {
 
 		const joins = acceptRelationTypeVisitor(this.schema, entity, relationName, new JoinVisitor(path))
 
-		return joins.reduce<SelectBuilder<SelectBuilder.Result, Filled | 'join'>>((qb, join) => {
+		return joins.reduce<SelectBuilder<SelectBuilder.Result>>((qb, join) => {
 			const targetAlias = join.targetAlias || path.getAlias()
 			if (qb.options.join.find(it => it.alias === targetAlias)) {
 				return qb

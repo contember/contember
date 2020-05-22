@@ -8,9 +8,7 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 	}
 
 	async fetch({ db }: DatabaseQueryable): Promise<ProjectMembershipByIdentityQuery.Result> {
-		let qb: SelectBuilder<ProjectMembershipByIdentityQuery.Row, any> = SelectBuilder.create<
-			ProjectMembershipByIdentityQuery.Row
-		>()
+		let qb = SelectBuilder.create<ProjectMembershipByIdentityQuery.Row>()
 		qb = qb
 			.with('memberships', qb =>
 				qb

@@ -7,12 +7,12 @@ import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
 import { SelectBuilder } from './SelectBuilder'
 import { resolveValues } from './utils'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
-class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends keyof UpdateBuilder<Result, never>>
-	implements With.Aware, Where.Aware, QueryBuilder {
+class UpdateBuilder<Result extends UpdateBuilder.UpdateResult> implements With.Aware, Where.Aware, QueryBuilder {
 	private constructor(private readonly options: UpdateBuilder.Options) {}
 
-	public static create(): UpdateBuilder.NewUpdateBuilder {
+	public static create(): UpdateBuilder<UpdateBuilder.AffectedRows> {
 		return new UpdateBuilder({
 			table: undefined,
 			with: new With.Statement({}),
@@ -20,35 +20,30 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 			returning: new Returning(),
 			from: undefined,
 			where: new Where.Statement([]),
-		}) as UpdateBuilder.UpdateBuilderState<UpdateBuilder.AffectedRows, never>
+		})
 	}
 
-	public with(alias: string, expression: With.Expression): UpdateBuilder.UpdateBuilderState<Result, Filled | 'with'> {
-		return this.withOption('with', this.options.with.withCte(alias, With.createLiteral(expression)))
+	public with(alias: string, expression: SubQueryExpression): UpdateBuilder<Result> {
+		return this.withOption('with', this.options.with.withCte(alias, createSubQueryLiteralFactory(expression)))
 	}
 
-	public table(name: string): UpdateBuilder.UpdateBuilderState<Result, Filled | 'table'> {
+	public table(name: string): UpdateBuilder<Result> {
 		return this.withOption('table', name)
 	}
 
-	public values(columns: QueryBuilder.Values): UpdateBuilder.UpdateBuilderState<Result, Filled | 'values'> {
+	public values(columns: QueryBuilder.Values): UpdateBuilder<Result> {
 		return this.withOption('values', resolveValues(columns))
 	}
 
-	public returning(
-		column: string | Literal,
-	): UpdateBuilder.UpdateBuilderState<Returning.Result[], Filled | 'returning'> {
-		return this.withOption('returning', new Returning(column)) as UpdateBuilder.UpdateBuilderState<
-			Returning.Result[],
-			Filled | 'returning'
-		>
+	public returning(column: string | Literal): UpdateBuilder<Returning.Result[]> {
+		return this.withOption('returning', new Returning(column)) as UpdateBuilder<Returning.Result[]>
 	}
 
-	public from(from: SelectBuilder.Callback): UpdateBuilder.UpdateBuilderState<Result, Filled | 'from'> {
+	public from(from: SelectBuilder.Callback): UpdateBuilder<Result> {
 		return this.withOption('from', from)
 	}
 
-	public where(where: Where.Expression): UpdateBuilder.UpdateBuilderState<Result, Filled | 'where'> {
+	public where(where: Where.Expression): UpdateBuilder<Result> {
 		return this.withOption('where', this.options.where.withWhere(where))
 	}
 
@@ -64,7 +59,7 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 		let where = this.options.where
 
 		if (this.options.from !== undefined) {
-			let fromQb: SelectBuilder<SelectBuilder.Result, any> = SelectBuilder.create()
+			let fromQb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 			fromQb = this.options.from(fromQb)
 			fromQb = this.options.where.values.reduce((builder, value) => builder.where(value), fromQb)
 			const selectSql = fromQb.createQuery(context.withAlias(...this.options.with.getAliases()))
@@ -89,11 +84,11 @@ class UpdateBuilder<Result extends UpdateBuilder.UpdateResult, Filled extends ke
 	protected withOption<K extends keyof UpdateBuilder.Options, V extends UpdateBuilder.Options[K]>(
 		key: K,
 		value: V,
-	): UpdateBuilder.UpdateBuilderState<Result, Filled | K> {
-		return new UpdateBuilder<Result, Filled | K>({
+	): UpdateBuilder<Result> {
+		return new UpdateBuilder<Result>({
 			...this.options,
 			[key]: value,
-		}) as UpdateBuilder.UpdateBuilderState<Result, Filled | K>
+		})
 	}
 }
 
@@ -114,19 +109,6 @@ namespace UpdateBuilder {
 		table: Exclude<Options['table'], undefined>
 		values: Exclude<Options['values'], undefined>
 	}
-
-	export type UpdateBuilderWithoutExecute<
-		Result extends UpdateResult,
-		Filled extends keyof UpdateBuilder<Result, Filled>
-	> = Pick<UpdateBuilder<Result, Filled>, Exclude<keyof UpdateBuilder<Result, Filled>, 'execute' | 'createQuery'>>
-
-	export type UpdateBuilderState<Result extends UpdateResult, Filled extends keyof UpdateBuilder<Result, Filled>> =
-		| 'table'
-		| 'values' extends Filled
-		? UpdateBuilder<Result, Filled>
-		: UpdateBuilderWithoutExecute<Result, Filled>
-
-	export type NewUpdateBuilder = UpdateBuilder.UpdateBuilderState<UpdateBuilder.AffectedRows, never>
 }
 
 export { UpdateBuilder }

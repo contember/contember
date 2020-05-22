@@ -1,21 +1,22 @@
-import { Stage } from '../dtos/Stage'
+import { Stage } from '../dtos'
 import { DiffQuery, StageBySlugQuery } from '../queries'
-import DependencyBuilder from './DependencyBuilder'
-import { EventsPermissionsVerifier } from './EventsPermissionsVerifier'
-import EventApplier from './EventApplier'
-import EventsRebaser from './EventsRebaser'
-import UpdateStageEventCommand from '../commands/UpdateStageEventCommand'
-import { createStageTree, StageTree } from '../stages/StageTree'
+import { DependencyBuilder, EventsDependencies } from './DependencyBuilder'
+import { EventsRebaser } from './EventsRebaser'
+import { UpdateStageEventCommand } from '../commands'
+import { createStageTree, StageTree } from '../stages'
 import { assertEveryIsContentEvent } from './eventUtils'
-import { SchemaVersionBuilder } from '../../SchemaVersionBuilder'
-import { DatabaseContext } from '../database/DatabaseContext'
+import { DatabaseContext } from '../database'
 import { ProjectConfig } from '../../types'
+import { SchemaVersionBuilder } from '../migrations'
+import { ContentEventsApplier } from '../dependencies'
+import { formatSchemaName } from '../helpers'
+import { Identity } from '../authorization'
+import { Acl } from '@contember/schema'
 
-class ReleaseExecutor {
+export class ReleaseExecutor {
 	constructor(
 		private readonly dependencyBuilder: DependencyBuilder,
-		private readonly permissionsVerifier: EventsPermissionsVerifier,
-		private readonly eventApplier: EventApplier,
+		private readonly eventApplier: ContentEventsApplier,
 		private readonly eventsRebaser: EventsRebaser,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
@@ -23,36 +24,48 @@ class ReleaseExecutor {
 	public async execute(
 		db: DatabaseContext,
 		project: ProjectConfig,
-		permissionContext: EventsPermissionsVerifier.Context,
+		permissionContext: {
+			variables: Acl.VariablesMap
+			identity: Identity
+		},
 		targetStage: Stage,
 		sourceStage: Stage,
 		eventsToApply: string[],
-	): Promise<void> {
+	): Promise<ReleaseExecutorResult> {
 		if (eventsToApply.length === 0) {
-			return
+			return new ReleaseExecutorOkResult()
 		}
 		const stageTree = createStageTree(project)
 		const allEvents = await db.queryHandler.fetch(new DiffQuery(targetStage.event_id, sourceStage.event_id))
 		assertEveryIsContentEvent(allEvents)
 		const allEventsIds = new Set(allEvents.map(it => it.id))
-		if (!this.allEventsExists(eventsToApply, allEventsIds)) {
-			throw new Error() //todo
+
+		const nonExistingEvents = this.getNonExistingEvents(eventsToApply, allEventsIds)
+		if (nonExistingEvents.length !== 0) {
+			throw new Error(`Following events were not found: ${nonExistingEvents.join(', ')}`)
 		}
 		const schema = await this.schemaVersionBuilder.buildSchema(db)
 		const dependencies = await this.dependencyBuilder.build(schema, allEvents)
 		if (!this.verifyDependencies(eventsToApply, dependencies)) {
-			throw new Error() //todo
+			throw new Error(`Some dependencies are missing`)
 		}
 
 		const eventsSet = new Set(eventsToApply)
 		const events = allEvents.filter(it => eventsSet.has(it.id))
 
-		const permissions = this.permissionsVerifier.verify(db, permissionContext, sourceStage, targetStage, events)
-		if (Object.values(permissions).filter(it => !it).length) {
-			throw new Error() // todo
+		const result = await this.eventApplier.apply(
+			{
+				db: db.client.forSchema(formatSchemaName(targetStage)),
+				schema,
+				identityVariables: permissionContext.variables,
+				roles: permissionContext.identity.roles,
+			},
+			events,
+		)
+		if (!result.ok) {
+			return new ReleaseExecutorErrorResult([ReleaseExecutorErrorCode.forbidden])
 		}
 
-		await this.eventApplier.applyEvents(db, targetStage, events)
 		const newBase = await db.queryHandler.fetch(new StageBySlugQuery(targetStage.slug))
 		if (!newBase) {
 			throw new Error('should not happen')
@@ -69,6 +82,7 @@ class ReleaseExecutor {
 		} else {
 			await this.rebaseRecursive(db, stageTree, sourceStage, targetStage.event_id, newBase.event_id, eventsToApply)
 		}
+		return new ReleaseExecutorOkResult()
 	}
 
 	private async rebaseRecursive(
@@ -102,16 +116,11 @@ class ReleaseExecutor {
 		return true
 	}
 
-	private allEventsExists(eventsToApply: string[], existingEvents: Set<string>): boolean {
-		for (const event of eventsToApply) {
-			if (!existingEvents.has(event)) {
-				return false
-			}
-		}
-		return true
+	private getNonExistingEvents(eventsToApply: string[], existingEvents: Set<string>): string[] {
+		return eventsToApply.filter(id => !existingEvents.has(id))
 	}
 
-	private verifyDependencies(eventsToApply: string[], dependencies: DependencyBuilder.Dependencies): boolean {
+	private verifyDependencies(eventsToApply: string[], dependencies: EventsDependencies): boolean {
 		const checked = new Set<string>()
 		const eventsSet = new Set(eventsToApply)
 		const verify = (id: string): boolean => {
@@ -138,4 +147,17 @@ class ReleaseExecutor {
 	}
 }
 
-export default ReleaseExecutor
+export class ReleaseExecutorOkResult {
+	public readonly ok = true
+}
+
+export enum ReleaseExecutorErrorCode {
+	forbidden = 'forbidden',
+}
+
+export class ReleaseExecutorErrorResult {
+	public readonly ok = false
+	constructor(public readonly errors: ReleaseExecutorErrorCode[]) {}
+}
+
+export type ReleaseExecutorResult = ReleaseExecutorOkResult | ReleaseExecutorErrorResult

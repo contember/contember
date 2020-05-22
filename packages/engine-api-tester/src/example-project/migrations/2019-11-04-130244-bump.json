@@ -277,42 +277,6 @@
 									"text": "Post author is required"
 								}
 							}
-						],
-						"tags": [
-							{
-								"validator": {
-									"operation": "not",
-									"args": [
-										{
-											"type": "validator",
-											"validator": {
-												"operation": "empty",
-												"args": []
-											}
-										}
-									]
-								},
-								"message": {
-									"text": "Post tags are required"
-								}
-							},
-							{
-								"validator": {
-									"operation": "lengthRange",
-									"args": [
-										{
-											"type": "literal",
-											"value": 2
-										},
-										{
-											"type": "literal"
-										}
-									]
-								},
-								"message": {
-									"text": "Please fill at least two tags"
-								}
-							}
 						]
 					}
 				},

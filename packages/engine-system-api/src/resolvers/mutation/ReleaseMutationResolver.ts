@@ -1,12 +1,11 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
-import { MutationReleaseArgs, ReleaseResponse } from '../../schema'
-import { createStageQuery } from '../../model/queries/StageQueryHelper'
-import RebaseExecutor from '../../model/events/RebaseExecutor'
-import ReleaseExecutor from '../../model/events/ReleaseExecutor'
+import { MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse } from '../../schema'
+import { AuthorizationActions, RebaseExecutor, ReleaseExecutor, ReleaseExecutorErrorCode } from '../../model'
+import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
-export default class ReleaseMutationResolver implements MutationResolver<'release'> {
+export class ReleaseMutationResolver implements MutationResolver<'release'> {
 	constructor(private readonly rebaseExecutor: RebaseExecutor, private readonly releaseExecutor: ReleaseExecutor) {}
 
 	async release(
@@ -16,30 +15,52 @@ export default class ReleaseMutationResolver implements MutationResolver<'releas
 		info: GraphQLResolveInfo,
 	): Promise<ReleaseResponse> {
 		return context.db.transaction(async db => {
-			const [baseStage, headStage] = await Promise.all([
-				db.queryHandler.fetch(createStageQuery(args.baseStage)),
-				db.queryHandler.fetch(createStageQuery(args.headStage)),
-			])
-			if (!baseStage || !headStage) {
+			const stagesResult = await fetchStages(args.stage, db, context.project)
+			if (!stagesResult.ok) {
 				return {
 					ok: false,
-					errors: [], //todo
+					errors: stagesResult.errors.map(
+						it =>
+							({
+								[FetchStageErrors.missingBase]: ReleaseErrorCode.MissingBase,
+								[FetchStageErrors.headNotFound]: ReleaseErrorCode.StageNotFound,
+							}[it]),
+					),
 				}
 			}
+			const { head, base } = stagesResult
+
+			await context.requireAccess(
+				AuthorizationActions.PROJECT_RELEASE_SOME,
+				head.slug,
+				'You are not allowed to execute a release.',
+			)
 
 			await this.rebaseExecutor.rebaseAll(db, context.project)
 
-			await this.releaseExecutor.execute(
+			const result = await this.releaseExecutor.execute(
 				db,
 				context.project,
 				{
 					variables: context.variables,
 					identity: context.identity,
 				},
-				baseStage,
-				headStage,
+				base,
+				head,
 				[...args.events],
 			)
+			if (!result.ok) {
+				await db.client.connection.rollback()
+				return {
+					ok: false,
+					errors: result.errors.map(
+						it =>
+							({
+								[ReleaseExecutorErrorCode.forbidden]: ReleaseErrorCode.Forbidden,
+							}[it]),
+					),
+				}
+			}
 
 			return {
 				ok: true,

@@ -6,7 +6,7 @@
 	"typings": "dist/src/index.d.ts",
 	"dependencies": {
 		"@contember/database": "^0.8.0-alpha.0",
-		"node-pg-migrate": "~3.22.1"
+		"node-pg-migrate": "^4.8.0"
 	},
 	"devDependencies": {
 		"pg": "^7.18.2",

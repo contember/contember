@@ -9,7 +9,6 @@ export * from './koa'
 export * from './providers'
 export * from './ProjectContainer'
 export * from './graphqlObjectFactories'
-export * from './schemaNormalizer'
 import Koa from 'koa'
 
 export { Koa }

@@ -1,28 +1,8 @@
 import { ContentEvent } from '@contember/engine-common'
 import { Schema } from '@contember/schema'
 
-interface DependencyBuilder {
-	build(schema: Schema, events: ContentEvent[]): Promise<DependencyBuilder.Dependencies>
+export interface DependencyBuilder {
+	build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies>
 }
 
-namespace DependencyBuilder {
-	export type Dependencies = { [eventId: string]: string[] }
-
-	export class DependencyBuilderList implements DependencyBuilder {
-		constructor(private readonly builders: DependencyBuilder[]) {}
-
-		async build(schema: Schema, events: ContentEvent[]): Promise<Dependencies> {
-			const emptyDeps = events.map(it => it.id).reduce((acc, val) => ({ ...acc, [val]: [] }), {})
-
-			return (await Promise.all(this.builders.map(builder => builder.build(schema, events)))).reduce((result, val) => {
-				for (let event in val) {
-					const current = result[event] || []
-					result[event] = [...current, ...val[event].filter(it => !current.includes(it) && it !== event)]
-				}
-				return result
-			}, emptyDeps)
-		}
-	}
-}
-
-export default DependencyBuilder
+export type EventsDependencies = { [eventId: string]: string[] }

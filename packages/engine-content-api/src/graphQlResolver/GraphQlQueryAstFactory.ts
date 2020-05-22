@@ -9,10 +9,9 @@ import {
 	GraphQLResolveInfo,
 } from 'graphql'
 import { SelectionSetNode } from 'graphql/language/ast'
-import FieldNode from './FieldNode'
-import ObjectNode from './ObjectNode'
 import { getArgumentValues } from 'graphql/execution/values'
 import { ResolveInfoUtils } from '../utils/ResolveInfoUtils'
+import { FieldNode, ObjectNode } from '../inputProcessing'
 
 type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 export default class GraphQlQueryAstFactory {

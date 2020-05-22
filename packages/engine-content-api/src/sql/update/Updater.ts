@@ -1,9 +1,8 @@
 import SqlUpdateInputProcessor from './SqlUpdateInputProcessor'
-import { UpdateInputVisitor } from '../../inputProcessing/UpdateInputVisitor'
+import { UniqueWhereExpander, UpdateInputVisitor } from '../../inputProcessing'
 import { Acl, Input, Model } from '@contember/schema'
 import PredicateFactory from '../../acl/PredicateFactory'
 import UpdateBuilderFactory from './UpdateBuilderFactory'
-import UniqueWhereExpander from '../../graphQlResolver/UniqueWhereExpander'
 import Mapper from '../Mapper'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import { Client } from '@contember/database'
@@ -13,7 +12,6 @@ import {
 	MutationNoResultError,
 	MutationNothingToDo,
 	MutationResultList,
-	ModificationType,
 	MutationUpdateOk,
 	NothingToDoReason,
 	ResultListNotFlatten,

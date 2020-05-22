@@ -33,7 +33,9 @@ export class NodeMailer implements Mailer {
 		try {
 			return await this.transport.sendMail({ ...message, from: message.from || this.from })
 		} catch (e) {
+			// eslint-disable-next-line no-console
 			console.log('Failed to send an email: \n' + JSON.stringify(message))
+			// eslint-disable-next-line no-console
 			console.error(e)
 			return { error: e }
 		}

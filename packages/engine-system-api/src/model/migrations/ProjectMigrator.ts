@@ -154,6 +154,7 @@ export class ProjectMigrator {
 					events = { ...events, [childStage.slug]: transformedEvents }
 				}
 			} catch (e) {
+				// eslint-disable-next-line no-console
 				console.error(e)
 				throw new MigrationFailedError(migrationVersion, e.message)
 			}
@@ -169,6 +170,7 @@ export class ProjectMigrator {
 			await db.query(sql)
 		} catch (e) {
 			if (e instanceof ConnectionError) {
+				// eslint-disable-next-line no-console
 				console.error(e)
 				throw new MigrationFailedError(migrationVersion, e.message)
 			}

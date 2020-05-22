@@ -4,6 +4,7 @@ export const initSentry = (dsn?: string) => {
 	if (!dsn) {
 		return
 	}
+	// eslint-disable-next-line no-console
 	console.log(`Intializing sentry with dsn: ${dsn}`)
 	Sentry.init({
 		dsn: dsn,

@@ -12,8 +12,11 @@ export class EventsRebaser {
 		newBase: string,
 		droppedEvents: string[],
 	): Promise<string> {
+		// eslint-disable-next-line no-console
 		console.log('Old head: ' + headEvent)
+		// eslint-disable-next-line no-console
 		console.log('Old base: ' + oldBase)
+		// eslint-disable-next-line no-console
 		console.log('New base: ' + newBase)
 
 		const result: {
@@ -27,6 +30,7 @@ export class EventsRebaser {
 
 		const newHead = result.rows[0] ? result.rows[0].new_id : newBase
 
+		// eslint-disable-next-line no-console
 		console.log('New head: ' + newHead)
 
 		await db.commandBus.execute(new UpdateStageEventCommand(stageSlug, newHead))

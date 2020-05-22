@@ -184,7 +184,9 @@ export const collectResults = async (
 	const errored = results.map(([err]) => err).filter(it => !!it)
 	if (errored.length > 0) {
 		if (errored.length > 1) {
+			// eslint-disable-next-line no-console
 			console.error('Multiple error has occurred, printing them & rethrowing the first one')
+			// eslint-disable-next-line no-console
 			errored.slice(1).map(e => console.error(e))
 		}
 		throw errored[0]

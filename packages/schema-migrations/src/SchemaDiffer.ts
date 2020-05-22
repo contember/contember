@@ -233,6 +233,7 @@ export class SchemaDiffer {
 		if (checkRecreate && !deepEqual(updatedSchema, schemaWithAppliedModifications)) {
 			const diff = createPatch(updatedSchema, schemaWithAppliedModifications)
 			for (let item of diff) {
+				// eslint-disable-next-line no-console
 				console.log(item)
 			}
 			throw new ImplementationException('Updated schema cannot be recreated by the generated diff!')

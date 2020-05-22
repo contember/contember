@@ -26,6 +26,7 @@ export class ProjectInitializer {
 		const dbContext = databaseContextFactory.create(unnamedIdentity)
 		if (project.db) {
 			// todo: use dbContext
+			// eslint-disable-next-line no-console
 			console.group(`Executing system schema migration`)
 			const pgClient = createPgClient(project.db)
 			await pgClient.connect()
@@ -40,6 +41,7 @@ export class ProjectInitializer {
 				project,
 			})
 			await pgClient.end()
+			// eslint-disable-next-line no-console
 			console.groupEnd()
 		}
 		return dbContext.transaction(async trx => {
@@ -51,6 +53,7 @@ export class ProjectInitializer {
 	private async createInitEvent(db: DatabaseContext) {
 		const rowCount = await db.commandBus.execute(new CreateInitEventCommand())
 		if (rowCount) {
+			// eslint-disable-next-line no-console
 			console.log(`Created init event`)
 		}
 	}
@@ -63,8 +66,10 @@ export class ProjectInitializer {
 		const createStage = async (parent: StageConfig | null, stage: StageConfig) => {
 			const created = await this.stageCreator.createStage(db, parent, stage)
 			if (created) {
+				// eslint-disable-next-line no-console
 				console.log(`Created stage ${stage.slug} `)
 			} else {
+				// eslint-disable-next-line no-console
 				console.log(`Updated stage ${stage.slug}`)
 			}
 		}
@@ -76,12 +81,16 @@ export class ProjectInitializer {
 			}
 		}
 
+		// eslint-disable-next-line no-console
 		console.group(`Creating stages`)
 		await createRecursive(null, root)
+		// eslint-disable-next-line no-console
 		console.groupEnd()
 
+		// eslint-disable-next-line no-console
 		console.group(`Executing project migrations`)
 		await this.runMigrations(db, project)
+		// eslint-disable-next-line no-console
 		console.groupEnd()
 	}
 
@@ -96,22 +105,27 @@ export class ProjectInitializer {
 			badMigrations,
 		} = await this.projectMigrationInfoResolver.getMigrationsInfo(db, project)
 
+		// eslint-disable-next-line no-console
 		console.log(`Reading migrations from directory "${migrationsDirectory}"`)
 		for (const bad of badMigrations) {
+			// eslint-disable-next-line no-console
 			console.warn(bad.error)
 		}
 
 		if (allMigrations.length === 0) {
+			// eslint-disable-next-line no-console
 			console.warn(`No migrations for project found.`)
 			return
 		}
 
 		if (migrationsToExecute.length === 0) {
+			// eslint-disable-next-line no-console
 			console.log(`No migrations to execute for project`)
 			return
 		}
 
 		await this.projectMigrator.migrate(db, project, migrationsToExecute, version =>
+			// eslint-disable-next-line no-console
 			console.log(`Executing migration ${version}`),
 		)
 	}
@@ -125,16 +139,19 @@ export class ProjectInitializer {
 		if (executedMigrations.length > 0 || migrationEvents.length === 0) {
 			return
 		}
+		// eslint-disable-next-line no-console
 		console.group('Upgrading schema migrations')
 		for (const event of migrationEvents) {
 			const version = event.data.version
 			const migration = allMigrations.find(it => it.version === version)
 			if (!migration) {
+				// eslint-disable-next-line no-console
 				console.warn(`Previously executed migration ${version} not found`)
 				continue
 			}
 			await db.commandBus.execute(new SaveMigrationCommand(migration, event.created_at))
 		}
+		// eslint-disable-next-line no-console
 		console.groupEnd()
 	}
 }

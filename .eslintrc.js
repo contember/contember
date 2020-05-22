@@ -13,6 +13,7 @@ module.exports =  {
 		sourceType:  'module',
 	},
 	rules: {
+		"no-console": "error",
 		"@typescript-eslint/array-type": "off",
 		"@typescript-eslint/ban-ts-ignore": "off",
 		"@typescript-eslint/camelcase": "off",
@@ -32,10 +33,5 @@ module.exports =  {
 		"@typescript-eslint/prefer-interface": "off",
 
 		"prefer-const": "off",
-	},
-	settings:  {
-		react:  {
-			version:  'detect',
-		},
 	},
 };

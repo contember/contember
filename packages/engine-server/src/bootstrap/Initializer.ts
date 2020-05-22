@@ -15,27 +15,33 @@ export class Initializer {
 	) {}
 
 	public async initialize(): Promise<void> {
+		// eslint-disable-next-line no-console
 		console.log()
+		// eslint-disable-next-line no-console
 		console.group('Initializing tenant database')
-		console.group('Executing migrations')
 		await this.tenantDbMigrationsRunner.migrate<TenantMigrationArgs>(true, {
 			credentials: this.tenantCredentials,
 			providers: this.providers,
 		})
-		console.groupEnd()
+		// eslint-disable-next-line no-console
 		console.groupEnd()
 
 		for (const container of this.projectContainers) {
 			const project = container.project
+			// eslint-disable-next-line no-console
 			console.log()
+			// eslint-disable-next-line no-console
 			console.group(`Initializing ${project.slug} database`)
 
+			// eslint-disable-next-line no-console
 			console.group(`Updating metadata in project table in tenant db`)
 			await this.projectManager.createOrUpdateProject(project)
+			// eslint-disable-next-line no-console
 			console.groupEnd()
 
 			await this.projectInitializer.initialize(container.systemDatabaseContextFactory, project)
 
+			// eslint-disable-next-line no-console
 			console.groupEnd()
 		}
 	}

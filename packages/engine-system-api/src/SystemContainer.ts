@@ -203,7 +203,10 @@ export class SystemContainerFactory {
 						releaseTreeMutationResolver,
 					).create(),
 			)
-			.addService('resolverContextFactory', ({ authorizator }) => new ResolverContextFactory(authorizator))
+			.addService(
+				'resolverContextFactory',
+				({ authorizator, schemaVersionBuilder }) => new ResolverContextFactory(authorizator, schemaVersionBuilder),
+			)
 			.addService(
 				'projectInitializer',
 				({

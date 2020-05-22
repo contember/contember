@@ -40,9 +40,14 @@ export class SystemApiTester {
 		await setupSystemVariables(this.db.client, unnamedIdentity, { uuid: this.uuidGenerator })
 		const identity = options.identity || new Identity(testUuid(888), options.roles || [ProjectRole.ADMIN])
 
-		const context = this.systemContainer.resolverContextFactory.create(this.db, this.project, identity, {})
+		const context = await this.systemContainer.resolverContextFactory.create(this.db, this.project, identity, {})
 
-		return await graphql(this.systemSchema, gql, null, context, variables)
+		const result = await graphql(this.systemSchema, gql, null, context, variables)
+		if (result.errors) {
+			throw result.errors.length === 1 ? result.errors[0] : result.errors
+		}
+
+		return result
 	}
 
 	public async diff(stage: string): Promise<Schema.DiffResult> {

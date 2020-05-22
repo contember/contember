@@ -71,9 +71,26 @@ namespace Acl {
 		manage: TenantManagePermissions
 	}
 
+	export enum SystemPermissionsLevel {
+		none = 'none',
+		any = 'any',
+		some = 'some',
+	}
+
+	export type LimitedSystemPermissionsLevel = SystemPermissionsLevel.any | SystemPermissionsLevel.none
+
+	export interface SystemPermissions {
+		diff?: SystemPermissionsLevel
+		history?: LimitedSystemPermissionsLevel
+		release?: SystemPermissionsLevel
+		rebase?: LimitedSystemPermissionsLevel
+		migrate?: boolean
+	}
+
 	export type RolePermissions = {
 		inherits?: string[]
 		tenant?: TenantPermissions
+		system?: SystemPermissions
 		variables: Acl.Variables
 		stages: StagesDefinition
 		entities: Permissions

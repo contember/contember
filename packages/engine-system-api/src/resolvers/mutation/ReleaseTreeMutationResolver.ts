@@ -3,6 +3,7 @@ import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
 import { MutationReleaseTreeArgs, ReleaseTreeErrorCode, ReleaseTreeResponse } from '../../schema'
 import {
+	AuthorizationActions,
 	DiffBuilder,
 	DiffBuilderErrorCode,
 	RebaseExecutor,
@@ -39,6 +40,12 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 				}
 			}
 			const { head, base } = stagesResult
+
+			await context.requireAccess(
+				AuthorizationActions.PROJECT_RELEASE_SOME,
+				head.slug,
+				'You are not allowed to execute a release.',
+			)
 
 			await this.rebaseExecutor.rebaseAll(db, context.project)
 			const filter = args.tree ? args.tree.map(it => ({ ...it, relations: it.relations || [] })) : null

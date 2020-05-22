@@ -1,28 +1,35 @@
 import { AuthorizationScope, Authorizator } from '@contember/authorization'
-import { Schema, Acl } from '@contember/schema'
+import { Acl, Schema } from '@contember/schema'
 import { ForbiddenError } from 'apollo-server-errors'
 import { DatabaseContext, SchemaVersionBuilder } from '../model'
 import { ProjectConfig } from '../types'
 import { Identity } from '../model/authorization'
+import { StagePermissionsFactory } from '../model/authorization/StagePermissionsFactory'
+import { StageScope } from '../model/authorization/StageScope'
 
 export class ResolverContextFactory {
-	constructor(private readonly authorizator: Authorizator<Identity>) {}
+	constructor(
+		private readonly authorizator: Authorizator<Identity>,
+		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+	) {}
 
-	public create(
+	public async create(
 		systemDbContext: DatabaseContext,
 		project: ProjectConfig,
 		identity: Identity,
 		variables: Acl.VariablesMap,
-	): ResolverContext {
+	): Promise<ResolverContext> {
+		const schema = await this.schemaVersionBuilder.buildSchema(systemDbContext)
+		const stagePermissionsFactory = new StagePermissionsFactory(schema)
 		return {
 			project,
 			identity,
 			variables,
+			schema,
 			authorizator: this.authorizator,
 			db: systemDbContext,
-			isAllowed: async (scope, action) => await this.authorizator.isAllowed(identity, scope, action),
-			requireAccess: async (action, message?) => {
-				if (!(await this.authorizator.isAllowed(identity, new AuthorizationScope.Global(), action))) {
+			requireAccess: async (action, stage, message?) => {
+				if (!(await this.authorizator.isAllowed(identity, new StageScope(stage, stagePermissionsFactory), action))) {
 					throw new ForbiddenError(message || 'Forbidden')
 				}
 			},
@@ -32,10 +39,10 @@ export class ResolverContextFactory {
 
 export interface ResolverContext {
 	readonly project: ProjectConfig
+	readonly schema: Schema
 	readonly identity: Identity
 	readonly db: DatabaseContext
 	readonly variables: Acl.VariablesMap
 	readonly authorizator: Authorizator<Identity>
-	readonly isAllowed: (scope: AuthorizationScope<Identity>, action: Authorizator.Action) => Promise<boolean>
-	readonly requireAccess: (action: Authorizator.Action, message?: string) => Promise<void>
+	readonly requireAccess: (action: Authorizator.Action, stage: string, message?: string) => Promise<void>
 }

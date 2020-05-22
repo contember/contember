@@ -6,9 +6,9 @@ import Acl from '@contember/schema/dist/src/schema/acl'
 import SystemPermissionsLevel = Acl.SystemPermissionsLevel
 import { VERSION_LATEST } from '@contember/schema-migrations'
 
-describe('system api - release', () => {
+describe('system api - releaseTree', () => {
 	it(
-		'executes release',
+		'executes tree release',
 		async () => {
 			const tester = await ApiTester.create({
 				project: {
@@ -38,34 +38,31 @@ describe('system api - release', () => {
 			}`,
 			)
 
-			await tester.content.queryContent(
+			const authorResult = await tester.content.queryContent(
 				'preview',
 				GQL`mutation {
 				createAuthor(data: {name: "Jack Black"}) {
 					ok
+					node {
+						id
+					}
 				}
 			}`,
 			)
 
-			const diff = await tester.system.diff('preview')
-
-			expect(diff.events.length).toEqual(2)
-			expect(diff.events[0].type).toEqual('CREATE')
-			expect(diff.events[1].type).toEqual('CREATE')
-
 			const result = await tester.system.querySystem(
-				GQL`mutation ($stage: String!, $events: [String!]!) {
-				release(stage: $stage, events: $events) {
+				GQL`mutation ($stage: String!, $filter: [TreeFilter!]!) {
+				releaseTree(stage: $stage, tree: $filter) {
 					ok
 				}
 			}`,
 				{
 					stage: 'preview',
-					events: [diff.events[1].id],
+					filter: [{ entity: 'Author', id: authorResult.createAuthor.node.id }],
 				},
 			)
 
-			expect(result.data.release.ok).toEqual(true)
+			expect(result.data.releaseTree.ok).toEqual(true)
 
 			const authors = await tester.content.queryContent(
 				'prod',
@@ -84,63 +81,6 @@ describe('system api - release', () => {
 
 			expect(diff2.events.length).toBe(1)
 			expect(diff2.events[0].type).toBe(EventType.Create)
-			await tester.cleanup()
-		},
-		TIMEOUT,
-	)
-
-	it(
-		'executes rebase after release',
-		async () => {
-			const eventsSequence = {
-				a: '  1 2 3',
-				b: 'a - - - 4 5',
-				c: 'b - - - - - 6',
-				d: 'b - - - - - 7',
-				e: 'd - - - - - 8',
-			}
-
-			const stages = EventSequence.createStagesConfiguration(eventsSequence)
-			const tester = await ApiTester.create({
-				project: {
-					stages: stages,
-				},
-			})
-			await tester.stages.createAll()
-
-			await tester.stages.migrate('2019-02-01-163923-init')
-
-			await tester.sequences.runSequence(eventsSequence)
-
-			const diff = await tester.system.diff('b')
-
-			expect(diff.events.length).toBe(2)
-			expect(diff.events[0].type).toBe('CREATE')
-
-			const result = await tester.system.querySystem(
-				GQL`mutation ($stage: String!, $events: [String!]!) {
-				release(stage: $stage, events: $events) {
-					ok
-				}
-			}`,
-				{
-					stage: 'b',
-					events: [diff.events[1].id],
-				},
-			)
-
-			await tester.sequences.verifySequence(
-				{
-					a: '  99 1 2 3 5',
-					b: 'a -  - - - - 4',
-					c: 'b -  - - - - - 6',
-					d: 'b -  - - - - - 7',
-					e: 'd -  - - - - - - 8',
-				},
-				{
-					99: createRunMigrationEvent('2019-02-01-163923'),
-				},
-			)
 			await tester.cleanup()
 		},
 		TIMEOUT,
@@ -196,6 +136,27 @@ describe('system api - release', () => {
 										Author: {
 											predicates: {},
 											operations: {
+												read: {
+													name: true,
+												},
+											},
+										},
+									},
+									system: {
+										release: SystemPermissionsLevel.some,
+									},
+								},
+							},
+							{
+								op: 'add',
+								path: '/roles/someWithAcl',
+								value: {
+									variables: {},
+									stages: '*',
+									entities: {
+										Author: {
+											predicates: {},
+											operations: {
 												create: {
 													name: true,
 												},
@@ -215,10 +176,11 @@ describe('system api - release', () => {
 				],
 			})
 
-			await tester.content.queryContent(
+			const authorResult = await tester.content.queryContent(
 				'preview',
 				GQL`mutation {
-					createAuthor(data: {name: "John Doe"}) {
+					createAuthor(data: {name: "Jack Black"}) {
+						ok
 						node {
 							id
 						}
@@ -226,30 +188,27 @@ describe('system api - release', () => {
 				}`,
 			)
 
-			const diff = await tester.system.diff('preview')
+			const filter = [{ entity: 'Author', id: authorResult.createAuthor.node.id }]
+			const releaseGql = GQL`mutation ($filter: [TreeFilter!]!) {
+				releaseTree(stage: "preview", tree: $filter) {
+					ok
+					errors
+				}
+			}`
 
-			expect(diff.events.length).toEqual(1)
-			expect(diff.events[0].type).toEqual('CREATE')
-
-			const gql = GQL`mutation ($stage: String!, $events: [String!]!) {
-			release(stage: $stage, events: $events) {
-				ok
-				errors
-			}
-		}`
-			const variables = {
-				stage: 'preview',
-				events: [diff.events[0].id],
-			}
-
-			const result = await tester.system.querySystem(gql, variables, { roles: ['some'] })
-			console.log(result.data.release.errors)
-
-			expect(result.data.release.ok).toBeTrue()
-
-			await expectAsync(tester.system.querySystem(gql, variables, { roles: ['none'] })).toBeRejectedWithError(
+			await expectAsync(tester.system.querySystem(releaseGql, { filter }, { roles: ['none'] })).toBeRejectedWithError(
 				/You are not allowed to execute a release.+/,
 			)
+
+			const releaseSome = await tester.system.querySystem(releaseGql, { filter }, { roles: ['some'] })
+
+			expect(releaseSome.data.releaseTree.ok).toBeFalse()
+			expect(releaseSome.data.releaseTree.errors.length).toBe(1)
+			expect(releaseSome.data.releaseTree.errors[0]).toBe('FORBIDDEN')
+
+			const releaseSomeWithAcl = await tester.system.querySystem(releaseGql, { filter }, { roles: ['someWithAcl'] })
+
+			expect(releaseSomeWithAcl.data.releaseTree.ok).toBeTrue()
 
 			await tester.cleanup()
 		},

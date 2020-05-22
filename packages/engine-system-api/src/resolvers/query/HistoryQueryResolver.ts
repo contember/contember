@@ -2,7 +2,13 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { QueryResolver } from '../Resolver'
 import { HistoryErrorCode, HistoryResponse, QueryHistoryArgs } from '../../schema'
-import { EventResponseBuilder, HistoryQuery, SchemaVersionBuilder, StageBySlugQuery } from '../../model'
+import {
+	AuthorizationActions,
+	EventResponseBuilder,
+	HistoryQuery,
+	SchemaVersionBuilder,
+	StageBySlugQuery,
+} from '../../model'
 import { getEntity } from '@contember/schema-utils'
 
 export class HistoryQueryResolver implements QueryResolver<'history'> {
@@ -25,6 +31,12 @@ export class HistoryQueryResolver implements QueryResolver<'history'> {
 					errors: [HistoryErrorCode.StageNotFound],
 				}
 			}
+			await context.requireAccess(
+				AuthorizationActions.PROJECT_HISTORY_ANY,
+				stage.slug,
+				'You are not allowed to view a history.',
+			)
+
 			const schema = await this.schemaVersionBuilder.buildSchema(db)
 
 			const filter = args.filter

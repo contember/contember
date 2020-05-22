@@ -117,13 +117,6 @@ export class ApiTester {
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
 			resolvers: systemContainer.get('systemResolvers') as any,
-			logger: {
-				log: err => {
-					console.error(err)
-					process.exit(1)
-					return err
-				},
-			},
 		})
 
 		const stageManager = new TesterStageManager(

@@ -2,7 +2,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
 import { MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse } from '../../schema'
-import { RebaseExecutor, ReleaseExecutor, ReleaseExecutorErrorCode } from '../../model'
+import { AuthorizationActions, RebaseExecutor, ReleaseExecutor, ReleaseExecutorErrorCode } from '../../model'
 import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
 export class ReleaseMutationResolver implements MutationResolver<'release'> {
@@ -29,6 +29,12 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 				}
 			}
 			const { head, base } = stagesResult
+
+			await context.requireAccess(
+				AuthorizationActions.PROJECT_RELEASE_SOME,
+				head.slug,
+				'You are not allowed to execute a release.',
+			)
 
 			await this.rebaseExecutor.rebaseAll(db, context.project)
 

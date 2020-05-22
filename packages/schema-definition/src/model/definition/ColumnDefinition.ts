@@ -62,14 +62,17 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 				return { ...common, type: type, columnType: 'date' }
 			case Model.ColumnType.Enum:
 				let enumName: string
-				if (enumRegistry.has(enumDefinition!)) {
-					enumName = enumRegistry.getName(enumDefinition!)
+				if (!enumDefinition) {
+					throw new Error()
+				}
+				if (enumRegistry.has(enumDefinition)) {
+					enumName = enumRegistry.getName(enumDefinition)
 				} else {
 					enumName = entityName + name.substring(0, 1).toUpperCase() + name.substring(1)
-					enumRegistry.register(enumName, enumDefinition!)
+					enumRegistry.register(enumName, enumDefinition)
 				}
 
-				return { ...common, type: type, columnType: enumName!, enumName: enumName! }
+				return { ...common, type: type, columnType: enumName, enumName: enumName }
 			default:
 				;(({}: never): never => {
 					throw new Error()

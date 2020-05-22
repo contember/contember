@@ -94,7 +94,11 @@ export class SystemApiTester {
 
 	public async fetchEvents(stage: string): Promise<AnyEvent[]> {
 		const initEvent = await this.db.queryHandler.fetch(new InitEventQuery())
-		const stageHead = (await this.db.queryHandler.fetch(new StageBySlugQuery(stage)))!.event_id
+		const stageRow = await this.db.queryHandler.fetch(new StageBySlugQuery(stage))
+		if (!stageRow) {
+			throw new Error()
+		}
+		const stageHead = stageRow.event_id
 
 		return await this.db.queryHandler.fetch(new DiffQuery(initEvent.id, stageHead))
 	}

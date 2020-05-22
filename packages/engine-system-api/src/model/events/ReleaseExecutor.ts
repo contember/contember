@@ -12,6 +12,7 @@ import { ContentEventsApplier } from '../dependencies'
 import { formatSchemaName } from '../helpers'
 import { Identity } from '../authorization'
 import { Acl } from '@contember/schema'
+import { ImplementationException } from '../../utils'
 
 export class ReleaseExecutor {
 	constructor(
@@ -103,7 +104,10 @@ export class ReleaseExecutor {
 		)
 		for (const child of stageTree.getChildren(rebasedStage)) {
 			const childWithEvent = await db.queryHandler.fetch(new StageBySlugQuery(child.slug))
-			await this.rebaseRecursive(db, stageTree, childWithEvent!, rebasedStage.event_id, newHead, [])
+			if (!childWithEvent) {
+				throw new ImplementationException()
+			}
+			await this.rebaseRecursive(db, stageTree, childWithEvent, rebasedStage.event_id, newHead, [])
 		}
 	}
 

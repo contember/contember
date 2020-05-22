@@ -1,6 +1,5 @@
 import 'jasmine'
 import { GQL } from './tags'
-import { DiffQuery, InitEventQuery, StageBySlugQuery } from '@contember/engine-system-api'
 import { AnyEvent, CreateEvent } from '@contember/engine-common'
 import { EventSequence } from './EventSequence'
 import { QueryHandler } from '@contember/queryable'
@@ -33,7 +32,10 @@ export class SequenceTester {
 		let follow: number | null = 0
 		const releaseForward = async () => {
 			if (follow) {
-				await this.systemApiTester.releaseForward(sequence.baseStage!, sequence.stage, follow)
+				if (!sequence.baseStage) {
+					throw new Error()
+				}
+				await this.systemApiTester.releaseForward(sequence.baseStage, sequence.stage, follow)
 			}
 			follow = null
 		}
@@ -89,7 +91,10 @@ export class SequenceTester {
 						this.assertEventEquals(expectedEvent, event)
 						break
 					case 'follow':
-						const baseEvent = events[sequence.baseStage!][i]
+						if (!sequence.baseStage) {
+							throw new Error()
+						}
+						const baseEvent = events[sequence.baseStage][i]
 						expect(baseEvent).not.toBeUndefined()
 						expect(event.id).toBe(baseEvent.id)
 						break

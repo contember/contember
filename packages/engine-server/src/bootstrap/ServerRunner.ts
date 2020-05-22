@@ -29,6 +29,7 @@ export class ServerRunner {
 
 		const monitoringPort = this.config.server.monitoringPort
 		const monitoringServer = this.monitoringKoa.listen(monitoringPort, () => {
+			// eslint-disable-next-line no-console
 			console.log(success(`Monitoring running on http://localhost:${monitoringPort}`))
 		})
 

@@ -9,8 +9,9 @@ export class ExecutedMigrationsQuery extends DatabaseQuery<ExecutedMigration[]> 
 
 	async fetch(queryable: DatabaseQueryable): Promise<ExecutedMigration[]> {
 		const builder = createExecutedMigrationQueryBuilder()
-		const builderWithWhere = this.afterVersion
-			? builder.where(expr => expr.compare('version', Operator.gt, this.afterVersion!))
+		const afterVersion = this.afterVersion
+		const builderWithWhere = afterVersion
+			? builder.where(expr => expr.compare('version', Operator.gt, afterVersion))
 			: builder
 
 		const result = await builderWithWhere.getResult(queryable.db)

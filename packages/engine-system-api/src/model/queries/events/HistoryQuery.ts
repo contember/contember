@@ -27,12 +27,13 @@ export class HistoryQuery extends DatabaseQuery<AnyEvent[]> {
 	}
 
 	private applyFilter(qb: SelectBuilder<EventRow>): SelectBuilder<EventRow> {
-		if (!this.filter) {
+		const filter = this.filter
+		if (!filter) {
 			return qb
 		}
 		return qb.where(expr =>
 			expr.or(or =>
-				this.filter!.reduce(
+				filter.reduce(
 					(or, filter) =>
 						or.and(and =>
 							and

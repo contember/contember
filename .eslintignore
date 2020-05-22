@@ -4,3 +4,4 @@
 /packages/*/node_modules
 /packages/cli/resources/templates/*/node_modules
 /packages/engine-system-api/migrations/*.d.ts
+/packages/engine-tenant-api/migrations/*.d.ts

@@ -1,5 +1,6 @@
 import { StageWithoutEvent } from '../dtos'
 import { ProjectConfig, StageConfig } from '../../types'
+import { ImplementationException } from '../../utils'
 
 export class StageTree {
 	constructor(private readonly root: StageConfig, private readonly childMap: StageTreeMap) {}
@@ -21,13 +22,15 @@ export const createStageTree = (project: Pick<ProjectConfig, 'stages'>): StageTr
 	const rootStage = rootStages[0]
 	const stages = project.stages
 		.filter(it => it.base)
-		.reduce<StageTreeMap>(
-			(acc, stage) => ({
+		.reduce<StageTreeMap>((acc, stage) => {
+			if (!stage.base) {
+				throw new ImplementationException()
+			}
+			return {
 				...acc,
-				[stage.base!]: [...(acc[stage.base!] || []), stage],
-			}),
-			{},
-		)
+				[stage.base]: [...(acc[stage.base] || []), stage],
+			}
+		}, {})
 	return new StageTree(rootStage, stages)
 }
 export type StageTreeMap = { [parent: string]: StageConfig[] }

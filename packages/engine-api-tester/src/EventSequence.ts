@@ -35,7 +35,7 @@ namespace EventSequence {
 			throw new Error('Invalid sequence format')
 		}
 		const items: SequencePart[] = []
-		for (let part of matchResult.groups!.sequence.trim().split(/\s+/)) {
+		for (let part of matchResult.groups?.sequence.trim().split(/\s+/) || []) {
 			if (part === '-') {
 				items.push(new Follow())
 			} else {
@@ -47,7 +47,7 @@ namespace EventSequence {
 				items.push(new Event(Number(part), modifier))
 			}
 		}
-		return new EventSequence(stage, matchResult.groups!.baseStage, items)
+		return new EventSequence(stage, matchResult.groups?.baseStage, items)
 	}
 
 	export function parseSet(sequences: StringSequenceSet): Sequences {

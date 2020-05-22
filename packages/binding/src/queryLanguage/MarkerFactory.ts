@@ -16,7 +16,6 @@ import {
 	HasManyRelation,
 	HasOneRelation,
 	RelativeSingleField,
-	SubTreeIdentifier,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedSingleEntity,
 	SugaredRelativeEntityList,
@@ -33,7 +32,6 @@ export namespace MarkerFactory {
 		environment: Environment,
 		singleEntity: SugaredQualifiedSingleEntity,
 		fields: EntityFieldMarkers,
-		subTreeIdentifier?: SubTreeIdentifier,
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
 		return new MarkerTreeRoot<TaggedQualifiedSingleEntity>(
@@ -42,7 +40,6 @@ export namespace MarkerFactory {
 				type: 'unique',
 			},
 			fields,
-			subTreeIdentifier,
 		)
 	}
 
@@ -50,7 +47,6 @@ export namespace MarkerFactory {
 		environment: Environment,
 		entityList: SugaredQualifiedEntityList,
 		fields: EntityFieldMarkers,
-		subTreeIdentifier?: SubTreeIdentifier,
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(entityList, environment)
 
@@ -60,7 +56,6 @@ export namespace MarkerFactory {
 				type: 'nonUnique',
 			},
 			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, fields),
-			subTreeIdentifier,
 		)
 	}
 
@@ -77,7 +72,6 @@ export namespace MarkerFactory {
 				type: 'unconstrainedNonUnique',
 			},
 			fields,
-			undefined,
 		)
 	}
 
@@ -94,7 +88,6 @@ export namespace MarkerFactory {
 				type: 'unconstrainedNonUnique',
 			},
 			fields,
-			undefined,
 		)
 	}
 

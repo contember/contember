@@ -1,4 +1,4 @@
-import { FieldName, SubTreeIdentifier } from '../treeParameters'
+import { FieldName } from '../treeParameters'
 import { Hashing } from '../utils'
 import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'

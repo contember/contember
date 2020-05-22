@@ -50,18 +50,12 @@ export type DynamicChoiceFieldProps = (
 ) &
 	BaseDynamicChoiceFieldProps
 
-// Now THIS, this is one of the nastiest hacks in the entire codebase 👏.
-// TODO how to improve this though…? 🤔
-const computeSubTreeIdentifier = (field: DynamicChoiceFieldProps['field']) => JSON.stringify(field)
-
 export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.ChoiceArity>(
 	props: DynamicChoiceFieldProps,
 ): ChoiceFieldData.MetadataByArity[DynamicArity] => {
 	const parentEntity = useParentEntityAccessor()
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
-	const subTreeIdentifier = React.useMemo(() => computeSubTreeIdentifier(props.field), [props.field])
-	const subTreeData = parentEntity.getSubTree(ExpectedEntityCount.PossiblyMany, subTreeIdentifier)
 
 	const desugaredRelativePath = React.useMemo<RelativeSingleEntity | RelativeEntityList>(() => {
 		if (props.arity === 'single') {
@@ -91,6 +85,11 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			environment,
 		)
 	}, [environment, props])
+	const subTreeData = parentEntity.getSubTree({
+		...desugaredOptionPath,
+		type: 'nonUnique',
+	})
+
 	const arity = props.arity
 	const currentValueEntity: EntityListAccessor | EntityAccessor = React.useMemo(() => {
 		if (arity === 'single') {
@@ -120,7 +119,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 		for (const entity of currentlyChosenEntities) {
 			if (entity instanceof EntityAccessor) {
 				const currentKey = entity.key
-				const index = filteredOptions.findIndex(entity => {
+				const index = filteredOptions.findIndex((entity: EntityAccessor) => {
 					const key = entity.primaryKey
 					return !!key && key === currentKey
 				})
@@ -231,8 +230,6 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		let reference: React.ReactNode
 		let entityListDataProvider: React.ReactNode
 
-		const subTreeIdentifier = computeSubTreeIdentifier(props.field)
-
 		const idField = <Field field={PRIMARY_KEY_NAME} />
 		if (props.arity === 'single') {
 			reference = <HasOne field={props.field}>{idField}</HasOne>
@@ -250,9 +247,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					  }
 					: props.options
 			entityListDataProvider = (
-				<EntityListDataProvider {...sugaredEntityList} subTreeIdentifier={subTreeIdentifier}>
-					{props.optionFieldStaticFactory}
-				</EntityListDataProvider>
+				<EntityListDataProvider {...sugaredEntityList}>{props.optionFieldStaticFactory}</EntityListDataProvider>
 			)
 		} else {
 			const sugaredFieldList: SugaredQualifiedFieldList =
@@ -263,7 +258,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					: props.options
 			const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
 			entityListDataProvider = (
-				<EntityListDataProvider {...fieldList} entities={fieldList} subTreeIdentifier={subTreeIdentifier}>
+				<EntityListDataProvider {...fieldList} entities={fieldList}>
 					<Field field={fieldList.field} />
 				</EntityListDataProvider>
 			)

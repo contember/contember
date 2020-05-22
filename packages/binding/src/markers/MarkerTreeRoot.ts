@@ -1,7 +1,6 @@
 import {
 	QualifiedEntityList,
 	QualifiedSingleEntity,
-	SubTreeIdentifier,
 	UnconstrainedQualifiedEntityList,
 	UnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
@@ -30,12 +29,8 @@ export type MarkerTreeParameters =
 	| TaggedUnconstrainedQualifiedSingleEntity
 	| TaggedUnconstrainedQualifiedEntityList
 
-class MarkerTreeRoot<C extends MarkerTreeParameters = MarkerTreeParameters> {
-	public constructor(
-		public readonly parameters: C,
-		public readonly fields: EntityFieldMarkers,
-		public readonly subTreeIdentifier?: SubTreeIdentifier,
-	) {}
+export class MarkerTreeRoot<C extends MarkerTreeParameters = MarkerTreeParameters> {
+	public constructor(public readonly parameters: C, public readonly fields: EntityFieldMarkers) {}
 
 	public get placeholderName(): string {
 		return PlaceholderGenerator.generateMarkerTreeRootPlaceholder(this)
@@ -45,9 +40,3 @@ class MarkerTreeRoot<C extends MarkerTreeParameters = MarkerTreeParameters> {
 		return this.parameters.entityName
 	}
 }
-
-namespace MarkerTreeRoot {
-	export type TreeId = string
-}
-
-export { MarkerTreeRoot }

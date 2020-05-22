@@ -9,13 +9,24 @@ import {
 	ErrorAccessor,
 	FieldAccessor,
 	RootAccessor,
-	TreeRootAccessor,
 } from '../accessors'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
-import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar, SubTreeIdentifier } from '../treeParameters'
+import {
+	ConnectionMarker,
+	EntityFieldMarkers,
+	FieldMarker,
+	MarkerTreeParameters,
+	MarkerTreeRoot,
+	PlaceholderGenerator,
+	ReferenceMarker,
+	TaggedQualifiedEntityList,
+	TaggedQualifiedSingleEntity,
+	TaggedUnconstrainedQualifiedEntityList,
+	TaggedUnconstrainedQualifiedSingleEntity,
+} from '../markers'
+import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
@@ -62,7 +73,7 @@ interface InternalEntityState extends InternalContainerState {
 	accessor: EntityAccessor | EntityForRemovalAccessor | null
 	addEventListener: AddEntityEventListener
 	dirtyChildFields: Set<FieldName> | undefined
-	dirtySubTrees: Set<SubTreeIdentifier> | undefined
+	dirtySubTrees: Set<string> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
@@ -71,7 +82,7 @@ interface InternalEntityState extends InternalContainerState {
 	id: string | EntityAccessor.UnpersistedEntityId
 	persistedData: AccessorTreeGenerator.InitialEntityData
 	realms: Map<EntityFieldMarkers, EntityRealm>
-	subTrees: Map<SubTreeIdentifier, InternalRootStateNode> | undefined
+	subTrees: Map<string, InternalRootStateNode> | undefined
 }
 
 type OnEntityListUpdate = (accessor: EntityListAccessor) => void
@@ -229,7 +240,7 @@ class AccessorTreeGenerator {
 		entityState: InternalEntityState,
 		markers: EntityFieldMarkers,
 		onFieldUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | null) => void,
-		onSubTreeUpdate: (subTreeIdentifier: SubTreeIdentifier, updatedRoot: RootAccessor) => void,
+		onSubTreeUpdate: (placeholderName: string, updatedRoot: RootAccessor) => void,
 		onReplace: OnReplace,
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
@@ -241,19 +252,14 @@ class AccessorTreeGenerator {
 			: undefined
 
 		// TODO move this and change sub tree identifiers
+		function getSubTree(parameters: TaggedQualifiedSingleEntity): EntityAccessor | EntityForRemovalAccessor | null
+		function getSubTree(parameters: TaggedQualifiedEntityList): EntityListAccessor
+		function getSubTree(parameters: TaggedUnconstrainedQualifiedSingleEntity): EntityAccessor
+		function getSubTree(parameters: TaggedUnconstrainedQualifiedEntityList): EntityListAccessor
 		function getSubTree(
-			expectedCount: ExpectedEntityCount.UpToOne,
-			identifier: SubTreeIdentifier,
-		): EntityAccessor | EntityForRemovalAccessor | null
-		function getSubTree(
-			expectedCount: ExpectedEntityCount.PossiblyMany,
-			identifier: SubTreeIdentifier,
-		): EntityListAccessor
-		function getSubTree(
-			expectedCount: ExpectedEntityCount,
-			identifier: SubTreeIdentifier,
+			parameters: MarkerTreeParameters,
 		): EntityAccessor | EntityForRemovalAccessor | null | EntityListAccessor {
-			return entityState.subTrees?.get(identifier)?.accessor || null
+			return entityState.subTrees?.get(PlaceholderGenerator.getMarkerTreePlaceholder(parameters))?.accessor || null
 		}
 
 		// We're overwriting existing states in entityState.fields which could already be there from a different
@@ -315,10 +321,12 @@ class AccessorTreeGenerator {
 					entityState.subTrees = new Map()
 				}
 
-				const identifier = field.subTreeIdentifier ?? field.placeholderName
-				const onThisSubTreeUpdate = (newRoot: RootAccessor) => onSubTreeUpdate(identifier, newRoot)
+				const onThisSubTreeUpdate = (newRoot: RootAccessor) => onSubTreeUpdate(field.placeholderName, newRoot)
 
-				entityState.subTrees.set(identifier, this.initializeSubTree(field, initialData, onThisSubTreeUpdate, undefined))
+				entityState.subTrees.set(
+					field.placeholderName,
+					this.initializeSubTree(field, initialData, onThisSubTreeUpdate, undefined),
+				)
 			} else if (field instanceof ReferenceMarker) {
 				for (const referencePlaceholder in field.references) {
 					const reference = field.references[referencePlaceholder]
@@ -533,7 +541,7 @@ class AccessorTreeGenerator {
 			entityState.dirtyChildFields.add(updatedField)
 			return onUpdateProxy(newAccessor)
 		}
-		const onSubTreeUpdate = (subTreeIdentifier: SubTreeIdentifier, updatedRoot: RootAccessor) => {
+		const onSubTreeUpdate = (placeholderName: string, updatedRoot: RootAccessor) => {
 			const entityAccessor = entityState.accessor
 			if (!(entityAccessor instanceof EntityAccessor)) {
 				return this.rejectInvalidAccessorTree()
@@ -541,7 +549,7 @@ class AccessorTreeGenerator {
 			if (entityState.subTrees === undefined) {
 				entityState.subTrees = new Map()
 			}
-			const subTreeState = entityState.subTrees.get(subTreeIdentifier)
+			const subTreeState = entityState.subTrees.get(placeholderName)
 			if (
 				subTreeState === undefined //||
 				//currentFieldState.accessor === updatedData
@@ -565,7 +573,7 @@ class AccessorTreeGenerator {
 			if (entityState.dirtySubTrees === undefined) {
 				entityState.dirtySubTrees = new Set()
 			}
-			entityState.dirtySubTrees.add(subTreeIdentifier)
+			entityState.dirtySubTrees.add(placeholderName)
 
 			if (entityState.hasPendingUpdate) {
 				return
@@ -944,8 +952,8 @@ class AccessorTreeGenerator {
 			if (existingState.dirtySubTrees === undefined) {
 				existingState.dirtySubTrees = new Set(existingState.subTrees.keys())
 			} else {
-				for (const [subTreeIdentifier] of existingState.subTrees) {
-					existingState.dirtySubTrees.add(subTreeIdentifier)
+				for (const [subTreePlaceholder] of existingState.subTrees) {
+					existingState.dirtySubTrees.add(subTreePlaceholder)
 				}
 			}
 		}

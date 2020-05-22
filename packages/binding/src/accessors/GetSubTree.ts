@@ -1,12 +1,16 @@
-import { ExpectedEntityCount, SubTreeIdentifier } from '../treeParameters'
+import {
+	TaggedQualifiedEntityList,
+	TaggedQualifiedSingleEntity,
+	TaggedUnconstrainedQualifiedEntityList,
+	TaggedUnconstrainedQualifiedSingleEntity,
+} from '../markers'
 import { EntityAccessor } from './EntityAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { EntityListAccessor } from './EntityListAccessor'
 
 export interface GetSubTree {
-	(expectedCount: ExpectedEntityCount.UpToOne, identifier: SubTreeIdentifier):
-		| EntityAccessor
-		| EntityForRemovalAccessor
-		| null
-	(expectedCount: ExpectedEntityCount.PossiblyMany, identifier: SubTreeIdentifier): EntityListAccessor
+	(parameters: TaggedQualifiedSingleEntity): EntityAccessor | EntityForRemovalAccessor | null
+	(parameters: TaggedQualifiedEntityList): EntityListAccessor
+	(parameters: TaggedUnconstrainedQualifiedSingleEntity): EntityAccessor
+	(parameters: TaggedUnconstrainedQualifiedEntityList): EntityListAccessor
 }

@@ -12,6 +12,7 @@ const schema: DocumentNode = gql`
 	type Query {
 		stages: [Stage!]!
 		diff(stage: String!, filter: [TreeFilter!]): DiffResponse!
+		history(stage: String!, filter: [HistoryFilter!]): HistoryResponse!
 	}
 
 	type Mutation {
@@ -19,6 +20,13 @@ const schema: DocumentNode = gql`
 		release(stage: String!, events: [String!]!): ReleaseResponse!
 		releaseTree(stage: String!, tree: [TreeFilter!]!): ReleaseTreeResponse!
 		rebaseAll: RebaseAllResponse!
+	}
+
+	# === history filter ===
+
+	input HistoryFilter {
+		entity: String!
+		id: String!
 	}
 
 	# === tree filter ==
@@ -31,6 +39,22 @@ const schema: DocumentNode = gql`
 	input TreeFilterRelation {
 		name: String!
 		relations: [TreeFilterRelation!]!
+	}
+
+	# === history ===
+
+	enum HistoryErrorCode {
+		STAGE_NOT_FOUND
+	}
+
+	type HistoryResponse {
+		ok: Boolean
+		errors: [HistoryErrorCode!]!
+		result: HistoryResult
+	}
+
+	type HistoryResult {
+		events: [Event!]!
 	}
 
 	# === diff ===

@@ -5,11 +5,13 @@ import { ResolverContext } from './ResolverContext'
 import { GraphQLResolveInfo, GraphQLScalarType, Kind } from 'graphql'
 import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
 import { ReleaseTreeMutationResolver } from './mutation/ReleaseTreeMutationResolver'
+import { HistoryQueryResolver } from './query/HistoryQueryResolver'
 
 class ResolverFactory {
 	public constructor(
 		private readonly stagesQueryResolver: StagesQueryResolver,
 		private readonly diffQueryResolver: DiffQueryResolver,
+		private readonly historyQueryResolver: HistoryQueryResolver,
 		private readonly releaseMutationResolver: ReleaseMutationResolver,
 		private readonly rebaseMutationResolver: RebaseAllMutationResolver,
 		private readonly migrateMutationResolver: MigrateMutationResolver,
@@ -58,6 +60,8 @@ class ResolverFactory {
 					this.stagesQueryResolver.stages(parent, args, context, info),
 				diff: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.diffQueryResolver.diff(parent, args, context, info),
+				history: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.historyQueryResolver.history(parent, args, context, info),
 			},
 			Mutation: {
 				release: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>

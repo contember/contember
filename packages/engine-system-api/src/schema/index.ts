@@ -74,6 +74,27 @@ export enum EventType {
 	RunMigration = 'RUN_MIGRATION',
 }
 
+export enum HistoryErrorCode {
+	StageNotFound = 'STAGE_NOT_FOUND',
+}
+
+export type HistoryFilter = {
+	readonly entity: Scalars['String']
+	readonly id: Scalars['String']
+}
+
+export type HistoryResponse = {
+	readonly __typename?: 'HistoryResponse'
+	readonly ok?: Maybe<Scalars['Boolean']>
+	readonly errors: ReadonlyArray<HistoryErrorCode>
+	readonly result?: Maybe<HistoryResult>
+}
+
+export type HistoryResult = {
+	readonly __typename?: 'HistoryResult'
+	readonly events: ReadonlyArray<Event>
+}
+
 export type MigrateError = {
 	readonly __typename?: 'MigrateError'
 	readonly code: MigrateErrorCode
@@ -139,11 +160,17 @@ export type Query = {
 	readonly __typename?: 'Query'
 	readonly stages: ReadonlyArray<Stage>
 	readonly diff: DiffResponse
+	readonly history: HistoryResponse
 }
 
 export type QueryDiffArgs = {
 	stage: Scalars['String']
 	filter?: Maybe<ReadonlyArray<TreeFilter>>
+}
+
+export type QueryHistoryArgs = {
+	stage: Scalars['String']
+	filter?: Maybe<ReadonlyArray<HistoryFilter>>
 }
 
 export type RebaseAllResponse = {
@@ -303,6 +330,10 @@ export type ResolversTypes = {
 	Event: ResolverTypeWrapper<Event>
 	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
 	EventType: EventType
+	HistoryFilter: HistoryFilter
+	HistoryResponse: ResolverTypeWrapper<HistoryResponse>
+	HistoryErrorCode: HistoryErrorCode
+	HistoryResult: ResolverTypeWrapper<HistoryResult>
 	Mutation: ResolverTypeWrapper<{}>
 	Migration: Migration
 	Int: ResolverTypeWrapper<Scalars['Int']>
@@ -336,6 +367,10 @@ export type ResolversParentTypes = {
 	Event: Event
 	DateTime: Scalars['DateTime']
 	EventType: EventType
+	HistoryFilter: HistoryFilter
+	HistoryResponse: HistoryResponse
+	HistoryErrorCode: HistoryErrorCode
+	HistoryResult: HistoryResult
 	Mutation: {}
 	Migration: Migration
 	Int: Scalars['Int']
@@ -428,6 +463,24 @@ export type EventResolvers<
 	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
 }
 
+export type HistoryResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['HistoryResponse'] = ResolversParentTypes['HistoryResponse']
+> = {
+	ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['HistoryErrorCode']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['HistoryResult']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
+export type HistoryResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['HistoryResult'] = ResolversParentTypes['HistoryResult']
+> = {
+	events?: Resolver<ReadonlyArray<ResolversTypes['Event']>, ParentType, ContextType>
+	__isTypeOf?: isTypeOfResolverFn<ParentType>
+}
+
 export type MigrateErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['MigrateError'] = ResolversParentTypes['MigrateError']
@@ -487,6 +540,12 @@ export type QueryResolvers<
 > = {
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
 	diff?: Resolver<ResolversTypes['DiffResponse'], ParentType, ContextType, RequireFields<QueryDiffArgs, 'stage'>>
+	history?: Resolver<
+		ResolversTypes['HistoryResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<QueryHistoryArgs, 'stage'>
+	>
 }
 
 export type RebaseAllResponseResolvers<
@@ -562,6 +621,8 @@ export type Resolvers<ContextType = any> = {
 	DiffResponse?: DiffResponseResolvers<ContextType>
 	DiffResult?: DiffResultResolvers<ContextType>
 	Event?: EventResolvers
+	HistoryResponse?: HistoryResponseResolvers<ContextType>
+	HistoryResult?: HistoryResultResolvers<ContextType>
 	MigrateError?: MigrateErrorResolvers<ContextType>
 	MigrateResponse?: MigrateResponseResolvers<ContextType>
 	MigrateResult?: MigrateResultResolvers<ContextType>

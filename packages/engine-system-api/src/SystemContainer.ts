@@ -14,7 +14,7 @@ import {
 	DeletedRowReferenceDependencyBuilder,
 	DependencyBuilderList,
 	DiffBuilder,
-	DiffResponseBuilder,
+	EventResponseBuilder,
 	EntitiesSelector,
 	EventApplier,
 	EventsRebaser,
@@ -48,6 +48,7 @@ import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
 import { ReleaseTreeMutationResolver } from './resolvers/mutation/ReleaseTreeMutationResolver'
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
+import { HistoryQueryResolver } from './resolvers/query/HistoryQueryResolver'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -158,12 +159,17 @@ export class SystemContainerFactory {
 					new ReleaseExecutor(dependencyBuilder, container.eventApplier, eventsRebaser, schemaVersionBuilder),
 			)
 
-			.addService('systemStagesQueryResolver', () => new StagesQueryResolver())
+			.addService('stagesQueryResolver', () => new StagesQueryResolver())
 
-			.addService('systemDiffResponseBuilder', () => new DiffResponseBuilder(container.identityFetcher))
+			.addService('eventResponseBuilder', () => new EventResponseBuilder(container.identityFetcher))
 			.addService(
-				'systemDiffQueryResolver',
-				({ systemDiffResponseBuilder, diffBuilder }) => new DiffQueryResolver(systemDiffResponseBuilder, diffBuilder),
+				'diffQueryResolver',
+				({ eventResponseBuilder, diffBuilder }) => new DiffQueryResolver(eventResponseBuilder, diffBuilder),
+			)
+			.addService(
+				'historyQueryResolver',
+				({ eventResponseBuilder, schemaVersionBuilder }) =>
+					new HistoryQueryResolver(eventResponseBuilder, schemaVersionBuilder),
 			)
 			.addService(
 				'releaseMutationResolver',
@@ -179,16 +185,18 @@ export class SystemContainerFactory {
 			.addService(
 				'systemResolvers',
 				({
-					systemStagesQueryResolver,
-					systemDiffQueryResolver,
+					stagesQueryResolver,
+					diffQueryResolver,
+					historyQueryResolver,
 					releaseMutationResolver,
 					rebaseMutationResolver,
 					migrateMutationResolver,
 					releaseTreeMutationResolver,
 				}) =>
 					new ResolverFactory(
-						systemStagesQueryResolver,
-						systemDiffQueryResolver,
+						stagesQueryResolver,
+						diffQueryResolver,
+						historyQueryResolver,
 						releaseMutationResolver,
 						rebaseMutationResolver,
 						migrateMutationResolver,

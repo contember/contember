@@ -4,7 +4,7 @@ import { assertNever } from '../../utils'
 import { EventWithDependencies } from './DiffBuilder'
 import { IdentityFetcher, TenantIdentity } from '../dependencies/tenant/IdentityFetcher'
 
-export class DiffResponseBuilder {
+export class EventResponseBuilder {
 	constructor(private readonly identityFetcher: IdentityFetcher) {}
 
 	public async buildResponse(events: EventWithDependencies[]): Promise<ApiEvent[]> {

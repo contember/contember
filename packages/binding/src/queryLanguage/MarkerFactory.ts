@@ -23,6 +23,7 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 	SugaredUnconstrainedQualifiedEntityList,
+	SugaredUnconstrainedQualifiedSingleEntity,
 	SugaredUniqueWhere,
 } from '../treeParameters'
 import { QueryLanguage } from './QueryLanguage'
@@ -36,7 +37,6 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
 		return new MarkerTreeRoot<TaggedQualifiedSingleEntity>(
-			environment.getSystemVariable('treeIdFactory')(),
 			{
 				...qualifiedSingleEntity,
 				type: 'unique',
@@ -55,7 +55,6 @@ export namespace MarkerFactory {
 		const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(entityList, environment)
 
 		return new MarkerTreeRoot<TaggedQualifiedEntityList>(
-			environment.getSystemVariable('treeIdFactory')(),
 			{
 				...qualifiedEntityList,
 				type: 'nonUnique',
@@ -65,7 +64,7 @@ export namespace MarkerFactory {
 		)
 	}
 
-	export const createUnconstrainedMarkerTreeRoot = (
+	export const createUnconstrainedEntityListMarkerTreeRoot = (
 		environment: Environment,
 		entityList: SugaredUnconstrainedQualifiedEntityList,
 		fields: EntityFieldMarkers,
@@ -73,10 +72,26 @@ export namespace MarkerFactory {
 		const qualifiedEntityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment)
 
 		return new MarkerTreeRoot<TaggedUnconstrainedQualifiedEntityList>(
-			environment.getSystemVariable('treeIdFactory')(),
 			{
 				...qualifiedEntityList,
-				type: 'unconstrained',
+				type: 'unconstrainedNonUnique',
+			},
+			fields,
+			undefined,
+		)
+	}
+
+	export const createUnconstrainedSingleEntityMarkerTreeRoot = (
+		environment: Environment,
+		entityList: SugaredUnconstrainedQualifiedSingleEntity,
+		fields: EntityFieldMarkers,
+	) => {
+		const qualifiedSingleEntity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entityList, environment)
+
+		return new MarkerTreeRoot<TaggedUnconstrainedQualifiedEntityList>(
+			{
+				...qualifiedSingleEntity,
+				type: 'unconstrainedNonUnique',
 			},
 			fields,
 			undefined,
@@ -178,7 +193,7 @@ export namespace MarkerFactory {
 			ExpectedEntityCount.PossiblyMany,
 			entityFieldMarkers,
 			hasManyRelation.filter,
-			undefined,
+			undefined, // No reducedBy for hasMany
 			preferences,
 		)
 }

@@ -4,6 +4,7 @@ import {
 	EntityAccessor,
 	EntityListAccessor,
 	EntityListDataProvider,
+	ExpectedEntityCount,
 	Field,
 	FieldAccessor,
 	HasMany,
@@ -18,9 +19,9 @@ import {
 	SugaredQualifiedFieldList,
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
-	useParentEntityAccessor,
 	useEnvironment,
 	useMutationState,
+	useParentEntityAccessor,
 } from '@contember/binding'
 import { assertNever } from '@contember/utils'
 import * as React from 'react'
@@ -60,14 +61,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 	const subTreeIdentifier = React.useMemo(() => computeSubTreeIdentifier(props.field), [props.field])
-	const subTreeData = React.useMemo(() => {
-		const subTree = parentEntity.getSubTreeRoot(subTreeIdentifier)
-
-		if (!(subTree instanceof EntityListAccessor)) {
-			throw new BindingError(`Something went horribly wrong. The options of a dynamic choice field are not a list.`)
-		}
-		return subTree
-	}, [parentEntity, subTreeIdentifier])
+	const subTreeData = parentEntity.getSubTree(ExpectedEntityCount.PossiblyMany, subTreeIdentifier)
 
 	const desugaredRelativePath = React.useMemo<RelativeSingleEntity | RelativeEntityList>(() => {
 		if (props.arity === 'single') {

@@ -148,7 +148,6 @@ namespace Environment {
 	export type Value = React.ReactNode
 
 	export interface SystemVariables {
-		treeIdFactory: () => number
 		labelMiddleware?: (label: React.ReactNode) => React.ReactNode
 	}
 
@@ -176,10 +175,6 @@ namespace Environment {
 	export type SystemMiddlewareName = 'labelMiddleware'
 
 	export const defaultSystemVariables: SystemVariables = {
-		treeIdFactory: (() => {
-			let treeId = 0
-			return () => treeId++
-		})(),
 		labelMiddleware: label => label,
 	}
 

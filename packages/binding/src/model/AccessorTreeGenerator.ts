@@ -8,8 +8,8 @@ import {
 	EntityListAccessor,
 	ErrorAccessor,
 	FieldAccessor,
-	GetSubTreeRoot,
 	RootAccessor,
+	TreeRootAccessor,
 } from '../accessors'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
@@ -173,7 +173,7 @@ class AccessorTreeGenerator {
 				? initialData
 				: initialData === undefined
 				? undefined
-				: initialData[this.tree.id],
+				: initialData[this.tree.placeholderName],
 			updateDataWithEvents,
 			this.errorTreeRoot,
 		)
@@ -187,7 +187,7 @@ class AccessorTreeGenerator {
 		updateData: (newData: RootAccessor) => void,
 		errors?: ErrorsPreprocessor.ErrorTreeRoot,
 	): InternalRootStateNode {
-		const errorNode = errors === undefined ? undefined : errors[tree.id]
+		const errorNode = errors === undefined ? undefined : errors[tree.placeholderName]
 
 		const onUpdate = (updatedData: EntityAccessor.NestedAccessor | null) => {
 			if (
@@ -240,7 +240,21 @@ class AccessorTreeGenerator {
 				: entityState.persistedData[TYPENAME_KEY_NAME]
 			: undefined
 
-		const getSubTreeRoot: GetSubTreeRoot = identifier => entityState.subTrees?.get(identifier)?.accessor || null
+		// TODO move this and change sub tree identifiers
+		function getSubTree(
+			expectedCount: ExpectedEntityCount.UpToOne,
+			identifier: SubTreeIdentifier,
+		): EntityAccessor | EntityForRemovalAccessor | null
+		function getSubTree(
+			expectedCount: ExpectedEntityCount.PossiblyMany,
+			identifier: SubTreeIdentifier,
+		): EntityListAccessor
+		function getSubTree(
+			expectedCount: ExpectedEntityCount,
+			identifier: SubTreeIdentifier,
+		): EntityAccessor | EntityForRemovalAccessor | null | EntityListAccessor {
+			return entityState.subTrees?.get(identifier)?.accessor || null
+		}
 
 		// We're overwriting existing states in entityState.fields which could already be there from a different
 		// entity realm. Most of the time this results in an equivalent accessor instance, and so for those cases this
@@ -289,19 +303,19 @@ class AccessorTreeGenerator {
 					if (this.persistedData === undefined) {
 						initialData = undefined
 					} else {
-						initialData = this.persistedData[field.id]
+						initialData = this.persistedData[field.placeholderName]
 					}
 				} else if (this.initialData === undefined) {
 					initialData = undefined
 				} else {
-					initialData = this.initialData[field.id]
+					initialData = this.initialData[field.placeholderName]
 				}
 
 				if (entityState.subTrees === undefined) {
 					entityState.subTrees = new Map()
 				}
 
-				const identifier = field.subTreeIdentifier ?? field.id
+				const identifier = field.subTreeIdentifier ?? field.placeholderName
 				const onThisSubTreeUpdate = (newRoot: RootAccessor) => onSubTreeUpdate(identifier, newRoot)
 
 				entityState.subTrees.set(identifier, this.initializeSubTree(field, initialData, onThisSubTreeUpdate, undefined))
@@ -438,7 +452,7 @@ class AccessorTreeGenerator {
 			// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 			// keep in sync two copies of the same data. TS hides the extra info anyway.
 			entityState.fields,
-			getSubTreeRoot,
+			getSubTree,
 			entityState.errors ? entityState.errors.errors : emptyArray,
 			entityState.addEventListener,
 			batchUpdates,
@@ -505,7 +519,7 @@ class AccessorTreeGenerator {
 				entityAccessor.runtimeId,
 				entityAccessor.typename,
 				entityState.fields,
-				entityAccessor.getSubTreeRoot,
+				entityAccessor.getSubTree,
 				entityAccessor.errors,
 				entityAccessor.addEventListener,
 				entityAccessor.batchUpdates,
@@ -540,7 +554,7 @@ class AccessorTreeGenerator {
 				entityAccessor.runtimeId,
 				entityAccessor.typename,
 				entityState.fields,
-				entityAccessor.getSubTreeRoot,
+				entityAccessor.getSubTree,
 				entityAccessor.errors,
 				entityAccessor.addEventListener,
 				entityAccessor.batchUpdates,
@@ -813,7 +827,7 @@ class AccessorTreeGenerator {
 			replacement.runtimeId,
 			blueprint.typename,
 			original.fields,
-			replacement.getSubTreeRoot,
+			replacement.getSubTree,
 			blueprint.errors,
 			blueprint.addEventListener,
 			blueprint.batchUpdates,

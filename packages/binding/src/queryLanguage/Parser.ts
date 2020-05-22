@@ -11,7 +11,7 @@ import {
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
 	DesugaredRelativeSingleField,
-	DesugaredUnconstrainedQualifiedEntityList,
+	DesugaredUnconstrainedQualifiedEntityList, DesugaredUnconstrainedQualifiedSingleEntity,
 	EntityName,
 	FieldName,
 	Filter,
@@ -92,6 +92,23 @@ class Parser extends EmbeddedActionsParser {
 
 	private unconstrainedQualifiedEntityList = this.RULE<DesugaredUnconstrainedQualifiedEntityList>(
 		'unconstrainedQualifiedEntityList',
+		() => {
+			const entityName = this.SUBRULE(this.entityIdentifier)
+			const relativeSingleEntity = this.OPTION1(() => this.SUBRULE(this.relativeSingleEntity))
+
+			const hasOneRelationPath = this.ACTION(() =>
+				relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
+			)
+
+			return {
+				entityName,
+				hasOneRelationPath,
+			}
+		},
+	)
+
+	private unconstrainedQualifiedSingleEntity = this.RULE<DesugaredUnconstrainedQualifiedSingleEntity>(
+		'unconstrainedQualifiedSingleEntity',
 		() => {
 			const entityName = this.SUBRULE(this.entityIdentifier)
 			const relativeSingleEntity = this.OPTION1(() => this.SUBRULE(this.relativeSingleEntity))
@@ -649,6 +666,9 @@ class Parser extends EmbeddedActionsParser {
 			case Parser.EntryPoint.UnconstrainedQualifiedEntityList:
 				expression = Parser.parser.unconstrainedQualifiedEntityList()
 				break
+			case Parser.EntryPoint.UnconstrainedQualifiedSingleEntity:
+				expression = Parser.parser.unconstrainedQualifiedSingleEntity()
+				break
 			case Parser.EntryPoint.UniqueWhere:
 				expression = Parser.parser.uniqueWhere()
 				break
@@ -688,6 +708,7 @@ namespace Parser {
 		QualifiedFieldList = 'qualifiedFieldList', // E.g. Author[age < 123].son.sister.name
 		QualifiedSingleEntity = 'qualifiedSingleEntity', // E.g. Author(id = 123).son.sister
 		UnconstrainedQualifiedEntityList = 'unconstrainedQualifiedEntityList', // E.g. Author.son.sister
+		UnconstrainedQualifiedSingleEntity = 'unconstrainedQualifiedSingleEntity', // E.g. Author.son.sister
 		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
 		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
 		RelativeEntityList = 'relativeEntityList', // E.g. genres(slug = 'sciFi').authors[age < 123]
@@ -701,6 +722,7 @@ namespace Parser {
 		qualifiedFieldList: DesugaredQualifiedFieldList
 		qualifiedSingleEntity: DesugaredQualifiedSingleEntity
 		unconstrainedQualifiedEntityList: DesugaredUnconstrainedQualifiedEntityList
+		unconstrainedQualifiedSingleEntity: DesugaredUnconstrainedQualifiedSingleEntity
 		relativeSingleField: DesugaredRelativeSingleField
 		relativeSingleEntity: DesugaredRelativeSingleEntity
 		relativeEntityList: DesugaredRelativeEntityList

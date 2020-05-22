@@ -39,12 +39,8 @@ export const useAccessorTreeState = ({
 	const environment = useEnvironment()
 	const sessionToken = useSessionToken()
 
-	const normalizedEnvironment = React.useMemo(() => {
-		let id = 0
-		return environment.putSystemVariable('treeIdFactory', () => id++)
-	}, [environment])
-	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, normalizedEnvironment).generate(), [
-		normalizedEnvironment,
+	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, environment).generate(), [
+		environment,
 		nodeTree,
 	])
 

@@ -28,10 +28,10 @@ export class MutationGenerator {
 	public getPersistMutation(): string | undefined {
 		try {
 			const builder = this.addSubMutation(
-				this.persistedData ? this.persistedData[this.markerTree.id] : undefined,
+				this.persistedData ? this.persistedData[this.markerTree.placeholderName] : undefined,
 				this.markerTree.fields,
 				this.currentData,
-				this.markerTree.id,
+				this.markerTree.placeholderName,
 				this.markerTree.parameters,
 			)
 			return builder.getGql()

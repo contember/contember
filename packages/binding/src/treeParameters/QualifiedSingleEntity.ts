@@ -33,32 +33,28 @@ import {
 export interface DesugaredQualifiedSingleEntity
 	extends DesugaredQualifiedSingleEntityParameters,
 		DesugaredSingleEntityParameters,
-		DesugaredQualifiedEntityParameters,
-		DesugaredEntityCreationParameters {
+		DesugaredQualifiedEntityParameters {
 	hasOneRelationPath: DesugaredHasOneRelation[]
 }
 
 export interface QualifiedSingleEntity
 	extends QualifiedSingleEntityParameters,
 		SingleEntityParameters,
-		QualifiedEntityParameters,
-		EntityCreationParameters {
+		QualifiedEntityParameters {
 	hasOneRelationPath: HasOneRelation[]
 }
 
 export interface SugarableQualifiedSingleEntity
 	extends SugarableQualifiedSingleEntityParameters,
 		SugarableSingleEntityParameters,
-		SugarableQualifiedEntityParameters,
-		SugarableEntityCreationParameters {
+		SugarableQualifiedEntityParameters {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableQualifiedSingleEntity
 	extends UnsugarableQualifiedSingleEntityParameters,
 		UnsugarableSingleEntityParameters,
-		UnsugarableQualifiedEntityParameters,
-		UnsugarableEntityCreationParameters {
+		UnsugarableQualifiedEntityParameters {
 	// Deliberately leaving out UnsugarableHasOneRelation
 }
 

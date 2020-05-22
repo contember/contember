@@ -32,16 +32,19 @@ export class QueryGenerator {
 			baseQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		if (subTree.parameters.type === 'unconstrained') {
-			const [populatedBaseQueryBuilder] = this.addMarkerTreeRootQueries(
-				baseQueryBuilder,
-				this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate()),
-			)
-			return populatedBaseQueryBuilder
-		} else if (subTree.parameters.type === 'unique') {
-			return this.addGetQuery(baseQueryBuilder, subTree as MarkerTreeRoot<TaggedQualifiedSingleEntity>)
-		} else if (subTree.parameters.type === 'nonUnique') {
-			return this.addListQuery(baseQueryBuilder, subTree as MarkerTreeRoot<TaggedQualifiedEntityList>)
+		switch (subTree.parameters.type) {
+			case 'unique':
+				return this.addGetQuery(baseQueryBuilder, subTree as MarkerTreeRoot<TaggedQualifiedSingleEntity>)
+			case 'nonUnique':
+				return this.addListQuery(baseQueryBuilder, subTree as MarkerTreeRoot<TaggedQualifiedEntityList>)
+			case 'unconstrainedUnique':
+			case 'unconstrainedNonUnique': {
+				const [populatedBaseQueryBuilder] = this.addMarkerTreeRootQueries(
+					baseQueryBuilder,
+					this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate()),
+				)
+				return populatedBaseQueryBuilder
+			}
 		}
 		assertNever(subTree.parameters)
 	}
@@ -63,7 +66,7 @@ export class QueryGenerator {
 			CrudQueryBuilder.ReadBuilder.instantiate(
 				populatedListQueryBuilder ? populatedListQueryBuilder.objectBuilder : undefined,
 			),
-			subTree.id,
+			subTree.placeholderName,
 		)
 	}
 
@@ -104,7 +107,7 @@ export class QueryGenerator {
 		return newBaseQueryBuilder.list(
 			subTree.entityName,
 			newReadBuilder || CrudQueryBuilder.ReadBuilder.instantiate(),
-			subTree.id,
+			subTree.placeholderName,
 		)
 	}
 

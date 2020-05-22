@@ -18,11 +18,12 @@ export class DirtinessChecker {
 	}
 
 	public isDirty(accessorTree: RootAccessor): boolean {
-		const persistedData = this.persistedData ? this.persistedData[this.markerTree.id] : undefined
+		const persistedData = this.persistedData ? this.persistedData[this.markerTree.placeholderName] : undefined
 
 		if (
 			Array.isArray(persistedData) ||
-			(this.markerTree.parameters.type === 'unconstrained' && persistedData === undefined)
+			(this.markerTree.parameters.type === 'unconstrainedNonUnique' && persistedData === undefined) ||
+			(this.markerTree.parameters.type === 'unconstrainedUnique' && persistedData === undefined)
 		) {
 			if (accessorTree instanceof EntityListAccessor) {
 				return this.isEntityListDirty(this.markerTree.fields, persistedData, accessorTree)

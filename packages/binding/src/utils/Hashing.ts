@@ -14,28 +14,24 @@ export class Hashing {
 	}
 
 	public static hashMarkerTreeParameters(parameters: MarkerTreeParameters): number {
-		if (parameters.type === 'unconstrained') {
-			return 0
-		} else if (parameters.type === 'nonUnique') {
-			return Hashing.hashArray([
-				parameters.type,
-				parameters.entityName,
-				parameters.filter,
-				parameters.orderBy,
-				parameters.offset,
-				parameters.limit,
-				parameters.connectTo,
-			])
-		} else if (parameters.type === 'unique') {
-			return Hashing.hashArray([
-				parameters.type,
-				parameters.where,
-				parameters.entityName,
-				parameters.connectTo,
-				parameters.filter,
-			])
+		switch (parameters.type) {
+			case 'unique':
+				return Hashing.hashArray([parameters.type, parameters.where, parameters.entityName, parameters.filter])
+			case 'nonUnique':
+				return Hashing.hashArray([
+					parameters.type,
+					parameters.entityName,
+					parameters.filter,
+					parameters.orderBy,
+					parameters.offset,
+					parameters.limit,
+					parameters.connectTo,
+				])
+			case 'unconstrainedUnique':
+			case 'unconstrainedNonUnique':
+				return Hashing.hashArray([parameters.type, parameters.entityName, parameters.connectTo])
 		}
-		assertNever(parameters)
+		return assertNever(parameters)
 	}
 
 	private static hashArray(array: any[]): number {

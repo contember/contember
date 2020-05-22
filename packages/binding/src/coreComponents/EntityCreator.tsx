@@ -21,7 +21,7 @@ export const EntityCreator = Component<EntityCreatorProps>(
 	},
 	{
 		generateMarkerTreeRoot: (props, fields, environment) =>
-			MarkerFactory.createUnconstrainedMarkerTreeRoot(environment, props, fields),
+			MarkerFactory.createUnconstrainedEntityListMarkerTreeRoot(environment, props, fields),
 	},
 	'EntityCreator',
 )

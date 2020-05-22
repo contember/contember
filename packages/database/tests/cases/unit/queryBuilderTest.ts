@@ -1,14 +1,5 @@
 import 'jasmine'
-import {
-	Client,
-	ConditionBuilder,
-	ConflictActionType,
-	InsertBuilder,
-	LimitByGroupWrapper,
-	LockType,
-	Operator,
-	SelectBuilder,
-} from '../../../src'
+import { Client, ConflictActionType, LimitByGroupWrapper, LockType, Operator } from '../../../src'
 import { createConnectionMock } from '@contember/database-tester'
 import { SQL } from '../../src/tags'
 

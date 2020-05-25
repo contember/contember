@@ -19,18 +19,14 @@ import { ConfigProcessor } from '@contember/engine-plugins'
 		['SIGTERM', 15],
 	] as const
 
-	let server: Server
+	let servers: Server[] = []
 	for (const [signal, code] of signals) {
-		process.on(signal, () => {
+		process.on(signal, async () => {
 			console.log(`process received a ${signal} signal`)
-			if (!server) {
-				process.exit(128 + code)
-			} else {
-				server.close(() => {
-					console.log(`server stopped by ${signal} with value ${code}`)
-					process.exit(128 + code)
-				})
+			for (const server of servers) {
+				await new Promise(resolve => server.close(() => resolve()))
 			}
+			process.exit(128 + code)
 		})
 	}
 	const debug = process.env.NODE_ENV === 'development'
@@ -43,7 +39,7 @@ import { ConfigProcessor } from '@contember/engine-plugins'
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
 	}
-	server = await run(debug, config, projectsDir, plugins)
+	servers = await run(debug, config, projectsDir, plugins)
 })().catch(e => {
 	console.log(e)
 	process.exit(1)

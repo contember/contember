@@ -3,9 +3,9 @@ import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
 import { ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
 import { TimerMiddlewareState } from '../common'
 import { Client } from '@contember/database'
-import { DatabaseContextFactory, formatSchemaName, unnamedIdentity } from '@contember/engine-system-api'
+import { formatSchemaName, unnamedIdentity } from '@contember/engine-system-api'
 import { StageResolveMiddlewareState } from './StageResolveMiddlewareFactory'
-import { ProvidersState } from '../services/ProvidersState'
+import { ProvidersState } from '../services'
 
 type KoaState = ProjectMemberMiddlewareState &
 	TimerMiddlewareState &

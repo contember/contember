@@ -11,13 +11,18 @@ import { GraphQLExtension } from 'graphql-extensions'
 import { Acl, Schema } from '@contember/schema'
 import { ErrorContextProvider, ErrorHandlerExtension, ErrorLogger } from '../graphql/ErrorHandlerExtension'
 import { ContentServerMiddlewareState } from './ContentServerMiddleware'
-import { AuthMiddlewareState, TimerMiddlewareState } from '../common'
+import { AuthMiddlewareState, GraphqlInfoProviderPlugin, GraphQLInfoState, TimerMiddlewareState } from '../common'
 
 type InputKoaContext = KoaContext<
-	ProjectMemberMiddlewareState & ContentServerMiddlewareState & TimerMiddlewareState & AuthMiddlewareState
+	ProjectMemberMiddlewareState &
+		ContentServerMiddlewareState &
+		TimerMiddlewareState &
+		AuthMiddlewareState &
+		GraphQLInfoState
 >
 
-type ExtendedGraphqlContext = Context & { errorContextProvider: ErrorContextProvider }
+type ExtendedGraphqlContext = Context & { errorContextProvider: ErrorContextProvider; koaContext: InputKoaContext }
+
 class ContentApolloServerFactory {
 	constructor(
 		private readonly projectName: string,
@@ -38,6 +43,7 @@ class ContentApolloServerFactory {
 			tracing: this.debug,
 			extensions,
 			schema: dataSchema,
+			plugins: [new GraphqlInfoProviderPlugin()],
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createGraphqlContext(permissions, schema, ctx),
 		})
 	}
@@ -67,6 +73,7 @@ class ContentApolloServerFactory {
 				body: ctx.request.body,
 				url: ctx.request.originalUrl,
 			}),
+			koaContext: ctx,
 		}
 	}
 }

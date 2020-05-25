@@ -13,6 +13,7 @@ COPY --from=builder /src/packages/engine-server/node_modules ./node_modules
 
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT 4000
+ENV CONTEMBER_MONITORING_PORT 4001
 ENV CONTEMBER_CONFIG_FILE "/src/config.yaml"
 ENV CONTEMBER_PROJECTS_DIRECTORY "/src/projects"
 

@@ -6,12 +6,15 @@ import { KoaContext } from '../koa'
 import { flattenVariables } from '@contember/engine-content-api'
 import { ErrorContextProvider, ErrorHandlerExtension, ErrorLogger } from '../graphql/ErrorHandlerExtension'
 import { ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
-import { AuthMiddlewareState } from '../common'
+import { AuthMiddlewareState, GraphqlInfoProviderPlugin, GraphQLInfoState } from '../common'
 
-type InputKoaContext = KoaContext<AuthMiddlewareState & ProjectMemberMiddlewareState & ProjectResolveMiddlewareState>
+type InputKoaContext = KoaContext<
+	AuthMiddlewareState & ProjectMemberMiddlewareState & ProjectResolveMiddlewareState & GraphQLInfoState
+>
 
 type ExtendedGraphqlContext = ResolverContext & {
 	errorContextProvider: ErrorContextProvider
+	koaContext: InputKoaContext
 }
 
 class SystemServerProvider {
@@ -34,6 +37,7 @@ class SystemServerProvider {
 				() => new ErrorCallbackExtension(),
 				() => new ErrorHandlerExtension(undefined, 'system', this.errorLogger),
 			],
+			plugins: [new GraphqlInfoProviderPlugin()],
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createContext(ctx),
 		}))
 	}
@@ -59,6 +63,7 @@ class SystemServerProvider {
 				url: ctx.request.originalUrl,
 				user: ctx.state.authResult.identityId,
 			}),
+			koaContext: ctx,
 		}
 	}
 }

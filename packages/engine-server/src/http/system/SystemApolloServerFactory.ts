@@ -20,6 +20,7 @@ import {
 } from '../project-common'
 import { flattenVariables } from '@contember/engine-content-api'
 import { ErrorContextProvider, ErrorHandlerExtension } from '../../core/graphql/ErrorHandlerExtension'
+import { GraphqlInfoProviderPlugin } from '../common/GraphqlInfoProviderPlugin'
 
 type InputKoaContext = KoaContext<
 	DatabaseTransactionMiddlewareFactory.KoaState &
@@ -31,6 +32,7 @@ type InputKoaContext = KoaContext<
 type ExtendedGraphqlContext = ResolverContext & {
 	errorHandler: (errors: readonly any[]) => void
 	errorContextProvider: ErrorContextProvider
+	koaContext: InputKoaContext
 }
 
 class SystemApolloServerFactory {
@@ -45,6 +47,7 @@ class SystemApolloServerFactory {
 		return new ApolloServer({
 			typeDefs,
 			resolvers: this.resolvers as Config['resolvers'],
+			plugins: [new GraphqlInfoProviderPlugin()],
 			extensions: [() => new ErrorCallbackExtension(), () => new ErrorHandlerExtension(this.projectName, 'system')],
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createContext(ctx),
 		})
@@ -67,6 +70,7 @@ class SystemApolloServerFactory {
 				url: ctx.request.originalUrl,
 				user: ctx.state.authResult.identityId,
 			}),
+			koaContext: ctx,
 		}
 	}
 }

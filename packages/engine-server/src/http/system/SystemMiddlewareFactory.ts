@@ -12,6 +12,7 @@ import {
 	ProjectMemberMiddlewareFactory,
 	ProjectResolveMiddlewareFactory,
 } from '../project-common'
+import { createModuleInfoMiddleware } from '../common/ModuleInfoMiddleware'
 
 export class SystemMiddlewareFactory {
 	constructor(
@@ -26,6 +27,7 @@ export class SystemMiddlewareFactory {
 		return route(
 			'/system/:projectSlug$',
 			koaCompose<KoaContext<any>>([
+				createModuleInfoMiddleware('system'),
 				corsMiddleware(),
 				bodyParser(),
 				this.authMiddlewareFactory.create(),

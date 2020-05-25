@@ -53,6 +53,9 @@ import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
 import { tuple } from './utils'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
+import prom from 'prom-client'
+import { createCollectMetricsMiddleware } from './http/CollectMetricsMiddelware'
+import { createShowMetricsMiddleware } from './http/ShowMetricsMiddleware'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -140,6 +143,11 @@ class CompositionRoot {
 						notModifiedMiddlewareFactory,
 					),
 			)
+			.addService('promRegistry', () => {
+				const registry = new prom.Registry()
+				prom.collectDefaultMetrics({ register: registry })
+				return registry
+			})
 			.addService(
 				'systemMiddlewareFactory',
 				({
@@ -169,6 +177,7 @@ class CompositionRoot {
 					tenantMiddlewareFactory,
 					systemMiddlewareFactory,
 					errorResponseMiddlewareFactory,
+					promRegistry,
 				}) =>
 					new MiddlewareStackFactory(
 						timerMiddlewareFactory,
@@ -177,12 +186,19 @@ class CompositionRoot {
 						contentMiddlewareFactory,
 						tenantMiddlewareFactory,
 						systemMiddlewareFactory,
+						() => createCollectMetricsMiddleware(promRegistry),
 					),
 			)
 
 			.addService('koa', ({ middlewareStackFactory }) => {
 				const app = new Koa()
 				app.use(middlewareStackFactory.create())
+
+				return app
+			})
+			.addService('monitoringKoa', ({ promRegistry }) => {
+				const app = new Koa()
+				app.use(createShowMetricsMiddleware(promRegistry))
 
 				return app
 			})
@@ -195,7 +211,7 @@ class CompositionRoot {
 				({ tenantMigrationsRunner }) =>
 					new Initializer(tenantMigrationsRunner, tenantContainer.projectManager, containerList),
 			)
-			.addService('serverRunner', ({ koa }) => new ServerRunner(koa, config))
+			.addService('serverRunner', ({ koa, monitoringKoa }) => new ServerRunner(koa, monitoringKoa, config))
 
 			.build()
 

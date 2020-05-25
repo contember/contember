@@ -5,6 +5,7 @@ import corsMiddleware from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
 import { compose, KoaMiddleware, route } from '../../core/koa'
 import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
+import { createModuleInfoMiddleware } from '../common/ModuleInfoMiddleware'
 
 export class TenantMiddlewareFactory {
 	constructor(private apolloServer: ApolloServer, private readonly authMiddlewareFactory: AuthMiddlewareFactory) {}
@@ -15,7 +16,13 @@ export class TenantMiddlewareFactory {
 		}
 		return route(
 			'/tenant$',
-			compose([corsMiddleware(), bodyParser(), this.authMiddlewareFactory.create(), graphQlMiddleware]),
+			compose([
+				createModuleInfoMiddleware('tenant'),
+				corsMiddleware(),
+				bodyParser(),
+				this.authMiddlewareFactory.create(),
+				graphQlMiddleware,
+			]),
 		)
 	}
 }

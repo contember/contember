@@ -14,6 +14,7 @@ import uuid from 'uuid'
 import { GraphQLExtension } from 'graphql-extensions'
 import { Acl, Schema } from '@contember/schema'
 import { ErrorContextProvider, ErrorHandlerExtension } from '../../core/graphql/ErrorHandlerExtension'
+import { GraphqlInfoProviderPlugin } from '../common/GraphqlInfoProviderPlugin'
 
 type InputKoaContext = KoaContext<
 	ProjectMemberMiddlewareFactory.KoaState &
@@ -23,7 +24,7 @@ type InputKoaContext = KoaContext<
 		AuthMiddlewareFactory.KoaState
 >
 
-type ExtendedGraphqlContext = Context & { errorContextProvider: ErrorContextProvider }
+type ExtendedGraphqlContext = Context & { errorContextProvider: ErrorContextProvider; koaContext: InputKoaContext }
 class ContentApolloServerFactory {
 	private cache = new LRUCache<GraphQLSchema, ApolloServer>({
 		max: 100,
@@ -48,6 +49,7 @@ class ContentApolloServerFactory {
 			tracing: this.debug,
 			extensions,
 			schema: dataSchema,
+			plugins: [new GraphqlInfoProviderPlugin()],
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createGraphqlContext(permissions, schema, ctx),
 		})
 		this.cache.set(dataSchema, newServer)
@@ -79,6 +81,7 @@ class ContentApolloServerFactory {
 				body: ctx.request.body,
 				url: ctx.request.originalUrl,
 			}),
+			koaContext: ctx,
 		}
 	}
 }

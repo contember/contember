@@ -8,6 +8,7 @@ import { formatSchemaName } from '@contember/engine-system-api'
 import { ProjectMemberMiddlewareFactory, ProjectResolveMiddlewareFactory } from '../project-common'
 import { StageResolveMiddlewareFactory } from './StageResolveMiddlewareFactory'
 import { NotModifiedMiddlewareFactory } from './NotModifiedMiddlewareFactory'
+import { createModuleInfoMiddleware } from '../common/ModuleInfoMiddleware'
 
 class ContentMiddlewareFactory {
 	constructor(
@@ -37,6 +38,7 @@ class ContentMiddlewareFactory {
 		return route(
 			'/content/:projectSlug/:stageSlug$',
 			compose([
+				createModuleInfoMiddleware('content'),
 				corsMiddleware(),
 				bodyParser(),
 				this.authMiddlewareFactory.create(),

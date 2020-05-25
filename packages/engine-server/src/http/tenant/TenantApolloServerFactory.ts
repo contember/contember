@@ -4,8 +4,11 @@ import { ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@cont
 import { AuthMiddlewareFactory } from '../AuthMiddlewareFactory'
 import { ErrorContextProvider, ErrorHandlerExtension } from '../../core/graphql/ErrorHandlerExtension'
 
+type InputKoaContext = AuthMiddlewareFactory.ContextWithAuth
+
 type ExtendedGraphqlContext = ResolverContext & {
 	errorContextProvider: ErrorContextProvider
+	koaContext: InputKoaContext
 }
 
 class TenantApolloServerFactory {
@@ -21,7 +24,7 @@ class TenantApolloServerFactory {
 			tracing: true,
 			extensions: [() => new ErrorHandlerExtension(undefined, 'tenant')],
 			resolvers: this.resolvers as Config['resolvers'],
-			context: ({ ctx }: { ctx: AuthMiddlewareFactory.ContextWithAuth }): ExtendedGraphqlContext => {
+			context: ({ ctx }: { ctx: InputKoaContext }): ExtendedGraphqlContext => {
 				return {
 					...this.resolverContextFactory.create(ctx.state.authResult),
 					errorContextProvider: () => ({
@@ -29,6 +32,7 @@ class TenantApolloServerFactory {
 						url: ctx.request.originalUrl,
 						user: ctx.state.authResult.identityId,
 					}),
+					koaContext: ctx,
 				}
 			},
 		})

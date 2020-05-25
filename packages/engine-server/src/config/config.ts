@@ -24,6 +24,7 @@ export interface Config {
 	projects: Record<string, Project>
 	server: {
 		port: number
+		monitoringPort: number
 		logging: {
 			sentry?: {
 				dsn: string
@@ -159,6 +160,9 @@ function checkServerStructure(json: unknown): Config['server'] {
 	if (!hasNumberProperty(json, 'port')) {
 		throw new Error('impl error')
 	}
+	if (!hasNumberProperty(json, 'monitoringPort')) {
+		return typeConfigError('server.monitoringPort', json.monitoringPort, 'number')
+	}
 	return { ...json, logging: checkLoggingStructure(json.logging) }
 }
 
@@ -245,6 +249,7 @@ export async function readConfig(filenames: string[], configProcessors: ConfigPr
 		},
 		server: {
 			port: '%env.CONTEMBER_PORT::number%',
+			monitoringPort: '%env.CONTEMBER_MONITORING_PORT::number%',
 			logging: {
 				sentry: {
 					dsn: '%?env.SENTRY_DSN%',

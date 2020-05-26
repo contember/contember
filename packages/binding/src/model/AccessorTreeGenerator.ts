@@ -643,7 +643,7 @@ class AccessorTreeGenerator {
 				accessor.addEventListener,
 				accessor.batchUpdates,
 				accessor.removeEntity,
-				accessor.addNew,
+				accessor.addEntity,
 			))
 		}
 		const batchUpdates: BatchEntityListUpdates = performUpdates => {

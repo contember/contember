@@ -4,17 +4,17 @@ import { throwNonWritableError } from './errors'
 import { repairEntitiesOrder } from './repairEntitiesOrder'
 import { sortEntities } from './sortEntities'
 
-export const addNewEntityAtIndex = (
+export const addEntityAtIndex = (
 	entityList: EntityListAccessor,
 	sortableByField: RelativeSingleField,
 	index: number,
 	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
 ) => {
-	if (!entityList.addNew) {
+	if (!entityList.addEntity) {
 		return throwNonWritableError(entityList)
 	}
 	const sortedEntities = sortEntities(entityList.getFilteredEntities(), sortableByField)
-	entityList.addNew((getListAccessor, newKey) => {
+	entityList.addEntity((getListAccessor, newKey) => {
 		let newlyAdded = getListAccessor().getEntityByKey(newKey)
 
 		if (!(newlyAdded instanceof EntityAccessor)) {

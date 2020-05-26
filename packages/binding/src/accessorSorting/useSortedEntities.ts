@@ -3,7 +3,7 @@ import { useDesugaredRelativeSingleField } from '../accessorPropagation'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { SugaredFieldProps } from '../helperComponents'
 import { RelativeSingleField } from '../treeParameters'
-import { addNewEntityAtIndex } from './addNewEntityAtIndex'
+import { addEntityAtIndex } from './addEntityAtIndex'
 import { throwNonWritableError, throwNoopError } from './errors'
 import { moveEntity } from './moveEntity'
 import { repairEntitiesOrder } from './repairEntitiesOrder'
@@ -25,16 +25,16 @@ const addNewAtIndexImplementation = (
 	index: number,
 	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
 ) => {
-	if (!entityList.addNew) {
+	if (!entityList.addEntity) {
 		return throwNonWritableError(entityList)
 	}
 	if (!desugaredSortableByField) {
 		if (index === sortedEntitiesCount) {
-			return entityList.addNew()
+			return entityList.addEntity()
 		}
 		return throwNoopError(callbackName)
 	}
-	addNewEntityAtIndex(entityList, desugaredSortableByField, index, preprocess)
+	addEntityAtIndex(entityList, desugaredSortableByField, index, preprocess)
 }
 
 export const useSortedEntities = (

@@ -1,5 +1,5 @@
 import {
-	addNewEntityAtIndex,
+	addEntityAtIndex,
 	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
@@ -179,7 +179,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					Math.min(elementIndex, sortedEntities.length + firstContentIndex),
 				)
 				const sortedEntityIndex = normalizedElementIndex - firstContentIndex
-				addNewEntityAtIndex(
+				addEntityAtIndex(
 					getAccessor().getRelativeEntityList(desugaredEntityList),
 					sortableByField,
 					sortedEntityIndex,

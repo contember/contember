@@ -99,6 +99,7 @@ interface InternalEntityListState extends InternalContainerState {
 	}
 	fieldMarkers: EntityFieldMarkers
 	initialData: ReceivedEntityData<undefined>[] | Array<EntityAccessor | EntityForRemovalAccessor>
+	removeEntity: EntityListAccessor.RemoveEntity
 	onUpdate: OnEntityListUpdate
 	preferences: ReferenceMarker.ReferencePreferences
 }
@@ -641,6 +642,7 @@ class AccessorTreeGenerator {
 				accessor.errors,
 				accessor.addEventListener,
 				accessor.batchUpdates,
+				accessor.removeEntity,
 				accessor.addNew,
 			))
 		}
@@ -652,6 +654,10 @@ class AccessorTreeGenerator {
 			if (entityListState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityListState.accessor) {
 				entityListState.onUpdate(entityListState.accessor)
 			}
+		}
+
+		const removeEntity: EntityListAccessor.RemoveEntity = function(this: EntityListAccessor, key, removalType) {
+			// TODO
 		}
 
 		const onUpdateProxy = (key: string, newValue: EntityAccessor.NestedAccessor | null) => {
@@ -751,12 +757,14 @@ class AccessorTreeGenerator {
 			generateNewAccessor(sourceDatum)
 		}
 
+		entityListState.removeEntity = removeEntity
 		entityListState.accessor = new EntityListAccessor(
 			getChildEntityByKey,
 			entityListState.childIds,
 			entityListState.errors ? entityListState.errors.errors : emptyArray,
 			entityListState.addEventListener,
 			batchUpdates,
+			entityListState.removeEntity,
 			newEntity => {
 				const newAccessor = generateNewAccessor(typeof newEntity === 'function' ? undefined : newEntity)
 
@@ -993,7 +1001,6 @@ class AccessorTreeGenerator {
 				preferences,
 				addEventListener: undefined as any,
 				initialData: sourceData,
-				accessor: (undefined as any) as EntityListAccessor,
 				batchUpdateDepth: 0,
 				childIds: new Set(),
 				dirtyChildIds: undefined,
@@ -1002,6 +1009,8 @@ class AccessorTreeGenerator {
 					beforeUpdate: undefined,
 				},
 				hasPendingUpdate: true,
+				accessor: (undefined as any) as EntityListAccessor,
+				removeEntity: (undefined as any) as EntityListAccessor.RemoveEntity,
 			}
 			state.addEventListener = this.getAddEventListener(state)
 			return state

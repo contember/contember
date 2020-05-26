@@ -1,3 +1,4 @@
+import { RemovalType } from '../treeParameters/primitives'
 import { Accessor } from './Accessor'
 import { EntityAccessor } from './EntityAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
@@ -13,6 +14,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: (performUpdates: EntityListAccessor.BatchUpdates) => void,
+		public readonly removeEntity: EntityListAccessor.RemoveEntity,
 		public readonly addNew:
 			| ((newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newKey: string) => void)) => void)
 			| undefined,
@@ -43,6 +45,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 namespace EntityListAccessor {
 	export type BatchUpdates = (getAccessor: () => EntityListAccessor) => void
 	export type UpdateListener = (accessor: EntityListAccessor) => void
+	export type RemoveEntity = (key: string, removalType: RemovalType) => void
 
 	export interface EntityListEventListenerMap {
 		beforeUpdate: BatchUpdates

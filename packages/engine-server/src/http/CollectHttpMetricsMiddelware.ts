@@ -6,7 +6,7 @@ import {
 } from '@contember/engine-http'
 import prom from 'prom-client'
 
-export const createCollectMetricsMiddleware = (
+export const createColllectHttpMetricsMiddleware = (
 	registry: prom.Registry,
 ): KoaMiddleware<Partial<ProjectResolveMiddlewareState & ModuleInfoMiddlewareState & GraphQLInfoState>> => {
 	const requestSummary = new prom.Histogram({

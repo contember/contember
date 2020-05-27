@@ -60,6 +60,15 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 			throw e
 		}
 	}
+
+	getPoolStatus(): { totalCount: number; idleCount: number; waitingCount: number; maxCount: number } {
+		return {
+			idleCount: this.pool.idleCount,
+			totalCount: this.pool.totalCount,
+			waitingCount: this.pool.waitingCount,
+			maxCount: this.config.max || 10,
+		}
+	}
 }
 
 namespace Connection {

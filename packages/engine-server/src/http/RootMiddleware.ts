@@ -14,7 +14,7 @@ import {
 	createDebugInfoMiddleware,
 } from '@contember/engine-http'
 import prom from 'prom-client'
-import { createCollectMetricsMiddleware } from './CollectMetricsMiddelware'
+import { createColllectHttpMetricsMiddleware } from './CollectHttpMetricsMiddelware'
 
 export const createRootMiddleware = (
 	debug: boolean,
@@ -22,7 +22,7 @@ export const createRootMiddleware = (
 	prometheusRegistry: prom.Registry,
 ): KoaMiddleware<any> => {
 	return compose([
-		createCollectMetricsMiddleware(prometheusRegistry),
+		createColllectHttpMetricsMiddleware(prometheusRegistry),
 		createDebugInfoMiddleware(debug),
 		createServicesProviderMiddleware(services),
 		createErrorResponseMiddleware(),

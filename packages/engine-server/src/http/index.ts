@@ -1,3 +1,3 @@
-export * from './CollectMetricsMiddelware'
+export * from './CollectHttpMetricsMiddelware'
 export * from './RootMiddleware'
 export * from './ShowMetricsMiddleware'

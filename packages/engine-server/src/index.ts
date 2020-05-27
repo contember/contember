@@ -14,7 +14,7 @@ export async function run(
 	projectsDirectory: string,
 	projectSchemas: undefined | { [name: string]: Schema },
 	plugins: Plugin[],
-): Promise<Server> {
+): Promise<Server[]> {
 	const container = new CompositionRoot().createMasterContainer(
 		debug,
 		config,

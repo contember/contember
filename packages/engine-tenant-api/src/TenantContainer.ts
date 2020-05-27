@@ -43,6 +43,7 @@ import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 
 interface TenantContainer {
+	connection: Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
 	projectMemberManager: ProjectMemberManager
 	apiKeyManager: ApiKeyManager
 	signUpManager: SignUpManager
@@ -70,6 +71,7 @@ namespace TenantContainer {
 					'resolvers',
 					'authorizator',
 					'resolverContextFactory',
+					'connection',
 				)
 		}
 
@@ -80,10 +82,12 @@ namespace TenantContainer {
 			projectVariablesResolver: ProjectVariablesResolver,
 		) {
 			return new Builder({})
-				.addService('connection', (): Connection.ConnectionLike & Connection.ClientFactory => {
-					return new Connection(tenantDbCredentials, {})
-				})
-				.addService('db', ({ connection }) => connection.createClient('tenant'))
+				.addService(
+					'connection',
+					(): Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider =>
+						new Connection(tenantDbCredentials, {}),
+				)
+				.addService('db', ({ connection }) => connection.createClient('tenant', { module: 'tenant' }))
 				.addService('mailer', () => createMailer(mailTransportParameters))
 				.addService('templateRenderer', () => new TemplateRenderer())
 				.addService('providers', () => providers)

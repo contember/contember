@@ -53,6 +53,10 @@ import { ProjectContainer, ProjectContainerResolver } from './ProjectContainer'
 import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFactory'
 import { tuple } from './utils'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
+import prom from 'prom-client'
+import { createShowMetricsMiddleware } from './http/ShowMetricsMiddleware'
+import { registerDbMetrics } from './utils/dbMetrics'
+import { createColllectHttpMetricsMiddleware } from './http/CollectHttpMetricsMiddelware'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -140,6 +144,12 @@ class CompositionRoot {
 						notModifiedMiddlewareFactory,
 					),
 			)
+			.addService('promRegistry', () => {
+				const registry = new prom.Registry()
+				prom.collectDefaultMetrics({ register: registry })
+				registerDbMetrics(registry, tenantContainer.connection, containerList)
+				return registry
+			})
 			.addService(
 				'systemMiddlewareFactory',
 				({
@@ -169,6 +179,7 @@ class CompositionRoot {
 					tenantMiddlewareFactory,
 					systemMiddlewareFactory,
 					errorResponseMiddlewareFactory,
+					promRegistry,
 				}) =>
 					new MiddlewareStackFactory(
 						timerMiddlewareFactory,
@@ -177,12 +188,19 @@ class CompositionRoot {
 						contentMiddlewareFactory,
 						tenantMiddlewareFactory,
 						systemMiddlewareFactory,
+						() => createColllectHttpMetricsMiddleware(promRegistry),
 					),
 			)
 
 			.addService('koa', ({ middlewareStackFactory }) => {
 				const app = new Koa()
 				app.use(middlewareStackFactory.create())
+
+				return app
+			})
+			.addService('monitoringKoa', ({ promRegistry }) => {
+				const app = new Koa()
+				app.use(createShowMetricsMiddleware(promRegistry))
 
 				return app
 			})
@@ -195,7 +213,7 @@ class CompositionRoot {
 				({ tenantMigrationsRunner }) =>
 					new Initializer(tenantMigrationsRunner, tenantContainer.projectManager, containerList),
 			)
-			.addService('serverRunner', ({ koa }) => new ServerRunner(koa, config))
+			.addService('serverRunner', ({ koa, monitoringKoa }) => new ServerRunner(koa, monitoringKoa, config))
 
 			.build()
 
@@ -235,7 +253,7 @@ class CompositionRoot {
 					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug),
 				)
 				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-				.addService('systemDbClient', ({ connection }) => connection.createClient('system'))
+				.addService('systemDbClient', ({ connection }) => connection.createClient('system', { module: 'system' }))
 				.addService('systemQueryHandler', ({ systemDbClient }) => systemDbClient.createQueryHandler())
 				.addService(
 					'modificationHandlerFactory',

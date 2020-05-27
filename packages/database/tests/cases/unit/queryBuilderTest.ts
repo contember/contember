@@ -29,7 +29,7 @@ const execute = async (test: Test) => {
 		],
 		(expected, actual, message) => expect(actual).toEqual(expected, message),
 	)
-	const wrapper = new Client(connection, 'public')
+	const wrapper = new Client(connection, 'public', {})
 
 	await test.query(wrapper)
 }

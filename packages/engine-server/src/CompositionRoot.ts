@@ -146,6 +146,7 @@ class CompositionRoot {
 			.addService('promRegistry', () => {
 				const registry = new prom.Registry()
 				prom.collectDefaultMetrics({ register: registry })
+				collectDbMetrics(registry, tenantContainer.connection, containerList)
 				return registry
 			})
 			.addService(

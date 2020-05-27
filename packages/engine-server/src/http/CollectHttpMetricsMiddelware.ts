@@ -4,7 +4,7 @@ import { KoaMiddleware } from '../core/koa'
 import { ModuleInfoMiddlewareState } from './common/ModuleInfoMiddleware'
 import { GraphQLInfoState } from './common/GraphqlInfoProviderPlugin'
 
-export const createCollectMetricsMiddleware = (
+export const createColllectHttpMetricsMiddleware = (
 	registry: prom.Registry,
 ): KoaMiddleware<Partial<ProjectResolveMiddlewareFactory.KoaState & ModuleInfoMiddlewareState & GraphQLInfoState>> => {
 	const requestSummary = new prom.Histogram({

@@ -1,6 +1,6 @@
 {
 	"name": "@contember/engine-content-api",
-	"version": "0.7.6",
+	"version": "0.7.7",
 	"license": "Apache-2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
@@ -9,19 +9,19 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/database": "^0.7.6",
-		"@contember/dic": "^0.7.6",
-		"@contember/engine-common": "^0.7.6",
-		"@contember/schema": "^0.7.6",
-		"@contember/schema-definition": "^0.7.6",
-		"@contember/schema-utils": "^0.7.6",
+		"@contember/database": "^0.7.7",
+		"@contember/dic": "^0.7.7",
+		"@contember/engine-common": "^0.7.7",
+		"@contember/schema": "^0.7.7",
+		"@contember/schema-definition": "^0.7.7",
+		"@contember/schema-utils": "^0.7.7",
 		"apollo-server-core": "^2.9.1",
 		"graphql": "^14.6.0",
 		"graphql-tools": "^4.0.5"
 	},
 	"devDependencies": {
-		"@contember/database-tester": "^0.7.6",
-		"@contember/engine-api-tester": "^0.7.6",
+		"@contember/database-tester": "^0.7.7",
+		"@contember/engine-api-tester": "^0.7.7",
 		"@types/jasmine": "^3.4.5",
 		"@types/node": "^12.11.7",
 		"jasmine": "^3.5.0",

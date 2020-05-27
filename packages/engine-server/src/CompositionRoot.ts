@@ -54,8 +54,9 @@ import { ErrorResponseMiddlewareFactory } from './http/ErrorResponseMiddlewareFa
 import { tuple } from './utils'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
 import prom from 'prom-client'
-import { createCollectMetricsMiddleware } from './http/CollectMetricsMiddelware'
 import { createShowMetricsMiddleware } from './http/ShowMetricsMiddleware'
+import { registerDbMetrics } from './utils/dbMetrics'
+import { createColllectHttpMetricsMiddleware } from './http/CollectHttpMetricsMiddelware'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -146,7 +147,7 @@ class CompositionRoot {
 			.addService('promRegistry', () => {
 				const registry = new prom.Registry()
 				prom.collectDefaultMetrics({ register: registry })
-				collectDbMetrics(registry, tenantContainer.connection, containerList)
+				registerDbMetrics(registry, tenantContainer.connection, containerList)
 				return registry
 			})
 			.addService(
@@ -187,7 +188,7 @@ class CompositionRoot {
 						contentMiddlewareFactory,
 						tenantMiddlewareFactory,
 						systemMiddlewareFactory,
-						() => createCollectMetricsMiddleware(promRegistry),
+						() => createColllectHttpMetricsMiddleware(promRegistry),
 					),
 			)
 
@@ -252,7 +253,7 @@ class CompositionRoot {
 					MigrationFilesManager.createForProject(projectsDir, project.directory || project.slug),
 				)
 				.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-				.addService('systemDbClient', ({ connection }) => connection.createClient('system'))
+				.addService('systemDbClient', ({ connection }) => connection.createClient('system', { module: 'system' }))
 				.addService('systemQueryHandler', ({ systemDbClient }) => systemDbClient.createQueryHandler())
 				.addService(
 					'modificationHandlerFactory',

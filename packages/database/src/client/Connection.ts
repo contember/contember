@@ -4,7 +4,7 @@ import { Client } from './Client'
 import { Transaction } from './Transaction'
 import { executeQuery } from './execution'
 
-class Connection implements Connection.ConnectionLike, Connection.ClientFactory {
+class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	private readonly pool: Pool
 
 	constructor(
@@ -15,8 +15,8 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 		this.pool = new Pool(config)
 	}
 
-	public createClient(schema: string): Client {
-		return new Client(this, schema)
+	public createClient(schema: string, queryMeta: Record<string, any>): Client {
+		return new Client(this, schema, queryMeta)
 	}
 
 	async transaction<Result>(
@@ -65,7 +65,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory 
 		}
 	}
 
-	getPoolStatus(): { totalCount: number; idleCount: number; waitingCount: number; maxCount: number } {
+	getPoolStatus(): Connection.PoolStatus {
 		return {
 			idleCount: this.pool.idleCount,
 			totalCount: this.pool.totalCount,
@@ -98,7 +98,11 @@ namespace Connection {
 	export interface ConnectionLike extends Transactional, Queryable {}
 
 	export interface ClientFactory {
-		createClient(schema: string): Client
+		createClient(schema: string, queryMeta: Record<string, any>): Client
+	}
+
+	export interface PoolStatusProvider {
+		getPoolStatus(): PoolStatus
 	}
 
 	export interface TransactionLike extends ConnectionLike {
@@ -131,6 +135,8 @@ namespace Connection {
 	}
 
 	export const REPEATABLE_READ = 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ'
+
+	export type PoolStatus = { totalCount: number; idleCount: number; waitingCount: number; maxCount: number }
 }
 
 export { Connection }

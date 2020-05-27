@@ -24,7 +24,7 @@ class ContentMiddlewareFactory {
 			StageResolveMiddlewareFactory.KoaState & { db: Client }> = (ctx, next) => {
 			const projectContainer = ctx.state.projectContainer
 			const stage = ctx.state.stage
-			ctx.state.db = projectContainer.connection.createClient(formatSchemaName(stage))
+			ctx.state.db = projectContainer.connection.createClient(formatSchemaName(stage), { module: 'content' })
 			return next()
 		}
 		const contentApollo: KoaMiddleware<ProjectResolveMiddlewareFactory.KoaState &

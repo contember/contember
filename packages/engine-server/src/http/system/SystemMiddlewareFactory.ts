@@ -35,7 +35,7 @@ export class SystemMiddlewareFactory {
 				this.projectMemberMiddlewareFactory.create(),
 				(ctx: KoaContext<ProjectResolveMiddlewareFactory.KoaState & { db: Client }>, next) => {
 					const projectContainer = ctx.state.projectContainer
-					ctx.state.db = projectContainer.connection.createClient('system')
+					ctx.state.db = projectContainer.connection.createClient('system', { module: 'system' })
 					return next()
 				},
 				this.databaseTransactionMiddlewareFactory.create(),

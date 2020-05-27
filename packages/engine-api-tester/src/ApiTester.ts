@@ -63,7 +63,7 @@ export class ApiTester {
 		await connection.end()
 
 		const projectConnection = createConnection(dbName)
-		const projectDb = projectConnection.createClient('system')
+		const projectDb = projectConnection.createClient('system', {})
 
 		await setupSystemVariables(projectDb, unnamedIdentity, { uuid: createUuidGenerator('a450') })
 

@@ -31,7 +31,7 @@ export class ProjectInitializer {
 			await pgClient.connect()
 			const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)
 			const dbContextMigrations = databaseContextFactory
-				.withClient(singleConnection.createClient('system'))
+				.withClient(singleConnection.createClient('system', { module: 'system' }))
 				.create(unnamedIdentity)
 
 			const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)

@@ -58,7 +58,7 @@ export class ApiTester {
 
 		const projectConnection = createConnection(dbName)
 		const providers = { uuid: createUuidGenerator('a452'), now: () => new Date('2019-09-04 12:00') }
-		const databaseContextFactory = new DatabaseContextFactory(projectConnection.createClient('system'), providers)
+		const databaseContextFactory = new DatabaseContextFactory(projectConnection.createClient('system', {}), providers)
 
 		// await setupSystemVariables(projectDb, unnamedIdentity, { uuid: createUuidGenerator('a450') })
 
@@ -100,7 +100,7 @@ export class ApiTester {
 		await pgClient.connect()
 		const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)
 		const dbContextMigrations = databaseContextFactory
-			.withClient(singleConnection.createClient('system'))
+			.withClient(singleConnection.createClient('system', {}))
 			.create(unnamedIdentity)
 
 		const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)

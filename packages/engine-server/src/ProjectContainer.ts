@@ -62,7 +62,8 @@ export const createProjectContainer = (
 		)
 		.addService(
 			'systemDatabaseContextFactory',
-			({ connection, providers }) => new DatabaseContextFactory(connection.createClient('system'), providers),
+			({ connection, providers }) =>
+				new DatabaseContextFactory(connection.createClient('system', { module: 'system' }), providers),
 		)
 		.build()
 	return projectContainer.pick('project', 'connection', 'contentServerProvider', 'systemDatabaseContextFactory')

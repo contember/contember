@@ -9,7 +9,7 @@ export interface ExpectedQuery {
 export const createConnectionMock = (
 	queries: ExpectedQuery[],
 	assertFunction: (expected: any, actual: any, message?: string) => void | never,
-): Connection.TransactionLike & Connection.ClientFactory => {
+): Connection.TransactionLike & Connection.ClientFactory & Connection.PoolStatusProvider => {
 	return new (class implements Connection.TransactionLike {
 		public readonly eventManager = new EventManagerImpl()
 
@@ -80,8 +80,17 @@ ${JSON.stringify(parameters)}
 			await this.query('ROLLBACK;')
 		}
 
-		public createClient(schema: string): Client {
-			return new Client(this, schema)
+		public createClient(schema: string, meta: Record<string, any>): Client {
+			return new Client(this, schema, meta)
+		}
+
+		getPoolStatus(): Connection.PoolStatus {
+			return {
+				idleCount: 0,
+				totalCount: 1,
+				waitingCount: 0,
+				maxCount: 1,
+			}
 		}
 	})()
 }

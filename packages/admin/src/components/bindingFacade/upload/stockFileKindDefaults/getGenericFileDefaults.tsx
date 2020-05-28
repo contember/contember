@@ -5,7 +5,7 @@ import { noFileUrlMessage } from './noFileUrlMessage'
 import { StockFileKindDefault } from './StockFileKindDefault'
 
 export const getGenericFileDefaults = (fileUrlField: SugaredFieldProps['field'] | undefined): StockFileKindDefault => ({
-	accept: '*',
+	accept: '',
 	renderFile: () => {
 		if (fileUrlField === undefined) {
 			if (__DEV_MODE__) {

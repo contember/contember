@@ -23,17 +23,17 @@ export interface TaggedUnconstrainedQualifiedEntityList extends UnconstrainedQua
 	type: 'unconstrainedNonUnique'
 }
 
-export type MarkerTreeParameters =
+export type MarkerSubTreeParameters =
 	| TaggedQualifiedSingleEntity
 	| TaggedQualifiedEntityList
 	| TaggedUnconstrainedQualifiedSingleEntity
 	| TaggedUnconstrainedQualifiedEntityList
 
-export class MarkerTreeRoot<C extends MarkerTreeParameters = MarkerTreeParameters> {
+export class MarkerSubTree<C extends MarkerSubTreeParameters = MarkerSubTreeParameters> {
 	public constructor(public readonly parameters: C, public readonly fields: EntityFieldMarkers) {}
 
 	public get placeholderName(): string {
-		return PlaceholderGenerator.generateMarkerTreeRootPlaceholder(this)
+		return PlaceholderGenerator.generateMarkerSubTreePlaceholder(this)
 	}
 
 	public get entityName() {

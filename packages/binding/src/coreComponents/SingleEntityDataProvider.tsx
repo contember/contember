@@ -21,8 +21,8 @@ export const SingleEntityDataProvider = Component<SingleEntityDataProviderProps>
 		return <AccessorTree state={accessorTreeState}>{props.children}</AccessorTree>
 	},
 	{
-		generateMarkerTreeRoot: (props, fields, environment) =>
-			MarkerFactory.createSingleEntityMarkerTreeRoot(environment, props, fields),
+		generateMarkerSubTree: (props, fields, environment) =>
+			MarkerFactory.createSingleEntityMarkerSubTree(environment, props, fields),
 	},
 	'SingleEntityDataProvider',
 )

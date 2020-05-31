@@ -1,6 +1,6 @@
 import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'
-import { MarkerTreeRoot } from './MarkerTreeRoot'
+import { MarkerSubTree } from './MarkerSubTree'
 import { ReferenceMarker } from './ReferenceMarker'
 
-export type Marker = FieldMarker | ReferenceMarker | ConnectionMarker | MarkerTreeRoot
+export type Marker = FieldMarker | ReferenceMarker | ConnectionMarker | MarkerSubTree

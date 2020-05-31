@@ -17,8 +17,8 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	MarkerTreeParameters,
-	MarkerTreeRoot,
+	MarkerSubTreeParameters,
+	MarkerSubTree,
 	PlaceholderGenerator,
 	ReferenceMarker,
 	TaggedQualifiedEntityList,
@@ -135,10 +135,10 @@ class AccessorTreeGenerator {
 		return entity.accessor
 	}
 
-	private treeRootStates: WeakMap<MarkerTreeRoot, InternalRootStateNode> = new WeakMap()
+	private subTreeStates: WeakMap<MarkerSubTree, InternalRootStateNode> = new WeakMap()
 	private treeWideBatchUpdateDepth = 0
 
-	public constructor(private tree: MarkerTreeRoot) {}
+	public constructor(private tree: MarkerSubTree) {}
 
 	public generateLiveTree(
 		persistedData: ReceivedDataTree<undefined> | undefined,
@@ -198,7 +198,7 @@ class AccessorTreeGenerator {
 	}
 
 	private initializeSubTree(
-		tree: MarkerTreeRoot,
+		tree: MarkerSubTree,
 		data: ReceivedData<undefined> | RootAccessor,
 		updateData: (newData: RootAccessor) => void,
 		errors?: ErrorsPreprocessor.ErrorTreeRoot,
@@ -220,7 +220,7 @@ class AccessorTreeGenerator {
 		let subTreeState: InternalEntityState | InternalEntityListState
 
 		if (Array.isArray(data) || data === undefined || data instanceof EntityListAccessor) {
-			const existingState = this.treeRootStates.get(tree) as InternalEntityListState
+			const existingState = this.subTreeStates.get(tree) as InternalEntityListState
 			const resolvedState = this.resolveOrCreateEntityListState(
 				existingState,
 				tree.fields,
@@ -231,12 +231,12 @@ class AccessorTreeGenerator {
 			)
 			subTreeState = this.initializeEntityListAccessor(resolvedState)
 		} else {
-			const existingState = this.treeRootStates.get(tree) as InternalEntityState
+			const existingState = this.subTreeStates.get(tree) as InternalEntityState
 			const id = this.resolveOrCreateEntityId(data)
 			const resolvedState = this.resolveOrCreateEntityState(id, existingState, tree.fields, onUpdate, data, errorNode)
 			subTreeState = this.initializeEntityAccessor(resolvedState, tree.fields)
 		}
-		this.treeRootStates.set(tree, subTreeState)
+		this.subTreeStates.set(tree, subTreeState)
 
 		return subTreeState
 	}
@@ -262,9 +262,9 @@ class AccessorTreeGenerator {
 		function getSubTree(parameters: TaggedUnconstrainedQualifiedSingleEntity): EntityAccessor
 		function getSubTree(parameters: TaggedUnconstrainedQualifiedEntityList): EntityListAccessor
 		function getSubTree(
-			parameters: MarkerTreeParameters,
+			parameters: MarkerSubTreeParameters,
 		): EntityAccessor | EntityForRemovalAccessor | null | EntityListAccessor {
-			return entityState.subTrees?.get(PlaceholderGenerator.getMarkerTreePlaceholder(parameters))?.accessor || null
+			return entityState.subTrees?.get(PlaceholderGenerator.getMarkerSubTreePlaceholder(parameters))?.accessor || null
 		}
 
 		// We're overwriting existing states in entityState.fields which could already be there from a different
@@ -303,7 +303,7 @@ class AccessorTreeGenerator {
 				continue
 			}
 
-			if (field instanceof MarkerTreeRoot) {
+			if (field instanceof MarkerSubTree) {
 				let initialData: ReceivedData<undefined> | RootAccessor
 
 				if (

@@ -53,5 +53,5 @@ export type AccessorTreeState =
 export type AccessorTreeStateWithData = MutatingAccessorTreeState | InteractiveAccessorTreeState
 
 //export type AccessorTreeGlobalStateById = {
-//	[Id in MarkerTreeRoot.TreeId]: any
+//	[Id in MarkerSubTree.TreeId]: any
 //}

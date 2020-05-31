@@ -20,8 +20,8 @@ export const EntityCreator = Component<EntityCreatorProps>(
 		return <AccessorTree state={accessorTreeState}>{props.children}</AccessorTree>
 	},
 	{
-		generateMarkerTreeRoot: (props, fields, environment) =>
-			MarkerFactory.createUnconstrainedEntityListMarkerTreeRoot(environment, props, fields),
+		generateMarkerSubTree: (props, fields, environment) =>
+			MarkerFactory.createUnconstrainedEntityListMarkerSubTree(environment, props, fields),
 	},
 	'EntityCreator',
 )

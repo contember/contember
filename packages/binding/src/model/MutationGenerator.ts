@@ -8,8 +8,8 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	MarkerTreeParameters,
-	MarkerTreeRoot,
+	MarkerSubTreeParameters,
+	MarkerSubTree,
 	ReferenceMarker,
 } from '../markers'
 import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
@@ -22,7 +22,7 @@ export class MutationGenerator {
 	public constructor(
 		private persistedData: any,
 		private currentData: RootAccessor,
-		private markerTree: MarkerTreeRoot,
+		private markerTree: MarkerSubTree,
 	) {}
 
 	public getPersistMutation(): string | undefined {
@@ -45,7 +45,7 @@ export class MutationGenerator {
 		entityFieldMarkers: EntityFieldMarkers,
 		entity: RootAccessor,
 		alias: string,
-		parameters: MarkerTreeParameters,
+		parameters: MarkerSubTreeParameters,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -85,7 +85,7 @@ export class MutationGenerator {
 	private addDeleteMutation(
 		entity: EntityForRemovalAccessor,
 		alias: string,
-		parameters: MarkerTreeParameters,
+		parameters: MarkerSubTreeParameters,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -114,7 +114,7 @@ export class MutationGenerator {
 		entityFieldMarkers: EntityFieldMarkers,
 		data: ReceivedEntityData<undefined>,
 		alias: string,
-		parameters: MarkerTreeParameters,
+		parameters: MarkerSubTreeParameters,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -150,7 +150,7 @@ export class MutationGenerator {
 		entity: EntityAccessor,
 		entityFieldMarkers: EntityFieldMarkers,
 		alias: string,
-		parameters: MarkerTreeParameters,
+		parameters: MarkerSubTreeParameters,
 		queryBuilder?: QueryBuilder,
 	): QueryBuilder {
 		if (!queryBuilder) {
@@ -300,7 +300,7 @@ export class MutationGenerator {
 				} else {
 					builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
 				}
-			} else if (marker instanceof MarkerTreeRoot) {
+			} else if (marker instanceof MarkerSubTree) {
 				// Do nothing: we don't support persisting nested queries (yet?).
 			} else {
 				assertNever(marker)
@@ -476,7 +476,7 @@ export class MutationGenerator {
 			} else if (marker instanceof ConnectionMarker) {
 				// Do nothing: connections are only relevant to create mutations. At the point of updating, the entity is
 				// supposed to have already been connected.
-			} else if (marker instanceof MarkerTreeRoot) {
+			} else if (marker instanceof MarkerSubTree) {
 				// Do nothing: we don't support persisting nested queries (yet?).
 			} else {
 				assertNever(marker)

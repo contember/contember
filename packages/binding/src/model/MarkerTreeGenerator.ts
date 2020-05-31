@@ -4,13 +4,13 @@ import * as React from 'react'
 import { MarkerProvider } from '../coreComponents'
 import { Environment } from '../dao'
 import { BindingError } from '../BindingError'
-import { ConnectionMarker, EntityFieldMarkers, FieldMarker, Marker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { ConnectionMarker, EntityFieldMarkers, FieldMarker, Marker, MarkerSubTree, ReferenceMarker } from '../markers'
 import { FieldName } from '../treeParameters'
 import { Hashing } from '../utils'
 
 type Fragment = EntityFieldMarkers
 type Terminals = FieldMarker | ConnectionMarker | Fragment
-type Nonterminals = MarkerTreeRoot | ReferenceMarker | Fragment
+type Nonterminals = MarkerSubTree | ReferenceMarker | Fragment
 
 type NodeResult = Terminals | Nonterminals
 type DataMarker = MarkerProvider &
@@ -21,13 +21,13 @@ export class MarkerTreeGenerator {
 
 	public constructor(private sourceTree: React.ReactNode, private environment: Environment = Environment.create()) {}
 
-	public generate(): MarkerTreeRoot {
+	public generate(): MarkerSubTree {
 		const processed = MarkerTreeGenerator.childrenAnalyzer.processChildren(this.sourceTree, this.environment)
 
 		if (processed.length === 1) {
 			const result = processed[0]
 
-			if (result instanceof MarkerTreeRoot) {
+			if (result instanceof MarkerSubTree) {
 				return result
 			}
 		}
@@ -78,8 +78,8 @@ export class MarkerTreeGenerator {
 				return original
 			} else if (fresh instanceof ReferenceMarker) {
 				return MarkerTreeGenerator.rejectRelationScalarCombo(original.fieldName)
-			} else if (fresh instanceof MarkerTreeRoot) {
-				throw new BindingError('Merging fields and tree roots is an undefined operation.')
+			} else if (fresh instanceof MarkerSubTree) {
+				throw new BindingError('Merging fields and sub trees is an undefined operation.')
 			} else if (fresh instanceof ConnectionMarker) {
 				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
 			}
@@ -114,7 +114,7 @@ export class MarkerTreeGenerator {
 				return new ReferenceMarker(original.fieldName, newReferences)
 			} else if (fresh instanceof ConnectionMarker) {
 				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
-			} else if (fresh instanceof MarkerTreeRoot) {
+			} else if (fresh instanceof MarkerSubTree) {
 				throw new BindingError('MarkerTreeGenerator merging: error code bb') // TODO msg
 			}
 			assertNever(fresh)
@@ -127,8 +127,8 @@ export class MarkerTreeGenerator {
 				return original
 			}
 			return MarkerTreeGenerator.rejectConnectionMarkerCombo(original)
-		} else if (original instanceof MarkerTreeRoot) {
-			if (fresh instanceof MarkerTreeRoot) {
+		} else if (original instanceof MarkerSubTree) {
+			if (fresh instanceof MarkerSubTree) {
 				if (
 					Hashing.hashMarkerTreeParameters(original.parameters) === Hashing.hashMarkerTreeParameters(fresh.parameters)
 				) {
@@ -183,8 +183,8 @@ export class MarkerTreeGenerator {
 		const fieldMarkerLeaf = new Leaf<Environment>('generateFieldMarker')
 		const connectionMarkerLeaf = new Leaf<Environment>('generateConnectionMarker')
 
-		const markerTreeRootBranchNode = new BranchNode<Environment>(
-			'generateMarkerTreeRoot',
+		const markerSubTreeBranchNode = new BranchNode<Environment>(
+			'generateMarkerSubTree',
 			MarkerTreeGenerator.mapNodeResultToEntityFields,
 			{
 				childrenAbsentErrorMessage: 'All data providers must have children',
@@ -201,7 +201,7 @@ export class MarkerTreeGenerator {
 
 		return new ChildrenAnalyzer(
 			[fieldMarkerLeaf, connectionMarkerLeaf],
-			[markerTreeRootBranchNode, referenceMarkerBranchNode],
+			[markerSubTreeBranchNode, referenceMarkerBranchNode],
 			{
 				syntheticChildrenFactoryName: 'generateSyntheticChildren',
 				renderPropsErrorMessage:

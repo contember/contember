@@ -3,7 +3,7 @@ import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAcce
 import { ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerSubTree, ReferenceMarker } from '../markers'
 import { ExpectedEntityCount } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 
@@ -11,7 +11,7 @@ export class DirtinessChecker {
 	private isDirtyCache: WeakMap<EntityAccessor | EntityListAccessor, boolean>
 
 	public constructor(
-		private readonly markerTree: MarkerTreeRoot,
+		private readonly markerTree: MarkerSubTree,
 		private readonly persistedData: ReceivedDataTree<undefined> | undefined,
 	) {
 		this.isDirtyCache = new WeakMap()
@@ -116,7 +116,7 @@ export class DirtinessChecker {
 						assertNever(reference.expectedCount)
 					}
 				}
-			} else if (marker instanceof MarkerTreeRoot) {
+			} else if (marker instanceof MarkerSubTree) {
 				// Do nothing. For the time being, we don't support persisting these so there's nothing to be concluded from
 				// here. However, that will likely change in future.
 			} else if (marker instanceof ConnectionMarker) {

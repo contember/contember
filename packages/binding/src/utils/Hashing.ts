@@ -1,4 +1,4 @@
-import { MarkerTreeParameters, ReferenceMarker } from '../markers'
+import { MarkerSubTreeParameters, ReferenceMarker } from '../markers'
 import { ExpectedEntityCount, Filter, UniqueWhere } from '../treeParameters'
 import { assertNever } from './assertNever'
 
@@ -13,7 +13,7 @@ export class Hashing {
 		return Hashing.hashArray(where)
 	}
 
-	public static hashMarkerTreeParameters(parameters: MarkerTreeParameters): number {
+	public static hashMarkerTreeParameters(parameters: MarkerSubTreeParameters): number {
 		switch (parameters.type) {
 			case 'unique':
 				return Hashing.hashArray([parameters.type, parameters.where, parameters.entityName, parameters.filter])

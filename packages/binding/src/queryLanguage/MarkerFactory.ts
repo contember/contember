@@ -4,7 +4,7 @@ import {
 	EntityFieldMarkers,
 	FieldMarker,
 	Marker,
-	MarkerTreeRoot,
+	MarkerSubTree,
 	PlaceholderGenerator,
 	ReferenceMarker,
 	TaggedQualifiedEntityList,
@@ -28,13 +28,13 @@ import {
 import { QueryLanguage } from './QueryLanguage'
 
 export namespace MarkerFactory {
-	export const createSingleEntityMarkerTreeRoot = (
+	export const createSingleEntityMarkerSubTree = (
 		environment: Environment,
 		singleEntity: SugaredQualifiedSingleEntity,
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
-		return new MarkerTreeRoot<TaggedQualifiedSingleEntity>(
+		return new MarkerSubTree<TaggedQualifiedSingleEntity>(
 			{
 				...qualifiedSingleEntity,
 				type: 'unique',
@@ -43,14 +43,14 @@ export namespace MarkerFactory {
 		)
 	}
 
-	export const createEntityListMarkerTreeRoot = (
+	export const createEntityListMarkerSubTree = (
 		environment: Environment,
 		entityList: SugaredQualifiedEntityList,
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(entityList, environment)
 
-		return new MarkerTreeRoot<TaggedQualifiedEntityList>(
+		return new MarkerSubTree<TaggedQualifiedEntityList>(
 			{
 				...qualifiedEntityList,
 				type: 'nonUnique',
@@ -59,14 +59,14 @@ export namespace MarkerFactory {
 		)
 	}
 
-	export const createUnconstrainedEntityListMarkerTreeRoot = (
+	export const createUnconstrainedEntityListMarkerSubTree = (
 		environment: Environment,
 		entityList: SugaredUnconstrainedQualifiedEntityList,
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment)
 
-		return new MarkerTreeRoot<TaggedUnconstrainedQualifiedEntityList>(
+		return new MarkerSubTree<TaggedUnconstrainedQualifiedEntityList>(
 			{
 				...qualifiedEntityList,
 				type: 'unconstrainedNonUnique',
@@ -75,14 +75,14 @@ export namespace MarkerFactory {
 		)
 	}
 
-	export const createUnconstrainedSingleEntityMarkerTreeRoot = (
+	export const createUnconstrainedSingleEntityMarkerSubTree = (
 		environment: Environment,
 		entityList: SugaredUnconstrainedQualifiedSingleEntity,
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entityList, environment)
 
-		return new MarkerTreeRoot<TaggedUnconstrainedQualifiedEntityList>(
+		return new MarkerSubTree<TaggedUnconstrainedQualifiedEntityList>(
 			{
 				...qualifiedSingleEntity,
 				type: 'unconstrainedNonUnique',

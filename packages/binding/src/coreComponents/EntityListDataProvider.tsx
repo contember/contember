@@ -20,8 +20,8 @@ export const EntityListDataProvider = Component<EntityListDataProviderProps>(
 		return <AccessorTree state={accessorTreeState}>{props.children}</AccessorTree>
 	},
 	{
-		generateMarkerTreeRoot: (props, fields, environment) =>
-			MarkerFactory.createEntityListMarkerTreeRoot(environment, props, fields),
+		generateMarkerSubTree: (props, fields, environment) =>
+			MarkerFactory.createEntityListMarkerSubTree(environment, props, fields),
 	},
 	'EntityListDataProvider',
 )

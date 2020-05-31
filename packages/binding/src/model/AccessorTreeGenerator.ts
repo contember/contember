@@ -193,6 +193,10 @@ class AccessorTreeGenerator {
 		updateDataWithEvents(subTreeState.accessor!)
 	}
 
+	private performRootTreeOperation(operation: () => void) {
+		operation() // TODO
+	}
+
 	private initializeSubTree(
 		tree: MarkerTreeRoot,
 		data: ReceivedData<undefined> | RootAccessor,
@@ -583,6 +587,7 @@ class AccessorTreeGenerator {
 		}
 		const onReplace: OnReplace = replacement => onUpdateProxy(this.replaceEntity(entityState, replacement, onRemove))
 		const onRemove = (removalType: RemovalType) => {
+			// TODO update this to mean remove a hasOne child field, not the whole entity.
 			if (entityState.batchUpdateDepth !== 0) {
 				throw new BindingError(`Removing entities that are being batch updated is a no-op.`)
 			}
@@ -633,6 +638,48 @@ class AccessorTreeGenerator {
 			)
 		}
 
+		const batchUpdatesImplementation: BatchEntityListUpdates = performUpdates => {
+			entityListState.batchUpdateDepth++
+			const accessorBeforeUpdates = entityListState.accessor
+			performUpdates(() => entityListState.accessor!)
+			entityListState.batchUpdateDepth--
+			if (entityListState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityListState.accessor) {
+				entityListState.onUpdate(entityListState.accessor)
+			}
+		}
+
+		const performMutatingOperation = (operation: () => void) => {
+			this.performRootTreeOperation(() => {
+				batchUpdatesImplementation(getAccessor => {
+					operation()
+
+					updateAccessorInstance()
+
+					if (
+						entityListState.eventListeners.beforeUpdate === undefined ||
+						entityListState.eventListeners.beforeUpdate.size === 0
+					) {
+						return
+					}
+
+					let currentAccessor: EntityListAccessor
+					for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
+						currentAccessor = getAccessor()
+						for (const listener of entityListState.eventListeners.beforeUpdate) {
+							listener(getAccessor)
+						}
+						if (currentAccessor === getAccessor()) {
+							return
+						}
+					}
+					throw new BindingError(
+						`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
+							`This likely means an infinite feedback loop in your code.`,
+					)
+				})
+			})
+		}
+
 		const updateAccessorInstance = () => {
 			const accessor = entityListState.accessor!
 			entityListState.hasPendingUpdate = true
@@ -647,21 +694,49 @@ class AccessorTreeGenerator {
 			))
 		}
 		const batchUpdates: BatchEntityListUpdates = performUpdates => {
-			entityListState.batchUpdateDepth++
-			const accessorBeforeUpdates = entityListState.accessor
-			performUpdates(() => entityListState.accessor!)
-			entityListState.batchUpdateDepth--
-			if (entityListState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityListState.accessor) {
-				entityListState.onUpdate(entityListState.accessor)
-			}
+			performMutatingOperation(() => {
+				batchUpdatesImplementation(performUpdates)
+			})
 		}
 
-		const removeEntity: EntityListAccessor.RemoveEntity = function(this: EntityListAccessor, key, removalType) {
-			// TODO
+		// TODO
+		const removeEntity: EntityListAccessor.RemoveEntity = (key, removalType) => {
+			performMutatingOperation(() => {
+				if (entityListState.dirtyChildIds === undefined) {
+					entityListState.dirtyChildIds = new Set()
+				}
+				entityListState.dirtyChildIds.add(key)
+
+				const childState = this.entityStore.get(key)
+				if (childState === undefined) {
+					this.rejectInvalidAccessorTree()
+				}
+				const childRealm = childState.realms.get(entityListState.fieldMarkers)
+				if (childRealm === undefined) {
+					this.rejectInvalidAccessorTree()
+				}
+
+				/*if (
+					!childState.persistedData ||
+					childState.persistedData instanceof EntityForRemovalAccessor ||
+					!(childState.accessor instanceof EntityAccessor)
+				) {
+					childRealm.removalType = removalType
+				}
+
+				if (childState.batchUpdateDepth !== 0) {
+					throw new BindingError(`Removing entities that are being batch updated is a no-op.`)
+				}
+
+				onUpdateProxy(
+					key,
+					new EntityForRemovalAccessor(childState.accessor, childState.accessor.replaceBy, removalType),
+				)*/
+			})
 		}
 
 		const onUpdateProxy = (key: string, newValue: EntityAccessor.NestedAccessor | null) => {
-			batchUpdates(getAccessor => {
+			performMutatingOperation(() => {
 				if (
 					!(newValue instanceof EntityAccessor || newValue instanceof EntityForRemovalAccessor || newValue === null)
 				) {
@@ -684,29 +759,6 @@ class AccessorTreeGenerator {
 					}
 					entityListState.dirtyChildIds.add(key)
 				}
-				updateAccessorInstance()
-
-				if (
-					entityListState.eventListeners.beforeUpdate === undefined ||
-					entityListState.eventListeners.beforeUpdate.size === 0
-				) {
-					return
-				}
-
-				let currentAccessor: EntityListAccessor
-				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
-					currentAccessor = getAccessor()
-					for (const listener of entityListState.eventListeners.beforeUpdate) {
-						listener(getAccessor)
-					}
-					if (currentAccessor === getAccessor()) {
-						return
-					}
-				}
-				throw new BindingError(
-					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
-						`This likely means an infinite feedback loop in your code.`,
-				)
 			})
 		}
 		const generateNewAccessor = (datum: AccessorTreeGenerator.InitialEntityData): EntityAccessor => {

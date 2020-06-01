@@ -134,9 +134,12 @@ export class ProjectInitializer {
 		if (!this.projectMigrationInfoResolver) {
 			return
 		}
-		const migrationEvents = await db.queryHandler.fetch(new MigrationEventsQuery(stage))
 		const { allMigrations, executedMigrations } = await this.projectMigrationInfoResolver.getMigrationsInfo(db, project)
-		if (executedMigrations.length > 0 || migrationEvents.length === 0) {
+		if (executedMigrations.length > 0) {
+			return
+		}
+		const migrationEvents = await db.queryHandler.fetch(new MigrationEventsQuery(stage))
+		if (migrationEvents.length === 0) {
 			return
 		}
 		// eslint-disable-next-line no-console

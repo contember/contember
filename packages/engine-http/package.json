@@ -17,6 +17,7 @@
 		"accepts": "^1.3.7",
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-koa": "^2.9.0",
+		"apollo-server-plugin-base": "^0.8.0",
 		"bcrypt": "^3.0.6",
 		"graphql": "^14.6.0",
 		"graphql-extensions": "^0.5.7",

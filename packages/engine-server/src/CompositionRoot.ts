@@ -30,6 +30,9 @@ import {
 	SystemServerProvider,
 	TenantApolloServerFactory,
 } from '@contember/engine-http'
+import prom from 'prom-client'
+import { createShowMetricsMiddleware } from './http'
+import { registerDbMetrics, registerDbPoolCollector } from './utils/dbMetrics'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -124,24 +127,47 @@ class CompositionRoot {
 					),
 			)
 
+			.addService('promRegistry', () => {
+				const registry = new prom.Registry()
+				prom.collectDefaultMetrics({ register: registry })
+				registerDbMetrics(registry, tenantContainer.connection, containerList)
+				return registry
+			})
 			.addService(
 				'koa',
-				({ tenantApolloServer, projectContainerResolver, tenantContainer, providers, systemServerProvider }) => {
+				({
+					tenantApolloServer,
+					projectContainerResolver,
+					tenantContainer,
+					providers,
+					systemServerProvider,
+					promRegistry,
+				}) => {
 					const app = new Koa()
 					app.use(
-						createRootMiddleware(debug, {
-							tenantApolloServer,
-							projectContainerResolver,
-							apiKeyManager: tenantContainer.apiKeyManager,
-							projectMemberManager: tenantContainer.projectMemberManager,
-							providers,
-							systemServerProvider,
-						}),
+						createRootMiddleware(
+							debug,
+							{
+								tenantApolloServer,
+								projectContainerResolver,
+								apiKeyManager: tenantContainer.apiKeyManager,
+								projectMemberManager: tenantContainer.projectMemberManager,
+								providers,
+								systemServerProvider,
+							},
+							promRegistry,
+						),
 					)
 
 					return app
 				},
 			)
+			.addService('monitoringKoa', ({ promRegistry }) => {
+				const app = new Koa()
+				app.use(createShowMetricsMiddleware(promRegistry))
+
+				return app
+			})
 			.addService(
 				'tenantMigrationsRunner',
 				() => new MigrationsRunner(config.tenant.db, 'tenant', getTenantMigrationsDirectory()),
@@ -156,7 +182,7 @@ class CompositionRoot {
 						containerList,
 					),
 			)
-			.addService('serverRunner', ({ koa }) => new ServerRunner(koa, config))
+			.addService('serverRunner', ({ koa, monitoringKoa }) => new ServerRunner(koa, monitoringKoa, config))
 
 			.build()
 

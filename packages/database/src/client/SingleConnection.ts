@@ -13,8 +13,8 @@ class SingleConnection implements Connection.ConnectionLike, Connection.ClientFa
 		private isConnected = false,
 	) {}
 
-	public createClient(schema: string): Client {
-		return new Client(this, schema)
+	public createClient(schema: string, queryMeta: Record<string, any>): Client {
+		return new Client(this, schema, queryMeta)
 	}
 
 	async transaction<Result>(

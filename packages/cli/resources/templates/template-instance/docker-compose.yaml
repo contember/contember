@@ -10,6 +10,7 @@ services:
       CONTEMBER_PROJECTS_DIRECTORY: /src/projects
       NODE_ENV: development
       CONTEMBER_PORT: 4000
+      CONTEMBER_MONITORING_PORT: 4001
       CONTEMBER_S3_SERVER: minio
     depends_on:
       - db

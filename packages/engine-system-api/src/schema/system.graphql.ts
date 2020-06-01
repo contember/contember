@@ -12,7 +12,7 @@ const schema: DocumentNode = gql`
 	type Query {
 		stages: [Stage!]!
 		diff(stage: String!, filter: [TreeFilter!]): DiffResponse!
-		history(stage: String!, filter: [HistoryFilter!]): HistoryResponse!
+		history(stage: String!, filter: [HistoryFilter!], sinceEvent: String, sinceTime: DateTime): HistoryResponse!
 	}
 
 	type Mutation {

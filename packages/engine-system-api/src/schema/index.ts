@@ -171,6 +171,8 @@ export type QueryDiffArgs = {
 export type QueryHistoryArgs = {
 	stage: Scalars['String']
 	filter?: Maybe<ReadonlyArray<HistoryFilter>>
+	sinceEvent?: Maybe<Scalars['String']>
+	sinceTime?: Maybe<Scalars['DateTime']>
 }
 
 export type RebaseAllResponse = {

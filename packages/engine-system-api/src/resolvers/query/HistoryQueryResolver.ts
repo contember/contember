@@ -4,7 +4,7 @@ import { QueryResolver } from '../Resolver'
 import { HistoryErrorCode, HistoryResponse, QueryHistoryArgs } from '../../schema'
 import {
 	AuthorizationActions,
-	EventResponseBuilder,
+	HistoryEventResponseBuilder,
 	HistoryQuery,
 	SchemaVersionBuilder,
 	StageBySlugQuery,
@@ -14,7 +14,7 @@ import { UserInputError } from 'apollo-server-errors'
 
 export class HistoryQueryResolver implements QueryResolver<'history'> {
 	constructor(
-		private readonly eventResponseBuilder: EventResponseBuilder,
+		private readonly eventResponseBuilder: HistoryEventResponseBuilder,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
@@ -65,7 +65,7 @@ export class HistoryQueryResolver implements QueryResolver<'history'> {
 				ok: true,
 				errors: [],
 				result: {
-					events: await this.eventResponseBuilder.buildResponse(history.map(it => ({ ...it, dependencies: [] }))),
+					events: await this.eventResponseBuilder.buildResponse(history),
 				},
 			}
 		})

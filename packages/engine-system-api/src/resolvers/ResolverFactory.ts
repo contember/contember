@@ -1,5 +1,5 @@
 import { DiffQueryResolver, StagesQueryResolver } from './query'
-import { Event, EventType, Resolvers } from '../schema'
+import { HistoryEvent, HistoryEventType, DiffEvent, DiffEventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
 import { GraphQLResolveInfo, GraphQLScalarType, Kind } from 'graphql'
@@ -36,17 +36,34 @@ class ResolverFactory {
 					return null
 				},
 			}),
-			Event: {
-				__resolveType: (obj: Event) => {
+			DiffEvent: {
+				__resolveType: (obj: DiffEvent) => {
 					switch (obj.type) {
-						case EventType.Create:
-							return 'CreateEvent'
-						case EventType.Update:
-							return 'UpdateEvent'
-						case EventType.Delete:
-							return 'DeleteEvent'
-						case EventType.RunMigration:
-							return 'RunMigrationEvent'
+						case DiffEventType.Create:
+							return 'DiffCreateEvent'
+						case DiffEventType.Update:
+							return 'DiffUpdateEvent'
+						case DiffEventType.Delete:
+							return 'DiffDeleteEvent'
+						case null:
+						case undefined:
+							return null
+						default:
+							return assertNever(obj.type)
+					}
+				},
+			},
+			HistoryEvent: {
+				__resolveType: (obj: HistoryEvent) => {
+					switch (obj.type) {
+						case HistoryEventType.Create:
+							return 'HistoryCreateEvent'
+						case HistoryEventType.Update:
+							return 'HistoryUpdateEvent'
+						case HistoryEventType.Delete:
+							return 'HistoryDeleteEvent'
+						case HistoryEventType.RunMigration:
+							return 'HistoryRunMigrationEvent'
 						case null:
 						case undefined:
 							return null

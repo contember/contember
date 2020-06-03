@@ -14,11 +14,12 @@ import {
 	DeletedRowReferenceDependencyBuilder,
 	DependencyBuilderList,
 	DiffBuilder,
-	EventResponseBuilder,
+	DiffEventResponseBuilder,
 	EntitiesSelector,
 	EventApplier,
 	EventsRebaser,
 	ExecutedMigrationsResolver,
+	HistoryEventResponseBuilder,
 	MigrationExecutor,
 	MigrationsResolverFactory,
 	PermissionsFactory,
@@ -161,15 +162,16 @@ export class SystemContainerFactory {
 
 			.addService('stagesQueryResolver', () => new StagesQueryResolver())
 
-			.addService('eventResponseBuilder', () => new EventResponseBuilder(container.identityFetcher))
+			.addService('diffEventResponseBuilder', () => new DiffEventResponseBuilder(container.identityFetcher))
 			.addService(
 				'diffQueryResolver',
-				({ eventResponseBuilder, diffBuilder }) => new DiffQueryResolver(eventResponseBuilder, diffBuilder),
+				({ diffEventResponseBuilder, diffBuilder }) => new DiffQueryResolver(diffEventResponseBuilder, diffBuilder),
 			)
+			.addService('historyEventResponseBuilder', () => new HistoryEventResponseBuilder(container.identityFetcher))
 			.addService(
 				'historyQueryResolver',
-				({ eventResponseBuilder, schemaVersionBuilder }) =>
-					new HistoryQueryResolver(eventResponseBuilder, schemaVersionBuilder),
+				({ historyEventResponseBuilder, schemaVersionBuilder }) =>
+					new HistoryQueryResolver(historyEventResponseBuilder, schemaVersionBuilder),
 			)
 			.addService(
 				'releaseMutationResolver',

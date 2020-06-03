@@ -3,6 +3,7 @@ import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
 	scalar DateTime
+	#scalar Json
 
 	schema {
 		query: Query
@@ -54,7 +55,74 @@ const schema: DocumentNode = gql`
 	}
 
 	type HistoryResult {
-		events: [Event!]!
+		events: [HistoryEvent!]!
+	}
+
+	interface HistoryEvent {
+		id: String!
+		transactionId: String!
+		identityDescription: String!
+		identityId: String!
+		description: String!
+		createdAt: DateTime!
+		type: HistoryEventType!
+	}
+
+	enum HistoryEventType {
+		UPDATE
+		DELETE
+		CREATE
+		RUN_MIGRATION
+	}
+
+	type HistoryUpdateEvent implements HistoryEvent {
+		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
+		description: String!
+		createdAt: DateTime!
+		type: HistoryEventType!
+		tableName: String!
+		primaryKeys: [String!]!
+		#oldData: Json!
+		#diffData: Json!
+	}
+
+	type HistoryDeleteEvent implements HistoryEvent {
+		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
+		description: String!
+		createdAt: DateTime!
+		type: HistoryEventType!
+		tableName: String!
+		primaryKeys: [String!]!
+		#oldData: Json!
+	}
+
+	type HistoryCreateEvent implements HistoryEvent {
+		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
+		description: String!
+		createdAt: DateTime!
+		type: HistoryEventType!
+		tableName: String!
+		primaryKeys: [String!]!
+		#newData: Json!
+	}
+
+	type HistoryRunMigrationEvent implements HistoryEvent {
+		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
+		description: String!
+		createdAt: DateTime!
+		type: HistoryEventType!
 	}
 
 	# === diff ===
@@ -74,7 +142,7 @@ const schema: DocumentNode = gql`
 	type DiffResult {
 		base: Stage!
 		head: Stage!
-		events: [Event!]!
+		events: [DiffEvent!]!
 	}
 
 	# === migrate ===
@@ -147,9 +215,9 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 	}
 
-	# === events ===
+	# === diff ===
 
-	interface Event {
+	interface DiffEvent {
 		id: String!
 		transactionId: String!
 		identityDescription: String!
@@ -157,56 +225,44 @@ const schema: DocumentNode = gql`
 		dependencies: [String!]!
 		description: String!
 		createdAt: DateTime!
-		type: EventType!
+		type: DiffEventType!
 	}
 
-	enum EventType {
+	enum DiffEventType {
 		UPDATE
 		DELETE
 		CREATE
-		RUN_MIGRATION
 	}
 
-	type UpdateEvent implements Event {
+	type DiffUpdateEvent implements DiffEvent {
 		id: String!
 		transactionId: String!
 		identityId: String!
 		identityDescription: String!
 		dependencies: [String!]!
-		type: EventType!
+		type: DiffEventType!
 		description: String!
 		createdAt: DateTime!
 	}
 
-	type DeleteEvent implements Event {
+	type DiffDeleteEvent implements DiffEvent {
 		id: String!
 		transactionId: String!
 		identityId: String!
 		identityDescription: String!
 		dependencies: [String!]!
-		type: EventType!
+		type: DiffEventType!
 		description: String!
 		createdAt: DateTime!
 	}
 
-	type CreateEvent implements Event {
+	type DiffCreateEvent implements DiffEvent {
 		id: String!
 		transactionId: String!
 		identityId: String!
 		identityDescription: String!
 		dependencies: [String!]!
-		type: EventType!
-		description: String!
-		createdAt: DateTime!
-	}
-
-	type RunMigrationEvent implements Event {
-		id: String!
-		transactionId: String!
-		identityId: String!
-		identityDescription: String!
-		dependencies: [String!]!
-		type: EventType!
+		type: DiffEventType!
 		description: String!
 		createdAt: DateTime!
 	}

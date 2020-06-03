@@ -83,6 +83,7 @@ const createSqlMetrics = (
 		name: 'contember_sql_error_count',
 		help:
 			'Failed SQL queries by contember_module (system, tenant, content or unknown) and contember_project (or "unknown" for unknown project)',
+		labelNames: ['contember_project', 'contember_module'],
 		registers: [registry],
 	})
 

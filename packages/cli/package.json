@@ -1,6 +1,6 @@
 {
 	"name": "@contember/cli",
-	"version": "0.7.7",
+	"version": "0.7.8",
 	"license": "Apache-2.0",
 	"bin": {
 		"contember": "./dist/src/run.js"
@@ -13,13 +13,13 @@
 		"@types/prompts": "^2.0.1"
 	},
 	"dependencies": {
-		"@contember/config-loader": "^0.7.7",
-		"@contember/dic": "^0.7.7",
-		"@contember/engine-common": "^0.7.7",
-		"@contember/schema": "^0.7.7",
-		"@contember/schema-definition": "^0.7.7",
-		"@contember/schema-migrations": "^0.7.7",
-		"@contember/schema-utils": "^0.7.7",
+		"@contember/config-loader": "^0.7.8",
+		"@contember/dic": "^0.7.8",
+		"@contember/engine-common": "^0.7.8",
+		"@contember/schema": "^0.7.8",
+		"@contember/schema-definition": "^0.7.8",
+		"@contember/schema-migrations": "^0.7.8",
+		"@contember/schema-utils": "^0.7.8",
 		"chalk": "^3.0.0",
 		"download-tarball": "^2.0.0",
 		"fs-extra": "^8.1.0",

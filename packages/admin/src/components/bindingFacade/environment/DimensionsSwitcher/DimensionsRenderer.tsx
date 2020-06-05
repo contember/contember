@@ -1,18 +1,6 @@
+import { Component, EntityAccessor, EntityListAccessor, Field, SingleEntity, useEnvironment } from '@contember/binding'
 import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown, Spinner } from '@contember/ui'
 import * as React from 'react'
-import { useContext } from 'react'
-import {
-	AccessorTreeState,
-	AccessorTreeStateContext,
-	AccessorTreeStateName,
-	Component,
-	Entity,
-	EntityAccessor,
-	EntityListAccessor,
-	Field,
-	FieldAccessor,
-	useEnvironment,
-} from '@contember/binding'
 import { RequestChange } from '../../../../state/request'
 import { Link } from '../../../Link'
 import { useRedirect } from '../../../pageRouting'
@@ -21,6 +9,7 @@ import { renderByJoining } from './renderByJoining'
 import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
 
 export interface DimensionsRendererProps {
+	accessor: EntityListAccessor
 	buttonProps?: ButtonBasedButtonProps
 	dimension: string
 	labelFactory: React.ReactNode
@@ -32,7 +21,6 @@ export interface DimensionsRendererProps {
 
 export const DimensionsRenderer = Component<DimensionsRendererProps>(
 	props => {
-		const accessorTreeState = useContext(AccessorTreeStateContext)
 		const environment = useEnvironment()
 		const redirect = useRedirect()
 
@@ -121,21 +109,8 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 			return <React.Fragment key="multipleDimensions">{renderedDimensions}</React.Fragment>
 		}
 
-		const getNormalizedData = (
-			currentDimensions: string[],
-			treeState: AccessorTreeState,
-		): StatefulDimensionDatum[] | undefined => {
-			if (treeState.name !== AccessorTreeStateName.Interactive) {
-				return undefined
-				/*return currentDimensions.map(dimension => {
-				return {
-					slug: dimension,
-					label: dimension, // We don't have the data to match the defaults with so this is better than nothing
-					isSelected: true,
-				}
-			})*/
-			}
-			const entities = treeState.data instanceof EntityListAccessor ? Array.from(treeState.data) : [treeState.data]
+		const getNormalizedData = (currentDimensions: string[], accessor: EntityListAccessor): StatefulDimensionDatum[] => {
+			const entities = Array.from(accessor)
 			const normalized: StatefulDimensionDatum[] = []
 
 			for (const entity of entities) {
@@ -148,7 +123,7 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 					normalized.push({
 						slug: slugValue,
 						isSelected: currentDimensions.indexOf(slugValue) !== -1,
-						label: <Entity accessor={entity}>{props.labelFactory}</Entity>,
+						label: <SingleEntity accessor={entity}>{props.labelFactory}</SingleEntity>,
 					})
 				}
 			}
@@ -161,7 +136,7 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 		}
 
 		const uniqueDimensions = getUniqueDimensions(environment.getDimension(props.dimension) || [])
-		const normalizedData = getNormalizedData(uniqueDimensions, accessorTreeState)
+		const normalizedData = getNormalizedData(uniqueDimensions, props.accessor)
 
 		const selectedDimensions = normalizedData
 			? uniqueDimensions
@@ -188,10 +163,6 @@ export const DimensionsRenderer = Component<DimensionsRendererProps>(
 				})
 			}
 		}, [normalizedData, props.dimension, props.maxItems, redirect, selectedDimensions])
-
-		if (normalizedData === undefined) {
-			return <Spinner />
-		}
 
 		if (normalizedData.length === 0) {
 			return null // What do we even do here…?

@@ -1,9 +1,22 @@
 import { GraphQlBuilder } from '@contember/client'
-import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
+import {
+	EntityAccessor,
+	EntityForRemovalAccessor,
+	EntityListAccessor,
+	FieldAccessor,
+	TreeRootAccessor,
+} from '../accessors'
 import { ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerSubTree, ReferenceMarker } from '../markers'
+import {
+	ConnectionMarker,
+	EntityFieldMarkers,
+	FieldMarker,
+	MarkerSubTree,
+	MarkerTreeRoot,
+	ReferenceMarker,
+} from '../markers'
 import { ExpectedEntityCount } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 
@@ -11,14 +24,15 @@ export class DirtinessChecker {
 	private isDirtyCache: WeakMap<EntityAccessor | EntityListAccessor, boolean>
 
 	public constructor(
-		private readonly markerTree: MarkerSubTree,
+		private readonly markerTree: MarkerTreeRoot,
 		private readonly persistedData: ReceivedDataTree<undefined> | undefined,
 	) {
 		this.isDirtyCache = new WeakMap()
 	}
 
-	public isDirty(accessorTree: RootAccessor): boolean {
-		const persistedData = this.persistedData ? this.persistedData[this.markerTree.placeholderName] : undefined
+	public isDirty(accessorTree: TreeRootAccessor): boolean {
+		return true // TODO
+		/*const persistedData = this.persistedData ? this.persistedData[this.markerTree.placeholderName] : undefined
 
 		if (
 			Array.isArray(persistedData) ||
@@ -33,7 +47,7 @@ export class DirtinessChecker {
 				return this.isEntityDirty(this.markerTree.fields, persistedData, accessorTree)
 			}
 		}
-		this.rejectInvalidTree()
+		this.rejectInvalidTree()*/
 	}
 
 	private isEntityDirty(

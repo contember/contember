@@ -1,10 +1,9 @@
-import { BindingError, Entity, EntityAccessor, RelativeSingleField, RemovalType } from '@contember/binding'
+import { BindingError, EntityAccessor, RelativeSingleField, RemovalType, SingleEntity } from '@contember/binding'
 import { ActionableBox, Box } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
-import { RemoveEntityButton } from '../../../collections/helpers'
 import { BlockSlateEditor } from '../editor'
 import { ContemberBlockElement } from '../elements'
 
@@ -52,7 +51,7 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 		<div {...props.attributes}>
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
-				<Entity accessor={props.entity}>
+				<SingleEntity accessor={props.entity}>
 					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
 					<ActionableBox
 						editContents={alternate}
@@ -63,7 +62,7 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 						</Box>
 					</ActionableBox>
 					<div onClick={() => addDefaultElement(1)} style={{ height: '1em' }} />
-				</Entity>
+				</SingleEntity>
 			</div>
 			{props.children}
 		</div>

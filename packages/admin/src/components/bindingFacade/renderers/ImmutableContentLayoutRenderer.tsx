@@ -1,57 +1,28 @@
+import { Component } from '@contember/binding'
 import { IncreaseHeadingDepth, TitleBar, TitleBarProps } from '@contember/ui'
 import * as React from 'react'
-import {
-	AccessorProvider,
-	AccessorTreeStateWithDataContext,
-	Component,
-	EntityAccessor,
-	EntityForRemovalAccessor,
-} from '@contember/binding'
 import { LayoutInner, LayoutSide } from '../../LayoutInner'
-import { FeedbackRenderer, FeedbackRendererProps } from './FeedbackRenderer'
 
-export interface ImmutableContentLayoutRendererProps extends ImmutableContentLayoutRendererInnerProps {}
-
-export const ImmutableContentLayoutRenderer = Component<ImmutableContentLayoutRendererProps>(
-	props => (
-		<FeedbackRenderer>
-			<ImmutableContentLayoutRendererInner {...props} />
-		</FeedbackRenderer>
-	),
-	'ImmutableContentLayoutRenderer',
-)
-
-interface ImmutableContentLayoutRendererInnerProps extends FeedbackRendererProps, Omit<TitleBarProps, 'children'> {
+export interface ImmutableContentLayoutRendererProps extends Omit<TitleBarProps, 'children'> {
 	side?: React.ReactNode
 	title?: React.ReactNode
+	children?: React.ReactNode
 }
 
-const ImmutableContentLayoutRendererInner = Component<ImmutableContentLayoutRendererInnerProps>(
+export const ImmutableContentLayoutRenderer = Component<ImmutableContentLayoutRendererProps>(
 	({ side, children, title, navigation, actions, headingProps }) => {
-		const accessorTreeState = React.useContext(AccessorTreeStateWithDataContext)
-		const titleBar = React.useMemo(
-			() =>
-				title && (
-					<TitleBar navigation={navigation} actions={actions} headingProps={headingProps}>
-						{title}
-					</TitleBar>
-				),
-			[actions, headingProps, navigation, title],
-		)
 		const content = React.useMemo(() => <IncreaseHeadingDepth currentDepth={1}>{children}</IncreaseHeadingDepth>, [
 			children,
 		])
 
-		const treeStateRoot =
-			accessorTreeState !== undefined &&
-			(accessorTreeState.data instanceof EntityAccessor || accessorTreeState.data instanceof EntityForRemovalAccessor)
-				? accessorTreeState.data
-				: undefined
-
 		return (
 			<>
 				<LayoutInner>
-					<AccessorProvider value={treeStateRoot}>{titleBar}</AccessorProvider>
+					{!!title && (
+						<TitleBar navigation={navigation} actions={actions} headingProps={headingProps}>
+							{title}
+						</TitleBar>
+					)}
 					{content}
 				</LayoutInner>
 				{side && <LayoutSide>{side}</LayoutSide>}
@@ -59,11 +30,11 @@ const ImmutableContentLayoutRendererInner = Component<ImmutableContentLayoutRend
 		)
 	},
 	props => (
-		<FeedbackRenderer>
+		<>
 			{props.title}
 			{props.children}
 			{props.side}
-		</FeedbackRenderer>
+		</>
 	),
-	'ImmutableContentLayoutRendererInner',
+	'ImmutableContentLayoutRenderer',
 )

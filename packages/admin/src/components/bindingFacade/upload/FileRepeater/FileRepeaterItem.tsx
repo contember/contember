@@ -1,9 +1,9 @@
 import {
-	Entity,
 	EntityAccessor,
 	Environment,
 	RelativeSingleField,
 	RemovalType,
+	SingleEntity,
 	VariableInputTransformer,
 } from '@contember/binding'
 import { SingleFileUploadState } from '@contember/react-client'
@@ -90,11 +90,11 @@ export const FileRepeaterItem = React.memo(
 
 		return (
 			<div className="fileInput-preview">
-				<Entity accessor={entity}>
+				<SingleEntity accessor={entity}>
 					<ActionableBox onRemove={canBeRemoved ? onRemove : undefined} editContents={editContents}>
 						{preview}
 					</ActionableBox>
-				</Entity>
+				</SingleEntity>
 			</div>
 		)
 	},

@@ -8,7 +8,9 @@ import {
 	EntityListAccessor,
 	ErrorAccessor,
 	FieldAccessor,
-	RootAccessor,
+	GetSubTree,
+	SubTreeAccessor,
+	TreeRootAccessor,
 } from '../accessors'
 import { MutationDataResponse, ReceivedData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
@@ -17,14 +19,11 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	MarkerSubTreeParameters,
 	MarkerSubTree,
+	MarkerSubTreeParameters,
+	MarkerTreeRoot,
 	PlaceholderGenerator,
 	ReferenceMarker,
-	TaggedQualifiedEntityList,
-	TaggedQualifiedSingleEntity,
-	TaggedUnconstrainedQualifiedEntityList,
-	TaggedUnconstrainedQualifiedSingleEntity,
 } from '../markers'
 import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
 import { assertNever } from '../utils'
@@ -98,7 +97,7 @@ interface InternalEntityListState extends InternalContainerState {
 			| undefined
 	}
 	fieldMarkers: EntityFieldMarkers
-	initialData: ReceivedEntityData<undefined>[] | Array<EntityAccessor | EntityForRemovalAccessor>
+	initialData: ReceivedEntityData<undefined | null>[] | Array<EntityAccessor | EntityForRemovalAccessor>
 	removeEntity: EntityListAccessor.RemoveEntity
 	onUpdate: OnEntityListUpdate
 	preferences: ReferenceMarker.ReferencePreferences
@@ -123,7 +122,9 @@ interface InternalFieldState {
 
 class AccessorTreeGenerator {
 	private persistedData: ReceivedDataTree<undefined> | undefined
-	private initialData: RootAccessor | ReceivedDataTree<undefined> | undefined
+	private initialData: TreeRootAccessor | ReceivedDataTree<undefined> | undefined
+	private updateData: AccessorTreeGenerator.UpdateData | undefined
+
 	private errorTreeRoot?: ErrorsPreprocessor.ErrorTreeRoot
 	private entityStore: Map<string, InternalEntityState> = new Map()
 	private readonly getEntityByKey = (key: string) => {
@@ -134,19 +135,28 @@ class AccessorTreeGenerator {
 		}
 		return entity.accessor
 	}
+	private subTreeStates: Map<string, InternalRootStateNode> = new Map()
+	private readonly getSubTree = ((parameters: MarkerSubTreeParameters) => {
+		const placeholderName = PlaceholderGenerator.getMarkerSubTreePlaceholder(parameters)
+		const subTreeState = this.subTreeStates.get(placeholderName)
 
-	private subTreeStates: WeakMap<MarkerSubTree, InternalRootStateNode> = new WeakMap()
+		if (subTreeState === undefined) {
+			throw new BindingError(`Trying to retrieve a non-existent accessor sub tree.`)
+		}
+		return subTreeState.accessor
+	}) as GetSubTree
+
+	private isFrozenWhileUpdating = false
 	private treeWideBatchUpdateDepth = 0
 
-	public constructor(private tree: MarkerSubTree) {}
+	public constructor(private tree: MarkerTreeRoot) {}
 
 	public generateLiveTree(
 		persistedData: ReceivedDataTree<undefined> | undefined,
-		initialData: RootAccessor | ReceivedDataTree<undefined> | undefined,
+		initialData: TreeRootAccessor | ReceivedDataTree<undefined> | undefined,
 		updateData: AccessorTreeGenerator.UpdateData,
 		errors?: MutationDataResponse,
 	): void {
-		let isFrozenWhileUpdating = false
 		const preprocessor = new ErrorsPreprocessor(errors)
 
 		this.errorTreeRoot = preprocessor.preprocess()
@@ -154,53 +164,64 @@ class AccessorTreeGenerator {
 
 		this.persistedData = persistedData
 		this.initialData = initialData
+		this.updateData = updateData
 
-		const updateDataWithEvents = (newData: RootAccessor) => {
-			if (this.treeWideBatchUpdateDepth > 0) {
-				return
-			}
-
-			if (isFrozenWhileUpdating) {
-				throw new BindingError(
-					`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
-						`by updating the accessor tree during rendering or in the 'afterUpdate' event handler. That is a no-op. ` +
-						`If you wish to react to changes, use the 'beforeUpdate' event handler.`,
-				)
-			}
-
-			ReactDOM.unstable_batchedUpdates(() => {
-				isFrozenWhileUpdating = true
-				updateData(newData, this.getEntityByKey)
-				subTreeState.hasPendingUpdate = true
-				this.flushPendingAccessorUpdates(subTreeState)
-				isFrozenWhileUpdating = false
-			})
+		for (const [placeholderName, marker] of this.tree.subTrees) {
+			const subTreeState = this.initializeSubTree(
+				marker,
+				initialData instanceof TreeRootAccessor
+					? initialData.getSubTree(marker.parameters)
+					: initialData === undefined
+					? undefined
+					: initialData[placeholderName],
+				newData => {
+					subTreeState.accessor = newData
+					subTreeState.hasPendingUpdate = true
+				},
+				this.errorTreeRoot,
+			)
+			this.subTreeStates.set(placeholderName, subTreeState)
 		}
 
-		const subTreeState = this.initializeSubTree(
-			this.tree,
-			initialData instanceof EntityAccessor ||
-				initialData instanceof EntityListAccessor ||
-				initialData instanceof EntityForRemovalAccessor
-				? initialData
-				: initialData === undefined
-				? undefined
-				: initialData[this.tree.placeholderName],
-			updateDataWithEvents,
-			this.errorTreeRoot,
-		)
-
-		updateDataWithEvents(subTreeState.accessor!)
+		this.updateMainTree()
 	}
 
 	private performRootTreeOperation(operation: () => void) {
-		operation() // TODO
+		this.treeWideBatchUpdateDepth++
+		operation()
+		this.treeWideBatchUpdateDepth--
+		this.updateMainTree()
+	}
+
+	private updateMainTree() {
+		if (this.treeWideBatchUpdateDepth > 0) {
+			return
+		}
+
+		if (this.isFrozenWhileUpdating) {
+			throw new BindingError(
+				`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
+					`by updating the accessor tree during rendering or in the 'afterUpdate' event handler. That is a no-op. ` +
+					`If you wish to react to changes, use the 'beforeUpdate' event handler.`,
+			)
+		}
+
+		ReactDOM.unstable_batchedUpdates(() => {
+			this.isFrozenWhileUpdating = true
+			this.updateData?.(new TreeRootAccessor(this.getEntityByKey, this.getSubTree))
+			this.flushPendingAccessorUpdates(
+				Array.from(this.tree.subTrees.keys())
+					.map(placeholderName => this.subTreeStates.get(placeholderName)!)
+					.filter(state => state.hasPendingUpdate),
+			)
+			this.isFrozenWhileUpdating = false
+		})
 	}
 
 	private initializeSubTree(
 		tree: MarkerSubTree,
-		data: ReceivedData<undefined> | RootAccessor,
-		updateData: (newData: RootAccessor) => void,
+		data: ReceivedData<undefined> | SubTreeAccessor,
+		updateData: (newData: SubTreeAccessor) => void,
 		errors?: ErrorsPreprocessor.ErrorTreeRoot,
 	): InternalRootStateNode {
 		const errorNode = errors === undefined ? undefined : errors[tree.placeholderName]
@@ -220,7 +241,7 @@ class AccessorTreeGenerator {
 		let subTreeState: InternalEntityState | InternalEntityListState
 
 		if (Array.isArray(data) || data === undefined || data instanceof EntityListAccessor) {
-			const existingState = this.subTreeStates.get(tree) as InternalEntityListState
+			const existingState = this.subTreeStates.get(tree.placeholderName) as InternalEntityListState
 			const resolvedState = this.resolveOrCreateEntityListState(
 				existingState,
 				tree.fields,
@@ -231,12 +252,12 @@ class AccessorTreeGenerator {
 			)
 			subTreeState = this.initializeEntityListAccessor(resolvedState)
 		} else {
-			const existingState = this.subTreeStates.get(tree) as InternalEntityState
+			const existingState = this.subTreeStates.get(tree.placeholderName) as InternalEntityState
 			const id = this.resolveOrCreateEntityId(data)
 			const resolvedState = this.resolveOrCreateEntityState(id, existingState, tree.fields, onUpdate, data, errorNode)
 			subTreeState = this.initializeEntityAccessor(resolvedState, tree.fields)
 		}
-		this.subTreeStates.set(tree, subTreeState)
+		this.subTreeStates.set(tree.placeholderName, subTreeState)
 
 		return subTreeState
 	}
@@ -245,7 +266,7 @@ class AccessorTreeGenerator {
 		entityState: InternalEntityState,
 		markers: EntityFieldMarkers,
 		onFieldUpdate: (identifier: string, updatedData: EntityAccessor.NestedAccessor | null) => void,
-		onSubTreeUpdate: (placeholderName: string, updatedRoot: RootAccessor) => void,
+		onSubTreeUpdate: (placeholderName: string, updatedRoot: SubTreeAccessor) => void,
 		onReplace: OnReplace,
 		batchUpdates: BatchEntityUpdates,
 		onUnlink?: OnUnlink,
@@ -255,17 +276,6 @@ class AccessorTreeGenerator {
 				? entityState.persistedData.typename
 				: entityState.persistedData[TYPENAME_KEY_NAME]
 			: undefined
-
-		// TODO move this and change sub tree identifiers
-		function getSubTree(parameters: TaggedQualifiedSingleEntity): EntityAccessor | EntityForRemovalAccessor | null
-		function getSubTree(parameters: TaggedQualifiedEntityList): EntityListAccessor
-		function getSubTree(parameters: TaggedUnconstrainedQualifiedSingleEntity): EntityAccessor
-		function getSubTree(parameters: TaggedUnconstrainedQualifiedEntityList): EntityListAccessor
-		function getSubTree(
-			parameters: MarkerSubTreeParameters,
-		): EntityAccessor | EntityForRemovalAccessor | null | EntityListAccessor {
-			return entityState.subTrees?.get(PlaceholderGenerator.getMarkerSubTreePlaceholder(parameters))?.accessor || null
-		}
 
 		// We're overwriting existing states in entityState.fields which could already be there from a different
 		// entity realm. Most of the time this results in an equivalent accessor instance, and so for those cases this
@@ -304,13 +314,9 @@ class AccessorTreeGenerator {
 			}
 
 			if (field instanceof MarkerSubTree) {
-				let initialData: ReceivedData<undefined> | RootAccessor
+				let initialData: ReceivedData<undefined> | SubTreeAccessor
 
-				if (
-					this.initialData instanceof EntityAccessor ||
-					this.initialData instanceof EntityListAccessor ||
-					this.initialData instanceof EntityForRemovalAccessor
-				) {
+				if (this.initialData instanceof TreeRootAccessor) {
 					if (this.persistedData === undefined) {
 						initialData = undefined
 					} else {
@@ -326,7 +332,7 @@ class AccessorTreeGenerator {
 					entityState.subTrees = new Map()
 				}
 
-				const onThisSubTreeUpdate = (newRoot: RootAccessor) => onSubTreeUpdate(field.placeholderName, newRoot)
+				const onThisSubTreeUpdate = (newRoot: SubTreeAccessor) => onSubTreeUpdate(field.placeholderName, newRoot)
 
 				entityState.subTrees.set(
 					field.placeholderName,
@@ -465,7 +471,7 @@ class AccessorTreeGenerator {
 			// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 			// keep in sync two copies of the same data. TS hides the extra info anyway.
 			entityState.fields,
-			getSubTree,
+			this.getSubTree,
 			entityState.errors ? entityState.errors.errors : emptyArray,
 			entityState.addEventListener,
 			batchUpdates,
@@ -546,7 +552,7 @@ class AccessorTreeGenerator {
 			entityState.dirtyChildFields.add(updatedField)
 			return onUpdateProxy(newAccessor)
 		}
-		const onSubTreeUpdate = (placeholderName: string, updatedRoot: RootAccessor) => {
+		const onSubTreeUpdate = (placeholderName: string, updatedRoot: SubTreeAccessor) => {
 			const entityAccessor = entityState.accessor
 			if (!(entityAccessor instanceof EntityAccessor)) {
 				return this.rejectInvalidAccessorTree()
@@ -1028,7 +1034,7 @@ class AccessorTreeGenerator {
 		existingState: InternalEntityListState | undefined,
 		fieldMarkers: EntityFieldMarkers,
 		onUpdate: OnEntityListUpdate,
-		initialData: ReceivedEntityData<undefined>[] | EntityListAccessor | undefined,
+		initialData: ReceivedEntityData<undefined | null>[] | EntityListAccessor | undefined,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		preferences: ReferenceMarker.ReferencePreferences | undefined,
 	): InternalEntityListState {
@@ -1038,7 +1044,7 @@ class AccessorTreeGenerator {
 		if (
 			sourceData.length === 0 ||
 			sourceData.every(
-				(datum: ReceivedEntityData<undefined> | EntityAccessor | EntityForRemovalAccessor | undefined) =>
+				(datum: ReceivedEntityData<undefined | null> | EntityAccessor | EntityForRemovalAccessor | undefined) =>
 					datum === undefined,
 			)
 		) {
@@ -1119,9 +1125,9 @@ class AccessorTreeGenerator {
 		}
 	}
 
-	private flushPendingAccessorUpdates(rootState: InternalEntityState | InternalEntityListState) {
+	private flushPendingAccessorUpdates(rootStates: Array<InternalEntityState | InternalEntityListState>) {
 		// It is *CRUCIAL* that this is a BFS so that we update the components in top-down order.
-		const agenda: Array<InternalEntityState | InternalEntityListState | InternalFieldState> = [rootState]
+		const agenda: Array<InternalEntityState | InternalEntityListState | InternalFieldState> = rootStates
 
 		for (const state of agenda) {
 			//console.log(state)
@@ -1179,12 +1185,9 @@ class AccessorTreeGenerator {
 }
 
 namespace AccessorTreeGenerator {
-	export type UpdateData = (
-		newData: RootAccessor,
-		getEntityByKey: (key: string) => EntityAccessor | EntityForRemovalAccessor | null,
-	) => void
+	export type UpdateData = (newData: TreeRootAccessor) => void
 
-	export type InitialEntityData = ReceivedEntityData<undefined> | EntityAccessor | EntityForRemovalAccessor
+	export type InitialEntityData = ReceivedEntityData<undefined | null> | EntityAccessor | EntityForRemovalAccessor
 }
 
 export { AccessorTreeGenerator }

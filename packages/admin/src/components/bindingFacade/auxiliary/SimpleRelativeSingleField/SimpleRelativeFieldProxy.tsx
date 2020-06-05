@@ -1,13 +1,5 @@
+import { Environment, SugaredRelativeSingleField, useEnvironment, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
-import {
-	Entity,
-	EntityAccessor,
-	Environment,
-	SugaredRelativeSingleField,
-	useParentEntityAccessor,
-	useEnvironment,
-	useRelativeSingleField,
-} from '@contember/binding'
 import { isScalar } from '../../../../utils'
 import { SimpleRelativeSingleFieldInner, SimpleRelativeSingleFieldInnerProps } from './SimpleRelativeSingleFieldInner'
 

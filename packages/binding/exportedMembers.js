@@ -16,6 +16,7 @@ export const bindingExportedMembers = [
 	'Component',
 	'Connection',
 	'ConnectionMarker',
+	'DataBindingProvider',
 	'DirtinessChecker',
 	'DirtinessContext',
 	'Entity',

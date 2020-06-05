@@ -3,17 +3,17 @@ import { useRelativeSingleEntity } from '../accessorPropagation'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeSingleEntity } from '../treeParameters'
 import { Component } from './Component'
-import { Entity } from './Entity'
+import { SingleEntity } from './SingleEntity'
 
 export interface HasOneProps extends SugaredRelativeSingleEntity {
-	children: React.ReactNode
+	children?: React.ReactNode
 }
 
 export const HasOne = Component<HasOneProps>(
 	props => {
 		const entity = useRelativeSingleEntity(props)
 
-		return <Entity accessor={entity}>{props.children}</Entity>
+		return <SingleEntity accessor={entity}>{props.children}</SingleEntity>
 	},
 	{
 		generateReferenceMarker: (props, fields, environment) =>

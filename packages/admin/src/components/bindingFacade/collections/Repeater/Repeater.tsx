@@ -1,5 +1,5 @@
+import { BindingError, Component, HasMany, HasManyProps, useRelativeEntityList } from '@contember/binding'
 import * as React from 'react'
-import { Component, BindingError, Field, HasMany, HasManyProps, useRelativeEntityList } from '@contember/binding'
 import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 
 export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>

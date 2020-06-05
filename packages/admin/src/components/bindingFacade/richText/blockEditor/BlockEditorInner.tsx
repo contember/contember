@@ -38,7 +38,7 @@ const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
 	[RB.strikeThrough, RB.code],
 ]
 export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
-	children: React.ReactNode
+	children?: React.ReactNode
 	label: React.ReactNode
 	removalType?: RemovalType
 	sortableBy: SugaredFieldProps['field']

@@ -1,4 +1,4 @@
-import { BindingError, Entity, EntityAccessor, RelativeSingleField, RemovalType } from '@contember/binding'
+import { EntityAccessor, RelativeSingleField, RemovalType, SingleEntity } from '@contember/binding'
 import { ActionableBox, Box } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
@@ -47,7 +47,7 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 		<div {...props.attributes}>
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
-				<Entity accessor={props.entity}>
+				<SingleEntity accessor={props.entity}>
 					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
 					<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
 						<ActionableBox
@@ -68,7 +68,7 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 						</ActionableBox>
 					</div>
 					<div onClick={() => addDefaultElement(1)} style={{ height: '1em' }} />
-				</Entity>
+				</SingleEntity>
 			</div>
 			{props.children}
 		</div>

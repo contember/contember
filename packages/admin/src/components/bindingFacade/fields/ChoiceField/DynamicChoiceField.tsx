@@ -3,8 +3,7 @@ import {
 	Component,
 	EntityAccessor,
 	EntityListAccessor,
-	EntityListDataProvider,
-	ExpectedEntityCount,
+	EntityListSubTree,
 	Field,
 	FieldAccessor,
 	HasMany,
@@ -247,7 +246,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					  }
 					: props.options
 			entityListDataProvider = (
-				<EntityListDataProvider {...sugaredEntityList}>{props.optionFieldStaticFactory}</EntityListDataProvider>
+				<EntityListSubTree {...sugaredEntityList}>{props.optionFieldStaticFactory}</EntityListSubTree>
 			)
 		} else {
 			const sugaredFieldList: SugaredQualifiedFieldList =
@@ -258,9 +257,9 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					: props.options
 			const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
 			entityListDataProvider = (
-				<EntityListDataProvider {...fieldList} entities={fieldList}>
+				<EntityListSubTree {...fieldList} entities={fieldList}>
 					<Field field={fieldList.field} />
-				</EntityListDataProvider>
+				</EntityListSubTree>
 			)
 		}
 

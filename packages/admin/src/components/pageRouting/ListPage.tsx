@@ -1,10 +1,11 @@
+import { DataBindingProvider, EntityListSubTree, SugaredQualifiedEntityList } from '@contember/binding'
 import * as React from 'react'
-import { EntityListDataProvider } from '@contember/binding'
-import { ListRenderer, ListRendererProps } from '../bindingFacade'
-import { EntityListPageProps } from './EntityListPageProps'
+import { FeedbackRenderer, ListRenderer, ListRendererProps } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 
-export interface ListPageProps<ContainerExtraProps, ItemExtraProps> extends EntityListPageProps {
+export interface ListPageProps<ContainerExtraProps, ItemExtraProps> extends SugaredQualifiedEntityList {
+	pageName: string
+	children?: React.ReactNode
 	rendererProps?: Omit<ListRendererProps<ContainerExtraProps, ItemExtraProps>, 'children'>
 }
 
@@ -15,9 +16,11 @@ const ListPage = React.memo(
 		pageName,
 		...entityListProps
 	}: ListPageProps<ContainerExtraProps, ItemExtraProps>) => (
-		<EntityListDataProvider {...entityListProps}>
-			<ListRenderer {...rendererProps}>{children}</ListRenderer>
-		</EntityListDataProvider>
+		<DataBindingProvider stateComponent={FeedbackRenderer}>
+			<EntityListSubTree {...entityListProps} listComponent={ListRenderer} listProps={rendererProps}>
+				{children}
+			</EntityListSubTree>
+		</DataBindingProvider>
 	),
 ) as (<ContainerExtraProps, ItemExtraProps>(
 	props: ListPageProps<ContainerExtraProps, ItemExtraProps>,

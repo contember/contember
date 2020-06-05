@@ -1,7 +1,6 @@
 import * as React from 'react'
 import {
 	BindingError,
-	EnforceSubtypeRelation,
 	Environment,
 	EnvironmentContext,
 	EnvironmentDeltaProvider,
@@ -10,6 +9,8 @@ import {
 	SugaredRelativeSingleField,
 	SyntheticChildrenProvider,
 } from '@contember/binding'
+
+type EnforceSubtypeRelation<Sub extends Super, Super> = never
 
 export interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
 	dimension?: string

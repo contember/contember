@@ -5,33 +5,34 @@ import {
 	EntityFieldMarkers,
 	FieldMarker,
 	MarkerSubTree,
+	MarkerTreeRoot,
 	ReferenceMarker,
 	TaggedQualifiedEntityList,
 	TaggedQualifiedSingleEntity,
 } from '../markers'
-import { assertNever } from '../utils'
-import ucfirst from '../utils/ucfirst'
+import { assertNever, ucfirst } from '../utils'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
 
 type ReadBuilder = CrudQueryBuilder.ReadBuilder.Builder<never>
 
 export class QueryGenerator {
-	constructor(private tree: MarkerSubTree) {}
+	constructor(private tree: MarkerTreeRoot) {}
 
 	public getReadQuery(): string | undefined {
 		try {
-			return this.addSubQuery(this.tree).getGql()
+			let baseQueryBuilder: BaseQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
+
+			for (const [, subTreeMarker] of this.tree.subTrees) {
+				baseQueryBuilder = this.addSubQuery(subTreeMarker, baseQueryBuilder)
+			}
+			return baseQueryBuilder.getGql()
 		} catch (e) {
 			return undefined
 		}
 	}
 
-	private addSubQuery(subTree: MarkerSubTree, baseQueryBuilder?: BaseQueryBuilder): BaseQueryBuilder {
-		if (!baseQueryBuilder) {
-			baseQueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
-		}
-
+	private addSubQuery(subTree: MarkerSubTree, baseQueryBuilder: BaseQueryBuilder): BaseQueryBuilder {
 		switch (subTree.parameters.type) {
 			case 'unique':
 				return this.addGetQuery(baseQueryBuilder, subTree as MarkerSubTree<TaggedQualifiedSingleEntity>)

@@ -1,7 +1,7 @@
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
+import { MarkerTreeRoot } from '../markers/MarkerTreeRoot'
 import { assertNever } from '../utils'
 import * as React from 'react'
-import { MarkerProvider } from '../coreComponents'
 import { Environment } from '../dao'
 import { BindingError } from '../BindingError'
 import { ConnectionMarker, EntityFieldMarkers, FieldMarker, Marker, MarkerSubTree, ReferenceMarker } from '../markers'
@@ -13,26 +13,30 @@ type Terminals = FieldMarker | ConnectionMarker | Fragment
 type Nonterminals = MarkerSubTree | ReferenceMarker | Fragment
 
 type NodeResult = Terminals | Nonterminals
-type DataMarker = MarkerProvider &
-	(React.ComponentClass<unknown> | React.FunctionComponent<unknown> | React.NamedExoticComponent<unknown>)
 
 export class MarkerTreeGenerator {
 	private static childrenAnalyzer = MarkerTreeGenerator.initializeChildrenAnalyzer()
 
 	public constructor(private sourceTree: React.ReactNode, private environment: Environment = Environment.create()) {}
 
-	public generate(): MarkerSubTree {
+	public generate(): MarkerTreeRoot {
 		const processed = MarkerTreeGenerator.childrenAnalyzer.processChildren(this.sourceTree, this.environment)
+		const subTreeMap: Map<string, MarkerSubTree> = new Map()
 
-		if (processed.length === 1) {
-			const result = processed[0]
+		if (processed.length === 0) {
+			throw new BindingError('Empty data tree discovered. Try adding some fields…')
+		}
 
-			if (result instanceof MarkerSubTree) {
-				return result
+		// TODO allow Fragment from here as well as handle it correctly from reportInvalidTopLevelError
+		for (const marker of processed) {
+			if (marker instanceof MarkerSubTree) {
+				subTreeMap.set(marker.placeholderName, marker)
+			} else {
+				this.reportInvalidTopLevelError(marker)
 			}
 		}
 
-		return this.reportInvalidTreeError(processed)
+		return new MarkerTreeRoot(subTreeMap)
 	}
 
 	private static mapNodeResultToEntityFields(
@@ -154,21 +158,12 @@ export class MarkerTreeGenerator {
 		return original
 	}
 
-	private reportInvalidTreeError(markers: NodeResult[]): never {
-		if (markers.length) {
-			if (markers.length > 1) {
-				throw new BindingError(`Multi-root data trees are not supported.`) // TODO this is planned to chane
-			}
-			const marker = markers[0]
+	private reportInvalidTopLevelError(marker: Exclude<NodeResult, MarkerSubTree>): never {
+		const kind = marker instanceof FieldMarker ? 'field' : marker instanceof ReferenceMarker ? 'relation' : 'connection'
 
-			const kind =
-				marker instanceof FieldMarker ? 'field' : marker instanceof ReferenceMarker ? 'relation' : 'connection'
-
-			throw new BindingError(
-				`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`,
-			)
-		}
-		throw new BindingError('Empty data tree discovered. Try adding some fields…')
+		throw new BindingError(
+			`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`,
+		)
 	}
 
 	private static rejectRelationScalarCombo(fieldName: FieldName): never {

@@ -23,6 +23,7 @@ export interface TaggedUnconstrainedQualifiedEntityList extends UnconstrainedQua
 	type: 'unconstrainedNonUnique'
 }
 
+// TODO turn these into classes
 export type MarkerSubTreeParameters =
 	| TaggedQualifiedSingleEntity
 	| TaggedQualifiedEntityList

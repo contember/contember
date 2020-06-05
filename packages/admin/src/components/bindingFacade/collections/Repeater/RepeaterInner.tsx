@@ -1,7 +1,7 @@
 import {
 	Component,
-	Entity,
 	EntityListAccessor,
+	SingleEntity,
 	SugaredField,
 	SugaredFieldProps,
 	useMutationState,
@@ -23,7 +23,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	entityList: EntityListAccessor
 	label: React.ReactNode
 	initialRowCount?: number
-	children: React.ReactNode
+	children?: React.ReactNode
 
 	sortableBy?: SugaredFieldProps['field']
 
@@ -78,7 +78,7 @@ export const RepeaterInner = Component(
 					entities={entities}
 				>
 					{entities.map(entity => (
-						<Entity accessor={entity} key={entity.key}>
+						<SingleEntity accessor={entity} key={entity.key}>
 							<Item
 								{...props.itemComponentExtraProps!}
 								removalType={props.removalType}
@@ -87,7 +87,7 @@ export const RepeaterInner = Component(
 							>
 								{props.children}
 							</Item>
-						</Entity>
+						</SingleEntity>
 					))}
 				</Container>
 			)
@@ -116,7 +116,7 @@ export const RepeaterInner = Component(
 				>
 					{entities.map((entity, i) => (
 						<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
-							<Entity accessor={entity}>
+							<SingleEntity accessor={entity}>
 								<Item
 									{...props.itemComponentExtraProps!}
 									removalType={props.removalType}
@@ -125,7 +125,7 @@ export const RepeaterInner = Component(
 								>
 									{props.children}
 								</Item>
-							</Entity>
+							</SingleEntity>
 						</SortableRepeaterItem>
 					))}
 				</Container>

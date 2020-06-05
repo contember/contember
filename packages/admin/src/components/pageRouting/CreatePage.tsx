@@ -1,28 +1,28 @@
 import {
-	EntityCreator,
-	EntityCreatorProps,
+	DataBindingProvider,
 	PersistResultSuccessType,
+	SingleEntitySubTree,
 	SuccessfulPersistResult,
+	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
 import * as React from 'react'
 import RequestState from '../../state/request'
-import { MutableSingleEntityRenderer, MutableSingleEntityRendererProps } from '../bindingFacade'
+import { FeedbackRenderer, MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 import { useRedirect } from './useRedirect'
 
-export interface CreatePageProps extends Omit<EntityCreatorProps, 'entities'> {
+export interface CreatePageProps extends SugaredUnconstrainedQualifiedSingleEntity {
 	pageName: string
-	entity: EntityCreatorProps['entities']
+	children: React.ReactNode
 	redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState
-	rendererProps?: Omit<MutableSingleEntityRendererProps, 'children'>
+	rendererProps?: MutableContentLayoutRendererProps
 }
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<CreatePageProps> = React.memo(
-	(props: CreatePageProps) => {
+	({ pageName, children, rendererProps, redirectOnSuccess, ...entityProps }: CreatePageProps) => {
 		const redirect = useRedirect()
 
 		const onSuccessfulPersist = React.useMemo(() => {
-			const redirectOnSuccess = props.redirectOnSuccess
 			if (!redirectOnSuccess) {
 				return undefined
 			}
@@ -32,12 +32,19 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<C
 				}
 				redirect(request => redirectOnSuccess(request, result.persistedEntityIds[0]))
 			}
-		}, [props.redirectOnSuccess, redirect])
+		}, [redirectOnSuccess, redirect])
 
 		return (
-			<EntityCreator {...props} entities={props.entity} onSuccessfulPersist={onSuccessfulPersist}>
-				<MutableSingleEntityRenderer {...props.rendererProps}>{props.children}</MutableSingleEntityRenderer>
-			</EntityCreator>
+			<DataBindingProvider stateComponent={FeedbackRenderer} onSuccessfulPersist={onSuccessfulPersist}>
+				<SingleEntitySubTree
+					{...entityProps}
+					entityComponent={MutableContentLayoutRenderer}
+					entityProps={rendererProps}
+					isCreating
+				>
+					{children}
+				</SingleEntitySubTree>
+			</DataBindingProvider>
 		)
 	},
 )

@@ -3,7 +3,7 @@ import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@co
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
-import { GetEntityByKey, RootAccessor } from '../accessors'
+import { TreeRootAccessor } from '../accessors'
 import {
 	AccessorTreeGenerator,
 	DirtinessChecker,
@@ -28,7 +28,6 @@ import { QueryRequestResponse, ReceivedDataTree } from './QueryRequestResponse'
 
 const initialState: AccessorTreeState = {
 	name: AccessorTreeStateName.Uninitialized,
-	getEntityByKey: () => null,
 }
 
 export const useAccessorTreeState = ({
@@ -100,18 +99,17 @@ export const useAccessorTreeState = ({
 	const initializeAccessorTree = React.useCallback(
 		(
 			persistedData: ReceivedDataTree<undefined> | undefined,
-			initialData: RootAccessor | ReceivedDataTree<undefined> | undefined,
+			initialData: TreeRootAccessor | ReceivedDataTree<undefined> | undefined,
 			errors?: MutationDataResponse,
 		) => {
 			accessorTreeGenerator.generateLiveTree(
 				persistedData,
 				initialData,
-				(accessor, getEntityByKey) => {
+				accessor => {
 					console.debug('data', accessor)
 					dispatch({
 						type: AccessorTreeStateActionType.SetData,
 						data: accessor,
-						getEntityByKey,
 						triggerPersist,
 					})
 				},

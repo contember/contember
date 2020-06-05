@@ -1,6 +1,12 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
-import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
+import {
+	EntityAccessor,
+	EntityForRemovalAccessor,
+	EntityListAccessor,
+	FieldAccessor,
+	TreeRootAccessor,
+} from '../accessors'
 import { ReceivedData, ReceivedEntityData } from '../accessorTree'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { BindingError } from '../BindingError'
@@ -11,6 +17,7 @@ import {
 	MarkerSubTreeParameters,
 	MarkerSubTree,
 	ReferenceMarker,
+	MarkerTreeRoot,
 } from '../markers'
 import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
@@ -21,37 +28,41 @@ type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Que
 export class MutationGenerator {
 	public constructor(
 		private persistedData: any,
-		private currentData: RootAccessor,
-		private markerTree: MarkerSubTree,
+		private currentData: TreeRootAccessor,
+		private markerTree: MarkerTreeRoot,
 	) {}
 
 	public getPersistMutation(): string | undefined {
 		try {
-			const builder = this.addSubMutation(
-				this.persistedData ? this.persistedData[this.markerTree.placeholderName] : undefined,
-				this.markerTree.fields,
-				this.currentData,
-				this.markerTree.placeholderName,
-				this.markerTree.parameters,
-			)
+			let builder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
+
+			for (const [placeholderName, markerSubTree] of this.markerTree.subTrees) {
+				builder = this.addSubMutation(
+					this.persistedData ? this.persistedData[placeholderName] : undefined,
+					markerSubTree.fields,
+					this.currentData.getSubTree(markerSubTree.parameters),
+					placeholderName,
+					markerSubTree.parameters,
+					builder,
+				)
+			}
 			return builder.getGql()
 		} catch (e) {
 			return undefined
 		}
 	}
 
+	// TODO this legacy implementation is no longer appropriate. It was superficially updated to make it compile but
+	// 		for actual nested tree updates it is completely inadequate. We must, among other things, mark visited
+	// 		entities in order to break cycles.
 	private addSubMutation(
 		data: ReceivedData<undefined>,
 		entityFieldMarkers: EntityFieldMarkers,
-		entity: RootAccessor,
+		entity: EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | null,
 		alias: string,
 		parameters: MarkerSubTreeParameters,
-		queryBuilder?: QueryBuilder,
+		queryBuilder: QueryBuilder,
 	): QueryBuilder {
-		if (!queryBuilder) {
-			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
-		}
-
 		if (entity instanceof EntityAccessor) {
 			if (!entity.isPersisted) {
 				queryBuilder = this.addCreateMutation(entity, entityFieldMarkers, alias, parameters, queryBuilder)
@@ -75,6 +86,8 @@ export class MutationGenerator {
 					)
 				}
 			}
+		} else if (entity === null) {
+			// Do nothing.
 		} else {
 			assertNever(entity)
 		}

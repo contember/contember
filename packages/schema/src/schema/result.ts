@@ -3,6 +3,7 @@ import Value from './value'
 namespace Result {
 	export interface CreateResult {
 		ok: boolean
+		errorMessage?: string
 		errors: ExecutionError[]
 		validation: ValidationResult
 		node: Value.Object | null
@@ -10,6 +11,7 @@ namespace Result {
 
 	export interface UpdateResult {
 		ok: boolean
+		errorMessage?: string
 		errors: ExecutionError[]
 		validation: ValidationResult
 		node: Value.Object | null
@@ -17,12 +19,14 @@ namespace Result {
 
 	export interface DeleteResult {
 		ok: boolean
+		errorMessage?: string
 		errors: ExecutionError[]
 		node: Value.Object | null
 	}
 
 	export interface TransactionResult {
 		ok: boolean
+		errorMessage?: string
 		validation: ValidationResult
 	}
 

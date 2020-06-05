@@ -19,6 +19,8 @@ enum _MutationErrorType {
   ForeignKeyConstraintViolation
   NotFoundOrDenied
   NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -54,6 +56,7 @@ type Mutation {
 
 type MutationTransaction {
   ok: Boolean!
+  errorMessage: String
   validation: _ValidationResult!
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
@@ -120,6 +123,7 @@ input TestCreateInput {
 
 type TestCreateResult {
   ok: Boolean!
+  errorMessage: String
   node: Test
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -150,6 +154,7 @@ input TestUpdateInput {
 
 type TestUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: Test
   errors: [_MutationError!]!
   validation: _ValidationResult!

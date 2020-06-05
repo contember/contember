@@ -19,6 +19,8 @@ enum _MutationErrorType {
   ForeignKeyConstraintViolation
   NotFoundOrDenied
   NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -56,6 +58,7 @@ type Mutation {
 
 type MutationTransaction {
   ok: Boolean!
+  errorMessage: String
   validation: _ValidationResult!
   deleteRoot(by: RootUniqueWhere!): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
@@ -77,6 +80,7 @@ type OneHasManyEntityConnection {
 
 type OneHasManyEntityDeleteResult {
   ok: Boolean!
+  errorMessage: String
   node: OneHasManyEntity
   errors: [_MutationError!]!
 }
@@ -116,6 +120,7 @@ input OneHasManyEntityUpdateR2EntityRelationInput {
 
 type OneHasManyEntityUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: OneHasManyEntity
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -181,6 +186,7 @@ type RootConnection {
 
 type RootDeleteResult {
   ok: Boolean!
+  errorMessage: String
   node: Root
   errors: [_MutationError!]!
 }
@@ -217,6 +223,7 @@ input RootUpdateREntityRelationInput {
 
 type RootUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: Root
   errors: [_MutationError!]!
   validation: _ValidationResult!

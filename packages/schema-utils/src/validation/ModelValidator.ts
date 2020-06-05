@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
 import { ErrorBuilder, ValidationError } from './errors'
 import { everyIs, isObject, UnknownObject } from './utils'
-import { isInversedRelation, isOwnerRelation } from '../model'
+import { getTargetEntity, isInversedRelation, isOwnerRelation } from '../model'
 
 export class ModelValidator {
 	constructor(private readonly model: Model.Schema) {}
@@ -196,6 +196,28 @@ export class ModelValidator {
 		if (!targetEntity) {
 			errors.add(`Target entity ${targetEntityName} not found`)
 			return undefined
+		}
+		if (((it: Model.AnyRelation): it is Model.AnyRelation & Model.OrderableRelation => 'orderBy' in it)(field as any)) {
+			;(field as Model.OrderableRelation).orderBy?.forEach(it => {
+				let entity = targetEntity
+
+				for (let i = 0; i < it.path.length; i++) {
+					const orderByField = entity.fields[it.path[i]]
+					const pathStr = it.path.slice(0, i + 1).join('.')
+					if (!orderByField) {
+						errors.add(`Invalid orderBy of ${entityName}::${field.name}: field ${pathStr} is not defined`)
+						return
+					}
+					if (i + 1 < it.path.length) {
+						const targetEntity = getTargetEntity(this.model, entity, orderByField.name)
+						if (!targetEntity) {
+							errors.add(`Invalid orderBy of ${entityName}::${field.name}: field ${pathStr} is not a relation`)
+							return
+						}
+						entity = targetEntity
+					}
+				}
+			})
 		}
 		if (isInversedRelation((field as any) as Model.Relation)) {
 			// todo

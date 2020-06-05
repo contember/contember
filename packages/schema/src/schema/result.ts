@@ -42,6 +42,8 @@ namespace Result {
 		ForeignKeyConstraintViolation = 'ForeignKeyConstraintViolation',
 		NotFoundOrDenied = 'NotFoundOrDenied',
 		NonUniqueWhereInput = 'NonUniqueWhereInput',
+		InvalidDataInput = 'InvalidDataInput',
+		SqlError = 'SqlError',
 	}
 
 	export interface ExecutionError {

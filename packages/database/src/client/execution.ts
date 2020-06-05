@@ -4,6 +4,7 @@ import { Connection } from './Connection'
 import {
 	ConnectionError,
 	ForeignKeyViolationError,
+	InvalidDataError,
 	NotNullViolationError,
 	SerializationFailureError,
 	UniqueViolationError,
@@ -63,6 +64,9 @@ export async function executeQuery<Row extends Record<string, any>>(
 				throw new UniqueViolationError(sql, parameters, error)
 			case '40001':
 				throw new SerializationFailureError(sql, parameters, error)
+			case '22P02':
+			case '22008':
+				throw new InvalidDataError(sql, parameters, error)
 			default:
 				throw new ConnectionError(sql, parameters, error)
 		}

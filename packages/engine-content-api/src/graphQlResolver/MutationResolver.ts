@@ -353,11 +353,15 @@ export default class MutationResolver {
 					case MutationResultType.constraintViolationError:
 						switch (it.constraint) {
 							case ConstraintType.notNull:
-								return { path: path, type: Result.ExecutionErrorType.NotNullConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.NotNullConstraintViolation, message: it.message }
 							case ConstraintType.foreignKey:
-								return { path: path, type: Result.ExecutionErrorType.ForeignKeyConstraintViolation }
+								return {
+									path: path,
+									type: Result.ExecutionErrorType.ForeignKeyConstraintViolation,
+									message: it.message,
+								}
 							case ConstraintType.uniqueKey:
-								return { path: path, type: Result.ExecutionErrorType.UniqueConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.UniqueConstraintViolation, message: it.message }
 							default:
 								return assertNever(it.constraint)
 						}
@@ -368,10 +372,14 @@ export default class MutationResolver {
 						switch (it.kind) {
 							case InputErrorKind.nonUniqueWhere:
 								return { path: path, type: Result.ExecutionErrorType.NonUniqueWhereInput, message: it.message }
+							case InputErrorKind.invalidData:
+								return { path: path, type: Result.ExecutionErrorType.InvalidDataInput, message: it.message }
 							default:
 								return assertNever(it.kind)
 						}
 
+					case MutationResultType.sqlError:
+						return { path, type: Result.ExecutionErrorType.SqlError, message: it.message }
 					case MutationResultType.ok:
 					case MutationResultType.nothingToDo:
 						throw new ImplementationException('MutationResolver: unexpected MutationResultType')

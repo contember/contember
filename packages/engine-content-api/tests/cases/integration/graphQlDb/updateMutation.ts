@@ -90,4 +90,67 @@ describe('update with db', () => {
 			}, 100000)
 		})
 	})
+
+	describe('invalid input value', () => {
+		const schema = new SchemaBuilder()
+			.entity('Post', e =>
+				e
+					.column('slug', c => c.type(Model.ColumnType.String).unique())
+					.column('createdAt', c => c.type(Model.ColumnType.DateTime)),
+			)
+			.buildSchema()
+		it('returns error for invalid date input', async () => {
+			await executeDbTest({
+				schema,
+				seed: [
+					{
+						query: GQL`mutation {
+							createPost(data: {slug: "foo"}) {
+								ok
+							}
+						}`,
+					},
+				],
+				query: GQL`mutation {
+            updatePost(by: { slug: "foo" }, data: { createdAt: "2020-13-01 20:00" }) {
+              ok
+              errors {
+              	type
+	            message
+              }
+            }
+          }`,
+				return: {
+					updatePost: {
+						ok: false,
+						errors: [{ type: 'InvalidDataInput', message: 'date/time field value out of range: "2020-13-01 20:00"' }],
+					},
+				},
+				expectDatabase: {},
+			})
+		}, 100000)
+
+		it('returns error for invalid uuid', async () => {
+			await executeDbTest({
+				schema,
+				seed: [],
+				query: GQL`mutation {
+        updatePost(by: { id: "abc" }, data: { createdAt: "2020-13-01 20:00" }) {
+          ok
+          errors {
+            type
+            message
+          }
+        }
+      }`,
+				return: {
+					updatePost: {
+						ok: false,
+						errors: [{ type: 'InvalidDataInput', message: 'invalid input syntax for type uuid: "abc"' }],
+					},
+				},
+				expectDatabase: {},
+			})
+		}, 100000)
+	})
 })

@@ -14,7 +14,7 @@ import * as React from 'react'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
 export interface DimensionsSwitcherBaseProps
-	extends Omit<DimensionsRendererProps, 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'>,
+	extends Omit<DimensionsRendererProps, 'accessor' | 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'>,
 		Omit<SugaredQualifiedFieldList, 'fields'> {
 	optionEntities: SugaredQualifiedFieldList['fields']
 	minItems?: number

@@ -68,7 +68,7 @@ EmptyTable.displayName = 'EmptyTable'
 
 const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => {
 	// TODO solve this via preferences
-	const isEmpty = !Array.from(props.entityList).some(entity => entity instanceof EntityAccessor && entity.isPersisted)
+	const isEmpty = !Array.from(props.accessor).some(entity => entity instanceof EntityAccessor && entity.isPersisted)
 
 	if (isEmpty) {
 		const EmptyMessageComponent = props.emptyMessageComponent || EmptyTable

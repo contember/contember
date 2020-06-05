@@ -63,7 +63,7 @@ export interface BlockEditorInnerInternalProps {
 	//trailingFieldBackedElements: NormalizedFieldBackedElement[]
 	batchUpdates: EntityAccessor['batchUpdates']
 	desugaredEntityList: RelativeEntityList
-	entityListAccessor: EntityListAccessor
+	accessor: EntityListAccessor
 	environment: Environment
 	embedHandlers: NormalizedEmbedHandlers
 }
@@ -74,7 +74,7 @@ export const BlockEditorInner = React.memo(
 	({
 		batchUpdates,
 		desugaredEntityList,
-		entityListAccessor,
+		accessor,
 		environment,
 		children,
 		discriminationField,
@@ -109,7 +109,7 @@ export const BlockEditorInner = React.memo(
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
 
-		const { entities, moveEntity, appendNew } = useSortedEntities(entityListAccessor, sortableBy)
+		const { entities, moveEntity, appendNew } = useSortedEntities(accessor, sortableBy)
 
 		const textBlockDiscriminant = React.useMemo<FieldValue>(() => {
 			if (textBlockDiscriminateBy !== undefined) {
@@ -142,7 +142,7 @@ export const BlockEditorInner = React.memo(
 		const [contemberBlockElementCache] = React.useState(() => new Map<string, Element>())
 
 		const batchUpdatesRef = React.useRef(batchUpdates)
-		const entityListAccessorRef = React.useRef(entityListAccessor)
+		const entityListAccessorRef = React.useRef(accessor)
 		const environmentRef = React.useRef(environment)
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedEntitiesRef = React.useRef(entities)
@@ -152,7 +152,7 @@ export const BlockEditorInner = React.memo(
 
 		React.useLayoutEffect(() => {
 			batchUpdatesRef.current = batchUpdates
-			entityListAccessorRef.current = entityListAccessor
+			entityListAccessorRef.current = accessor
 			environmentRef.current = environment
 			isMutatingRef.current = isMutating
 			sortedEntitiesRef.current = entities
@@ -213,7 +213,7 @@ export const BlockEditorInner = React.memo(
 		return (
 			<BlockEditorGetEntityByKeyContext.Provider
 				value={key => {
-					const entity = entityListAccessor.getEntityByKey(key)
+					const entity = accessor.getEntityByKey(key)
 					if (!(entity instanceof EntityAccessor)) {
 						throw new BindingError(`Corrupted data.`)
 					}

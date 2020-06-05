@@ -4,7 +4,7 @@ import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 
 export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>
 	extends HasManyProps,
-		Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'entityList'> {
+		Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'accessor'> {
 	initialRowCount?: number
 }
 
@@ -22,7 +22,7 @@ export const Repeater = Component(
 
 		const entityList = useRelativeEntityList(props)
 
-		return <RepeaterInner {...props} entityList={entityList} />
+		return <RepeaterInner {...props} accessor={entityList} />
 	},
 	props => (
 		<HasMany
@@ -31,7 +31,7 @@ export const Repeater = Component(
 				initialEntityCount: props.initialRowCount === undefined ? 1 : props.initialRowCount,
 			}}
 		>
-			<RepeaterInner {...props} entityList={undefined as any} />
+			<RepeaterInner {...props} accessor={undefined as any} />
 		</HasMany>
 	),
 	'Repeater',

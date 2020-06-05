@@ -66,7 +66,7 @@ export const FileRepeaterContainer = React.memo(
 		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
 		emptyMessageComponentExtraProps,
 		enableAddingNew = true,
-		entityList,
+		accessor,
 		entities,
 		isEmpty,
 		label,
@@ -75,7 +75,7 @@ export const FileRepeaterContainer = React.memo(
 	}: FileRepeaterContainerProps) => {
 		const [uploadState, { startUpload, abortUpload }] = useFileUpload()
 		const isMutating = useMutationState()
-		const batchUpdates = entityList.batchUpdates
+		const batchUpdates = accessor.batchUpdates
 		const desugaredDiscriminant = useDesugaredRelativeSingleField(discriminationField)
 		const environment = useEnvironment()
 		const fileKinds = React.useMemo(() => Array.from(iterableFileKinds), [iterableFileKinds])

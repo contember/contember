@@ -15,7 +15,7 @@ export interface CreatePageProps extends SugaredUnconstrainedQualifiedSingleEnti
 	pageName: string
 	children: React.ReactNode
 	redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState
-	rendererProps?: MutableContentLayoutRendererProps
+	rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
 }
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<CreatePageProps> = React.memo(

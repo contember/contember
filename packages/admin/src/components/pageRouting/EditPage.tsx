@@ -6,7 +6,7 @@ import { PageProvider } from './PageProvider'
 export interface EditPageProps extends SugaredQualifiedSingleEntity {
 	pageName: string
 	children: React.ReactNode
-	rendererProps?: MutableContentLayoutRendererProps
+	rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
 }
 
 const EditPage: Partial<PageProvider<EditPageProps>> & React.ComponentType<EditPageProps> = React.memo(

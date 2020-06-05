@@ -19,7 +19,7 @@ export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtra
 	> {
 	beforeContent?: React.ReactNode
 	afterContent?: React.ReactNode
-	entityList: EntityListAccessor
+	accessor: EntityListAccessor
 }
 
 export const ImmutableEntityListRenderer = Component(
@@ -38,7 +38,7 @@ export const ImmutableEntityListRenderer = Component(
 		// Deliberately omitting emptyMessage ‒ it's not supposed to be data-dependent.
 		<>
 			{props.beforeContent}
-			<RepeaterInner label={undefined} {...props} entityList={undefined as any} />
+			<RepeaterInner label={undefined} {...props} accessor={undefined as any} />
 			{props.afterContent}
 		</>
 	),

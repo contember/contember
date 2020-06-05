@@ -6,7 +6,7 @@ import { PageProvider } from './PageProvider'
 export interface ListPageProps<ContainerExtraProps, ItemExtraProps> extends SugaredQualifiedEntityList {
 	pageName: string
 	children?: React.ReactNode
-	rendererProps?: Omit<ListRendererProps<ContainerExtraProps, ItemExtraProps>, 'children'>
+	rendererProps?: Omit<ListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 }
 
 const ListPage = React.memo(

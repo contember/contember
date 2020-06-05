@@ -6,7 +6,7 @@ import { PageProvider } from './PageProvider'
 export interface TablePageProps<ContainerExtraProps, ItemExtraProps> extends SugaredQualifiedEntityList {
 	pageName: string
 	children?: React.ReactNode
-	rendererProps?: Omit<TableRendererProps<ContainerExtraProps, ItemExtraProps>, 'children'>
+	rendererProps?: Omit<TableRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 }
 
 const TablePage = React.memo(

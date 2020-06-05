@@ -20,7 +20,7 @@ import { SortableRepeaterItemHandle } from './SortableRepeaterItemHandle'
 export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	extends RepeaterContainerPublicProps,
 		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
-	entityList: EntityListAccessor
+	accessor: EntityListAccessor
 	label: React.ReactNode
 	initialRowCount?: number
 	children?: React.ReactNode
@@ -43,7 +43,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 export const RepeaterInner = Component(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>) => {
 		const isMutating = useMutationState()
-		const { entities, moveEntity, appendNew } = useSortedEntities(props.entityList, props.sortableBy)
+		const { entities, moveEntity, appendNew } = useSortedEntities(props.accessor, props.sortableBy)
 		const onSortEnd = React.useCallback<SortEndHandler>(
 			({ oldIndex, newIndex }) => {
 				moveEntity(oldIndex, newIndex)

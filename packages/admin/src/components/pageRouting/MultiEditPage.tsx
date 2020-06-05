@@ -6,7 +6,7 @@ import { PageProvider } from './PageProvider'
 export interface MultiEditPageProps<ContainerExtraProps, ItemExtraProps> extends SugaredQualifiedEntityList {
 	pageName: string
 	children?: React.ReactNode
-	rendererProps?: Omit<MultiEditRendererProps<ContainerExtraProps, ItemExtraProps>, 'children'>
+	rendererProps?: Omit<MultiEditRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 }
 
 const MultiEditPage = React.memo(

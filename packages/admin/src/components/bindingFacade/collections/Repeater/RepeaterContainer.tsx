@@ -4,7 +4,7 @@ import { EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { AddNewEntityButton, AddNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 
 export interface RepeaterContainerPrivateProps {
-	entityList: EntityListAccessor
+	accessor: EntityListAccessor
 	entities: EntityAccessor[]
 	isEmpty: boolean
 	label: React.ReactNode

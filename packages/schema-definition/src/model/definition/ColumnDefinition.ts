@@ -3,38 +3,46 @@ import { Interface } from './types'
 import FieldDefinition from './FieldDefinition'
 import EnumDefinition from './EnumDefinition'
 
-class ColumnDefinition extends FieldDefinition<ColumnDefinition.Options> {
+class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<ColumnDefinition.Options<Type>> {
 	type = 'ColumnDefinition' as const
 
-	public static create(type: Model.ColumnType, typeOptions: ColumnDefinition.TypeOptions = {}): ColumnDefinition {
+	public static create<Type extends Model.ColumnType>(
+		type: Type,
+		typeOptions: ColumnDefinition.TypeOptions = {},
+	): ColumnDefinition<Type> {
 		return new ColumnDefinition({
 			type: type,
 			...typeOptions,
 		})
 	}
 
-	public columnName(columnName: string): Interface<ColumnDefinition> {
+	public columnName(columnName: string): Interface<ColumnDefinition<Type>> {
 		return this.withOption('columnName', columnName)
 	}
 
-	public nullable(): Interface<ColumnDefinition> {
+	public nullable(): Interface<ColumnDefinition<Type>> {
 		return this.withOption('nullable', true)
 	}
 
-	public notNull(): Interface<ColumnDefinition> {
+	public notNull(): Interface<ColumnDefinition<Type>> {
 		return this.withOption('nullable', false)
 	}
 
-	public unique(): Interface<ColumnDefinition> {
+	public unique(): Interface<ColumnDefinition<Type>> {
 		return this.withOption('unique', true)
 	}
 
+	public default(value: ColumnDefinition<Type>['options']['default']): Interface<ColumnDefinition<Type>> {
+		return this.withOption('default', value)
+	}
+
 	createField({ name, conventions, enumRegistry, entityName }: FieldDefinition.CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition } = this.options
+		const { type, nullable, columnName, enumDefinition, default: defaultValue } = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
 			nullable: nullable === undefined ? true : nullable,
+			default: defaultValue as any,
 		}
 
 		switch (type) {
@@ -75,11 +83,12 @@ namespace ColumnDefinition {
 		enumDefinition?: EnumDefinition
 	}
 
-	export type Options = {
+	export type Options<Type extends Model.ColumnType> = {
 		type: Model.ColumnType
 		columnName?: string
 		unique?: boolean
 		nullable?: boolean
+		default?: Model.ColumnByType<Type>['default']
 	} & TypeOptions
 }
 

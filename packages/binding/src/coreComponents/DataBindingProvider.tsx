@@ -29,10 +29,14 @@ export const DataBindingProvider = React.memo(
 
 		const children =
 			'stateComponent' in props && props.stateComponent
-				? React.createElement(props.stateComponent, {
-						...props.stateProps!,
-						accessorTreeState: accessorTreeState,
-				  })
+				? React.createElement(
+						props.stateComponent,
+						{
+							...props.stateProps!,
+							accessorTreeState: accessorTreeState,
+						},
+						props.children,
+				  )
 				: props.children
 		return <AccessorTree state={accessorTreeState}>{children}</AccessorTree>
 	},

@@ -1,6 +1,6 @@
-import { assertNever } from '../utils'
 import * as React from 'react'
 import { Environment } from '../dao'
+import { assertNever } from '../utils'
 import { MarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
 
 function Component<P extends {}>(

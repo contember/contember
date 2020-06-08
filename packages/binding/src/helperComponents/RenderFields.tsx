@@ -1,7 +1,6 @@
 import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useParentEntityAccessor } from '../accessorPropagation'
-import { useEnvironment } from '../accessorPropagation'
+import { useEnvironment, useParentEntityAccessor } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { Component } from '../coreComponents'
 import { QueryLanguage } from '../queryLanguage'

@@ -1,4 +1,4 @@
-import { GetEntityByKey, TreeRootAccessor } from '../accessors'
+import { TreeRootAccessor } from '../accessors'
 import { SuccessfulPersistResult } from './PersistResult'
 import { RequestError } from './RequestError'
 

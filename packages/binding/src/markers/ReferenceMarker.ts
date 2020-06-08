@@ -1,6 +1,6 @@
-import { assertNever } from '../utils'
 import { BindingError } from '../BindingError'
 import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
+import { assertNever } from '../utils'
 import { EntityFieldMarkers } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 

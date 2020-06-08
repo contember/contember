@@ -8,16 +8,16 @@ import {
 	TreeRootAccessor,
 } from '../accessors'
 import { ReceivedData, ReceivedEntityData } from '../accessorTree'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { BindingError } from '../BindingError'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	MarkerSubTreeParameters,
 	MarkerSubTree,
-	ReferenceMarker,
+	MarkerSubTreeParameters,
 	MarkerTreeRoot,
+	ReferenceMarker,
 } from '../markers'
 import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'

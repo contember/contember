@@ -1,8 +1,7 @@
-import { assertNever } from '../utils'
-import { MutationDataResponse, MutationError, MutationResponse } from '../accessorTree'
 import { ErrorAccessor } from '../accessors'
+import { MutationDataResponse, MutationError, MutationResponse } from '../accessorTree'
+import { assertNever } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
-import { MutationGenerator } from './MutationGenerator'
 
 class ErrorsPreprocessor {
 	public constructor(private readonly requestResponse?: MutationDataResponse) {}

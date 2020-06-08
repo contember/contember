@@ -1,12 +1,11 @@
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
-import { MarkerTreeRoot } from '../markers/MarkerTreeRoot'
-import { assertNever } from '../utils'
 import * as React from 'react'
-import { Environment } from '../dao'
 import { BindingError } from '../BindingError'
+import { Environment } from '../dao'
 import { ConnectionMarker, EntityFieldMarkers, FieldMarker, Marker, MarkerSubTree, ReferenceMarker } from '../markers'
+import { MarkerTreeRoot } from '../markers/MarkerTreeRoot'
 import { FieldName } from '../treeParameters'
-import { Hashing } from '../utils'
+import { assertNever, Hashing } from '../utils'
 
 type Fragment = EntityFieldMarkers
 type Terminals = FieldMarker | ConnectionMarker | Fragment

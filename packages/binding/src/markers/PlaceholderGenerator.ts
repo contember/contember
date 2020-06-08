@@ -2,7 +2,7 @@ import { FieldName } from '../treeParameters'
 import { Hashing } from '../utils'
 import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'
-import { MarkerSubTreeParameters, MarkerSubTree } from './MarkerSubTree'
+import { MarkerSubTree, MarkerSubTreeParameters } from './MarkerSubTree'
 import { ReferenceMarker } from './ReferenceMarker'
 
 export class PlaceholderGenerator {

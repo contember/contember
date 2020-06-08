@@ -1,15 +1,7 @@
 import { GraphQlBuilder } from '@contember/client'
-import { assertNever } from '../utils'
-import { Environment, VariableLiteral, VariableScalar } from '../dao'
 import { BindingError } from '../BindingError'
-import {
-	FieldValue,
-	Filter,
-	OptionallyVariableFieldValue,
-	Scalar,
-	UniqueWhere,
-	VariableFieldValue,
-} from '../treeParameters'
+import { Environment, VariableLiteral, VariableScalar } from '../dao'
+import { FieldValue, OptionallyVariableFieldValue, Scalar } from '../treeParameters'
 
 export class VariableInputTransformer {
 	// This is probably just dead code but I'll leave it for now.

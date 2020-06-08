@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { useParentEntityAccessor } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
 import { SugaredRelativeSingleEntity } from '../treeParameters'
 import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity'
-import { useParentEntityAccessor } from '../accessorPropagation'
 
 function useRelativeSingleEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity): EntityAccessor
 function useRelativeSingleEntity(

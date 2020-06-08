@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { useParentEntityAccessor } from '../accessorPropagation'
 import { EntityListAccessor } from '../accessors'
 import { SugaredRelativeEntityList } from '../treeParameters'
 import { useDesugaredRelativeEntityList } from './useDesugaredRelativeEntityList'
-import { useParentEntityAccessor } from '../accessorPropagation'
 
 function useRelativeEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): EntityListAccessor
 function useRelativeEntityList(

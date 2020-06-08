@@ -1,9 +1,3 @@
-import {
-	DesugaredEntityCreationParameters,
-	EntityCreationParameters,
-	SugarableEntityCreationParameters,
-	UnsugarableEntityCreationParameters,
-} from './EntityCreationParameters'
 import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import {
 	DesugaredQualifiedEntityParameters,
@@ -17,12 +11,6 @@ import {
 	SugarableQualifiedSingleEntityParameters,
 	UnsugarableQualifiedSingleEntityParameters,
 } from './QualifiedSingleEntityParameters'
-import {
-	DesugaredRelativeSingleEntity,
-	RelativeSingleEntity,
-	SugarableRelativeSingleEntity,
-	UnsugarableRelativeSingleEntity,
-} from './RelativeSingleEntity'
 import {
 	DesugaredSingleEntityParameters,
 	SingleEntityParameters,

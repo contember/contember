@@ -1,7 +1,7 @@
 class Merger {
 	static merge<P = Merger.ValuePrimitive>(...values: Merger.ValueObject<P>[]): Merger.ValueObject<P> {
 		return values
-			.reduce<[string, Merger.ValueItem<P>][]>((acc, val) => [...acc, ...Object.entries(val)], [])
+			.reduce<[string, Merger.ValueItem<P>][]>((acc, val) => [...acc, ...Object.entries(val || {})], [])
 			.reduce<Merger.ValueObject<P>>((acc, [key, value]) => {
 				if (!acc.hasOwnProperty(key)) {
 					return { ...acc, [key]: value }

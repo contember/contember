@@ -67,8 +67,15 @@ interface InternalContainerState {
 	hasPendingUpdate: boolean
 }
 
+enum InternalStateType {
+	Field = 1,
+	SingleEntity,
+	EntityList,
+}
+
 type OnEntityUpdate = (accessor: EntityAccessor | EntityForRemovalAccessor | null) => void
 interface InternalEntityState extends InternalContainerState {
+	type: InternalStateType.SingleEntity
 	accessor: EntityAccessor | EntityForRemovalAccessor | null
 	addEventListener: AddEntityEventListener
 	dirtyChildFields: Set<FieldName> | undefined
@@ -86,6 +93,7 @@ interface InternalEntityState extends InternalContainerState {
 
 type OnEntityListUpdate = (accessor: EntityListAccessor) => void
 interface InternalEntityListState extends InternalContainerState {
+	type: InternalStateType.EntityList
 	accessor: EntityListAccessor
 	addEventListener: AddEntityListEventListener
 	childIds: Set<string>
@@ -105,6 +113,7 @@ interface InternalEntityListState extends InternalContainerState {
 
 type OnFieldUpdate = (placeholderName: FieldName, accessor: FieldAccessor) => void
 interface InternalFieldState {
+	type: InternalStateType.Field
 	accessor: FieldAccessor
 	addEventListener: AddFieldEventListener
 	errors: ErrorAccessor[]
@@ -287,6 +296,7 @@ class AccessorTreeGenerator {
 				// Falling back to null since that's what fields do. Arguably, we could also stringify the unpersisted entity id. Which is better?
 				const idValue = typeof entityState.id === 'string' ? entityState.id : null
 				entityState.fields.set(placeholderName, {
+					type: InternalStateType.Field,
 					accessor: new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
 						placeholderName,
 						idValue,
@@ -928,6 +938,7 @@ class AccessorTreeGenerator {
 			initialData instanceof FieldAccessor ? initialData.persistedValue : initialData === undefined ? null : initialData
 		if (existingState === undefined) {
 			const state: InternalFieldState = {
+				type: InternalStateType.Field,
 				errors,
 				fieldMarker,
 				onUpdate,
@@ -967,6 +978,7 @@ class AccessorTreeGenerator {
 
 		if (existingState === undefined) {
 			const entityState: InternalEntityState = {
+				type: InternalStateType.SingleEntity,
 				accessor: null,
 				addEventListener: undefined as any,
 				batchUpdateDepth: 0,
@@ -1053,6 +1065,7 @@ class AccessorTreeGenerator {
 
 		if (existingState === undefined) {
 			const state: InternalEntityListState = {
+				type: InternalStateType.EntityList,
 				errors,
 				fieldMarkers,
 				onUpdate,
@@ -1127,7 +1140,7 @@ class AccessorTreeGenerator {
 
 	private flushPendingAccessorUpdates(rootStates: Array<InternalEntityState | InternalEntityListState>) {
 		// It is *CRUCIAL* that this is a BFS so that we update the components in top-down order.
-		const agenda: Array<InternalEntityState | InternalEntityListState | InternalFieldState> = rootStates
+		const agenda: InternalStateNode[] = rootStates
 
 		for (const state of agenda) {
 			//console.log(state)
@@ -1140,43 +1153,39 @@ class AccessorTreeGenerator {
 					state.accessor && handler(state.accessor as any)
 				}
 			}
-			if (state.accessor instanceof FieldAccessor) {
+			if (state.type === InternalStateType.Field) {
 				// Do nothing
-			} else if (state.accessor instanceof EntityListAccessor) {
-				const listState = state as InternalEntityListState
-
-				if (listState.dirtyChildIds !== undefined) {
-					for (const dirtyChildId of listState.dirtyChildIds) {
+			} else if (state.type === InternalStateType.EntityList) {
+				if (state.dirtyChildIds !== undefined) {
+					for (const dirtyChildId of state.dirtyChildIds) {
 						const dirtyChildState = this.entityStore.get(dirtyChildId)
 						if (dirtyChildState === undefined) {
 							throw new BindingError()
 						}
 						agenda.push(dirtyChildState)
 					}
-					listState.dirtyChildIds = undefined
+					state.dirtyChildIds = undefined
 				}
 			} else {
-				const entityState = state as InternalEntityState
-
-				if (entityState.dirtyChildFields !== undefined) {
-					for (const dirtyChildPlaceholder of entityState.dirtyChildFields) {
-						const dirtyChildState = entityState.fields.get(dirtyChildPlaceholder)
+				if (state.dirtyChildFields !== undefined) {
+					for (const dirtyChildPlaceholder of state.dirtyChildFields) {
+						const dirtyChildState = state.fields.get(dirtyChildPlaceholder)
 						if (dirtyChildState === undefined) {
 							throw new BindingError()
 						}
 						agenda.push(dirtyChildState)
 					}
-					entityState.dirtyChildFields = undefined
+					state.dirtyChildFields = undefined
 				}
-				if (entityState.dirtySubTrees !== undefined && entityState.subTrees !== undefined) {
-					for (const dirtySubTreeIdentifier of entityState.dirtySubTrees) {
-						const dirtySubTree = entityState.subTrees.get(dirtySubTreeIdentifier)
+				if (state.dirtySubTrees !== undefined && state.subTrees !== undefined) {
+					for (const dirtySubTreeIdentifier of state.dirtySubTrees) {
+						const dirtySubTree = state.subTrees.get(dirtySubTreeIdentifier)
 						if (dirtySubTree === undefined) {
 							throw new BindingError()
 						}
 						agenda.push(dirtySubTree)
 					}
-					entityState.dirtyChildFields = undefined
+					state.dirtyChildFields = undefined
 				}
 			}
 			state.hasPendingUpdate = false

@@ -1,9 +1,13 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment, useGetSubTree } from '../accessorPropagation'
-import { TaggedQualifiedSingleEntity, TaggedUnconstrainedQualifiedSingleEntity } from '../markers'
 import { MarkerFactory, QueryLanguage } from '../queryLanguage'
-import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
+import {
+	BoxedQualifiedSingleEntity,
+	BoxedUnconstrainedQualifiedSingleEntity,
+	SugaredQualifiedSingleEntity,
+	SugaredUnconstrainedQualifiedSingleEntity,
+} from '../treeParameters'
 import { Component } from './Component'
 import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
@@ -31,17 +35,13 @@ export const SingleEntitySubTree = Component(
 
 		const getSubTree = useGetSubTree()
 		const environment = useEnvironment()
-		const parameters: TaggedQualifiedSingleEntity | TaggedUnconstrainedQualifiedSingleEntity = React.useMemo(() => {
+		const parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity = React.useMemo(() => {
 			if ('isCreating' in props && props.isCreating) {
-				return {
-					...QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(props, environment),
-					type: 'unconstrainedUnique',
-				}
+				return new BoxedUnconstrainedQualifiedSingleEntity(
+					QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(props, environment),
+				)
 			}
-			return {
-				...QueryLanguage.desugarQualifiedSingleEntity(props, environment),
-				type: 'unique',
-			}
+			return new BoxedQualifiedSingleEntity(QueryLanguage.desugarQualifiedSingleEntity(props, environment))
 		}, [environment, props])
 
 		return <SingleEntity {...props} accessor={getSubTree(parameters)} />

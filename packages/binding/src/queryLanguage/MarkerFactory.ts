@@ -7,11 +7,11 @@ import {
 	MarkerSubTree,
 	PlaceholderGenerator,
 	ReferenceMarker,
-	TaggedQualifiedEntityList,
-	TaggedQualifiedSingleEntity,
-	TaggedUnconstrainedQualifiedEntityList,
 } from '../markers'
 import {
+	BoxedQualifiedEntityList,
+	BoxedQualifiedSingleEntity,
+	BoxedUnconstrainedQualifiedEntityList,
 	ExpectedEntityCount,
 	HasManyRelation,
 	HasOneRelation,
@@ -34,13 +34,8 @@ export namespace MarkerFactory {
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
-		return new MarkerSubTree<TaggedQualifiedSingleEntity>(
-			{
-				...qualifiedSingleEntity,
-				type: 'unique',
-			},
-			fields,
-		)
+
+		return new MarkerSubTree(new BoxedQualifiedSingleEntity(qualifiedSingleEntity), fields)
 	}
 
 	export const createEntityListMarkerSubTree = (
@@ -50,11 +45,8 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(entityList, environment)
 
-		return new MarkerSubTree<TaggedQualifiedEntityList>(
-			{
-				...qualifiedEntityList,
-				type: 'nonUnique',
-			},
+		return new MarkerSubTree(
+			new BoxedQualifiedEntityList(qualifiedEntityList),
 			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, fields),
 		)
 	}
@@ -66,13 +58,7 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment)
 
-		return new MarkerSubTree<TaggedUnconstrainedQualifiedEntityList>(
-			{
-				...qualifiedEntityList,
-				type: 'unconstrainedNonUnique',
-			},
-			fields,
-		)
+		return new MarkerSubTree(new BoxedUnconstrainedQualifiedEntityList(qualifiedEntityList), fields)
 	}
 
 	export const createUnconstrainedSingleEntityMarkerSubTree = (
@@ -82,13 +68,7 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entityList, environment)
 
-		return new MarkerSubTree<TaggedUnconstrainedQualifiedEntityList>(
-			{
-				...qualifiedSingleEntity,
-				type: 'unconstrainedNonUnique',
-			},
-			fields,
-		)
+		return new MarkerSubTree(new BoxedUnconstrainedQualifiedEntityList(qualifiedSingleEntity), fields)
 	}
 
 	export const createRelativeSingleEntityFields = (

@@ -1,5 +1,6 @@
 import {
 	BindingError,
+	BoxedQualifiedEntityList,
 	Component,
 	EntityAccessor,
 	EntityListAccessor,
@@ -84,10 +85,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			environment,
 		)
 	}, [environment, props])
-	const subTreeData = parentEntity.getSubTree({
-		...desugaredOptionPath,
-		type: 'nonUnique',
-	})
+	const subTreeData = parentEntity.getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath))
 
 	const arity = props.arity
 	const currentValueEntity: EntityListAccessor | EntityAccessor = React.useMemo(() => {

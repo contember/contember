@@ -47,3 +47,13 @@ export interface UnsugarableQualifiedEntityList
 export interface SugaredQualifiedEntityList extends UnsugarableQualifiedEntityList {
 	entities: string | SugarableQualifiedEntityList
 }
+
+export class BoxedQualifiedEntityList {
+	public constructor(public readonly value: QualifiedEntityList) {}
+	public get type() {
+		return 'qualifiedEntityList' as const
+	}
+	public get isConstrained(): true {
+		return true
+	}
+}

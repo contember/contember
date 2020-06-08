@@ -7,9 +7,13 @@ import {
 	MarkerSubTree,
 	MarkerTreeRoot,
 	ReferenceMarker,
-	TaggedQualifiedEntityList,
-	TaggedQualifiedSingleEntity,
 } from '../markers'
+import {
+	BoxedQualifiedEntityList,
+	BoxedQualifiedSingleEntity,
+	BoxedUnconstrainedQualifiedEntityList,
+	BoxedUnconstrainedQualifiedSingleEntity,
+} from '../treeParameters'
 import { assertNever, ucfirst } from '../utils'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
@@ -34,12 +38,12 @@ export class QueryGenerator {
 
 	private addSubQuery(subTree: MarkerSubTree, baseQueryBuilder: BaseQueryBuilder): BaseQueryBuilder {
 		switch (subTree.parameters.type) {
-			case 'unique':
-				return this.addGetQuery(baseQueryBuilder, subTree as MarkerSubTree<TaggedQualifiedSingleEntity>)
-			case 'nonUnique':
-				return this.addListQuery(baseQueryBuilder, subTree as MarkerSubTree<TaggedQualifiedEntityList>)
-			case 'unconstrainedUnique':
-			case 'unconstrainedNonUnique': {
+			case 'qualifiedSingleEntity':
+				return this.addGetQuery(baseQueryBuilder, subTree as MarkerSubTree<BoxedQualifiedSingleEntity>)
+			case 'qualifiedEntityList':
+				return this.addListQuery(baseQueryBuilder, subTree as MarkerSubTree<BoxedQualifiedEntityList>)
+			case 'unconstrainedQualifiedSingleEntity':
+			case 'unconstrainedQualifiedEntityList': {
 				const [populatedBaseQueryBuilder] = this.addMarkerSubTreeQueries(
 					baseQueryBuilder,
 					this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate()),
@@ -52,13 +56,15 @@ export class QueryGenerator {
 
 	private addGetQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerSubTree<TaggedQualifiedSingleEntity>,
+		subTree: MarkerSubTree<BoxedQualifiedSingleEntity>,
 	): BaseQueryBuilder {
 		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addMarkerSubTreeQueries(
 			baseQueryBuilder,
 			this.registerQueryPart(
 				subTree.fields,
-				CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.parameters.where),
+				CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(
+					subTree.parameters.value.where,
+				),
 			),
 		)
 
@@ -73,29 +79,30 @@ export class QueryGenerator {
 
 	private addListQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerSubTree<TaggedQualifiedEntityList>,
+		subTree: MarkerSubTree<BoxedQualifiedEntityList>,
 	): BaseQueryBuilder {
 		let finalBuilder: ReadBuilder
 
 		if (subTree.parameters) {
+			const parametersValue = subTree.parameters.value
 			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter'
-			>> = subTree.parameters.filter
-				? CrudQueryBuilder.ReadBuilder.instantiate().filter(subTree.parameters.filter)
+			>> = parametersValue.filter
+				? CrudQueryBuilder.ReadBuilder.instantiate().filter(parametersValue.filter)
 				: CrudQueryBuilder.ReadBuilder.instantiate()
 
 			const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter' | 'orderBy'
-			>> = subTree.parameters.orderBy ? withFilter.orderBy(subTree.parameters.orderBy) : withFilter
+			>> = parametersValue.orderBy ? withFilter.orderBy(parametersValue.orderBy) : withFilter
 
 			const withOffset: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter' | 'orderBy' | 'offset'
-			>> = subTree.parameters.offset === undefined ? withOrderBy : withOrderBy.offset(subTree.parameters.offset)
+			>> = parametersValue.offset === undefined ? withOrderBy : withOrderBy.offset(parametersValue.offset)
 
-			finalBuilder = subTree.parameters.limit === undefined ? withOffset : withOffset.limit(subTree.parameters.limit)
+			finalBuilder = parametersValue.limit === undefined ? withOffset : withOffset.limit(parametersValue.limit)
 		} else {
 			finalBuilder = CrudQueryBuilder.ReadBuilder.instantiate()
 		}

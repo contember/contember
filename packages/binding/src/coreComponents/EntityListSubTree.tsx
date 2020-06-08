@@ -1,9 +1,13 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment, useGetSubTree } from '../accessorPropagation'
-import { TaggedQualifiedEntityList, TaggedUnconstrainedQualifiedEntityList } from '../markers'
 import { MarkerFactory, QueryLanguage } from '../queryLanguage'
-import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
+import {
+	BoxedQualifiedEntityList,
+	BoxedUnconstrainedQualifiedEntityList,
+	SugaredQualifiedEntityList,
+	SugaredUnconstrainedQualifiedEntityList,
+} from '../treeParameters'
 import { Component } from './Component'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { SingleEntityBaseProps } from './SingleEntity'
@@ -36,17 +40,13 @@ export const EntityListSubTree = Component(
 
 		const getSubTree = useGetSubTree()
 		const environment = useEnvironment()
-		const parameters: TaggedQualifiedEntityList | TaggedUnconstrainedQualifiedEntityList = React.useMemo(() => {
+		const parameters: BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList = React.useMemo(() => {
 			if ('isCreating' in props && props.isCreating) {
-				return {
-					...QueryLanguage.desugarUnconstrainedQualifiedEntityList(props, environment),
-					type: 'unconstrainedNonUnique',
-				}
+				return new BoxedUnconstrainedQualifiedEntityList(
+					QueryLanguage.desugarUnconstrainedQualifiedEntityList(props, environment),
+				)
 			}
-			return {
-				...QueryLanguage.desugarQualifiedEntityList(props, environment),
-				type: 'nonUnique',
-			}
+			return new BoxedQualifiedEntityList(QueryLanguage.desugarQualifiedEntityList(props, environment))
 		}, [environment, props])
 
 		return <EntityList {...props} accessor={getSubTree(parameters)} />

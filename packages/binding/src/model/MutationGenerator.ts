@@ -106,11 +106,11 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.delete(
-			parameters.entityName,
+			parameters.value.entityName,
 			builder => {
 				let where = {}
-				if (parameters && parameters.type === 'unique') {
-					where = parameters.where
+				if (parameters && parameters.type === 'qualifiedSingleEntity') {
+					where = parameters.value.where
 				}
 
 				return builder
@@ -141,11 +141,11 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.update(
-			parameters.entityName,
+			parameters.value.entityName,
 			builder => {
 				let where = {}
-				if (parameters && parameters.type === 'unique') {
-					where = parameters.where
+				if (parameters && parameters.type === 'qualifiedSingleEntity') {
+					where = parameters.value.where
 				}
 
 				return builder
@@ -171,7 +171,7 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.create(
-			parameters.entityName,
+			parameters.value.entityName,
 			builder => {
 				let writeBuilder = this.registerCreateMutationPart(
 					entity,
@@ -180,13 +180,13 @@ export class MutationGenerator {
 				)
 				if (
 					parameters &&
-					parameters.type === 'unique' &&
+					parameters.type === 'qualifiedSingleEntity' &&
 					writeBuilder.data !== undefined &&
 					!isEmptyObject(writeBuilder.data)
 				) {
 					// Shallow cloning the parameters like this IS too naïve but it will likely last surprisingly long before we
 					// run into issues.
-					writeBuilder = new CrudQueryBuilder.WriteDataBuilder({ ...writeBuilder.data, ...parameters.where })
+					writeBuilder = new CrudQueryBuilder.WriteDataBuilder({ ...writeBuilder.data, ...parameters.value.where })
 				}
 
 				return builder

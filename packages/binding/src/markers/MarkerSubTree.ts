@@ -1,34 +1,17 @@
 import {
-	QualifiedEntityList,
-	QualifiedSingleEntity,
-	UnconstrainedQualifiedEntityList,
-	UnconstrainedQualifiedSingleEntity,
+	BoxedQualifiedEntityList,
+	BoxedQualifiedSingleEntity,
+	BoxedUnconstrainedQualifiedEntityList,
+	BoxedUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { EntityFieldMarkers } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
-export interface TaggedQualifiedSingleEntity extends QualifiedSingleEntity {
-	type: 'unique'
-}
-
-export interface TaggedQualifiedEntityList extends QualifiedEntityList {
-	type: 'nonUnique'
-}
-
-export interface TaggedUnconstrainedQualifiedSingleEntity extends UnconstrainedQualifiedSingleEntity {
-	type: 'unconstrainedUnique'
-}
-
-export interface TaggedUnconstrainedQualifiedEntityList extends UnconstrainedQualifiedEntityList {
-	type: 'unconstrainedNonUnique'
-}
-
-// TODO turn these into classes
 export type MarkerSubTreeParameters =
-	| TaggedQualifiedSingleEntity
-	| TaggedQualifiedEntityList
-	| TaggedUnconstrainedQualifiedSingleEntity
-	| TaggedUnconstrainedQualifiedEntityList
+	| BoxedQualifiedSingleEntity
+	| BoxedQualifiedEntityList
+	| BoxedUnconstrainedQualifiedSingleEntity
+	| BoxedUnconstrainedQualifiedEntityList
 
 export class MarkerSubTree<C extends MarkerSubTreeParameters = MarkerSubTreeParameters> {
 	public constructor(public readonly parameters: C, public readonly fields: EntityFieldMarkers) {}
@@ -38,6 +21,6 @@ export class MarkerSubTree<C extends MarkerSubTreeParameters = MarkerSubTreePara
 	}
 
 	public get entityName() {
-		return this.parameters.entityName
+		return this.parameters.value.entityName
 	}
 }

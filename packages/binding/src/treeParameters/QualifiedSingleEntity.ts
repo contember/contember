@@ -49,3 +49,13 @@ export interface UnsugarableQualifiedSingleEntity
 export interface SugaredQualifiedSingleEntity extends UnsugarableQualifiedSingleEntity {
 	entity: string | SugarableQualifiedSingleEntity
 }
+
+export class BoxedQualifiedSingleEntity {
+	public constructor(public readonly value: QualifiedSingleEntity) {}
+	public get type() {
+		return 'qualifiedSingleEntity' as const
+	}
+	public get isConstrained(): true {
+		return true
+	}
+}

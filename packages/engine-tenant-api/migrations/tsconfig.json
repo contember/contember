@@ -1,8 +1,7 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"sourceMap": false,
-		"esModuleInterop": true
+		"sourceMap": false
 	},
 	"references": [
 		{

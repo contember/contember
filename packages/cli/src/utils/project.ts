@@ -11,8 +11,8 @@ import { InstanceLocalEnvironment, validateInstanceName } from './instance'
 import { updateMainDockerComposeConfig } from './dockerCompose'
 
 export const validateProjectName = (name: string) => {
-	if (!name.match(/^[a-z][-a-z0-9]*$/)) {
-		throw 'Invalid project name. It can contain only alphanumeric letters, dash and must start with a letter'
+	if (!name.match(/^[a-z][-a-z0-9]*$/i)) {
+		throw 'Invalid project name. It can contain only alphanumeric characters, dash and must start with a letter'
 	}
 }
 export const listProjects = async (args: { workspaceDirectory: string }) => {
@@ -38,7 +38,9 @@ export const registerProjectToInstance = async (
 	validateProjectName(args.projectName)
 	const path = join(args.instanceDirectory, 'admin/src/projects.ts')
 	if (await pathExists(path)) {
-		const code = `export { default as ${args.projectName} } from '../../../../projects/${args.projectName}/admin'\n`
+		const code = `export { default as ${args.projectName.replace('-', '_')} } from '../../../../projects/${
+			args.projectName
+		}/admin'\n`
 		await fs.appendFile(path, code, { encoding: 'utf8' })
 	}
 

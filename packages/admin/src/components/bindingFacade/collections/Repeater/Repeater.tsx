@@ -10,8 +10,13 @@ export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>
 
 export const Repeater = Component(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => {
-		if (process.env.NODE_ENV === 'development') {
-			if ('sortableBy' in props && 'orderBy' in props) {
+		if (__DEV_MODE__) {
+			if (
+				'sortableBy' in props &&
+				props.sortableBy !== undefined &&
+				'orderBy' in props &&
+				props.orderBy !== undefined
+			) {
 				throw new BindingError(
 					`Incorrect <Repeater /> use: cannot supply both the 'orderBy' and the 'sortableBy' properties.\n` +
 						`\tTo allow the user to interactively order the rows, use 'sortableBy'.\n` +

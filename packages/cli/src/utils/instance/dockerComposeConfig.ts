@@ -68,7 +68,7 @@ const updateConfigWithPorts = (config: any, portsMapping: ServicePortsMapping): 
 			services: {
 				...config.services,
 				[service]: {
-					...config.services[service],
+					...(config.services || {})[service],
 					ports: mapping.map(serializePortMapping),
 				},
 			},

@@ -7,7 +7,7 @@ import {
 } from '@contember/binding'
 import * as React from 'react'
 import RequestState from '../../state/request'
-import { FeedbackRenderer, MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from '../bindingFacade'
+import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 import { useRedirect } from './useRedirect'
 
@@ -38,7 +38,7 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<C
 			<DataBindingProvider stateComponent={FeedbackRenderer} onSuccessfulPersist={onSuccessfulPersist}>
 				<SingleEntitySubTree
 					{...entityProps}
-					entityComponent={MutableContentLayoutRenderer}
+					entityComponent={MutableSingleEntityRenderer}
 					entityProps={rendererProps}
 					isCreating
 				>

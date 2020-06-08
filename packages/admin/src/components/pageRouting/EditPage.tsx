@@ -1,6 +1,6 @@
 import { DataBindingProvider, SingleEntitySubTree, SugaredQualifiedSingleEntity } from '@contember/binding'
 import * as React from 'react'
-import { FeedbackRenderer, MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from '../bindingFacade'
+import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 
 export interface EditPageProps extends SugaredQualifiedSingleEntity {
@@ -12,7 +12,7 @@ export interface EditPageProps extends SugaredQualifiedSingleEntity {
 const EditPage: Partial<PageProvider<EditPageProps>> & React.ComponentType<EditPageProps> = React.memo(
 	({ pageName, children, rendererProps, ...entityProps }: EditPageProps) => (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<SingleEntitySubTree {...entityProps} entityComponent={MutableContentLayoutRenderer} entityProps={rendererProps}>
+			<SingleEntitySubTree {...entityProps} entityComponent={MutableSingleEntityRenderer} entityProps={rendererProps}>
 				{children}
 			</SingleEntitySubTree>
 		</DataBindingProvider>

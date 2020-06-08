@@ -68,6 +68,9 @@ export class InputParser {
 				}
 			}
 			if (option) {
+				if (option.deprecated) {
+					console.warn(`Option ${option.name} is deprecated.`)
+				}
 				if (option.mode === OptionMode.VALUE_NONE) {
 					options[option.name] = true
 					continue

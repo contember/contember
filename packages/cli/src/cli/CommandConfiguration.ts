@@ -21,7 +21,7 @@ export class CommandConfiguration<Args extends Arguments, TOptions extends Optio
 	}
 
 	public option(name: Extract<keyof TOptions, string>): OptionConfiguration {
-		const option: Option = { name, required: false, mode: OptionMode.VALUE_NONE }
+		const option: Option = { name, required: false, mode: OptionMode.VALUE_NONE, deprecated: false }
 		this.options.push(option)
 		return new OptionConfiguration(option)
 	}

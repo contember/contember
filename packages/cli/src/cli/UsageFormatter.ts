@@ -19,6 +19,9 @@ export class UsageFormatter {
 			}
 		}
 		for (let opt of options) {
+			if (opt.deprecated) {
+				continue
+			}
 			const name = `--${opt.name}` + (!isShort && opt.shortcut ? `|-${opt.shortcut}` : '')
 			let valueDescription
 			switch (opt.mode) {

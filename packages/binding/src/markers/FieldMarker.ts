@@ -8,13 +8,13 @@ import { PlaceholderGenerator } from './PlaceholderGenerator'
  * controlled fields within repeaters.
  */
 export class FieldMarker {
+	public readonly placeholderName: string
+
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly defaultValue?: GraphQlBuilder.Literal | Scalar,
 		public readonly isNonbearing: boolean = false,
-	) {}
-
-	public get placeholderName(): string {
-		return PlaceholderGenerator.generateFieldMarkerPlaceholder(this)
+	) {
+		this.placeholderName = PlaceholderGenerator.generateFieldMarkerPlaceholder(this)
 	}
 }

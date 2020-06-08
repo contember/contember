@@ -14,10 +14,10 @@ export type MarkerSubTreeParameters =
 	| BoxedUnconstrainedQualifiedEntityList
 
 export class MarkerSubTree<C extends MarkerSubTreeParameters = MarkerSubTreeParameters> {
-	public constructor(public readonly parameters: C, public readonly fields: EntityFieldMarkers) {}
+	public readonly placeholderName: string
 
-	public get placeholderName(): string {
-		return PlaceholderGenerator.generateMarkerSubTreePlaceholder(this)
+	public constructor(public readonly parameters: C, public readonly fields: EntityFieldMarkers) {
+		this.placeholderName = PlaceholderGenerator.generateMarkerSubTreePlaceholder(this)
 	}
 
 	public get entityName() {

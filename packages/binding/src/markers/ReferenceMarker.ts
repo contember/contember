@@ -8,6 +8,7 @@ import { PlaceholderGenerator } from './PlaceholderGenerator'
 class ReferenceMarker {
 	public readonly fieldName: FieldName
 	public readonly references: ReferenceMarker.References
+	public readonly placeholderName: string
 
 	public static readonly defaultReferencePreferences: {
 		readonly [index in ExpectedEntityCount]: ReferenceMarker.ReferencePreferences
@@ -84,10 +85,8 @@ class ReferenceMarker {
 
 		this.fieldName = fieldName
 		this.references = references
-	}
 
-	public get placeholderName(): string {
-		return PlaceholderGenerator.generateReferenceMarkerPlaceholder(this)
+		this.placeholderName = PlaceholderGenerator.generateReferenceMarkerPlaceholder(this)
 	}
 }
 

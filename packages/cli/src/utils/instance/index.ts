@@ -1,4 +1,5 @@
 export * from './enviornment'
+export * from './configure'
 export { listInstances, validateInstanceName } from './common'
 export * from './config'
 export * from './create'

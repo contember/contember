@@ -64,7 +64,7 @@ export const interactiveSignIn = async ({
 	return await client.signIn(email, password, expiration || 3600)
 }
 
-export const interactiveSetup = async (apiUrl: string): Promise<{ loginToken: string }> => {
+export const interactiveAskForCredentials = async (): Promise<{ email: string; password: string }> => {
 	const { email, password } = await prompts([
 		{
 			type: 'text',
@@ -82,7 +82,13 @@ export const interactiveSetup = async (apiUrl: string): Promise<{ loginToken: st
 	if (!email || !password) {
 		throw 'Aborting a setup'
 	}
+	return { email, password }
+}
 
+export const setup = async (
+	apiUrl: string,
+	{ email, password }: { email: string; password: string },
+): Promise<{ loginToken: string }> => {
 	const client = TenantClient.create(apiUrl, '12345123451234512345')
 	const response = await client.setup(email, password)
 	console.log('Superadmin created.')

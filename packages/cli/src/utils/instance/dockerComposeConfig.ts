@@ -1,7 +1,6 @@
 import { PortMapping } from '../docker'
-import { getConfiguredPortsMap, readDefaultDockerComposeConfig, updateOverrideConfig } from '../dockerCompose'
+import { getConfiguredPortsMap } from '../dockerCompose'
 import getPort from 'get-port'
-import { getInstanceStatus } from './status'
 
 type ServicePortsMapping = Record<string, PortMapping[]>
 
@@ -19,7 +18,6 @@ export const resolvePortsMapping = async (args: {
 		{ service: 'adminer', port: 8080 },
 		{ service: 'mailhog', port: 8025 },
 	]
-	const runningServices = await getInstanceStatus({ instanceDirectory: args.instanceDirectory })
 
 	const configuredPorts = getConfiguredPortsMap(args.config)
 	const occupiedPorts = Object.values(configuredPorts).flatMap(it => it.map(it => it.hostPort))
@@ -35,11 +33,7 @@ export const resolvePortsMapping = async (args: {
 		)
 		const otherConfiguredPorts = serviceConfiguredPorts.filter(it => !configuredPortMapping.includes(it))
 
-		const runningStatus = runningServices.find(it => it.name === service)
-		const runningPortMapping =
-			runningStatus?.ports.filter(it => !containerPort || it.containerPort === containerPort) || []
-
-		let assignedPortMapping = configuredPortMapping.length > 0 ? configuredPortMapping : runningPortMapping
+		let assignedPortMapping = configuredPortMapping.length > 0 ? configuredPortMapping : []
 		if (assignedPortMapping.length === 0) {
 			let freePort: number
 			do {
@@ -75,6 +69,42 @@ const updateConfigWithPorts = (config: any, portsMapping: ServicePortsMapping): 
 		}),
 		config,
 	)
+}
+
+const filterUndefinedEntries = (input: Record<string, string | undefined>) =>
+	Object.fromEntries(Object.entries(input).filter(([key, val]) => val !== undefined))
+
+export const patchInstanceOverrideCredentials = (config: any, tenantCredentials: TenantCredentials) => {
+	if (config.services?.admin) {
+		config = {
+			...config,
+			services: {
+				...config.services,
+				admin: {
+					...config.services.admin,
+					environment: filterUndefinedEntries({
+						...config.services.admin.environment,
+						CONTEMBER_LOGIN_TOKEN: tenantCredentials.loginToken,
+					}),
+				},
+			},
+		}
+	}
+	return {
+		...config,
+		services: {
+			...config.services,
+			api: {
+				...config.services?.api,
+				environment: filterUndefinedEntries({
+					...config.services?.api?.environment,
+					CONTEMBER_ROOT_TOKEN: tenantCredentials.rootToken,
+					CONTEMBER_ROOT_EMAIL: tenantCredentials.rootEmail,
+					CONTEMBER_ROOT_PASSWORD: tenantCredentials.rootPassword,
+				}),
+			},
+		},
+	}
 }
 
 export const patchInstanceOverrideConfig = (config: any, portsMapping: ServicePortsMapping) => {
@@ -118,46 +148,9 @@ export const patchInstanceOverrideConfig = (config: any, portsMapping: ServicePo
 	}
 }
 
-export const resolveInstanceDockerConfig = async ({
-	instanceDirectory,
-	host,
-	saveConfig,
-	startPort,
-}: {
-	instanceDirectory: string
-	host?: string[]
-	saveConfig?: boolean
-	startPort?: number
-}): Promise<{ composeConfig: any; portsMapping: ServicePortsMapping }> => {
-	let config = await readDefaultDockerComposeConfig(instanceDirectory)
-	if (!config.services) {
-		throw 'docker-compose is not configured'
-	}
-
-	const portMapping = await resolvePortsMapping({ instanceDirectory, config, host, startPort })
-	config = patchInstanceOverrideConfig(config, portMapping)
-	if (saveConfig) {
-		await updateOverrideConfig(instanceDirectory, config => patchInstanceOverrideConfig(config, portMapping))
-	}
-
-	return { composeConfig: config, portsMapping: portMapping }
-}
-
-export const updateInstanceOverrideConfig = async ({
-	instanceDirectory,
-	host,
-	startPort,
-}: {
-	instanceDirectory: string
-	host?: string[]
-	savePortsMapping?: boolean
-	startPort?: number
-}): Promise<void> => {
-	let config = await readDefaultDockerComposeConfig(instanceDirectory)
-	if (!config.services) {
-		throw 'docker-compose is not configured'
-	}
-
-	const portMapping = await resolvePortsMapping({ instanceDirectory, config, host, startPort })
-	await updateOverrideConfig(instanceDirectory, config => patchInstanceOverrideConfig(config, portMapping))
+type TenantCredentials = {
+	rootEmail?: string
+	rootPassword?: string
+	rootToken?: string
+	loginToken?: string
 }

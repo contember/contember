@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { interactiveSetup } from '../../utils/tenant'
+import { interactiveAskForCredentials, setup } from '../../utils/tenant'
 
 type Args = {
 	apiUrl: string
@@ -18,7 +18,8 @@ export class SetupCommand extends Command<Args, Options> {
 			throw 'This command is interactive and requires TTY'
 		}
 		const apiUrl = input.getArgument('apiUrl')
+		const credentials = await interactiveAskForCredentials()
 
-		await interactiveSetup(apiUrl)
+		await setup(apiUrl, credentials)
 	}
 }

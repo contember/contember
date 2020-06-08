@@ -15,7 +15,6 @@ export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtra
 		| 'addButtonComponent'
 		| 'enableAddingNew'
 		| 'enableRemoving'
-		| 'enableRemovingLast'
 	> {
 	beforeContent?: React.ReactNode
 	afterContent?: React.ReactNode

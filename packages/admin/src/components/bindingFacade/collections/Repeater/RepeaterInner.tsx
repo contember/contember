@@ -28,7 +28,6 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	sortableBy?: SugaredFieldProps['field']
 
 	enableRemoving?: boolean
-	enableRemovingLast?: boolean
 
 	containerComponent?: React.ComponentType<RepeaterContainerProps & ContainerExtraProps>
 	containerComponentExtraProps?: ContainerExtraProps
@@ -57,7 +56,7 @@ export const RepeaterInner = Component(
 			props.containerComponent || RepeaterContainer
 
 		const isEmpty = entities.length === 0
-		const itemRemovingEnabled = props.enableRemoving !== false && (entities.length > 1 || !!props.enableRemovingLast)
+		const itemRemovingEnabled = props.enableRemoving !== false
 
 		const sortableHandle = React.useCallback(
 			({ children }) => (

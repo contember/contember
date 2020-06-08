@@ -43,6 +43,7 @@ function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredenti
 	}
 	if (!hasNumberProperty(json, 'port')) {
 		if (hasStringProperty({ ...json }, 'port')) {
+			// eslint-disable-next-line no-console
 			console.warn(
 				`DEPRECATED: Property ${path}.port must be a number, but string was found. Use ::number typecast in config.`,
 			)
@@ -149,6 +150,7 @@ function checkProjectStructure(json: unknown, slug: string, path: string): Proje
 		return typeConfigError(`${path}.stages`, json.stages, 'object')
 	}
 	if (json.dbCredentials) {
+		// eslint-disable-next-line no-console
 		console.warn(`${path}.dbCredentials is deprecated, use ${path}.db instead`)
 		json.db = json.dbCredentials
 	}
@@ -171,6 +173,7 @@ function checkServerStructure(json: unknown): Config['server'] {
 	}
 	if (!hasNumberProperty(json, 'port')) {
 		if (hasStringProperty({ ...json }, 'port')) {
+			// eslint-disable-next-line no-console
 			console.warn(
 				`DEPRECATED: Property server.port must be a number, but string was found. Use ::number typecast in config.`,
 			)

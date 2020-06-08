@@ -4,6 +4,7 @@ import { DiffQuery, StageBySlugQuery } from '../queries'
 import { StageConfig } from '../../types'
 import { emptySchema } from '@contember/schema-utils'
 import { DatabaseContext } from '../database'
+import { ImplementationException } from '../../utils'
 
 class StageCreator {
 	constructor(private readonly eventApplier: EventApplier) {}
@@ -19,8 +20,11 @@ class StageCreator {
 
 		const queryHandler = db.client.createQueryHandler()
 
-		const newStage = (await queryHandler.fetch(new StageBySlugQuery(stage.slug)))!
-		const parentStage = (await queryHandler.fetch(new StageBySlugQuery(parent.slug)))!
+		const newStage = await queryHandler.fetch(new StageBySlugQuery(stage.slug))
+		const parentStage = await queryHandler.fetch(new StageBySlugQuery(parent.slug))
+		if (!newStage || !parentStage) {
+			throw new ImplementationException()
+		}
 
 		// both are new
 		if (newStage.event_id === parentStage.event_id) {

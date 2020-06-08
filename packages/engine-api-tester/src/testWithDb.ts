@@ -82,6 +82,7 @@ export const executeDbTest = async (test: Test) => {
 		const qbWithSelect = columns.reduce<SelectBuilder<Record<string, any>>>((qb, column) => qb.select(column), qb)
 		dbData[table] = await qbWithSelect.getResult(tester.client.forSchema('stage_prod'))
 	}
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	expect(dbData).toEqual(test.expectDatabase!)
 	await tester.cleanup()
 }

@@ -45,6 +45,7 @@ export class ErrorHandlerExtension extends GraphQLExtension {
 		if (originalError instanceof UserError) {
 			return { message: error.message, locations: error.locations, path: error.path }
 		}
+		// eslint-disable-next-line no-console
 		console.error(originalError || error)
 		this.errorLogger(originalError || error, {
 			project: this.projectSlug,

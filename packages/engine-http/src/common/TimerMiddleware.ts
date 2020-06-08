@@ -25,6 +25,7 @@ export const createTimerMiddleware = (): KoaMiddleware<TimerMiddlewareState> => 
 			.join('; ')
 		const total = new Date().getTime() - globalStart
 		const timeLabel = total > 500 ? 'TIME_SLOW' : 'TIME_OK'
+		// eslint-disable-next-line no-console
 		console.log(
 			`${ctx.request.method} ${ctx.request.url} [${ctx.response.status}] ${ctx.req.connection.remoteAddress} ${timeLabel} ${total}ms (${eventsDescription})`,
 		)

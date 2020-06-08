@@ -22,6 +22,7 @@ import { ConfigProcessor } from '@contember/engine-plugins'
 	let servers: Server[] = []
 	for (const [signal, code] of signals) {
 		process.on(signal, async () => {
+			// eslint-disable-next-line no-console
 			console.log(`process received a ${signal} signal`)
 			for (const server of servers) {
 				await new Promise(resolve => server.close(() => resolve()))
@@ -41,6 +42,7 @@ import { ConfigProcessor } from '@contember/engine-plugins'
 	}
 	servers = await run(debug, config, projectsDir, plugins)
 })().catch(e => {
+	// eslint-disable-next-line no-console
 	console.log(e)
 	process.exit(1)
 })

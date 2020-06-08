@@ -1,14 +1,6 @@
-import {
-	AnyEvent,
-	ContentEvent,
-	CreateEvent,
-	DeleteEvent,
-	EventType,
-	RunMigrationEvent,
-	UpdateEvent,
-} from '@contember/engine-common'
+import { AnyEvent, CreateEvent, DeleteEvent, EventType, RunMigrationEvent, UpdateEvent } from '@contember/engine-common'
 import { Stage } from '../dtos'
-import { assertNever } from '../../utils'
+import { assertNever, ImplementationException } from '../../utils'
 import { DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'
 import { formatSchemaName, getJunctionTables } from '../helpers'
 import { ExecutedMigrationsResolver, MigrationExecutor } from '../migrations'
@@ -80,7 +72,7 @@ export class EventApplier {
 				await this.applyDelete(db, stage, event, primaryColumns)
 				return schema
 			case EventType.runMigration:
-				return await this.applyRunMigration(db, schema!, stage, event)
+				return await this.applyRunMigration(db, schema, stage, event)
 			default:
 				assertNever(event)
 		}
@@ -135,7 +127,11 @@ export class EventApplier {
 		stage: Stage,
 		event: RunMigrationEvent,
 	): Promise<Schema> {
-		const event_id = (await db.queryHandler.fetch(new StageBySlugQuery(stage.slug)))!.event_id
+		const stageRow = await db.queryHandler.fetch(new StageBySlugQuery(stage.slug))
+		if (!stageRow) {
+			throw new ImplementationException()
+		}
+		const event_id = stageRow.event_id
 		const migration = await this.executedMigrationsResolver.getMigrationByVersion(db, event.version)
 		if (!migration) {
 			throw new Error(`Migration ${event.version} not found`)

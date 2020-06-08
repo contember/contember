@@ -324,11 +324,13 @@ export default class MutationResolver {
 					throw e
 				}
 				if (attempt++ >= 5) {
-					console.error('Serilization failure, aborting')
+					// eslint-disable-next-line no-console
+					console.error('Serialization failure, aborting')
 					throw e
 				}
 
-				console.warn('Serilization failure, retrying')
+				// eslint-disable-next-line no-console
+				console.warn('Serialization failure, retrying')
 				await new Promise(resolve => setTimeout(resolve, Math.round(20 + Math.random() * 50)))
 			}
 		} while (true)

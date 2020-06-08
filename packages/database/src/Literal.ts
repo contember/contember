@@ -13,8 +13,8 @@ export class Literal {
 
 	public appendAll(literal: Literal[], separator: string, prefixSuffix?: [string, string]) {
 		const hasPrefixAndSuffix = prefixSuffix && literal.length > 0
-		const prefix = hasPrefixAndSuffix ? prefixSuffix![0] : ''
-		const suffix = hasPrefixAndSuffix ? prefixSuffix![1] : ''
+		const prefix = hasPrefixAndSuffix ? prefixSuffix?.[0] : ''
+		const suffix = hasPrefixAndSuffix ? prefixSuffix?.[1] : ''
 		return new Literal(this.sql + prefix + literal.map(it => it.sql).join(separator) + suffix, [
 			...this.parameters,
 			...literal.map(it => it.parameters).reduce((acc, params) => [...acc, ...params], []),

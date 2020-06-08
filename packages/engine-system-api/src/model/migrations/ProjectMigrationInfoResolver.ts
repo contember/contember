@@ -37,11 +37,11 @@ class ProjectMigrationInfoResolver {
 			const shouldExecute = !latestMigration || latestMigration < migration.version
 			const isExecuted = !!executedMigrationsMap[migration.version]
 			if (!shouldExecute && !isExecuted) {
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+				const migratioName = executedMigrationsMap[latestMigration!].name
 				badMigrations.push({
 					...migration,
-					error: `New migration ${migration.name} must follow latest executed migration ${
-						executedMigrationsMap[latestMigration!].name
-					}`,
+					error: `New migration ${migration.name} must follow latest executed migration ${migratioName}`,
 				})
 			}
 			if (shouldExecute) {

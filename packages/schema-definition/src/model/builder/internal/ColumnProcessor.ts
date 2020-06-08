@@ -43,6 +43,7 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 			case Model.ColumnType.Date:
 				return { ...common, type: type, columnType: 'date' }
 			case Model.ColumnType.Enum:
+				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 				return { ...common, type: type, columnType: options.enumName!, enumName: options.enumName! }
 			default:
 				;(({}: never): never => {

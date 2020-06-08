@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import { promisify } from 'util'
 import * as path from 'path'
+// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 // @ts-ignore-line
 import autocannonCompare from 'autocannon-compare'
 

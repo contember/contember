@@ -25,6 +25,7 @@ export class MigrationsRunner {
 			createSchema: true,
 			migrationArgs,
 			log: (msg: string) => {
+				// eslint-disable-next-line no-console
 				log && console.log(msg)
 			},
 		})
@@ -35,6 +36,7 @@ export class MigrationsRunner {
 		const result = await connection.query('SELECT 1 FROM "pg_database" WHERE "datname" = ?', [this.db.database])
 
 		if (result.rowCount === 0) {
+			// eslint-disable-next-line no-console
 			console.warn(`Database ${this.db.database} does not exist, attempting to create it...`)
 			await connection.query(`CREATE DATABASE ${wrapIdentifier(this.db.database)}`)
 		}

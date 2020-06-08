@@ -74,8 +74,7 @@ export const execute = async (test: Test) => {
 		expect(actual).toEqual(expected, message)
 	})
 
-	// @ts-ignore
-	const db = new Client(connection, 'public')
+	const db = new Client(connection, 'public', {})
 	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {} }
 	await executeGraphQlTest({
 		context: {

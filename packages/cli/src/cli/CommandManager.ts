@@ -9,7 +9,10 @@ export class CommandManager {
 	public createCommand(name: string): [string, Command<any, any>] {
 		const fullName = this.findCommand(name)
 		const factory = this.commands[fullName]
-		const originalCommand = Object.entries(this.commands).find(([, it]) => it === factory)!
+		const originalCommand = Object.entries(this.commands).find(([, it]) => it === factory)
+		if (!originalCommand) {
+			throw new Error('impl error')
+		}
 		if (originalCommand[0] !== fullName) {
 			console.warn(chalk.yellow(`Command name "${fullName}" is deprecated, use "${originalCommand[0]}" instead.`))
 		}

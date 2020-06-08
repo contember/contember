@@ -42,6 +42,7 @@ export class S3Service {
 			endpoint: config.endpoint || 's3.{region}.amazonaws.com',
 			s3ForcePathStyle: !!config.endpoint,
 		})
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		this.endpoint = this.s3.config.endpoint!
 	}
 

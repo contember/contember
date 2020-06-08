@@ -39,6 +39,7 @@ class ModificationBuilder {
 			RemoveUniqueConstraintModification.id,
 			RemoveFieldModification.id,
 			RemoveEntityModification.id,
+			CreateEnumModification.id,
 
 			UpdateEntityNameModification.id,
 			UpdateEntityTableNameModification.id,
@@ -50,7 +51,6 @@ class ModificationBuilder {
 			MakeRelationNotNullModification.id,
 			UpdateEnumModification.id,
 
-			CreateEnumModification.id,
 			CreateEntityModification.id,
 			CreateColumnModification.id,
 			CreateRelationInverseSideModification.id,

@@ -1,14 +1,14 @@
 {
 	"name": "@contember/engine-vimeo-plugin",
 	"license": "Apache-2.0",
-	"version": "0.8.0-alpha.1",
+	"version": "0.8.0-alpha.2",
 	"main": "dist/src/index.js",
 	"scripts": {},
 	"typings": "dist/src/index.d.ts",
 	"dependencies": {
-		"@contember/engine-common": "^0.8.0-alpha.1",
-		"@contember/engine-plugins": "^0.8.0-alpha.1",
-		"@contember/schema": "^0.8.0-alpha.1",
+		"@contember/engine-common": "^0.8.0-alpha.2",
+		"@contember/engine-plugins": "^0.8.0-alpha.2",
+		"@contember/schema": "^0.8.0-alpha.2",
 		"@types/node": "^13.11.1",
 		"apollo-server-errors": "^2.3.4",
 		"node-fetch": "^2.6.0"

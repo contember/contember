@@ -1,17 +1,29 @@
 version: '3.7'
 services:
   api:
-    image: contember/contember:$CONTEMBER_VERSION
+    image: contember/contember
     volumes:
       - ./api/config.yaml:/src/config.yaml:cached
       - ../../projects:/src/projects:cached
     environment:
-      CONTEMBER_CONFIG_FILE: /src/config.yaml
-      CONTEMBER_PROJECTS_DIRECTORY: /src/projects
-      NODE_ENV: development
-      CONTEMBER_PORT: 4000
-      CONTEMBER_MONITORING_PORT: 4001
+      NODE_ENV: 'development'
       CONTEMBER_S3_SERVER: minio
+
+      DEFAULT_DB_HOST: 'db'
+      DEFAULT_DB_PORT: '5432'
+      DEFAULT_DB_USER: 'contember'
+      DEFAULT_DB_PASSWORD: 'contember'
+      DEFAULT_S3_BUCKET: 'contember'
+      DEFAULT_S3_REGION: ''
+      DEFAULT_S3_KEY: 'contember'
+      DEFAULT_S3_SECRET: 'contember'
+      DEFAULT_S3_PROVIDER: 'minio'
+
+      TENANT_DB_NAME: 'tenant'
+      TENANT_MAILER_HOST: 'mailhog'
+      TENANT_MAILER_PORT: '1025'
+      TENANT_MAILER_FROM: 'contember@localhost'
+
     depends_on:
       - db
 
@@ -39,9 +51,12 @@ services:
       ADMINER_NAME: Contember
   s3:
     image: minio/minio
-    command: server /data
+    command: 'server /data'
     volumes:
       - s3-data:/data
+      - ./s3-policy.json:/bucket-policy.json
+      - ./s3-entrypoint.sh:/minio-entrypoint.sh
+    entrypoint: /minio-entrypoint.sh
     environment:
       MINIO_ACCESS_KEY: contember
       MINIO_SECRET_KEY: contember

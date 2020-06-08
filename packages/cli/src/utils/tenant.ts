@@ -79,6 +79,10 @@ export const interactiveSetup = async (apiUrl: string): Promise<{ loginToken: st
 		},
 	])
 
+	if (!email || !password) {
+		throw 'Aborting a setup'
+	}
+
 	const client = TenantClient.create(apiUrl, '12345123451234512345')
 	const response = await client.setup(email, password)
 	console.log('Superadmin created.')

@@ -22,6 +22,7 @@ type Options = {
 	['ports']?: string
 	host?: string[]
 	['save-ports']?: boolean
+	['save-config']?: boolean
 	['detach']?: boolean
 }
 
@@ -30,7 +31,11 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		configuration.description('Starts Contember instance')
 		configuration.argument('instanceName').optional()
 		configuration.option('host').valueArray()
-		configuration.option('save-ports').valueNone()
+		configuration
+			.option('save-ports')
+			.valueNone()
+			.deprecated()
+		configuration.option('save-config').valueNone()
 		configuration.option('ports').valueRequired()
 		configuration
 			.option('detach')
@@ -49,7 +54,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 			instanceDirectory,
 			host: input.getOption('host'),
 			startPort: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
-			savePortsMapping: input.getOption('save-ports'),
+			saveConfig: input.getOption('save-config') || input.getOption('save-ports'),
 		})
 		const version = await getWorkspaceApiVersion({ workspaceDirectory })
 

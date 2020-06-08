@@ -9,16 +9,24 @@ import { tuple } from './tuple'
 const OVERRIDE_CONFIGS = ['docker-compose.override.yaml', 'docker-compose.override.yml']
 const MAIN_CONFIGS = ['docker-compose.yaml', 'docker-compose.yml']
 
-export const updateOverrideConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
-	let overridePath = join(dir, 'docker-compose.override.yaml')
-	for (const file of OVERRIDE_CONFIGS) {
+const resolvePath = async (dir: string, possibleFileNames: string[], fallbackFileName: string): Promise<string> => {
+	for (const file of possibleFileNames) {
 		const path = join(dir, file)
 		if (await pathExists(path)) {
-			overridePath = path
-			break
+			return path
 		}
 	}
-	return updateYaml(overridePath, updater, { createMissing: true })
+	return join(dir, fallbackFileName)
+}
+
+export const updateOverrideConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
+	const path = await resolvePath(dir, OVERRIDE_CONFIGS, OVERRIDE_CONFIGS[0])
+	return updateYaml(path, updater, { createMissing: true })
+}
+
+export const updateMainDockerComposeConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
+	const path = await resolvePath(dir, MAIN_CONFIGS, MAIN_CONFIGS[0])
+	return updateYaml(path, updater, { createMissing: true })
 }
 
 export const readDefaultDockerComposeConfig = async (dir: string): Promise<any> => {

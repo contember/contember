@@ -8,6 +8,7 @@ import { projectNameToEnvName } from '@contember/engine-common'
 import { workspaceHasAdmin } from './workspace'
 import { installTemplate } from './template'
 import { InstanceLocalEnvironment, validateInstanceName } from './instance'
+import { updateMainDockerComposeConfig } from './dockerCompose'
 
 export const validateProjectName = (name: string) => {
 	if (!name.match(/^[a-z][-a-z0-9]*$/)) {
@@ -50,13 +51,17 @@ export const registerProjectToInstance = async (
 			},
 		}),
 	)
-}
-
-export const getProjectDockerEnv = (projectName: string): Record<string, string> => {
-	validateProjectName(projectName)
-	const projectEnvName = projectNameToEnvName(projectName)
-	return {
-		[`${projectEnvName}_DB_NAME`]: projectName,
-		[`${projectEnvName}_S3_PREFIX`]: projectName,
-	}
+	await updateMainDockerComposeConfig(args.instanceDirectory, (config: any) => ({
+		...config,
+		services: {
+			...config.services,
+			api: {
+				...config.services.api,
+				environment: {
+					...config.services.api.environment,
+					[projectNameToEnvName(args.projectName) + '_DB_NAME']: args.projectName,
+				},
+			},
+		},
+	}))
 }

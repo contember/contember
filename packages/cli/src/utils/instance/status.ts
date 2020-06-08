@@ -14,9 +14,6 @@ export const getInstanceStatus = async ({
 		await execDockerCompose(['ps', '-q'], {
 			cwd: instanceDirectory,
 			stdout: false,
-			env: {
-				CONTEMBER_VERSION: 'latest',
-			},
 		})
 	)
 		.split('\n')

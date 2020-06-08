@@ -8,7 +8,7 @@ import {
 } from '@contember/config-loader'
 import { DatabaseCredentials } from '@contember/database'
 import { tuple, upperCaseFirst } from '../utils'
-import { MailerOptions } from '@contember/engine-tenant-api'
+import { MailerOptions, TenantCredentials } from '@contember/engine-tenant-api'
 import { ConfigProcessor } from '@contember/engine-plugins'
 import { isObject, typeConfigError, hasStringProperty, hasNumberProperty } from '@contember/engine-common'
 
@@ -17,6 +17,7 @@ export { Project }
 export interface TenantConfig {
 	db: DatabaseCredentials
 	mailer: MailerOptions
+	credentials: TenantCredentials
 }
 
 export interface Config {
@@ -93,6 +94,26 @@ function checkMailerParameters(json: unknown, path: string): MailerOptions {
 	}
 }
 
+function checkTenantCredentials(json: unknown, path: string): TenantCredentials {
+	if (!isObject(json)) {
+		return typeConfigError(path, json, 'object')
+	}
+	const values = Object.fromEntries(Object.entries(json).filter(([, it]) => it !== undefined))
+	if ('rootToken' in values && !hasStringProperty(values, 'rootToken')) {
+		return typeConfigError(path + '.rootToken', values.rootToken, 'string')
+	}
+	if ('rootPassword' in values && !hasStringProperty(values, 'rootPassword')) {
+		return typeConfigError(path + '.rootPassword', values.rootPassword, 'string')
+	}
+	if ('rootEmail' in values && !hasStringProperty(values, 'rootEmail')) {
+		return typeConfigError(path + '.rootEmail', values.rootEmail, 'string')
+	}
+	if ('loginToken' in values && !hasStringProperty(values, 'loginToken')) {
+		return typeConfigError(path + '.loginToken', values.loginToken, 'string')
+	}
+
+	return values
+}
 function checkTenantStructure(json: unknown): Config['tenant'] {
 	if (!isObject(json)) {
 		return typeConfigError('tenant', json, 'object')
@@ -100,6 +121,7 @@ function checkTenantStructure(json: unknown): Config['tenant'] {
 	return {
 		db: checkDatabaseCredentials(json.db, 'tenant.db'),
 		mailer: checkMailerParameters(json.mailer, 'tenant.mailer'),
+		credentials: checkTenantCredentials(json.credentials, 'tenant.credentials'),
 	}
 }
 
@@ -236,6 +258,12 @@ export async function readConfig(filenames: string[], configProcessors: ConfigPr
 				secure: '%?tenant.env.MAILER_SECURE::bool%',
 				user: '%?tenant.env.MAILER_USER%',
 				password: '%?tenant.env.MAILER_PASSWORD%',
+			},
+			credentials: {
+				rootEmail: '%?env.CONTEMBER_ROOT_EMAIL%',
+				rootToken: '%?env.CONTEMBER_ROOT_TOKEN%',
+				rootPassword: '%?env.CONTEMBER_ROOT_PASSWORD%',
+				loginToken: '%?env.CONTEMBER_LOGIN_TOKEN%',
 			},
 		},
 		projectDefaults: {

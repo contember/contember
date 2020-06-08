@@ -14,6 +14,7 @@ export const runCommand = (
 		detached?: boolean
 	},
 ): RunningCommand => {
+	console.log(`$ ${command} ${args.map(it => `'${it.replace(/'/g, `'\\''`)}'`).join(' ')}`)
 	const child = spawn(command, args, {
 		cwd: options.cwd,
 		env: { ...process.env, ...(options.env || {}) },

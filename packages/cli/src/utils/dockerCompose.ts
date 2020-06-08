@@ -9,16 +9,24 @@ import { tuple } from './tuple'
 const OVERRIDE_CONFIGS = ['docker-compose.override.yaml', 'docker-compose.override.yml']
 const MAIN_CONFIGS = ['docker-compose.yaml', 'docker-compose.yml']
 
-export const updateOverrideConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
-	let overridePath = join(dir, 'docker-compose.override.yaml')
-	for (const file of OVERRIDE_CONFIGS) {
+const resolvePath = async (dir: string, possibleFileNames: string[], fallbackFileName: string): Promise<string> => {
+	for (const file of possibleFileNames) {
 		const path = join(dir, file)
 		if (await pathExists(path)) {
-			overridePath = path
-			break
+			return path
 		}
 	}
-	return updateYaml(overridePath, updater, { createMissing: true })
+	return join(dir, fallbackFileName)
+}
+
+export const updateOverrideConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
+	const path = await resolvePath(dir, OVERRIDE_CONFIGS, OVERRIDE_CONFIGS[0])
+	return updateYaml(path, updater, { createMissing: true })
+}
+
+export const updateMainDockerComposeConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
+	const path = await resolvePath(dir, MAIN_CONFIGS, MAIN_CONFIGS[0])
+	return updateYaml(path, updater, { createMissing: true })
 }
 
 export const readDefaultDockerComposeConfig = async (dir: string): Promise<any> => {
@@ -105,32 +113,18 @@ interface DockerComposeConfig {
 }
 
 export class DockerCompose {
-	private configYamlCache: string | null = null
-
-	get configYaml(): string {
-		if (this.configYamlCache === null) {
-			this.configYamlCache = dump(this.config)
-		}
-		return this.configYamlCache
-	}
-
 	get options(): DockerComposeRunOptions {
 		return {
 			cwd: this.cwd,
-			stdin: this.configYaml,
 			...this._options,
 		}
 	}
 
-	constructor(
-		private readonly cwd: string,
-		public readonly config: DockerComposeConfig,
-		private readonly _options: Partial<DockerComposeRunOptions> = {},
-	) {}
+	constructor(private readonly cwd: string, private readonly _options: Partial<DockerComposeRunOptions> = {}) {}
 
 	run(args: string[], options: Partial<DockerComposeRunOptions> = {}): RunningCommand {
 		const thisOptions = this.options
-		return runDockerCompose(['-f', '-', ...args], {
+		return runDockerCompose(args, {
 			...thisOptions,
 			...options,
 			env: {
@@ -138,13 +132,5 @@ export class DockerCompose {
 				...options.env,
 			},
 		})
-	}
-
-	public withConfig(config: DockerComposeConfig): DockerCompose {
-		return new DockerCompose(this.cwd, config, this._options)
-	}
-
-	public withService(service: string, serviceConfig: DockerComposeServiceConfig): DockerCompose {
-		return this.withConfig({ ...this.config, services: { ...this.config.services, [service]: serviceConfig } })
 	}
 }

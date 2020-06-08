@@ -3,6 +3,7 @@ export type Option = {
 	description?: string
 	shortcut?: string
 	required: boolean
+	deprecated: boolean
 	mode: OptionMode
 }
 
@@ -48,6 +49,11 @@ export class OptionConfiguration {
 
 	public valueArray() {
 		this.option.mode = OptionMode.VALUE_ARRAY
+		return this
+	}
+
+	public deprecated() {
+		this.option.deprecated = true
 		return this
 	}
 }

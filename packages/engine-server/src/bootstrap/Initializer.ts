@@ -1,7 +1,8 @@
-import { ProjectManager } from '@contember/engine-tenant-api'
+import { ProjectManager, Providers as TenantProviders } from '@contember/engine-tenant-api'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { ProjectInitializer } from '@contember/engine-system-api'
 import { ProjectContainer } from '@contember/engine-http'
+import { TenantCredentials, TenantMigrationArgs } from '@contember/engine-tenant-api/src'
 
 export class Initializer {
 	constructor(
@@ -9,13 +10,18 @@ export class Initializer {
 		private readonly projectManager: ProjectManager,
 		private readonly projectInitializer: ProjectInitializer,
 		private readonly projectContainers: ProjectContainer[],
+		private readonly tenantCredentials: TenantCredentials,
+		private readonly providers: TenantProviders,
 	) {}
 
 	public async initialize(): Promise<void> {
 		console.log()
 		console.group('Initializing tenant database')
 		console.group('Executing migrations')
-		await this.tenantDbMigrationsRunner.migrate()
+		await this.tenantDbMigrationsRunner.migrate<TenantMigrationArgs>(true, {
+			credentials: this.tenantCredentials,
+			providers: this.providers,
+		})
 		console.groupEnd()
 		console.groupEnd()
 

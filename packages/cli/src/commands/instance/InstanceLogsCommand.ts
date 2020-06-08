@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { resolveInstanceDockerConfig, resolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { resolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { DockerCompose } from '../../utils/dockerCompose'
 
 type Args = {
@@ -17,9 +17,7 @@ export class InstanceLogsCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const workspaceDirectory = process.cwd()
 		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
-		const { composeConfig } = await resolveInstanceDockerConfig({ instanceDirectory })
-		const dockerCompose = new DockerCompose(instanceDirectory, composeConfig)
-
+		const dockerCompose = new DockerCompose(instanceDirectory)
 		await dockerCompose.run(['logs', '-f']).output
 	}
 }

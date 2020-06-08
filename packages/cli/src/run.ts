@@ -24,6 +24,7 @@ import {
 } from './commands'
 import { Application } from './cli'
 import { MigrationExecuteCommand } from './commands/migrations/MigrationExecuteCommand'
+import { InstanceConfigureCommand } from './commands/instance/InstanceConfigureCommand'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -45,6 +46,7 @@ import { MigrationExecuteCommand } from './commands/migrations/MigrationExecuteC
 		['instance:create']: () => new InstanceCreateCommand(),
 		['instance:info']: () => new InstanceInfoCommand(),
 		['instance:up']: () => new InstanceStartCommand(),
+		['instance:configure']: () => new InstanceConfigureCommand(),
 		['instance:down']: () => new InstanceStopCommand(),
 		['instance:logs']: () => new InstanceLogsCommand(),
 		['instance:validate-config']: () => new InstanceValidateConfigCommand(),

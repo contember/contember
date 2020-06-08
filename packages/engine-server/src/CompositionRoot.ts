@@ -180,6 +180,8 @@ class CompositionRoot {
 						tenantContainer.projectManager,
 						systemContainer.projectInitializer,
 						containerList,
+						config.tenant.credentials,
+						providers,
 					),
 			)
 			.addService('serverRunner', ({ koa, monitoringKoa }) => new ServerRunner(koa, monitoringKoa, config))

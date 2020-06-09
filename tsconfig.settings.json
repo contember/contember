@@ -7,10 +7,11 @@
 		"noEmitOnError": true,
 		"experimentalDecorators": true,
 		"esModuleInterop": true,
+		"jsx": "react",
 
-		"target": "es2018",
+		"target": "es2019",
 		"moduleResolution": "node",
-		"module": "commonjs",
+		"module": "esnext",
 		"outDir": "dist",
 
 		"strict": true,

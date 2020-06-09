@@ -3,8 +3,5 @@
 	"include": [],
 	"references": [
 		{ "path": "./src" }
-	],
-	"compilerOptions": {
-		"jsx": "react"
-	}
+	]
 }

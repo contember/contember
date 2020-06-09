@@ -4,17 +4,9 @@
 		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../../packages/react-multipass-rendering/src"
-		},
-		{
-			"path": "../../../packages/client/src"
-		},
-		{
-			"path": "../../../packages/react-client/src"
-		},
-		{
-			"path": "../../../packages/react-utils/src"
-		}
+		{ "path": "../../../packages/react-multipass-rendering/src" },
+		{ "path": "../../../packages/client/src" },
+		{ "path": "../../../packages/react-client/src" },
+		{ "path": "../../../packages/react-utils/src" }
 	]
 }

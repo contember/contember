@@ -11,7 +11,8 @@ export const useParentEntityAccessor = (): EntityAccessor => {
 
 	if (entityKey === undefined) {
 		throw new BindingError(
-			`Trying to use a data bound component outside a correct parent. Perhaps you forgot to use a data provider?`,
+			`Trying to use a data bound component outside a correct parent. You likely forgot to use <DataBindingProvider /> ` +
+				`or a SubTree.`,
 		)
 	}
 

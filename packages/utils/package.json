@@ -3,6 +3,7 @@
 	"version": "0.4.25",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
+	"type": "module",
 	"scripts": {},
 	"devDependencies": {
 		"typescript": "3.8.3"

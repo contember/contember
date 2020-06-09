@@ -1,7 +1,7 @@
 {
 	"name": "@contember/vimeo-file-uploader",
 	"version": "0.4.25",
-	"main": "index.js",
+	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
 	"scripts": {

@@ -1,7 +1,9 @@
 {
   "name": "@contember/ui",
   "version": "0.4.25",
-  "main": "index.js",
+  "main": "dist/src/index.js",
+  "typings": "dist/src/index.d.ts",
+  "type": "module",
   "files": [
     "dist",
     "src"
@@ -10,7 +12,6 @@
     "build": "rollup --config && node --experimental-modules ./scripts/build-style.mjs",
     "storybook": "start-storybook --ci -p 9001 -c dist/storybook/config"
   },
-  "typings": "dist/src/index.d.ts",
   "dependencies": {
     "@blueprintjs/icons": "3.11.0",
     "@contember/react-multipass-rendering": "^0.4.25",

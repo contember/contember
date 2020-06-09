@@ -1,14 +1,13 @@
 {
 	"name": "@contember/react-multipass-rendering",
 	"version": "0.4.25",
-	"main": "index.js",
-	"module": "dist/src/index.js",
+	"main": "dist/src/index.js",
+	"typings": "dist/src/index.d.ts",
 	"type": "module",
 	"scripts": {
 		"build": "rollup --config",
 		"test": "jasmine --config=jasmine.json"
 	},
-	"typings": "dist/src/index.d.ts",
 	"peerDependencies": {
 		"react": "16.12.0"
 	},

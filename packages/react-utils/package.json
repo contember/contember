@@ -1,9 +1,9 @@
 {
 	"name": "@contember/react-utils",
 	"version": "0.4.25",
-	"main": "index.js",
-	"type": "module",
+	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
+	"type": "module",
 	"scripts": {
 		"build": "rollup --config"
 	},

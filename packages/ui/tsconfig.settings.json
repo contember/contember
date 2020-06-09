@@ -1,8 +1,3 @@
 {
-	"extends": "../../tsconfig.settings.json",
-	"compilerOptions": {
-		"jsx": "react",
-		"target": "ES2018",
-		"module": "esnext"
-	}
+	"extends": "../../tsconfig.settings.json"
 }

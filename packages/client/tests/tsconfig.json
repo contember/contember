@@ -1,15 +1,9 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/tests",
-		"esModuleInterop": true,
-		"module": "commonjs",
-		"target": "es5",
-		"allowSyntheticDefaultImports": true
+		"outDir": "../dist/tests"
 	},
 	"references": [
-		{
-			"path": "../src"
-		}
+		{ "path": "../src" }
 	]
 }

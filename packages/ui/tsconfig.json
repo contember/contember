@@ -4,8 +4,5 @@
 	"references": [
 		{ "path": "./src" },
 		{ "path": "./storybook" }
-	],
-	"compilerOptions": {
-		"jsx": "react"
-	}
+	]
 }

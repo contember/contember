@@ -1,12 +1,9 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src",
-		"esModuleInterop": true
+		"outDir": "../dist/src"
 	},
 	"references": [
-		{
-			"path": "../../client/src"
-		}
+		{ "path": "../../client/src" }
 	]
 }

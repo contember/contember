@@ -105,7 +105,10 @@ interface InternalEntityListState extends InternalContainerState {
 	fieldMarkers: EntityFieldMarkers
 	initialData: ReceivedEntityData<undefined | null>[] | Array<EntityAccessor | EntityForRemovalAccessor>
 	removeEntity: EntityListAccessor.RemoveEntity
+	addEntity: EntityListAccessor.AddEntity
+	batchUpdates: EntityListAccessor.BatchUpdates
 	onUpdate: OnEntityListUpdate
+	getEntityByKey: EntityListAccessor.GetEntityByKey
 	preferences: ReferenceMarker.ReferencePreferences
 }
 
@@ -247,7 +250,7 @@ class AccessorTreeGenerator {
 		let subTreeState: InternalEntityState | InternalEntityListState
 
 		if (Array.isArray(data) || data === undefined || data instanceof EntityListAccessor) {
-			const existingState = this.subTreeStates.get(tree.placeholderName) as InternalEntityListState
+			const existingState = this.subTreeStates.get(tree.placeholderName) as InternalEntityListState | undefined
 			subTreeState = this.initializeEntityListAccessor(
 				this.resolveOrCreateEntityListState(existingState, tree.fields, onUpdate, data, errorNode, undefined),
 			)
@@ -626,16 +629,15 @@ class AccessorTreeGenerator {
 		}
 
 		const updateAccessorInstance = () => {
-			const accessor = entityListState.accessor!
 			entityListState.hasPendingUpdate = true
 			return (entityListState.accessor = new EntityListAccessor(
-				accessor.getEntityByKey,
+				entityListState.getEntityByKey,
 				entityListState.childrenKeys,
-				accessor.errors,
-				accessor.addEventListener,
-				accessor.batchUpdates,
-				accessor.removeEntity,
-				accessor.addEntity,
+				entityListState.errors ? entityListState.errors.errors : emptyArray,
+				entityListState.addEventListener,
+				entityListState.batchUpdates,
+				entityListState.removeEntity,
+				entityListState.addEntity,
 			))
 		}
 		const markDirtyChildState = (updatedState: InternalEntityState) => {
@@ -652,7 +654,7 @@ class AccessorTreeGenerator {
 			performMutatingOperation(() => markDirtyChildState(updatedState))
 		}
 
-		const batchUpdates: BatchEntityListUpdates = performUpdates => {
+		entityListState.batchUpdates = performUpdates => {
 			this.performRootTreeOperation(() => {
 				performMutatingOperation(() => {
 					batchUpdatesImplementation(performUpdates)
@@ -661,7 +663,7 @@ class AccessorTreeGenerator {
 		}
 
 		// TODO
-		const removeEntity: EntityListAccessor.RemoveEntity = (key, removalType) => {
+		entityListState.removeEntity = (key, removalType) => {
 			this.performRootTreeOperation(() => {
 				performMutatingOperation(() => {
 					const childState = this.entityStore.get(key)
@@ -704,8 +706,8 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		const addEntity: EntityListAccessor.AddEntity = newEntity => {
-			batchUpdates(getAccessor => {
+		entityListState.addEntity = newEntity => {
+			entityListState.batchUpdates(getAccessor => {
 				const newState = generateNewEntityState(typeof newEntity === 'function' ? undefined : newEntity)
 				markDirtyChildState(newState)
 
@@ -746,7 +748,7 @@ class AccessorTreeGenerator {
 
 			return entityState
 		}
-		const getChildEntityByKey = (key: string) => {
+		entityListState.getEntityByKey = (key: string) => {
 			if (!entityListState.childrenKeys.has(key)) {
 				throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as is is not on the list.`)
 			}
@@ -761,16 +763,7 @@ class AccessorTreeGenerator {
 			generateNewEntityState(sourceDatum)
 		}
 
-		entityListState.removeEntity = removeEntity
-		entityListState.accessor = new EntityListAccessor(
-			getChildEntityByKey,
-			entityListState.childrenKeys,
-			entityListState.errors ? entityListState.errors.errors : emptyArray,
-			entityListState.addEventListener,
-			batchUpdates,
-			entityListState.removeEntity,
-			addEntity,
-		)
+		updateAccessorInstance()
 
 		return entityListState
 	}
@@ -997,6 +990,9 @@ class AccessorTreeGenerator {
 				hasPendingUpdate: true,
 				accessor: (undefined as any) as EntityListAccessor,
 				removeEntity: (undefined as any) as EntityListAccessor.RemoveEntity,
+				addEntity: (undefined as any) as EntityListAccessor.AddEntity,
+				batchUpdates: (undefined as any) as EntityListAccessor.BatchUpdates,
+				getEntityByKey: (undefined as any) as EntityListAccessor.GetEntityByKey,
 			}
 			state.addEventListener = this.getAddEventListener(state)
 			return state

@@ -9,11 +9,11 @@ class EntityListAccessor extends Accessor implements Errorable {
 	private _filteredEntities: EntityAccessor[] | undefined
 
 	public constructor(
-		public readonly getEntityByKey: (key: string) => EntityAccessor | EntityForRemovalAccessor,
+		public readonly getEntityByKey: EntityListAccessor.GetEntityByKey,
 		private readonly entityIds: Set<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
-		public readonly batchUpdates: (performUpdates: EntityListAccessor.BatchUpdates) => void,
+		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
 		public readonly removeEntity: EntityListAccessor.RemoveEntity | undefined,
 		public readonly addEntity: EntityListAccessor.AddEntity | undefined,
 	) {
@@ -41,15 +41,17 @@ class EntityListAccessor extends Accessor implements Errorable {
 }
 
 namespace EntityListAccessor {
-	export type BatchUpdates = (getAccessor: () => EntityListAccessor) => void
-	export type UpdateListener = (accessor: EntityListAccessor) => void
-	export type RemoveEntity = (key: string, removalType: RemovalType) => void
 	export type AddEntity = (
 		newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newKey: string) => void),
 	) => void
+	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
+	export type BatchUpdatesHandler = (getAccessor: () => EntityListAccessor) => void
+	export type GetEntityByKey = (key: string) => EntityAccessor | EntityForRemovalAccessor
+	export type RemoveEntity = (key: string, removalType: RemovalType) => void
+	export type UpdateListener = (accessor: EntityListAccessor) => void
 
 	export interface EntityListEventListenerMap {
-		beforeUpdate: BatchUpdates
+		beforeUpdate: BatchUpdatesHandler
 		update: UpdateListener
 	}
 	export type EntityListEventType = keyof EntityListEventListenerMap

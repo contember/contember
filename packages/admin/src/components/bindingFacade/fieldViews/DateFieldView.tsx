@@ -15,6 +15,8 @@ export const DateFieldView = Component<DateFieldViewProps>(
 		if (!dateField.currentValue) {
 			return <>{fallback}</>
 		}
+
+		// dateField.currentValue is created on server by Date.toISOString() and therefore always in UTC
 		const date = new Date(dateField.currentValue)
 
 		if (format === undefined) {
@@ -25,7 +27,7 @@ export const DateFieldView = Component<DateFieldViewProps>(
 			return <>{format(date)}</>
 		}
 
-		const intl = new Intl.DateTimeFormat(locale ?? 'default', format)
+		const intl = new Intl.DateTimeFormat(locale ?? 'default', { timeZone: 'UTC', ...format })
 		return <>{intl.format(date)}</>
 	},
 	props => (

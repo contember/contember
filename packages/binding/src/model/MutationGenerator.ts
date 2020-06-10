@@ -64,7 +64,7 @@ export class MutationGenerator {
 		queryBuilder: QueryBuilder,
 	): QueryBuilder {
 		if (entity instanceof EntityAccessor) {
-			if (!entity.isPersisted) {
+			if (!entity.existsOnServer) {
 				queryBuilder = this.addCreateMutation(entity, entityFieldMarkers, alias, parameters, queryBuilder)
 			} else if (data && !Array.isArray(data)) {
 				queryBuilder = this.addUpdateMutation(entity, entityFieldMarkers, data, alias, parameters, queryBuilder)

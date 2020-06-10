@@ -43,7 +43,7 @@ class EntityAccessor extends Accessor implements Errorable, SubTreeContainer {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : undefined
 	}
 
-	public get isPersisted(): boolean {
+	public get existsOnServer(): boolean {
 		return typeof this.runtimeId === 'string'
 	}
 

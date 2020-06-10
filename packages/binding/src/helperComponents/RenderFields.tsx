@@ -47,11 +47,11 @@ export const RenderFields = Component<RenderFieldsProps>(
 		// TODO we probably want something like useDeferredValue from here.
 		//      Will probably just wait for Concurrent React though.
 		const output = React.useMemo(() => {
-			if (!entityAccessor.isPersisted && fallbackIfUnpersisted !== undefined) {
+			if (!entityAccessor.existsOnServer && fallbackIfUnpersisted !== undefined) {
 				return fallbackIfUnpersisted
 			}
 			return render(...accessors)
-		}, [accessors, entityAccessor.isPersisted, fallbackIfUnpersisted, render])
+		}, [accessors, entityAccessor.existsOnServer, fallbackIfUnpersisted, render])
 
 		return <>{output}</>
 	},

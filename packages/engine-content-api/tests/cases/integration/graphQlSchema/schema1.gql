@@ -19,6 +19,8 @@ enum _MutationErrorType {
   ForeignKeyConstraintViolation
   NotFoundOrDenied
   NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -63,6 +65,7 @@ input AuthorCreatePostsEntityRelationInput {
 
 type AuthorCreateResult {
   ok: Boolean!
+  errorMessage: String
   node: Author
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -70,6 +73,7 @@ type AuthorCreateResult {
 
 type AuthorDeleteResult {
   ok: Boolean!
+  errorMessage: String
   node: Author
   errors: [_MutationError!]!
 }
@@ -116,6 +120,7 @@ input AuthorUpdatePostsRelationInput {
 
 type AuthorUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: Author
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -172,6 +177,7 @@ input CategoryCreatePostsEntityRelationInput {
 
 type CategoryCreateResult {
   ok: Boolean!
+  errorMessage: String
   node: Category
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -179,6 +185,7 @@ type CategoryCreateResult {
 
 type CategoryDeleteResult {
   ok: Boolean!
+  errorMessage: String
   node: Category
   errors: [_MutationError!]!
 }
@@ -225,6 +232,7 @@ input CategoryUpdatePostsRelationInput {
 
 type CategoryUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: Category
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -300,6 +308,7 @@ type Mutation {
 
 type MutationTransaction {
   ok: Boolean!
+  errorMessage: String
   validation: _ValidationResult!
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!): PostDeleteResult!
@@ -365,6 +374,7 @@ input PostCreateLocalesEntityRelationInput {
 
 type PostCreateResult {
   ok: Boolean!
+  errorMessage: String
   node: Post
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -372,6 +382,7 @@ type PostCreateResult {
 
 type PostDeleteResult {
   ok: Boolean!
+  errorMessage: String
   node: Post
   errors: [_MutationError!]!
 }
@@ -405,6 +416,7 @@ input PostLocaleCreatePostEntityRelationInput {
 
 type PostLocaleCreateResult {
   ok: Boolean!
+  errorMessage: String
   node: PostLocale
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -412,6 +424,7 @@ type PostLocaleCreateResult {
 
 type PostLocaleDeleteResult {
   ok: Boolean!
+  errorMessage: String
   node: PostLocale
   errors: [_MutationError!]!
 }
@@ -453,6 +466,7 @@ input PostLocaleUpdatePostEntityRelationInput {
 
 type PostLocaleUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: PostLocale
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -549,6 +563,7 @@ input PostUpdateLocalesRelationInput {
 
 type PostUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: Post
   errors: [_MutationError!]!
   validation: _ValidationResult!

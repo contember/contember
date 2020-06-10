@@ -5,22 +5,29 @@ import {
 	MutationInputError,
 	MutationResult,
 	MutationResultList,
+	MutationSqlError,
 } from './Result'
 import * as Database from '@contember/database'
 import { UniqueWhereError } from '../inputProcessing'
 
 export const convertError = (e: any): null | MutationResult => {
 	if (e instanceof Database.NotNullViolationError) {
-		return new MutationConstraintViolationError([], ConstraintType.notNull)
+		return new MutationConstraintViolationError([], ConstraintType.notNull, e.originalMessage)
 	}
 	if (e instanceof Database.ForeignKeyViolationError) {
-		return new MutationConstraintViolationError([], ConstraintType.foreignKey)
+		return new MutationConstraintViolationError([], ConstraintType.foreignKey, e.originalMessage)
 	}
 	if (e instanceof Database.UniqueViolationError) {
-		return new MutationConstraintViolationError([], ConstraintType.uniqueKey)
+		return new MutationConstraintViolationError([], ConstraintType.uniqueKey, e.originalMessage)
 	}
 	if (e instanceof UniqueWhereError) {
 		return new MutationInputError([], InputErrorKind.nonUniqueWhere, e.message)
+	}
+	if (e instanceof Database.InvalidDataError) {
+		return new MutationInputError([], InputErrorKind.invalidData, e.originalMessage)
+	}
+	if (e instanceof Database.ConnectionError) {
+		return new MutationSqlError([], e.originalMessage)
 	}
 	return null
 }

@@ -33,6 +33,7 @@ export default class GraphQlSchemaBuilder {
 						name: 'MutationTransaction',
 						fields: {
 							ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
+							errorMessage: { type: this.graphqlObjectFactories.string },
 							validation: {
 								type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 							},

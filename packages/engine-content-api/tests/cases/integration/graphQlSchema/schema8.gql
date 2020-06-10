@@ -19,6 +19,8 @@ enum _MutationErrorType {
   ForeignKeyConstraintViolation
   NotFoundOrDenied
   NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
 }
 
 union _PathFragment = _FieldPathFragment | _IndexPathFragment
@@ -76,6 +78,7 @@ input FrontPageCreateIntroVideoEntityRelationInput {
 
 type FrontPageCreateResult {
   ok: Boolean!
+  errorMessage: String
   node: FrontPage
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -83,6 +86,7 @@ type FrontPageCreateResult {
 
 type FrontPageDeleteResult {
   ok: Boolean!
+  errorMessage: String
   node: FrontPage
   errors: [_MutationError!]!
 }
@@ -147,6 +151,7 @@ input FrontPageUpdateIntroVideoEntityRelationInput {
 
 type FrontPageUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: FrontPage
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -213,6 +218,7 @@ type Mutation {
 
 type MutationTransaction {
   ok: Boolean!
+  errorMessage: String
   validation: _ValidationResult!
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
   deleteFrontPage(by: FrontPageUniqueWhere!): FrontPageDeleteResult!
@@ -345,6 +351,7 @@ input VideoCreateInput {
 
 type VideoCreateResult {
   ok: Boolean!
+  errorMessage: String
   node: Video
   errors: [_MutationError!]!
   validation: _ValidationResult!
@@ -352,6 +359,7 @@ type VideoCreateResult {
 
 type VideoDeleteResult {
   ok: Boolean!
+  errorMessage: String
   node: Video
   errors: [_MutationError!]!
 }
@@ -406,6 +414,7 @@ input VideoUpdateInput {
 
 type VideoUpdateResult {
   ok: Boolean!
+  errorMessage: String
   node: Video
   errors: [_MutationError!]!
   validation: _ValidationResult!

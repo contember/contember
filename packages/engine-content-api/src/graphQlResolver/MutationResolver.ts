@@ -25,7 +25,7 @@ export default class MutationResolver {
 	public async resolveTransaction(info: GraphQLResolveInfo): Promise<Result.TransactionResult> {
 		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
 			return (
-				(path.length === 1 && !['ok', 'validation'].includes(node.name.value)) ||
+				(path.length === 1 && !['ok', 'validation', 'errorMessage'].includes(node.name.value)) ||
 				(path.length === 2 && node.name.value === 'node') ||
 				path.length > 2 ||
 				path.length === 0
@@ -33,14 +33,17 @@ export default class MutationResolver {
 		})
 		const fields = GraphQlQueryAstFactory.resolveObjectType(info.returnType).getFields()
 
-		const prefixValidationErrors = (errors: Result.ValidationError[], field: string) =>
+		const prefixErrors = <T extends { path: Result.PathFragment[] }>(errors: T[], field: string): T[] =>
 			errors.map(it => ({
 				...it,
 				path: [{ __typename: '_FieldPathFragment', field }, ...it.path],
 			}))
 
 		return this.transaction(async (mapper, trx) => {
-			const validationResult: Record<string, { ok: boolean; validation?: Result.ValidationResult }> = {}
+			const validationResult: Record<
+				string,
+				{ ok: boolean; validation?: Result.ValidationResult; errorMessage?: string }
+			> = {}
 			const validationErrors: Result.ValidationError[] = []
 			for (const field of queryAst.fields) {
 				if (!(field instanceof ObjectNode)) {
@@ -68,8 +71,12 @@ export default class MutationResolver {
 					return assertNever(meta.operation)
 				})()
 				if (result !== null) {
-					validationResult[field.alias] = { ok: false, validation: result }
-					validationErrors.push(...prefixValidationErrors(result.errors, field.alias))
+					validationResult[field.alias] = {
+						ok: false,
+						validation: result,
+						errorMessage: this.stringifyValidationErrors(result.errors),
+					}
+					validationErrors.push(...prefixErrors(result.errors, field.alias))
 				} else {
 					validationResult[field.alias] = { ok: false, validation: { valid: true, errors: [] } }
 				}
@@ -77,6 +84,7 @@ export default class MutationResolver {
 			if (validationErrors.length) {
 				return {
 					ok: false,
+					errorMessage: this.stringifyValidationErrors(validationErrors),
 					validation: {
 						valid: false,
 						errors: validationErrors,
@@ -96,7 +104,11 @@ export default class MutationResolver {
 				}
 				const meta = readOperationMeta(fieldConfig.extensions)
 
-				const result: { ok: boolean; validation?: Result.ValidationResult } = await (() => {
+				const result: {
+					ok: boolean
+					validation?: Result.ValidationResult
+					errors: Result.ExecutionError[]
+				} = await (() => {
 					switch (meta.operation) {
 						case Operation.create:
 							return this.resolveCreateInternal(mapper, meta.entity, field)
@@ -113,14 +125,21 @@ export default class MutationResolver {
 				})()
 
 				if (!result.ok) {
+					const validationErrors = result.validation ? prefixErrors(result.validation.errors, field.alias) : []
 					return {
 						ok: false,
 						validation: result.validation
 							? {
 									valid: result.validation.valid,
-									errors: prefixValidationErrors(result.validation.errors, field.alias),
+									errors: validationErrors,
 							  }
 							: { valid: true, errors: [] },
+						errorMessage: [
+							this.stringifyValidationErrors(validationErrors),
+							this.stringifyExecutionErrors(prefixErrors(result.errors, field.alias)),
+						]
+							.filter(it => it !== undefined)
+							.join('\n'),
 						...validationResult,
 						[field.alias]: result,
 					}
@@ -140,7 +159,7 @@ export default class MutationResolver {
 		return this.transaction(async mapper => {
 			const validation = await this.validateUpdate(mapper, entity, queryAst)
 			if (validation !== null) {
-				return { ok: false, validation, errors: [] }
+				return { ok: false, validation, errors: [], errorMessage: this.stringifyValidationErrors(validation.errors) }
 			}
 			return await this.resolveUpdateInternal(mapper, entity, queryAst)
 		})
@@ -174,7 +193,12 @@ export default class MutationResolver {
 		const result = await mapper.update(entity, input.by, input.data)
 		const errors = this.convertResultToErrors(result)
 		if (errors.length > 0) {
-			return { ok: false, validation: { valid: true, errors: [] }, errors }
+			return {
+				ok: false,
+				validation: { valid: true, errors: [] },
+				errors,
+				errorMessage: this.stringifyExecutionErrors(errors),
+			}
 		}
 
 		const nodes = await this.resolveResultNodes(mapper, entity, input.by, queryAst)
@@ -197,7 +221,7 @@ export default class MutationResolver {
 		return this.transaction(async mapper => {
 			const validation = await this.validateCreate(mapper, entity, queryAst)
 			if (validation !== null) {
-				return { ok: false, validation, errors: [] }
+				return { ok: false, validation, errors: [], errorMessage: this.stringifyValidationErrors(validation.errors) }
 			}
 			return await this.resolveCreateInternal(mapper, entity, queryAst)
 		})
@@ -231,7 +255,12 @@ export default class MutationResolver {
 		const result = await mapper.insert(entity, input.data)
 		const errors = this.convertResultToErrors(result)
 		if (errors.length > 0) {
-			return { ok: false, validation: { valid: true, errors: [] }, errors }
+			return {
+				ok: false,
+				validation: { valid: true, errors: [] },
+				errors,
+				errorMessage: this.stringifyExecutionErrors(errors),
+			}
 		}
 		const primary = getInsertPrimary(result)
 		if (!primary) {
@@ -273,7 +302,8 @@ export default class MutationResolver {
 		if (result.length === 1 && result[0].result === MutationResultType.ok) {
 			return { ok: true, errors: [], ...nodes }
 		} else {
-			return { ok: false, errors: this.convertResultToErrors(result) }
+			const errors = this.convertResultToErrors(result)
+			return { ok: false, errors, errorMessage: this.stringifyExecutionErrors(errors) }
 		}
 	}
 
@@ -353,11 +383,15 @@ export default class MutationResolver {
 					case MutationResultType.constraintViolationError:
 						switch (it.constraint) {
 							case ConstraintType.notNull:
-								return { path: path, type: Result.ExecutionErrorType.NotNullConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.NotNullConstraintViolation, message: it.message }
 							case ConstraintType.foreignKey:
-								return { path: path, type: Result.ExecutionErrorType.ForeignKeyConstraintViolation }
+								return {
+									path: path,
+									type: Result.ExecutionErrorType.ForeignKeyConstraintViolation,
+									message: it.message,
+								}
 							case ConstraintType.uniqueKey:
-								return { path: path, type: Result.ExecutionErrorType.UniqueConstraintViolation }
+								return { path: path, type: Result.ExecutionErrorType.UniqueConstraintViolation, message: it.message }
 							default:
 								return assertNever(it.constraint)
 						}
@@ -368,10 +402,14 @@ export default class MutationResolver {
 						switch (it.kind) {
 							case InputErrorKind.nonUniqueWhere:
 								return { path: path, type: Result.ExecutionErrorType.NonUniqueWhereInput, message: it.message }
+							case InputErrorKind.invalidData:
+								return { path: path, type: Result.ExecutionErrorType.InvalidDataInput, message: it.message }
 							default:
 								return assertNever(it.kind)
 						}
 
+					case MutationResultType.sqlError:
+						return { path, type: Result.ExecutionErrorType.SqlError, message: it.message }
 					case MutationResultType.ok:
 					case MutationResultType.nothingToDo:
 						throw new ImplementationException('MutationResolver: unexpected MutationResultType')
@@ -379,5 +417,42 @@ export default class MutationResolver {
 						return assertNever(it)
 				}
 			})
+	}
+
+	private stringifyValidationErrors(validationErrors: Result.ValidationError[]): string | undefined {
+		if (validationErrors.length === 0) {
+			return undefined
+		}
+		return (
+			'Validation has failed:\n' +
+			validationErrors.map(it => `${this.stringifyPath(it.path)}: ${it.message.text}`).join('\n')
+		)
+	}
+
+	private stringifyExecutionErrors(executionErrors: Result.ExecutionError[]): string | undefined {
+		if (executionErrors.length === 0) {
+			return undefined
+		}
+		return (
+			'Execution has failed:\n' +
+			executionErrors.map(it => `${this.stringifyPath(it.path)}: ${it.type} (${it.message || ''})`)
+		)
+	}
+
+	private stringifyPath(path: Result.PathFragment[]): string {
+		if (path.length === 0) {
+			return 'unknown field'
+		}
+		return path
+			.map(it => {
+				if ('field' in it) {
+					return it.field
+				}
+				if ('alias' in it) {
+					return `${it.index}(${it.alias})`
+				}
+				return it.index
+			})
+			.join('.')
 	}
 }

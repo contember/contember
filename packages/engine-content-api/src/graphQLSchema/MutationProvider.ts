@@ -114,6 +114,7 @@ export default class MutationProvider {
 		const nodeType = this.entityTypeProvider.getEntity(entityName)
 		const fields: GraphQLObjectTypeConfig<any, any>['fields'] = {
 			ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
+			errorMessage: { type: this.graphqlObjectFactories.string },
 			node: { type: nodeType, resolve: aliasAwareResolver },
 			errors: { type: this.resultSchemaTypeProvider.errorListResultType },
 		}

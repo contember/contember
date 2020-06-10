@@ -10,6 +10,7 @@ export enum MutationResultType {
 	noResultError = 'noResultError',
 	validationError = 'validationError',
 	inputError = 'inputError',
+	sqlError = 'sqlError',
 }
 
 export enum ModificationType {
@@ -29,6 +30,7 @@ export type MutationResult =
 	| MutationConstraintViolationError
 	| MutationNoResultError
 	| MutationInputError
+	| MutationSqlError
 
 export type MutationResultList = MutationResult[]
 
@@ -106,12 +108,19 @@ export class MutationNothingToDo implements MutationResultInterface {
 
 export enum InputErrorKind {
 	nonUniqueWhere = 'nonUniqueWhere',
+	invalidData = 'invalidData',
 }
 
 export class MutationInputError implements MutationResultInterface {
 	result = MutationResultType.inputError as const
 
 	constructor(public readonly path: Path, public readonly kind: InputErrorKind, public readonly message?: string) {}
+}
+
+export class MutationSqlError implements MutationResultInterface {
+	result = MutationResultType.sqlError as const
+
+	constructor(public readonly path: Path, public readonly message?: string) {}
 }
 
 export enum ConstraintType {
@@ -123,7 +132,11 @@ export enum ConstraintType {
 export class MutationConstraintViolationError implements MutationResultInterface {
 	result = MutationResultType.constraintViolationError as const
 
-	constructor(public readonly path: Path, public readonly constraint: ConstraintType) {}
+	constructor(
+		public readonly path: Path,
+		public readonly constraint: ConstraintType,
+		public readonly message?: string,
+	) {}
 }
 
 // maybe denied by acl

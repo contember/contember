@@ -18,6 +18,7 @@ const schema: DocumentNode = gql`
 
 	type _Field {
 		name: String!
+		type: String!
 		rules: [_Rule!]!
 		validators: [_Validator!]!
 	}

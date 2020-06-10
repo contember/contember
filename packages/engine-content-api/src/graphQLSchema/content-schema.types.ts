@@ -1,5 +1,4 @@
 import { GraphQLResolveInfo } from 'graphql'
-
 export type Maybe<T> = T | null
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 /** All built-in and custom scalars, mapped to their actual values */
@@ -16,93 +15,110 @@ export type _AnyValue = _IntValue | _StringValue | _BooleanValue | _FloatValue |
 export type _Argument = _ValidatorArgument | _PathArgument | _LiteralArgument
 
 export type _BooleanValue = {
-	__typename?: '_BooleanValue'
+	readonly __typename?: '_BooleanValue'
 	readonly booleanValue: Scalars['Boolean']
 }
 
 export type _Entity = {
-	__typename?: '_Entity'
+	readonly __typename?: '_Entity'
 	readonly name: Scalars['String']
 	readonly fields: ReadonlyArray<_Field>
 }
 
 export type _Enum = {
-	__typename?: '_Enum'
+	readonly __typename?: '_Enum'
 	readonly name: Scalars['String']
 	readonly values: ReadonlyArray<Scalars['String']>
 }
 
 export type _Field = {
-	__typename?: '_Field'
+	readonly __typename?: '_Field'
 	readonly name: Scalars['String']
+	readonly type: Scalars['String']
 	readonly rules: ReadonlyArray<_Rule>
 	readonly validators: ReadonlyArray<_Validator>
 }
 
 export type _FloatValue = {
-	__typename?: '_FloatValue'
+	readonly __typename?: '_FloatValue'
 	readonly floatValue: Scalars['Float']
 }
 
 export type _IntValue = {
-	__typename?: '_IntValue'
+	readonly __typename?: '_IntValue'
 	readonly intValue: Scalars['Int']
 }
 
 export type _LiteralArgument = {
-	__typename?: '_LiteralArgument'
+	readonly __typename?: '_LiteralArgument'
 	readonly value?: Maybe<_AnyValue>
 }
 
 export type _PathArgument = {
-	__typename?: '_PathArgument'
+	readonly __typename?: '_PathArgument'
 	readonly path: ReadonlyArray<Scalars['String']>
 }
 
 export type _Rule = {
-	__typename?: '_Rule'
+	readonly __typename?: '_Rule'
 	readonly message?: Maybe<_RuleMessage>
 	readonly validator: Scalars['Int']
 }
 
 export type _RuleMessage = {
-	__typename?: '_RuleMessage'
+	readonly __typename?: '_RuleMessage'
 	readonly text?: Maybe<Scalars['String']>
 }
 
 export type _Schema = {
-	__typename?: '_Schema'
+	readonly __typename?: '_Schema'
 	readonly enums: ReadonlyArray<_Enum>
 	readonly entities: ReadonlyArray<_Entity>
 }
 
 export type _StringValue = {
-	__typename?: '_StringValue'
+	readonly __typename?: '_StringValue'
 	readonly stringValue: Scalars['String']
 }
 
 export type _UndefinedValue = {
-	__typename?: '_UndefinedValue'
+	readonly __typename?: '_UndefinedValue'
 	readonly undefinedValue: Scalars['Boolean']
 }
 
 export type _Validator = {
-	__typename?: '_Validator'
+	readonly __typename?: '_Validator'
 	readonly operation: Scalars['String']
 	readonly arguments: ReadonlyArray<_Argument>
 }
 
 export type _ValidatorArgument = {
-	__typename?: '_ValidatorArgument'
+	readonly __typename?: '_ValidatorArgument'
 	readonly validator: Scalars['Int']
 }
 
 export type Query = {
-	__typename?: 'Query'
+	readonly __typename?: 'Query'
 	readonly schema?: Maybe<_Schema>
 }
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
+
+export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
+	fragment: string
+	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
+}
+
+export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
+	selectionSet: string
+	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
+}
+export type StitchingResolver<TResult, TParent, TContext, TArgs> =
+	| LegacyStitchingResolver<TResult, TParent, TContext, TArgs>
+	| NewStitchingResolver<TResult, TParent, TContext, TArgs>
+export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+	| ResolverFn<TResult, TParent, TContext, TArgs>
+	| StitchingResolver<TResult, TParent, TContext, TArgs>
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
@@ -110,15 +126,6 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 	context: TContext,
 	info: GraphQLResolveInfo,
 ) => Promise<TResult> | TResult
-
-export type StitchingResolver<TResult, TParent, TContext, TArgs> = {
-	fragment: string
-	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
-}
-
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
-	| ResolverFn<TResult, TParent, TContext, TArgs>
-	| StitchingResolver<TResult, TParent, TContext, TArgs>
 
 export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
@@ -156,7 +163,9 @@ export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
 	parent: TParent,
 	context: TContext,
 	info: GraphQLResolveInfo,
-) => Maybe<TTypes>
+) => Maybe<TTypes> | Promise<Maybe<TTypes>>
+
+export type IsTypeOfResolverFn<T = {}> = (obj: T, info: GraphQLResolveInfo) => boolean | Promise<boolean>
 
 export type NextResolverFn<T> = () => Promise<T>
 
@@ -179,7 +188,9 @@ export type ResolversTypes = {
 	_Rule: ResolverTypeWrapper<_Rule>
 	_RuleMessage: ResolverTypeWrapper<_RuleMessage>
 	Int: ResolverTypeWrapper<Scalars['Int']>
-	_Validator: ResolverTypeWrapper<Omit<_Validator, 'arguments'> & { arguments: Array<ResolversTypes['_Argument']> }>
+	_Validator: ResolverTypeWrapper<
+		Omit<_Validator, 'arguments'> & { arguments: ReadonlyArray<ResolversTypes['_Argument']> }
+	>
 	_Argument: ResolversTypes['_ValidatorArgument'] | ResolversTypes['_PathArgument'] | ResolversTypes['_LiteralArgument']
 	_ValidatorArgument: ResolverTypeWrapper<_ValidatorArgument>
 	_PathArgument: ResolverTypeWrapper<_PathArgument>
@@ -212,17 +223,20 @@ export type ResolversParentTypes = {
 	_Rule: _Rule
 	_RuleMessage: _RuleMessage
 	Int: Scalars['Int']
-	_Validator: Omit<_Validator, 'arguments'> & { arguments: Array<ResolversTypes['_Argument']> }
-	_Argument: ResolversTypes['_ValidatorArgument'] | ResolversTypes['_PathArgument'] | ResolversTypes['_LiteralArgument']
+	_Validator: Omit<_Validator, 'arguments'> & { arguments: ReadonlyArray<ResolversParentTypes['_Argument']> }
+	_Argument:
+		| ResolversParentTypes['_ValidatorArgument']
+		| ResolversParentTypes['_PathArgument']
+		| ResolversParentTypes['_LiteralArgument']
 	_ValidatorArgument: _ValidatorArgument
 	_PathArgument: _PathArgument
-	_LiteralArgument: Omit<_LiteralArgument, 'value'> & { value?: Maybe<ResolversTypes['_AnyValue']> }
+	_LiteralArgument: Omit<_LiteralArgument, 'value'> & { value?: Maybe<ResolversParentTypes['_AnyValue']> }
 	_AnyValue:
-		| ResolversTypes['_IntValue']
-		| ResolversTypes['_StringValue']
-		| ResolversTypes['_BooleanValue']
-		| ResolversTypes['_FloatValue']
-		| ResolversTypes['_UndefinedValue']
+		| ResolversParentTypes['_IntValue']
+		| ResolversParentTypes['_StringValue']
+		| ResolversParentTypes['_BooleanValue']
+		| ResolversParentTypes['_FloatValue']
+		| ResolversParentTypes['_UndefinedValue']
 	_IntValue: _IntValue
 	_StringValue: _StringValue
 	_BooleanValue: _BooleanValue
@@ -255,6 +269,7 @@ export type _BooleanValueResolvers<
 	ParentType extends ResolversParentTypes['_BooleanValue'] = ResolversParentTypes['_BooleanValue']
 > = {
 	booleanValue?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _EntityResolvers<
@@ -263,6 +278,7 @@ export type _EntityResolvers<
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	fields?: Resolver<ReadonlyArray<ResolversTypes['_Field']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _EnumResolvers<
@@ -271,6 +287,7 @@ export type _EnumResolvers<
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	values?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _FieldResolvers<
@@ -278,8 +295,10 @@ export type _FieldResolvers<
 	ParentType extends ResolversParentTypes['_Field'] = ResolversParentTypes['_Field']
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
 	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _FloatValueResolvers<
@@ -287,6 +306,7 @@ export type _FloatValueResolvers<
 	ParentType extends ResolversParentTypes['_FloatValue'] = ResolversParentTypes['_FloatValue']
 > = {
 	floatValue?: Resolver<ResolversTypes['Float'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _IntValueResolvers<
@@ -294,6 +314,7 @@ export type _IntValueResolvers<
 	ParentType extends ResolversParentTypes['_IntValue'] = ResolversParentTypes['_IntValue']
 > = {
 	intValue?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _LiteralArgumentResolvers<
@@ -301,6 +322,7 @@ export type _LiteralArgumentResolvers<
 	ParentType extends ResolversParentTypes['_LiteralArgument'] = ResolversParentTypes['_LiteralArgument']
 > = {
 	value?: Resolver<Maybe<ResolversTypes['_AnyValue']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _PathArgumentResolvers<
@@ -308,6 +330,7 @@ export type _PathArgumentResolvers<
 	ParentType extends ResolversParentTypes['_PathArgument'] = ResolversParentTypes['_PathArgument']
 > = {
 	path?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _RuleResolvers<
@@ -316,6 +339,7 @@ export type _RuleResolvers<
 > = {
 	message?: Resolver<Maybe<ResolversTypes['_RuleMessage']>, ParentType, ContextType>
 	validator?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _RuleMessageResolvers<
@@ -323,6 +347,7 @@ export type _RuleMessageResolvers<
 	ParentType extends ResolversParentTypes['_RuleMessage'] = ResolversParentTypes['_RuleMessage']
 > = {
 	text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _SchemaResolvers<
@@ -331,6 +356,7 @@ export type _SchemaResolvers<
 > = {
 	enums?: Resolver<ReadonlyArray<ResolversTypes['_Enum']>, ParentType, ContextType>
 	entities?: Resolver<ReadonlyArray<ResolversTypes['_Entity']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _StringValueResolvers<
@@ -338,6 +364,7 @@ export type _StringValueResolvers<
 	ParentType extends ResolversParentTypes['_StringValue'] = ResolversParentTypes['_StringValue']
 > = {
 	stringValue?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _UndefinedValueResolvers<
@@ -345,6 +372,7 @@ export type _UndefinedValueResolvers<
 	ParentType extends ResolversParentTypes['_UndefinedValue'] = ResolversParentTypes['_UndefinedValue']
 > = {
 	undefinedValue?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _ValidatorResolvers<
@@ -353,6 +381,7 @@ export type _ValidatorResolvers<
 > = {
 	operation?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	arguments?: Resolver<ReadonlyArray<ResolversTypes['_Argument']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _ValidatorArgumentResolvers<
@@ -360,6 +389,7 @@ export type _ValidatorArgumentResolvers<
 	ParentType extends ResolversParentTypes['_ValidatorArgument'] = ResolversParentTypes['_ValidatorArgument']
 > = {
 	validator?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type QueryResolvers<

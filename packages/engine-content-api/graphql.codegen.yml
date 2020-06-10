@@ -1,0 +1,18 @@
+schema:
+  - "./src/graphQLSchema/content-schema.graphql.ts"
+documents: []
+config:
+  immutableTypes: "1"
+generates:
+  ./src/graphQLSchema/content-schema.types.ts:
+    config:
+      immutableTypes: "1"
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-resolvers"
+require:
+  - "ts-node/register"
+hooks:
+  afterAllFileWrite:
+    - prettier --write

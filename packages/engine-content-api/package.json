@@ -5,7 +5,7 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {
-		"prebuild": "mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
+		"prebuild": "gql-gen --config graphql.codegen.yml && mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
@@ -22,6 +22,10 @@
 		"@contember/database-tester": "^0.8.0-alpha.2",
 		"@contember/engine-api-tester": "^0.8.0-alpha.2",
 		"@contember/schema-definition": "^0.8.0-alpha.2",
+		"@graphql-codegen/cli": "^1.15.2",
+		"@graphql-codegen/typescript": "^1.15.2",
+		"@graphql-codegen/typescript-operations": "^1.15.2",
+		"@graphql-codegen/typescript-resolvers": "^1.15.2",
 		"@types/jasmine": "^3.5.10",
 		"@types/node": "^13.11.1",
 		"jasmine": "^3.5.0",

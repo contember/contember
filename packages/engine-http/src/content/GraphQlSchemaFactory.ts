@@ -7,6 +7,7 @@ import {
 } from '@contember/engine-content-api'
 import { makeExecutableSchema, mergeSchemas } from 'graphql-tools'
 import { GraphQLSchemaContributor } from '@contember/engine-plugins'
+import { EntityRulesResolver } from '@contember/engine-content-api'
 
 type Context = { schema: Schema; identity: PermissionsByIdentityFactory.Identity }
 class GraphQlSchemaFactory {
@@ -52,7 +53,10 @@ class GraphQlSchemaFactory {
 		const { permissions, verifier } = this.permissionFactory.createPermissions(schema, identity)
 
 		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, permissions)
-		const contentSchemaFactory = new ContentSchemaFactory(schema)
+		const contentSchemaFactory = new ContentSchemaFactory(
+			schema.model,
+			new EntityRulesResolver(schema.validation, schema.model),
+		)
 		const dataSchema: GraphQLSchema = dataSchemaBuilder.build()
 		const contentSchema = makeExecutableSchema(contentSchemaFactory.create())
 

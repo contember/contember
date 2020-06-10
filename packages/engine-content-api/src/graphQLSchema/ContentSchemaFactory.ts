@@ -1,14 +1,24 @@
 import { IExecutableSchemaDefinition } from 'graphql-tools'
 import schema from './content-schema.graphql'
 import * as ContentSchema from './content-schema.types'
-import { Schema, Validation } from '@contember/schema'
+import { Model, Validation } from '@contember/schema'
 import { assertNever } from '../utils'
+import { EntityRulesResolver } from '../input-validation/EntityRulesResolver'
+import { getEntity } from '@contember/schema-utils'
 
 export class ContentSchemaFactory {
-	constructor(private readonly schema: Schema) {}
+	constructor(private readonly model: Model.Schema, private readonly rulesResolver: EntityRulesResolver) {}
 
-	createFieldSchema(entityName: string, fieldName: string): ContentSchema._Field {
-		const rules = (this.schema.validation[entityName] || {})[fieldName] || []
+	createFieldsSchema(entityName: string): readonly ContentSchema._Field[] {
+		const entityRules = this.rulesResolver.getEntityRules(entityName)
+		return Object.values(getEntity(this.model, entityName).fields).map(it => ({
+			name: it.name,
+			type: it.type,
+			...this.createValidationSchema(entityRules[it.name] || []),
+		}))
+	}
+
+	createValidationSchema(rules: Validation.ValidationRule[]): Pick<ContentSchema._Field, 'rules' | 'validators'> {
 		const validators: ContentSchema._Validator[] = []
 
 		const createValue = (value: number | string | boolean): ContentSchema._AnyValue & { __typename: string } => {
@@ -57,7 +67,6 @@ export class ContentSchemaFactory {
 			(it): ContentSchema._Rule => ({ message: it.message, validator: processValidator(it.validator) }),
 		)
 		return {
-			name: fieldName,
 			rules: processedRules,
 			validators: validators,
 		}
@@ -69,12 +78,10 @@ export class ContentSchemaFactory {
 			resolvers: {
 				Query: {
 					schema: (): ContentSchema._Schema => ({
-						enums: Object.entries(this.schema.model.enums).map(([name, values]) => ({ name, values })),
-						entities: Object.values(this.schema.model.entities).map(entity => ({
+						enums: Object.entries(this.model.enums).map(([name, values]) => ({ name, values })),
+						entities: Object.values(this.model.entities).map(entity => ({
 							name: entity.name,
-							fields: Object.values(entity.fields).map(
-								(field): ContentSchema._Field => this.createFieldSchema(entity.name, field.name),
-							),
+							fields: this.createFieldsSchema(entity.name),
 						})),
 					}),
 				},

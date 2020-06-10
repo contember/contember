@@ -52,6 +52,7 @@ type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
 // listeners.
 const BEFORE_UPDATE_SETTLE_LIMIT = 20
 
+// TODO the state initialization methods are kind of crap but we'll deal with them later.
 type InternalRootStateNode = InternalEntityState | InternalEntityListState
 type InternalStateNode = InternalEntityState | InternalEntityListState | InternalFieldState
 

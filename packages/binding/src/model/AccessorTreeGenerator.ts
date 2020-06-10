@@ -708,6 +708,11 @@ class AccessorTreeGenerator {
 		}
 
 		entityListState.addEntity = newEntity => {
+			if (newEntity instanceof EntityAccessor && !newEntity.existsOnServer) {
+				throw new BindingError(
+					`EntityList: attempting to connect an entity that doesn't exist on server. That is a no-op.`, // At least for now.
+				)
+			}
 			entityListState.batchUpdates(getAccessor => {
 				const newState = generateNewEntityState(typeof newEntity === 'function' ? undefined : newEntity)
 				markDirtyChildState(newState)

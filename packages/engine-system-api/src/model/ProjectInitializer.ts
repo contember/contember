@@ -8,7 +8,7 @@ import { DatabaseContext, DatabaseContextFactory } from './database'
 import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
 import { DatabaseCredentials, EventManagerImpl, SingleConnection } from '@contember/database'
 import { MigrationArgs } from '../migrations'
-import { createPgClient } from '@contember/database-migrations'
+import { createDatabaseIfNotExists, createPgClient } from '@contember/database-migrations'
 
 export class ProjectInitializer {
 	constructor(
@@ -28,6 +28,7 @@ export class ProjectInitializer {
 			// todo: use dbContext
 			// eslint-disable-next-line no-console
 			console.group(`Executing system schema migration`)
+			await createDatabaseIfNotExists(project.db)
 			const pgClient = createPgClient(project.db)
 			await pgClient.connect()
 			const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)

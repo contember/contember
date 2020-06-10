@@ -74,6 +74,89 @@ describe('system api - history', () => {
 		},
 		TIMEOUT,
 	)
+	it(
+		'returns history with old values',
+		async () => {
+			const tester = await ApiTester.create({
+				project: {
+					stages: [
+						{
+							name: 'Prod',
+							slug: 'prod',
+						},
+					],
+				},
+			})
+			await tester.stages.createAll()
+			await tester.stages.migrate('2019-02-01-163923')
+
+			const response = await tester.content.queryContent(
+				'prod',
+				GQL`
+					mutation {
+						createAuthor(data: {name: "John Doe"}) {
+							node {
+								id
+							}
+						}
+					}
+				`,
+			)
+
+			await tester.content.queryContent(
+				'prod',
+				GQL`
+					mutation {
+						updateAuthor(by: {id: "${response.createAuthor.node.id}"}, data: {name: "Jack Black"}) {
+							ok
+						}
+					}
+				`,
+			)
+
+			await tester.content.queryContent(
+				'prod',
+				GQL`
+					mutation {
+						deleteAuthor(by: {id: "${response.createAuthor.node.id}"}) {
+							ok
+						}
+					}
+				`,
+			)
+
+			const history = await tester.system.querySystem(
+				GQL`
+					query {
+						history(stage: "prod") {
+							result {
+								events {
+									id
+									type
+									... on HistoryDeleteEvent {
+										oldValues
+									}
+									... on HistoryUpdateEvent {
+										oldValues
+									}
+								}
+							}
+						}
+					}
+				`,
+			)
+
+			expect(history.data.history.result.events.length).toBe(3)
+			expect(history.data.history.result.events[0].type).toBe('CREATE')
+			expect(history.data.history.result.events[1].type).toBe('UPDATE')
+			expect(history.data.history.result.events[2].type).toBe('DELETE')
+			expect(history.data.history.result.events[1].oldValues).toEqual({ name: 'John Doe' })
+			expect(history.data.history.result.events[2].oldValues).toEqual({ name: 'Jack Black' })
+
+			await tester.cleanup()
+		},
+		TIMEOUT,
+	)
 
 	it(
 		'works with acl',
@@ -144,7 +227,6 @@ describe('system api - history', () => {
 					result {
 						events {
 							id
-							dependencies
 							description
 							type
 						}

@@ -15,7 +15,14 @@ export class HistoryQuery extends DatabaseQuery<AnyEvent[]> {
 
 	async fetch(queryable: DatabaseQueryable): Promise<ContentEvent[]> {
 		const qb = await createEventsQueryBuilder(
-			qb => qb.where({ id: this.headEvent }),
+			qb =>
+				qb.where({ id: this.headEvent }).match(qb => {
+					if (!this.since || !this.since.date) {
+						return qb
+					}
+					const sinceDate = this.since.date
+					return qb.where(expr => expr.compare('created_at', Operator.gte, sinceDate))
+				}),
 			qb => {
 				if (!this.since) {
 					return qb

@@ -3,7 +3,7 @@ import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
 	scalar DateTime
-	#scalar Json
+	scalar Json
 
 	schema {
 		query: Query
@@ -85,8 +85,8 @@ const schema: DocumentNode = gql`
 		type: HistoryEventType!
 		tableName: String!
 		primaryKeys: [String!]!
-		#oldData: Json!
-		#diffData: Json!
+		oldValues: Json!
+		diffValues: Json!
 	}
 
 	type HistoryDeleteEvent implements HistoryEvent {
@@ -99,7 +99,7 @@ const schema: DocumentNode = gql`
 		type: HistoryEventType!
 		tableName: String!
 		primaryKeys: [String!]!
-		#oldData: Json!
+		oldValues: Json!
 	}
 
 	type HistoryCreateEvent implements HistoryEvent {
@@ -112,7 +112,7 @@ const schema: DocumentNode = gql`
 		type: HistoryEventType!
 		tableName: String!
 		primaryKeys: [String!]!
-		#newData: Json!
+		newValues: Json!
 	}
 
 	type HistoryRunMigrationEvent implements HistoryEvent {

@@ -1,7 +1,14 @@
 import { AnyEvent, EventType } from '@contember/engine-common'
-import { HistoryEvent as ApiEvent, HistoryEventType as ApiEventType } from '../../schema'
+import {
+	HistoryCreateEvent,
+	HistoryDeleteEvent,
+	HistoryEvent as ApiEvent,
+	HistoryEventType as ApiEventType,
+	HistoryRunMigrationEvent,
+	HistoryUpdateEvent,
+} from '../../schema'
 import { assertNever } from '../../utils'
-import { IdentityFetcher, TenantIdentity } from '../dependencies/tenant/IdentityFetcher'
+import { IdentityFetcher } from '../dependencies/tenant/IdentityFetcher'
 import { formatIdentity } from './identityUtils'
 
 export class HistoryEventResponseBuilder {
@@ -18,15 +25,44 @@ export class HistoryEventResponseBuilder {
 		const identities = await this.identityFetcher.fetchIdentities(identityIds)
 		const identitiesMap = Object.fromEntries(identities.map(it => [it.identityId, it]))
 
-		return events.map(it => ({
-			createdAt: it.createdAt,
-			id: it.id,
-			type: apiEventTypeMapping[it.type],
-			description: this.formatDescription(it),
-			transactionId: it.transactionId,
-			identityId: it.identityId,
-			identityDescription: formatIdentity(identitiesMap[it.identityId]),
-		}))
+		return events.map(it => {
+			const commonData = {
+				createdAt: it.createdAt,
+				id: it.id,
+				type: apiEventTypeMapping[it.type],
+				description: this.formatDescription(it),
+				transactionId: it.transactionId,
+				identityId: it.identityId,
+				identityDescription: formatIdentity(identitiesMap[it.identityId]),
+			}
+			switch (it.type) {
+				case EventType.create:
+					return ((): HistoryCreateEvent => ({
+						...commonData,
+						tableName: it.tableName,
+						primaryKeys: it.rowId,
+						newValues: it.values,
+					}))()
+				case EventType.update:
+					return ((): HistoryUpdateEvent => ({
+						...commonData,
+						tableName: it.tableName,
+						primaryKeys: it.rowId,
+						diffValues: it.values,
+						oldValues: {},
+					}))()
+				case EventType.delete:
+					return ((): HistoryDeleteEvent => ({
+						...commonData,
+						tableName: it.tableName,
+						primaryKeys: it.rowId,
+						oldValues: {},
+					}))()
+				case EventType.runMigration:
+					return ((): HistoryRunMigrationEvent => commonData)()
+			}
+			assertNever(it)
+		})
 	}
 
 	private formatDescription(event: AnyEvent): string {

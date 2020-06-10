@@ -76,14 +76,18 @@ class SelectBuilder<Result = SelectBuilder.Result>
 		return this.withOption('orderBy', [...this.options.orderBy, [new Literal(toFqnWrap(columnName)), direction]])
 	}
 
-	public join(table: string, alias?: string, condition?: SelectBuilder.JoinCondition): SelectBuilder<Result> {
+	public join(table: string | Literal, alias?: string, condition?: SelectBuilder.JoinCondition): SelectBuilder<Result> {
 		return this.withOption('join', [
 			...this.options.join,
 			{ type: 'inner', table, alias, condition: this.joinConditionToLiteral(condition) },
 		])
 	}
 
-	public leftJoin(table: string, alias?: string, condition?: SelectBuilder.JoinCondition): SelectBuilder<Result> {
+	public leftJoin(
+		table: string | Literal,
+		alias?: string,
+		condition?: SelectBuilder.JoinCondition,
+	): SelectBuilder<Result> {
 		return this.withOption('join', [
 			...this.options.join,
 			{ type: 'left', table, alias, condition: this.joinConditionToLiteral(condition) },
@@ -166,7 +170,7 @@ namespace SelectBuilder {
 				orderBy: [Literal, 'asc' | 'desc'][]
 				join: {
 					type: 'inner' | 'left'
-					table: string
+					table: string | Literal
 					alias: string | undefined
 					condition: Literal | undefined
 				}[]

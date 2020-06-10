@@ -10,6 +10,7 @@ export type Scalars = {
 	Int: number
 	Float: number
 	DateTime: Date
+	Json: object
 }
 
 export type DiffCreateEvent = DiffEvent & {
@@ -96,6 +97,7 @@ export type HistoryCreateEvent = HistoryEvent & {
 	readonly type: HistoryEventType
 	readonly tableName: Scalars['String']
 	readonly primaryKeys: ReadonlyArray<Scalars['String']>
+	readonly newValues: Scalars['Json']
 }
 
 export type HistoryDeleteEvent = HistoryEvent & {
@@ -109,6 +111,7 @@ export type HistoryDeleteEvent = HistoryEvent & {
 	readonly type: HistoryEventType
 	readonly tableName: Scalars['String']
 	readonly primaryKeys: ReadonlyArray<Scalars['String']>
+	readonly oldValues: Scalars['Json']
 }
 
 export enum HistoryErrorCode {
@@ -171,6 +174,8 @@ export type HistoryUpdateEvent = HistoryEvent & {
 	readonly type: HistoryEventType
 	readonly tableName: Scalars['String']
 	readonly primaryKeys: ReadonlyArray<Scalars['String']>
+	readonly oldValues: Scalars['Json']
+	readonly diffValues: Scalars['Json']
 }
 
 export type MigrateError = {
@@ -414,6 +419,7 @@ export type ResolversTypes = {
 	ReleaseTreeResponse: ResolverTypeWrapper<ReleaseTreeResponse>
 	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: ResolverTypeWrapper<RebaseAllResponse>
+	Json: ResolverTypeWrapper<Scalars['Json']>
 	HistoryUpdateEvent: ResolverTypeWrapper<HistoryUpdateEvent>
 	HistoryDeleteEvent: ResolverTypeWrapper<HistoryDeleteEvent>
 	HistoryCreateEvent: ResolverTypeWrapper<HistoryCreateEvent>
@@ -463,6 +469,7 @@ export type ResolversParentTypes = {
 	ReleaseTreeResponse: ReleaseTreeResponse
 	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: RebaseAllResponse
+	Json: Scalars['Json']
 	HistoryUpdateEvent: HistoryUpdateEvent
 	HistoryDeleteEvent: HistoryDeleteEvent
 	HistoryCreateEvent: HistoryCreateEvent
@@ -569,6 +576,7 @@ export type HistoryCreateEventResolvers<
 	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
 	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	newValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -585,6 +593,7 @@ export type HistoryDeleteEventResolvers<
 	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
 	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -651,7 +660,13 @@ export type HistoryUpdateEventResolvers<
 	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
 	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	diffValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Json'], any> {
+	name: 'Json'
 }
 
 export type MigrateErrorResolvers<
@@ -772,6 +787,7 @@ export type Resolvers<ContextType = any> = {
 	HistoryResult?: HistoryResultResolvers<ContextType>
 	HistoryRunMigrationEvent?: HistoryRunMigrationEventResolvers<ContextType>
 	HistoryUpdateEvent?: HistoryUpdateEventResolvers<ContextType>
+	Json?: GraphQLScalarType
 	MigrateError?: MigrateErrorResolvers<ContextType>
 	MigrateResponse?: MigrateResponseResolvers<ContextType>
 	MigrateResult?: MigrateResultResolvers<ContextType>

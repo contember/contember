@@ -146,7 +146,12 @@ describe('update with db', () => {
 				return: {
 					updatePost: {
 						ok: false,
-						errors: [{ type: 'InvalidDataInput', message: 'invalid input syntax for type uuid: "abc"' }],
+						errors: [
+							{
+								type: 'InvalidDataInput',
+								message: jasmine.stringMatching(/invalid input syntax for (type )?uuid: "abc"/),
+							},
+						],
 					},
 				},
 				expectDatabase: {},

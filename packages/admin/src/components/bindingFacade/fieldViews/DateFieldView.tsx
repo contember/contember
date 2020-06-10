@@ -3,12 +3,13 @@ import * as React from 'react'
 
 export interface DateFieldViewProps {
 	field: SugaredFieldProps['field']
+	locale?: string
 	format?: Intl.DateTimeFormatOptions | ((date: Date) => React.ReactNode)
 	fallback?: React.ReactNode
 }
 
 export const DateFieldView = Component<DateFieldViewProps>(
-	({ field, format, fallback = null }) => {
+	({ field, locale, format, fallback = null }) => {
 		const dateField = useRelativeSingleField<string>(field)
 
 		if (!dateField.currentValue) {
@@ -24,7 +25,7 @@ export const DateFieldView = Component<DateFieldViewProps>(
 			return <>{format(date)}</>
 		}
 
-		const intl = new Intl.DateTimeFormat('default', format)
+		const intl = new Intl.DateTimeFormat(locale ?? 'default', format)
 		return <>{intl.format(date)}</>
 	},
 	props => (

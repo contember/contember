@@ -13,6 +13,7 @@ export class ContentSchemaFactory {
 		const entityRules = this.rulesResolver.getEntityRules(entityName)
 		return Object.values(getEntity(this.model, entityName).fields).map(it => ({
 			name: it.name,
+			type: it.type,
 			...this.createValidationSchema(entityRules[it.name] || []),
 		}))
 	}

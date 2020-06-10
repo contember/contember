@@ -34,6 +34,7 @@ export type _Enum = {
 export type _Field = {
 	readonly __typename?: '_Field'
 	readonly name: Scalars['String']
+	readonly type: Scalars['String']
 	readonly rules: ReadonlyArray<_Rule>
 	readonly validators: ReadonlyArray<_Validator>
 }
@@ -294,6 +295,7 @@ export type _FieldResolvers<
 	ParentType extends ResolversParentTypes['_Field'] = ResolversParentTypes['_Field']
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
 	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>

@@ -1,6 +1,6 @@
 import { BaseEditor, ElementNode, SerializableEditorNode } from '../baseEditor'
 
-export const deserializeElements = <E extends BaseEditor>(
+export const strictlyDeserializeElements = <E extends BaseEditor>(
 	editor: E,
 	serializedElement: string,
 	errorMessage?: string,

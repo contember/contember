@@ -2,8 +2,8 @@ import { Button, ButtonBasedButtonProps, FormGroup, Icon, IconProps } from '@con
 import * as React from 'react'
 import { EntityListAccessor, useMutationState } from '@contember/binding'
 
-export type AddNewEntityButtonProps = ButtonBasedButtonProps & {
-	addNew: ((preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void) | undefined
+export type CreateNewEntityButtonProps = ButtonBasedButtonProps & {
+	createNewEntity: EntityListAccessor.CreateNewEntity | undefined
 	iconProps?: IconProps
 }
 
@@ -16,18 +16,18 @@ const defaultIconProps: IconProps = {
 	},
 }
 
-export const AddNewEntityButton = React.memo(
-	({ addNew, iconProps, children = 'Add', ...buttonProps }: AddNewEntityButtonProps) => {
+export const CreateNewEntityButton = React.memo(
+	({ createNewEntity, iconProps, children = 'Add', ...buttonProps }: CreateNewEntityButtonProps) => {
 		const isMutating = useMutationState()
-		const addNewCallback = React.useCallback(() => addNew && addNew(), [addNew])
 
-		if (!addNew) {
+		if (!createNewEntity) {
 			return null
 		}
 		return (
 			<FormGroup label={undefined}>
 				<Button
-					onClick={addNewCallback}
+					// This looks silly but the event handler gets a different parameter than createNewEntity expects.
+					onClick={() => createNewEntity?.()}
 					disabled={isMutating}
 					isLoading={isMutating}
 					distinction="seamless"

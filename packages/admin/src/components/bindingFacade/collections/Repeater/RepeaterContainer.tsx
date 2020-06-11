@@ -1,7 +1,7 @@
 import { Box, BoxSection } from '@contember/ui'
 import * as React from 'react'
 import { EntityAccessor, EntityListAccessor } from '@contember/binding'
-import { AddNewEntityButton, AddNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
+import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 
 export interface RepeaterContainerPrivateProps {
 	accessor: EntityListAccessor
@@ -19,8 +19,8 @@ export interface RepeaterContainerPublicProps {
 	emptyMessageComponentExtraProps?: {}
 
 	addButtonText?: React.ReactNode
-	addButtonProps?: AddNewEntityButtonProps // Children here override 'addButtonText'
-	addButtonComponent?: React.ComponentType<AddNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
+	addButtonProps?: CreateNewEntityButtonProps // Children here override 'addButtonText'
+	addButtonComponent?: React.ComponentType<CreateNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
 	addButtonComponentExtraProps?: {}
 }
 
@@ -30,7 +30,7 @@ export const RepeaterContainer = React.memo(
 	({
 		addNew,
 		children,
-		addButtonComponent: AddButton = AddNewEntityButton,
+		addButtonComponent: AddButton = CreateNewEntityButton,
 		addButtonComponentExtraProps,
 		addButtonProps,
 		addButtonText = 'Add',

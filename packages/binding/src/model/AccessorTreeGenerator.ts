@@ -105,7 +105,7 @@ interface InternalEntityListState extends InternalContainerState {
 	}
 	fieldMarkers: EntityFieldMarkers
 	initialData: ReceivedEntityData<undefined | null>[] | Array<EntityAccessor | EntityForRemovalAccessor>
-	removeEntity: EntityListAccessor.RemoveEntity
+	disconnectEntity: EntityListAccessor.DisconnectEntity
 	addEntity: EntityListAccessor.AddEntity
 	batchUpdates: EntityListAccessor.BatchUpdates
 	onUpdate: OnEntityListUpdate
@@ -637,7 +637,7 @@ class AccessorTreeGenerator {
 				entityListState.errors ? entityListState.errors.errors : emptyArray,
 				entityListState.addEventListener,
 				entityListState.batchUpdates,
-				entityListState.removeEntity,
+				entityListState.disconnectEntity,
 				entityListState.addEntity,
 			))
 		}
@@ -664,7 +664,7 @@ class AccessorTreeGenerator {
 		}
 
 		// TODO
-		entityListState.removeEntity = (key, removalType) => {
+		entityListState.disconnectEntity = key => {
 			this.performRootTreeOperation(() => {
 				performMutatingOperation(() => {
 					const childState = this.entityStore.get(key)
@@ -995,7 +995,7 @@ class AccessorTreeGenerator {
 				},
 				hasPendingUpdate: true,
 				accessor: (undefined as any) as EntityListAccessor,
-				removeEntity: (undefined as any) as EntityListAccessor.RemoveEntity,
+				disconnectEntity: (undefined as any) as EntityListAccessor.DisconnectEntity,
 				addEntity: (undefined as any) as EntityListAccessor.AddEntity,
 				batchUpdates: (undefined as any) as EntityListAccessor.BatchUpdates,
 				getEntityByKey: (undefined as any) as EntityListAccessor.GetEntityByKey,

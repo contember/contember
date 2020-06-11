@@ -14,7 +14,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
-		public readonly removeEntity: EntityListAccessor.RemoveEntity | undefined,
+		public readonly disconnectEntity: EntityListAccessor.DisconnectEntity | undefined,
 		public readonly addEntity: EntityListAccessor.AddEntity | undefined,
 	) {
 		super()
@@ -46,8 +46,8 @@ namespace EntityListAccessor {
 	) => void
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: () => EntityListAccessor) => void
+	export type DisconnectEntity = (key: string) => void
 	export type GetEntityByKey = (key: string) => EntityAccessor | EntityForRemovalAccessor
-	export type RemoveEntity = (key: string, removalType: RemovalType) => void
 	export type UpdateListener = (accessor: EntityListAccessor) => void
 
 	export interface EntityListEventListenerMap {

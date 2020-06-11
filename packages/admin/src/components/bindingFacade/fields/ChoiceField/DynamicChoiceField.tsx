@@ -193,9 +193,9 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			...baseMetadata,
 			currentValues: currentValues,
 			onChange: (optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
-				if (currentValueEntity instanceof EntityListAccessor && currentValueEntity.addEntity) {
+				if (currentValueEntity instanceof EntityListAccessor && currentValueEntity.connectEntity) {
 					if (isChosen) {
-						currentValueEntity.addEntity(optionEntities[optionKey])
+						currentValueEntity.connectEntity(optionEntities[optionKey])
 					} else {
 						const targetEntityId = optionEntities[optionKey].primaryKey
 

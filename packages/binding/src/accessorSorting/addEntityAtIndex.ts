@@ -10,11 +10,11 @@ export const addEntityAtIndex = (
 	index: number,
 	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
 ) => {
-	if (!entityList.addEntity) {
+	if (!entityList.createNewEntity) {
 		return throwNonWritableError(entityList)
 	}
 	const sortedEntities = sortEntities(entityList.getFilteredEntities(), sortableByField)
-	entityList.addEntity((getListAccessor, newKey) => {
+	entityList.createNewEntity((getListAccessor, newKey) => {
 		let newlyAdded = getListAccessor().getEntityByKey(newKey)
 
 		if (!(newlyAdded instanceof EntityAccessor)) {

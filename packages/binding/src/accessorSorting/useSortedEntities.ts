@@ -25,12 +25,12 @@ const addNewAtIndexImplementation = (
 	index: number,
 	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
 ) => {
-	if (!entityList.addEntity) {
+	if (!entityList.createNewEntity) {
 		return throwNonWritableError(entityList)
 	}
 	if (!desugaredSortableByField) {
 		if (index === sortedEntitiesCount) {
-			return entityList.addEntity()
+			return entityList.createNewEntity()
 		}
 		return throwNoopError(callbackName)
 	}

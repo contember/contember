@@ -105,12 +105,13 @@ interface InternalEntityListState extends InternalContainerState {
 	}
 	fieldMarkers: EntityFieldMarkers
 	initialData: ReceivedEntityData<undefined | null>[] | Array<EntityAccessor | EntityForRemovalAccessor>
-	disconnectEntity: EntityListAccessor.DisconnectEntity
-	addEntity: EntityListAccessor.AddEntity
-	batchUpdates: EntityListAccessor.BatchUpdates
 	onUpdate: OnEntityListUpdate
 	getEntityByKey: EntityListAccessor.GetEntityByKey
 	preferences: ReferenceMarker.ReferencePreferences
+	batchUpdates: EntityListAccessor.BatchUpdates
+	connectEntity: EntityListAccessor.ConnectEntity
+	createNewEntity: EntityListAccessor.CreateNewEntity
+	disconnectEntity: EntityListAccessor.DisconnectEntity
 }
 
 type OnFieldUpdate = (state: InternalFieldState) => void
@@ -637,8 +638,9 @@ class AccessorTreeGenerator {
 				entityListState.errors ? entityListState.errors.errors : emptyArray,
 				entityListState.addEventListener,
 				entityListState.batchUpdates,
+				entityListState.connectEntity,
+				entityListState.createNewEntity,
 				entityListState.disconnectEntity,
-				entityListState.addEntity,
 			))
 		}
 		const markDirtyChildState = (updatedState: InternalEntityState) => {
@@ -707,19 +709,23 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		entityListState.addEntity = newEntity => {
-			if (newEntity instanceof EntityAccessor && !newEntity.existsOnServer) {
+		// TODO
+		entityListState.connectEntity = connectedEntity => {
+			if (!connectedEntity.existsOnServer) {
 				throw new BindingError(
 					`EntityList: attempting to connect an entity that doesn't exist on server. That is a no-op.`, // At least for now.
 				)
 			}
+			// const newState = generateNewEntityState(typeof newEntity === 'function' ? undefined : newEntity)
+			throw new BindingError(`EntityListAccessor.connectEntity is not yet implemented.`)
+		}
+
+		entityListState.createNewEntity = initialize => {
 			entityListState.batchUpdates(getAccessor => {
-				const newState = generateNewEntityState(typeof newEntity === 'function' ? undefined : newEntity)
+				const newState = generateNewEntityState(undefined)
 				markDirtyChildState(newState)
 
-				if (typeof newEntity === 'function') {
-					newEntity(getAccessor, typeof newState.id === 'string' ? newState.id : newState.id.value)
-				}
+				initialize?.(getAccessor, typeof newState.id === 'string' ? newState.id : newState.id.value)
 			})
 		}
 
@@ -995,9 +1001,10 @@ class AccessorTreeGenerator {
 				},
 				hasPendingUpdate: true,
 				accessor: (undefined as any) as EntityListAccessor,
-				disconnectEntity: (undefined as any) as EntityListAccessor.DisconnectEntity,
-				addEntity: (undefined as any) as EntityListAccessor.AddEntity,
 				batchUpdates: (undefined as any) as EntityListAccessor.BatchUpdates,
+				connectEntity: (undefined as any) as EntityListAccessor.ConnectEntity,
+				createNewEntity: (undefined as any) as EntityListAccessor.CreateNewEntity,
+				disconnectEntity: (undefined as any) as EntityListAccessor.DisconnectEntity,
 				getEntityByKey: (undefined as any) as EntityListAccessor.GetEntityByKey,
 			}
 			state.addEventListener = this.getAddEventListener(state)

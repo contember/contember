@@ -172,7 +172,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			const addNewDiscriminatedEntityAt = (
 				elementIndex: number,
 				blockDiscriminant: FieldValue,
-				preprocess?: EntityAccessor.BatchUpdates,
+				preprocess?: EntityAccessor.BatchUpdatesHandler,
 			): EntityAccessor => {
 				const normalizedElementIndex = Math.max(
 					firstContentIndex,

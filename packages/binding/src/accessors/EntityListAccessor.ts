@@ -45,9 +45,7 @@ namespace EntityListAccessor {
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: () => EntityListAccessor) => void
 	export type ConnectEntity = (connectedEntity: EntityAccessor) => void
-	export type CreateNewEntity = (
-		initialize?: (getAccessor: () => EntityListAccessor, newEntityKey: string) => void,
-	) => void
+	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	export type DisconnectEntity = (key: string) => void
 	export type GetEntityByKey = (key: string) => EntityAccessor | EntityForRemovalAccessor
 	export type UpdateListener = (accessor: EntityListAccessor) => void

@@ -10,33 +10,29 @@ export const addEntityAtIndex = (
 	index: number,
 	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
 ) => {
-	if (!entityList.createNewEntity) {
+	const createNewEntity = entityList.createNewEntity
+
+	if (!createNewEntity) {
 		return throwNonWritableError(entityList)
 	}
 	const sortedEntities = sortEntities(entityList.getFilteredEntities(), sortableByField)
-	entityList.createNewEntity((getListAccessor, newKey) => {
-		let newlyAdded = getListAccessor().getEntityByKey(newKey)
+	entityList.batchUpdates(getListAccessor => {
+		createNewEntity(getNewlyAdded => {
+			let newlyAdded = getNewlyAdded()
 
-		if (!(newlyAdded instanceof EntityAccessor)) {
-			return
-		}
+			const sortableField = newlyAdded.getRelativeSingleField<number>(sortableByField)
 
-		const sortableField = newlyAdded.getRelativeSingleField<number>(sortableByField)
+			if (sortableField.updateValue) {
+				sortableField.updateValue(index)
+				newlyAdded = getNewlyAdded()
 
-		if (sortableField.updateValue) {
-			sortableField.updateValue(index)
-			newlyAdded = getListAccessor().getEntityByKey(newKey)
-
-			if (!(newlyAdded instanceof EntityAccessor)) {
-				return
+				sortedEntities.splice(index, 0, newlyAdded)
+				repairEntitiesOrder(sortableByField, getListAccessor(), sortedEntities)
+			} else {
+				return throwNonWritableError(sortableField.fieldName)
 			}
 
-			sortedEntities.splice(index, 0, newlyAdded)
-			repairEntitiesOrder(sortableByField, getListAccessor(), sortedEntities)
-		} else {
-			return throwNonWritableError(sortableField.fieldName)
-		}
-
-		preprocess && preprocess(getListAccessor, newKey)
+			preprocess && preprocess(getListAccessor, newlyAdded.key)
+		})
 	})
 }

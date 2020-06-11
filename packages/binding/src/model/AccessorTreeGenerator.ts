@@ -88,6 +88,7 @@ interface InternalEntityState extends InternalContainerState {
 	id: string | EntityAccessor.UnpersistedEntityId
 	persistedData: AccessorTreeGenerator.InitialEntityData
 	realms: Map<EntityFieldMarkers, EntityRealm>
+	batchUpdates: EntityAccessor.BatchUpdates
 }
 
 type OnEntityListUpdate = (state: InternalEntityListState) => void
@@ -721,11 +722,10 @@ class AccessorTreeGenerator {
 		}
 
 		entityListState.createNewEntity = initialize => {
-			entityListState.batchUpdates(getAccessor => {
+			entityListState.batchUpdates(() => {
 				const newState = generateNewEntityState(undefined)
 				markDirtyChildState(newState)
-
-				initialize?.(getAccessor, typeof newState.id === 'string' ? newState.id : newState.id.value)
+				initialize && newState.batchUpdates(initialize)
 			})
 		}
 
@@ -932,6 +932,7 @@ class AccessorTreeGenerator {
 						},
 					],
 				]),
+				batchUpdates: (undefined as any) as EntityAccessor.BatchUpdates,
 			}
 			entityState.addEventListener = this.getAddEventListener(entityState)
 			this.entityStore.set(entityKey, entityState)

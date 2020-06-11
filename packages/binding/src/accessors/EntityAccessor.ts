@@ -31,7 +31,7 @@ class EntityAccessor extends Accessor implements Errorable, SubTreeContainer {
 		public readonly getSubTree: GetSubTree,
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
-		public readonly batchUpdates: (performUpdates: EntityAccessor.BatchUpdates) => void,
+		public readonly batchUpdates: EntityAccessor.BatchUpdates,
 		public readonly replaceBy: ((replacement: EntityAccessor) => void) | undefined,
 		public readonly remove: ((removalType: RemovalType) => void) | undefined,
 	) {
@@ -212,11 +212,12 @@ namespace EntityAccessor {
 
 	export type FieldData = Map<FieldName, FieldDatum>
 
-	export type BatchUpdates = (getAccessor: () => EntityAccessor) => void
+	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
+	export type BatchUpdatesHandler = (getAccessor: () => EntityAccessor) => void
 	export type UpdateListener = (accessor: null | EntityAccessor | EntityForRemovalAccessor) => void
 
 	export interface EntityEventListenerMap {
-		beforeUpdate: BatchUpdates
+		beforeUpdate: BatchUpdatesHandler
 		update: UpdateListener
 	}
 	export type EntityEventType = keyof EntityEventListenerMap

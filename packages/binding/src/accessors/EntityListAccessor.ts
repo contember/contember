@@ -1,4 +1,3 @@
-import { RemovalType } from '../treeParameters/primitives'
 import { Accessor } from './Accessor'
 import { EntityAccessor } from './EntityAccessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
@@ -44,10 +43,10 @@ class EntityListAccessor extends Accessor implements Errorable {
 namespace EntityListAccessor {
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: () => EntityListAccessor) => void
-	export type ConnectEntity = (connectedEntity: EntityAccessor) => void
+	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
-	export type DisconnectEntity = (key: string) => void
-	export type GetEntityByKey = (key: string) => EntityAccessor | EntityForRemovalAccessor
+	export type DisconnectEntity = (childEntityOrItsKey: EntityAccessor | string) => void
+	export type GetEntityByKey = (key: string) => EntityAccessor
 	export type UpdateListener = (accessor: EntityListAccessor) => void
 
 	export interface EntityListEventListenerMap {

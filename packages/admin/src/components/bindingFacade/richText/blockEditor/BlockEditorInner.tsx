@@ -6,7 +6,6 @@ import {
 	FieldAccessor,
 	FieldValue,
 	RelativeEntityList,
-	RemovalType,
 	SugaredFieldProps,
 	useDesugaredRelativeSingleField,
 	useMutationState,
@@ -40,7 +39,6 @@ const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
 export interface BlockEditorInnerPublicProps extends CreateEditorPublicOptions {
 	children?: React.ReactNode
 	label: React.ReactNode
-	removalType?: RemovalType
 	sortableBy: SugaredFieldProps['field']
 	discriminationField: SugaredFieldProps['field']
 
@@ -80,7 +78,6 @@ export const BlockEditorInner = React.memo(
 		discriminationField,
 		sortableBy,
 		label,
-		removalType = 'disconnect',
 		textBlockDiscriminateBy,
 		textBlockDiscriminateByScalar,
 		textBlockField,
@@ -186,7 +183,6 @@ export const BlockEditorInner = React.memo(
 				sortableByField: desugaredSortableByField,
 				textBlockField: desugaredTextBlockField,
 				textElementCache,
-				removalType,
 				placeholder: label,
 			}),
 		)

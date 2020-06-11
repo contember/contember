@@ -1,34 +1,33 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
 import * as React from 'react'
-import { EntityAccessor, RemovalType, useParentEntityAccessor, useMutationState } from '@contember/binding'
+import { EntityAccessor, useParentEntityAccessor, useMutationState } from '@contember/binding'
 import { useTriggerPersistWithFeedback } from '../../../ui'
 
-export type RemoveEntityButtonProps = ButtonProps & {
-	removalType?: RemovalType
+export type DeleteEntityButtonProps = ButtonProps & {
 	immediatePersist?: true
 	children?: React.ReactNode
 }
 
-export const RemoveEntityButton = React.memo((props: RemoveEntityButtonProps) => {
-	const { removalType, children, immediatePersist, ...rest } = props
-	const value = useParentEntityAccessor()
+export const DeleteEntityButton = React.memo((props: DeleteEntityButtonProps) => {
+	const { children, immediatePersist, ...rest } = props
+	const parentEntityAccessor = useParentEntityAccessor()
 	const triggerPersist = useTriggerPersistWithFeedback()
 	const isMutating = useMutationState()
 	const onClick = React.useCallback(() => {
-		if (!(value instanceof EntityAccessor) || !value.remove) {
+		if (!parentEntityAccessor.deleteEntity) {
 			return
 		}
 		if (props.immediatePersist && !confirm('Really?')) {
 			return
 		}
-		value.remove(props.removalType || 'disconnect')
+		parentEntityAccessor.deleteEntity()
 
 		if (props.immediatePersist && triggerPersist) {
 			triggerPersist().catch(() => {})
 		}
-	}, [triggerPersist, props.immediatePersist, props.removalType, value])
+	}, [triggerPersist, props.immediatePersist, parentEntityAccessor])
 
-	if (!(value instanceof EntityAccessor)) {
+	if (!(parentEntityAccessor instanceof EntityAccessor)) {
 		return null
 	}
 
@@ -45,4 +44,4 @@ export const RemoveEntityButton = React.memo((props: RemoveEntityButtonProps) =>
 		</Button>
 	)
 })
-RemoveEntityButton.displayName = 'RemoveEntityButton'
+DeleteEntityButton.displayName = 'DeleteEntityButton'

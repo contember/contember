@@ -1,7 +1,7 @@
 import { Box, Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import * as React from 'react'
 import { Component, EntityAccessor } from '@contember/binding'
-import { EmptyMessage, RemoveEntityButton } from '../collections/helpers'
+import { EmptyMessage, DeleteEntityButton } from '../collections/helpers'
 import { RepeaterContainerProps, RepeaterItemProps } from '../collections/Repeater'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
@@ -88,7 +88,7 @@ const Row = React.memo((props: RepeaterItemProps & Omit<TableRowProps, 'children
 		{props.children}
 		{props.enableRemove !== false && (
 			<TableCell shrunk>
-				<RemoveEntityButton removalType="delete" immediatePersist={true} />
+				<DeleteEntityButton immediatePersist={true} />
 			</TableCell>
 		)}
 	</TableRow>

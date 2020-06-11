@@ -10,7 +10,6 @@ import { ContemberEmbedElement } from '../elements'
 export interface ContemberEmbedElementRendererProps extends RenderElementProps {
 	element: ContemberEmbedElement
 	entity: EntityAccessor
-	removalType: RemovalType
 	embedContentDiscriminationField: RelativeSingleField
 	embedSubBlocks: NormalizedBlocks
 }
@@ -52,7 +51,7 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 					<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
 						<ActionableBox
 							editContents={alternate || null}
-							onRemove={selected ? undefined : () => props.entity.remove?.(props.removalType)}
+							onRemove={selected ? undefined : () => props.entity.deleteEntity?.()}
 						>
 							<Box heading={selectedBlock?.label} isActive={selected} onClick={onContainerClick}>
 								<div

@@ -1,3 +1,3 @@
 export * from './CreateNewEntityButton'
+export * from './DeleteEntityButton'
 export * from './EmptyMessage'
-export * from './RemoveEntityButton'

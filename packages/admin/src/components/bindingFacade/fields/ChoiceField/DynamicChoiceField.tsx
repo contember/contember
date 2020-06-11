@@ -174,16 +174,16 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			currentValue: currentValues.length ? currentValues[0] : -1,
 			onChange: (newValue: ChoiceFieldData.ValueRepresentation) => {
 				const entity = currentlyChosenEntities[0]
-				if (entity === undefined) {
+				if (entity === undefined || !(currentValueEntity instanceof EntityAccessor)) {
 					return
 				}
 
+				// TODO field names
+				// TODO we maybe shouldn't even use currentValueEntity for hasOne connections
 				if (newValue === -1) {
-					if (entity instanceof EntityAccessor && entity.remove) {
-						entity.remove('disconnect')
-					}
+					currentValueEntity.disconnectEntityAtField?.('TODO')
 				} else {
-					entity.replaceBy?.(filteredOptions[newValue])
+					currentValueEntity.connectEntityAtField?.('TODO', filteredOptions[newValue])
 				}
 			},
 		}
@@ -193,21 +193,11 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			...baseMetadata,
 			currentValues: currentValues,
 			onChange: (optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
-				if (currentValueEntity instanceof EntityListAccessor && currentValueEntity.connectEntity) {
+				if (currentValueEntity instanceof EntityListAccessor) {
 					if (isChosen) {
-						currentValueEntity.connectEntity(optionEntities[optionKey])
+						currentValueEntity.connectEntity?.(optionEntities[optionKey])
 					} else {
-						const targetEntityId = optionEntities[optionKey].primaryKey
-
-						for (const searchedEntity of currentValueEntity) {
-							if (!(searchedEntity instanceof EntityAccessor)) {
-								continue
-							}
-							if (searchedEntity.primaryKey === targetEntityId) {
-								searchedEntity.remove?.('disconnect')
-								break
-							}
-						}
+						currentValueEntity.disconnectEntity?.(optionEntities[optionKey])
 					}
 				}
 			},

@@ -29,14 +29,6 @@ import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from 
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
-type AddEntityEventListener = EntityAccessor['addEventListener']
-type AddEntityListEventListener = EntityListAccessor['addEventListener']
-type AddFieldEventListener = FieldAccessor['addEventListener']
-type OnReplace = EntityAccessor['replaceBy']
-type OnUnlink = EntityAccessor['remove']
-type BatchEntityUpdates = EntityAccessor['batchUpdates']
-type BatchEntityListUpdates = EntityListAccessor['batchUpdates']
-
 // This only applies to the 'beforeUpdate' event:
 
 // If the listeners mutate the entity/list, other listeners may want to respond to that, which in turn may trigger
@@ -56,13 +48,6 @@ const BEFORE_UPDATE_SETTLE_LIMIT = 20
 type InternalRootStateNode = InternalEntityState | InternalEntityListState
 type InternalStateNode = InternalEntityState | InternalEntityListState | InternalFieldState
 
-// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
-// completely different contexts. Even with different fields.
-interface EntityRealm {
-	depth: number
-	onUpdate: OnEntityFieldUpdate
-}
-
 interface InternalContainerState {
 	batchUpdateDepth: number
 	hasPendingUpdate: boolean
@@ -77,8 +62,8 @@ enum InternalStateType {
 type OnEntityFieldUpdate = (state: InternalStateNode) => void
 interface InternalEntityState extends InternalContainerState {
 	type: InternalStateType.SingleEntity
-	accessor: EntityAccessor | EntityForRemovalAccessor | null
-	addEventListener: AddEntityEventListener
+	accessor: EntityAccessor
+	addEventListener: EntityAccessor.AddEntityEventListener
 	dirtyChildren: Set<InternalStateNode> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
@@ -87,15 +72,21 @@ interface InternalEntityState extends InternalContainerState {
 	fields: Map<FieldName, InternalStateNode>
 	id: string | EntityAccessor.UnpersistedEntityId
 	persistedData: AccessorTreeGenerator.InitialEntityData
-	realms: Map<EntityFieldMarkers, EntityRealm>
+
+	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
+	// completely different contexts. Even with different fields.
+	realms: Map<EntityFieldMarkers, OnEntityFieldUpdate>
 	batchUpdates: EntityAccessor.BatchUpdates
+	connectEntityAtField: EntityAccessor.ConnectEntityAtField
+	disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField
+	deleteEntity: EntityAccessor.DeleteEntity
 }
 
 type OnEntityListUpdate = (state: InternalEntityListState) => void
 interface InternalEntityListState extends InternalContainerState {
 	type: InternalStateType.EntityList
 	accessor: EntityListAccessor
-	addEventListener: AddEntityListEventListener
+	addEventListener: EntityListAccessor.AddEntityListEventListener
 	childrenKeys: Set<string>
 	dirtyChildren: Set<InternalEntityState> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
@@ -119,7 +110,7 @@ type OnFieldUpdate = (state: InternalFieldState) => void
 interface InternalFieldState {
 	type: InternalStateType.Field
 	accessor: FieldAccessor
-	addEventListener: AddFieldEventListener
+	addEventListener: FieldAccessor.AddFieldEventListener
 	errors: ErrorAccessor[]
 	eventListeners: {
 		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
@@ -274,9 +265,6 @@ class AccessorTreeGenerator {
 		entityState: InternalEntityState,
 		markers: EntityFieldMarkers,
 		onEntityFieldUpdate: OnEntityFieldUpdate,
-		onReplace: OnReplace,
-		batchUpdates: BatchEntityUpdates,
-		onUnlink?: OnUnlink,
 	): EntityAccessor {
 		const typename = entityState.persistedData
 			? entityState.persistedData instanceof Accessor
@@ -474,31 +462,31 @@ class AccessorTreeGenerator {
 			this.getSubTree,
 			entityState.errors ? entityState.errors.errors : emptyArray,
 			entityState.addEventListener,
-			batchUpdates,
-			onReplace,
-			onUnlink,
+			entityState.batchUpdates,
+			entityState.connectEntityAtField,
+			entityState.disconnectEntityAtField,
+			entityState.deleteEntity,
 		)
 	}
 
 	private initializeEntityAccessor(entityState: InternalEntityState, markers: EntityFieldMarkers): InternalEntityState {
-		const performUpdate = () => {
-			if (entityState.hasPendingUpdate) {
-				return
-			}
-			entityState.hasPendingUpdate = true
-			this.treeWideBatchUpdateDepth++
-			const realmCount = entityState.realms.size
-			let i = 1
-			for (const [, { onUpdate }] of entityState.realms) {
-				if (i++ === realmCount) {
-					this.treeWideBatchUpdateDepth--
+		const batchUpdatesImplementation: EntityAccessor.BatchUpdates = performUpdates => {
+			entityState.batchUpdateDepth++
+			const accessorBeforeUpdates = entityState.accessor
+			performUpdates(() => entityState.accessor!)
+			entityState.batchUpdateDepth--
+			if (entityState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityState.accessor) {
+				for (const [, onUpdate] of entityState.realms) {
+					onUpdate(entityState)
 				}
-				onUpdate(entityState)
 			}
 		}
-		const onUpdateProxy = (newValue: EntityAccessor | EntityForRemovalAccessor | null) => {
-			batchUpdates(getAccessor => {
-				entityState.accessor = newValue
+
+		const performMutatingOperation = (operation: () => void) => {
+			batchUpdatesImplementation(getAccessor => {
+				operation()
+
+				updateAccessorInstance()
 
 				if (
 					entityState.eventListeners.beforeUpdate === undefined ||
@@ -523,64 +511,55 @@ class AccessorTreeGenerator {
 				)
 			})
 		}
-		const onFieldUpdate = (updatedState: InternalStateNode) => {
-			const entityAccessor = entityState.accessor
-			if (!(entityAccessor instanceof EntityAccessor)) {
-				return this.rejectInvalidAccessorTree()
-			}
-			const newAccessor = new EntityAccessor(
-				entityAccessor.runtimeId,
-				entityAccessor.typename,
-				entityState.fields,
-				entityAccessor.getSubTree,
-				entityAccessor.errors,
-				entityAccessor.addEventListener,
-				entityAccessor.batchUpdates,
-				entityAccessor.replaceBy,
-				entityAccessor.remove,
-			)
 
+		const updateAccessorInstance = () => {
+			entityState.hasPendingUpdate = true
+			return (entityState.accessor = new EntityAccessor(
+				entityState.id,
+				entityState.accessor.typename,
+				entityState.fields,
+				this.getSubTree,
+				entityState.errors ? entityState.errors.errors : emptyArray,
+				entityState.addEventListener,
+				entityState.batchUpdates,
+				entityState.connectEntityAtField,
+				entityState.disconnectEntityAtField,
+				entityState.deleteEntity,
+			))
+		}
+
+		const markChildStateDirty = (updatedState: InternalStateNode) => {
 			if (entityState.dirtyChildren === undefined) {
 				entityState.dirtyChildren = new Set()
 			}
 			entityState.dirtyChildren.add(updatedState)
-			return onUpdateProxy(newAccessor)
 		}
-		const onReplace: OnReplace = replacement => onUpdateProxy(this.replaceEntity(entityState, replacement, onRemove))
-		const onRemove = (removalType: RemovalType) => {
-			// TODO update this to mean remove a hasOne child field, not the whole entity.
-			if (entityState.batchUpdateDepth !== 0) {
-				throw new BindingError(`Removing entities that are being batch updated is a no-op.`)
-			}
-			if (
-				!entityState.persistedData ||
-				entityState.persistedData instanceof EntityForRemovalAccessor ||
-				!(entityState.accessor instanceof EntityAccessor)
-			) {
-				// TODO it isn't safe to just delete it as the entity may be linked from other places too.
-				//		Just leaving it is a memory leak though.
-				//this.entityStore.delete(entityState.accessor?.key!)
-				return onUpdateProxy(null)
-			}
 
-			onUpdateProxy(new EntityForRemovalAccessor(entityState.accessor, entityState.accessor.replaceBy, removalType))
-		}
-		const batchUpdates: BatchEntityUpdates = performUpdates => {
-			entityState.batchUpdateDepth++
-			const accessorBeforeUpdates = entityState.accessor
-			performUpdates(() => {
-				const accessor = entityState.accessor
-				if (accessor instanceof EntityAccessor) {
-					return accessor
-				}
-				throw new BindingError(`The entity that was being batch-updated somehow got deleted which was a no-op.`)
+		entityState.batchUpdates = performUpdates => {
+			this.performRootTreeOperation(() => {
+				performMutatingOperation(() => {
+					batchUpdatesImplementation(performUpdates)
+				})
 			})
-			entityState.batchUpdateDepth--
-			if (entityState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityState.accessor) {
-				performUpdate()
-			}
 		}
-		entityState.accessor = this.updateFields(entityState, markers, onFieldUpdate, onReplace, batchUpdates, onRemove)
+
+		entityState.connectEntityAtField = field => {
+			throw new BindingError(`EntityAccessor.connectEntityAtField: not implemented`) // TODO
+		}
+
+		entityState.disconnectEntityAtField = field => {
+			throw new BindingError(`EntityAccessor.disconnectEntityAtField: not implemented`) // TODO
+		}
+
+		entityState.deleteEntity = () => {
+			throw new BindingError(`EntityAccessor.deleteEntity: not implemented`) // TODO
+		}
+
+		const onFieldUpdate = (updatedState: InternalStateNode) => {
+			performMutatingOperation(() => markChildStateDirty(updatedState))
+		}
+
+		entityState.accessor = this.updateFields(entityState, markers, onFieldUpdate)
 		return entityState
 	}
 
@@ -591,7 +570,7 @@ class AccessorTreeGenerator {
 			)
 		}
 
-		const batchUpdatesImplementation: BatchEntityListUpdates = performUpdates => {
+		const batchUpdatesImplementation: EntityListAccessor.BatchUpdates = performUpdates => {
 			entityListState.batchUpdateDepth++
 			const accessorBeforeUpdates = entityListState.accessor
 			performUpdates(() => entityListState.accessor!)
@@ -644,18 +623,18 @@ class AccessorTreeGenerator {
 				entityListState.disconnectEntity,
 			))
 		}
-		const markDirtyChildState = (updatedState: InternalEntityState) => {
+		const markChildStateDirty = (updatedState: InternalEntityState) => {
 			if (entityListState.dirtyChildren === undefined) {
 				entityListState.dirtyChildren = new Set()
 			}
 			entityListState.dirtyChildren.add(updatedState)
 		}
-		const onUpdateProxy: OnEntityFieldUpdate = updatedState => {
+		const onChildEntityUpdate: OnEntityFieldUpdate = updatedState => {
 			if (updatedState.type !== InternalStateType.SingleEntity) {
 				throw new BindingError(`Illegal entity list value.`)
 			}
 
-			performMutatingOperation(() => markDirtyChildState(updatedState))
+			performMutatingOperation(() => markChildStateDirty(updatedState))
 		}
 
 		entityListState.batchUpdates = performUpdates => {
@@ -667,10 +646,10 @@ class AccessorTreeGenerator {
 		}
 
 		// TODO
-		entityListState.disconnectEntity = key => {
+		entityListState.disconnectEntity = childEntityOrItsKey => {
 			this.performRootTreeOperation(() => {
 				performMutatingOperation(() => {
-					const childState = this.entityStore.get(key)
+					/*const childState = this.entityStore.get(key)
 					if (childState === undefined) {
 						throw new BindingError(`Cannot remove entity with key '${key}' as it doesn't exist.`)
 					}
@@ -682,14 +661,13 @@ class AccessorTreeGenerator {
 					const childRealm = childState.realms.get(entityListState.fieldMarkers)
 					if (childRealm === undefined) {
 						this.rejectInvalidAccessorTree()
-					}
+					}*/
 					/*
 						if (entityListState.dirtyChildren === undefined) {
 							entityListState.dirtyChildren = new Set()
 						}
 						entityListState.dirtyChildren.add(key)
 					*/
-
 					/*if (
 						!childState.persistedData ||
 						childState.persistedData instanceof EntityForRemovalAccessor ||
@@ -711,12 +689,24 @@ class AccessorTreeGenerator {
 		}
 
 		// TODO
-		entityListState.connectEntity = connectedEntity => {
-			if (!connectedEntity.existsOnServer) {
-				throw new BindingError(
-					`EntityList: attempting to connect an entity that doesn't exist on server. That is a no-op.`, // At least for now.
-				)
+		entityListState.connectEntity = entityToConnectOrItsKey => {
+			let entityKey: string
+
+			if (entityToConnectOrItsKey instanceof EntityAccessor) {
+				if (!entityToConnectOrItsKey.existsOnServer) {
+					throw new BindingError(
+						`EntityList: attempting to connect an entity that doesn't exist on server. That is a no-op.`, // At least for now.
+					)
+				}
+				entityKey = entityToConnectOrItsKey.key
+			} else {
+				entityKey = entityToConnectOrItsKey
 			}
+			const connectedState = this.entityStore.get(entityKey)
+
+			if (connectedState === undefined) {
+			}
+
 			// const newState = generateNewEntityState(typeof newEntity === 'function' ? undefined : newEntity)
 			throw new BindingError(`EntityListAccessor.connectEntity is not yet implemented.`)
 		}
@@ -724,7 +714,7 @@ class AccessorTreeGenerator {
 		entityListState.createNewEntity = initialize => {
 			entityListState.batchUpdates(() => {
 				const newState = generateNewEntityState(undefined)
-				markDirtyChildState(newState)
+				markChildStateDirty(newState)
 				initialize && newState.batchUpdates(initialize)
 			})
 		}
@@ -749,7 +739,7 @@ class AccessorTreeGenerator {
 					id,
 					this.getExistingEntityState(id),
 					entityListState.fieldMarkers,
-					onUpdateProxy,
+					onChildEntityUpdate,
 					datum,
 					childErrors,
 				),
@@ -830,7 +820,7 @@ class AccessorTreeGenerator {
 		return fieldState
 	}
 
-	private replaceEntity(
+	/*private replaceEntity(
 		original: InternalEntityState,
 		replacement: EntityAccessor,
 		onRemove?: EntityAccessor['remove'],
@@ -849,7 +839,7 @@ class AccessorTreeGenerator {
 			blueprint.replaceBy,
 			onRemove || blueprint.remove,
 		)
-	}
+	}*/
 
 	private rejectInvalidAccessorTree(): never {
 		throw new BindingError(
@@ -910,7 +900,7 @@ class AccessorTreeGenerator {
 		if (existingState === undefined) {
 			const entityState: InternalEntityState = {
 				type: InternalStateType.SingleEntity,
-				accessor: null,
+				accessor: undefined as any,
 				addEventListener: undefined as any,
 				batchUpdateDepth: 0,
 				dirtyChildren: undefined,
@@ -923,16 +913,11 @@ class AccessorTreeGenerator {
 				hasPendingUpdate: true,
 				id,
 				persistedData,
-				realms: new Map([
-					[
-						fieldMarkers,
-						{
-							depth: 0, // TODO
-							onUpdate,
-						},
-					],
-				]),
+				realms: new Map([[fieldMarkers, onUpdate]]),
 				batchUpdates: (undefined as any) as EntityAccessor.BatchUpdates,
+				connectEntityAtField: (undefined as any) as EntityAccessor.ConnectEntityAtField,
+				disconnectEntityAtField: (undefined as any) as EntityAccessor.DisconnectEntityAtField,
+				deleteEntity: (undefined as any) as EntityAccessor.DeleteEntity,
 			}
 			entityState.addEventListener = this.getAddEventListener(entityState)
 			this.entityStore.set(entityKey, entityState)
@@ -944,10 +929,7 @@ class AccessorTreeGenerator {
 		existingState.hasPendingUpdate = true
 		existingState.errors = errors
 		existingState.persistedData = persistedData
-		existingState.realms.set(fieldMarkers, {
-			depth: 0, // TODO
-			onUpdate,
-		})
+		existingState.realms.set(fieldMarkers, onUpdate)
 
 		if (existingState.dirtyChildren === undefined) {
 			existingState.dirtyChildren = new Set(existingState.fields.values())

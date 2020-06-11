@@ -34,7 +34,6 @@ export interface OverrideApplyOptions {
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlocks>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	removalType: RemovalType
 	sortableByField: RelativeSingleField
 	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
 	textBlockDiscriminant: FieldValue
@@ -55,7 +54,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		fieldElementCache,
 		normalizedLeadingFieldsRef,
 		//normalizedTrailingFieldsRef,
-		removalType,
 		sortableByField,
 		sortedEntitiesRef,
 		textBlockDiscriminant,
@@ -165,7 +163,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					setFieldBackedElementValue('leading', elementIndex, '')
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
-					sortedEntities[sortedEntityIndex].remove?.(removalType)
+					sortedEntities[sortedEntityIndex].deleteEntity?.()
 					sortedEntities.splice(sortedEntityIndex, 1)
 				}
 			}

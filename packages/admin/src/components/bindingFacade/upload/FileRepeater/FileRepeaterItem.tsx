@@ -37,7 +37,6 @@ export const FileRepeaterItem = React.memo(
 		fileDataPopulators,
 		fileKinds,
 		normalizedBlocks,
-		removalType = 'disconnect',
 		uploadingState,
 	}: FileRepeaterItemProps) => {
 		let resolvedFileKind: Partial<DiscriminatedFileUploadProps> = defaultFileKind
@@ -83,9 +82,9 @@ export const FileRepeaterItem = React.memo(
 		const onRemove = React.useCallback(
 			(e: React.MouseEvent) => {
 				e.stopPropagation()
-				entity.remove?.(removalType)
+				entity.deleteEntity?.()
 			},
-			[entity.remove, removalType],
+			[entity.deleteEntity],
 		)
 
 		return (

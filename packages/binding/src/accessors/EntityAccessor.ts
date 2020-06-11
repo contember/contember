@@ -10,7 +10,6 @@ import {
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
-	RemovalType,
 } from '../treeParameters'
 import { Accessor } from './Accessor'
 import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
@@ -32,8 +31,9 @@ class EntityAccessor extends Accessor implements Errorable, SubTreeContainer {
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: EntityAccessor.BatchUpdates,
-		public readonly replaceBy: ((replacement: EntityAccessor) => void) | undefined,
-		public readonly remove: ((removalType: RemovalType) => void) | undefined,
+		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField | undefined,
+		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField | undefined,
+		public readonly deleteEntity: EntityAccessor.DeleteEntity | undefined,
 	) {
 		super()
 		this.runtimeId = key || new EntityAccessor.UnpersistedEntityId()
@@ -214,6 +214,9 @@ namespace EntityAccessor {
 
 	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: () => EntityAccessor) => void
+	export type ConnectEntityAtField = (field: FieldName, connectedEntityOrItsKey: EntityAccessor | string) => void
+	export type DeleteEntity = () => void
+	export type DisconnectEntityAtField = (field: FieldName) => void
 	export type UpdateListener = (accessor: null | EntityAccessor | EntityForRemovalAccessor) => void
 
 	export interface EntityEventListenerMap {

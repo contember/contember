@@ -10,7 +10,6 @@ import { ContemberBlockElement } from '../elements'
 export interface ContemberBlockElementRendererProps extends RenderElementProps {
 	element: ContemberBlockElement
 	entity: EntityAccessor
-	removalType: RemovalType
 	discriminationField: RelativeSingleField
 	normalizedBlocks: NormalizedBlocks
 }
@@ -53,10 +52,7 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 			<div contentEditable={false} data-slate-editor={false}>
 				<SingleEntity accessor={props.entity}>
 					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
-					<ActionableBox
-						editContents={alternate}
-						onRemove={selected ? undefined : () => props.entity.remove?.(props.removalType)}
-					>
+					<ActionableBox editContents={alternate} onRemove={selected ? undefined : () => props.entity.deleteEntity?.()}>
 						<Box heading={selectedBlock.label} isActive={selected} onClick={onContainerClick} style={{ margin: '0' }}>
 							{selectedBlock.children}
 						</Box>

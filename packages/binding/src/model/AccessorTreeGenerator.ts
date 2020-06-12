@@ -211,14 +211,16 @@ class AccessorTreeGenerator {
 			)
 		}
 
+		const rootsWithPendingUpdates = Array.from(this.subTreeStates.values()).filter(state => state.hasPendingUpdate)
+
+		if (!rootsWithPendingUpdates.length) {
+			return
+		}
+
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
 			this.updateData?.(new TreeRootAccessor(this.getEntityByKey, this.getSubTree))
-			this.flushPendingAccessorUpdates(
-				Array.from(this.tree.subTrees.keys())
-					.map(placeholderName => this.subTreeStates.get(placeholderName)!)
-					.filter(state => state.hasPendingUpdate),
-			)
+			this.flushPendingAccessorUpdates(rootsWithPendingUpdates)
 			this.isFrozenWhileUpdating = false
 		})
 	}

@@ -7,22 +7,25 @@ import {
 	ResolverContext,
 	StaticIdentity,
 	TenantContainer,
+	TenantMigrationArgs,
 	typeDefs,
 } from '../../src'
 import { Buffer } from 'buffer'
 import { ProjectScopeFactory } from '../../src/model/authorization/ProjectScopeFactory'
 import { AclSchemaEvaluatorFactory } from '../../src/model/authorization/AclSchemaEvaluatorFactory'
 import { makeExecutableSchema } from 'graphql-tools'
-import { executeGraphQlTest } from './testGraphql'
-import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import { Acl, Schema } from '@contember/schema'
-import { createMockedMailer, ExpectedMessage } from './mailer'
+import { createMockedMailer, MockedMailer } from './mailer'
+import { dbCredentials, recreateDatabase } from './dbUtils'
+import { MigrationsRunner } from '@contember/database-migrations'
+import { graphql } from 'graphql'
+import { promises } from 'fs'
+import { join } from 'path'
 
 export interface Test {
 	query: GraphQLTestQuery
-	executes: ExpectedQuery[]
 	return: object
-	sentMails?: ExpectedMessage[]
+	sentMails?: { subject: string }[]
 }
 
 export const createUuidGenerator = () => {
@@ -55,34 +58,50 @@ const projectSchemaResolver: ProjectSchemaResolver = project => Promise.resolve(
 export const authenticatedIdentityId = testUuid(999)
 export const authenticatedApiKeyId = testUuid(998)
 
-export const executeTenantTest = async (test: Test) => {
+interface TenantTester {
+	execute(query: GraphQLTestQuery): Promise<any>
+	mailer: MockedMailer
+}
+
+const getMigrationsDir = async () => {
+	const distPath = join(__dirname, '/../../../migrations')
+	const srcPath = join(__dirname, '/../../migrations')
+	try {
+		await promises.stat(distPath)
+		return distPath
+	} catch (e) {
+		if (e.code === 'ENOENT') {
+			return srcPath
+		}
+		throw e
+	}
+}
+
+export const createTenantTester = async (): Promise<TenantTester> => {
+	const dbName = String(process.env.TEST_DB_NAME)
+	const credentials = dbCredentials(dbName)
+	const conn = await recreateDatabase(dbName)
+	await conn.end()
+	const migrationsRunner = new MigrationsRunner(credentials, 'tenant', await getMigrationsDir())
+	const providers = {
+		bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
+		bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
+		now: () => now,
+		randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length)),
+		uuid: createUuidGenerator(),
+	}
+
+	await migrationsRunner.migrate<TenantMigrationArgs>(false, {
+		credentials: {},
+		providers,
+	})
 	const mailer = createMockedMailer()
 	const tenantContainer = new TenantContainer.Factory()
-		.createBuilder(
-			{
-				database: 'foo',
-				host: 'localhost',
-				port: 5432,
-				password: '123',
-				user: 'foo',
-			},
-			{},
-			{
-				bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
-				bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
-				now: () => now,
-				randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length)),
-				uuid: createUuidGenerator(),
-			},
-			projectSchemaResolver,
-		)
-		.replaceService('connection', () =>
-			createConnectionMock(test.executes, (expected, actual, message) => {
-				expect(actual).toEqual(expected, message)
-			}),
-		)
+		.createBuilder(credentials, {}, providers, projectSchemaResolver)
 		.replaceService('mailer', () => mailer)
 		.build()
+
+	await tenantContainer.projectManager.createOrUpdateProject({ slug: 'blog', name: 'blog' })
 
 	const context: ResolverContext = createResolverContext(
 		new PermissionContext(
@@ -102,15 +121,17 @@ export const executeTenantTest = async (test: Test) => {
 			requireResolversForResolveType: false,
 		},
 	})
-	await executeGraphQlTest({
-		context: context,
-		query: typeof test.query === 'string' ? test.query : test.query.query,
-		queryVariables: typeof test.query === 'string' ? undefined : test.query.variables,
-		return: test.return,
-		schema: schema,
-	})
-	for (const email of test.sentMails || []) {
-		mailer.expectMessage(email)
+
+	return {
+		async execute(query: GraphQLTestQuery): Promise<any> {
+			return await graphql(
+				schema,
+				typeof query === 'string' ? query : query.query,
+				null,
+				context,
+				typeof query === 'string' ? undefined : query.variables,
+			)
+		},
+		mailer,
 	}
-	mailer.expectEmpty()
 }

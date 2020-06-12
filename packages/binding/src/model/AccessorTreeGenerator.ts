@@ -1073,6 +1073,8 @@ class AccessorTreeGenerator {
 			if (!state.hasPendingUpdate) {
 				continue
 			}
+			state.hasPendingUpdate = false
+
 			if (state.eventListeners.update !== undefined) {
 				for (const handler of state.eventListeners.update) {
 					// TS can't quite handle the polymorphism here but this is fine.
@@ -1096,7 +1098,6 @@ class AccessorTreeGenerator {
 				default:
 					assertNever(state)
 			}
-			state.hasPendingUpdate = false
 		}
 	}
 }

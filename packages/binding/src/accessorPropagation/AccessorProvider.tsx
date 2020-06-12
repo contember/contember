@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { EntityAccessor, EntityForRemovalAccessor } from '../accessors'
+import { EntityAccessor } from '../accessors'
 import { EntityKeyContext } from './EntityKeyContext'
 
 export interface EntityProviderProps {
-	accessor: EntityAccessor | EntityForRemovalAccessor
+	accessor: EntityAccessor
 	children: React.ReactNode
 }
 

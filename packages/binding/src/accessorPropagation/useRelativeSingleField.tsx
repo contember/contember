@@ -1,9 +1,11 @@
+import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useParentEntityAccessor } from '../accessorPropagation'
+import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { SugaredRelativeSingleField } from '../treeParameters'
 import { FieldValue } from '../treeParameters/primitives'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
+import { useNonKeyedAccessorUpdateSubscription } from './useNonKeyedAccessorUpdateSubscription'
 
 function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
@@ -14,11 +16,24 @@ function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produ
 function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
 ): FieldAccessor<Persisted, Produced> | undefined {
-	const entity = useParentEntityAccessor()
 	const relativeSingleField = useDesugaredRelativeSingleField(sugaredRelativeSingleField)
-	return React.useMemo(() => {
-		return relativeSingleField ? entity.getRelativeSingleField<Persisted, Produced>(relativeSingleField) : undefined
-	}, [entity, relativeSingleField])
+	useConstantValueInvariant(
+		!!relativeSingleField,
+		'useRelativeSingleField: cannot alternate between providing and omitting the argument.',
+	)
+
+	const entityKey = useEntityKey()
+	const getEntityByKey = useGetEntityByKey()
+	const getField = React.useCallback(() => {
+		const parent = getEntityByKey(entityKey)
+		return parent.getRelativeSingleField<Persisted, Produced>(relativeSingleField!)
+	}, [entityKey, getEntityByKey, relativeSingleField])
+
+	if (relativeSingleField) {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		return useNonKeyedAccessorUpdateSubscription<Persisted, Produced>(getField)
+	}
+	return undefined
 }
 
 export { useRelativeSingleField }

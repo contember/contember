@@ -1,10 +1,14 @@
 import * as React from 'react'
-import { EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
+import { EntityListAccessor, FieldAccessor } from '../accessors'
+import { FieldValue } from '../treeParameters/primitives'
 
 /**
  * It is VERY IMPORTANT for the parameter to be referentially stable!
  */
-function useNonKeyedAccessorUpdateSubscription(getFieldAccessor: () => FieldAccessor): FieldAccessor
+function useNonKeyedAccessorUpdateSubscription<
+	Persisted extends FieldValue = FieldValue,
+	Produced extends Persisted = Persisted
+>(getFieldAccessor: () => FieldAccessor<Persisted, Produced>): FieldAccessor<Persisted, Produced>
 function useNonKeyedAccessorUpdateSubscription(getEntityListAccessor: () => EntityListAccessor): EntityListAccessor
 function useNonKeyedAccessorUpdateSubscription<A extends FieldAccessor | EntityListAccessor>(getAccessor: () => A): A {
 	// This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js

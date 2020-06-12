@@ -1071,17 +1071,22 @@ class AccessorTreeGenerator {
 					state.accessor && handler(state.accessor as any)
 				}
 			}
-			if (state.type === InternalStateType.Field) {
-				// Do nothing
-			} else if (state.type === InternalStateType.EntityList || state.type === InternalStateType.SingleEntity) {
-				if (state.dirtyChildren !== undefined) {
-					for (const dirtyChildState of state.dirtyChildren) {
-						agenda.push(dirtyChildState)
+			switch (state.type) {
+				case InternalStateType.SingleEntity:
+				case InternalStateType.EntityList: {
+					if (state.dirtyChildren !== undefined) {
+						for (const dirtyChildState of state.dirtyChildren) {
+							agenda.push(dirtyChildState)
+						}
+						state.dirtyChildren = undefined
 					}
-					state.dirtyChildren = undefined
+					break
 				}
-			} else {
-				assertNever(state)
+				case InternalStateType.Field:
+					// Do nothing
+					break
+				default:
+					assertNever(state)
 			}
 			state.hasPendingUpdate = false
 		}

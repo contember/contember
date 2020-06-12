@@ -42,6 +42,7 @@ export const EntityListSubTree = Component(
 			}
 			return MarkerFactory.createEntityListMarkerSubTree(environment, props, fields)
 		},
+		generateSyntheticChildren: props => <EntityList {...props} accessor={0 as any} />,
 	},
 	'EntityListSubTree',
 ) as <ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => React.ReactElement

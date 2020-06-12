@@ -37,6 +37,7 @@ export const SingleEntitySubTree = Component(
 			}
 			return MarkerFactory.createSingleEntityMarkerSubTree(environment, props, fields)
 		},
+		generateSyntheticChildren: props => <SingleEntity {...props} accessor={0 as any} />,
 	},
 	'SingleEntitySubTree',
 ) as <EntityProps>(pros: SingleEntitySubTreeProps<EntityProps>) => React.ReactElement

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { AccessorProvider } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
+import { Component } from './Component'
 
 export interface SingleEntityBaseProps {
 	accessor: EntityAccessor
@@ -16,7 +17,7 @@ export type SingleEntityProps<EntityProps> = SingleEntityBaseProps &
 		  }
 	)
 
-export function SingleEntity<EntityProps>(props: SingleEntityProps<EntityProps>) {
+export const SingleEntity = Component(<EntityProps extends {}>(props: SingleEntityProps<EntityProps>) => {
 	if ('entityComponent' in props && props.entityComponent) {
 		return React.createElement(props.entityComponent, {
 			...props.entityProps!,
@@ -25,4 +26,4 @@ export function SingleEntity<EntityProps>(props: SingleEntityProps<EntityProps>)
 		})
 	}
 	return <AccessorProvider accessor={props.accessor}>{props.children}</AccessorProvider>
-}
+}, 'SingleEntity') as <EntityProps extends {}>(props: SingleEntityProps<EntityProps>) => React.ReactElement

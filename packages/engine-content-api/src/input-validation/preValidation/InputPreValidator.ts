@@ -81,7 +81,8 @@ export class InputPreValidator {
 		const nodeData = acceptEveryFieldVisitor(this.model, entity, {
 			visitColumn: (entity, column) => {
 				const value = data[column.name] as Input.ColumnValue | undefined
-				return this.columnValueResolver.getDefaultValidationValue({ entity, column, input: value })
+				const validationValue = this.columnValueResolver.getDefaultValidationValue({ entity, column, input: value })
+				return validationValue === undefined ? null : validationValue
 			},
 			visitHasOne: (entity, relation) => {
 				const value = data[relation.name] as Input.CreateOneRelationInput | undefined

@@ -11,7 +11,7 @@ const getValueOrLiteral = (
 	return getValueFromContext(argument.path ? ValidationContext.changeContext(context, argument.path) : context)
 }
 
-const getValueFromContext = (context: ValidationContext.AnyContext): any => {
+const getValueFromContext = (context: ValidationContext.AnyContext): ValidationContext.ValueType | undefined => {
 	if (ValidationContext.isUndefinedNodeContext(context)) {
 		return undefined
 	}
@@ -76,7 +76,14 @@ const validatorEvaluators: {
 		return ruleResult
 	},
 	pattern: (context: ValidationContext.AnyContext, patternArgument: Validation.LiteralArgument<[string, string]>) => {
-		return new RegExp(patternArgument.value[0], patternArgument.value[1]).test(getValueFromContext(context))
+		const value = getValueFromContext(context)
+		if (value === undefined || value === null) {
+			return false
+		}
+		if (typeof value !== 'string') {
+			throw new Error(`Cannot apply pattern validation on ${typeof value}`)
+		}
+		return new RegExp(patternArgument.value[0], patternArgument.value[1]).test(value)
 	},
 	equals: (context: ValidationContext.AnyContext, other: Validation.LiteralArgument | Validation.PathArgument) => {
 		return getValueFromContext(context) === getValueOrLiteral(context, other)

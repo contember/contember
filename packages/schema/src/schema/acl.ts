@@ -25,8 +25,10 @@ namespace Acl {
 	// 	fieldName: string
 	// }
 
+	export type VariableValue = string | number | (string | number)[]
+
 	export interface VariablesMap {
-		[name: string]: string | number | (string | number)[]
+		[name: string]: VariableValue
 	}
 
 	export type PredicateVariable = string //{ name: string }

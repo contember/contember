@@ -20,6 +20,7 @@ import {
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
 	useEnvironment,
+	useGetSubTree,
 	useMutationState,
 	useParentEntityAccessor,
 } from '@contember/binding'
@@ -56,6 +57,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	const parentEntity = useParentEntityAccessor()
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
+	const getSubTree = useGetSubTree()
 
 	const desugaredRelativePath = React.useMemo<RelativeSingleEntity | RelativeEntityList>(() => {
 		if (props.arity === 'single') {
@@ -85,7 +87,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			environment,
 		)
 	}, [environment, props])
-	const subTreeData = parentEntity.getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath))
+	const subTreeData = getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath))
 
 	const arity = props.arity
 	const currentValueEntity: EntityListAccessor | EntityAccessor = React.useMemo(() => {

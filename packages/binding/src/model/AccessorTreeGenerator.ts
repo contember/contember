@@ -180,9 +180,6 @@ class AccessorTreeGenerator {
 					: initialData === undefined
 					? undefined
 					: initialData[placeholderName],
-				newState => {
-					newState.hasPendingUpdate = true
-				},
 				this.errorTreeRoot,
 			)
 			this.subTreeStates.set(placeholderName, subTreeState)
@@ -228,21 +225,12 @@ class AccessorTreeGenerator {
 	private initializeSubTree(
 		tree: MarkerSubTree,
 		data: ReceivedData<undefined> | SubTreeAccessor,
-		updateData: (state: InternalRootStateNode) => void,
 		errors?: ErrorsPreprocessor.ErrorTreeRoot,
 	): InternalRootStateNode {
 		const errorNode = errors === undefined ? undefined : errors[tree.placeholderName]
 
 		const onUpdate = (updatedState: InternalStateNode) => {
-			if (subTreeState.dirtyChildren === undefined) {
-				subTreeState.dirtyChildren = new Set()
-			}
-			subTreeState.dirtyChildren.add(updatedState as any)
-
-			if (!subTreeState.hasPendingUpdate) {
-				subTreeState.hasPendingUpdate = true
-				return updateData(subTreeState)
-			}
+			updatedState.hasPendingUpdate = true
 		}
 
 		let subTreeState: InternalEntityState | InternalEntityListState
@@ -330,10 +318,7 @@ class AccessorTreeGenerator {
 					initialData = this.initialData[field.placeholderName]
 				}
 
-				entityState.fields.set(
-					field.placeholderName,
-					this.initializeSubTree(field, initialData, onEntityFieldUpdate, undefined),
-				)
+				entityState.fields.set(field.placeholderName, this.initializeSubTree(field, initialData, this.errorTreeRoot))
 			} else if (field instanceof ReferenceMarker) {
 				for (const referencePlaceholder in field.references) {
 					const reference = field.references[referencePlaceholder]
@@ -465,7 +450,6 @@ class AccessorTreeGenerator {
 			// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 			// keep in sync two copies of the same data. TS hides the extra info anyway.
 			entityState.fields,
-			this.getSubTree,
 			entityState.errors ? entityState.errors.errors : emptyArray,
 			entityState.addEventListener,
 			entityState.batchUpdates,
@@ -523,7 +507,6 @@ class AccessorTreeGenerator {
 				entityState.id,
 				entityState.accessor.typename,
 				entityState.fields,
-				this.getSubTree,
 				entityState.errors ? entityState.errors.errors : emptyArray,
 				entityState.addEventListener,
 				entityState.batchUpdates,

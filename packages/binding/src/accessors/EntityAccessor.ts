@@ -16,17 +16,14 @@ import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
-import { GetSubTree } from './GetSubTree'
-import { SubTreeContainer } from './SubTreeContainer'
 
-class EntityAccessor extends Accessor implements Errorable, SubTreeContainer {
+class EntityAccessor extends Accessor implements Errorable {
 	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
 
 	public constructor(
 		key: string | EntityAccessor.UnpersistedEntityId,
 		public readonly typename: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
-		public readonly getSubTree: GetSubTree,
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: EntityAccessor.BatchUpdates,

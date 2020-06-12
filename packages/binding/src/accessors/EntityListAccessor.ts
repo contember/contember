@@ -1,6 +1,5 @@
 import { Accessor } from './Accessor'
 import { EntityAccessor } from './EntityAccessor'
-import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
@@ -33,7 +32,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 		return [...this._filteredEntities]
 	}
 
-	public *[Symbol.iterator](): Generator<EntityAccessor | EntityForRemovalAccessor> {
+	public *[Symbol.iterator](): Generator<EntityAccessor> {
 		for (const id of this.entityIds) {
 			yield this.getEntityByKey(id)
 		}

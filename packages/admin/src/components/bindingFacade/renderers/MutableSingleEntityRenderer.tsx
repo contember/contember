@@ -1,9 +1,9 @@
-import { Component, EntityAccessor, EntityForRemovalAccessor, SingleEntity } from '@contember/binding'
+import { Component, EntityAccessor, SingleEntity } from '@contember/binding'
 import * as React from 'react'
 import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
 
 export interface MutableSingleEntityRendererProps extends MutableContentLayoutRendererProps {
-	accessor: EntityAccessor | EntityForRemovalAccessor
+	accessor: EntityAccessor
 }
 
 export const MutableSingleEntityRenderer = Component<MutableSingleEntityRendererProps>(

@@ -6,21 +6,18 @@ import {
 	BoxedUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { EntityAccessor } from './EntityAccessor'
-import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { EntityListAccessor } from './EntityListAccessor'
 
-export type SubTreeAccessor = EntityAccessor | EntityForRemovalAccessor | EntityListAccessor
+export type SubTreeAccessor = EntityAccessor | EntityListAccessor
 
 export interface GetSubTree {
-	(parameters: BoxedQualifiedSingleEntity): EntityAccessor | EntityForRemovalAccessor
+	(parameters: BoxedQualifiedSingleEntity): EntityAccessor
 	(parameters: BoxedQualifiedEntityList): EntityListAccessor
 	(parameters: BoxedUnconstrainedQualifiedSingleEntity): EntityAccessor
 	(parameters: BoxedUnconstrainedQualifiedEntityList): EntityListAccessor
 
 	// The following overloads are really just combinations of the above combined.
-	(parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity):
-		| EntityAccessor
-		| EntityForRemovalAccessor
+	(parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity): EntityAccessor
 	(parameters: BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList): EntityListAccessor
-	(parameters: MarkerSubTreeParameters): EntityAccessor | EntityForRemovalAccessor | EntityListAccessor
+	(parameters: MarkerSubTreeParameters): EntityAccessor | EntityListAccessor
 }

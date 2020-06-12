@@ -12,7 +12,6 @@ import {
 	RelativeSingleField,
 } from '../treeParameters'
 import { Accessor } from './Accessor'
-import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
@@ -208,7 +207,7 @@ namespace EntityAccessor {
 	export interface FieldDatum {
 		accessor: NestedAccessor | null
 	}
-	export type NestedAccessor = EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | FieldAccessor
+	export type NestedAccessor = EntityAccessor | EntityListAccessor | FieldAccessor
 
 	export type FieldData = Map<FieldName, FieldDatum>
 
@@ -217,7 +216,7 @@ namespace EntityAccessor {
 	export type ConnectEntityAtField = (field: FieldName, connectedEntityOrItsKey: EntityAccessor | string) => void
 	export type DeleteEntity = () => void
 	export type DisconnectEntityAtField = (field: FieldName) => void
-	export type UpdateListener = (accessor: null | EntityAccessor | EntityForRemovalAccessor) => void
+	export type UpdateListener = (accessor: EntityAccessor) => void
 
 	export interface EntityEventListenerMap {
 		beforeUpdate: BatchUpdatesHandler

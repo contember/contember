@@ -135,7 +135,7 @@ class AccessorTreeGenerator {
 		const entity = this.entityStore.get(key)
 
 		if (entity === undefined) {
-			throw new BindingError(`Trying to retrieve a non-existent entity.`)
+			throw new BindingError(`Trying to retrieve a non-existent entity: key '${key}' was not found.`)
 		}
 		return entity.accessor
 	}

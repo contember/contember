@@ -2,6 +2,7 @@
 // export * from './GetEntityByKeyContext' // Deliberately not exporting it
 // export * from './GetSubTreeContext' // Deliberately not exporting it
 // export * from './useEntityAccessorUpdateSubscription' // Deliberately not exporting it
+// export * from './useNonKeyedAccessorUpdateSubscription' // Deliberately not exporting it
 export * from './AccessorProvider'
 export * from './EntityKeyProvider'
 export * from './EnvironmentContext'

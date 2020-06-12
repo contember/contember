@@ -40,11 +40,11 @@ export const useEntityAccessorUpdateSubscription = (getEntityAccessor: () => Ent
 			}
 
 			setState(prevState => {
-				if (prevState.accessorKey !== newAccessor.key || prevState.getEntityAccessor !== getEntityAccessor) {
-					return prevState
-				}
-
-				if (prevState.accessor === newAccessor) {
+				if (
+					prevState.accessorKey !== newAccessor.key ||
+					prevState.getEntityAccessor !== getEntityAccessor ||
+					prevState.accessor === newAccessor
+				) {
 					return prevState
 				}
 

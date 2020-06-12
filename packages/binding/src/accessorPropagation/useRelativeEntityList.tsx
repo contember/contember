@@ -4,7 +4,7 @@ import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { EntityListAccessor } from '../accessors'
 import { SugaredRelativeEntityList } from '../treeParameters'
 import { useDesugaredRelativeEntityList } from './useDesugaredRelativeEntityList'
-import { useNonKeyedAccessorUpdateSubscription } from './useNonKeyedAccessorUpdateSubscription'
+import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 
 function useRelativeEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): EntityListAccessor
 function useRelativeEntityList(
@@ -28,7 +28,7 @@ function useRelativeEntityList(
 
 	if (relativeEntityList) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return useNonKeyedAccessorUpdateSubscription(getEntityList)
+		return useAccessorUpdateSubscription(getEntityList)
 	}
 	return undefined
 }

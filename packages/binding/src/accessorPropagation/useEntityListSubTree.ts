@@ -8,7 +8,7 @@ import {
 } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
 import { useGetSubTree } from './useGetSubTree'
-import { useNonKeyedAccessorUpdateSubscription } from './useNonKeyedAccessorUpdateSubscription'
+import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 
 export type UseEntityListSubTreeProps =
 	| ({
@@ -33,5 +33,5 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 	}, [environment, qualifiedEntityList])
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 
-	return useNonKeyedAccessorUpdateSubscription(getAccessor)
+	return useAccessorUpdateSubscription(getAccessor)
 }

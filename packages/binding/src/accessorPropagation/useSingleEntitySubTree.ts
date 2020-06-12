@@ -6,7 +6,7 @@ import {
 	SugaredQualifiedSingleEntity,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
-import { useEntityAccessorUpdateSubscription } from './useEntityAccessorUpdateSubscription'
+import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useEnvironment } from './useEnvironment'
 import { useGetSubTree } from './useGetSubTree'
 
@@ -35,5 +35,5 @@ export const useSingleEntitySubTree = (qualifiedSingleEntity: UseSingleEntitySub
 	}, [environment, qualifiedSingleEntity])
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 
-	return useEntityAccessorUpdateSubscription(getAccessor)
+	return useAccessorUpdateSubscription(getAccessor)
 }

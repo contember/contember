@@ -5,7 +5,7 @@ import { FieldAccessor } from '../accessors'
 import { SugaredRelativeSingleField } from '../treeParameters'
 import { FieldValue } from '../treeParameters/primitives'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
-import { useNonKeyedAccessorUpdateSubscription } from './useNonKeyedAccessorUpdateSubscription'
+import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 
 function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
@@ -31,7 +31,7 @@ function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produ
 
 	if (relativeSingleField) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return useNonKeyedAccessorUpdateSubscription<Persisted, Produced>(getField)
+		return useAccessorUpdateSubscription<Persisted, Produced>(getField)
 	}
 	return undefined
 }

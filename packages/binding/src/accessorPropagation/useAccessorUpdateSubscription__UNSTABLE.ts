@@ -5,13 +5,13 @@ import { FieldValue } from '../treeParameters/primitives'
 /**
  * It is VERY IMPORTANT for the parameter to be referentially stable!
  */
-function useAccessorUpdateSubscription<
+function useAccessorUpdateSubscription__UNSTABLE<
 	Persisted extends FieldValue = FieldValue,
 	Produced extends Persisted = Persisted
 >(getFieldAccessor: () => FieldAccessor<Persisted, Produced>): FieldAccessor<Persisted, Produced>
-function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor): EntityAccessor
-function useAccessorUpdateSubscription(getEntityListAccessor: () => EntityListAccessor): EntityListAccessor
-function useAccessorUpdateSubscription<A extends FieldAccessor | EntityListAccessor | EntityAccessor>(
+function useAccessorUpdateSubscription__UNSTABLE(getEntityAccessor: () => EntityAccessor): EntityAccessor
+function useAccessorUpdateSubscription__UNSTABLE(getEntityListAccessor: () => EntityListAccessor): EntityListAccessor
+function useAccessorUpdateSubscription__UNSTABLE<A extends FieldAccessor | EntityListAccessor | EntityAccessor>(
 	getAccessor: () => A,
 ): A {
 	// This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
@@ -64,4 +64,4 @@ function useAccessorUpdateSubscription<A extends FieldAccessor | EntityListAcces
 
 	return accessor
 }
-export { useAccessorUpdateSubscription }
+export { useAccessorUpdateSubscription__UNSTABLE }

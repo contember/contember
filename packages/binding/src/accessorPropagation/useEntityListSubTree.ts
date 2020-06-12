@@ -6,9 +6,9 @@ import {
 	SugaredQualifiedEntityList,
 	SugaredUnconstrainedQualifiedEntityList,
 } from '../treeParameters'
+import { useAccessorUpdateSubscription__UNSTABLE } from './useAccessorUpdateSubscription__UNSTABLE'
 import { useEnvironment } from './useEnvironment'
 import { useGetSubTree } from './useGetSubTree'
-import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 
 export type UseEntityListSubTreeProps =
 	| ({
@@ -33,5 +33,5 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 	}, [environment, qualifiedEntityList])
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 
-	return useAccessorUpdateSubscription(getAccessor)
+	return useAccessorUpdateSubscription__UNSTABLE(getAccessor)
 }

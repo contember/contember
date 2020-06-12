@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
 import { SugaredRelativeSingleEntity } from '../treeParameters'
-import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
+import { useAccessorUpdateSubscription__UNSTABLE } from './useAccessorUpdateSubscription__UNSTABLE'
 import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity'
 
 function useRelativeSingleEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity): EntityAccessor
@@ -30,7 +30,7 @@ function useRelativeSingleEntity(
 
 	if (relativeSingleEntity) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return useAccessorUpdateSubscription(getEntity)
+		return useAccessorUpdateSubscription__UNSTABLE(getEntity)
 	}
 	return undefined
 }

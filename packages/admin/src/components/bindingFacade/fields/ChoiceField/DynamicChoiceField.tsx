@@ -19,6 +19,7 @@ import {
 	SugaredQualifiedFieldList,
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
+	useAccessorUpdateSubscription__UNSTABLE,
 	useEnvironment,
 	useGetSubTree,
 	useMutationState,
@@ -87,7 +88,11 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			environment,
 		)
 	}, [environment, props])
-	const subTreeData = getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath))
+	const getSubTreeData = React.useCallback(() => getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath)), [
+		desugaredOptionPath,
+		getSubTree,
+	])
+	const subTreeData = useAccessorUpdateSubscription__UNSTABLE(getSubTreeData)
 
 	const arity = props.arity
 	const currentValueEntity: EntityListAccessor | EntityAccessor = React.useMemo(() => {

@@ -71,7 +71,10 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 					renderSelected: props.renderSelected,
 					slugField: props.slugField,
 				}}
-			/>
+			>
+				{labelFactory}
+				<Field field={props.slugField} />
+			</EntityListSubTree>
 		</DataBindingProvider>
 	)
 })

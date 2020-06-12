@@ -809,27 +809,6 @@ class AccessorTreeGenerator {
 		return fieldState
 	}
 
-	/*private replaceEntity(
-		original: InternalEntityState,
-		replacement: EntityAccessor,
-		onRemove?: EntityAccessor['remove'],
-	): EntityAccessor {
-		// TODO: we also need to update the callbacks inside replacement.data
-		const blueprint =
-			original.accessor instanceof EntityAccessor ? original.accessor : original.accessor!.entityAccessor
-		return new EntityAccessor(
-			replacement.runtimeId,
-			blueprint.typename,
-			original.fields,
-			replacement.getSubTree,
-			blueprint.errors,
-			blueprint.addEventListener,
-			blueprint.batchUpdates,
-			blueprint.replaceBy,
-			onRemove || blueprint.remove,
-		)
-	}*/
-
 	private rejectInvalidAccessorTree(): never {
 		throw new BindingError(
 			`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`,

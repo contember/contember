@@ -1,6 +1,6 @@
 import 'jasmine'
 import { ApiTester, createRunMigrationEvent, EventSequence, GQL } from '@contember/engine-api-tester'
-import { EventType } from '../../../../src/schema'
+import { DiffEventType } from '../../../../src/schema'
 import { TIMEOUT } from '../../../src/constants'
 import Acl from '@contember/schema/dist/src/schema/acl'
 import SystemPermissionsLevel = Acl.SystemPermissionsLevel
@@ -80,7 +80,7 @@ describe('system api - releaseTree', () => {
 			const diff2 = await tester.system.diff('preview')
 
 			expect(diff2.events.length).toBe(1)
-			expect(diff2.events[0].type).toBe(EventType.Create)
+			expect(diff2.events[0].type).toBe(DiffEventType.Create)
 			await tester.cleanup()
 		},
 		TIMEOUT,

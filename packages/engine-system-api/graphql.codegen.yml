@@ -5,6 +5,7 @@ config:
   immutableTypes: "1"
   scalars:
     DateTime: Date
+    Json: object
 generates:
   ./src/schema/index.ts:
     config:

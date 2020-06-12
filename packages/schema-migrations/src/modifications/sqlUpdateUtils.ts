@@ -15,3 +15,15 @@ export const createEventTrigger = (builder: MigrationBuilder, tableName: Name, p
 		functionParams: primaryColumns,
 	})
 }
+
+export const createEventStatementTrigger = (builder: MigrationBuilder, tableName: Name) => {
+	builder.createTrigger(tableName, 'log_event_statement', {
+		when: 'AFTER',
+		operation: ['INSERT', 'UPDATE', 'DELETE'],
+		level: 'STATEMENT',
+		function: {
+			schema: 'system',
+			name: 'statement_trigger_event',
+		},
+	})
+}

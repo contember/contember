@@ -1,11 +1,14 @@
 import { DiffQueryResolver, StagesQueryResolver } from './query'
-import { Event, EventType, Resolvers } from '../schema'
+import { HistoryEvent, HistoryEventType, DiffEvent, DiffEventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
-import { GraphQLResolveInfo, GraphQLScalarType, Kind } from 'graphql'
+import { GraphQLInt, GraphQLResolveInfo, GraphQLScalarType, Kind, ValueNode } from 'graphql'
 import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
 import { ReleaseTreeMutationResolver } from './mutation/ReleaseTreeMutationResolver'
 import { HistoryQueryResolver } from './query/HistoryQueryResolver'
+import { HistoryEventTypeResolver } from './types/HistoryEventTypeResolver'
+import Maybe from 'graphql/tsutils/Maybe'
+import { JSONValue } from '../utils/json'
 
 class ResolverFactory {
 	public constructor(
@@ -16,6 +19,7 @@ class ResolverFactory {
 		private readonly rebaseMutationResolver: RebaseAllMutationResolver,
 		private readonly migrateMutationResolver: MigrateMutationResolver,
 		private readonly releaseTreeMutationResolver: ReleaseTreeMutationResolver,
+		private readonly historyEventTypeResolver: HistoryEventTypeResolver,
 	) {}
 
 	create(): Resolvers {
@@ -36,17 +40,69 @@ class ResolverFactory {
 					return null
 				},
 			}),
-			Event: {
-				__resolveType: (obj: Event) => {
+			Json: new GraphQLScalarType({
+				name: 'Json',
+				description: 'Json custom scalar type',
+				serialize(value) {
+					return value
+				},
+				parseValue(value) {
+					return value
+				},
+				parseLiteral(ast, variables) {
+					const parseLiteral = (ast: ValueNode, variables: Maybe<{ [key: string]: any }>): JSONValue => {
+						switch (ast.kind) {
+							case Kind.STRING:
+								return ast.value
+							case Kind.BOOLEAN:
+								return ast.value
+							case Kind.FLOAT:
+								return parseFloat(ast.value)
+							case Kind.INT:
+								return Number(ast.value)
+							case Kind.LIST:
+								return ast.values.map(it => parseLiteral(it, variables))
+							case Kind.OBJECT:
+								return Object.fromEntries(ast.fields.map(it => [it.name.value, parseLiteral(it.value, variables)]))
+							case Kind.NULL:
+								return null
+							case Kind.VARIABLE:
+								return variables?.[ast.name.value] || undefined
+							default:
+								throw new TypeError()
+						}
+					}
+					return parseLiteral(ast, variables)
+				},
+			}),
+			DiffEvent: {
+				__resolveType: (obj: DiffEvent) => {
 					switch (obj.type) {
-						case EventType.Create:
-							return 'CreateEvent'
-						case EventType.Update:
-							return 'UpdateEvent'
-						case EventType.Delete:
-							return 'DeleteEvent'
-						case EventType.RunMigration:
-							return 'RunMigrationEvent'
+						case DiffEventType.Create:
+							return 'DiffCreateEvent'
+						case DiffEventType.Update:
+							return 'DiffUpdateEvent'
+						case DiffEventType.Delete:
+							return 'DiffDeleteEvent'
+						case null:
+						case undefined:
+							return null
+						default:
+							return assertNever(obj.type)
+					}
+				},
+			},
+			HistoryEvent: {
+				__resolveType: (obj: HistoryEvent) => {
+					switch (obj.type) {
+						case HistoryEventType.Create:
+							return 'HistoryCreateEvent'
+						case HistoryEventType.Update:
+							return 'HistoryUpdateEvent'
+						case HistoryEventType.Delete:
+							return 'HistoryDeleteEvent'
+						case HistoryEventType.RunMigration:
+							return 'HistoryRunMigrationEvent'
 						case null:
 						case undefined:
 							return null
@@ -72,6 +128,14 @@ class ResolverFactory {
 					this.rebaseMutationResolver.rebaseAll(parent, args, context, info),
 				migrate: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.migrateMutationResolver.migrate(parent, args, context, info),
+			},
+			HistoryDeleteEvent: {
+				oldValues: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.historyEventTypeResolver.oldValues(parent, args, context),
+			},
+			HistoryUpdateEvent: {
+				oldValues: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.historyEventTypeResolver.oldValues(parent, args, context),
 			},
 		}
 	}

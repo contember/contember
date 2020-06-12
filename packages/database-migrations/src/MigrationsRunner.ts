@@ -1,7 +1,8 @@
-import { DatabaseCredentials, Connection, wrapIdentifier } from '@contember/database'
+import { DatabaseCredentials } from '@contember/database'
 import migrate from './runner'
 import { ClientBase } from 'pg'
 import { RunnerOptionClient, RunnerOptionUrl } from 'node-pg-migrate/dist/types'
+import { createDatabaseIfNotExists } from './helpers'
 
 export class MigrationsRunner {
 	constructor(
@@ -32,15 +33,6 @@ export class MigrationsRunner {
 	}
 
 	private async createDatabaseIfNotExists() {
-		const connection = new Connection({ ...this.db, database: 'postgres' }, {})
-		const result = await connection.query('SELECT 1 FROM "pg_database" WHERE "datname" = ?', [this.db.database])
-
-		if (result.rowCount === 0) {
-			// eslint-disable-next-line no-console
-			console.warn(`Database ${this.db.database} does not exist, attempting to create it...`)
-			await connection.query(`CREATE DATABASE ${wrapIdentifier(this.db.database)}`)
-		}
-
-		await connection.end()
+		await createDatabaseIfNotExists(this.db)
 	}
 }

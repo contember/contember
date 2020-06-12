@@ -14,11 +14,12 @@ import {
 	DeletedRowReferenceDependencyBuilder,
 	DependencyBuilderList,
 	DiffBuilder,
-	EventResponseBuilder,
+	DiffEventResponseBuilder,
 	EntitiesSelector,
 	EventApplier,
 	EventsRebaser,
 	ExecutedMigrationsResolver,
+	HistoryEventResponseBuilder,
 	MigrationExecutor,
 	MigrationsResolverFactory,
 	PermissionsFactory,
@@ -49,6 +50,7 @@ import { ClientBase } from 'pg'
 import { ReleaseTreeMutationResolver } from './resolvers/mutation/ReleaseTreeMutationResolver'
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
 import { HistoryQueryResolver } from './resolvers/query/HistoryQueryResolver'
+import { HistoryEventTypeResolver } from './resolvers/types/HistoryEventTypeResolver'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -161,15 +163,16 @@ export class SystemContainerFactory {
 
 			.addService('stagesQueryResolver', () => new StagesQueryResolver())
 
-			.addService('eventResponseBuilder', () => new EventResponseBuilder(container.identityFetcher))
+			.addService('diffEventResponseBuilder', () => new DiffEventResponseBuilder(container.identityFetcher))
 			.addService(
 				'diffQueryResolver',
-				({ eventResponseBuilder, diffBuilder }) => new DiffQueryResolver(eventResponseBuilder, diffBuilder),
+				({ diffEventResponseBuilder, diffBuilder }) => new DiffQueryResolver(diffEventResponseBuilder, diffBuilder),
 			)
+			.addService('historyEventResponseBuilder', () => new HistoryEventResponseBuilder(container.identityFetcher))
 			.addService(
 				'historyQueryResolver',
-				({ eventResponseBuilder, schemaVersionBuilder }) =>
-					new HistoryQueryResolver(eventResponseBuilder, schemaVersionBuilder),
+				({ historyEventResponseBuilder, schemaVersionBuilder }) =>
+					new HistoryQueryResolver(historyEventResponseBuilder, schemaVersionBuilder),
 			)
 			.addService(
 				'releaseMutationResolver',
@@ -182,6 +185,7 @@ export class SystemContainerFactory {
 			)
 			.addService('rebaseMutationResolver', ({ rebaseExecutor }) => new RebaseAllMutationResolver(rebaseExecutor))
 			.addService('migrateMutationResolver', ({ projectMigrator }) => new MigrateMutationResolver(projectMigrator))
+			.addService('historyEventTypeResolver', () => new HistoryEventTypeResolver())
 			.addService(
 				'systemResolvers',
 				({
@@ -192,6 +196,7 @@ export class SystemContainerFactory {
 					rebaseMutationResolver,
 					migrateMutationResolver,
 					releaseTreeMutationResolver,
+					historyEventTypeResolver,
 				}) =>
 					new ResolverFactory(
 						stagesQueryResolver,
@@ -201,6 +206,7 @@ export class SystemContainerFactory {
 						rebaseMutationResolver,
 						migrateMutationResolver,
 						releaseTreeMutationResolver,
+						historyEventTypeResolver,
 					).create(),
 			)
 			.addService(

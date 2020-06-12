@@ -4,16 +4,17 @@ import { QueryResolver } from '../Resolver'
 import { HistoryErrorCode, HistoryResponse, QueryHistoryArgs } from '../../schema'
 import {
 	AuthorizationActions,
-	EventResponseBuilder,
+	HistoryEventResponseBuilder,
 	HistoryQuery,
 	SchemaVersionBuilder,
 	StageBySlugQuery,
 } from '../../model'
 import { getEntity } from '@contember/schema-utils'
+import { UserInputError } from 'apollo-server-errors'
 
 export class HistoryQueryResolver implements QueryResolver<'history'> {
 	constructor(
-		private readonly eventResponseBuilder: EventResponseBuilder,
+		private readonly eventResponseBuilder: HistoryEventResponseBuilder,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
@@ -46,13 +47,25 @@ export class HistoryQueryResolver implements QueryResolver<'history'> {
 				  }))
 				: undefined
 
-			const history = await db.queryHandler.fetch(new HistoryQuery(stage.event_id, filter))
+			const sinceFilter = (() => {
+				if (args.sinceEvent && args.sinceTime) {
+					throw new UserInputError('You can use either sinceEvent or sinceTime but not both.')
+				}
+				if (args.sinceEvent) {
+					return { eventId: args.sinceEvent }
+				}
+				if (args.sinceTime) {
+					return { date: args.sinceTime }
+				}
+				return undefined
+			})()
+			const history = await db.queryHandler.fetch(new HistoryQuery(stage.event_id, filter, sinceFilter))
 
 			return {
 				ok: true,
 				errors: [],
 				result: {
-					events: await this.eventResponseBuilder.buildResponse(history.map(it => ({ ...it, dependencies: [] }))),
+					events: await this.eventResponseBuilder.buildResponse(history),
 				},
 			}
 		})

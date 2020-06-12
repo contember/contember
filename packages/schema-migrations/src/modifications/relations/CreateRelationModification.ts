@@ -4,7 +4,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { ContentEvent } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { createEventTrigger } from '../sqlUpdateUtils'
+import { createEventStatementTrigger, createEventTrigger } from '../sqlUpdateUtils'
 import { isIt } from '../../utils/isIt'
 
 const getPrimaryType = (entity: Model.Entity): string => {
@@ -100,6 +100,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 					},
 				)
 				createEventTrigger(builder, relation.joiningTable.tableName, primaryColumns)
+				createEventStatementTrigger(builder, relation.joiningTable.tableName)
 			},
 			visitManyHasManyInversed: () => {},
 		})

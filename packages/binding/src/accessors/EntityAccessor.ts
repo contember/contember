@@ -184,7 +184,7 @@ class EntityAccessor extends Accessor implements Errorable, SubTreeContainer {
 	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor | null {
 		const record = this.fieldData.get(placeholderName)
 		if (record === undefined) {
-			throw new BindingError('EntityAccessor: unknown field')
+			throw new BindingError(`EntityAccessor: unknown field '${placeholderName}'.`)
 		}
 		return record.accessor
 	}

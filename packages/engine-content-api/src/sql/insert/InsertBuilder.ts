@@ -42,28 +42,28 @@ export default class InsertBuilder {
 	}
 
 	public async execute(db: Client): Promise<InsertResult> {
-		const resolvedData = await this.getResolvedData()
-		const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
-			(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
-			{},
-		)
-		const qb = DbInsertBuilder.create()
-			.with('root_', qb => {
-				return resolvedData.reduce(
-					(qb, value) =>
-						qb.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName),
-					qb,
-				)
-			})
-			.into(this.entity.tableName)
-			.values(insertData)
-			.from(qb => {
-				qb = qb.from('root_')
-				return this.whereBuilder.build(qb, this.entity, new Path([]), this.where)
-			})
-			.returning(this.entity.primaryColumn)
-
 		try {
+			const resolvedData = await this.getResolvedData()
+			const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
+				(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
+				{},
+			)
+			const qb = DbInsertBuilder.create()
+				.with('root_', qb => {
+					return resolvedData.reduce(
+						(qb, value) =>
+							qb.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName),
+						qb,
+					)
+				})
+				.into(this.entity.tableName)
+				.values(insertData)
+				.from(qb => {
+					qb = qb.from('root_')
+					return this.whereBuilder.build(qb, this.entity, new Path([]), this.where)
+				})
+				.returning(this.entity.primaryColumn)
+
 			const returning = await qb.execute(db)
 			const result = returning.length === 1 ? returning[0] : null
 			this.resolver(result)

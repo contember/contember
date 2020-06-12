@@ -50,62 +50,63 @@ export default class UpdateBuilder {
 	}
 
 	public async execute(db: Client): Promise<UpdateResult> {
-		const resolvedData = await resolveRowData(this.rowData)
-		if (Object.keys(resolvedData).length === 0) {
-			this.resolver(null)
-			return { values: [], affectedRows: null, executed: false }
-		}
+		try {
+			const resolvedData = await resolveRowData(this.rowData)
+			if (Object.keys(resolvedData).length === 0) {
+				this.resolver(null)
+				return { values: [], affectedRows: null, executed: false }
+			}
 
-		const qb = DbUpdateBuilder.create()
-			.with('newData_', qb => {
-				qb = resolvedData.reduce(
-					(qb, value) =>
-						qb.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName),
-					qb,
+			const qb = DbUpdateBuilder.create()
+				.with('newData_', qb => {
+					qb = resolvedData.reduce(
+						(qb, value) =>
+							qb.select(expr => expr.selectValue(value.resolvedValue as DbValue, value.columnType), value.columnName),
+						qb,
+					)
+					const columns = new Set(resolvedData.map(it => it.columnName))
+					const allColumns: string[] = Object.values(
+						acceptEveryFieldVisitor(this.schema, this.entity, {
+							visitColumn: (entity, column) => column.columnName,
+							visitManyHasOne: (entity, relation) => relation.joiningColumn.columnName,
+							visitOneHasOneOwner: (entity, relation) => relation.joiningColumn.columnName,
+							visitManyHasManyInversed: () => null,
+							visitManyHasManyOwner: () => null,
+							visitOneHasOneInversed: () => null,
+							visitOneHasMany: () => null,
+						}),
+					).filter((it): it is string => it !== null)
+
+					const remainingColumns = allColumns.filter(it => !columns.has(it))
+					qb = qb.from(this.entity.tableName, 'root_')
+
+					qb = remainingColumns.reduce((qb, columnName) => qb.select(['root_', columnName]), qb)
+
+					qb = this.whereBuilder.build(qb, this.entity, new Path([]), {
+						and: [this.uniqueWhere, this.oldWhere],
+					})
+
+					return qb
+				})
+				.table(this.entity.tableName)
+				.values(
+					resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
+						(result: object, item) => ({
+							...result,
+							[item.columnName]: expr => expr.select(['newData_', item.columnName]),
+						}),
+						{},
+					),
 				)
-				const columns = new Set(resolvedData.map(it => it.columnName))
-				const allColumns: string[] = Object.values(
-					acceptEveryFieldVisitor(this.schema, this.entity, {
-						visitColumn: (entity, column) => column.columnName,
-						visitManyHasOne: (entity, relation) => relation.joiningColumn.columnName,
-						visitOneHasOneOwner: (entity, relation) => relation.joiningColumn.columnName,
-						visitManyHasManyInversed: () => null,
-						visitManyHasManyOwner: () => null,
-						visitOneHasOneInversed: () => null,
-						visitOneHasMany: () => null,
-					}),
-				).filter((it): it is string => it !== null)
-
-				const remainingColumns = allColumns.filter(it => !columns.has(it))
-				qb = qb.from(this.entity.tableName, 'root_')
-
-				qb = remainingColumns.reduce((qb, columnName) => qb.select(['root_', columnName]), qb)
-
-				qb = this.whereBuilder.build(qb, this.entity, new Path([]), {
-					and: [this.uniqueWhere, this.oldWhere],
+				.from(qb => {
+					qb = qb.from('newData_')
+					const col1 = tuple(this.entity.tableName, this.entity.primaryColumn)
+					const col2 = tuple('newData_', this.entity.primaryColumn)
+					qb = qb.where(expr => expr.compareColumns(col1, Operator.eq, col2))
+					qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
+					return qb
 				})
 
-				return qb
-			})
-			.table(this.entity.tableName)
-			.values(
-				resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
-					(result: object, item) => ({
-						...result,
-						[item.columnName]: expr => expr.select(['newData_', item.columnName]),
-					}),
-					{},
-				),
-			)
-			.from(qb => {
-				qb = qb.from('newData_')
-				const col1 = tuple(this.entity.tableName, this.entity.primaryColumn)
-				const col2 = tuple('newData_', this.entity.primaryColumn)
-				qb = qb.where(expr => expr.compareColumns(col1, Operator.eq, col2))
-				qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
-				return qb
-			})
-		try {
 			const result = await qb.execute(db)
 			this.resolver(result)
 			return { values: resolvedData, affectedRows: result, executed: true }

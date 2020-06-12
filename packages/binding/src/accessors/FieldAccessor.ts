@@ -11,12 +11,10 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly currentValue: Persisted | null,
 		public readonly persistedValue: Persisted | null,
 		public readonly defaultValue: Persisted | undefined,
-		public readonly isTouchedBy: (agent: string) => boolean,
 		public readonly errors: ErrorAccessor[],
+		public readonly isTouchedBy: FieldAccessor.IsTouchedBy,
 		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Persisted, Produced>,
-		public readonly updateValue:
-			| ((newValue: Produced | null, options?: FieldAccessor.UpdateOptions) => void)
-			| undefined,
+		public readonly updateValue: FieldAccessor.UpdateValue<Produced> | undefined,
 	) {
 		super()
 	}
@@ -55,8 +53,13 @@ namespace FieldAccessor {
 		agent?: string
 	}
 
+	export type IsTouchedBy = (agent: string) => boolean
 	export type UpdateListener<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted> = (
 		accessor: FieldAccessor<Persisted, Produced>,
+	) => void
+	export type UpdateValue<Produced extends FieldValue = FieldValue> = (
+		newValue: Produced | null,
+		options?: FieldAccessor.UpdateOptions,
 	) => void
 
 	export interface FieldEventListenerMap<

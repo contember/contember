@@ -122,6 +122,8 @@ interface InternalFieldState {
 	persistedValue: FieldValue
 	placeholderName: FieldName
 	touchLog: Map<string, boolean> | undefined
+	isTouchedBy: FieldAccessor.IsTouchedBy
+	updateValue: FieldAccessor.UpdateValue
 }
 
 class AccessorTreeGenerator {
@@ -288,8 +290,8 @@ class AccessorTreeGenerator {
 						idValue,
 						idValue,
 						undefined,
-						returnFalse, // IDs cannot be updated, and thus they cannot be touched either
 						emptyArray, // There cannot be errors associated with the id, right? If so, we should probably handle them at the Entity level.
+						returnFalse, // IDs cannot be updated, and thus they cannot be touched either
 						() => noop, // It won't ever fire but at the same time it makes other code simpler.
 						undefined, // IDs cannot be updated
 					),
@@ -305,6 +307,8 @@ class AccessorTreeGenerator {
 					touchLog: undefined,
 					hasPendingUpdate: false,
 					persistedValue: idValue,
+					isTouchedBy: returnFalse,
+					updateValue: undefined as any,
 				})
 				continue
 			}
@@ -771,7 +775,7 @@ class AccessorTreeGenerator {
 	}
 
 	private initializeFieldAccessor(fieldState: InternalFieldState): InternalFieldState {
-		const isTouchedBy = (agent: string) =>
+		fieldState.isTouchedBy = (agent: string) =>
 			fieldState.touchLog === undefined ? false : fieldState.touchLog.get(agent) || false
 		const createNewInstance = (value: FieldValue) =>
 			new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
@@ -779,31 +783,27 @@ class AccessorTreeGenerator {
 				value,
 				fieldState.persistedValue,
 				fieldState.fieldMarker.defaultValue,
-				isTouchedBy,
 				fieldState.errors,
+				fieldState.isTouchedBy,
 				fieldState.addEventListener,
-				onChange,
+				fieldState.updateValue,
 			)
-		const onChange = function(
-			this: FieldAccessor,
+		fieldState.updateValue = (
 			newValue: Scalar | GraphQlBuilder.Literal,
 			{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
-		) {
-			if (this !== fieldState.accessor) {
-				throw new BindingError(
-					`Trying to update a field value via a stale FieldAccessor. Perhaps you're dealing with stale props?`,
-				)
-			}
-			if (fieldState.touchLog === undefined) {
-				fieldState.touchLog = new Map()
-			}
-			fieldState.touchLog.set(agent, true)
-			if (newValue === this.currentValue) {
-				return
-			}
-			fieldState.hasPendingUpdate = true
-			fieldState.accessor = createNewInstance(newValue)
-			fieldState.onUpdate(fieldState)
+		) => {
+			this.performRootTreeOperation(() => {
+				if (fieldState.touchLog === undefined) {
+					fieldState.touchLog = new Map()
+				}
+				fieldState.touchLog.set(agent, true)
+				if (newValue === fieldState.accessor.currentValue) {
+					return
+				}
+				fieldState.hasPendingUpdate = true
+				fieldState.accessor = createNewInstance(newValue)
+				fieldState.onUpdate(fieldState)
+			})
 		}
 
 		let fieldValue: FieldValue
@@ -873,6 +873,8 @@ class AccessorTreeGenerator {
 				},
 				touchLog: undefined,
 				hasPendingUpdate: true,
+				updateValue: (undefined as any) as FieldAccessor.UpdateValue,
+				isTouchedBy: (undefined as any) as FieldAccessor.IsTouchedBy,
 			}
 			state.addEventListener = this.getAddEventListener(state)
 			return state

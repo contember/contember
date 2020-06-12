@@ -179,7 +179,7 @@ export class CreateInputVisitor<Result>
 		return Promise.all(results)
 	}
 
-	private verifyOperations(input: any) {
+	private verifyOperations(input: object) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
 		if (keys.length !== 1 || !['create', 'connect'].includes(keys[0])) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')

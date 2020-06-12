@@ -23,7 +23,7 @@ class VariableInjector {
 		})
 	}
 
-	private createCondition(variable: any): Input.Condition {
+	private createCondition(variable: Acl.VariableValue | undefined): Input.Condition {
 		if (variable === undefined) {
 			return { never: true }
 		}

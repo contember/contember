@@ -1,4 +1,4 @@
-const arrayEquals = (a: any, b: any): boolean => {
+const arrayEquals = (a: unknown[] | null, b: unknown[] | null): boolean => {
 	if (a === b) {
 		return true
 	}

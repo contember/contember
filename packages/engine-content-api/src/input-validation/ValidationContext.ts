@@ -8,7 +8,7 @@ namespace ValidationContext {
 	}
 
 	export type NodeType = Value.Object
-	type ValueType = Value.FieldValue
+	export type ValueType = Value.FieldValue
 
 	export interface NodeContext extends ValidationContext {
 		node: NodeType

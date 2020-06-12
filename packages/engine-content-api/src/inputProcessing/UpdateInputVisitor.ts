@@ -197,7 +197,7 @@ export class UpdateInputVisitor<Result>
 		return results
 	}
 
-	private verifyOperations(input: any) {
+	private verifyOperations(input: object) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
 		if (keys.length !== 1 || !['create', 'connect', 'delete', 'disconnect', 'update', 'upsert'].includes(keys[0])) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')

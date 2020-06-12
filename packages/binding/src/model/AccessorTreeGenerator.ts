@@ -482,6 +482,7 @@ class AccessorTreeGenerator {
 			performUpdates(() => entityState.accessor!)
 			entityState.batchUpdateDepth--
 			if (entityState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityState.accessor) {
+				updateAccessorInstance()
 				for (const [, onUpdate] of entityState.realms) {
 					onUpdate(entityState)
 				}
@@ -491,8 +492,6 @@ class AccessorTreeGenerator {
 		const performMutatingOperation = (operation: () => void) => {
 			batchUpdatesImplementation(getAccessor => {
 				operation()
-
-				updateAccessorInstance()
 
 				if (
 					entityState.eventListeners.beforeUpdate === undefined ||
@@ -562,7 +561,10 @@ class AccessorTreeGenerator {
 		}
 
 		const onFieldUpdate = (updatedState: InternalStateNode) => {
-			performMutatingOperation(() => markChildStateDirty(updatedState))
+			performMutatingOperation(() => {
+				updateAccessorInstance()
+				markChildStateDirty(updatedState)
+			})
 		}
 
 		entityState.accessor = this.updateFields(entityState, markers, onFieldUpdate)
@@ -582,6 +584,7 @@ class AccessorTreeGenerator {
 			performUpdates(() => entityListState.accessor!)
 			entityListState.batchUpdateDepth--
 			if (entityListState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityListState.accessor) {
+				updateAccessorInstance()
 				entityListState.onUpdate(entityListState)
 			}
 		}
@@ -589,8 +592,6 @@ class AccessorTreeGenerator {
 		const performMutatingOperation = (operation: () => void) => {
 			batchUpdatesImplementation(getAccessor => {
 				operation()
-
-				updateAccessorInstance()
 
 				if (
 					entityListState.eventListeners.beforeUpdate === undefined ||
@@ -640,7 +641,10 @@ class AccessorTreeGenerator {
 				throw new BindingError(`Illegal entity list value.`)
 			}
 
-			performMutatingOperation(() => markChildStateDirty(updatedState))
+			performMutatingOperation(() => {
+				updateAccessorInstance()
+				markChildStateDirty(updatedState)
+			})
 		}
 
 		entityListState.batchUpdates = performUpdates => {

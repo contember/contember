@@ -181,17 +181,13 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					getAccessor().getRelativeEntityList(desugaredEntityList),
 					sortableByField,
 					sortedEntityIndex,
-					(getInnerAccessor, newEntityKey) => {
-						const newEntity = getInnerAccessor().getEntityByKey(newEntityKey) as EntityAccessor
+					getNewEntity => {
+						const newEntity = getNewEntity()
 						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
 						if (preprocess) {
-							;(getInnerAccessor().getEntityByKey(newEntityKey) as EntityAccessor).batchUpdates(preprocess)
+							getNewEntity().batchUpdates(preprocess)
 						}
-						sortedEntities.splice(
-							sortedEntityIndex,
-							0,
-							getInnerAccessor().getEntityByKey(newEntityKey) as EntityAccessor,
-						)
+						sortedEntities.splice(sortedEntityIndex, 0, getNewEntity())
 					},
 				)
 				return sortedEntities[sortedEntityIndex]

@@ -11,9 +11,9 @@ import { sortEntities } from './sortEntities'
 
 export interface SortedEntities {
 	entities: EntityAccessor[]
-	prependNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
-	appendNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
-	addNewAtIndex: (index: number, preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
+	prependNew: EntityListAccessor.CreateNewEntity
+	appendNew: EntityListAccessor.CreateNewEntity
+	addNewAtIndex: (index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void
 	moveEntity: (oldIndex: number, newIndex: number) => void
 }
 
@@ -23,7 +23,7 @@ const addNewAtIndexImplementation = (
 	desugaredSortableByField: RelativeSingleField | undefined,
 	sortedEntitiesCount: number,
 	index: number,
-	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
+	preprocess?: EntityAccessor.BatchUpdatesHandler,
 ) => {
 	if (!entityList.createNewEntity) {
 		return throwNonWritableError(entityList)
@@ -48,7 +48,7 @@ export const useSortedEntities = (
 	}, [desugaredSortableByField, entityList])
 
 	const addNewAtIndex = React.useCallback<SortedEntities['addNewAtIndex']>(
-		(index: number, preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => {
+		(index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => {
 			addNewAtIndexImplementation(
 				'addNewAtIndex',
 				entityList,

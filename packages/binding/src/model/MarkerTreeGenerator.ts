@@ -2,8 +2,15 @@ import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@cont
 import * as React from 'react'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
-import { ConnectionMarker, EntityFieldMarkers, FieldMarker, Marker, MarkerSubTree, ReferenceMarker } from '../markers'
-import { MarkerTreeRoot } from '../markers/MarkerTreeRoot'
+import {
+	ConnectionMarker,
+	EntityFieldMarkers,
+	FieldMarker,
+	Marker,
+	MarkerSubTree,
+	MarkerTreeRoot,
+	ReferenceMarker,
+} from '../markers'
 import { FieldName } from '../treeParameters'
 import { assertNever, Hashing } from '../utils'
 

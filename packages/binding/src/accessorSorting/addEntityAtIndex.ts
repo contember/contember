@@ -8,7 +8,7 @@ export const addEntityAtIndex = (
 	entityList: EntityListAccessor,
 	sortableByField: RelativeSingleField,
 	index: number,
-	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
+	preprocess?: EntityAccessor.BatchUpdatesHandler,
 ) => {
 	const createNewEntity = entityList.createNewEntity
 
@@ -32,7 +32,7 @@ export const addEntityAtIndex = (
 				return throwNonWritableError(sortableField.fieldName)
 			}
 
-			preprocess && preprocess(getListAccessor, newlyAdded.key)
+			preprocess?.(getNewlyAdded)
 		})
 	})
 }

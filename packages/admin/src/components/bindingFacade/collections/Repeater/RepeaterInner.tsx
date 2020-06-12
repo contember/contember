@@ -1,6 +1,7 @@
 import {
 	Component,
 	EntityListAccessor,
+	RemovalType,
 	SingleEntity,
 	SugaredField,
 	SugaredFieldProps,
@@ -67,20 +68,23 @@ export const RepeaterInner = Component(
 			[],
 		)
 
+		const removalType: RemovalType = props.removalType ?? 'delete'
+
 		if (props.sortableBy === undefined) {
 			return (
 				<Container
 					{...props.containerComponentExtraProps!}
 					{...props}
+					removalType={removalType}
 					isEmpty={isEmpty}
-					addNew={appendNew}
+					createNewEntity={appendNew}
 					entities={entities}
 				>
 					{entities.map(entity => (
 						<SingleEntity accessor={entity} key={entity.key}>
 							<Item
 								{...props.itemComponentExtraProps!}
-								removalType={props.removalType}
+								removalType={removalType}
 								canBeRemoved={itemRemovingEnabled}
 								dragHandleComponent={undefined}
 							>
@@ -109,8 +113,9 @@ export const RepeaterInner = Component(
 				<Container
 					{...props.containerComponentExtraProps!}
 					{...props}
+					removalType={removalType}
 					isEmpty={isEmpty}
-					addNew={appendNew}
+					createNewEntity={appendNew}
 					entities={entities}
 				>
 					{entities.map((entity, i) => (
@@ -118,7 +123,7 @@ export const RepeaterInner = Component(
 							<SingleEntity accessor={entity}>
 								<Item
 									{...props.itemComponentExtraProps!}
-									removalType={props.removalType}
+									removalType={removalType}
 									canBeRemoved={itemRemovingEnabled}
 									dragHandleComponent={useDragHandle ? sortableHandle : undefined}
 								>

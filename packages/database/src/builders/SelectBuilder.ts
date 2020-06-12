@@ -51,6 +51,13 @@ class SelectBuilder<Result = SelectBuilder.Result>
 		})
 	}
 
+	public unionDistinct(expression: SubQueryExpression): SelectBuilder<Result> {
+		return this.withOption('union', {
+			type: 'distinct',
+			literal: createSubQueryLiteralFactory(expression),
+		})
+	}
+
 	public from(tableName: string | Literal, alias?: string): SelectBuilder<Result> {
 		return this.withOption('from', [...(this.options.from || []), [tableName, alias]])
 	}

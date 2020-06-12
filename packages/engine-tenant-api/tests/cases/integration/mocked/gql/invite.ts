@@ -10,9 +10,15 @@ export const inviteMutation = (variables: {
 	query: GQL`mutation($email: String!, $projectSlug: String!, $memberships: [MembershipInput!]!) {
 		invite(email: $email, projectSlug: $projectSlug, memberships: $memberships) {
 			ok
+			errors {
+				code
+			}
 			result {
 				person {
 					id
+					identity {
+						id
+					}
 				}
 			}
 		}

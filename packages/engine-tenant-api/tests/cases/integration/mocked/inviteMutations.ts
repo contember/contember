@@ -69,9 +69,13 @@ describe('Invite mutations', () => {
 				data: {
 					invite: {
 						ok: true,
+						errors: [],
 						result: {
 							person: {
 								id: personId,
+								identity: {
+									id: identityId,
+								},
 							},
 						},
 					},

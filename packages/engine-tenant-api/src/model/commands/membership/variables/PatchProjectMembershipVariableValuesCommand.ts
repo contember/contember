@@ -1,5 +1,5 @@
 import { Command } from '../../Command'
-import { ConflictActionType, InsertBuilder } from '@contember/database'
+import { ConflictActionType, InsertBuilder, Literal } from '@contember/database'
 
 class PatchProjectMembershipVariableValuesCommand implements Command<string[]> {
 	constructor(
@@ -21,14 +21,13 @@ class PatchProjectMembershipVariableValuesCommand implements Command<string[]> {
 					.select(expr => expr.raw('jsonb_array_elements_text(value)'), 'value'),
 			)
 			.with('filtered', qb => qb.from('current').where(expr => expr.not(expr => expr.in('value', [...this.remove]))))
-			.with('new', qb =>
+			.with('new_list', qb =>
 				qb
+					.select(['filtered', 'value'])
 					.from('filtered')
-					.select(
-						expr => expr.raw(`coalesce(jsonb_agg(filtered.value), '[]'::jsonb) || to_jsonb(?::TEXT[])`, this.append),
-						'value',
-					),
+					.unionDistinct(qb => qb.select(expr => expr.raw('*')).from(new Literal('unnest(?::text[])', [this.append]))),
 			)
+			.with('new', qb => qb.from('new_list').select(expr => expr.raw(`jsonb_agg(value)`), 'value'))
 			.into('project_membership_variable')
 			.from(qb => qb.from('new'))
 			.values({

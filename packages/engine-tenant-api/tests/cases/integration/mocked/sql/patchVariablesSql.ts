@@ -16,9 +16,11 @@ export const patchVariablesSql = (args: {
     		WHERE "membership_id" = ? AND "variable" = ?),
 		"filtered" AS
 		    (SELECT * FROM "current" WHERE NOT(${args.removeValues ? '"value" in (?)' : 'false'})),
-		"new" AS
-		    (SELECT coalesce(jsonb_agg(filtered.value), '[]'::JSONB) || to_jsonb(?::TEXT[]) AS "value"
-		    FROM "filtered")
+		"new_list" AS
+		    (SELECT "filtered"."value"
+		    FROM "filtered"
+		        UNION DISTINCT ( SELECT * FROM unnest(?::TEXT[]))),
+		"new" AS (SELECT jsonb_agg(value) AS "value" FROM "new_list")
 		INSERT INTO "tenant"."project_membership_variable"
 		    ("id", "membership_id", "variable", "value")
 		    SELECT ?, ?, ?, "new"."value"

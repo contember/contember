@@ -721,7 +721,7 @@ class AccessorTreeGenerator {
 
 		const generateNewEntityState = (datum: AccessorTreeGenerator.InitialEntityData): InternalEntityState => {
 			const id = this.resolveOrCreateEntityId(datum)
-			const key = typeof id === 'string' ? id : id.value
+			const key = this.idToKey(id)
 			let childErrors
 
 			if (entityListState.errors && datum) {
@@ -895,7 +895,7 @@ class AccessorTreeGenerator {
 		persistedData: AccessorTreeGenerator.InitialEntityData,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 	): InternalEntityState {
-		const entityKey = typeof id === 'string' ? id : id.value
+		const entityKey = this.idToKey(id)
 
 		if (existingState === undefined) {
 			const entityState: InternalEntityState = {
@@ -942,7 +942,7 @@ class AccessorTreeGenerator {
 	}
 
 	private getExistingEntityState(id: string | EntityAccessor.UnpersistedEntityId): InternalEntityState | undefined {
-		return this.entityStore.get(typeof id === 'string' ? id : id.value)
+		return this.entityStore.get(this.idToKey(id))
 	}
 
 	private resolveOrCreateEntityListState(
@@ -1025,6 +1025,13 @@ class AccessorTreeGenerator {
 				? data.runtimeId
 				: data[PRIMARY_KEY_NAME]
 			: new EntityAccessor.UnpersistedEntityId()
+	}
+
+	private idToKey(id: string | EntityAccessor.UnpersistedEntityId) {
+		if (typeof id === 'string') {
+			return id
+		}
+		return id.value
 	}
 
 	private getAddEventListener(state: {

@@ -15,7 +15,7 @@ export const addEntityAtIndex = (
 	if (!createNewEntity) {
 		return throwNonWritableError(entityList)
 	}
-	const sortedEntities = sortEntities(entityList.getFilteredEntities(), sortableByField)
+	const sortedEntities = sortEntities(Array.from(entityList), sortableByField)
 	entityList.batchUpdates(getListAccessor => {
 		createNewEntity(getNewlyAdded => {
 			let newlyAdded = getNewlyAdded()

@@ -97,7 +97,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 		assertNever(arity)
 	}, [parentEntity, desugaredRelativePath, arity])
 
-	const filteredOptions = subTreeData.getFilteredEntities()
+	const filteredOptions = Array.from(subTreeData)
 
 	const optionEntities = React.useMemo(() => {
 		const entities: EntityAccessor[] = []
@@ -108,7 +108,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	}, [desugaredOptionPath, filteredOptions])
 
 	const currentlyChosenEntities =
-		currentValueEntity instanceof EntityListAccessor ? currentValueEntity.getFilteredEntities() : [currentValueEntity]
+		currentValueEntity instanceof EntityListAccessor ? Array.from(currentValueEntity) : [currentValueEntity]
 
 	const currentValues = React.useMemo(() => {
 		const values: ChoiceFieldData.ValueRepresentation[] = []

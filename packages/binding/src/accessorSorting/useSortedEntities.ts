@@ -43,8 +43,7 @@ export const useSortedEntities = (
 ): SortedEntities => {
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableByField)
 	const sortedEntities = React.useMemo(() => {
-		const filteredEntities = entityList.getFilteredEntities()
-		return sortEntities(filteredEntities, desugaredSortableByField)
+		return sortEntities(Array.from(entityList), desugaredSortableByField)
 	}, [desugaredSortableByField, entityList])
 
 	const addNewAtIndex = React.useCallback<SortedEntities['addNewAtIndex']>(

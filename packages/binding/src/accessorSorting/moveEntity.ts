@@ -9,12 +9,7 @@ export const moveEntity = (
 	oldIndex: number,
 	newIndex: number,
 ) => {
-	const order = computeEntityOrder(
-		sortEntities(entityList.getFilteredEntities(), sortByField),
-		sortByField,
-		oldIndex,
-		newIndex,
-	)
+	const order = computeEntityOrder(sortEntities(Array.from(entityList), sortByField), sortByField, oldIndex, newIndex)
 	entityList.batchUpdates((getAccessor: () => EntityListAccessor) => {
 		let listAccessor: EntityListAccessor = getAccessor()
 		for (const entity of listAccessor) {

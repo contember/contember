@@ -6,8 +6,7 @@ export const repairEntitiesOrder = (
 	entityList: EntityListAccessor,
 	sortedEntities: EntityAccessor[],
 ) => {
-	entityList.batchUpdates(getAccessor => {
-		let listAccessor: EntityListAccessor = getAccessor()
+	entityList.batchUpdates(() => {
 		for (let i = 0, len = sortedEntities.length; i < len; i++) {
 			const entity = sortedEntities[i]
 			const orderField = entity.getRelativeSingleField(sortableByField)
@@ -16,7 +15,6 @@ export const repairEntitiesOrder = (
 				// TODO ideally, this condition should just be `orderField.currentValue === null`
 				// We should generally try to touch the indexes less
 				orderField.updateValue?.(i)
-				listAccessor = getAccessor()
 			}
 		}
 	})

@@ -30,7 +30,7 @@ export function EntityList<ListProps, EntityProps>(props: EntityListProps<ListPr
 	}
 	return (
 		<>
-			{props.accessor.getFilteredEntities().map(entity => {
+			{Array.from(props.accessor, entity => {
 				if ('entityComponent' in props && props.entityComponent) {
 					return (
 						<SingleEntity

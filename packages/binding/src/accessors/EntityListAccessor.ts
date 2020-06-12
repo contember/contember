@@ -4,11 +4,9 @@ import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
 class EntityListAccessor extends Accessor implements Errorable {
-	private _filteredEntities: EntityAccessor[] | undefined
-
 	public constructor(
 		public readonly getEntityByKey: EntityListAccessor.GetEntityByKey,
-		private readonly entityIds: Set<string>, // See EntityAccessor.key
+		private readonly entityKeys: Set<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
@@ -19,21 +17,8 @@ class EntityListAccessor extends Accessor implements Errorable {
 		super()
 	}
 
-	/**
-	 * ⚠ Important ⚠
-	 * The indexes of the resulting array *MIGHT NOT* correspond to the indexes of the original entities array.
-	 */
-	public getFilteredEntities(): EntityAccessor[] {
-		if (this._filteredEntities === undefined) {
-			this._filteredEntities = Array.from(this.entityIds, this.getEntityByKey).filter(
-				(entity): entity is EntityAccessor => entity instanceof EntityAccessor,
-			)
-		}
-		return [...this._filteredEntities]
-	}
-
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
-		for (const id of this.entityIds) {
+		for (const id of this.entityKeys) {
 			yield this.getEntityByKey(id)
 		}
 	}

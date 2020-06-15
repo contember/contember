@@ -758,7 +758,12 @@ class AccessorTreeGenerator {
 						`but it doesn't exist.`,
 				)
 			}
-			connectedState.isScheduledForDeletion = false
+			if (connectedState.isScheduledForDeletion) {
+				// As far as the other realms are concerned, this entity is deleted. We don't want to just make it re-appear
+				// for them just because some other random relation decided to connect it.
+				connectedState.realms.clear()
+				connectedState.isScheduledForDeletion = false
+			}
 
 			if (entityListState.plannedRemovals) {
 				// If the entity was previously scheduled for removal, undo that.

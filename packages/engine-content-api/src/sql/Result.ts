@@ -98,6 +98,7 @@ export enum NothingToDoReason {
 	emptyRelation = 'emptyRelation',
 	alreadyExists = 'alreadyExists',
 	aborted = 'aborted',
+	alreadyDeleted = 'alreadyDeleted',
 }
 
 export class MutationNothingToDo implements MutationResultInterface {

@@ -8,7 +8,7 @@ import SelectBuilderFactory from './select/SelectBuilderFactory'
 import PredicatesInjector from '../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
-import DeleteExecutor from './delete/DeleteExecutor'
+import { DeletedEntitiesStorage, DeleteExecutor } from './delete'
 import { MutationResultList } from './Result'
 import { Updater } from './update/Updater'
 import { Inserter } from './insert/Inserter'
@@ -18,6 +18,7 @@ import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 
 class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
+	public readonly deletedEntities = new DeletedEntitiesStorage()
 
 	constructor(
 		private readonly schema: Model.Schema,

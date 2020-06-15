@@ -25,9 +25,20 @@ import {
 	PlaceholderGenerator,
 	ReferenceMarker,
 } from '../markers'
-import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
+import { ExpectedEntityCount, FieldName, FieldValue, Scalar } from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
+import {
+	InternalEntityListState,
+	InternalEntityState,
+	InternalFieldState,
+	InternalRootStateNode,
+	InternalStateNode,
+	InternalStateType,
+	OnEntityFieldUpdate,
+	OnEntityListUpdate,
+	OnFieldUpdate,
+} from './internalState'
 
 // This only applies to the 'beforeUpdate' event:
 
@@ -45,107 +56,6 @@ import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 const BEFORE_UPDATE_SETTLE_LIMIT = 20
 
 // TODO the state initialization methods are kind of crap but we'll deal with them later.
-type InternalRootStateNode = InternalEntityState | InternalEntityListState
-type InternalStateNode = InternalEntityState | InternalEntityListState | InternalFieldState
-
-interface InternalContainerState {
-	batchUpdateDepth: number
-	hasPendingUpdate: boolean
-}
-
-enum InternalStateType {
-	Field = 1,
-	SingleEntity,
-	EntityList,
-}
-
-interface InternalEntityFieldPlannedRemoval {
-	field: FieldName
-	removalType: RemovalType
-	removedEntity: InternalEntityState
-}
-
-type OnEntityFieldUpdate = (state: InternalStateNode) => void
-interface InternalEntityState extends InternalContainerState {
-	type: InternalStateType.SingleEntity
-	accessor: EntityAccessor
-	addEventListener: EntityAccessor.AddEntityEventListener
-	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
-	//childrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
-	errors: ErrorsPreprocessor.ErrorNode | undefined
-	eventListeners: {
-		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
-	}
-	fields: Map<FieldName, InternalStateNode>
-	id: string | EntityAccessor.UnpersistedEntityId
-	persistedData: AccessorTreeGenerator.InitialEntityData
-	isScheduledForDeletion: boolean
-	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined
-
-	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
-	// completely different contexts. Even with different fields.
-	// TODO it is rather unfortunate that we're effectively mandating EntityFieldMarkers to be unique across the tree.
-	//  It is really just an implementation detail which ideally shouldn't have any bearing on the developer.
-	//  It could probably just be a Set<OnEntityFieldUpdate>
-	realms: Map<EntityFieldMarkers, OnEntityFieldUpdate>
-	batchUpdates: EntityAccessor.BatchUpdates
-	connectEntityAtField: EntityAccessor.ConnectEntityAtField
-	disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField
-	deleteEntity: EntityAccessor.DeleteEntity
-}
-
-interface InternalEntityPlannedRemoval {
-	removalType: RemovalType
-	removedEntity: InternalEntityState
-}
-
-type OnEntityListUpdate = (state: InternalEntityListState) => void
-interface InternalEntityListState extends InternalContainerState {
-	type: InternalStateType.EntityList
-	accessor: EntityListAccessor
-	addEventListener: EntityListAccessor.AddEntityListEventListener
-	childrenKeys: Set<string>
-	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
-	//childrenWithUnpersistedChanges: Set<InternalEntityState> | undefined
-	errors: ErrorsPreprocessor.ErrorNode | undefined
-	eventListeners: {
-		[Type in EntityListAccessor.EntityListEventType]:
-			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>
-			| undefined
-	}
-	fieldMarkers: EntityFieldMarkers
-	initialData: ReceivedEntityData<undefined | null>[] | Array<EntityAccessor | EntityForRemovalAccessor>
-	plannedRemovals: Set<InternalEntityPlannedRemoval> | undefined
-
-	onUpdate: OnEntityListUpdate
-	getEntityByKey: EntityListAccessor.GetEntityByKey
-	preferences: ReferenceMarker.ReferencePreferences
-	batchUpdates: EntityListAccessor.BatchUpdates
-	connectEntity: EntityListAccessor.ConnectEntity
-	createNewEntity: EntityListAccessor.CreateNewEntity
-	disconnectEntity: EntityListAccessor.DisconnectEntity
-}
-
-type OnFieldUpdate = (state: InternalFieldState) => void
-interface InternalFieldState {
-	type: InternalStateType.Field
-	accessor: FieldAccessor
-	addEventListener: FieldAccessor.AddFieldEventListener
-	errors: ErrorAccessor[]
-	eventListeners: {
-		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
-	}
-	fieldMarker: FieldMarker
-	//hasUnpersistedChanges: boolean
-	hasPendingUpdate: boolean
-	initialData: Scalar | undefined | FieldAccessor
-	onUpdate: OnFieldUpdate
-	persistedValue: FieldValue
-	placeholderName: FieldName
-	touchLog: Map<string, boolean> | undefined
-	isTouchedBy: FieldAccessor.IsTouchedBy
-	updateValue: FieldAccessor.UpdateValue
-}
 
 class AccessorTreeGenerator {
 	private persistedData: ReceivedDataTree<undefined> | undefined

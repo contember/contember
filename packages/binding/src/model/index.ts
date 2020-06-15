@@ -1,3 +1,4 @@
+// export * from './internalState' // Deliberately not exporting it
 export * from './AccessorTreeGenerator'
 export * from './AliasTransformer'
 export * from './DirtinessChecker'

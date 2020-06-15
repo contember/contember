@@ -50,11 +50,11 @@ type Info {
 
 type Mutation {
   createRoot(data: RootCreateInput!): RootCreateResult!
-  deleteRoot(by: RootUniqueWhere!): RootDeleteResult!
-  updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
+  deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
+  updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
-  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntityDeleteResult!
-  updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
+  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntityDeleteResult!
+  updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
   transaction: MutationTransaction!
 }
 
@@ -63,11 +63,11 @@ type MutationTransaction {
   errorMessage: String
   validation: _ValidationResult!
   createRoot(data: RootCreateInput!): RootCreateResult!
-  deleteRoot(by: RootUniqueWhere!): RootDeleteResult!
-  updateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): RootUpdateResult!
+  deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
+  updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
-  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntityDeleteResult!
-  updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
+  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntityDeleteResult!
+  updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
 }
 
 type OneHasManyEntity {
@@ -85,7 +85,7 @@ type OneHasManyEntityConnection {
 input OneHasManyEntityCreateInput {
   a: String
   r2: OneHasManyEntityCreateR2EntityRelationInput
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input OneHasManyEntityCreateR2EntityRelationInput {
@@ -133,7 +133,7 @@ input OneHasManyEntityUniqueWhere {
 input OneHasManyEntityUpdateInput {
   a: String
   r2: OneHasManyEntityUpdateR2EntityRelationInput
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input OneHasManyEntityUpdateR2EntityRelationInput {
@@ -169,12 +169,12 @@ input OneHasManyEntityWhere {
 
 input OneHasManyEntityWithoutR2CreateInput {
   a: String
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input OneHasManyEntityWithoutR2UpdateInput {
   a: String
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 enum OrderDirection {
@@ -229,7 +229,7 @@ type RootConnection {
 input RootCreateInput {
   foo: String
   r: [RootCreateREntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input RootCreateREntityRelationInput {
@@ -277,7 +277,7 @@ input RootUniqueWhere {
 input RootUpdateInput {
   foo: String
   r: [RootUpdateREntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input RootUpdateREntityRelationInput {
@@ -320,12 +320,12 @@ input RootWhere {
 
 input RootWithoutRCreateInput {
   foo: String
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input RootWithoutRUpdateInput {
   foo: String
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input StringCondition {

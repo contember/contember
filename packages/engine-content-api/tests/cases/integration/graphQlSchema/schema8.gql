@@ -68,7 +68,7 @@ input FrontPageCreateInput {
   unique: One
   introVideo: FrontPageCreateIntroVideoEntityRelationInput
   inHouseVideos: [FrontPageCreateInHouseVideosEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input FrontPageCreateIntroVideoEntityRelationInput {
@@ -139,7 +139,7 @@ input FrontPageUpdateInput {
   unique: One
   introVideo: FrontPageUpdateIntroVideoEntityRelationInput
   inHouseVideos: [FrontPageUpdateInHouseVideosEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input FrontPageUpdateIntroVideoEntityRelationInput {
@@ -183,25 +183,25 @@ input FrontPageWhere {
 input FrontPageWithoutInHouseVideosCreateInput {
   unique: One
   introVideo: FrontPageCreateIntroVideoEntityRelationInput
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input FrontPageWithoutInHouseVideosUpdateInput {
   unique: One
   introVideo: FrontPageUpdateIntroVideoEntityRelationInput
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input FrontPageWithoutIntroVideoCreateInput {
   unique: One
   inHouseVideos: [FrontPageCreateInHouseVideosEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input FrontPageWithoutIntroVideoUpdateInput {
   unique: One
   inHouseVideos: [FrontPageUpdateInHouseVideosEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 type Info {
@@ -210,11 +210,11 @@ type Info {
 
 type Mutation {
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
-  deleteFrontPage(by: FrontPageUniqueWhere!): FrontPageDeleteResult!
-  updateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): FrontPageUpdateResult!
+  deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
+  updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   createVideo(data: VideoCreateInput!): VideoCreateResult!
-  deleteVideo(by: VideoUniqueWhere!): VideoDeleteResult!
-  updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): VideoUpdateResult!
+  deleteVideo(by: VideoUniqueWhere!, filter: VideoWhere): VideoDeleteResult!
+  updateVideo(by: VideoUniqueWhere!, filter: VideoWhere, data: VideoUpdateInput!): VideoUpdateResult!
   transaction: MutationTransaction!
 }
 
@@ -223,11 +223,11 @@ type MutationTransaction {
   errorMessage: String
   validation: _ValidationResult!
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
-  deleteFrontPage(by: FrontPageUniqueWhere!): FrontPageDeleteResult!
-  updateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): FrontPageUpdateResult!
+  deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
+  updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   createVideo(data: VideoCreateInput!): VideoCreateResult!
-  deleteVideo(by: VideoUniqueWhere!): VideoDeleteResult!
-  updateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): VideoUpdateResult!
+  deleteVideo(by: VideoUniqueWhere!, filter: VideoWhere): VideoDeleteResult!
+  updateVideo(by: VideoUniqueWhere!, filter: VideoWhere, data: VideoUpdateInput!): VideoUpdateResult!
 }
 
 enum One {
@@ -351,7 +351,7 @@ input VideoCreateInput {
   vimeoId: String
   frontPageForIntro: VideoCreateFrontPageForIntroEntityRelationInput
   frontPage: VideoCreateFrontPageEntityRelationInput
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 type VideoCreateResult {
@@ -416,7 +416,7 @@ input VideoUpdateInput {
   vimeoId: String
   frontPageForIntro: VideoUpdateFrontPageForIntroEntityRelationInput
   frontPage: VideoUpdateFrontPageEntityRelationInput
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 type VideoUpdateResult {
@@ -450,23 +450,23 @@ input VideoWhere {
 input VideoWithoutFrontPageCreateInput {
   vimeoId: String
   frontPageForIntro: VideoCreateFrontPageForIntroEntityRelationInput
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input VideoWithoutFrontPageForIntroCreateInput {
   vimeoId: String
   frontPage: VideoCreateFrontPageEntityRelationInput
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input VideoWithoutFrontPageForIntroUpdateInput {
   vimeoId: String
   frontPage: VideoUpdateFrontPageEntityRelationInput
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input VideoWithoutFrontPageUpdateInput {
   vimeoId: String
   frontPageForIntro: VideoUpdateFrontPageForIntroEntityRelationInput
-  _update: Boolean
+  _dummy_field_: Boolean
 }

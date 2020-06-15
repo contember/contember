@@ -147,22 +147,22 @@ class Mapper {
 		return tryMutation(() => this.updater.update(this, entity, by, data, filter))
 	}
 
-	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<MutationResultList> {
-		return tryMutation(() => this.deleteExecutor.execute(this, entity, where))
+	public async delete(entity: Model.Entity, by: Input.UniqueWhere, filter?: Input.Where): Promise<MutationResultList> {
+		return tryMutation(() => this.deleteExecutor.execute(this, entity, by, filter))
 	}
 
 	public async connectJunction(
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerPrimary: Input.PrimaryValue,
-		insersePrimary: Input.PrimaryValue,
+		inversePrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
 		return await this.junctionTableManager.connectJunction(
 			this.db,
 			owningEntity,
 			relation,
 			ownerPrimary,
-			insersePrimary,
+			inversePrimary,
 		)
 	}
 

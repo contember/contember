@@ -85,6 +85,7 @@ namespace Input {
 
 	export interface DeleteInput<E = never> {
 		by: UniqueWhere<E>
+		filter?: Where<Condition<Value.FieldValue<E>>>
 	}
 
 	export interface UniqueQueryInput<E = never> {

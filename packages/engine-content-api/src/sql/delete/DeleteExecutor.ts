@@ -19,14 +19,20 @@ class DeleteExecutor {
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 	) {}
 
-	public async execute(mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere): Promise<MutationResultList> {
+	public async execute(
+		mapper: Mapper,
+		entity: Model.Entity,
+		by: Input.UniqueWhere,
+		filter?: Input.Where,
+	): Promise<MutationResultList> {
 		const db = mapper.db
 		await db.query('SET CONSTRAINTS ALL DEFERRED')
-		const primaryValue = await mapper.getPrimaryValue(entity, where)
+		const primaryValue = await mapper.getPrimaryValue(entity, by)
 		if (!primaryValue) {
-			return [new MutationEntryNotFoundError([], where)]
+			return [new MutationEntryNotFoundError([], by)]
 		}
-		const result = await this.delete(db, entity, { [entity.primary]: { eq: primaryValue } })
+		const primaryWhere = { [entity.primary]: { eq: primaryValue } }
+		const result = await this.delete(db, entity, filter ? { and: [primaryWhere, filter] } : primaryWhere)
 		if (result.length === 0) {
 			return [new MutationNoResultError([])]
 		}

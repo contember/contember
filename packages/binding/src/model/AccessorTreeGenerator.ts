@@ -83,6 +83,9 @@ interface InternalEntityState extends InternalContainerState {
 
 	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.
+	// TODO it is rather unfortunate that we're effectively mandating EntityFieldMarkers to be unique across the tree.
+	//  It is really just an implementation detail which ideally shouldn't have any bearing on the developer.
+	//  It could probably just be a Set<OnEntityFieldUpdate>
 	realms: Map<EntityFieldMarkers, OnEntityFieldUpdate>
 	batchUpdates: EntityAccessor.BatchUpdates
 	connectEntityAtField: EntityAccessor.ConnectEntityAtField
@@ -147,7 +150,14 @@ class AccessorTreeGenerator {
 	private updateData: AccessorTreeGenerator.UpdateData | undefined
 
 	private errorTreeRoot?: ErrorsPreprocessor.ErrorTreeRoot
+
+	// TODO deletes and disconnects cause memory leaks here as they don't traverse the tree to remove nested states.
+	//  This could theoretically also be intentional given that both operations happen relatively infrequently,
+	//  or at least rarely enough that we could potentially just ignore the problem (which we're doing now).
+	//  Nevertheless, no real analysis has been done and it could turn out to be a problem.
 	private entityStore: Map<string, InternalEntityState> = new Map()
+	private subTreeStates: Map<string, InternalRootStateNode> = new Map()
+
 	private readonly getEntityByKey = (key: string) => {
 		const entity = this.entityStore.get(key)
 
@@ -156,7 +166,6 @@ class AccessorTreeGenerator {
 		}
 		return entity.accessor
 	}
-	private subTreeStates: Map<string, InternalRootStateNode> = new Map()
 	private readonly getSubTree = ((parameters: MarkerSubTreeParameters) => {
 		const placeholderName = PlaceholderGenerator.getMarkerSubTreePlaceholder(parameters)
 		const subTreeState = this.subTreeStates.get(placeholderName)
@@ -692,70 +701,67 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		// TODO
 		entityListState.disconnectEntity = childEntityOrItsKey => {
 			this.performRootTreeOperation(() => {
 				performMutatingOperation(() => {
-					/*const childState = this.entityStore.get(key)
-					if (childState === undefined) {
-						throw new BindingError(`Cannot remove entity with key '${key}' as it doesn't exist.`)
-					}
-					if (!entityListState.childrenKeys.has(key)) {
+					const disconnectedChildKey =
+						typeof childEntityOrItsKey === 'string' ? childEntityOrItsKey : childEntityOrItsKey.key
+
+					const disconnectedChildState = this.entityStore.get(disconnectedChildKey)
+					if (disconnectedChildState === undefined) {
 						throw new BindingError(
-							`Entity list doesn't include an entity with key '${key}' and so it cannot remove it.`,
+							`EntityListAccessor: Cannot remove entity with key '${disconnectedChildKey}' as it doesn't exist.`,
 						)
 					}
-					const childRealm = childState.realms.get(entityListState.fieldMarkers)
-					if (childRealm === undefined) {
+
+					if (!entityListState.childrenKeys.has(disconnectedChildKey)) {
+						throw new BindingError(
+							`Entity list doesn't include an entity with key '${disconnectedChildKey}' and so it cannot remove it.`,
+						)
+					}
+					const didDelete = disconnectedChildState.realms.delete(entityListState.fieldMarkers)
+					if (!didDelete) {
 						this.rejectInvalidAccessorTree()
-					}*/
-					/*
-						if (entityListState.childrenWithPendingUpdates === undefined) {
-							entityListState.childrenWithPendingUpdates = new Set()
-						}
-						entityListState.childrenWithPendingUpdates.add(key)
-					*/
-					/*if (
-						!childState.persistedData ||
-						childState.persistedData instanceof EntityForRemovalAccessor ||
-						!(childState.accessor instanceof EntityAccessor)
-					) {
-						childRealm.removalType = removalType
 					}
-
-					if (childState.batchUpdateDepth !== 0) {
-						throw new BindingError(`Removing entities that are being batch updated is a no-op.`)
+					if (entityListState.plannedRemovals === undefined) {
+						entityListState.plannedRemovals = new Set()
 					}
-
-					onUpdateProxy(
-						key,
-						new EntityForRemovalAccessor(childState.accessor, childState.accessor.replaceBy, removalType),
-					)*/
+					entityListState.plannedRemovals.add({
+						removedEntity: disconnectedChildState,
+						removalType: 'disconnect',
+					})
+					entityListState.childrenKeys.delete(disconnectedChildKey)
+					updateAccessorInstance()
 				})
 			})
 		}
 
 		// TODO
 		entityListState.connectEntity = entityToConnectOrItsKey => {
-			let entityKey: string
+			let connectedEntityKey: string
 
-			if (entityToConnectOrItsKey instanceof EntityAccessor) {
+			if (typeof entityToConnectOrItsKey === 'string') {
+				connectedEntityKey = entityToConnectOrItsKey
+			} else {
 				if (!entityToConnectOrItsKey.existsOnServer) {
 					throw new BindingError(
-						`EntityList: attempting to connect an entity that doesn't exist on server. That is a no-op.`, // At least for now.
+						`EntityListAccessor: attempting to connect an entity with key '${entityToConnectOrItsKey.key}' that ` +
+							`doesn't exist on server. That is currently impossible.`, // At least for now.
 					)
 				}
-				entityKey = entityToConnectOrItsKey.key
-			} else {
-				entityKey = entityToConnectOrItsKey
+				connectedEntityKey = entityToConnectOrItsKey.key
 			}
-			const connectedState = this.entityStore.get(entityKey)
 
+			const connectedState = this.entityStore.get(connectedEntityKey)
 			if (connectedState === undefined) {
+				throw new BindingError(
+					`EntityListAccessor: attempting to connect an entity with key '${connectedEntityKey}' ` +
+						`but it doesn't exist.`,
+				)
 			}
 
-			// const newState = generateNewEntityState(typeof newEntity === 'function' ? undefined : newEntity)
-			throw new BindingError(`EntityListAccessor.connectEntity is not yet implemented.`)
+			connectedState.realms.set(entityListState.fieldMarkers, onChildEntityUpdate)
+			updateAccessorInstance()
 		}
 
 		entityListState.createNewEntity = initialize => {

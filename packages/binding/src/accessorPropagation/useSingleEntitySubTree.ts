@@ -1,3 +1,4 @@
+import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { QueryLanguage } from '../queryLanguage'
 import {
@@ -22,17 +23,45 @@ export const useSingleEntitySubTree = (qualifiedSingleEntity: UseSingleEntitySub
 	const getSubTree = useGetSubTree()
 	const environment = useEnvironment()
 
-	// TODO this super bad. It's too sensitive to unwanted updates due to qualifiedSingleEntity changes.
-	const parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity = React.useMemo(() => {
-		if ('isCreating' in qualifiedSingleEntity && qualifiedSingleEntity.isCreating) {
-			return new BoxedUnconstrainedQualifiedSingleEntity(
-				QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(qualifiedSingleEntity, environment),
-			)
-		}
-		return new BoxedQualifiedSingleEntity(
-			QueryLanguage.desugarQualifiedSingleEntity(qualifiedSingleEntity, environment),
+	useConstantValueInvariant(
+		qualifiedSingleEntity.isCreating,
+		`EntityListSubTree: cannot alternate the 'isCreating' value.`,
+	)
+
+	let parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity
+
+	// We're not really breaking rules of hooks here since the error state is prevented by the invariant above.
+	if ('isCreating' in qualifiedSingleEntity && qualifiedSingleEntity.isCreating) {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		parameters = React.useMemo(
+			() =>
+				new BoxedUnconstrainedQualifiedSingleEntity(
+					QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(
+						{
+							entity: qualifiedSingleEntity.entity,
+							connectTo: qualifiedSingleEntity.connectTo,
+						},
+						environment,
+					),
+				),
+			[qualifiedSingleEntity.entity, qualifiedSingleEntity.connectTo, environment],
 		)
-	}, [environment, qualifiedSingleEntity])
+	} else {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		parameters = React.useMemo(
+			() =>
+				new BoxedQualifiedSingleEntity(
+					QueryLanguage.desugarQualifiedSingleEntity(
+						{
+							entity: qualifiedSingleEntity.entity,
+						},
+						environment,
+					),
+				),
+			[qualifiedSingleEntity.entity, environment],
+		)
+	}
+
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 
 	return useAccessorUpdateSubscription__UNSTABLE(getAccessor)

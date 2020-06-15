@@ -1,3 +1,4 @@
+import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { QueryLanguage } from '../queryLanguage'
 import {
@@ -22,15 +23,55 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 	const getSubTree = useGetSubTree()
 	const environment = useEnvironment()
 
-	// TODO this super bad. It's too sensitive to unwanted updates due to qualifiedEntityList changes.
-	const parameters: BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList = React.useMemo(() => {
-		if ('isCreating' in qualifiedEntityList && qualifiedEntityList.isCreating) {
-			return new BoxedUnconstrainedQualifiedEntityList(
-				QueryLanguage.desugarUnconstrainedQualifiedEntityList(qualifiedEntityList, environment),
-			)
-		}
-		return new BoxedQualifiedEntityList(QueryLanguage.desugarQualifiedEntityList(qualifiedEntityList, environment))
-	}, [environment, qualifiedEntityList])
+	useConstantValueInvariant(
+		qualifiedEntityList.isCreating,
+		`EntityListSubTree: cannot alternate the 'isCreating' value.`,
+	)
+
+	let parameters: BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList
+
+	// We're not really breaking rules of hooks here since the error state is prevented by the invariant above.
+	if ('isCreating' in qualifiedEntityList && qualifiedEntityList.isCreating) {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		parameters = React.useMemo(
+			() =>
+				new BoxedUnconstrainedQualifiedEntityList(
+					QueryLanguage.desugarUnconstrainedQualifiedEntityList(
+						{
+							connectTo: qualifiedEntityList.connectTo,
+							entities: qualifiedEntityList.entities,
+						},
+						environment,
+					),
+				),
+			[qualifiedEntityList.entities, qualifiedEntityList.connectTo, environment],
+		)
+	} else {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		parameters = React.useMemo(
+			() =>
+				new BoxedQualifiedEntityList(
+					QueryLanguage.desugarQualifiedEntityList(
+						{
+							connectTo: qualifiedEntityList.connectTo,
+							entities: qualifiedEntityList.entities,
+							orderBy: qualifiedEntityList.orderBy,
+							offset: qualifiedEntityList.offset,
+							limit: qualifiedEntityList.limit,
+						},
+						environment,
+					),
+				),
+			[
+				qualifiedEntityList.entities,
+				qualifiedEntityList.connectTo,
+				qualifiedEntityList.orderBy,
+				qualifiedEntityList.offset,
+				qualifiedEntityList.limit,
+				environment,
+			],
+		)
+	}
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 
 	return useAccessorUpdateSubscription__UNSTABLE(getAccessor)

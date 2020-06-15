@@ -190,7 +190,7 @@ export default class MutationResolver {
 		queryAst: ObjectNode<Input.UpdateInput>,
 	): Promise<WithoutNode<Result.UpdateResult>> {
 		const input = queryAst.args
-		const result = await mapper.update(entity, input.by, input.data)
+		const result = await mapper.update(entity, input.by, input.data, input.filter)
 		const errors = this.convertResultToErrors(result)
 		if (errors.length > 0) {
 			return {

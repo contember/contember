@@ -140,10 +140,11 @@ class Mapper {
 
 	public async update(
 		entity: Model.Entity,
-		where: Input.UniqueWhere,
+		by: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
+		filter?: Input.Where,
 	): Promise<MutationResultList> {
-		return tryMutation(() => this.updater.update(this, entity, where, data))
+		return tryMutation(() => this.updater.update(this, entity, by, data, filter))
 	}
 
 	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<MutationResultList> {

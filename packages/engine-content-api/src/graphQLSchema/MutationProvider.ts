@@ -96,6 +96,9 @@ export default class MutationProvider {
 				by: {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
 				},
+				filter: {
+					type: this.whereTypeProvider.getEntityWhereType(entityName),
+				},
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.update, entity) },

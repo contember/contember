@@ -31,20 +31,24 @@ export class Updater {
 	public async update(
 		mapper: Mapper,
 		entity: Model.Entity,
-		where: Input.UniqueWhere,
+		by: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
+		filter?: Input.Where,
 	): Promise<MutationResultList> {
-		const primaryValue = await mapper.getPrimaryValue(entity, where)
+		const primaryValue = await mapper.getPrimaryValue(entity, by)
 
 		if (primaryValue === undefined) {
-			return [new MutationEntryNotFoundError([], where)]
+			return [new MutationEntryNotFoundError([], by)]
 		}
 
-		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
+		const uniqueWhere = this.uniqueWhereExpander.expand(entity, by)
 		const updateBuilder = this.updateBuilderFactory.create(entity, uniqueWhere)
 
 		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, Object.keys(data))
 		updateBuilder.addOldWhere(predicateWhere)
+		if (filter) {
+			updateBuilder.addOldWhere(filter)
+		}
 		updateBuilder.addNewWhere(predicateWhere)
 
 		const updateVisitor = new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper)

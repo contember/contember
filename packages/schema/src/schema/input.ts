@@ -75,6 +75,7 @@ namespace Input {
 
 	export interface UpdateInput<E = never> {
 		by: UniqueWhere<E>
+		filter?: Where<Condition<Value.FieldValue<E>>>
 		data: UpdateDataInput<E>
 	}
 

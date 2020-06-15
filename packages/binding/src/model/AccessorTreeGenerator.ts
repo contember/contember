@@ -4,7 +4,6 @@ import * as ReactDOM from 'react-dom'
 import {
 	Accessor,
 	EntityAccessor,
-	EntityForRemovalAccessor,
 	EntityListAccessor,
 	ErrorAccessor,
 	FieldAccessor,
@@ -39,6 +38,7 @@ import {
 	OnEntityListUpdate,
 	OnFieldUpdate,
 } from './internalState'
+import { MutationGenerator } from './MutationGenerator'
 
 // This only applies to the 'beforeUpdate' event:
 
@@ -92,7 +92,7 @@ class AccessorTreeGenerator {
 	private isFrozenWhileUpdating = false
 	private treeWideBatchUpdateDepth = 0
 
-	public constructor(private tree: MarkerTreeRoot) {}
+	public constructor(private markerTree: MarkerTreeRoot) {}
 
 	public generateLiveTree(
 		persistedData: ReceivedDataTree<undefined> | undefined,
@@ -109,7 +109,7 @@ class AccessorTreeGenerator {
 		this.initialData = initialData
 		this.updateData = updateData
 
-		for (const [placeholderName, marker] of this.tree.subTrees) {
+		for (const [placeholderName, marker] of this.markerTree.subTrees) {
 			const subTreeState = this.initializeSubTree(
 				marker,
 				initialData instanceof TreeRootAccessor
@@ -123,6 +123,12 @@ class AccessorTreeGenerator {
 		}
 
 		this.updateMainTree()
+	}
+
+	public generatePersistMutation() {
+		const generator = new MutationGenerator(this.markerTree, this.subTreeStates, this.entityStore)
+
+		return generator.getPersistMutation()
 	}
 
 	private performRootTreeOperation(operation: () => void) {
@@ -338,11 +344,7 @@ class AccessorTreeGenerator {
 						? entityState.persistedData.getField(placeholderName)
 						: entityState.persistedData[placeholderName]
 					: undefined
-				if (
-					fieldDatum instanceof EntityListAccessor ||
-					fieldDatum instanceof EntityAccessor ||
-					fieldDatum instanceof EntityForRemovalAccessor
-				) {
+				if (fieldDatum instanceof EntityListAccessor || fieldDatum instanceof EntityAccessor) {
 					return this.rejectInvalidAccessorTree()
 				} else if (Array.isArray(fieldDatum)) {
 					throw new BindingError(
@@ -705,10 +707,7 @@ class AccessorTreeGenerator {
 			let childErrors
 
 			if (entityListState.errors && datum) {
-				const errorKey =
-					datum instanceof EntityAccessor || datum instanceof EntityForRemovalAccessor
-						? datum.key
-						: datum[PRIMARY_KEY_NAME]
+				const errorKey = datum instanceof EntityAccessor ? datum.key : datum[PRIMARY_KEY_NAME]
 				childErrors = (entityListState.errors as ErrorsPreprocessor.KeyIndexedErrorNode).children[errorKey]
 			} else {
 				childErrors = undefined
@@ -918,8 +917,7 @@ class AccessorTreeGenerator {
 		if (
 			sourceData.length === 0 ||
 			sourceData.every(
-				(datum: ReceivedEntityData<undefined | null> | EntityAccessor | EntityForRemovalAccessor | undefined) =>
-					datum === undefined,
+				(datum: ReceivedEntityData<undefined | null> | EntityAccessor | undefined) => datum === undefined,
 			)
 		) {
 			sourceData = Array(preferences.initialEntityCount).map(() => undefined)
@@ -983,7 +981,7 @@ class AccessorTreeGenerator {
 		data: AccessorTreeGenerator.InitialEntityData,
 	): string | EntityAccessor.UnpersistedEntityId {
 		return data
-			? data instanceof EntityAccessor || data instanceof EntityForRemovalAccessor
+			? data instanceof EntityAccessor
 				? data.runtimeId
 				: data[PRIMARY_KEY_NAME]
 			: new EntityAccessor.UnpersistedEntityId()
@@ -1074,7 +1072,7 @@ class AccessorTreeGenerator {
 namespace AccessorTreeGenerator {
 	export type UpdateData = (newData: TreeRootAccessor) => void
 
-	export type InitialEntityData = ReceivedEntityData<undefined | null> | EntityAccessor | EntityForRemovalAccessor
+	export type InitialEntityData = ReceivedEntityData<undefined | null> | EntityAccessor
 }
 
 export { AccessorTreeGenerator }

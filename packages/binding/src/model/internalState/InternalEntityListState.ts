@@ -1,4 +1,4 @@
-import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor } from '../../accessors'
+import { EntityAccessor, EntityListAccessor } from '../../accessors'
 import { ReceivedEntityData } from '../../accessorTree'
 import { EntityFieldMarkers, ReferenceMarker } from '../../markers'
 import { RemovalType } from '../../treeParameters/primitives'
@@ -27,7 +27,7 @@ export interface InternalEntityListState extends InternalContainerState {
 			| undefined
 	}
 	fieldMarkers: EntityFieldMarkers
-	initialData: ReceivedEntityData<undefined | null>[] | Array<EntityAccessor | EntityForRemovalAccessor>
+	initialData: ReceivedEntityData<undefined | null>[] | EntityAccessor[]
 	plannedRemovals: Set<InternalEntityPlannedRemoval> | undefined
 
 	onUpdate: OnEntityListUpdate

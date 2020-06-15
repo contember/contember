@@ -6,7 +6,7 @@ export class AliasTransformer {
 
 	private static ALIAS_SECTION_SEPARATOR = '__'
 
-	public static entityToAlias(accessor: EntityAccessor | EntityForRemovalAccessor): string {
+	public static entityToAlias(accessor: EntityAccessor): string {
 		return `${this.COMMON_PREFIX}${accessor.key.replace(/-/g, '_')}`
 	}
 

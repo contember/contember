@@ -1,13 +1,7 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
-import {
-	EntityAccessor,
-	EntityForRemovalAccessor,
-	EntityListAccessor,
-	FieldAccessor,
-	TreeRootAccessor,
-} from '../accessors'
-import { ReceivedData, ReceivedEntityData } from '../accessorTree'
+import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
+import { ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
@@ -22,14 +16,15 @@ import {
 import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
+import { InternalEntityState, InternalRootStateNode, InternalStateType } from './internalState'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
 export class MutationGenerator {
 	public constructor(
-		private persistedData: any,
-		private currentData: TreeRootAccessor,
 		private markerTree: MarkerTreeRoot,
+		private allSubTrees: Map<string, InternalRootStateNode>,
+		private entityStore: Map<string, InternalEntityState>,
 	) {}
 
 	public getPersistMutation(): string | undefined {
@@ -38,9 +33,8 @@ export class MutationGenerator {
 
 			for (const [placeholderName, markerSubTree] of this.markerTree.subTrees) {
 				builder = this.addSubMutation(
-					this.persistedData ? this.persistedData[placeholderName] : undefined,
 					markerSubTree.fields,
-					this.currentData.getSubTree(markerSubTree.parameters),
+					this.allSubTrees.get(placeholderName)!,
 					placeholderName,
 					markerSubTree.parameters,
 					builder,
@@ -56,47 +50,41 @@ export class MutationGenerator {
 	// 		for actual nested tree updates it is completely inadequate. We must, among other things, mark visited
 	// 		entities in order to break cycles.
 	private addSubMutation(
-		data: ReceivedData<undefined>,
 		entityFieldMarkers: EntityFieldMarkers,
-		entity: EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | null,
+		rootState: InternalRootStateNode,
 		alias: string,
 		parameters: MarkerSubTreeParameters,
 		queryBuilder: QueryBuilder,
 	): QueryBuilder {
-		if (entity instanceof EntityAccessor) {
-			if (!entity.existsOnServer) {
-				queryBuilder = this.addCreateMutation(entity, entityFieldMarkers, alias, parameters, queryBuilder)
-			} else if (data && !Array.isArray(data)) {
-				queryBuilder = this.addUpdateMutation(entity, entityFieldMarkers, data, alias, parameters, queryBuilder)
+		if (rootState.type === InternalStateType.SingleEntity) {
+			if (rootState.isScheduledForDeletion) {
+				queryBuilder = this.addDeleteMutation(rootState, alias, parameters, queryBuilder)
+			} else if (!rootState.accessor.existsOnServer) {
+				queryBuilder = this.addCreateMutation(rootState, entityFieldMarkers, alias, parameters, queryBuilder)
+			} else {
+				queryBuilder = this.addUpdateMutation(rootState, entityFieldMarkers, alias, parameters, queryBuilder)
 			}
-		} else if (entity instanceof EntityForRemovalAccessor) {
-			queryBuilder = this.addDeleteMutation(entity, alias, parameters, queryBuilder)
-		} else if (entity instanceof EntityListAccessor) {
-			if (Array.isArray(data) || data === undefined) {
-				data = data || []
-				let i = 0
-				for (const currentEntity of entity) {
-					queryBuilder = this.addSubMutation(
-						data[i++], // Deliberately using that this may evaluate to undefined
-						entityFieldMarkers,
-						currentEntity,
-						AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(currentEntity)),
-						parameters,
-						queryBuilder,
-					)
-				}
+		} else if (rootState.type === InternalStateType.EntityList) {
+			for (const childKey of rootState.childrenKeys) {
+				const childState = this.entityStore.get(childKey)!
+
+				queryBuilder = this.addSubMutation(
+					entityFieldMarkers,
+					childState,
+					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.accessor)),
+					parameters,
+					queryBuilder,
+				)
 			}
-		} else if (entity === null) {
-			// Do nothing.
 		} else {
-			assertNever(entity)
+			assertNever(rootState)
 		}
 
 		return queryBuilder
 	}
 
 	private addDeleteMutation(
-		entity: EntityForRemovalAccessor,
+		entityState: InternalEntityState,
 		alias: string,
 		parameters: MarkerSubTreeParameters,
 		queryBuilder?: QueryBuilder,
@@ -116,16 +104,15 @@ export class MutationGenerator {
 				return builder
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
-					.by({ ...where, [PRIMARY_KEY_NAME]: entity.primaryKey })
+					.by({ ...where, [PRIMARY_KEY_NAME]: entityState.accessor.primaryKey! })
 			},
 			alias,
 		)
 	}
 
 	private addUpdateMutation(
-		entity: EntityAccessor,
+		entityState: InternalEntityState,
 		entityFieldMarkers: EntityFieldMarkers,
-		data: ReceivedEntityData<undefined>,
 		alias: string,
 		parameters: MarkerSubTreeParameters,
 		queryBuilder?: QueryBuilder,
@@ -134,9 +121,9 @@ export class MutationGenerator {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
 
-		const runtimeId = entity.runtimeId
+		const runtimeId = entityState.id
 
-		if (runtimeId instanceof EntityAccessor.UnpersistedEntityId || !data) {
+		if (runtimeId instanceof EntityAccessor.UnpersistedEntityId) {
 			return queryBuilder
 		}
 
@@ -149,7 +136,7 @@ export class MutationGenerator {
 				}
 
 				return builder
-					.data(builder => this.registerUpdateMutationPart(entity, entityFieldMarkers, data, builder))
+					.data(builder => this.registerUpdateMutationPart(entityState, entityFieldMarkers, builder))
 					.by({ ...where, [PRIMARY_KEY_NAME]: runtimeId })
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.ok()
@@ -160,7 +147,7 @@ export class MutationGenerator {
 	}
 
 	private addCreateMutation(
-		entity: EntityAccessor,
+		entityState: InternalEntityState,
 		entityFieldMarkers: EntityFieldMarkers,
 		alias: string,
 		parameters: MarkerSubTreeParameters,
@@ -174,7 +161,7 @@ export class MutationGenerator {
 			parameters.value.entityName,
 			builder => {
 				let writeBuilder = this.registerCreateMutationPart(
-					entity,
+					entityState,
 					entityFieldMarkers,
 					new CrudQueryBuilder.WriteDataBuilder(),
 				)
@@ -200,7 +187,7 @@ export class MutationGenerator {
 	}
 
 	private registerCreateMutationPart(
-		currentData: EntityAccessor,
+		currentState: InternalEntityState,
 		entityFieldMarkers: EntityFieldMarkers,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
@@ -215,9 +202,9 @@ export class MutationGenerator {
 				continue
 			}
 			if (marker instanceof FieldMarker) {
-				const accessor = currentData.getFieldByPlaceholder(placeholderName)
-				if (accessor instanceof FieldAccessor) {
-					const resolvedValue = accessor.resolvedValue
+				const fieldState = currentState.fields.get(placeholderName)!
+				if (fieldState.type === InternalStateType.Field) {
+					const resolvedValue = fieldState.accessor.resolvedValue
 
 					if (resolvedValue !== undefined && resolvedValue !== null) {
 						if (marker.isNonbearing) {
@@ -235,30 +222,32 @@ export class MutationGenerator {
 				const references = marker.references
 				const accessorReference: Array<{
 					alias?: string
-					accessor: EntityAccessor
+					entityState: InternalEntityState
 					reference: ReferenceMarker.Reference
 				}> = []
 
 				for (const referencePlaceholder in references) {
 					const reference = references[referencePlaceholder]
-					const accessor = currentData.getFieldByPlaceholder(reference.placeholderName)
+					const referenceState = currentState.fields.get(reference.placeholderName)!
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
-						if (accessor instanceof EntityAccessor) {
-							accessorReference.push({ accessor, reference, alias: referencePlaceholder })
+						if (referenceState.type === InternalStateType.SingleEntity) {
+							accessorReference.push({ entityState: referenceState, reference, alias: referencePlaceholder })
 
 							if (reference.reducedBy === undefined) {
 								unreducedHasOnePresent = true
 							}
 						}
 					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
-						if (accessor instanceof EntityListAccessor) {
-							for (const innerAccessor of accessor) {
-								if (innerAccessor instanceof EntityAccessor) {
+						if (referenceState.type === InternalStateType.EntityList) {
+							for (const childKey of referenceState.childrenKeys) {
+								const childState = this.entityStore.get(childKey)!
+
+								if (childState) {
 									accessorReference.push({
-										accessor: innerAccessor,
+										entityState: childState,
 										reference,
-										alias: AliasTransformer.entityToAlias(innerAccessor),
+										alias: AliasTransformer.entityToAlias(childState.accessor),
 									})
 								}
 							}
@@ -273,11 +262,11 @@ export class MutationGenerator {
 						const createOneRelationBuilder = CrudQueryBuilder.WriteOneRelationBuilder.instantiate<
 							CrudQueryBuilder.WriteOperation.Create
 						>()
-						const { accessor, reference } = accessorReference[0]
+						const { entityState, reference } = accessorReference[0]
 
-						if (!accessor.primaryKey) {
+						if (typeof entityState.id !== 'string') {
 							const createBuilder = createOneRelationBuilder.create(
-								this.registerCreateReferenceMutationPart(accessor, reference),
+								this.registerCreateReferenceMutationPart(entityState, reference),
 							)
 							if (createBuilder.data) {
 								builder = builder.one(placeholderName, createBuilder)
@@ -286,7 +275,7 @@ export class MutationGenerator {
 							builder = builder.one(
 								placeholderName,
 								createOneRelationBuilder.connect({
-									[PRIMARY_KEY_NAME]: accessor.primaryKey,
+									[PRIMARY_KEY_NAME]: entityState.id,
 								}),
 							)
 						}
@@ -296,12 +285,12 @@ export class MutationGenerator {
 				} else {
 					builder = builder.many(placeholderName, builder => {
 						for (const referencePair of accessorReference) {
-							const { alias, accessor, reference } = referencePair
+							const { alias, entityState, reference } = referencePair
 
-							if (!accessor.primaryKey) {
-								builder = builder.create(this.registerCreateReferenceMutationPart(accessor, reference), alias)
+							if (typeof entityState.id !== 'string') {
+								builder = builder.create(this.registerCreateReferenceMutationPart(entityState, reference), alias)
 							} else {
-								builder = builder.connect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
+								builder = builder.connect({ [PRIMARY_KEY_NAME]: entityState.id }, alias)
 							}
 						}
 						return builder
@@ -333,9 +322,8 @@ export class MutationGenerator {
 	}
 
 	private registerUpdateMutationPart(
-		currentData: EntityAccessor,
+		currentState: InternalEntityState,
 		entityFieldMarkers: EntityFieldMarkers,
-		persistedData: ReceivedEntityData<undefined>,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
 		for (const [placeholderName, marker] of entityFieldMarkers) {
@@ -500,7 +488,7 @@ export class MutationGenerator {
 	}
 
 	private registerCreateReferenceMutationPart(
-		accessor: EntityAccessor,
+		entityState: InternalEntityState,
 		reference: ReferenceMarker.Reference,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
 		const registerReductionFields = (where: UniqueWhere): Input.CreateDataInput<GraphQlBuilder.Literal> => {
@@ -527,7 +515,7 @@ export class MutationGenerator {
 		}
 
 		const dataBuilder = this.registerCreateMutationPart(
-			accessor,
+			entityState,
 			reference.fields,
 			new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 		)

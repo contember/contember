@@ -130,8 +130,7 @@ export const useAccessorTreeState = ({
 			queryStateRef.current.readyState === ApiRequestReadyState.Success ? queryStateRef.current.data.data : undefined
 
 		const latestAccessorTree = stateRef.current.data
-		const generator = new MutationGenerator(persistedData, latestAccessorTree, markerTree)
-		const mutation = generator.getPersistMutation()
+		const mutation = accessorTreeGenerator.generatePersistMutation()
 
 		if (mutation === undefined) {
 			return Promise.resolve<NothingToPersistPersistResult>({

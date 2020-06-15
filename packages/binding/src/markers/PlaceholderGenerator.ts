@@ -43,6 +43,6 @@ export class PlaceholderGenerator {
 	}
 
 	public static getMarkerSubTreePlaceholder(subTreeParameters: MarkerSubTreeParameters): string {
-		return `contember__subTree_${Hashing.hashMarkerTreeParameters(subTreeParameters)}`
+		return `subTree_${Hashing.hashMarkerTreeParameters(subTreeParameters)}`
 	}
 }

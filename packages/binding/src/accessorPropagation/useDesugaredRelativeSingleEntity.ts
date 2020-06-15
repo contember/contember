@@ -13,12 +13,35 @@ function useDesugaredRelativeSingleEntity(
 	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined,
 ): RelativeSingleEntity | undefined {
 	const environment = useEnvironment()
+
+	let normalizedSugared: SugaredRelativeSingleEntity | undefined = undefined
+	let hasEntity: boolean
+
+	if (sugaredRelativeSingleEntity === undefined) {
+		hasEntity = false
+	} else if (typeof sugaredRelativeSingleEntity === 'string') {
+		hasEntity = true
+		normalizedSugared = {
+			field: sugaredRelativeSingleEntity,
+		}
+	} else {
+		hasEntity = true
+		normalizedSugared = sugaredRelativeSingleEntity
+	}
+
 	return React.useMemo(
 		() =>
-			sugaredRelativeSingleEntity !== undefined
-				? QueryLanguage.desugarRelativeSingleEntity(sugaredRelativeSingleEntity, environment)
-				: sugaredRelativeSingleEntity,
-		[environment, sugaredRelativeSingleEntity],
+			hasEntity
+				? QueryLanguage.desugarRelativeSingleEntity(
+						{
+							field: normalizedSugared?.field!,
+							isNonbearing: normalizedSugared?.isNonbearing,
+							connectTo: normalizedSugared?.connectTo,
+						},
+						environment,
+				  )
+				: undefined,
+		[normalizedSugared?.field, normalizedSugared?.isNonbearing, normalizedSugared?.connectTo, environment, hasEntity],
 	)
 }
 

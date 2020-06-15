@@ -71,6 +71,7 @@ interface InternalEntityState extends InternalContainerState {
 	accessor: EntityAccessor
 	addEventListener: EntityAccessor.AddEntityEventListener
 	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
+	//childrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
@@ -105,6 +106,7 @@ interface InternalEntityListState extends InternalContainerState {
 	addEventListener: EntityListAccessor.AddEntityListEventListener
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
+	//childrenWithUnpersistedChanges: Set<InternalEntityState> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:
@@ -134,6 +136,7 @@ interface InternalFieldState {
 		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
 	}
 	fieldMarker: FieldMarker
+	//hasUnpersistedChanges: boolean
 	hasPendingUpdate: boolean
 	initialData: Scalar | undefined | FieldAccessor
 	onUpdate: OnFieldUpdate

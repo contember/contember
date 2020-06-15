@@ -76,6 +76,20 @@ export class MutationGenerator {
 					queryBuilder,
 				)
 			}
+			if (rootState.plannedRemovals) {
+				for (const { removedEntity, removalType } of rootState.plannedRemovals) {
+					if (removalType === 'delete') {
+						queryBuilder = this.addDeleteMutation(
+							removedEntity,
+							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.accessor)),
+							parameters,
+							queryBuilder,
+						)
+					} else if (removalType === 'disconnect') {
+						throw new BindingError(`EntityList: cannot disconnect top-level entities.`)
+					}
+				}
+			}
 		} else {
 			assertNever(rootState)
 		}

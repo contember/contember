@@ -617,6 +617,7 @@ class AccessorTreeGenerator {
 		}
 
 		entityListState.disconnectEntity = childEntityOrItsKey => {
+			// TODO disallow this if the EntityList is at the top level
 			this.performRootTreeOperation(() => {
 				performMutatingOperation(() => {
 					const disconnectedChildKey =

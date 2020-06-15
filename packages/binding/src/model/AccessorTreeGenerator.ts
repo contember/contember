@@ -25,7 +25,7 @@ import {
 	PlaceholderGenerator,
 	ReferenceMarker,
 } from '../markers'
-import { ExpectedEntityCount, FieldName, FieldValue, Scalar } from '../treeParameters'
+import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
@@ -59,6 +59,12 @@ enum InternalStateType {
 	EntityList,
 }
 
+interface InternalEntityFieldPlannedRemoval {
+	field: FieldName
+	removalType: RemovalType
+	removedEntity: InternalEntityState
+}
+
 type OnEntityFieldUpdate = (state: InternalStateNode) => void
 interface InternalEntityState extends InternalContainerState {
 	type: InternalStateType.SingleEntity
@@ -72,6 +78,8 @@ interface InternalEntityState extends InternalContainerState {
 	fields: Map<FieldName, InternalStateNode>
 	id: string | EntityAccessor.UnpersistedEntityId
 	persistedData: AccessorTreeGenerator.InitialEntityData
+	isScheduledForDeletion: boolean
+	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined
 
 	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.
@@ -80,6 +88,11 @@ interface InternalEntityState extends InternalContainerState {
 	connectEntityAtField: EntityAccessor.ConnectEntityAtField
 	disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField
 	deleteEntity: EntityAccessor.DeleteEntity
+}
+
+interface InternalEntityPlannedRemoval {
+	removalType: RemovalType
+	removedEntity: InternalEntityState
 }
 
 type OnEntityListUpdate = (state: InternalEntityListState) => void
@@ -97,6 +110,8 @@ interface InternalEntityListState extends InternalContainerState {
 	}
 	fieldMarkers: EntityFieldMarkers
 	initialData: ReceivedEntityData<undefined | null>[] | Array<EntityAccessor | EntityForRemovalAccessor>
+	plannedRemovals: Set<InternalEntityPlannedRemoval> | undefined
+
 	onUpdate: OnEntityListUpdate
 	getEntityByKey: EntityListAccessor.GetEntityByKey
 	preferences: ReferenceMarker.ReferencePreferences
@@ -461,6 +476,9 @@ class AccessorTreeGenerator {
 
 	private initializeEntityAccessor(entityState: InternalEntityState, markers: EntityFieldMarkers): InternalEntityState {
 		const batchUpdatesImplementation: EntityAccessor.BatchUpdates = performUpdates => {
+			if (entityState.isScheduledForDeletion) {
+				throw new BindingError(`Trying to update an entity (or something within said entity) that has been deleted.`)
+			}
 			entityState.batchUpdateDepth++
 			const accessorBeforeUpdates = entityState.accessor
 			performUpdates(() => entityState.accessor!)
@@ -524,7 +542,7 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		entityState.connectEntityAtField = field => {
+		entityState.connectEntityAtField = (field, connectedEntityOrItsKey) => {
 			throw new BindingError(`EntityAccessor.connectEntityAtField: not implemented`) // TODO
 		}
 
@@ -533,13 +551,42 @@ class AccessorTreeGenerator {
 		}
 
 		entityState.deleteEntity = () => {
-			throw new BindingError(`EntityAccessor.deleteEntity: not implemented`) // TODO
+			this.performRootTreeOperation(() => {
+				// Deliberately not calling performMutatingOperation ‒ no beforeUpdate events after deletion
+				batchUpdatesImplementation(() => {
+					entityState.isScheduledForDeletion = true
+					updateAccessorInstance()
+				})
+			})
+		}
+
+		const processEntityDeletion = (stateForDeletion: InternalEntityState) => {
+			entityState.childrenWithPendingUpdates?.delete(stateForDeletion)
+
+			if (entityState.plannedRemovals === undefined) {
+				entityState.plannedRemovals = new Set()
+			}
+
+			for (const [fieldName, fieldState] of entityState.fields) {
+				if (fieldState === stateForDeletion) {
+					entityState.fields.delete(fieldName)
+					entityState.plannedRemovals.add({
+						field: fieldName,
+						removalType: 'delete',
+						removedEntity: stateForDeletion,
+					})
+				}
+			}
 		}
 
 		const onFieldUpdate = (updatedState: InternalStateNode) => {
 			performMutatingOperation(() => {
+				if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
+					processEntityDeletion(updatedState)
+				} else {
+					this.markChildStateInNeedOfUpdate(entityState, updatedState)
+				}
 				updateAccessorInstance()
-				this.markChildStateInNeedOfUpdate(entityState, updatedState)
 			})
 		}
 
@@ -606,14 +653,34 @@ class AccessorTreeGenerator {
 				entityListState.disconnectEntity,
 			))
 		}
+
+		const processEntityDeletion = (stateForDeletion: InternalEntityState) => {
+			entityListState.childrenWithPendingUpdates?.delete(stateForDeletion)
+
+			if (entityListState.plannedRemovals === undefined) {
+				entityListState.plannedRemovals = new Set()
+			}
+			const key = this.idToKey(stateForDeletion.id)
+
+			entityListState.childrenKeys.delete(key)
+			entityListState.plannedRemovals.add({
+				removalType: 'delete',
+				removedEntity: stateForDeletion,
+			})
+		}
+
 		const onChildEntityUpdate: OnEntityFieldUpdate = updatedState => {
 			if (updatedState.type !== InternalStateType.SingleEntity) {
 				throw new BindingError(`Illegal entity list value.`)
 			}
 
 			performMutatingOperation(() => {
+				if (updatedState.isScheduledForDeletion) {
+					processEntityDeletion(updatedState)
+				} else {
+					this.markChildStateInNeedOfUpdate(entityListState, updatedState)
+				}
 				updateAccessorInstance()
-				this.markChildStateInNeedOfUpdate(entityListState, updatedState)
 			})
 		}
 
@@ -868,6 +935,8 @@ class AccessorTreeGenerator {
 				},
 				fields: new Map(),
 				hasPendingUpdate: true,
+				isScheduledForDeletion: false,
+				plannedRemovals: undefined,
 				id,
 				persistedData,
 				realms: new Map([[fieldMarkers, onUpdate]]),
@@ -939,6 +1008,7 @@ class AccessorTreeGenerator {
 					update: undefined,
 					beforeUpdate: undefined,
 				},
+				plannedRemovals: undefined,
 				hasPendingUpdate: true,
 				accessor: (undefined as any) as EntityListAccessor,
 				batchUpdates: (undefined as any) as EntityListAccessor.BatchUpdates,

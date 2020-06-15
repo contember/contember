@@ -25,7 +25,7 @@ import {
 	PlaceholderGenerator,
 	ReferenceMarker,
 } from '../markers'
-import { ExpectedEntityCount, FieldName, FieldValue, RemovalType, Scalar } from '../treeParameters'
+import { ExpectedEntityCount, FieldName, FieldValue, Scalar } from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 
@@ -64,7 +64,7 @@ interface InternalEntityState extends InternalContainerState {
 	type: InternalStateType.SingleEntity
 	accessor: EntityAccessor
 	addEventListener: EntityAccessor.AddEntityEventListener
-	dirtyChildren: Set<InternalStateNode> | undefined
+	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
@@ -88,7 +88,7 @@ interface InternalEntityListState extends InternalContainerState {
 	accessor: EntityListAccessor
 	addEventListener: EntityListAccessor.AddEntityListEventListener
 	childrenKeys: Set<string>
-	dirtyChildren: Set<InternalEntityState> | undefined
+	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:
@@ -516,13 +516,6 @@ class AccessorTreeGenerator {
 			))
 		}
 
-		const markChildStateDirty = (updatedState: InternalStateNode) => {
-			if (entityState.dirtyChildren === undefined) {
-				entityState.dirtyChildren = new Set()
-			}
-			entityState.dirtyChildren.add(updatedState)
-		}
-
 		entityState.batchUpdates = performUpdates => {
 			this.performRootTreeOperation(() => {
 				performMutatingOperation(() => {
@@ -546,7 +539,7 @@ class AccessorTreeGenerator {
 		const onFieldUpdate = (updatedState: InternalStateNode) => {
 			performMutatingOperation(() => {
 				updateAccessorInstance()
-				markChildStateDirty(updatedState)
+				this.markChildStateInNeedOfUpdate(entityState, updatedState)
 			})
 		}
 
@@ -613,12 +606,6 @@ class AccessorTreeGenerator {
 				entityListState.disconnectEntity,
 			))
 		}
-		const markChildStateDirty = (updatedState: InternalEntityState) => {
-			if (entityListState.dirtyChildren === undefined) {
-				entityListState.dirtyChildren = new Set()
-			}
-			entityListState.dirtyChildren.add(updatedState)
-		}
 		const onChildEntityUpdate: OnEntityFieldUpdate = updatedState => {
 			if (updatedState.type !== InternalStateType.SingleEntity) {
 				throw new BindingError(`Illegal entity list value.`)
@@ -626,7 +613,7 @@ class AccessorTreeGenerator {
 
 			performMutatingOperation(() => {
 				updateAccessorInstance()
-				markChildStateDirty(updatedState)
+				this.markChildStateInNeedOfUpdate(entityListState, updatedState)
 			})
 		}
 
@@ -656,10 +643,10 @@ class AccessorTreeGenerator {
 						this.rejectInvalidAccessorTree()
 					}*/
 					/*
-						if (entityListState.dirtyChildren === undefined) {
-							entityListState.dirtyChildren = new Set()
+						if (entityListState.childrenWithPendingUpdates === undefined) {
+							entityListState.childrenWithPendingUpdates = new Set()
 						}
-						entityListState.dirtyChildren.add(key)
+						entityListState.childrenWithPendingUpdates.add(key)
 					*/
 					/*if (
 						!childState.persistedData ||
@@ -707,7 +694,7 @@ class AccessorTreeGenerator {
 		entityListState.createNewEntity = initialize => {
 			entityListState.batchUpdates(() => {
 				const newState = generateNewEntityState(undefined)
-				markChildStateDirty(newState)
+				this.markChildStateInNeedOfUpdate(entityListState, newState)
 				initialize && newState.batchUpdates(initialize)
 			})
 		}
@@ -873,7 +860,7 @@ class AccessorTreeGenerator {
 				accessor: undefined as any,
 				addEventListener: undefined as any,
 				batchUpdateDepth: 0,
-				dirtyChildren: undefined,
+				childrenWithPendingUpdates: undefined,
 				errors,
 				eventListeners: {
 					update: undefined,
@@ -901,11 +888,11 @@ class AccessorTreeGenerator {
 		existingState.persistedData = persistedData
 		existingState.realms.set(fieldMarkers, onUpdate)
 
-		if (existingState.dirtyChildren === undefined) {
-			existingState.dirtyChildren = new Set(existingState.fields.values())
+		if (existingState.childrenWithPendingUpdates === undefined) {
+			existingState.childrenWithPendingUpdates = new Set(existingState.fields.values())
 		} else {
 			for (const [, childState] of existingState.fields) {
-				existingState.dirtyChildren.add(childState)
+				existingState.childrenWithPendingUpdates.add(childState)
 			}
 		}
 		return existingState
@@ -947,7 +934,7 @@ class AccessorTreeGenerator {
 				initialData: sourceData,
 				batchUpdateDepth: 0,
 				childrenKeys: new Set(),
-				dirtyChildren: undefined,
+				childrenWithPendingUpdates: undefined,
 				eventListeners: {
 					update: undefined,
 					beforeUpdate: undefined,
@@ -970,15 +957,17 @@ class AccessorTreeGenerator {
 		existingState.onUpdate = onUpdate
 		existingState.initialData = sourceData
 
-		if (existingState.dirtyChildren === undefined) {
-			existingState.dirtyChildren = new Set(Array.from(existingState.childrenKeys, id => this.entityStore.get(id)!))
+		if (existingState.childrenWithPendingUpdates === undefined) {
+			existingState.childrenWithPendingUpdates = new Set(
+				Array.from(existingState.childrenKeys, id => this.entityStore.get(id)!),
+			)
 		} else {
 			for (const childId of existingState.childrenKeys) {
 				const childState = this.entityStore.get(childId)
 				if (childState === undefined) {
 					continue
 				}
-				existingState.dirtyChildren.add(childState)
+				existingState.childrenWithPendingUpdates.add(childState)
 			}
 		}
 		// TODO This is kind of crap. We should resolve child ids from here.
@@ -1002,6 +991,21 @@ class AccessorTreeGenerator {
 			return id
 		}
 		return id.value
+	}
+
+	private markChildStateInNeedOfUpdate(
+		entityListState: InternalEntityListState,
+		updatedState: InternalEntityState,
+	): void
+	private markChildStateInNeedOfUpdate(entityState: InternalEntityState, updatedState: InternalStateNode): void
+	private markChildStateInNeedOfUpdate(
+		state: InternalEntityListState | InternalEntityState,
+		updatedState: InternalStateNode,
+	): void {
+		if (state.childrenWithPendingUpdates === undefined) {
+			state.childrenWithPendingUpdates = new Set()
+		}
+		state.childrenWithPendingUpdates.add(updatedState as InternalEntityState)
 	}
 
 	private getAddEventListener(state: {
@@ -1046,11 +1050,11 @@ class AccessorTreeGenerator {
 			switch (state.type) {
 				case InternalStateType.SingleEntity:
 				case InternalStateType.EntityList: {
-					if (state.dirtyChildren !== undefined) {
-						for (const dirtyChildState of state.dirtyChildren) {
-							agenda.push(dirtyChildState)
+					if (state.childrenWithPendingUpdates !== undefined) {
+						for (const childState of state.childrenWithPendingUpdates) {
+							agenda.push(childState)
 						}
-						state.dirtyChildren = undefined
+						state.childrenWithPendingUpdates = undefined
 					}
 					break
 				}

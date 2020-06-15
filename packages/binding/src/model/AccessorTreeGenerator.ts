@@ -203,8 +203,8 @@ class AccessorTreeGenerator {
 		if (this.isFrozenWhileUpdating) {
 			throw new BindingError(
 				`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
-					`by updating the accessor tree during rendering or in the 'afterUpdate' event handler. That is a no-op. ` +
-					`If you wish to react to changes, use the 'beforeUpdate' event handler.`,
+					`by updating the accessor tree during rendering or in the 'update' event handler, which is a no-op. ` +
+					`If you wish to mutate the tree in reaction to changes, use the 'beforeUpdate' event handler.`,
 			)
 		}
 

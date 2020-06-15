@@ -736,7 +736,6 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		// TODO
 		entityListState.connectEntity = entityToConnectOrItsKey => {
 			let connectedEntityKey: string
 
@@ -758,6 +757,16 @@ class AccessorTreeGenerator {
 					`EntityListAccessor: attempting to connect an entity with key '${connectedEntityKey}' ` +
 						`but it doesn't exist.`,
 				)
+			}
+			connectedState.isScheduledForDeletion = false
+
+			if (entityListState.plannedRemovals) {
+				// If the entity was previously scheduled for removal, undo that.
+				for (const plannedRemoval of entityListState.plannedRemovals) {
+					if (plannedRemoval.removedEntity === connectedState) {
+						entityListState.plannedRemovals.delete(plannedRemoval)
+					}
+				}
 			}
 
 			connectedState.realms.set(entityListState.fieldMarkers, onChildEntityUpdate)

@@ -5,7 +5,7 @@ import { SugaredRelativeSingleEntity } from '../treeParameters'
 import { Component } from './Component'
 import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
-export type HasOneProps<EntityProps> = SugaredRelativeSingleEntity & {
+export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 	children?: React.ReactNode
 } & (
 		| {}

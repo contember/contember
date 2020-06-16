@@ -7,7 +7,7 @@ import { Component } from './Component'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { SingleEntityBaseProps } from './SingleEntity'
 
-export type HasManyProps<ListProps, EntityProps> = SugaredRelativeEntityList & {
+export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelativeEntityList & {
 	preferences?: Partial<ReferenceMarker.ReferencePreferences>
 	children?: React.ReactNode
 } & (

@@ -315,8 +315,7 @@ export class MutationGenerator {
 					builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
 				}
 			} else if (marker instanceof SubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted, and so while they may appear here, they are definitely also
-				// handled at the top level.
+				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {
 				assertNever(marker)
 			}
@@ -477,8 +476,7 @@ export class MutationGenerator {
 				// Do nothing: connections are only relevant to create mutations. At the point of updating, the entity is
 				// supposed to have already been connected.
 			} else if (marker instanceof SubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted, and so while they may appear here, they are definitely also
-				// handled at the top level.
+				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {
 				assertNever(marker)
 			}

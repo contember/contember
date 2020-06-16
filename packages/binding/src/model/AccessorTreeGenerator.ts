@@ -247,21 +247,7 @@ class AccessorTreeGenerator {
 			}
 
 			if (field instanceof SubTreeMarker) {
-				let initialData: ReceivedData<undefined> | SubTreeAccessor
-
-				if (this.initialData instanceof TreeRootAccessor) {
-					if (this.persistedData === undefined) {
-						initialData = undefined
-					} else {
-						initialData = this.persistedData[field.placeholderName]
-					}
-				} else if (this.initialData === undefined) {
-					initialData = undefined
-				} else {
-					initialData = this.initialData[field.placeholderName]
-				}
-
-				entityState.fields.set(field.placeholderName, this.initializeSubTree(field, initialData, this.errorTreeRoot))
+				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else if (field instanceof ReferenceMarker) {
 				for (const referencePlaceholder in field.references) {
 					const reference = field.references[referencePlaceholder]

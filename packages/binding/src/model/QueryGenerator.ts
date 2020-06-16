@@ -4,9 +4,9 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	SubTreeMarker,
 	MarkerTreeRoot,
 	ReferenceMarker,
+	SubTreeMarker,
 } from '../markers'
 import { BoxedQualifiedEntityList, BoxedQualifiedSingleEntity } from '../treeParameters'
 import { assertNever, ucfirst } from '../utils'
@@ -38,13 +38,9 @@ export class QueryGenerator {
 			case 'qualifiedEntityList':
 				return this.addListQuery(baseQueryBuilder, subTree as SubTreeMarker<BoxedQualifiedEntityList>)
 			case 'unconstrainedQualifiedSingleEntity':
-			case 'unconstrainedQualifiedEntityList': {
-				const [populatedBaseQueryBuilder] = this.addSubTreeMarkerQueries(
-					baseQueryBuilder,
-					this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate()),
-				)
-				return populatedBaseQueryBuilder
-			}
+			case 'unconstrainedQualifiedEntityList':
+				// Unconstrained trees, by definition, don't have any queries.
+				return baseQueryBuilder
 		}
 		assertNever(subTree.parameters)
 	}
@@ -53,17 +49,11 @@ export class QueryGenerator {
 		baseQueryBuilder: BaseQueryBuilder,
 		subTree: SubTreeMarker<BoxedQualifiedSingleEntity>,
 	): BaseQueryBuilder {
-		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addSubTreeMarkerQueries(
-			baseQueryBuilder,
-			this.registerQueryPart(
-				subTree.fields,
-				CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(
-					subTree.parameters.value.where,
-				),
-			),
+		const populatedListQueryBuilder = this.registerQueryPart(
+			subTree.fields,
+			CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.parameters.value.where),
 		)
-
-		return populatedBaseQueryBuilder.get(
+		return baseQueryBuilder.get(
 			subTree.entityName,
 			CrudQueryBuilder.ReadBuilder.instantiate(
 				populatedListQueryBuilder ? populatedListQueryBuilder.objectBuilder : undefined,
@@ -102,19 +92,14 @@ export class QueryGenerator {
 			finalBuilder = CrudQueryBuilder.ReadBuilder.instantiate()
 		}
 
-		const [newBaseQueryBuilder, newReadBuilder] = this.addSubTreeMarkerQueries(
-			baseQueryBuilder,
-			this.registerQueryPart(subTree.fields, finalBuilder),
-		)
-
-		return newBaseQueryBuilder.list(
+		return baseQueryBuilder.list(
 			subTree.entityName,
-			newReadBuilder || CrudQueryBuilder.ReadBuilder.instantiate(),
+			this.registerQueryPart(subTree.fields, finalBuilder),
 			subTree.placeholderName,
 		)
 	}
 
-	private *registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): Generator<SubTreeMarker, ReadBuilder> {
+	private registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): ReadBuilder {
 		builder = builder.column(PRIMARY_KEY_NAME)
 		builder = builder.column(TYPENAME_KEY_NAME)
 
@@ -128,15 +113,10 @@ export class QueryGenerator {
 					const reference = fieldValue.references[referenceName]
 
 					let builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate()
-					const subPart = this.registerQueryPart(reference.fields, builderWithBody)
 
-					let item = subPart.next()
-
-					while (!item.done) {
-						yield item.value
-						item = subPart.next()
-					}
-					builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(item.value.objectBuilder)
+					builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
+						this.registerQueryPart(reference.fields, builderWithBody).objectBuilder,
+					)
 
 					const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 						CrudQueryBuilder.ReadArguments,
@@ -161,24 +141,13 @@ export class QueryGenerator {
 				}
 			} else if (fieldValue instanceof ConnectionMarker) {
 				// Do nothing ‒ connections are only relevant to mutations.
+			} else if (fieldValue instanceof SubTreeMarker) {
+				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {
-				yield fieldValue
+				assertNever(fieldValue)
 			}
 		}
 
 		return builder
-	}
-
-	private addSubTreeMarkerQueries(
-		baseQueryBuilder: BaseQueryBuilder,
-		subTrees: Generator<SubTreeMarker, ReadBuilder>,
-	): [BaseQueryBuilder, ReadBuilder | undefined] {
-		let item = subTrees.next()
-		while (!item.done) {
-			baseQueryBuilder = this.addSubQuery(item.value, baseQueryBuilder)
-			item = subTrees.next()
-		}
-
-		return [baseQueryBuilder, item.value]
 	}
 }

@@ -139,55 +139,67 @@ export class ChildrenAnalyzer<
 			}
 
 			for (const leaf of this.leafs) {
-				if (leaf.specification.type === RepresentationFactorySite.DeclarationSite) {
-					const { factoryMethodName } = leaf.specification
+				const specification = leaf.specification
+				switch (specification.type) {
+					case RepresentationFactorySite.DeclarationSite: {
+						const { factoryMethodName } = specification
 
-					if (factoryMethodName in treeNode) {
-						const factory = treeNode[factoryMethodName] as LeafRepresentationFactory<
-							any,
-							AllBranchNodesRepresentation | AllLeafsRepresentation,
-							Environment
-						>
-						return factory(node.props, environment)
+						if (factoryMethodName in treeNode) {
+							const factory = treeNode[factoryMethodName] as LeafRepresentationFactory<
+								any,
+								AllBranchNodesRepresentation | AllLeafsRepresentation,
+								Environment
+							>
+							return factory(node.props, environment)
+						}
+						break
 					}
-				} else if (leaf.specification.type === RepresentationFactorySite.UseSite) {
-					const { ComponentType, factory } = leaf.specification
-					if (ComponentType === undefined || node.type === ComponentType) {
-						return factory(node.props, environment)
+					case RepresentationFactorySite.UseSite: {
+						const { ComponentType, factory } = specification
+						if (ComponentType === undefined || node.type === ComponentType) {
+							return factory(node.props, environment)
+						}
+						break
 					}
-				} else {
-					return assertNever(leaf.specification)
+					default:
+						return assertNever(specification)
 				}
 			}
 
 			const processedChildren = this.processNode(children, environment)
 
 			for (const branchNode of this.branchNodes) {
-				if (branchNode.specification.type === RepresentationFactorySite.DeclarationSite) {
-					const { factoryMethodName, childrenRepresentationReducer } = branchNode.specification
+				const specification = branchNode.specification
+				switch (specification.type) {
+					case RepresentationFactorySite.DeclarationSite: {
+						const { factoryMethodName, childrenRepresentationReducer } = specification
 
-					if (factoryMethodName in treeNode) {
-						if (!processedChildren) {
-							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
+						if (factoryMethodName in treeNode) {
+							if (!processedChildren) {
+								throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
+							}
+							const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
+								any,
+								unknown,
+								AllBranchNodesRepresentation | AllLeafsRepresentation,
+								Environment
+							>
+							return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
 						}
-						const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
-							any,
-							unknown,
-							AllBranchNodesRepresentation | AllLeafsRepresentation,
-							Environment
-						>
-						return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
+						break
 					}
-				} else if (branchNode.specification.type === RepresentationFactorySite.UseSite) {
-					const { factory, ComponentType } = branchNode.specification
-					if (ComponentType === undefined || node.type === ComponentType) {
-						if (!processedChildren) {
-							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
+					case RepresentationFactorySite.UseSite: {
+						const { factory, ComponentType } = specification
+						if (ComponentType === undefined || node.type === ComponentType) {
+							if (!processedChildren) {
+								throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
+							}
+							return factory(node.props, processedChildren, environment)
 						}
-						return factory(node.props, processedChildren, environment)
+						break
 					}
-				} else {
-					return assertNever(branchNode.specification)
+					default:
+						return assertNever(specification)
 				}
 			}
 

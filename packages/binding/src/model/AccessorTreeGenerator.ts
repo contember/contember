@@ -58,11 +58,7 @@ const BEFORE_UPDATE_SETTLE_LIMIT = 20
 // TODO the state initialization methods are kind of crap but we'll deal with them later.
 
 class AccessorTreeGenerator {
-	private persistedData: ReceivedDataTree<undefined> | undefined
-	private initialData: TreeRootAccessor | ReceivedDataTree<undefined> | undefined
 	private updateData: AccessorTreeGenerator.UpdateData | undefined
-
-	private errorTreeRoot?: ErrorsPreprocessor.ErrorTreeRoot
 
 	// TODO deletes and disconnects cause memory leaks here as they don't traverse the tree to remove nested states.
 	//  This could theoretically also be intentional given that both operations happen relatively infrequently,
@@ -102,11 +98,9 @@ class AccessorTreeGenerator {
 	): void {
 		const preprocessor = new ErrorsPreprocessor(errors)
 
-		this.errorTreeRoot = preprocessor.preprocess()
-		console.debug(this.errorTreeRoot, errors)
+		const errorTreeRoot = preprocessor.preprocess()
+		console.debug(errorTreeRoot, errors)
 
-		this.persistedData = persistedData
-		this.initialData = initialData
 		this.updateData = updateData
 
 		for (const [placeholderName, marker] of this.markerTree.subTrees) {
@@ -117,7 +111,7 @@ class AccessorTreeGenerator {
 					: initialData === undefined
 					? undefined
 					: initialData[placeholderName],
-				this.errorTreeRoot,
+				errorTreeRoot,
 			)
 			this.subTreeStates.set(placeholderName, subTreeState)
 		}

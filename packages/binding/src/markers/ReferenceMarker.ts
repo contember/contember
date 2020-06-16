@@ -57,7 +57,7 @@ class ReferenceMarker {
 				throw new BindingError(`The preferred 'initialEntityCount' for a relation must be a non-negative integer!`)
 			}
 			if (decider === ExpectedEntityCount.UpToOne && normalizedPreferences.initialEntityCount > 1) {
-				throw new BindingError(`A ToOne reference cannot prefer more than one entity!`)
+				throw new BindingError(`A HasOne reference cannot prefer more than one entity!`)
 			}
 
 			references = {

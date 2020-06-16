@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Environment } from '../dao'
-import { ConnectionMarker, EntityFieldMarkers, FieldMarker, MarkerSubTree, ReferenceMarker } from '../markers'
+import { ConnectionMarker, EntityFieldMarkers, FieldMarker, SubTreeMarker, ReferenceMarker } from '../markers'
 
 export interface EnvironmentDeltaProvider<P extends {} = any> {
 	generateEnvironment: (props: P, oldEnvironment: Environment) => Environment
@@ -15,12 +15,12 @@ export interface FieldMarkerProvider<P extends {} = any> {
 	generateFieldMarker: (props: P, environment: Environment) => FieldMarker | ReferenceMarker | EntityFieldMarkers
 }
 
-export interface MarkerSubTreeProvider<P extends {} = any> {
-	generateMarkerSubTree: (
+export interface SubTreeMarkerProvider<P extends {} = any> {
+	generateSubTreeMarker: (
 		props: P,
-		fields: MarkerSubTree['fields'],
+		fields: SubTreeMarker['fields'],
 		environment: Environment,
-	) => MarkerSubTree | EntityFieldMarkers
+	) => SubTreeMarker | EntityFieldMarkers
 }
 
 export interface ReferenceMarkerProvider<P extends {} = any> {
@@ -45,7 +45,7 @@ export interface SyntheticChildrenProvider<P extends {} = any> {
 
 export type CompleteMarkerProvider<P extends {} = any> = EnvironmentDeltaProvider<P> &
 	FieldMarkerProvider<P> &
-	MarkerSubTreeProvider<P> &
+	SubTreeMarkerProvider<P> &
 	ReferenceMarkerProvider<P> &
 	ConnectionMarkerProvider<P> &
 	SyntheticChildrenProvider<P>

@@ -13,7 +13,7 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	MarkerSubTree,
+	SubTreeMarker,
 	MarkerTreeRoot,
 	ReferenceMarker,
 } from '../markers'
@@ -130,7 +130,7 @@ export class DirtinessChecker {
 						assertNever(reference.expectedCount)
 					}
 				}
-			} else if (marker instanceof MarkerSubTree) {
+			} else if (marker instanceof SubTreeMarker) {
 				// Do nothing. For the time being, we don't support persisting these so there's nothing to be concluded from
 				// here. However, that will likely change in future.
 			} else if (marker instanceof ConnectionMarker) {

@@ -18,8 +18,8 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	MarkerSubTree,
-	MarkerSubTreeParameters,
+	SubTreeMarker,
+	SubTreeMarkerParameters,
 	MarkerTreeRoot,
 	PlaceholderGenerator,
 	ReferenceMarker,
@@ -79,8 +79,8 @@ class AccessorTreeGenerator {
 		}
 		return entity.accessor
 	}
-	private readonly getSubTree = ((parameters: MarkerSubTreeParameters) => {
-		const placeholderName = PlaceholderGenerator.getMarkerSubTreePlaceholder(parameters)
+	private readonly getSubTree = ((parameters: SubTreeMarkerParameters) => {
+		const placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(parameters)
 		const subTreeState = this.subTreeStates.get(placeholderName)
 
 		if (subTreeState === undefined) {
@@ -166,7 +166,7 @@ class AccessorTreeGenerator {
 	}
 
 	private initializeSubTree(
-		tree: MarkerSubTree,
+		tree: SubTreeMarker,
 		data: ReceivedData<undefined> | SubTreeAccessor,
 		errors?: ErrorsPreprocessor.ErrorTreeRoot,
 	): InternalRootStateNode {
@@ -246,7 +246,7 @@ class AccessorTreeGenerator {
 				continue
 			}
 
-			if (field instanceof MarkerSubTree) {
+			if (field instanceof SubTreeMarker) {
 				let initialData: ReceivedData<undefined> | SubTreeAccessor
 
 				if (this.initialData instanceof TreeRootAccessor) {

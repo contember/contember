@@ -1,4 +1,4 @@
-import { MarkerSubTreeParameters, ReferenceMarker } from '../markers'
+import { SubTreeMarkerParameters, ReferenceMarker } from '../markers'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
@@ -19,7 +19,7 @@ export class Hashing {
 		return Hashing.hashArray(where)
 	}
 
-	public static hashMarkerTreeParameters(parameters: MarkerSubTreeParameters): number {
+	public static hashMarkerTreeParameters(parameters: SubTreeMarkerParameters): number {
 		if (parameters.isConstrained) {
 			if (parameters instanceof BoxedQualifiedSingleEntity) {
 				return Hashing.hashArray([

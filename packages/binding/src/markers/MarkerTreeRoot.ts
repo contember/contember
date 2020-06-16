@@ -1,5 +1,5 @@
-import { MarkerSubTree } from './MarkerSubTree'
+import { SubTreeMarker } from './SubTreeMarker'
 
 export class MarkerTreeRoot {
-	public constructor(public readonly subTrees: Map<string, MarkerSubTree>) {}
+	public constructor(public readonly subTrees: Map<string, SubTreeMarker>) {}
 }

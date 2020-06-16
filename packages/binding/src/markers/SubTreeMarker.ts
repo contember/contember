@@ -7,17 +7,17 @@ import {
 import { EntityFieldMarkers } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
-export type MarkerSubTreeParameters =
+export type SubTreeMarkerParameters =
 	| BoxedQualifiedSingleEntity
 	| BoxedQualifiedEntityList
 	| BoxedUnconstrainedQualifiedSingleEntity
 	| BoxedUnconstrainedQualifiedEntityList
 
-export class MarkerSubTree<C extends MarkerSubTreeParameters = MarkerSubTreeParameters> {
+export class SubTreeMarker<C extends SubTreeMarkerParameters = SubTreeMarkerParameters> {
 	public readonly placeholderName: string
 
 	public constructor(public readonly parameters: C, public readonly fields: EntityFieldMarkers) {
-		this.placeholderName = PlaceholderGenerator.generateMarkerSubTreePlaceholder(this)
+		this.placeholderName = PlaceholderGenerator.generateSubTreeMarkerPlaceholder(this)
 	}
 
 	public get entityName() {

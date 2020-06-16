@@ -2,7 +2,7 @@ import { FieldName } from '../treeParameters'
 import { Hashing } from '../utils'
 import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'
-import { MarkerSubTree, MarkerSubTreeParameters } from './MarkerSubTree'
+import { SubTreeMarker, SubTreeMarkerParameters } from './SubTreeMarker'
 import { ReferenceMarker } from './ReferenceMarker'
 
 export class PlaceholderGenerator {
@@ -38,11 +38,11 @@ export class PlaceholderGenerator {
 
 	//
 
-	public static generateMarkerSubTreePlaceholder(marker: MarkerSubTree): string {
-		return PlaceholderGenerator.getMarkerSubTreePlaceholder(marker.parameters)
+	public static generateSubTreeMarkerPlaceholder(marker: SubTreeMarker): string {
+		return PlaceholderGenerator.getSubTreeMarkerPlaceholder(marker.parameters)
 	}
 
-	public static getMarkerSubTreePlaceholder(subTreeParameters: MarkerSubTreeParameters): string {
+	public static getSubTreeMarkerPlaceholder(subTreeParameters: SubTreeMarkerParameters): string {
 		return `subTree_${Hashing.hashMarkerTreeParameters(subTreeParameters)}`
 	}
 }

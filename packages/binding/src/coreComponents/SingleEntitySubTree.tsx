@@ -31,11 +31,11 @@ export const SingleEntitySubTree = Component(
 		return <SingleEntity {...props} accessor={useSingleEntitySubTree(props)} />
 	},
 	{
-		generateMarkerSubTree: (props, fields, environment) => {
+		generateSubTreeMarker: (props, fields, environment) => {
 			if ('isCreating' in props && props.isCreating) {
-				return MarkerFactory.createUnconstrainedSingleEntityMarkerSubTree(environment, props, fields)
+				return MarkerFactory.createUnconstrainedSingleEntitySubTreeMarker(environment, props, fields)
 			}
-			return MarkerFactory.createSingleEntityMarkerSubTree(environment, props, fields)
+			return MarkerFactory.createSingleEntitySubTreeMarker(environment, props, fields)
 		},
 		generateSyntheticChildren: props => <SingleEntity {...props} accessor={0 as any} />,
 	},

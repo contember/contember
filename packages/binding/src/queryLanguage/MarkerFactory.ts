@@ -4,9 +4,9 @@ import {
 	EntityFieldMarkers,
 	FieldMarker,
 	Marker,
-	MarkerSubTree,
 	PlaceholderGenerator,
 	ReferenceMarker,
+	SubTreeMarker,
 } from '../markers'
 import {
 	BoxedQualifiedEntityList,
@@ -28,47 +28,47 @@ import {
 import { QueryLanguage } from './QueryLanguage'
 
 export namespace MarkerFactory {
-	export const createSingleEntityMarkerSubTree = (
+	export const createSingleEntitySubTreeMarker = (
 		environment: Environment,
 		singleEntity: SugaredQualifiedSingleEntity,
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
 
-		return new MarkerSubTree(new BoxedQualifiedSingleEntity(qualifiedSingleEntity), fields)
+		return new SubTreeMarker(new BoxedQualifiedSingleEntity(qualifiedSingleEntity), fields)
 	}
 
-	export const createEntityListMarkerSubTree = (
+	export const createEntityListSubTreeMarker = (
 		environment: Environment,
 		entityList: SugaredQualifiedEntityList,
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(entityList, environment)
 
-		return new MarkerSubTree(
+		return new SubTreeMarker(
 			new BoxedQualifiedEntityList(qualifiedEntityList),
 			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, fields),
 		)
 	}
 
-	export const createUnconstrainedEntityListMarkerSubTree = (
+	export const createUnconstrainedEntityListSubTreeMarker = (
 		environment: Environment,
 		entityList: SugaredUnconstrainedQualifiedEntityList,
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment)
 
-		return new MarkerSubTree(new BoxedUnconstrainedQualifiedEntityList(qualifiedEntityList), fields)
+		return new SubTreeMarker(new BoxedUnconstrainedQualifiedEntityList(qualifiedEntityList), fields)
 	}
 
-	export const createUnconstrainedSingleEntityMarkerSubTree = (
+	export const createUnconstrainedSingleEntitySubTreeMarker = (
 		environment: Environment,
 		entityList: SugaredUnconstrainedQualifiedSingleEntity,
 		fields: EntityFieldMarkers,
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entityList, environment)
 
-		return new MarkerSubTree(new BoxedUnconstrainedQualifiedEntityList(qualifiedSingleEntity), fields)
+		return new SubTreeMarker(new BoxedUnconstrainedQualifiedEntityList(qualifiedSingleEntity), fields)
 	}
 
 	export const createRelativeSingleEntityFields = (

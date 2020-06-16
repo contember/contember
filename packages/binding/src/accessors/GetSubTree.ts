@@ -1,4 +1,4 @@
-import { MarkerSubTreeParameters } from '../markers'
+import { SubTreeMarkerParameters } from '../markers'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
@@ -19,5 +19,5 @@ export interface GetSubTree {
 	// The following overloads are really just combinations of the above combined.
 	(parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity): EntityAccessor
 	(parameters: BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList): EntityListAccessor
-	(parameters: MarkerSubTreeParameters): EntityAccessor | EntityListAccessor
+	(parameters: SubTreeMarkerParameters): EntityAccessor | EntityListAccessor
 }

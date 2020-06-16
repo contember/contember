@@ -36,11 +36,11 @@ export const EntityListSubTree = Component(
 		return <EntityList {...props} accessor={useEntityListSubTree(props)} />
 	},
 	{
-		generateMarkerSubTree: (props, fields, environment) => {
+		generateSubTreeMarker: (props, fields, environment) => {
 			if ('isCreating' in props && props.isCreating) {
-				return MarkerFactory.createUnconstrainedEntityListMarkerSubTree(environment, props, fields)
+				return MarkerFactory.createUnconstrainedEntityListSubTreeMarker(environment, props, fields)
 			}
-			return MarkerFactory.createEntityListMarkerSubTree(environment, props, fields)
+			return MarkerFactory.createEntityListSubTreeMarker(environment, props, fields)
 		},
 		generateSyntheticChildren: props => <EntityList {...props} accessor={0 as any} />,
 	},

@@ -4,16 +4,11 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	MarkerSubTree,
+	SubTreeMarker,
 	MarkerTreeRoot,
 	ReferenceMarker,
 } from '../markers'
-import {
-	BoxedQualifiedEntityList,
-	BoxedQualifiedSingleEntity,
-	BoxedUnconstrainedQualifiedEntityList,
-	BoxedUnconstrainedQualifiedSingleEntity,
-} from '../treeParameters'
+import { BoxedQualifiedEntityList, BoxedQualifiedSingleEntity } from '../treeParameters'
 import { assertNever, ucfirst } from '../utils'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
@@ -36,15 +31,15 @@ export class QueryGenerator {
 		}
 	}
 
-	private addSubQuery(subTree: MarkerSubTree, baseQueryBuilder: BaseQueryBuilder): BaseQueryBuilder {
+	private addSubQuery(subTree: SubTreeMarker, baseQueryBuilder: BaseQueryBuilder): BaseQueryBuilder {
 		switch (subTree.parameters.type) {
 			case 'qualifiedSingleEntity':
-				return this.addGetQuery(baseQueryBuilder, subTree as MarkerSubTree<BoxedQualifiedSingleEntity>)
+				return this.addGetQuery(baseQueryBuilder, subTree as SubTreeMarker<BoxedQualifiedSingleEntity>)
 			case 'qualifiedEntityList':
-				return this.addListQuery(baseQueryBuilder, subTree as MarkerSubTree<BoxedQualifiedEntityList>)
+				return this.addListQuery(baseQueryBuilder, subTree as SubTreeMarker<BoxedQualifiedEntityList>)
 			case 'unconstrainedQualifiedSingleEntity':
 			case 'unconstrainedQualifiedEntityList': {
-				const [populatedBaseQueryBuilder] = this.addMarkerSubTreeQueries(
+				const [populatedBaseQueryBuilder] = this.addSubTreeMarkerQueries(
 					baseQueryBuilder,
 					this.registerQueryPart(subTree.fields, CrudQueryBuilder.ReadBuilder.instantiate()),
 				)
@@ -56,9 +51,9 @@ export class QueryGenerator {
 
 	private addGetQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerSubTree<BoxedQualifiedSingleEntity>,
+		subTree: SubTreeMarker<BoxedQualifiedSingleEntity>,
 	): BaseQueryBuilder {
-		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addMarkerSubTreeQueries(
+		const [populatedBaseQueryBuilder, populatedListQueryBuilder] = this.addSubTreeMarkerQueries(
 			baseQueryBuilder,
 			this.registerQueryPart(
 				subTree.fields,
@@ -79,7 +74,7 @@ export class QueryGenerator {
 
 	private addListQuery(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTree: MarkerSubTree<BoxedQualifiedEntityList>,
+		subTree: SubTreeMarker<BoxedQualifiedEntityList>,
 	): BaseQueryBuilder {
 		let finalBuilder: ReadBuilder
 
@@ -107,7 +102,7 @@ export class QueryGenerator {
 			finalBuilder = CrudQueryBuilder.ReadBuilder.instantiate()
 		}
 
-		const [newBaseQueryBuilder, newReadBuilder] = this.addMarkerSubTreeQueries(
+		const [newBaseQueryBuilder, newReadBuilder] = this.addSubTreeMarkerQueries(
 			baseQueryBuilder,
 			this.registerQueryPart(subTree.fields, finalBuilder),
 		)
@@ -119,7 +114,7 @@ export class QueryGenerator {
 		)
 	}
 
-	private *registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): Generator<MarkerSubTree, ReadBuilder> {
+	private *registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): Generator<SubTreeMarker, ReadBuilder> {
 		builder = builder.column(PRIMARY_KEY_NAME)
 		builder = builder.column(TYPENAME_KEY_NAME)
 
@@ -174,9 +169,9 @@ export class QueryGenerator {
 		return builder
 	}
 
-	private addMarkerSubTreeQueries(
+	private addSubTreeMarkerQueries(
 		baseQueryBuilder: BaseQueryBuilder,
-		subTrees: Generator<MarkerSubTree, ReadBuilder>,
+		subTrees: Generator<SubTreeMarker, ReadBuilder>,
 	): [BaseQueryBuilder, ReadBuilder | undefined] {
 		let item = subTrees.next()
 		while (!item.done) {

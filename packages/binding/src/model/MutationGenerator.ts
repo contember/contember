@@ -278,20 +278,20 @@ export class MutationGenerator {
 						>()
 						const { entityState, reference } = accessorReference[0]
 
-						if (typeof entityState.id !== 'string') {
-							const createBuilder = createOneRelationBuilder.create(
-								this.registerCreateReferenceMutationPart(entityState, reference),
-							)
-							if (createBuilder.data) {
-								builder = builder.one(placeholderName, createBuilder)
-							}
-						} else {
+						if (typeof entityState.id === 'string') {
 							builder = builder.one(
 								placeholderName,
 								createOneRelationBuilder.connect({
 									[PRIMARY_KEY_NAME]: entityState.id,
 								}),
 							)
+						} else {
+							const createBuilder = createOneRelationBuilder.create(
+								this.registerCreateReferenceMutationPart(entityState, reference),
+							)
+							if (createBuilder.data) {
+								builder = builder.one(placeholderName, createBuilder)
+							}
 						}
 					} else {
 						throw new BindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
@@ -315,7 +315,8 @@ export class MutationGenerator {
 					builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
 				}
 			} else if (marker instanceof SubTreeMarker) {
-				// Do nothing: we don't support persisting nested queries (yet?).
+				// Do nothing: all sub trees have been hoisted, and so while they may appear here, they are definitely also
+				// handled at the top level.
 			} else {
 				assertNever(marker)
 			}
@@ -476,7 +477,8 @@ export class MutationGenerator {
 				// Do nothing: connections are only relevant to create mutations. At the point of updating, the entity is
 				// supposed to have already been connected.
 			} else if (marker instanceof SubTreeMarker) {
-				// Do nothing: we don't support persisting nested queries (yet?).
+				// Do nothing: all sub trees have been hoisted, and so while they may appear here, they are definitely also
+				// handled at the top level.
 			} else {
 				assertNever(marker)
 			}

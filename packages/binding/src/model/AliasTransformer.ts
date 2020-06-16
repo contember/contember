@@ -1,4 +1,4 @@
-import { EntityAccessor, EntityForRemovalAccessor } from '../accessors'
+import { EntityAccessor } from '../accessors'
 
 export class AliasTransformer {
 	// This is just a random character we use to make sure the alias doesn't start with a number as UUIDs often do.

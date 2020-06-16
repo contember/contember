@@ -12,7 +12,7 @@ import {
 	ReferenceMarker,
 } from '../markers'
 import { FieldName } from '../treeParameters'
-import { assertNever, Hashing } from '../utils'
+import { assertNever } from '../utils'
 
 type Fragment = EntityFieldMarkers
 type Terminals = FieldMarker | ConnectionMarker | Fragment
@@ -126,7 +126,7 @@ export class MarkerTreeGenerator {
 			} else if (fresh instanceof ConnectionMarker) {
 				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
 			} else if (fresh instanceof MarkerSubTree) {
-				throw new BindingError('MarkerTreeGenerator merging: error code bb') // TODO msg
+				throw new BindingError('MarkerTreeGenerator merging: MarkerSubTrees can only be merged with other sub trees.')
 			}
 			assertNever(fresh)
 		} else if (original instanceof ConnectionMarker) {
@@ -140,14 +140,12 @@ export class MarkerTreeGenerator {
 			return MarkerTreeGenerator.rejectConnectionMarkerCombo(original)
 		} else if (original instanceof MarkerSubTree) {
 			if (fresh instanceof MarkerSubTree) {
-				if (
-					Hashing.hashMarkerTreeParameters(original.parameters) === Hashing.hashMarkerTreeParameters(fresh.parameters)
-				) {
-					return original
-				}
-				throw new BindingError('MarkerTreeGenerator merging: error code cc') // TODO msg
+				return new MarkerSubTree(
+					original.parameters,
+					MarkerTreeGenerator.mergeEntityFields(original.fields, fresh.fields),
+				)
 			} else {
-				throw new BindingError('MarkerTreeGenerator merging: error code aa') // TODO msg
+				throw new BindingError('MarkerTreeGenerator merging: MarkerSubTrees can only be merged with other sub trees.')
 			}
 		}
 		assertNever(original)

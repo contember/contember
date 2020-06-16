@@ -210,7 +210,7 @@ namespace EntityAccessor {
 
 	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: () => EntityAccessor) => void
-	export type ConnectEntityAtField = (field: FieldName, connectedEntityOrItsKey: EntityAccessor | string) => void
+	export type ConnectEntityAtField = (field: FieldName, entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type DeleteEntity = () => void
 	export type DisconnectEntityAtField = (field: FieldName) => void
 	export type UpdateListener = (accessor: EntityAccessor) => void

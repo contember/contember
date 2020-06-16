@@ -228,7 +228,16 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		if (props.arity === 'single') {
 			reference = <HasOne field={props.field}>{idField}</HasOne>
 		} else if (props.arity === 'multiple') {
-			reference = <HasMany field={props.field}>{idField}</HasMany>
+			reference = (
+				<HasMany
+					field={props.field}
+					preferences={{
+						initialEntityCount: 0,
+					}}
+				>
+					{idField}
+				</HasMany>
+			)
 		} else {
 			assertNever(props)
 		}

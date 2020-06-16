@@ -18,11 +18,11 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	SubTreeMarker,
-	SubTreeMarkerParameters,
 	MarkerTreeRoot,
 	PlaceholderGenerator,
 	ReferenceMarker,
+	SubTreeMarker,
+	SubTreeMarkerParameters,
 } from '../markers'
 import { ExpectedEntityCount, FieldName, FieldValue, Scalar } from '../treeParameters'
 import { assertNever } from '../utils'
@@ -653,45 +653,50 @@ class AccessorTreeGenerator {
 		}
 
 		entityListState.connectEntity = entityToConnectOrItsKey => {
-			let connectedEntityKey: string
+			this.performRootTreeOperation(() => {
+				performMutatingOperation(() => {
+					let connectedEntityKey: string
 
-			if (typeof entityToConnectOrItsKey === 'string') {
-				connectedEntityKey = entityToConnectOrItsKey
-			} else {
-				if (!entityToConnectOrItsKey.existsOnServer) {
-					throw new BindingError(
-						`EntityListAccessor: attempting to connect an entity with key '${entityToConnectOrItsKey.key}' that ` +
-							`doesn't exist on server. That is currently impossible.`, // At least for now.
-					)
-				}
-				connectedEntityKey = entityToConnectOrItsKey.key
-			}
-
-			const connectedState = this.entityStore.get(connectedEntityKey)
-			if (connectedState === undefined) {
-				throw new BindingError(
-					`EntityListAccessor: attempting to connect an entity with key '${connectedEntityKey}' ` +
-						`but it doesn't exist.`,
-				)
-			}
-			if (connectedState.isScheduledForDeletion) {
-				// As far as the other realms are concerned, this entity is deleted. We don't want to just make it re-appear
-				// for them just because some other random relation decided to connect it.
-				connectedState.realms.clear()
-				connectedState.isScheduledForDeletion = false
-			}
-
-			if (entityListState.plannedRemovals) {
-				// If the entity was previously scheduled for removal, undo that.
-				for (const plannedRemoval of entityListState.plannedRemovals) {
-					if (plannedRemoval.removedEntity === connectedState) {
-						entityListState.plannedRemovals.delete(plannedRemoval)
+					if (typeof entityToConnectOrItsKey === 'string') {
+						connectedEntityKey = entityToConnectOrItsKey
+					} else {
+						if (!entityToConnectOrItsKey.existsOnServer) {
+							throw new BindingError(
+								`EntityListAccessor: attempting to connect an entity with key '${entityToConnectOrItsKey.key}' that ` +
+									`doesn't exist on server. That is currently impossible.`, // At least for now.
+							)
+						}
+						connectedEntityKey = entityToConnectOrItsKey.key
 					}
-				}
-			}
 
-			connectedState.realms.set(entityListState.fieldMarkers, onChildEntityUpdate)
-			updateAccessorInstance()
+					const connectedState = this.entityStore.get(connectedEntityKey)
+					if (connectedState === undefined) {
+						throw new BindingError(
+							`EntityListAccessor: attempting to connect an entity with key '${connectedEntityKey}' ` +
+								`but it doesn't exist.`,
+						)
+					}
+					if (connectedState.isScheduledForDeletion) {
+						// As far as the other realms are concerned, this entity is deleted. We don't want to just make it re-appear
+						// for them just because some other random relation decided to connect it.
+						connectedState.realms.clear()
+						connectedState.isScheduledForDeletion = false
+					}
+
+					if (entityListState.plannedRemovals) {
+						// If the entity was previously scheduled for removal, undo that.
+						for (const plannedRemoval of entityListState.plannedRemovals) {
+							if (plannedRemoval.removedEntity === connectedState) {
+								entityListState.plannedRemovals.delete(plannedRemoval)
+							}
+						}
+					}
+
+					connectedState.realms.set(entityListState.fieldMarkers, onChildEntityUpdate)
+					entityListState.childrenKeys.add(connectedEntityKey)
+					updateAccessorInstance()
+				})
+			})
 		}
 
 		entityListState.createNewEntity = initialize => {

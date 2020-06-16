@@ -42,7 +42,44 @@ export class MarkerTreeGenerator {
 			}
 		}
 
-		return new MarkerTreeRoot(subTreeMap)
+		return new MarkerTreeRoot(this.hoistDeepSubTrees(subTreeMap))
+	}
+
+	private hoistDeepSubTrees(subTreeMap: Map<string, MarkerSubTree>): Map<string, MarkerSubTree> {
+		const hoistedMap: Map<string, MarkerSubTree> = new Map()
+		for (const [placeholderName, subTree] of subTreeMap) {
+			hoistedMap.set(placeholderName, subTree)
+			for (const nestedSubTree of this.hoistSubTeesFromEntityFields(subTree.fields)) {
+				const presentSubTree = hoistedMap.get(nestedSubTree.placeholderName)
+				hoistedMap.set(
+					nestedSubTree.placeholderName,
+					presentSubTree === undefined
+						? nestedSubTree
+						: new MarkerSubTree(
+								nestedSubTree.parameters,
+								MarkerTreeGenerator.mergeEntityFields(presentSubTree.fields, nestedSubTree.fields),
+						  ),
+				)
+			}
+		}
+
+		return hoistedMap
+	}
+
+	private *hoistSubTeesFromEntityFields(fields: EntityFieldMarkers): Generator<MarkerSubTree, void> {
+		for (const [placeholderName, marker] of fields) {
+			if (marker instanceof MarkerSubTree) {
+				yield marker
+				yield* this.hoistSubTeesFromEntityFields(marker.fields)
+				fields.delete(placeholderName)
+			} else if (marker instanceof ReferenceMarker) {
+				for (const alias in marker.references) {
+					const reference = marker.references[alias]
+
+					yield* this.hoistSubTeesFromEntityFields(reference.fields)
+				}
+			}
+		}
 	}
 
 	private static mapNodeResultToEntityFields(

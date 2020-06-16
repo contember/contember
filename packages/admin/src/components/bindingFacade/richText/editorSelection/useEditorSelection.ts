@@ -1,6 +1,6 @@
 import { debounce } from 'debounce'
 import * as React from 'react'
-import { Element, Node as SlateNode, Range as SlateRange } from 'slate'
+import { Range as SlateRange } from 'slate'
 import { ReactEditor, useEditor } from 'slate-react'
 import { EditorSelectionActionType } from './EditorSelectionActionType'
 import { defaultEditorSelectionState, editorSelectionReducer } from './editorSelectionReducer'
@@ -13,8 +13,8 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 
 	selectionStateRef.current = selectionState
 
-	const onDOMSelectionChange = React.useCallback(
-		debounce(() => {
+	const onDOMSelectionChange = debounce(
+		React.useCallback(() => {
 			const selection = getSelection()
 			const isRelevant =
 				selection && selection.anchorNode && ReactEditor.hasDOMNode(editor, selection.anchorNode, { editable: true })
@@ -43,8 +43,8 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 					type: EditorSelectionActionType.Blur,
 				})
 			}
-		}, maxInterval),
-		[],
+		}, [editor]),
+		maxInterval,
 	)
 	const onMouseDown = React.useCallback(
 		(e: MouseEvent) => {

@@ -14,6 +14,6 @@ export interface ReceivedDataTree<A = never> {
 	[treeId: string]: ReceivedData<A>
 }
 
-export interface QueryRequestResponse {
-	data: ReceivedDataTree<undefined>
+export interface QueryRequestResponse<A = never> {
+	data: ReceivedDataTree<A>
 }

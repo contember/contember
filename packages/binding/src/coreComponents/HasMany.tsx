@@ -4,22 +4,33 @@ import { ReferenceMarker } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeEntityList } from '../treeParameters'
 import { Component } from './Component'
-import { EntityList } from './EntityList'
+import { EntityList, EntityListBaseProps } from './EntityList'
+import { SingleEntityBaseProps } from './SingleEntity'
 
-export interface HasManyProps extends SugaredRelativeEntityList {
+export type HasManyProps<ListProps, EntityProps> = SugaredRelativeEntityList & {
 	preferences?: Partial<ReferenceMarker.ReferencePreferences>
 	children?: React.ReactNode
-}
+} & (
+		| {}
+		| {
+				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
+				entityProps?: EntityProps
+		  }
+		| {
+				listComponent: React.ComponentType<ListProps & EntityListBaseProps>
+				listProps?: ListProps
+		  }
+	)
 
-export const HasMany = Component<HasManyProps>(
-	props => {
+export const HasMany = Component(
+	<ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => {
 		const entity = useRelativeEntityList(props)
 
-		return <EntityList accessor={entity} children={props.children} />
+		return <EntityList {...props} accessor={entity} />
 	},
 	{
 		generateReferenceMarker: (props, fields, environment) =>
 			MarkerFactory.createRelativeEntityListFields(props, environment, fields, props.preferences),
 	},
 	'HasMany',
-)
+) as <ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => React.ReactElement

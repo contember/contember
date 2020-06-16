@@ -21,11 +21,11 @@ export type EntityListSubTreeProps<ListProps, EntityProps> = {
 		| {}
 		| {
 				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
-				entityProps: EntityProps
+				entityProps?: EntityProps
 		  }
 		| {
 				listComponent: React.ComponentType<ListProps & EntityListBaseProps>
-				listProps: ListProps
+				listProps?: ListProps
 		  }
 	)
 

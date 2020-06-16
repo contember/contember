@@ -13,11 +13,11 @@ export type EntityListProps<ListProps, EntityProps> = EntityListBaseProps &
 		| {}
 		| {
 				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
-				entityProps: EntityProps
+				entityProps?: EntityProps
 		  }
 		| {
 				listComponent: React.ComponentType<ListProps & EntityListBaseProps>
-				listProps: ListProps
+				listProps?: ListProps
 		  }
 	)
 
@@ -25,7 +25,7 @@ export const EntityList = Component(
 	<ListProps, EntityProps>(props: EntityListProps<ListProps, EntityProps>) => {
 		if ('listComponent' in props && props.listComponent) {
 			return React.createElement(props.listComponent, {
-				...props.listProps,
+				...props.listProps!,
 				accessor: props.accessor,
 				children: props.children,
 			})
@@ -57,7 +57,7 @@ export const EntityList = Component(
 	<ListProps, EntityProps>(props: EntityListProps<ListProps, EntityProps>) => {
 		if ('listComponent' in props && props.listComponent) {
 			return React.createElement(props.listComponent, {
-				...props.listProps,
+				...props.listProps!,
 				accessor: props.accessor,
 				children: props.children,
 			})

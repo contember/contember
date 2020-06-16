@@ -62,7 +62,15 @@ export const useSingleEntitySubTree = (qualifiedSingleEntity: UseSingleEntitySub
 		)
 	}
 
-	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
+	const getAccessor = React.useCallback(() => {
+		const subTree = getSubTree(parameters)
+		if (parameters.value.hasOneRelationPath.length) {
+			return subTree.getRelativeSingleEntity({
+				hasOneRelationPath: parameters.value.hasOneRelationPath,
+			})
+		}
+		return subTree
+	}, [getSubTree, parameters])
 
 	return useAccessorUpdateSubscription__UNSTABLE(getAccessor)
 }

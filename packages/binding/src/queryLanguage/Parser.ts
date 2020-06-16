@@ -41,11 +41,9 @@ class Parser extends EmbeddedActionsParser {
 		const entityName = this.SUBRULE(this.entityIdentifier)
 		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
 
-		const hasOneRelationPath: DesugaredHasOneRelation[] = []
-
-		this.MANY(() => {
+		const hasOneRelationPath = this.OPTION1(() => {
 			this.CONSUME(tokens.Dot)
-			hasOneRelationPath.push(this.SUBRULE(this.hasOneRelation))
+			return this.SUBRULE(this.relativeSingleEntity)
 		})
 
 		return {
@@ -77,7 +75,10 @@ class Parser extends EmbeddedActionsParser {
 		// TODO this will probably go away once we support singleton entities
 		const where = this.SUBRULE(this.uniqueWhere)
 		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
-		const relativeSingleEntity = this.OPTION1(() => this.SUBRULE(this.relativeSingleEntity))
+		const relativeSingleEntity = this.OPTION1(() => {
+			this.CONSUME(tokens.Dot)
+			return this.SUBRULE(this.relativeSingleEntity)
+		})
 
 		const hasOneRelationPath = this.ACTION(() =>
 			relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
@@ -95,7 +96,10 @@ class Parser extends EmbeddedActionsParser {
 		'unconstrainedQualifiedEntityList',
 		() => {
 			const entityName = this.SUBRULE(this.entityIdentifier)
-			const relativeSingleEntity = this.OPTION1(() => this.SUBRULE(this.relativeSingleEntity))
+			const relativeSingleEntity = this.OPTION(() => {
+				this.CONSUME(tokens.Dot)
+				return this.SUBRULE(this.relativeSingleEntity)
+			})
 
 			const hasOneRelationPath = this.ACTION(() =>
 				relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
@@ -112,7 +116,10 @@ class Parser extends EmbeddedActionsParser {
 		'unconstrainedQualifiedSingleEntity',
 		() => {
 			const entityName = this.SUBRULE(this.entityIdentifier)
-			const relativeSingleEntity = this.OPTION1(() => this.SUBRULE(this.relativeSingleEntity))
+			const relativeSingleEntity = this.OPTION1(() => {
+				this.CONSUME(tokens.Dot)
+				return this.SUBRULE(this.relativeSingleEntity)
+			})
 
 			const hasOneRelationPath = this.ACTION(() =>
 				relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,

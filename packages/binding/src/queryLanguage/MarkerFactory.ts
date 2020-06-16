@@ -35,7 +35,10 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
 
-		return new SubTreeMarker(new BoxedQualifiedSingleEntity(qualifiedSingleEntity), fields)
+		return new SubTreeMarker(
+			new BoxedQualifiedSingleEntity(qualifiedSingleEntity),
+			wrapRelativeEntityFields(qualifiedSingleEntity.hasOneRelationPath, fields),
+		)
 	}
 
 	export const createEntityListSubTreeMarker = (
@@ -58,7 +61,10 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment)
 
-		return new SubTreeMarker(new BoxedUnconstrainedQualifiedEntityList(qualifiedEntityList), fields)
+		return new SubTreeMarker(
+			new BoxedUnconstrainedQualifiedEntityList(qualifiedEntityList),
+			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, fields),
+		)
 	}
 
 	export const createUnconstrainedSingleEntitySubTreeMarker = (
@@ -68,7 +74,10 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entityList, environment)
 
-		return new SubTreeMarker(new BoxedUnconstrainedQualifiedEntityList(qualifiedSingleEntity), fields)
+		return new SubTreeMarker(
+			new BoxedUnconstrainedQualifiedEntityList(qualifiedSingleEntity),
+			wrapRelativeEntityFields(qualifiedSingleEntity.hasOneRelationPath, fields),
+		)
 	}
 
 	export const createRelativeSingleEntityFields = (

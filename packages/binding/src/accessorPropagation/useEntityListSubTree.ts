@@ -1,5 +1,6 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
+import { BindingError } from '../BindingError'
 import { QueryLanguage } from '../queryLanguage'
 import {
 	BoxedQualifiedEntityList,
@@ -71,6 +72,9 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				environment,
 			],
 		)
+	}
+	if (parameters.value.hasOneRelationPath.length) {
+		throw new BindingError(`EntityListSubTree: using hasOneRelationPath for lists is currently not supported.`)
 	}
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 

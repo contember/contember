@@ -4,13 +4,13 @@ import {
 	EntityAccessor,
 	Environment,
 	FieldAccessor,
-	HasManyProps,
 	QueryLanguage,
 	RelativeSingleField,
 	SugaredField,
+	SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList,
-	useParentEntityAccessor,
 	useEnvironment,
+	useParentEntityAccessor,
 } from '@contember/binding'
 import { emptyArray, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
@@ -20,7 +20,7 @@ import { BlockEditorInner, BlockEditorInnerPublicProps } from './BlockEditorInne
 import { EmbedHandler } from './embed'
 import { FieldBackedElement, NormalizedFieldBackedElement } from './FieldBackedElement'
 
-export interface BlockEditorProps extends HasManyProps, BlockEditorInnerPublicProps {
+export interface BlockEditorProps extends SugaredRelativeEntityList, BlockEditorInnerPublicProps {
 	leadingFieldBackedElements?: FieldBackedElement[]
 	//trailingFieldBackedElements?: FieldBackedElement[]
 

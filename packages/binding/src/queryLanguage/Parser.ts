@@ -41,10 +41,13 @@ class Parser extends EmbeddedActionsParser {
 		const entityName = this.SUBRULE(this.entityIdentifier)
 		const filter = this.OPTION(() => this.SUBRULE(this.nonUniqueWhere))
 
-		const hasOneRelationPath = this.OPTION1(() => {
+		const relativeSingleEntity = this.OPTION1(() => {
 			this.CONSUME(tokens.Dot)
 			return this.SUBRULE(this.relativeSingleEntity)
 		})
+		const hasOneRelationPath = this.ACTION(() =>
+			relativeSingleEntity === undefined ? [] : relativeSingleEntity.hasOneRelationPath,
+		)
 
 		return {
 			entityName,

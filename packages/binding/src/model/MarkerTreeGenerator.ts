@@ -61,19 +61,20 @@ export class MarkerTreeGenerator {
 		for (const marker of result) {
 			if (marker instanceof Map) {
 				for (const [placeholderName, innerMarker] of marker) {
+					const markerFromFields = fields.get(placeholderName)
 					fields.set(
 						placeholderName,
-						fields.has(placeholderName)
-							? MarkerTreeGenerator.mergeMarkers(fields.get(placeholderName)!, innerMarker)
-							: innerMarker,
+						markerFromFields === undefined
+							? innerMarker
+							: MarkerTreeGenerator.mergeMarkers(markerFromFields, innerMarker),
 					)
 				}
 			} else {
 				const placeholderName = marker.placeholderName
-
+				const markerFromFields = fields.get(placeholderName)
 				fields.set(
 					placeholderName,
-					fields.has(placeholderName) ? MarkerTreeGenerator.mergeMarkers(fields.get(placeholderName)!, marker) : marker,
+					markerFromFields === undefined ? marker : MarkerTreeGenerator.mergeMarkers(markerFromFields, marker),
 				)
 			}
 		}
@@ -154,11 +155,12 @@ export class MarkerTreeGenerator {
 
 	private static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers {
 		for (const [placeholderName, freshMarker] of fresh) {
+			const markerFromOriginal = original.get(placeholderName)
 			original.set(
 				placeholderName,
-				original.has(placeholderName)
-					? MarkerTreeGenerator.mergeMarkers(original.get(placeholderName)!, freshMarker)
-					: freshMarker,
+				markerFromOriginal === undefined
+					? freshMarker
+					: MarkerTreeGenerator.mergeMarkers(markerFromOriginal, freshMarker),
 			)
 		}
 		return original

@@ -13,6 +13,7 @@ export interface InternalEntityFieldPlannedRemoval {
 	removedEntity: InternalEntityState
 }
 
+export type OnEntityUpdate = (state: InternalStateNode) => void
 export type OnEntityFieldUpdate = (state: InternalStateNode) => void
 export interface InternalEntityState extends InternalContainerState {
 	type: InternalStateType.SingleEntity
@@ -29,13 +30,11 @@ export interface InternalEntityState extends InternalContainerState {
 	persistedData: AccessorTreeGenerator.InitialEntityData
 	isScheduledForDeletion: boolean
 	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined
+	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 
 	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.
-	// TODO it is rather unfortunate that we're effectively mandating EntityFieldMarkers to be unique across the tree.
-	//  It is really just an implementation detail which ideally shouldn't have any bearing on the developer.
-	//  It could probably just be a Set<OnEntityFieldUpdate>
-	realms: Map<EntityFieldMarkers, OnEntityFieldUpdate>
+	realms: Set<OnEntityUpdate>
 	batchUpdates: EntityAccessor.BatchUpdates
 	connectEntityAtField: EntityAccessor.ConnectEntityAtField
 	disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField

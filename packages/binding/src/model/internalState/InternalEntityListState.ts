@@ -4,7 +4,7 @@ import { EntityFieldMarkers, ReferenceMarker } from '../../markers'
 import { RemovalType } from '../../treeParameters/primitives'
 import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
 import { InternalContainerState } from './InternalContainerState'
-import { InternalEntityState } from './InternalEntityState'
+import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
 import { InternalStateType } from './InternalStateType'
 
 export interface InternalEntityPlannedRemoval {
@@ -30,7 +30,9 @@ export interface InternalEntityListState extends InternalContainerState {
 	initialData: ReceivedEntityData<undefined | null>[] | EntityAccessor[]
 	plannedRemovals: Set<InternalEntityPlannedRemoval> | undefined
 
-	onUpdate: OnEntityListUpdate
+	onChildEntityUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
+	onEntityListUpdate: OnEntityListUpdate // To be called by this entity list to inform the parent entity
+
 	getEntityByKey: EntityListAccessor.GetEntityByKey
 	preferences: ReferenceMarker.ReferencePreferences
 	batchUpdates: EntityListAccessor.BatchUpdates

@@ -34,8 +34,8 @@ import {
 	InternalRootStateNode,
 	InternalStateNode,
 	InternalStateType,
-	OnEntityFieldUpdate,
 	OnEntityListUpdate,
+	OnEntityUpdate,
 	OnFieldUpdate,
 } from './internalState'
 import { MutationGenerator } from './MutationGenerator'
@@ -166,22 +166,18 @@ class AccessorTreeGenerator {
 	): InternalRootStateNode {
 		const errorNode = errors === undefined ? undefined : errors[tree.placeholderName]
 
-		const onUpdate = (updatedState: InternalStateNode) => {
-			updatedState.hasPendingUpdate = true
-		}
-
 		let subTreeState: InternalEntityState | InternalEntityListState
 
 		if (Array.isArray(data) || data === undefined || data instanceof EntityListAccessor) {
 			const existingState = this.subTreeStates.get(tree.placeholderName) as InternalEntityListState | undefined
 			subTreeState = this.initializeEntityListAccessor(
-				this.resolveOrCreateEntityListState(existingState, tree.fields, onUpdate, data, errorNode, undefined),
+				this.resolveOrCreateEntityListState(existingState, tree.fields, noop, data, errorNode, undefined),
 			)
 		} else {
 			const existingState = this.subTreeStates.get(tree.placeholderName) as InternalEntityState
 			const id = this.resolveOrCreateEntityId(data)
 			subTreeState = this.initializeEntityAccessor(
-				this.resolveOrCreateEntityState(id, existingState, tree.fields, onUpdate, data, errorNode),
+				this.resolveOrCreateEntityState(id, existingState, tree.fields, noop, data, errorNode),
 				tree.fields,
 			)
 		}
@@ -190,11 +186,7 @@ class AccessorTreeGenerator {
 		return subTreeState
 	}
 
-	private updateFields(
-		entityState: InternalEntityState,
-		markers: EntityFieldMarkers,
-		onEntityFieldUpdate: OnEntityFieldUpdate,
-	): EntityAccessor {
+	private updateFields(entityState: InternalEntityState, markers: EntityFieldMarkers): EntityAccessor {
 		const typename = entityState.persistedData
 			? entityState.persistedData instanceof Accessor
 				? entityState.persistedData.typename
@@ -229,7 +221,7 @@ class AccessorTreeGenerator {
 					placeholderName,
 					fieldMarker: field as FieldMarker,
 					initialData: idValue,
-					onUpdate: noop,
+					onFieldUpdate: noop,
 					errors: emptyArray,
 					touchLog: undefined,
 					hasPendingUpdate: false,
@@ -277,7 +269,7 @@ class AccessorTreeGenerator {
 									entityId,
 									this.getExistingEntityState(entityId),
 									reference.fields,
-									onEntityFieldUpdate,
+									entityState.onChildFieldUpdate,
 									fieldDatum || undefined,
 									referenceError,
 								),
@@ -295,7 +287,7 @@ class AccessorTreeGenerator {
 							const referenceEntityListState = this.resolveOrCreateEntityListState(
 								entityState.fields.get(referencePlaceholder) as InternalEntityListState | undefined,
 								reference.fields,
-								onEntityFieldUpdate,
+								entityState.onChildFieldUpdate,
 								fieldDatum,
 								referenceError,
 								reference.preferences,
@@ -348,7 +340,7 @@ class AccessorTreeGenerator {
 							placeholderName,
 							entityState.fields.get(placeholderName) as InternalFieldState | undefined,
 							field,
-							onEntityFieldUpdate,
+							entityState.onChildFieldUpdate,
 							fieldDatum,
 							fieldErrors,
 						),
@@ -389,7 +381,7 @@ class AccessorTreeGenerator {
 			entityState.batchUpdateDepth--
 			if (entityState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityState.accessor) {
 				updateAccessorInstance()
-				for (const [, onUpdate] of entityState.realms) {
+				for (const onUpdate of entityState.realms) {
 					onUpdate(entityState)
 				}
 			}
@@ -463,6 +455,15 @@ class AccessorTreeGenerator {
 		}
 
 		entityState.disconnectEntityAtField = field => {
+			const stateToDisconnect = entityState.fields.get(field)
+
+			if (stateToDisconnect === undefined) {
+				throw new BindingError(`Cannot disconnect field '${field}' as it doesn't exist.`)
+			}
+			if (stateToDisconnect.type !== InternalStateType.SingleEntity) {
+				throw new BindingError(`Trying to disconnect the field '${field}' but it isn't a has-one relation.`)
+			}
+
 			throw new BindingError(`EntityAccessor.disconnectEntityAtField: not implemented`) // TODO
 		}
 
@@ -495,7 +496,7 @@ class AccessorTreeGenerator {
 			}
 		}
 
-		const onFieldUpdate = (updatedState: InternalStateNode) => {
+		entityState.onChildFieldUpdate = (updatedState: InternalStateNode) => {
 			performMutatingOperation(() => {
 				if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
 					processEntityDeletion(updatedState)
@@ -506,7 +507,7 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		entityState.accessor = this.updateFields(entityState, markers, onFieldUpdate)
+		entityState.accessor = this.updateFields(entityState, markers)
 		return entityState
 	}
 
@@ -524,7 +525,7 @@ class AccessorTreeGenerator {
 			entityListState.batchUpdateDepth--
 			if (entityListState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityListState.accessor) {
 				updateAccessorInstance()
-				entityListState.onUpdate(entityListState)
+				entityListState.onEntityListUpdate(entityListState)
 			}
 		}
 
@@ -585,7 +586,7 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		const onChildEntityUpdate: OnEntityFieldUpdate = updatedState => {
+		entityListState.onChildEntityUpdate = updatedState => {
 			if (updatedState.type !== InternalStateType.SingleEntity) {
 				throw new BindingError(`Illegal entity list value.`)
 			}
@@ -627,7 +628,7 @@ class AccessorTreeGenerator {
 							`Entity list doesn't include an entity with key '${disconnectedChildKey}' and so it cannot remove it.`,
 						)
 					}
-					const didDelete = disconnectedChildState.realms.delete(entityListState.fieldMarkers)
+					const didDelete = disconnectedChildState.realms.delete(entityListState.onChildEntityUpdate)
 					if (!didDelete) {
 						this.rejectInvalidAccessorTree()
 					}
@@ -652,7 +653,7 @@ class AccessorTreeGenerator {
 						entityToConnectOrItsKey,
 					)
 
-					connectedState.realms.set(entityListState.fieldMarkers, onChildEntityUpdate)
+					connectedState.realms.add(entityListState.onChildEntityUpdate)
 					entityListState.childrenKeys.add(connectedEntityKey)
 					updateAccessorInstance()
 				})
@@ -684,7 +685,7 @@ class AccessorTreeGenerator {
 					id,
 					this.getExistingEntityState(id),
 					entityListState.fieldMarkers,
-					onChildEntityUpdate,
+					entityListState.onChildEntityUpdate,
 					datum,
 					childErrors,
 				),
@@ -743,7 +744,7 @@ class AccessorTreeGenerator {
 				}
 				fieldState.hasPendingUpdate = true
 				fieldState.accessor = createNewInstance(newValue)
-				fieldState.onUpdate(fieldState)
+				fieldState.onFieldUpdate(fieldState)
 			})
 		}
 
@@ -771,7 +772,7 @@ class AccessorTreeGenerator {
 		placeholderName: FieldName,
 		existingState: InternalFieldState | undefined,
 		fieldMarker: FieldMarker,
-		onUpdate: OnFieldUpdate,
+		onFieldUpdate: OnFieldUpdate,
 		initialData: Scalar | undefined | FieldAccessor,
 		errors: ErrorAccessor[],
 	): InternalFieldState {
@@ -782,7 +783,7 @@ class AccessorTreeGenerator {
 				type: InternalStateType.Field,
 				errors,
 				fieldMarker,
-				onUpdate,
+				onFieldUpdate,
 				placeholderName,
 				persistedValue,
 				initialData,
@@ -801,7 +802,7 @@ class AccessorTreeGenerator {
 		}
 
 		existingState.errors = errors
-		existingState.onUpdate = onUpdate
+		existingState.onFieldUpdate = onFieldUpdate
 		existingState.initialData = initialData
 		existingState.persistedValue = persistedValue
 		existingState.hasPendingUpdate = true
@@ -813,7 +814,7 @@ class AccessorTreeGenerator {
 		id: string | EntityAccessor.UnpersistedEntityId,
 		existingState: InternalEntityState | undefined,
 		fieldMarkers: EntityFieldMarkers,
-		onUpdate: OnEntityFieldUpdate,
+		onEntityUpdate: OnEntityUpdate,
 		persistedData: AccessorTreeGenerator.InitialEntityData,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 	): InternalEntityState {
@@ -837,7 +838,8 @@ class AccessorTreeGenerator {
 				plannedRemovals: undefined,
 				id,
 				persistedData,
-				realms: new Map([[fieldMarkers, onUpdate]]),
+				onChildFieldUpdate: undefined as any,
+				realms: new Set([onEntityUpdate]),
 				batchUpdates: (undefined as any) as EntityAccessor.BatchUpdates,
 				connectEntityAtField: (undefined as any) as EntityAccessor.ConnectEntityAtField,
 				disconnectEntityAtField: (undefined as any) as EntityAccessor.DisconnectEntityAtField,
@@ -853,7 +855,7 @@ class AccessorTreeGenerator {
 		existingState.hasPendingUpdate = true
 		existingState.errors = errors
 		existingState.persistedData = persistedData
-		existingState.realms.set(fieldMarkers, onUpdate)
+		existingState.realms.add(onEntityUpdate)
 
 		if (existingState.childrenWithPendingUpdates === undefined) {
 			existingState.childrenWithPendingUpdates = new Set(existingState.fields.values())
@@ -872,7 +874,7 @@ class AccessorTreeGenerator {
 	private resolveOrCreateEntityListState(
 		existingState: InternalEntityListState | undefined,
 		fieldMarkers: EntityFieldMarkers,
-		onUpdate: OnEntityListUpdate,
+		onEntityListUpdate: OnEntityListUpdate,
 		initialData: ReceivedEntityData<undefined | null>[] | EntityListAccessor | undefined,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 		preferences: ReferenceMarker.ReferencePreferences | undefined,
@@ -894,7 +896,7 @@ class AccessorTreeGenerator {
 				type: InternalStateType.EntityList,
 				errors,
 				fieldMarkers,
-				onUpdate,
+				onEntityListUpdate,
 				preferences,
 				addEventListener: undefined as any,
 				initialData: sourceData,
@@ -907,6 +909,7 @@ class AccessorTreeGenerator {
 				},
 				plannedRemovals: undefined,
 				hasPendingUpdate: true,
+				onChildEntityUpdate: undefined as any,
 				accessor: (undefined as any) as EntityListAccessor,
 				batchUpdates: (undefined as any) as EntityListAccessor.BatchUpdates,
 				connectEntity: (undefined as any) as EntityListAccessor.ConnectEntity,
@@ -921,7 +924,7 @@ class AccessorTreeGenerator {
 		existingState.batchUpdateDepth = 0
 		existingState.hasPendingUpdate = true
 		existingState.errors = errors
-		existingState.onUpdate = onUpdate
+		existingState.onEntityListUpdate = onEntityListUpdate
 		existingState.initialData = sourceData
 
 		if (existingState.childrenWithPendingUpdates === undefined) {

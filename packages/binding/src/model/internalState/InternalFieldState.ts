@@ -16,7 +16,7 @@ export interface InternalFieldState {
 	//hasUnpersistedChanges: boolean
 	hasPendingUpdate: boolean
 	initialData: Scalar | undefined | FieldAccessor
-	onUpdate: OnFieldUpdate
+	onFieldUpdate: OnFieldUpdate // To be called by this field to inform the parent entity
 	persistedValue: FieldValue
 	placeholderName: FieldName
 	touchLog: Map<string, boolean> | undefined

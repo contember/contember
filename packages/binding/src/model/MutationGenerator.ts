@@ -16,7 +16,12 @@ import {
 import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
-import { InternalEntityState, InternalRootStateNode, InternalStateType } from './internalState'
+import {
+	InternalEntityPlannedRemoval,
+	InternalEntityState,
+	InternalRootStateNode,
+	InternalStateType,
+} from './internalState'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
@@ -353,12 +358,12 @@ export class MutationGenerator {
 				}
 			} else if (marker instanceof ReferenceMarker) {
 				let unreducedHasOnePresent = false
+				let hasManyPlannedRemovals: Set<InternalEntityPlannedRemoval> | undefined = undefined
 				const references = marker.references
 				const accessorReference: Array<{
 					alias?: string
 					referenceState: InternalEntityState
 					reference: ReferenceMarker.Reference
-					persistedField: ReceivedEntityData<undefined>
 				}> = []
 
 				for (const referencePlaceholder in references) {
@@ -382,7 +387,6 @@ export class MutationGenerator {
 							accessorReference.push({
 								referenceState,
 								reference,
-								persistedField: (persistedField as ReceivedEntityData<undefined>) || undefined, // TODO handle this cast
 								alias: referencePlaceholder,
 							})
 
@@ -394,23 +398,18 @@ export class MutationGenerator {
 						reference.expectedCount === ExpectedEntityCount.PossiblyMany &&
 						referenceState.type === InternalStateType.EntityList
 					) {
-						const persistedField = referenceState.initialData
-						if (Array.isArray(persistedField) || persistedField === undefined || persistedField === null) {
-							let i = 0
-							for (const childKey of referenceState.childrenKeys) {
-								const innerState = this.entityStore.get(childKey)
-								if (innerState === undefined) {
-									continue
-								}
-								const innerField = persistedField ? persistedField[i] : undefined
-								accessorReference.push({
-									referenceState: innerState,
-									reference,
-									persistedField: innerField as ReceivedEntityData<undefined>, // TODO handle this cast
-									alias: AliasTransformer.entityToAlias(innerState.accessor),
-								})
-								i++
+						hasManyPlannedRemovals = referenceState.plannedRemovals
+
+						for (const childKey of referenceState.childrenKeys) {
+							const innerState = this.entityStore.get(childKey)
+							if (innerState === undefined) {
+								continue
 							}
+							accessorReference.push({
+								referenceState: innerState,
+								reference,
+								alias: AliasTransformer.entityToAlias(innerState.accessor),
+							})
 						}
 					}
 				}
@@ -420,12 +419,13 @@ export class MutationGenerator {
 						const subBuilder = ((
 							builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
 						) => {
-							const { referenceState, reference, persistedField, alias } = accessorReference[0]
+							const { referenceState, reference, alias } = accessorReference[0]
+							const persistedField = referenceState.persistedData as ReceivedEntityData<undefined> // TODO handle this cast
 
-							// TODO (dis)connects!!
 							if (referenceState.isScheduledForDeletion) {
-								return builder.delete() // builder.disconnect()
+								return builder.delete()
 							} else if (typeof referenceState.id === 'string') {
+								// referenceState exists on server
 								const updated = builder.update(builder =>
 									this.registerUpdateMutationPart(referenceState, reference.fields, builder),
 								)
@@ -436,6 +436,8 @@ export class MutationGenerator {
 									})
 								}
 								return updated
+							} else if (persistedField && persistedField[PRIMARY_KEY_NAME]) {
+								return builder.disconnect()
 							} else {
 								return builder.create(this.registerCreateReferenceMutationPart(referenceState, reference))
 							}
@@ -449,24 +451,40 @@ export class MutationGenerator {
 					}
 				} else {
 					builder = builder.many(placeholderName, builder => {
-						for (const { referenceState, reference, persistedField, alias } of accessorReference) {
-							if (referenceState.isScheduledForDeletion) {
-								// TODO builder = builder.disconnect({ [PRIMARY_KEY_NAME]: accessor.primaryKey }, alias)
-								builder = builder.delete({ [PRIMARY_KEY_NAME]: referenceState.id }, alias)
-							} else if (typeof referenceState.id === 'string') {
-								builder = builder.update(
-									{ [PRIMARY_KEY_NAME]: referenceState.id },
-									builder => {
-										return this.registerUpdateMutationPart(referenceState, reference.fields, builder)
-									},
-									alias,
-								)
+						for (const { referenceState, reference, alias } of accessorReference) {
+							const persistedField = referenceState.persistedData as ReceivedEntityData<undefined> // TODO handle this cast
 
+							if (typeof referenceState.id === 'string') {
 								if (!persistedField || (persistedField && referenceState.id !== persistedField[PRIMARY_KEY_NAME])) {
 									builder = builder.connect({ [PRIMARY_KEY_NAME]: referenceState.id }, alias)
+								} else {
+									builder = builder.update(
+										{ [PRIMARY_KEY_NAME]: referenceState.id },
+										builder => {
+											return this.registerUpdateMutationPart(referenceState, reference.fields, builder)
+										},
+										alias,
+									)
 								}
 							} else {
 								builder = builder.create(this.registerCreateReferenceMutationPart(referenceState, reference), alias)
+							}
+						}
+						if (hasManyPlannedRemovals) {
+							for (const { removedEntity, removalType } of hasManyPlannedRemovals) {
+								if (removalType === 'delete') {
+									builder = builder.delete(
+										{ [PRIMARY_KEY_NAME]: removedEntity.id },
+										AliasTransformer.entityToAlias(removedEntity.accessor),
+									)
+								} else if (removalType === 'disconnect') {
+									builder = builder.disconnect(
+										{ [PRIMARY_KEY_NAME]: removedEntity.id },
+										AliasTransformer.entityToAlias(removedEntity.accessor),
+									)
+								} else {
+									assertNever(removalType)
+								}
 							}
 						}
 						return builder

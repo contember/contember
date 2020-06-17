@@ -11,10 +11,15 @@ import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 
 export class QueryResponseNormalizer {
-	public static normalizeResponse(response: QueryRequestResponse): NormalizedQueryResponseData {
-		const { data } = response
+	public static normalizeResponse(response: QueryRequestResponse | undefined): NormalizedQueryResponseData {
 		const entityMap: PersistedEntityDataStore = new Map()
 		const subTreeMap: SubTreeDataStore = new Map()
+
+		if (response === undefined) {
+			return new NormalizedQueryResponseData(subTreeMap, entityMap)
+		}
+
+		const { data } = response
 
 		for (const treeId in data) {
 			const treeDatum = data[treeId]

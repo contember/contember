@@ -6,7 +6,7 @@ import {
 	FieldAccessor,
 	TreeRootAccessor,
 } from '../accessors'
-import { ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
+import { NormalizedQueryResponseData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
@@ -25,7 +25,7 @@ export class DirtinessChecker {
 
 	public constructor(
 		private readonly markerTree: MarkerTreeRoot,
-		private readonly persistedData: ReceivedDataTree<undefined> | undefined,
+		private readonly persistedData: NormalizedQueryResponseData,
 	) {
 		this.isDirtyCache = new WeakMap()
 	}

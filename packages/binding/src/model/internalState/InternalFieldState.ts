@@ -15,7 +15,6 @@ export interface InternalFieldState {
 	fieldMarker: FieldMarker
 	//hasUnpersistedChanges: boolean
 	hasPendingUpdate: boolean
-	initialData: Scalar | undefined | FieldAccessor
 	onFieldUpdate: OnFieldUpdate // To be called by this field to inform the parent entity
 	persistedValue: FieldValue
 	placeholderName: FieldName

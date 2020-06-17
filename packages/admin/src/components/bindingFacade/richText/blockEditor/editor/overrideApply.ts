@@ -124,7 +124,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				const oldEntityKey = sortedEntities[sortedEntityIndex].key
 				const newEntity = getAccessor()
 					.getRelativeEntityList(desugaredEntityList)
-					.getEntityByKey(oldEntityKey)
+					.getChildEntityByKey(oldEntityKey)
 				if (!(newEntity instanceof EntityAccessor)) {
 					throw new BindingError(`Corrupted data`)
 				}

@@ -1,4 +1,5 @@
 import { EntityAccessor } from '../../accessors'
+import { SingleEntityPersistedData } from '../../accessorTree'
 import { EntityFieldMarkers } from '../../markers'
 import { FieldName, RemovalType } from '../../treeParameters/primitives'
 import { AccessorTreeGenerator } from '../AccessorTreeGenerator'
@@ -27,7 +28,7 @@ export interface InternalEntityState extends InternalContainerState {
 	}
 	fields: Map<FieldName, InternalStateNode>
 	id: string | EntityAccessor.UnpersistedEntityId
-	persistedData: AccessorTreeGenerator.InitialEntityData
+	persistedData: SingleEntityPersistedData | undefined
 	isScheduledForDeletion: boolean
 	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity

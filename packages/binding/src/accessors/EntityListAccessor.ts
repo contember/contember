@@ -5,7 +5,7 @@ import { ErrorAccessor } from './ErrorAccessor'
 
 class EntityListAccessor extends Accessor implements Errorable {
 	public constructor(
-		public readonly getEntityByKey: EntityListAccessor.GetEntityByKey,
+		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
 		private readonly entityKeys: Set<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
@@ -19,7 +19,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
 		for (const id of this.entityKeys) {
-			yield this.getEntityByKey(id)
+			yield this.getChildEntityByKey(id)
 		}
 	}
 }
@@ -30,7 +30,7 @@ namespace EntityListAccessor {
 	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	export type DisconnectEntity = (childEntityOrItsKey: EntityAccessor | string) => void
-	export type GetEntityByKey = (key: string) => EntityAccessor
+	export type GetChildEntityByKey = (key: string) => EntityAccessor
 	export type UpdateListener = (accessor: EntityListAccessor) => void
 
 	export interface EntityListEventListenerMap {

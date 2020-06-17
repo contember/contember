@@ -209,7 +209,7 @@ export const BlockEditorInner = React.memo(
 		return (
 			<BlockEditorGetEntityByKeyContext.Provider
 				value={key => {
-					const entity = accessor.getEntityByKey(key)
+					const entity = accessor.getChildEntityByKey(key)
 					if (!(entity instanceof EntityAccessor)) {
 						throw new BindingError(`Corrupted data.`)
 					}

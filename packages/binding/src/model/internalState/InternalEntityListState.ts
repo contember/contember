@@ -27,13 +27,13 @@ export interface InternalEntityListState extends InternalContainerState {
 			| undefined
 	}
 	fieldMarkers: EntityFieldMarkers
-	initialData: ReceivedEntityData<undefined | null>[] | EntityAccessor[]
+	persistedEntityIds: Set<string>
 	plannedRemovals: Set<InternalEntityPlannedRemoval> | undefined
 
 	onChildEntityUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
 	onEntityListUpdate: OnEntityListUpdate // To be called by this entity list to inform the parent entity
 
-	getEntityByKey: EntityListAccessor.GetEntityByKey
+	getChildEntityByKey: EntityListAccessor.GetChildEntityByKey
 	preferences: ReferenceMarker.ReferencePreferences
 	batchUpdates: EntityListAccessor.BatchUpdates
 	connectEntity: EntityListAccessor.ConnectEntity

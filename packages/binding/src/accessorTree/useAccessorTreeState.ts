@@ -9,8 +9,8 @@ import {
 	AccessorTreeGenerator,
 	DirtinessChecker,
 	MarkerTreeGenerator,
-	MutationGenerator,
 	QueryGenerator,
+	QueryResponseNormalizer,
 } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
@@ -101,25 +101,18 @@ export const useAccessorTreeState = ({
 	}, [unstable_onSuccessfulPersist])
 
 	const initializeAccessorTree = React.useCallback(
-		(
-			persistedData: ReceivedDataTree<undefined> | undefined,
-			initialData: TreeRootAccessor | ReceivedDataTree<undefined> | undefined,
-			errors?: MutationDataResponse,
-		) => {
-			accessorTreeGenerator.generateLiveTree(
-				persistedData,
-				initialData,
-				accessor => {
-					console.debug('data', accessor)
-					dispatch({
-						type: AccessorTreeStateActionType.SetData,
-						data: accessor,
-						triggerPersist,
-					})
-				},
-				errors,
-			)
-			dirtinessCheckerRef.current = new DirtinessChecker(markerTree, persistedData)
+		(data: QueryRequestResponse | undefined) => {
+			const normalizedData = QueryResponseNormalizer.normalizeResponse(data)
+			console.log('normQe', normalizedData)
+			accessorTreeGenerator.initializeLiveTree(normalizedData, accessor => {
+				console.debug('data', accessor)
+				dispatch({
+					type: AccessorTreeStateActionType.SetData,
+					data: accessor,
+					triggerPersist,
+				})
+			})
+			dirtinessCheckerRef.current = new DirtinessChecker(markerTree, normalizedData)
 		},
 		[accessorTreeGenerator, markerTree, triggerPersist],
 	)
@@ -151,7 +144,8 @@ export const useAccessorTreeState = ({
 			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
 
 			if (!allSubMutationsOk) {
-				initializeAccessorTree(persistedData, latestAccessorTree, data.data)
+				//initializeAccessorTree(persistedData, latestAccessorTree, data.data)
+				console.error('ERRORS!', data.data) // TODO
 				return Promise.reject({
 					type: MutationErrorType.InvalidInput,
 				})
@@ -172,7 +166,7 @@ export const useAccessorTreeState = ({
 
 			try {
 				const queryData = await sendQuery(query, {}, sessionToken)
-				initializeAccessorTree(queryData.data, queryData.data)
+				initializeAccessorTree(queryData)
 				return Promise.resolve({
 					type: PersistResultSuccessType.JustSuccess,
 					persistedEntityIds,
@@ -217,7 +211,7 @@ export const useAccessorTreeState = ({
 			) {
 				if (query === undefined) {
 					// We're creating AND there are no subqueries
-					initializeAccessorTree(undefined, undefined)
+					initializeAccessorTree(undefined)
 					isForcingRefreshRef.current = false
 				} else {
 					dispatch({
@@ -225,7 +219,7 @@ export const useAccessorTreeState = ({
 					})
 					try {
 						const data = await sendQuery(query, {}, sessionToken)
-						isMountedRef.current && initializeAccessorTree(data.data, data.data)
+						isMountedRef.current && initializeAccessorTree(data)
 					} catch (metadata) {
 						rejectFailedRequest(metadata)
 					} finally {

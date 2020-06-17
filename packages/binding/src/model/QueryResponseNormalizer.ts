@@ -24,7 +24,7 @@ export class QueryResponseNormalizer {
 		for (const treeId in data) {
 			const treeDatum = data[treeId]
 
-			if (treeDatum === undefined) {
+			if (treeDatum === undefined || treeDatum === null) {
 				continue
 			}
 			if (Array.isArray(treeDatum)) {

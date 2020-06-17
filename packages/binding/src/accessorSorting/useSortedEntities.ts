@@ -95,12 +95,13 @@ export const useSortedEntities = (
 		[desugaredSortableByField, entityList],
 	)
 
-	React.useEffect(() => {
-		if (!desugaredSortableByField) {
-			return
-		}
-		repairEntitiesOrder(desugaredSortableByField, entityList, sortedEntities)
-	}, [desugaredSortableByField, entityList, sortedEntities])
+	// This wasn't such a great idea…
+	// React.useEffect(() => {
+	// 	if (!desugaredSortableByField) {
+	// 		return
+	// 	}
+	// 	repairEntitiesOrder(desugaredSortableByField, entityList, sortedEntities)
+	// }, [desugaredSortableByField, entityList, sortedEntities])
 
 	return React.useMemo<SortedEntities>(
 		() => ({

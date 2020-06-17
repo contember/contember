@@ -23,7 +23,11 @@ export default class PermissionOverrider {
 				create: { ...(original.operations.create || {}), ...(overrides.operations.create || {}) },
 				read: { ...(original.operations.read || {}), ...(overrides.operations.read || {}) },
 				update: { ...(original.operations.update || {}), ...(overrides.operations.update || {}) },
-				delete: overrides.operations.delete === undefined ? original.operations.delete : overrides.operations.delete,
+				...(overrides.operations.delete === undefined
+					? {}
+					: {
+							delete: overrides.operations.delete,
+					  }),
 			},
 		}
 	}

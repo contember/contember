@@ -1,11 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
-import {
-	EntityAccessor,
-	EntityForRemovalAccessor,
-	EntityListAccessor,
-	FieldAccessor,
-	TreeRootAccessor,
-} from '../accessors'
+import { EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } from '../accessors'
 import { NormalizedQueryResponseData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
@@ -53,11 +47,11 @@ export class DirtinessChecker {
 	private isEntityDirty(
 		fields: EntityFieldMarkers,
 		persistedData: ReceivedEntityData<undefined>,
-		node: EntityAccessor | EntityForRemovalAccessor,
+		node: EntityAccessor,
 	): boolean {
-		if (node instanceof EntityForRemovalAccessor) {
-			return true
-		}
+		// if (node instanceof EntityForRemovalAccessor) {
+		// 	return true
+		// }
 		const isPersisted = node.existsOnServer
 		if ((!persistedData && isPersisted) || (persistedData && node.primaryKey !== persistedData[PRIMARY_KEY_NAME])) {
 			return true
@@ -103,7 +97,7 @@ export class DirtinessChecker {
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (
-							(accessor instanceof EntityAccessor || accessor instanceof EntityForRemovalAccessor) &&
+							accessor instanceof EntityAccessor /*|| accessor instanceof EntityForRemovalAccessor*/ &&
 							((persistedValue !== null && typeof persistedValue === 'object' && !Array.isArray(persistedValue)) ||
 								persistedValue === undefined ||
 								persistedValue === null)

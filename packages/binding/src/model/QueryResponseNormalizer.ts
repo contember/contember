@@ -1,17 +1,20 @@
 import {
-	BoxedHasOneRelationId,
+	BoxedSingleEntityId,
+	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
 	QueryRequestResponse,
 	ReceivedEntityData,
 	SingleEntityPersistedData,
+	SubTreeDataStore,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 
 export class QueryResponseNormalizer {
-	public static normalizeResponse(response: QueryRequestResponse): PersistedEntityDataStore {
+	public static normalizeResponse(response: QueryRequestResponse): NormalizedQueryResponseData {
 		const { data } = response
 		const entityMap: PersistedEntityDataStore = new Map()
+		const subTreeMap: SubTreeDataStore = new Map()
 
 		for (const treeId in data) {
 			const treeDatum = data[treeId]
@@ -20,15 +23,17 @@ export class QueryResponseNormalizer {
 				continue
 			}
 			if (Array.isArray(treeDatum)) {
+				const subTreeListIds = new Set<string>()
 				for (const entityDatum of treeDatum) {
-					this.addEntityResponse(entityMap, entityDatum)
+					subTreeListIds.add(this.addEntityResponse(entityMap, entityDatum))
 				}
+				subTreeMap.set(treeId, subTreeListIds)
 			} else {
-				this.addEntityResponse(entityMap, treeDatum)
+				subTreeMap.set(treeId, new BoxedSingleEntityId(this.addEntityResponse(entityMap, treeDatum)))
 			}
 		}
 
-		return entityMap
+		return new NormalizedQueryResponseData(subTreeMap, entityMap)
 	}
 
 	private static addEntityResponse(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData): string {
@@ -50,7 +55,7 @@ export class QueryResponseNormalizer {
 
 				fieldsMap.set(field, ids)
 			} else if (fieldDatum !== null && typeof fieldDatum === 'object') {
-				fieldsMap.set(field, new BoxedHasOneRelationId(this.addEntityResponse(entityMap, fieldDatum)))
+				fieldsMap.set(field, new BoxedSingleEntityId(this.addEntityResponse(entityMap, fieldDatum)))
 			} else {
 				fieldsMap.set(field, fieldDatum)
 			}
@@ -77,8 +82,8 @@ export class QueryResponseNormalizer {
 			if (fromOriginal === undefined) {
 				original.set(field, fromFresh)
 			} else if (__DEV_MODE__) {
-				if (fromOriginal instanceof BoxedHasOneRelationId) {
-					if (!(fromFresh instanceof BoxedHasOneRelationId)) {
+				if (fromOriginal instanceof BoxedSingleEntityId) {
+					if (!(fromFresh instanceof BoxedSingleEntityId)) {
 						throw new BindingError() // TODO msg
 					}
 					if (fromOriginal.id !== fromFresh.id) {

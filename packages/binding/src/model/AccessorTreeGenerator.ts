@@ -84,6 +84,14 @@ class AccessorTreeGenerator {
 		return subTreeState.accessor
 	}) as GetSubTree
 
+	private readonly getAllEntities = (entityStore => {
+		return function*(): Generator<EntityAccessor> {
+			for (const [, entity] of entityStore) {
+				yield entity.accessor
+			}
+		}
+	})(this.entityStore)
+
 	private readonly getAllTypeNames = (): Set<string> => {
 		const typeNames = new Set<string>()
 
@@ -157,7 +165,9 @@ class AccessorTreeGenerator {
 
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
-			this.updateData?.(new TreeRootAccessor(this.getEntityByKey, this.getSubTree, this.getAllTypeNames))
+			this.updateData?.(
+				new TreeRootAccessor(this.getEntityByKey, this.getSubTree, this.getAllEntities, this.getAllTypeNames),
+			)
 			this.flushPendingAccessorUpdates(rootsWithPendingUpdates)
 			this.isFrozenWhileUpdating = false
 		})

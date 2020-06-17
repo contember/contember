@@ -84,6 +84,16 @@ class AccessorTreeGenerator {
 		return subTreeState.accessor
 	}) as GetSubTree
 
+	private readonly getAllTypeNames = (): Set<string> => {
+		const typeNames = new Set<string>()
+
+		for (const [, { typeName }] of this.entityStore) {
+			typeName && typeNames.add(typeName)
+		}
+
+		return typeNames
+	}
+
 	private isFrozenWhileUpdating = false
 	private treeWideBatchUpdateDepth = 0
 
@@ -147,7 +157,7 @@ class AccessorTreeGenerator {
 
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
-			this.updateData?.(new TreeRootAccessor(this.getEntityByKey, this.getSubTree))
+			this.updateData?.(new TreeRootAccessor(this.getEntityByKey, this.getSubTree, this.getAllTypeNames))
 			this.flushPendingAccessorUpdates(rootsWithPendingUpdates)
 			this.isFrozenWhileUpdating = false
 		})
@@ -179,8 +189,6 @@ class AccessorTreeGenerator {
 
 	// TODO make this just initialize the fields…
 	private initializeEntityFields(entityState: InternalEntityState, markers: EntityFieldMarkers): EntityAccessor {
-		const typename = entityState.persistedData?.get(TYPENAME_KEY_NAME) as string
-
 		// We're overwriting existing states in entityState.fields which could already be there from a different
 		// entity realm. Most of the time this results in an equivalent accessor instance, and so for those cases this
 		// is rather inefficient. However, there are cases where we do want to do this. (E.g. refresh after a persist)
@@ -325,7 +333,7 @@ class AccessorTreeGenerator {
 
 		return new EntityAccessor(
 			entityState.id,
-			typename,
+			entityState.typeName,
 
 			// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 			// keep in sync two copies of the same data. TS hides the extra info anyway.
@@ -369,6 +377,7 @@ class AccessorTreeGenerator {
 			hasPendingUpdate: true,
 			isScheduledForDeletion: false,
 			plannedRemovals: undefined,
+			typeName: undefined,
 			id,
 			persistedData: this.persistedEntityData.get(entityKey),
 			realms: new Set([onEntityUpdate]),
@@ -439,6 +448,12 @@ class AccessorTreeGenerator {
 		entityState.addEventListener = this.getAddEventListener(entityState)
 		this.entityStore.set(entityKey, entityState)
 
+		const typeName = entityState.persistedData?.get(TYPENAME_KEY_NAME)
+
+		if (typeof typeName === 'string') {
+			entityState.typeName = typeName
+		}
+
 		const batchUpdatesImplementation: EntityAccessor.BatchUpdates = performUpdates => {
 			if (entityState.isScheduledForDeletion) {
 				throw new BindingError(`Trying to update an entity (or something within said entity) that has been deleted.`)
@@ -487,7 +502,7 @@ class AccessorTreeGenerator {
 			entityState.hasPendingUpdate = true
 			return (entityState.accessor = new EntityAccessor(
 				entityState.id,
-				entityState.accessor.typename,
+				entityState.accessor.typeName,
 				entityState.fields,
 				entityState.errors ? entityState.errors.errors : emptyArray,
 				entityState.addEventListener,

@@ -22,7 +22,7 @@ class EntityAccessor extends Accessor implements Errorable {
 
 	public constructor(
 		key: string | EntityAccessor.UnpersistedEntityId,
-		public readonly typename: string | undefined,
+		public readonly typeName: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
@@ -139,7 +139,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		if (!(accessor instanceof FieldAccessor)) {
 			throw new BindingError(
 				`Trying to access the field '${fieldName}'${
-					nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
+					nestedEntity.typeName ? ` of the '${nestedEntity.typeName}' entity` : ''
 				} but it does not exist.`,
 			)
 		}
@@ -168,7 +168,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		if (!(field instanceof EntityListAccessor)) {
 			throw new BindingError(
 				`Trying to access the entity list '${field}'${
-					nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
+					nestedEntity.typeName ? ` of the '${nestedEntity.typeName}' entity` : ''
 				} but it does not exist.`,
 			)
 		}

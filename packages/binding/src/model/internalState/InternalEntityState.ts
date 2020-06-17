@@ -26,6 +26,7 @@ export interface InternalEntityState extends InternalContainerState {
 	}
 	fields: Map<FieldName, InternalStateNode>
 	id: string | EntityAccessor.UnpersistedEntityId
+	typeName: string | undefined
 	persistedData: SingleEntityPersistedData | undefined
 	isScheduledForDeletion: boolean
 	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined

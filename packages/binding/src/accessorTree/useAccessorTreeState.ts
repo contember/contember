@@ -4,6 +4,7 @@ import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import { TreeRootAccessor } from '../accessors'
+import { BindingError } from '../BindingError'
 import {
 	AccessorTreeGenerator,
 	DirtinessChecker,
@@ -74,7 +75,10 @@ export const useAccessorTreeState = ({
 		initialize: autoInitialize ? undefined : initialize,
 	}
 
-	const rejectFailedRequest = React.useCallback((metadata: GraphQlClient.FailedRequestMetadata) => {
+	const rejectFailedRequest = React.useCallback((metadata: GraphQlClient.FailedRequestMetadata | BindingError) => {
+		if (metadata instanceof BindingError) {
+			throw metadata
+		}
 		const error = metadataToRequestError(metadata)
 		dispatch({
 			type: AccessorTreeStateActionType.ResolveRequestWithError,

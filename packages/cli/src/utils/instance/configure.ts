@@ -1,4 +1,4 @@
-import { updateOverrideConfig } from '../dockerCompose'
+import { DockerComposeConfig, updateOverrideConfig } from '../dockerCompose'
 import { readInstanceConfig, updateInstanceLocalConfig } from './config'
 import { interactiveAskForCredentials } from '../tenant'
 import { randomBytes } from '../random'
@@ -14,7 +14,7 @@ export const interactiveInstanceConfigure = async ({
 	host,
 	ports,
 }: {
-	composeConfig: any
+	composeConfig: DockerComposeConfig
 	instanceDirectory: string
 	host?: string[]
 	ports?: number
@@ -58,5 +58,5 @@ export const interactiveInstanceConfigure = async ({
 		)
 	}
 
-	return adminEnv
+	return { adminEnv }
 }

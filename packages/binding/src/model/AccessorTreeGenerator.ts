@@ -619,8 +619,7 @@ class AccessorTreeGenerator {
 						if (!didDelete) {
 							this.rejectInvalidAccessorTree()
 						}
-						if (true) {
-							// TODO only do this when the disconnects have actually been there before
+						if (entityListState.persistedEntityIds.has(disconnectedChildKey)) {
 							if (entityListState.plannedRemovals === undefined) {
 								entityListState.plannedRemovals = new Set()
 							}
@@ -634,7 +633,7 @@ class AccessorTreeGenerator {
 					})
 				})
 			},
-			getChildEntityByKey: (key: string) => {
+			getChildEntityByKey: key => {
 				if (!entityListState.childrenKeys.has(key)) {
 					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as is is not on the list.`)
 				}

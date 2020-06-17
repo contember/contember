@@ -1,7 +1,7 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { EntityAccessor } from '../accessors'
-import { ReceivedEntityData } from '../accessorTree'
+import { BoxedSingleEntityId, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
@@ -358,6 +358,7 @@ export class MutationGenerator {
 				}
 			} else if (marker instanceof ReferenceMarker) {
 				let unreducedHasOnePresent = false
+				let hasManyPersistedData: Set<string> | undefined = undefined
 				let hasManyPlannedRemovals: Set<InternalEntityPlannedRemoval> | undefined = undefined
 				const references = marker.references
 				const accessorReference: Array<{
@@ -378,27 +379,42 @@ export class MutationGenerator {
 						reference.expectedCount === ExpectedEntityCount.UpToOne &&
 						referenceState.type === InternalStateType.SingleEntity
 					) {
-						const persistedField = referenceState.persistedData
-						if (
-							(persistedField !== null && typeof persistedField === 'object' && !Array.isArray(persistedField)) ||
-							persistedField === undefined ||
-							persistedField === null
-						) {
-							accessorReference.push({
-								referenceState,
-								reference,
-								alias: referencePlaceholder,
-							})
+						accessorReference.push({
+							referenceState,
+							reference,
+							alias: referencePlaceholder,
+						})
 
-							if (reference.reducedBy === undefined) {
-								unreducedHasOnePresent = true
+						if (reference.reducedBy === undefined) {
+							unreducedHasOnePresent = true
+						} else {
+							const id = referenceState.persistedData?.get(PRIMARY_KEY_NAME)
+							if (id instanceof BoxedSingleEntityId) {
+								if (hasManyPersistedData === undefined) {
+									hasManyPersistedData = new Set()
+								}
+								hasManyPersistedData.add(id.id)
 							}
 						}
 					} else if (
 						reference.expectedCount === ExpectedEntityCount.PossiblyMany &&
 						referenceState.type === InternalStateType.EntityList
 					) {
-						hasManyPlannedRemovals = referenceState.plannedRemovals
+						// TODO this is very likely just crap
+						if (hasManyPersistedData === undefined) {
+							hasManyPersistedData = new Set()
+						}
+						for (const persistedId of referenceState.persistedEntityIds) {
+							hasManyPersistedData.add(persistedId)
+						}
+						if (hasManyPlannedRemovals === undefined) {
+							hasManyPlannedRemovals = new Set()
+						}
+						if (referenceState.plannedRemovals) {
+							for (const plannedRemoval of referenceState.plannedRemovals) {
+								hasManyPlannedRemovals.add(plannedRemoval)
+							}
+						}
 
 						for (const childKey of referenceState.childrenKeys) {
 							const innerState = this.entityStore.get(childKey)
@@ -420,23 +436,23 @@ export class MutationGenerator {
 							builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
 						) => {
 							const { referenceState, reference, alias } = accessorReference[0]
-							const persistedField = referenceState.persistedData as ReceivedEntityData<undefined> // TODO handle this cast
+							const persistedField = referenceState.persistedData
 
+							// TODO we're not handling deletions followed by connections
 							if (referenceState.isScheduledForDeletion) {
 								return builder.delete()
 							} else if (typeof referenceState.id === 'string') {
 								// referenceState exists on server
-								const updated = builder.update(builder =>
-									this.registerUpdateMutationPart(referenceState, reference.fields, builder),
-								)
 
-								if (!persistedField || (persistedField && referenceState.id !== persistedField[PRIMARY_KEY_NAME])) {
-									return updated.connect({
+								if (!persistedField || persistedField?.get(PRIMARY_KEY_NAME) !== referenceState.id) {
+									return builder.connect({
 										[PRIMARY_KEY_NAME]: referenceState.id,
 									})
 								}
-								return updated
-							} else if (persistedField && persistedField[PRIMARY_KEY_NAME]) {
+								return builder.update(builder =>
+									this.registerUpdateMutationPart(referenceState, reference.fields, builder),
+								)
+							} else if (persistedField?.get(PRIMARY_KEY_NAME)) {
 								return builder.disconnect()
 							} else {
 								return builder.create(this.registerCreateReferenceMutationPart(referenceState, reference))
@@ -452,10 +468,8 @@ export class MutationGenerator {
 				} else {
 					builder = builder.many(placeholderName, builder => {
 						for (const { referenceState, reference, alias } of accessorReference) {
-							const persistedField = referenceState.persistedData as ReceivedEntityData<undefined> // TODO handle this cast
-
 							if (typeof referenceState.id === 'string') {
-								if (!persistedField || (persistedField && referenceState.id !== persistedField[PRIMARY_KEY_NAME])) {
+								if (!hasManyPersistedData || !hasManyPersistedData.has(referenceState.id)) {
 									builder = builder.connect({ [PRIMARY_KEY_NAME]: referenceState.id }, alias)
 								} else {
 									builder = builder.update(

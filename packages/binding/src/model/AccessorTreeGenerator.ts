@@ -187,8 +187,7 @@ class AccessorTreeGenerator {
 		return subTreeState
 	}
 
-	// TODO make this just initialize the fields…
-	private initializeEntityFields(entityState: InternalEntityState, markers: EntityFieldMarkers): EntityAccessor {
+	private initializeEntityFields(entityState: InternalEntityState, markers: EntityFieldMarkers): void {
 		// We're overwriting existing states in entityState.fields which could already be there from a different
 		// entity realm. Most of the time this results in an equivalent accessor instance, and so for those cases this
 		// is rather inefficient. However, there are cases where we do want to do this. (E.g. refresh after a persist)
@@ -330,21 +329,6 @@ class AccessorTreeGenerator {
 				assertNever(field)
 			}
 		}
-
-		return new EntityAccessor(
-			entityState.id,
-			entityState.typeName,
-
-			// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
-			// keep in sync two copies of the same data. TS hides the extra info anyway.
-			entityState.fields,
-			entityState.errors ? entityState.errors.errors : emptyArray,
-			entityState.addEventListener,
-			entityState.batchUpdates,
-			entityState.connectEntityAtField,
-			entityState.disconnectEntityAtField,
-			entityState.deleteEntity,
-		)
 	}
 
 	private initializeEntityAccessor(
@@ -356,9 +340,28 @@ class AccessorTreeGenerator {
 		const entityKey = this.idToKey(id)
 		const existingEntityState = this.entityStore.get(entityKey)
 
+		const updateAccessorInstance = (state: InternalEntityState) => {
+			state.hasPendingUpdate = true
+			return (state.accessor = new EntityAccessor(
+				state.id,
+				state.typeName,
+
+				// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
+				// keep in sync two copies of the same data. TS hides the extra info anyway.
+				state.fields,
+				state.errors ? state.errors.errors : emptyArray,
+				state.addEventListener,
+				state.batchUpdates,
+				state.connectEntityAtField,
+				state.disconnectEntityAtField,
+				state.deleteEntity,
+			))
+		}
+
 		if (existingEntityState !== undefined) {
 			existingEntityState.realms.add(onEntityUpdate)
-			existingEntityState.accessor = this.initializeEntityFields(existingEntityState, fieldMarkers)
+			this.initializeEntityFields(existingEntityState, fieldMarkers)
+			updateAccessorInstance(existingEntityState)
 			return existingEntityState
 		}
 
@@ -388,7 +391,7 @@ class AccessorTreeGenerator {
 					} else {
 						this.markChildStateInNeedOfUpdate(entityState, updatedState)
 					}
-					updateAccessorInstance()
+					updateAccessorInstance(entityState)
 				})
 			},
 			batchUpdates: performUpdates => {
@@ -440,7 +443,7 @@ class AccessorTreeGenerator {
 					// Deliberately not calling performMutatingOperation ‒ no beforeUpdate events after deletion
 					batchUpdatesImplementation(() => {
 						entityState.isScheduledForDeletion = true
-						updateAccessorInstance()
+						updateAccessorInstance(entityState)
 					})
 				})
 			},
@@ -463,7 +466,7 @@ class AccessorTreeGenerator {
 			performUpdates(() => entityState.accessor!)
 			entityState.batchUpdateDepth--
 			if (entityState.batchUpdateDepth === 0 && accessorBeforeUpdates !== entityState.accessor) {
-				updateAccessorInstance()
+				updateAccessorInstance(entityState)
 				for (const onUpdate of entityState.realms) {
 					onUpdate(entityState)
 				}
@@ -498,21 +501,6 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		const updateAccessorInstance = () => {
-			entityState.hasPendingUpdate = true
-			return (entityState.accessor = new EntityAccessor(
-				entityState.id,
-				entityState.accessor.typeName,
-				entityState.fields,
-				entityState.errors ? entityState.errors.errors : emptyArray,
-				entityState.addEventListener,
-				entityState.batchUpdates,
-				entityState.connectEntityAtField,
-				entityState.disconnectEntityAtField,
-				entityState.deleteEntity,
-			))
-		}
-
 		const processEntityDeletion = (stateForDeletion: InternalEntityState) => {
 			entityState.childrenWithPendingUpdates?.delete(stateForDeletion)
 
@@ -532,7 +520,8 @@ class AccessorTreeGenerator {
 			}
 		}
 
-		entityState.accessor = this.initializeEntityFields(entityState, fieldMarkers)
+		this.initializeEntityFields(entityState, fieldMarkers)
+		updateAccessorInstance(entityState)
 		return entityState
 	}
 

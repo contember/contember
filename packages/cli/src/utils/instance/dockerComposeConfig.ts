@@ -98,6 +98,7 @@ export const patchInstanceOverrideCredentials = (config: any, tenantCredentials:
 				...config.services?.api,
 				environment: filterUndefinedEntries({
 					...config.services?.api?.environment,
+					CONTEMBER_LOGIN_TOKEN: tenantCredentials.loginToken,
 					CONTEMBER_ROOT_TOKEN: tenantCredentials.rootToken,
 					CONTEMBER_ROOT_EMAIL: tenantCredentials.rootEmail,
 					CONTEMBER_ROOT_PASSWORD: tenantCredentials.rootPassword,

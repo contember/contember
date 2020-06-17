@@ -597,6 +597,7 @@ class AccessorTreeGenerator {
 				entityListState.batchUpdates(() => {
 					const newState = generateNewEntityState(undefined)
 					this.markChildStateInNeedOfUpdate(entityListState, newState)
+					updateAccessorInstance()
 					initialize && newState.batchUpdates(initialize)
 				})
 			},

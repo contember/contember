@@ -1,6 +1,6 @@
 {
 	"name": "@contember/client",
-	"version": "0.4.25",
+	"version": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",

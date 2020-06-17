@@ -100,14 +100,14 @@ export const runDockerCompose = (args: string[], options: DockerComposeRunOption
 	return command
 }
 
-interface DockerComposeServiceConfig {
+export interface DockerComposeServiceConfig {
 	image?: string
 	command?: string
 	environment?: Record<string, string>
 	ports?: (string | {})[] // todo long syntax
 }
 
-interface DockerComposeConfig {
+export interface DockerComposeConfig {
 	version?: string
 	services: Record<string, DockerComposeServiceConfig>
 }

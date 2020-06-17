@@ -1,64 +1,46 @@
 import { Accessor } from './Accessor'
 import { EntityAccessor } from './EntityAccessor'
-import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
 class EntityListAccessor extends Accessor implements Errorable {
-	private _filteredEntities: EntityAccessor[] | undefined
-
 	public constructor(
-		private readonly entities: Map<
-			string, // See EntityAccessor.key
-			EntityListAccessor.ChildWithMetadata
-		>,
+		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
+		private readonly entityKeys: Set<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
-		public readonly addEventListener: EntityListAccessor.AddEntityEventListener,
-		public readonly batchUpdates: (performUpdates: EntityListAccessor.BatchUpdates) => void,
-		public readonly addNew:
-			| ((newEntity?: EntityAccessor | ((getAccessor: () => EntityListAccessor, newKey: string) => void)) => void)
-			| undefined,
+		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
+		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
+		public readonly connectEntity: EntityListAccessor.ConnectEntity | undefined,
+		public readonly createNewEntity: EntityListAccessor.CreateNewEntity | undefined,
+		public readonly disconnectEntity: EntityListAccessor.DisconnectEntity | undefined,
 	) {
 		super()
 	}
 
-	/**
-	 * ⚠ Important ⚠
-	 * The indexes of the resulting array *MIGHT NOT* correspond to the indexes of the original entities array.
-	 */
-	public getFilteredEntities(): EntityAccessor[] {
-		if (this._filteredEntities === undefined) {
-			this._filteredEntities = Array.from(this.entities, ([, { accessor }]) => accessor).filter(
-				(entity): entity is EntityAccessor => entity instanceof EntityAccessor,
-			)
-		}
-		return [...this._filteredEntities]
-	}
-
-	public getByKey(key: string): EntityAccessor | EntityForRemovalAccessor | undefined {
-		return this.entities.get(key)?.accessor
-	}
-
-	public *[Symbol.iterator](): Generator<EntityAccessor | EntityForRemovalAccessor> {
-		for (const [, entity] of this.entities) {
-			yield entity.accessor
+	public *[Symbol.iterator](): Generator<EntityAccessor> {
+		for (const id of this.entityKeys) {
+			yield this.getChildEntityByKey(id)
 		}
 	}
 }
 
 namespace EntityListAccessor {
-	export interface ChildWithMetadata {
-		readonly accessor: EntityAccessor | EntityForRemovalAccessor
-	}
+	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
+	export type BatchUpdatesHandler = (getAccessor: () => EntityListAccessor) => void
+	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void
+	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
+	export type DisconnectEntity = (childEntityOrItsKey: EntityAccessor | string) => void
+	export type GetChildEntityByKey = (key: string) => EntityAccessor
+	export type UpdateListener = (accessor: EntityListAccessor) => void
 
-	export type BatchUpdates = (getAccessor: () => EntityListAccessor) => void
-
-	export interface EntityEventListenerMap {
-		beforeUpdate: BatchUpdates
+	export interface EntityListEventListenerMap {
+		beforeUpdate: BatchUpdatesHandler
+		update: UpdateListener
 	}
-	export type EntityEventType = keyof EntityEventListenerMap
-	export interface AddEntityEventListener {
-		(type: EntityEventType & 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+	export type EntityListEventType = keyof EntityListEventListenerMap
+	export interface AddEntityListEventListener {
+		(type: 'beforeUpdate', listener: EntityListEventListenerMap['beforeUpdate']): () => void
+		(type: 'update', listener: EntityListEventListenerMap['update']): () => void
 	}
 }
 

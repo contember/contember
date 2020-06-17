@@ -1,6 +1,6 @@
 import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useEntityContext, useEnvironment } from '../accessorRetrievers'
+import { useEnvironment, useParentEntityAccessor } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { Component } from '../coreComponents'
 import { QueryLanguage } from '../queryLanguage'
@@ -30,7 +30,7 @@ export const RenderFields = Component<RenderFieldsProps>(
 			`The number of fields in the 'fields' prop of the 'RenderFields' must remain constant between renders!`,
 		)
 
-		const entityAccessor = useEntityContext()
+		const entityAccessor = useParentEntityAccessor()
 		const environment = useEnvironment()
 
 		const desugarField = React.useCallback((rsf: SRSF) => QueryLanguage.desugarRelativeSingleField(rsf, environment), [
@@ -47,11 +47,11 @@ export const RenderFields = Component<RenderFieldsProps>(
 		// TODO we probably want something like useDeferredValue from here.
 		//      Will probably just wait for Concurrent React though.
 		const output = React.useMemo(() => {
-			if (!entityAccessor.isPersisted && fallbackIfUnpersisted !== undefined) {
+			if (!entityAccessor.existsOnServer && fallbackIfUnpersisted !== undefined) {
 				return fallbackIfUnpersisted
 			}
 			return render(...accessors)
-		}, [accessors, entityAccessor.isPersisted, fallbackIfUnpersisted, render])
+		}, [accessors, entityAccessor.existsOnServer, fallbackIfUnpersisted, render])
 
 		return <>{output}</>
 	},

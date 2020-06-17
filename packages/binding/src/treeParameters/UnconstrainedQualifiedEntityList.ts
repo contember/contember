@@ -38,3 +38,13 @@ export interface UnsugarableUnconstrainedQualifiedEntityList
 export interface SugaredUnconstrainedQualifiedEntityList extends UnsugarableUnconstrainedQualifiedEntityList {
 	entities: string | SugarableUnconstrainedQualifiedEntityList
 }
+
+export class BoxedUnconstrainedQualifiedEntityList {
+	public constructor(public readonly value: UnconstrainedQualifiedEntityList) {}
+	public get type() {
+		return 'unconstrainedQualifiedEntityList' as const
+	}
+	public get isConstrained(): false {
+		return false
+	}
+}

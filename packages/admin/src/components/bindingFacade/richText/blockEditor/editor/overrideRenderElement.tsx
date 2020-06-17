@@ -10,7 +10,6 @@ export interface OverrideRenderElementOptions {
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlocks>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	removalType: RemovalType
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks
 }
@@ -22,7 +21,6 @@ export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, opt
 		<BlockEditorElementRenderer
 			normalizedBlocks={options.normalizedBlocksRef.current}
 			fallbackRenderer={renderElement}
-			removalType={options.removalType}
 			element={props.element}
 			attributes={props.attributes}
 			children={props.children}

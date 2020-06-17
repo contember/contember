@@ -1,17 +1,16 @@
+import { Component, EntityAccessor, SingleEntity } from '@contember/binding'
 import * as React from 'react'
-import { Component } from '@contember/binding'
 import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
-import { SingleEntityRenderer, SingleEntityRendererProps } from './SingleEntityRenderer'
 
-export interface MutableSingleEntityRendererProps
-	extends MutableContentLayoutRendererProps,
-		SingleEntityRendererProps {}
+export interface MutableSingleEntityRendererProps extends MutableContentLayoutRendererProps {
+	accessor: EntityAccessor
+}
 
 export const MutableSingleEntityRenderer = Component<MutableSingleEntityRendererProps>(
-	({ children, side, ...contentLayoutProps }) => (
-		<MutableContentLayoutRenderer {...contentLayoutProps} side={<SingleEntityRenderer>{side}</SingleEntityRenderer>}>
-			<SingleEntityRenderer>{children}</SingleEntityRenderer>
-		</MutableContentLayoutRenderer>
+	({ accessor, children, ...contentLayoutProps }) => (
+		<SingleEntity accessor={accessor}>
+			<MutableContentLayoutRenderer {...contentLayoutProps}>{children}</MutableContentLayoutRenderer>
+		</SingleEntity>
 	),
 	'MutableSingleEntityRenderer',
 )

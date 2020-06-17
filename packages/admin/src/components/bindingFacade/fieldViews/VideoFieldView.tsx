@@ -1,11 +1,4 @@
-import {
-	Component,
-	FieldValue,
-	SugaredField,
-	SugaredFieldProps,
-	useOptionalRelativeSingleField,
-	useRelativeSingleField,
-} from '@contember/binding'
+import { Component, FieldValue, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 
 export interface VideoFieldViewProps<SrcField extends FieldValue = string>
@@ -25,7 +18,7 @@ export const VideoFieldView = Component(
 		...videoProps
 	}: VideoFieldViewProps<SrcField>) => {
 		const srcAccessor = useRelativeSingleField<SrcField>(srcField)
-		const titleAccessor = useOptionalRelativeSingleField<string>(titleField)
+		const titleAccessor = useRelativeSingleField<string>(titleField)
 
 		if (!srcAccessor.currentValue) {
 			return <>{fallback}</>

@@ -11,9 +11,9 @@ export type ReceivedEntityData<A = never> =
 export type ReceivedData<A = never> = A | ReceivedEntityData<A> | ReceivedEntityData<A>[]
 
 export interface ReceivedDataTree<A = never> {
-	[treeId: string]: ReceivedData<A>
+	[treeId: string]: ReceivedData<A> | null
 }
 
-export interface QueryRequestResponse {
-	data: ReceivedDataTree<undefined>
+export interface QueryRequestResponse<A = never> {
+	data: ReceivedDataTree<A>
 }

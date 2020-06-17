@@ -4,13 +4,13 @@ import {
 	EntityAccessor,
 	Environment,
 	FieldAccessor,
-	HasManyProps,
 	QueryLanguage,
 	RelativeSingleField,
 	SugaredField,
+	SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList,
-	useEntityContext,
 	useEnvironment,
+	useParentEntityAccessor,
 } from '@contember/binding'
 import { emptyArray, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
@@ -20,7 +20,7 @@ import { BlockEditorInner, BlockEditorInnerPublicProps } from './BlockEditorInne
 import { EmbedHandler } from './embed'
 import { FieldBackedElement, NormalizedFieldBackedElement } from './FieldBackedElement'
 
-export interface BlockEditorProps extends HasManyProps, BlockEditorInnerPublicProps {
+export interface BlockEditorProps extends SugaredRelativeEntityList, BlockEditorInnerPublicProps {
 	leadingFieldBackedElements?: FieldBackedElement[]
 	//trailingFieldBackedElements?: FieldBackedElement[]
 
@@ -30,7 +30,7 @@ export interface BlockEditorProps extends HasManyProps, BlockEditorInnerPublicPr
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
 export const BlockEditor = Component<BlockEditorProps>(
 	props => {
-		const entity = useEntityContext()
+		const entity = useParentEntityAccessor()
 		const environment = useEnvironment()
 
 		useConstantLengthInvariant(
@@ -80,7 +80,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 				environment={environment}
 				batchUpdates={entity.batchUpdates}
 				desugaredEntityList={desugaredEntityList}
-				entityListAccessor={entityListAccessor}
+				accessor={entityListAccessor}
 				leadingFieldBackedElements={normalizedLeading}
 				//trailingFieldBackedElements={normalizedTrailing}
 				embedHandlers={embedHandlers}

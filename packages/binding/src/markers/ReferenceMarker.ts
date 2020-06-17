@@ -1,13 +1,14 @@
-import { assertNever } from '../utils'
 import { BindingError } from '../BindingError'
 import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
-import { EntityFields } from './EntityFields'
+import { assertNever } from '../utils'
+import { EntityFieldMarkers } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 // TODO unify with EntityListTreeConstraints / SingleEntityTreeConstraints
 class ReferenceMarker {
 	public readonly fieldName: FieldName
 	public readonly references: ReferenceMarker.References
+	public readonly placeholderName: string
 
 	public static readonly defaultReferencePreferences: {
 		readonly [index in ExpectedEntityCount]: ReferenceMarker.ReferencePreferences
@@ -23,7 +24,7 @@ class ReferenceMarker {
 	public constructor(
 		fieldName: FieldName,
 		expectedCount: ExpectedEntityCount,
-		fields: EntityFields,
+		fields: EntityFieldMarkers,
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
@@ -32,7 +33,7 @@ class ReferenceMarker {
 	public constructor(
 		fieldName: FieldName,
 		decider: ExpectedEntityCount | ReferenceMarker.References,
-		fields?: EntityFields,
+		fields?: EntityFieldMarkers,
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
@@ -56,7 +57,7 @@ class ReferenceMarker {
 				throw new BindingError(`The preferred 'initialEntityCount' for a relation must be a non-negative integer!`)
 			}
 			if (decider === ExpectedEntityCount.UpToOne && normalizedPreferences.initialEntityCount > 1) {
-				throw new BindingError(`A ToOne reference cannot prefer more than one entity!`)
+				throw new BindingError(`A HasOne reference cannot prefer more than one entity!`)
 			}
 
 			references = {
@@ -84,10 +85,8 @@ class ReferenceMarker {
 
 		this.fieldName = fieldName
 		this.references = references
-	}
 
-	public get placeholderName(): string {
-		return PlaceholderGenerator.generateReferenceMarkerPlaceholder(this)
+		this.placeholderName = PlaceholderGenerator.generateReferenceMarkerPlaceholder(this)
 	}
 }
 
@@ -103,7 +102,7 @@ namespace ReferenceMarker {
 	}
 
 	export interface Reference extends ReferenceConstraints {
-		fields: EntityFields
+		fields: EntityFieldMarkers
 		preferences: ReferencePreferences
 		placeholderName: string
 	}

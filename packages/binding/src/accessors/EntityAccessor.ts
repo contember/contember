@@ -1,5 +1,5 @@
 import { BindingError } from '../BindingError'
-import { MarkerTreeRoot, PlaceholderGenerator, ReferenceMarker } from '../markers'
+import { PlaceholderGenerator, ReferenceMarker } from '../markers'
 import {
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
@@ -10,30 +10,26 @@ import {
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
-	RemovalType,
-	SubTreeIdentifier,
 } from '../treeParameters'
 import { Accessor } from './Accessor'
-import { EntityForRemovalAccessor } from './EntityForRemovalAccessor'
 import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
-import { RootAccessor } from './RootAccessor'
 
 class EntityAccessor extends Accessor implements Errorable {
 	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
 
 	public constructor(
 		key: string | EntityAccessor.UnpersistedEntityId,
-		public readonly typename: string | undefined,
-		public readonly fieldData: EntityAccessor.FieldData,
-		public readonly subTreeData: EntityAccessor.SubTreeData,
+		public readonly typeName: string | undefined,
+		private readonly fieldData: EntityAccessor.FieldData,
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
-		public readonly batchUpdates: (performUpdates: EntityAccessor.BatchUpdates) => void,
-		public readonly replaceBy: ((replacement: EntityAccessor) => void) | undefined,
-		public readonly remove: ((removalType: RemovalType) => void) | undefined,
+		public readonly batchUpdates: EntityAccessor.BatchUpdates,
+		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField | undefined,
+		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField | undefined,
+		public readonly deleteEntity: EntityAccessor.DeleteEntity | undefined,
 	) {
 		super()
 		this.runtimeId = key || new EntityAccessor.UnpersistedEntityId()
@@ -43,7 +39,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : undefined
 	}
 
-	public get isPersisted(): boolean {
+	public get existsOnServer(): boolean {
 		return typeof this.runtimeId === 'string'
 	}
 
@@ -51,24 +47,24 @@ class EntityAccessor extends Accessor implements Errorable {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
 	}
 
-	public getField(fieldName: FieldName): EntityAccessor.FieldDatum
+	public getField(fieldName: FieldName): EntityAccessor.NestedAccessor
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
-	): EntityAccessor.FieldDatum | undefined
+	): EntityAccessor.NestedAccessor | null
 	public getField(
 		fieldName: FieldName,
 		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter: ReferenceMarker.ReferenceConstraints['filter'],
 		reducedBy: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.FieldDatum | undefined
+	): EntityAccessor.NestedAccessor | null
 	public getField(
 		fieldName: FieldName,
 		expectedCount?: ReferenceMarker.ReferenceConstraints['expectedCount'],
 		filter?: ReferenceMarker.ReferenceConstraints['filter'],
 		reducedBy?: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.FieldDatum | undefined {
+	): EntityAccessor.NestedAccessor | null {
 		let placeholder: FieldName
 
 		if (expectedCount !== undefined) {
@@ -81,11 +77,7 @@ class EntityAccessor extends Accessor implements Errorable {
 			placeholder = PlaceholderGenerator.getFieldPlaceholder(fieldName)
 		}
 
-		return this.fieldData.get(placeholder)
-	}
-
-	public getTreeRoot(identifier: SubTreeIdentifier): RootAccessor | undefined {
-		return this.subTreeData?.get(identifier)
+		return this.getFieldByPlaceholder(placeholder)
 	}
 
 	/**
@@ -146,8 +138,8 @@ class EntityAccessor extends Accessor implements Errorable {
 
 		if (!(accessor instanceof FieldAccessor)) {
 			throw new BindingError(
-				`Trying to access the field '${field}'${
-					nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
+				`Trying to access the field '${fieldName}'${
+					nestedEntity.typeName ? ` of the '${nestedEntity.typeName}' entity` : ''
 				} but it does not exist.`,
 			)
 		}
@@ -176,11 +168,22 @@ class EntityAccessor extends Accessor implements Errorable {
 		if (!(field instanceof EntityListAccessor)) {
 			throw new BindingError(
 				`Trying to access the entity list '${field}'${
-					nestedEntity.typename ? ` of the '${nestedEntity.typename}' entity` : ''
+					nestedEntity.typeName ? ` of the '${nestedEntity.typeName}' entity` : ''
 				} but it does not exist.`,
 			)
 		}
 		return field
+	}
+
+	/**
+	 * @internal
+	 */
+	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor | null {
+		const record = this.fieldData.get(placeholderName)
+		if (record === undefined) {
+			throw new BindingError(`EntityAccessor: unknown field '${placeholderName}'.`)
+		}
+		return record.accessor
 	}
 }
 
@@ -198,20 +201,28 @@ namespace EntityAccessor {
 		}
 	}
 
-	export type FieldDatum = undefined | EntityAccessor | EntityForRemovalAccessor | EntityListAccessor | FieldAccessor
-	export type SubTreeDatum = RootAccessor
+	export interface FieldDatum {
+		accessor: NestedAccessor | null
+	}
+	export type NestedAccessor = EntityAccessor | EntityListAccessor | FieldAccessor
 
 	export type FieldData = Map<FieldName, FieldDatum>
-	export type SubTreeData = Map<SubTreeIdentifier, SubTreeDatum> | undefined
 
-	export type BatchUpdates = (getAccessor: () => EntityAccessor) => void
+	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
+	export type BatchUpdatesHandler = (getAccessor: () => EntityAccessor) => void
+	export type ConnectEntityAtField = (field: FieldName, entityToConnectOrItsKey: EntityAccessor | string) => void
+	export type DeleteEntity = () => void
+	export type DisconnectEntityAtField = (field: FieldName) => void
+	export type UpdateListener = (accessor: EntityAccessor) => void
 
 	export interface EntityEventListenerMap {
-		beforeUpdate: BatchUpdates
+		beforeUpdate: BatchUpdatesHandler
+		update: UpdateListener
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
 	export interface AddEntityEventListener {
-		(type: EntityEventType & 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+		(type: 'update', listener: EntityEventListenerMap['update']): () => void
 	}
 }
 

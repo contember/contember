@@ -1,6 +1,6 @@
-import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import * as React from 'react'
-import { AccessorTreeStateContext } from './AccessorTreeStateContext'
+import { GetEntityByKeyProvider, GetSubTreeProvider } from '../accessorPropagation'
+import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { DirtinessContext } from './DirtinessContext'
 import { MutationStateContext } from './MutationStateContext'
 import { TriggerPersistContext } from './TriggerPersistContext'
@@ -10,27 +10,32 @@ export interface AccessorTreeProps {
 	children: React.ReactNode
 }
 
-// This is a nasty piece of awfulness which we'll have to live with until we implement subscriptions or until the
-// context case of https://github.com/facebook/react/issues/14110 lands a RFC.
-export const AccessorTree = React.memo(({ state, children }: AccessorTreeProps) => (
-	<TriggerPersistContext.Provider
-		value={
-			state.name === AccessorTreeStateName.Interactive || state.name === AccessorTreeStateName.Mutating
-				? state.triggerPersist
-				: undefined
-		}
-	>
-		<DirtinessContext.Provider
-			value={
-				state.name === AccessorTreeStateName.Interactive || state.name === AccessorTreeStateName.Mutating
-					? state.isDirty
-					: false
-			}
-		>
-			<MutationStateContext.Provider value={state.name === AccessorTreeStateName.Mutating}>
-				<AccessorTreeStateContext.Provider value={state}>{children}</AccessorTreeStateContext.Provider>
-			</MutationStateContext.Provider>
-		</DirtinessContext.Provider>
-	</TriggerPersistContext.Provider>
-))
+export function AccessorTree({ state, children }: AccessorTreeProps) {
+	// It is *CRUCIAL* that both branches differ only in props, not structurally. Otherwise there would be far too many
+	// remounts.
+	if (state.name === AccessorTreeStateName.Interactive || state.name === AccessorTreeStateName.Mutating) {
+		return (
+			<TriggerPersistContext.Provider value={state.triggerPersist}>
+				<DirtinessContext.Provider value={state.isDirty}>
+					<MutationStateContext.Provider value={state.name === AccessorTreeStateName.Mutating}>
+						<GetSubTreeProvider getSubTree={state.data.getSubTree}>
+							<GetEntityByKeyProvider getEntityByKey={state.data.getEntityByKey}>{children}</GetEntityByKeyProvider>
+						</GetSubTreeProvider>
+					</MutationStateContext.Provider>
+				</DirtinessContext.Provider>
+			</TriggerPersistContext.Provider>
+		)
+	}
+	return (
+		<TriggerPersistContext.Provider value={undefined}>
+			<DirtinessContext.Provider value={false}>
+				<MutationStateContext.Provider value={false}>
+					<GetSubTreeProvider getSubTree={undefined}>
+						<GetEntityByKeyProvider getEntityByKey={undefined}>{children}</GetEntityByKeyProvider>
+					</GetSubTreeProvider>
+				</MutationStateContext.Provider>
+			</DirtinessContext.Provider>
+		</TriggerPersistContext.Provider>
+	)
+}
 AccessorTree.displayName = 'AccessorTree'

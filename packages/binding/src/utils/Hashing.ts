@@ -1,5 +1,11 @@
-import { MarkerTreeParameters, ReferenceMarker } from '../markers'
-import { ExpectedEntityCount, Filter, UniqueWhere } from '../treeParameters'
+import { SubTreeMarkerParameters, ReferenceMarker } from '../markers'
+import {
+	BoxedQualifiedEntityList,
+	BoxedQualifiedSingleEntity,
+	ExpectedEntityCount,
+	Filter,
+	UniqueWhere,
+} from '../treeParameters'
 import { assertNever } from './assertNever'
 
 export class Hashing {
@@ -13,29 +19,31 @@ export class Hashing {
 		return Hashing.hashArray(where)
 	}
 
-	public static hashMarkerTreeParameters(parameters: MarkerTreeParameters): number {
-		if (parameters.type === 'unconstrained') {
-			return 0
-		} else if (parameters.type === 'nonUnique') {
-			return Hashing.hashArray([
-				parameters.type,
-				parameters.entityName,
-				parameters.filter,
-				parameters.orderBy,
-				parameters.offset,
-				parameters.limit,
-				parameters.connectTo,
-			])
-		} else if (parameters.type === 'unique') {
-			return Hashing.hashArray([
-				parameters.type,
-				parameters.where,
-				parameters.entityName,
-				parameters.connectTo,
-				parameters.filter,
-			])
+	public static hashMarkerTreeParameters(parameters: SubTreeMarkerParameters): number {
+		if (parameters.isConstrained) {
+			if (parameters instanceof BoxedQualifiedSingleEntity) {
+				return Hashing.hashArray([
+					parameters.type,
+					parameters.value.where,
+					parameters.value.entityName,
+					parameters.value.filter,
+				])
+			} else if (parameters instanceof BoxedQualifiedEntityList) {
+				const value = parameters.value
+				return Hashing.hashArray([
+					parameters.type,
+					value.entityName,
+					value.filter,
+					value.orderBy,
+					value.offset,
+					value.limit,
+					value.connectTo,
+				])
+			}
+		} else {
+			return Hashing.hashArray([parameters.type, parameters.value.entityName, parameters.value.connectTo])
 		}
-		assertNever(parameters)
+		return assertNever(parameters)
 	}
 
 	private static hashArray(array: any[]): number {

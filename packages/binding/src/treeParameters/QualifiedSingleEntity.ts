@@ -1,9 +1,3 @@
-import {
-	DesugaredEntityCreationParameters,
-	EntityCreationParameters,
-	SugarableEntityCreationParameters,
-	UnsugarableEntityCreationParameters,
-} from './EntityCreationParameters'
 import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import {
 	DesugaredQualifiedEntityParameters,
@@ -18,12 +12,6 @@ import {
 	UnsugarableQualifiedSingleEntityParameters,
 } from './QualifiedSingleEntityParameters'
 import {
-	DesugaredRelativeSingleEntity,
-	RelativeSingleEntity,
-	SugarableRelativeSingleEntity,
-	UnsugarableRelativeSingleEntity,
-} from './RelativeSingleEntity'
-import {
 	DesugaredSingleEntityParameters,
 	SingleEntityParameters,
 	SugarableSingleEntityParameters,
@@ -33,35 +21,41 @@ import {
 export interface DesugaredQualifiedSingleEntity
 	extends DesugaredQualifiedSingleEntityParameters,
 		DesugaredSingleEntityParameters,
-		DesugaredQualifiedEntityParameters,
-		DesugaredEntityCreationParameters {
+		DesugaredQualifiedEntityParameters {
 	hasOneRelationPath: DesugaredHasOneRelation[]
 }
 
 export interface QualifiedSingleEntity
 	extends QualifiedSingleEntityParameters,
 		SingleEntityParameters,
-		QualifiedEntityParameters,
-		EntityCreationParameters {
+		QualifiedEntityParameters {
 	hasOneRelationPath: HasOneRelation[]
 }
 
 export interface SugarableQualifiedSingleEntity
 	extends SugarableQualifiedSingleEntityParameters,
 		SugarableSingleEntityParameters,
-		SugarableQualifiedEntityParameters,
-		SugarableEntityCreationParameters {
+		SugarableQualifiedEntityParameters {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableQualifiedSingleEntity
 	extends UnsugarableQualifiedSingleEntityParameters,
 		UnsugarableSingleEntityParameters,
-		UnsugarableQualifiedEntityParameters,
-		UnsugarableEntityCreationParameters {
+		UnsugarableQualifiedEntityParameters {
 	// Deliberately leaving out UnsugarableHasOneRelation
 }
 
 export interface SugaredQualifiedSingleEntity extends UnsugarableQualifiedSingleEntity {
 	entity: string | SugarableQualifiedSingleEntity
+}
+
+export class BoxedQualifiedSingleEntity {
+	public constructor(public readonly value: QualifiedSingleEntity) {}
+	public get type() {
+		return 'qualifiedSingleEntity' as const
+	}
+	public get isConstrained(): true {
+		return true
+	}
 }

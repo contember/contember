@@ -1,7 +1,7 @@
 import { Box, Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
 import * as React from 'react'
 import { Component, EntityAccessor } from '@contember/binding'
-import { EmptyMessage, RemoveEntityButton } from '../collections/helpers'
+import { EmptyMessage, DeleteEntityButton } from '../collections/helpers'
 import { RepeaterContainerProps, RepeaterItemProps } from '../collections/Repeater'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
@@ -68,7 +68,7 @@ EmptyTable.displayName = 'EmptyTable'
 
 const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => {
 	// TODO solve this via preferences
-	const isEmpty = !Array.from(props.entityList).some(entity => entity instanceof EntityAccessor && entity.isPersisted)
+	const isEmpty = !Array.from(props.accessor).some(entity => entity instanceof EntityAccessor && entity.existsOnServer)
 
 	if (isEmpty) {
 		const EmptyMessageComponent = props.emptyMessageComponent || EmptyTable
@@ -88,7 +88,7 @@ const Row = React.memo((props: RepeaterItemProps & Omit<TableRowProps, 'children
 		{props.children}
 		{props.enableRemove !== false && (
 			<TableCell shrunk>
-				<RemoveEntityButton removalType="delete" immediatePersist={true} />
+				<DeleteEntityButton immediatePersist={true} />
 			</TableCell>
 		)}
 	</TableRow>

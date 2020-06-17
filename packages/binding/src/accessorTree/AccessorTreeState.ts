@@ -1,4 +1,4 @@
-import { RootAccessor } from '../accessors'
+import { TreeRootAccessor } from '../accessors'
 import { SuccessfulPersistResult } from './PersistResult'
 import { RequestError } from './RequestError'
 
@@ -20,7 +20,7 @@ export interface QueryingAccessorTreeState {
 
 export interface MutatingAccessorTreeState {
 	name: AccessorTreeStateName.Mutating
-	data: RootAccessor
+	data: TreeRootAccessor
 	// This is really a no-op but we want to avoid having to un-render all e.g. persist buttons
 	triggerPersist: () => Promise<SuccessfulPersistResult>
 	isDirty: boolean
@@ -28,7 +28,7 @@ export interface MutatingAccessorTreeState {
 
 export interface InteractiveAccessorTreeState {
 	name: AccessorTreeStateName.Interactive
-	data: RootAccessor
+	data: TreeRootAccessor
 	triggerPersist: () => Promise<SuccessfulPersistResult>
 	isDirty: boolean
 }
@@ -48,5 +48,5 @@ export type AccessorTreeState =
 export type AccessorTreeStateWithData = MutatingAccessorTreeState | InteractiveAccessorTreeState
 
 //export type AccessorTreeGlobalStateById = {
-//	[Id in MarkerTreeRoot.TreeId]: any
+//	[Id in SubTreeMarker.TreeId]: any
 //}

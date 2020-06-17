@@ -1,14 +1,14 @@
+import { EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { Box, BoxSection } from '@contember/ui'
 import * as React from 'react'
-import { EntityAccessor, EntityListAccessor } from '@contember/binding'
-import { AddNewEntityButton, AddNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
+import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 
 export interface RepeaterContainerPrivateProps {
-	entityList: EntityListAccessor
+	accessor: EntityListAccessor
 	entities: EntityAccessor[]
 	isEmpty: boolean
 	label: React.ReactNode
-	addNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
+	createNewEntity: EntityListAccessor.CreateNewEntity
 	children: React.ReactNode
 }
 export interface RepeaterContainerPublicProps {
@@ -19,8 +19,8 @@ export interface RepeaterContainerPublicProps {
 	emptyMessageComponentExtraProps?: {}
 
 	addButtonText?: React.ReactNode
-	addButtonProps?: AddNewEntityButtonProps // Children here override 'addButtonText'
-	addButtonComponent?: React.ComponentType<AddNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
+	addButtonProps?: CreateNewEntityButtonProps // Children here override 'addButtonText'
+	addButtonComponent?: React.ComponentType<CreateNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
 	addButtonComponentExtraProps?: {}
 }
 
@@ -28,9 +28,9 @@ export interface RepeaterContainerProps extends RepeaterContainerPublicProps, Re
 
 export const RepeaterContainer = React.memo(
 	({
-		addNew,
 		children,
-		addButtonComponent: AddButton = AddNewEntityButton,
+		createNewEntity,
+		addButtonComponent: AddButton = CreateNewEntityButton,
 		addButtonComponentExtraProps,
 		addButtonProps,
 		addButtonText = 'Add',
@@ -47,7 +47,12 @@ export const RepeaterContainer = React.memo(
 				{isEmpty || children}
 				{enableAddingNew && (
 					<BoxSection heading={undefined}>
-						<AddButton {...addButtonComponentExtraProps} children={addButtonText} {...addButtonProps} addNew={addNew} />
+						<AddButton
+							{...addButtonComponentExtraProps}
+							children={addButtonText}
+							{...addButtonProps}
+							createNewEntity={createNewEntity}
+						/>
 					</BoxSection>
 				)}
 			</Box>

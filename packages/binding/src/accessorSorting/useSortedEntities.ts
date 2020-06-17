@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { useOptionalDesugaredRelativeSingleField } from '../accessorRetrievers'
+import { useDesugaredRelativeSingleField } from '../accessorPropagation'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { SugaredFieldProps } from '../helperComponents'
 import { RelativeSingleField } from '../treeParameters'
-import { addNewEntityAtIndex } from './addNewEntityAtIndex'
+import { addEntityAtIndex } from './addEntityAtIndex'
 import { throwNonWritableError, throwNoopError } from './errors'
 import { moveEntity } from './moveEntity'
 import { repairEntitiesOrder } from './repairEntitiesOrder'
@@ -11,9 +11,9 @@ import { sortEntities } from './sortEntities'
 
 export interface SortedEntities {
 	entities: EntityAccessor[]
-	prependNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
-	appendNew: (preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
-	addNewAtIndex: (index: number, preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => void
+	prependNew: EntityListAccessor.CreateNewEntity
+	appendNew: EntityListAccessor.CreateNewEntity
+	addNewAtIndex: (index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void
 	moveEntity: (oldIndex: number, newIndex: number) => void
 }
 
@@ -23,32 +23,31 @@ const addNewAtIndexImplementation = (
 	desugaredSortableByField: RelativeSingleField | undefined,
 	sortedEntitiesCount: number,
 	index: number,
-	preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void,
+	preprocess?: EntityAccessor.BatchUpdatesHandler,
 ) => {
-	if (!entityList.addNew) {
+	if (!entityList.createNewEntity) {
 		return throwNonWritableError(entityList)
 	}
 	if (!desugaredSortableByField) {
 		if (index === sortedEntitiesCount) {
-			return entityList.addNew()
+			return entityList.createNewEntity()
 		}
 		return throwNoopError(callbackName)
 	}
-	addNewEntityAtIndex(entityList, desugaredSortableByField, index, preprocess)
+	addEntityAtIndex(entityList, desugaredSortableByField, index, preprocess)
 }
 
 export const useSortedEntities = (
 	entityList: EntityListAccessor,
 	sortableByField: SugaredFieldProps['field'] | undefined,
 ): SortedEntities => {
-	const desugaredSortableByField = useOptionalDesugaredRelativeSingleField(sortableByField)
+	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableByField)
 	const sortedEntities = React.useMemo(() => {
-		const filteredEntities = entityList.getFilteredEntities()
-		return sortEntities(filteredEntities, desugaredSortableByField)
+		return sortEntities(Array.from(entityList), desugaredSortableByField)
 	}, [desugaredSortableByField, entityList])
 
 	const addNewAtIndex = React.useCallback<SortedEntities['addNewAtIndex']>(
-		(index: number, preprocess?: (getAccessor: () => EntityListAccessor, newKey: string) => void) => {
+		(index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => {
 			addNewAtIndexImplementation(
 				'addNewAtIndex',
 				entityList,
@@ -96,12 +95,13 @@ export const useSortedEntities = (
 		[desugaredSortableByField, entityList],
 	)
 
-	React.useEffect(() => {
-		if (!desugaredSortableByField) {
-			return
-		}
-		repairEntitiesOrder(desugaredSortableByField, entityList, sortedEntities)
-	}, [desugaredSortableByField, entityList, sortedEntities])
+	// This wasn't such a great idea…
+	// React.useEffect(() => {
+	// 	if (!desugaredSortableByField) {
+	// 		return
+	// 	}
+	// 	repairEntitiesOrder(desugaredSortableByField, entityList, sortedEntities)
+	// }, [desugaredSortableByField, entityList, sortedEntities])
 
 	return React.useMemo<SortedEntities>(
 		() => ({

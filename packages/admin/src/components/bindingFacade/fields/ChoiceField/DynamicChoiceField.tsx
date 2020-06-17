@@ -1,11 +1,10 @@
-import { assertNever } from '@contember/utils'
-import * as React from 'react'
 import {
-	Component,
 	BindingError,
+	BoxedQualifiedEntityList,
+	Component,
 	EntityAccessor,
 	EntityListAccessor,
-	EntityListDataProvider,
+	EntityListSubTree,
 	Field,
 	FieldAccessor,
 	HasMany,
@@ -20,10 +19,14 @@ import {
 	SugaredQualifiedFieldList,
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
-	useEntityContext,
+	useAccessorUpdateSubscription__UNSTABLE,
 	useEnvironment,
+	useGetSubTree,
 	useMutationState,
+	useParentEntityAccessor,
 } from '@contember/binding'
+import { assertNever } from '@contember/utils'
+import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export type BaseDynamicChoiceFieldProps =
@@ -49,25 +52,13 @@ export type DynamicChoiceFieldProps = (
 ) &
 	BaseDynamicChoiceFieldProps
 
-// Now THIS, this is one of the nastiest hacks in the entire codebase 👏.
-// TODO how to improve this though…? 🤔
-const computeSubTreeIdentifier = (field: DynamicChoiceFieldProps['field']) => JSON.stringify(field)
-
 export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.ChoiceArity>(
 	props: DynamicChoiceFieldProps,
 ): ChoiceFieldData.MetadataByArity[DynamicArity] => {
-	const parentEntity = useEntityContext()
+	const parentEntity = useParentEntityAccessor()
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
-	const subTreeIdentifier = React.useMemo(() => computeSubTreeIdentifier(props.field), [props.field])
-	const subTreeData = React.useMemo(() => {
-		const subTree = parentEntity.getTreeRoot(subTreeIdentifier)
-
-		if (!(subTree instanceof EntityListAccessor)) {
-			throw new BindingError(`Something went horribly wrong. The options of a dynamic choice field are not a list.`)
-		}
-		return subTree
-	}, [parentEntity, subTreeIdentifier])
+	const getSubTree = useGetSubTree()
 
 	const desugaredRelativePath = React.useMemo<RelativeSingleEntity | RelativeEntityList>(() => {
 		if (props.arity === 'single') {
@@ -97,6 +88,12 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			environment,
 		)
 	}, [environment, props])
+	const getSubTreeData = React.useCallback(() => getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath)), [
+		desugaredOptionPath,
+		getSubTree,
+	])
+	const subTreeData = useAccessorUpdateSubscription__UNSTABLE(getSubTreeData)
+
 	const arity = props.arity
 	const currentValueEntity: EntityListAccessor | EntityAccessor = React.useMemo(() => {
 		if (arity === 'single') {
@@ -107,7 +104,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 		assertNever(arity)
 	}, [parentEntity, desugaredRelativePath, arity])
 
-	const filteredOptions = subTreeData.getFilteredEntities()
+	const filteredOptions = Array.from(subTreeData)
 
 	const optionEntities = React.useMemo(() => {
 		const entities: EntityAccessor[] = []
@@ -118,7 +115,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 	}, [desugaredOptionPath, filteredOptions])
 
 	const currentlyChosenEntities =
-		currentValueEntity instanceof EntityListAccessor ? currentValueEntity.getFilteredEntities() : [currentValueEntity]
+		currentValueEntity instanceof EntityListAccessor ? Array.from(currentValueEntity) : [currentValueEntity]
 
 	const currentValues = React.useMemo(() => {
 		const values: ChoiceFieldData.ValueRepresentation[] = []
@@ -126,7 +123,7 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 		for (const entity of currentlyChosenEntities) {
 			if (entity instanceof EntityAccessor) {
 				const currentKey = entity.key
-				const index = filteredOptions.findIndex(entity => {
+				const index = filteredOptions.findIndex((entity: EntityAccessor) => {
 					const key = entity.primaryKey
 					return !!key && key === currentKey
 				})
@@ -184,16 +181,16 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			currentValue: currentValues.length ? currentValues[0] : -1,
 			onChange: (newValue: ChoiceFieldData.ValueRepresentation) => {
 				const entity = currentlyChosenEntities[0]
-				if (entity === undefined) {
+				if (entity === undefined || !(currentValueEntity instanceof EntityAccessor)) {
 					return
 				}
 
+				// TODO field names
+				// TODO we maybe shouldn't even use currentValueEntity for hasOne connections
 				if (newValue === -1) {
-					if (entity instanceof EntityAccessor && entity.remove) {
-						entity.remove('disconnect')
-					}
+					currentValueEntity.disconnectEntityAtField?.('TODO')
 				} else {
-					entity.replaceBy?.(filteredOptions[newValue])
+					currentValueEntity.connectEntityAtField?.('TODO', filteredOptions[newValue])
 				}
 			},
 		}
@@ -203,21 +200,11 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 			...baseMetadata,
 			currentValues: currentValues,
 			onChange: (optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
-				if (currentValueEntity instanceof EntityListAccessor && currentValueEntity.addNew) {
+				if (currentValueEntity instanceof EntityListAccessor) {
 					if (isChosen) {
-						currentValueEntity.addNew(optionEntities[optionKey])
+						currentValueEntity.connectEntity?.(optionEntities[optionKey])
 					} else {
-						const targetEntityId = optionEntities[optionKey].primaryKey
-
-						for (const searchedEntity of currentValueEntity) {
-							if (!(searchedEntity instanceof EntityAccessor)) {
-								continue
-							}
-							if (searchedEntity.primaryKey === targetEntityId) {
-								searchedEntity.remove?.('disconnect')
-								break
-							}
-						}
+						currentValueEntity.disconnectEntity?.(optionEntities[optionKey])
 					}
 				}
 			},
@@ -237,13 +224,20 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		let reference: React.ReactNode
 		let entityListDataProvider: React.ReactNode
 
-		const subTreeIdentifier = computeSubTreeIdentifier(props.field)
-
 		const idField = <Field field={PRIMARY_KEY_NAME} />
 		if (props.arity === 'single') {
 			reference = <HasOne field={props.field}>{idField}</HasOne>
 		} else if (props.arity === 'multiple') {
-			reference = <HasMany field={props.field}>{idField}</HasMany>
+			reference = (
+				<HasMany
+					field={props.field}
+					preferences={{
+						initialEntityCount: 0,
+					}}
+				>
+					{idField}
+				</HasMany>
+			)
 		} else {
 			assertNever(props)
 		}
@@ -256,9 +250,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					  }
 					: props.options
 			entityListDataProvider = (
-				<EntityListDataProvider {...sugaredEntityList} subTreeIdentifier={subTreeIdentifier}>
-					{props.optionFieldStaticFactory}
-				</EntityListDataProvider>
+				<EntityListSubTree {...sugaredEntityList}>{props.optionFieldStaticFactory}</EntityListSubTree>
 			)
 		} else {
 			const sugaredFieldList: SugaredQualifiedFieldList =
@@ -269,9 +261,9 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					: props.options
 			const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
 			entityListDataProvider = (
-				<EntityListDataProvider {...fieldList} entities={fieldList} subTreeIdentifier={subTreeIdentifier}>
+				<EntityListSubTree {...fieldList} entities={fieldList}>
 					<Field field={fieldList.field} />
-				</EntityListDataProvider>
+				</EntityListSubTree>
 			)
 		}
 

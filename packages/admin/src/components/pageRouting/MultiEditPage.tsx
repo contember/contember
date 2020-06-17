@@ -1,23 +1,26 @@
+import { DataBindingProvider, EntityListSubTree, SugaredQualifiedEntityList } from '@contember/binding'
 import * as React from 'react'
-import { EntityListDataProvider } from '@contember/binding'
-import { MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/renderers'
-import { EntityListPageProps } from './EntityListPageProps'
+import { FeedbackRenderer, MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/renderers'
 import { PageProvider } from './PageProvider'
 
-export interface MultiEditPageProps<ContainerExtraProps, ItemExtraProps> extends EntityListPageProps {
-	rendererProps?: Omit<MultiEditRendererProps<ContainerExtraProps, ItemExtraProps>, 'children'>
+export interface MultiEditPageProps<ContainerExtraProps, ItemExtraProps> extends SugaredQualifiedEntityList {
+	pageName: string
+	children?: React.ReactNode
+	rendererProps?: Omit<MultiEditRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 }
 
 const MultiEditPage = React.memo(
 	<ContainerExtraProps, ItemExtraProps>({
-		pageName,
-		rendererProps,
 		children,
+		rendererProps,
+		pageName,
 		...entityListProps
 	}: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>) => (
-		<EntityListDataProvider {...entityListProps}>
-			<MultiEditRenderer {...rendererProps}>{children}</MultiEditRenderer>
-		</EntityListDataProvider>
+		<DataBindingProvider stateComponent={FeedbackRenderer}>
+			<EntityListSubTree {...entityListProps} listComponent={MultiEditRenderer} listProps={rendererProps}>
+				{children}
+			</EntityListSubTree>
+		</DataBindingProvider>
 	),
 ) as (<ContainerExtraProps, ItemExtraProps>(
 	props: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>,

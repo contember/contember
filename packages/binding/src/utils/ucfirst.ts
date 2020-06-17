@@ -1,1 +1,1 @@
-export default (string: string) => `${string.charAt(0).toUpperCase()}${string.substring(1)}`
+export const ucfirst = (string: string) => `${string.charAt(0).toUpperCase()}${string.substring(1)}`

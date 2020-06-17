@@ -32,7 +32,10 @@ export const fileUploadReducer = (
 		liveState: new Map(previousState.liveState),
 	})
 	const getNewDirtyState = (): FileUploadMultiTemporalState => ({
-		...previousState,
+		fileIdByFile: previousState.fileIdByFile,
+		liveState: previousState.liveState,
+		publicState: previousState.publicState,
+		stockFileIdSeed: previousState.stockFileIdSeed,
 		isLiveStateDirty: true,
 		lastUpdateTime: Date.now(),
 	})

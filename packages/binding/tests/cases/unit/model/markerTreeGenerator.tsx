@@ -1,12 +1,6 @@
 import 'jasmine'
 import React from 'react'
-import {
-	EntityListDataProvider,
-	Field,
-	HasMany,
-	HasOne,
-	SingleEntityDataProvider,
-} from '../../../../src/coreComponents'
+import { EntityListSubTree, Field, HasMany, HasOne, SingleEntitySubTree } from '../../../../src/coreComponents'
 import { MarkerTreeGenerator } from '../../../../src/model'
 
 describe('Marker tree generator', () => {
@@ -36,23 +30,23 @@ describe('Marker tree generator', () => {
 
 	it('should enforce mandatory children', () => {
 		const list = (
-			<EntityListDataProvider entities="Foo">
+			<EntityListSubTree entities="Foo">
 				<></>
-			</EntityListDataProvider>
+			</EntityListSubTree>
 		)
 		const hasOne = (
-			<SingleEntityDataProvider entity="Foo">
+			<SingleEntitySubTree entity="Foo">
 				<HasOne field="foo">
 					<></>
 				</HasOne>
-			</SingleEntityDataProvider>
+			</SingleEntitySubTree>
 		)
 		const hasMany = (
-			<SingleEntityDataProvider entity="Foo">
+			<SingleEntitySubTree entity="Foo">
 				<HasMany field="foo">
 					<></>
 				</HasMany>
-			</SingleEntityDataProvider>
+			</SingleEntitySubTree>
 		)
 
 		for (const faultyChildren of [list, hasOne, hasMany]) {

@@ -44,7 +44,7 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		serializeElements: (elements, errorMessage) =>
 			ContemberEditor.serializeElements(editorWithEssentials, elements, errorMessage),
 		deserializeElements: (serializedElement, errorMessage) =>
-			ContemberEditor.deserializeElements(editorWithEssentials, serializedElement, errorMessage),
+			ContemberEditor.permissivelyDeserializeElements(editorWithEssentials, serializedElement, errorMessage),
 
 		renderElement: props => React.createElement(DefaultElement, props),
 

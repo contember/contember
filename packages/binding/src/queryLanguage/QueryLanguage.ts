@@ -26,6 +26,7 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 	SugaredUnconstrainedQualifiedEntityList,
+	SugaredUnconstrainedQualifiedSingleEntity,
 	UnconstrainedQualifiedEntityList,
 	UniqueWhere,
 	UnsugarableEntityListParameters,
@@ -46,6 +47,9 @@ export namespace QueryLanguage {
 	}
 
 	const desugarSugarableUnconstrainedQualifiedEntityList = preparePrimitiveEntryPoint(
+		Parser.EntryPoint.UnconstrainedQualifiedEntityList,
+	)
+	const desugarSugarableUnconstrainedQualifiedSingleEntity = preparePrimitiveEntryPoint(
 		Parser.EntryPoint.UnconstrainedQualifiedEntityList,
 	)
 	const desugarSugarableQualifiedEntityList = preparePrimitiveEntryPoint(Parser.EntryPoint.QualifiedEntityList)
@@ -168,6 +172,31 @@ export namespace QueryLanguage {
 		}
 	}
 
+	export const desugarUnconstrainedQualifiedSingleEntity = (
+		{ entity, ...unsugarableSingleEntity }: SugaredUnconstrainedQualifiedSingleEntity,
+		environment: Environment,
+	): UnconstrainedQualifiedEntityList => {
+		let hasOneRelationPath: HasOneRelation[]
+		let entityName: EntityName
+
+		if (typeof entity === 'string') {
+			const desugared = desugarSugarableUnconstrainedQualifiedSingleEntity(entity, environment)
+			entityName = desugared.entityName
+			hasOneRelationPath = augmentDesugaredHasOneRelationPath(desugared.hasOneRelationPath, environment)
+		} else {
+			entityName = entity.entityName
+			hasOneRelationPath = desugarHasOneRelationPath(entity.hasOneRelationPath, {}, environment)
+		}
+
+		return {
+			connectTo: unsugarableSingleEntity.connectTo
+				? desugarUniqueWhere(unsugarableSingleEntity.connectTo, environment)
+				: undefined,
+			entityName,
+			hasOneRelationPath,
+		}
+	}
+
 	export const desugarQualifiedEntityList = (
 		{ entities, ...unsugarableEntityList }: SugaredQualifiedEntityList,
 		environment: Environment,
@@ -278,9 +307,6 @@ export namespace QueryLanguage {
 			where,
 			filter,
 			hasOneRelationPath,
-			connectTo: unsugarableSingleEntity.connectTo
-				? desugarUniqueWhere(unsugarableSingleEntity.connectTo, environment)
-				: undefined,
 		}
 	}
 

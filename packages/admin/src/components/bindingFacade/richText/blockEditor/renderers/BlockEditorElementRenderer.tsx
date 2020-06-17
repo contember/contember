@@ -22,7 +22,6 @@ export interface BlockEditorElementRendererProps extends RenderElementProps {
 	discriminationField: RelativeSingleField
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks
-	removalType: RemovalType
 	fallbackRenderer: (props: RenderElementProps) => React.ReactElement
 }
 
@@ -38,7 +37,6 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 						element={element}
 						entity={getEntityByKey(element.entityKey)}
 						normalizedBlocks={props.normalizedBlocks}
-						removalType={props.removalType}
 						discriminationField={props.discriminationField}
 					/>
 				)}
@@ -72,7 +70,6 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 						entity={getEntityByKey(element.entityKey)}
 						embedSubBlocks={props.embedSubBlocks}
 						embedContentDiscriminationField={props.embedContentDiscriminationField!}
-						removalType={props.removalType}
 					/>
 				)}
 			</BlockEditorGetEntityByKeyContext.Consumer>

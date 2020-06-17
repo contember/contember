@@ -1,5 +1,5 @@
 import {
-	addNewEntityAtIndex,
+	addEntityAtIndex,
 	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
@@ -34,7 +34,6 @@ export interface OverrideApplyOptions {
 	normalizedBlocksRef: React.MutableRefObject<NormalizedBlocks>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	removalType: RemovalType
 	sortableByField: RelativeSingleField
 	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
 	textBlockDiscriminant: FieldValue
@@ -55,7 +54,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		fieldElementCache,
 		normalizedLeadingFieldsRef,
 		//normalizedTrailingFieldsRef,
-		removalType,
 		sortableByField,
 		sortedEntitiesRef,
 		textBlockDiscriminant,
@@ -126,7 +124,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				const oldEntityKey = sortedEntities[sortedEntityIndex].key
 				const newEntity = getAccessor()
 					.getRelativeEntityList(desugaredEntityList)
-					.getByKey(oldEntityKey)
+					.getChildEntityByKey(oldEntityKey)
 				if (!(newEntity instanceof EntityAccessor)) {
 					throw new BindingError(`Corrupted data`)
 				}
@@ -165,31 +163,31 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					setFieldBackedElementValue('leading', elementIndex, '')
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
-					sortedEntities[sortedEntityIndex].remove?.(removalType)
+					sortedEntities[sortedEntityIndex].deleteEntity?.()
 					sortedEntities.splice(sortedEntityIndex, 1)
 				}
 			}
 			const addNewDiscriminatedEntityAt = (
 				elementIndex: number,
 				blockDiscriminant: FieldValue,
-				preprocess?: EntityAccessor.BatchUpdates,
+				preprocess?: EntityAccessor.BatchUpdatesHandler,
 			): EntityAccessor => {
 				const normalizedElementIndex = Math.max(
 					firstContentIndex,
 					Math.min(elementIndex, sortedEntities.length + firstContentIndex),
 				)
 				const sortedEntityIndex = normalizedElementIndex - firstContentIndex
-				addNewEntityAtIndex(
+				addEntityAtIndex(
 					getAccessor().getRelativeEntityList(desugaredEntityList),
 					sortableByField,
 					sortedEntityIndex,
-					(getInnerAccessor, newEntityKey) => {
-						const newEntity = getInnerAccessor().getByKey(newEntityKey) as EntityAccessor
+					getNewEntity => {
+						const newEntity = getNewEntity()
 						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
 						if (preprocess) {
-							;(getInnerAccessor().getByKey(newEntityKey) as EntityAccessor).batchUpdates(preprocess)
+							getNewEntity().batchUpdates(preprocess)
 						}
-						sortedEntities.splice(sortedEntityIndex, 0, getInnerAccessor().getByKey(newEntityKey) as EntityAccessor)
+						sortedEntities.splice(sortedEntityIndex, 0, getNewEntity())
 					},
 				)
 				return sortedEntities[sortedEntityIndex]

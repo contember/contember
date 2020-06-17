@@ -1,10 +1,9 @@
 import {
-	EntityAccessor,
 	RemovalType,
 	SugaredFieldProps,
+	useDesugaredRelativeSingleField,
 	useEnvironment,
 	useMutationState,
-	useOptionalDesugaredRelativeSingleField,
 	VariableInputTransformer,
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
@@ -48,7 +47,7 @@ export const FileRepeaterContainer = React.memo(
 		addButtonComponentExtraProps,
 		addButtonProps,
 		addButtonText = 'Select files to upload',
-		addNew,
+		createNewEntity,
 		discriminationField,
 		children,
 		fileDataPopulators,
@@ -66,7 +65,7 @@ export const FileRepeaterContainer = React.memo(
 		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
 		emptyMessageComponentExtraProps,
 		enableAddingNew = true,
-		entityList,
+		accessor,
 		entities,
 		isEmpty,
 		label,
@@ -75,8 +74,8 @@ export const FileRepeaterContainer = React.memo(
 	}: FileRepeaterContainerProps) => {
 		const [uploadState, { startUpload, abortUpload }] = useFileUpload()
 		const isMutating = useMutationState()
-		const batchUpdates = entityList.batchUpdates
-		const desugaredDiscriminant = useOptionalDesugaredRelativeSingleField(discriminationField)
+		const batchUpdates = accessor.batchUpdates
+		const desugaredDiscriminant = useDesugaredRelativeSingleField(discriminationField)
 		const environment = useEnvironment()
 		const fileKinds = React.useMemo(() => Array.from(iterableFileKinds), [iterableFileKinds])
 		const resolvedAccept = React.useMemo<string[] | undefined>(() => {
@@ -116,8 +115,8 @@ export const FileRepeaterContainer = React.memo(
 							continue
 						}
 
-						addNew((getAccessor, newKey) => {
-							filesWithIds.push([newKey, file])
+						createNewEntity(getNewAccessor => {
+							filesWithIds.push([getNewAccessor().key, file])
 
 							if (
 								desugaredDiscriminant &&
@@ -127,7 +126,7 @@ export const FileRepeaterContainer = React.memo(
 								const discriminateBy =
 									acceptingFileKind.discriminateByScalar ??
 									VariableInputTransformer.transformVariableLiteral(acceptingFileKind.discriminateBy!, environment)
-								;(getAccessor().getByKey(newKey) as EntityAccessor)
+								getNewAccessor()
 									.getRelativeSingleField(desugaredDiscriminant)
 									.updateValue?.(discriminateBy)
 							}
@@ -138,7 +137,7 @@ export const FileRepeaterContainer = React.memo(
 					})
 				})
 			},
-			[addNew, batchUpdates, desugaredDiscriminant, environment, fileKinds, startUpload, uploader],
+			[createNewEntity, batchUpdates, desugaredDiscriminant, environment, fileKinds, startUpload, uploader],
 		)
 		const { getRootProps, getInputProps, isDragActive } = useDropzone({
 			onDrop,

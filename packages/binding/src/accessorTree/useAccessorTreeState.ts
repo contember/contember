@@ -2,14 +2,15 @@ import { GraphQlClient } from '@contember/client'
 import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
-import { useEnvironment } from '../accessorRetrievers'
-import { RootAccessor } from '../accessors'
+import { useEnvironment } from '../accessorPropagation'
+import { TreeRootAccessor } from '../accessors'
+import { BindingError } from '../BindingError'
 import {
 	AccessorTreeGenerator,
 	DirtinessChecker,
 	MarkerTreeGenerator,
-	MutationGenerator,
 	QueryGenerator,
+	QueryResponseNormalizer,
 } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
@@ -38,14 +39,12 @@ export const useAccessorTreeState = ({
 	const environment = useEnvironment()
 	const sessionToken = useSessionToken()
 
-	const normalizedEnvironment = React.useMemo(() => {
-		let id = 0
-		return environment.putSystemVariable('treeIdFactory', () => id++)
-	}, [environment])
-	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, normalizedEnvironment).generate(), [
-		normalizedEnvironment,
+	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, environment).generate(), [
+		environment,
 		nodeTree,
 	])
+
+	// TODO this REALLY should be useState.
 	const accessorTreeGenerator = React.useMemo(() => new AccessorTreeGenerator(markerTree), [markerTree])
 	const query = React.useMemo(() => new QueryGenerator(markerTree).getReadQuery(), [markerTree])
 	const [state, dispatch] = React.useReducer(accessorTreeStateReducer, initialState)
@@ -76,7 +75,10 @@ export const useAccessorTreeState = ({
 		initialize: autoInitialize ? undefined : initialize,
 	}
 
-	const rejectFailedRequest = React.useCallback((metadata: GraphQlClient.FailedRequestMetadata) => {
+	const rejectFailedRequest = React.useCallback((metadata: GraphQlClient.FailedRequestMetadata | BindingError) => {
+		if (metadata instanceof BindingError) {
+			throw metadata
+		}
 		const error = metadataToRequestError(metadata)
 		dispatch({
 			type: AccessorTreeStateActionType.ResolveRequestWithError,
@@ -99,25 +101,17 @@ export const useAccessorTreeState = ({
 	}, [unstable_onSuccessfulPersist])
 
 	const initializeAccessorTree = React.useCallback(
-		(
-			persistedData: ReceivedDataTree<undefined> | undefined,
-			initialData: RootAccessor | ReceivedDataTree<undefined> | undefined,
-			errors?: MutationDataResponse,
-		) => {
-			accessorTreeGenerator.generateLiveTree(
-				persistedData,
-				initialData,
-				accessor => {
-					console.debug('data', accessor)
-					dispatch({
-						type: AccessorTreeStateActionType.SetData,
-						data: accessor,
-						triggerPersist,
-					})
-				},
-				errors,
-			)
-			dirtinessCheckerRef.current = new DirtinessChecker(markerTree, persistedData)
+		(data: QueryRequestResponse | undefined) => {
+			const normalizedData = QueryResponseNormalizer.normalizeResponse(data)
+			accessorTreeGenerator.initializeLiveTree(normalizedData, accessor => {
+				console.debug('data', accessor)
+				dispatch({
+					type: AccessorTreeStateActionType.SetData,
+					data: accessor,
+					triggerPersist,
+				})
+			})
+			dirtinessCheckerRef.current = new DirtinessChecker(markerTree, normalizedData)
 		},
 		[accessorTreeGenerator, markerTree, triggerPersist],
 	)
@@ -132,8 +126,7 @@ export const useAccessorTreeState = ({
 			queryStateRef.current.readyState === ApiRequestReadyState.Success ? queryStateRef.current.data.data : undefined
 
 		const latestAccessorTree = stateRef.current.data
-		const generator = new MutationGenerator(persistedData, latestAccessorTree, markerTree)
-		const mutation = generator.getPersistMutation()
+		const mutation = accessorTreeGenerator.generatePersistMutation()
 
 		if (mutation === undefined) {
 			return Promise.resolve<NothingToPersistPersistResult>({
@@ -150,7 +143,8 @@ export const useAccessorTreeState = ({
 			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
 
 			if (!allSubMutationsOk) {
-				initializeAccessorTree(persistedData, latestAccessorTree, data.data)
+				//initializeAccessorTree(persistedData, latestAccessorTree, data.data)
+				console.error('ERRORS!', data.data) // TODO
 				return Promise.reject({
 					type: MutationErrorType.InvalidInput,
 				})
@@ -171,7 +165,7 @@ export const useAccessorTreeState = ({
 
 			try {
 				const queryData = await sendQuery(query, {}, sessionToken)
-				initializeAccessorTree(queryData.data, queryData.data)
+				initializeAccessorTree(queryData)
 				return Promise.resolve({
 					type: PersistResultSuccessType.JustSuccess,
 					persistedEntityIds,
@@ -216,7 +210,7 @@ export const useAccessorTreeState = ({
 			) {
 				if (query === undefined) {
 					// We're creating AND there are no subqueries
-					initializeAccessorTree(undefined, undefined)
+					initializeAccessorTree(undefined)
 					isForcingRefreshRef.current = false
 				} else {
 					dispatch({
@@ -224,7 +218,7 @@ export const useAccessorTreeState = ({
 					})
 					try {
 						const data = await sendQuery(query, {}, sessionToken)
-						isMountedRef.current && initializeAccessorTree(data.data, data.data)
+						isMountedRef.current && initializeAccessorTree(data)
 					} catch (metadata) {
 						rejectFailedRequest(metadata)
 					} finally {

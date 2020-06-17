@@ -1,4 +1,4 @@
-import { EntityAccessor, EntityForRemovalAccessor } from '../accessors'
+import { EntityAccessor } from '../accessors'
 
 export class AliasTransformer {
 	// This is just a random character we use to make sure the alias doesn't start with a number as UUIDs often do.
@@ -6,7 +6,7 @@ export class AliasTransformer {
 
 	private static ALIAS_SECTION_SEPARATOR = '__'
 
-	public static entityToAlias(accessor: EntityAccessor | EntityForRemovalAccessor): string {
+	public static entityToAlias(accessor: EntityAccessor): string {
 		return `${this.COMMON_PREFIX}${accessor.key.replace(/-/g, '_')}`
 	}
 

@@ -35,7 +35,7 @@ export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
 				{({ requestClose }) => (
 					<AddNewBlockButtonInner
 						normalizedBlocks={props.normalizedBlocks}
-						addNew={props.addNew}
+						createNewEntity={props.createNewEntity}
 						isMutating={props.isMutating}
 						discriminationField={props.discriminationField}
 						requestClose={requestClose}

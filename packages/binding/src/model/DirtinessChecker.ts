@@ -1,9 +1,16 @@
 import { GraphQlBuilder } from '@contember/client'
-import { EntityAccessor, EntityForRemovalAccessor, EntityListAccessor, FieldAccessor, RootAccessor } from '../accessors'
-import { ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
+import { EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } from '../accessors'
+import { NormalizedQueryResponseData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { ConnectionMarker, EntityFields, FieldMarker, MarkerTreeRoot, ReferenceMarker } from '../markers'
+import {
+	ConnectionMarker,
+	EntityFieldMarkers,
+	FieldMarker,
+	SubTreeMarker,
+	MarkerTreeRoot,
+	ReferenceMarker,
+} from '../markers'
 import { ExpectedEntityCount } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 
@@ -12,17 +19,19 @@ export class DirtinessChecker {
 
 	public constructor(
 		private readonly markerTree: MarkerTreeRoot,
-		private readonly persistedData: ReceivedDataTree<undefined> | undefined,
+		private readonly persistedData: NormalizedQueryResponseData,
 	) {
 		this.isDirtyCache = new WeakMap()
 	}
 
-	public isDirty(accessorTree: RootAccessor): boolean {
-		const persistedData = this.persistedData ? this.persistedData[this.markerTree.id] : undefined
+	public isDirty(accessorTree: TreeRootAccessor): boolean {
+		return true // TODO
+		/*const persistedData = this.persistedData ? this.persistedData[this.markerTree.placeholderName] : undefined
 
 		if (
 			Array.isArray(persistedData) ||
-			(this.markerTree.parameters.type === 'unconstrained' && persistedData === undefined)
+			(this.markerTree.parameters.type === 'unconstrainedNonUnique' && persistedData === undefined) ||
+			(this.markerTree.parameters.type === 'unconstrainedUnique' && persistedData === undefined)
 		) {
 			if (accessorTree instanceof EntityListAccessor) {
 				return this.isEntityListDirty(this.markerTree.fields, persistedData, accessorTree)
@@ -32,18 +41,18 @@ export class DirtinessChecker {
 				return this.isEntityDirty(this.markerTree.fields, persistedData, accessorTree)
 			}
 		}
-		this.rejectInvalidTree()
+		this.rejectInvalidTree()*/
 	}
 
 	private isEntityDirty(
-		fields: EntityFields,
+		fields: EntityFieldMarkers,
 		persistedData: ReceivedEntityData<undefined>,
-		node: EntityAccessor | EntityForRemovalAccessor,
+		node: EntityAccessor,
 	): boolean {
-		if (node instanceof EntityForRemovalAccessor) {
-			return true
-		}
-		const isPersisted = node.isPersisted
+		// if (node instanceof EntityForRemovalAccessor) {
+		// 	return true
+		// }
+		const isPersisted = node.existsOnServer
 		if ((!persistedData && isPersisted) || (persistedData && node.primaryKey !== persistedData[PRIMARY_KEY_NAME])) {
 			return true
 		}
@@ -58,7 +67,7 @@ export class DirtinessChecker {
 			}
 
 			if (marker instanceof FieldMarker) {
-				const accessor = node.fieldData.get(placeholderName)
+				const accessor = node.getFieldByPlaceholder(placeholderName)
 				const persistedValue = persistedData ? persistedData[placeholderName] : undefined
 
 				if (!(accessor instanceof FieldAccessor)) {
@@ -83,12 +92,12 @@ export class DirtinessChecker {
 
 				for (const referencePlaceholder in references) {
 					const reference = references[referencePlaceholder]
-					const accessor = node.fieldData.get(reference.placeholderName)
+					const accessor = node.getFieldByPlaceholder(reference.placeholderName)
 					const persistedValue = persistedData ? persistedData[reference.placeholderName] : undefined
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (
-							(accessor instanceof EntityAccessor || accessor instanceof EntityForRemovalAccessor) &&
+							accessor instanceof EntityAccessor /*|| accessor instanceof EntityForRemovalAccessor*/ &&
 							((persistedValue !== null && typeof persistedValue === 'object' && !Array.isArray(persistedValue)) ||
 								persistedValue === undefined ||
 								persistedValue === null)
@@ -115,7 +124,7 @@ export class DirtinessChecker {
 						assertNever(reference.expectedCount)
 					}
 				}
-			} else if (marker instanceof MarkerTreeRoot) {
+			} else if (marker instanceof SubTreeMarker) {
 				// Do nothing. For the time being, we don't support persisting these so there's nothing to be concluded from
 				// here. However, that will likely change in future.
 			} else if (marker instanceof ConnectionMarker) {
@@ -133,7 +142,7 @@ export class DirtinessChecker {
 	}
 
 	private isEntityListDirty(
-		fields: EntityFields,
+		fields: EntityFieldMarkers,
 		persistedData: ReceivedEntityData<undefined>[] | undefined | null,
 		accessor: EntityListAccessor,
 	): boolean {

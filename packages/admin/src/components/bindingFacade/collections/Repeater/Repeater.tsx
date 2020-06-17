@@ -1,17 +1,22 @@
+import { BindingError, Component, HasMany, SugaredRelativeEntityList, useRelativeEntityList } from '@contember/binding'
 import * as React from 'react'
-import { Component, BindingError, Field, HasMany, HasManyProps, useRelativeEntityList } from '@contember/binding'
 import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 
 export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>
-	extends HasManyProps,
-		Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'entityList'> {
+	extends SugaredRelativeEntityList,
+		Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'accessor'> {
 	initialRowCount?: number
 }
 
 export const Repeater = Component(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => {
-		if (process.env.NODE_ENV === 'development') {
-			if ('sortableBy' in props && 'orderBy' in props) {
+		if (__DEV_MODE__) {
+			if (
+				'sortableBy' in props &&
+				props.sortableBy !== undefined &&
+				'orderBy' in props &&
+				props.orderBy !== undefined
+			) {
 				throw new BindingError(
 					`Incorrect <Repeater /> use: cannot supply both the 'orderBy' and the 'sortableBy' properties.\n` +
 						`\tTo allow the user to interactively order the rows, use 'sortableBy'.\n` +
@@ -22,7 +27,7 @@ export const Repeater = Component(
 
 		const entityList = useRelativeEntityList(props)
 
-		return <RepeaterInner {...props} entityList={entityList} />
+		return <RepeaterInner {...props} accessor={entityList} />
 	},
 	props => (
 		<HasMany
@@ -31,7 +36,7 @@ export const Repeater = Component(
 				initialEntityCount: props.initialRowCount === undefined ? 1 : props.initialRowCount,
 			}}
 		>
-			<RepeaterInner {...props} entityList={undefined as any} />
+			<RepeaterInner {...props} accessor={undefined as any} />
 		</HasMany>
 	),
 	'Repeater',

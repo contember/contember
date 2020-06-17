@@ -1,8 +1,8 @@
-import { FieldName, SubTreeIdentifier } from '../treeParameters'
+import { FieldName } from '../treeParameters'
 import { Hashing } from '../utils'
 import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'
-import { MarkerTreeRoot } from './MarkerTreeRoot'
+import { SubTreeMarker, SubTreeMarkerParameters } from './SubTreeMarker'
 import { ReferenceMarker } from './ReferenceMarker'
 
 export class PlaceholderGenerator {
@@ -17,7 +17,7 @@ export class PlaceholderGenerator {
 	//
 
 	public static generateConnectionMarkerPlaceholder(marker: ConnectionMarker): string {
-		return PlaceholderGenerator.getFieldPlaceholder(marker.fieldName)
+		return PlaceholderGenerator.getConnectionPlaceholder(marker.fieldName)
 	}
 
 	public static getConnectionPlaceholder(fieldName: FieldName): string {
@@ -38,11 +38,11 @@ export class PlaceholderGenerator {
 
 	//
 
-	public static generateMarkerTreeRootPlaceholder(marker: MarkerTreeRoot): string {
-		return PlaceholderGenerator.getMarkerTreePlaceholder(marker.id)
+	public static generateSubTreeMarkerPlaceholder(marker: SubTreeMarker): string {
+		return PlaceholderGenerator.getSubTreeMarkerPlaceholder(marker.parameters)
 	}
 
-	public static getMarkerTreePlaceholder(id: MarkerTreeRoot.TreeId): string {
-		return id
+	public static getSubTreeMarkerPlaceholder(subTreeParameters: SubTreeMarkerParameters): string {
+		return `subTree_${Hashing.hashMarkerTreeParameters(subTreeParameters)}`
 	}
 }

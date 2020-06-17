@@ -4,13 +4,13 @@ import { FieldName } from '../treeParameters'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 export class ConnectionMarker {
+	public readonly placeholderName: string
+
 	public constructor(
 		public readonly fieldName: FieldName,
 		public readonly target: Input.UniqueWhere<GraphQlBuilder.Literal>,
 		public readonly isNonbearing: boolean | undefined = true,
-	) {}
-
-	get placeholderName(): string {
-		return PlaceholderGenerator.generateConnectionMarkerPlaceholder(this)
+	) {
+		this.placeholderName = PlaceholderGenerator.generateConnectionMarkerPlaceholder(this)
 	}
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useDesugaredRelativeSingleField } from '../accessorRetrievers'
+import { useDesugaredRelativeSingleField } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
 import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 import { useEntityBeforeUpdate } from './useEntityBeforeUpdate'
@@ -21,7 +21,7 @@ export const useDrivenField = <DriverPersisted extends FieldValue = FieldValue>(
 	const desugaredDriver = useDesugaredRelativeSingleField(driverField)
 	const desugaredDriven = useDesugaredRelativeSingleField(drivenField)
 
-	const onBeforeUpdate = React.useCallback<EntityAccessor.BatchUpdates>(
+	const onBeforeUpdate = React.useCallback<EntityAccessor.BatchUpdatesHandler>(
 		getAccessor => {
 			const driverAccessor = getAccessor().getRelativeSingleField<DriverPersisted>(desugaredDriver)
 
@@ -31,7 +31,7 @@ export const useDrivenField = <DriverPersisted extends FieldValue = FieldValue>(
 			// This is tricky: we're deliberately getting the Entity, and not the field
 			const drivenHostEntity = getAccessor().getRelativeSingleEntity(desugaredDriven)
 
-			if (drivenHostEntity.isPersisted) {
+			if (drivenHostEntity.existsOnServer) {
 				return
 			}
 

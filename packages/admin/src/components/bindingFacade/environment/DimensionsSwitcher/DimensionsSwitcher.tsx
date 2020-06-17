@@ -1,16 +1,20 @@
-import * as React from 'react'
 import {
+	AccessorTreeStateName,
 	BindingError,
-	EntityListDataProvider,
+	DataBindingProvider,
+	DataBindingStateComponentProps,
+	EntityListSubTree,
 	Field,
 	QueryLanguage,
 	SugaredQualifiedFieldList,
 	useEnvironment,
 } from '@contember/binding'
+import { Spinner } from '@contember/ui'
+import * as React from 'react'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
 export interface DimensionsSwitcherBaseProps
-	extends Omit<DimensionsRendererProps, 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'>,
+	extends Omit<DimensionsRendererProps, 'accessor' | 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'>,
 		Omit<SugaredQualifiedFieldList, 'fields'> {
 	optionEntities: SugaredQualifiedFieldList['fields']
 	minItems?: number
@@ -19,6 +23,13 @@ export interface DimensionsSwitcherBaseProps
 }
 
 export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {}
+
+const DimensionsStateRenderer = (props: DataBindingStateComponentProps) => {
+	if (props.accessorTreeState.name === AccessorTreeStateName.Interactive) {
+		return <>{props.children}</>
+	}
+	return <Spinner />
+}
 
 export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) => {
 	const minItems = props.minItems === undefined ? 1 : props.minItems
@@ -44,22 +55,27 @@ export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) =>
 	const labelFactory = <Field field={props.labelField} />
 
 	return (
-		<EntityListDataProvider
-			entities={qualifiedEntityList}
-			orderBy={qualifiedEntityList.orderBy}
-			offset={qualifiedEntityList.offset}
-			limit={qualifiedEntityList.limit}
-		>
-			<DimensionsRenderer
-				buttonProps={props.buttonProps}
-				dimension={props.dimension}
-				labelFactory={labelFactory}
-				minItems={minItems}
-				maxItems={maxItems}
-				renderSelected={props.renderSelected}
-				slugField={props.slugField}
-			/>
-		</EntityListDataProvider>
+		<DataBindingProvider stateComponent={DimensionsStateRenderer}>
+			<EntityListSubTree
+				entities={qualifiedEntityList}
+				orderBy={qualifiedEntityList.orderBy}
+				offset={qualifiedEntityList.offset}
+				limit={qualifiedEntityList.limit}
+				listComponent={DimensionsRenderer}
+				listProps={{
+					buttonProps: props.buttonProps,
+					dimension: props.dimension,
+					labelFactory: labelFactory,
+					minItems: minItems,
+					maxItems: maxItems,
+					renderSelected: props.renderSelected,
+					slugField: props.slugField,
+				}}
+			>
+				{labelFactory}
+				<Field field={props.slugField} />
+			</EntityListSubTree>
+		</DataBindingProvider>
 	)
 })
 

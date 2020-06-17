@@ -4,6 +4,7 @@ import { Text as SlateText } from 'slate'
 export const permissivelyDeserializeElements = <E extends BaseEditor>(
 	editor: E,
 	serializedElement: string,
+	errorMessage?: string,
 ): ElementNode[] => {
 	try {
 		const deserialized:

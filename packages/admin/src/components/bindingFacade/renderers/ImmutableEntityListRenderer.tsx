@@ -1,4 +1,4 @@
-import { AccessorTreeStateWithDataContext, Component, EntityListAccessor } from '@contember/binding'
+import { Component, EntityListAccessor } from '@contember/binding'
 import * as React from 'react'
 import { RepeaterInner, RepeaterInnerProps } from '../collections/Repeater'
 
@@ -15,31 +15,20 @@ export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtra
 		| 'addButtonComponent'
 		| 'enableAddingNew'
 		| 'enableRemoving'
-		| 'enableRemovingLast'
 	> {
 	beforeContent?: React.ReactNode
 	afterContent?: React.ReactNode
+	accessor: EntityListAccessor
 }
 
 export const ImmutableEntityListRenderer = Component(
 	<ContainerExtraProps, ItemExtraProps>(
 		props: ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
 	) => {
-		const accessorTreeState = React.useContext(AccessorTreeStateWithDataContext)
-
-		if (accessorTreeState === undefined) {
-			return null
-		}
-		const root = accessorTreeState.data
-
-		if (!(root instanceof EntityListAccessor)) {
-			return null
-		}
-
 		return (
 			<>
 				{props.beforeContent}
-				<RepeaterInner entityList={root} label={undefined} enableAddingNew={false} enableRemoving={false} {...props} />
+				<RepeaterInner label={undefined} enableAddingNew={false} enableRemoving={false} {...props} />
 				{props.afterContent}
 			</>
 		)
@@ -48,7 +37,7 @@ export const ImmutableEntityListRenderer = Component(
 		// Deliberately omitting emptyMessage ‒ it's not supposed to be data-dependent.
 		<>
 			{props.beforeContent}
-			<RepeaterInner entityList={undefined as any} label={undefined} {...props} />
+			<RepeaterInner label={undefined} {...props} accessor={undefined as any} />
 			{props.afterContent}
 		</>
 	),

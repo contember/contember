@@ -1,17 +1,16 @@
+import { Component, EntityAccessor, SingleEntity } from '@contember/binding'
 import * as React from 'react'
-import { Component } from '@contember/binding'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
-import { SingleEntityRenderer, SingleEntityRendererProps } from './SingleEntityRenderer'
 
-export interface ImmutableSingleEntityRendererProps
-	extends ImmutableContentLayoutRendererProps,
-		SingleEntityRendererProps {}
+export interface ImmutableSingleEntityRendererProps extends ImmutableContentLayoutRendererProps {
+	accessor: EntityAccessor
+}
 
 export const ImmutableSingleEntityRenderer = Component<ImmutableSingleEntityRendererProps>(
-	({ children, ...contentLayoutProps }) => (
-		<ImmutableContentLayoutRenderer {...contentLayoutProps}>
-			<SingleEntityRenderer>{children}</SingleEntityRenderer>
-		</ImmutableContentLayoutRenderer>
+	({ accessor, children, ...contentLayoutProps }) => (
+		<SingleEntity accessor={accessor}>
+			<ImmutableContentLayoutRenderer {...contentLayoutProps}>{children}</ImmutableContentLayoutRenderer>
+		</SingleEntity>
 	),
 	'ImmutableSingleEntityRenderer',
 )

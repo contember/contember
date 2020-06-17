@@ -103,7 +103,6 @@ export const useAccessorTreeState = ({
 	const initializeAccessorTree = React.useCallback(
 		(data: QueryRequestResponse | undefined) => {
 			const normalizedData = QueryResponseNormalizer.normalizeResponse(data)
-			console.log('normQe', normalizedData)
 			accessorTreeGenerator.initializeLiveTree(normalizedData, accessor => {
 				console.debug('data', accessor)
 				dispatch({

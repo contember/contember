@@ -12,6 +12,7 @@ import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
 	BoxedUnconstrainedQualifiedEntityList,
+	BoxedUnconstrainedQualifiedSingleEntity,
 	ExpectedEntityCount,
 	HasManyRelation,
 	HasOneRelation,
@@ -75,7 +76,7 @@ export namespace MarkerFactory {
 		const qualifiedSingleEntity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entityList, environment)
 
 		return new SubTreeMarker(
-			new BoxedUnconstrainedQualifiedEntityList(qualifiedSingleEntity),
+			new BoxedUnconstrainedQualifiedSingleEntity(qualifiedSingleEntity),
 			wrapRelativeEntityFields(qualifiedSingleEntity.hasOneRelationPath, fields),
 		)
 	}

@@ -231,6 +231,7 @@ class AccessorTreeGenerator {
 						),
 					addEventListener: () => noop,
 					eventListeners: {
+						beforeUpdate: undefined,
 						update: undefined,
 					},
 					placeholderName,
@@ -831,6 +832,7 @@ class AccessorTreeGenerator {
 			currentValue: resolvedFieldValue,
 			addEventListener: undefined as any,
 			eventListeners: {
+				beforeUpdate: undefined,
 				update: undefined,
 			},
 			touchLog: undefined,

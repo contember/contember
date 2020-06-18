@@ -79,7 +79,7 @@ export namespace QueryLanguage {
 		filter: sugarable.filter ? desugarFilter(sugarable.filter, environment) : undefined,
 		reducedBy: sugarable.reducedBy ? desugarUniqueWhere(sugarable.reducedBy, environment) : undefined,
 		connectTo: unsugarable.connectTo ? desugarUniqueWhere(unsugarable.connectTo, environment) : undefined,
-		isNonbearing: unsugarable.isNonbearing,
+		isNonbearing: unsugarable.isNonbearing ?? false,
 	})
 
 	const augmentDesugaredHasOneRelationPath = (
@@ -94,7 +94,7 @@ export namespace QueryLanguage {
 	): HasManyRelation => ({
 		field: relation.field,
 		filter: relation.filter,
-		isNonbearing: unsugarable.isNonbearing,
+		isNonbearing: unsugarable.isNonbearing ?? false,
 		connectTo: unsugarable.connectTo ? desugarUniqueWhere(unsugarable.connectTo, environment) : undefined,
 		orderBy: unsugarable.orderBy ? desugarOrderBy(unsugarable.orderBy, environment) : undefined,
 		offset: unsugarable.offset,
@@ -137,7 +137,7 @@ export namespace QueryLanguage {
 		...desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
 		connectTo: unsugarablePart.connectTo ? desugarUniqueWhere(unsugarablePart.connectTo, environment) : undefined,
 		field: sugarablePart.field,
-		isNonbearing: unsugarablePart.isNonbearing,
+		isNonbearing: unsugarablePart.isNonbearing ?? false,
 	})
 
 	export const desugarUniqueWhere = preparePrimitiveEntryPoint(Parser.EntryPoint.UniqueWhere)
@@ -268,7 +268,7 @@ export namespace QueryLanguage {
 				unsugarableFieldList.defaultValue !== undefined
 					? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
 					: undefined,
-			isNonbearing: unsugarableFieldList.isNonbearing,
+			isNonbearing: unsugarableFieldList.isNonbearing ?? false,
 			...desugarEntityListParameters(
 				{
 					filter,
@@ -366,7 +366,7 @@ export namespace QueryLanguage {
 		return {
 			hasOneRelationPath,
 			field: fieldName,
-			isNonbearing: unsugarableField.isNonbearing,
+			isNonbearing: unsugarableField.isNonbearing ?? false,
 			defaultValue:
 				unsugarableField.defaultValue !== undefined
 					? VariableInputTransformer.transformValue(unsugarableField.defaultValue, environment)

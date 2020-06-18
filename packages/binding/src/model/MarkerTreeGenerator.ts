@@ -153,6 +153,7 @@ export class MarkerTreeGenerator {
 							reducedBy: fresh.references[placeholderName].reducedBy,
 							expectedCount: fresh.references[placeholderName].expectedCount,
 							preferences: fresh.references[placeholderName].preferences,
+							isNonbearing: fresh.references[placeholderName].isNonbearing,
 						}
 					}
 

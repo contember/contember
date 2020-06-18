@@ -27,6 +27,7 @@ class ReferenceMarker {
 		fields: EntityFieldMarkers,
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
+		isNonbearing?: boolean,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	)
 	public constructor(fieldName: FieldName, references: ReferenceMarker.References)
@@ -36,6 +37,7 @@ class ReferenceMarker {
 		fields?: EntityFieldMarkers,
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
+		isNonbearing?: boolean,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) {
 		let references: ReferenceMarker.References
@@ -65,6 +67,7 @@ class ReferenceMarker {
 					placeholderName,
 					fields: fields || new Map(),
 					preferences: normalizedPreferences,
+					isNonbearing: isNonbearing ?? false,
 				}),
 			}
 		} else {
@@ -105,6 +108,7 @@ namespace ReferenceMarker {
 		fields: EntityFieldMarkers
 		preferences: ReferencePreferences
 		placeholderName: string
+		isNonbearing: boolean
 	}
 
 	export interface References {

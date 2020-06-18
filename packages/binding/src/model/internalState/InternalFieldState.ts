@@ -14,8 +14,8 @@ export interface InternalFieldState {
 		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
 	}
 	fieldMarker: FieldMarker
-	//hasUnpersistedChanges: boolean
 	hasPendingUpdate: boolean
+	hasUnpersistedChanges: boolean
 	onFieldUpdate: OnFieldUpdate // To be called by this field to inform the parent entity
 	currentValue: FieldValue
 	persistedValue: FieldValue

@@ -12,6 +12,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly persistedValue: Persisted | null,
 		public readonly defaultValue: Persisted | undefined,
 		public readonly errors: ErrorAccessor[],
+		public readonly hasUnpersistedChanges: boolean,
 		public readonly isTouchedBy: FieldAccessor.IsTouchedBy,
 		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Persisted, Produced>,
 		public readonly updateValue: FieldAccessor.UpdateValue<Produced> | undefined,
@@ -29,10 +30,6 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		const right = candidate instanceof GraphQlBuilder.Literal ? candidate.value : candidate
 
 		return left === right
-	}
-
-	public get isDirty() {
-		return this.currentValue !== this.persistedValue
 	}
 
 	public get isTouched() {

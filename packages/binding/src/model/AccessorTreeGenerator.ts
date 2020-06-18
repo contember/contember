@@ -218,6 +218,7 @@ class AccessorTreeGenerator {
 					type: InternalStateType.Field,
 					currentValue: idValue,
 					hasStaleAccessor: true,
+					hasUnpersistedChanges: false,
 					getAccessor: () =>
 						new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
 							placeholderName,
@@ -225,6 +226,7 @@ class AccessorTreeGenerator {
 							idValue,
 							undefined,
 							emptyArray, // There cannot be errors associated with the id, right? If so, we should probably handle them at the Entity level.
+							false,
 							returnFalse, // IDs cannot be updated, and thus they cannot be touched either
 							() => noop, // It won't ever fire but at the same time it makes other code simpler.
 							undefined, // IDs cannot be updated
@@ -837,6 +839,7 @@ class AccessorTreeGenerator {
 			},
 			touchLog: undefined,
 			hasPendingUpdate: false,
+			hasUnpersistedChanges: false,
 			hasStaleAccessor: true,
 			getAccessor: (() => {
 				let accessor: FieldAccessor | undefined = undefined
@@ -849,6 +852,7 @@ class AccessorTreeGenerator {
 							fieldState.persistedValue,
 							fieldState.fieldMarker.defaultValue,
 							fieldState.errors,
+							fieldState.hasUnpersistedChanges,
 							fieldState.isTouchedBy,
 							fieldState.addEventListener,
 							fieldState.updateValue,
@@ -872,6 +876,16 @@ class AccessorTreeGenerator {
 					fieldState.currentValue = newValue
 					fieldState.hasPendingUpdate = true
 					fieldState.hasStaleAccessor = true
+
+					const resolvedValue =
+						fieldState.fieldMarker.defaultValue === undefined
+							? newValue
+							: newValue === null
+							? fieldState.fieldMarker.defaultValue
+							: newValue
+					const normalizedValue = resolvedValue instanceof GraphQlBuilder.Literal ? resolvedValue.value : resolvedValue
+					fieldState.hasUnpersistedChanges = normalizedValue !== fieldState.persistedValue
+
 					fieldState.onFieldUpdate(fieldState)
 				})
 			},

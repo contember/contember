@@ -6,7 +6,8 @@ import { InternalStateType } from './InternalStateType'
 export type OnFieldUpdate = (state: InternalFieldState) => void
 export interface InternalFieldState {
 	type: InternalStateType.Field
-	accessor: FieldAccessor
+	hasStaleAccessor: boolean
+	getAccessor: () => FieldAccessor
 	addEventListener: FieldAccessor.AddFieldEventListener
 	errors: ErrorAccessor[]
 	eventListeners: {
@@ -16,6 +17,7 @@ export interface InternalFieldState {
 	//hasUnpersistedChanges: boolean
 	hasPendingUpdate: boolean
 	onFieldUpdate: OnFieldUpdate // To be called by this field to inform the parent entity
+	currentValue: FieldValue
 	persistedValue: FieldValue
 	placeholderName: FieldName
 	touchLog: Map<string, boolean> | undefined

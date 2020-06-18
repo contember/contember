@@ -1,9 +1,7 @@
-import { EntityAccessor, EntityListAccessor } from '../../accessors'
-import { ReceivedEntityData } from '../../accessorTree'
+import { EntityListAccessor } from '../../accessors'
 import { EntityFieldMarkers, ReferenceMarker } from '../../markers'
 import { RemovalType } from '../../treeParameters/primitives'
 import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
-import { InternalContainerState } from './InternalContainerState'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
 import { InternalStateType } from './InternalStateType'
 
@@ -13,10 +11,9 @@ export interface InternalEntityPlannedRemoval {
 }
 
 export type OnEntityListUpdate = (state: InternalEntityListState) => void
-export interface InternalEntityListState extends InternalContainerState {
+export interface InternalEntityListState {
 	type: InternalStateType.EntityList
-	accessor: EntityListAccessor
-	addEventListener: EntityListAccessor.AddEntityListEventListener
+	batchUpdateDepth: number
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
 	//childrenWithUnpersistedChanges: Set<InternalEntityState> | undefined
@@ -27,16 +24,21 @@ export interface InternalEntityListState extends InternalContainerState {
 			| undefined
 	}
 	fieldMarkers: EntityFieldMarkers
+	getAccessor: () => EntityListAccessor
+	hasPendingParentNotification: boolean
+	hasPendingUpdate: boolean
+	hasStaleAccessor: boolean
 	persistedEntityIds: Set<string>
 	plannedRemovals: Set<InternalEntityPlannedRemoval> | undefined
 
 	onChildEntityUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
 	onEntityListUpdate: OnEntityListUpdate // To be called by this entity list to inform the parent entity
 
-	getChildEntityByKey: EntityListAccessor.GetChildEntityByKey
-	preferences: ReferenceMarker.ReferencePreferences
+	addEventListener: EntityListAccessor.AddEntityListEventListener
 	batchUpdates: EntityListAccessor.BatchUpdates
 	connectEntity: EntityListAccessor.ConnectEntity
 	createNewEntity: EntityListAccessor.CreateNewEntity
 	disconnectEntity: EntityListAccessor.DisconnectEntity
+	getChildEntityByKey: EntityListAccessor.GetChildEntityByKey
+	preferences: ReferenceMarker.ReferencePreferences
 }

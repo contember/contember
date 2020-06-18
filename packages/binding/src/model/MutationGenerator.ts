@@ -64,7 +64,7 @@ export class MutationGenerator {
 		if (rootState.type === InternalStateType.SingleEntity) {
 			if (rootState.isScheduledForDeletion) {
 				queryBuilder = this.addDeleteMutation(rootState, alias, parameters, queryBuilder)
-			} else if (!rootState.accessor.existsOnServer) {
+			} else if (!rootState.getAccessor().existsOnServer) {
 				queryBuilder = this.addCreateMutation(rootState, entityFieldMarkers, alias, parameters, queryBuilder)
 			} else {
 				queryBuilder = this.addUpdateMutation(rootState, entityFieldMarkers, alias, parameters, queryBuilder)
@@ -76,7 +76,7 @@ export class MutationGenerator {
 				queryBuilder = this.addSubMutation(
 					entityFieldMarkers,
 					childState,
-					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.accessor)),
+					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.getAccessor())),
 					parameters,
 					queryBuilder,
 				)
@@ -86,7 +86,7 @@ export class MutationGenerator {
 					if (removalType === 'delete') {
 						queryBuilder = this.addDeleteMutation(
 							removedEntity,
-							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.accessor)),
+							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.getAccessor())),
 							parameters,
 							queryBuilder,
 						)
@@ -123,7 +123,7 @@ export class MutationGenerator {
 				return builder
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
-					.by({ ...where, [PRIMARY_KEY_NAME]: entityState.accessor.primaryKey! })
+					.by({ ...where, [PRIMARY_KEY_NAME]: entityState.getAccessor().primaryKey! })
 			},
 			alias,
 		)
@@ -223,7 +223,7 @@ export class MutationGenerator {
 			if (marker instanceof FieldMarker) {
 				const fieldState = currentState.fields.get(placeholderName)!
 				if (fieldState.type === InternalStateType.Field) {
-					const resolvedValue = fieldState.accessor.resolvedValue
+					const resolvedValue = fieldState.getAccessor().resolvedValue
 
 					if (resolvedValue !== undefined && resolvedValue !== null) {
 						if (marker.isNonbearing) {
@@ -266,7 +266,7 @@ export class MutationGenerator {
 									accessorReference.push({
 										entityState: childState,
 										reference,
-										alias: AliasTransformer.entityToAlias(childState.accessor),
+										alias: AliasTransformer.entityToAlias(childState.getAccessor()),
 									})
 								}
 							}
@@ -351,7 +351,7 @@ export class MutationGenerator {
 				const fieldState = currentState.fields.get(placeholderName)
 
 				if (fieldState?.type === InternalStateType.Field && fieldState.persistedValue !== undefined) {
-					const resolvedValue = fieldState.accessor.resolvedValue
+					const resolvedValue = fieldState.getAccessor().resolvedValue
 					if (fieldState.persistedValue !== resolvedValue) {
 						builder = builder.set(placeholderName, resolvedValue)
 					}
@@ -424,7 +424,7 @@ export class MutationGenerator {
 							accessorReference.push({
 								referenceState: innerState,
 								reference,
-								alias: AliasTransformer.entityToAlias(innerState.accessor),
+								alias: AliasTransformer.entityToAlias(innerState.getAccessor()),
 							})
 						}
 					}
@@ -489,12 +489,12 @@ export class MutationGenerator {
 								if (removalType === 'delete') {
 									builder = builder.delete(
 										{ [PRIMARY_KEY_NAME]: removedEntity.id },
-										AliasTransformer.entityToAlias(removedEntity.accessor),
+										AliasTransformer.entityToAlias(removedEntity.getAccessor()),
 									)
 								} else if (removalType === 'disconnect') {
 									builder = builder.disconnect(
 										{ [PRIMARY_KEY_NAME]: removedEntity.id },
-										AliasTransformer.entityToAlias(removedEntity.accessor),
+										AliasTransformer.entityToAlias(removedEntity.getAccessor()),
 									)
 								} else {
 									assertNever(removalType)

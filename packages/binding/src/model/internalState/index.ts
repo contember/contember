@@ -1,4 +1,3 @@
-export * from './InternalContainerState'
 export * from './InternalEntityListState'
 export * from './InternalEntityState'
 export * from './InternalFieldState'

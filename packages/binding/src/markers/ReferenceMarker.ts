@@ -1,6 +1,7 @@
 import { BindingError } from '../BindingError'
 import { EntityConnections, ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
 import { assertNever } from '../utils'
+import { EntityContainerMarker } from './EntityContainerMarker'
 import { EntityFieldMarkers, hasAtLeastOneBearingField } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
@@ -115,7 +116,7 @@ namespace ReferenceMarker {
 		readonly initialEntityCount: number
 	}
 
-	export interface Reference extends ReferenceConstraints {
+	export interface Reference extends ReferenceConstraints, EntityContainerMarker {
 		fields: EntityFieldMarkers
 		preferences: ReferencePreferences
 		placeholderName: string

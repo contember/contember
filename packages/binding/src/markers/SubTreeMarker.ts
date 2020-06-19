@@ -4,6 +4,7 @@ import {
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
+import { EntityContainerMarker } from './EntityContainerMarker'
 import { EntityFieldMarkers, hasAtLeastOneBearingField } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
@@ -13,7 +14,8 @@ export type SubTreeMarkerParameters =
 	| BoxedUnconstrainedQualifiedSingleEntity
 	| BoxedUnconstrainedQualifiedEntityList
 
-export class SubTreeMarker<C extends SubTreeMarkerParameters = SubTreeMarkerParameters> {
+export class SubTreeMarker<C extends SubTreeMarkerParameters = SubTreeMarkerParameters>
+	implements EntityContainerMarker {
 	public readonly placeholderName: string
 	public readonly hasAtLeastOneBearingField: boolean
 

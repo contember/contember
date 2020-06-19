@@ -14,9 +14,9 @@ import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	ConnectionMarker,
+	EntityContainerMarker,
 	EntityFieldMarkers,
 	FieldMarker,
-	hasAtLeastOneBearingField,
 	MarkerTreeRoot,
 	PlaceholderGenerator,
 	ReferenceMarker,
@@ -53,8 +53,6 @@ import { MutationGenerator } from './MutationGenerator'
 // Notice also that we effectively shift the responsibility to check whether an update concerns them to the
 // listeners.
 const BEFORE_UPDATE_SETTLE_LIMIT = 20
-
-// TODO the state initialization methods are kind of crap but we'll deal with them later.
 
 class AccessorTreeGenerator {
 	private updateData: AccessorTreeGenerator.UpdateData | undefined
@@ -192,13 +190,13 @@ class AccessorTreeGenerator {
 
 		if (tree.parameters.type === 'qualifiedEntityList' || tree.parameters.type === 'unconstrainedQualifiedEntityList') {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
-			subTreeState = this.initializeEntityListAccessor(tree.fields, noop, persistedEntityIds, errorNode, undefined)
+			subTreeState = this.initializeEntityListAccessor(tree, noop, persistedEntityIds, errorNode, undefined)
 		} else {
 			const id =
 				persistedRootData instanceof BoxedSingleEntityId
 					? persistedRootData.id
 					: new EntityAccessor.UnpersistedEntityId()
-			subTreeState = this.initializeEntityAccessor(id, tree.fields, noop, errorNode)
+			subTreeState = this.initializeEntityAccessor(id, tree, noop, errorNode)
 		}
 		this.subTreeStates.set(tree.placeholderName, subTreeState)
 
@@ -275,7 +273,7 @@ class AccessorTreeGenerator {
 								fieldDatum instanceof BoxedSingleEntityId ? fieldDatum.id : new EntityAccessor.UnpersistedEntityId()
 							const referenceEntityState = this.initializeEntityAccessor(
 								entityId,
-								reference.fields,
+								reference,
 								entityState.onChildFieldUpdate,
 								referenceError,
 							)
@@ -291,7 +289,7 @@ class AccessorTreeGenerator {
 							entityState.fields.set(
 								referencePlaceholder,
 								this.initializeEntityListAccessor(
-									reference.fields,
+									reference,
 									entityState.onChildFieldUpdate,
 									fieldDatum || new Set(),
 									referenceError,
@@ -357,7 +355,7 @@ class AccessorTreeGenerator {
 
 	private initializeEntityAccessor(
 		id: string | EntityAccessor.UnpersistedEntityId,
-		fieldMarkers: EntityFieldMarkers,
+		marker: EntityContainerMarker,
 		onEntityUpdate: OnEntityUpdate,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 	): InternalEntityState {
@@ -365,11 +363,11 @@ class AccessorTreeGenerator {
 		const existingEntityState = this.entityStore.get(entityKey)
 
 		if (existingEntityState !== undefined) {
-			this.initializeEntityFields(existingEntityState, fieldMarkers)
+			this.initializeEntityFields(existingEntityState, marker.fields)
 			existingEntityState.realms.add(onEntityUpdate)
 			existingEntityState.hasStaleAccessor = true
 			existingEntityState.hasAtLeastOneBearingField =
-				existingEntityState.hasAtLeastOneBearingField || hasAtLeastOneBearingField(fieldMarkers)
+				existingEntityState.hasAtLeastOneBearingField || marker.hasAtLeastOneBearingField
 			return existingEntityState
 		}
 
@@ -385,7 +383,7 @@ class AccessorTreeGenerator {
 				beforeUpdate: undefined,
 			},
 			fields: new Map(),
-			hasAtLeastOneBearingField: hasAtLeastOneBearingField(fieldMarkers),
+			hasAtLeastOneBearingField: marker.hasAtLeastOneBearingField,
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
 			hasStaleAccessor: true,
@@ -467,7 +465,7 @@ class AccessorTreeGenerator {
 						}
 						stateToDisconnect.realms.delete(entityState.onChildFieldUpdate)
 
-						const referenceMarkers = (fieldMarkers.get(field)! as ReferenceMarker).references[field].fields
+						const referenceMarkers = (marker.fields.get(field)! as ReferenceMarker).references[field]
 						const newEntityState = this.initializeEntityAccessor(
 							new EntityAccessor.UnpersistedEntityId(),
 							referenceMarkers,
@@ -569,12 +567,12 @@ class AccessorTreeGenerator {
 			}
 		}
 
-		this.initializeEntityFields(entityState, fieldMarkers)
+		this.initializeEntityFields(entityState, marker.fields)
 		return entityState
 	}
 
 	private initializeEntityListAccessor(
-		fieldMarkers: EntityFieldMarkers,
+		marker: EntityContainerMarker,
 		onEntityListUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
@@ -591,7 +589,7 @@ class AccessorTreeGenerator {
 		const entityListState: InternalEntityListState = {
 			type: InternalStateType.EntityList,
 			errors,
-			fieldMarkers,
+			marker,
 			onEntityListUpdate,
 			persistedEntityIds,
 			preferences,
@@ -822,7 +820,7 @@ class AccessorTreeGenerator {
 
 			const entityState = this.initializeEntityAccessor(
 				id,
-				entityListState.fieldMarkers,
+				entityListState.marker,
 				entityListState.onChildEntityUpdate,
 				childErrors,
 			)

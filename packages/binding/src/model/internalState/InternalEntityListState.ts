@@ -1,5 +1,5 @@
 import { EntityListAccessor } from '../../accessors'
-import { EntityFieldMarkers, ReferenceMarker } from '../../markers'
+import { EntityContainerMarker, ReferenceMarker } from '../../markers'
 import { RemovalType } from '../../treeParameters/primitives'
 import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
@@ -23,7 +23,7 @@ export interface InternalEntityListState {
 			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>
 			| undefined
 	}
-	fieldMarkers: EntityFieldMarkers
+	marker: EntityContainerMarker
 	getAccessor: () => EntityListAccessor
 	hasPendingParentNotification: boolean
 	hasPendingUpdate: boolean

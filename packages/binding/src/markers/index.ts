@@ -1,4 +1,5 @@
 export * from './ConnectionMarker'
+export * from './EntityContainerMarker'
 export * from './EntityFieldMarkers'
 export * from './FieldMarker'
 export * from './Marker'

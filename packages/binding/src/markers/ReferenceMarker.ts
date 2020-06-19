@@ -1,5 +1,5 @@
 import { BindingError } from '../BindingError'
-import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
+import { EntityConnections, ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
 import { assertNever } from '../utils'
 import { EntityFieldMarkers, hasAtLeastOneBearingField } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
@@ -29,6 +29,7 @@ class ReferenceMarker {
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
 		isNonbearing?: boolean,
+		connections?: EntityConnections,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	)
 	public constructor(fieldName: FieldName, references: ReferenceMarker.References)
@@ -39,6 +40,7 @@ class ReferenceMarker {
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
 		isNonbearing?: boolean,
+		connections?: EntityConnections,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) {
 		let references: ReferenceMarker.References
@@ -66,6 +68,7 @@ class ReferenceMarker {
 			references = {
 				[placeholderName]: Object.assign(constraints, {
 					placeholderName,
+					connections,
 					fields: fields || new Map(),
 					preferences: normalizedPreferences,
 					isNonbearing: isNonbearing ?? false,
@@ -117,6 +120,7 @@ namespace ReferenceMarker {
 		placeholderName: string
 		hasAtLeastOneBearingField: boolean
 		isNonbearing: boolean
+		connections: EntityConnections | undefined
 	}
 
 	export interface References {

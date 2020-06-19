@@ -18,6 +18,7 @@ import {
 	SugarableEntityListParameters,
 	SugarableHasManyRelation,
 	SugarableHasOneRelation,
+	SugaredEntityConnections,
 	SugaredFilter,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
@@ -70,6 +71,21 @@ export namespace QueryLanguage {
 		orderBy: unsugarablePart.orderBy ? desugarOrderBy(unsugarablePart.orderBy, environment) : undefined,
 	})
 
+	export const desugarConnections = (
+		connections: SugaredEntityConnections,
+		environment: Environment,
+	): Map<string, UniqueWhere> => {
+		if (connections instanceof Map) {
+			return connections
+		}
+		return new Map(
+			Object.entries(connections).map(([fieldName, uniqueWhere]) => [
+				fieldName,
+				desugarUniqueWhere(uniqueWhere, environment),
+			]),
+		)
+	}
+
 	const desugarHasOneRelation = (
 		sugarable: SugarableHasOneRelation,
 		unsugarable: UnsugarableHasOneRelation,
@@ -78,7 +94,7 @@ export namespace QueryLanguage {
 		field: sugarable.field,
 		filter: sugarable.filter ? desugarFilter(sugarable.filter, environment) : undefined,
 		reducedBy: sugarable.reducedBy ? desugarUniqueWhere(sugarable.reducedBy, environment) : undefined,
-		connectTo: unsugarable.connectTo ? desugarUniqueWhere(unsugarable.connectTo, environment) : undefined,
+		connections: unsugarable.connections ? desugarConnections(unsugarable.connections, environment) : undefined,
 		isNonbearing: unsugarable.isNonbearing ?? false,
 	})
 
@@ -95,7 +111,7 @@ export namespace QueryLanguage {
 		field: relation.field,
 		filter: relation.filter,
 		isNonbearing: unsugarable.isNonbearing ?? false,
-		connectTo: unsugarable.connectTo ? desugarUniqueWhere(unsugarable.connectTo, environment) : undefined,
+		connections: unsugarable.connections ? desugarConnections(unsugarable.connections, environment) : undefined,
 		orderBy: unsugarable.orderBy ? desugarOrderBy(unsugarable.orderBy, environment) : undefined,
 		offset: unsugarable.offset,
 		limit: unsugarable.limit,
@@ -135,7 +151,7 @@ export namespace QueryLanguage {
 		environment: Environment,
 	): HasManyRelation => ({
 		...desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
-		connectTo: unsugarablePart.connectTo ? desugarUniqueWhere(unsugarablePart.connectTo, environment) : undefined,
+		connections: unsugarablePart.connections ? desugarConnections(unsugarablePart.connections, environment) : undefined,
 		field: sugarablePart.field,
 		isNonbearing: unsugarablePart.isNonbearing ?? false,
 	})
@@ -164,8 +180,8 @@ export namespace QueryLanguage {
 		}
 
 		return {
-			connectTo: unsugarableEntityList.connectTo
-				? desugarUniqueWhere(unsugarableEntityList.connectTo, environment)
+			connections: unsugarableEntityList.connections
+				? desugarConnections(unsugarableEntityList.connections, environment)
 				: undefined,
 			entityName,
 			hasOneRelationPath,
@@ -189,8 +205,8 @@ export namespace QueryLanguage {
 		}
 
 		return {
-			connectTo: unsugarableSingleEntity.connectTo
-				? desugarUniqueWhere(unsugarableSingleEntity.connectTo, environment)
+			connections: unsugarableSingleEntity.connections
+				? desugarConnections(unsugarableSingleEntity.connections, environment)
 				: undefined,
 			entityName,
 			hasOneRelationPath,
@@ -228,8 +244,8 @@ export namespace QueryLanguage {
 				unsugarableEntityList,
 				environment,
 			),
-			connectTo: unsugarableEntityList.connectTo
-				? desugarUniqueWhere(unsugarableEntityList.connectTo, environment)
+			connections: unsugarableEntityList.connections
+				? desugarConnections(unsugarableEntityList.connections, environment)
 				: undefined,
 		}
 	}
@@ -261,8 +277,8 @@ export namespace QueryLanguage {
 			field,
 			entityName,
 			hasOneRelationPath,
-			connectTo: unsugarableFieldList.connectTo
-				? desugarUniqueWhere(unsugarableFieldList.connectTo, environment)
+			connections: unsugarableFieldList.connections
+				? desugarConnections(unsugarableFieldList.connections, environment)
 				: undefined,
 			defaultValue:
 				unsugarableFieldList.defaultValue !== undefined

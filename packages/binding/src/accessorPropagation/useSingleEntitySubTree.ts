@@ -39,12 +39,12 @@ export const useSingleEntitySubTree = (qualifiedSingleEntity: UseSingleEntitySub
 					QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(
 						{
 							entity: qualifiedSingleEntity.entity,
-							connectTo: qualifiedSingleEntity.connectTo,
+							connections: qualifiedSingleEntity.connections,
 						},
 						environment,
 					),
 				),
-			[qualifiedSingleEntity.entity, qualifiedSingleEntity.connectTo, environment],
+			[qualifiedSingleEntity.entity, qualifiedSingleEntity.connections, environment],
 		)
 	} else {
 		// eslint-disable-next-line react-hooks/rules-of-hooks

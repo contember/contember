@@ -35,7 +35,7 @@ function useDesugaredRelativeEntityList(
 				? QueryLanguage.desugarRelativeEntityList(
 						{
 							field: normalizedSugared?.field!,
-							connectTo: normalizedSugared?.connectTo,
+							connections: normalizedSugared?.connections,
 							isNonbearing: normalizedSugared?.isNonbearing,
 							offset: normalizedSugared?.offset,
 							limit: normalizedSugared?.limit,
@@ -46,7 +46,7 @@ function useDesugaredRelativeEntityList(
 				: undefined,
 		[
 			normalizedSugared?.field,
-			normalizedSugared?.connectTo,
+			normalizedSugared?.connections,
 			normalizedSugared?.isNonbearing,
 			normalizedSugared?.offset,
 			normalizedSugared?.limit,

@@ -39,13 +39,13 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				new BoxedUnconstrainedQualifiedEntityList(
 					QueryLanguage.desugarUnconstrainedQualifiedEntityList(
 						{
-							connectTo: qualifiedEntityList.connectTo,
+							connections: qualifiedEntityList.connections,
 							entities: qualifiedEntityList.entities,
 						},
 						environment,
 					),
 				),
-			[qualifiedEntityList.entities, qualifiedEntityList.connectTo, environment],
+			[qualifiedEntityList.entities, qualifiedEntityList.connections, environment],
 		)
 	} else {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
@@ -54,7 +54,7 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				new BoxedQualifiedEntityList(
 					QueryLanguage.desugarQualifiedEntityList(
 						{
-							connectTo: qualifiedEntityList.connectTo,
+							connections: qualifiedEntityList.connections,
 							entities: qualifiedEntityList.entities,
 							orderBy: qualifiedEntityList.orderBy,
 							offset: qualifiedEntityList.offset,
@@ -65,7 +65,7 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				),
 			[
 				qualifiedEntityList.entities,
-				qualifiedEntityList.connectTo,
+				qualifiedEntityList.connections,
 				qualifiedEntityList.orderBy,
 				qualifiedEntityList.offset,
 				qualifiedEntityList.limit,

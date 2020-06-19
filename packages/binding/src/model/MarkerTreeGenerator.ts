@@ -155,6 +155,7 @@ export class MarkerTreeGenerator {
 							preferences: fresh.references[placeholderName].preferences,
 							isNonbearing: fresh.references[placeholderName].isNonbearing,
 							hasAtLeastOneBearingField: fresh.references[placeholderName].hasAtLeastOneBearingField,
+							connections: fresh.references[placeholderName].connections,
 						}
 					}
 

@@ -36,12 +36,12 @@ function useDesugaredRelativeSingleEntity(
 						{
 							field: normalizedSugared?.field!,
 							isNonbearing: normalizedSugared?.isNonbearing,
-							connectTo: normalizedSugared?.connectTo,
+							connections: normalizedSugared?.connections,
 						},
 						environment,
 				  )
 				: undefined,
-		[normalizedSugared?.field, normalizedSugared?.isNonbearing, normalizedSugared?.connectTo, environment, hasEntity],
+		[normalizedSugared?.field, normalizedSugared?.isNonbearing, normalizedSugared?.connections, environment, hasEntity],
 	)
 }
 

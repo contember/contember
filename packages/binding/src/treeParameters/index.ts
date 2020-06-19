@@ -1,6 +1,7 @@
 export * from './primitives'
 
 export * from './AnyField'
+export * from './EntityConnections'
 export * from './EntityCreationParameters'
 export * from './EntityListParameters'
 export * from './HasManyRelation'

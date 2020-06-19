@@ -14,6 +14,7 @@ import {
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
 	ExpectedEntityCount,
+	FieldName,
 	HasManyRelation,
 	HasOneRelation,
 	RelativeSingleField,
@@ -101,7 +102,6 @@ export namespace MarkerFactory {
 		const hasManyRelationMarker = createHasManyRelationMarker(
 			relativeEntityList.hasManyRelation,
 			entityFieldMarkers,
-			isNonbearing,
 			preferences,
 		)
 		return wrapRelativeEntityFields(
@@ -110,13 +110,9 @@ export namespace MarkerFactory {
 		)
 	}
 
-	export const createConnectionMarker = (
-		field: SugaredRelativeSingleField,
-		to: SugaredUniqueWhere,
-		environment: Environment,
-	) =>
+	export const createConnectionMarker = (field: FieldName, to: SugaredUniqueWhere, environment: Environment) =>
 		wrapRelativeSingleField(
-			field,
+			{ field },
 			environment,
 			relativeSingleField =>
 				new ConnectionMarker(
@@ -172,7 +168,6 @@ export namespace MarkerFactory {
 	export const createHasManyRelationMarker = (
 		hasManyRelation: HasManyRelation,
 		entityFieldMarkers: EntityFieldMarkers,
-		isNonbearing: boolean = false,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) =>
 		new ReferenceMarker(
@@ -181,7 +176,8 @@ export namespace MarkerFactory {
 			entityFieldMarkers,
 			hasManyRelation.filter,
 			undefined, // No reducedBy for hasMany
-			isNonbearing,
+			hasManyRelation.isNonbearing,
+			hasManyRelation.connections,
 			preferences,
 		)
 }

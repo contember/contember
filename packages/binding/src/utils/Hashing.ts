@@ -37,11 +37,10 @@ export class Hashing {
 					value.orderBy,
 					value.offset,
 					value.limit,
-					value.connectTo,
 				])
 			}
 		} else {
-			return Hashing.hashArray([parameters.type, parameters.value.entityName, parameters.value.connectTo])
+			return Hashing.hashArray([parameters.type, parameters.value.entityName])
 		}
 		return assertNever(parameters)
 	}

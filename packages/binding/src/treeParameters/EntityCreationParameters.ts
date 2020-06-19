@@ -1,13 +1,13 @@
-import { SugaredUniqueWhere, UniqueWhere } from './primitives'
+import { EntityConnections, SugaredEntityConnections } from './EntityConnections'
 
 export interface DesugaredEntityCreationParameters {}
 
 export interface EntityCreationParameters {
-	connectTo: UniqueWhere | undefined
+	connections: EntityConnections
 }
 
 export interface SugarableEntityCreationParameters {}
 
 export interface UnsugarableEntityCreationParameters {
-	connectTo?: SugaredUniqueWhere
+	connections?: SugaredEntityConnections
 }

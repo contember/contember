@@ -6,7 +6,7 @@ import { ErrorAccessor } from './ErrorAccessor'
 class EntityListAccessor extends Accessor implements Errorable {
 	public constructor(
 		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
-		public readonly childEntityKeys: ReadonlySet<string>, // See EntityAccessor.key
+		private readonly childEntityKeys: ReadonlySet<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
@@ -21,6 +21,10 @@ class EntityListAccessor extends Accessor implements Errorable {
 		for (const id of this.childEntityKeys) {
 			yield this.getChildEntityByKey(id)
 		}
+	}
+
+	public hasEntityKey(childEntityKey: string): boolean {
+		return this.childEntityKeys.has(childEntityKey)
 	}
 }
 

@@ -5,7 +5,7 @@ export interface DesugaredAnyField {
 }
 
 export interface AnyField {
-	isNonbearing: boolean | undefined
+	isNonbearing: boolean
 	field: FieldName
 }
 

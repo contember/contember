@@ -30,7 +30,7 @@ export const HasMany = Component(
 	},
 	{
 		generateReferenceMarker: (props, fields, environment) =>
-			MarkerFactory.createRelativeEntityListFields(props, environment, fields, props.preferences),
+			MarkerFactory.createRelativeEntityListFields(props, environment, fields, props.isNonbearing, props.preferences),
 	},
 	'HasMany',
 ) as <ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => React.ReactElement

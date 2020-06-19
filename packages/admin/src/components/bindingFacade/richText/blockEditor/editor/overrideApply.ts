@@ -8,7 +8,6 @@ import {
 	FieldValue,
 	RelativeEntityList,
 	RelativeSingleField,
-	RemovalType,
 } from '@contember/binding'
 import * as React from 'react'
 import { Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'

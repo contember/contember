@@ -7,7 +7,7 @@ import { Component } from './Component'
 import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
 export type SingleEntitySubTreeProps<EntityProps> = {
-	children: React.ReactNode
+	children?: React.ReactNode
 } & (
 	| ({
 			isCreating?: false

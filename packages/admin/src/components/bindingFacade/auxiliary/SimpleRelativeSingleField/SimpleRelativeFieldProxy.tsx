@@ -1,6 +1,5 @@
 import { Environment, SugaredRelativeSingleField, useEnvironment, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
-import { isScalar } from '../../../../utils'
 import { SimpleRelativeSingleFieldInner, SimpleRelativeSingleFieldInnerProps } from './SimpleRelativeSingleFieldInner'
 
 const contextualizeNode = (
@@ -15,9 +14,6 @@ const contextualizeNode = (
 		// TODO this will fail once there are more middleware types.
 		// Welcome, future developer, sent here by TypeScript.
 		node = environment.applySystemMiddleware(middlewareName, node)
-	}
-	if (isScalar(node)) {
-		return node
 	}
 	return node
 }

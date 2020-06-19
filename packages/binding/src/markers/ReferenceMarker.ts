@@ -1,7 +1,7 @@
 import { BindingError } from '../BindingError'
 import { ExpectedEntityCount, FieldName, Filter, UniqueWhere } from '../treeParameters'
 import { assertNever } from '../utils'
-import { EntityFieldMarkers } from './EntityFieldMarkers'
+import { EntityFieldMarkers, hasAtLeastOneBearingField } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 // TODO unify with EntityListTreeConstraints / SingleEntityTreeConstraints
@@ -9,6 +9,7 @@ class ReferenceMarker {
 	public readonly fieldName: FieldName
 	public readonly references: ReferenceMarker.References
 	public readonly placeholderName: string
+	public readonly hasAtLeastOneBearingField: boolean
 
 	public static readonly defaultReferencePreferences: {
 		readonly [index in ExpectedEntityCount]: ReferenceMarker.ReferencePreferences
@@ -27,6 +28,7 @@ class ReferenceMarker {
 		fields: EntityFieldMarkers,
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
+		isNonbearing?: boolean,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	)
 	public constructor(fieldName: FieldName, references: ReferenceMarker.References)
@@ -36,6 +38,7 @@ class ReferenceMarker {
 		fields?: EntityFieldMarkers,
 		filter?: Filter,
 		reducedBy?: UniqueWhere,
+		isNonbearing?: boolean,
 		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) {
 		let references: ReferenceMarker.References
@@ -65,12 +68,15 @@ class ReferenceMarker {
 					placeholderName,
 					fields: fields || new Map(),
 					preferences: normalizedPreferences,
+					isNonbearing: isNonbearing ?? false,
+					hasAtLeastOneBearingField: fields ? hasAtLeastOneBearingField(fields) : false,
 				}),
 			}
 		} else {
 			throw assertNever(decider)
 		}
 
+		let hasAtLeastOneBearingReference = false
 		for (const placeholderName in references) {
 			const reference = references[placeholderName]
 			if (reference.reducedBy) {
@@ -81,10 +87,14 @@ class ReferenceMarker {
 					throw new BindingError(`A hasMany relation can only be reduced to a hasOne by exactly one field.`)
 				}
 			}
+			if (reference.hasAtLeastOneBearingField) {
+				hasAtLeastOneBearingReference = true
+			}
 		}
 
 		this.fieldName = fieldName
 		this.references = references
+		this.hasAtLeastOneBearingField = hasAtLeastOneBearingReference
 
 		this.placeholderName = PlaceholderGenerator.generateReferenceMarkerPlaceholder(this)
 	}
@@ -105,6 +115,8 @@ namespace ReferenceMarker {
 		fields: EntityFieldMarkers
 		preferences: ReferencePreferences
 		placeholderName: string
+		hasAtLeastOneBearingField: boolean
+		isNonbearing: boolean
 	}
 
 	export interface References {

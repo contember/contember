@@ -12,6 +12,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly persistedValue: Persisted | null,
 		public readonly defaultValue: Persisted | undefined,
 		public readonly errors: ErrorAccessor[],
+		public readonly hasUnpersistedChanges: boolean,
 		public readonly isTouchedBy: FieldAccessor.IsTouchedBy,
 		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Persisted, Produced>,
 		public readonly updateValue: FieldAccessor.UpdateValue<Produced> | undefined,
@@ -29,10 +30,6 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		const right = candidate instanceof GraphQlBuilder.Literal ? candidate.value : candidate
 
 		return left === right
-	}
-
-	public get isDirty() {
-		return this.currentValue !== this.persistedValue
 	}
 
 	public get isTouched() {
@@ -54,6 +51,10 @@ namespace FieldAccessor {
 	}
 
 	export type IsTouchedBy = (agent: string) => boolean
+	export type BeforeUpdateListener<
+		Persisted extends FieldValue = FieldValue,
+		Produced extends Persisted = Persisted
+	> = (updatedAccessor: FieldAccessor<Persisted, Produced>) => void
 	export type UpdateListener<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted> = (
 		accessor: FieldAccessor<Persisted, Produced>,
 	) => void
@@ -66,6 +67,7 @@ namespace FieldAccessor {
 		Persisted extends FieldValue = FieldValue,
 		Produced extends Persisted = Persisted
 	> {
+		beforeUpdate: BeforeUpdateListener<Persisted, Produced>
 		update: UpdateListener<Persisted, Produced>
 	}
 	export type FieldEventType = keyof FieldEventListenerMap
@@ -73,6 +75,7 @@ namespace FieldAccessor {
 		Persisted extends FieldValue = FieldValue,
 		Produced extends Persisted = Persisted
 	> {
+		(type: 'beforeUpdate', listener: FieldEventListenerMap<Persisted, Produced>['beforeUpdate']): () => void
 		(type: 'update', listener: FieldEventListenerMap<Persisted, Produced>['update']): () => void
 	}
 }

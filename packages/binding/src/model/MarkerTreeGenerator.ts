@@ -123,6 +123,11 @@ export class MarkerTreeGenerator {
 	private static mergeMarkers(original: Marker, fresh: Marker): Marker {
 		if (original instanceof FieldMarker) {
 			if (fresh instanceof FieldMarker) {
+				if (original.isNonbearing !== fresh.isNonbearing && original.isNonbearing) {
+					// If only one isNonbearing, then the whole field is bearing
+					return fresh
+				}
+				// TODO warn in case of defaultValue differences
 				return original
 			} else if (fresh instanceof ReferenceMarker) {
 				return MarkerTreeGenerator.rejectRelationScalarCombo(original.fieldName)
@@ -148,6 +153,8 @@ export class MarkerTreeGenerator {
 							reducedBy: fresh.references[placeholderName].reducedBy,
 							expectedCount: fresh.references[placeholderName].expectedCount,
 							preferences: fresh.references[placeholderName].preferences,
+							isNonbearing: fresh.references[placeholderName].isNonbearing,
+							hasAtLeastOneBearingField: fresh.references[placeholderName].hasAtLeastOneBearingField,
 						}
 					}
 

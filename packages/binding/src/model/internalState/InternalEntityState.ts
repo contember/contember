@@ -2,7 +2,6 @@ import { EntityAccessor } from '../../accessors'
 import { SingleEntityPersistedData } from '../../accessorTree'
 import { FieldName, RemovalType } from '../../treeParameters/primitives'
 import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
-import { InternalContainerState } from './InternalContainerState'
 import { InternalStateNode } from './InternalStateNode'
 import { InternalStateType } from './InternalStateType'
 
@@ -14,29 +13,37 @@ export interface InternalEntityFieldPlannedRemoval {
 
 export type OnEntityUpdate = (state: InternalStateNode) => void
 export type OnEntityFieldUpdate = (state: InternalStateNode) => void
-export interface InternalEntityState extends InternalContainerState {
+export interface InternalEntityState {
 	type: InternalStateType.SingleEntity
-	accessor: EntityAccessor
-	addEventListener: EntityAccessor.AddEntityEventListener
-	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
-	//childrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
-	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
+	batchUpdateDepth: number
+	bearingChildrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
+	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
+	errors: ErrorsPreprocessor.ErrorNode | undefined
 	fields: Map<FieldName, InternalStateNode>
+	getAccessor: () => EntityAccessor
+	hasAtLeastOneBearingField: boolean
+	hasPendingUpdate: boolean
+	hasPendingParentNotification: boolean
+	hasStaleAccessor: boolean
+	hasUnpersistedChanges: boolean
 	id: string | EntityAccessor.UnpersistedEntityId
-	typeName: string | undefined
-	persistedData: SingleEntityPersistedData | undefined
 	isScheduledForDeletion: boolean
-	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined
+	nonbearingChildrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
+	persistedData: SingleEntityPersistedData | undefined
+	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined
 
 	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.
 	realms: Set<OnEntityUpdate>
+	typeName: string | undefined
+
+	addEventListener: EntityAccessor.AddEntityEventListener
 	batchUpdates: EntityAccessor.BatchUpdates
 	connectEntityAtField: EntityAccessor.ConnectEntityAtField
-	disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField
 	deleteEntity: EntityAccessor.DeleteEntity
+	disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField
 }

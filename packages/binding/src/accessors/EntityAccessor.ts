@@ -183,7 +183,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		if (record === undefined) {
 			throw new BindingError(`EntityAccessor: unknown field '${placeholderName}'.`)
 		}
-		return record.accessor
+		return record.getAccessor()
 	}
 }
 
@@ -202,7 +202,7 @@ namespace EntityAccessor {
 	}
 
 	export interface FieldDatum {
-		accessor: NestedAccessor | null
+		getAccessor(): NestedAccessor
 	}
 	export type NestedAccessor = EntityAccessor | EntityListAccessor | FieldAccessor
 

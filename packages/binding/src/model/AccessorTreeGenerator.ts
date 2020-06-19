@@ -16,6 +16,7 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
+	hasAtLeastOneBearingField,
 	MarkerTreeRoot,
 	PlaceholderGenerator,
 	ReferenceMarker,
@@ -364,9 +365,11 @@ class AccessorTreeGenerator {
 		const existingEntityState = this.entityStore.get(entityKey)
 
 		if (existingEntityState !== undefined) {
-			existingEntityState.realms.add(onEntityUpdate)
 			this.initializeEntityFields(existingEntityState, fieldMarkers)
+			existingEntityState.realms.add(onEntityUpdate)
 			existingEntityState.hasStaleAccessor = true
+			existingEntityState.hasAtLeastOneBearingField =
+				existingEntityState.hasAtLeastOneBearingField || hasAtLeastOneBearingField(fieldMarkers)
 			return existingEntityState
 		}
 
@@ -374,6 +377,7 @@ class AccessorTreeGenerator {
 			type: InternalStateType.SingleEntity,
 			addEventListener: undefined as any,
 			batchUpdateDepth: 0,
+			bearingChildrenWithUnpersistedChanges: undefined,
 			childrenWithPendingUpdates: undefined,
 			errors,
 			eventListeners: {
@@ -381,11 +385,14 @@ class AccessorTreeGenerator {
 				beforeUpdate: undefined,
 			},
 			fields: new Map(),
+			hasAtLeastOneBearingField: hasAtLeastOneBearingField(fieldMarkers),
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
 			hasStaleAccessor: true,
+			hasUnpersistedChanges: false, // TODO that is not necessarily the case
 			id,
 			isScheduledForDeletion: false,
+			nonbearingChildrenWithUnpersistedChanges: undefined,
 			persistedData: this.persistedEntityData.get(entityKey),
 			plannedRemovals: undefined,
 			realms: new Set([onEntityUpdate]),
@@ -503,7 +510,7 @@ class AccessorTreeGenerator {
 
 			if (
 				entityState.batchUpdateDepth === 0 &&
-				!entityState.hasPendingUpdate &&
+				!entityState.hasPendingUpdate && // We must have already told the parent if this is true.
 				entityState.hasPendingParentNotification
 			) {
 				entityState.hasPendingUpdate = true
@@ -592,6 +599,7 @@ class AccessorTreeGenerator {
 			batchUpdateDepth: 0,
 			childrenKeys: new Set(),
 			childrenWithPendingUpdates: undefined,
+			childrenWithUnpersistedChanges: undefined,
 			eventListeners: {
 				update: undefined,
 				beforeUpdate: undefined,
@@ -600,6 +608,7 @@ class AccessorTreeGenerator {
 			hasPendingParentNotification: false,
 			hasPendingUpdate: false,
 			hasStaleAccessor: true,
+			hasUnpersistedChanges: false, // That is not necessarily the case even initially but is immediately fixed below.
 			getAccessor: (() => {
 				let accessor: EntityListAccessor | undefined = undefined
 				return () => {
@@ -630,9 +639,18 @@ class AccessorTreeGenerator {
 						processEntityDeletion(updatedState)
 					} else {
 						this.markChildStateInNeedOfUpdate(entityListState, updatedState)
+						if (updatedState.hasUnpersistedChanges) {
+							if (entityListState.childrenWithUnpersistedChanges === undefined) {
+								entityListState.childrenWithUnpersistedChanges = new Set()
+							}
+							entityListState.childrenWithUnpersistedChanges.add(updatedState)
+						} else if (entityListState.childrenWithUnpersistedChanges) {
+							entityListState.childrenWithUnpersistedChanges.delete(updatedState)
+						}
 					}
 					entityListState.hasStaleAccessor = true
 					entityListState.hasPendingParentNotification = true
+					entityListState.hasUnpersistedChanges = hasUnpersistedChanges()
 				})
 			},
 			batchUpdates: performUpdates => {
@@ -649,6 +667,14 @@ class AccessorTreeGenerator {
 							entityListState,
 							entityToConnectOrItsKey,
 						)
+
+						if (connectedState.hasUnpersistedChanges) {
+							if (entityListState.childrenWithUnpersistedChanges === undefined) {
+								entityListState.childrenWithUnpersistedChanges = new Set()
+							}
+							entityListState.childrenWithUnpersistedChanges.add(connectedState)
+							entityListState.hasUnpersistedChanges = true
+						}
 
 						connectedState.realms.add(entityListState.onChildEntityUpdate)
 						entityListState.childrenKeys.add(connectedEntityKey)
@@ -714,6 +740,10 @@ class AccessorTreeGenerator {
 		}
 		entityListState.addEventListener = this.getAddEventListener(entityListState)
 
+		const hasUnpersistedChanges = (): boolean => {
+			return !!(entityListState.plannedRemovals?.size || entityListState.childrenWithUnpersistedChanges?.size)
+		}
+
 		const batchUpdatesImplementation: EntityListAccessor.BatchUpdates = performUpdates => {
 			entityListState.batchUpdateDepth++
 			performUpdates(entityListState.getAccessor)
@@ -721,7 +751,7 @@ class AccessorTreeGenerator {
 
 			if (
 				entityListState.batchUpdateDepth === 0 &&
-				!entityListState.hasPendingUpdate &&
+				!entityListState.hasPendingUpdate && // We must have already told the parent if this is true.
 				entityListState.hasPendingParentNotification
 			) {
 				entityListState.hasPendingUpdate = true
@@ -762,12 +792,17 @@ class AccessorTreeGenerator {
 		const processEntityDeletion = (stateForDeletion: InternalEntityState) => {
 			entityListState.childrenWithPendingUpdates?.delete(stateForDeletion)
 
+			const key = this.idToKey(stateForDeletion.id)
+			entityListState.childrenKeys.delete(key)
+
+			if (stateForDeletion.id instanceof EntityAccessor.UnpersistedEntityId) {
+				// TODO remove it from the store
+				return
+			}
+
 			if (entityListState.plannedRemovals === undefined) {
 				entityListState.plannedRemovals = new Set()
 			}
-			const key = this.idToKey(stateForDeletion.id)
-
-			entityListState.childrenKeys.delete(key)
 			entityListState.plannedRemovals.add({
 				removalType: 'delete',
 				removedEntity: stateForDeletion,
@@ -792,6 +827,14 @@ class AccessorTreeGenerator {
 				childErrors,
 			)
 
+			if (entityState.hasUnpersistedChanges) {
+				if (entityListState.childrenWithUnpersistedChanges === undefined) {
+					entityListState.childrenWithUnpersistedChanges = new Set()
+				}
+				entityListState.childrenWithUnpersistedChanges.add(entityState)
+				entityListState.hasUnpersistedChanges = true
+			}
+
 			entityListState.childrenKeys.add(key)
 
 			return entityState
@@ -799,7 +842,7 @@ class AccessorTreeGenerator {
 
 		const initialData: Set<string | undefined> =
 			persistedEntityIds.size === 0
-				? new Set(Array(preferences.initialEntityCount).map(() => undefined))
+				? new Set(Array.from({ length: preferences.initialEntityCount }))
 				: persistedEntityIds
 		for (const entityId of initialData) {
 			generateNewEntityState(entityId)

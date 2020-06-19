@@ -16,7 +16,7 @@ export interface InternalEntityListState {
 	batchUpdateDepth: number
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
-	//childrenWithUnpersistedChanges: Set<InternalEntityState> | undefined
+	childrenWithUnpersistedChanges: Set<InternalEntityState> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:
@@ -28,6 +28,7 @@ export interface InternalEntityListState {
 	hasPendingParentNotification: boolean
 	hasPendingUpdate: boolean
 	hasStaleAccessor: boolean
+	hasUnpersistedChanges: boolean
 	persistedEntityIds: Set<string>
 	plannedRemovals: Set<InternalEntityPlannedRemoval> | undefined
 

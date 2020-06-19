@@ -19,16 +19,19 @@ export interface InternalEntityState {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
 	batchUpdateDepth: number
+	bearingChildrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
 	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
-	//childrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	fields: Map<FieldName, InternalStateNode>
 	getAccessor: () => EntityAccessor
+	hasAtLeastOneBearingField: boolean
 	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean
 	hasStaleAccessor: boolean
+	hasUnpersistedChanges: boolean
 	id: string | EntityAccessor.UnpersistedEntityId
 	isScheduledForDeletion: boolean
+	nonbearingChildrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	persistedData: SingleEntityPersistedData | undefined
 	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined

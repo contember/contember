@@ -1,7 +1,8 @@
-import { SubTreeMarkerParameters, ReferenceMarker } from '../markers'
+import { ReferenceMarker, SubTreeMarkerParameters } from '../markers'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
+	EntityConnections,
 	ExpectedEntityCount,
 	Filter,
 	UniqueWhere,
@@ -14,6 +15,7 @@ export class Hashing {
 			constraints.filter,
 			constraints.reducedBy,
 			constraints.expectedCount,
+			constraints.connections ? Object.fromEntries(constraints.connections.entries()) : undefined,
 		]
 
 		return Hashing.hashArray(where)

@@ -50,6 +50,7 @@ class ReferenceMarker {
 		} else if (decider === ExpectedEntityCount.UpToOne || decider === ExpectedEntityCount.PossiblyMany) {
 			const constraints: ReferenceMarker.ReferenceConstraints = {
 				expectedCount: decider,
+				connections,
 				filter,
 				reducedBy,
 			}
@@ -68,7 +69,6 @@ class ReferenceMarker {
 			references = {
 				[placeholderName]: Object.assign(constraints, {
 					placeholderName,
-					connections,
 					fields: fields || new Map(),
 					preferences: normalizedPreferences,
 					isNonbearing: isNonbearing ?? false,
@@ -108,6 +108,7 @@ namespace ReferenceMarker {
 		expectedCount: ExpectedEntityCount
 		filter?: Filter
 		reducedBy?: UniqueWhere
+		connections?: EntityConnections
 	}
 
 	export interface ReferencePreferences {
@@ -120,7 +121,6 @@ namespace ReferenceMarker {
 		placeholderName: string
 		hasAtLeastOneBearingField: boolean
 		isNonbearing: boolean
-		connections: EntityConnections | undefined
 	}
 
 	export interface References {

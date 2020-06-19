@@ -248,8 +248,38 @@ class AccessorTreeGenerator {
 				continue
 			}
 
-			if (field instanceof SubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
+			if (field instanceof FieldMarker) {
+				const fieldDatum = entityState.persistedData?.get(placeholderName)
+
+				if (fieldDatum instanceof Set) {
+					throw new BindingError(
+						`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
+							`Perhaps you wanted to use a <Repeater />?`,
+					)
+				} else if (fieldDatum instanceof BoxedSingleEntityId) {
+					throw new BindingError(
+						`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
+							`Perhaps you wanted to use <HasOne />?`,
+					)
+				} else {
+					if (entityState.fields.get(placeholderName)) {
+						continue
+					}
+					const fieldErrors: ErrorAccessor[] =
+						entityState.errors &&
+						entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
+						field.fieldName in entityState.errors.children
+							? entityState.errors.children[field.fieldName].errors
+							: emptyArray
+					const fieldState = this.initializeFieldAccessor(
+						placeholderName,
+						field,
+						entityState.onChildFieldUpdate,
+						fieldDatum,
+						fieldErrors,
+					)
+					entityState.fields.set(placeholderName, fieldState)
+				}
 			} else if (field instanceof ReferenceMarker) {
 				for (const referencePlaceholder in field.references) {
 					const reference = field.references[referencePlaceholder]
@@ -313,40 +343,10 @@ class AccessorTreeGenerator {
 						return assertNever(reference.expectedCount)
 					}
 				}
-			} else if (field instanceof FieldMarker) {
-				const fieldDatum = entityState.persistedData?.get(placeholderName)
-
-				if (fieldDatum instanceof Set) {
-					throw new BindingError(
-						`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
-							`Perhaps you wanted to use a <Repeater />?`,
-					)
-				} else if (fieldDatum instanceof BoxedSingleEntityId) {
-					throw new BindingError(
-						`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
-							`Perhaps you wanted to use <HasOne />?`,
-					)
-				} else {
-					if (entityState.fields.get(placeholderName)) {
-						continue
-					}
-					const fieldErrors: ErrorAccessor[] =
-						entityState.errors &&
-						entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
-						field.fieldName in entityState.errors.children
-							? entityState.errors.children[field.fieldName].errors
-							: emptyArray
-					const fieldState = this.initializeFieldAccessor(
-						placeholderName,
-						field,
-						entityState.onChildFieldUpdate,
-						fieldDatum,
-						fieldErrors,
-					)
-					entityState.fields.set(placeholderName, fieldState)
-				}
 			} else if (field instanceof ConnectionMarker) {
-				// Do nothing ‒ connections need no runtime representation
+				// Do nothing: connections need no runtime representation
+			} else if (field instanceof SubTreeMarker) {
+				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {
 				assertNever(field)
 			}

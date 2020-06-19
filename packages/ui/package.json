@@ -1,6 +1,6 @@
 {
   "name": "@contember/ui",
-  "version": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.0",
+  "version": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.1",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "type": "module",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@blueprintjs/icons": "3.11.0",
-    "@contember/react-multipass-rendering": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.0",
+    "@contember/react-multipass-rendering": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.1",
     "@mangoweb/sass-base": "0.0.5",
     "@popperjs/core": "2.3.3",
     "classnames": "2.2.6",

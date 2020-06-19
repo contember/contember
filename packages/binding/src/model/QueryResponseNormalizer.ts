@@ -73,12 +73,14 @@ export class QueryResponseNormalizer {
 		if (presentEntityData === undefined) {
 			entityMap.set(primaryKey, fieldsMap)
 		} else {
-			entityMap.set(primaryKey, this.mergeEntityData(presentEntityData, fieldsMap))
+			entityMap.set(primaryKey, this.mergeEntityData(entityMap, entityData, presentEntityData, fieldsMap))
 		}
 		return primaryKey
 	}
 
 	private static mergeEntityData(
+		entityMap: PersistedEntityDataStore,
+		freshEntityData: ReceivedEntityData,
 		original: SingleEntityPersistedData,
 		fresh: SingleEntityPersistedData,
 	): SingleEntityPersistedData {
@@ -86,24 +88,28 @@ export class QueryResponseNormalizer {
 			const fromOriginal = original.get(field)
 			if (fromOriginal === undefined) {
 				original.set(field, fromFresh)
-			} else if (__DEV_MODE__) {
-				if (fromOriginal instanceof BoxedSingleEntityId) {
-					if (!(fromFresh instanceof BoxedSingleEntityId)) {
-						throw new BindingError() // TODO msg
-					}
-					if (fromOriginal.id !== fromFresh.id) {
-						throw new BindingError() // TODO msg
-					}
-				} else if (fromOriginal instanceof Set) {
-					if (!(fromFresh instanceof Set)) {
-						throw new BindingError() // TODO msg
-					}
-					// TODO check that they're the same in size as well as contents
+			} else if (fromOriginal instanceof BoxedSingleEntityId) {
+				if (fromFresh instanceof BoxedSingleEntityId) {
+					// Assuming the ids are the same.
+					this.addEntityResponse(entityMap, freshEntityData[field] as ReceivedEntityData)
 				} else {
-					if (fromOriginal !== fromFresh) {
-						throw new BindingError() // TODO msg
-					}
+					throw new BindingError()
 				}
+			} else if (fromOriginal instanceof Set) {
+				if (fromFresh instanceof Set) {
+					// Assuming the set themselves are the same. This should be encoded in the placeholder. If that isn't the case,
+					// our hash function has had a conflict or something else has gone horribly wrong beyond repair.
+
+					for (const listEntityDatum of freshEntityData[field] as ReceivedEntityData[]) {
+						this.addEntityResponse(entityMap, listEntityDatum)
+					}
+				} else {
+					throw new BindingError()
+				}
+			} else if (fromOriginal === fromFresh) {
+				// They are both scalars. Do nothing.
+			} else if (__DEV_MODE__) {
+				throw new BindingError(`Failed to process data received from the API.`)
 			}
 		}
 		return original

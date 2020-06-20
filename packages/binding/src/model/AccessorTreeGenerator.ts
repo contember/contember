@@ -408,6 +408,7 @@ class AccessorTreeGenerator {
 							// keep in sync two copies of the same data. TS hides the extra info anyway.
 							entityState.fields,
 							entityState.errors ? entityState.errors.errors : emptyArray,
+							entityState.hasUnpersistedChanges,
 							entityState.addEventListener,
 							entityState.batchUpdates,
 							entityState.connectEntityAtField,
@@ -616,6 +617,7 @@ class AccessorTreeGenerator {
 							entityListState.getChildEntityByKey,
 							entityListState.childrenKeys,
 							entityListState.errors ? entityListState.errors.errors : emptyArray,
+							entityListState.hasUnpersistedChanges,
 							entityListState.addEventListener,
 							entityListState.batchUpdates,
 							entityListState.connectEntity,
@@ -646,9 +648,9 @@ class AccessorTreeGenerator {
 							entityListState.childrenWithUnpersistedChanges.delete(updatedState)
 						}
 					}
-					entityListState.hasStaleAccessor = true
 					entityListState.hasPendingParentNotification = true
 					entityListState.hasUnpersistedChanges = hasUnpersistedChanges()
+					entityListState.hasStaleAccessor = true
 				})
 			},
 			batchUpdates: performUpdates => {
@@ -671,7 +673,10 @@ class AccessorTreeGenerator {
 								entityListState.childrenWithUnpersistedChanges = new Set()
 							}
 							entityListState.childrenWithUnpersistedChanges.add(connectedState)
-							entityListState.hasUnpersistedChanges = true
+							if (!entityListState.hasUnpersistedChanges) {
+								entityListState.hasUnpersistedChanges = true
+								entityListState.hasStaleAccessor = true
+							}
 						}
 
 						connectedState.realms.add(entityListState.onChildEntityUpdate)
@@ -833,6 +838,7 @@ class AccessorTreeGenerator {
 				entityListState.hasUnpersistedChanges = true
 			}
 
+			entityListState.hasStaleAccessor = true
 			entityListState.childrenKeys.add(key)
 
 			return entityState

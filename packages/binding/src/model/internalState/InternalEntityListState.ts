@@ -1,5 +1,6 @@
 import { EntityListAccessor } from '../../accessors'
-import { EntityContainerMarker, ReferenceMarker } from '../../markers'
+import { EntityFieldMarkers } from '../../markers'
+import { EntityCreationParameters } from '../../treeParameters'
 import { RemovalType } from '../../treeParameters/primitives'
 import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
@@ -17,13 +18,14 @@ export interface InternalEntityListState {
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
 	childrenWithUnpersistedChanges: Set<InternalEntityState> | undefined
+	creationParameters: EntityCreationParameters
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:
 			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>
 			| undefined
 	}
-	marker: EntityContainerMarker
+	fieldMarkers: EntityFieldMarkers
 	getAccessor: () => EntityListAccessor
 	hasPendingParentNotification: boolean
 	hasPendingUpdate: boolean
@@ -41,5 +43,4 @@ export interface InternalEntityListState {
 	createNewEntity: EntityListAccessor.CreateNewEntity
 	disconnectEntity: EntityListAccessor.DisconnectEntity
 	getChildEntityByKey: EntityListAccessor.GetChildEntityByKey
-	preferences: ReferenceMarker.ReferencePreferences
 }

@@ -3,9 +3,10 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
 	Marker,
 	PlaceholderGenerator,
-	ReferenceMarker,
 	SubTreeMarker,
 } from '../markers'
 import {
@@ -13,7 +14,6 @@ import {
 	BoxedQualifiedSingleEntity,
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
-	ExpectedEntityCount,
 	FieldName,
 	HasManyRelation,
 	HasOneRelation,
@@ -95,15 +95,9 @@ export namespace MarkerFactory {
 		field: SugaredRelativeEntityList,
 		environment: Environment,
 		entityFieldMarkers: EntityFieldMarkers,
-		isNonbearing: boolean = false,
-		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) => {
 		const relativeEntityList = QueryLanguage.desugarRelativeEntityList(field, environment)
-		const hasManyRelationMarker = createHasManyRelationMarker(
-			relativeEntityList.hasManyRelation,
-			entityFieldMarkers,
-			preferences,
-		)
+		const hasManyRelationMarker = createHasManyRelationMarker(relativeEntityList.hasManyRelation, entityFieldMarkers)
 		return wrapRelativeEntityFields(
 			relativeEntityList.hasOneRelationPath,
 			new Map([[hasManyRelationMarker.placeholderName, hasManyRelationMarker]]),
@@ -156,28 +150,10 @@ export namespace MarkerFactory {
 	}
 
 	export const createHasOneRelationMarker = (hasOneRelation: HasOneRelation, entityFieldMarkers: EntityFieldMarkers) =>
-		new ReferenceMarker(
-			hasOneRelation.field,
-			ExpectedEntityCount.UpToOne,
-			entityFieldMarkers,
-			hasOneRelation.filter,
-			hasOneRelation.reducedBy,
-			hasOneRelation.isNonbearing,
-		)
+		new HasOneRelationMarker(hasOneRelation, entityFieldMarkers)
 
 	export const createHasManyRelationMarker = (
 		hasManyRelation: HasManyRelation,
 		entityFieldMarkers: EntityFieldMarkers,
-		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
-	) =>
-		new ReferenceMarker(
-			hasManyRelation.field,
-			ExpectedEntityCount.PossiblyMany,
-			entityFieldMarkers,
-			hasManyRelation.filter,
-			undefined, // No reducedBy for hasMany
-			hasManyRelation.isNonbearing,
-			hasManyRelation.connections,
-			preferences,
-		)
+	) => new HasManyRelationMarker(hasManyRelation, entityFieldMarkers)
 }

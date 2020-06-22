@@ -1,5 +1,5 @@
 import { BindingError } from '../BindingError'
-import { PlaceholderGenerator, ReferenceMarker } from '../markers'
+import { PlaceholderGenerator } from '../markers'
 import {
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
@@ -7,6 +7,8 @@ import {
 	ExpectedEntityCount,
 	FieldName,
 	FieldValue,
+	HasManyRelation,
+	HasOneRelation,
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
@@ -48,34 +50,23 @@ class EntityAccessor extends Accessor implements Errorable {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
 	}
 
-	public getField(fieldName: FieldName): EntityAccessor.NestedAccessor
+	public getField(fieldName: FieldName): FieldAccessor
+	public getField(hasOneRelation: HasOneRelation, expectedCount: ExpectedEntityCount.UpToOne): EntityAccessor
+	public getField(hasManyRelation: HasManyRelation, expectedCount: ExpectedEntityCount.PossiblyMany): EntityListAccessor
 	public getField(
-		fieldName: FieldName,
-		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
-		filter: ReferenceMarker.ReferenceConstraints['filter'],
-	): EntityAccessor.NestedAccessor | null
-	public getField(
-		fieldName: FieldName,
-		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
-		filter: ReferenceMarker.ReferenceConstraints['filter'],
-		reducedBy: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.NestedAccessor | null
-	public getField(
-		fieldName: FieldName,
-		expectedCount?: ReferenceMarker.ReferenceConstraints['expectedCount'],
-		filter?: ReferenceMarker.ReferenceConstraints['filter'],
-		reducedBy?: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.NestedAccessor | null {
+		fieldNameOrRelation: FieldName | HasOneRelation | HasManyRelation,
+		expectedCount?: ExpectedEntityCount,
+	): EntityAccessor.NestedAccessor {
 		let placeholder: FieldName
 
-		if (expectedCount !== undefined) {
-			placeholder = PlaceholderGenerator.getReferencePlaceholder(fieldName, {
-				expectedCount,
-				reducedBy,
-				filter,
-			})
+		if (typeof fieldNameOrRelation === 'string') {
+			placeholder = fieldNameOrRelation
+		} else if (expectedCount === ExpectedEntityCount.UpToOne) {
+			placeholder = PlaceholderGenerator.getHasOneRelationPlaceholder(fieldNameOrRelation as HasOneRelation)
+		} else if (expectedCount === ExpectedEntityCount.PossiblyMany) {
+			placeholder = PlaceholderGenerator.getHasManyRelationPlaceholder(fieldNameOrRelation as HasManyRelation)
 		} else {
-			placeholder = PlaceholderGenerator.getFieldPlaceholder(fieldName)
+			throw new BindingError()
 		}
 
 		return this.getFieldByPlaceholder(placeholder)
@@ -88,23 +79,21 @@ class EntityAccessor extends Accessor implements Errorable {
 		entity: RelativeSingleEntity | DesugaredRelativeSingleEntity | string,
 	): EntityAccessor {
 		let relativeTo: EntityAccessor = this
-		const hasOneRelationPath: DesugaredRelativeSingleEntity['hasOneRelationPath'] =
+		const hasOneRelationPath: RelativeSingleEntity['hasOneRelationPath'] =
 			typeof entity === 'string'
 				? [
 						{
+							connections: undefined,
+							forceCreation: false,
+							isNonbearing: false,
 							field: entity,
 							reducedBy: undefined,
 							filter: undefined,
 						},
 				  ]
-				: entity.hasOneRelationPath
+				: (entity.hasOneRelationPath as HasOneRelation[]) // TODO
 		for (const hasOneRelation of hasOneRelationPath) {
-			const field = relativeTo.getField(
-				hasOneRelation.field,
-				ExpectedEntityCount.UpToOne,
-				hasOneRelation.filter,
-				hasOneRelation.reducedBy,
-			)
+			const field = relativeTo.getField(hasOneRelation, ExpectedEntityCount.UpToOne)
 
 			if (field instanceof EntityAccessor) {
 				relativeTo = field
@@ -161,7 +150,7 @@ class EntityAccessor extends Accessor implements Errorable {
 			fieldName = entityList
 		} else {
 			nestedEntity = this.getRelativeSingleEntity({ hasOneRelationPath: entityList.hasOneRelationPath })
-			fieldName = entityList.hasManyRelation.field
+			fieldName = PlaceholderGenerator.getHasManyRelationPlaceholder(entityList.hasManyRelation)
 		}
 
 		const field = nestedEntity.getField(fieldName)
@@ -179,7 +168,7 @@ class EntityAccessor extends Accessor implements Errorable {
 	/**
 	 * @internal
 	 */
-	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor | null {
+	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor {
 		const record = this.fieldData.get(placeholderName)
 		if (record === undefined) {
 			throw new BindingError(`EntityAccessor: unknown field '${placeholderName}'.`)

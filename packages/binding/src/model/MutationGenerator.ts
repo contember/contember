@@ -11,9 +11,10 @@ import {
 	SubTreeMarker,
 	SubTreeMarkerParameters,
 	MarkerTreeRoot,
-	ReferenceMarker,
+	HasOneRelationMarker,
+	HasManyRelationMarker,
 } from '../markers'
-import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
+import { EntityCreationParameters, ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import {
@@ -236,7 +237,11 @@ export class MutationGenerator {
 						}
 					}
 				}
-			} else if (marker instanceof ReferenceMarker) {
+			} else if (marker instanceof HasOneRelationMarker) {
+				// TODO
+			} else if (marker instanceof HasManyRelationMarker) {
+				// TODO
+			} /*else if (marker instanceof ReferenceMarker) {
 				let unreducedHasOnePresent = false
 				const references = marker.references
 				const accessorReference: Array<{
@@ -313,7 +318,9 @@ export class MutationGenerator {
 						return builder
 					})
 				}
-			} else if (marker instanceof ConnectionMarker) {
+			} */ else if (
+				marker instanceof ConnectionMarker
+			) {
 				if (marker.isNonbearing) {
 					nonbearingConnections.push(marker)
 				} else {
@@ -356,7 +363,11 @@ export class MutationGenerator {
 						builder = builder.set(placeholderName, resolvedValue)
 					}
 				}
-			} else if (marker instanceof ReferenceMarker) {
+			} else if (marker instanceof HasOneRelationMarker) {
+				// TODO
+			} else if (marker instanceof HasManyRelationMarker) {
+				// TODO
+			} /*else if (marker instanceof ReferenceMarker) {
 				let unreducedHasOnePresent = false
 				let hasManyPersistedData: Set<string> | undefined = undefined
 				let hasManyPlannedRemovals: Set<InternalEntityPlannedRemoval> | undefined = undefined
@@ -504,7 +515,9 @@ export class MutationGenerator {
 						return builder
 					})
 				}
-			} else if (marker instanceof ConnectionMarker) {
+			} */ else if (
+				marker instanceof ConnectionMarker
+			) {
 				// Do nothing: connections are only relevant to create mutations. At the point of updating, the entity is
 				// supposed to have already been connected.
 			} else if (marker instanceof SubTreeMarker) {
@@ -519,7 +532,8 @@ export class MutationGenerator {
 
 	private registerCreateReferenceMutationPart(
 		entityState: InternalEntityState,
-		reference: ReferenceMarker.Reference,
+		creationParameters: EntityCreationParameters,
+		fields: EntityFieldMarkers,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
 		const registerReductionFields = (where: UniqueWhere): Input.CreateDataInput<GraphQlBuilder.Literal> => {
 			const data: Input.CreateDataInput<GraphQlBuilder.Literal> = {}
@@ -546,16 +560,16 @@ export class MutationGenerator {
 
 		const dataBuilder = this.registerCreateMutationPart(
 			entityState,
-			reference.fields,
+			fields,
 			new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 		)
 
-		if (!reference.reducedBy || isEmptyObject(dataBuilder.data)) {
+		if (!creationParameters.connections || isEmptyObject(dataBuilder.data)) {
 			return dataBuilder
 		}
 		return new CrudQueryBuilder.WriteDataBuilder({
 			...dataBuilder.data,
-			...registerReductionFields(reference.reducedBy),
+			...registerReductionFields(creationParameters.connections),
 		})
 	}
 }

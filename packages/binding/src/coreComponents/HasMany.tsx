@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useRelativeEntityList } from '../accessorPropagation'
-import { ReferenceMarker } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeEntityList } from '../treeParameters'
 import { Component } from './Component'
@@ -8,7 +7,6 @@ import { EntityList, EntityListBaseProps } from './EntityList'
 import { SingleEntityBaseProps } from './SingleEntity'
 
 export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelativeEntityList & {
-	preferences?: Partial<ReferenceMarker.ReferencePreferences>
 	children?: React.ReactNode
 } & (
 		| {}
@@ -29,8 +27,8 @@ export const HasMany = Component(
 		return <EntityList {...props} accessor={entity} />
 	},
 	{
-		generateReferenceMarker: (props, fields, environment) =>
-			MarkerFactory.createRelativeEntityListFields(props, environment, fields, props.isNonbearing, props.preferences),
+		generateRelationMarker: (props, fields, environment) =>
+			MarkerFactory.createRelativeEntityListFields(props, environment, fields),
 	},
 	'HasMany',
 ) as <ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => React.ReactElement

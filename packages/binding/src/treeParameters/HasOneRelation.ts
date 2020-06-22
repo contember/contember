@@ -1,3 +1,4 @@
+import { HasManyRelation } from './HasManyRelation'
 import { SugaredUniqueWhere, UniqueWhere } from './primitives'
 import { DesugaredRelation, Relation, SugarableRelation, UnsugarableRelation } from './Relation'
 import {
@@ -20,3 +21,25 @@ export interface SugarableHasOneRelation extends SugarableRelation, SugarableSin
 }
 
 export interface UnsugarableHasOneRelation extends UnsugarableRelation, UnsugarableSingleEntityParameters {}
+
+const x: HasOneRelation = {
+	connections: undefined,
+	field: '',
+	filter: {},
+	forceCreation: false,
+	isNonbearing: false,
+	reducedBy: undefined,
+}
+
+const y: HasManyRelation = {
+	connections: undefined,
+	field: '',
+	filter: {},
+	forceCreation: false,
+	isNonbearing: false,
+	initialEntityCount: 0,
+
+	orderBy: undefined,
+	offset: undefined,
+	limit: undefined,
+}

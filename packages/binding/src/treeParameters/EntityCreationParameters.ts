@@ -1,5 +1,10 @@
 import { EntityConnections, SugaredEntityConnections } from './EntityConnections'
 
+export const EntityCreationParametersDefaults = {
+	forceCreation: false,
+	isNonbearing: false,
+} as const
+
 export interface DesugaredEntityCreationParameters {}
 
 export interface EntityCreationParameters {

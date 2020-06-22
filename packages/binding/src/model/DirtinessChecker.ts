@@ -3,14 +3,7 @@ import { EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } f
 import { NormalizedQueryResponseData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import {
-	ConnectionMarker,
-	EntityFieldMarkers,
-	FieldMarker,
-	SubTreeMarker,
-	MarkerTreeRoot,
-	ReferenceMarker,
-} from '../markers'
+import { ConnectionMarker, EntityFieldMarkers, FieldMarker, SubTreeMarker, MarkerTreeRoot } from '../markers'
 import { ExpectedEntityCount } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 
@@ -87,7 +80,7 @@ export class DirtinessChecker {
 					isEntityDirty = true
 					break
 				}
-			} else if (marker instanceof ReferenceMarker) {
+			} /*else if (marker instanceof ReferenceMarker) {
 				const references = marker.references
 
 				for (const referencePlaceholder in references) {
@@ -97,7 +90,7 @@ export class DirtinessChecker {
 
 					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
 						if (
-							accessor instanceof EntityAccessor /*|| accessor instanceof EntityForRemovalAccessor*/ &&
+							accessor instanceof EntityAccessor /*|| accessor instanceof EntityForRemovalAccessor* / &&
 							((persistedValue !== null && typeof persistedValue === 'object' && !Array.isArray(persistedValue)) ||
 								persistedValue === undefined ||
 								persistedValue === null)
@@ -135,7 +128,7 @@ export class DirtinessChecker {
 				// Otherwise do nothing
 			} else {
 				assertNever(marker)
-			}
+			}*/
 		}
 		this.isDirtyCache.set(node, isEntityDirty)
 		return isEntityDirty

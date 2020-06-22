@@ -22,7 +22,7 @@ export const HasOne = Component(
 		return <SingleEntity {...props} accessor={entity} />
 	},
 	{
-		generateReferenceMarker: (props, fields, environment) =>
+		generateRelationMarker: (props, fields, environment) =>
 			MarkerFactory.createRelativeSingleEntityFields(props, environment, fields),
 	},
 	'HasOne',

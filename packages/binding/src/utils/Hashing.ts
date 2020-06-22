@@ -1,21 +1,40 @@
-import { ReferenceMarker, SubTreeMarkerParameters } from '../markers'
+import { SubTreeMarkerParameters } from '../markers'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
-	EntityConnections,
+	DesugaredHasManyRelation,
 	ExpectedEntityCount,
 	Filter,
+	HasManyRelation,
+	HasOneRelation,
+	OrderBy,
 	UniqueWhere,
 } from '../treeParameters'
 import { assertNever } from './assertNever'
 
 export class Hashing {
-	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {
-		const where: Array<Filter | UniqueWhere | ExpectedEntityCount | undefined> = [
-			constraints.filter,
-			constraints.reducedBy,
-			constraints.expectedCount,
-			constraints.connections ? Object.fromEntries(constraints.connections.entries()) : undefined,
+	public static hashHasOneRelation(relation: HasOneRelation): number {
+		const where: Array<Filter | UniqueWhere | string | undefined> = [
+			ExpectedEntityCount.UpToOne,
+			relation.field,
+			relation.filter,
+			relation.reducedBy,
+			relation.connections,
+		]
+
+		return Hashing.hashArray(where)
+	}
+
+	// TODO
+	public static hashHasManyRelation(relation: HasManyRelation | DesugaredHasManyRelation): number {
+		const where: Array<Filter | UniqueWhere | OrderBy | string | number | undefined> = [
+			ExpectedEntityCount.PossiblyMany,
+			relation.field,
+			relation.filter,
+			(relation as HasManyRelation).connections,
+			(relation as HasManyRelation).offset,
+			(relation as HasManyRelation).limit,
+			(relation as HasManyRelation).orderBy,
 		]
 
 		return Hashing.hashArray(where)

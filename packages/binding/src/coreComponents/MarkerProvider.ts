@@ -1,6 +1,13 @@
 import * as React from 'react'
 import { Environment } from '../dao'
-import { ConnectionMarker, EntityFieldMarkers, FieldMarker, SubTreeMarker, ReferenceMarker } from '../markers'
+import {
+	ConnectionMarker,
+	EntityFieldMarkers,
+	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+	SubTreeMarker,
+} from '../markers'
 
 export interface EnvironmentDeltaProvider<P extends {} = any> {
 	generateEnvironment: (props: P, oldEnvironment: Environment) => Environment
@@ -11,32 +18,33 @@ export interface EnvironmentDeltaProvider<P extends {} = any> {
  */
 
 export interface FieldMarkerProvider<P extends {} = any> {
-	// It may also return a ReferenceMarker so as to facilitate implementation of conditionally nested fields
-	generateFieldMarker: (props: P, environment: Environment) => FieldMarker | ReferenceMarker | EntityFieldMarkers
+	// It may also return a HasOneRelationMarker so as to facilitate implementation of conditionally nested fields
+	generateFieldMarker: (props: P, environment: Environment) => FieldMarker | HasOneRelationMarker | EntityFieldMarkers
 }
 
 export interface SubTreeMarkerProvider<P extends {} = any> {
 	generateSubTreeMarker: (
 		props: P,
-		fields: SubTreeMarker['fields'],
+		fields: EntityFieldMarkers,
 		environment: Environment,
 	) => SubTreeMarker | EntityFieldMarkers
 }
 
-export interface ReferenceMarkerProvider<P extends {} = any> {
-	generateReferenceMarker: (
+export interface RelationMarkerProvider<P extends {} = any> {
+	// It may also return a HasOneRelationMarker so as to facilitate implementation of conditionally nested connections
+	generateRelationMarker: (
 		props: P,
-		fields: ReferenceMarker.Reference['fields'],
+		fields: EntityFieldMarkers,
 		environment: Environment,
-	) => ReferenceMarker | EntityFieldMarkers
+	) => HasOneRelationMarker | HasManyRelationMarker | EntityFieldMarkers
 }
 
 export interface ConnectionMarkerProvider<P extends {} = any> {
-	// It may also return a ReferenceMarker so as to facilitate implementation of conditionally nested connections
+	// It may also return a HasOneRelationMarker so as to facilitate implementation of conditionally nested connections
 	generateConnectionMarker: (
 		props: P,
 		environment: Environment,
-	) => ConnectionMarker | ReferenceMarker | EntityFieldMarkers
+	) => ConnectionMarker | HasOneRelationMarker | EntityFieldMarkers
 }
 
 export interface SyntheticChildrenProvider<P extends {} = any> {
@@ -46,7 +54,7 @@ export interface SyntheticChildrenProvider<P extends {} = any> {
 export type CompleteMarkerProvider<P extends {} = any> = EnvironmentDeltaProvider<P> &
 	FieldMarkerProvider<P> &
 	SubTreeMarkerProvider<P> &
-	ReferenceMarkerProvider<P> &
+	RelationMarkerProvider<P> &
 	ConnectionMarkerProvider<P> &
 	SyntheticChildrenProvider<P>
 

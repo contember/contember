@@ -6,17 +6,19 @@ import {
 	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
 	Marker,
-	SubTreeMarker,
 	MarkerTreeRoot,
-	ReferenceMarker,
+	SubTreeMarker,
 } from '../markers'
 import { FieldName } from '../treeParameters'
 import { assertNever } from '../utils'
+import { MarkerMerger } from './MarkerMerger'
 
 type Fragment = EntityFieldMarkers
 type Terminals = FieldMarker | ConnectionMarker | Fragment
-type Nonterminals = SubTreeMarker | ReferenceMarker | Fragment
+type Nonterminals = SubTreeMarker | HasOneRelationMarker | HasManyRelationMarker | Fragment
 
 type NodeResult = Terminals | Nonterminals
 
@@ -57,7 +59,7 @@ export class MarkerTreeGenerator {
 						? nestedSubTree
 						: new SubTreeMarker(
 								nestedSubTree.parameters,
-								MarkerTreeGenerator.mergeEntityFields(presentSubTree.fields, nestedSubTree.fields),
+								MarkerMerger.mergeEntityFields(presentSubTree.fields, nestedSubTree.fields),
 						  ),
 				)
 			}
@@ -72,12 +74,8 @@ export class MarkerTreeGenerator {
 				yield marker
 				yield* this.hoistSubTeesFromEntityFields(marker.fields)
 				fields.delete(placeholderName)
-			} else if (marker instanceof ReferenceMarker) {
-				for (const alias in marker.references) {
-					const reference = marker.references[alias]
-
-					yield* this.hoistSubTeesFromEntityFields(reference.fields)
-				}
+			} else if (marker instanceof HasOneRelationMarker || marker instanceof HasManyRelationMarker) {
+				yield* this.hoistSubTeesFromEntityFields(marker.fields)
 			}
 		}
 	}
@@ -101,9 +99,7 @@ export class MarkerTreeGenerator {
 					const markerFromFields = fields.get(placeholderName)
 					fields.set(
 						placeholderName,
-						markerFromFields === undefined
-							? innerMarker
-							: MarkerTreeGenerator.mergeMarkers(markerFromFields, innerMarker),
+						markerFromFields === undefined ? innerMarker : MarkerMerger.mergeMarkers(markerFromFields, innerMarker),
 					)
 				}
 			} else {
@@ -111,7 +107,7 @@ export class MarkerTreeGenerator {
 				const markerFromFields = fields.get(placeholderName)
 				fields.set(
 					placeholderName,
-					markerFromFields === undefined ? marker : MarkerTreeGenerator.mergeMarkers(markerFromFields, marker),
+					markerFromFields === undefined ? marker : MarkerMerger.mergeMarkers(markerFromFields, marker),
 				)
 			}
 		}
@@ -119,110 +115,17 @@ export class MarkerTreeGenerator {
 		return fields
 	}
 
-	// This method assumes their placeholder names are the same
-	private static mergeMarkers(original: Marker, fresh: Marker): Marker {
-		if (original instanceof FieldMarker) {
-			if (fresh instanceof FieldMarker) {
-				if (original.isNonbearing !== fresh.isNonbearing && original.isNonbearing) {
-					// If only one isNonbearing, then the whole field is bearing
-					return fresh
-				}
-				// TODO warn in case of defaultValue differences
-				return original
-			} else if (fresh instanceof ReferenceMarker) {
-				return MarkerTreeGenerator.rejectRelationScalarCombo(original.fieldName)
-			} else if (fresh instanceof SubTreeMarker) {
-				throw new BindingError('Merging fields and sub trees is an undefined operation.')
-			} else if (fresh instanceof ConnectionMarker) {
-				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
-			}
-			assertNever(fresh)
-		} else if (original instanceof ReferenceMarker) {
-			if (fresh instanceof FieldMarker) {
-				return MarkerTreeGenerator.rejectRelationScalarCombo(original.fieldName)
-			} else if (fresh instanceof ReferenceMarker) {
-				const newReferences = { ...original.references }
-				for (const placeholderName in fresh.references) {
-					const namePresentInOriginal = placeholderName in newReferences
-
-					if (!namePresentInOriginal) {
-						newReferences[placeholderName] = {
-							placeholderName,
-							fields: new Map(),
-							filter: fresh.references[placeholderName].filter,
-							reducedBy: fresh.references[placeholderName].reducedBy,
-							expectedCount: fresh.references[placeholderName].expectedCount,
-							preferences: fresh.references[placeholderName].preferences,
-							isNonbearing: fresh.references[placeholderName].isNonbearing,
-							hasAtLeastOneBearingField: fresh.references[placeholderName].hasAtLeastOneBearingField,
-							connections: fresh.references[placeholderName].connections,
-						}
-					}
-
-					// TODO what to do with preferences?
-					newReferences[placeholderName].fields = namePresentInOriginal
-						? MarkerTreeGenerator.mergeEntityFields(
-								newReferences[placeholderName].fields,
-								fresh.references[placeholderName].fields,
-						  )
-						: fresh.references[placeholderName].fields
-				}
-				return new ReferenceMarker(original.fieldName, newReferences)
-			} else if (fresh instanceof ConnectionMarker) {
-				return MarkerTreeGenerator.rejectConnectionMarkerCombo(fresh)
-			} else if (fresh instanceof SubTreeMarker) {
-				throw new BindingError('MarkerTreeGenerator merging: SubTreeMarkers can only be merged with other sub trees.')
-			}
-			assertNever(fresh)
-		} else if (original instanceof ConnectionMarker) {
-			if (
-				fresh instanceof ConnectionMarker &&
-				fresh.fieldName === original.fieldName &&
-				JSON.stringify(fresh.target) === JSON.stringify(original.target)
-			) {
-				return original
-			}
-			return MarkerTreeGenerator.rejectConnectionMarkerCombo(original)
-		} else if (original instanceof SubTreeMarker) {
-			if (fresh instanceof SubTreeMarker) {
-				return new SubTreeMarker(
-					original.parameters,
-					MarkerTreeGenerator.mergeEntityFields(original.fields, fresh.fields),
-				)
-			} else {
-				throw new BindingError('MarkerTreeGenerator merging: SubTreeMarkers can only be merged with other sub trees.')
-			}
-		}
-		assertNever(original)
-	}
-
-	private static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers {
-		for (const [placeholderName, freshMarker] of fresh) {
-			const markerFromOriginal = original.get(placeholderName)
-			original.set(
-				placeholderName,
-				markerFromOriginal === undefined
-					? freshMarker
-					: MarkerTreeGenerator.mergeMarkers(markerFromOriginal, freshMarker),
-			)
-		}
-		return original
-	}
-
 	private reportInvalidTopLevelError(marker: Exclude<NodeResult, SubTreeMarker>): never {
-		const kind = marker instanceof FieldMarker ? 'field' : marker instanceof ReferenceMarker ? 'relation' : 'connection'
+		const kind =
+			marker instanceof FieldMarker
+				? 'field'
+				: marker instanceof HasOneRelationMarker || marker instanceof HasManyRelationMarker
+				? 'relation'
+				: 'connection'
 
 		throw new BindingError(
 			`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`,
 		)
-	}
-
-	private static rejectRelationScalarCombo(fieldName: FieldName): never {
-		throw new BindingError(`Cannot combine a relation with a scalar field '${fieldName}'.`)
-	}
-
-	private static rejectConnectionMarkerCombo(connectionMarker: ConnectionMarker): never {
-		throw new BindingError(`Attempting to combine a connection reference for field '${connectionMarker.fieldName}'.`)
 	}
 
 	private static initializeChildrenAnalyzer(): ChildrenAnalyzer<Terminals, Nonterminals, Environment> {
@@ -231,15 +134,15 @@ export class MarkerTreeGenerator {
 
 		const subTreeMarkerBranchNode = new BranchNode<Environment>(
 			'generateSubTreeMarker',
-			MarkerTreeGenerator.mapNodeResultToEntityFields,
+			this.mapNodeResultToEntityFields,
 			{
 				childrenAbsentErrorMessage: 'All data providers must have children',
 			},
 		)
 
 		const referenceMarkerBranchNode = new BranchNode<Environment>(
-			'generateReferenceMarker',
-			MarkerTreeGenerator.mapNodeResultToEntityFields,
+			'generateRelationMarker',
+			this.mapNodeResultToEntityFields,
 			{
 				childrenAbsentErrorMessage: 'All references must have children',
 			},

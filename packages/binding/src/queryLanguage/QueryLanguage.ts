@@ -3,12 +3,15 @@ import { VariableInputTransformer } from '../model'
 import {
 	DesugaredHasManyRelation,
 	DesugaredHasOneRelation,
+	EntityCreationParametersDefaults,
 	EntityListParameters,
+	EntityListPreferencesDefaults,
 	EntityName,
 	FieldName,
 	Filter,
 	HasManyRelation,
 	HasOneRelation,
+	LeafFieldDefaults,
 	QualifiedEntityList,
 	QualifiedFieldList,
 	QualifiedSingleEntity,
@@ -69,21 +72,18 @@ export namespace QueryLanguage {
 		limit: unsugarablePart.limit,
 		offset: unsugarablePart.offset,
 		orderBy: unsugarablePart.orderBy ? desugarOrderBy(unsugarablePart.orderBy, environment) : undefined,
+		initialEntityCount: unsugarablePart.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 	})
 
-	export const desugarConnections = (
-		connections: SugaredEntityConnections,
-		environment: Environment,
-	): Map<string, UniqueWhere> => {
-		if (connections instanceof Map) {
-			return connections
+	export const desugarConnections = (connections: SugaredEntityConnections, environment: Environment): UniqueWhere => {
+		if (Array.isArray(connections)) {
+			const whereList = connections.map(connection => desugarConnections(connection, environment))
+			return Object.assign({}, ...whereList) // TODO This is **WAAAAY** too silly and naive. And just wrong.
 		}
-		return new Map(
-			Object.entries(connections).map(([fieldName, uniqueWhere]) => [
-				fieldName,
-				desugarUniqueWhere(uniqueWhere, environment),
-			]),
-		)
+		if (typeof connections === 'string') {
+			return desugarUniqueWhere(connections, environment)
+		}
+		return connections
 	}
 
 	const desugarHasOneRelation = (
@@ -95,7 +95,8 @@ export namespace QueryLanguage {
 		filter: sugarable.filter ? desugarFilter(sugarable.filter, environment) : undefined,
 		reducedBy: sugarable.reducedBy ? desugarUniqueWhere(sugarable.reducedBy, environment) : undefined,
 		connections: unsugarable.connections ? desugarConnections(unsugarable.connections, environment) : undefined,
-		isNonbearing: unsugarable.isNonbearing ?? false,
+		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+		forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 	})
 
 	const augmentDesugaredHasOneRelationPath = (
@@ -110,7 +111,9 @@ export namespace QueryLanguage {
 	): HasManyRelation => ({
 		field: relation.field,
 		filter: relation.filter,
-		isNonbearing: unsugarable.isNonbearing ?? false,
+		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+		forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
+		initialEntityCount: unsugarable.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 		connections: unsugarable.connections ? desugarConnections(unsugarable.connections, environment) : undefined,
 		orderBy: unsugarable.orderBy ? desugarOrderBy(unsugarable.orderBy, environment) : undefined,
 		offset: unsugarable.offset,
@@ -153,7 +156,8 @@ export namespace QueryLanguage {
 		...desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
 		connections: unsugarablePart.connections ? desugarConnections(unsugarablePart.connections, environment) : undefined,
 		field: sugarablePart.field,
-		isNonbearing: unsugarablePart.isNonbearing ?? false,
+		isNonbearing: unsugarablePart.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+		forceCreation: unsugarablePart.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 	})
 
 	export const desugarUniqueWhere = preparePrimitiveEntryPoint(Parser.EntryPoint.UniqueWhere)
@@ -180,6 +184,8 @@ export namespace QueryLanguage {
 		}
 
 		return {
+			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+			forceCreation: unsugarableEntityList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			connections: unsugarableEntityList.connections
 				? desugarConnections(unsugarableEntityList.connections, environment)
 				: undefined,
@@ -205,6 +211,8 @@ export namespace QueryLanguage {
 		}
 
 		return {
+			isNonbearing: unsugarableSingleEntity.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+			forceCreation: unsugarableSingleEntity.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			connections: unsugarableSingleEntity.connections
 				? desugarConnections(unsugarableSingleEntity.connections, environment)
 				: undefined,
@@ -244,6 +252,8 @@ export namespace QueryLanguage {
 				unsugarableEntityList,
 				environment,
 			),
+			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+			forceCreation: unsugarableEntityList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			connections: unsugarableEntityList.connections
 				? desugarConnections(unsugarableEntityList.connections, environment)
 				: undefined,
@@ -277,6 +287,8 @@ export namespace QueryLanguage {
 			field,
 			entityName,
 			hasOneRelationPath,
+			isNonbearing: unsugarableFieldList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+			forceCreation: unsugarableFieldList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			connections: unsugarableFieldList.connections
 				? desugarConnections(unsugarableFieldList.connections, environment)
 				: undefined,
@@ -284,7 +296,6 @@ export namespace QueryLanguage {
 				unsugarableFieldList.defaultValue !== undefined
 					? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
 					: undefined,
-			isNonbearing: unsugarableFieldList.isNonbearing ?? false,
 			...desugarEntityListParameters(
 				{
 					filter,
@@ -382,7 +393,7 @@ export namespace QueryLanguage {
 		return {
 			hasOneRelationPath,
 			field: fieldName,
-			isNonbearing: unsugarableField.isNonbearing ?? false,
+			isNonbearing: unsugarableField.isNonbearing ?? LeafFieldDefaults.isNonbearing,
 			defaultValue:
 				unsugarableField.defaultValue !== undefined
 					? VariableInputTransformer.transformValue(unsugarableField.defaultValue, environment)

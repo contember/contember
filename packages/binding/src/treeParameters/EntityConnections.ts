@@ -1,11 +1,8 @@
 import { SugaredUniqueWhere, UniqueWhere } from './primitives'
 
-export type EntityConnections = Map<string, UniqueWhere> | undefined
+export type EntityConnections = UniqueWhere | undefined
 
-// TODO allow deeper connections
-export type SugaredEntityConnections =
-	| {
-			[hasOneRelationName: string]: SugaredUniqueWhere
-	  }
-	| Exclude<EntityConnections, undefined>
-//| Array<[SugaredRelativeSingleEntity['field'], SugaredUniqueWhere]>
+// TODO think of a better name.
+//		→ It can also be just e.g. 'column = value' in which case no actual connection in the sense of using `connect`
+//			api directive would be used.
+export type SugaredEntityConnections = SugaredUniqueWhere | SugaredUniqueWhere[] | Exclude<EntityConnections, undefined>

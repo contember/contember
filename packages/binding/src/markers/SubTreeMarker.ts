@@ -4,8 +4,7 @@ import {
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
-import { EntityContainerMarker } from './EntityContainerMarker'
-import { EntityFieldMarkers, hasAtLeastOneBearingField } from './EntityFieldMarkers'
+import { EntityFieldMarkers } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 export type SubTreeMarkerParameters =
@@ -14,17 +13,19 @@ export type SubTreeMarkerParameters =
 	| BoxedUnconstrainedQualifiedSingleEntity
 	| BoxedUnconstrainedQualifiedEntityList
 
-export class SubTreeMarker<C extends SubTreeMarkerParameters = SubTreeMarkerParameters>
-	implements EntityContainerMarker {
-	public readonly placeholderName: string
-	public readonly hasAtLeastOneBearingField: boolean
+export class SubTreeMarker<Parameters extends SubTreeMarkerParameters = SubTreeMarkerParameters> {
+	private _placeholderName: string | undefined
 
-	public constructor(public readonly parameters: C, public readonly fields: EntityFieldMarkers) {
-		this.placeholderName = PlaceholderGenerator.generateSubTreeMarkerPlaceholder(this)
-		this.hasAtLeastOneBearingField = hasAtLeastOneBearingField(fields)
-	}
+	public constructor(public readonly parameters: Parameters, public readonly fields: EntityFieldMarkers) {}
 
 	public get entityName() {
 		return this.parameters.value.entityName
+	}
+
+	public get placeholderName(): string {
+		if (this._placeholderName === undefined) {
+			this._placeholderName = PlaceholderGenerator.generateSubTreeMarkerPlaceholder(this)
+		}
+		return this._placeholderName
 	}
 }

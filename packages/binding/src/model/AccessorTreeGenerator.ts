@@ -13,7 +13,6 @@ import { BoxedSingleEntityId, NormalizedQueryResponseData, PersistedEntityDataSt
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
-	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
 	HasManyRelationMarker,
@@ -377,8 +376,6 @@ class AccessorTreeGenerator {
 							`Perhaps you meant to use a variant of <Field />?`,
 					)
 				}
-			} else if (field instanceof ConnectionMarker) {
-				// Do nothing: connections need no runtime representation
 			} else if (field instanceof SubTreeMarker) {
 				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {

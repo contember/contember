@@ -1,4 +1,3 @@
-export * from './ConnectionMarker'
 export * from './EntityFieldMarkers'
 export * from './FieldMarker'
 export * from './HasManyRelationMarker'

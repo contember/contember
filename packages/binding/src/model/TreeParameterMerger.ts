@@ -10,11 +10,11 @@ export class TreeParameterMerger {
 		return {
 			// Encoded within the placeholder
 			field: original.field,
-			connections: original.connections,
 			filter: original.filter,
 			reducedBy: original.reducedBy,
 
 			// Not encoded within the placeholder
+			connections: this.mergeEntityConnections(original.connections, fresh.connections),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			forceCreation: original.forceCreation || fresh.forceCreation,
 		}
@@ -31,12 +31,12 @@ export class TreeParameterMerger {
 			// Encoded within the placeholder
 			field: original.field,
 			filter: original.filter,
-			connections: original.connections,
 			orderBy: original.orderBy,
 			offset: original.offset,
 			limit: original.limit,
 
 			// Not encoded within the placeholder
+			connections: this.mergeEntityConnections(original.connections, fresh.connections),
 			forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above

@@ -3,7 +3,6 @@ import * as React from 'react'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import {
-	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
 	HasManyRelationMarker,
@@ -14,7 +13,7 @@ import {
 import { MarkerMerger } from './MarkerMerger'
 
 type Fragment = EntityFieldMarkers
-type Terminals = FieldMarker | ConnectionMarker | Fragment
+type Terminals = FieldMarker | Fragment
 type Nonterminals = SubTreeMarker | HasOneRelationMarker | HasManyRelationMarker | Fragment
 
 type NodeResult = Terminals | Nonterminals
@@ -113,12 +112,7 @@ export class MarkerTreeGenerator {
 	}
 
 	private reportInvalidTopLevelError(marker: Exclude<NodeResult, SubTreeMarker>): never {
-		const kind =
-			marker instanceof FieldMarker
-				? 'field'
-				: marker instanceof HasOneRelationMarker || marker instanceof HasManyRelationMarker
-				? 'relation'
-				: 'connection'
+		const kind = marker instanceof FieldMarker ? 'field' : 'relation'
 
 		throw new BindingError(
 			`Top-level ${kind} discovered. Any repeaters or similar components need to be used from within a data provider.`,
@@ -127,7 +121,6 @@ export class MarkerTreeGenerator {
 
 	private static initializeChildrenAnalyzer(): ChildrenAnalyzer<Terminals, Nonterminals, Environment> {
 		const fieldMarkerLeaf = new Leaf<Environment>('generateFieldMarker')
-		const connectionMarkerLeaf = new Leaf<Environment>('generateConnectionMarker')
 
 		const subTreeMarkerBranchNode = new BranchNode<Environment>(
 			'generateSubTreeMarker',
@@ -145,18 +138,14 @@ export class MarkerTreeGenerator {
 			},
 		)
 
-		return new ChildrenAnalyzer(
-			[fieldMarkerLeaf, connectionMarkerLeaf],
-			[subTreeMarkerBranchNode, referenceMarkerBranchNode],
-			{
-				syntheticChildrenFactoryName: 'generateSyntheticChildren',
-				renderPropsErrorMessage:
-					`Render props (functions as React component children) are not supported within the schema. ` +
-					`You have likely used a bare custom component as opposed to wrapping in with \`Component\` ` +
-					`from the \`@contember/admin\` package. Please refer to the documentation.`,
-				ignoreRenderProps: false,
-				environmentFactoryName: 'generateEnvironment',
-			},
-		)
+		return new ChildrenAnalyzer([fieldMarkerLeaf], [subTreeMarkerBranchNode, referenceMarkerBranchNode], {
+			syntheticChildrenFactoryName: 'generateSyntheticChildren',
+			renderPropsErrorMessage:
+				`Render props (functions as React component children) are not supported within the schema. ` +
+				`You have likely used a bare custom component as opposed to wrapping in with \`Component\` ` +
+				`from the \`@contember/admin\` package. Please refer to the documentation.`,
+			ignoreRenderProps: false,
+			environmentFactoryName: 'generateEnvironment',
+		})
 	}
 }

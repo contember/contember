@@ -6,7 +6,6 @@ import {
 	HasOneRelation,
 } from '../treeParameters'
 import { Hashing } from '../utils'
-import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'
 import { HasManyRelationMarker } from './HasManyRelationMarker'
 import { HasOneRelationMarker } from './HasOneRelationMarker'
@@ -18,16 +17,6 @@ export class PlaceholderGenerator {
 	}
 
 	public static getFieldPlaceholder(fieldName: FieldName): string {
-		return fieldName
-	}
-
-	//
-
-	public static generateConnectionMarkerPlaceholder(marker: ConnectionMarker): string {
-		return PlaceholderGenerator.getConnectionPlaceholder(marker.fieldName)
-	}
-
-	public static getConnectionPlaceholder(fieldName: FieldName): string {
 		return fieldName
 	}
 

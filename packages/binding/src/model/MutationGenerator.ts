@@ -1,28 +1,21 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { Input } from '@contember/schema'
 import { EntityAccessor } from '../accessors'
-import { BoxedSingleEntityId, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
-	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+	MarkerTreeRoot,
 	SubTreeMarker,
 	SubTreeMarkerParameters,
-	MarkerTreeRoot,
-	HasOneRelationMarker,
-	HasManyRelationMarker,
 } from '../markers'
-import { EntityCreationParameters, ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
+import { EntityCreationParameters, FieldValue, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
-import {
-	InternalEntityPlannedRemoval,
-	InternalEntityState,
-	InternalRootStateNode,
-	InternalStateType,
-} from './internalState'
+import { InternalEntityState, InternalRootStateNode, InternalStateType } from './internalState'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
@@ -215,7 +208,7 @@ export class MutationGenerator {
 			placeholderName: string
 			value: FieldValue
 		}> = []
-		const nonbearingConnections: ConnectionMarker[] = []
+		const nonbearingConnections: any[] = []
 
 		for (const [placeholderName, marker] of entityFieldMarkers) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
@@ -318,7 +311,7 @@ export class MutationGenerator {
 						return builder
 					})
 				}
-			} */ else if (
+			} else if (
 				marker instanceof ConnectionMarker
 			) {
 				if (marker.isNonbearing) {
@@ -326,7 +319,9 @@ export class MutationGenerator {
 				} else {
 					builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
 				}
-			} else if (marker instanceof SubTreeMarker) {
+			} */ else if (
+				marker instanceof SubTreeMarker
+			) {
 				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {
 				assertNever(marker)
@@ -515,12 +510,14 @@ export class MutationGenerator {
 						return builder
 					})
 				}
-			} */ else if (
+			}  else if (
 				marker instanceof ConnectionMarker
 			) {
 				// Do nothing: connections are only relevant to create mutations. At the point of updating, the entity is
 				// supposed to have already been connected.
-			} else if (marker instanceof SubTreeMarker) {
+			} */ else if (
+				marker instanceof SubTreeMarker
+			) {
 				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {
 				assertNever(marker)

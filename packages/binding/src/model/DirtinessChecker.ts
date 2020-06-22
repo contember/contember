@@ -3,7 +3,7 @@ import { EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } f
 import { NormalizedQueryResponseData, ReceivedDataTree, ReceivedEntityData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { ConnectionMarker, EntityFieldMarkers, FieldMarker, SubTreeMarker, MarkerTreeRoot } from '../markers'
+import { EntityFieldMarkers, FieldMarker, SubTreeMarker, MarkerTreeRoot } from '../markers'
 import { ExpectedEntityCount } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 

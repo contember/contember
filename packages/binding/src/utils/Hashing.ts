@@ -20,7 +20,6 @@ export class Hashing {
 			relation.field,
 			relation.filter,
 			relation.reducedBy,
-			'connections' in relation ? relation.connections : undefined,
 		]
 
 		return Hashing.hashArray(where)
@@ -31,7 +30,6 @@ export class Hashing {
 			ExpectedEntityCount.PossiblyMany,
 			relation.field,
 			relation.filter,
-			'connections' in relation ? relation.connections : undefined,
 			'offset' in relation ? relation.offset : undefined,
 			'limit' in relation ? relation.limit : undefined,
 			'orderBy' in relation ? relation.orderBy : undefined,

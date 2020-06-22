@@ -1,6 +1,5 @@
 import { BindingError } from '../BindingError'
 import {
-	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
 	HasManyRelationMarker,
@@ -27,8 +26,6 @@ export class MarkerMerger {
 				return this.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof SubTreeMarker) {
 				throw new BindingError('Merging fields and sub trees is an undefined operation.')
-			} else if (fresh instanceof ConnectionMarker) {
-				return this.rejectConnectionMarkerCombo(fresh)
 			}
 			assertNever(fresh)
 		} else if (original instanceof HasOneRelationMarker) {
@@ -41,8 +38,6 @@ export class MarkerMerger {
 				return this.rejectRelationScalarCombo(original.relation.field)
 			} else if (fresh instanceof HasManyRelationMarker) {
 				throw new BindingError() // TODO not implemented
-			} else if (fresh instanceof ConnectionMarker) {
-				return this.rejectConnectionMarkerCombo(fresh)
 			} else if (fresh instanceof SubTreeMarker) {
 				throw new BindingError('MarkerTreeGenerator merging: SubTreeMarkers can only be merged with other sub trees.')
 			}
@@ -58,21 +53,10 @@ export class MarkerMerger {
 				return this.rejectRelationScalarCombo(original.relation.field)
 			} else if (fresh instanceof HasOneRelationMarker) {
 				throw new BindingError() // TODO not implemented
-			} else if (fresh instanceof ConnectionMarker) {
-				return this.rejectConnectionMarkerCombo(fresh)
 			} else if (fresh instanceof SubTreeMarker) {
 				throw new BindingError('MarkerTreeGenerator merging: SubTreeMarkers can only be merged with other sub trees.')
 			}
 			assertNever(fresh)
-		} else if (original instanceof ConnectionMarker) {
-			if (fresh instanceof ConnectionMarker && fresh.fieldName === original.fieldName) {
-				return new ConnectionMarker(
-					original.fieldName,
-					TreeParameterMerger.mergeEntityConnections(original.target, fresh.target)!,
-					original.isNonbearing && fresh.isNonbearing, // If one is nonbearing, then so is the result.
-				)
-			}
-			return this.rejectConnectionMarkerCombo(original)
 		} else if (original instanceof SubTreeMarker) {
 			if (fresh instanceof SubTreeMarker) {
 				return new SubTreeMarker(original.parameters, this.mergeEntityFields(original.fields, fresh.fields))
@@ -96,9 +80,5 @@ export class MarkerMerger {
 
 	private static rejectRelationScalarCombo(fieldName: FieldName): never {
 		throw new BindingError(`Cannot combine a relation with a scalar field '${fieldName}'.`)
-	}
-
-	private static rejectConnectionMarkerCombo(connectionMarker: ConnectionMarker): never {
-		throw new BindingError(`Attempting to combine a connection reference for field '${connectionMarker.fieldName}'.`)
 	}
 }

@@ -1,7 +1,6 @@
 import { CrudQueryBuilder } from '@contember/client'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
-	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
 	HasManyRelationMarker,
@@ -165,8 +164,6 @@ export class QueryGenerator {
 					// TODO this will currently always go to the latter condition, resulting in less than ideal queries.
 					fieldValue.placeholderName === relation.field ? undefined : fieldValue.placeholderName,
 				)
-			} else if (fieldValue instanceof ConnectionMarker) {
-				// Do nothing ‒ connections are only relevant to mutations.
 			} else if (fieldValue instanceof SubTreeMarker) {
 				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {

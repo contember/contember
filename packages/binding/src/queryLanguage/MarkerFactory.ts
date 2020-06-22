@@ -1,6 +1,5 @@
 import { Environment } from '../dao'
 import {
-	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
 	HasManyRelationMarker,
@@ -103,18 +102,6 @@ export namespace MarkerFactory {
 			new Map([[hasManyRelationMarker.placeholderName, hasManyRelationMarker]]),
 		)
 	}
-
-	export const createConnectionMarker = (field: FieldName, to: SugaredUniqueWhere, environment: Environment) =>
-		wrapRelativeSingleField(
-			{ field },
-			environment,
-			relativeSingleField =>
-				new ConnectionMarker(
-					relativeSingleField.field,
-					QueryLanguage.desugarUniqueWhere(to, environment),
-					relativeSingleField.isNonbearing,
-				),
-		)
 
 	export const createFieldMarker = (field: SugaredRelativeSingleField, environment: Environment) =>
 		wrapRelativeSingleField(

@@ -36,6 +36,6 @@
 		"@types/lru-cache": "^5.1.0",
 		"@types/node": "^13.11.1",
 		"@types/uuid": "^3.4.5",
-		"typescript": "^3.7.4"
+		"typescript": "^3.9.5"
 	}
 }

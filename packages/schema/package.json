@@ -6,6 +6,6 @@
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
 	"devDependencies": {
-		"typescript": "^3.7.4"
+		"typescript": "^3.9.5"
 	}
 }

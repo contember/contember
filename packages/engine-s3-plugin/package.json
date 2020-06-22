@@ -8,7 +8,7 @@
 	"devDependencies": {
 		"@types/mime-types": "^2.1.0",
 		"@types/uuid": "^3.4.5",
-		"typescript": "^3.7.4"
+		"typescript": "^3.9.5"
 	},
 	"dependencies": {
 		"@contember/engine-common": "^0.8.0-alpha.2",

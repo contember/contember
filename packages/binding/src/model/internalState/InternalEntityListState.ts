@@ -1,6 +1,6 @@
 import { EntityListAccessor } from '../../accessors'
 import { EntityFieldMarkers } from '../../markers'
-import { EntityCreationParameters } from '../../treeParameters'
+import { EntityCreationParameters, EntityListPreferences } from '../../treeParameters'
 import { RemovalType } from '../../treeParameters/primitives'
 import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'

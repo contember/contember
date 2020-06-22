@@ -39,13 +39,21 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				new BoxedUnconstrainedQualifiedEntityList(
 					QueryLanguage.desugarUnconstrainedQualifiedEntityList(
 						{
+							forceCreation: qualifiedEntityList.forceCreation,
+							isNonbearing: qualifiedEntityList.isNonbearing,
 							connections: qualifiedEntityList.connections,
 							entities: qualifiedEntityList.entities,
 						},
 						environment,
 					),
 				),
-			[qualifiedEntityList.entities, qualifiedEntityList.connections, environment],
+			[
+				qualifiedEntityList.entities,
+				qualifiedEntityList.connections,
+				qualifiedEntityList.forceCreation,
+				qualifiedEntityList.isNonbearing,
+				environment,
+			],
 		)
 	} else {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
@@ -54,6 +62,9 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				new BoxedQualifiedEntityList(
 					QueryLanguage.desugarQualifiedEntityList(
 						{
+							forceCreation: qualifiedEntityList.forceCreation,
+							isNonbearing: qualifiedEntityList.isNonbearing,
+							initialEntityCount: qualifiedEntityList.initialEntityCount,
 							connections: qualifiedEntityList.connections,
 							entities: qualifiedEntityList.entities,
 							orderBy: qualifiedEntityList.orderBy,
@@ -69,6 +80,9 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				qualifiedEntityList.orderBy,
 				qualifiedEntityList.offset,
 				qualifiedEntityList.limit,
+				qualifiedEntityList.forceCreation,
+				qualifiedEntityList.isNonbearing,
+				qualifiedEntityList.initialEntityCount,
 				environment,
 			],
 		)

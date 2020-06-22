@@ -38,13 +38,21 @@ export const useSingleEntitySubTree = (qualifiedSingleEntity: UseSingleEntitySub
 				new BoxedUnconstrainedQualifiedSingleEntity(
 					QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(
 						{
+							forceCreation: qualifiedSingleEntity.forceCreation,
+							isNonbearing: qualifiedSingleEntity.isNonbearing,
 							entity: qualifiedSingleEntity.entity,
 							connections: qualifiedSingleEntity.connections,
 						},
 						environment,
 					),
 				),
-			[qualifiedSingleEntity.entity, qualifiedSingleEntity.connections, environment],
+			[
+				qualifiedSingleEntity.entity,
+				qualifiedSingleEntity.connections,
+				qualifiedSingleEntity.forceCreation,
+				qualifiedSingleEntity.isNonbearing,
+				environment,
+			],
 		)
 	} else {
 		// eslint-disable-next-line react-hooks/rules-of-hooks

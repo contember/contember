@@ -1,5 +1,7 @@
 import { EntityAccessor } from '../../accessors'
 import { SingleEntityPersistedData } from '../../accessorTree'
+import { EntityFieldMarkers } from '../../markers'
+import { EntityCreationParameters } from '../../treeParameters'
 import { FieldName, RemovalType } from '../../treeParameters/primitives'
 import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
 import { InternalStateNode } from './InternalStateNode'
@@ -21,8 +23,10 @@ export interface InternalEntityState {
 	batchUpdateDepth: number
 	bearingChildrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
 	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
+	creationParameters: EntityCreationParameters
 	errors: ErrorsPreprocessor.ErrorNode | undefined
 	fields: Map<FieldName, InternalStateNode>
+	fieldMarkers: EntityFieldMarkers
 	getAccessor: () => EntityAccessor
 	hasAtLeastOneBearingField: boolean
 	hasPendingUpdate: boolean

@@ -192,18 +192,27 @@ class AccessorTreeGenerator {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
 			subTreeState = this.initializeEntityListAccessor(
 				tree.fields,
-				tree.parameters.value,
+				{ initialEntityCount: 0, ...tree.parameters.value },
 				noop,
 				persistedEntityIds,
 				errorNode,
-				{ initialEntityCount: 0 }, // TODO
 			)
 		} else {
 			const id =
 				persistedRootData instanceof BoxedSingleEntityId
 					? persistedRootData.id
 					: new EntityAccessor.UnpersistedEntityId()
-			subTreeState = this.initializeEntityAccessor(id, tree.fields, noop, errorNode)
+			subTreeState = this.initializeEntityAccessor(
+				id,
+				tree.fields,
+				{
+					isNonbearing: false,
+					connections: undefined,
+					forceCreation: false,
+				},
+				noop,
+				errorNode,
+			)
 		}
 		this.subTreeStates.set(tree.placeholderName, subTreeState)
 
@@ -309,6 +318,7 @@ class AccessorTreeGenerator {
 					const referenceEntityState = this.initializeEntityAccessor(
 						entityId,
 						field.fields,
+						field.relation,
 						entityState.onChildFieldUpdate,
 						referenceError,
 					)
@@ -338,7 +348,6 @@ class AccessorTreeGenerator {
 							entityState.onChildFieldUpdate,
 							fieldDatum || new Set(),
 							referenceError,
-							relation,
 						),
 					)
 				} else if (typeof fieldDatum === 'object') {
@@ -367,6 +376,7 @@ class AccessorTreeGenerator {
 	private initializeEntityAccessor(
 		id: string | EntityAccessor.UnpersistedEntityId,
 		fieldMarkers: EntityFieldMarkers,
+		creationParameters: EntityCreationParameters,
 		onEntityUpdate: OnEntityUpdate,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 	): InternalEntityState {
@@ -388,12 +398,14 @@ class AccessorTreeGenerator {
 			batchUpdateDepth: 0,
 			bearingChildrenWithUnpersistedChanges: undefined,
 			childrenWithPendingUpdates: undefined,
+			creationParameters,
 			errors,
 			eventListeners: {
 				update: undefined,
 				beforeUpdate: undefined,
 			},
 			fields: new Map(),
+			fieldMarkers,
 			hasAtLeastOneBearingField: true, // TODO
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
@@ -477,9 +489,11 @@ class AccessorTreeGenerator {
 						}
 						stateToDisconnect.realms.delete(entityState.onChildFieldUpdate)
 
+						const hasOneMarker = fieldMarkers.get(field)! as HasOneRelationMarker
 						const newEntityState = this.initializeEntityAccessor(
 							new EntityAccessor.UnpersistedEntityId(),
-							(fieldMarkers.get(field)! as HasOneRelationMarker).fields,
+							hasOneMarker.fields,
+							hasOneMarker.relation,
 							entityState.onChildFieldUpdate,
 							undefined,
 						)
@@ -584,11 +598,10 @@ class AccessorTreeGenerator {
 
 	private initializeEntityListAccessor(
 		fieldMarkers: EntityFieldMarkers,
-		creationParameters: EntityCreationParameters,
+		creationParameters: EntityCreationParameters & EntityListPreferences,
 		onEntityListUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
-		preferences: EntityListPreferences,
 	): InternalEntityListState {
 		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 			throw new BindingError(
@@ -835,6 +848,7 @@ class AccessorTreeGenerator {
 			const entityState = this.initializeEntityAccessor(
 				id,
 				entityListState.fieldMarkers,
+				entityListState.creationParameters,
 				entityListState.onChildEntityUpdate,
 				childErrors,
 			)
@@ -855,7 +869,7 @@ class AccessorTreeGenerator {
 
 		const initialData: Set<string | undefined> =
 			persistedEntityIds.size === 0
-				? new Set(Array.from({ length: preferences.initialEntityCount }))
+				? new Set(Array.from({ length: creationParameters.initialEntityCount }))
 				: persistedEntityIds
 		for (const entityId of initialData) {
 			generateNewEntityState(entityId)

@@ -1,6 +1,6 @@
 import { Input, Model, Value } from '@contember/schema'
 import { convertError } from './ErrorUtils'
-import { tuple } from '../utils'
+import { getFulfilledValues, getRejections } from '../utils'
 
 export enum MutationResultType {
 	ok = 'ok',
@@ -177,36 +177,29 @@ export type ResultListNotFlatten = MutationResultList | MutationResultList[]
 export const collectResults = async (
 	promises: (Promise<ResultListNotFlatten | undefined> | undefined)[],
 ): Promise<MutationResultList> => {
-	const allPromises: Promise<ResultListNotFlatten>[] = promises.filter(
-		(it): it is Promise<ResultListNotFlatten> => !!it,
-	)
-	const catchPromise = async (promise: Promise<ResultListNotFlatten>) => {
-		try {
-			return tuple(null, await promise)
-		} catch (e) {
-			const converted = convertError(e)
-			if (!converted) {
-				return tuple(e, null)
-			}
-			return tuple(null, [converted])
-		}
-	}
-
-	const enrichedPromises: Promise<[any, null] | [null, ResultListNotFlatten]>[] = allPromises.map(catchPromise)
-
-	const results = await Promise.all(enrichedPromises)
-	const errored = results.map(([err]) => err).filter(it => !!it)
-	if (errored.length > 0) {
-		if (errored.length > 1) {
+	const allPromises: Promise<ResultListNotFlatten>[] = promises
+		.filter((it): it is Promise<ResultListNotFlatten> => !!it)
+		.map(it =>
+			it.catch(e => {
+				const converted = convertError(e)
+				if (!converted) {
+					throw e
+				}
+				return [converted]
+			}),
+		)
+	const results = await Promise.allSettled(allPromises)
+	const failures = getRejections(results)
+	if (failures.length > 0) {
+		if (failures.length > 1) {
 			// eslint-disable-next-line no-console
 			console.error('Multiple error has occurred, printing them & rethrowing the first one')
 			// eslint-disable-next-line no-console
-			errored.slice(1).map(e => console.error(e))
+			failures.slice(1).map(e => console.error(e))
 		}
-		throw errored[0]
+		throw failures[0]
 	}
 
-	return flattenResult(
-		results.map(([, it]) => it).filter((it): it is MutationResultList | MutationResultList[] => !!it),
-	)
+	const values = getFulfilledValues(results)
+	return flattenResult(values.filter((it): it is MutationResultList | MutationResultList[] => !!it))
 }

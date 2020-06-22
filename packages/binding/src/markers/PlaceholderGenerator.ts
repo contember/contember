@@ -1,4 +1,10 @@
-import { DesugaredHasManyRelation, FieldName, HasManyRelation, HasOneRelation } from '../treeParameters'
+import {
+	DesugaredHasManyRelation,
+	DesugaredHasOneRelation,
+	FieldName,
+	HasManyRelation,
+	HasOneRelation,
+} from '../treeParameters'
 import { Hashing } from '../utils'
 import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'
@@ -31,7 +37,7 @@ export class PlaceholderGenerator {
 		return PlaceholderGenerator.getHasOneRelationPlaceholder(marker.relation)
 	}
 
-	public static getHasOneRelationPlaceholder(relation: HasOneRelation): string {
+	public static getHasOneRelationPlaceholder(relation: HasOneRelation | DesugaredHasOneRelation): string {
 		return `${relation.field}_${Hashing.hashHasOneRelation(relation)}`
 	}
 

@@ -3,6 +3,7 @@ import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
 	DesugaredHasManyRelation,
+	DesugaredHasOneRelation,
 	ExpectedEntityCount,
 	Filter,
 	HasManyRelation,
@@ -13,28 +14,27 @@ import {
 import { assertNever } from './assertNever'
 
 export class Hashing {
-	public static hashHasOneRelation(relation: HasOneRelation): number {
+	public static hashHasOneRelation(relation: HasOneRelation | DesugaredHasOneRelation): number {
 		const where: Array<Filter | UniqueWhere | string | undefined> = [
 			ExpectedEntityCount.UpToOne,
 			relation.field,
 			relation.filter,
 			relation.reducedBy,
-			relation.connections,
+			'connections' in relation ? relation.connections : undefined,
 		]
 
 		return Hashing.hashArray(where)
 	}
 
-	// TODO
 	public static hashHasManyRelation(relation: HasManyRelation | DesugaredHasManyRelation): number {
 		const where: Array<Filter | UniqueWhere | OrderBy | string | number | undefined> = [
 			ExpectedEntityCount.PossiblyMany,
 			relation.field,
 			relation.filter,
-			(relation as HasManyRelation).connections,
-			(relation as HasManyRelation).offset,
-			(relation as HasManyRelation).limit,
-			(relation as HasManyRelation).orderBy,
+			'connections' in relation ? relation.connections : undefined,
+			'offset' in relation ? relation.offset : undefined,
+			'limit' in relation ? relation.limit : undefined,
+			'orderBy' in relation ? relation.orderBy : undefined,
 		]
 
 		return Hashing.hashArray(where)

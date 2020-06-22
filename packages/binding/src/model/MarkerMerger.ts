@@ -1,4 +1,3 @@
-import { GraphQlBuilder } from '@contember/client'
 import { BindingError } from '../BindingError'
 import {
 	ConnectionMarker,
@@ -9,7 +8,7 @@ import {
 	Marker,
 	SubTreeMarker,
 } from '../markers'
-import { FieldName, UniqueWhere } from '../treeParameters/primitives'
+import { FieldName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { TreeParameterMerger } from './TreeParameterMerger'
 

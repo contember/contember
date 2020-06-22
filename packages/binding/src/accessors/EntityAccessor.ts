@@ -1,6 +1,8 @@
 import { BindingError } from '../BindingError'
 import { PlaceholderGenerator } from '../markers'
 import {
+	DesugaredHasManyRelation,
+	DesugaredHasOneRelation,
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
 	DesugaredRelativeSingleField,
@@ -51,10 +53,21 @@ class EntityAccessor extends Accessor implements Errorable {
 	}
 
 	public getField(fieldName: FieldName): FieldAccessor
-	public getField(hasOneRelation: HasOneRelation, expectedCount: ExpectedEntityCount.UpToOne): EntityAccessor
-	public getField(hasManyRelation: HasManyRelation, expectedCount: ExpectedEntityCount.PossiblyMany): EntityListAccessor
 	public getField(
-		fieldNameOrRelation: FieldName | HasOneRelation | HasManyRelation,
+		hasOneRelation: HasOneRelation | DesugaredHasOneRelation,
+		expectedCount: ExpectedEntityCount.UpToOne,
+	): EntityAccessor
+	public getField(
+		hasManyRelation: HasManyRelation | DesugaredHasManyRelation,
+		expectedCount: ExpectedEntityCount.PossiblyMany,
+	): EntityListAccessor
+	public getField(
+		fieldNameOrRelation:
+			| FieldName
+			| HasOneRelation
+			| HasManyRelation
+			| DesugaredHasOneRelation
+			| DesugaredHasManyRelation,
 		expectedCount?: ExpectedEntityCount,
 	): EntityAccessor.NestedAccessor {
 		let placeholder: FieldName
@@ -62,9 +75,13 @@ class EntityAccessor extends Accessor implements Errorable {
 		if (typeof fieldNameOrRelation === 'string') {
 			placeholder = fieldNameOrRelation
 		} else if (expectedCount === ExpectedEntityCount.UpToOne) {
-			placeholder = PlaceholderGenerator.getHasOneRelationPlaceholder(fieldNameOrRelation as HasOneRelation)
+			placeholder = PlaceholderGenerator.getHasOneRelationPlaceholder(
+				fieldNameOrRelation as HasOneRelation | DesugaredHasOneRelation,
+			)
 		} else if (expectedCount === ExpectedEntityCount.PossiblyMany) {
-			placeholder = PlaceholderGenerator.getHasManyRelationPlaceholder(fieldNameOrRelation as HasManyRelation)
+			placeholder = PlaceholderGenerator.getHasManyRelationPlaceholder(
+				fieldNameOrRelation as HasManyRelation | DesugaredHasManyRelation,
+			)
 		} else {
 			throw new BindingError()
 		}
@@ -79,7 +96,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		entity: RelativeSingleEntity | DesugaredRelativeSingleEntity | string,
 	): EntityAccessor {
 		let relativeTo: EntityAccessor = this
-		const hasOneRelationPath: RelativeSingleEntity['hasOneRelationPath'] =
+		const hasOneRelationPath: Array<HasOneRelation | DesugaredHasOneRelation> =
 			typeof entity === 'string'
 				? [
 						{
@@ -91,15 +108,9 @@ class EntityAccessor extends Accessor implements Errorable {
 							filter: undefined,
 						},
 				  ]
-				: (entity.hasOneRelationPath as HasOneRelation[]) // TODO
+				: entity.hasOneRelationPath
 		for (const hasOneRelation of hasOneRelationPath) {
-			const field = relativeTo.getField(hasOneRelation, ExpectedEntityCount.UpToOne)
-
-			if (field instanceof EntityAccessor) {
-				relativeTo = field
-			} else {
-				throw new BindingError('Corrupted data')
-			}
+			relativeTo = relativeTo.getField(hasOneRelation, ExpectedEntityCount.UpToOne)
 		}
 		return relativeTo
 	}

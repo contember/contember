@@ -8,12 +8,9 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	Marker,
 	MarkerTreeRoot,
 	SubTreeMarker,
 } from '../markers'
-import { FieldName } from '../treeParameters'
-import { assertNever } from '../utils'
 import { MarkerMerger } from './MarkerMerger'
 
 type Fragment = EntityFieldMarkers

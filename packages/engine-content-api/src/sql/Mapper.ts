@@ -15,6 +15,7 @@ import { Inserter } from './insert/Inserter'
 import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select/OrderByHelper'
 import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
+import UpdateBuilder from './update/UpdateBuilder'
 
 class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
@@ -146,6 +147,15 @@ class Mapper {
 		filter?: Input.Where,
 	): Promise<MutationResultList> {
 		return tryMutation(() => this.updater.update(this, entity, by, data, filter))
+	}
+
+	public async updateInternal(
+		entity: Model.Entity,
+		by: Input.UniqueWhere,
+		predicateFields: string[],
+		builderCb: (builder: UpdateBuilder) => void,
+	): Promise<MutationResultList> {
+		return tryMutation(() => this.updater.updateCb(this, entity, by, predicateFields, builderCb))
 	}
 
 	public async delete(entity: Model.Entity, by: Input.UniqueWhere, filter?: Input.Where): Promise<MutationResultList> {

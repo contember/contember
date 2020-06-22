@@ -1,15 +1,16 @@
 import { Value } from '@contember/schema'
 import { getFulfilledValues, getRejections } from '../utils'
+import { AbortUpdate } from './update/Updater'
 
 export type ColumnValue<E = never> = {
-	value: PromiseLike<Value.AtomicValue<E> | undefined>
+	value: PromiseLike<Value.AtomicValue<E> | AbortUpdate | undefined>
 	fieldName: string
 	columnName: string
 	columnType: string
 }
 
 export type ResolvedColumnValue<E = never> = ColumnValue<E> & {
-	resolvedValue: Value.AtomicValue<E>
+	resolvedValue: Value.AtomicValue<E> | AbortUpdate
 }
 
 export const resolveGenericValue = <T>(value: Value.GenericValueLike<T>): Promise<T> => {

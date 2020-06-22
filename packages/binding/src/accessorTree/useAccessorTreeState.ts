@@ -3,7 +3,6 @@ import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@co
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
-import { TreeRootAccessor } from '../accessors'
 import { BindingError } from '../BindingError'
 import {
 	AccessorTreeGenerator,
@@ -18,14 +17,14 @@ import { AccessorTreeStateMetadata } from './AccessorTreeStateMetadata'
 import { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
 import { metadataToRequestError } from './metadataToRequestError'
-import { MutationDataResponse, MutationRequestResponse } from './MutationRequestResponse'
+import { MutationRequestResponse } from './MutationRequestResponse'
 import {
 	MutationErrorType,
 	NothingToPersistPersistResult,
 	PersistResultSuccessType,
 	SuccessfulPersistResult,
 } from './PersistResult'
-import { QueryRequestResponse, ReceivedDataTree } from './QueryRequestResponse'
+import { QueryRequestResponse } from './QueryRequestResponse'
 
 const initialState: AccessorTreeState = {
 	name: AccessorTreeStateName.Uninitialized,
@@ -229,19 +228,6 @@ export const useAccessorTreeState = ({
 		}
 		performEffect()
 	}, [initializeAccessorTree, isInitialized, query, rejectFailedRequest, sendQuery, sessionToken, state.name])
-
-	const rootAccessor = state.name === AccessorTreeStateName.Interactive ? state.data : undefined
-	React.useEffect(() => {
-		const dirtinessChecker = dirtinessCheckerRef.current
-		if (rootAccessor && dirtinessChecker) {
-			const newIsDirty = dirtinessChecker.isDirty(rootAccessor)
-
-			dispatch({
-				type: AccessorTreeStateActionType.SetDirtiness,
-				isDirty: newIsDirty,
-			})
-		}
-	}, [rootAccessor])
 
 	// For this to work, this effect must be the last one to run.
 	React.useEffect(() => {

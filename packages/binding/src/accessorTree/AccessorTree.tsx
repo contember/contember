@@ -16,7 +16,7 @@ export function AccessorTree({ state, children }: AccessorTreeProps) {
 	if (state.name === AccessorTreeStateName.Interactive || state.name === AccessorTreeStateName.Mutating) {
 		return (
 			<TriggerPersistContext.Provider value={state.triggerPersist}>
-				<DirtinessContext.Provider value={state.isDirty}>
+				<DirtinessContext.Provider value={state.data.hasUnpersistedChanges}>
 					<MutationStateContext.Provider value={state.name === AccessorTreeStateName.Mutating}>
 						<GetSubTreeProvider getSubTree={state.data.getSubTree}>
 							<GetEntityByKeyProvider getEntityByKey={state.data.getEntityByKey}>{children}</GetEntityByKeyProvider>

@@ -174,8 +174,22 @@ class AccessorTreeGenerator {
 	}
 
 	private updateTreeRoot() {
+		let hasTreeWithUnpersistedChanges = false
+
+		for (const [, { hasUnpersistedChanges }] of this.subTreeStates) {
+			if (hasUnpersistedChanges) {
+				hasTreeWithUnpersistedChanges = true
+				break
+			}
+		}
 		this.updateData?.(
-			new TreeRootAccessor(this.getEntityByKey, this.getSubTree, this.getAllEntities, this.getAllTypeNames),
+			new TreeRootAccessor(
+				hasTreeWithUnpersistedChanges,
+				this.getEntityByKey,
+				this.getSubTree,
+				this.getAllEntities,
+				this.getAllTypeNames,
+			),
 		)
 	}
 

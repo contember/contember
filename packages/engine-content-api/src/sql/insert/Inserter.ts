@@ -35,6 +35,7 @@ export class Inserter {
 	): Promise<MutationResultList> {
 		const where = this.predicateFactory.create(entity, Acl.Operation.create, Object.keys(data))
 		const insertBuilder = this.insertBuilderFactory.create(entity)
+		// eslint-disable-next-line promise/catch-or-return
 		insertBuilder.insert.then(id => id && pushId(String(id)))
 
 		insertBuilder.addWhere(where)

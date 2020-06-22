@@ -5,10 +5,12 @@ import Path from '../select/Path'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { ImplementationException } from '../../exception'
+import { AbortInsert } from './Inserter'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]
 	executed: boolean
+	aborted: boolean
 	primaryValue: Value.PrimaryValue | null
 }
 
@@ -18,7 +20,7 @@ export default class InsertBuilder {
 	}
 	public readonly insert: Promise<Value.PrimaryValue | null> = new Promise(resolve => (this.resolver = resolve))
 
-	private rowData: ColumnValue<undefined>[] = []
+	private rowData: ColumnValue<AbortInsert | undefined>[] = []
 	private where: Input.Where = {}
 
 	constructor(
@@ -27,7 +29,7 @@ export default class InsertBuilder {
 		private readonly whereBuilder: WhereBuilder,
 	) {}
 
-	public addFieldValue(fieldName: string, value: Value.GenericValueLike<Value.AtomicValue | undefined>) {
+	public addFieldValue(fieldName: string, value: Value.GenericValueLike<Value.AtomicValue<AbortInsert | undefined>>) {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		this.rowData.push({ columnName, value: resolveGenericValue(value), columnType, fieldName })
@@ -37,13 +39,16 @@ export default class InsertBuilder {
 		this.where = { and: [where, this.where] }
 	}
 
-	public async getResolvedData(): Promise<ResolvedColumnValue[]> {
+	public async getResolvedData(): Promise<ResolvedColumnValue<AbortInsert>[]> {
 		return resolveRowData(this.rowData)
 	}
 
 	public async execute(db: Client): Promise<InsertResult> {
 		try {
 			const resolvedData = await this.getResolvedData()
+			if (resolvedData.find(it => it.resolvedValue === AbortInsert)) {
+				return { aborted: true, executed: false, primaryValue: null, values: [] }
+			}
 			const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
 				(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
 				{},
@@ -67,7 +72,7 @@ export default class InsertBuilder {
 			const returning = await qb.execute(db)
 			const result = returning.length === 1 ? returning[0] : null
 			this.resolver(result)
-			return { values: resolvedData, executed: true, primaryValue: result }
+			return { values: resolvedData as ResolvedColumnValue[], executed: true, primaryValue: result, aborted: false }
 		} catch (e) {
 			this.resolver(null)
 			throw e

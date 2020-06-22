@@ -109,7 +109,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 				this.insertBuilder.addFieldValue(context.relation.name, async () => {
 					const value = await primaryValue
 					if (!value) {
-						throw new AbortInsert()
+						return AbortInsert
 					}
 					return value
 				})
@@ -168,7 +168,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 				this.insertBuilder.addFieldValue(context.relation.name, async () => {
 					const value = await primaryValue
 					if (!value) {
-						throw new AbortInsert()
+						return AbortInsert
 					}
 					return value
 				})

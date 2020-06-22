@@ -20,7 +20,7 @@ export default class UpdateBuilder {
 	}
 	public readonly update: Promise<number | null> = new Promise(resolve => (this.resolver = resolve))
 
-	private rowData: ColumnValue[] = []
+	private rowData: ColumnValue<AbortUpdate>[] = []
 
 	private newWhere: Input.Where = {}
 	private oldWhere: Input.Where = {}
@@ -34,8 +34,8 @@ export default class UpdateBuilder {
 
 	public async addFieldValue(
 		fieldName: string,
-		value: Value.GenericValueLike<Value.AtomicValue | AbortUpdate | undefined>,
-	): Promise<Value.AtomicValue | AbortUpdate | undefined> {
+		value: Value.GenericValueLike<Value.AtomicValue<AbortUpdate | undefined>>,
+	): Promise<Value.AtomicValue<AbortUpdate | undefined>> {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
 		const resolvedValue = resolveGenericValue(value)
@@ -53,7 +53,7 @@ export default class UpdateBuilder {
 
 	public async execute(db: Client): Promise<UpdateResult> {
 		try {
-			const resolvedData = await resolveRowData(this.rowData)
+			const resolvedData = await resolveRowData<AbortUpdate>(this.rowData)
 			if (Object.keys(resolvedData).length === 0) {
 				this.resolver(null)
 				return { values: [], affectedRows: null, executed: false, aborted: false }
@@ -114,7 +114,7 @@ export default class UpdateBuilder {
 
 			const result = await qb.execute(db)
 			this.resolver(result)
-			return { values: resolvedData, affectedRows: result, executed: true, aborted: false }
+			return { values: resolvedData as ResolvedColumnValue[], affectedRows: result, executed: true, aborted: false }
 		} catch (e) {
 			this.resolver(null)
 			throw e

@@ -54,7 +54,9 @@ mutation($migrations: [Migration!]!) {
 }
 `
 		return (
-			await this.apiClient.request(query, {
+			await this.apiClient.request<{
+				migrate: { ok: boolean; errors: { code: MigrateErrorCode; migration: string; message: string }[] }
+			}>(query, {
 				migrations: migrations.map(({ version, formatVersion, name, modifications }) => ({
 					version,
 					formatVersion,

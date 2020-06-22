@@ -297,7 +297,9 @@ export class TenantClient {
     }
   }
 }`
-		const response = await this.apiClient.request(query, { projectSlug, memberships, description })
+		const response = await this.apiClient.request<{
+			createApiKey: { ok: boolean; errors: { code: string }[]; result: { apiKey: { id: string; token: string } } }
+		}>(query, { projectSlug, memberships, description })
 		if (!response.createApiKey.ok) {
 			throw response.createApiKey.errors.map((it: any) => it.code)
 		}
@@ -313,14 +315,20 @@ export class TenantClient {
     }
   }
 }`
-		const response = await this.apiClient.request(query, { projectSlug, memberships, email })
+		const response = await this.apiClient.request<{ invite: { ok: boolean; errors: { code: string }[] } }>(query, {
+			projectSlug,
+			memberships,
+			email,
+		})
 		if (!response.invite.ok) {
 			throw response.invite.errors.map((it: any) => it.code)
 		}
 	}
 
 	public async listProjects(): Promise<Project[]> {
-		const response = await this.apiClient.request(`query {
+		const response = await this.apiClient.request<{
+			me: { projects: { project: { slug: string; roles: { name: string; variables: { name: string }[] }[] } }[] }
+		}>(`query {
   me {
     projects {
       project {
@@ -352,7 +360,9 @@ export class TenantClient {
   }
 }`
 
-		const result = await this.apiClient.request(query, { email, password, expiration })
+		const result = await this.apiClient.request<{
+			signIn: { ok: boolean; errors: { code: string }[]; result: { token: string } }
+		}>(query, { email, password, expiration })
 		if (!result.signIn.ok) {
 			throw result.signIn.errors.map((it: any) => it.code)
 		}
@@ -370,7 +380,10 @@ export class TenantClient {
     }
   }
 }`
-		const result = await this.apiClient.request(query, { email, password })
+		const result = await this.apiClient.request<{ setup: { ok: boolean; result: { loginKey: { token: string } } } }>(
+			query,
+			{ email, password },
+		)
 		const loginToken = result.setup.result.loginKey.token
 		return { loginToken }
 	}

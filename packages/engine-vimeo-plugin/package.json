@@ -19,6 +19,6 @@
 	"devDependencies": {
 		"@types/node-fetch": "^2.5.4",
 		"graphql": "^14.6.0",
-		"typescript": "^3.7.4"
+		"typescript": "^3.9.5"
 	}
 }

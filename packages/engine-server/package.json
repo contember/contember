@@ -39,6 +39,6 @@
 		"@types/supertest": "^2.0.8",
 		"jasmine": "^3.5.0",
 		"supertest": "^4.0.2",
-		"typescript": "^3.7.4"
+		"typescript": "^3.9.5"
 	}
 }

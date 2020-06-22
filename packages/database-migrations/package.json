@@ -10,7 +10,7 @@
 	},
 	"devDependencies": {
 		"pg": "^7.18.2",
-		"typescript": "^3.7.4"
+		"typescript": "^3.9.5"
 	},
 	"peerDependencies": {
 		"pg": ">=7.0.0 <8.0.0"

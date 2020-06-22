@@ -30,6 +30,7 @@
 		"eslint": "^6.7.2",
 		"eslint-config-prettier": "^6.7.0",
 		"eslint-plugin-prettier": "^3.1.1",
+		"eslint-plugin-promise": "^4.2.1",
 		"husky": "^4.2.0",
 		"jasmine": "^3.5.0",
 		"jasmine-ts": "^0.3.0",
@@ -38,6 +39,6 @@
 		"lint-staged": "^10.0.2",
 		"prettier": "^1.18.2",
 		"ts-node": "^8.4.1",
-		"typescript": "^3.7.2"
+		"typescript": "^3.9.5"
 	}
 }

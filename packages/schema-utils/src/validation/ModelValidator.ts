@@ -183,7 +183,7 @@ export class ModelValidator {
 		if (isRelation(field as any)) {
 			return this.validateRelation(entityName, field, errors)
 		}
-		return field as Model.AnyColumn
+		return (field as unknown) as Model.AnyColumn
 	}
 
 	private validateRelation(

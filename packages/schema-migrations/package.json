@@ -19,6 +19,6 @@
 		"@contember/schema-definition": "^0.8.0-alpha.2",
 		"@types/jasmine": "^3.5.10",
 		"jasmine": "^3.5.0",
-		"typescript": "^3.7.4"
+		"typescript": "^3.9.5"
 	}
 }

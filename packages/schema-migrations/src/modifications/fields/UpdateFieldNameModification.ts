@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Model, Schema } from '@contember/schema'
+import { Acl, Input, Model, Schema, Value } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import {
 	SchemaUpdater,
@@ -129,16 +129,20 @@ class UpdateFieldNameModification implements Modification<UpdateFieldNameModific
 								updateAclEveryPredicate((predicate, entityName) => {
 									const processor = new PredicateDefinitionProcessor(this.schema.model)
 									const currentEntity = this.schema.model.entities[entityName]
-									return processor.process(currentEntity, predicate, {
-										handleColumn: ctx =>
-											ctx.entity.name === this.data.entityName && ctx.column.name === this.data.fieldName
-												? [this.data.newFieldName, ctx.value]
-												: ctx.value,
-										handleRelation: ctx =>
-											ctx.entity.name === this.data.entityName && ctx.relation.name === this.data.fieldName
-												? [this.data.newFieldName, ctx.value]
-												: ctx.value,
-									})
+									return processor.process<Input.Condition<Value.FieldValue<never>> | string, never>(
+										currentEntity,
+										predicate,
+										{
+											handleColumn: ctx =>
+												ctx.entity.name === this.data.entityName && ctx.column.name === this.data.fieldName
+													? [this.data.newFieldName, ctx.value]
+													: ctx.value,
+											handleRelation: ctx =>
+												ctx.entity.name === this.data.entityName && ctx.relation.name === this.data.fieldName
+													? [this.data.newFieldName, ctx.value]
+													: ctx.value,
+										},
+									)
 								}),
 							),
 						),

@@ -456,12 +456,43 @@ class AccessorTreeGenerator {
 			onChildFieldUpdate: (updatedState: InternalStateNode) => {
 				// No before update for child updates!
 				batchUpdatesImplementation(() => {
+					const isBearing =
+						updatedState.type === InternalStateType.Field
+							? !updatedState.fieldMarker.isNonbearing
+							: !updatedState.creationParameters.isNonbearing
+
 					if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
+						if (isBearing) {
+							entityState.bearingChildrenWithUnpersistedChanges?.delete(updatedState)
+						} else {
+							entityState.nonbearingChildrenWithUnpersistedChanges?.delete(updatedState)
+						}
 					} else {
 						this.markChildStateInNeedOfUpdate(entityState, updatedState)
+
+						if (updatedState.hasUnpersistedChanges) {
+							if (isBearing) {
+								if (entityState.bearingChildrenWithUnpersistedChanges === undefined) {
+									entityState.bearingChildrenWithUnpersistedChanges = new Set()
+								}
+								entityState.bearingChildrenWithUnpersistedChanges.add(updatedState)
+							} else {
+								if (entityState.nonbearingChildrenWithUnpersistedChanges === undefined) {
+									entityState.nonbearingChildrenWithUnpersistedChanges = new Set()
+								}
+								entityState.nonbearingChildrenWithUnpersistedChanges.add(updatedState)
+							}
+						} else {
+							if (isBearing) {
+								entityState.bearingChildrenWithUnpersistedChanges?.delete(updatedState)
+							} else {
+								entityState.nonbearingChildrenWithUnpersistedChanges?.delete(updatedState)
+							}
+						}
 					}
 					entityState.hasStaleAccessor = true
+					entityState.hasUnpersistedChanges = updateHasUnpersistedChanges()
 					entityState.hasPendingParentNotification = true
 				})
 			},
@@ -521,6 +552,7 @@ class AccessorTreeGenerator {
 					batchUpdatesImplementation(() => {
 						entityState.isScheduledForDeletion = true
 						entityState.hasPendingParentNotification = true
+						entityState.hasUnpersistedChanges = typeof entityState.id === 'string'
 					})
 				})
 			},
@@ -553,6 +585,14 @@ class AccessorTreeGenerator {
 					onUpdate(entityState)
 				}
 			}
+		}
+
+		const updateHasUnpersistedChanges = (): boolean => {
+			return !!(
+				entityState.bearingChildrenWithUnpersistedChanges?.size ||
+				entityState.plannedRemovals?.size ||
+				(entityState.id instanceof EntityAccessor.UnpersistedEntityId && entityState.creationParameters.forceCreation)
+			)
 		}
 
 		const performOperationWithBeforeUpdate = (operation: () => void) => {
@@ -670,6 +710,7 @@ class AccessorTreeGenerator {
 				batchUpdatesImplementation(() => {
 					if (updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
+						entityListState.childrenWithUnpersistedChanges?.delete(updatedState)
 					} else {
 						this.markChildStateInNeedOfUpdate(entityListState, updatedState)
 						if (updatedState.hasUnpersistedChanges) {
@@ -706,12 +747,10 @@ class AccessorTreeGenerator {
 								entityListState.childrenWithUnpersistedChanges = new Set()
 							}
 							entityListState.childrenWithUnpersistedChanges.add(connectedState)
-							if (!entityListState.hasUnpersistedChanges) {
-								entityListState.hasUnpersistedChanges = true
-								entityListState.hasStaleAccessor = true
-							}
+							entityListState.hasUnpersistedChanges = true
 						}
 
+						entityListState.hasStaleAccessor = true
 						connectedState.realms.add(entityListState.onChildEntityUpdate)
 						entityListState.childrenKeys.add(connectedEntityKey)
 						entityListState.hasPendingParentNotification = true

@@ -14,18 +14,13 @@ export type SubTreeMarkerParameters =
 	| BoxedUnconstrainedQualifiedEntityList
 
 export class SubTreeMarker<Parameters extends SubTreeMarkerParameters = SubTreeMarkerParameters> {
-	private _placeholderName: string | undefined
+	public readonly placeholderName: string
 
-	public constructor(public readonly parameters: Parameters, public readonly fields: EntityFieldMarkers) {}
+	public constructor(public readonly parameters: Parameters, public readonly fields: EntityFieldMarkers) {
+		this.placeholderName = PlaceholderGenerator.generateSubTreeMarkerPlaceholder(this)
+	}
 
 	public get entityName() {
 		return this.parameters.value.entityName
-	}
-
-	public get placeholderName(): string {
-		if (this._placeholderName === undefined) {
-			this._placeholderName = PlaceholderGenerator.generateSubTreeMarkerPlaceholder(this)
-		}
-		return this._placeholderName
 	}
 }

@@ -16,12 +16,7 @@ export class MarkerMerger {
 	public static mergeMarkers(original: Marker, fresh: Marker): Marker {
 		if (original instanceof FieldMarker) {
 			if (fresh instanceof FieldMarker) {
-				if (original.isNonbearing !== fresh.isNonbearing && original.isNonbearing) {
-					// If only one isNonbearing, then the whole field is bearing
-					return fresh
-				}
-				// TODO warn in case of defaultValue differences
-				return original
+				return this.mergeFieldMarkers(original, fresh)
 			} else if (fresh instanceof HasOneRelationMarker || fresh instanceof HasManyRelationMarker) {
 				return this.rejectRelationScalarCombo(original.fieldName)
 			} else if (fresh instanceof SubTreeMarker) {
@@ -30,10 +25,7 @@ export class MarkerMerger {
 			assertNever(fresh)
 		} else if (original instanceof HasOneRelationMarker) {
 			if (fresh instanceof HasOneRelationMarker) {
-				return new HasOneRelationMarker(
-					TreeParameterMerger.mergeHasOneRelationsWithSamePlaceholders(original.relation, fresh.relation),
-					this.mergeEntityFields(original.fields, fresh.fields),
-				)
+				return this.mergeHasOneRelationMarkers(original, fresh)
 			} else if (fresh instanceof FieldMarker) {
 				return this.rejectRelationScalarCombo(original.relation.field)
 			} else if (fresh instanceof HasManyRelationMarker) {
@@ -44,11 +36,7 @@ export class MarkerMerger {
 			assertNever(fresh)
 		} else if (original instanceof HasManyRelationMarker) {
 			if (fresh instanceof HasManyRelationMarker) {
-				console.log('hasMany merge', original, fresh)
-				return new HasManyRelationMarker(
-					TreeParameterMerger.mergeHasManyRelationsWithSamePlaceholders(original.relation, fresh.relation),
-					this.mergeEntityFields(original.fields, fresh.fields),
-				)
+				return this.mergeHasManyRelationMarkers(original, fresh)
 			} else if (fresh instanceof FieldMarker) {
 				return this.rejectRelationScalarCombo(original.relation.field)
 			} else if (fresh instanceof HasOneRelationMarker) {
@@ -59,7 +47,7 @@ export class MarkerMerger {
 			assertNever(fresh)
 		} else if (original instanceof SubTreeMarker) {
 			if (fresh instanceof SubTreeMarker) {
-				return new SubTreeMarker(original.parameters, this.mergeEntityFields(original.fields, fresh.fields))
+				return this.mergeSubTreeMarkers(original, fresh)
 			} else {
 				throw new BindingError('MarkerTreeGenerator merging: SubTreeMarkers can only be merged with other sub trees.')
 			}
@@ -68,13 +56,41 @@ export class MarkerMerger {
 	}
 
 	public static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers {
+		const newOriginal: EntityFieldMarkers = new Map(original)
 		for (const [placeholderName, freshMarker] of fresh) {
-			const markerFromOriginal = original.get(placeholderName)
-			original.set(
+			const markerFromOriginal = newOriginal.get(placeholderName)
+			newOriginal.set(
 				placeholderName,
 				markerFromOriginal === undefined ? freshMarker : this.mergeMarkers(markerFromOriginal, freshMarker),
 			)
 		}
+		return newOriginal
+	}
+
+	public static mergeHasOneRelationMarkers(original: HasOneRelationMarker, fresh: HasOneRelationMarker) {
+		return new HasOneRelationMarker(
+			TreeParameterMerger.mergeHasOneRelationsWithSamePlaceholders(original.relation, fresh.relation),
+			this.mergeEntityFields(original.fields, fresh.fields),
+		)
+	}
+
+	public static mergeHasManyRelationMarkers(original: HasManyRelationMarker, fresh: HasManyRelationMarker) {
+		return new HasManyRelationMarker(
+			TreeParameterMerger.mergeHasManyRelationsWithSamePlaceholders(original.relation, fresh.relation),
+			this.mergeEntityFields(original.fields, fresh.fields),
+		)
+	}
+
+	public static mergeSubTreeMarkers(original: SubTreeMarker, fresh: SubTreeMarker) {
+		return new SubTreeMarker(original.parameters, this.mergeEntityFields(original.fields, fresh.fields))
+	}
+
+	public static mergeFieldMarkers(original: FieldMarker, fresh: FieldMarker) {
+		if (original.isNonbearing !== fresh.isNonbearing && original.isNonbearing) {
+			// If only one isNonbearing, then the whole field is bearing
+			return fresh
+		}
+		// TODO warn in case of defaultValue differences
 		return original
 	}
 

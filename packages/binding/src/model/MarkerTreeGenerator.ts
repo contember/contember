@@ -34,7 +34,11 @@ export class MarkerTreeGenerator {
 		// TODO allow Fragment from here as well as handle it correctly from reportInvalidTopLevelError
 		for (const marker of processed) {
 			if (marker instanceof SubTreeMarker) {
-				subTreeMap.set(marker.placeholderName, marker)
+				const presentSubTree = subTreeMap.get(marker.placeholderName)
+				subTreeMap.set(
+					marker.placeholderName,
+					presentSubTree === undefined ? marker : MarkerMerger.mergeSubTreeMarkers(presentSubTree, marker),
+				)
 			} else {
 				this.reportInvalidTopLevelError(marker)
 			}
@@ -44,19 +48,15 @@ export class MarkerTreeGenerator {
 	}
 
 	private hoistDeepSubTrees(subTreeMap: Map<string, SubTreeMarker>): Map<string, SubTreeMarker> {
-		const hoistedMap: Map<string, SubTreeMarker> = new Map()
-		for (const [placeholderName, subTree] of subTreeMap) {
-			hoistedMap.set(placeholderName, subTree)
+		const hoistedMap: Map<string, SubTreeMarker> = new Map(subTreeMap)
+		for (const [, subTree] of hoistedMap) {
 			for (const nestedSubTree of this.hoistSubTeesFromEntityFields(subTree.fields)) {
 				const presentSubTree = hoistedMap.get(nestedSubTree.placeholderName)
 				hoistedMap.set(
 					nestedSubTree.placeholderName,
 					presentSubTree === undefined
 						? nestedSubTree
-						: new SubTreeMarker(
-								nestedSubTree.parameters,
-								MarkerMerger.mergeEntityFields(presentSubTree.fields, nestedSubTree.fields),
-						  ),
+						: MarkerMerger.mergeSubTreeMarkers(presentSubTree, nestedSubTree),
 				)
 			}
 		}

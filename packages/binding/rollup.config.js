@@ -66,11 +66,10 @@ export default [
 	{
 		input: 'dist/tests/index.js',
 		output: {
-			file: 'dist/tests/bundle.cjs',
+			file: 'dist/tests/bundle.spec.js',
 			format: 'cjs',
 			sourcemap: false,
 		},
-		external: ['jasmine'],
 		plugins: [replace(getReplaceConfig(false)), resolve(resolveConfig), commonjs(commonJsConfig)],
 	},
 ]

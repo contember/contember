@@ -103,7 +103,6 @@ export const useAccessorTreeState = ({
 		(data: QueryRequestResponse | undefined) => {
 			const normalizedData = QueryResponseNormalizer.normalizeResponse(data)
 			accessorTreeGenerator.initializeLiveTree(normalizedData, accessor => {
-				console.debug('data', accessor)
 				dispatch({
 					type: AccessorTreeStateActionType.SetData,
 					data: accessor,

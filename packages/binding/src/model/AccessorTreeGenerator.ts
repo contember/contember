@@ -181,15 +181,28 @@ class AccessorTreeGenerator {
 				break
 			}
 		}
-		this.updateData?.(
-			new TreeRootAccessor(
-				hasTreeWithUnpersistedChanges,
-				this.getEntityByKey,
-				this.getSubTree,
-				this.getAllEntities,
-				this.getAllTypeNames,
-			),
+		const treeRootAccessor = new TreeRootAccessor(
+			hasTreeWithUnpersistedChanges,
+			this.getEntityByKey,
+			this.getSubTree,
+			this.getAllEntities,
+			this.getAllTypeNames,
 		)
+
+		const states: Set<[InternalEntityState, InternalStateNode]> = new Set()
+		for (const [, entityState] of this.entityStore) {
+			if (entityState.hasUnpersistedChanges) {
+				for (const field of entityState.bearingChildrenToBePersisted || []) {
+					states.add([entityState, field])
+				}
+			}
+		}
+		if (__DEV_MODE__ || states.size) {
+			console.debug('unpersisted', states)
+		}
+
+		console.debug(treeRootAccessor)
+		this.updateData?.(treeRootAccessor)
 	}
 
 	private initializeSubTree(

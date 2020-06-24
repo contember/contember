@@ -632,7 +632,7 @@ class AccessorTreeGenerator {
 
 			for (const [fieldName, fieldState] of entityState.fields) {
 				if (fieldState === stateForDeletion) {
-					entityState.fields.delete(fieldName)
+					//entityState.fields.delete(fieldName) // TODO generate a new one instead.
 					entityState.plannedRemovals.set(fieldName, {
 						removalType: 'delete',
 						removedEntity: stateForDeletion,
@@ -644,6 +644,7 @@ class AccessorTreeGenerator {
 			} else {
 				entityState.nonbearingChildrenToBePersisted?.delete(stateForDeletion)
 			}
+			entityState.hasPendingParentNotification = true
 		}
 		const processFieldUpdate = (updatedState: InternalStateNode, isBearing: boolean) => {
 			this.markChildStateInNeedOfUpdate(entityState, updatedState)
@@ -747,30 +748,9 @@ class AccessorTreeGenerator {
 				batchUpdatesImplementation(() => {
 					if (updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
-						entityListState.childrenToBePersisted?.delete(updatedState)
 					} else {
-						this.markChildStateInNeedOfUpdate(entityListState, updatedState)
-						if (updatedState.hasUnpersistedChanges) {
-							if (entityListState.childrenToBePersisted === undefined) {
-								entityListState.childrenToBePersisted = new Set()
-							}
-							const alreadyMarked = entityListState.childrenToBePersisted.has(updatedState)
-							if (!alreadyMarked) {
-								entityListState.childrenToBePersisted.add(updatedState)
-								if (!entityListState.hasPendingUpdate) {
-									entityListState.hasPendingParentNotification = true
-								}
-							}
-							if (!alreadyMarked || (alreadyMarked && !entityListState.hasPendingUpdate)) {
-								entityListState.hasPendingParentNotification = true
-							}
-						} else {
-							if (entityListState.childrenToBePersisted?.delete(updatedState)) {
-								entityListState.hasPendingParentNotification = true
-							}
-						}
+						processEntityUpdate(updatedState)
 					}
-					//entityListState.hasPendingParentNotification = true
 					entityListState.hasStaleAccessor = true
 					updateHasUnpersistedChanges()
 				})
@@ -923,16 +903,40 @@ class AccessorTreeGenerator {
 
 			const key = this.idToKey(stateForDeletion.id)
 			entityListState.childrenKeys.delete(key)
+			entityListState.childrenToBePersisted?.delete(stateForDeletion)
+			entityListState.hasPendingParentNotification = true
 
 			if (stateForDeletion.id instanceof EntityAccessor.UnpersistedEntityId) {
-				// TODO remove it from the store
-				return
+				return // TODO remove it from the store
 			}
 
 			if (entityListState.plannedRemovals === undefined) {
 				entityListState.plannedRemovals = new Map()
 			}
 			entityListState.plannedRemovals.set(stateForDeletion, 'delete')
+		}
+
+		const processEntityUpdate = (updatedState: InternalEntityState) => {
+			this.markChildStateInNeedOfUpdate(entityListState, updatedState)
+			if (updatedState.hasUnpersistedChanges) {
+				if (entityListState.childrenToBePersisted === undefined) {
+					entityListState.childrenToBePersisted = new Set()
+				}
+				const alreadyMarked = entityListState.childrenToBePersisted.has(updatedState)
+				if (!alreadyMarked) {
+					entityListState.childrenToBePersisted.add(updatedState)
+					if (!entityListState.hasPendingUpdate) {
+						entityListState.hasPendingParentNotification = true
+					}
+				}
+				if (!alreadyMarked || (alreadyMarked && !entityListState.hasPendingUpdate)) {
+					entityListState.hasPendingParentNotification = true
+				}
+			} else {
+				if (entityListState.childrenToBePersisted?.delete(updatedState)) {
+					entityListState.hasPendingParentNotification = true
+				}
+			}
 		}
 
 		const generateNewEntityState = (persistedId: string | undefined): InternalEntityState => {

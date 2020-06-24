@@ -1,5 +1,5 @@
 export enum InternalStateType {
-	Field = 1,
-	SingleEntity,
-	EntityList,
+	Field = 'field',
+	SingleEntity = 'singleEntity',
+	EntityList = 'entityList',
 }

@@ -1,12 +1,10 @@
 import Path from '../select/Path'
 import Mapper from '../Mapper'
 import WhereBuilder from '../select/WhereBuilder'
-import { Client, Operator } from '@contember/database'
+import { Client, LimitByGroupWrapper, Operator, SelectBuilder } from '@contember/database'
 import { Input, Model, Value } from '@contember/schema'
 import OrderByBuilder from './OrderByBuilder'
 import PredicatesInjector from '../../acl/PredicatesInjector'
-import { LimitByGroupWrapper } from '@contember/database'
-import { SelectBuilder } from '@contember/database'
 import { ObjectNode } from '../../inputProcessing'
 
 class JunctionFetcher {
@@ -38,7 +36,11 @@ class JunctionFetcher {
 			this.predicateInjector.inject(targetEntity, object.args.filter || {}),
 		)
 		const where = queryWithPredicates.args.filter
-		if (where && Object.keys(where).length > 0) {
+		const hasWhere = where && Object.keys(where).length > 0
+		const hasFieldOrderBy =
+			object.args.orderBy && object.args.orderBy.length > 0 && object.args.orderBy[0]._random === undefined
+
+		if (hasWhere || hasFieldOrderBy) {
 			const path = new Path([])
 			qb = qb.join(targetEntity.tableName, path.getAlias(), condition =>
 				condition.compareColumns(['junction_', column.targetColumn.columnName], Operator.eq, [
@@ -46,7 +48,10 @@ class JunctionFetcher {
 					targetEntity.primaryColumn,
 				]),
 			)
-			qb = this.whereBuilder.build(qb, targetEntity, path, where)
+		}
+
+		if (where && hasWhere) {
+			qb = this.whereBuilder.build(qb, targetEntity, new Path([]), where)
 		}
 
 		const wrapper = new LimitByGroupWrapper(

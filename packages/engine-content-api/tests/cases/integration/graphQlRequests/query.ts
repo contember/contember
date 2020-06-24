@@ -2007,6 +2007,7 @@ order by "root_"."order" asc, "root_"."id" asc`,
 				{
 					sql: SQL`select "junction_"."category_id", "junction_"."post_id"
 from  "public"."post_categories" as "junction_"
+inner join "public"."category" as "root_" on "junction_"."category_id" = "root_"."id"
 where "junction_"."post_id" in (?, ?)   order by "root_"."name" asc, "root_"."id" asc`,
 					parameters: [testUuid(1), testUuid(2)],
 					response: {

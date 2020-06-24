@@ -530,10 +530,7 @@ class AccessorTreeGenerator {
 			connectEntityAtField: (field, entityToConnectOrItsKey) => {
 				this.performRootTreeOperation(() => {
 					performOperationWithBeforeUpdate(() => {
-						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(
-							entityState,
-							entityToConnectOrItsKey,
-						)
+						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
 
 						if (entityState.plannedRemovals) {
 							// If the entity was previously scheduled for removal, undo that.
@@ -786,10 +783,7 @@ class AccessorTreeGenerator {
 			connectEntity: entityToConnectOrItsKey => {
 				this.performRootTreeOperation(() => {
 					performOperationWithBeforeUpdate(() => {
-						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(
-							entityListState,
-							entityToConnectOrItsKey,
-						)
+						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
 
 						if (connectedState.hasUnpersistedChanges || !entityListState.persistedEntityIds.has(connectedEntityKey)) {
 							if (entityListState.childrenToBePersisted === undefined) {
@@ -1100,7 +1094,6 @@ class AccessorTreeGenerator {
 	}
 
 	private resolveAndPrepareEntityToConnect(
-		rootState: InternalEntityState | InternalEntityListState,
 		entityToConnectOrItsKey: string | EntityAccessor,
 	): [string, InternalEntityState] {
 		let connectedEntityKey: string

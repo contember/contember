@@ -1,5 +1,4 @@
 import { DatabaseCredentials } from '@contember/database'
-import migrate from './runner'
 import { ClientBase } from 'pg'
 import { RunnerOptionClient, RunnerOptionUrl } from 'node-pg-migrate/dist/types'
 import { createDatabaseIfNotExists } from './helpers'
@@ -17,6 +16,7 @@ export class MigrationsRunner {
 		const dbParams: RunnerOptionClient | RunnerOptionUrl = this.dbClient
 			? { dbClient: this.dbClient }
 			: { databaseUrl: this.db }
+		const migrate = (await import('./runner')).default
 		await migrate({
 			...dbParams,
 			dir: this.dir,

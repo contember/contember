@@ -96,7 +96,7 @@ export class ApiTester {
 
 		const db = databaseContextFactory.create(unnamedIdentity)
 
-		const pgClient = createPgClient(dbCredentials(dbName))
+		const pgClient = await createPgClient(dbCredentials(dbName))
 		await pgClient.connect()
 		const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)
 		const dbContextMigrations = databaseContextFactory

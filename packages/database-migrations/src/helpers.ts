@@ -1,6 +1,6 @@
 import { MigrationBuilder } from 'node-pg-migrate'
 import { Client, ClientConfig } from 'pg'
-import { Connection, DatabaseCredentials, wrapIdentifier } from '@contember/database'
+import { DatabaseCredentials } from '@contember/database'
 
 export function createMigrationBuilder(): MigrationBuilder & { getSql: () => string; getSqlSteps: () => string[] } {
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -21,11 +21,15 @@ export function escapeValue(value: any): any {
 	return pgEscape(value)
 }
 
-export function createPgClient(cfg: ClientConfig) {
-	return new Client(cfg)
+const wrapIdentifier = (value: string) => '"' + value.replace(/"/g, '""') + '"'
+
+export async function createPgClient(cfg: ClientConfig): Promise<Client> {
+	const client = (await import('pg')).Client
+	return new client(cfg)
 }
 
 export const createDatabaseIfNotExists = async (db: DatabaseCredentials) => {
+	const Connection = (await import('@contember/database')).Connection
 	const connection = new Connection({ ...db, database: 'postgres' }, {})
 	const result = await connection.query('SELECT 1 FROM "pg_database" WHERE "datname" = ?', [db.database])
 

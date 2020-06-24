@@ -29,7 +29,7 @@ export class ProjectInitializer {
 			// eslint-disable-next-line no-console
 			console.group(`Executing system schema migration`)
 			await createDatabaseIfNotExists(project.db)
-			const pgClient = createPgClient(project.db)
+			const pgClient = await createPgClient(project.db)
 			await pgClient.connect()
 			const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)
 			const dbContextMigrations = databaseContextFactory

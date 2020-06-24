@@ -8,7 +8,6 @@ import { InternalStateNode } from './InternalStateNode'
 import { InternalStateType } from './InternalStateType'
 
 export interface InternalEntityFieldPlannedRemoval {
-	field: FieldName
 	removalType: RemovalType
 	removedEntity: InternalEntityState
 }
@@ -38,7 +37,7 @@ export interface InternalEntityState {
 	nonbearingChildrenToBePersisted: Set<InternalStateNode> | undefined
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	persistedData: SingleEntityPersistedData | undefined
-	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined
+	plannedRemovals: Map<FieldName, InternalEntityFieldPlannedRemoval> | undefined
 
 	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.

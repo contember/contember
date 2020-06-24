@@ -475,45 +475,9 @@ class AccessorTreeGenerator {
 							: !updatedState.creationParameters.isNonbearing
 
 					if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
-						processEntityDeletion(updatedState)
-						if (isBearing) {
-							entityState.bearingChildrenToBePersisted?.delete(updatedState)
-						} else {
-							entityState.nonbearingChildrenToBePersisted?.delete(updatedState)
-						}
+						processEntityDeletion(updatedState, isBearing)
 					} else {
-						this.markChildStateInNeedOfUpdate(entityState, updatedState)
-
-						if (updatedState.hasUnpersistedChanges) {
-							let alreadyMarked: boolean
-							if (isBearing) {
-								if (entityState.bearingChildrenToBePersisted === undefined) {
-									entityState.bearingChildrenToBePersisted = new Set()
-								}
-								alreadyMarked = entityState.bearingChildrenToBePersisted.has(updatedState)
-								if (!alreadyMarked) {
-									entityState.bearingChildrenToBePersisted.add(updatedState)
-								}
-							} else {
-								if (entityState.nonbearingChildrenToBePersisted === undefined) {
-									entityState.nonbearingChildrenToBePersisted = new Set()
-								}
-								alreadyMarked = entityState.nonbearingChildrenToBePersisted.has(updatedState)
-								if (!alreadyMarked) {
-									entityState.nonbearingChildrenToBePersisted.add(updatedState)
-								}
-							}
-							if (!alreadyMarked || (alreadyMarked && !entityState.hasPendingUpdate)) {
-								entityState.hasPendingParentNotification = true
-							}
-						} else {
-							const didDelete = isBearing
-								? !!entityState.bearingChildrenToBePersisted?.delete(updatedState)
-								: !!entityState.nonbearingChildrenToBePersisted?.delete(updatedState)
-							if (didDelete) {
-								entityState.hasPendingParentNotification = true
-							}
-						}
+						processFieldUpdate(updatedState, isBearing)
 					}
 					entityState.hasStaleAccessor = true
 					updateHasUnpersistedChanges()
@@ -534,14 +498,14 @@ class AccessorTreeGenerator {
 
 						if (entityState.plannedRemovals) {
 							// If the entity was previously scheduled for removal, undo that.
-							for (const plannedRemoval of entityState.plannedRemovals) {
+							for (const [fieldName, plannedRemoval] of entityState.plannedRemovals) {
 								if (plannedRemoval.removedEntity === connectedState) {
-									entityState.plannedRemovals.delete(plannedRemoval)
+									entityState.plannedRemovals.delete(fieldName)
 								}
 							}
 						}
 
-						throw new BindingError('EntityAccessor.connectEntity: not implemented')
+						throw new BindingError('EntityAccessor.connectEntity: not implemented') // TODO
 						//connectedState.realms.set(entityState.fieldMarkers, onChildEntityUpdate)
 						//entityState.fields.add(connectedEntityKey)
 						//updateAccessorInstance()
@@ -659,21 +623,59 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		const processEntityDeletion = (stateForDeletion: InternalEntityState) => {
+		const processEntityDeletion = (stateForDeletion: InternalEntityState, isBearing: boolean) => {
 			entityState.childrenWithPendingUpdates?.delete(stateForDeletion)
 
 			if (entityState.plannedRemovals === undefined) {
-				entityState.plannedRemovals = new Set()
+				entityState.plannedRemovals = new Map()
 			}
 
 			for (const [fieldName, fieldState] of entityState.fields) {
 				if (fieldState === stateForDeletion) {
 					entityState.fields.delete(fieldName)
-					entityState.plannedRemovals.add({
-						field: fieldName,
+					entityState.plannedRemovals.set(fieldName, {
 						removalType: 'delete',
 						removedEntity: stateForDeletion,
 					})
+				}
+			}
+			if (isBearing) {
+				entityState.bearingChildrenToBePersisted?.delete(stateForDeletion)
+			} else {
+				entityState.nonbearingChildrenToBePersisted?.delete(stateForDeletion)
+			}
+		}
+		const processFieldUpdate = (updatedState: InternalStateNode, isBearing: boolean) => {
+			this.markChildStateInNeedOfUpdate(entityState, updatedState)
+
+			if (updatedState.hasUnpersistedChanges) {
+				let alreadyMarked: boolean
+				if (isBearing) {
+					if (entityState.bearingChildrenToBePersisted === undefined) {
+						entityState.bearingChildrenToBePersisted = new Set()
+					}
+					alreadyMarked = entityState.bearingChildrenToBePersisted.has(updatedState)
+					if (!alreadyMarked) {
+						entityState.bearingChildrenToBePersisted.add(updatedState)
+					}
+				} else {
+					if (entityState.nonbearingChildrenToBePersisted === undefined) {
+						entityState.nonbearingChildrenToBePersisted = new Set()
+					}
+					alreadyMarked = entityState.nonbearingChildrenToBePersisted.has(updatedState)
+					if (!alreadyMarked) {
+						entityState.nonbearingChildrenToBePersisted.add(updatedState)
+					}
+				}
+				if (!alreadyMarked || (alreadyMarked && !entityState.hasPendingUpdate)) {
+					entityState.hasPendingParentNotification = true
+				}
+			} else {
+				const didDelete = isBearing
+					? !!entityState.bearingChildrenToBePersisted?.delete(updatedState)
+					: !!entityState.nonbearingChildrenToBePersisted?.delete(updatedState)
+				if (didDelete) {
+					entityState.hasPendingParentNotification = true
 				}
 			}
 		}

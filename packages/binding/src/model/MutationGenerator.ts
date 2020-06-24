@@ -76,18 +76,18 @@ export class MutationGenerator {
 				)
 			}
 			if (rootState.plannedRemovals) {
-				for (const { removedEntity, removalType } of rootState.plannedRemovals) {
-					if (removalType === 'delete') {
-						queryBuilder = this.addDeleteMutation(
-							removedEntity,
-							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.getAccessor())),
-							parameters,
-							queryBuilder,
-						)
-					} else if (removalType === 'disconnect') {
-						throw new BindingError(`EntityList: cannot disconnect top-level entities.`)
-					}
-				}
+				// for (const { removedEntity, removalType } of rootState.plannedRemovals) {
+				// 	if (removalType === 'delete') {
+				// 		queryBuilder = this.addDeleteMutation(
+				// 			removedEntity,
+				// 			AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.getAccessor())),
+				// 			parameters,
+				// 			queryBuilder,
+				// 		)
+				// 	} else if (removalType === 'disconnect') {
+				// 		throw new BindingError(`EntityList: cannot disconnect top-level entities.`)
+				// 	}
+				// }
 			}
 		} else {
 			assertNever(rootState)

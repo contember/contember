@@ -315,7 +315,12 @@ describe('query builder', () => {
 
 				await new LimitByGroupWrapper(
 					['foo', 'lorem'],
-					(orderable, qb) => [orderable.orderBy(['foo', 'ipsum']), qb],
+					(orderable, qb) => {
+						if (orderable) {
+							return [orderable.orderBy(['foo', 'ipsum']), qb.orderBy(['foo', 'ipsum'])]
+						}
+						return [null, qb.orderBy(['foo', 'ipsum'])]
+					},
 					1,
 					3,
 				).getResult(qb, wrapper)

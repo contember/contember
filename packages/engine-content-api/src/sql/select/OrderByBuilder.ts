@@ -9,7 +9,7 @@ import { UserError } from '../../exception'
 class OrderByBuilder {
 	constructor(private readonly schema: Model.Schema, private readonly joinBuilder: JoinBuilder) {}
 
-	public build<Orderable extends QueryBuilder.Orderable<any>>(
+	public build<Orderable extends QueryBuilder.Orderable<any> | null>(
 		qb: SelectBuilder<SelectBuilder.Result>,
 		orderable: Orderable,
 		entity: Model.Entity,
@@ -22,12 +22,12 @@ class OrderByBuilder {
 		)
 	}
 
-	private buildOne<Orderable extends QueryBuilder.Orderable<any>>(
+	private buildOne<Orderable extends QueryBuilder.Orderable<any> | null>(
 		qb: SelectBuilder<SelectBuilder.Result>,
 		orderable: Orderable,
 		entity: Model.Entity,
 		path: Path,
-		orderBy: Input.FieldOrderBy,
+		orderBy: Input.OrderBy,
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
@@ -38,10 +38,12 @@ class OrderByBuilder {
 
 		if (typeof value === 'string') {
 			const columnName = getColumnName(this.schema, entity, fieldName)
-			const prevOrderable: any = orderable
-			orderable = orderable.orderBy([path.getAlias(), columnName], value as Input.OrderDirection)
-			if (qb === prevOrderable) {
-				qb = (orderable as any) as SelectBuilder
+			const applyOrder = <Orderable extends QueryBuilder.Orderable<any>>(orderable: Orderable) =>
+				orderable.orderBy([path.getAlias(), columnName], value as Input.OrderDirection)
+
+			qb = applyOrder(qb)
+			if (orderable !== null) {
+				orderable = applyOrder(orderable as QueryBuilder.Orderable<any>)
 			}
 			return [qb, orderable]
 		} else {
@@ -50,11 +52,8 @@ class OrderByBuilder {
 				throw new Error(`OrderByBuilder: target entity for relation ${entity.name}::${fieldName} not found`)
 			}
 			const newPath = path.for(fieldName)
-			const prevQb: any = qb
 			const joined = this.joinBuilder.join(qb, newPath, entity, fieldName)
-			if (prevQb === orderable) {
-				orderable = (joined as any) as Orderable
-			}
+
 			return this.buildOne(joined, orderable, targetEntity, newPath, value)
 		}
 	}

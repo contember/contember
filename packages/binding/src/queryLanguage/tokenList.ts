@@ -1,8 +1,8 @@
 import { createToken, Lexer } from 'chevrotain'
 
 export namespace TokenRegExps {
-	export const entityIdentifier = /[A-Z]\w*/
-	export const identifier = /[a-zA-Z]\w*/
+	export const entityIdentifier = /[A-Z_]\w*/
+	export const identifier = /[a-zA-Z_]\w*/
 }
 
 const identifier = createToken({

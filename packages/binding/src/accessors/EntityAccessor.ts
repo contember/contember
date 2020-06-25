@@ -29,7 +29,6 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly typeName: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
 		public readonly errors: ErrorAccessor[],
-		public readonly hasUnpersistedChanges: boolean,
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: EntityAccessor.BatchUpdates,
 		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField | undefined,

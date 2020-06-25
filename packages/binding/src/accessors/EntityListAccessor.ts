@@ -8,7 +8,6 @@ class EntityListAccessor extends Accessor implements Errorable {
 		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
 		private readonly childEntityKeys: ReadonlySet<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
-		public readonly hasUnpersistedChanges: boolean,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
 		public readonly connectEntity: EntityListAccessor.ConnectEntity | undefined,

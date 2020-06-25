@@ -105,6 +105,7 @@ class AccessorTreeGenerator {
 
 	private isFrozenWhileUpdating = false
 	private treeWideBatchUpdateDepth = 0
+	private unpersistedChangesCount = 0
 
 	public constructor(private markerTree: MarkerTreeRoot) {}
 
@@ -439,12 +440,12 @@ class AccessorTreeGenerator {
 							entityState.deleteEntity,
 						)
 					}
-					return accessor!
+					return accessor
 				}
 			})(),
 			onChildFieldUpdate: (updatedState: InternalStateNode) => {
 				// No before update for child updates!
-				const performUpdates = () => {
+				batchUpdatesImplementation(() => {
 					if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
 					} else {
@@ -452,8 +453,7 @@ class AccessorTreeGenerator {
 					}
 					entityState.hasStaleAccessor = true
 					entityState.hasPendingParentNotification = true
-				}
-				batchUpdatesImplementation(performUpdates)
+				})
 			},
 			batchUpdates: performUpdates => {
 				this.performRootTreeOperation(() => {
@@ -650,7 +650,7 @@ class AccessorTreeGenerator {
 							entityListState.disconnectEntity,
 						)
 					}
-					return accessor!
+					return accessor
 				}
 			})(),
 			onChildEntityUpdate: updatedState => {
@@ -681,9 +681,20 @@ class AccessorTreeGenerator {
 					performOperationWithBeforeUpdate(() => {
 						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
 
+						if (entityListState.childrenKeys.has(connectedEntityKey)) {
+							return
+						}
+
 						connectedState.realms.add(entityListState.onChildEntityUpdate)
 						entityListState.childrenKeys.add(connectedEntityKey)
 						entityListState.plannedRemovals?.delete(connectedState)
+
+						if (entityListState.persistedEntityIds.has(connectedEntityKey)) {
+							// It was removed from the list but now we're adding it back.
+							this.unpersistedChangesCount--
+						} else {
+							this.unpersistedChangesCount++
+						}
 
 						entityListState.hasPendingParentNotification = true
 						entityListState.hasStaleAccessor = true
@@ -727,6 +738,14 @@ class AccessorTreeGenerator {
 							}
 							entityListState.plannedRemovals.set(disconnectedChildState, 'disconnect')
 						}
+
+						if (entityListState.persistedEntityIds.has(disconnectedChildKey)) {
+							this.unpersistedChangesCount++
+						} else {
+							// It wasn't on the list, then it was, and now we're removing it again.
+							this.unpersistedChangesCount--
+						}
+
 						entityListState.childrenKeys.delete(disconnectedChildKey)
 						entityListState.hasPendingParentNotification = true
 						entityListState.hasStaleAccessor = true
@@ -866,7 +885,7 @@ class AccessorTreeGenerator {
 			fieldMarker,
 			onFieldUpdate,
 			placeholderName,
-			persistedValue: persistedValue === undefined ? null : persistedValue,
+			persistedValue,
 			currentValue: resolvedFieldValue,
 			addEventListener: undefined as any,
 			eventListeners: {
@@ -885,7 +904,7 @@ class AccessorTreeGenerator {
 						accessor = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
 							fieldState.placeholderName,
 							fieldState.currentValue,
-							fieldState.persistedValue,
+							fieldState.persistedValue === undefined ? null : fieldState.persistedValue,
 							fieldState.fieldMarker.defaultValue,
 							fieldState.errors,
 							fieldState.hasUnpersistedChanges,
@@ -894,7 +913,7 @@ class AccessorTreeGenerator {
 							fieldState.updateValue,
 						)
 					}
-					return accessor!
+					return accessor
 				}
 			})(),
 			updateValue: (
@@ -920,7 +939,21 @@ class AccessorTreeGenerator {
 							? fieldState.fieldMarker.defaultValue
 							: newValue
 					const normalizedValue = resolvedValue instanceof GraphQlBuilder.Literal ? resolvedValue.value : resolvedValue
-					fieldState.hasUnpersistedChanges = normalizedValue !== fieldState.persistedValue
+					const normalizedPersistedValue = fieldState.persistedValue === undefined ? null : fieldState.persistedValue
+					const hadUnpersistedChangesBefore = fieldState.hasUnpersistedChanges
+					const hasUnpersistedChangesNow = normalizedValue !== normalizedPersistedValue
+					fieldState.hasUnpersistedChanges = hasUnpersistedChangesNow
+
+					const shouldInfluenceUpdateCount =
+						!fieldState.fieldMarker.isNonbearing || fieldState.persistedValue !== undefined
+
+					if (shouldInfluenceUpdateCount) {
+						if (!hadUnpersistedChangesBefore && hasUnpersistedChangesNow) {
+							this.unpersistedChangesCount++
+						} else if (hadUnpersistedChangesBefore && !hasUnpersistedChangesNow) {
+							this.unpersistedChangesCount--
+						}
+					}
 
 					fieldState.onFieldUpdate(fieldState)
 				})

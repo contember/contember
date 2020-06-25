@@ -232,45 +232,6 @@ class AccessorTreeGenerator {
 		// is rather inefficient. However, there are cases where we do want to do this. (E.g. refresh after a persist)
 		// or when a reference further down the tree would introduce more fields.
 		for (const [placeholderName, field] of fieldMarkers) {
-			if (placeholderName === PRIMARY_KEY_NAME) {
-				// TODO get rid of this verbose monstrosity and handle ids properly.
-				// Falling back to null since that's what fields do. Arguably, we could also stringify the unpersisted entity id. Which is better?
-				const idValue = typeof entityState.id === 'string' ? entityState.id : null
-				entityState.fields.set(placeholderName, {
-					type: InternalStateType.Field,
-					currentValue: idValue,
-					hasStaleAccessor: true,
-					hasUnpersistedChanges: false,
-					getAccessor: () =>
-						new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
-							placeholderName,
-							idValue,
-							idValue,
-							undefined,
-							emptyArray, // There cannot be errors associated with the id, right? If so, we should probably handle them at the Entity level.
-							false,
-							returnFalse, // IDs cannot be updated, and thus they cannot be touched either
-							() => noop, // It won't ever fire but at the same time it makes other code simpler.
-							undefined, // IDs cannot be updated
-						),
-					addEventListener: () => noop,
-					eventListeners: {
-						beforeUpdate: undefined,
-						update: undefined,
-					},
-					placeholderName,
-					fieldMarker: field as FieldMarker,
-					onFieldUpdate: noop,
-					errors: emptyArray,
-					touchLog: undefined,
-					hasPendingUpdate: false,
-					persistedValue: idValue,
-					isTouchedBy: returnFalse,
-					updateValue: undefined as any,
-				})
-				continue
-			}
-
 			if (field instanceof FieldMarker) {
 				const fieldDatum = entityState.persistedData?.get(placeholderName)
 

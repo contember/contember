@@ -9,7 +9,6 @@ import {
 	FieldAccessor,
 	HasMany,
 	HasOne,
-	PRIMARY_KEY_NAME,
 	QualifiedEntityList,
 	QualifiedFieldList,
 	QueryLanguage,
@@ -224,15 +223,10 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		let reference: React.ReactNode
 		let entityListDataProvider: React.ReactNode
 
-		const idField = <Field field={PRIMARY_KEY_NAME} />
 		if (props.arity === 'single') {
-			reference = <HasOne field={props.field}>{idField}</HasOne>
+			reference = <HasOne field={props.field} />
 		} else if (props.arity === 'multiple') {
-			reference = (
-				<HasMany field={props.field} initialEntityCount={0}>
-					{idField}
-				</HasMany>
-			)
+			reference = <HasMany field={props.field} initialEntityCount={0} />
 		} else {
 			assertNever(props)
 		}

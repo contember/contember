@@ -105,7 +105,7 @@ export class QueryGenerator {
 
 		for (const [, fieldValue] of fields) {
 			if (fieldValue instanceof FieldMarker) {
-				if (fieldValue.fieldName !== PRIMARY_KEY_NAME) {
+				if (fieldValue.fieldName !== PRIMARY_KEY_NAME && fieldValue.fieldName !== TYPENAME_KEY_NAME) {
 					builder = builder.column(fieldValue.fieldName)
 				}
 			} else if (fieldValue instanceof HasOneRelationMarker) {
@@ -161,7 +161,6 @@ export class QueryGenerator {
 				builder = builder.anyRelation(
 					relation.field,
 					withLimit,
-					// TODO this will currently always go to the latter condition, resulting in less than ideal queries.
 					fieldValue.placeholderName === relation.field ? undefined : fieldValue.placeholderName,
 				)
 			} else if (fieldValue instanceof SubTreeMarker) {

@@ -132,30 +132,4 @@ describe('Marker tree generator', () => {
 			expect(() => new MarkerTreeGenerator(faultyTop).generate()).toThrowError()
 		}
 	})
-
-	it('should enforce mandatory children', () => {
-		const list = (
-			<EntityListSubTree entities="Foo">
-				<></>
-			</EntityListSubTree>
-		)
-		const hasOne = (
-			<SingleEntitySubTree entity="Foo">
-				<HasOne field="foo">
-					<></>
-				</HasOne>
-			</SingleEntitySubTree>
-		)
-		const hasMany = (
-			<SingleEntitySubTree entity="Foo">
-				<HasMany field="foo">
-					<></>
-				</HasMany>
-			</SingleEntitySubTree>
-		)
-
-		for (const faultyChildren of [list, hasOne, hasMany]) {
-			expect(() => new MarkerTreeGenerator(faultyChildren).generate()).toThrowError()
-		}
-	})
 })

@@ -1,9 +1,11 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { useSingleEntitySubTree } from '../accessorPropagation'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
 import { Component } from './Component'
+import { Field } from './Field'
 import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
 export type SingleEntitySubTreeProps<EntityProps> = {
@@ -37,7 +39,13 @@ export const SingleEntitySubTree = Component(
 			}
 			return MarkerFactory.createSingleEntitySubTreeMarker(environment, props, fields)
 		},
-		generateSyntheticChildren: props => <SingleEntity {...props} accessor={0 as any} />,
+		generateSyntheticChildren: props => (
+			<SingleEntity {...props} accessor={0 as any}>
+				<Field field={PRIMARY_KEY_NAME} />
+				<Field field={TYPENAME_KEY_NAME} />
+				{props.children}
+			</SingleEntity>
+		),
 	},
 	'SingleEntitySubTree',
 ) as <EntityProps>(pros: SingleEntitySubTreeProps<EntityProps>) => React.ReactElement

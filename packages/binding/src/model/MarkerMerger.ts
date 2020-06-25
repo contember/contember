@@ -1,4 +1,5 @@
 import { BindingError } from '../BindingError'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFieldMarkers,
 	FieldMarker,
@@ -92,6 +93,17 @@ export class MarkerMerger {
 		}
 		// TODO warn in case of defaultValue differences
 		return original
+	}
+
+	public static mergeInSystemFields(original: EntityFieldMarkers) {
+		const primaryKey = new FieldMarker(PRIMARY_KEY_NAME)
+		const typeName = new FieldMarker(TYPENAME_KEY_NAME)
+		// We could potentially share this map for all fields. Maybe sometime later.
+		const freshFields: EntityFieldMarkers = new Map([
+			[primaryKey.placeholderName, primaryKey],
+			[typeName.placeholderName, typeName],
+		])
+		return this.mergeEntityFields(original, freshFields)
 	}
 
 	private static rejectRelationScalarCombo(fieldName: FieldName): never {

@@ -124,7 +124,11 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 				const insertPromise = this.mapper.insert(context.targetEntity, context.input)
 				await this.insertBuilder.addFieldValue(context.relation.name, async () => {
 					const insertResult = await insertPromise
-					return getInsertPrimary(insertResult)
+					const primary = getInsertPrimary(insertResult)
+					if (!primary) {
+						return AbortInsert
+					}
+					return primary
 				})
 				return await insertPromise
 			},
@@ -183,7 +187,11 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 				const insertPromise = this.mapper.insert(context.targetEntity, context.input)
 				await this.insertBuilder.addFieldValue(context.relation.name, async () => {
 					const insertResult = await insertPromise
-					return getInsertPrimary(insertResult)
+					const primary = getInsertPrimary(insertResult)
+					if (!primary) {
+						return AbortInsert
+					}
+					return primary
 				})
 				return await insertPromise
 			},

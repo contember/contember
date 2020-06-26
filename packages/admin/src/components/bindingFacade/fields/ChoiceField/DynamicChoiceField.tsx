@@ -9,6 +9,7 @@ import {
 	FieldAccessor,
 	HasMany,
 	HasOne,
+	PlaceholderGenerator,
 	QualifiedEntityList,
 	QualifiedFieldList,
 	QueryLanguage,
@@ -184,12 +185,20 @@ export const useDynamicChoiceField = <DynamicArity extends ChoiceFieldData.Choic
 					return
 				}
 
-				// TODO field names
-				// TODO we maybe shouldn't even use currentValueEntity for hasOne connections
+				const currentValueParent =
+					desugaredRelativePath.hasOneRelationPath.length > 1
+						? parentEntity.getRelativeSingleEntity({
+								hasOneRelationPath: desugaredRelativePath.hasOneRelationPath.slice(0, -1),
+						  })
+						: parentEntity
+				const lastHasOneRelation =
+					desugaredRelativePath.hasOneRelationPath[desugaredRelativePath.hasOneRelationPath.length - 1]
+				const hasOneFieldPlaceholder = PlaceholderGenerator.getHasOneRelationPlaceholder(lastHasOneRelation)
+
 				if (newValue === -1) {
-					currentValueEntity.disconnectEntityAtField?.('TODO')
+					currentValueParent.disconnectEntityAtField?.(hasOneFieldPlaceholder)
 				} else {
-					currentValueEntity.connectEntityAtField?.('TODO', filteredOptions[newValue])
+					currentValueParent.connectEntityAtField?.(hasOneFieldPlaceholder, filteredOptions[newValue])
 				}
 			},
 		}

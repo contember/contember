@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../../../../src'
 import { Field, HasMany, HasOne, SingleEntitySubTree } from '../../../../src/coreComponents'
 import {
 	FieldMarker,
@@ -49,6 +50,9 @@ describe('Marker tree generator', () => {
 			),
 		)
 
+		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
+		const typeNameMarker = [TYPENAME_KEY_NAME, new FieldMarker(TYPENAME_KEY_NAME)] as const
+
 		const innerHasMany = new HasManyRelationMarker(
 			{
 				field: 'common',
@@ -62,6 +66,8 @@ describe('Marker tree generator', () => {
 				limit: undefined,
 			},
 			new Map([
+				idMarker,
+				typeNameMarker,
 				['same', new FieldMarker('same')],
 				['name', new FieldMarker('name')],
 				['surname', new FieldMarker('surname')],
@@ -78,6 +84,8 @@ describe('Marker tree generator', () => {
 				reducedBy: undefined,
 			},
 			new Map<string, Marker>([
+				idMarker,
+				typeNameMarker,
 				[innerHasMany.placeholderName, innerHasMany],
 				['hasOneField', new FieldMarker('hasOneField')],
 			]),
@@ -96,6 +104,8 @@ describe('Marker tree generator', () => {
 				limit: undefined,
 			},
 			new Map<string, Marker>([
+				idMarker,
+				typeNameMarker,
 				['hasManyField', new FieldMarker('hasManyField')],
 				[hasOne.placeholderName, hasOne],
 			]),
@@ -108,6 +118,8 @@ describe('Marker tree generator', () => {
 				hasOneRelationPath: [],
 			}),
 			new Map<string, Marker>([
+				idMarker,
+				typeNameMarker,
 				[outerHasMany.placeholderName, outerHasMany],
 				['fooField', new FieldMarker('fooField')],
 			]),

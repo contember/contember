@@ -7,11 +7,6 @@ import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
 import { InternalStateNode } from './InternalStateNode'
 import { InternalStateType } from './InternalStateType'
 
-export interface InternalEntityFieldPlannedRemoval {
-	removalType: RemovalType
-	removedEntity: InternalEntityState
-}
-
 export type OnEntityUpdate = (state: InternalStateNode) => void
 export type OnEntityFieldUpdate = (state: InternalStateNode) => void
 export interface InternalEntityState {
@@ -34,7 +29,6 @@ export interface InternalEntityState {
 	isScheduledForDeletion: boolean
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	persistedData: SingleEntityPersistedData | undefined
-	plannedRemovals: Map<FieldName, InternalEntityFieldPlannedRemoval> | undefined
 
 	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.

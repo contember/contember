@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
-import { emptyArray, noop, returnFalse } from '@contember/react-utils'
+import { emptyArray, noop } from '@contember/react-utils'
 import * as ReactDOM from 'react-dom'
 import {
 	EntityAccessor,
@@ -11,7 +11,7 @@ import {
 } from '../accessors'
 import { BoxedSingleEntityId, NormalizedQueryResponseData, PersistedEntityDataStore } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFieldMarkers,
 	FieldMarker,
@@ -378,7 +378,6 @@ class AccessorTreeGenerator {
 			id,
 			isScheduledForDeletion: false,
 			persistedData: this.persistedEntityData.get(entityKey),
-			plannedRemovals: undefined,
 			realms: new Set([onEntityUpdate]),
 			typeName: undefined,
 			getAccessor: (() => {
@@ -408,7 +407,7 @@ class AccessorTreeGenerator {
 				// No before update for child updates!
 				batchUpdatesImplementation(() => {
 					if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
-						processEntityDeletion(updatedState)
+						entityState.childrenWithPendingUpdates?.delete(updatedState)
 					} else {
 						this.markChildStateInNeedOfUpdate(entityState, updatedState)
 					}
@@ -423,24 +422,54 @@ class AccessorTreeGenerator {
 					})
 				})
 			},
-			connectEntityAtField: (field, entityToConnectOrItsKey) => {
+			connectEntityAtField: (placeholderName, entityToConnectOrItsKey) => {
 				this.performRootTreeOperation(() => {
 					performOperationWithBeforeUpdate(() => {
-						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
+						const hasOneMarker = resolveHasOneRelationMarker(
+							placeholderName,
+							`Cannot connect at field '${placeholderName}' as it doesn't refer to a has one relation. ` +
+								`Perhaps you forgot to generate a placeholder?`,
+						)
+						const previouslyConnectedState = entityState.fields.get(placeholderName)
 
-						if (entityState.plannedRemovals) {
-							// If the entity was previously scheduled for removal, undo that.
-							for (const [fieldName, plannedRemoval] of entityState.plannedRemovals) {
-								if (plannedRemoval.removedEntity === connectedState) {
-									entityState.plannedRemovals.delete(fieldName)
-								}
-							}
+						if (
+							previouslyConnectedState === undefined ||
+							previouslyConnectedState.type !== InternalStateType.SingleEntity
+						) {
+							this.rejectInvalidAccessorTree()
 						}
 
-						throw new BindingError('EntityAccessor.connectEntity: not implemented') // TODO
-						//connectedState.realms.set(entityState.fieldMarkers, onChildEntityUpdate)
-						//entityState.fields.add(connectedEntityKey)
-						//updateAccessorInstance()
+						const [connectedEntityKey, newlyConnectedState] = this.resolveAndPrepareEntityToConnect(
+							entityToConnectOrItsKey,
+						)
+
+						if (previouslyConnectedState === newlyConnectedState) {
+							return // Do nothing.
+						}
+
+						const persistedKey = entityState.persistedData?.get(placeholderName)
+						if (persistedKey instanceof BoxedSingleEntityId) {
+							if (persistedKey.id === connectedEntityKey) {
+								this.unpersistedChangesCount-- // It was removed from the list but now we're adding it back.
+							} else {
+								this.unpersistedChangesCount++
+							}
+						} else if (persistedKey === null) {
+							// We're updating but no entity was connected.
+							this.unpersistedChangesCount++
+						} else if (
+							persistedKey === undefined && // We're creating
+							(!entityState.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing)
+						) {
+							this.unpersistedChangesCount++
+						}
+
+						// TODO do something about the existing state…
+
+						newlyConnectedState.realms.add(entityState.onChildFieldUpdate)
+						entityState.fields.set(placeholderName, newlyConnectedState)
+						entityState.hasStaleAccessor = true
+						entityState.hasPendingParentNotification = true
 					})
 				})
 			},
@@ -489,6 +518,9 @@ class AccessorTreeGenerator {
 
 		if (typeof typeName === 'string') {
 			entityState.typeName = typeName
+		}
+		if (creationParameters.forceCreation && id instanceof EntityAccessor.UnpersistedEntityId) {
+			this.unpersistedChangesCount++
 		}
 
 		const batchUpdatesImplementation: EntityAccessor.BatchUpdates = performUpdates => {
@@ -541,22 +573,13 @@ class AccessorTreeGenerator {
 			})
 		}
 
-		const processEntityDeletion = (stateForDeletion: InternalEntityState) => {
-			entityState.childrenWithPendingUpdates?.delete(stateForDeletion)
+		const resolveHasOneRelationMarker = (field: FieldName, message: string): HasOneRelationMarker => {
+			const hasOneRelation = entityState.fieldMarkers.get(field)
 
-			if (entityState.plannedRemovals === undefined) {
-				entityState.plannedRemovals = new Map()
+			if (!(hasOneRelation instanceof HasOneRelationMarker)) {
+				throw new BindingError(message)
 			}
-
-			for (const [fieldName, fieldState] of entityState.fields) {
-				if (fieldState === stateForDeletion) {
-					//entityState.fields.delete(fieldName) // TODO generate a new one instead.
-					entityState.plannedRemovals.set(fieldName, {
-						removalType: 'delete',
-						removedEntity: stateForDeletion,
-					})
-				}
-			}
+			return hasOneRelation
 		}
 
 		this.initializeEntityFields(entityState, fieldMarkers)
@@ -905,6 +928,7 @@ class AccessorTreeGenerator {
 					const hasUnpersistedChangesNow = normalizedValue !== normalizedPersistedValue
 					fieldState.hasUnpersistedChanges = hasUnpersistedChangesNow
 
+					// TODO if the entity only has nonbearing fields, this should be true.
 					const shouldInfluenceUpdateCount =
 						!fieldState.fieldMarker.isNonbearing || fieldState.persistedValue !== undefined
 

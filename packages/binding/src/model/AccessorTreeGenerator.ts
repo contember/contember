@@ -451,17 +451,20 @@ class AccessorTreeGenerator {
 						if (persistedKey instanceof BoxedSingleEntityId) {
 							if (persistedKey.id === connectedEntityKey) {
 								this.unpersistedChangesCount-- // It was removed from the list but now we're adding it back.
-							} else {
+							} else if (persistedKey.id === this.idToKey(previouslyConnectedState.id)) {
+								this.unpersistedChangesCount++ // We're changing it from the persisted id.
+							}
+						} else if (previouslyConnectedState.id instanceof EntityAccessor.UnpersistedEntityId) {
+							// This assumes the invariant enforced above that we cannot connect unpersisted entities.
+							// Hence the previouslyConnectedState still refers to the entity created initially.
+
+							if (
+								persistedKey === null || // We're updating.
+								(persistedKey === undefined && // We're creating.
+									(!entityState.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing))
+							) {
 								this.unpersistedChangesCount++
 							}
-						} else if (persistedKey === null) {
-							// We're updating but no entity was connected.
-							this.unpersistedChangesCount++
-						} else if (
-							persistedKey === undefined && // We're creating
-							(!entityState.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing)
-						) {
-							this.unpersistedChangesCount++
 						}
 
 						// TODO do something about the existing state…
@@ -473,20 +476,35 @@ class AccessorTreeGenerator {
 					})
 				})
 			},
-			disconnectEntityAtField: field => {
+			disconnectEntityAtField: placeholderName => {
 				this.performRootTreeOperation(() => {
 					performOperationWithBeforeUpdate(() => {
-						const stateToDisconnect = entityState.fields.get(field)
+						const hasOneMarker = resolveHasOneRelationMarker(
+							placeholderName,
+							`Cannot disconnect the field '${placeholderName}' as it doesn't refer to a has one relation. ` +
+								`Perhaps you forgot to generate a placeholder?`,
+						)
+						const stateToDisconnect = entityState.fields.get(placeholderName)
 
 						if (stateToDisconnect === undefined) {
-							throw new BindingError(`Cannot disconnect field '${field}' as it doesn't exist.`)
+							throw new BindingError(`Cannot disconnect field '${placeholderName}' as it doesn't exist.`)
 						}
 						if (stateToDisconnect.type !== InternalStateType.SingleEntity) {
-							throw new BindingError(`Trying to disconnect the field '${field}' but it isn't a has-one relation.`)
+							this.rejectInvalidAccessorTree()
 						}
+
+						const persistedKey = entityState.persistedData?.get(placeholderName)
+
+						if (persistedKey instanceof BoxedSingleEntityId && persistedKey.id === this.idToKey(stateToDisconnect.id)) {
+							this.unpersistedChangesCount++
+						} else {
+							// Do nothing. Disconnecting unpersisted entities doesn't change the count.
+						}
+
 						stateToDisconnect.realms.delete(entityState.onChildFieldUpdate)
 
-						const hasOneMarker = fieldMarkers.get(field)! as HasOneRelationMarker
+						// TODO do something about the existing state…
+
 						const newEntityState = this.initializeEntityAccessor(
 							new EntityAccessor.UnpersistedEntityId(),
 							hasOneMarker.fields,
@@ -494,10 +512,10 @@ class AccessorTreeGenerator {
 							entityState.onChildFieldUpdate,
 							undefined,
 						)
-						entityState.fields.set(field, newEntityState)
-						entityState.hasPendingParentNotification = true
+						entityState.fields.set(placeholderName, newEntityState)
 
-						throw new BindingError(`EntityAccessor.disconnectEntityAtField: not implemented`) // TODO
+						entityState.hasStaleAccessor = true
+						entityState.hasPendingParentNotification = true
 					})
 				})
 			},

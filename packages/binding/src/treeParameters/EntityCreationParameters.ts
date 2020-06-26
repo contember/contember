@@ -1,4 +1,4 @@
-import { EntityConnections, SugaredEntityConnections } from './EntityConnections'
+import { SetOnCreate, SugaredSetOnCreate } from './SetOnCreate'
 
 export const EntityCreationParametersDefaults = {
 	forceCreation: false,
@@ -8,15 +8,15 @@ export const EntityCreationParametersDefaults = {
 export interface DesugaredEntityCreationParameters {}
 
 export interface EntityCreationParameters {
-	connections: EntityConnections
 	forceCreation: boolean
 	isNonbearing: boolean
+	setOnCreate: SetOnCreate
 }
 
 export interface SugarableEntityCreationParameters {}
 
 export interface UnsugarableEntityCreationParameters {
-	connections?: SugaredEntityConnections
 	forceCreation?: boolean
 	isNonbearing?: boolean
+	setOnCreate?: SugaredSetOnCreate
 }

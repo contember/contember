@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import { BindingError } from '../BindingError'
-import { EntityConnections, HasManyRelation, HasOneRelation, UniqueWhere } from '../treeParameters'
+import { SetOnCreate, HasManyRelation, HasOneRelation, UniqueWhere } from '../treeParameters'
 
 export class TreeParameterMerger {
 	public static mergeHasOneRelationsWithSamePlaceholders(
@@ -14,7 +14,7 @@ export class TreeParameterMerger {
 			reducedBy: original.reducedBy,
 
 			// Not encoded within the placeholder
-			connections: this.mergeEntityConnections(original.connections, fresh.connections),
+			setOnCreate: this.mergeEntitysetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			forceCreation: original.forceCreation || fresh.forceCreation,
 		}
@@ -36,14 +36,14 @@ export class TreeParameterMerger {
 			limit: original.limit,
 
 			// Not encoded within the placeholder
-			connections: this.mergeEntityConnections(original.connections, fresh.connections),
+			setOnCreate: this.mergeEntitysetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
 		}
 	}
 
-	public static mergeEntityConnections(original: EntityConnections, fresh: EntityConnections): EntityConnections {
+	public static mergeEntitysetOnCreate(original: SetOnCreate, fresh: SetOnCreate): SetOnCreate {
 		if (original === undefined && fresh === undefined) {
 			return undefined
 		}
@@ -76,7 +76,7 @@ export class TreeParameterMerger {
 					if (fromFresh instanceof GraphQlBuilder.Literal) {
 						throw new BindingError() // TODO msg
 					} else if (typeof fromFresh === 'object') {
-						const merged = this.mergeEntityConnections(fromOriginal, fromFresh)
+						const merged = this.mergeEntitysetOnCreate(fromOriginal, fromFresh)
 						if (merged !== undefined) {
 							originalCopy[field] = merged
 						}

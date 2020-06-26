@@ -41,7 +41,7 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 						{
 							forceCreation: qualifiedEntityList.forceCreation,
 							isNonbearing: qualifiedEntityList.isNonbearing,
-							connections: qualifiedEntityList.connections,
+							setOnCreate: qualifiedEntityList.setOnCreate,
 							entities: qualifiedEntityList.entities,
 						},
 						environment,
@@ -49,7 +49,7 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				),
 			[
 				qualifiedEntityList.entities,
-				qualifiedEntityList.connections,
+				qualifiedEntityList.setOnCreate,
 				qualifiedEntityList.forceCreation,
 				qualifiedEntityList.isNonbearing,
 				environment,
@@ -65,7 +65,7 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 							forceCreation: qualifiedEntityList.forceCreation,
 							isNonbearing: qualifiedEntityList.isNonbearing,
 							initialEntityCount: qualifiedEntityList.initialEntityCount,
-							connections: qualifiedEntityList.connections,
+							setOnCreate: qualifiedEntityList.setOnCreate,
 							entities: qualifiedEntityList.entities,
 							orderBy: qualifiedEntityList.orderBy,
 							offset: qualifiedEntityList.offset,
@@ -76,7 +76,7 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 				),
 			[
 				qualifiedEntityList.entities,
-				qualifiedEntityList.connections,
+				qualifiedEntityList.setOnCreate,
 				qualifiedEntityList.orderBy,
 				qualifiedEntityList.offset,
 				qualifiedEntityList.limit,

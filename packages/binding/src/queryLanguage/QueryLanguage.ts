@@ -21,7 +21,6 @@ import {
 	SugarableEntityListParameters,
 	SugarableHasManyRelation,
 	SugarableHasOneRelation,
-	SugaredEntityConnections,
 	SugaredFilter,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
@@ -29,6 +28,7 @@ import {
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
+	SugaredSetOnCreate,
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUnconstrainedQualifiedSingleEntity,
 	UnconstrainedQualifiedEntityList,
@@ -75,15 +75,15 @@ export namespace QueryLanguage {
 		initialEntityCount: unsugarablePart.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 	})
 
-	export const desugarConnections = (connections: SugaredEntityConnections, environment: Environment): UniqueWhere => {
-		if (Array.isArray(connections)) {
-			const whereList = connections.map(connection => desugarConnections(connection, environment))
+	export const desugarsetOnCreate = (setOnCreate: SugaredSetOnCreate, environment: Environment): UniqueWhere => {
+		if (Array.isArray(setOnCreate)) {
+			const whereList = setOnCreate.map(connection => desugarsetOnCreate(connection, environment))
 			return Object.assign({}, ...whereList) // TODO This is **WAAAAY** too silly and naive. And just wrong.
 		}
-		if (typeof connections === 'string') {
-			return desugarUniqueWhere(connections, environment)
+		if (typeof setOnCreate === 'string') {
+			return desugarUniqueWhere(setOnCreate, environment)
 		}
-		return connections
+		return setOnCreate
 	}
 
 	const desugarHasOneRelation = (
@@ -94,7 +94,7 @@ export namespace QueryLanguage {
 		field: sugarable.field,
 		filter: sugarable.filter ? desugarFilter(sugarable.filter, environment) : undefined,
 		reducedBy: sugarable.reducedBy ? desugarUniqueWhere(sugarable.reducedBy, environment) : undefined,
-		connections: unsugarable.connections ? desugarConnections(unsugarable.connections, environment) : undefined,
+		setOnCreate: unsugarable.setOnCreate ? desugarsetOnCreate(unsugarable.setOnCreate, environment) : undefined,
 		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 		forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 	})
@@ -114,7 +114,7 @@ export namespace QueryLanguage {
 		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 		forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 		initialEntityCount: unsugarable.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
-		connections: unsugarable.connections ? desugarConnections(unsugarable.connections, environment) : undefined,
+		setOnCreate: unsugarable.setOnCreate ? desugarsetOnCreate(unsugarable.setOnCreate, environment) : undefined,
 		orderBy: unsugarable.orderBy ? desugarOrderBy(unsugarable.orderBy, environment) : undefined,
 		offset: unsugarable.offset,
 		limit: unsugarable.limit,
@@ -154,7 +154,7 @@ export namespace QueryLanguage {
 		environment: Environment,
 	): HasManyRelation => ({
 		...desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
-		connections: unsugarablePart.connections ? desugarConnections(unsugarablePart.connections, environment) : undefined,
+		setOnCreate: unsugarablePart.setOnCreate ? desugarsetOnCreate(unsugarablePart.setOnCreate, environment) : undefined,
 		field: sugarablePart.field,
 		isNonbearing: unsugarablePart.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 		forceCreation: unsugarablePart.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
@@ -186,8 +186,8 @@ export namespace QueryLanguage {
 		return {
 			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			forceCreation: unsugarableEntityList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
-			connections: unsugarableEntityList.connections
-				? desugarConnections(unsugarableEntityList.connections, environment)
+			setOnCreate: unsugarableEntityList.setOnCreate
+				? desugarsetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
 			entityName,
 			hasOneRelationPath,
@@ -213,8 +213,8 @@ export namespace QueryLanguage {
 		return {
 			isNonbearing: unsugarableSingleEntity.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			forceCreation: unsugarableSingleEntity.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
-			connections: unsugarableSingleEntity.connections
-				? desugarConnections(unsugarableSingleEntity.connections, environment)
+			setOnCreate: unsugarableSingleEntity.setOnCreate
+				? desugarsetOnCreate(unsugarableSingleEntity.setOnCreate, environment)
 				: undefined,
 			entityName,
 			hasOneRelationPath,
@@ -254,8 +254,8 @@ export namespace QueryLanguage {
 			),
 			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			forceCreation: unsugarableEntityList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
-			connections: unsugarableEntityList.connections
-				? desugarConnections(unsugarableEntityList.connections, environment)
+			setOnCreate: unsugarableEntityList.setOnCreate
+				? desugarsetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
 		}
 	}
@@ -289,8 +289,8 @@ export namespace QueryLanguage {
 			hasOneRelationPath,
 			isNonbearing: unsugarableFieldList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			forceCreation: unsugarableFieldList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
-			connections: unsugarableFieldList.connections
-				? desugarConnections(unsugarableFieldList.connections, environment)
+			setOnCreate: unsugarableFieldList.setOnCreate
+				? desugarsetOnCreate(unsugarableFieldList.setOnCreate, environment)
 				: undefined,
 			defaultValue:
 				unsugarableFieldList.defaultValue !== undefined

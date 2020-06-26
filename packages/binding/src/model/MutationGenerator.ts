@@ -561,12 +561,12 @@ export class MutationGenerator {
 			new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 		)
 
-		if (!creationParameters.connections || isEmptyObject(dataBuilder.data)) {
+		if (!creationParameters.setOnCreate || isEmptyObject(dataBuilder.data)) {
 			return dataBuilder
 		}
 		return new CrudQueryBuilder.WriteDataBuilder({
 			...dataBuilder.data,
-			...registerReductionFields(creationParameters.connections),
+			...registerReductionFields(creationParameters.setOnCreate),
 		})
 	}
 }

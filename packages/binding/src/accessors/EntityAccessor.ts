@@ -99,7 +99,7 @@ class EntityAccessor extends Accessor implements Errorable {
 			typeof entity === 'string'
 				? [
 						{
-							connections: undefined,
+							setOnCreate: undefined,
 							forceCreation: false,
 							isNonbearing: false,
 							field: entity,

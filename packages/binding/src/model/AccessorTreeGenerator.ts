@@ -214,7 +214,7 @@ class AccessorTreeGenerator {
 				tree.fields,
 				{
 					isNonbearing: false,
-					connections: undefined,
+					setOnCreate: undefined,
 					forceCreation: false,
 				},
 				noop,

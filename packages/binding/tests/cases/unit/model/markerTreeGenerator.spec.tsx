@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { EntityListSubTree, Field, HasMany, HasOne, SingleEntitySubTree } from '../../../../src/coreComponents'
+import { Field, HasMany, HasOne, SingleEntitySubTree } from '../../../../src/coreComponents'
 import {
 	FieldMarker,
 	HasManyRelationMarker,
@@ -53,7 +53,7 @@ describe('Marker tree generator', () => {
 			{
 				field: 'common',
 				filter: undefined,
-				connections: undefined,
+				setOnCreate: undefined,
 				forceCreation: false,
 				isNonbearing: false,
 				initialEntityCount: 0,
@@ -71,7 +71,7 @@ describe('Marker tree generator', () => {
 		const hasOne = new HasOneRelationMarker(
 			{
 				field: 'hasOne',
-				connections: undefined,
+				setOnCreate: undefined,
 				filter: undefined,
 				forceCreation: false,
 				isNonbearing: false,
@@ -87,7 +87,7 @@ describe('Marker tree generator', () => {
 			{
 				field: 'hasMany',
 				filter: { x: { gt: 50 } },
-				connections: undefined,
+				setOnCreate: undefined,
 				forceCreation: false,
 				isNonbearing: false,
 				initialEntityCount: 0,

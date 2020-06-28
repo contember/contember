@@ -1,5 +1,4 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { Input } from '@contember/schema'
 import { EntityAccessor } from '../accessors'
 import { BoxedSingleEntityId } from '../accessorTree'
 import { BindingError } from '../BindingError'
@@ -12,7 +11,6 @@ import {
 	SubTreeMarker,
 	SubTreeMarkerParameters,
 } from '../markers'
-import { EntityCreationParameters, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import {
@@ -222,7 +220,9 @@ export class MutationGenerator {
 	private registerCreateMutationPart(
 		processedEntities: ProcessedEntities,
 		currentState: InternalEntityState,
-		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
+		builder: CrudQueryBuilder.WriteDataBuilder<
+			CrudQueryBuilder.WriteOperation.Create
+		> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
 		if (processedEntities.has(currentState)) {
 			return builder
@@ -313,8 +313,22 @@ export class MutationGenerator {
 			}
 		}
 
-		if (builder.data !== undefined && !isEmptyObject(builder.data)) {
-			// TODO setOnCreate
+		if (currentState.creationParameters.setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
+			const setOnCreate = currentState.creationParameters.setOnCreate
+			for (const key in setOnCreate) {
+				const field = setOnCreate[key]
+
+				if (
+					typeof field === 'string' ||
+					typeof field === 'number' ||
+					field === null ||
+					field instanceof GraphQlBuilder.Literal
+				) {
+					builder = builder.set(key, field)
+				} else {
+					builder = builder.one(key, builder => builder.connect(field))
+				}
+			}
 		}
 
 		return builder
@@ -339,9 +353,6 @@ export class MutationGenerator {
 		marker: HasOneRelationMarker,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
-		if (processedEntities.has(fieldState)) {
-			return builder
-		}
 		const reducedBy = marker.relation.reducedBy
 
 		if (reducedBy === undefined) {
@@ -350,11 +361,17 @@ export class MutationGenerator {
 					// TODO also potentially update
 					return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id })
 				}
-				return builder.create(this.registerCreateReferenceMutationPart(processedEntities, fieldState, marker.relation))
+				return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 			})
 		}
-		// TODO reduced
-		return builder
+		return builder.many(marker.relation.field, builder => {
+			const alias = AliasTransformer.entityToAlias(fieldState.getAccessor())
+			if (typeof fieldState.id === 'string') {
+				// TODO also potentially update
+				return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id }, alias)
+			}
+			return builder.create(this.registerCreateMutationPart(processedEntities, fieldState), alias)
+		})
 	}
 
 	private registerCreateEntityListPart(
@@ -366,7 +383,7 @@ export class MutationGenerator {
 		return builder.many(marker.relation.field, builder => {
 			for (const childKey of fieldState.childrenKeys) {
 				const entityState = this.entityStore.get(childKey)
-				if (entityState === undefined || processedEntities.has(entityState)) {
+				if (entityState === undefined) {
 					continue
 				}
 
@@ -375,10 +392,7 @@ export class MutationGenerator {
 					// TODO also potentially update
 					builder = builder.connect({ [PRIMARY_KEY_NAME]: entityState.id }, alias)
 				} else {
-					builder = builder.create(
-						this.registerCreateReferenceMutationPart(processedEntities, entityState, marker.relation),
-						alias,
-					)
+					builder = builder.create(this.registerCreateMutationPart(processedEntities, entityState), alias)
 				}
 			}
 			return builder
@@ -411,10 +425,9 @@ export class MutationGenerator {
 					}
 				}
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState?.type !== InternalStateType.SingleEntity || processedEntities.has(fieldState)) {
+				if (fieldState?.type !== InternalStateType.SingleEntity) {
 					continue
 				}
-				// Deliberately not adding the entity to processedEntities - it will be done in a subroutine.
 
 				const reducedBy = marker.relation.reducedBy
 				if (reducedBy === undefined) {
@@ -446,9 +459,7 @@ export class MutationGenerator {
 								})
 							}
 							// The currently present entity doesn't exist on the server. Try if creating yields anything…
-							const subBuilder = builder.create(
-								this.registerCreateReferenceMutationPart(processedEntities, fieldState, fieldState.creationParameters),
-							)
+							const subBuilder = builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 							if (isEmptyObject(subBuilder.data)) {
 								// …and if it doesn't, we just disconnect.
 								return builder.disconnect()
@@ -463,9 +474,7 @@ export class MutationGenerator {
 								[PRIMARY_KEY_NAME]: fieldState.id,
 							})
 						} else {
-							return builder.create(
-								this.registerCreateReferenceMutationPart(processedEntities, fieldState, fieldState.creationParameters),
-							)
+							return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 						}
 					})(CrudQueryBuilder.WriteOneRelationBuilder.instantiate<CrudQueryBuilder.WriteOperation.Update>())
 
@@ -494,24 +503,17 @@ export class MutationGenerator {
 							if (typeof fieldState.id === 'string') {
 								// TODO will re-using the alias like this work?
 								// TODO also potentially update
-								return builder.disconnect(reducedBy, alias).connect(
-									{
-										[PRIMARY_KEY_NAME]: fieldState.id,
-									},
-									alias,
-								)
+								return builder.disconnect(reducedBy, alias).connect({ [PRIMARY_KEY_NAME]: fieldState.id }, alias)
 							}
-							const subBuilder = builder.create(
-								this.registerCreateReferenceMutationPart(processedEntities, fieldState, fieldState.creationParameters),
-							)
+							const subBuilder = builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 							if (isEmptyObject(subBuilder.data)) {
 								return builder.disconnect(reducedBy, alias)
 							}
 							return subBuilder
+						} else if (typeof fieldState.id === 'string') {
+							return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id }, alias)
 						} else {
-							return builder.create(
-								this.registerCreateReferenceMutationPart(processedEntities, fieldState, fieldState.creationParameters),
-							)
+							return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 						}
 					})
 				}
@@ -523,10 +525,9 @@ export class MutationGenerator {
 					for (const childKey of fieldState.childrenKeys) {
 						const childEntityState = this.entityStore.get(childKey)
 
-						if (childEntityState === undefined || processedEntities.has(childEntityState)) {
+						if (childEntityState === undefined) {
 							continue
 						}
-						// Deliberately not adding the entity to processedEntities - it will be done in a subroutine.
 						const alias = AliasTransformer.entityToAlias(childEntityState.getAccessor())
 
 						if (typeof childEntityState.id === 'string') {
@@ -541,14 +542,7 @@ export class MutationGenerator {
 								builder = builder.connect({ [PRIMARY_KEY_NAME]: childEntityState.id }, alias)
 							}
 						} else {
-							builder = builder.create(
-								this.registerCreateReferenceMutationPart(
-									processedEntities,
-									childEntityState,
-									childEntityState.creationParameters,
-								),
-								alias,
-							)
+							builder = builder.create(this.registerCreateMutationPart(processedEntities, childEntityState), alias)
 						}
 					}
 					if (fieldState.plannedRemovals) {
@@ -574,50 +568,5 @@ export class MutationGenerator {
 		}
 
 		return builder
-	}
-
-	private registerCreateReferenceMutationPart(
-		processedEntities: ProcessedEntities,
-		entityState: InternalEntityState,
-		creationParameters: EntityCreationParameters,
-	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		const registerReductionFields = (where: UniqueWhere): Input.CreateDataInput<GraphQlBuilder.Literal> => {
-			const data: Input.CreateDataInput<GraphQlBuilder.Literal> = {}
-
-			for (const key in where) {
-				const field = where[key]
-
-				if (
-					typeof field === 'string' ||
-					typeof field === 'number' ||
-					field === null ||
-					field instanceof GraphQlBuilder.Literal
-				) {
-					data[key] = field
-				} else {
-					data[key] = {
-						connect: field,
-					}
-				}
-			}
-
-			return data
-		}
-		// TODO creation params & reducedBy
-		// TODO forceCreate
-
-		const dataBuilder = this.registerCreateMutationPart(
-			processedEntities,
-			entityState,
-			new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
-		)
-
-		if (!creationParameters.setOnCreate || isEmptyObject(dataBuilder.data)) {
-			return dataBuilder
-		}
-		return new CrudQueryBuilder.WriteDataBuilder({
-			...dataBuilder.data,
-			...registerReductionFields(creationParameters.setOnCreate),
-		})
 	}
 }

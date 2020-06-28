@@ -120,9 +120,6 @@ export const useAccessorTreeState = ({
 				type: PersistResultSuccessType.NothingToPersist,
 			})
 		}
-		const persistedData =
-			queryStateRef.current.readyState === ApiRequestReadyState.Success ? queryStateRef.current.data.data : undefined
-
 		const latestAccessorTree = stateRef.current.data
 		const mutation = accessorTreeGenerator.generatePersistMutation()
 

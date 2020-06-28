@@ -134,6 +134,9 @@ class AccessorTreeGenerator {
 	}
 
 	public generatePersistMutation() {
+		if (this.unpersistedChangesCount === 0) {
+			return undefined
+		}
 		const generator = new MutationGenerator(this.markerTree, this.subTreeStates, this.entityStore)
 
 		return generator.getPersistMutation()
@@ -350,6 +353,7 @@ class AccessorTreeGenerator {
 		const existingEntityState = this.entityStore.get(entityKey)
 
 		if (existingEntityState !== undefined) {
+			// TODO this is too naïve.
 			this.initializeEntityFields(existingEntityState, fieldMarkers)
 			existingEntityState.realms.add(onEntityUpdate)
 			existingEntityState.hasStaleAccessor = true
@@ -378,6 +382,7 @@ class AccessorTreeGenerator {
 			id,
 			isScheduledForDeletion: false,
 			persistedData: this.persistedEntityData.get(entityKey),
+			plannedHasOneDeletions: undefined,
 			realms: new Set([onEntityUpdate]),
 			typeName: undefined,
 			getAccessor: (() => {
@@ -407,7 +412,7 @@ class AccessorTreeGenerator {
 				// No before update for child updates!
 				batchUpdatesImplementation(() => {
 					if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
-						entityState.childrenWithPendingUpdates?.delete(updatedState)
+						processEntityDeletion(updatedState)
 					} else {
 						this.markChildStateInNeedOfUpdate(entityState, updatedState)
 					}
@@ -446,6 +451,7 @@ class AccessorTreeGenerator {
 						if (previouslyConnectedState === newlyConnectedState) {
 							return // Do nothing.
 						}
+						// TODO remove from planned deletions if appropriate
 
 						const persistedKey = entityState.persistedData?.get(placeholderName)
 						if (persistedKey instanceof BoxedSingleEntityId) {
@@ -589,6 +595,39 @@ class AccessorTreeGenerator {
 						`This likely means an infinite feedback loop in your code.`,
 				)
 			})
+		}
+
+		const processEntityDeletion = (deletedState: InternalEntityState) => {
+			const relevantPlaceholders = new Set<FieldName>()
+
+			// All has one relations where this entity is present.
+			for (const [placeholderName, candidateState] of entityState.fields) {
+				if (candidateState === deletedState) {
+					relevantPlaceholders.add(placeholderName)
+				}
+			}
+
+			if (typeof deletedState.id === 'string') {
+				if (entityState.plannedHasOneDeletions === undefined) {
+					entityState.plannedHasOneDeletions = new Map()
+				}
+				for (const placeholderName of relevantPlaceholders) {
+					entityState.plannedHasOneDeletions.set(placeholderName, deletedState)
+				}
+			}
+
+			for (const placeholderName of relevantPlaceholders) {
+				const newEntityState = this.initializeEntityAccessor(
+					new EntityAccessor.UnpersistedEntityId(),
+					deletedState.fieldMarkers,
+					deletedState.creationParameters,
+					entityState.onChildFieldUpdate,
+					undefined,
+				)
+				entityState.fields.set(placeholderName, newEntityState)
+			}
+			// TODO finish deleting the entityState & update the changes count
+			entityState.childrenWithPendingUpdates?.delete(deletedState)
 		}
 
 		const resolveHasOneRelationMarker = (field: FieldName, message: string): HasOneRelationMarker => {

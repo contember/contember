@@ -381,28 +381,43 @@ export class MutationGenerator {
 
 						if (persistedValue instanceof BoxedSingleEntityId) {
 							if (persistedValue.id === fieldState.id) {
+								// The persisted and currently referenced ids match, and so this is an update.
 								return builder.update(builder =>
 									this.registerUpdateMutationPart(processedEntities, fieldState, builder),
 								)
 							}
+							// There was a referenced entity but currently, there is a different one. Let's investigate:
+
 							const plannedDeletion = currentState.plannedHasOneDeletions?.get(placeholderName)
 							if (plannedDeletion !== undefined) {
+								// It's planned for deletion.
 								// TODO also potentially do something about the current entity
 								return builder.delete()
 							}
 							if (typeof fieldState.id === 'string') {
+								// This isn't the persisted entity but it does exist on the server. Thus this is a connect.
 								// TODO also potentially update
 								return builder.connect({
 									[PRIMARY_KEY_NAME]: fieldState.id,
 								})
 							}
+							// The currently present entity doesn't exist on the server. Try if creating yields anything…
 							const subBuilder = builder.create(
 								this.registerCreateReferenceMutationPart(processedEntities, fieldState, fieldState.creationParameters),
 							)
 							if (isEmptyObject(subBuilder.data)) {
+								// …and if it doesn't, we just disconnect.
 								return builder.disconnect()
 							}
+							// …but if it does, we return the create, disconnecting implicitly.
 							return subBuilder
+						} else if (typeof fieldState.id === 'string') {
+							// There isn't a linked entity on the server but we're seeing one that exists there.
+							// Thus this is a connect.
+							// TODO also potentially update
+							return builder.connect({
+								[PRIMARY_KEY_NAME]: fieldState.id,
+							})
 						} else {
 							return builder.create(
 								this.registerCreateReferenceMutationPart(processedEntities, fieldState, fieldState.creationParameters),
@@ -414,6 +429,7 @@ export class MutationGenerator {
 						builder = builder.one(marker.relation.field, subBuilder)
 					}
 				} else {
+					// This is a reduced has many relation.
 					builder = builder.many(marker.relation.field, builder => {
 						const persistedValue = currentState.persistedData?.get?.(placeholderName)
 						const alias = AliasTransformer.entityToAlias(fieldState.getAccessor())
@@ -432,6 +448,7 @@ export class MutationGenerator {
 								return builder.delete(reducedBy, alias)
 							}
 							if (typeof fieldState.id === 'string') {
+								// TODO will re-using the alias like this work?
 								// TODO also potentially update
 								return builder.disconnect(reducedBy, alias).connect(
 									{

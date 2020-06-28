@@ -372,7 +372,8 @@ export class MutationGenerator {
 				}
 				// Deliberately not adding the entity to processedEntities - it will be done in a subroutine.
 
-				if (marker.relation.reducedBy === undefined) {
+				const reducedBy = marker.relation.reducedBy
+				if (reducedBy === undefined) {
 					const subBuilder = ((
 						builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
 					) => {
@@ -413,7 +414,45 @@ export class MutationGenerator {
 						builder = builder.one(marker.relation.field, subBuilder)
 					}
 				} else {
-					// TODO
+					builder = builder.many(marker.relation.field, builder => {
+						const persistedValue = currentState.persistedData?.get?.(placeholderName)
+						const alias = AliasTransformer.entityToAlias(fieldState.getAccessor())
+
+						if (persistedValue instanceof BoxedSingleEntityId) {
+							if (persistedValue.id === fieldState.id) {
+								return builder.update(
+									reducedBy,
+									builder => this.registerUpdateMutationPart(processedEntities, fieldState, builder),
+									alias,
+								)
+							}
+							const plannedDeletion = currentState.plannedHasOneDeletions?.get(placeholderName)
+							if (plannedDeletion !== undefined) {
+								// TODO also potentially do something about the current entity
+								return builder.delete(reducedBy, alias)
+							}
+							if (typeof fieldState.id === 'string') {
+								// TODO also potentially update
+								return builder.disconnect(reducedBy, alias).connect(
+									{
+										[PRIMARY_KEY_NAME]: fieldState.id,
+									},
+									alias,
+								)
+							}
+							const subBuilder = builder.create(
+								this.registerCreateReferenceMutationPart(processedEntities, fieldState, fieldState.creationParameters),
+							)
+							if (isEmptyObject(subBuilder.data)) {
+								return builder.disconnect(reducedBy, alias)
+							}
+							return subBuilder
+						} else {
+							return builder.create(
+								this.registerCreateReferenceMutationPart(processedEntities, fieldState, fieldState.creationParameters),
+							)
+						}
+					})
 				}
 			} else if (marker instanceof HasManyRelationMarker) {
 				if (fieldState?.type !== InternalStateType.EntityList) {
@@ -457,6 +496,7 @@ export class MutationGenerator {
 							if (removalType === 'delete') {
 								builder = builder.delete({ [PRIMARY_KEY_NAME]: entityToRemove.id }, alias)
 							} else if (removalType === 'disconnect') {
+								// TODO also potentially update
 								builder = builder.disconnect({ [PRIMARY_KEY_NAME]: entityToRemove.id }, alias)
 							} else {
 								assertNever(removalType)
@@ -465,163 +505,8 @@ export class MutationGenerator {
 					}
 					return builder
 				})
-			} /*else if (marker instanceof ReferenceMarker) {
-				let unreducedHasOnePresent = false
-				let hasManyPersistedData: Set<string> | undefined = undefined
-				let hasManyPlannedRemovals: Set<InternalEntityPlannedRemoval> | undefined = undefined
-				const references = marker.references
-				const accessorReference: Array<{
-					alias?: string
-					referenceState: InternalEntityState
-					reference: ReferenceMarker.Reference
-				}> = []
-
-				for (const referencePlaceholder in references) {
-					const reference = references[referencePlaceholder]
-					const referenceState = currentState.fields.get(reference.placeholderName)
-
-					if (referenceState === undefined) {
-						continue
-					}
-
-					if (
-						reference.expectedCount === ExpectedEntityCount.UpToOne &&
-						referenceState.type === InternalStateType.SingleEntity
-					) {
-						accessorReference.push({
-							referenceState,
-							reference,
-							alias: referencePlaceholder,
-						})
-
-						if (reference.reducedBy === undefined) {
-							unreducedHasOnePresent = true
-						} else {
-							const id = referenceState.persistedData?.get(PRIMARY_KEY_NAME)
-							if (id instanceof BoxedSingleEntityId) {
-								if (hasManyPersistedData === undefined) {
-									hasManyPersistedData = new Set()
-								}
-								hasManyPersistedData.add(id.id)
-							}
-						}
-					} else if (
-						reference.expectedCount === ExpectedEntityCount.PossiblyMany &&
-						referenceState.type === InternalStateType.EntityList
-					) {
-						// TODO this is very likely just crap
-						if (hasManyPersistedData === undefined) {
-							hasManyPersistedData = new Set()
-						}
-						for (const persistedId of referenceState.persistedEntityIds) {
-							hasManyPersistedData.add(persistedId)
-						}
-						if (hasManyPlannedRemovals === undefined) {
-							hasManyPlannedRemovals = new Set()
-						}
-						if (referenceState.plannedRemovals) {
-							for (const plannedRemoval of referenceState.plannedRemovals) {
-								hasManyPlannedRemovals.add(plannedRemoval)
-							}
-						}
-
-						for (const childKey of referenceState.childrenKeys) {
-							const innerState = this.entityStore.get(childKey)
-							if (innerState === undefined) {
-								continue
-							}
-							accessorReference.push({
-								referenceState: innerState,
-								reference,
-								alias: AliasTransformer.entityToAlias(innerState.getAccessor()),
-							})
-						}
-					}
-				}
-
-				if (unreducedHasOnePresent) {
-					if (accessorReference.length === 1) {
-						const subBuilder = ((
-							builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
-						) => {
-							const { referenceState, reference, alias } = accessorReference[0]
-							const persistedField = referenceState.persistedData
-
-							// TODO we're not handling deletions followed by connections
-							if (referenceState.isScheduledForDeletion) {
-								return builder.delete()
-							} else if (typeof referenceState.id === 'string') {
-								// referenceState exists on server
-
-								if (!persistedField || persistedField?.get(PRIMARY_KEY_NAME) !== referenceState.id) {
-									return builder.connect({
-										[PRIMARY_KEY_NAME]: referenceState.id,
-									})
-								}
-								return builder.update(builder =>
-									this.registerUpdateMutationPart(referenceState, reference.fields, builder),
-								)
-							} else if (persistedField?.get(PRIMARY_KEY_NAME)) {
-								return builder.disconnect()
-							} else {
-								return builder.create(this.registerCreateReferenceMutationPart(referenceState, reference))
-							}
-						})(CrudQueryBuilder.WriteOneRelationBuilder.instantiate<CrudQueryBuilder.WriteOperation.Update>())
-
-						if (subBuilder.data) {
-							builder = builder.one(placeholderName, subBuilder)
-						}
-					} else {
-						throw new BindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
-					}
-				} else {
-					builder = builder.many(placeholderName, builder => {
-						for (const { referenceState, reference, alias } of accessorReference) {
-							if (typeof referenceState.id === 'string') {
-								if (!hasManyPersistedData || !hasManyPersistedData.has(referenceState.id)) {
-									builder = builder.connect({ [PRIMARY_KEY_NAME]: referenceState.id }, alias)
-								} else {
-									builder = builder.update(
-										{ [PRIMARY_KEY_NAME]: referenceState.id },
-										builder => {
-											return this.registerUpdateMutationPart(referenceState, reference.fields, builder)
-										},
-										alias,
-									)
-								}
-							} else {
-								builder = builder.create(this.registerCreateReferenceMutationPart(referenceState, reference), alias)
-							}
-						}
-						if (hasManyPlannedRemovals) {
-							for (const { removedEntity, removalType } of hasManyPlannedRemovals) {
-								if (removalType === 'delete') {
-									builder = builder.delete(
-										{ [PRIMARY_KEY_NAME]: removedEntity.id },
-										AliasTransformer.entityToAlias(removedEntity.getAccessor()),
-									)
-								} else if (removalType === 'disconnect') {
-									builder = builder.disconnect(
-										{ [PRIMARY_KEY_NAME]: removedEntity.id },
-										AliasTransformer.entityToAlias(removedEntity.getAccessor()),
-									)
-								} else {
-									assertNever(removalType)
-								}
-							}
-						}
-						return builder
-					})
-				}
-			}  else if (
-				marker instanceof ConnectionMarker
-			) {
-				// Do nothing: connections are only relevant to create mutations. At the point of updating, the entity is
-				// supposed to have already been connected.
-			} */ else if (
-				marker instanceof SubTreeMarker
-			) {
-				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
+			} else if (marker instanceof SubTreeMarker) {
+				// Do nothing: all sub trees have been hoisted and are handled elsewhere.
 			} else {
 				assertNever(marker)
 			}
@@ -657,6 +542,7 @@ export class MutationGenerator {
 
 			return data
 		}
+		// TODO creation params & reducedBy
 		// TODO forceCreate
 
 		const dataBuilder = this.registerCreateMutationPart(

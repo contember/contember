@@ -1,3 +1,4 @@
+export * from './Compiler'
 export * from './CaseStatement'
 export * from './ConditionBuilder'
 export * from './DeleteBuilder'

@@ -3,7 +3,7 @@ import { calculateMigrationChecksum, Migration } from '@contember/schema-migrati
 import { Command } from './Command'
 
 export class SaveMigrationCommand implements Command<void> {
-	constructor(private readonly migration: Migration, private readonly executedAt?: Date) {}
+	constructor(private readonly migration: Migration) {}
 
 	public async execute({ db }: Command.Args): Promise<void> {
 		const values: QueryBuilder.Values = {
@@ -11,9 +11,6 @@ export class SaveMigrationCommand implements Command<void> {
 			name: this.migration.name,
 			migration: JSON.stringify(this.migration),
 			checksum: calculateMigrationChecksum(this.migration),
-		}
-		if (this.executedAt) {
-			values.executed_at = this.executedAt
 		}
 		await InsertBuilder.create()
 			.into('schema_migration')

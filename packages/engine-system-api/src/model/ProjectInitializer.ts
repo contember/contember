@@ -40,6 +40,8 @@ export class ProjectInitializer {
 			await this.systemDbMigrationsRunnerFactory(project.db, pgClient).migrate<MigrationArgs>(true, {
 				schemaResolver,
 				project,
+				queryHandler: dbContextMigrations.queryHandler,
+				migrationsResolverFactory: this.projectMigrationInfoResolver?.migrationsResolverFactory,
 			})
 			await pgClient.end()
 			// eslint-disable-next-line no-console
@@ -62,7 +64,6 @@ export class ProjectInitializer {
 	private async initStages(db: DatabaseContext, project: ProjectConfig) {
 		const stageTree = createStageTree(project)
 		const root = stageTree.getRoot()
-		await this.upgradeSchemaMigrations(db, project, root.slug)
 
 		const createStage = async (parent: StageConfig | null, stage: StageConfig) => {
 			const created = await this.stageCreator.createStage(db, parent, stage)
@@ -129,33 +130,5 @@ export class ProjectInitializer {
 			// eslint-disable-next-line no-console
 			console.log(`Executing migration ${version}`),
 		)
-	}
-
-	private async upgradeSchemaMigrations(db: DatabaseContext, project: ProjectConfig, stage: string) {
-		if (!this.projectMigrationInfoResolver) {
-			return
-		}
-		const { allMigrations, executedMigrations } = await this.projectMigrationInfoResolver.getMigrationsInfo(db, project)
-		if (executedMigrations.length > 0) {
-			return
-		}
-		const migrationEvents = await db.queryHandler.fetch(new MigrationEventsQuery(stage))
-		if (migrationEvents.length === 0) {
-			return
-		}
-		// eslint-disable-next-line no-console
-		console.group('Upgrading schema migrations')
-		for (const event of migrationEvents) {
-			const version = event.data.version
-			const migration = allMigrations.find(it => it.version === version)
-			if (!migration) {
-				// eslint-disable-next-line no-console
-				console.warn(`Previously executed migration ${version} not found`)
-				continue
-			}
-			await db.commandBus.execute(new SaveMigrationCommand(migration, event.created_at))
-		}
-		// eslint-disable-next-line no-console
-		console.groupEnd()
 	}
 }

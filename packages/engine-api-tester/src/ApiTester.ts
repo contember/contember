@@ -6,7 +6,6 @@ import {
 	ProjectConfig,
 	SystemContainer,
 	SystemContainerFactory,
-	systemMigrationsDirectory,
 	typeDefs as systemTypeDefs,
 	unnamedIdentity,
 } from '@contember/engine-system-api'
@@ -109,6 +108,7 @@ export class ApiTester {
 			.migrate<MigrationArgs>(true, {
 				schemaResolver,
 				project: projectConfig,
+				queryHandler: null as any,
 			})
 		await pgClient.end()
 

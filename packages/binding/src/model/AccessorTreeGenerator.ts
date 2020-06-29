@@ -184,12 +184,16 @@ class AccessorTreeGenerator {
 
 	private setEntityStateErrors(
 		state: InternalEntityState,
-		errors: ErrorsPreprocessor.FieldIndexedErrorNode,
+		errors: ErrorsPreprocessor.FieldIndexedErrorNode | ErrorsPreprocessor.LeafErrorNode,
 		mode: AccessorTreeGenerator.ErrorPopulationMode,
 	) {
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? errors : undefined
+		state.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? errors.errors : emptyArray
+
+		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.FieldIndexed) {
+			return
+		}
 
 		if (state.childrenWithPendingUpdates === undefined) {
 			state.childrenWithPendingUpdates = new Set()
@@ -214,7 +218,7 @@ class AccessorTreeGenerator {
 			for (const [fieldPlaceholder, fieldState] of state.fields) {
 				if (fieldState.type === InternalStateType.SingleEntity) {
 					if (
-						child.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
+						child.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed &&
 						PlaceholderGenerator.isHasOneRelationFieldPlaceholder(childKey, fieldPlaceholder)
 					) {
 						state.childrenWithPendingUpdates.add(fieldState)
@@ -222,7 +226,7 @@ class AccessorTreeGenerator {
 					}
 				} else if (fieldState.type === InternalStateType.EntityList) {
 					if (
-						child.nodeType === ErrorsPreprocessor.ErrorNodeType.KeyIndexed &&
+						child.nodeType !== ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
 						PlaceholderGenerator.isHasManyRelationFieldPlaceholder(childKey, fieldPlaceholder)
 					) {
 						state.childrenWithPendingUpdates.add(fieldState)
@@ -235,12 +239,16 @@ class AccessorTreeGenerator {
 
 	private setEntityListStateErrors(
 		state: InternalEntityListState,
-		errors: ErrorsPreprocessor.KeyIndexedErrorNode,
+		errors: ErrorsPreprocessor.KeyIndexedErrorNode | ErrorsPreprocessor.LeafErrorNode,
 		mode: AccessorTreeGenerator.ErrorPopulationMode,
 	) {
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? errors : undefined
+		state.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? errors.errors : emptyArray
+
+		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
+			return
+		}
 
 		if (state.childrenWithPendingUpdates === undefined) {
 			state.childrenWithPendingUpdates = new Set()
@@ -446,7 +454,7 @@ class AccessorTreeGenerator {
 			batchUpdateDepth: 0,
 			childrenWithPendingUpdates: undefined,
 			creationParameters,
-			errors: undefined,
+			errors: emptyArray,
 			eventListeners: {
 				update: undefined,
 				beforeUpdate: undefined,
@@ -475,7 +483,7 @@ class AccessorTreeGenerator {
 							// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 							// keep in sync two copies of the same data. TS hides the extra info anyway.
 							entityState.fields,
-							entityState.errors ? entityState.errors.errors : emptyArray,
+							entityState.errors,
 							entityState.addEventListener,
 							entityState.batchUpdates,
 							entityState.connectEntityAtField,
@@ -739,7 +747,7 @@ class AccessorTreeGenerator {
 				update: undefined,
 				beforeUpdate: undefined,
 			},
-			errors: undefined,
+			errors: emptyArray,
 			plannedRemovals: undefined,
 			hasPendingParentNotification: false,
 			hasPendingUpdate: false,
@@ -752,7 +760,7 @@ class AccessorTreeGenerator {
 						accessor = new EntityListAccessor(
 							entityListState.getChildEntityByKey,
 							entityListState.childrenKeys,
-							entityListState.errors ? entityListState.errors.errors : emptyArray,
+							entityListState.errors,
 							entityListState.addEventListener,
 							entityListState.batchUpdates,
 							entityListState.connectEntity,

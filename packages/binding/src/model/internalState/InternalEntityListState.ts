@@ -1,7 +1,6 @@
-import { EntityListAccessor } from '../../accessors'
+import { EntityListAccessor, ErrorAccessor } from '../../accessors'
 import { EntityFieldMarkers } from '../../markers'
 import { EntityCreationParameters, RemovalType } from '../../treeParameters'
-import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
 import { InternalStateType } from './InternalStateType'
 
@@ -12,7 +11,7 @@ export interface InternalEntityListState {
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
 	creationParameters: EntityCreationParameters
-	errors: ErrorsPreprocessor.KeyIndexedErrorNode | undefined
+	errors: ErrorAccessor[]
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:
 			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>

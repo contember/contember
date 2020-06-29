@@ -1,4 +1,4 @@
-import { EntityAccessor } from '../../accessors'
+import { EntityAccessor, ErrorAccessor } from '../../accessors'
 import { SingleEntityPersistedData } from '../../accessorTree'
 import { EntityFieldMarkers } from '../../markers'
 import { EntityCreationParameters, FieldName } from '../../treeParameters'
@@ -16,7 +16,7 @@ export interface InternalEntityState {
 	batchUpdateDepth: number
 	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
 	creationParameters: EntityCreationParameters
-	errors: ErrorsPreprocessor.FieldIndexedErrorNode | undefined
+	errors: ErrorAccessor[]
 	fields: Map<FieldName, InternalStateNode>
 	fieldMarkers: EntityFieldMarkers
 	getAccessor: () => EntityAccessor

@@ -89,6 +89,8 @@ type AuthorMeta {
 }
 
 input AuthorOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
   name: OrderDirection
 }
@@ -201,6 +203,8 @@ type CategoryMeta {
 }
 
 input CategoryOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
   name: OrderDirection
 }
@@ -468,6 +472,8 @@ type PostLocaleMeta {
 }
 
 input PostLocaleOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
   locale: OrderDirection
   title: OrderDirection
@@ -545,6 +551,8 @@ type PostMeta {
 }
 
 input PostOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
   state: OrderDirection
   publishedAt: OrderDirection

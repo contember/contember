@@ -139,6 +139,8 @@ type TestMeta {
 }
 
 input TestOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
   c: OrderDirection
 }

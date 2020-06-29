@@ -1,9 +1,8 @@
 import { Input, Model } from '@contember/schema'
 import Path from './Path'
 import JoinBuilder from './JoinBuilder'
-import { QueryBuilder } from '@contember/database'
+import { Literal, QueryBuilder, SelectBuilder } from '@contember/database'
 import { getColumnName, getTargetEntity } from '@contember/schema-utils'
-import { SelectBuilder } from '@contember/database'
 import { UserError } from '../../exception'
 
 class OrderByBuilder {
@@ -34,6 +33,24 @@ class OrderByBuilder {
 			const fields = entries.join(', ')
 			throw new UserError('Order by: only one field is expected in each item of order by clause, got: ' + fields)
 		}
+		if (orderBy._random || orderBy._randomSeeded) {
+			if (orderBy._randomSeeded) {
+				const seed = orderBy._randomSeeded / Math.pow(2, 31)
+				if (seed < -1 || seed > 1) {
+					throw new UserError(`Order by: random seed must be in range of 32bit signed integer`)
+				}
+				qb = qb
+					.with('rand_seed', qb => qb.select(expr => expr.raw('setseed(?)', seed)))
+					.join('rand_seed', undefined, expr => expr.raw('true'))
+			}
+
+			qb = qb.orderBy(new Literal('random()'))
+			if (orderable !== null) {
+				orderable = orderable.orderBy(new Literal('random()'))
+			}
+			return [qb, orderable]
+		}
+
 		const [fieldName, value]: [string, Input.FieldOrderBy] = entries[0]
 
 		if (typeof value === 'string') {

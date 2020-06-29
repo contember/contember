@@ -36,7 +36,10 @@ export default class OrderByTypeProvider {
 	}
 
 	private getEntityOrderByFields(name: string) {
-		const fields: GraphQLInputFieldConfigMap = {}
+		const fields: GraphQLInputFieldConfigMap = {
+			_random: { type: this.graphqlObjectFactories.boolean },
+			_randomSeeded: { type: this.graphqlObjectFactories.int },
+		}
 		const entity = this.schema.entities[name]
 
 		for (const fieldName in entity.fields) {

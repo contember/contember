@@ -38,7 +38,10 @@ class JunctionFetcher {
 		const where = queryWithPredicates.args.filter
 		const hasWhere = where && Object.keys(where).length > 0
 		const hasFieldOrderBy =
-			object.args.orderBy && object.args.orderBy.length > 0 && object.args.orderBy[0]._random === undefined
+			object.args.orderBy &&
+			object.args.orderBy.length > 0 &&
+			!object.args.orderBy[0]._random &&
+			object.args.orderBy[0]._randomSeeded === undefined
 
 		if (hasWhere || hasFieldOrderBy) {
 			const path = new Path([])

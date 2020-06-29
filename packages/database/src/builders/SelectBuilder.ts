@@ -79,8 +79,12 @@ class SelectBuilder<Result = SelectBuilder.Result>
 		return this.withOption('where', this.options.where.withWhere(where))
 	}
 
-	public orderBy(columnName: QueryBuilder.ColumnIdentifier, direction: 'asc' | 'desc' = 'asc'): SelectBuilder<Result> {
-		return this.withOption('orderBy', [...this.options.orderBy, [new Literal(toFqnWrap(columnName)), direction]])
+	public orderBy(
+		expression: QueryBuilder.ColumnIdentifier | Literal,
+		direction: 'asc' | 'desc' = 'asc',
+	): SelectBuilder<Result> {
+		const literal = expression instanceof Literal ? expression : new Literal(toFqnWrap(expression))
+		return this.withOption('orderBy', [...this.options.orderBy, [literal, direction]])
 	}
 
 	public join(table: string | Literal, alias?: string, condition?: SelectBuilder.JoinCondition): SelectBuilder<Result> {

@@ -128,11 +128,13 @@ namespace Input {
 		desc = 'desc',
 	}
 
-	export type FieldOrderBy<T = OrderDirection> = T | OrderBy<T>
+	export type FieldOrderBy = OrderDirection | OrderBy
 
-	export interface OrderBy<T = OrderDirection> {
-		[fieldName: string]: FieldOrderBy<T>
+	export interface OrderByFields {
+		[fieldName: string]: FieldOrderBy
 	}
+
+	export type OrderBy = OrderByFields & { _random?: boolean; _randomSeeded?: number }
 
 	export interface Condition<T = Value.FieldValue> {
 		and?: Array<Condition<T>>

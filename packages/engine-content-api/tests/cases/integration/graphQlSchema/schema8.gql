@@ -107,6 +107,8 @@ type FrontPageMeta {
 }
 
 input FrontPageOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
   unique: OrderDirection
   introVideo: VideoOrderBy
@@ -376,6 +378,8 @@ type VideoMeta {
 }
 
 input VideoOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
   vimeoId: OrderDirection
   frontPageForIntro: FrontPageOrderBy

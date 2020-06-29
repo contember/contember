@@ -27,9 +27,15 @@ class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Ordera
 		return new WindowFunction(this.windowFunction, raw, this.orderByColumns)
 	}
 
-	orderBy(columnName: QueryBuilder.ColumnIdentifier, direction: 'asc' | 'desc' = 'asc'): WindowFunction<HasFunction> {
-		const raw = new Literal(toFqnWrap(columnName) + (direction === 'asc' ? ' asc' : ' desc'))
-		return new WindowFunction(this.windowFunction, this.partitionByExpr, [...this.orderByColumns, raw])
+	orderBy(
+		expression: QueryBuilder.ColumnIdentifier | Literal,
+		direction: 'asc' | 'desc' = 'asc',
+	): WindowFunction<HasFunction> {
+		const raw = expression instanceof Literal ? expression : new Literal(toFqnWrap(expression))
+		return new WindowFunction(this.windowFunction, this.partitionByExpr, [
+			...this.orderByColumns,
+			raw.appendString(direction === 'asc' ? ' asc' : ' desc'),
+		])
 	}
 
 	compile(): Literal {

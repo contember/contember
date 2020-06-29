@@ -96,6 +96,8 @@ type OneHasManyEntityMeta {
 }
 
 input OneHasManyEntityOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
   a: OrderDirection
   r2: RootOrderBy
@@ -201,6 +203,8 @@ type RootMeta {
 }
 
 input RootOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
   id: OrderDirection
 }
 

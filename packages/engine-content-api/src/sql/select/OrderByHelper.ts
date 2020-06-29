@@ -16,7 +16,10 @@ export class OrderByHelper {
 		}
 		const hasLimit = typeof objectNode.args.limit === 'number'
 		const hasOffset = typeof objectNode.args.offset === 'number'
-		if (!hasLimit && !hasOffset && !hasOrderBy) {
+		if (
+			(!hasLimit && !hasOffset && !hasOrderBy) ||
+			(hasOrderBy && (inputOrder[0]._random || inputOrder[0]._randomSeeded !== undefined))
+		) {
 			return objectNode
 		}
 
@@ -24,18 +27,18 @@ export class OrderByHelper {
 		return objectNode.withArg('orderBy', [...(inputOrder || []), ...orderBy])
 	}
 
-	private static buildOrderBy(defaultOrderBy: Model.OrderBy[]): Input.OrderBy[] {
+	private static buildOrderBy(defaultOrderBy: Model.OrderBy[]): Input.OrderByFields[] {
 		return defaultOrderBy
-			.map(({ path, direction }) => {
+			.map(({ path, direction }): Input.OrderByFields | null => {
 				path = [...path]
 				const lastItem = path.pop()
 				if (!lastItem) {
 					return null
 				}
 				const columnOrderBy = { [lastItem]: direction }
-				return path.reverse().reduce<Input.OrderBy>((value, field) => ({ [field]: value }), columnOrderBy)
+				return path.reverse().reduce<Input.OrderByFields>((value, field) => ({ [field]: value }), columnOrderBy)
 			})
-			.filter((it): it is Input.OrderBy => !!it)
+			.filter((it): it is Input.OrderByFields => !!it)
 	}
 
 	private static getPrimaryOrderBy(inputOrder: Input.OrderBy[], entity: Model.Entity): Model.OrderBy[] {

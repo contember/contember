@@ -4,13 +4,7 @@ import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import { BindingError } from '../BindingError'
-import {
-	AccessorTreeGenerator,
-	DirtinessChecker,
-	MarkerTreeGenerator,
-	QueryGenerator,
-	QueryResponseNormalizer,
-} from '../model'
+import { AccessorTreeGenerator, MarkerTreeGenerator, QueryGenerator, QueryResponseNormalizer } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { AccessorTreeStateMetadata } from './AccessorTreeStateMetadata'
@@ -59,7 +53,6 @@ export const useAccessorTreeState = ({
 
 	const queryRef = React.useRef(query)
 	const stateRef = React.useRef(state)
-	const dirtinessCheckerRef = React.useRef<DirtinessChecker | undefined>(undefined)
 	const queryStateRef = React.useRef(queryState)
 
 	stateRef.current = state
@@ -109,9 +102,8 @@ export const useAccessorTreeState = ({
 					triggerPersist,
 				})
 			})
-			dirtinessCheckerRef.current = new DirtinessChecker(markerTree, normalizedData)
 		},
-		[accessorTreeGenerator, markerTree, triggerPersist],
+		[accessorTreeGenerator, triggerPersist],
 	)
 
 	triggerPersistRef.current = async (): Promise<SuccessfulPersistResult> => {

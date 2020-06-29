@@ -1,7 +1,6 @@
 // export * from './internalState' // Deliberately not exporting it
 export * from './AccessorTreeGenerator'
 export * from './AliasTransformer'
-export * from './DirtinessChecker'
 export * from './ErrorsPreprocessor'
 export * from './MarkerMerger'
 export * from './MarkerTreeGenerator'

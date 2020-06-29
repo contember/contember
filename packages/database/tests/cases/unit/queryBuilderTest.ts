@@ -40,6 +40,9 @@ describe('query builder', () => {
 							.compare('d', Operator.lte, 4)
 							.compare('e', Operator.gt, 5)
 							.compare('f', Operator.gte, 6)
+							.compare('g', Operator.contains, 'foo\\%bar')
+							.compare('h', Operator.startsWith, 'lorem_ipsum')
+							.compare('i', Operator.endsWith, 'dolor%sit')
 							.compareColumns('z', Operator.eq, ['foo', 'x'])
 							.in('o', [1, 2, 3])
 							.in(
@@ -54,9 +57,10 @@ describe('query builder', () => {
 			},
 			sql: SQL`select *
                from "public"."foo"
-               where "a" = ? and "b" != ? and "c" < ? and "d" <= ? and "e" > ? and "f" >= ? and "z" = "foo"."x" and "o" in (?, ?, ?) and
-                     "m" in (select ?) and "n" is null and false`,
-			parameters: [1, 2, 3, 4, 5, 6, 1, 2, 3, 1],
+               where "a" = ? and "b" != ? and "c" < ? and "d" <= ? and "e" > ? and "f" >= ?
+                     and "g" like '%' || ? || '%' and "h" like ? || '%' and "i" like '%' || ?
+                     and "z" = "foo"."x" and "o" in (?, ?, ?) and "m" in (select ?) and "n" is null and false`,
+			parameters: [1, 2, 3, 4, 5, 6, 'foo\\\\\\%bar', 'lorem\\_ipsum', 'dolor\\%sit', 1, 2, 3, 1],
 		})
 	})
 

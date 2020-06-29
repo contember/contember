@@ -48,7 +48,13 @@ export class ConditionBuilder {
 		if (!Object.values(Operator).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
-		return this.with(new Literal(`${toFqnWrap(columnName)} ${operator} ?`, [value]))
+		if (operator === Operator.contains || operator === Operator.endsWith || operator === Operator.startsWith) {
+			if (typeof value !== 'string') {
+				throw new Error(`Operator ${operator} supports only a string value`)
+			}
+			value = value.replace(/([\\%_])/g, v => '\\' + v)
+		}
+		return this.with(new Literal(this.createOperatorSql(toFqnWrap(columnName), '?', operator), [value]))
 	}
 
 	columnsEq(columnName1: QueryBuilder.ColumnIdentifier, columnName2: QueryBuilder.ColumnIdentifier): ConditionBuilder {
@@ -60,10 +66,22 @@ export class ConditionBuilder {
 		operator: Operator,
 		columnName2: QueryBuilder.ColumnIdentifier,
 	) {
+		return this.with(new Literal(this.createOperatorSql(toFqnWrap(columnName1), toFqnWrap(columnName2), operator)))
+	}
+
+	private createOperatorSql(left: string, right: string, operator: Operator): string {
 		if (!Object.values(Operator).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
-		return this.with(new Literal(`${toFqnWrap(columnName1)} ${operator} ${toFqnWrap(columnName2)}`))
+		switch (operator) {
+			case Operator.contains:
+				return `${left} LIKE '%' || ${right} || '%'`
+			case Operator.startsWith:
+				return `${left} LIKE ${right} || '%'`
+			case Operator.endsWith:
+				return `${left} LIKE '%' || ${right}`
+		}
+		return `${left} ${operator} ${right}`
 	}
 
 	in(
@@ -130,4 +148,7 @@ export enum Operator {
 	'gte' = '>=',
 	'lt' = '<',
 	'lte' = '<=',
+	'contains' = 'contains',
+	'startsWith' = 'startsWith',
+	'endsWith' = 'endsWith',
 }

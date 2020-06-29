@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { GraphQLEnumType, GraphQLInputObjectType, GraphQLScalarType } from 'graphql'
+import { GraphQLEnumType, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLScalarType } from 'graphql'
 import singletonFactory from '../utils/singletonFactory'
 import ColumnTypeResolver from './ColumnTypeResolver'
 import { GqlTypeName } from './utils'
@@ -25,22 +25,30 @@ export default class ConditionTypeProvider {
 			typeof type === 'object' && type.constructor && type.constructor.name === 'GraphQLEnumType' ? 'Enum' : ''
 		const condition: GraphQLInputObjectType = this.graphqlObjectFactories.createInputObjectType({
 			name: GqlTypeName`${type.name}${suffix}Condition`,
-			fields: () => ({
-				and: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(condition)) },
-				or: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(condition)) },
-				not: { type: condition },
+			fields: (): GraphQLInputFieldConfigMap => {
+				const conditions: GraphQLInputFieldConfigMap = {
+					and: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(condition)) },
+					or: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(condition)) },
+					not: { type: condition },
 
-				eq: { type: type },
-				null: { type: this.graphqlObjectFactories.boolean },
-				isNull: { type: this.graphqlObjectFactories.boolean },
-				notEq: { type: type },
-				in: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(type)) },
-				notIn: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(type)) },
-				lt: { type: type },
-				lte: { type: type },
-				gt: { type: type },
-				gte: { type: type },
-			}),
+					eq: { type: type },
+					null: { type: this.graphqlObjectFactories.boolean },
+					isNull: { type: this.graphqlObjectFactories.boolean },
+					notEq: { type: type },
+					in: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(type)) },
+					notIn: { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(type)) },
+					lt: { type: type },
+					lte: { type: type },
+					gt: { type: type },
+					gte: { type: type },
+				}
+				if (type.name === 'String') {
+					conditions.contains = { type: this.graphqlObjectFactories.string }
+					conditions.startsWith = { type: this.graphqlObjectFactories.string }
+					conditions.endsWith = { type: this.graphqlObjectFactories.string }
+				}
+				return conditions
+			},
 		})
 		return condition
 	}

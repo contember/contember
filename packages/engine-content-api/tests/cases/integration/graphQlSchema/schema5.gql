@@ -271,6 +271,9 @@ input StringCondition {
   lte: String
   gt: String
   gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
 }
 
 scalar UUID

@@ -122,11 +122,7 @@ class AccessorTreeGenerator {
 		this.updateData = updateData
 
 		for (const [placeholderName, marker] of this.markerTree.subTrees) {
-			const subTreeState = this.initializeSubTree(
-				marker,
-				persistedData.subTreeDataStore.get(placeholderName),
-				undefined,
-			)
+			const subTreeState = this.initializeSubTree(marker, persistedData.subTreeDataStore.get(placeholderName))
 			this.subTreeStates.set(placeholderName, subTreeState)
 		}
 
@@ -192,10 +188,7 @@ class AccessorTreeGenerator {
 	private initializeSubTree(
 		tree: SubTreeMarker,
 		persistedRootData: BoxedSingleEntityId | Set<string> | undefined,
-		errors: ErrorsPreprocessor.ErrorTreeRoot | undefined,
 	): InternalRootStateNode {
-		const errorNode = errors === undefined ? undefined : errors[tree.placeholderName]
-
 		let subTreeState: InternalEntityState | InternalEntityListState
 
 		if (tree.parameters.type === 'qualifiedEntityList' || tree.parameters.type === 'unconstrainedQualifiedEntityList') {
@@ -205,14 +198,13 @@ class AccessorTreeGenerator {
 				{ initialEntityCount: 0, ...tree.parameters.value },
 				noop,
 				persistedEntityIds,
-				errorNode,
 			)
 		} else {
 			const id =
 				persistedRootData instanceof BoxedSingleEntityId
 					? persistedRootData.id
 					: new EntityAccessor.UnpersistedEntityId()
-			subTreeState = this.initializeEntityAccessor(id, tree.fields, tree.parameters.value, noop, errorNode)
+			subTreeState = this.initializeEntityAccessor(id, tree.fields, tree.parameters.value, noop)
 		}
 		this.subTreeStates.set(tree.placeholderName, subTreeState)
 
@@ -261,13 +253,6 @@ class AccessorTreeGenerator {
 				const relation = field.relation
 				const fieldDatum = entityState.persistedData?.get(field.placeholderName)
 
-				const referenceError =
-					entityState.errors && entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.INode
-						? entityState.errors.children[relation.field] ||
-						  entityState.errors.children[field.placeholderName] ||
-						  undefined
-						: undefined
-
 				if (fieldDatum instanceof Set) {
 					throw new BindingError(
 						`Received a collection of entities for field '${relation.field}' where a single entity was expected. ` +
@@ -281,7 +266,6 @@ class AccessorTreeGenerator {
 						field.fields,
 						field.relation,
 						entityState.onChildFieldUpdate,
-						referenceError,
 					)
 					entityState.fields.set(field.placeholderName, referenceEntityState)
 				} else {
@@ -308,7 +292,6 @@ class AccessorTreeGenerator {
 							relation,
 							entityState.onChildFieldUpdate,
 							fieldDatum || new Set(),
-							referenceError,
 						),
 					)
 				} else if (typeof fieldDatum === 'object') {
@@ -337,7 +320,6 @@ class AccessorTreeGenerator {
 		fieldMarkers: EntityFieldMarkers,
 		creationParameters: EntityCreationParameters,
 		onEntityUpdate: OnEntityUpdate,
-		errors: ErrorsPreprocessor.ErrorNode | undefined,
 	): InternalEntityState {
 		const entityKey = this.idToKey(id)
 		const existingEntityState = this.entityStore.get(entityKey)
@@ -358,7 +340,7 @@ class AccessorTreeGenerator {
 			batchUpdateDepth: 0,
 			childrenWithPendingUpdates: undefined,
 			creationParameters,
-			errors,
+			errors: undefined,
 			eventListeners: {
 				update: undefined,
 				beforeUpdate: undefined,
@@ -506,7 +488,6 @@ class AccessorTreeGenerator {
 							hasOneMarker.fields,
 							hasOneMarker.relation,
 							entityState.onChildFieldUpdate,
-							undefined,
 						)
 						entityState.fields.set(placeholderName, newEntityState)
 
@@ -612,7 +593,6 @@ class AccessorTreeGenerator {
 					deletedState.fieldMarkers,
 					deletedState.creationParameters,
 					entityState.onChildFieldUpdate,
-					undefined,
 				)
 				entityState.fields.set(placeholderName, newEntityState)
 			}
@@ -638,18 +618,10 @@ class AccessorTreeGenerator {
 		creationParameters: EntityCreationParameters & EntityListPreferences,
 		onEntityListUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
-		errors: ErrorsPreprocessor.ErrorNode | undefined,
 	): InternalEntityListState {
-		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
-			throw new BindingError(
-				`The error tree structure does not correspond to the marker tree. This should never happen.`,
-			)
-		}
-
 		const entityListState: InternalEntityListState = {
 			type: InternalStateType.EntityList,
 			creationParameters,
-			errors,
 			fieldMarkers,
 			onEntityListUpdate,
 			persistedEntityIds,
@@ -661,6 +633,7 @@ class AccessorTreeGenerator {
 				update: undefined,
 				beforeUpdate: undefined,
 			},
+			errors: undefined,
 			plannedRemovals: undefined,
 			hasPendingParentNotification: false,
 			hasPendingUpdate: false,
@@ -862,20 +835,12 @@ class AccessorTreeGenerator {
 		const generateNewEntityState = (persistedId: string | undefined): InternalEntityState => {
 			const id = persistedId === undefined ? new EntityAccessor.UnpersistedEntityId() : persistedId
 			const key = this.idToKey(id)
-			let childErrors
-
-			if (entityListState.errors) {
-				childErrors = (entityListState.errors as ErrorsPreprocessor.ErrorINode).children[key]
-			} else {
-				childErrors = undefined
-			}
 
 			const entityState = this.initializeEntityAccessor(
 				id,
 				entityListState.fieldMarkers,
 				entityListState.creationParameters,
 				entityListState.onChildEntityUpdate,
-				childErrors,
 			)
 
 			entityListState.hasStaleAccessor = true

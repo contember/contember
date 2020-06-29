@@ -16,7 +16,7 @@ export interface InternalEntityState {
 	batchUpdateDepth: number
 	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
 	creationParameters: EntityCreationParameters
-	errors: ErrorsPreprocessor.ErrorNode | undefined
+	errors: ErrorsPreprocessor.ErrorINode | undefined
 	fields: Map<FieldName, InternalStateNode>
 	fieldMarkers: EntityFieldMarkers
 	getAccessor: () => EntityAccessor

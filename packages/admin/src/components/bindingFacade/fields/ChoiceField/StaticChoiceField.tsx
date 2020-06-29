@@ -1,7 +1,6 @@
-import * as React from 'react'
 import {
-	Component,
 	BindingError,
+	Component,
 	Environment,
 	Field,
 	FieldValue,
@@ -12,6 +11,7 @@ import {
 	useRelativeSingleField,
 	VariableInputTransformer,
 } from '@contember/binding'
+import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export interface StaticOption {
@@ -66,7 +66,7 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 	)
 	const onChange = React.useCallback(
 		(newValue: ChoiceFieldData.ValueRepresentation) => {
-			field.updateValue && field.updateValue(options[newValue].value)
+			field.updateValue?.(newValue === -1 ? null : options[newValue].value)
 		},
 		[field, options],
 	)

@@ -46,6 +46,9 @@ export default class ConditionBuilder {
 			lte: (builder, value) => builder.compare(columnIdentifier, Operator.lte, value),
 			gt: (builder, value) => builder.compare(columnIdentifier, Operator.gt, value),
 			gte: (builder, value) => builder.compare(columnIdentifier, Operator.gte, value),
+			contains: (builder, value) => builder.compare(columnIdentifier, Operator.contains, value),
+			startsWith: (builder, value) => builder.compare(columnIdentifier, Operator.startsWith, value),
+			endsWith: (builder, value) => builder.compare(columnIdentifier, Operator.endsWith, value),
 			never: builder => builder.raw('false'),
 			always: builder => builder.raw('true'),
 			// deprecated

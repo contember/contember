@@ -153,6 +153,9 @@ namespace Input {
 		gte?: T
 		never?: true
 		always?: true
+		contains?: string
+		startsWith?: string
+		endsWith?: string
 	}
 
 	export interface UniqueWhere<E = never> {

@@ -1,4 +1,3 @@
-import { TreeParameterMerger } from '../model'
 import { HasOneRelation } from '../treeParameters'
 import { EntityFieldMarkers, hasAtLeastOneBearingField } from './EntityFieldMarkers'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
@@ -7,15 +6,8 @@ import { PlaceholderGenerator } from './PlaceholderGenerator'
 export class HasOneRelationMarker {
 	public readonly placeholderName: string
 	public readonly hasAtLeastOneBearingField: boolean
-	public readonly relation: HasOneRelation
 
-	public constructor(relation: HasOneRelation, public readonly fields: EntityFieldMarkers) {
-		this.relation = {
-			...relation,
-			setOnCreate: relation.reducedBy
-				? TreeParameterMerger.mergeSetOnCreate(relation.setOnCreate || {}, relation.reducedBy)
-				: undefined,
-		}
+	public constructor(public readonly relation: HasOneRelation, public readonly fields: EntityFieldMarkers) {
 		this.placeholderName = PlaceholderGenerator.generateHasOneRelationMarkerPlaceholder(this)
 		this.hasAtLeastOneBearingField = hasAtLeastOneBearingField(fields)
 	}

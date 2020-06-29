@@ -8,7 +8,7 @@ import {
 	PlaceholderGenerator,
 	SubTreeMarker,
 } from '../markers'
-import { MarkerMerger } from '../model'
+import { MarkerMerger, TreeParameterMerger } from '../model'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
@@ -36,7 +36,13 @@ export namespace MarkerFactory {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
 
 		return new SubTreeMarker(
-			new BoxedQualifiedSingleEntity(qualifiedSingleEntity),
+			new BoxedQualifiedSingleEntity({
+				...qualifiedSingleEntity,
+				setOnCreate: TreeParameterMerger.mergeSetOnCreate(
+					qualifiedSingleEntity.setOnCreate || {},
+					qualifiedSingleEntity.where,
+				),
+			}),
 			wrapRelativeEntityFields(qualifiedSingleEntity.hasOneRelationPath, MarkerMerger.mergeInSystemFields(fields)),
 		)
 	}
@@ -136,7 +142,15 @@ export namespace MarkerFactory {
 	}
 
 	export const createHasOneRelationMarker = (hasOneRelation: HasOneRelation, entityFieldMarkers: EntityFieldMarkers) =>
-		new HasOneRelationMarker(hasOneRelation, MarkerMerger.mergeInSystemFields(entityFieldMarkers))
+		new HasOneRelationMarker(
+			{
+				...hasOneRelation,
+				setOnCreate: hasOneRelation.reducedBy
+					? TreeParameterMerger.mergeSetOnCreate(hasOneRelation.setOnCreate || {}, hasOneRelation.reducedBy)
+					: hasOneRelation.setOnCreate,
+			},
+			MarkerMerger.mergeInSystemFields(entityFieldMarkers),
+		)
 
 	export const createHasManyRelationMarker = (
 		hasManyRelation: HasManyRelation,

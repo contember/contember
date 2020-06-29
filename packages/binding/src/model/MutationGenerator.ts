@@ -313,8 +313,8 @@ export class MutationGenerator {
 			}
 		}
 
-		if (currentState.creationParameters.setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
-			const setOnCreate = currentState.creationParameters.setOnCreate
+		const setOnCreate = currentState.creationParameters.setOnCreate
+		if (setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
 			for (const key in setOnCreate) {
 				const field = setOnCreate[key]
 

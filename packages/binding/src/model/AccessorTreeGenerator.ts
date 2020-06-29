@@ -212,17 +212,7 @@ class AccessorTreeGenerator {
 				persistedRootData instanceof BoxedSingleEntityId
 					? persistedRootData.id
 					: new EntityAccessor.UnpersistedEntityId()
-			subTreeState = this.initializeEntityAccessor(
-				id,
-				tree.fields,
-				{
-					isNonbearing: false,
-					setOnCreate: undefined,
-					forceCreation: false,
-				},
-				noop,
-				errorNode,
-			)
+			subTreeState = this.initializeEntityAccessor(id, tree.fields, tree.parameters.value, noop, errorNode)
 		}
 		this.subTreeStates.set(tree.placeholderName, subTreeState)
 

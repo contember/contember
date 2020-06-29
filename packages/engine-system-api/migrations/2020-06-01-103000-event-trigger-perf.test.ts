@@ -21,6 +21,7 @@ describe('test event-trigger-performance migration', () => {
 					},
 				],
 			},
+			queryHandler: null as any,
 		})
 		expect(builder.getSql()).toEqual(`CREATE OR REPLACE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
 DECLARE

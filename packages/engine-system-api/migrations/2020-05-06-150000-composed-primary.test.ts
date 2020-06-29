@@ -21,6 +21,7 @@ describe('test many-has-many-primary migration', () => {
 					},
 				],
 			},
+			queryHandler: null as any,
 		})
 		expect(builder.getSql()).toEqual(`ALTER TABLE "stage_prod"."post_tags"
   DROP "id";

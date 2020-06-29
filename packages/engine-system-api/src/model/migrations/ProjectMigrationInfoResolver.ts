@@ -8,7 +8,7 @@ import { MigrationsResolverFactory } from './MigrationsResolverFactory'
 class ProjectMigrationInfoResolver {
 	constructor(
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
-		private readonly migrationsResolverFactory: MigrationsResolverFactory,
+		public readonly migrationsResolverFactory: MigrationsResolverFactory,
 	) {}
 
 	public async getMigrationsInfo(

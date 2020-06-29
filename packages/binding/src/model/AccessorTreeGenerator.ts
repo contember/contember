@@ -499,7 +499,7 @@ class AccessorTreeGenerator {
 
 						stateToDisconnect.realms.delete(entityState.onChildFieldUpdate)
 
-						// TODO do something about the existing state…
+						// TODO update chagnes count?
 
 						const newEntityState = this.initializeEntityAccessor(
 							new EntityAccessor.UnpersistedEntityId(),
@@ -616,7 +616,7 @@ class AccessorTreeGenerator {
 				)
 				entityState.fields.set(placeholderName, newEntityState)
 			}
-			// TODO finish deleting the entityState & update the changes count
+			// TODO update the changes count
 			entityState.childrenWithPendingUpdates?.delete(deletedState)
 		}
 
@@ -842,6 +842,7 @@ class AccessorTreeGenerator {
 		}
 
 		const processEntityDeletion = (stateForDeletion: InternalEntityState) => {
+			// We don't remove entities from the store so as to allow their re-connection.
 			entityListState.childrenWithPendingUpdates?.delete(stateForDeletion)
 
 			const key = this.idToKey(stateForDeletion.id)
@@ -849,7 +850,7 @@ class AccessorTreeGenerator {
 			entityListState.hasPendingParentNotification = true
 
 			if (stateForDeletion.id instanceof EntityAccessor.UnpersistedEntityId) {
-				return // TODO remove it from the store
+				return
 			}
 
 			if (entityListState.plannedRemovals === undefined) {
@@ -1083,7 +1084,6 @@ class AccessorTreeGenerator {
 		const agenda: InternalStateNode[] = rootStates
 
 		for (const state of agenda) {
-			//console.log(state)
 			if (!state.hasPendingUpdate) {
 				continue
 			}

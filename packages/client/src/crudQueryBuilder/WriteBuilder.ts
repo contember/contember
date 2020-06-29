@@ -1,5 +1,6 @@
 import { Input } from '@contember/schema'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
+import { ErrorsRelationBuilder } from './ErrorsRelationBuilder'
 import { ReadBuilder } from './ReadBuilder'
 import { WriteArguments, WriteFields, WriteOperation } from './types'
 import { ValidationRelationBuilder } from './ValidationRelationBuilder'
@@ -43,6 +44,12 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 	public validation() {
 		return WriteBuilder.instantiate<AA, Exclude<AF, 'validation'>, Op>(
 			ValidationRelationBuilder.validationRelation(this.objectBuilder),
+		)
+	}
+
+	public errors() {
+		return WriteBuilder.instantiate<AA, Exclude<AF, 'errors'>, Op>(
+			ErrorsRelationBuilder.errorsRelation(this.objectBuilder),
 		)
 	}
 

@@ -115,16 +115,31 @@ describe('crud query builder', () => {
 }`)
 	})
 
-	it('validation relation builder', () => {
+	it('validation & errors relation builders', () => {
 		const builder = new CrudQueryBuilder.CrudQueryBuilder().create('Foo', builder =>
 			builder
 				.data({ bar: '123' })
 				.ok()
+				.errors()
 				.validation(),
 		)
 		expect(builder.getGql()).toEqual(`mutation {
 	createFoo(data: {bar: "123"}) {
 		ok
+		errors {
+			type
+			message
+			path {
+				__typename
+				... on _FieldPathFragment {
+					field
+				}
+				... on _IndexPathFragment {
+					index
+					alias
+				}
+			}
+		}
 		validation {
 			valid
 			errors {

@@ -30,6 +30,10 @@ export class PlaceholderGenerator {
 		return `${relation.field}_${Hashing.hashHasOneRelation(relation)}`
 	}
 
+	public static isHasOneRelationFieldPlaceholder(field: FieldName, placeholderName: FieldName): boolean {
+		return placeholderName.startsWith(`${field}_`) // Meh.
+	}
+
 	//
 
 	public static generateHasManyRelationMarkerPlaceholder(marker: HasManyRelationMarker): string {
@@ -38,6 +42,10 @@ export class PlaceholderGenerator {
 
 	public static getHasManyRelationPlaceholder(relation: HasManyRelation | DesugaredHasManyRelation): string {
 		return `${relation.field}_${Hashing.hashHasManyRelation(relation)}`
+	}
+
+	public static isHasManyRelationFieldPlaceholder(field: FieldName, placeholderName: FieldName): boolean {
+		return placeholderName.startsWith(`${field}_`) // Meh.
 	}
 
 	//

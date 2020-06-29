@@ -12,7 +12,7 @@ export interface InternalEntityListState {
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
 	creationParameters: EntityCreationParameters
-	errors: ErrorsPreprocessor.ErrorINode | undefined
+	errors: ErrorsPreprocessor.KeyIndexedErrorNode | undefined
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:
 			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>

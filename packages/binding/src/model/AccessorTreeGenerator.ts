@@ -1,15 +1,13 @@
 import { GraphQlBuilder } from '@contember/client'
 import { emptyArray, noop } from '@contember/react-utils'
 import * as ReactDOM from 'react-dom'
+import { EntityAccessor, EntityListAccessor, FieldAccessor, GetSubTree, TreeRootAccessor } from '../accessors'
 import {
-	EntityAccessor,
-	EntityListAccessor,
-	ErrorAccessor,
-	FieldAccessor,
-	GetSubTree,
-	TreeRootAccessor,
-} from '../accessors'
-import { BoxedSingleEntityId, NormalizedQueryResponseData, PersistedEntityDataStore } from '../accessorTree'
+	BoxedSingleEntityId,
+	MutationDataResponse,
+	NormalizedQueryResponseData,
+	PersistedEntityDataStore,
+} from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
@@ -63,6 +61,8 @@ class AccessorTreeGenerator {
 	//  Nevertheless, no real analysis has been done and it could turn out to be a problem.
 	private entityStore: Map<string, InternalEntityState> = new Map()
 	private subTreeStates: Map<string, InternalRootStateNode> = new Map()
+
+	private currentErrors: ErrorsPreprocessor.ErrorTreeRoot | undefined
 
 	private readonly getEntityByKey = (key: string) => {
 		const entity = this.entityStore.get(key)
@@ -136,6 +136,125 @@ class AccessorTreeGenerator {
 		const generator = new MutationGenerator(this.markerTree, this.subTreeStates, this.entityStore)
 
 		return generator.getPersistMutation()
+	}
+
+	public setErrors(data: MutationDataResponse | undefined) {
+		this.performRootTreeOperation(() => {
+			if (this.currentErrors) {
+				this.setRootStateErrors(this.currentErrors, AccessorTreeGenerator.ErrorPopulationMode.Clear)
+			}
+
+			const preprocessor = new ErrorsPreprocessor(data)
+			const errorTreeRoot = preprocessor.preprocess()
+			this.currentErrors = errorTreeRoot
+
+			this.setRootStateErrors(errorTreeRoot, AccessorTreeGenerator.ErrorPopulationMode.Add)
+
+			console.error('Errors', errorTreeRoot)
+		})
+	}
+
+	private setRootStateErrors(
+		errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot,
+		mode: AccessorTreeGenerator.ErrorPopulationMode,
+	) {
+		for (const subTreePlaceholder in errorTreeRoot) {
+			const rootError = errorTreeRoot[subTreePlaceholder]
+			const rootState = this.subTreeStates.get(subTreePlaceholder)
+
+			if (!rootState) {
+				continue
+			}
+			switch (rootState.type) {
+				case InternalStateType.SingleEntity: {
+					if (rootError.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed) {
+						this.setEntityStateErrors(rootState, rootError, mode)
+					}
+					break
+				}
+				case InternalStateType.EntityList: {
+					if (rootError.nodeType === ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
+						this.setEntityListStateErrors(rootState, rootError, mode)
+					}
+					break
+				}
+			}
+		}
+	}
+
+	private setEntityStateErrors(
+		state: InternalEntityState,
+		errors: ErrorsPreprocessor.FieldIndexedErrorNode,
+		mode: AccessorTreeGenerator.ErrorPopulationMode,
+	) {
+		state.hasStaleAccessor = true
+		state.hasPendingUpdate = true
+		state.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? errors : undefined
+
+		if (state.childrenWithPendingUpdates === undefined) {
+			state.childrenWithPendingUpdates = new Set()
+		}
+
+		for (const childKey in errors.children) {
+			const child = errors.children[childKey]
+
+			if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
+				const fieldState = state.fields.get(childKey)
+
+				if (fieldState?.type === InternalStateType.Field) {
+					fieldState.hasStaleAccessor = true
+					fieldState.hasPendingUpdate = true
+					fieldState.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? child.errors : emptyArray
+					state.childrenWithPendingUpdates.add(fieldState)
+					continue
+				}
+			}
+			// Deliberately letting flow get here as well. Leaf errors *CAN* refer to relations as well.
+
+			for (const [fieldPlaceholder, fieldState] of state.fields) {
+				if (fieldState.type === InternalStateType.SingleEntity) {
+					if (
+						child.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
+						PlaceholderGenerator.isHasOneRelationFieldPlaceholder(childKey, fieldPlaceholder)
+					) {
+						state.childrenWithPendingUpdates.add(fieldState)
+						this.setEntityStateErrors(fieldState, child, mode)
+					}
+				} else if (fieldState.type === InternalStateType.EntityList) {
+					if (
+						child.nodeType === ErrorsPreprocessor.ErrorNodeType.KeyIndexed &&
+						PlaceholderGenerator.isHasManyRelationFieldPlaceholder(childKey, fieldPlaceholder)
+					) {
+						state.childrenWithPendingUpdates.add(fieldState)
+						this.setEntityListStateErrors(fieldState, child, mode)
+					}
+				}
+			}
+		}
+	}
+
+	private setEntityListStateErrors(
+		state: InternalEntityListState,
+		errors: ErrorsPreprocessor.KeyIndexedErrorNode,
+		mode: AccessorTreeGenerator.ErrorPopulationMode,
+	) {
+		state.hasStaleAccessor = true
+		state.hasPendingUpdate = true
+		state.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? errors : undefined
+
+		if (state.childrenWithPendingUpdates === undefined) {
+			state.childrenWithPendingUpdates = new Set()
+		}
+
+		for (const childKey in errors.children) {
+			const childError = errors.children[childKey]
+			const childState = this.entityStore.get(childKey)
+
+			if (childState && childError.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed) {
+				state.childrenWithPendingUpdates.add(childState)
+				this.setEntityStateErrors(childState, childError, mode)
+			}
+		}
 	}
 
 	private performRootTreeOperation(operation: () => void) {
@@ -234,18 +353,11 @@ class AccessorTreeGenerator {
 					if (entityState.fields.get(placeholderName)) {
 						continue
 					}
-					const fieldErrors: ErrorAccessor[] =
-						entityState.errors &&
-						entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.INode &&
-						field.fieldName in entityState.errors.children
-							? entityState.errors.children[field.fieldName].errors
-							: emptyArray
 					const fieldState = this.initializeFieldAccessor(
 						placeholderName,
 						field,
 						entityState.onChildFieldUpdate,
 						fieldDatum,
-						fieldErrors,
 					)
 					entityState.fields.set(placeholderName, fieldState)
 				}
@@ -277,12 +389,6 @@ class AccessorTreeGenerator {
 			} else if (field instanceof HasManyRelationMarker) {
 				const relation = field.relation
 				const fieldDatum = entityState.persistedData?.get(field.placeholderName)
-				const referenceError =
-					entityState.errors && entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.INode
-						? entityState.errors.children[relation.field] ||
-						  entityState.errors.children[field.placeholderName] ||
-						  undefined
-						: undefined
 
 				if (fieldDatum === undefined || fieldDatum instanceof Set) {
 					entityState.fields.set(
@@ -865,7 +971,6 @@ class AccessorTreeGenerator {
 		fieldMarker: FieldMarker,
 		onFieldUpdate: OnFieldUpdate,
 		persistedValue: Scalar | undefined,
-		errors: ErrorAccessor[],
 	): InternalFieldState {
 		let resolvedFieldValue: FieldValue
 		if (persistedValue === undefined) {
@@ -878,7 +983,6 @@ class AccessorTreeGenerator {
 
 		const fieldState: InternalFieldState = {
 			type: InternalStateType.Field,
-			errors,
 			fieldMarker,
 			onFieldUpdate,
 			placeholderName,
@@ -889,6 +993,7 @@ class AccessorTreeGenerator {
 				beforeUpdate: undefined,
 				update: undefined,
 			},
+			errors: emptyArray,
 			touchLog: undefined,
 			hasPendingUpdate: false,
 			hasUnpersistedChanges: false,
@@ -1083,6 +1188,11 @@ class AccessorTreeGenerator {
 
 namespace AccessorTreeGenerator {
 	export type UpdateData = (newData: TreeRootAccessor) => void
+
+	export enum ErrorPopulationMode {
+		Add = 'add',
+		Clear = 'clear',
+	}
 }
 
 export { AccessorTreeGenerator }

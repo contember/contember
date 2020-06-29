@@ -136,10 +136,7 @@ export const useAccessorTreeState = ({
 			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
 
 			if (!allSubMutationsOk) {
-				//initializeAccessorTree(persistedData, latestAccessorTree, data.data)
-				const preprocessor = new ErrorsPreprocessor(data.data)
-				const errorTreeRoot = preprocessor.preprocess()
-				console.error('ERRORS!', errorTreeRoot, data.data) // TODO
+				accessorTreeGenerator.setErrors(data.data)
 				dispatch({
 					type: AccessorTreeStateActionType.SetData,
 					data: latestAccessorTree,

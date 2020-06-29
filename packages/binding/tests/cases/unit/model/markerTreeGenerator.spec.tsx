@@ -117,7 +117,7 @@ describe('Marker tree generator', () => {
 				filter: undefined,
 				hasOneRelationPath: [],
 				isNonbearing: false,
-				setOnCreate: undefined,
+				setOnCreate: { bar: 123 },
 				forceCreation: false,
 			}),
 			new Map<string, Marker>([

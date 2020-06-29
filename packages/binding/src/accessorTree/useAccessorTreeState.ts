@@ -132,6 +132,11 @@ export const useAccessorTreeState = ({
 			if (!allSubMutationsOk) {
 				//initializeAccessorTree(persistedData, latestAccessorTree, data.data)
 				console.error('ERRORS!', data.data) // TODO
+				dispatch({
+					type: AccessorTreeStateActionType.SetData,
+					data: latestAccessorTree,
+					triggerPersist,
+				})
 				return Promise.reject({
 					type: MutationErrorType.InvalidInput,
 				})

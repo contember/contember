@@ -288,7 +288,7 @@ export class MutationGenerator {
 			}
 		}
 
-		if (currentState.creationParameters.forceCreation && builder.data !== undefined && !isEmptyObject(builder.data)) {
+		if (currentState.creationParameters.forceCreation && (builder.data === undefined || isEmptyObject(builder.data))) {
 			builder = builder.set('_create', true)
 		}
 

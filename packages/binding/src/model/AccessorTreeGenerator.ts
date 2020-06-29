@@ -244,7 +244,7 @@ class AccessorTreeGenerator {
 					}
 					const fieldErrors: ErrorAccessor[] =
 						entityState.errors &&
-						entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
+						entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.INode &&
 						field.fieldName in entityState.errors.children
 							? entityState.errors.children[field.fieldName].errors
 							: emptyArray
@@ -262,7 +262,7 @@ class AccessorTreeGenerator {
 				const fieldDatum = entityState.persistedData?.get(field.placeholderName)
 
 				const referenceError =
-					entityState.errors && entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed
+					entityState.errors && entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.INode
 						? entityState.errors.children[relation.field] ||
 						  entityState.errors.children[field.placeholderName] ||
 						  undefined
@@ -294,7 +294,7 @@ class AccessorTreeGenerator {
 				const relation = field.relation
 				const fieldDatum = entityState.persistedData?.get(field.placeholderName)
 				const referenceError =
-					entityState.errors && entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed
+					entityState.errors && entityState.errors.nodeType === ErrorsPreprocessor.ErrorNodeType.INode
 						? entityState.errors.children[relation.field] ||
 						  entityState.errors.children[field.placeholderName] ||
 						  undefined
@@ -640,7 +640,7 @@ class AccessorTreeGenerator {
 		persistedEntityIds: Set<string>,
 		errors: ErrorsPreprocessor.ErrorNode | undefined,
 	): InternalEntityListState {
-		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
+		if (errors && errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
 			throw new BindingError(
 				`The error tree structure does not correspond to the marker tree. This should never happen.`,
 			)
@@ -865,7 +865,7 @@ class AccessorTreeGenerator {
 			let childErrors
 
 			if (entityListState.errors) {
-				childErrors = (entityListState.errors as ErrorsPreprocessor.KeyIndexedErrorNode).children[key]
+				childErrors = (entityListState.errors as ErrorsPreprocessor.ErrorINode).children[key]
 			} else {
 				childErrors = undefined
 			}

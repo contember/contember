@@ -4,7 +4,13 @@ import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import { BindingError } from '../BindingError'
-import { AccessorTreeGenerator, MarkerTreeGenerator, QueryGenerator, QueryResponseNormalizer } from '../model'
+import {
+	AccessorTreeGenerator,
+	ErrorsPreprocessor,
+	MarkerTreeGenerator,
+	QueryGenerator,
+	QueryResponseNormalizer,
+} from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { AccessorTreeStateMetadata } from './AccessorTreeStateMetadata'
@@ -131,7 +137,9 @@ export const useAccessorTreeState = ({
 
 			if (!allSubMutationsOk) {
 				//initializeAccessorTree(persistedData, latestAccessorTree, data.data)
-				console.error('ERRORS!', data.data) // TODO
+				const preprocessor = new ErrorsPreprocessor(data.data)
+				const errorTreeRoot = preprocessor.preprocess()
+				console.error('ERRORS!', errorTreeRoot, data.data) // TODO
 				dispatch({
 					type: AccessorTreeStateActionType.SetData,
 					data: latestAccessorTree,

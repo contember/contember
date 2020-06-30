@@ -1176,6 +1176,7 @@ export class AccessorTreeGenerator {
 			state.hasPendingUpdate = false
 
 			if (state.eventListeners.update !== undefined) {
+				console.log(state)
 				for (const handler of state.eventListeners.update) {
 					// TS can't quite handle the polymorphism here but this is fine.
 					handler(state.getAccessor() as any)

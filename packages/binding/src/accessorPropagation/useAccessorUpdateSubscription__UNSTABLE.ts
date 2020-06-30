@@ -10,10 +10,15 @@ function useAccessorUpdateSubscription__UNSTABLE<
 	Produced extends Persisted = Persisted
 >(getFieldAccessor: () => FieldAccessor<Persisted, Produced>): FieldAccessor<Persisted, Produced>
 function useAccessorUpdateSubscription__UNSTABLE(getEntityAccessor: () => EntityAccessor): EntityAccessor
-function useAccessorUpdateSubscription__UNSTABLE(getEntityListAccessor: () => EntityListAccessor): EntityListAccessor
-function useAccessorUpdateSubscription__UNSTABLE<A extends FieldAccessor | EntityListAccessor | EntityAccessor>(
-	getAccessor: () => A,
-): A {
+function useAccessorUpdateSubscription__UNSTABLE(getAccessor: () => EntityListAccessor): EntityListAccessor
+function useAccessorUpdateSubscription__UNSTABLE(
+	getEntityListAccessor: () => EntityListAccessor | EntityAccessor,
+): EntityListAccessor | EntityAccessor
+function useAccessorUpdateSubscription__UNSTABLE<
+	A extends FieldAccessor<Persisted, Produced> | EntityListAccessor | EntityAccessor,
+	Persisted extends FieldValue = FieldValue,
+	Produced extends Persisted = Persisted
+>(getAccessor: () => A): A {
 	// This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
 	const [state, setState] = React.useState<{
 		accessor: A
@@ -34,7 +39,7 @@ function useAccessorUpdateSubscription__UNSTABLE<A extends FieldAccessor | Entit
 
 	const addEventListener: (
 		eventType: 'update',
-		handler: (newAccessor: FieldAccessor | EntityListAccessor | EntityAccessor) => void,
+		handler: (newAccessor: FieldAccessor<Persisted, Produced> | EntityListAccessor | EntityAccessor) => void,
 	) => () => void = accessor.addEventListener
 	React.useEffect(() => {
 		let isStillSubscribed = true

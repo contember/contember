@@ -4,13 +4,7 @@ import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import { BindingError } from '../BindingError'
-import {
-	AccessorTreeGenerator,
-	ErrorsPreprocessor,
-	MarkerTreeGenerator,
-	QueryGenerator,
-	QueryResponseNormalizer,
-} from '../model'
+import { AccessorTreeGenerator, MarkerTreeGenerator, QueryGenerator } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { AccessorTreeStateMetadata } from './AccessorTreeStateMetadata'
@@ -100,8 +94,7 @@ export const useAccessorTreeState = ({
 
 	const initializeAccessorTree = React.useCallback(
 		(data: QueryRequestResponse | undefined) => {
-			const normalizedData = QueryResponseNormalizer.normalizeResponse(data)
-			accessorTreeGenerator.initializeLiveTree(normalizedData, accessor => {
+			accessorTreeGenerator.initializeLiveTree(data, accessor => {
 				dispatch({
 					type: AccessorTreeStateActionType.SetData,
 					data: accessor,
@@ -162,7 +155,7 @@ export const useAccessorTreeState = ({
 
 			try {
 				const queryData = await sendQuery(query, {}, sessionToken)
-				initializeAccessorTree(queryData)
+				accessorTreeGenerator.updatePersistedData(queryData)
 				return Promise.resolve({
 					type: PersistResultSuccessType.JustSuccess,
 					persistedEntityIds,

@@ -7,6 +7,7 @@ import {
 	MutationDataResponse,
 	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
+	QueryRequestResponse,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { TYPENAME_KEY_NAME } from '../bindingTypes'
@@ -35,6 +36,7 @@ import {
 	OnFieldUpdate,
 } from './internalState'
 import { MutationGenerator } from './MutationGenerator'
+import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 
 // This only applies to the 'beforeUpdate' event:
 
@@ -115,9 +117,11 @@ export class AccessorTreeGenerator {
 	public constructor(private markerTree: MarkerTreeRoot) {}
 
 	public initializeLiveTree(
-		persistedData: NormalizedQueryResponseData,
+		queryResponse: QueryRequestResponse | undefined,
 		updateData: (newData: TreeRootAccessor) => void,
 	): void {
+		const persistedData = QueryResponseNormalizer.normalizeResponse(queryResponse)
+
 		this.persistedEntityData = persistedData.persistedEntityDataStore
 		this.updateData = updateData
 
@@ -152,6 +156,13 @@ export class AccessorTreeGenerator {
 
 			console.error('Errors', errorTreeRoot)
 		})
+	}
+
+	public updatePersistedData(queryResponse: QueryRequestResponse | undefined) {
+		const persistedData = QueryResponseNormalizer.normalizeResponse(queryResponse)
+
+		//this.persistedEntityData = persistedData.persistedEntityDataStore
+		// TODO
 	}
 
 	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot, mode: ErrorPopulationMode) {

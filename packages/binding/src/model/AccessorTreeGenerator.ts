@@ -51,8 +51,13 @@ import { MutationGenerator } from './MutationGenerator'
 // listeners.
 const BEFORE_UPDATE_SETTLE_LIMIT = 20
 
-class AccessorTreeGenerator {
-	private updateData: AccessorTreeGenerator.UpdateData | undefined
+enum ErrorPopulationMode {
+	Add = 'add',
+	Clear = 'clear',
+}
+
+export class AccessorTreeGenerator {
+	private updateData: ((newData: TreeRootAccessor) => void) | undefined
 	private persistedEntityData: PersistedEntityDataStore = new Map()
 
 	// TODO deletes and disconnects cause memory leaks here as they don't traverse the tree to remove nested states.
@@ -111,13 +116,8 @@ class AccessorTreeGenerator {
 
 	public initializeLiveTree(
 		persistedData: NormalizedQueryResponseData,
-		updateData: AccessorTreeGenerator.UpdateData,
+		updateData: (newData: TreeRootAccessor) => void,
 	): void {
-		//const preprocessor = new ErrorsPreprocessor(errors)
-
-		//const errorTreeRoot = preprocessor.preprocess()
-		//console.debug(errorTreeRoot, errors)
-
 		this.persistedEntityData = persistedData.persistedEntityDataStore
 		this.updateData = updateData
 
@@ -141,23 +141,20 @@ class AccessorTreeGenerator {
 	public setErrors(data: MutationDataResponse | undefined) {
 		this.performRootTreeOperation(() => {
 			if (this.currentErrors) {
-				this.setRootStateErrors(this.currentErrors, AccessorTreeGenerator.ErrorPopulationMode.Clear)
+				this.setRootStateErrors(this.currentErrors, ErrorPopulationMode.Clear)
 			}
 
 			const preprocessor = new ErrorsPreprocessor(data)
 			const errorTreeRoot = preprocessor.preprocess()
 			this.currentErrors = errorTreeRoot
 
-			this.setRootStateErrors(errorTreeRoot, AccessorTreeGenerator.ErrorPopulationMode.Add)
+			this.setRootStateErrors(errorTreeRoot, ErrorPopulationMode.Add)
 
 			console.error('Errors', errorTreeRoot)
 		})
 	}
 
-	private setRootStateErrors(
-		errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot,
-		mode: AccessorTreeGenerator.ErrorPopulationMode,
-	) {
+	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot, mode: ErrorPopulationMode) {
 		for (const subTreePlaceholder in errorTreeRoot) {
 			const rootError = errorTreeRoot[subTreePlaceholder]
 			const rootState = this.subTreeStates.get(subTreePlaceholder)
@@ -185,11 +182,11 @@ class AccessorTreeGenerator {
 	private setEntityStateErrors(
 		state: InternalEntityState,
 		errors: ErrorsPreprocessor.FieldIndexedErrorNode | ErrorsPreprocessor.LeafErrorNode,
-		mode: AccessorTreeGenerator.ErrorPopulationMode,
+		mode: ErrorPopulationMode,
 	) {
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? errors.errors : emptyArray
+		state.errors = mode === ErrorPopulationMode.Add ? errors.errors : emptyArray
 
 		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.FieldIndexed) {
 			return
@@ -208,7 +205,7 @@ class AccessorTreeGenerator {
 				if (fieldState?.type === InternalStateType.Field) {
 					fieldState.hasStaleAccessor = true
 					fieldState.hasPendingUpdate = true
-					fieldState.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? child.errors : emptyArray
+					fieldState.errors = mode === ErrorPopulationMode.Add ? child.errors : emptyArray
 					state.childrenWithPendingUpdates.add(fieldState)
 					continue
 				}
@@ -240,11 +237,11 @@ class AccessorTreeGenerator {
 	private setEntityListStateErrors(
 		state: InternalEntityListState,
 		errors: ErrorsPreprocessor.KeyIndexedErrorNode | ErrorsPreprocessor.LeafErrorNode,
-		mode: AccessorTreeGenerator.ErrorPopulationMode,
+		mode: ErrorPopulationMode,
 	) {
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === AccessorTreeGenerator.ErrorPopulationMode.Add ? errors.errors : emptyArray
+		state.errors = mode === ErrorPopulationMode.Add ? errors.errors : emptyArray
 
 		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 			return
@@ -1193,14 +1190,3 @@ class AccessorTreeGenerator {
 		}
 	}
 }
-
-namespace AccessorTreeGenerator {
-	export type UpdateData = (newData: TreeRootAccessor) => void
-
-	export enum ErrorPopulationMode {
-		Add = 'add',
-		Clear = 'clear',
-	}
-}
-
-export { AccessorTreeGenerator }

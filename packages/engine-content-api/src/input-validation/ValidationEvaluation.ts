@@ -90,8 +90,8 @@ const validatorEvaluators: {
 	},
 	lengthRange: (
 		context: ValidationContext.AnyContext,
-		min: Validation.LiteralArgument<number | undefined>,
-		max: Validation.LiteralArgument<number | undefined>,
+		min: Validation.LiteralArgument<number | null>,
+		max: Validation.LiteralArgument<number | null>,
 	) => {
 		let value: number
 		if (ValidationContext.isValueContext(context)) {
@@ -103,7 +103,7 @@ const validatorEvaluators: {
 		} else {
 			throw new Error('Value or List context is required for range operation')
 		}
-		return (min.value === undefined || min.value <= value) && (max.value === undefined || max.value >= value)
+		return (min.value === null || min.value <= value) && (max.value === null || max.value >= value)
 	},
 	and: (context: ValidationContext.AnyContext, ...values: Validation.ValidatorArgument[]) => {
 		return values.reduce<boolean>((acc, val) => acc && evaluateValidation(context, val.validator), true)

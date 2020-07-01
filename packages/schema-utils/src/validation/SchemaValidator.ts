@@ -3,6 +3,8 @@ import { ValidationError } from './errors'
 import { AclValidator } from './AclValidator'
 import { ModelValidator } from './ModelValidator'
 import { isDeepStrictEqual } from 'util'
+import { ValidationValidator } from './ValidationValidator'
+import { deepCompare } from '../utils'
 
 export class SchemaValidator {
 	public static validate(schema: Schema): ValidationError[] {
@@ -12,11 +14,20 @@ export class SchemaValidator {
 		const modelValidator = new ModelValidator(schema.model)
 		const [model, modelErrors] = modelValidator.validate()
 
-		const validSchema = { ...schema, acl, model }
+		const validationValidator = new ValidationValidator(schema.model)
+		const [validation, validationErrors] = validationValidator.validate(schema.validation)
 
-		const errors = [...aclErrors, ...modelErrors]
+		const validSchema = { ...schema, acl, model, validation }
+
+		const errors = [...aclErrors, ...modelErrors, ...validationErrors]
 		if (errors.length === 0 && !isDeepStrictEqual(validSchema, schema)) {
-			throw new Error('There is something wrong with a schema validator')
+			const errors = deepCompare(validSchema, schema, [])
+			let message = 'There is something wrong with a schema validator:'
+			for (const err of errors) {
+				message += '\n\t' + err.path.join('.') + ': ' + err.message
+			}
+			message += '\n\nPlease fill a bug report'
+			throw new Error(message)
 		}
 		return errors
 	}

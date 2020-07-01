@@ -42,7 +42,7 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
 			nullable: nullable === undefined ? true : nullable,
-			default: defaultValue as any,
+			...(defaultValue !== undefined ? { default: defaultValue as any } : {}),
 		}
 
 		switch (type) {

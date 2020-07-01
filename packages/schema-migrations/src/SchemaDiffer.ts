@@ -9,6 +9,7 @@ import deepEqual from 'fast-deep-equal'
 import deepCopy from './utils/deepCopy'
 import { ImplementationException } from './exceptions'
 import { VERSION_LATEST } from './modifications/ModificationVersions'
+import { deepCompare } from '@contember/schema-utils'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -239,12 +240,13 @@ export class SchemaDiffer {
 		const schemaWithAppliedModifications = this.schemaMigrator.applyModifications(originalSchema, diff, VERSION_LATEST)
 
 		if (checkRecreate && !deepEqual(updatedSchema, schemaWithAppliedModifications)) {
-			const diff = createPatch(updatedSchema, schemaWithAppliedModifications)
-			for (let item of diff) {
-				// eslint-disable-next-line no-console
-				console.log(item)
+			const errors = deepCompare(updatedSchema, schemaWithAppliedModifications, [])
+			let message = 'Updated schema cannot be recreated by the generated diff:'
+			for (const err of errors) {
+				message += '\n\t' + err.path.join('.') + ': ' + err.message
 			}
-			throw new ImplementationException('Updated schema cannot be recreated by the generated diff!')
+			message += '\n\nPlease fill a bug report'
+			throw new ImplementationException(message)
 		}
 
 		return diff

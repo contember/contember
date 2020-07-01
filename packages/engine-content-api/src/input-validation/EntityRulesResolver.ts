@@ -25,7 +25,7 @@ export class EntityRulesResolver {
 						visitRelation: () => true,
 					})
 					if (isRelation) {
-						throw new NotSupportedError('Rules dependent on relations are currently not supported.')
+						throw new NotSupportedError('Rules depending on relations are currently not supported.')
 					}
 				}
 			}

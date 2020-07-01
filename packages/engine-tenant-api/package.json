@@ -1,6 +1,6 @@
 {
 	"name": "@contember/engine-tenant-api",
-	"version": "0.8.0-alpha.3",
+	"version": "0.8.0-alpha.4",
 	"license": "Apache-2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
@@ -9,12 +9,12 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/authorization": "^0.8.0-alpha.3",
-		"@contember/database": "^0.8.0-alpha.3",
-		"@contember/database-migrations": "^0.8.0-alpha.3",
-		"@contember/dic": "^0.8.0-alpha.3",
-		"@contember/queryable": "^0.8.0-alpha.3",
-		"@contember/schema": "^0.8.0-alpha.3",
+		"@contember/authorization": "^0.8.0-alpha.4",
+		"@contember/database": "^0.8.0-alpha.4",
+		"@contember/database-migrations": "^0.8.0-alpha.4",
+		"@contember/dic": "^0.8.0-alpha.4",
+		"@contember/queryable": "^0.8.0-alpha.4",
+		"@contember/schema": "^0.8.0-alpha.4",
 		"apollo-server-core": "^2.9.1",
 		"apollo-server-errors": "^2.4.0",
 		"graphql": "^14.6.0",
@@ -23,7 +23,7 @@
 		"nodemailer": "^6.4.2"
 	},
 	"devDependencies": {
-		"@contember/database-tester": "^0.8.0-alpha.3",
+		"@contember/database-tester": "^0.8.0-alpha.4",
 		"@graphql-codegen/cli": "^1.15.2",
 		"@graphql-codegen/typescript": "^1.15.2",
 		"@graphql-codegen/typescript-operations": "^1.15.2",

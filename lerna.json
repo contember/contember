@@ -4,5 +4,5 @@
 		"packages/*",
 		"packages/cli/resources/templates/*"
 	],
-	"version": "0.8.0-alpha.3"
+	"version": "0.8.0-alpha.4"
 }

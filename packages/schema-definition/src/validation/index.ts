@@ -107,7 +107,7 @@ const patternOperation = (pattern: RegExp): Validation.Validator => ({
 	args: [ArgumentFactory.literal([pattern.source, pattern.flags])],
 })
 
-const lengthRangeOperation = (min?: number, max?: number): Validation.Validator => ({
+const lengthRangeOperation = (min: number | null, max: number | null): Validation.Validator => ({
 	operation: 'lengthRange',
 	args: [ArgumentFactory.literal(min), ArgumentFactory.literal(max)],
 })
@@ -151,8 +151,8 @@ export const rules = {
 	conditional: conditionalOperation,
 	pattern: patternOperation,
 	lengthRange: lengthRangeOperation,
-	minLength: (min: number) => lengthRangeOperation(min),
-	maxLength: (max: number) => lengthRangeOperation(undefined, max),
+	minLength: (min: number) => lengthRangeOperation(min, null),
+	maxLength: (max: number) => lengthRangeOperation(null, max),
 	equals: equalsOperation,
 	not: notOperation,
 	['empty']: emptyOperation,

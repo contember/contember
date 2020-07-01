@@ -1,6 +1,6 @@
 import { EntityListAccessor, ErrorAccessor } from '../../accessors'
 import { EntityFieldMarkers } from '../../markers'
-import { EntityCreationParameters, RemovalType } from '../../treeParameters'
+import { EntityCreationParameters, EntityListPreferences, RemovalType } from '../../treeParameters'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
 import { InternalStateType } from './InternalStateType'
 
@@ -10,7 +10,7 @@ export interface InternalEntityListState {
 	batchUpdateDepth: number
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
-	creationParameters: EntityCreationParameters
+	creationParameters: EntityCreationParameters & EntityListPreferences
 	errors: ErrorAccessor[]
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:

@@ -1,6 +1,6 @@
 {
 	"name": "@contember/schema-migrations",
-	"version": "0.8.0-alpha.4",
+	"version": "0.8.0-alpha.5",
 	"license": "Apache-2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
@@ -8,15 +8,15 @@
 		"test": "jasmine --config=jasmine.json"
 	},
 	"dependencies": {
-		"@contember/database-migrations": "^0.8.0-alpha.4",
-		"@contember/engine-common": "^0.8.0-alpha.4",
-		"@contember/schema": "^0.8.0-alpha.4",
-		"@contember/schema-utils": "^0.8.0-alpha.4",
+		"@contember/database-migrations": "^0.8.0-alpha.5",
+		"@contember/engine-common": "^0.8.0-alpha.5",
+		"@contember/schema": "^0.8.0-alpha.5",
+		"@contember/schema-utils": "^0.8.0-alpha.5",
 		"fast-deep-equal": "^2.0.1",
 		"rfc6902": "^3.0.4"
 	},
 	"devDependencies": {
-		"@contember/schema-definition": "^0.8.0-alpha.4",
+		"@contember/schema-definition": "^0.8.0-alpha.5",
 		"@types/jasmine": "^3.5.10",
 		"jasmine": "^3.5.0",
 		"typescript": "^3.9.5"

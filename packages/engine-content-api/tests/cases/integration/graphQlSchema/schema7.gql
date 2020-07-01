@@ -68,11 +68,11 @@ type Info {
 
 type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
-  deletePost(by: PostUniqueWhere!): PostDeleteResult!
-  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
+  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
-  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocaleDeleteResult!
-  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
+  updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
   transaction: MutationTransaction!
 }
 
@@ -81,11 +81,11 @@ type MutationTransaction {
   errorMessage: String
   validation: _ValidationResult!
   createPost(data: PostCreateInput!): PostCreateResult!
-  deletePost(by: PostUniqueWhere!): PostDeleteResult!
-  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
+  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
-  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocaleDeleteResult!
-  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
+  updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
 }
 
 enum OrderDirection {
@@ -113,7 +113,7 @@ type PostConnection {
 input PostCreateInput {
   publishedAt: DateTime
   locales: [PostCreateLocalesEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostCreateLocalesEntityRelationInput {
@@ -158,7 +158,7 @@ input PostLocaleCreateInput {
   locale: String
   title: String
   post: PostLocaleCreatePostEntityRelationInput
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostLocaleCreatePostEntityRelationInput {
@@ -215,7 +215,7 @@ input PostLocaleUpdateInput {
   locale: String
   title: String
   post: PostLocaleUpdatePostEntityRelationInput
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostLocaleUpdatePostEntityRelationInput {
@@ -253,13 +253,13 @@ input PostLocaleWhere {
 input PostLocaleWithoutPostCreateInput {
   locale: String
   title: String
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostLocaleWithoutPostUpdateInput {
   locale: String
   title: String
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 type PostMeta {
@@ -282,7 +282,7 @@ input PostUniqueWhere {
 input PostUpdateInput {
   publishedAt: DateTime
   locales: [PostUpdateLocalesEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostUpdateLocalesEntityRelationInput {
@@ -325,12 +325,12 @@ input PostWhere {
 
 input PostWithoutLocalesCreateInput {
   publishedAt: DateTime
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostWithoutLocalesUpdateInput {
   publishedAt: DateTime
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 type Query {

@@ -66,7 +66,7 @@ class EntityInputProvider<Operation extends EntityInputProvider.Type.create | En
 			}
 		}
 
-		fields['_' + this.operation] = { type: this.graphqlObjectFactories.boolean }
+		fields['_dummy_field_'] = { type: this.graphqlObjectFactories.boolean }
 
 		return fields
 	}

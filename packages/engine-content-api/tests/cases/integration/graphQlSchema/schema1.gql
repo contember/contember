@@ -54,7 +54,7 @@ type AuthorConnection {
 input AuthorCreateInput {
   name: String
   posts: [AuthorCreatePostsEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input AuthorCreatePostsEntityRelationInput {
@@ -102,7 +102,7 @@ input AuthorUniqueWhere {
 input AuthorUpdateInput {
   name: String
   posts: [AuthorUpdatePostsEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input AuthorUpdatePostsEntityRelationInput {
@@ -145,12 +145,12 @@ input AuthorWhere {
 
 input AuthorWithoutPostsCreateInput {
   name: String
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input AuthorWithoutPostsUpdateInput {
   name: String
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 type Category {
@@ -168,7 +168,7 @@ type CategoryConnection {
 input CategoryCreateInput {
   name: String
   posts: [CategoryCreatePostsEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input CategoryCreatePostsEntityRelationInput {
@@ -216,7 +216,7 @@ input CategoryUniqueWhere {
 input CategoryUpdateInput {
   name: String
   posts: [CategoryUpdatePostsEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input CategoryUpdatePostsEntityRelationInput {
@@ -259,12 +259,12 @@ input CategoryWhere {
 
 input CategoryWithoutPostsCreateInput {
   name: String
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input CategoryWithoutPostsUpdateInput {
   name: String
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 scalar DateTime
@@ -296,17 +296,17 @@ type Info {
 
 type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
-  deletePost(by: PostUniqueWhere!): PostDeleteResult!
-  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
+  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
-  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocaleDeleteResult!
-  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
+  updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
-  deleteCategory(by: CategoryUniqueWhere!): CategoryDeleteResult!
-  updateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): CategoryUpdateResult!
+  deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
+  updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
-  deleteAuthor(by: AuthorUniqueWhere!): AuthorDeleteResult!
-  updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): AuthorUpdateResult!
+  deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
+  updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
   transaction: MutationTransaction!
 }
 
@@ -315,17 +315,17 @@ type MutationTransaction {
   errorMessage: String
   validation: _ValidationResult!
   createPost(data: PostCreateInput!): PostCreateResult!
-  deletePost(by: PostUniqueWhere!): PostDeleteResult!
-  updatePost(by: PostUniqueWhere!, data: PostUpdateInput!): PostUpdateResult!
+  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
-  deletePostLocale(by: PostLocaleUniqueWhere!): PostLocaleDeleteResult!
-  updatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
+  updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
-  deleteCategory(by: CategoryUniqueWhere!): CategoryDeleteResult!
-  updateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): CategoryUpdateResult!
+  deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
+  updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
-  deleteAuthor(by: AuthorUniqueWhere!): AuthorDeleteResult!
-  updateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): AuthorUpdateResult!
+  deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
+  updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
 }
 
 enum OrderDirection {
@@ -367,7 +367,7 @@ input PostCreateInput {
   publishedAt: DateTime
   locales: [PostCreateLocalesEntityRelationInput!]
   categories: [PostCreateCategoriesEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostCreateLocalesEntityRelationInput {
@@ -410,7 +410,7 @@ type PostLocaleConnection {
 input PostLocaleCreateInput {
   title: String
   Post: PostLocaleCreatePostEntityRelationInput
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostLocaleCreatePostEntityRelationInput {
@@ -458,7 +458,7 @@ input PostLocaleUniqueWhere {
 input PostLocaleUpdateInput {
   title: String
   Post: PostLocaleUpdatePostEntityRelationInput
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostLocaleUpdatePostEntityRelationInput {
@@ -494,12 +494,12 @@ input PostLocaleWhere {
 
 input PostLocaleWithoutPostCreateInput {
   title: String
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostLocaleWithoutPostUpdateInput {
   title: String
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 type PostMeta {
@@ -551,7 +551,7 @@ input PostUpdateInput {
   publishedAt: DateTime
   locales: [PostUpdateLocalesEntityRelationInput!]
   categories: [PostUpdateCategoriesEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostUpdateLocalesEntityRelationInput {
@@ -609,42 +609,42 @@ input PostWithoutAuthorCreateInput {
   publishedAt: DateTime
   locales: [PostCreateLocalesEntityRelationInput!]
   categories: [PostCreateCategoriesEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostWithoutAuthorUpdateInput {
   publishedAt: DateTime
   locales: [PostUpdateLocalesEntityRelationInput!]
   categories: [PostUpdateCategoriesEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostWithoutCategoriesCreateInput {
   author: PostCreateAuthorEntityRelationInput
   publishedAt: DateTime
   locales: [PostCreateLocalesEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostWithoutCategoriesUpdateInput {
   author: PostUpdateAuthorEntityRelationInput
   publishedAt: DateTime
   locales: [PostUpdateLocalesEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostWithoutLocalesCreateInput {
   author: PostCreateAuthorEntityRelationInput
   publishedAt: DateTime
   categories: [PostCreateCategoriesEntityRelationInput!]
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 input PostWithoutLocalesUpdateInput {
   author: PostUpdateAuthorEntityRelationInput
   publishedAt: DateTime
   categories: [PostUpdateCategoriesEntityRelationInput!]
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 type Query {

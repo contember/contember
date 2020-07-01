@@ -15,6 +15,7 @@ import {
 } from '../Result'
 import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
 import { AbortUpdate } from './Updater'
+import { ImplementationException } from '../../exception'
 
 export default class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationResultList> {
 	constructor(
@@ -162,7 +163,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 			this.updateBuilder.addFieldValue(relation.name, async () => {
 				const value = await primaryValue
 				if (!value) {
-					throw new AbortUpdate()
+					return AbortUpdate
 				}
 				return value
 			})
@@ -178,7 +179,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 				const insertResult = await insert
 				const value = getInsertPrimary(insertResult)
 				if (!value) {
-					throw new AbortUpdate()
+					return AbortUpdate
 				}
 				return value
 			})
@@ -211,7 +212,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 					return insertPrimary
 				}
 				result.push(...insertResult)
-				throw new AbortUpdate()
+				return AbortUpdate
 			})
 
 			const inversedPrimary = await select
@@ -339,10 +340,16 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 			}
 			return result
 		}),
-		delete: hasOneProcessor(async ({ targetEntity, targetRelation, entity }) => {
+		delete: hasOneProcessor(async ({ targetEntity, targetRelation, entity, relation }) => {
+			if (!relation.nullable) {
+				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+			}
 			return await this.mapper.delete(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } })
 		}),
-		disconnect: hasOneProcessor(async ({ targetEntity, targetRelation, entity }) => {
+		disconnect: hasOneProcessor(async ({ targetEntity, targetRelation, entity, relation }) => {
+			if (!relation.nullable) {
+				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+			}
 			return await this.mapper.update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
@@ -352,48 +359,88 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 	}
 
 	oneHasOneOwner: UpdateInputProcessor<MutationResultList>['oneHasOneOwner'] = {
-		connect: hasOneProcessor(async ({ targetEntity, input, entity, relation }) => {
+		connect: hasOneProcessor(async ({ targetEntity, input, entity, relation, targetRelation }) => {
 			const result: MutationResultList = []
 
 			await this.updateBuilder.addFieldValue(relation.name, async () => {
-				const relationPrimary = (await this.mapper.getPrimaryValue(targetEntity, input)) as Input.PrimaryValue
-				if (!relationPrimary) {
+				const targetPrimary = (await this.mapper.getPrimaryValue(targetEntity, input)) as Input.PrimaryValue
+				if (!targetPrimary) {
 					result.push(new MutationEntryNotFoundError([], input))
-					throw new AbortUpdate()
+					return AbortUpdate
 				}
 
-				const currentOwner = await this.mapper.getPrimaryValue(entity, {
-					[relation.name]: { [targetEntity.primary]: relationPrimary },
+				const currentOwnerOfTarget = await this.mapper.getPrimaryValue(entity, {
+					[relation.name]: { [targetEntity.primary]: targetPrimary },
 				})
-				if (currentOwner === this.primaryValue) {
+
+				if (currentOwnerOfTarget === this.primaryValue) {
+					// same owner, nothing to do
 					return undefined
 				}
-				if (currentOwner) {
+				if (targetRelation && !targetRelation.nullable) {
+					const currentTargetPrimary = await this.mapper.selectField(
+						entity,
+						{ [entity.primary]: this.primaryValue },
+						relation.name,
+					)
+					if (currentTargetPrimary === targetPrimary) {
+						// should be already handled in a currentOwnerOfTarget === this.primaryValue branch
+						throw new ImplementationException()
+					}
+					if (currentTargetPrimary) {
+						result.push(new MutationConstraintViolationError([], ConstraintType.uniqueKey))
+						return AbortUpdate
+					}
+				}
+
+				if (currentOwnerOfTarget) {
+					if (!relation.nullable) {
+						result.push(new MutationConstraintViolationError([], ConstraintType.notNull))
+						return AbortUpdate
+					}
+
 					result.push(
-						...(await this.mapper.update(
+						...(await this.mapper.updateInternal(
 							entity,
 							{
-								[entity.primary]: currentOwner,
+								[entity.primary]: currentOwnerOfTarget,
 							},
-							{ [relation.name]: { disconnect: true } },
+							[relation.name],
+							builder => {
+								builder.addFieldValue(relation.name, null)
+							},
 						)),
 					)
 				}
-				return relationPrimary
+				return targetPrimary
 			})
 			return result
 		}),
-		create: hasOneProcessor(async ({ targetEntity, input, relation }) => {
+		create: hasOneProcessor(async ({ targetEntity, input, relation, entity, targetRelation }) => {
 			const insert = this.mapper.insert(targetEntity, input)
+			const result: MutationResultList = []
 			this.updateBuilder.addFieldValue(relation.name, async () => {
+				if (targetRelation && !targetRelation.nullable) {
+					const currentTargetPrimary = await this.mapper.selectField(
+						entity,
+						{ [entity.primary]: this.primaryValue },
+						relation.name,
+					)
+					if (currentTargetPrimary) {
+						result.push(new MutationConstraintViolationError([], ConstraintType.uniqueKey))
+						return AbortUpdate
+					}
+				}
+
 				const insertResult = await insert
 				const insertPrimary = getInsertPrimary(insertResult)
 				if (insertPrimary) {
 					return insertPrimary
 				}
-				throw new AbortUpdate()
+				return AbortUpdate
 			})
-			return await insert
+			result.push(...(await insert))
+			return result
 		}),
 		update: hasOneProcessor(async ({ targetEntity, input, entity, relation }) => {
 			const inversedPrimary = await this.mapper.selectField(
@@ -422,7 +469,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 					return insertPrimary
 				}
 				result.push(...insertResult)
-				throw new AbortUpdate()
+				return AbortUpdate
 			})
 
 			const inversedPrimary = await select
@@ -436,17 +483,30 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			this.updateBuilder.addFieldValue(relation.name, null)
-			const inversedPrimary = await this.mapper.selectField(
+			const targetPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
 			)
+			if (!targetPrimary) {
+				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
+			}
 			await this.updateBuilder.update
-			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
+			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: targetPrimary })
 		}),
-		disconnect: hasOneProcessor(async ({ entity, relation }) => {
+		disconnect: hasOneProcessor(async ({ entity, relation, targetRelation, input }) => {
 			if (!relation.nullable) {
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+			}
+			if (targetRelation && !targetRelation.nullable) {
+				const targetPrimary = await this.mapper.selectField(
+					entity,
+					{ [entity.primary]: this.primaryValue },
+					relation.name,
+				)
+				if (targetPrimary) {
+					return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+				}
 			}
 			this.updateBuilder.addFieldValue(relation.name, null)
 			return []

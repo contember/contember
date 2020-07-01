@@ -89,6 +89,89 @@ describe('update with db', () => {
 				})
 			}, 100000)
 		})
+
+		describe('owner nullable, inversed not null', () => {
+			const schema = new SchemaBuilder()
+				.entity('Site', e =>
+					e
+						.column('slug', c => c.unique().type(Model.ColumnType.String))
+
+						.oneHasOne('contactPage', r =>
+							r
+								.target('ContactPage')
+								.inversedBy('site')
+								.inversedNotNull(),
+						),
+				)
+				.entity('ContactPage', e => e.column('title'))
+				.buildSchema()
+
+			it('update site & create contact page', async () => {
+				await executeDbTest({
+					schema,
+					seed: [
+						{
+							query: GQL`mutation {
+                createSite(data: {slug: "en"}) {
+                  ok
+                }
+              }`,
+						},
+					],
+					query: GQL`mutation {
+            updateSite(by: { slug: "en" }, data: { contactPage: { create: { title: "Test" } } }) {
+              ok
+            }
+          }`,
+					return: {
+						updateSite: {
+							ok: true,
+						},
+					},
+					expectDatabase: {
+						site: [{ id: testUuid(1), slug: 'en', contact_page_id: testUuid(2) }],
+						contact_page: [{ id: testUuid(2), title: 'Test' }],
+					},
+				})
+			}, 100000)
+
+			it('update site & try to create contact page which however exists', async () => {
+				await executeDbTest({
+					schema,
+					seed: [
+						{
+							query: GQL`mutation {
+                createSite(data: {slug: "en", contactPage: { create: { title: "Test" } } }) {
+                  ok
+                }
+              }`,
+						},
+					],
+					query: GQL`mutation {
+            updateSite(by: { slug: "en" }, data: { contactPage: { create: { title: "Test 2" } } }) {
+              ok
+	            errors {
+		            type
+	            }
+            }
+          }`,
+					return: {
+						updateSite: {
+							ok: false,
+							errors: [
+								{
+									type: 'UniqueConstraintViolation',
+								},
+							],
+						},
+					},
+					expectDatabase: {
+						site: [{ id: testUuid(1), slug: 'en', contact_page_id: testUuid(2) }],
+						contact_page: [{ id: testUuid(2), title: 'Test' }],
+					},
+				})
+			}, 100000)
+		})
 	})
 
 	describe('invalid input value', () => {

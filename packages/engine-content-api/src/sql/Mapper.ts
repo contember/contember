@@ -8,16 +8,18 @@ import SelectBuilderFactory from './select/SelectBuilderFactory'
 import PredicatesInjector from '../acl/PredicatesInjector'
 import WhereBuilder from './select/WhereBuilder'
 import JunctionTableManager from './JunctionTableManager'
-import DeleteExecutor from './delete/DeleteExecutor'
+import { DeletedEntitiesStorage, DeleteExecutor } from './delete'
 import { MutationResultList } from './Result'
 import { Updater } from './update/Updater'
 import { Inserter } from './insert/Inserter'
 import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select/OrderByHelper'
 import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
+import UpdateBuilder from './update/UpdateBuilder'
 
 class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
+	public readonly deletedEntities = new DeletedEntitiesStorage()
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -140,28 +142,38 @@ class Mapper {
 
 	public async update(
 		entity: Model.Entity,
-		where: Input.UniqueWhere,
+		by: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
+		filter?: Input.Where,
 	): Promise<MutationResultList> {
-		return tryMutation(() => this.updater.update(this, entity, where, data))
+		return tryMutation(() => this.updater.update(this, entity, by, data, filter))
 	}
 
-	public async delete(entity: Model.Entity, where: Input.UniqueWhere): Promise<MutationResultList> {
-		return tryMutation(() => this.deleteExecutor.execute(this, entity, where))
+	public async updateInternal(
+		entity: Model.Entity,
+		by: Input.UniqueWhere,
+		predicateFields: string[],
+		builderCb: (builder: UpdateBuilder) => void,
+	): Promise<MutationResultList> {
+		return tryMutation(() => this.updater.updateCb(this, entity, by, predicateFields, builderCb))
+	}
+
+	public async delete(entity: Model.Entity, by: Input.UniqueWhere, filter?: Input.Where): Promise<MutationResultList> {
+		return tryMutation(() => this.deleteExecutor.execute(this, entity, by, filter))
 	}
 
 	public async connectJunction(
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		ownerPrimary: Input.PrimaryValue,
-		insersePrimary: Input.PrimaryValue,
+		inversePrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
 		return await this.junctionTableManager.connectJunction(
 			this.db,
 			owningEntity,
 			relation,
 			ownerPrimary,
-			insersePrimary,
+			inversePrimary,
 		)
 	}
 

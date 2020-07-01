@@ -50,7 +50,7 @@ type Info {
 
 type Mutation {
   createTest(data: TestCreateInput!): TestCreateResult!
-  updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
+  updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
   transaction: MutationTransaction!
 }
 
@@ -59,7 +59,7 @@ type MutationTransaction {
   errorMessage: String
   validation: _ValidationResult!
   createTest(data: TestCreateInput!): TestCreateResult!
-  updateTest(by: TestUniqueWhere!, data: TestUpdateInput!): TestUpdateResult!
+  updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
 }
 
 enum OrderDirection {
@@ -121,7 +121,7 @@ type TestConnection {
 
 input TestCreateInput {
   a: String
-  _create: Boolean
+  _dummy_field_: Boolean
 }
 
 type TestCreateResult {
@@ -154,7 +154,7 @@ input TestUniqueWhere {
 
 input TestUpdateInput {
   b: String
-  _update: Boolean
+  _dummy_field_: Boolean
 }
 
 type TestUpdateResult {

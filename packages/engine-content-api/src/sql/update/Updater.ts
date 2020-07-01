@@ -31,21 +31,24 @@ export class Updater {
 	public async update(
 		mapper: Mapper,
 		entity: Model.Entity,
-		where: Input.UniqueWhere,
+		by: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
+		filter?: Input.Where,
 	): Promise<MutationResultList> {
-		const primaryValue = await mapper.getPrimaryValue(entity, where)
+		const primaryValue = await mapper.getPrimaryValue(entity, by)
 
 		if (primaryValue === undefined) {
-			return [new MutationEntryNotFoundError([], where)]
+			return [new MutationEntryNotFoundError([], by)]
 		}
 
-		const uniqueWhere = this.uniqueWhereExpander.expand(entity, where)
-		const updateBuilder = this.updateBuilderFactory.create(entity, uniqueWhere)
+		const updateBuilder = this.createBuilder(entity, by)
 
-		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, Object.keys(data))
-		updateBuilder.addOldWhere(predicateWhere)
-		updateBuilder.addNewWhere(predicateWhere)
+		const predicateFields = Object.keys(data)
+		this.applyPredicates(entity, predicateFields, updateBuilder)
+
+		if (filter) {
+			updateBuilder.addOldWhere(filter)
+		}
 
 		const updateVisitor = new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper)
 		const visitor = new UpdateInputVisitor<MutationResultList>(updateVisitor, this.schema, data)
@@ -57,27 +60,57 @@ export class Updater {
 		return await collectResults([mutationResultPromise, ...Object.values(promises)])
 	}
 
+	public async updateCb(
+		mapper: Mapper,
+		entity: Model.Entity,
+		by: Input.UniqueWhere,
+		predicateFields: string[],
+		builderCb: (builder: UpdateBuilder) => void,
+	): Promise<MutationResultList> {
+		const primaryValue = await mapper.getPrimaryValue(entity, by)
+
+		if (primaryValue === undefined) {
+			return [new MutationEntryNotFoundError([], by)]
+		}
+		const updateBuilder = this.createBuilder(entity, by)
+
+		this.applyPredicates(entity, predicateFields, updateBuilder)
+
+		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, {}, values)
+		builderCb(updateBuilder)
+
+		return Updater.executeUpdate(updateBuilder, mapper.db, okResultFactory)
+	}
+
+	private applyPredicates(entity: Model.Entity, predicateFields: string[], updateBuilder: UpdateBuilder): void {
+		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, predicateFields)
+		updateBuilder.addOldWhere(predicateWhere)
+		updateBuilder.addNewWhere(predicateWhere)
+	}
+
+	private createBuilder(entity: Model.Entity, by: Input.UniqueWhere): UpdateBuilder {
+		const uniqueWhere = this.uniqueWhereExpander.expand(entity, by)
+		return this.updateBuilderFactory.create(entity, uniqueWhere)
+	}
+
 	private static async executeUpdate(
 		updateBuilder: UpdateBuilder,
 		db: Client,
 		okResultFactory: (values: RowValues) => MutationUpdateOk,
 	): Promise<MutationResultList> {
-		try {
-			const result = await updateBuilder.execute(db)
-			if (!result.executed) {
-				return [new MutationNothingToDo([], NothingToDoReason.noData)]
-			}
-			if (result.affectedRows !== 1) {
-				return [new MutationNoResultError([])]
-			}
-			return [okResultFactory(rowDataToFieldValues(result.values))]
-		} catch (e) {
-			if (e instanceof AbortUpdate) {
-				return [new MutationNothingToDo([], NothingToDoReason.aborted)]
-			}
-			throw e
+		const result = await updateBuilder.execute(db)
+		if (result.aborted) {
+			return [new MutationNothingToDo([], NothingToDoReason.aborted)]
 		}
+		if (!result.executed) {
+			return [new MutationNothingToDo([], NothingToDoReason.noData)]
+		}
+		if (result.affectedRows !== 1) {
+			return [new MutationNoResultError([])]
+		}
+		return [okResultFactory(rowDataToFieldValues(result.values))]
 	}
 }
 
-export class AbortUpdate {}
+export const AbortUpdate = Symbol('AbortUpdate')
+export type AbortUpdate = typeof AbortUpdate

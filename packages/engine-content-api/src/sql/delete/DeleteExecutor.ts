@@ -6,12 +6,19 @@ import { Client, DeleteBuilder, ForeignKeyViolationError, SelectBuilder } from '
 import Path from '../select/Path'
 import PredicateFactory from '../../acl/PredicateFactory'
 import UpdateBuilderFactory from '../update/UpdateBuilderFactory'
-import { MutationDeleteOk, MutationEntryNotFoundError, MutationNoResultError, MutationResultList } from '../Result'
+import {
+	MutationDeleteOk,
+	MutationEntryNotFoundError,
+	MutationNoResultError,
+	MutationNothingToDo,
+	MutationResultList,
+	NothingToDoReason,
+} from '../Result'
 import Mapper from '../Mapper'
 
 type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwnerRelation]
 
-class DeleteExecutor {
+export class DeleteExecutor {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly predicateFactory: PredicateFactory,
@@ -19,14 +26,23 @@ class DeleteExecutor {
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
 	) {}
 
-	public async execute(mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere): Promise<MutationResultList> {
+	public async execute(
+		mapper: Mapper,
+		entity: Model.Entity,
+		by: Input.UniqueWhere,
+		filter?: Input.Where,
+	): Promise<MutationResultList> {
 		const db = mapper.db
 		await db.query('SET CONSTRAINTS ALL DEFERRED')
-		const primaryValue = await mapper.getPrimaryValue(entity, where)
+		const primaryValue = await mapper.getPrimaryValue(entity, by)
 		if (!primaryValue) {
-			return [new MutationEntryNotFoundError([], where)]
+			return [new MutationEntryNotFoundError([], by)]
 		}
-		const result = await this.delete(db, entity, { [entity.primary]: { eq: primaryValue } })
+		if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {
+			return [new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)]
+		}
+		const primaryWhere = { [entity.primary]: { eq: primaryValue } }
+		const result = await this.delete(db, entity, filter ? { and: [primaryWhere, filter] } : primaryWhere)
 		if (result.length === 0) {
 			return [new MutationNoResultError([])]
 		}
@@ -34,6 +50,7 @@ class DeleteExecutor {
 
 		try {
 			await db.query('SET CONSTRAINTS ALL IMMEDIATE')
+			mapper.deletedEntities.markDeleted(entity.name, primaryValue)
 			return [new MutationDeleteOk([], entity, primaryValue)]
 		} catch (e) {
 			if (e instanceof ForeignKeyViolationError) {
@@ -118,5 +135,3 @@ class DeleteExecutor {
 			.filter(([{}, relation]) => relation.target === entity.name)
 	}
 }
-
-export default DeleteExecutor

@@ -259,14 +259,12 @@ export class AccessorTreeGenerator {
 					break
 				}
 				case InternalStateType.SingleEntity: {
-					// TODO newFieldDatum can be null (or even undefined?)
 					const marker = state.fieldMarkers.get(fieldPlaceholder)
 
 					if (marker instanceof HasOneRelationMarker) {
 						if (newFieldDatum instanceof BoxedSingleEntityId) {
 							if (newFieldDatum.id === fieldState.id) {
-								didChildUpdate =
-									didChildUpdate || this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
+								didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
 							} else {
 								// TODO delete the previous entity
 								state.fields.set(
@@ -297,9 +295,11 @@ export class AccessorTreeGenerator {
 				}
 				case InternalStateType.EntityList: {
 					if (newFieldDatum instanceof Set || newFieldDatum === undefined) {
-						didChildUpdate =
-							didChildUpdate ||
-							this.updateEntityListPersistedData(alreadyProcessed, fieldState, newFieldDatum || new Set())
+						didChildUpdate = this.updateEntityListPersistedData(
+							alreadyProcessed,
+							fieldState,
+							newFieldDatum || new Set(),
+						)
 					}
 					break
 				}

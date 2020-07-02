@@ -157,12 +157,12 @@ export class AccessorTreeGenerator {
 		})
 	}
 
-	public updatePersistedData(queryResponse: QueryRequestResponse | undefined): boolean {
-		let didUpdateSomething = false
+	public updatePersistedData(queryResponse: QueryRequestResponse | undefined) {
 		this.performRootTreeOperation(() => {
 			const normalizedResponse = QueryResponseNormalizer.normalizeResponse(queryResponse)
 			this.persistedEntityData = normalizedResponse.persistedEntityDataStore
 
+			let didUpdateSomething = false
 			for (const [subTreePlaceholder, subTreeState] of this.subTreeStates) {
 				const newSubTreeData = normalizedResponse.subTreeDataStore.get(subTreePlaceholder)
 
@@ -191,11 +191,12 @@ export class AccessorTreeGenerator {
 					assertNever(subTreeState)
 				}
 			}
+			if (!didUpdateSomething) {
+				this.updateTreeRoot() // Still force an update, albeit without update events.
+			}
 
 			this.unpersistedChangesCount = 0
 		})
-		console.log('did', didUpdateSomething)
-		return didUpdateSomething
 	}
 
 	private updateSingleEntityPersistedData(state: InternalEntityState, newPersistedId: string): boolean {
@@ -344,29 +345,48 @@ export class AccessorTreeGenerator {
 		}
 
 		state.persistedEntityIds = newPersistedData
-		state.childrenKeys = newPersistedData
 
-		for (const newPersistedId of newPersistedData) {
-			let childState = this.entityStore.get(newPersistedId)
+		const initialData: Set<string | undefined> =
+			newPersistedData.size > 0
+				? newPersistedData
+				: new Set(Array.from({ length: state.creationParameters.initialEntityCount }))
 
-			if (childState === undefined) {
-				childState = this.initializeEntityAccessor(
-					newPersistedId,
-					state.fieldMarkers,
-					state.creationParameters,
-					state.onChildEntityUpdate,
-				)
+		state.childrenKeys = new Set()
+
+		for (const newPersistedId of initialData) {
+			let key: string
+
+			if (newPersistedId === undefined) {
+				const newKey = new EntityAccessor.UnpersistedEntityId()
+
+				this.initializeEntityAccessor(newKey, state.fieldMarkers, state.creationParameters, state.onChildEntityUpdate)
+				key = newKey.value
 				didUpdate = true
 			} else {
-				const didChildUpdate = this.updateSingleEntityPersistedData(childState, newPersistedId)
+				key = newPersistedId
+				let childState = this.entityStore.get(newPersistedId)
 
-				if (didChildUpdate) {
-					if (state.childrenWithPendingUpdates === undefined) {
-						state.childrenWithPendingUpdates = new Set()
+				if (childState === undefined) {
+					childState = this.initializeEntityAccessor(
+						newPersistedId,
+						state.fieldMarkers,
+						state.creationParameters,
+						state.onChildEntityUpdate,
+					)
+					didUpdate = true
+				} else {
+					const didChildUpdate = this.updateSingleEntityPersistedData(childState, newPersistedId)
+
+					if (didChildUpdate) {
+						didUpdate = true
+						if (state.childrenWithPendingUpdates === undefined) {
+							state.childrenWithPendingUpdates = new Set()
+						}
+						state.childrenWithPendingUpdates.add(childState)
 					}
-					state.childrenWithPendingUpdates.add(childState)
 				}
 			}
+			state.childrenKeys.add(key)
 		}
 
 		if (didUpdate) {

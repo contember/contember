@@ -166,6 +166,8 @@ export class AccessorTreeGenerator {
 			const normalizedResponse = QueryResponseNormalizer.normalizeResponse(queryResponse)
 			this.persistedEntityData = normalizedResponse.persistedEntityDataStore
 
+			const alreadyProcessed: Set<InternalEntityState> = new Set()
+
 			let didUpdateSomething = false
 			for (const [subTreePlaceholder, subTreeState] of this.subTreeStates) {
 				const newSubTreeData = normalizedResponse.subTreeDataStore.get(subTreePlaceholder)
@@ -174,7 +176,8 @@ export class AccessorTreeGenerator {
 					if (newSubTreeData instanceof BoxedSingleEntityId) {
 						if (newSubTreeData.id === subTreeState.id) {
 							didUpdateSomething =
-								didUpdateSomething || this.updateSingleEntityPersistedData(subTreeState, newSubTreeData.id)
+								didUpdateSomething ||
+								this.updateSingleEntityPersistedData(alreadyProcessed, subTreeState, newSubTreeData.id)
 						} else {
 							const newSubTreeState = this.initializeEntityAccessor(
 								newSubTreeData.id,
@@ -189,7 +192,8 @@ export class AccessorTreeGenerator {
 					}
 				} else if (subTreeState.type === InternalStateType.EntityList) {
 					if (newSubTreeData instanceof Set) {
-						didUpdateSomething = didUpdateSomething || this.updateEntityListPersistedData(subTreeState, newSubTreeData)
+						didUpdateSomething =
+							didUpdateSomething || this.updateEntityListPersistedData(alreadyProcessed, subTreeState, newSubTreeData)
 					}
 				} else {
 					assertNever(subTreeState)
@@ -203,7 +207,16 @@ export class AccessorTreeGenerator {
 		})
 	}
 
-	private updateSingleEntityPersistedData(state: InternalEntityState, newPersistedId: string): boolean {
+	private updateSingleEntityPersistedData(
+		alreadyProcessed: Set<InternalEntityState>,
+		state: InternalEntityState,
+		newPersistedId: string,
+	): boolean {
+		if (alreadyProcessed.has(state)) {
+			return false
+		}
+		alreadyProcessed.add(state)
+
 		// TODO this entire process needs to also update realms!
 		let didUpdate = false
 
@@ -252,7 +265,8 @@ export class AccessorTreeGenerator {
 					if (marker instanceof HasOneRelationMarker) {
 						if (newFieldDatum instanceof BoxedSingleEntityId) {
 							if (newFieldDatum.id === fieldState.id) {
-								didChildUpdate = didChildUpdate || this.updateSingleEntityPersistedData(fieldState, fieldState.id)
+								didChildUpdate =
+									didChildUpdate || this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
 							} else {
 								// TODO delete the previous entity
 								state.fields.set(
@@ -284,7 +298,8 @@ export class AccessorTreeGenerator {
 				case InternalStateType.EntityList: {
 					if (newFieldDatum instanceof Set || newFieldDatum === undefined) {
 						didChildUpdate =
-							didChildUpdate || this.updateEntityListPersistedData(fieldState, newFieldDatum || new Set())
+							didChildUpdate ||
+							this.updateEntityListPersistedData(alreadyProcessed, fieldState, newFieldDatum || new Set())
 					}
 					break
 				}
@@ -311,7 +326,11 @@ export class AccessorTreeGenerator {
 		return didUpdate
 	}
 
-	private updateEntityListPersistedData(state: InternalEntityListState, newPersistedData: Set<string>): boolean {
+	private updateEntityListPersistedData(
+		alreadyProcessed: Set<InternalEntityState>,
+		state: InternalEntityListState,
+		newPersistedData: Set<string>,
+	): boolean {
 		let didUpdate = false
 
 		if (state.plannedRemovals?.size) {
@@ -355,7 +374,7 @@ export class AccessorTreeGenerator {
 				? newPersistedData
 				: new Set(Array.from({ length: state.creationParameters.initialEntityCount }))
 
-		state.childrenKeys = new Set()
+		state.childrenKeys.clear()
 
 		for (const newPersistedId of initialData) {
 			let key: string
@@ -379,7 +398,7 @@ export class AccessorTreeGenerator {
 					)
 					didUpdate = true
 				} else {
-					const didChildUpdate = this.updateSingleEntityPersistedData(childState, newPersistedId)
+					const didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, childState, newPersistedId)
 
 					if (didChildUpdate) {
 						didUpdate = true

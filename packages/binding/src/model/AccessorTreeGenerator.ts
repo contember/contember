@@ -4,6 +4,7 @@ import * as ReactDOM from 'react-dom'
 import { EntityAccessor, EntityListAccessor, FieldAccessor, GetSubTree, TreeRootAccessor } from '../accessors'
 import {
 	BoxedSingleEntityId,
+	EntityFieldPersistedData,
 	MutationDataResponse,
 	PersistedEntityDataStore,
 	QueryRequestResponse,
@@ -13,6 +14,7 @@ import { TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFieldMarkers,
 	FieldMarker,
+	hasAtLeastOneBearingField,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
@@ -34,8 +36,10 @@ import {
 	OnEntityUpdate,
 	OnFieldUpdate,
 } from './internalState'
+import { MarkerMerger } from './MarkerMerger'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
+import { TreeParameterMerger } from './TreeParameterMerger'
 
 // This only applies to the 'beforeUpdate' event:
 
@@ -577,88 +581,142 @@ export class AccessorTreeGenerator {
 		return subTreeState
 	}
 
-	private initializeEntityFields(entityState: InternalEntityState, fieldMarkers: EntityFieldMarkers): void {
-		// We're overwriting existing states in entityState.fields which could already be there from a different
-		// entity realm. Most of the time this results in an equivalent accessor instance, and so for those cases this
-		// is rather inefficient. However, there are cases where we do want to do this. (E.g. refresh after a persist)
-		// or when a reference further down the tree would introduce more fields.
-		for (const [placeholderName, field] of fieldMarkers) {
-			if (field instanceof FieldMarker) {
-				const fieldDatum = entityState.persistedData?.get(placeholderName)
+	private initializeFromFieldMarker(
+		entityState: InternalEntityState,
+		field: FieldMarker,
+		fieldDatum: EntityFieldPersistedData | undefined,
+	) {
+		if (fieldDatum instanceof Set) {
+			throw new BindingError(
+				`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
+					`Perhaps you wanted to use a <Repeater />?`,
+			)
+		} else if (fieldDatum instanceof BoxedSingleEntityId) {
+			throw new BindingError(
+				`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
+					`Perhaps you wanted to use <HasOne />?`,
+			)
+		} else {
+			const fieldState = this.initializeFieldAccessor(
+				field.placeholderName,
+				field,
+				entityState.onChildFieldUpdate,
+				fieldDatum,
+			)
+			entityState.fields.set(field.placeholderName, fieldState)
+		}
+	}
 
-				if (fieldDatum instanceof Set) {
-					throw new BindingError(
-						`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
-							`Perhaps you wanted to use a <Repeater />?`,
-					)
-				} else if (fieldDatum instanceof BoxedSingleEntityId) {
-					throw new BindingError(
-						`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
-							`Perhaps you wanted to use <HasOne />?`,
-					)
-				} else {
-					if (entityState.fields.get(placeholderName)) {
-						continue
-					}
-					const fieldState = this.initializeFieldAccessor(
-						placeholderName,
-						field,
-						entityState.onChildFieldUpdate,
-						fieldDatum,
-					)
-					entityState.fields.set(placeholderName, fieldState)
+	private initializeFromHasOneRelationMarker(
+		entityState: InternalEntityState,
+		field: HasOneRelationMarker,
+		fieldDatum: EntityFieldPersistedData | undefined,
+	) {
+		const relation = field.relation
+
+		if (fieldDatum instanceof Set) {
+			throw new BindingError(
+				`Received a collection of entities for field '${relation.field}' where a single entity was expected. ` +
+					`Perhaps you wanted to use a <Repeater />?`,
+			)
+		} else if (fieldDatum instanceof BoxedSingleEntityId || fieldDatum === null || fieldDatum === undefined) {
+			const entityId =
+				fieldDatum instanceof BoxedSingleEntityId ? fieldDatum.id : new EntityAccessor.UnpersistedEntityId()
+			const referenceEntityState = this.initializeEntityAccessor(
+				entityId,
+				field.fields,
+				field.relation,
+				entityState.onChildFieldUpdate,
+			)
+			entityState.fields.set(field.placeholderName, referenceEntityState)
+		} else {
+			throw new BindingError(
+				`Received a scalar value for field '${relation.field}' where a single entity was expected.` +
+					`Perhaps you meant to use a variant of <Field />?`,
+			)
+		}
+	}
+
+	private initializeFromHasManyRelationMarker(
+		entityState: InternalEntityState,
+		field: HasManyRelationMarker,
+		fieldDatum: EntityFieldPersistedData | undefined,
+	) {
+		const relation = field.relation
+
+		if (fieldDatum === undefined || fieldDatum instanceof Set) {
+			entityState.fields.set(
+				field.placeholderName,
+				this.initializeEntityListAccessor(
+					field.fields,
+					relation,
+					entityState.onChildFieldUpdate,
+					fieldDatum || new Set(),
+				),
+			)
+		} else if (typeof fieldDatum === 'object') {
+			// Intentionally allowing `fieldDatum === null` here as well since this should only happen when a *hasOne
+			// relation is unlinked, e.g. a Person does not have a linked Nationality.
+			throw new BindingError(
+				`Received a referenced entity for field '${relation.field}' where a collection of entities was expected.` +
+					`Perhaps you wanted to use a <HasOne />?`,
+			)
+		} else {
+			throw new BindingError(
+				`Received a scalar value for field '${relation.field}' where a collection of entities was expected.` +
+					`Perhaps you meant to use a variant of <Field />?`,
+			)
+		}
+	}
+
+	private initializeEntityFields(entityState: InternalEntityState, fieldMarkers: EntityFieldMarkers): void {
+		for (const [placeholderName, field] of fieldMarkers) {
+			const fieldDatum = entityState.persistedData?.get(placeholderName)
+			if (field instanceof FieldMarker) {
+				this.initializeFromFieldMarker(entityState, field, fieldDatum)
+			} else if (field instanceof HasOneRelationMarker) {
+				this.initializeFromHasOneRelationMarker(entityState, field, fieldDatum)
+			} else if (field instanceof HasManyRelationMarker) {
+				this.initializeFromHasManyRelationMarker(entityState, field, fieldDatum)
+			} else if (field instanceof SubTreeMarker) {
+				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
+			} else {
+				assertNever(field)
+			}
+		}
+	}
+
+	private mergeInEntityFields(existingEntityState: InternalEntityState, newFieldMarkers: EntityFieldMarkers): void {
+		for (const [placeholderName, field] of newFieldMarkers) {
+			const fieldState = existingEntityState.fields.get(placeholderName)
+			const fieldDatum = existingEntityState.persistedData?.get(placeholderName)
+
+			if (field instanceof FieldMarker) {
+				// Merge markers but don't re-initialize the state. It shouldn't be needed.
+				if (fieldState === undefined) {
+					this.initializeFromFieldMarker(existingEntityState, field, fieldDatum)
+				} else if (fieldState.type === InternalStateType.Field) {
+					fieldState.fieldMarker = MarkerMerger.mergeFieldMarkers(fieldState.fieldMarker, field)
 				}
 			} else if (field instanceof HasOneRelationMarker) {
-				const relation = field.relation
-				const fieldDatum = entityState.persistedData?.get(field.placeholderName)
-
-				if (fieldDatum instanceof Set) {
-					throw new BindingError(
-						`Received a collection of entities for field '${relation.field}' where a single entity was expected. ` +
-							`Perhaps you wanted to use a <Repeater />?`,
-					)
-				} else if (fieldDatum instanceof BoxedSingleEntityId || fieldDatum === null || fieldDatum === undefined) {
-					const entityId =
-						fieldDatum instanceof BoxedSingleEntityId ? fieldDatum.id : new EntityAccessor.UnpersistedEntityId()
-					const referenceEntityState = this.initializeEntityAccessor(
-						entityId,
-						field.fields,
-						field.relation,
-						entityState.onChildFieldUpdate,
-					)
-					entityState.fields.set(field.placeholderName, referenceEntityState)
-				} else {
-					throw new BindingError(
-						`Received a scalar value for field '${relation.field}' where a single entity was expected.` +
-							`Perhaps you meant to use a variant of <Field />?`,
-					)
+				if (fieldState === undefined || fieldState.type === InternalStateType.SingleEntity) {
+					// This method calls initializeEntityAccessor which handles the merging on its own.
+					this.initializeFromHasOneRelationMarker(existingEntityState, field, fieldDatum)
 				}
 			} else if (field instanceof HasManyRelationMarker) {
-				const relation = field.relation
-				const fieldDatum = entityState.persistedData?.get(field.placeholderName)
-
-				if (fieldDatum === undefined || fieldDatum instanceof Set) {
-					entityState.fields.set(
-						field.placeholderName,
-						this.initializeEntityListAccessor(
-							field.fields,
-							relation,
-							entityState.onChildFieldUpdate,
-							fieldDatum || new Set(),
-						),
-					)
-				} else if (typeof fieldDatum === 'object') {
-					// Intentionally allowing `fieldDatum === null` here as well since this should only happen when a *hasOne
-					// relation is unlinked, e.g. a Person does not have a linked Nationality.
-					throw new BindingError(
-						`Received a referenced entity for field '${relation.field}' where a collection of entities was expected.` +
-							`Perhaps you wanted to use a <HasOne />?`,
-					)
-				} else {
-					throw new BindingError(
-						`Received a scalar value for field '${relation.field}' where a collection of entities was expected.` +
-							`Perhaps you meant to use a variant of <Field />?`,
-					)
+				if (fieldState === undefined) {
+					this.initializeFromHasManyRelationMarker(existingEntityState, field, fieldDatum)
+				} else if (fieldState.type === InternalStateType.EntityList) {
+					for (const childKey of fieldState.childrenKeys) {
+						const childState = this.entityStore.get(childKey)!
+						this.initializeEntityAccessor(
+							childState.id,
+							newFieldMarkers,
+							fieldState.creationParameters,
+							fieldState.onChildEntityUpdate,
+						)
+					}
+					fieldState.fieldMarkers = MarkerMerger.mergeEntityFields(fieldState.fieldMarkers, newFieldMarkers)
 				}
 			} else if (field instanceof SubTreeMarker) {
 				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
@@ -678,12 +736,23 @@ export class AccessorTreeGenerator {
 		const existingEntityState = this.entityStore.get(entityKey)
 
 		if (existingEntityState !== undefined) {
-			// TODO this is too naïve.
-			this.initializeEntityFields(existingEntityState, fieldMarkers)
+			existingEntityState.fieldMarkers = MarkerMerger.mergeEntityFields(existingEntityState.fieldMarkers, fieldMarkers)
 			existingEntityState.realms.add(onEntityUpdate)
 			existingEntityState.hasStaleAccessor = true
-			//existingEntityState.hasAtLeastOneBearingField =
-			//	existingEntityState.hasAtLeastOneBearingField || marker.hasAtLeastOneBearingField
+			existingEntityState.creationParameters = {
+				forceCreation: existingEntityState.creationParameters.forceCreation || creationParameters.forceCreation,
+				isNonbearing: existingEntityState.creationParameters.isNonbearing && creationParameters.isNonbearing, // If either is false, it's bearing
+				setOnCreate: TreeParameterMerger.mergeSetOnCreate(
+					existingEntityState.creationParameters.setOnCreate,
+					creationParameters.setOnCreate,
+				),
+			}
+
+			if (!existingEntityState.hasAtLeastOneBearingField) {
+				existingEntityState.hasAtLeastOneBearingField = hasAtLeastOneBearingField(fieldMarkers)
+			}
+			this.mergeInEntityFields(existingEntityState, fieldMarkers)
+
 			return existingEntityState
 		}
 
@@ -700,7 +769,7 @@ export class AccessorTreeGenerator {
 			},
 			fields: new Map(),
 			fieldMarkers,
-			hasAtLeastOneBearingField: true, // TODO
+			hasAtLeastOneBearingField: hasAtLeastOneBearingField(fieldMarkers),
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
 			hasStaleAccessor: true,

@@ -3,7 +3,7 @@ import {
 	Environment,
 	Field,
 	SugaredRelativeSingleField,
-	useDrivenField,
+	useDerivedField,
 	useEnvironment,
 	useMutationState,
 	useRelativeSingleField,
@@ -16,7 +16,7 @@ import { ConcealableField, ConcealableFieldProps } from '../ui'
 
 export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &
 	SimpleRelativeSingleFieldProps & {
-		drivenBy: SugaredRelativeSingleField['field']
+		derivedFrom: SugaredRelativeSingleField['field']
 		unpersistedHardPrefix?: string | ((environment: Environment) => string)
 		persistedHardPrefix?: string | ((environment: Environment) => string)
 		persistedSoftPrefix?: string | ((environment: Environment) => string)
@@ -30,7 +30,7 @@ export const SlugField = Component<SlugFieldProps>(
 		unpersistedHardPrefix,
 		persistedHardPrefix,
 		persistedSoftPrefix,
-		drivenBy,
+		derivedFrom,
 		field,
 		...props
 	}) => {
@@ -60,7 +60,7 @@ export const SlugField = Component<SlugFieldProps>(
 			},
 			[normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix],
 		)
-		useDrivenField<string>(drivenBy, field, transform)
+		useDerivedField<string>(derivedFrom, field, transform)
 
 		const slugField = useRelativeSingleField<string>(field)
 		const isMutating = useMutationState()
@@ -108,7 +108,7 @@ export const SlugField = Component<SlugFieldProps>(
 	props => (
 		<>
 			<Field field={props.field} defaultValue={props.defaultValue} />
-			<Field field={props.drivenBy} />
+			<Field field={props.derivedFrom} />
 			{props.label}
 		</>
 	),

@@ -1299,6 +1299,14 @@ export class AccessorTreeGenerator {
 					}
 
 					fieldState.onFieldUpdate(fieldState)
+
+					// Deliberately firing this *AFTER* letting the parent know.
+					// Listeners are likely to invoke a parent's batchUpdates, and so the parents should be up to date.
+					if (fieldState.eventListeners.beforeUpdate) {
+						for (const listener of fieldState.eventListeners.beforeUpdate) {
+							listener(fieldState.getAccessor())
+						}
+					}
 				})
 			},
 			isTouchedBy: (agent: string) =>
@@ -1400,7 +1408,7 @@ export class AccessorTreeGenerator {
 			state.hasPendingUpdate = false
 
 			if (state.eventListeners.update !== undefined) {
-				console.log(state)
+				//console.log(state)
 				for (const handler of state.eventListeners.update) {
 					// TS can't quite handle the polymorphism here but this is fine.
 					handler(state.getAccessor() as any)

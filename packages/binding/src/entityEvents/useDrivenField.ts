@@ -1,8 +1,7 @@
 import * as React from 'react'
-import { useDesugaredRelativeSingleField } from '../accessorPropagation'
-import { EntityAccessor } from '../accessors'
+import { useDesugaredRelativeSingleField, useEntityKey, useGetEntityByKey } from '../accessorPropagation'
+import { FieldAccessor } from '../accessors'
 import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
-import { useEntityBeforeUpdate } from './useEntityBeforeUpdate'
 
 const identityFunction = <Value>(value: Value) => value
 
@@ -17,40 +16,45 @@ export const useDrivenField = <DriverPersisted extends FieldValue = FieldValue>(
 	transform: (driverValue: DriverPersisted | null) => DriverPersisted | null = identityFunction,
 	agent: string = 'drivenField',
 ) => {
-	const previousDriverValue = React.useRef<DriverPersisted | null | undefined>(undefined)
+	const entityKey = useEntityKey()
+	const getEntityByKey = useGetEntityByKey()
+	const potentiallyStaleParent = getEntityByKey(entityKey)
+	const stableBatchUpdatesReference = potentiallyStaleParent.batchUpdates
+
 	const desugaredDriver = useDesugaredRelativeSingleField(driverField)
 	const desugaredDriven = useDesugaredRelativeSingleField(drivenField)
 
-	const onBeforeUpdate = React.useCallback<EntityAccessor.BatchUpdatesHandler>(
-		getAccessor => {
-			const driverAccessor = getAccessor().getRelativeSingleField<DriverPersisted>(desugaredDriver)
+	const potentiallyStaleDriverAccessor = potentiallyStaleParent.getRelativeSingleField<DriverPersisted>(desugaredDriver)
+	const stableAddEventListenerReference = potentiallyStaleDriverAccessor.addEventListener
 
-			if (previousDriverValue.current !== undefined && previousDriverValue.current === driverAccessor.currentValue) {
-				return
-			}
-			// This is tricky: we're deliberately getting the Entity, and not the field
-			const drivenHostEntity = getAccessor().getRelativeSingleEntity(desugaredDriven)
+	const onBeforeUpdate = React.useCallback<FieldAccessor.BeforeUpdateListener<DriverPersisted>>(
+		driverAccessor => {
+			stableBatchUpdatesReference(getAccessor => {
+				// This is tricky: we're deliberately getting the Entity, and not the field
+				const drivenHostEntity = getAccessor().getRelativeSingleEntity(desugaredDriven)
 
-			if (drivenHostEntity.existsOnServer) {
-				return
-			}
+				if (drivenHostEntity.existsOnServer) {
+					return
+				}
 
-			const drivenAccessor = getAccessor().getRelativeSingleField<DriverPersisted, DriverPersisted>(desugaredDriven)
+				const drivenAccessor = getAccessor().getRelativeSingleField<DriverPersisted, DriverPersisted>(desugaredDriven)
 
-			if (drivenAccessor.isTouched) {
-				// Querying the user
-				return
-			}
+				if (drivenAccessor.isTouched) {
+					// Querying the user
+					return
+				}
 
-			const transformedValue = transform(driverAccessor.currentValue)
-			drivenAccessor.updateValue?.(transformedValue, {
-				agent,
+				const transformedValue = transform(driverAccessor.currentValue)
+				drivenAccessor.updateValue?.(transformedValue, {
+					agent,
+				})
 			})
-
-			previousDriverValue.current = driverAccessor.currentValue
 		},
-		[agent, desugaredDriven, desugaredDriver, transform],
+		[agent, desugaredDriven, transform, stableBatchUpdatesReference],
 	)
 
-	useEntityBeforeUpdate(onBeforeUpdate)
+	React.useEffect(() => stableAddEventListenerReference('beforeUpdate', onBeforeUpdate), [
+		onBeforeUpdate,
+		stableAddEventListenerReference,
+	])
 }

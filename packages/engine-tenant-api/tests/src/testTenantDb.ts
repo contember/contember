@@ -21,6 +21,8 @@ import { MigrationsRunner } from '@contember/database-migrations'
 import { graphql } from 'graphql'
 import { promises } from 'fs'
 import { join } from 'path'
+import { Membership } from '../../src/model/type/Membership'
+import { Connection } from '@contember/database'
 
 export interface Test {
 	query: GraphQLTestQuery
@@ -39,6 +41,26 @@ const schema: Schema = {
 	validation: {},
 	acl: {
 		roles: {
+			superEditor: {
+				stages: '*',
+				entities: {},
+				tenant: {
+					invite: true,
+					manage: {
+						editor: {
+							variables: {
+								language: 'language',
+							},
+						},
+					},
+				},
+				variables: {
+					language: {
+						type: Acl.VariableType.entity,
+						entityName: 'Language',
+					},
+				},
+			},
 			editor: {
 				stages: '*',
 				entities: {},
@@ -58,9 +80,14 @@ const projectSchemaResolver: ProjectSchemaResolver = project => Promise.resolve(
 export const authenticatedIdentityId = testUuid(999)
 export const authenticatedApiKeyId = testUuid(998)
 
+interface TenantTestOptions {
+	membership?: Membership
+}
+
 interface TenantTester {
-	execute(query: GraphQLTestQuery): Promise<any>
+	execute(query: GraphQLTestQuery, options?: TenantTestOptions): Promise<any>
 	mailer: MockedMailer
+	end: () => Promise<void>
 }
 
 const getMigrationsDir = async () => {
@@ -103,17 +130,6 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 
 	await tenantContainer.projectManager.createOrUpdateProject({ slug: 'blog', name: 'blog' })
 
-	const context: ResolverContext = createResolverContext(
-		new PermissionContext(
-			new StaticIdentity(authenticatedIdentityId, []),
-			{
-				isAllowed: () => Promise.resolve(true),
-			},
-			new ProjectScopeFactory(projectSchemaResolver, new AclSchemaEvaluatorFactory()),
-		),
-		authenticatedApiKeyId,
-	)
-
 	const schema = makeExecutableSchema({
 		typeDefs: typeDefs,
 		resolvers: tenantContainer.resolvers as any,
@@ -123,15 +139,29 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 	})
 
 	return {
-		async execute(query: GraphQLTestQuery): Promise<any> {
-			return await graphql(
+		async execute(query: GraphQLTestQuery, options: TenantTestOptions = {}): Promise<any> {
+			const context: ResolverContext = createResolverContext(
+				new PermissionContext(
+					new StaticIdentity(authenticatedIdentityId, [], {
+						blog: [options.membership || { role: 'admin', variables: [] }],
+					}),
+					tenantContainer.authorizator,
+					tenantContainer.projectScopeFactory,
+				),
+				authenticatedApiKeyId,
+			)
+			const result = await graphql(
 				schema,
 				typeof query === 'string' ? query : query.query,
 				null,
 				context,
 				typeof query === 'string' ? undefined : query.variables,
 			)
+			return result
 		},
 		mailer,
+		end: async () => {
+			await (tenantContainer.connection as Connection).end()
+		},
 	}
 }

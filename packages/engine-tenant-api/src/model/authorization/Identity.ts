@@ -9,10 +9,14 @@ export interface Identity {
 }
 
 export class StaticIdentity implements Identity {
-	constructor(public readonly id: string, public readonly roles: string[]) {}
+	constructor(
+		public readonly id: string,
+		public readonly roles: string[],
+		private projectMemberships: Record<string, readonly Membership[]> = {},
+	) {}
 
 	getProjectMemberships(projectSlug: string): Promise<readonly Membership[]> {
-		return Promise.resolve([])
+		return Promise.resolve(this.projectMemberships[projectSlug] || {})
 	}
 }
 

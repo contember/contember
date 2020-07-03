@@ -1,5 +1,6 @@
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { Environment } from '../dao'
 import {
 	EntityFieldMarkers,
 	FieldMarker,
@@ -72,6 +73,7 @@ export class MarkerMerger {
 		return new HasOneRelationMarker(
 			TreeParameterMerger.mergeHasOneRelationsWithSamePlaceholders(original.relation, fresh.relation),
 			this.mergeEntityFields(original.fields, fresh.fields),
+			this.mergeEnvironments(original.environment, fresh.environment),
 		)
 	}
 
@@ -79,11 +81,16 @@ export class MarkerMerger {
 		return new HasManyRelationMarker(
 			TreeParameterMerger.mergeHasManyRelationsWithSamePlaceholders(original.relation, fresh.relation),
 			this.mergeEntityFields(original.fields, fresh.fields),
+			this.mergeEnvironments(original.environment, fresh.environment),
 		)
 	}
 
 	public static mergeSubTreeMarkers(original: SubTreeMarker, fresh: SubTreeMarker) {
-		return new SubTreeMarker(original.parameters, this.mergeEntityFields(original.fields, fresh.fields))
+		return new SubTreeMarker(
+			original.parameters,
+			this.mergeEntityFields(original.fields, fresh.fields),
+			this.mergeEnvironments(original.environment, fresh.environment),
+		)
 	}
 
 	public static mergeFieldMarkers(original: FieldMarker, fresh: FieldMarker) {
@@ -104,6 +111,13 @@ export class MarkerMerger {
 			[typeName.placeholderName, typeName],
 		])
 		return this.mergeEntityFields(original, freshFields)
+	}
+
+	public static mergeEnvironments(original: Environment, fresh: Environment): Environment {
+		if (original === fresh) {
+			return original
+		}
+		return original.putDelta(fresh.getAllNames())
 	}
 
 	private static rejectRelationScalarCombo(fieldName: FieldName): never {

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../../../../src'
+import { Environment, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../../../../src'
 import { Field, HasMany, HasOne, SingleEntitySubTree } from '../../../../src/coreComponents'
 import {
 	FieldMarker,
@@ -50,6 +50,7 @@ describe('Marker tree generator', () => {
 			),
 		)
 
+		const environment = new Environment()
 		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
 		const typeNameMarker = [TYPENAME_KEY_NAME, new FieldMarker(TYPENAME_KEY_NAME)] as const
 
@@ -72,6 +73,7 @@ describe('Marker tree generator', () => {
 				['name', new FieldMarker('name')],
 				['surname', new FieldMarker('surname')],
 			]),
+			environment,
 		)
 
 		const hasOne = new HasOneRelationMarker(
@@ -89,6 +91,7 @@ describe('Marker tree generator', () => {
 				[innerHasMany.placeholderName, innerHasMany],
 				['hasOneField', new FieldMarker('hasOneField')],
 			]),
+			environment,
 		)
 
 		const outerHasMany = new HasManyRelationMarker(
@@ -109,6 +112,7 @@ describe('Marker tree generator', () => {
 				['hasManyField', new FieldMarker('hasManyField')],
 				[hasOne.placeholderName, hasOne],
 			]),
+			environment,
 		)
 		const subTreeMarker = new SubTreeMarker(
 			new BoxedQualifiedSingleEntity({
@@ -126,6 +130,7 @@ describe('Marker tree generator', () => {
 				[outerHasMany.placeholderName, outerHasMany],
 				['fooField', new FieldMarker('fooField')],
 			]),
+			environment,
 		)
 		expect(generator.generate()).toEqual(new MarkerTreeRoot(new Map([[subTreeMarker.placeholderName, subTreeMarker]])))
 	})

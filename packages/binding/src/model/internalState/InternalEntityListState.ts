@@ -1,4 +1,5 @@
 import { EntityListAccessor, ErrorAccessor } from '../../accessors'
+import { Environment } from '../../dao'
 import { EntityFieldMarkers } from '../../markers'
 import { EntityCreationParameters, EntityListPreferences, RemovalType } from '../../treeParameters'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
@@ -11,6 +12,7 @@ export interface InternalEntityListState {
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
 	creationParameters: EntityCreationParameters & EntityListPreferences
+	environment: Environment
 	errors: ErrorAccessor[]
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:

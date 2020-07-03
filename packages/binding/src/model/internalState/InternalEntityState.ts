@@ -1,8 +1,8 @@
 import { EntityAccessor, ErrorAccessor } from '../../accessors'
 import { SingleEntityPersistedData } from '../../accessorTree'
+import { Environment } from '../../dao'
 import { EntityFieldMarkers } from '../../markers'
 import { EntityCreationParameters, FieldName } from '../../treeParameters'
-import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
 import { InternalStateNode } from './InternalStateNode'
 import { InternalStateType } from './InternalStateType'
 
@@ -13,6 +13,7 @@ export interface InternalEntityState {
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
+	environment: Environment
 	batchUpdateDepth: number
 	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
 	creationParameters: EntityCreationParameters

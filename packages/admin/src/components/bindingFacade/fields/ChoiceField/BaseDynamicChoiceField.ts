@@ -102,7 +102,7 @@ export const useNormalizedOptions = (
 					const label = renderOptionText
 						? renderOptionText(item)
 						: 'field' in desugaredOptionPath
-						? `${item.getRelativeSingleField(desugaredOptionPath.field).currentValue ?? ''}`
+						? `${item.getField(desugaredOptionPath.field).currentValue ?? ''}`
 						: ''
 
 					return {

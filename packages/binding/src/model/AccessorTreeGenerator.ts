@@ -11,6 +11,7 @@ import {
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { TYPENAME_KEY_NAME } from '../bindingTypes'
+import { Environment } from '../dao'
 import {
 	EntityFieldMarkers,
 	FieldMarker,
@@ -181,6 +182,7 @@ export class AccessorTreeGenerator {
 						} else {
 							const newSubTreeState = this.initializeEntityAccessor(
 								newSubTreeData.id,
+								subTreeState.environment,
 								subTreeState.fieldMarkers,
 								subTreeState.creationParameters,
 								subTreeState.onChildFieldUpdate,
@@ -279,6 +281,7 @@ export class AccessorTreeGenerator {
 								fieldPlaceholder,
 								this.initializeEntityAccessor(
 									newFieldDatum.id,
+									marker.environment,
 									marker.fields,
 									marker.relation,
 									state.onChildFieldUpdate,
@@ -291,6 +294,7 @@ export class AccessorTreeGenerator {
 							fieldPlaceholder,
 							this.initializeEntityAccessor(
 								new EntityAccessor.UnpersistedEntityId(),
+								marker.environment,
 								marker.fields,
 								marker.relation,
 								state.onChildFieldUpdate,
@@ -390,7 +394,13 @@ export class AccessorTreeGenerator {
 			if (newPersistedId === undefined) {
 				const newKey = new EntityAccessor.UnpersistedEntityId()
 
-				this.initializeEntityAccessor(newKey, state.fieldMarkers, state.creationParameters, state.onChildEntityUpdate)
+				this.initializeEntityAccessor(
+					newKey,
+					state.environment,
+					state.fieldMarkers,
+					state.creationParameters,
+					state.onChildEntityUpdate,
+				)
 				key = newKey.value
 				didUpdate = true
 			} else {
@@ -400,6 +410,7 @@ export class AccessorTreeGenerator {
 				if (childState === undefined) {
 					childState = this.initializeEntityAccessor(
 						newPersistedId,
+						state.environment,
 						state.fieldMarkers,
 						state.creationParameters,
 						state.onChildEntityUpdate,
@@ -590,6 +601,7 @@ export class AccessorTreeGenerator {
 		if (tree.parameters.type === 'qualifiedEntityList' || tree.parameters.type === 'unconstrainedQualifiedEntityList') {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
 			subTreeState = this.initializeEntityListAccessor(
+				tree.environment,
 				tree.fields,
 				{ initialEntityCount: 0, ...tree.parameters.value },
 				noop,
@@ -600,7 +612,7 @@ export class AccessorTreeGenerator {
 				persistedRootData instanceof BoxedSingleEntityId
 					? persistedRootData.id
 					: new EntityAccessor.UnpersistedEntityId()
-			subTreeState = this.initializeEntityAccessor(id, tree.fields, tree.parameters.value, noop)
+			subTreeState = this.initializeEntityAccessor(id, tree.environment, tree.fields, tree.parameters.value, noop)
 		}
 		this.subTreeStates.set(tree.placeholderName, subTreeState)
 
@@ -650,6 +662,7 @@ export class AccessorTreeGenerator {
 				fieldDatum instanceof BoxedSingleEntityId ? fieldDatum.id : new EntityAccessor.UnpersistedEntityId()
 			const referenceEntityState = this.initializeEntityAccessor(
 				entityId,
+				field.environment,
 				field.fields,
 				field.relation,
 				entityState.onChildFieldUpdate,
@@ -674,6 +687,7 @@ export class AccessorTreeGenerator {
 			entityState.fields.set(
 				field.placeholderName,
 				this.initializeEntityListAccessor(
+					field.environment,
 					field.fields,
 					relation,
 					entityState.onChildFieldUpdate,
@@ -737,6 +751,7 @@ export class AccessorTreeGenerator {
 						const childState = this.entityStore.get(childKey)!
 						this.initializeEntityAccessor(
 							childState.id,
+							fieldState.environment,
 							newFieldMarkers,
 							fieldState.creationParameters,
 							fieldState.onChildEntityUpdate,
@@ -754,6 +769,7 @@ export class AccessorTreeGenerator {
 
 	private initializeEntityAccessor(
 		id: string | EntityAccessor.UnpersistedEntityId,
+		environment: Environment,
 		fieldMarkers: EntityFieldMarkers,
 		creationParameters: EntityCreationParameters,
 		onEntityUpdate: OnEntityUpdate,
@@ -788,6 +804,7 @@ export class AccessorTreeGenerator {
 			batchUpdateDepth: 0,
 			childrenWithPendingUpdates: undefined,
 			creationParameters,
+			environment,
 			errors: emptyArray,
 			eventListeners: {
 				update: undefined,
@@ -818,6 +835,7 @@ export class AccessorTreeGenerator {
 							// keep in sync two copies of the same data. TS hides the extra info anyway.
 							entityState.fields,
 							entityState.errors,
+							entityState.environment,
 							entityState.addEventListener,
 							entityState.batchUpdates,
 							entityState.connectEntityAtField,
@@ -929,10 +947,11 @@ export class AccessorTreeGenerator {
 
 						stateToDisconnect.realms.delete(entityState.onChildFieldUpdate)
 
-						// TODO update chagnes count?
+						// TODO update changes count?
 
 						const newEntityState = this.initializeEntityAccessor(
 							new EntityAccessor.UnpersistedEntityId(),
+							hasOneMarker.environment,
 							hasOneMarker.fields,
 							hasOneMarker.relation,
 							entityState.onChildFieldUpdate,
@@ -1038,6 +1057,7 @@ export class AccessorTreeGenerator {
 			for (const placeholderName of relevantPlaceholders) {
 				const newEntityState = this.initializeEntityAccessor(
 					new EntityAccessor.UnpersistedEntityId(),
+					deletedState.environment,
 					deletedState.fieldMarkers,
 					deletedState.creationParameters,
 					entityState.onChildFieldUpdate,
@@ -1062,6 +1082,7 @@ export class AccessorTreeGenerator {
 	}
 
 	private initializeEntityListAccessor(
+		environment: Environment,
 		fieldMarkers: EntityFieldMarkers,
 		creationParameters: EntityCreationParameters & EntityListPreferences,
 		onEntityListUpdate: OnEntityListUpdate,
@@ -1077,6 +1098,7 @@ export class AccessorTreeGenerator {
 			batchUpdateDepth: 0,
 			childrenKeys: new Set(),
 			childrenWithPendingUpdates: undefined,
+			environment,
 			eventListeners: {
 				update: undefined,
 				beforeUpdate: undefined,
@@ -1286,6 +1308,7 @@ export class AccessorTreeGenerator {
 
 			const entityState = this.initializeEntityAccessor(
 				id,
+				entityListState.environment,
 				entityListState.fieldMarkers,
 				entityListState.creationParameters,
 				entityListState.onChildEntityUpdate,

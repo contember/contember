@@ -43,7 +43,12 @@ export namespace MarkerFactory {
 					qualifiedSingleEntity.where,
 				),
 			}),
-			wrapRelativeEntityFields(qualifiedSingleEntity.hasOneRelationPath, MarkerMerger.mergeInSystemFields(fields)),
+			wrapRelativeEntityFields(
+				qualifiedSingleEntity.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(fields),
+			),
+			environment,
 		)
 	}
 
@@ -56,7 +61,12 @@ export namespace MarkerFactory {
 
 		return new SubTreeMarker(
 			new BoxedQualifiedEntityList(qualifiedEntityList),
-			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, MarkerMerger.mergeInSystemFields(fields)),
+			wrapRelativeEntityFields(
+				qualifiedEntityList.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(fields),
+			),
+			environment,
 		)
 	}
 
@@ -69,7 +79,12 @@ export namespace MarkerFactory {
 
 		return new SubTreeMarker(
 			new BoxedUnconstrainedQualifiedEntityList(qualifiedEntityList),
-			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, MarkerMerger.mergeInSystemFields(fields)),
+			wrapRelativeEntityFields(
+				qualifiedEntityList.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(fields),
+			),
+			environment,
 		)
 	}
 
@@ -82,7 +97,12 @@ export namespace MarkerFactory {
 
 		return new SubTreeMarker(
 			new BoxedUnconstrainedQualifiedSingleEntity(qualifiedSingleEntity),
-			wrapRelativeEntityFields(qualifiedSingleEntity.hasOneRelationPath, MarkerMerger.mergeInSystemFields(fields)),
+			wrapRelativeEntityFields(
+				qualifiedSingleEntity.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(fields),
+			),
+			environment,
 		)
 	}
 
@@ -92,7 +112,7 @@ export namespace MarkerFactory {
 		entityFieldMarkers: EntityFieldMarkers,
 	) => {
 		const relativeSingleEntity = QueryLanguage.desugarRelativeSingleEntity(field, environment)
-		return wrapRelativeEntityFields(relativeSingleEntity.hasOneRelationPath, entityFieldMarkers)
+		return wrapRelativeEntityFields(relativeSingleEntity.hasOneRelationPath, environment, entityFieldMarkers)
 	}
 
 	export const createRelativeEntityListFields = (
@@ -101,9 +121,14 @@ export namespace MarkerFactory {
 		entityFieldMarkers: EntityFieldMarkers,
 	) => {
 		const relativeEntityList = QueryLanguage.desugarRelativeEntityList(field, environment)
-		const hasManyRelationMarker = createHasManyRelationMarker(relativeEntityList.hasManyRelation, entityFieldMarkers)
+		const hasManyRelationMarker = createHasManyRelationMarker(
+			relativeEntityList.hasManyRelation,
+			environment,
+			entityFieldMarkers,
+		)
 		return wrapRelativeEntityFields(
 			relativeEntityList.hasOneRelationPath,
+			environment,
 			new Map([[hasManyRelationMarker.placeholderName, hasManyRelationMarker]]),
 		)
 	}
@@ -126,22 +151,28 @@ export namespace MarkerFactory {
 
 		return wrapRelativeEntityFields(
 			relativeSingleField.hasOneRelationPath,
+			environment,
 			new Map([[placeholderName, getMarker(relativeSingleField)]]),
 		)
 	}
 
 	export const wrapRelativeEntityFields = (
 		hasOneRelationPath: HasOneRelation[],
+		environment: Environment,
 		entityFieldMarkers: EntityFieldMarkers,
 	): EntityFieldMarkers => {
 		for (let i = hasOneRelationPath.length - 1; i >= 0; i--) {
-			const marker = createHasOneRelationMarker(hasOneRelationPath[i], entityFieldMarkers)
+			const marker = createHasOneRelationMarker(hasOneRelationPath[i], environment, entityFieldMarkers)
 			entityFieldMarkers = new Map([[marker.placeholderName, marker]])
 		}
 		return entityFieldMarkers
 	}
 
-	export const createHasOneRelationMarker = (hasOneRelation: HasOneRelation, entityFieldMarkers: EntityFieldMarkers) =>
+	export const createHasOneRelationMarker = (
+		hasOneRelation: HasOneRelation,
+		environment: Environment,
+		entityFieldMarkers: EntityFieldMarkers,
+	) =>
 		new HasOneRelationMarker(
 			{
 				...hasOneRelation,
@@ -150,10 +181,12 @@ export namespace MarkerFactory {
 					: hasOneRelation.setOnCreate,
 			},
 			MarkerMerger.mergeInSystemFields(entityFieldMarkers),
+			environment,
 		)
 
 	export const createHasManyRelationMarker = (
 		hasManyRelation: HasManyRelation,
+		environment: Environment,
 		entityFieldMarkers: EntityFieldMarkers,
-	) => new HasManyRelationMarker(hasManyRelation, MarkerMerger.mergeInSystemFields(entityFieldMarkers))
+	) => new HasManyRelationMarker(hasManyRelation, MarkerMerger.mergeInSystemFields(entityFieldMarkers), environment)
 }

@@ -86,12 +86,11 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 			}
 		})()
 		if (migrations.length === 0) {
-			console.error('No migrations to execute')
+			console.log('No migrations to execute')
 			return 0
 		}
-		console.error('\nWill execute following migrations:')
+		console.log('Will execute following migrations:')
 		migrations.forEach(it => console.error(it.name))
-		console.error('\n')
 		if (!input.getOption('yes')) {
 			if (!process.stdin.isTTY) {
 				throw 'TTY not available. Pass --yes option to confirm execution.'
@@ -124,7 +123,7 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 
 		const result = await client.migrate(migrations.map(it => it.localMigration))
 		if (result.ok) {
-			console.error('Migration executed')
+			console.log('Migration executed')
 			return 0
 		}
 		console.error(result.errors)

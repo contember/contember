@@ -63,7 +63,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 		if (restoreMissing) {
 			const missing = status.errorMigrations.filter(it => it.state === MigrationState.EXECUTED_MISSING)
 			for (const migration of missing) {
-				console.error(`Restoring migration ${migration.name}`)
+				console.log(`Restoring migration ${migration.name}`)
 				const fullMigration = await client.getExecutedMigration(migration.version)
 				await container.migrationFilesManager.createFile(
 					JSON.stringify(
@@ -92,7 +92,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 						...(onlyToExecute ? status.migrationsToExecute : []),
 				  ])
 				: status.allMigrations
-		console.error(createMigrationStatusTable(filtered))
+		console.log(createMigrationStatusTable(filtered))
 		const hasErrors = status.errorMigrations.length > 0
 
 		if (hasErrors) {

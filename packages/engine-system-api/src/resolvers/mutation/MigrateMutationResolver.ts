@@ -15,15 +15,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	): Promise<MigrateResponse> {
 		const rootStageSlug = createStageTree(context.project).getRoot().slug
 		await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, rootStageSlug)
-		const migrations: Migration[] = []
-		for (const { formatVersion, name, version, modifications } of args.migrations) {
-			migrations.push({
-				formatVersion,
-				name,
-				version,
-				modifications: modifications.map(({ modification, data }) => ({ modification, ...JSON.parse(data) })),
-			})
-		}
+		const migrations = args.migrations as readonly Migration[]
 
 		return context.db.transaction(async trx => {
 			try {

@@ -1,6 +1,6 @@
 {
 	"name": "@contember/binding",
-	"version": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.1",
+	"version": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.2",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
@@ -9,10 +9,10 @@
 		"test": "jest dist/tests/bundle.spec.js"
 	},
 	"dependencies": {
-		"@contember/client": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.1",
-		"@contember/react-client": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.1",
-		"@contember/react-multipass-rendering": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.1",
-		"@contember/react-utils": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.1",
+		"@contember/client": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.2",
+		"@contember/react-client": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.2",
+		"@contember/react-multipass-rendering": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.2",
+		"@contember/react-utils": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.2",
 		"@contember/schema": "0.7.2",
 		"chevrotain": "6.5.0"
 	},

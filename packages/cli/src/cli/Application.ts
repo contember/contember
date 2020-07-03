@@ -10,7 +10,7 @@ export class Application {
 
 		const [name, ...rest] = commandArgs
 		if (!name || name === '--help') {
-			console.log(`Usage: <command> <command args>`)
+			console.error(`Usage: <command> <command args>`)
 			const commands = Object.entries(this.commandManager.commands)
 				.filter(([name, factory], index, commands) => commands.findIndex(it => it[1] === factory) === index)
 				.map(([name]) => name)
@@ -21,23 +21,24 @@ export class Application {
 				const usage = configuration.getUsage()
 				const commandUsage = usage ? ' ' + usage : ''
 				const description = configuration.getDescription() ? ` - ${configuration.getDescription()}` : ''
-				console.log(`\t${chalk.greenBright(commandName)}${chalk.green(commandUsage)}${description}`)
+				console.error(`\t${chalk.greenBright(commandName)}${chalk.green(commandUsage)}${description}`)
 			}
 			return process.exit(0)
 		}
 
 		const [fullName, command] = this.commandManager.createCommand(name)
-		if (rest[0] === '--help') {
-			console.log(chalk.greenBright(fullName))
+
+		if (rest[0] === '--help' || rest[0] === '-h') {
+			console.error(chalk.greenBright(fullName))
 			const configuration = command.getConfiguration()
 			const commandDescription = configuration.getDescription()
 			if (commandDescription) {
-				console.log(commandDescription)
+				console.error(commandDescription)
 			}
-			console.log('\nUsage:')
-			console.log(chalk.green(configuration.getUsage('short')))
-			console.log('\nArguments and options:')
-			console.log(configuration.getUsage('multiline'))
+			console.error('\nUsage:')
+			console.error(chalk.green(configuration.getUsage('short')))
+			console.error('\nArguments and options:')
+			console.error(configuration.getUsage('multiline'))
 
 			return process.exit(0)
 		}
@@ -47,7 +48,10 @@ export class Application {
 			return process.exit(result)
 		} catch (e) {
 			if (e instanceof InvalidInputError) {
-				console.error(e.message)
+				console.error(chalk.bgRedBright.white(e.message))
+				const configuration = command.getConfiguration()
+				console.error(`${chalk.greenBright(fullName)} ${chalk.green(configuration.getUsage('line'))}`)
+
 				return process.exit(1)
 			} else {
 				console.error(e)

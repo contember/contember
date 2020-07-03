@@ -26,7 +26,7 @@ export class CreateApiKeyCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(input)
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(input.getArgument('instance'))
 		const apiToken = await interactiveResolveApiToken({ instance })
 		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 		const { id, token } = await interactiveCreateApiKey({ client: tenantClient })

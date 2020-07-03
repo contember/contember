@@ -1,15 +1,12 @@
-import { Input } from '../../cli'
 import { getInstanceStatus, listInstances } from '../instance'
 import prompts from 'prompts'
 import { InstanceApiEnvironment, resolveInstanceEnvironment } from './enviornment'
 
 export const interactiveResolveInstanceEnvironmentFromInput = async (
-	inputCommand: Input<{
-		instance?: string
-	}>,
+	instance?: string,
 ): Promise<InstanceApiEnvironment> => {
 	const workspaceDirectory = process.cwd()
-	let [instanceName] = [inputCommand.getArgument('instance') || process.env.CONTEMBER_INSTANCE]
+	let [instanceName] = [instance || process.env.CONTEMBER_INSTANCE]
 	if (!instanceName) {
 		const instances = await listInstances({ workspaceDirectory })
 		;({ instanceName } = await prompts({

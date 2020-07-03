@@ -1,3 +1,5 @@
-export * from './MigrationsDiffCommand'
+export * from './MigrationCreateCommand'
 export * from './MigrationDescribeCommand'
-export * from './MigrationsCreateCommand'
+export * from './MigrationDiffCommand'
+export * from './MigrationExecuteCommand'
+export * from './MigrationStatusCommand'

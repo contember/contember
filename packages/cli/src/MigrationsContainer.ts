@@ -16,6 +16,7 @@ export interface MigrationsContainer {
 	schemaVersionBuilder: SchemaVersionBuilder
 	schemaDiffer: SchemaDiffer
 	migrationsResolver: MigrationsResolver
+	migrationFilesManager: MigrationFilesManager
 }
 
 export class MigrationsContainerFactory {
@@ -45,6 +46,13 @@ export class MigrationsContainerFactory {
 				({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory),
 			)
 			.build()
-			.pick('migrationCreator', 'migrationsDescriber', 'schemaVersionBuilder', 'schemaDiffer', 'migrationsResolver')
+			.pick(
+				'migrationCreator',
+				'migrationsDescriber',
+				'schemaVersionBuilder',
+				'schemaDiffer',
+				'migrationsResolver',
+				'migrationFilesManager',
+			)
 	}
 }

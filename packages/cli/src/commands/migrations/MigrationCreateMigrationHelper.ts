@@ -2,7 +2,6 @@ import { CommandConfiguration, Input } from '../../cli'
 import { listProjects } from '../../utils/project'
 import { getProjectDirectories } from '../../NamingHelper'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { printValidationErrors } from '../../utils/schema'
 import { MigrationCreator, MigrationDescriber } from '@contember/schema-migrations'
 
 type Args = {

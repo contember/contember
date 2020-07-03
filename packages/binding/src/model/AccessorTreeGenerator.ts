@@ -261,28 +261,24 @@ export class AccessorTreeGenerator {
 				case InternalStateType.SingleEntity: {
 					const marker = state.fieldMarkers.get(fieldPlaceholder)
 
-					if (marker instanceof HasOneRelationMarker) {
-						if (newFieldDatum instanceof BoxedSingleEntityId) {
-							if (newFieldDatum.id === fieldState.id) {
-								didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
-							} else {
-								// TODO delete the previous entity
-								state.fields.set(
-									fieldPlaceholder,
-									this.initializeEntityAccessor(
-										newFieldDatum.id,
-										marker.fields,
-										marker.relation,
-										state.onChildFieldUpdate,
-									),
-								)
-								didUpdate = true // Deliberately not child update
-							}
-						} else if (newFieldDatum === null || newFieldDatum === undefined) {
+					if (!(marker instanceof HasOneRelationMarker)) {
+						break
+					}
+
+					if (newFieldDatum instanceof BoxedSingleEntityId) {
+						const previousFieldDatum = state.persistedData?.get(fieldPlaceholder)
+						if (
+							previousFieldDatum instanceof BoxedSingleEntityId &&
+							newFieldDatum.id === previousFieldDatum.id &&
+							newFieldDatum.id === fieldState.id
+						) {
+							didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
+						} else {
+							// TODO delete the previous entity
 							state.fields.set(
 								fieldPlaceholder,
 								this.initializeEntityAccessor(
-									new EntityAccessor.UnpersistedEntityId(),
+									newFieldDatum.id,
 									marker.fields,
 									marker.relation,
 									state.onChildFieldUpdate,
@@ -290,7 +286,19 @@ export class AccessorTreeGenerator {
 							)
 							didUpdate = true // Deliberately not child update
 						}
+					} else if (newFieldDatum === null || newFieldDatum === undefined) {
+						state.fields.set(
+							fieldPlaceholder,
+							this.initializeEntityAccessor(
+								new EntityAccessor.UnpersistedEntityId(),
+								marker.fields,
+								marker.relation,
+								state.onChildFieldUpdate,
+							),
+						)
+						didUpdate = true // Deliberately not child update
 					}
+
 					break
 				}
 				case InternalStateType.EntityList: {

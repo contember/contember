@@ -9,7 +9,6 @@ import {
 	SugaredField,
 	SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList,
-	useEnvironment,
 	useParentEntityAccessor,
 } from '@contember/binding'
 import { emptyArray, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
@@ -31,7 +30,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, BlockEditor
 export const BlockEditor = Component<BlockEditorProps>(
 	props => {
 		const entity = useParentEntityAccessor()
-		const environment = useEnvironment()
+		const environment = entity.environment
 
 		useConstantLengthInvariant(
 			props.leadingFieldBackedElements || emptyArray,

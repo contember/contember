@@ -578,7 +578,6 @@ export class AccessorTreeGenerator {
 			this.getAllTypeNames,
 		)
 
-		console.debug(treeRootAccessor)
 		this.updateData?.(treeRootAccessor)
 	}
 

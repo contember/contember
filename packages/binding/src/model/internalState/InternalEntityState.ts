@@ -1,15 +1,10 @@
-import { EntityAccessor } from '../../accessors'
+import { EntityAccessor, ErrorAccessor } from '../../accessors'
 import { SingleEntityPersistedData } from '../../accessorTree'
-import { FieldName, RemovalType } from '../../treeParameters/primitives'
-import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
+import { Environment } from '../../dao'
+import { EntityFieldMarkers } from '../../markers'
+import { EntityCreationParameters, FieldName } from '../../treeParameters'
 import { InternalStateNode } from './InternalStateNode'
 import { InternalStateType } from './InternalStateType'
-
-export interface InternalEntityFieldPlannedRemoval {
-	field: FieldName
-	removalType: RemovalType
-	removedEntity: InternalEntityState
-}
 
 export type OnEntityUpdate = (state: InternalStateNode) => void
 export type OnEntityFieldUpdate = (state: InternalStateNode) => void
@@ -18,23 +13,23 @@ export interface InternalEntityState {
 	eventListeners: {
 		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
 	}
+	environment: Environment
 	batchUpdateDepth: number
-	bearingChildrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
 	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
-	errors: ErrorsPreprocessor.ErrorNode | undefined
+	creationParameters: EntityCreationParameters
+	errors: ErrorAccessor[]
 	fields: Map<FieldName, InternalStateNode>
+	fieldMarkers: EntityFieldMarkers
 	getAccessor: () => EntityAccessor
 	hasAtLeastOneBearingField: boolean
 	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean
 	hasStaleAccessor: boolean
-	hasUnpersistedChanges: boolean
 	id: string | EntityAccessor.UnpersistedEntityId
 	isScheduledForDeletion: boolean
-	nonbearingChildrenWithUnpersistedChanges: Set<InternalStateNode> | undefined
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	persistedData: SingleEntityPersistedData | undefined
-	plannedRemovals: Set<InternalEntityFieldPlannedRemoval> | undefined
+	plannedHasOneDeletions: Map<FieldName, InternalEntityState> | undefined
 
 	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.

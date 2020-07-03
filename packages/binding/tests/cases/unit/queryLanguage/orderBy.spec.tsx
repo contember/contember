@@ -1,6 +1,4 @@
 import { GraphQlBuilder } from '@contember/client'
-import 'jasmine'
-import React from 'react'
 import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
 

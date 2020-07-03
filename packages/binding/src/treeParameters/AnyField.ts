@@ -5,7 +5,6 @@ export interface DesugaredAnyField {
 }
 
 export interface AnyField {
-	isNonbearing: boolean
 	field: FieldName
 }
 
@@ -13,6 +12,4 @@ export interface SugarableAnyField {
 	field: FieldName
 }
 
-export interface UnsugarableAnyField {
-	isNonbearing?: boolean
-}
+export interface UnsugarableAnyField {}

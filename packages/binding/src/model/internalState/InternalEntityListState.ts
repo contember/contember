@@ -1,14 +1,9 @@
-import { EntityListAccessor } from '../../accessors'
-import { EntityFieldMarkers, ReferenceMarker } from '../../markers'
-import { RemovalType } from '../../treeParameters/primitives'
-import { ErrorsPreprocessor } from '../ErrorsPreprocessor'
+import { EntityListAccessor, ErrorAccessor } from '../../accessors'
+import { Environment } from '../../dao'
+import { EntityFieldMarkers } from '../../markers'
+import { EntityCreationParameters, EntityListPreferences, RemovalType } from '../../treeParameters'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
 import { InternalStateType } from './InternalStateType'
-
-export interface InternalEntityPlannedRemoval {
-	removalType: RemovalType
-	removedEntity: InternalEntityState
-}
 
 export type OnEntityListUpdate = (state: InternalEntityListState) => void
 export interface InternalEntityListState {
@@ -16,8 +11,9 @@ export interface InternalEntityListState {
 	batchUpdateDepth: number
 	childrenKeys: Set<string>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
-	childrenWithUnpersistedChanges: Set<InternalEntityState> | undefined
-	errors: ErrorsPreprocessor.ErrorNode | undefined
+	creationParameters: EntityCreationParameters & EntityListPreferences
+	environment: Environment
+	errors: ErrorAccessor[]
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:
 			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>
@@ -28,9 +24,8 @@ export interface InternalEntityListState {
 	hasPendingParentNotification: boolean
 	hasPendingUpdate: boolean
 	hasStaleAccessor: boolean
-	hasUnpersistedChanges: boolean
 	persistedEntityIds: Set<string>
-	plannedRemovals: Set<InternalEntityPlannedRemoval> | undefined
+	plannedRemovals: Map<InternalEntityState, RemovalType> | undefined
 
 	onChildEntityUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
 	onEntityListUpdate: OnEntityListUpdate // To be called by this entity list to inform the parent entity
@@ -41,5 +36,4 @@ export interface InternalEntityListState {
 	createNewEntity: EntityListAccessor.CreateNewEntity
 	disconnectEntity: EntityListAccessor.DisconnectEntity
 	getChildEntityByKey: EntityListAccessor.GetChildEntityByKey
-	preferences: ReferenceMarker.ReferencePreferences
 }

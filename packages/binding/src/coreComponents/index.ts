@@ -1,5 +1,4 @@
 export * from './Component'
-export * from './Connection'
 export * from './DataBindingProvider'
 export * from './EntityList'
 export * from './EntityListSubTree'

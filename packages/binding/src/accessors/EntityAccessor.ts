@@ -1,15 +1,24 @@
 import { BindingError } from '../BindingError'
-import { PlaceholderGenerator, ReferenceMarker } from '../markers'
+import { Environment } from '../dao'
+import { PlaceholderGenerator } from '../markers'
+import { QueryLanguage } from '../queryLanguage'
 import {
+	DesugaredHasManyRelation,
+	DesugaredHasOneRelation,
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
 	DesugaredRelativeSingleField,
 	ExpectedEntityCount,
 	FieldName,
 	FieldValue,
+	HasManyRelation,
+	HasOneRelation,
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
+	SugaredRelativeEntityList,
+	SugaredRelativeSingleEntity,
+	SugaredRelativeSingleField,
 } from '../treeParameters'
 import { Accessor } from './Accessor'
 import { EntityListAccessor } from './EntityListAccessor'
@@ -25,6 +34,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly typeName: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
 		public readonly errors: ErrorAccessor[],
+		public readonly environment: Environment,
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: EntityAccessor.BatchUpdates,
 		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField | undefined,
@@ -47,141 +57,105 @@ class EntityAccessor extends Accessor implements Errorable {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
 	}
 
-	public getField(fieldName: FieldName): EntityAccessor.NestedAccessor
+	/**
+	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameters
+	 * are really just a way to succinctly write a type cast. Nothing more, really.
+	 */
+	public getSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+		field: SugaredRelativeSingleField | string,
+	): FieldAccessor<Persisted, Produced> {
+		return this.getRelativeSingleField<Persisted, Produced>(
+			QueryLanguage.desugarRelativeSingleField(field, this.environment),
+		)
+	}
+
+	public getSingleEntity(entity: SugaredRelativeSingleEntity | string): EntityAccessor {
+		return this.getRelativeSingleEntity(QueryLanguage.desugarRelativeSingleEntity(entity, this.environment))
+	}
+
+	public getEntityList(entityList: SugaredRelativeEntityList | string): EntityListAccessor {
+		return this.getRelativeEntityList(QueryLanguage.desugarRelativeEntityList(entityList, this.environment))
+	}
+
+	//
+
+	/**
+	 * @see EntityAccessor.getSingleField
+	 */
+	public getRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+		field: RelativeSingleField | DesugaredRelativeSingleField,
+	): FieldAccessor<Persisted, Produced> {
+		const accessor = this.getRelativeSingleEntity(field).getField(field.field)
+
+		return (accessor as unknown) as FieldAccessor<Persisted, Produced>
+	}
+
+	public getRelativeSingleEntity(
+		relativeSingleEntity: RelativeSingleEntity | DesugaredRelativeSingleEntity,
+	): EntityAccessor {
+		let relativeTo: EntityAccessor = this
+
+		for (const hasOneRelation of relativeSingleEntity.hasOneRelationPath) {
+			relativeTo = relativeTo.getField(hasOneRelation, ExpectedEntityCount.UpToOne)
+		}
+		return relativeTo
+	}
+
+	public getRelativeEntityList(entityList: RelativeEntityList | DesugaredRelativeEntityList): EntityListAccessor {
+		return this.getRelativeSingleEntity(entityList).getField(
+			entityList.hasManyRelation,
+			ExpectedEntityCount.PossiblyMany,
+		)
+	}
+
+	public getField(fieldName: FieldName): FieldAccessor
 	public getField(
-		fieldName: FieldName,
-		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
-		filter: ReferenceMarker.ReferenceConstraints['filter'],
-	): EntityAccessor.NestedAccessor | null
+		hasOneRelation: HasOneRelation | DesugaredHasOneRelation,
+		expectedCount: ExpectedEntityCount.UpToOne,
+	): EntityAccessor
 	public getField(
-		fieldName: FieldName,
-		expectedCount: ReferenceMarker.ReferenceConstraints['expectedCount'],
-		filter: ReferenceMarker.ReferenceConstraints['filter'],
-		reducedBy: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.NestedAccessor | null
+		hasManyRelation: HasManyRelation | DesugaredHasManyRelation,
+		expectedCount: ExpectedEntityCount.PossiblyMany,
+	): EntityListAccessor
 	public getField(
-		fieldName: FieldName,
-		expectedCount?: ReferenceMarker.ReferenceConstraints['expectedCount'],
-		filter?: ReferenceMarker.ReferenceConstraints['filter'],
-		reducedBy?: ReferenceMarker.ReferenceConstraints['reducedBy'],
-	): EntityAccessor.NestedAccessor | null {
+		fieldNameOrRelation:
+			| FieldName
+			| HasOneRelation
+			| HasManyRelation
+			| DesugaredHasOneRelation
+			| DesugaredHasManyRelation,
+		expectedCount?: ExpectedEntityCount,
+	): EntityAccessor.NestedAccessor {
 		let placeholder: FieldName
 
-		if (expectedCount !== undefined) {
-			placeholder = PlaceholderGenerator.getReferencePlaceholder(fieldName, {
-				expectedCount,
-				reducedBy,
-				filter,
-			})
+		if (typeof fieldNameOrRelation === 'string') {
+			placeholder = PlaceholderGenerator.getFieldPlaceholder(fieldNameOrRelation)
+		} else if (expectedCount === ExpectedEntityCount.UpToOne) {
+			placeholder = PlaceholderGenerator.getHasOneRelationPlaceholder(
+				fieldNameOrRelation as HasOneRelation | DesugaredHasOneRelation,
+			)
+		} else if (expectedCount === ExpectedEntityCount.PossiblyMany) {
+			placeholder = PlaceholderGenerator.getHasManyRelationPlaceholder(
+				fieldNameOrRelation as HasManyRelation | DesugaredHasManyRelation,
+			)
 		} else {
-			placeholder = PlaceholderGenerator.getFieldPlaceholder(fieldName)
+			throw new BindingError()
 		}
 
 		return this.getFieldByPlaceholder(placeholder)
 	}
 
 	/**
-	 * If entity is a string, it *MUST NOT* make use of QL
-	 */
-	public getRelativeSingleEntity(
-		entity: RelativeSingleEntity | DesugaredRelativeSingleEntity | string,
-	): EntityAccessor {
-		let relativeTo: EntityAccessor = this
-		const hasOneRelationPath: DesugaredRelativeSingleEntity['hasOneRelationPath'] =
-			typeof entity === 'string'
-				? [
-						{
-							field: entity,
-							reducedBy: undefined,
-							filter: undefined,
-						},
-				  ]
-				: entity.hasOneRelationPath
-		for (const hasOneRelation of hasOneRelationPath) {
-			const field = relativeTo.getField(
-				hasOneRelation.field,
-				ExpectedEntityCount.UpToOne,
-				hasOneRelation.filter,
-				hasOneRelation.reducedBy,
-			)
-
-			if (field instanceof EntityAccessor) {
-				relativeTo = field
-			} else {
-				throw new BindingError('Corrupted data')
-			}
-		}
-		return relativeTo
-	}
-
-	/**
-	 * If field is a string, it *MUST NOT* make use of QL
-	 *
-	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameters
-	 * are really just a way to succinctly write a type cast. Nothing more, really.
-	 */
-	public getRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
-		field: RelativeSingleField | DesugaredRelativeSingleField | string,
-	): FieldAccessor<Persisted, Produced> {
-		let nestedEntity: EntityAccessor
-		let fieldName: string
-
-		if (typeof field === 'string') {
-			nestedEntity = this
-			fieldName = field
-		} else {
-			nestedEntity = this.getRelativeSingleEntity({ hasOneRelationPath: field.hasOneRelationPath })
-			fieldName = field.field
-		}
-
-		const accessor = nestedEntity.getField(fieldName)
-
-		if (!(accessor instanceof FieldAccessor)) {
-			throw new BindingError(
-				`Trying to access the field '${fieldName}'${
-					nestedEntity.typeName ? ` of the '${nestedEntity.typeName}' entity` : ''
-				} but it does not exist.`,
-			)
-		}
-		return (accessor as unknown) as FieldAccessor<Persisted, Produced>
-	}
-
-	/**
-	 * If entityList is a string, it *MUST NOT* make use of QL
-	 */
-	public getRelativeEntityList(
-		entityList: RelativeEntityList | DesugaredRelativeEntityList | string,
-	): EntityListAccessor {
-		let nestedEntity: EntityAccessor
-		let fieldName: string
-
-		if (typeof entityList === 'string') {
-			nestedEntity = this
-			fieldName = entityList
-		} else {
-			nestedEntity = this.getRelativeSingleEntity({ hasOneRelationPath: entityList.hasOneRelationPath })
-			fieldName = entityList.hasManyRelation.field
-		}
-
-		const field = nestedEntity.getField(fieldName)
-
-		if (!(field instanceof EntityListAccessor)) {
-			throw new BindingError(
-				`Trying to access the entity list '${field}'${
-					nestedEntity.typeName ? ` of the '${nestedEntity.typeName}' entity` : ''
-				} but it does not exist.`,
-			)
-		}
-		return field
-	}
-
-	/**
 	 * @internal
 	 */
-	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor | null {
+	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor {
 		const record = this.fieldData.get(placeholderName)
 		if (record === undefined) {
-			throw new BindingError(`EntityAccessor: unknown field '${placeholderName}'.`)
+			throw new BindingError(
+				`EntityAccessor: unknown field placeholder '${placeholderName}'. This is typically caused when trying to ` +
+					`access a field that does not appear in the marker tree or as a result of misuse of the ` +
+					`EntityAccessor.getField() method. Perhaps you wanted one from the EntityAccessor.getRelative**** family?`,
+			)
 		}
 		return record.getAccessor()
 	}

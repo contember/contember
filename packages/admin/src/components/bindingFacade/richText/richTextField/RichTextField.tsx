@@ -1,12 +1,4 @@
-import {
-	Component,
-	Field,
-	FieldBasicProps,
-	QueryLanguage,
-	useDesugaredRelativeSingleField,
-	useParentEntityAccessor,
-	useEnvironment,
-} from '@contember/binding'
+import { Component, Field, FieldBasicProps, QueryLanguage, useParentEntityAccessor } from '@contember/binding'
 import * as React from 'react'
 import { RichTextFieldInner, RichTextFieldInnerPublicProps } from './RichTextFieldInner'
 
@@ -15,7 +7,7 @@ export interface RichTextFieldProps extends FieldBasicProps, RichTextFieldInnerP
 export const RichTextField = Component<RichTextFieldProps>(
 	props => {
 		const entity = useParentEntityAccessor()
-		const environment = useEnvironment()
+		const environment = entity.environment
 
 		const desugaredField = React.useMemo(() => QueryLanguage.desugarRelativeSingleField(props, environment), [
 			environment,

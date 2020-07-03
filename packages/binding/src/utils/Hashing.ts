@@ -1,19 +1,38 @@
-import { SubTreeMarkerParameters, ReferenceMarker } from '../markers'
+import { SubTreeMarkerParameters } from '../markers'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
+	DesugaredHasManyRelation,
+	DesugaredHasOneRelation,
 	ExpectedEntityCount,
 	Filter,
+	HasManyRelation,
+	HasOneRelation,
+	OrderBy,
 	UniqueWhere,
 } from '../treeParameters'
 import { assertNever } from './assertNever'
 
 export class Hashing {
-	public static hashReferenceConstraints(constraints: ReferenceMarker.ReferenceConstraints): number {
-		const where: Array<Filter | UniqueWhere | ExpectedEntityCount | undefined> = [
-			constraints.filter,
-			constraints.reducedBy,
-			constraints.expectedCount,
+	public static hashHasOneRelation(relation: HasOneRelation | DesugaredHasOneRelation): number {
+		const where: Array<Filter | UniqueWhere | string | undefined> = [
+			ExpectedEntityCount.UpToOne,
+			relation.field,
+			relation.filter,
+			relation.reducedBy,
+		]
+
+		return Hashing.hashArray(where)
+	}
+
+	public static hashHasManyRelation(relation: HasManyRelation | DesugaredHasManyRelation): number {
+		const where: Array<Filter | UniqueWhere | OrderBy | string | number | undefined> = [
+			ExpectedEntityCount.PossiblyMany,
+			relation.field,
+			relation.filter,
+			'offset' in relation ? relation.offset : undefined,
+			'limit' in relation ? relation.limit : undefined,
+			'orderBy' in relation ? relation.orderBy : undefined,
 		]
 
 		return Hashing.hashArray(where)
@@ -37,11 +56,10 @@ export class Hashing {
 					value.orderBy,
 					value.offset,
 					value.limit,
-					value.connectTo,
 				])
 			}
 		} else {
-			return Hashing.hashArray([parameters.type, parameters.value.entityName, parameters.value.connectTo])
+			return Hashing.hashArray([parameters.type, parameters.value.entityName])
 		}
 		return assertNever(parameters)
 	}

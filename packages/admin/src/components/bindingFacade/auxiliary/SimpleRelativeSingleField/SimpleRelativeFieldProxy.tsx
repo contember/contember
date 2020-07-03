@@ -1,6 +1,13 @@
-import { Environment, SugaredRelativeSingleField, useEnvironment, useRelativeSingleField } from '@contember/binding'
+import {
+	Environment,
+	SugaredRelativeSingleField,
+	useEnvironment,
+	useMutationState,
+	useRelativeSingleField,
+} from '@contember/binding'
+import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { SimpleRelativeSingleFieldInner, SimpleRelativeSingleFieldInnerProps } from './SimpleRelativeSingleFieldInner'
+import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
 const contextualizeNode = (
 	node: React.ReactNode,
@@ -18,34 +25,57 @@ const contextualizeNode = (
 	return node
 }
 
-export type SimpleRelativeSingleFieldProxyProps = Omit<SimpleRelativeSingleFieldInnerProps, 'field'> &
-	SugaredRelativeSingleField
+export type SimpleRelativeSingleFieldProxyProps = Omit<FormGroupProps, 'children'> &
+	SugaredRelativeSingleField & {
+		render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any, any>, props: any) => React.ReactNode
+	}
 
-export const SimpleRelativeSingleFieldProxy = React.memo((props: SimpleRelativeSingleFieldProxyProps) => {
-	const environment = useEnvironment()
-	const field = useRelativeSingleField(props)
+export const SimpleRelativeSingleFieldProxy = React.memo(
+	({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => {
+		const environment = useEnvironment()
+		const field = useRelativeSingleField(props)
 
-	const normalizedLabel = React.useMemo(() => contextualizeNode(props.label, environment, 'labelMiddleware'), [
-		environment,
-		props.label,
-	])
-	const normalizedLabelDescription = React.useMemo(() => contextualizeNode(props.labelDescription, environment), [
-		environment,
-		props.labelDescription,
-	])
-	const normalizedDescription = React.useMemo(() => contextualizeNode(props.description, environment), [
-		environment,
-		props.description,
-	])
+		const normalizedLabel = React.useMemo(() => contextualizeNode(label, environment, 'labelMiddleware'), [
+			environment,
+			label,
+		])
+		const normalizedLabelDescription = React.useMemo(() => contextualizeNode(labelDescription, environment), [
+			environment,
+			labelDescription,
+		])
+		const normalizedDescription = React.useMemo(() => contextualizeNode(description, environment), [
+			environment,
+			description,
+		])
+		const isMutating = useMutationState()
 
-	return (
-		<SimpleRelativeSingleFieldInner
-			{...props}
-			field={field}
-			label={normalizedLabel}
-			labelDescription={normalizedLabelDescription}
-			description={normalizedDescription}
-		/>
-	)
-})
+		const fieldMetadata: SimpleRelativeSingleFieldMetadata = React.useMemo(
+			() => ({
+				field,
+				environment,
+				isMutating,
+			}),
+			[environment, field, isMutating],
+		)
+
+		const rendered = render(fieldMetadata, props)
+
+		return (
+			<>
+				{rendered && (
+					<FormGroup
+						label={normalizedLabel}
+						size={props.size}
+						labelDescription={normalizedLabelDescription}
+						labelPosition={labelPosition}
+						description={normalizedDescription}
+						errors={fieldMetadata.field.errors}
+					>
+						{rendered}
+					</FormGroup>
+				)}
+			</>
+		)
+	},
+)
 SimpleRelativeSingleFieldProxy.displayName = 'SimpleRelativeSingleFieldProxy'

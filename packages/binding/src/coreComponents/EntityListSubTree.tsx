@@ -1,10 +1,12 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { useEntityListSubTree } from '../accessorPropagation'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
 import { Component } from './Component'
 import { EntityList, EntityListBaseProps } from './EntityList'
+import { Field } from './Field'
 import { SingleEntityBaseProps } from './SingleEntity'
 
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
@@ -42,7 +44,13 @@ export const EntityListSubTree = Component(
 			}
 			return MarkerFactory.createEntityListSubTreeMarker(environment, props, fields)
 		},
-		generateSyntheticChildren: props => <EntityList {...props} accessor={0 as any} />,
+		generateSyntheticChildren: props => (
+			<EntityList {...props} accessor={0 as any}>
+				<Field field={PRIMARY_KEY_NAME} />
+				<Field field={TYPENAME_KEY_NAME} />
+				{props.children}
+			</EntityList>
+		),
 	},
 	'EntityListSubTree',
 ) as <ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => React.ReactElement

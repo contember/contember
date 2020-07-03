@@ -1,5 +1,5 @@
 import { EntityAccessor, EntityListAccessor } from '@contember/binding'
-import { Box, BoxSection } from '@contember/ui'
+import { Box, BoxSection, ErrorList } from '@contember/ui'
 import * as React from 'react'
 import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 
@@ -28,6 +28,7 @@ export interface RepeaterContainerProps extends RepeaterContainerPublicProps, Re
 
 export const RepeaterContainer = React.memo(
 	({
+		accessor,
 		children,
 		createNewEntity,
 		addButtonComponent: AddButton = CreateNewEntityButton,
@@ -43,6 +44,7 @@ export const RepeaterContainer = React.memo(
 	}: RepeaterContainerProps) => {
 		return (
 			<Box heading={label}>
+				<ErrorList errors={accessor.errors} />
 				{isEmpty && <EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>}
 				{isEmpty || children}
 				{enableAddingNew && (

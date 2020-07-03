@@ -22,25 +22,15 @@ export const accessorTreeStateReducer = (
 				return {
 					...actionData,
 					name: AccessorTreeStateName.Interactive,
-					isDirty: previousState.name === AccessorTreeStateName.Uninitialized,
 				}
 			}
 			if (previousState.name === AccessorTreeStateName.Mutating) {
 				return {
 					...actionData,
 					name: AccessorTreeStateName.Interactive,
-					isDirty: false,
 				}
 			}
 			return previousState // Ignore input in other states
-		case AccessorTreeStateActionType.SetDirtiness:
-			if (previousState.name === AccessorTreeStateName.Interactive && previousState.isDirty !== action.isDirty) {
-				return {
-					...previousState,
-					isDirty: action.isDirty,
-				}
-			}
-			return previousState
 		case AccessorTreeStateActionType.InitializeQuery:
 			return {
 				name: AccessorTreeStateName.Querying,

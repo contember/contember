@@ -1,9 +1,15 @@
-import { FieldName } from '../treeParameters'
+import {
+	DesugaredHasManyRelation,
+	DesugaredHasOneRelation,
+	FieldName,
+	HasManyRelation,
+	HasOneRelation,
+} from '../treeParameters'
 import { Hashing } from '../utils'
-import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'
+import { HasManyRelationMarker } from './HasManyRelationMarker'
+import { HasOneRelationMarker } from './HasOneRelationMarker'
 import { SubTreeMarker, SubTreeMarkerParameters } from './SubTreeMarker'
-import { ReferenceMarker } from './ReferenceMarker'
 
 export class PlaceholderGenerator {
 	public static generateFieldMarkerPlaceholder(marker: FieldMarker): string {
@@ -16,24 +22,30 @@ export class PlaceholderGenerator {
 
 	//
 
-	public static generateConnectionMarkerPlaceholder(marker: ConnectionMarker): string {
-		return PlaceholderGenerator.getConnectionPlaceholder(marker.fieldName)
+	public static generateHasOneRelationMarkerPlaceholder(marker: HasOneRelationMarker): string {
+		return PlaceholderGenerator.getHasOneRelationPlaceholder(marker.relation)
 	}
 
-	public static getConnectionPlaceholder(fieldName: FieldName): string {
-		return fieldName
+	public static getHasOneRelationPlaceholder(relation: HasOneRelation | DesugaredHasOneRelation): string {
+		return `${relation.field}_${Hashing.hashHasOneRelation(relation)}`
+	}
+
+	public static isHasOneRelationFieldPlaceholder(field: FieldName, placeholderName: FieldName): boolean {
+		return placeholderName.startsWith(`${field}_`) // Meh.
 	}
 
 	//
 
-	public static generateReferenceMarkerPlaceholder(marker: ReferenceMarker): string {
-		return marker.fieldName
+	public static generateHasManyRelationMarkerPlaceholder(marker: HasManyRelationMarker): string {
+		return PlaceholderGenerator.getHasManyRelationPlaceholder(marker.relation)
 	}
 
-	public static getReferencePlaceholder(fieldName: FieldName, reference: ReferenceMarker.ReferenceConstraints): string {
-		return reference.filter || reference.reducedBy
-			? `${fieldName}_${Hashing.hashReferenceConstraints(reference)}`
-			: fieldName
+	public static getHasManyRelationPlaceholder(relation: HasManyRelation | DesugaredHasManyRelation): string {
+		return `${relation.field}_${Hashing.hashHasManyRelation(relation)}`
+	}
+
+	public static isHasManyRelationFieldPlaceholder(field: FieldName, placeholderName: FieldName): boolean {
+		return placeholderName.startsWith(`${field}_`) // Meh.
 	}
 
 	//

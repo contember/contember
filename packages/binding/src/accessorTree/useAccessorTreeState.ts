@@ -3,29 +3,22 @@ import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@co
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
-import { TreeRootAccessor } from '../accessors'
 import { BindingError } from '../BindingError'
-import {
-	AccessorTreeGenerator,
-	DirtinessChecker,
-	MarkerTreeGenerator,
-	QueryGenerator,
-	QueryResponseNormalizer,
-} from '../model'
+import { AccessorTreeGenerator, MarkerTreeGenerator, QueryGenerator } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { AccessorTreeStateMetadata } from './AccessorTreeStateMetadata'
 import { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
 import { metadataToRequestError } from './metadataToRequestError'
-import { MutationDataResponse, MutationRequestResponse } from './MutationRequestResponse'
+import { MutationRequestResponse } from './MutationRequestResponse'
 import {
 	MutationErrorType,
 	NothingToPersistPersistResult,
 	PersistResultSuccessType,
 	SuccessfulPersistResult,
 } from './PersistResult'
-import { QueryRequestResponse, ReceivedDataTree } from './QueryRequestResponse'
+import { QueryRequestResponse } from './QueryRequestResponse'
 
 const initialState: AccessorTreeState = {
 	name: AccessorTreeStateName.Uninitialized,
@@ -60,7 +53,6 @@ export const useAccessorTreeState = ({
 
 	const queryRef = React.useRef(query)
 	const stateRef = React.useRef(state)
-	const dirtinessCheckerRef = React.useRef<DirtinessChecker | undefined>(undefined)
 	const queryStateRef = React.useRef(queryState)
 
 	stateRef.current = state
@@ -102,18 +94,15 @@ export const useAccessorTreeState = ({
 
 	const initializeAccessorTree = React.useCallback(
 		(data: QueryRequestResponse | undefined) => {
-			const normalizedData = QueryResponseNormalizer.normalizeResponse(data)
-			accessorTreeGenerator.initializeLiveTree(normalizedData, accessor => {
-				console.debug('data', accessor)
+			accessorTreeGenerator.initializeLiveTree(data, accessor => {
 				dispatch({
 					type: AccessorTreeStateActionType.SetData,
 					data: accessor,
 					triggerPersist,
 				})
 			})
-			dirtinessCheckerRef.current = new DirtinessChecker(markerTree, normalizedData)
 		},
-		[accessorTreeGenerator, markerTree, triggerPersist],
+		[accessorTreeGenerator, triggerPersist],
 	)
 
 	triggerPersistRef.current = async (): Promise<SuccessfulPersistResult> => {
@@ -122,9 +111,6 @@ export const useAccessorTreeState = ({
 				type: PersistResultSuccessType.NothingToPersist,
 			})
 		}
-		const persistedData =
-			queryStateRef.current.readyState === ApiRequestReadyState.Success ? queryStateRef.current.data.data : undefined
-
 		const latestAccessorTree = stateRef.current.data
 		const mutation = accessorTreeGenerator.generatePersistMutation()
 
@@ -143,8 +129,12 @@ export const useAccessorTreeState = ({
 			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
 
 			if (!allSubMutationsOk) {
-				//initializeAccessorTree(persistedData, latestAccessorTree, data.data)
-				console.error('ERRORS!', data.data) // TODO
+				accessorTreeGenerator.setErrors(data.data)
+				dispatch({
+					type: AccessorTreeStateActionType.SetData,
+					data: latestAccessorTree,
+					triggerPersist,
+				})
 				return Promise.reject({
 					type: MutationErrorType.InvalidInput,
 				})
@@ -165,7 +155,7 @@ export const useAccessorTreeState = ({
 
 			try {
 				const queryData = await sendQuery(query, {}, sessionToken)
-				initializeAccessorTree(queryData)
+				accessorTreeGenerator.updatePersistedData(queryData)
 				return Promise.resolve({
 					type: PersistResultSuccessType.JustSuccess,
 					persistedEntityIds,
@@ -229,19 +219,6 @@ export const useAccessorTreeState = ({
 		}
 		performEffect()
 	}, [initializeAccessorTree, isInitialized, query, rejectFailedRequest, sendQuery, sessionToken, state.name])
-
-	const rootAccessor = state.name === AccessorTreeStateName.Interactive ? state.data : undefined
-	React.useEffect(() => {
-		const dirtinessChecker = dirtinessCheckerRef.current
-		if (rootAccessor && dirtinessChecker) {
-			const newIsDirty = dirtinessChecker.isDirty(rootAccessor)
-
-			dispatch({
-				type: AccessorTreeStateActionType.SetDirtiness,
-				isDirty: newIsDirty,
-			})
-		}
-	}, [rootAccessor])
 
 	// For this to work, this effect must be the last one to run.
 	React.useEffect(() => {

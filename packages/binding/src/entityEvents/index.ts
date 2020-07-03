@@ -1,2 +1,2 @@
-export * from './useDrivenField'
+export * from './useDerivedField'
 export * from './useEntityBeforeUpdate'

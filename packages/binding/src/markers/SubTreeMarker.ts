@@ -1,3 +1,4 @@
+import { Environment } from '../dao'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
@@ -13,11 +14,15 @@ export type SubTreeMarkerParameters =
 	| BoxedUnconstrainedQualifiedSingleEntity
 	| BoxedUnconstrainedQualifiedEntityList
 
-export class SubTreeMarker<C extends SubTreeMarkerParameters = SubTreeMarkerParameters> {
+export class SubTreeMarker<Parameters extends SubTreeMarkerParameters = SubTreeMarkerParameters> {
 	public readonly placeholderName: string
 	public readonly hasAtLeastOneBearingField: boolean
 
-	public constructor(public readonly parameters: C, public readonly fields: EntityFieldMarkers) {
+	public constructor(
+		public readonly parameters: Parameters,
+		public readonly fields: EntityFieldMarkers,
+		public readonly environment: Environment,
+	) {
 		this.placeholderName = PlaceholderGenerator.generateSubTreeMarkerPlaceholder(this)
 		this.hasAtLeastOneBearingField = hasAtLeastOneBearingField(fields)
 	}

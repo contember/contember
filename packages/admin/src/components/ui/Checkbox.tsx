@@ -19,8 +19,8 @@ export const Checkbox = React.memo((props: CheckboxProps) => (
 				readOnly={props.readOnly}
 				onChange={e => props.onChange(e.currentTarget.checked)}
 			/>
-			<span className="checkbox-label">{props.children}</span>
 			<span className="checkbox-box" />
+			<span className="checkbox-label">{props.children}</span>
 		</label>
 	</div>
 ))

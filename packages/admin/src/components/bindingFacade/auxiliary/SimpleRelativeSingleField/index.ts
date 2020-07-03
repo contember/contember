@@ -1,2 +1,2 @@
+export * from './SimpleRelativeFieldProxy'
 export * from './SimpleRelativeSingleField'
-export * from './SimpleRelativeSingleFieldInner'

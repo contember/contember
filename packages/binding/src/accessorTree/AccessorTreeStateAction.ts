@@ -8,10 +8,6 @@ export type AccessorTreeStateAction =
 			type: AccessorTreeStateActionType.Uninitialize
 	  }
 	| {
-			type: AccessorTreeStateActionType.SetDirtiness
-			isDirty: boolean
-	  }
-	| {
 			type: AccessorTreeStateActionType.SetData
 			data: TreeRootAccessor
 			getEntityByKey?: GetEntityByKey

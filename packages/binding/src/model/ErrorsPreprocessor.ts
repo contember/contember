@@ -160,41 +160,11 @@ class ErrorsPreprocessor {
 					)
 				}
 
-				const numericAlias = parseInt(alias, 10)
-
-				if (isNaN(numericAlias)) {
-					// Failed to parse the alias but that's fine, we can just use i.
-					if (!(i - 1 in error.path)) {
-						throw new ErrorsPreprocessor.ErrorsPreprocessorError(
-							`Corrupt data: non-numeric alias without a corresponding associated path.`,
-						)
-					}
-					const previousPath = error.path[i - 1]
-
-					if (previousPath.__typename === '_FieldPathFragment') {
-						const field = previousPath.field
-						if (alias.startsWith(field)) {
-							rootNode = {
-								errors: [],
-								nodeType: ErrorsPreprocessor.ErrorNodeType.FieldIndexed,
-								children: {
-									[alias]: rootNode,
-								},
-							}
-							i--
-							continue
-						}
-					}
-					throw new ErrorsPreprocessor.ErrorsPreprocessorError(
-						`Corrupt data: non-numeric alias with an invalid corresponding associated path.`,
-					)
-				}
-
 				rootNode = {
 					errors: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.KeyIndexed,
 					children: {
-						[numericAlias]: rootNode,
+						[AliasTransformer.aliasToEntityKey(alias)]: rootNode,
 					},
 				}
 			} else {
@@ -233,7 +203,6 @@ namespace ErrorsPreprocessor {
 		nodeType: ErrorNodeType.FieldIndexed
 	}
 
-	// TODO we don't technically need two types of inodes anymore but the rewrite will have to come at a later time.
 	export type ErrorINode = KeyIndexedErrorNode | FieldIndexedErrorNode
 	export type ErrorNode = ErrorINode | LeafErrorNode
 

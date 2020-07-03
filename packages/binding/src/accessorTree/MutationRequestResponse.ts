@@ -1,3 +1,5 @@
+import { Result } from '@contember/schema'
+
 export interface FieldPathErrorFragment {
 	__typename: '_FieldPathFragment'
 	field: string
@@ -20,8 +22,15 @@ export interface MutationError {
 	}
 }
 
+export interface ExecutionError {
+	path: MutationErrorPath
+	type: Result.ExecutionErrorType
+	message: string | null
+}
+
 export interface MutationResponse {
 	ok: boolean
+	errors: ExecutionError[]
 	validation: {
 		valid: boolean
 		errors: MutationError[]

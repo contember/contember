@@ -140,7 +140,7 @@ export const RepeaterInner = Component(
 		props, // TODO emptyMessage, etc.
 	) => (
 		<>
-			{props.sortableBy && <SugaredField field={props.sortableBy} isNonbearing={true} />}
+			{props.sortableBy && <SugaredField field={props.sortableBy} defaultValue={0} isNonbearing />}
 			{props.children}
 		</>
 	),

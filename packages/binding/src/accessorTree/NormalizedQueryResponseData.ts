@@ -7,6 +7,8 @@ export class BoxedSingleEntityId {
 // HasMany relations are encoded as sets of entity ids.
 // HasOne relations are encoded as BoxedSingleEntityId just to make them different from actual strings.
 //		Not sure whether that is a reasonable precaution or just pure overhead.
+export type EntityFieldPersistedData = Scalar | BoxedSingleEntityId | Set<string>
+
 export type SingleEntityPersistedData = Map<string, Scalar | BoxedSingleEntityId | Set<string>>
 
 // The key is the entity id

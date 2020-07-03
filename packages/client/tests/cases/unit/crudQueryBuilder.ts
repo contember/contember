@@ -45,7 +45,7 @@ describe('crud query builder', () => {
 			)
 
 		expect(builder.getGql()).toEqual(`mutation {
-	updatePost(data: {name: "John", locales: [{update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}, alias: "connectId1"}, {create: {name: "foo"}, alias: "createNameFoo"}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}, by: {id: "123"}) {
+	updatePost(data: {name: "John", locales: [{connect: {id: "1"}}, {update: {by: {locale: "cs"}, data: {title: "foo"}}}, {update: {by: {id: "123"}, data: {foo: "bar"}}}], tags: [{connect: {id: "1"}, alias: "connectId1"}, {create: {name: "foo"}, alias: "createNameFoo"}, {disconnect: {id: 2}}], author: {create: {name: "John"}}}, by: {id: "123"}) {
 		node {
 			id
 			... on Foo {
@@ -62,6 +62,34 @@ describe('crud query builder', () => {
 	createAuthor(data: {name: "John", posts: [{connect: {id: "456"}}, {create: {title: "Abcd"}}]}) {
 		node {
 			name
+		}
+	}
+}`)
+	})
+
+	it('mutation part merging', () => {
+		const builder = new CrudQueryBuilder.CrudQueryBuilder().update('Post', builder =>
+			builder
+				.data(data =>
+					data
+						.set('name', 'John')
+						.many('locales', builder => builder.connect({ id: '1' }).update({ locale: 'cs' }, { title: 'foo' }))
+						.many('tags', b => b.connect({ id: '1' }, 'connectId1'))
+						.many('locales', [{ update: { by: { id: '123' }, data: { foo: 'bar' } } }])
+						.many('tags', b => b.create({ name: 'foo' }, 'createNameFoo'))
+						.many('tags', b => b.disconnect({ id: 2 }))
+						.one('author', { create: { surname: 'Smith' } })
+						.many('locales', [{ update: { by: { id: '456' }, data: { foo: 'baz' } } }])
+						.one('author', { create: { name: 'John' } }),
+				)
+				.by({ id: '123' })
+				.node(builder => builder.column('id')),
+		)
+
+		expect(builder.getGql()).toEqual(`mutation {
+	updatePost(data: {name: "John", locales: [{connect: {id: "1"}}, {update: {by: {locale: "cs"}, data: {title: "foo"}}}, {update: {by: {id: "123"}, data: {foo: "bar"}}}, {update: {by: {id: "456"}, data: {foo: "baz"}}}], tags: [{connect: {id: "1"}, alias: "connectId1"}, {create: {name: "foo"}, alias: "createNameFoo"}, {disconnect: {id: 2}}], author: {create: {surname: "Smith", name: "John"}}}, by: {id: "123"}) {
+		node {
+			id
 		}
 	}
 }`)
@@ -87,16 +115,31 @@ describe('crud query builder', () => {
 }`)
 	})
 
-	it('validation relation builder', () => {
+	it('validation & errors relation builders', () => {
 		const builder = new CrudQueryBuilder.CrudQueryBuilder().create('Foo', builder =>
 			builder
 				.data({ bar: '123' })
 				.ok()
+				.errors()
 				.validation(),
 		)
 		expect(builder.getGql()).toEqual(`mutation {
 	createFoo(data: {bar: "123"}) {
 		ok
+		errors {
+			type
+			message
+			path {
+				__typename
+				... on _FieldPathFragment {
+					field
+				}
+				... on _IndexPathFragment {
+					index
+					alias
+				}
+			}
+		}
 		validation {
 			valid
 			errors {

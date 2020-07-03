@@ -1,29 +1,29 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { Input } from '@contember/schema'
 import { EntityAccessor } from '../accessors'
-import { BoxedSingleEntityId, ReceivedEntityData } from '../accessorTree'
+import { BoxedSingleEntityId } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
-	ConnectionMarker,
-	EntityFieldMarkers,
 	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+	MarkerTreeRoot,
 	SubTreeMarker,
 	SubTreeMarkerParameters,
-	MarkerTreeRoot,
-	ReferenceMarker,
 } from '../markers'
-import { ExpectedEntityCount, FieldValue, UniqueWhere } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import {
-	InternalEntityPlannedRemoval,
+	InternalEntityListState,
 	InternalEntityState,
+	InternalFieldState,
 	InternalRootStateNode,
 	InternalStateType,
 } from './internalState'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
+
+type ProcessedEntities = Set<InternalEntityState>
 
 export class MutationGenerator {
 	public constructor(
@@ -35,10 +35,11 @@ export class MutationGenerator {
 	public getPersistMutation(): string | undefined {
 		try {
 			let builder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
+			const processedEntities: ProcessedEntities = new Set()
 
 			for (const [placeholderName, subTreeMarker] of this.markerTree.subTrees) {
 				builder = this.addSubMutation(
-					subTreeMarker.fields,
+					processedEntities,
 					this.allSubTrees.get(placeholderName)!,
 					placeholderName,
 					subTreeMarker.parameters,
@@ -51,11 +52,8 @@ export class MutationGenerator {
 		}
 	}
 
-	// TODO this legacy implementation is no longer appropriate. It was superficially updated to make it compile but
-	// 		for actual nested tree updates it is completely inadequate. We must, among other things, mark visited
-	// 		entities in order to break cycles.
 	private addSubMutation(
-		entityFieldMarkers: EntityFieldMarkers,
+		processedEntities: ProcessedEntities,
 		rootState: InternalRootStateNode,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
@@ -63,18 +61,18 @@ export class MutationGenerator {
 	): QueryBuilder {
 		if (rootState.type === InternalStateType.SingleEntity) {
 			if (rootState.isScheduledForDeletion) {
-				queryBuilder = this.addDeleteMutation(rootState, alias, parameters, queryBuilder)
+				queryBuilder = this.addDeleteMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			} else if (!rootState.getAccessor().existsOnServer) {
-				queryBuilder = this.addCreateMutation(rootState, entityFieldMarkers, alias, parameters, queryBuilder)
+				queryBuilder = this.addCreateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			} else {
-				queryBuilder = this.addUpdateMutation(rootState, entityFieldMarkers, alias, parameters, queryBuilder)
+				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			}
 		} else if (rootState.type === InternalStateType.EntityList) {
 			for (const childKey of rootState.childrenKeys) {
 				const childState = this.entityStore.get(childKey)!
 
 				queryBuilder = this.addSubMutation(
-					entityFieldMarkers,
+					processedEntities,
 					childState,
 					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.getAccessor())),
 					parameters,
@@ -82,9 +80,10 @@ export class MutationGenerator {
 				)
 			}
 			if (rootState.plannedRemovals) {
-				for (const { removedEntity, removalType } of rootState.plannedRemovals) {
+				for (const [removedEntity, removalType] of rootState.plannedRemovals) {
 					if (removalType === 'delete') {
 						queryBuilder = this.addDeleteMutation(
+							processedEntities,
 							removedEntity,
 							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.getAccessor())),
 							parameters,
@@ -103,6 +102,7 @@ export class MutationGenerator {
 	}
 
 	private addDeleteMutation(
+		processedEntities: ProcessedEntities,
 		entityState: InternalEntityState,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
@@ -111,6 +111,10 @@ export class MutationGenerator {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
+		if (processedEntities.has(entityState)) {
+			return queryBuilder
+		}
+		processedEntities.add(entityState)
 
 		return queryBuilder.delete(
 			parameters.value.entityName,
@@ -130,8 +134,8 @@ export class MutationGenerator {
 	}
 
 	private addUpdateMutation(
+		processedEntities: ProcessedEntities,
 		entityState: InternalEntityState,
-		entityFieldMarkers: EntityFieldMarkers,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder?: QueryBuilder,
@@ -139,6 +143,10 @@ export class MutationGenerator {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
+		if (processedEntities.has(entityState)) {
+			return queryBuilder
+		}
+		// Deliberately not adding the entity to processedEntities - it will be done by registerUpdateMutationPart.
 
 		const runtimeId = entityState.id
 
@@ -155,7 +163,7 @@ export class MutationGenerator {
 				}
 
 				return builder
-					.data(builder => this.registerUpdateMutationPart(entityState, entityFieldMarkers, builder))
+					.data(builder => this.registerUpdateMutationPart(processedEntities, entityState, builder))
 					.by({ ...where, [PRIMARY_KEY_NAME]: runtimeId })
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.ok()
@@ -166,8 +174,8 @@ export class MutationGenerator {
 	}
 
 	private addCreateMutation(
+		processedEntities: ProcessedEntities,
 		entityState: InternalEntityState,
-		entityFieldMarkers: EntityFieldMarkers,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder?: QueryBuilder,
@@ -175,13 +183,17 @@ export class MutationGenerator {
 		if (!queryBuilder) {
 			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 		}
+		if (processedEntities.has(entityState)) {
+			return queryBuilder
+		}
+		// Deliberately not adding the entity to processedEntities - it will be done by registerCreateMutationPart.
 
 		return queryBuilder.create(
 			parameters.value.entityName,
 			builder => {
 				let writeBuilder = this.registerCreateMutationPart(
+					processedEntities,
 					entityState,
-					entityFieldMarkers,
 					new CrudQueryBuilder.WriteDataBuilder(),
 				)
 				if (
@@ -206,326 +218,105 @@ export class MutationGenerator {
 	}
 
 	private registerCreateMutationPart(
+		processedEntities: ProcessedEntities,
 		currentState: InternalEntityState,
-		entityFieldMarkers: EntityFieldMarkers,
-		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
+		builder: CrudQueryBuilder.WriteDataBuilder<
+			CrudQueryBuilder.WriteOperation.Create
+		> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		const nonbearingFields: Array<{
-			placeholderName: string
-			value: FieldValue
-		}> = []
-		const nonbearingConnections: ConnectionMarker[] = []
+		if (processedEntities.has(currentState)) {
+			return builder
+		}
+		processedEntities.add(currentState)
 
-		for (const [placeholderName, marker] of entityFieldMarkers) {
+		// It shouldn't
+		const nonbearingFields: Array<
+			| { type: 'field'; marker: FieldMarker; fieldState: InternalFieldState }
+			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: InternalEntityState }
+			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: InternalEntityListState }
+		> = []
+
+		for (const [placeholderName, marker] of currentState.fieldMarkers) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}
+			if (marker instanceof SubTreeMarker) {
+				continue // Do nothing: all sub trees have been hoisted and are handled elsewhere.
+			}
+			const fieldState = currentState.fields.get(placeholderName)
 			if (marker instanceof FieldMarker) {
-				const fieldState = currentState.fields.get(placeholderName)!
-				if (fieldState.type === InternalStateType.Field) {
-					const resolvedValue = fieldState.getAccessor().resolvedValue
-
-					if (resolvedValue !== undefined && resolvedValue !== null) {
-						if (marker.isNonbearing) {
-							nonbearingFields.push({
-								value: resolvedValue,
-								placeholderName,
-							})
-						} else {
-							builder = builder.set(placeholderName, resolvedValue)
-						}
-					}
+				if (fieldState?.type !== InternalStateType.Field) {
+					continue
 				}
-			} else if (marker instanceof ReferenceMarker) {
-				let unreducedHasOnePresent = false
-				const references = marker.references
-				const accessorReference: Array<{
-					alias?: string
-					entityState: InternalEntityState
-					reference: ReferenceMarker.Reference
-				}> = []
-
-				for (const referencePlaceholder in references) {
-					const reference = references[referencePlaceholder]
-					const referenceState = currentState.fields.get(reference.placeholderName)!
-
-					if (reference.expectedCount === ExpectedEntityCount.UpToOne) {
-						if (referenceState.type === InternalStateType.SingleEntity) {
-							accessorReference.push({ entityState: referenceState, reference, alias: referencePlaceholder })
-
-							if (reference.reducedBy === undefined) {
-								unreducedHasOnePresent = true
-							}
-						}
-					} else if (reference.expectedCount === ExpectedEntityCount.PossiblyMany) {
-						if (referenceState.type === InternalStateType.EntityList) {
-							for (const childKey of referenceState.childrenKeys) {
-								const childState = this.entityStore.get(childKey)!
-
-								if (childState) {
-									accessorReference.push({
-										entityState: childState,
-										reference,
-										alias: AliasTransformer.entityToAlias(childState.getAccessor()),
-									})
-								}
-							}
-						}
-					} else {
-						assertNever(reference.expectedCount)
-					}
-				}
-
-				if (unreducedHasOnePresent) {
-					if (accessorReference.length === 1) {
-						const createOneRelationBuilder = CrudQueryBuilder.WriteOneRelationBuilder.instantiate<
-							CrudQueryBuilder.WriteOperation.Create
-						>()
-						const { entityState, reference } = accessorReference[0]
-
-						if (typeof entityState.id === 'string') {
-							builder = builder.one(
-								placeholderName,
-								createOneRelationBuilder.connect({
-									[PRIMARY_KEY_NAME]: entityState.id,
-								}),
-							)
-						} else {
-							const createBuilder = createOneRelationBuilder.create(
-								this.registerCreateReferenceMutationPart(entityState, reference),
-							)
-							if (createBuilder.data) {
-								builder = builder.one(placeholderName, createBuilder)
-							}
-						}
-					} else {
-						throw new BindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
-					}
-				} else {
-					builder = builder.many(placeholderName, builder => {
-						for (const { alias, entityState, reference } of accessorReference) {
-							if (typeof entityState.id !== 'string') {
-								builder = builder.create(this.registerCreateReferenceMutationPart(entityState, reference), alias)
-							} else {
-								builder = builder.connect({ [PRIMARY_KEY_NAME]: entityState.id }, alias)
-							}
-						}
-						return builder
-					})
-				}
-			} else if (marker instanceof ConnectionMarker) {
 				if (marker.isNonbearing) {
-					nonbearingConnections.push(marker)
-				} else {
-					builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
-				}
-			} else if (marker instanceof SubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
-			} else {
-				assertNever(marker)
-			}
-		}
-
-		if (builder.data !== undefined && !isEmptyObject(builder.data)) {
-			for (const { value, placeholderName } of nonbearingFields) {
-				builder = builder.set(placeholderName, value)
-			}
-			for (const marker of nonbearingConnections) {
-				builder = builder.one(marker.fieldName, builder => builder.connect(marker.target))
-			}
-		}
-
-		return builder
-	}
-
-	private registerUpdateMutationPart(
-		currentState: InternalEntityState,
-		entityFieldMarkers: EntityFieldMarkers,
-		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
-	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
-		for (const [placeholderName, marker] of entityFieldMarkers) {
-			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
-				continue
-			}
-			if (marker instanceof FieldMarker) {
-				const fieldState = currentState.fields.get(placeholderName)
-
-				if (fieldState?.type === InternalStateType.Field && fieldState.persistedValue !== undefined) {
-					const resolvedValue = fieldState.getAccessor().resolvedValue
-					if (fieldState.persistedValue !== resolvedValue) {
-						builder = builder.set(placeholderName, resolvedValue)
-					}
-				}
-			} else if (marker instanceof ReferenceMarker) {
-				let unreducedHasOnePresent = false
-				let hasManyPersistedData: Set<string> | undefined = undefined
-				let hasManyPlannedRemovals: Set<InternalEntityPlannedRemoval> | undefined = undefined
-				const references = marker.references
-				const accessorReference: Array<{
-					alias?: string
-					referenceState: InternalEntityState
-					reference: ReferenceMarker.Reference
-				}> = []
-
-				for (const referencePlaceholder in references) {
-					const reference = references[referencePlaceholder]
-					const referenceState = currentState.fields.get(reference.placeholderName)
-
-					if (referenceState === undefined) {
-						continue
-					}
-
-					if (
-						reference.expectedCount === ExpectedEntityCount.UpToOne &&
-						referenceState.type === InternalStateType.SingleEntity
-					) {
-						accessorReference.push({
-							referenceState,
-							reference,
-							alias: referencePlaceholder,
-						})
-
-						if (reference.reducedBy === undefined) {
-							unreducedHasOnePresent = true
-						} else {
-							const id = referenceState.persistedData?.get(PRIMARY_KEY_NAME)
-							if (id instanceof BoxedSingleEntityId) {
-								if (hasManyPersistedData === undefined) {
-									hasManyPersistedData = new Set()
-								}
-								hasManyPersistedData.add(id.id)
-							}
-						}
-					} else if (
-						reference.expectedCount === ExpectedEntityCount.PossiblyMany &&
-						referenceState.type === InternalStateType.EntityList
-					) {
-						// TODO this is very likely just crap
-						if (hasManyPersistedData === undefined) {
-							hasManyPersistedData = new Set()
-						}
-						for (const persistedId of referenceState.persistedEntityIds) {
-							hasManyPersistedData.add(persistedId)
-						}
-						if (hasManyPlannedRemovals === undefined) {
-							hasManyPlannedRemovals = new Set()
-						}
-						if (referenceState.plannedRemovals) {
-							for (const plannedRemoval of referenceState.plannedRemovals) {
-								hasManyPlannedRemovals.add(plannedRemoval)
-							}
-						}
-
-						for (const childKey of referenceState.childrenKeys) {
-							const innerState = this.entityStore.get(childKey)
-							if (innerState === undefined) {
-								continue
-							}
-							accessorReference.push({
-								referenceState: innerState,
-								reference,
-								alias: AliasTransformer.entityToAlias(innerState.getAccessor()),
-							})
-						}
-					}
-				}
-
-				if (unreducedHasOnePresent) {
-					if (accessorReference.length === 1) {
-						const subBuilder = ((
-							builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
-						) => {
-							const { referenceState, reference, alias } = accessorReference[0]
-							const persistedField = referenceState.persistedData
-
-							// TODO we're not handling deletions followed by connections
-							if (referenceState.isScheduledForDeletion) {
-								return builder.delete()
-							} else if (typeof referenceState.id === 'string') {
-								// referenceState exists on server
-
-								if (!persistedField || persistedField?.get(PRIMARY_KEY_NAME) !== referenceState.id) {
-									return builder.connect({
-										[PRIMARY_KEY_NAME]: referenceState.id,
-									})
-								}
-								return builder.update(builder =>
-									this.registerUpdateMutationPart(referenceState, reference.fields, builder),
-								)
-							} else if (persistedField?.get(PRIMARY_KEY_NAME)) {
-								return builder.disconnect()
-							} else {
-								return builder.create(this.registerCreateReferenceMutationPart(referenceState, reference))
-							}
-						})(CrudQueryBuilder.WriteOneRelationBuilder.instantiate<CrudQueryBuilder.WriteOperation.Update>())
-
-						if (subBuilder.data) {
-							builder = builder.one(placeholderName, subBuilder)
-						}
-					} else {
-						throw new BindingError(`Creating several entities for the hasOne '${placeholderName}' relation.`)
-					}
-				} else {
-					builder = builder.many(placeholderName, builder => {
-						for (const { referenceState, reference, alias } of accessorReference) {
-							if (typeof referenceState.id === 'string') {
-								if (!hasManyPersistedData || !hasManyPersistedData.has(referenceState.id)) {
-									builder = builder.connect({ [PRIMARY_KEY_NAME]: referenceState.id }, alias)
-								} else {
-									builder = builder.update(
-										{ [PRIMARY_KEY_NAME]: referenceState.id },
-										builder => {
-											return this.registerUpdateMutationPart(referenceState, reference.fields, builder)
-										},
-										alias,
-									)
-								}
-							} else {
-								builder = builder.create(this.registerCreateReferenceMutationPart(referenceState, reference), alias)
-							}
-						}
-						if (hasManyPlannedRemovals) {
-							for (const { removedEntity, removalType } of hasManyPlannedRemovals) {
-								if (removalType === 'delete') {
-									builder = builder.delete(
-										{ [PRIMARY_KEY_NAME]: removedEntity.id },
-										AliasTransformer.entityToAlias(removedEntity.getAccessor()),
-									)
-								} else if (removalType === 'disconnect') {
-									builder = builder.disconnect(
-										{ [PRIMARY_KEY_NAME]: removedEntity.id },
-										AliasTransformer.entityToAlias(removedEntity.getAccessor()),
-									)
-								} else {
-									assertNever(removalType)
-								}
-							}
-						}
-						return builder
+					nonbearingFields.push({
+						type: 'field',
+						marker,
+						fieldState,
 					})
+					continue
 				}
-			} else if (marker instanceof ConnectionMarker) {
-				// Do nothing: connections are only relevant to create mutations. At the point of updating, the entity is
-				// supposed to have already been connected.
-			} else if (marker instanceof SubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
+				builder = this.registerCreateFieldPart(fieldState, marker, builder)
+			} else if (marker instanceof HasOneRelationMarker) {
+				if (fieldState?.type !== InternalStateType.SingleEntity) {
+					continue
+				}
+				if (marker.relation.isNonbearing) {
+					nonbearingFields.push({
+						type: 'hasOne',
+						marker,
+						fieldState,
+					})
+					continue
+				}
+				builder = this.registerCreateEntityPart(processedEntities, fieldState, marker, builder)
+			} else if (marker instanceof HasManyRelationMarker) {
+				if (fieldState?.type !== InternalStateType.EntityList) {
+					continue
+				}
+				if (marker.relation.isNonbearing) {
+					nonbearingFields.push({
+						type: 'hasMany',
+						marker,
+						fieldState,
+					})
+					continue
+				}
+				builder = this.registerCreateEntityListPart(processedEntities, fieldState, marker, builder)
 			} else {
 				assertNever(marker)
 			}
 		}
 
-		return builder
-	}
+		if (currentState.creationParameters.forceCreation && (builder.data === undefined || isEmptyObject(builder.data))) {
+			builder = builder.set('_create', true)
+		}
 
-	private registerCreateReferenceMutationPart(
-		entityState: InternalEntityState,
-		reference: ReferenceMarker.Reference,
-	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		const registerReductionFields = (where: UniqueWhere): Input.CreateDataInput<GraphQlBuilder.Literal> => {
-			const data: Input.CreateDataInput<GraphQlBuilder.Literal> = {}
+		if ((builder.data !== undefined && !isEmptyObject(builder.data)) || !currentState.hasAtLeastOneBearingField) {
+			for (const field of nonbearingFields) {
+				switch (field.type) {
+					case 'field': {
+						builder = this.registerCreateFieldPart(field.fieldState, field.marker, builder)
+						break
+					}
+					case 'hasOne': {
+						builder = this.registerCreateEntityPart(processedEntities, field.fieldState, field.marker, builder)
+						break
+					}
+					case 'hasMany': {
+						builder = this.registerCreateEntityListPart(processedEntities, field.fieldState, field.marker, builder)
+						break
+					}
+					default:
+						assertNever(field)
+				}
+			}
+		}
 
-			for (const key in where) {
-				const field = where[key]
+		const setOnCreate = currentState.creationParameters.setOnCreate
+		if (setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
+			for (const key in setOnCreate) {
+				const field = setOnCreate[key]
 
 				if (
 					typeof field === 'string' ||
@@ -533,29 +324,249 @@ export class MutationGenerator {
 					field === null ||
 					field instanceof GraphQlBuilder.Literal
 				) {
-					data[key] = field
+					builder = builder.set(key, field)
 				} else {
-					data[key] = {
-						connect: field,
-					}
+					builder = builder.one(key, builder => builder.connect(field))
 				}
 			}
-
-			return data
 		}
 
-		const dataBuilder = this.registerCreateMutationPart(
-			entityState,
-			reference.fields,
-			new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
-		)
+		return builder
+	}
 
-		if (!reference.reducedBy || isEmptyObject(dataBuilder.data)) {
-			return dataBuilder
+	private registerCreateFieldPart(
+		fieldState: InternalFieldState,
+		marker: FieldMarker,
+		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
+	) {
+		const resolvedValue = fieldState.getAccessor().resolvedValue
+
+		if (resolvedValue !== undefined && resolvedValue !== null) {
+			return builder.set(marker.fieldName, resolvedValue)
 		}
-		return new CrudQueryBuilder.WriteDataBuilder({
-			...dataBuilder.data,
-			...registerReductionFields(reference.reducedBy),
+		return builder
+	}
+
+	private registerCreateEntityPart(
+		processedEntities: ProcessedEntities,
+		fieldState: InternalEntityState,
+		marker: HasOneRelationMarker,
+		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
+	) {
+		const reducedBy = marker.relation.reducedBy
+
+		if (reducedBy === undefined) {
+			return builder.one(marker.relation.field, builder => {
+				if (typeof fieldState.id === 'string') {
+					// TODO also potentially update
+					return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id })
+				}
+				return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
+			})
+		}
+		return builder.many(marker.relation.field, builder => {
+			const alias = AliasTransformer.entityToAlias(fieldState.getAccessor())
+			if (typeof fieldState.id === 'string') {
+				// TODO also potentially update
+				return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id }, alias)
+			}
+			return builder.create(this.registerCreateMutationPart(processedEntities, fieldState), alias)
 		})
+	}
+
+	private registerCreateEntityListPart(
+		processedEntities: ProcessedEntities,
+		fieldState: InternalEntityListState,
+		marker: HasManyRelationMarker,
+		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
+	) {
+		return builder.many(marker.relation.field, builder => {
+			for (const childKey of fieldState.childrenKeys) {
+				const entityState = this.entityStore.get(childKey)
+				if (entityState === undefined) {
+					continue
+				}
+
+				const alias = AliasTransformer.entityToAlias(entityState.getAccessor())
+				if (typeof entityState.id === 'string') {
+					// TODO also potentially update
+					builder = builder.connect({ [PRIMARY_KEY_NAME]: entityState.id }, alias)
+				} else {
+					builder = builder.create(this.registerCreateMutationPart(processedEntities, entityState), alias)
+				}
+			}
+			return builder
+		})
+	}
+
+	private registerUpdateMutationPart(
+		processedEntities: ProcessedEntities,
+		currentState: InternalEntityState,
+		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
+	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
+		if (processedEntities.has(currentState)) {
+			return builder
+		}
+		processedEntities.add(currentState)
+
+		for (const [placeholderName, marker] of currentState.fieldMarkers) {
+			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
+				continue
+			}
+			const fieldState = currentState.fields.get(placeholderName)
+			if (marker instanceof FieldMarker) {
+				if (fieldState?.type !== InternalStateType.Field) {
+					continue
+				}
+				if (fieldState.persistedValue !== undefined) {
+					const resolvedValue = fieldState.getAccessor().resolvedValue
+					if (fieldState.persistedValue !== resolvedValue) {
+						builder = builder.set(placeholderName, resolvedValue)
+					}
+				}
+			} else if (marker instanceof HasOneRelationMarker) {
+				if (fieldState?.type !== InternalStateType.SingleEntity) {
+					continue
+				}
+
+				const reducedBy = marker.relation.reducedBy
+				if (reducedBy === undefined) {
+					const subBuilder = ((
+						builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
+					) => {
+						const persistedValue = currentState.persistedData?.get?.(placeholderName)
+
+						if (persistedValue instanceof BoxedSingleEntityId) {
+							if (persistedValue.id === fieldState.id) {
+								// The persisted and currently referenced ids match, and so this is an update.
+								return builder.update(builder =>
+									this.registerUpdateMutationPart(processedEntities, fieldState, builder),
+								)
+							}
+							// There was a referenced entity but currently, there is a different one. Let's investigate:
+
+							const plannedDeletion = currentState.plannedHasOneDeletions?.get(placeholderName)
+							if (plannedDeletion !== undefined) {
+								// It's planned for deletion.
+								// TODO also potentially do something about the current entity
+								return builder.delete()
+							}
+							if (typeof fieldState.id === 'string') {
+								// This isn't the persisted entity but it does exist on the server. Thus this is a connect.
+								// TODO also potentially update
+								return builder.connect({
+									[PRIMARY_KEY_NAME]: fieldState.id,
+								})
+							}
+							// The currently present entity doesn't exist on the server. Try if creating yields anything…
+							const subBuilder = builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
+							if (isEmptyObject(subBuilder.data)) {
+								// …and if it doesn't, we just disconnect.
+								return builder.disconnect()
+							}
+							// …but if it does, we return the create, disconnecting implicitly.
+							return subBuilder
+						} else if (typeof fieldState.id === 'string') {
+							// There isn't a linked entity on the server but we're seeing one that exists there.
+							// Thus this is a connect.
+							// TODO also potentially update
+							return builder.connect({
+								[PRIMARY_KEY_NAME]: fieldState.id,
+							})
+						} else {
+							return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
+						}
+					})(CrudQueryBuilder.WriteOneRelationBuilder.instantiate<CrudQueryBuilder.WriteOperation.Update>())
+
+					if (subBuilder.data) {
+						builder = builder.one(marker.relation.field, subBuilder)
+					}
+				} else {
+					// This is a reduced has many relation.
+					builder = builder.many(marker.relation.field, builder => {
+						const persistedValue = currentState.persistedData?.get?.(placeholderName)
+						const alias = AliasTransformer.entityToAlias(fieldState.getAccessor())
+
+						if (persistedValue instanceof BoxedSingleEntityId) {
+							if (persistedValue.id === fieldState.id) {
+								return builder.update(
+									reducedBy,
+									builder => this.registerUpdateMutationPart(processedEntities, fieldState, builder),
+									alias,
+								)
+							}
+							const plannedDeletion = currentState.plannedHasOneDeletions?.get(placeholderName)
+							if (plannedDeletion !== undefined) {
+								// TODO also potentially do something about the current entity
+								return builder.delete(reducedBy, alias)
+							}
+							if (typeof fieldState.id === 'string') {
+								// TODO will re-using the alias like this work?
+								// TODO also potentially update
+								return builder.disconnect(reducedBy, alias).connect({ [PRIMARY_KEY_NAME]: fieldState.id }, alias)
+							}
+							const subBuilder = builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
+							if (isEmptyObject(subBuilder.data)) {
+								return builder.disconnect(reducedBy, alias)
+							}
+							return subBuilder
+						} else if (typeof fieldState.id === 'string') {
+							return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id }, alias)
+						} else {
+							return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
+						}
+					})
+				}
+			} else if (marker instanceof HasManyRelationMarker) {
+				if (fieldState?.type !== InternalStateType.EntityList) {
+					continue
+				}
+				builder = builder.many(marker.relation.field, builder => {
+					for (const childKey of fieldState.childrenKeys) {
+						const childEntityState = this.entityStore.get(childKey)
+
+						if (childEntityState === undefined) {
+							continue
+						}
+						const alias = AliasTransformer.entityToAlias(childEntityState.getAccessor())
+
+						if (typeof childEntityState.id === 'string') {
+							if (fieldState.persistedEntityIds.has(childEntityState.id)) {
+								builder = builder.update(
+									{ [PRIMARY_KEY_NAME]: childEntityState.id },
+									builder => this.registerUpdateMutationPart(processedEntities, childEntityState, builder),
+									alias,
+								)
+							} else {
+								// TODO also potentially update
+								builder = builder.connect({ [PRIMARY_KEY_NAME]: childEntityState.id }, alias)
+							}
+						} else {
+							builder = builder.create(this.registerCreateMutationPart(processedEntities, childEntityState), alias)
+						}
+					}
+					if (fieldState.plannedRemovals) {
+						for (const [entityToRemove, removalType] of fieldState.plannedRemovals) {
+							const alias = AliasTransformer.entityToAlias(entityToRemove.getAccessor())
+							if (removalType === 'delete') {
+								builder = builder.delete({ [PRIMARY_KEY_NAME]: entityToRemove.id }, alias)
+							} else if (removalType === 'disconnect') {
+								// TODO also potentially update
+								builder = builder.disconnect({ [PRIMARY_KEY_NAME]: entityToRemove.id }, alias)
+							} else {
+								assertNever(removalType)
+							}
+						}
+					}
+					return builder
+				})
+			} else if (marker instanceof SubTreeMarker) {
+				// Do nothing: all sub trees have been hoisted and are handled elsewhere.
+			} else {
+				assertNever(marker)
+			}
+		}
+
+		return builder
 	}
 }

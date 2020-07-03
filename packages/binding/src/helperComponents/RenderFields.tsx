@@ -1,6 +1,6 @@
 import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useEnvironment, useParentEntityAccessor } from '../accessorPropagation'
+import { useParentEntityAccessor } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { Component } from '../coreComponents'
 import { QueryLanguage } from '../queryLanguage'
@@ -31,7 +31,7 @@ export const RenderFields = Component<RenderFieldsProps>(
 		)
 
 		const entityAccessor = useParentEntityAccessor()
-		const environment = useEnvironment()
+		const environment = entityAccessor.environment
 
 		const desugarField = React.useCallback((rsf: SRSF) => QueryLanguage.desugarRelativeSingleField(rsf, environment), [
 			environment,

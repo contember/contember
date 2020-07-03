@@ -1,19 +1,19 @@
 import { Environment } from '../dao'
 import {
-	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
 	Marker,
 	PlaceholderGenerator,
-	ReferenceMarker,
 	SubTreeMarker,
 } from '../markers'
+import { MarkerMerger, TreeParameterMerger } from '../model'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
-	ExpectedEntityCount,
 	HasManyRelation,
 	HasOneRelation,
 	RelativeSingleField,
@@ -24,7 +24,6 @@ import {
 	SugaredRelativeSingleField,
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUnconstrainedQualifiedSingleEntity,
-	SugaredUniqueWhere,
 } from '../treeParameters'
 import { QueryLanguage } from './QueryLanguage'
 
@@ -37,8 +36,19 @@ export namespace MarkerFactory {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
 
 		return new SubTreeMarker(
-			new BoxedQualifiedSingleEntity(qualifiedSingleEntity),
-			wrapRelativeEntityFields(qualifiedSingleEntity.hasOneRelationPath, fields),
+			new BoxedQualifiedSingleEntity({
+				...qualifiedSingleEntity,
+				setOnCreate: TreeParameterMerger.mergeSetOnCreate(
+					qualifiedSingleEntity.setOnCreate || {},
+					qualifiedSingleEntity.where,
+				),
+			}),
+			wrapRelativeEntityFields(
+				qualifiedSingleEntity.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(fields),
+			),
+			environment,
 		)
 	}
 
@@ -51,7 +61,12 @@ export namespace MarkerFactory {
 
 		return new SubTreeMarker(
 			new BoxedQualifiedEntityList(qualifiedEntityList),
-			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, fields),
+			wrapRelativeEntityFields(
+				qualifiedEntityList.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(fields),
+			),
+			environment,
 		)
 	}
 
@@ -64,7 +79,12 @@ export namespace MarkerFactory {
 
 		return new SubTreeMarker(
 			new BoxedUnconstrainedQualifiedEntityList(qualifiedEntityList),
-			wrapRelativeEntityFields(qualifiedEntityList.hasOneRelationPath, fields),
+			wrapRelativeEntityFields(
+				qualifiedEntityList.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(fields),
+			),
+			environment,
 		)
 	}
 
@@ -77,7 +97,12 @@ export namespace MarkerFactory {
 
 		return new SubTreeMarker(
 			new BoxedUnconstrainedQualifiedSingleEntity(qualifiedSingleEntity),
-			wrapRelativeEntityFields(qualifiedSingleEntity.hasOneRelationPath, fields),
+			wrapRelativeEntityFields(
+				qualifiedSingleEntity.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(fields),
+			),
+			environment,
 		)
 	}
 
@@ -87,44 +112,26 @@ export namespace MarkerFactory {
 		entityFieldMarkers: EntityFieldMarkers,
 	) => {
 		const relativeSingleEntity = QueryLanguage.desugarRelativeSingleEntity(field, environment)
-		return wrapRelativeEntityFields(relativeSingleEntity.hasOneRelationPath, entityFieldMarkers)
+		return wrapRelativeEntityFields(relativeSingleEntity.hasOneRelationPath, environment, entityFieldMarkers)
 	}
 
 	export const createRelativeEntityListFields = (
 		field: SugaredRelativeEntityList,
 		environment: Environment,
 		entityFieldMarkers: EntityFieldMarkers,
-		isNonbearing: boolean = false,
-		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
 	) => {
 		const relativeEntityList = QueryLanguage.desugarRelativeEntityList(field, environment)
 		const hasManyRelationMarker = createHasManyRelationMarker(
 			relativeEntityList.hasManyRelation,
+			environment,
 			entityFieldMarkers,
-			isNonbearing,
-			preferences,
 		)
 		return wrapRelativeEntityFields(
 			relativeEntityList.hasOneRelationPath,
+			environment,
 			new Map([[hasManyRelationMarker.placeholderName, hasManyRelationMarker]]),
 		)
 	}
-
-	export const createConnectionMarker = (
-		field: SugaredRelativeSingleField,
-		to: SugaredUniqueWhere,
-		environment: Environment,
-	) =>
-		wrapRelativeSingleField(
-			field,
-			environment,
-			relativeSingleField =>
-				new ConnectionMarker(
-					relativeSingleField.field,
-					QueryLanguage.desugarUniqueWhere(to, environment),
-					relativeSingleField.isNonbearing,
-				),
-		)
 
 	export const createFieldMarker = (field: SugaredRelativeSingleField, environment: Environment) =>
 		wrapRelativeSingleField(
@@ -144,44 +151,42 @@ export namespace MarkerFactory {
 
 		return wrapRelativeEntityFields(
 			relativeSingleField.hasOneRelationPath,
+			environment,
 			new Map([[placeholderName, getMarker(relativeSingleField)]]),
 		)
 	}
 
 	export const wrapRelativeEntityFields = (
 		hasOneRelationPath: HasOneRelation[],
+		environment: Environment,
 		entityFieldMarkers: EntityFieldMarkers,
 	): EntityFieldMarkers => {
 		for (let i = hasOneRelationPath.length - 1; i >= 0; i--) {
-			const marker = createHasOneRelationMarker(hasOneRelationPath[i], entityFieldMarkers)
+			const marker = createHasOneRelationMarker(hasOneRelationPath[i], environment, entityFieldMarkers)
 			entityFieldMarkers = new Map([[marker.placeholderName, marker]])
 		}
 		return entityFieldMarkers
 	}
 
-	export const createHasOneRelationMarker = (hasOneRelation: HasOneRelation, entityFieldMarkers: EntityFieldMarkers) =>
-		new ReferenceMarker(
-			hasOneRelation.field,
-			ExpectedEntityCount.UpToOne,
-			entityFieldMarkers,
-			hasOneRelation.filter,
-			hasOneRelation.reducedBy,
-			hasOneRelation.isNonbearing,
+	export const createHasOneRelationMarker = (
+		hasOneRelation: HasOneRelation,
+		environment: Environment,
+		entityFieldMarkers: EntityFieldMarkers,
+	) =>
+		new HasOneRelationMarker(
+			{
+				...hasOneRelation,
+				setOnCreate: hasOneRelation.reducedBy
+					? TreeParameterMerger.mergeSetOnCreate(hasOneRelation.setOnCreate || {}, hasOneRelation.reducedBy)
+					: hasOneRelation.setOnCreate,
+			},
+			MarkerMerger.mergeInSystemFields(entityFieldMarkers),
+			environment,
 		)
 
 	export const createHasManyRelationMarker = (
 		hasManyRelation: HasManyRelation,
+		environment: Environment,
 		entityFieldMarkers: EntityFieldMarkers,
-		isNonbearing: boolean = false,
-		preferences?: Partial<ReferenceMarker.ReferencePreferences>,
-	) =>
-		new ReferenceMarker(
-			hasManyRelation.field,
-			ExpectedEntityCount.PossiblyMany,
-			entityFieldMarkers,
-			hasManyRelation.filter,
-			undefined, // No reducedBy for hasMany
-			isNonbearing,
-			preferences,
-		)
+	) => new HasManyRelationMarker(hasManyRelation, MarkerMerger.mergeInSystemFields(entityFieldMarkers), environment)
 }

@@ -1,8 +1,8 @@
 import { assertNever } from '../utils'
-import { ConnectionMarker } from './ConnectionMarker'
 import { FieldMarker } from './FieldMarker'
+import { HasManyRelationMarker } from './HasManyRelationMarker'
+import { HasOneRelationMarker } from './HasOneRelationMarker'
 import { Marker } from './Marker'
-import { ReferenceMarker } from './ReferenceMarker'
 import { SubTreeMarker } from './SubTreeMarker'
 
 export type EntityFieldMarkers = Map<string, Marker>
@@ -13,12 +13,8 @@ export const hasAtLeastOneBearingField = (fields: EntityFieldMarkers): boolean =
 			if (!marker.isNonbearing) {
 				return true
 			}
-		} else if (marker instanceof ReferenceMarker) {
+		} else if (marker instanceof HasOneRelationMarker || marker instanceof HasManyRelationMarker) {
 			if (marker.hasAtLeastOneBearingField) {
-				return true
-			}
-		} else if (marker instanceof ConnectionMarker) {
-			if (!marker.isNonbearing) {
 				return true
 			}
 		} else if (marker instanceof SubTreeMarker) {

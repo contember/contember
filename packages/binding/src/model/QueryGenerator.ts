@@ -1,11 +1,11 @@
 import { CrudQueryBuilder } from '@contember/client'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
-	ConnectionMarker,
 	EntityFieldMarkers,
 	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
 	MarkerTreeRoot,
-	ReferenceMarker,
 	SubTreeMarker,
 } from '../markers'
 import { BoxedQualifiedEntityList, BoxedQualifiedSingleEntity } from '../treeParameters'
@@ -105,42 +105,64 @@ export class QueryGenerator {
 
 		for (const [, fieldValue] of fields) {
 			if (fieldValue instanceof FieldMarker) {
-				if (fieldValue.fieldName !== PRIMARY_KEY_NAME) {
+				if (fieldValue.fieldName !== PRIMARY_KEY_NAME && fieldValue.fieldName !== TYPENAME_KEY_NAME) {
 					builder = builder.column(fieldValue.fieldName)
 				}
-			} else if (fieldValue instanceof ReferenceMarker) {
-				for (const referenceName in fieldValue.references) {
-					const reference = fieldValue.references[referenceName]
+			} else if (fieldValue instanceof HasOneRelationMarker) {
+				const relation = fieldValue.relation
+				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
+					this.registerQueryPart(fieldValue.fields, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
+				)
 
-					let builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate()
+				const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
+					CrudQueryBuilder.ReadArguments,
+					'filter'
+				>> = relation.filter ? builderWithBody.filter(relation.filter) : builderWithBody
 
-					builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
-						this.registerQueryPart(reference.fields, builderWithBody).objectBuilder,
+				if (relation.reducedBy) {
+					// Assuming there's exactly one reducer field as enforced by MarkerTreeGenerator
+					const relationField = `${relation.field}By${ucfirst(Object.keys(relation.reducedBy)[0])}`
+					builder = builder.reductionRelation(
+						relationField,
+						filteredBuilder.by(relation.reducedBy),
+						fieldValue.placeholderName,
 					)
-
-					const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
-						CrudQueryBuilder.ReadArguments,
-						'filter'
-					>> = reference.filter ? builderWithBody.filter(reference.filter) : builderWithBody
-
-					if (reference.reducedBy) {
-						// Assuming there's exactly one reducer field as enforced by MarkerTreeGenerator
-						const relationField = `${fieldValue.fieldName}By${ucfirst(Object.keys(reference.reducedBy)[0])}`
-						builder = builder.reductionRelation(
-							relationField,
-							filteredBuilder.by(reference.reducedBy),
-							referenceName === relationField ? undefined : referenceName,
-						)
-					} else {
-						builder = builder.anyRelation(
-							fieldValue.fieldName,
-							filteredBuilder,
-							referenceName === fieldValue.fieldName ? undefined : referenceName,
-						)
-					}
+				} else {
+					builder = builder.hasOneRelation(
+						relation.field,
+						filteredBuilder,
+						// TODO this will currently always go to the latter condition, resulting in less than ideal queries.
+						fieldValue.placeholderName === relation.field ? undefined : fieldValue.placeholderName,
+					)
 				}
-			} else if (fieldValue instanceof ConnectionMarker) {
-				// Do nothing ‒ connections are only relevant to mutations.
+			} else if (fieldValue instanceof HasManyRelationMarker) {
+				const relation = fieldValue.relation
+				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
+					this.registerQueryPart(fieldValue.fields, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
+				)
+
+				const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
+					CrudQueryBuilder.ReadArguments,
+					'filter'
+				>> = relation.filter ? builderWithBody.filter(relation.filter) : builderWithBody
+
+				const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
+					CrudQueryBuilder.ReadArguments,
+					'filter' | 'orderBy'
+				>> = relation.orderBy ? withFilter.orderBy(relation.orderBy) : withFilter
+
+				const withOffset: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
+					CrudQueryBuilder.ReadArguments,
+					'filter' | 'orderBy' | 'offset'
+				>> = relation.offset === undefined ? withOrderBy : withOrderBy.offset(relation.offset)
+
+				const withLimit = relation.limit === undefined ? withOffset : withOffset.limit(relation.limit)
+
+				builder = builder.anyRelation(
+					relation.field,
+					withLimit,
+					fieldValue.placeholderName === relation.field ? undefined : fieldValue.placeholderName,
+				)
 			} else if (fieldValue instanceof SubTreeMarker) {
 				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {

@@ -7,7 +7,7 @@ export class ValidationValidator {
 	constructor(private readonly model: Model.Schema) {}
 
 	public validate(schema: unknown): [Validation.Schema, ValidationError[]] {
-		const errorBuilder = new ErrorBuilder([], ['acl'])
+		const errorBuilder = new ErrorBuilder([], ['validation'])
 		let validSchema: Validation.Schema
 		if (!isObject(schema)) {
 			errorBuilder.add('Must be an object')

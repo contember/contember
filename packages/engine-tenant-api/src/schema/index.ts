@@ -178,6 +178,7 @@ export type Mutation = {
 	readonly signOut?: Maybe<SignOutResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly invite?: Maybe<InviteResponse>
+	readonly unmanagedInvite?: Maybe<InviteResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
 	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
@@ -213,6 +214,13 @@ export type MutationInviteArgs = {
 	email: Scalars['String']
 	projectSlug: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
+}
+
+export type MutationUnmanagedInviteArgs = {
+	email: Scalars['String']
+	projectSlug: Scalars['String']
+	memberships: ReadonlyArray<MembershipInput>
+	password: Scalars['String']
 }
 
 export type MutationAddProjectMemberArgs = {
@@ -843,6 +851,12 @@ export type MutationResolvers<
 		ParentType,
 		ContextType,
 		RequireFields<MutationInviteArgs, 'email' | 'projectSlug' | 'memberships'>
+	>
+	unmanagedInvite?: Resolver<
+		Maybe<ResolversTypes['InviteResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationUnmanagedInviteArgs, 'email' | 'projectSlug' | 'memberships' | 'password'>
 	>
 	addProjectMember?: Resolver<
 		Maybe<ResolversTypes['AddProjectMemberResponse']>,

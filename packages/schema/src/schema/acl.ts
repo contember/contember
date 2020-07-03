@@ -69,8 +69,9 @@ namespace Acl {
 		}
 	}
 	export interface TenantPermissions {
-		invite: boolean
-		manage: TenantManagePermissions
+		invite?: boolean
+		unmanagedInvite?: boolean
+		manage?: TenantManagePermissions
 	}
 
 	export enum SystemPermissionsLevel {

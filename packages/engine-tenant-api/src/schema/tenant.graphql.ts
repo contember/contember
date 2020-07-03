@@ -23,6 +23,12 @@ const schema: DocumentNode = gql`
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 
 		invite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!): InviteResponse
+		unmanagedInvite(
+			email: String!
+			projectSlug: String!
+			memberships: [MembershipInput!]!
+			password: String!
+		): InviteResponse
 
 		addProjectMember(
 			projectSlug: String!

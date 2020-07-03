@@ -82,6 +82,7 @@ export const authenticatedApiKeyId = testUuid(998)
 
 interface TenantTestOptions {
 	membership?: Membership
+	roles?: string[]
 }
 
 interface TenantTester {
@@ -142,7 +143,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		async execute(query: GraphQLTestQuery, options: TenantTestOptions = {}): Promise<any> {
 			const context: ResolverContext = createResolverContext(
 				new PermissionContext(
-					new StaticIdentity(authenticatedIdentityId, [], {
+					new StaticIdentity(authenticatedIdentityId, options.roles || [], {
 						blog: [options.membership || { role: 'admin', variables: [] }],
 					}),
 					tenantContainer.authorizator,

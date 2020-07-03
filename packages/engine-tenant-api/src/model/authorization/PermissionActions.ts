@@ -19,6 +19,9 @@ namespace PermissionActions {
 	export const PERSON_INVITE = (memberships: readonly Membership[]) =>
 		Authorizator.createAction(Resources.person, 'invite', { memberships })
 
+	export const PERSON_INVITE_UNMANAGED = (memberships: readonly Membership[]) =>
+		Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships })
+
 	export const PROJECT_VIEW = Authorizator.createAction(Resources.project, 'view')
 
 	export const PROJECT_VIEW_MEMBER = (memberships: readonly Membership[]) =>

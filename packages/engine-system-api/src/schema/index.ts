@@ -10,7 +10,7 @@ export type Scalars = {
 	Int: number
 	Float: number
 	DateTime: Date
-	Json: object
+	Json: unknown
 }
 
 export type DiffCreateEvent = DiffEvent & {
@@ -84,6 +84,16 @@ export type DiffUpdateEvent = DiffEvent & {
 	readonly type: DiffEventType
 	readonly description: Scalars['String']
 	readonly createdAt: Scalars['DateTime']
+}
+
+export type ExecutedMigration = {
+	readonly __typename?: 'ExecutedMigration'
+	readonly version: Scalars['String']
+	readonly name: Scalars['String']
+	readonly executedAt: Scalars['DateTime']
+	readonly checksum: Scalars['String']
+	readonly formatVersion: Scalars['Int']
+	readonly modifications: ReadonlyArray<Scalars['Json']>
 }
 
 export type HistoryCreateEvent = HistoryEvent & {
@@ -209,12 +219,7 @@ export type Migration = {
 	readonly version: Scalars['String']
 	readonly name: Scalars['String']
 	readonly formatVersion: Scalars['Int']
-	readonly modifications: ReadonlyArray<Modification>
-}
-
-export type Modification = {
-	readonly modification: Scalars['String']
-	readonly data: Scalars['String']
+	readonly modifications: ReadonlyArray<Scalars['Json']>
 }
 
 export type Mutation = {
@@ -242,8 +247,13 @@ export type MutationReleaseTreeArgs = {
 export type Query = {
 	readonly __typename?: 'Query'
 	readonly stages: ReadonlyArray<Stage>
+	readonly executedMigrations: ReadonlyArray<ExecutedMigration>
 	readonly diff: DiffResponse
 	readonly history: HistoryResponse
+}
+
+export type QueryExecutedMigrationsArgs = {
+	version?: Maybe<Scalars['String']>
 }
 
 export type QueryDiffArgs = {
@@ -387,6 +397,10 @@ export type ResolversTypes = {
 	Query: ResolverTypeWrapper<{}>
 	Stage: ResolverTypeWrapper<Stage>
 	String: ResolverTypeWrapper<Scalars['String']>
+	ExecutedMigration: ResolverTypeWrapper<ExecutedMigration>
+	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
+	Int: ResolverTypeWrapper<Scalars['Int']>
+	Json: ResolverTypeWrapper<Scalars['Json']>
 	TreeFilter: TreeFilter
 	TreeFilterRelation: TreeFilterRelation
 	DiffResponse: ResolverTypeWrapper<DiffResponse>
@@ -394,7 +408,6 @@ export type ResolversTypes = {
 	DiffErrorCode: DiffErrorCode
 	DiffResult: ResolverTypeWrapper<DiffResult>
 	DiffEvent: ResolversTypes['DiffUpdateEvent'] | ResolversTypes['DiffDeleteEvent'] | ResolversTypes['DiffCreateEvent']
-	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
 	DiffEventType: DiffEventType
 	HistoryFilter: HistoryFilter
 	HistoryResponse: ResolverTypeWrapper<HistoryResponse>
@@ -408,8 +421,6 @@ export type ResolversTypes = {
 	HistoryEventType: HistoryEventType
 	Mutation: ResolverTypeWrapper<{}>
 	Migration: Migration
-	Int: ResolverTypeWrapper<Scalars['Int']>
-	Modification: Modification
 	MigrateResponse: ResolverTypeWrapper<MigrateResponse>
 	MigrateError: ResolverTypeWrapper<MigrateError>
 	MigrateErrorCode: MigrateErrorCode
@@ -419,7 +430,6 @@ export type ResolversTypes = {
 	ReleaseTreeResponse: ResolverTypeWrapper<ReleaseTreeResponse>
 	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: ResolverTypeWrapper<RebaseAllResponse>
-	Json: ResolverTypeWrapper<Scalars['Json']>
 	HistoryUpdateEvent: ResolverTypeWrapper<HistoryUpdateEvent>
 	HistoryDeleteEvent: ResolverTypeWrapper<HistoryDeleteEvent>
 	HistoryCreateEvent: ResolverTypeWrapper<HistoryCreateEvent>
@@ -434,6 +444,10 @@ export type ResolversParentTypes = {
 	Query: {}
 	Stage: Stage
 	String: Scalars['String']
+	ExecutedMigration: ExecutedMigration
+	DateTime: Scalars['DateTime']
+	Int: Scalars['Int']
+	Json: Scalars['Json']
 	TreeFilter: TreeFilter
 	TreeFilterRelation: TreeFilterRelation
 	DiffResponse: DiffResponse
@@ -444,7 +458,6 @@ export type ResolversParentTypes = {
 		| ResolversParentTypes['DiffUpdateEvent']
 		| ResolversParentTypes['DiffDeleteEvent']
 		| ResolversParentTypes['DiffCreateEvent']
-	DateTime: Scalars['DateTime']
 	DiffEventType: DiffEventType
 	HistoryFilter: HistoryFilter
 	HistoryResponse: HistoryResponse
@@ -458,8 +471,6 @@ export type ResolversParentTypes = {
 	HistoryEventType: HistoryEventType
 	Mutation: {}
 	Migration: Migration
-	Int: Scalars['Int']
-	Modification: Modification
 	MigrateResponse: MigrateResponse
 	MigrateError: MigrateError
 	MigrateErrorCode: MigrateErrorCode
@@ -469,7 +480,6 @@ export type ResolversParentTypes = {
 	ReleaseTreeResponse: ReleaseTreeResponse
 	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: RebaseAllResponse
-	Json: Scalars['Json']
 	HistoryUpdateEvent: HistoryUpdateEvent
 	HistoryDeleteEvent: HistoryDeleteEvent
 	HistoryCreateEvent: HistoryCreateEvent
@@ -560,6 +570,19 @@ export type DiffUpdateEventResolvers<
 	type?: Resolver<ResolversTypes['DiffEventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type ExecutedMigrationResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ExecutedMigration'] = ResolversParentTypes['ExecutedMigration']
+> = {
+	version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	executedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	checksum?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	formatVersion?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	modifications?: Resolver<ReadonlyArray<ResolversTypes['Json']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -727,6 +750,12 @@ export type QueryResolvers<
 	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
 > = {
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
+	executedMigrations?: Resolver<
+		ReadonlyArray<ResolversTypes['ExecutedMigration']>,
+		ParentType,
+		ContextType,
+		RequireFields<QueryExecutedMigrationsArgs, never>
+	>
 	diff?: Resolver<ResolversTypes['DiffResponse'], ParentType, ContextType, RequireFields<QueryDiffArgs, 'stage'>>
 	history?: Resolver<
 		ResolversTypes['HistoryResponse'],
@@ -780,6 +809,7 @@ export type Resolvers<ContextType = any> = {
 	DiffResponse?: DiffResponseResolvers<ContextType>
 	DiffResult?: DiffResultResolvers<ContextType>
 	DiffUpdateEvent?: DiffUpdateEventResolvers<ContextType>
+	ExecutedMigration?: ExecutedMigrationResolvers<ContextType>
 	HistoryCreateEvent?: HistoryCreateEventResolvers<ContextType>
 	HistoryDeleteEvent?: HistoryDeleteEventResolvers<ContextType>
 	HistoryEvent?: HistoryEventResolvers

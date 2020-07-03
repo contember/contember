@@ -7,7 +7,7 @@ export const printValidationErrors = (errors: ValidationError[], message?: strin
 	}
 	console.group(message || 'Schema is invalid:')
 	for (const err of errors) {
-		console.error(err.path.join('.') + ': ' + err.message)
+		console.log(err.path.join('.') + ': ' + err.message)
 	}
 	console.groupEnd()
 }

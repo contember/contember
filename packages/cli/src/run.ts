@@ -3,8 +3,7 @@ import { register } from 'ts-node'
 import { CommandManager } from './cli/CommandManager'
 import {
 	CreateApiKeyCommand,
-	MigrationsDiffCommand,
-	MigrationDescribeCommand,
+	InstanceConfigureCommand,
 	InstanceCreateCommand,
 	InstanceInfoCommand,
 	InstanceLogsCommand,
@@ -14,17 +13,19 @@ import {
 	InstanceStopCommand,
 	InstanceValidateConfigCommand,
 	InviteCommand,
+	MigrationCreateCommand,
+	MigrationDescribeCommand,
+	MigrationDiffCommand,
+	MigrationExecuteCommand,
+	MigrationStatusCommand,
 	ProjectCreateCommand,
 	ProjectRegisterCommand,
 	ProjectValidateCommand,
 	SetupCommand,
 	SignInCommand,
 	WorkspaceCreateCommand,
-	MigrationsCreateCommand,
 } from './commands'
 import { Application } from './cli'
-import { MigrationExecuteCommand } from './commands/migrations/MigrationExecuteCommand'
-import { InstanceConfigureCommand } from './commands/instance/InstanceConfigureCommand'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -32,13 +33,14 @@ import { InstanceConfigureCommand } from './commands/instance/InstanceConfigureC
 			module: 'commonjs',
 		},
 	})
-	const diffCommandFactory = () => new MigrationsDiffCommand()
+	const diffCommandFactory = () => new MigrationDiffCommand()
 	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
 	const commandManager = new CommandManager({
 		['migrations:diff']: diffCommandFactory,
 		['migrations:describe']: migrationsDescribeFactory,
-		['migrations:create']: () => new MigrationsCreateCommand(),
+		['migrations:create']: () => new MigrationCreateCommand(),
 		['migrations:execute']: () => new MigrationExecuteCommand(),
+		['migrations:status']: () => new MigrationStatusCommand(),
 		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),

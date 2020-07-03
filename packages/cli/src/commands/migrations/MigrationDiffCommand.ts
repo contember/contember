@@ -15,7 +15,7 @@ type Options = {
 	['project-dir']?: string
 }
 
-export class MigrationsDiffCommand extends Command<Args, Options> {
+export class MigrationDiffCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates schema migration diff for given project')
 		configureCreateMigrationCommand(configuration)

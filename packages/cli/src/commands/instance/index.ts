@@ -1,3 +1,4 @@
+export * from './InstanceConfigureCommand'
 export * from './InstanceCreateCommand'
 export * from './InstanceInfoCommand'
 export * from './InstanceLogsCommand'

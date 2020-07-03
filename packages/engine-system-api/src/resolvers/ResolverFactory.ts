@@ -1,18 +1,20 @@
 import { DiffQueryResolver, StagesQueryResolver } from './query'
-import { HistoryEvent, HistoryEventType, DiffEvent, DiffEventType, Resolvers } from '../schema'
+import { DiffEvent, DiffEventType, HistoryEvent, HistoryEventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
-import { GraphQLInt, GraphQLResolveInfo, GraphQLScalarType, Kind, ValueNode } from 'graphql'
+import { GraphQLResolveInfo, GraphQLScalarType, Kind, ValueNode } from 'graphql'
 import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
 import { ReleaseTreeMutationResolver } from './mutation/ReleaseTreeMutationResolver'
 import { HistoryQueryResolver } from './query/HistoryQueryResolver'
 import { HistoryEventTypeResolver } from './types/HistoryEventTypeResolver'
 import Maybe from 'graphql/tsutils/Maybe'
 import { JSONValue } from '../utils/json'
+import { ExecutedMigrationsQueryResolver } from './query/ExecutedMigrationsQueryResolver'
 
 class ResolverFactory {
 	public constructor(
 		private readonly stagesQueryResolver: StagesQueryResolver,
+		private readonly executedMigrationsQueryResolver: ExecutedMigrationsQueryResolver,
 		private readonly diffQueryResolver: DiffQueryResolver,
 		private readonly historyQueryResolver: HistoryQueryResolver,
 		private readonly releaseMutationResolver: ReleaseMutationResolver,
@@ -114,6 +116,8 @@ class ResolverFactory {
 			Query: {
 				stages: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.stagesQueryResolver.stages(parent, args, context, info),
+				executedMigrations: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.executedMigrationsQueryResolver.executedMigrations(parent, args, context, info),
 				diff: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.diffQueryResolver.diff(parent, args, context, info),
 				history: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>

@@ -51,6 +51,7 @@ import { ReleaseTreeMutationResolver } from './resolvers/mutation/ReleaseTreeMut
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
 import { HistoryQueryResolver } from './resolvers/query/HistoryQueryResolver'
 import { HistoryEventTypeResolver } from './resolvers/types/HistoryEventTypeResolver'
+import { ExecutedMigrationsQueryResolver } from './resolvers/query/ExecutedMigrationsQueryResolver'
 
 export interface SystemContainer {
 	systemResolvers: Resolvers
@@ -162,6 +163,7 @@ export class SystemContainerFactory {
 			)
 
 			.addService('stagesQueryResolver', () => new StagesQueryResolver())
+			.addService('executedMigrationsQueryResolver', () => new ExecutedMigrationsQueryResolver())
 
 			.addService('diffEventResponseBuilder', () => new DiffEventResponseBuilder(container.identityFetcher))
 			.addService(
@@ -190,6 +192,7 @@ export class SystemContainerFactory {
 				'systemResolvers',
 				({
 					stagesQueryResolver,
+					executedMigrationsQueryResolver,
 					diffQueryResolver,
 					historyQueryResolver,
 					releaseMutationResolver,
@@ -200,6 +203,7 @@ export class SystemContainerFactory {
 				}) =>
 					new ResolverFactory(
 						stagesQueryResolver,
+						executedMigrationsQueryResolver,
 						diffQueryResolver,
 						historyQueryResolver,
 						releaseMutationResolver,

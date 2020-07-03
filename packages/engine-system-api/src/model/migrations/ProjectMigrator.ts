@@ -34,7 +34,7 @@ export class ProjectMigrator {
 	public async migrate(
 		db: DatabaseContext,
 		project: ProjectConfig,
-		migrationsToExecute: Migration[],
+		migrationsToExecute: readonly Migration[],
 		progressCb: (version: string) => void,
 	) {
 		const stageTree = createStageTree(project)
@@ -89,7 +89,7 @@ export class ProjectMigrator {
 		db: DatabaseContext,
 		schema: Schema,
 		version: string,
-		migrationsToExecute: Migration[],
+		migrationsToExecute: readonly Migration[],
 	) {
 		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
 		for (const migration of migrationsToExecute) {

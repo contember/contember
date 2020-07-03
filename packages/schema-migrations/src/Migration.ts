@@ -1,8 +1,12 @@
 import crypto from 'crypto'
-interface Migration {
+
+export interface MigrationInfo {
 	readonly version: string // YYYY-MM-DD-HHIISS
 	readonly name: string // version-label
 	readonly formatVersion: number
+}
+
+interface Migration extends MigrationInfo {
 	readonly modifications: readonly Migration.Modification[]
 }
 

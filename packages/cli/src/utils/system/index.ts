@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request'
-import { createTenantApiUrl } from '../tenant'
 import { Migration } from '@contember/schema-migrations'
+import { ExecutedMigration, ExecutedMigrationInfo } from '../migrations'
 
 export type MigrateError = {
 	readonly code: MigrateErrorCode
@@ -57,16 +57,45 @@ mutation($migrations: [Migration!]!) {
 			await this.apiClient.request<{
 				migrate: { ok: boolean; errors: { code: MigrateErrorCode; migration: string; message: string }[] }
 			}>(query, {
-				migrations: migrations.map(({ version, formatVersion, name, modifications }) => ({
-					version,
-					formatVersion,
-					name,
-					modifications: modifications.map(({ modification, ...data }) => ({
-						modification,
-						data: JSON.stringify(data),
-					})),
-				})),
+				migrations,
 			})
 		).migrate
+	}
+
+	public async listExecutedMigrations(): Promise<ExecutedMigrationInfo[]> {
+		const query = `query {
+	executedMigrations {
+		name
+		version
+		formatVersion
+		checksum
+		executedAt
+	}
+}`
+		return (
+			await this.apiClient.request<{
+				executedMigrations: ExecutedMigrationInfo[]
+			}>(query, {})
+		).executedMigrations.map(it => ({ ...it, executedAt: new Date(it.executedAt) }))
+	}
+
+	public async getExecutedMigration(version: string): Promise<ExecutedMigration> {
+		const query = `query($version: String!) {
+	executedMigrations(version: $version) {
+		name
+		version
+		formatVersion
+		checksum
+		executedAt
+		modifications
+	}
+}`
+		return (
+			(
+				await this.apiClient.request<{
+					executedMigrations: ExecutedMigration[]
+				}>(query, { version })
+			).executedMigrations.map(it => ({ ...it, executedAt: new Date(it.executedAt) }))[0] || null
+		)
 	}
 }

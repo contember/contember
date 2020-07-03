@@ -11,7 +11,7 @@ type Options = {
 	['project-dir']?: string
 }
 
-export class MigrationsCreateCommand extends Command<Args, Options> {
+export class MigrationCreateCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates empty schema migration for given project')
 		configureCreateMigrationCommand(configuration)

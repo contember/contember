@@ -22,7 +22,7 @@ export class SignInCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(input)
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(input.getArgument('instance'))
 		const loginToken = await interactiveResolveLoginToken(instance)
 		const { sessionToken } = await interactiveSignIn({ apiUrl: instance.baseUrl, loginToken })
 		console.log('Session token:')

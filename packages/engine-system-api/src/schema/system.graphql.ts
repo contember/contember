@@ -12,6 +12,7 @@ const schema: DocumentNode = gql`
 
 	type Query {
 		stages: [Stage!]!
+		executedMigrations(version: String): [ExecutedMigration!]!
 		diff(stage: String!, filter: [TreeFilter!]): DiffResponse!
 		history(stage: String!, filter: [HistoryFilter!], sinceEvent: String, sinceTime: DateTime): HistoryResponse!
 	}
@@ -145,17 +146,24 @@ const schema: DocumentNode = gql`
 		events: [DiffEvent!]!
 	}
 
+	# === executedMigrations ===
+
+	type ExecutedMigration {
+		version: String!
+		name: String!
+		executedAt: DateTime!
+		checksum: String!
+		formatVersion: Int!
+		modifications: [Json!]!
+	}
+
 	# === migrate ===
 
 	input Migration {
 		version: String!
 		name: String!
 		formatVersion: Int!
-		modifications: [Modification!]!
-	}
-	input Modification {
-		modification: String!
-		data: String!
+		modifications: [Json!]!
 	}
 
 	enum MigrateErrorCode {

@@ -22,6 +22,7 @@
 		"@contember/schema-migrations": "^0.8.0-alpha.5",
 		"@contember/schema-utils": "^0.8.0-alpha.5",
 		"chalk": "^3.0.0",
+		"chalk-table": "^1.0.2",
 		"download-tarball": "^2.0.0",
 		"fs-extra": "^8.1.0",
 		"get-package-json-from-registry": "^2.2.2",

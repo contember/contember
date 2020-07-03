@@ -1,5 +1,6 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import { Readable, Writable } from 'stream'
+import chalk from 'chalk'
 
 export type RunningCommand = { child: ChildProcessWithoutNullStreams; output: Promise<string> }
 export const runCommand = (
@@ -14,7 +15,9 @@ export const runCommand = (
 		detached?: boolean
 	},
 ): RunningCommand => {
-	console.log(`$ ${command} ${args.map(it => `'${it.replace(/'/g, `'\\''`)}'`).join(' ')}`)
+	if (!process.env.DISABLE_COMMAND_PRINTING) {
+		console.error(chalk.gray(`$ ${command} ${args.map(it => `'${it.replace(/'/g, `'\\''`)}'`).join(' ')}`))
+	}
 	const child = spawn(command, args, {
 		cwd: options.cwd,
 		env: { ...process.env, ...(options.env || {}) },

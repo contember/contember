@@ -9,19 +9,19 @@ function Component<Props extends {}>(
 ): React.NamedExoticComponent<Props> & StaticRenderProvider<Props>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	statefulRender: React.FunctionComponent<Props>,
-	staticRender: (props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactNode,
+	staticRender: (props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactElement,
 	displayName?: string,
-): React.NamedExoticComponent<Props> & StaticRenderProvider<Props>
+): React.NamedExoticComponent<Props> & StaticRenderProvider<Props, NonStaticPropNames>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	statefulRender: React.FunctionComponent<Props>,
 	markerProvisions: MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
-): React.NamedExoticComponent<Props> & MarkerProvider<Props>
+): React.NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	render: React.FunctionComponent<Props>,
 	decider?:
 		| string
-		| ((props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactNode)
+		| ((props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactElement)
 		| MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
 ) {

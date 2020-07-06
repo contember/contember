@@ -44,7 +44,10 @@ export type StaticRenderProps<Props extends {} = any, NonStaticPropNames extends
 	: Omit<Props, NonStaticPropNames>
 
 export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> {
-	staticRender: (props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactNode
+	staticRender: (
+		props: StaticRenderProps<Props, NonStaticPropNames>,
+		environment: Environment,
+	) => React.ReactElement | null
 }
 
 export type CompleteMarkerProvider<

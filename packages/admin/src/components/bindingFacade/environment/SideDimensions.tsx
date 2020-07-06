@@ -31,7 +31,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 		)
 	}
 
-	public static staticRender(props: SideDimensionsProps, environment: Environment): React.ReactNode {
+	public static staticRender(props: SideDimensionsProps, environment: Environment): React.ReactElement | null {
 		if ((props.dimension === undefined) === (props.staticOptions === undefined)) {
 			throw new BindingError(
 				`The SideDimensions component needs to be passed exactly one of its 'dimension' or 'staticOptions' props.`,
@@ -45,7 +45,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 			if (!(props.dimension in selectedDimensions)) {
 				console.error(new BindingError(`The '${props.dimension}' dimension in undefined`))
-				return
+				return null
 			}
 
 			dimensions = selectedDimensions[props.dimension]

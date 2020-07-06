@@ -6,6 +6,6 @@
 	"type": "module",
 	"scripts": {},
 	"devDependencies": {
-		"typescript": "3.8.3"
+		"typescript": "3.9.6"
 	}
 }

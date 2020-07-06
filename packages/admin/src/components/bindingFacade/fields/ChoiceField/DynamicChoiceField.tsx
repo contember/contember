@@ -36,7 +36,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		}
 		return assertNever(props)
 	},
-	(props: DynamicChoiceFieldProps, environment) => {
+	(props: DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity, environment) => {
 		let reference: React.ReactNode
 		let entityListDataProvider: React.ReactNode
 

@@ -44,7 +44,7 @@ export const EntityListSubTree = Component(
 			}
 			return MarkerFactory.createEntityListSubTreeMarker(environment, props, fields)
 		},
-		generateSyntheticChildren: props => (
+		staticRender: props => (
 			<EntityList {...props} accessor={0 as any}>
 				<Field field={PRIMARY_KEY_NAME} />
 				<Field field={TYPENAME_KEY_NAME} />

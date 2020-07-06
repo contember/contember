@@ -31,7 +31,7 @@
 		"test": "lerna run --concurrency 1 test",
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
 		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
-		"tag-version": "lerna version --force-publish"
+		"tag-version": "lerna version --exact --force-publish"
 	},
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "2.23.0",

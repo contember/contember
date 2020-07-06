@@ -18,7 +18,6 @@
 		"bootstrap": "lerna bootstrap --ci",
 		"bootstrap:hoist": "lerna bootstrap --ci --hoist",
 		"update": "lerna bootstrap --no-ci",
-		"cli": "node ./packages/cli/dist/src/cli.js",
 		"restart-api": "docker-compose up --force-recreate -d --no-deps api",
 		"ci-clean": "rm -rf packages/*/node_modules/typescript",
 		"clean:dist": "rm -rf packages/*/dist",
@@ -32,7 +31,7 @@
 		"test": "lerna run --concurrency 1 test",
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
 		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
-		"tag-version": "lerna version --force-publish"
+		"tag-version": "lerna version --exact --force-publish"
 	},
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "2.23.0",

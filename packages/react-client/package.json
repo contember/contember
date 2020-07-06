@@ -1,6 +1,6 @@
 {
 	"name": "@contember/react-client",
-	"version": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.2",
+	"version": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.3",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
@@ -8,7 +8,7 @@
 		"build": "rollup --config"
 	},
 	"dependencies": {
-		"@contember/client": "^0.4.26-incredibly-unstable-experimental-broken-pre-alpha.2"
+		"@contember/client": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.3"
 	},
 	"peerDependencies": {
 		"react": "16.12.0"

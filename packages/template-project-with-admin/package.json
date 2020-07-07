@@ -3,7 +3,7 @@
 	"version": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.3",
 	"devDependencies": {
 		"@types/react": "^16.9.41",
-		"@types/react-dom": "16.9.5",
+		"@types/react-dom": "^16.9.8",
 		"typescript": "3.9.6"
 	},
 	"dependencies": {

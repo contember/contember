@@ -29,9 +29,9 @@ export const Repeater = Component(
 
 		return <RepeaterInner {...props} accessor={entityList} />
 	},
-	props => (
+	(props, environment) => (
 		<HasMany {...props} initialEntityCount={props.initialRowCount === undefined ? 1 : props.initialRowCount}>
-			<RepeaterInner.staticRender {...props} />
+			{RepeaterInner.staticRender(props, environment)}
 		</HasMany>
 	),
 	'Repeater',

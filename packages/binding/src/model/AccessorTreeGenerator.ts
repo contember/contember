@@ -995,7 +995,9 @@ export class AccessorTreeGenerator {
 
 			if (
 				entityState.batchUpdateDepth === 0 &&
-				!entityState.hasPendingUpdate && // We must have already told the parent if this is true.
+				// We must have already told the parent if hasPendingUpdate is true. However, we may have updated the entity
+				// and then subsequently deleted it, in which case we want to let the parent know regardless.
+				(!entityState.hasPendingUpdate || entityState.isScheduledForDeletion) &&
 				entityState.hasPendingParentNotification
 			) {
 				entityState.hasPendingUpdate = true

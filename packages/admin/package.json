@@ -50,7 +50,7 @@
     "@types/debounce": "1.2.0",
     "@types/is-hotkey": "0.1.1",
     "@types/jasmine": "3.4.6",
-    "@types/react": "16.9.23",
+    "@types/react": "^16.9.41",
     "@types/react-datepicker": "2.11.0",
     "@types/react-dom": "16.9.5",
     "@types/react-redux": "7.1.5",

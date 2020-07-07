@@ -23,10 +23,16 @@ export const MutableEntityListRenderer = Component(
 			</>
 		)
 	},
-	({ beforeContent, afterContent, ...repeaterInnerProps }) => (
+	({ beforeContent, afterContent, ...repeaterInnerProps }, environment) => (
 		<>
 			{beforeContent}
-			<RepeaterInner.staticRender label={undefined} {...repeaterInnerProps} />
+			{RepeaterInner.staticRender(
+				{
+					label: undefined,
+					...repeaterInnerProps,
+				},
+				environment,
+			)}
 			{afterContent}
 		</>
 	),

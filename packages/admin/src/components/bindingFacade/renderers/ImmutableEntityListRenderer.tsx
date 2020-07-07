@@ -33,11 +33,17 @@ export const ImmutableEntityListRenderer = Component(
 			</>
 		)
 	},
-	props => (
+	(props, environment) => (
 		// Deliberately omitting emptyMessage ‒ it's not supposed to be data-dependent.
 		<>
 			{props.beforeContent}
-			<RepeaterInner.staticRender label={undefined} {...props} />
+			{RepeaterInner.staticRender(
+				{
+					label: undefined,
+					...props,
+				},
+				environment,
+			)}
 			{props.afterContent}
 		</>
 	),

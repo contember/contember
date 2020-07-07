@@ -37,7 +37,7 @@
 		"@contember/admin": "0.4.26-incredibly-unstable-experimental-broken-pre-alpha.3",
 		"@contember/schema": "0.7.2",
 		"@contember/schema-definition": "0.4.0",
-		"react": "^16.13.1",
-		"react-dom": "16.12.0"
+		"react": "16.13.1",
+		"react-dom": "^16.13.1"
 	}
 }

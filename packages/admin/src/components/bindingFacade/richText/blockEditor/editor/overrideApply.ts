@@ -77,6 +77,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		if (operation.type === 'set_selection') {
 			return apply(operation) // Nothing to do here
 		}
+		console.log(operation, editor.children)
 		if (options.isMutatingRef.current) {
 			return
 		}

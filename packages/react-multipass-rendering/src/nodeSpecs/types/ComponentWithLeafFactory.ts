@@ -6,8 +6,8 @@ export type ComponentWithLeafFactory<
 	FactoryMethodName extends ValidFactoryName,
 	Props extends {},
 	Representation,
-	Environment
+	StaticContext
 > = BaseComponent<Props> &
 	{
-		[N in FactoryMethodName]: LeafRepresentationFactory<Props, Representation, Environment>
+		[N in FactoryMethodName]: LeafRepresentationFactory<Props, Representation, StaticContext>
 	}

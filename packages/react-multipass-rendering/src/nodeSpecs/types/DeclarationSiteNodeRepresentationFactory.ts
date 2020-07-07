@@ -2,9 +2,9 @@ export type DeclarationSiteNodeRepresentationFactory<
 	Props extends {},
 	ReducedChildrenRepresentation,
 	Representation,
-	Environment
+	StaticContext
 > = (
 	props: Props,
 	reducedChildrenRepresentation: ReducedChildrenRepresentation,
-	environment: Environment,
+	staticContext: StaticContext,
 ) => Representation

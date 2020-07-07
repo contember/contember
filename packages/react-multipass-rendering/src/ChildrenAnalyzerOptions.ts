@@ -1,12 +1,12 @@
 import { ErrorMessageFactory } from './ErrorMessageFactory'
 
-export interface ChildrenAnalyzerOptions<Environment = any> {
+export interface ChildrenAnalyzerOptions<StaticContext = any> {
 	ignoreRenderProps: boolean
-	renderPropsErrorMessage: ErrorMessageFactory<Environment>
+	renderPropsErrorMessage: ErrorMessageFactory<StaticContext>
 
 	ignoreUnhandledNodes: boolean
-	unhandledNodeErrorMessage: ErrorMessageFactory<Environment>
+	unhandledNodeErrorMessage: ErrorMessageFactory<StaticContext>
 
-	environmentFactoryName: string
-	syntheticChildrenFactoryName: string
+	staticContextFactoryName: string
+	staticRenderFactoryName: string
 }

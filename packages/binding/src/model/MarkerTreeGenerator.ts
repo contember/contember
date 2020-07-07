@@ -139,13 +139,13 @@ export class MarkerTreeGenerator {
 		)
 
 		return new ChildrenAnalyzer([fieldMarkerLeaf], [subTreeMarkerBranchNode, referenceMarkerBranchNode], {
-			syntheticChildrenFactoryName: 'staticRender',
+			staticRenderFactoryName: 'staticRender',
 			renderPropsErrorMessage:
 				`Render props (functions as React component children) are not supported within the schema. ` +
 				`You have likely used a bare custom component as opposed to wrapping in with \`Component\` ` +
 				`from the \`@contember/admin\` package. Please refer to the documentation.`,
 			ignoreRenderProps: false,
-			environmentFactoryName: 'generateEnvironment',
+			staticContextFactoryName: 'generateEnvironment',
 		})
 	}
 }

@@ -77,11 +77,9 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		if (operation.type === 'set_selection') {
 			return apply(operation) // Nothing to do here
 		}
-		console.log(operation, editor.children)
 		if (options.isMutatingRef.current) {
 			return
 		}
-		//console.log('op', operation, firstContentElementPath.current)
 		if (operation.path.length === 0) {
 			// This is invalid.
 			return
@@ -205,7 +203,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				addNewTextElementAt(topLevelIndex)
 			}
 			apply(operation)
-			//console.log('op', operation, editor.children)
 
 			if (path.length > 1 && operation.type !== 'move_node') {
 				saveElementAt(topLevelIndex)

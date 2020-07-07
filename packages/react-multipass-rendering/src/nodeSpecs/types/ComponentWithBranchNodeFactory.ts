@@ -7,13 +7,13 @@ export type ComponentWithBranchNodeFactory<
 	Props extends {},
 	ReducedChildrenRepresentation,
 	Representation,
-	Environment
+	StaticContext
 > = BaseComponent<Props> &
 	{
 		[N in FactoryMethodName]: DeclarationSiteNodeRepresentationFactory<
 			Props,
 			ReducedChildrenRepresentation,
 			Representation,
-			Environment
+			StaticContext
 		>
 	}

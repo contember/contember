@@ -3,6 +3,8 @@ import {
 	EntityListAccessor,
 	RemovalType,
 	SingleEntity,
+	StaticRenderProps,
+	StaticRenderProvider,
 	SugaredField,
 	SugaredFieldProps,
 	useMutationState,
@@ -40,7 +42,9 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	useDragHandle?: boolean
 }
 
-export const RepeaterInner = Component(
+type NonStaticPropNames = 'accessor'
+
+export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPropNames>(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>) => {
 		const isMutating = useMutationState()
 		const { entities, moveEntity, appendNew } = useSortedEntities(props.accessor, props.sortableBy)
@@ -136,8 +140,8 @@ export const RepeaterInner = Component(
 			</SortableRepeaterContainer>
 		)
 	},
-	(
-		props, // TODO emptyMessage, etc.
+	<ContainerExtraProps, ItemExtraProps>(
+		props: StaticRenderProps<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, NonStaticPropNames>, // TODO emptyMessage, etc.
 	) => (
 		<>
 			{props.sortableBy && <SugaredField field={props.sortableBy} defaultValue={0} isNonbearing />}
@@ -145,6 +149,7 @@ export const RepeaterInner = Component(
 		</>
 	),
 	'RepeaterInner',
-) as <ContainerExtraProps, ItemExtraProps>(
+) as (<ContainerExtraProps, ItemExtraProps>(
 	props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>,
-) => React.ReactElement
+) => React.ReactElement) &
+	StaticRenderProvider<RepeaterInnerProps<unknown, unknown>, NonStaticPropNames>

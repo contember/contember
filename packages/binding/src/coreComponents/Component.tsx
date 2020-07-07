@@ -1,48 +1,57 @@
 import * as React from 'react'
 import { Environment } from '../dao'
 import { assertNever } from '../utils'
-import { MarkerProvider, SyntheticChildrenProvider } from './MarkerProvider'
+import { MarkerProvider, StaticRenderProps, StaticRenderProvider } from './MarkerProvider'
 
-function Component<P extends {}>(
-	statelessRender: React.FunctionComponent<P>,
+function Component<Props extends {}>(
+	statelessRender: React.FunctionComponent<Props>,
 	displayName?: string,
-): React.NamedExoticComponent<P> & SyntheticChildrenProvider<P>
-function Component<P extends {}>(
-	statefulRender: React.FunctionComponent<P>,
-	generateSyntheticChildren: (props: P, environment: Environment) => React.ReactNode,
+): React.NamedExoticComponent<Props> & StaticRenderProvider<Props>
+function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
+	statefulRender: React.FunctionComponent<Props>,
+	staticRender: (
+		props: StaticRenderProps<Props, NonStaticPropNames>,
+		environment: Environment,
+	) => React.ReactElement | null,
 	displayName?: string,
-): React.NamedExoticComponent<P> & SyntheticChildrenProvider<P>
-function Component<P extends {}>(
-	statefulRender: React.FunctionComponent<P>,
-	markerProvisions: MarkerProvider<P>,
+): React.NamedExoticComponent<Props> & StaticRenderProvider<Props, NonStaticPropNames>
+function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
+	statefulRender: React.FunctionComponent<Props>,
+	markerProvisions: MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
-): React.NamedExoticComponent<P> & MarkerProvider<P>
-function Component<P extends {}>(
-	render: React.FunctionComponent<P>,
-	decider?: string | ((props: P, environment: Environment) => React.ReactNode) | MarkerProvider<P>,
+): React.NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames>
+function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
+	render: React.FunctionComponent<Props>,
+	decider?:
+		| string
+		| ((props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactElement | null)
+		| MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
 ) {
-	let augmentedRender: React.NamedExoticComponent<P> & MarkerProvider<P>
 	if (decider === undefined || typeof decider === 'string') {
 		render.displayName = decider
-		augmentedRender = React.memo<P>(render)
-		augmentedRender.generateSyntheticChildren = render
+		const augmentedRender: React.NamedExoticComponent<Props> & MarkerProvider<Props> = React.memo<Props>(render)
+		augmentedRender.staticRender = render as StaticRenderProvider<Props>['staticRender']
 
-		return augmentedRender as React.NamedExoticComponent<P> & SyntheticChildrenProvider<P>
+		return augmentedRender
 	}
 
 	render.displayName = displayName
-	augmentedRender = React.memo<P>(render)
+	const augmentedRender: React.NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames> = React.memo<
+		Props
+	>(render)
 
 	if (typeof decider === 'function') {
-		augmentedRender.generateSyntheticChildren = decider
+		augmentedRender.staticRender = decider
 
 		return augmentedRender
 	}
 	if (typeof decider === 'object') {
 		for (const provisionName in decider) {
-			const methodName = provisionName as keyof MarkerProvider<P>
-			;(augmentedRender[methodName] as MarkerProvider<P>[typeof methodName]) = decider[methodName]
+			const methodName = provisionName as keyof MarkerProvider<Props, NonStaticPropNames>
+			;(augmentedRender[methodName] as MarkerProvider<Props, NonStaticPropNames>[typeof methodName]) = decider[
+				methodName
+			]
 		}
 
 		return augmentedRender

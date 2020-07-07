@@ -1,5 +1,5 @@
 import * as React from 'react'
 
-export type ErrorMessageFactory<Environment = any> =
+export type ErrorMessageFactory<StaticContext = any> =
 	| string
-	| ((node: React.ReactNode, environment: Environment) => string)
+	| ((node: React.ReactNode, staticContext: StaticContext) => string)

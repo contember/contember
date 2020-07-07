@@ -1,20 +1,20 @@
 import { BaseComponent, RepresentationFactorySite, LeafRepresentationFactory, ValidFactoryName } from './types'
 
 class Leaf<
-	Environment = any,
+	StaticContext = any,
 	FactoryMethodName extends ValidFactoryName = string,
 	Representation = any,
 	Props extends {} = {}
 > {
-	public readonly specification: Leaf.Specification<FactoryMethodName, Representation, Props, Environment>
+	public readonly specification: Leaf.Specification<FactoryMethodName, Representation, Props, StaticContext>
 
 	public constructor(factoryMethodName: FactoryMethodName)
 	public constructor(
-		staticFactory: LeafRepresentationFactory<Props, Representation, Environment>,
+		staticFactory: LeafRepresentationFactory<Props, Representation, StaticContext>,
 		ComponentType?: BaseComponent<Props>,
 	)
 	public constructor(
-		factory: FactoryMethodName | LeafRepresentationFactory<Props, Representation, Environment>,
+		factory: FactoryMethodName | LeafRepresentationFactory<Props, Representation, StaticContext>,
 		ComponentType?: BaseComponent<Props>,
 	) {
 		if (typeof factory === 'function') {
@@ -37,7 +37,7 @@ namespace Leaf {
 		FactoryMethodName extends ValidFactoryName,
 		Representation,
 		Props extends {},
-		Environment
+		StaticContext
 	> =
 		| {
 				type: RepresentationFactorySite.DeclarationSite
@@ -45,7 +45,7 @@ namespace Leaf {
 		  }
 		| {
 				type: RepresentationFactorySite.UseSite
-				factory: LeafRepresentationFactory<Props, Representation, Environment>
+				factory: LeafRepresentationFactory<Props, Representation, StaticContext>
 				ComponentType?: BaseComponent<Props>
 		  }
 }

@@ -1,4 +1,4 @@
-export type LeafRepresentationFactory<Props extends {}, Representation, Environment> = (
+export type LeafRepresentationFactory<Props extends {}, Representation, StaticContext> = (
 	props: Props,
-	environment: Environment,
+	staticContext: StaticContext,
 ) => Representation

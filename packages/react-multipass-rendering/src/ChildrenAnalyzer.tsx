@@ -6,18 +6,20 @@ import { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
 import { getErrorMessage } from './helpers'
 import { LeafList } from './LeafList'
 import {
+	BaseComponent,
 	DeclarationSiteNodeRepresentationFactory,
 	LeafRepresentationFactory,
 	RawNodeRepresentation,
 	RepresentationFactorySite,
+	StaticContextFactory,
+	SyntheticChildrenFactory,
 	ValidFactoryName,
 } from './nodeSpecs'
-import { BaseComponent, EnvironmentFactory, SyntheticChildrenFactory } from './nodeSpecs/types'
 
 export class ChildrenAnalyzer<
 	AllLeafsRepresentation = any,
 	AllBranchNodesRepresentation = never,
-	Environment = undefined
+	StaticContext = undefined
 > {
 	private static defaultOptions: ChildrenAnalyzerOptions = {
 		ignoreRenderProps: true,
@@ -26,25 +28,25 @@ export class ChildrenAnalyzer<
 		ignoreUnhandledNodes: true,
 		unhandledNodeErrorMessage: 'Encountered an unknown child.',
 
-		environmentFactoryName: 'generateEnvironment',
-		syntheticChildrenFactoryName: 'generateSyntheticChildren',
+		staticContextFactoryName: 'getStaticContext',
+		staticRenderFactoryName: 'staticRender',
 	}
 
-	private readonly leafs: LeafList<AllLeafsRepresentation, Environment>
-	private readonly branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, Environment>
-	private readonly options: ChildrenAnalyzerOptions<Environment>
+	private readonly leafs: LeafList<AllLeafsRepresentation, StaticContext>
+	private readonly branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, StaticContext>
+	private readonly options: ChildrenAnalyzerOptions<StaticContext>
 
-	public constructor(leafs: LeafList<AllLeafsRepresentation, Environment>, options?: Partial<ChildrenAnalyzerOptions>)
+	public constructor(leafs: LeafList<AllLeafsRepresentation, StaticContext>, options?: Partial<ChildrenAnalyzerOptions>)
 	public constructor(
-		leafs: LeafList<AllLeafsRepresentation, Environment>,
-		branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, Environment>,
+		leafs: LeafList<AllLeafsRepresentation, StaticContext>,
+		branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, StaticContext>,
 		options?: Partial<ChildrenAnalyzerOptions>,
 	)
 	public constructor(
-		leafs: LeafList<AllLeafsRepresentation, Environment>,
+		leafs: LeafList<AllLeafsRepresentation, StaticContext>,
 		decider:
 			| Partial<ChildrenAnalyzerOptions>
-			| BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, Environment> = [],
+			| BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, StaticContext> = [],
 		options: Partial<ChildrenAnalyzerOptions> = {},
 	) {
 		this.leafs = leafs
@@ -60,9 +62,9 @@ export class ChildrenAnalyzer<
 
 	public processChildren(
 		children: React.ReactNode,
-		initialEnvironment: Environment,
+		initialStaticContext: StaticContext,
 	): Array<AllLeafsRepresentation | AllBranchNodesRepresentation> {
-		const processed = this.processNode(children, initialEnvironment)
+		const processed = this.processNode(children, initialStaticContext)
 
 		const rawResult: Array<AllLeafsRepresentation | AllBranchNodesRepresentation | undefined> = Array.isArray(processed)
 			? processed
@@ -73,7 +75,7 @@ export class ChildrenAnalyzer<
 
 	private processNode(
 		node: React.ReactNode | Function,
-		environment: Environment,
+		staticContext: StaticContext,
 	): RawNodeRepresentation<AllLeafsRepresentation, AllBranchNodesRepresentation> {
 		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
 			return undefined
@@ -83,14 +85,14 @@ export class ChildrenAnalyzer<
 			if (this.options.ignoreRenderProps) {
 				return undefined
 			}
-			throw new ChildrenAnalyzerError(getErrorMessage(this.options.renderPropsErrorMessage, node, environment))
+			throw new ChildrenAnalyzerError(getErrorMessage(this.options.renderPropsErrorMessage, node, staticContext))
 		}
 
 		if (Array.isArray(node)) {
 			let mapped: Array<AllLeafsRepresentation | AllBranchNodesRepresentation> = []
 
 			for (const subNode of node) {
-				const processed = this.processNode(subNode, environment)
+				const processed = this.processNode(subNode, staticContext)
 
 				if (processed) {
 					if (Array.isArray(processed)) {
@@ -111,7 +113,7 @@ export class ChildrenAnalyzer<
 
 			if (typeof node.type === 'symbol' || typeof node.type === 'string') {
 				// React.Fragment, React.Portal or other non-component
-				return this.processNode(children, environment)
+				return this.processNode(children, staticContext)
 			}
 
 			// React.Component, React.PureComponent, React.FunctionComponent
@@ -119,23 +121,23 @@ export class ChildrenAnalyzer<
 			const treeNode = node.type as BaseComponent<any> &
 				{
 					[staticMethod in ValidFactoryName]:
-						| EnvironmentFactory<any, Environment>
-						| SyntheticChildrenFactory<any, Environment>
-						| LeafRepresentationFactory<any, AllLeafsRepresentation, Environment>
-						| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, Environment>
+						| StaticContextFactory<any, StaticContext>
+						| SyntheticChildrenFactory<any, StaticContext>
+						| LeafRepresentationFactory<any, AllLeafsRepresentation, StaticContext>
+						| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
 				}
 
-			if (this.options.environmentFactoryName in treeNode) {
-				const environmentFactory = treeNode[this.options.environmentFactoryName] as EnvironmentFactory<any, Environment>
-				environment = environmentFactory(node.props, environment)
+			if (this.options.staticContextFactoryName in treeNode) {
+				const StaticContextFactory = treeNode[this.options.staticContextFactoryName] as StaticContextFactory<
+					any,
+					StaticContext
+				>
+				staticContext = StaticContextFactory(node.props, staticContext)
 			}
 
-			if (this.options.syntheticChildrenFactoryName in treeNode) {
-				const factory = treeNode[this.options.syntheticChildrenFactoryName] as SyntheticChildrenFactory<
-					any,
-					Environment
-				>
-				children = factory(node.props, environment)
+			if (this.options.staticRenderFactoryName in treeNode) {
+				const factory = treeNode[this.options.staticRenderFactoryName] as SyntheticChildrenFactory<any, StaticContext>
+				children = factory(node.props, staticContext)
 			}
 
 			for (const leaf of this.leafs) {
@@ -148,16 +150,16 @@ export class ChildrenAnalyzer<
 							const factory = treeNode[factoryMethodName] as LeafRepresentationFactory<
 								any,
 								AllBranchNodesRepresentation | AllLeafsRepresentation,
-								Environment
+								StaticContext
 							>
-							return factory(node.props, environment)
+							return factory(node.props, staticContext)
 						}
 						break
 					}
 					case RepresentationFactorySite.UseSite: {
 						const { ComponentType, factory } = specification
 						if (ComponentType === undefined || node.type === ComponentType) {
-							return factory(node.props, environment)
+							return factory(node.props, staticContext)
 						}
 						break
 					}
@@ -166,7 +168,7 @@ export class ChildrenAnalyzer<
 				}
 			}
 
-			const processedChildren = this.processNode(children, environment)
+			const processedChildren = this.processNode(children, staticContext)
 
 			for (const branchNode of this.branchNodes) {
 				const specification = branchNode.specification
@@ -182,9 +184,9 @@ export class ChildrenAnalyzer<
 								any,
 								unknown,
 								AllBranchNodesRepresentation | AllLeafsRepresentation,
-								Environment
+								StaticContext
 							>
-							return factory(node.props, childrenRepresentationReducer(processedChildren), environment)
+							return factory(node.props, childrenRepresentationReducer(processedChildren), staticContext)
 						}
 						break
 					}
@@ -194,7 +196,7 @@ export class ChildrenAnalyzer<
 							if (!processedChildren) {
 								throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 							}
-							return factory(node.props, processedChildren, environment)
+							return factory(node.props, processedChildren, staticContext)
 						}
 						break
 					}
@@ -204,11 +206,11 @@ export class ChildrenAnalyzer<
 			}
 
 			if (!this.options.ignoreUnhandledNodes) {
-				throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, environment))
+				throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, staticContext))
 			}
 
 			return processedChildren
 		}
-		return this.processNode(children, environment)
+		return this.processNode(children, staticContext)
 	}
 }

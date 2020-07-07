@@ -29,7 +29,7 @@ export const HasMany = Component(
 		return <EntityList {...props} accessor={entity} />
 	},
 	{
-		generateSyntheticChildren: props => (
+		staticRender: props => (
 			<>
 				<Field field={PRIMARY_KEY_NAME} />
 				<Field field={TYPENAME_KEY_NAME} />

@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { ErrorMessageFactory } from '../ErrorMessageFactory'
 
-export const getErrorMessage = <Environment>(
-	factory: ErrorMessageFactory<Environment>,
+export const getErrorMessage = <StaticContext>(
+	factory: ErrorMessageFactory<StaticContext>,
 	node: React.ReactNode,
-	environment: Environment,
+	staticContext: StaticContext,
 ): string => {
-	return typeof factory === 'string' ? factory : factory(node, environment)
+	return typeof factory === 'string' ? factory : factory(node, staticContext)
 }

@@ -1,14 +1,13 @@
-import * as React from 'react'
 import {
 	BindingError,
 	Environment,
 	EnvironmentContext,
 	EnvironmentDeltaProvider,
 	HasOne,
+	StaticRenderProvider,
 	SugaredRelativeSingleEntity,
-	SugaredRelativeSingleField,
-	SyntheticChildrenProvider,
 } from '@contember/binding'
+import * as React from 'react'
 
 type EnforceSubtypeRelation<Sub extends Super, Super> = never
 
@@ -26,13 +25,13 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 		return (
 			<div className="sideDimensions">
 				<EnvironmentContext.Consumer>
-					{oldEnvironment => SideDimensions.generateSyntheticChildren(this.props, oldEnvironment)}
+					{oldEnvironment => SideDimensions.staticRender(this.props, oldEnvironment)}
 				</EnvironmentContext.Consumer>
 			</div>
 		)
 	}
 
-	public static generateSyntheticChildren(props: SideDimensionsProps, environment: Environment): React.ReactNode {
+	public static staticRender(props: SideDimensionsProps, environment: Environment): React.ReactElement | null {
 		if ((props.dimension === undefined) === (props.staticOptions === undefined)) {
 			throw new BindingError(
 				`The SideDimensions component needs to be passed exactly one of its 'dimension' or 'staticOptions' props.`,
@@ -46,7 +45,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 
 			if (!(props.dimension in selectedDimensions)) {
 				console.error(new BindingError(`The '${props.dimension}' dimension in undefined`))
-				return
+				return null
 			}
 
 			dimensions = selectedDimensions[props.dimension]
@@ -100,7 +99,7 @@ namespace SideDimensions {
 		static displayName = 'SideDimension'
 
 		public render() {
-			const children = SingleDimension.generateSyntheticChildren(this.props, this.props.environment)
+			const children = SingleDimension.staticRender(this.props, this.props.environment)
 			return (
 				<EnvironmentContext.Provider value={SingleDimension.generateEnvironment(this.props, this.props.environment)}>
 					<div className="sideDimensions-dimensions-dimension">{children}</div>
@@ -108,7 +107,7 @@ namespace SideDimensions {
 			)
 		}
 
-		public static generateSyntheticChildren(props: SingleDimensionProps, environment: Environment): React.ReactNode {
+		public static staticRender(props: SingleDimensionProps, environment: Environment): React.ReactNode {
 			if (!props.hasOneField) {
 				return props.children
 			}
@@ -155,5 +154,5 @@ export { SideDimensions }
 
 type EnforceDataBindingCompatibility = EnforceSubtypeRelation<
 	typeof SideDimensions,
-	SyntheticChildrenProvider<SideDimensionsProps>
+	StaticRenderProvider<SideDimensionsProps>
 >

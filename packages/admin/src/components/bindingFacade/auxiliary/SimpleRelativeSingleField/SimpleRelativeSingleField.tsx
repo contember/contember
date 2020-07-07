@@ -8,7 +8,7 @@ import {
 	FieldAccessor,
 	FieldBasicProps,
 	Scalar,
-	SyntheticChildrenProvider,
+	StaticRenderProvider,
 } from '@contember/binding'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
 
@@ -31,7 +31,7 @@ export const SimpleRelativeSingleField = function<
 	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Persisted, Produced>, props: P) => React.ReactNode,
 	displayName: string,
 	defaultProps?: Partial<P>,
-): React.NamedExoticComponent<P> & SyntheticChildrenProvider<P> {
+): React.NamedExoticComponent<P> & StaticRenderProvider<P> {
 	return Component<P>(
 		props => <SimpleRelativeSingleFieldProxy {...defaultProps} {...props} render={render} />,
 		(props: P) => {

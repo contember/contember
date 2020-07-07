@@ -39,7 +39,7 @@ export const SingleEntitySubTree = Component(
 			}
 			return MarkerFactory.createSingleEntitySubTreeMarker(environment, props, fields)
 		},
-		generateSyntheticChildren: props => (
+		staticRender: props => (
 			<SingleEntity {...props} accessor={0 as any}>
 				<Field field={PRIMARY_KEY_NAME} />
 				<Field field={TYPENAME_KEY_NAME} />

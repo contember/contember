@@ -9,7 +9,7 @@ import {
 } from './types'
 
 class BranchNode<
-	Environment = undefined,
+	StaticContext = undefined,
 	FactoryMethodName extends ValidFactoryName = string,
 	Props extends {} = {},
 	ChildrenRepresentation = any,
@@ -21,7 +21,7 @@ class BranchNode<
 	}
 
 	public readonly specification: BranchNode.Specification<
-		Environment,
+		StaticContext,
 		FactoryMethodName,
 		Props,
 		ChildrenRepresentation,
@@ -37,14 +37,19 @@ class BranchNode<
 		options?: Partial<BranchNodeOptions>,
 	)
 	public constructor(
-		useSiteFactory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, Environment>,
+		useSiteFactory: UseSiteBranchNodeRepresentationFactory<
+			Props,
+			ChildrenRepresentation,
+			Representation,
+			StaticContext
+		>,
 		ComponentType?: BaseComponent<Props>,
 		options?: Partial<BranchNodeOptions>,
 	)
 	public constructor(
 		factory:
 			| FactoryMethodName
-			| UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, Environment>,
+			| UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>,
 		componentOrReducer?:
 			| ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>
 			| BaseComponent<Props>,
@@ -77,7 +82,7 @@ class BranchNode<
 
 namespace BranchNode {
 	export type Specification<
-		Environment = any,
+		StaticContext = any,
 		FactoryMethodName extends ValidFactoryName = string,
 		Props extends {} = {},
 		ChildrenRepresentation = any,
@@ -94,7 +99,7 @@ namespace BranchNode {
 		  }
 		| {
 				type: RepresentationFactorySite.UseSite
-				factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, Environment>
+				factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>
 				ComponentType?: BaseComponent<Props>
 		  }
 }

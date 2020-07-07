@@ -62,7 +62,7 @@ export const EntityList = Component(
 				children: props.children,
 			})
 		}
-		return props.children
+		return <>{props.children}</>
 	},
 	'EntityList',
 ) as <ListProps, EntityProps>(props: EntityListProps<ListProps, EntityProps>) => React.ReactElement

@@ -8,9 +8,9 @@ import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoi
 export type SelectFieldProps = SelectFieldInnerPublicProps &
 	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | DynamicSingleChoiceFieldProps)
 
-export const SelectField = Component<SelectFieldProps>(props => {
-	return (
-		<ChoiceField {...(props as any)} arity="single">
+export const SelectField = Component<SelectFieldProps>(
+	props => (
+		<ChoiceField {...props} arity="single">
 			{({
 				data,
 				currentValue,
@@ -18,24 +18,23 @@ export const SelectField = Component<SelectFieldProps>(props => {
 				errors,
 				environment,
 				isMutating,
-			}: ChoiceFieldData.SingleChoiceFieldMetadata) => {
-				return (
-					<SelectFieldInner
-						label={props.label}
-						allowNull={props.allowNull}
-						firstOptionCaption={props.firstOptionCaption}
-						data={data}
-						currentValue={currentValue}
-						onChange={onChange}
-						environment={environment}
-						errors={errors}
-						isMutating={isMutating}
-					/>
-				)
-			}}
+			}: ChoiceFieldData.SingleChoiceFieldMetadata) => (
+				<SelectFieldInner
+					label={props.label}
+					allowNull={props.allowNull}
+					firstOptionCaption={props.firstOptionCaption}
+					data={data}
+					currentValue={currentValue}
+					onChange={onChange}
+					environment={environment}
+					errors={errors}
+					isMutating={isMutating}
+				/>
+			)}
 		</ChoiceField>
-	)
-}, 'SelectField')
+	),
+	'SelectField',
+)
 
 export interface SelectFieldInnerPublicProps extends Omit<FormGroupProps, 'children'> {
 	firstOptionCaption?: string

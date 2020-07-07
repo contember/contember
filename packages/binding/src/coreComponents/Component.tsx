@@ -9,7 +9,10 @@ function Component<Props extends {}>(
 ): React.NamedExoticComponent<Props> & StaticRenderProvider<Props>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	statefulRender: React.FunctionComponent<Props>,
-	staticRender: (props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactElement,
+	staticRender: (
+		props: StaticRenderProps<Props, NonStaticPropNames>,
+		environment: Environment,
+	) => React.ReactElement | null,
 	displayName?: string,
 ): React.NamedExoticComponent<Props> & StaticRenderProvider<Props, NonStaticPropNames>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
@@ -21,7 +24,7 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	render: React.FunctionComponent<Props>,
 	decider?:
 		| string
-		| ((props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactElement)
+		| ((props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactElement | null)
 		| MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
 ) {

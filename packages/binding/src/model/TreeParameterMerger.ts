@@ -25,7 +25,10 @@ export class TreeParameterMerger {
 		fresh: HasManyRelation,
 	): HasManyRelation {
 		if (original.initialEntityCount !== fresh.initialEntityCount) {
-			throw new BindingError()
+			throw new BindingError(
+				`Detected hasMany relations on the same field '${original.field}' with different preferred initial ` +
+					`entity counts: '${original.initialEntityCount}' and '${fresh.initialEntityCount}' respectively.`,
+			)
 		}
 		return {
 			// Encoded within the placeholder

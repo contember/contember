@@ -967,6 +967,9 @@ export class AccessorTreeGenerator {
 				this.performRootTreeOperation(() => {
 					// Deliberately not calling performOperationWithBeforeUpdate ‒ no beforeUpdate events after deletion
 					batchUpdatesImplementation(() => {
+						if (typeof entityState.id === 'string') {
+							this.unpersistedChangesCount++
+						}
 						entityState.isScheduledForDeletion = true
 						entityState.hasPendingParentNotification = true
 					})

@@ -71,6 +71,9 @@ class ResolverFactory {
 					this.resolvers.changePasswordMutationResolver,
 				),
 				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
+				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(
+					this.resolvers.inviteMutationResolver,
+				),
 				addProjectMember: this.resolvers.addProjectMemberMutationResolver.addProjectMember.bind(
 					this.resolvers.addProjectMemberMutationResolver,
 				),

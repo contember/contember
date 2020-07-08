@@ -12,6 +12,9 @@ export class AclSchemaEvaluatorFactory {
 			if (definition.tenant.invite) {
 				permissions.allow(role, PermissionActions.PERSON_INVITE([]))
 			}
+			if (definition.tenant.unmanagedInvite) {
+				permissions.allow(role, PermissionActions.PERSON_INVITE_UNMANAGED([]))
+			}
 			if (definition.tenant.manage) {
 				permissions.allow(role, PermissionActions.PROJECT_ADD_MEMBER([]))
 				permissions.allow(role, PermissionActions.PROJECT_VIEW_MEMBER([]))

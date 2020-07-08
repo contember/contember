@@ -11,6 +11,11 @@ import { Project } from '../type'
 import { createAppendMembershipVariables } from './membershipUtils'
 import { CreateOrUpdateProjectMembershipCommand } from '../commands/membership/CreateOrUpdateProjectMembershipCommand'
 
+export interface InviteOptions {
+	noEmail?: boolean
+	password?: string
+}
+
 export class InviteManager {
 	constructor(
 		private readonly client: Client,
@@ -18,7 +23,12 @@ export class InviteManager {
 		private readonly mailer: UserMailer,
 	) {}
 
-	async invite(email: string, project: Project, memberships: readonly Membership[]): Promise<InviteResponse> {
+	async invite(
+		email: string,
+		project: Project,
+		memberships: readonly Membership[],
+		options: InviteOptions = {},
+	): Promise<InviteResponse> {
 		return await this.client.transaction(async trx => {
 			const bus = new CommandBus(trx, this.providers)
 			let person: Omit<PersonRow, 'roles'> | null = await trx.createQueryHandler().fetch(PersonQuery.byEmail(email))
@@ -26,16 +36,18 @@ export class InviteManager {
 			let generatedPassword: string = ''
 			if (!person) {
 				const identityId = await bus.execute(new CreateIdentityCommand([TenantRole.PERSON]))
-				generatedPassword = (await this.providers.randomBytes(9)).toString('base64')
+				generatedPassword = options.password || (await this.providers.randomBytes(9)).toString('base64')
 				person = await bus.execute(new CreatePersonCommand(identityId, email, generatedPassword))
 			}
 			for (const membershipUpdate of createAppendMembershipVariables(memberships)) {
 				await bus.execute(new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate))
 			}
-			if (isNew) {
-				await this.mailer.sendNewUserInvitedMail({ email, project: project.name, password: generatedPassword })
-			} else {
-				await this.mailer.sendExistingUserInvitedEmail({ email, project: project.name })
+			if (!options.noEmail) {
+				if (isNew) {
+					await this.mailer.sendNewUserInvitedMail({ email, project: project.name, password: generatedPassword })
+				} else {
+					await this.mailer.sendExistingUserInvitedEmail({ email, project: project.name })
+				}
 			}
 			return new InviteResponseOk(person, isNew)
 		})

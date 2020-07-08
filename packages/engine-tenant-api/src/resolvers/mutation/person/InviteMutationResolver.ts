@@ -1,7 +1,14 @@
-import { InviteErrorCode, InviteResponse, MutationInviteArgs, MutationResolvers } from '../../../schema'
+import {
+	InviteErrorCode,
+	InviteResponse,
+	MembershipInput,
+	MutationInviteArgs,
+	MutationResolvers,
+	MutationUnmanagedInviteArgs,
+} from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, ProjectScope } from '../../../model'
-import { InviteManager } from '../../../model/service/InviteManager'
+import { PermissionActions, ProjectManager, Project, InviteOptions } from '../../../model'
+import { InviteManager } from '../../../model/service'
 import { createMembershipValidationErrorResult } from '../../utils'
 import { MembershipValidator } from '../../../model/service/MembershipValidator'
 
@@ -23,6 +30,32 @@ export class InviteMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_INVITE(memberships),
 			message: 'You are not allowed to invite a person',
 		})
+		return this.doInvite(project, memberships, email)
+	}
+
+	async unmanagedInvite(
+		parent: any,
+		{ projectSlug, email, memberships, password }: MutationUnmanagedInviteArgs,
+		context: ResolverContext,
+	): Promise<InviteResponse> {
+		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		await context.requireAccess({
+			scope: await context.permissionContext.createProjectScope(project),
+			action: PermissionActions.PERSON_INVITE_UNMANAGED(memberships),
+			message: 'You are not allowed to unmanaged person invite',
+		})
+		return this.doInvite(project, memberships, email, {
+			noEmail: true,
+			password,
+		})
+	}
+
+	private async doInvite(
+		project: Project | null,
+		memberships: ReadonlyArray<MembershipInput>,
+		email: string,
+		inviteOptions: InviteOptions = {},
+	): Promise<InviteResponse> {
 		if (!project) {
 			return {
 				ok: false,
@@ -36,7 +69,7 @@ export class InviteMutationResolver implements MutationResolvers {
 				errors: createMembershipValidationErrorResult(validationResult),
 			}
 		}
-		const result = await this.inviteManager.invite(email, project, memberships)
+		const result = await this.inviteManager.invite(email, project, memberships, inviteOptions)
 
 		if (!result.ok) {
 			return {

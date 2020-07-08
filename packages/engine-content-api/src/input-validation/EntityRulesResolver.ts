@@ -8,7 +8,7 @@ import { NotSupportedError } from './exceptions'
 export class EntityRulesResolver {
 	constructor(private readonly validationSchema: Validation.Schema, private readonly model: Model.Schema) {}
 
-	public getSimpleRules(entityName: string) {
+	public getSimpleRules(entityName: string): Validation.EntityRules {
 		return mapObject(this.getEntityRules(entityName), (rules, field) => {
 			acceptFieldVisitor(this.model, entityName, field, {
 				visitColumn: () => null,

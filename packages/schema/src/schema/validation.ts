@@ -17,6 +17,7 @@ namespace Validation {
 		conditional: [ValidatorArgument, ValidatorArgument]
 		pattern: [LiteralArgument<[string, string]>]
 		lengthRange: [LiteralArgument<number | null>, LiteralArgument<number | null>]
+		range: [LiteralArgument<number | null>, LiteralArgument<number | null>]
 		equals: [LiteralArgument<any>]
 		not: [ValidatorArgument]
 		empty: []

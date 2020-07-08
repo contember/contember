@@ -178,6 +178,16 @@ export class ValidationValidator {
 					operation: 'lengthRange',
 					args: [lengthArgA as Validation.LiteralArgument<number>, lengthArgB as Validation.LiteralArgument<number>],
 				}
+			case 'range':
+				const rangeArgA = this.validateLiteralArgument(errorBuilder.for('min'), validatorCast.args[0])
+				const rangeArgB = this.validateLiteralArgument(errorBuilder.for('max'), validatorCast.args[1])
+				if (lengthArgA === undefined || lengthArgB === undefined) {
+					return undefined
+				}
+				return {
+					operation: 'range',
+					args: [rangeArgA as Validation.LiteralArgument<number>, rangeArgB as Validation.LiteralArgument<number>],
+				}
 			case 'equals':
 				const eqArg = this.validateLiteralArgument(errorBuilder, validatorCast.args[0])
 				if (eqArg === undefined) {

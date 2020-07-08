@@ -112,6 +112,11 @@ const lengthRangeOperation = (min: number | null, max: number | null): Validatio
 	args: [ArgumentFactory.literal(min), ArgumentFactory.literal(max)],
 })
 
+const rangeOperation = (min: number | null, max: number | null): Validation.Validator => ({
+	operation: 'range',
+	args: [ArgumentFactory.literal(min), ArgumentFactory.literal(max)],
+})
+
 const equalsOperation = (value: any): Validation.Validator => ({
 	operation: 'equals',
 	args: [ArgumentFactory.literal(value)],
@@ -153,6 +158,9 @@ export const rules = {
 	lengthRange: lengthRangeOperation,
 	minLength: (min: number) => lengthRangeOperation(min, null),
 	maxLength: (max: number) => lengthRangeOperation(null, max),
+	range: rangeOperation,
+	min: (min: number) => rangeOperation(min, null),
+	max: (max: number) => rangeOperation(null, max),
 	equals: equalsOperation,
 	not: notOperation,
 	['empty']: emptyOperation,

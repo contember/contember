@@ -21,7 +21,10 @@ const getValueFromContext = (context: ValidationContext.AnyContext): ValidationC
 	return context.value
 }
 
-export const evaluateValidation = (context: ValidationContext.AnyContext, validator: Validation.Validator): boolean => {
+export const evaluateValidation = (
+	context: ValidationContext.AnyContext,
+	validator: Validation.Validator,
+): boolean | null => {
 	return validatorEvaluators[validator.operation](context, ...(validator.args as any[]))
 }
 
@@ -29,14 +32,14 @@ const validatorEvaluators: {
 	[K in keyof Validation.ValidatorArguments]: (
 		context: ValidationContext.AnyContext,
 		...args: Validation.ValidatorArguments[K]
-	) => boolean
+	) => boolean | null
 } = {
 	empty: (context: ValidationContext.AnyContext) => {
 		if (ValidationContext.isNodeListContext(context)) {
 			return context.nodes.length === 0
 		}
 		if (ValidationContext.isNodeContext(context) && !ValidationContext.isValueContext(context)) {
-			return false
+			return null
 		}
 		const value = getValueFromContext(context)
 		return !value
@@ -61,7 +64,11 @@ const validatorEvaluators: {
 		return context.node !== undefined
 	},
 	not: (context: ValidationContext.AnyContext, { validator }: Validation.ValidatorArgument) => {
-		return !evaluateValidation(context, validator)
+		const result = evaluateValidation(context, validator)
+		if (result === null) {
+			return null
+		}
+		return !result
 	},
 	conditional: (
 		context: ValidationContext.AnyContext,
@@ -69,6 +76,9 @@ const validatorEvaluators: {
 		{ validator: rule }: Validation.ValidatorArgument,
 	) => {
 		const conditionResult = evaluateValidation(context, condition)
+		if (conditionResult === null) {
+			return null
+		}
 		if (!conditionResult) {
 			return true
 		}
@@ -78,7 +88,7 @@ const validatorEvaluators: {
 	pattern: (context: ValidationContext.AnyContext, patternArgument: Validation.LiteralArgument<[string, string]>) => {
 		const value = getValueFromContext(context)
 		if (value === undefined || value === null) {
-			return false
+			return null
 		}
 		if (typeof value !== 'string') {
 			throw new Error(`Cannot apply pattern validation on ${typeof value}`)
@@ -86,7 +96,15 @@ const validatorEvaluators: {
 		return new RegExp(patternArgument.value[0], patternArgument.value[1]).test(value)
 	},
 	equals: (context: ValidationContext.AnyContext, other: Validation.LiteralArgument | Validation.PathArgument) => {
-		return getValueFromContext(context) === getValueOrLiteral(context, other)
+		const contextValue = getValueFromContext(context)
+		const otherValue = getValueOrLiteral(context, other)
+		if (otherValue === null) {
+			return contextValue === otherValue
+		}
+		if (contextValue === null || contextValue === undefined) {
+			return null
+		}
+		return contextValue === otherValue
 	},
 	lengthRange: (
 		context: ValidationContext.AnyContext,
@@ -99,7 +117,7 @@ const validatorEvaluators: {
 		} else if (ValidationContext.isNodeListContext(context)) {
 			value = context.nodes.length
 		} else if (ValidationContext.isUndefinedNodeContext(context)) {
-			return false
+			return null
 		} else {
 			throw new Error('Value or List context is required for range operation')
 		}
@@ -112,21 +130,44 @@ const validatorEvaluators: {
 	) => {
 		if (ValidationContext.isValueContext(context)) {
 			const value = getValueFromContext(context)
+			if (value === null) {
+				return null
+			}
 			if (typeof value !== 'number') {
-				return false
+				throw new Error(`Cannot apply range validation on ${typeof value}`)
 			}
 			return (min.value === null || min.value <= value) && (max.value === null || max.value >= value)
 		} else if (ValidationContext.isUndefinedNodeContext(context)) {
-			return false
+			return null
 		} else {
 			throw new Error('Value context is required for range operation')
 		}
 	},
 	and: (context: ValidationContext.AnyContext, ...values: Validation.ValidatorArgument[]) => {
-		return values.reduce<boolean>((acc, val) => acc && evaluateValidation(context, val.validator), true)
+		let result: null | true = true
+		for (const val of values) {
+			const validationResult = evaluateValidation(context, val.validator)
+			if (validationResult === false) {
+				return false
+			}
+			if (validationResult === null) {
+				result = null
+			}
+		}
+		return result
 	},
 	or: (context: ValidationContext.AnyContext, ...values: Validation.ValidatorArgument[]) => {
-		return values.reduce<boolean>((acc, val) => acc || evaluateValidation(context, val.validator), false)
+		let result: null | false = false
+		for (const val of values) {
+			const validationResult = evaluateValidation(context, val.validator)
+			if (validationResult === true) {
+				return true
+			}
+			if (validationResult === null) {
+				result = null
+			}
+		}
+		return result
 	},
 	inContext: (
 		context: ValidationContext.AnyContext,
@@ -139,13 +180,33 @@ const validatorEvaluators: {
 		if (!ValidationContext.isNodeListContext(context)) {
 			throw new Error('NodeListContext expected for "every" operation')
 		}
-		return context.nodes.reduce<boolean>((acc, context) => acc && evaluateValidation(context, validator), true)
+		let result: true | null = true
+		for (const node of context.nodes) {
+			const validationResult = evaluateValidation(node, validator)
+			if (validationResult === false) {
+				return false
+			}
+			if (validationResult === null) {
+				result = null
+			}
+		}
+		return result
 	},
 	any: (context: ValidationContext.AnyContext, { validator }: Validation.ValidatorArgument) => {
 		if (!ValidationContext.isNodeListContext(context)) {
 			throw new Error('NodeListContext expected for "any" operation')
 		}
-		return context.nodes.reduce<boolean>((acc, context) => acc || evaluateValidation(context, validator), false)
+		let result: false | null = false
+		for (const node of context.nodes) {
+			const validationResult = evaluateValidation(node, validator)
+			if (validationResult === true) {
+				return true
+			}
+			if (validationResult === null) {
+				result = null
+			}
+		}
+		return result
 	},
 	filter: (
 		context: ValidationContext.AnyContext,
@@ -157,7 +218,7 @@ const validatorEvaluators: {
 		}
 		const filteredContext = ValidationContext.createNodeListContext(
 			context.root,
-			context.nodes.filter(it => evaluateValidation(it, filter)),
+			context.nodes.filter(it => evaluateValidation(it, filter) !== false),
 		)
 		return evaluateValidation(filteredContext, validator)
 	},

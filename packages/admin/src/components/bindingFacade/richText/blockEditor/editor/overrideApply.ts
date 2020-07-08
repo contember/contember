@@ -8,6 +8,7 @@ import {
 	FieldValue,
 	RelativeEntityList,
 	RelativeSingleField,
+	repairEntitiesOrder,
 } from '@contember/binding'
 import * as React from 'react'
 import { Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
@@ -163,6 +164,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					const sortedEntityIndex = elementIndex - firstContentIndex
 					sortedEntities[sortedEntityIndex].deleteEntity?.()
 					sortedEntities.splice(sortedEntityIndex, 1)
+					repairEntitiesOrder(sortableByField, sortedEntities)
 				}
 			}
 			const addNewDiscriminatedEntityAt = (

@@ -16,7 +16,7 @@ export const addEntityAtIndex = (
 		return throwNonWritableError(entityList)
 	}
 	const sortedEntities = sortEntities(Array.from(entityList), sortableByField)
-	entityList.batchUpdates(getListAccessor => {
+	entityList.batchUpdates(() => {
 		createNewEntity(getNewlyAdded => {
 			let newlyAdded = getNewlyAdded()
 
@@ -27,7 +27,7 @@ export const addEntityAtIndex = (
 				newlyAdded = getNewlyAdded()
 
 				sortedEntities.splice(index, 0, newlyAdded)
-				repairEntitiesOrder(sortableByField, getListAccessor(), sortedEntities)
+				repairEntitiesOrder(sortableByField, sortedEntities)
 			} else {
 				return throwNonWritableError(sortableField.fieldName)
 			}

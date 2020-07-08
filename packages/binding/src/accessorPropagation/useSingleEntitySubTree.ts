@@ -1,84 +1,23 @@
-import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { QueryLanguage } from '../queryLanguage'
-import {
-	BoxedQualifiedSingleEntity,
-	BoxedUnconstrainedQualifiedSingleEntity,
-	SugaredQualifiedSingleEntity,
-	SugaredUnconstrainedQualifiedSingleEntity,
-} from '../treeParameters'
+import { BindingError } from '../BindingError'
 import { useAccessorUpdateSubscription__UNSTABLE } from './useAccessorUpdateSubscription__UNSTABLE'
-import { useEnvironment } from './useEnvironment'
 import { useGetSubTree } from './useGetSubTree'
+import {
+	QualifiedSingleEntityProps,
+	UnconstrainedQualifiedSingleEntityProps,
+	useSingleEntitySubTreeParameters,
+} from './useSingleEntitySubTreeParameters'
 
-export type UseSingleEntitySubTreeProps =
-	| ({
-			isCreating?: false
-	  } & SugaredQualifiedSingleEntity)
-	| ({
-			isCreating: true
-	  } & SugaredUnconstrainedQualifiedSingleEntity)
+export type UseSingleEntitySubTreeProps = QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps
 
 export const useSingleEntitySubTree = (qualifiedSingleEntity: UseSingleEntitySubTreeProps) => {
 	const getSubTree = useGetSubTree()
-	const environment = useEnvironment()
+	const parameters = useSingleEntitySubTreeParameters(qualifiedSingleEntity)
+	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
+	const accessor = useAccessorUpdateSubscription__UNSTABLE(getAccessor)
 
-	useConstantValueInvariant(
-		qualifiedSingleEntity.isCreating,
-		`EntityListSubTree: cannot alternate the 'isCreating' value.`,
-	)
-
-	let parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity
-
-	// We're not really breaking rules of hooks here since the error state is prevented by the invariant above.
-	if ('isCreating' in qualifiedSingleEntity && qualifiedSingleEntity.isCreating) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		parameters = React.useMemo(
-			() =>
-				new BoxedUnconstrainedQualifiedSingleEntity(
-					QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(
-						{
-							forceCreation: qualifiedSingleEntity.forceCreation,
-							isNonbearing: qualifiedSingleEntity.isNonbearing,
-							entity: qualifiedSingleEntity.entity,
-							setOnCreate: qualifiedSingleEntity.setOnCreate,
-						},
-						environment,
-					),
-				),
-			[
-				qualifiedSingleEntity.entity,
-				qualifiedSingleEntity.setOnCreate,
-				qualifiedSingleEntity.forceCreation,
-				qualifiedSingleEntity.isNonbearing,
-				environment,
-			],
-		)
-	} else {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		parameters = React.useMemo(
-			() =>
-				new BoxedQualifiedSingleEntity(
-					QueryLanguage.desugarQualifiedSingleEntity(
-						{
-							entity: qualifiedSingleEntity.entity,
-						},
-						environment,
-					),
-				),
-			[qualifiedSingleEntity.entity, environment],
-		)
+	if (parameters.value.hasOneRelationPath.length) {
+		throw new BindingError(`useSingleEntitySubTree: cannot use hasOneRelationPath!`)
 	}
-
-	const getAccessor = React.useCallback(() => {
-		const subTree = getSubTree(parameters)
-		if (parameters.value.hasOneRelationPath.length) {
-			return subTree.getRelativeSingleEntity({
-				hasOneRelationPath: parameters.value.hasOneRelationPath,
-			})
-		}
-		return subTree
-	}, [getSubTree, parameters])
-
-	return useAccessorUpdateSubscription__UNSTABLE(getAccessor)
+	return accessor
 }

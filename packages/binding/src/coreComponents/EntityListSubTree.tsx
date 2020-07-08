@@ -1,12 +1,17 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useEntityListSubTree } from '../accessorPropagation'
+import {
+	useAccessorUpdateSubscription__UNSTABLE,
+	useEntityListSubTreeParameters,
+	useGetSubTree,
+} from '../accessorPropagation'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
 import { Component } from './Component'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
+import { HasOne } from './HasOne'
 import { SingleEntityBaseProps } from './SingleEntity'
 
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
@@ -35,7 +40,20 @@ export const EntityListSubTree = Component(
 	<ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => {
 		useConstantValueInvariant(props.isCreating, 'EntityListSubTree: cannot update isCreating')
 
-		return <EntityList {...props} accessor={useEntityListSubTree(props)} />
+		const getSubTree = useGetSubTree()
+		const parameters = useEntityListSubTreeParameters(props)
+		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
+		const accessor = useAccessorUpdateSubscription__UNSTABLE(getAccessor)
+
+		return (
+			<EntityList {...props} accessor={accessor}>
+				{parameters.value.hasOneRelationPath.length ? (
+					<HasOne field={parameters.value.hasOneRelationPath}>{props.children}</HasOne>
+				) : (
+					props.children
+				)}
+			</EntityList>
+		)
 	},
 	{
 		generateSubTreeMarker: (props, fields, environment) => {

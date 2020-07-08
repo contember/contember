@@ -1,11 +1,16 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useSingleEntitySubTree } from '../accessorPropagation'
+import {
+	useAccessorUpdateSubscription__UNSTABLE,
+	useGetSubTree,
+	useSingleEntitySubTreeParameters,
+} from '../accessorPropagation'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
 import { Component } from './Component'
 import { Field } from './Field'
+import { HasOne } from './HasOne'
 import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
 export type SingleEntitySubTreeProps<EntityProps> = {
@@ -30,7 +35,20 @@ export const SingleEntitySubTree = Component(
 	<EntityProps extends {}>(props: SingleEntitySubTreeProps<EntityProps>) => {
 		useConstantValueInvariant(props.isCreating, 'SingleEntitySubTree: cannot update isCreating')
 
-		return <SingleEntity {...props} accessor={useSingleEntitySubTree(props)} />
+		const getSubTree = useGetSubTree()
+		const parameters = useSingleEntitySubTreeParameters(props)
+		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
+		const accessor = useAccessorUpdateSubscription__UNSTABLE(getAccessor)
+
+		return (
+			<SingleEntity {...props} accessor={accessor}>
+				{parameters.value.hasOneRelationPath.length ? (
+					<HasOne field={parameters.value.hasOneRelationPath}>{props.children}</HasOne>
+				) : (
+					props.children
+				)}
+			</SingleEntity>
+		)
 	},
 	{
 		generateSubTreeMarker: (props, fields, environment) => {

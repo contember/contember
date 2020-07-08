@@ -143,7 +143,17 @@ export class AccessorTreeGenerator {
 		}
 		const generator = new MutationGenerator(this.markerTree, this.subTreeStates, this.entityStore)
 
-		return generator.getPersistMutation()
+		const mutation = generator.getPersistMutation()
+
+		if (mutation === undefined) {
+			// TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
+			this.unpersistedChangesCount = 0
+			Promise.resolve().then(() => {
+				this.updateTreeRoot()
+			})
+		}
+
+		return mutation
 	}
 
 	public setErrors(data: MutationDataResponse | undefined) {
@@ -967,6 +977,9 @@ export class AccessorTreeGenerator {
 				this.performRootTreeOperation(() => {
 					// Deliberately not calling performOperationWithBeforeUpdate ‒ no beforeUpdate events after deletion
 					batchUpdatesImplementation(() => {
+						if (typeof entityState.id === 'string') {
+							this.unpersistedChangesCount++
+						}
 						entityState.isScheduledForDeletion = true
 						entityState.hasPendingParentNotification = true
 					})

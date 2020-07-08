@@ -3,6 +3,7 @@ import { SchemaDefinition } from '../model'
 import 'reflect-metadata'
 import { Validation } from '@contember/schema'
 
+type ValidationRuleWithMeta = Validation.ValidationRule & { noOptional?: true }
 type MessageOrString = Validation.Message | string
 
 export type ContextPath = Validation.ContextPath | string | undefined
@@ -54,11 +55,15 @@ export function fluent() {
 }
 
 class RuleBranch {
-	constructor(private conditions: Validation.Validator[], private branchRules: Validation.ValidationRule[]) {}
+	constructor(
+		private conditions: Validation.Validator[],
+		private branchRules: Validation.ValidationRule[],
+		private _noOptional?: true,
+	) {}
 
-	public buildRules = (): Validation.ValidationRule[] => {
+	public buildRules = (): ValidationRuleWithMeta[] => {
 		if (this.conditions.length === 0) {
-			return this.branchRules
+			return this.branchRules.map(it => ({ ...it, noOptional: this._noOptional }))
 		}
 		return this.branchRules.map(rule => ({
 			validator: rules.conditional(
@@ -66,18 +71,18 @@ class RuleBranch {
 				rule.validator,
 			),
 			message: rule.message,
+			noOptional: this._noOptional,
 		}))
 	}
 
 	public assert = (validator: Validation.Validator, message: MessageOrString): RuleBranch & PropertyDecorator => {
 		const messageParsed: Validation.Message = typeof message === 'string' ? { text: message } : message
 		const newRules = [...this.branchRules, { validator, message: messageParsed }]
-		const branch = new RuleBranch(this.conditions, newRules)
+		const branch = new RuleBranch(this.conditions, newRules, this._noOptional)
 		const propertyDecorator: PropertyDecorator = (target: any, propertykey: string | symbol) => {
 			addRuleToMetadata(target, propertykey, ...branch.buildRules())
 		}
-		const result = Object.assign(propertyDecorator, branch)
-		return result
+		return Object.assign(propertyDecorator, branch)
 	}
 
 	assertPattern = (pattern: RegExp, message: MessageOrString) => {
@@ -86,6 +91,14 @@ class RuleBranch {
 
 	assertMinLength = (minLength: number, message: MessageOrString) => {
 		return this.assert(rules.minLength(minLength), message)
+	}
+
+	public noOptional = (): RuleBranch & PropertyDecorator => {
+		const branch = new RuleBranch(this.conditions, this.branchRules, true)
+		const propertyDecorator: PropertyDecorator = (target: any, propertykey: string | symbol) => {
+			addRuleToMetadata(target, propertykey, ...branch.buildRules())
+		}
+		return Object.assign(propertyDecorator, branch)
 	}
 }
 
@@ -109,6 +122,11 @@ const patternOperation = (pattern: RegExp): Validation.Validator => ({
 
 const lengthRangeOperation = (min: number | null, max: number | null): Validation.Validator => ({
 	operation: 'lengthRange',
+	args: [ArgumentFactory.literal(min), ArgumentFactory.literal(max)],
+})
+
+const rangeOperation = (min: number | null, max: number | null): Validation.Validator => ({
+	operation: 'range',
 	args: [ArgumentFactory.literal(min), ArgumentFactory.literal(max)],
 })
 
@@ -153,6 +171,9 @@ export const rules = {
 	lengthRange: lengthRangeOperation,
 	minLength: (min: number) => lengthRangeOperation(min, null),
 	maxLength: (max: number) => lengthRangeOperation(null, max),
+	range: rangeOperation,
+	min: (min: number) => rangeOperation(min, null),
+	max: (max: number) => rangeOperation(null, max),
 	equals: equalsOperation,
 	not: notOperation,
 	['empty']: emptyOperation,
@@ -182,11 +203,16 @@ export function optional(): PropertyDecorator {
 }
 
 export function required(message: MessageOrString): PropertyDecorator {
-	return combine(requiredOrOptional(true), assert(rules.notEmpty(), message))
+	return combine(requiredOrOptional(true), assert(rules.defined(), message))
 }
 
 export function requiredWhen(condition: Validation.Validator, message: MessageOrString) {
-	return combine(requiredOrOptional(true), when(condition).assert(rules.notEmpty(), message))
+	return combine(
+		requiredOrOptional(false),
+		when(condition)
+			.assert(rules.defined(), message)
+			.noOptional(),
+	)
 }
 
 export const assertPattern = (pattern: RegExp, message: MessageOrString) => fluent().assertPattern(pattern, message)
@@ -202,21 +228,36 @@ export function parseDefinition(
 		.filter((it): it is [string, { new (): any }] => !(it[1] instanceof SchemaDefinition.EnumDefinition))
 		.map(([name, definition]) => {
 			const target = definition.prototype
-			const fields = Object.keys(new definition())
+			const defInstance = new definition()
+			const fields = Object.keys(defInstance)
 			return tuple(
 				name,
 				fields
 					.map(field => {
-						const required: boolean | undefined = Reflect.getMetadata(RequiredMetaKey, target, field)
-						const fieldRules: Validation.ValidationRule[] | undefined = Reflect.getMetadata(RuleMetaKey, target, field)
+						let required: boolean | undefined = Reflect.getMetadata(RequiredMetaKey, target, field)
+						const fieldRules: ValidationRuleWithMeta[] | undefined = Reflect.getMetadata(RuleMetaKey, target, field)
 						if (fieldRules === undefined) {
 							return tuple(field, [])
+						}
+						const isNotNull = 'nullable' in defInstance[field] ? !defInstance[field].nullable : undefined
+						if (required === undefined) {
+							required = isNotNull
+						}
+						if (isNotNull && !required) {
+							throw new Error(`${name}::${field}: Cannot make not-null field optional`)
 						}
 						if (required === undefined) {
 							throw new Error(`${name}::${field}: You have to specify whether the field is optional or required`)
 						}
 						const finalRules = !required
-							? fieldRules.map(rule => ({ ...rule, validator: rules.conditional(rules.notEmpty(), rule.validator) }))
+							? fieldRules.map(({ message, validator, noOptional }) =>
+									noOptional
+										? { message, validator }
+										: {
+												message,
+												validator: rules.conditional(rules.defined(), validator),
+										  },
+							  )
 							: fieldRules
 						return tuple(field, finalRules)
 					})

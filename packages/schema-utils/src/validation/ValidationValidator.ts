@@ -95,7 +95,7 @@ export class ValidationValidator {
 			return undefined
 		}
 
-		const validValidator = this.validateValidator(errorBuilder.for('validator'), rule.validator, entity)
+		const validValidator = this.validateValidator(errorBuilder.for('validator'), rule.validator, entity, field)
 		if (!validValidator) {
 			return undefined
 		}
@@ -127,6 +127,7 @@ export class ValidationValidator {
 		errorBuilder: ErrorBuilder,
 		validator: unknown,
 		entity: Model.Entity,
+		field: Model.AnyField,
 	): Validation.Validator | undefined {
 		if (!isObject(validator)) {
 			errorBuilder.add('Must be an object')
@@ -136,17 +137,17 @@ export class ValidationValidator {
 		switch (validatorCast.operation) {
 			case 'and':
 				const andArgs = validatorCast.args
-					.map((it, index) => this.validateValidatorArgument(errorBuilder.for(String(index)), it, entity))
+					.map((it, index) => this.validateValidatorArgument(errorBuilder.for(String(index)), it, entity, field))
 					.filter((it): it is Validation.ValidatorArgument => it !== undefined)
 				return { operation: 'and' as const, args: andArgs }
 			case 'or':
 				const orArgs = validatorCast.args
-					.map((it, index) => this.validateValidatorArgument(errorBuilder.for(String(index)), it, entity))
+					.map((it, index) => this.validateValidatorArgument(errorBuilder.for(String(index)), it, entity, field))
 					.filter((it): it is Validation.ValidatorArgument => it !== undefined)
 				return { operation: 'or' as const, args: orArgs }
 			case 'conditional':
-				const argA = this.validateValidatorArgument(errorBuilder.for('condition'), validatorCast.args[0], entity)
-				const argB = this.validateValidatorArgument(errorBuilder.for('rule'), validatorCast.args[1], entity)
+				const argA = this.validateValidatorArgument(errorBuilder.for('condition'), validatorCast.args[0], entity, field)
+				const argB = this.validateValidatorArgument(errorBuilder.for('rule'), validatorCast.args[1], entity, field)
 				if (argA === undefined || argB === undefined) {
 					return undefined
 				}
@@ -177,6 +178,16 @@ export class ValidationValidator {
 					operation: 'lengthRange',
 					args: [lengthArgA as Validation.LiteralArgument<number>, lengthArgB as Validation.LiteralArgument<number>],
 				}
+			case 'range':
+				const rangeArgA = this.validateLiteralArgument(errorBuilder.for('min'), validatorCast.args[0])
+				const rangeArgB = this.validateLiteralArgument(errorBuilder.for('max'), validatorCast.args[1])
+				if (lengthArgA === undefined || lengthArgB === undefined) {
+					return undefined
+				}
+				return {
+					operation: 'range',
+					args: [rangeArgA as Validation.LiteralArgument<number>, rangeArgB as Validation.LiteralArgument<number>],
+				}
 			case 'equals':
 				const eqArg = this.validateLiteralArgument(errorBuilder, validatorCast.args[0])
 				if (eqArg === undefined) {
@@ -187,7 +198,7 @@ export class ValidationValidator {
 					args: [eqArg],
 				}
 			case 'not':
-				const notArg = this.validateValidatorArgument(errorBuilder, validatorCast.args[0], entity)
+				const notArg = this.validateValidatorArgument(errorBuilder, validatorCast.args[0], entity, field)
 				if (notArg === undefined) {
 					return undefined
 				}
@@ -199,31 +210,47 @@ export class ValidationValidator {
 			case 'defined':
 				return { operation: 'defined', args: [] }
 			case 'inContext':
-				const pathArg = this.validatePathArgument(errorBuilder.for('path'), validatorCast.args[0], entity)
+				const pathArgResult = this.validatePathArgument(errorBuilder.for('path'), validatorCast.args[0], entity)
+				if (pathArgResult === undefined) {
+					return undefined
+				}
+				const [pathArg, inField] = pathArgResult
+
 				const inValidatorArg = this.validateValidatorArgument(
 					errorBuilder.for('validator'),
 					validatorCast.args[1],
 					entity,
+					inField,
 				)
-				if (pathArg === undefined || inValidatorArg === undefined) {
+				if (inValidatorArg === undefined) {
 					return undefined
 				}
 				return { operation: 'inContext', args: [pathArg, inValidatorArg] }
 			case 'every':
-				const everyArg = this.validateValidatorArgument(errorBuilder, validatorCast.args[0], entity)
+				const everyArg = this.validateValidatorArgument(errorBuilder, validatorCast.args[0], entity, field)
 				if (everyArg === undefined) {
 					return undefined
 				}
 				return { operation: 'every', args: [everyArg] }
 			case 'any':
-				const anyArg = this.validateValidatorArgument(errorBuilder, validatorCast.args[0], entity)
+				const anyArg = this.validateValidatorArgument(errorBuilder, validatorCast.args[0], entity, field)
 				if (anyArg === undefined) {
 					return undefined
 				}
 				return { operation: 'any', args: [anyArg] }
 			case 'filter':
-				const filterArgA = this.validateValidatorArgument(errorBuilder.for('filter'), validatorCast.args[0], entity)
-				const filterArgB = this.validateValidatorArgument(errorBuilder.for('validator'), validatorCast.args[1], entity)
+				const filterArgA = this.validateValidatorArgument(
+					errorBuilder.for('filter'),
+					validatorCast.args[0],
+					entity,
+					field,
+				)
+				const filterArgB = this.validateValidatorArgument(
+					errorBuilder.for('validator'),
+					validatorCast.args[1],
+					entity,
+					field,
+				)
 				if (filterArgA === undefined || filterArgB === undefined) {
 					return undefined
 				}
@@ -240,6 +267,7 @@ export class ValidationValidator {
 		errorBuilder: ErrorBuilder,
 		argument: unknown,
 		entity: Model.Entity,
+		field: Model.AnyField,
 	): Validation.ValidatorArgument | undefined {
 		if (!isObject(argument)) {
 			errorBuilder.add('Must be an object')
@@ -249,7 +277,7 @@ export class ValidationValidator {
 			errorBuilder.for('type').add(`Invalid value ${argument.type}`)
 			return undefined
 		}
-		const validator = this.validateValidator(errorBuilder.for('validator'), argument.validator, entity)
+		const validator = this.validateValidator(errorBuilder.for('validator'), argument.validator, entity, field)
 		if (!validator) {
 			return undefined
 		}
@@ -279,7 +307,7 @@ export class ValidationValidator {
 		errorBuilder: ErrorBuilder,
 		argument: unknown,
 		entity: Model.Entity,
-	): Validation.PathArgument | undefined {
+	): [Validation.PathArgument, Model.AnyField] | undefined {
 		if (!isObject(argument)) {
 			errorBuilder.add('Must be an object')
 			return undefined
@@ -304,6 +332,6 @@ export class ValidationValidator {
 			errorBuilder.add('Rules depending on relations are currently not supported.')
 			return undefined
 		}
-		return { type: argument.type, path: argument.path }
+		return [{ type: argument.type, path: argument.path }, entity.fields[argument.path[0]]]
 	}
 }

@@ -119,7 +119,7 @@ export abstract class Entity {
 	[key: string]: Interface<FieldDefinition<any>> | undefined
 }
 
-type ModelDefinition<M> = {
+export type ModelDefinition<M> = {
 	[K in keyof M]:
 		| EnumDefinition
 		| EntityConstructor<EntityType<M[K] extends { new (): any } ? InstanceType<M[K]> : never>>

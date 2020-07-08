@@ -42,8 +42,7 @@ export class InputPreValidator {
 	) {}
 
 	async validateCreate({ entity, data, path, mapper, overRelation }: CreateValidationArgs): Promise<ValidationResult> {
-		const simpleRules = this.entityRulesResolver.getSimpleRules(entity.name)
-		const fieldsWithRules = Object.keys(simpleRules).filter(field => simpleRules[field].length > 0)
+		const rules = this.entityRulesResolver.getSimpleRules(entity.name)
 
 		const dataWithRelation = overRelation
 			? {
@@ -53,7 +52,7 @@ export class InputPreValidator {
 			: data
 		const context = this.createContextForCreate(entity, dataWithRelation)
 
-		const fieldsResult = this.validateFields(fieldsWithRules, simpleRules, context, path)
+		const fieldsResult = this.validateFields(rules, context, path)
 
 		const processor = new CreateInputPreValidationProcessor(this, path, mapper)
 		const visitor = new CreateInputVisitor(processor, this.model, data)
@@ -64,11 +63,11 @@ export class InputPreValidator {
 
 	async validateUpdate({ entity, data, path, mapper, where }: UpdateValidationArgs): Promise<ValidationResult> {
 		const simpleRules = this.entityRulesResolver.getSimpleRules(entity.name)
-		const fieldsWithRules = Object.keys(data).filter(field => simpleRules[field] && simpleRules[field].length > 0)
-		const dependencies = this.buildDependencies(fieldsWithRules, simpleRules)
+		const rules = this.getApplicableRules(Object.keys(data), simpleRules)
+		const dependencies = this.buildDependencies(rules)
 
 		const context = await this.createContextForUpdate(mapper, entity, where, data, dependencies)
-		const fieldsResult: ValidationResult = this.validateFields(fieldsWithRules, simpleRules, context, path)
+		const fieldsResult: ValidationResult = this.validateFields(rules, context, path)
 
 		const processor = new UpdateInputPreValidationProcessor(this, path, mapper)
 		const visitor = new UpdateInputVisitor(processor, this.model, data)
@@ -133,14 +132,8 @@ export class InputPreValidator {
 		return ValidationContext.createRootContext({ ...(inputNodeData as Value.Object), ...(dbData || {}) })
 	}
 
-	private validateFields(
-		fields: string[],
-		entityRules: Validation.EntityRules,
-		context: ValidationContext.NodeContext,
-		path: ValidationPath,
-	) {
-		return fields
-			.map(field => tuple(field, entityRules[field]))
+	private validateFields(rules: Validation.EntityRules, context: ValidationContext.NodeContext, path: ValidationPath) {
+		return Object.entries(rules)
 			.map(([field, fieldRules]) =>
 				tuple(
 					field,
@@ -163,12 +156,30 @@ export class InputPreValidator {
 			.reduce<FieldValidationResult[]>((res, it) => [...res, ...(Array.isArray(it) ? it : [it])], [])
 	}
 
-	private buildDependencies(fields: string[], entityRules: Validation.EntityRules): DependencyCollector.Dependencies {
-		return fields
-			.map(it => entityRules[it] || [])
-			.reduce((acc, val) => [...acc, ...val], [])
+	private getApplicableRules(changedFields: string[], entityRules: Validation.EntityRules): Validation.EntityRules {
+		return Object.fromEntries(
+			Object.entries(entityRules)
+				.map(([field, fieldRules]) => {
+					return tuple(
+						field,
+						changedFields.includes(field)
+							? fieldRules
+							: fieldRules.filter(rule =>
+									Object.keys(DependencyCollector.collect(rule.validator)).find(it => changedFields.includes(it)),
+							  ),
+					)
+				})
+				.filter(([, it]) => it.length > 0),
+		)
+	}
+
+	private buildDependencies(rules: Validation.EntityRules): DependencyCollector.Dependencies {
+		const baseFieldsAsDeps = Object.keys(rules).reduce((acc, field) => ({ ...acc, [field]: {} }), {})
+
+		return Object.values(rules)
+			.flatMap(it => it)
 			.map(it => DependencyCollector.collect(it.validator))
-			.concat(fields.reduce((acc, field) => (entityRules[field] ? { ...acc, [field]: {} } : acc), {}))
-			.reduce((acc, dependency) => DependencyMerger.merge(acc, dependency), {})
+			.concat(baseFieldsAsDeps)
+			.reduce((acc, dependecy) => DependencyMerger.merge(acc, dependecy), {})
 	}
 }

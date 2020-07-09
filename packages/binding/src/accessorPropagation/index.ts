@@ -1,3 +1,4 @@
+// export * from './AddTreeRootListenerContext' // Deliberately not exporting it
 // export * from './EntityKeyContext' // Deliberately not exporting it
 // export * from './GetEntityByKeyContext' // Deliberately not exporting it
 // export * from './GetSubTreeContext' // Deliberately not exporting it

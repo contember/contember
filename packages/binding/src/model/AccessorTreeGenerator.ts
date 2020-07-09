@@ -75,6 +75,16 @@ export class AccessorTreeGenerator {
 
 	private currentErrors: ErrorsPreprocessor.ErrorTreeRoot | undefined
 
+	private treeRootListeners: {
+		eventListeners: {
+			beforePersist: Set<TreeRootAccessor.BeforePersistListener> | undefined
+		}
+	} = {
+		eventListeners: {
+			beforePersist: undefined,
+		},
+	}
+
 	private readonly getEntityByKey = (key: string) => {
 		const entity = this.entityStore.get(key)
 
@@ -92,6 +102,10 @@ export class AccessorTreeGenerator {
 		}
 		return subTreeState.getAccessor()
 	}) as GetSubTree
+
+	private readonly addTreeRootEventListener: TreeRootAccessor.AddTreeRootEventListener = this.getAddEventListener(
+		this.treeRootListeners,
+	)
 
 	private readonly getAllEntities = (accessorTreeGenerator => {
 		return function*(): Generator<EntityAccessor> {
@@ -593,6 +607,7 @@ export class AccessorTreeGenerator {
 	private updateTreeRoot() {
 		const treeRootAccessor = new TreeRootAccessor(
 			this.unpersistedChangesCount !== 0,
+			this.addTreeRootEventListener,
 			this.getEntityByKey,
 			this.getSubTree,
 			this.getAllEntities,

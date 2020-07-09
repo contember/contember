@@ -3,11 +3,13 @@
 // export * from './GetEntityByKeyContext' // Deliberately not exporting it
 // export * from './GetSubTreeContext' // Deliberately not exporting it
 export * from './AccessorProvider'
+export * from './AddTreeRootListenerProvider'
 export * from './EntityKeyProvider'
 export * from './EnvironmentContext'
 export * from './GetEntityByKeyProvider'
 export * from './GetSubTreeProvider'
 export * from './useAccessorUpdateSubscription'
+export * from './useAddTreeRootListener'
 export * from './useDesugaredRelativeEntityList'
 export * from './useDesugaredRelativeSingleEntity'
 export * from './useDesugaredRelativeSingleField'

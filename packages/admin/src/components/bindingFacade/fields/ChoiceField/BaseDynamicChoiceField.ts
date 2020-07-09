@@ -6,7 +6,7 @@ import {
 	QueryLanguage,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
-	useAccessorUpdateSubscription__UNSTABLE,
+	useAccessorUpdateSubscription,
 	useEnvironment,
 	useGetSubTree,
 } from '@contember/binding'
@@ -53,7 +53,7 @@ export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldLi
 		desugaredOptionPath,
 		getSubTree,
 	])
-	const subTreeData = useAccessorUpdateSubscription__UNSTABLE(getSubTreeData)
+	const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
 	return Array.from(subTreeData)
 }
 

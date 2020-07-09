@@ -1,7 +1,7 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import {
-	useAccessorUpdateSubscription__UNSTABLE,
+	useAccessorUpdateSubscription,
 	useEntityListSubTreeParameters,
 	useGetSubTree,
 } from '../accessorPropagation'
@@ -43,7 +43,7 @@ export const EntityListSubTree = Component(
 		const getSubTree = useGetSubTree()
 		const parameters = useEntityListSubTreeParameters(props)
 		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
-		const accessor = useAccessorUpdateSubscription__UNSTABLE(getAccessor)
+		const accessor = useAccessorUpdateSubscription(getAccessor)
 
 		return (
 			<EntityList {...props} accessor={accessor}>

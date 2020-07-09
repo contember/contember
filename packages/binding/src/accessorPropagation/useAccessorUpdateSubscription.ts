@@ -5,16 +5,16 @@ import { FieldValue } from '../treeParameters/primitives'
 /**
  * It is VERY IMPORTANT for the parameter to be referentially stable!
  */
-function useAccessorUpdateSubscription__UNSTABLE<
+function useAccessorUpdateSubscription<
 	Persisted extends FieldValue = FieldValue,
 	Produced extends Persisted = Persisted
 >(getFieldAccessor: () => FieldAccessor<Persisted, Produced>): FieldAccessor<Persisted, Produced>
-function useAccessorUpdateSubscription__UNSTABLE(getEntityAccessor: () => EntityAccessor): EntityAccessor
-function useAccessorUpdateSubscription__UNSTABLE(getAccessor: () => EntityListAccessor): EntityListAccessor
-function useAccessorUpdateSubscription__UNSTABLE(
+function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor): EntityAccessor
+function useAccessorUpdateSubscription(getAccessor: () => EntityListAccessor): EntityListAccessor
+function useAccessorUpdateSubscription(
 	getEntityListAccessor: () => EntityListAccessor | EntityAccessor,
 ): EntityListAccessor | EntityAccessor
-function useAccessorUpdateSubscription__UNSTABLE<
+function useAccessorUpdateSubscription<
 	A extends FieldAccessor<Persisted, Produced> | EntityListAccessor | EntityAccessor,
 	Persisted extends FieldValue = FieldValue,
 	Produced extends Persisted = Persisted
@@ -69,4 +69,4 @@ function useAccessorUpdateSubscription__UNSTABLE<
 
 	return accessor
 }
-export { useAccessorUpdateSubscription__UNSTABLE }
+export { useAccessorUpdateSubscription }

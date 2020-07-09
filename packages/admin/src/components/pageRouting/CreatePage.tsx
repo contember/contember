@@ -2,6 +2,7 @@ import {
 	DataBindingProvider,
 	PersistResultSuccessType,
 	SingleEntitySubTree,
+	SingleEntitySubTreeAdditionalProps,
 	SuccessfulPersistResult,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
@@ -11,7 +12,7 @@ import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntit
 import { PageProvider } from './PageProvider'
 import { useRedirect } from './useRedirect'
 
-export interface CreatePageProps extends SugaredUnconstrainedQualifiedSingleEntity {
+export interface CreatePageProps extends SugaredUnconstrainedQualifiedSingleEntity, SingleEntitySubTreeAdditionalProps {
 	pageName: string
 	children: React.ReactNode
 	redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState

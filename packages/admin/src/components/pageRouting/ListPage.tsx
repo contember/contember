@@ -1,9 +1,16 @@
-import { DataBindingProvider, EntityListSubTree, SugaredQualifiedEntityList } from '@contember/binding'
+import {
+	DataBindingProvider,
+	EntityListSubTree,
+	EntityListSubTreeAdditionalProps,
+	SugaredQualifiedEntityList,
+} from '@contember/binding'
 import * as React from 'react'
 import { FeedbackRenderer, ListRenderer, ListRendererProps } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 
-export interface ListPageProps<ContainerExtraProps, ItemExtraProps> extends SugaredQualifiedEntityList {
+export interface ListPageProps<ContainerExtraProps, ItemExtraProps>
+	extends SugaredQualifiedEntityList,
+		EntityListSubTreeAdditionalProps {
 	pageName: string
 	children?: React.ReactNode
 	rendererProps?: Omit<ListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>

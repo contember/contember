@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { GetEntityByKeyProvider, GetSubTreeProvider } from '../accessorPropagation'
+import { AddTreeRootListenerProvider, GetEntityByKeyProvider, GetSubTreeProvider } from '../accessorPropagation'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { DirtinessContext } from './DirtinessContext'
 import { MutationStateContext } from './MutationStateContext'
@@ -18,9 +18,11 @@ export function AccessorTree({ state, children }: AccessorTreeProps) {
 			<TriggerPersistContext.Provider value={state.triggerPersist}>
 				<DirtinessContext.Provider value={state.data.hasUnpersistedChanges}>
 					<MutationStateContext.Provider value={state.name === AccessorTreeStateName.Mutating}>
-						<GetSubTreeProvider getSubTree={state.data.getSubTree}>
-							<GetEntityByKeyProvider getEntityByKey={state.data.getEntityByKey}>{children}</GetEntityByKeyProvider>
-						</GetSubTreeProvider>
+						<AddTreeRootListenerProvider addTreeRootListener={state.data.addEventListener}>
+							<GetSubTreeProvider getSubTree={state.data.getSubTree}>
+								<GetEntityByKeyProvider getEntityByKey={state.data.getEntityByKey}>{children}</GetEntityByKeyProvider>
+							</GetSubTreeProvider>
+						</AddTreeRootListenerProvider>
 					</MutationStateContext.Provider>
 				</DirtinessContext.Provider>
 			</TriggerPersistContext.Provider>
@@ -30,9 +32,11 @@ export function AccessorTree({ state, children }: AccessorTreeProps) {
 		<TriggerPersistContext.Provider value={undefined}>
 			<DirtinessContext.Provider value={false}>
 				<MutationStateContext.Provider value={false}>
-					<GetSubTreeProvider getSubTree={undefined}>
-						<GetEntityByKeyProvider getEntityByKey={undefined}>{children}</GetEntityByKeyProvider>
-					</GetSubTreeProvider>
+					<AddTreeRootListenerProvider addTreeRootListener={undefined}>
+						<GetSubTreeProvider getSubTree={undefined}>
+							<GetEntityByKeyProvider getEntityByKey={undefined}>{children}</GetEntityByKeyProvider>
+						</GetSubTreeProvider>
+					</AddTreeRootListenerProvider>
 				</MutationStateContext.Provider>
 			</DirtinessContext.Provider>
 		</TriggerPersistContext.Provider>

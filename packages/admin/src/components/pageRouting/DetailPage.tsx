@@ -1,9 +1,14 @@
-import { DataBindingProvider, SingleEntitySubTree, SugaredQualifiedSingleEntity } from '@contember/binding'
+import {
+	DataBindingProvider,
+	SingleEntitySubTree,
+	SingleEntitySubTreeAdditionalProps,
+	SugaredQualifiedSingleEntity,
+} from '@contember/binding'
 import * as React from 'react'
 import { FeedbackRenderer, ImmutableContentLayoutRendererProps, ImmutableSingleEntityRenderer } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 
-export interface DetailPageProps extends SugaredQualifiedSingleEntity {
+export interface DetailPageProps extends SugaredQualifiedSingleEntity, SingleEntitySubTreeAdditionalProps {
 	pageName: string
 	children: React.ReactNode
 	rendererProps?: Omit<ImmutableContentLayoutRendererProps, 'accessor'>

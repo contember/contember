@@ -75,6 +75,16 @@ export class AccessorTreeGenerator {
 
 	private currentErrors: ErrorsPreprocessor.ErrorTreeRoot | undefined
 
+	private treeRootListeners: {
+		eventListeners: {
+			beforePersist: Set<TreeRootAccessor.BeforePersistListener> | undefined
+		}
+	} = {
+		eventListeners: {
+			beforePersist: undefined,
+		},
+	}
+
 	private readonly getEntityByKey = (key: string) => {
 		const entity = this.entityStore.get(key)
 
@@ -92,6 +102,20 @@ export class AccessorTreeGenerator {
 		}
 		return subTreeState.getAccessor()
 	}) as GetSubTree
+
+	private readonly getNewTreeRootInstance = () =>
+		new TreeRootAccessor(
+			this.unpersistedChangesCount !== 0,
+			this.addTreeRootEventListener,
+			this.getEntityByKey,
+			this.getSubTree,
+			this.getAllEntities,
+			this.getAllTypeNames,
+		)
+
+	private readonly addTreeRootEventListener: TreeRootAccessor.AddTreeRootEventListener = this.getAddEventListener(
+		this.treeRootListeners,
+	)
 
 	private readonly getAllEntities = (accessorTreeGenerator => {
 		return function*(): Generator<EntityAccessor> {
@@ -141,11 +165,24 @@ export class AccessorTreeGenerator {
 		if (this.unpersistedChangesCount === 0) {
 			return undefined
 		}
+		const beforePersistListeners = this.treeRootListeners.eventListeners.beforePersist
+		let hasBeforePersist = false
+
+		if (beforePersistListeners !== undefined && beforePersistListeners.size) {
+			hasBeforePersist = true
+
+			this.treeWideBatchUpdateDepth++
+			for (const listener of beforePersistListeners) {
+				listener(this.getNewTreeRootInstance)
+			}
+			this.treeWideBatchUpdateDepth--
+		}
+
 		const generator = new MutationGenerator(this.markerTree, this.subTreeStates, this.entityStore)
 
 		const mutation = generator.getPersistMutation()
 
-		if (mutation === undefined) {
+		if (hasBeforePersist || mutation === undefined) {
 			// TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
 			this.unpersistedChangesCount = 0
 			Promise.resolve().then(() => {
@@ -591,15 +628,7 @@ export class AccessorTreeGenerator {
 	}
 
 	private updateTreeRoot() {
-		const treeRootAccessor = new TreeRootAccessor(
-			this.unpersistedChangesCount !== 0,
-			this.getEntityByKey,
-			this.getSubTree,
-			this.getAllEntities,
-			this.getAllTypeNames,
-		)
-
-		this.updateData?.(treeRootAccessor)
+		this.updateData?.(this.getNewTreeRootInstance())
 	}
 
 	private initializeSubTree(

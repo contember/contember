@@ -5,7 +5,7 @@ import {
 	QueryLanguage,
 	RelativeSingleEntity,
 	SugaredRelativeSingleEntity,
-	useAccessorUpdateSubscription__UNSTABLE,
+	useAccessorUpdateSubscription,
 	useEntityKey,
 	useEnvironment,
 	useGetEntityByKey,
@@ -48,7 +48,7 @@ export const useDynamicSingleChoiceField = (
 			  })
 			: parentEntity
 	}, [entityKey, desugaredRelativePath, getEntityByKey])
-	const currentValueParent = useAccessorUpdateSubscription__UNSTABLE(getCurrentValueParent)
+	const currentValueParent = useAccessorUpdateSubscription(getCurrentValueParent)
 	const currentValueEntity = currentValueParent.getRelativeSingleEntity({
 		hasOneRelationPath: [lastHasOneRelation],
 	})

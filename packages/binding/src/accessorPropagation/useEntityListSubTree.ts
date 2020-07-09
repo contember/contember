@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BindingError } from '../BindingError'
 import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
-import { useAccessorUpdateSubscription__UNSTABLE } from './useAccessorUpdateSubscription__UNSTABLE'
+import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useEntityListSubTreeParameters } from './useEntityListSubTreeParameters'
 import { useGetSubTree } from './useGetSubTree'
 
@@ -17,7 +17,7 @@ export const useEntityListSubTree = (qualifiedEntityList: UseEntityListSubTreePr
 	const getSubTree = useGetSubTree()
 	const parameters = useEntityListSubTreeParameters(qualifiedEntityList)
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
-	const accessor = useAccessorUpdateSubscription__UNSTABLE(getAccessor)
+	const accessor = useAccessorUpdateSubscription(getAccessor)
 
 	if (parameters.value.hasOneRelationPath.length) {
 		throw new BindingError(`useEntityListSubTree: cannot use hasOneRelationPath!`)

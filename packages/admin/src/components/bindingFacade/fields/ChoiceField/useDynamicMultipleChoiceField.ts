@@ -3,7 +3,7 @@ import {
 	QueryLanguage,
 	RelativeEntityList,
 	SugaredRelativeEntityList,
-	useAccessorUpdateSubscription__UNSTABLE,
+	useAccessorUpdateSubscription,
 	useEntityKey,
 	useEnvironment,
 	useGetEntityByKey,
@@ -41,7 +41,7 @@ export const useDynamicMultipleChoiceField = (
 		return parentEntity.getRelativeEntityList(desugaredRelativePath as RelativeEntityList)
 	}, [entityKey, desugaredRelativePath, getEntityByKey])
 
-	const currentValueEntity = useAccessorUpdateSubscription__UNSTABLE(getCurrentValueEntity)
+	const currentValueEntity = useAccessorUpdateSubscription(getCurrentValueEntity)
 	const currentlyChosenEntities = Array.from(currentValueEntity)
 
 	//

@@ -1,6 +1,6 @@
 {
 	"name": "@contember/database-tester",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"license": "Apache-2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
@@ -8,6 +8,6 @@
 		"typescript": "^3.9.5"
 	},
 	"dependencies": {
-		"@contember/database": "^0.8.0"
+		"@contember/database": "^0.8.1"
 	}
 }

@@ -1,14 +1,14 @@
 {
 	"name": "@contember/engine-plugins",
 	"license": "Apache-2.0",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"main": "dist/src/index.js",
 	"scripts": {},
 	"typings": "dist/src/index.d.ts",
 	"dependencies": {
-		"@contember/dic": "^0.8.0",
-		"@contember/engine-common": "^0.8.0",
-		"@contember/schema": "^0.8.0"
+		"@contember/dic": "^0.8.1",
+		"@contember/engine-common": "^0.8.1",
+		"@contember/schema": "^0.8.1"
 	},
 	"peerDependencies": {
 		"graphql": "14.6.0"

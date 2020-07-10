@@ -88,10 +88,7 @@ const loadMigrations = async (db: DBConnection, options: RunnerOption) => {
 }
 
 const lock = async (db: DBConnection): Promise<void> => {
-	const [result] = await db.select(`select pg_try_advisory_lock(${PG_MIGRATE_LOCK_ID}) as "lockObtained"`)
-	if (!result.lockObtained) {
-		throw new Error('Another migration is already running')
-	}
+	await db.select(`select pg_advisory_lock(${PG_MIGRATE_LOCK_ID})`)
 }
 
 const unlock = async (db: DBConnection): Promise<void> => {

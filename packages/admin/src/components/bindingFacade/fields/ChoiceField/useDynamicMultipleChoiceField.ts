@@ -62,6 +62,13 @@ export const useDynamicMultipleChoiceField = (
 		currentValues,
 		data: normalizedOptions,
 		errors: currentValueEntity.errors,
+		clear: () => {
+			currentValueEntity.batchUpdates(getListAccessor => {
+				for (const currentKey of currentValues) {
+					getListAccessor().disconnectEntity?.(optionEntities[currentKey])
+				}
+			})
+		},
 		onChange: (optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
 			if (currentValueEntity instanceof EntityListAccessor) {
 				if (isChosen) {

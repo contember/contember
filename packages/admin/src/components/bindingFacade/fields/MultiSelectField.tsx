@@ -24,7 +24,7 @@ export const MultiSelectField = Component<MultiSelectFieldProps>(
 				clear,
 			}: ChoiceFieldData.MultipleChoiceFieldMetadata) => (
 				<MultiSelectFieldInner
-					label={props.label}
+					{...props}
 					data={data}
 					currentValues={currentValues}
 					onChange={onChange}
@@ -40,7 +40,6 @@ export const MultiSelectField = Component<MultiSelectFieldProps>(
 )
 
 export interface MultiSelectFieldInnerPublicProps extends Omit<FormGroupProps, 'children'> {
-	//firstOptionCaption?: string
 	placeholder?: string
 	reactSelectProps?: Partial<SelectProps<any>>
 }
@@ -61,6 +60,7 @@ const MultiSelectFieldInner = React.memo(
 		onChange,
 		clear,
 		reactSelectProps,
+		placeholder,
 		...formGroupProps
 	}: MultiSelectFieldInnerProps) => {
 		const fuse = React.useMemo(
@@ -82,6 +82,7 @@ const MultiSelectFieldInner = React.memo(
 							zIndex: 99,
 						}),
 					}}
+					placeholder={placeholder}
 					{...reactSelectProps}
 					loadOptions={(inputValue, callback) => {
 						const result = fuse.search(inputValue)
@@ -173,10 +174,7 @@ const VirtualizedMenuList = React.memo(function VirtualizedMenuList(
 			outerRef={innerRef}
 		>
 			{({ index, style }) => (
-				<div
-					className="option-wrapper"
-					style={{ ...style, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}
-				>
+				<div style={{ ...style, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
 					{children[index]}
 				</div>
 			)}

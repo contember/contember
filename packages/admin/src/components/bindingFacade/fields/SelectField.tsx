@@ -20,9 +20,7 @@ export const SelectField = Component<SelectFieldProps>(
 				isMutating,
 			}: ChoiceFieldData.SingleChoiceFieldMetadata) => (
 				<SelectFieldInner
-					label={props.label}
-					allowNull={props.allowNull}
-					firstOptionCaption={props.firstOptionCaption}
+					{...props}
 					data={data}
 					currentValue={currentValue}
 					onChange={onChange}

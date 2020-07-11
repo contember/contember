@@ -40,6 +40,7 @@ export namespace ChoiceFieldData {
 
 	export interface MultipleChoiceFieldMetadata extends BaseChoiceMetadata {
 		currentValues: ValueRepresentation[]
+		clear: () => void
 		onChange: (optionKey: ValueRepresentation, isChosen: boolean) => void
 	}
 

@@ -10,21 +10,24 @@ export type CheckboxListProps = Omit<FormGroupProps, 'children'> &
 export const CheckboxList = Component<CheckboxListProps>(
 	props => (
 		<ChoiceField {...(props as any)} arity="multiple">
-			{({ data, currentValues, onChange, isMutating }: ChoiceFieldData.MultipleChoiceFieldMetadata) => (
+			{({ data, currentValues, onChange, isMutating }: ChoiceFieldData.MultipleChoiceFieldMetadata) => {
 				// TODO this formGroup should be a fieldset
-				<FormGroup {...props}>
-					{data.map(({ key, label }) => (
-						<Checkbox
-							key={key}
-							checked={(currentValues || []).indexOf(key) !== -1}
-							readOnly={isMutating}
-							onChange={isChecked => onChange(key, isChecked)}
-						>
-							{label}
-						</Checkbox>
-					))}
-				</FormGroup>
-			)}
+				const currentValueSet = new Set(currentValues)
+				return (
+					<FormGroup {...props}>
+						{data.map(({ key, label }) => (
+							<Checkbox
+								key={key}
+								checked={currentValueSet.has(key)}
+								readOnly={isMutating}
+								onChange={isChecked => onChange(key, isChecked)}
+							>
+								{label}
+							</Checkbox>
+						))}
+					</FormGroup>
+				)
+			}}
 		</ChoiceField>
 	),
 	'CheckboxList',

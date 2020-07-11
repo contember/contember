@@ -56,27 +56,34 @@ export const useDynamicMultipleChoiceField = (
 		'renderOptionText' in props && props.renderOptionText ? props.renderOptionText : undefined,
 	)
 
+	const { batchUpdates, connectEntity, disconnectEntity } = currentValueEntity
+
+	const clear = React.useCallback(() => {
+		batchUpdates(getListAccessor => {
+			for (const child of getListAccessor()) {
+				getListAccessor().disconnectEntity?.(child)
+			}
+		})
+	}, [batchUpdates])
+
+	const onChange = React.useCallback(
+		(optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
+			if (isChosen) {
+				connectEntity?.(optionEntities[optionKey])
+			} else {
+				disconnectEntity?.(optionEntities[optionKey])
+			}
+		},
+		[optionEntities, connectEntity, disconnectEntity],
+	)
+
 	return {
 		isMutating,
 		environment,
 		currentValues,
 		data: normalizedOptions,
 		errors: currentValueEntity.errors,
-		clear: () => {
-			currentValueEntity.batchUpdates(getListAccessor => {
-				for (const currentKey of currentValues) {
-					getListAccessor().disconnectEntity?.(optionEntities[currentKey])
-				}
-			})
-		},
-		onChange: (optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
-			if (currentValueEntity instanceof EntityListAccessor) {
-				if (isChosen) {
-					currentValueEntity.connectEntity?.(optionEntities[optionKey])
-				} else {
-					currentValueEntity.disconnectEntity?.(optionEntities[optionKey])
-				}
-			}
-		},
+		clear,
+		onChange,
 	}
 }

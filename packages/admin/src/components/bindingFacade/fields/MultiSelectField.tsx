@@ -1,7 +1,10 @@
-import { Component, ErrorAccessor } from '@contember/binding'
+import { Component, ErrorAccessor, FieldValue } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
+import Fuse from 'fuse.js'
 import * as React from 'react'
-import Select, { Props as SelectProps } from 'react-select'
+import { MenuListComponentProps, Props as SelectProps } from 'react-select'
+import AsyncSelect from 'react-select/async'
+import { FixedSizeList } from 'react-window'
 
 import { ChoiceField, ChoiceFieldData, DynamicMultipleChoiceFieldProps, StaticChoiceFieldProps } from './ChoiceField'
 
@@ -21,7 +24,7 @@ export const MultiSelectField = Component<MultiSelectFieldProps>(
 				clear,
 			}: ChoiceFieldData.MultipleChoiceFieldMetadata) => (
 				<MultiSelectFieldInner
-					label={props.label}
+					{...props}
 					data={data}
 					currentValues={currentValues}
 					onChange={onChange}
@@ -37,7 +40,7 @@ export const MultiSelectField = Component<MultiSelectFieldProps>(
 )
 
 export interface MultiSelectFieldInnerPublicProps extends Omit<FormGroupProps, 'children'> {
-	//firstOptionCaption?: string
+	placeholder?: string
 	reactSelectProps?: Partial<SelectProps<any>>
 }
 
@@ -57,11 +60,19 @@ const MultiSelectFieldInner = React.memo(
 		onChange,
 		clear,
 		reactSelectProps,
+		placeholder,
 		...formGroupProps
 	}: MultiSelectFieldInnerProps) => {
+		const fuse = React.useMemo(
+			() =>
+				new Fuse(data, {
+					keys: ['label'],
+				}),
+			[data],
+		)
 		return (
 			<FormGroup {...formGroupProps} label={environment.applySystemMiddleware('labelMiddleware', formGroupProps.label)}>
-				<Select
+				<AsyncSelect
 					isMulti
 					isClearable
 					closeMenuOnSelect={false}
@@ -71,8 +82,20 @@ const MultiSelectFieldInner = React.memo(
 							zIndex: 99,
 						}),
 					}}
+					placeholder={placeholder}
 					{...reactSelectProps}
-					options={data}
+					loadOptions={(inputValue, callback) => {
+						const result = fuse.search(inputValue)
+						callback(result.map(item => item.item))
+					}}
+					defaultOptions={data}
+					components={
+						data.length > 100
+							? {
+									MenuList: VirtualizedMenuList,
+							  }
+							: {}
+					}
 					getOptionValue={datum => datum.key.toFixed()}
 					value={Array.from(currentValues, key => data[key])}
 					onChange={(newValues, actionMeta) => {
@@ -111,3 +134,50 @@ const MultiSelectFieldInner = React.memo(
 		)
 	},
 )
+
+const VirtualizedMenuList = React.memo(function VirtualizedMenuList(
+	props: MenuListComponentProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>>,
+) {
+	const { children, maxHeight, innerRef } = props
+	const height = 40
+	const list = React.useRef<FixedSizeList>(null)
+
+	// This is taken from react-windowed-select
+	const currentIndex = React.useMemo(() => {
+		if (!Array.isArray(children)) {
+			return 0
+		}
+		return Math.max(
+			children.findIndex(child => (child as React.ReactElement).props.isFocused === true),
+			0,
+		)
+	}, [children])
+
+	React.useEffect(() => {
+		if (currentIndex >= 0 && list.current !== null) {
+			list.current.scrollToItem(currentIndex)
+		}
+	}, [currentIndex, children, list])
+
+	if (!Array.isArray(children)) {
+		return <>{children}</>
+	}
+
+	return (
+		<FixedSizeList
+			height={Math.min(maxHeight, children.length * height)}
+			itemCount={children.length}
+			initialScrollOffset={currentIndex * height}
+			itemSize={height}
+			ref={list}
+			width={''} // 100% width
+			outerRef={innerRef}
+		>
+			{({ index, style }) => (
+				<div style={{ ...style, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+					{children[index]}
+				</div>
+			)}
+		</FixedSizeList>
+	)
+})

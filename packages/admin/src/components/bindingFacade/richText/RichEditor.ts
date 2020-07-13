@@ -10,6 +10,7 @@ import {
 	headingTwoToolbarButton,
 	italicToolbarButton,
 	orderedListToolbarButton,
+	scrollTargetToolbarButton,
 	strikeThroughToolbarButton,
 	underlineToolbarButton,
 	unorderedListToolbarButton,
@@ -25,6 +26,7 @@ export namespace RichEditor {
 		headingFive: headingFiveToolbarButton,
 		headingSix: headingSixToolbarButton,
 		orderedList: orderedListToolbarButton,
+		scrollTarget: scrollTargetToolbarButton,
 		unorderedList: unorderedListToolbarButton,
 
 		bold: boldToolbarButton,

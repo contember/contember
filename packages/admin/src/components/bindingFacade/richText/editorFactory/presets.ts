@@ -6,6 +6,7 @@ export const defaultEditorPluginPreset: BuiltinEditorPlugins[] = [
 	'underline',
 	'italic',
 	'bold',
+	'scrollTarget',
 
 	'anchor',
 	'paragraph',

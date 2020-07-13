@@ -8,6 +8,7 @@ import {
 	withItalic,
 	withLists,
 	withParagraphs,
+	withScrollTargets,
 	withStrikeThrough,
 	withUnderline,
 } from '../plugins'
@@ -22,6 +23,7 @@ const pluginAugmenters: {
 	paragraph: withParagraphs,
 	heading: withHeadings,
 	list: withLists,
+	scrollTarget: withScrollTargets,
 
 	bold: withBold,
 	code: withCode,

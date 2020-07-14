@@ -1,8 +1,8 @@
 import { FieldValue } from '@contember/binding'
 import Fuse from 'fuse.js'
 import * as React from 'react'
+import { Props as SelectProps } from 'react-select'
 import { Props as AsyncProps } from 'react-select/async'
-import { Props as SelectProps } from 'react-select/src/Select'
 import { ChoiceFieldData } from '../ChoiceField'
 import { VirtualizedMenuList } from './VirtualizedMenuList'
 

@@ -2,7 +2,7 @@ import { Component, ErrorAccessor, FieldValue } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import AsyncSelect from 'react-select/async'
-import { Props as SelectProps } from 'react-select/src/Select'
+import { Props as SelectProps } from 'react-select'
 
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoiceFieldProps } from '../ChoiceField'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'

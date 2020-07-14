@@ -1,12 +1,13 @@
 import { Component, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 
-export interface DateFieldViewProps {
+export type DateFieldViewProps = {
 	field: SugaredFieldProps['field']
-	locale?: string
-	format?: Intl.DateTimeFormatOptions | ((date: Date) => React.ReactNode)
 	fallback?: React.ReactNode
-}
+} & (
+	| { format?: ((date: Date) => React.ReactNode) | Intl.DateTimeFormatOptions; locale?: never }
+	| { format?: Intl.DateTimeFormatOptions; locale: string | string[] }
+)
 
 export const DateFieldView = Component<DateFieldViewProps>(
 	({ field, locale, format, fallback = null }) => {
@@ -19,15 +20,17 @@ export const DateFieldView = Component<DateFieldViewProps>(
 		// dateField.currentValue is created on server by Date.toISOString() and therefore always in UTC
 		const date = new Date(dateField.currentValue)
 
-		if (format === undefined) {
-			return <>{date.toLocaleString()}</>
+		if (locale === undefined) {
+			if (format === undefined) {
+				return <>{date.toLocaleString()}</>
+			}
+
+			if (typeof format === 'function') {
+				return <>{format(date)}</>
+			}
 		}
 
-		if (typeof format === 'function') {
-			return <>{format(date)}</>
-		}
-
-		const intl = new Intl.DateTimeFormat(locale ?? 'default', { timeZone: 'UTC', ...format })
+		const intl = new Intl.DateTimeFormat(locale ?? 'default', { ...format, timeZone: 'UTC' })
 		return <>{intl.format(date)}</>
 	},
 	props => (

@@ -54,7 +54,7 @@ export const useDynamicMultipleChoiceField = (
 		optionEntities,
 		desugaredOptionPath,
 		'renderOption' in props && props.renderOption ? props.renderOption : undefined,
-		'getSearchKeywords' in props && props.getSearchKeywords ? props.getSearchKeywords : undefined,
+		props.searchByFields,
 	)
 
 	const { batchUpdates, connectEntity, disconnectEntity } = currentValueEntity

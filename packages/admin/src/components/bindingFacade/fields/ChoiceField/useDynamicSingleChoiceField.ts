@@ -1,6 +1,5 @@
 import {
 	EntityAccessor,
-	ExpectedEntityCount,
 	PlaceholderGenerator,
 	QueryLanguage,
 	RelativeSingleEntity,
@@ -63,7 +62,7 @@ export const useDynamicSingleChoiceField = (
 		optionEntities,
 		desugaredOptionPath,
 		'renderOption' in props && props.renderOption ? props.renderOption : undefined,
-		'getSearchKeywords' in props && props.getSearchKeywords ? props.getSearchKeywords : undefined,
+		props.searchByFields,
 	)
 
 	return {

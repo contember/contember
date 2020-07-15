@@ -7,6 +7,7 @@ import {
 	QueryLanguage,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
+	SugaredRelativeSingleField,
 	useAccessorUpdateSubscription,
 	useEnvironment,
 	useGetSubTree,
@@ -14,9 +15,8 @@ import {
 import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
-export type BaseDynamicChoiceField =
+export type BaseDynamicChoiceField = (
 	| {
-			getSearchKeywords?: (entityAccessor: EntityAccessor) => string | null | Array<string | null>
 			renderOption: (entityAccessor: EntityAccessor) => React.ReactNode
 			options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
 			optionsStaticRender: React.ReactElement | ((environment: Environment) => React.ReactElement)
@@ -24,6 +24,9 @@ export type BaseDynamicChoiceField =
 	| {
 			options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
 	  }
+) & {
+	searchByFields?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][]
+}
 
 export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 	const environment = useEnvironment()
@@ -96,9 +99,16 @@ export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
 	renderOption: ((entityAccessor: EntityAccessor) => React.ReactNode) | undefined,
-	getSearchKeywords: ((entityAccessor: EntityAccessor) => string | null | Array<string | null>) | undefined,
-) =>
-	React.useMemo(
+	searchByFields: BaseDynamicChoiceField['searchByFields'],
+) => {
+	const sugaredFields =
+		searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]
+	const environment = useEnvironment()
+	const desugaredFields = React.useMemo(
+		() => sugaredFields.map(field => QueryLanguage.desugarRelativeSingleField(field, environment)),
+		[sugaredFields, environment],
+	)
+	return React.useMemo(
 		() =>
 			optionEntities.map(
 				(item, i): ChoiceFieldData.SingleDatum => {
@@ -110,15 +120,14 @@ export const useNormalizedOptions = (
 
 					let searchKeywords: string
 
-					if (getSearchKeywords) {
-						let keywords = getSearchKeywords(item)
-						if (!Array.isArray(keywords)) {
-							keywords = [keywords]
-						}
-						searchKeywords = keywords.filter((keyword): keyword is string => typeof keyword === 'string').join(' ')
+					if (desugaredFields.length) {
+						searchKeywords = desugaredFields
+							.map(desugared => item.getRelativeSingleField<string>(desugared).currentValue ?? '')
+							.join(' ')
 					} else if (typeof label === 'string') {
 						searchKeywords = label
 					} else {
+						// TODO we're failing silently which is not ideal but at the same time it's not correct to throw.
 						searchKeywords = ''
 					}
 
@@ -130,5 +139,6 @@ export const useNormalizedOptions = (
 					}
 				},
 			),
-		[desugaredOptionPath, optionEntities, renderOption, getSearchKeywords],
+		[desugaredOptionPath, optionEntities, renderOption, desugaredFields],
 	)
+}

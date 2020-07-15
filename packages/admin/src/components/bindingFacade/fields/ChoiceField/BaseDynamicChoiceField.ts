@@ -59,7 +59,7 @@ export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldLi
 		getSubTree,
 	])
 	const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
-	return Array.from(subTreeData)
+	return React.useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
 }
 
 export const useOptionEntities = (

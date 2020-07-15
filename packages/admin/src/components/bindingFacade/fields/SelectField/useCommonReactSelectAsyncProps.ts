@@ -16,9 +16,7 @@ export const useCommonReactSelectAsyncProps = ({
 	reactSelectProps,
 	placeholder,
 	data,
-}: UseCommonReactSelectAsyncPropsProps): Partial<AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>>> & {
-	loadOptions: AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>>['loadOptions']
-} => {
+}: UseCommonReactSelectAsyncPropsProps): AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>> => {
 	const fuse = React.useMemo(
 		() =>
 			new Fuse(data, {

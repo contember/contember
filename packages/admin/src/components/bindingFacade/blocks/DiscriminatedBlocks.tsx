@@ -19,6 +19,7 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 					...item,
 					label: item.data.label,
 					value: item.discriminateBy,
+					searchKeywords: typeof item.data.label === 'string' ? item.data.label : '',
 				})),
 			[blocksArray],
 		)

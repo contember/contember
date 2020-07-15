@@ -20,7 +20,7 @@ export const useCommonReactSelectAsyncProps = ({
 	const fuse = React.useMemo(
 		() =>
 			new Fuse(data, {
-				keys: ['label'],
+				keys: ['searchKeywords'],
 			}),
 		[data],
 	)

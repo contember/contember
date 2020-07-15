@@ -1,6 +1,7 @@
 import {
 	BoxedQualifiedEntityList,
 	EntityAccessor,
+	Environment,
 	QualifiedEntityList,
 	QualifiedFieldList,
 	QueryLanguage,
@@ -15,9 +16,10 @@ import { ChoiceFieldData } from './ChoiceFieldData'
 
 export type BaseDynamicChoiceField =
 	| {
-			renderOptionText: (entityAccessor: EntityAccessor) => string
+			getSearchKeywords?: (entityAccessor: EntityAccessor) => string | null | Array<string | null>
+			renderOption: (entityAccessor: EntityAccessor) => React.ReactNode
 			options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
-			optionFieldStaticFactory: React.ReactNode
+			optionsStaticRender: React.ReactElement | ((environment: Environment) => React.ReactElement)
 	  }
 	| {
 			options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
@@ -26,7 +28,7 @@ export type BaseDynamicChoiceField =
 export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 	const environment = useEnvironment()
 	return React.useMemo<QualifiedFieldList | QualifiedEntityList>(() => {
-		if ('renderOptionText' in props) {
+		if ('optionsStaticRender' in props) {
 			return QueryLanguage.desugarQualifiedEntityList(
 				typeof props.options === 'string' || !('entities' in props.options)
 					? {
@@ -93,24 +95,40 @@ export const useCurrentValues = (
 export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
-	renderOptionText: ((entityAccessor: EntityAccessor) => string) | undefined,
+	renderOption: ((entityAccessor: EntityAccessor) => React.ReactNode) | undefined,
+	getSearchKeywords: ((entityAccessor: EntityAccessor) => string | null | Array<string | null>) | undefined,
 ) =>
 	React.useMemo(
 		() =>
 			optionEntities.map(
 				(item, i): ChoiceFieldData.SingleDatum => {
-					const label = renderOptionText
-						? renderOptionText(item)
+					const label = renderOption
+						? renderOption(item)
 						: 'field' in desugaredOptionPath
 						? `${item.getField(desugaredOptionPath.field).currentValue ?? ''}`
 						: ''
 
+					let searchKeywords: string
+
+					if (getSearchKeywords) {
+						let keywords = getSearchKeywords(item)
+						if (!Array.isArray(keywords)) {
+							keywords = [keywords]
+						}
+						searchKeywords = keywords.filter((keyword): keyword is string => typeof keyword === 'string').join(' ')
+					} else if (typeof label === 'string') {
+						searchKeywords = label
+					} else {
+						searchKeywords = ''
+					}
+
 					return {
 						key: i,
 						label,
+						searchKeywords,
 						actualValue: item.key,
 					}
 				},
 			),
-		[desugaredOptionPath, optionEntities, renderOptionText],
+		[desugaredOptionPath, optionEntities, renderOption, getSearchKeywords],
 	)

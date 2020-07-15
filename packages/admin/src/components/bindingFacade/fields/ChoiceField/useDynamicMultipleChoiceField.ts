@@ -53,7 +53,8 @@ export const useDynamicMultipleChoiceField = (
 	const normalizedOptions = useNormalizedOptions(
 		optionEntities,
 		desugaredOptionPath,
-		'renderOptionText' in props && props.renderOptionText ? props.renderOptionText : undefined,
+		'renderOption' in props && props.renderOption ? props.renderOption : undefined,
+		'getSearchKeywords' in props && props.getSearchKeywords ? props.getSearchKeywords : undefined,
 	)
 
 	const { batchUpdates, connectEntity, disconnectEntity } = currentValueEntity

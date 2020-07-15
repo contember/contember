@@ -20,6 +20,7 @@ export namespace ChoiceFieldData {
 	export interface SingleDatum<ActualValue extends Environment.Value = string> {
 		key: ValueRepresentation
 		label: React.ReactNode
+		searchKeywords: string
 		description?: React.ReactNode
 		actualValue: ActualValue
 	}

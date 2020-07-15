@@ -1,7 +1,7 @@
 import { FieldValue } from '@contember/binding'
 import * as React from 'react'
 import { MenuListComponentProps } from 'react-select'
-import { FixedSizeList } from 'react-window'
+import { FixedSizeList, ListChildComponentProps } from 'react-window'
 import { ChoiceFieldData } from '../ChoiceField'
 
 export const VirtualizedMenuList = React.memo(function VirtualizedMenuList(
@@ -41,12 +41,18 @@ export const VirtualizedMenuList = React.memo(function VirtualizedMenuList(
 			ref={list}
 			width={''} // 100% width
 			outerRef={innerRef}
+			itemKey={dataKey => props.options[dataKey].key}
+			itemData={props}
 		>
-			{({ index, style }) => (
-				<div style={{ ...style, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-					{children[index]}
-				</div>
-			)}
+			{Item}
 		</FixedSizeList>
 	)
 })
+
+function Item({ index, style, data }: ListChildComponentProps) {
+	return (
+		<div style={{ ...style }} key={data.options[index].key} className="selectField-optionWrapper">
+			{data.children[index]}
+		</div>
+	)
+}

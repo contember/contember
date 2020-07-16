@@ -1,3 +1,4 @@
+import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import {
@@ -7,7 +8,8 @@ import {
 	useGetSubTree,
 } from '../accessorPropagation'
 import { EntityListAccessor } from '../accessors'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
 import { Component } from './Component'
@@ -18,6 +20,7 @@ import { SingleEntityBaseProps } from './SingleEntity'
 
 export interface EntityListSubTreeAdditionalProps {
 	onBeforePersist?: EntityListAccessor.BatchUpdatesHandler
+	variables?: Environment.DeltaFactory
 }
 
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
@@ -93,6 +96,22 @@ export const EntityListSubTree = Component(
 				{props.children}
 			</EntityList>
 		),
+		generateEnvironment: (props, oldEnvironment) => {
+			const newEnvironment =
+				props.variables === undefined
+					? oldEnvironment
+					: oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, props.variables))
+
+			if (newEnvironment.hasName('rootWhere') || newEnvironment.hasName('rootWhereAsFilter')) {
+				return newEnvironment
+			}
+
+			const rootWhere = { id: NIL_UUID } as const
+			return newEnvironment.putDelta({
+				rootWhere,
+				rootWhereAsFilter: whereToFilter(rootWhere),
+			})
+		},
 	},
 	'EntityListSubTree',
 ) as <ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => React.ReactElement

@@ -1,3 +1,4 @@
+import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import {
@@ -7,8 +8,9 @@ import {
 	useSingleEntitySubTreeParameters,
 } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { MarkerFactory } from '../queryLanguage'
+import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { Environment } from '../dao'
+import { MarkerFactory, QueryLanguage } from '../queryLanguage'
 import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
 import { Component } from './Component'
 import { Field } from './Field'
@@ -17,6 +19,7 @@ import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
 export interface SingleEntitySubTreeAdditionalProps {
 	onBeforePersist?: EntityAccessor.BatchUpdatesHandler
+	variables?: Environment.DeltaFactory
 }
 
 export type SingleEntitySubTreeProps<EntityProps> = {
@@ -88,6 +91,29 @@ export const SingleEntitySubTree = Component(
 				{props.children}
 			</SingleEntity>
 		),
+		generateEnvironment: (props, oldEnvironment) => {
+			const newEnvironment =
+				props.variables === undefined
+					? oldEnvironment
+					: oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, props.variables))
+
+			if (newEnvironment.hasName('rootWhere') || newEnvironment.hasName('rootWhereAsFilter')) {
+				return newEnvironment
+			}
+
+			if (props.isCreating) {
+				const rootWhere = { id: NIL_UUID } as const
+				return newEnvironment.putDelta({
+					rootWhere,
+					rootWhereAsFilter: whereToFilter(rootWhere),
+				})
+			}
+			const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(props, newEnvironment)
+			return newEnvironment.putDelta({
+				rootWhere: qualifiedSingleEntity.where,
+				rootWhereAsFilter: whereToFilter(qualifiedSingleEntity.where),
+			})
+		},
 	},
 	'SingleEntitySubTree',
 ) as <EntityProps>(pros: SingleEntitySubTreeProps<EntityProps>) => React.ReactElement

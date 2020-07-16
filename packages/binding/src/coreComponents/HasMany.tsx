@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useRelativeEntityList } from '../accessorPropagation'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeEntityList } from '../treeParameters'
 import { Component } from './Component'
@@ -10,6 +11,7 @@ import { SingleEntityBaseProps } from './SingleEntity'
 
 export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelativeEntityList & {
 	children?: React.ReactNode
+	variables?: Environment.DeltaFactory
 } & (
 		| {}
 		| {
@@ -29,6 +31,12 @@ export const HasMany = Component(
 		return <EntityList {...props} accessor={entity} />
 	},
 	{
+		generateEnvironment: (props, oldEnvironment) => {
+			if (props.variables === undefined) {
+				return oldEnvironment
+			}
+			return oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, props.variables))
+		},
 		staticRender: props => (
 			<>
 				<Field field={PRIMARY_KEY_NAME} />

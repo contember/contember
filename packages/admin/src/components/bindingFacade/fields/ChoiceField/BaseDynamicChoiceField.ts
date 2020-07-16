@@ -1,11 +1,13 @@
 import {
 	BoxedQualifiedEntityList,
 	EntityAccessor,
+	Environment,
 	QualifiedEntityList,
 	QualifiedFieldList,
 	QueryLanguage,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
+	SugaredRelativeSingleField,
 	useAccessorUpdateSubscription,
 	useEnvironment,
 	useGetSubTree,
@@ -13,20 +15,23 @@ import {
 import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
-export type BaseDynamicChoiceField =
+export type BaseDynamicChoiceField = (
 	| {
-			renderOptionText: (entityAccessor: EntityAccessor) => string
+			renderOption: (entityAccessor: EntityAccessor) => React.ReactNode
 			options: string | SugaredQualifiedEntityList['entities'] | SugaredQualifiedEntityList
-			optionFieldStaticFactory: React.ReactNode
+			optionsStaticRender: React.ReactElement | ((environment: Environment) => React.ReactElement)
 	  }
 	| {
 			options: string | SugaredQualifiedFieldList['fields'] | SugaredQualifiedFieldList
 	  }
+) & {
+	searchByFields?: SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][]
+}
 
 export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 	const environment = useEnvironment()
 	return React.useMemo<QualifiedFieldList | QualifiedEntityList>(() => {
-		if ('renderOptionText' in props) {
+		if ('optionsStaticRender' in props) {
 			return QueryLanguage.desugarQualifiedEntityList(
 				typeof props.options === 'string' || !('entities' in props.options)
 					? {
@@ -54,7 +59,7 @@ export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldLi
 		getSubTree,
 	])
 	const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
-	return Array.from(subTreeData)
+	return React.useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
 }
 
 export const useOptionEntities = (
@@ -93,24 +98,47 @@ export const useCurrentValues = (
 export const useNormalizedOptions = (
 	optionEntities: EntityAccessor[],
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
-	renderOptionText: ((entityAccessor: EntityAccessor) => string) | undefined,
-) =>
-	React.useMemo(
+	renderOption: ((entityAccessor: EntityAccessor) => React.ReactNode) | undefined,
+	searchByFields: BaseDynamicChoiceField['searchByFields'],
+) => {
+	const sugaredFields =
+		searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]
+	const environment = useEnvironment()
+	const desugaredFields = React.useMemo(
+		() => sugaredFields.map(field => QueryLanguage.desugarRelativeSingleField(field, environment)),
+		[sugaredFields, environment],
+	)
+	return React.useMemo(
 		() =>
 			optionEntities.map(
 				(item, i): ChoiceFieldData.SingleDatum => {
-					const label = renderOptionText
-						? renderOptionText(item)
+					const label = renderOption
+						? renderOption(item)
 						: 'field' in desugaredOptionPath
 						? `${item.getField(desugaredOptionPath.field).currentValue ?? ''}`
 						: ''
 
+					let searchKeywords: string
+
+					if (desugaredFields.length) {
+						searchKeywords = desugaredFields
+							.map(desugared => item.getRelativeSingleField<string>(desugared).currentValue ?? '')
+							.join(' ')
+					} else if (typeof label === 'string') {
+						searchKeywords = label
+					} else {
+						// TODO we're failing silently which is not ideal but at the same time it's not correct to throw.
+						searchKeywords = ''
+					}
+
 					return {
 						key: i,
 						label,
+						searchKeywords,
 						actualValue: item.key,
 					}
 				},
 			),
-		[desugaredOptionPath, optionEntities, renderOptionText],
+		[desugaredOptionPath, optionEntities, renderOption, desugaredFields],
 	)
+}

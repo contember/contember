@@ -48,7 +48,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 			assertNever(props)
 		}
 
-		if ('renderOptionText' in props) {
+		if ('renderOption' in props) {
 			const sugaredEntityList: SugaredQualifiedEntityList =
 				typeof props.options === 'string' || !('entities' in props.options)
 					? {
@@ -56,7 +56,11 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					  }
 					: props.options
 			entityListDataProvider = (
-				<EntityListSubTree {...sugaredEntityList}>{props.optionFieldStaticFactory}</EntityListSubTree>
+				<EntityListSubTree {...sugaredEntityList}>
+					{typeof props.optionsStaticRender === 'function'
+						? props.optionsStaticRender(environment)
+						: props.optionsStaticRender}
+				</EntityListSubTree>
 			)
 		} else {
 			const sugaredFieldList: SugaredQualifiedFieldList =

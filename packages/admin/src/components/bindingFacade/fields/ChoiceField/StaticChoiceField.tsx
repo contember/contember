@@ -21,10 +21,12 @@ export interface StaticOption {
 
 export interface NormalizedStaticOption extends StaticOption {
 	value: FieldValue
+	searchKeywords: string
 }
 
 export interface OptionallyVariableStaticOption extends StaticOption {
 	value: OptionallyVariableFieldValue
+	searchKeywords?: string
 }
 
 export interface StaticChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceFieldData.ChoiceArity>
@@ -36,6 +38,7 @@ export interface StaticChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArit
 const normalizeOptions = (options: OptionallyVariableStaticOption[], environment: Environment) =>
 	options.map(
 		(options): NormalizedStaticOption => ({
+			searchKeywords: options.searchKeywords ?? '',
 			value: VariableInputTransformer.transformValue(options.value, environment),
 			label: options.label,
 			description: options.description,
@@ -56,11 +59,12 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 	const currentValue: ChoiceFieldData.ValueRepresentation = options.findIndex(({ value }) => field.hasValue(value))
 	const data = React.useMemo(
 		() =>
-			options.map(({ label, description, value: actualValue }, i) => ({
+			options.map(({ label, description, value: actualValue, searchKeywords }, i) => ({
 				key: i,
 				description,
 				label,
 				actualValue,
+				searchKeywords: searchKeywords ?? '',
 			})),
 		[options],
 	)

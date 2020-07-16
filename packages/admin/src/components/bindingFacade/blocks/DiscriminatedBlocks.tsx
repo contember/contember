@@ -1,7 +1,7 @@
-import { Component, Scalar, SugaredRelativeSingleField } from '@contember/binding'
+import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import { FormGroupProps } from '@contember/ui'
 import * as React from 'react'
-import { NormalizedStaticOption, SelectFieldInner, StaticChoiceField, useStaticChoiceField } from '../fields'
+import { NativeSelectFieldInner, NormalizedStaticOption, StaticChoiceField, useStaticChoiceField } from '../fields'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 
 export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children'>, SugaredRelativeSingleField {
@@ -19,6 +19,7 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 					...item,
 					label: item.data.label,
 					value: item.discriminateBy,
+					searchKeywords: typeof item.data.label === 'string' ? item.data.label : '',
 				})),
 			[blocksArray],
 		)
@@ -30,14 +31,14 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 		return (
 			<>
 				{props.allowBlockTypeChange !== false && (
-					<SelectFieldInner
+					<NativeSelectFieldInner
 						label={props.label}
 						data={metadata.data}
 						currentValue={metadata.currentValue}
 						onChange={metadata.onChange}
 						environment={metadata.environment}
 						errors={metadata.errors}
-						firstOptionCaption="Choose…"
+						placeholder="Choose…"
 						isMutating={metadata.isMutating}
 					/>
 				)}

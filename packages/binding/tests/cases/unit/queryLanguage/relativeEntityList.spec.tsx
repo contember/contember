@@ -45,36 +45,4 @@ describe('relative entity list QueryLanguage parser', () => {
 		expect(parse("foo[bar = 'value'][baz >= 456]")).toEqual(expected)
 		expect(parse("foo[bar = 'value' && baz >= 456]")).toEqual(expected)
 	})
-
-	it('should parse complex filter conditions', () => {
-		expect(parse('foo[a < 1 || b = 2 && c != 3 || d > 4]')).toEqual({
-			hasOneRelationPath: [],
-			hasManyRelation: {
-				field: 'foo',
-				filter: {
-					or: [
-						{ a: { lt: 1 } },
-						{
-							and: [{ b: { eq: 2 } }, { c: { notEq: 3 } }],
-						},
-						{
-							d: { gt: 4 },
-						},
-					],
-				},
-			},
-		})
-	})
-
-	it('should parse conditions with nested fields', () => {
-		expect(parse('foo[a.b.c < 123 && a.d = 456]')).toEqual({
-			hasOneRelationPath: [],
-			hasManyRelation: {
-				field: 'foo',
-				filter: {
-					and: [{ a: { b: { c: { lt: 123 } } } }, { a: { d: { eq: 456 } } }],
-				},
-			},
-		})
-	})
 })

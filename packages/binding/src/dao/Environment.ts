@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { Filter, UniqueWhere } from '../treeParameters/primitives'
 
 class Environment {
 	private readonly names: Environment.NameStore
@@ -149,9 +150,15 @@ namespace Environment {
 
 	export interface SystemVariables {
 		labelMiddleware?: (label: React.ReactNode) => React.ReactNode
+		rootWhere?: UniqueWhere
+		rootWhereAsFilter?: Filter
 	}
 
-	export const systemVariableNames: Set<SystemVariableName> = new Set(['labelMiddleware'])
+	export const systemVariableNames: Set<SystemVariableName> = new Set([
+		'labelMiddleware',
+		'rootWhere',
+		'rootWhereAsFilter',
+	])
 
 	export type SystemVariableName = keyof SystemVariables
 

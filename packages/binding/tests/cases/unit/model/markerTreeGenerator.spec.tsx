@@ -50,7 +50,10 @@ describe('Marker tree generator', () => {
 			),
 		)
 
-		const environment = new Environment()
+		const environment = Environment.create({
+			rootWhere: { bar: 123 },
+			rootWhereAsFilter: { bar: { eq: 123 } },
+		})
 		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
 		const typeNameMarker = [TYPENAME_KEY_NAME, new FieldMarker(TYPENAME_KEY_NAME)] as const
 

@@ -8,13 +8,12 @@ describe('query language parser', () => {
 			ab: 456,
 			a: 123,
 			x: 'x',
-			fieldVariable: 'fieldVariableName',
+			lit: new GraphQlBuilder.Literal('lit'),
 			literal: new GraphQlBuilder.Literal('literal'),
-			dimensions: {},
 		})
 		expect(
 			Parser.parseQueryLanguageExpression(
-				'a(a=$a).$fieldVariable(ab = $ab, literalColumn = $literal).x(x = truecolor).foo',
+				'a(a=$a).field(ab = $ab, literalColumn = $literal).x(x = truecolor).foo',
 				Parser.EntryPoint.RelativeSingleField,
 				environment,
 			),
@@ -27,7 +26,7 @@ describe('query language parser', () => {
 					reducedBy: { a: 123 },
 				},
 				{
-					field: 'fieldVariableName',
+					field: 'field',
 					filter: undefined,
 					reducedBy: { ab: 456, literalColumn: new GraphQlBuilder.Literal('literal') },
 				},

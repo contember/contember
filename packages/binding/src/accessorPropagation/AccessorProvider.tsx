@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { EntityAccessor } from '../accessors'
 import { EntityKeyContext } from './EntityKeyContext'
+import { EnvironmentContext } from './EnvironmentContext'
 
 export interface EntityProviderProps {
 	accessor: EntityAccessor
@@ -8,5 +9,9 @@ export interface EntityProviderProps {
 }
 
 export function AccessorProvider(props: EntityProviderProps) {
-	return <EntityKeyContext.Provider value={props.accessor.key}>{props.children}</EntityKeyContext.Provider>
+	return (
+		<EntityKeyContext.Provider value={props.accessor.key}>
+			<EnvironmentContext.Provider value={props.accessor.environment}>{props.children}</EnvironmentContext.Provider>
+		</EntityKeyContext.Provider>
+	)
 }

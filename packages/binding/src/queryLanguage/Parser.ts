@@ -25,8 +25,6 @@ import { tokenList, TokenRegExps, tokens } from './tokenList'
 /**
  * TODO:
  * 	- double quoted strings
- * 	- parentheses within non-unique where
- * 	- predicate negation
  * 	- collections (objects & lists)
  * 	- collection operators (e.g. 'in', 'notIn', etc.)
  * 	- filtering toOne
@@ -269,14 +267,49 @@ class Parser extends EmbeddedActionsParser {
 				ALT: () => {
 					this.CONSUME(tokens.Not)
 					return {
-						not: this.SUBRULE(this.fieldWhere),
+						not: this.SUBRULE(this.filterGroup),
 					}
 				},
 			},
 			{
 				ALT: () => {
-					return this.SUBRULE1(this.fieldWhere)
+					return this.SUBRULE1(this.filterGroup)
 				},
+			},
+		])
+	})
+
+	private filterGroup: () => Filter = this.RULE('filterGroup', () => {
+		return this.OR([
+			{
+				ALT: () => {
+					this.CONSUME(tokens.LeftParenthesis)
+					const subFilter = this.SUBRULE(this.disjunction)
+					this.CONSUME1(tokens.RightParenthesis)
+					return subFilter
+				},
+			},
+			{
+				ALT: () => this.SUBRULE1(this.filterAtom),
+			},
+		])
+	})
+
+	private filterAtom: () => Filter = this.RULE('filterAtom', () => {
+		return this.OR([
+			{
+				ALT: () => {
+					const variable = this.SUBRULE(this.variable)
+					return this.ACTION(() => {
+						if (typeof variable !== 'object' || variable instanceof GraphQlBuilder.Literal) {
+							throw new QueryLanguageError(`Invalid filter value '${JSON.stringify(variable)}'`)
+						}
+						return variable
+					})
+				},
+			},
+			{
+				ALT: () => this.SUBRULE1(this.fieldWhere),
 			},
 		])
 	})
@@ -537,22 +570,23 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private fieldIdentifier: () => FieldName = this.RULE('fieldIdentifier', () => {
-		return this.OR([
-			{
-				ALT: () => this.SUBRULE(this.identifier),
-			},
-			{
-				ALT: () => {
-					const variable = this.SUBRULE(this.variable)
-					return this.ACTION(() => {
-						if (!(typeof variable === 'string') || !TokenRegExps.identifier.test(variable)) {
-							throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
-						}
-						return variable
-					})
-				},
-			},
-		])
+		return this.SUBRULE(this.identifier)
+		// return this.OR([
+		// 	{
+		// 		ALT: () => this.SUBRULE(this.identifier),
+		// 	},
+		// 	{
+		// 		ALT: () => {
+		// 			const variable = this.SUBRULE(this.variable)
+		// 			return this.ACTION(() => {
+		// 				if (!(typeof variable === 'string') || !TokenRegExps.identifier.test(variable)) {
+		// 					throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
+		// 				}
+		// 				return variable
+		// 			})
+		// 		},
+		// 	},
+		// ])
 	})
 
 	private identifier: () => string = this.RULE('identifier', () => {
@@ -609,7 +643,7 @@ class Parser extends EmbeddedActionsParser {
 		return new GraphQlBuilder.Literal(image)
 	})
 
-	private variable = this.RULE<string | number | GraphQlBuilder.Literal>('variable', () => {
+	private variable = this.RULE<string | number | GraphQlBuilder.Literal | Filter | UniqueWhere>('variable', () => {
 		this.CONSUME(tokens.DollarSign)
 		const variableName = this.CONSUME(tokens.Identifier).image
 

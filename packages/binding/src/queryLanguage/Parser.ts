@@ -537,22 +537,23 @@ class Parser extends EmbeddedActionsParser {
 	})
 
 	private fieldIdentifier: () => FieldName = this.RULE('fieldIdentifier', () => {
-		return this.OR([
-			{
-				ALT: () => this.SUBRULE(this.identifier),
-			},
-			{
-				ALT: () => {
-					const variable = this.SUBRULE(this.variable)
-					return this.ACTION(() => {
-						if (!(typeof variable === 'string') || !TokenRegExps.identifier.test(variable)) {
-							throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
-						}
-						return variable
-					})
-				},
-			},
-		])
+		return this.SUBRULE(this.identifier)
+		// return this.OR([
+		// 	{
+		// 		ALT: () => this.SUBRULE(this.identifier),
+		// 	},
+		// 	{
+		// 		ALT: () => {
+		// 			const variable = this.SUBRULE(this.variable)
+		// 			return this.ACTION(() => {
+		// 				if (!(typeof variable === 'string') || !TokenRegExps.identifier.test(variable)) {
+		// 					throw new QueryLanguageError(`The value \$${variable} is not a valid field identifier.`)
+		// 				}
+		// 				return variable
+		// 			})
+		// 		},
+		// 	},
+		// ])
 	})
 
 	private identifier: () => string = this.RULE('identifier', () => {

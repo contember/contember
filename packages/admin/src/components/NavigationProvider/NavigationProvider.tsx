@@ -13,7 +13,9 @@ export interface NavigationIsActiveProviderProps {
 	children?: React.ReactNode
 }
 
-export const NavigationIsActiveProvider = React.memo((props: NavigationIsActiveProviderProps) => {
+export const NavigationIsActiveProvider = React.memo(function NavigationIsActiveProvider(
+	props: NavigationIsActiveProviderProps,
+) {
 	const viewRoute = useSelector((state: State): PageRequest<any> | undefined => {
 		if (!state.view.route || state.view.route.name !== 'project_page') {
 			return undefined
@@ -49,7 +51,7 @@ export interface NavigationProviderProps {
 	children?: React.ReactNode
 }
 
-export const NavigationProvider = React.memo((props: NavigationProviderProps) => {
+export const NavigationProvider = React.memo(function NavigationProvider(props: NavigationProviderProps) {
 	return (
 		<NavigationIsActiveProvider>
 			<Navigation.MiddlewareContext.Provider

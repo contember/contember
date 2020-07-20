@@ -37,15 +37,20 @@ export const Admin = React.memo((props: AdminProps) => {
 	const [store] = React.useState(() => {
 		const store: Store = configureStore(emptyState, props.clientConfig)
 		store.dispatch(createAction(PROJECT_CONFIGS_REPLACE, () => props.configs)())
-		store.dispatch(populateRequest(document.location!))
+		store.dispatch(populateRequest(window.location))
 
 		return store
 	})
 
 	React.useEffect(() => {
 		const onPopState = (e: PopStateEvent) => {
+			if (history.length > 1 && e.state === null) {
+				// This is a terrible hack. We're trying to ignore hash changes.
+				// TODO This breaks when coming back from a page that doesn't have a hash to one that has it.
+				return
+			}
 			e.preventDefault()
-			store.dispatch(populateRequest(document.location!))
+			store.dispatch(populateRequest(window.location))
 		}
 		window.addEventListener('popstate', onPopState)
 

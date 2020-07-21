@@ -6,7 +6,9 @@ import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoi
 import { SelectFieldInnerPublicProps } from './SelectField'
 
 export type NativeSelectFieldProps = SelectFieldInnerPublicProps &
-	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | DynamicSingleChoiceFieldProps)
+	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | DynamicSingleChoiceFieldProps) & {
+		searchByFields?: never
+	}
 
 export const NativeSelectField = Component<NativeSelectFieldProps>(
 	props => (

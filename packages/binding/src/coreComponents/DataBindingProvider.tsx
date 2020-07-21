@@ -20,24 +20,24 @@ export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps 
 		  }
 	)
 
-export const DataBindingProvider = React.memo(
-	<StateProps extends DataBindingStateComponentProps>(props: DataBindingProviderProps<StateProps>) => {
-		const [accessorTreeState] = useAccessorTreeState({
-			nodeTree: props.children,
-			unstable_onSuccessfulPersist: props.onSuccessfulPersist,
-		})
+export const DataBindingProvider = React.memo(function DataBindingProvider<
+	StateProps extends DataBindingStateComponentProps
+>(props: DataBindingProviderProps<StateProps>) {
+	const [accessorTreeState] = useAccessorTreeState({
+		nodeTree: props.children,
+		unstable_onSuccessfulPersist: props.onSuccessfulPersist,
+	})
 
-		const children =
-			'stateComponent' in props && props.stateComponent
-				? React.createElement(
-						props.stateComponent,
-						{
-							...props.stateProps!,
-							accessorTreeState: accessorTreeState,
-						},
-						props.children,
-				  )
-				: props.children
-		return <AccessorTree state={accessorTreeState}>{children}</AccessorTree>
-	},
-) as <StateProps>(props: DataBindingProviderProps<StateProps>) => React.ReactElement
+	const children =
+		'stateComponent' in props && props.stateComponent
+			? React.createElement(
+					props.stateComponent,
+					{
+						...props.stateProps!,
+						accessorTreeState: accessorTreeState,
+					},
+					props.children,
+			  )
+			: props.children
+	return <AccessorTree state={accessorTreeState}>{children}</AccessorTree>
+}) as <StateProps>(props: DataBindingProviderProps<StateProps>) => React.ReactElement

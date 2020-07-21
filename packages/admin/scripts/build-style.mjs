@@ -1,21 +1,27 @@
-import sass from 'node-sass'
+import sass from 'sass'
+import Fiber from 'fibers'
 import path from 'path'
 import fs from 'fs'
 
-const result = sass.renderSync({
-	file: path.join(process.cwd(), '/src/index.sass'),
-	importer: (url /*, prev */) => {
-		if (url.startsWith('~')) {
-			const path = process.cwd() + '/node_modules/' + url.slice(1)
+sass.render(
+	{
+		file: path.join(process.cwd(), '/src/index.sass'),
+		importer: (url /*, prev */) => {
+			if (url.startsWith('~')) {
+				const path = process.cwd() + '/node_modules/' + url.slice(1)
 
-			return {
-				file: path,
+				return {
+					file: path,
+				}
 			}
-		}
+		},
+		fiber: Fiber,
 	},
-})
-fs.writeFileSync(path.join(process.cwd(), '/dist/style.css'), result.css, function(err) {
-	if (err) {
-		throw err
-	}
-})
+	(err, result) => {
+		fs.writeFileSync(path.join(process.cwd(), '/dist/style.css'), result.css, function(err) {
+			if (err) {
+				throw err
+			}
+		})
+	},
+)

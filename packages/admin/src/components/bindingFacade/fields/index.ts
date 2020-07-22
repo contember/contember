@@ -1,4 +1,5 @@
 export * from './ChoiceField'
+export * from './LocationField'
 export * from './SelectField'
 
 export * from './CheckboxField'

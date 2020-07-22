@@ -30,7 +30,7 @@ export const executeCreateMigrationCommand = async (
 		projectName: string
 		migrationCreator: MigrationCreator
 		migrationDescriber: MigrationDescriber
-	}) => Promise<void>,
+	}) => Promise<number>,
 ) => {
 	const [projectArg, migrationName] = [input.getArgument('projectName'), input.getArgument('migrationName')]
 	const allProjects = projectArg === '.'
@@ -48,7 +48,7 @@ export const executeCreateMigrationCommand = async (
 		})
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 
-		await createMigrationCallback({
+		const result = await createMigrationCallback({
 			projectDir,
 			projectName,
 			migrationName,
@@ -56,7 +56,10 @@ export const executeCreateMigrationCommand = async (
 			migrationCreator: container.migrationCreator,
 			migrationDescriber: container.migrationsDescriber,
 		})
-
 		console.groupEnd()
+		if (result > 0) {
+			return result
+		}
 	}
+	return 0
 }

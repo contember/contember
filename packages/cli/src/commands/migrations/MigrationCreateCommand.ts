@@ -17,10 +17,11 @@ export class MigrationCreateCommand extends Command<Args, Options> {
 		configureCreateMigrationCommand(configuration)
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void> {
-		await executeCreateMigrationCommand(input, async ({ projectDir, migrationName, migrationCreator }) => {
+	protected async execute(input: Input<Args, Options>): Promise<number> {
+		return await executeCreateMigrationCommand(input, async ({ projectDir, migrationName, migrationCreator }) => {
 			const result = await migrationCreator.createEmpty(migrationName)
 			console.log(`${result} created`)
+			return 0
 		})
 	}
 }

@@ -21,8 +21,8 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		configureCreateMigrationCommand(configuration)
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void> {
-		await executeCreateMigrationCommand(
+	protected async execute(input: Input<Args, Options>): Promise<number> {
+		return await executeCreateMigrationCommand(
 			input,
 			async ({ projectDir, migrationName, migrationCreator, migrationDescriber }) => {
 				const schema: Schema = require(projectDir).default
@@ -35,10 +35,11 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 
 						await printMigrationDescription(migrationDescriber, result.initialSchema, result.migration, { noSql: true })
 					}
+					return 0
 				} catch (e) {
 					if (e instanceof InvalidSchemaException) {
 						printValidationErrors(e.validationErrors, e.message)
-						return
+						return 1
 					}
 					throw e
 				}

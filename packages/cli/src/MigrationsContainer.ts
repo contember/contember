@@ -17,6 +17,7 @@ export interface MigrationsContainer {
 	schemaDiffer: SchemaDiffer
 	migrationsResolver: MigrationsResolver
 	migrationFilesManager: MigrationFilesManager
+	schemaMigrator: SchemaMigrator
 }
 
 export class MigrationsContainerFactory {
@@ -53,6 +54,7 @@ export class MigrationsContainerFactory {
 				'schemaDiffer',
 				'migrationsResolver',
 				'migrationFilesManager',
+				'schemaMigrator',
 			)
 	}
 }

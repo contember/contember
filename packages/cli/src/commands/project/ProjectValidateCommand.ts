@@ -4,6 +4,8 @@ import { getProjectDirectories } from '../../NamingHelper'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { Schema } from '@contember/schema'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
+import { emptySchema } from '@contember/schema-utils'
+import { SchemaUpdateError } from '@contember/schema-migrations/dist/src/modifications/exceptions'
 
 type Args = {
 	projectName: string
@@ -31,10 +33,30 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 		for (const projectName of projects) {
 			console.group(`Project ${projectName}:`)
 			const { migrationsDir, projectDir } = getProjectDirectories(projectName)
-			const schema: Schema = require(projectDir).default
-			let projectValid = validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')
-
 			const container = new MigrationsContainerFactory(migrationsDir).create()
+			let projectValid = true
+			let migratedSchema = emptySchema
+			for (const migration of await container.migrationsResolver.getMigrations()) {
+				try {
+					migratedSchema = container.schemaMigrator.applyModifications(
+						migratedSchema,
+						migration.modifications,
+						migration.formatVersion,
+					)
+				} catch (e) {
+					if (e instanceof SchemaUpdateError) {
+						console.error(`Migration ${migration.name} has failed`)
+					}
+					throw e
+				}
+				projectValid =
+					validateSchemaAndPrintErrors(migratedSchema, `Migration ${migration.name} produces invalid schema:`) &&
+					projectValid
+			}
+
+			const schema: Schema = require(projectDir).default
+			projectValid = validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')
+
 			const builtSchema = await container.schemaVersionBuilder.buildSchema()
 			projectValid =
 				validateSchemaAndPrintErrors(builtSchema, 'Schema built from migrations is invalid:') && projectValid

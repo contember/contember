@@ -67,7 +67,7 @@ export class AclValidator {
 		const stages = this.validateStagesDefinition(stagesIn, errorBuilder.for('stages'))
 		const entities = this.validatePermissions(
 			entitiesIn,
-			permissions.variables as Acl.Variables,
+			(permissions.variables as Acl.Variables) || {},
 			errorBuilder.for('entities'),
 		)
 		// todo: plugins validation

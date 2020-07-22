@@ -26,7 +26,12 @@ export const convertError = (e: any): null | MutationResult => {
 	if (e instanceof Database.InvalidDataError) {
 		return new MutationInputError([], InputErrorKind.invalidData, e.originalMessage)
 	}
+	if (e instanceof Database.SerializationFailureError) {
+		return null // rethrow
+	}
 	if (e instanceof Database.ConnectionError) {
+		// eslint-disable-next-line no-console
+		console.error(e)
 		return new MutationSqlError([], e.originalMessage)
 	}
 	return null

@@ -156,6 +156,8 @@ export default async (options: RunnerOption): Promise<{ name: string }[]> => {
 	const db = Db((options as RunnerOptionClient).dbClient || (options as RunnerOptionUrl).databaseUrl, logger)
 	try {
 		await db.createConnection()
+		await lock(db)
+
 		if (options.schema) {
 			const schemas = getSchemas(options.schema)
 			if (options.createSchema) {
@@ -168,8 +170,6 @@ export default async (options: RunnerOption): Promise<{ name: string }[]> => {
 		}
 
 		await ensureMigrationsTable(db, options)
-
-		await lock(db)
 
 		const [migrations, runNames] = await Promise.all([loadMigrations(db, options), getRunMigrations(db, options)])
 

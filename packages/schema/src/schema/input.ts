@@ -130,13 +130,14 @@ namespace Input {
 		desc = 'desc',
 	}
 
-	export type FieldOrderBy = OrderDirection | OrderBy
+	// generics required by admin
+	export type FieldOrderBy<T = OrderDirection> = T | OrderBy
 
-	export interface OrderByFields {
-		[fieldName: string]: FieldOrderBy
+	export interface OrderByFields<T = OrderDirection> {
+		[fieldName: string]: FieldOrderBy<T>
 	}
 
-	export type OrderBy = OrderByFields & { _random?: boolean; _randomSeeded?: number }
+	export type OrderBy<T = OrderDirection> = OrderByFields<T> & { _random?: boolean; _randomSeeded?: number }
 
 	export interface Condition<T = Value.FieldValue> {
 		and?: Array<Condition<T>>

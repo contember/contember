@@ -9,7 +9,7 @@ export const getInstanceStatus = async ({
 }: {
 	instanceDirectory: string
 }): Promise<ServiceStatus[]> => {
-	const instanceName = instanceDirectoryToName(instanceDirectory)
+	const instanceName = process.env.COMPOSE_PROJECT_NAME || instanceDirectoryToName(instanceDirectory)
 	const runningContainers = (
 		await execDockerCompose(['ps', '-q'], {
 			cwd: instanceDirectory,

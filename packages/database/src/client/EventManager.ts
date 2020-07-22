@@ -1,29 +1,32 @@
 import { Connection } from './Connection'
 
 export class EventManagerImpl {
-	private readonly listeners: EventManager.ListenersList = {
-		[EventManager.Event.queryStart]: [],
-		[EventManager.Event.queryEnd]: [],
-		[EventManager.Event.queryError]: [],
+	private readonly listeners = {
+		[EventManager.Event.queryStart]: [] as EventManager.QueryStartCallback[],
+		[EventManager.Event.queryEnd]: [] as EventManager.QueryEndCallback[],
+		[EventManager.Event.queryError]: [] as EventManager.QueryStartCallback[],
 	}
 
 	constructor(private readonly parent: EventManager | null = null) {}
 
-	on(event: EventManager.Event.queryStart, cb: EventManager.QueryStartCallback): void
-	on(event: EventManager.Event.queryEnd, cb: EventManager.QueryEndCallback): void
-	on(event: EventManager.Event.queryError, cb: EventManager.QueryErrorCallback): void
-	on<Event extends EventManager.Event>(event: Event, cb: EventManager.ListenerTypes[Event]): void {
-		this.listeners[event].push(cb as any)
+	on<Event extends keyof EventManager.ListenerTypes>(event: Event, cb: EventManager.ListenerTypes[Event]): void {
+		;(this.listeners[event] as EventManager.ListenerTypes[Event][]).push(cb)
 	}
 
-	fire(event: EventManager.Event.queryStart, ...params: Parameters<EventManager.QueryStartCallback>): void
-	fire(event: EventManager.Event.queryEnd, ...params: Parameters<EventManager.QueryEndCallback>): void
-	fire(event: EventManager.Event.queryError, ...params: Parameters<EventManager.QueryErrorCallback>): void
 	fire<Event extends EventManager.Event>(event: Event, ...params: Parameters<EventManager.ListenerTypes[Event]>): void {
-		this.listeners[event].forEach((cb: any) => cb(...(params as any)))
+		;(this.listeners[event] as EventManager.ListenerTypes[Event][]).forEach((cb: EventManager.ListenerTypes[Event]) =>
+			cb(...(params as [any, any])),
+		)
 		if (this.parent) {
-			this.parent.fire(event as any, ...(params as [any, any]))
+			this.parent.fire(event, ...params)
 		}
+	}
+
+	removeListener<Event extends EventManager.Event>(
+		event: EventManager.Event,
+		cb: EventManager.ListenerTypes[Event],
+	): void {
+		this.listeners[event] = this.listeners[event].filter(it => it !== cb) as any[]
 	}
 }
 

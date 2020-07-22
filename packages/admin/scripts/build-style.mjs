@@ -14,11 +14,21 @@ sass.render(
 					file: path,
 				}
 			}
+			return {
+				file: url,
+			}
 		},
+		outFile: path.join(process.cwd(), '/dist/style.css'),
+		sourceMap: true,
 		fiber: Fiber,
 	},
 	(err, result) => {
 		fs.writeFileSync(path.join(process.cwd(), '/dist/style.css'), result.css, function(err) {
+			if (err) {
+				throw err
+			}
+		})
+		fs.writeFileSync(path.join(process.cwd(), '/dist/style.css.map'), result.map.toString(), function(err) {
 			if (err) {
 				throw err
 			}

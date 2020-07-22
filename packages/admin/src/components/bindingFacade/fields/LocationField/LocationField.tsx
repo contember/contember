@@ -3,13 +3,16 @@ import { useRelativeSingleField } from '@contember/binding/dist/src/accessorProp
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as Leaflet from 'leaflet'
 import * as React from 'react'
-import { Map, Marker, TileLayer } from 'react-leaflet'
+import { Map, MapProps, Marker, MarkerProps, TileLayer, TileLayerProps } from 'react-leaflet'
 
 export interface LocationFieldProps extends Omit<FormGroupProps, 'children'> {
 	latitudeField: SugaredFieldProps['field']
 	longitudeField: SugaredFieldProps['field']
 	mapCenter?: [number, number]
 	zoom?: number
+	tileLayerProps?: TileLayerProps
+	mapProps?: MapProps
+	markerProps?: MarkerProps
 }
 
 const markerIcon = Leaflet.divIcon({
@@ -21,7 +24,16 @@ const markerIcon = Leaflet.divIcon({
 const defaultZoom = 5
 
 export const LocationField = Component<LocationFieldProps>(
-	({ latitudeField, longitudeField, mapCenter, zoom = defaultZoom, ...formGroupProps }) => {
+	({
+		latitudeField,
+		longitudeField,
+		mapCenter,
+		zoom = defaultZoom,
+		tileLayerProps,
+		mapProps,
+		markerProps,
+		...formGroupProps
+	}) => {
 		const latitude = useRelativeSingleField<number>(latitudeField)
 		const longitude = useRelativeSingleField<number>(longitudeField)
 
@@ -47,17 +59,25 @@ export const LocationField = Component<LocationFieldProps>(
 		return (
 			<FormGroup {...formGroupProps}>
 				<div className="locationField-map-container">
-					<Map center={resolvedCenter} zoom={zoom} onclick={moveMarker} className="locationField-map-canvas">
+					<Map
+						center={resolvedCenter}
+						zoom={zoom}
+						className="locationField-map-canvas"
+						{...(mapProps ?? {})}
+						onclick={moveMarker}
+					>
 						<TileLayer
 							url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 							attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+							{...(tileLayerProps ?? {})}
 						/>
 						{latitude.currentValue !== null && longitude.currentValue !== null && (
 							<Marker
+								icon={markerIcon}
+								{...(markerProps ?? {})}
 								position={[latitude.currentValue, longitude.currentValue]}
 								onmove={moveMarker as any}
 								draggable
-								icon={markerIcon}
 							/>
 						)}
 					</Map>

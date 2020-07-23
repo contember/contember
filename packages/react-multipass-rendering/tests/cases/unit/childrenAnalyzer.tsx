@@ -1,6 +1,6 @@
 import 'jasmine'
 import React from 'react'
-import { ChildrenAnalyzer, BranchNode, RawNodeRepresentation, Leaf } from '../../../src'
+import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '../../../src'
 
 interface FooComponentProps {
 	foo: string
@@ -115,5 +115,40 @@ describe('children analyzer', () => {
 		})
 		const analyser = new ChildrenAnalyzer<number, number>([numberLeaf], [calculatorBranchNode])
 		expect(analyser.processChildren(calculatorFormula, undefined)).toEqual([140])
+	})
+	it('should not ignore unhandled nodes when appropriate', () => {
+		const fooLeaf = new Leaf((props: FooComponentProps): FooComponentProps => props, FooComponent)
+		const Container: React.FunctionComponent = props => <>{props.children}</>
+		;(Container as any).staticRender = (props: any) => props.children
+
+		const analyzer = new ChildrenAnalyzer<FooComponentProps>([fooLeaf], {
+			ignoreUnhandledNodes: false,
+			staticRenderFactoryName: 'staticRender',
+			unhandledNodeErrorMessage: 'Only foo children are supported.',
+		})
+
+		const nodes = (
+			<>
+				<>
+					<Container>
+						<>
+							<FooComponent foo="123" baz={123} />
+							<FooComponent foo="456" baz={456} />
+						</>
+						<FooComponent foo="789" baz={789} />
+						<Container>
+							<FooComponent foo="135" baz={135} />
+						</Container>
+					</Container>
+				</>
+			</>
+		)
+
+		expect(analyzer.processChildren(nodes, undefined)).toEqual([
+			{ foo: '123', baz: 123 },
+			{ foo: '456', baz: 456 },
+			{ foo: '789', baz: 789 },
+			{ foo: '135', baz: 135 },
+		])
 	})
 })

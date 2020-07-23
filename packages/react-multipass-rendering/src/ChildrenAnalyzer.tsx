@@ -111,8 +111,15 @@ export class ChildrenAnalyzer<
 		if ('type' in node) {
 			children = node.props.children
 
-			if (typeof node.type === 'symbol' || typeof node.type === 'string') {
+			if (typeof node.type === 'symbol') {
 				// React.Fragment, React.Portal or other non-component
+				return this.processNode(children, staticContext)
+			}
+			if (typeof node.type === 'string') {
+				// Typically a host component
+				if (!this.options.ignoreUnhandledNodes) {
+					throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, staticContext))
+				}
 				return this.processNode(children, staticContext)
 			}
 
@@ -128,11 +135,11 @@ export class ChildrenAnalyzer<
 				}
 
 			if (this.options.staticContextFactoryName in treeNode) {
-				const StaticContextFactory = treeNode[this.options.staticContextFactoryName] as StaticContextFactory<
+				const staticContextFactory = treeNode[this.options.staticContextFactoryName] as StaticContextFactory<
 					any,
 					StaticContext
 				>
-				staticContext = StaticContextFactory(node.props, staticContext)
+				staticContext = staticContextFactory(node.props, staticContext)
 			}
 
 			if (this.options.staticRenderFactoryName in treeNode) {
@@ -205,7 +212,7 @@ export class ChildrenAnalyzer<
 				}
 			}
 
-			if (!this.options.ignoreUnhandledNodes) {
+			if (!this.options.ignoreUnhandledNodes && !(this.options.staticRenderFactoryName in treeNode)) {
 				throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, staticContext))
 			}
 

@@ -6,5 +6,6 @@ const blockLeaf = new Leaf((props: BlockProps): BlockProps => props, Block)
 
 export const blockAnalyzer = new ChildrenAnalyzer<BlockProps, never, Environment>([blockLeaf], {
 	ignoreUnhandledNodes: false,
+	staticRenderFactoryName: 'staticRender',
 	unhandledNodeErrorMessage: 'Only Block children are supported.',
 })

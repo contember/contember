@@ -131,7 +131,7 @@ namespace Input {
 	}
 
 	// generics required by admin
-	export type FieldOrderBy<T = OrderDirection> = T | OrderBy
+	export type FieldOrderBy<T = OrderDirection> = T | OrderBy<T>
 
 	export interface OrderByFields<T = OrderDirection> {
 		[fieldName: string]: FieldOrderBy<T>

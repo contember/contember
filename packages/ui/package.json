@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "rollup --config && node --experimental-modules ./scripts/build-style.mjs",
-    "storybook": "start-storybook --ci -p 9001 -c dist/storybook/config"
+    "storybook": "start-storybook --ci -p 9001 -c storybookConfig"
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {

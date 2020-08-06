@@ -1,7 +1,7 @@
-module.exports = ({ config }: any) => {
+module.exports = ({ config }) => {
 	// https://github.com/storybookjs/storybook/issues/3346
 	config.module.rules = config.module.rules.filter(
-		(rule: any) => !(rule.use && rule.use.length && rule.use.find(({ loader }: any) => loader === 'babel-loader')),
+		rule => !(rule.use && rule.use.length && rule.use.find(({ loader }) => loader === 'babel-loader')),
 	)
 	config.module.rules.push({
 		test: /\.(ts|tsx)$/,

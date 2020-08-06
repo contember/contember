@@ -3,16 +3,18 @@ import * as React from 'react'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import {
-	EntityFieldMarkers,
+	//EntityFieldMarkers,
+	EntityFieldMarkersContainer,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
 	SubTreeMarker,
 } from '../markers'
+import { MarkerFactory } from '../queryLanguage'
 import { MarkerMerger } from './MarkerMerger'
 
-type Fragment = EntityFieldMarkers
+type Fragment = EntityFieldMarkersContainer
 type Terminals = FieldMarker | Fragment
 type Nonterminals = SubTreeMarker | HasOneRelationMarker | HasManyRelationMarker | Fragment
 
@@ -64,12 +66,12 @@ export class MarkerTreeGenerator {
 		return hoistedMap
 	}
 
-	private *hoistSubTeesFromEntityFields(fields: EntityFieldMarkers): Generator<SubTreeMarker, void> {
-		for (const [placeholderName, marker] of fields) {
+	private *hoistSubTeesFromEntityFields(fields: EntityFieldMarkersContainer): Generator<SubTreeMarker, void> {
+		for (const [placeholderName, marker] of fields.markers) {
 			if (marker instanceof SubTreeMarker) {
 				yield marker
 				yield* this.hoistSubTeesFromEntityFields(marker.fields)
-				fields.delete(placeholderName)
+				fields.markers.delete(placeholderName)
 			} else if (marker instanceof HasOneRelationMarker || marker instanceof HasManyRelationMarker) {
 				yield* this.hoistSubTeesFromEntityFields(marker.fields)
 			}
@@ -78,11 +80,11 @@ export class MarkerTreeGenerator {
 
 	private static mapNodeResultToEntityFields(
 		result: RawNodeRepresentation<Terminals, Nonterminals>,
-	): EntityFieldMarkers {
-		const fields: EntityFieldMarkers = new Map()
+	): EntityFieldMarkersContainer {
+		let fieldsContainer: EntityFieldMarkersContainer = new EntityFieldMarkersContainer(false, new Map(), new Map())
 
 		if (!result) {
-			return fields
+			return fieldsContainer
 		}
 
 		if (!Array.isArray(result)) {
@@ -90,25 +92,17 @@ export class MarkerTreeGenerator {
 		}
 
 		for (const marker of result) {
-			if (marker instanceof Map) {
-				for (const [placeholderName, innerMarker] of marker) {
-					const markerFromFields = fields.get(placeholderName)
-					fields.set(
-						placeholderName,
-						markerFromFields === undefined ? innerMarker : MarkerMerger.mergeMarkers(markerFromFields, innerMarker),
-					)
-				}
+			if (marker instanceof EntityFieldMarkersContainer) {
+				fieldsContainer = MarkerMerger.mergeEntityFieldsContainers(fieldsContainer, marker)
 			} else {
-				const placeholderName = marker.placeholderName
-				const markerFromFields = fields.get(placeholderName)
-				fields.set(
-					placeholderName,
-					markerFromFields === undefined ? marker : MarkerMerger.mergeMarkers(markerFromFields, marker),
+				fieldsContainer = MarkerMerger.mergeEntityFieldsContainers(
+					fieldsContainer,
+					MarkerFactory.createEntityFieldMarkersContainer(marker),
 				)
 			}
 		}
 
-		return fields
+		return fieldsContainer
 	}
 
 	private reportInvalidTopLevelError(marker: Exclude<NodeResult, SubTreeMarker>): never {

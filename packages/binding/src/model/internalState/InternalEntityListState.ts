@@ -1,6 +1,6 @@
 import { EntityListAccessor, ErrorAccessor } from '../../accessors'
 import { Environment } from '../../dao'
-import { EntityFieldMarkers } from '../../markers'
+import { EntityFieldMarkersContainer } from '../../markers'
 import { EntityCreationParameters, EntityListPreferences, RemovalType } from '../../treeParameters'
 import { InternalEntityState, OnEntityUpdate } from './InternalEntityState'
 import { InternalStateType } from './InternalStateType'
@@ -19,11 +19,11 @@ export interface InternalEntityListState {
 			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>
 			| undefined
 	}
-	fieldMarkers: EntityFieldMarkers
 	getAccessor: () => EntityListAccessor
 	hasPendingParentNotification: boolean
 	hasPendingUpdate: boolean
 	hasStaleAccessor: boolean
+	markersContainer: EntityFieldMarkersContainer
 	persistedEntityIds: Set<string>
 	plannedRemovals: Map<InternalEntityState, RemovalType> | undefined
 

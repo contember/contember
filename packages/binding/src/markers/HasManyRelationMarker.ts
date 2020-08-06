@@ -1,17 +1,16 @@
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import { HasManyRelation } from '../treeParameters'
-import { EntityFieldMarkers, hasAtLeastOneBearingField } from './EntityFieldMarkers'
+import { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 // This doesn't represent reduced has many relations.
 export class HasManyRelationMarker {
 	public readonly placeholderName: string
-	public readonly hasAtLeastOneBearingField: boolean
 
 	public constructor(
 		public readonly relation: HasManyRelation,
-		public readonly fields: EntityFieldMarkers,
+		public readonly fields: EntityFieldMarkersContainer,
 		public readonly environment: Environment,
 	) {
 		if (__DEV_MODE__) {
@@ -20,6 +19,5 @@ export class HasManyRelationMarker {
 			}
 		}
 		this.placeholderName = PlaceholderGenerator.generateHasManyRelationMarkerPlaceholder(this)
-		this.hasAtLeastOneBearingField = hasAtLeastOneBearingField(fields)
 	}
 }

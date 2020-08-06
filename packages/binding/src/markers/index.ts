@@ -1,4 +1,6 @@
 export * from './EntityFieldMarkers'
+export * from './EntityFieldMarkersContainer'
+export * from './EntityFieldPlaceholders'
 export * from './FieldMarker'
 export * from './HasManyRelationMarker'
 export * from './HasOneRelationMarker'

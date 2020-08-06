@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Environment, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../../../../src'
+import { EntityFieldMarkersContainer, Environment, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../../../../src'
 import { Field, HasMany, HasOne, SingleEntitySubTree } from '../../../../src/coreComponents'
 import {
 	FieldMarker,
@@ -69,13 +69,23 @@ describe('Marker tree generator', () => {
 				offset: undefined,
 				limit: undefined,
 			},
-			new Map([
-				idMarker,
-				typeNameMarker,
-				['same', new FieldMarker('same')],
-				['name', new FieldMarker('name')],
-				['surname', new FieldMarker('surname')],
-			]),
+			new EntityFieldMarkersContainer(
+				true,
+				new Map([
+					idMarker,
+					typeNameMarker,
+					['same', new FieldMarker('same')],
+					['name', new FieldMarker('name')],
+					['surname', new FieldMarker('surname')],
+				]),
+				new Map([
+					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
+					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
+					['same', 'same'],
+					['name', 'name'],
+					['surname', 'surname'],
+				]),
+			),
 			environment,
 		)
 
@@ -88,12 +98,21 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				reducedBy: undefined,
 			},
-			new Map<string, Marker>([
-				idMarker,
-				typeNameMarker,
-				[innerHasMany.placeholderName, innerHasMany],
-				['hasOneField', new FieldMarker('hasOneField')],
-			]),
+			new EntityFieldMarkersContainer(
+				true,
+				new Map<string, Marker>([
+					idMarker,
+					typeNameMarker,
+					[innerHasMany.placeholderName, innerHasMany],
+					['hasOneField', new FieldMarker('hasOneField')],
+				]),
+				new Map([
+					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
+					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
+					['common', innerHasMany.placeholderName],
+					['hasOneField', 'hasOneField'],
+				]),
+			),
 			environment,
 		)
 
@@ -109,12 +128,21 @@ describe('Marker tree generator', () => {
 				offset: undefined,
 				limit: undefined,
 			},
-			new Map<string, Marker>([
-				idMarker,
-				typeNameMarker,
-				['hasManyField', new FieldMarker('hasManyField')],
-				[hasOne.placeholderName, hasOne],
-			]),
+			new EntityFieldMarkersContainer(
+				true,
+				new Map<string, Marker>([
+					idMarker,
+					typeNameMarker,
+					['hasManyField', new FieldMarker('hasManyField')],
+					[hasOne.placeholderName, hasOne],
+				]),
+				new Map([
+					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
+					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
+					['hasManyField', 'hasManyField'],
+					[hasOne.relation.field, hasOne.placeholderName],
+				]),
+			),
 			environment,
 		)
 		const subTreeMarker = new SubTreeMarker(
@@ -127,12 +155,21 @@ describe('Marker tree generator', () => {
 				setOnCreate: { bar: 123 },
 				forceCreation: false,
 			}),
-			new Map<string, Marker>([
-				idMarker,
-				typeNameMarker,
-				[outerHasMany.placeholderName, outerHasMany],
-				['fooField', new FieldMarker('fooField')],
-			]),
+			new EntityFieldMarkersContainer(
+				true,
+				new Map<string, Marker>([
+					idMarker,
+					typeNameMarker,
+					[outerHasMany.placeholderName, outerHasMany],
+					['fooField', new FieldMarker('fooField')],
+				]),
+				new Map([
+					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
+					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
+					[outerHasMany.relation.field, outerHasMany.placeholderName],
+					['fooField', 'fooField'],
+				]),
+			),
 			environment,
 		)
 		expect(generator.generate()).toEqual(new MarkerTreeRoot(new Map([[subTreeMarker.placeholderName, subTreeMarker]])))

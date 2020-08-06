@@ -13,9 +13,8 @@ import { BindingError } from '../BindingError'
 import { TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import {
-	EntityFieldMarkers,
+	EntityFieldMarkersContainer,
 	FieldMarker,
-	hasAtLeastOneBearingField,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
@@ -230,7 +229,7 @@ export class AccessorTreeGenerator {
 							const newSubTreeState = this.initializeEntityAccessor(
 								newSubTreeData.id,
 								subTreeState.environment,
-								subTreeState.fieldMarkers,
+								subTreeState.markersContainer,
 								subTreeState.creationParameters,
 								subTreeState.onChildFieldUpdate,
 							)
@@ -308,7 +307,7 @@ export class AccessorTreeGenerator {
 					break
 				}
 				case InternalStateType.SingleEntity: {
-					const marker = state.fieldMarkers.get(fieldPlaceholder)
+					const marker = state.markersContainer.markers.get(fieldPlaceholder)
 
 					if (!(marker instanceof HasOneRelationMarker)) {
 						break
@@ -444,7 +443,7 @@ export class AccessorTreeGenerator {
 				this.initializeEntityAccessor(
 					newKey,
 					state.environment,
-					state.fieldMarkers,
+					state.markersContainer,
 					state.creationParameters,
 					state.onChildEntityUpdate,
 				)
@@ -458,7 +457,7 @@ export class AccessorTreeGenerator {
 					childState = this.initializeEntityAccessor(
 						newPersistedId,
 						state.environment,
-						state.fieldMarkers,
+						state.markersContainer,
 						state.creationParameters,
 						state.onChildEntityUpdate,
 					)
@@ -543,20 +542,24 @@ export class AccessorTreeGenerator {
 			}
 			// Deliberately letting flow get here as well. Leaf errors *CAN* refer to relations as well.
 
-			for (const [fieldPlaceholder, fieldState] of state.fields) {
+			const placeholders = state.markersContainer.placeholders.get(childKey)
+			if (placeholders === undefined) {
+				continue
+			}
+			const normalizedPlaceholders = typeof placeholders === 'string' ? new Set([placeholders]) : placeholders
+
+			for (const normalizedPlaceholder of normalizedPlaceholders) {
+				const fieldState = state.fields.get(normalizedPlaceholder)
+				if (fieldState === undefined) {
+					continue
+				}
 				if (fieldState.type === InternalStateType.SingleEntity) {
-					if (
-						child.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed &&
-						PlaceholderGenerator.isHasOneRelationFieldPlaceholder(childKey, fieldPlaceholder)
-					) {
+					if (child.nodeType !== ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
 						state.childrenWithPendingUpdates.add(fieldState)
 						this.setEntityStateErrors(fieldState, child, mode)
 					}
 				} else if (fieldState.type === InternalStateType.EntityList) {
-					if (
-						child.nodeType !== ErrorsPreprocessor.ErrorNodeType.FieldIndexed &&
-						PlaceholderGenerator.isHasManyRelationFieldPlaceholder(childKey, fieldPlaceholder)
-					) {
+					if (child.nodeType !== ErrorsPreprocessor.ErrorNodeType.FieldIndexed) {
 						state.childrenWithPendingUpdates.add(fieldState)
 						this.setEntityListStateErrors(fieldState, child, mode)
 					}
@@ -748,8 +751,11 @@ export class AccessorTreeGenerator {
 		}
 	}
 
-	private initializeEntityFields(entityState: InternalEntityState, fieldMarkers: EntityFieldMarkers): void {
-		for (const [placeholderName, field] of fieldMarkers) {
+	private initializeEntityFields(
+		entityState: InternalEntityState,
+		markersContainer: EntityFieldMarkersContainer,
+	): void {
+		for (const [placeholderName, field] of markersContainer.markers) {
 			const fieldDatum = entityState.persistedData?.get(placeholderName)
 			if (field instanceof FieldMarker) {
 				this.initializeFromFieldMarker(entityState, field, fieldDatum)
@@ -765,8 +771,11 @@ export class AccessorTreeGenerator {
 		}
 	}
 
-	private mergeInEntityFields(existingEntityState: InternalEntityState, newFieldMarkers: EntityFieldMarkers): void {
-		for (const [placeholderName, field] of newFieldMarkers) {
+	private mergeInEntityFieldsContainer(
+		existingEntityState: InternalEntityState,
+		newMarkersContainer: EntityFieldMarkersContainer,
+	): void {
+		for (const [placeholderName, field] of newMarkersContainer.markers) {
 			const fieldState = existingEntityState.fields.get(placeholderName)
 			const fieldDatum = existingEntityState.persistedData?.get(placeholderName)
 
@@ -791,12 +800,15 @@ export class AccessorTreeGenerator {
 						this.initializeEntityAccessor(
 							childState.id,
 							fieldState.environment,
-							newFieldMarkers,
+							newMarkersContainer,
 							fieldState.creationParameters,
 							fieldState.onChildEntityUpdate,
 						)
 					}
-					fieldState.fieldMarkers = MarkerMerger.mergeEntityFields(fieldState.fieldMarkers, newFieldMarkers)
+					fieldState.markersContainer = MarkerMerger.mergeEntityFieldsContainers(
+						fieldState.markersContainer,
+						newMarkersContainer,
+					)
 				}
 			} else if (field instanceof SubTreeMarker) {
 				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
@@ -809,7 +821,7 @@ export class AccessorTreeGenerator {
 	private initializeEntityAccessor(
 		id: string | EntityAccessor.UnpersistedEntityId,
 		environment: Environment,
-		fieldMarkers: EntityFieldMarkers,
+		markersContainer: EntityFieldMarkersContainer,
 		creationParameters: EntityCreationParameters,
 		onEntityUpdate: OnEntityUpdate,
 	): InternalEntityState {
@@ -817,7 +829,10 @@ export class AccessorTreeGenerator {
 		const existingEntityState = this.entityStore.get(entityKey)
 
 		if (existingEntityState !== undefined) {
-			existingEntityState.fieldMarkers = MarkerMerger.mergeEntityFields(existingEntityState.fieldMarkers, fieldMarkers)
+			existingEntityState.markersContainer = MarkerMerger.mergeEntityFieldsContainers(
+				existingEntityState.markersContainer,
+				markersContainer,
+			)
 			existingEntityState.realms.add(onEntityUpdate)
 			existingEntityState.hasStaleAccessor = true
 			existingEntityState.creationParameters = {
@@ -828,11 +843,7 @@ export class AccessorTreeGenerator {
 					creationParameters.setOnCreate,
 				),
 			}
-
-			if (!existingEntityState.hasAtLeastOneBearingField) {
-				existingEntityState.hasAtLeastOneBearingField = hasAtLeastOneBearingField(fieldMarkers)
-			}
-			this.mergeInEntityFields(existingEntityState, fieldMarkers)
+			this.mergeInEntityFieldsContainer(existingEntityState, markersContainer)
 
 			return existingEntityState
 		}
@@ -850,13 +861,12 @@ export class AccessorTreeGenerator {
 				beforeUpdate: undefined,
 			},
 			fields: new Map(),
-			fieldMarkers,
-			hasAtLeastOneBearingField: hasAtLeastOneBearingField(fieldMarkers),
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
 			hasStaleAccessor: true,
 			id,
 			isScheduledForDeletion: false,
+			markersContainer,
 			persistedData: this.persistedEntityData.get(entityKey),
 			plannedHasOneDeletions: undefined,
 			realms: new Set([onEntityUpdate]),
@@ -907,98 +917,103 @@ export class AccessorTreeGenerator {
 			connectEntityAtField: (placeholderName, entityToConnectOrItsKey) => {
 				this.performRootTreeOperation(() => {
 					performOperationWithBeforeUpdate(() => {
-						const hasOneMarker = resolveHasOneRelationMarker(
+						const hasOneMarkers = resolveHasOneRelationMarkers(
 							placeholderName,
-							`Cannot connect at field '${placeholderName}' as it doesn't refer to a has one relation. ` +
-								`Perhaps you forgot to generate a placeholder?`,
+							`Cannot connect at field '${placeholderName}' as it doesn't refer to a has one relation.`,
 						)
-						const previouslyConnectedState = entityState.fields.get(placeholderName)
-
-						if (
-							previouslyConnectedState === undefined ||
-							previouslyConnectedState.type !== InternalStateType.SingleEntity
-						) {
-							this.rejectInvalidAccessorTree()
-						}
-
-						const [connectedEntityKey, newlyConnectedState] = this.resolveAndPrepareEntityToConnect(
-							entityToConnectOrItsKey,
-						)
-
-						if (previouslyConnectedState === newlyConnectedState) {
-							return // Do nothing.
-						}
-						// TODO remove from planned deletions if appropriate
-
-						const persistedKey = entityState.persistedData?.get(placeholderName)
-						if (persistedKey instanceof BoxedSingleEntityId) {
-							if (persistedKey.id === connectedEntityKey) {
-								this.unpersistedChangesCount-- // It was removed from the list but now we're adding it back.
-							} else if (persistedKey.id === this.idToKey(previouslyConnectedState.id)) {
-								this.unpersistedChangesCount++ // We're changing it from the persisted id.
-							}
-						} else if (previouslyConnectedState.id instanceof EntityAccessor.UnpersistedEntityId) {
-							// This assumes the invariant enforced above that we cannot connect unpersisted entities.
-							// Hence the previouslyConnectedState still refers to the entity created initially.
+						for (const hasOneMarker of hasOneMarkers) {
+							const previouslyConnectedState = entityState.fields.get(placeholderName)
 
 							if (
-								persistedKey === null || // We're updating.
-								(persistedKey === undefined && // We're creating.
-									(!entityState.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing))
+								previouslyConnectedState === undefined ||
+								previouslyConnectedState.type !== InternalStateType.SingleEntity
 							) {
-								this.unpersistedChangesCount++
+								this.rejectInvalidAccessorTree()
 							}
+
+							const [connectedEntityKey, newlyConnectedState] = this.resolveAndPrepareEntityToConnect(
+								entityToConnectOrItsKey,
+							)
+
+							if (previouslyConnectedState === newlyConnectedState) {
+								return // Do nothing.
+							}
+							// TODO remove from planned deletions if appropriate
+
+							const persistedKey = entityState.persistedData?.get(placeholderName)
+							if (persistedKey instanceof BoxedSingleEntityId) {
+								if (persistedKey.id === connectedEntityKey) {
+									this.unpersistedChangesCount-- // It was removed from the list but now we're adding it back.
+								} else if (persistedKey.id === this.idToKey(previouslyConnectedState.id)) {
+									this.unpersistedChangesCount++ // We're changing it from the persisted id.
+								}
+							} else if (previouslyConnectedState.id instanceof EntityAccessor.UnpersistedEntityId) {
+								// This assumes the invariant enforced above that we cannot connect unpersisted entities.
+								// Hence the previouslyConnectedState still refers to the entity created initially.
+
+								if (
+									persistedKey === null || // We're updating.
+									(persistedKey === undefined && // We're creating.
+										(!entityState.markersContainer.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing))
+								) {
+									this.unpersistedChangesCount++
+								}
+							}
+
+							// TODO do something about the existing state…
+
+							newlyConnectedState.realms.add(entityState.onChildFieldUpdate)
+							entityState.fields.set(placeholderName, newlyConnectedState)
+							entityState.hasStaleAccessor = true
+							entityState.hasPendingParentNotification = true
 						}
-
-						// TODO do something about the existing state…
-
-						newlyConnectedState.realms.add(entityState.onChildFieldUpdate)
-						entityState.fields.set(placeholderName, newlyConnectedState)
-						entityState.hasStaleAccessor = true
-						entityState.hasPendingParentNotification = true
 					})
 				})
 			},
 			disconnectEntityAtField: placeholderName => {
 				this.performRootTreeOperation(() => {
 					performOperationWithBeforeUpdate(() => {
-						const hasOneMarker = resolveHasOneRelationMarker(
+						const hasOneMarkers = resolveHasOneRelationMarkers(
 							placeholderName,
-							`Cannot disconnect the field '${placeholderName}' as it doesn't refer to a has one relation. ` +
-								`Perhaps you forgot to generate a placeholder?`,
+							`Cannot disconnect the field '${placeholderName}' as it doesn't refer to a has one relation.`,
 						)
-						const stateToDisconnect = entityState.fields.get(placeholderName)
+						for (const hasOneMarker of hasOneMarkers) {
+							const stateToDisconnect = entityState.fields.get(placeholderName)
 
-						if (stateToDisconnect === undefined) {
-							throw new BindingError(`Cannot disconnect field '${placeholderName}' as it doesn't exist.`)
+							if (stateToDisconnect === undefined) {
+								throw new BindingError(`Cannot disconnect field '${placeholderName}' as it doesn't exist.`)
+							}
+							if (stateToDisconnect.type !== InternalStateType.SingleEntity) {
+								this.rejectInvalidAccessorTree()
+							}
+
+							const persistedKey = entityState.persistedData?.get(placeholderName)
+
+							if (
+								persistedKey instanceof BoxedSingleEntityId &&
+								persistedKey.id === this.idToKey(stateToDisconnect.id)
+							) {
+								this.unpersistedChangesCount++
+							} else {
+								// Do nothing. Disconnecting unpersisted entities doesn't change the count.
+							}
+
+							stateToDisconnect.realms.delete(entityState.onChildFieldUpdate)
+
+							// TODO update changes count?
+
+							const newEntityState = this.initializeEntityAccessor(
+								new EntityAccessor.UnpersistedEntityId(),
+								hasOneMarker.environment,
+								hasOneMarker.fields,
+								hasOneMarker.relation,
+								entityState.onChildFieldUpdate,
+							)
+							entityState.fields.set(placeholderName, newEntityState)
+
+							entityState.hasStaleAccessor = true
+							entityState.hasPendingParentNotification = true
 						}
-						if (stateToDisconnect.type !== InternalStateType.SingleEntity) {
-							this.rejectInvalidAccessorTree()
-						}
-
-						const persistedKey = entityState.persistedData?.get(placeholderName)
-
-						if (persistedKey instanceof BoxedSingleEntityId && persistedKey.id === this.idToKey(stateToDisconnect.id)) {
-							this.unpersistedChangesCount++
-						} else {
-							// Do nothing. Disconnecting unpersisted entities doesn't change the count.
-						}
-
-						stateToDisconnect.realms.delete(entityState.onChildFieldUpdate)
-
-						// TODO update changes count?
-
-						const newEntityState = this.initializeEntityAccessor(
-							new EntityAccessor.UnpersistedEntityId(),
-							hasOneMarker.environment,
-							hasOneMarker.fields,
-							hasOneMarker.relation,
-							entityState.onChildFieldUpdate,
-						)
-						entityState.fields.set(placeholderName, newEntityState)
-
-						entityState.hasStaleAccessor = true
-						entityState.hasPendingParentNotification = true
 					})
 				})
 			},
@@ -1102,7 +1117,7 @@ export class AccessorTreeGenerator {
 				const newEntityState = this.initializeEntityAccessor(
 					new EntityAccessor.UnpersistedEntityId(),
 					deletedState.environment,
-					deletedState.fieldMarkers,
+					deletedState.markersContainer,
 					deletedState.creationParameters,
 					entityState.onChildFieldUpdate,
 				)
@@ -1112,22 +1127,33 @@ export class AccessorTreeGenerator {
 			entityState.childrenWithPendingUpdates?.delete(deletedState)
 		}
 
-		const resolveHasOneRelationMarker = (field: FieldName, message: string): HasOneRelationMarker => {
-			const hasOneRelation = entityState.fieldMarkers.get(field)
+		const resolveHasOneRelationMarkers = (field: FieldName, message: string): Set<HasOneRelationMarker> => {
+			const placeholders = entityState.markersContainer.placeholders.get(field)
 
-			if (!(hasOneRelation instanceof HasOneRelationMarker)) {
+			if (placeholders === undefined) {
 				throw new BindingError(message)
 			}
-			return hasOneRelation
+			const placeholderArray = placeholders instanceof Set ? Array.from(placeholders) : [placeholders]
+
+			return new Set(
+				placeholderArray.map(placeholderName => {
+					const hasOneRelation = entityState.markersContainer.markers.get(placeholderName)
+
+					if (!(hasOneRelation instanceof HasOneRelationMarker)) {
+						throw new BindingError(message)
+					}
+					return hasOneRelation
+				}),
+			)
 		}
 
-		this.initializeEntityFields(entityState, fieldMarkers)
+		this.initializeEntityFields(entityState, markersContainer)
 		return entityState
 	}
 
 	private initializeEntityListAccessor(
 		environment: Environment,
-		fieldMarkers: EntityFieldMarkers,
+		markersContainer: EntityFieldMarkersContainer,
 		creationParameters: EntityCreationParameters & EntityListPreferences,
 		onEntityListUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
@@ -1135,7 +1161,7 @@ export class AccessorTreeGenerator {
 		const entityListState: InternalEntityListState = {
 			type: InternalStateType.EntityList,
 			creationParameters,
-			fieldMarkers,
+			markersContainer,
 			onEntityListUpdate,
 			persistedEntityIds,
 			addEventListener: undefined as any,
@@ -1353,7 +1379,7 @@ export class AccessorTreeGenerator {
 			const entityState = this.initializeEntityAccessor(
 				id,
 				entityListState.environment,
-				entityListState.fieldMarkers,
+				entityListState.markersContainer,
 				entityListState.creationParameters,
 				entityListState.onChildEntityUpdate,
 			)

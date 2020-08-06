@@ -3,6 +3,8 @@ import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkers,
+	EntityFieldMarkersContainer,
+	EntityFieldPlaceholders,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
@@ -69,10 +71,68 @@ export class MarkerMerger {
 		return newOriginal
 	}
 
+	public static mergeEntityFieldPlaceholders(
+		original: EntityFieldPlaceholders,
+		fresh: EntityFieldPlaceholders,
+	): EntityFieldPlaceholders {
+		const newOriginal: EntityFieldPlaceholders = new Map(original)
+		for (const [fieldName, freshPlaceholders] of fresh) {
+			const placeholderFromOriginal = newOriginal.get(fieldName)
+
+			if (placeholderFromOriginal === undefined) {
+				newOriginal.set(fieldName, freshPlaceholders)
+			} else if (placeholderFromOriginal instanceof Set) {
+				const combinedSet = new Set(placeholderFromOriginal)
+				if (freshPlaceholders instanceof Set) {
+					for (const freshPlaceholder of freshPlaceholders) {
+						combinedSet.add(freshPlaceholder)
+					}
+				} else if (typeof freshPlaceholders === 'string') {
+					combinedSet.add(freshPlaceholders)
+				} else {
+					assertNever(freshPlaceholders)
+				}
+				newOriginal.set(fieldName, combinedSet)
+			} else if (typeof placeholderFromOriginal === 'string') {
+				if (typeof freshPlaceholders === 'string') {
+					if (placeholderFromOriginal === freshPlaceholders) {
+						// Do nothing
+					} else {
+						newOriginal.set(fieldName, new Set([placeholderFromOriginal, freshPlaceholders]))
+					}
+				} else if (freshPlaceholders instanceof Set) {
+					if (freshPlaceholders.has(placeholderFromOriginal)) {
+						newOriginal.set(fieldName, freshPlaceholders)
+					} else {
+						const combinedSet = new Set(freshPlaceholders)
+						combinedSet.add(placeholderFromOriginal)
+						newOriginal.set(fieldName, combinedSet)
+					}
+				} else {
+					assertNever(freshPlaceholders)
+				}
+			} else {
+				assertNever(placeholderFromOriginal)
+			}
+		}
+		return newOriginal
+	}
+
+	public static mergeEntityFieldsContainers(
+		original: EntityFieldMarkersContainer,
+		fresh: EntityFieldMarkersContainer,
+	): EntityFieldMarkersContainer {
+		return new EntityFieldMarkersContainer(
+			original.hasAtLeastOneBearingField || fresh.hasAtLeastOneBearingField,
+			this.mergeEntityFields(original.markers, fresh.markers),
+			this.mergeEntityFieldPlaceholders(original.placeholders, fresh.placeholders),
+		)
+	}
+
 	public static mergeHasOneRelationMarkers(original: HasOneRelationMarker, fresh: HasOneRelationMarker) {
 		return new HasOneRelationMarker(
 			TreeParameterMerger.mergeHasOneRelationsWithSamePlaceholders(original.relation, fresh.relation),
-			this.mergeEntityFields(original.fields, fresh.fields),
+			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
 			this.mergeEnvironments(original.environment, fresh.environment),
 		)
 	}
@@ -80,7 +140,7 @@ export class MarkerMerger {
 	public static mergeHasManyRelationMarkers(original: HasManyRelationMarker, fresh: HasManyRelationMarker) {
 		return new HasManyRelationMarker(
 			TreeParameterMerger.mergeHasManyRelationsWithSamePlaceholders(original.relation, fresh.relation),
-			this.mergeEntityFields(original.fields, fresh.fields),
+			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
 			this.mergeEnvironments(original.environment, fresh.environment),
 		)
 	}
@@ -88,7 +148,7 @@ export class MarkerMerger {
 	public static mergeSubTreeMarkers(original: SubTreeMarker, fresh: SubTreeMarker) {
 		return new SubTreeMarker(
 			original.parameters,
-			this.mergeEntityFields(original.fields, fresh.fields),
+			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
 			this.mergeEnvironments(original.environment, fresh.environment),
 		)
 	}
@@ -102,15 +162,22 @@ export class MarkerMerger {
 		return original
 	}
 
-	public static mergeInSystemFields(original: EntityFieldMarkers) {
+	public static mergeInSystemFields(original: EntityFieldMarkersContainer): EntityFieldMarkersContainer {
 		const primaryKey = new FieldMarker(PRIMARY_KEY_NAME)
 		const typeName = new FieldMarker(TYPENAME_KEY_NAME)
-		// We could potentially share this map for all fields. Maybe sometime later.
-		const freshFields: EntityFieldMarkers = new Map([
-			[primaryKey.placeholderName, primaryKey],
-			[typeName.placeholderName, typeName],
-		])
-		return this.mergeEntityFields(original, freshFields)
+		// We could potentially share this instance for all fields. Maybe sometime later.
+		const freshFields = new EntityFieldMarkersContainer(
+			false,
+			new Map([
+				[primaryKey.placeholderName, primaryKey],
+				[typeName.placeholderName, typeName],
+			]),
+			new Map([
+				[PRIMARY_KEY_NAME, primaryKey.placeholderName],
+				[TYPENAME_KEY_NAME, typeName.placeholderName],
+			]),
+		)
+		return this.mergeEntityFieldsContainers(original, freshFields)
 	}
 
 	public static mergeEnvironments(original: Environment, fresh: Environment): Environment {

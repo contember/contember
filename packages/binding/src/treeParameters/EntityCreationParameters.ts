@@ -20,7 +20,7 @@ are nonbearing, the nonbearing fields/relations are also processed using the sam
 fields/relations.
 
 Lastly, setOnCreate comes to play. It doesn't influence whether the entity will be persisted or not but if after
-all of the above it is concluded that it will, the values from it are be used.
+all of the above it is concluded that it will, the values from it are used.
  */
 export interface EntityCreationParameters {
 	forceCreation: boolean

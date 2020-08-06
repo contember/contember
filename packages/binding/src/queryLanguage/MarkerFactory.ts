@@ -165,7 +165,7 @@ export namespace MarkerFactory {
 	export const createEntityFieldMarkersContainer = (marker: Marker) => {
 		if (marker instanceof FieldMarker) {
 			return new EntityFieldMarkersContainer(
-				marker.isNonbearing,
+				!marker.isNonbearing,
 				new Map([[marker.placeholderName, marker]]),
 				new Map([[marker.fieldName, marker.placeholderName]]),
 			)
@@ -177,7 +177,7 @@ export namespace MarkerFactory {
 			)
 		} else {
 			return new EntityFieldMarkersContainer(
-				marker.relation.isNonbearing,
+				!marker.relation.isNonbearing,
 				new Map([[marker.placeholderName, marker]]),
 				new Map([[marker.relation.field, marker.placeholderName]]),
 			)

@@ -1,6 +1,12 @@
 import * as React from 'react'
 import { Environment } from '../dao'
-import { EntityFieldMarkers, FieldMarker, HasManyRelationMarker, HasOneRelationMarker, SubTreeMarker } from '../markers'
+import {
+	EntityFieldMarkersContainer,
+	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+	SubTreeMarker,
+} from '../markers'
 
 export interface EnvironmentDeltaProvider<Props extends {} = any> {
 	generateEnvironment: (props: Props, oldEnvironment: Environment) => Environment
@@ -15,24 +21,24 @@ export interface FieldMarkerProvider<Props extends {} = any> {
 	generateFieldMarker: (
 		props: Props,
 		environment: Environment,
-	) => FieldMarker | HasOneRelationMarker | EntityFieldMarkers
+	) => FieldMarker | HasOneRelationMarker | EntityFieldMarkersContainer
 }
 
 export interface SubTreeMarkerProvider<Props extends {} = any> {
 	generateSubTreeMarker: (
 		props: Props,
-		fields: EntityFieldMarkers,
+		fields: EntityFieldMarkersContainer,
 		environment: Environment,
-	) => SubTreeMarker | EntityFieldMarkers
+	) => SubTreeMarker | EntityFieldMarkersContainer
 }
 
 export interface RelationMarkerProvider<Props extends {} = any> {
 	// It may also return a HasOneRelationMarker so as to facilitate implementation of conditionally nested connections
 	generateRelationMarker: (
 		props: Props,
-		fields: EntityFieldMarkers,
+		fields: EntityFieldMarkersContainer,
 		environment: Environment,
-	) => HasOneRelationMarker | HasManyRelationMarker | EntityFieldMarkers
+	) => HasOneRelationMarker | HasManyRelationMarker | EntityFieldMarkersContainer
 }
 
 // See https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379091887 about the never trick

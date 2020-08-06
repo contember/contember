@@ -5,7 +5,7 @@ import {
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
-import { EntityFieldMarkers, hasAtLeastOneBearingField } from './EntityFieldMarkers'
+import { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 export type SubTreeMarkerParameters =
@@ -16,15 +16,13 @@ export type SubTreeMarkerParameters =
 
 export class SubTreeMarker<Parameters extends SubTreeMarkerParameters = SubTreeMarkerParameters> {
 	public readonly placeholderName: string
-	public readonly hasAtLeastOneBearingField: boolean
 
 	public constructor(
 		public readonly parameters: Parameters,
-		public readonly fields: EntityFieldMarkers,
+		public readonly fields: EntityFieldMarkersContainer,
 		public readonly environment: Environment,
 	) {
 		this.placeholderName = PlaceholderGenerator.generateSubTreeMarkerPlaceholder(this)
-		this.hasAtLeastOneBearingField = hasAtLeastOneBearingField(fields)
 	}
 
 	public get entityName() {

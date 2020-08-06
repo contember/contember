@@ -50,7 +50,7 @@ export class QueryGenerator {
 		subTree: SubTreeMarker<BoxedQualifiedSingleEntity>,
 	): BaseQueryBuilder {
 		const populatedListQueryBuilder = this.registerQueryPart(
-			subTree.fields,
+			subTree.fields.markers,
 			CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.parameters.value.where),
 		)
 		return baseQueryBuilder.get(
@@ -94,7 +94,7 @@ export class QueryGenerator {
 
 		return baseQueryBuilder.list(
 			subTree.entityName,
-			this.registerQueryPart(subTree.fields, finalBuilder),
+			this.registerQueryPart(subTree.fields.markers, finalBuilder),
 			subTree.placeholderName,
 		)
 	}
@@ -111,7 +111,7 @@ export class QueryGenerator {
 			} else if (fieldValue instanceof HasOneRelationMarker) {
 				const relation = fieldValue.relation
 				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
-					this.registerQueryPart(fieldValue.fields, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
+					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
 				)
 
 				const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
@@ -138,7 +138,7 @@ export class QueryGenerator {
 			} else if (fieldValue instanceof HasManyRelationMarker) {
 				const relation = fieldValue.relation
 				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
-					this.registerQueryPart(fieldValue.fields, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
+					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
 				)
 
 				const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<

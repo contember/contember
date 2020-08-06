@@ -1,10 +1,10 @@
-// import { EntityConnections, EntityCreationParameters } from '../treeParameters'
-// import { SingleEntityFieldMarker } from './EntityFieldMarkers'
-//
-// export class EntityFieldMarkersContainer implements EntityCreationParameters {
-// 	public constructor(
-// 		public readonly hasAtLeastOneBearingField: boolean,
-// 		public readonly markers: Map<string, SingleEntityFieldMarker>,
-// 		public readonly connections: EntityConnections | undefined,
-// 	) {}
-// }
+import { EntityFieldMarkers } from './EntityFieldMarkers'
+import { EntityFieldPlaceholders } from './EntityFieldPlaceholders'
+
+export class EntityFieldMarkersContainer {
+	public constructor(
+		public readonly hasAtLeastOneBearingField: boolean,
+		public readonly markers: EntityFieldMarkers, // Indexed by placeholder names
+		public readonly placeholders: EntityFieldPlaceholders, // Indexed by field names
+	) {}
+}

@@ -1,7 +1,7 @@
 import { EntityAccessor, ErrorAccessor } from '../../accessors'
 import { SingleEntityPersistedData } from '../../accessorTree'
 import { Environment } from '../../dao'
-import { EntityFieldMarkers } from '../../markers'
+import { EntityFieldMarkersContainer } from '../../markers'
 import { EntityCreationParameters, FieldName } from '../../treeParameters'
 import { InternalStateNode } from './InternalStateNode'
 import { InternalStateType } from './InternalStateType'
@@ -19,15 +19,14 @@ export interface InternalEntityState {
 	creationParameters: EntityCreationParameters
 	errors: ErrorAccessor[]
 	fields: Map<FieldName, InternalStateNode>
-	fieldMarkers: EntityFieldMarkers
 	getAccessor: () => EntityAccessor
-	hasAtLeastOneBearingField: boolean
 	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean
 	hasStaleAccessor: boolean
 	id: string | EntityAccessor.UnpersistedEntityId
 	isScheduledForDeletion: boolean
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
+	markersContainer: EntityFieldMarkersContainer
 	persistedData: SingleEntityPersistedData | undefined
 	plannedHasOneDeletions: Map<FieldName, InternalEntityState> | undefined
 

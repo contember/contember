@@ -1,6 +1,5 @@
 import {
 	EntityAccessor,
-	PlaceholderGenerator,
 	QueryLanguage,
 	RelativeSingleEntity,
 	SugaredRelativeSingleEntity,
@@ -37,7 +36,7 @@ export const useDynamicSingleChoiceField = (
 
 	const lastHasOneRelation =
 		desugaredRelativePath.hasOneRelationPath[desugaredRelativePath.hasOneRelationPath.length - 1]
-	const currentValueFieldPlaceholder = PlaceholderGenerator.getHasOneRelationPlaceholder(lastHasOneRelation)
+	const currentValueFieldName = lastHasOneRelation.field
 
 	const getCurrentValueParent = React.useCallback((): EntityAccessor => {
 		const parentEntity = getEntityByKey(entityKey)
@@ -78,9 +77,9 @@ export const useDynamicSingleChoiceField = (
 			}
 
 			if (newValue === -1) {
-				currentValueParent.disconnectEntityAtField?.(currentValueFieldPlaceholder)
+				currentValueParent.disconnectEntityAtField?.(currentValueFieldName)
 			} else {
-				currentValueParent.connectEntityAtField?.(currentValueFieldPlaceholder, topLevelOptionAccessors[newValue])
+				currentValueParent.connectEntityAtField?.(currentValueFieldName, topLevelOptionAccessors[newValue])
 			}
 		},
 	}

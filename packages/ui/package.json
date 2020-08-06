@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "rollup --config && node --experimental-modules ./scripts/build-style.mjs",
-    "storybook": "start-storybook --ci -p 9001 -c dist/storybook/config"
+    "storybook": "start-storybook --ci -p 9001 -c storybookConfig"
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
@@ -27,9 +27,9 @@
   },
   "devDependencies": {
     "@rollup/plugin-replace": "2.2.1",
-    "@storybook/addon-info": "5.3.18",
-    "@storybook/addon-knobs": "5.3.18",
-    "@storybook/react": "5.3.18",
+    "@storybook/addon-info": "6.0.0-alpha.2",
+    "@storybook/addon-knobs": "6.0.0-rc.27",
+    "@storybook/react": "6.0.0-rc.27",
     "@types/classnames": "2.2.9",
     "@types/react": "16.9.41",
     "@types/react-dom": "16.9.8",

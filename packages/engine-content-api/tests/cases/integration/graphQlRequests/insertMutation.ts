@@ -282,7 +282,7 @@ describe('Insert mutation', () => {
 					},
 					{
 						sql: SQL`with "root_" as
-						(select ? :: uuid as "id", ? :: timestamp as "published_at", ? :: uuid as "author_id")
+						(select ? :: uuid as "id", ? :: timestamptz as "published_at", ? :: uuid as "author_id")
 						insert into "public"."post" ("id", "published_at", "author_id")
 						select "root_"."id", "root_"."published_at", "root_"."author_id"
             from "root_"
@@ -347,7 +347,7 @@ describe('Insert mutation', () => {
 				...sqlTransaction([
 					{
 						sql: SQL`with "root_" as
-						(select ? :: uuid as "id", ? :: timestamp as "published_at")
+						(select ? :: uuid as "id", ? :: timestamptz as "published_at")
 						insert into "public"."post" ("id", "published_at")
 						select "root_"."id", "root_"."published_at"
             from "root_"

@@ -86,7 +86,7 @@ namespace Model {
 	}
 
 	export interface DateTimeColumnDefinition extends ColumnTypeDefinition<ColumnType.DateTime> {
-		columnType: 'timestamp'
+		columnType: 'timestamptz'
 		default?: 'now'
 	}
 

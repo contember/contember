@@ -39,7 +39,7 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 			case Model.ColumnType.Bool:
 				return { ...common, type: type, columnType: 'boolean' }
 			case Model.ColumnType.DateTime:
-				return { ...common, type: type, columnType: 'timestamp' }
+				return { ...common, type: type, columnType: 'timestamptz' }
 			case Model.ColumnType.Date:
 				return { ...common, type: type, columnType: 'date' }
 			case Model.ColumnType.Enum:

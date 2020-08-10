@@ -813,13 +813,13 @@ describe('Diff schemas', () => {
 				fieldName: 'registeredAt',
 				definition: {
 					type: Model.ColumnType.DateTime,
-					columnType: 'timestamp',
+					columnType: 'timestamptz',
 					nullable: true,
 				},
 			},
 		]
 		const sql = SQL`ALTER TABLE "author"
-						ALTER "registered_at" SET DATA TYPE timestamp,
+						ALTER "registered_at" SET DATA TYPE timestamptz,
 						ALTER "registered_at" DROP NOT NULL;`
 		it('diff schemas', () => {
 			testDiffSchemas(originalSchema, updatedSchema, diff)

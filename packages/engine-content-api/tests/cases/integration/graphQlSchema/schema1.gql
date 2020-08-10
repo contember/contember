@@ -66,16 +66,16 @@ input AuthorCreatePostsEntityRelationInput {
 type AuthorCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: Author
   errors: [_MutationError!]!
+  node: Author
   validation: _ValidationResult!
 }
 
 type AuthorDeleteResult {
   ok: Boolean!
   errorMessage: String
-  node: Author
   errors: [_MutationError!]!
+  node: Author
 }
 
 type AuthorEdge {
@@ -123,8 +123,8 @@ input AuthorUpdatePostsRelationInput {
 type AuthorUpdateResult {
   ok: Boolean!
   errorMessage: String
-  node: Author
   errors: [_MutationError!]!
+  node: Author
   validation: _ValidationResult!
 }
 
@@ -180,16 +180,16 @@ input CategoryCreatePostsEntityRelationInput {
 type CategoryCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: Category
   errors: [_MutationError!]!
+  node: Category
   validation: _ValidationResult!
 }
 
 type CategoryDeleteResult {
   ok: Boolean!
   errorMessage: String
-  node: Category
   errors: [_MutationError!]!
+  node: Category
 }
 
 type CategoryEdge {
@@ -237,8 +237,8 @@ input CategoryUpdatePostsRelationInput {
 type CategoryUpdateResult {
   ok: Boolean!
   errorMessage: String
-  node: Category
   errors: [_MutationError!]!
+  node: Category
   validation: _ValidationResult!
 }
 
@@ -379,16 +379,16 @@ input PostCreateLocalesEntityRelationInput {
 type PostCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: Post
   errors: [_MutationError!]!
+  node: Post
   validation: _ValidationResult!
 }
 
 type PostDeleteResult {
   ok: Boolean!
   errorMessage: String
-  node: Post
   errors: [_MutationError!]!
+  node: Post
 }
 
 type PostEdge {
@@ -421,16 +421,16 @@ input PostLocaleCreatePostEntityRelationInput {
 type PostLocaleCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: PostLocale
   errors: [_MutationError!]!
+  node: PostLocale
   validation: _ValidationResult!
 }
 
 type PostLocaleDeleteResult {
   ok: Boolean!
   errorMessage: String
-  node: PostLocale
   errors: [_MutationError!]!
+  node: PostLocale
 }
 
 type PostLocaleEdge {
@@ -473,8 +473,8 @@ input PostLocaleUpdatePostEntityRelationInput {
 type PostLocaleUpdateResult {
   ok: Boolean!
   errorMessage: String
-  node: PostLocale
   errors: [_MutationError!]!
+  node: PostLocale
   validation: _ValidationResult!
 }
 
@@ -572,8 +572,8 @@ input PostUpdateLocalesRelationInput {
 type PostUpdateResult {
   ok: Boolean!
   errorMessage: String
-  node: Post
   errors: [_MutationError!]!
+  node: Post
   validation: _ValidationResult!
 }
 

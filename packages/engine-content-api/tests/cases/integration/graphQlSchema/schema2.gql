@@ -127,8 +127,8 @@ input TestCreateInput {
 type TestCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: Test
   errors: [_MutationError!]!
+  node: Test
   validation: _ValidationResult!
 }
 
@@ -160,8 +160,8 @@ input TestUpdateInput {
 type TestUpdateResult {
   ok: Boolean!
   errorMessage: String
-  node: Test
   errors: [_MutationError!]!
+  node: Test
   validation: _ValidationResult!
 }
 

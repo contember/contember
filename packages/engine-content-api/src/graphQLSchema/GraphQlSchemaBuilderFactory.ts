@@ -113,6 +113,7 @@ export default class GraphQlSchemaBuilderFactory {
 		const updateEntityRelationAllowedOperationsVisitor = new UpdateEntityRelationAllowedOperationsVisitor(authorizator)
 		const updateEntityRelationInputFieldVisitor = new UpdateEntityRelationInputFieldVisitor(
 			schema,
+			authorizator,
 			whereTypeProvider,
 			updateEntityInputProviderAccessor,
 			createEntityInputProvider,

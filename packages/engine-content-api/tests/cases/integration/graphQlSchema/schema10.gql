@@ -1,0 +1,215 @@
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+input AuthorCreateInput {
+  name: String
+  posts: [AuthorCreatePostsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input AuthorCreatePostsEntityRelationInput {
+  create: PostWithoutAuthorCreateInput
+  alias: String
+}
+
+type AuthorCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+}
+
+input AuthorWithoutPostsCreateInput {
+  name: String
+  _dummy_field_: Boolean
+}
+
+input CategoryCreateInput {
+  name: String
+  posts: [CategoryCreatePostsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input CategoryCreatePostsEntityRelationInput {
+  create: PostWithoutCategoriesCreateInput
+  alias: String
+}
+
+type CategoryCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+}
+
+input CategoryWithoutPostsCreateInput {
+  name: String
+  _dummy_field_: Boolean
+}
+
+scalar DateTime
+
+type Info {
+  description: String
+}
+
+enum Locale {
+  cs
+  en
+}
+
+type Mutation {
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
+  createPost(data: PostCreateInput!): PostCreateResult!
+  createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  validation: _ValidationResult!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
+  createPost(data: PostCreateInput!): PostCreateResult!
+  createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
+}
+
+input PostCreateAuthorEntityRelationInput {
+  create: AuthorWithoutPostsCreateInput
+}
+
+input PostCreateCategoriesEntityRelationInput {
+  create: CategoryWithoutPostsCreateInput
+  alias: String
+}
+
+input PostCreateInput {
+  state: PostState
+  publishedAt: DateTime
+  categories: [PostCreateCategoriesEntityRelationInput!]
+  author: PostCreateAuthorEntityRelationInput
+  locales: [PostCreateLocalesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostCreateLocalesEntityRelationInput {
+  create: PostLocaleWithoutPostCreateInput
+  alias: String
+}
+
+type PostCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+}
+
+input PostLocaleCreateInput {
+  locale: Locale
+  title: String
+  post: PostLocaleCreatePostEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input PostLocaleCreatePostEntityRelationInput {
+  create: PostWithoutLocalesCreateInput
+}
+
+type PostLocaleCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+}
+
+input PostLocaleWithoutPostCreateInput {
+  locale: Locale
+  title: String
+  _dummy_field_: Boolean
+}
+
+enum PostState {
+  draft
+  forReview
+  published
+}
+
+input PostWithoutAuthorCreateInput {
+  state: PostState
+  publishedAt: DateTime
+  categories: [PostCreateCategoriesEntityRelationInput!]
+  locales: [PostCreateLocalesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostWithoutCategoriesCreateInput {
+  state: PostState
+  publishedAt: DateTime
+  author: PostCreateAuthorEntityRelationInput
+  locales: [PostCreateLocalesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostWithoutLocalesCreateInput {
+  state: PostState
+  publishedAt: DateTime
+  categories: [PostCreateCategoriesEntityRelationInput!]
+  author: PostCreateAuthorEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+type Query {
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
+  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
+  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
+}

@@ -12,6 +12,7 @@ import { FieldAccessVisitor } from './FieldAccessVisitor'
 import OrderByTypeProvider from './OrderByTypeProvider'
 import EntityFieldsProvider from '../extensions/EntityFieldsProvider'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { ImplementationException } from '../exception'
 
 class EntityTypeProvider {
 	private entities = singletonFactory(name => this.createEntity(name))
@@ -35,6 +36,9 @@ class EntityTypeProvider {
 	) {}
 
 	public getEntity(entityName: string): GraphQLObjectType {
+		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+			throw new ImplementationException()
+		}
 		return this.entities(entityName)
 	}
 

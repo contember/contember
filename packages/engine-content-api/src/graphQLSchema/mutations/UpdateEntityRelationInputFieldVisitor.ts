@@ -1,19 +1,20 @@
 import { GraphQLInputObjectType } from 'graphql'
-import { Input, Model } from '@contember/schema'
+import { Acl, Input, Model } from '@contember/schema'
 import { GqlTypeName } from '../utils'
 import WhereTypeProvider from '../WhereTypeProvider'
-import { Accessor } from '../../utils/accessor'
+import { Accessor, filterObject } from '../../utils'
 import EntityInputProvider from './EntityInputProvider'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import UpdateEntityRelationAllowedOperationsVisitor from './UpdateEntityRelationAllowedOperationsVisitor'
-import { filterObject } from '../../utils/object'
 import { GraphQLObjectsFactory } from '../GraphQLObjectsFactory'
+import Authorizator from '../../acl/Authorizator'
 
 export default class UpdateEntityRelationInputFieldVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
 	constructor(
 		private readonly schema: Model.Schema,
+		private readonly authorizator: Authorizator,
 		private readonly whereTypeBuilder: WhereTypeProvider,
 		private readonly updateEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputProvider.Type.update>>,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputProvider.Type.create>,
@@ -33,9 +34,11 @@ export default class UpdateEntityRelationInputFieldVisitor
 	): GraphQLInputObjectType | undefined {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
-		const whereInput = {
-			type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
-		}
+		const whereInput = this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)
+			? {
+					type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
+			  }
+			: undefined
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType
 			? {
@@ -92,9 +95,11 @@ export default class UpdateEntityRelationInputFieldVisitor
 	): GraphQLInputObjectType | undefined {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
-		const whereInput = {
-			type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
-		}
+		const whereInput = this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)
+			? {
+					type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
+			  }
+			: undefined
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType
 			? {
@@ -108,20 +113,21 @@ export default class UpdateEntityRelationInputFieldVisitor
 			  }
 			: undefined
 
-		const updateSpecifiedInput = updateInput
-			? {
-					type: this.graphqlObjectFactories.createInputObjectType({
-						name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
-						fields: () => ({
-							by: whereInput,
-							data: updateInput,
+		const updateSpecifiedInput =
+			updateInput && whereInput
+				? {
+						type: this.graphqlObjectFactories.createInputObjectType({
+							name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
+							fields: () => ({
+								by: whereInput,
+								data: updateInput,
+							}),
 						}),
-					}),
-			  }
-			: undefined
+				  }
+				: undefined
 
 		const upsertInput =
-			updateInput && createInput
+			updateInput && createInput && whereInput
 				? {
 						type: this.graphqlObjectFactories.createInputObjectType({
 							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,

@@ -40,8 +40,9 @@ export default class QueryProvider {
 
 	private getByUniqueQuery(entityName: string): GraphQLFieldConfig<any, Context, Input.UniqueQueryInput> {
 		const entity = getEntity(this.schema, entityName)
+		const entityType = this.entityTypeProvider.getEntity(entityName)
 		return {
-			type: this.entityTypeProvider.getEntity(entityName),
+			type: entityType,
 			args: {
 				by: {
 					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
@@ -62,11 +63,10 @@ export default class QueryProvider {
 	private getListQuery(entityName: string): GraphQLFieldConfig<any, Context, Input.ListQueryInput> {
 		const entity = getEntity(this.schema, entityName)
 
+		const entityType = this.entityTypeProvider.getEntity(entityName)
 		return {
 			type: this.graphqlObjectFactories.createNotNull(
-				this.graphqlObjectFactories.createList(
-					this.graphqlObjectFactories.createNotNull(this.entityTypeProvider.getEntity(entityName)),
-				),
+				this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(entityType)),
 			),
 			args: {
 				filter: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
@@ -93,6 +93,7 @@ export default class QueryProvider {
 	private getPaginationQuery(entityName: string): GraphQLFieldConfig<any, Context, Input.ListQueryInput> {
 		const entity = getEntity(this.schema, entityName)
 
+		const entityType = this.entityTypeProvider.getEntity(entityName)
 		return {
 			type: this.graphqlObjectFactories.createNotNull(
 				this.graphqlObjectFactories.createObjectType({
@@ -109,9 +110,7 @@ export default class QueryProvider {
 											name: GqlTypeName`${entityName}Edge`,
 											fields: {
 												node: {
-													type: this.graphqlObjectFactories.createNotNull(
-														this.entityTypeProvider.getEntity(entityName),
-													),
+													type: this.graphqlObjectFactories.createNotNull(entityType),
 													resolve: aliasAwareResolver,
 												},
 											},

@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, isAbsolute } from 'path'
 import { replaceFileContent, tryUnlink } from './fs'
 import { copy, pathExists, remove, rename } from 'fs-extra'
 import { readYaml } from './yaml'
@@ -13,7 +13,7 @@ export const installTemplate = async (
 	if (await pathExists(targetDir)) {
 		throw `${targetDir} already exists`
 	}
-	if (template.startsWith('/')) {
+	if (isAbsolute(template)) {
 		const nodeModulesDir = join(template, 'node_modules')
 		await copy(template, targetDir, {
 			filter: src => {

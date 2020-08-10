@@ -77,7 +77,7 @@ type OneHasManyEntity {
 
 type OneHasManyEntityConnection {
   pageInfo: PageInfo!
-  edges: [OneHasManyEntityEdge!]
+  edges: [OneHasManyEntityEdge!]!
 }
 
 input OneHasManyEntityCreateInput {
@@ -100,7 +100,7 @@ type OneHasManyEntityCreateResult {
 }
 
 type OneHasManyEntityEdge {
-  node: OneHasManyEntity
+  node: OneHasManyEntity!
 }
 
 type OneHasManyEntityMeta {
@@ -179,12 +179,12 @@ type PageInfo {
 
 type Query {
   getRoot(by: RootUniqueWhere!): Root
-  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]
+  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
   paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
   validateCreateRoot(data: RootCreateInput!): _ValidationResult!
   validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
   getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
-  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
+  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
   paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
   validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
   validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
@@ -194,12 +194,12 @@ type Query {
 
 type QueryTransaction {
   getRoot(by: RootUniqueWhere!): Root
-  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]
+  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
   paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
   validateCreateRoot(data: RootCreateInput!): _ValidationResult!
   validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
   getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
-  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
+  listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
   paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
   validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
   validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
@@ -208,12 +208,12 @@ type QueryTransaction {
 type Root {
   _meta: RootMeta
   id: UUID!
-  r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]
+  r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
 }
 
 type RootConnection {
   pageInfo: PageInfo!
-  edges: [RootEdge!]
+  edges: [RootEdge!]!
 }
 
 input RootCreateInput {
@@ -243,7 +243,7 @@ type RootDeleteResult {
 }
 
 type RootEdge {
-  node: Root
+  node: Root!
 }
 
 type RootMeta {

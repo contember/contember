@@ -73,7 +73,7 @@ type PageInfo {
 
 type Query {
   getTest(by: TestUniqueWhere!): Test
-  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]
+  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
   paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
   validateCreateTest(data: TestCreateInput!): _ValidationResult!
   validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
@@ -83,7 +83,7 @@ type Query {
 
 type QueryTransaction {
   getTest(by: TestUniqueWhere!): Test
-  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]
+  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
   paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
   validateCreateTest(data: TestCreateInput!): _ValidationResult!
   validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
@@ -116,7 +116,7 @@ type Test {
 
 type TestConnection {
   pageInfo: PageInfo!
-  edges: [TestEdge!]
+  edges: [TestEdge!]!
 }
 
 input TestCreateInput {
@@ -133,7 +133,7 @@ type TestCreateResult {
 }
 
 type TestEdge {
-  node: Test
+  node: Test!
 }
 
 type TestMeta {

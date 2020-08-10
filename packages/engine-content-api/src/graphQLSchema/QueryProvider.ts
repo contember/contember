@@ -63,8 +63,10 @@ export default class QueryProvider {
 		const entity = getEntity(this.schema, entityName)
 
 		return {
-			type: this.graphqlObjectFactories.createList(
-				this.graphqlObjectFactories.createNotNull(this.entityTypeProvider.getEntity(entityName)),
+			type: this.graphqlObjectFactories.createNotNull(
+				this.graphqlObjectFactories.createList(
+					this.graphqlObjectFactories.createNotNull(this.entityTypeProvider.getEntity(entityName)),
+				),
 			),
 			args: {
 				filter: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
@@ -100,14 +102,21 @@ export default class QueryProvider {
 							type: this.graphqlObjectFactories.createNotNull(this.PageInfo),
 						},
 						edges: {
-							type: this.graphqlObjectFactories.createList(
-								this.graphqlObjectFactories.createNotNull(
-									this.graphqlObjectFactories.createObjectType({
-										name: GqlTypeName`${entityName}Edge`,
-										fields: {
-											node: { type: this.entityTypeProvider.getEntity(entityName), resolve: aliasAwareResolver },
-										},
-									}),
+							type: this.graphqlObjectFactories.createNotNull(
+								this.graphqlObjectFactories.createList(
+									this.graphqlObjectFactories.createNotNull(
+										this.graphqlObjectFactories.createObjectType({
+											name: GqlTypeName`${entityName}Edge`,
+											fields: {
+												node: {
+													type: this.graphqlObjectFactories.createNotNull(
+														this.entityTypeProvider.getEntity(entityName),
+													),
+													resolve: aliasAwareResolver,
+												},
+											},
+										}),
+									),
 								),
 							),
 							resolve: aliasAwareResolver,

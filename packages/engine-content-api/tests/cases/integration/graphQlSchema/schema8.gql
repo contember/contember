@@ -49,13 +49,13 @@ type FrontPage {
   id: UUID!
   unique: One!
   introVideo(filter: VideoWhere): Video
-  inHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]
+  inHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
   inHouseVideosByFrontPageForIntro(by: FrontPageInHouseVideosByFrontPageForIntroUniqueWhere, filter: VideoWhere): Video
 }
 
 type FrontPageConnection {
   pageInfo: PageInfo!
-  edges: [FrontPageEdge!]
+  edges: [FrontPageEdge!]!
 }
 
 input FrontPageCreateInHouseVideosEntityRelationInput {
@@ -92,7 +92,7 @@ type FrontPageDeleteResult {
 }
 
 type FrontPageEdge {
-  node: FrontPage
+  node: FrontPage!
 }
 
 input FrontPageInHouseVideosByFrontPageForIntroUniqueWhere {
@@ -261,12 +261,12 @@ type PageInfo {
 
 type Query {
   getFrontPage(by: FrontPageUniqueWhere!): FrontPage
-  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]
+  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
   paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
   validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
   validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
   getVideo(by: VideoUniqueWhere!): Video
-  listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]
+  listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
   paginateVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
   validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
@@ -276,12 +276,12 @@ type Query {
 
 type QueryTransaction {
   getFrontPage(by: FrontPageUniqueWhere!): FrontPage
-  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]
+  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
   paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
   validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
   validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
   getVideo(by: VideoUniqueWhere!): Video
-  listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]
+  listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
   paginateVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
   validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
@@ -334,7 +334,7 @@ type Video {
 
 type VideoConnection {
   pageInfo: PageInfo!
-  edges: [VideoEdge!]
+  edges: [VideoEdge!]!
 }
 
 input VideoCreateFrontPageEntityRelationInput {
@@ -370,7 +370,7 @@ type VideoDeleteResult {
 }
 
 type VideoEdge {
-  node: Video
+  node: Video!
 }
 
 type VideoMeta {

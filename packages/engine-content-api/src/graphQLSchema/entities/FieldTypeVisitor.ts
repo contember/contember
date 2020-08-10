@@ -24,8 +24,10 @@ export default class FieldTypeVisitor
 	}
 
 	public visitHasMany(entity: Model.Entity, relation: Model.Relation): GraphQLOutputType {
-		return this.graphqlObjectFactories.createList(
-			this.graphqlObjectFactories.createNotNull(this.entityTypeProvider.getEntity(relation.target)),
+		return this.graphqlObjectFactories.createNotNull(
+			this.graphqlObjectFactories.createList(
+				this.graphqlObjectFactories.createNotNull(this.entityTypeProvider.getEntity(relation.target)),
+			),
 		)
 	}
 

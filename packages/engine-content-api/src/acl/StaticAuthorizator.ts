@@ -17,6 +17,9 @@ export default class StaticAuthorizator implements Authorizator {
 		if (!fieldPermissions) {
 			return false
 		}
-		return !field || !!fieldPermissions[field]
+		if (field) {
+			return !!fieldPermissions[field]
+		}
+		return Object.values(fieldPermissions).filter(it => !!it).length > 0
 	}
 }

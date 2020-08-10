@@ -94,16 +94,16 @@ input OneHasManyEntityCreateR2EntityRelationInput {
 type OneHasManyEntityCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: OneHasManyEntity
   errors: [_MutationError!]!
+  node: OneHasManyEntity
   validation: _ValidationResult!
 }
 
 type OneHasManyEntityDeleteResult {
   ok: Boolean!
   errorMessage: String
-  node: OneHasManyEntity
   errors: [_MutationError!]!
+  node: OneHasManyEntity
 }
 
 type OneHasManyEntityEdge {
@@ -202,16 +202,16 @@ input RootCreateREntityRelationInput {
 type RootCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: Root
   errors: [_MutationError!]!
+  node: Root
   validation: _ValidationResult!
 }
 
 type RootDeleteResult {
   ok: Boolean!
   errorMessage: String
-  node: Root
   errors: [_MutationError!]!
+  node: Root
 }
 
 type RootEdge {
@@ -240,8 +240,8 @@ input RootUpdateInput {
 type RootUpdateResult {
   ok: Boolean!
   errorMessage: String
-  node: Root
   errors: [_MutationError!]!
+  node: Root
   validation: _ValidationResult!
 }
 

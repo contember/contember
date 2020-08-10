@@ -268,4 +268,13 @@ describe('build gql schema from model schema', () => {
 			graphQlSchemaFile: 'schema9.gql',
 		})
 	})
+
+	it('allows only create', async () => {
+		const schema = SchemaDefinition.createModel(model)
+		await testSchema({
+			schema: () => schema,
+			permissions: schema => new AllowAllPermissionFactory([Acl.Operation.create]).create(schema),
+			graphQlSchemaFile: 'schema10.gql',
+		})
+	})
 })

@@ -79,16 +79,16 @@ input FrontPageCreateIntroVideoEntityRelationInput {
 type FrontPageCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: FrontPage
   errors: [_MutationError!]!
+  node: FrontPage
   validation: _ValidationResult!
 }
 
 type FrontPageDeleteResult {
   ok: Boolean!
   errorMessage: String
-  node: FrontPage
   errors: [_MutationError!]!
+  node: FrontPage
 }
 
 type FrontPageEdge {
@@ -154,8 +154,8 @@ input FrontPageUpdateIntroVideoEntityRelationInput {
 type FrontPageUpdateResult {
   ok: Boolean!
   errorMessage: String
-  node: FrontPage
   errors: [_MutationError!]!
+  node: FrontPage
   validation: _ValidationResult!
 }
 
@@ -357,16 +357,16 @@ input VideoCreateInput {
 type VideoCreateResult {
   ok: Boolean!
   errorMessage: String
-  node: Video
   errors: [_MutationError!]!
+  node: Video
   validation: _ValidationResult!
 }
 
 type VideoDeleteResult {
   ok: Boolean!
   errorMessage: String
-  node: Video
   errors: [_MutationError!]!
+  node: Video
 }
 
 type VideoEdge {
@@ -422,8 +422,8 @@ input VideoUpdateInput {
 type VideoUpdateResult {
   ok: Boolean!
   errorMessage: String
-  node: Video
   errors: [_MutationError!]!
+  node: Video
   validation: _ValidationResult!
 }
 

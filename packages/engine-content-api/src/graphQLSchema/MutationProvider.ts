@@ -117,12 +117,14 @@ export default class MutationProvider {
 	}
 
 	private createResultType(entityName: string, operation: 'create' | 'update' | 'delete'): GraphQLObjectType {
-		const nodeType = this.entityTypeProvider.getEntity(entityName)
 		const fields: GraphQLObjectTypeConfig<any, any>['fields'] = {
 			ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
 			errorMessage: { type: this.graphqlObjectFactories.string },
-			node: { type: nodeType, resolve: aliasAwareResolver },
 			errors: { type: this.resultSchemaTypeProvider.errorListResultType },
+		}
+		if (this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+			const nodeType = this.entityTypeProvider.getEntity(entityName)
+			fields.node = { type: nodeType, resolve: aliasAwareResolver }
 		}
 		if (operation !== 'delete') {
 			fields.validation = {

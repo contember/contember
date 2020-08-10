@@ -10,6 +10,7 @@ import { GqlTypeName } from './utils'
 import Authorizator from '../acl/Authorizator'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { ImplementationException } from '../exception'
 
 export default class WhereTypeProvider {
 	private whereSingleton = singletonFactory(name => this.createEntityWhereType(name))
@@ -24,10 +25,16 @@ export default class WhereTypeProvider {
 	) {}
 
 	public getEntityWhereType(entityName: string): GraphQLInputObjectType {
+		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+			throw new ImplementationException()
+		}
 		return this.whereSingleton(entityName)
 	}
 
 	public getEntityUniqueWhereType(entityName: string): GraphQLInputObjectType {
+		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+			throw new ImplementationException()
+		}
 		return this.uniqueWhereSingleton(entityName)
 	}
 

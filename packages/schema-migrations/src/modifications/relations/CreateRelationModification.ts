@@ -123,7 +123,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 		const notNull = isIt<Model.NullableRelation>(this.data.owningSide, 'nullable') && !this.data.owningSide.nullable
 		const failureWarning =
 			notNull && !createdEntities.includes(this.data.entityName)
-				? `Mail fail in runtime, because relation is not-null`
+				? `May fail in runtime, because relation is not-null`
 				: undefined
 		return { message: `Add relation ${this.data.entityName}.${this.data.owningSide.name}`, failureWarning }
 	}

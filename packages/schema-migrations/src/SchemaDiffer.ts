@@ -91,6 +91,15 @@ export class SchemaDiffer {
 					;(tmpRelation as Model.AnyRelation & Model.NullableRelation).nullable = false
 					builder.makeRelationNotNull(entityName, updatedRelation.name)
 				}
+				if (
+					isIt<Model.NullableRelation>(updatedRelation, 'nullable') &&
+					isIt<Model.NullableRelation>(originalRelation, 'nullable') &&
+					updatedRelation.nullable &&
+					!originalRelation.nullable
+				) {
+					;(tmpRelation as Model.AnyRelation & Model.NullableRelation).nullable = true
+					builder.makeRelationNullable(entityName, updatedRelation.name)
+				}
 
 				const isItOrderable = (relation: Model.AnyRelation): relation is Model.OrderableRelation & Model.AnyRelation =>
 					relation.type === Model.RelationType.ManyHasMany || relation.type === Model.RelationType.OneHasMany

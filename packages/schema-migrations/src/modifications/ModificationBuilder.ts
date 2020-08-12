@@ -27,6 +27,7 @@ import PatchValidationSchemaModification from './validation/PatchValidationSchem
 import deepCopy from '../utils/deepCopy'
 import MakeRelationNotNullModification from './relations/MakeRelationNotNullModification'
 import UpdateRelationOrderByModification from './relations/UpdateRelationOrderByModification'
+import MakeRelationNullableModification from './relations/MakeRelationNullableModification'
 
 class ModificationBuilder {
 	private modifications: Migration.Modification[] = []
@@ -49,6 +50,7 @@ class ModificationBuilder {
 			UpdateRelationOnDeleteModification.id,
 			UpdateRelationOrderByModification.id,
 			MakeRelationNotNullModification.id,
+			MakeRelationNullableModification.id,
 			UpdateEnumModification.id,
 
 			CreateEntityModification.id,
@@ -229,6 +231,14 @@ class ModificationBuilder {
 	public makeRelationNotNull(entityName: string, fieldName: string) {
 		this.modifications.push({
 			modification: MakeRelationNotNullModification.id,
+			entityName,
+			fieldName,
+		})
+	}
+
+	public makeRelationNullable(entityName: string, fieldName: string) {
+		this.modifications.push({
+			modification: MakeRelationNullableModification.id,
 			entityName,
 			fieldName,
 		})

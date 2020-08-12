@@ -1281,6 +1281,40 @@ describe('Diff schemas', () => {
 		})
 	})
 
+	describe('make relation nullable', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Post', entity =>
+				entity
+					.column('name', c => c.type(Model.ColumnType.String))
+					.manyHasOne('category', r => r.target('Category').notNull()),
+			)
+			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.column('name', c => c.type(Model.ColumnType.String)).manyHasOne('category', r => r.target('Category')),
+			)
+			.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'makeRelationNullable',
+				entityName: 'Post',
+				fieldName: 'category',
+			},
+		]
+		const sql = SQL`ALTER TABLE "post" ALTER "category_id" DROP NOT NULL;`
+		it('diff schemas', () => {
+			testDiffSchemas(originalSchema, updatedSchema, diff)
+		})
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
 	describe('set relation default order by', () => {
 		const originalSchema = new SchemaBuilder()
 			.entity('Menu', e =>

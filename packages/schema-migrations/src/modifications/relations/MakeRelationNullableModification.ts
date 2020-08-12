@@ -5,14 +5,14 @@ import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schema
 import { Modification } from '../Modification'
 import { getColumnName } from '@contember/schema-utils'
 
-class MakeRelationNotNullModification implements Modification<MakeRelationNotNullModification.Data> {
-	constructor(private readonly data: MakeRelationNotNullModification.Data, private readonly schema: Schema) {}
+class MakeRelationNullableModification implements Modification<MakeRelationNullableModification.Data> {
+	constructor(private readonly data: MakeRelationNullableModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		const columnName = getColumnName(this.schema.model, entity, this.data.fieldName)
 		builder.alterColumn(entity.tableName, columnName, {
-			notNull: true,
+			notNull: false,
 		})
 	}
 
@@ -23,7 +23,7 @@ class MakeRelationNotNullModification implements Modification<MakeRelationNotNul
 				entityName,
 				updateField<Model.AnyRelation & Model.NullableRelation>(fieldName, field => ({
 					...field,
-					nullable: false,
+					nullable: true,
 				})),
 			),
 		)
@@ -35,20 +35,18 @@ class MakeRelationNotNullModification implements Modification<MakeRelationNotNul
 
 	describe() {
 		return {
-			message: `Make relation ${this.data.entityName}.${this.data.fieldName} not-nullable`,
-			failureWarning: 'Changing to not-null may fail in runtime',
+			message: `Make relation ${this.data.entityName}.${this.data.fieldName} nullable`,
 		}
 	}
 }
 
-namespace MakeRelationNotNullModification {
-	export const id = 'makeRelationNotNull'
+namespace MakeRelationNullableModification {
+	export const id = 'makeRelationNullable'
 
 	export interface Data {
 		entityName: string
 		fieldName: string
-		// todo fillValue
 	}
 }
 
-export default MakeRelationNotNullModification
+export default MakeRelationNullableModification

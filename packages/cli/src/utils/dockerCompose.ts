@@ -24,7 +24,10 @@ export const updateOverrideConfig = async (dir: string, updater: JsonUpdateCallb
 	return updateYaml(path, updater, { createMissing: true })
 }
 
-export const updateMainDockerComposeConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
+export const updateMainDockerComposeConfig = async (
+	dir: string,
+	updater: JsonUpdateCallback<DockerComposeConfig>,
+): Promise<void> => {
 	const path = await resolvePath(dir, MAIN_CONFIGS, MAIN_CONFIGS[0])
 	return updateYaml(path, updater, { createMissing: true })
 }

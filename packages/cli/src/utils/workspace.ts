@@ -2,7 +2,7 @@ import { pathExists } from 'fs-extra'
 import { join } from 'path'
 import { createInstance } from './instance'
 import { createProject, registerProjectToInstance } from './project'
-import { readYaml } from './yaml'
+import { readYaml, updateYaml } from './yaml'
 import { installTemplate } from './template'
 import { resourcesDir } from '../pathUtils'
 
@@ -37,10 +37,12 @@ export interface WorkspaceConfig {
 	}
 }
 
+const formatConfigPath = (workspaceDirectory: string) => join(workspaceDirectory, 'contember.workspace.yaml')
+
 export const readWorkspaceConfig = async ({
 	workspaceDirectory,
 }: WorkspaceDirectoryArgument): Promise<WorkspaceConfig> => {
-	const configPath = join(workspaceDirectory, 'contember.workspace.yaml')
+	const configPath = formatConfigPath(workspaceDirectory)
 	if (!(await pathExists(configPath))) {
 		return {}
 	}
@@ -57,4 +59,24 @@ export const getWorkspaceApiVersion = async ({
 }: WorkspaceDirectoryArgument): Promise<string | undefined> => {
 	const workspaceConfig = await readWorkspaceConfig({ workspaceDirectory })
 	return workspaceConfig?.api?.version || undefined
+}
+
+export const updateWorkspaceApiVersion = async ({
+	workspaceDirectory,
+	version,
+}: WorkspaceDirectoryArgument & { version: string }) => {
+	const configPath = formatConfigPath(workspaceDirectory)
+	if (!(await pathExists(configPath))) {
+		return false
+	}
+	await updateYaml(configPath, data => {
+		return {
+			...data,
+			api: {
+				...(typeof data.api === 'object' ? data.api : {}),
+				version,
+			},
+		}
+	})
+	return true
 }

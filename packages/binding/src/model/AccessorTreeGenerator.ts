@@ -5,6 +5,7 @@ import { EntityAccessor, EntityListAccessor, FieldAccessor, GetSubTree, TreeRoot
 import {
 	BoxedSingleEntityId,
 	EntityFieldPersistedData,
+	ExecutionError,
 	MutationDataResponse,
 	PersistedEntityDataStore,
 	QueryRequestResponse,
@@ -204,6 +205,28 @@ export class AccessorTreeGenerator {
 
 			this.setRootStateErrors(errorTreeRoot, ErrorPopulationMode.Add)
 
+			// TODO this is just temporary
+			if (data) {
+				for (const subTreePlaceholder in data) {
+					const executionErrors = data[subTreePlaceholder].errors.map((error: ExecutionError) => {
+						return {
+							path: error.path
+								.map(pathPart => {
+									if (pathPart.__typename === '_FieldPathFragment') {
+										return pathPart.field
+									}
+									return pathPart.alias || pathPart.index
+								})
+								.join('.'),
+							type: error.type,
+							message: error.message,
+						}
+					})
+					if (Object.keys(executionErrors).length) {
+						console.table(executionErrors)
+					}
+				}
+			}
 			console.error('Errors', errorTreeRoot)
 		})
 	}

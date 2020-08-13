@@ -128,6 +128,7 @@ export class MutationGenerator {
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.by({ ...where, [PRIMARY_KEY_NAME]: entityState.getAccessor().primaryKey! })
+					.errors()
 			},
 			alias,
 		)
@@ -168,6 +169,7 @@ export class MutationGenerator {
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.ok()
 					.validation()
+					.errors()
 			},
 			alias,
 		)
@@ -212,6 +214,7 @@ export class MutationGenerator {
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
 					.ok()
 					.validation()
+					.errors()
 			},
 			alias,
 		)

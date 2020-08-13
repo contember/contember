@@ -7,6 +7,7 @@ import {
 	EntityFieldPersistedData,
 	ExecutionError,
 	MutationDataResponse,
+	MutationError,
 	PersistedEntityDataStore,
 	QueryRequestResponse,
 } from '../accessorTree'
@@ -208,26 +209,33 @@ export class AccessorTreeGenerator {
 			// TODO this is just temporary
 			if (data) {
 				for (const subTreePlaceholder in data) {
-					const executionErrors = data[subTreePlaceholder].errors.map((error: ExecutionError) => {
+					const treeDatum = data[subTreePlaceholder]
+					const executionErrors: Array<ExecutionError | MutationError> = treeDatum.errors
+					const allErrors = treeDatum?.validation?.errors
+						? executionErrors.concat(treeDatum.validation.errors)
+						: executionErrors
+					const normalizedErrors = allErrors.map((error: ExecutionError | MutationError) => {
 						return {
 							path: error.path
 								.map(pathPart => {
 									if (pathPart.__typename === '_FieldPathFragment') {
 										return pathPart.field
 									}
-									return pathPart.alias || pathPart.index
+									if (pathPart.alias) {
+										return `#${pathPart.index}(${pathPart.alias})`
+									}
+									return pathPart.index
 								})
 								.join('.'),
-							type: error.type,
-							message: error.message,
+							type: 'type' in error ? error.type : undefined,
+							message: typeof error.message === 'string' ? error.message : error.message?.text,
 						}
 					})
-					if (Object.keys(executionErrors).length) {
-						console.table(executionErrors)
+					if (Object.keys(normalizedErrors).length) {
+						console.table(normalizedErrors)
 					}
 				}
 			}
-			console.error('Errors', errorTreeRoot)
 		})
 	}
 

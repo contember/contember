@@ -21,7 +21,6 @@ namespace Validation {
 		equals: [LiteralArgument<any>]
 		not: [ValidatorArgument]
 		empty: []
-		exists: []
 		defined: []
 		inContext: [PathArgument, ValidatorArgument]
 		every: [ValidatorArgument]

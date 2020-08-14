@@ -8,7 +8,7 @@ export class Author {
 
 	authorWithContact = d.boolColumn().notNull()
 
-	@v.requiredWhen(v.rules.on('authorWithContact', v.rules.equals(true)), 'E-mail is required')
+	@(v.when(v.rules.on('authorWithContact', v.rules.equals(true))).assertNotEmpty('E-mail is required'))
 	email = d.stringColumn()
 }
 

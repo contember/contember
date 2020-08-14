@@ -6,7 +6,6 @@ import { testUuid } from '../../../../src/testUuid'
 export class Author {
 	name = d.stringColumn()
 
-	@v.optional()
 	@v.assertPattern(/.+@.+/, 'E-mail is not valid')
 	email = d.stringColumn()
 }

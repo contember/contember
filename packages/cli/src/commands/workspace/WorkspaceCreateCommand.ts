@@ -20,7 +20,7 @@ export class WorkspaceCreateCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const [workspaceName] = [input.getArgument('workspaceName')]
+		const workspaceName = input.getArgument('workspaceName')
 		const workspaceDirectory = join(process.cwd(), workspaceName)
 		const withAdmin = input.getOption('with-admin')
 		const template = input.getOption('template')

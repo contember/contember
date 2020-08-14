@@ -24,6 +24,7 @@ import {
 	SetupCommand,
 	SignInCommand,
 	WorkspaceCreateCommand,
+	WorkspaceUpdateApiCommand,
 } from './commands'
 import { Application } from './cli'
 ;(async () => {
@@ -42,6 +43,7 @@ import { Application } from './cli'
 		['migrations:execute']: () => new MigrationExecuteCommand(),
 		['migrations:status']: () => new MigrationStatusCommand(),
 		['workspace:create']: () => new WorkspaceCreateCommand(),
+		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:register']: () => new ProjectRegisterCommand(),
 		['project:validate']: () => new ProjectValidateCommand(),

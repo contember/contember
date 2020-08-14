@@ -78,8 +78,11 @@ class RuleBranch {
 	}
 
 	assertPattern = (pattern: RegExp, message: MessageOrString) => this.assert(rules.pattern(pattern), message)
+	assertEquals = (value: any, message: MessageOrString) => this.assert(rules.equals(value), message)
 	assertDefined = (message: MessageOrString) => this.assert(rules.defined(), message)
+	assertNotEmpty = (message: MessageOrString) => this.assert(rules.notEmpty(), message)
 	assertMinLength = (minLength: number, message: MessageOrString) => this.assert(rules.minLength(minLength), message)
+	assertMaxLength = (minLength: number, message: MessageOrString) => this.assert(rules.maxLength(minLength), message)
 }
 
 const andOperation = (...conditions: Validation.Validator[]): Validation.Validator => ({
@@ -144,27 +147,34 @@ const filterOperation = (filter: Validation.Validator, validator: Validation.Val
 })
 
 export const rules = {
-	and: andOperation,
-	or: orOperation,
-	conditional: conditionalOperation,
+	equals: equalsOperation,
+	in: (...value: any[]) => orOperation(...value.map(it => equalsOperation(it))),
 	pattern: patternOperation,
+
 	lengthRange: lengthRangeOperation,
 	minLength: (min: number) => lengthRangeOperation(min, null),
 	maxLength: (max: number) => lengthRangeOperation(null, max),
+
 	range: rangeOperation,
 	min: (min: number) => rangeOperation(min, null),
 	max: (max: number) => rangeOperation(null, max),
-	equals: equalsOperation,
-	not: notOperation,
+
+	defined: definedOperation,
 	['empty']: emptyOperation,
 	notEmpty: () => notOperation(emptyOperation()),
 	['null']: () => equalsOperation(null),
 	notNull: () => notOperation(equalsOperation(null)),
+
+	and: andOperation,
+	or: orOperation,
+	not: notOperation,
+
+	conditional: conditionalOperation,
 	on: onOperation,
+
 	filter: filterOperation,
 	any: anyOperation,
 	every: everyOperation,
-	defined: definedOperation,
 }
 
 export function when(...conditions: Validation.Validator[]) {
@@ -172,9 +182,13 @@ export function when(...conditions: Validation.Validator[]) {
 }
 
 export const assert = (validator: Validation.Validator, message: MessageOrString) => fluent().assert(validator, message)
+/** alias for assertDefined */
 export const required = (message: MessageOrString) => fluent().assertDefined(message)
+export const assertDefined = (message: MessageOrString) => fluent().assertDefined(message)
+export const assertNotEmpty = (message: MessageOrString) => fluent().assertNotEmpty(message)
 export const assertPattern = (pattern: RegExp, message: MessageOrString) => fluent().assertPattern(pattern, message)
 export const assertMinLength = (min: number, message: MessageOrString) => fluent().assertMinLength(min, message)
+export const assertMaxLength = (min: number, message: MessageOrString) => fluent().assertMaxLength(min, message)
 
 export const combine = (...decorators: PropertyDecorator[]): PropertyDecorator => (target, propertyKey) =>
 	decorators.forEach(it => it(target, propertyKey))

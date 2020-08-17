@@ -15,12 +15,13 @@
 		"@contember/dic": "^0.8.3",
 		"@contember/queryable": "^0.8.3",
 		"@contember/schema": "^0.8.3",
-		"apollo-server-core": "^2.9.1",
+		"apollo-server-core": "^2.16.1",
 		"apollo-server-errors": "^2.4.0",
 		"graphql": "^14.6.0",
 		"graphql-tools": "^4.0.7",
 		"mustache": "^4.0.0",
-		"nodemailer": "^6.4.2"
+		"nodemailer": "^6.4.2",
+		"otplib": "^12.0.1"
 	},
 	"devDependencies": {
 		"@contember/database-tester": "^0.8.3",

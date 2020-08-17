@@ -155,4 +155,53 @@ describe('input validation', () => {
 			),
 		)
 	})
+
+	describe('trinary logic', () => {
+		it('trinary "and" results in a null', () => {
+			const rule = validation.rules.and(
+				validation.rules.on('email', validation.rules.pattern(/.+@.+/)),
+				validation.rules.on('name', validation.rules.pattern(/.+/)),
+			)
+
+			const author = {
+				name: 'john',
+				email: null,
+			}
+
+			const context = ValidationContext.createRootContext(author)
+
+			expect(evaluateValidation(context, rule)).toBe(null)
+		})
+
+		it('trinary "and" results in a false', () => {
+			const rule = validation.rules.and(
+				validation.rules.on('email', validation.rules.pattern(/.+@.+/)),
+				validation.rules.on('name', validation.rules.pattern(/.+/)),
+			)
+
+			const author = {
+				name: null,
+				email: 'abcd',
+			}
+
+			const context = ValidationContext.createRootContext(author)
+
+			expect(evaluateValidation(context, rule)).toBe(false)
+		})
+		it('trinary "and" results in a true', () => {
+			const rule = validation.rules.and(
+				validation.rules.on('email', validation.rules.pattern(/.+@.+/)),
+				validation.rules.on('name', validation.rules.pattern(/.+/)),
+			)
+
+			const author = {
+				name: 'johh',
+				email: 'abcd@foo',
+			}
+
+			const context = ValidationContext.createRootContext(author)
+
+			expect(evaluateValidation(context, rule)).toBe(true)
+		})
+	})
 })

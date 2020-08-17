@@ -28,6 +28,7 @@ import {
 	IdentityTypeResolver,
 	InviteMutationResolver,
 	MeQueryResolver,
+	OtpMutationResolver,
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 	ProjectTypeResolver,
@@ -44,8 +45,9 @@ import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 import { ProjectScopeFactory } from './model/authorization/ProjectScopeFactory'
 import { AclSchemaEvaluatorFactory } from './model/authorization/AclSchemaEvaluatorFactory'
-import { MembershipValidator } from './model/service/MembershipValidator'
+import { MembershipValidator } from './model/service'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
+import { OtpManager } from './model/service'
 
 interface TenantContainer {
 	connection: Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
@@ -142,7 +144,9 @@ namespace TenantContainer {
 				)
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
 				.addService('inviteManager', ({ db, providers, userMailer }) => new InviteManager(db, providers, userMailer))
+				.addService('otpManager', ({ commandBus }) => new OtpManager(commandBus))
 				.addService('identityFetcher', ({ db }) => new IdentityFetcher(db))
+
 				.addService(
 					'identityTypeResolver',
 					({ queryHandler, projectMemberManager, projectManager }) =>
@@ -209,6 +213,10 @@ namespace TenantContainer {
 				.addService(
 					'disableApiKeyMutationResolver',
 					({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager),
+				)
+				.addService(
+					'otpMutationResolver',
+					({ otpManager, queryHandler }) => new OtpMutationResolver(otpManager, queryHandler),
 				)
 
 				.addService(

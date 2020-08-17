@@ -10,6 +10,7 @@ import {
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
 	InviteMutationResolver,
+	OtpMutationResolver,
 } from './mutation'
 
 import { Resolvers } from '../schema'
@@ -37,6 +38,8 @@ class ResolverFactory {
 
 			createApiKeyMutationResolver: CreateApiKeyMutationResolver
 			disableApiKeyMutationResolver: DisableApiKeyMutationResolver
+
+			otpMutationResolver: OtpMutationResolver
 
 			identityTypeResolver: IdentityTypeResolver
 			projectTypeResolver: ProjectTypeResolver
@@ -90,6 +93,9 @@ class ResolverFactory {
 				disableApiKey: this.resolvers.disableApiKeyMutationResolver.disableApiKey.bind(
 					this.resolvers.disableApiKeyMutationResolver,
 				),
+				prepareOtp: this.resolvers.otpMutationResolver.prepareOtp.bind(this.resolvers.otpMutationResolver),
+				confirmOtp: this.resolvers.otpMutationResolver.confirmOtp.bind(this.resolvers.otpMutationResolver),
+				disableOtp: this.resolvers.otpMutationResolver.disableOtp.bind(this.resolvers.otpMutationResolver),
 			},
 		}
 	}

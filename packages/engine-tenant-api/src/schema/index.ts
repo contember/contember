@@ -69,6 +69,24 @@ export type ChangePasswordResponse = {
 	readonly errors: ReadonlyArray<ChangePasswordError>
 }
 
+export type ConfirmOtpError = {
+	readonly __typename?: 'ConfirmOtpError'
+	readonly code: ConfirmOtpErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum ConfirmOtpErrorCode {
+	InvalidOtpToken = 'INVALID_OTP_TOKEN',
+	NotPrepared = 'NOT_PREPARED',
+}
+
+export type ConfirmOtpResponse = {
+	readonly __typename?: 'ConfirmOtpResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<ConfirmOtpError>
+}
+
 export type CreateApiKeyError = {
 	readonly __typename?: 'CreateApiKeyError'
 	readonly code: CreateApiKeyErrorCode
@@ -110,6 +128,23 @@ export type DisableApiKeyResponse = {
 	readonly __typename?: 'DisableApiKeyResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<DisableApiKeyError>
+}
+
+export type DisableOtpError = {
+	readonly __typename?: 'DisableOtpError'
+	readonly code: DisableOtpErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum DisableOtpErrorCode {
+	OtpNotActive = 'OTP_NOT_ACTIVE',
+}
+
+export type DisableOtpResponse = {
+	readonly __typename?: 'DisableOtpResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<DisableOtpError>
 }
 
 export type Identity = {
@@ -184,6 +219,9 @@ export type Mutation = {
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
+	readonly prepareOtp?: Maybe<PrepareOtpResponse>
+	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
+	readonly disableOtp?: Maybe<DisableOtpResponse>
 }
 
 export type MutationSetupArgs = {
@@ -199,6 +237,7 @@ export type MutationSignInArgs = {
 	email: Scalars['String']
 	password: Scalars['String']
 	expiration?: Maybe<Scalars['Int']>
+	otpToken?: Maybe<Scalars['String']>
 }
 
 export type MutationSignOutArgs = {
@@ -250,11 +289,31 @@ export type MutationDisableApiKeyArgs = {
 	id: Scalars['String']
 }
 
+export type MutationPrepareOtpArgs = {
+	label?: Maybe<Scalars['String']>
+}
+
+export type MutationConfirmOtpArgs = {
+	otpToken: Scalars['String']
+}
+
 export type Person = {
 	readonly __typename?: 'Person'
 	readonly id: Scalars['String']
 	readonly email: Scalars['String']
 	readonly identity: Identity
+}
+
+export type PrepareOtpResponse = {
+	readonly __typename?: 'PrepareOtpResponse'
+	readonly ok: Scalars['Boolean']
+	readonly result?: Maybe<PrepareOtpResult>
+}
+
+export type PrepareOtpResult = {
+	readonly __typename?: 'PrepareOtpResult'
+	readonly otpUri: Scalars['String']
+	readonly otpSecret: Scalars['String']
 }
 
 export type Project = {
@@ -361,6 +420,8 @@ export type SignInError = {
 export enum SignInErrorCode {
 	UnknownEmail = 'UNKNOWN_EMAIL',
 	InvalidPassword = 'INVALID_PASSWORD',
+	OtpRequried = 'OTP_REQURIED',
+	InvalidOtpToken = 'INVALID_OTP_TOKEN',
 }
 
 export type SignInResponse = {
@@ -583,6 +644,14 @@ export type ResolversTypes = {
 	DisableApiKeyResponse: ResolverTypeWrapper<DisableApiKeyResponse>
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
+	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
+	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
+	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
+	ConfirmOtpError: ResolverTypeWrapper<ConfirmOtpError>
+	ConfirmOtpErrorCode: ConfirmOtpErrorCode
+	DisableOtpResponse: ResolverTypeWrapper<DisableOtpResponse>
+	DisableOtpError: ResolverTypeWrapper<DisableOtpError>
+	DisableOtpErrorCode: DisableOtpErrorCode
 	SetupError: ResolverTypeWrapper<SetupError>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 }
@@ -646,6 +715,14 @@ export type ResolversParentTypes = {
 	DisableApiKeyResponse: DisableApiKeyResponse
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
+	PrepareOtpResponse: PrepareOtpResponse
+	PrepareOtpResult: PrepareOtpResult
+	ConfirmOtpResponse: ConfirmOtpResponse
+	ConfirmOtpError: ConfirmOtpError
+	ConfirmOtpErrorCode: ConfirmOtpErrorCode
+	DisableOtpResponse: DisableOtpResponse
+	DisableOtpError: DisableOtpError
+	DisableOtpErrorCode: DisableOtpErrorCode
 	SetupError: SetupError
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 }
@@ -707,6 +784,25 @@ export type ChangePasswordResponseResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export type ConfirmOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmOtpError'] = ResolversParentTypes['ConfirmOtpError']
+> = {
+	code?: Resolver<ResolversTypes['ConfirmOtpErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type ConfirmOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmOtpResponse'] = ResolversParentTypes['ConfirmOtpResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['ConfirmOtpError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
 export type CreateApiKeyErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['CreateApiKeyError'] = ResolversParentTypes['CreateApiKeyError']
@@ -751,6 +847,25 @@ export type DisableApiKeyResponseResolvers<
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableApiKeyError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type DisableOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisableOtpError'] = ResolversParentTypes['DisableOtpError']
+> = {
+	code?: Resolver<ResolversTypes['DisableOtpErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type DisableOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisableOtpResponse'] = ResolversParentTypes['DisableOtpResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableOtpError']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -888,6 +1003,19 @@ export type MutationResolvers<
 		ContextType,
 		RequireFields<MutationDisableApiKeyArgs, 'id'>
 	>
+	prepareOtp?: Resolver<
+		Maybe<ResolversTypes['PrepareOtpResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationPrepareOtpArgs, never>
+	>
+	confirmOtp?: Resolver<
+		Maybe<ResolversTypes['ConfirmOtpResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationConfirmOtpArgs, 'otpToken'>
+	>
+	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
 }
 
 export type PersonResolvers<
@@ -897,6 +1025,24 @@ export type PersonResolvers<
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type PrepareOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['PrepareOtpResponse'] = ResolversParentTypes['PrepareOtpResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['PrepareOtpResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type PrepareOtpResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['PrepareOtpResult'] = ResolversParentTypes['PrepareOtpResult']
+> = {
+	otpUri?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	otpSecret?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -1131,11 +1277,15 @@ export type Resolvers<ContextType = any> = {
 	ApiKeyWithToken?: ApiKeyWithTokenResolvers<ContextType>
 	ChangePasswordError?: ChangePasswordErrorResolvers<ContextType>
 	ChangePasswordResponse?: ChangePasswordResponseResolvers<ContextType>
+	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>
+	ConfirmOtpResponse?: ConfirmOtpResponseResolvers<ContextType>
 	CreateApiKeyError?: CreateApiKeyErrorResolvers<ContextType>
 	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<ContextType>
 	CreateApiKeyResult?: CreateApiKeyResultResolvers<ContextType>
 	DisableApiKeyError?: DisableApiKeyErrorResolvers<ContextType>
 	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
+	DisableOtpError?: DisableOtpErrorResolvers<ContextType>
+	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
 	Identity?: IdentityResolvers<ContextType>
 	IdentityProjectRelation?: IdentityProjectRelationResolvers<ContextType>
 	InviteError?: InviteErrorResolvers<ContextType>
@@ -1144,6 +1294,8 @@ export type Resolvers<ContextType = any> = {
 	Membership?: MembershipResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>
 	Person?: PersonResolvers<ContextType>
+	PrepareOtpResponse?: PrepareOtpResponseResolvers<ContextType>
+	PrepareOtpResult?: PrepareOtpResultResolvers<ContextType>
 	Project?: ProjectResolvers<ContextType>
 	ProjectIdentityRelation?: ProjectIdentityRelationResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>

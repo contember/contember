@@ -3,7 +3,7 @@ import { Providers } from '../providers'
 import { CommandBus } from './CommandBus'
 
 interface Command<Result> {
-	execute(args: { db: Client; providers: Providers; bus: CommandBus }): Promise<Result>
+	execute(args: Command.Args): Promise<Result>
 }
 
 namespace Command {

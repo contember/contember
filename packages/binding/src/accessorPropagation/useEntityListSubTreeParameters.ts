@@ -37,21 +37,23 @@ export const useEntityListSubTreeParameters = (
 				new BoxedUnconstrainedQualifiedEntityList(
 					QueryLanguage.desugarUnconstrainedQualifiedEntityList(
 						{
-							forceCreation: qualifiedEntityList.forceCreation,
-							isNonbearing: qualifiedEntityList.isNonbearing,
-							setOnCreate: qualifiedEntityList.setOnCreate,
 							entities: qualifiedEntityList.entities,
+							forceCreation: qualifiedEntityList.forceCreation,
+							initialEntityCount: qualifiedEntityList.initialEntityCount,
+							isNonbearing: qualifiedEntityList.isNonbearing,
 							onInitialize: qualifiedEntityList.onInitialize,
+							setOnCreate: qualifiedEntityList.setOnCreate,
 						},
 						environment,
 					),
 				),
 			[
 				qualifiedEntityList.entities,
-				qualifiedEntityList.setOnCreate,
 				qualifiedEntityList.forceCreation,
+				qualifiedEntityList.initialEntityCount,
 				qualifiedEntityList.isNonbearing,
 				qualifiedEntityList.onInitialize,
+				qualifiedEntityList.setOnCreate,
 				environment,
 			],
 		)

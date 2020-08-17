@@ -147,7 +147,7 @@ export class MarkerMerger {
 
 	public static mergeSubTreeMarkers(original: SubTreeMarker, fresh: SubTreeMarker) {
 		return new SubTreeMarker(
-			original.parameters, // TODO merge this!!!
+			TreeParameterMerger.mergeSubTreeParametersWithSamePlaceholders(original.parameters, fresh.parameters),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
 			this.mergeEnvironments(original.environment, fresh.environment),
 		)

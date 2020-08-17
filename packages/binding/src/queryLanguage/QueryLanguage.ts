@@ -202,6 +202,7 @@ export namespace QueryLanguage {
 				? desugarSetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
 			onInitialize: unsugarableEntityList.onInitialize,
+			initialEntityCount: unsugarableEntityList.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 			entityName,
 			hasOneRelationPath,
 		}

@@ -676,7 +676,7 @@ export class AccessorTreeGenerator {
 			subTreeState = this.initializeEntityListAccessor(
 				tree.environment,
 				tree.fields,
-				{ initialEntityCount: 0, ...tree.parameters.value },
+				tree.parameters.value,
 				noop,
 				persistedEntityIds,
 			)

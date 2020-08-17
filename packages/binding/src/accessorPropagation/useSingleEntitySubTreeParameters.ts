@@ -41,6 +41,7 @@ export const useSingleEntitySubTreeParameters = (
 							isNonbearing: qualifiedSingleEntity.isNonbearing,
 							entity: qualifiedSingleEntity.entity,
 							setOnCreate: qualifiedSingleEntity.setOnCreate,
+							onInitialize: qualifiedSingleEntity.onInitialize,
 						},
 						environment,
 					),
@@ -50,6 +51,7 @@ export const useSingleEntitySubTreeParameters = (
 				qualifiedSingleEntity.setOnCreate,
 				qualifiedSingleEntity.forceCreation,
 				qualifiedSingleEntity.isNonbearing,
+				qualifiedSingleEntity.onInitialize,
 				environment,
 			],
 		)
@@ -60,12 +62,23 @@ export const useSingleEntitySubTreeParameters = (
 				new BoxedQualifiedSingleEntity(
 					QueryLanguage.desugarQualifiedSingleEntity(
 						{
+							forceCreation: qualifiedSingleEntity.forceCreation,
+							isNonbearing: qualifiedSingleEntity.isNonbearing,
 							entity: qualifiedSingleEntity.entity,
+							setOnCreate: qualifiedSingleEntity.setOnCreate,
+							onInitialize: qualifiedSingleEntity.onInitialize,
 						},
 						environment,
 					),
 				),
-			[qualifiedSingleEntity.entity, environment],
+			[
+				qualifiedSingleEntity.entity,
+				qualifiedSingleEntity.setOnCreate,
+				qualifiedSingleEntity.forceCreation,
+				qualifiedSingleEntity.isNonbearing,
+				qualifiedSingleEntity.onInitialize,
+				environment,
+			],
 		)
 	}
 

@@ -1,3 +1,4 @@
+import { emptyObject } from '@contember/react-utils'
 import { Environment } from '../dao'
 import { TreeParameterMerger, VariableInputTransformer } from '../model'
 import {
@@ -32,6 +33,7 @@ import {
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUnconstrainedQualifiedSingleEntity,
 	UnconstrainedQualifiedEntityList,
+	UnconstrainedQualifiedSingleEntity,
 	UniqueWhere,
 	UnsugarableEntityListParameters,
 	UnsugarableHasManyRelation,
@@ -99,6 +101,7 @@ export namespace QueryLanguage {
 		setOnCreate: unsugarable.setOnCreate ? desugarSetOnCreate(unsugarable.setOnCreate, environment) : undefined,
 		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 		forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
+		onInitialize: unsugarable.onInitialize,
 	})
 
 	const augmentDesugaredHasOneRelationPath = (
@@ -125,6 +128,7 @@ export namespace QueryLanguage {
 		orderBy: unsugarable.orderBy ? desugarOrderBy(unsugarable.orderBy, environment) : undefined,
 		offset: unsugarable.offset,
 		limit: unsugarable.limit,
+		onInitialize: unsugarable.onInitialize,
 	})
 
 	const desugarHasOneRelationPath = (
@@ -165,6 +169,7 @@ export namespace QueryLanguage {
 		field: sugarablePart.field,
 		isNonbearing: unsugarablePart.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 		forceCreation: unsugarablePart.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
+		onInitialize: unsugarablePart.onInitialize,
 	})
 
 	export const desugarUniqueWhere = preparePrimitiveEntryPoint(Parser.EntryPoint.UniqueWhere)
@@ -184,14 +189,10 @@ export namespace QueryLanguage {
 		if (typeof entities === 'string') {
 			const desugared = desugarSugarableUnconstrainedQualifiedEntityList(entities, environment)
 			entityName = desugared.entityName
-			hasOneRelationPath = augmentDesugaredHasOneRelationPath(
-				desugared.hasOneRelationPath,
-				unsugarableEntityList,
-				environment,
-			)
+			hasOneRelationPath = augmentDesugaredHasOneRelationPath(desugared.hasOneRelationPath, emptyObject, environment)
 		} else {
 			entityName = entities.entityName
-			hasOneRelationPath = desugarHasOneRelationPath(entities.hasOneRelationPath, unsugarableEntityList, environment)
+			hasOneRelationPath = desugarHasOneRelationPath(entities.hasOneRelationPath, emptyObject, environment)
 		}
 
 		return {
@@ -200,6 +201,7 @@ export namespace QueryLanguage {
 			setOnCreate: unsugarableEntityList.setOnCreate
 				? desugarSetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
+			onInitialize: unsugarableEntityList.onInitialize,
 			entityName,
 			hasOneRelationPath,
 		}
@@ -208,7 +210,7 @@ export namespace QueryLanguage {
 	export const desugarUnconstrainedQualifiedSingleEntity = (
 		{ entity, ...unsugarableSingleEntity }: SugaredUnconstrainedQualifiedSingleEntity,
 		environment: Environment,
-	): UnconstrainedQualifiedEntityList => {
+	): UnconstrainedQualifiedSingleEntity => {
 		let hasOneRelationPath: HasOneRelation[]
 		let entityName: EntityName
 
@@ -231,6 +233,7 @@ export namespace QueryLanguage {
 			setOnCreate: unsugarableSingleEntity.setOnCreate
 				? desugarSetOnCreate(unsugarableSingleEntity.setOnCreate, environment)
 				: undefined,
+			onInitialize: unsugarableSingleEntity.onInitialize,
 			entityName,
 			hasOneRelationPath,
 		}
@@ -250,15 +253,11 @@ export namespace QueryLanguage {
 
 			entityName = desugared.entityName
 			filter = desugared.filter
-			hasOneRelationPath = augmentDesugaredHasOneRelationPath(
-				desugared.hasOneRelationPath,
-				unsugarableEntityList,
-				environment,
-			)
+			hasOneRelationPath = augmentDesugaredHasOneRelationPath(desugared.hasOneRelationPath, emptyObject, environment)
 		} else {
 			entityName = entities.entityName
 			filter = entities.filter
-			hasOneRelationPath = desugarHasOneRelationPath(entities.hasOneRelationPath, unsugarableEntityList, environment)
+			hasOneRelationPath = desugarHasOneRelationPath(entities.hasOneRelationPath, emptyObject, environment)
 		}
 
 		return {
@@ -276,6 +275,7 @@ export namespace QueryLanguage {
 			setOnCreate: unsugarableEntityList.setOnCreate
 				? desugarSetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
+			onInitialize: unsugarableEntityList.onInitialize,
 		}
 	}
 
@@ -294,16 +294,12 @@ export namespace QueryLanguage {
 			field = desugared.field
 			entityName = desugared.entityName
 			filter = desugared.filter
-			hasOneRelationPath = augmentDesugaredHasOneRelationPath(
-				desugared.hasOneRelationPath,
-				unsugarableFieldList,
-				environment,
-			)
+			hasOneRelationPath = augmentDesugaredHasOneRelationPath(desugared.hasOneRelationPath, emptyObject, environment)
 		} else {
 			field = fields.field
 			entityName = fields.entityName
 			filter = fields.filter
-			hasOneRelationPath = desugarHasOneRelationPath(fields.hasOneRelationPath, unsugarableFieldList, environment)
+			hasOneRelationPath = desugarHasOneRelationPath(fields.hasOneRelationPath, emptyObject, environment)
 		}
 
 		return {
@@ -319,6 +315,7 @@ export namespace QueryLanguage {
 				unsugarableFieldList.defaultValue !== undefined
 					? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
 					: undefined,
+			onInitialize: unsugarableFieldList.onInitialize,
 			...desugarEntityListParameters(
 				{
 					filter,
@@ -368,6 +365,7 @@ export namespace QueryLanguage {
 			unsugarableSingleEntity.isNonbearing !== undefined
 				? unsugarableSingleEntity.isNonbearing !== undefined
 				: EntityCreationParametersDefaults.isNonbearing
+		const onInitialize = unsugarableSingleEntity.onInitialize
 
 		return {
 			entityName,
@@ -377,6 +375,7 @@ export namespace QueryLanguage {
 			forceCreation,
 			setOnCreate,
 			isNonbearing,
+			onInitialize,
 		}
 	}
 
@@ -469,7 +468,7 @@ export namespace QueryLanguage {
 			const desugaredField = desugarSugarableRelativeEntityList(field, environment)
 			hasOneRelationPath = augmentDesugaredHasOneRelationPath(
 				desugaredField.hasOneRelationPath,
-				unsugarableEntityList,
+				emptyObject,
 				environment,
 			)
 			hasManyRelation = augmentDesugaredHasManyRelation(
@@ -478,7 +477,7 @@ export namespace QueryLanguage {
 				environment,
 			)
 		} else {
-			hasOneRelationPath = desugarHasOneRelationPath(field.hasOneRelationPath || [], unsugarableEntityList, environment)
+			hasOneRelationPath = desugarHasOneRelationPath(field.hasOneRelationPath || [], emptyObject, environment)
 			hasManyRelation = desugarHasManyRelation(field.hasManyRelation, unsugarableEntityList, environment)
 		}
 

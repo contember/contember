@@ -6,17 +6,32 @@ import {
 	SugarableSingleEntityParameters,
 	UnsugarableSingleEntityParameters,
 } from './SingleEntityParameters'
+import {
+	DesugaredSingleEntityStaticEvents,
+	SingleEntityStaticEvents,
+	SugarableSingleEntityStaticEvents,
+	UnsugarableSingleEntityStaticEvents,
+} from './SingleEntityStaticEvents'
 
-export interface DesugaredHasOneRelation extends DesugaredRelation, DesugaredSingleEntityParameters {
+export interface DesugaredHasOneRelation
+	extends DesugaredRelation,
+		DesugaredSingleEntityParameters,
+		DesugaredSingleEntityStaticEvents {
 	reducedBy: UniqueWhere | undefined
 }
 
-export interface HasOneRelation extends Relation, SingleEntityParameters {
+export interface HasOneRelation extends Relation, SingleEntityParameters, SingleEntityStaticEvents {
 	reducedBy: UniqueWhere | undefined
 }
 
-export interface SugarableHasOneRelation extends SugarableRelation, SugarableSingleEntityParameters {
+export interface SugarableHasOneRelation
+	extends SugarableRelation,
+		SugarableSingleEntityParameters,
+		SugarableSingleEntityStaticEvents {
 	reducedBy?: SugaredUniqueWhere
 }
 
-export interface UnsugarableHasOneRelation extends UnsugarableRelation, UnsugarableSingleEntityParameters {}
+export interface UnsugarableHasOneRelation
+	extends UnsugarableRelation,
+		UnsugarableSingleEntityParameters,
+		UnsugarableSingleEntityStaticEvents {}

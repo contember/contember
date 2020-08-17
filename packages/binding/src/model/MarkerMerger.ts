@@ -11,7 +11,7 @@ import {
 	Marker,
 	SubTreeMarker,
 } from '../markers'
-import { FieldName } from '../treeParameters'
+import { EntityListStaticEvents, FieldName, SingleEntityStaticEvents } from '../treeParameters'
 import { assertNever } from '../utils'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
@@ -147,7 +147,7 @@ export class MarkerMerger {
 
 	public static mergeSubTreeMarkers(original: SubTreeMarker, fresh: SubTreeMarker) {
 		return new SubTreeMarker(
-			original.parameters,
+			original.parameters, // TODO merge this!!!
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
 			this.mergeEnvironments(original.environment, fresh.environment),
 		)

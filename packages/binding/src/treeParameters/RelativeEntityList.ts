@@ -1,29 +1,28 @@
-import {
-	DesugaredHasManyRelation,
-	HasManyRelation,
-	SugarableHasManyRelation,
-	UnsugarableHasManyRelation,
-} from './HasManyRelation'
-import {
-	DesugaredRelativeSingleEntity,
-	RelativeSingleEntity,
-	SugarableRelativeSingleEntity,
-	UnsugarableRelativeSingleEntity,
-} from './RelativeSingleEntity'
+import { UnsugarableEntityListParameters } from './EntityListParameters'
+import { UnsugarableEntityListStaticEvents } from './EntityListStaticEvents'
+import { DesugaredHasManyRelation, HasManyRelation, SugarableHasManyRelation } from './HasManyRelation'
+import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import { UnsugarableRelation } from './Relation'
 
-export interface DesugaredRelativeEntityList extends DesugaredRelativeSingleEntity {
+export interface DesugaredRelativeEntityList {
+	hasOneRelationPath: DesugaredHasOneRelation[]
 	hasManyRelation: DesugaredHasManyRelation
 }
 
-export interface RelativeEntityList extends RelativeSingleEntity {
+export interface RelativeEntityList {
+	hasOneRelationPath: HasOneRelation[]
 	hasManyRelation: HasManyRelation
 }
 
-export interface SugarableRelativeEntityList extends Partial<SugarableRelativeSingleEntity> {
+export interface SugarableRelativeEntityList {
+	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 	hasManyRelation: SugarableHasManyRelation
 }
 
-export interface UnsugarableRelativeEntityList extends UnsugarableHasManyRelation, UnsugarableRelativeSingleEntity {}
+export interface UnsugarableRelativeEntityList
+	extends UnsugarableRelation,
+		UnsugarableEntityListParameters,
+		UnsugarableEntityListStaticEvents {}
 
 export interface SugaredRelativeEntityList extends UnsugarableRelativeEntityList {
 	// E.g. genres(slug = 'sciFi').authors[age < 123]

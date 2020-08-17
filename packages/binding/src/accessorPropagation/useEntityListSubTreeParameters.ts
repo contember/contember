@@ -41,6 +41,7 @@ export const useEntityListSubTreeParameters = (
 							isNonbearing: qualifiedEntityList.isNonbearing,
 							setOnCreate: qualifiedEntityList.setOnCreate,
 							entities: qualifiedEntityList.entities,
+							onInitialize: qualifiedEntityList.onInitialize,
 						},
 						environment,
 					),
@@ -50,6 +51,7 @@ export const useEntityListSubTreeParameters = (
 				qualifiedEntityList.setOnCreate,
 				qualifiedEntityList.forceCreation,
 				qualifiedEntityList.isNonbearing,
+				qualifiedEntityList.onInitialize,
 				environment,
 			],
 		)
@@ -68,6 +70,7 @@ export const useEntityListSubTreeParameters = (
 							orderBy: qualifiedEntityList.orderBy,
 							offset: qualifiedEntityList.offset,
 							limit: qualifiedEntityList.limit,
+							onInitialize: qualifiedEntityList.onInitialize,
 						},
 						environment,
 					),
@@ -81,6 +84,7 @@ export const useEntityListSubTreeParameters = (
 				qualifiedEntityList.forceCreation,
 				qualifiedEntityList.isNonbearing,
 				qualifiedEntityList.initialEntityCount,
+				qualifiedEntityList.onInitialize,
 				environment,
 			],
 		)

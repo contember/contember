@@ -68,6 +68,7 @@ describe('Marker tree generator', () => {
 				orderBy: undefined,
 				offset: undefined,
 				limit: undefined,
+				onInitialize: undefined,
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -97,6 +98,7 @@ describe('Marker tree generator', () => {
 				forceCreation: false,
 				isNonbearing: false,
 				reducedBy: undefined,
+				onInitialize: undefined,
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -127,6 +129,7 @@ describe('Marker tree generator', () => {
 				orderBy: undefined,
 				offset: undefined,
 				limit: undefined,
+				onInitialize: undefined,
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -154,6 +157,7 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				setOnCreate: { bar: 123 },
 				forceCreation: false,
+				onInitialize: undefined,
 			}),
 			new EntityFieldMarkersContainer(
 				true,

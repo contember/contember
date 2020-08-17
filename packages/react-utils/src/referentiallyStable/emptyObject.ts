@@ -1,1 +1,1 @@
-export const emptyObject = {}
+export const emptyObject = Object.freeze({})

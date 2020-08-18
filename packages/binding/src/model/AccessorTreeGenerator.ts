@@ -889,6 +889,7 @@ export class AccessorTreeGenerator {
 			errors: emptyArray,
 			eventListeners: {
 				update: undefined,
+				initialize: undefined,
 				beforeUpdate: undefined,
 			},
 			fields: new Map(),
@@ -1202,6 +1203,7 @@ export class AccessorTreeGenerator {
 			environment,
 			eventListeners: {
 				update: undefined,
+				initialize: undefined,
 				beforeUpdate: undefined,
 			},
 			errors: emptyArray,

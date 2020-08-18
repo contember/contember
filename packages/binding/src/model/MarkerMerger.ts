@@ -11,7 +11,7 @@ import {
 	Marker,
 	SubTreeMarker,
 } from '../markers'
-import { EntityListStaticEvents, FieldName, SingleEntityStaticEvents } from '../treeParameters'
+import { FieldName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { TreeParameterMerger } from './TreeParameterMerger'
 

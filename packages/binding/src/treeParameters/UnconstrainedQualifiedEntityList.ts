@@ -11,11 +11,11 @@ import {
 	UnsugarableEntityListPreferences,
 } from './EntityListPreferences'
 import {
-	DesugaredEntityListStaticEvents,
-	EntityListStaticEvents,
-	SugarableEntityListStaticEvents,
-	UnsugarableEntityListStaticEvents,
-} from './EntityListStaticEvents'
+	DesugaredEntityListEventListeners,
+	EntityListEventListeners,
+	SugarableEntityListEventListeners,
+	UnsugarableEntityListEventListeners,
+} from './EntityListEventListeners'
 import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import {
 	DesugaredQualifiedEntityParameters,
@@ -27,7 +27,7 @@ import {
 export interface DesugaredUnconstrainedQualifiedEntityList
 	extends DesugaredQualifiedEntityParameters,
 		DesugaredEntityCreationParameters,
-		DesugaredEntityListStaticEvents,
+		DesugaredEntityListEventListeners,
 		DesugaredEntityListPreferences {
 	hasOneRelationPath: DesugaredHasOneRelation[]
 }
@@ -35,7 +35,7 @@ export interface DesugaredUnconstrainedQualifiedEntityList
 export interface UnconstrainedQualifiedEntityList
 	extends QualifiedEntityParameters,
 		EntityCreationParameters,
-		EntityListStaticEvents,
+		EntityListEventListeners,
 		EntityListPreferences {
 	hasOneRelationPath: HasOneRelation[]
 }
@@ -43,7 +43,7 @@ export interface UnconstrainedQualifiedEntityList
 export interface SugarableUnconstrainedQualifiedEntityList
 	extends SugarableQualifiedEntityParameters,
 		SugarableEntityCreationParameters,
-		SugarableEntityListStaticEvents,
+		SugarableEntityListEventListeners,
 		SugarableEntityListPreferences {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
@@ -51,7 +51,7 @@ export interface SugarableUnconstrainedQualifiedEntityList
 export interface UnsugarableUnconstrainedQualifiedEntityList
 	extends UnsugarableQualifiedEntityParameters,
 		UnsugarableEntityCreationParameters,
-		UnsugarableEntityListStaticEvents,
+		UnsugarableEntityListEventListeners,
 		UnsugarableEntityListPreferences {
 	// Deliberately leaving out UnsugarableHasOneRelation
 }

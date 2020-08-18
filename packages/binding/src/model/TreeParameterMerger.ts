@@ -27,7 +27,11 @@ export class TreeParameterMerger {
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			forceCreation: original.forceCreation || fresh.forceCreation,
-			onInitialize: this.mergeStaticEvent(original.onInitialize, fresh.onInitialize),
+			eventListeners: {
+				beforeUpdate: this.mergeEventListener(original.eventListeners.beforeUpdate, fresh.eventListeners.beforeUpdate),
+				initialize: this.mergeEventListener(original.eventListeners.initialize, fresh.eventListeners.initialize),
+				update: this.mergeEventListener(original.eventListeners.update, fresh.eventListeners.update),
+			},
 		}
 	}
 
@@ -54,7 +58,11 @@ export class TreeParameterMerger {
 			forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
-			onInitialize: this.mergeStaticEvent(original.onInitialize, fresh.onInitialize),
+			eventListeners: {
+				beforeUpdate: this.mergeEventListener(original.eventListeners.beforeUpdate, fresh.eventListeners.beforeUpdate),
+				initialize: this.mergeEventListener(original.eventListeners.initialize, fresh.eventListeners.initialize),
+				update: this.mergeEventListener(original.eventListeners.update, fresh.eventListeners.update),
+			},
 		}
 	}
 
@@ -74,7 +82,17 @@ export class TreeParameterMerger {
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				onInitialize: this.mergeStaticEvent(original.value.onInitialize, fresh.value.onInitialize),
+				eventListeners: {
+					beforeUpdate: this.mergeEventListener(
+						original.value.eventListeners.beforeUpdate,
+						fresh.value.eventListeners.beforeUpdate,
+					),
+					initialize: this.mergeEventListener(
+						original.value.eventListeners.initialize,
+						fresh.value.eventListeners.initialize,
+					),
+					update: this.mergeEventListener(original.value.eventListeners.update, fresh.value.eventListeners.update),
+				},
 			})
 		}
 		if (original instanceof BoxedQualifiedEntityList && fresh instanceof BoxedQualifiedEntityList) {
@@ -97,7 +115,17 @@ export class TreeParameterMerger {
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				onInitialize: this.mergeStaticEvent(original.value.onInitialize, fresh.value.onInitialize),
+				eventListeners: {
+					beforeUpdate: this.mergeEventListener(
+						original.value.eventListeners.beforeUpdate,
+						fresh.value.eventListeners.beforeUpdate,
+					),
+					initialize: this.mergeEventListener(
+						original.value.eventListeners.initialize,
+						fresh.value.eventListeners.initialize,
+					),
+					update: this.mergeEventListener(original.value.eventListeners.update, fresh.value.eventListeners.update),
+				},
 				initialEntityCount: original.value.initialEntityCount, // Handled above
 			})
 		}
@@ -114,7 +142,17 @@ export class TreeParameterMerger {
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				onInitialize: this.mergeStaticEvent(original.value.onInitialize, fresh.value.onInitialize),
+				eventListeners: {
+					beforeUpdate: this.mergeEventListener(
+						original.value.eventListeners.beforeUpdate,
+						fresh.value.eventListeners.beforeUpdate,
+					),
+					initialize: this.mergeEventListener(
+						original.value.eventListeners.initialize,
+						fresh.value.eventListeners.initialize,
+					),
+					update: this.mergeEventListener(original.value.eventListeners.update, fresh.value.eventListeners.update),
+				},
 			})
 		}
 		if (
@@ -136,7 +174,17 @@ export class TreeParameterMerger {
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				onInitialize: this.mergeStaticEvent(original.value.onInitialize, fresh.value.onInitialize),
+				eventListeners: {
+					beforeUpdate: this.mergeEventListener(
+						original.value.eventListeners.beforeUpdate,
+						fresh.value.eventListeners.beforeUpdate,
+					),
+					initialize: this.mergeEventListener(
+						original.value.eventListeners.initialize,
+						fresh.value.eventListeners.initialize,
+					),
+					update: this.mergeEventListener(original.value.eventListeners.update, fresh.value.eventListeners.update),
+				},
 				initialEntityCount: original.value.initialEntityCount, // Handled above
 			})
 		}
@@ -202,10 +250,10 @@ export class TreeParameterMerger {
 		return originalCopy
 	}
 
-	private static mergeStaticEvent<F extends Function>(
-		original: F | Set<F> | undefined,
-		fresh: F | Set<F> | undefined,
-	): F | Set<F> | undefined {
+	private static mergeEventListener<F extends Function>(
+		original: Set<F> | undefined,
+		fresh: Set<F> | undefined,
+	): Set<F> | undefined {
 		if (original === undefined && fresh === undefined) {
 			return undefined
 		}
@@ -215,16 +263,7 @@ export class TreeParameterMerger {
 		if (fresh === undefined) {
 			return original
 		}
-		if (original instanceof Set) {
-			if (fresh instanceof Set) {
-				return this.mergeSets(original, fresh)
-			}
-			return this.appendToSet(original, fresh)
-		}
-		if (fresh instanceof Set) {
-			return this.appendToSet(fresh, original)
-		}
-		return new Set([original, fresh])
+		return this.mergeSets(original, fresh)
 	}
 
 	private static mergeSets<T>(original: Set<T>, fresh: Set<T>): Set<T> {
@@ -232,12 +271,6 @@ export class TreeParameterMerger {
 		for (const item of fresh) {
 			combinedSet.add(item)
 		}
-		return combinedSet
-	}
-
-	private static appendToSet<T>(set: Set<T>, newItem: T): Set<T> {
-		const combinedSet = new Set(set)
-		combinedSet.add(newItem)
 		return combinedSet
 	}
 }

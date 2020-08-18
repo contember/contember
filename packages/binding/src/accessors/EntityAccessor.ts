@@ -194,11 +194,13 @@ namespace EntityAccessor {
 
 	export interface EntityEventListenerMap {
 		beforeUpdate: BatchUpdatesHandler
+		initialize: BatchUpdatesHandler
 		update: UpdateListener
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
 	export interface AddEntityEventListener {
 		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
+		(type: 'initialize', listener: EntityEventListenerMap['initialize']): () => void
 		(type: 'update', listener: EntityEventListenerMap['update']): () => void
 	}
 }

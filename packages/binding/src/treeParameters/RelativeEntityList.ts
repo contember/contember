@@ -1,5 +1,5 @@
 import { UnsugarableEntityListParameters } from './EntityListParameters'
-import { UnsugarableEntityListStaticEvents } from './EntityListStaticEvents'
+import { UnsugarableEntityListEventListeners } from './EntityListEventListeners'
 import { DesugaredHasManyRelation, HasManyRelation, SugarableHasManyRelation } from './HasManyRelation'
 import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import { UnsugarableRelation } from './Relation'
@@ -22,7 +22,7 @@ export interface SugarableRelativeEntityList {
 export interface UnsugarableRelativeEntityList
 	extends UnsugarableRelation,
 		UnsugarableEntityListParameters,
-		UnsugarableEntityListStaticEvents {}
+		UnsugarableEntityListEventListeners {}
 
 export interface SugaredRelativeEntityList extends UnsugarableRelativeEntityList {
 	// E.g. genres(slug = 'sciFi').authors[age < 123]

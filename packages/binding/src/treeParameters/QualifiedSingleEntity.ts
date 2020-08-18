@@ -24,18 +24,18 @@ import {
 	UnsugarableSingleEntityParameters,
 } from './SingleEntityParameters'
 import {
-	DesugaredSingleEntityStaticEvents,
-	SingleEntityStaticEvents,
-	SugarableSingleEntityStaticEvents,
-	UnsugarableSingleEntityStaticEvents,
-} from './SingleEntityStaticEvents'
+	DesugaredSingleEntityEventListeners,
+	SingleEntityEventListeners,
+	SugarableSingleEntityEventListeners,
+	UnsugarableSingleEntityEventListeners,
+} from './SingleEntityEventListeners'
 
 export interface DesugaredQualifiedSingleEntity
 	extends DesugaredQualifiedSingleEntityParameters,
 		DesugaredSingleEntityParameters,
 		DesugaredQualifiedEntityParameters,
 		DesugaredEntityCreationParameters,
-		DesugaredSingleEntityStaticEvents {
+		DesugaredSingleEntityEventListeners {
 	hasOneRelationPath: DesugaredHasOneRelation[]
 }
 
@@ -44,7 +44,7 @@ export interface QualifiedSingleEntity
 		SingleEntityParameters,
 		QualifiedEntityParameters,
 		EntityCreationParameters,
-		SingleEntityStaticEvents {
+		SingleEntityEventListeners {
 	hasOneRelationPath: HasOneRelation[]
 }
 
@@ -53,7 +53,7 @@ export interface SugarableQualifiedSingleEntity
 		SugarableSingleEntityParameters,
 		SugarableQualifiedEntityParameters,
 		SugarableEntityCreationParameters,
-		SugarableSingleEntityStaticEvents {
+		SugarableSingleEntityEventListeners {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
@@ -62,7 +62,7 @@ export interface UnsugarableQualifiedSingleEntity
 		UnsugarableSingleEntityParameters,
 		UnsugarableQualifiedEntityParameters,
 		UnsugarableEntityCreationParameters,
-		UnsugarableSingleEntityStaticEvents {
+		UnsugarableSingleEntityEventListeners {
 	// Deliberately leaving out UnsugarableHasOneRelation
 }
 

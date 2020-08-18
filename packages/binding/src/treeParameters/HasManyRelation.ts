@@ -5,26 +5,26 @@ import {
 	UnsugarableEntityListParameters,
 } from './EntityListParameters'
 import {
-	DesugaredEntityListStaticEvents,
-	EntityListStaticEvents,
-	SugarableEntityListStaticEvents,
-	UnsugarableEntityListStaticEvents,
-} from './EntityListStaticEvents'
+	DesugaredEntityListEventListeners,
+	EntityListEventListeners,
+	SugarableEntityListEventListeners,
+	UnsugarableEntityListEventListeners,
+} from './EntityListEventListeners'
 import { DesugaredRelation, Relation, SugarableRelation, UnsugarableRelation } from './Relation'
 
 export interface DesugaredHasManyRelation
 	extends DesugaredRelation,
 		DesugaredEntityListParameters,
-		DesugaredEntityListStaticEvents {}
+		DesugaredEntityListEventListeners {}
 
-export interface HasManyRelation extends Relation, EntityListParameters, EntityListStaticEvents {}
+export interface HasManyRelation extends Relation, EntityListParameters, EntityListEventListeners {}
 
 export interface SugarableHasManyRelation
 	extends SugarableRelation,
 		SugarableEntityListParameters,
-		SugarableEntityListStaticEvents {}
+		SugarableEntityListEventListeners {}
 
 export interface UnsugarableHasManyRelation
 	extends UnsugarableRelation,
 		UnsugarableEntityListParameters,
-		UnsugarableEntityListStaticEvents {}
+		UnsugarableEntityListEventListeners {}

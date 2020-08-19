@@ -11,6 +11,24 @@ export type Scalars = {
 	Float: number
 }
 
+export type AddMailTemplateError = {
+	readonly __typename?: 'AddMailTemplateError'
+	readonly code: AddMailTemplateErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum AddMailTemplateErrorCode {
+	MissingVariable = 'MISSING_VARIABLE',
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+}
+
+export type AddMailTemplateResponse = {
+	readonly __typename?: 'AddMailTemplateResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<AddMailTemplateError>
+}
+
 export type AddProjectMemberError = {
 	readonly __typename?: 'AddProjectMemberError'
 	readonly code: AddProjectMemberErrorCode
@@ -189,6 +207,27 @@ export type InviteResult = {
 	readonly isNew: Scalars['Boolean']
 }
 
+export type MailTemplate = {
+	readonly projectSlug: Scalars['String']
+	readonly type: MailType
+	/** Custom mail variant identifier, e.g. a locale. */
+	readonly variant?: Maybe<Scalars['String']>
+	readonly subject: Scalars['String']
+	readonly content: Scalars['String']
+	readonly useLayout?: Maybe<Scalars['Boolean']>
+}
+
+export type MailTemplateIdentifier = {
+	readonly projectSlug: Scalars['String']
+	readonly type: MailType
+	readonly variant?: Maybe<Scalars['String']>
+}
+
+export enum MailType {
+	ExistingUserInvited = 'EXISTING_USER_INVITED',
+	NewUserInvited = 'NEW_USER_INVITED',
+}
+
 export enum Member_Type {
 	ApiKey = 'API_KEY',
 	Person = 'PERSON',
@@ -222,6 +261,8 @@ export type Mutation = {
 	readonly prepareOtp?: Maybe<PrepareOtpResponse>
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly disableOtp?: Maybe<DisableOtpResponse>
+	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
+	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 }
 
 export type MutationSetupArgs = {
@@ -297,6 +338,14 @@ export type MutationConfirmOtpArgs = {
 	otpToken: Scalars['String']
 }
 
+export type MutationAddProjectMailTemplateArgs = {
+	template: MailTemplate
+}
+
+export type MutationRemoveProjectMailTemplateArgs = {
+	templateIdentifier: MailTemplateIdentifier
+}
+
 export type Person = {
 	readonly __typename?: 'Person'
 	readonly id: Scalars['String']
@@ -350,6 +399,24 @@ export type QueryProjectBySlugArgs = {
 export type QueryProjectMembershipsArgs = {
 	projectSlug: Scalars['String']
 	identityId: Scalars['String']
+}
+
+export type RemoveMailTemplateError = {
+	readonly __typename?: 'RemoveMailTemplateError'
+	readonly code: RemoveMailTemplateErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum RemoveMailTemplateErrorCode {
+	ProjectNotFound = 'PROJECT_NOT_FOUND',
+	TemplateNotFound = 'TEMPLATE_NOT_FOUND',
+}
+
+export type RemoveMailTemplateResponse = {
+	readonly __typename?: 'RemoveMailTemplateResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<RemoveMailTemplateError>
 }
 
 export type RemoveProjectMemberError = {
@@ -652,6 +719,15 @@ export type ResolversTypes = {
 	DisableOtpResponse: ResolverTypeWrapper<DisableOtpResponse>
 	DisableOtpError: ResolverTypeWrapper<DisableOtpError>
 	DisableOtpErrorCode: DisableOtpErrorCode
+	MailTemplate: MailTemplate
+	MailType: MailType
+	AddMailTemplateResponse: ResolverTypeWrapper<AddMailTemplateResponse>
+	AddMailTemplateError: ResolverTypeWrapper<AddMailTemplateError>
+	AddMailTemplateErrorCode: AddMailTemplateErrorCode
+	MailTemplateIdentifier: MailTemplateIdentifier
+	RemoveMailTemplateResponse: ResolverTypeWrapper<RemoveMailTemplateResponse>
+	RemoveMailTemplateError: ResolverTypeWrapper<RemoveMailTemplateError>
+	RemoveMailTemplateErrorCode: RemoveMailTemplateErrorCode
 	SetupError: ResolverTypeWrapper<SetupError>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 }
@@ -723,8 +799,36 @@ export type ResolversParentTypes = {
 	DisableOtpResponse: DisableOtpResponse
 	DisableOtpError: DisableOtpError
 	DisableOtpErrorCode: DisableOtpErrorCode
+	MailTemplate: MailTemplate
+	MailType: MailType
+	AddMailTemplateResponse: AddMailTemplateResponse
+	AddMailTemplateError: AddMailTemplateError
+	AddMailTemplateErrorCode: AddMailTemplateErrorCode
+	MailTemplateIdentifier: MailTemplateIdentifier
+	RemoveMailTemplateResponse: RemoveMailTemplateResponse
+	RemoveMailTemplateError: RemoveMailTemplateError
+	RemoveMailTemplateErrorCode: RemoveMailTemplateErrorCode
 	SetupError: SetupError
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
+}
+
+export type AddMailTemplateErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['AddMailTemplateError'] = ResolversParentTypes['AddMailTemplateError']
+> = {
+	code?: Resolver<ResolversTypes['AddMailTemplateErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type AddMailTemplateResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['AddMailTemplateResponse'] = ResolversParentTypes['AddMailTemplateResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['AddMailTemplateError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type AddProjectMemberErrorResolvers<
@@ -1016,6 +1120,18 @@ export type MutationResolvers<
 		RequireFields<MutationConfirmOtpArgs, 'otpToken'>
 	>
 	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
+	addProjectMailTemplate?: Resolver<
+		Maybe<ResolversTypes['AddMailTemplateResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationAddProjectMailTemplateArgs, 'template'>
+	>
+	removeProjectMailTemplate?: Resolver<
+		Maybe<ResolversTypes['RemoveMailTemplateResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationRemoveProjectMailTemplateArgs, 'templateIdentifier'>
+	>
 }
 
 export type PersonResolvers<
@@ -1090,6 +1206,25 @@ export type QueryResolvers<
 		ContextType,
 		RequireFields<QueryProjectMembershipsArgs, 'projectSlug' | 'identityId'>
 	>
+}
+
+export type RemoveMailTemplateErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RemoveMailTemplateError'] = ResolversParentTypes['RemoveMailTemplateError']
+> = {
+	code?: Resolver<ResolversTypes['RemoveMailTemplateErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type RemoveMailTemplateResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RemoveMailTemplateResponse'] = ResolversParentTypes['RemoveMailTemplateResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveMailTemplateError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type RemoveProjectMemberErrorResolvers<
@@ -1271,6 +1406,8 @@ export type VariableEntryResolvers<
 }
 
 export type Resolvers<ContextType = any> = {
+	AddMailTemplateError?: AddMailTemplateErrorResolvers<ContextType>
+	AddMailTemplateResponse?: AddMailTemplateResponseResolvers<ContextType>
 	AddProjectMemberError?: AddProjectMemberErrorResolvers<ContextType>
 	AddProjectMemberResponse?: AddProjectMemberResponseResolvers<ContextType>
 	ApiKey?: ApiKeyResolvers<ContextType>
@@ -1299,6 +1436,8 @@ export type Resolvers<ContextType = any> = {
 	Project?: ProjectResolvers<ContextType>
 	ProjectIdentityRelation?: ProjectIdentityRelationResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
+	RemoveMailTemplateError?: RemoveMailTemplateErrorResolvers<ContextType>
+	RemoveMailTemplateResponse?: RemoveMailTemplateResponseResolvers<ContextType>
 	RemoveProjectMemberError?: RemoveProjectMemberErrorResolvers<ContextType>
 	RemoveProjectMemberResponse?: RemoveProjectMemberResponseResolvers<ContextType>
 	RoleDefinition?: RoleDefinitionResolvers<ContextType>

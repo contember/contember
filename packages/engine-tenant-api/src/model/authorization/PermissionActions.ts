@@ -7,6 +7,7 @@ namespace PermissionActions {
 		person = 'person',
 		project = 'project',
 		apiKey = 'apiKey',
+		mailTemplate = 'mailTemplate',
 	}
 
 	export const SYSTEM_SETUP = Authorizator.createAction(Resources.system, 'setup')
@@ -36,6 +37,9 @@ namespace PermissionActions {
 
 	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
 	export const API_KEY_DISABLE = Authorizator.createAction(Resources.apiKey, 'disable')
+
+	export const MAIL_TEMPLATE_ADD = Authorizator.createAction(Resources.mailTemplate, 'add')
+	export const MAIL_TEMPLATE_REMOVE = Authorizator.createAction(Resources.mailTemplate, 'remove')
 }
 
 export { PermissionActions }

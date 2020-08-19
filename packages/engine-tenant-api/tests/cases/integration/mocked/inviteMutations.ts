@@ -47,6 +47,15 @@ describe('Invite mutations', () => {
 						values: [languageId],
 						variableName: 'language',
 					}),
+					{
+						sql: `select "id", "subject", "content", "use_layout" as "uselayout"
+							from "tenant"."mail_template"
+							where "project_id" = ? and "mail_type" = ? and "variant" = ?`,
+						parameters: [projectId, 'newUserInvited', ''],
+						response: {
+							rows: [],
+						},
+					},
 				),
 				disableOneOffKeySql({ id: authenticatedApiKeyId }),
 				{

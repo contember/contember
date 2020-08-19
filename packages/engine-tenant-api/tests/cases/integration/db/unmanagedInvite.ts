@@ -39,9 +39,12 @@ describe('unmanaged invite', () => {
 			},
 		})
 		tester.mailer.expectEmpty()
-		const signInResult = await tester.execute(signInMutation({ email, password }), { roles: [TenantRole.LOGIN] })
+		const signInResult = await tester.execute(signInMutation({ email, password }, { withData: true }), {
+			roles: [TenantRole.LOGIN],
+		})
 		expect(signInResult.data.signIn).toEqual({
 			ok: true,
+			errors: [],
 			result: {
 				token: '0000000000000000000000000000000000000000',
 				person: {

@@ -1,13 +1,23 @@
 import { GraphQLTestQuery } from './types'
 import { GQL } from '../../../../src/tags'
 
-export const signInMutation = (variables: { email: string; password: string }): GraphQLTestQuery => ({
-	query: GQL`mutation($email: String!, $password: String!) {
-		signIn(email: $email, password: $password) {
+export const signInMutation = (
+	variables: {
+		email: string
+		password: string
+		otpToken?: string
+	},
+	options: { withData?: boolean } = {},
+): GraphQLTestQuery => ({
+	query: GQL`mutation($email: String!, $password: String!, $otpToken: String) {
+		signIn(email: $email, password: $password, otpToken: $otpToken) {
 			ok
+			errors {code}
 			result {
 				token
-				person {
+				${
+					options.withData
+						? `person {
 					id
 					identity {
 						projects {
@@ -20,6 +30,10 @@ export const signInMutation = (variables: { email: string; password: string }): 
 						}
 					}
 				}
+				`
+						: ''
+				}
+
 			}
 		}
 	}`,

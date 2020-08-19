@@ -10,6 +10,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.SETUP, PermissionActions.SYSTEM_SETUP)
 		permissions.allow(TenantRole.SELF, PermissionActions.PERSON_CHANGE_PASSWORD)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SIGN_OUT)
+		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SETUP_OTP)
 		permissions.allow(TenantRole.PROJECT_MEMBER, PermissionActions.PROJECT_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)

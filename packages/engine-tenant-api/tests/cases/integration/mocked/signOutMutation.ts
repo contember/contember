@@ -37,6 +37,8 @@ describe('sign out mutation', () => {
 	})
 
 	it('sign out all', async () => {
+		const identityId = authenticatedIdentityId
+		const personId = testUuid(1)
 		await executeTenantTest({
 			query: GQL`mutation {
           signOut(all: true) {
@@ -44,23 +46,18 @@ describe('sign out mutation', () => {
           }
         }`,
 			executes: [
-				{
-					sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."identity_id" = ?`,
-					parameters: [testUuid(999)],
+				getPersonByIdentity({
+					identityId,
 					response: {
-						rows: [
-							{
-								id: testUuid(1),
-								email: 'john@doe.com',
-								roles: [],
-							},
-						],
+						password: '',
+						personId: personId,
+						email: 'john@doe.com',
+						roles: [],
 					},
-				},
+				}),
 				{
 					sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "identity_id" = ?`,
-					parameters: [(val: any) => val instanceof Date, testUuid(999)],
+					parameters: [(val: any) => val instanceof Date, identityId],
 					response: { rowCount: 1 },
 				},
 			],
@@ -85,14 +82,10 @@ from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity
           }
         }`,
 			executes: [
-				{
-					sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."identity_id" = ?`,
-					parameters: [testUuid(999)],
-					response: {
-						rows: [],
-					},
-				},
+				getPersonByIdentity({
+					identityId: authenticatedIdentityId,
+					response: null,
+				}),
 			],
 			return: {
 				data: {

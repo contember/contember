@@ -1,7 +1,6 @@
 import { MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, SignInManager } from '../../../model'
-import { PermissionContextFactory } from '../../../model/authorization/PermissionContextFactory'
+import { PermissionActions, PermissionContextFactory, SignInManager } from '../../../model'
 import { IdentityTypeResolver } from '../../types'
 import { createResolverContext } from '../../ResolverContextFactory'
 
@@ -18,7 +17,12 @@ export class SignInMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign in',
 		})
 
-		const result = await this.signInManager.signIn(args.email, args.password, args.expiration || undefined)
+		const result = await this.signInManager.signIn(
+			args.email,
+			args.password,
+			args.expiration || undefined,
+			args.otpToken || undefined,
+		)
 
 		if (!result.ok) {
 			return {

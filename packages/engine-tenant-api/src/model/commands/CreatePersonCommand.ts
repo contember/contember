@@ -19,7 +19,7 @@ class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 			})
 			.execute(db)
 
-		return { id, email: this.email, password_hash, identity_id: this.identityId }
+		return { id, email: this.email, password_hash, identity_id: this.identityId, otp_uri: null, otp_activated_at: null }
 	}
 }
 

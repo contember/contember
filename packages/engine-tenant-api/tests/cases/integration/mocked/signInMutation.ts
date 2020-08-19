@@ -5,7 +5,46 @@ import { testUuid } from '../../../src/testUuid'
 import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { signInMutation } from './gql/signIn'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
+import { ExpectedQuery } from '@contember/database-tester'
+import { SignInErrorCode } from '../../../../src/schema'
+import { createOtp, generateOtp } from '../../../../src/model/utils/otp'
 
+const createApiKeySql = function({ apiKeyId, identityId }: { apiKeyId: string; identityId: string }) {
+	return {
+		sql: SQL`INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at")
+			         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		parameters: [
+			apiKeyId,
+			'9692e67b8378a6f6753f97782d458aa757e947eab2fbdf6b5c187b74561eb78f',
+			'session',
+			identityId,
+			null,
+			new Date('2019-09-04 12:30'),
+			null,
+			new Date('2019-09-04 12:00'),
+		],
+		response: { rowCount: 1 },
+	}
+}
+const getIdentityRolesSql = function({ identityId }: { identityId: string }) {
+	return {
+		sql: SQL`SELECT "roles"
+			         FROM "tenant"."identity"
+			         WHERE "id" = ?`,
+		parameters: [identityId],
+		response: { rows: [{ roles: [] }] },
+	}
+}
+const getIdentityProjectsSql = function({ identityId, projectId }: { identityId: string; projectId: string }) {
+	return {
+		sql: SQL`SELECT "project"."id", "project"."name", "project"."slug"
+			         FROM "tenant"."project"
+			         WHERE "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?) AND
+					         "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?)`,
+		parameters: [identityId, identityId],
+		response: { rows: [{ id: projectId, name: 'Foo', slug: 'foo' }] },
+	}
+}
 describe('sign in mutation', () => {
 	it('signs in', async () => {
 		const email = 'john@doe.com'
@@ -15,39 +54,12 @@ describe('sign in mutation', () => {
 		const projectId = testUuid(10)
 		const apiKeyId = testUuid(1)
 		await executeTenantTest({
-			query: signInMutation({ email, password }),
+			query: signInMutation({ email, password }, { withData: true }),
 			executes: [
 				getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
-				{
-					sql: SQL`INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at")
-					         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-					parameters: [
-						apiKeyId,
-						'9692e67b8378a6f6753f97782d458aa757e947eab2fbdf6b5c187b74561eb78f',
-						'session',
-						identityId,
-						null,
-						new Date('2019-09-04 12:30'),
-						null,
-						new Date('2019-09-04 12:00'),
-					],
-					response: { rowCount: 1 },
-				},
-				{
-					sql: SQL`SELECT "roles"
-					         FROM "tenant"."identity"
-					         WHERE "id" = ?`,
-					parameters: [identityId],
-					response: { rows: [{ roles: [] }] },
-				},
-				{
-					sql: SQL`SELECT "project"."id", "project"."name", "project"."slug"
-					         FROM "tenant"."project"
-					         WHERE "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?) AND
-							         "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?)`,
-					parameters: [identityId, identityId],
-					response: { rows: [{ id: projectId, name: 'Foo', slug: 'foo' }] },
-				},
+				createApiKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
+				getIdentityRolesSql({ identityId: identityId }),
+				getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
 				selectMembershipsSql({
 					identityId: identityId,
 					projectId,
@@ -77,6 +89,7 @@ describe('sign in mutation', () => {
 				data: {
 					signIn: {
 						ok: true,
+						errors: [],
 						result: {
 							person: {
 								id: personId,
@@ -95,6 +108,107 @@ describe('sign in mutation', () => {
 									],
 								},
 							},
+							token: '0000000000000000000000000000000000000000',
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('invalid password', async () => {
+		const email = 'john@doe.com'
+		const password = '123'
+		const identityId = testUuid(2)
+		const personId = testUuid(7)
+		await executeTenantTest({
+			query: signInMutation({ email, password: 'abcd' }),
+			executes: [getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } })],
+			return: {
+				data: {
+					signIn: {
+						ok: false,
+						errors: [{ code: SignInErrorCode.InvalidPassword }],
+						result: null,
+					},
+				},
+			},
+		})
+	})
+
+	it('otp token not provided', async () => {
+		const email = 'john@doe.com'
+		const password = '123'
+		const identityId = testUuid(2)
+		const personId = testUuid(7)
+		const otp = createOtp('a', 'b')
+		await executeTenantTest({
+			query: signInMutation({ email, password }),
+			executes: [
+				getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			],
+			return: {
+				data: {
+					signIn: {
+						ok: false,
+						errors: [{ code: SignInErrorCode.OtpRequried }],
+						result: null,
+					},
+				},
+			},
+		})
+	})
+
+	it('invalid otp token', async () => {
+		const email = 'john@doe.com'
+		const password = '123'
+		const identityId = testUuid(2)
+		const personId = testUuid(7)
+		const otp = createOtp('a', 'b')
+		await executeTenantTest({
+			query: signInMutation({ email, password, otpToken: '123' }),
+			executes: [
+				getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			],
+			return: {
+				data: {
+					signIn: {
+						ok: false,
+						errors: [{ code: SignInErrorCode.InvalidOtpToken }],
+						result: null,
+					},
+				},
+			},
+		})
+	})
+
+	it('signs in with a valid otp token', async () => {
+		const email = 'john@doe.com'
+		const password = '123'
+		const identityId = testUuid(2)
+		const personId = testUuid(7)
+		const otp = createOtp('a', 'b')
+		const apiKeyId = testUuid(1)
+		const projectId = testUuid(10)
+		await executeTenantTest({
+			query: signInMutation({ email, password, otpToken: generateOtp(otp) }),
+			executes: [
+				getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+				createApiKeySql({ apiKeyId, identityId }),
+				getIdentityRolesSql({ identityId }),
+				getIdentityProjectsSql({ identityId, projectId }),
+				selectMembershipsSql({
+					identityId,
+					projectId,
+					membershipsResponse: [],
+				}),
+			],
+			return: {
+				data: {
+					signIn: {
+						ok: true,
+						errors: [],
+						result: {
 							token: '0000000000000000000000000000000000000000',
 						},
 					},

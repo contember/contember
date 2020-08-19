@@ -6,6 +6,8 @@ export class PersonQueryBuilderFactory {
 		return SelectBuilder.create<PersonRow>()
 			.select(['person', 'id'])
 			.select(['person', 'password_hash'])
+			.select(['person', 'otp_uri'])
+			.select(['person', 'otp_activated_at'])
 			.select(['person', 'identity_id'])
 			.select(['person', 'email'])
 			.select(['identity', 'roles'])

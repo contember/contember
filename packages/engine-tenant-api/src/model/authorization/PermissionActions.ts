@@ -14,6 +14,7 @@ namespace PermissionActions {
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
 	export const PERSON_SIGN_UP = Authorizator.createAction(Resources.person, 'signUp')
 	export const PERSON_SIGN_OUT = Authorizator.createAction(Resources.person, 'signOut')
+	export const PERSON_SETUP_OTP = Authorizator.createAction(Resources.person, 'setupOtp')
 	export const PERSON_CHANGE_PASSWORD = Authorizator.createAction(Resources.person, 'changePassword')
 
 	export const PERSON_INVITE = (memberships: readonly Membership[]) =>

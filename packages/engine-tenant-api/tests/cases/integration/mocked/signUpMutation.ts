@@ -60,12 +60,7 @@ describe('sign up mutation', () => {
 		await executeTenantTest({
 			query: signUpMutation({ email, password }),
 			executes: [
-				{
-					sql: SQL`select "person"."id", "person"."password_hash", "person"."identity_id", "person"."email", "identity"."roles"
-from "tenant"."person" inner join "tenant"."identity" as "identity" on "identity"."id" = "person"."identity_id" where "person"."email" = ?`,
-					parameters: [email],
-					response: { rows: [{ id: personId, password_hash: null, identity_id: null, roles: [] }] },
-				},
+				getPersonByEmailSql({ email, response: { personId, password: '', roles: [], identityId: testUuid(1) } }),
 			],
 			return: {
 				data: {

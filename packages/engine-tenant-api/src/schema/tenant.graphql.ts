@@ -18,7 +18,7 @@ const schema: DocumentNode = gql`
 		setup(superadmin: AdminCredentials!): SetupResponse
 
 		signUp(email: String!, password: String!): SignUpResponse
-		signIn(email: String!, password: String!, expiration: Int): SignInResponse
+		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 
@@ -45,6 +45,10 @@ const schema: DocumentNode = gql`
 
 		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
+
+		prepareOtp(label: String): PrepareOtpResponse
+		confirmOtp(otpToken: String!): ConfirmOtpResponse
+		disableOtp: DisableOtpResponse
 	}
 
 	# === setUp ===
@@ -113,6 +117,8 @@ const schema: DocumentNode = gql`
 	enum SignInErrorCode {
 		UNKNOWN_EMAIL
 		INVALID_PASSWORD
+		OTP_REQURIED
+		INVALID_OTP_TOKEN
 	}
 
 	type SignInResult {
@@ -377,6 +383,49 @@ const schema: DocumentNode = gql`
 	type RoleEntityVariableDefinition implements RoleVariableDefinition {
 		name: String!
 		entityName: String!
+	}
+
+	# ==== 2fa ====
+
+	type PrepareOtpResponse {
+		ok: Boolean!
+		result: PrepareOtpResult
+	}
+
+	type PrepareOtpResult {
+		otpUri: String!
+		otpSecret: String!
+	}
+
+	type ConfirmOtpResponse {
+		ok: Boolean!
+		errors: [ConfirmOtpError!]!
+	}
+
+	type ConfirmOtpError {
+		code: ConfirmOtpErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum ConfirmOtpErrorCode {
+		INVALID_OTP_TOKEN
+		NOT_PREPARED
+	}
+
+	type DisableOtpResponse {
+		ok: Boolean!
+		errors: [DisableOtpError!]!
+	}
+
+	type DisableOtpError {
+		code: DisableOtpErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum DisableOtpErrorCode {
+		OTP_NOT_ACTIVE
 	}
 `
 

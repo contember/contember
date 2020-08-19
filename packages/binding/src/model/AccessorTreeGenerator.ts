@@ -320,7 +320,7 @@ export class AccessorTreeGenerator {
 
 		const newPersistedData = this.persistedEntityData.get(this.idToKey(state.id))
 
-		for (const [fieldPlaceholder, fieldState] of state.fields) {
+		for (let [fieldPlaceholder, fieldState] of state.fields) {
 			let didChildUpdate = false
 			const newFieldDatum = newPersistedData?.get(fieldPlaceholder)
 
@@ -344,40 +344,51 @@ export class AccessorTreeGenerator {
 						break
 					}
 
+					let shouldInitializeNewEntity = false
+					const previousFieldDatum = state.persistedData?.get(fieldPlaceholder)
 					if (newFieldDatum instanceof BoxedSingleEntityId) {
-						const previousFieldDatum = state.persistedData?.get(fieldPlaceholder)
-						if (
-							previousFieldDatum instanceof BoxedSingleEntityId &&
-							newFieldDatum.id === previousFieldDatum.id &&
-							newFieldDatum.id === fieldState.id
-						) {
-							didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
-						} else {
-							// TODO delete the previous entity
-							state.fields.set(
-								fieldPlaceholder,
-								this.initializeEntityAccessor(
-									newFieldDatum.id,
-									marker.environment,
-									marker.fields,
-									marker.relation,
-									state.onChildFieldUpdate,
-								),
-							)
-							didUpdate = true // Deliberately not child update
+						if (previousFieldDatum instanceof BoxedSingleEntityId) {
+							if (newFieldDatum.id === previousFieldDatum.id && newFieldDatum.id === fieldState.id) {
+								// Updating an entity that already existed on the server.
+								didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
+							} else {
+								// An entity still exists on the server but got re-connected.
+								shouldInitializeNewEntity = true
+							}
+						} else if (previousFieldDatum === null || previousFieldDatum === undefined) {
+							// This entity got created/connected.
+							shouldInitializeNewEntity = true
 						}
 					} else if (newFieldDatum === null || newFieldDatum === undefined) {
+						if (previousFieldDatum instanceof BoxedSingleEntityId) {
+							// This entity got deleted/disconnected.
+							shouldInitializeNewEntity = true
+						} else if (previousFieldDatum === null || previousFieldDatum === undefined) {
+							// This entity remained untouched.
+							shouldInitializeNewEntity = true
+						}
+					}
+
+					if (shouldInitializeNewEntity) {
+						// TODO this is bogus. Rely on the connectionUpdate event instead.
+						const previousOnUpdate = fieldState.eventListeners.update
+							? new Set(fieldState.eventListeners.update)
+							: undefined
 						state.fields.set(
 							fieldPlaceholder,
-							this.initializeEntityAccessor(
-								new EntityAccessor.UnpersistedEntityId(),
+							(fieldState = this.initializeEntityAccessor(
+								newFieldDatum instanceof BoxedSingleEntityId
+									? newFieldDatum.id
+									: new EntityAccessor.UnpersistedEntityId(),
 								marker.environment,
 								marker.fields,
 								marker.relation,
 								state.onChildFieldUpdate,
-							),
+							)),
 						)
-						didUpdate = true // Deliberately not child update
+						fieldState.eventListeners.update = previousOnUpdate
+						alreadyProcessed.add(fieldState)
+						didChildUpdate = true
 					}
 
 					break
@@ -465,6 +476,8 @@ export class AccessorTreeGenerator {
 
 		state.childrenKeys.clear()
 
+		// TODO instead of calling initializeEntityAccessor we might be able to perform some Longest Common Subsequence
+		// 	wizardry and match the id sets in order to convert the unpersisted
 		for (const newPersistedId of initialData) {
 			let key: string
 

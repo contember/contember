@@ -194,6 +194,10 @@ export enum InviteErrorCode {
 	AlreadyMember = 'ALREADY_MEMBER',
 }
 
+export type InviteOptions = {
+	readonly mailVariant?: Maybe<Scalars['String']>
+}
+
 export type InviteResponse = {
 	readonly __typename?: 'InviteResponse'
 	readonly ok: Scalars['Boolean']
@@ -294,6 +298,7 @@ export type MutationInviteArgs = {
 	email: Scalars['String']
 	projectSlug: Scalars['String']
 	memberships: ReadonlyArray<MembershipInput>
+	options?: Maybe<InviteOptions>
 }
 
 export type MutationUnmanagedInviteArgs = {
@@ -691,6 +696,7 @@ export type ResolversTypes = {
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
+	InviteOptions: InviteOptions
 	InviteResponse: ResolverTypeWrapper<InviteResponse>
 	InviteError: ResolverTypeWrapper<InviteError>
 	InviteErrorCode: InviteErrorCode
@@ -771,6 +777,7 @@ export type ResolversParentTypes = {
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
+	InviteOptions: InviteOptions
 	InviteResponse: InviteResponse
 	InviteError: InviteError
 	InviteErrorCode: InviteErrorCode

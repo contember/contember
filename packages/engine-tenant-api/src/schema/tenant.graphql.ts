@@ -22,7 +22,12 @@ const schema: DocumentNode = gql`
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 
-		invite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!): InviteResponse
+		invite(
+			email: String!
+			projectSlug: String!
+			memberships: [MembershipInput!]!
+			options: InviteOptions
+		): InviteResponse
 		unmanagedInvite(
 			email: String!
 			projectSlug: String!
@@ -188,6 +193,10 @@ const schema: DocumentNode = gql`
 	type InviteResult {
 		person: Person!
 		isNew: Boolean!
+	}
+
+	input InviteOptions {
+		mailVariant: String
 	}
 
 	# === addProjectMember ===

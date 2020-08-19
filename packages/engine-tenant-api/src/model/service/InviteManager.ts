@@ -13,6 +13,7 @@ import { CreateOrUpdateProjectMembershipCommand } from '../commands/membership/C
 export interface InviteOptions {
 	noEmail?: boolean
 	password?: string
+	emailVariant?: string
 }
 
 export class InviteManager {
@@ -44,7 +45,7 @@ export class InviteManager {
 			if (!options.noEmail) {
 				const customMailOptions = {
 					projectId: project.id,
-					variant: '',
+					variant: options.emailVariant || '',
 				}
 				if (isNew) {
 					await this.mailer.sendNewUserInvitedMail(

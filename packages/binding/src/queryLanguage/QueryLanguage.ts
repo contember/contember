@@ -94,7 +94,9 @@ export namespace QueryLanguage {
 		return setOnCreate
 	}
 
-	const desugarEventListener = <F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined => {
+	function desugarEventListener<F extends Function>(listener: F | Set<F>): Set<F>
+	function desugarEventListener<F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined
+	function desugarEventListener<F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined {
 		if (typeof listener === 'function') {
 			return new Set([listener])
 		}
@@ -104,8 +106,18 @@ export namespace QueryLanguage {
 	const desugarSingleEntityEventListeners = (
 		unsugarable: UnsugarableSingleEntityEventListeners,
 	): SingleEntityEventListeners['eventListeners'] => {
+		const connectionUpdate = unsugarable.onConnectionUpdate
+			? new Map(
+					Object.entries(unsugarable.onConnectionUpdate).map(([fieldName, listener]) => [
+						fieldName,
+						desugarEventListener(listener),
+					]),
+			  )
+			: undefined
+
 		return {
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
+			connectionUpdate,
 			initialize: desugarEventListener(unsugarable.onInitialize),
 			update: desugarEventListener(unsugarable.onUpdate),
 		}

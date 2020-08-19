@@ -38,10 +38,11 @@ namespace EntityListAccessor {
 	export type UpdateListener = (accessor: EntityListAccessor) => void
 
 	export interface EntityListEventListenerMap {
+		//beforePersist: BatchUpdatesHandler
 		beforeUpdate: BatchUpdatesHandler
 		//childInitialize: EntityAccessor.BatchUpdatesHandler
-		initialize: BatchUpdatesHandler
 		//childListUpdate: UpdateListener
+		initialize: BatchUpdatesHandler
 		update: UpdateListener
 	}
 	export type EntityListEventType = keyof EntityListEventListenerMap

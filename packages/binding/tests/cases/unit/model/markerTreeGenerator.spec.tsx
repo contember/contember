@@ -59,6 +59,7 @@ describe('Marker tree generator', () => {
 
 		const eventListeners = {
 			initialize: undefined,
+			connectionUpdate: undefined,
 			beforeUpdate: undefined,
 			update: undefined,
 		} as const

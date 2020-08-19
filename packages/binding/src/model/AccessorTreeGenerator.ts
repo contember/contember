@@ -888,9 +888,10 @@ export class AccessorTreeGenerator {
 			environment,
 			errors: emptyArray,
 			eventListeners: {
-				update: undefined,
-				initialize: undefined,
 				beforeUpdate: undefined,
+				connectionUpdate: undefined,
+				initialize: undefined,
+				update: undefined,
 			},
 			fields: new Map(),
 			hasPendingUpdate: false,
@@ -1062,7 +1063,7 @@ export class AccessorTreeGenerator {
 				})
 			},
 		}
-		entityState.addEventListener = this.getAddEventListener(entityState)
+		entityState.addEventListener = this.getAddEventListener(entityState) as any // TODO!!!!!!!!!!
 		this.entityStore.set(entityKey, entityState)
 
 		const typeName = entityState.persistedData?.get(TYPENAME_KEY_NAME)

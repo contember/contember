@@ -6,6 +6,7 @@ import {
 	BoxedQualifiedSingleEntity,
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
+	FieldName,
 	HasManyRelation,
 	HasOneRelation,
 	SetOnCreate,
@@ -17,6 +18,8 @@ export class TreeParameterMerger {
 		original: HasOneRelation,
 		fresh: HasOneRelation,
 	): HasOneRelation {
+		const originalListeners = original.eventListeners
+		const freshListeners = fresh.eventListeners
 		return {
 			// Encoded within the placeholder
 			field: original.field,
@@ -28,9 +31,13 @@ export class TreeParameterMerger {
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			forceCreation: original.forceCreation || fresh.forceCreation,
 			eventListeners: {
-				beforeUpdate: this.mergeEventListener(original.eventListeners.beforeUpdate, fresh.eventListeners.beforeUpdate),
-				initialize: this.mergeEventListener(original.eventListeners.initialize, fresh.eventListeners.initialize),
-				update: this.mergeEventListener(original.eventListeners.update, fresh.eventListeners.update),
+				beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
+				connectionUpdate: this.mergeFieldScopedListeners(
+					originalListeners.connectionUpdate,
+					freshListeners.connectionUpdate,
+				),
+				initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
+				update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
 			},
 		}
 	}
@@ -59,9 +66,9 @@ export class TreeParameterMerger {
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
 			eventListeners: {
-				beforeUpdate: this.mergeEventListener(original.eventListeners.beforeUpdate, fresh.eventListeners.beforeUpdate),
-				initialize: this.mergeEventListener(original.eventListeners.initialize, fresh.eventListeners.initialize),
-				update: this.mergeEventListener(original.eventListeners.update, fresh.eventListeners.update),
+				beforeUpdate: this.mergeEventListeners(original.eventListeners.beforeUpdate, fresh.eventListeners.beforeUpdate),
+				initialize: this.mergeEventListeners(original.eventListeners.initialize, fresh.eventListeners.initialize),
+				update: this.mergeEventListeners(original.eventListeners.update, fresh.eventListeners.update),
 			},
 		}
 	}
@@ -71,6 +78,8 @@ export class TreeParameterMerger {
 		fresh: SubTreeMarkerParameters,
 	): SubTreeMarkerParameters {
 		if (original instanceof BoxedQualifiedSingleEntity && fresh instanceof BoxedQualifiedSingleEntity) {
+			const originalListeners = original.value.eventListeners
+			const freshListeners = fresh.value.eventListeners
 			return new BoxedQualifiedSingleEntity({
 				// Encoded within the placeholder
 				where: original.value.where,
@@ -83,19 +92,19 @@ export class TreeParameterMerger {
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
 				eventListeners: {
-					beforeUpdate: this.mergeEventListener(
-						original.value.eventListeners.beforeUpdate,
-						fresh.value.eventListeners.beforeUpdate,
+					beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
+					connectionUpdate: this.mergeFieldScopedListeners(
+						originalListeners.connectionUpdate,
+						freshListeners.connectionUpdate,
 					),
-					initialize: this.mergeEventListener(
-						original.value.eventListeners.initialize,
-						fresh.value.eventListeners.initialize,
-					),
-					update: this.mergeEventListener(original.value.eventListeners.update, fresh.value.eventListeners.update),
+					initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
+					update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
 				},
 			})
 		}
 		if (original instanceof BoxedQualifiedEntityList && fresh instanceof BoxedQualifiedEntityList) {
+			const originalListeners = original.value.eventListeners
+			const freshListeners = fresh.value.eventListeners
 			if (original.value.initialEntityCount !== fresh.value.initialEntityCount) {
 				throw new BindingError(
 					`Detected sub trees of the same entity '${original.value.entityName}' with different preferred initial ` +
@@ -116,15 +125,9 @@ export class TreeParameterMerger {
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
 				eventListeners: {
-					beforeUpdate: this.mergeEventListener(
-						original.value.eventListeners.beforeUpdate,
-						fresh.value.eventListeners.beforeUpdate,
-					),
-					initialize: this.mergeEventListener(
-						original.value.eventListeners.initialize,
-						fresh.value.eventListeners.initialize,
-					),
-					update: this.mergeEventListener(original.value.eventListeners.update, fresh.value.eventListeners.update),
+					beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
+					initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
+					update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
 				},
 				initialEntityCount: original.value.initialEntityCount, // Handled above
 			})
@@ -133,6 +136,8 @@ export class TreeParameterMerger {
 			original instanceof BoxedUnconstrainedQualifiedSingleEntity &&
 			fresh instanceof BoxedUnconstrainedQualifiedSingleEntity
 		) {
+			const originalListeners = original.value.eventListeners
+			const freshListeners = fresh.value.eventListeners
 			return new BoxedUnconstrainedQualifiedSingleEntity({
 				// Encoded within the placeholder
 				entityName: original.value.entityName,
@@ -143,15 +148,13 @@ export class TreeParameterMerger {
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
 				eventListeners: {
-					beforeUpdate: this.mergeEventListener(
-						original.value.eventListeners.beforeUpdate,
-						fresh.value.eventListeners.beforeUpdate,
+					beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
+					connectionUpdate: this.mergeFieldScopedListeners(
+						originalListeners.connectionUpdate,
+						freshListeners.connectionUpdate,
 					),
-					initialize: this.mergeEventListener(
-						original.value.eventListeners.initialize,
-						fresh.value.eventListeners.initialize,
-					),
-					update: this.mergeEventListener(original.value.eventListeners.update, fresh.value.eventListeners.update),
+					initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
+					update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
 				},
 			})
 		}
@@ -159,6 +162,8 @@ export class TreeParameterMerger {
 			original instanceof BoxedUnconstrainedQualifiedEntityList &&
 			fresh instanceof BoxedUnconstrainedQualifiedEntityList
 		) {
+			const originalListeners = original.value.eventListeners
+			const freshListeners = fresh.value.eventListeners
 			if (original.value.initialEntityCount !== fresh.value.initialEntityCount) {
 				throw new BindingError(
 					`Detected sub trees of the same entity '${original.value.entityName}' with different preferred initial ` +
@@ -175,15 +180,9 @@ export class TreeParameterMerger {
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
 				eventListeners: {
-					beforeUpdate: this.mergeEventListener(
-						original.value.eventListeners.beforeUpdate,
-						fresh.value.eventListeners.beforeUpdate,
-					),
-					initialize: this.mergeEventListener(
-						original.value.eventListeners.initialize,
-						fresh.value.eventListeners.initialize,
-					),
-					update: this.mergeEventListener(original.value.eventListeners.update, fresh.value.eventListeners.update),
+					beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
+					initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
+					update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
 				},
 				initialEntityCount: original.value.initialEntityCount, // Handled above
 			})
@@ -250,13 +249,32 @@ export class TreeParameterMerger {
 		return originalCopy
 	}
 
-	private static mergeEventListener<F extends Function>(
+	private static mergeFieldScopedListeners<T extends Function>(
+		original: Map<FieldName, Set<T>> | undefined,
+		fresh: Map<FieldName, Set<T>> | undefined,
+	) {
+		if (original === undefined) {
+			return fresh
+		}
+		if (fresh === undefined) {
+			return original
+		}
+		const combinedMap = new Map(original)
+		for (const [fieldName, listeners] of fresh) {
+			const existing = combinedMap.get(fieldName)
+			if (existing === undefined) {
+				combinedMap.set(fieldName, listeners)
+			} else {
+				combinedMap.set(fieldName, this.mergeSets(existing, listeners))
+			}
+		}
+		return combinedMap
+	}
+
+	private static mergeEventListeners<F extends Function>(
 		original: Set<F> | undefined,
 		fresh: Set<F> | undefined,
 	): Set<F> | undefined {
-		if (original === undefined && fresh === undefined) {
-			return undefined
-		}
 		if (original === undefined) {
 			return fresh
 		}

@@ -2,7 +2,7 @@ import { EntityAccessor, ErrorAccessor } from '../../accessors'
 import { SingleEntityPersistedData } from '../../accessorTree'
 import { Environment } from '../../dao'
 import { EntityFieldMarkersContainer } from '../../markers'
-import { EntityCreationParameters, FieldName } from '../../treeParameters'
+import { EntityCreationParameters, FieldName, SingleEntityEventListeners } from '../../treeParameters'
 import { InternalStateNode } from './InternalStateNode'
 import { InternalStateType } from './InternalStateType'
 
@@ -10,15 +10,14 @@ export type OnEntityUpdate = (state: InternalStateNode) => void
 export type OnEntityFieldUpdate = (state: InternalStateNode) => void
 export interface InternalEntityState {
 	type: InternalStateType.SingleEntity
-	eventListeners: {
-		[Type in EntityAccessor.EntityEventType]: Set<EntityAccessor.EntityEventListenerMap[Type]> | undefined
-	}
+	eventListeners: SingleEntityEventListeners['eventListeners']
 	environment: Environment
 	batchUpdateDepth: number
 	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
 	creationParameters: EntityCreationParameters
 	errors: ErrorAccessor[]
 	fields: Map<FieldName, InternalStateNode>
+	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
 	getAccessor: () => EntityAccessor
 	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean

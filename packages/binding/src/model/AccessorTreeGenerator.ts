@@ -370,10 +370,6 @@ export class AccessorTreeGenerator {
 					}
 
 					if (shouldInitializeNewEntity) {
-						// TODO this is bogus. Rely on the connectionUpdate event instead.
-						const previousOnUpdate = fieldState.eventListeners.update
-							? new Set(fieldState.eventListeners.update)
-							: undefined
 						state.fields.set(
 							fieldPlaceholder,
 							(fieldState = this.initializeEntityAccessor(
@@ -386,7 +382,7 @@ export class AccessorTreeGenerator {
 								state.onChildFieldUpdate,
 							)),
 						)
-						fieldState.eventListeners.update = previousOnUpdate
+						this.markPendingConnections(state, new Set([fieldPlaceholder]))
 						alreadyProcessed.add(fieldState)
 						didChildUpdate = true
 					}
@@ -894,8 +890,8 @@ export class AccessorTreeGenerator {
 
 		const entityState: InternalEntityState = {
 			type: InternalStateType.SingleEntity,
-			addEventListener: undefined as any,
 			batchUpdateDepth: 0,
+			fieldsWithPendingConnectionUpdates: undefined,
 			childrenWithPendingUpdates: undefined,
 			creationParameters,
 			environment,
@@ -952,6 +948,44 @@ export class AccessorTreeGenerator {
 					entityState.hasStaleAccessor = true
 					entityState.hasPendingParentNotification = true
 				})
+			},
+			addEventListener: (type: EntityAccessor.EntityEventType, ...args: unknown[]) => {
+				if (type === 'connectionUpdate') {
+					if (entityState.eventListeners.connectionUpdate === undefined) {
+						entityState.eventListeners.connectionUpdate = new Map()
+					}
+					const fieldName = args[0] as FieldName
+					const listener = args[1] as EntityAccessor.UpdateListener
+					const existingListeners = entityState.eventListeners.connectionUpdate.get(fieldName)
+
+					if (existingListeners === undefined) {
+						entityState.eventListeners.connectionUpdate.set(fieldName, new Set([listener]))
+					} else {
+						existingListeners.add(listener)
+					}
+					return () => {
+						const existingListeners = entityState.eventListeners.connectionUpdate?.get(fieldName)
+						if (existingListeners === undefined) {
+							return // Throw an error? This REALLY should not happen.
+						}
+						existingListeners.delete(listener)
+					}
+				} else {
+					const listener = args[0] as EntityAccessor.EntityEventListenerMap[typeof type]
+					if (entityState.eventListeners[type] === undefined) {
+						entityState.eventListeners[type] = new Set<never>()
+					}
+					entityState.eventListeners[type]!.add(listener as any)
+					return () => {
+						if (entityState.eventListeners[type] === undefined) {
+							return // Throw an error? This REALLY should not happen.
+						}
+						entityState.eventListeners[type]!.delete(listener as any)
+						if (entityState.eventListeners[type]!.size === 0) {
+							entityState.eventListeners[type] = undefined
+						}
+					}
+				}
 			},
 			batchUpdates: performUpdates => {
 				this.performRootTreeOperation(() => {
@@ -1013,6 +1047,10 @@ export class AccessorTreeGenerator {
 							entityState.hasStaleAccessor = true
 							entityState.hasPendingParentNotification = true
 						}
+						if (entityState.fieldsWithPendingConnectionUpdates === undefined) {
+							entityState.fieldsWithPendingConnectionUpdates = new Set()
+						}
+						entityState.fieldsWithPendingConnectionUpdates.add(fieldName)
 					})
 				})
 			},
@@ -1060,6 +1098,10 @@ export class AccessorTreeGenerator {
 							entityState.hasStaleAccessor = true
 							entityState.hasPendingParentNotification = true
 						}
+						if (entityState.fieldsWithPendingConnectionUpdates === undefined) {
+							entityState.fieldsWithPendingConnectionUpdates = new Set()
+						}
+						entityState.fieldsWithPendingConnectionUpdates.add(fieldName)
 					})
 				})
 			},
@@ -1076,7 +1118,6 @@ export class AccessorTreeGenerator {
 				})
 			},
 		}
-		entityState.addEventListener = this.getAddEventListener(entityState) as any // TODO!!!!!!!!!!
 		this.entityStore.set(entityKey, entityState)
 
 		const typeName = entityState.persistedData?.get(TYPENAME_KEY_NAME)
@@ -1141,14 +1182,7 @@ export class AccessorTreeGenerator {
 		}
 
 		const processEntityDeletion = (deletedState: InternalEntityState) => {
-			const relevantPlaceholders = new Set<FieldName>()
-
-			// All has one relations where this entity is present.
-			for (const [placeholderName, candidateState] of entityState.fields) {
-				if (candidateState === deletedState) {
-					relevantPlaceholders.add(placeholderName)
-				}
-			}
+			const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, deletedState)
 
 			if (typeof deletedState.id === 'string') {
 				if (entityState.plannedHasOneDeletions === undefined) {
@@ -1171,6 +1205,8 @@ export class AccessorTreeGenerator {
 			}
 			// TODO update the changes count
 			entityState.childrenWithPendingUpdates?.delete(deletedState)
+
+			this.markPendingConnections(entityState, relevantPlaceholders)
 		}
 
 		const resolveHasOneRelationMarkers = (field: FieldName, message: string): Set<HasOneRelationMarker> => {
@@ -1579,6 +1615,42 @@ export class AccessorTreeGenerator {
 		state.childrenWithPendingUpdates.add(updatedState as InternalEntityState)
 	}
 
+	private findChildPlaceholdersByState(containingState: InternalEntityState, childState: InternalStateNode) {
+		const relevantPlaceholders = new Set<FieldName>()
+
+		// All has one relations where this entity is present.
+		for (const [placeholderName, candidateState] of containingState.fields) {
+			if (candidateState === childState) {
+				relevantPlaceholders.add(placeholderName)
+			}
+		}
+
+		return relevantPlaceholders
+	}
+
+	private markPendingConnections(parentState: InternalEntityState, connectionPlaceholders: Set<FieldName>) {
+		if (parentState.fieldsWithPendingConnectionUpdates === undefined) {
+			parentState.fieldsWithPendingConnectionUpdates = new Set()
+		}
+		placeholders: for (const [fieldName, placeholderNames] of parentState.markersContainer.placeholders) {
+			if (typeof placeholderNames === 'string') {
+				if (connectionPlaceholders.has(placeholderNames)) {
+					parentState.fieldsWithPendingConnectionUpdates.add(fieldName)
+				}
+			} else {
+				for (const placeholderName of placeholderNames) {
+					if (connectionPlaceholders.has(placeholderName)) {
+						parentState.fieldsWithPendingConnectionUpdates.add(fieldName)
+						continue placeholders
+					}
+				}
+			}
+		}
+		if (parentState.fieldsWithPendingConnectionUpdates.size === 0) {
+			parentState.fieldsWithPendingConnectionUpdates = undefined
+		}
+	}
+
 	private resolveAndPrepareEntityToConnect(
 		entityToConnectOrItsKey: string | EntityAccessor,
 	): [string, InternalEntityState] {
@@ -1649,6 +1721,23 @@ export class AccessorTreeGenerator {
 					handler(state.getAccessor() as any)
 				}
 			}
+			if (
+				state.type === InternalStateType.SingleEntity &&
+				state.fieldsWithPendingConnectionUpdates &&
+				state.eventListeners.connectionUpdate
+			) {
+				for (const updatedField of state.fieldsWithPendingConnectionUpdates) {
+					const listenersMap = state.eventListeners.connectionUpdate
+					const listeners = listenersMap.get(updatedField)
+					if (!listeners) {
+						continue
+					}
+					for (const listener of listeners) {
+						listener(state.getAccessor())
+					}
+				}
+			}
+
 			switch (state.type) {
 				case InternalStateType.SingleEntity:
 				case InternalStateType.EntityList: {

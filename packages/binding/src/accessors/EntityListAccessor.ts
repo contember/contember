@@ -40,7 +40,7 @@ namespace EntityListAccessor {
 	export interface EntityListEventListenerMap {
 		//beforePersist: BatchUpdatesHandler
 		beforeUpdate: BatchUpdatesHandler
-		//childInitialize: EntityAccessor.BatchUpdatesHandler
+		childInitialize: EntityAccessor.BatchUpdatesHandler
 		//childListUpdate: UpdateListener
 		initialize: BatchUpdatesHandler
 		update: UpdateListener
@@ -48,6 +48,7 @@ namespace EntityListAccessor {
 	export type EntityListEventType = keyof EntityListEventListenerMap
 	export interface AddEntityListEventListener {
 		(type: 'beforeUpdate', listener: EntityListEventListenerMap['beforeUpdate']): () => void
+		(type: 'childInitialize', listener: EntityListEventListenerMap['childInitialize']): () => void
 		(type: 'initialize', listener: EntityListEventListenerMap['initialize']): () => void
 		(type: 'update', listener: EntityListEventListenerMap['update']): () => void
 	}

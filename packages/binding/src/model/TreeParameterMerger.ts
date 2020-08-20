@@ -6,10 +6,12 @@ import {
 	BoxedQualifiedSingleEntity,
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
+	EntityListEventListeners,
 	FieldName,
 	HasManyRelation,
 	HasOneRelation,
 	SetOnCreate,
+	SingleEntityEventListeners,
 	UniqueWhere,
 } from '../treeParameters'
 
@@ -18,8 +20,6 @@ export class TreeParameterMerger {
 		original: HasOneRelation,
 		fresh: HasOneRelation,
 	): HasOneRelation {
-		const originalListeners = original.eventListeners
-		const freshListeners = fresh.eventListeners
 		return {
 			// Encoded within the placeholder
 			field: original.field,
@@ -30,15 +30,7 @@ export class TreeParameterMerger {
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			forceCreation: original.forceCreation || fresh.forceCreation,
-			eventListeners: {
-				beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
-				connectionUpdate: this.mergeFieldScopedListeners(
-					originalListeners.connectionUpdate,
-					freshListeners.connectionUpdate,
-				),
-				initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
-				update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
-			},
+			eventListeners: this.mergeSingleEntityEventListeners(original.eventListeners, fresh.eventListeners),
 		}
 	}
 
@@ -65,11 +57,7 @@ export class TreeParameterMerger {
 			forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
-			eventListeners: {
-				beforeUpdate: this.mergeEventListeners(original.eventListeners.beforeUpdate, fresh.eventListeners.beforeUpdate),
-				initialize: this.mergeEventListeners(original.eventListeners.initialize, fresh.eventListeners.initialize),
-				update: this.mergeEventListeners(original.eventListeners.update, fresh.eventListeners.update),
-			},
+			eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
 		}
 	}
 
@@ -78,8 +66,6 @@ export class TreeParameterMerger {
 		fresh: SubTreeMarkerParameters,
 	): SubTreeMarkerParameters {
 		if (original instanceof BoxedQualifiedSingleEntity && fresh instanceof BoxedQualifiedSingleEntity) {
-			const originalListeners = original.value.eventListeners
-			const freshListeners = fresh.value.eventListeners
 			return new BoxedQualifiedSingleEntity({
 				// Encoded within the placeholder
 				where: original.value.where,
@@ -91,15 +77,7 @@ export class TreeParameterMerger {
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: {
-					beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
-					connectionUpdate: this.mergeFieldScopedListeners(
-						originalListeners.connectionUpdate,
-						freshListeners.connectionUpdate,
-					),
-					initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
-					update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
-				},
+				eventListeners: this.mergeSingleEntityEventListeners(original.value.eventListeners, fresh.value.eventListeners),
 			})
 		}
 		if (original instanceof BoxedQualifiedEntityList && fresh instanceof BoxedQualifiedEntityList) {
@@ -124,11 +102,7 @@ export class TreeParameterMerger {
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: {
-					beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
-					initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
-					update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
-				},
+				eventListeners: this.mergeEntityListEventListeners(original.value.eventListeners, fresh.value.eventListeners),
 				initialEntityCount: original.value.initialEntityCount, // Handled above
 			})
 		}
@@ -136,8 +110,6 @@ export class TreeParameterMerger {
 			original instanceof BoxedUnconstrainedQualifiedSingleEntity &&
 			fresh instanceof BoxedUnconstrainedQualifiedSingleEntity
 		) {
-			const originalListeners = original.value.eventListeners
-			const freshListeners = fresh.value.eventListeners
 			return new BoxedUnconstrainedQualifiedSingleEntity({
 				// Encoded within the placeholder
 				entityName: original.value.entityName,
@@ -147,15 +119,7 @@ export class TreeParameterMerger {
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: {
-					beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
-					connectionUpdate: this.mergeFieldScopedListeners(
-						originalListeners.connectionUpdate,
-						freshListeners.connectionUpdate,
-					),
-					initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
-					update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
-				},
+				eventListeners: this.mergeSingleEntityEventListeners(original.value.eventListeners, fresh.value.eventListeners),
 			})
 		}
 		if (
@@ -179,11 +143,7 @@ export class TreeParameterMerger {
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: {
-					beforeUpdate: this.mergeEventListeners(originalListeners.beforeUpdate, freshListeners.beforeUpdate),
-					initialize: this.mergeEventListeners(originalListeners.initialize, freshListeners.initialize),
-					update: this.mergeEventListeners(originalListeners.update, freshListeners.update),
-				},
+				eventListeners: this.mergeEntityListEventListeners(original.value.eventListeners, fresh.value.eventListeners),
 				initialEntityCount: original.value.initialEntityCount, // Handled above
 			})
 		}
@@ -290,5 +250,65 @@ export class TreeParameterMerger {
 			combinedSet.add(item)
 		}
 		return combinedSet
+	}
+
+	public static mergeSingleEntityEventListeners(
+		original: SingleEntityEventListeners['eventListeners'],
+		fresh: SingleEntityEventListeners['eventListeners'],
+	): SingleEntityEventListeners['eventListeners'] {
+		return {
+			beforeUpdate: this.mergeEventListeners(original.beforeUpdate, fresh.beforeUpdate),
+			connectionUpdate: this.mergeFieldScopedListeners(original.connectionUpdate, fresh.connectionUpdate),
+			initialize: this.mergeEventListeners(original.initialize, fresh.initialize),
+			update: this.mergeEventListeners(original.update, fresh.update),
+		}
+	}
+
+	public static mergeEntityListEventListeners(
+		original: EntityListEventListeners['eventListeners'],
+		fresh: EntityListEventListeners['eventListeners'],
+	): EntityListEventListeners['eventListeners'] {
+		return {
+			beforeUpdate: this.mergeEventListeners(original.beforeUpdate, fresh.beforeUpdate),
+			childInitialize: this.mergeEventListeners(original.childInitialize, fresh.childInitialize),
+			initialize: this.mergeEventListeners(original.initialize, fresh.initialize),
+			update: this.mergeEventListeners(original.update, fresh.update),
+		}
+	}
+
+	public static cloneSingleEntityEventListeners(
+		listeners: SingleEntityEventListeners['eventListeners'] | undefined,
+	): SingleEntityEventListeners['eventListeners'] {
+		return {
+			connectionUpdate: this.cloneOptionalMapOfSets(listeners?.connectionUpdate),
+			update: this.cloneOptionalSet(listeners?.update),
+			beforeUpdate: this.cloneOptionalSet(listeners?.beforeUpdate),
+			initialize: this.cloneOptionalSet(listeners?.initialize),
+		}
+	}
+
+	public static cloneEntityListEventListeners(
+		listeners: EntityListEventListeners['eventListeners'] | undefined,
+	): EntityListEventListeners['eventListeners'] {
+		return {
+			update: this.cloneOptionalSet(listeners?.update),
+			beforeUpdate: this.cloneOptionalSet(listeners?.beforeUpdate),
+			childInitialize: this.cloneOptionalSet(listeners?.childInitialize),
+			initialize: this.cloneOptionalSet(listeners?.initialize),
+		}
+	}
+
+	private static cloneOptionalSet<T>(set: Set<T> | undefined): Set<T> | undefined {
+		if (set === undefined) {
+			return undefined
+		}
+		return new Set(set)
+	}
+
+	private static cloneOptionalMapOfSets<K, T>(map: Map<K, Set<T>> | undefined): Map<K, Set<T>> | undefined {
+		if (map === undefined) {
+			return undefined
+		}
+		return new Map(Array.from(map, ([key, set]) => [key, new Set(set)]))
 	}
 }

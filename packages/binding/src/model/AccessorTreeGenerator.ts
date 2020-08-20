@@ -24,7 +24,15 @@ import {
 	SubTreeMarker,
 	SubTreeMarkerParameters,
 } from '../markers'
-import { EntityCreationParameters, EntityListPreferences, FieldName, Scalar } from '../treeParameters'
+import {
+	BoxedQualifiedSingleEntity,
+	EntityCreationParameters,
+	EntityListEventListeners,
+	EntityListPreferences,
+	FieldName,
+	Scalar,
+	SingleEntityEventListeners,
+} from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import {
@@ -263,6 +271,8 @@ export class AccessorTreeGenerator {
 								subTreeState.markersContainer,
 								subTreeState.creationParameters,
 								subTreeState.onChildFieldUpdate,
+								(this.markerTree.subTrees.get(subTreePlaceholder)?.parameters as BoxedQualifiedSingleEntity | undefined)
+									?.value,
 							)
 							newSubTreeState.hasPendingUpdate = true
 							this.subTreeStates.set(subTreePlaceholder, newSubTreeState)
@@ -380,6 +390,7 @@ export class AccessorTreeGenerator {
 								marker.fields,
 								marker.relation,
 								state.onChildFieldUpdate,
+								marker.relation,
 							)),
 						)
 						this.markPendingConnections(state, new Set([fieldPlaceholder]))
@@ -486,6 +497,7 @@ export class AccessorTreeGenerator {
 					state.markersContainer,
 					state.creationParameters,
 					state.onChildEntityUpdate,
+					this.getEventListenersForListEntity(state),
 				)
 				key = newKey.value
 				didUpdate = true
@@ -500,6 +512,7 @@ export class AccessorTreeGenerator {
 						state.markersContainer,
 						state.creationParameters,
 						state.onChildEntityUpdate,
+						this.getEventListenersForListEntity(state),
 					)
 					didUpdate = true
 				} else {
@@ -688,13 +701,21 @@ export class AccessorTreeGenerator {
 				tree.parameters.value,
 				noop,
 				persistedEntityIds,
+				tree.parameters.value,
 			)
 		} else {
 			const id =
 				persistedRootData instanceof BoxedSingleEntityId
 					? persistedRootData.id
 					: new EntityAccessor.UnpersistedEntityId()
-			subTreeState = this.initializeEntityAccessor(id, tree.environment, tree.fields, tree.parameters.value, noop)
+			subTreeState = this.initializeEntityAccessor(
+				id,
+				tree.environment,
+				tree.fields,
+				tree.parameters.value,
+				noop,
+				tree.parameters.value,
+			)
 		}
 		this.subTreeStates.set(tree.placeholderName, subTreeState)
 
@@ -748,6 +769,7 @@ export class AccessorTreeGenerator {
 				field.fields,
 				field.relation,
 				entityState.onChildFieldUpdate,
+				field.relation,
 			)
 			entityState.fields.set(field.placeholderName, referenceEntityState)
 		} else {
@@ -774,6 +796,7 @@ export class AccessorTreeGenerator {
 					relation,
 					entityState.onChildFieldUpdate,
 					fieldDatum || new Set(),
+					field.relation,
 				),
 			)
 		} else if (typeof fieldDatum === 'object') {
@@ -843,6 +866,7 @@ export class AccessorTreeGenerator {
 							newMarkersContainer,
 							fieldState.creationParameters,
 							fieldState.onChildEntityUpdate,
+							this.getEventListenersForListEntity(fieldState, field),
 						)
 					}
 					fieldState.markersContainer = MarkerMerger.mergeEntityFieldsContainers(
@@ -864,6 +888,7 @@ export class AccessorTreeGenerator {
 		markersContainer: EntityFieldMarkersContainer,
 		creationParameters: EntityCreationParameters,
 		onEntityUpdate: OnEntityUpdate,
+		initialEventListeners: SingleEntityEventListeners | undefined,
 	): InternalEntityState {
 		const entityKey = this.idToKey(id)
 		const existingEntityState = this.entityStore.get(entityKey)
@@ -896,12 +921,7 @@ export class AccessorTreeGenerator {
 			creationParameters,
 			environment,
 			errors: emptyArray,
-			eventListeners: {
-				beforeUpdate: undefined,
-				connectionUpdate: undefined,
-				initialize: undefined,
-				update: undefined,
-			},
+			eventListeners: TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
 			fields: new Map(),
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
@@ -1092,6 +1112,7 @@ export class AccessorTreeGenerator {
 								hasOneMarker.fields,
 								hasOneMarker.relation,
 								entityState.onChildFieldUpdate,
+								hasOneMarker.relation,
 							)
 							entityState.fields.set(hasOneMarker.placeholderName, newEntityState)
 
@@ -1200,6 +1221,7 @@ export class AccessorTreeGenerator {
 					deletedState.markersContainer,
 					deletedState.creationParameters,
 					entityState.onChildFieldUpdate,
+					initialEventListeners,
 				)
 				entityState.fields.set(placeholderName, newEntityState)
 			}
@@ -1239,6 +1261,7 @@ export class AccessorTreeGenerator {
 		creationParameters: EntityCreationParameters & EntityListPreferences,
 		onEntityListUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
+		initialEventListeners: EntityListEventListeners | undefined,
 	): InternalEntityListState {
 		const entityListState: InternalEntityListState = {
 			type: InternalStateType.EntityList,
@@ -1251,11 +1274,7 @@ export class AccessorTreeGenerator {
 			childrenKeys: new Set(),
 			childrenWithPendingUpdates: undefined,
 			environment,
-			eventListeners: {
-				update: undefined,
-				initialize: undefined,
-				beforeUpdate: undefined,
-			},
+			eventListeners: TreeParameterMerger.cloneEntityListEventListeners(initialEventListeners?.eventListeners),
 			errors: emptyArray,
 			plannedRemovals: undefined,
 			hasPendingParentNotification: false,
@@ -1465,6 +1484,7 @@ export class AccessorTreeGenerator {
 				entityListState.markersContainer,
 				entityListState.creationParameters,
 				entityListState.onChildEntityUpdate,
+				this.getEventListenersForListEntity(entityListState),
 			)
 
 			entityListState.hasStaleAccessor = true
@@ -1680,6 +1700,31 @@ export class AccessorTreeGenerator {
 		}
 
 		return [connectedEntityKey, connectedState]
+	}
+
+	private getEventListenersForListEntity(
+		containingListState: InternalEntityListState,
+		additionalMarker?: HasManyRelationMarker,
+	): SingleEntityEventListeners {
+		const create = (base: {
+			eventListeners: EntityListEventListeners['eventListeners']
+		}): SingleEntityEventListeners['eventListeners'] => ({
+			initialize: base.eventListeners.childInitialize,
+			beforeUpdate: undefined,
+			update: undefined,
+			connectionUpdate: undefined,
+		})
+
+		let eventListeners: SingleEntityEventListeners['eventListeners'] = create(containingListState)
+		if (additionalMarker) {
+			eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
+				eventListeners,
+				create(additionalMarker.relation),
+			)
+		}
+		return {
+			eventListeners,
+		}
 	}
 
 	private getAddEventListener(state: {

@@ -128,6 +128,7 @@ export namespace QueryLanguage {
 	): EntityListEventListeners['eventListeners'] => {
 		return {
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
+			childInitialize: desugarEventListener(unsugarable.onChildInitialize),
 			initialize: desugarEventListener(unsugarable.onInitialize),
 			update: desugarEventListener(unsugarable.onUpdate),
 		}

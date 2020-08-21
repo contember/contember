@@ -160,7 +160,7 @@ describe('pattern validation', () => {
 
 describe('not empty validation', () => {
 	class Item {
-		@(v.assert(v.rules.notEmpty(), 'failure').noOptional())
+		@v.assert(v.rules.notEmpty(), 'failure')
 		value = d.stringColumn()
 	}
 

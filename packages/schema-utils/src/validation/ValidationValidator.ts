@@ -205,8 +205,6 @@ export class ValidationValidator {
 				return { operation: 'not', args: [notArg] }
 			case 'empty':
 				return { operation: 'empty', args: [] }
-			case 'exists':
-				return { operation: 'exists', args: [] }
 			case 'defined':
 				return { operation: 'defined', args: [] }
 			case 'inContext':

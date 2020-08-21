@@ -137,7 +137,7 @@ export class InputPreValidator {
 			.map(([field, fieldRules]) =>
 				tuple(
 					field,
-					fieldRules.find(it => !evaluateValidation(context, InputValidation.rules.on(field, it.validator))),
+					fieldRules.find(it => evaluateValidation(context, InputValidation.rules.on(field, it.validator)) === false),
 				),
 			)
 			.filter((arg): arg is [string, Validation.ValidationRule] => !!arg[1])

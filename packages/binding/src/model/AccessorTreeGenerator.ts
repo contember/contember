@@ -129,7 +129,7 @@ export class AccessorTreeGenerator {
 	private readonly getAllEntities = (accessorTreeGenerator => {
 		return function*(): Generator<EntityAccessor> {
 			if (accessorTreeGenerator.isFrozenWhileUpdating) {
-				throw new BindingError(`Cannot query all entitites while the tree is updating.`)
+				throw new BindingError(`Cannot query all entities while the tree is updating.`)
 			}
 			for (const [, entity] of accessorTreeGenerator.entityStore) {
 				yield entity.getAccessor()

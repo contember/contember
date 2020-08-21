@@ -27,6 +27,7 @@ import {
 	WorkspaceUpdateApiCommand,
 } from './commands'
 import { Application } from './cli'
+import { VersionCommand } from './commands/misc'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -37,6 +38,7 @@ import { Application } from './cli'
 	const diffCommandFactory = () => new MigrationDiffCommand()
 	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
 	const commandManager = new CommandManager({
+		['version']: () => new VersionCommand(),
 		['migrations:diff']: diffCommandFactory,
 		['migrations:describe']: migrationsDescribeFactory,
 		['migrations:create']: () => new MigrationCreateCommand(),

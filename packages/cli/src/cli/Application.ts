@@ -1,6 +1,7 @@
-import { InputParser, InvalidInputError } from './InputParser'
+import { InvalidInputError } from './InputParser'
 import { CommandManager } from './CommandManager'
 import chalk from 'chalk'
+import { getContemberVersion } from '../utils/contember'
 
 export class Application {
 	constructor(private readonly commandManager: CommandManager) {}
@@ -10,6 +11,8 @@ export class Application {
 
 		const [name, ...rest] = commandArgs
 		if (!name || name === '--help') {
+			const version = getContemberVersion()
+			console.error(`Contember CLI version ${version}`)
 			console.error(`Usage: <command> <command args>`)
 			const commands = Object.entries(this.commandManager.commands)
 				.filter(([name, factory], index, commands) => commands.findIndex(it => it[1] === factory) === index)

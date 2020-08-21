@@ -40,6 +40,7 @@ import {
 	InternalEntityState,
 	InternalFieldState,
 	InternalRootStateNode,
+	InternalStateIterator,
 	InternalStateNode,
 	InternalStateType,
 	OnEntityListUpdate,
@@ -82,16 +83,14 @@ export class AccessorTreeGenerator {
 	private entityStore: Map<string, InternalEntityState> = new Map()
 	private subTreeStates: Map<string, InternalRootStateNode> = new Map()
 
+	private newlyInitializedWithListeners: Set<InternalEntityListState | InternalEntityState> = new Set()
+
 	private currentErrors: ErrorsPreprocessor.ErrorTreeRoot | undefined
 
 	private treeRootListeners: {
-		eventListeners: {
-			beforePersist: Set<TreeRootAccessor.BeforePersistListener> | undefined
-		}
+		eventListeners: {}
 	} = {
-		eventListeners: {
-			beforePersist: undefined,
-		},
+		eventListeners: {},
 	}
 
 	private readonly getEntityByKey = (key: string) => {
@@ -174,21 +173,8 @@ export class AccessorTreeGenerator {
 		if (this.unpersistedChangesCount === 0) {
 			return undefined
 		}
-		const beforePersistListeners = this.treeRootListeners.eventListeners.beforePersist
-		let hasBeforePersist = false
-
-		if (beforePersistListeners !== undefined && beforePersistListeners.size) {
-			hasBeforePersist = true
-
-			this.treeWideBatchUpdateDepth++
-			for (const listener of beforePersistListeners) {
-				listener(this.getNewTreeRootInstance)
-			}
-			this.treeWideBatchUpdateDepth--
-		}
-
+		const hasBeforePersist = this.triggerOnBeforePersist()
 		const generator = new MutationGenerator(this.markerTree, this.subTreeStates, this.entityStore)
-
 		const mutation = generator.getPersistMutation()
 
 		if (hasBeforePersist || mutation === undefined) {
@@ -1709,6 +1695,7 @@ export class AccessorTreeGenerator {
 		const create = (base: {
 			eventListeners: EntityListEventListeners['eventListeners']
 		}): SingleEntityEventListeners['eventListeners'] => ({
+			beforePersist: undefined,
 			initialize: base.eventListeners.childInitialize,
 			beforeUpdate: undefined,
 			update: undefined,
@@ -1725,6 +1712,27 @@ export class AccessorTreeGenerator {
 		return {
 			eventListeners,
 		}
+	}
+
+	private triggerOnBeforePersist(): boolean {
+		let hasBeforePersist = false
+
+		this.treeWideBatchUpdateDepth++
+		for (const [, subTreeState] of this.subTreeStates) {
+			for (const iNode of InternalStateIterator.depthFirstINodes(
+				this.entityStore,
+				subTreeState,
+				iNode => iNode.eventListeners.beforePersist !== undefined,
+			)) {
+				for (const listener of iNode.eventListeners.beforePersist!) {
+					listener(iNode.getAccessor as any) // TS can't quite handle this but this is sound.
+					hasBeforePersist = true
+				}
+			}
+		}
+		this.treeWideBatchUpdateDepth--
+
+		return hasBeforePersist
 	}
 
 	private getAddEventListener(state: {

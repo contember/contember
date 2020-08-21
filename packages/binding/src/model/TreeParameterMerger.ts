@@ -257,6 +257,7 @@ export class TreeParameterMerger {
 		fresh: SingleEntityEventListeners['eventListeners'],
 	): SingleEntityEventListeners['eventListeners'] {
 		return {
+			beforePersist: this.mergeEventListeners(original.beforePersist, fresh.beforePersist),
 			beforeUpdate: this.mergeEventListeners(original.beforeUpdate, fresh.beforeUpdate),
 			connectionUpdate: this.mergeFieldScopedListeners(original.connectionUpdate, fresh.connectionUpdate),
 			initialize: this.mergeEventListeners(original.initialize, fresh.initialize),
@@ -269,6 +270,7 @@ export class TreeParameterMerger {
 		fresh: EntityListEventListeners['eventListeners'],
 	): EntityListEventListeners['eventListeners'] {
 		return {
+			beforePersist: this.mergeEventListeners(original.beforePersist, fresh.beforePersist),
 			beforeUpdate: this.mergeEventListeners(original.beforeUpdate, fresh.beforeUpdate),
 			childInitialize: this.mergeEventListeners(original.childInitialize, fresh.childInitialize),
 			initialize: this.mergeEventListeners(original.initialize, fresh.initialize),
@@ -280,6 +282,7 @@ export class TreeParameterMerger {
 		listeners: SingleEntityEventListeners['eventListeners'] | undefined,
 	): SingleEntityEventListeners['eventListeners'] {
 		return {
+			beforePersist: this.cloneOptionalSet(listeners?.beforePersist),
 			connectionUpdate: this.cloneOptionalMapOfSets(listeners?.connectionUpdate),
 			update: this.cloneOptionalSet(listeners?.update),
 			beforeUpdate: this.cloneOptionalSet(listeners?.beforeUpdate),
@@ -291,10 +294,11 @@ export class TreeParameterMerger {
 		listeners: EntityListEventListeners['eventListeners'] | undefined,
 	): EntityListEventListeners['eventListeners'] {
 		return {
-			update: this.cloneOptionalSet(listeners?.update),
+			beforePersist: this.cloneOptionalSet(listeners?.beforePersist),
 			beforeUpdate: this.cloneOptionalSet(listeners?.beforeUpdate),
 			childInitialize: this.cloneOptionalSet(listeners?.childInitialize),
 			initialize: this.cloneOptionalSet(listeners?.initialize),
+			update: this.cloneOptionalSet(listeners?.update),
 		}
 	}
 

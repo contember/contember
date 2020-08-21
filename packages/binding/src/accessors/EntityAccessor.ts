@@ -193,7 +193,7 @@ namespace EntityAccessor {
 	export type UpdateListener = (accessor: EntityAccessor) => void
 
 	export interface EntityEventListenerMap {
-		// beforePersist: BatchUpdatesHandler
+		beforePersist: BatchUpdatesHandler
 		beforeUpdate: BatchUpdatesHandler
 		connectionUpdate: UpdateListener
 		initialize: BatchUpdatesHandler
@@ -201,6 +201,7 @@ namespace EntityAccessor {
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
 	export interface AddEntityEventListener {
+		(type: 'beforePersist', listener: EntityEventListenerMap['beforePersist']): () => void
 		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
 		(type: 'connectionUpdate', hasOneField: FieldName, listener: EntityEventListenerMap['connectionUpdate']): () => void
 		(type: 'initialize', listener: EntityEventListenerMap['initialize']): () => void

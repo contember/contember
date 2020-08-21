@@ -16,6 +16,7 @@ export interface SingleEntityEventListeners {
 export interface SugarableSingleEntityEventListeners {}
 
 export interface UnsugarableSingleEntityEventListeners {
+	onBeforePersist?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
 	onBeforeUpdate?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
 	onConnectionUpdate?: {
 		[fieldName: string]: EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>

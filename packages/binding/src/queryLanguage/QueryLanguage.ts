@@ -116,6 +116,7 @@ export namespace QueryLanguage {
 			: undefined
 
 		return {
+			beforePersist: desugarEventListener(unsugarable.onBeforePersist),
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
 			connectionUpdate,
 			initialize: desugarEventListener(unsugarable.onInitialize),
@@ -127,6 +128,7 @@ export namespace QueryLanguage {
 		unsugarable: UnsugarableEntityListEventListeners,
 	): EntityListEventListeners['eventListeners'] => {
 		return {
+			beforePersist: desugarEventListener(unsugarable.onBeforePersist),
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
 			childInitialize: desugarEventListener(unsugarable.onChildInitialize),
 			initialize: desugarEventListener(unsugarable.onInitialize),

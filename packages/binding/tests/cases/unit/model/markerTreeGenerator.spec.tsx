@@ -58,12 +58,14 @@ describe('Marker tree generator', () => {
 		const typeNameMarker = [TYPENAME_KEY_NAME, new FieldMarker(TYPENAME_KEY_NAME)] as const
 
 		const singleListeners = {
+			beforePersist: undefined,
 			initialize: undefined,
 			connectionUpdate: undefined,
 			beforeUpdate: undefined,
 			update: undefined,
 		} as const
 		const listListeners = {
+			beforePersist: undefined,
 			initialize: undefined,
 			childInitialize: undefined,
 			beforeUpdate: undefined,

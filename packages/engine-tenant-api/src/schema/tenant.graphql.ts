@@ -22,7 +22,12 @@ const schema: DocumentNode = gql`
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 
-		invite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!): InviteResponse
+		invite(
+			email: String!
+			projectSlug: String!
+			memberships: [MembershipInput!]!
+			options: InviteOptions
+		): InviteResponse
 		unmanagedInvite(
 			email: String!
 			projectSlug: String!
@@ -49,6 +54,9 @@ const schema: DocumentNode = gql`
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
 		disableOtp: DisableOtpResponse
+
+		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
+		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 	}
 
 	# === setUp ===
@@ -185,6 +193,10 @@ const schema: DocumentNode = gql`
 	type InviteResult {
 		person: Person!
 		isNew: Boolean!
+	}
+
+	input InviteOptions {
+		mailVariant: String
 	}
 
 	# === addProjectMember ===
@@ -426,6 +438,61 @@ const schema: DocumentNode = gql`
 
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
+	}
+
+	# === mails ===
+
+	input MailTemplate {
+		projectSlug: String!
+		type: MailType!
+		"Custom mail variant identifier, e.g. a locale."
+		variant: String
+		subject: String!
+		content: String!
+		useLayout: Boolean
+	}
+
+	enum MailType {
+		EXISTING_USER_INVITED
+		NEW_USER_INVITED
+	}
+
+	input MailTemplateIdentifier {
+		projectSlug: String!
+		type: MailType!
+		variant: String
+	}
+
+	type AddMailTemplateResponse {
+		ok: Boolean!
+		errors: [AddMailTemplateError!]!
+	}
+
+	type AddMailTemplateError {
+		code: AddMailTemplateErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum AddMailTemplateErrorCode {
+		MISSING_VARIABLE
+		PROJECT_NOT_FOUND
+	}
+
+	type RemoveMailTemplateResponse {
+		ok: Boolean!
+		errors: [RemoveMailTemplateError!]!
+	}
+
+	type RemoveMailTemplateError {
+		code: RemoveMailTemplateErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum RemoveMailTemplateErrorCode {
+		PROJECT_NOT_FOUND
+		TEMPLATE_NOT_FOUND
 	}
 `
 

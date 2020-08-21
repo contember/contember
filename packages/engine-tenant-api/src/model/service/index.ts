@@ -1,5 +1,6 @@
 export * from './ApiKeyManager'
 export * from './InviteManager'
+export * from './MailTemplateManager'
 export * from './MembershipValidator'
 export * from './OtpManager'
 export * from './PasswordChangeManager'

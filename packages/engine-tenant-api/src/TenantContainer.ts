@@ -9,6 +9,7 @@ import {
 	Identity,
 	IdentityFactory,
 	InviteManager,
+	MailTemplateManager,
 	PasswordChangeManager,
 	PermissionContextFactory,
 	PermissionsFactory,
@@ -27,6 +28,7 @@ import {
 	DisableApiKeyMutationResolver,
 	IdentityTypeResolver,
 	InviteMutationResolver,
+	MailTemplateMutationResolver,
 	MeQueryResolver,
 	OtpMutationResolver,
 	ProjectMembersQueryResolver,
@@ -118,7 +120,10 @@ namespace TenantContainer {
 				)
 				.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 
-				.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
+				.addService(
+					'userMailer',
+					({ mailer, templateRenderer, queryHandler }) => new UserMailer(mailer, templateRenderer, queryHandler),
+				)
 
 				.addService('apiKeyManager', ({ queryHandler, commandBus }) => new ApiKeyManager(queryHandler, commandBus))
 				.addService('signUpManager', ({ queryHandler, commandBus }) => new SignUpManager(queryHandler, commandBus))
@@ -145,6 +150,7 @@ namespace TenantContainer {
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
 				.addService('inviteManager', ({ db, providers, userMailer }) => new InviteManager(db, providers, userMailer))
 				.addService('otpManager', ({ commandBus }) => new OtpManager(commandBus))
+				.addService('mailTemplateManager', ({ commandBus }) => new MailTemplateManager(commandBus))
 				.addService('identityFetcher', ({ db }) => new IdentityFetcher(db))
 
 				.addService(
@@ -217,6 +223,11 @@ namespace TenantContainer {
 				.addService(
 					'otpMutationResolver',
 					({ otpManager, queryHandler }) => new OtpMutationResolver(otpManager, queryHandler),
+				)
+				.addService(
+					'mailTemplateMutationResolver',
+					({ projectManager, mailTemplateManager }) =>
+						new MailTemplateMutationResolver(projectManager, mailTemplateManager),
 				)
 
 				.addService(

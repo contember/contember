@@ -1,12 +1,11 @@
-import { CommandBus } from '../commands/CommandBus'
+import { CommandBus, CreateIdentityCommand, CreatePersonCommand } from '../commands'
 import { Client } from '@contember/database'
-import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
 import { Membership } from '../type/Membership'
 import { InviteErrorCode } from '../../schema'
-import { TenantRole } from '../authorization/Roles'
-import { UserMailer } from '../mailing/UserMailer'
+import { TenantRole } from '../authorization'
+import { UserMailer } from '../mailing'
 import { Project } from '../type'
 import { createAppendMembershipVariables } from './membershipUtils'
 import { CreateOrUpdateProjectMembershipCommand } from '../commands/membership/CreateOrUpdateProjectMembershipCommand'
@@ -14,6 +13,7 @@ import { CreateOrUpdateProjectMembershipCommand } from '../commands/membership/C
 export interface InviteOptions {
 	noEmail?: boolean
 	password?: string
+	emailVariant?: string
 }
 
 export class InviteManager {
@@ -43,10 +43,17 @@ export class InviteManager {
 				await bus.execute(new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate))
 			}
 			if (!options.noEmail) {
+				const customMailOptions = {
+					projectId: project.id,
+					variant: options.emailVariant || '',
+				}
 				if (isNew) {
-					await this.mailer.sendNewUserInvitedMail({ email, project: project.name, password: generatedPassword })
+					await this.mailer.sendNewUserInvitedMail(
+						{ email, project: project.name, password: generatedPassword },
+						customMailOptions,
+					)
 				} else {
-					await this.mailer.sendExistingUserInvitedEmail({ email, project: project.name })
+					await this.mailer.sendExistingUserInvitedEmail({ email, project: project.name }, customMailOptions)
 				}
 			}
 			return new InviteResponseOk(person, isNew)

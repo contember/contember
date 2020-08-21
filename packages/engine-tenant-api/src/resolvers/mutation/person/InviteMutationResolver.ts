@@ -21,7 +21,7 @@ export class InviteMutationResolver implements MutationResolvers {
 
 	async invite(
 		parent: any,
-		{ projectSlug, email, memberships }: MutationInviteArgs,
+		{ projectSlug, email, memberships, options }: MutationInviteArgs,
 		context: ResolverContext,
 	): Promise<InviteResponse> {
 		const project = await this.projectManager.getProjectBySlug(projectSlug)
@@ -30,7 +30,9 @@ export class InviteMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_INVITE(memberships),
 			message: 'You are not allowed to invite a person',
 		})
-		return this.doInvite(project, memberships, email)
+		return this.doInvite(project, memberships, email, {
+			emailVariant: options?.mailVariant || '',
+		})
 	}
 
 	async unmanagedInvite(

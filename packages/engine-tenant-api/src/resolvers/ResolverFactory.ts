@@ -11,6 +11,7 @@ import {
 	UpdateProjectMemberMutationResolver,
 	InviteMutationResolver,
 	OtpMutationResolver,
+	MailTemplateMutationResolver,
 } from './mutation'
 
 import { Resolvers } from '../schema'
@@ -40,6 +41,8 @@ class ResolverFactory {
 			disableApiKeyMutationResolver: DisableApiKeyMutationResolver
 
 			otpMutationResolver: OtpMutationResolver
+
+			mailTemplateMutationResolver: MailTemplateMutationResolver
 
 			identityTypeResolver: IdentityTypeResolver
 			projectTypeResolver: ProjectTypeResolver
@@ -96,6 +99,12 @@ class ResolverFactory {
 				prepareOtp: this.resolvers.otpMutationResolver.prepareOtp.bind(this.resolvers.otpMutationResolver),
 				confirmOtp: this.resolvers.otpMutationResolver.confirmOtp.bind(this.resolvers.otpMutationResolver),
 				disableOtp: this.resolvers.otpMutationResolver.disableOtp.bind(this.resolvers.otpMutationResolver),
+				addProjectMailTemplate: this.resolvers.mailTemplateMutationResolver.addProjectMailTemplate.bind(
+					this.resolvers.mailTemplateMutationResolver,
+				),
+				removeProjectMailTemplate: this.resolvers.mailTemplateMutationResolver.removeProjectMailTemplate.bind(
+					this.resolvers.mailTemplateMutationResolver,
+				),
 			},
 		}
 	}

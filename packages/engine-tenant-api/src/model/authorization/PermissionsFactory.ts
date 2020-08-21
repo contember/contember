@@ -21,6 +21,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_REMOVE_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE_UNMANAGED([]))
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_ADD)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_REMOVE)
 
 		return permissions
 	}

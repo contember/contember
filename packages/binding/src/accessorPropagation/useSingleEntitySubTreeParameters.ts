@@ -32,54 +32,60 @@ export const useSingleEntitySubTreeParameters = (
 	// We're not really breaking rules of hooks here since the error state is prevented by the invariant above.
 	if ('isCreating' in qualifiedSingleEntity && qualifiedSingleEntity.isCreating) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		parameters = React.useMemo(
-			() =>
-				new BoxedUnconstrainedQualifiedSingleEntity(
-					QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(
-						{
-							forceCreation: qualifiedSingleEntity.forceCreation,
-							isNonbearing: qualifiedSingleEntity.isNonbearing,
-							entity: qualifiedSingleEntity.entity,
-							setOnCreate: qualifiedSingleEntity.setOnCreate,
-							onInitialize: qualifiedSingleEntity.onInitialize,
-						},
-						environment,
-					),
-				),
-			[
-				qualifiedSingleEntity.entity,
-				qualifiedSingleEntity.setOnCreate,
-				qualifiedSingleEntity.forceCreation,
-				qualifiedSingleEntity.isNonbearing,
-				qualifiedSingleEntity.onInitialize,
-				environment,
-			],
-		)
+		parameters = React.useMemo(() => {
+			const singleEntity: Required<SugaredUnconstrainedQualifiedSingleEntity> = {
+				forceCreation: qualifiedSingleEntity.forceCreation!,
+				isNonbearing: qualifiedSingleEntity.isNonbearing!,
+				entity: qualifiedSingleEntity.entity,
+				setOnCreate: qualifiedSingleEntity.setOnCreate!,
+				unstable_onInitialize: qualifiedSingleEntity.unstable_onInitialize!,
+				onConnectionUpdate: qualifiedSingleEntity.onConnectionUpdate!,
+				onBeforeUpdate: qualifiedSingleEntity.onBeforeUpdate!,
+				onUpdate: qualifiedSingleEntity.onUpdate!,
+				onBeforePersist: qualifiedSingleEntity.onBeforePersist!,
+			}
+			return new BoxedUnconstrainedQualifiedSingleEntity(
+				QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(singleEntity, environment),
+			)
+		}, [
+			qualifiedSingleEntity.entity,
+			qualifiedSingleEntity.setOnCreate,
+			qualifiedSingleEntity.forceCreation,
+			qualifiedSingleEntity.isNonbearing,
+			qualifiedSingleEntity.unstable_onInitialize,
+			qualifiedSingleEntity.onConnectionUpdate,
+			qualifiedSingleEntity.onBeforeUpdate,
+			qualifiedSingleEntity.onUpdate,
+			qualifiedSingleEntity.onBeforePersist,
+			environment,
+		])
 	} else {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		parameters = React.useMemo(
-			() =>
-				new BoxedQualifiedSingleEntity(
-					QueryLanguage.desugarQualifiedSingleEntity(
-						{
-							forceCreation: qualifiedSingleEntity.forceCreation,
-							isNonbearing: qualifiedSingleEntity.isNonbearing,
-							entity: qualifiedSingleEntity.entity,
-							setOnCreate: qualifiedSingleEntity.setOnCreate,
-							onInitialize: qualifiedSingleEntity.onInitialize,
-						},
-						environment,
-					),
-				),
-			[
-				qualifiedSingleEntity.entity,
-				qualifiedSingleEntity.setOnCreate,
-				qualifiedSingleEntity.forceCreation,
-				qualifiedSingleEntity.isNonbearing,
-				qualifiedSingleEntity.onInitialize,
-				environment,
-			],
-		)
+		parameters = React.useMemo(() => {
+			const singleEntity: Required<SugaredQualifiedSingleEntity> = {
+				forceCreation: qualifiedSingleEntity.forceCreation!,
+				isNonbearing: qualifiedSingleEntity.isNonbearing!,
+				entity: qualifiedSingleEntity.entity,
+				setOnCreate: qualifiedSingleEntity.setOnCreate!,
+				unstable_onInitialize: qualifiedSingleEntity.unstable_onInitialize!,
+				onConnectionUpdate: qualifiedSingleEntity.onConnectionUpdate!,
+				onBeforeUpdate: qualifiedSingleEntity.onBeforeUpdate!,
+				onUpdate: qualifiedSingleEntity.onUpdate!,
+				onBeforePersist: qualifiedSingleEntity.onBeforePersist!,
+			}
+			return new BoxedQualifiedSingleEntity(QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment))
+		}, [
+			qualifiedSingleEntity.entity,
+			qualifiedSingleEntity.setOnCreate,
+			qualifiedSingleEntity.forceCreation,
+			qualifiedSingleEntity.isNonbearing,
+			qualifiedSingleEntity.unstable_onInitialize,
+			qualifiedSingleEntity.onConnectionUpdate,
+			qualifiedSingleEntity.onBeforeUpdate,
+			qualifiedSingleEntity.onUpdate,
+			qualifiedSingleEntity.onBeforePersist,
+			environment,
+		])
 	}
 
 	return parameters

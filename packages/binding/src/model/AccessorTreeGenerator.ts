@@ -167,6 +167,7 @@ export class AccessorTreeGenerator {
 			this.subTreeStates.set(placeholderName, subTreeState)
 		}
 
+		this.triggerOnInitialize()
 		this.updateTreeRoot()
 	}
 
@@ -664,6 +665,7 @@ export class AccessorTreeGenerator {
 
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
+			this.triggerOnInitialize()
 			this.updateTreeRoot()
 			this.flushPendingAccessorUpdates(rootsWithPendingUpdates)
 			this.isFrozenWhileUpdating = false
@@ -1239,6 +1241,11 @@ export class AccessorTreeGenerator {
 		}
 
 		this.initializeEntityFields(entityState, markersContainer)
+
+		if (entityState.eventListeners.initialize?.size) {
+			this.newlyInitializedWithListeners.add(entityState)
+		}
+
 		return entityState
 	}
 
@@ -1733,7 +1740,23 @@ export class AccessorTreeGenerator {
 		}
 		this.treeWideBatchUpdateDepth--
 
-		return hasBeforePersist
+		return this.triggerOnInitialize() || hasBeforePersist
+	}
+
+	private triggerOnInitialize(): boolean {
+		let hasOnInitialize = false
+
+		this.treeWideBatchUpdateDepth++
+		for (const state of this.newlyInitializedWithListeners) {
+			for (const listener of state.eventListeners.initialize!) {
+				listener(state.getAccessor as any)
+				hasOnInitialize = true
+			}
+		}
+		this.treeWideBatchUpdateDepth--
+		this.newlyInitializedWithListeners.clear()
+
+		return hasOnInitialize
 	}
 
 	private getAddEventListener(state: {

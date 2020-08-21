@@ -151,7 +151,7 @@ export class AccessorTreeGenerator {
 	private treeWideBatchUpdateDepth = 0
 	private unpersistedChangesCount = 0
 
-	public constructor(private markerTree: MarkerTreeRoot) {}
+	public constructor(private readonly markerTree: MarkerTreeRoot) {}
 
 	public initializeLiveTree(
 		queryResponse: QueryRequestResponse | undefined,

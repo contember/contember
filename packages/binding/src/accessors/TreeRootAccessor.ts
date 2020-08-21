@@ -24,14 +24,8 @@ class TreeRootAccessor {
 	) {}
 }
 namespace TreeRootAccessor {
-	export type BeforePersistListener = (getTreeRoot: () => TreeRootAccessor) => void
-
-	export interface TreeRootEventListenerMap {
-		beforePersist: BeforePersistListener
-	}
-	export interface AddTreeRootEventListener {
-		(type: 'beforePersist', listener: TreeRootEventListenerMap['beforePersist']): () => void
-	}
+	export interface TreeRootEventListenerMap {}
+	export interface AddTreeRootEventListener {}
 }
 
 export { TreeRootAccessor }

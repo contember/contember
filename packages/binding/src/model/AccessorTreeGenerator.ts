@@ -121,6 +121,7 @@ export class AccessorTreeGenerator {
 			this.getAllTypeNames,
 		)
 
+	// This is currently useless but potentially future-compatible
 	private readonly addTreeRootEventListener: TreeRootAccessor.AddTreeRootEventListener = this.getAddEventListener(
 		this.treeRootListeners,
 	)

@@ -5,7 +5,9 @@ import { EntityAccessor, EntityListAccessor, FieldAccessor, GetSubTree, TreeRoot
 import {
 	BoxedSingleEntityId,
 	EntityFieldPersistedData,
+	ExecutionError,
 	MutationDataResponse,
+	MutationError,
 	PersistedEntityDataStore,
 	QueryRequestResponse,
 } from '../accessorTree'
@@ -22,7 +24,15 @@ import {
 	SubTreeMarker,
 	SubTreeMarkerParameters,
 } from '../markers'
-import { EntityCreationParameters, EntityListPreferences, FieldName, Scalar } from '../treeParameters'
+import {
+	BoxedQualifiedSingleEntity,
+	EntityCreationParameters,
+	EntityListEventListeners,
+	EntityListPreferences,
+	FieldName,
+	Scalar,
+	SingleEntityEventListeners,
+} from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import {
@@ -30,6 +40,7 @@ import {
 	InternalEntityState,
 	InternalFieldState,
 	InternalRootStateNode,
+	InternalStateIterator,
 	InternalStateNode,
 	InternalStateType,
 	OnEntityListUpdate,
@@ -72,16 +83,14 @@ export class AccessorTreeGenerator {
 	private entityStore: Map<string, InternalEntityState> = new Map()
 	private subTreeStates: Map<string, InternalRootStateNode> = new Map()
 
+	private newlyInitializedWithListeners: Set<InternalEntityListState | InternalEntityState> = new Set()
+
 	private currentErrors: ErrorsPreprocessor.ErrorTreeRoot | undefined
 
 	private treeRootListeners: {
-		eventListeners: {
-			beforePersist: Set<TreeRootAccessor.BeforePersistListener> | undefined
-		}
+		eventListeners: {}
 	} = {
-		eventListeners: {
-			beforePersist: undefined,
-		},
+		eventListeners: {},
 	}
 
 	private readonly getEntityByKey = (key: string) => {
@@ -112,6 +121,7 @@ export class AccessorTreeGenerator {
 			this.getAllTypeNames,
 		)
 
+	// This is currently useless but potentially future-compatible
 	private readonly addTreeRootEventListener: TreeRootAccessor.AddTreeRootEventListener = this.getAddEventListener(
 		this.treeRootListeners,
 	)
@@ -119,7 +129,7 @@ export class AccessorTreeGenerator {
 	private readonly getAllEntities = (accessorTreeGenerator => {
 		return function*(): Generator<EntityAccessor> {
 			if (accessorTreeGenerator.isFrozenWhileUpdating) {
-				throw new BindingError(`Cannot query all entitites while the tree is updating.`)
+				throw new BindingError(`Cannot query all entities while the tree is updating.`)
 			}
 			for (const [, entity] of accessorTreeGenerator.entityStore) {
 				yield entity.getAccessor()
@@ -141,7 +151,7 @@ export class AccessorTreeGenerator {
 	private treeWideBatchUpdateDepth = 0
 	private unpersistedChangesCount = 0
 
-	public constructor(private markerTree: MarkerTreeRoot) {}
+	public constructor(private readonly markerTree: MarkerTreeRoot) {}
 
 	public initializeLiveTree(
 		queryResponse: QueryRequestResponse | undefined,
@@ -157,6 +167,7 @@ export class AccessorTreeGenerator {
 			this.subTreeStates.set(placeholderName, subTreeState)
 		}
 
+		this.triggerOnInitialize()
 		this.updateTreeRoot()
 	}
 
@@ -164,21 +175,8 @@ export class AccessorTreeGenerator {
 		if (this.unpersistedChangesCount === 0) {
 			return undefined
 		}
-		const beforePersistListeners = this.treeRootListeners.eventListeners.beforePersist
-		let hasBeforePersist = false
-
-		if (beforePersistListeners !== undefined && beforePersistListeners.size) {
-			hasBeforePersist = true
-
-			this.treeWideBatchUpdateDepth++
-			for (const listener of beforePersistListeners) {
-				listener(this.getNewTreeRootInstance)
-			}
-			this.treeWideBatchUpdateDepth--
-		}
-
+		const hasBeforePersist = this.triggerOnBeforePersist()
 		const generator = new MutationGenerator(this.markerTree, this.subTreeStates, this.entityStore)
-
 		const mutation = generator.getPersistMutation()
 
 		if (hasBeforePersist || mutation === undefined) {
@@ -204,7 +202,36 @@ export class AccessorTreeGenerator {
 
 			this.setRootStateErrors(errorTreeRoot, ErrorPopulationMode.Add)
 
-			console.error('Errors', errorTreeRoot)
+			// TODO this is just temporary
+			if (data) {
+				for (const subTreePlaceholder in data) {
+					const treeDatum = data[subTreePlaceholder]
+					const executionErrors: Array<ExecutionError | MutationError> = treeDatum.errors
+					const allErrors = treeDatum?.validation?.errors
+						? executionErrors.concat(treeDatum.validation.errors)
+						: executionErrors
+					const normalizedErrors = allErrors.map((error: ExecutionError | MutationError) => {
+						return {
+							path: error.path
+								.map(pathPart => {
+									if (pathPart.__typename === '_FieldPathFragment') {
+										return pathPart.field
+									}
+									if (pathPart.alias) {
+										return `#${pathPart.index}(${pathPart.alias})`
+									}
+									return pathPart.index
+								})
+								.join('.'),
+							type: 'type' in error ? error.type : undefined,
+							message: typeof error.message === 'string' ? error.message : error.message?.text,
+						}
+					})
+					if (Object.keys(normalizedErrors).length) {
+						console.table(normalizedErrors)
+					}
+				}
+			}
 		})
 	}
 
@@ -232,6 +259,8 @@ export class AccessorTreeGenerator {
 								subTreeState.markersContainer,
 								subTreeState.creationParameters,
 								subTreeState.onChildFieldUpdate,
+								(this.markerTree.subTrees.get(subTreePlaceholder)?.parameters as BoxedQualifiedSingleEntity | undefined)
+									?.value,
 							)
 							newSubTreeState.hasPendingUpdate = true
 							this.subTreeStates.set(subTreePlaceholder, newSubTreeState)
@@ -289,7 +318,7 @@ export class AccessorTreeGenerator {
 
 		const newPersistedData = this.persistedEntityData.get(this.idToKey(state.id))
 
-		for (const [fieldPlaceholder, fieldState] of state.fields) {
+		for (let [fieldPlaceholder, fieldState] of state.fields) {
 			let didChildUpdate = false
 			const newFieldDatum = newPersistedData?.get(fieldPlaceholder)
 
@@ -313,40 +342,48 @@ export class AccessorTreeGenerator {
 						break
 					}
 
+					let shouldInitializeNewEntity = false
+					const previousFieldDatum = state.persistedData?.get(fieldPlaceholder)
 					if (newFieldDatum instanceof BoxedSingleEntityId) {
-						const previousFieldDatum = state.persistedData?.get(fieldPlaceholder)
-						if (
-							previousFieldDatum instanceof BoxedSingleEntityId &&
-							newFieldDatum.id === previousFieldDatum.id &&
-							newFieldDatum.id === fieldState.id
-						) {
-							didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
-						} else {
-							// TODO delete the previous entity
-							state.fields.set(
-								fieldPlaceholder,
-								this.initializeEntityAccessor(
-									newFieldDatum.id,
-									marker.environment,
-									marker.fields,
-									marker.relation,
-									state.onChildFieldUpdate,
-								),
-							)
-							didUpdate = true // Deliberately not child update
+						if (previousFieldDatum instanceof BoxedSingleEntityId) {
+							if (newFieldDatum.id === previousFieldDatum.id && newFieldDatum.id === fieldState.id) {
+								// Updating an entity that already existed on the server.
+								didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id)
+							} else {
+								// An entity still exists on the server but got re-connected.
+								shouldInitializeNewEntity = true
+							}
+						} else if (previousFieldDatum === null || previousFieldDatum === undefined) {
+							// This entity got created/connected.
+							shouldInitializeNewEntity = true
 						}
 					} else if (newFieldDatum === null || newFieldDatum === undefined) {
+						if (previousFieldDatum instanceof BoxedSingleEntityId) {
+							// This entity got deleted/disconnected.
+							shouldInitializeNewEntity = true
+						} else if (previousFieldDatum === null || previousFieldDatum === undefined) {
+							// This entity remained untouched.
+							shouldInitializeNewEntity = true
+						}
+					}
+
+					if (shouldInitializeNewEntity) {
 						state.fields.set(
 							fieldPlaceholder,
-							this.initializeEntityAccessor(
-								new EntityAccessor.UnpersistedEntityId(),
+							(fieldState = this.initializeEntityAccessor(
+								newFieldDatum instanceof BoxedSingleEntityId
+									? newFieldDatum.id
+									: new EntityAccessor.UnpersistedEntityId(),
 								marker.environment,
 								marker.fields,
 								marker.relation,
 								state.onChildFieldUpdate,
-							),
+								marker.relation,
+							)),
 						)
-						didUpdate = true // Deliberately not child update
+						this.markPendingConnections(state, new Set([fieldPlaceholder]))
+						alreadyProcessed.add(fieldState)
+						didChildUpdate = true
 					}
 
 					break
@@ -434,6 +471,8 @@ export class AccessorTreeGenerator {
 
 		state.childrenKeys.clear()
 
+		// TODO instead of calling initializeEntityAccessor we might be able to perform some Longest Common Subsequence
+		// 	wizardry and match the id sets in order to convert the unpersisted
 		for (const newPersistedId of initialData) {
 			let key: string
 
@@ -446,6 +485,7 @@ export class AccessorTreeGenerator {
 					state.markersContainer,
 					state.creationParameters,
 					state.onChildEntityUpdate,
+					this.getEventListenersForListEntity(state),
 				)
 				key = newKey.value
 				didUpdate = true
@@ -460,6 +500,7 @@ export class AccessorTreeGenerator {
 						state.markersContainer,
 						state.creationParameters,
 						state.onChildEntityUpdate,
+						this.getEventListenersForListEntity(state),
 					)
 					didUpdate = true
 				} else {
@@ -624,6 +665,7 @@ export class AccessorTreeGenerator {
 
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
+			this.triggerOnInitialize()
 			this.updateTreeRoot()
 			this.flushPendingAccessorUpdates(rootsWithPendingUpdates)
 			this.isFrozenWhileUpdating = false
@@ -645,16 +687,24 @@ export class AccessorTreeGenerator {
 			subTreeState = this.initializeEntityListAccessor(
 				tree.environment,
 				tree.fields,
-				{ initialEntityCount: 0, ...tree.parameters.value },
+				tree.parameters.value,
 				noop,
 				persistedEntityIds,
+				tree.parameters.value,
 			)
 		} else {
 			const id =
 				persistedRootData instanceof BoxedSingleEntityId
 					? persistedRootData.id
 					: new EntityAccessor.UnpersistedEntityId()
-			subTreeState = this.initializeEntityAccessor(id, tree.environment, tree.fields, tree.parameters.value, noop)
+			subTreeState = this.initializeEntityAccessor(
+				id,
+				tree.environment,
+				tree.fields,
+				tree.parameters.value,
+				noop,
+				tree.parameters.value,
+			)
 		}
 		this.subTreeStates.set(tree.placeholderName, subTreeState)
 
@@ -708,6 +758,7 @@ export class AccessorTreeGenerator {
 				field.fields,
 				field.relation,
 				entityState.onChildFieldUpdate,
+				field.relation,
 			)
 			entityState.fields.set(field.placeholderName, referenceEntityState)
 		} else {
@@ -734,6 +785,7 @@ export class AccessorTreeGenerator {
 					relation,
 					entityState.onChildFieldUpdate,
 					fieldDatum || new Set(),
+					field.relation,
 				),
 			)
 		} else if (typeof fieldDatum === 'object') {
@@ -803,6 +855,7 @@ export class AccessorTreeGenerator {
 							newMarkersContainer,
 							fieldState.creationParameters,
 							fieldState.onChildEntityUpdate,
+							this.getEventListenersForListEntity(fieldState, field),
 						)
 					}
 					fieldState.markersContainer = MarkerMerger.mergeEntityFieldsContainers(
@@ -824,6 +877,7 @@ export class AccessorTreeGenerator {
 		markersContainer: EntityFieldMarkersContainer,
 		creationParameters: EntityCreationParameters,
 		onEntityUpdate: OnEntityUpdate,
+		initialEventListeners: SingleEntityEventListeners | undefined,
 	): InternalEntityState {
 		const entityKey = this.idToKey(id)
 		const existingEntityState = this.entityStore.get(entityKey)
@@ -850,16 +904,13 @@ export class AccessorTreeGenerator {
 
 		const entityState: InternalEntityState = {
 			type: InternalStateType.SingleEntity,
-			addEventListener: undefined as any,
 			batchUpdateDepth: 0,
+			fieldsWithPendingConnectionUpdates: undefined,
 			childrenWithPendingUpdates: undefined,
 			creationParameters,
 			environment,
 			errors: emptyArray,
-			eventListeners: {
-				update: undefined,
-				beforeUpdate: undefined,
-			},
+			eventListeners: TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
 			fields: new Map(),
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
@@ -906,6 +957,44 @@ export class AccessorTreeGenerator {
 					entityState.hasStaleAccessor = true
 					entityState.hasPendingParentNotification = true
 				})
+			},
+			addEventListener: (type: EntityAccessor.EntityEventType, ...args: unknown[]) => {
+				if (type === 'connectionUpdate') {
+					if (entityState.eventListeners.connectionUpdate === undefined) {
+						entityState.eventListeners.connectionUpdate = new Map()
+					}
+					const fieldName = args[0] as FieldName
+					const listener = args[1] as EntityAccessor.UpdateListener
+					const existingListeners = entityState.eventListeners.connectionUpdate.get(fieldName)
+
+					if (existingListeners === undefined) {
+						entityState.eventListeners.connectionUpdate.set(fieldName, new Set([listener]))
+					} else {
+						existingListeners.add(listener)
+					}
+					return () => {
+						const existingListeners = entityState.eventListeners.connectionUpdate?.get(fieldName)
+						if (existingListeners === undefined) {
+							return // Throw an error? This REALLY should not happen.
+						}
+						existingListeners.delete(listener)
+					}
+				} else {
+					const listener = args[0] as EntityAccessor.EntityEventListenerMap[typeof type]
+					if (entityState.eventListeners[type] === undefined) {
+						entityState.eventListeners[type] = new Set<never>()
+					}
+					entityState.eventListeners[type]!.add(listener as any)
+					return () => {
+						if (entityState.eventListeners[type] === undefined) {
+							return // Throw an error? This REALLY should not happen.
+						}
+						entityState.eventListeners[type]!.delete(listener as any)
+						if (entityState.eventListeners[type]!.size === 0) {
+							entityState.eventListeners[type] = undefined
+						}
+					}
+				}
 			},
 			batchUpdates: performUpdates => {
 				this.performRootTreeOperation(() => {
@@ -967,6 +1056,10 @@ export class AccessorTreeGenerator {
 							entityState.hasStaleAccessor = true
 							entityState.hasPendingParentNotification = true
 						}
+						if (entityState.fieldsWithPendingConnectionUpdates === undefined) {
+							entityState.fieldsWithPendingConnectionUpdates = new Set()
+						}
+						entityState.fieldsWithPendingConnectionUpdates.add(fieldName)
 					})
 				})
 			},
@@ -1008,12 +1101,17 @@ export class AccessorTreeGenerator {
 								hasOneMarker.fields,
 								hasOneMarker.relation,
 								entityState.onChildFieldUpdate,
+								hasOneMarker.relation,
 							)
 							entityState.fields.set(hasOneMarker.placeholderName, newEntityState)
 
 							entityState.hasStaleAccessor = true
 							entityState.hasPendingParentNotification = true
 						}
+						if (entityState.fieldsWithPendingConnectionUpdates === undefined) {
+							entityState.fieldsWithPendingConnectionUpdates = new Set()
+						}
+						entityState.fieldsWithPendingConnectionUpdates.add(fieldName)
 					})
 				})
 			},
@@ -1030,7 +1128,6 @@ export class AccessorTreeGenerator {
 				})
 			},
 		}
-		entityState.addEventListener = this.getAddEventListener(entityState)
 		this.entityStore.set(entityKey, entityState)
 
 		const typeName = entityState.persistedData?.get(TYPENAME_KEY_NAME)
@@ -1095,14 +1192,7 @@ export class AccessorTreeGenerator {
 		}
 
 		const processEntityDeletion = (deletedState: InternalEntityState) => {
-			const relevantPlaceholders = new Set<FieldName>()
-
-			// All has one relations where this entity is present.
-			for (const [placeholderName, candidateState] of entityState.fields) {
-				if (candidateState === deletedState) {
-					relevantPlaceholders.add(placeholderName)
-				}
-			}
+			const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, deletedState)
 
 			if (typeof deletedState.id === 'string') {
 				if (entityState.plannedHasOneDeletions === undefined) {
@@ -1120,11 +1210,14 @@ export class AccessorTreeGenerator {
 					deletedState.markersContainer,
 					deletedState.creationParameters,
 					entityState.onChildFieldUpdate,
+					initialEventListeners,
 				)
 				entityState.fields.set(placeholderName, newEntityState)
 			}
 			// TODO update the changes count
 			entityState.childrenWithPendingUpdates?.delete(deletedState)
+
+			this.markPendingConnections(entityState, relevantPlaceholders)
 		}
 
 		const resolveHasOneRelationMarkers = (field: FieldName, message: string): Set<HasOneRelationMarker> => {
@@ -1148,6 +1241,11 @@ export class AccessorTreeGenerator {
 		}
 
 		this.initializeEntityFields(entityState, markersContainer)
+
+		if (entityState.eventListeners.initialize?.size) {
+			this.newlyInitializedWithListeners.add(entityState)
+		}
+
 		return entityState
 	}
 
@@ -1157,6 +1255,7 @@ export class AccessorTreeGenerator {
 		creationParameters: EntityCreationParameters & EntityListPreferences,
 		onEntityListUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
+		initialEventListeners: EntityListEventListeners | undefined,
 	): InternalEntityListState {
 		const entityListState: InternalEntityListState = {
 			type: InternalStateType.EntityList,
@@ -1169,10 +1268,7 @@ export class AccessorTreeGenerator {
 			childrenKeys: new Set(),
 			childrenWithPendingUpdates: undefined,
 			environment,
-			eventListeners: {
-				update: undefined,
-				beforeUpdate: undefined,
-			},
+			eventListeners: TreeParameterMerger.cloneEntityListEventListeners(initialEventListeners?.eventListeners),
 			errors: emptyArray,
 			plannedRemovals: undefined,
 			hasPendingParentNotification: false,
@@ -1382,6 +1478,7 @@ export class AccessorTreeGenerator {
 				entityListState.markersContainer,
 				entityListState.creationParameters,
 				entityListState.onChildEntityUpdate,
+				this.getEventListenersForListEntity(entityListState),
 			)
 
 			entityListState.hasStaleAccessor = true
@@ -1532,6 +1629,42 @@ export class AccessorTreeGenerator {
 		state.childrenWithPendingUpdates.add(updatedState as InternalEntityState)
 	}
 
+	private findChildPlaceholdersByState(containingState: InternalEntityState, childState: InternalStateNode) {
+		const relevantPlaceholders = new Set<FieldName>()
+
+		// All has one relations where this entity is present.
+		for (const [placeholderName, candidateState] of containingState.fields) {
+			if (candidateState === childState) {
+				relevantPlaceholders.add(placeholderName)
+			}
+		}
+
+		return relevantPlaceholders
+	}
+
+	private markPendingConnections(parentState: InternalEntityState, connectionPlaceholders: Set<FieldName>) {
+		if (parentState.fieldsWithPendingConnectionUpdates === undefined) {
+			parentState.fieldsWithPendingConnectionUpdates = new Set()
+		}
+		placeholders: for (const [fieldName, placeholderNames] of parentState.markersContainer.placeholders) {
+			if (typeof placeholderNames === 'string') {
+				if (connectionPlaceholders.has(placeholderNames)) {
+					parentState.fieldsWithPendingConnectionUpdates.add(fieldName)
+				}
+			} else {
+				for (const placeholderName of placeholderNames) {
+					if (connectionPlaceholders.has(placeholderName)) {
+						parentState.fieldsWithPendingConnectionUpdates.add(fieldName)
+						continue placeholders
+					}
+				}
+			}
+		}
+		if (parentState.fieldsWithPendingConnectionUpdates.size === 0) {
+			parentState.fieldsWithPendingConnectionUpdates = undefined
+		}
+	}
+
 	private resolveAndPrepareEntityToConnect(
 		entityToConnectOrItsKey: string | EntityAccessor,
 	): [string, InternalEntityState] {
@@ -1561,6 +1694,69 @@ export class AccessorTreeGenerator {
 		}
 
 		return [connectedEntityKey, connectedState]
+	}
+
+	private getEventListenersForListEntity(
+		containingListState: InternalEntityListState,
+		additionalMarker?: HasManyRelationMarker,
+	): SingleEntityEventListeners {
+		const create = (base: {
+			eventListeners: EntityListEventListeners['eventListeners']
+		}): SingleEntityEventListeners['eventListeners'] => ({
+			beforePersist: undefined,
+			initialize: base.eventListeners.childInitialize,
+			beforeUpdate: undefined,
+			update: undefined,
+			connectionUpdate: undefined,
+		})
+
+		let eventListeners: SingleEntityEventListeners['eventListeners'] = create(containingListState)
+		if (additionalMarker) {
+			eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
+				eventListeners,
+				create(additionalMarker.relation),
+			)
+		}
+		return {
+			eventListeners,
+		}
+	}
+
+	private triggerOnBeforePersist(): boolean {
+		let hasBeforePersist = false
+
+		this.treeWideBatchUpdateDepth++
+		for (const [, subTreeState] of this.subTreeStates) {
+			for (const iNode of InternalStateIterator.depthFirstINodes(
+				this.entityStore,
+				subTreeState,
+				iNode => iNode.eventListeners.beforePersist !== undefined,
+			)) {
+				for (const listener of iNode.eventListeners.beforePersist!) {
+					listener(iNode.getAccessor as any) // TS can't quite handle this but this is sound.
+					hasBeforePersist = true
+				}
+			}
+		}
+		this.treeWideBatchUpdateDepth--
+
+		return this.triggerOnInitialize() || hasBeforePersist
+	}
+
+	private triggerOnInitialize(): boolean {
+		let hasOnInitialize = false
+
+		this.treeWideBatchUpdateDepth++
+		for (const state of this.newlyInitializedWithListeners) {
+			for (const listener of state.eventListeners.initialize!) {
+				listener(state.getAccessor as any)
+				hasOnInitialize = true
+			}
+		}
+		this.treeWideBatchUpdateDepth--
+		this.newlyInitializedWithListeners.clear()
+
+		return hasOnInitialize
 	}
 
 	private getAddEventListener(state: {
@@ -1602,6 +1798,23 @@ export class AccessorTreeGenerator {
 					handler(state.getAccessor() as any)
 				}
 			}
+			if (
+				state.type === InternalStateType.SingleEntity &&
+				state.fieldsWithPendingConnectionUpdates &&
+				state.eventListeners.connectionUpdate
+			) {
+				for (const updatedField of state.fieldsWithPendingConnectionUpdates) {
+					const listenersMap = state.eventListeners.connectionUpdate
+					const listeners = listenersMap.get(updatedField)
+					if (!listeners) {
+						continue
+					}
+					for (const listener of listeners) {
+						listener(state.getAccessor())
+					}
+				}
+			}
+
 			switch (state.type) {
 				case InternalStateType.SingleEntity:
 				case InternalStateType.EntityList: {

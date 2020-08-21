@@ -19,7 +19,6 @@ import { HasOne } from './HasOne'
 import { SingleEntityBaseProps } from './SingleEntity'
 
 export interface EntityListSubTreeAdditionalProps {
-	onBeforePersist?: EntityListAccessor.BatchUpdatesHandler
 	variables?: Environment.DeltaFactory
 }
 
@@ -54,23 +53,6 @@ export const EntityListSubTree = Component(
 		const parameters = useEntityListSubTreeParameters(props)
 		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 		const accessor = useAccessorUpdateSubscription(getAccessor)
-
-		const batchUpdates = accessor.batchUpdates
-		const addTreeRootListener = useAddTreeRootListener()
-		const onBeforePersist = props.onBeforePersist
-		const normalizedOnBeforePersist = React.useCallback(() => {
-			if (!onBeforePersist) {
-				return
-			}
-			batchUpdates(onBeforePersist)
-		}, [onBeforePersist, batchUpdates])
-
-		React.useEffect(() => {
-			if (!onBeforePersist) {
-				return
-			}
-			return addTreeRootListener('beforePersist', normalizedOnBeforePersist)
-		}, [onBeforePersist, normalizedOnBeforePersist, addTreeRootListener])
 
 		return (
 			<EntityList {...props} accessor={accessor}>

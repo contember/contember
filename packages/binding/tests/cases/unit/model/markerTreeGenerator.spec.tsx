@@ -57,6 +57,20 @@ describe('Marker tree generator', () => {
 		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
 		const typeNameMarker = [TYPENAME_KEY_NAME, new FieldMarker(TYPENAME_KEY_NAME)] as const
 
+		const singleListeners = {
+			beforePersist: undefined,
+			initialize: undefined,
+			connectionUpdate: undefined,
+			beforeUpdate: undefined,
+			update: undefined,
+		} as const
+		const listListeners = {
+			beforePersist: undefined,
+			initialize: undefined,
+			childInitialize: undefined,
+			beforeUpdate: undefined,
+			update: undefined,
+		} as const
 		const innerHasMany = new HasManyRelationMarker(
 			{
 				field: 'common',
@@ -68,6 +82,7 @@ describe('Marker tree generator', () => {
 				orderBy: undefined,
 				offset: undefined,
 				limit: undefined,
+				eventListeners: listListeners,
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -97,6 +112,7 @@ describe('Marker tree generator', () => {
 				forceCreation: false,
 				isNonbearing: false,
 				reducedBy: undefined,
+				eventListeners: singleListeners,
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -127,6 +143,7 @@ describe('Marker tree generator', () => {
 				orderBy: undefined,
 				offset: undefined,
 				limit: undefined,
+				eventListeners: listListeners,
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -154,6 +171,7 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				setOnCreate: { bar: 123 },
 				forceCreation: false,
+				eventListeners: singleListeners,
 			}),
 			new EntityFieldMarkersContainer(
 				true,

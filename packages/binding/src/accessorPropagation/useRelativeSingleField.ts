@@ -1,7 +1,8 @@
-import { useConstantValueInvariant } from '@contember/react-utils'
+import { useConstantLengthInvariant, useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
+import { useOnConnectionUpdate } from '../entityEvents'
 import { SugaredRelativeSingleField } from '../treeParameters'
 import { FieldValue } from '../treeParameters/primitives'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
@@ -31,7 +32,19 @@ function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produ
 
 	if (relativeSingleField) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return useAccessorUpdateSubscription<Persisted, Produced>(getField)
+		useConstantLengthInvariant(
+			relativeSingleField.hasOneRelationPath,
+			'Cannot change the length of the hasOneRelation path!',
+		)
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const [field, forceUpdate] = useAccessorUpdateSubscription<Persisted, Produced>(getField, true)
+
+		if (relativeSingleField.hasOneRelationPath.length) {
+			// eslint-disable-next-line react-hooks/rules-of-hooks
+			useOnConnectionUpdate(relativeSingleField.hasOneRelationPath[0].field, forceUpdate)
+		}
+
+		return field
 	}
 	return undefined
 }

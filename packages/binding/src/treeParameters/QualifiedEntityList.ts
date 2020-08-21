@@ -10,6 +10,12 @@ import {
 	SugarableEntityListParameters,
 	UnsugarableEntityListParameters,
 } from './EntityListParameters'
+import {
+	DesugaredEntityListEventListeners,
+	EntityListEventListeners,
+	SugarableEntityListEventListeners,
+	UnsugarableEntityListEventListeners,
+} from './EntityListEventListeners'
 import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import {
 	DesugaredQualifiedEntityParameters,
@@ -21,25 +27,32 @@ import {
 export interface DesugaredQualifiedEntityList
 	extends DesugaredEntityListParameters,
 		DesugaredQualifiedEntityParameters,
-		DesugaredEntityCreationParameters {
+		DesugaredEntityCreationParameters,
+		DesugaredEntityListEventListeners {
 	hasOneRelationPath: DesugaredHasOneRelation[]
 }
 
-export interface QualifiedEntityList extends EntityListParameters, QualifiedEntityParameters, EntityCreationParameters {
+export interface QualifiedEntityList
+	extends EntityListParameters,
+		QualifiedEntityParameters,
+		EntityCreationParameters,
+		EntityListEventListeners {
 	hasOneRelationPath: HasOneRelation[]
 }
 
 export interface SugarableQualifiedEntityList
 	extends SugarableEntityListParameters,
 		SugarableQualifiedEntityParameters,
-		SugarableEntityCreationParameters {
+		SugarableEntityCreationParameters,
+		SugarableEntityListEventListeners {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableQualifiedEntityList
 	extends UnsugarableEntityListParameters,
 		UnsugarableQualifiedEntityParameters,
-		UnsugarableEntityCreationParameters {
+		UnsugarableEntityCreationParameters,
+		UnsugarableEntityListEventListeners {
 	// Deliberately leaving out UnsugarableHasOneRelation
 }
 

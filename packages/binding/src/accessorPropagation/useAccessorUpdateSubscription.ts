@@ -1,6 +1,9 @@
+import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
 import { FieldValue } from '../treeParameters/primitives'
+
+export type ForceAccessorUpdate = () => void
 
 /**
  * It is VERY IMPORTANT for the parameter to be referentially stable!
@@ -10,15 +13,34 @@ function useAccessorUpdateSubscription<
 	Produced extends Persisted = Persisted
 >(getFieldAccessor: () => FieldAccessor<Persisted, Produced>): FieldAccessor<Persisted, Produced>
 function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor): EntityAccessor
-function useAccessorUpdateSubscription(getAccessor: () => EntityListAccessor): EntityListAccessor
+function useAccessorUpdateSubscription(getListAccessor: () => EntityListAccessor): EntityListAccessor
 function useAccessorUpdateSubscription(
-	getEntityListAccessor: () => EntityListAccessor | EntityAccessor,
+	getAccessor: () => EntityListAccessor | EntityAccessor,
 ): EntityListAccessor | EntityAccessor
+function useAccessorUpdateSubscription<
+	Persisted extends FieldValue = FieldValue,
+	Produced extends Persisted = Persisted
+>(
+	getFieldAccessor: () => FieldAccessor<Persisted, Produced>,
+	withForceUpdate: true,
+): [FieldAccessor<Persisted, Produced>, ForceAccessorUpdate]
+function useAccessorUpdateSubscription(
+	getEntityAccessor: () => EntityAccessor,
+	withForceUpdate: true,
+): [EntityAccessor, ForceAccessorUpdate]
+function useAccessorUpdateSubscription(
+	getListAccessor: () => EntityListAccessor,
+	withForceUpdate: true,
+): [EntityListAccessor, ForceAccessorUpdate]
+function useAccessorUpdateSubscription(
+	getAccessor: () => EntityListAccessor | EntityAccessor,
+	withForceUpdate: true,
+): [EntityListAccessor | EntityAccessor, ForceAccessorUpdate]
 function useAccessorUpdateSubscription<
 	A extends FieldAccessor<Persisted, Produced> | EntityListAccessor | EntityAccessor,
 	Persisted extends FieldValue = FieldValue,
 	Produced extends Persisted = Persisted
->(getAccessor: () => A): A {
+>(getAccessor: () => A, withForceUpdate?: true): A | [A, ForceAccessorUpdate] {
 	// This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
 	const [state, setState] = React.useState<{
 		accessor: A
@@ -28,6 +50,8 @@ function useAccessorUpdateSubscription<
 		getAccessor,
 	}))
 
+	useConstantValueInvariant(withForceUpdate, 'useAccessorUpdateSubscription: cannot change the withForceUpdate value!')
+
 	let accessor = state.accessor
 
 	if (state.getAccessor !== getAccessor) {
@@ -35,6 +59,17 @@ function useAccessorUpdateSubscription<
 			accessor: getAccessor(),
 			getAccessor,
 		})
+	}
+
+	let forceUpdate: ForceAccessorUpdate | undefined = undefined
+	if (withForceUpdate) {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		forceUpdate = React.useCallback(() => {
+			setState({
+				accessor: getAccessor(),
+				getAccessor,
+			})
+		}, [getAccessor])
 	}
 
 	const addEventListener: (
@@ -67,6 +102,9 @@ function useAccessorUpdateSubscription<
 		}
 	}, [addEventListener, getAccessor])
 
+	if (withForceUpdate && forceUpdate) {
+		return [accessor, forceUpdate]
+	}
 	return accessor
 }
 export { useAccessorUpdateSubscription }

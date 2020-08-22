@@ -1,8 +1,8 @@
 {
 	"name": "@contember/template-instance-with-admin",
-	"version": "0.5.9",
+	"version": "0.5.10",
 	"dependencies": {
-		"@contember/admin": "0.5.9",
+		"@contember/admin": "0.5.10",
 		"@contember/schema": "0.8.3",
 		"@contember/schema-definition": "0.4.0",
 		"react": "16.13.1",

@@ -9,7 +9,7 @@ export type RenderElement<
 	CustomLeaves extends RichTextLeaf
 > = React.ComponentType<{
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
-	fallback: React.FunctionComponent<RenderElementFallbackProps>
+	fallback: React.FunctionComponent<RenderElementFallbackProps<CustomElements, CustomLeaves>>
 	formatVersion: number
 	children: React.ReactElement | null
 }>

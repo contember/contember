@@ -1,12 +1,20 @@
 import * as React from 'react'
 import { BuiltinElements } from './BuiltinElements'
+import { RichTextElement } from './RichTextElement'
+import { RichTextLeaf } from './RichTextLeaf'
 
-export interface RenderElementFallbackProps {
-	element: BuiltinElements
+export interface RenderElementFallbackProps<
+	CustomElements extends RichTextElement = never,
+	CustomLeaves extends RichTextLeaf = never
+> {
+	element: BuiltinElements<CustomElements, CustomLeaves>
 	children: React.ReactElement | null
 }
 
-export function RenderElementFallback({ element, children }: RenderElementFallbackProps) {
+export function RenderElementFallback<
+	CustomElements extends RichTextElement = never,
+	CustomLeaves extends RichTextLeaf = never
+>({ element, children }: RenderElementFallbackProps<CustomElements, CustomLeaves>) {
 	// const formatVersion = React.useContext(RichTextFormatVersionContext)
 	switch (element.type) {
 		case 'anchor':

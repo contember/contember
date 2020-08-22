@@ -17,6 +17,7 @@ export const reactClientMembers = [
 	'invokeIfSupportsCredentials',
 	'loginMutation',
 	'ProjectSlugContext',
+	'RichTextRenderer',
 	'SessionTokenContext',
 	'StageSlugContext',
 	'tenantApiRelativeUrl',

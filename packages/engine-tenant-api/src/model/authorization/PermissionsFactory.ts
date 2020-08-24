@@ -7,6 +7,7 @@ class PermissionsFactory {
 		const permissions = new Permissions()
 		permissions.allow(TenantRole.SUPER_ADMIN, { resource: Permissions.ALL, privilege: Permissions.ALL })
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_SIGN_IN)
+		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_RESET_PASSWORD)
 		permissions.allow(TenantRole.SETUP, PermissionActions.SYSTEM_SETUP)
 		permissions.allow(TenantRole.SELF, PermissionActions.PERSON_CHANGE_PASSWORD)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SIGN_OUT)

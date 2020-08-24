@@ -2,6 +2,9 @@ import prompts from 'prompts'
 import { GraphQLClient } from 'graphql-request'
 import { InstanceApiEnvironment, readInstanceConfig } from './instance'
 
+const validatePassword = (password: string) =>
+	password.length < 6 ? 'Password must contain at least 6 characters' : true
+
 export const createTenantApiUrl = (url: string) => {
 	if (url.endsWith('/')) {
 		url = url.substring(0, url.length - 1)
@@ -75,7 +78,7 @@ export const interactiveAskForCredentials = async (): Promise<{ email: string; p
 			type: 'password',
 			name: 'password',
 			message: 'Superadmin password',
-			validate: password => (password.length < 6 ? 'Password must contain at least 6 characters' : true),
+			validate: validatePassword,
 		},
 	])
 
@@ -247,6 +250,48 @@ const interactiveResolveMemberships = async ({
 	return { project, memberships }
 }
 
+export const interactiveResetPassword = async ({
+	apiUrl,
+	loginToken,
+}: {
+	apiUrl: string
+	loginToken: string
+}): Promise<void> => {
+	const { email } = await prompts([
+		{
+			type: 'text',
+			name: 'email',
+			message: 'E-mail',
+		},
+	])
+	if (!email) {
+		throw `Aborted`
+	}
+	const client = TenantClient.create(apiUrl, loginToken)
+	await client.createResetPasswordRequest(email)
+	console.log('A reset token has been sent to given email')
+
+	const { token, password } = await prompts([
+		{
+			type: 'text',
+			name: 'token',
+			message: 'Token',
+		},
+		{
+			type: 'password',
+			name: 'password',
+			message: 'Password',
+			validate: validatePassword,
+		},
+	])
+	if (!token || !password) {
+		throw 'Aborted'
+	}
+	await client.resetPassword(token, password)
+
+	console.log('Password reset successful. You can now login using a new password')
+}
+
 type MembershipVariable = {
 	name: string
 	values: string[]
@@ -386,5 +431,39 @@ export class TenantClient {
 		)
 		const loginToken = result.setup.result.loginKey.token
 		return { loginToken }
+	}
+
+	public async createResetPasswordRequest(email: string): Promise<void> {
+		const query = `mutation($email: String!) {
+  createResetPasswordRequest(email: $email) {
+    ok
+    errors {
+      code
+    }
+  }
+}`
+		const result = await this.apiClient.request<{
+			createResetPasswordRequest: { ok: boolean; errors: { code: string }[] }
+		}>(query, { email })
+		if (!result.createResetPasswordRequest.ok) {
+			throw result.createResetPasswordRequest.errors.map((it: any) => it.code)
+		}
+	}
+
+	public async resetPassword(token: string, password: string): Promise<void> {
+		const query = `mutation($token: String!, $password: String!) {
+  resetPassword(token: $token, password: $password) {
+    ok
+    errors {
+      code
+    }
+  }
+}`
+		const result = await this.apiClient.request<{
+			resetPassword: { ok: boolean; errors: { code: string }[] }
+		}>(query, { token, password })
+		if (!result.resetPassword.ok) {
+			throw result.resetPassword.errors.map((it: any) => it.code)
+		}
 	}
 }

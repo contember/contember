@@ -1,5 +1,6 @@
 import { DatabaseQueryable, DatabaseQuery, SelectBuilder, Operator } from '@contember/database'
 import { ApiKey } from '../type'
+import { computeTokenHash } from '../utils/tokenUtils'
 
 class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
 	constructor(private readonly token: string) {
@@ -7,7 +8,7 @@ class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
 	}
 
 	async fetch({ db }: DatabaseQueryable): Promise<ApiKeyByTokenQuery.Result> {
-		const tokenHash = ApiKey.computeTokenHash(this.token)
+		const tokenHash = computeTokenHash(this.token)
 		const rows = await SelectBuilder.create<ApiKeyByTokenQuery.Row>()
 			.select(['api_key', 'id'])
 			.select(['api_key', 'type'])

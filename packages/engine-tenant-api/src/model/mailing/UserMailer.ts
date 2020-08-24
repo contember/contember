@@ -1,11 +1,14 @@
 import { Mailer, TemplateRenderer } from '../../utils'
 import NewUserInvited from './templates/NewUserInvited.mustache'
 import ExistingUserInvited from './templates/ExistingUserInvited.mustache'
+import PasswordReset from './templates/PasswordReset.mustache'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 import { MailTemplateQuery } from '../queries/MailTemplateQuery'
 import Layout from './templates/Layout.mustache'
+
+type SomeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 export class UserMailer {
 	constructor(
@@ -36,6 +39,17 @@ export class UserMailer {
 		await this.sendTemplate(template, mailArguments)
 	}
 
+	async sendPasswordResetEmail(
+		mailArguments: { email: string; token: string; project?: string },
+		customMailOptions: { projectId?: string; variant: string },
+	): Promise<void> {
+		const template = (await this.getCustomTemplate({ type: MailType.passwordReset, ...customMailOptions })) || {
+			subject: 'Password reset',
+			content: PasswordReset,
+		}
+		await this.sendTemplate(template, mailArguments)
+	}
+
 	private async sendTemplate(
 		template: Pick<MailTemplateData, 'subject' | 'content'>,
 		mailArguments: Record<string, any>,
@@ -49,8 +63,11 @@ export class UserMailer {
 	}
 
 	private async getCustomTemplate(
-		identifier: MailTemplateIdentifier,
+		identifier: SomeOptional<MailTemplateIdentifier, 'projectId'>,
 	): Promise<Pick<MailTemplateData, 'subject' | 'content'> | null> {
+		if (!identifier.projectId) {
+			return null
+		}
 		const customTemplate = await this.queryHandler.fetch(
 			new MailTemplateQuery(identifier.projectId, identifier.type, identifier.variant),
 		)

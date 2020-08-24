@@ -1,8 +1,8 @@
 import { Command } from './Command'
 import { ApiKey } from '../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
-import { Providers } from '../providers'
 import { InsertBuilder } from '@contember/database'
+import { computeTokenHash, generateToken } from '../utils'
 
 class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 	private readonly type: ApiKey.Type
@@ -19,8 +19,8 @@ class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 
 	async execute({ db, providers }: Command.Args): Promise<CreateApiKeyCommand.Result> {
 		const apiKeyId = providers.uuid()
-		const token = await this.generateToken(providers)
-		const tokenHash = ApiKey.computeTokenHash(token)
+		const token = await generateToken(providers)
+		const tokenHash = computeTokenHash(token)
 
 		await InsertBuilder.create()
 			.into('api_key')
@@ -37,10 +37,6 @@ class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 			.execute(db)
 
 		return new CreateApiKeyCommand.Result(apiKeyId, token)
-	}
-
-	private async generateToken(providers: Providers): Promise<string> {
-		return (await providers.randomBytes(20)).toString('hex')
 	}
 }
 

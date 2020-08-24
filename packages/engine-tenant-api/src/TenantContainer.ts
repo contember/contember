@@ -11,6 +11,7 @@ import {
 	InviteManager,
 	MailTemplateManager,
 	PasswordChangeManager,
+	PasswordResetManager,
 	PermissionContextFactory,
 	PermissionsFactory,
 	ProjectManager,
@@ -50,6 +51,7 @@ import { AclSchemaEvaluatorFactory } from './model/authorization/AclSchemaEvalua
 import { MembershipValidator } from './model/service'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
 import { OtpManager } from './model/service'
+import { ResetPasswordMutationResolver } from './resolvers/mutation/person/ResetPasswordMutationResolver'
 
 interface TenantContainer {
 	connection: Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
@@ -129,14 +131,9 @@ namespace TenantContainer {
 				.addService('signUpManager', ({ queryHandler, commandBus }) => new SignUpManager(queryHandler, commandBus))
 				.addService('passwordChangeManager', ({ commandBus }) => new PasswordChangeManager(commandBus))
 				.addService(
-					'signInManager',
-					({ queryHandler, apiKeyManager, providers }) => new SignInManager(queryHandler, apiKeyManager, providers),
-				)
-				.addService(
 					'projectMemberManager',
 					({ queryHandler, commandBus }) => new ProjectMemberManager(queryHandler, commandBus),
 				)
-				.addService('membershipValidator', () => new MembershipValidator(projectSchemaResolver))
 				.addService('identityFactory', ({ projectMemberManager }) => new IdentityFactory(projectMemberManager))
 				.addService(
 					'projectScopeFactory',
@@ -148,6 +145,16 @@ namespace TenantContainer {
 						new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory),
 				)
 				.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
+				.addService(
+					'passwordResetManager',
+					({ commandBus, userMailer, permissionContextFactory, projectManager }) =>
+						new PasswordResetManager(commandBus, userMailer, permissionContextFactory, projectManager),
+				)
+				.addService(
+					'signInManager',
+					({ queryHandler, apiKeyManager, providers }) => new SignInManager(queryHandler, apiKeyManager, providers),
+				)
+				.addService('membershipValidator', () => new MembershipValidator(projectSchemaResolver))
 				.addService('inviteManager', ({ db, providers, userMailer }) => new InviteManager(db, providers, userMailer))
 				.addService('otpManager', ({ commandBus }) => new OtpManager(commandBus))
 				.addService('mailTemplateManager', ({ commandBus }) => new MailTemplateManager(commandBus))
@@ -186,6 +193,11 @@ namespace TenantContainer {
 					'changePasswordMutationResolver',
 					({ passwordChangeManager, queryHandler }) =>
 						new ChangePasswordMutationResolver(passwordChangeManager, queryHandler),
+				)
+				.addService(
+					'resetPasswordMutationResolver',
+					({ passwordResetManager, queryHandler }) =>
+						new ResetPasswordMutationResolver(passwordResetManager, queryHandler),
 				)
 				.addService(
 					'inviteMutationResolver',

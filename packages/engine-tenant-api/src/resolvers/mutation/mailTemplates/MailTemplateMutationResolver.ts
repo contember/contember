@@ -90,6 +90,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		return {
 			[SchemaMailType.ExistingUserInvited]: MailType.existingUserInvited,
 			[SchemaMailType.NewUserInvited]: MailType.newUserInvited,
+			[SchemaMailType.ResetPasswordRequest]: MailType.passwordReset,
 		}[type]
 	}
 }

@@ -1,9 +1,9 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
-import { ApiKey, TenantMigrationArgs } from '../'
+import { computeTokenHash, TenantMigrationArgs } from '../'
 
 export default async function(builder: MigrationBuilder, args: TenantMigrationArgs) {
 	if (args.credentials.loginToken) {
-		const tokenHash = ApiKey.computeTokenHash(args.credentials.loginToken)
+		const tokenHash = computeTokenHash(args.credentials.loginToken)
 		builder.sql(`
 			WITH identity AS (
 			    INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
@@ -23,7 +23,7 @@ export default async function(builder: MigrationBuilder, args: TenantMigrationAr
 		const rootPassword = args.credentials.rootPassword || null
 		const rootPasswordHash = rootPassword ? await args.providers.bcrypt(rootPassword) : null
 
-		const rootTokenHash = args.credentials.rootToken ? ApiKey.computeTokenHash(args.credentials.rootToken) : null
+		const rootTokenHash = args.credentials.rootToken ? computeTokenHash(args.credentials.rootToken) : null
 
 		builder.sql(`
 			WITH identity AS (

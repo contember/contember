@@ -1,7 +1,6 @@
-import { AuthorizationScope } from '@contember/authorization'
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { ProjectsQuery } from './ProjectsQuery'
-import { PermissionActions, PermissionContext, StaticIdentity } from '../authorization'
+import { PermissionActions, PermissionContext } from '../authorization'
 
 class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Result> {
 	constructor(private readonly identityId: string, private readonly permissionContext: PermissionContext) {
@@ -9,24 +8,11 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<ProjectsByIdentityQuery.Result> {
-		const identityResult = await SelectBuilder.create<{ roles: string[] }>()
-			.from('identity')
-			.where({
-				id: this.identityId,
-			})
-			.select('roles')
-			.getResult(queryable.db)
-		const identityRow = this.fetchOneOrNull(identityResult)
-		if (!identityRow) {
-			return []
-		}
-		const identity = new StaticIdentity(this.identityId, identityRow.roles)
-		const canViewAll = await this.permissionContext.authorizator.isAllowed(
-			identity,
-			new AuthorizationScope.Global(),
-			PermissionActions.PROJECT_VIEW,
-		)
-		if (canViewAll && this.identityId === this.permissionContext.identity.id) {
+		const canAuthorizedEntityViewAll = await this.permissionContext.isAllowed({
+			action: PermissionActions.PROJECT_VIEW,
+		})
+
+		if (this.identityId === this.permissionContext.identity.id && canAuthorizedEntityViewAll) {
 			return await new ProjectsQuery().fetch(queryable)
 		}
 
@@ -46,11 +32,6 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 						}),
 				),
 			)
-
-		const canAuthorizedEntityViewAll = await this.permissionContext.isAllowed({
-			scope: new AuthorizationScope.Global(),
-			action: PermissionActions.PROJECT_VIEW,
-		})
 
 		const qbWithIdentityPermissions = canAuthorizedEntityViewAll
 			? qb

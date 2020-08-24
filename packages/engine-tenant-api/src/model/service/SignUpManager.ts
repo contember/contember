@@ -5,6 +5,7 @@ import { PersonQuery, PersonRow } from '../queries'
 import { SignUpErrorCode } from '../../schema'
 import { CommandBus } from '../commands/CommandBus'
 import { TenantRole } from '../authorization/Roles'
+import { isWeakPassword } from '../utils/password'
 
 class SignUpManager {
 	constructor(
@@ -16,7 +17,7 @@ class SignUpManager {
 		if (await this.isEmailAlreadyUsed(email)) {
 			return new SignUpManager.SignUpResultError([SignUpErrorCode.EmailAlreadyExists])
 		}
-		if (password.length < 6) {
+		if (isWeakPassword(password)) {
 			return new SignUpManager.SignUpResultError([SignUpErrorCode.TooWeak])
 		}
 		const person = await this.commandBus.transaction(async bus => {

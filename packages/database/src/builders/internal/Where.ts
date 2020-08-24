@@ -49,7 +49,7 @@ namespace Where {
 		where(expression: Expression): any
 	}
 
-	export type ValueWhere = { [columName: string]: Value }
+	export type ValueWhere = { [columnName: string]: Value }
 	export type Expression = ValueWhere | ConditionCallback | Literal
 }
 

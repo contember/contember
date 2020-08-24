@@ -12,6 +12,7 @@ const schema: DocumentNode = gql`
 		projects: [Project!]!
 		projectBySlug(slug: String!): Project
 		projectMemberships(projectSlug: String!, identityId: String!): [Membership!]!
+		checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
 	}
 
 	type Mutation {
@@ -21,6 +22,16 @@ const schema: DocumentNode = gql`
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
+
+		prepareOtp(label: String): PrepareOtpResponse
+		confirmOtp(otpToken: String!): ConfirmOtpResponse
+		disableOtp: DisableOtpResponse
+
+		createResetPasswordRequest(
+			email: String!
+			options: CreateResetPasswordRequestOptions
+		): CreatePasswordResetRequestResponse
+		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
 		invite(
 			email: String!
@@ -50,10 +61,6 @@ const schema: DocumentNode = gql`
 
 		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
-
-		prepareOtp(label: String): PrepareOtpResponse
-		confirmOtp(otpToken: String!): ConfirmOtpResponse
-		disableOtp: DisableOtpResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
@@ -455,6 +462,7 @@ const schema: DocumentNode = gql`
 	enum MailType {
 		EXISTING_USER_INVITED
 		NEW_USER_INVITED
+		RESET_PASSWORD_REQUEST
 	}
 
 	input MailTemplateIdentifier {
@@ -493,6 +501,57 @@ const schema: DocumentNode = gql`
 	enum RemoveMailTemplateErrorCode {
 		PROJECT_NOT_FOUND
 		TEMPLATE_NOT_FOUND
+	}
+
+	# === password reset ===
+
+	type CheckResetPasswordTokenResult {
+		code: CheckResetPasswordTokenCode!
+	}
+
+	enum CheckResetPasswordTokenCode {
+		REQUEST_NOT_FOUND
+		TOKEN_NOT_FOUND
+		TOKEN_USED
+		TOKEN_EXPIRED
+	}
+
+	type CreatePasswordResetRequestResponse {
+		ok: Boolean!
+		errors: [CreatePasswordResetRequestError!]!
+	}
+
+	type CreatePasswordResetRequestError {
+		code: CreatePasswordResetRequestErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum CreatePasswordResetRequestErrorCode {
+		PERSON_NOT_FOUND
+	}
+
+	type ResetPasswordResponse {
+		ok: Boolean!
+		errors: [ResetPasswordError!]!
+	}
+	type ResetPasswordError {
+		code: ResetPasswordErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum ResetPasswordErrorCode {
+		TOKEN_NOT_FOUND
+		TOKEN_USED
+		TOKEN_EXPIRED
+
+		PASSWORD_TOO_WEAK
+	}
+
+	input CreateResetPasswordRequestOptions {
+		mailProject: String
+		mailVariant: String
 	}
 `
 

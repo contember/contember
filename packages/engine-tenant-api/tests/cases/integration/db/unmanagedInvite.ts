@@ -1,8 +1,6 @@
 import 'jasmine'
 import { createTenantTester } from '../../../src/testTenantDb'
-import { inviteMutation } from '../mocked/gql/invite'
 import { testUuid } from '../../../src/testUuid'
-import { GQL } from '../../../src/tags'
 import { unmanagedInviteMutation } from '../mocked/gql/unmanagedInvite'
 import { signInMutation } from '../mocked/gql/signIn'
 import { TenantRole } from '../../../../src/model/authorization'

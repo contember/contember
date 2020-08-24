@@ -1,6 +1,7 @@
 export enum MailType {
 	existingUserInvited = 'existingUserInvited',
 	newUserInvited = 'newUserInvited',
+	passwordReset = 'passwordReset',
 }
 
 export interface MailTemplateIdentifier {

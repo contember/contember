@@ -1,5 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { Input } from '@contember/schema'
+import { Input } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
 import {

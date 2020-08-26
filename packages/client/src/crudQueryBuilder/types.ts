@@ -20,11 +20,11 @@ export type HasOneArguments = 'filter'
 
 export type HasManyArguments = 'filter' | 'orderBy' | 'offset' | 'limit'
 
-export type UpdateMutationFields = 'ok' | 'validation' | 'errors' | 'node'
+export type UpdateMutationFields = 'ok' | 'validation' | 'errors' | 'errorMessage' | 'node'
 
-export type CreateMutationFields = 'ok' | 'validation' | 'errors' | 'node'
+export type CreateMutationFields = 'ok' | 'validation' | 'errors' | 'errorMessage' | 'node'
 
-export type DeleteMutationFields = 'ok' | 'node' | 'errors'
+export type DeleteMutationFields = 'ok' | 'node' | 'errors' | 'errorMessage'
 
 export type WriteArguments = CreateMutationArguments | UpdateMutationArguments | DeleteMutationArguments
 

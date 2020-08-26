@@ -13,7 +13,6 @@
     "@contember/react-client": "0.5.10",
     "@contember/react-multipass-rendering": "0.5.10",
     "@contember/react-utils": "0.5.10",
-    "@contember/schema": "0.8.3",
     "chevrotain": "6.5.0"
   },
   "peerDependencies": {
@@ -23,7 +22,7 @@
   "devDependencies": {
     "@rollup/plugin-replace": "2.2.1",
     "@types/jest": "26.0.0",
-    "@types/react": "16.9.41",
+    "@types/react": "16.9.47",
     "@types/react-dom": "16.9.8",
     "jest": "26.0.1",
     "react": "16.12.0",

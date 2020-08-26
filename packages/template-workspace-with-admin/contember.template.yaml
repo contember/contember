@@ -1,4 +1,0 @@
-type: workspace
-remove:
-  - package-lock.json
-patchPackageJson: true

@@ -1,4 +1,4 @@
-import { Input } from '@contember/schema'
+import { Input } from '@contember/client'
 import { Literal } from '../../dao'
 
 export type Filter<T = Literal> = Input.Where<Input.Condition<Input.ColumnValue<T>>>

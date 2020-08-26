@@ -41,6 +41,10 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 		return WriteBuilder.instantiate<AA, Exclude<AF, 'ok'>, Op>(this.objectBuilder.field('ok'))
 	}
 
+	public errorMessage() {
+		return WriteBuilder.instantiate<AA, Exclude<AF, 'errorMessage'>, Op>(this.objectBuilder.field('errorMessage'))
+	}
+
 	public validation() {
 		return WriteBuilder.instantiate<AA, Exclude<AF, 'validation'>, Op>(
 			ValidationRelationBuilder.validationRelation(this.objectBuilder),

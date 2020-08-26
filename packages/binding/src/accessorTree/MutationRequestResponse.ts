@@ -1,4 +1,4 @@
-import { Result } from '@contember/schema'
+import { Result } from '@contember/client'
 
 export interface FieldPathErrorFragment {
 	__typename: '_FieldPathFragment'
@@ -30,6 +30,7 @@ export interface ExecutionError {
 
 export interface MutationResponse {
 	ok: boolean
+	errorMessage: string | null
 	errors: ExecutionError[]
 	validation: {
 		valid: boolean

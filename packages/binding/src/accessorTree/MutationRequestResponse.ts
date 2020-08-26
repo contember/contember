@@ -1,4 +1,4 @@
-import { Result } from '@contember/schema'
+import { Result } from '@contember/client'
 
 export interface FieldPathErrorFragment {
 	__typename: '_FieldPathFragment'

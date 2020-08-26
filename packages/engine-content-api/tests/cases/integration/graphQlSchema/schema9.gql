@@ -44,7 +44,7 @@ type Author {
   id: UUID!
   name: String
   posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
-  postsByLocales(by: AuthorPostsByLocalesUniqueWhere, filter: PostWhere): Post
+  postsByLocales(by: AuthorPostsByLocalesUniqueWhere!, filter: PostWhere): Post
 }
 
 type AuthorConnection {
@@ -373,7 +373,7 @@ type Post {
   categories(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
   author(filter: AuthorWhere): Author
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
-  localesByLocale(by: PostLocalesByLocaleUniqueWhere, filter: PostLocaleWhere): PostLocale
+  localesByLocale(by: PostLocalesByLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
 }
 
 type PostConnection {

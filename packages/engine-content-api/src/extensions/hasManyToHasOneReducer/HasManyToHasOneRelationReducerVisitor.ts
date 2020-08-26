@@ -97,7 +97,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 							relationName: relation.name,
 						},
 						args: {
-							by: { type: uniqueWhere },
+							by: { type: this.graphqlObjectFactories.createNotNull(uniqueWhere) },
 							filter: { type: this.whereTypeProvider.getEntityWhereType(targetEntity.name) },
 						},
 						resolve: aliasAwareResolver,

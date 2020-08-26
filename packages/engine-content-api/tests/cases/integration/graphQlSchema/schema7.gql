@@ -102,7 +102,7 @@ type Post {
   id: UUID!
   publishedAt: DateTime
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
-  localesByLocale(by: PostLocalesByLocaleUniqueWhere, filter: PostLocaleWhere): PostLocale
+  localesByLocale(by: PostLocalesByLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
 }
 
 type PostConnection {

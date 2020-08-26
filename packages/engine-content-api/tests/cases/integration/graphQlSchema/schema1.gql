@@ -44,6 +44,7 @@ type Author {
   id: UUID!
   name: String
   posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
+  postsByLocales(by: AuthorPostsByLocalesUniqueWhere, filter: PostWhere): Post
 }
 
 type AuthorConnection {
@@ -95,8 +96,13 @@ input AuthorOrderBy {
   name: OrderDirection
 }
 
+input AuthorPostsByLocalesUniqueWhere {
+  locales: PostLocaleUniqueWhere
+}
+
 input AuthorUniqueWhere {
   id: UUID
+  posts: PostUniqueWhere
 }
 
 input AuthorUpdateInput {
@@ -520,6 +526,7 @@ input PostOrderBy {
 
 input PostUniqueWhere {
   id: UUID
+  locales: PostLocaleUniqueWhere
 }
 
 input PostUpdateAuthorEntityRelationInput {

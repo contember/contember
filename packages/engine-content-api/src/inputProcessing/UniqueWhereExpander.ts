@@ -1,6 +1,7 @@
 import { Input, Model } from '@contember/schema'
-import { getTargetEntity, getUniqueConstraints } from '@contember/schema-utils'
+import { getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../exception'
+import { getFieldsForUniqueWhere } from '../utils/uniqueWhereFields'
 
 export class UniqueWhereExpander {
 	constructor(private readonly schema: Model.Schema) {}
@@ -12,8 +13,8 @@ export class UniqueWhereExpander {
 			if (isFilled(entity.primary)) {
 				return true
 			}
-			uniqueKeys: for (const unique of getUniqueConstraints(this.schema, entity)) {
-				for (const field of unique.fields) {
+			uniqueKeys: for (const fields of getFieldsForUniqueWhere(this.schema, entity)) {
+				for (const field of fields) {
 					if (!isFilled(field)) {
 						continue uniqueKeys
 					}
@@ -44,8 +45,8 @@ export class UniqueWhereExpander {
 	}
 
 	private formatErrorMessage(entity: Model.Entity, where: Input.UniqueWhere, path: string[]): string {
-		const knownUniqueKeys = [{ fields: [entity.primary] }, ...getUniqueConstraints(this.schema, entity)]
-			.map(it => it.fields.join(', '))
+		const knownUniqueKeys = getFieldsForUniqueWhere(this.schema, entity)
+			.map(it => it.join(', '))
 			.map(it => `\t - ${it}`)
 			.join('\n')
 		return `Provided where is not unique for entity ${entity.name}:

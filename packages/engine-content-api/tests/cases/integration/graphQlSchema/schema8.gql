@@ -118,6 +118,7 @@ input FrontPageUniqueWhere {
   id: UUID
   unique: One
   introVideo: VideoUniqueWhere
+  inHouseVideos: VideoUniqueWhere
 }
 
 input FrontPageUpdateInHouseVideosEntityRelationInput {

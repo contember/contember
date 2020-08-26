@@ -1,7 +1,0 @@
-type: instance
-remove:
-  - package.json
-  - package-lock.json
-  - tsconfig.json
-rename:
-  "admin/src/project.template.ts": "admin/src/project.ts"

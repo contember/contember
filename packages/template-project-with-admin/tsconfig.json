@@ -1,7 +1,0 @@
-{
-	"include": ["admin"],
-	"compilerOptions": {
-		"noEmit": true,
-		"jsx": "react"
-	}
-}

@@ -1,6 +1,6 @@
 {
 	"name": "@contember/utils",
-	"version": "0.5.10",
+	"version": "0.5.11",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",

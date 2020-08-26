@@ -8,6 +8,7 @@ type InputState = ErrorResponseMiddlewareState & ApiKeyManagerState & TimerMiddl
 
 type KoaState = InputState & AuthMiddlewareState
 
+const assumeIdentityHeader = 'x-contember-assume-identity'
 export const createAuthMiddleware = (): KoaMiddleware<KoaState> => {
 	const auth: KoaMiddleware<KoaState> = async (ctx, next) => {
 		const authHeader = ctx.request.get('Authorization')
@@ -26,12 +27,12 @@ export const createAuthMiddleware = (): KoaMiddleware<KoaState> => {
 		if (!authResult.valid) {
 			return ctx.state.fail.authorizationFailure(authResult.error)
 		}
-		ctx.state.authResult = authResult
+		ctx.state.authResult = { ...authResult, assumedIdentityId: ctx.request.get(assumeIdentityHeader) || undefined }
 		await next()
 	}
 	return auth
 }
 
 export interface AuthMiddlewareState {
-	authResult: ApiKeyManager.VerifyResultOk
+	authResult: ApiKeyManager.VerifyResultOk & { assumedIdentityId?: string }
 }

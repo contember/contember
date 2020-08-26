@@ -61,8 +61,15 @@ class ContentApolloServerFactory {
 			uuid: () => uuid.v4(),
 			now: () => new Date(),
 		}
+		let identityId = ctx.state.authResult.identityId
+		if (
+			ctx.state.authResult.assumedIdentityId &&
+			Object.values(schema.acl.roles).find(it => it.system?.assumeIdentity)
+		) {
+			identityId = ctx.state.authResult.assumedIdentityId
+		}
 		const executionContainer = new ExecutionContainerFactory(schema, permissions, providers, getArgumentValues, db =>
-			setupSystemVariables(db, ctx.state.authResult.identityId, providers),
+			setupSystemVariables(db, identityId, providers),
 		).create(partialContext)
 		return {
 			...partialContext,

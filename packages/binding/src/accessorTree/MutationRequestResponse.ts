@@ -30,6 +30,7 @@ export interface ExecutionError {
 
 export interface MutationResponse {
 	ok: boolean
+	errorMessage: string | null
 	errors: ExecutionError[]
 	validation: {
 		valid: boolean

@@ -230,6 +230,9 @@ export class AccessorTreeGenerator {
 					if (Object.keys(normalizedErrors).length) {
 						console.table(normalizedErrors)
 					}
+					if (treeDatum.errorMessage) {
+						console.error(treeDatum.errorMessage)
+					}
 				}
 			}
 		})

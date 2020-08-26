@@ -13,7 +13,6 @@
     "@contember/react-client": "0.5.10",
     "@contember/react-multipass-rendering": "0.5.10",
     "@contember/react-utils": "0.5.10",
-    "@contember/schema": "0.8.3",
     "chevrotain": "6.5.0"
   },
   "peerDependencies": {

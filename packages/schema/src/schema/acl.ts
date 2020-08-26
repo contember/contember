@@ -88,6 +88,7 @@ namespace Acl {
 		release?: SystemPermissionsLevel
 		rebase?: LimitedSystemPermissionsLevel
 		migrate?: boolean
+		assumeIdentity?: boolean
 	}
 
 	export type RolePermissions = {

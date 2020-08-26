@@ -1,5 +1,5 @@
 import { Acl, Model } from '@contember/schema'
-import { acceptFieldVisitor, getEntity, getUniqueConstraints } from '@contember/schema-utils'
+import { acceptEveryFieldVisitor, acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { GraphQLInputObjectType } from 'graphql'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import singletonFactory from '../utils/singletonFactory'
@@ -11,6 +11,7 @@ import Authorizator from '../acl/Authorizator'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
 import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
 import { ImplementationException } from '../exception'
+import { getFieldsForUniqueWhere } from '../utils/uniqueWhereFields'
 
 export default class WhereTypeProvider {
 	private whereSingleton = singletonFactory(name => this.createEntityWhereType(name))
@@ -52,8 +53,8 @@ export default class WhereTypeProvider {
 
 		const combinations: string[] = []
 
-		const definedUniqueKeys = getUniqueConstraints(this.schema, entity).map(it => it.fields)
-		const uniqueKeys: string[][] = [[entity.primary], ...definedUniqueKeys].filter(uniqueKey =>
+		const possibleUniqueWhereFields = getFieldsForUniqueWhere(this.schema, entity)
+		const uniqueKeys: string[][] = possibleUniqueWhereFields.filter(uniqueKey =>
 			uniqueKey.every(it =>
 				acceptFieldVisitor(this.schema, entityName, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator)),
 			),

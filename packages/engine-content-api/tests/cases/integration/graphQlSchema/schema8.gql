@@ -50,7 +50,7 @@ type FrontPage {
   unique: One!
   introVideo(filter: VideoWhere): Video
   inHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
-  inHouseVideosByFrontPageForIntro(by: FrontPageInHouseVideosByFrontPageForIntroUniqueWhere, filter: VideoWhere): Video
+  inHouseVideosByFrontPageForIntro(by: FrontPageInHouseVideosByFrontPageForIntroUniqueWhere!, filter: VideoWhere): Video
 }
 
 type FrontPageConnection {
@@ -118,6 +118,7 @@ input FrontPageUniqueWhere {
   id: UUID
   unique: One
   introVideo: VideoUniqueWhere
+  inHouseVideos: VideoUniqueWhere
 }
 
 input FrontPageUpdateInHouseVideosEntityRelationInput {

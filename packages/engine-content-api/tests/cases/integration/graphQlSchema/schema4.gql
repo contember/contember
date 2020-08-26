@@ -259,6 +259,7 @@ input RootOrderBy {
 
 input RootUniqueWhere {
   id: UUID
+  r: OneHasManyEntityUniqueWhere
 }
 
 input RootUpdateInput {

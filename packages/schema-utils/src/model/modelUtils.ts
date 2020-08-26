@@ -46,28 +46,6 @@ export const getTargetEntity = (
 	})
 }
 
-export const getUniqueConstraints = (schema: Model.Schema, entity: Model.Entity): Model.UniqueConstraint[] => {
-	const additionalConstraints = Object.values(
-		acceptEveryFieldVisitor<Model.UniqueConstraint | undefined>(schema, entity, {
-			visitColumn: () => undefined,
-			visitManyHasManyInversed: () => undefined,
-			visitManyHasManyOwner: () => undefined,
-			visitOneHasMany: () => undefined,
-			visitManyHasOne: () => undefined,
-			visitOneHasOneInversed: (entity, relation) => ({
-				fields: [relation.name],
-				name: NamingHelper.createUniqueConstraintName(entity.name, [relation.name]),
-			}),
-			visitOneHasOneOwner: (entity, relation) => ({
-				fields: [relation.name],
-				name: NamingHelper.createUniqueConstraintName(entity.name, [relation.name]),
-			}),
-		}),
-	).filter((it): it is Model.UniqueConstraint => !!it)
-
-	return [...Object.values(entity.unique), ...additionalConstraints]
-}
-
 export const acceptEveryFieldVisitor = <T>(
 	schema: Model.Schema,
 	entity: string | Model.Entity,

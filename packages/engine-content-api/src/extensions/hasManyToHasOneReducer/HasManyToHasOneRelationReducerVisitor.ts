@@ -2,14 +2,15 @@ import { GraphQLInputObjectType } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import EntityTypeProvider from '../../graphQLSchema/EntityTypeProvider'
 import WhereTypeProvider from '../../graphQLSchema/WhereTypeProvider'
-import { acceptFieldVisitor, getUniqueConstraints } from '@contember/schema-utils'
+import { acceptFieldVisitor } from '@contember/schema-utils'
 import { FieldAccessVisitor } from '../../graphQLSchema/FieldAccessVisitor'
 import Authorizator from '../../acl/Authorizator'
 import { aliasAwareResolver, GqlTypeName } from '../../graphQLSchema/utils'
-import { Accessor } from '../../utils/accessor'
+import { Accessor } from '../../utils'
 import HasManyToHasOneReducer from './HasManyToHasOneReducer'
 import EntityFieldsProvider from '../EntityFieldsProvider'
 import { GraphQLObjectsFactory } from '../../graphQLSchema'
+import { getFieldsForUniqueWhere } from '../../utils/uniqueWhereFields'
 
 class HasManyToHasOneRelationReducerFieldVisitor
 	implements
@@ -56,14 +57,14 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		if (!targetRelation) {
 			return {}
 		}
-		const uniqueConstraints = getUniqueConstraints(this.schema, targetEntity).map(unique => unique.fields)
+		const uniqueConstraints = getFieldsForUniqueWhere(this.schema, targetEntity)
 		const composedUnique = uniqueConstraints
 			.filter(fields => fields.length === 2) //todo support all uniques
 			.filter(fields => fields.includes(targetRelation.name))
 			.map(fields => fields.filter(it => it !== targetRelation.name))
 			.map(fields => fields[0])
 		const singleUnique = uniqueConstraints
-			.filter(fields => fields.length === 1)
+			.filter(fields => fields.length === 1 && fields[0] !== targetEntity.primary)
 			.map(fields => fields[0])
 			.filter(it => it !== targetRelation.name)
 
@@ -96,7 +97,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 							relationName: relation.name,
 						},
 						args: {
-							by: { type: uniqueWhere },
+							by: { type: this.graphqlObjectFactories.createNotNull(uniqueWhere) },
 							filter: { type: this.whereTypeProvider.getEntityWhereType(targetEntity.name) },
 						},
 						resolve: aliasAwareResolver,

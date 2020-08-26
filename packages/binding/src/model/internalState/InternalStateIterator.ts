@@ -9,10 +9,23 @@ export class InternalStateIterator {
 		root: InternalEntityState | InternalEntityListState,
 		match: (iNode: InternalEntityState | InternalEntityListState) => boolean,
 	): Generator<InternalEntityState | InternalEntityListState, void> {
+		yield* this.depthFirstINodesImplementation(store, root, match, new Set())
+	}
+
+	private static *depthFirstINodesImplementation(
+		store: Map<string, InternalEntityState>,
+		root: InternalEntityState | InternalEntityListState,
+		match: (iNode: InternalEntityState | InternalEntityListState) => boolean,
+		visitedINodes: Set<InternalEntityState | InternalEntityListState>,
+	): Generator<InternalEntityState | InternalEntityListState, void> {
+		if (visitedINodes.has(root)) {
+			return
+		}
+		visitedINodes.add(root)
 		if (root.type === InternalStateType.SingleEntity) {
 			for (const [, childState] of root.fields) {
 				if (childState.type === InternalStateType.SingleEntity || childState.type === InternalStateType.EntityList) {
-					yield* this.depthFirstINodes(store, childState, match)
+					yield* this.depthFirstINodesImplementation(store, childState, match, visitedINodes)
 				}
 			}
 		} else if (root.type === InternalStateType.EntityList) {
@@ -21,7 +34,7 @@ export class InternalStateIterator {
 				if (child === undefined) {
 					continue
 				}
-				yield* this.depthFirstINodes(store, child, match)
+				yield* this.depthFirstINodesImplementation(store, child, match, visitedINodes)
 			}
 		} else {
 			return assertNever(root)

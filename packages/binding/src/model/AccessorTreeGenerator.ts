@@ -1673,12 +1673,14 @@ export class AccessorTreeGenerator {
 		if (typeof entityToConnectOrItsKey === 'string') {
 			connectedEntityKey = entityToConnectOrItsKey
 		} else {
-			if (!entityToConnectOrItsKey.existsOnServer) {
-				throw new BindingError(
-					`Attempting to connect an entity with key '${entityToConnectOrItsKey.key}' that ` +
-						`doesn't exist on server. That is currently impossible.`, // At least for now.
-				)
-			}
+			// TODO This is commented out for now in order to at least somewhat mitigate the limitations of dealing with
+			//		inversed relations. However, once that has been addressed systemically, this code needs to be re-enabled.
+			// if (!entityToConnectOrItsKey.existsOnServer) {
+			// 	throw new BindingError(
+			// 		`Attempting to connect an entity with key '${entityToConnectOrItsKey.key}' that ` +
+			// 			`doesn't exist on server. That is currently impossible.`, // At least for now.
+			// 	)
+			// }
 			connectedEntityKey = entityToConnectOrItsKey.key
 		}
 

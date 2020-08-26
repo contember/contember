@@ -87,6 +87,18 @@ export type ChangePasswordResponse = {
 	readonly errors: ReadonlyArray<ChangePasswordError>
 }
 
+export enum CheckResetPasswordTokenCode {
+	RequestNotFound = 'REQUEST_NOT_FOUND',
+	TokenNotFound = 'TOKEN_NOT_FOUND',
+	TokenUsed = 'TOKEN_USED',
+	TokenExpired = 'TOKEN_EXPIRED',
+}
+
+export type CheckResetPasswordTokenResult = {
+	readonly __typename?: 'CheckResetPasswordTokenResult'
+	readonly code: CheckResetPasswordTokenCode
+}
+
 export type ConfirmOtpError = {
 	readonly __typename?: 'ConfirmOtpError'
 	readonly code: ConfirmOtpErrorCode
@@ -129,6 +141,28 @@ export type CreateApiKeyResponse = {
 export type CreateApiKeyResult = {
 	readonly __typename?: 'CreateApiKeyResult'
 	readonly apiKey: ApiKeyWithToken
+}
+
+export type CreatePasswordResetRequestError = {
+	readonly __typename?: 'CreatePasswordResetRequestError'
+	readonly code: CreatePasswordResetRequestErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum CreatePasswordResetRequestErrorCode {
+	PersonNotFound = 'PERSON_NOT_FOUND',
+}
+
+export type CreatePasswordResetRequestResponse = {
+	readonly __typename?: 'CreatePasswordResetRequestResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<CreatePasswordResetRequestError>
+}
+
+export type CreateResetPasswordRequestOptions = {
+	readonly mailProject?: Maybe<Scalars['String']>
+	readonly mailVariant?: Maybe<Scalars['String']>
 }
 
 export type DisableApiKeyError = {
@@ -230,6 +264,7 @@ export type MailTemplateIdentifier = {
 export enum MailType {
 	ExistingUserInvited = 'EXISTING_USER_INVITED',
 	NewUserInvited = 'NEW_USER_INVITED',
+	ResetPasswordRequest = 'RESET_PASSWORD_REQUEST',
 }
 
 export enum Member_Type {
@@ -255,6 +290,11 @@ export type Mutation = {
 	readonly signIn?: Maybe<SignInResponse>
 	readonly signOut?: Maybe<SignOutResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
+	readonly prepareOtp?: Maybe<PrepareOtpResponse>
+	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
+	readonly disableOtp?: Maybe<DisableOtpResponse>
+	readonly createResetPasswordRequest?: Maybe<CreatePasswordResetRequestResponse>
+	readonly resetPassword?: Maybe<ResetPasswordResponse>
 	readonly invite?: Maybe<InviteResponse>
 	readonly unmanagedInvite?: Maybe<InviteResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
@@ -262,9 +302,6 @@ export type Mutation = {
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
-	readonly prepareOtp?: Maybe<PrepareOtpResponse>
-	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
-	readonly disableOtp?: Maybe<DisableOtpResponse>
 	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 }
@@ -291,6 +328,24 @@ export type MutationSignOutArgs = {
 
 export type MutationChangePasswordArgs = {
 	personId: Scalars['String']
+	password: Scalars['String']
+}
+
+export type MutationPrepareOtpArgs = {
+	label?: Maybe<Scalars['String']>
+}
+
+export type MutationConfirmOtpArgs = {
+	otpToken: Scalars['String']
+}
+
+export type MutationCreateResetPasswordRequestArgs = {
+	email: Scalars['String']
+	options?: Maybe<CreateResetPasswordRequestOptions>
+}
+
+export type MutationResetPasswordArgs = {
+	token: Scalars['String']
 	password: Scalars['String']
 }
 
@@ -333,14 +388,6 @@ export type MutationCreateApiKeyArgs = {
 
 export type MutationDisableApiKeyArgs = {
 	id: Scalars['String']
-}
-
-export type MutationPrepareOtpArgs = {
-	label?: Maybe<Scalars['String']>
-}
-
-export type MutationConfirmOtpArgs = {
-	otpToken: Scalars['String']
 }
 
 export type MutationAddProjectMailTemplateArgs = {
@@ -395,6 +442,7 @@ export type Query = {
 	readonly projects: ReadonlyArray<Project>
 	readonly projectBySlug?: Maybe<Project>
 	readonly projectMemberships: ReadonlyArray<Membership>
+	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 }
 
 export type QueryProjectBySlugArgs = {
@@ -404,6 +452,11 @@ export type QueryProjectBySlugArgs = {
 export type QueryProjectMembershipsArgs = {
 	projectSlug: Scalars['String']
 	identityId: Scalars['String']
+}
+
+export type QueryCheckResetPasswordTokenArgs = {
+	requestId: Scalars['String']
+	token: Scalars['String']
 }
 
 export type RemoveMailTemplateError = {
@@ -440,6 +493,26 @@ export type RemoveProjectMemberResponse = {
 	readonly __typename?: 'RemoveProjectMemberResponse'
 	readonly ok: Scalars['Boolean']
 	readonly errors: ReadonlyArray<RemoveProjectMemberError>
+}
+
+export type ResetPasswordError = {
+	readonly __typename?: 'ResetPasswordError'
+	readonly code: ResetPasswordErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum ResetPasswordErrorCode {
+	TokenNotFound = 'TOKEN_NOT_FOUND',
+	TokenUsed = 'TOKEN_USED',
+	TokenExpired = 'TOKEN_EXPIRED',
+	PasswordTooWeak = 'PASSWORD_TOO_WEAK',
+}
+
+export type ResetPasswordResponse = {
+	readonly __typename?: 'ResetPasswordResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<ResetPasswordError>
 }
 
 export type RoleDefinition = {
@@ -672,6 +745,7 @@ export type ResolversTypes = {
 	ProjectIdentityRelation: ResolverTypeWrapper<ProjectIdentityRelation>
 	Membership: ResolverTypeWrapper<Membership>
 	VariableEntry: ResolverTypeWrapper<VariableEntry>
+	CheckResetPasswordTokenCode: CheckResetPasswordTokenCode
 	Mutation: ResolverTypeWrapper<{}>
 	AdminCredentials: AdminCredentials
 	SetupResponse: ResolverTypeWrapper<SetupResponse>
@@ -694,6 +768,21 @@ export type ResolversTypes = {
 	ChangePasswordResponse: ResolverTypeWrapper<ChangePasswordResponse>
 	ChangePasswordError: ResolverTypeWrapper<ChangePasswordError>
 	ChangePasswordErrorCode: ChangePasswordErrorCode
+	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
+	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
+	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
+	ConfirmOtpError: ResolverTypeWrapper<ConfirmOtpError>
+	ConfirmOtpErrorCode: ConfirmOtpErrorCode
+	DisableOtpResponse: ResolverTypeWrapper<DisableOtpResponse>
+	DisableOtpError: ResolverTypeWrapper<DisableOtpError>
+	DisableOtpErrorCode: DisableOtpErrorCode
+	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
+	CreatePasswordResetRequestResponse: ResolverTypeWrapper<CreatePasswordResetRequestResponse>
+	CreatePasswordResetRequestError: ResolverTypeWrapper<CreatePasswordResetRequestError>
+	CreatePasswordResetRequestErrorCode: CreatePasswordResetRequestErrorCode
+	ResetPasswordResponse: ResolverTypeWrapper<ResetPasswordResponse>
+	ResetPasswordError: ResolverTypeWrapper<ResetPasswordError>
+	ResetPasswordErrorCode: ResetPasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
 	InviteOptions: InviteOptions
@@ -717,14 +806,6 @@ export type ResolversTypes = {
 	DisableApiKeyResponse: ResolverTypeWrapper<DisableApiKeyResponse>
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
-	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
-	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
-	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
-	ConfirmOtpError: ResolverTypeWrapper<ConfirmOtpError>
-	ConfirmOtpErrorCode: ConfirmOtpErrorCode
-	DisableOtpResponse: ResolverTypeWrapper<DisableOtpResponse>
-	DisableOtpError: ResolverTypeWrapper<DisableOtpError>
-	DisableOtpErrorCode: DisableOtpErrorCode
 	MailTemplate: MailTemplate
 	MailType: MailType
 	AddMailTemplateResponse: ResolverTypeWrapper<AddMailTemplateResponse>
@@ -736,6 +817,7 @@ export type ResolversTypes = {
 	RemoveMailTemplateErrorCode: RemoveMailTemplateErrorCode
 	SetupError: ResolverTypeWrapper<SetupError>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
+	CheckResetPasswordTokenResult: ResolverTypeWrapper<CheckResetPasswordTokenResult>
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -753,6 +835,7 @@ export type ResolversParentTypes = {
 	ProjectIdentityRelation: ProjectIdentityRelation
 	Membership: Membership
 	VariableEntry: VariableEntry
+	CheckResetPasswordTokenCode: CheckResetPasswordTokenCode
 	Mutation: {}
 	AdminCredentials: AdminCredentials
 	SetupResponse: SetupResponse
@@ -775,6 +858,21 @@ export type ResolversParentTypes = {
 	ChangePasswordResponse: ChangePasswordResponse
 	ChangePasswordError: ChangePasswordError
 	ChangePasswordErrorCode: ChangePasswordErrorCode
+	PrepareOtpResponse: PrepareOtpResponse
+	PrepareOtpResult: PrepareOtpResult
+	ConfirmOtpResponse: ConfirmOtpResponse
+	ConfirmOtpError: ConfirmOtpError
+	ConfirmOtpErrorCode: ConfirmOtpErrorCode
+	DisableOtpResponse: DisableOtpResponse
+	DisableOtpError: DisableOtpError
+	DisableOtpErrorCode: DisableOtpErrorCode
+	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
+	CreatePasswordResetRequestResponse: CreatePasswordResetRequestResponse
+	CreatePasswordResetRequestError: CreatePasswordResetRequestError
+	CreatePasswordResetRequestErrorCode: CreatePasswordResetRequestErrorCode
+	ResetPasswordResponse: ResetPasswordResponse
+	ResetPasswordError: ResetPasswordError
+	ResetPasswordErrorCode: ResetPasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
 	InviteOptions: InviteOptions
@@ -798,14 +896,6 @@ export type ResolversParentTypes = {
 	DisableApiKeyResponse: DisableApiKeyResponse
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
-	PrepareOtpResponse: PrepareOtpResponse
-	PrepareOtpResult: PrepareOtpResult
-	ConfirmOtpResponse: ConfirmOtpResponse
-	ConfirmOtpError: ConfirmOtpError
-	ConfirmOtpErrorCode: ConfirmOtpErrorCode
-	DisableOtpResponse: DisableOtpResponse
-	DisableOtpError: DisableOtpError
-	DisableOtpErrorCode: DisableOtpErrorCode
 	MailTemplate: MailTemplate
 	MailType: MailType
 	AddMailTemplateResponse: AddMailTemplateResponse
@@ -817,6 +907,7 @@ export type ResolversParentTypes = {
 	RemoveMailTemplateErrorCode: RemoveMailTemplateErrorCode
 	SetupError: SetupError
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
+	CheckResetPasswordTokenResult: CheckResetPasswordTokenResult
 }
 
 export type AddMailTemplateErrorResolvers<
@@ -895,6 +986,14 @@ export type ChangePasswordResponseResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export type CheckResetPasswordTokenResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CheckResetPasswordTokenResult'] = ResolversParentTypes['CheckResetPasswordTokenResult']
+> = {
+	code?: Resolver<ResolversTypes['CheckResetPasswordTokenCode'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
 export type ConfirmOtpErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ConfirmOtpError'] = ResolversParentTypes['ConfirmOtpError']
@@ -939,6 +1038,25 @@ export type CreateApiKeyResultResolvers<
 	ParentType extends ResolversParentTypes['CreateApiKeyResult'] = ResolversParentTypes['CreateApiKeyResult']
 > = {
 	apiKey?: Resolver<ResolversTypes['ApiKeyWithToken'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type CreatePasswordResetRequestErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreatePasswordResetRequestError'] = ResolversParentTypes['CreatePasswordResetRequestError']
+> = {
+	code?: Resolver<ResolversTypes['CreatePasswordResetRequestErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type CreatePasswordResetRequestResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreatePasswordResetRequestResponse'] = ResolversParentTypes['CreatePasswordResetRequestResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['CreatePasswordResetRequestError']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -1072,6 +1190,31 @@ export type MutationResolvers<
 		ContextType,
 		RequireFields<MutationChangePasswordArgs, 'personId' | 'password'>
 	>
+	prepareOtp?: Resolver<
+		Maybe<ResolversTypes['PrepareOtpResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationPrepareOtpArgs, never>
+	>
+	confirmOtp?: Resolver<
+		Maybe<ResolversTypes['ConfirmOtpResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationConfirmOtpArgs, 'otpToken'>
+	>
+	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
+	createResetPasswordRequest?: Resolver<
+		Maybe<ResolversTypes['CreatePasswordResetRequestResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationCreateResetPasswordRequestArgs, 'email'>
+	>
+	resetPassword?: Resolver<
+		Maybe<ResolversTypes['ResetPasswordResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationResetPasswordArgs, 'token' | 'password'>
+	>
 	invite?: Resolver<
 		Maybe<ResolversTypes['InviteResponse']>,
 		ParentType,
@@ -1114,19 +1257,6 @@ export type MutationResolvers<
 		ContextType,
 		RequireFields<MutationDisableApiKeyArgs, 'id'>
 	>
-	prepareOtp?: Resolver<
-		Maybe<ResolversTypes['PrepareOtpResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationPrepareOtpArgs, never>
-	>
-	confirmOtp?: Resolver<
-		Maybe<ResolversTypes['ConfirmOtpResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationConfirmOtpArgs, 'otpToken'>
-	>
-	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
 	addProjectMailTemplate?: Resolver<
 		Maybe<ResolversTypes['AddMailTemplateResponse']>,
 		ParentType,
@@ -1213,6 +1343,12 @@ export type QueryResolvers<
 		ContextType,
 		RequireFields<QueryProjectMembershipsArgs, 'projectSlug' | 'identityId'>
 	>
+	checkResetPasswordToken?: Resolver<
+		ResolversTypes['CheckResetPasswordTokenCode'],
+		ParentType,
+		ContextType,
+		RequireFields<QueryCheckResetPasswordTokenArgs, 'requestId' | 'token'>
+	>
 }
 
 export type RemoveMailTemplateErrorResolvers<
@@ -1250,6 +1386,25 @@ export type RemoveProjectMemberResponseResolvers<
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveProjectMemberError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type ResetPasswordErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ResetPasswordError'] = ResolversParentTypes['ResetPasswordError']
+> = {
+	code?: Resolver<ResolversTypes['ResetPasswordErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type ResetPasswordResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ResetPasswordResponse'] = ResolversParentTypes['ResetPasswordResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['ResetPasswordError']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -1421,11 +1576,14 @@ export type Resolvers<ContextType = any> = {
 	ApiKeyWithToken?: ApiKeyWithTokenResolvers<ContextType>
 	ChangePasswordError?: ChangePasswordErrorResolvers<ContextType>
 	ChangePasswordResponse?: ChangePasswordResponseResolvers<ContextType>
+	CheckResetPasswordTokenResult?: CheckResetPasswordTokenResultResolvers<ContextType>
 	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>
 	ConfirmOtpResponse?: ConfirmOtpResponseResolvers<ContextType>
 	CreateApiKeyError?: CreateApiKeyErrorResolvers<ContextType>
 	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<ContextType>
 	CreateApiKeyResult?: CreateApiKeyResultResolvers<ContextType>
+	CreatePasswordResetRequestError?: CreatePasswordResetRequestErrorResolvers<ContextType>
+	CreatePasswordResetRequestResponse?: CreatePasswordResetRequestResponseResolvers<ContextType>
 	DisableApiKeyError?: DisableApiKeyErrorResolvers<ContextType>
 	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
 	DisableOtpError?: DisableOtpErrorResolvers<ContextType>
@@ -1447,6 +1605,8 @@ export type Resolvers<ContextType = any> = {
 	RemoveMailTemplateResponse?: RemoveMailTemplateResponseResolvers<ContextType>
 	RemoveProjectMemberError?: RemoveProjectMemberErrorResolvers<ContextType>
 	RemoveProjectMemberResponse?: RemoveProjectMemberResponseResolvers<ContextType>
+	ResetPasswordError?: ResetPasswordErrorResolvers<ContextType>
+	ResetPasswordResponse?: ResetPasswordResponseResolvers<ContextType>
 	RoleDefinition?: RoleDefinitionResolvers<ContextType>
 	RoleEntityVariableDefinition?: RoleEntityVariableDefinitionResolvers<ContextType>
 	RoleVariableDefinition?: RoleVariableDefinitionResolvers

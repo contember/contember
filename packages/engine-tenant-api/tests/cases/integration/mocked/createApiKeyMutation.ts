@@ -42,13 +42,6 @@ describe('create api key', () => {
 					createMembershipVariableSql({ variableId, membershipId, values: [languageId], variableName: 'language' }),
 				),
 				{
-					sql: SQL`SELECT "roles"
-					         FROM "tenant"."identity"
-					         WHERE "id" = ?`,
-					parameters: [identityId],
-					response: { rows: [{ roles: [] }] },
-				},
-				{
 					sql: SQL`SELECT "project"."id", "project"."name", "project"."slug"
 					         FROM "tenant"."project"
 					         WHERE "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?)`,

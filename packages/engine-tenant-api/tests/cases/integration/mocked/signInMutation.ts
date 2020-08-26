@@ -26,15 +26,6 @@ const createApiKeySql = function({ apiKeyId, identityId }: { apiKeyId: string; i
 		response: { rowCount: 1 },
 	}
 }
-const getIdentityRolesSql = function({ identityId }: { identityId: string }) {
-	return {
-		sql: SQL`SELECT "roles"
-			         FROM "tenant"."identity"
-			         WHERE "id" = ?`,
-		parameters: [identityId],
-		response: { rows: [{ roles: [] }] },
-	}
-}
 const getIdentityProjectsSql = function({ identityId, projectId }: { identityId: string; projectId: string }) {
 	return {
 		sql: SQL`SELECT "project"."id", "project"."name", "project"."slug"
@@ -58,7 +49,6 @@ describe('sign in mutation', () => {
 			executes: [
 				getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
 				createApiKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
-				getIdentityRolesSql({ identityId: identityId }),
 				getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
 				selectMembershipsSql({
 					identityId: identityId,
@@ -195,7 +185,6 @@ describe('sign in mutation', () => {
 			executes: [
 				getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 				createApiKeySql({ apiKeyId, identityId }),
-				getIdentityRolesSql({ identityId }),
 				getIdentityProjectsSql({ identityId, projectId }),
 				selectMembershipsSql({
 					identityId,

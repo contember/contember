@@ -1,12 +1,13 @@
 import { ChangePasswordErrorCode } from '../../schema'
 import { ChangePasswordCommand } from '../commands'
-import { CommandBus } from '../commands/CommandBus'
+import { CommandBus } from '../commands'
+import { isWeakPassword } from '../utils/password'
 
 class PasswordChangeManager {
 	constructor(private readonly commandBus: CommandBus) {}
 
 	async changePassword(personId: string, password: string): Promise<PasswordChangeManager.PasswordChangeResult> {
-		if (password.length < 6) {
+		if (isWeakPassword(password)) {
 			return new PasswordChangeManager.PasswordChangeResultError([ChangePasswordErrorCode.TooWeak])
 		}
 		await this.commandBus.execute(new ChangePasswordCommand(personId, password))

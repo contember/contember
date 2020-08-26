@@ -21,6 +21,7 @@ import {
 	ProjectCreateCommand,
 	ProjectRegisterCommand,
 	ProjectValidateCommand,
+	ResetPasswordCommand,
 	SetupCommand,
 	SignInCommand,
 	WorkspaceCreateCommand,
@@ -62,6 +63,7 @@ import { VersionCommand } from './commands/misc'
 		['tenant:sign-in']: () => new SignInCommand(),
 		['tenant:create-api-key']: () => new CreateApiKeyCommand(),
 		['tenant:invite']: () => new InviteCommand(),
+		['tenant:reset-password']: () => new ResetPasswordCommand(),
 
 		// deprecated
 		['migrations:dry-run']: migrationsDescribeFactory,

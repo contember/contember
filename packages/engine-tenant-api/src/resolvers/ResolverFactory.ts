@@ -17,6 +17,7 @@ import {
 import { Resolvers } from '../schema'
 import { MeQueryResolver, ProjectQueryResolver, ProjectMembersQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
+import { ResetPasswordMutationResolver } from './mutation/person/ResetPasswordMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -31,6 +32,7 @@ class ResolverFactory {
 			signInMutationResolver: SignInMutationResolver
 			signOutMutationResolver: SignOutMutationResolver
 			changePasswordMutationResolver: ChangePasswordMutationResolver
+			resetPasswordMutationResolver: ResetPasswordMutationResolver
 
 			inviteMutationResolver: InviteMutationResolver
 			addProjectMemberMutationResolver: AddProjectMemberMutationResolver
@@ -75,6 +77,12 @@ class ResolverFactory {
 				signOut: this.resolvers.signOutMutationResolver.signOut.bind(this.resolvers.signOutMutationResolver),
 				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(
 					this.resolvers.changePasswordMutationResolver,
+				),
+				createResetPasswordRequest: this.resolvers.resetPasswordMutationResolver.createResetPasswordRequest.bind(
+					this.resolvers.resetPasswordMutationResolver,
+				),
+				resetPassword: this.resolvers.resetPasswordMutationResolver.resetPassword.bind(
+					this.resolvers.resetPasswordMutationResolver,
 				),
 				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
 				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(

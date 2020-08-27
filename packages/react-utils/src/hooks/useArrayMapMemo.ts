@@ -3,7 +3,7 @@ import { useConstantLengthInvariant } from './useConstantLengthInvariant'
 
 /**
  * ⚠️ ONLY USE THIS IF YOU *REALLY* KNOW WHAT YOU'RE DOING! ⚠️
- * ⚠ HERE BE DRAGONS THAT CAN TELL DAN ABRAMOV WHERE YOU LIVE! ⚠
+ * ⚠   HERE BE DRAGONS THAT KNOW WHERE YOU LIVE! ⚠
  *
  * This is a bit of React naughtiness that allows us to memoize outputs of Array.prototype.map() based on the contents
  * of the original array, and not its referential equality. That way, if we create a new array with identical items,

@@ -32,6 +32,6 @@ export function RenderElementFallback<
 		case 'unorderedList':
 			return <ul>{children}</ul>
 		default:
-			return null
+			return children // At least render the text contents
 	}
 }

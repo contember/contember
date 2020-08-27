@@ -1,4 +1,4 @@
-import { EditorPlaceholder } from '@contember/ui'
+import { EditorPlaceholder, ErrorList } from '@contember/ui'
 import * as React from 'react'
 import { Node as SlateNode } from 'slate'
 import { RenderElementProps } from 'slate-react'
@@ -24,6 +24,11 @@ export const ContemberFieldElementRenderer = React.memo((props: ContemberFieldEl
 					</>
 				),
 			})}
+			{!!props.fieldBackedElement.accessor.errors.length && (
+				<div contentEditable={false} data-slate-editor={false}>
+					<ErrorList errors={props.fieldBackedElement.accessor.errors} size="small" />
+				</div>
+			)}
 		</div>
 	)
 })

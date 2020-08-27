@@ -8,6 +8,7 @@ import {
 	headingSixToolbarButton,
 	headingThreeToolbarButton,
 	headingTwoToolbarButton,
+	highlightToolbarButton,
 	italicToolbarButton,
 	orderedListToolbarButton,
 	scrollTargetToolbarButton,
@@ -31,6 +32,7 @@ export namespace RichEditor {
 
 		bold: boldToolbarButton,
 		code: codeToolbarButton,
+		highlight: highlightToolbarButton,
 		italic: italicToolbarButton,
 		strikeThrough: strikeThroughToolbarButton,
 		underline: underlineToolbarButton,

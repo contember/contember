@@ -15,6 +15,9 @@ export function RenderLeafFallback({ leaf }: RenderLeafFallbackProps) {
 	if ('isStruckThrough' in leaf && leaf.isStruckThrough === true) {
 		element = <s>{element}</s>
 	}
+	if ('isHighlighted' in leaf && leaf.isHighlighted === true) {
+		element = <em>{element}</em>
+	}
 	if ('isUnderlined' in leaf && leaf.isUnderlined === true) {
 		element = <u>{element}</u>
 	}

@@ -5,6 +5,7 @@ import {
 	withBold,
 	withCode,
 	withHeadings,
+	withHighlight,
 	withItalic,
 	withLists,
 	withParagraphs,
@@ -27,6 +28,7 @@ const pluginAugmenters: {
 
 	bold: withBold,
 	code: withCode,
+	highlight: withHighlight,
 	italic: withItalic,
 	strikeThrough: withStrikeThrough,
 	underline: withUnderline,

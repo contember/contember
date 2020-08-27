@@ -15,6 +15,10 @@ export interface WithLists<
 		element: ElementNode | SlateNode,
 		suchThat?: ElementSpecifics<OrderedListElement>,
 	) => element is OrderedListElement
+	isList: (
+		element: ElementNode | SlateNode,
+		suchThat?: ElementSpecifics<UnorderedListElement | OrderedListElement>,
+	) => element is UnorderedListElement | OrderedListElement
 	isListItem: (
 		element: ElementNode | SlateNode,
 		suchThat?: ElementSpecifics<ListItemElement>,

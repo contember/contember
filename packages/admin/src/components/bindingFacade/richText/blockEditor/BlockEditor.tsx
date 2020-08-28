@@ -2,7 +2,6 @@ import {
 	BindingError,
 	Component,
 	EntityAccessor,
-	Environment,
 	FieldAccessor,
 	QueryLanguage,
 	RelativeSingleField,
@@ -10,6 +9,7 @@ import {
 	SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList,
 	useParentEntityAccessor,
+	useRelativeSingleField,
 } from '@contember/binding'
 import { emptyArray, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
@@ -53,6 +53,15 @@ export const BlockEditor = Component<BlockEditorProps>(
 		)
 
 		const leadingDesugared = useArrayMapMemo(props.leadingFieldBackedElements || emptyArray, desugarFieldBackedElement)
+
+		const accessors: FieldAccessor[] = []
+		if (props.leadingFieldBackedElements) {
+			for (const fieldBackedElement of props.leadingFieldBackedElements) {
+				// eslint-disable-next-line react-hooks/rules-of-hooks
+				accessors.push(useRelativeSingleField(fieldBackedElement.field))
+			}
+		}
+
 		//const trailingDesugared = useArrayMapMemo(
 		//	props.trailingFieldBackedElements || emptyArray,
 		//	desugarFieldBackedElement,
@@ -60,7 +69,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 
 		const normalizedLeading = useNormalizedFieldBackedElements(
 			entity,
-			environment,
+			accessors,
 			leadingDesugared,
 			props.leadingFieldBackedElements,
 		)
@@ -153,15 +162,10 @@ export const BlockEditor = Component<BlockEditorProps>(
 
 const useNormalizedFieldBackedElements = (
 	entity: EntityAccessor,
-	environment: Environment,
+	accessors: FieldAccessor[],
 	desugaredOriginal: RelativeSingleField[] = [],
 	original: FieldBackedElement[] = [],
 ): NormalizedFieldBackedElement[] => {
-	const getRelativeSingleFields = React.useCallback(
-		(item: RelativeSingleField) => entity.getRelativeSingleField(item),
-		[entity],
-	)
-	const accessors = useArrayMapMemo(desugaredOriginal, getRelativeSingleFields)
 	const normalizeFieldBackElement = React.useCallback(
 		(value: FieldAccessor, index: number): NormalizedFieldBackedElement => ({
 			...original[index],

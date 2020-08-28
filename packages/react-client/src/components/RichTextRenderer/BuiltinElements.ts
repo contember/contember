@@ -11,6 +11,7 @@ export type BuiltinElements<
 	| RichTextUnorderedListElement<CustomElements, CustomLeaves>
 	| RichTextListItemElement<CustomElements, CustomLeaves>
 	| RichTextParagraphElement<CustomElements, CustomLeaves>
+	| RichTextHorizontalRuleElement<CustomElements, CustomLeaves>
 	| RichTextScrollTargetElement<CustomElements, CustomLeaves>
 
 export interface RichTextAnchorElement<
@@ -49,6 +50,13 @@ export interface RichTextListItemElement<
 	CustomLeaves extends RichTextLeaf = never
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'listItem'
+}
+
+export interface RichTextHorizontalRuleElement<
+	CustomElements extends RichTextElement = never,
+	CustomLeaves extends RichTextLeaf = never
+> extends RichTextElement<CustomElements, CustomLeaves> {
+	type: 'horizontalRule'
 }
 
 export interface RichTextParagraphElement<

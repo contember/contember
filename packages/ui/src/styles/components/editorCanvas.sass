@@ -27,11 +27,26 @@
 		& > :last-child
 			margin-bottom: 0
 		a
-			color: #0094ff
+			color: $cui-color-blue
+
+		code,
+		em
+			padding: em(2px) em(1px)
+
 		code
 			font-family: monospace
 			background-color: $cui-color-gray-2
-			padding: em(2px) em(1px)
+
+		em
+			// TODO use a css var with a fallback
+			background-color: lighten($cui-color-blue, 35)
+			font-style: normal
+
+		hr
+			background-color: $cui-color-gray-2
+			height: em(1px)
+			margin: 1em 0 0 0
+			border: none
 
 		::selection
 			background-color: #BFE4FF

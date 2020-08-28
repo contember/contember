@@ -77,7 +77,14 @@ export const Login = React.memo(() => {
 			<form onSubmit={onSubmit}>
 				<ErrorList size="large" errors={errorMessages} />
 				<FormGroup label="Email">
-					<TextInput value={email} autoComplete="username" type="email" disabled={isLoading} onChange={onEmailChange} />
+					<TextInput
+						value={email}
+						autoComplete="username"
+						type="email"
+						autoFocus
+						disabled={isLoading}
+						onChange={onEmailChange}
+					/>
 				</FormGroup>
 				<FormGroup label="Password">
 					<TextInput

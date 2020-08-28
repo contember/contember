@@ -3,6 +3,7 @@ import { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
 export const defaultEditorPluginPreset: BuiltinEditorPlugins[] = [
 	'code',
 	'strikeThrough',
+	'highlight',
 	'underline',
 	'italic',
 	'bold',
@@ -11,5 +12,6 @@ export const defaultEditorPluginPreset: BuiltinEditorPlugins[] = [
 	'anchor',
 	'paragraph',
 	'heading',
+	'horizontalRule',
 	'list',
 ]

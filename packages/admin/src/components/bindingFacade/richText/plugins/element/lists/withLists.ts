@@ -1,5 +1,12 @@
 import * as React from 'react'
-import { Editor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
+import {
+	Editor,
+	Element as SlateElement,
+	Node as SlateNode,
+	Path as SlatePath,
+	Range as SlateRange,
+	Transforms,
+} from 'slate'
 import { BaseEditor } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
@@ -16,6 +23,8 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		isListItem: (element, suchThat): element is ListItemElement => element.type === listItemElementType,
 		isUnorderedList: (element, suchThat): element is UnorderedListElement => element.type === unorderedListElementType,
 		isOrderedList: (element, suchThat): element is OrderedListElement => element.type === orderedListElementType,
+		isList: (element, suchThat): element is OrderedListElement | UnorderedListElement =>
+			element.type === unorderedListElementType || element.type === orderedListElementType,
 
 		renderElement: props => {
 			switch (props.element.type) {
@@ -92,20 +101,131 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		normalizeNode: entry => {
 			const [node, path] = entry
 
-			if (
-				SlateElement.isElement(node) &&
-				(node.type === unorderedListElementType || node.type === orderedListElementType)
-			) {
-				for (const [child, childPath] of SlateNode.children(editor, path)) {
-					if (SlateElement.isElement(child) && child.type !== listItemElementType) {
-						ContemberEditor.ejectElement(editor, childPath)
-						Transforms.setNodes(editor, { type: listItemElementType }, { at: childPath })
-						return
+			if (SlateElement.isElement(node)) {
+				if (e.isList(node)) {
+					for (const [child, childPath] of SlateNode.children(editor, path)) {
+						if (SlateElement.isElement(child) && child.type !== listItemElementType) {
+							ContemberEditor.ejectElement(editor, childPath)
+							Transforms.setNodes(editor, { type: listItemElementType }, { at: childPath })
+							return
+						}
+					}
+				} else if (e.isListItem(node)) {
+					const closestBlockEntry = Editor.above(e, {
+						at: path,
+						mode: 'lowest',
+						match: matchedNode => SlateElement.isElement(matchedNode) && !e.isInline(matchedNode),
+					})
+					if (closestBlockEntry === undefined || !e.isList(closestBlockEntry[0])) {
+						Editor.withoutNormalizing(e, () => {
+							const defaultElement = e.createDefaultElement([{ text: '' }])
+							Transforms.wrapNodes(e, defaultElement, {
+								at: path,
+							})
+							Transforms.unwrapNodes(e, {
+								at: [...path, 0],
+							})
+						})
 					}
 				}
 			}
 
 			normalizeNode(entry)
+		},
+		insertBreak: () => {
+			const { selection } = editor
+
+			if (!selection || !SlateRange.isCollapsed(selection)) {
+				return insertBreak()
+			}
+			const [node, path] = Editor.node(editor, selection)
+
+			if (SlateNode.string(node) !== '') {
+				return insertBreak()
+			}
+
+			const closestListItemEntry = Editor.above(e, {
+				mode: 'lowest',
+				match: node => e.isListItem(node),
+			})
+
+			if (closestListItemEntry === undefined) {
+				return insertBreak()
+			}
+			// We're in a list and want to leave this list.
+
+			const [containingListItem, containingListItemPath] = closestListItemEntry
+
+			const containingListPath = SlatePath.parent(containingListItemPath)
+			const containingList = SlateNode.get(e, containingListPath)
+
+			if (!e.isList(containingList)) {
+				// This shouldn't really happen. It's more of a sanity check.
+				return insertBreak()
+			}
+
+			const followingListItemPath = SlatePath.next(containingListItemPath)
+			const hasFollowingListItem = SlateNode.has(e, followingListItemPath)
+
+			const listParentEntry = Editor.above(e, {
+				at: containingListPath,
+				mode: 'lowest',
+				match: node => e.isListItem(node),
+			})
+
+			if (hasFollowingListItem) {
+				const followingListItemNode = SlateNode.get(e, followingListItemPath)
+				if (!e.isListItem(followingListItemNode)) {
+					// This shouldn't really happen. It's more of a sanity check.
+					return insertBreak()
+				}
+				if (containingListItemPath[containingListItemPath.length - 1] === 0) {
+					// We're at the beginning of a list
+					if (listParentEntry !== undefined) {
+						// This is a nested list
+						// TODO
+					} else {
+						// We're not in a nested list
+						Editor.withoutNormalizing(e, () => {
+							// Remove the trailing empty listItem
+							Transforms.removeNodes(e, { at: containingListItemPath })
+							Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: containingListPath })
+							Transforms.select(e, containingListPath)
+						})
+					}
+				} else {
+					// We're in the middle of a list.
+					if (listParentEntry !== undefined) {
+						// This is a nested list
+						// TODO
+					} else {
+						// We're not in a nested list
+						Editor.withoutNormalizing(e, () => {
+							Transforms.removeNodes(e, { at: containingListItemPath })
+							Transforms.splitNodes(e, { at: containingListItemPath })
+							const afterListParent = SlatePath.next(containingListPath)
+							Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: afterListParent })
+							Transforms.select(e, afterListParent)
+						})
+					}
+				}
+			} else {
+				// We're at the end of a list.
+
+				if (listParentEntry !== undefined) {
+					// We're in a nested list
+					// TODO
+				} else {
+					// We're not in a nested list
+					Editor.withoutNormalizing(e, () => {
+						const afterListParent = SlatePath.next(containingListPath)
+						// Remove the trailing empty listItem
+						Transforms.removeNodes(e, { at: containingListItemPath })
+						Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: afterListParent })
+						Transforms.select(e, afterListParent)
+					})
+				}
+			}
 		},
 	})
 

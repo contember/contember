@@ -21,6 +21,8 @@ export function RenderElementFallback<
 			return <a href={element.href}>{children}</a>
 		case 'heading':
 			return React.createElement(`h${element.level}`, null, children) // TODO numbered
+		case 'horizontalRule':
+			return <hr />
 		case 'listItem':
 			return <li>{children}</li>
 		case 'orderedList':

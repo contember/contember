@@ -1,5 +1,6 @@
 export * from './anchors'
 export * from './headings'
+export * from './horizonalRules'
 export * from './lists'
 export * from './paragraphs'
 export * from './scrollTargets'

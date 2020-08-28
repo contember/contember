@@ -12,5 +12,6 @@ export const defaultEditorPluginPreset: BuiltinEditorPlugins[] = [
 	'anchor',
 	'paragraph',
 	'heading',
+	'horizontalRule',
 	'list',
 ]

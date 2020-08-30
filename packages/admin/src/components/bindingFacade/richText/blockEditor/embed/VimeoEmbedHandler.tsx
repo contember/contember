@@ -4,6 +4,8 @@ import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../dis
 import { EmbedHandler, PopulateEmbedDataOptions, RenderEmbedProps } from './EmbedHandler'
 
 class VimeoEmbedHandler implements EmbedHandler<string> {
+	public readonly debugName = 'Vimeo'
+
 	public readonly discriminateBy: SugaredDiscriminateBy | undefined = undefined
 	public readonly discriminateByScalar: SugaredDiscriminateByScalar | undefined = undefined
 

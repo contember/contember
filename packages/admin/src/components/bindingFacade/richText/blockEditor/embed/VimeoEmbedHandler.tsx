@@ -10,8 +10,11 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 	public readonly discriminateByScalar: SugaredDiscriminateByScalar | undefined = undefined
 
 	public constructor(private readonly options: VimeoEmbedHandler.Options) {
-		this.discriminateBy = options.discriminateBy
-		this.discriminateByScalar = options.discriminateByScalar
+		if ('discriminateBy' in options) {
+			this.discriminateBy = options.discriminateBy
+		} else if ('discriminateByScalar' in options) {
+			this.discriminateByScalar = options.discriminateByScalar
+		}
 	}
 
 	public getStaticFields() {
@@ -64,12 +67,17 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 }
 
 namespace VimeoEmbedHandler {
-	export interface Options {
+	export type Options = {
 		render?: (props: RenderEmbedProps) => React.ReactNode
 		vimeoIdField: SugaredFieldProps['field']
-		discriminateBy?: SugaredDiscriminateBy
-		discriminateByScalar?: SugaredDiscriminateByScalar
-	}
+	} & (
+		| {
+				discriminateBy: SugaredDiscriminateBy
+		  }
+		| {
+				discriminateByScalar: SugaredDiscriminateByScalar
+		  }
+	)
 
 	export interface RendererOptions extends RenderEmbedProps {
 		VimeoIdField: SugaredFieldProps['field']

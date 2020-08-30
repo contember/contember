@@ -52,7 +52,7 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 		if (this.options.render) {
 			return this.options.render(props)
 		}
-		return <VimeoEmbedHandler.Renderer VimeoIdField={this.options.vimeoIdField} entity={props.entity} />
+		return <VimeoEmbedHandler.Renderer vimeoIdField={this.options.vimeoIdField} entity={props.entity} />
 	}
 
 	public populateEmbedData({ batchUpdates, environment, embedArtifacts }: PopulateEmbedDataOptions<string>) {
@@ -80,11 +80,11 @@ namespace VimeoEmbedHandler {
 	)
 
 	export interface RendererOptions extends RenderEmbedProps {
-		VimeoIdField: SugaredFieldProps['field']
+		vimeoIdField: SugaredFieldProps['field']
 	}
 
 	export const Renderer = React.memo(function VimeoRenderer(props: RendererOptions) {
-		const vimeoId = useRelativeSingleField<string>(props.VimeoIdField).currentValue
+		const vimeoId = useRelativeSingleField<string>(props.vimeoIdField).currentValue
 
 		if (vimeoId === null) {
 			return null

@@ -33,7 +33,12 @@ export function RenderElementFallback<
 			return <span id={element.identifier}>{children}</span>
 		case 'unorderedList':
 			return <ul>{children}</ul>
-		default:
-			return children // At least render the text contents
+		default: {
+			if (__DEV_MODE__) {
+				throw new Error(`RichTextRenderer: unknown element of type '${(element as { type: string }).type}'.`)
+			} else {
+				return children // At least render the text contents
+			}
+		}
 	}
 }

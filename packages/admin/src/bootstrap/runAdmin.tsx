@@ -1,8 +1,9 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { assertValidClientConfig, ClientConfig } from '@contember/react-client'
 import { Admin } from '../components'
 import { ProjectConfig } from '../state/projectsConfigs'
+import { assertValidClientConfig } from './assertValidClientConfig'
+import { ClientConfig } from './ClientConfig'
 
 type ReactRootFactory = (config: ClientConfig, projects: ProjectConfig[]) => React.ReactElement
 

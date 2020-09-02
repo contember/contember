@@ -1,17 +1,10 @@
+import { Environment, EnvironmentContext } from '@contember/binding'
+import { ContemberClient } from '@contember/react-client'
 import { ContainerSpinner } from '@contember/ui'
 import * as React from 'react'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
-import {
-	assertValidClientConfig,
-	ClientConfig,
-	Client,
-	ProjectSlugContext,
-	StageSlugContext,
-	SessionTokenContext,
-} from '@contember/react-client'
-import { EnvironmentContext } from '@contember/binding'
-import { Environment } from '@contember/binding'
+import { assertValidClientConfig, ClientConfig } from '../bootstrap'
 import { Router } from '../containers/router'
 import { PROJECT_CONFIGS_REPLACE } from '../reducer/projectsConfigs'
 import { emptyState } from '../state'
@@ -60,7 +53,7 @@ export const Admin = React.memo((props: AdminProps) => {
 	}, [store])
 
 	return (
-		<Client config={props.clientConfig}>
+		<ContemberClient apiBaseUrl={props.clientConfig.apiBaseUrl} loginToken={props.clientConfig.loginToken}>
 			<ReduxStoreProvider store={store}>
 				<NavigationProvider>
 					<NavigationIsActiveProvider>
@@ -110,17 +103,19 @@ export const Admin = React.memo((props: AdminProps) => {
 													...route.parameters,
 												})
 											return (
-												<SessionTokenContext.Provider value={store.getState().auth.identity?.token}>
-													<ProjectSlugContext.Provider value={route.project}>
-														<StageSlugContext.Provider value={route.stage}>
-															<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
-																<React.Suspense fallback={<ContainerSpinner />}>
-																	<Component />
-																</React.Suspense>
-															</EnvironmentContext.Provider>
-														</StageSlugContext.Provider>
-													</ProjectSlugContext.Provider>
-												</SessionTokenContext.Provider>
+												<ContemberClient
+													apiBaseUrl={props.clientConfig.apiBaseUrl}
+													loginToken={props.clientConfig.loginToken}
+													project={route.project}
+													sessionToken={store.getState().auth.identity?.token}
+													stage={route.stage}
+												>
+													<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
+														<React.Suspense fallback={<ContainerSpinner />}>
+															<Component />
+														</React.Suspense>
+													</EnvironmentContext.Provider>
+												</ContemberClient>
 											)
 										} else {
 											return <>{`No such project or stage as ${route.project}/${route.stage}`}</>
@@ -133,7 +128,7 @@ export const Admin = React.memo((props: AdminProps) => {
 					</NavigationIsActiveProvider>
 				</NavigationProvider>
 			</ReduxStoreProvider>
-		</Client>
+		</ContemberClient>
 	)
 })
 Admin.displayName = 'Admin'

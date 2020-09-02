@@ -7,7 +7,7 @@ export * from './project'
 export * from './tenant'
 export * from './upload'
 
-export * from './Client'
+export * from './ContemberClient'
 export * from './ClientError'
 export * from './useGraphQlClient'
 

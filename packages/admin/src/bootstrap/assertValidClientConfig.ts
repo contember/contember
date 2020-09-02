@@ -1,4 +1,4 @@
-import { ClientError } from '../ClientError'
+import { ClientError } from '@contember/react-client'
 import { ClientConfig } from './ClientConfig'
 
 export function assertValidClientConfig(config: any): asserts config is ClientConfig {

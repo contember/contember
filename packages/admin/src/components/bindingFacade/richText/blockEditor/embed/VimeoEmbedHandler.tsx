@@ -4,12 +4,17 @@ import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../dis
 import { EmbedHandler, PopulateEmbedDataOptions, RenderEmbedProps } from './EmbedHandler'
 
 class VimeoEmbedHandler implements EmbedHandler<string> {
+	public readonly debugName = 'Vimeo'
+
 	public readonly discriminateBy: SugaredDiscriminateBy | undefined = undefined
 	public readonly discriminateByScalar: SugaredDiscriminateByScalar | undefined = undefined
 
 	public constructor(private readonly options: VimeoEmbedHandler.Options) {
-		this.discriminateBy = options.discriminateBy
-		this.discriminateByScalar = options.discriminateByScalar
+		if ('discriminateBy' in options) {
+			this.discriminateBy = options.discriminateBy
+		} else if ('discriminateByScalar' in options) {
+			this.discriminateByScalar = options.discriminateByScalar
+		}
 	}
 
 	public getStaticFields() {
@@ -47,34 +52,37 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 		if (this.options.render) {
 			return this.options.render(props)
 		}
-		return <VimeoEmbedHandler.Renderer VimeoIdField={this.options.vimeoIdField} entity={props.entity} />
+		return <VimeoEmbedHandler.Renderer vimeoIdField={this.options.vimeoIdField} entity={props.entity} />
 	}
 
-	public populateEmbedData({ batchUpdates, environment, embedArtifacts }: PopulateEmbedDataOptions<string>) {
+	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
 		batchUpdates(getAccessor => {
 			getAccessor()
-				.getRelativeSingleField<string>(
-					QueryLanguage.desugarRelativeSingleField(this.options.vimeoIdField, environment),
-				)
+				.getSingleField<string>(this.options.vimeoIdField)
 				.updateValue?.(embedArtifacts)
 		})
 	}
 }
 
 namespace VimeoEmbedHandler {
-	export interface Options {
+	export type Options = {
 		render?: (props: RenderEmbedProps) => React.ReactNode
 		vimeoIdField: SugaredFieldProps['field']
-		discriminateBy?: SugaredDiscriminateBy
-		discriminateByScalar?: SugaredDiscriminateByScalar
-	}
+	} & (
+		| {
+				discriminateBy: SugaredDiscriminateBy
+		  }
+		| {
+				discriminateByScalar: SugaredDiscriminateByScalar
+		  }
+	)
 
 	export interface RendererOptions extends RenderEmbedProps {
-		VimeoIdField: SugaredFieldProps['field']
+		vimeoIdField: SugaredFieldProps['field']
 	}
 
 	export const Renderer = React.memo(function VimeoRenderer(props: RendererOptions) {
-		const vimeoId = useRelativeSingleField<string>(props.VimeoIdField).currentValue
+		const vimeoId = useRelativeSingleField<string>(props.vimeoIdField).currentValue
 
 		if (vimeoId === null) {
 			return null

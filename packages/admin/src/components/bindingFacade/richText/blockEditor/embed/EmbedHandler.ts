@@ -18,6 +18,8 @@ export interface RenderEmbedProps {
 }
 
 export interface EmbedHandler<EmbedArtifacts = any> {
+	debugName: string // Optional for error messages
+
 	getStaticFields: (environment: Environment) => React.ReactNode
 	canHandleSource: (source: string, url: URL | undefined) => boolean | EmbedArtifacts
 	renderEmbed: (props: RenderEmbedProps) => React.ReactNode

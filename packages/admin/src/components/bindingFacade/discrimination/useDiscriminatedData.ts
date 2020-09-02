@@ -5,8 +5,11 @@ import { NormalizedDiscriminatedData } from './NormalizedDiscriminatedData'
 import { ResolvedDiscriminatedData } from './ResolvedDiscriminatedData'
 import { ScalarDiscriminatedDatum } from './ScalarDiscriminatedDatum'
 
-export interface UseDiscriminatedDataOptions {
-	undiscriminatedItemMessage?: string
+export interface UseDiscriminatedDataOptions<
+	LiteralBased extends LiteralDiscriminatedDatum,
+	ScalarBased extends ScalarDiscriminatedDatum
+> {
+	undiscriminatedItemMessage?: string | ((item: LiteralBased | ScalarBased) => string)
 	mixedDiscriminationMessage?: string
 }
 
@@ -15,7 +18,7 @@ export const useDiscriminatedData = <
 	ScalarBased extends ScalarDiscriminatedDatum
 >(
 	source: Iterable<LiteralBased | ScalarBased>,
-	options: UseDiscriminatedDataOptions = {},
+	options: UseDiscriminatedDataOptions<LiteralBased, ScalarBased> = {},
 ): NormalizedDiscriminatedData<LiteralBased, ScalarBased> => {
 	const environment = useEnvironment()
 	const undiscriminatedItemMessage = options.undiscriminatedItemMessage ?? 'Found an undiscriminated item.'
@@ -42,7 +45,11 @@ export const useDiscriminatedData = <
 					data,
 				})
 			} else {
-				throw new BindingError(undiscriminatedItemMessage)
+				throw new BindingError(
+					typeof undiscriminatedItemMessage === 'string'
+						? undiscriminatedItemMessage
+						: undiscriminatedItemMessage(data),
+				)
 			}
 		}
 

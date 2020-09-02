@@ -4,12 +4,17 @@ import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../dis
 import { EmbedHandler, PopulateEmbedDataOptions, RenderEmbedProps } from './EmbedHandler'
 
 class YouTubeEmbedHandler implements EmbedHandler<string> {
+	public readonly debugName = 'YouTube'
+
 	public readonly discriminateBy: SugaredDiscriminateBy | undefined = undefined
 	public readonly discriminateByScalar: SugaredDiscriminateByScalar | undefined = undefined
 
 	public constructor(private readonly options: YouTubeEmbedHandler.Options) {
-		this.discriminateBy = options.discriminateBy
-		this.discriminateByScalar = options.discriminateByScalar
+		if ('discriminateBy' in options) {
+			this.discriminateBy = options.discriminateBy
+		} else if ('discriminateByScalar' in options) {
+			this.discriminateByScalar = options.discriminateByScalar
+		}
 	}
 
 	public getStaticFields() {
@@ -50,24 +55,27 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 		return <YouTubeEmbedHandler.Renderer youTubeIdField={this.options.youTubeIdField} entity={props.entity} />
 	}
 
-	public populateEmbedData({ batchUpdates, environment, embedArtifacts }: PopulateEmbedDataOptions<string>) {
+	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
 		batchUpdates(getAccessor => {
 			getAccessor()
-				.getRelativeSingleField<string>(
-					QueryLanguage.desugarRelativeSingleField(this.options.youTubeIdField, environment),
-				)
+				.getSingleField<string>(this.options.youTubeIdField)
 				.updateValue?.(embedArtifacts)
 		})
 	}
 }
 
 namespace YouTubeEmbedHandler {
-	export interface Options {
+	export type Options = {
 		render?: (props: RenderEmbedProps) => React.ReactNode
 		youTubeIdField: SugaredFieldProps['field']
-		discriminateBy?: SugaredDiscriminateBy
-		discriminateByScalar?: SugaredDiscriminateByScalar
-	}
+	} & (
+		| {
+				discriminateBy: SugaredDiscriminateBy
+		  }
+		| {
+				discriminateByScalar: SugaredDiscriminateByScalar
+		  }
+	)
 
 	export interface RendererOptions extends RenderEmbedProps {
 		youTubeIdField: SugaredFieldProps['field']

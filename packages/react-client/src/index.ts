@@ -4,6 +4,7 @@ export * from './components'
 export * from './config'
 export * from './content'
 export * from './project'
+export * from './system'
 export * from './tenant'
 export * from './upload'
 

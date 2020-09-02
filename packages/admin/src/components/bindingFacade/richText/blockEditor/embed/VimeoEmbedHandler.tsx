@@ -55,12 +55,10 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 		return <VimeoEmbedHandler.Renderer vimeoIdField={this.options.vimeoIdField} entity={props.entity} />
 	}
 
-	public populateEmbedData({ batchUpdates, environment, embedArtifacts }: PopulateEmbedDataOptions<string>) {
+	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
 		batchUpdates(getAccessor => {
 			getAccessor()
-				.getRelativeSingleField<string>(
-					QueryLanguage.desugarRelativeSingleField(this.options.vimeoIdField, environment),
-				)
+				.getSingleField<string>(this.options.vimeoIdField)
 				.updateValue?.(embedArtifacts)
 		})
 	}

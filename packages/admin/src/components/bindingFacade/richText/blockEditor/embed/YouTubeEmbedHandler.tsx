@@ -55,12 +55,10 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 		return <YouTubeEmbedHandler.Renderer youTubeIdField={this.options.youTubeIdField} entity={props.entity} />
 	}
 
-	public populateEmbedData({ batchUpdates, environment, embedArtifacts }: PopulateEmbedDataOptions<string>) {
+	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
 		batchUpdates(getAccessor => {
 			getAccessor()
-				.getRelativeSingleField<string>(
-					QueryLanguage.desugarRelativeSingleField(this.options.youTubeIdField, environment),
-				)
+				.getSingleField<string>(this.options.youTubeIdField)
 				.updateValue?.(embedArtifacts)
 		})
 	}

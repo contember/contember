@@ -1,5 +1,5 @@
 import { GraphQlClient } from '@contember/client'
-import { ApiRequestReadyState, useContentApiRequest, useSessionToken } from '@contember/react-client'
+import { ApiRequestReadyState, useContentApiRequest } from '@contember/react-client'
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
@@ -30,7 +30,6 @@ export const useAccessorTreeState = ({
 	unstable_onSuccessfulPersist = noop,
 }: AccessorTreeStateOptions): [AccessorTreeState, AccessorTreeStateMetadata] => {
 	const environment = useEnvironment()
-	const sessionToken = useSessionToken()
 
 	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, environment).generate(), [
 		environment,
@@ -123,7 +122,7 @@ export const useAccessorTreeState = ({
 			type: AccessorTreeStateActionType.InitializeMutation,
 		})
 		try {
-			const data = await sendMutation(mutation, {}, sessionToken)
+			const data = await sendMutation(mutation)
 			const normalizedData = data.data === null ? {} : data.data
 			const aliases = Object.keys(normalizedData)
 			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
@@ -154,7 +153,7 @@ export const useAccessorTreeState = ({
 			}
 
 			try {
-				const queryData = await sendQuery(query, {}, sessionToken)
+				const queryData = await sendQuery(query)
 				accessorTreeGenerator.updatePersistedData(queryData)
 				return Promise.resolve({
 					type: PersistResultSuccessType.JustSuccess,
@@ -207,7 +206,7 @@ export const useAccessorTreeState = ({
 						type: AccessorTreeStateActionType.InitializeQuery,
 					})
 					try {
-						const data = await sendQuery(query, {}, sessionToken)
+						const data = await sendQuery(query)
 						isMountedRef.current && initializeAccessorTree(data)
 					} catch (metadata) {
 						rejectFailedRequest(metadata)
@@ -218,7 +217,7 @@ export const useAccessorTreeState = ({
 			}
 		}
 		performEffect()
-	}, [initializeAccessorTree, isInitialized, query, rejectFailedRequest, sendQuery, sessionToken, state.name])
+	}, [initializeAccessorTree, isInitialized, query, rejectFailedRequest, sendQuery, state.name])
 
 	// For this to work, this effect must be the last one to run.
 	React.useEffect(() => {

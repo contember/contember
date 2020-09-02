@@ -1,5 +1,6 @@
 import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
+import { useSessionToken } from '../auth'
 import { ApiRequestActionType } from './ApiRequestActionType'
 import { ApiRequestReadyState } from './ApiRequestReadyState'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
@@ -13,21 +14,23 @@ export const useApiRequest = <SuccessData>(
 	client: GraphQlClient,
 ): [
 	ApiRequestState<SuccessData>,
-	(query: string, variables: GraphQlClient.Variables, apiToken?: string) => Promise<SuccessData>,
+	(query: string, variables?: GraphQlClient.Variables, apiToken?: string | null) => Promise<SuccessData>,
 ] => {
 	const [state, dispatch] = React.useReducer(apiRequestReducer as ApiRequestReducer<SuccessData>, initialState)
+	const sessionToken = useSessionToken()
 
 	const isUnmountedRef = React.useRef(false)
 	const sendRequest = React.useCallback(
-		async (query: string, variables: GraphQlClient.Variables = {}, apiToken?: string): Promise<SuccessData> => {
+		async (query: string, variables: GraphQlClient.Variables = {}, apiToken?: string | null): Promise<SuccessData> => {
 			if (isUnmountedRef.current) {
 				return Promise.reject()
 			}
 			dispatch({
 				type: ApiRequestActionType.Initialize,
 			})
+			const resolvedToken = apiToken === null ? undefined : apiToken ?? sessionToken
 			return client
-				.sendRequest<SuccessData>(query, variables, apiToken)
+				.sendRequest<SuccessData>(query, variables, resolvedToken)
 				.then(data => {
 					dispatch({
 						type: ApiRequestActionType.ResolveSuccessfully,
@@ -43,7 +46,7 @@ export const useApiRequest = <SuccessData>(
 					return Promise.reject(error)
 				})
 		},
-		[client],
+		[client, sessionToken],
 	)
 
 	React.useEffect(

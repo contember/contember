@@ -2,7 +2,7 @@
   "name": "@contember/react-client",
   "version": "0.5.12",
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "index.js",
   "scripts": {
     "build": "rollup --config"
   },

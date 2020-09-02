@@ -1,12 +1,11 @@
 import { RichTextLeaf } from './RichTextLeaf'
 
-export type BuiltinLeaves =
-	| RichTextBoldLeaf
-	| RichTextCodeLeaf
-	| RichTextHighlightLeaf
-	| RichTextItalicLeaf
-	| RichTextStrikeThroughLeaf
-	| RichTextUnderlineLeaf
+export type BuiltinLeaves = RichTextBoldLeaf &
+	RichTextCodeLeaf &
+	RichTextHighlightLeaf &
+	RichTextItalicLeaf &
+	RichTextStrikeThroughLeaf &
+	RichTextUnderlineLeaf
 
 export interface RichTextBoldLeaf extends RichTextLeaf {
 	isBold?: boolean

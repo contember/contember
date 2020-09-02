@@ -50,17 +50,18 @@ export const Login = React.memo(() => {
 	React.useEffect(() => {
 		if (requestState.readyState === ApiRequestReadyState.Success) {
 			const signIn = requestState.data.data.signIn
+			const { ok, result } = signIn
 
-			if (!signIn.ok) {
+			if (!ok || !result) {
 				return
 			}
 
 			dispatch(
 				createAction<AuthIdentity>(SET_IDENTITY, () => ({
-					token: signIn.result.token,
-					email: signIn.result.person.email,
-					personId: signIn.result.person.id,
-					projects: signIn.result.person.identity.projects.map(
+					token: result.token,
+					email: result.person.email,
+					personId: result.person.id,
+					projects: result.person.identity.projects.map(
 						(it: any): Project => ({
 							slug: it.project.slug,
 							roles: it.memberships.map((membership: { role: string }) => membership.role),

@@ -1,12 +1,15 @@
-import { loginMutation } from '@contember/client'
+import { loginMutation, LoginMutationResponse } from '@contember/client'
 import * as React from 'react'
 import { ApiRequestState } from '../apiRequest'
 import { useLoginToken } from '../config'
 import { useTenantApiRequest } from '../tenant'
 import { invokeIfSupportsCredentials } from './invokeIfSupportsCredentials'
 
-export const useLoginRequest = (): [ApiRequestState<any>, (email: string, password: string) => void] => {
-	const [requestState, sendRequest] = useTenantApiRequest<any>()
+export const useLoginRequest = (): [
+	ApiRequestState<LoginMutationResponse>,
+	(email: string, password: string) => void,
+] => {
+	const [requestState, sendRequest] = useTenantApiRequest<LoginMutationResponse>()
 	const loginToken = useLoginToken()
 
 	const login = React.useCallback(

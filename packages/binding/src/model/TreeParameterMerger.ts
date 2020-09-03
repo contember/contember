@@ -7,6 +7,7 @@ import {
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
 	EntityListEventListeners,
+	ExpectedRelationMutation,
 	FieldName,
 	HasManyRelation,
 	HasOneRelation,
@@ -27,6 +28,7 @@ export class TreeParameterMerger {
 			reducedBy: original.reducedBy,
 
 			// Not encoded within the placeholder
+			expectedMutation: this.mergeExpectedRelationMutation(original.expectedMutation, fresh.expectedMutation),
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			forceCreation: original.forceCreation || fresh.forceCreation,
@@ -53,6 +55,7 @@ export class TreeParameterMerger {
 			limit: original.limit,
 
 			// Not encoded within the placeholder
+			expectedMutation: this.mergeExpectedRelationMutation(original.expectedMutation, fresh.expectedMutation),
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
@@ -314,5 +317,21 @@ export class TreeParameterMerger {
 			return undefined
 		}
 		return new Map(Array.from(map, ([key, set]) => [key, new Set(set)]))
+	}
+
+	private static mergeExpectedRelationMutation(
+		original: ExpectedRelationMutation,
+		fresh: ExpectedRelationMutation,
+	): ExpectedRelationMutation {
+		if (original === fresh) {
+			return original
+		}
+		if (original === 'none') {
+			return fresh
+		}
+		if (fresh === 'none') {
+			return original
+		}
+		return 'anyMutation'
 	}
 }

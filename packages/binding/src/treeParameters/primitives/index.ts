@@ -1,5 +1,7 @@
 export * from './EntityName'
 export * from './ExpectedEntityCount'
+export * from './ExpectedRelationMutation'
+export * from './ExpectedSubTreeMutation'
 export * from './FieldName'
 export * from './FieldValue'
 export * from './Filter'

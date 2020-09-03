@@ -16,7 +16,7 @@ import {
 	LeafFieldDefaults,
 	QualifiedEntityList,
 	QualifiedFieldList,
-	QualifiedSingleEntity,
+	QualifiedSingleEntity, RelationDefaults,
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
@@ -143,6 +143,7 @@ export namespace QueryLanguage {
 	): HasOneRelation => ({
 		field: sugarable.field,
 		filter: sugarable.filter ? desugarFilter(sugarable.filter, environment) : undefined,
+		expectedMutation: unsugarable.expectedMutation ?? RelationDefaults.expectedMutation,
 		reducedBy: sugarable.reducedBy ? desugarUniqueWhere(sugarable.reducedBy, environment) : undefined,
 		setOnCreate: unsugarable.setOnCreate ? desugarSetOnCreate(unsugarable.setOnCreate, environment) : undefined,
 		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
@@ -167,6 +168,7 @@ export namespace QueryLanguage {
 	): HasManyRelation => ({
 		field: relation.field,
 		filter: relation.filter,
+		expectedMutation: unsugarable.expectedMutation ?? RelationDefaults.expectedMutation,
 		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 		forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 		initialEntityCount: unsugarable.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
@@ -211,6 +213,7 @@ export namespace QueryLanguage {
 		environment: Environment,
 	): HasManyRelation => ({
 		...desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
+		expectedMutation: unsugarablePart.expectedMutation ?? RelationDefaults.expectedMutation,
 		setOnCreate: unsugarablePart.setOnCreate ? desugarSetOnCreate(unsugarablePart.setOnCreate, environment) : undefined,
 		field: sugarablePart.field,
 		isNonbearing: unsugarablePart.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,

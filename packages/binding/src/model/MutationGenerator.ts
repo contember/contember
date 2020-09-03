@@ -25,6 +25,7 @@ type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Que
 
 type ProcessedEntities = Set<InternalEntityState>
 
+// TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
 	public constructor(
 		private markerTree: MarkerTreeRoot,

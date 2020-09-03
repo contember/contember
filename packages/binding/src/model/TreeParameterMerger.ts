@@ -7,6 +7,7 @@ import {
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
 	EntityListEventListeners,
+	ExpectedQualifiedEntityMutation,
 	ExpectedRelationMutation,
 	FieldName,
 	HasManyRelation,
@@ -78,6 +79,10 @@ export class TreeParameterMerger {
 				// Not encoded within the placeholder
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
+					original.value.expectedMutation,
+					fresh.value.expectedMutation,
+				),
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
 				eventListeners: this.mergeSingleEntityEventListeners(original.value.eventListeners, fresh.value.eventListeners),
@@ -103,6 +108,10 @@ export class TreeParameterMerger {
 				// Not encoded within the placeholder
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
+					original.value.expectedMutation,
+					fresh.value.expectedMutation,
+				),
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
 				eventListeners: this.mergeEntityListEventListeners(original.value.eventListeners, fresh.value.eventListeners),
@@ -120,6 +129,10 @@ export class TreeParameterMerger {
 				// Not encoded within the placeholder
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
+					original.value.expectedMutation,
+					fresh.value.expectedMutation,
+				),
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
 				eventListeners: this.mergeSingleEntityEventListeners(original.value.eventListeners, fresh.value.eventListeners),
@@ -144,6 +157,10 @@ export class TreeParameterMerger {
 				// Not encoded within the placeholder
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
+					original.value.expectedMutation,
+					fresh.value.expectedMutation,
+				),
 				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
 				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
 				eventListeners: this.mergeEntityListEventListeners(original.value.eventListeners, fresh.value.eventListeners),
@@ -323,6 +340,22 @@ export class TreeParameterMerger {
 		original: ExpectedRelationMutation,
 		fresh: ExpectedRelationMutation,
 	): ExpectedRelationMutation {
+		if (original === fresh) {
+			return original
+		}
+		if (original === 'none') {
+			return fresh
+		}
+		if (fresh === 'none') {
+			return original
+		}
+		return 'anyMutation'
+	}
+
+	private static mergeExpectedQualifiedEntityMutation(
+		original: ExpectedQualifiedEntityMutation,
+		fresh: ExpectedQualifiedEntityMutation,
+	): ExpectedQualifiedEntityMutation {
 		if (original === fresh) {
 			return original
 		}

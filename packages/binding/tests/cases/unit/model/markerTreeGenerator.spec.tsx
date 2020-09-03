@@ -181,6 +181,7 @@ describe('Marker tree generator', () => {
 				setOnCreate: { bar: 123 },
 				forceCreation: false,
 				eventListeners: singleListeners,
+				expectedMutation: 'anyMutation',
 			}),
 			new EntityFieldMarkersContainer(
 				true,

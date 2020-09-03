@@ -58,7 +58,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					  }
 					: props.options
 			entityListDataProvider = (
-				<EntityListSubTree {...sugaredEntityList}>
+				<EntityListSubTree {...sugaredEntityList} expectedMutation="none">
 					{typeof props.optionsStaticRender === 'function'
 						? props.optionsStaticRender(environment)
 						: props.optionsStaticRender}
@@ -73,7 +73,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					: props.options
 			const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
 			entityListDataProvider = (
-				<EntityListSubTree {...fieldList} entities={fieldList}>
+				<EntityListSubTree {...fieldList} entities={fieldList} expectedMutation="none">
 					<Field field={fieldList.field} />
 				</EntityListSubTree>
 			)

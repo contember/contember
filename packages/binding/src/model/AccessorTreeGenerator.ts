@@ -118,7 +118,6 @@ export class AccessorTreeGenerator {
 			this.getEntityByKey,
 			this.getSubTree,
 			this.getAllEntities,
-			this.getAllTypeNames,
 		)
 
 	// This is currently useless but potentially future-compatible
@@ -136,16 +135,6 @@ export class AccessorTreeGenerator {
 			}
 		}
 	})(this)
-
-	private readonly getAllTypeNames = (): Set<string> => {
-		const typeNames = new Set<string>()
-
-		for (const [, { typeName }] of this.entityStore) {
-			typeName && typeNames.add(typeName)
-		}
-
-		return typeNames
-	}
 
 	private isFrozenWhileUpdating = false
 	private treeWideBatchUpdateDepth = 0

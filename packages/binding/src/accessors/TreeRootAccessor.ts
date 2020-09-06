@@ -1,3 +1,4 @@
+import { TreeFilter } from '@contember/client'
 import { EntityAccessor } from './EntityAccessor'
 import { GetEntityByKey } from './GetEntityByKey'
 import { GetSubTree } from './GetSubTree'
@@ -12,6 +13,7 @@ class TreeRootAccessor {
 	 * @param getEntityByKey Guaranteed to be referentially stable between updates.
 	 * @param getSubTree Guaranteed to be referentially stable between updates.
 	 * @param getAllEntities Guaranteed to be referentially stable between updates.
+	 * @param unstable_getTreeFilters
 	 */
 	public constructor(
 		public readonly hasUnpersistedChanges: boolean,
@@ -19,6 +21,7 @@ class TreeRootAccessor {
 		public readonly getEntityByKey: GetEntityByKey,
 		public readonly getSubTree: GetSubTree,
 		public readonly getAllEntities: () => Generator<EntityAccessor>,
+		public readonly unstable_getTreeFilters: () => TreeFilter[],
 	) {}
 
 	public getAllTypeNames(): Set<string> {

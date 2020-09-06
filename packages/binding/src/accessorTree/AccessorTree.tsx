@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { AddTreeRootListenerProvider, GetEntityByKeyProvider, GetSubTreeProvider } from '../accessorPropagation'
+import {
+	AddTreeRootListenerProvider,
+	GetEntityByKeyProvider,
+	GetSubTreeProvider,
+	GetTreeFiltersProvider,
+} from '../accessorPropagation'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { DirtinessContext } from './DirtinessContext'
 import { MutationStateContext } from './MutationStateContext'
@@ -19,9 +24,11 @@ export function AccessorTree({ state, children }: AccessorTreeProps) {
 				<DirtinessContext.Provider value={state.data.hasUnpersistedChanges}>
 					<MutationStateContext.Provider value={state.name === AccessorTreeStateName.Mutating}>
 						<AddTreeRootListenerProvider addTreeRootListener={state.data.addEventListener}>
-							<GetSubTreeProvider getSubTree={state.data.getSubTree}>
-								<GetEntityByKeyProvider getEntityByKey={state.data.getEntityByKey}>{children}</GetEntityByKeyProvider>
-							</GetSubTreeProvider>
+							<GetTreeFiltersProvider getTreeFilters={state.data.unstable_getTreeFilters}>
+								<GetSubTreeProvider getSubTree={state.data.getSubTree}>
+									<GetEntityByKeyProvider getEntityByKey={state.data.getEntityByKey}>{children}</GetEntityByKeyProvider>
+								</GetSubTreeProvider>
+							</GetTreeFiltersProvider>
 						</AddTreeRootListenerProvider>
 					</MutationStateContext.Provider>
 				</DirtinessContext.Provider>
@@ -33,9 +40,11 @@ export function AccessorTree({ state, children }: AccessorTreeProps) {
 			<DirtinessContext.Provider value={false}>
 				<MutationStateContext.Provider value={false}>
 					<AddTreeRootListenerProvider addTreeRootListener={undefined}>
-						<GetSubTreeProvider getSubTree={undefined}>
-							<GetEntityByKeyProvider getEntityByKey={undefined}>{children}</GetEntityByKeyProvider>
-						</GetSubTreeProvider>
+						<GetTreeFiltersProvider getTreeFilters={undefined}>
+							<GetSubTreeProvider getSubTree={undefined}>
+								<GetEntityByKeyProvider getEntityByKey={undefined}>{children}</GetEntityByKeyProvider>
+							</GetSubTreeProvider>
+						</GetTreeFiltersProvider>
 					</AddTreeRootListenerProvider>
 				</MutationStateContext.Provider>
 			</DirtinessContext.Provider>

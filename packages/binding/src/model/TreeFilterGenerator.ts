@@ -76,7 +76,7 @@ export class TreeFilterGenerator {
 		relations: RawRelationFilters = new Map(),
 	): RawRelationFilters {
 		for (const [, marker] of markers.markers) {
-			if (!(marker instanceof HasOneRelationMarker) || !(marker instanceof HasManyRelationMarker)) {
+			if (!(marker instanceof HasOneRelationMarker) && !(marker instanceof HasManyRelationMarker)) {
 				continue
 			}
 			if (marker.relation.expectedMutation === 'none' || marker.relation.expectedMutation === 'connectOrDisconnect') {

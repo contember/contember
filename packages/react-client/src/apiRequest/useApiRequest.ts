@@ -2,12 +2,13 @@ import { GraphQlClient } from '@contember/client'
 import * as React from 'react'
 import { useSessionToken } from '../auth'
 import { ApiRequestActionType } from './ApiRequestActionType'
-import { ApiRequestReadyState } from './ApiRequestReadyState'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
 import { ApiRequestState } from './ApiRequestState'
 
 const initialState: ApiRequestState<any> = {
-	readyState: ApiRequestReadyState.Uninitialized,
+	isLoading: false,
+	isFinished: false,
+	readyState: 'uninitialized',
 }
 
 export const useApiRequest = <SuccessData>(

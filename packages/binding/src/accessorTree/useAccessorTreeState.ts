@@ -195,7 +195,7 @@ export const useAccessorTreeState = ({
 				// not sufficient on its own. Thus we typically also enforce that queryStateRef.current.readyState is
 				// ApiRequestReadyState.Uninitialized. However, we may need to force a change even while both conditions hold,
 				// e.g. while a query is loading. For that we have a special ref which we always reset after we're done.
-				(isForcingRefreshRef.current || queryStateRef.current.readyState === ApiRequestReadyState.Uninitialized)
+				(isForcingRefreshRef.current || queryStateRef.current.readyState === 'uninitialized')
 			) {
 				if (query === undefined) {
 					// We're creating AND there are no subqueries

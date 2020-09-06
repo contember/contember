@@ -15,21 +15,29 @@ export const apiRequestReducer = <SuccessData>(
 	switch (action.type) {
 		case ApiRequestActionType.Uninitialize:
 			return {
-				readyState: ApiRequestReadyState.Uninitialized,
+				readyState: 'uninitialized',
+				isFinished: false,
+				isLoading: false,
 			}
 		case ApiRequestActionType.Initialize:
 			return {
-				readyState: ApiRequestReadyState.Pending,
+				readyState: 'pending',
+				isFinished: false,
+				isLoading: true,
 			}
 		case ApiRequestActionType.ResolveSuccessfully:
 			return {
-				readyState: ApiRequestReadyState.Success,
+				readyState: 'networkSuccess',
 				data: action.data,
+				isFinished: true,
+				isLoading: false,
 			}
 		case ApiRequestActionType.ResolveWithError:
 			return {
-				readyState: ApiRequestReadyState.Error,
+				readyState: 'networkError',
 				data: action.error,
+				isFinished: true,
+				isLoading: false,
 			}
 	}
 }

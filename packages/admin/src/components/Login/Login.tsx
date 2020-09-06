@@ -3,7 +3,7 @@ import { Button, ErrorList, FormGroup, TextInput } from '@contember/ui'
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { createAction } from 'redux-actions'
-import { ApiRequestReadyState, useLoginRequest } from '@contember/react-client'
+import { useLoginRequest } from '@contember/react-client'
 import { SET_IDENTITY } from '../../reducer/auth'
 import { AuthIdentity, Project } from '../../state/auth'
 import { MiscPageLayout } from '../MiscPageLayout'
@@ -13,8 +13,7 @@ export const Login = React.memo(() => {
 	const [requestState, login] = useLoginRequest()
 	const [email, setEmail] = React.useState('')
 	const [password, setPassword] = React.useState('')
-
-	const isLoading = requestState.readyState === ApiRequestReadyState.Pending
+	const isLoading = requestState.isLoading
 
 	const onSubmit = React.useCallback(
 		(e: React.FormEvent<HTMLFormElement>) => {
@@ -32,9 +31,9 @@ export const Login = React.memo(() => {
 	const errorMessages = React.useMemo(() => {
 		let errors: string[] = []
 
-		if (requestState.readyState === ApiRequestReadyState.Error) {
+		if (requestState.readyState === 'networkError') {
 			errors.push('Something went wrong. Please try again.')
-		} else if (requestState.readyState === ApiRequestReadyState.Success) {
+		} else if (requestState.readyState === 'networkSuccess') {
 			errors = errors.concat(
 				requestState.data.data.signIn.errors.map(
 					(error: { endUserMessage: string | null; code: string }) =>
@@ -48,7 +47,7 @@ export const Login = React.memo(() => {
 	const dispatch = useDispatch()
 	const redirect = useRedirect()
 	React.useEffect(() => {
-		if (requestState.readyState === ApiRequestReadyState.Success) {
+		if (requestState.readyState === 'networkSuccess') {
 			const signIn = requestState.data.data.signIn
 			const { ok, result } = signIn
 

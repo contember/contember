@@ -7,7 +7,7 @@ class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQu
 	}
 
 	async fetch({ db }: DatabaseQueryable): Promise<ProjectRolesByIdentityQuery.Result> {
-		let qb = SelectBuilder.create<{ role: string }>()
+		let qb = SelectBuilder.create<{ role: string }>() //
 			.select('role')
 			.from('project_membership')
 			.where({

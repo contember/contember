@@ -85,7 +85,7 @@ export class DeleteExecutor {
 
 	private async delete(db: Client, entity: Model.Entity, where: Input.Where): Promise<string[]> {
 		const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
-		const inQb = SelectBuilder.create()
+		const inQb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')
 			.select(['root_', entity.primaryColumn])
 		const inQbWithWhere = this.whereBuilder.build(inQb, entity, new Path([]), { and: [where, predicate] })

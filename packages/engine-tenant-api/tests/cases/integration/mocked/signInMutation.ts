@@ -9,7 +9,7 @@ import { ExpectedQuery } from '@contember/database-tester'
 import { SignInErrorCode } from '../../../../src/schema'
 import { createOtp, generateOtp } from '../../../../src/model/utils/otp'
 
-const createApiKeySql = function({ apiKeyId, identityId }: { apiKeyId: string; identityId: string }) {
+const createApiKeySql = function ({ apiKeyId, identityId }: { apiKeyId: string; identityId: string }) {
 	return {
 		sql: SQL`INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at")
 			         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -26,7 +26,7 @@ const createApiKeySql = function({ apiKeyId, identityId }: { apiKeyId: string; i
 		response: { rowCount: 1 },
 	}
 }
-const getIdentityProjectsSql = function({ identityId, projectId }: { identityId: string; projectId: string }) {
+const getIdentityProjectsSql = function ({ identityId, projectId }: { identityId: string; projectId: string }) {
 	return {
 		sql: SQL`SELECT "project"."id", "project"."name", "project"."slug"
 			         FROM "tenant"."project"

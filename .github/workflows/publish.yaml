@@ -15,11 +15,11 @@ jobs:
       - name: Get the version
         run: echo ::set-env name=VERSION::$(echo ${GITHUB_REF:10})
       - name: "Install base deps"
-        run: npm ci
-      - name: "Install lerna deps"
-        run: npm run bootstrap
+        run: yarn install
+      - name: "Install yarn deps"
+        run: yarn run bootstrap
       - name: "Build app"
-        run: npm run build
+        run: yarn run build
       - name: "Publish NPM"
         run: bash ./scripts/npm/publish.sh
         env:

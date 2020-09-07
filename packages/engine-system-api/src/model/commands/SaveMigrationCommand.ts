@@ -12,7 +12,7 @@ export class SaveMigrationCommand implements Command<void> {
 			migration: JSON.stringify(this.migration),
 			checksum: calculateMigrationChecksum(this.migration),
 		}
-		await InsertBuilder.create()
+		await InsertBuilder.create() //
 			.into('schema_migration')
 			.values(values)
 			.execute(db)

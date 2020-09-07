@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'fs'
 import { promisify } from 'util'
 import { join } from 'path'
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore-line
 import autocannon from 'autocannon'
 import { createHttpOptions, graphqlRequest } from './http'

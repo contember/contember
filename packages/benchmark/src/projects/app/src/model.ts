@@ -11,23 +11,28 @@ builder.entity('Locale', entity =>
 )
 
 builder.entity('Linkable', entity =>
-	entity.column('url', col =>
-		col
-			.type(Model.ColumnType.String)
-			.notNull()
-			.unique(),
-	),
+	entity //
+		.column('url', col =>
+			col //
+				.type(Model.ColumnType.String)
+				.notNull()
+				.unique(),
+		),
 )
 
 builder.entity('Redirect', entity =>
 	entity
 		.oneHasOne('link', ref =>
-			ref
+			ref //
 				.target('Linkable')
 				.inversedBy('redirect')
 				.notNull(),
 		)
-		.manyHasOne('target', ref => ref.target('Linkable').notNull()),
+		.manyHasOne('target', ref =>
+			ref //
+				.target('Linkable')
+				.notNull(),
+		),
 )
 
 builder.enum('State', ['Draft', 'ToBePublished', 'Published'])
@@ -78,7 +83,7 @@ builder.entity('MenuItem', entity =>
 	entity
 		.column('order', col => col.type(Model.ColumnType.Int))
 		.oneHasMany('locales', ref =>
-			ref
+			ref //
 				.target('MenuItemLocale')
 				.ownedBy('menuItem')
 				.onDelete(Model.OnDelete.cascade)
@@ -98,13 +103,13 @@ builder.entity('MenuItemLocale', entity =>
 builder.entity('Footer', entity =>
 	entity
 		.column('unique', col =>
-			col
+			col //
 				.type(Model.ColumnType.Enum, { enumName: 'One' })
 				.notNull()
 				.unique(),
 		)
 		.oneHasMany('locales', ref =>
-			ref
+			ref //
 				.target('FooterLocale')
 				.ownedBy('footer')
 				.onDelete(Model.OnDelete.cascade)
@@ -125,7 +130,7 @@ builder.entity('Person', entity =>
 		.manyHasOne('image', ref => ref.target('Image').onDelete(Model.OnDelete.cascade))
 		.column('email')
 		.oneHasMany('locales', ref =>
-			ref
+			ref //
 				.target('PersonLocale')
 				.ownedBy('person')
 				.onDelete(Model.OnDelete.cascade),
@@ -144,14 +149,14 @@ builder.entity('PersonLocale', entity =>
 builder.entity('Page', entity =>
 	entity
 		.oneHasMany('locales', ref =>
-			ref
+			ref //
 				.target('PageLocale')
 				.ownedBy('page')
 				.onDelete(Model.OnDelete.cascade),
 		)
 		.manyHasOne('image', ref => ref.target('Image').onDelete(Model.OnDelete.cascade))
 		.manyHasOne('category', ref =>
-			ref
+			ref //
 				.target('Category')
 				.onDelete(Model.OnDelete.setNull)
 				.inversedBy('pages'),
@@ -166,14 +171,14 @@ builder.entity('PageLocale', entity =>
 		.oneHasMany('content', ref => ref.target('Block').onDelete(Model.OnDelete.cascade))
 		.column('contactUs')
 		.oneHasOne('seo', ref =>
-			ref
+			ref //
 				.target('Seo')
 				.notNull()
 				.onDelete(Model.OnDelete.cascade),
 		)
 		.manyHasOne('locale', ref => ref.target('Locale').notNull())
 		.oneHasOne('link', ref =>
-			ref
+			ref //
 				.target('Linkable')
 				.inversedBy('page')
 				.notNull(),
@@ -202,13 +207,13 @@ builder.entity('Category', entity =>
 builder.entity('Contact', entity =>
 	entity
 		.column('unique', col =>
-			col
+			col //
 				.type(Model.ColumnType.Enum, { enumName: 'One' })
 				.notNull()
 				.unique(),
 		)
 		.oneHasMany('locales', ref =>
-			ref
+			ref //
 				.target('ContactLocale')
 				.ownedBy('contact')
 				.onDelete(Model.OnDelete.cascade)
@@ -221,13 +226,13 @@ builder.entity('ContactLocale', entity =>
 		.manyHasOne('locale', ref => ref.target('Locale').notNull())
 		.column('header')
 		.oneHasOne('seo', ref =>
-			ref
+			ref //
 				.target('Seo')
 				.notNull()
 				.onDelete(Model.OnDelete.cascade),
 		)
 		.oneHasOne('link', ref =>
-			ref
+			ref //
 				.target('Linkable')
 				.inversedBy('contact')
 				.notNull(),

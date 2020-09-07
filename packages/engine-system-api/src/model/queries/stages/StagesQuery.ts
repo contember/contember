@@ -3,7 +3,7 @@ import { Stage } from '../../../schema'
 
 class StagesQuery extends DatabaseQuery<Stage[]> {
 	async fetch(queryable: DatabaseQueryable): Promise<Stage[]> {
-		const select = SelectBuilder.create<Stage>()
+		const select = SelectBuilder.create<Stage>() //
 			.from('stage')
 			.select('id')
 			.select('name')

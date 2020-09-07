@@ -295,14 +295,11 @@ describe('query builder', () => {
 	it('constructs window function', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper.selectBuilder().select(expr =>
-					expr.window(window =>
-						window
-							.orderBy(['foo', 'bar'], 'desc')
-							.rowNumber()
-							.partitionBy(['lorem', 'ipsum']),
-					),
-				)
+				const qb = wrapper
+					.selectBuilder()
+					.select(expr =>
+						expr.window(window => window.orderBy(['foo', 'bar'], 'desc').rowNumber().partitionBy(['lorem', 'ipsum'])),
+					)
 
 				await qb.getResult(wrapper)
 			},
@@ -316,10 +313,7 @@ describe('query builder', () => {
 	it('applies limit by group', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper
-					.selectBuilder()
-					.select(['foo', 'bar'])
-					.from('foo')
+				const qb = wrapper.selectBuilder().select(['foo', 'bar']).from('foo')
 
 				await new LimitByGroupWrapper(
 					['foo', 'lorem'],
@@ -345,11 +339,7 @@ describe('query builder', () => {
 	it('select with no key update', async () => {
 		await execute({
 			query: async wrapper => {
-				const qb = wrapper
-					.selectBuilder()
-					.select('id')
-					.from('foo')
-					.lock(LockType.forNoKeyUpdate)
+				const qb = wrapper.selectBuilder().select('id').from('foo').lock(LockType.forNoKeyUpdate)
 
 				await qb.getResult(wrapper)
 			},

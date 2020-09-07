@@ -37,7 +37,7 @@ class Mapper {
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
-		const qb = SelectBuilder.create()
+		const qb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)

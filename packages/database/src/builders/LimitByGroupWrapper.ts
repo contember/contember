@@ -19,16 +19,14 @@ class LimitByGroupWrapper {
 
 	public async getResult<R>(qb: SelectBuilder<R>, db: Client): Promise<R[]> {
 		if (this.limit !== undefined || this.skip !== undefined) {
-			let window = WindowFunction.createEmpty()
-				.rowNumber()
-				.partitionBy(this.groupBy)
+			let window = WindowFunction.createEmpty().rowNumber().partitionBy(this.groupBy)
 			if (this.orderByCallback !== undefined) {
 				;[window, qb] = this.orderByCallback(window, qb)
 			}
 
 			qb = qb.select(window.compile(), 'rowNumber_')
 
-			let wrapperQb: SelectBuilder<R> = SelectBuilder.create<R>()
+			let wrapperQb: SelectBuilder<R> = SelectBuilder.create<R>() //
 				.with('data', qb)
 				.from('data')
 				.select(['data', '*'])

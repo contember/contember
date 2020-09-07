@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -400,8 +401,8 @@ export type QueryResolvers<
 }
 
 export type Resolvers<ContextType = any> = {
-	_AnyValue?: _AnyValueResolvers
-	_Argument?: _ArgumentResolvers
+	_AnyValue?: _AnyValueResolvers<ContextType>
+	_Argument?: _ArgumentResolvers<ContextType>
 	_BooleanValue?: _BooleanValueResolvers<ContextType>
 	_Entity?: _EntityResolvers<ContextType>
 	_Enum?: _EnumResolvers<ContextType>

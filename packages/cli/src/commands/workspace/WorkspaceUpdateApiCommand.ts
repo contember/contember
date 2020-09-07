@@ -20,6 +20,7 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const version = input.getArgument('version')
 		const workspaceDirectory = process.cwd()
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const packageJson = require(join(workspaceDirectory, 'package.json')) as any
 		const upgradablePackages = ['@contember/schema', '@contember/schema-definition', '@contember/cli']
 		const upgradeDeps = async (type: 'dependencies' | 'devDependencies') => {

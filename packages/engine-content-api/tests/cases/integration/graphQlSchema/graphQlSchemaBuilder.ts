@@ -237,18 +237,8 @@ describe('build gql schema from model schema', () => {
 					.entity('Video', entity => entity.column('vimeoId'))
 					.entity('FrontPage', entity =>
 						entity
-							.column('unique', column =>
-								column
-									.type(Model.ColumnType.Enum, { enumName: 'one' })
-									.unique()
-									.notNull(),
-							)
-							.oneHasOne('introVideo', relation =>
-								relation
-									.target('Video')
-									.notNull()
-									.inversedBy('frontPageForIntro'),
-							)
+							.column('unique', column => column.type(Model.ColumnType.Enum, { enumName: 'one' }).unique().notNull())
+							.oneHasOne('introVideo', relation => relation.target('Video').notNull().inversedBy('frontPageForIntro'))
 							.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage')),
 					),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),

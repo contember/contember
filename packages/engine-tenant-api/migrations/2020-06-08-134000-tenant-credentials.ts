@@ -1,7 +1,7 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { computeTokenHash, TenantMigrationArgs } from '../'
 
-export default async function(builder: MigrationBuilder, args: TenantMigrationArgs) {
+export default async function (builder: MigrationBuilder, args: TenantMigrationArgs) {
 	if (args.credentials.loginToken) {
 		const tokenHash = computeTokenHash(args.credentials.loginToken)
 		builder.sql(`

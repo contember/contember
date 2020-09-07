@@ -28,7 +28,7 @@ export const findMigration = <M extends { version: string }>(migrations: M[], ve
 		it => MigrationVersionHelper.extractVersion(it.version) === MigrationVersionHelper.extractVersion(version),
 	) || null
 
-export const printMigrationDescription = async function(
+export const printMigrationDescription = async function (
 	migrationsDescriber: MigrationDescriber,
 	schema: Schema,
 	migration: Migration,
@@ -49,7 +49,7 @@ export const printMigrationDescription = async function(
 				if (sql.trim()) {
 					console.log(sql)
 				} else {
-					'No sql to execute'
+					console.log('No sql to execute')
 				}
 			}
 			console.groupEnd()

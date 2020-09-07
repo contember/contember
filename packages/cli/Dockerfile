@@ -2,8 +2,9 @@ FROM node:12 as builder
 
 WORKDIR /src
 ENV NODE_ENV "production"
-COPY ./ ./
-RUN sh ./packages/cli/init-build.sh
+COPY ./packages/cli ./
+COPY ./yarn.lock ./
+RUN yarn install
 
 FROM node:12
 
@@ -18,9 +19,6 @@ RUN curl -Ls "https://download.docker.com/linux/debian/dists/stretch/pool/stable
 	curl -Ls "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
 	chmod +x /usr/local/bin/docker-compose
 
-COPY --from=builder /src/packages/cli/dist/src /opt/contember/dist/src
-COPY --from=builder /src/packages/cli/node_modules /opt/contember/node_modules
-COPY --from=builder /src/packages/cli/run.sh /opt/contember/run.sh
-COPY --from=builder /src/packages/cli/resources /opt/contember/resources
+COPY --from=builder /src/ /opt/contember/
 
 ENTRYPOINT ["bash", "/opt/contember/run.sh"]

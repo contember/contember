@@ -54,6 +54,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 					projectValid
 			}
 
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const schema: Schema = require(projectDir).default
 			projectValid = validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')
 

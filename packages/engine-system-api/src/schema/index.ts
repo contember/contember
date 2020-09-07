@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
 	{ [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
@@ -452,33 +453,26 @@ export type ResolversParentTypes = {
 	TreeFilterRelation: TreeFilterRelation
 	DiffResponse: DiffResponse
 	Boolean: Scalars['Boolean']
-	DiffErrorCode: DiffErrorCode
 	DiffResult: DiffResult
 	DiffEvent:
 		| ResolversParentTypes['DiffUpdateEvent']
 		| ResolversParentTypes['DiffDeleteEvent']
 		| ResolversParentTypes['DiffCreateEvent']
-	DiffEventType: DiffEventType
 	HistoryFilter: HistoryFilter
 	HistoryResponse: HistoryResponse
-	HistoryErrorCode: HistoryErrorCode
 	HistoryResult: HistoryResult
 	HistoryEvent:
 		| ResolversParentTypes['HistoryUpdateEvent']
 		| ResolversParentTypes['HistoryDeleteEvent']
 		| ResolversParentTypes['HistoryCreateEvent']
 		| ResolversParentTypes['HistoryRunMigrationEvent']
-	HistoryEventType: HistoryEventType
 	Mutation: {}
 	Migration: Migration
 	MigrateResponse: MigrateResponse
 	MigrateError: MigrateError
-	MigrateErrorCode: MigrateErrorCode
 	MigrateResult: MigrateResult
 	ReleaseResponse: ReleaseResponse
-	ReleaseErrorCode: ReleaseErrorCode
 	ReleaseTreeResponse: ReleaseTreeResponse
-	ReleaseTreeErrorCode: ReleaseTreeErrorCode
 	RebaseAllResponse: RebaseAllResponse
 	HistoryUpdateEvent: HistoryUpdateEvent
 	HistoryDeleteEvent: HistoryDeleteEvent
@@ -805,14 +799,14 @@ export type Resolvers<ContextType = any> = {
 	DateTime?: GraphQLScalarType
 	DiffCreateEvent?: DiffCreateEventResolvers<ContextType>
 	DiffDeleteEvent?: DiffDeleteEventResolvers<ContextType>
-	DiffEvent?: DiffEventResolvers
+	DiffEvent?: DiffEventResolvers<ContextType>
 	DiffResponse?: DiffResponseResolvers<ContextType>
 	DiffResult?: DiffResultResolvers<ContextType>
 	DiffUpdateEvent?: DiffUpdateEventResolvers<ContextType>
 	ExecutedMigration?: ExecutedMigrationResolvers<ContextType>
 	HistoryCreateEvent?: HistoryCreateEventResolvers<ContextType>
 	HistoryDeleteEvent?: HistoryDeleteEventResolvers<ContextType>
-	HistoryEvent?: HistoryEventResolvers
+	HistoryEvent?: HistoryEventResolvers<ContextType>
 	HistoryResponse?: HistoryResponseResolvers<ContextType>
 	HistoryResult?: HistoryResultResolvers<ContextType>
 	HistoryRunMigrationEvent?: HistoryRunMigrationEventResolvers<ContextType>

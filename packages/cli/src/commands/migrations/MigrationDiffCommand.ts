@@ -25,6 +25,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		return await executeCreateMigrationCommand(
 			input,
 			async ({ projectDir, migrationName, migrationCreator, migrationDescriber }) => {
+				// eslint-disable-next-line @typescript-eslint/no-var-requires
 				const schema: Schema = require(projectDir).default
 				try {
 					const result = await migrationCreator.createDiff(schema, migrationName)

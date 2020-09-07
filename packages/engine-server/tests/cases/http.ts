@@ -124,7 +124,7 @@ beforeAll(async () => {
 
 describe('http tests', () => {
 	it('homepage runs', async () => {
-		await supertest(createContainer(false).koa.callback())
+		await supertest(createContainer(false).koa.callback()) //
 			.get('/')
 			.expect(200)
 			.expect('App is running')

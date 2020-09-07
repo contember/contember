@@ -2,7 +2,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { createEventStatementTrigger } from '@contember/schema-migrations'
 import { formatSchemaName, getJunctionTables, MigrationArgs } from '..'
 
-export default async function(builder: MigrationBuilder, args: MigrationArgs) {
+export default async function (builder: MigrationBuilder, args: MigrationArgs) {
 	const schema = await args.schemaResolver()
 	const junctionTables = getJunctionTables(schema.model)
 	const schemas = args.project.stages.map(formatSchemaName)

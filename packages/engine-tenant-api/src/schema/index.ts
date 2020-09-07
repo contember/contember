@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql'
 export type Maybe<T> = T | null
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
 	{ [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
@@ -831,80 +832,60 @@ export type ResolversParentTypes = {
 	Project: Project
 	RoleDefinition: RoleDefinition
 	RoleVariableDefinition: ResolversParentTypes['RoleEntityVariableDefinition']
-	MEMBER_TYPE: Member_Type
 	ProjectIdentityRelation: ProjectIdentityRelation
 	Membership: Membership
 	VariableEntry: VariableEntry
-	CheckResetPasswordTokenCode: CheckResetPasswordTokenCode
 	Mutation: {}
 	AdminCredentials: AdminCredentials
 	SetupResponse: SetupResponse
 	Boolean: Scalars['Boolean']
-	SetupErrorCode: SetupErrorCode
 	SetupResult: SetupResult
 	ApiKeyWithToken: ApiKeyWithToken
 	SignUpResponse: SignUpResponse
 	SignUpError: SignUpError
-	SignUpErrorCode: SignUpErrorCode
 	SignUpResult: SignUpResult
 	Int: Scalars['Int']
 	SignInResponse: SignInResponse
 	SignInError: SignInError
-	SignInErrorCode: SignInErrorCode
 	SignInResult: SignInResult
 	SignOutResponse: SignOutResponse
 	SignOutError: SignOutError
-	SignOutErrorCode: SignOutErrorCode
 	ChangePasswordResponse: ChangePasswordResponse
 	ChangePasswordError: ChangePasswordError
-	ChangePasswordErrorCode: ChangePasswordErrorCode
 	PrepareOtpResponse: PrepareOtpResponse
 	PrepareOtpResult: PrepareOtpResult
 	ConfirmOtpResponse: ConfirmOtpResponse
 	ConfirmOtpError: ConfirmOtpError
-	ConfirmOtpErrorCode: ConfirmOtpErrorCode
 	DisableOtpResponse: DisableOtpResponse
 	DisableOtpError: DisableOtpError
-	DisableOtpErrorCode: DisableOtpErrorCode
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
 	CreatePasswordResetRequestResponse: CreatePasswordResetRequestResponse
 	CreatePasswordResetRequestError: CreatePasswordResetRequestError
-	CreatePasswordResetRequestErrorCode: CreatePasswordResetRequestErrorCode
 	ResetPasswordResponse: ResetPasswordResponse
 	ResetPasswordError: ResetPasswordError
-	ResetPasswordErrorCode: ResetPasswordErrorCode
 	MembershipInput: MembershipInput
 	VariableEntryInput: VariableEntryInput
 	InviteOptions: InviteOptions
 	InviteResponse: InviteResponse
 	InviteError: InviteError
-	InviteErrorCode: InviteErrorCode
 	InviteResult: InviteResult
 	AddProjectMemberResponse: AddProjectMemberResponse
 	AddProjectMemberError: AddProjectMemberError
-	AddProjectMemberErrorCode: AddProjectMemberErrorCode
 	RemoveProjectMemberResponse: RemoveProjectMemberResponse
 	RemoveProjectMemberError: RemoveProjectMemberError
-	RemoveProjectMemberErrorCode: RemoveProjectMemberErrorCode
 	UpdateProjectMemberResponse: UpdateProjectMemberResponse
 	UpdateProjectMemberError: UpdateProjectMemberError
-	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
 	CreateApiKeyResponse: CreateApiKeyResponse
 	CreateApiKeyError: CreateApiKeyError
-	CreateApiKeyErrorCode: CreateApiKeyErrorCode
 	CreateApiKeyResult: CreateApiKeyResult
 	DisableApiKeyResponse: DisableApiKeyResponse
 	DisableApiKeyError: DisableApiKeyError
-	DisableApiKeyErrorCode: DisableApiKeyErrorCode
 	MailTemplate: MailTemplate
-	MailType: MailType
 	AddMailTemplateResponse: AddMailTemplateResponse
 	AddMailTemplateError: AddMailTemplateError
-	AddMailTemplateErrorCode: AddMailTemplateErrorCode
 	MailTemplateIdentifier: MailTemplateIdentifier
 	RemoveMailTemplateResponse: RemoveMailTemplateResponse
 	RemoveMailTemplateError: RemoveMailTemplateError
-	RemoveMailTemplateErrorCode: RemoveMailTemplateErrorCode
 	SetupError: SetupError
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 	CheckResetPasswordTokenResult: CheckResetPasswordTokenResult
@@ -1609,7 +1590,7 @@ export type Resolvers<ContextType = any> = {
 	ResetPasswordResponse?: ResetPasswordResponseResolvers<ContextType>
 	RoleDefinition?: RoleDefinitionResolvers<ContextType>
 	RoleEntityVariableDefinition?: RoleEntityVariableDefinitionResolvers<ContextType>
-	RoleVariableDefinition?: RoleVariableDefinitionResolvers
+	RoleVariableDefinition?: RoleVariableDefinitionResolvers<ContextType>
 	SetupError?: SetupErrorResolvers<ContextType>
 	SetupResponse?: SetupResponseResolvers<ContextType>
 	SetupResult?: SetupResultResolvers<ContextType>

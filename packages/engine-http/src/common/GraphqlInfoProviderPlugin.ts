@@ -8,8 +8,10 @@ export type GraphQLInfoState = {
 	}
 }
 
-export class GraphqlInfoProviderPlugin implements ApolloServerPlugin<{ koaContext: KoaContext<GraphQLInfoState> }> {
-	requestDidStart(requestContext: GraphQLRequestContext): GraphQLRequestListener {
+type Context = { koaContext: KoaContext<GraphQLInfoState> }
+
+export class GraphqlInfoProviderPlugin implements ApolloServerPlugin<Context> {
+	requestDidStart(requestContext: GraphQLRequestContext<Context>): GraphQLRequestListener<Context> {
 		return {
 			didResolveOperation: requestContext => {
 				requestContext.context.koaContext.state.graphql = {

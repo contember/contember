@@ -78,7 +78,8 @@ const loadMigrations = async (db: DBConnection, options: RunnerOption) => {
 				const actions =
 					path.extname(filePath) === '.sql'
 						? (await migrateSqlFile(filePath)).up
-						: require(path.relative(__dirname, filePath)).default
+						: // eslint-disable-next-line @typescript-eslint/no-var-requires
+						  require(path.relative(__dirname, filePath)).default
 				return new Migration(filePath, actions)
 			}),
 		)
@@ -135,6 +136,9 @@ const checkOrder = (runNames: string[], migrations: Migration[]) => {
 	for (let i = 0; i < len; i += 1) {
 		const runName = runNames[i]
 		const migrationName = migrations[i].name
+		if (runName < migrationName) {
+			throw new Error(`Previously run migration ${runName} is missing`)
+		}
 		if (runName !== migrationName) {
 			throw new Error(`Not run migration ${migrationName} is preceding already run migration ${runName}`)
 		}

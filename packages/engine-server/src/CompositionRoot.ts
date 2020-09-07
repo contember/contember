@@ -90,7 +90,7 @@ class CompositionRoot {
 			Promise.resolve(
 				projectContainers[slug] ||
 					(aliasFallback
-						? containerList.find(function(it) {
+						? containerList.find(function (it) {
 								return it.project.alias && it.project.alias.includes(slug)
 						  })
 						: undefined),

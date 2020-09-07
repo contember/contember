@@ -5,7 +5,7 @@ services:
     volumes:
       - ./:/src:cached
     working_dir: /src
-    command: npm run ts:watch
+    command: yarn run ts:watch
 
   db:
     image: postgres:10-alpine

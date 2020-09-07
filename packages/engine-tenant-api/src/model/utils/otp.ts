@@ -1,7 +1,7 @@
 import url from 'url'
 import { authenticator } from 'otplib'
 
-const getSecret = function(otp: { uri: string } | { secret: string }) {
+const getSecret = function (otp: { uri: string } | { secret: string }) {
 	return 'uri' in otp ? (url.parse(otp.uri, true).query.secret as string) : otp.secret
 }
 export const verifyOtp = (otp: { uri: string } | { secret: string }, token: string): boolean => {

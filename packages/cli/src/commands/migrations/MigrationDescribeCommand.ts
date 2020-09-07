@@ -16,7 +16,7 @@ type Options = {
 	['no-sql']: boolean
 }
 
-let printMigrationDescription = async function(
+let printMigrationDescription = async function (
 	migrationsDescriber: MigrationDescriber,
 	schema: Schema,
 	migration: Migration,
@@ -39,7 +39,7 @@ let printMigrationDescription = async function(
 				if (sql.trim()) {
 					console.log(sql)
 				} else {
-					'No sql to execute'
+					console.log('No sql to execute')
 				}
 			}
 			console.groupEnd()

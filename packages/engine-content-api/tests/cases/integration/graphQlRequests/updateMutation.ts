@@ -80,12 +80,7 @@ describe('update', () => {
 		const postWithAuthor = new SchemaBuilder()
 			.entity('Post', e =>
 				e
-					.manyHasOne('author', r =>
-						r
-							.target('Author')
-							.notNull()
-							.inversedBy('posts'),
-					)
+					.manyHasOne('author', r => r.target('Author').notNull().inversedBy('posts'))
 					.column('title', c => c.type(Model.ColumnType.String)),
 			)
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))

@@ -295,7 +295,12 @@ export async function readConfig(filenames: string[], configProcessors: ConfigPr
 	)
 
 	let { projectDefaults, ...config } = Merger.merge(template, ...configs)
-	if (typeof projectDefaults === 'object' && projectDefaults !== null && typeof config.projects === 'object') {
+	if (
+		typeof projectDefaults === 'object' &&
+		projectDefaults !== null &&
+		typeof config.projects === 'object' &&
+		config.projects !== null
+	) {
 		const projectsWithDefaults = Object.entries(config.projects).map(([slug, project]) =>
 			tuple(slug, Merger.merge(projectDefaults as any, project as any)),
 		)

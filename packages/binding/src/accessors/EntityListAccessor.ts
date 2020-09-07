@@ -26,6 +26,34 @@ class EntityListAccessor extends Accessor implements Errorable {
 	public hasEntityKey(childEntityKey: string): boolean {
 		return this.childEntityKeys.has(childEntityKey)
 	}
+
+	public isEmpty(): boolean {
+		return this.length === 0
+	}
+
+	public get length(): number {
+		return this.childEntityKeys.size
+	}
+
+	public deleteAll() {
+		this.batchUpdates(getAccessor => {
+			const list = getAccessor()
+			for (const entity of list) {
+				entity.deleteEntity?.()
+			}
+		})
+		return this
+	}
+
+	public disconnectAll() {
+		this.batchUpdates(getAccessor => {
+			const list = getAccessor()
+			for (const entity of list) {
+				list.disconnectEntity?.(entity)
+			}
+		})
+		return this
+	}
 }
 
 namespace EntityListAccessor {

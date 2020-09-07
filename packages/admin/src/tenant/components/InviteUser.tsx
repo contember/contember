@@ -274,7 +274,7 @@ export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }>
 		if (inviteResult.invite.ok) {
 			goToUsersList()
 			addToast({
-				type: ToastType.Success,
+				type: 'success',
 				message: `User has been invited to this project and credentials have been sent to the given email.`,
 			})
 		}
@@ -342,7 +342,7 @@ export const EditUser: React.FC<{ project: string; rolesConfig: RolesConfig; ide
 		if (result.updateProjectMember.ok) {
 			goToUsersList()
 			addToast({
-				type: ToastType.Success,
+				type: 'success',
 				message: `Updated user's roles successfully.`,
 			})
 		}

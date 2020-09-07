@@ -1,16 +1,22 @@
 import * as React from 'react'
-import { EntityFieldMarkersContainer, Environment, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../../../../src'
-import { Field, HasMany, HasOne, SingleEntitySubTree } from '../../../../src/coreComponents'
 import {
+	BoxedQualifiedSingleEntity,
+	EntityFieldMarkersContainer,
+	Environment,
+	Field,
 	FieldMarker,
+	HasMany,
 	HasManyRelationMarker,
+	HasOne,
 	HasOneRelationMarker,
 	Marker,
+	MarkerTreeGenerator,
 	MarkerTreeRoot,
+	PRIMARY_KEY_NAME,
+	SingleEntitySubTree,
 	SubTreeMarker,
-} from '../../../../src/markers'
-import { MarkerTreeGenerator } from '../../../../src/model'
-import { BoxedQualifiedSingleEntity } from '../../../../src/treeParameters'
+	TYPENAME_KEY_NAME,
+} from '../../../../src'
 
 describe('Marker tree generator', () => {
 	it('should reject empty trees', () => {
@@ -83,6 +89,7 @@ describe('Marker tree generator', () => {
 				offset: undefined,
 				limit: undefined,
 				eventListeners: listListeners,
+				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -113,6 +120,7 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				reducedBy: undefined,
 				eventListeners: singleListeners,
+				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -144,6 +152,7 @@ describe('Marker tree generator', () => {
 				offset: undefined,
 				limit: undefined,
 				eventListeners: listListeners,
+				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
 				true,
@@ -172,6 +181,7 @@ describe('Marker tree generator', () => {
 				setOnCreate: { bar: 123 },
 				forceCreation: false,
 				eventListeners: singleListeners,
+				expectedMutation: 'anyMutation',
 			}),
 			new EntityFieldMarkersContainer(
 				true,

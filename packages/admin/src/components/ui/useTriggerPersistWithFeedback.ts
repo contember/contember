@@ -1,6 +1,5 @@
-import * as React from 'react'
 import { ErrorPersistResult, RequestErrorType, SuccessfulPersistResult, useTriggerPersist } from '@contember/binding'
-import { ToastType } from '../../state/toasts'
+import * as React from 'react'
 import { useShowToastWithTimeout } from './useShowToastWithTimeout'
 
 export const useTriggerPersistWithFeedback = () => {
@@ -18,7 +17,7 @@ export const useTriggerPersistWithFeedback = () => {
 			.then(result => {
 				console.debug('persist success', result)
 				showToast({
-					type: ToastType.Success,
+					type: 'success',
 					message: 'Success!',
 				})
 				return result
@@ -26,7 +25,7 @@ export const useTriggerPersistWithFeedback = () => {
 			.catch((result: ErrorPersistResult) => {
 				console.debug('persist error', result)
 				showToast({
-					type: ToastType.Error,
+					type: 'error',
 					message: 'Error!',
 				})
 				return Promise.reject(result)

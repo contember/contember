@@ -1,10 +1,4 @@
-export enum ToastType {
-	Success = 'success',
-	Error = 'error',
-	Warning = 'warning',
-	Info = 'info',
-}
-
+export type ToastType = 'success' | 'error' | 'warning' | 'info'
 export type ToastId = string
 
 export interface ToastDefinition {

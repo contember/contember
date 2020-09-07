@@ -15,8 +15,10 @@ import {
 	HasOneRelation,
 	LeafFieldDefaults,
 	QualifiedEntityList,
+	QualifiedEntityParametersDefaults,
 	QualifiedFieldList,
 	QualifiedSingleEntity,
+	RelationDefaults,
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
@@ -143,6 +145,7 @@ export namespace QueryLanguage {
 	): HasOneRelation => ({
 		field: sugarable.field,
 		filter: sugarable.filter ? desugarFilter(sugarable.filter, environment) : undefined,
+		expectedMutation: unsugarable.expectedMutation ?? RelationDefaults.expectedMutation,
 		reducedBy: sugarable.reducedBy ? desugarUniqueWhere(sugarable.reducedBy, environment) : undefined,
 		setOnCreate: unsugarable.setOnCreate ? desugarSetOnCreate(unsugarable.setOnCreate, environment) : undefined,
 		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
@@ -167,6 +170,7 @@ export namespace QueryLanguage {
 	): HasManyRelation => ({
 		field: relation.field,
 		filter: relation.filter,
+		expectedMutation: unsugarable.expectedMutation ?? RelationDefaults.expectedMutation,
 		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 		forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 		initialEntityCount: unsugarable.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
@@ -211,6 +215,7 @@ export namespace QueryLanguage {
 		environment: Environment,
 	): HasManyRelation => ({
 		...desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
+		expectedMutation: unsugarablePart.expectedMutation ?? RelationDefaults.expectedMutation,
 		setOnCreate: unsugarablePart.setOnCreate ? desugarSetOnCreate(unsugarablePart.setOnCreate, environment) : undefined,
 		field: sugarablePart.field,
 		isNonbearing: unsugarablePart.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
@@ -247,6 +252,7 @@ export namespace QueryLanguage {
 			setOnCreate: unsugarableEntityList.setOnCreate
 				? desugarSetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
+			expectedMutation: unsugarableEntityList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
 			eventListeners: desugarEntityListEventListeners(unsugarableEntityList),
 			initialEntityCount: unsugarableEntityList.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 			entityName,
@@ -280,6 +286,7 @@ export namespace QueryLanguage {
 			setOnCreate: unsugarableSingleEntity.setOnCreate
 				? desugarSetOnCreate(unsugarableSingleEntity.setOnCreate, environment)
 				: undefined,
+			expectedMutation: unsugarableSingleEntity.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
 			eventListeners: desugarSingleEntityEventListeners(unsugarableSingleEntity),
 			entityName,
 			hasOneRelationPath,
@@ -322,6 +329,7 @@ export namespace QueryLanguage {
 			setOnCreate: unsugarableEntityList.setOnCreate
 				? desugarSetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
+			expectedMutation: unsugarableEntityList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
 			eventListeners: desugarEntityListEventListeners(unsugarableEntityList),
 		}
 	}
@@ -362,6 +370,7 @@ export namespace QueryLanguage {
 				unsugarableFieldList.defaultValue !== undefined
 					? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
 					: undefined,
+			expectedMutation: unsugarableFieldList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
 			eventListeners: desugarEntityListEventListeners(unsugarableFieldList),
 			...desugarEntityListParameters(
 				{
@@ -413,6 +422,8 @@ export namespace QueryLanguage {
 				? unsugarableSingleEntity.isNonbearing !== undefined
 				: EntityCreationParametersDefaults.isNonbearing
 		const eventListeners = desugarSingleEntityEventListeners(unsugarableSingleEntity)
+		const expectedMutation =
+			unsugarableSingleEntity.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation
 
 		return {
 			entityName,
@@ -423,6 +434,7 @@ export namespace QueryLanguage {
 			setOnCreate,
 			isNonbearing,
 			eventListeners,
+			expectedMutation,
 		}
 	}
 

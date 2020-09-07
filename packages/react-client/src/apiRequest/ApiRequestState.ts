@@ -3,13 +3,24 @@ import { ApiRequestReadyState } from './ApiRequestReadyState'
 
 export type ApiRequestState<SuccessData> =
 	| {
-			readyState: ApiRequestReadyState.Uninitialized | ApiRequestReadyState.Pending
+			isLoading: false
+			isFinished: false
+			readyState: 'uninitialized'
 	  }
 	| {
-			readyState: ApiRequestReadyState.Success
+			isLoading: true
+			isFinished: false
+			readyState: 'pending'
+	  }
+	| {
+			isLoading: false
+			isFinished: true
+			readyState: 'networkSuccess'
 			data: SuccessData
 	  }
 	| {
-			readyState: ApiRequestReadyState.Error
+			isLoading: false
+			isFinished: true
+			readyState: 'networkError'
 			data: GraphQlClient.FailedRequestMetadata
 	  }

@@ -57,6 +57,18 @@ class EntityAccessor extends Accessor implements Errorable {
 		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
 	}
 
+	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs) {
+		this.batchUpdates(getAccessor => {
+			const entries = Array.isArray(fieldValuePairs) ? fieldValuePairs : Object.entries(fieldValuePairs)
+
+			for (const [field, value] of entries) {
+				getAccessor()
+					.getSingleField(field)
+					.updateValue?.(value)
+			}
+		})
+	}
+
 	/**
 	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameters
 	 * are really just a way to succinctly write a type cast. Nothing more, really.
@@ -182,6 +194,12 @@ namespace EntityAccessor {
 		getAccessor(): NestedAccessor
 	}
 	export type NestedAccessor = EntityAccessor | EntityListAccessor | FieldAccessor
+
+	export type FieldValuePairs =
+		| {
+				[field: string]: FieldValue
+		  }
+		| Array<[SugaredRelativeSingleField | string, FieldValue]>
 
 	export type FieldData = Map<FieldName, FieldDatum>
 

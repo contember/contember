@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from '@contember/client'
+import { GraphQlBuilder, TreeFilter } from '@contember/client'
 import { emptyArray, noop } from '@contember/react-utils'
 import * as ReactDOM from 'react-dom'
 import { EntityAccessor, EntityListAccessor, FieldAccessor, GetSubTree, TreeRootAccessor } from '../accessors'
@@ -51,6 +51,7 @@ import { MarkerMerger } from './MarkerMerger'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { TreeParameterMerger } from './TreeParameterMerger'
+import { TreeFilterGenerator } from './TreeFilterGenerator'
 
 // This only applies to the 'beforeUpdate' event:
 
@@ -73,6 +74,8 @@ enum ErrorPopulationMode {
 }
 
 export class AccessorTreeGenerator {
+	private readonly treeFilterGenerator: TreeFilterGenerator
+
 	private updateData: ((newData: TreeRootAccessor) => void) | undefined
 	private persistedEntityData: PersistedEntityDataStore = new Map()
 
@@ -118,7 +121,7 @@ export class AccessorTreeGenerator {
 			this.getEntityByKey,
 			this.getSubTree,
 			this.getAllEntities,
-			this.getAllTypeNames,
+			this.getTreeFilters,
 		)
 
 	// This is currently useless but potentially future-compatible
@@ -137,21 +140,17 @@ export class AccessorTreeGenerator {
 		}
 	})(this)
 
-	private readonly getAllTypeNames = (): Set<string> => {
-		const typeNames = new Set<string>()
-
-		for (const [, { typeName }] of this.entityStore) {
-			typeName && typeNames.add(typeName)
-		}
-
-		return typeNames
+	private readonly getTreeFilters = (): TreeFilter[] => {
+		return this.treeFilterGenerator.generateTreeFilter()
 	}
 
 	private isFrozenWhileUpdating = false
 	private treeWideBatchUpdateDepth = 0
 	private unpersistedChangesCount = 0
 
-	public constructor(private readonly markerTree: MarkerTreeRoot) {}
+	public constructor(private readonly markerTree: MarkerTreeRoot) {
+		this.treeFilterGenerator = new TreeFilterGenerator(this.markerTree, this.subTreeStates, this.entityStore)
+	}
 
 	public initializeLiveTree(
 		queryResponse: QueryRequestResponse | undefined,

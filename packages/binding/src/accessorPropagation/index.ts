@@ -2,12 +2,14 @@
 // export * from './EntityKeyContext' // Deliberately not exporting it
 // export * from './GetEntityByKeyContext' // Deliberately not exporting it
 // export * from './GetSubTreeContext' // Deliberately not exporting it
+// export * from './GetTreeFiltersContext' // Deliberately not exporting it
 export * from './AccessorProvider'
 export * from './AddTreeRootListenerProvider'
 export * from './EntityKeyProvider'
 export * from './EnvironmentContext'
 export * from './GetEntityByKeyProvider'
 export * from './GetSubTreeProvider'
+export * from './GetTreeFiltersProvider'
 export * from './useAccessorUpdateSubscription'
 export * from './useAddTreeRootListener'
 export * from './useDesugaredRelativeEntityList'
@@ -19,6 +21,7 @@ export * from './useEntityListSubTreeParameters'
 export * from './useEnvironment'
 export * from './useGetEntityByKey'
 export * from './useGetSubTree'
+export * from './useGetTreeFilters'
 export * from './useParentEntityAccessor'
 export * from './useRelativeEntityList'
 export * from './useRelativeSingleEntity'

@@ -7,16 +7,16 @@ import { dismissToast } from '../../actions/toasts'
 import { Button, Icon, Intent, Message, MessageProps } from '@contember/ui'
 
 const toastTypeToMessageType: { [K in ToastType]: MessageProps['type'] } = {
-	[ToastType.Success]: 'success',
-	[ToastType.Warning]: 'warn',
-	[ToastType.Error]: 'danger',
-	[ToastType.Info]: 'info',
+	success: 'success',
+	warning: 'warn',
+	error: 'danger',
+	info: 'info',
 }
 const toastTypeToIntent: { [K in ToastType]: Intent } = {
-	[ToastType.Success]: 'success',
-	[ToastType.Warning]: 'warn',
-	[ToastType.Error]: 'danger',
-	[ToastType.Info]: 'primary',
+	success: 'success',
+	warning: 'warn',
+	error: 'danger',
+	info: 'primary',
 }
 
 class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & Toaster.ToasterDispatcherProps> {

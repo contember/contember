@@ -46,14 +46,14 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 			if (result.updateProjectMember.ok) {
 				addToast({
 					message: `Membership updated`,
-					type: ToastType.Success,
+					type: 'success',
 				})
 			} else {
 				addToast({
 					message: `Error updating membership: ${result.updateProjectMember.errors
 						.map(it => getTenantErrorMessage(it.code))
 						.join(', ')}`,
-					type: ToastType.Error,
+					type: 'error',
 				})
 			}
 			await refetchUserList()
@@ -71,14 +71,14 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 			if (result.removeProjectMember.ok) {
 				addToast({
 					message: `Member removed`,
-					type: ToastType.Success,
+					type: 'success',
 				})
 			} else {
 				addToast({
 					message: `Error removing member: ${result.removeProjectMember.errors
 						.map(it => getTenantErrorMessage(it.code))
 						.join(', ')}`,
-					type: ToastType.Error,
+					type: 'error',
 				})
 			}
 			await refetchUserList()

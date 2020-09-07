@@ -28,11 +28,11 @@ export enum Operator {
 	'endsWithCI' = 'endsWithCI',
 }
 
-const stringOnlyOperators = [
+const likeOperators = [
 	Operator.contains,
 	Operator.containsCI,
 	Operator.startsWith,
-	Operator.startsWith,
+	Operator.startsWithCI,
 	Operator.endsWith,
 	Operator.endsWithCI,
 ]
@@ -74,7 +74,7 @@ export class ConditionBuilder {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
 
-		if (stringOnlyOperators.includes(operator)) {
+		if (likeOperators.includes(operator)) {
 			if (typeof value !== 'string') {
 				throw new Error(`Operator ${operator} supports only a string value`)
 			}

@@ -12,6 +12,31 @@ interface Raw {
 	bindings: Value[]
 }
 
+export enum Operator {
+	'notEq' = '!=',
+	'eq' = '=',
+	'gt' = '>',
+	'gte' = '>=',
+	'lt' = '<',
+	'lte' = '<=',
+	'contains' = 'contains',
+	'startsWith' = 'startsWith',
+	'endsWith' = 'endsWith',
+
+	'containsCI' = 'containsCI',
+	'startsWithCI' = 'startsWithCI',
+	'endsWithCI' = 'endsWithCI',
+}
+
+const stringOnlyOperators = [
+	Operator.contains,
+	Operator.containsCI,
+	Operator.startsWith,
+	Operator.startsWith,
+	Operator.endsWith,
+	Operator.endsWithCI,
+]
+
 export class ConditionBuilder {
 	private constructor(public readonly expressions: Literal[]) {}
 
@@ -48,7 +73,8 @@ export class ConditionBuilder {
 		if (!Object.values(Operator).includes(operator)) {
 			throw new Error(`Operator ${operator} is not supported`)
 		}
-		if (operator === Operator.contains || operator === Operator.endsWith || operator === Operator.startsWith) {
+
+		if (stringOnlyOperators.includes(operator)) {
 			if (typeof value !== 'string') {
 				throw new Error(`Operator ${operator} supports only a string value`)
 			}
@@ -76,10 +102,16 @@ export class ConditionBuilder {
 		switch (operator) {
 			case Operator.contains:
 				return `${left} LIKE '%' || ${right} || '%'`
+			case Operator.containsCI:
+				return `${left} ILIKE '%' || ${right} || '%'`
 			case Operator.startsWith:
 				return `${left} LIKE ${right} || '%'`
+			case Operator.startsWithCI:
+				return `${left} ILIKE ${right} || '%'`
 			case Operator.endsWith:
 				return `${left} LIKE '%' || ${right}`
+			case Operator.endsWithCI:
+				return `${left} ILIKE '%' || ${right}`
 		}
 		return `${left} ${operator} ${right}`
 	}
@@ -139,16 +171,4 @@ export class ConditionBuilder {
 	isEmpty(): boolean {
 		return this.expressions.length === 0
 	}
-}
-
-export enum Operator {
-	'notEq' = '!=',
-	'eq' = '=',
-	'gt' = '>',
-	'gte' = '>=',
-	'lt' = '<',
-	'lte' = '<=',
-	'contains' = 'contains',
-	'startsWith' = 'startsWith',
-	'endsWith' = 'endsWith',
 }

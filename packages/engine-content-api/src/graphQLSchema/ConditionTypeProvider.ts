@@ -46,6 +46,10 @@ export default class ConditionTypeProvider {
 					conditions.contains = { type: this.graphqlObjectFactories.string }
 					conditions.startsWith = { type: this.graphqlObjectFactories.string }
 					conditions.endsWith = { type: this.graphqlObjectFactories.string }
+
+					conditions.containsCI = { type: this.graphqlObjectFactories.string }
+					conditions.startsWithCI = { type: this.graphqlObjectFactories.string }
+					conditions.endsWithCI = { type: this.graphqlObjectFactories.string }
 				}
 				return conditions
 			},

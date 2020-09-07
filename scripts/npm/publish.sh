@@ -9,4 +9,4 @@ if [[ $VERSION =~ ^v((([0-9]+)\.([0-9]+))\.[0-9]+)$ ]]; then
 	NPM_TAG="latest"
 fi
 
-npx oao all npm publish --tag $NPM_TAG
+npx oao all "yarn publish --tag $NPM_TAG"

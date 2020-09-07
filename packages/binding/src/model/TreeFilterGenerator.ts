@@ -81,6 +81,12 @@ export class TreeFilterGenerator {
 			}
 			if (marker.relation.expectedMutation === 'none' || marker.relation.expectedMutation === 'connectOrDisconnect') {
 				continue
+			} else if (
+				marker.relation.expectedMutation === 'anyMutation' ||
+				marker.relation.expectedMutation === 'createOrDelete'
+			) {
+			} else {
+				return assertNever(marker.relation.expectedMutation)
 			}
 			const existingRelation = relations.get(marker.relation.field)
 

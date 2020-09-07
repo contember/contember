@@ -9,7 +9,7 @@ if [[ -f "`pwd`/node_modules/.bin/contember" && -x "$(command -v npx)" ]]; then
 	npx contember "$@"
 else
 	docker run -ti --network host --rm \
-	  -v "$(pwd)":/src -v /var/run/docker.sock:/var/run/docker.sock \
+	   -v "$(pwd)":"$(pwd)" --workdir="$(pwd)" -v /var/run/docker.sock:/var/run/docker.sock \
 	  "$IMAGE" "$@"
 fi
 

@@ -1,15 +1,16 @@
-FROM node:12 as builder
+FROM node:12-alpine as builder
 
 WORKDIR /src
 ENV NODE_ENV "production"
-COPY ./ ./
-RUN sh ./packages/engine-server/init-build.sh
+COPY ./packages/engine-server ./
+COPY ./yarn.lock ./
+RUN apk --no-cache add --virtual builds-deps build-base python
+RUN yarn install
 
-FROM node:12
+FROM node:12-alpine
 
 WORKDIR /src
-COPY --from=builder /src/packages/engine-server/dist/src ./dist/src
-COPY --from=builder /src/packages/engine-server/node_modules ./node_modules
+COPY --from=builder /src/ /src
 
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT 4000

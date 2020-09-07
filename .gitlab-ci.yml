@@ -10,10 +10,8 @@ install:
   stage: install
   image: node:12.13
   script:
-    - npm ci
-    - npm run bootstrap
-    - rm -rf packages/*/node_modules/typescript packages/*/node_modules/.bin/{tsc,tsserver}
-    - rm -rf packages/cli/resources/templates/*/node_modules/typescript packages/cli/resources/templates/*/node_modules/.bin/{tsc,tsserver}
+    - yarn install
+    - yarn run bootstrap
   artifacts:
     paths:
       - "node_modules"
@@ -25,11 +23,12 @@ build:
   image: node:12.13
 
   script:
-    - npm run build
+    - yarn run build
 
   artifacts:
     paths:
       - "packages/*/dist"
+      - "packages/*/migrations/*.js"
 
 test:
   stage: test
@@ -48,13 +47,13 @@ test:
     POSTGRES_PASSWORD: "123"
 
   script:
-    - npm run test
+    - yarn run test
 
 eslint:
   stage: test
   image: node:12.13
   script:
-    - npm run eslint:lint
+    - yarn run eslint:lint
 
 publish:npm:
   image: node:12.13

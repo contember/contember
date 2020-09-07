@@ -6,6 +6,8 @@
 	"tabWidth": 2,
 	"trailingComma": "all",
 	"useTabs": true,
+	"arrowParens": "avoid",
+
 	"overrides": [
 		{
 			"files": "tsconfig.json",

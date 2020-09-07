@@ -24,7 +24,7 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 			.where(where =>
 				where.in(
 					['project', 'id'],
-					SelectBuilder.create()
+					SelectBuilder.create() //
 						.from('project_membership')
 						.select('project_id')
 						.where({
@@ -38,12 +38,9 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 			: qb.where(where =>
 					where.in(
 						['project', 'id'],
-						SelectBuilder.create()
-							.from('project_membership')
-							.select('project_id')
-							.where({
-								identity_id: this.permissionContext.identity.id,
-							}),
+						SelectBuilder.create().from('project_membership').select('project_id').where({
+							identity_id: this.permissionContext.identity.id,
+						}),
 					),
 			  )
 

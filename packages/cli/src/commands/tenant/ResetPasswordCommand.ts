@@ -1,7 +1,6 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { interactiveResetPassword, interactiveResolveLoginToken, interactiveSignIn } from '../../utils/tenant'
-import prompt from 'prompts'
-import { interactiveResolveInstanceEnvironmentFromInput, updateInstanceLocalConfig } from '../../utils/instance'
+import { interactiveResetPassword, interactiveResolveLoginToken } from '../../utils/tenant'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 
 type Args = {
 	instance?: string
@@ -12,7 +11,7 @@ type Options = {}
 export class ResetPasswordCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Resets user password')
-		configuration
+		configuration //
 			.argument('instance')
 			.optional()
 			.description('Local instance name or remote Contember API URL')

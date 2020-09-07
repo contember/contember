@@ -11,7 +11,7 @@ class ProlongApiKeyCommand implements Command<void> {
 		if (newExpiration === null) {
 			return
 		}
-		const qb = UpdateBuilder.create()
+		const qb = UpdateBuilder.create() //
 			.table('api_key')
 			.where({ id: this.id })
 			.values({

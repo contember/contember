@@ -29,15 +29,15 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		configuration.description('Executes migrations on an instance')
 		configuration.argument('project')
 		configuration.argument('migration').optional()
-		configuration
+		configuration //
 			.option('instance')
 			.valueRequired()
 			.description('Local instance name or remote Contember API URL')
-		configuration
+		configuration //
 			.option('remote-project')
 			.valueRequired()
 			.description('Specify this when remote project name does not match local project name.')
-		configuration
+		configuration //
 			.option('yes')
 			.valueNone()
 			.description('Do not ask for confirmation.')

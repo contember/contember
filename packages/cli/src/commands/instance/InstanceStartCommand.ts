@@ -25,16 +25,16 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		configuration.description('Starts Contember instance')
 		configuration.argument('instanceName').optional()
 		configuration.option('host').valueArray()
-		configuration
+		configuration //
 			.option('save-ports')
 			.valueNone()
 			.deprecated()
 		configuration.option('ports').valueRequired()
-		configuration
+		configuration //
 			.option('detach')
 			.valueNone()
 			.shortcut('d')
-		configuration
+		configuration //
 			.option('admin-runtime')
 			.valueRequired()
 			.description('"docker" or "node"')

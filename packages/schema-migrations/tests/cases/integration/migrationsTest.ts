@@ -49,10 +49,7 @@ function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Modificat
 		modificationHandler.createSql(builder)
 		schema = modificationHandler.getSchemaUpdater()(schema)
 	}
-	const actual = builder
-		.getSql()
-		.replace(/\s+/g, ' ')
-		.trim()
+	const actual = builder.getSql().replace(/\s+/g, ' ').trim()
 	expect(actual).toEqual(expectedSql)
 }
 
@@ -227,13 +224,7 @@ describe('Diff schemas', () => {
 		const originalSchema = new SchemaBuilder().entity('Post', e => e).buildSchema()
 		const updatedSchema = new SchemaBuilder()
 			.entity('Post', e =>
-				e.oneHasMany('locales', r =>
-					r
-						.target('PostLocale')
-						.ownerNotNull()
-						.ownedBy('post')
-						.orderBy('title'),
-				),
+				e.oneHasMany('locales', r => r.target('PostLocale').ownerNotNull().ownedBy('post').orderBy('title')),
 			)
 			.entity('PostLocale', e =>
 				e
@@ -965,14 +956,7 @@ describe('Diff schemas', () => {
 			.entity('Author', e => e.column('slug', c => c.type(Model.ColumnType.String).unique()))
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
-			.entity('Author', e =>
-				e.column('identifier', c =>
-					c
-						.type(Model.ColumnType.String)
-						.columnName('slug')
-						.unique(),
-				),
-			)
+			.entity('Author', e => e.column('identifier', c => c.type(Model.ColumnType.String).columnName('slug').unique()))
 			.buildSchema()
 		const diff: Migration.Modification[] = [
 			{
@@ -999,12 +983,7 @@ describe('Diff schemas', () => {
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
 			.entity('Post', e =>
-				e.column('title').manyHasOne('author', r =>
-					r
-						.target('Author')
-						.inversedBy('posts')
-						.joiningColumn('user_id'),
-				),
+				e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts').joiningColumn('user_id')),
 			)
 			.entity('Author', e => e.column('name'))
 			.buildSchema()
@@ -1059,14 +1038,7 @@ describe('Diff schemas', () => {
 
 	describe('drop relation (one has many)', () => {
 		const originalSchema = new SchemaBuilder()
-			.entity('Post', e =>
-				e.oneHasMany('locales', r =>
-					r
-						.target('PostLocale')
-						.ownerNotNull()
-						.ownedBy('post'),
-				),
-			)
+			.entity('Post', e => e.oneHasMany('locales', r => r.target('PostLocale').ownerNotNull().ownedBy('post')))
 			.entity('PostLocale', e =>
 				e
 					.unique(['post', 'locale'])
@@ -1526,12 +1498,7 @@ describe('Diff schemas', () => {
 			.buildSchema()
 		const updatedModel = new SchemaBuilder()
 			.entity('Post', e =>
-				e.column('title').manyHasOne('author', r =>
-					r
-						.target('Author')
-						.inversedBy('posts')
-						.joiningColumn('user_id'),
-				),
+				e.column('title').manyHasOne('author', r => r.target('Author').inversedBy('posts').joiningColumn('user_id')),
 			)
 			.entity('Comment', e => e.column('content').manyHasOne('post', r => r.target('Post')))
 			.entity('Author', e => e.column('name'))

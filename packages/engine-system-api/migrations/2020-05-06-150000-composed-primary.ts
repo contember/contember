@@ -43,7 +43,7 @@ const migrateEvents = (builder: MigrationBuilder, tableName: string, primaryKeys
 `)
 }
 
-export default async function(builder: MigrationBuilder, args: MigrationArgs) {
+export default async function (builder: MigrationBuilder, args: MigrationArgs) {
 	const schema = await args.schemaResolver()
 	const tablesToMigrate = getJunctionTables(schema.model)
 	const schemas = args.project.stages.map(formatSchemaName)

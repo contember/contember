@@ -297,7 +297,7 @@ export class ContentEventApplier {
 		assert.equal(event.rowId.length, 1)
 		const entity = context.entityTable.entity
 		const predicate = context.predicateFactory.create(entity, Acl.Operation.delete)
-		const inQb = SelectBuilder.create()
+		const inQb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')
 			.select(['root_', entity.primaryColumn])
 		const primary = event.rowId[0]

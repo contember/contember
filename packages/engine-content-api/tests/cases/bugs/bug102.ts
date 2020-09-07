@@ -10,13 +10,11 @@ it('Filter by has many with additional join', async () => {
 		schema: new SchemaBuilder()
 			.entity('Language', entity => entity.column('slug', column => column.type(Model.ColumnType.String).unique()))
 			.entity('Person', entity =>
-				entity.column('shortName').oneHasMany('locales', relation =>
-					relation
-						.target('PersonLocale')
-						.onDelete(Model.OnDelete.cascade)
-						.ownedBy('person')
-						.ownerNotNull(),
-				),
+				entity
+					.column('shortName')
+					.oneHasMany('locales', relation =>
+						relation.target('PersonLocale').onDelete(Model.OnDelete.cascade).ownedBy('person').ownerNotNull(),
+					),
 			)
 			.entity('PersonLocale', entity =>
 				entity

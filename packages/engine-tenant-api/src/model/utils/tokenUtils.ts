@@ -7,7 +7,7 @@ export const generateToken = async (generator: {
 }
 
 export const computeTokenHash = (token: string): string => {
-	return crypto
+	return crypto //
 		.createHash('sha256')
 		.update(token, 'ascii')
 		.digest('hex')

@@ -109,7 +109,7 @@ export function Unique<T extends EntityType<T>>(
 		}
 	}
 
-	return function(cls: { new (): T }) {
+	return function (cls: { new (): T }) {
 		const keys = Reflect.getMetadata('uniqueKeys', cls) || []
 		Reflect.defineMetadata('uniqueKeys', [...keys, options], cls)
 	}

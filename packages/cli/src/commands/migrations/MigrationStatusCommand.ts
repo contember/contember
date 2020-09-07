@@ -23,23 +23,23 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Shows status of executed migrations on an instance & sync status')
 		configuration.argument('project')
-		configuration
+		configuration //
 			.option('instance')
 			.valueRequired()
 			.description('Local instance name or remote Contember API URL')
-		configuration
+		configuration //
 			.option('remote-project')
 			.valueRequired()
 			.description('Specify this when remote project name does not match local project name.')
-		configuration
+		configuration //
 			.option('only-errors')
 			.valueNone()
 			.description('Show only migrations with an error.')
-		configuration
+		configuration //
 			.option('only-to-execute')
 			.valueNone()
 			.description('Show only migrations to execute.')
-		configuration
+		configuration //
 			.option('restore-missing')
 			.valueNone()
 			.description('Restores migrations locally missing')

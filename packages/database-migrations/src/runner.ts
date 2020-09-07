@@ -78,7 +78,8 @@ const loadMigrations = async (db: DBConnection, options: RunnerOption) => {
 				const actions =
 					path.extname(filePath) === '.sql'
 						? (await migrateSqlFile(filePath)).up
-						: require(path.relative(__dirname, filePath)).default
+						: // eslint-disable-next-line @typescript-eslint/no-var-requires
+						  require(path.relative(__dirname, filePath)).default
 				return new Migration(filePath, actions)
 			}),
 		)

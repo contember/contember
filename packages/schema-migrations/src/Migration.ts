@@ -16,7 +16,7 @@ namespace Migration {
 
 export const calculateMigrationChecksum = (migration: Migration): string => {
 	const canonicalMigration = JSON.stringify(migration.modifications)
-	return crypto
+	return crypto //
 		.createHash('md5')
 		.update(canonicalMigration)
 		.digest('hex')

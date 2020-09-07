@@ -10,7 +10,7 @@ class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.R
 			project_id: this.projectId,
 			identity_id: this.identityId,
 		}
-		const result = await DeleteBuilder.create()
+		const result = await DeleteBuilder.create() //
 			.from('project_membership')
 			.where(memberWhere)
 			.execute(db)

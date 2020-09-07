@@ -11,12 +11,7 @@ describe('update with db', () => {
 			const schema = new SchemaBuilder()
 				.entity('Site', e => e.column('slug', c => c.unique().type(Model.ColumnType.String)))
 				.entity('ContactPage', e =>
-					e.column('title').oneHasOne('site', r =>
-						r
-							.target('Site')
-							.inversedBy('contactPage')
-							.notNull(),
-					),
+					e.column('title').oneHasOne('site', r => r.target('Site').inversedBy('contactPage').notNull()),
 				)
 				.buildSchema()
 
@@ -96,12 +91,7 @@ describe('update with db', () => {
 					e
 						.column('slug', c => c.unique().type(Model.ColumnType.String))
 
-						.oneHasOne('contactPage', r =>
-							r
-								.target('ContactPage')
-								.inversedBy('site')
-								.inversedNotNull(),
-						),
+						.oneHasOne('contactPage', r => r.target('ContactPage').inversedBy('site').inversedNotNull()),
 				)
 				.entity('ContactPage', e => e.column('title'))
 				.buildSchema()

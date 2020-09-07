@@ -12,7 +12,7 @@ type Options = {}
 export class SignInCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Signs in a user')
-		configuration
+		configuration //
 			.argument('instance')
 			.optional()
 			.description('Local instance name or remote Contember API URL')

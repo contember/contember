@@ -230,7 +230,7 @@ const interactiveResolveMemberships = async ({
 				type: 'list',
 				message: `Values for ${variable.name} (comma separated)`,
 				name: 'values',
-				// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
 				separator: ',',
 			})

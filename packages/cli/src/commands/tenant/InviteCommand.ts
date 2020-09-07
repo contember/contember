@@ -11,7 +11,7 @@ type Options = {}
 export class InviteCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Invites a user by an email')
-		configuration
+		configuration //
 			.argument('instance')
 			.optional()
 			.description('Local instance name or remote Contember API URL')

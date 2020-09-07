@@ -29,7 +29,7 @@ export class TesterStageManager {
 	}
 
 	public async refreshCreatedStages(): Promise<Set<string>> {
-		const stages = await SelectBuilder.create<{ slug: string }>()
+		const stages = await SelectBuilder.create<{ slug: string }>() //
 			.select('slug')
 			.from('stage')
 			.getResult(this.db.client)

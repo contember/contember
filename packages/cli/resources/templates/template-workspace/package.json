@@ -1,19 +1,17 @@
 {
-	"name": "@contember/template-workspace",
-	"version": "0.9.0-alpha.1",
-	"license": "Apache-2.0",
-	"scripts": {
-		"version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml && git add contember.workspace.yaml"
-	},
-	"scripts-template": {
-		"cli": "contember",
-		"build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
-	},
-	"devDependencies": {
-		"typescript": "^3.9.5"
-	},
-	"dependencies": {
-		"@contember/schema": "^0.9.0-alpha.1",
-		"@contember/schema-definition": "^0.9.0-alpha.1"
-	}
+  "name": "@contember/template-workspace",
+  "version": "0.9.0-alpha.1",
+  "license": "Apache-2.0",
+  "scripts": {
+    "version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml && git add contember.workspace.yaml"
+  },
+  "scripts-template": {
+    "cli": "contember",
+    "build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "@contember/schema": "^0.9.0-alpha.1",
+    "@contember/schema-definition": "^0.9.0-alpha.1"
+  }
 }

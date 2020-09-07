@@ -1,44 +1,49 @@
 {
-	"scripts": {
-		"bootstrap": "lerna bootstrap --ci",
-		"update": "lerna bootstrap --no-ci",
-		"ci-clean": "rm -rf packages/*/node_modules/typescript",
-		"clean": "rm -rf node_modules/ packages/*/{dist,node_modules}",
-		"ts:build": "tsc --build",
-		"ts:watch": "tsc --build --watch --pretty",
-		"ts:clean": "tsc --build --clean",
-		"prebuild": "lerna run prebuild",
-		"build": "tsc --build && lerna run build",
-		"test": "lerna run --concurrency 1 test",
-		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
-		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
-		"tag-version": "lerna version --force-publish"
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
-	"lint-staged": {
-		"*.ts": [
-			"eslint --fix"
-		]
-	},
-	"devDependencies": {
-		"@typescript-eslint/eslint-plugin": "^2.10.0",
-		"@typescript-eslint/parser": "^2.10.0",
-		"eslint": "^6.7.2",
-		"eslint-config-prettier": "^6.7.0",
-		"eslint-plugin-prettier": "^3.1.1",
-		"eslint-plugin-promise": "^4.2.1",
-		"husky": "^4.2.0",
-		"jasmine": "^3.5.0",
-		"jasmine-ts": "^0.3.0",
-		"lerna": "^3.20.2",
-		"lerna-audit": "^1.1.1",
-		"lint-staged": "^10.0.2",
-		"prettier": "^1.18.2",
-		"ts-node": "^8.4.1",
-		"typescript": "^3.9.5"
-	}
+  "version": "0.9.0-alpha.1",
+  "private": true,
+  "scripts": {
+    "oao": "oao",
+    "bootstrap": "oao bootstrap",
+    "ci-clean": "rm -rf packages/*/node_modules/typescript",
+    "clean": "rm -rf node_modules/ packages/*/{dist,node_modules}",
+    "ts:build": "tsc --build",
+    "ts:watch": "tsc --build --watch --pretty",
+    "ts:clean": "tsc --build --clean",
+    "prebuild": "oao all prebuild",
+    "build": "tsc --build && oao all build",
+    "test": "oao all test --concurrency 1 test",
+    "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
+    "eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
+    "tag-version": "oao publish --no-npm-publish --no-changelog"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^14.6.4",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "eslint": "^7.8.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "husky": "^4.2.0",
+    "jasmine": "^3.5.0",
+    "lint-staged": "^10.0.2",
+    "oao": "^2.0.0",
+    "prettier": "^2.1.1",
+    "ts-node": "^8.4.1",
+    "typescript": "^4.0.2"
+  },
+  "workspaces": [
+    "packages/*",
+    "packages/cli/resources/templates/*"
+  ]
 }

@@ -27,15 +27,15 @@ jobs:
         with:
           node-version: 12
       - name: "Install base deps"
-        run: npm ci
+        run: yarn install
       - name: "Run linter"
-        run: npm run eslint:lint
-      - name: "Install lerna deps"
-        run: npm run bootstrap
+        run: yarn run eslint:lint
+      - name: "Install yarn deps"
+        run: yarn run bootstrap
       - name: "Build app"
-        run: npm run build
+        run: yarn run build
       - name: "Run tests"
-        run: npm run test
+        run: yarn run test
         env:
           TEST_DB_HOST: 127.0.0.1
           TEST_DB_PASSWORD: postgres

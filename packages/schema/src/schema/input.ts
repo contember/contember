@@ -159,6 +159,9 @@ namespace Input {
 		contains?: string
 		startsWith?: string
 		endsWith?: string
+		containsCI?: string
+		startsWithCI?: string
+		endsWithCI?: string
 	}
 
 	export interface UniqueWhere<E = never> {

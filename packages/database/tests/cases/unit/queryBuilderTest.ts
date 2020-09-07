@@ -43,6 +43,9 @@ describe('query builder', () => {
 							.compare('g', Operator.contains, 'foo\\%bar')
 							.compare('h', Operator.startsWith, 'lorem_ipsum')
 							.compare('i', Operator.endsWith, 'dolor%sit')
+							.compare('j', Operator.containsCI, 'X')
+							.compare('k', Operator.startsWithCI, 'Y')
+							.compare('l', Operator.endsWithCI, 'Z')
 							.compareColumns('z', Operator.eq, ['foo', 'x'])
 							.in('o', [1, 2, 3])
 							.in(
@@ -59,8 +62,9 @@ describe('query builder', () => {
                from "public"."foo"
                where "a" = ? and "b" != ? and "c" < ? and "d" <= ? and "e" > ? and "f" >= ?
                      and "g" like '%' || ? || '%' and "h" like ? || '%' and "i" like '%' || ?
+                     and "j" ilike '%' || ? || '%' and "k" ilike ? || '%' and "l" ilike '%' || ?
                      and "z" = "foo"."x" and "o" in (?, ?, ?) and "m" in (select ?) and "n" is null and false`,
-			parameters: [1, 2, 3, 4, 5, 6, 'foo\\\\\\%bar', 'lorem\\_ipsum', 'dolor\\%sit', 1, 2, 3, 1],
+			parameters: [1, 2, 3, 4, 5, 6, 'foo\\\\\\%bar', 'lorem\\_ipsum', 'dolor\\%sit', 'X', 'Y', 'Z', 1, 2, 3, 1],
 		})
 	})
 

@@ -49,6 +49,9 @@ export default class ConditionBuilder {
 			contains: (builder, value) => builder.compare(columnIdentifier, Operator.contains, value),
 			startsWith: (builder, value) => builder.compare(columnIdentifier, Operator.startsWith, value),
 			endsWith: (builder, value) => builder.compare(columnIdentifier, Operator.endsWith, value),
+			containsCI: (builder, value) => builder.compare(columnIdentifier, Operator.containsCI, value),
+			startsWithCI: (builder, value) => builder.compare(columnIdentifier, Operator.startsWithCI, value),
+			endsWithCI: (builder, value) => builder.compare(columnIdentifier, Operator.endsWithCI, value),
 			never: builder => builder.raw('false'),
 			always: builder => builder.raw('true'),
 			// deprecated

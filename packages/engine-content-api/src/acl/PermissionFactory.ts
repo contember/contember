@@ -50,7 +50,7 @@ export default class PermissionFactory {
 			const entity = getEntity(this.schema, entityName)
 			const entityPermissions: Acl.EntityPermissions = permissions[entityName]
 
-			const operationNames: (keyof Pick<Acl.EntityOperations, 'create' | 'read'>)[] = ['read', 'create']
+			const operationNames = ['read', 'create', 'update'] as const
 			for (let operation of operationNames) {
 				const fieldPermissions: Acl.FieldPermissions | undefined = entityPermissions.operations[operation]
 				if (fieldPermissions === undefined) {

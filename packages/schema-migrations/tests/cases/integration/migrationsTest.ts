@@ -1318,7 +1318,14 @@ describe('Diff schemas', () => {
 	describe('make relation nullable inversed', () => {
 		const originalSchema = new SchemaBuilder()
 			.entity('Post', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
-			.entity('Link', e => e.oneHasOne('post', r => r.target('Post').inversedNotNull().inversedBy('link')))
+			.entity('Link', e =>
+				e.oneHasOne('post', r =>
+					r
+						.target('Post')
+						.inversedNotNull()
+						.inversedBy('link'),
+				),
+			)
 			.buildSchema()
 		const updatedSchema = new SchemaBuilder()
 			.entity('Post', entity => entity.column('name', c => c.type(Model.ColumnType.String)))

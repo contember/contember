@@ -38,6 +38,9 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 			let migratedSchema = emptySchema
 			for (const migration of await container.migrationsResolver.getMigrations()) {
 				try {
+					// just a check that it does not fail
+					await container.migrationsDescriber.describeModifications(migratedSchema, migration)
+
 					migratedSchema = container.schemaMigrator.applyModifications(
 						migratedSchema,
 						migration.modifications,

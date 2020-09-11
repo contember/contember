@@ -17,7 +17,7 @@ export const addEntityAtIndex = (
 	}
 	const sortedEntities = sortEntities(Array.from(entityList), sortableByField)
 	entityList.batchUpdates(() => {
-		createNewEntity(getNewlyAdded => {
+		createNewEntity((getNewlyAdded, options) => {
 			let newlyAdded = getNewlyAdded()
 
 			const sortableField = newlyAdded.getRelativeSingleField<number>(sortableByField)
@@ -32,7 +32,7 @@ export const addEntityAtIndex = (
 				return throwNonWritableError(sortableField.fieldName)
 			}
 
-			preprocess?.(getNewlyAdded)
+			preprocess?.(getNewlyAdded, options)
 		})
 	})
 }

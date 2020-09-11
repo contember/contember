@@ -2,6 +2,7 @@ import {
 	DataBindingProvider,
 	PersistResultSuccessType,
 	SingleEntitySubTree,
+	SingleEntitySubTreeAdditionalCreationProps,
 	SingleEntitySubTreeAdditionalProps,
 	SuccessfulPersistResult,
 	SugaredUnconstrainedQualifiedSingleEntity,
@@ -12,12 +13,14 @@ import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntit
 import { PageProvider } from './PageProvider'
 import { useRedirect } from './useRedirect'
 
-export interface CreatePageProps extends SugaredUnconstrainedQualifiedSingleEntity, SingleEntitySubTreeAdditionalProps {
-	pageName: string
-	children: React.ReactNode
-	redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState
-	rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
-}
+export type CreatePageProps = SugaredUnconstrainedQualifiedSingleEntity &
+	SingleEntitySubTreeAdditionalProps &
+	SingleEntitySubTreeAdditionalCreationProps & {
+		pageName: string
+		children: React.ReactNode
+		redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState
+		rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
+	}
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<CreatePageProps> = React.memo(
 	({ pageName, children, rendererProps, redirectOnSuccess, ...entityProps }: CreatePageProps) => {

@@ -113,6 +113,11 @@ export class AccessorTreeGenerator {
 		}
 		return subTreeState.getAccessor()
 	}) as GetSubTree
+	private readonly batchUpdatesHandlerExtraProps: EntityAccessor.BatchUpdatesHandlerExtraProps &
+		EntityListAccessor.BatchUpdatesHandlerExtraProps = Object.freeze({
+		getEntityByKey: this.getEntityByKey,
+		getSubTree: this.getSubTree,
+	})
 
 	private readonly getNewTreeRootInstance = () =>
 		new TreeRootAccessor(
@@ -1146,7 +1151,7 @@ export class AccessorTreeGenerator {
 				throw new BindingError(`Trying to update an entity (or something within said entity) that has been deleted.`)
 			}
 			entityState.batchUpdateDepth++
-			performUpdates(entityState.getAccessor)
+			performUpdates(entityState.getAccessor, this.batchUpdatesHandlerExtraProps)
 			entityState.batchUpdateDepth--
 
 			if (
@@ -1180,7 +1185,7 @@ export class AccessorTreeGenerator {
 				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
 					currentAccessor = getAccessor()
 					for (const listener of entityState.eventListeners.beforeUpdate) {
-						listener(getAccessor)
+						listener(getAccessor, this.batchUpdatesHandlerExtraProps)
 					}
 					if (currentAccessor === getAccessor()) {
 						return
@@ -1285,6 +1290,7 @@ export class AccessorTreeGenerator {
 							entityListState.getChildEntityByKey,
 							entityListState.childrenKeys,
 							entityListState.errors,
+							entityListState.environment,
 							entityListState.addEventListener,
 							entityListState.batchUpdates,
 							entityListState.connectEntity,
@@ -1409,7 +1415,7 @@ export class AccessorTreeGenerator {
 
 		const batchUpdatesImplementation: EntityListAccessor.BatchUpdates = performUpdates => {
 			entityListState.batchUpdateDepth++
-			performUpdates(entityListState.getAccessor)
+			performUpdates(entityListState.getAccessor, this.batchUpdatesHandlerExtraProps)
 			entityListState.batchUpdateDepth--
 
 			if (
@@ -1439,7 +1445,7 @@ export class AccessorTreeGenerator {
 				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
 					currentAccessor = getAccessor()
 					for (const listener of entityListState.eventListeners.beforeUpdate) {
-						listener(getAccessor)
+						listener(getAccessor, this.batchUpdatesHandlerExtraProps)
 					}
 					if (currentAccessor === getAccessor()) {
 						return
@@ -1737,7 +1743,7 @@ export class AccessorTreeGenerator {
 				iNode => iNode.eventListeners.beforePersist !== undefined,
 			)) {
 				for (const listener of iNode.eventListeners.beforePersist!) {
-					listener(iNode.getAccessor as any) // TS can't quite handle this but this is sound.
+					listener(iNode.getAccessor as any, this.batchUpdatesHandlerExtraProps) // TS can't quite handle this but this is sound.
 					hasBeforePersist = true
 				}
 			}
@@ -1753,7 +1759,7 @@ export class AccessorTreeGenerator {
 		this.treeWideBatchUpdateDepth++
 		for (const state of this.newlyInitializedWithListeners) {
 			for (const listener of state.eventListeners.initialize!) {
-				listener(state.getAccessor as any)
+				listener(state.getAccessor as any, this.batchUpdatesHandlerExtraProps)
 				hasOnInitialize = true
 			}
 		}

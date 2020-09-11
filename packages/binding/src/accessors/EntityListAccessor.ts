@@ -1,13 +1,17 @@
+import { Environment } from '../dao'
 import { Accessor } from './Accessor'
 import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
+import { GetEntityByKey } from './GetEntityByKey'
+import { GetSubTree } from './GetSubTree'
 
 class EntityListAccessor extends Accessor implements Errorable {
 	public constructor(
 		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
 		private readonly childEntityKeys: ReadonlySet<string>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
+		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
 		public readonly connectEntity: EntityListAccessor.ConnectEntity | undefined,
@@ -57,8 +61,16 @@ class EntityListAccessor extends Accessor implements Errorable {
 }
 
 namespace EntityListAccessor {
+	export interface BatchUpdatesHandlerExtraProps {
+		getEntityByKey: GetEntityByKey
+		getSubTree: GetSubTree
+	}
+
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
-	export type BatchUpdatesHandler = (getAccessor: () => EntityListAccessor) => void
+	export type BatchUpdatesHandler = (
+		getAccessor: () => EntityListAccessor,
+		extraProps: BatchUpdatesHandlerExtraProps,
+	) => void
 	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	export type DisconnectEntity = (childEntityOrItsKey: EntityAccessor | string) => void

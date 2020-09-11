@@ -19,6 +19,7 @@ class MakeRelationNotNullModification implements Modification<MakeRelationNotNul
 			if (e instanceof ModelError && e.code === ModelErrorCode.NOT_OWNING_SIDE) {
 				return
 			}
+			throw e
 		}
 	}
 

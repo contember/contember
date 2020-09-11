@@ -138,6 +138,9 @@ export class CreateInputVisitor<Result>
 		input: Input.CreateOneRelationInput | undefined,
 	): Promise<undefined | Result> {
 		if (input === undefined || input === null) {
+			if (processor.nothing) {
+				return processor.nothing({ ...context, input: undefined })
+			}
 			return Promise.resolve(undefined)
 		}
 		input = filterObject(input, (k, v) => v !== null && v !== undefined)

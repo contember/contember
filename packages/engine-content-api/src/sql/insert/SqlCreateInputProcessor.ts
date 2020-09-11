@@ -103,6 +103,10 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 	}
 
 	manyHasOne: CreateInputProcessor<MutationResultList>['manyHasOne'] = {
+		nothing: async ctx => {
+			this.insertBuilder.addFieldValue(ctx.relation.name, null)
+			return []
+		},
 		connect: hasOneProcessor(
 			async (context): Promise<MutationResultList> => {
 				const primaryValue = this.mapper.getPrimaryValue(context.targetEntity, context.input)
@@ -166,6 +170,10 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 	}
 
 	oneHasOneOwner: CreateInputProcessor<MutationResultList>['oneHasOneOwner'] = {
+		nothing: async ctx => {
+			this.insertBuilder.addFieldValue(ctx.relation.name, null)
+			return []
+		},
 		connect: hasOneProcessor(
 			async (context: Context.OneHasOneOwnerContext & { input: Input.UniqueWhere }): Promise<MutationResultList> => {
 				const primaryValue = this.mapper.getPrimaryValue(context.targetEntity, context.input)

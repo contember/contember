@@ -1287,6 +1287,34 @@ describe('Diff schemas', () => {
 		})
 	})
 
+	describe('make relation nullable inversed', () => {
+		const originalSchema = new SchemaBuilder()
+			.entity('Post', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Link', e => e.oneHasOne('post', r => r.target('Post').inversedNotNull().inversedBy('link')))
+			.buildSchema()
+		const updatedSchema = new SchemaBuilder()
+			.entity('Post', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.entity('Link', e => e.oneHasOne('post', r => r.target('Post').inversedBy('link')))
+			.buildSchema()
+		const diff: Migration.Modification[] = [
+			{
+				modification: 'makeRelationNullable',
+				entityName: 'Post',
+				fieldName: 'link',
+			},
+		]
+		const sql = SQL``
+		it('diff schemas', () => {
+			testDiffSchemas(originalSchema, updatedSchema, diff)
+		})
+		it('apply diff', () => {
+			testApplyDiff(originalSchema, diff, updatedSchema)
+		})
+		it('generate sql', () => {
+			testGenerateSql(originalSchema, diff, sql)
+		})
+	})
+
 	describe('set relation default order by', () => {
 		const originalSchema = new SchemaBuilder()
 			.entity('Menu', e =>

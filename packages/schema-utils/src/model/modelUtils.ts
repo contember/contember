@@ -1,11 +1,29 @@
-import { isIt } from '../utils'
+import { assertNever, isIt } from '../utils'
 import { Model } from '@contember/schema'
-import { NamingHelper } from './NamingHelper'
+
+export enum ModelErrorCode {
+	ENTITY_NOT_FOUND = 'entityNotFound',
+	FIELD_NOT_FOUND = 'fieldNotFound',
+	NOT_RELATION = 'notRelation',
+	NOT_OWNING_SIDE = 'notOwningSide',
+}
+
+export class ModelError extends Error {
+	constructor(public readonly code: ModelErrorCode, message: string) {
+		super(message)
+	}
+}
+
+const createEntityNotFoundError = (entityName: string) =>
+	new ModelError(ModelErrorCode.ENTITY_NOT_FOUND, `Entity ${entityName} not found`)
+
+const createFieldNotFoundError = (entityName: string, fieldName: string) =>
+	new ModelError(ModelErrorCode.FIELD_NOT_FOUND, `Field ${fieldName} of entity ${entityName} not found`)
 
 export const getEntity = (schema: Model.Schema, entityName: string): Model.Entity => {
 	const entity = schema.entities[entityName]
 	if (!entity) {
-		throw new Error(`Entity ${entityName} not found`)
+		throw createEntityNotFoundError(entityName)
 	}
 	return entity
 }
@@ -17,7 +35,10 @@ export const getColumnName = (schema: Model.Schema, entity: Model.Entity, fieldN
 			if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
 				return relation.joiningColumn.columnName
 			}
-			throw new Error('Not an owning side')
+			throw new ModelError(
+				ModelErrorCode.NOT_OWNING_SIDE,
+				`Field ${relation.name} of entity ${entity.name} is not an owning side`,
+			)
 		},
 	})
 }
@@ -30,7 +51,10 @@ export const getColumnType = (schema: Model.Schema, entity: Model.Entity, fieldN
 			if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
 				return getColumnType(schema, targetEntity, targetEntity.primary)
 			}
-			throw new Error('Not an owning side')
+			throw new ModelError(
+				ModelErrorCode.NOT_OWNING_SIDE,
+				`Field ${relation.name} of entity ${entity.name} is not an owning side`,
+			)
 		},
 	})
 }
@@ -75,7 +99,7 @@ export const acceptEveryFieldVisitor = <T>(
 ): { [fieldName: string]: T } => {
 	const entityObj: Model.Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
 	if (!entityObj) {
-		throw new Error(`entity ${entity} not found`)
+		throw createEntityNotFoundError(typeof entity === 'string' ? entity : 'unknown')
 	}
 	const result: { [fieldName: string]: T } = {}
 	for (const field in entityObj.fields) {
@@ -92,17 +116,17 @@ export const acceptFieldVisitor = <T>(
 ): T => {
 	const entityObj: Model.Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
 	if (!entityObj) {
-		throw new Error(`entity ${entity} not found`)
+		throw createEntityNotFoundError(typeof entity === 'string' ? entity : 'unknown')
 	}
 	const fieldObj: Model.AnyField = typeof field === 'string' ? entityObj.fields[field] : field
 	if (!fieldObj) {
-		throw new Error(`field ${field} of entity ${entityObj.name} not found`)
+		throw createFieldNotFoundError(entityObj.name, typeof field === 'string' ? field : 'unknown')
 	}
 	if (isIt<Model.AnyColumn>(fieldObj, 'columnType')) {
 		return visitor.visitColumn(entityObj, fieldObj)
 	}
 	if (!isIt<Model.AnyRelation>(fieldObj, 'target')) {
-		throw new Error()
+		throw new Error(`Invalid field type`)
 	}
 	const targetEntity = getEntity(schema, fieldObj.target)
 
@@ -113,10 +137,10 @@ export const acceptFieldVisitor = <T>(
 		} else if (isInversedRelation(fieldObj)) {
 			targetRelation = targetEntity.fields[fieldObj.ownedBy]
 		} else {
-			throw new Error()
+			throw new Error('Invalid relaton type')
 		}
 		if (targetRelation && !isIt<Model.Relation>(targetRelation, 'target')) {
-			throw new Error()
+			throw new Error('Invalid target')
 		}
 		return visitor.visitRelation(entityObj, fieldObj, targetEntity, targetRelation)
 	}
@@ -135,7 +159,7 @@ export const acceptFieldVisitor = <T>(
 	if (isIt<Model.ColumnVisitor<T> & Model.RelationByTypeVisitor<T>>(visitor, 'visitManyHasManyInversed')) {
 		return acceptRelationTypeVisitor(schema, entityObj, fieldObj, visitor)
 	}
-	throw new Error()
+	throw new Error('Invalid field type')
 }
 
 export const acceptRelationTypeVisitor = <T>(
@@ -146,22 +170,24 @@ export const acceptRelationTypeVisitor = <T>(
 ): T => {
 	const entityObj: Model.Entity = typeof entity === 'string' ? getEntity(schema, entity) : entity
 	if (!entityObj) {
-		throw new Error(`entity ${entity} not found`)
+		throw createEntityNotFoundError(typeof entity === 'string' ? entity : 'unknown')
 	}
-	const relationObj: Model.AnyRelation =
-		typeof relation === 'string' ? (entityObj.fields[relation] as Model.AnyRelation) : relation
+	const relationObj: Model.AnyField = typeof relation === 'string' ? entityObj.fields[relation] : relation
 	if (!relationObj) {
-		throw new Error(`relation ${relation} of entity ${entityObj.name} not found`)
+		throw createFieldNotFoundError(entityObj.name, typeof relation === 'string' ? relation : 'unknown')
 	}
-	if (!isIt<Model.Relation>(relationObj, 'target')) {
-		throw new Error(`field ${relation} is not a relation`)
+	if (!isRelation(relationObj)) {
+		throw new ModelError(
+			ModelErrorCode.NOT_RELATION,
+			`Field ${relationObj.name} of entity ${entityObj.name} is not a relation`,
+		)
 	}
 	const targetEntity = getEntity(schema, relationObj.target)
 
 	if (isInversedRelation(relationObj)) {
 		const targetRelation = targetEntity.fields[relationObj.ownedBy]
-		if (!isIt<Model.Relation>(targetRelation, 'target')) {
-			throw new Error()
+		if (!isRelation(targetRelation)) {
+			throw new Error('Invalid target relation')
 		}
 		switch (relationObj.type) {
 			case Model.RelationType.ManyHasMany:
@@ -185,8 +211,9 @@ export const acceptRelationTypeVisitor = <T>(
 					targetEntity,
 					targetRelation as Model.ManyHasOneRelation,
 				)
+			default:
+				return assertNever(relationObj)
 		}
-		throw new Error()
 	} else if (isOwnerRelation(relationObj)) {
 		const targetRelation = relationObj.inversedBy ? targetEntity.fields[relationObj.inversedBy] : null
 
@@ -212,11 +239,16 @@ export const acceptRelationTypeVisitor = <T>(
 					targetEntity,
 					targetRelation as Model.OneHasManyRelation,
 				)
+			default:
+				return assertNever(relationObj)
 		}
-		throw new Error()
 	}
 
-	throw new Error()
+	throw new Error('Invalid relation type')
+}
+
+export const isRelation = (field: Model.AnyField): field is Model.AnyRelation => {
+	return isIt<Model.Relation>(field, 'target')
 }
 
 export const isInversedRelation = (relation: Model.Relation): relation is Model.InversedRelation => {

@@ -1285,6 +1285,7 @@ export class AccessorTreeGenerator {
 							entityListState.getChildEntityByKey,
 							entityListState.childrenKeys,
 							entityListState.errors,
+							entityListState.environment,
 							entityListState.addEventListener,
 							entityListState.batchUpdates,
 							entityListState.connectEntity,

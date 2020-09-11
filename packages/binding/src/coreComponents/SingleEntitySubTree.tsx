@@ -1,13 +1,8 @@
 import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import {
-	useAccessorUpdateSubscription,
-	useAddTreeRootListener,
-	useGetSubTree,
-	useSingleEntitySubTreeParameters,
-} from '../accessorPropagation'
-import { EntityAccessor } from '../accessors'
+import { useAccessorUpdateSubscription, useGetSubTree, useSingleEntitySubTreeParameters } from '../accessorPropagation'
+import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
 import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory, QueryLanguage } from '../queryLanguage'
@@ -21,6 +16,8 @@ export interface SingleEntitySubTreeAdditionalProps {
 	variables?: Environment.DeltaFactory
 }
 
+export type SingleEntitySubTreeAdditionalCreationProps = {} | SetOrderFieldOnCreateOwnProps
+
 export type SingleEntitySubTreeProps<EntityProps> = {
 	children?: React.ReactNode
 } & SingleEntitySubTreeAdditionalProps &
@@ -30,7 +27,8 @@ export type SingleEntitySubTreeProps<EntityProps> = {
 		  } & SugaredQualifiedSingleEntity)
 		| ({
 				isCreating: true
-		  } & SugaredUnconstrainedQualifiedSingleEntity)
+		  } & SugaredUnconstrainedQualifiedSingleEntity &
+				SingleEntitySubTreeAdditionalCreationProps)
 	) &
 	(
 		| {}
@@ -67,11 +65,20 @@ export const SingleEntitySubTree = Component(
 			return MarkerFactory.createSingleEntitySubTreeMarker(environment, props, fields)
 		},
 		staticRender: props => (
-			<SingleEntity {...props} accessor={0 as any}>
-				<Field field={PRIMARY_KEY_NAME} />
-				<Field field={TYPENAME_KEY_NAME} />
-				{props.children}
-			</SingleEntity>
+			<>
+				<SingleEntity {...props} accessor={0 as any}>
+					<Field field={PRIMARY_KEY_NAME} />
+					<Field field={TYPENAME_KEY_NAME} />
+					{props.children}
+				</SingleEntity>
+				{props.isCreating && 'orderField' in props && (
+					<SetOrderFieldOnCreate
+						orderField={props.orderField}
+						newOrderFieldValue={props.newOrderFieldValue}
+						entity={props.entity}
+					/>
+				)}
+			</>
 		),
 		generateEnvironment: (props, oldEnvironment) => {
 			const newEnvironment =

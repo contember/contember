@@ -18,6 +18,7 @@ namespace CreateInputProcessor {
 	export type ContextWithInput<Context, Input> = Context & { input: Input }
 
 	export interface HasOneRelationProcessor<Context, Result> {
+		nothing?: (context: ContextWithInput<Context, undefined>) => Promise<Result>
 		connect: (context: ContextWithInput<Context, Input.UniqueWhere>) => Promise<Result>
 		create: (context: ContextWithInput<Context, Input.CreateDataInput>) => Promise<Result>
 	}

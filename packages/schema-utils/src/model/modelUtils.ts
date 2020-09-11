@@ -1,5 +1,6 @@
 import { assertNever, isIt } from '../utils'
 import { Model } from '@contember/schema'
+import { NamingHelper } from './NamingHelper'
 
 export enum ModelErrorCode {
 	ENTITY_NOT_FOUND = 'entityNotFound',

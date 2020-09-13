@@ -1,7 +1,7 @@
 import replace from '@rollup/plugin-replace'
 //import analyzer from 'rollup-plugin-analyzer'
-import commonjs from 'rollup-plugin-commonjs'
-import resolve from 'rollup-plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 //import { terser } from 'rollup-plugin-terser'
 import visualizer from 'rollup-plugin-visualizer'
 import { debounceExportedMembers } from '../../build/exportedMembers/debounce'
@@ -93,11 +93,10 @@ export default [
 	{
 		input: 'dist/tests/index.js',
 		output: {
-			file: 'dist/tests/bundle.cjs',
+			file: 'dist/tests/bundle.spec.js',
 			format: 'cjs',
 			sourcemap: false,
 		},
-		external: ['jasmine'],
 		plugins: [replace(getReplaceConfig(false)), resolve(resolveConfig), commonjs(commonJsConfig)],
 	},
 ]

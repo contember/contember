@@ -1,5 +1,5 @@
-import commonjs from 'rollup-plugin-commonjs'
-import resolve from 'rollup-plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 
 export default [
 	{
@@ -9,7 +9,6 @@ export default [
 			format: 'cjs',
 			sourcemap: false,
 		},
-		external: ['jasmine'],
 		plugins: [
 			resolve({
 				preferBuiltins: true,
@@ -20,11 +19,10 @@ export default [
 	{
 		input: 'dist/tests/index.js',
 		output: {
-			file: 'dist/tests/bundle.cjs',
+			file: 'dist/tests/bundle.spec.js',
 			format: 'cjs',
 			sourcemap: false,
 		},
-		external: ['jasmine'],
 		plugins: [
 			resolve({
 				preferBuiltins: true,

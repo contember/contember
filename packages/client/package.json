@@ -6,17 +6,9 @@
 	"type": "module",
 	"scripts": {
 		"build": "rollup --config",
-		"test": "jasmine --config=jasmine.json"
+		"test": "jest dist/tests/bundle.spec.js"
 	},
 	"dependencies": {
 		"@contember/schema": "0.8.3"
-	},
-	"devDependencies": {
-		"@types/jasmine": "3.4.6",
-		"jasmine": "3.5.0",
-		"rollup": "1.27.0",
-		"rollup-plugin-commonjs": "10.1.0",
-		"rollup-plugin-node-resolve": "5.2.0",
-		"typescript": "3.9.6"
 	}
 }

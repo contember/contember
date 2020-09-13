@@ -1,7 +1,6 @@
 import replace from '@rollup/plugin-replace'
-import commonjs from 'rollup-plugin-commonjs'
-import resolve from 'rollup-plugin-node-resolve'
-//import { terser } from 'rollup-plugin-terser'
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 
 export default [
 	{
@@ -25,11 +24,11 @@ export default [
 	{
 		input: 'dist/tests/index.js',
 		output: {
-			file: 'dist/tests/bundle.cjs',
+			file: 'dist/tests/bundle.spec.js',
 			format: 'cjs',
 			sourcemap: false,
 		},
-		external: ['react', 'jasmine'],
+		external: ['react'],
 		plugins: [
 			replace({
 				'process.env.NODE_ENV': JSON.stringify('production'),

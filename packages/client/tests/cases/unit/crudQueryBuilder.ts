@@ -1,4 +1,3 @@
-import 'jasmine'
 import { CrudQueryBuilder } from '../../../src'
 import { DeleteMutationArguments } from '../../../src/crudQueryBuilder'
 

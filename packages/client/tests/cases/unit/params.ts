@@ -1,4 +1,3 @@
-import 'jasmine'
 import { whereToFilter, GraphQlBuilder } from '../../../src'
 
 describe('whereToFilter', () => {

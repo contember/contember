@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode, SerializableEditorNode } from '../baseEditor'
+import { BaseEditor, ElementNode, SerializableEditorNode } from '../../baseEditor'
 
 export const strictlyDeserializeElements = <E extends BaseEditor>(
 	editor: E,

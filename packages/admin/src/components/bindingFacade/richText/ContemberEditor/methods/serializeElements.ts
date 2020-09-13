@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode, SerializableEditorNode } from '../baseEditor'
+import { BaseEditor, ElementNode, SerializableEditorNode } from '../../baseEditor'
 
 export const serializeElements = <E extends BaseEditor>(editor: E, elements: ElementNode[], errorMessage?: string) => {
 	try {

@@ -1,5 +1,5 @@
 import { Element as SlateElement, Node as SlateNode, Path, Transforms } from 'slate'
-import { BaseEditor } from '../baseEditor'
+import { BaseEditor } from '../../baseEditor'
 
 export const ejectElement = <E extends BaseEditor>(editor: E, path: Path) => {
 	const element = SlateNode.get(editor, path)

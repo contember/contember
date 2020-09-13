@@ -49,9 +49,7 @@ export default (map: ProjectConfig[]): RouteMap => {
 				const func = configMap.routes[pageName].objectToParams
 				const params = func ? func(parameters) : parameters
 				return {
-					path: pathToRegexp
-						.compile(configMap.routes[pageName].path)(params)
-						.slice(1),
+					path: pathToRegexp.compile(configMap.routes[pageName].path)(params).slice(1),
 					project,
 					stage,
 					dimensions: dimensionsStr,

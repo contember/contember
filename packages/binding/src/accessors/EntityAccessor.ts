@@ -64,9 +64,7 @@ class EntityAccessor extends Accessor implements Errorable {
 			const entries = Array.isArray(fieldValuePairs) ? fieldValuePairs : Object.entries(fieldValuePairs)
 
 			for (const [field, value] of entries) {
-				getAccessor()
-					.getSingleField(field)
-					.updateValue?.(value)
+				getAccessor().getSingleField(field).updateValue?.(value)
 			}
 		})
 	}

@@ -59,9 +59,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 							const newOrderFieldValue = !entities.length
 								? 0
 								: (entities[0].getRelativeSingleField<number>(desugaredOrderField).currentValue ?? 0) + 1
-							getAccessor()
-								.getRelativeSingleField<number>(desugaredOrderField)
-								.updateValue?.(newOrderFieldValue)
+							getAccessor().getRelativeSingleField<number>(desugaredOrderField).updateValue?.(newOrderFieldValue)
 						}}
 					>
 						<SugaredField field={orderField} />
@@ -84,10 +82,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 						addEntityAtIndex(getAccessor(), desugaredOrderField, newOrderFieldValue, getNewEntity => {
 							newEntityKey = getNewEntity().key
 						})
-						newEntityKey &&
-							getAccessor()
-								.getChildEntityByKey(newEntityKey)
-								.deleteEntity?.()
+						newEntityKey && getAccessor().getChildEntityByKey(newEntityKey).deleteEntity?.()
 					}}
 				>
 					<SugaredField field={orderField} />

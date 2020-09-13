@@ -17,7 +17,7 @@ export const MutableContentLayoutRenderer = Component<MutableContentLayoutRender
 					<PersistComponent />
 				</>
 			),
-			[side],
+			[PersistComponent, side],
 		)
 		return (
 			<ImmutableContentLayoutRenderer {...immutableProps} side={augmentedSide}>

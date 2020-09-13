@@ -49,27 +49,21 @@ export class VideoFileMetadataPopulator implements FileDataPopulator<HTMLVideoEl
 					this.props.videoWidthField,
 					options.environment,
 				)
-				getAccessor()
-					.getRelativeSingleField<number>(videoWidthField)
-					.updateValue?.(videoElement.videoWidth)
+				getAccessor().getRelativeSingleField<number>(videoWidthField).updateValue?.(videoElement.videoWidth)
 			}
 			if (this.props.videoHeightField) {
 				const videoHeightField = QueryLanguage.desugarRelativeSingleField(
 					this.props.videoHeightField,
 					options.environment,
 				)
-				getAccessor()
-					.getRelativeSingleField<number>(videoHeightField)
-					.updateValue?.(videoElement.videoHeight)
+				getAccessor().getRelativeSingleField<number>(videoHeightField).updateValue?.(videoElement.videoHeight)
 			}
 			if (this.props.videoDurationField) {
 				const videoDurationField = QueryLanguage.desugarRelativeSingleField(
 					this.props.videoDurationField,
 					options.environment,
 				)
-				getAccessor()
-					.getRelativeSingleField<number>(videoDurationField)
-					.updateValue?.(videoElement.duration)
+				getAccessor().getRelativeSingleField<number>(videoDurationField).updateValue?.(videoElement.duration)
 			}
 		})
 	}

@@ -69,7 +69,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					<Handle>{children}</Handle>
 				</SortableRepeaterItemHandle>
 			),
-			[],
+			[Handle],
 		)
 
 		const removalType: RemovalType = props.removalType ?? 'delete'

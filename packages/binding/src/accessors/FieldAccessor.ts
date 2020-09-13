@@ -4,7 +4,8 @@ import { Accessor } from './Accessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
-class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted> extends Accessor
+class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>
+	extends Accessor
 	implements Errorable {
 	constructor(
 		public readonly fieldName: FieldName,

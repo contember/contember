@@ -79,12 +79,13 @@ export const FileRepeaterItem = React.memo(
 			<UploadedFilePreview renderFile={resolvedFileKind.renderFile || defaultFileKind.renderFile} />
 		)
 
+		const deleteEntity = entity.deleteEntity
 		const onRemove = React.useCallback(
 			(e: React.MouseEvent) => {
 				e.stopPropagation()
-				entity.deleteEntity?.()
+				deleteEntity?.()
 			},
-			[entity.deleteEntity],
+			[deleteEntity],
 		)
 
 		return (

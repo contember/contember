@@ -10,7 +10,7 @@ interface PageLinkByIdProps {
 	children?: ReactNode
 }
 
-export const PageLinkById = React.memo(function(props: PageLinkByIdProps) {
+export const PageLinkById = React.memo(function (props: PageLinkByIdProps) {
 	const parentEntity = useParentEntityAccessor()
 	const id = parentEntity.primaryKey
 

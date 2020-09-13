@@ -12,6 +12,7 @@ import {
 	useEnvironment,
 	useGetSubTree,
 } from '@contember/binding'
+import { emptyArray } from '@contember/react-utils'
 import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
@@ -101,8 +102,10 @@ export const useNormalizedOptions = (
 	renderOption: ((entityAccessor: EntityAccessor) => React.ReactNode) | undefined,
 	searchByFields: BaseDynamicChoiceField['searchByFields'],
 ) => {
-	const sugaredFields =
-		searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]
+	const sugaredFields = React.useMemo(
+		() => (searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]),
+		[searchByFields],
+	)
 	const environment = useEnvironment()
 	const desugaredFields = React.useMemo(
 		() => sugaredFields.map(field => QueryLanguage.desugarRelativeSingleField(field, environment)),

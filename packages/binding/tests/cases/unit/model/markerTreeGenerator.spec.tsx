@@ -20,7 +20,7 @@ import {
 
 describe('Marker tree generator', () => {
 	it('should reject empty trees', () => {
-		const generator = new MarkerTreeGenerator((<></>))
+		const generator = new MarkerTreeGenerator(<></>)
 
 		expect(() => generator.generate()).toThrowError(/empty/i)
 	})

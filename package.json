@@ -28,7 +28,7 @@
 		"ts:clean": "tsc --build --clean",
 		"prebuild": "lerna run prebuild",
 		"build": "tsc --build && lerna run build",
-		"test": "lerna run --concurrency 1 test",
+		"test": "lerna run test",
 		"eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
 		"eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
 		"tag-version": "lerna version --exact --force-publish"

@@ -4,7 +4,7 @@ import {
 	NormalizedDiscriminatedData,
 	SugaredDiscriminateBy,
 	SugaredDiscriminateByScalar,
-} from '../../../discrimination'
+} from '../../../../discrimination'
 
 export interface PopulateEmbedDataOptions<EmbedArtifacts = any> {
 	source: string

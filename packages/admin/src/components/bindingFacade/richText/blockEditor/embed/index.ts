@@ -1,2 +1,2 @@
-export * from './EmbedHandler'
-export * from './EmbedHandlers'
+export * from './core'
+export * as EmbedHandlers from './handlers'

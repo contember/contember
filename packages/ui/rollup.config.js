@@ -1,7 +1,7 @@
 import replace from '@rollup/plugin-replace'
 //import analyzer from 'rollup-plugin-analyzer'
-import commonjs from 'rollup-plugin-commonjs'
-import resolve from 'rollup-plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 import { propTypesExportedMembers } from '../../build/exportedMembers/prop-types'
 //import { terser } from 'rollup-plugin-terser'
 

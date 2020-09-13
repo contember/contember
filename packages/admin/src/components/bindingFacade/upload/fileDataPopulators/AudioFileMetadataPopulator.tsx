@@ -37,9 +37,7 @@ export class AudioFileMetadataPopulator implements FileDataPopulator<HTMLAudioEl
 			options.environment,
 		)
 		options.batchUpdates(getAccessor => {
-			getAccessor()
-				.getRelativeSingleField<number>(desugaredAudioDurationField)
-				.updateValue?.(audioElement.duration)
+			getAccessor().getRelativeSingleField<number>(desugaredAudioDurationField).updateValue?.(audioElement.duration)
 		})
 	}
 }

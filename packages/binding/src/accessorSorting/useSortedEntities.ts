@@ -6,7 +6,6 @@ import { RelativeSingleField } from '../treeParameters'
 import { addEntityAtIndex } from './addEntityAtIndex'
 import { throwNonWritableError, throwNoopError } from './errors'
 import { moveEntity } from './moveEntity'
-import { repairEntitiesOrder } from './repairEntitiesOrder'
 import { sortEntities } from './sortEntities'
 
 export interface SortedEntities {

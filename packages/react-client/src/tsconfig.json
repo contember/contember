@@ -1,7 +1,11 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src"
+		"outDir": "../dist/src",
+		"baseUrl": "..",
+		"paths": {
+			"@contember/client": ["node_modules/@contember/client"]
+		}
 	},
 	"references": [
 		{ "path": "../../client/src" }

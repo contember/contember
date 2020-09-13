@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode, TextNode } from '../baseEditor'
+import { BaseEditor, ElementNode, TextNode } from '../../baseEditor'
 import { Text as SlateText } from 'slate'
 
 export const permissivelyDeserializeElements = <E extends BaseEditor>(

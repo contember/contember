@@ -1,5 +1,3 @@
-import 'jasmine'
-
 import { GenerateUploadUrlMutationBuilder } from '../../../src/content'
 import { Literal } from '../../../src/graphQlBuilder'
 

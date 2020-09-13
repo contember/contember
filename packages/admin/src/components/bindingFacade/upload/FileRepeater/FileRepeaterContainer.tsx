@@ -126,9 +126,7 @@ export const FileRepeaterContainer = React.memo(
 								const discriminateBy =
 									acceptingFileKind.discriminateByScalar ??
 									VariableInputTransformer.transformVariableLiteral(acceptingFileKind.discriminateBy!, environment)
-								getNewAccessor()
-									.getRelativeSingleField(desugaredDiscriminant)
-									.updateValue?.(discriminateBy)
+								getNewAccessor().getRelativeSingleField(desugaredDiscriminant).updateValue?.(discriminateBy)
 							}
 						})
 					}

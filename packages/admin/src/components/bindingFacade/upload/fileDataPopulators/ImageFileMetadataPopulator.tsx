@@ -44,18 +44,14 @@ export class ImageFileMetadataPopulator implements FileDataPopulator<HTMLImageEl
 					this.props.imageWidthField,
 					options.environment,
 				)
-				getAccessor()
-					.getRelativeSingleField<number>(imageWidthField)
-					.updateValue?.(imageElement.naturalWidth)
+				getAccessor().getRelativeSingleField<number>(imageWidthField).updateValue?.(imageElement.naturalWidth)
 			}
 			if (this.props.imageHeightField) {
 				const imageHeightField = QueryLanguage.desugarRelativeSingleField(
 					this.props.imageHeightField,
 					options.environment,
 				)
-				getAccessor()
-					.getRelativeSingleField<number>(imageHeightField)
-					.updateValue?.(imageElement.naturalHeight)
+				getAccessor().getRelativeSingleField<number>(imageHeightField).updateValue?.(imageElement.naturalHeight)
 			}
 		})
 	}

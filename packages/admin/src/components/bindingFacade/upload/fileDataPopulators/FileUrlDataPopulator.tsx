@@ -51,9 +51,7 @@ export class FileUrlDataPopulator implements FileDataPopulator<any, S3FileUpload
 
 		const desugaredFileUrlField = QueryLanguage.desugarRelativeSingleField(targetField, options.environment)
 		options.batchUpdates(getAccessor => {
-			getAccessor()
-				.getRelativeSingleField<string>(desugaredFileUrlField)
-				.updateValue?.(options.uploadResult.fileUrl)
+			getAccessor().getRelativeSingleField<string>(desugaredFileUrlField).updateValue?.(options.uploadResult.fileUrl)
 		})
 	}
 }

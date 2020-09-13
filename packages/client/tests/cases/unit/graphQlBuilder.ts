@@ -1,4 +1,3 @@
-import 'jasmine'
 import { GraphQlBuilder } from '../../../src'
 
 describe('GraphQlQueryBuilder', () => {

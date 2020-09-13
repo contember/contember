@@ -1,5 +1,6 @@
-import { Component, EntityAccessor, EntityListAccessor, Field, SingleEntity, useEnvironment } from '@contember/binding'
-import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown, Spinner } from '@contember/ui'
+import { EntityAccessor, EntityListAccessor, SingleEntity, useEnvironment } from '@contember/binding'
+import { emptyArray } from '@contember/react-utils'
+import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown } from '@contember/ui'
 import * as React from 'react'
 import { RequestChange } from '../../../../state/request'
 import { Link } from '../../../Link'
@@ -142,7 +143,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 				.filter(slug => normalizedData.find(item => item.slug === slug) !== undefined)
 				.map(dimension => normalizedData.find(item => item.slug === dimension))
 				.filter((item): item is StatefulDimensionDatum<true> => !!item && item.isSelected)
-		: []
+		: emptyArray
 
 	React.useEffect(() => {
 		const redirectTarget = selectedDimensions.length === 0 ? normalizedData || [] : selectedDimensions

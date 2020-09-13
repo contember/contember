@@ -16,7 +16,7 @@ export const moveEntity = (
 			if (!(entity instanceof EntityAccessor)) {
 				continue
 			}
-			const target = order[entity.key]
+			const target = order.get(entity.key)
 			const orderField = entity.getRelativeSingleField<number>(sortByField)
 
 			if (target !== undefined) {
@@ -31,9 +31,7 @@ export const moveEntity = (
 	})
 }
 
-interface EntityOrder {
-	[primaryKey: string]: number
-}
+type EntityOrder = Map<string, number>
 
 const computeEntityOrder = (
 	entities: EntityAccessor[],
@@ -41,7 +39,7 @@ const computeEntityOrder = (
 	oldIndex: number,
 	newIndex: number,
 ): EntityOrder => {
-	const order: EntityOrder = {}
+	const order: EntityOrder = new Map()
 
 	for (let i = 0, len = entities.length; i < len; i++) {
 		const entity = entities[i]
@@ -60,7 +58,7 @@ const computeEntityOrder = (
 		}
 
 		if (typeof orderField.currentValue !== 'number' || orderField.currentValue !== targetValue) {
-			order[entity.key] = targetValue
+			order.set(entity.key, targetValue)
 		}
 	}
 	return order

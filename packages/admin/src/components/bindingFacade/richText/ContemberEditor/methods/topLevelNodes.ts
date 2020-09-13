@@ -1,5 +1,5 @@
 import { Editor as SlateEditor, Element as SlateElement } from 'slate'
-import { BaseEditor } from '../baseEditor'
+import { BaseEditor } from '../../baseEditor'
 
 export const topLevelNodes = <E extends BaseEditor>(editor: E) => {
 	// We manually filter out void nodes because it appears that Slate doesn't respect the voids setting from here.

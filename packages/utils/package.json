@@ -4,8 +4,5 @@
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
-	"scripts": {},
-	"devDependencies": {
-		"typescript": "3.9.6"
-	}
+	"scripts": {}
 }

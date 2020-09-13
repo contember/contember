@@ -1,4 +1,3 @@
-import 'jasmine'
 import React from 'react'
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '../../../src'
 

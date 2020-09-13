@@ -1,7 +1,7 @@
 import { SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
-import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../discrimination'
-import { EmbedHandler, PopulateEmbedDataOptions, RenderEmbedProps } from './EmbedHandler'
+import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
+import { EmbedHandler, PopulateEmbedDataOptions, RenderEmbedProps } from '../core'
 
 class GoogleFormEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'GoogleForm'
@@ -75,9 +75,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 
 	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
 		batchUpdates(getAccessor => {
-			getAccessor()
-				.getSingleField<string>(this.options.googleFormIdField)
-				.updateValue?.(embedArtifacts)
+			getAccessor().getSingleField<string>(this.options.googleFormIdField).updateValue?.(embedArtifacts)
 		})
 	}
 }

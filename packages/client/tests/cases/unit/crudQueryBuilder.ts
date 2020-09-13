@@ -1,4 +1,3 @@
-import 'jasmine'
 import { CrudQueryBuilder } from '../../../src'
 import { DeleteMutationArguments } from '../../../src/crudQueryBuilder'
 
@@ -12,10 +11,7 @@ describe('crud query builder', () => {
 							.set('name', 'John')
 							.many('locales', builder => builder.connect({ id: '1' }).update({ locale: 'cs' }, { title: 'foo' }))
 							.many('tags', b =>
-								b
-									.connect({ id: '1' }, 'connectId1')
-									.create({ name: 'foo' }, 'createNameFoo')
-									.disconnect({ id: 2 }),
+								b.connect({ id: '1' }, 'connectId1').create({ name: 'foo' }, 'createNameFoo').disconnect({ id: 2 }),
 							)
 							.many('locales', [{ update: { by: { id: '123' }, data: { foo: 'bar' } } }])
 							.one('author', { create: { name: 'John' } }),
@@ -30,9 +26,7 @@ describe('crud query builder', () => {
 			)
 			.delete(
 				'Category',
-				CrudQueryBuilder.ReadBuilder.instantiate<DeleteMutationArguments>()
-					.by({ id: '123' })
-					.column('id'),
+				CrudQueryBuilder.ReadBuilder.instantiate<DeleteMutationArguments>().by({ id: '123' }).column('id'),
 			)
 			.create('Author', builder =>
 				builder
@@ -117,11 +111,7 @@ describe('crud query builder', () => {
 
 	it('validation & errors relation builders', () => {
 		const builder = new CrudQueryBuilder.CrudQueryBuilder().create('Foo', builder =>
-			builder
-				.data({ bar: '123' })
-				.ok()
-				.errors()
-				.validation(),
+			builder.data({ bar: '123' }).ok().errors().validation(),
 		)
 		expect(builder.getGql()).toEqual(`mutation {
 	createFoo(data: {bar: "123"}) {

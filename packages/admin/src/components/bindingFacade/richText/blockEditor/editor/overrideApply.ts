@@ -121,9 +121,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			) => getFreshFieldAccessor(position, normalizedFieldIndex).updateValue?.(newValue)
 			const getFreshContentEntityAccessor = (sortedEntityIndex: number): EntityAccessor => {
 				const oldEntityKey = sortedEntities[sortedEntityIndex].key
-				const newEntity = getAccessor()
-					.getRelativeEntityList(desugaredEntityList)
-					.getChildEntityByKey(oldEntityKey)
+				const newEntity = getAccessor().getRelativeEntityList(desugaredEntityList).getChildEntityByKey(oldEntityKey)
 				if (!(newEntity instanceof EntityAccessor)) {
 					throw new BindingError(`Corrupted data`)
 				}
@@ -143,9 +141,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						normalizedField.format === 'editorJSON'
 							? editor.serializeElements([targetElement])
 							: SlateNode.string(targetElement)
-					getAccessor()
-						.getRelativeSingleField(normalizedField.field)
-						.updateValue?.(targetValue)
+					getAccessor().getRelativeSingleField(normalizedField.field).updateValue?.(targetValue)
 					fieldElementCache.set(getAccessor().getRelativeSingleField(normalizedField.field), targetElement)
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
@@ -275,9 +271,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							const embedHandler = node.embedHandler
 							const embedContentType = embedHandler.discriminateBy
 							addNewDiscriminatedEntityAt(topLevelIndex, embedBlockDiscriminant, getAccessor => {
-								getAccessor()
-									.getRelativeSingleField(embedContentDiscriminationField)
-									.updateValue?.(embedContentType)
+								getAccessor().getRelativeSingleField(embedContentDiscriminationField).updateValue?.(embedContentType)
 								embedHandler.data.populateEmbedData({
 									embedArtifacts: node.embedArtifacts,
 									source: node.source,

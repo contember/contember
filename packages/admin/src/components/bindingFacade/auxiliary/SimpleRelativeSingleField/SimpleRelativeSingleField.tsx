@@ -23,7 +23,7 @@ export interface SimpleRelativeSingleFieldMetadata<
 	isMutating: boolean
 }
 
-export const SimpleRelativeSingleField = function<
+export const SimpleRelativeSingleField = function <
 	P extends FieldBasicProps & Omit<FormGroupProps, 'children'>,
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
 	Produced extends Persisted = Persisted

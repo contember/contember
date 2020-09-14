@@ -1,4 +1,6 @@
+export * from './idp'
 export * from './ApiKeyManager'
+export * from './IDPSignInManager'
 export * from './InviteManager'
 export * from './MailTemplateManager'
 export * from './MembershipValidator'

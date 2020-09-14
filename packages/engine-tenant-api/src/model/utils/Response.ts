@@ -9,5 +9,5 @@ export class ResponseOk<Result> {
 export class ResponseError<Error> {
 	public readonly ok = false
 
-	constructor(public readonly error: Error) {}
+	constructor(public readonly error: Error, public readonly errorMessage?: string) {}
 }

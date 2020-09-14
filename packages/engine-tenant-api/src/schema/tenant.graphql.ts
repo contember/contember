@@ -2,6 +2,8 @@ import { gql } from 'apollo-server-core'
 import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
+	scalar Json
+
 	schema {
 		query: Query
 		mutation: Mutation
@@ -22,6 +24,14 @@ const schema: DocumentNode = gql`
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
+
+		initSignInIDP(identityProvider: String!, redirectUrl: String!): InitSignInIDPResponse
+		signInIDP(
+			identityProvider: String!
+			idpResponse: IDPResponseInput!
+			redirectUrl: String!
+			sessionData: Json!
+		): SignInIDPResponse
 
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
@@ -175,6 +185,58 @@ const schema: DocumentNode = gql`
 		PERSON_NOT_FOUND
 		TOO_WEAK
 	}
+
+	# === IDP ===
+
+	type InitSignInIDPResponse {
+		ok: Boolean!
+		errors: [InitSignInIDPError!]!
+		result: InitSignInIDPResult
+	}
+
+	type InitSignInIDPResult {
+		authUrl: String!
+		sessionData: Json!
+	}
+
+	type InitSignInIDPError {
+		code: InitSignInIDPErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum InitSignInIDPErrorCode {
+		PROVIDER_NOT_FOUND
+	}
+
+	input IDPResponseInput {
+		url: String!
+	}
+
+	type SignInIDPResponse {
+		ok: Boolean!
+		errors: [SignInIDPError!]!
+		result: SignInIDPResult
+	}
+
+	type SignInIDPError {
+		code: SignInIDPErrorCode!
+		endUserMessage: String
+		developerMessage: String
+	}
+
+	enum SignInIDPErrorCode {
+		INVALID_IDP_RESPONSE
+		IDP_VALIDATION_FAILED
+
+		PERSON_NOT_FOUND
+	}
+
+	type SignInIDPResult {
+		token: String!
+		person: Person!
+	}
+
 	# === invite ===
 
 	type InviteResponse {

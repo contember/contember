@@ -8,8 +8,11 @@ import {
 	CommandBus,
 	Identity,
 	IdentityFactory,
+	IDPManager,
+	IDPSignInManager,
 	InviteManager,
 	MailTemplateManager,
+	OIDCProvider,
 	PasswordChangeManager,
 	PasswordResetManager,
 	PermissionContextFactory,
@@ -52,6 +55,7 @@ import { MembershipValidator } from './model/service'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
 import { OtpManager } from './model/service'
 import { ResetPasswordMutationResolver } from './resolvers/mutation/person/ResetPasswordMutationResolver'
+import { IDPMutationResolver } from './resolvers/mutation/person/IDPMutationResolver'
 
 interface TenantContainer {
 	connection: Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
@@ -150,6 +154,16 @@ namespace TenantContainer {
 					({ commandBus, userMailer, permissionContextFactory, projectManager }) =>
 						new PasswordResetManager(commandBus, userMailer, permissionContextFactory, projectManager),
 				)
+				.addService('idpManager', () => {
+					const idpManager = new IDPManager()
+					idpManager.registerProvider('oidc', new OIDCProvider())
+					return idpManager
+				})
+				.addService(
+					'idpSignInManager',
+					({ queryHandler, apiKeyManager, idpManager }) =>
+						new IDPSignInManager(queryHandler, apiKeyManager, idpManager),
+				)
 				.addService(
 					'signInManager',
 					({ queryHandler, apiKeyManager, providers }) => new SignInManager(queryHandler, apiKeyManager, providers),
@@ -240,6 +254,11 @@ namespace TenantContainer {
 					'mailTemplateMutationResolver',
 					({ projectManager, mailTemplateManager }) =>
 						new MailTemplateMutationResolver(projectManager, mailTemplateManager),
+				)
+				.addService(
+					'idpMutationResolver',
+					({ idpSignInManager, identityTypeResolver, permissionContextFactory }) =>
+						new IDPMutationResolver(idpSignInManager, identityTypeResolver, permissionContextFactory),
 				)
 
 				.addService(

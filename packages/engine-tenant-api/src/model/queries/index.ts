@@ -1,5 +1,6 @@
 export * from './person/PersonQuery'
 export * from './person/types'
+export * from './IdentityProviderQuery'
 export * from './ApiKeyByTokenQuery'
 export * from './ProjectByIdQuery'
 export * from './ProjectBySlugQuery'

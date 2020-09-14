@@ -1,17 +1,20 @@
 import * as React from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import cn from 'classnames'
+import { toStateClass } from '../../../utils'
 import { Icon } from '../../Icon'
 import { Button } from '../../forms'
 
 export interface EditorTableElementProps {
 	rowCount: number
 	columnCount: number
-	addRow?: (index?: number) => void
-	addColumn?: (index?: number) => void
+	addRow: (index?: number) => void
+	addColumn: (index?: number) => void
+	deleteTable: () => void
 	deleteRow?: (index: number) => void
 	deleteColumn?: (index: number) => void
-	showControls?: boolean
+	isSelected: boolean
+	isFocused: boolean
 	children: React.ReactNode
 }
 
@@ -20,15 +23,17 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 	columnCount,
 	addRow,
 	addColumn,
+	deleteTable,
 	deleteRow,
 	deleteColumn,
-	showControls,
+	isSelected,
+	isFocused,
 	children,
 }: EditorTableElementProps) {
 	const prefix = useClassNamePrefix()
 	return (
 		<div
-			className={cn(`${prefix}editorTable`)}
+			className={cn(`${prefix}editorTable`, toStateClass('focused', isFocused))}
 			style={
 				{
 					[`--${prefix}editorTable-rowCount`]: rowCount,
@@ -37,6 +42,7 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 			}
 		>
 			<div className={cn(`${prefix}editorTable-handle`)} contentEditable={false} />
+			<div className={cn(`${prefix}editorTable-remove`)} contentEditable={false} />
 			<div className={cn(`${prefix}editorTable-columnControls`)} contentEditable={false}>
 				{Array.from({ length: columnCount + 1 }, (_, columnNumber) => (
 					<div
@@ -49,7 +55,7 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 							<div className={cn(`${prefix}editorTable-columnControls-item`)} key={columnNumber} />
 						)}
 						<Button
-							onClick={() => 0}
+							onClick={() => addColumn(columnNumber)}
 							className={cn(`${prefix}editorTable-columnControls-add`)}
 							flow="circular"
 							size="small"
@@ -73,7 +79,7 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 							<div className={cn(`${prefix}editorTable-rowControls-item`)} />
 						)}
 						<Button
-							onClick={() => 0}
+							onClick={() => addRow(rowNumber)}
 							className={cn(`${prefix}editorTable-rowControls-add`)}
 							flow="circular"
 							size="small"
@@ -85,10 +91,20 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 					</div>
 				))}
 			</div>
-			<button type="button" className={cn(`${prefix}editorTable-appendColumn`)} contentEditable={false}>
+			<button
+				type="button"
+				className={cn(`${prefix}editorTable-appendColumn`)}
+				onClick={() => addColumn()}
+				contentEditable={false}
+			>
 				<Icon blueprintIcon="plus" />
 			</button>
-			<button type="button" className={cn(`${prefix}editorTable-appendRow`)} contentEditable={false}>
+			<button
+				type="button"
+				className={cn(`${prefix}editorTable-appendRow`)}
+				onClick={() => addRow()}
+				contentEditable={false}
+			>
 				<Icon blueprintIcon="plus" />
 			</button>
 			{children}

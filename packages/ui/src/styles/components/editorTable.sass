@@ -5,7 +5,8 @@
 	$topColumnControlsHeight: 2em
 	$lineThickness: em(1px)
 	$addDimensionThickness: 1em
-	$verticalOffset: 2.5em
+	$verticalOffsetTop: 1em
+	$verticalOffsetBottom: 2.5em
 
 	$rowCount: var(--#{$cui-conf-globalPrefix}editorTable-rowCount, 0)
 	$columnCount: var(--#{$cui-conf-globalPrefix}editorTable-columnCount, 0)
@@ -13,7 +14,7 @@
 	display: grid
 	grid-template-rows: $topColumnControlsHeight repeat(calc(#{$rowCount}), $lineThickness auto) $lineThickness $addDimensionThickness
 	grid-template-columns: $frontRowControlsWidth repeat(calc(#{$columnCount}), $lineThickness 1fr) $lineThickness $addDimensionThickness
-	margin: ($verticalOffset - $topColumnControlsHeight) (-$addDimensionThickness) ($verticalOffset - $frontRowControlsWidth) (-$frontRowControlsWidth)
+	margin: ($verticalOffsetTop - $topColumnControlsHeight) (-$addDimensionThickness) ($verticalOffsetBottom - $frontRowControlsWidth) (-$frontRowControlsWidth)
 
 	&-rowControls,
 	&-columnControls,
@@ -73,9 +74,11 @@
 			z-index: 1
 	&-handle
 		grid-area: 1 / 1 / span 1 / span 1
+	&-remove
+		grid-area: 1 / -2 / span 1 / span 1
 	&-cell
-		grid-row: calc(2 * #{$row} + 3) / span 1
-		grid-column: calc(2 * #{$column} + 3) / span 1
+		// grid-row: calc(2 * #{$row} + 3) / span 1
+		// grid-column: calc(2 * #{$column} + 3) / span 1
 		padding: em(2px) em(6px)
 	&-appendRow
 		grid-row: -2 / span 1
@@ -115,19 +118,23 @@
 	&-columnControls-add,
 	&-columnControls-item,
 	&-appendRow,
-	&-appendColumn
+	&-appendColumn,
+	&-handle,
+	&-remove
 		transition-property: visibility, opacity
 		transition-duration: .2s
 		visibility: hidden
 		opacity: 0
 
-	&.is-active &,
+	&.is-focused &,
 	&:hover &
 		&-rowControls-add,
 		&-rowControls-item,
 		&-columnControls-add,
 		&-columnControls-item,
 		&-appendRow,
-		&-appendColumn
+		&-appendColumn,
+		&-handle,
+		&-remove
 			opacity: 1
 			visibility: visible

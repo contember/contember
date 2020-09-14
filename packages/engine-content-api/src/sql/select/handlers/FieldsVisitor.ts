@@ -88,9 +88,12 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 			entity.primary,
 			async ids => {
 				const objectNode = this.executionContext.field as ObjectNode
+				const targetRelationFilter = { [entity.primary]: { in: ids } }
 				const whereWithParentId = {
 					...objectNode.args.filter,
-					[targetRelation.name]: { [entity.primary]: { in: ids } },
+					[targetRelation.name]: !objectNode.args.filter?.[targetRelation.name]
+						? targetRelationFilter
+						: { and: [objectNode.args.filter[targetRelation.name], targetRelationFilter] },
 				}
 				const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('filter', whereWithParentId)
 				const objectNodeWithOrder = OrderByHelper.appendDefaultOrderBy(

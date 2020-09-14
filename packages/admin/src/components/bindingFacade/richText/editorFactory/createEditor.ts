@@ -12,6 +12,7 @@ import {
 	withParagraphs,
 	withScrollTargets,
 	withStrikeThrough,
+	withTables,
 	withUnderline,
 } from '../plugins'
 import { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
@@ -27,6 +28,7 @@ const pluginAugmenters: {
 	list: withLists,
 	horizontalRule: withHorizontalRules,
 	scrollTarget: withScrollTargets,
+	table: withTables,
 
 	bold: withBold,
 	code: withCode,

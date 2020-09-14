@@ -14,6 +14,7 @@ import {
 	orderedListToolbarButton,
 	scrollTargetToolbarButton,
 	strikeThroughToolbarButton,
+	tableToolbarButton,
 	underlineToolbarButton,
 	unorderedListToolbarButton,
 } from './plugins'
@@ -31,6 +32,7 @@ export namespace RichEditor {
 		orderedList: orderedListToolbarButton,
 		scrollTarget: scrollTargetToolbarButton,
 		unorderedList: unorderedListToolbarButton,
+		table: tableToolbarButton,
 
 		bold: boldToolbarButton,
 		code: codeToolbarButton,

@@ -1,0 +1,44 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}editorTable
+	$frontRowControlsWidth: 2em
+	$topColumnControlsHeight: 2em
+	$lineThickness: em(1px)
+
+	$rowCount: var(--#{$cui-conf-globalPrefix}editorTable-rowCount, 0)
+	$columnCount: var(--#{$cui-conf-globalPrefix}editorTable-columnCount, 0)
+
+	display: grid
+	grid-template-rows: $topColumnControlsHeight repeat(calc(#{$rowCount}), $lineThickness 1fr) $lineThickness
+	grid-template-columns: $frontRowControlsWidth repeat(calc(#{$columnCount}), $lineThickness 1fr) $lineThickness
+
+	&-rowControls,
+	&-columnControls,
+	&-body,
+	&-row
+		display: contents
+
+	$row: var(--#{$cui-conf-globalPrefix}editorTable-row, 0)
+	$column: var(--#{$cui-conf-globalPrefix}editorTable-column, 0)
+	&-rowControls
+		&-item
+			grid-row: calc(2 * #{$row} + 3) / span 1
+			grid-column: 1 / span 1
+			align-self: center
+		&-rowLine
+			grid-row: calc(2 * #{$row} + 2) / span 1
+			grid-column: 2 / -1
+			background: $cui-color-gray-3
+	&-columnControls
+		&-item
+			grid-row: 1 / span 1
+			grid-column: calc(2 * #{$column} + 3) / span 1
+			justify-self: center
+		&-columnLine
+			grid-row: 2 / -1
+			grid-column: calc(2 * #{$column} + 2) / span 1
+			background: $cui-color-gray-3
+	&-cell
+		grid-row: calc(2 * #{$row} + 3) / span 1
+		grid-column: calc(2 * #{$column} + 3) / span 1
+		padding: em(2px) em(6px)

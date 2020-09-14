@@ -3,6 +3,7 @@ import { GraphQlBuilder } from '@contember/client'
 import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import * as React from 'react'
 import { ReactEditor, useEditor } from 'slate-react'
+import { ElementSpecificToolbarButton } from '../toolbars'
 import { ContemberBlockElement, contemberBlockElementType } from './elements'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
@@ -14,6 +15,7 @@ export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 		| {
 				discriminateByScalar: Scalar
 		  }
+		| ElementSpecificToolbarButton<any>
 	)
 
 export interface BlockHoveringToolbarContentsProps {
@@ -42,17 +44,22 @@ function toToolbarGroups(
 					onClick: (e: React.MouseEvent) => {
 						e.nativeEvent.preventDefault()
 						e.nativeEvent.stopPropagation()
-						const discriminateBy =
-							'discriminateBy' in buttonProps
-								? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
-								: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
-						const contemberBlockElement: ContemberBlockElement = {
-							type: contemberBlockElementType,
-							blockType: discriminateBy,
-							entityKey: '', // Any string will do from here.
-							children: [{ text: '' }],
+
+						if ('discriminateBy' in buttonProps || 'discriminateByScalar' in buttonProps) {
+							const discriminateBy =
+								'discriminateBy' in buttonProps
+									? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
+									: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
+							const contemberBlockElement: ContemberBlockElement = {
+								type: contemberBlockElementType,
+								blockType: discriminateBy,
+								entityKey: '', // Any string will do from here.
+								children: [{ text: '' }],
+							}
+							editor.insertNode(contemberBlockElement)
+						} else {
+							editor.toggleElement(buttonProps.elementType, buttonProps.suchThat)
 						}
-						editor.insertNode(contemberBlockElement)
 					},
 				}
 			}),

@@ -4,16 +4,21 @@
 	$frontRowControlsWidth: 2em
 	$topColumnControlsHeight: 2em
 	$lineThickness: em(1px)
+	$addDimensionThickness: 1em
+	$verticalOffset: 2.5em
 
 	$rowCount: var(--#{$cui-conf-globalPrefix}editorTable-rowCount, 0)
 	$columnCount: var(--#{$cui-conf-globalPrefix}editorTable-columnCount, 0)
 
 	display: grid
-	grid-template-rows: $topColumnControlsHeight repeat(calc(#{$rowCount}), $lineThickness 1fr) $lineThickness
-	grid-template-columns: $frontRowControlsWidth repeat(calc(#{$columnCount}), $lineThickness 1fr) $lineThickness
+	grid-template-rows: $topColumnControlsHeight repeat(calc(#{$rowCount}), $lineThickness auto) $lineThickness $addDimensionThickness
+	grid-template-columns: $frontRowControlsWidth repeat(calc(#{$columnCount}), $lineThickness 1fr) $lineThickness $addDimensionThickness
+	margin: ($verticalOffset - $topColumnControlsHeight) (-$addDimensionThickness) ($verticalOffset - $frontRowControlsWidth) (-$frontRowControlsWidth)
 
 	&-rowControls,
 	&-columnControls,
+	&-rowControls-in,
+	&-columnControls-in,
 	&-body,
 	&-row
 		display: contents
@@ -25,20 +30,104 @@
 			grid-row: calc(2 * #{$row} + 3) / span 1
 			grid-column: 1 / span 1
 			align-self: center
-		&-rowLine
+		&-line
 			grid-row: calc(2 * #{$row} + 2) / span 1
-			grid-column: 2 / -1
-			background: $cui-color-gray-3
+			grid-column: 2 / -2
+			background: $cui-color-gray-2
+		&-add
+			grid-row: calc(2 * #{$row} + 2) / span 1
+			grid-column: 1 / span 1
+		&-add:hover ~ &-line,
+		&-add:focus ~ &-line
+			transform: scaleY(4)
 	&-columnControls
 		&-item
 			grid-row: 1 / span 1
 			grid-column: calc(2 * #{$column} + 3) / span 1
 			justify-self: center
-		&-columnLine
-			grid-row: 2 / -1
+		&-line
+			grid-row: 2 / -2
 			grid-column: calc(2 * #{$column} + 2) / span 1
-			background: $cui-color-gray-3
+			background: $cui-color-gray-2
+		&-add
+			grid-row: 1 / span 1
+			grid-column: calc(2 * #{$column} + 2) / span 1
+		&-add:hover ~ &-line,
+		&-add:focus ~ &-line
+			transform: scaleX(4)
+
+	&-rowControls,
+	&-columnControls
+		&-line
+			transition: background-color .2s
+		&-add
+			justify-self: center
+			align-self: center
+			> *
+				transition: transform .2s
+				transform: scale(.4)
+			&:hover > *
+				transform: scale(1)
+		&-add:hover ~ &-line // This is a *BAD* selector
+			background-color: $cui-box-active-color
+			z-index: 1
+	&-handle
+		grid-area: 1 / 1 / span 1 / span 1
 	&-cell
 		grid-row: calc(2 * #{$row} + 3) / span 1
 		grid-column: calc(2 * #{$column} + 3) / span 1
 		padding: em(2px) em(6px)
+	&-appendRow
+		grid-row: -2 / span 1
+		grid-column: 2 / -2
+		border-bottom-left-radius: ($addDimensionThickness / 2)
+		border-bottom-right-radius: ($addDimensionThickness / 2)
+	&-appendColumn
+		grid-row: 2 / -2
+		grid-column: -2 / span 1
+		border-top-right-radius: ($addDimensionThickness / 2)
+		border-bottom-right-radius: ($addDimensionThickness / 2)
+	&-appendRow,
+	&-appendColumn
+		@extend %implementsCustomFocusEffects
+		border: none
+		background: $cui-color-gray-1
+		font-size: .6em
+		display: flex
+		justify-content: center
+		align-items: center
+		color: $cui-color-gray-7
+		cursor: pointer
+
+		&,
+		& > *
+			transition-property: background-color, color
+			transition-duration: .2s
+			transition-timing-function: ease-in-out
+		&:hover,
+		&:focus
+			background-color: $cui-box-active-color
+			& > *
+				color: $cui-color-white
+
+	&-rowControls-add,
+	&-rowControls-item,
+	&-columnControls-add,
+	&-columnControls-item,
+	&-appendRow,
+	&-appendColumn
+		transition-property: visibility, opacity
+		transition-duration: .2s
+		visibility: hidden
+		opacity: 0
+
+	&.is-active &,
+	&:hover &
+		&-rowControls-add,
+		&-rowControls-item,
+		&-columnControls-add,
+		&-columnControls-item,
+		&-appendRow,
+		&-appendColumn
+			opacity: 1
+			visibility: visible

@@ -7,6 +7,10 @@ export interface EditorTableRowElementProps {
 	children: React.ReactNode
 }
 
+/**
+ * CAREFUL! This is only a separate component because of the editor but is unfortunately very tightly coupled with
+ * the EditorTableElement component.
+ */
 export const EditorTableRowElement = React.memo(function EditorTableRowElement({
 	attributes,
 	children,

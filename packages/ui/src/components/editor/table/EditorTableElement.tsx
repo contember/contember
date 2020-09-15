@@ -13,6 +13,7 @@ export interface EditorTableElementProps {
 	deleteTable: () => void
 	deleteRow?: (index: number) => void
 	deleteColumn?: (index: number) => void
+	//selectTable: () => void
 	isSelected: boolean
 	isFocused: boolean
 	children: React.ReactNode
@@ -26,6 +27,7 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 	deleteTable,
 	deleteRow,
 	deleteColumn,
+	//selectTable,
 	isSelected,
 	isFocused,
 	children,
@@ -33,7 +35,7 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 	const prefix = useClassNamePrefix()
 	return (
 		<div
-			className={cn(`${prefix}editorTable`, toStateClass('focused', isFocused))}
+			className={cn(`${prefix}editorTable`, toStateClass('focused', isFocused), toStateClass('selected', isSelected))}
 			style={
 				{
 					[`--${prefix}editorTable-rowCount`]: rowCount,
@@ -41,8 +43,16 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 				} as React.CSSProperties
 			}
 		>
-			<div className={cn(`${prefix}editorTable-handle`)} contentEditable={false} />
-			<div className={cn(`${prefix}editorTable-remove`)} contentEditable={false} />
+			<div className={cn(`${prefix}editorTable-handle`)} contentEditable={false}>
+				{/*<Button onClick={selectTable} flow="circular" size="small" distinction="seamless">*/}
+				{/*	<Icon blueprintIcon="selection" />*/}
+				{/*</Button>*/}
+			</div>
+			<div className={cn(`${prefix}editorTable-remove`)} contentEditable={false}>
+				<Button onClick={deleteTable} flow="circular" size="small" distinction="seamless">
+					<Icon blueprintIcon="trash" />
+				</Button>
+			</div>
 			<div className={cn(`${prefix}editorTable-columnControls`)} contentEditable={false}>
 				{Array.from({ length: columnCount + 1 }, (_, columnNumber) => (
 					<div

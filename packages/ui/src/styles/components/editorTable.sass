@@ -38,8 +38,8 @@
 		&-add
 			grid-row: calc(2 * #{$row} + 2) / span 1
 			grid-column: 1 / span 1
-		&-add:hover ~ &-line,
-		&-add:focus ~ &-line
+		&-add:hover + &-line,
+		&-add:focus + &-line
 			transform: scaleY(4)
 	&-columnControls
 		&-item
@@ -53,8 +53,8 @@
 		&-add
 			grid-row: 1 / span 1
 			grid-column: calc(2 * #{$column} + 2) / span 1
-		&-add:hover ~ &-line,
-		&-add:focus ~ &-line
+		&-add:hover + &-line,
+		&-add:focus + &-line
 			transform: scaleX(4)
 
 	&-rowControls,
@@ -67,15 +67,30 @@
 			> *
 				transition: transform .2s
 				transform: scale(.4)
-			&:hover > *
+			&:hover > *,
+			&:focus > *
 				transform: scale(1)
-		&-add:hover ~ &-line // This is a *BAD* selector
+		&-add:hover + &-line,
+		&-add:focus + &-line
 			background-color: $cui-box-active-color
 			z-index: 1
+	&-rowControls-add,
+	&-columnControls-add,
+	&-handle,
+	&-remove
+		> *
+			transition: transform .2s
+			transform: scale(.4)
+		&:hover > *,
+		&:focus > *
+			transform: scale(1)
 	&-handle
 		grid-area: 1 / 1 / span 1 / span 1
 	&-remove
 		grid-area: 1 / -2 / span 1 / span 1
+		align-self: center
+		padding-left: .6em
+		width: 1.5em
 	&-cell
 		// grid-row: calc(2 * #{$row} + 3) / span 1
 		// grid-column: calc(2 * #{$column} + 3) / span 1
@@ -112,6 +127,10 @@
 			background-color: $cui-box-active-color
 			& > *
 				color: $cui-color-white
+
+	&-handle
+		&:hover > *
+			transform: scale(1)
 
 	&-rowControls-add,
 	&-rowControls-item,

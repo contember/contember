@@ -7,11 +7,13 @@
 	$addDimensionThickness: 1em
 	$frontRemoveDimensionThickness: 1em
 	$topRemoveDimensionThickness: 1em
-	$verticalOffsetTop: 2em
+	$verticalOffsetTop: 1.5em
 	$verticalOffsetBottom: 3.5em
 
 	$removeDimensionBorderRadius: .5em
-	$removeColor: $cui-color-danger
+
+	$addColor: lighten($cui-color-blue, 10)
+	$removeColor: lighten($cui-color-danger, 10)
 
 	$rowCount: var(--#{$cui-conf-globalPrefix}editorTable-rowCount, 0)
 	$columnCount: var(--#{$cui-conf-globalPrefix}editorTable-columnCount, 0)
@@ -37,9 +39,9 @@
 			place-self: center end
 			width: $frontRemoveDimensionThickness
 			height: 100%
-			&:first-of-type
+			&-first
 				border-top-left-radius: $removeDimensionBorderRadius
-			&:last-of-type
+			&-last
 				border-bottom-left-radius: $removeDimensionBorderRadius
 		&-item:hover + * + &-line,
 		&-item:hover + * + * + * + * + &-line // I know…
@@ -66,9 +68,9 @@
 			place-self: end center
 			height: $topRemoveDimensionThickness
 			width: 100%
-			&:first-of-type
+			&-first
 				border-top-left-radius: $removeDimensionBorderRadius
-			&:last-of-type
+			&-last
 				border-top-right-radius: $removeDimensionBorderRadius
 		&-item:hover + * + &-line,
 		&-item:hover + * + * + * + * + &-line // I know…
@@ -108,7 +110,7 @@
 			&:hover > *
 				transform: scale(1)
 		&-add:hover + &-line
-			background-color: $cui-box-active-color
+			background-color: $addColor
 			z-index: 1
 	&-rowControls-add,
 	&-columnControls-add,
@@ -163,7 +165,7 @@
 	&-appendColumn
 		font-size: .6em
 		&:hover
-			background-color: $cui-box-active-color
+			background-color: $addColor
 			& > *
 				color: $cui-color-white
 

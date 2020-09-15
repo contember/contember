@@ -62,7 +62,11 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 								<button
 									type="button"
 									onClick={() => deleteColumn(columnNumber)}
-									className={cn(`${prefix}editorTable-columnControls-item`)}
+									className={cn(
+										`${prefix}editorTable-columnControls-item`,
+										columnNumber === 0 && `${prefix}editorTable-columnControls-item-first`,
+										columnNumber === columnCount - 1 && `${prefix}editorTable-columnControls-item-last`,
+									)}
 									style={columnStyle}
 								>
 									<Icon blueprintIcon="trash" />
@@ -94,7 +98,11 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 								<button
 									type="button"
 									onClick={() => deleteRow(rowNumber)}
-									className={cn(`${prefix}editorTable-rowControls-item`)}
+									className={cn(
+										`${prefix}editorTable-rowControls-item`,
+										rowNumber === 0 && `${prefix}editorTable-rowControls-item-first`,
+										rowNumber === rowCount - 1 && `${prefix}editorTable-rowControls-item-last`,
+									)}
 									style={rowStyle}
 								>
 									<Icon blueprintIcon="trash" />

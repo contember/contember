@@ -16,18 +16,22 @@ export const TableElementRenderer = React.memo(function TableElementRenderer(pro
 	const isSelected = useSelected()
 	const isFocused = false
 
-	const addRow = React.useCallback(
-		(index?: number) => {
-			editor.addTableRow(props.element, index)
-		},
-		[editor, props.element],
-	)
-	const addColumn = React.useCallback(
-		(index?: number) => {
-			editor.addTableColumn(props.element, index)
-		},
-		[editor, props.element],
-	)
+	const addRow = React.useCallback((index?: number) => editor.addTableRow(props.element, index), [
+		editor,
+		props.element,
+	])
+	const addColumn = React.useCallback((index?: number) => editor.addTableColumn(props.element, index), [
+		editor,
+		props.element,
+	])
+	const deleteRow = React.useCallback((index: number) => editor.deleteTableRow(props.element, index), [
+		editor,
+		props.element,
+	])
+	const deleteColumn = React.useCallback((index: number) => editor.deleteTableColumn(props.element, index), [
+		editor,
+		props.element,
+	])
 	// TODO this kind of works but ends up generating tons of operations when used to delete the whole table.
 	// 		it would require more testing to ensure that it works well so it will have to wait for now.
 	// const selectTable = React.useCallback(() => {
@@ -70,6 +74,8 @@ export const TableElementRenderer = React.memo(function TableElementRenderer(pro
 				columnCount={(props.element.children[0] as TableRowElement | undefined)?.children.length ?? 0}
 				addRow={addRow}
 				addColumn={addColumn}
+				deleteRow={deleteRow}
+				deleteColumn={deleteColumn}
 				//selectTable={selectTable}
 				deleteTable={deleteTable}
 				isSelected={isSelected}

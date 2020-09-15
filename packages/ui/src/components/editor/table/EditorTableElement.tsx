@@ -11,8 +11,8 @@ export interface EditorTableElementProps {
 	addRow: (index?: number) => void
 	addColumn: (index?: number) => void
 	deleteTable: () => void
-	deleteRow?: (index: number) => void
-	deleteColumn?: (index: number) => void
+	deleteRow: (index: number) => void
+	deleteColumn: (index: number) => void
 	//selectTable: () => void
 	isSelected: boolean
 	isFocused: boolean
@@ -59,7 +59,12 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 					return (
 						<React.Fragment key={columnNumber}>
 							{columnNumber < columnCount ? (
-								<button type="button" className={cn(`${prefix}editorTable-columnControls-item`)} style={columnStyle}>
+								<button
+									type="button"
+									onClick={() => deleteColumn(columnNumber)}
+									className={cn(`${prefix}editorTable-columnControls-item`)}
+									style={columnStyle}
+								>
 									<Icon blueprintIcon="trash" />
 								</button>
 							) : (
@@ -86,7 +91,12 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 					return (
 						<React.Fragment key={rowNumber}>
 							{rowNumber < rowCount ? (
-								<button type="button" className={cn(`${prefix}editorTable-rowControls-item`)} style={rowStyle}>
+								<button
+									type="button"
+									onClick={() => deleteRow(rowNumber)}
+									className={cn(`${prefix}editorTable-rowControls-item`)}
+									style={rowStyle}
+								>
 									<Icon blueprintIcon="trash" />
 								</button>
 							) : (

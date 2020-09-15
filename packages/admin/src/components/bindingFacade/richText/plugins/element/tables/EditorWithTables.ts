@@ -25,8 +25,8 @@ export interface WithTables<
 
 	addTableRow: (element: TableElement, index?: number) => void
 	addTableColumn: (element: TableElement, index?: number) => void
-	deleteTableRow: (element: TableElement, index?: number) => void
-	deleteTableColumn: (element: TableElement, index?: number) => void
+	deleteTableRow: (element: TableElement, index: number) => void
+	deleteTableColumn: (element: TableElement, index: number) => void
 }
 
 export type EditorWithTables<E extends BaseEditor> = WithAnotherNodeType<

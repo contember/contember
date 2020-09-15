@@ -77,11 +77,23 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				}
 			})
 		},
-		deleteTableRow: (element: TableElement, index?: number) => {
-			// TODO
+		deleteTableRow: (element: TableElement, index: number) => {
+			const tablePath = ReactEditor.findPath(e, element)
+			Transforms.removeNodes(e, {
+				at: [...tablePath, index],
+			})
 		},
-		deleteTableColumn: (element: TableElement, index?: number) => {
-			// TODO
+		deleteTableColumn: (element: TableElement, index: number) => {
+			const tablePath = ReactEditor.findPath(e, element)
+			const rowCount = element.children.length
+
+			Editor.withoutNormalizing(e, () => {
+				for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+					Transforms.removeNodes(e, {
+						at: [...tablePath, rowIndex, index],
+					})
+				}
+			})
 		},
 
 		renderElement: props => {

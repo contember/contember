@@ -18,5 +18,10 @@
 		"incremental": true,
 
 		"lib": ["esnext", "dom"]
+	},
+	"watchOptions": {
+		"watchFile": "useFsEvents",
+		"watchDirectory": "useFsEvents",
+		"fallbackPolling": "dynamicPriority"
 	}
 }

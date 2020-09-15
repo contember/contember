@@ -23,6 +23,9 @@ sass.render(
 		fiber: Fiber,
 	},
 	(err, result) => {
+		if (err) {
+			throw err
+		}
 		fs.writeFileSync(path.join(process.cwd(), '/dist/style.css'), result.css, function(err) {
 			if (err) {
 				throw err

@@ -1,14 +1,7 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src",
-		"baseUrl": "..",
-		"paths": {
-			"@contember/client": ["node_modules/@contember/client"],
-			"@contember/react-client": ["node_modules/@contember/react-client"],
-			"@contember/react-multipass-rendering": ["node_modules/@contember/react-multipass-rendering"],
-			"@contember/react-utils": ["node_modules/@contember/react-utils"]
-		}
+		"outDir": "../dist/src"
 	},
 	"references": [
 		{ "path": "../../../packages/react-multipass-rendering/src" },

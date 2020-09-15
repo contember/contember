@@ -5,6 +5,7 @@ import {
 	Node as SlateNode,
 	NodeEntry,
 	Path as SlatePath,
+	Point,
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
@@ -20,7 +21,16 @@ import { TableRowElement, tableRowElementType } from './TableRowElement'
 import { TableRowElementRenderer, TableRowElementRendererProps } from './TableRowElementRenderer'
 
 export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E> => {
-	const { renderElement, insertBreak, deleteBackward, normalizeNode, isElementActive, toggleElement } = editor
+	const {
+		renderElement,
+		deleteForward,
+		deleteBackward,
+		normalizeNode,
+		deleteFragment,
+		insertBreak,
+		isElementActive,
+		toggleElement,
+	} = editor
 
 	const e = (editor as any) as EditorWithTables<E>
 
@@ -169,6 +179,46 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 					at: targetPath,
 				})
 			})
+		},
+		insertBreak: () => {
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
+			if (closestBlockEntry && e.isTableCell(closestBlockEntry[0])) {
+				return // TODO insert <br />
+			}
+			insertBreak()
+		},
+		deleteBackward: unit => {
+			const selection = editor.selection
+			if (selection && SlateRange.isCollapsed(selection)) {
+				const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
+				if (closestBlockEntry && Point.equals(selection.focus, Editor.start(e, closestBlockEntry[1]))) {
+					return
+				}
+			}
+			deleteBackward(unit)
+		},
+		deleteForward: unit => {
+			const selection = editor.selection
+			if (selection && SlateRange.isCollapsed(selection)) {
+				const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
+				if (closestBlockEntry && Point.equals(selection.focus, Editor.end(e, closestBlockEntry[1]))) {
+					return
+				}
+			}
+			deleteForward(unit)
+		},
+		deleteFragment: () => {
+			const selection = editor.selection
+			if (!selection || SlateRange.isCollapsed(selection)) {
+				return deleteFragment()
+			}
+			const lowestCommonAncestorPath = SlatePath.common(selection.anchor.path, selection.focus.path)
+			const [lowestCommonAncestor] = Editor.node(e, lowestCommonAncestorPath)
+
+			if (e.isTable(lowestCommonAncestor) || e.isTableRow(lowestCommonAncestor)) {
+				return // TODO nope for now
+			}
+			deleteFragment()
 		},
 	})
 

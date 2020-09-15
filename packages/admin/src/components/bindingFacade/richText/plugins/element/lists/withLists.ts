@@ -111,11 +111,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 						}
 					}
 				} else if (e.isListItem(node)) {
-					const closestBlockEntry = Editor.above(e, {
-						at: path,
-						mode: 'lowest',
-						match: matchedNode => SlateElement.isElement(matchedNode) && !e.isInline(matchedNode),
-					})
+					const closestBlockEntry = ContemberEditor.closestBlockEntry(e, path)
 					if (closestBlockEntry === undefined || !e.isList(closestBlockEntry[0])) {
 						Editor.withoutNormalizing(e, () => {
 							const defaultElement = e.createDefaultElement([{ text: '' }])

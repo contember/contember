@@ -1,5 +1,6 @@
 export * from './addMarks'
 export * from './canToggleMark'
+export * from './closestBlockEntry'
 export * from './ejectElement'
 export * from './hasMarks'
 export * from './isElementType'

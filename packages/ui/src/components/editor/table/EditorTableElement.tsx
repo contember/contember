@@ -54,52 +54,58 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 				</Button>
 			</div>
 			<div className={cn(`${prefix}editorTable-columnControls`)} contentEditable={false}>
-				{Array.from({ length: columnCount + 1 }, (_, columnNumber) => (
-					<div
-						className={cn(`${prefix}editorTable-columnControls-in`)}
-						style={{ [`--${prefix}editorTable-column`]: columnNumber } as React.CSSProperties}
-						key={columnNumber}
-					>
-						{columnNumber < columnCount && (
-							// TODO select column
-							<div className={cn(`${prefix}editorTable-columnControls-item`)} key={columnNumber} />
-						)}
-						<Button
-							onClick={() => addColumn(columnNumber)}
-							className={cn(`${prefix}editorTable-columnControls-add`)}
-							flow="circular"
-							size="small"
-							distinction="seamless"
-						>
-							<Icon blueprintIcon="plus" />
-						</Button>
-						<div className={cn(`${prefix}editorTable-columnControls-line`)} />
-					</div>
-				))}
+				{Array.from({ length: columnCount + 1 }, (_, columnNumber) => {
+					const columnStyle = { [`--${prefix}editorTable-column`]: columnNumber } as React.CSSProperties
+					return (
+						<React.Fragment key={columnNumber}>
+							{columnNumber < columnCount ? (
+								<button type="button" className={cn(`${prefix}editorTable-columnControls-item`)} style={columnStyle}>
+									<Icon blueprintIcon="trash" />
+								</button>
+							) : (
+								<span className={cn(`${prefix}editorTable-stub`)} />
+							)}
+							<Button
+								onClick={() => addColumn(columnNumber)}
+								className={cn(`${prefix}editorTable-columnControls-add`)}
+								flow="circular"
+								size="small"
+								distinction="seamless"
+								style={columnStyle}
+							>
+								<Icon blueprintIcon="plus" />
+							</Button>
+							<div className={cn(`${prefix}editorTable-columnControls-line`)} style={columnStyle} />
+						</React.Fragment>
+					)
+				})}
 			</div>
 			<div className={cn(`${prefix}editorTable-rowControls`)} contentEditable={false}>
-				{Array.from({ length: rowCount + 1 }, (_, rowNumber) => (
-					<div
-						className={cn(`${prefix}editorTable-rowControls-in`)}
-						style={{ [`--${prefix}editorTable-row`]: rowNumber } as React.CSSProperties}
-						key={rowNumber}
-					>
-						{rowNumber < rowCount && (
-							// TODO select row
-							<div className={cn(`${prefix}editorTable-rowControls-item`)} />
-						)}
-						<Button
-							onClick={() => addRow(rowNumber)}
-							className={cn(`${prefix}editorTable-rowControls-add`)}
-							flow="circular"
-							size="small"
-							distinction="seamless"
-						>
-							<Icon blueprintIcon="plus" />
-						</Button>
-						<div className={cn(`${prefix}editorTable-rowControls-line`)} />
-					</div>
-				))}
+				{Array.from({ length: rowCount + 1 }, (_, rowNumber) => {
+					const rowStyle = { [`--${prefix}editorTable-row`]: rowNumber } as React.CSSProperties
+					return (
+						<React.Fragment key={rowNumber}>
+							{rowNumber < rowCount ? (
+								<button type="button" className={cn(`${prefix}editorTable-rowControls-item`)} style={rowStyle}>
+									<Icon blueprintIcon="trash" />
+								</button>
+							) : (
+								<span className={cn(`${prefix}editorTable-stub`)} />
+							)}
+							<Button
+								onClick={() => addRow(rowNumber)}
+								className={cn(`${prefix}editorTable-rowControls-add`)}
+								flow="circular"
+								size="small"
+								distinction="seamless"
+								style={rowStyle}
+							>
+								<Icon blueprintIcon="plus" />
+							</Button>
+							<div className={cn(`${prefix}editorTable-rowControls-line`)} style={rowStyle} />
+						</React.Fragment>
+					)
+				})}
 			</div>
 			<button
 				type="button"

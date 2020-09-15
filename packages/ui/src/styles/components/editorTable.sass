@@ -1,12 +1,17 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorTable
-	$frontRowControlsWidth: 2em
-	$topColumnControlsHeight: 2em
+	$frontRowControlsWidth: 3.5em
+	$topColumnControlsHeight: 3.5em
 	$lineThickness: em(1px)
 	$addDimensionThickness: 1em
-	$verticalOffsetTop: 1em
-	$verticalOffsetBottom: 2.5em
+	$frontRemoveDimensionThickness: 1em
+	$topRemoveDimensionThickness: 1em
+	$verticalOffsetTop: 2em
+	$verticalOffsetBottom: 3.5em
+
+	$removeDimensionBorderRadius: .5em
+	$removeColor: $cui-color-danger
 
 	$rowCount: var(--#{$cui-conf-globalPrefix}editorTable-rowCount, 0)
 	$columnCount: var(--#{$cui-conf-globalPrefix}editorTable-columnCount, 0)
@@ -18,10 +23,9 @@
 
 	&-rowControls,
 	&-columnControls,
-	&-rowControls-in,
-	&-columnControls-in,
 	&-body,
-	&-row
+	&-row,
+	&-stub
 		display: contents
 
 	$row: var(--#{$cui-conf-globalPrefix}editorTable-row, 0)
@@ -30,7 +34,21 @@
 		&-item
 			grid-row: calc(2 * #{$row} + 3) / span 1
 			grid-column: 1 / span 1
-			align-self: center
+			place-self: center end
+			width: $frontRemoveDimensionThickness
+			height: 100%
+			&:first-of-type
+				border-top-left-radius: $removeDimensionBorderRadius
+			&:last-of-type
+				border-bottom-left-radius: $removeDimensionBorderRadius
+		&-item:hover + * + &-line,
+		&-item:hover + * + * + * + * + &-line // I know…
+			background-color: $removeColor
+			z-index: 1
+		&-item:hover + * + &-line
+			transform: translateY(150%) scaleY(2)
+		&-item:hover + * + * + * + * + &-line
+			transform: translateY(-150%) scaleY(2)
 		&-line
 			grid-row: calc(2 * #{$row} + 2) / span 1
 			grid-column: 2 / -2
@@ -38,14 +56,28 @@
 		&-add
 			grid-row: calc(2 * #{$row} + 2) / span 1
 			grid-column: 1 / span 1
-		&-add:hover + &-line,
-		&-add:focus + &-line
+		&-add:hover + &-line
 			transform: scaleY(4)
 	&-columnControls
 		&-item
 			grid-row: 1 / span 1
 			grid-column: calc(2 * #{$column} + 3) / span 1
 			justify-self: center
+			place-self: end center
+			height: $topRemoveDimensionThickness
+			width: 100%
+			&:first-of-type
+				border-top-left-radius: $removeDimensionBorderRadius
+			&:last-of-type
+				border-top-right-radius: $removeDimensionBorderRadius
+		&-item:hover + * + &-line,
+		&-item:hover + * + * + * + * + &-line // I know…
+			background-color: $removeColor
+			z-index: 1
+		&-item:hover + * + &-line
+			transform: translateX(150%) scaleX(2)
+		&-item:hover + * + * + * + * + &-line
+			transform: translateX(-150%) scaleX(2)
 		&-line
 			grid-row: 2 / -2
 			grid-column: calc(2 * #{$column} + 2) / span 1
@@ -53,25 +85,29 @@
 		&-add
 			grid-row: 1 / span 1
 			grid-column: calc(2 * #{$column} + 2) / span 1
-		&-add:hover + &-line,
-		&-add:focus + &-line
+		&-add:hover + &-line
 			transform: scaleX(4)
 
 	&-rowControls,
 	&-columnControls
+		&-item
+			&:hover
+				background-color: $removeColor
+				color: $cui-color-white
+			& > * > * // This is 10/10 crap.
+				font-size: .5em
 		&-line
-			transition: background-color .2s
+			transition-property: background-color, transform
+			transition-duration: .2s, .1s
 		&-add
 			justify-self: center
 			align-self: center
 			> *
 				transition: transform .2s
 				transform: scale(.4)
-			&:hover > *,
-			&:focus > *
+			&:hover > *
 				transform: scale(1)
-		&-add:hover + &-line,
-		&-add:focus + &-line
+		&-add:hover + &-line
 			background-color: $cui-box-active-color
 			z-index: 1
 	&-rowControls-add,
@@ -81,8 +117,7 @@
 		> *
 			transition: transform .2s
 			transform: scale(.4)
-		&:hover > *,
-		&:focus > *
+		&:hover > *
 			transform: scale(1)
 	&-handle
 		grid-area: 1 / 1 / span 1 / span 1
@@ -106,24 +141,28 @@
 		border-top-right-radius: ($addDimensionThickness / 2)
 		border-bottom-right-radius: ($addDimensionThickness / 2)
 	&-appendRow,
-	&-appendColumn
+	&-appendColumn,
+	&-rowControls-item,
+	&-columnControls-item
 		@extend %implementsCustomFocusEffects
 		border: none
 		background: $cui-color-gray-1
-		font-size: .6em
 		display: flex
 		justify-content: center
 		align-items: center
 		color: $cui-color-gray-7
 		cursor: pointer
+		padding: 0
 
 		&,
 		& > *
 			transition-property: background-color, color
 			transition-duration: .2s
 			transition-timing-function: ease-in-out
-		&:hover,
-		&:focus
+	&-appendRow,
+	&-appendColumn
+		font-size: .6em
+		&:hover
 			background-color: $cui-box-active-color
 			& > *
 				color: $cui-color-white

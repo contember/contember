@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
@@ -10,6 +10,7 @@ export type Scalars = {
 	Boolean: boolean
 	Int: number
 	Float: number
+	Json: any
 }
 
 export type AddMailTemplateError = {
@@ -214,6 +215,34 @@ export type IdentityProjectRelation = {
 	readonly memberships: ReadonlyArray<Membership>
 }
 
+export type IdpResponseInput = {
+	readonly url: Scalars['String']
+}
+
+export type InitSignInIdpError = {
+	readonly __typename?: 'InitSignInIDPError'
+	readonly code: InitSignInIdpErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum InitSignInIdpErrorCode {
+	ProviderNotFound = 'PROVIDER_NOT_FOUND',
+}
+
+export type InitSignInIdpResponse = {
+	readonly __typename?: 'InitSignInIDPResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<InitSignInIdpError>
+	readonly result?: Maybe<InitSignInIdpResult>
+}
+
+export type InitSignInIdpResult = {
+	readonly __typename?: 'InitSignInIDPResult'
+	readonly authUrl: Scalars['String']
+	readonly sessionData: Scalars['Json']
+}
+
 export type InviteError = {
 	readonly __typename?: 'InviteError'
 	readonly code: InviteErrorCode
@@ -291,6 +320,8 @@ export type Mutation = {
 	readonly signIn?: Maybe<SignInResponse>
 	readonly signOut?: Maybe<SignOutResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
+	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
+	readonly signInIDP?: Maybe<SignInIdpResponse>
 	readonly prepareOtp?: Maybe<PrepareOtpResponse>
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly disableOtp?: Maybe<DisableOtpResponse>
@@ -330,6 +361,18 @@ export type MutationSignOutArgs = {
 export type MutationChangePasswordArgs = {
 	personId: Scalars['String']
 	password: Scalars['String']
+}
+
+export type MutationInitSignInIdpArgs = {
+	identityProvider: Scalars['String']
+	redirectUrl: Scalars['String']
+}
+
+export type MutationSignInIdpArgs = {
+	identityProvider: Scalars['String']
+	idpResponse: IdpResponseInput
+	redirectUrl: Scalars['String']
+	sessionData: Scalars['Json']
 }
 
 export type MutationPrepareOtpArgs = {
@@ -570,6 +613,32 @@ export enum SignInErrorCode {
 	InvalidOtpToken = 'INVALID_OTP_TOKEN',
 }
 
+export type SignInIdpError = {
+	readonly __typename?: 'SignInIDPError'
+	readonly code: SignInIdpErrorCode
+	readonly endUserMessage?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
+}
+
+export enum SignInIdpErrorCode {
+	InvalidIdpResponse = 'INVALID_IDP_RESPONSE',
+	IdpValidationFailed = 'IDP_VALIDATION_FAILED',
+	PersonNotFound = 'PERSON_NOT_FOUND',
+}
+
+export type SignInIdpResponse = {
+	readonly __typename?: 'SignInIDPResponse'
+	readonly ok: Scalars['Boolean']
+	readonly errors: ReadonlyArray<SignInIdpError>
+	readonly result?: Maybe<SignInIdpResult>
+}
+
+export type SignInIdpResult = {
+	readonly __typename?: 'SignInIDPResult'
+	readonly token: Scalars['String']
+	readonly person: Person
+}
+
 export type SignInResponse = {
 	readonly __typename?: 'SignInResponse'
 	readonly ok: Scalars['Boolean']
@@ -769,6 +838,16 @@ export type ResolversTypes = {
 	ChangePasswordResponse: ResolverTypeWrapper<ChangePasswordResponse>
 	ChangePasswordError: ResolverTypeWrapper<ChangePasswordError>
 	ChangePasswordErrorCode: ChangePasswordErrorCode
+	InitSignInIDPResponse: ResolverTypeWrapper<InitSignInIdpResponse>
+	InitSignInIDPError: ResolverTypeWrapper<InitSignInIdpError>
+	InitSignInIDPErrorCode: InitSignInIdpErrorCode
+	InitSignInIDPResult: ResolverTypeWrapper<InitSignInIdpResult>
+	Json: ResolverTypeWrapper<Scalars['Json']>
+	IDPResponseInput: IdpResponseInput
+	SignInIDPResponse: ResolverTypeWrapper<SignInIdpResponse>
+	SignInIDPError: ResolverTypeWrapper<SignInIdpError>
+	SignInIDPErrorCode: SignInIdpErrorCode
+	SignInIDPResult: ResolverTypeWrapper<SignInIdpResult>
 	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
 	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
 	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
@@ -852,6 +931,14 @@ export type ResolversParentTypes = {
 	SignOutError: SignOutError
 	ChangePasswordResponse: ChangePasswordResponse
 	ChangePasswordError: ChangePasswordError
+	InitSignInIDPResponse: InitSignInIdpResponse
+	InitSignInIDPError: InitSignInIdpError
+	InitSignInIDPResult: InitSignInIdpResult
+	Json: Scalars['Json']
+	IDPResponseInput: IdpResponseInput
+	SignInIDPResponse: SignInIdpResponse
+	SignInIDPError: SignInIdpError
+	SignInIDPResult: SignInIdpResult
 	PrepareOtpResponse: PrepareOtpResponse
 	PrepareOtpResult: PrepareOtpResult
 	ConfirmOtpResponse: ConfirmOtpResponse
@@ -1099,6 +1186,35 @@ export type IdentityProjectRelationResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export type InitSignInIdpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InitSignInIDPError'] = ResolversParentTypes['InitSignInIDPError']
+> = {
+	code?: Resolver<ResolversTypes['InitSignInIDPErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type InitSignInIdpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InitSignInIDPResponse'] = ResolversParentTypes['InitSignInIDPResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['InitSignInIDPError']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['InitSignInIDPResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type InitSignInIdpResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InitSignInIDPResult'] = ResolversParentTypes['InitSignInIDPResult']
+> = {
+	authUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	sessionData?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
 export type InviteErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['InviteError'] = ResolversParentTypes['InviteError']
@@ -1126,6 +1242,10 @@ export type InviteResultResolvers<
 	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
 	isNew?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Json'], any> {
+	name: 'Json'
 }
 
 export type MembershipResolvers<
@@ -1170,6 +1290,18 @@ export type MutationResolvers<
 		ParentType,
 		ContextType,
 		RequireFields<MutationChangePasswordArgs, 'personId' | 'password'>
+	>
+	initSignInIDP?: Resolver<
+		Maybe<ResolversTypes['InitSignInIDPResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationInitSignInIdpArgs, 'identityProvider' | 'redirectUrl'>
+	>
+	signInIDP?: Resolver<
+		Maybe<ResolversTypes['SignInIDPResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationSignInIdpArgs, 'identityProvider' | 'idpResponse' | 'redirectUrl' | 'sessionData'>
 	>
 	prepareOtp?: Resolver<
 		Maybe<ResolversTypes['PrepareOtpResponse']>,
@@ -1454,6 +1586,35 @@ export type SignInErrorResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export type SignInIdpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['SignInIDPError'] = ResolversParentTypes['SignInIDPError']
+> = {
+	code?: Resolver<ResolversTypes['SignInIDPErrorCode'], ParentType, ContextType>
+	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type SignInIdpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['SignInIDPResponse'] = ResolversParentTypes['SignInIDPResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	errors?: Resolver<ReadonlyArray<ResolversTypes['SignInIDPError']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['SignInIDPResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type SignInIdpResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['SignInIDPResult'] = ResolversParentTypes['SignInIDPResult']
+> = {
+	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
 export type SignInResponseResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['SignInResponse'] = ResolversParentTypes['SignInResponse']
@@ -1571,9 +1732,13 @@ export type Resolvers<ContextType = any> = {
 	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
 	Identity?: IdentityResolvers<ContextType>
 	IdentityProjectRelation?: IdentityProjectRelationResolvers<ContextType>
+	InitSignInIDPError?: InitSignInIdpErrorResolvers<ContextType>
+	InitSignInIDPResponse?: InitSignInIdpResponseResolvers<ContextType>
+	InitSignInIDPResult?: InitSignInIdpResultResolvers<ContextType>
 	InviteError?: InviteErrorResolvers<ContextType>
 	InviteResponse?: InviteResponseResolvers<ContextType>
 	InviteResult?: InviteResultResolvers<ContextType>
+	Json?: GraphQLScalarType
 	Membership?: MembershipResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>
 	Person?: PersonResolvers<ContextType>
@@ -1595,6 +1760,9 @@ export type Resolvers<ContextType = any> = {
 	SetupResponse?: SetupResponseResolvers<ContextType>
 	SetupResult?: SetupResultResolvers<ContextType>
 	SignInError?: SignInErrorResolvers<ContextType>
+	SignInIDPError?: SignInIdpErrorResolvers<ContextType>
+	SignInIDPResponse?: SignInIdpResponseResolvers<ContextType>
+	SignInIDPResult?: SignInIdpResultResolvers<ContextType>
 	SignInResponse?: SignInResponseResolvers<ContextType>
 	SignInResult?: SignInResultResolvers<ContextType>
 	SignOutError?: SignOutErrorResolvers<ContextType>

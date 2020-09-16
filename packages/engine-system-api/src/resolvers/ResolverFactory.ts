@@ -2,14 +2,13 @@ import { DiffQueryResolver, StagesQueryResolver } from './query'
 import { DiffEvent, DiffEventType, HistoryEvent, HistoryEventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
-import { GraphQLResolveInfo, GraphQLScalarType, Kind, ValueNode } from 'graphql'
+import { GraphQLResolveInfo } from 'graphql'
 import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
 import { ReleaseTreeMutationResolver } from './mutation/ReleaseTreeMutationResolver'
 import { HistoryQueryResolver } from './query/HistoryQueryResolver'
 import { HistoryEventTypeResolver } from './types/HistoryEventTypeResolver'
-import Maybe from 'graphql/tsutils/Maybe'
-import { JSONValue } from '../utils/json'
 import { ExecutedMigrationsQueryResolver } from './query/ExecutedMigrationsQueryResolver'
+import { DateTimeType, JSONType } from '@contember/engine-common'
 
 class ResolverFactory {
 	public constructor(
@@ -26,57 +25,8 @@ class ResolverFactory {
 
 	create(): Resolvers {
 		return {
-			DateTime: new GraphQLScalarType({
-				name: 'DateTime',
-				description: 'DateTime custom scalar type',
-				serialize(value) {
-					return value instanceof Date ? value.toISOString() : null
-				},
-				parseValue(value) {
-					return new Date(value)
-				},
-				parseLiteral(ast) {
-					if (ast.kind === Kind.STRING) {
-						return new Date(ast.value)
-					}
-					return null
-				},
-			}),
-			Json: new GraphQLScalarType({
-				name: 'Json',
-				description: 'Json custom scalar type',
-				serialize(value) {
-					return value
-				},
-				parseValue(value) {
-					return value
-				},
-				parseLiteral(ast, variables) {
-					const parseLiteral = (ast: ValueNode, variables: Maybe<{ [key: string]: any }>): JSONValue => {
-						switch (ast.kind) {
-							case Kind.STRING:
-								return ast.value
-							case Kind.BOOLEAN:
-								return ast.value
-							case Kind.FLOAT:
-								return parseFloat(ast.value)
-							case Kind.INT:
-								return Number(ast.value)
-							case Kind.LIST:
-								return ast.values.map(it => parseLiteral(it, variables))
-							case Kind.OBJECT:
-								return Object.fromEntries(ast.fields.map(it => [it.name.value, parseLiteral(it.value, variables)]))
-							case Kind.NULL:
-								return null
-							case Kind.VARIABLE:
-								return variables?.[ast.name.value] || undefined
-							default:
-								throw new TypeError()
-						}
-					}
-					return parseLiteral(ast, variables)
-				},
-			}),
+			DateTime: DateTimeType,
+			Json: JSONType,
 			DiffEvent: {
 				__resolveType: (obj: DiffEvent) => {
 					switch (obj.type) {

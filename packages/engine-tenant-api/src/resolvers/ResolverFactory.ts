@@ -3,21 +3,23 @@ import {
 	ChangePasswordMutationResolver,
 	CreateApiKeyMutationResolver,
 	DisableApiKeyMutationResolver,
+	InviteMutationResolver,
+	MailTemplateMutationResolver,
+	OtpMutationResolver,
 	RemoveProjectMemberMutationResolver,
 	SetupMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
-	InviteMutationResolver,
-	OtpMutationResolver,
-	MailTemplateMutationResolver,
 } from './mutation'
 
 import { Resolvers } from '../schema'
-import { MeQueryResolver, ProjectQueryResolver, ProjectMembersQueryResolver } from './query'
+import { MeQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { ResetPasswordMutationResolver } from './mutation/person/ResetPasswordMutationResolver'
+import { IDPMutationResolver } from './mutation/person/IDPMutationResolver'
+import { JSONType } from '@contember/engine-common'
 
 class ResolverFactory {
 	public constructor(
@@ -33,6 +35,7 @@ class ResolverFactory {
 			signOutMutationResolver: SignOutMutationResolver
 			changePasswordMutationResolver: ChangePasswordMutationResolver
 			resetPasswordMutationResolver: ResetPasswordMutationResolver
+			idpMutationResolver: IDPMutationResolver
 
 			inviteMutationResolver: InviteMutationResolver
 			addProjectMemberMutationResolver: AddProjectMemberMutationResolver
@@ -53,6 +56,7 @@ class ResolverFactory {
 
 	create(): Resolvers {
 		return {
+			Json: JSONType,
 			Identity: {
 				projects: this.resolvers.identityTypeResolver.projects.bind(this.resolvers.identityTypeResolver),
 				person: this.resolvers.identityTypeResolver.person.bind(this.resolvers.identityTypeResolver),
@@ -78,6 +82,8 @@ class ResolverFactory {
 				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(
 					this.resolvers.changePasswordMutationResolver,
 				),
+				initSignInIDP: this.resolvers.idpMutationResolver.initSignInIDP.bind(this.resolvers.idpMutationResolver),
+				signInIDP: this.resolvers.idpMutationResolver.signInIDP.bind(this.resolvers.idpMutationResolver),
 				createResetPasswordRequest: this.resolvers.resetPasswordMutationResolver.createResetPasswordRequest.bind(
 					this.resolvers.resetPasswordMutationResolver,
 				),

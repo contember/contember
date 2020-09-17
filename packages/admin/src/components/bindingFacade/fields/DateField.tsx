@@ -26,7 +26,7 @@ export interface DateFieldInnerProps extends Omit<DateFieldProps, 'field' | 'lab
 export const DateFieldInner = React.memo(
 	React.forwardRef((props: DateFieldInnerProps, suppliedRef: React.Ref<any>) => {
 		const generateOnChange = (data: FieldAccessor<string>) => (date: Date | null) => {
-			data.updateValue && data.updateValue(date ? date.toISOString() : null)
+			data.updateValue(date ? date.toISOString() : null)
 		}
 		const { onFocus: outerOnFocus, onBlur: outerOnBlur } = props
 		const UnderlyingTextInput = React.useMemo(

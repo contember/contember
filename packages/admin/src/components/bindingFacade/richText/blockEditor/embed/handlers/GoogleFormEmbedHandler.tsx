@@ -75,7 +75,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 
 	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
 		batchUpdates(getAccessor => {
-			getAccessor().getSingleField<string>(this.options.googleFormIdField).updateValue?.(embedArtifacts)
+			getAccessor().getSingleField<string>(this.options.googleFormIdField).updateValue(embedArtifacts)
 		})
 	}
 }

@@ -15,7 +15,7 @@ export const CheckboxField = Component<CheckboxFieldProps>(
 			{...props}
 			render={(fieldMetadata: SimpleRelativeSingleFieldMetadata<boolean>, props) => {
 				const generateOnChange = (data: FieldAccessor<boolean>) => (isChecked: boolean) => {
-					data.updateValue && data.updateValue(isChecked)
+					data.updateValue(isChecked)
 				}
 				return (
 					<Checkbox

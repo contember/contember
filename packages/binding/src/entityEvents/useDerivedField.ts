@@ -45,7 +45,7 @@ export const useDerivedField = <SourcePersisted extends FieldValue = FieldValue>
 				}
 
 				const transformedValue = transform(sourceAccessor.currentValue)
-				derivedAccessor.updateValue?.(transformedValue, {
+				derivedAccessor.updateValue(transformedValue, {
 					agent,
 				})
 			})

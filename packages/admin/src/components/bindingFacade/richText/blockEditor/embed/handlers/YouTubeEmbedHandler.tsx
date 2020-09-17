@@ -57,7 +57,7 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 
 	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
 		batchUpdates(getAccessor => {
-			getAccessor().getSingleField<string>(this.options.youTubeIdField).updateValue?.(embedArtifacts)
+			getAccessor().getSingleField<string>(this.options.youTubeIdField).updateValue(embedArtifacts)
 		})
 	}
 }

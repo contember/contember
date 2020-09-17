@@ -9,7 +9,7 @@ export const repairEntitiesOrder = (sortableByField: RelativeSingleField, sorted
 		if (orderField.currentValue !== i) {
 			// TODO ideally, this condition should just be `orderField.currentValue === null`
 			// We should generally try to touch the indexes less
-			orderField.updateValue?.(i)
+			orderField.updateValue(i)
 		}
 	}
 }

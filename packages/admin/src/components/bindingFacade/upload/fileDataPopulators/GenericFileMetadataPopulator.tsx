@@ -36,22 +36,22 @@ export class GenericFileMetadataPopulator implements FileDataPopulator {
 		options.batchUpdates(getAccessor => {
 			if (this.props.fileNameField) {
 				const fileNameField = QueryLanguage.desugarRelativeSingleField(this.props.fileNameField, options.environment)
-				getAccessor().getRelativeSingleField<string>(fileNameField).updateValue?.(options.file.name)
+				getAccessor().getRelativeSingleField<string>(fileNameField).updateValue(options.file.name)
 			}
 			if (this.props.lastModifiedField) {
 				const lastModifiedField = QueryLanguage.desugarRelativeSingleField(
 					this.props.lastModifiedField,
 					options.environment,
 				)
-				getAccessor().getRelativeSingleField<number>(lastModifiedField).updateValue?.(options.file.lastModified)
+				getAccessor().getRelativeSingleField<number>(lastModifiedField).updateValue(options.file.lastModified)
 			}
 			if (this.props.fileSizeField) {
 				const fileSizeField = QueryLanguage.desugarRelativeSingleField(this.props.fileSizeField, options.environment)
-				getAccessor().getRelativeSingleField<number>(fileSizeField).updateValue?.(options.file.size)
+				getAccessor().getRelativeSingleField<number>(fileSizeField).updateValue(options.file.size)
 			}
 			if (this.props.fileTypeField) {
 				const fileTypeField = QueryLanguage.desugarRelativeSingleField(this.props.fileTypeField, options.environment)
-				getAccessor().getRelativeSingleField<string>(fileTypeField).updateValue?.(options.file.type)
+				getAccessor().getRelativeSingleField<string>(fileTypeField).updateValue(options.file.type)
 			}
 		})
 	}

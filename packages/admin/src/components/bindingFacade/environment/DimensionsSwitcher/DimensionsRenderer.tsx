@@ -117,7 +117,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 			if (!(entity instanceof EntityAccessor)) {
 				continue
 			}
-			const slugField = entity.getField(props.slugField)
+			const slugField = entity.getSingleField(props.slugField)
 			if (typeof slugField.currentValue === 'string') {
 				const slugValue = slugField.currentValue
 				normalized.push({

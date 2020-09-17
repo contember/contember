@@ -12,7 +12,6 @@ import {
 	useEnvironment,
 	useGetSubTree,
 } from '@contember/binding'
-import { emptyArray } from '@contember/react-utils'
 import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
@@ -118,7 +117,7 @@ export const useNormalizedOptions = (
 					const label = renderOption
 						? renderOption(item)
 						: 'field' in desugaredOptionPath
-						? `${item.getField(desugaredOptionPath.field).currentValue ?? ''}`
+						? `${item.getSingleField(desugaredOptionPath.field).currentValue ?? ''}`
 						: ''
 
 					let searchKeywords: string

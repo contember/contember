@@ -9,7 +9,7 @@ export type FloatFieldProps = SimpleRelativeSingleFieldProps &
 export const FloatField = SimpleRelativeSingleField<FloatFieldProps, number>(
 	(fieldMetadata, { defaultValue, ...props }) => {
 		const generateOnChange = (data: FieldAccessor<number>) => (e: React.ChangeEvent<HTMLInputElement>) => {
-			data.updateValue && data.updateValue(parseFloat(e.target.value))
+			data.updateValue(parseFloat(e.target.value))
 		}
 		return (
 			<TextInput

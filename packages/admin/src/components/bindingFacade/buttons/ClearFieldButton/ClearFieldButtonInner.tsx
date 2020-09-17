@@ -14,9 +14,6 @@ export type ClearFieldButtonInnerProps = ClearFieldButtonInnerPublicProps & Clea
 export const ClearFieldButtonInner = (props: ClearFieldButtonInnerProps) => {
 	const { field, isMutating, ...buttonProps } = props
 	const onClick = React.useCallback(() => {
-		if (!field.updateValue) {
-			return
-		}
 		field.updateValue(null)
 	}, [field])
 

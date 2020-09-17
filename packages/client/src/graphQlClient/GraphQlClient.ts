@@ -1,10 +1,10 @@
 class GraphQlClient {
-	constructor(private readonly apiUrl: string) {}
+	constructor(private readonly apiUrl: string, private readonly apiToken?: string) {}
 
 	async sendRequest<T = any>(
 		query: string,
-		variables: GraphQlClient.Variables,
-		apiToken: string | undefined,
+		variables: GraphQlClient.Variables = {},
+		apiTokenOverride: string | undefined = undefined,
 	): Promise<T> {
 		const headers: {
 			[header: string]: string
@@ -12,8 +12,9 @@ class GraphQlClient {
 			'Content-Type': 'application/json',
 		}
 
-		if (apiToken !== undefined) {
-			headers['Authorization'] = `Bearer ${apiToken}`
+		const resolvedToken = apiTokenOverride ?? this.apiToken
+		if (resolvedToken !== undefined) {
+			headers['Authorization'] = `Bearer ${resolvedToken}`
 		}
 
 		console.debug(query)

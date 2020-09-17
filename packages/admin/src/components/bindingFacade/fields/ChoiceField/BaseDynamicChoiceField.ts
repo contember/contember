@@ -12,7 +12,6 @@ import {
 	useEnvironment,
 	useGetSubTree,
 } from '@contember/binding'
-import { emptyArray } from '@contember/react-utils'
 import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 

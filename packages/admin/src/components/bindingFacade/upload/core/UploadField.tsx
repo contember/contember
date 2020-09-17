@@ -86,7 +86,7 @@ export const UploadField = Component<UploadFieldProps>(
 		// 	return fileUrlField && fileUrlField.currentValue !== null
 		// 		? e => {
 		// 				e.stopPropagation()
-		// 				fileUrlField.updateValue?.(null)
+		// 				fileUrlField.updateValue(null)
 		// 		  }
 		// 		: undefined
 		// }, [fileUrlField])

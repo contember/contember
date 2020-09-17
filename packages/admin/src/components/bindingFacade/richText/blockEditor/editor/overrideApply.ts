@@ -118,7 +118,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				position: keyof typeof fieldBackedElementRefs,
 				normalizedFieldIndex: number,
 				newValue: string,
-			) => getFreshFieldAccessor(position, normalizedFieldIndex).updateValue?.(newValue)
+			) => getFreshFieldAccessor(position, normalizedFieldIndex).updateValue(newValue)
 			const getFreshContentEntityAccessor = (sortedEntityIndex: number): EntityAccessor => {
 				const oldEntityKey = sortedEntities[sortedEntityIndex].key
 				const newEntity = getAccessor().getRelativeEntityList(desugaredEntityList).getChildEntityByKey(oldEntityKey)
@@ -141,14 +141,14 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						normalizedField.format === 'editorJSON'
 							? editor.serializeElements([targetElement])
 							: SlateNode.string(targetElement)
-					getAccessor().getRelativeSingleField(normalizedField.field).updateValue?.(targetValue)
+					getAccessor().getRelativeSingleField(normalizedField.field).updateValue(targetValue)
 					fieldElementCache.set(getAccessor().getRelativeSingleField(normalizedField.field), targetElement)
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
 					if (!entity) {
 						entity = getFreshContentEntityAccessor(sortedEntityIndex)
 					}
-					entity.getRelativeSingleField(textBlockField).updateValue?.(editor.serializeElements([targetElement]))
+					entity.getRelativeSingleField(textBlockField).updateValue(editor.serializeElements([targetElement]))
 					const updatedEntity = getFreshContentEntityAccessor(sortedEntityIndex)
 					textElementCache.set(updatedEntity, targetElement)
 				}
@@ -158,7 +158,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					setFieldBackedElementValue('leading', elementIndex, '')
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
-					sortedEntities[sortedEntityIndex].deleteEntity?.()
+					sortedEntities[sortedEntityIndex].deleteEntity()
 					sortedEntities.splice(sortedEntityIndex, 1)
 					repairEntitiesOrder(sortableByField, sortedEntities)
 				}
@@ -179,7 +179,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					sortedEntityIndex,
 					getNewEntity => {
 						const newEntity = getNewEntity()
-						newEntity.getRelativeSingleField(discriminationField).updateValue?.(blockDiscriminant)
+						newEntity.getRelativeSingleField(discriminationField).updateValue(blockDiscriminant)
 						if (preprocess) {
 							getNewEntity().batchUpdates(preprocess)
 						}
@@ -271,7 +271,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							const embedHandler = node.embedHandler
 							const embedContentType = embedHandler.discriminateBy
 							addNewDiscriminatedEntityAt(topLevelIndex, embedBlockDiscriminant, getAccessor => {
-								getAccessor().getRelativeSingleField(embedContentDiscriminationField).updateValue?.(embedContentType)
+								getAccessor().getRelativeSingleField(embedContentDiscriminationField).updateValue(embedContentType)
 								embedHandler.data.populateEmbedData({
 									embedArtifacts: node.embedArtifacts,
 									source: node.source,

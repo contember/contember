@@ -22,12 +22,12 @@ class VimeoFileUploader implements FileUploader {
 
 	public async upload(
 		files: Map<File, UploadedFileMetadata>,
-		{ client, onError, contentApiToken, onProgress, onSuccess }: FileUploaderInitializeOptions,
+		{ contentApiClient, onError, onProgress, onSuccess }: FileUploaderInitializeOptions,
 	) {
 		if (!files.size) {
 			return
 		}
-		if (!client) {
+		if (!contentApiClient) {
 			return onError?.(files.keys())
 		}
 
@@ -60,7 +60,7 @@ class VimeoFileUploader implements FileUploader {
 
 		const mutation = this.buildAPIQuery(parameters)
 		try {
-			const response = await client.sendRequest(mutation, {}, contentApiToken)
+			const response = await contentApiClient.sendRequest(mutation)
 			const responseData: {
 				[fileAlias: string]: {
 					ok: boolean

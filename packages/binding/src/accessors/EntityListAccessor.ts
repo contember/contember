@@ -14,9 +14,9 @@ class EntityListAccessor extends Accessor implements Errorable {
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
-		public readonly connectEntity: EntityListAccessor.ConnectEntity | undefined,
-		public readonly createNewEntity: EntityListAccessor.CreateNewEntity | undefined,
-		public readonly disconnectEntity: EntityListAccessor.DisconnectEntity | undefined,
+		public readonly connectEntity: EntityListAccessor.ConnectEntity,
+		public readonly createNewEntity: EntityListAccessor.CreateNewEntity,
+		public readonly disconnectEntity: EntityListAccessor.DisconnectEntity,
 	) {
 		super()
 	}
@@ -43,7 +43,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 		this.batchUpdates(getAccessor => {
 			const list = getAccessor()
 			for (const entity of list) {
-				entity.deleteEntity?.()
+				entity.deleteEntity()
 			}
 		})
 		return this
@@ -53,7 +53,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 		this.batchUpdates(getAccessor => {
 			const list = getAccessor()
 			for (const entity of list) {
-				list.disconnectEntity?.(entity)
+				list.disconnectEntity(entity)
 			}
 		})
 		return this

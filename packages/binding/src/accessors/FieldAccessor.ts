@@ -16,7 +16,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly hasUnpersistedChanges: boolean,
 		public readonly isTouchedBy: FieldAccessor.IsTouchedBy,
 		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Persisted, Produced>,
-		public readonly updateValue: FieldAccessor.UpdateValue<Produced> | undefined,
+		public readonly updateValue: FieldAccessor.UpdateValue<Produced>,
 	) {
 		super()
 	}

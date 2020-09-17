@@ -62,7 +62,7 @@ export const useDynamicMultipleChoiceField = (
 	const clear = React.useCallback(() => {
 		batchUpdates(getListAccessor => {
 			for (const child of getListAccessor()) {
-				getListAccessor().disconnectEntity?.(child)
+				getListAccessor().disconnectEntity(child)
 			}
 		})
 	}, [batchUpdates])
@@ -70,9 +70,9 @@ export const useDynamicMultipleChoiceField = (
 	const onChange = React.useCallback(
 		(optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
 			if (isChosen) {
-				connectEntity?.(optionEntities[optionKey])
+				connectEntity(optionEntities[optionKey])
 			} else {
-				disconnectEntity?.(optionEntities[optionKey])
+				disconnectEntity(optionEntities[optionKey])
 			}
 		},
 		[optionEntities, connectEntity, disconnectEntity],

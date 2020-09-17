@@ -86,11 +86,9 @@ export const SlugField = Component<SlugFieldProps>(
 						<TextInput
 							value={presentedValue}
 							onChange={e => {
-								if (slugField.updateValue) {
-									const rawValue = e.target.value
-									const valueWithoutHardPrefix = rawValue.substring(completeHardPrefix.length)
-									slugField.updateValue(`${normalizedPersistedHardPrefix}${valueWithoutHardPrefix}`)
-								}
+								const rawValue = e.target.value
+								const valueWithoutHardPrefix = rawValue.substring(completeHardPrefix.length)
+								slugField.updateValue(`${normalizedPersistedHardPrefix}${valueWithoutHardPrefix}`)
 							}}
 							readOnly={isMutating}
 							validationState={slugField.errors.length ? 'invalid' : undefined}

@@ -42,8 +42,8 @@ export const LocationField = Component<LocationFieldProps>(
 			if (latLng === undefined) {
 				return
 			}
-			latitude.updateValue?.(latLng.lat)
-			longitude.updateValue?.(latLng.lng)
+			latitude.updateValue(latLng.lat)
+			longitude.updateValue(latLng.lng)
 		}
 
 		const [resolvedCenter] = React.useState((): [number, number] => {

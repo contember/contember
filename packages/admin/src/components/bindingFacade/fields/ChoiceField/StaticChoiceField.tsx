@@ -70,7 +70,7 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 	)
 	const onChange = React.useCallback(
 		(newValue: ChoiceFieldData.ValueRepresentation) => {
-			field.updateValue?.(newValue === -1 ? null : options[newValue].value)
+			field.updateValue(newValue === -1 ? null : options[newValue].value)
 		},
 		[field, options],
 	)

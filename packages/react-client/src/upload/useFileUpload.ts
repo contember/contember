@@ -19,8 +19,7 @@ export interface FileUploadOptions {
 export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 100
 
-	const client = useCurrentContentGraphQlClient()
-	const contentApiToken = useSessionToken()
+	const contentApiClient = useCurrentContentGraphQlClient()
 
 	const updateTimeoutRef = React.useRef<number | undefined>(undefined)
 	const isFirstRenderRef = React.useRef(true)
@@ -97,8 +96,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 							error,
 						})
 					},
-					contentApiToken,
-					client,
+					contentApiClient,
 				})
 			} catch (_) {
 				dispatch({
@@ -107,7 +105,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 				})
 			}
 		},
-		[client, contentApiToken],
+		[contentApiClient],
 	)
 
 	const operations = React.useMemo<FileUploadOperations>(

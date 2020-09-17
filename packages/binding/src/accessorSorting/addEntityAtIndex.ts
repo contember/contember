@@ -22,15 +22,11 @@ export const addEntityAtIndex = (
 
 			const sortableField = newlyAdded.getRelativeSingleField<number>(sortableByField)
 
-			if (sortableField.updateValue) {
-				sortableField.updateValue(index)
-				newlyAdded = getNewlyAdded()
+			sortableField.updateValue(index)
+			newlyAdded = getNewlyAdded()
 
-				sortedEntities.splice(index, 0, newlyAdded)
-				repairEntitiesOrder(sortableByField, sortedEntities)
-			} else {
-				return throwNonWritableError(sortableField.fieldName)
-			}
+			sortedEntities.splice(index, 0, newlyAdded)
+			repairEntitiesOrder(sortableByField, sortedEntities)
 
 			preprocess?.(getNewlyAdded, options)
 		})

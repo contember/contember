@@ -91,11 +91,11 @@ export const RichTextFieldInner = React.memo(
 					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
 
 					if (SlateNode.string({ children: value }) === '') {
-						fieldAccessor.updateValue?.(fieldAccessor.persistedValue === null ? null : '')
+						fieldAccessor.updateValue(fieldAccessor.persistedValue === null ? null : '')
 						return
 					}
 
-					fieldAccessor.updateValue?.(serialize(value as ElementNode[]))
+					fieldAccessor.updateValue(serialize(value as ElementNode[]))
 					contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as ElementNode[])
 				})
 			},

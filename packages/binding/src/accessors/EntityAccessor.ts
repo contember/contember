@@ -3,16 +3,11 @@ import { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
 import {
-	DesugaredHasManyRelation,
-	DesugaredHasOneRelation,
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
 	DesugaredRelativeSingleField,
-	ExpectedEntityCount,
 	FieldName,
 	FieldValue,
-	HasManyRelation,
-	HasOneRelation,
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
@@ -39,9 +34,9 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: EntityAccessor.BatchUpdates,
-		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField | undefined,
-		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField | undefined,
-		public readonly deleteEntity: EntityAccessor.DeleteEntity | undefined,
+		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField,
+		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField,
+		public readonly deleteEntity: EntityAccessor.DeleteEntity,
 	) {
 		super()
 		this.runtimeId = key || new EntityAccessor.UnpersistedEntityId()
@@ -64,7 +59,7 @@ class EntityAccessor extends Accessor implements Errorable {
 			const entries = Array.isArray(fieldValuePairs) ? fieldValuePairs : Object.entries(fieldValuePairs)
 
 			for (const [field, value] of entries) {
-				getAccessor().getSingleField(field).updateValue?.(value)
+				getAccessor().getField(field).updateValue(value)
 			}
 		})
 	}
@@ -73,7 +68,7 @@ class EntityAccessor extends Accessor implements Errorable {
 	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameters
 	 * are really just a way to succinctly write a type cast. Nothing more, really.
 	 */
-	public getSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+	public getField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 		field: SugaredRelativeSingleField | string,
 	): FieldAccessor<Persisted, Produced> {
 		return this.getRelativeSingleField<Persisted, Produced>(
@@ -81,7 +76,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		)
 	}
 
-	public getSingleEntity(entity: SugaredRelativeSingleEntity | string): EntityAccessor {
+	public getEntity(entity: SugaredRelativeSingleEntity | string): EntityAccessor {
 		return this.getRelativeSingleEntity(QueryLanguage.desugarRelativeSingleEntity(entity, this.environment))
 	}
 
@@ -92,14 +87,14 @@ class EntityAccessor extends Accessor implements Errorable {
 	//
 
 	/**
-	 * @see EntityAccessor.getSingleField
+	 * @see EntityAccessor.getField
 	 */
 	public getRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 		field: RelativeSingleField | DesugaredRelativeSingleField,
 	): FieldAccessor<Persisted, Produced> {
-		const accessor = this.getRelativeSingleEntity(field).getField(field.field)
-
-		return (accessor as unknown) as FieldAccessor<Persisted, Produced>
+		return (this.getRelativeSingleEntity(field).retrieveNestedAccessorByPlaceholder(
+			PlaceholderGenerator.getFieldPlaceholder(field.field),
+		) as unknown) as FieldAccessor<Persisted, Produced>
 	}
 
 	public getRelativeSingleEntity(
@@ -108,59 +103,24 @@ class EntityAccessor extends Accessor implements Errorable {
 		let relativeTo: EntityAccessor = this
 
 		for (const hasOneRelation of relativeSingleEntity.hasOneRelationPath) {
-			relativeTo = relativeTo.getField(hasOneRelation, ExpectedEntityCount.UpToOne)
+			relativeTo = relativeTo.retrieveNestedAccessorByPlaceholder(
+				PlaceholderGenerator.getHasOneRelationPlaceholder(hasOneRelation),
+			) as EntityAccessor
 		}
 		return relativeTo
 	}
 
 	public getRelativeEntityList(entityList: RelativeEntityList | DesugaredRelativeEntityList): EntityListAccessor {
-		return this.getRelativeSingleEntity(entityList).getField(
-			entityList.hasManyRelation,
-			ExpectedEntityCount.PossiblyMany,
-		)
-	}
-
-	public getField(fieldName: FieldName): FieldAccessor
-	public getField(
-		hasOneRelation: HasOneRelation | DesugaredHasOneRelation,
-		expectedCount: ExpectedEntityCount.UpToOne,
-	): EntityAccessor
-	public getField(
-		hasManyRelation: HasManyRelation | DesugaredHasManyRelation,
-		expectedCount: ExpectedEntityCount.PossiblyMany,
-	): EntityListAccessor
-	public getField(
-		fieldNameOrRelation:
-			| FieldName
-			| HasOneRelation
-			| HasManyRelation
-			| DesugaredHasOneRelation
-			| DesugaredHasManyRelation,
-		expectedCount?: ExpectedEntityCount,
-	): EntityAccessor.NestedAccessor {
-		let placeholder: FieldName
-
-		if (typeof fieldNameOrRelation === 'string') {
-			placeholder = PlaceholderGenerator.getFieldPlaceholder(fieldNameOrRelation)
-		} else if (expectedCount === ExpectedEntityCount.UpToOne) {
-			placeholder = PlaceholderGenerator.getHasOneRelationPlaceholder(
-				fieldNameOrRelation as HasOneRelation | DesugaredHasOneRelation,
-			)
-		} else if (expectedCount === ExpectedEntityCount.PossiblyMany) {
-			placeholder = PlaceholderGenerator.getHasManyRelationPlaceholder(
-				fieldNameOrRelation as HasManyRelation | DesugaredHasManyRelation,
-			)
-		} else {
-			throw new BindingError()
-		}
-
-		return this.getFieldByPlaceholder(placeholder)
+		return this.getRelativeSingleEntity(entityList).retrieveNestedAccessorByPlaceholder(
+			PlaceholderGenerator.getHasManyRelationPlaceholder(entityList.hasManyRelation),
+		) as EntityListAccessor
 	}
 
 	/**
+	 * The jarring method name is a not-so-subtle way to inform you that you probably shouldn't be using it.
 	 * @internal
 	 */
-	public getFieldByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor {
+	public retrieveNestedAccessorByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor {
 		const record = this.fieldData.get(placeholderName)
 		if (record === undefined) {
 			throw new BindingError(

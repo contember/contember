@@ -20,12 +20,8 @@ export const moveEntity = (
 			const orderField = entity.getRelativeSingleField<number>(sortByField)
 
 			if (target !== undefined) {
-				if (orderField.updateValue) {
-					orderField.updateValue(target)
-					listAccessor = getAccessor()
-				} else {
-					return throwNonWritableError(orderField.fieldName)
-				}
+				orderField.updateValue(target)
+				listAccessor = getAccessor()
 			}
 		}
 	})

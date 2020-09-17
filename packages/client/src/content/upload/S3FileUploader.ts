@@ -8,7 +8,7 @@ interface S3UploadState {
 	alias: number
 }
 
-class S3FileUploader implements FileUploader {
+class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 	private readonly uploadState: WeakMap<File, S3UploadState>
 
 	public constructor(public readonly options: S3FileUploader.Options = {}) {
@@ -26,9 +26,9 @@ class S3FileUploader implements FileUploader {
 
 	public async upload(
 		files: Map<File, UploadedFileMetadata>,
-		{ client, contentApiToken, onSuccess, onError, onProgress }: FileUploaderInitializeOptions,
+		{ contentApiClient, onSuccess, onError, onProgress }: FileUploaderInitializeOptions,
 	) {
-		if (!client) {
+		if (!contentApiClient) {
 			return onError?.(files.keys())
 		}
 
@@ -61,7 +61,7 @@ class S3FileUploader implements FileUploader {
 
 		const mutation = GenerateUploadUrlMutationBuilder.buildQuery(parameters)
 		try {
-			const response = await client.sendRequest(mutation, {}, contentApiToken)
+			const response = await contentApiClient.sendRequest(mutation)
 			const responseData: GenerateUploadUrlMutationBuilder.MutationResponse = response.data
 
 			for (const [file] of files) {

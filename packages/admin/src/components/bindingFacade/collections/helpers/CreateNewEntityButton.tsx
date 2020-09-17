@@ -3,7 +3,7 @@ import * as React from 'react'
 import { EntityListAccessor, useMutationState } from '@contember/binding'
 
 export type CreateNewEntityButtonProps = ButtonBasedButtonProps & {
-	createNewEntity: EntityListAccessor.CreateNewEntity | undefined
+	createNewEntity: EntityListAccessor.CreateNewEntity
 	iconProps?: IconProps
 }
 
@@ -27,7 +27,7 @@ export const CreateNewEntityButton = React.memo(
 			<FormGroup label={undefined}>
 				<Button
 					// This looks silly but the event handler gets a different parameter than createNewEntity expects.
-					onClick={() => createNewEntity?.()}
+					onClick={() => createNewEntity()}
 					disabled={isMutating}
 					isLoading={isMutating}
 					distinction="seamless"

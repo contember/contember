@@ -59,7 +59,7 @@ class EntityAccessor extends Accessor implements Errorable {
 			const entries = Array.isArray(fieldValuePairs) ? fieldValuePairs : Object.entries(fieldValuePairs)
 
 			for (const [field, value] of entries) {
-				getAccessor().getSingleField(field).updateValue(value)
+				getAccessor().getField(field).updateValue(value)
 			}
 		})
 	}
@@ -68,7 +68,7 @@ class EntityAccessor extends Accessor implements Errorable {
 	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameters
 	 * are really just a way to succinctly write a type cast. Nothing more, really.
 	 */
-	public getSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+	public getField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 		field: SugaredRelativeSingleField | string,
 	): FieldAccessor<Persisted, Produced> {
 		return this.getRelativeSingleField<Persisted, Produced>(
@@ -76,7 +76,7 @@ class EntityAccessor extends Accessor implements Errorable {
 		)
 	}
 
-	public getSingleEntity(entity: SugaredRelativeSingleEntity | string): EntityAccessor {
+	public getEntity(entity: SugaredRelativeSingleEntity | string): EntityAccessor {
 		return this.getRelativeSingleEntity(QueryLanguage.desugarRelativeSingleEntity(entity, this.environment))
 	}
 
@@ -87,7 +87,7 @@ class EntityAccessor extends Accessor implements Errorable {
 	//
 
 	/**
-	 * @see EntityAccessor.getSingleField
+	 * @see EntityAccessor.getField
 	 */
 	public getRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 		field: RelativeSingleField | DesugaredRelativeSingleField,

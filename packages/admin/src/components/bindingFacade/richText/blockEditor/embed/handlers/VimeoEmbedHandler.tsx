@@ -57,7 +57,7 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 
 	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
 		batchUpdates(getAccessor => {
-			getAccessor().getSingleField<string>(this.options.vimeoIdField).updateValue(embedArtifacts)
+			getAccessor().getField<string>(this.options.vimeoIdField).updateValue(embedArtifacts)
 		})
 	}
 }

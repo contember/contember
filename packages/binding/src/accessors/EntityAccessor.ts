@@ -39,9 +39,9 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: EntityAccessor.BatchUpdates,
-		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField | undefined,
-		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField | undefined,
-		public readonly deleteEntity: EntityAccessor.DeleteEntity | undefined,
+		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField,
+		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField,
+		public readonly deleteEntity: EntityAccessor.DeleteEntity,
 	) {
 		super()
 		this.runtimeId = key || new EntityAccessor.UnpersistedEntityId()

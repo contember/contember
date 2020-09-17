@@ -51,7 +51,7 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 					<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
 						<ActionableBox
 							editContents={alternate || null}
-							onRemove={selected ? undefined : () => props.entity.deleteEntity?.()}
+							onRemove={selected ? undefined : () => props.entity.deleteEntity()}
 						>
 							<Box heading={selectedBlock?.label} isActive={selected} onClick={onContainerClick}>
 								<div

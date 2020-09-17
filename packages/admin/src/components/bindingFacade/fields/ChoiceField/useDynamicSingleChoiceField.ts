@@ -77,9 +77,9 @@ export const useDynamicSingleChoiceField = (
 			}
 
 			if (newValue === -1) {
-				currentValueParent.disconnectEntityAtField?.(currentValueFieldName)
+				currentValueParent.disconnectEntityAtField(currentValueFieldName)
 			} else {
-				currentValueParent.connectEntityAtField?.(currentValueFieldName, topLevelOptionAccessors[newValue])
+				currentValueParent.connectEntityAtField(currentValueFieldName, topLevelOptionAccessors[newValue])
 			}
 		},
 	}

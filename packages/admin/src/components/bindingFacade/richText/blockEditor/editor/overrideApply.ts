@@ -158,7 +158,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					setFieldBackedElementValue('leading', elementIndex, '')
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
-					sortedEntities[sortedEntityIndex].deleteEntity?.()
+					sortedEntities[sortedEntityIndex].deleteEntity()
 					sortedEntities.splice(sortedEntityIndex, 1)
 					repairEntitiesOrder(sortableByField, sortedEntities)
 				}

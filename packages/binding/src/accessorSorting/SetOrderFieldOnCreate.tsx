@@ -82,7 +82,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 						addEntityAtIndex(getAccessor(), desugaredOrderField, newOrderFieldValue, getNewEntity => {
 							newEntityKey = getNewEntity().key
 						})
-						newEntityKey && getAccessor().getChildEntityByKey(newEntityKey).deleteEntity?.()
+						newEntityKey && getAccessor().getChildEntityByKey(newEntityKey).deleteEntity()
 					}}
 				>
 					<SugaredField field={orderField} />

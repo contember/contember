@@ -14,7 +14,7 @@ export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(pr
 	const desugaredDiscriminationField = useDesugaredRelativeSingleField(props.discriminationField)
 	return (
 		<ButtonGroup orientation="vertical">
-			{Array.from(props.normalizedBlocks.data.values()).map(({ discriminateBy, data: blockProps }, i) => (
+			{Array.from(props.normalizedBlocks.values(), ({ discriminateBy, datum: blockProps }, i) => (
 				<Button
 					key={i}
 					distinction="seamless"

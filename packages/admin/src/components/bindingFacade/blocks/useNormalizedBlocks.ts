@@ -8,7 +8,7 @@ export type NormalizedBlocks = NormalizedDiscriminatedData<BlockCommonProps>
 export const useNormalizedBlocks = (children: React.ReactNode): NormalizedBlocks => {
 	const propList = useBlockProps(children)
 
-	return useDiscriminatedData<LiteralBasedBlockProps, ScalarBasedBlockProps>(propList, {
+	return useDiscriminatedData<BlockCommonProps, LiteralBasedBlockProps, ScalarBasedBlockProps>(propList, {
 		undiscriminatedItemMessage:
 			`Each block must be discriminated by either exactly one of the ` +
 			`'discriminateBy' or 'discriminateByScalar' props.`,

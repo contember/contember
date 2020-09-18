@@ -1,5 +1,5 @@
 import { Element, Node } from 'slate'
-import { ResolvedDiscriminatedData } from '../../../discrimination'
+import { ResolvedDiscriminatedDatum } from '../../../discrimination'
 import { EmbedHandler } from '../embed'
 
 type ContemberEmbedElementType = '__contember_embed__'
@@ -7,7 +7,7 @@ export const contemberEmbedElementType: ContemberEmbedElementType = '__contember
 
 export interface ContemberEmbedElement extends Element {
 	type: ContemberEmbedElementType
-	embedHandler: ResolvedDiscriminatedData<EmbedHandler>
+	embedHandler: ResolvedDiscriminatedDatum<EmbedHandler>
 	entityKey: string
 	source: string | undefined
 	embedArtifacts: any | undefined

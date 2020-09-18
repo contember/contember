@@ -19,8 +19,8 @@ export const SortableBlock = React.memo<SortableBlockProps>(props => {
 	}
 
 	return (
-		<RepeaterItem {...props} label={selectedBlock.data.label}>
-			{selectedBlock.data.children}
+		<RepeaterItem {...props} label={selectedBlock.datum.label}>
+			{selectedBlock.datum.children}
 		</RepeaterItem>
 	)
 })

@@ -80,7 +80,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 		//	props.trailingFieldBackedElements,
 		//)
 
-		const embedHandlers = useDiscriminatedData<EmbedHandler, EmbedHandler>(props.embedHandlers || emptyArray)
+		const embedHandlers = useDiscriminatedData<EmbedHandler>(props.embedHandlers || emptyArray)
 
 		return (
 			<BlockEditorInner

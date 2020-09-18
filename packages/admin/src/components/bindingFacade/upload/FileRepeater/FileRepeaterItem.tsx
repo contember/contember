@@ -61,7 +61,7 @@ export const FileRepeaterItem = React.memo(
 			if (relevantBlock !== undefined) {
 				editContents = (
 					<div>
-						<Box heading={relevantBlock.data.label}>{relevantBlock.data.children}</Box>
+						<Box heading={relevantBlock.datum.label}>{relevantBlock.datum.children}</Box>
 					</div>
 				)
 			}

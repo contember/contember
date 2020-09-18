@@ -7,6 +7,7 @@ import {
 	InvalidDataError,
 	NotNullViolationError,
 	SerializationFailureError,
+	TransactionAbortedError,
 	UniqueViolationError,
 } from './errors'
 
@@ -67,6 +68,8 @@ export async function executeQuery<Row extends Record<string, any>>(
 			case '22P02':
 			case '22008':
 				throw new InvalidDataError(sql, parameters, error)
+			case '25P02':
+				throw new TransactionAbortedError(sql, parameters, error)
 			default:
 				throw new ConnectionError(sql, parameters, error)
 		}

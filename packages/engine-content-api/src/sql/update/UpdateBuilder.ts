@@ -6,6 +6,7 @@ import WhereBuilder from '../select/WhereBuilder'
 import { PathFactory } from '../select/Path'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { AbortUpdate } from './Updater'
+import { EnrichedError } from '../ErrorUtils'
 
 export interface UpdateResult {
 	values: ResolvedColumnValue[]
@@ -53,6 +54,7 @@ export default class UpdateBuilder {
 	}
 
 	public async execute(db: Client): Promise<UpdateResult> {
+		let resolvedDataFinal: ResolvedColumnValue[] | null = null
 		try {
 			const resolvedData = await resolveRowData<AbortUpdate>(this.rowData)
 			if (Object.keys(resolvedData).length === 0) {
@@ -62,6 +64,7 @@ export default class UpdateBuilder {
 			if (resolvedData.find(it => it.resolvedValue === AbortUpdate)) {
 				return { values: [], affectedRows: null, executed: false, aborted: true }
 			}
+			resolvedDataFinal = resolvedData as ResolvedColumnValue[]
 
 			const qb = DbUpdateBuilder.create()
 				.with('newData_', qb => {
@@ -118,7 +121,7 @@ export default class UpdateBuilder {
 			return { values: resolvedData as ResolvedColumnValue[], affectedRows: result, executed: true, aborted: false }
 		} catch (e) {
 			this.resolver(null)
-			throw e
+			throw new EnrichedError(this.entity, resolvedDataFinal, e)
 		}
 	}
 }

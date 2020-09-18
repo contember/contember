@@ -51,7 +51,9 @@ namespace Result {
 	}
 
 	export interface ExecutionError {
+		/** @deprecated */
 		path: PathFragment[]
+		paths: PathFragment[][]
 		type: ExecutionErrorType
 		message?: string
 	}

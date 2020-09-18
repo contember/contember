@@ -30,4 +30,4 @@ export interface EmbedHandler<EmbedArtifacts = any> {
 	discriminateByScalar?: SugaredDiscriminateByScalar
 }
 
-export type NormalizedEmbedHandlers = NormalizedDiscriminatedData<EmbedHandler, EmbedHandler>
+export type NormalizedEmbedHandlers = NormalizedDiscriminatedData<EmbedHandler>

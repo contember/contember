@@ -272,7 +272,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 							const embedContentType = embedHandler.discriminateBy
 							addNewDiscriminatedEntityAt(topLevelIndex, embedBlockDiscriminant, getAccessor => {
 								getAccessor().getRelativeSingleField(embedContentDiscriminationField).updateValue(embedContentType)
-								embedHandler.data.populateEmbedData({
+								embedHandler.datum.populateEmbedData({
 									embedArtifacts: node.embedArtifacts,
 									source: node.source,
 									batchUpdates: getAccessor().batchUpdates,

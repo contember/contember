@@ -1,6 +1,6 @@
 import { FieldValue } from '@contember/binding'
 
-export interface ResolvedDiscriminatedData<Data> {
+export interface ResolvedDiscriminatedDatum<Datum> {
 	discriminateBy: FieldValue
-	data: Data
+	datum: Datum
 }

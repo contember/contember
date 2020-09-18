@@ -191,7 +191,11 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			const selection = editor.selection
 			if (selection && SlateRange.isCollapsed(selection)) {
 				const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
-				if (closestBlockEntry && Point.equals(selection.focus, Editor.start(e, closestBlockEntry[1]))) {
+				if (
+					closestBlockEntry &&
+					e.isTableCell(closestBlockEntry[0]) &&
+					Point.equals(selection.focus, Editor.start(e, closestBlockEntry[1]))
+				) {
 					return
 				}
 			}
@@ -201,7 +205,11 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			const selection = editor.selection
 			if (selection && SlateRange.isCollapsed(selection)) {
 				const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
-				if (closestBlockEntry && Point.equals(selection.focus, Editor.end(e, closestBlockEntry[1]))) {
+				if (
+					closestBlockEntry &&
+					e.isTableCell(closestBlockEntry[0]) &&
+					Point.equals(selection.focus, Editor.end(e, closestBlockEntry[1]))
+				) {
 					return
 				}
 			}

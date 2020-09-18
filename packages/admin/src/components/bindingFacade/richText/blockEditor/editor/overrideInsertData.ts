@@ -1,4 +1,4 @@
-import { ResolvedDiscriminatedData } from '../../../discrimination'
+import { ResolvedDiscriminatedDatum } from '../../../discrimination'
 import { ContemberEmbedElement, contemberEmbedElementType } from '../elements'
 import { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
 import { BlockSlateEditor } from './BlockSlateEditor'
@@ -23,11 +23,11 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 			url = new URL(text)
 		} catch {}
 
-		let embedHandler: ResolvedDiscriminatedData<EmbedHandler> | undefined = undefined
+		let embedHandler: ResolvedDiscriminatedDatum<EmbedHandler> | undefined = undefined
 		let embedArtifacts: any = undefined
 
-		for (const [, handler] of options.embedHandlers!.data) {
-			const result = handler.data.canHandleSource(text, url)
+		for (const [, handler] of options.embedHandlers!) {
+			const result = handler.datum.canHandleSource(text, url)
 			if (result !== false) {
 				embedHandler = handler
 				embedArtifacts = result

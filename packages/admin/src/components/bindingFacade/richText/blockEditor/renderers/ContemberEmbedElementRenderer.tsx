@@ -39,7 +39,7 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 		Transforms.select(editor, targetPath)
 	}
 
-	const selectedBlock = discriminatedBlock?.data
+	const selectedBlock = discriminatedBlock?.datum
 	const alternate = selectedBlock?.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 	return (
@@ -59,7 +59,7 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 									style={{ display: 'flex' }}
 								>
 									{/*{selectedBlock.children}*/}
-									{props.element.embedHandler.data.renderEmbed({
+									{props.element.embedHandler.datum.renderEmbed({
 										entity: props.entity,
 									})}
 								</div>

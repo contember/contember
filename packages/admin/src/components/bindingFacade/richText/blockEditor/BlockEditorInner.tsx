@@ -130,7 +130,7 @@ export const BlockEditorInner = React.memo(
 		const normalizedBlocks = useNormalizedBlocks(children)
 		const embedSubBlocks = useNormalizedBlocks(
 			embedBlockDiscriminant !== undefined
-				? getDiscriminatedBlock(normalizedBlocks, embedBlockDiscriminant)?.data.children
+				? getDiscriminatedBlock(normalizedBlocks, embedBlockDiscriminant)?.datum.children
 				: undefined, // TODO this may crash
 		)
 

@@ -43,7 +43,7 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 		throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
 	}
 
-	const selectedBlock = discriminatedBlock.data
+	const selectedBlock = discriminatedBlock.datum
 	const alternate = selectedBlock.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 	return (

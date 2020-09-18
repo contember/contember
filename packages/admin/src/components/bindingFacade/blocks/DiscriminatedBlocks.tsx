@@ -12,14 +12,14 @@ export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children
 export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 	props => {
 		const normalizedBlocks = useNormalizedBlocks(props.children)
-		const blocksArray = React.useMemo(() => Array.from(normalizedBlocks.data.values()), [normalizedBlocks.data])
+		const blocksArray = React.useMemo(() => Array.from(normalizedBlocks.values()), [normalizedBlocks])
 		const transformedBlockList = React.useMemo<NormalizedStaticOption[]>(
 			() =>
 				blocksArray.map(item => ({
 					...item,
-					label: item.data.label,
+					label: item.datum.label,
 					value: item.discriminateBy,
-					searchKeywords: typeof item.data.label === 'string' ? item.data.label : '',
+					searchKeywords: typeof item.datum.label === 'string' ? item.datum.label : '',
 				})),
 			[blocksArray],
 		)
@@ -42,7 +42,7 @@ export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
 						isMutating={metadata.isMutating}
 					/>
 				)}
-				{metadata.currentValue in blocksArray && blocksArray[metadata.currentValue].data.children}
+				{metadata.currentValue in blocksArray && blocksArray[metadata.currentValue].datum.children}
 			</>
 		)
 	},

@@ -1,12 +1,8 @@
-import { Scalar } from '@contember/binding'
-import { ResolvedDiscriminatedData } from './ResolvedDiscriminatedData'
+import { FieldValue } from '@contember/binding'
+import { GraphQlBuilder } from '@contember/client'
+import { ResolvedDiscriminatedDatum } from './ResolvedDiscriminatedDatum'
 
-export type NormalizedDiscriminatedData<LiteralBased, ScalarBased = LiteralBased> =
-	| {
-			discriminationKind: 'literal'
-			data: Map<string, ResolvedDiscriminatedData<LiteralBased>>
-	  }
-	| {
-			discriminationKind: 'scalar'
-			data: Map<Scalar, ResolvedDiscriminatedData<ScalarBased>>
-	  }
+export type NormalizedDiscriminatedData<Data> = Map<
+	Exclude<FieldValue, GraphQlBuilder.Literal>,
+	ResolvedDiscriminatedDatum<Data>
+>

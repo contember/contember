@@ -1,10 +1,5 @@
 import * as React from 'react'
-import {
-	AddTreeRootListenerProvider,
-	GetEntityByKeyProvider,
-	GetSubTreeProvider,
-	GetTreeFiltersProvider,
-} from '../accessorPropagation'
+import { BindingOperationsProvider } from '../accessorPropagation'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { DirtinessContext } from './DirtinessContext'
 import { MutationStateContext } from './MutationStateContext'
@@ -23,13 +18,9 @@ export function AccessorTree({ state, children }: AccessorTreeProps) {
 			<TriggerPersistContext.Provider value={state.triggerPersist}>
 				<DirtinessContext.Provider value={state.data.hasUnpersistedChanges}>
 					<MutationStateContext.Provider value={state.name === AccessorTreeStateName.Mutating}>
-						<AddTreeRootListenerProvider addTreeRootListener={state.data.addEventListener}>
-							<GetTreeFiltersProvider getTreeFilters={state.data.unstable_getTreeFilters}>
-								<GetSubTreeProvider getSubTree={state.data.getSubTree}>
-									<GetEntityByKeyProvider getEntityByKey={state.data.getEntityByKey}>{children}</GetEntityByKeyProvider>
-								</GetSubTreeProvider>
-							</GetTreeFiltersProvider>
-						</AddTreeRootListenerProvider>
+						<BindingOperationsProvider bindingOperations={state.data.bindingOperations}>
+							{children}
+						</BindingOperationsProvider>
 					</MutationStateContext.Provider>
 				</DirtinessContext.Provider>
 			</TriggerPersistContext.Provider>
@@ -39,13 +30,7 @@ export function AccessorTree({ state, children }: AccessorTreeProps) {
 		<TriggerPersistContext.Provider value={undefined}>
 			<DirtinessContext.Provider value={false}>
 				<MutationStateContext.Provider value={false}>
-					<AddTreeRootListenerProvider addTreeRootListener={undefined}>
-						<GetTreeFiltersProvider getTreeFilters={undefined}>
-							<GetSubTreeProvider getSubTree={undefined}>
-								<GetEntityByKeyProvider getEntityByKey={undefined}>{children}</GetEntityByKeyProvider>
-							</GetSubTreeProvider>
-						</GetTreeFiltersProvider>
-					</AddTreeRootListenerProvider>
+					<BindingOperationsProvider bindingOperations={undefined}>{children}</BindingOperationsProvider>
 				</MutationStateContext.Provider>
 			</DirtinessContext.Provider>
 		</TriggerPersistContext.Provider>

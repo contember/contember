@@ -1,4 +1,5 @@
 export * from './Accessor'
+export * from './BindingOperations'
 export * from './EntityAccessor'
 export * from './EntityListAccessor'
 export * from './Errorable'

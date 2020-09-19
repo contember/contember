@@ -1,4 +1,4 @@
 import * as React from 'react'
-import { GetTreeFiltersContext } from './getTreeFiltersContext'
+import { BindingOperationsContext } from './BindingOperationsContext'
 
-export const useGetTreeFilters = () => React.useContext(GetTreeFiltersContext)
+export const useGetTreeFilters = () => React.useContext(BindingOperationsContext).getTreeFilters

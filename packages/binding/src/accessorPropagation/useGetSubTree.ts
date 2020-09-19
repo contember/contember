@@ -1,4 +1,4 @@
 import * as React from 'react'
-import { GetSubTreeContext } from './GetSubTreeContext'
+import { BindingOperationsContext } from './BindingOperationsContext'
 
-export const useGetSubTree = () => React.useContext(GetSubTreeContext)
+export const useGetSubTree = () => React.useContext(BindingOperationsContext).getSubTree

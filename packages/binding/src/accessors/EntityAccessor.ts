@@ -16,12 +16,11 @@ import {
 	SugaredRelativeSingleField,
 } from '../treeParameters'
 import { Accessor } from './Accessor'
+import { BindingOperations } from './BindingOperations'
 import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
-import { GetEntityByKey } from './GetEntityByKey'
-import { GetSubTree } from './GetSubTree'
 
 class EntityAccessor extends Accessor implements Errorable {
 	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
@@ -163,16 +162,8 @@ namespace EntityAccessor {
 
 	export type FieldData = Map<FieldName, FieldDatum>
 
-	export interface BatchUpdatesHandlerExtraProps {
-		getEntityByKey: GetEntityByKey
-		getSubTree: GetSubTree
-	}
-
 	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
-	export type BatchUpdatesHandler = (
-		getAccessor: () => EntityAccessor,
-		extraProps: BatchUpdatesHandlerExtraProps,
-	) => void
+	export type BatchUpdatesHandler = (getAccessor: () => EntityAccessor, bindingOperations: BindingOperations) => void
 	export type ConnectEntityAtField = (field: FieldName, entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type DeleteEntity = () => void
 	export type DisconnectEntityAtField = (field: FieldName) => void

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { BindingError } from '../BindingError'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
-import { useGetSubTree } from './useGetSubTree'
+import { useGetEntitySubTree } from './useGetEntitySubTree'
 import {
 	QualifiedSingleEntityProps,
 	UnconstrainedQualifiedSingleEntityProps,
@@ -11,7 +11,7 @@ import {
 export type UseSingleEntitySubTreeProps = QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps
 
 export const useSingleEntitySubTree = (qualifiedSingleEntity: UseSingleEntitySubTreeProps) => {
-	const getSubTree = useGetSubTree()
+	const getSubTree = useGetEntitySubTree()
 	const parameters = useSingleEntitySubTreeParameters(qualifiedSingleEntity)
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 	const accessor = useAccessorUpdateSubscription(getAccessor)

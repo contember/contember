@@ -1,14 +1,7 @@
 import { GraphQlBuilder, TreeFilter } from '@contember/client'
 import { emptyArray, noop } from '@contember/react-utils'
 import * as ReactDOM from 'react-dom'
-import {
-	BindingOperations,
-	EntityAccessor,
-	EntityListAccessor,
-	FieldAccessor,
-	GetSubTree,
-	TreeRootAccessor,
-} from '../accessors'
+import { BindingOperations, EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } from '../accessors'
 import {
 	BoxedSingleEntityId,
 	EntityFieldPersistedData,
@@ -32,7 +25,9 @@ import {
 	SubTreeMarkerParameters,
 } from '../markers'
 import {
+	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
+	BoxedUnconstrainedQualifiedEntityList,
 	EntityCreationParameters,
 	EntityListEventListeners,
 	EntityListPreferences,
@@ -122,15 +117,34 @@ export class AccessorTreeGenerator {
 			}
 			return entity.getAccessor()
 		},
-		getSubTree: ((parameters: SubTreeMarkerParameters) => {
+		getEntityListSubTree: (
+			parameters: BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList,
+		): EntityListAccessor => {
 			const placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(parameters)
 			const subTreeState = this.subTreeStates.get(placeholderName)
 
 			if (subTreeState === undefined) {
-				throw new BindingError(`Trying to retrieve a non-existent accessor sub tree.`)
+				throw new BindingError(`Trying to retrieve a non-existent entity list sub tree.`)
 			}
-			return subTreeState.getAccessor()
-		}) as GetSubTree,
+			const accessor = subTreeState.getAccessor()
+			if (!(accessor instanceof EntityListAccessor)) {
+				throw new BindingError()
+			}
+			return accessor
+		},
+		getEntitySubTree: (parameters: SubTreeMarkerParameters): EntityAccessor => {
+			const placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(parameters)
+			const subTreeState = this.subTreeStates.get(placeholderName)
+
+			if (subTreeState === undefined) {
+				throw new BindingError(`Trying to retrieve a non-existent entity sub tree.`)
+			}
+			const accessor = subTreeState.getAccessor()
+			if (!(accessor instanceof EntityAccessor)) {
+				throw new BindingError()
+			}
+			return accessor
+		},
 		getTreeFilters: (): TreeFilter[] => {
 			return this.treeFilterGenerator.generateTreeFilter()
 		},

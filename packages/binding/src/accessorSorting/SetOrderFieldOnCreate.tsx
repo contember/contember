@@ -51,8 +51,8 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 					<SingleEntitySubTree
 						entity={entity}
 						isCreating
-						onBeforePersist={(getAccessor, extraProps) => {
-							const listSubTree = extraProps.getSubTree(
+						onBeforePersist={(getAccessor, bindingOperations) => {
+							const listSubTree = bindingOperations.getEntityListSubTree(
 								new BoxedQualifiedEntityList(QueryLanguage.desugarQualifiedEntityList(qel, environment)),
 							)
 							const entities = Array.from(listSubTree)

@@ -2,6 +2,7 @@ import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { QueryLanguage } from '../queryLanguage'
 import {
+	Alias,
 	BoxedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedEntityList,
 	SugaredQualifiedEntityList,
@@ -17,11 +18,26 @@ export type UnconstrainedQualifiedEntityListProps = {
 	isCreating: true
 } & SugaredUnconstrainedQualifiedEntityList
 
-export const useEntityListSubTreeParameters = (
+export function useEntityListSubTreeParameters(alias: Alias): Alias
+export function useEntityListSubTreeParameters(
 	qualifiedEntityList: QualifiedEntityListProps | UnconstrainedQualifiedEntityListProps,
-): BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList => {
+): BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList
+export function useEntityListSubTreeParameters(
+	qualifiedEntityListOrAlias: Alias | QualifiedEntityListProps | UnconstrainedQualifiedEntityListProps,
+): Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList
+export function useEntityListSubTreeParameters(
+	qualifiedEntityList: Alias | QualifiedEntityListProps | UnconstrainedQualifiedEntityListProps,
+): Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList {
+	useConstantValueInvariant(typeof qualifiedEntityList)
+
+	if (typeof qualifiedEntityList === 'string') {
+		return qualifiedEntityList
+	}
+
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const environment = useEnvironment()
 
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useConstantValueInvariant(
 		qualifiedEntityList.isCreating,
 		`EntityListSubTree: cannot alternate the 'isCreating' value.`,

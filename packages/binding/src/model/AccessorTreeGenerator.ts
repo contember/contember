@@ -34,6 +34,8 @@ import {
 	FieldName,
 	Scalar,
 	SingleEntityEventListeners,
+	Alias,
+	BoxedUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
@@ -118,30 +120,28 @@ export class AccessorTreeGenerator {
 			return entity.getAccessor()
 		},
 		getEntityListSubTree: (
-			parameters: BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList,
+			aliasOrParameters: Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList,
 		): EntityListAccessor => {
-			const placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(parameters)
-			const subTreeState = this.subTreeStates.get(placeholderName)
-
-			if (subTreeState === undefined) {
-				throw new BindingError(`Trying to retrieve a non-existent entity list sub tree.`)
-			}
+			const subTreeState = this.getSubTreeState(aliasOrParameters)
 			const accessor = subTreeState.getAccessor()
 			if (!(accessor instanceof EntityListAccessor)) {
-				throw new BindingError()
+				throw new BindingError(
+					`Trying to retrieve an entity list sub-tree but resolves to a single entity.\n` +
+						`Perhaps you meant to use 'getEntitySubTree'?`,
+				)
 			}
 			return accessor
 		},
-		getEntitySubTree: (parameters: SubTreeMarkerParameters): EntityAccessor => {
-			const placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(parameters)
-			const subTreeState = this.subTreeStates.get(placeholderName)
-
-			if (subTreeState === undefined) {
-				throw new BindingError(`Trying to retrieve a non-existent entity sub tree.`)
-			}
+		getEntitySubTree: (
+			aliasOrParameters: Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity,
+		): EntityAccessor => {
+			const subTreeState = this.getSubTreeState(aliasOrParameters)
 			const accessor = subTreeState.getAccessor()
 			if (!(accessor instanceof EntityAccessor)) {
-				throw new BindingError()
+				throw new BindingError(
+					`Trying to retrieve an entity sub-tree but resolves to an entity list.\n` +
+						`Perhaps you meant to use 'getEntityListSubTree'?`,
+				)
 			}
 			return accessor
 		},
@@ -1739,6 +1739,27 @@ export class AccessorTreeGenerator {
 		return {
 			eventListeners,
 		}
+	}
+
+	private getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): InternalRootStateNode {
+		let placeholderName: string
+
+		if (typeof aliasOrParameters === 'string') {
+			const placeholderByAlias = this.markerTree.placeholdersByAliases.get(aliasOrParameters)
+
+			if (placeholderByAlias === undefined) {
+				throw new BindingError(`Undefined sub-tree alias '${aliasOrParameters}'.`)
+			}
+			placeholderName = placeholderByAlias
+		} else {
+			placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters)
+		}
+		const subTreeState = this.subTreeStates.get(placeholderName)
+
+		if (subTreeState === undefined) {
+			throw new BindingError(`Trying to retrieve a non-existent sub-tree '${placeholderName}'.`)
+		}
+		return subTreeState
 	}
 
 	private triggerOnBeforePersist(): boolean {

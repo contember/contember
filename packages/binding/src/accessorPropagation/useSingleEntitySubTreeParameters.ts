@@ -40,6 +40,7 @@ export const useSingleEntitySubTreeParameters = (
 				setOnCreate: qualifiedSingleEntity.setOnCreate!,
 				expectedMutation: qualifiedSingleEntity.expectedMutation!,
 				unstable_onInitialize: qualifiedSingleEntity.unstable_onInitialize!,
+				alias: qualifiedSingleEntity.alias!,
 				onConnectionUpdate: qualifiedSingleEntity.onConnectionUpdate!,
 				onBeforeUpdate: qualifiedSingleEntity.onBeforeUpdate!,
 				onUpdate: qualifiedSingleEntity.onUpdate!,
@@ -59,6 +60,7 @@ export const useSingleEntitySubTreeParameters = (
 			qualifiedSingleEntity.onBeforeUpdate,
 			qualifiedSingleEntity.onUpdate,
 			qualifiedSingleEntity.onBeforePersist,
+			qualifiedSingleEntity.alias,
 			environment,
 		])
 	} else {
@@ -70,6 +72,7 @@ export const useSingleEntitySubTreeParameters = (
 				entity: qualifiedSingleEntity.entity,
 				setOnCreate: qualifiedSingleEntity.setOnCreate!,
 				expectedMutation: qualifiedSingleEntity.expectedMutation!,
+				alias: qualifiedSingleEntity.alias!,
 				unstable_onInitialize: qualifiedSingleEntity.unstable_onInitialize!,
 				onConnectionUpdate: qualifiedSingleEntity.onConnectionUpdate!,
 				onBeforeUpdate: qualifiedSingleEntity.onBeforeUpdate!,
@@ -84,6 +87,7 @@ export const useSingleEntitySubTreeParameters = (
 			qualifiedSingleEntity.isNonbearing,
 			qualifiedSingleEntity.expectedMutation,
 			qualifiedSingleEntity.unstable_onInitialize,
+			qualifiedSingleEntity.alias,
 			qualifiedSingleEntity.onConnectionUpdate,
 			qualifiedSingleEntity.onBeforeUpdate,
 			qualifiedSingleEntity.onUpdate,

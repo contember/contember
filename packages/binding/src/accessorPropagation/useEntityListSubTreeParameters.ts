@@ -44,6 +44,7 @@ export const useEntityListSubTreeParameters = (
 				onUpdate: qualifiedEntityList.onUpdate!,
 				setOnCreate: qualifiedEntityList.setOnCreate!,
 				expectedMutation: qualifiedEntityList.expectedMutation!,
+				alias: qualifiedEntityList.alias!,
 				unstable_onInitialize: qualifiedEntityList.unstable_onInitialize!,
 			}
 			return new BoxedUnconstrainedQualifiedEntityList(
@@ -60,6 +61,7 @@ export const useEntityListSubTreeParameters = (
 			qualifiedEntityList.onUpdate,
 			qualifiedEntityList.setOnCreate,
 			qualifiedEntityList.expectedMutation,
+			qualifiedEntityList.alias,
 			qualifiedEntityList.unstable_onInitialize,
 			environment,
 		])
@@ -75,6 +77,7 @@ export const useEntityListSubTreeParameters = (
 				orderBy: qualifiedEntityList.orderBy!,
 				offset: qualifiedEntityList.offset!,
 				limit: qualifiedEntityList.limit!,
+				alias: qualifiedEntityList.alias!,
 				expectedMutation: qualifiedEntityList.expectedMutation!,
 				unstable_onInitialize: qualifiedEntityList.unstable_onInitialize!,
 				onUpdate: qualifiedEntityList.onUpdate!,
@@ -92,6 +95,7 @@ export const useEntityListSubTreeParameters = (
 			qualifiedEntityList.forceCreation,
 			qualifiedEntityList.isNonbearing,
 			qualifiedEntityList.initialEntityCount,
+			qualifiedEntityList.alias,
 			qualifiedEntityList.expectedMutation,
 			qualifiedEntityList.unstable_onInitialize,
 			qualifiedEntityList.onUpdate,

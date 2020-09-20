@@ -12,6 +12,7 @@ import {
 	SubTreeMarker,
 } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
+import { Alias } from '../treeParameters/primitives'
 import { MarkerMerger } from './MarkerMerger'
 
 type Fragment = EntityFieldMarkersContainer
@@ -46,7 +47,10 @@ export class MarkerTreeGenerator {
 			}
 		}
 
-		return new MarkerTreeRoot(this.hoistDeepSubTrees(subTreeMap))
+		const hoistedSubTreeMap = this.hoistDeepSubTrees(subTreeMap)
+		const placeholdersByAliases = this.generatePlaceholdersByAliases(hoistedSubTreeMap)
+
+		return new MarkerTreeRoot(hoistedSubTreeMap, placeholdersByAliases)
 	}
 
 	private hoistDeepSubTrees(subTreeMap: Map<string, SubTreeMarker>): Map<string, SubTreeMarker> {
@@ -76,6 +80,31 @@ export class MarkerTreeGenerator {
 				yield* this.hoistSubTeesFromEntityFields(marker.fields)
 			}
 		}
+	}
+
+	private generatePlaceholdersByAliases(hoistedSubTrees: Map<string, SubTreeMarker>): Map<Alias, string> {
+		const placeholders = new Map<Alias, string>()
+
+		for (const [placeholderName, subTree] of hoistedSubTrees) {
+			const aliases = subTree.parameters.value.alias
+			if (aliases === undefined || aliases.size === 0) {
+				continue
+			}
+			for (const alias of aliases) {
+				const existingPlaceholder = placeholders.get(alias)
+				if (existingPlaceholder !== undefined) {
+					if (existingPlaceholder === placeholderName) {
+						continue
+					}
+					throw new BindingError(
+						`Detected the same sub-tree alias '${alias}' referring to sub-trees with different parameters!`,
+					)
+				}
+				placeholders.set(alias, placeholderName)
+			}
+		}
+
+		return placeholders
 	}
 
 	private static mapNodeResultToEntityFields(

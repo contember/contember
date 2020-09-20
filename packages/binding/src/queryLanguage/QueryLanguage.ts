@@ -2,6 +2,7 @@ import { emptyObject } from '@contember/react-utils'
 import { Environment } from '../dao'
 import { TreeParameterMerger, VariableInputTransformer } from '../model'
 import {
+	Alias,
 	DesugaredHasManyRelation,
 	DesugaredHasOneRelation,
 	EntityCreationParametersDefaults,
@@ -138,6 +139,16 @@ export namespace QueryLanguage {
 		}
 	}
 
+	const desugarSubTreeAlias = (alias: Alias | Set<Alias> | undefined): Set<Alias> | undefined => {
+		if (alias === undefined) {
+			return undefined
+		}
+		if (alias instanceof Set) {
+			return alias
+		}
+		return new Set<Alias>().add(alias)
+	}
+
 	const desugarHasOneRelation = (
 		sugarable: SugarableHasOneRelation,
 		unsugarable: UnsugarableHasOneRelation,
@@ -255,6 +266,7 @@ export namespace QueryLanguage {
 			expectedMutation: unsugarableEntityList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
 			eventListeners: desugarEntityListEventListeners(unsugarableEntityList),
 			initialEntityCount: unsugarableEntityList.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
+			alias: desugarSubTreeAlias(unsugarableEntityList.alias),
 			entityName,
 			hasOneRelationPath,
 		}
@@ -288,6 +300,7 @@ export namespace QueryLanguage {
 				: undefined,
 			expectedMutation: unsugarableSingleEntity.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
 			eventListeners: desugarSingleEntityEventListeners(unsugarableSingleEntity),
+			alias: desugarSubTreeAlias(unsugarableSingleEntity.alias),
 			entityName,
 			hasOneRelationPath,
 		}
@@ -324,6 +337,7 @@ export namespace QueryLanguage {
 				unsugarableEntityList,
 				environment,
 			),
+			alias: desugarSubTreeAlias(unsugarableEntityList.alias),
 			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			forceCreation: unsugarableEntityList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			setOnCreate: unsugarableEntityList.setOnCreate
@@ -361,6 +375,7 @@ export namespace QueryLanguage {
 			field,
 			entityName,
 			hasOneRelationPath,
+			alias: desugarSubTreeAlias(unsugarableFieldList.alias),
 			isNonbearing: unsugarableFieldList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			forceCreation: unsugarableFieldList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			setOnCreate: unsugarableFieldList.setOnCreate
@@ -424,8 +439,10 @@ export namespace QueryLanguage {
 		const eventListeners = desugarSingleEntityEventListeners(unsugarableSingleEntity)
 		const expectedMutation =
 			unsugarableSingleEntity.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation
+		const alias = desugarSubTreeAlias(unsugarableSingleEntity.alias)
 
 		return {
+			alias,
 			entityName,
 			where,
 			filter,

@@ -182,6 +182,7 @@ describe('Marker tree generator', () => {
 				forceCreation: false,
 				eventListeners: singleListeners,
 				expectedMutation: 'anyMutation',
+				alias: undefined,
 			}),
 			new EntityFieldMarkersContainer(
 				true,
@@ -200,7 +201,9 @@ describe('Marker tree generator', () => {
 			),
 			environment,
 		)
-		expect(generator.generate()).toEqual(new MarkerTreeRoot(new Map([[subTreeMarker.placeholderName, subTreeMarker]])))
+		expect(generator.generate()).toEqual(
+			new MarkerTreeRoot(new Map([[subTreeMarker.placeholderName, subTreeMarker]]), new Map()),
+		)
 	})
 
 	it('should reject top-level fields and relations', () => {

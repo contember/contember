@@ -1,7 +1,7 @@
-import { BoxedQualifiedEntityList, BoxedUnconstrainedQualifiedEntityList } from '../treeParameters'
+import { Alias, BoxedQualifiedEntityList, BoxedUnconstrainedQualifiedEntityList } from '../treeParameters'
 import { EntityListAccessor } from './EntityListAccessor'
 
 export interface GetEntityListSubTree {
-	//(customAlias: string): EntityListAccessor
+	(alias: Alias): EntityListAccessor
 	(parameters: BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList): EntityListAccessor
 }

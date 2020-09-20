@@ -1,4 +1,4 @@
-import { EntityName, ExpectedQualifiedEntityMutation } from './primitives'
+import { Alias, EntityName, ExpectedQualifiedEntityMutation } from './primitives'
 
 export const QualifiedEntityParametersDefaults = {
 	expectedMutation: 'anyMutation',
@@ -9,6 +9,7 @@ export interface DesugaredQualifiedEntityParameters {
 }
 
 export interface QualifiedEntityParameters {
+	alias: Set<Alias> | undefined
 	entityName: EntityName
 	expectedMutation: ExpectedQualifiedEntityMutation
 }
@@ -18,5 +19,6 @@ export interface SugarableQualifiedEntityParameters {
 }
 
 export interface UnsugarableQualifiedEntityParameters {
+	alias?: Alias | Set<Alias>
 	expectedMutation?: ExpectedQualifiedEntityMutation
 }

@@ -3,11 +3,9 @@ import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import {
 	useAccessorUpdateSubscription,
-	useAddTreeRootListener,
 	useEntityListSubTreeParameters,
-	useGetSubTree,
+	useGetEntityListSubTree,
 } from '../accessorPropagation'
-import { EntityListAccessor } from '../accessors'
 import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
@@ -49,7 +47,7 @@ export const EntityListSubTree = Component(
 	<ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => {
 		useConstantValueInvariant(props.isCreating, 'EntityListSubTree: cannot update isCreating')
 
-		const getSubTree = useGetSubTree()
+		const getSubTree = useGetEntityListSubTree()
 		const parameters = useEntityListSubTreeParameters(props)
 		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 		const accessor = useAccessorUpdateSubscription(getAccessor)

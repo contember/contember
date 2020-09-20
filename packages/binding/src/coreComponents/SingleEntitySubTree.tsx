@@ -1,7 +1,11 @@
 import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useAccessorUpdateSubscription, useGetSubTree, useSingleEntitySubTreeParameters } from '../accessorPropagation'
+import {
+	useAccessorUpdateSubscription,
+	useGetEntitySubTree,
+	useSingleEntitySubTreeParameters,
+} from '../accessorPropagation'
 import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
 import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
@@ -42,7 +46,7 @@ export const SingleEntitySubTree = Component(
 	<EntityProps extends {}>(props: SingleEntitySubTreeProps<EntityProps>) => {
 		useConstantValueInvariant(props.isCreating, 'SingleEntitySubTree: cannot update isCreating')
 
-		const getSubTree = useGetSubTree()
+		const getSubTree = useGetEntitySubTree()
 		const parameters = useSingleEntitySubTreeParameters(props)
 		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 		const accessor = useAccessorUpdateSubscription(getAccessor)

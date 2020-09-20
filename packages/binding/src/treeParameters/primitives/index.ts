@@ -1,3 +1,4 @@
+export * from './Alias'
 export * from './EntityName'
 export * from './ExpectedEntityCount'
 export * from './ExpectedQualifiedEntityMutation'

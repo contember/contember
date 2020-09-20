@@ -10,7 +10,7 @@ import {
 	SugaredRelativeSingleField,
 	useAccessorUpdateSubscription,
 	useEnvironment,
-	useGetSubTree,
+	useGetEntityListSubTree,
 } from '@contember/binding'
 import * as React from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
@@ -53,7 +53,7 @@ export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 }
 
 export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldList | QualifiedEntityList) => {
-	const getSubTree = useGetSubTree()
+	const getSubTree = useGetEntityListSubTree()
 	const getSubTreeData = React.useCallback(() => getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath)), [
 		desugaredOptionPath,
 		getSubTree,

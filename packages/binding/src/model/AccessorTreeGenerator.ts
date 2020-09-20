@@ -1,7 +1,7 @@
 import { GraphQlBuilder, TreeFilter } from '@contember/client'
 import { emptyArray, noop } from '@contember/react-utils'
 import * as ReactDOM from 'react-dom'
-import { EntityAccessor, EntityListAccessor, FieldAccessor, GetSubTree, TreeRootAccessor } from '../accessors'
+import { BindingOperations, EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } from '../accessors'
 import {
 	BoxedSingleEntityId,
 	EntityFieldPersistedData,
@@ -25,13 +25,17 @@ import {
 	SubTreeMarkerParameters,
 } from '../markers'
 import {
+	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
+	BoxedUnconstrainedQualifiedEntityList,
 	EntityCreationParameters,
 	EntityListEventListeners,
 	EntityListPreferences,
 	FieldName,
 	Scalar,
 	SingleEntityEventListeners,
+	Alias,
+	BoxedUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
@@ -50,8 +54,8 @@ import {
 import { MarkerMerger } from './MarkerMerger'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
-import { TreeParameterMerger } from './TreeParameterMerger'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
+import { TreeParameterMerger } from './TreeParameterMerger'
 
 // This only applies to the 'beforeUpdate' event:
 
@@ -90,64 +94,69 @@ export class AccessorTreeGenerator {
 
 	private currentErrors: ErrorsPreprocessor.ErrorTreeRoot | undefined
 
-	private treeRootListeners: {
-		eventListeners: {}
-	} = {
-		eventListeners: {},
-	}
+	// private treeRootListeners: {
+	// 	eventListeners: {}
+	// } = {
+	// 	eventListeners: {},
+	// }
 
-	private readonly getEntityByKey = (key: string) => {
-		const entity = this.entityStore.get(key)
+	private readonly bindingOperations = Object.freeze<BindingOperations>({
+		getAllEntities: (accessorTreeGenerator => {
+			return function* (): Generator<EntityAccessor> {
+				if (accessorTreeGenerator.isFrozenWhileUpdating) {
+					throw new BindingError(`Cannot query all entities while the tree is updating.`)
+				}
+				for (const [, entity] of accessorTreeGenerator.entityStore) {
+					yield entity.getAccessor()
+				}
+			}
+		})(this),
+		getEntityByKey: (key: string) => {
+			const entity = this.entityStore.get(key)
 
-		if (entity === undefined) {
-			throw new BindingError(`Trying to retrieve a non-existent entity: key '${key}' was not found.`)
-		}
-		return entity.getAccessor()
-	}
-	private readonly getSubTree = ((parameters: SubTreeMarkerParameters) => {
-		const placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(parameters)
-		const subTreeState = this.subTreeStates.get(placeholderName)
-
-		if (subTreeState === undefined) {
-			throw new BindingError(`Trying to retrieve a non-existent accessor sub tree.`)
-		}
-		return subTreeState.getAccessor()
-	}) as GetSubTree
-	private readonly batchUpdatesHandlerExtraProps: EntityAccessor.BatchUpdatesHandlerExtraProps &
-		EntityListAccessor.BatchUpdatesHandlerExtraProps = Object.freeze({
-		getEntityByKey: this.getEntityByKey,
-		getSubTree: this.getSubTree,
+			if (entity === undefined) {
+				throw new BindingError(`Trying to retrieve a non-existent entity: key '${key}' was not found.`)
+			}
+			return entity.getAccessor()
+		},
+		getEntityListSubTree: (
+			aliasOrParameters: Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList,
+		): EntityListAccessor => {
+			const subTreeState = this.getSubTreeState(aliasOrParameters)
+			const accessor = subTreeState.getAccessor()
+			if (!(accessor instanceof EntityListAccessor)) {
+				throw new BindingError(
+					`Trying to retrieve an entity list sub-tree but resolves to a single entity.\n` +
+						`Perhaps you meant to use 'getEntitySubTree'?`,
+				)
+			}
+			return accessor
+		},
+		getEntitySubTree: (
+			aliasOrParameters: Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity,
+		): EntityAccessor => {
+			const subTreeState = this.getSubTreeState(aliasOrParameters)
+			const accessor = subTreeState.getAccessor()
+			if (!(accessor instanceof EntityAccessor)) {
+				throw new BindingError(
+					`Trying to retrieve an entity sub-tree but resolves to an entity list.\n` +
+						`Perhaps you meant to use 'getEntityListSubTree'?`,
+				)
+			}
+			return accessor
+		},
+		getTreeFilters: (): TreeFilter[] => {
+			return this.treeFilterGenerator.generateTreeFilter()
+		},
 	})
 
 	private readonly getNewTreeRootInstance = () =>
-		new TreeRootAccessor(
-			this.unpersistedChangesCount !== 0,
-			this.addTreeRootEventListener,
-			this.getEntityByKey,
-			this.getSubTree,
-			this.getAllEntities,
-			this.getTreeFilters,
-		)
+		new TreeRootAccessor(this.unpersistedChangesCount !== 0, this.bindingOperations)
 
 	// This is currently useless but potentially future-compatible
-	private readonly addTreeRootEventListener: TreeRootAccessor.AddTreeRootEventListener = this.getAddEventListener(
-		this.treeRootListeners,
-	)
-
-	private readonly getAllEntities = (accessorTreeGenerator => {
-		return function* (): Generator<EntityAccessor> {
-			if (accessorTreeGenerator.isFrozenWhileUpdating) {
-				throw new BindingError(`Cannot query all entities while the tree is updating.`)
-			}
-			for (const [, entity] of accessorTreeGenerator.entityStore) {
-				yield entity.getAccessor()
-			}
-		}
-	})(this)
-
-	private readonly getTreeFilters = (): TreeFilter[] => {
-		return this.treeFilterGenerator.generateTreeFilter()
-	}
+	// private readonly addTreeRootEventListener: TreeRootAccessor.AddTreeRootEventListener = this.getAddEventListener(
+	// 	this.treeRootListeners,
+	// )
 
 	private isFrozenWhileUpdating = false
 	private treeWideBatchUpdateDepth = 0
@@ -1151,7 +1160,7 @@ export class AccessorTreeGenerator {
 				throw new BindingError(`Trying to update an entity (or something within said entity) that has been deleted.`)
 			}
 			entityState.batchUpdateDepth++
-			performUpdates(entityState.getAccessor, this.batchUpdatesHandlerExtraProps)
+			performUpdates(entityState.getAccessor, this.bindingOperations)
 			entityState.batchUpdateDepth--
 
 			if (
@@ -1185,7 +1194,7 @@ export class AccessorTreeGenerator {
 				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
 					currentAccessor = getAccessor()
 					for (const listener of entityState.eventListeners.beforeUpdate) {
-						listener(getAccessor, this.batchUpdatesHandlerExtraProps)
+						listener(getAccessor, this.bindingOperations)
 					}
 					if (currentAccessor === getAccessor()) {
 						return
@@ -1404,7 +1413,7 @@ export class AccessorTreeGenerator {
 				if (!entityListState.childrenKeys.has(key)) {
 					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as is is not on the list.`)
 				}
-				const entity = this.getEntityByKey(key)
+				const entity = this.bindingOperations.getEntityByKey(key)
 				if (entity === null) {
 					throw new BindingError(`Corrupted data`)
 				}
@@ -1415,7 +1424,7 @@ export class AccessorTreeGenerator {
 
 		const batchUpdatesImplementation: EntityListAccessor.BatchUpdates = performUpdates => {
 			entityListState.batchUpdateDepth++
-			performUpdates(entityListState.getAccessor, this.batchUpdatesHandlerExtraProps)
+			performUpdates(entityListState.getAccessor, this.bindingOperations)
 			entityListState.batchUpdateDepth--
 
 			if (
@@ -1445,7 +1454,7 @@ export class AccessorTreeGenerator {
 				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
 					currentAccessor = getAccessor()
 					for (const listener of entityListState.eventListeners.beforeUpdate) {
-						listener(getAccessor, this.batchUpdatesHandlerExtraProps)
+						listener(getAccessor, this.bindingOperations)
 					}
 					if (currentAccessor === getAccessor()) {
 						return
@@ -1732,6 +1741,27 @@ export class AccessorTreeGenerator {
 		}
 	}
 
+	private getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): InternalRootStateNode {
+		let placeholderName: string
+
+		if (typeof aliasOrParameters === 'string') {
+			const placeholderByAlias = this.markerTree.placeholdersByAliases.get(aliasOrParameters)
+
+			if (placeholderByAlias === undefined) {
+				throw new BindingError(`Undefined sub-tree alias '${aliasOrParameters}'.`)
+			}
+			placeholderName = placeholderByAlias
+		} else {
+			placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters)
+		}
+		const subTreeState = this.subTreeStates.get(placeholderName)
+
+		if (subTreeState === undefined) {
+			throw new BindingError(`Trying to retrieve a non-existent sub-tree '${placeholderName}'.`)
+		}
+		return subTreeState
+	}
+
 	private triggerOnBeforePersist(): boolean {
 		let hasBeforePersist = false
 
@@ -1743,7 +1773,7 @@ export class AccessorTreeGenerator {
 				iNode => iNode.eventListeners.beforePersist !== undefined,
 			)) {
 				for (const listener of iNode.eventListeners.beforePersist!) {
-					listener(iNode.getAccessor as any, this.batchUpdatesHandlerExtraProps) // TS can't quite handle this but this is sound.
+					listener(iNode.getAccessor as any, this.bindingOperations) // TS can't quite handle this but this is sound.
 					hasBeforePersist = true
 				}
 			}
@@ -1759,7 +1789,7 @@ export class AccessorTreeGenerator {
 		this.treeWideBatchUpdateDepth++
 		for (const state of this.newlyInitializedWithListeners) {
 			for (const listener of state.eventListeners.initialize!) {
-				listener(state.getAccessor as any, this.batchUpdatesHandlerExtraProps)
+				listener(state.getAccessor as any, this.bindingOperations)
 				hasOnInitialize = true
 			}
 		}

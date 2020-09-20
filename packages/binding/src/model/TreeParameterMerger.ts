@@ -2,6 +2,7 @@ import { GraphQlBuilder } from '@contember/client'
 import { BindingError } from '../BindingError'
 import { SubTreeMarkerParameters } from '../markers'
 import {
+	Alias,
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
 	BoxedUnconstrainedQualifiedEntityList,
@@ -77,6 +78,7 @@ export class TreeParameterMerger {
 				filter: original.value.filter,
 
 				// Not encoded within the placeholder
+				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
@@ -106,6 +108,7 @@ export class TreeParameterMerger {
 				limit: original.value.limit,
 
 				// Not encoded within the placeholder
+				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
@@ -127,6 +130,7 @@ export class TreeParameterMerger {
 				entityName: original.value.entityName,
 
 				// Not encoded within the placeholder
+				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
@@ -155,6 +159,7 @@ export class TreeParameterMerger {
 				entityName: original.value.entityName,
 
 				// Not encoded within the placeholder
+				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
 				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
@@ -366,5 +371,18 @@ export class TreeParameterMerger {
 			return original
 		}
 		return 'anyMutation'
+	}
+
+	private static mergeSubTreeAliases(
+		original: Set<Alias> | undefined,
+		fresh: Set<Alias> | undefined,
+	): Set<Alias> | undefined {
+		if (original === undefined) {
+			return fresh
+		}
+		if (fresh === undefined) {
+			return original
+		}
+		return this.mergeSets(original, fresh)
 	}
 }

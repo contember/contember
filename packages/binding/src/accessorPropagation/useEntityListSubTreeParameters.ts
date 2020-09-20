@@ -2,6 +2,7 @@ import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { QueryLanguage } from '../queryLanguage'
 import {
+	Alias,
 	BoxedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedEntityList,
 	SugaredQualifiedEntityList,
@@ -17,11 +18,26 @@ export type UnconstrainedQualifiedEntityListProps = {
 	isCreating: true
 } & SugaredUnconstrainedQualifiedEntityList
 
-export const useEntityListSubTreeParameters = (
+export function useEntityListSubTreeParameters(alias: Alias): Alias
+export function useEntityListSubTreeParameters(
 	qualifiedEntityList: QualifiedEntityListProps | UnconstrainedQualifiedEntityListProps,
-): BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList => {
+): BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList
+export function useEntityListSubTreeParameters(
+	qualifiedEntityListOrAlias: Alias | QualifiedEntityListProps | UnconstrainedQualifiedEntityListProps,
+): Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList
+export function useEntityListSubTreeParameters(
+	qualifiedEntityList: Alias | QualifiedEntityListProps | UnconstrainedQualifiedEntityListProps,
+): Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList {
+	useConstantValueInvariant(typeof qualifiedEntityList)
+
+	if (typeof qualifiedEntityList === 'string') {
+		return qualifiedEntityList
+	}
+
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const environment = useEnvironment()
 
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useConstantValueInvariant(
 		qualifiedEntityList.isCreating,
 		`EntityListSubTree: cannot alternate the 'isCreating' value.`,
@@ -44,6 +60,7 @@ export const useEntityListSubTreeParameters = (
 				onUpdate: qualifiedEntityList.onUpdate!,
 				setOnCreate: qualifiedEntityList.setOnCreate!,
 				expectedMutation: qualifiedEntityList.expectedMutation!,
+				alias: qualifiedEntityList.alias!,
 				unstable_onInitialize: qualifiedEntityList.unstable_onInitialize!,
 			}
 			return new BoxedUnconstrainedQualifiedEntityList(
@@ -60,6 +77,7 @@ export const useEntityListSubTreeParameters = (
 			qualifiedEntityList.onUpdate,
 			qualifiedEntityList.setOnCreate,
 			qualifiedEntityList.expectedMutation,
+			qualifiedEntityList.alias,
 			qualifiedEntityList.unstable_onInitialize,
 			environment,
 		])
@@ -75,6 +93,7 @@ export const useEntityListSubTreeParameters = (
 				orderBy: qualifiedEntityList.orderBy!,
 				offset: qualifiedEntityList.offset!,
 				limit: qualifiedEntityList.limit!,
+				alias: qualifiedEntityList.alias!,
 				expectedMutation: qualifiedEntityList.expectedMutation!,
 				unstable_onInitialize: qualifiedEntityList.unstable_onInitialize!,
 				onUpdate: qualifiedEntityList.onUpdate!,
@@ -92,6 +111,7 @@ export const useEntityListSubTreeParameters = (
 			qualifiedEntityList.forceCreation,
 			qualifiedEntityList.isNonbearing,
 			qualifiedEntityList.initialEntityCount,
+			qualifiedEntityList.alias,
 			qualifiedEntityList.expectedMutation,
 			qualifiedEntityList.unstable_onInitialize,
 			qualifiedEntityList.onUpdate,

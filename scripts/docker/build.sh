@@ -20,7 +20,7 @@ fi
 MAIN_VERSION=${ALL_VERSIONS[0]}
 
 REPO="mangoweb/contember/admin"
-docker build -t "$ECR/$REPO:$MAIN_VERSION" -f ./packages/cms-admin-server/Dockerfile .
+docker build -t "$ECR/$REPO:$MAIN_VERSION" -f ./packages/admin-server/Dockerfile .
 for VERSION in "${ALL_VERSIONS[@]:1}"
 do
   docker tag "$ECR/$REPO:$MAIN_VERSION" "$ECR/$REPO:$VERSION"

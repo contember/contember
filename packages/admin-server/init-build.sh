@@ -6,7 +6,7 @@ npx lerna bootstrap --scope @contember/admin-server --ci -- --production --no-op
 set -e
 
 find ./packages/*/node_modules -type d -name typescript -exec rm -rf "{}" +
-SYMLINKS=$(find ./packages/cms-admin-server/node_modules -maxdepth 2 -type l)
+SYMLINKS=$(find ./packages/admin-server/node_modules -maxdepth 2 -type l)
 
 for SYMLINK in $SYMLINKS; do
 	REALPATH=$(readlink -f $SYMLINK)

@@ -1,6 +1,5 @@
 import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { RelativeSingleField } from '../treeParameters'
-import { throwNonWritableError } from './errors'
 import { sortEntities } from './sortEntities'
 
 export const moveEntity = (
@@ -9,22 +8,28 @@ export const moveEntity = (
 	oldIndex: number,
 	newIndex: number,
 ) => {
-	const order = computeEntityOrder(sortEntities(Array.from(entityList), sortByField), sortByField, oldIndex, newIndex)
-	entityList.batchUpdates((getAccessor: () => EntityListAccessor) => {
-		let listAccessor: EntityListAccessor = getAccessor()
-		for (const entity of listAccessor) {
-			if (!(entity instanceof EntityAccessor)) {
-				continue
-			}
-			const target = order.get(entity.key)
-			const orderField = entity.getRelativeSingleField<number>(sortByField)
+	moveEntityInArray(Array.from(entityList), entityList.batchUpdates, sortByField, oldIndex, newIndex)
+}
 
-			if (target !== undefined) {
-				orderField.updateValue(target)
-				listAccessor = getAccessor()
-			}
+export const moveEntityInArray = (
+	entities: EntityAccessor[],
+	batchUpdates: EntityListAccessor.BatchUpdates,
+	sortByField: RelativeSingleField,
+	oldIndex: number,
+	newIndex: number,
+): EntityAccessor[] => {
+	const sorted = sortEntities(entities, sortByField)
+	const order = computeEntityOrder(sorted, sortByField, oldIndex, newIndex)
+
+	batchUpdates(getAccessor => {
+		for (const [entityKey, newOrderValue] of order) {
+			const targetEntity = getAccessor().getChildEntityByKey(entityKey)
+			const orderField = targetEntity.getRelativeSingleField<number>(sortByField)
+
+			orderField.updateValue(newOrderValue)
 		}
 	})
+	return sorted
 }
 
 type EntityOrder = Map<string, number>

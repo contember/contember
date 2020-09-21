@@ -34,6 +34,7 @@ export const Admin = React.memo((props: AdminProps) => {
 
 		return store
 	})
+	const [adminWideEnvironment] = React.useState(() => Environment.create(props.clientConfig.envVariables))
 
 	React.useEffect(() => {
 		const onPopState = (e: PopStateEvent) => {
@@ -83,7 +84,7 @@ export const Admin = React.memo((props: AdminProps) => {
 										normalizedConfigs[config.project][config.stage] = {
 											...config,
 											lazyComponent: React.lazy(config.component),
-											rootEnvironment: Environment.create({
+											rootEnvironment: adminWideEnvironment.putDelta({
 												dimensions: config.defaultDimensions || {},
 											}),
 										}

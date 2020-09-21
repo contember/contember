@@ -5,7 +5,7 @@
 		{ "path": "./packages/admin"},
 		{ "path": "./packages/binding" },
 		{ "path": "./packages/client"},
-		{ "path": "./packages/cms-admin-server" },
+		{ "path": "./packages/admin-server"},
 		{ "path": "./packages/react-client"},
 		{ "path": "./packages/react-multipass-rendering"},
 		{ "path": "./packages/react-utils"},

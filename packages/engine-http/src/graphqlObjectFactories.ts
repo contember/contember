@@ -14,7 +14,7 @@ import {
 	GraphQLUnionType,
 	GraphQLFloat,
 } from 'graphql'
-import { GraphQLObjectsFactory } from '@contember/engine-content-api'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export const graphqlObjectFactories: GraphQLObjectsFactory = {
 	createObjectType: args => new GraphQLObjectType(args),

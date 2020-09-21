@@ -1,5 +1,5 @@
 import { Builder, Container } from '@contember/dic'
-import { GraphQLObjectsFactory } from '@contember/engine-common'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export type ProjectConfig = any // todo
 

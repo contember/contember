@@ -1,5 +1,5 @@
 import { GraphQLScalarType, Kind } from 'graphql'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 //todo: implement serialize, parseValue and parseLiteral properly
 

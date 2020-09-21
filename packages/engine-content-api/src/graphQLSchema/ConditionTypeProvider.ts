@@ -3,7 +3,7 @@ import { GraphQLEnumType, GraphQLInputFieldConfigMap, GraphQLInputObjectType, Gr
 import singletonFactory from '../utils/singletonFactory'
 import ColumnTypeResolver from './ColumnTypeResolver'
 import { GqlTypeName } from './utils'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export default class ConditionTypeProvider {
 	private conditions = singletonFactory<GraphQLInputObjectType, string, GraphQLScalarType | GraphQLEnumType>(

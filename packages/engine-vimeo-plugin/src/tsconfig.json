@@ -9,6 +9,9 @@
 			"path": "../../engine-common/src"
 		},
 		{
+			"path": "../../graphql-utils/src"
+		},
+		{
 			"path": "../../engine-plugins/src"
 		}
 	]

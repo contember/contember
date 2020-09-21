@@ -9,6 +9,7 @@
     "@contember/engine-common": "^0.9.0-alpha.8",
     "@contember/engine-plugins": "^0.9.0-alpha.8",
     "@contember/schema": "^0.9.0-alpha.8",
+    "@contember/graphql-utils": "0.0.0",
     "apollo-server-errors": "^2.3.4",
     "node-fetch": "^2.6.0"
   },

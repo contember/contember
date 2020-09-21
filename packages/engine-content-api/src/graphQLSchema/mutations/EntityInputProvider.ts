@@ -5,7 +5,7 @@ import { Acl, Model } from '@contember/schema'
 import Authorizator from '../../acl/Authorizator'
 import singletonFactory from '../../utils/singletonFactory'
 import { GraphQLInputType } from 'graphql/type/definition'
-import { GraphQLObjectsFactory } from '../GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../../exception'
 
 class EntityInputProvider<Operation extends EntityInputProvider.Type.create | EntityInputProvider.Type.update> {

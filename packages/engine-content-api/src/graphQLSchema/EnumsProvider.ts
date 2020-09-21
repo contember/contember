@@ -3,7 +3,7 @@ import { GraphQLEnumValueConfigMap } from 'graphql/type/definition'
 import { Model } from '@contember/schema'
 import singletonFactory from '../utils/singletonFactory'
 import { capitalizeFirstLetter } from '../utils/strings'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export default class EnumsProvider {
 	private schema: Model.Schema

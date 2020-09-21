@@ -2,7 +2,7 @@ import { Model } from '@contember/schema'
 import WhereTypeProvider from '../WhereTypeProvider'
 import { GraphQLFieldConfigArgumentMap } from 'graphql/type/definition'
 import OrderByTypeProvider from '../OrderByTypeProvider'
-import { GraphQLObjectsFactory } from '../GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export default class FieldArgsVisitor
 	implements

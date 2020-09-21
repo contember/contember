@@ -9,7 +9,7 @@ import ConditionTypeProvider from './ConditionTypeProvider'
 import { GqlTypeName } from './utils'
 import Authorizator from '../acl/Authorizator'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../exception'
 import { getFieldsForUniqueWhere } from '../utils/uniqueWhereFields'
 

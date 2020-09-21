@@ -6,7 +6,6 @@
   "scripts": {},
   "typings": "dist/src/index.d.ts",
   "devDependencies": {
-    "@types/node": "^14.6.4",
-    "graphql": "^14.6.0"
+    "@types/node": "^14.6.4"
   }
 }

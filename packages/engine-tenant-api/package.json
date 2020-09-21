@@ -15,6 +15,7 @@
     "@contember/dic": "^0.9.0-alpha.8",
     "@contember/queryable": "^0.9.0-alpha.8",
     "@contember/schema": "^0.9.0-alpha.8",
+    "@contember/graphql-utils": "0.0.0",
     "apollo-server-core": "^2.16.1",
     "apollo-server-errors": "^2.4.0",
     "graphql": "^14.6.0",

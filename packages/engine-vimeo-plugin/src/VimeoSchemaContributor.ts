@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLSchema } from 'graphql'
-import { GraphQLObjectsFactory } from '@contember/engine-common'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { VimeoService, VimeoServiceFactory } from './VimeoService'
 import { VimeoConfig } from './Config'
 import { GraphQLSchemaContributor, SchemaContext } from '@contember/engine-plugins'

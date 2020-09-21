@@ -16,6 +16,7 @@
     "@contember/schema-definition": "^0.9.0-alpha.8",
     "@contember/schema-migrations": "^0.9.0-alpha.8",
     "@contember/schema-utils": "^0.9.0-alpha.8",
+    "@contember/graphql-utils": "0.0.0",
     "graphql": "^14.6.0",
     "graphql-tools": "^4.0.7",
     "jasmine": "^3.5.0",

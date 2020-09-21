@@ -18,6 +18,9 @@
 			"path": "../../engine-common/src"
 		},
 		{
+			"path": "../../graphql-utils/src"
+		},
+		{
 			"path": "../../schema/src"
 		},
 		{

@@ -11,7 +11,7 @@ import Authorizator from '../acl/Authorizator'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
 import OrderByTypeProvider from './OrderByTypeProvider'
 import EntityFieldsProvider from '../extensions/EntityFieldsProvider'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../exception'
 
 class EntityTypeProvider {

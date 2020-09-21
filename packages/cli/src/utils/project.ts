@@ -1,14 +1,18 @@
-import { copy, pathExists } from 'fs-extra'
+import { pathExists } from 'fs-extra'
 import { basename, join } from 'path'
 import { resourcesDir } from '../pathUtils'
 import { promises as fs } from 'fs'
-import { listDirectories, replaceFileContent } from './fs'
+import { listDirectories } from './fs'
 import { updateYaml } from './yaml'
-import { projectNameToEnvName } from '@contember/engine-common'
 import { workspaceHasAdmin } from './workspace'
 import { installTemplate } from './template'
 import { InstanceLocalEnvironment, validateInstanceName } from './instance'
 import { updateMainDockerComposeConfig } from './dockerCompose'
+
+// do not forget to update packages/engine-common/src/config/Project.ts
+export const projectNameToEnvName = (projectName: string): string => {
+	return projectName.toUpperCase().replace(/-/g, '_')
+}
 
 export const validateProjectName = (name: string) => {
 	if (!name.match(/^[a-z][-a-z0-9]*$/i)) {

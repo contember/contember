@@ -1,13 +1,13 @@
 {
 	"name": "@contember/schema-definition",
-	"version": "0.8.5",
+	"version": "0.8.6",
 	"license": "Apache-2.0",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"scripts": {},
 	"dependencies": {
-		"@contember/schema": "^0.8.5",
-		"@contember/schema-utils": "^0.8.5",
+		"@contember/schema": "^0.8.6",
+		"@contember/schema-utils": "^0.8.6",
 		"reflect-metadata": "^0.1.13"
 	},
 	"devDependencies": {

@@ -5,12 +5,24 @@ import { Server as HttpServer } from 'net'
 ;(async () => {
 	try {
 		const server = new Server()
+
+		const envPrefixName = 'CONTEMBER_ADMIN_ENV_PREFIX'
+		const envPrefix = process.env[envPrefixName] ?? 'CONTEMBER_ADMIN_'
+		const envVariables = new Map<string, string>()
+
+		for (const envVariableName in process.env) {
+			if (envVariableName.startsWith(envPrefix) && envVariableName !== envPrefixName) {
+				envVariables.set(envVariableName.substring(envPrefix.length), process.env[envVariableName]!)
+			}
+		}
+
 		const config: Configuration = {
 			apiBaseUrl: String(process.env['CONTEMBER_API_SERVER']),
 			loginToken: String(process.env['CONTEMBER_LOGIN_TOKEN']),
 			port: Number(process.env['CONTEMBER_PORT']),
 			configPlaceholder: String(process.env['CONTEMBER_CONFIG_PLACEHOLDER']),
 			indexFile: String(process.env['CONTEMBER_INDEX_FILE']),
+			envVariables: Object.fromEntries(envVariables),
 		}
 		const signals = [
 			['SIGHUP', 1],

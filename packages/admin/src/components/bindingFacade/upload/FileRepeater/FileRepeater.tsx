@@ -26,7 +26,7 @@ type FileRepeaterProps = Omit<
 	| 'itemComponent'
 	| 'itemComponentExtraProps'
 	| 'unstable__sortAxis'
-	| 'initialRowCount'
+	| 'initialEntityCount'
 	| 'useDragHandle'
 > &
 	FileRepeaterContainerPublicProps & {
@@ -88,7 +88,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 		return (
 			<Repeater
 				{...props}
-				initialRowCount={0}
+				initialEntityCount={0}
 				useDragHandle={false}
 				containerComponent={FileRepeaterContainer}
 				containerComponentExtraProps={containerExtraProps}
@@ -131,7 +131,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 		}
 
 		return (
-			<Repeater {...props} initialRowCount={0}>
+			<Repeater {...props} initialEntityCount={0}>
 				{normalizedChildren}
 			</Repeater>
 		)

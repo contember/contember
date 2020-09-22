@@ -25,7 +25,6 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
 	accessor: EntityListAccessor
 	label: React.ReactNode
-	initialRowCount?: number
 	children?: React.ReactNode
 
 	sortableBy?: SugaredFieldProps['field']

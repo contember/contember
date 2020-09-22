@@ -30,7 +30,7 @@ export const Repeater = Component(
 		return <RepeaterInner {...props} accessor={entityList} />
 	},
 	(props, environment) => (
-		<HasMany {...props} initialEntityCount={props.initialRowCount === undefined ? 1 : props.initialRowCount}>
+		<HasMany {...props} initialEntityCount={props.initialRowCount === undefined ? props.initialEntityCount === undefined ? 1 : props.initialEntityCount : props.initialRowCount}>
 			{RepeaterInner.staticRender(props, environment)}
 		</HasMany>
 	),

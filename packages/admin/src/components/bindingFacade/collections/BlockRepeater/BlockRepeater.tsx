@@ -35,7 +35,7 @@ export const BlockRepeater = Component<BlockRepeaterProps>(
 		)
 	},
 	props => (
-		<Repeater {...props} initialRowCount={0}>
+		<Repeater {...props} initialEntityCount={0}>
 			{typeof props.discriminationField === 'string' && (
 				<DiscriminatedBlocks field={props.discriminationField} label={props.label}>
 					{props.children}

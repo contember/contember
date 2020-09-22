@@ -4,9 +4,7 @@ import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 
 export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>
 	extends SugaredRelativeEntityList,
-		Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'accessor'> {
-	initialRowCount?: number
-}
+		Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'accessor'> {}
 
 export const Repeater = Component(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => {
@@ -30,7 +28,7 @@ export const Repeater = Component(
 		return <RepeaterInner {...props} accessor={entityList} />
 	},
 	(props, environment) => (
-		<HasMany {...props} initialEntityCount={props.initialRowCount === undefined ? 1 : props.initialRowCount}>
+		<HasMany {...props} initialEntityCount={props.initialEntityCount ?? 1}>
 			{RepeaterInner.staticRender(props, environment)}
 		</HasMany>
 	),

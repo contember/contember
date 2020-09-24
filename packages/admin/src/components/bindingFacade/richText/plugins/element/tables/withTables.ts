@@ -7,6 +7,7 @@ import {
 	Path as SlatePath,
 	Point,
 	Range as SlateRange,
+	Text,
 	Transforms,
 } from 'slate'
 import { ReactEditor } from 'slate-react'
@@ -325,11 +326,11 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				}
 			}
 			const selection = editor.selection
-			if (!SlateRange.isCollapsed(selection)) {
-				return onKeyDown(event)
-			}
 
 			if (event.key === 'ArrowLeft') {
+				if (!SlateRange.isCollapsed(selection)) {
+					return onKeyDown(event)
+				}
 				if (Point.equals(selection.focus, Editor.start(e, cellPath))) {
 					if (columnIndex > 0) {
 						event.preventDefault()
@@ -343,6 +344,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 					}
 				}
 			} else if (event.key === 'ArrowRight') {
+				if (!SlateRange.isCollapsed(selection)) {
+					return onKeyDown(event)
+				}
 				if (Point.equals(selection.focus, Editor.end(e, cellPath))) {
 					if (columnIndex < columnCount - 1) {
 						event.preventDefault()
@@ -359,15 +363,32 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			} else if (event.key === 'ArrowUp') {
 				if (rowIndex > 0) {
 					event.preventDefault()
-					// TODO try to match the offset
-					return Transforms.select(e, Editor.end(e, [...tablePath, rowIndex - 1, columnIndex]))
+					const rowAboveEndPoint = Editor.end(e, [...tablePath, rowIndex - 1, columnIndex])
+
+					if (!SlateRange.isCollapsed(selection)) {
+						return Transforms.select(e, rowAboveEndPoint)
+					}
+					const minOffset = Math.min(selection.focus.offset, rowAboveEndPoint.offset)
+					return Transforms.select(e, {
+						path: rowAboveEndPoint.path,
+						offset: minOffset,
+					})
 				}
 				return moveSelectionBeforeTable()
 			} else if (event.key === 'ArrowDown') {
 				if (rowIndex < rowCount - 1) {
 					event.preventDefault()
-					// TODO try to match the offset
-					return Transforms.select(e, Editor.start(e, [...tablePath, rowIndex + 1, columnIndex]))
+					const rowBelowStatPoint = Editor.start(e, [...tablePath, rowIndex + 1, columnIndex])
+
+					if (!SlateRange.isCollapsed(selection)) {
+						return Transforms.select(e, rowBelowStatPoint)
+					}
+					const [rowBelowStatPointNode] = Editor.node(e, rowBelowStatPoint) as NodeEntry<Text>
+
+					return Transforms.select(e, {
+						path: rowBelowStatPoint.path,
+						offset: Math.min(selection.focus.offset, rowBelowStatPointNode.text.length),
+					})
 				}
 				return moveSelectionAfterTable()
 			}

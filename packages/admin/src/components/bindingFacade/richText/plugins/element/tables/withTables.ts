@@ -245,7 +245,16 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			deleteFragment()
 		},
 		onKeyDown: event => {
-			if (event.key !== 'Tab' || !editor.selection) {
+			if (
+				!editor.selection ||
+				!(
+					event.key === 'Tab' ||
+					event.key === 'ArrowUp' ||
+					event.key === 'ArrowRight' ||
+					event.key === 'ArrowDown' ||
+					event.key === 'ArrowLeft'
+				)
+			) {
 				return onKeyDown(event)
 			}
 			const closestBlockEntry = Editor.above(editor, {
@@ -269,47 +278,100 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				return
 			}
 
-			if (event.shiftKey) {
-				// Moving backwards
-				if (columnIndex > 0) {
-					event.preventDefault()
-					e.selectTableCellContents(tablePath, rowIndex, columnIndex - 1)
-				} else if (columnIndex === 0) {
-					if (rowIndex > 0) {
-						event.preventDefault()
-						e.selectTableCellContents(tablePath, rowIndex - 1, columnCount - 1)
-					} else {
-						const pointBeforeTable = Editor.before(e, tablePath)
-						if (!pointBeforeTable) {
-							return
-						}
-						event.preventDefault()
-						Transforms.select(e, pointBeforeTable)
-						return
-					}
+			const moveSelectionBeforeTable = () => {
+				const pointBeforeTable = Editor.before(e, tablePath)
+				if (!pointBeforeTable) {
+					return onKeyDown(event)
 				}
-			} else {
-				// Moving forwards
-				if (columnIndex < columnCount - 1) {
-					event.preventDefault()
-					e.selectTableCellContents(tablePath, rowIndex, columnIndex + 1)
-					return
-				} else if (columnIndex === columnCount - 1) {
-					// We're at the right edge of the table
-					if (rowIndex < rowCount - 1) {
+				event.preventDefault()
+				return Transforms.select(e, pointBeforeTable)
+			}
+			const moveSelectionAfterTable = () => {
+				const pointAfterTable = Editor.after(e, tablePath)
+				if (!pointAfterTable) {
+					return onKeyDown(event)
+				}
+				event.preventDefault()
+				return Transforms.select(e, pointAfterTable)
+			}
+
+			if (event.key === 'Tab') {
+				if (event.shiftKey) {
+					// Moving backwards
+					if (columnIndex > 0) {
 						event.preventDefault()
-						e.selectTableCellContents(tablePath, rowIndex + 1, 0)
-					} else if (rowIndex === rowCount - 1) {
-						const pointAfterTable = Editor.after(e, tablePath)
-						if (!pointAfterTable) {
-							return
+						return e.selectTableCellContents(tablePath, rowIndex, columnIndex - 1)
+					} else if (columnIndex === 0) {
+						if (rowIndex > 0) {
+							event.preventDefault()
+							return e.selectTableCellContents(tablePath, rowIndex - 1, columnCount - 1)
 						}
+						return moveSelectionBeforeTable()
+					}
+				} else {
+					// Moving forwards
+					if (columnIndex < columnCount - 1) {
 						event.preventDefault()
-						Transforms.select(e, pointAfterTable)
-						return
+						return e.selectTableCellContents(tablePath, rowIndex, columnIndex + 1)
+					} else if (columnIndex === columnCount - 1) {
+						// We're at the right edge of the table
+						if (rowIndex < rowCount - 1) {
+							event.preventDefault()
+							return e.selectTableCellContents(tablePath, rowIndex + 1, 0)
+						} else if (rowIndex === rowCount - 1) {
+							return moveSelectionAfterTable()
+						}
 					}
 				}
 			}
+			const selection = editor.selection
+			if (!SlateRange.isCollapsed(selection)) {
+				return onKeyDown(event)
+			}
+
+			if (event.key === 'ArrowLeft') {
+				if (Point.equals(selection.focus, Editor.start(e, cellPath))) {
+					if (columnIndex > 0) {
+						event.preventDefault()
+						return Transforms.select(e, Editor.end(e, [...tablePath, rowIndex, columnIndex - 1]))
+					} else if (columnIndex === 0) {
+						if (rowIndex > 0) {
+							event.preventDefault()
+							return Transforms.select(e, Editor.end(e, [...tablePath, rowIndex - 1, columnCount - 1]))
+						}
+						return moveSelectionBeforeTable()
+					}
+				}
+			} else if (event.key === 'ArrowRight') {
+				if (Point.equals(selection.focus, Editor.end(e, cellPath))) {
+					if (columnIndex < columnCount - 1) {
+						event.preventDefault()
+						return Transforms.select(e, Editor.start(e, [...tablePath, rowIndex, columnIndex + 1]))
+					} else if (columnIndex === columnCount - 1) {
+						if (rowIndex < rowCount - 1) {
+							event.preventDefault()
+							return Transforms.select(e, Editor.start(e, [...tablePath, rowIndex + 1, 0]))
+						} else if (rowIndex === rowCount - 1) {
+							return moveSelectionAfterTable()
+						}
+					}
+				}
+			} else if (event.key === 'ArrowUp') {
+				if (rowIndex > 0) {
+					event.preventDefault()
+					// TODO try to match the offset
+					return Transforms.select(e, Editor.end(e, [...tablePath, rowIndex - 1, columnIndex]))
+				}
+				return moveSelectionBeforeTable()
+			} else if (event.key === 'ArrowDown') {
+				if (rowIndex < rowCount - 1) {
+					event.preventDefault()
+					// TODO try to match the offset
+					return Transforms.select(e, Editor.start(e, [...tablePath, rowIndex + 1, columnIndex]))
+				}
+				return moveSelectionAfterTable()
+			}
+			onKeyDown(event)
 		},
 	})
 

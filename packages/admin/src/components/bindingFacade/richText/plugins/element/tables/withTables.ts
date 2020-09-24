@@ -30,6 +30,7 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		insertBreak,
 		isElementActive,
 		toggleElement,
+		onKeyDown,
 	} = editor
 
 	const e = (editor as any) as EditorWithTables<E>
@@ -51,9 +52,26 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			children: [{ text: '' }],
 		}),
 
+		selectTableCellContents: (table, rowIndex, columnIndex) => {
+			if (!Array.isArray(table)) {
+				table = ReactEditor.findPath(e, table)
+			}
+			Transforms.select(e, {
+				anchor: Editor.start(e, [...table, rowIndex, columnIndex]),
+				focus: Editor.end(e, [...table, rowIndex, columnIndex]),
+			})
+		},
+
 		getTableCellCoordinates: (element: TableCellElement) => {
 			const cellPath = ReactEditor.findPath(e, element)
 			return cellPath.slice(-2) as [number, number]
+		},
+		getTableRowCount: (element: TableElement): number => {
+			return element.children.length
+		},
+		getTableColumnCount: (element: TableElement): number => {
+			const firstRow = element.children[0] as TableRowElement | undefined
+			return firstRow?.children.length ?? 0
 		},
 		getTableRowNumber: (element: TableRowElement | TableCellElement) => {
 			if (e.isTableCell(element)) {
@@ -64,8 +82,7 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		},
 		addTableRow: (element: TableElement, index?: number) => {
 			const tablePath = ReactEditor.findPath(e, element)
-			const firstRow = element.children[0] as TableRowElement | undefined
-			const columnCount = firstRow?.children.length
+			const columnCount = e.getTableColumnCount(element)
 			const rowIndex = index ?? element.children.length
 
 			Transforms.insertNodes(e, e.createEmptyTableRowElement(columnCount), {
@@ -74,9 +91,8 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		},
 		addTableColumn: (element: TableElement, index?: number) => {
 			const tablePath = ReactEditor.findPath(e, element)
-			const firstRow = element.children[0] as TableRowElement | undefined
-			const columnCount = firstRow?.children.length
-			const rowCount = element.children.length
+			const columnCount = e.getTableColumnCount(element)
+			const rowCount = e.getTableRowCount(element)
 			const columnIndex = index ?? columnCount ?? 0
 
 			Editor.withoutNormalizing(e, () => {
@@ -227,6 +243,73 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				return // TODO nope for now
 			}
 			deleteFragment()
+		},
+		onKeyDown: event => {
+			if (event.key !== 'Tab' || !editor.selection) {
+				return onKeyDown(event)
+			}
+			const closestBlockEntry = Editor.above(editor, {
+				at: editor.selection,
+				match: node => Editor.isBlock(editor, node),
+			})
+			if (!closestBlockEntry || !e.isTableCell(closestBlockEntry[0])) {
+				return onKeyDown(event)
+			}
+			const [cellElement, cellPath] = closestBlockEntry
+			if (cellPath.length < 3) {
+				return onKeyDown(event)
+			}
+			const [rowIndex, columnIndex] = e.getTableCellCoordinates(cellElement)
+			const tablePath = cellPath.slice(0, -2)
+			const tableElement = SlateNode.get(editor, tablePath) as TableElement
+			const rowCount = e.getTableRowCount(tableElement)
+			const columnCount = e.getTableColumnCount(tableElement)
+
+			if (rowCount === 0 || columnCount === 0) {
+				return
+			}
+
+			if (event.shiftKey) {
+				// Moving backwards
+				if (columnIndex > 0) {
+					event.preventDefault()
+					e.selectTableCellContents(tablePath, rowIndex, columnIndex - 1)
+				} else if (columnIndex === 0) {
+					if (rowIndex > 0) {
+						event.preventDefault()
+						e.selectTableCellContents(tablePath, rowIndex - 1, columnCount - 1)
+					} else {
+						const pointBeforeTable = Editor.before(e, tablePath)
+						if (!pointBeforeTable) {
+							return
+						}
+						event.preventDefault()
+						Transforms.select(e, pointBeforeTable)
+						return
+					}
+				}
+			} else {
+				// Moving forwards
+				if (columnIndex < columnCount - 1) {
+					event.preventDefault()
+					e.selectTableCellContents(tablePath, rowIndex, columnIndex + 1)
+					return
+				} else if (columnIndex === columnCount - 1) {
+					// We're at the right edge of the table
+					if (rowIndex < rowCount - 1) {
+						event.preventDefault()
+						e.selectTableCellContents(tablePath, rowIndex + 1, 0)
+					} else if (rowIndex === rowCount - 1) {
+						const pointAfterTable = Editor.after(e, tablePath)
+						if (!pointAfterTable) {
+							return
+						}
+						event.preventDefault()
+						Transforms.select(e, pointAfterTable)
+						return
+					}
+				}
+			}
 		},
 	})
 

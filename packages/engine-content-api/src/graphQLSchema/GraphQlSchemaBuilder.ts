@@ -3,7 +3,7 @@ import { Model } from '@contember/schema'
 import MutationProvider from './MutationProvider'
 import QueryProvider from './QueryProvider'
 import { ValidationQueriesProvider } from './ValidationQueriesProvider'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { Context } from '../types'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 

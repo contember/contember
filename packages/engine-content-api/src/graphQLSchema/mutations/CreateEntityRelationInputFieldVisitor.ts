@@ -7,7 +7,7 @@ import EntityInputProvider from './EntityInputProvider'
 import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import CreateEntityRelationAllowedOperationsVisitor from './CreateEntityRelationAllowedOperationsVisitor'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { GraphQLObjectsFactory } from '../GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../../exception'
 
 export default class CreateEntityRelationInputFieldVisitor

@@ -2,7 +2,7 @@ import { GraphQLEnumType, GraphQLScalarType } from 'graphql'
 import { Model } from '@contember/schema'
 import EnumsProvider from './EnumsProvider'
 import { CustomTypesProvider } from './CustomTypesProvider'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../exception'
 
 export default class ColumnTypeResolver {

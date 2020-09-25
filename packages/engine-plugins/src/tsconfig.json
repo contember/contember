@@ -3,5 +3,15 @@
 	"compilerOptions": {
 		"outDir": "../dist/src"
 	},
-	"references": []
+	"references": [
+		{
+			"path": "../../graphql-utils/src"
+		},
+		{
+			"path": "../../schema/src"
+		},
+		{
+			"path": "../../dic/src"
+		}
+	]
 }

@@ -1,4 +1,4 @@
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { Result } from '@contember/schema'
 
 export class ResultSchemaTypeProvider {

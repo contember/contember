@@ -22,6 +22,9 @@
 		},
 		{
 			"path": "../../dic/src"
+		},
+		{
+			"path": "../../graphql-utils/src"
 		}
 	]
 }

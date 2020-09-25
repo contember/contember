@@ -5,7 +5,7 @@ import WhereTypeProvider from './WhereTypeProvider'
 import EntityInputProvider from './mutations/EntityInputProvider'
 import { Input, Model } from '@contember/schema'
 import { filterObject } from '../utils/object'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>

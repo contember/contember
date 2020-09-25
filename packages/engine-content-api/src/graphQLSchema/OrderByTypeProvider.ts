@@ -5,7 +5,7 @@ import singletonFactory from '../utils/singletonFactory'
 import { GqlTypeName } from './utils'
 import Authorizator from '../acl/Authorizator'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export default class OrderByTypeProvider {
 	private orderBySingleton = singletonFactory(name => this.createEntityOrderByType(name))

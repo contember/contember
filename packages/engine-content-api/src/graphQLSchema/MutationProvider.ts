@@ -8,7 +8,7 @@ import Authorizator from '../acl/Authorizator'
 import EntityInputProvider from './mutations/EntityInputProvider'
 import { filterObject } from '../utils/object'
 import { aliasAwareResolver, GqlTypeName } from './utils'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 import { ExtensionKey, OperationMeta, Operation } from './OperationExtension'
 

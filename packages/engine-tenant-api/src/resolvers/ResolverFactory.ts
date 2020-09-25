@@ -19,7 +19,7 @@ import { MeQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } fr
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { ResetPasswordMutationResolver } from './mutation/person/ResetPasswordMutationResolver'
 import { IDPMutationResolver } from './mutation/person/IDPMutationResolver'
-import { JSONType } from '@contember/engine-common'
+import { JSONType } from '@contember/graphql-utils'
 
 class ResolverFactory {
 	public constructor(

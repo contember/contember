@@ -9,7 +9,7 @@ import { aliasAwareResolver, GqlTypeName } from '../../graphQLSchema/utils'
 import { Accessor } from '../../utils'
 import HasManyToHasOneReducer from './HasManyToHasOneReducer'
 import EntityFieldsProvider from '../EntityFieldsProvider'
-import { GraphQLObjectsFactory } from '../../graphQLSchema'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { getFieldsForUniqueWhere } from '../../utils/uniqueWhereFields'
 
 class HasManyToHasOneRelationReducerFieldVisitor

@@ -1,6 +1,5 @@
 import { Schema } from '@contember/schema'
 import { GraphQLSchema } from 'graphql'
-import { GraphQLObjectsFactory } from '@contember/engine-common'
 
 export interface Identity {
 	projectRoles: string[]

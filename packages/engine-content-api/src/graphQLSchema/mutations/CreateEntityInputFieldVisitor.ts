@@ -3,7 +3,7 @@ import { Acl, Model } from '@contember/schema'
 import ColumnTypeResolver from '../ColumnTypeResolver'
 import CreateEntityRelationInputProvider from './CreateEntityRelationInputProvider'
 import Authorizator from '../../acl/Authorizator'
-import { GraphQLObjectsFactory } from '../GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export default class CreateEntityInputFieldVisitor
 	implements

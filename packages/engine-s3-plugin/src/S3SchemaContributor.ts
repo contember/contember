@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig, GraphQLSchema } from 'graphql'
-import { GraphQLObjectsFactory } from '@contember/engine-common'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { S3Acl, S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
 import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier'

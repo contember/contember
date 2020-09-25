@@ -8,7 +8,7 @@ import { ReleaseTreeMutationResolver } from './mutation/ReleaseTreeMutationResol
 import { HistoryQueryResolver } from './query/HistoryQueryResolver'
 import { HistoryEventTypeResolver } from './types/HistoryEventTypeResolver'
 import { ExecutedMigrationsQueryResolver } from './query/ExecutedMigrationsQueryResolver'
-import { DateTimeType, JSONType } from '@contember/engine-common'
+import { DateTimeType, JSONType } from '@contember/graphql-utils'
 
 class ResolverFactory {
 	public constructor(

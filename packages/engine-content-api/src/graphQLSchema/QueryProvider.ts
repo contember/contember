@@ -6,7 +6,7 @@ import EntityTypeProvider from './EntityTypeProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import Authorizator from '../acl/Authorizator'
 import OrderByTypeProvider from './OrderByTypeProvider'
-import { GraphQLObjectsFactory } from './GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
 import { aliasAwareResolver, GqlTypeName } from './utils'
 

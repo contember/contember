@@ -2,7 +2,7 @@ import { GraphQLOutputType } from 'graphql'
 import { Model } from '@contember/schema'
 import ColumnTypeResolver from '../ColumnTypeResolver'
 import EntityTypeProvider from '../EntityTypeProvider'
-import { GraphQLObjectsFactory } from '../GraphQLObjectsFactory'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export default class FieldTypeVisitor
 	implements Model.ColumnVisitor<GraphQLOutputType>, Model.RelationByGenericTypeVisitor<GraphQLOutputType> {

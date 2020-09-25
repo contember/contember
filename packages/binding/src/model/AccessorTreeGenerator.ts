@@ -905,6 +905,10 @@ export class AccessorTreeGenerator {
 			)
 			existingEntityState.realms.add(onEntityUpdate)
 			existingEntityState.hasStaleAccessor = true
+			existingEntityState.eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
+				TreeParameterMerger.cloneSingleEntityEventListeners(existingEntityState.eventListeners),
+				TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
+			)
 			existingEntityState.creationParameters = {
 				forceCreation: existingEntityState.creationParameters.forceCreation || creationParameters.forceCreation,
 				isNonbearing: existingEntityState.creationParameters.isNonbearing && creationParameters.isNonbearing, // If either is false, it's bearing
@@ -914,6 +918,10 @@ export class AccessorTreeGenerator {
 				),
 			}
 			this.mergeInEntityFieldsContainer(existingEntityState, markersContainer)
+
+			if (existingEntityState.eventListeners.initialize?.size) {
+				this.newlyInitializedWithListeners.add(existingEntityState)
+			}
 
 			return existingEntityState
 		}

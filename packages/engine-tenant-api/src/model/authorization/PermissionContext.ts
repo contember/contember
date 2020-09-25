@@ -6,6 +6,8 @@ import { Identity } from './Identity'
 
 export type AccessVerifier = (action: Authorizator.Action) => Promise<boolean>
 
+const deniedScope = new AuthorizationScope.Fixed(AccessNode.Fixed.denied())
+
 export class PermissionContext {
 	private projectScopes: Record<string, AuthorizationScope<Identity>> = {}
 
@@ -45,10 +47,10 @@ export class PermissionContext {
 
 	public async createProjectScope(project: Pick<Project, 'slug'> | null): Promise<AuthorizationScope<Identity>> {
 		if (!project) {
-			return new AuthorizationScope.Fixed(AccessNode.Fixed.denied())
+			return deniedScope
 		}
 		if (!this.projectScopes[project.slug]) {
-			this.projectScopes[project.slug] = await this.projectScopeFactory.create(project)
+			this.projectScopes[project.slug] = (await this.projectScopeFactory.create(project)) || deniedScope
 		}
 		return this.projectScopes[project.slug]
 	}

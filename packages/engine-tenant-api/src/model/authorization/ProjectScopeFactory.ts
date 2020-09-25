@@ -10,10 +10,10 @@ export class ProjectScopeFactory {
 		private readonly aclSchemaEvaluatorFactory: AclSchemaEvaluatorFactory,
 	) {}
 
-	async create(project: Pick<Project, 'slug'>): Promise<AuthorizationScope<Identity>> {
+	async create(project: Pick<Project, 'slug'>): Promise<AuthorizationScope<Identity> | null> {
 		const schema = await this.schemaResolver(project.slug)
 		if (!schema) {
-			throw new Error(`undefined project ${project.slug}`)
+			return null
 		}
 		return new ProjectScope(project, schema.acl, this.aclSchemaEvaluatorFactory)
 	}

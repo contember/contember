@@ -6,9 +6,10 @@ import { createStageTree, StageCreator } from './stages'
 import { MigrationEventsQuery } from './queries'
 import { DatabaseContext, DatabaseContextFactory } from './database'
 import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
-import { DatabaseCredentials, EventManagerImpl, SingleConnection } from '@contember/database'
+import { DatabaseCredentials, EventManagerImpl, SerializationFailureError, SingleConnection } from '@contember/database'
 import { MigrationArgs } from '../migrations'
 import { createDatabaseIfNotExists, createPgClient } from '@contember/database-migrations'
+import { retryTransaction } from '@contember/database/dist/src/utils'
 
 export class ProjectInitializer {
 	constructor(
@@ -47,10 +48,12 @@ export class ProjectInitializer {
 			// eslint-disable-next-line no-console
 			console.groupEnd()
 		}
-		return dbContext.transaction(async trx => {
-			await this.createInitEvent(trx)
-			await this.initStages(trx, project)
-		})
+		return await retryTransaction(() =>
+			dbContext.transaction(async trx => {
+				await this.createInitEvent(trx)
+				await this.initStages(trx, project)
+			}),
+		)
 	}
 
 	private async createInitEvent(db: DatabaseContext) {

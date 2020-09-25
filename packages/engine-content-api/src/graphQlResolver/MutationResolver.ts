@@ -10,6 +10,7 @@ import { assertNever } from '../utils'
 import { ConstraintType, getInsertPrimary, InputErrorKind, MutationResultList, MutationResultType } from '../sql/Result'
 import { InputPreValidator } from '../input-validation/preValidation/InputPreValidator'
 import { ObjectNode } from '../inputProcessing'
+import { retryTransaction } from '@contember/database/dist/src/utils'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -338,35 +339,19 @@ export default class MutationResolver {
 	private async transaction<R extends { ok: boolean }>(
 		cb: (mapper: Mapper, db: Client<Connection.TransactionLike>) => Promise<R>,
 	): Promise<R> {
-		do {
-			let attempt = 0
-			try {
-				return await this.db.transaction(async trx => {
-					await trx.connection.query(Connection.REPEATABLE_READ)
-					await this.systemVariablesSetup(trx)
-					const mapper = this.mapperFactory(trx)
+		return await retryTransaction(async () => {
+			return await this.db.transaction(async trx => {
+				await trx.connection.query(Connection.REPEATABLE_READ)
+				await this.systemVariablesSetup(trx)
+				const mapper = this.mapperFactory(trx)
 
-					const result = await cb(mapper, trx)
-					if (!result.ok) {
-						await trx.connection.rollback()
-					}
-					return result
-				})
-			} catch (e) {
-				if (!(e instanceof SerializationFailureError)) {
-					throw e
+				const result = await cb(mapper, trx)
+				if (!result.ok) {
+					await trx.connection.rollback()
 				}
-				if (attempt++ >= 5) {
-					// eslint-disable-next-line no-console
-					console.error('Serialization failure, aborting')
-					throw e
-				}
-
-				// eslint-disable-next-line no-console
-				console.warn('Serialization failure, retrying')
-				await new Promise(resolve => setTimeout(resolve, Math.round(20 + Math.random() * 50)))
-			}
-		} while (true)
+				return result
+			})
+		})
 	}
 
 	private convertResultToErrors(result: MutationResultList): Result.ExecutionError[] {

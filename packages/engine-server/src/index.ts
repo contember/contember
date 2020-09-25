@@ -13,9 +13,9 @@ export async function run(
 	projectsDirectory: string,
 	plugins: Plugin[],
 ): Promise<Server[]> {
+	initSentry(config.server.logging.sentry?.dsn)
 	const container = new CompositionRoot().createMasterContainer(debug, config, projectsDirectory, plugins)
 	await container.initializer.initialize()
-	initSentry(config.server.logging.sentry?.dsn)
 
 	return await container.serverRunner.run()
 }

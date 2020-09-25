@@ -10,6 +10,10 @@ class StageCreator {
 	constructor(private readonly eventApplier: EventApplier) {}
 
 	public async createStage(db: DatabaseContext, parent: StageConfig | null, stage: StageConfig): Promise<boolean> {
+		const stageRow = await db.queryHandler.fetch(new StageBySlugQuery(stage.slug))
+		if (stageRow && stageRow.name === stage.name) {
+			return false
+		}
 		const created = await db.commandBus.execute(new CreateOrUpdateStageCommand(stage))
 		if (!created) {
 			return false

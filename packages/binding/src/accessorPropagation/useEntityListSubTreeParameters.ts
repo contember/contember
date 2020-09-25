@@ -61,7 +61,7 @@ export function useEntityListSubTreeParameters(
 				setOnCreate: qualifiedEntityList.setOnCreate!,
 				expectedMutation: qualifiedEntityList.expectedMutation!,
 				alias: qualifiedEntityList.alias!,
-				unstable_onInitialize: qualifiedEntityList.unstable_onInitialize!,
+				onInitialize: qualifiedEntityList.onInitialize!,
 			}
 			return new BoxedUnconstrainedQualifiedEntityList(
 				QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment),
@@ -78,7 +78,7 @@ export function useEntityListSubTreeParameters(
 			qualifiedEntityList.setOnCreate,
 			qualifiedEntityList.expectedMutation,
 			qualifiedEntityList.alias,
-			qualifiedEntityList.unstable_onInitialize,
+			qualifiedEntityList.onInitialize,
 			environment,
 		])
 	} else {
@@ -95,7 +95,7 @@ export function useEntityListSubTreeParameters(
 				limit: qualifiedEntityList.limit!,
 				alias: qualifiedEntityList.alias!,
 				expectedMutation: qualifiedEntityList.expectedMutation!,
-				unstable_onInitialize: qualifiedEntityList.unstable_onInitialize!,
+				onInitialize: qualifiedEntityList.onInitialize!,
 				onUpdate: qualifiedEntityList.onUpdate!,
 				onBeforeUpdate: qualifiedEntityList.onBeforeUpdate!,
 				onBeforePersist: qualifiedEntityList.onBeforePersist!,
@@ -113,7 +113,7 @@ export function useEntityListSubTreeParameters(
 			qualifiedEntityList.initialEntityCount,
 			qualifiedEntityList.alias,
 			qualifiedEntityList.expectedMutation,
-			qualifiedEntityList.unstable_onInitialize,
+			qualifiedEntityList.onInitialize,
 			qualifiedEntityList.onUpdate,
 			qualifiedEntityList.onBeforeUpdate,
 			qualifiedEntityList.onBeforePersist,

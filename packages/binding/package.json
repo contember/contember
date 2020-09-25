@@ -1,6 +1,6 @@
 {
   "name": "@contember/binding",
-  "version": "0.5.20",
+  "version": "0.5.21",
   "type": "module",
   "main": "dist/src/index.js",
   "scripts": {
@@ -9,10 +9,10 @@
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/client": "0.5.20",
-    "@contember/react-client": "0.5.20",
-    "@contember/react-multipass-rendering": "0.5.20",
-    "@contember/react-utils": "0.5.20",
+    "@contember/client": "0.5.21",
+    "@contember/react-client": "0.5.21",
+    "@contember/react-multipass-rendering": "0.5.21",
+    "@contember/react-utils": "0.5.21",
     "chevrotain": "6.5.0"
   },
   "peerDependencies": {

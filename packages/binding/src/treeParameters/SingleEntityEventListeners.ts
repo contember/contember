@@ -21,6 +21,6 @@ export interface UnsugarableSingleEntityEventListeners {
 	onConnectionUpdate?: {
 		[fieldName: string]: EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>
 	}
-	unstable_onInitialize?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
+	onInitialize?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
 	onUpdate?: EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>
 }

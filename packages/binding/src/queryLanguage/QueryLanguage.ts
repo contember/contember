@@ -122,7 +122,7 @@ export namespace QueryLanguage {
 			beforePersist: desugarEventListener(unsugarable.onBeforePersist),
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
 			connectionUpdate,
-			initialize: desugarEventListener(unsugarable.unstable_onInitialize),
+			initialize: desugarEventListener(unsugarable.onInitialize),
 			update: desugarEventListener(unsugarable.onUpdate),
 		}
 	}
@@ -134,7 +134,7 @@ export namespace QueryLanguage {
 			beforePersist: desugarEventListener(unsugarable.onBeforePersist),
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
 			childInitialize: desugarEventListener(unsugarable.onChildInitialize),
-			initialize: desugarEventListener(unsugarable.unstable_onInitialize),
+			initialize: desugarEventListener(unsugarable.onInitialize),
 			update: desugarEventListener(unsugarable.onUpdate),
 		}
 	}

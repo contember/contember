@@ -7,6 +7,7 @@ import {
 	Path as SlatePath,
 	Point,
 	Range as SlateRange,
+	Text,
 	Transforms,
 } from 'slate'
 import { ReactEditor } from 'slate-react'
@@ -30,6 +31,7 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		insertBreak,
 		isElementActive,
 		toggleElement,
+		onKeyDown,
 	} = editor
 
 	const e = (editor as any) as EditorWithTables<E>
@@ -51,9 +53,26 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			children: [{ text: '' }],
 		}),
 
+		selectTableCellContents: (table, rowIndex, columnIndex) => {
+			if (!Array.isArray(table)) {
+				table = ReactEditor.findPath(e, table)
+			}
+			Transforms.select(e, {
+				anchor: Editor.start(e, [...table, rowIndex, columnIndex]),
+				focus: Editor.end(e, [...table, rowIndex, columnIndex]),
+			})
+		},
+
 		getTableCellCoordinates: (element: TableCellElement) => {
 			const cellPath = ReactEditor.findPath(e, element)
 			return cellPath.slice(-2) as [number, number]
+		},
+		getTableRowCount: (element: TableElement): number => {
+			return element.children.length
+		},
+		getTableColumnCount: (element: TableElement): number => {
+			const firstRow = element.children[0] as TableRowElement | undefined
+			return firstRow?.children.length ?? 0
 		},
 		getTableRowNumber: (element: TableRowElement | TableCellElement) => {
 			if (e.isTableCell(element)) {
@@ -64,8 +83,7 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		},
 		addTableRow: (element: TableElement, index?: number) => {
 			const tablePath = ReactEditor.findPath(e, element)
-			const firstRow = element.children[0] as TableRowElement | undefined
-			const columnCount = firstRow?.children.length
+			const columnCount = e.getTableColumnCount(element)
 			const rowIndex = index ?? element.children.length
 
 			Transforms.insertNodes(e, e.createEmptyTableRowElement(columnCount), {
@@ -74,9 +92,8 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		},
 		addTableColumn: (element: TableElement, index?: number) => {
 			const tablePath = ReactEditor.findPath(e, element)
-			const firstRow = element.children[0] as TableRowElement | undefined
-			const columnCount = firstRow?.children.length
-			const rowCount = element.children.length
+			const columnCount = e.getTableColumnCount(element)
+			const rowCount = e.getTableRowCount(element)
 			const columnIndex = index ?? columnCount ?? 0
 
 			Editor.withoutNormalizing(e, () => {
@@ -227,6 +244,155 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				return // TODO nope for now
 			}
 			deleteFragment()
+		},
+		onKeyDown: event => {
+			if (
+				!editor.selection ||
+				!(
+					event.key === 'Tab' ||
+					event.key === 'ArrowUp' ||
+					event.key === 'ArrowRight' ||
+					event.key === 'ArrowDown' ||
+					event.key === 'ArrowLeft'
+				)
+			) {
+				return onKeyDown(event)
+			}
+			const closestBlockEntry = Editor.above(editor, {
+				at: editor.selection,
+				match: node => Editor.isBlock(editor, node),
+			})
+			if (!closestBlockEntry || !e.isTableCell(closestBlockEntry[0])) {
+				return onKeyDown(event)
+			}
+			const [cellElement, cellPath] = closestBlockEntry
+			if (cellPath.length < 3) {
+				return onKeyDown(event)
+			}
+			const [rowIndex, columnIndex] = e.getTableCellCoordinates(cellElement)
+			const tablePath = cellPath.slice(0, -2)
+			const tableElement = SlateNode.get(editor, tablePath) as TableElement
+			const rowCount = e.getTableRowCount(tableElement)
+			const columnCount = e.getTableColumnCount(tableElement)
+
+			if (rowCount === 0 || columnCount === 0) {
+				return
+			}
+
+			const moveSelectionBeforeTable = () => {
+				const pointBeforeTable = Editor.before(e, tablePath)
+				if (!pointBeforeTable) {
+					return onKeyDown(event)
+				}
+				event.preventDefault()
+				return Transforms.select(e, pointBeforeTable)
+			}
+			const moveSelectionAfterTable = () => {
+				const pointAfterTable = Editor.after(e, tablePath)
+				if (!pointAfterTable) {
+					return onKeyDown(event)
+				}
+				event.preventDefault()
+				return Transforms.select(e, pointAfterTable)
+			}
+
+			if (event.key === 'Tab') {
+				if (event.shiftKey) {
+					// Moving backwards
+					if (columnIndex > 0) {
+						event.preventDefault()
+						return e.selectTableCellContents(tablePath, rowIndex, columnIndex - 1)
+					} else if (columnIndex === 0) {
+						if (rowIndex > 0) {
+							event.preventDefault()
+							return e.selectTableCellContents(tablePath, rowIndex - 1, columnCount - 1)
+						}
+						return moveSelectionBeforeTable()
+					}
+				} else {
+					// Moving forwards
+					if (columnIndex < columnCount - 1) {
+						event.preventDefault()
+						return e.selectTableCellContents(tablePath, rowIndex, columnIndex + 1)
+					} else if (columnIndex === columnCount - 1) {
+						// We're at the right edge of the table
+						if (rowIndex < rowCount - 1) {
+							event.preventDefault()
+							return e.selectTableCellContents(tablePath, rowIndex + 1, 0)
+						} else if (rowIndex === rowCount - 1) {
+							return moveSelectionAfterTable()
+						}
+					}
+				}
+			}
+			const selection = editor.selection
+
+			if (event.key === 'ArrowLeft') {
+				if (!SlateRange.isCollapsed(selection)) {
+					return onKeyDown(event)
+				}
+				if (Point.equals(selection.focus, Editor.start(e, cellPath))) {
+					if (columnIndex > 0) {
+						event.preventDefault()
+						return Transforms.select(e, Editor.end(e, [...tablePath, rowIndex, columnIndex - 1]))
+					} else if (columnIndex === 0) {
+						if (rowIndex > 0) {
+							event.preventDefault()
+							return Transforms.select(e, Editor.end(e, [...tablePath, rowIndex - 1, columnCount - 1]))
+						}
+						return moveSelectionBeforeTable()
+					}
+				}
+			} else if (event.key === 'ArrowRight') {
+				if (!SlateRange.isCollapsed(selection)) {
+					return onKeyDown(event)
+				}
+				if (Point.equals(selection.focus, Editor.end(e, cellPath))) {
+					if (columnIndex < columnCount - 1) {
+						event.preventDefault()
+						return Transforms.select(e, Editor.start(e, [...tablePath, rowIndex, columnIndex + 1]))
+					} else if (columnIndex === columnCount - 1) {
+						if (rowIndex < rowCount - 1) {
+							event.preventDefault()
+							return Transforms.select(e, Editor.start(e, [...tablePath, rowIndex + 1, 0]))
+						} else if (rowIndex === rowCount - 1) {
+							return moveSelectionAfterTable()
+						}
+					}
+				}
+			} else if (event.key === 'ArrowUp') {
+				if (rowIndex > 0) {
+					event.preventDefault()
+					const rowAboveEndPoint = Editor.end(e, [...tablePath, rowIndex - 1, columnIndex])
+
+					if (!SlateRange.isCollapsed(selection)) {
+						return Transforms.select(e, rowAboveEndPoint)
+					}
+					const minOffset = Math.min(selection.focus.offset, rowAboveEndPoint.offset)
+					return Transforms.select(e, {
+						path: rowAboveEndPoint.path,
+						offset: minOffset,
+					})
+				}
+				return moveSelectionBeforeTable()
+			} else if (event.key === 'ArrowDown') {
+				if (rowIndex < rowCount - 1) {
+					event.preventDefault()
+					const rowBelowStatPoint = Editor.start(e, [...tablePath, rowIndex + 1, columnIndex])
+
+					if (!SlateRange.isCollapsed(selection)) {
+						return Transforms.select(e, rowBelowStatPoint)
+					}
+					const [rowBelowStatPointNode] = Editor.node(e, rowBelowStatPoint) as NodeEntry<Text>
+
+					return Transforms.select(e, {
+						path: rowBelowStatPoint.path,
+						offset: Math.min(selection.focus.offset, rowBelowStatPointNode.text.length),
+					})
+				}
+				return moveSelectionAfterTable()
+			}
+			onKeyDown(event)
 		},
 	})
 

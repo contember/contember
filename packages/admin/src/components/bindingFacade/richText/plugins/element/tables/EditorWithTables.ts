@@ -1,4 +1,4 @@
-import { Node as SlateNode } from 'slate'
+import { Node as SlateNode, Path as SlatePath } from 'slate'
 import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { TableCellElement } from './TableCellElement'
 import { TableElement } from './TableElement'
@@ -22,6 +22,9 @@ export interface WithTables<
 
 	getTableCellCoordinates: (element: TableCellElement) => [number, number] // RC
 	getTableRowNumber: (element: TableRowElement | TableCellElement) => number
+	getTableRowCount: (element: TableElement) => number
+	getTableColumnCount: (element: TableElement) => number
+	selectTableCellContents: (table: TableElement | SlatePath, rowIndex: number, columnIndex: number) => void
 
 	addTableRow: (element: TableElement, index?: number) => void
 	addTableColumn: (element: TableElement, index?: number) => void

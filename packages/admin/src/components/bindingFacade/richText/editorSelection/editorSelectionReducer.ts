@@ -6,6 +6,8 @@ export const defaultEditorSelectionState: EditorSelectionState = {
 	name: EditorSelectionStateName.Unfocused,
 }
 
+// TODO this whole thing needs reworked because the selection object is actually super mutable and that leads to some
+// 	fun situations…
 export const editorSelectionReducer = (
 	previousState: EditorSelectionState,
 	action: EditorSelectionAction,
@@ -19,6 +21,7 @@ export const editorSelectionReducer = (
 				return {
 					name: EditorSelectionStateName.CollapsedSelection,
 					selection: action.selection,
+					selectedString: action.selection.toString(),
 				}
 			} else if (action.selection.type === 'Range') {
 				if (previousState.name === EditorSelectionStateName.EmergingPointerSelection) {
@@ -33,11 +36,13 @@ export const editorSelectionReducer = (
 						startEvent: previousState.startEvent,
 						finishEvent: previousState.finishEvent,
 						selection: action.selection,
+						selectedString: action.selection.toString(),
 					}
 				}
 				return {
 					name: EditorSelectionStateName.ExpandedNonPointerSelection,
 					selection: action.selection,
+					selectedString: action.selection.toString(),
 				}
 			}
 			return previousState
@@ -46,6 +51,7 @@ export const editorSelectionReducer = (
 			return {
 				name: EditorSelectionStateName.EmergingPointerSelection,
 				selection: undefined,
+				selectedString: '',
 				startEvent: action.event,
 				finishEvent: undefined,
 			}
@@ -63,6 +69,7 @@ export const editorSelectionReducer = (
 					return {
 						name: EditorSelectionStateName.CollapsedSelection,
 						selection,
+						selectedString: selection.toString(),
 					}
 				} else if (selection.type === 'Range') {
 					if (action.event) {
@@ -71,11 +78,13 @@ export const editorSelectionReducer = (
 							startEvent: previousState.startEvent,
 							finishEvent: action.event,
 							selection,
+							selectedString: selection.toString(),
 						}
 					}
 					return {
 						name: EditorSelectionStateName.ExpandedNonPointerSelection,
 						selection,
+						selectedString: selection.toString(),
 					}
 				}
 				return previousState

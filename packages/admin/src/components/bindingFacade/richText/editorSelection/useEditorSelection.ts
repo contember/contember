@@ -1,6 +1,6 @@
 import { debounce } from 'debounce'
 import * as React from 'react'
-import { Range as SlateRange } from 'slate'
+import { Editor, Range as SlateRange } from 'slate'
 import { ReactEditor, useEditor } from 'slate-react'
 import { EditorSelectionActionType } from './EditorSelectionActionType'
 import { defaultEditorSelectionState, editorSelectionReducer } from './editorSelectionReducer'
@@ -15,28 +15,34 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 
 	const onDOMSelectionChange = debounce(
 		React.useCallback(() => {
-			const selection = getSelection()
+			const domSelection = getSelection()
 			const isRelevant =
-				selection && selection.anchorNode && ReactEditor.hasDOMNode(editor, selection.anchorNode, { editable: true })
+				domSelection &&
+				domSelection.anchorNode &&
+				ReactEditor.hasDOMNode(editor, domSelection.anchorNode, { editable: true })
 
 			if (isRelevant) {
 				if (
 					(selectionStateRef.current.name === EditorSelectionStateName.ExpandedPointerSelection ||
 						selectionStateRef.current.name === EditorSelectionStateName.ExpandedNonPointerSelection) &&
-					!selection!.isCollapsed &&
-					selectionStateRef.current.selection &&
-					SlateRange.equals(
-						ReactEditor.toSlateRange(editor, selectionStateRef.current.selection),
-						ReactEditor.toSlateRange(editor, selection!),
-					)
+					!domSelection!.isCollapsed &&
+					selectionStateRef.current.selection
 				) {
-					// We've likely just changed a mark or something. To the DOM, this *is* a selection change but as far as we're
-					// concerned they are the same.
-					return
+					const stateSelectionRange = ReactEditor.toSlateRange(editor, selectionStateRef.current.selection)
+					const domSelectionRange = ReactEditor.toSlateRange(editor, domSelection!)
+
+					if (
+						SlateRange.equals(stateSelectionRange, domSelectionRange) &&
+						(!editor.selection || Editor.string(editor, editor.selection) === selectionStateRef.current.selectedString)
+					) {
+						// We've likely just changed a mark or something. To the DOM, this *is* a selection change but as far as we're
+						// concerned they are the same.
+						return
+					}
 				}
 				dispatch({
 					type: EditorSelectionActionType.SetSelection,
-					selection: selection!,
+					selection: domSelection!,
 				})
 			} else {
 				dispatch({

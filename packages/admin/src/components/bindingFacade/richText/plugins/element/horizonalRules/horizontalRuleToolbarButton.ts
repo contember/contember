@@ -5,5 +5,5 @@ export const horizontalRuleToolbarButton: ElementToolbarButton<HorizontalRuleEle
 	elementType: horizontalRuleElementType,
 	label: 'Horizontal line',
 	title: 'Horizontal line',
-	blueprintIcon: 'layout-linear', // TODO this is a really inappropriate icon
+	contemberIcon: 'horizontalRule',
 }

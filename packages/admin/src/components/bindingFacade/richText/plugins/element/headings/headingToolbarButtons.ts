@@ -6,7 +6,7 @@ export const headingOneToolbarButton: ElementToolbarButton<HeadingElement> = {
 	contemberIcon: 'heading1',
 	label: 'Heading level 1',
 	title: 'Heading level 1',
-	suchThat: { level: 1 },
+	suchThat: { level: 1, isNumbered: false },
 }
 
 export const headingOneNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
@@ -22,7 +22,7 @@ export const headingTwoToolbarButton: ElementToolbarButton<HeadingElement> = {
 	contemberIcon: 'heading2',
 	label: 'Heading level 2',
 	title: 'Heading level 2',
-	suchThat: { level: 2 },
+	suchThat: { level: 2, isNumbered: false },
 }
 
 export const headingTwoNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
@@ -38,7 +38,7 @@ export const headingThreeToolbarButton: ElementToolbarButton<HeadingElement> = {
 	contemberIcon: 'heading3',
 	label: 'Heading level 3',
 	title: 'Heading level 3',
-	suchThat: { level: 3 },
+	suchThat: { level: 3, isNumbered: false },
 }
 
 export const headingThreeNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
@@ -54,7 +54,7 @@ export const headingFourToolbarButton: ElementToolbarButton<HeadingElement> = {
 	contemberIcon: 'heading4',
 	label: 'Heading level 4',
 	title: 'Heading level 4',
-	suchThat: { level: 4 },
+	suchThat: { level: 4, isNumbered: false },
 }
 
 export const headingFourNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
@@ -70,7 +70,7 @@ export const headingFiveToolbarButton: ElementToolbarButton<HeadingElement> = {
 	contemberIcon: 'heading5',
 	label: 'Heading level 5',
 	title: 'Heading level 5',
-	suchThat: { level: 5 },
+	suchThat: { level: 5, isNumbered: false },
 }
 
 export const headingFiveNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
@@ -86,7 +86,7 @@ export const headingSixToolbarButton: ElementToolbarButton<HeadingElement> = {
 	contemberIcon: 'heading6',
 	label: 'Heading level 6',
 	title: 'Heading level 6',
-	suchThat: { level: 6 },
+	suchThat: { level: 6, isNumbered: false },
 }
 
 export const headingSixNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {

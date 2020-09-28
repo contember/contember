@@ -14,10 +14,15 @@ export const isElementType = <Element extends ElementNode>(
 	}
 
 	for (const prop in suchThat) {
-		if (
-			!(prop in element) ||
-			(element as Element)[prop as keyof Element] !== suchThat[prop as keyof ElementSpecifics<Element>]
-		) {
+		const propValue = suchThat[prop as keyof ElementSpecifics<Element>]
+		const propPresent = prop in element
+
+		if (!propValue && !propPresent) {
+			// Falsy values get special treatment.
+			continue
+		}
+
+		if (!propPresent || (element as Element)[prop as keyof Element] !== propValue) {
 			return false
 		}
 	}

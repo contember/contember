@@ -25,7 +25,13 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		canToggleElement: <E extends ElementNode>() => true,
 
 		hasMarks: <T extends TextNode>(marks: TextSpecifics<T>) => ContemberEditor.hasMarks(editorWithEssentials, marks),
-		isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => false, // TODO
+
+		// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
+		// 	include empty strings at the edges of top-level elements.
+		isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
+			Array.from(ContemberEditor.topLevelNodes(editorWithEssentials)).every(([node]) =>
+				ContemberEditor.isElementType(node, elementType, suchThat),
+			),
 
 		toggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => {
 			if (!editorWithEssentials.canToggleMarks(marks)) {

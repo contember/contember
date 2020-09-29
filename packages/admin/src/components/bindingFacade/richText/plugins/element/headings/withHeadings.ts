@@ -56,14 +56,8 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 	// 	return normalizedPrevious.map(level => Math.max(level, 1))
 	// }
 
-	// TODO in the following two functions, we need to conditionally trim the selection so that it doesn't potentially
+	// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
 	// 	include empty strings at the edges of top-level elements.
-	e.isElementActive = (elementType, suchThat) => {
-		if (elementType === headingElementType) {
-			return Array.from(ContemberEditor.topLevelNodes(e)).every(([node]) => isHeading(node, suchThat))
-		}
-		return isElementActive(elementType, suchThat)
-	}
 	e.toggleElement = (elementType, suchThat) => {
 		if (elementType === headingElementType) {
 			SlateEditor.withoutNormalizing(e, () => {

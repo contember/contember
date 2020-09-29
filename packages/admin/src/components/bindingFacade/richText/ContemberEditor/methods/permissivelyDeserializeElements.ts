@@ -1,5 +1,6 @@
 import { BaseEditor, ElementNode, TextNode } from '../../baseEditor'
 import { Text as SlateText } from 'slate'
+import { toLatestFormat } from './toLatestFormat'
 
 export const permissivelyDeserializeElements = <E extends BaseEditor>(
 	editor: E,
@@ -16,11 +17,14 @@ export const permissivelyDeserializeElements = <E extends BaseEditor>(
 
 		if ('formatVersion' in deserialized) {
 			const children = deserialized.children
+			const targetElements: ElementNode[] = SlateText.isText(children[0])
+				? [editor.createDefaultElement(children)]
+				: (children as ElementNode[])
 
-			if (SlateText.isText(children[0])) {
-				return [editor.createDefaultElement(children)]
-			}
-			return children as ElementNode[]
+			return toLatestFormat(editor, {
+				formatVersion: deserialized.formatVersion,
+				children: targetElements,
+			}).children
 		}
 		return [deserialized]
 	} catch (e) {

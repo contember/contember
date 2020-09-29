@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Element as SlateElement } from 'slate'
+import { Element as SlateElement, Node as SlateNode } from 'slate'
 import { RenderElementProps, RenderLeafProps } from 'slate-react'
 import { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
 
@@ -19,6 +19,8 @@ export interface WithEssentials<E extends EditorNode> {
 
 	serializeElements: (elements: ElementNode[], errorMessage?: string) => string
 	deserializeElements: (serializedElement: string, errorMessage?: string) => ElementNode[]
+
+	upgradeFormatBySingleVersion: (node: SlateNode, oldVersion: number) => SlateNode
 
 	// <Editable> props
 	onDOMBeforeInput: (event: Event) => void

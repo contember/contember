@@ -1,4 +1,5 @@
 import { BaseEditor, ElementNode, SerializableEditorNode } from '../../baseEditor'
+import { toLatestFormat } from './toLatestFormat'
 
 export const strictlyDeserializeElements = <E extends BaseEditor>(
 	editor: E,
@@ -7,7 +8,7 @@ export const strictlyDeserializeElements = <E extends BaseEditor>(
 ): ElementNode[] => {
 	try {
 		const deserialized: SerializableEditorNode = JSON.parse(serializedElement)
-		return deserialized.children
+		return toLatestFormat(editor, deserialized).children
 	} catch (e) {
 		throw new Error(errorMessage || `Editor: deserialization error`)
 	}

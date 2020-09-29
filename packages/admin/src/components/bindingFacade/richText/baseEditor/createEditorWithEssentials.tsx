@@ -1,5 +1,5 @@
 import React from 'react'
-import { createEditor, Editor, Path, Range as SlateRange, Transforms } from 'slate'
+import { createEditor, Editor, Element as SlateElement, Path, Range as SlateRange, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
@@ -51,6 +51,16 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			ContemberEditor.serializeElements(editorWithEssentials, elements, errorMessage),
 		deserializeElements: (serializedElement, errorMessage) =>
 			ContemberEditor.permissivelyDeserializeElements(editorWithEssentials, serializedElement, errorMessage),
+
+		upgradeFormatBySingleVersion: (node, oldVersion) => {
+			if (SlateElement.isElement(node)) {
+				return {
+					...node,
+					children: node.children.map(child => editorWithEssentials.upgradeFormatBySingleVersion(child, oldVersion)),
+				}
+			}
+			return node
+		},
 
 		renderElement: props => React.createElement(DefaultElement, props),
 

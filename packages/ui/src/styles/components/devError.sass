@@ -26,13 +26,13 @@
 	&::before
 		+absolute(0)
 		content: ''
-		background: lighten($cui-color-danger, 20) center center url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='500px' width='500px'><text text-anchor='middle' x='250' y='250' fill='red' font-size='60' font-weight='900' style='transform-origin: center center; transform: rotate(-45deg)'>FATAL ERROR</text></svg>") repeat
-		opacity: 0.15
+		background: center center url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='500px' width='500px'><text text-anchor='middle' x='250' y='250' fill='red' font-size='60' font-weight='900' style='transform-origin: center center; transform: rotate(-45deg)'>FATAL ERROR</text></svg>") repeat
+		opacity: 0.2
 
 	&-in
 		z-index: 100
 		margin: 1em
-		padding: 3em
+		padding: 1.5em 2.5em
 		max-width: 45em
 		max-height: 90vh
 		border-radius: .5em
@@ -46,7 +46,7 @@
 	&-message
 		margin: 0
 		flex: 0 0 auto
-		color: $cui-color-danger
+		font-weight: $fw-light
 
 	&-stack
 		margin-top: 1em

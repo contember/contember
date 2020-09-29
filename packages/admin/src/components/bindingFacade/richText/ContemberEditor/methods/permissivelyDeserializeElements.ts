@@ -7,27 +7,27 @@ export const permissivelyDeserializeElements = <E extends BaseEditor>(
 	serializedElement: string,
 	errorMessage?: string,
 ): ElementNode[] => {
+	let deserialized:
+		| {
+				formatVersion: number
+				children: ElementNode[] | TextNode[]
+		  }
+		| ElementNode
 	try {
-		const deserialized:
-			| {
-					formatVersion: number
-					children: ElementNode[] | TextNode[]
-			  }
-			| ElementNode = JSON.parse(serializedElement)
-
-		if ('formatVersion' in deserialized) {
-			const children = deserialized.children
-			const targetElements: ElementNode[] = SlateText.isText(children[0])
-				? [editor.createDefaultElement(children)]
-				: (children as ElementNode[])
-
-			return toLatestFormat(editor, {
-				formatVersion: deserialized.formatVersion,
-				children: targetElements,
-			}).children
-		}
-		return [deserialized]
+		deserialized = JSON.parse(serializedElement)
 	} catch (e) {
 		return [editor.createDefaultElement([{ text: serializedElement }])]
 	}
+	if ('formatVersion' in deserialized) {
+		const children = deserialized.children
+		const targetElements: ElementNode[] = SlateText.isText(children[0])
+			? [editor.createDefaultElement(children)]
+			: (children as ElementNode[])
+
+		return toLatestFormat(editor, {
+			formatVersion: deserialized.formatVersion,
+			children: targetElements,
+		}).children
+	}
+	return [deserialized]
 }

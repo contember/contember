@@ -20,7 +20,6 @@ export class DevErrorBoundary extends React.PureComponent<DevErrorBoundaryProps,
 	}
 
 	public render() {
-		console.log('DEV error boundary rendered')
 		const errorSlot =
 			__DEV_MODE__ && this.state.caughtError ? (
 				<Portal>

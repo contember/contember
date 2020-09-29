@@ -97,8 +97,6 @@ export const BlockEditorInner = React.memo(
 		augmentEditor,
 		augmentEditorBuiltins,
 	}: BlockEditorInnerProps) => {
-		const renderCountRef = React.useRef(0)
-
 		const isMutating = useMutationState()
 
 		const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
@@ -155,8 +153,6 @@ export const BlockEditorInner = React.memo(
 			sortedEntitiesRef.current = entities
 			normalizedLeadingFieldsRef.current = leadingFieldBackedElements
 			//normalizedTrailingFieldsRef.current = trailingFieldBackedElements
-
-			renderCountRef.current++
 		}) // Deliberately no deps array
 
 		const [editor] = React.useState(() =>

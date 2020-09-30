@@ -1,5 +1,14 @@
 import * as React from 'react'
-import { Editor as SlateEditor, Node as SlateNode, Path as SlatePath, Range as SlateRange, Transforms } from 'slate'
+import {
+	Editor,
+	Editor as SlateEditor,
+	Element as SlateElement,
+	Node as SlateNode,
+	Path as SlatePath,
+	Point,
+	Range as SlateRange,
+	Transforms,
+} from 'slate'
 import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithHeadings, WithHeadings } from './EditorWithHeadings'
@@ -8,7 +17,7 @@ import { HeadingRenderer, HeadingRendererProps } from './HeadingRenderer'
 
 export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeadings<E> => {
 	const e: E & Partial<WithHeadings<WithAnotherNodeType<E, HeadingElement>>> = editor
-	const { renderElement, insertBreak, isElementActive, toggleElement } = editor
+	const { renderElement, insertBreak, isElementActive, toggleElement, deleteBackward } = editor
 
 	const isHeading = (
 		element: SlateNode | ElementNode,
@@ -111,6 +120,33 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 				ejectHeading(path)
 			}
 		})
+	}
+
+	e.deleteBackward = unit => {
+		const selection = e.selection
+		if (unit !== 'character' || !selection || !SlateRange.isCollapsed(selection) || selection.focus.offset !== 0) {
+			return deleteBackward(unit)
+		}
+		// The offset being zero doesn't necessarily imply that selection refers to the start of a heading.
+		// It's just a way to early-exit.
+
+		const closestNumberedEntry = Editor.above<HeadingElement>(e, {
+			match: node => SlateElement.isElement(node) && isHeading(node, { isNumbered: true }),
+		})
+		if (closestNumberedEntry === undefined) {
+			return deleteBackward(unit)
+		}
+		const [, headingPath] = closestNumberedEntry
+		const headingStartPoint = Editor.start(editor, headingPath)
+
+		if (!Point.equals(headingStartPoint, selection.focus)) {
+			return deleteBackward(unit)
+		}
+		Transforms.setNodes(
+			editor,
+			{ isNumbered: null }, // null removes the key altogether
+			{ at: headingPath },
+		)
 	}
 
 	return (e as unknown) as EditorWithHeadings<E>

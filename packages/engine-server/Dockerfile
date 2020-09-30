@@ -9,6 +9,8 @@ RUN yarn install
 
 FROM node:12-alpine
 
+RUN apk --no-cache add curl
+
 WORKDIR /src
 COPY --from=builder /src/ /src
 

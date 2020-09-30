@@ -1,11 +1,11 @@
 {
   "name": "@contember/database-migrations",
-  "version": "0.9.0-alpha.8",
+  "version": "0.9.0-beta.1",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/database": "^0.9.0-alpha.8",
+    "@contember/database": "^0.9.0-beta.1",
     "node-pg-migrate": "^4.8.0"
   },
   "devDependencies": {

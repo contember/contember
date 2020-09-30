@@ -11,7 +11,7 @@ export const paragraphToolbarButton: ElementToolbarButton<ParagraphElement> = {
 
 export const paragraphNumberedToolbarButton: ElementToolbarButton<ParagraphElement> = {
 	elementType: paragraphElementType,
-	blueprintIcon: 'paragraph', // TODO
+	contemberIcon: 'paragraphNumbered',
 	label: 'Numbered paragraph',
 	title: 'Numbered paragraph',
 	suchThat: { isNumbered: true },

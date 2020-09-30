@@ -1,6 +1,6 @@
 {
   "name": "@contember/template-workspace",
-  "version": "0.9.0-beta.2",
+  "version": "0.9.0",
   "license": "Apache-2.0",
   "scripts": {
     "version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml && git add contember.workspace.yaml"
@@ -11,7 +11,7 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@contember/schema": "^0.9.0-beta.2",
-    "@contember/schema-definition": "^0.9.0-beta.2"
+    "@contember/schema": "^0.9.0",
+    "@contember/schema-definition": "^0.9.0"
   }
 }

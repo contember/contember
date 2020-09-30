@@ -11,7 +11,7 @@ export const headingOneToolbarButton: ElementToolbarButton<HeadingElement> = {
 
 export const headingOneNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
 	elementType: headingElementType,
-	contemberIcon: 'heading1', // TODO
+	contemberIcon: 'heading1Numbered',
 	label: 'Numbered heading level 1',
 	title: 'Numbered heading level 1',
 	suchThat: { level: 1, isNumbered: true },
@@ -27,7 +27,7 @@ export const headingTwoToolbarButton: ElementToolbarButton<HeadingElement> = {
 
 export const headingTwoNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
 	elementType: headingElementType,
-	contemberIcon: 'heading2', // TODO
+	contemberIcon: 'heading2Numbered',
 	label: 'Numbered heading level 2',
 	title: 'Numbered heading level 2',
 	suchThat: { level: 2, isNumbered: true },
@@ -43,7 +43,7 @@ export const headingThreeToolbarButton: ElementToolbarButton<HeadingElement> = {
 
 export const headingThreeNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
 	elementType: headingElementType,
-	contemberIcon: 'heading3', // TODO
+	contemberIcon: 'heading3Numbered',
 	label: 'Numbered heading level 3',
 	title: 'Numbered heading level 3',
 	suchThat: { level: 3, isNumbered: true },
@@ -59,7 +59,7 @@ export const headingFourToolbarButton: ElementToolbarButton<HeadingElement> = {
 
 export const headingFourNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
 	elementType: headingElementType,
-	contemberIcon: 'heading4', // TODO
+	contemberIcon: 'heading4Numbered',
 	label: 'Numbered heading level 4',
 	title: 'Numbered heading level 4',
 	suchThat: { level: 4, isNumbered: true },
@@ -75,7 +75,7 @@ export const headingFiveToolbarButton: ElementToolbarButton<HeadingElement> = {
 
 export const headingFiveNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
 	elementType: headingElementType,
-	contemberIcon: 'heading5', // TODO
+	contemberIcon: 'heading5Numbered',
 	label: 'Numbered heading level 5',
 	title: 'Numbered heading level 5',
 	suchThat: { level: 5, isNumbered: true },
@@ -91,7 +91,7 @@ export const headingSixToolbarButton: ElementToolbarButton<HeadingElement> = {
 
 export const headingSixNumberedToolbarButton: ElementToolbarButton<HeadingElement> = {
 	elementType: headingElementType,
-	contemberIcon: 'heading6', // TODO
+	contemberIcon: 'heading6Numbered',
 	label: 'Numbered heading level 6',
 	title: 'Numbered heading level 6',
 	suchThat: { level: 6, isNumbered: true },

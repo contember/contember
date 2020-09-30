@@ -1,6 +1,6 @@
 {
 	"name": "@contember/client",
-	"version": "0.5.21",
+	"version": "0.5.22",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",

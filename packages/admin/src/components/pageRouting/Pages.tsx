@@ -1,3 +1,4 @@
+import { DevErrorBoundary } from '@contember/ui'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
@@ -65,16 +66,18 @@ class Pages extends React.PureComponent<PagesProps & PagesStateProps> {
 		const isProvider = isPageProvider(matchedPage)
 		const Layout = this.props.layout || React.Fragment
 		return (
-			<Layout>
-				{isProvider && (
-					<ParametersContext.Provider value={this.props.parameters}>
-						<React.Fragment key={pageName}>{matchedPage}</React.Fragment>
-					</ParametersContext.Provider>
-				)}
-				{isProvider || (
-					<React.Fragment key={pageName}>{matchedPage.props.children(this.props.parameters)}</React.Fragment>
-				)}
-			</Layout>
+			<DevErrorBoundary>
+				<Layout>
+					{isProvider && (
+						<ParametersContext.Provider value={this.props.parameters}>
+							<React.Fragment key={pageName}>{matchedPage}</React.Fragment>
+						</ParametersContext.Provider>
+					)}
+					{isProvider || (
+						<React.Fragment key={pageName}>{matchedPage.props.children(this.props.parameters)}</React.Fragment>
+					)}
+				</Layout>
+			</DevErrorBoundary>
 		)
 	}
 }

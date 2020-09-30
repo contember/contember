@@ -1,3 +1,4 @@
+import { DevError } from '@contember/ui'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { Admin } from '../components'
@@ -53,5 +54,30 @@ export const runAdmin = (
 	const projectConfigs = Object.values(projects)
 		.map(it => (Array.isArray(it) ? it : [it]))
 		.reduce((acc, it) => [...acc, ...it], [])
-	ReactDOM.render(reactRoot(config, projectConfigs), rootEl)
+
+	const handleError = (error: Error | PromiseRejectionEvent | ErrorEvent) => {
+		if (!__DEV_MODE__) {
+			return
+		}
+		const errorElementId = '__contember__dev__error__container__element'
+		let errorContainer = document.getElementById(errorElementId)
+
+		if (errorContainer) {
+			return
+		}
+
+		errorContainer = document.createElement('div')
+		errorContainer.id = errorElementId
+
+		document.body.appendChild(errorContainer)
+		ReactDOM.render(<DevError error={error} />, errorContainer)
+	}
+
+	window.addEventListener('error', handleError)
+	window.addEventListener('unhandledrejection', handleError)
+	try {
+		ReactDOM.render(reactRoot(config, projectConfigs), rootEl)
+	} catch (e) {
+		handleError(e)
+	}
 }

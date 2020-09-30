@@ -633,3 +633,14 @@ $cui-progressBar-foreground-color: #85FF00;
 // FileDropZone
 $cui-fileDropZone-border-color: #DFDFDF;
 $cui-fileDropZone-active-border-color: $cui-box-active-color;
+
+// Editor
+$cui-editor-heading-counters: (
+	"#{$cui-conf-globalPrefix}editorHeading-1"
+	"#{$cui-conf-globalPrefix}editorHeading-2"
+	"#{$cui-conf-globalPrefix}editorHeading-3"
+	"#{$cui-conf-globalPrefix}editorHeading-4"
+	"#{$cui-conf-globalPrefix}editorHeading-5"
+	"#{$cui-conf-globalPrefix}editorHeading-6"
+);
+$cui-editor-paragraph-counter: "#{$cui-conf-globalPrefix}editorParagraph-counter"

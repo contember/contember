@@ -1,5 +1,5 @@
 import React from 'react'
-import { createEditor, Editor, Path, Range as SlateRange, Transforms } from 'slate'
+import { createEditor, Editor, Element as SlateElement, Path, Range as SlateRange, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
@@ -25,7 +25,13 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		canToggleElement: <E extends ElementNode>() => true,
 
 		hasMarks: <T extends TextNode>(marks: TextSpecifics<T>) => ContemberEditor.hasMarks(editorWithEssentials, marks),
-		isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => false, // TODO
+
+		// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
+		// 	include empty strings at the edges of top-level elements.
+		isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
+			Array.from(ContemberEditor.topLevelNodes(editorWithEssentials)).every(([node]) =>
+				ContemberEditor.isElementType(node, elementType, suchThat),
+			),
 
 		toggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => {
 			if (!editorWithEssentials.canToggleMarks(marks)) {
@@ -45,6 +51,16 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			ContemberEditor.serializeElements(editorWithEssentials, elements, errorMessage),
 		deserializeElements: (serializedElement, errorMessage) =>
 			ContemberEditor.permissivelyDeserializeElements(editorWithEssentials, serializedElement, errorMessage),
+
+		upgradeFormatBySingleVersion: (node, oldVersion) => {
+			if (SlateElement.isElement(node)) {
+				return {
+					...node,
+					children: node.children.map(child => editorWithEssentials.upgradeFormatBySingleVersion(child, oldVersion)),
+				}
+			}
+			return node
+		},
 
 		renderElement: props => React.createElement(DefaultElement, props),
 

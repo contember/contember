@@ -18,7 +18,7 @@ import * as React from 'react'
 import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { assertNever } from '../../../../utils'
-import { getDiscriminatedBlock, NormalizedBlocks, useNormalizedBlocks } from '../../blocks'
+import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../discrimination'
 import { CreateEditorPublicOptions } from '../editorFactory'
 import { RichEditor } from '../RichEditor'
@@ -97,8 +97,6 @@ export const BlockEditorInner = React.memo(
 		augmentEditor,
 		augmentEditorBuiltins,
 	}: BlockEditorInnerProps) => {
-		const renderCountRef = React.useRef(0)
-
 		const isMutating = useMutationState()
 
 		const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
@@ -106,7 +104,7 @@ export const BlockEditorInner = React.memo(
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
 
-		const { entities, moveEntity, appendNew } = useSortedEntities(accessor, sortableBy)
+		const { entities } = useSortedEntities(accessor, sortableBy)
 
 		const textBlockDiscriminant = React.useMemo<FieldValue>(() => {
 			if (textBlockDiscriminateBy !== undefined) {
@@ -155,8 +153,6 @@ export const BlockEditorInner = React.memo(
 			sortedEntitiesRef.current = entities
 			normalizedLeadingFieldsRef.current = leadingFieldBackedElements
 			//normalizedTrailingFieldsRef.current = trailingFieldBackedElements
-
-			renderCountRef.current++
 		}) // Deliberately no deps array
 
 		const [editor] = React.useState(() =>
@@ -207,15 +203,7 @@ export const BlockEditorInner = React.memo(
 
 		// TODO label?
 		return (
-			<BlockEditorGetEntityByKeyContext.Provider
-				value={key => {
-					const entity = accessor.getChildEntityByKey(key)
-					if (!(entity instanceof EntityAccessor)) {
-						throw new BindingError(`Corrupted data.`)
-					}
-					return entity
-				}}
-			>
+			<BlockEditorGetEntityByKeyContext.Provider value={key => accessor.getChildEntityByKey(key)}>
 				<BlockEditorGetNormalizedFieldBackedElementContext.Provider
 					value={element => {
 						let normalizedElements: NormalizedFieldBackedElement[]

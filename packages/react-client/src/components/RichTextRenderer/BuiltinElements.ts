@@ -64,6 +64,7 @@ export interface RichTextParagraphElement<
 	CustomLeaves extends RichTextLeaf = never
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'paragraph'
+	isNumbered?: boolean
 }
 
 export interface RichTextScrollTargetElement<

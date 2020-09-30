@@ -9,6 +9,7 @@ import {
 	removeMarks,
 	serializeElements,
 	strictlyDeserializeElements,
+	toLatestFormat,
 	topLevelNodes,
 } from './methods'
 
@@ -24,5 +25,6 @@ export const ContemberEditor = {
 	removeMarks,
 	serializeElements,
 	strictlyDeserializeElements,
+	toLatestFormat,
 	topLevelNodes,
 }

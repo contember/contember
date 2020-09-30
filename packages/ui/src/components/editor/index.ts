@@ -1,7 +1,9 @@
 export * from './table'
 
 export * from './EditorCanvas'
+export * from './EditorHeading'
 export * from './EditorNonEditable'
+export * from './EditorParagraph'
 export * from './EditorPlaceholder'
 export * from './EditorToolbar'
 export * from './EditorToolbarButton'

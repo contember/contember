@@ -1,3 +1,4 @@
+import { EditorParagraph } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { ParagraphElement } from './ParagraphElement'
@@ -6,7 +7,10 @@ export interface ParagraphRendererProps extends Omit<RenderElementProps, 'elemen
 	element: ParagraphElement
 }
 
-export const ParagraphRenderer: React.FunctionComponent<ParagraphRendererProps> = (props: ParagraphRendererProps) => (
-	<p {...props.attributes}>{props.children}</p>
-)
-ParagraphRenderer.displayName = 'ParagraphRenderer'
+export function ParagraphRenderer({ attributes, children, element }: ParagraphRendererProps) {
+	return (
+		<EditorParagraph attributes={attributes} isNumbered={element.isNumbered}>
+			{children}
+		</EditorParagraph>
+	)
+}

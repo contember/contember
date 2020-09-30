@@ -1,0 +1,58 @@
+@import '../common'
+
+@keyframes #{$cui-conf-globalPrefix}devErrorIntro
+	0%
+		opacity: 0
+	100%
+		opacity: 1
+
+@keyframes #{$cui-conf-globalPrefix}devErrorIntroIn
+	0%
+		opacity: 0
+		transform: translateY(-20%) scale(1.1)
+	100%
+		opacity: 1
+		transform: translateY(0) scale(1)
+
+.#{$cui-conf-globalPrefix}devError
+	+fixed(0)
+	+size(100vw 100vh)
+	z-index: 99
+	display: flex
+	justify-content: center
+	align-items: center
+	animation: #{$cui-conf-globalPrefix}devErrorIntro .2s forwards
+
+	&::before
+		+absolute(0)
+		content: ''
+		background: center center url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='500px' width='500px'><text text-anchor='middle' x='250' y='250' fill='red' font-size='60' font-weight='900' style='transform-origin: center center; transform: rotate(-45deg)'>FATAL ERROR</text></svg>") repeat
+		opacity: 0.2
+
+	&-in
+		z-index: 100
+		margin: 1em
+		padding: 1.5em 2.5em
+		max-width: 45em
+		max-height: 90vh
+		border-radius: .5em
+		border: em(2px) solid $cui-color-danger
+		background: #fff
+		display: flex
+		flex-direction: column
+		opacity: 0
+		animation: #{$cui-conf-globalPrefix}devErrorIntroIn .2s .3s forwards
+
+	&-message
+		margin: 0
+		flex: 0 0 auto
+		font-weight: $fw-light
+		white-space: pre-wrap
+
+	&-stack
+		margin-top: 1em
+		padding-bottom: 1em
+		flex: 1 1 auto
+		overflow: auto
+		&-dump
+			white-space: pre-wrap

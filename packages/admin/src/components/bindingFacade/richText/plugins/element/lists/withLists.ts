@@ -15,16 +15,27 @@ import { OrderedListElement, orderedListElementType } from './OrderedListElement
 import { UnorderedListElement, unorderedListElementType } from './UnorderedListElement'
 
 export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> => {
-	const { renderElement, insertBreak, deleteBackward, normalizeNode, isElementActive, toggleElement } = editor
+	const {
+		renderElement,
+		insertBreak,
+		deleteBackward,
+		normalizeNode,
+		isElementActive,
+		toggleElement,
+		onKeyDown,
+	} = editor
 
 	const e = (editor as any) as EditorWithLists<E>
 
 	Object.assign<EditorWithLists<BaseEditor>, Partial<EditorWithLists<BaseEditor>>>(e, {
-		isListItem: (element, suchThat): element is ListItemElement => element.type === listItemElementType,
-		isUnorderedList: (element, suchThat): element is UnorderedListElement => element.type === unorderedListElementType,
-		isOrderedList: (element, suchThat): element is OrderedListElement => element.type === orderedListElementType,
+		isListItem: (element, suchThat): element is ListItemElement =>
+			ContemberEditor.isElementType(element, listItemElementType, suchThat),
+		isUnorderedList: (element, suchThat): element is UnorderedListElement =>
+			ContemberEditor.isElementType(element, unorderedListElementType, suchThat),
+		isOrderedList: (element, suchThat): element is OrderedListElement =>
+			ContemberEditor.isElementType(element, orderedListElementType, suchThat),
 		isList: (element, suchThat): element is OrderedListElement | UnorderedListElement =>
-			element.type === unorderedListElementType || element.type === orderedListElementType,
+			e.isUnorderedList(element, suchThat) || e.isOrderedList(element, suchThat),
 
 		renderElement: props => {
 			switch (props.element.type) {
@@ -223,6 +234,11 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				}
 			}
 		},
+		// onKeyDown: e => {
+		// 	if (e.key !== 'Tab') {
+		// 		return onKeyDown(e)
+		// 	}
+		// },
 	})
 
 	return (editor as unknown) as EditorWithLists<E>

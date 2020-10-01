@@ -88,13 +88,12 @@ export class TreeFilterGenerator {
 			} else {
 				return assertNever(marker.relation.expectedMutation)
 			}
-			const existingRelation = relations.get(marker.relation.field)
+			let existingRelation = relations.get(marker.relation.field)
 
 			if (existingRelation === undefined) {
-				relations.set(marker.relation.field, new Map())
-			} else {
-				this.populateRawRelationFilters(marker.fields, existingRelation)
+				relations.set(marker.relation.field, (existingRelation = new Map()))
 			}
+			this.populateRawRelationFilters(marker.fields, existingRelation)
 		}
 
 		return relations

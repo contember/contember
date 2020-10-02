@@ -3,6 +3,7 @@ import {
 	canToggleMark,
 	closestBlockEntry,
 	ejectElement,
+	elementToSpecifics,
 	hasMarks,
 	getPreviousSibling,
 	isElementType,
@@ -10,6 +11,7 @@ import {
 	removeMarks,
 	serializeElements,
 	strictlyDeserializeElements,
+	textToSpecifics,
 	toLatestFormat,
 	topLevelNodes,
 } from './methods'
@@ -20,6 +22,7 @@ export const ContemberEditor = {
 	canToggleMark,
 	closestBlockEntry,
 	ejectElement,
+	elementToSpecifics,
 	hasMarks,
 	getPreviousSibling,
 	isElementType,
@@ -27,6 +30,7 @@ export const ContemberEditor = {
 	removeMarks,
 	serializeElements,
 	strictlyDeserializeElements,
+	textToSpecifics,
 	toLatestFormat,
 	topLevelNodes,
 }

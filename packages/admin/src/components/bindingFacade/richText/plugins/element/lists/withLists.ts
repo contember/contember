@@ -12,6 +12,7 @@ import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
 import { OrderedListElement, orderedListElementType } from './OrderedListElement'
+import { indentListItem, dedentListItem } from './transforms'
 import { UnorderedListElement, unorderedListElementType } from './UnorderedListElement'
 
 export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> => {
@@ -234,11 +235,32 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				}
 			}
 		},
-		// onKeyDown: e => {
-		// 	if (e.key !== 'Tab') {
-		// 		return onKeyDown(e)
-		// 	}
-		// },
+		onKeyDown: event => {
+			if (event.key !== 'Tab' || !editor.selection || !SlateRange.isCollapsed(editor.selection)) {
+				return onKeyDown(event)
+			}
+			const selection = editor.selection
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, selection.focus)
+
+			if (closestBlockEntry === undefined) {
+				return onKeyDown(event)
+			}
+			let [closestBlockElement, closestBlockPath] = closestBlockEntry
+			if (e.isDefaultElement(closestBlockElement)) {
+				;[closestBlockElement, closestBlockPath] = Editor.parent(e, closestBlockPath)
+			}
+			if (!e.isListItem(closestBlockElement)) {
+				return onKeyDown(event)
+			}
+			const succeeded = event.shiftKey
+				? dedentListItem(e, closestBlockElement, closestBlockPath)
+				: indentListItem(e, closestBlockElement, closestBlockPath)
+
+			if (succeeded) {
+				return event.preventDefault()
+			}
+			return onKeyDown(event)
+		},
 	})
 
 	return (editor as unknown) as EditorWithLists<E>

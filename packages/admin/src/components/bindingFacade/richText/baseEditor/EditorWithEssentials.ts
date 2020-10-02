@@ -17,6 +17,10 @@ export interface WithEssentials<E extends EditorNode> {
 	isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
 	toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => void
 
+	canContainAnyFlowContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
+	isHeadingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
+	isPhrasingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
+
 	serializeElements: (elements: ElementNode[], errorMessage?: string) => string
 	deserializeElements: (serializedElement: string, errorMessage?: string) => ElementNode[]
 

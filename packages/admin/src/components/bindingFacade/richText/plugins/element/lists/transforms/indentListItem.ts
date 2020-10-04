@@ -1,4 +1,12 @@
-import { Editor, Element as SlateElement, Node as SlateNode, Path as SlatePath, Text, Transforms } from 'slate'
+import {
+	Editor,
+	Element as SlateElement,
+	Node as SlateNode,
+	NodeEntry,
+	Path as SlatePath,
+	Text,
+	Transforms,
+} from 'slate'
 import { BaseEditor } from '../../../../baseEditor'
 import { ContemberEditor } from '../../../../ContemberEditor'
 import { EditorWithLists } from '../EditorWithLists'
@@ -21,13 +29,19 @@ export const indentListItem = (
 	}
 
 	Editor.withoutNormalizing(editor, () => {
-		const [parentListElement] = Editor.parent(editor, listItemPath)
+		const [parentListElement] = Editor.parent(editor, listItemPath) as NodeEntry<
+			OrderedListElement | UnorderedListElement
+		>
 		let [previousListItem, previousListItemPath] = previousListEntry
 
 		const lastPreviousListItemChild = previousListItem.children[previousListItem.children.length - 1]
 		const previousEndsWithCompatibleList =
 			SlateElement.isElement(lastPreviousListItemChild) &&
-			editor.isList(lastPreviousListItemChild, ContemberEditor.elementToSpecifics(parentListElement))
+			ContemberEditor.isElementType(
+				lastPreviousListItemChild,
+				parentListElement.type,
+				ContemberEditor.elementToSpecifics(parentListElement),
+			)
 
 		if (previousEndsWithCompatibleList) {
 			const newListItemPath = [

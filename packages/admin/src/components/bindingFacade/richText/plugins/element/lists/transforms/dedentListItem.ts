@@ -15,6 +15,7 @@ import { EditorWithLists } from '../EditorWithLists'
 import { ListItemElement } from '../ListItemElement'
 import { OrderedListElement } from '../OrderedListElement'
 import { UnorderedListElement } from '../UnorderedListElement'
+import { indentListItem } from './indentListItem'
 
 export const dedentListItem = (
 	editor: EditorWithLists<BaseEditor>,
@@ -24,6 +25,7 @@ export const dedentListItem = (
 	const parentListPath = SlatePath.parent(listItemPath)
 	const parentListElement = SlateNode.get(editor, parentListPath)
 	const parentListChildrenCount = parentListElement.children.length
+	const subsequentListItemCount = parentListChildrenCount - listItemPath[listItemPath.length - 1] - 1
 
 	if (!editor.isList(parentListElement) || parentListPath.length <= 1) {
 		return false
@@ -53,6 +55,13 @@ export const dedentListItem = (
 	if (parentAndGrandParentAreCompatible) {
 		const newListItemPath = SlatePath.next(parentListItemPath)
 		Editor.withoutNormalizing(editor, () => {
+			if (subsequentListItemCount) {
+				const nextSiblingPath = SlatePath.next(listItemPath)
+				for (let i = 0; i < subsequentListItemCount; i++) {
+					const nextListItem = SlateNode.get(editor, nextSiblingPath) as ListItemElement
+					indentListItem(editor, nextListItem, nextSiblingPath)
+				}
+			}
 			Transforms.moveNodes(editor, {
 				at: listItemPath,
 				to: newListItemPath,

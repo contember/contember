@@ -1,54 +1,8 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorBlockBoundary
-	$height: 1em
-	$duration: .1s
-	$delay: .05s
-
-	height: $height
-	position: relative
-	display: grid
-	grid-template: 100% / 100%
-	align-items: center
+	height: .75em
 	cursor: text
-	justify-items: start
-	transition-property: opacity $duration $delay
-	transition-duration: $duration
-	transition-delay: $delay
-	opacity: 0
-
-	&::before,
-	&::after
-		transition-property: transform
-		transition-duration: $duration
-		transition-delay: $delay
-		grid-area: 1 / 1
-
-	&::before
-		content: ''
-		width: 100%
-		height: em(2px)
-		background: $cui-box-active-color
-		transform: scaleX(.96)
-	&::after
-		+size($height)
-		content: '+'
-		border-radius: 50%
-		background: $cui-box-active-color
-		color: #FFFFFF
-		display: flex
-		justify-content: center
-		align-items: center
-		z-index: 1
-
-	&:hover
-		opacity: 1
-		cursor: pointer
-
-		&::before
-			transform: scaleX(1)
-		&::after
-			transform: translateX(-.5em)
 
 	//&.view-beforeBlock
 	//	top: (-$height / 2)

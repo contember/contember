@@ -7,7 +7,7 @@ import {
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
-import { BaseEditor } from '../../../baseEditor'
+import { BaseEditor, BlockElement } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
@@ -41,11 +41,26 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		renderElement: props => {
 			switch (props.element.type) {
 				case listItemElementType:
-					return React.createElement('li', props.attributes, props.children)
+					return React.createElement(BlockElement, {
+						element: props.element,
+						attributes: props.attributes,
+						domElement: 'li',
+						children: props.children,
+					})
 				case unorderedListElementType:
-					return React.createElement('ul', props.attributes, props.children)
+					return React.createElement(BlockElement, {
+						element: props.element,
+						attributes: props.attributes,
+						domElement: 'ul',
+						children: props.children,
+					})
 				case orderedListElementType:
-					return React.createElement('ol', props.attributes, props.children)
+					return React.createElement(BlockElement, {
+						element: props.element,
+						attributes: props.attributes,
+						domElement: 'ol',
+						children: props.children,
+					})
 				default:
 					return renderElement(props)
 			}

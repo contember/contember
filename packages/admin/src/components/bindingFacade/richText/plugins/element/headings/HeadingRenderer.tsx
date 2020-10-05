@@ -12,6 +12,7 @@ export const HeadingRenderer: React.FunctionComponent<HeadingRendererProps> = ({
 	element,
 	children,
 }: HeadingRendererProps) => (
+	// TODO use BlockElement
 	<EditorHeading attributes={attributes} level={element.level} isNumbered={element.isNumbered}>
 		{children}
 	</EditorHeading>

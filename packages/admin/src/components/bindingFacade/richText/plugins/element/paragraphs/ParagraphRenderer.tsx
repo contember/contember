@@ -9,6 +9,7 @@ export interface ParagraphRendererProps extends Omit<RenderElementProps, 'elemen
 
 export function ParagraphRenderer({ attributes, children, element }: ParagraphRendererProps) {
 	return (
+		// TODO use BlockElement
 		<EditorParagraph attributes={attributes} isNumbered={element.isNumbered}>
 			{children}
 		</EditorParagraph>

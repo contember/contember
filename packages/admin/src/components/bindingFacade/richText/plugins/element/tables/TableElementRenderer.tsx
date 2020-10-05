@@ -2,7 +2,7 @@ import { EditorTableElement } from '@contember/ui'
 import * as React from 'react'
 import { Transforms, Editor as SlateEditor, Range as SlateRange } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useFocused, useSelected } from 'slate-react'
-import { BaseEditor } from '../../../baseEditor'
+import { BaseEditor, BlockElement } from '../../../baseEditor'
 import { EditorWithTables } from './EditorWithTables'
 import { TableElement } from './TableElement'
 import { TableRowElement } from './TableRowElement'
@@ -68,7 +68,7 @@ export const TableElementRenderer = React.memo(function TableElementRenderer(pro
 		})
 	}, [editor, props.element])
 	return (
-		<div {...props.attributes}>
+		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
 			<EditorTableElement
 				rowCount={props.element.children.length}
 				columnCount={(props.element.children[0] as TableRowElement | undefined)?.children.length ?? 0}
@@ -83,6 +83,6 @@ export const TableElementRenderer = React.memo(function TableElementRenderer(pro
 			>
 				{props.children}
 			</EditorTableElement>
-		</div>
+		</BlockElement>
 	)
 })

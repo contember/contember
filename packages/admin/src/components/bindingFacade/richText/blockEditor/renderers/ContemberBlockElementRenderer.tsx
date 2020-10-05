@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
+import { BlockElement } from '../../baseEditor'
 import { BlockSlateEditor } from '../editor'
 import { ContemberBlockElement } from '../elements'
 
@@ -30,14 +31,6 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 		},
 		[editor, props.element],
 	)
-	const addDefaultElement = (offset: number) => {
-		const [topLevelIndex] = ReactEditor.findPath(editor, props.element)
-		const targetPath = [topLevelIndex + offset]
-		Transforms.insertNodes(editor, editor.createDefaultElement([{ text: '' }]), {
-			at: targetPath,
-		})
-		Transforms.select(editor, targetPath)
-	}
 
 	if (!discriminatedBlock) {
 		throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
@@ -47,21 +40,19 @@ export const ContemberBlockElementRenderer = React.memo((props: ContemberBlockEl
 	const alternate = selectedBlock.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 	return (
-		<div {...props.attributes}>
+		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
 				<SingleEntity accessor={props.entity}>
-					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
 					<ActionableBox editContents={alternate} onRemove={selected ? undefined : () => props.entity.deleteEntity()}>
 						<Box heading={selectedBlock.label} isActive={selected} onClick={onContainerClick} style={{ margin: '0' }}>
 							{selectedBlock.children}
 						</Box>
 					</ActionableBox>
-					<div onClick={() => addDefaultElement(1)} style={{ height: '1em' }} />
 				</SingleEntity>
 			</div>
 			{props.children}
-		</div>
+		</BlockElement>
 	)
 })
 ContemberBlockElementRenderer.displayName = 'ContemberBlockElementRenderer'

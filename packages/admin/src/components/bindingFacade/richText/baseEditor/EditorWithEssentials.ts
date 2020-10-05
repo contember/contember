@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Element as SlateElement, Node as SlateNode } from 'slate'
+import { Element as SlateElement, Node as SlateNode, NodeEntry } from 'slate'
 import { RenderElementProps, RenderLeafProps } from 'slate-react'
 import { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
 
@@ -8,6 +8,7 @@ export interface WithEssentials<E extends EditorNode> {
 	defaultElementType: string
 	isDefaultElement: (element: SlateElement) => boolean
 	createDefaultElement: (children: SlateElement['children']) => SlateElement
+	insertBetweenBlocks: (blockEntry: NodeEntry, edge: 'before' | 'after') => void
 
 	canToggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => boolean
 	hasMarks: <T extends TextNode>(marks: TextSpecifics<T>) => boolean

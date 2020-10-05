@@ -20,6 +20,14 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			type: defaultElementType,
 			children,
 		}),
+		insertBetweenBlocks: ([element, path], edge) => {
+			const edgeOffset = edge === 'before' ? 0 : 1
+			const targetPath = path.slice(0, -1).concat(path[path.length - 1] + edgeOffset)
+			Transforms.insertNodes(editorWithEssentials, editorWithEssentials.createDefaultElement([{ text: '' }]), {
+				at: targetPath,
+			})
+			Transforms.select(editorWithEssentials, targetPath)
+		},
 
 		canToggleMarks: () => true,
 		canToggleElement: <E extends ElementNode>() => true,

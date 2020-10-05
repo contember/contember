@@ -7,11 +7,12 @@ import {
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
-import { BaseEditor } from '../../../baseEditor'
+import { BaseEditor, BlockElement } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
 import { OrderedListElement, orderedListElementType } from './OrderedListElement'
+import { indentListItem, dedentListItem } from './transforms'
 import { UnorderedListElement, unorderedListElementType } from './UnorderedListElement'
 
 export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> => {
@@ -40,11 +41,26 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		renderElement: props => {
 			switch (props.element.type) {
 				case listItemElementType:
-					return React.createElement('li', props.attributes, props.children)
+					return React.createElement(BlockElement, {
+						element: props.element,
+						attributes: props.attributes,
+						domElement: 'li',
+						children: props.children,
+					})
 				case unorderedListElementType:
-					return React.createElement('ul', props.attributes, props.children)
+					return React.createElement(BlockElement, {
+						element: props.element,
+						attributes: props.attributes,
+						domElement: 'ul',
+						children: props.children,
+					})
 				case orderedListElementType:
-					return React.createElement('ol', props.attributes, props.children)
+					return React.createElement(BlockElement, {
+						element: props.element,
+						attributes: props.attributes,
+						domElement: 'ol',
+						children: props.children,
+					})
 				default:
 					return renderElement(props)
 			}
@@ -103,6 +119,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					)
 				}
 				const emptyList: UnorderedListElement | OrderedListElement = {
+					...suchThat,
 					type: elementType as (UnorderedListElement | OrderedListElement)['type'],
 					children: [],
 				}
@@ -114,17 +131,23 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 
 			if (SlateElement.isElement(node)) {
 				if (e.isList(node)) {
-					for (const [child, childPath] of SlateNode.children(editor, path)) {
-						if (SlateElement.isElement(child) && child.type !== listItemElementType) {
-							ContemberEditor.ejectElement(editor, childPath)
-							Transforms.setNodes(editor, { type: listItemElementType }, { at: childPath })
-							return
+					for (const [child, childPath] of SlateNode.children(e, path)) {
+						if (SlateElement.isElement(child)) {
+							if (child.type !== listItemElementType) {
+								ContemberEditor.ejectElement(e, childPath)
+								Transforms.setNodes(e, { type: listItemElementType }, { at: childPath })
+							}
+						} else {
+							// If a list contains non-element nodes, just remove it.
+							return Transforms.removeNodes(e, {
+								at: path,
+							})
 						}
 					}
 				} else if (e.isListItem(node)) {
 					const closestBlockEntry = ContemberEditor.closestBlockEntry(e, path)
 					if (closestBlockEntry === undefined || !e.isList(closestBlockEntry[0])) {
-						Editor.withoutNormalizing(e, () => {
+						return Editor.withoutNormalizing(e, () => {
 							const defaultElement = e.createDefaultElement([{ text: '' }])
 							Transforms.wrapNodes(e, defaultElement, {
 								at: path,
@@ -133,6 +156,14 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 								at: [...path, 0],
 							})
 						})
+					}
+					if (node.children.length === 1) {
+						const onlyChild = node.children[0]
+						if (SlateElement.isElement(onlyChild) && e.isDefaultElement(onlyChild)) {
+							Transforms.unwrapNodes(e, {
+								at: [...path, 0],
+							})
+						}
 					}
 				}
 			}
@@ -234,11 +265,32 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				}
 			}
 		},
-		// onKeyDown: e => {
-		// 	if (e.key !== 'Tab') {
-		// 		return onKeyDown(e)
-		// 	}
-		// },
+		onKeyDown: event => {
+			if (event.key !== 'Tab' || !editor.selection || !SlateRange.isCollapsed(editor.selection)) {
+				return onKeyDown(event)
+			}
+			const selection = editor.selection
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, selection.focus)
+
+			if (closestBlockEntry === undefined) {
+				return onKeyDown(event)
+			}
+			let [closestBlockElement, closestBlockPath] = closestBlockEntry
+			if (e.isDefaultElement(closestBlockElement)) {
+				;[closestBlockElement, closestBlockPath] = Editor.parent(e, closestBlockPath)
+			}
+			if (!e.isListItem(closestBlockElement)) {
+				return onKeyDown(event)
+			}
+			const succeeded = event.shiftKey
+				? dedentListItem(e, closestBlockElement, closestBlockPath)
+				: indentListItem(e, closestBlockElement, closestBlockPath)
+
+			if (succeeded) {
+				return event.preventDefault()
+			}
+			return onKeyDown(event)
+		},
 	})
 
 	return (editor as unknown) as EditorWithLists<E>

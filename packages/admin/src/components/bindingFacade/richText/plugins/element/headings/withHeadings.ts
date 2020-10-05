@@ -25,15 +25,7 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 	): element is HeadingElement => ContemberEditor.isElementType(element, headingElementType, suchThat)
 	const ejectHeading = (elementPath: SlatePath) => {
 		ContemberEditor.ejectElement(e, elementPath)
-		Transforms.setNodes(
-			e,
-			{
-				type: e.defaultElementType,
-			},
-			{
-				at: elementPath,
-			},
-		)
+		Transforms.setNodes(e, { type: e.defaultElementType }, { at: elementPath })
 	}
 
 	e.isHeading = isHeading

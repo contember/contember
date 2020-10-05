@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
+import { BlockElement } from '../../baseEditor'
 import { BlockSlateEditor } from '../editor'
 import { ContemberEmbedElement } from '../elements'
 
@@ -30,24 +31,15 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 		},
 		[editor, props.element],
 	)
-	const addDefaultElement = (offset: number) => {
-		const [topLevelIndex] = ReactEditor.findPath(editor, props.element)
-		const targetPath = [topLevelIndex + offset]
-		Transforms.insertNodes(editor, editor.createDefaultElement([{ text: '' }]), {
-			at: targetPath,
-		})
-		Transforms.select(editor, targetPath)
-	}
 
 	const selectedBlock = discriminatedBlock?.datum
 	const alternate = selectedBlock?.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 	return (
-		<div {...props.attributes}>
+		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
 				<SingleEntity accessor={props.entity}>
-					<div onClick={() => addDefaultElement(0)} style={{ height: '1em' }} />
 					<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
 						<ActionableBox
 							editContents={alternate || null}
@@ -66,11 +58,10 @@ export const ContemberEmbedElementRenderer = React.memo((props: ContemberEmbedEl
 							</Box>
 						</ActionableBox>
 					</div>
-					<div onClick={() => addDefaultElement(1)} style={{ height: '1em' }} />
 				</SingleEntity>
 			</div>
 			{props.children}
-		</div>
+		</BlockElement>
 	)
 })
 ContemberEmbedElementRenderer.displayName = 'ContemberEmbedElementRenderer'

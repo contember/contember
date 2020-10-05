@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
+import { BlockElement } from '../../../baseEditor'
 import { HorizontalRuleElement } from './HorizontalRuleElement'
 
 export interface HorizontalRuleRendererProps extends Omit<RenderElementProps, 'element'> {
@@ -11,7 +12,7 @@ export const HorizontalRuleRenderer: React.FunctionComponent<HorizontalRuleRende
 ) => {
 	const isSelected = useSelected()
 	return (
-		<div {...props.attributes}>
+		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
 			<span contentEditable={false}>
 				<hr
 					style={{
@@ -21,7 +22,7 @@ export const HorizontalRuleRenderer: React.FunctionComponent<HorizontalRuleRende
 				/>
 			</span>
 			{props.children}
-		</div>
+		</BlockElement>
 	)
 }
 HorizontalRuleRenderer.displayName = 'HorizontalRuleRenderer'

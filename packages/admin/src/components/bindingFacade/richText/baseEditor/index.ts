@@ -1,4 +1,5 @@
 export * from './BaseEditor'
+export * from './BlockElement'
 export * from './createEditorWithEssentials'
 export * from './DefaultElement'
 export * from './EditorWithEssentials'

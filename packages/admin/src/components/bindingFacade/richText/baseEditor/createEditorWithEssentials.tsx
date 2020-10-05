@@ -20,6 +20,14 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			type: defaultElementType,
 			children,
 		}),
+		insertBetweenBlocks: ([element, path], edge) => {
+			const edgeOffset = edge === 'before' ? 0 : 1
+			const targetPath = path.slice(0, -1).concat(path[path.length - 1] + edgeOffset)
+			Transforms.insertNodes(editorWithEssentials, editorWithEssentials.createDefaultElement([{ text: '' }]), {
+				at: targetPath,
+			})
+			Transforms.select(editorWithEssentials, targetPath)
+		},
 
 		canToggleMarks: () => true,
 		canToggleElement: <E extends ElementNode>() => true,
@@ -46,6 +54,16 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			return true
 		},
 		toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {}, // TODO
+
+		canContainAnyFlowContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
+			!editorWithEssentials.isPhrasingContent(elementType, suchThat),
+		isHeadingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => false,
+		isPhrasingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
+			editorWithEssentials.isInline({
+				...suchThat,
+				type: elementType,
+				children: [{ text: '' }],
+			}),
 
 		serializeElements: (elements, errorMessage) =>
 			ContemberEditor.serializeElements(editorWithEssentials, elements, errorMessage),

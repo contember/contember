@@ -119,6 +119,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					)
 				}
 				const emptyList: UnorderedListElement | OrderedListElement = {
+					...suchThat,
 					type: elementType as (UnorderedListElement | OrderedListElement)['type'],
 					children: [],
 				}

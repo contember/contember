@@ -126,8 +126,8 @@ export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWith
 				const targetPath = [...newHrPath.slice(0, -1), newHrPath[newHrPath.length - 1] + 1]
 				Transforms.insertNodes(editor, editor.createDefaultElement([{ text: '' }]), {
 					at: targetPath,
+					select: true,
 				})
-				Transforms.select(editor, targetPath)
 			}
 
 			// Lastly, if remove the closest block. Need to update the entry though.

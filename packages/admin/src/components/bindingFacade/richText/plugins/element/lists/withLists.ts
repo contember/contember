@@ -208,8 +208,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					Editor.withoutNormalizing(e, () => {
 						// Remove the trailing empty listItem
 						Transforms.removeNodes(e, { at: containingListItemPath })
-						Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: containingListPath })
-						Transforms.select(e, containingListPath)
+						Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: containingListPath, select: true })
 					})
 				} else {
 					// We're in the middle of a list.
@@ -217,8 +216,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 						Transforms.removeNodes(e, { at: containingListItemPath })
 						Transforms.splitNodes(e, { at: containingListItemPath })
 						const afterListParent = SlatePath.next(containingListPath)
-						Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: afterListParent })
-						Transforms.select(e, afterListParent)
+						Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: afterListParent, select: true })
 					})
 				}
 			} else {
@@ -227,8 +225,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					const afterListParent = SlatePath.next(containingListPath)
 					// Remove the trailing empty listItem
 					Transforms.removeNodes(e, { at: containingListItemPath })
-					Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: afterListParent })
-					Transforms.select(e, afterListParent)
+					Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), { at: afterListParent, select: true })
 				})
 			}
 		},

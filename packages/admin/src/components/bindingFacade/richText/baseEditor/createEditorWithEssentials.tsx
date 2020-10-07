@@ -25,8 +25,8 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			const targetPath = path.slice(0, -1).concat(path[path.length - 1] + edgeOffset)
 			Transforms.insertNodes(editorWithEssentials, editorWithEssentials.createDefaultElement([{ text: '' }]), {
 				at: targetPath,
+				select: true,
 			})
-			Transforms.select(editorWithEssentials, targetPath)
 		},
 
 		canToggleMarks: () => true,

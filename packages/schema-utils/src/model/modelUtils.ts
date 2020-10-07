@@ -43,6 +43,17 @@ export const getColumnName = (schema: Model.Schema, entity: Model.Entity, fieldN
 	})
 }
 
+export const tryGetColumnName = (schema: Model.Schema, entity: Model.Entity, fieldName: string) => {
+	try {
+		return getColumnName(schema, entity, fieldName)
+	} catch (e) {
+		if (e instanceof ModelError && e.code === ModelErrorCode.NOT_OWNING_SIDE) {
+			return undefined
+		}
+		throw e
+	}
+}
+
 export const getColumnType = (schema: Model.Schema, entity: Model.Entity, fieldName: string): string => {
 	return acceptFieldVisitor(schema, entity, fieldName, {
 		// TODO solve enum handling properly maybe we should distinguish between domain and column type

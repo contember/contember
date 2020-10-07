@@ -108,15 +108,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 
 				for (const [, path] of selectedNodes) {
 					ContemberEditor.ejectElement(e, path)
-					Transforms.setNodes(
-						e,
-						{
-							type: listItemElementType,
-						},
-						{
-							at: path,
-						},
-					)
+					Transforms.setNodes(e, { type: listItemElementType }, { at: path })
 				}
 				const emptyList: UnorderedListElement | OrderedListElement = {
 					...suchThat,
@@ -129,45 +121,45 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		normalizeNode: entry => {
 			const [node, path] = entry
 
-			if (SlateElement.isElement(node)) {
-				if (e.isList(node)) {
-					for (const [child, childPath] of SlateNode.children(e, path)) {
-						if (SlateElement.isElement(child)) {
-							if (child.type !== listItemElementType) {
-								ContemberEditor.ejectElement(e, childPath)
-								Transforms.setNodes(e, { type: listItemElementType }, { at: childPath })
-							}
-						} else {
-							// If a list contains non-element nodes, just remove it.
-							return Transforms.removeNodes(e, {
-								at: path,
-							})
+			if (!SlateElement.isElement(node)) {
+				return normalizeNode(entry)
+			}
+			if (e.isList(node)) {
+				for (const [child, childPath] of SlateNode.children(e, path)) {
+					if (SlateElement.isElement(child)) {
+						if (child.type !== listItemElementType) {
+							ContemberEditor.ejectElement(e, childPath)
+							Transforms.setNodes(e, { type: listItemElementType }, { at: childPath })
 						}
-					}
-				} else if (e.isListItem(node)) {
-					const closestBlockEntry = ContemberEditor.closestBlockEntry(e, path)
-					if (closestBlockEntry === undefined || !e.isList(closestBlockEntry[0])) {
-						return Editor.withoutNormalizing(e, () => {
-							const defaultElement = e.createDefaultElement([{ text: '' }])
-							Transforms.wrapNodes(e, defaultElement, {
-								at: path,
-							})
-							Transforms.unwrapNodes(e, {
-								at: [...path, 0],
-							})
+					} else {
+						// If a list contains non-element nodes, just remove it.
+						return Transforms.removeNodes(e, {
+							at: path,
 						})
 					}
-					if (node.children.length === 1) {
-						const onlyChild = node.children[0]
-						if (SlateElement.isElement(onlyChild) && e.isDefaultElement(onlyChild)) {
-							Transforms.unwrapNodes(e, {
-								at: [...path, 0],
-							})
-						}
+				}
+			} else if (e.isListItem(node)) {
+				const closestBlockEntry = ContemberEditor.closestBlockEntry(e, path)
+				if (closestBlockEntry === undefined || !e.isList(closestBlockEntry[0])) {
+					return Editor.withoutNormalizing(e, () => {
+						const defaultElement = e.createDefaultElement([{ text: '' }])
+						Transforms.wrapNodes(e, defaultElement, {
+							at: path,
+						})
+						Transforms.unwrapNodes(e, {
+							at: [...path, 0],
+						})
+					})
+				}
+				if (node.children.length === 1) {
+					const onlyChild = node.children[0]
+					if (SlateElement.isElement(onlyChild) && e.isDefaultElement(onlyChild)) {
+						return Transforms.unwrapNodes(e, {
+							at: [...path, 0],
+						})
 					}
 				}
 			}
-
 			normalizeNode(entry)
 		},
 		insertBreak: () => {

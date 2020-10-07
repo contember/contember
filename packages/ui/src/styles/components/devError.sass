@@ -21,7 +21,6 @@
 	display: flex
 	justify-content: center
 	align-items: center
-	overflow: auto
 	animation: #{$cui-conf-globalPrefix}devErrorIntro .2s forwards
 
 	&::before
@@ -42,6 +41,7 @@
 		display: flex
 		flex-direction: column
 		opacity: 0
+		overflow: hidden auto
 		animation: #{$cui-conf-globalPrefix}devErrorIntroIn .2s .3s forwards
 
 	&-message

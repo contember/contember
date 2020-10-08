@@ -177,7 +177,25 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			const [node, path] = Editor.node(editor, selection)
 
 			if (SlateNode.string(node) !== '') {
-				return insertBreak()
+				const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
+				if (closestBlockEntry === undefined) {
+					return insertBreak()
+				}
+				const [closestBlock, closestBlockPath] = closestBlockEntry
+				if (!e.isDefaultElement(closestBlock) || closestBlockPath.length < 2) {
+					return insertBreak()
+				}
+				const listItemPath = SlatePath.parent(closestBlockPath)
+				const closestListItem = SlateNode.get(e, listItemPath)
+
+				if (!e.isListItem(closestListItem)) {
+					return insertBreak()
+				}
+				return Transforms.splitNodes(e, {
+					always: true,
+					at: selection.focus,
+					match: node => e.isListItem(node),
+				})
 			}
 
 			const closestListItemEntry = Editor.above(e, {

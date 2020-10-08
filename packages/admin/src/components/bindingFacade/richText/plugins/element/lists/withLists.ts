@@ -159,6 +159,12 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 						})
 					}
 				}
+				const firstChild = node.children[0]
+				if (SlateElement.isElement(firstChild) && e.isList(firstChild)) {
+					return Transforms.insertNodes(e, e.createDefaultElement([{ text: '' }]), {
+						at: [...path, 0],
+					})
+				}
 			}
 			normalizeNode(entry)
 		},

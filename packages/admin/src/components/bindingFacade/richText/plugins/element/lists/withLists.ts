@@ -174,23 +174,35 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			if (!selection || !SlateRange.isCollapsed(selection)) {
 				return insertBreak()
 			}
-			const [node, path] = Editor.node(editor, selection)
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
+			if (closestBlockEntry === undefined) {
+				return insertBreak()
+			}
+			const [closestBlock, closestBlockPath] = closestBlockEntry
 
-			if (SlateNode.string(node) !== '') {
-				const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
-				if (closestBlockEntry === undefined) {
+			let containingListItem: ListItemElement
+			let containingListItemPath: SlatePath
+
+			if (!e.isListItem(closestBlock)) {
+				if (closestBlockPath.length < 2) {
+					// This block cannot be inside a list
 					return insertBreak()
 				}
-				const [closestBlock, closestBlockPath] = closestBlockEntry
-				if (!e.isDefaultElement(closestBlock) || closestBlockPath.length < 2) {
-					return insertBreak()
-				}
-				const listItemPath = SlatePath.parent(closestBlockPath)
-				const closestListItem = SlateNode.get(e, listItemPath)
+
+				containingListItemPath = SlatePath.parent(closestBlockPath)
+				const closestListItem = SlateNode.get(e, containingListItemPath)
 
 				if (!e.isListItem(closestListItem)) {
+					// The block is not inside a list
 					return insertBreak()
 				}
+				containingListItem = closestListItem
+			} else {
+				containingListItem = closestBlock
+				containingListItemPath = closestBlockPath
+			}
+
+			if (SlateNode.string(containingListItem) !== '') {
 				return Transforms.splitNodes(e, {
 					always: true,
 					at: selection.focus,
@@ -198,17 +210,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				})
 			}
 
-			const closestListItemEntry = Editor.above(e, {
-				mode: 'lowest',
-				match: node => e.isListItem(node),
-			})
-
-			if (closestListItemEntry === undefined) {
-				return insertBreak()
-			}
 			// We're in a list and want to leave this list.
-
-			const [, containingListItemPath] = closestListItemEntry
 
 			const containingListPath = SlatePath.parent(containingListItemPath)
 			const containingList = SlateNode.get(e, containingListPath)

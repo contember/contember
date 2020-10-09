@@ -5,6 +5,7 @@ import {
 	Node as SlateNode,
 	Path as SlatePath,
 	Range as SlateRange,
+	Text,
 	Transforms,
 } from 'slate'
 import { BaseEditor, BlockElement } from '../../../baseEditor'
@@ -257,7 +258,11 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		},
 		onKeyDown: event => {
 			// TODO this should also work for expanded selections
-			if (event.key !== 'Tab' || !editor.selection || !SlateRange.isCollapsed(editor.selection)) {
+			if (
+				(event.key !== 'Tab' && event.key !== 'Enter') ||
+				!editor.selection ||
+				!SlateRange.isCollapsed(editor.selection)
+			) {
 				return onKeyDown(event)
 			}
 			const selection = editor.selection
@@ -267,18 +272,58 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				return onKeyDown(event)
 			}
 			let [closestBlockElement, closestBlockPath] = closestBlockEntry
-			if (e.isDefaultElement(closestBlockElement)) {
-				;[closestBlockElement, closestBlockPath] = Editor.parent(e, closestBlockPath)
-			}
-			if (!e.isListItem(closestBlockElement)) {
-				return onKeyDown(event)
-			}
-			const succeeded = event.shiftKey
-				? dedentListItem(e, closestBlockElement, closestBlockPath)
-				: indentListItem(e, closestBlockElement, closestBlockPath)
 
-			if (succeeded) {
-				return event.preventDefault()
+			if (event.key === 'Tab') {
+				if (e.isDefaultElement(closestBlockElement)) {
+					;[closestBlockElement, closestBlockPath] = Editor.parent(e, closestBlockPath)
+				}
+				if (!e.isListItem(closestBlockElement)) {
+					return onKeyDown(event)
+				}
+				const succeeded = event.shiftKey
+					? dedentListItem(e, closestBlockElement, closestBlockPath)
+					: indentListItem(e, closestBlockElement, closestBlockPath)
+
+				if (succeeded) {
+					return event.preventDefault()
+				}
+			} else if (event.key === 'Enter' && event.shiftKey) {
+				if (e.isDefaultElement(closestBlockElement)) {
+					const [listItem] = Editor.parent(e, closestBlockPath)
+					if (!e.isListItem(listItem)) {
+						return onKeyDown(event)
+					}
+					event.preventDefault()
+					return Transforms.splitNodes(e, {
+						always: true,
+						at: selection.focus,
+						match: node => Editor.isBlock(e, node) && e.isDefaultElement(node),
+					})
+				} else if (e.isListItem(closestBlockElement)) {
+					// We want to create a newline but the closest block is the list item.
+					// This should mean that it only contains inlines. Hence we wrap them in a default element
+					// and then split it.
+					const [listItemStart, listItemEnd] = Editor.edges(editor, closestBlockPath)
+					event.preventDefault()
+					return Editor.withoutNormalizing(e, () => {
+						Transforms.wrapNodes(e, e.createDefaultElement([]), {
+							match: node => Text.isText(node) || e.isInline(node),
+							at: {
+								anchor: listItemStart,
+								focus: listItemEnd,
+							},
+						})
+						const relative = SlatePath.relative(selection.focus.path, closestBlockPath)
+						Transforms.splitNodes(e, {
+							// The zero should be the newly created default element.
+							at: {
+								path: [...closestBlockPath, 0, ...relative],
+								offset: selection.focus.offset,
+							},
+							always: true,
+						})
+					})
+				}
 			}
 			return onKeyDown(event)
 		},

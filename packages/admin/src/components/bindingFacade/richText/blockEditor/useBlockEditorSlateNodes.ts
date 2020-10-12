@@ -58,8 +58,9 @@ export const useBlockEditorSlateNodes = ({
 		position: ContemberFieldElementPosition,
 	): SlateElement[] =>
 		elements.map((normalizedElement, index) => {
-			if (contemberFieldElementCache.has(normalizedElement.accessor)) {
-				return contemberFieldElementCache.get(normalizedElement.accessor)!
+			const existingElement = contemberFieldElementCache.get(normalizedElement.accessor)
+			if (existingElement) {
+				return existingElement
 			}
 			let element: SlateElement
 			const fieldValue = normalizedElement.accessor.currentValue
@@ -88,13 +89,16 @@ export const useBlockEditorSlateNodes = ({
 
 	const contentElements = entities.length
 		? entities.map(entity => {
-				if (textElementCache.has(entity)) {
-					return textElementCache.get(entity)!
+				const existingTextElement = textElementCache.get(entity)
+				if (existingTextElement) {
+					return existingTextElement
 				}
 				const entityKey = entity.key
 
-				if (contemberBlockElementCache.has(entityKey)) {
-					return contemberBlockElementCache.get(entityKey)!
+				const existingBlockElement = contemberBlockElementCache.get(entityKey)
+
+				if (existingBlockElement) {
+					return existingBlockElement
 				}
 
 				const blockType = entity.getRelativeSingleField(discriminationField)

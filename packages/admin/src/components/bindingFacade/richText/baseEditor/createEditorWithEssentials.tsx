@@ -65,10 +65,9 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 				children: [{ text: '' }],
 			}),
 
-		serializeElements: (elements, errorMessage) =>
-			ContemberEditor.serializeElements(editorWithEssentials, elements, errorMessage),
-		deserializeElements: (serializedElement, errorMessage) =>
-			ContemberEditor.permissivelyDeserializeElements(editorWithEssentials, serializedElement, errorMessage),
+		serializeNodes: (nodes, errorMessage) => ContemberEditor.serializeNodes(editorWithEssentials, nodes, errorMessage),
+		deserializeNodes: (serializedNodes, errorMessage) =>
+			ContemberEditor.permissivelyDeserializeNodes(editorWithEssentials, serializedNodes, errorMessage),
 
 		upgradeFormatBySingleVersion: (node, oldVersion) => {
 			if (SlateElement.isElement(node)) {

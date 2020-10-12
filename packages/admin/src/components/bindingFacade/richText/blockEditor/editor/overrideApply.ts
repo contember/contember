@@ -78,11 +78,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		if (operation.type === 'set_selection') {
 			return apply(operation) // Nothing to do here
 		}
-		if (options.isMutatingRef.current) {
-			return
-		}
-		if (operation.path.length === 0) {
-			// This is invalid.
+		if (options.isMutatingRef.current || operation.path.length === 0) {
 			return
 		}
 
@@ -239,9 +235,6 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					}
 					case 'insert_text':
 					case 'remove_text': {
-						const {
-							path: [topLevelIndex],
-						} = operation
 						if (editor.isContemberBlockElement(editor.children[topLevelIndex])) {
 							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 						}
@@ -290,6 +283,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						break
 					}
 					case 'move_node': {
+						// TODO prevent the target from being among leading/trailing
 						const sourcePath = operation.path
 						const targetPathBefore = operation.newPath
 						const targetPathAfter = SlatePath.transform(operation.path, operation)!

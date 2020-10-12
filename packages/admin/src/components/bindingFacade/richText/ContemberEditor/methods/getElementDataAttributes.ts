@@ -13,7 +13,7 @@ export const getElementDataAttributes = <Element extends ElementNode = ElementNo
 
 	return Object.fromEntries(
 		Object.entries(extendedSpecifics).map(([attribute, value]) => [
-			`data-${attributeNamePrefix}-${attribute}`,
+			`data-${attributeNamePrefix}-${attribute.toLowerCase()}`,
 			value as Scalar,
 		]),
 	)

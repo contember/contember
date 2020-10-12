@@ -1,4 +1,9 @@
-import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
+import {
+	acceptFieldVisitor,
+	NamingHelper,
+	PredicateDefinitionProcessor,
+	tryGetColumnName,
+} from '@contember/schema-utils'
 import { isIt } from '../../utils/isIt'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
@@ -95,7 +100,10 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
 		const entity = this.schema.model.entities[this.data.entityName]
 		const tableName = entity.tableName
-		const columnName = (entity.fields[this.data.fieldName] as Model.AnyColumn).columnName
+		const columnName = tryGetColumnName(this.schema.model, entity, this.data.fieldName)
+		if (!columnName) {
+			return events
+		}
 		return events.map(it => {
 			if (
 				it.tableName !== tableName ||

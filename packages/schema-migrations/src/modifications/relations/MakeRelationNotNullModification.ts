@@ -3,24 +3,20 @@ import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { getColumnName, getEntity, ModelError, ModelErrorCode } from '@contember/schema-utils'
+import { getEntity, tryGetColumnName } from '@contember/schema-utils'
 
 class MakeRelationNotNullModification implements Modification<MakeRelationNotNullModification.Data> {
 	constructor(private readonly data: MakeRelationNotNullModification.Data, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
-		try {
-			const entity = getEntity(this.schema.model, this.data.entityName)
-			const columnName = getColumnName(this.schema.model, entity, this.data.fieldName)
-			builder.alterColumn(entity.tableName, columnName, {
-				notNull: true,
-			})
-		} catch (e) {
-			if (e instanceof ModelError && e.code === ModelErrorCode.NOT_OWNING_SIDE) {
-				return
-			}
-			throw e
+		const entity = getEntity(this.schema.model, this.data.entityName)
+		const columnName = tryGetColumnName(this.schema.model, entity, this.data.fieldName)
+		if (!columnName) {
+			return
 		}
+		builder.alterColumn(entity.tableName, columnName, {
+			notNull: true,
+		})
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {

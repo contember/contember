@@ -58,8 +58,9 @@ export const useBlockEditorSlateNodes = ({
 		position: ContemberFieldElementPosition,
 	): SlateElement[] =>
 		elements.map((normalizedElement, index) => {
-			if (contemberFieldElementCache.has(normalizedElement.accessor)) {
-				return contemberFieldElementCache.get(normalizedElement.accessor)!
+			const existingElement = contemberFieldElementCache.get(normalizedElement.accessor)
+			if (existingElement) {
+				return existingElement
 			}
 			let element: SlateElement
 			const fieldValue = normalizedElement.accessor.currentValue
@@ -77,10 +78,17 @@ export const useBlockEditorSlateNodes = ({
 				}
 				element = fieldElement
 			} else {
-				element = editor.deserializeElements(
+				const deserialized = editor.deserializeNodes(
 					fieldValue,
 					`BlockEditor: The ${position} field backed element at index '${index}' contains invalid JSON.`,
-				)[0]
+				)
+				const fieldElement: ContemberFieldElement = {
+					type: contemberFieldElementType,
+					children: deserialized,
+					position,
+					index,
+				}
+				element = fieldElement
 			}
 			contemberFieldElementCache.set(normalizedElement.accessor, element)
 			return element
@@ -88,13 +96,16 @@ export const useBlockEditorSlateNodes = ({
 
 	const contentElements = entities.length
 		? entities.map(entity => {
-				if (textElementCache.has(entity)) {
-					return textElementCache.get(entity)!
+				const existingTextElement = textElementCache.get(entity)
+				if (existingTextElement) {
+					return existingTextElement
 				}
 				const entityKey = entity.key
 
-				if (contemberBlockElementCache.has(entityKey)) {
-					return contemberBlockElementCache.get(entityKey)!
+				const existingBlockElement = contemberBlockElementCache.get(entityKey)
+
+				if (existingBlockElement) {
+					return existingBlockElement
 				}
 
 				const blockType = entity.getRelativeSingleField(discriminationField)
@@ -109,10 +120,10 @@ export const useBlockEditorSlateNodes = ({
 					} else if (typeof textAccessor.currentValue !== 'string') {
 						throw new BindingError(`BlockEditor: The 'textBlockField' does not contain a string value.`)
 					} else {
-						element = editor.deserializeElements(
+						element = editor.deserializeNodes(
 							textAccessor.currentValue,
 							`BlockEditor: The 'textBlockField' contains invalid JSON.`,
-						)[0]
+						)[0] as SlateElement
 					}
 					textElementCache.set(entity, element)
 					return element
@@ -153,11 +164,10 @@ export const useBlockEditorSlateNodes = ({
 					entityKey,
 					blockType: selectedBlock.discriminateBy,
 				}
-				/*
-				TODO This is a memory leak as we don't ever remove the blocks from the map. They're tiny objects though and
-					we're not expecting the user to create thousands and thousands of them so it's not that big of a deal but it's
-					still far from ideal. How do we fix this though? 🤔
-				*/
+
+				// TODO This is a memory leak as we don't ever remove the blocks from the map. They're tiny objects though and
+				//		we're not expecting the user to create thousands and thousands of them so it's not that big of a deal
+				//		but it's still far from ideal. How do we fix this though? 🤔
 				contemberBlockElementCache.set(entityKey, contemberBlock)
 				return contemberBlock
 		  })

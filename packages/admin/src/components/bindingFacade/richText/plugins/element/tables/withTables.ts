@@ -394,6 +394,47 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			}
 			onKeyDown(event)
 		},
+		normalizeNode: entry => {
+			const [node, path] = entry
+
+			if (!SlateElement.isElement(node)) {
+				return normalizeNode(entry)
+			}
+			// TODO validate consistent table dimensions
+			if (e.isTable(node)) {
+				for (const [child, childPath] of SlateNode.children(e, path)) {
+					if (SlateElement.isElement(child)) {
+						if (!e.isTableRow(child)) {
+							ContemberEditor.ejectElement(e, childPath)
+							Transforms.setNodes(e, { type: tableRowElementType }, { at: childPath })
+						}
+					} else {
+						return Transforms.removeNodes(e, { at: path })
+					}
+				}
+			} else if (e.isTableRow(node)) {
+				for (const [child, childPath] of SlateNode.children(e, path)) {
+					if (SlateElement.isElement(child)) {
+						if (!e.isTableCell(child)) {
+							ContemberEditor.ejectElement(e, childPath)
+							Transforms.setNodes(e, { type: tableCellElementType }, { at: childPath })
+						}
+					} else {
+						return Transforms.removeNodes(e, { at: path })
+					}
+				}
+			} else if (e.isTableCell(node)) {
+				if (node.children.length === 1) {
+					const onlyChild = node.children[0]
+					if (SlateElement.isElement(onlyChild) && e.isDefaultElement(onlyChild)) {
+						Transforms.unwrapNodes(e, {
+							at: [...path, 0],
+						})
+					}
+				}
+			}
+			normalizeNode(entry)
+		},
 	})
 
 	return (editor as unknown) as EditorWithTables<E>

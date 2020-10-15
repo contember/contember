@@ -162,8 +162,9 @@ namespace EntityAccessor {
 
 	export type FieldData = Map<FieldName, FieldDatum>
 
+	export type GetEntityAccessor = () => EntityAccessor
 	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
-	export type BatchUpdatesHandler = (getAccessor: () => EntityAccessor, bindingOperations: BindingOperations) => void
+	export type BatchUpdatesHandler = (getAccessor: GetEntityAccessor, bindingOperations: BindingOperations) => void
 	export type ConnectEntityAtField = (field: FieldName, entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type DeleteEntity = () => void
 	export type DisconnectEntityAtField = (field: FieldName) => void

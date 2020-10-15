@@ -28,19 +28,23 @@ export const BlockElement = React.memo(function BlockElement({
 			...attributes,
 		},
 		[
-			withBoundaries && (
-				<EditorBlockBoundary
-					blockEdge="before"
-					onClick={() => editor.insertBetweenBlocks([element, elementPath], 'before')}
-				/>
-			),
-			children,
-			withBoundaries && (
-				<EditorBlockBoundary
-					blockEdge="after"
-					onClick={() => editor.insertBetweenBlocks([element, elementPath], 'after')}
-				/>
-			),
+			<React.Fragment key="before">
+				{withBoundaries && (
+					<EditorBlockBoundary
+						blockEdge="before"
+						onClick={() => editor.insertBetweenBlocks([element, elementPath], 'before')}
+					/>
+				)}
+			</React.Fragment>,
+			<React.Fragment key="block">{children}</React.Fragment>,
+			<React.Fragment key="after">
+				{withBoundaries && (
+					<EditorBlockBoundary
+						blockEdge="after"
+						onClick={() => editor.insertBetweenBlocks([element, elementPath], 'after')}
+					/>
+				)}
+			</React.Fragment>,
 		],
 	)
 })

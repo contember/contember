@@ -28,7 +28,7 @@ export type EditorNode = Omit<Pick<UnderlyingEditor, KnownKeys<UnderlyingEditor>
 
 export type SerializableEditorNode = {
 	formatVersion: number
-	children: Array<ElementNode>
+	children: Array<ElementNode | TextNode>
 }
 
 export type Node = EditorNode | ElementNode | TextNode

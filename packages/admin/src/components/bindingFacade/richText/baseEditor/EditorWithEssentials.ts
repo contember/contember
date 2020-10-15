@@ -22,8 +22,8 @@ export interface WithEssentials<E extends EditorNode> {
 	isHeadingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
 	isPhrasingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
 
-	serializeElements: (elements: ElementNode[], errorMessage?: string) => string
-	deserializeElements: (serializedElement: string, errorMessage?: string) => ElementNode[]
+	serializeNodes: (nodes: Array<ElementNode | TextNode>, errorMessage?: string) => string
+	deserializeNodes: (serializedNodes: string, errorMessage?: string) => Array<ElementNode | TextNode>
 
 	upgradeFormatBySingleVersion: (node: SlateNode, oldVersion: number) => SlateNode
 

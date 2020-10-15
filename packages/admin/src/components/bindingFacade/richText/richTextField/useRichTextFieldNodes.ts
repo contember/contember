@@ -24,7 +24,10 @@ export const useRichTextFieldNodes = ({
 	const elements: ElementNode[] =
 		fieldValue === null || fieldValue === ''
 			? [editor.createDefaultElement([{ text: '' }])]
-			: editor.deserializeElements(fieldValue, `RichTextField: the underlying field contains invalid JSON.`)
+			: (editor.deserializeNodes(
+					fieldValue,
+					`RichTextField: the underlying field contains invalid JSON.`,
+			  ) as ElementNode[])
 	contemberFieldElementCache.set(fieldAccessor, elements)
 
 	return elements

@@ -1,6 +1,10 @@
-import { BaseEditor, ElementNode, SerializableEditorNode } from '../../baseEditor'
+import { BaseEditor, ElementNode, SerializableEditorNode, TextNode } from '../../baseEditor'
 
-export const serializeElements = <E extends BaseEditor>(editor: E, elements: ElementNode[], errorMessage?: string) => {
+export const serializeNodes = <E extends BaseEditor>(
+	editor: E,
+	elements: Array<ElementNode | TextNode>,
+	errorMessage?: string,
+) => {
 	try {
 		const serialized: SerializableEditorNode = {
 			formatVersion: editor.formatVersion,

@@ -84,7 +84,7 @@ export const RichTextFieldInner = React.memo(
 			contemberFieldElementCache,
 		})
 
-		const serialize = editor.serializeElements
+		const serialize = editor.serializeNodes
 		const onChange = React.useCallback(
 			(value: SlateNode[]) => {
 				batchUpdates(getAccessor => {

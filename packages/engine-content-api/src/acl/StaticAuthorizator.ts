@@ -22,4 +22,8 @@ export default class StaticAuthorizator implements Authorizator {
 		}
 		return Object.values(fieldPermissions).filter(it => !!it).length > 0
 	}
+
+	isCustomPrimaryAllowed(entity: string): boolean {
+		return this.permissions?.[entity]?.operations?.customPrimary || false
+	}
 }

@@ -10,7 +10,7 @@ export class AllowAllPermissionFactory {
 		],
 	) {}
 
-	create(schema: Pick<Model.Schema, 'entities'>): Acl.Permissions {
+	create(schema: Pick<Model.Schema, 'entities'>, allowCustomPrimary = false): Acl.Permissions {
 		const permissions: Acl.Permissions = {}
 		for (let entityName in schema.entities) {
 			if (!schema.entities.hasOwnProperty(entityName)) {
@@ -35,6 +35,7 @@ export class AllowAllPermissionFactory {
 								delete: true,
 						  }
 						: {}),
+					...(allowCustomPrimary ? { customPrimary: true } : {}),
 				},
 			}
 		}

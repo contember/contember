@@ -8,6 +8,8 @@ interface Authorizator {
 		entity: string,
 		field: string,
 	): boolean
+
+	isCustomPrimaryAllowed(entity: string): boolean
 }
 
 export default Authorizator

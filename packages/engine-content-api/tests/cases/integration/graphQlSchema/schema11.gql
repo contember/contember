@@ -1,0 +1,753 @@
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type Author {
+  _meta: AuthorMeta
+  id: UUID!
+  name: String
+  posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
+  postsByLocales(by: AuthorPostsByLocalesUniqueWhere!, filter: PostWhere): Post
+}
+
+type AuthorConnection {
+  pageInfo: PageInfo!
+  edges: [AuthorEdge!]!
+}
+
+input AuthorCreateInput {
+  id: UUID
+  name: String
+  posts: [AuthorCreatePostsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input AuthorCreatePostsEntityRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutAuthorCreateInput
+  alias: String
+}
+
+type AuthorCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Author
+  validation: _ValidationResult!
+}
+
+type AuthorDeleteResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Author
+}
+
+type AuthorEdge {
+  node: Author!
+}
+
+type AuthorMeta {
+  id: FieldMeta
+  name: FieldMeta
+  posts: FieldMeta
+}
+
+input AuthorOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  name: OrderDirection
+}
+
+input AuthorPostsByLocalesUniqueWhere {
+  locales: PostLocaleUniqueWhere
+}
+
+input AuthorUniqueWhere {
+  id: UUID
+  posts: PostUniqueWhere
+}
+
+input AuthorUpdateInput {
+  name: String
+  posts: [AuthorUpdatePostsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input AuthorUpdatePostsEntityRelationInput {
+  create: PostWithoutAuthorCreateInput
+  update: AuthorUpdatePostsRelationInput
+  upsert: AuthorUpsertPostsRelationInput
+  connect: PostUniqueWhere
+  disconnect: PostUniqueWhere
+  delete: PostUniqueWhere
+  alias: String
+}
+
+input AuthorUpdatePostsRelationInput {
+  by: PostUniqueWhere
+  data: PostWithoutAuthorUpdateInput
+}
+
+type AuthorUpdateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Author
+  validation: _ValidationResult!
+}
+
+input AuthorUpsertPostsRelationInput {
+  by: PostUniqueWhere
+  update: PostWithoutAuthorUpdateInput
+  create: PostWithoutAuthorCreateInput
+}
+
+input AuthorWhere {
+  id: UUIDCondition
+  name: StringCondition
+  posts: PostWhere
+  and: [AuthorWhere!]
+  or: [AuthorWhere!]
+  not: AuthorWhere
+}
+
+input AuthorWithoutPostsCreateInput {
+  id: UUID
+  name: String
+  _dummy_field_: Boolean
+}
+
+input AuthorWithoutPostsUpdateInput {
+  name: String
+  _dummy_field_: Boolean
+}
+
+type Category {
+  _meta: CategoryMeta
+  id: UUID!
+  name: String
+  posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
+}
+
+type CategoryConnection {
+  pageInfo: PageInfo!
+  edges: [CategoryEdge!]!
+}
+
+input CategoryCreateInput {
+  id: UUID
+  name: String
+  posts: [CategoryCreatePostsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input CategoryCreatePostsEntityRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutCategoriesCreateInput
+  alias: String
+}
+
+type CategoryCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
+type CategoryDeleteResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+}
+
+type CategoryEdge {
+  node: Category!
+}
+
+type CategoryMeta {
+  id: FieldMeta
+  name: FieldMeta
+  posts: FieldMeta
+}
+
+input CategoryOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  name: OrderDirection
+}
+
+input CategoryUniqueWhere {
+  id: UUID
+}
+
+input CategoryUpdateInput {
+  name: String
+  posts: [CategoryUpdatePostsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input CategoryUpdatePostsEntityRelationInput {
+  create: PostWithoutCategoriesCreateInput
+  update: CategoryUpdatePostsRelationInput
+  upsert: CategoryUpsertPostsRelationInput
+  connect: PostUniqueWhere
+  disconnect: PostUniqueWhere
+  delete: PostUniqueWhere
+  alias: String
+}
+
+input CategoryUpdatePostsRelationInput {
+  by: PostUniqueWhere
+  data: PostWithoutCategoriesUpdateInput
+}
+
+type CategoryUpdateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
+input CategoryUpsertPostsRelationInput {
+  by: PostUniqueWhere
+  update: PostWithoutCategoriesUpdateInput
+  create: PostWithoutCategoriesCreateInput
+}
+
+input CategoryWhere {
+  id: UUIDCondition
+  name: StringCondition
+  posts: PostWhere
+  and: [CategoryWhere!]
+  or: [CategoryWhere!]
+  not: CategoryWhere
+}
+
+input CategoryWithoutPostsCreateInput {
+  id: UUID
+  name: String
+  _dummy_field_: Boolean
+}
+
+input CategoryWithoutPostsUpdateInput {
+  name: String
+  _dummy_field_: Boolean
+}
+
+scalar DateTime
+
+input DateTimeCondition {
+  and: [DateTimeCondition!]
+  or: [DateTimeCondition!]
+  not: DateTimeCondition
+  eq: DateTime
+  null: Boolean
+  isNull: Boolean
+  notEq: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  createPost(data: PostCreateInput!): PostCreateResult!
+  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
+  deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
+  updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
+  updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
+  createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
+  deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
+  updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
+  transaction: MutationTransaction!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  validation: _ValidationResult!
+  createPost(data: PostCreateInput!): PostCreateResult!
+  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
+  deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
+  updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
+  updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
+  createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
+  deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
+  updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
+}
+
+enum OrderDirection {
+  asc
+  desc
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type Post {
+  _meta: PostMeta
+  author(filter: AuthorWhere): Author
+  id: UUID!
+  publishedAt: DateTime
+  locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
+  categories(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge!]!
+}
+
+input PostCreateAuthorEntityRelationInput {
+  connect: AuthorUniqueWhere
+  create: AuthorWithoutPostsCreateInput
+}
+
+input PostCreateCategoriesEntityRelationInput {
+  connect: CategoryUniqueWhere
+  create: CategoryWithoutPostsCreateInput
+  alias: String
+}
+
+input PostCreateInput {
+  author: PostCreateAuthorEntityRelationInput
+  id: UUID
+  publishedAt: DateTime
+  locales: [PostCreateLocalesEntityRelationInput!]
+  categories: [PostCreateCategoriesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostCreateLocalesEntityRelationInput {
+  connect: PostLocaleUniqueWhere
+  create: PostLocaleWithoutPostCreateInput
+  alias: String
+}
+
+type PostCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Post
+  validation: _ValidationResult!
+}
+
+type PostDeleteResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Post
+}
+
+type PostEdge {
+  node: Post!
+}
+
+type PostLocale {
+  _meta: PostLocaleMeta
+  id: UUID!
+  title: String
+  Post(filter: PostWhere): Post
+}
+
+type PostLocaleConnection {
+  pageInfo: PageInfo!
+  edges: [PostLocaleEdge!]!
+}
+
+input PostLocaleCreateInput {
+  id: UUID
+  title: String
+  Post: PostLocaleCreatePostEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input PostLocaleCreatePostEntityRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutLocalesCreateInput
+}
+
+type PostLocaleCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: PostLocale
+  validation: _ValidationResult!
+}
+
+type PostLocaleDeleteResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: PostLocale
+}
+
+type PostLocaleEdge {
+  node: PostLocale!
+}
+
+type PostLocaleMeta {
+  id: FieldMeta
+  title: FieldMeta
+  Post: FieldMeta
+}
+
+input PostLocaleOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  title: OrderDirection
+  Post: PostOrderBy
+}
+
+input PostLocaleUniqueWhere {
+  id: UUID
+}
+
+input PostLocaleUpdateInput {
+  title: String
+  Post: PostLocaleUpdatePostEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input PostLocaleUpdatePostEntityRelationInput {
+  create: PostWithoutLocalesCreateInput
+  update: PostWithoutLocalesUpdateInput
+  upsert: PostLocaleUpsertPostRelationInput
+  connect: PostUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
+}
+
+type PostLocaleUpdateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: PostLocale
+  validation: _ValidationResult!
+}
+
+input PostLocaleUpsertPostRelationInput {
+  update: PostWithoutLocalesUpdateInput
+  create: PostWithoutLocalesCreateInput
+}
+
+input PostLocaleWhere {
+  id: UUIDCondition
+  title: StringCondition
+  Post: PostWhere
+  and: [PostLocaleWhere!]
+  or: [PostLocaleWhere!]
+  not: PostLocaleWhere
+}
+
+input PostLocaleWithoutPostCreateInput {
+  id: UUID
+  title: String
+  _dummy_field_: Boolean
+}
+
+input PostLocaleWithoutPostUpdateInput {
+  title: String
+  _dummy_field_: Boolean
+}
+
+type PostMeta {
+  author: FieldMeta
+  id: FieldMeta
+  publishedAt: FieldMeta
+  locales: FieldMeta
+  categories: FieldMeta
+}
+
+input PostOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  author: AuthorOrderBy
+  id: OrderDirection
+  publishedAt: OrderDirection
+}
+
+input PostUniqueWhere {
+  id: UUID
+  locales: PostLocaleUniqueWhere
+}
+
+input PostUpdateAuthorEntityRelationInput {
+  create: AuthorWithoutPostsCreateInput
+  update: AuthorWithoutPostsUpdateInput
+  upsert: PostUpsertAuthorRelationInput
+  connect: AuthorUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input PostUpdateCategoriesEntityRelationInput {
+  create: CategoryWithoutPostsCreateInput
+  update: PostUpdateCategoriesRelationInput
+  upsert: PostUpsertCategoriesRelationInput
+  connect: CategoryUniqueWhere
+  disconnect: CategoryUniqueWhere
+  delete: CategoryUniqueWhere
+  alias: String
+}
+
+input PostUpdateCategoriesRelationInput {
+  by: CategoryUniqueWhere
+  data: CategoryWithoutPostsUpdateInput
+}
+
+input PostUpdateInput {
+  author: PostUpdateAuthorEntityRelationInput
+  publishedAt: DateTime
+  locales: [PostUpdateLocalesEntityRelationInput!]
+  categories: [PostUpdateCategoriesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostUpdateLocalesEntityRelationInput {
+  create: PostLocaleWithoutPostCreateInput
+  update: PostUpdateLocalesRelationInput
+  upsert: PostUpsertLocalesRelationInput
+  connect: PostLocaleUniqueWhere
+  disconnect: PostLocaleUniqueWhere
+  delete: PostLocaleUniqueWhere
+  alias: String
+}
+
+input PostUpdateLocalesRelationInput {
+  by: PostLocaleUniqueWhere
+  data: PostLocaleWithoutPostUpdateInput
+}
+
+type PostUpdateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Post
+  validation: _ValidationResult!
+}
+
+input PostUpsertAuthorRelationInput {
+  update: AuthorWithoutPostsUpdateInput
+  create: AuthorWithoutPostsCreateInput
+}
+
+input PostUpsertCategoriesRelationInput {
+  by: CategoryUniqueWhere
+  update: CategoryWithoutPostsUpdateInput
+  create: CategoryWithoutPostsCreateInput
+}
+
+input PostUpsertLocalesRelationInput {
+  by: PostLocaleUniqueWhere
+  update: PostLocaleWithoutPostUpdateInput
+  create: PostLocaleWithoutPostCreateInput
+}
+
+input PostWhere {
+  author: AuthorWhere
+  id: UUIDCondition
+  publishedAt: DateTimeCondition
+  locales: PostLocaleWhere
+  categories: CategoryWhere
+  and: [PostWhere!]
+  or: [PostWhere!]
+  not: PostWhere
+}
+
+input PostWithoutAuthorCreateInput {
+  id: UUID
+  publishedAt: DateTime
+  locales: [PostCreateLocalesEntityRelationInput!]
+  categories: [PostCreateCategoriesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostWithoutAuthorUpdateInput {
+  publishedAt: DateTime
+  locales: [PostUpdateLocalesEntityRelationInput!]
+  categories: [PostUpdateCategoriesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostWithoutCategoriesCreateInput {
+  author: PostCreateAuthorEntityRelationInput
+  id: UUID
+  publishedAt: DateTime
+  locales: [PostCreateLocalesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostWithoutCategoriesUpdateInput {
+  author: PostUpdateAuthorEntityRelationInput
+  publishedAt: DateTime
+  locales: [PostUpdateLocalesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostWithoutLocalesCreateInput {
+  author: PostCreateAuthorEntityRelationInput
+  id: UUID
+  publishedAt: DateTime
+  categories: [PostCreateCategoriesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostWithoutLocalesUpdateInput {
+  author: PostUpdateAuthorEntityRelationInput
+  publishedAt: DateTime
+  categories: [PostUpdateCategoriesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+type Query {
+  getPost(by: PostUniqueWhere!): Post
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
+  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
+  getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
+  paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
+  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
+  validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
+  getCategory(by: CategoryUniqueWhere!): Category
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
+  paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
+  validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
+  getAuthor(by: AuthorUniqueWhere!): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
+  validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
+  validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type QueryTransaction {
+  getPost(by: PostUniqueWhere!): Post
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
+  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
+  getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
+  paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
+  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
+  validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
+  getCategory(by: CategoryUniqueWhere!): Category
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
+  paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
+  validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
+  getAuthor(by: AuthorUniqueWhere!): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
+  validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
+  validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  eq: String
+  null: Boolean
+  isNull: Boolean
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+}
+
+scalar UUID
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  eq: UUID
+  null: Boolean
+  isNull: Boolean
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}

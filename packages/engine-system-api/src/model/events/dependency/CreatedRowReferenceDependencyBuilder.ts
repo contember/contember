@@ -2,8 +2,9 @@ import { ContentEvent, EventType } from '@contember/engine-common'
 import { DependencyBuilder, EventsDependencies } from '../DependencyBuilder'
 import { TableReferencingResolver, TableReferencingResolverResult } from '../TableReferencingResolver'
 import { Schema } from '@contember/schema'
-import { getJunctionTables } from '../../helpers/modelHelpers'
+import { getJunctionTables } from '../../helpers'
 import assert from 'assert'
+import { MapSet, tuple } from '../../../utils'
 
 /**
  * Events that references a row depends on creation of such event (or its following update)
@@ -22,27 +23,29 @@ export class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 
 	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
 		if (events.length === 0) {
-			return {}
+			return new MapSet()
 		}
 
 		const tableReferencing: TableReferencingResolverResult = this.tableReferencingResolver.getTableReferencing(
 			schema.model,
 		)
 
-		const dependencies: EventsDependencies = {}
-		const createdRows: { [id: string]: string } = {}
+		const dependencies: EventsDependencies = new MapSet()
+		const formatRef = (id: string, table: string) => `${table}#${id}`
+		const createdRows = new Map<string, string>()
 		const junctionTables = getJunctionTables(schema.model)
-		const junctionTableNames = new Set(junctionTables.map(it => it.tableName))
+		const junctionTableMap = new Map(junctionTables.map(it => tuple(it.tableName, it)))
 
 		for (const event of events) {
-			const isJunction = junctionTableNames.has(event.tableName)
-			if (!isJunction) {
+			const junctionTable = junctionTableMap.get(event.tableName)
+			if (!junctionTable) {
 				assert.equal(event.rowId.length, 1)
+				const ref = formatRef(event.rowId[0], event.tableName)
 				if (event.type === EventType.create) {
-					createdRows[event.rowId[0]] = event.id
-				} else if (createdRows[event.rowId[0]]) {
+					createdRows.set(ref, event.id)
+				} else if (createdRows.has(ref)) {
 					// update event reference to latest event
-					createdRows[event.rowId[0]] = event.id
+					createdRows.set(ref, event.id)
 				}
 			}
 
@@ -55,14 +58,22 @@ export class CreatedRowReferenceDependencyBuilder implements DependencyBuilder {
 				if (!referencedTable) {
 					continue
 				}
-				if (createdRows[event.values[column]]) {
-					dependencies[event.id] = [...(dependencies[event.id] || []), createdRows[event.values[column]]]
+				const ref = formatRef(event.values[column], referencedTable)
+				const createEventId = createdRows.get(ref)
+				if (createEventId !== undefined) {
+					dependencies.add(event.id, createEventId)
 				}
 			}
-			if (isJunction) {
-				event.rowId.forEach(id => {
-					if (createdRows[id]) {
-						dependencies[event.id] = [...(dependencies[event.id] || []), createdRows[id]]
+			if (junctionTable) {
+				event.rowId.forEach((id, index) => {
+					assert.ok(index === 0 || index === 1)
+					const columnName =
+						index === 0 ? junctionTable.joiningColumn.columnName : junctionTable.inverseJoiningColumn.columnName
+					const table = tableReferencing[junctionTable.tableName][columnName]
+					const ref = formatRef(id, table)
+					const createdEventId = createdRows.get(ref)
+					if (createdEventId) {
+						dependencies.add(event.id, createdEventId)
 					}
 				})
 			}

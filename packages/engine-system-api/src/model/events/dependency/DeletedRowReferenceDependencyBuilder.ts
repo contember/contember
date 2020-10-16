@@ -4,6 +4,7 @@ import { TableReferencingResolver, TableReferencingResolverResult } from '../Tab
 import { Schema } from '@contember/schema'
 import { getJunctionTables } from '../../helpers/modelHelpers'
 import assert from 'assert'
+import { MapSet } from '../../../utils'
 
 /**
  * Delete event depends on all previous events which references this row
@@ -20,23 +21,22 @@ export class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 
 	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
 		if (events.length === 0) {
-			return {}
+			return new MapSet()
 		}
 
 		const tableReferencing: TableReferencingResolverResult = this.tableReferencingResolver.getTableReferencing(
 			schema.model,
 		)
-
-		const dependencies: EventsDependencies = {}
-		const deletedRows: { [rowId: string]: string } = {}
+		const formatRef = (id: string, table: string) => `${table}#${id}`
+		const dependencies: EventsDependencies = new MapSet()
+		const deletedRows = new Map()
 		const junctionTables = new Set(getJunctionTables(schema.model).map(it => it.tableName))
 
 		for (const event of events) {
 			if (!junctionTables.has(event.tableName)) {
 				assert.equal(event.rowId.length, 1)
 				if (event.type === EventType.delete) {
-					dependencies[event.id] = []
-					deletedRows[event.rowId[0]] = event.id
+					deletedRows.set(formatRef(event.rowId[0], event.tableName), event.id)
 				}
 			}
 		}
@@ -51,8 +51,10 @@ export class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 				if (!referencedTable) {
 					continue
 				}
-				if (deletedRows[event.values[column]]) {
-					dependencies[deletedRows[event.values[column]]].push(event.id)
+				const ref = formatRef(event.values[column], referencedTable)
+				const deleteEventId = deletedRows.get(ref)
+				if (deleteEventId) {
+					dependencies.add(deleteEventId, event.id)
 				}
 			}
 		}

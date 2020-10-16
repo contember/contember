@@ -1,8 +1,9 @@
 import { ContentEvent } from '@contember/engine-common'
 import { DependencyBuilder, EventsDependencies } from '../DependencyBuilder'
 import { Schema } from '@contember/schema'
-import { getJunctionTables } from '../../helpers/modelHelpers'
+import { getJunctionTables } from '../../helpers'
 import assert from 'assert'
+import { MapSet } from '../../../utils'
 
 /**
  * Events on a same row are depending on each other. Meaning that
@@ -15,27 +16,19 @@ import assert from 'assert'
  */
 export class SameRowDependencyBuilder implements DependencyBuilder {
 	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
-		const rows: { [id: string]: string[] } = {}
-		const dependencies: EventsDependencies = {}
+		const rows = new MapSet<string, string>()
+		const dependencies: EventsDependencies = new MapSet()
 		const junctionTables = new Set(getJunctionTables(schema.model).map(it => it.tableName))
+		const formatRef = (id: string, table: string) => `${table}#${id}`
 		for (const event of events) {
 			if (junctionTables.has(event.tableName)) {
 				continue
 			}
 			assert.equal(event.rowId.length, 1)
+			const ref = formatRef(event.rowId[0], event.tableName)
 
-			const rowId = event.rowId[0]
-			if (!rows[rowId]) {
-				rows[rowId] = []
-			}
-
-			// currently there is cyclic dependency on both previous and following events
-			dependencies[event.id] = rows[rowId]
-
-			// depending only on past events
-			// dependencies[event.id] = [...rows[event.tableName][rowId]]
-
-			rows[rowId].push(event.id)
+			const events = rows.add(ref, event.id)
+			dependencies.set(event.id, events)
 		}
 
 		return dependencies

@@ -128,11 +128,12 @@ export class ReleaseExecutor {
 		const checked = new Set<string>()
 		const eventsSet = new Set(eventsToApply)
 		const verify = (id: string): boolean => {
-			if (!dependencies[id]) {
+			const deps = dependencies.get(id)
+			if (!deps) {
 				throw new Error()
 			}
 			checked.add(id)
-			for (let dependency of dependencies[id]) {
+			for (let dependency of deps.values()) {
 				if (checked.has(dependency)) {
 					continue
 				}

@@ -20,7 +20,7 @@ export class DiffEventResponseBuilder {
 
 		return events.map(it => ({
 			createdAt: it.createdAt,
-			dependencies: it.dependencies,
+			dependencies: [...it.dependencies.values()],
 			id: it.id,
 			type: apiEventTypeMapping[it.type],
 			description: this.formatDescription(it),

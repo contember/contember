@@ -81,6 +81,29 @@ describe('build gql schema from model schema', () => {
 		})
 	})
 
+	it('builds schema with custom primary allowed', async () => {
+		await testSchema({
+			schema: builder =>
+				builder
+					.entity('Author', e =>
+						e
+							.column('name', c => c.type(Model.ColumnType.String))
+							.oneHasMany('posts', r => r.target('Post').ownedBy('author')),
+					)
+					.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
+					.entity('Post', e =>
+						e
+							.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
+							.oneHasMany('locales', r =>
+								r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))),
+							)
+							.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
+					),
+			permissions: schema => new AllowAllPermissionFactory().create(schema, true),
+			graphQlSchemaFile: 'schema11.gql',
+		})
+	})
+
 	it('restricts access to fields by permissions', async () => {
 		await testSchema({
 			schema: builder =>

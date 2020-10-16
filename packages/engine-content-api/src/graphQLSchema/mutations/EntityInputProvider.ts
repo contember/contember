@@ -43,13 +43,11 @@ class EntityInputProvider<Operation extends EntityInputProvider.Type.create | En
 					throw new ImplementationException(`EntityInputProvider: Invalid operation ${this.operation}`)
 			}
 		})()
-		if (!this.authorizator.isAllowed(operation, entity.name, entity.primary)) {
+		if (!this.authorizator.isAllowed(operation, entity.name)) {
 			return undefined
 		}
 
-		const fieldNames = Object.keys(entity.fields)
-			.filter(it => it !== entity.primary)
-			.filter(it => it !== withoutRelation)
+		const fieldNames = Object.keys(entity.fields).filter(it => it !== withoutRelation)
 
 		return this.graphqlObjectFactories.createInputObjectType({
 			name: GqlTypeName`${entityName}${withoutSuffix}${this.operation}Input`,

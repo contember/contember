@@ -18,7 +18,7 @@ export default class CreateEntityInputFieldVisitor
 	) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLInputFieldConfig | undefined {
-		if (entity.primary === column.name) {
+		if (entity.primary === column.name && !this.authorizator.isCustomPrimaryAllowed(entity.name)) {
 			return undefined
 		}
 		if (!this.authorizator.isAllowed(Acl.Operation.create, entity.name, column.name)) {

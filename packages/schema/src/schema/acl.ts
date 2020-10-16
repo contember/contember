@@ -51,6 +51,7 @@ namespace Acl {
 	export interface EntityOperations {
 		read?: FieldPermissions
 		create?: FieldPermissions
+		customPrimary?: boolean
 		update?: FieldPermissions
 		delete?: Predicate
 	}

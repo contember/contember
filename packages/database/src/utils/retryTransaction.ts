@@ -9,7 +9,7 @@ export interface RetryOptions {
 const defaultOptions: RetryOptions = {
 	maxAttempts: 5,
 	minTimeout: 20,
-	maxTimeout: 70,
+	maxTimeout: 100,
 }
 
 export const retryTransaction = async <R>(
@@ -18,10 +18,13 @@ export const retryTransaction = async <R>(
 ): Promise<R> => {
 	let attempt = 0
 	const minTimeout = options.minTimeout ?? defaultOptions.minTimeout
-	const additionalTimeout = (options.maxTimeout ?? defaultOptions.maxTimeout) - minTimeout
 	const maxAttempts = options.maxAttempts ?? defaultOptions.maxAttempts
-	const timeout = async () =>
-		await new Promise(resolve => setTimeout(resolve, Math.round(minTimeout + Math.random() * additionalTimeout)))
+	const additionalTimeout = ((options.maxTimeout ?? defaultOptions.maxTimeout) - minTimeout) / maxAttempts
+	const timeout = async (attempt: number) => {
+		const timeout = Math.round(minTimeout + Math.random() * additionalTimeout * attempt)
+		await new Promise(resolve => setTimeout(resolve, timeout))
+		return timeout
+	}
 
 	do {
 		attempt++
@@ -32,12 +35,12 @@ export const retryTransaction = async <R>(
 				throw e
 			}
 			if (attempt < maxAttempts) {
+				const timeoutMs = await timeout(attempt)
 				// eslint-disable-next-line no-console
-				console.error('Serialization failure, retrying')
-				await timeout()
+				console.error(`RETRY: Serialization failure (attempt #${attempt}, retrying after ${timeoutMs}ms)`)
 			} else {
 				// eslint-disable-next-line no-console
-				console.error('Serialization failure, aborting')
+				console.error(`ABORT: Serialization failure (attempt #${attempt})`)
 				throw e
 			}
 		}

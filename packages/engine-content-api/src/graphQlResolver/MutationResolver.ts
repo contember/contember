@@ -339,19 +339,26 @@ export default class MutationResolver {
 	private async transaction<R extends { ok: boolean }>(
 		cb: (mapper: Mapper, db: Client<Connection.TransactionLike>) => Promise<R>,
 	): Promise<R> {
-		return await retryTransaction(async () => {
-			return await this.db.transaction(async trx => {
-				await trx.connection.query(Connection.REPEATABLE_READ)
-				await this.systemVariablesSetup(trx)
-				const mapper = this.mapperFactory(trx)
+		return await retryTransaction(
+			async () => {
+				return await this.db.transaction(async trx => {
+					await trx.connection.query(Connection.REPEATABLE_READ)
+					await this.systemVariablesSetup(trx)
+					const mapper = this.mapperFactory(trx)
 
-				const result = await cb(mapper, trx)
-				if (!result.ok) {
-					await trx.connection.rollback()
-				}
-				return result
-			})
-		})
+					const result = await cb(mapper, trx)
+					if (!result.ok) {
+						await trx.connection.rollback()
+					}
+					return result
+				})
+			},
+			{
+				maxAttempts: 15,
+				minTimeout: 10,
+				maxTimeout: 1000,
+			},
+		)
 	}
 
 	private convertResultToErrors(result: MutationResultList): Result.ExecutionError[] {

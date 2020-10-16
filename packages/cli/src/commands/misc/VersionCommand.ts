@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration } from '../../cli'
-import { getContemberVersion } from '../../utils/contember'
+import { getCliVersion } from '../../utils/contember'
 
 export class VersionCommand extends Command<{}, {}> {
 	protected configure(configuration: CommandConfiguration<{}, {}>): void {
@@ -7,7 +7,7 @@ export class VersionCommand extends Command<{}, {}> {
 	}
 
 	protected async execute(): Promise<void | number> {
-		console.log(getContemberVersion())
+		console.log(getCliVersion())
 		return 0
 	}
 }

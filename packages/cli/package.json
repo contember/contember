@@ -1,6 +1,6 @@
 {
   "name": "@contember/cli",
-  "version": "0.9.2-alpha.1",
+  "version": "0.9.2-alpha.2",
   "license": "Apache-2.0",
   "bin": {
     "contember": "./dist/src/run.js"
@@ -13,13 +13,13 @@
     "@types/prompts": "^2.0.1"
   },
   "dependencies": {
-    "@contember/config-loader": "^0.9.2-alpha.1",
-    "@contember/database-migrations": "^0.9.2-alpha.1",
-    "@contember/dic": "^0.9.2-alpha.1",
-    "@contember/schema": "^0.9.2-alpha.1",
-    "@contember/schema-definition": "^0.9.2-alpha.1",
-    "@contember/schema-migrations": "^0.9.2-alpha.1",
-    "@contember/schema-utils": "^0.9.2-alpha.1",
+    "@contember/config-loader": "^0.9.2-alpha.2",
+    "@contember/database-migrations": "^0.9.2-alpha.2",
+    "@contember/dic": "^0.9.2-alpha.2",
+    "@contember/schema": "^0.9.2-alpha.2",
+    "@contember/schema-definition": "^0.9.2-alpha.2",
+    "@contember/schema-migrations": "^0.9.2-alpha.2",
+    "@contember/schema-utils": "^0.9.2-alpha.2",
     "chalk": "^4.1.0",
     "chalk-table": "^1.0.2",
     "download-tarball": "^2.0.0",

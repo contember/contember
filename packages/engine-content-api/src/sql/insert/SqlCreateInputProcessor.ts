@@ -142,13 +142,13 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 	oneHasMany: CreateInputProcessor<MutationResultList>['oneHasMany'] = {
 		connect: hasManyProcessor(
 			async (context): Promise<MutationResultList> => {
-				const value = await this.insertBuilder.insert
-				if (!value) {
+				const primary = await this.insertBuilder.insert
+				if (!primary) {
 					return []
 				}
 				return await this.mapper.update(context.targetEntity, context.input, {
 					[context.targetRelation.name]: {
-						connect: { [context.relation.name]: value },
+						connect: { [context.entity.primary]: primary },
 					},
 				})
 			},

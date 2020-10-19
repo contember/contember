@@ -1,4 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
+import { FieldHelpers } from '../fieldHelpers'
 import { FieldName, FieldValue } from '../treeParameters'
 import { Accessor } from './Accessor'
 import { Errorable } from './Errorable'
@@ -42,6 +43,16 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 			return this.currentValue
 		}
 		return this.currentValue === null ? this.defaultValue : this.currentValue
+	}
+
+	// helpers
+
+	public get asTemporal() {
+		return new FieldHelpers.Temporal(this.updateValue as FieldAccessor.UpdateValue<string>)
+	}
+
+	public get asUuid() {
+		return new FieldHelpers.Uuid(this.updateValue as FieldAccessor.UpdateValue<string>)
 	}
 }
 namespace FieldAccessor {

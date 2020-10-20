@@ -1,13 +1,12 @@
 import { Environment } from '../dao'
-import { Accessor } from './Accessor'
 import { BindingOperations } from './BindingOperations'
 import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
-class EntityListAccessor extends Accessor implements Errorable {
+class EntityListAccessor implements Errorable {
 	public constructor(
-		private readonly children: ReadonlyMap<string, { getAccessor: () => EntityAccessor }>, // See EntityAccessor.key
+		private readonly children: ReadonlyMap<string, { getAccessor: () => EntityAccessor }>,
 		public readonly errors: ErrorAccessor[],
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
@@ -16,9 +15,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 		public readonly createNewEntity: EntityListAccessor.CreateNewEntity,
 		public readonly disconnectEntity: EntityListAccessor.DisconnectEntity,
 		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
-	) {
-		super()
-	}
+	) {}
 
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
 		for (const [, child] of this.children) {

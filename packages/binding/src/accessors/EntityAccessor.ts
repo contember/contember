@@ -15,14 +15,13 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 } from '../treeParameters'
-import { Accessor } from './Accessor'
 import { BindingOperations } from './BindingOperations'
 import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
 
-class EntityAccessor extends Accessor implements Errorable {
+class EntityAccessor implements Errorable {
 	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
 
 	public constructor(
@@ -37,7 +36,6 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField,
 		public readonly deleteEntity: EntityAccessor.DeleteEntity,
 	) {
-		super()
 		this.runtimeId = key || new EntityAccessor.UnpersistedEntityId()
 	}
 

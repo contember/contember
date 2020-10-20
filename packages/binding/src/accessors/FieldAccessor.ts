@@ -1,12 +1,10 @@
 import { GraphQlBuilder } from '@contember/client'
 import { FieldHelpers } from '../fieldHelpers'
 import { FieldName, FieldValue } from '../treeParameters'
-import { Accessor } from './Accessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
 class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>
-	extends Accessor
 	implements Errorable {
 	constructor(
 		public readonly fieldName: FieldName,
@@ -18,9 +16,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly isTouchedBy: FieldAccessor.IsTouchedBy,
 		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Persisted, Produced>,
 		public readonly updateValue: FieldAccessor.UpdateValue<Produced>,
-	) {
-		super()
-	}
+	) {}
 
 	public hasValue(candidate: this['currentValue']): boolean {
 		const currentValue = this.currentValue

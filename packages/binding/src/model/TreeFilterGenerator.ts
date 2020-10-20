@@ -9,7 +9,6 @@ export class TreeFilterGenerator {
 	public constructor(
 		private readonly markerTree: MarkerTreeRoot,
 		private readonly subTreeStates: Map<string, InternalRootStateNode>,
-		private readonly entityStore: Map<string, InternalEntityState>,
 	) {}
 
 	public generateTreeFilter(): TreeFilter[] {
@@ -29,11 +28,7 @@ export class TreeFilterGenerator {
 				break
 			}
 			case InternalStateType.EntityList: {
-				for (const entityKey of subTree.childrenKeys) {
-					const entity = this.entityStore.get(entityKey)
-					if (entity === undefined) {
-						continue
-					}
+				for (const [, entity] of subTree.children) {
 					const filter = this.generateTopLevelEntityFilter(entity)
 					filter && filters.push(filter)
 				}

@@ -7,8 +7,7 @@ import { ErrorAccessor } from './ErrorAccessor'
 
 class EntityListAccessor extends Accessor implements Errorable {
 	public constructor(
-		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
-		private readonly childEntityKeys: ReadonlySet<string>, // See EntityAccessor.key
+		private readonly children: ReadonlyMap<string, { getAccessor: () => EntityAccessor }>, // See EntityAccessor.key
 		public readonly errors: ErrorAccessor[],
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
@@ -16,18 +15,19 @@ class EntityListAccessor extends Accessor implements Errorable {
 		public readonly connectEntity: EntityListAccessor.ConnectEntity,
 		public readonly createNewEntity: EntityListAccessor.CreateNewEntity,
 		public readonly disconnectEntity: EntityListAccessor.DisconnectEntity,
+		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
 	) {
 		super()
 	}
 
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
-		for (const id of this.childEntityKeys) {
-			yield this.getChildEntityByKey(id)
+		for (const [, child] of this.children) {
+			yield child.getAccessor()
 		}
 	}
 
 	public hasEntityKey(childEntityKey: string): boolean {
-		return this.childEntityKeys.has(childEntityKey)
+		return this.children.has(childEntityKey)
 	}
 
 	public isEmpty(): boolean {
@@ -35,7 +35,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 	}
 
 	public get length(): number {
-		return this.childEntityKeys.size
+		return this.children.size
 	}
 
 	public deleteAll() {

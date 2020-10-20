@@ -1,6 +1,7 @@
 import { GraphQlBuilder, TreeFilter } from '@contember/client'
 import { emptyArray, noop } from '@contember/react-utils'
 import * as ReactDOM from 'react-dom'
+import { validate as uuidValidate } from 'uuid'
 import { BindingOperations, EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } from '../accessors'
 import {
 	BoxedSingleEntityId,
@@ -12,7 +13,7 @@ import {
 	QueryRequestResponse,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { TYPENAME_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkersContainer,
@@ -25,17 +26,17 @@ import {
 	SubTreeMarkerParameters,
 } from '../markers'
 import {
+	Alias,
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
 	BoxedUnconstrainedQualifiedEntityList,
+	BoxedUnconstrainedQualifiedSingleEntity,
 	EntityCreationParameters,
 	EntityListEventListeners,
 	EntityListPreferences,
 	FieldName,
 	Scalar,
 	SingleEntityEventListeners,
-	Alias,
-	BoxedUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { assertNever } from '../utils'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
@@ -1234,7 +1235,7 @@ export class AccessorTreeGenerator {
 					deletedState.markersContainer,
 					deletedState.creationParameters,
 					entityState.onChildFieldUpdate,
-					initialEventListeners,
+					initialEventListeners, // TODO this is wrong!!!
 				)
 				entityState.fields.set(placeholderName, newEntityState)
 			}
@@ -1419,7 +1420,7 @@ export class AccessorTreeGenerator {
 			},
 			getChildEntityByKey: key => {
 				if (!entityListState.childrenKeys.has(key)) {
-					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as is is not on the list.`)
+					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as it is not on the list.`)
 				}
 				const entity = this.bindingOperations.getEntityByKey(key)
 				if (entity === null) {
@@ -1575,6 +1576,30 @@ export class AccessorTreeGenerator {
 				this.performRootTreeOperation(() => {
 					if (fieldState.touchLog === undefined) {
 						fieldState.touchLog = new Map()
+					} else if (__DEV_MODE__) {
+						if (placeholderName === PRIMARY_KEY_NAME && newValue !== fieldState.currentValue) {
+							throw new BindingError(
+								`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n` +
+									`Once set, it is immutable.`,
+							)
+						}
+					}
+					if (__DEV_MODE__) {
+						if (placeholderName === PRIMARY_KEY_NAME) {
+							if (typeof newValue !== 'string' || !uuidValidate(newValue)) {
+								throw new BindingError(
+									`Invalid value supplied for the '${PRIMARY_KEY_NAME}' field. ` +
+										`Expecting a valid uuid but '${newValue}' was given.\n` +
+										`Hint: you may use 'FieldAccessor.asUuid.setToUuid()'.`,
+								)
+							}
+							if (this.entityStore.has(newValue)) {
+								throw new BindingError(
+									`Trying to set the '${PRIMARY_KEY_NAME}' field to '${newValue}' which is a valid uuid but is not unique. ` +
+										`It is already in use by an existing entity.`,
+								)
+							}
+						}
 					}
 					fieldState.touchLog.set(agent, true)
 					if (newValue === fieldState.currentValue) {

@@ -774,9 +774,7 @@ export class AccessorTreeGenerator {
 			errors: emptyArray,
 			eventListeners: TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
 			fields: new Map(),
-
-			// For unpersisted entities, leave one chance to set the ID.
-			hasIdSetInStone: id instanceof ServerGeneratedUuid,
+			hasIdSetInStone: true,
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
 			hasStaleAccessor: true,
@@ -957,7 +955,7 @@ export class AccessorTreeGenerator {
 					})
 				})
 			},
-			disconnectEntityAtField: fieldName => {
+			disconnectEntityAtField: (fieldName, initializeReplacement) => {
 				this.performRootTreeOperation(() => {
 					performOperationWithBeforeUpdate(() => {
 						const hasOneMarkers = resolveHasOneRelationMarkers(
@@ -998,6 +996,8 @@ export class AccessorTreeGenerator {
 
 							entityState.hasStaleAccessor = true
 							entityState.hasPendingParentNotification = true
+
+							this.runImmediateUserInitialization(newEntityState, initializeReplacement)
 						}
 						if (entityState.fieldsWithPendingConnectionUpdates === undefined) {
 							entityState.fieldsWithPendingConnectionUpdates = new Set()
@@ -1238,7 +1238,8 @@ export class AccessorTreeGenerator {
 					const newState = generateNewEntityState(undefined)
 					this.markChildStateInNeedOfUpdate(entityListState, newState)
 					entityListState.hasPendingParentNotification = true
-					initialize && newState.batchUpdates(initialize)
+
+					this.runImmediateUserInitialization(newState, initialize)
 				})
 			},
 			disconnectEntity: childEntityOrItsKey => {
@@ -1547,6 +1548,18 @@ export class AccessorTreeGenerator {
 		return relevantPlaceholders
 	}
 
+	private runImmediateUserInitialization(
+		newEntityState: InternalEntityState,
+		initialize: EntityAccessor.BatchUpdatesHandler | undefined,
+	) {
+		newEntityState.hasIdSetInStone = false
+		initialize && newEntityState.batchUpdates(initialize)
+
+		if (!newEntityState.eventListeners.initialize) {
+			newEntityState.hasIdSetInStone = true
+		}
+	}
+
 	private markPendingConnections(parentState: InternalEntityState, connectionPlaceholders: Set<FieldName>) {
 		if (parentState.fieldsWithPendingConnectionUpdates === undefined) {
 			parentState.fieldsWithPendingConnectionUpdates = new Set()
@@ -1679,6 +1692,9 @@ export class AccessorTreeGenerator {
 			for (const listener of state.eventListeners.initialize!) {
 				listener(state.getAccessor as any, this.bindingOperations)
 				hasOnInitialize = true
+			}
+			if (state.type === InternalStateType.SingleEntity) {
+				state.hasIdSetInStone = true
 			}
 		}
 		this.treeWideBatchUpdateDepth--

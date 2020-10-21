@@ -835,6 +835,13 @@ export class AccessorTreeGenerator {
 						this.entityStore.delete(previousKey)
 						this.entityStore.set(newKey, entityState)
 					}
+					if (
+						updatedState.type === InternalStateType.SingleEntity &&
+						updatedState.maidenKey !== updatedState.id.value
+					) {
+						const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, updatedState)
+						this.markPendingConnections(entityState, relevantPlaceholders)
+					}
 
 					if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
@@ -1185,10 +1192,6 @@ export class AccessorTreeGenerator {
 
 				// No beforeUpdate for child updates!
 				batchUpdatesImplementation(() => {
-					//if (updatedState.maidenKey !== updatedState.id.value) {
-					//	entityListState.children. // TODO update children!
-					//}
-
 					if (updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
 					} else {

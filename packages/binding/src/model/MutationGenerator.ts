@@ -1,5 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { ServerGeneratedUuid } from '../accessorTree'
+import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
@@ -237,15 +237,20 @@ export class MutationGenerator {
 		> = []
 
 		for (const [placeholderName, marker] of currentState.markersContainer.markers) {
-			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
+			if (
+				placeholderName === TYPENAME_KEY_NAME ||
+				(placeholderName === PRIMARY_KEY_NAME && !(currentState.id instanceof ClientGeneratedUuid))
+			) {
 				continue
 			}
-			if (marker instanceof SubTreeMarker) {
-				continue // Do nothing: all sub trees have been hoisted and are handled elsewhere.
-			}
 			const fieldState = currentState.fields.get(placeholderName)
+
+			if (fieldState === undefined) {
+				continue
+			}
+
 			if (marker instanceof FieldMarker) {
-				if (fieldState?.type !== InternalStateType.Field) {
+				if (fieldState.type !== InternalStateType.Field) {
 					continue
 				}
 				if (marker.isNonbearing) {
@@ -258,7 +263,7 @@ export class MutationGenerator {
 				}
 				builder = this.registerCreateFieldPart(fieldState, marker, builder)
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState?.type !== InternalStateType.SingleEntity) {
+				if (fieldState.type !== InternalStateType.SingleEntity) {
 					continue
 				}
 				if (marker.relation.isNonbearing) {
@@ -271,7 +276,7 @@ export class MutationGenerator {
 				}
 				builder = this.registerCreateEntityPart(processedEntities, fieldState, marker, builder)
 			} else if (marker instanceof HasManyRelationMarker) {
-				if (fieldState?.type !== InternalStateType.EntityList) {
+				if (fieldState.type !== InternalStateType.EntityList) {
 					continue
 				}
 				if (marker.relation.isNonbearing) {
@@ -283,6 +288,8 @@ export class MutationGenerator {
 					continue
 				}
 				builder = this.registerCreateEntityListPart(processedEntities, fieldState, marker, builder)
+			} else if (marker instanceof SubTreeMarker) {
+				// All sub trees have been hoisted and are handled elsewhere.
 			} else {
 				assertNever(marker)
 			}
@@ -412,8 +419,13 @@ export class MutationGenerator {
 				continue
 			}
 			const fieldState = currentState.fields.get(placeholderName)
+
+			if (fieldState === undefined) {
+				continue
+			}
+
 			if (marker instanceof FieldMarker) {
-				if (fieldState?.type !== InternalStateType.Field) {
+				if (fieldState.type !== InternalStateType.Field) {
 					continue
 				}
 				if (fieldState.persistedValue !== undefined) {
@@ -423,7 +435,7 @@ export class MutationGenerator {
 					}
 				}
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState?.type !== InternalStateType.SingleEntity) {
+				if (fieldState.type !== InternalStateType.SingleEntity) {
 					continue
 				}
 
@@ -516,7 +528,7 @@ export class MutationGenerator {
 					})
 				}
 			} else if (marker instanceof HasManyRelationMarker) {
-				if (fieldState?.type !== InternalStateType.EntityList) {
+				if (fieldState.type !== InternalStateType.EntityList) {
 					continue
 				}
 				builder = builder.many(marker.relation.field, builder => {

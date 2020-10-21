@@ -4,6 +4,7 @@ import * as ReactDOM from 'react-dom'
 import { validate as uuidValidate } from 'uuid'
 import { BindingOperations, EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } from '../accessors'
 import {
+	ClientGeneratedUuid,
 	EntityFieldPersistedData,
 	MutationDataResponse,
 	PersistedEntityDataStore,
@@ -775,11 +776,15 @@ export class AccessorTreeGenerator {
 			errors: emptyArray,
 			eventListeners: TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
 			fields: new Map(),
+
+			// For unpersisted entities, leave one chance to set the ID.
+			hasIdSetInStone: id instanceof ServerGeneratedUuid,
 			hasPendingUpdate: false,
 			hasPendingParentNotification: false,
 			hasStaleAccessor: true,
 			id,
 			isScheduledForDeletion: false,
+			maidenKey: id instanceof UnpersistedEntityKey ? id.value : undefined,
 			markersContainer,
 			persistedData: this.persistedEntityData.get(entityKey),
 			plannedHasOneDeletions: undefined,
@@ -812,6 +817,27 @@ export class AccessorTreeGenerator {
 			onChildFieldUpdate: (updatedState: InternalStateNode) => {
 				// No before update for child updates!
 				batchUpdatesImplementation(() => {
+					if (updatedState.type === InternalStateType.Field && updatedState.placeholderName === PRIMARY_KEY_NAME) {
+						if (entityState.id.existsOnServer) {
+							throw new BindingError(
+								`Trying to change the id of an entity that already exists on the server. ` +
+									`That is strictly prohibited. Once created, an entity's id cannot be changed.`,
+							)
+						}
+						if (entityState.hasIdSetInStone) {
+							throw new BindingError(
+								`Trying to change the id of an entity at a time it's no longer allowed. ` +
+									`In order to change it, it needs to be set immediately after initialization of the entity.`,
+							)
+						}
+						entityState.hasIdSetInStone = true
+						const previousKey = entityState.id.value
+						const newKey = updatedState.currentValue as string
+						entityState.id = new ClientGeneratedUuid(newKey)
+						this.entityStore.delete(previousKey)
+						this.entityStore.set(newKey, entityState)
+					}
+
 					if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
 					} else {
@@ -1161,6 +1187,10 @@ export class AccessorTreeGenerator {
 
 				// No beforeUpdate for child updates!
 				batchUpdatesImplementation(() => {
+					//if (updatedState.maidenKey !== updatedState.id.value) {
+					//	entityListState.children. // TODO update children!
+					//}
+
 					if (updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
 					} else {

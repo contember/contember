@@ -176,7 +176,7 @@ export class AccessorTreeGenerator {
 			this.subTreeStates.set(placeholderName, subTreeState)
 		}
 
-		this.triggerOnInitialize()
+		this.batchTreeWideUpdates(() => this.triggerOnInitialize())
 		this.updateTreeRoot()
 	}
 
@@ -497,10 +497,14 @@ export class AccessorTreeGenerator {
 	}
 
 	private performRootTreeOperation(operation: () => void) {
+		this.batchTreeWideUpdates(operation)
+		this.updateSubTrees()
+	}
+
+	private batchTreeWideUpdates(operation: () => void) {
 		this.treeWideBatchUpdateDepth++
 		operation()
 		this.treeWideBatchUpdateDepth--
-		this.updateSubTrees()
 	}
 
 	private updateSubTrees() {
@@ -1666,20 +1670,19 @@ export class AccessorTreeGenerator {
 	private triggerOnBeforePersist(): boolean {
 		let hasBeforePersist = false
 
-		this.treeWideBatchUpdateDepth++
+		this.batchTreeWideUpdates(() => {
+			const iNodeHasBeforePersist = (iNode: InternalEntityState | InternalEntityListState) =>
+				iNode.eventListeners.beforePersist !== undefined
 
-		const iNodeHasBeforePersist = (iNode: InternalEntityState | InternalEntityListState) =>
-			iNode.eventListeners.beforePersist !== undefined
-
-		for (const [, subTreeState] of this.subTreeStates) {
-			for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
-				for (const listener of iNode.eventListeners.beforePersist!) {
-					listener(iNode.getAccessor as any, this.bindingOperations) // TS can't quite handle this but this is sound.
-					hasBeforePersist = true
+			for (const [, subTreeState] of this.subTreeStates) {
+				for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
+					for (const listener of iNode.eventListeners.beforePersist!) {
+						listener(iNode.getAccessor as any, this.bindingOperations) // TS can't quite handle this but this is sound.
+						hasBeforePersist = true
+					}
 				}
 			}
-		}
-		this.treeWideBatchUpdateDepth--
+		})
 
 		return this.triggerOnInitialize() || hasBeforePersist
 	}
@@ -1687,17 +1690,17 @@ export class AccessorTreeGenerator {
 	private triggerOnInitialize(): boolean {
 		let hasOnInitialize = false
 
-		this.treeWideBatchUpdateDepth++
-		for (const state of this.newlyInitializedWithListeners) {
-			for (const listener of state.eventListeners.initialize!) {
-				listener(state.getAccessor as any, this.bindingOperations)
-				hasOnInitialize = true
+		this.batchTreeWideUpdates(() => {
+			for (const state of this.newlyInitializedWithListeners) {
+				for (const listener of state.eventListeners.initialize!) {
+					listener(state.getAccessor as any, this.bindingOperations)
+					hasOnInitialize = true
+				}
+				if (state.type === InternalStateType.SingleEntity) {
+					state.hasIdSetInStone = true
+				}
 			}
-			if (state.type === InternalStateType.SingleEntity) {
-				state.hasIdSetInStone = true
-			}
-		}
-		this.treeWideBatchUpdateDepth--
+		})
 		this.newlyInitializedWithListeners.clear()
 
 		return hasOnInitialize

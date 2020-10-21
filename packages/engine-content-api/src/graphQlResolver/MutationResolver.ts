@@ -10,7 +10,7 @@ import { assertNever } from '../utils'
 import { ConstraintType, getInsertPrimary, InputErrorKind, MutationResultList, MutationResultType } from '../sql/Result'
 import { InputPreValidator } from '../input-validation/preValidation/InputPreValidator'
 import { ObjectNode } from '../inputProcessing'
-import { retryTransaction } from '@contember/database/dist/src/utils'
+import { retryTransaction } from '@contember/database'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 

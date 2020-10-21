@@ -9,7 +9,7 @@ import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
 import { DatabaseCredentials, EventManagerImpl, SerializationFailureError, SingleConnection } from '@contember/database'
 import { MigrationArgs } from '../migrations'
 import { createDatabaseIfNotExists, createPgClient } from '@contember/database-migrations'
-import { retryTransaction } from '@contember/database/dist/src/utils'
+import { retryTransaction } from '@contember/database'
 
 export class ProjectInitializer {
 	constructor(

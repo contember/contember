@@ -1,5 +1,4 @@
 import {
-	BindingError,
 	EntityAccessor,
 	EntityListAccessor,
 	Environment,
@@ -25,9 +24,10 @@ import { RichEditor } from '../RichEditor'
 import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
 import { createBlockEditor } from './editor'
+import { ContemberFieldElement } from './elements'
 import { NormalizedEmbedHandlers } from './embed'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
-import { BlockEditorGetEntityByKeyContext, BlockEditorGetNormalizedFieldBackedElementContext } from './renderers'
+import { BlockEditorGetNormalizedFieldBackedElementContext } from './renderers'
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 
 const RB = RichEditor.buttons
@@ -201,45 +201,46 @@ export const BlockEditorInner = React.memo(
 			//trailingFieldBackedElements,
 		})
 
-		// TODO label?
-		return (
-			<BlockEditorGetEntityByKeyContext.Provider value={key => accessor.getChildEntityByKey(key)}>
-				<BlockEditorGetNormalizedFieldBackedElementContext.Provider
-					value={element => {
-						let normalizedElements: NormalizedFieldBackedElement[]
-						if (element.position === 'leading') {
-							normalizedElements = leadingFieldBackedElements
-						} /*else if (element.position === 'trailing') {
+		const getNormalizedFieldBackedElement = React.useCallback(
+			(element: ContemberFieldElement) => {
+				let normalizedElements: NormalizedFieldBackedElement[]
+				if (element.position === 'leading') {
+					normalizedElements = leadingFieldBackedElements
+				} /*else if (element.position === 'trailing') {
 							normalizedElements = trailingFieldBackedElements
 						} */ else {
-							return assertNever(element.position)
-						}
-						return normalizedElements[element.index]
-					}}
-				>
-					<Slate editor={editor} value={nodes} onChange={noop}>
-						<EditorCanvas
-							underlyingComponent={Editable}
-							componentProps={{
-								renderElement: editor.renderElement,
-								renderLeaf: editor.renderLeaf,
-								onKeyDown: editor.onKeyDown,
-								onFocusCapture: editor.onFocus,
-								onBlurCapture: editor.onBlur,
-								onDOMBeforeInput: editor.onDOMBeforeInput,
-							}}
-							size="large"
-						>
-							<HoveringToolbars
-								inlineButtons={inlineButtons}
-								blockButtons={
-									<BlockHoveringToolbarContents blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
-								}
-							/>
-						</EditorCanvas>
-					</Slate>
-				</BlockEditorGetNormalizedFieldBackedElementContext.Provider>
-			</BlockEditorGetEntityByKeyContext.Provider>
+					return assertNever(element.position)
+				}
+				return normalizedElements[element.index]
+			},
+			[leadingFieldBackedElements],
+		)
+
+		// TODO label?
+		return (
+			<BlockEditorGetNormalizedFieldBackedElementContext.Provider value={getNormalizedFieldBackedElement}>
+				<Slate editor={editor} value={nodes} onChange={noop}>
+					<EditorCanvas
+						underlyingComponent={Editable}
+						componentProps={{
+							renderElement: editor.renderElement,
+							renderLeaf: editor.renderLeaf,
+							onKeyDown: editor.onKeyDown,
+							onFocusCapture: editor.onFocus,
+							onBlurCapture: editor.onBlur,
+							onDOMBeforeInput: editor.onDOMBeforeInput,
+						}}
+						size="large"
+					>
+						<HoveringToolbars
+							inlineButtons={inlineButtons}
+							blockButtons={
+								<BlockHoveringToolbarContents blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
+							}
+						/>
+					</EditorCanvas>
+				</Slate>
+			</BlockEditorGetNormalizedFieldBackedElementContext.Provider>
 		)
 	},
 )

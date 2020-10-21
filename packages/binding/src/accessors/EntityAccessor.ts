@@ -22,10 +22,8 @@ import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
 
 class EntityAccessor implements Errorable {
-	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
-
 	public constructor(
-		key: string | EntityAccessor.UnpersistedEntityId,
+		public readonly runtimeId: EntityAccessor.RuntimeId,
 		public readonly typeName: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
 		public readonly errors: ErrorAccessor[],
@@ -35,20 +33,18 @@ class EntityAccessor implements Errorable {
 		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField,
 		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField,
 		public readonly deleteEntity: EntityAccessor.DeleteEntity,
-	) {
-		this.runtimeId = key || new EntityAccessor.UnpersistedEntityId()
-	}
+	) {}
 
 	public get primaryKey(): string | undefined {
-		return typeof this.runtimeId === 'string' ? this.runtimeId : undefined
+		return this.runtimeId.existsOnServer ? this.runtimeId.value : undefined
 	}
 
 	public get existsOnServer(): boolean {
-		return typeof this.runtimeId === 'string'
+		return this.runtimeId.existsOnServer
 	}
 
 	public get key(): string {
-		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
+		return this.runtimeId.value
 	}
 
 	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs) {
@@ -134,16 +130,36 @@ class EntityAccessor implements Errorable {
 }
 
 namespace EntityAccessor {
-	export class UnpersistedEntityId {
+	export type RuntimeId = ServerGeneratedUuid | ClientGeneratedUuid | UnpersistedEntityKey
+
+	// TODO unify with BoxedSingleEntityId
+	export class ServerGeneratedUuid {
+		public get existsOnServer(): true {
+			return true
+		}
+		public constructor(public readonly value: string) {}
+	}
+
+	export class ClientGeneratedUuid {
+		public get existsOnServer(): false {
+			return false
+		}
+		public constructor(public readonly value: string) {}
+	}
+
+	export class UnpersistedEntityKey {
+		public get existsOnServer(): false {
+			return false
+		}
 		public readonly value: string
 
-		private static generateId = (() => {
-			let id = 0
-			return () => id++
+		private static getNextSeed = (() => {
+			let seed = 0
+			return () => seed++
 		})()
 
 		public constructor() {
-			this.value = `unpersistedEntity-${UnpersistedEntityId.generateId()}`
+			this.value = `unpersistedEntity-${UnpersistedEntityKey.getNextSeed()}`
 		}
 	}
 

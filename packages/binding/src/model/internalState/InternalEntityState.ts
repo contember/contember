@@ -22,7 +22,7 @@ export interface InternalEntityState {
 	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean
 	hasStaleAccessor: boolean
-	id: string | EntityAccessor.UnpersistedEntityId
+	id: EntityAccessor.RuntimeId
 	isScheduledForDeletion: boolean
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	markersContainer: EntityFieldMarkersContainer

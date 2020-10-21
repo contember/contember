@@ -6,7 +6,7 @@ import { ErrorAccessor } from './ErrorAccessor'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
-		private readonly children: ReadonlyMap<string, { getAccessor: () => EntityAccessor }>,
+		private readonly children: ReadonlySet<EntityListAccessor.FieldDatum>,
 		public readonly errors: ErrorAccessor[],
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
@@ -18,13 +18,20 @@ class EntityListAccessor implements Errorable {
 	) {}
 
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
-		for (const [, child] of this.children) {
-			yield child.getAccessor()
+		for (const childDatum of this.children) {
+			yield childDatum.getAccessor()
 		}
 	}
 
 	public hasEntityKey(childEntityKey: string): boolean {
-		return this.children.has(childEntityKey)
+		// This is an absolutely awful, awful implementation.
+		// We should probably just pass global binding operations to here as well.
+		try {
+			this.getChildEntityByKey(childEntityKey)
+			return true
+		} catch {
+			return false
+		}
 	}
 
 	public isEmpty(): boolean {
@@ -57,6 +64,10 @@ class EntityListAccessor implements Errorable {
 }
 
 namespace EntityListAccessor {
+	export interface FieldDatum {
+		getAccessor(): EntityAccessor
+	}
+
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (
 		getAccessor: () => EntityListAccessor,

@@ -64,7 +64,7 @@ export class MutationGenerator {
 				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			}
 		} else if (rootState.type === InternalStateType.EntityList) {
-			for (const [, childState] of rootState.children) {
+			for (const childState of rootState.children) {
 				queryBuilder = this.addSubMutation(
 					processedEntities,
 					childState,
@@ -391,7 +391,7 @@ export class MutationGenerator {
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
 		return builder.many(marker.relation.field, builder => {
-			for (const [, entityState] of fieldState.children) {
+			for (const entityState of fieldState.children) {
 				const alias = AliasTransformer.entityToAlias(entityState.getAccessor())
 				if (entityState.id.existsOnServer) {
 					// TODO also potentially update
@@ -532,7 +532,7 @@ export class MutationGenerator {
 					continue
 				}
 				builder = builder.many(marker.relation.field, builder => {
-					for (const [, childEntityState] of fieldState.children) {
+					for (const childEntityState of fieldState.children) {
 						const alias = AliasTransformer.entityToAlias(childEntityState.getAccessor())
 
 						if (childEntityState.id.existsOnServer) {

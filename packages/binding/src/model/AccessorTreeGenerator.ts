@@ -159,7 +159,7 @@ export class AccessorTreeGenerator {
 
 	public constructor(private readonly markerTree: MarkerTreeRoot) {
 		this.treeFilterGenerator = new TreeFilterGenerator(this.markerTree, this.subTreeStates)
-		this.accessorErrorManager = new AccessorErrorManager(this.subTreeStates)
+		this.accessorErrorManager = new AccessorErrorManager(this.subTreeStates, this.entityStore)
 	}
 
 	public initializeLiveTree(
@@ -414,7 +414,8 @@ export class AccessorTreeGenerator {
 
 		if (haveSameKeySets) {
 			const newKeyIterator = newPersistedData[Symbol.iterator]()
-			for (const [oldKey] of state.children) {
+			for (const childState of state.children) {
+				const oldKey = childState.id.value
 				if (!newPersistedData.has(oldKey)) {
 					haveSameKeySets = false
 					// TODO delete the corresponding state
@@ -453,12 +454,10 @@ export class AccessorTreeGenerator {
 					state.onChildEntityUpdate,
 					this.getEventListenersForListEntity(state),
 				)
-				const key = newKey.value
-				state.children.set(key, childState)
+				state.children.add(childState)
 
 				didUpdate = true
 			} else {
-				const key = newPersistedId
 				let childState = this.entityStore.get(newPersistedId)
 
 				if (childState === undefined) {
@@ -486,7 +485,7 @@ export class AccessorTreeGenerator {
 						state.childrenWithPendingUpdates.add(childState)
 					}
 				}
-				state.children.set(key, childState)
+				state.children.add(childState)
 			}
 		}
 
@@ -703,8 +702,7 @@ export class AccessorTreeGenerator {
 				if (fieldState === undefined) {
 					this.initializeFromHasManyRelationMarker(existingEntityState, field, fieldDatum)
 				} else if (fieldState.type === InternalStateType.EntityList) {
-					for (const [childKey] of fieldState.children) {
-						const childState = this.entityStore.get(childKey)!
+					for (const childState of fieldState.children) {
 						this.initializeEntityAccessor(
 							childState.id,
 							fieldState.environment,
@@ -1151,7 +1149,7 @@ export class AccessorTreeGenerator {
 			persistedEntityIds,
 			addEventListener: undefined as any,
 			batchUpdateDepth: 0,
-			children: new Map(),
+			children: new Set(),
 			childrenWithPendingUpdates: undefined,
 			environment,
 			eventListeners: TreeParameterMerger.cloneEntityListEventListeners(initialEventListeners?.eventListeners),
@@ -1212,12 +1210,12 @@ export class AccessorTreeGenerator {
 					performOperationWithBeforeUpdate(() => {
 						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
 
-						if (entityListState.children.has(connectedEntityKey)) {
+						if (entityListState.children.has(connectedState)) {
 							return
 						}
 
 						connectedState.realms.add(entityListState.onChildEntityUpdate)
-						entityListState.children.set(connectedEntityKey, connectedState)
+						entityListState.children.add(connectedState)
 						entityListState.plannedRemovals?.delete(connectedState)
 
 						if (entityListState.persistedEntityIds.has(connectedEntityKey)) {
@@ -1254,7 +1252,7 @@ export class AccessorTreeGenerator {
 							)
 						}
 
-						if (!entityListState.children.has(disconnectedChildKey)) {
+						if (!entityListState.children.has(disconnectedChildState)) {
 							throw new BindingError(
 								`Entity list doesn't include an entity with key '${disconnectedChildKey}' and so it cannot remove it.`,
 							)
@@ -1277,15 +1275,15 @@ export class AccessorTreeGenerator {
 							this.unpersistedChangesCount--
 						}
 
-						entityListState.children.delete(disconnectedChildKey)
+						entityListState.children.delete(disconnectedChildState)
 						entityListState.hasPendingParentNotification = true
 						entityListState.hasStaleAccessor = true
 					})
 				})
 			},
 			getChildEntityByKey: key => {
-				const childState = entityListState.children.get(key)
-				if (childState === undefined) {
+				const childState = this.entityStore.get(key)
+				if (childState === undefined || !entityListState.children.has(childState)) {
 					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as it is not on the list.`)
 				}
 				return childState.getAccessor()
@@ -1343,7 +1341,7 @@ export class AccessorTreeGenerator {
 			entityListState.childrenWithPendingUpdates?.delete(stateForDeletion)
 
 			const key = stateForDeletion.id.value
-			entityListState.children.delete(key)
+			entityListState.children.delete(stateForDeletion)
 			entityListState.hasPendingParentNotification = true
 
 			if (!stateForDeletion.id.existsOnServer) {
@@ -1358,7 +1356,6 @@ export class AccessorTreeGenerator {
 
 		const generateNewEntityState = (persistedId: string | undefined): InternalEntityState => {
 			const id = persistedId === undefined ? new UnpersistedEntityKey() : new ServerGeneratedUuid(persistedId)
-			const key = id.value
 
 			const entityState = this.initializeEntityAccessor(
 				id,
@@ -1370,7 +1367,7 @@ export class AccessorTreeGenerator {
 			)
 
 			entityListState.hasStaleAccessor = true
-			entityListState.children.set(key, entityState)
+			entityListState.children.add(entityState)
 
 			return entityState
 		}

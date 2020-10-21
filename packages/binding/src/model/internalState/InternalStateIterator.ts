@@ -27,8 +27,8 @@ export class InternalStateIterator {
 				}
 			}
 		} else if (root.type === InternalStateType.EntityList) {
-			for (const [, child] of root.children) {
-				yield* this.depthFirstINodesImplementation(child, match, visitedINodes)
+			for (const childState of root.children) {
+				yield* this.depthFirstINodesImplementation(childState, match, visitedINodes)
 			}
 		} else {
 			return assertNever(root)

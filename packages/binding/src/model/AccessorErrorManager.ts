@@ -11,7 +11,10 @@ enum ErrorPopulationMode {
 export class AccessorErrorManager {
 	private currentErrors: ErrorsPreprocessor.ErrorTreeRoot | undefined = undefined
 
-	public constructor(private readonly subTreeStates: Map<string, InternalRootStateNode>) {}
+	public constructor(
+		private readonly subTreeStates: Map<string, InternalRootStateNode>,
+		private readonly entityStore: Map<string, InternalEntityState>,
+	) {}
 
 	public setErrors(data: MutationDataResponse | undefined) {
 		if (this.currentErrors) {
@@ -130,7 +133,7 @@ export class AccessorErrorManager {
 
 		for (const childKey in errors.children) {
 			const childError = errors.children[childKey]
-			const childState = state.children.get(childKey)
+			const childState = this.entityStore.get(childKey)
 
 			if (childState && childError.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed) {
 				state.childrenWithPendingUpdates.add(childState)

@@ -22,6 +22,10 @@ class PermissionsBuilder {
 		return this.add(allowAllFactory.create(this.schema))
 	}
 
+	public allowCustomPrimary(): PermissionsBuilder {
+		return this.onEveryEntity().allowCustomPrimary().builder
+	}
+
 	public add(permissions: Acl.Permissions): PermissionsBuilder {
 		const overrider = new PermissionOverrider()
 		return new PermissionsBuilder(this.schema, overrider.override(this.permissions, permissions))

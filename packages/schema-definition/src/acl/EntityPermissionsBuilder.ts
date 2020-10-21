@@ -55,6 +55,10 @@ export default class EntityPermissionsBuilder {
 		return this.addEntityPermission(() => ({ operations: { delete: predicate }, predicates: {} }))
 	}
 
+	allowCustomPrimary(): EntityPermissionsBuilder {
+		return this.addEntityPermission(() => ({ operations: { customPrimary: true }, predicates: {} }))
+	}
+
 	private updateAll(operations: Acl.Operation[], predicate: Acl.Predicate): EntityPermissionsBuilder {
 		return this.addEntityPermission(entity => {
 			const fieldPermissions = Object.keys(entity.fields).reduce(

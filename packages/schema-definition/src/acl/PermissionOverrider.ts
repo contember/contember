@@ -23,10 +23,15 @@ export default class PermissionOverrider {
 				create: { ...(original.operations.create || {}), ...(overrides.operations.create || {}) },
 				read: { ...(original.operations.read || {}), ...(overrides.operations.read || {}) },
 				update: { ...(original.operations.update || {}), ...(overrides.operations.update || {}) },
-				...(overrides.operations.delete === undefined
+				...(original.operations.delete === undefined && overrides.operations.delete === undefined
 					? {}
 					: {
-							delete: overrides.operations.delete,
+							delete: overrides.operations.delete ?? original.operations.delete,
+					  }),
+				...(original.operations.customPrimary === undefined && overrides.operations.customPrimary === undefined
+					? {}
+					: {
+							customPrimary: overrides.operations.customPrimary ?? original.operations.customPrimary,
 					  }),
 			},
 		}

@@ -307,7 +307,7 @@ export class AclValidator {
 			errorBuilder.add('Must be an object')
 			return {}
 		}
-		const extra = checkExtraProperties(operations, ['read', 'create', 'update', 'delete'])
+		const extra = checkExtraProperties(operations, ['read', 'create', 'update', 'delete', 'customPrimary'])
 		if (extra.length) {
 			errorBuilder.add('Unsupported properties found: ' + extra.join(', '))
 		}
@@ -319,6 +319,12 @@ export class AclValidator {
 			if (operations[op]) {
 				validOperations[op] = this.validateFieldPermissions(operations[op], entity, predicates, errorBuilder.for(op))
 			}
+		}
+		if (operations.customPrimary !== undefined) {
+			if (typeof operations.customPrimary !== 'boolean') {
+				errorBuilder.for('customPrimary').add('Must be boolean')
+			}
+			validOperations.customPrimary = operations.customPrimary as boolean
 		}
 
 		return validOperations

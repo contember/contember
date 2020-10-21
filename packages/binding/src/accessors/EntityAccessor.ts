@@ -1,3 +1,4 @@
+import { ClientGeneratedUuid, ServerGeneratedUuid, UnpersistedEntityKey } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
@@ -131,37 +132,6 @@ class EntityAccessor implements Errorable {
 
 namespace EntityAccessor {
 	export type RuntimeId = ServerGeneratedUuid | ClientGeneratedUuid | UnpersistedEntityKey
-
-	// TODO unify with BoxedSingleEntityId
-	export class ServerGeneratedUuid {
-		public get existsOnServer(): true {
-			return true
-		}
-		public constructor(public readonly value: string) {}
-	}
-
-	export class ClientGeneratedUuid {
-		public get existsOnServer(): false {
-			return false
-		}
-		public constructor(public readonly value: string) {}
-	}
-
-	export class UnpersistedEntityKey {
-		public get existsOnServer(): false {
-			return false
-		}
-		public readonly value: string
-
-		private static getNextSeed = (() => {
-			let seed = 0
-			return () => seed++
-		})()
-
-		public constructor() {
-			this.value = `unpersistedEntity-${UnpersistedEntityKey.getNextSeed()}`
-		}
-	}
 
 	export interface FieldDatum {
 		getAccessor(): NestedAccessor

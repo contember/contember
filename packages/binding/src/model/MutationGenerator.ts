@@ -1,5 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { BoxedSingleEntityId } from '../accessorTree'
+import { ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
@@ -434,8 +434,8 @@ export class MutationGenerator {
 					) => {
 						const persistedValue = currentState.persistedData?.get?.(placeholderName)
 
-						if (persistedValue instanceof BoxedSingleEntityId) {
-							if (persistedValue.id === fieldState.id.value) {
+						if (persistedValue instanceof ServerGeneratedUuid) {
+							if (persistedValue.value === fieldState.id.value) {
 								// The persisted and currently referenced ids match, and so this is an update.
 								return builder.update(builder =>
 									this.registerUpdateMutationPart(processedEntities, fieldState, builder),
@@ -485,8 +485,8 @@ export class MutationGenerator {
 						const persistedValue = currentState.persistedData?.get?.(placeholderName)
 						const alias = AliasTransformer.entityToAlias(fieldState.getAccessor())
 
-						if (persistedValue instanceof BoxedSingleEntityId) {
-							if (persistedValue.id === fieldState.id.value) {
+						if (persistedValue instanceof ServerGeneratedUuid) {
+							if (persistedValue.value === fieldState.id.value) {
 								return builder.update(
 									reducedBy,
 									builder => this.registerUpdateMutationPart(processedEntities, fieldState, builder),

@@ -4,13 +4,14 @@ import * as ReactDOM from 'react-dom'
 import { validate as uuidValidate } from 'uuid'
 import { BindingOperations, EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } from '../accessors'
 import {
-	BoxedSingleEntityId,
 	EntityFieldPersistedData,
 	ExecutionError,
 	MutationDataResponse,
 	MutationError,
 	PersistedEntityDataStore,
+	ServerGeneratedUuid,
 	QueryRequestResponse,
+	UnpersistedEntityKey,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
@@ -264,14 +265,14 @@ export class AccessorTreeGenerator {
 				const newSubTreeData = normalizedResponse.subTreeDataStore.get(subTreePlaceholder)
 
 				if (subTreeState.type === InternalStateType.SingleEntity) {
-					if (newSubTreeData instanceof BoxedSingleEntityId) {
-						if (newSubTreeData.id === subTreeState.id.value) {
+					if (newSubTreeData instanceof ServerGeneratedUuid) {
+						if (newSubTreeData.value === subTreeState.id.value) {
 							didUpdateSomething =
 								didUpdateSomething ||
-								this.updateSingleEntityPersistedData(alreadyProcessed, subTreeState, newSubTreeData.id)
+								this.updateSingleEntityPersistedData(alreadyProcessed, subTreeState, newSubTreeData)
 						} else {
 							const newSubTreeState = this.initializeEntityAccessor(
-								new EntityAccessor.ServerGeneratedUuid(newSubTreeData.id),
+								newSubTreeData,
 								subTreeState.environment,
 								subTreeState.markersContainer,
 								subTreeState.creationParameters,
@@ -304,7 +305,7 @@ export class AccessorTreeGenerator {
 	private updateSingleEntityPersistedData(
 		alreadyProcessed: Set<InternalEntityState>,
 		state: InternalEntityState,
-		newPersistedId: string,
+		newPersistedId: ServerGeneratedUuid,
 	): boolean {
 		if (alreadyProcessed.has(state)) {
 			return false
@@ -319,8 +320,8 @@ export class AccessorTreeGenerator {
 			didUpdate = true
 		}
 
-		if (newPersistedId !== state.id.value) {
-			state.id = new EntityAccessor.ServerGeneratedUuid(newPersistedId)
+		if (newPersistedId.value !== state.id.value) {
+			state.id = newPersistedId
 			didUpdate = true
 		}
 
@@ -341,7 +342,7 @@ export class AccessorTreeGenerator {
 
 			switch (fieldState.type) {
 				case InternalStateType.Field: {
-					if (!(newFieldDatum instanceof Set) && !(newFieldDatum instanceof BoxedSingleEntityId)) {
+					if (!(newFieldDatum instanceof Set) && !(newFieldDatum instanceof ServerGeneratedUuid)) {
 						if (fieldState.persistedValue !== newFieldDatum) {
 							fieldState.persistedValue = newFieldDatum
 							fieldState.currentValue = newFieldDatum ?? fieldState.fieldMarker.defaultValue ?? null
@@ -361,11 +362,11 @@ export class AccessorTreeGenerator {
 
 					let shouldInitializeNewEntity = false
 					const previousFieldDatum = state.persistedData?.get(fieldPlaceholder)
-					if (newFieldDatum instanceof BoxedSingleEntityId) {
-						if (previousFieldDatum instanceof BoxedSingleEntityId) {
-							if (newFieldDatum.id === previousFieldDatum.id && newFieldDatum.id === fieldState.id.value) {
+					if (newFieldDatum instanceof ServerGeneratedUuid) {
+						if (previousFieldDatum instanceof ServerGeneratedUuid) {
+							if (newFieldDatum.value === previousFieldDatum.value && newFieldDatum.value === fieldState.id.value) {
 								// Updating an entity that already existed on the server.
-								didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, fieldState.id.value)
+								didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, fieldState, newFieldDatum)
 							} else {
 								// An entity still exists on the server but got re-connected.
 								shouldInitializeNewEntity = true
@@ -375,7 +376,7 @@ export class AccessorTreeGenerator {
 							shouldInitializeNewEntity = true
 						}
 					} else if (newFieldDatum === null || newFieldDatum === undefined) {
-						if (previousFieldDatum instanceof BoxedSingleEntityId) {
+						if (previousFieldDatum instanceof ServerGeneratedUuid) {
 							// This entity got deleted/disconnected.
 							shouldInitializeNewEntity = true
 						} else if (previousFieldDatum === null || previousFieldDatum === undefined) {
@@ -388,9 +389,7 @@ export class AccessorTreeGenerator {
 						state.fields.set(
 							fieldPlaceholder,
 							(fieldState = this.initializeEntityAccessor(
-								newFieldDatum instanceof BoxedSingleEntityId
-									? new EntityAccessor.ServerGeneratedUuid(newFieldDatum.id)
-									: new EntityAccessor.UnpersistedEntityKey(),
+								newFieldDatum instanceof ServerGeneratedUuid ? newFieldDatum : new UnpersistedEntityKey(),
 								marker.environment,
 								marker.fields,
 								marker.relation,
@@ -492,7 +491,7 @@ export class AccessorTreeGenerator {
 		// 	wizardry and match the id sets in order to convert the unpersisted
 		for (const newPersistedId of initialData) {
 			if (newPersistedId === undefined) {
-				const newKey = new EntityAccessor.UnpersistedEntityKey()
+				const newKey = new UnpersistedEntityKey()
 
 				const childState = this.initializeEntityAccessor(
 					newKey,
@@ -512,7 +511,7 @@ export class AccessorTreeGenerator {
 
 				if (childState === undefined) {
 					childState = this.initializeEntityAccessor(
-						new EntityAccessor.ServerGeneratedUuid(newPersistedId),
+						new ServerGeneratedUuid(newPersistedId),
 						state.environment,
 						state.markersContainer,
 						state.creationParameters,
@@ -521,7 +520,11 @@ export class AccessorTreeGenerator {
 					)
 					didUpdate = true
 				} else {
-					const didChildUpdate = this.updateSingleEntityPersistedData(alreadyProcessed, childState, newPersistedId)
+					const didChildUpdate = this.updateSingleEntityPersistedData(
+						alreadyProcessed,
+						childState,
+						new ServerGeneratedUuid(newPersistedId),
+					)
 
 					if (didChildUpdate) {
 						didUpdate = true
@@ -695,7 +698,7 @@ export class AccessorTreeGenerator {
 
 	private initializeSubTree(
 		tree: SubTreeMarker,
-		persistedRootData: BoxedSingleEntityId | Set<string> | undefined,
+		persistedRootData: ServerGeneratedUuid | Set<string> | undefined,
 	): InternalRootStateNode {
 		let subTreeState: InternalEntityState | InternalEntityListState
 
@@ -710,10 +713,7 @@ export class AccessorTreeGenerator {
 				tree.parameters.value,
 			)
 		} else {
-			const id =
-				persistedRootData instanceof BoxedSingleEntityId
-					? new EntityAccessor.ServerGeneratedUuid(persistedRootData.id)
-					: new EntityAccessor.UnpersistedEntityKey()
+			const id = persistedRootData instanceof ServerGeneratedUuid ? persistedRootData : new UnpersistedEntityKey()
 			subTreeState = this.initializeEntityAccessor(
 				id,
 				tree.environment,
@@ -738,7 +738,7 @@ export class AccessorTreeGenerator {
 				`Received a collection of referenced entities where a single '${field.fieldName}' field was expected. ` +
 					`Perhaps you wanted to use a <Repeater />?`,
 			)
-		} else if (fieldDatum instanceof BoxedSingleEntityId) {
+		} else if (fieldDatum instanceof ServerGeneratedUuid) {
 			throw new BindingError(
 				`Received a referenced entity where a single '${field.fieldName}' field was expected. ` +
 					`Perhaps you wanted to use <HasOne />?`,
@@ -766,11 +766,8 @@ export class AccessorTreeGenerator {
 				`Received a collection of entities for field '${relation.field}' where a single entity was expected. ` +
 					`Perhaps you wanted to use a <Repeater />?`,
 			)
-		} else if (fieldDatum instanceof BoxedSingleEntityId || fieldDatum === null || fieldDatum === undefined) {
-			const entityId =
-				fieldDatum instanceof BoxedSingleEntityId
-					? new EntityAccessor.ServerGeneratedUuid(fieldDatum.id)
-					: new EntityAccessor.UnpersistedEntityKey()
+		} else if (fieldDatum instanceof ServerGeneratedUuid || fieldDatum === null || fieldDatum === undefined) {
+			const entityId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityKey()
 			const referenceEntityState = this.initializeEntityAccessor(
 				entityId,
 				field.environment,
@@ -1057,10 +1054,10 @@ export class AccessorTreeGenerator {
 							// TODO remove from planned deletions if appropriate
 
 							const persistedKey = entityState.persistedData?.get(hasOneMarker.placeholderName)
-							if (persistedKey instanceof BoxedSingleEntityId) {
-								if (persistedKey.id === connectedEntityKey) {
+							if (persistedKey instanceof ServerGeneratedUuid) {
+								if (persistedKey.value === connectedEntityKey) {
 									this.unpersistedChangesCount-- // It was removed from the list but now we're adding it back.
-								} else if (persistedKey.id === previouslyConnectedState.id.value) {
+								} else if (persistedKey.value === previouslyConnectedState.id.value) {
 									this.unpersistedChangesCount++ // We're changing it from the persisted id.
 								}
 							} else if (!previouslyConnectedState.id.existsOnServer) {
@@ -1109,7 +1106,7 @@ export class AccessorTreeGenerator {
 
 							const persistedKey = entityState.persistedData?.get(hasOneMarker.placeholderName)
 
-							if (persistedKey instanceof BoxedSingleEntityId && persistedKey.id === stateToDisconnect.id.value) {
+							if (persistedKey instanceof ServerGeneratedUuid && persistedKey.value === stateToDisconnect.id.value) {
 								this.unpersistedChangesCount++
 							} else {
 								// Do nothing. Disconnecting unpersisted entities doesn't change the count.
@@ -1120,7 +1117,7 @@ export class AccessorTreeGenerator {
 							// TODO update changes count?
 
 							const newEntityState = this.initializeEntityAccessor(
-								new EntityAccessor.UnpersistedEntityKey(),
+								new UnpersistedEntityKey(),
 								hasOneMarker.environment,
 								hasOneMarker.fields,
 								hasOneMarker.relation,
@@ -1229,7 +1226,7 @@ export class AccessorTreeGenerator {
 
 			for (const placeholderName of relevantPlaceholders) {
 				const newEntityState = this.initializeEntityAccessor(
-					new EntityAccessor.UnpersistedEntityKey(),
+					new UnpersistedEntityKey(),
 					deletedState.environment,
 					deletedState.markersContainer,
 					deletedState.creationParameters,
@@ -1491,10 +1488,7 @@ export class AccessorTreeGenerator {
 		}
 
 		const generateNewEntityState = (persistedId: string | undefined): InternalEntityState => {
-			const id =
-				persistedId === undefined
-					? new EntityAccessor.UnpersistedEntityKey()
-					: new EntityAccessor.ServerGeneratedUuid(persistedId)
+			const id = persistedId === undefined ? new UnpersistedEntityKey() : new ServerGeneratedUuid(persistedId)
 			const key = id.value
 
 			const entityState = this.initializeEntityAccessor(

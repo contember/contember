@@ -6,7 +6,7 @@ import { ErrorAccessor } from './ErrorAccessor'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
-		private readonly children: ReadonlySet<EntityListAccessor.FieldDatum>,
+		private readonly children: ReadonlySet<EntityListAccessor.EntityDatum>,
 		public readonly errors: ErrorAccessor[],
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
@@ -64,7 +64,7 @@ class EntityListAccessor implements Errorable {
 }
 
 namespace EntityListAccessor {
-	export interface FieldDatum {
+	export interface EntityDatum {
 		getAccessor(): EntityAccessor
 	}
 

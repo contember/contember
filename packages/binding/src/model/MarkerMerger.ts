@@ -163,8 +163,8 @@ export class MarkerMerger {
 	}
 
 	public static mergeInSystemFields(original: EntityFieldMarkersContainer): EntityFieldMarkersContainer {
-		const primaryKey = new FieldMarker(PRIMARY_KEY_NAME)
-		const typeName = new FieldMarker(TYPENAME_KEY_NAME)
+		const primaryKey = new FieldMarker(PRIMARY_KEY_NAME, undefined, true)
+		const typeName = new FieldMarker(TYPENAME_KEY_NAME, undefined, true)
 		// We could potentially share this instance for all fields. Maybe sometime later.
 		const freshFields = new EntityFieldMarkersContainer(
 			false,

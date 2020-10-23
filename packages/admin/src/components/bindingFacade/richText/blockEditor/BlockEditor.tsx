@@ -7,7 +7,6 @@ import {
 	FieldValue,
 	HasMany,
 	QueryLanguage,
-	RelativeSingleField,
 	SugaredField,
 	SugaredFieldProps,
 	SugaredRelativeEntityList,
@@ -25,7 +24,6 @@ import {
 import { emptyArray, noop, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
-import { Element } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { assertNever } from '../../../../utils'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
@@ -37,7 +35,7 @@ import { RichEditor } from '../RichEditor'
 import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
 import { createBlockEditor } from './editor'
-import { ContemberContentPlaceholderElement, ContemberFieldElement } from './elements'
+import { ContemberFieldElement } from './elements'
 import { EmbedHandler } from './embed'
 import { FieldBackedElement, NormalizedFieldBackedElement } from './FieldBackedElement'
 import { BlockEditorGetNormalizedFieldBackedElementContext } from './renderers'
@@ -110,7 +108,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 		const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
 		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 
-		const desugaredReferenceList = useDesugaredRelativeEntityList(referencesField)
+		// const desugaredReferenceList = useDesugaredRelativeEntityList(referencesField)
 		const desugaredReferenceDiscriminationField = useDesugaredRelativeSingleField(referenceDiscriminationField)
 		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
 
@@ -172,6 +170,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
 				embedSubBlocks,
+				getEntityByKey,
 				isMutatingRef,
 				normalizedLeadingFieldsRef,
 				normalizedReferenceBlocksRef,

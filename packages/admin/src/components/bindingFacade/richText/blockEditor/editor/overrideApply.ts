@@ -3,13 +3,14 @@ import {
 	BindingError,
 	EntityAccessor,
 	FieldAccessor,
+	GetEntityByKey,
 	RelativeEntityList,
 	RelativeSingleField,
 	repairEntitiesOrder,
 } from '@contember/binding'
 import * as React from 'react'
 import { Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
-import { ElementNode } from '../../baseEditor'
+import { ElementNode, TextNode } from '../../baseEditor'
 import {
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
@@ -25,6 +26,7 @@ export interface OverrideApplyOptions {
 	blockElementCache: WeakMap<EntityAccessor, ElementNode>
 	contemberFieldElementCache: WeakMap<FieldAccessor, ContemberFieldElement>
 	desugaredBlockList: RelativeEntityList
+	getEntityByKey: GetEntityByKey
 	isMutatingRef: React.MutableRefObject<boolean>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	placeholder: ContemberContentPlaceholderElement['placeholder']
@@ -40,6 +42,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		blockElementCache,
 		contemberFieldElementCache,
 		desugaredBlockList,
+		getEntityByKey,
 		isMutatingRef,
 		normalizedLeadingFieldsRef,
 		placeholder,
@@ -137,6 +140,18 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					blockElementCache.set(updatedEntity, targetElement)
 				}
 			}
+			const purgeElementReferences = (element: ElementNode | TextNode) => {
+				if (!SlateElement.isElement(element)) {
+					return
+				}
+				if ('referenceId' in element && element.referenceId !== undefined) {
+					const referencedEntity = getEntityByKey(element.referenceId)
+					referencedEntity.deleteEntity()
+				}
+				for (const child of element.children) {
+					purgeElementReferences(child)
+				}
+			}
 			const removeElementAt = (elementIndex: number) => {
 				if (isFieldBackedElement(elementIndex)) {
 					setFieldBackedElementValue('leading', elementIndex, '')
@@ -194,6 +209,14 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			// 		}
 			// 	}
 			// }
+
+			// TODO: clone references when splitting nodes!!
+			if (operation.type === 'remove_node') {
+				purgeElementReferences(operation.node)
+			} else if (operation.type === 'merge_node') {
+				purgeElementReferences(SlateNode.get(editor, path))
+			}
+
 			apply(operation)
 
 			if (path.length > 1 && operation.type !== 'move_node') {

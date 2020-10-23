@@ -1,3 +1,4 @@
+import { ClientGeneratedUuid, ServerGeneratedUuid, UnpersistedEntityKey } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
@@ -15,18 +16,15 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 } from '../treeParameters'
-import { Accessor } from './Accessor'
 import { BindingOperations } from './BindingOperations'
 import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
 
-class EntityAccessor extends Accessor implements Errorable {
-	public readonly runtimeId: string | EntityAccessor.UnpersistedEntityId
-
+class EntityAccessor implements Errorable {
 	public constructor(
-		key: string | EntityAccessor.UnpersistedEntityId,
+		public readonly runtimeId: EntityAccessor.RuntimeId,
 		public readonly typeName: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
 		public readonly errors: ErrorAccessor[],
@@ -36,21 +34,18 @@ class EntityAccessor extends Accessor implements Errorable {
 		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField,
 		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField,
 		public readonly deleteEntity: EntityAccessor.DeleteEntity,
-	) {
-		super()
-		this.runtimeId = key || new EntityAccessor.UnpersistedEntityId()
-	}
+	) {}
 
 	public get primaryKey(): string | undefined {
-		return typeof this.runtimeId === 'string' ? this.runtimeId : undefined
+		return this.runtimeId.existsOnServer ? this.runtimeId.value : undefined
 	}
 
 	public get existsOnServer(): boolean {
-		return typeof this.runtimeId === 'string'
+		return this.runtimeId.existsOnServer
 	}
 
 	public get key(): string {
-		return typeof this.runtimeId === 'string' ? this.runtimeId : this.runtimeId.value
+		return this.runtimeId.value
 	}
 
 	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs) {
@@ -136,18 +131,7 @@ class EntityAccessor extends Accessor implements Errorable {
 }
 
 namespace EntityAccessor {
-	export class UnpersistedEntityId {
-		public readonly value: string
-
-		private static generateId = (() => {
-			let id = 0
-			return () => id++
-		})()
-
-		public constructor() {
-			this.value = `unpersistedEntity-${UnpersistedEntityId.generateId()}`
-		}
-	}
+	export type RuntimeId = ServerGeneratedUuid | ClientGeneratedUuid | UnpersistedEntityKey
 
 	export interface FieldDatum {
 		getAccessor(): NestedAccessor
@@ -167,7 +151,10 @@ namespace EntityAccessor {
 	export type BatchUpdatesHandler = (getAccessor: GetEntityAccessor, bindingOperations: BindingOperations) => void
 	export type ConnectEntityAtField = (field: FieldName, entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type DeleteEntity = () => void
-	export type DisconnectEntityAtField = (field: FieldName) => void
+	export type DisconnectEntityAtField = (
+		field: FieldName,
+		initializeReplacement?: EntityAccessor.BatchUpdatesHandler,
+	) => void
 	export type UpdateListener = (accessor: EntityAccessor) => void
 
 	export interface EntityEventListenerMap {

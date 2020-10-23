@@ -1,14 +1,12 @@
 import { Environment } from '../dao'
-import { Accessor } from './Accessor'
 import { BindingOperations } from './BindingOperations'
 import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
-class EntityListAccessor extends Accessor implements Errorable {
+class EntityListAccessor implements Errorable {
 	public constructor(
-		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
-		private readonly childEntityKeys: ReadonlySet<string>, // See EntityAccessor.key
+		private readonly children: ReadonlySet<EntityListAccessor.EntityDatum>,
 		public readonly errors: ErrorAccessor[],
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
@@ -16,18 +14,24 @@ class EntityListAccessor extends Accessor implements Errorable {
 		public readonly connectEntity: EntityListAccessor.ConnectEntity,
 		public readonly createNewEntity: EntityListAccessor.CreateNewEntity,
 		public readonly disconnectEntity: EntityListAccessor.DisconnectEntity,
-	) {
-		super()
-	}
+		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
+	) {}
 
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
-		for (const id of this.childEntityKeys) {
-			yield this.getChildEntityByKey(id)
+		for (const childDatum of this.children) {
+			yield childDatum.getAccessor()
 		}
 	}
 
 	public hasEntityKey(childEntityKey: string): boolean {
-		return this.childEntityKeys.has(childEntityKey)
+		// This is an absolutely awful, awful implementation.
+		// We should probably just pass global binding operations to here as well.
+		try {
+			this.getChildEntityByKey(childEntityKey)
+			return true
+		} catch {
+			return false
+		}
 	}
 
 	public isEmpty(): boolean {
@@ -35,7 +39,7 @@ class EntityListAccessor extends Accessor implements Errorable {
 	}
 
 	public get length(): number {
-		return this.childEntityKeys.size
+		return this.children.size
 	}
 
 	public deleteAll() {
@@ -60,6 +64,10 @@ class EntityListAccessor extends Accessor implements Errorable {
 }
 
 namespace EntityListAccessor {
+	export interface EntityDatum {
+		getAccessor(): EntityAccessor
+	}
+
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (
 		getAccessor: () => EntityListAccessor,

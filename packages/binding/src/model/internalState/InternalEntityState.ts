@@ -19,12 +19,14 @@ export interface InternalEntityState {
 	fields: Map<FieldName, InternalStateNode>
 	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
 	getAccessor: () => EntityAccessor
+	hasIdSetInStone: boolean // Initially, ids may be changed but only up to a certain point. This marks that point.
 	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean
 	hasStaleAccessor: boolean
-	id: string | EntityAccessor.UnpersistedEntityId
+	id: EntityAccessor.RuntimeId
 	isScheduledForDeletion: boolean
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
+	maidenKey: string | undefined // undefined for persisted entities
 	markersContainer: EntityFieldMarkersContainer
 	persistedData: SingleEntityPersistedData | undefined
 	plannedHasOneDeletions: Map<FieldName, InternalEntityState> | undefined

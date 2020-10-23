@@ -1,9 +1,9 @@
 import {
-	BoxedSingleEntityId,
 	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
 	QueryRequestResponse,
 	ReceivedEntityData,
+	ServerGeneratedUuid,
 	SingleEntityPersistedData,
 	SubTreeDataStore,
 } from '../accessorTree'
@@ -34,7 +34,7 @@ export class QueryResponseNormalizer {
 				}
 				subTreeMap.set(treeId, subTreeListIds)
 			} else {
-				subTreeMap.set(treeId, new BoxedSingleEntityId(this.addEntityResponse(entityMap, treeDatum)))
+				subTreeMap.set(treeId, new ServerGeneratedUuid(this.addEntityResponse(entityMap, treeDatum)))
 			}
 		}
 
@@ -60,7 +60,7 @@ export class QueryResponseNormalizer {
 
 				fieldsMap.set(field, ids)
 			} else if (fieldDatum !== null && typeof fieldDatum === 'object') {
-				fieldsMap.set(field, new BoxedSingleEntityId(this.addEntityResponse(entityMap, fieldDatum)))
+				fieldsMap.set(field, new ServerGeneratedUuid(this.addEntityResponse(entityMap, fieldDatum)))
 			} else {
 				fieldsMap.set(field, fieldDatum)
 			}
@@ -88,8 +88,8 @@ export class QueryResponseNormalizer {
 			const fromOriginal = original.get(field)
 			if (fromOriginal === undefined) {
 				original.set(field, fromFresh)
-			} else if (fromOriginal instanceof BoxedSingleEntityId) {
-				if (fromFresh instanceof BoxedSingleEntityId) {
+			} else if (fromOriginal instanceof ServerGeneratedUuid) {
+				if (fromFresh instanceof ServerGeneratedUuid) {
 					// Assuming the ids are the same.
 					this.addEntityResponse(entityMap, freshEntityData[field] as ReceivedEntityData)
 				} else {

@@ -13,13 +13,15 @@
     "@contember/react-client": "0.5.25",
     "@contember/react-multipass-rendering": "0.5.25",
     "@contember/react-utils": "0.5.25",
-    "chevrotain": "6.5.0"
+    "chevrotain": "6.5.0",
+    "uuid": "8.3.1"
   },
   "peerDependencies": {
     "react": "16.13.1",
     "react-dom": "16.13.1"
   },
   "devDependencies": {
-    "@types/jest": "26.0.13"
+    "@types/jest": "26.0.13",
+    "@types/uuid": "8.3.0"
   }
 }

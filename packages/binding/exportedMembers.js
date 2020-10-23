@@ -1,7 +1,6 @@
 // See build/exportedMembers/readme.md
 // TODO This is very crude, just a list of all relevant filenames, really. We should be smarter about this.
 export const bindingExportedMembers = [
-	'Accessor',
 	'AccessorContext',
 	'AccessorTree',
 	'AccessorTreeGenerator',

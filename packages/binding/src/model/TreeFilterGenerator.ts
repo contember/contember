@@ -9,7 +9,6 @@ export class TreeFilterGenerator {
 	public constructor(
 		private readonly markerTree: MarkerTreeRoot,
 		private readonly subTreeStates: Map<string, InternalRootStateNode>,
-		private readonly entityStore: Map<string, InternalEntityState>,
 	) {}
 
 	public generateTreeFilter(): TreeFilter[] {
@@ -29,12 +28,8 @@ export class TreeFilterGenerator {
 				break
 			}
 			case InternalStateType.EntityList: {
-				for (const entityKey of subTree.childrenKeys) {
-					const entity = this.entityStore.get(entityKey)
-					if (entity === undefined) {
-						continue
-					}
-					const filter = this.generateTopLevelEntityFilter(entity)
+				for (const entityState of subTree.children) {
+					const filter = this.generateTopLevelEntityFilter(entityState)
 					filter && filters.push(filter)
 				}
 				break
@@ -49,12 +44,12 @@ export class TreeFilterGenerator {
 	private generateTopLevelEntityFilter(topLevelEntity: InternalEntityState): TreeFilter | undefined {
 		const { id, typeName } = topLevelEntity
 
-		if (typeof id !== 'string' || typeName === undefined) {
+		if (!id.existsOnServer || typeName === undefined) {
 			return undefined
 		}
 		return {
 			entity: typeName,
-			id,
+			id: id.value,
 			relations: this.generateEntityRelations(topLevelEntity.markersContainer),
 		}
 	}

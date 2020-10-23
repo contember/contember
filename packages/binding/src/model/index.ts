@@ -1,4 +1,5 @@
 // export * from './internalState' // Deliberately not exporting it
+export * from './AccessorErrorManager'
 export * from './AccessorTreeGenerator'
 export * from './AliasTransformer'
 export * from './ErrorsPreprocessor'

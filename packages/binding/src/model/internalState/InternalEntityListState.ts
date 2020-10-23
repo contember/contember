@@ -9,7 +9,7 @@ export type OnEntityListUpdate = (state: InternalEntityListState) => void
 export interface InternalEntityListState {
 	type: InternalStateType.EntityList
 	batchUpdateDepth: number
-	childrenKeys: Set<string>
+	children: Set<InternalEntityState>
 	childrenWithPendingUpdates: Set<InternalEntityState> | undefined
 	creationParameters: EntityCreationParameters & EntityListPreferences
 	environment: Environment

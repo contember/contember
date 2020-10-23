@@ -1,5 +1,4 @@
-import { Component, SugaredField, SugaredFieldProps } from '@contember/binding'
-import { useRelativeSingleField } from '@contember/binding/dist/src/accessorPropagation/useRelativeSingleField'
+import { Component, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as Leaflet from 'leaflet'
 import * as React from 'react'

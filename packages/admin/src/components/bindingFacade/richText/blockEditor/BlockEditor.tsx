@@ -2,138 +2,244 @@ import {
 	BindingError,
 	Component,
 	EntityAccessor,
+	Environment,
 	FieldAccessor,
+	FieldValue,
+	HasMany,
 	QueryLanguage,
-	RelativeSingleField,
 	SugaredField,
+	SugaredFieldProps,
 	SugaredRelativeEntityList,
 	useDesugaredRelativeEntityList,
+	useDesugaredRelativeSingleField,
+	useEnvironment,
+	useGetEntityByKey,
+	useMutationState,
 	useParentEntityAccessor,
+	useRelativeEntityList,
 	useRelativeSingleField,
+	useSortedEntities,
+	VariableInputTransformer,
 } from '@contember/binding'
-import { emptyArray, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
+import { emptyArray, noop, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
+import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
-import { BlockRepeater } from '../../collections'
-import { useDiscriminatedData } from '../../discrimination'
-import { BlockEditorInner, BlockEditorInnerPublicProps } from './BlockEditorInner'
+import { Editable, Slate } from 'slate-react'
+import { assertNever } from '../../../../utils'
+import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
+import { Repeater } from '../../collections'
+import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
+import { ElementNode } from '../baseEditor'
+import { CreateEditorPublicOptions } from '../editorFactory'
+import { RichEditor } from '../RichEditor'
+import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
+import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
+import { createBlockEditor } from './editor'
+import { ContemberFieldElement } from './elements'
 import { EmbedHandler } from './embed'
 import { FieldBackedElement, NormalizedFieldBackedElement } from './FieldBackedElement'
+import { BlockEditorGetNormalizedFieldBackedElementContext } from './renderers'
+import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 
-export interface BlockEditorProps extends SugaredRelativeEntityList, BlockEditorInnerPublicProps {
+export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
+	label: React.ReactNode
+	contentField: SugaredFieldProps['field']
+	sortableBy: SugaredFieldProps['field']
+	children?: React.ReactNode
+
 	leadingFieldBackedElements?: FieldBackedElement[]
 	//trailingFieldBackedElements?: FieldBackedElement[]
 
+	referencesField?: SugaredRelativeEntityList | string
+	referenceDiscriminationField?: SugaredFieldProps['field']
+
+	embedReferenceDiscriminateBy?: SugaredDiscriminateBy
+	embedContentDiscriminationField?: SugaredFieldProps['field']
 	embedHandlers?: Iterable<EmbedHandler>
+
+	// TODO
+	inlineButtons?: HoveringToolbarsProps['inlineButtons']
+	blockButtons?: BlockHoveringToolbarContentsProps['blockButtons']
+	otherBlockButtons?: BlockHoveringToolbarContentsProps['otherBlockButtons']
 }
 
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
 export const BlockEditor = Component<BlockEditorProps>(
 	props => {
-		const entity = useParentEntityAccessor()
-		const environment = entity.environment
+		const environment = useEnvironment()
+		const isMutating = useMutationState()
+		const getEntityByKey = useGetEntityByKey()
 
-		useConstantLengthInvariant(
-			props.leadingFieldBackedElements || emptyArray,
-			'The number of leadingFieldBackedElements must remain constant between renders.',
-		)
-		//useConstantLengthInvariant(
-		//	props.trailingFieldBackedElements || emptyArray,
-		//	'The number of trailingFieldBackedElements must remain constant between renders.',
-		//)
+		assertStaticBlockEditorInvariants(props, environment)
 
-		const desugaredEntityList = useDesugaredRelativeEntityList(props)
-		const entityListAccessor = React.useMemo(() => entity.getRelativeEntityList(desugaredEntityList), [
-			entity,
-			desugaredEntityList,
-		])
+		const {
+			label,
+			contentField,
+			sortableBy,
+			children,
 
-		const desugarFieldBackedElement = React.useCallback(
-			(element: FieldBackedElement) => QueryLanguage.desugarRelativeSingleField(element.field, environment),
-			[environment],
-		)
+			leadingFieldBackedElements,
 
-		const leadingDesugared = useArrayMapMemo(props.leadingFieldBackedElements || emptyArray, desugarFieldBackedElement)
+			referencesField,
+			referenceDiscriminationField,
 
-		const accessors: FieldAccessor[] = []
-		if (props.leadingFieldBackedElements) {
-			for (const fieldBackedElement of props.leadingFieldBackedElements) {
-				// eslint-disable-next-line react-hooks/rules-of-hooks
-				accessors.push(useRelativeSingleField(fieldBackedElement.field))
+			embedReferenceDiscriminateBy,
+			embedContentDiscriminationField,
+			embedHandlers,
+
+			inlineButtons = defaultInlineButtons,
+			blockButtons,
+			otherBlockButtons,
+
+			plugins,
+			augmentEditor,
+			augmentEditorBuiltins,
+
+			...blockListProps
+		} = props
+
+		const parentEntity = useParentEntityAccessor() // TODO this is over-subscribing
+		const referenceList = useRelativeEntityList(referencesField) // TODO this is over-subscribing
+
+		const batchUpdates = parentEntity.batchUpdates
+		const blockList = useRelativeEntityList(blockListProps)
+
+		const desugaredBlockList = useDesugaredRelativeEntityList(blockListProps)
+		const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
+		const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
+
+		// const desugaredReferenceList = useDesugaredRelativeEntityList(referencesField)
+		const desugaredReferenceDiscriminationField = useDesugaredRelativeSingleField(referenceDiscriminationField)
+		const desugaredEmbedContentDiscriminationField = useDesugaredRelativeSingleField(embedContentDiscriminationField)
+
+		//
+
+		const normalizedLeading = useNormalizedFieldBackedElements(parentEntity, leadingFieldBackedElements)
+		const normalizedReferenceBlocks = useNormalizedBlocks(children)
+		const { entities: topLevelBlocks } = useSortedEntities(blockList, sortableBy)
+
+		//
+
+		const discriminatedEmbedHandlers = useDiscriminatedData<EmbedHandler>(embedHandlers || emptyArray)
+		const embedReferenceDiscriminant = React.useMemo<FieldValue | undefined>(() => {
+			if (embedReferenceDiscriminateBy !== undefined) {
+				return VariableInputTransformer.transformVariableLiteral(embedReferenceDiscriminateBy, environment)
 			}
-		}
-
-		//const trailingDesugared = useArrayMapMemo(
-		//	props.trailingFieldBackedElements || emptyArray,
-		//	desugarFieldBackedElement,
-		//)
-
-		const normalizedLeading = useNormalizedFieldBackedElements(
-			entity,
-			accessors,
-			leadingDesugared,
-			props.leadingFieldBackedElements,
+			return undefined
+		}, [embedReferenceDiscriminateBy, environment])
+		const embedSubBlocks = useNormalizedBlocks(
+			embedReferenceDiscriminant !== undefined
+				? getDiscriminatedBlock(normalizedReferenceBlocks, embedReferenceDiscriminant)?.datum.children
+				: undefined, // TODO this may crash
 		)
-		//const normalizedTrailing = useNormalizedFieldBackedElements(
-		//	entity,
-		//	environment,
-		//	trailingDesugared,
-		//	props.trailingFieldBackedElements,
-		//)
 
-		const embedHandlers = useDiscriminatedData<EmbedHandler>(props.embedHandlers || emptyArray)
+		//
 
+		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor, ContemberFieldElement>())
+		const [blockElementCache] = React.useState(() => new WeakMap<EntityAccessor, ElementNode>())
+
+		//
+
+		const batchUpdatesRef = React.useRef(batchUpdates)
+		const blockListRef = React.useRef(blockList)
+		const isMutatingRef = React.useRef(isMutating)
+		const sortedBlocksRef = React.useRef(topLevelBlocks)
+		const normalizedReferenceBlocksRef = React.useRef(normalizedReferenceBlocks)
+		const normalizedLeadingFieldsRef = React.useRef(normalizedLeading)
+
+		React.useLayoutEffect(() => {
+			batchUpdatesRef.current = batchUpdates
+			blockListRef.current = blockList
+			isMutatingRef.current = isMutating
+			sortedBlocksRef.current = topLevelBlocks
+			normalizedReferenceBlocksRef.current = normalizedReferenceBlocks
+			normalizedLeadingFieldsRef.current = normalizedLeading
+		}) // Deliberately no deps array
+
+		const [editor] = React.useState(() =>
+			createBlockEditor({
+				augmentEditor,
+				augmentEditorBuiltins,
+				batchUpdatesRef,
+				blockContentField: desugaredBlockContentField,
+				blockElementCache,
+				contemberFieldElementCache,
+				createNewReference: referenceList?.createNewEntity,
+				desugaredBlockList,
+				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
+				embedHandlers: discriminatedEmbedHandlers,
+				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
+				embedSubBlocks,
+				getEntityByKey,
+				isMutatingRef,
+				normalizedLeadingFieldsRef,
+				normalizedReferenceBlocksRef,
+				placeholder: label,
+				plugins,
+				referenceDiscriminationField: desugaredReferenceDiscriminationField,
+				sortableByField: desugaredSortableByField,
+				sortedBlocksRef,
+			}),
+		)
+
+		const nodes = useBlockEditorSlateNodes({
+			placeholder: label,
+			editor,
+			blockElementCache,
+			blockContentField: desugaredBlockContentField,
+			contemberFieldElementCache,
+			topLevelBlocks,
+			leadingFieldBackedElements: normalizedLeading,
+			//trailingFieldBackedElements,
+		})
+
+		const getNormalizedFieldBackedElement = React.useCallback(
+			(element: ContemberFieldElement) => {
+				let normalizedElements: NormalizedFieldBackedElement[]
+				if (element.position === 'leading') {
+					normalizedElements = normalizedLeading
+				} /*else if (element.position === 'trailing') {
+							normalizedElements = trailingFieldBackedElements
+						} */ else {
+					return assertNever(element.position)
+				}
+				return normalizedElements[element.index]
+			},
+			[normalizedLeading],
+		)
+
+		// TODO label?
 		return (
-			<BlockEditorInner
-				{...props}
-				environment={environment}
-				batchUpdates={entity.batchUpdates}
-				desugaredEntityList={desugaredEntityList}
-				accessor={entityListAccessor}
-				leadingFieldBackedElements={normalizedLeading}
-				//trailingFieldBackedElements={normalizedTrailing}
-				embedHandlers={embedHandlers}
-			/>
+			<BlockEditorGetNormalizedFieldBackedElementContext.Provider value={getNormalizedFieldBackedElement}>
+				<Slate editor={editor} value={nodes} onChange={noop}>
+					<EditorCanvas
+						underlyingComponent={Editable}
+						componentProps={{
+							renderElement: editor.renderElement,
+							renderLeaf: editor.renderLeaf,
+							onKeyDown: editor.onKeyDown,
+							onFocusCapture: editor.onFocus,
+							onBlurCapture: editor.onBlur,
+							onDOMBeforeInput: editor.onDOMBeforeInput,
+						}}
+						size="large"
+					>
+						<HoveringToolbars
+							inlineButtons={inlineButtons}
+							blockButtons={
+								<BlockHoveringToolbarContents blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
+							}
+						/>
+					</EditorCanvas>
+				</Slate>
+			</BlockEditorGetNormalizedFieldBackedElementContext.Provider>
 		)
 	},
 	(props, environment) => {
+		assertStaticBlockEditorInvariants(props, environment)
+
 		const embedHandlers = Array.from(props.embedHandlers || [])
-		if (__DEV_MODE__) {
-			if (props.textBlockDiscriminateBy !== undefined && props.textBlockDiscriminateByScalar !== undefined) {
-				throw new BindingError(
-					`BlockEditor: You cannot simultaneously use the 'textBlockDiscriminateBy' and the ` +
-						`'textBlockDiscriminateByScalar' prop at the same time. Choose exactly one.`,
-				)
-			}
-			if (props.textBlockDiscriminateBy === undefined && props.textBlockDiscriminateByScalar === undefined) {
-				throw new BindingError(
-					`BlockEditor: undiscriminated text blocks. You must supply either the 'textBlockDiscriminateBy' or the ` +
-						`'textBlockDiscriminateByScalar' props. The editor needs to be able to tell which blocks are to be ` +
-						`treated as text.`,
-				)
-			}
-			if (props.embedBlockDiscriminateBy !== undefined && props.embedBlockDiscriminateByScalar !== undefined) {
-				throw new BindingError(
-					`BlockEditor: You cannot simultaneously use the 'embedBlockDiscriminateBy' and the ` +
-						`'embedBlockDiscriminateByScalar' prop at the same time. Choose exactly one.`,
-				)
-			}
-			if (props.embedBlockDiscriminateBy !== undefined || props.embedBlockDiscriminateByScalar !== undefined) {
-				if (props.embedContentDiscriminationField === undefined) {
-					throw new BindingError(
-						`BlockEditor: You enabled embed blocks by supplying the 'embedBlockDiscriminateBy(Scalar)' prop but then ` +
-							`failed to also supply the 'embedContentDiscriminationField'. Without it, the editor would not be ` +
-							`able to distinguish between the kinds of embedded content.`,
-					)
-				}
-				if (embedHandlers.length === 0) {
-					throw new BindingError(
-						`BlockEditor: You enabled embed blocks by supplying the 'embedBlockDiscriminateBy(Scalar)' prop but then ` +
-							`failed to also supply any embed handlers. Without them, the editor would not be able to ` +
-							`recognize any embedded content.`,
-					)
-				}
-			}
-		}
+
 		return (
 			<>
 				{props.leadingFieldBackedElements?.map((item, i) => (
@@ -142,38 +248,125 @@ export const BlockEditor = Component<BlockEditorProps>(
 				{/*props.trailingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`trailing_${i}`} />
 				))*/}
-				<BlockRepeater {...props}>
-					<SugaredField field={props.textBlockField} />
-					{props.children}
-					{props.embedContentDiscriminationField && (
-						<>
-							<SugaredField field={props.embedContentDiscriminationField} />
-							{embedHandlers.map((handler, i) => (
-								<React.Fragment key={i}>{handler.getStaticFields(environment)}</React.Fragment>
-							))}
-						</>
-					)}
-				</BlockRepeater>
+				<Repeater {...props} initialEntityCount={0}>
+					<SugaredField field={props.sortableBy} />
+					<SugaredField field={props.contentField} />
+				</Repeater>
+				{!!(props.referencesField && props.referenceDiscriminationField) && (
+					<HasMany
+						{...(typeof props.referencesField === 'string' ? { field: props.referencesField } : props.referencesField)}
+						initialEntityCount={0}
+					>
+						<SugaredField field={props.referenceDiscriminationField} />
+						{props.children}
+						{props.embedContentDiscriminationField && (
+							<>
+								<SugaredField field={props.embedContentDiscriminationField} />
+								{embedHandlers.map((handler, i) => (
+									<React.Fragment key={i}>{handler.getStaticFields(environment)}</React.Fragment>
+								))}
+							</>
+						)}
+					</HasMany>
+				)}
 			</>
 		)
 	},
 	'BlockEditor',
 )
 
+// TODO this whole routine is garbage.
 const useNormalizedFieldBackedElements = (
 	entity: EntityAccessor,
-	accessors: FieldAccessor[],
-	desugaredOriginal: RelativeSingleField[] = [],
-	original: FieldBackedElement[] = [],
+	original: FieldBackedElement[] = emptyArray,
 ): NormalizedFieldBackedElement[] => {
+	useConstantLengthInvariant(
+		original,
+		'The number of leading/trailing field-backed elements must remain constant between renders.',
+	)
+	const environment = entity.environment
+	const desugarFieldBackedElement = React.useCallback(
+		(element: FieldBackedElement) => QueryLanguage.desugarRelativeSingleField(element.field, environment),
+		[environment],
+	)
+	const desugared = useArrayMapMemo(original, desugarFieldBackedElement)
+	const accessors = original.map(fieldBackedToAccessor)
+
 	const normalizeFieldBackElement = React.useCallback(
 		(value: FieldAccessor, index: number): NormalizedFieldBackedElement => ({
 			...original[index],
-			field: desugaredOriginal[index],
+			field: desugared[index],
 			accessor: accessors[index],
 		}),
-		[accessors, desugaredOriginal, original],
+		[accessors, desugared, original],
 	)
 
 	return useArrayMapMemo(accessors, normalizeFieldBackElement)
 }
+const fieldBackedToAccessor = (field: FieldBackedElement): FieldAccessor => {
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	return useRelativeSingleField(field.field)
+}
+
+const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment: Environment) => {
+	if (__DEV_MODE__) {
+		//referencesField?: SugaredRelativeEntityList | string
+		//referenceDiscriminationField?: SugaredFieldProps['field']
+		//
+		//embedReferenceDiscriminateBy?: SugaredDiscriminateBy
+		//embedContentDiscriminationField?: SugaredFieldProps['field']
+		//embedHandlers?: Iterable<EmbedHandler>
+
+		if (props.referencesField !== undefined && props.referenceDiscriminationField === undefined) {
+			throw new BindingError(
+				`BlockEditor: missing the 'referenceDiscriminationField' prop. ` +
+					`Without it the editor cannot tell different kinds of references apart!`,
+			)
+		}
+		if (props.referencesField === undefined && props.referenceDiscriminationField !== undefined) {
+			throw new BindingError(
+				`BlockEditor: supplied the 'referenceDiscriminationField' prop but missing 'referencesField'. ` +
+					`Either remove 'referenceDiscriminationField' to get rid of this error ` +
+					`or provide 'referencesField' to enable content references.`,
+			)
+		}
+		if (
+			props.referencesField !== undefined &&
+			(props.embedReferenceDiscriminateBy === undefined ||
+				props.embedContentDiscriminationField === undefined ||
+				props.embedHandlers === undefined) &&
+			(props.embedReferenceDiscriminateBy !== undefined ||
+				props.embedContentDiscriminationField !== undefined ||
+				props.embedHandlers !== undefined)
+		) {
+			throw new BindingError(
+				`BlockEditor: trying to enable embeds without content references being enabled. In order to use embeds, ` +
+					`provide both the 'referenceDiscriminationField' as well as the 'referencesField' prop`,
+			)
+		}
+
+		if (props.embedReferenceDiscriminateBy !== undefined) {
+			if (props.embedContentDiscriminationField === undefined) {
+				throw new BindingError(
+					`BlockEditor: You enabled embed blocks by supplying the 'embedReferenceDiscriminateBy' prop but then ` +
+						`failed to also supply the 'embedContentDiscriminationField'. Without it, the editor would not be ` +
+						`able to distinguish between the kinds of embedded content.`,
+				)
+			}
+			if (!props.embedHandlers || Array.from(props.embedHandlers).length === 0) {
+				throw new BindingError(
+					`BlockEditor: You enabled embed blocks by supplying the 'embedReferenceDiscriminateBy' prop but then ` +
+						`failed to also supply any embed handlers. Without them, the editor would not be able to ` +
+						`recognize any embedded content.`,
+				)
+			}
+		}
+	}
+}
+
+const RB = RichEditor.buttons
+const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
+	[RB.bold, RB.italic, RB.underline, RB.anchor],
+	[RB.headingOne, RB.headingTwo],
+	[RB.strikeThrough, RB.code],
+]

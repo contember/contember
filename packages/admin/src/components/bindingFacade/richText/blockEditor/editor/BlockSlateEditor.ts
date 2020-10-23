@@ -1,23 +1,29 @@
+import { EntityAccessor, FieldValue } from '@contember/binding'
 import { Node } from 'slate'
-import { BaseEditor, WithAnotherNodeType } from '../../baseEditor'
+import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../baseEditor'
 import {
-	ContemberBlockElement,
+	BlockVoidReferenceElement,
 	ContemberContentPlaceholderElement,
-	ContemberEmbedElement,
 	ContemberFieldElement,
+	EmbedElement,
 } from '../elements'
 
 export type BlockEditorElements =
-	| ContemberBlockElement
-	| ContemberFieldElement
-	| ContemberEmbedElement
+	| BlockVoidReferenceElement
 	| ContemberContentPlaceholderElement
+	| ContemberFieldElement
+	| EmbedElement
 
 export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, BlockEditorElements>> {
-	isContemberBlockElement: (node: Node) => node is ContemberBlockElement
+	isBlockVoidReferenceElement: (node: Node) => node is BlockVoidReferenceElement
 	isContemberContentPlaceholderElement: (node: Node) => node is ContemberContentPlaceholderElement
-	isContemberEmbedElement: (node: Node) => node is ContemberEmbedElement
+	isEmbedElement: (node: Node) => node is EmbedElement
 	isContemberFieldElement: (node: Node) => node is ContemberFieldElement
+	insertElementWithReference: <Element extends ElementNode>(
+		element: Omit<Element, 'referenceId'>,
+		referenceDiscriminant: FieldValue,
+		initialize?: EntityAccessor.BatchUpdatesHandler,
+	) => void
 }
 
 export type EditorWithBlockElements<E extends BaseEditor> = WithAnotherNodeType<E, BlockEditorElements> &

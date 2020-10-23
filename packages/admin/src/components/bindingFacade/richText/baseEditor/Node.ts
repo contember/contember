@@ -16,6 +16,7 @@ export interface TextNode {
 
 export interface ElementNode {
 	type?: string
+	referenceId?: string
 	children: Array<ElementNode | TextNode>
 }
 

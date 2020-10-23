@@ -1,56 +1,67 @@
-import { RelativeSingleField, RemovalType } from '@contember/binding'
+import { BindingError, EntityKeyProvider, FieldValue, RelativeSingleField } from '@contember/binding'
 import { EditorPlaceholder } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlocks } from '../../../blocks'
+import { ElementNode } from '../../baseEditor'
 import {
-	isContemberBlockElement,
+	isBlockVoidReferenceElement,
 	isContemberContentPlaceholderElement,
-	isContemberEmbedElement,
 	isContemberFieldElement,
+	isEmbedElement,
 } from '../elements'
-import { ContemberBlockElementRenderer } from './ContemberBlockElementRenderer'
-import {
-	BlockEditorGetEntityByKeyContext,
-	BlockEditorGetNormalizedFieldBackedElementContext,
-} from './ContemberElementRefreshContext'
-import { ContemberEmbedElementRenderer } from './ContemberEmbedElementRenderer'
+import { NormalizedEmbedHandlers } from '../embed/core'
+import { BlockVoidReferenceElementRenderer } from './BlockVoidReferenceElementRenderer'
+import { BlockEditorGetNormalizedFieldBackedElementContext } from './ContemberElementRefreshContext'
 import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
+import { EmbedElementRenderer } from './EmbedElementRenderer'
 
 export interface BlockEditorElementRendererProps extends RenderElementProps {
-	normalizedBlocks: NormalizedBlocks
-	discriminationField: RelativeSingleField
-	embedContentDiscriminationField: RelativeSingleField | undefined
-	embedSubBlocks: NormalizedBlocks
+	element: ElementNode
+	referenceDiscriminationField: RelativeSingleField | undefined
+	normalizedReferenceBlocks: NormalizedBlocks
 	fallbackRenderer: (props: RenderElementProps) => React.ReactElement
+
+	embedContentDiscriminationField: RelativeSingleField | undefined
+	embedSubBlocks: NormalizedBlocks | undefined
+	embedHandlers: NormalizedEmbedHandlers | undefined
+	embedReferenceDiscriminateBy: FieldValue | undefined
 }
 
-export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: BlockEditorElementRendererProps) => {
-	if (isContemberBlockElement(props.element)) {
-		const element = props.element
+export const BlockEditorElementRenderer = ({
+	fallbackRenderer,
+	embedContentDiscriminationField,
+	embedHandlers,
+	embedReferenceDiscriminateBy,
+	embedSubBlocks,
+	normalizedReferenceBlocks,
+	referenceDiscriminationField,
+	...renderElementProps
+}: BlockEditorElementRendererProps) => {
+	const { attributes, children, element } = renderElementProps
+	if (isBlockVoidReferenceElement(element)) {
+		if (referenceDiscriminationField === undefined) {
+			throw new BindingError()
+		}
 		return (
-			<BlockEditorGetEntityByKeyContext.Consumer>
-				{getEntityByKey => (
-					<ContemberBlockElementRenderer
-						attributes={props.attributes}
-						children={props.children}
-						element={element}
-						entity={getEntityByKey(element.entityKey)}
-						normalizedBlocks={props.normalizedBlocks}
-						discriminationField={props.discriminationField}
-					/>
-				)}
-			</BlockEditorGetEntityByKeyContext.Consumer>
+			<EntityKeyProvider entityKey={element.referenceId}>
+				<BlockVoidReferenceElementRenderer
+					attributes={attributes}
+					children={children}
+					element={element}
+					referenceDiscriminationField={referenceDiscriminationField}
+					normalizedReferenceBlocks={normalizedReferenceBlocks}
+				/>
+			</EntityKeyProvider>
 		)
 	}
-	if (isContemberFieldElement(props.element)) {
-		const element = props.element
+	if (isContemberFieldElement(element)) {
 		return (
 			<BlockEditorGetNormalizedFieldBackedElementContext.Consumer>
 				{getNormalizedFieldBackedElement => (
 					<ContemberFieldElementRenderer
-						attributes={props.attributes}
-						children={props.children}
+						attributes={attributes}
+						children={children}
 						element={element}
 						fieldBackedElement={getNormalizedFieldBackedElement(element)}
 					/>
@@ -58,30 +69,28 @@ export const BlockEditorElementRenderer = ({ fallbackRenderer, ...props }: Block
 			</BlockEditorGetNormalizedFieldBackedElementContext.Consumer>
 		)
 	}
-	if (isContemberEmbedElement(props.element)) {
-		const element = props.element
+	if (isEmbedElement(element)) {
 		return (
-			<BlockEditorGetEntityByKeyContext.Consumer>
-				{getEntityByKey => (
-					<ContemberEmbedElementRenderer
-						attributes={props.attributes}
-						children={props.children}
-						element={element}
-						entity={getEntityByKey(element.entityKey)}
-						embedSubBlocks={props.embedSubBlocks}
-						embedContentDiscriminationField={props.embedContentDiscriminationField!}
-					/>
-				)}
-			</BlockEditorGetEntityByKeyContext.Consumer>
+			<EntityKeyProvider entityKey={element.referenceId}>
+				<EmbedElementRenderer
+					attributes={attributes}
+					children={children}
+					element={element}
+					embedSubBlocks={embedSubBlocks}
+					embedHandlers={embedHandlers}
+					embedContentDiscriminationField={embedContentDiscriminationField}
+					embedReferenceDiscriminateBy={embedReferenceDiscriminateBy}
+				/>
+			</EntityKeyProvider>
 		)
 	}
-	if (isContemberContentPlaceholderElement(props.element)) {
+	if (isContemberContentPlaceholderElement(element)) {
 		return (
-			<div {...props.attributes}>
-				<EditorPlaceholder>{props.element.placeholder}</EditorPlaceholder>
-				{props.children}
+			<div {...attributes}>
+				<EditorPlaceholder>{element.placeholder}</EditorPlaceholder>
+				{children}
 			</div>
 		)
 	}
-	return fallbackRenderer(props)
+	return fallbackRenderer(renderElementProps)
 }

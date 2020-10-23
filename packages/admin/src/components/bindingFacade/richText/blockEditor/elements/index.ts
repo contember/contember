@@ -1,4 +1,4 @@
-export * from './ContemberBlockElement'
+export * from './BlockVoidReferenceElement'
 export * from './ContemberContentPlaceholderElement'
-export * from './ContemberEmbedElement'
+export * from './EmbedElement'
 export * from './ContemberFieldElement'

@@ -1,14 +1,27 @@
+import { FieldValue, RelativeSingleField } from '@contember/binding'
 import { ResolvedDiscriminatedDatum } from '../../../discrimination'
-import { ContemberEmbedElement, contemberEmbedElementType } from '../elements'
+import { EmbedElement, embedElementType } from '../elements'
 import { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertDataOptions {
 	embedHandlers: NormalizedEmbedHandlers | undefined
+	embedReferenceDiscriminateBy: FieldValue | undefined
+	embedContentDiscriminationField: RelativeSingleField | undefined
 }
 
 export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, options: OverrideInsertDataOptions) => {
 	const { insertData } = editor
+
+	const { embedReferenceDiscriminateBy, embedHandlers, embedContentDiscriminationField } = options
+
+	if (
+		embedReferenceDiscriminateBy === undefined ||
+		embedHandlers === undefined ||
+		embedContentDiscriminationField === undefined
+	) {
+		return
+	}
 
 	editor.insertData = data => {
 		const text = data.getData('text/plain').trim()
@@ -19,9 +32,13 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 
 		let url: URL | undefined = undefined
 
-		try {
-			url = new URL(text)
-		} catch {}
+		if (text.length >= 4) {
+			// See isUrl(). This branch is just a quick bailout
+
+			try {
+				url = new URL(text)
+			} catch {}
+		}
 
 		let embedHandler: ResolvedDiscriminatedDatum<EmbedHandler> | undefined = undefined
 		let embedArtifacts: any = undefined
@@ -39,15 +56,22 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 			return insertData(data)
 		}
 
-		const embedBlock: ContemberEmbedElement = {
-			type: contemberEmbedElementType,
+		const partialEmbed: Omit<EmbedElement, 'referenceId'> = {
+			type: embedElementType,
 			children: [{ text: '' }],
-			source: text,
-			entityKey: '', // TODO fix this crap
-			embedHandler,
-			embedArtifacts,
 		}
 
-		return editor.insertNode(embedBlock)
+		return editor.insertElementWithReference(partialEmbed, embedReferenceDiscriminateBy, getEmbedReference => {
+			getEmbedReference()
+				.getRelativeSingleField(embedContentDiscriminationField)
+				.updateValue(embedHandler!.discriminateBy)
+			const reference = getEmbedReference()
+			embedHandler!.datum.populateEmbedData({
+				embedArtifacts,
+				source: text,
+				batchUpdates: reference.batchUpdates,
+				environment: reference.environment,
+			})
+		})
 	}
 }

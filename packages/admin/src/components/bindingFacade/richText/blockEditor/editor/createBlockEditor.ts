@@ -1,15 +1,20 @@
+import { BindingError } from '@contember/binding'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
 import {
-	isContemberBlockElement,
+	isBlockVoidReferenceElement,
 	isContemberContentPlaceholderElement,
-	isContemberEmbedElement,
 	isContemberFieldElement,
+	isEmbedElement,
 } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
-import { overrideInsertNode } from './overrideInsertNode'
 import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData'
+import {
+	overrideInsertElementWithReference,
+	OverrideInsertElementWithReferenceOptions,
+} from './overrideInsertElementWithReference'
+import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 
@@ -17,12 +22,13 @@ export interface CreateEditorOptions
 	extends OverrideApplyOptions,
 		OverrideRenderElementOptions,
 		OverrideInsertDataOptions,
+		OverrideInsertElementWithReferenceOptions,
 		CreateEditorPublicOptions {}
 
 export const createBlockEditor = (options: CreateEditorOptions) => {
 	if (options.plugins && options.plugins.indexOf(paragraphElementType) === -1) {
 		// TODO make this configurable and remove this?
-		throw new Error(`The block editor plugin set must include the paragraph plugin!`)
+		throw new BindingError(`The block editor plugin set must include the paragraph plugin!`)
 	}
 
 	return createEditor({
@@ -32,17 +38,25 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 
 		addEditorBuiltins: editor => {
 			const e = editor as BlockSlateEditor
-			e.isContemberBlockElement = isContemberBlockElement
+			e.isBlockVoidReferenceElement = isBlockVoidReferenceElement
 			e.isContemberContentPlaceholderElement = isContemberContentPlaceholderElement
-			e.isContemberEmbedElement = isContemberEmbedElement
+			e.isEmbedElement = isEmbedElement
 			e.isContemberFieldElement = isContemberFieldElement
+			e.insertElementWithReference = () => {
+				throw new BindingError(
+					`BlockEditor: trying to insert a referenced element but referencing has not been correctly set up. ` +
+						`Check the BlockEditor props.`,
+				)
+			}
 
 			overrideIsVoid(e)
 
 			overrideApply(e, options)
+
 			overrideRenderElement(e, options)
 			overrideInsertNode(e)
 			overrideInsertData(e, options)
+			overrideInsertElementWithReference(e, options)
 
 			return e
 		},

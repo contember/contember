@@ -2,9 +2,10 @@ import { Environment, Scalar, useEnvironment, VariableInputTransformer, Variable
 import { GraphQlBuilder } from '@contember/client'
 import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import * as React from 'react'
-import { ReactEditor, useEditor } from 'slate-react'
+import { useEditor } from 'slate-react'
 import { ElementSpecificToolbarButton } from '../toolbars'
-import { ContemberBlockElement, contemberBlockElementType } from './elements'
+import { BlockSlateEditor } from './editor'
+import { BlockVoidReferenceElement, blockVoidReferenceElementType } from './elements'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	title?: string
@@ -26,7 +27,7 @@ export interface BlockHoveringToolbarContentsProps {
 function toToolbarGroups(
 	buttons: BlockHoveringToolbarContentsProps['blockButtons'],
 	environment: Environment,
-	editor: ReactEditor,
+	editor: BlockSlateEditor,
 ): ToolbarGroup[] {
 	if (!buttons) {
 		return []
@@ -50,13 +51,11 @@ function toToolbarGroups(
 								'discriminateBy' in buttonProps
 									? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
 									: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
-							const contemberBlockElement: ContemberBlockElement = {
-								type: contemberBlockElementType,
-								blockType: discriminateBy,
-								entityKey: '', // Any string will do from here.
+							const contemberBlockElement: Omit<BlockVoidReferenceElement, 'referenceId'> = {
+								type: blockVoidReferenceElementType,
 								children: [{ text: '' }],
 							}
-							editor.insertNode(contemberBlockElement)
+							editor.insertElementWithReference(contemberBlockElement, discriminateBy)
 						} else {
 							editor.toggleElement(buttonProps.elementType, buttonProps.suchThat)
 						}
@@ -68,7 +67,7 @@ function toToolbarGroups(
 }
 
 export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringToolbarContentsProps) => {
-	const editor = useEditor()
+	const editor = useEditor() as BlockSlateEditor
 	const environment = useEnvironment()
 
 	const { blockButtons, otherBlockButtons } = props

@@ -1,36 +1,23 @@
-import { BindingError, EntityAccessor, FieldAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
+import { BindingError, EntityAccessor, FieldAccessor, RelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 import { Element as SlateElement } from 'slate'
-import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
-import { getDiscriminatedDatum } from '../../discrimination'
+import { ElementNode } from '../baseEditor'
 import { BlockSlateEditor } from './editor'
 import {
-	ContemberBlockElement,
-	contemberBlockElementType,
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
-	ContemberEmbedElement,
-	contemberEmbedElementType,
 	ContemberFieldElement,
 	ContemberFieldElementPosition,
 	contemberFieldElementType,
 } from './elements'
-import { NormalizedEmbedHandlers } from './embed'
 import { NormalizedFieldBackedElement } from './FieldBackedElement'
 
 export interface UseBlockEditorSlateNodesOptions {
 	editor: BlockSlateEditor
-	blocks: NormalizedBlocks
-	discriminationField: RelativeSingleField
-	contemberFieldElementCache: WeakMap<FieldAccessor, SlateElement>
-	textElementCache: WeakMap<EntityAccessor, SlateElement>
-	contemberBlockElementCache: Map<string, SlateElement>
-	textBlockField: RelativeSingleField
-	textBlockDiscriminant: FieldValue
-	embedContentDiscriminationField: RelativeSingleField | undefined
-	embedBlockDiscriminant: FieldValue | undefined
-	embedHandlers: NormalizedEmbedHandlers
-	entities: EntityAccessor[]
+	blockElementCache: WeakMap<EntityAccessor, ElementNode>
+	contemberFieldElementCache: WeakMap<FieldAccessor, ContemberFieldElement>
+	blockContentField: RelativeSingleField
+	topLevelBlocks: EntityAccessor[]
 	leadingFieldBackedElements: NormalizedFieldBackedElement[]
 	//trailingFieldBackedElements: NormalizedFieldBackedElement[]
 	placeholder: React.ReactNode
@@ -38,17 +25,10 @@ export interface UseBlockEditorSlateNodesOptions {
 
 export const useBlockEditorSlateNodes = ({
 	editor,
-	blocks,
-	discriminationField,
-	textElementCache,
+	blockElementCache,
 	contemberFieldElementCache,
-	contemberBlockElementCache,
-	textBlockField,
-	textBlockDiscriminant,
-	embedContentDiscriminationField,
-	embedBlockDiscriminant,
-	embedHandlers,
-	entities,
+	blockContentField,
+	topLevelBlocks,
 	leadingFieldBackedElements,
 	//trailingFieldBackedElements,
 	placeholder,
@@ -62,7 +42,7 @@ export const useBlockEditorSlateNodes = ({
 			if (existingElement) {
 				return existingElement
 			}
-			let element: SlateElement
+			let element: ContemberFieldElement
 			const fieldValue = normalizedElement.accessor.currentValue
 			if (typeof fieldValue !== 'string' && fieldValue !== null) {
 				throw new BindingError(
@@ -70,106 +50,50 @@ export const useBlockEditorSlateNodes = ({
 				)
 			}
 			if (fieldValue === null || fieldValue === '' || normalizedElement.format === 'plainText') {
-				const fieldElement: ContemberFieldElement = {
+				element = {
 					type: contemberFieldElementType,
 					children: [{ text: fieldValue || '' }],
 					position,
 					index,
 				}
-				element = fieldElement
 			} else {
 				const deserialized = editor.deserializeNodes(
 					fieldValue,
 					`BlockEditor: The ${position} field backed element at index '${index}' contains invalid JSON.`,
 				)
-				const fieldElement: ContemberFieldElement = {
+				element = {
 					type: contemberFieldElementType,
 					children: deserialized,
 					position,
 					index,
 				}
-				element = fieldElement
 			}
 			contemberFieldElementCache.set(normalizedElement.accessor, element)
 			return element
 		})
 
-	const contentElements = entities.length
-		? entities.map(entity => {
-				const existingTextElement = textElementCache.get(entity)
-				if (existingTextElement) {
-					return existingTextElement
-				}
-				const entityKey = entity.key
-
-				const existingBlockElement = contemberBlockElementCache.get(entityKey)
-
+	const topLevelBlockElements = topLevelBlocks.length
+		? topLevelBlocks.map(entity => {
+				const existingBlockElement = blockElementCache.get(entity)
 				if (existingBlockElement) {
 					return existingBlockElement
 				}
+				const contentField = entity.getRelativeSingleField(blockContentField)
 
-				const blockType = entity.getRelativeSingleField(discriminationField)
+				let blockElement: ElementNode
 
-				if (blockType.hasValue(textBlockDiscriminant)) {
-					// This is a text block
-					const textAccessor = entity.getRelativeSingleField(textBlockField)
-					let element: SlateElement
-
-					if (textAccessor.currentValue === null || textAccessor.currentValue === '') {
-						element = editor.createDefaultElement([{ text: '' }])
-					} else if (typeof textAccessor.currentValue !== 'string') {
-						throw new BindingError(`BlockEditor: The 'textBlockField' does not contain a string value.`)
-					} else {
-						element = editor.deserializeNodes(
-							textAccessor.currentValue,
-							`BlockEditor: The 'textBlockField' contains invalid JSON.`,
-						)[0] as SlateElement
-					}
-					textElementCache.set(entity, element)
-					return element
+				if (contentField.currentValue === null || contentField.currentValue === '') {
+					blockElement = editor.createDefaultElement([{ text: '' }])
+				} else if (typeof contentField.currentValue !== 'string') {
+					throw new BindingError(`BlockEditor: The 'textBlockField' does not contain a string value.`)
+				} else {
+					blockElement = editor.deserializeNodes(
+						contentField.currentValue,
+						`BlockEditor: The 'contentField' of a block contains invalid data.`,
+					)[0] as ElementNode
 				}
-				if (embedBlockDiscriminant !== undefined && blockType.hasValue(embedBlockDiscriminant)) {
-					// This is an embed block.
-
-					const embedContentType = entity.getRelativeSingleField(embedContentDiscriminationField!)
-					const embedHandler = getDiscriminatedDatum(embedHandlers, embedContentType)
-
-					if (embedHandler === undefined) {
-						throw new BindingError() // TODO message
-					}
-
-					const embedBlock: ContemberEmbedElement = {
-						type: contemberEmbedElementType,
-						children: [{ text: '' }],
-						embedArtifacts: undefined,
-						source: undefined,
-						embedHandler,
-						entityKey,
-					}
-					// TODO same as below: this is a memory leak.
-					contemberBlockElementCache.set(entityKey, embedBlock)
-					return embedBlock
-				}
-
-				// If we make it to here, this is a regular contember block.
-
-				const selectedBlock = getDiscriminatedBlock(blocks, blockType)
-
-				if (selectedBlock === undefined) {
-					throw new BindingError(`BlockEditor: Encountered an entity without a corresponding block definition.`)
-				}
-				const contemberBlock: ContemberBlockElement = {
-					type: contemberBlockElementType,
-					children: [{ text: '' }],
-					entityKey,
-					blockType: selectedBlock.discriminateBy,
-				}
-
-				// TODO This is a memory leak as we don't ever remove the blocks from the map. They're tiny objects though and
-				//		we're not expecting the user to create thousands and thousands of them so it's not that big of a deal
-				//		but it's still far from ideal. How do we fix this though? 🤔
-				contemberBlockElementCache.set(entityKey, contemberBlock)
-				return contemberBlock
+				blockElementCache.set(entity, blockElement)
+				return blockElement
 		  })
 		: [
 				{
@@ -179,7 +103,7 @@ export const useBlockEditorSlateNodes = ({
 				} as ContemberContentPlaceholderElement,
 		  ]
 	return adjacentAccessorsToElements(leadingFieldBackedElements, 'leading').concat(
-		contentElements,
+		topLevelBlockElements,
 		//adjacentAccessorsToElements(trailingFieldBackedElements, 'trailing'),
 	)
 }

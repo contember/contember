@@ -2,20 +2,18 @@ import {
 	addEntityAtIndex,
 	BindingError,
 	EntityAccessor,
-	EntityListAccessor,
-	Environment,
 	FieldAccessor,
-	FieldValue,
 	RelativeEntityList,
 	RelativeSingleField,
 	repairEntitiesOrder,
 } from '@contember/binding'
 import * as React from 'react'
 import { Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
-import { NormalizedBlocks } from '../../../blocks'
+import { ElementNode } from '../../baseEditor'
 import {
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
+	ContemberFieldElement,
 	ContemberFieldElementPosition,
 } from '../elements'
 import { NormalizedFieldBackedElement } from '../FieldBackedElement'
@@ -23,43 +21,30 @@ import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideApplyOptions {
 	batchUpdatesRef: React.MutableRefObject<EntityAccessor['batchUpdates']>
-	desugaredEntityList: RelativeEntityList
-	discriminationField: RelativeSingleField
-	embedBlockDiscriminant: FieldValue | undefined
-	embedContentDiscriminationField: RelativeSingleField | undefined
-	entityListAccessorRef: React.MutableRefObject<EntityListAccessor>
-	environmentRef: React.MutableRefObject<Environment>
-	fieldElementCache: WeakMap<FieldAccessor, SlateElement>
+	blockContentField: RelativeSingleField
+	blockElementCache: WeakMap<EntityAccessor, ElementNode>
+	contemberFieldElementCache: WeakMap<FieldAccessor, ContemberFieldElement>
+	desugaredBlockList: RelativeEntityList
 	isMutatingRef: React.MutableRefObject<boolean>
-	normalizedBlocksRef: React.MutableRefObject<NormalizedBlocks>
 	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	sortableByField: RelativeSingleField
-	sortedEntitiesRef: React.MutableRefObject<EntityAccessor[]>
-	textBlockDiscriminant: FieldValue
-	textBlockField: RelativeSingleField
-	textElementCache: WeakMap<EntityAccessor, SlateElement>
 	placeholder: ContemberContentPlaceholderElement['placeholder']
+	sortableByField: RelativeSingleField
+	sortedBlocksRef: React.MutableRefObject<EntityAccessor[]>
 }
 
 export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {
 	const { apply } = editor
 	const {
 		batchUpdatesRef,
-		desugaredEntityList,
-		discriminationField,
-		embedBlockDiscriminant,
-		embedContentDiscriminationField,
-		environmentRef,
-		fieldElementCache,
+		blockContentField,
+		blockElementCache,
+		contemberFieldElementCache,
+		desugaredBlockList,
+		isMutatingRef,
 		normalizedLeadingFieldsRef,
-		//normalizedTrailingFieldsRef,
-		sortableByField,
-		sortedEntitiesRef,
-		textBlockDiscriminant,
-		textBlockField,
-		textElementCache,
 		placeholder,
+		sortableByField,
+		sortedBlocksRef,
 	} = options
 
 	const fieldBackedElementRefs: {
@@ -69,7 +54,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		//trailing: normalizedTrailingFieldsRef,
 	}
 
-	const firstContentIndex = options.normalizedLeadingFieldsRef.current.length
+	const firstContentIndex = normalizedLeadingFieldsRef.current.length
 	//const firstContentElementPath = Editor.pathRef(editor, [firstContentIndex], {
 	//	affinity: 'backward',
 	//})
@@ -78,19 +63,19 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		if (operation.type === 'set_selection') {
 			return apply(operation) // Nothing to do here
 		}
-		if (options.isMutatingRef.current || operation.path.length === 0) {
+		if (isMutatingRef.current || operation.path.length === 0) {
 			return
 		}
 
 		batchUpdatesRef.current(getAccessor => {
 			const { path } = operation
-			const sortedEntities = sortedEntitiesRef.current
+			const sortedTopLevelBlocks = sortedBlocksRef.current
 			const [topLevelIndex] = path
 
 			// TODO also handle trailing
 			const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
 			const isTrailingElement = (elementIndex: number) =>
-				elementIndex >= options.normalizedLeadingFieldsRef.current.length + Math.max(sortedEntities.length, 1)
+				elementIndex >= normalizedLeadingFieldsRef.current.length + Math.max(sortedTopLevelBlocks.length, 1)
 			const isFieldBackedElement = (elementIndex: number) =>
 				isLeadingElement(elementIndex) || isTrailingElement(elementIndex)
 			const getNormalizedFieldBackedElement = (elementIndex: number) => {
@@ -116,12 +101,12 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				newValue: string,
 			) => getFreshFieldAccessor(position, normalizedFieldIndex).updateValue(newValue)
 			const getFreshContentEntityAccessor = (sortedEntityIndex: number): EntityAccessor => {
-				const oldEntityKey = sortedEntities[sortedEntityIndex].key
-				const newEntity = getAccessor().getRelativeEntityList(desugaredEntityList).getChildEntityByKey(oldEntityKey)
+				const oldEntityKey = sortedTopLevelBlocks[sortedEntityIndex].key
+				const newEntity = getAccessor().getRelativeEntityList(desugaredBlockList).getChildEntityByKey(oldEntityKey)
 				if (!(newEntity instanceof EntityAccessor)) {
 					throw new BindingError(`Corrupted data`)
 				}
-				return (sortedEntities[sortedEntityIndex] = newEntity)
+				return (sortedTopLevelBlocks[sortedEntityIndex] = newEntity)
 			}
 			const saveElementAt = (elementIndex: number, entity?: EntityAccessor) => {
 				const targetElement = editor.children[elementIndex]
@@ -132,21 +117,24 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					return
 				}
 				if (isLeadingElement(elementIndex) || isTrailingElement(elementIndex)) {
+					if (!editor.isContemberFieldElement(targetElement)) {
+						throw new BindingError()
+					}
 					const normalizedField = getNormalizedFieldBackedElement(elementIndex)
 					const targetValue =
 						normalizedField.format === 'editorJSON'
 							? editor.serializeNodes(targetElement.children)
 							: SlateNode.string(targetElement)
 					getAccessor().getRelativeSingleField(normalizedField.field).updateValue(targetValue)
-					fieldElementCache.set(getAccessor().getRelativeSingleField(normalizedField.field), targetElement)
+					contemberFieldElementCache.set(getAccessor().getRelativeSingleField(normalizedField.field), targetElement)
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
 					if (!entity) {
 						entity = getFreshContentEntityAccessor(sortedEntityIndex)
 					}
-					entity.getRelativeSingleField(textBlockField).updateValue(editor.serializeNodes([targetElement]))
+					entity.getRelativeSingleField(blockContentField).updateValue(editor.serializeNodes([targetElement]))
 					const updatedEntity = getFreshContentEntityAccessor(sortedEntityIndex)
-					textElementCache.set(updatedEntity, targetElement)
+					blockElementCache.set(updatedEntity, targetElement)
 				}
 			}
 			const removeElementAt = (elementIndex: number) => {
@@ -154,39 +142,26 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					setFieldBackedElementValue('leading', elementIndex, '')
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
-					sortedEntities[sortedEntityIndex].deleteEntity()
-					sortedEntities.splice(sortedEntityIndex, 1)
-					repairEntitiesOrder(sortableByField, sortedEntities)
+					sortedTopLevelBlocks[sortedEntityIndex].deleteEntity()
+					sortedTopLevelBlocks.splice(sortedEntityIndex, 1)
+					repairEntitiesOrder(sortableByField, sortedTopLevelBlocks)
 				}
 			}
-			const addNewDiscriminatedEntityAt = (
-				elementIndex: number,
-				blockDiscriminant: FieldValue,
-				preprocess?: EntityAccessor.BatchUpdatesHandler,
-			): EntityAccessor => {
+			const addNewTopLevelBlockAt = (elementIndex: number) => {
 				const normalizedElementIndex = Math.max(
 					firstContentIndex,
-					Math.min(elementIndex, sortedEntities.length + firstContentIndex),
+					Math.min(elementIndex, sortedTopLevelBlocks.length + firstContentIndex),
 				)
 				const sortedEntityIndex = normalizedElementIndex - firstContentIndex
 				addEntityAtIndex(
-					getAccessor().getRelativeEntityList(desugaredEntityList),
+					getAccessor().getRelativeEntityList(desugaredBlockList),
 					sortableByField,
 					sortedEntityIndex,
 					getNewEntity => {
-						const newEntity = getNewEntity()
-						newEntity.getRelativeSingleField(discriminationField).updateValue(blockDiscriminant)
-						if (preprocess) {
-							getNewEntity().batchUpdates(preprocess)
-						}
-						sortedEntities.splice(sortedEntityIndex, 0, getNewEntity())
+						sortedTopLevelBlocks.splice(sortedEntityIndex, 0, getNewEntity())
 					},
 				)
-				return sortedEntities[sortedEntityIndex]
-			}
-			const addNewTextElementAt = (elementIndex: number) => {
-				const newEntity = addNewDiscriminatedEntityAt(elementIndex, textBlockDiscriminant)
-				saveElementAt(elementIndex, newEntity)
+				saveElementAt(elementIndex, sortedTopLevelBlocks[sortedEntityIndex])
 			}
 
 			if (editor.isContemberContentPlaceholderElement(editor.children[topLevelIndex])) {
@@ -194,8 +169,31 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					type: editor.defaultElementType,
 					placeholder: null,
 				})
-				addNewTextElementAt(topLevelIndex)
+				addNewTopLevelBlockAt(topLevelIndex)
 			}
+
+			// Some operations are simply illegal. Currently, we simply don't pass these through and don't call apply,
+			// thereby essentially preventing them from happening. It is unclear whether that is the optimal approach
+			// though. Alternatively, we could let them thorough and then perform an inverse operation or somehow
+			// leverage normalization.
+			// if (isLeadingElement(topLevelIndex)) {
+			// 	// TODO trailing
+			// 	const relevantField = normalizedLeadingFieldsRef.current[topLevelIndex]
+			// 	if (relevantField.format === 'plainText') {
+			// 		if (operation.type !== 'insert_text' && operation.type !== 'remove_text') {
+			// 			return
+			// 		}
+			// 	} else if (relevantField.format === 'editorJSON') {
+			// 		if (
+			// 			operation.path.length === 1 && // Attempting to do something at the very top level. Ops inside are fine.
+			// 			operation.type !== 'insert_text' &&
+			// 			operation.type !== 'remove_text' &&
+			// 			operation.type !== 'set_node'
+			// 		) {
+			// 			return
+			// 		}
+			// 	}
+			// }
 			apply(operation)
 
 			if (path.length > 1 && operation.type !== 'move_node') {
@@ -214,7 +212,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					}
 					case 'split_node': {
 						// TODO special checks for leading/trailing
-						if (editor.isContemberBlockElement(editor.children[topLevelIndex])) {
+						if (editor.isBlockVoidReferenceElement(editor.children[topLevelIndex])) {
 							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 						}
 						if (isTrailingElement(topLevelIndex)) {
@@ -226,16 +224,16 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 								saveElementAt(i)
 							}
 							setTopLevelNode(firstContentIndex, { type: editor.defaultElementType, index: null, position: null })
-							addNewTextElementAt(firstContentIndex)
+							addNewTopLevelBlockAt(firstContentIndex)
 						} else {
 							saveElementAt(topLevelIndex)
-							addNewTextElementAt(topLevelIndex + 1)
+							addNewTopLevelBlockAt(topLevelIndex + 1)
 						}
 						break
 					}
 					case 'insert_text':
 					case 'remove_text': {
-						if (editor.isContemberBlockElement(editor.children[topLevelIndex])) {
+						if (editor.isBlockVoidReferenceElement(editor.children[topLevelIndex])) {
 							throw new BindingError(`Cannot perform the '${operation.type}' operation on a contember block.`)
 						}
 						saveElementAt(topLevelIndex)
@@ -248,37 +246,12 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						if (!SlateElement.isElement(node)) {
 							throw new BindingError()
 						}
-						let blockType: FieldValue
-
-						if (editor.isContemberBlockElement(node)) {
-							blockType = node.blockType
-							// TODO cache?
-							addNewDiscriminatedEntityAt(topLevelIndex, blockType)
-						} else if (editor.isContemberEmbedElement(node)) {
-							if (embedBlockDiscriminant === undefined) {
-								throw new BindingError() // TODO message
-							}
-							if (embedContentDiscriminationField === undefined) {
-								throw new BindingError() // TODO message
-							}
-							const embedHandler = node.embedHandler
-							const embedContentType = embedHandler.discriminateBy
-							addNewDiscriminatedEntityAt(topLevelIndex, embedBlockDiscriminant, getAccessor => {
-								getAccessor().getRelativeSingleField(embedContentDiscriminationField).updateValue(embedContentType)
-								embedHandler.datum.populateEmbedData({
-									embedArtifacts: node.embedArtifacts,
-									source: node.source,
-									batchUpdates: getAccessor().batchUpdates,
-									environment: environmentRef.current,
-								})
-							})
-						} else {
-							addNewTextElementAt(topLevelIndex)
-						}
+						addNewTopLevelBlockAt(topLevelIndex)
 						break
 					}
 					case 'remove_node': {
 						// TODO for leading/trailing, this makes the state inconsistent
+						// TODO remove the corresponding reference
 						removeElementAt(topLevelIndex)
 						break
 					}
@@ -294,7 +267,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 
 						if (sourceTopLevelIndex === targetPathBeforeTopLevelIndex) {
 							if (targetPathAfter.length === 1) {
-								addNewTextElementAt(sourceTopLevelIndex)
+								addNewTopLevelBlockAt(sourceTopLevelIndex)
 								saveElementAt(sourceTopLevelIndex + 1)
 							} else {
 								saveElementAt(sourceTopLevelIndex)
@@ -306,7 +279,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 								saveElementAt(sourceTopLevelIndex)
 							}
 							if (targetPathAfter.length === 1) {
-								addNewTextElementAt(targetPathAfterTopLevelIndex)
+								addNewTopLevelBlockAt(targetPathAfterTopLevelIndex)
 							} else {
 								saveElementAt(targetPathAfterTopLevelIndex)
 							}
@@ -315,7 +288,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					}
 				}
 			}
-			if (sortedEntities.length === 1) {
+			if (sortedTopLevelBlocks.length === 1) {
 				const soleElement = editor.children[firstContentIndex] as SlateElement
 
 				if (editor.isDefaultElement(soleElement) && SlateNode.string(soleElement) === '') {

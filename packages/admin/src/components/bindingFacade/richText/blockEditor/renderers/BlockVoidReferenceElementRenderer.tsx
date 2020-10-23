@@ -32,6 +32,12 @@ export const BlockVoidReferenceElementRenderer = React.memo((props: BlockVoidRef
 		},
 		[editor, props.element],
 	)
+	const onRemove = React.useCallback(() => {
+		const path = ReactEditor.findPath(editor, props.element)
+		Transforms.removeNodes(editor, {
+			at: path,
+		})
+	}, [editor, props.element])
 
 	if (!discriminatedBlock) {
 		throw new BindingError(`BlockEditor: Trying to render an entity with an undefined block type.`)
@@ -45,7 +51,7 @@ export const BlockVoidReferenceElementRenderer = React.memo((props: BlockVoidRef
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
 				<SingleEntity accessor={referencedEntity}>
-					<ActionableBox editContents={alternate} onRemove={selected ? undefined : referencedEntity.deleteEntity}>
+					<ActionableBox editContents={alternate} onRemove={onRemove}>
 						<Box heading={selectedBlock.label} isActive={selected} onClick={onContainerClick} style={{ margin: '0' }}>
 							{selectedBlock.children}
 						</Box>

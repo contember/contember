@@ -67,6 +67,12 @@ export const EmbedElementRenderer = React.memo(
 			},
 			[editor, element],
 		)
+		const onRemove = React.useCallback(() => {
+			const path = ReactEditor.findPath(editor, element)
+			Transforms.removeNodes(editor, {
+				at: path,
+			})
+		}, [editor, element])
 
 		const selectedBlock = discriminatedBlock?.datum
 		const alternate = selectedBlock?.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
@@ -81,10 +87,7 @@ export const EmbedElementRenderer = React.memo(
 				<div contentEditable={false} data-slate-editor={false}>
 					<SingleEntity accessor={referencedEntity}>
 						<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-							<ActionableBox
-								editContents={alternate || null}
-								onRemove={selected ? undefined : () => referencedEntity.deleteEntity()}
-							>
+							<ActionableBox editContents={alternate || null} onRemove={onRemove}>
 								<Box heading={selectedBlock?.label} isActive={selected} onClick={onContainerClick}>
 									<div
 										// This is a bit of a hack to avoid rendering any whitespace

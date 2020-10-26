@@ -31,6 +31,7 @@ const schema: DocumentNode = gql`
 	type _Column implements _Field {
 		name: String!
 		type: String!
+		enumName: String
 		rules: [_Rule!]!
 		validators: [_Validator!]!
 	}

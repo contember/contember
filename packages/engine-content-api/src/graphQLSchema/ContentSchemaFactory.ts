@@ -5,6 +5,7 @@ import { Model, Validation } from '@contember/schema'
 import { assertNever } from '../utils'
 import { EntityRulesResolver } from '../input-validation/EntityRulesResolver'
 import { acceptEveryFieldVisitor, getEntity } from '@contember/schema-utils'
+import ColumnType = Model.ColumnType
 
 type AdditionalFieldInfo =
 	| Omit<ContentSchema._Relation, keyof ContentSchema._Field>
@@ -93,9 +94,10 @@ export class ContentSchemaFactory {
 					nullable: relation.nullable,
 				}
 			},
-			visitColumn() {
+			visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
 				return {
 					__typename: '_Column',
+					enumName: column.type === ColumnType.Enum ? column.enumName : null,
 				}
 			},
 		})

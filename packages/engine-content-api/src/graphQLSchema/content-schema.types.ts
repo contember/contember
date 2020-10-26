@@ -24,6 +24,7 @@ export type _Column = _Field & {
 	readonly __typename?: '_Column'
 	readonly name: Scalars['String']
 	readonly type: Scalars['String']
+	readonly enumName?: Maybe<Scalars['String']>
 	readonly rules: ReadonlyArray<_Rule>
 	readonly validators: ReadonlyArray<_Validator>
 }
@@ -340,6 +341,7 @@ export type _ColumnResolvers<
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	enumName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
 	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>

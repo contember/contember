@@ -24,6 +24,7 @@ const schema: DocumentNode = gql`
 	interface _Field {
 		name: String!
 		type: String!
+		nullable: Boolean
 		rules: [_Rule!]!
 		validators: [_Validator!]!
 	}
@@ -32,6 +33,7 @@ const schema: DocumentNode = gql`
 		name: String!
 		type: String!
 		enumName: String
+		nullable: Boolean!
 		rules: [_Rule!]!
 		validators: [_Validator!]!
 	}

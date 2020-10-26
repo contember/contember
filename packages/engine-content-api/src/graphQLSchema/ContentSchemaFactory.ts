@@ -11,8 +11,8 @@ import ColumnType = Model.ColumnType
 import Operation = Acl.Operation
 
 type AdditionalFieldInfo =
-	| Omit<ContentSchema._Relation, keyof ContentSchema._Field>
-	| Omit<ContentSchema._Column, keyof ContentSchema._Field>
+	| Omit<ContentSchema._Relation, 'name' | 'type' | 'rules' | 'validators'>
+	| Omit<ContentSchema._Column, 'name' | 'type' | 'rules' | 'validators'>
 
 export class ContentSchemaFactory {
 	constructor(
@@ -105,16 +105,17 @@ export class ContentSchemaFactory {
 				return {
 					__typename: '_Column',
 					enumName: column.type === ColumnType.Enum ? column.enumName : null,
+					nullable: column.nullable,
 				}
 			},
 		})
 		return Object.values(getEntity(this.model, entityName).fields)
 			.filter(it => this.authorizator.isAllowed(Operation.read, entityName, it.name))
-			.map(it => ({
+			.map((it): ContentSchema._Column | ContentSchema._Relation => ({
+				...additionalInfo[it.name],
 				name: it.name,
 				type: it.type,
 				...this.createValidationSchema(entityRules[it.name] || []),
-				...additionalInfo[it.name],
 			}))
 	}
 

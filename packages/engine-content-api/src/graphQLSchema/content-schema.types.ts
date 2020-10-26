@@ -25,6 +25,7 @@ export type _Column = _Field & {
 	readonly name: Scalars['String']
 	readonly type: Scalars['String']
 	readonly enumName?: Maybe<Scalars['String']>
+	readonly nullable: Scalars['Boolean']
 	readonly rules: ReadonlyArray<_Rule>
 	readonly validators: ReadonlyArray<_Validator>
 }
@@ -45,6 +46,7 @@ export type _Enum = {
 export type _Field = {
 	readonly name: Scalars['String']
 	readonly type: Scalars['String']
+	readonly nullable?: Maybe<Scalars['Boolean']>
 	readonly rules: ReadonlyArray<_Rule>
 	readonly validators: ReadonlyArray<_Validator>
 }
@@ -237,6 +239,7 @@ export type ResolversTypes = {
 	String: ResolverTypeWrapper<Scalars['String']>
 	_Entity: ResolverTypeWrapper<_Entity>
 	_Field: ResolversTypes['_Column'] | ResolversTypes['_Relation']
+	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	_Rule: ResolverTypeWrapper<_Rule>
 	_RuleMessage: ResolverTypeWrapper<_RuleMessage>
 	Int: ResolverTypeWrapper<Scalars['Int']>
@@ -258,7 +261,6 @@ export type ResolversTypes = {
 	_IntValue: ResolverTypeWrapper<_IntValue>
 	_StringValue: ResolverTypeWrapper<_StringValue>
 	_BooleanValue: ResolverTypeWrapper<_BooleanValue>
-	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	_FloatValue: ResolverTypeWrapper<_FloatValue>
 	Float: ResolverTypeWrapper<Scalars['Float']>
 	_UndefinedValue: ResolverTypeWrapper<_UndefinedValue>
@@ -279,6 +281,7 @@ export type ResolversParentTypes = {
 	String: Scalars['String']
 	_Entity: _Entity
 	_Field: ResolversParentTypes['_Column'] | ResolversParentTypes['_Relation']
+	Boolean: Scalars['Boolean']
 	_Rule: _Rule
 	_RuleMessage: _RuleMessage
 	Int: Scalars['Int']
@@ -299,7 +302,6 @@ export type ResolversParentTypes = {
 	_IntValue: _IntValue
 	_StringValue: _StringValue
 	_BooleanValue: _BooleanValue
-	Boolean: Scalars['Boolean']
 	_FloatValue: _FloatValue
 	Float: Scalars['Float']
 	_UndefinedValue: _UndefinedValue
@@ -342,6 +344,7 @@ export type _ColumnResolvers<
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	enumName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	nullable?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
 	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
@@ -373,6 +376,7 @@ export type _FieldResolvers<
 	__resolveType: TypeResolveFn<'_Column' | '_Relation', ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	nullable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
 	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
 	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
 }

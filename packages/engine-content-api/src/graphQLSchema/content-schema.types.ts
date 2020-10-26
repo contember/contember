@@ -32,6 +32,7 @@ export type _Entity = {
 	readonly __typename?: '_Entity'
 	readonly name: Scalars['String']
 	readonly fields: ReadonlyArray<_Field>
+	readonly unique: ReadonlyArray<_UniqueConstraint>
 }
 
 export type _Enum = {
@@ -129,6 +130,11 @@ export type _StringValue = {
 export type _UndefinedValue = {
 	readonly __typename?: '_UndefinedValue'
 	readonly undefinedValue: Scalars['Boolean']
+}
+
+export type _UniqueConstraint = {
+	readonly __typename?: '_UniqueConstraint'
+	readonly fields: ReadonlyArray<Scalars['String']>
 }
 
 export type _Validator = {
@@ -255,6 +261,7 @@ export type ResolversTypes = {
 	_FloatValue: ResolverTypeWrapper<_FloatValue>
 	Float: ResolverTypeWrapper<Scalars['Float']>
 	_UndefinedValue: ResolverTypeWrapper<_UndefinedValue>
+	_UniqueConstraint: ResolverTypeWrapper<_UniqueConstraint>
 	_Column: ResolverTypeWrapper<_Column>
 	_OnDeleteBehaviour: _OnDeleteBehaviour
 	_RelationSide: _RelationSide
@@ -295,6 +302,7 @@ export type ResolversParentTypes = {
 	_FloatValue: _FloatValue
 	Float: Scalars['Float']
 	_UndefinedValue: _UndefinedValue
+	_UniqueConstraint: _UniqueConstraint
 	_Column: _Column
 	_OrderBy: _OrderBy
 	_Relation: _Relation
@@ -343,6 +351,7 @@ export type _EntityResolvers<
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	fields?: Resolver<ReadonlyArray<ResolversTypes['_Field']>, ParentType, ContextType>
+	unique?: Resolver<ReadonlyArray<ResolversTypes['_UniqueConstraint']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -467,6 +476,14 @@ export type _UndefinedValueResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export type _UniqueConstraintResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['_UniqueConstraint'] = ResolversParentTypes['_UniqueConstraint']
+> = {
+	fields?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
 export type _ValidatorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['_Validator'] = ResolversParentTypes['_Validator']
@@ -510,6 +527,7 @@ export type Resolvers<ContextType = any> = {
 	_Schema?: _SchemaResolvers<ContextType>
 	_StringValue?: _StringValueResolvers<ContextType>
 	_UndefinedValue?: _UndefinedValueResolvers<ContextType>
+	_UniqueConstraint?: _UniqueConstraintResolvers<ContextType>
 	_Validator?: _ValidatorResolvers<ContextType>
 	_ValidatorArgument?: _ValidatorArgumentResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>

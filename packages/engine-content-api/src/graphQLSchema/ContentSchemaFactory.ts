@@ -171,6 +171,7 @@ export class ContentSchemaFactory {
 						entities: Object.values(this.model.entities).map(entity => ({
 							name: entity.name,
 							fields: this.createFieldsSchema(entity.name),
+							unique: Object.values(entity.unique).map(({ fields }) => ({ fields })),
 						})),
 					}),
 				},

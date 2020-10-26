@@ -14,6 +14,11 @@ const schema: DocumentNode = gql`
 	type _Entity {
 		name: String!
 		fields: [_Field!]!
+		unique: [_UniqueConstraint!]!
+	}
+
+	type _UniqueConstraint {
+		fields: [String!]!
 	}
 
 	interface _Field {

@@ -61,7 +61,12 @@ class GraphQlSchemaFactory {
 			authorizator,
 		)
 		const dataSchema: GraphQLSchema = dataSchemaBuilder.build()
-		const contentSchema = makeExecutableSchema(contentSchemaFactory.create())
+		const contentSchema = makeExecutableSchema({
+			...contentSchemaFactory.create(),
+			resolverValidationOptions: {
+				requireResolversForResolveType: false,
+			},
+		})
 
 		const otherSchemas = this.schemaContributors
 			.map(it => it.createSchema({ schema, identity }))

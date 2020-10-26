@@ -183,6 +183,7 @@ export class ContentSchemaFactory {
 							.filter(it => this.authorizator.isAllowed(Operation.read, it.name))
 							.map(entity => ({
 								name: entity.name,
+								customPrimaryAllowed: this.authorizator.isCustomPrimaryAllowed(entity.name),
 								fields: this.createFieldsSchema(entity.name),
 								unique: Object.values(entity.unique).map(({ fields }) => ({ fields })),
 							}))

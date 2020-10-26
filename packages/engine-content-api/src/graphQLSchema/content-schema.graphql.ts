@@ -13,6 +13,7 @@ const schema: DocumentNode = gql`
 
 	type _Entity {
 		name: String!
+		customPrimaryAllowed: Boolean!
 		fields: [_Field!]!
 		unique: [_UniqueConstraint!]!
 	}

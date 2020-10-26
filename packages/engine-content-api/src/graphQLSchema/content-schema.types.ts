@@ -33,6 +33,7 @@ export type _Column = _Field & {
 export type _Entity = {
 	readonly __typename?: '_Entity'
 	readonly name: Scalars['String']
+	readonly customPrimaryAllowed: Scalars['Boolean']
 	readonly fields: ReadonlyArray<_Field>
 	readonly unique: ReadonlyArray<_UniqueConstraint>
 }
@@ -238,8 +239,8 @@ export type ResolversTypes = {
 	_Enum: ResolverTypeWrapper<_Enum>
 	String: ResolverTypeWrapper<Scalars['String']>
 	_Entity: ResolverTypeWrapper<_Entity>
-	_Field: ResolversTypes['_Column'] | ResolversTypes['_Relation']
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+	_Field: ResolversTypes['_Column'] | ResolversTypes['_Relation']
 	_Rule: ResolverTypeWrapper<_Rule>
 	_RuleMessage: ResolverTypeWrapper<_RuleMessage>
 	Int: ResolverTypeWrapper<Scalars['Int']>
@@ -280,8 +281,8 @@ export type ResolversParentTypes = {
 	_Enum: _Enum
 	String: Scalars['String']
 	_Entity: _Entity
-	_Field: ResolversParentTypes['_Column'] | ResolversParentTypes['_Relation']
 	Boolean: Scalars['Boolean']
+	_Field: ResolversParentTypes['_Column'] | ResolversParentTypes['_Relation']
 	_Rule: _Rule
 	_RuleMessage: _RuleMessage
 	Int: Scalars['Int']
@@ -355,6 +356,7 @@ export type _EntityResolvers<
 	ParentType extends ResolversParentTypes['_Entity'] = ResolversParentTypes['_Entity']
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	customPrimaryAllowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	fields?: Resolver<ReadonlyArray<ResolversTypes['_Field']>, ParentType, ContextType>
 	unique?: Resolver<ReadonlyArray<ResolversTypes['_UniqueConstraint']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>

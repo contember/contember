@@ -16,9 +16,49 @@ const schema: DocumentNode = gql`
 		fields: [_Field!]!
 	}
 
-	type _Field {
+	interface _Field {
 		name: String!
 		type: String!
+		rules: [_Rule!]!
+		validators: [_Validator!]!
+	}
+
+	type _Column implements _Field {
+		name: String!
+		type: String!
+		rules: [_Rule!]!
+		validators: [_Validator!]!
+	}
+
+	enum _OnDeleteBehaviour {
+		restrict
+		cascade
+		setNull
+	}
+
+	enum _RelationSide {
+		owning
+		inversed
+	}
+	enum _OrderByDirection {
+		asc
+		desc
+	}
+	type _OrderBy {
+		path: [String!]!
+		direction: _OrderByDirection!
+	}
+
+	type _Relation implements _Field {
+		name: String!
+		type: String!
+		side: _RelationSide!
+		targetEntity: String!
+		ownedBy: String
+		inversedBy: String
+		nullable: Boolean
+		onDelete: _OnDeleteBehaviour
+		orderBy: [_OrderBy!]
 		rules: [_Rule!]!
 		validators: [_Validator!]!
 	}

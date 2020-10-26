@@ -20,6 +20,14 @@ export type _BooleanValue = {
 	readonly booleanValue: Scalars['Boolean']
 }
 
+export type _Column = _Field & {
+	readonly __typename?: '_Column'
+	readonly name: Scalars['String']
+	readonly type: Scalars['String']
+	readonly rules: ReadonlyArray<_Rule>
+	readonly validators: ReadonlyArray<_Validator>
+}
+
 export type _Entity = {
 	readonly __typename?: '_Entity'
 	readonly name: Scalars['String']
@@ -33,7 +41,6 @@ export type _Enum = {
 }
 
 export type _Field = {
-	readonly __typename?: '_Field'
 	readonly name: Scalars['String']
 	readonly type: Scalars['String']
 	readonly rules: ReadonlyArray<_Rule>
@@ -55,9 +62,46 @@ export type _LiteralArgument = {
 	readonly value?: Maybe<_AnyValue>
 }
 
+export enum _OnDeleteBehaviour {
+	Restrict = 'restrict',
+	Cascade = 'cascade',
+	SetNull = 'setNull',
+}
+
+export type _OrderBy = {
+	readonly __typename?: '_OrderBy'
+	readonly path: ReadonlyArray<Scalars['String']>
+	readonly direction: _OrderByDirection
+}
+
+export enum _OrderByDirection {
+	Asc = 'asc',
+	Desc = 'desc',
+}
+
 export type _PathArgument = {
 	readonly __typename?: '_PathArgument'
 	readonly path: ReadonlyArray<Scalars['String']>
+}
+
+export type _Relation = _Field & {
+	readonly __typename?: '_Relation'
+	readonly name: Scalars['String']
+	readonly type: Scalars['String']
+	readonly side: _RelationSide
+	readonly targetEntity: Scalars['String']
+	readonly ownedBy?: Maybe<Scalars['String']>
+	readonly inversedBy?: Maybe<Scalars['String']>
+	readonly nullable?: Maybe<Scalars['Boolean']>
+	readonly onDelete?: Maybe<_OnDeleteBehaviour>
+	readonly orderBy?: Maybe<ReadonlyArray<_OrderBy>>
+	readonly rules: ReadonlyArray<_Rule>
+	readonly validators: ReadonlyArray<_Validator>
+}
+
+export enum _RelationSide {
+	Owning = 'owning',
+	Inversed = 'inversed',
 }
 
 export type _Rule = {
@@ -185,7 +229,7 @@ export type ResolversTypes = {
 	_Enum: ResolverTypeWrapper<_Enum>
 	String: ResolverTypeWrapper<Scalars['String']>
 	_Entity: ResolverTypeWrapper<_Entity>
-	_Field: ResolverTypeWrapper<_Field>
+	_Field: ResolversTypes['_Column'] | ResolversTypes['_Relation']
 	_Rule: ResolverTypeWrapper<_Rule>
 	_RuleMessage: ResolverTypeWrapper<_RuleMessage>
 	Int: ResolverTypeWrapper<Scalars['Int']>
@@ -211,6 +255,12 @@ export type ResolversTypes = {
 	_FloatValue: ResolverTypeWrapper<_FloatValue>
 	Float: ResolverTypeWrapper<Scalars['Float']>
 	_UndefinedValue: ResolverTypeWrapper<_UndefinedValue>
+	_Column: ResolverTypeWrapper<_Column>
+	_OnDeleteBehaviour: _OnDeleteBehaviour
+	_RelationSide: _RelationSide
+	_OrderByDirection: _OrderByDirection
+	_OrderBy: ResolverTypeWrapper<_OrderBy>
+	_Relation: ResolverTypeWrapper<_Relation>
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -220,7 +270,7 @@ export type ResolversParentTypes = {
 	_Enum: _Enum
 	String: Scalars['String']
 	_Entity: _Entity
-	_Field: _Field
+	_Field: ResolversParentTypes['_Column'] | ResolversParentTypes['_Relation']
 	_Rule: _Rule
 	_RuleMessage: _RuleMessage
 	Int: Scalars['Int']
@@ -245,6 +295,9 @@ export type ResolversParentTypes = {
 	_FloatValue: _FloatValue
 	Float: Scalars['Float']
 	_UndefinedValue: _UndefinedValue
+	_Column: _Column
+	_OrderBy: _OrderBy
+	_Relation: _Relation
 }
 
 export type _AnyValueResolvers<
@@ -273,6 +326,17 @@ export type _BooleanValueResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export type _ColumnResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['_Column'] = ResolversParentTypes['_Column']
+> = {
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
+	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
 export type _EntityResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['_Entity'] = ResolversParentTypes['_Entity']
@@ -295,11 +359,11 @@ export type _FieldResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['_Field'] = ResolversParentTypes['_Field']
 > = {
+	__resolveType: TypeResolveFn<'_Column' | '_Relation', ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
 	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
 export type _FloatValueResolvers<
@@ -326,11 +390,38 @@ export type _LiteralArgumentResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export type _OrderByResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['_OrderBy'] = ResolversParentTypes['_OrderBy']
+> = {
+	path?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	direction?: Resolver<ResolversTypes['_OrderByDirection'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
 export type _PathArgumentResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['_PathArgument'] = ResolversParentTypes['_PathArgument']
 > = {
 	path?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType>
+}
+
+export type _RelationResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['_Relation'] = ResolversParentTypes['_Relation']
+> = {
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	side?: Resolver<ResolversTypes['_RelationSide'], ParentType, ContextType>
+	targetEntity?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	ownedBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	inversedBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	nullable?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	onDelete?: Resolver<Maybe<ResolversTypes['_OnDeleteBehaviour']>, ParentType, ContextType>
+	orderBy?: Resolver<Maybe<ReadonlyArray<ResolversTypes['_OrderBy']>>, ParentType, ContextType>
+	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
+	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
@@ -404,13 +495,16 @@ export type Resolvers<ContextType = any> = {
 	_AnyValue?: _AnyValueResolvers<ContextType>
 	_Argument?: _ArgumentResolvers<ContextType>
 	_BooleanValue?: _BooleanValueResolvers<ContextType>
+	_Column?: _ColumnResolvers<ContextType>
 	_Entity?: _EntityResolvers<ContextType>
 	_Enum?: _EnumResolvers<ContextType>
 	_Field?: _FieldResolvers<ContextType>
 	_FloatValue?: _FloatValueResolvers<ContextType>
 	_IntValue?: _IntValueResolvers<ContextType>
 	_LiteralArgument?: _LiteralArgumentResolvers<ContextType>
+	_OrderBy?: _OrderByResolvers<ContextType>
 	_PathArgument?: _PathArgumentResolvers<ContextType>
+	_Relation?: _RelationResolvers<ContextType>
 	_Rule?: _RuleResolvers<ContextType>
 	_RuleMessage?: _RuleMessageResolvers<ContextType>
 	_Schema?: _SchemaResolvers<ContextType>

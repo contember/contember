@@ -1,10 +1,9 @@
 import { Config } from 'apollo-server-core'
 import { ApolloServer } from 'apollo-server-koa'
 import { Identity, ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@contember/engine-system-api'
-import ErrorCallbackExtension from '../graphql/ErrorCallbackExtension'
 import { KoaContext } from '../koa'
 import { flattenVariables } from '@contember/engine-content-api'
-import { ErrorContextProvider, ErrorHandlerExtension, ErrorLogger } from '../graphql/ErrorHandlerExtension'
+import { ErrorContextProvider, ErrorHandlerPlugin, ErrorLogger } from '../graphql/ErrorHandlerPlugin'
 import { ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
 import { AuthMiddlewareState, GraphqlInfoProviderPlugin, GraphQLInfoState } from '../common'
 
@@ -33,11 +32,7 @@ class SystemServerProvider {
 		return (this.server = new ApolloServer({
 			typeDefs,
 			resolvers: this.resolvers as Config['resolvers'],
-			extensions: [
-				() => new ErrorCallbackExtension(),
-				() => new ErrorHandlerExtension(undefined, 'system', this.errorLogger),
-			],
-			plugins: [new GraphqlInfoProviderPlugin()],
+			plugins: [new GraphqlInfoProviderPlugin(), new ErrorHandlerPlugin(undefined, 'system', this.errorLogger)],
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createContext(ctx),
 		}))
 	}

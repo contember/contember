@@ -1,8 +1,8 @@
 import { Config } from 'apollo-server-core'
-import { ApolloServer } from 'apollo-server-koa'
+import { ApolloServer, makeExecutableSchema } from 'apollo-server-koa'
 import { ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@contember/engine-tenant-api'
 import { AuthMiddlewareState, GraphqlInfoProviderPlugin, GraphQLInfoState } from '../common'
-import { ErrorContextProvider, ErrorHandlerExtension, ErrorLogger } from '../graphql/ErrorHandlerExtension'
+import { ErrorContextProvider, ErrorHandlerPlugin, ErrorLogger } from '../graphql/ErrorHandlerPlugin'
 import { KoaContext } from '../koa'
 
 type ExtendedGraphqlContext = ResolverContext & {
@@ -20,13 +20,16 @@ class TenantApolloServerFactory {
 	) {}
 
 	create(): ApolloServer {
-		return new ApolloServer({
+		const schema = makeExecutableSchema({
 			typeDefs,
+			resolvers: this.resolvers as Config['resolvers'],
+			resolverValidationOptions: { requireResolversForResolveType: false },
+		})
+		return new ApolloServer({
+			schema,
 			introspection: true,
 			tracing: true,
-			extensions: [() => new ErrorHandlerExtension(undefined, 'tenant', this.errorLogger)],
-			plugins: [new GraphqlInfoProviderPlugin()],
-			resolvers: this.resolvers as Config['resolvers'],
+			plugins: [new GraphqlInfoProviderPlugin(), new ErrorHandlerPlugin(undefined, 'tenant', this.errorLogger)],
 			context: ({ ctx }: { ctx: InputKoaContext }): ExtendedGraphqlContext => {
 				return {
 					...this.resolverContextFactory.create(ctx.state.authResult),

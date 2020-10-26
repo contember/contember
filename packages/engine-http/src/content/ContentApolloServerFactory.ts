@@ -1,7 +1,7 @@
 import { ApolloServer } from 'apollo-server-koa'
 import { GraphQLSchema } from 'graphql'
 import { Context, ExecutionContainerFactory, flattenVariables } from '@contember/engine-content-api'
-import DbQueriesExtension from '../graphql/DbQueriesExtension'
+import DbQueriesPlugin from '../graphql/DbQueriesPlugin'
 import { KoaContext } from '../koa'
 import { ProjectMemberMiddlewareState } from '../project-common'
 import { getArgumentValues } from 'graphql/execution/values'
@@ -9,9 +9,10 @@ import { setupSystemVariables } from '@contember/engine-system-api'
 import uuid from 'uuid'
 import { GraphQLExtension } from 'graphql-extensions'
 import { Acl, Schema } from '@contember/schema'
-import { ErrorContextProvider, ErrorHandlerExtension, ErrorLogger } from '../graphql/ErrorHandlerExtension'
+import { ErrorContextProvider, ErrorHandlerPlugin, ErrorLogger } from '../graphql/ErrorHandlerPlugin'
 import { ContentServerMiddlewareState } from './ContentServerMiddleware'
 import { AuthMiddlewareState, GraphqlInfoProviderPlugin, GraphQLInfoState, TimerMiddlewareState } from '../common'
+import { ApolloServerPlugin } from 'apollo-server-plugin-base'
 
 type InputKoaContext = KoaContext<
 	ProjectMemberMiddlewareState &
@@ -31,19 +32,20 @@ class ContentApolloServerFactory {
 	) {}
 
 	public create(permissions: Acl.Permissions, schema: Schema, dataSchema: GraphQLSchema): ApolloServer {
-		const extensions: Array<() => GraphQLExtension> = []
-		extensions.push(() => new ErrorHandlerExtension(this.projectName, 'content', this.errorLogger))
+		const plugins: ApolloServerPlugin<ExtendedGraphqlContext>[] = [
+			new GraphqlInfoProviderPlugin(),
+			new ErrorHandlerPlugin(this.projectName, 'content', this.errorLogger),
+		]
 		if (this.debug) {
-			extensions.push(() => new DbQueriesExtension())
+			plugins.push(new DbQueriesPlugin())
 		}
 		return new ApolloServer({
 			uploads: false,
 			playground: false,
 			introspection: true,
 			tracing: this.debug,
-			extensions,
 			schema: dataSchema,
-			plugins: [new GraphqlInfoProviderPlugin()],
+			plugins,
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createGraphqlContext(permissions, schema, ctx),
 		})
 	}

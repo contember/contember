@@ -17,7 +17,7 @@ import {
 } from './nodeSpecs'
 
 export class ChildrenAnalyzer<
-	AllLeafsRepresentation = any,
+	AllLeavesRepresentation = any,
 	AllBranchNodesRepresentation = never,
 	StaticContext = undefined
 > {
@@ -32,24 +32,27 @@ export class ChildrenAnalyzer<
 		staticRenderFactoryName: 'staticRender',
 	}
 
-	private readonly leafs: LeafList<AllLeafsRepresentation, StaticContext>
-	private readonly branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, StaticContext>
+	private readonly leaves: LeafList<AllLeavesRepresentation, StaticContext>
+	private readonly branchNodes: BranchNodeList<AllLeavesRepresentation, AllBranchNodesRepresentation, StaticContext>
 	private readonly options: ChildrenAnalyzerOptions<StaticContext>
 
-	public constructor(leafs: LeafList<AllLeafsRepresentation, StaticContext>, options?: Partial<ChildrenAnalyzerOptions>)
 	public constructor(
-		leafs: LeafList<AllLeafsRepresentation, StaticContext>,
-		branchNodes: BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, StaticContext>,
+		leaves: LeafList<AllLeavesRepresentation, StaticContext>,
 		options?: Partial<ChildrenAnalyzerOptions>,
 	)
 	public constructor(
-		leafs: LeafList<AllLeafsRepresentation, StaticContext>,
+		leaves: LeafList<AllLeavesRepresentation, StaticContext>,
+		branchNodes: BranchNodeList<AllLeavesRepresentation, AllBranchNodesRepresentation, StaticContext>,
+		options?: Partial<ChildrenAnalyzerOptions>,
+	)
+	public constructor(
+		leaves: LeafList<AllLeavesRepresentation, StaticContext>,
 		decider:
 			| Partial<ChildrenAnalyzerOptions>
-			| BranchNodeList<AllLeafsRepresentation, AllBranchNodesRepresentation, StaticContext> = [],
+			| BranchNodeList<AllLeavesRepresentation, AllBranchNodesRepresentation, StaticContext> = [],
 		options: Partial<ChildrenAnalyzerOptions> = {},
 	) {
-		this.leafs = leafs
+		this.leaves = leaves
 
 		if (Array.isArray(decider)) {
 			this.branchNodes = decider
@@ -63,20 +66,24 @@ export class ChildrenAnalyzer<
 	public processChildren(
 		children: React.ReactNode,
 		initialStaticContext: StaticContext,
-	): Array<AllLeafsRepresentation | AllBranchNodesRepresentation> {
+	): Array<AllLeavesRepresentation | AllBranchNodesRepresentation> {
 		const processed = this.processNode(children, initialStaticContext)
 
-		const rawResult: Array<AllLeafsRepresentation | AllBranchNodesRepresentation | undefined> = Array.isArray(processed)
+		const rawResult: Array<AllLeavesRepresentation | AllBranchNodesRepresentation | undefined> = Array.isArray(
+			processed,
+		)
 			? processed
 			: [processed]
 
-		return rawResult.filter((item): item is AllLeafsRepresentation | AllBranchNodesRepresentation => item !== undefined)
+		return rawResult.filter(
+			(item): item is AllLeavesRepresentation | AllBranchNodesRepresentation => item !== undefined,
+		)
 	}
 
 	private processNode(
 		node: React.ReactNode | Function,
 		staticContext: StaticContext,
-	): RawNodeRepresentation<AllLeafsRepresentation, AllBranchNodesRepresentation> {
+	): RawNodeRepresentation<AllLeavesRepresentation, AllBranchNodesRepresentation> {
 		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
 			return undefined
 		}
@@ -89,7 +96,7 @@ export class ChildrenAnalyzer<
 		}
 
 		if (Array.isArray(node)) {
-			let mapped: Array<AllLeafsRepresentation | AllBranchNodesRepresentation> = []
+			let mapped: Array<AllLeavesRepresentation | AllBranchNodesRepresentation> = []
 
 			for (const subNode of node) {
 				const processed = this.processNode(subNode, staticContext)
@@ -130,7 +137,7 @@ export class ChildrenAnalyzer<
 					[staticMethod in ValidFactoryName]:
 						| StaticContextFactory<any, StaticContext>
 						| SyntheticChildrenFactory<any, StaticContext>
-						| LeafRepresentationFactory<any, AllLeafsRepresentation, StaticContext>
+						| LeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
 						| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
 				}
 
@@ -147,7 +154,7 @@ export class ChildrenAnalyzer<
 				children = factory(node.props, staticContext)
 			}
 
-			for (const leaf of this.leafs) {
+			for (const leaf of this.leaves) {
 				const specification = leaf.specification
 				switch (specification.type) {
 					case RepresentationFactorySite.DeclarationSite: {
@@ -156,7 +163,7 @@ export class ChildrenAnalyzer<
 						if (factoryMethodName in treeNode) {
 							const factory = treeNode[factoryMethodName] as LeafRepresentationFactory<
 								any,
-								AllBranchNodesRepresentation | AllLeafsRepresentation,
+								AllBranchNodesRepresentation | AllLeavesRepresentation,
 								StaticContext
 							>
 							return factory(node.props, staticContext)
@@ -190,7 +197,7 @@ export class ChildrenAnalyzer<
 							const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
 								any,
 								unknown,
-								AllBranchNodesRepresentation | AllLeafsRepresentation,
+								AllBranchNodesRepresentation | AllLeavesRepresentation,
 								StaticContext
 							>
 							return factory(node.props, childrenRepresentationReducer(processedChildren), staticContext)

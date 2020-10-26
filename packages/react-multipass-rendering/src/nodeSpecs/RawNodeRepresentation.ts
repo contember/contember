@@ -1,5 +1,5 @@
-export type RawNodeRepresentation<AllLeafsRepresentation, AllBranchNodesRepresentation> =
-	| AllLeafsRepresentation
+export type RawNodeRepresentation<AllLeavesRepresentation, AllBranchNodesRepresentation> =
+	| AllLeavesRepresentation
 	| AllBranchNodesRepresentation
-	| Array<AllLeafsRepresentation | AllBranchNodesRepresentation>
+	| Array<AllLeavesRepresentation | AllBranchNodesRepresentation>
 	| undefined

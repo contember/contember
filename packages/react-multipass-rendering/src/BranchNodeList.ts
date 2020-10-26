@@ -1,10 +1,10 @@
 import { BranchNode, RawNodeRepresentation, ValidFactoryName } from './nodeSpecs'
 
-export type BranchNodeList<LeafsRepresentationUnion, BranchNodesRepresentationUnion, StaticContext> = BranchNode<
+export type BranchNodeList<LeavesRepresentationUnion, BranchNodesRepresentationUnion, StaticContext> = BranchNode<
 	StaticContext,
 	ValidFactoryName,
 	any,
-	RawNodeRepresentation<LeafsRepresentationUnion, BranchNodesRepresentationUnion>,
+	RawNodeRepresentation<LeavesRepresentationUnion, BranchNodesRepresentationUnion>,
 	any,
 	BranchNodesRepresentationUnion
 >[]

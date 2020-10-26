@@ -58,6 +58,7 @@ class GraphQlSchemaFactory {
 		const contentSchemaFactory = new ContentSchemaFactory(
 			schema.model,
 			new EntityRulesResolver(schema.validation, schema.model),
+			authorizator,
 		)
 		const dataSchema: GraphQLSchema = dataSchemaBuilder.build()
 		const contentSchema = makeExecutableSchema(contentSchemaFactory.create())

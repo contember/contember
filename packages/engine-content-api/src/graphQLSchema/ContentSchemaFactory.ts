@@ -5,16 +5,23 @@ import { Model, Validation } from '@contember/schema'
 import { assertNever } from '../utils'
 import { EntityRulesResolver } from '../input-validation/EntityRulesResolver'
 import { acceptEveryFieldVisitor, getEntity } from '@contember/schema-utils'
+import Authorizator from '../acl/Authorizator'
+import Acl from '@contember/schema/dist/src/schema/acl'
 import ColumnType = Model.ColumnType
+import Operation = Acl.Operation
 
 type AdditionalFieldInfo =
 	| Omit<ContentSchema._Relation, keyof ContentSchema._Field>
 	| Omit<ContentSchema._Column, keyof ContentSchema._Field>
 
 export class ContentSchemaFactory {
-	constructor(private readonly model: Model.Schema, private readonly rulesResolver: EntityRulesResolver) {}
+	constructor(
+		private readonly model: Model.Schema,
+		private readonly rulesResolver: EntityRulesResolver,
+		private readonly authorizator: Authorizator,
+	) {}
 
-	createFieldsSchema(entityName: string): readonly ContentSchema._Field[] {
+	createFieldsSchema(entityName: string): readonly (ContentSchema._Column | ContentSchema._Relation)[] {
 		const entityRules = this.rulesResolver.getEntityRules(entityName)
 		const convertOnDelete = (onDelete: Model.OnDelete): ContentSchema._OnDeleteBehaviour => {
 			switch (onDelete) {
@@ -101,12 +108,14 @@ export class ContentSchemaFactory {
 				}
 			},
 		})
-		return Object.values(getEntity(this.model, entityName).fields).map(it => ({
-			name: it.name,
-			type: it.type,
-			...this.createValidationSchema(entityRules[it.name] || []),
-			...additionalInfo[it.name],
-		}))
+		return Object.values(getEntity(this.model, entityName).fields)
+			.filter(it => this.authorizator.isAllowed(Operation.read, entityName, it.name))
+			.map(it => ({
+				name: it.name,
+				type: it.type,
+				...this.createValidationSchema(entityRules[it.name] || []),
+				...additionalInfo[it.name],
+			}))
 	}
 
 	createValidationSchema(rules: Validation.ValidationRule[]): Pick<ContentSchema._Field, 'rules' | 'validators'> {
@@ -168,14 +177,28 @@ export class ContentSchemaFactory {
 			typeDefs: schema,
 			resolvers: {
 				Query: {
-					schema: (): ContentSchema._Schema => ({
-						enums: Object.entries(this.model.enums).map(([name, values]) => ({ name, values })),
-						entities: Object.values(this.model.entities).map(entity => ({
-							name: entity.name,
-							fields: this.createFieldsSchema(entity.name),
-							unique: Object.values(entity.unique).map(({ fields }) => ({ fields })),
-						})),
-					}),
+					schema: (): ContentSchema._Schema => {
+						const entities = Object.values(this.model.entities)
+							.filter(it => this.authorizator.isAllowed(Operation.read, it.name))
+							.map(entity => ({
+								name: entity.name,
+								fields: this.createFieldsSchema(entity.name),
+								unique: Object.values(entity.unique).map(({ fields }) => ({ fields })),
+							}))
+						const usedEnums = new Set(
+							entities
+								.flatMap(it => it.fields)
+								.map(it => (it.__typename === '_Column' ? it.enumName : undefined))
+								.filter((it): it is string => !!it),
+						)
+						const enums = Object.entries(this.model.enums)
+							.filter(([name]) => usedEnums.has(name))
+							.map(([name, values]) => ({ name, values }))
+						return {
+							enums,
+							entities,
+						}
+					},
 				},
 			},
 		}

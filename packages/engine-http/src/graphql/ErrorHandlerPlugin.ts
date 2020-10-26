@@ -1,10 +1,11 @@
 import { AuthenticationError } from 'apollo-server-koa'
 import { ApolloError } from 'apollo-server-errors'
-import { ApolloError as ApolloCoreError } from 'apollo-server-core'
+import { ApolloError as ApolloCoreError, GraphQLRequestContext } from 'apollo-server-core'
 import { UserError } from '@contember/engine-content-api'
 import { GraphQLError } from 'graphql'
 import { extractOriginalError } from './errorExtract'
-import { GraphQLExtension, GraphQLResponse } from 'graphql-extensions'
+import { GraphQLResponse } from 'graphql-extensions'
+import { ApolloServerPlugin, GraphQLRequestListener } from 'apollo-server-plugin-base'
 
 interface ErrorContext {
 	user: string
@@ -18,13 +19,23 @@ export type ErrorLogger = (error: any, context: ErrorContext) => void
 
 export type ErrorContextProvider = () => Pick<ErrorContext, 'url' | 'body' | 'user'>
 
-export class ErrorHandlerExtension extends GraphQLExtension {
+type Context = { errorContextProvider: ErrorContextProvider }
+
+export class ErrorHandlerPlugin implements ApolloServerPlugin {
 	constructor(
 		private readonly projectSlug: string | undefined,
 		private readonly module: string,
 		private readonly errorLogger: ErrorLogger,
-	) {
-		super()
+	) {}
+
+	requestDidStart(requestContext: GraphQLRequestContext<Context>): GraphQLRequestListener<Context> {
+		return {
+			willSendResponse: ({ response, context }) => {
+				if (response.errors) {
+					response.errors = response.errors.map((it: any) => this.processError(it, context.errorContextProvider))
+				}
+			},
+		}
 	}
 
 	processError(error: any, errorContextProvider: ErrorContextProvider): any {
@@ -54,20 +65,5 @@ export class ErrorHandlerExtension extends GraphQLExtension {
 		})
 
 		return { message: 'Internal server error', locations: undefined, path: undefined }
-	}
-
-	willSendResponse({
-		graphqlResponse,
-		context,
-	}: {
-		graphqlResponse: GraphQLResponse
-		context: { errorContextProvider: ErrorContextProvider }
-	}): { graphqlResponse: GraphQLResponse; context: any } {
-		if (graphqlResponse.errors) {
-			graphqlResponse.errors = graphqlResponse.errors.map((it: any) =>
-				this.processError(it, context.errorContextProvider),
-			)
-		}
-		return { graphqlResponse, context }
 	}
 }

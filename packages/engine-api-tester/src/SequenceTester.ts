@@ -1,4 +1,3 @@
-import 'jasmine'
 import { GQL } from './tags'
 import { AnyEvent, CreateEvent } from '@contember/engine-common'
 import { EventSequence } from './EventSequence'
@@ -7,6 +6,7 @@ import { DatabaseQueryable } from '@contember/database'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { createCreateEvent } from './DummyEventFactory'
+import * as assert from 'uvu/assert'
 
 export class SequenceTester {
 	constructor(
@@ -80,7 +80,7 @@ export class SequenceTester {
 				const sequenceItem = sequence.sequence[i]
 
 				const event = events[sequence.stage][i]
-				expect(event).not.toBeUndefined()
+				assert.not.equal(event, undefined)
 
 				switch (sequenceItem.type) {
 					case 'event':
@@ -95,8 +95,8 @@ export class SequenceTester {
 							throw new Error()
 						}
 						const baseEvent = events[sequence.baseStage][i]
-						expect(baseEvent).not.toBeUndefined()
-						expect(event.id).toBe(baseEvent.id)
+						assert.not.equal(baseEvent, undefined)
+						assert.is(event.id, baseEvent.id)
 						break
 				}
 			}
@@ -118,6 +118,6 @@ export class SequenceTester {
 			identityId: {},
 			...restActual
 		} = actual
-		expect(restActual).toEqual(restExpected)
+		assert.equal(restActual, restExpected)
 	}
 }

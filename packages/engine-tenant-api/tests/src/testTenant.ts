@@ -17,6 +17,7 @@ import { executeGraphQlTest } from './testGraphql'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, ExpectedMessage } from './mailer'
+import * as assert from 'uvu/assert'
 
 export interface Test {
 	query: GraphQLTestQuery
@@ -76,11 +77,7 @@ export const executeTenantTest = async (test: Test) => {
 			},
 			projectSchemaResolver,
 		)
-		.replaceService('connection', () =>
-			createConnectionMock(test.executes, (expected, actual, message) => {
-				expect(actual).toEqual(expected, message)
-			}),
-		)
+		.replaceService('connection', () => createConnectionMock(test.executes))
 		.replaceService('mailer', () => mailer)
 		.build()
 

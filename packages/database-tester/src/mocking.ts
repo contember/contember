@@ -1,4 +1,6 @@
 import { Client, Connection, EventManagerImpl } from '@contember/database'
+import 'uvu'
+import * as assert from 'uvu/assert'
 
 export interface ExpectedQuery {
 	sql: string
@@ -8,7 +10,6 @@ export interface ExpectedQuery {
 
 export const createConnectionMock = (
 	queries: ExpectedQuery[],
-	assertFunction: (expected: any, actual: any, message?: string) => void | never,
 ): Connection.TransactionLike & Connection.ClientFactory & Connection.PoolStatusProvider => {
 	return new (class implements Connection.TransactionLike {
 		public readonly eventManager = new EventManagerImpl()
@@ -19,36 +20,24 @@ export const createConnectionMock = (
 			meta?: any,
 			config?: Connection.QueryConfig,
 		): Promise<Connection.Result<Row>> {
-			const expected = queries.shift()
-			assertFunction(
-				true,
-				expected !== undefined,
-				`Unexpected query:
-${sql}
-${JSON.stringify(parameters)}
-`,
-			)
-
-			if (!expected) {
-				throw new Error()
-			}
+			const expected = queries.shift() || { sql: '', parameters: [], response: {} }
 
 			const actualSql = sql.replace(/\s+/g, ' ').toLowerCase()
 			const expectedSql = expected.sql.replace(/\s+/g, ' ').toLowerCase()
-			assertFunction(expectedSql, actualSql)
+			assert.equal(expectedSql, actualSql)
 
 			if (expected.parameters) {
-				assertFunction(expected.parameters.length, (parameters || []).length)
+				assert.equal(expected.parameters.length, (parameters || []).length)
 
 				for (let index in expected.parameters) {
 					const expectedParameter = expected.parameters[index]
 					const actualParameter = (parameters || [])[index]
 					if (typeof expectedParameter === 'function') {
-						assertFunction(true, expectedParameter(actualParameter))
+						assert.equal(true, expectedParameter(actualParameter))
 					} else if (expectedParameter instanceof Date && actualParameter instanceof Date) {
-						assertFunction(expectedParameter.getTime(), actualParameter.getTime())
+						assert.equal(expectedParameter, actualParameter)
 					} else {
-						assertFunction(expectedParameter, actualParameter)
+						assert.equal(expectedParameter, actualParameter)
 					}
 				}
 			}

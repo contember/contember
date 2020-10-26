@@ -58,7 +58,7 @@ export class ContentApiTester {
 			executionContainer,
 			timer: async (label, cb) => (cb ? await cb() : (undefined as any)),
 		}
-		const result = await graphql(gqlSchema, gql, null, context, variables)
+		const result = JSON.parse(JSON.stringify(await graphql(gqlSchema, gql, null, context, variables)))
 		if (result.errors) {
 			throw result.errors[0]
 		}

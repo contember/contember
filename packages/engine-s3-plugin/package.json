@@ -4,7 +4,9 @@
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "test": "echo 'No tests'"
+  },
   "devDependencies": {
     "@types/mime-types": "^2.1.0",
     "@types/uuid": "^3.4.5"

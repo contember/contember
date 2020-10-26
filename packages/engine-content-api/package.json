@@ -6,7 +6,7 @@
   "typings": "dist/src/index.d.ts",
   "scripts": {
     "prebuild": "gql-gen --config graphql.codegen.yml && mkdir -p dist && find ./tests/ -name '*.gql' -type f -exec cp --parents {} ./dist \\;",
-    "test": "jasmine --config=jasmine.json"
+    "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
     "@contember/database": "^0.9.2-alpha.3",
@@ -28,9 +28,7 @@
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",
     "@graphql-codegen/typescript-resolvers": "^1.15.2",
-    "@types/jasmine": "^3.5.10",
     "@types/node": "^14.6.4",
-    "jasmine": "^3.5.0",
     "pg": "^7.18.2"
   }
 }

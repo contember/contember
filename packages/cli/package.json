@@ -5,7 +5,9 @@
   "bin": {
     "contember": "./dist/src/run.js"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "echo 'No tests'"
+  },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
     "@types/js-yaml": "^3.12.1",

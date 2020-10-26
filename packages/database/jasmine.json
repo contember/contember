@@ -1,7 +1,0 @@
-{
-	"spec_files": [
-		"dist/tests/cases/**/*.js"
-	],
-	"stopSpecOnExpectationFailure": false,
-	"random": false
-}

@@ -1,12 +1,12 @@
-import 'jasmine'
 import { graphql, GraphQLSchema } from 'graphql'
+import * as assert from 'uvu/assert'
 
 export interface Test {
 	schema: GraphQLSchema
 	context: any
 	query: string
 	queryVariables?: Record<string, any>
-	return: object
+	return: object | ((data: object) => void)
 }
 
 export const executeGraphQlTest = async (test: Test) => {
@@ -15,5 +15,10 @@ export const executeGraphQlTest = async (test: Test) => {
 		console.error((response.errors as any)[0])
 		response.errors = (response.errors as any).map(({ message }: any) => ({ message }))
 	}
-	expect(response).toEqual(test.return)
+	const responseNormalized = JSON.parse(JSON.stringify(response))
+	if (typeof test.return === 'function') {
+		test.return(responseNormalized)
+	} else {
+		assert.equal(responseNormalized, test.return)
+	}
 }

@@ -11,8 +11,6 @@ import {
 	typeDefs,
 } from '../../src'
 import { Buffer } from 'buffer'
-import { ProjectScopeFactory } from '../../src/model/authorization/ProjectScopeFactory'
-import { AclSchemaEvaluatorFactory } from '../../src/model/authorization/AclSchemaEvaluatorFactory'
 import { makeExecutableSchema } from 'graphql-tools'
 import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, MockedMailer } from './mailer'
@@ -23,8 +21,9 @@ import { promises } from 'fs'
 import { join } from 'path'
 import { Membership } from '../../src/model/type/Membership'
 import { Connection } from '@contember/database'
+import * as uvu from 'uvu'
 
-export interface Test {
+export interface TenantTest {
 	query: GraphQLTestQuery
 	return: object
 	sentMails?: { subject: string }[]
@@ -85,7 +84,7 @@ interface TenantTestOptions {
 	roles?: string[]
 }
 
-interface TenantTester {
+export interface TenantTester {
 	execute(query: GraphQLTestQuery, options?: TenantTestOptions): Promise<any>
 	mailer: MockedMailer
 	end: () => Promise<void>
@@ -158,11 +157,26 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 				context,
 				typeof query === 'string' ? undefined : query.variables,
 			)
-			return result
+			return JSON.parse(JSON.stringify(result))
 		},
 		mailer,
 		end: async () => {
 			await (tenantContainer.connection as Connection).end()
 		},
 	}
+}
+
+interface TenantContext {
+	tester: TenantTester
+}
+
+export const dbSuite = (title: string) => {
+	const dbSuite = uvu.suite<TenantContext>(title)
+	dbSuite.before.each(async ctx => {
+		ctx.tester = await createTenantTester()
+	})
+	dbSuite.after.each(async ctx => {
+		await ctx.tester.end()
+	})
+	return dbSuite
 }

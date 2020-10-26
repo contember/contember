@@ -9,6 +9,7 @@ import { SchemaBuilder, AllowAllPermissionFactory, SchemaDefinition } from '@con
 import GraphQlSchemaBuilderFactory from '../../../../src/graphQLSchema/GraphQlSchemaBuilderFactory'
 import * as model from './model'
 import { graphqlObjectFactories } from '../../../src/graphqlObjectFactories'
+import { StaticAuthorizator } from '../../../../src'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -26,7 +27,8 @@ const testSchema = async (test: Test) => {
 	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)
-	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, permissions)
+	const authorizator = new StaticAuthorizator(permissions)
+	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, authorizator)
 	const graphQlSchema = graphQlSchemaBuilder.build()
 
 	const result = await graphql(

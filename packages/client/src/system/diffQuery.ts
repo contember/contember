@@ -5,7 +5,7 @@ export interface DiffQueryResponse {
 		diff: {
 			ok: boolean
 			errors: Array<'STAGE_NOT_FOUND' | 'MISSING_BASE' | 'NOT_REBASED'>
-			result?: {
+			result?: null | {
 				head: {
 					id: string
 					name: string

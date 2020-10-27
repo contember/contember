@@ -1,4 +1,4 @@
-import { BindingError, EntityKeyProvider, FieldValue, RelativeSingleField } from '@contember/binding'
+import { BindingError, FieldValue, RelativeSingleField } from '@contember/binding'
 import { EditorPlaceholder } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
@@ -44,15 +44,13 @@ export const BlockEditorElementRenderer = ({
 			throw new BindingError()
 		}
 		return (
-			<EntityKeyProvider entityKey={element.referenceId}>
-				<BlockVoidReferenceElementRenderer
-					attributes={attributes}
-					children={children}
-					element={element}
-					referenceDiscriminationField={referenceDiscriminationField}
-					normalizedReferenceBlocks={normalizedReferenceBlocks}
-				/>
-			</EntityKeyProvider>
+			<BlockVoidReferenceElementRenderer
+				attributes={attributes}
+				children={children}
+				element={element}
+				referenceDiscriminationField={referenceDiscriminationField}
+				normalizedReferenceBlocks={normalizedReferenceBlocks}
+			/>
 		)
 	}
 	if (isContemberFieldElement(element)) {
@@ -71,17 +69,15 @@ export const BlockEditorElementRenderer = ({
 	}
 	if (isEmbedElement(element)) {
 		return (
-			<EntityKeyProvider entityKey={element.referenceId}>
-				<EmbedElementRenderer
-					attributes={attributes}
-					children={children}
-					element={element}
-					embedSubBlocks={embedSubBlocks}
-					embedHandlers={embedHandlers}
-					embedContentDiscriminationField={embedContentDiscriminationField}
-					embedReferenceDiscriminateBy={embedReferenceDiscriminateBy}
-				/>
-			</EntityKeyProvider>
+			<EmbedElementRenderer
+				attributes={attributes}
+				children={children}
+				element={element}
+				embedSubBlocks={embedSubBlocks}
+				embedHandlers={embedHandlers}
+				embedContentDiscriminationField={embedContentDiscriminationField}
+				embedReferenceDiscriminateBy={embedReferenceDiscriminateBy}
+			/>
 		)
 	}
 	if (isContemberContentPlaceholderElement(element)) {

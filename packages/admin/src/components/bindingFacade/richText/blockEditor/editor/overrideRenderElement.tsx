@@ -1,4 +1,4 @@
-import { FieldValue, RelativeSingleField, RemovalType } from '@contember/binding'
+import { EntityKeyProvider, FieldValue, RelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 import { NormalizedBlocks } from '../../../blocks'
 import { NormalizedEmbedHandlers } from '../embed/core'
@@ -21,18 +21,25 @@ export interface OverrideRenderElementOptions {
 export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, options: OverrideRenderElementOptions) => {
 	const { renderElement } = editor
 
-	editor.renderElement = props => (
-		<BlockEditorElementRenderer
-			attributes={props.attributes}
-			children={props.children}
-			element={props.element}
-			fallbackRenderer={renderElement}
-			normalizedReferenceBlocks={options.normalizedReferenceBlocksRef.current}
-			referenceDiscriminationField={options.referenceDiscriminationField}
-			embedContentDiscriminationField={options.embedContentDiscriminationField}
-			embedSubBlocks={options.embedSubBlocks}
-			embedHandlers={options.embedHandlers}
-			embedReferenceDiscriminateBy={options.embedReferenceDiscriminateBy}
-		/>
-	)
+	editor.renderElement = props => {
+		const child = (
+			<BlockEditorElementRenderer
+				attributes={props.attributes}
+				children={props.children}
+				element={props.element}
+				fallbackRenderer={renderElement}
+				normalizedReferenceBlocks={options.normalizedReferenceBlocksRef.current}
+				referenceDiscriminationField={options.referenceDiscriminationField}
+				embedContentDiscriminationField={options.embedContentDiscriminationField}
+				embedSubBlocks={options.embedSubBlocks}
+				embedHandlers={options.embedHandlers}
+				embedReferenceDiscriminateBy={options.embedReferenceDiscriminateBy}
+			/>
+		)
+
+		if ('referenceId' in props.element && props.element.referenceId) {
+			return <EntityKeyProvider entityKey={props.element.referenceId}>{child}</EntityKeyProvider>
+		}
+		return child
+	}
 }

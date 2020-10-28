@@ -12,8 +12,13 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 		const field = entity.fields[this.data.fieldName] as Model.AnyColumn
 		const definition = this.data.definition
 		builder.alterColumn(entity.tableName, field.columnName, {
-			type: definition.type === Model.ColumnType.Enum ? `"${definition.columnType}"` : definition.columnType,
-			notNull: !definition.nullable,
+			type:
+				definition.columnType !== field.columnType
+					? definition.type === Model.ColumnType.Enum
+						? `"${definition.columnType}"`
+						: definition.columnType
+					: undefined,
+			notNull: field.nullable !== definition.nullable ? !definition.nullable : undefined,
 		})
 	}
 

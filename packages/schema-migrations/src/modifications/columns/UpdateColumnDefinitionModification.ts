@@ -12,7 +12,6 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 		const field = entity.fields[this.data.fieldName] as Model.AnyColumn
 		builder.alterColumn(entity.tableName, field.columnName, {
 			type: this.data.definition.columnType,
-			default: this.data.definition.default,
 			notNull: !this.data.definition.nullable,
 		})
 	}

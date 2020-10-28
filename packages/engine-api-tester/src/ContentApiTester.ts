@@ -5,7 +5,6 @@ import {
 	setupSystemVariables,
 } from '@contember/engine-system-api'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
-import { Client } from '@contember/database'
 import {
 	Context as ContentContext,
 	ExecutionContainerFactory,
@@ -16,6 +15,7 @@ import { TesterStageManager } from './TesterStageManager'
 import { Schema } from '@contember/schema'
 import { createUuidGenerator } from './testUuid'
 import { getArgumentValues } from 'graphql/execution/values'
+import { StaticAuthorizator } from '@contember/engine-content-api'
 
 export class ContentApiTester {
 	private trxUuidGenerator = createUuidGenerator('a453')
@@ -34,7 +34,8 @@ export class ContentApiTester {
 		const schema = await this.getSchema()
 		const model = schema.model
 		const permissions = new AllowAllPermissionFactory().create(model)
-		const gqlSchemaBuilder = this.graphqlSchemaBuilderFactory.create(model, permissions)
+		const authorizator = new StaticAuthorizator(permissions)
+		const gqlSchemaBuilder = this.graphqlSchemaBuilderFactory.create(model, authorizator)
 		const gqlSchema = gqlSchemaBuilder.build()
 		const db = this.db.client.forSchema(formatSchemaName(stage))
 

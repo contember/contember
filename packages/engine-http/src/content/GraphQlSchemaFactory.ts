@@ -8,6 +8,8 @@ import {
 import { makeExecutableSchema, mergeSchemas } from 'graphql-tools'
 import { GraphQLSchemaContributor } from '@contember/engine-plugins'
 import { EntityRulesResolver } from '@contember/engine-content-api'
+import { StaticAuthorizator } from '@contember/engine-content-api'
+import { JSONType } from '@contember/graphql-utils'
 
 type Context = { schema: Schema; identity: PermissionsByIdentityFactory.Identity }
 class GraphQlSchemaFactory {
@@ -52,18 +54,30 @@ class GraphQlSchemaFactory {
 
 		const { permissions, verifier } = this.permissionFactory.createPermissions(schema, identity)
 
-		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, permissions)
+		const authorizator = new StaticAuthorizator(permissions)
+		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
 		const contentSchemaFactory = new ContentSchemaFactory(
 			schema.model,
 			new EntityRulesResolver(schema.validation, schema.model),
+			authorizator,
 		)
 		const dataSchema: GraphQLSchema = dataSchemaBuilder.build()
-		const contentSchema = makeExecutableSchema(contentSchemaFactory.create())
+		const contentSchema = makeExecutableSchema({
+			...contentSchemaFactory.create(),
+			resolverValidationOptions: {
+				requireResolversForResolveType: false,
+			},
+		})
 
 		const otherSchemas = this.schemaContributors
 			.map(it => it.createSchema({ schema, identity }))
 			.filter((it): it is GraphQLSchema => it !== undefined)
-		const graphQlSchema = mergeSchemas({ schemas: [dataSchema, contentSchema, ...otherSchemas] })
+		const graphQlSchema = mergeSchemas({
+			schemas: [dataSchema, contentSchema, ...otherSchemas],
+			resolvers: {
+				Json: JSONType,
+			},
+		})
 		schemaCacheEntry.entries.push({ graphQlSchema, verifier, permissions })
 
 		return [graphQlSchema, permissions]

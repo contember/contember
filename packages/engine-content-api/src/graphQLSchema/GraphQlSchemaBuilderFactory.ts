@@ -7,7 +7,6 @@ import MutationProvider from './MutationProvider'
 import WhereTypeProvider from './WhereTypeProvider'
 import ConditionTypeProvider from './ConditionTypeProvider'
 import GraphQlSchemaBuilder from './GraphQlSchemaBuilder'
-import StaticAuthorizator from '../acl/StaticAuthorizator'
 import CreateEntityInputFieldVisitor from './mutations/CreateEntityInputFieldVisitor'
 import CreateEntityRelationInputProvider from './mutations/CreateEntityRelationInputProvider'
 import CreateEntityRelationInputFieldVisitor from './mutations/CreateEntityRelationInputFieldVisitor'
@@ -25,12 +24,12 @@ import { ValidationQueriesProvider } from './ValidationQueriesProvider'
 import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { CustomTypesProvider } from './CustomTypesProvider'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
+import Authorizator from '../acl/Authorizator'
 
 export default class GraphQlSchemaBuilderFactory {
 	constructor(private readonly graphqlObjectFactories: GraphQLObjectsFactory) {}
 
-	public create(schema: Model.Schema, permissions: Acl.Permissions): GraphQlSchemaBuilder {
-		const authorizator = new StaticAuthorizator(permissions)
+	public create(schema: Model.Schema, authorizator: Authorizator): GraphQlSchemaBuilder {
 		const customTypesProvider = new CustomTypesProvider(this.graphqlObjectFactories)
 		const enumsProvider = new EnumsProvider(schema, this.graphqlObjectFactories)
 		const columnTypeResolver = new ColumnTypeResolver(

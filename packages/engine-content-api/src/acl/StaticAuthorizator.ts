@@ -1,7 +1,7 @@
 import { Acl } from '@contember/schema'
 import Authorizator from './Authorizator'
 
-export default class StaticAuthorizator implements Authorizator {
+export class StaticAuthorizator implements Authorizator {
 	constructor(private readonly permissions: Acl.Permissions) {}
 
 	isAllowed(operation: Acl.Operation, entity: string, field?: string): boolean {

@@ -61,8 +61,9 @@ export class DeleteExecutor {
 	}
 
 	private async executeCascade(db: Client, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
+		const owningRelations = this.findOwningRelations(entity)
 		await Promise.all(
-			this.findOwningRelations(entity).map(async ([owningEntity, relation]) => {
+			owningRelations.map(async ([owningEntity, relation]) => {
 				const relationWhere: Input.Where = { [relation.name]: { [entity.primary]: { in: values } } }
 				switch (relation.joiningColumn.onDelete) {
 					case Model.OnDelete.restrict:

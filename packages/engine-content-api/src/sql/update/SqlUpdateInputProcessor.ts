@@ -1,4 +1,4 @@
-import { Input, Value } from '@contember/schema'
+import { Input, Model, Value } from '@contember/schema'
 import Mapper from '../Mapper'
 import UpdateBuilder from './UpdateBuilder'
 import { UpdateInputProcessor } from '../../inputProcessing'
@@ -223,10 +223,16 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 			}
 		}),
 		delete: hasOneProcessor(async ({ targetEntity, entity, relation }) => {
-			if (!relation.nullable) {
+			if (!relation.nullable && relation.joiningColumn.onDelete !== Model.OnDelete.cascade) {
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
-			this.updateBuilder.addFieldValue(relation.name, null)
+			if (relation.joiningColumn.onDelete === Model.OnDelete.restrict) {
+				// eslint-disable-next-line no-console
+				console.error(
+					'[DEPRECATED] You are deleting an entity over the relation where onDelete behaviour is set to restrict. This will fail in next version.',
+				)
+				this.updateBuilder.addFieldValue(relation.name, null)
+			}
 			const inversedPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
@@ -479,10 +485,16 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 			return result
 		}),
 		delete: hasOneProcessor(async ({ targetEntity, entity, relation }) => {
-			if (!relation.nullable) {
+			if (!relation.nullable && relation.joiningColumn.onDelete !== Model.OnDelete.cascade) {
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
-			this.updateBuilder.addFieldValue(relation.name, null)
+			if (relation.joiningColumn.onDelete === Model.OnDelete.restrict) {
+				// eslint-disable-next-line no-console
+				console.error(
+					'[DEPRECATED] You are deleting an entity over the relation where onDelete behaviour is set to restrict. This will fail in next version.',
+				)
+				this.updateBuilder.addFieldValue(relation.name, null)
+			}
 			const targetPrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },

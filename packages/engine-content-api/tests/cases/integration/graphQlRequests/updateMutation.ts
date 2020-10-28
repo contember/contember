@@ -80,14 +80,16 @@ describe('update', () => {
 		const postWithAuthor = new SchemaBuilder()
 			.entity('Post', e =>
 				e
-					.manyHasOne('author', r => r.target('Author').notNull().inversedBy('posts'))
+					.manyHasOne('author', r => r.target('Author').notNull().inversedBy('posts').onDelete(Model.OnDelete.cascade))
 					.column('title', c => c.type(Model.ColumnType.String)),
 			)
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
 
 		const postWithNullableAuthor = new SchemaBuilder()
-			.entity('Post', e => e.manyHasOne('author', r => r.target('Author').inversedBy('posts')))
+			.entity('Post', e =>
+				e.manyHasOne('author', r => r.target('Author').inversedBy('posts').onDelete(Model.OnDelete.setNull)),
+			)
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema()
 
@@ -440,18 +442,82 @@ describe('update', () => {
 								rows: [{ author_id: testUuid(1) }],
 							},
 						},
-
 						{
-							sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "author_id",
-                 "root_"."id"
-               from "public"."post" as "root_"
-               where "root_"."id" = ?) update "public"."post"
-              set "author_id" = "newData_"."author_id" from "newData_"
-             where "post"."id" = "newData_"."id"`,
-							parameters: [null, testUuid(2)],
-							response: { rowCount: 1 },
+							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
+							parameters: [],
+							response: 1,
+						},
+						{
+							sql: SQL`select "root_"."id" from "public"."author" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(1)],
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`delete from "public"."author"
+              where "id" in (select "root_"."id"
+                             from "public"."author" as "root_"
+                             where "root_"."id" = ?)
+              returning "id"`,
+							parameters: [testUuid(1)],
+							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`
+								with "newdata_" as
+								(select ? :: uuid as "author_id", "root_"."id"
+									from "public"."post" as "root_"
+									where "root_"."author_id" in (?))
+								update "public"."post" set "author_id" = "newdata_"."author_id"
+								from "newdata_"
+								where "post"."id" = "newdata_"."id"`,
+							parameters: [null, testUuid(1)],
+							response: {
+								rowCount: 1,
+							},
+						},
+						{
+							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
+							parameters: [],
+							response: 1,
+						},
+					]),
+				],
+				return: {
+					data: {
+						updatePost: {
+							ok: true,
+						},
+					},
+				},
+			})
+		})
+
+		it('delete with cascade', async () => {
+			await execute({
+				schema: postWithAuthor,
+				query: GQL`mutation {
+        updatePost(
+            by: {id: "${testUuid(2)}"},
+            data: {author: {delete: true}}
+          ) {
+          ok
+        }
+      }`,
+				executes: [
+					...sqlTransaction([
+						{
+							sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: { rows: [{ id: testUuid(2) }] },
+						},
+						{
+							sql: SQL`select "root_"."author_id"
+                       from "public"."post" as "root_"
+                       where "root_"."id" = ?`,
+							parameters: [testUuid(2)],
+							response: {
+								rows: [{ author_id: testUuid(1) }],
+							},
 						},
 						{
 							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
@@ -471,6 +537,19 @@ describe('update', () => {
               returning "id"`,
 							parameters: [testUuid(1)],
 							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`
+								delete from "public"."post"
+								where "id" in
+									(select "root_"."id"
+									from "public"."post" as "root_"
+									where "root_"."author_id" in (?))
+								returning "id"`,
+							parameters: [testUuid(1)],
+							response: {
+								rows: [{ id: testUuid(2) }],
+							},
 						},
 						{
 							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
@@ -991,7 +1070,10 @@ describe('update', () => {
 			entity
 				.column('name', c => c.type(Model.ColumnType.String))
 				.oneHasOne('setting', r =>
-					r.inversedBy('site').target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String))),
+					r
+						.inversedBy('site')
+						.target('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
+						.onDelete(Model.OnDelete.setNull),
 				),
 		)
 		.buildSchema()
@@ -1486,19 +1568,6 @@ describe('update', () => {
 							},
 						},
 						{
-							sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
-							parameters: [null, testUuid(2)],
-							response: { rowCount: 1 },
-						},
-						{
 							sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
 							parameters: [],
 							response: 1,
@@ -1516,6 +1585,20 @@ describe('update', () => {
               returning "id"`,
 							parameters: [testUuid(1)],
 							response: { rows: [{ id: testUuid(1) }] },
+						},
+						{
+							sql: SQL`
+								with "newdata_" as
+								(select ? :: uuid as "setting_id", "root_"."id", "root_"."name"
+									from "public"."site" as "root_"
+									where "root_"."setting_id" in (?))
+								update "public"."site"
+								set "setting_id" = "newdata_"."setting_id" from "newdata_"
+								where "site"."id" = "newdata_"."id"`,
+							parameters: [null, testUuid(1)],
+							response: {
+								rowCount: 1,
+							},
 						},
 						{
 							sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,

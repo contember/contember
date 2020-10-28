@@ -1,5 +1,5 @@
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
-import { tuple } from '../../utils'
+import { isIt, tuple } from '../../utils'
 import { Input, Model, Validation, Value } from '@contember/schema'
 import { InputValidation } from '@contember/schema-definition'
 import { CreateInputVisitor, UpdateInputVisitor } from '../../inputProcessing'
@@ -109,7 +109,19 @@ export class InputPreValidator {
 				if (value === undefined) {
 					return undefined
 				}
-				return 'disconnect' in value || 'delete' in value ? null : true
+				if ('disconnect' in value) {
+					return null
+				}
+				if ('delete' in value) {
+					if (
+						isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn') &&
+						relation.joiningColumn.onDelete === Model.OnDelete.cascade
+					) {
+						return true
+					}
+					return null
+				}
+				return true
 			},
 			// more complex validation on relations are not possible in pre-validation phase
 			visitHasMany: () => null,

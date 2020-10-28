@@ -30,7 +30,10 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		if (relation.nullable) {
 			return operations
 		}
-		const forbiddenOperations = [Input.UpdateRelationOperation.delete, Input.UpdateRelationOperation.disconnect]
+		const forbiddenOperations = [Input.UpdateRelationOperation.disconnect]
+		if (relation.joiningColumn.onDelete !== Model.OnDelete.cascade) {
+			forbiddenOperations.push(Input.UpdateRelationOperation.delete)
+		}
 		return operations.filter(it => !forbiddenOperations.includes(it))
 	}
 
@@ -57,7 +60,11 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		if (relation.nullable || (targetRelation && targetRelation.nullable)) {
 			return operations
 		}
-		return operations.filter(it => it === Input.UpdateRelationOperation.update)
+		const allowedOperations = [Input.UpdateRelationOperation.update]
+		if (relation.joiningColumn.onDelete === Model.OnDelete.cascade) {
+			allowedOperations.push(Input.UpdateRelationOperation.delete)
+		}
+		return operations.filter(it => allowedOperations.includes(it))
 	}
 
 	private getAllowedOperations(

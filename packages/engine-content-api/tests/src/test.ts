@@ -1,4 +1,3 @@
-import 'jasmine'
 import { Acl, Model, Schema, Validation } from '@contember/schema'
 import GraphQlSchemaBuilderFactory from '../../src/graphQLSchema/GraphQlSchemaBuilderFactory'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
@@ -72,9 +71,7 @@ export const execute = async (test: Test) => {
 	const builder = new GraphQlSchemaBuilderFactory(graphqlObjectFactories).create(test.schema, authorizator)
 	const graphQLSchema = builder.build()
 
-	const connection = createConnectionMock(test.executes, (expected, actual, message) => {
-		expect(actual).toEqual(expected, message)
-	})
+	const connection = createConnectionMock(test.executes)
 
 	const db = new Client(connection, 'public', {})
 	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {} }

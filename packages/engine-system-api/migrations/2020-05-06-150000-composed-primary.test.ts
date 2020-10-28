@@ -1,29 +1,31 @@
 import migration from './2020-05-06-150000-composed-primary'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { exampleProject } from '@contember/engine-api-tester'
-import 'jasmine'
+import { test } from 'uvu'
+import * as assert from 'uvu/assert'
 
-describe('test many-has-many-primary migration', () => {
-	it('generates migration sql', async () => {
-		const builder = createMigrationBuilder()
-		await migration(builder, {
-			schemaResolver: () => Promise.resolve(exampleProject),
-			project: {
-				slug: 'test',
-				stages: [
-					{
-						slug: 'prod',
-						name: 'prod',
-					},
-					{
-						slug: 'preview',
-						name: 'preview',
-					},
-				],
-			},
-			queryHandler: null as any,
-		})
-		expect(builder.getSql()).toEqual(`ALTER TABLE "stage_prod"."post_tags"
+test('many-has-many-primary migration sql', async () => {
+	const builder = createMigrationBuilder()
+	await migration(builder, {
+		schemaResolver: () => Promise.resolve(exampleProject),
+		project: {
+			slug: 'test',
+			stages: [
+				{
+					slug: 'prod',
+					name: 'prod',
+				},
+				{
+					slug: 'preview',
+					name: 'preview',
+				},
+			],
+		},
+		queryHandler: null as any,
+	})
+	assert.equal(
+		builder.getSql(),
+		`ALTER TABLE "stage_prod"."post_tags"
   DROP "id";
 ALTER TABLE "stage_prod"."post_tags" DROP CONSTRAINT "post_tags_uniq_post_id_tag_id";
 ALTER TABLE "stage_prod"."post_tags"
@@ -218,6 +220,8 @@ END;
 $$ LANGUAGE plpgsql;
 ;
 DROP FUNCTION "system"."make_diff"("old" jsonb, "new" jsonb);
-`)
-	})
+`,
+	)
 })
+
+test.run()

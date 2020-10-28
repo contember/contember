@@ -1,19 +1,22 @@
 import migration from './2020-06-08-134000-tenant-credentials'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import 'jasmine'
+import { suite } from 'uvu'
+import * as assert from 'uvu/assert'
 
-describe('test credentials migration', () => {
-	it('generates sql with login token', async () => {
-		const builder = createMigrationBuilder()
-		await migration(builder, {
-			providers: {
-				bcrypt: val => Promise.resolve(`${val}-bcrypted`),
-			},
-			credentials: {
-				loginToken: 'helloworld',
-			},
-		})
-		expect(builder.getSql()).toEqual(`
+const credentialsMigrationTest = suite('credentials migration ')
+credentialsMigrationTest('generate sql with login token', async () => {
+	const builder = createMigrationBuilder()
+	await migration(builder, {
+		providers: {
+			bcrypt: val => Promise.resolve(`${val}-bcrypted`),
+		},
+		credentials: {
+			loginToken: 'helloworld',
+		},
+	})
+	assert.equal(
+		builder.getSql(),
+		`
 			WITH identity AS (
 			    INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
 				VALUES ("tenant"."uuid_generate_v4"(), NULL, '["login"]'::JSONB, 'Login key', now()) RETURNING id
@@ -22,20 +25,23 @@ describe('test credentials migration', () => {
 			SELECT "tenant"."uuid_generate_v4"(), $pg1$936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af$pg1$, 'permanent', identity.id, NULL, NULL, NULL, now()
 			FROM identity
 			;
-`)
-	})
+`,
+	)
+})
 
-	it('generates sql with root token', async () => {
-		const builder = createMigrationBuilder()
-		await migration(builder, {
-			providers: {
-				bcrypt: val => Promise.resolve(`${val}-bcrypted`),
-			},
-			credentials: {
-				rootToken: 'foobar',
-			},
-		})
-		expect(builder.getSql()).toEqual(`
+credentialsMigrationTest('generate sql with root token', async () => {
+	const builder = createMigrationBuilder()
+	await migration(builder, {
+		providers: {
+			bcrypt: val => Promise.resolve(`${val}-bcrypted`),
+		},
+		credentials: {
+			rootToken: 'foobar',
+		},
+	})
+	assert.equal(
+		builder.getSql(),
+		`
 			WITH identity AS (
 				INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
 				VALUES (
@@ -66,20 +72,23 @@ UPDATE "tenant"."api_key"
 	         SET "disabled_at" = now()
 	         WHERE "token_hash" = '081115df5d291465362f17c4b7b182da6aaa6d8147a0fec1aca8435eec404612'
 	               AND "disabled_at" IS NULL;
-`)
-	})
+`,
+	)
+})
 
-	it('generates sql with root user', async () => {
-		const builder = createMigrationBuilder()
-		await migration(builder, {
-			providers: {
-				bcrypt: val => Promise.resolve(`${val}-bcrypted`),
-			},
-			credentials: {
-				rootPassword: 'foobar',
-			},
-		})
-		expect(builder.getSql()).toEqual(`
+credentialsMigrationTest('generate sql with root user', async () => {
+	const builder = createMigrationBuilder()
+	await migration(builder, {
+		providers: {
+			bcrypt: val => Promise.resolve(`${val}-bcrypted`),
+		},
+		credentials: {
+			rootPassword: 'foobar',
+		},
+	})
+	assert.equal(
+		builder.getSql(),
+		`
 			WITH identity AS (
 				INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
 				VALUES (
@@ -110,22 +119,25 @@ UPDATE "tenant"."api_key"
 	         SET "disabled_at" = now()
 	         WHERE "token_hash" = '081115df5d291465362f17c4b7b182da6aaa6d8147a0fec1aca8435eec404612'
 	               AND "disabled_at" IS NULL;
-`)
-	})
+`,
+	)
+})
 
-	it('generates sql with both root user and token', async () => {
-		const builder = createMigrationBuilder()
-		await migration(builder, {
-			providers: {
-				bcrypt: val => Promise.resolve(`${val}-bcrypted`),
-			},
-			credentials: {
-				rootPassword: 'pwd',
-				rootToken: 'tkn',
-				rootEmail: 'john@doe.com',
-			},
-		})
-		expect(builder.getSql()).toEqual(`
+credentialsMigrationTest('generate sql with both root user and token', async () => {
+	const builder = createMigrationBuilder()
+	await migration(builder, {
+		providers: {
+			bcrypt: val => Promise.resolve(`${val}-bcrypted`),
+		},
+		credentials: {
+			rootPassword: 'pwd',
+			rootToken: 'tkn',
+			rootEmail: 'john@doe.com',
+		},
+	})
+	assert.equal(
+		builder.getSql(),
+		`
 			WITH identity AS (
 				INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
 				VALUES (
@@ -156,6 +168,7 @@ UPDATE "tenant"."api_key"
 	         SET "disabled_at" = now()
 	         WHERE "token_hash" = '081115df5d291465362f17c4b7b182da6aaa6d8147a0fec1aca8435eec404612'
 	               AND "disabled_at" IS NULL;
-`)
-	})
+`,
+	)
 })
+credentialsMigrationTest.run()

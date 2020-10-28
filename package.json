@@ -11,7 +11,7 @@
     "ts:clean": "tsc --build --clean",
     "prebuild": "oao run-script prebuild",
     "build": "tsc --build && oao run-script build",
-    "test": "oao run-script test",
+    "test": "oao run-script --relative-time test",
     "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
     "eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
     "tag-version": "oao publish --no-npm-publish --no-changelog"
@@ -35,7 +35,6 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-promise": "^4.2.1",
     "husky": "^4.2.0",
-    "jasmine": "^3.5.0",
     "lint-staged": "^10.0.2",
     "oao": "^2.0.0",
     "prettier": "^2.1.1",

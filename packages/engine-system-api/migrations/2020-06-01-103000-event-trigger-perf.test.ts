@@ -1,29 +1,31 @@
 import migration from './2020-06-01-103000-event-trigger-perf'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { exampleProject } from '@contember/engine-api-tester'
-import 'jasmine'
+import { test } from 'uvu'
+import * as assert from 'uvu/assert'
 
-describe('test event-trigger-performance migration', () => {
-	it('generates migration sql', async () => {
-		const builder = createMigrationBuilder()
-		await migration(builder, {
-			schemaResolver: () => Promise.resolve(exampleProject),
-			project: {
-				slug: 'test',
-				stages: [
-					{
-						slug: 'prod',
-						name: 'prod',
-					},
-					{
-						slug: 'preview',
-						name: 'preview',
-					},
-				],
-			},
-			queryHandler: null as any,
-		})
-		expect(builder.getSql()).toEqual(`CREATE OR REPLACE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
+test('event-trigger-performance sql', async () => {
+	const builder = createMigrationBuilder()
+	await migration(builder, {
+		schemaResolver: () => Promise.resolve(exampleProject),
+		project: {
+			slug: 'test',
+			stages: [
+				{
+					slug: 'prod',
+					name: 'prod',
+				},
+				{
+					slug: 'preview',
+					name: 'preview',
+				},
+			],
+		},
+		queryHandler: null as any,
+	})
+	assert.equal(
+		builder.getSql(),
+		`CREATE OR REPLACE FUNCTION "system"."trigger_event"() RETURNS TRIGGER AS $$
 DECLARE
     DECLARE new_event_type TEXT;
     DECLARE previous_id UUID;
@@ -160,6 +162,8 @@ CREATE TRIGGER "log_event_statement"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."entry"
   FOR EACH STATEMENT
   EXECUTE PROCEDURE "system"."statement_trigger_event"();
-`)
-	})
+`,
+	)
 })
+
+test.run()

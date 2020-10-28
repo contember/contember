@@ -1,4 +1,5 @@
 import { Mailer, MailMessage, SentInfo } from '../../src/utils'
+import * as assert from 'uvu/assert'
 
 export type ExpectedMessage = { subject: string }
 
@@ -16,16 +17,16 @@ export const createMockedMailer = (): MockedMailer => {
 
 		expectMessage(expected: ExpectedMessage) {
 			const actual = mails.shift()
-			expect(actual).not.toBeUndefined()
+			assert.ok(actual)
 			if (!actual) {
 				throw new Error('No email to consume')
 			}
-			expect(actual.subject).toEqual(expected.subject)
+			assert.equal(actual.subject, expected.subject)
 			return actual
 		}
 
 		expectEmpty() {
-			expect(mails.length).toEqual(0)
+			assert.equal(mails.length, 0)
 		}
 	})()
 }

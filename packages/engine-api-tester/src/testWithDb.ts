@@ -1,4 +1,3 @@
-import 'jasmine'
 import { Model } from '@contember/schema'
 import { createMock } from './utils'
 import {
@@ -12,6 +11,7 @@ import {
 import { emptySchema } from '@contember/schema-utils'
 import { ApiTester } from './ApiTester'
 import { SelectBuilder } from '@contember/database'
+import * as assert from 'uvu/assert'
 
 type Test = {
 	schema: Model.Schema
@@ -22,7 +22,7 @@ type Test = {
 	query: string
 	queryVariables?: Record<string, any>
 	expectDatabase?: Record<string, Record<string, any>[]>
-} & ({ return: object } | { throws: { message: string } })
+} & ({ return: object | ((response: any) => void) } | { throws: { message: string } })
 
 export const executeDbTest = async (test: Test) => {
 	const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
@@ -56,33 +56,40 @@ export const executeDbTest = async (test: Test) => {
 			],
 		},
 	})
-	await tester.stages.createAll()
-	await tester.stages.migrate('2019-01-01-100000')
-	for (const { query, queryVariables } of test.seed) {
-		await tester.content.queryContent('prod', query, queryVariables)
-	}
 	try {
-		const response = await tester.content.queryContent('prod', test.query, test.queryVariables)
-		if ('return' in test) {
-			expect(response).toEqual(test.return)
+		await tester.stages.createAll()
+		await tester.stages.migrate('2019-01-01-100000')
+		for (const { query, queryVariables } of test.seed) {
+			await tester.content.queryContent('prod', query, queryVariables)
 		}
-	} catch (e) {
-		if ('throws' in test) {
-			expect(e.message).toBe(test.throws.message)
-		} else {
-			throw e
+		try {
+			const response = await tester.content.queryContent('prod', test.query, test.queryVariables)
+			if ('return' in test) {
+				if (typeof test.return === 'function') {
+					test.return(response)
+				} else {
+					assert.equal(response, test.return)
+				}
+			}
+		} catch (e) {
+			if ('throws' in test) {
+				assert.is(e.message, test.throws.message)
+			} else {
+				throw e
+			}
 		}
-	}
 
-	const dbData: Record<string, Record<string, any>[]> = {}
-	for (const table of Object.keys(test.expectDatabase || {})) {
-		const qb = SelectBuilder.create().from(table)
+		const dbData: Record<string, Record<string, any>[]> = {}
+		for (const table of Object.keys(test.expectDatabase || {})) {
+			const qb = SelectBuilder.create().from(table)
 
-		const columns = Object.keys((test.expectDatabase || {})[table][0] || { id: null })
-		const qbWithSelect = columns.reduce<SelectBuilder<Record<string, any>>>((qb, column) => qb.select(column), qb)
-		dbData[table] = await qbWithSelect.getResult(tester.client.forSchema('stage_prod'))
+			const columns = Object.keys((test.expectDatabase || {})[table][0] || { id: null })
+			const qbWithSelect = columns.reduce<SelectBuilder<Record<string, any>>>((qb, column) => qb.select(column), qb)
+			dbData[table] = await qbWithSelect.getResult(tester.client.forSchema('stage_prod'))
+		}
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		assert.equal(dbData, test.expectDatabase!)
+	} finally {
+		await tester.cleanup()
 	}
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	expect(dbData).toEqual(test.expectDatabase!)
-	await tester.cleanup()
 }

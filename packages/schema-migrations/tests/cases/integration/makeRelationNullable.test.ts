@@ -29,7 +29,7 @@ testMigrations('make relation nullable', {
 		ALTER "category_id" DROP NOT NULL;`,
 })
 
-testMigrations('TODO', {
+testMigrations('make inversed relation nullable', {
 	originalSchema: new SchemaBuilder()
 		.entity('Post', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
 		.entity('Link', e => e.oneHasOne('post', r => r.target('Post').inversedNotNull().inversedBy('link')))

@@ -3,7 +3,7 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('TODO', {
+testMigrations('make column not null', {
 	originalSchema: new SchemaBuilder()
 		.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
 		.buildSchema(),
@@ -23,6 +23,5 @@ testMigrations('TODO', {
 		},
 	],
 	sql: SQL`ALTER TABLE "author"
-		ALTER "name" SET DATA TYPE text,
 		ALTER "name" SET NOT NULL;`,
 })

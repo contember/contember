@@ -29,6 +29,5 @@ testMigrations('update column definition', {
 		},
 	],
 	sql: SQL`ALTER TABLE "author"
-		ALTER "registered_at" SET DATA TYPE timestamptz,
-		ALTER "registered_at" DROP NOT NULL;`,
+		ALTER "registered_at" SET DATA TYPE timestamptz;`,
 })

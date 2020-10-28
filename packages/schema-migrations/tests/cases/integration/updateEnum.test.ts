@@ -3,7 +3,7 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 
-testMigrations('TODO', {
+testMigrations('update enum', {
 	originalSchema: new SchemaBuilder()
 		.entity('Post', e =>
 			e

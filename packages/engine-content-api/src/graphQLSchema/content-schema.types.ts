@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql'
+import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
@@ -9,6 +9,7 @@ export type Scalars = {
 	Boolean: boolean
 	Int: number
 	Float: number
+	Json: any
 }
 
 export type _AnyValue = _IntValue | _StringValue | _BooleanValue | _FloatValue | _UndefinedValue
@@ -25,6 +26,7 @@ export type _Column = _Field & {
 	readonly name: Scalars['String']
 	readonly type: Scalars['String']
 	readonly enumName?: Maybe<Scalars['String']>
+	readonly defaultValue?: Maybe<Scalars['Json']>
 	readonly nullable: Scalars['Boolean']
 	readonly rules: ReadonlyArray<_Rule>
 	readonly validators: ReadonlyArray<_Validator>
@@ -266,6 +268,7 @@ export type ResolversTypes = {
 	Float: ResolverTypeWrapper<Scalars['Float']>
 	_UndefinedValue: ResolverTypeWrapper<_UndefinedValue>
 	_UniqueConstraint: ResolverTypeWrapper<_UniqueConstraint>
+	Json: ResolverTypeWrapper<Scalars['Json']>
 	_Column: ResolverTypeWrapper<_Column>
 	_OnDeleteBehaviour: _OnDeleteBehaviour
 	_RelationSide: _RelationSide
@@ -307,6 +310,7 @@ export type ResolversParentTypes = {
 	Float: Scalars['Float']
 	_UndefinedValue: _UndefinedValue
 	_UniqueConstraint: _UniqueConstraint
+	Json: Scalars['Json']
 	_Column: _Column
 	_OrderBy: _OrderBy
 	_Relation: _Relation
@@ -345,6 +349,7 @@ export type _ColumnResolvers<
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	enumName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	defaultValue?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
 	nullable?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	rules?: Resolver<ReadonlyArray<ResolversTypes['_Rule']>, ParentType, ContextType>
 	validators?: Resolver<ReadonlyArray<ResolversTypes['_Validator']>, ParentType, ContextType>
@@ -509,6 +514,10 @@ export type _ValidatorArgumentResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType>
 }
 
+export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Json'], any> {
+	name: 'Json'
+}
+
 export type QueryResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
@@ -538,6 +547,7 @@ export type Resolvers<ContextType = any> = {
 	_UniqueConstraint?: _UniqueConstraintResolvers<ContextType>
 	_Validator?: _ValidatorResolvers<ContextType>
 	_ValidatorArgument?: _ValidatorArgumentResolvers<ContextType>
+	Json?: GraphQLScalarType
 	Query?: QueryResolvers<ContextType>
 }
 

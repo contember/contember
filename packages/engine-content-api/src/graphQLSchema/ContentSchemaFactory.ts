@@ -104,6 +104,7 @@ export class ContentSchemaFactory {
 			visitColumn(entity: Model.Entity, column: Model.AnyColumn) {
 				return {
 					__typename: '_Column',
+					defaultValue: column.default ?? undefined,
 					enumName: column.type === ColumnType.Enum ? column.enumName : null,
 					nullable: column.nullable,
 				}

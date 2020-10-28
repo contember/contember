@@ -2,6 +2,8 @@ import { gql } from 'apollo-server-core'
 import { DocumentNode } from 'graphql'
 
 const schema: DocumentNode = gql`
+	scalar Json
+
 	type Query {
 		schema: _Schema
 	}
@@ -34,6 +36,7 @@ const schema: DocumentNode = gql`
 		name: String!
 		type: String!
 		enumName: String
+		defaultValue: Json
 		nullable: Boolean!
 		rules: [_Rule!]!
 		validators: [_Validator!]!

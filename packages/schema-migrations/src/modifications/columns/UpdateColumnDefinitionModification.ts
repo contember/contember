@@ -10,10 +10,15 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
 		const field = entity.fields[this.data.fieldName] as Model.AnyColumn
+		const definition = this.data.definition
 		builder.alterColumn(entity.tableName, field.columnName, {
-			type: this.data.definition.columnType,
-			default: this.data.definition.default,
-			notNull: !this.data.definition.nullable,
+			type:
+				definition.columnType !== field.columnType
+					? definition.type === Model.ColumnType.Enum
+						? `"${definition.columnType}"`
+						: definition.columnType
+					: undefined,
+			notNull: field.nullable !== definition.nullable ? !definition.nullable : undefined,
 		})
 	}
 

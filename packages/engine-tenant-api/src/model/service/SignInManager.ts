@@ -30,7 +30,7 @@ class SignInManager {
 		}
 		if (personRow.otp_uri && personRow.otp_activated_at) {
 			if (!otpCode) {
-				return new SignInManager.SignInResultError([SignInErrorCode.OtpRequried])
+				return new SignInManager.SignInResultError([SignInErrorCode.OtpRequired])
 			}
 			if (!verifyOtp({ uri: personRow.otp_uri }, otpCode)) {
 				return new SignInManager.SignInResultError([SignInErrorCode.InvalidOtpToken])

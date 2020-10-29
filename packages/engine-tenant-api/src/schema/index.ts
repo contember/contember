@@ -609,7 +609,7 @@ export type SignInError = {
 export enum SignInErrorCode {
 	UnknownEmail = 'UNKNOWN_EMAIL',
 	InvalidPassword = 'INVALID_PASSWORD',
-	OtpRequried = 'OTP_REQURIED',
+	OtpRequired = 'OTP_REQUIRED',
 	InvalidOtpToken = 'INVALID_OTP_TOKEN',
 }
 

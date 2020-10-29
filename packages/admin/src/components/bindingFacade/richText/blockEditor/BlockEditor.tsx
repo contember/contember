@@ -208,12 +208,17 @@ export const BlockEditor = Component<BlockEditorProps>(
 					}}
 					size="large"
 				>
-					<HoveringToolbars
-						inlineButtons={inlineButtons}
-						blockButtons={
-							<BlockHoveringToolbarContents blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
-						}
-					/>
+					{React.useMemo(
+						() => (
+							<HoveringToolbars
+								inlineButtons={inlineButtons}
+								blockButtons={
+									<BlockHoveringToolbarContents blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
+								}
+							/>
+						),
+						[blockButtons, inlineButtons, otherBlockButtons],
+					)}
 				</EditorCanvas>
 			</Slate>
 		)

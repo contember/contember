@@ -139,7 +139,7 @@ test('otp token not provided', async () => {
 			data: {
 				signIn: {
 					ok: false,
-					errors: [{ code: SignInErrorCode.OtpRequried }],
+					errors: [{ code: SignInErrorCode.OtpRequired }],
 					result: null,
 				},
 			},

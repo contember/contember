@@ -142,7 +142,7 @@ const schema: DocumentNode = gql`
 	enum SignInErrorCode {
 		UNKNOWN_EMAIL
 		INVALID_PASSWORD
-		OTP_REQURIED
+		OTP_REQUIRED
 		INVALID_OTP_TOKEN
 	}
 

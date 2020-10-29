@@ -2,13 +2,12 @@ import { EntityKeyProvider, FieldValue, RelativeSingleField } from '@contember/b
 import * as React from 'react'
 import { NormalizedBlocks } from '../../../blocks'
 import { NormalizedEmbedHandlers } from '../embed/core'
-import { NormalizedFieldBackedElement } from '../FieldBackedElement'
+import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockEditorElementRenderer } from '../renderers'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideRenderElementOptions {
 	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
-	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	normalizedReferenceBlocksRef: React.MutableRefObject<NormalizedBlocks>
 	referenceDiscriminationField: RelativeSingleField | undefined
 

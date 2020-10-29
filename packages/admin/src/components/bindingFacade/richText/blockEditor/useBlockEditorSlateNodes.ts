@@ -7,18 +7,18 @@ import {
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
 	ContemberFieldElement,
-	ContemberFieldElementPosition,
 	contemberFieldElementType,
 } from './elements'
-import { NormalizedFieldBackedElement } from './FieldBackedElement'
+import { FieldBackedElement } from './FieldBackedElement'
 
 export interface UseBlockEditorSlateNodesOptions {
 	editor: BlockSlateEditor
 	blockElementCache: WeakMap<EntityAccessor, ElementNode>
-	contemberFieldElementCache: WeakMap<FieldAccessor, ContemberFieldElement>
+	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	blockContentField: RelativeSingleField
 	topLevelBlocks: EntityAccessor[]
-	leadingFieldBackedElements: NormalizedFieldBackedElement[]
+	leadingFieldBackedElements: FieldBackedElement[]
+	leadingFieldBackedAccessors: FieldAccessor<string>[]
 	//trailingFieldBackedElements: NormalizedFieldBackedElement[]
 	placeholder: React.ReactNode
 }
@@ -30,45 +30,34 @@ export const useBlockEditorSlateNodes = ({
 	blockContentField,
 	topLevelBlocks,
 	leadingFieldBackedElements,
+	leadingFieldBackedAccessors,
 	//trailingFieldBackedElements,
 	placeholder,
 }: UseBlockEditorSlateNodesOptions): SlateElement[] => {
-	const adjacentAccessorsToElements = (
-		elements: NormalizedFieldBackedElement[],
-		position: ContemberFieldElementPosition,
-	): SlateElement[] =>
+	const adjacentAccessorsToElements = (elements: FieldBackedElement[]): SlateElement[] =>
 		elements.map((normalizedElement, index) => {
-			const existingElement = contemberFieldElementCache.get(normalizedElement.accessor)
+			const accessor = leadingFieldBackedAccessors[index]
+			const existingElement = contemberFieldElementCache.get(accessor)
 			if (existingElement) {
 				return existingElement
 			}
+
 			let element: ContemberFieldElement
-			const fieldValue = normalizedElement.accessor.currentValue
-			if (typeof fieldValue !== 'string' && fieldValue !== null) {
-				throw new BindingError(
-					`BlockEditor: The ${position} field backed element at index '${index}' does not contain a string value.`,
-				)
-			}
+			const fieldValue = accessor.currentValue
+
 			if (fieldValue === null || fieldValue === '' || normalizedElement.format === 'plainText') {
 				element = {
 					type: contemberFieldElementType,
 					children: [{ text: fieldValue || '' }],
-					position,
-					index,
 				}
 			} else {
-				const deserialized = editor.deserializeNodes(
-					fieldValue,
-					`BlockEditor: The ${position} field backed element at index '${index}' contains invalid JSON.`,
-				)
+				const deserialized = editor.deserializeNodes(fieldValue)
 				element = {
 					type: contemberFieldElementType,
 					children: deserialized,
-					position,
-					index,
 				}
 			}
-			contemberFieldElementCache.set(normalizedElement.accessor, element)
+			contemberFieldElementCache.set(accessor, element)
 			return element
 		})
 
@@ -102,7 +91,7 @@ export const useBlockEditorSlateNodes = ({
 					placeholder,
 				} as ContemberContentPlaceholderElement,
 		  ]
-	return adjacentAccessorsToElements(leadingFieldBackedElements, 'leading').concat(
+	return adjacentAccessorsToElements(leadingFieldBackedElements).concat(
 		topLevelBlockElements,
 		//adjacentAccessorsToElements(trailingFieldBackedElements, 'trailing'),
 	)

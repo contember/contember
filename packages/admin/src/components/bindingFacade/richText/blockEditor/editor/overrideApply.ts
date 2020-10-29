@@ -11,24 +11,19 @@ import {
 import * as React from 'react'
 import { Element as SlateElement, Node as SlateNode, Operation, Path as SlatePath } from 'slate'
 import { ElementNode, TextNode } from '../../baseEditor'
-import {
-	ContemberContentPlaceholderElement,
-	contemberContentPlaceholderType,
-	ContemberFieldElement,
-	ContemberFieldElementPosition,
-} from '../elements'
-import { NormalizedFieldBackedElement } from '../FieldBackedElement'
+import { ContemberContentPlaceholderElement, contemberContentPlaceholderType, ContemberFieldElement } from '../elements'
+import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideApplyOptions {
 	batchUpdatesRef: React.MutableRefObject<EntityAccessor['batchUpdates']>
 	blockContentField: RelativeSingleField
 	blockElementCache: WeakMap<EntityAccessor, ElementNode>
-	contemberFieldElementCache: WeakMap<FieldAccessor, ContemberFieldElement>
+	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	desugaredBlockList: RelativeEntityList
 	getEntityByKey: GetEntityByKey
 	isMutatingRef: React.MutableRefObject<boolean>
-	normalizedLeadingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
+	leadingFields: FieldBackedElement[]
 	placeholder: ContemberContentPlaceholderElement['placeholder']
 	sortableByField: RelativeSingleField
 	sortedBlocksRef: React.MutableRefObject<EntityAccessor[]>
@@ -44,20 +39,20 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 		desugaredBlockList,
 		getEntityByKey,
 		isMutatingRef,
-		normalizedLeadingFieldsRef,
+		leadingFields,
 		placeholder,
 		sortableByField,
 		sortedBlocksRef,
 	} = options
 
 	const fieldBackedElementRefs: {
-		[Key in ContemberFieldElementPosition]: React.MutableRefObject<NormalizedFieldBackedElement[]>
+		[Key in 'leading']: FieldBackedElement[]
 	} = {
-		leading: normalizedLeadingFieldsRef,
+		leading: leadingFields,
 		//trailing: normalizedTrailingFieldsRef,
 	}
 
-	const firstContentIndex = normalizedLeadingFieldsRef.current.length
+	const firstContentIndex = leadingFields.length
 	//const firstContentElementPath = Editor.pathRef(editor, [firstContentIndex], {
 	//	affinity: 'backward',
 	//})
@@ -78,7 +73,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			// TODO also handle trailing
 			const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
 			const isTrailingElement = (elementIndex: number) =>
-				elementIndex >= normalizedLeadingFieldsRef.current.length + Math.max(sortedTopLevelBlocks.length, 1)
+				elementIndex >= firstContentIndex + Math.max(sortedTopLevelBlocks.length, 1)
 			const isFieldBackedElement = (elementIndex: number) =>
 				isLeadingElement(elementIndex) || isTrailingElement(elementIndex)
 			const getNormalizedFieldBackedElement = (elementIndex: number) => {
@@ -86,7 +81,10 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 				if (!editor.isContemberFieldElement(fieldBackedElement)) {
 					throw new BindingError(`Corrupted data`)
 				}
-				return fieldBackedElementRefs[fieldBackedElement.position].current[fieldBackedElement.index]
+				if (isLeadingElement(elementIndex)) {
+					return leadingFields[elementIndex]
+				}
+				throw new BindingError(`Corrupted data`)
 			}
 			const setTopLevelNode = (elementIndex: number, properties: object) => {
 				apply({
@@ -96,8 +94,8 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					properties,
 				})
 			}
-			const getFreshFieldAccessor = (position: ContemberFieldElementPosition, normalizedFieldIndex: number) =>
-				getAccessor().getRelativeSingleField(fieldBackedElementRefs[position].current[normalizedFieldIndex].field)
+			const getFreshFieldAccessor = (position: 'leading', normalizedFieldIndex: number) =>
+				getAccessor().getField(fieldBackedElementRefs[position][normalizedFieldIndex].field)
 			const setFieldBackedElementValue = (
 				position: keyof typeof fieldBackedElementRefs,
 				normalizedFieldIndex: number,
@@ -128,8 +126,8 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 						normalizedField.format === 'editorJSON'
 							? editor.serializeNodes(targetElement.children)
 							: SlateNode.string(targetElement)
-					getAccessor().getRelativeSingleField(normalizedField.field).updateValue(targetValue)
-					contemberFieldElementCache.set(getAccessor().getRelativeSingleField(normalizedField.field), targetElement)
+					getAccessor().getField(normalizedField.field).updateValue(targetValue)
+					contemberFieldElementCache.set(getAccessor().getField(normalizedField.field), targetElement)
 				} else {
 					const sortedEntityIndex = elementIndex - firstContentIndex
 					if (!entity) {

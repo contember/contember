@@ -12,7 +12,6 @@ import {
 } from '../elements'
 import { NormalizedEmbedHandlers } from '../embed/core'
 import { BlockVoidReferenceElementRenderer } from './BlockVoidReferenceElementRenderer'
-import { BlockEditorGetNormalizedFieldBackedElementContext } from './ContemberElementRefreshContext'
 import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
 import { EmbedElementRenderer } from './EmbedElementRenderer'
 
@@ -54,18 +53,7 @@ export const BlockEditorElementRenderer = ({
 		)
 	}
 	if (isContemberFieldElement(element)) {
-		return (
-			<BlockEditorGetNormalizedFieldBackedElementContext.Consumer>
-				{getNormalizedFieldBackedElement => (
-					<ContemberFieldElementRenderer
-						attributes={attributes}
-						children={children}
-						element={element}
-						fieldBackedElement={getNormalizedFieldBackedElement(element)}
-					/>
-				)}
-			</BlockEditorGetNormalizedFieldBackedElementContext.Consumer>
-		)
+		return <ContemberFieldElementRenderer attributes={attributes} children={children} element={element} />
 	}
 	if (isEmbedElement(element)) {
 		return (

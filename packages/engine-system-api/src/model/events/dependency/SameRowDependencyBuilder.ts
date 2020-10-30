@@ -24,7 +24,7 @@ export class SameRowDependencyBuilder implements DependencyBuilder {
 			if (junctionTables.has(event.tableName)) {
 				continue
 			}
-			assert.equal(event.rowId.length, 1)
+			assert.strictEqual(event.rowId.length, 1)
 			const ref = formatRef(event.rowId[0], event.tableName)
 
 			const events = rows.add(ref, event.id)

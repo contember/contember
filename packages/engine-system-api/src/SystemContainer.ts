@@ -32,7 +32,6 @@ import {
 	SameRowDependencyBuilder,
 	SchemaVersionBuilder,
 	StageCreator,
-	TableReferencingResolver,
 	TransactionDependencyBuilder,
 } from './model'
 import { Resolvers } from './schema'
@@ -116,15 +115,14 @@ export class SystemContainerFactory {
 				({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory),
 			)
 
-			.addService('tableReferencingResolver', () => new TableReferencingResolver())
 			.addService(
 				'dependencyBuilder',
-				({ tableReferencingResolver }) =>
+				({}) =>
 					new DependencyBuilderList([
 						new SameRowDependencyBuilder(),
 						new TransactionDependencyBuilder(),
-						new DeletedRowReferenceDependencyBuilder(tableReferencingResolver),
-						new CreatedRowReferenceDependencyBuilder(tableReferencingResolver),
+						new DeletedRowReferenceDependencyBuilder(),
+						new CreatedRowReferenceDependencyBuilder(),
 					]),
 			)
 			.addService(

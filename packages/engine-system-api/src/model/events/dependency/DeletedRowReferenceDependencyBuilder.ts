@@ -1,8 +1,8 @@
 import { ContentEvent, EventType } from '@contember/engine-common'
 import { DependencyBuilder, EventsDependencies } from '../DependencyBuilder'
-import { TableReferencingResolver, TableReferencingResolverResult } from '../TableReferencingResolver'
+import { getTableReferencing, TableReferencingResolverResult } from '../TableReferencingResolver'
 import { Schema } from '@contember/schema'
-import { getJunctionTables } from '../../helpers/modelHelpers'
+import { getJunctionTables } from '../../helpers'
 import assert from 'assert'
 import { MapSet } from '../../../utils'
 
@@ -17,16 +17,12 @@ import { MapSet } from '../../../utils'
  *
  */
 export class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
-	constructor(private readonly tableReferencingResolver: TableReferencingResolver) {}
-
 	async build(schema: Schema, events: ContentEvent[]): Promise<EventsDependencies> {
 		if (events.length === 0) {
 			return new MapSet()
 		}
 
-		const tableReferencing: TableReferencingResolverResult = this.tableReferencingResolver.getTableReferencing(
-			schema.model,
-		)
+		const tableReferencing: TableReferencingResolverResult = getTableReferencing(schema.model)
 		const formatRef = (id: string, table: string) => `${table}#${id}`
 		const dependencies: EventsDependencies = new MapSet()
 		const deletedRows = new Map()

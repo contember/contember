@@ -23,7 +23,9 @@ export const createRootMiddleware = (
 	prometheusRegistry: prom.Registry,
 ): KoaMiddleware<any> => {
 	return compose([
-		koaCompress(),
+		koaCompress({
+			br: false,
+		}),
 		createColllectHttpMetricsMiddleware(prometheusRegistry),
 		createDebugInfoMiddleware(debug),
 		createServicesProviderMiddleware(services),

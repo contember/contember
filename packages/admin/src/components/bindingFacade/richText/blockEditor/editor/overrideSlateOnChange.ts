@@ -6,9 +6,9 @@ import {
 	RelativeSingleField,
 } from '@contember/binding'
 import * as React from 'react'
-import { Editor, Element as SlateElement, Node as SlateNode, PathRef } from 'slate'
+import { Editor, Node as SlateNode, PathRef } from 'slate'
 import { assertNever } from '../../../../../utils'
-import { EditorNode, ElementNode, TextNode } from '../../baseEditor'
+import { EditorNode, ElementNode } from '../../baseEditor'
 import { ContemberContentPlaceholderElement, ContemberFieldElement } from '../elements'
 import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
@@ -129,8 +129,6 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 			})
 		}
 
-		console.log('onChange: node op', operations)
-
 		return batchUpdatesRef.current((getAccessor, { getEntityByKey }) => {
 			const processedAccessors: Array<true | undefined> = Array.from({
 				length: editor.children.length - leadingCount - trailingCount,
@@ -197,16 +195,6 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 				}
 			}
 
-			for (const operation of operations) {
-				if (operation.type === 'remove_node') {
-					purgeElementReferences(operation.node)
-				} else if (operation.type === 'merge_node') {
-					// TODO: purge references. But HOW?!
-				} else if (operation.type === 'split_node') {
-					// TODO: clone references. But HOW?!
-				}
-			}
-
 			return slateOnChange()
 		})
 	}
@@ -229,18 +217,5 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 			.getRelativeSingleField(blockContentField)
 			.updateValue(editor.serializeNodes([element]))
 		blockElementCache.set(getEntityByKey(key), element)
-	}
-
-	const purgeElementReferences = (element: ElementNode | TextNode) => {
-		if (!SlateElement.isElement(element)) {
-			return
-		}
-		if ('referenceId' in element && element.referenceId !== undefined) {
-			const referencedEntity = getEntityByKey(element.referenceId)
-			referencedEntity.deleteEntity()
-		}
-		for (const child of element.children) {
-			purgeElementReferences(child)
-		}
 	}
 }

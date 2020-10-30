@@ -17,11 +17,12 @@ import {
 } from './overrideInsertElementWithReference'
 import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
-import { overrideSlateOnChange, OverrideOnChangeOptions } from './overrideSlateOnChange'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
+import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
 
 export interface CreateEditorOptions
 	extends OverrideOnChangeOptions,
+		OverrideApplyOptions,
 		OverrideRenderElementOptions,
 		OverrideInsertDataOptions,
 		OverrideInsertElementWithReferenceOptions,
@@ -54,6 +55,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 
 			overrideIsVoid(e)
 
+			overrideApply(e, options)
 			overrideSlateOnChange(e, options)
 
 			overrideRenderElement(e, options)

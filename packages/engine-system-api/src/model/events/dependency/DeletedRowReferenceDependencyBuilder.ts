@@ -4,7 +4,7 @@ import { getTableReferencing, TableReferencingResolverResult } from '../TableRef
 import { Schema } from '@contember/schema'
 import { getJunctionTables } from '../../helpers'
 import assert from 'assert'
-import { MapSet } from '../../../utils'
+import { MapSet, tuple } from '../../../utils'
 
 /**
  * Delete event depends on all previous events which references this row
@@ -26,11 +26,12 @@ export class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 		const formatRef = (id: string, table: string) => `${table}#${id}`
 		const dependencies: EventsDependencies = new MapSet()
 		const deletedRows = new Map()
-		const junctionTables = new Set(getJunctionTables(schema.model).map(it => it.tableName))
+		const junctionTables = getJunctionTables(schema.model)
+		const junctionTableMap = new Map(junctionTables.map(it => tuple(it.tableName, it)))
 
 		for (const event of events) {
-			if (!junctionTables.has(event.tableName)) {
-				assert.equal(event.rowId.length, 1)
+			if (!junctionTableMap.has(event.tableName)) {
+				assert.strictEqual(event.rowId.length, 1)
 				if (event.type === EventType.delete) {
 					deletedRows.set(formatRef(event.rowId[0], event.tableName), event.id)
 				}
@@ -41,16 +42,30 @@ export class DeletedRowReferenceDependencyBuilder implements DependencyBuilder {
 			if (event.type !== EventType.create && event.type !== EventType.update) {
 				continue
 			}
-
-			for (let column in event.values) {
-				const referencedTable = tableReferencing[event.tableName][column]
-				if (!referencedTable) {
-					continue
-				}
-				const ref = formatRef(event.values[column], referencedTable)
-				const deleteEventId = deletedRows.get(ref)
-				if (deleteEventId) {
-					dependencies.add(deleteEventId, event.id)
+			const junctionTable = junctionTableMap.get(event.tableName)
+			if (junctionTable) {
+				event.rowId.forEach((id, index) => {
+					assert.ok(index === 0 || index === 1)
+					const columnName =
+						index === 0 ? junctionTable.joiningColumn.columnName : junctionTable.inverseJoiningColumn.columnName
+					const table = tableReferencing[junctionTable.tableName][columnName]
+					const ref = formatRef(id, table)
+					const deleteEventId = deletedRows.get(ref)
+					if (deleteEventId) {
+						dependencies.add(deleteEventId, event.id)
+					}
+				})
+			} else {
+				for (let column in event.values) {
+					const referencedTable = tableReferencing[event.tableName][column]
+					if (!referencedTable) {
+						continue
+					}
+					const ref = formatRef(event.values[column], referencedTable)
+					const deleteEventId = deletedRows.get(ref)
+					if (deleteEventId) {
+						dependencies.add(deleteEventId, event.id)
+					}
 				}
 			}
 		}

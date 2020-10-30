@@ -1,4 +1,3 @@
-import * as React from 'react'
-import { BindingOperationsContext } from './BindingOperationsContext'
+import { useBindingOperations } from './useBindingOperations'
 
-export const useGetEntitySubTree = () => React.useContext(BindingOperationsContext).getEntitySubTree
+export const useGetEntitySubTree = () => useBindingOperations().getEntitySubTree

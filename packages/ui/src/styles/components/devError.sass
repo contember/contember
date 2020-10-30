@@ -6,6 +6,12 @@
 	100%
 		opacity: 1
 
+@keyframes #{$cui-conf-globalPrefix}devErrorBanner
+	0%
+		background-position: 0 0
+	100%
+		background-position: (500px) (-500px)
+
 @keyframes #{$cui-conf-globalPrefix}devErrorIntroIn
 	0%
 		opacity: 0
@@ -26,8 +32,9 @@
 	&::before
 		+absolute(0)
 		content: ''
-		background: center center url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='500px' width='500px'><text text-anchor='middle' x='250' y='250' fill='red' font-size='60' font-weight='900' style='transform-origin: center center; transform: rotate(-45deg)'>FATAL ERROR</text></svg>") repeat
+		background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='500px' width='500px'><text text-anchor='middle' x='250' y='250' fill='red' font-size='60' font-weight='900' style='transform-origin: center center; transform: rotate(-45deg)'>FATAL ERROR</text></svg>") repeat
 		opacity: 0.2
+		animation: #{$cui-conf-globalPrefix}devErrorBanner 10s linear infinite
 
 	&-in
 		z-index: 100

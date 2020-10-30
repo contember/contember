@@ -1,9 +1,15 @@
-import { EntityAccessor, EntityListAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
-import * as ReactDOM from 'react-dom'
+import {
+	BindingOperations,
+	EntityAccessor,
+	EntityListAccessor,
+	FieldValue,
+	RelativeSingleField,
+} from '@contember/binding'
 import { ElementNode } from '../../baseEditor'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertElementWithReferenceOptions {
+	bindingOperations: BindingOperations
 	createNewReference: EntityListAccessor.CreateNewEntity | undefined
 	referenceDiscriminationField: RelativeSingleField | undefined
 }
@@ -12,7 +18,7 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 	editor: E,
 	options: OverrideInsertElementWithReferenceOptions,
 ) => {
-	const { createNewReference, referenceDiscriminationField } = options
+	const { bindingOperations, createNewReference, referenceDiscriminationField } = options
 	if (referenceDiscriminationField === undefined || createNewReference === undefined) {
 		return
 	}
@@ -21,15 +27,17 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 		referenceDiscriminant: FieldValue,
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => {
-		let theUuid: string = ''
+		let theUuid: string = 'richEditorIsBroken'
 
-		createNewReference((getNewReference, bindingOperations) => {
-			getNewReference().getField('id').asUuid.setToUuid()
-			getNewReference().getField(referenceDiscriminationField).updateValue(referenceDiscriminant)
+		bindingOperations.batchDeferredUpdates(() => {
+			createNewReference((getNewReference, bindingOperations) => {
+				getNewReference().getField('id').asUuid.setToUuid()
+				getNewReference().getField(referenceDiscriminationField).updateValue(referenceDiscriminant)
 
-			theUuid = getNewReference().getField<string>('id').currentValue!
+				theUuid = getNewReference().getField<string>('id').currentValue!
 
-			initialize?.(getNewReference, bindingOperations)
+				initialize?.(getNewReference, bindingOperations)
+			})
 		})
 
 		editor.insertNode({

@@ -1,7 +1,7 @@
 import {
+	BindingOperations,
 	EntityAccessor,
 	FieldAccessor,
-	GetEntityByKey,
 	RelativeEntityList,
 	RelativeSingleField,
 } from '@contember/binding'
@@ -15,12 +15,12 @@ import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideOnChangeOptions {
 	batchUpdatesRef: React.MutableRefObject<EntityAccessor['batchUpdates']>
+	bindingOperations: BindingOperations
 	blockContentField: RelativeSingleField
 	blockElementCache: WeakMap<EntityAccessor, ElementNode>
 	blockElementPathRefs: Map<string, PathRef>
 	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	desugaredBlockList: RelativeEntityList
-	getEntityByKey: GetEntityByKey
 	isMutatingRef: React.MutableRefObject<boolean>
 	leadingFields: FieldBackedElement[]
 	trailingFields: FieldBackedElement[]
@@ -33,12 +33,12 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 	editor: E,
 	{
 		batchUpdatesRef,
+		bindingOperations,
 		blockContentField,
 		blockElementCache,
 		blockElementPathRefs,
 		contemberFieldElementCache,
 		desugaredBlockList,
-		getEntityByKey,
 		isMutatingRef,
 		leadingFields,
 		trailingFields,
@@ -48,6 +48,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 	}: OverrideOnChangeOptions,
 ) => {
 	const { slateOnChange } = editor
+	const { getEntityByKey } = bindingOperations
 
 	editor.slateOnChange = () => {
 		const { children, operations } = editor

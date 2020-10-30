@@ -9,10 +9,10 @@ import {
 	SugaredField,
 	SugaredFieldProps,
 	SugaredRelativeEntityList,
+	useBindingOperations,
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEnvironment,
-	useGetEntityByKey,
 	useMutationState,
 	useParentEntityAccessor,
 	useRelativeEntityList,
@@ -20,7 +20,7 @@ import {
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { emptyArray, noop, useConstantLengthInvariant } from '@contember/react-utils'
+import { emptyArray, useConstantLengthInvariant } from '@contember/react-utils'
 import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
 import { PathRef } from 'slate'
@@ -66,7 +66,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 	props => {
 		const environment = useEnvironment()
 		const isMutating = useMutationState()
-		const getEntityByKey = useGetEntityByKey()
+		const bindingOperations = useBindingOperations()
 
 		assertStaticBlockEditorInvariants(props, environment)
 
@@ -163,6 +163,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 				augmentEditor,
 				augmentEditorBuiltins,
 				batchUpdatesRef,
+				bindingOperations,
 				blockContentField: desugaredBlockContentField,
 				blockElementCache,
 				blockElementPathRefs,
@@ -173,7 +174,6 @@ export const BlockEditor = Component<BlockEditorProps>(
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
 				embedSubBlocks,
-				getEntityByKey,
 				isMutatingRef,
 				leadingFields: leadingFieldBackedElements,
 				trailingFields: trailingFieldBackedElements,

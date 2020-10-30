@@ -143,6 +143,11 @@ export class AccessorTreeGenerator {
 		getTreeFilters: (): TreeFilter[] => {
 			return this.treeFilterGenerator.generateTreeFilter()
 		},
+		batchDeferredUpdates: performUpdates => {
+			this.batchTreeWideUpdates(() => {
+				performUpdates(this.bindingOperations)
+			})
+		},
 	})
 
 	private readonly getNewTreeRootInstance = () =>

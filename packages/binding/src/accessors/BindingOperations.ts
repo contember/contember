@@ -12,4 +12,6 @@ export interface BindingOperations {
 	getEntitySubTree: GetEntitySubTree
 	getAllEntities: () => Generator<EntityAccessor>
 	getTreeFilters: () => TreeFilter[]
+
+	batchDeferredUpdates: (performUpdates: (bindingOperations: BindingOperations) => void) => void
 }

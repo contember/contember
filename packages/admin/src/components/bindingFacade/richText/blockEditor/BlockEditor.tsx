@@ -23,6 +23,7 @@ import {
 import { emptyArray, noop, useConstantLengthInvariant } from '@contember/react-utils'
 import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
+import { PathRef } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater } from '../../collections'
@@ -45,7 +46,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 	children?: React.ReactNode
 
 	leadingFieldBackedElements?: FieldBackedElement[]
-	//trailingFieldBackedElements?: FieldBackedElement[]
+	trailingFieldBackedElements?: FieldBackedElement[]
 
 	referencesField?: SugaredRelativeEntityList | string
 	referenceDiscriminationField?: SugaredFieldProps['field']
@@ -76,6 +77,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 			children,
 
 			leadingFieldBackedElements = emptyArray,
+			trailingFieldBackedElements = emptyArray,
 
 			referencesField,
 			referenceDiscriminationField,
@@ -112,7 +114,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 		//
 
 		const leadingAccessors = useFieldBackedElements(parentEntity, leadingFieldBackedElements)
-		//const trailingAccessors = useFieldBackedElements(parentEntity, trailingFieldBackedElements)
+		const trailingAccessors = useFieldBackedElements(parentEntity, trailingFieldBackedElements)
 
 		const normalizedReferenceBlocks = useNormalizedBlocks(children)
 		const { entities: topLevelBlocks } = useSortedEntities(blockList, sortableBy)
@@ -138,6 +140,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 			() => new WeakMap<FieldAccessor<string>, ContemberFieldElement>(),
 		)
 		const [blockElementCache] = React.useState(() => new WeakMap<EntityAccessor, ElementNode>())
+		const [blockElementPathRefs] = React.useState(() => new Map<string, PathRef>())
 
 		//
 
@@ -162,6 +165,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 				batchUpdatesRef,
 				blockContentField: desugaredBlockContentField,
 				blockElementCache,
+				blockElementPathRefs,
 				contemberFieldElementCache,
 				createNewReference: referenceList?.createNewEntity,
 				desugaredBlockList,
@@ -172,6 +176,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 				getEntityByKey,
 				isMutatingRef,
 				leadingFields: leadingFieldBackedElements,
+				trailingFields: trailingFieldBackedElements,
 				normalizedReferenceBlocksRef,
 				placeholder: label,
 				plugins,
@@ -185,17 +190,19 @@ export const BlockEditor = Component<BlockEditorProps>(
 			placeholder: label,
 			editor,
 			blockElementCache,
+			blockElementPathRefs,
 			blockContentField: desugaredBlockContentField,
 			contemberFieldElementCache,
 			topLevelBlocks,
-			leadingFieldBackedElements: leadingFieldBackedElements,
+			leadingFieldBackedElements,
+			trailingFieldBackedElements,
 			leadingFieldBackedAccessors: leadingAccessors,
-			//trailingFieldBackedElements,
+			trailingFieldBackedAccessors: trailingAccessors,
 		})
 
 		// TODO label?
 		return (
-			<Slate editor={editor} value={nodes} onChange={noop}>
+			<Slate editor={editor} value={nodes} onChange={editor.slateOnChange}>
 				<EditorCanvas
 					underlyingComponent={Editable}
 					componentProps={{
@@ -233,9 +240,9 @@ export const BlockEditor = Component<BlockEditorProps>(
 				{props.leadingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`leading_${i}`} />
 				))}
-				{/*props.trailingFieldBackedElements?.map((item, i) => (
+				{props.trailingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`trailing_${i}`} />
-				))*/}
+				))}
 				<Repeater {...props} initialEntityCount={0}>
 					<SugaredField field={props.sortableBy} />
 					<SugaredField field={props.contentField} />

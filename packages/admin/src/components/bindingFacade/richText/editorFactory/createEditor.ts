@@ -17,7 +17,6 @@ import {
 } from '../plugins'
 import { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
 import { defaultEditorPluginPreset } from './presets'
-import { BatchUpdatesRef, withBatching } from './withBatching'
 
 const pluginAugmenters: {
 	[pluginName in BuiltinEditorPlugins]: (editor: BaseEditor) => BaseEditor
@@ -45,13 +44,11 @@ export interface CreateEditorPublicOptions {
 }
 
 export interface CreateEditorOptions extends CreateEditorPublicOptions {
-	batchUpdatesRef: BatchUpdatesRef
 	defaultElementType: string
 	addEditorBuiltins: (augmentedBaseEditor: BaseEditor) => BaseEditor
 }
 
 export const createEditor = ({
-	batchUpdatesRef,
 	plugins = defaultEditorPluginPreset,
 	defaultElementType,
 	augmentEditorBuiltins = identityFunction,
@@ -66,7 +63,6 @@ export const createEditor = ({
 
 	const withAugmentedBase = augmentEditor(baseEditor)
 	const withBuiltins = addEditorBuiltins(withAugmentedBase)
-	const withAugmentedBuiltins = augmentEditorBuiltins(withBuiltins)
 
-	return withBatching(withAugmentedBuiltins, batchUpdatesRef)
+	return augmentEditorBuiltins(withBuiltins)
 }

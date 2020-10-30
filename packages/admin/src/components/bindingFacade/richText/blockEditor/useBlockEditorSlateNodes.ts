@@ -1,6 +1,6 @@
 import { BindingError, EntityAccessor, FieldAccessor, RelativeSingleField } from '@contember/binding'
 import * as React from 'react'
-import { Element as SlateElement } from 'slate'
+import { Editor, Element as SlateElement, PathRef } from 'slate'
 import { ElementNode } from '../baseEditor'
 import { BlockSlateEditor } from './editor'
 import {
@@ -14,29 +14,48 @@ import { FieldBackedElement } from './FieldBackedElement'
 export interface UseBlockEditorSlateNodesOptions {
 	editor: BlockSlateEditor
 	blockElementCache: WeakMap<EntityAccessor, ElementNode>
+	blockElementPathRefs: Map<string, PathRef>
 	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	blockContentField: RelativeSingleField
 	topLevelBlocks: EntityAccessor[]
 	leadingFieldBackedElements: FieldBackedElement[]
+	trailingFieldBackedElements: FieldBackedElement[]
 	leadingFieldBackedAccessors: FieldAccessor<string>[]
-	//trailingFieldBackedElements: NormalizedFieldBackedElement[]
+	trailingFieldBackedAccessors: FieldAccessor<string>[]
 	placeholder: React.ReactNode
 }
 
 export const useBlockEditorSlateNodes = ({
 	editor,
 	blockElementCache,
+	blockElementPathRefs,
 	contemberFieldElementCache,
 	blockContentField,
 	topLevelBlocks,
 	leadingFieldBackedElements,
+	trailingFieldBackedElements,
 	leadingFieldBackedAccessors,
-	//trailingFieldBackedElements,
+	trailingFieldBackedAccessors,
 	placeholder,
 }: UseBlockEditorSlateNodesOptions): SlateElement[] => {
-	const adjacentAccessorsToElements = (elements: FieldBackedElement[]): SlateElement[] =>
+	if (editor.operations.length) {
+		// This is *ABSOLUTELY CRUCIAL*!
+		//	Slate invokes the onChange callback asynchronously, and so it could happen that this hook is invoked whilst
+		//	there are pending changes that the onChange routines haven't had a chance to let binding know about yet.
+		//	In those situations, if this hook were to generate elements based on accessors, it would effectively
+		//	prevent the pending changes from ever happening because Slate updates editor.children based on the value
+		//	this hook generates and onChange in turn uses editor.children to update accessors.
+		//	Consequently, whenever there are pending changes, we just return whatever children the editor already has
+		//	because we know that an onChange is already scheduled.
+		return editor.children as SlateElement[]
+	}
+
+	const adjacentAccessorsToElements = (
+		elements: FieldBackedElement[],
+		accessors: FieldAccessor<string>[],
+	): SlateElement[] =>
 		elements.map((normalizedElement, index) => {
-			const accessor = leadingFieldBackedAccessors[index]
+			const accessor = accessors[index]
 			const existingElement = contemberFieldElementCache.get(accessor)
 			if (existingElement) {
 				return existingElement
@@ -62,8 +81,22 @@ export const useBlockEditorSlateNodes = ({
 		})
 
 	const topLevelBlockElements = topLevelBlocks.length
-		? topLevelBlocks.map(entity => {
+		? topLevelBlocks.map((entity, index) => {
 				const existingBlockElement = blockElementCache.get(entity)
+
+				const blockPathRef = blockElementPathRefs.get(entity.key)
+				const desiredIndex = index + leadingFieldBackedElements.length
+
+				if (blockPathRef === undefined) {
+					blockElementPathRefs.set(entity.key, Editor.pathRef(editor, [desiredIndex], { affinity: 'backward' }))
+				} else {
+					const current = blockPathRef.current
+					if (current === null || current.length !== 1 || current[0] !== desiredIndex) {
+						blockPathRef.unref()
+						blockElementPathRefs.set(entity.key, Editor.pathRef(editor, [desiredIndex], { affinity: 'backward' }))
+					}
+				}
+
 				if (existingBlockElement) {
 					return existingBlockElement
 				}
@@ -91,8 +124,9 @@ export const useBlockEditorSlateNodes = ({
 					placeholder,
 				} as ContemberContentPlaceholderElement,
 		  ]
-	return adjacentAccessorsToElements(leadingFieldBackedElements).concat(
+	return ([] as SlateElement[]).concat(
+		adjacentAccessorsToElements(leadingFieldBackedElements, leadingFieldBackedAccessors),
 		topLevelBlockElements,
-		//adjacentAccessorsToElements(trailingFieldBackedElements, 'trailing'),
+		adjacentAccessorsToElements(trailingFieldBackedElements, trailingFieldBackedAccessors),
 	)
 }

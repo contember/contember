@@ -7,7 +7,7 @@ export type FieldBackedElement = {
 	render: (props: { isEmpty: boolean; children: React.ReactNode }) => React.ReactNode
 } & (
 	| {
-			format: 'editorJSON'
+			format: 'richText'
 			// TODO specific settings
 	  }
 	| {

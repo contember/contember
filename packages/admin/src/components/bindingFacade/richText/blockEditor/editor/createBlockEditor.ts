@@ -1,4 +1,5 @@
 import { BindingError } from '@contember/binding'
+import { noop } from '@contember/react-utils'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
 import {
@@ -16,10 +17,11 @@ import {
 } from './overrideInsertElementWithReference'
 import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
+import { overrideSlateOnChange, OverrideOnChangeOptions } from './overrideSlateOnChange'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 
 export interface CreateEditorOptions
-	extends OverrideApplyOptions,
+	extends OverrideOnChangeOptions,
 		OverrideRenderElementOptions,
 		OverrideInsertDataOptions,
 		OverrideInsertElementWithReferenceOptions,
@@ -48,10 +50,11 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 						`Check the BlockEditor props.`,
 				)
 			}
+			e.slateOnChange = noop
 
 			overrideIsVoid(e)
 
-			overrideApply(e, options)
+			overrideSlateOnChange(e, options)
 
 			overrideRenderElement(e, options)
 			overrideInsertNode(e)
@@ -61,6 +64,5 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			return e
 		},
 		defaultElementType: paragraphElementType,
-		batchUpdatesRef: options.batchUpdatesRef,
 	}) as BlockSlateEditor
 }

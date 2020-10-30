@@ -24,6 +24,7 @@ export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, Blo
 		referenceDiscriminant: FieldValue,
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => void
+	slateOnChange: () => void
 }
 
 export type EditorWithBlockElements<E extends BaseEditor> = WithAnotherNodeType<E, BlockEditorElements> &

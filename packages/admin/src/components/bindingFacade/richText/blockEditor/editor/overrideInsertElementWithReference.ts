@@ -1,4 +1,5 @@
 import { EntityAccessor, EntityListAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
+import * as ReactDOM from 'react-dom'
 import { ElementNode } from '../../baseEditor'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
@@ -20,18 +21,20 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 		referenceDiscriminant: FieldValue,
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => {
+		let theUuid: string = ''
+
 		createNewReference((getNewReference, bindingOperations) => {
 			getNewReference().getField('id').asUuid.setToUuid()
 			getNewReference().getField(referenceDiscriminationField).updateValue(referenceDiscriminant)
 
-			const theUuid = getNewReference().getField<string>('id').currentValue!
+			theUuid = getNewReference().getField<string>('id').currentValue!
 
 			initialize?.(getNewReference, bindingOperations)
+		})
 
-			editor.insertNode({
-				...element,
-				referenceId: theUuid,
-			})
+		editor.insertNode({
+			...element,
+			referenceId: theUuid,
 		})
 	}
 }

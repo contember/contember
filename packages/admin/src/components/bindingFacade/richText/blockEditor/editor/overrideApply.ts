@@ -123,7 +123,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 					}
 					const normalizedField = getNormalizedFieldBackedElement(elementIndex)
 					const targetValue =
-						normalizedField.format === 'editorJSON'
+						normalizedField.format === 'richText'
 							? editor.serializeNodes(targetElement.children)
 							: SlateNode.string(targetElement)
 					getAccessor().getField(normalizedField.field).updateValue(targetValue)

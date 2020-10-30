@@ -18,7 +18,6 @@ export const BlockElement = React.memo(function BlockElement({
 	withBoundaries = false,
 }: BlockElementProps) {
 	const editor = useEditor() as EditorWithEssentials<EditorNode>
-	const elementPath = ReactEditor.findPath(editor, element)
 	const dataAttributes = ContemberEditor.getElementDataAttributes(element)
 
 	return React.createElement(
@@ -32,7 +31,10 @@ export const BlockElement = React.memo(function BlockElement({
 				{withBoundaries && (
 					<EditorBlockBoundary
 						blockEdge="before"
-						onClick={() => editor.insertBetweenBlocks([element, elementPath], 'before')}
+						onClick={() => {
+							const elementPath = ReactEditor.findPath(editor, element)
+							editor.insertBetweenBlocks([element, elementPath], 'before')
+						}}
 					/>
 				)}
 			</React.Fragment>,
@@ -41,7 +43,10 @@ export const BlockElement = React.memo(function BlockElement({
 				{withBoundaries && (
 					<EditorBlockBoundary
 						blockEdge="after"
-						onClick={() => editor.insertBetweenBlocks([element, elementPath], 'after')}
+						onClick={() => {
+							const elementPath = ReactEditor.findPath(editor, element)
+							editor.insertBetweenBlocks([element, elementPath], 'after')
+						}}
 					/>
 				)}
 			</React.Fragment>,

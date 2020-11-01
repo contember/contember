@@ -29,7 +29,7 @@ export class DevErrorBoundary extends React.PureComponent<DevErrorBoundaryProps,
 				</Portal>
 			) : null
 
-		if (__DEV_MODE__ && this.state.caughtErrors.length > 5) {
+		if (__DEV_MODE__ && this.state.caughtErrors.length > 1) {
 			return errorSlot
 		}
 

@@ -12,9 +12,11 @@ export const getElementDataAttributes = <Element extends ElementNode = ElementNo
 	const { children, ...extendedSpecifics } = element
 
 	return Object.fromEntries(
-		Object.entries(extendedSpecifics).map(([attribute, value]) => [
-			`data-${attributeNamePrefix}-${attribute.toLowerCase()}`,
-			value as Scalar,
-		]),
+		Object.entries(extendedSpecifics)
+			.filter(([, value]) => {
+				const t = typeof value
+				return t === 'string' || t === 'number' || t === 'boolean'
+			})
+			.map(([attribute, value]) => [`data-${attributeNamePrefix}-${attribute.toLowerCase()}`, value as Scalar]),
 	)
 }

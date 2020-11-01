@@ -21,10 +21,8 @@ export interface OverrideOnChangeOptions {
 	blockElementPathRefs: Map<string, PathRef>
 	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	desugaredBlockList: RelativeEntityList
-	isMutatingRef: React.MutableRefObject<boolean>
 	leadingFields: FieldBackedElement[]
 	trailingFields: FieldBackedElement[]
-	placeholder: ContemberContentPlaceholderElement['placeholder']
 	sortableByField: RelativeSingleField
 	sortedBlocksRef: React.MutableRefObject<EntityAccessor[]>
 }
@@ -39,10 +37,8 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 		blockElementPathRefs,
 		contemberFieldElementCache,
 		desugaredBlockList,
-		isMutatingRef,
 		leadingFields,
 		trailingFields,
-		placeholder,
 		sortableByField,
 		sortedBlocksRef,
 	}: OverrideOnChangeOptions,
@@ -138,32 +134,39 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 			for (const [blockKey, pathRef] of blockElementPathRefs) {
 				const current = pathRef.current
 				const originalBlock = getEntityByKey(blockKey)
-
-				if (current === null || current.length > 1) {
+				const cleanUp = () => {
 					originalBlock.deleteEntity()
 					pathRef.unref()
 					blockElementPathRefs.delete(blockKey)
+				}
+
+				if (current === null || current.length > 1) {
+					cleanUp()
 				} else {
 					const newBlockIndex = current[0]
-					const newBlockOrder = newBlockIndex - leadingCount
 
-					if (processedAccessors[newBlockOrder]) {
-						// This path has already been processed. This happens when nodes get merged.
-						originalBlock.deleteEntity()
-						pathRef.unref()
-						blockElementPathRefs.delete(blockKey)
+					if (newBlockIndex < leadingCount || newBlockIndex >= children.length - trailingCount) {
+						// This path points to a leading/trailing element.
+						cleanUp()
 					} else {
-						const originalElement = blockElementCache.get(originalBlock)
-						const currentElement = editor.children[newBlockIndex] as EditorNode
+						const newBlockOrder = newBlockIndex - leadingCount
 
-						if (
-							originalElement !== currentElement ||
-							originalBlock.getRelativeSingleField(sortableByField).currentValue !== newBlockOrder
-						) {
-							getEntityByKey(blockKey).getRelativeSingleField(sortableByField).updateValue(newBlockOrder)
-							saveBlockElement(blockKey, currentElement)
+						if (processedAccessors[newBlockOrder]) {
+							// This path has already been processed. This happens when nodes get merged.
+							cleanUp()
+						} else {
+							const originalElement = blockElementCache.get(originalBlock)
+							const currentElement = editor.children[newBlockIndex] as EditorNode
+
+							if (
+								originalElement !== currentElement ||
+								originalBlock.getRelativeSingleField(sortableByField).currentValue !== newBlockOrder
+							) {
+								getEntityByKey(blockKey).getRelativeSingleField(sortableByField).updateValue(newBlockOrder)
+								saveBlockElement(blockKey, currentElement)
+							}
+							processedAccessors[newBlockOrder] = true
 						}
-						processedAccessors[newBlockOrder] = true
 					}
 				}
 			}
@@ -181,6 +184,8 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 						trailingFields[topLevelIndex],
 						children[topLevelIndex] as ContemberFieldElement,
 					)
+				} else if (editor.isContemberContentPlaceholderElement(child)) {
+					// Do nothing
 				} else {
 					const blockOrder = topLevelIndex - leadingCount
 					const isProcessed = processedAccessors[blockOrder]

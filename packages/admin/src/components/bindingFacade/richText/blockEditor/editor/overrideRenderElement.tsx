@@ -7,7 +7,6 @@ import { BlockEditorElementRenderer } from '../renderers'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideRenderElementOptions {
-	//normalizedTrailingFieldsRef: React.MutableRefObject<NormalizedFieldBackedElement[]>
 	normalizedReferenceBlocksRef: React.MutableRefObject<NormalizedBlocks>
 	referenceDiscriminationField: RelativeSingleField | undefined
 
@@ -15,6 +14,9 @@ export interface OverrideRenderElementOptions {
 	embedSubBlocks: NormalizedBlocks | undefined
 	embedHandlers: NormalizedEmbedHandlers | undefined
 	embedReferenceDiscriminateBy: FieldValue | undefined
+
+	leadingFields: FieldBackedElement[]
+	trailingFields: FieldBackedElement[]
 }
 
 export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, options: OverrideRenderElementOptions) => {
@@ -33,6 +35,8 @@ export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, opt
 				embedSubBlocks={options.embedSubBlocks}
 				embedHandlers={options.embedHandlers}
 				embedReferenceDiscriminateBy={options.embedReferenceDiscriminateBy}
+				leadingFields={options.leadingFields}
+				trailingFields={options.trailingFields}
 			/>
 		)
 

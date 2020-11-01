@@ -11,6 +11,7 @@ import {
 	isEmbedElement,
 } from '../elements'
 import { NormalizedEmbedHandlers } from '../embed/core'
+import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockVoidReferenceElementRenderer } from './BlockVoidReferenceElementRenderer'
 import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
 import { EmbedElementRenderer } from './EmbedElementRenderer'
@@ -25,9 +26,12 @@ export interface BlockEditorElementRendererProps extends RenderElementProps {
 	embedSubBlocks: NormalizedBlocks | undefined
 	embedHandlers: NormalizedEmbedHandlers | undefined
 	embedReferenceDiscriminateBy: FieldValue | undefined
+
+	leadingFields: FieldBackedElement[]
+	trailingFields: FieldBackedElement[]
 }
 
-export const BlockEditorElementRenderer = ({
+export function BlockEditorElementRenderer({
 	fallbackRenderer,
 	embedContentDiscriminationField,
 	embedHandlers,
@@ -35,8 +39,10 @@ export const BlockEditorElementRenderer = ({
 	embedSubBlocks,
 	normalizedReferenceBlocks,
 	referenceDiscriminationField,
+	leadingFields,
+	trailingFields,
 	...renderElementProps
-}: BlockEditorElementRendererProps) => {
+}: BlockEditorElementRendererProps) {
 	const { attributes, children, element } = renderElementProps
 	if (isBlockVoidReferenceElement(element)) {
 		if (referenceDiscriminationField === undefined) {
@@ -53,7 +59,15 @@ export const BlockEditorElementRenderer = ({
 		)
 	}
 	if (isContemberFieldElement(element)) {
-		return <ContemberFieldElementRenderer attributes={attributes} children={children} element={element} />
+		return (
+			<ContemberFieldElementRenderer
+				attributes={attributes}
+				children={children}
+				element={element}
+				leadingFields={leadingFields}
+				trailingFields={trailingFields}
+			/>
+		)
 	}
 	if (isEmbedElement(element)) {
 		return (

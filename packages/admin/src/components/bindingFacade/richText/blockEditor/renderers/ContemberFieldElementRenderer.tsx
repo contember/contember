@@ -1,36 +1,45 @@
-import { EditorPlaceholder, ErrorList } from '@contember/ui'
+import { EditorPlaceholder } from '@contember/ui'
 import * as React from 'react'
-import { Node as SlateNode } from 'slate'
-import { RenderElementProps } from 'slate-react'
+import { Node as SlateNode, Path as SlatePath } from 'slate'
+import { ReactEditor, RenderElementProps, useEditor } from 'slate-react'
 import { BlockElement } from '../../baseEditor'
 import { ContemberFieldElement } from '../elements'
+import { FieldBackedElement } from '../FieldBackedElement'
 
 export interface ContemberFieldElementRendererProps extends RenderElementProps {
 	element: ContemberFieldElement
+	leadingFields: FieldBackedElement[]
+	trailingFields: FieldBackedElement[]
 }
 
 export const ContemberFieldElementRenderer = React.memo((props: ContemberFieldElementRendererProps) => {
 	const fieldString = SlateNode.string(props.element)
 	const shouldDisplayPlaceholder = fieldString === ''
+	const editor = useEditor()
+	const path = ReactEditor.findPath(editor, props.element)
+	const parentPath = SlatePath.parent(path)
+	const parent = SlateNode.get(editor, parentPath)
+	const lastIndex = path[path.length - 1]
+
+	let fieldBackedElement: FieldBackedElement =
+		lastIndex < props.leadingFields.length
+			? props.leadingFields[lastIndex]
+			: props.trailingFields[props.trailingFields.length - (parent.children.length - lastIndex)]
+
 	return (
 		<BlockElement attributes={props.attributes} element={props.element}>
-			{props.children}
-			{/*<div contentEditable={false}>*/}
-			{/*	{props.fieldBackedElement.render({*/}
-			{/*		isEmpty: shouldDisplayPlaceholder,*/}
-			{/*		children: (*/}
-			{/*			<div contentEditable={true}>*/}
-			{/*				{shouldDisplayPlaceholder && (*/}
-			{/*					<EditorPlaceholder>{props.fieldBackedElement.placeholder}</EditorPlaceholder>*/}
-			{/*				)}*/}
-			{/*				{props.children}*/}
-			{/*			</div>*/}
-			{/*		),*/}
-			{/*	})}*/}
-			{/*</div>*/}
-			{/*{!!props.fieldBackedElement.accessor.errors.length && (*/}
+			{fieldBackedElement.render({
+				isEmpty: shouldDisplayPlaceholder,
+				children: (
+					<>
+						{shouldDisplayPlaceholder && <EditorPlaceholder>{fieldBackedElement.placeholder}</EditorPlaceholder>}
+						{props.children}
+					</>
+				),
+			})}
+			{/*{!!props.element.accessor.errors.length && (*/}
 			{/*	<div contentEditable={false} data-slate-editor={false}>*/}
-			{/*		<ErrorList errors={props.fieldBackedElement.accessor.errors} size="small" />*/}
+			{/*		<ErrorList errors={props.element.accessor.errors} size="small" />*/}
 			{/*	</div>*/}
 			{/*)}*/}
 		</BlockElement>

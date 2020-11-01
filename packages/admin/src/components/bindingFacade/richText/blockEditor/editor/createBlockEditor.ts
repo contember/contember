@@ -10,6 +10,7 @@ import {
 } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
+import { overrideInsertBreak } from './overrideInsertBreak'
 import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData'
 import {
 	overrideInsertElementWithReference,
@@ -18,6 +19,7 @@ import {
 import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
 import { overrideNormalizeNode, OverrideNormalizeNodeOptions } from './overrideNormalizeNode'
+import { overrideOnKeyDown } from './overrideOnKeyDown'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
 
@@ -55,16 +57,16 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			}
 			e.slateOnChange = noop
 
-			overrideIsVoid(e)
-
 			overrideApply(e, options)
-			overrideSlateOnChange(e, options)
-
-			overrideNormalizeNode(e, options)
-			overrideRenderElement(e, options)
-			overrideInsertNode(e)
+			overrideInsertBreak(e, options)
 			overrideInsertData(e, options)
 			overrideInsertElementWithReference(e, options)
+			overrideInsertNode(e)
+			overrideIsVoid(e)
+			overrideNormalizeNode(e, options)
+			overrideOnKeyDown(e, options)
+			overrideRenderElement(e, options)
+			overrideSlateOnChange(e, options)
 
 			return e
 		},

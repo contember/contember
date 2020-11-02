@@ -277,8 +277,10 @@ export class AccessorTreeGenerator {
 			didUpdate = true
 		}
 
-		if (newPersistedId.value !== state.id.value) {
+		if (!(state.id instanceof ServerGeneratedUuid) || newPersistedId.value !== state.id.value) {
 			state.id = newPersistedId
+			state.maidenKey = undefined
+			state.hasIdSetInStone = true
 			didUpdate = true
 		}
 

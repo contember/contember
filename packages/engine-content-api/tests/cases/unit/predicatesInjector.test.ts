@@ -52,11 +52,7 @@ predicateInjectorTest('injects predicate', () => {
 	const result = injector.inject(schema.entities['PostLocale'], {})
 
 	assert.equal(result, {
-		and: [
-			{
-				locale: { in: ['cs'] },
-			},
-		],
+		locale: { in: ['cs'] },
 	})
 })
 

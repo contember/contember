@@ -17,6 +17,9 @@ class PredicatesInjector {
 		if (and.length === 0) {
 			return {}
 		}
+		if (and.length === 1) {
+			return and[0]
+		}
 		return { and: and }
 	}
 

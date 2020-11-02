@@ -75,7 +75,7 @@ const calculatorFormula = ( // 10 * ((5 - 3) + (2 * 6)) === 140
 
 describe('children analyzer', () => {
 	it('should gather children props', () => {
-		const fooLeaf = new Leaf((props: FooComponentProps): FooComponentProps => props)
+		const fooLeaf = new Leaf<FooComponentProps>(node => (node as React.ReactElement<FooComponentProps>).props)
 		const analyzer = new ChildrenAnalyzer<FooComponentProps>([fooLeaf])
 
 		expect(analyzer.processChildren(simpleFooComponentTree, undefined)).toEqual([
@@ -85,14 +85,14 @@ describe('children analyzer', () => {
 		])
 	})
 	it('should filter leaves by component type', () => {
-		const fooLeaf = new Leaf((props: FooComponentProps): FooComponentProps => props, FooComponent)
-		const barLeaf = new Leaf(
-			(props: BarComponentProps): BarComponentProps => ({
+		const fooLeaf = new Leaf(node => node.props, FooComponent)
+		const barLeaf = new Leaf((node): BarComponentProps => {
+			const props = node.props
+			return {
 				bar: `${props.bar}${props.bar}`,
 				baz: props.baz + 1,
-			}),
-			BarComponent,
-		)
+			}
+		}, BarComponent)
 		const analyzer = new ChildrenAnalyzer<FooComponentProps | BarComponentProps>([fooLeaf, barLeaf])
 
 		expect(analyzer.processChildren(simpleFooBarComponentTree, undefined)).toEqual([
@@ -102,7 +102,7 @@ describe('children analyzer', () => {
 		])
 	})
 	it('should correctly process leaves & branch nodes', () => {
-		const numberLeaf = new Leaf((props: NumberComponentProps) => props.value, NumberComponent)
+		const numberLeaf = new Leaf(node => node.props.value, NumberComponent)
 		const calculatorBranchNode = new BranchNode('compute', (children: RawNodeRepresentation<number, number>): [
 			number,
 			number,
@@ -116,7 +116,7 @@ describe('children analyzer', () => {
 		expect(analyser.processChildren(calculatorFormula, undefined)).toEqual([140])
 	})
 	it('should not ignore unhandled nodes when appropriate', () => {
-		const fooLeaf = new Leaf((props: FooComponentProps): FooComponentProps => props, FooComponent)
+		const fooLeaf = new Leaf(node => node.props, FooComponent)
 		const Container: React.FunctionComponent = props => <>{props.children}</>
 		;(Container as any).staticRender = (props: any) => props.children
 
@@ -148,6 +148,35 @@ describe('children analyzer', () => {
 			{ foo: '456', baz: 456 },
 			{ foo: '789', baz: 789 },
 			{ foo: '135', baz: 135 },
+		])
+	})
+	it('should process arbitrary nodes and support catch-all leaves', () => {
+		const fooLeaf = new Leaf(node => node.props, FooComponent)
+		const catchAllLef = new Leaf<any>(node => node)
+
+		const analyzer = new ChildrenAnalyzer([fooLeaf, catchAllLef])
+
+		const nodes = (
+			<>
+				<>
+					{123}
+					<FooComponent foo="123" baz={123} />
+					bar<a href="#baz">baz</a>
+					<FooComponent foo="456" baz={456} />
+					<br />
+					<FooComponent foo="789" baz={789} />
+				</>
+			</>
+		)
+
+		expect(analyzer.processChildren(nodes, undefined)).toEqual([
+			123,
+			{ foo: '123', baz: 123 },
+			'bar',
+			<a href="#baz">baz</a>,
+			{ foo: '456', baz: 456 },
+			<br />,
+			{ foo: '789', baz: 789 },
 		])
 	})
 })

@@ -1,6 +1,12 @@
+import * as React from 'react'
+
 export type UseSiteBranchNodeRepresentationFactory<
 	Props extends {},
 	ChildrenRepresentation,
 	Representation,
 	StaticContext
-> = (props: Props, childrenRepresentation: ChildrenRepresentation, staticContext: StaticContext) => Representation
+> = (
+	node: React.ReactElement<Props, any>,
+	childrenRepresentation: ChildrenRepresentation,
+	staticContext: StaticContext,
+) => Representation

@@ -1,21 +1,28 @@
-import { BaseComponent, RepresentationFactorySite, LeafRepresentationFactory, ValidFactoryName } from './types'
+import * as React from 'react'
+import {
+	ConstrainedLeafRepresentationFactory,
+	RepresentationFactorySite,
+	UnconstrainedLeafRepresentationFactory,
+	ValidFactoryName,
+} from './types'
 
 class Leaf<
+	Props extends {} = {},
 	StaticContext = any,
 	FactoryMethodName extends ValidFactoryName = string,
-	Representation = any,
-	Props extends {} = {}
+	Representation = any
 > {
 	public readonly specification: Leaf.Specification<FactoryMethodName, Representation, Props, StaticContext>
 
 	public constructor(factoryMethodName: FactoryMethodName)
+	public constructor(staticFactory: UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>)
 	public constructor(
-		staticFactory: LeafRepresentationFactory<Props, Representation, StaticContext>,
-		ComponentType?: BaseComponent<Props>,
+		staticFactory: ConstrainedLeafRepresentationFactory<Props, Representation, StaticContext>,
+		ComponentType: React.ElementType<Props>,
 	)
 	public constructor(
-		factory: FactoryMethodName | LeafRepresentationFactory<Props, Representation, StaticContext>,
-		ComponentType?: BaseComponent<Props>,
+		factory: FactoryMethodName | UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>,
+		ComponentType?: React.ElementType<Props>,
 	) {
 		if (typeof factory === 'function') {
 			this.specification = {
@@ -45,8 +52,8 @@ namespace Leaf {
 		  }
 		| {
 				type: RepresentationFactorySite.UseSite
-				factory: LeafRepresentationFactory<Props, Representation, StaticContext>
-				ComponentType?: BaseComponent<Props>
+				factory: UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>
+				ComponentType?: React.ElementType<Props>
 		  }
 }
 

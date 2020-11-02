@@ -1,17 +1,17 @@
+import * as React from 'react'
 import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError'
 import { BranchNodeOptions } from './BranchNodeOptions'
 import {
-	BaseComponent,
 	ChildrenRepresentationReducer,
-	UseSiteBranchNodeRepresentationFactory,
 	RepresentationFactorySite,
+	UseSiteBranchNodeRepresentationFactory,
 	ValidFactoryName,
 } from './types'
 
 class BranchNode<
+	Props extends {} = {},
 	StaticContext = undefined,
 	FactoryMethodName extends ValidFactoryName = string,
-	Props extends {} = {},
 	ChildrenRepresentation = any,
 	ReducedChildrenRepresentation = any,
 	Representation = any
@@ -21,9 +21,9 @@ class BranchNode<
 	}
 
 	public readonly specification: BranchNode.Specification<
+		Props,
 		StaticContext,
 		FactoryMethodName,
-		Props,
 		ChildrenRepresentation,
 		ReducedChildrenRepresentation,
 		Representation
@@ -43,7 +43,7 @@ class BranchNode<
 			Representation,
 			StaticContext
 		>,
-		ComponentType?: BaseComponent<Props>,
+		ComponentType?: React.ElementType<Props>,
 		options?: Partial<BranchNodeOptions>,
 	)
 	public constructor(
@@ -52,7 +52,7 @@ class BranchNode<
 			| UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>,
 		componentOrReducer?:
 			| ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>
-			| BaseComponent<Props>,
+			| React.ElementType<Props>,
 		options?: Partial<BranchNodeOptions>,
 	) {
 		if (typeof factory !== 'function') {
@@ -68,7 +68,7 @@ class BranchNode<
 			this.specification = {
 				type: RepresentationFactorySite.UseSite,
 				factory,
-				ComponentType: componentOrReducer as BaseComponent<Props>,
+				ComponentType: componentOrReducer as React.ElementType<Props>,
 			}
 		} else {
 			throw new ChildrenAnalyzerError('Invalid arguments')
@@ -82,9 +82,9 @@ class BranchNode<
 
 namespace BranchNode {
 	export type Specification<
+		Props extends {} = {},
 		StaticContext = any,
 		FactoryMethodName extends ValidFactoryName = string,
-		Props extends {} = {},
 		ChildrenRepresentation = any,
 		ReducedChildrenRepresentation = any,
 		Representation = any
@@ -100,7 +100,7 @@ namespace BranchNode {
 		| {
 				type: RepresentationFactorySite.UseSite
 				factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>
-				ComponentType?: BaseComponent<Props>
+				ComponentType?: React.ElementType<Props>
 		  }
 }
 

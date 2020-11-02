@@ -11,10 +11,13 @@ export class ButtonFormGroupProps {
 	public constructor(public readonly formGroupProps: FormGroupProps, public readonly buttonProps: ButtonProps) {}
 }
 
-const buttonLeaf = new Leaf((props: ButtonProps) => new BoxedButtonProps(props), Button)
+const buttonLeaf = new Leaf(node => new BoxedButtonProps(node.props), Button)
 
 const formGroupBranchNode = new BranchNode(
-	(props: FormGroupProps, childrenRepresentation: RawNodeRepresentation<BoxedButtonProps, ButtonFormGroupProps>) => {
+	(
+		{ props }: React.ReactElement<FormGroupProps>,
+		childrenRepresentation: RawNodeRepresentation<BoxedButtonProps, ButtonFormGroupProps>,
+	) => {
 		if (childrenRepresentation instanceof BoxedButtonProps) {
 			return new ButtonFormGroupProps(props, childrenRepresentation.props)
 		}

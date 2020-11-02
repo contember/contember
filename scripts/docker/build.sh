@@ -16,13 +16,19 @@ fi
 MAIN_VERSION=${ALL_VERSIONS[0]}
 
 REPO="contember/contember"
-docker build -t "$REPO:$MAIN_VERSION" -f ./packages/engine-server/Dockerfile .
+docker build -t "$REPO:$MAIN_VERSION" -f ./packages/engine-server/alpine.dockerfile .
 for VERSION in "${ALL_VERSIONS[@]:1}"
 do
   docker tag "$REPO:$MAIN_VERSION" "$REPO:$VERSION"
 done
 docker push "$REPO"
 
+docker build -t "$REPO:$MAIN_VERSION-debian" -f ./packages/engine-server/debian.dockerfile .
+for VERSION in "${ALL_VERSIONS[@]:1}"
+do
+  docker tag "$REPO:$MAIN_VERSION-debian" "$REPO:$VERSION-debian"
+done
+docker push "$REPO"
 
 REPO="contember/cli"
 docker build -t "$REPO:$MAIN_VERSION" -f ./packages/cli/Dockerfile .

@@ -1,17 +1,15 @@
-FROM node:12-alpine as builder
+FROM node:14 as builder
 
 WORKDIR /src
 ENV NODE_ENV "production"
 COPY ./packages/engine-server ./
 COPY ./yarn.lock ./
-RUN apk --no-cache add --virtual builds-deps build-base python
 RUN yarn install
 
-FROM node:12-alpine
-
-RUN apk --no-cache add curl
+FROM node:14
 
 WORKDIR /src
+
 COPY --from=builder /src/ /src
 
 ENV NODE_ENV "production"

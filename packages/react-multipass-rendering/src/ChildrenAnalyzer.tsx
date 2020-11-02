@@ -115,116 +115,116 @@ export class ChildrenAnalyzer<
 
 		let children: React.ReactNode = undefined
 
-		if ('type' in node) {
-			children = node.props.children
+		if (!('type' in node)) {
+			return this.processNode(children, staticContext)
+		}
+		children = node.props.children
 
-			if (typeof node.type === 'symbol') {
-				// React.Fragment, React.Portal or other non-component
-				return this.processNode(children, staticContext)
-			}
-			if (typeof node.type === 'string') {
-				// Typically a host component
-				if (!this.options.ignoreUnhandledNodes) {
-					throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, staticContext))
-				}
-				return this.processNode(children, staticContext)
-			}
-
-			// React.Component, React.PureComponent, React.FunctionComponent
-
-			const treeNode = node.type as BaseComponent<any> &
-				{
-					[staticMethod in ValidFactoryName]:
-						| StaticContextFactory<any, StaticContext>
-						| SyntheticChildrenFactory<any, StaticContext>
-						| LeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
-						| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
-				}
-
-			if (this.options.staticContextFactoryName in treeNode) {
-				const staticContextFactory = treeNode[this.options.staticContextFactoryName] as StaticContextFactory<
-					any,
-					StaticContext
-				>
-				staticContext = staticContextFactory(node.props, staticContext)
-			}
-
-			if (this.options.staticRenderFactoryName in treeNode) {
-				const factory = treeNode[this.options.staticRenderFactoryName] as SyntheticChildrenFactory<any, StaticContext>
-				children = factory(node.props, staticContext)
-			}
-
-			for (const leaf of this.leaves) {
-				const specification = leaf.specification
-				switch (specification.type) {
-					case RepresentationFactorySite.DeclarationSite: {
-						const { factoryMethodName } = specification
-
-						if (factoryMethodName in treeNode) {
-							const factory = treeNode[factoryMethodName] as LeafRepresentationFactory<
-								any,
-								AllBranchNodesRepresentation | AllLeavesRepresentation,
-								StaticContext
-							>
-							return factory(node.props, staticContext)
-						}
-						break
-					}
-					case RepresentationFactorySite.UseSite: {
-						const { ComponentType, factory } = specification
-						if (ComponentType === undefined || node.type === ComponentType) {
-							return factory(node.props, staticContext)
-						}
-						break
-					}
-					default:
-						return assertNever(specification)
-				}
-			}
-
-			const processedChildren = this.processNode(children, staticContext)
-
-			for (const branchNode of this.branchNodes) {
-				const specification = branchNode.specification
-				switch (specification.type) {
-					case RepresentationFactorySite.DeclarationSite: {
-						const { factoryMethodName, childrenRepresentationReducer } = specification
-
-						if (factoryMethodName in treeNode) {
-							if (!processedChildren) {
-								throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
-							}
-							const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
-								any,
-								unknown,
-								AllBranchNodesRepresentation | AllLeavesRepresentation,
-								StaticContext
-							>
-							return factory(node.props, childrenRepresentationReducer(processedChildren), staticContext)
-						}
-						break
-					}
-					case RepresentationFactorySite.UseSite: {
-						const { factory, ComponentType } = specification
-						if (ComponentType === undefined || node.type === ComponentType) {
-							if (!processedChildren) {
-								throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
-							}
-							return factory(node.props, processedChildren, staticContext)
-						}
-						break
-					}
-					default:
-						return assertNever(specification)
-				}
-			}
-
-			if (!this.options.ignoreUnhandledNodes && !(this.options.staticRenderFactoryName in treeNode)) {
+		if (typeof node.type === 'symbol') {
+			// React.Fragment, React.Portal or other non-component
+			return this.processNode(children, staticContext)
+		}
+		if (typeof node.type === 'string') {
+			// Typically a host component
+			if (!this.options.ignoreUnhandledNodes) {
 				throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, staticContext))
 			}
-
-			return processedChildren
+			return this.processNode(children, staticContext)
 		}
-		return this.processNode(children, staticContext)
+
+		// React.Component, React.PureComponent, React.FunctionComponent
+
+		const treeNode = node.type as BaseComponent<any> &
+			{
+				[staticMethod in ValidFactoryName]:
+					| StaticContextFactory<any, StaticContext>
+					| SyntheticChildrenFactory<any, StaticContext>
+					| LeafRepresentationFactory<any, AllLeavesRepresentation, StaticContext>
+					| DeclarationSiteNodeRepresentationFactory<any, unknown, AllBranchNodesRepresentation, StaticContext>
+			}
+
+		if (this.options.staticContextFactoryName in treeNode) {
+			const staticContextFactory = treeNode[this.options.staticContextFactoryName] as StaticContextFactory<
+				any,
+				StaticContext
+			>
+			staticContext = staticContextFactory(node.props, staticContext)
+		}
+
+		if (this.options.staticRenderFactoryName in treeNode) {
+			const factory = treeNode[this.options.staticRenderFactoryName] as SyntheticChildrenFactory<any, StaticContext>
+			children = factory(node.props, staticContext)
+		}
+
+		for (const leaf of this.leaves) {
+			const specification = leaf.specification
+			switch (specification.type) {
+				case RepresentationFactorySite.DeclarationSite: {
+					const { factoryMethodName } = specification
+
+					if (factoryMethodName in treeNode) {
+						const factory = treeNode[factoryMethodName] as LeafRepresentationFactory<
+							any,
+							AllBranchNodesRepresentation | AllLeavesRepresentation,
+							StaticContext
+						>
+						return factory(node.props, staticContext)
+					}
+					break
+				}
+				case RepresentationFactorySite.UseSite: {
+					const { ComponentType, factory } = specification
+					if (ComponentType === undefined || node.type === ComponentType) {
+						return factory(node.props, staticContext)
+					}
+					break
+				}
+				default:
+					return assertNever(specification)
+			}
+		}
+
+		const processedChildren = this.processNode(children, staticContext)
+
+		for (const branchNode of this.branchNodes) {
+			const specification = branchNode.specification
+			switch (specification.type) {
+				case RepresentationFactorySite.DeclarationSite: {
+					const { factoryMethodName, childrenRepresentationReducer } = specification
+
+					if (factoryMethodName in treeNode) {
+						if (!processedChildren) {
+							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
+						}
+						const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
+							any,
+							unknown,
+							AllBranchNodesRepresentation | AllLeavesRepresentation,
+							StaticContext
+						>
+						return factory(node.props, childrenRepresentationReducer(processedChildren), staticContext)
+					}
+					break
+				}
+				case RepresentationFactorySite.UseSite: {
+					const { factory, ComponentType } = specification
+					if (ComponentType === undefined || node.type === ComponentType) {
+						if (!processedChildren) {
+							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
+						}
+						return factory(node.props, processedChildren, staticContext)
+					}
+					break
+				}
+				default:
+					return assertNever(specification)
+			}
+		}
+
+		if (!this.options.ignoreUnhandledNodes && !(this.options.staticRenderFactoryName in treeNode)) {
+			throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, staticContext))
+		}
+
+		return processedChildren
 	}
 }

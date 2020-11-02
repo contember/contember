@@ -65,7 +65,8 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 export const BlockEditor = Component<BlockEditorProps>(
 	props => {
 		const environment = useEnvironment()
-		const isMutating = useMutationState()
+		//const isMutating = useMutationState()
+		const isMutating = false // TODO see the pathRef flushing below
 		const bindingOperations = useBindingOperations()
 
 		assertStaticBlockEditorInvariants(props, environment)
@@ -157,6 +158,24 @@ export const BlockEditor = Component<BlockEditorProps>(
 			sortedBlocksRef.current = topLevelBlocks
 			normalizedReferenceBlocksRef.current = normalizedReferenceBlocks
 		}) // Deliberately no deps array
+
+		// TODO This is the epitome of *BRITTLE*.
+		//		We need the path refs to reflect the ID changes of newly created entities. As far as this component is
+		//		concerned, this happens right after persist. Unfortunately, we don't have an event that would fire at just
+		//		the right moment quite yet, and so we do this. This works as long as there aren't any re-renders between
+		//		the event and the actual moment we're after. For now, that holds but it can break at any time in the most
+		//		unpredictable and sinister fashion. We *REALLY* need to change this.
+		const addBlockListListener = blockList.addEventListener
+		React.useEffect(
+			() =>
+				addBlockListListener('beforePersist', () => {
+					for (const [, ref] of blockElementPathRefs) {
+						ref.unref()
+					}
+					blockElementPathRefs.clear()
+				}),
+			[addBlockListListener, blockElementPathRefs],
+		)
 
 		const [editor] = React.useState(() =>
 			createBlockEditor({

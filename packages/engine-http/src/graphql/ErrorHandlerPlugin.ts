@@ -4,7 +4,6 @@ import { ApolloError as ApolloCoreError, GraphQLRequestContext } from 'apollo-se
 import { UserError } from '@contember/engine-content-api'
 import { GraphQLError } from 'graphql'
 import { extractOriginalError } from './errorExtract'
-import { GraphQLResponse } from 'graphql-extensions'
 import { ApolloServerPlugin, GraphQLRequestListener } from 'apollo-server-plugin-base'
 
 interface ErrorContext {
@@ -19,7 +18,7 @@ export type ErrorLogger = (error: any, context: ErrorContext) => void
 
 export type ErrorContextProvider = () => Pick<ErrorContext, 'url' | 'body' | 'user'>
 
-type Context = { errorContextProvider: ErrorContextProvider }
+type Context = { errorContextProvider?: ErrorContextProvider }
 
 export class ErrorHandlerPlugin implements ApolloServerPlugin {
 	constructor(
@@ -31,8 +30,9 @@ export class ErrorHandlerPlugin implements ApolloServerPlugin {
 	requestDidStart(requestContext: GraphQLRequestContext<Context>): GraphQLRequestListener<Context> {
 		return {
 			willSendResponse: ({ response, context }) => {
-				if (response.errors) {
-					response.errors = response.errors.map((it: any) => this.processError(it, context.errorContextProvider))
+				const errorContextProvider = context.errorContextProvider
+				if (response.errors && errorContextProvider) {
+					response.errors = response.errors.map((it: any) => this.processError(it, errorContextProvider))
 				}
 			},
 		}

@@ -32,7 +32,7 @@ class ContentApolloServerFactory {
 	) {}
 
 	public create(permissions: Acl.Permissions, schema: Schema, dataSchema: GraphQLSchema): ApolloServer {
-		const plugins: ApolloServerPlugin<ExtendedGraphqlContext>[] = [
+		const plugins: ApolloServerPlugin[] = [
 			new GraphqlInfoProviderPlugin(),
 			new ErrorHandlerPlugin(this.projectName, 'content', this.errorLogger),
 		]

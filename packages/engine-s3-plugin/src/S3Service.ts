@@ -43,7 +43,8 @@ export class S3Service {
 			s3ForcePathStyle: !!config.endpoint,
 		})
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		this.endpoint = this.s3.config.endpoint!
+		const endpoint = this.s3.config.endpoint!
+		this.endpoint = typeof endpoint === 'string' ? endpoint : endpoint.href
 	}
 
 	public getSignedUploadUrl(

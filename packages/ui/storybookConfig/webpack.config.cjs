@@ -21,7 +21,7 @@ module.exports = ({ config }) => {
 				loader: 'sass-loader',
 				options: {
 					sourceMap: true,
-					sourceMapContents: false,
+					//sourceMapContents: false,
 				},
 			},
 		],

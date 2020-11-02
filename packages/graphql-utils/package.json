@@ -12,6 +12,6 @@
     "graphql": "^14.6.0"
   },
   "peerDependencies": {
-    "graphql": "*"
+    "graphql": "^14.6.0"
   }
 }

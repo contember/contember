@@ -62,7 +62,8 @@ class WhereBuilder {
 			const expr = where.or
 			conditionBuilder = conditionBuilder.or(clause =>
 				expr.reduce(
-					(clause2, where: Input.Where) => this.buildInternal(clause2, entity, path, where, allowManyJoin, joinList),
+					(clause2, where: Input.Where) =>
+						clause2.and(clause3 => this.buildInternal(clause3, entity, path, where, allowManyJoin, joinList)),
 					clause,
 				),
 			)

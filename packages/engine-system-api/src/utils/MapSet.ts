@@ -1,6 +1,10 @@
 export class MapSet<K, V> {
 	public readonly map = new Map<K, Set<V>>()
 
+	get size() {
+		return this.map.size
+	}
+
 	has(key: K): boolean {
 		return this.map.has(key)
 	}

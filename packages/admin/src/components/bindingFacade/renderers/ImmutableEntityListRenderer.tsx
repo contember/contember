@@ -15,6 +15,8 @@ export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtra
 		| 'addButtonComponent'
 		| 'enableAddingNew'
 		| 'enableRemoving'
+		| 'dragHandleComponent'
+		| 'useDragHandle'
 	> {
 	beforeContent?: React.ReactNode
 	afterContent?: React.ReactNode

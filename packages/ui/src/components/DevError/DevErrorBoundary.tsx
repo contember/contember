@@ -5,27 +5,33 @@ import { DevError } from './DevError'
 export interface DevErrorBoundaryProps {}
 
 interface DevErrorBoundaryState {
-	caughtError?: [Error, React.ErrorInfo]
+	caughtErrors: [Error, React.ErrorInfo][]
 }
 
 export class DevErrorBoundary extends React.PureComponent<DevErrorBoundaryProps, DevErrorBoundaryState> {
 	state: DevErrorBoundaryState = {
-		caughtError: undefined,
+		caughtErrors: [],
 	}
 
 	public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
 		this.setState({
-			caughtError: [error, errorInfo],
+			caughtErrors: [...this.state.caughtErrors, [error, errorInfo]],
 		})
 	}
 
 	public render() {
+		// TODO actually render all the errors
+		// TODO detect when an error happens on mount
 		const errorSlot =
-			__DEV_MODE__ && this.state.caughtError ? (
+			__DEV_MODE__ && this.state.caughtErrors.length ? (
 				<Portal>
-					<DevError error={this.state.caughtError[0]} stack={this.state.caughtError[1].componentStack} />
+					<DevError error={this.state.caughtErrors[0][0]} stack={this.state.caughtErrors[0][1].componentStack} />
 				</Portal>
 			) : null
+
+		if (__DEV_MODE__ && this.state.caughtErrors.length > 1) {
+			return errorSlot
+		}
 
 		return (
 			<>

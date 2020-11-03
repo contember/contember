@@ -28,7 +28,7 @@ export const ActionableBox = React.memo(({ children, editContents, onRemove }: A
 	return (
 		<div className={`${prefix}actionableBox`}>
 			<div className={`${prefix}actionableBox-contents`}>{children}</div>
-			<ul className={`${prefix}actionableBox-actions`}>
+			<ul className={`${prefix}actionableBox-actions`} contentEditable={false}>
 				{editContents && (
 					<li className={`${prefix}actionableBox-action`}>
 						<Dropdown

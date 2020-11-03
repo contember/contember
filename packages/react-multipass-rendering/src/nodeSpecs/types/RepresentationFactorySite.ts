@@ -1,4 +1,4 @@
 export enum RepresentationFactorySite {
-	DeclarationSite,
+	DeclarationSite = 1,
 	UseSite,
 }

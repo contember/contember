@@ -3,7 +3,6 @@ import * as React from 'react'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import {
-	//EntityFieldMarkers,
 	EntityFieldMarkersContainer,
 	FieldMarker,
 	HasManyRelationMarker,
@@ -143,9 +142,9 @@ export class MarkerTreeGenerator {
 	}
 
 	private static initializeChildrenAnalyzer(): ChildrenAnalyzer<Terminals, Nonterminals, Environment> {
-		const fieldMarkerLeaf = new Leaf<Environment>('generateFieldMarker')
+		const fieldMarkerLeaf = new Leaf<any, Environment>('generateFieldMarker')
 
-		const subTreeMarkerBranchNode = new BranchNode<Environment>(
+		const subTreeMarkerBranchNode = new BranchNode<any, Environment>(
 			'generateSubTreeMarker',
 			this.mapNodeResultToEntityFields,
 			{
@@ -153,7 +152,7 @@ export class MarkerTreeGenerator {
 			},
 		)
 
-		const referenceMarkerBranchNode = new BranchNode<Environment>(
+		const referenceMarkerBranchNode = new BranchNode<any, Environment>(
 			'generateRelationMarker',
 			this.mapNodeResultToEntityFields,
 			{

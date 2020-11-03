@@ -1,3 +1,4 @@
+export * from './BlockReferenceElement'
 export * from './BlockVoidReferenceElement'
 export * from './ContemberContentPlaceholderElement'
 export * from './EmbedElement'

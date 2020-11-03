@@ -1,4 +1,3 @@
-import * as React from 'react'
-import { BindingOperationsContext } from './BindingOperationsContext'
+import { useBindingOperations } from './useBindingOperations'
 
-export const useGetEntityByKey = () => React.useContext(BindingOperationsContext).getEntityByKey
+export const useGetEntityByKey = () => useBindingOperations().getEntityByKey

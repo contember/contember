@@ -36,13 +36,17 @@ export const Box = React.memo(
 					ref={ref}
 				>
 					{heading && (
-						<div className={`${prefix}box-heading`}>
+						<div className={`${prefix}box-heading`} contentEditable={false}>
 							<Heading depth={headingDepth} size="small">
 								{heading}
 							</Heading>
 						</div>
 					)}
-					{actions && <div className={`${prefix}box-actions`}>{actions}</div>}
+					{actions && (
+						<div className={`${prefix}box-actions`} contentEditable={false}>
+							{actions}
+						</div>
+					)}
 					<div className={`${prefix}box-content`}>
 						<IncreaseHeadingDepth currentDepth={headingDepth} onlyIf={!!heading}>
 							<IncreaseBoxDepth currentDepth={boxDepth} onlyIf={distinction !== 'seamlessIfNested'}>

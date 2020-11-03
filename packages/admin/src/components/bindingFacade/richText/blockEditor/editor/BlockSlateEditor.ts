@@ -2,6 +2,7 @@ import { EntityAccessor, FieldValue } from '@contember/binding'
 import { Node } from 'slate'
 import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../baseEditor'
 import {
+	BlockReferenceElement,
 	BlockVoidReferenceElement,
 	ContemberContentPlaceholderElement,
 	ContemberFieldElement,
@@ -15,6 +16,7 @@ export type BlockEditorElements =
 	| EmbedElement
 
 export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, BlockEditorElements>> {
+	isBlockReferenceElement: (node: Node) => node is BlockReferenceElement
 	isBlockVoidReferenceElement: (node: Node) => node is BlockVoidReferenceElement
 	isContemberContentPlaceholderElement: (node: Node) => node is ContemberContentPlaceholderElement
 	isEmbedElement: (node: Node) => node is EmbedElement
@@ -24,6 +26,7 @@ export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, Blo
 		referenceDiscriminant: FieldValue,
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => void
+	slateOnChange: () => void
 }
 
 export type EditorWithBlockElements<E extends BaseEditor> = WithAnotherNodeType<E, BlockEditorElements> &

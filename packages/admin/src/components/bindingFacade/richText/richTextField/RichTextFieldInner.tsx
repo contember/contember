@@ -61,18 +61,11 @@ export const RichTextFieldInner = React.memo(
 		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
 		const isMutating = useMutationState()
 
-		const batchUpdatesRef = React.useRef(batchUpdates)
-
-		React.useLayoutEffect(() => {
-			batchUpdatesRef.current = batchUpdates
-		}) // Deliberately no deps array
-
 		const [editor] = React.useState(() => {
 			return createEditor({
 				plugins,
 				augmentEditor,
 				augmentEditorBuiltins,
-				batchUpdatesRef,
 				defaultElementType: paragraphElementType,
 				addEditorBuiltins: editor => editor,
 			})

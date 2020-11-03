@@ -6,14 +6,13 @@ import {
 	FieldAccessor,
 	FieldValue,
 	HasMany,
-	QueryLanguage,
 	SugaredField,
 	SugaredFieldProps,
 	SugaredRelativeEntityList,
+	useBindingOperations,
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEnvironment,
-	useGetEntityByKey,
 	useMutationState,
 	useParentEntityAccessor,
 	useRelativeEntityList,
@@ -21,11 +20,11 @@ import {
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { emptyArray, noop, useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
+import { emptyArray, useConstantLengthInvariant } from '@contember/react-utils'
 import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
+import { PathRef } from 'slate'
 import { Editable, Slate } from 'slate-react'
-import { assertNever } from '../../../../utils'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater } from '../../collections'
 import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
@@ -37,8 +36,8 @@ import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from 
 import { createBlockEditor } from './editor'
 import { ContemberFieldElement } from './elements'
 import { EmbedHandler } from './embed'
-import { FieldBackedElement, NormalizedFieldBackedElement } from './FieldBackedElement'
-import { BlockEditorGetNormalizedFieldBackedElementContext } from './renderers'
+import { FieldBackedElement } from './FieldBackedElement'
+import { ContentOutlet, ContentOutletProps, TextFieldProps, useEditorReferenceBlocks } from './templating'
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
@@ -48,7 +47,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 	children?: React.ReactNode
 
 	leadingFieldBackedElements?: FieldBackedElement[]
-	//trailingFieldBackedElements?: FieldBackedElement[]
+	trailingFieldBackedElements?: FieldBackedElement[]
 
 	referencesField?: SugaredRelativeEntityList | string
 	referenceDiscriminationField?: SugaredFieldProps['field']
@@ -64,11 +63,12 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 }
 
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
-export const BlockEditor = Component<BlockEditorProps>(
+const BlockEditorComponent = Component<BlockEditorProps>(
 	props => {
 		const environment = useEnvironment()
-		const isMutating = useMutationState()
-		const getEntityByKey = useGetEntityByKey()
+		//const isMutating = useMutationState()
+		const isMutating = false // TODO see the pathRef flushing below
+		const bindingOperations = useBindingOperations()
 
 		assertStaticBlockEditorInvariants(props, environment)
 
@@ -78,14 +78,15 @@ export const BlockEditor = Component<BlockEditorProps>(
 			sortableBy,
 			children,
 
-			leadingFieldBackedElements,
+			leadingFieldBackedElements = emptyArray,
+			trailingFieldBackedElements = emptyArray,
 
 			referencesField,
 			referenceDiscriminationField,
 
 			embedReferenceDiscriminateBy,
 			embedContentDiscriminationField,
-			embedHandlers,
+			embedHandlers = emptyArray,
 
 			inlineButtons = defaultInlineButtons,
 			blockButtons,
@@ -114,13 +115,15 @@ export const BlockEditor = Component<BlockEditorProps>(
 
 		//
 
-		const normalizedLeading = useNormalizedFieldBackedElements(parentEntity, leadingFieldBackedElements)
-		const normalizedReferenceBlocks = useNormalizedBlocks(children)
+		const leadingAccessors = useFieldBackedElements(parentEntity, leadingFieldBackedElements)
+		const trailingAccessors = useFieldBackedElements(parentEntity, trailingFieldBackedElements)
+
+		const editorReferenceBlocks = useEditorReferenceBlocks(children)
 		const { entities: topLevelBlocks } = useSortedEntities(blockList, sortableBy)
 
 		//
 
-		const discriminatedEmbedHandlers = useDiscriminatedData<EmbedHandler>(embedHandlers || emptyArray)
+		const discriminatedEmbedHandlers = useDiscriminatedData<EmbedHandler>(embedHandlers)
 		const embedReferenceDiscriminant = React.useMemo<FieldValue | undefined>(() => {
 			if (embedReferenceDiscriminateBy !== undefined) {
 				return VariableInputTransformer.transformVariableLiteral(embedReferenceDiscriminateBy, environment)
@@ -129,14 +132,17 @@ export const BlockEditor = Component<BlockEditorProps>(
 		}, [embedReferenceDiscriminateBy, environment])
 		const embedSubBlocks = useNormalizedBlocks(
 			embedReferenceDiscriminant !== undefined
-				? getDiscriminatedBlock(normalizedReferenceBlocks, embedReferenceDiscriminant)?.datum.children
+				? getDiscriminatedBlock(editorReferenceBlocks, embedReferenceDiscriminant)?.datum.children
 				: undefined, // TODO this may crash
 		)
 
 		//
 
-		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor, ContemberFieldElement>())
+		const [contemberFieldElementCache] = React.useState(
+			() => new WeakMap<FieldAccessor<string>, ContemberFieldElement>(),
+		)
 		const [blockElementCache] = React.useState(() => new WeakMap<EntityAccessor, ElementNode>())
+		const [blockElementPathRefs] = React.useState(() => new Map<string, PathRef>())
 
 		//
 
@@ -144,36 +150,52 @@ export const BlockEditor = Component<BlockEditorProps>(
 		const blockListRef = React.useRef(blockList)
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedBlocksRef = React.useRef(topLevelBlocks)
-		const normalizedReferenceBlocksRef = React.useRef(normalizedReferenceBlocks)
-		const normalizedLeadingFieldsRef = React.useRef(normalizedLeading)
 
 		React.useLayoutEffect(() => {
 			batchUpdatesRef.current = batchUpdates
 			blockListRef.current = blockList
 			isMutatingRef.current = isMutating
 			sortedBlocksRef.current = topLevelBlocks
-			normalizedReferenceBlocksRef.current = normalizedReferenceBlocks
-			normalizedLeadingFieldsRef.current = normalizedLeading
 		}) // Deliberately no deps array
+
+		// TODO This is the epitome of *BRITTLE*.
+		//		We need the path refs to reflect the ID changes of newly created entities. As far as this component is
+		//		concerned, this happens right after persist. Unfortunately, we don't have an event that would fire at just
+		//		the right moment quite yet, and so we do this. This works as long as there aren't any re-renders between
+		//		the event and the actual moment we're after. For now, that holds but it can break at any time in the most
+		//		unpredictable and sinister fashion. We *REALLY* need to change this.
+		const addBlockListListener = blockList.addEventListener
+		React.useEffect(
+			() =>
+				addBlockListListener('beforePersist', () => {
+					for (const [, ref] of blockElementPathRefs) {
+						ref.unref()
+					}
+					blockElementPathRefs.clear()
+				}),
+			[addBlockListListener, blockElementPathRefs],
+		)
 
 		const [editor] = React.useState(() =>
 			createBlockEditor({
 				augmentEditor,
 				augmentEditorBuiltins,
 				batchUpdatesRef,
+				bindingOperations,
 				blockContentField: desugaredBlockContentField,
 				blockElementCache,
+				blockElementPathRefs,
 				contemberFieldElementCache,
 				createNewReference: referenceList?.createNewEntity,
 				desugaredBlockList,
+				editorReferenceBlocks,
 				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
 				embedSubBlocks,
-				getEntityByKey,
 				isMutatingRef,
-				normalizedLeadingFieldsRef,
-				normalizedReferenceBlocksRef,
+				leadingFields: leadingFieldBackedElements,
+				trailingFields: trailingFieldBackedElements,
 				placeholder: label,
 				plugins,
 				referenceDiscriminationField: desugaredReferenceDiscriminationField,
@@ -186,53 +208,48 @@ export const BlockEditor = Component<BlockEditorProps>(
 			placeholder: label,
 			editor,
 			blockElementCache,
+			blockElementPathRefs,
 			blockContentField: desugaredBlockContentField,
 			contemberFieldElementCache,
 			topLevelBlocks,
-			leadingFieldBackedElements: normalizedLeading,
-			//trailingFieldBackedElements,
+			leadingFieldBackedElements,
+			trailingFieldBackedElements,
+			leadingFieldBackedAccessors: leadingAccessors,
+			trailingFieldBackedAccessors: trailingAccessors,
 		})
-
-		const getNormalizedFieldBackedElement = React.useCallback(
-			(element: ContemberFieldElement) => {
-				let normalizedElements: NormalizedFieldBackedElement[]
-				if (element.position === 'leading') {
-					normalizedElements = normalizedLeading
-				} /*else if (element.position === 'trailing') {
-							normalizedElements = trailingFieldBackedElements
-						} */ else {
-					return assertNever(element.position)
-				}
-				return normalizedElements[element.index]
-			},
-			[normalizedLeading],
-		)
 
 		// TODO label?
 		return (
-			<BlockEditorGetNormalizedFieldBackedElementContext.Provider value={getNormalizedFieldBackedElement}>
-				<Slate editor={editor} value={nodes} onChange={noop}>
-					<EditorCanvas
-						underlyingComponent={Editable}
-						componentProps={{
-							renderElement: editor.renderElement,
-							renderLeaf: editor.renderLeaf,
-							onKeyDown: editor.onKeyDown,
-							onFocusCapture: editor.onFocus,
-							onBlurCapture: editor.onBlur,
-							onDOMBeforeInput: editor.onDOMBeforeInput,
-						}}
-						size="large"
-					>
-						<HoveringToolbars
-							inlineButtons={inlineButtons}
-							blockButtons={
-								<BlockHoveringToolbarContents blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
-							}
-						/>
-					</EditorCanvas>
-				</Slate>
-			</BlockEditorGetNormalizedFieldBackedElementContext.Provider>
+			<Slate editor={editor} value={nodes} onChange={editor.slateOnChange}>
+				<EditorCanvas
+					underlyingComponent={Editable}
+					componentProps={{
+						renderElement: editor.renderElement,
+						renderLeaf: editor.renderLeaf,
+						onKeyDown: editor.onKeyDown,
+						onFocusCapture: editor.onFocus,
+						onBlurCapture: editor.onBlur,
+						onDOMBeforeInput: editor.onDOMBeforeInput,
+					}}
+					size="large"
+				>
+					{React.useMemo(
+						() => (
+							<HoveringToolbars
+								inlineButtons={inlineButtons}
+								blockButtons={
+									<BlockHoveringToolbarContents
+										editorReferenceBlocks={editorReferenceBlocks}
+										blockButtons={blockButtons}
+										otherBlockButtons={otherBlockButtons}
+									/>
+								}
+							/>
+						),
+						[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons],
+					)}
+				</EditorCanvas>
+			</Slate>
 		)
 	},
 	(props, environment) => {
@@ -245,9 +262,9 @@ export const BlockEditor = Component<BlockEditorProps>(
 				{props.leadingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`leading_${i}`} />
 				))}
-				{/*props.trailingFieldBackedElements?.map((item, i) => (
+				{props.trailingFieldBackedElements?.map((item, i) => (
 					<SugaredField field={item.field} key={`trailing_${i}`} />
-				))*/}
+				))}
 				<Repeater {...props} initialEntityCount={0}>
 					<SugaredField field={props.sortableBy} />
 					<SugaredField field={props.contentField} />
@@ -275,37 +292,28 @@ export const BlockEditor = Component<BlockEditorProps>(
 	'BlockEditor',
 )
 
-// TODO this whole routine is garbage.
-const useNormalizedFieldBackedElements = (
-	entity: EntityAccessor,
-	original: FieldBackedElement[] = emptyArray,
-): NormalizedFieldBackedElement[] => {
+export const BlockEditor = Object.assign<
+	typeof BlockEditorComponent,
+	{
+		ContentOutlet: (props: ContentOutletProps) => React.ReactElement | null
+		// TextField: (props: TextFieldProps) => React.ReactElement | null
+	}
+>(BlockEditorComponent, {
+	ContentOutlet,
+})
+
+const useFieldBackedElements = (entity: EntityAccessor, original: FieldBackedElement[]): FieldAccessor<string>[] => {
 	useConstantLengthInvariant(
 		original,
 		'The number of leading/trailing field-backed elements must remain constant between renders.',
 	)
-	const environment = entity.environment
-	const desugarFieldBackedElement = React.useCallback(
-		(element: FieldBackedElement) => QueryLanguage.desugarRelativeSingleField(element.field, environment),
-		[environment],
-	)
-	const desugared = useArrayMapMemo(original, desugarFieldBackedElement)
-	const accessors = original.map(fieldBackedToAccessor)
+	const unstableAccessorArray = original.map(fieldBackedElement => {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		return useRelativeSingleField<string>(fieldBackedElement.field)
+	})
 
-	const normalizeFieldBackElement = React.useCallback(
-		(value: FieldAccessor, index: number): NormalizedFieldBackedElement => ({
-			...original[index],
-			field: desugared[index],
-			accessor: accessors[index],
-		}),
-		[accessors, desugared, original],
-	)
-
-	return useArrayMapMemo(accessors, normalizeFieldBackElement)
-}
-const fieldBackedToAccessor = (field: FieldBackedElement): FieldAccessor => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	return useRelativeSingleField(field.field)
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	return React.useMemo(() => unstableAccessorArray, unstableAccessorArray)
 }
 
 const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment: Environment) => {

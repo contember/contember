@@ -1,11 +1,26 @@
-import { Environment, Scalar, useEnvironment, VariableInputTransformer, VariableLiteral } from '@contember/binding'
+import {
+	BindingError,
+	Environment,
+	Scalar,
+	useEnvironment,
+	VariableInputTransformer,
+	VariableLiteral,
+} from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
 import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import * as React from 'react'
 import { useEditor } from 'slate-react'
+import { getDiscriminatedDatum } from '../../discrimination'
+import { EditorNode } from '../baseEditor'
 import { ElementSpecificToolbarButton } from '../toolbars'
 import { BlockSlateEditor } from './editor'
-import { BlockVoidReferenceElement, blockVoidReferenceElementType } from './elements'
+import {
+	BlockReferenceElement,
+	blockReferenceElementType,
+	BlockVoidReferenceElement,
+	blockVoidReferenceElementType,
+} from './elements'
+import { EditorReferenceBlocks } from './templating'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	title?: string
@@ -20,11 +35,13 @@ export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	)
 
 export interface BlockHoveringToolbarContentsProps {
+	editorReferenceBlocks: EditorReferenceBlocks
 	blockButtons?: BlockHoveringToolbarConfig[] | BlockHoveringToolbarConfig[][]
 	otherBlockButtons?: BlockHoveringToolbarConfig[]
 }
 
 function toToolbarGroups(
+	editorReferenceBlocks: EditorReferenceBlocks,
 	buttons: BlockHoveringToolbarContentsProps['blockButtons'],
 	environment: Environment,
 	editor: BlockSlateEditor,
@@ -51,11 +68,28 @@ function toToolbarGroups(
 								'discriminateBy' in buttonProps
 									? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
 									: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
-							const contemberBlockElement: Omit<BlockVoidReferenceElement, 'referenceId'> = {
-								type: blockVoidReferenceElementType,
-								children: [{ text: '' }],
+							const targetBlock = getDiscriminatedDatum(editorReferenceBlocks, discriminateBy)
+
+							if (targetBlock === undefined) {
+								throw new BindingError(
+									`BlockEditor: Trying to insert a block discriminated by '${discriminateBy}' but nu such block has been found!`,
+								)
 							}
-							editor.insertElementWithReference(contemberBlockElement, discriminateBy)
+							let insertedElement: Omit<BlockVoidReferenceElement | BlockReferenceElement, 'referenceId'>
+
+							if (targetBlock.datum.template === undefined) {
+								insertedElement = {
+									type: blockVoidReferenceElementType,
+									children: [{ text: '' }],
+								}
+							} else {
+								insertedElement = {
+									type: blockReferenceElementType,
+									children: [editor.createDefaultElement([{ text: '' }])],
+								}
+							}
+
+							editor.insertElementWithReference(insertedElement, discriminateBy)
 						} else {
 							editor.toggleElement(buttonProps.elementType, buttonProps.suchThat)
 						}
@@ -70,15 +104,17 @@ export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringTool
 	const editor = useEditor() as BlockSlateEditor
 	const environment = useEnvironment()
 
-	const { blockButtons, otherBlockButtons } = props
+	const { editorReferenceBlocks, blockButtons, otherBlockButtons } = props
 
 	const groups = React.useMemo<ToolbarGroup[]>(() => {
-		return toToolbarGroups(blockButtons, environment, editor)
-	}, [blockButtons, environment, editor])
+		return toToolbarGroups(editorReferenceBlocks, blockButtons, environment, editor)
+	}, [editorReferenceBlocks, blockButtons, environment, editor])
 
 	const restGroups = React.useMemo<ToolbarGroup[] | undefined>(() => {
-		return otherBlockButtons ? toToolbarGroups(otherBlockButtons, environment, editor) : undefined
-	}, [otherBlockButtons, environment, editor])
+		return otherBlockButtons
+			? toToolbarGroups(editorReferenceBlocks, otherBlockButtons, environment, editor)
+			: undefined
+	}, [otherBlockButtons, editorReferenceBlocks, environment, editor])
 
 	if (!props.blockButtons || !props.blockButtons.length) {
 		return null

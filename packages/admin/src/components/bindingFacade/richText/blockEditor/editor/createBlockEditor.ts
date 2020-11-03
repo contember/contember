@@ -1,7 +1,9 @@
 import { BindingError } from '@contember/binding'
+import { noop } from '@contember/react-utils'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
 import {
+	isBlockReferenceElement,
 	isBlockVoidReferenceElement,
 	isContemberContentPlaceholderElement,
 	isContemberFieldElement,
@@ -9,6 +11,7 @@ import {
 } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
+import { overrideInsertBreak } from './overrideInsertBreak'
 import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData'
 import {
 	overrideInsertElementWithReference,
@@ -16,11 +19,16 @@ import {
 } from './overrideInsertElementWithReference'
 import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid } from './overrideIsVoid'
+import { overrideNormalizeNode, OverrideNormalizeNodeOptions } from './overrideNormalizeNode'
+import { overrideOnKeyDown } from './overrideOnKeyDown'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
+import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
 
 export interface CreateEditorOptions
-	extends OverrideApplyOptions,
+	extends OverrideOnChangeOptions,
+		OverrideApplyOptions,
 		OverrideRenderElementOptions,
+		OverrideNormalizeNodeOptions,
 		OverrideInsertDataOptions,
 		OverrideInsertElementWithReferenceOptions,
 		CreateEditorPublicOptions {}
@@ -38,6 +46,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 
 		addEditorBuiltins: editor => {
 			const e = editor as BlockSlateEditor
+			e.isBlockReferenceElement = isBlockReferenceElement
 			e.isBlockVoidReferenceElement = isBlockVoidReferenceElement
 			e.isContemberContentPlaceholderElement = isContemberContentPlaceholderElement
 			e.isEmbedElement = isEmbedElement
@@ -48,19 +57,21 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 						`Check the BlockEditor props.`,
 				)
 			}
-
-			overrideIsVoid(e)
+			e.slateOnChange = noop
 
 			overrideApply(e, options)
-
-			overrideRenderElement(e, options)
-			overrideInsertNode(e)
+			overrideInsertBreak(e, options)
 			overrideInsertData(e, options)
 			overrideInsertElementWithReference(e, options)
+			overrideInsertNode(e)
+			overrideIsVoid(e)
+			overrideNormalizeNode(e, options)
+			overrideOnKeyDown(e, options)
+			overrideRenderElement(e, options)
+			overrideSlateOnChange(e, options)
 
 			return e
 		},
 		defaultElementType: paragraphElementType,
-		batchUpdatesRef: options.batchUpdatesRef,
 	}) as BlockSlateEditor
 }

@@ -10,20 +10,23 @@ export interface TableRendererProps<ContainerExtraProps, ItemExtraProps>
 	extends ImmutableContentLayoutRendererProps,
 		Omit<
 			ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
+			| 'afterContent'
+			| 'beforeContent'
 			| 'wrapperComponent'
 			| 'itemComponent'
 			| 'itemComponentExtraProps'
 			| 'containerComponent'
 			| 'containerComponentExtraProps'
+			| 'removalType'
 		> {
 	tableProps?: Omit<TableProps, 'children'>
 	tableRowProps?: Omit<TableRowProps, 'children'>
-	enableRemove?: boolean
+	enableRemoving?: boolean
 }
 
 export const TableRenderer = Component(
 	<ContainerExtraProps, ItemExtraProps>({
-		enableRemove = true,
+		enableRemoving = true,
 		children,
 		side,
 		title,
@@ -33,7 +36,7 @@ export const TableRenderer = Component(
 		tableProps,
 		tableRowProps,
 		...entityListProps
-	}: any) => {
+	}: TableRendererProps<ContainerExtraProps, ItemExtraProps>) => {
 		return (
 			<ImmutableContentLayoutRenderer
 				side={side}
@@ -47,7 +50,10 @@ export const TableRenderer = Component(
 					containerComponent={Container}
 					containerComponentExtraProps={tableProps}
 					itemComponent={Row}
-					itemComponentExtraProps={tableRowProps}
+					itemComponentExtraProps={{
+						...tableRowProps,
+						enableRemoving,
+					}}
 				>
 					{children}
 				</ImmutableEntityListRenderer>
@@ -83,10 +89,10 @@ const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, '
 })
 Container.displayName = 'Container'
 
-const Row = React.memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & { enableRemove?: boolean }) => (
+const Row = React.memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & { enableRemoving: boolean }) => (
 	<TableRow {...props}>
 		{props.children}
-		{props.enableRemove !== false && (
+		{props.enableRemoving && (
 			<TableCell shrunk>
 				<DeleteEntityButton immediatePersist={true} />
 			</TableCell>

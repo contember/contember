@@ -26,6 +26,10 @@
 			$headingCounter: $headingCounter unquote($counter-name)
 		counter-reset: $headingCounter unquote($cui-editor-paragraph-counter)
 
+		// TODO this is crap
+		[data-contember-type="__contember_contentPlaceholder__"]:not(:first-child)
+			margin-top: var(--cui-formGroup-separation)
+
 		h1, h2, h3, h4, h5, h6
 			margin: 0
 		& > :first-child
@@ -70,3 +74,11 @@
 	&.view-large > &-canvas
 		min-height: 32em
 		padding: 2em
+
+	& > &-canvas &-canvas
+		min-height: 1em
+		padding: 0
+
+	& &
+		&:not(:first-child)
+			margin-top: var(--cui-formGroup-separation)

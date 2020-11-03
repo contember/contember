@@ -3,7 +3,7 @@ import { EditorPlaceholder } from '@contember/ui'
 import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlocks } from '../../../blocks'
-import { ElementNode } from '../../baseEditor'
+import { BlockElement, ElementNode } from '../../baseEditor'
 import {
 	isBlockReferenceElement,
 	isBlockVoidReferenceElement,
@@ -101,10 +101,10 @@ export function BlockEditorElementRenderer({
 	}
 	if (isContemberContentPlaceholderElement(element)) {
 		return (
-			<div {...attributes}>
+			<BlockElement attributes={attributes} element={element}>
 				<EditorPlaceholder>{element.placeholder}</EditorPlaceholder>
 				{children}
-			</div>
+			</BlockElement>
 		)
 	}
 	return fallbackRenderer(renderElementProps)

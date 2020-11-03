@@ -5,6 +5,7 @@ import { RenderElementProps } from 'slate-react'
 import { NormalizedBlocks } from '../../../blocks'
 import { ElementNode } from '../../baseEditor'
 import {
+	isBlockReferenceElement,
 	isBlockVoidReferenceElement,
 	isContemberContentPlaceholderElement,
 	isContemberFieldElement,
@@ -12,6 +13,8 @@ import {
 } from '../elements'
 import { NormalizedEmbedHandlers } from '../embed/core'
 import { FieldBackedElement } from '../FieldBackedElement'
+import { EditorReferenceBlocks } from '../templating'
+import { BlockReferenceElementRenderer } from './BlockReferenceElementRenderer'
 import { BlockVoidReferenceElementRenderer } from './BlockVoidReferenceElementRenderer'
 import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
 import { EmbedElementRenderer } from './EmbedElementRenderer'
@@ -19,7 +22,7 @@ import { EmbedElementRenderer } from './EmbedElementRenderer'
 export interface BlockEditorElementRendererProps extends RenderElementProps {
 	element: ElementNode
 	referenceDiscriminationField: RelativeSingleField | undefined
-	normalizedReferenceBlocks: NormalizedBlocks
+	editorReferenceBlocks: EditorReferenceBlocks
 	fallbackRenderer: (props: RenderElementProps) => React.ReactElement
 
 	embedContentDiscriminationField: RelativeSingleField | undefined
@@ -33,11 +36,11 @@ export interface BlockEditorElementRendererProps extends RenderElementProps {
 
 export function BlockEditorElementRenderer({
 	fallbackRenderer,
+	editorReferenceBlocks,
 	embedContentDiscriminationField,
 	embedHandlers,
 	embedReferenceDiscriminateBy,
 	embedSubBlocks,
-	normalizedReferenceBlocks,
 	referenceDiscriminationField,
 	leadingFields,
 	trailingFields,
@@ -53,8 +56,22 @@ export function BlockEditorElementRenderer({
 				attributes={attributes}
 				children={children}
 				element={element}
+				editorReferenceBlocks={editorReferenceBlocks}
 				referenceDiscriminationField={referenceDiscriminationField}
-				normalizedReferenceBlocks={normalizedReferenceBlocks}
+			/>
+		)
+	}
+	if (isBlockReferenceElement(element)) {
+		if (referenceDiscriminationField === undefined) {
+			throw new BindingError()
+		}
+		return (
+			<BlockReferenceElementRenderer
+				attributes={attributes}
+				children={children}
+				element={element}
+				editorReferenceBlocks={editorReferenceBlocks}
+				referenceDiscriminationField={referenceDiscriminationField}
 			/>
 		)
 	}

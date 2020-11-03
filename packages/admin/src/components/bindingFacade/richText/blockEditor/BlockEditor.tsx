@@ -37,6 +37,7 @@ import { createBlockEditor } from './editor'
 import { ContemberFieldElement } from './elements'
 import { EmbedHandler } from './embed'
 import { FieldBackedElement } from './FieldBackedElement'
+import { ContentOutlet, ContentOutletProps, TextFieldProps, useEditorReferenceBlocks } from './templating'
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
@@ -62,7 +63,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 }
 
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
-export const BlockEditor = Component<BlockEditorProps>(
+const BlockEditorComponent = Component<BlockEditorProps>(
 	props => {
 		const environment = useEnvironment()
 		//const isMutating = useMutationState()
@@ -117,7 +118,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 		const leadingAccessors = useFieldBackedElements(parentEntity, leadingFieldBackedElements)
 		const trailingAccessors = useFieldBackedElements(parentEntity, trailingFieldBackedElements)
 
-		const normalizedReferenceBlocks = useNormalizedBlocks(children)
+		const editorReferenceBlocks = useEditorReferenceBlocks(children)
 		const { entities: topLevelBlocks } = useSortedEntities(blockList, sortableBy)
 
 		//
@@ -131,7 +132,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 		}, [embedReferenceDiscriminateBy, environment])
 		const embedSubBlocks = useNormalizedBlocks(
 			embedReferenceDiscriminant !== undefined
-				? getDiscriminatedBlock(normalizedReferenceBlocks, embedReferenceDiscriminant)?.datum.children
+				? getDiscriminatedBlock(editorReferenceBlocks, embedReferenceDiscriminant)?.datum.children
 				: undefined, // TODO this may crash
 		)
 
@@ -149,14 +150,12 @@ export const BlockEditor = Component<BlockEditorProps>(
 		const blockListRef = React.useRef(blockList)
 		const isMutatingRef = React.useRef(isMutating)
 		const sortedBlocksRef = React.useRef(topLevelBlocks)
-		const normalizedReferenceBlocksRef = React.useRef(normalizedReferenceBlocks)
 
 		React.useLayoutEffect(() => {
 			batchUpdatesRef.current = batchUpdates
 			blockListRef.current = blockList
 			isMutatingRef.current = isMutating
 			sortedBlocksRef.current = topLevelBlocks
-			normalizedReferenceBlocksRef.current = normalizedReferenceBlocks
 		}) // Deliberately no deps array
 
 		// TODO This is the epitome of *BRITTLE*.
@@ -189,6 +188,7 @@ export const BlockEditor = Component<BlockEditorProps>(
 				contemberFieldElementCache,
 				createNewReference: referenceList?.createNewEntity,
 				desugaredBlockList,
+				editorReferenceBlocks,
 				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
@@ -196,7 +196,6 @@ export const BlockEditor = Component<BlockEditorProps>(
 				isMutatingRef,
 				leadingFields: leadingFieldBackedElements,
 				trailingFields: trailingFieldBackedElements,
-				normalizedReferenceBlocksRef,
 				placeholder: label,
 				plugins,
 				referenceDiscriminationField: desugaredReferenceDiscriminationField,
@@ -239,11 +238,15 @@ export const BlockEditor = Component<BlockEditorProps>(
 							<HoveringToolbars
 								inlineButtons={inlineButtons}
 								blockButtons={
-									<BlockHoveringToolbarContents blockButtons={blockButtons} otherBlockButtons={otherBlockButtons} />
+									<BlockHoveringToolbarContents
+										editorReferenceBlocks={editorReferenceBlocks}
+										blockButtons={blockButtons}
+										otherBlockButtons={otherBlockButtons}
+									/>
 								}
 							/>
 						),
-						[blockButtons, inlineButtons, otherBlockButtons],
+						[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons],
 					)}
 				</EditorCanvas>
 			</Slate>
@@ -288,6 +291,16 @@ export const BlockEditor = Component<BlockEditorProps>(
 	},
 	'BlockEditor',
 )
+
+export const BlockEditor = Object.assign<
+	typeof BlockEditorComponent,
+	{
+		ContentOutlet: (props: ContentOutletProps) => React.ReactElement | null
+		// TextField: (props: TextFieldProps) => React.ReactElement | null
+	}
+>(BlockEditorComponent, {
+	ContentOutlet,
+})
 
 const useFieldBackedElements = (entity: EntityAccessor, original: FieldBackedElement[]): FieldAccessor<string>[] => {
 	useConstantLengthInvariant(

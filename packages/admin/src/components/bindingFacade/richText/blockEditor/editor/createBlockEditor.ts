@@ -3,6 +3,7 @@ import { noop } from '@contember/react-utils'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
 import {
+	isBlockReferenceElement,
 	isBlockVoidReferenceElement,
 	isContemberContentPlaceholderElement,
 	isContemberFieldElement,
@@ -45,6 +46,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 
 		addEditorBuiltins: editor => {
 			const e = editor as BlockSlateEditor
+			e.isBlockReferenceElement = isBlockReferenceElement
 			e.isBlockVoidReferenceElement = isBlockVoidReferenceElement
 			e.isContemberContentPlaceholderElement = isContemberContentPlaceholderElement
 			e.isEmbedElement = isEmbedElement

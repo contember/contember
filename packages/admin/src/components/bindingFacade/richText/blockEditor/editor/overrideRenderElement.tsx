@@ -4,10 +4,11 @@ import { NormalizedBlocks } from '../../../blocks'
 import { NormalizedEmbedHandlers } from '../embed/core'
 import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockEditorElementRenderer } from '../renderers'
+import { EditorReferenceBlocks } from '../templating'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideRenderElementOptions {
-	normalizedReferenceBlocksRef: React.MutableRefObject<NormalizedBlocks>
+	editorReferenceBlocks: EditorReferenceBlocks
 	referenceDiscriminationField: RelativeSingleField | undefined
 
 	embedContentDiscriminationField: RelativeSingleField | undefined
@@ -29,8 +30,8 @@ export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, opt
 				children={props.children}
 				element={props.element}
 				fallbackRenderer={renderElement}
-				normalizedReferenceBlocks={options.normalizedReferenceBlocksRef.current}
 				referenceDiscriminationField={options.referenceDiscriminationField}
+				editorReferenceBlocks={options.editorReferenceBlocks}
 				embedContentDiscriminationField={options.embedContentDiscriminationField}
 				embedSubBlocks={options.embedSubBlocks}
 				embedHandlers={options.embedHandlers}

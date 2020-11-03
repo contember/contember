@@ -3,15 +3,16 @@ import { ActionableBox, Box } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
-import { getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
+import { getDiscriminatedBlock } from '../../../blocks'
 import { BlockElement } from '../../baseEditor'
 import { BlockSlateEditor } from '../editor'
 import { BlockVoidReferenceElement } from '../elements'
+import { EditorReferenceBlocks } from '../templating'
 
 export interface BlockVoidReferenceElementRendererProps extends RenderElementProps {
 	element: BlockVoidReferenceElement
 	referenceDiscriminationField: RelativeSingleField
-	normalizedReferenceBlocks: NormalizedBlocks
+	editorReferenceBlocks: EditorReferenceBlocks
 }
 
 export const BlockVoidReferenceElementRenderer = React.memo((props: BlockVoidReferenceElementRendererProps) => {
@@ -22,7 +23,7 @@ export const BlockVoidReferenceElementRenderer = React.memo((props: BlockVoidRef
 
 	// TODO remove button, dragHandle, etc.
 	const discriminationField = referencedEntity.getRelativeSingleField(props.referenceDiscriminationField)
-	const discriminatedBlock = getDiscriminatedBlock(props.normalizedReferenceBlocks, discriminationField)
+	const discriminatedBlock = getDiscriminatedBlock(props.editorReferenceBlocks, discriminationField)
 	const onContainerClick = React.useCallback(
 		(e: React.MouseEvent<HTMLElement>) => {
 			if (e.target === e.currentTarget) {

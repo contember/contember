@@ -9,7 +9,7 @@ import * as React from 'react'
 import { Editor, Node as SlateNode, PathRef } from 'slate'
 import { assertNever } from '../../../../../utils'
 import { EditorNode, ElementNode } from '../../baseEditor'
-import { ContemberContentPlaceholderElement, ContemberFieldElement } from '../elements'
+import { ContemberFieldElement } from '../elements'
 import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 

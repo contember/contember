@@ -1,9 +1,11 @@
 import {
-	DesugaredRelativeSingleField,
-	EntityAccessor,
-	Environment,
+	Component,
+	Field,
 	FieldAccessor,
+	FieldBasicProps,
+	QueryLanguage,
 	useMutationState,
+	useParentEntityAccessor,
 } from '@contember/binding'
 import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
@@ -16,56 +18,38 @@ import { RichEditor } from '../RichEditor'
 import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
 import { useRichTextFieldNodes } from './useRichTextFieldNodes'
 
-export interface RichTextFieldInnerPublicProps
-	extends Omit<FormGroupProps, 'children' | 'errors'>,
+export interface LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps
+	extends FieldBasicProps,
+		Omit<FormGroupProps, 'children' | 'errors'>,
 		CreateEditorPublicOptions,
 		HoveringToolbarsProps {}
 
-export interface RichTextFieldInnerInternalProps {
-	batchUpdates: EntityAccessor['batchUpdates']
-	desugaredField: DesugaredRelativeSingleField
-	fieldAccessor: FieldAccessor<string>
-	environment: Environment
-}
+export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField = Component<
+	LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps
+>(
+	props => {
+		const entity = useParentEntityAccessor()
+		const environment = entity.environment
+		const batchUpdates = entity.batchUpdates
 
-export interface RichTextFieldInnerProps extends RichTextFieldInnerPublicProps, RichTextFieldInnerInternalProps {}
+		const desugaredField = React.useMemo(() => QueryLanguage.desugarRelativeSingleField(props, environment), [
+			environment,
+			props,
+		])
+		const fieldAccessor = React.useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [
+			entity,
+			desugaredField,
+		])
 
-const RB = RichEditor.buttons
-const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
-	[RB.bold, RB.italic, RB.underline, RB.anchor],
-	[RB.strikeThrough, RB.code],
-]
-
-export const RichTextFieldInner = React.memo(
-	({
-		augmentEditor,
-		augmentEditorBuiltins,
-		plugins,
-
-		batchUpdates,
-		desugaredField,
-		fieldAccessor,
-		environment,
-
-		blockButtons,
-		inlineButtons = defaultInlineButtons,
-
-		description,
-		label,
-		labelDescription,
-		labelPosition,
-		size,
-		useLabelElement,
-	}: RichTextFieldInnerProps) => {
 		// The cache is questionable, really.
 		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
 		const isMutating = useMutationState()
 
 		const [editor] = React.useState(() => {
 			return createEditor({
-				plugins,
-				augmentEditor,
-				augmentEditorBuiltins,
+				plugins: props.plugins,
+				augmentEditor: props.augmentEditor,
+				augmentEditorBuiltins: props.augmentEditorBuiltins,
 				defaultElementType: paragraphElementType,
 				addEditorBuiltins: editor => editor,
 			})
@@ -97,12 +81,12 @@ export const RichTextFieldInner = React.memo(
 
 		return (
 			<FormGroup
-				label={label}
-				size={size}
-				labelDescription={labelDescription}
-				labelPosition={labelPosition}
-				description={description}
-				useLabelElement={useLabelElement}
+				label={props.label}
+				size={props.size}
+				labelDescription={props.labelDescription}
+				labelPosition={props.labelPosition}
+				description={props.description}
+				useLabelElement={props.useLabelElement}
 				errors={fieldAccessor.errors}
 			>
 				<Slate editor={editor} value={valueNodes} onChange={onChange}>
@@ -118,10 +102,28 @@ export const RichTextFieldInner = React.memo(
 							onDOMBeforeInput: editor.onDOMBeforeInput,
 						}}
 					>
-						<HoveringToolbars blockButtons={blockButtons} inlineButtons={inlineButtons} />
+						<HoveringToolbars
+							blockButtons={props.blockButtons}
+							inlineButtons={props.inlineButtons ?? defaultInlineButtons}
+						/>
 					</EditorCanvas>
 				</Slate>
 			</FormGroup>
 		)
 	},
+	props => (
+		<>
+			<Field defaultValue={props.defaultValue} field={props.field} isNonbearing={props.isNonbearing} />
+			{props.label}
+			{props.labelDescription}
+			{props.description}
+		</>
+	),
+	'LegacyDeprecatedEditorFormerlyKnownAsRichTextField',
 )
+
+const RB = RichEditor.buttons
+const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [
+	[RB.bold, RB.italic, RB.underline, RB.anchor],
+	[RB.strikeThrough, RB.code],
+]

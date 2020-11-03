@@ -6,5 +6,10 @@ import { blockAnalyzer } from './blockAnalyzer'
 export const useBlockProps = (children: React.ReactNode): BlockProps[] => {
 	const environment = useEnvironment()
 
-	return React.useMemo(() => blockAnalyzer.processChildren(children, environment), [children, environment])
+	return React.useMemo(() => {
+		if (children === undefined) {
+			return []
+		}
+		return blockAnalyzer.processChildren(children, environment)
+	}, [children, environment])
 }

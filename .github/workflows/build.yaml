@@ -6,6 +6,8 @@ on:
     tags-ignore:
       - '**'
   pull_request:
+    branches-ignore:
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-latest

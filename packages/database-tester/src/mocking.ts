@@ -24,20 +24,19 @@ export const createConnectionMock = (
 
 			const actualSql = sql.replace(/\s+/g, ' ').toLowerCase()
 			const expectedSql = expected.sql.replace(/\s+/g, ' ').toLowerCase()
-			assert.equal(expectedSql, actualSql)
+
+			assert.is(actualSql, expectedSql)
 
 			if (expected.parameters) {
-				assert.equal(expected.parameters.length, (parameters || []).length)
+				assert.is((parameters || []).length, expected.parameters.length)
 
 				for (let index in expected.parameters) {
 					const expectedParameter = expected.parameters[index]
 					const actualParameter = (parameters || [])[index]
 					if (typeof expectedParameter === 'function') {
-						assert.equal(true, expectedParameter(actualParameter))
-					} else if (expectedParameter instanceof Date && actualParameter instanceof Date) {
-						assert.equal(expectedParameter, actualParameter)
+						assert.is(expectedParameter(actualParameter), true)
 					} else {
-						assert.equal(expectedParameter, actualParameter)
+						assert.equal(actualParameter, expectedParameter)
 					}
 				}
 			}

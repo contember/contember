@@ -1,13 +1,16 @@
-import { DiffQueryResolver, StagesQueryResolver } from './query'
+import { DiffQueryResolver, ExecutedMigrationsQueryResolver, HistoryQueryResolver, StagesQueryResolver } from './query'
 import { DiffEvent, DiffEventType, HistoryEvent, HistoryEventType, Resolvers } from '../schema'
 import { assertNever } from '../utils'
 import { ResolverContext } from './ResolverContext'
 import { GraphQLResolveInfo } from 'graphql'
-import { MigrateMutationResolver, RebaseAllMutationResolver, ReleaseMutationResolver } from './mutation'
-import { ReleaseTreeMutationResolver } from './mutation/ReleaseTreeMutationResolver'
-import { HistoryQueryResolver } from './query/HistoryQueryResolver'
+import {
+	MigrateMutationResolver,
+	RebaseAllMutationResolver,
+	ReleaseMutationResolver,
+	ReleaseTreeMutationResolver,
+	TruncateMutationResolver,
+} from './mutation'
 import { HistoryEventTypeResolver } from './types/HistoryEventTypeResolver'
-import { ExecutedMigrationsQueryResolver } from './query/ExecutedMigrationsQueryResolver'
 import { DateTimeType, JSONType } from '@contember/graphql-utils'
 
 class ResolverFactory {
@@ -20,11 +23,12 @@ class ResolverFactory {
 		private readonly rebaseMutationResolver: RebaseAllMutationResolver,
 		private readonly migrateMutationResolver: MigrateMutationResolver,
 		private readonly releaseTreeMutationResolver: ReleaseTreeMutationResolver,
+		private readonly truncateMutationResolver: TruncateMutationResolver,
 		private readonly historyEventTypeResolver: HistoryEventTypeResolver,
 	) {}
 
-	create(): Resolvers {
-		return {
+	create(debugMode: boolean): Resolvers {
+		const resolvers: Resolvers & Required<Pick<Resolvers, 'Mutation'>> = {
 			DateTime: DateTimeType,
 			Json: JSONType,
 			DiffEvent: {
@@ -92,6 +96,10 @@ class ResolverFactory {
 					this.historyEventTypeResolver.oldValues(parent, args, context),
 			},
 		}
+		if (debugMode) {
+			resolvers.Mutation.truncate = this.truncateMutationResolver.truncate.bind(this.truncateMutationResolver)
+		}
+		return resolvers
 	}
 }
 

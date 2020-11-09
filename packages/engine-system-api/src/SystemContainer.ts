@@ -26,6 +26,7 @@ import {
 	ProjectInitializer,
 	ProjectMigrationInfoResolver,
 	ProjectMigrator,
+	ProjectTruncateExecutor,
 	RebaseExecutor,
 	ReleaseExecutor,
 	SameRowDependencyBuilder,
@@ -47,14 +48,13 @@ import {
 } from './resolvers'
 import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
-import { ReleaseTreeMutationResolver } from './resolvers/mutation/ReleaseTreeMutationResolver'
+import { ReleaseTreeMutationResolver, TruncateMutationResolver } from './resolvers/mutation'
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
-import { HistoryQueryResolver } from './resolvers/query/HistoryQueryResolver'
+import { ExecutedMigrationsQueryResolver, HistoryQueryResolver } from './resolvers/query'
 import { HistoryEventTypeResolver } from './resolvers/types/HistoryEventTypeResolver'
-import { ExecutedMigrationsQueryResolver } from './resolvers/query/ExecutedMigrationsQueryResolver'
 
 export interface SystemContainer {
-	systemResolvers: Resolvers
+	systemResolversFactory: ResolverFactory
 	authorizator: Authorizator
 	resolverContextFactory: ResolverContextFactory
 	schemaVersionBuilder: SchemaVersionBuilder
@@ -78,7 +78,7 @@ export class SystemContainerFactory {
 		return this.createBuilder(container)
 			.build()
 			.pick(
-				'systemResolvers',
+				'systemResolversFactory',
 				'authorizator',
 				'resolverContextFactory',
 				'schemaVersionBuilder',
@@ -161,6 +161,10 @@ export class SystemContainerFactory {
 				({ dependencyBuilder, eventsRebaser, schemaVersionBuilder }) =>
 					new ReleaseExecutor(dependencyBuilder, container.eventApplier, eventsRebaser, schemaVersionBuilder),
 			)
+			.addService(
+				'projectTruncateExecutor',
+				({ executedMigrationsResolver }) => new ProjectTruncateExecutor(executedMigrationsResolver),
+			)
 
 			.addService('stagesQueryResolver', () => new StagesQueryResolver())
 			.addService('executedMigrationsQueryResolver', () => new ExecutedMigrationsQueryResolver())
@@ -187,9 +191,13 @@ export class SystemContainerFactory {
 			)
 			.addService('rebaseMutationResolver', ({ rebaseExecutor }) => new RebaseAllMutationResolver(rebaseExecutor))
 			.addService('migrateMutationResolver', ({ projectMigrator }) => new MigrateMutationResolver(projectMigrator))
+			.addService(
+				'truncateMutationResolver',
+				({ projectTruncateExecutor }) => new TruncateMutationResolver(projectTruncateExecutor),
+			)
 			.addService('historyEventTypeResolver', () => new HistoryEventTypeResolver())
 			.addService(
-				'systemResolvers',
+				'systemResolversFactory',
 				({
 					stagesQueryResolver,
 					executedMigrationsQueryResolver,
@@ -199,6 +207,7 @@ export class SystemContainerFactory {
 					rebaseMutationResolver,
 					migrateMutationResolver,
 					releaseTreeMutationResolver,
+					truncateMutationResolver,
 					historyEventTypeResolver,
 				}) =>
 					new ResolverFactory(
@@ -210,8 +219,9 @@ export class SystemContainerFactory {
 						rebaseMutationResolver,
 						migrateMutationResolver,
 						releaseTreeMutationResolver,
+						truncateMutationResolver,
 						historyEventTypeResolver,
-					).create(),
+					),
 			)
 			.addService(
 				'resolverContextFactory',

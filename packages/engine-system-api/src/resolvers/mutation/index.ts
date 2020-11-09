@@ -1,3 +1,5 @@
 export * from './MigrateMutationResolver'
 export * from './RebaseAllMutationResolver'
 export * from './ReleaseMutationResolver'
+export * from './ReleaseTreeMutationResolver'
+export * from './TruncateMutationResolver'

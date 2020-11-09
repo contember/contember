@@ -115,7 +115,7 @@ export class ApiTester {
 
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
-			resolvers: systemContainer.get('systemResolvers') as any,
+			resolvers: systemContainer.get('systemResolversFactory').create(false) as any,
 		})
 
 		const stageManager = new TesterStageManager(

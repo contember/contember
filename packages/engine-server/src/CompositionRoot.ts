@@ -21,7 +21,7 @@ import { Initializer, ServerRunner } from './bootstrap'
 import { createProjectContainer } from './ProjectContainer'
 import { Plugin } from '@contember/engine-plugins'
 import { MigrationsRunner } from '@contember/database-migrations'
-import { createRootMiddleware } from './http/RootMiddleware'
+import { createRootMiddleware, createShowMetricsMiddleware } from './http'
 import {
 	Koa,
 	ProjectContainer,
@@ -31,8 +31,7 @@ import {
 	TenantApolloServerFactory,
 } from '@contember/engine-http'
 import prom from 'prom-client'
-import { createShowMetricsMiddleware } from './http'
-import { registerDbMetrics, registerDbPoolCollector } from './utils/dbMetrics'
+import { registerDbMetrics } from './utils/dbMetrics'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -41,7 +40,12 @@ export interface MasterContainer {
 }
 
 class CompositionRoot {
-	createMasterContainer(debug: boolean, config: Config, projectsDirectory: string, plugins: Plugin[]): MasterContainer {
+	createMasterContainer(
+		debugMode: boolean,
+		config: Config,
+		projectsDirectory: string,
+		plugins: Plugin[],
+	): MasterContainer {
 		let projectSchemaResolverInner: ProjectSchemaResolver = () => {
 			throw new Error('called too soon')
 		}
@@ -79,7 +83,7 @@ class CompositionRoot {
 		const systemContainer = new SystemContainerFactory().create(systemContainerDependencies)
 
 		const projectContainers = this.createProjectContainers(
-			debug,
+			debugMode,
 			Object.values(config.projects),
 			plugins,
 			systemContainer.schemaVersionBuilder,
@@ -121,9 +125,10 @@ class CompositionRoot {
 				'systemServerProvider',
 				() =>
 					new SystemServerProvider(
-						systemContainer.systemResolvers,
+						systemContainer.systemResolversFactory,
 						systemContainer.resolverContextFactory,
 						logSentryError,
+						debugMode,
 					),
 			)
 
@@ -146,7 +151,7 @@ class CompositionRoot {
 					const app = new Koa()
 					app.use(
 						createRootMiddleware(
-							debug,
+							debugMode,
 							{
 								tenantApolloServer,
 								projectContainerResolver,

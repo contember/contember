@@ -1,9 +1,6 @@
 export { SchemaMigrator, MigrationsResolver } from '@contember/schema-migrations'
 
-import * as Schema from './schema'
-
-export { Schema }
-export { default as typeDefs } from './schema/system.graphql'
+export { typeDefs, devTypeDefs, Schema } from './schema'
 
 export {
 	Identity,

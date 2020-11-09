@@ -1,5 +1,6 @@
 schema:
   - "./src/schema/system.graphql.ts"
+  - "./src/schema/dev.graphql.ts"
 documents: []
 config:
   immutableTypes: "1"
@@ -7,7 +8,7 @@ config:
     DateTime: Date
     Json: unknown
 generates:
-  ./src/schema/index.ts:
+  ./src/schema/types.ts:
     config:
       immutableTypes: "1"
     plugins:

@@ -5,10 +5,10 @@ import { StageConfig } from '../../types'
 import { Command } from './Command'
 
 export class CreateOrUpdateStageCommand implements Command<boolean> {
-	constructor(private readonly stage: StageConfig) {}
+	constructor(private readonly stage: StageConfig, private readonly eventId?: string) {}
 
 	public async execute({ db, providers }: Command.Args): Promise<boolean> {
-		const initEvent = await db.createQueryHandler().fetch(new InitEventQuery())
+		const eventId = this.eventId || (await db.createQueryHandler().fetch(new InitEventQuery())).id
 
 		const result = await InsertBuilder.create()
 			.into('stage')
@@ -16,7 +16,7 @@ export class CreateOrUpdateStageCommand implements Command<boolean> {
 				id: providers.uuid(),
 				name: this.stage.name,
 				slug: this.stage.slug,
-				event_id: initEvent.id,
+				event_id: eventId,
 			})
 			.onConflict(ConflictActionType.update, ['slug'], {
 				name: this.stage.name,
@@ -26,6 +26,6 @@ export class CreateOrUpdateStageCommand implements Command<boolean> {
 
 		await db.query('CREATE SCHEMA IF NOT EXISTS ' + wrapIdentifier(formatSchemaName(this.stage)))
 
-		return result.length === 1 && result[0] === initEvent.id
+		return result.length === 1 && result[0] === eventId
 	}
 }

@@ -1,15 +1,19 @@
-import { CreateInitEventCommand, SaveMigrationCommand } from './commands'
+import { CreateInitEventCommand } from './commands'
 import { unnamedIdentity } from './helpers'
 import { ProjectConfig, StageConfig } from '../types'
 import { ProjectMigrationInfoResolver, ProjectMigrator, SchemaVersionBuilder } from './migrations'
 import { createStageTree, StageCreator } from './stages'
-import { MigrationEventsQuery } from './queries'
 import { DatabaseContext, DatabaseContextFactory } from './database'
 import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
-import { DatabaseCredentials, EventManagerImpl, SerializationFailureError, SingleConnection } from '@contember/database'
+import {
+	Connection,
+	DatabaseCredentials,
+	EventManagerImpl,
+	retryTransaction,
+	SingleConnection,
+} from '@contember/database'
 import { MigrationArgs } from '../migrations'
 import { createDatabaseIfNotExists, createPgClient } from '@contember/database-migrations'
-import { retryTransaction } from '@contember/database'
 
 export class ProjectInitializer {
 	constructor(
@@ -56,15 +60,15 @@ export class ProjectInitializer {
 		)
 	}
 
-	private async createInitEvent(db: DatabaseContext) {
-		const rowCount = await db.commandBus.execute(new CreateInitEventCommand())
-		if (rowCount) {
+	private async createInitEvent(db: DatabaseContext<Connection.TransactionLike>) {
+		const rowId = await db.commandBus.execute(new CreateInitEventCommand())
+		if (rowId) {
 			// eslint-disable-next-line no-console
 			console.log(`Created init event`)
 		}
 	}
 
-	private async initStages(db: DatabaseContext, project: ProjectConfig) {
+	private async initStages(db: DatabaseContext<Connection.TransactionLike>, project: ProjectConfig) {
 		const stageTree = createStageTree(project)
 		const root = stageTree.getRoot()
 

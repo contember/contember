@@ -1,6 +1,14 @@
 import { Config } from 'apollo-server-core'
-import { ApolloServer } from 'apollo-server-koa'
-import { Identity, ResolverContext, ResolverContextFactory, Schema, typeDefs } from '@contember/engine-system-api'
+import { ApolloServer, mergeSchemas } from 'apollo-server-koa'
+import {
+	devTypeDefs,
+	Identity,
+	ResolverContext,
+	ResolverContextFactory,
+	ResolverFactory,
+	Schema,
+	typeDefs,
+} from '@contember/engine-system-api'
 import { KoaContext } from '../koa'
 import { flattenVariables } from '@contember/engine-content-api'
 import { ErrorContextProvider, ErrorHandlerPlugin, ErrorLogger } from '../graphql/ErrorHandlerPlugin'
@@ -20,18 +28,24 @@ class SystemServerProvider {
 	private server: ApolloServer | null = null
 
 	constructor(
-		private readonly resolvers: Schema.Resolvers,
+		private readonly resolversFactory: ResolverFactory,
 		private readonly resolverContextFactory: ResolverContextFactory,
 		private readonly errorLogger: ErrorLogger,
+		private readonly debugMode: boolean,
 	) {}
 
 	get(): ApolloServer {
 		if (this.server) {
 			return this.server
 		}
+		const schemas: Parameters<typeof mergeSchemas>[0]['schemas'] = [typeDefs]
+		if (this.debugMode) {
+			schemas.push(devTypeDefs)
+		}
+		const resolvers = this.resolversFactory.create(this.debugMode)
+		const mergedSchema = mergeSchemas({ schemas, resolvers: resolvers as Config['resolvers'] })
 		return (this.server = new ApolloServer({
-			typeDefs,
-			resolvers: this.resolvers as Config['resolvers'],
+			schema: mergedSchema,
 			plugins: [new GraphqlInfoProviderPlugin(), new ErrorHandlerPlugin(undefined, 'system', this.errorLogger)],
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createContext(ctx),
 		}))

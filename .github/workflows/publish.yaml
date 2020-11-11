@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 12
       - name: Get the version
-        run: echo ::set-env name=VERSION::$(echo ${GITHUB_REF:10})
+        run: echo "VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
       - name: "Install base deps"
         run: yarn install
       - name: "Install yarn deps"

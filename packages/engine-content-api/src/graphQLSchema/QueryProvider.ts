@@ -9,6 +9,7 @@ import OrderByTypeProvider from './OrderByTypeProvider'
 import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
 import { aliasAwareResolver, GqlTypeName } from './utils'
+import { ImplementationException } from '../exception'
 
 export default class QueryProvider {
 	private PageInfo = this.graphqlObjectFactories.createObjectType({
@@ -41,11 +42,15 @@ export default class QueryProvider {
 	private getByUniqueQuery(entityName: string): GraphQLFieldConfig<any, Context, Input.UniqueQueryInput> {
 		const entity = getEntity(this.schema, entityName)
 		const entityType = this.entityTypeProvider.getEntity(entityName)
+		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
+		if (!uniqueWhere) {
+			throw new ImplementationException()
+		}
 		return {
 			type: entityType,
 			args: {
 				by: {
-					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
+					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
 				},
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },

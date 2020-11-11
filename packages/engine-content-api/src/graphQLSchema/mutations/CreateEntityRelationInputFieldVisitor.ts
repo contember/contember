@@ -59,8 +59,11 @@ export default class CreateEntityRelationInputFieldVisitor
 		)
 
 		if (allowedOperations.includes(Input.CreateRelationOperation.connect)) {
-			fields[Input.CreateRelationOperation.connect] = {
-				type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
+			const uniqueWhere = this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
+			if (uniqueWhere) {
+				fields[Input.CreateRelationOperation.connect] = {
+					type: uniqueWhere,
+				}
 			}
 		}
 

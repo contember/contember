@@ -52,11 +52,15 @@ export class ValidationQueriesProvider {
 		if (dataType === undefined) {
 			return undefined
 		}
+		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
+		if (!uniqueWhere) {
+			return undefined
+		}
 		return {
 			type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 			args: {
 				by: {
-					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
+					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
 				},
 				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
 			},

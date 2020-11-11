@@ -64,11 +64,15 @@ export default class MutationProvider {
 			return undefined
 		}
 		const entity = getEntity(this.schema, entityName)
+		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
+		if (!uniqueWhere) {
+			return undefined
+		}
 		return {
 			type: this.graphqlObjectFactories.createNotNull(this.createResultType(entityName, 'delete')),
 			args: {
 				by: {
-					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
+					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
 				},
 				filter: {
 					type: this.whereTypeProvider.getEntityWhereType(entityName),
@@ -93,11 +97,15 @@ export default class MutationProvider {
 			return undefined
 		}
 		const resultType = this.createResultType(entityName, 'update')
+		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
+		if (!uniqueWhere) {
+			return undefined
+		}
 		return {
 			type: this.graphqlObjectFactories.createNotNull(resultType),
 			args: {
 				by: {
-					type: this.graphqlObjectFactories.createNotNull(this.whereTypeProvider.getEntityUniqueWhereType(entityName)),
+					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
 				},
 				filter: {
 					type: this.whereTypeProvider.getEntityWhereType(entityName),

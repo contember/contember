@@ -9,6 +9,7 @@ import { acceptFieldVisitor } from '@contember/schema-utils'
 import UpdateEntityRelationAllowedOperationsVisitor from './UpdateEntityRelationAllowedOperationsVisitor'
 import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import Authorizator from '../../acl/Authorizator'
+import { ImplementationException } from '../../exception'
 
 export default class UpdateEntityRelationInputFieldVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
@@ -34,11 +35,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 	): GraphQLInputObjectType | undefined {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
-		const whereInput = this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)
-			? {
-					type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
-			  }
-			: undefined
+		const whereInput = this.createWhereInput(targetEntity)
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType
 			? {
@@ -95,11 +92,7 @@ export default class UpdateEntityRelationInputFieldVisitor
 	): GraphQLInputObjectType | undefined {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 
-		const whereInput = this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)
-			? {
-					type: this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name),
-			  }
-			: undefined
+		const whereInput = this.createWhereInput(targetEntity)
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType
 			? {
@@ -178,5 +171,18 @@ export default class UpdateEntityRelationInputFieldVisitor
 			(key, value): value is GraphQLInputFieldConfig =>
 				allowedOperations.includes(key as Input.UpdateRelationOperation) && value !== undefined,
 		)
+	}
+
+	private createWhereInput(targetEntity: Model.Entity): GraphQLInputFieldConfig | undefined {
+		if (!this.authorizator.isAllowed(Acl.Operation.read, targetEntity.name)) {
+			return undefined
+		}
+		const uniqueWhere = this.whereTypeBuilder.getEntityUniqueWhereType(targetEntity.name)
+		if (!uniqueWhere) {
+			throw new ImplementationException()
+		}
+		return {
+			type: uniqueWhere,
+		}
 	}
 }

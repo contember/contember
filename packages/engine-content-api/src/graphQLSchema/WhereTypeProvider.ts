@@ -32,9 +32,9 @@ export default class WhereTypeProvider {
 		return this.whereSingleton(entityName)
 	}
 
-	public getEntityUniqueWhereType(entityName: string): GraphQLInputObjectType {
+	public getEntityUniqueWhereType(entityName: string): undefined | GraphQLInputObjectType {
 		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
-			throw new ImplementationException()
+			return undefined
 		}
 		return this.uniqueWhereSingleton(entityName)
 	}
@@ -82,7 +82,11 @@ export default class WhereTypeProvider {
 						// if (!isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
 						// 	throw new Error('Only column or owning relation can be a part of unique key')
 						// }
-						return { type: this.getEntityUniqueWhereType(targetEntity.name) }
+						const uniqueWhere = this.getEntityUniqueWhereType(targetEntity.name)
+						if (!uniqueWhere) {
+							throw new ImplementationException()
+						}
+						return { type: uniqueWhere }
 					},
 					visitColumn: (entity, column) => ({ type: this.columnTypeResolver.getType(column) }),
 				})

@@ -56,7 +56,7 @@ export default class GraphQlQueryAstFactory {
 			alias,
 			fields,
 			this.argumentValuesResolver(field, node, info.variableValues),
-			(field as any).meta || {},
+			field.extensions || {},
 			path,
 		)
 	}
@@ -145,7 +145,7 @@ export default class GraphQlQueryAstFactory {
 				throw new Error(`GraphQlQueryAstFactory: incompatible args`)
 			}
 			const fields = GraphQlQueryAstFactory.mergeFieldList([...left.fields, ...right.fields])
-			return new ObjectNode(left.name, left.alias, fields, left.args, left.meta, left.path)
+			return new ObjectNode(left.name, left.alias, fields, left.args, left.extensions, left.path)
 		}
 		return left
 	}

@@ -1,6 +1,7 @@
 import { JSONValue } from './json'
 import { GraphQLScalarType, Kind, ValueNode } from 'graphql'
-import Maybe from 'graphql/tsutils/Maybe'
+
+type Maybe<T> = null | undefined | T
 
 export const JSONType = new GraphQLScalarType({
 	name: 'Json',

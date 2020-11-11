@@ -22,7 +22,7 @@ credentialsMigrationTest('generate sql with login token', async () => {
 				VALUES ("tenant"."uuid_generate_v4"(), NULL, '["login"]'::JSONB, 'Login key', now()) RETURNING id
 			)
 			INSERT INTO tenant.api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
-			SELECT "tenant"."uuid_generate_v4"(), $pg1$936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af$pg1$, 'permanent', identity.id, NULL, NULL, NULL, now()
+			SELECT "tenant"."uuid_generate_v4"(), $pga$936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af$pga$, 'permanent', identity.id, NULL, NULL, NULL, now()
 			FROM identity
 			;
 `,
@@ -62,8 +62,8 @@ credentialsMigrationTest('generate sql with root token', async () => {
 			),
 			api_key AS (
 				INSERT INTO tenant.api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
-				SELECT "tenant"."uuid_generate_v4"(), $pg1$c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2$pg1$, 'permanent', identity.id, NULL, NULL, NULL, now()
-				FROM identity WHERE $pg1$c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2$pg1$ IS NOT NULL
+				SELECT "tenant"."uuid_generate_v4"(), $pga$c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2$pga$, 'permanent', identity.id, NULL, NULL, NULL, now()
+				FROM identity WHERE $pga$c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2$pga$ IS NOT NULL
 			    RETURNING id
 			)
 			SELECT * FROM person, api_key
@@ -95,16 +95,16 @@ credentialsMigrationTest('generate sql with root user', async () => {
 						"tenant"."uuid_generate_v4"(),
 						NULL,
 						'["super_admin"]'::JSONB
-							|| (CASE WHEN $pg1$root@localhost$pg1$ IS NOT NULL THEN '["person"]'::JSONB ELSE '[]'::JSONB END),
+							|| (CASE WHEN $pga$root@localhost$pga$ IS NOT NULL THEN '["person"]'::JSONB ELSE '[]'::JSONB END),
 						'Superadmin',
 						now()
 					) RETURNING id
 			),
 			person AS (
 				INSERT INTO tenant.person(id, email, password_hash, identity_id)
-				SELECT "tenant"."uuid_generate_v4"(), $pg1$root@localhost$pg1$, $pg1$foobar-bcrypted$pg1$, identity.id
+				SELECT "tenant"."uuid_generate_v4"(), $pga$root@localhost$pga$, $pga$foobar-bcrypted$pga$, identity.id
 				FROM identity
-				WHERE $pg1$root@localhost$pg1$ IS NOT NULL
+				WHERE $pga$root@localhost$pga$ IS NOT NULL
 			    RETURNING id
 			),
 			api_key AS (
@@ -144,22 +144,22 @@ credentialsMigrationTest('generate sql with both root user and token', async () 
 						"tenant"."uuid_generate_v4"(),
 						NULL,
 						'["super_admin"]'::JSONB
-							|| (CASE WHEN $pg1$john@doe.com$pg1$ IS NOT NULL THEN '["person"]'::JSONB ELSE '[]'::JSONB END),
+							|| (CASE WHEN $pga$john@doe.com$pga$ IS NOT NULL THEN '["person"]'::JSONB ELSE '[]'::JSONB END),
 						'Superadmin',
 						now()
 					) RETURNING id
 			),
 			person AS (
 				INSERT INTO tenant.person(id, email, password_hash, identity_id)
-				SELECT "tenant"."uuid_generate_v4"(), $pg1$john@doe.com$pg1$, $pg1$pwd-bcrypted$pg1$, identity.id
+				SELECT "tenant"."uuid_generate_v4"(), $pga$john@doe.com$pga$, $pga$pwd-bcrypted$pga$, identity.id
 				FROM identity
-				WHERE $pg1$john@doe.com$pg1$ IS NOT NULL
+				WHERE $pga$john@doe.com$pga$ IS NOT NULL
 			    RETURNING id
 			),
 			api_key AS (
 				INSERT INTO tenant.api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
-				SELECT "tenant"."uuid_generate_v4"(), $pg1$d96f62ea0f2f543aa7822a58114f75dbcc05bdf970fb15eb55eea836a1439e43$pg1$, 'permanent', identity.id, NULL, NULL, NULL, now()
-				FROM identity WHERE $pg1$d96f62ea0f2f543aa7822a58114f75dbcc05bdf970fb15eb55eea836a1439e43$pg1$ IS NOT NULL
+				SELECT "tenant"."uuid_generate_v4"(), $pga$d96f62ea0f2f543aa7822a58114f75dbcc05bdf970fb15eb55eea836a1439e43$pga$, 'permanent', identity.id, NULL, NULL, NULL, now()
+				FROM identity WHERE $pga$d96f62ea0f2f543aa7822a58114f75dbcc05bdf970fb15eb55eea836a1439e43$pga$ IS NOT NULL
 			    RETURNING id
 			)
 			SELECT * FROM person, api_key

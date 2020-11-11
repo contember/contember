@@ -15,7 +15,7 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 		addData(
 			entity.primary,
 			async (ids: Input.PrimaryValue[]) => {
-				const [targetEntity, targetRelation] = this.getRelationTarget(entity, objectNode.meta.relationName)
+				const [targetEntity, targetRelation] = this.getRelationTarget(entity, objectNode.extensions.relationName)
 
 				const uniqueWhere = this.uniqueWhereExpander.expand(targetEntity, {
 					...objectNode.args.by,

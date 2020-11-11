@@ -1,5 +1,4 @@
-import pathToRegexp from 'path-to-regexp'
-import Koa from 'koa'
+import { Key, pathToRegexp } from 'path-to-regexp'
 import { KoaContext, KoaMiddleware } from './types'
 
 type Params = { [param: string]: string }
@@ -18,7 +17,7 @@ function createRoutingMiddleware(
 	const exact = mask.slice(-1) === '$'
 	const normalizedMask = exact ? mask.slice(0, -1) : mask + ':__path(.*)'
 
-	const keys: pathToRegexp.Key[] = []
+	const keys: Key[] = []
 	const regexp: RegExp = pathToRegexp(normalizedMask, keys)
 
 	const match = function (url: string): Params | null {

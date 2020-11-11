@@ -1,76 +1,3 @@
-type _FieldPathFragment {
-  field: String!
-}
-
-type _IndexPathFragment {
-  index: Int!
-  alias: String
-}
-
-type _MutationError {
-  path: [_PathFragment!]!
-  type: _MutationErrorType!
-  message: String
-}
-
-enum _MutationErrorType {
-  NotNullConstraintViolation
-  UniqueConstraintViolation
-  ForeignKeyConstraintViolation
-  NotFoundOrDenied
-  NonUniqueWhereInput
-  InvalidDataInput
-  SqlError
-}
-
-union _PathFragment = _FieldPathFragment | _IndexPathFragment
-
-type _ValidationError {
-  path: [_PathFragment!]!
-  message: _ValidationMessage!
-}
-
-type _ValidationMessage {
-  text: String!
-}
-
-type _ValidationResult {
-  valid: Boolean!
-  errors: [_ValidationError!]!
-}
-
-type FieldMeta {
-  readable: Boolean
-  updatable: Boolean
-}
-
-type Info {
-  description: String
-}
-
-type Mutation {
-  createTest(data: TestCreateInput!): TestCreateResult!
-  updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
-  transaction: MutationTransaction!
-}
-
-type MutationTransaction {
-  ok: Boolean!
-  errorMessage: String
-  validation: _ValidationResult!
-  createTest(data: TestCreateInput!): TestCreateResult!
-  updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
-}
-
-enum OrderDirection {
-  asc
-  desc
-}
-
-type PageInfo {
-  totalCount: Int!
-}
-
 type Query {
   getTest(by: TestUniqueWhere!): Test
   listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
@@ -81,12 +8,50 @@ type Query {
   _info: Info
 }
 
-type QueryTransaction {
-  getTest(by: TestUniqueWhere!): Test
-  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
-  paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
-  validateCreateTest(data: TestCreateInput!): _ValidationResult!
-  validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
+type Test {
+  _meta: TestMeta
+  id: UUID!
+  c: String
+}
+
+type TestMeta {
+  id: FieldMeta
+  c: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+input TestUniqueWhere {
+  id: UUID
+}
+
+input TestWhere {
+  id: UUIDCondition
+  c: StringCondition
+  and: [TestWhere!]
+  or: [TestWhere!]
+  not: TestWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  eq: UUID
+  null: Boolean
+  isNull: Boolean
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
 }
 
 input StringCondition {
@@ -111,10 +76,16 @@ input StringCondition {
   endsWithCI: String
 }
 
-type Test {
-  _meta: TestMeta
-  id: UUID!
-  c: String
+input TestOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  c: OrderDirection
+}
+
+enum OrderDirection {
+  asc
+  desc
 }
 
 type TestConnection {
@@ -122,9 +93,65 @@ type TestConnection {
   edges: [TestEdge!]!
 }
 
+type PageInfo {
+  totalCount: Int!
+}
+
+type TestEdge {
+  node: Test!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
 input TestCreateInput {
   a: String
   _dummy_field_: Boolean
+}
+
+input TestUpdateInput {
+  b: String
+  _dummy_field_: Boolean
+}
+
+type QueryTransaction {
+  getTest(by: TestUniqueWhere!): Test
+  listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
+  paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
+  validateCreateTest(data: TestCreateInput!): _ValidationResult!
+  validateUpdateTest(by: TestUniqueWhere!, data: TestUpdateInput!): _ValidationResult!
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  createTest(data: TestCreateInput!): TestCreateResult!
+  updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
+  transaction: MutationTransaction!
 }
 
 type TestCreateResult {
@@ -135,29 +162,20 @@ type TestCreateResult {
   validation: _ValidationResult!
 }
 
-type TestEdge {
-  node: Test!
+type _MutationError {
+  path: [_PathFragment!]!
+  type: _MutationErrorType!
+  message: String
 }
 
-type TestMeta {
-  id: FieldMeta
-  c: FieldMeta
-}
-
-input TestOrderBy {
-  _random: Boolean
-  _randomSeeded: Int
-  id: OrderDirection
-  c: OrderDirection
-}
-
-input TestUniqueWhere {
-  id: UUID
-}
-
-input TestUpdateInput {
-  b: String
-  _dummy_field_: Boolean
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
 }
 
 type TestUpdateResult {
@@ -168,28 +186,10 @@ type TestUpdateResult {
   validation: _ValidationResult!
 }
 
-input TestWhere {
-  id: UUIDCondition
-  c: StringCondition
-  and: [TestWhere!]
-  or: [TestWhere!]
-  not: TestWhere
-}
-
-scalar UUID
-
-input UUIDCondition {
-  and: [UUIDCondition!]
-  or: [UUIDCondition!]
-  not: UUIDCondition
-  eq: UUID
-  null: Boolean
-  isNull: Boolean
-  notEq: UUID
-  in: [UUID!]
-  notIn: [UUID!]
-  lt: UUID
-  lte: UUID
-  gt: UUID
-  gte: UUID
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  validation: _ValidationResult!
+  createTest(data: TestCreateInput!): TestCreateResult!
+  updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
 }

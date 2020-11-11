@@ -3,7 +3,7 @@ import { Acl, Model, Schema } from '@contember/schema'
 
 const builder = new SchemaBuilder()
 
-// Meta things
+// Extension things
 builder.enum('One', ['One'])
 
 builder.entity('Locale', entity =>

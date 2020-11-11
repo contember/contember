@@ -1,5 +1,5 @@
 import { S3 as AwsS3 } from 'aws-sdk'
-import uuid from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { extension } from 'mime-types'
 import { S3Config } from './Config'
 import { ObjectKeyVerifier } from './ObjectKeyVerifier'
@@ -55,7 +55,7 @@ export class S3Service {
 		prefix?: string,
 	): SignedUploadUrl {
 		const ext = extension(contentType) || 'bin'
-		const localObjectKey = (prefix ? prefix + '/' : '') + `${uuid.v4()}.${ext}`
+		const localObjectKey = (prefix ? prefix + '/' : '') + `${uuidv4()}.${ext}`
 		verifyKey(localObjectKey)
 		const objectKey = (this.config.prefix ? this.config.prefix + '/' : '') + localObjectKey
 

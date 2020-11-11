@@ -1,9 +1,9 @@
-import uuid from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 
 export const providers = {
-	uuid: () => uuid.v4(),
+	uuid: () => uuidv4(),
 	now: () => new Date(),
 	bcrypt: async (value: string) => await bcrypt.hash(value, 10),
 	bcryptCompare: (data: any, hash: string) => bcrypt.compare(data, hash),

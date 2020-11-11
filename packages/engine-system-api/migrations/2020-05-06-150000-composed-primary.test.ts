@@ -34,7 +34,7 @@ DROP TRIGGER "log_event" ON "stage_prod"."post_tags";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."post_tags"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$post_id$pg1$, $pg1$tag_id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$post_id$pga$, $pga$tag_id$pga$);
 ALTER TABLE "stage_preview"."post_tags"
   DROP "id";
 ALTER TABLE "stage_preview"."post_tags" DROP CONSTRAINT "post_tags_uniq_post_id_tag_id";
@@ -44,7 +44,7 @@ DROP TRIGGER "log_event" ON "stage_preview"."post_tags";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."post_tags"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$post_id$pg1$, $pg1$tag_id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$post_id$pga$, $pga$tag_id$pga$);
 
 		WITH RECURSIVE
 			recent_events(id, type, previous_id, data, created_at, stage) AS (
@@ -63,8 +63,8 @@ CREATE TRIGGER "log_event"
 					delete_event.id AS delete_id,
 					create_event.id AS create_id,
 					json_build_array(
-						create_event.data -> 'values' ->> $pg1$post_id$pg1$,
-						create_event.data -> 'values' ->> $pg1$tag_id$pg1$
+						create_event.data -> 'values' ->> $pga$post_id$pga$,
+						create_event.data -> 'values' ->> $pga$tag_id$pga$
 					) AS id
 				FROM recent_events AS create_event
 				LEFT JOIN recent_events AS delete_event
@@ -72,7 +72,7 @@ CREATE TRIGGER "log_event"
 						delete_event.data ->> 'rowId' = create_event.data ->> 'rowId'
 						AND delete_event.type = 'delete'
 						AND delete_event.data ->> 'tableName' = create_event.data ->> 'tableName'
-				WHERE create_event.type = 'create' AND create_event.data ->> 'tableName' = $pg1$post_tags$pg1$
+				WHERE create_event.type = 'create' AND create_event.data ->> 'tableName' = $pga$post_tags$pga$
 			)
 		UPDATE event
 		SET
@@ -87,52 +87,52 @@ DROP TRIGGER "log_event" ON "stage_prod"."author";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."author"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_preview"."author";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."author"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_prod"."author_contact";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."author_contact"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_preview"."author_contact";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."author_contact"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_prod"."post";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."post"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_preview"."post";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."post"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_prod"."tag";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."tag"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_preview"."tag";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."tag"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_prod"."entry";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_prod"."entry"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 DROP TRIGGER "log_event" ON "stage_preview"."entry";
 CREATE TRIGGER "log_event"
   AFTER INSERT OR UPDATE OR DELETE ON "stage_preview"."entry"
   FOR EACH ROW
-  EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 
 		UPDATE system.event
 		SET data = data || jsonb_build_object('rowId', json_build_array(data ->> 'rowId'))

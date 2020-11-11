@@ -6,8 +6,7 @@ import { KoaContext } from '../koa'
 import { ProjectMemberMiddlewareState } from '../project-common'
 import { getArgumentValues } from 'graphql/execution/values'
 import { setupSystemVariables } from '@contember/engine-system-api'
-import uuid from 'uuid'
-import { GraphQLExtension } from 'graphql-extensions'
+import { v4 as uuidv4 } from 'uuid'
 import { Acl, Schema } from '@contember/schema'
 import { ErrorContextProvider, ErrorHandlerPlugin, ErrorLogger } from '../graphql/ErrorHandlerPlugin'
 import { ContentServerMiddlewareState } from './ContentServerMiddleware'
@@ -60,7 +59,7 @@ class ContentApolloServerFactory {
 			identityVariables: flattenVariables(ctx.state.projectMemberships),
 		}
 		const providers = {
-			uuid: () => uuid.v4(),
+			uuid: () => uuidv4(),
 			now: () => new Date(),
 		}
 		let identityId = ctx.state.authResult.identityId

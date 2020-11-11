@@ -1,4 +1,4 @@
-import { GraphQLInputObjectType } from 'graphql'
+import { GraphQLFieldMap, GraphQLInputObjectType } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import EntityTypeProvider from '../../graphQLSchema/EntityTypeProvider'
 import WhereTypeProvider from '../../graphQLSchema/WhereTypeProvider'
@@ -14,8 +14,8 @@ import { getFieldsForUniqueWhere } from '../../utils/uniqueWhereFields'
 
 class HasManyToHasOneRelationReducerFieldVisitor
 	implements
-		Model.ColumnVisitor<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Meta>>,
-		Model.RelationByTypeVisitor<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Meta>> {
+		Model.ColumnVisitor<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Extension>>,
+		Model.RelationByTypeVisitor<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Extension>> {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
@@ -77,7 +77,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 					new FieldAccessVisitor(Acl.Operation.read, this.authorizator),
 				),
 			)
-			.reduce<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Meta>>((fields, fieldName) => {
+			.reduce<EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Extension>>((fields, fieldName) => {
 				const graphQlName = relation.name + GqlTypeName`By${fieldName}`
 				const uniqueWhere: GraphQLInputObjectType = this.graphqlObjectFactories.createInputObjectType({
 					//todo this can be simplified to ${targetEntity.name}By${fieldName}, but singleton must be used
@@ -93,7 +93,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 					...fields,
 					[graphQlName]: {
 						type: entityType,
-						meta: {
+						extensions: {
 							relationName: relation.name,
 						},
 						args: {

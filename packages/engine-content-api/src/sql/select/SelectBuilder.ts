@@ -116,10 +116,10 @@ export default class SelectBuilder {
 				continue
 			}
 
-			if (field.meta.extensionKey) {
-				const handler = this.selectHandlers[field.meta.extensionKey]
+			if (field.extensions.extensionKey) {
+				const handler = this.selectHandlers[field.extensions.extensionKey]
 				if (!handler) {
-					throw new Error(`Handler for ${field.meta.extensionKey} not found`)
+					throw new Error(`Handler for ${field.extensions.extensionKey} not found`)
 				}
 				handler.process(executionContext)
 				continue

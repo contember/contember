@@ -61,16 +61,16 @@ test('project-migration sql', async () => {
   "name" varchar(255) UNIQUE NOT NULL,
   "migration" json NOT NULL,
   "checksum" char(32) NOT NULL,
-  "executed_at" timestamp DEFAULT $pg1$now()$pg1$ NOT NULL
+  "executed_at" timestamp DEFAULT $pga$now()$pga$ NOT NULL
 );
 CREATE INDEX "system_schema_migration_version" ON "system"."schema_migration" ("version");
 INSERT INTO "system"."schema_migration" (version, name, migration, checksum, executed_at)
 VALUES (
-        $pg1$2018-08-04-102200$pg1$,
-        $pg1$2018-08-04-102200-init$pg1$,
-        $pg1\${"formatVersion":2,"version":"2018-08-04-102200","name":"2018-08-04-102200-init","modifications":[{"modification":"createEntity","entity":{"name":"Author","unique":{}}}]}$pg1$,
-        $pg1$6a40afb75a82d745e9ad0a23f71e916d$pg1$,
-        $pg1$2020-04-01T00:00:00.000Z$pg1$
+        $pga$2018-08-04-102200$pga$,
+        $pga$2018-08-04-102200-init$pga$,
+        $pga\${"formatVersion":2,"version":"2018-08-04-102200","name":"2018-08-04-102200-init","modifications":[{"modification":"createEntity","entity":{"name":"Author","unique":{}}}]}$pga$,
+        $pga$6a40afb75a82d745e9ad0a23f71e916d$pga$,
+        $pga$2020-04-01T00:00:00.000Z$pga$
         );
 `,
 	)

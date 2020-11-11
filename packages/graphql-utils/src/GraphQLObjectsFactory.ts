@@ -23,8 +23,8 @@ import {
 
 export interface GraphQLObjectsFactory {
 	createObjectType: <TSource, TContext, TArgs = { [key: string]: any }>(
-		args: GraphQLObjectTypeConfig<TSource, TContext, TArgs>,
-	) => GraphQLObjectType<TSource, TContext, TArgs>
+		args: GraphQLObjectTypeConfig<TSource, TContext>,
+	) => GraphQLObjectType<TSource, TContext>
 	createScalarType: (args: GraphQLScalarTypeConfig<any, any>) => GraphQLScalarType
 	createInputObjectType: (args: GraphQLInputObjectTypeConfig) => GraphQLInputObjectType
 	createEnumType: (args: GraphQLEnumTypeConfig) => GraphQLEnumType

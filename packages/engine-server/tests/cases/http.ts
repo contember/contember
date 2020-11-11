@@ -243,7 +243,7 @@ test('Content API: invalid schema error', async () => {
 		.expect(response => {
 			assert.equal(
 				response.body.errors[0].message,
-				'Cannot query field "createFoo" on type "Mutation". Did you mean "createTag", "createPost", "createEntry", or "createAuthor"?',
+				'Cannot query field "createFoo" on type "Mutation". Did you mean "createPost" or "createTag"?',
 			)
 		})
 })

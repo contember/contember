@@ -80,13 +80,12 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 			return slateOnChange()
 		}
 
-		const firstContentIndex = leadingFields.length
 		const leadingCount = leadingFields.length
 		const trailingCount = trailingFields.length
 
 		const topLevelBlocks = sortedBlocksRef.current
 
-		const isLeadingElement = (elementIndex: number) => elementIndex < firstContentIndex
+		const isLeadingElement = (elementIndex: number) => elementIndex < leadingCount
 		const isTrailingElement = (elementIndex: number) => elementIndex >= editor.children.length - trailingCount
 
 		if (hasTextOperation && !hasNodeOperation) {
@@ -125,7 +124,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 			})
 		}
 
-		return batchUpdatesRef.current((getAccessor, { getEntityByKey }) => {
+		return batchUpdatesRef.current(getAccessor => {
 			const processedAccessors: Array<true | undefined> = Array.from({
 				length: editor.children.length - leadingCount - trailingCount,
 			})
@@ -145,8 +144,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 				} else {
 					const newBlockIndex = current[0]
 
-					if (newBlockIndex < leadingCount || newBlockIndex >= children.length - trailingCount) {
-						// This path points to a leading/trailing element.
+					if (isLeadingElement(newBlockIndex) || isTrailingElement(newBlockIndex)) {
 						cleanUp()
 					} else {
 						const newBlockOrder = newBlockIndex - leadingCount

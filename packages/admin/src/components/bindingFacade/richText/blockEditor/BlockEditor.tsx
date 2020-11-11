@@ -280,7 +280,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 							<>
 								<SugaredField field={props.embedContentDiscriminationField} />
 								{embedHandlers.map((handler, i) => (
-									<React.Fragment key={i}>{handler.getStaticFields(environment)}</React.Fragment>
+									<React.Fragment key={i}>{handler.staticRender(environment)}</React.Fragment>
 								))}
 							</>
 						)}

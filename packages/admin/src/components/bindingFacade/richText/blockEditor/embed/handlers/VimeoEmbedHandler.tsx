@@ -1,7 +1,7 @@
 import { SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
-import { EmbedHandler, PopulateEmbedDataOptions, RenderEmbedProps } from '../core'
+import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
 class VimeoEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'Vimeo'
@@ -17,7 +17,7 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 		}
 	}
 
-	public getStaticFields() {
+	public staticRender() {
 		return <SugaredField field={this.options.vimeoIdField} />
 	}
 
@@ -48,23 +48,21 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 		return false
 	}
 
-	public renderEmbed(props: RenderEmbedProps) {
+	public renderEmbed() {
 		if (this.options.render) {
-			return this.options.render(props)
+			return this.options.render()
 		}
-		return <VimeoEmbedHandler.Renderer vimeoIdField={this.options.vimeoIdField} entity={props.entity} />
+		return <VimeoEmbedHandler.Renderer vimeoIdField={this.options.vimeoIdField} />
 	}
 
-	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
-		batchUpdates(getAccessor => {
-			getAccessor().getField<string>(this.options.vimeoIdField).updateValue(embedArtifacts)
-		})
+	public populateEmbedData({ entity, embedArtifacts }: PopulateEmbedDataOptions<string>) {
+		entity.getField<string>(this.options.vimeoIdField).updateValue(embedArtifacts)
 	}
 }
 
 namespace VimeoEmbedHandler {
 	export type Options = {
-		render?: (props: RenderEmbedProps) => React.ReactNode
+		render?: () => React.ReactNode
 		vimeoIdField: SugaredFieldProps['field']
 	} & (
 		| {
@@ -75,7 +73,7 @@ namespace VimeoEmbedHandler {
 		  }
 	)
 
-	export interface RendererOptions extends RenderEmbedProps {
+	export interface RendererOptions {
 		vimeoIdField: SugaredFieldProps['field']
 	}
 

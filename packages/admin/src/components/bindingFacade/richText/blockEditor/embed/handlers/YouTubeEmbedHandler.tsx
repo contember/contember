@@ -1,7 +1,7 @@
 import { SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
-import { EmbedHandler, PopulateEmbedDataOptions, RenderEmbedProps } from '../core'
+import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
 class YouTubeEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'YouTube'
@@ -17,7 +17,7 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 		}
 	}
 
-	public getStaticFields() {
+	public staticRender() {
 		return <SugaredField field={this.options.youTubeIdField} />
 	}
 
@@ -48,23 +48,21 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 		return false
 	}
 
-	public renderEmbed(props: RenderEmbedProps) {
+	public renderEmbed() {
 		if (this.options.render) {
-			return this.options.render(props)
+			return this.options.render()
 		}
-		return <YouTubeEmbedHandler.Renderer youTubeIdField={this.options.youTubeIdField} entity={props.entity} />
+		return <YouTubeEmbedHandler.Renderer youTubeIdField={this.options.youTubeIdField} />
 	}
 
-	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
-		batchUpdates(getAccessor => {
-			getAccessor().getField<string>(this.options.youTubeIdField).updateValue(embedArtifacts)
-		})
+	public populateEmbedData({ entity, embedArtifacts }: PopulateEmbedDataOptions<string>) {
+		entity.getField<string>(this.options.youTubeIdField).updateValue(embedArtifacts)
 	}
 }
 
 namespace YouTubeEmbedHandler {
 	export type Options = {
-		render?: (props: RenderEmbedProps) => React.ReactNode
+		render?: () => React.ReactNode
 		youTubeIdField: SugaredFieldProps['field']
 	} & (
 		| {
@@ -75,7 +73,7 @@ namespace YouTubeEmbedHandler {
 		  }
 	)
 
-	export interface RendererOptions extends RenderEmbedProps {
+	export interface RendererOptions {
 		youTubeIdField: SugaredFieldProps['field']
 	}
 

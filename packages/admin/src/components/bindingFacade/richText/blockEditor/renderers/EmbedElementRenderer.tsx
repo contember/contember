@@ -94,9 +94,7 @@ export const EmbedElementRenderer = React.memo(
 										style={{ display: 'flex' }}
 									>
 										{/*{selectedBlock.children}*/}
-										{embedHandler.datum.renderEmbed({
-											entity: referencedEntity,
-										})}
+										{embedHandler.datum.renderEmbed()}
 									</div>
 								</Box>
 							</ActionableBox>

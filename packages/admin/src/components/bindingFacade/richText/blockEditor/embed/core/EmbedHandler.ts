@@ -9,20 +9,15 @@ import {
 export interface PopulateEmbedDataOptions<EmbedArtifacts = any> {
 	source: string
 	embedArtifacts: EmbedArtifacts
-	batchUpdates: EntityAccessor['batchUpdates']
-	environment: Environment
-}
-
-export interface RenderEmbedProps {
 	entity: EntityAccessor
 }
 
 export interface EmbedHandler<EmbedArtifacts = any> {
 	debugName: string // Optional for error messages
 
-	getStaticFields: (environment: Environment) => React.ReactNode
+	staticRender: (environment: Environment) => React.ReactNode
 	canHandleSource: (source: string, url: URL | undefined) => boolean | EmbedArtifacts
-	renderEmbed: (props: RenderEmbedProps) => React.ReactNode
+	renderEmbed: () => React.ReactNode
 	populateEmbedData: (options: PopulateEmbedDataOptions<EmbedArtifacts>) => void
 
 	// Exactly one of these *MUST* be defined

@@ -14,7 +14,7 @@ import { getDiscriminatedDatum } from '../../../discrimination'
 import { BlockElement } from '../../baseEditor'
 import { BlockSlateEditor } from '../editor'
 import { EmbedElement } from '../elements'
-import { NormalizedEmbedHandlers } from '../embed'
+import { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
 
 export interface EmbedElementRendererProps extends RenderElementProps {
 	element: EmbedElement
@@ -94,7 +94,7 @@ export const EmbedElementRenderer = React.memo(
 										style={{ display: 'flex' }}
 									>
 										{/*{selectedBlock.children}*/}
-										{embedHandler.datum.renderEmbed()}
+										<EmbedElementRendererInner handler={embedHandler.datum} />
 									</div>
 								</Box>
 							</ActionableBox>
@@ -107,3 +107,10 @@ export const EmbedElementRenderer = React.memo(
 	},
 )
 EmbedElementRenderer.displayName = 'EmbedElementRenderer'
+
+// This is to make sure that if someone decides to use hooks directly inside the renderEmbed function,
+// it doesn't break (provided they don't break rules of hooks further) because React will think that
+// this component called them.
+function EmbedElementRendererInner({ handler }: { handler: EmbedHandler }) {
+	return <>{handler.renderEmbed()}</>
+}

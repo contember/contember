@@ -1,8 +1,7 @@
-import * as React from 'react'
-import { GlobalClassNamePrefixContext } from '../contexts'
+import { useClassNamePrefix } from './useClassNamePrefix'
 
 export const useComponentClassName = (className: string) => {
-	const prefix = React.useContext(GlobalClassNamePrefixContext)
+	const prefix = useClassNamePrefix()
 
 	return `${prefix}${className}`
 }

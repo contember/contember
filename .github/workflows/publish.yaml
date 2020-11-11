@@ -11,7 +11,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 12
       - name: Get the version
         run: echo ::set-env name=VERSION::$(echo ${GITHUB_REF:10})
       - name: "Install base deps"

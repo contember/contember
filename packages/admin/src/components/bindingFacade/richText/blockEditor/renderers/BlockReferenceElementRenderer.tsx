@@ -1,5 +1,5 @@
 import { BindingError, RelativeSingleField, SingleEntity, useParentEntityAccessor } from '@contember/binding'
-import { ActionableBox, Box } from '@contember/ui'
+import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
@@ -58,13 +58,11 @@ export const BlockReferenceElementRenderer = React.memo((props: BlockReferenceEl
 		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
 			<SingleEntity accessor={referencedEntity}>
 				<ActionableBox editContents={alternate} onRemove={onRemove}>
-					<Box heading={selectedBlock.label} style={{ margin: '0' }}>
-						{contentTemplate.nodeBefore !== undefined && (
-							<div contentEditable={false}>{contentTemplate.nodeBefore}</div>
-						)}
+					<EditorBox heading={selectedBlock.label}>
+						{!!contentTemplate.nodeBefore && <div contentEditable={false}>{contentTemplate.nodeBefore}</div>}
 						{props.children}
-						{contentTemplate.nodeAfter !== undefined && <div contentEditable={false}>{contentTemplate.nodeAfter}</div>}
-					</Box>
+						{!!contentTemplate.nodeAfter && <div contentEditable={false}>{contentTemplate.nodeAfter}</div>}
+					</EditorBox>
 				</ActionableBox>
 			</SingleEntity>
 		</BlockElement>

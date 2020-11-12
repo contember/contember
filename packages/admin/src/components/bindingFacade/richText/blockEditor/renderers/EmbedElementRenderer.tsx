@@ -5,7 +5,7 @@ import {
 	SingleEntity,
 	useParentEntityAccessor,
 } from '@contember/binding'
-import { ActionableBox, Box } from '@contember/ui'
+import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
@@ -88,7 +88,7 @@ export const EmbedElementRenderer = React.memo(
 					<SingleEntity accessor={referencedEntity}>
 						<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
 							<ActionableBox editContents={alternate || null} onRemove={onRemove}>
-								<Box heading={selectedBlock?.label} isActive={selected} onClick={onContainerClick}>
+								<EditorBox heading={selectedBlock?.label} isActive={selected} onClick={onContainerClick}>
 									<div
 										// This is a bit of a hack to avoid rendering any whitespace
 										style={{ display: 'flex' }}
@@ -96,7 +96,7 @@ export const EmbedElementRenderer = React.memo(
 										{/*{selectedBlock.children}*/}
 										<EmbedElementRendererInner handler={embedHandler.datum} />
 									</div>
-								</Box>
+								</EditorBox>
 							</ActionableBox>
 						</div>
 					</SingleEntity>

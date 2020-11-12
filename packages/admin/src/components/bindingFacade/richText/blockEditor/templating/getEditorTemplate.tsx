@@ -47,9 +47,9 @@ export const getEditorTemplate = (blockContents: React.ReactNode): EditorTemplat
 	}
 	return {
 		blockContent: {
-			nodeBefore: <>{nodesBefore}</>,
+			nodeBefore: nodesBefore.length ? <>{nodesBefore}</> : undefined,
 			value: contentOutlet,
-			nodeAfter: <>{nodesAfter}</>,
+			nodeAfter: nodesAfter.length ? <>{nodesAfter}</> : undefined,
 		},
 	}
 }

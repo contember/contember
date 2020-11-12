@@ -1,13 +1,13 @@
+import cn from 'classnames'
 import * as React from 'react'
 import { MouseEventHandler } from 'react'
 import { usePopper } from 'react-popper'
-import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../auxiliary'
+import { useClassNamePrefix, useRawCloseOnEscapeOrClickOutside } from '../auxiliary'
 import { DropdownAlignment } from '../types'
 import { assertNever, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
 import { Button, ButtonBasedButtonProps } from './forms'
 import { Portal } from './Portal'
-import cn from 'classnames'
 
 export interface DropdownRenderProps {
 	requestClose: () => void
@@ -18,7 +18,7 @@ export interface DropdownProps {
 		ref: React.Ref<HTMLElement>
 		onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 	}) => React.ReactNode
-	renderContent?: (props: { ref: React.Ref<HTMLElement> }) => React.ReactNode
+	renderContent?: (props: DropdownRenderProps) => React.ReactNode
 	buttonProps?: ButtonBasedButtonProps
 	alignment?: DropdownAlignment
 	contentContainer?: HTMLElement
@@ -70,7 +70,13 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 		setIsOpen(false)
 		setIsTransitioning(true)
 	}, [])
-	const refs = useCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>(isOpen, close)
+
+	useRawCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>({
+		isOpen,
+		close,
+		reference: referenceElement,
+		content: popperElement,
+	})
 
 	const contentContainerFromContent = React.useContext(DropdownContentContainerContext)
 	const contentContainer = props.contentContainer || contentContainerFromContent || document.body
@@ -81,14 +87,14 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 	const placement = 'top' || alignmentToPlacement(props.alignment)
 
 	return (
-		<div className={`${prefix}dropdown`}>
-			<div className={`${prefix}dropdown-button`} ref={setReferenceElement}>
-				{renderToggle ? (
-					renderToggle({ ref: refs.buttonRef, onClick: onButtonClick })
-				) : (
-					<Button ref={refs.buttonRef} {...props.buttonProps} onClick={onButtonClick} />
-				)}
-			</div>
+		<>
+			{renderToggle ? (
+				renderToggle({ ref: setReferenceElement, onClick: onButtonClick })
+			) : (
+				<div className={`${prefix}dropdown-button`} ref={setReferenceElement}>
+					<Button {...props.buttonProps} onClick={onButtonClick} />
+				</div>
+			)}
 			{isActive && (
 				<Portal to={contentContainer}>
 					<div
@@ -98,33 +104,28 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 						className={`${prefix}dropdown-content`}
 						data-placement={placement}
 					>
-						<div ref={refs.contentRef}>
-							<Collapsible
-								expanded={isOpen}
-								transition="fade"
-								onTransitionEnd={() => {
-									if (isOpen) {
-										return
-									}
-									setIsTransitioning(false)
-								}}
-							>
-								{renderContent ? (
-									renderContent({ ref: refs.contentRef })
-								) : (
-									<div
-										ref={refs.contentRef}
-										className={cn(`${prefix}dropdown-content-in`, toViewClass('unstyled', !styledContent))}
-									>
-										{typeof children === 'function' ? children({ requestClose: close }) : children}
-									</div>
-								)}
-							</Collapsible>
-						</div>
+						<Collapsible
+							expanded={isOpen}
+							transition="fade"
+							onTransitionEnd={() => {
+								if (isOpen) {
+									return
+								}
+								setIsTransitioning(false)
+							}}
+						>
+							{renderContent ? (
+								renderContent({ requestClose: close })
+							) : (
+								<div className={cn(`${prefix}dropdown-content-in`, toViewClass('unstyled', !styledContent))}>
+									{typeof children === 'function' ? children({ requestClose: close }) : children}
+								</div>
+							)}
+						</Collapsible>
 					</div>
 				</Portal>
 			)}
-		</div>
+		</>
 	)
 })
 Dropdown.displayName = 'Dropdown'

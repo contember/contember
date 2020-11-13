@@ -11,6 +11,7 @@ import {
 } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
+import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference'
 import { overrideInsertBreak } from './overrideInsertBreak'
 import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData'
 import {
@@ -27,6 +28,7 @@ import * as Slate from 'slate'
 
 export interface CreateEditorOptions
 	extends OverrideOnChangeOptions,
+		OverrideCreateElementReferenceOptions,
 		OverrideApplyOptions,
 		OverrideRenderElementOptions,
 		OverrideNormalizeNodeOptions,
@@ -62,6 +64,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			e.slate = Slate
 
 			overrideApply(e, options)
+			overrideCreateElementReference(e, options)
 			overrideInsertBreak(e, options)
 			overrideInsertData(e, options)
 			overrideInsertElementWithReference(e, options)

@@ -22,6 +22,7 @@ export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, Blo
 	isContemberContentPlaceholderElement: (node: Slate.Node) => node is ContemberContentPlaceholderElement
 	isEmbedElement: (node: Slate.Node) => node is EmbedElement
 	isContemberFieldElement: (node: Slate.Node) => node is ContemberFieldElement
+	createElementReference: (referenceDiscriminant: FieldValue, initialize?: EntityAccessor.BatchUpdatesHandler) => string
 	insertElementWithReference: <Element extends ElementNode>(
 		element: Omit<Element, 'referenceId'>,
 		referenceDiscriminant: FieldValue,

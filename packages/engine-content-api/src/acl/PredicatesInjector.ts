@@ -7,10 +7,10 @@ class PredicatesInjector {
 
 	public inject(entity: Model.Entity, where: Input.Where): Input.Where {
 		const restrictedWhere = this.injectToWhere(where, entity)
-		return this.createWhere(entity, [entity.primary], restrictedWhere)
+		return this.createWhere(entity, undefined, restrictedWhere)
 	}
 
-	private createWhere(entity: Model.Entity, fieldNames: string[], where: Input.Where): Input.Where {
+	private createWhere(entity: Model.Entity, fieldNames: string[] | undefined, where: Input.Where): Input.Where {
 		const predicatesWhere: Input.Where = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames)
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)

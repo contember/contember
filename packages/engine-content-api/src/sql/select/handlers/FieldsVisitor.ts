@@ -24,10 +24,13 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 			const tableAlias = columnPath.back().getAlias()
 			const columnAlias = columnPath.getAlias()
 
-			const fieldPredicate =
-				entity.primary === column.name
-					? undefined
-					: this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
+			const fieldPredicate = this.predicateFactory.shouldApplyCellLevelPredicate(
+				entity,
+				Acl.Operation.read,
+				column.name,
+			)
+				? this.predicateFactory.create(entity, Acl.Operation.read, [column.name])
+				: undefined
 
 			if (!fieldPredicate || Object.keys(fieldPredicate).length === 0) {
 				return qb.select([tableAlias, column.columnName], columnAlias)

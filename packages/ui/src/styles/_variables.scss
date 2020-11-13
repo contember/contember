@@ -350,7 +350,7 @@ $cui-message-variants: map_merge((
 
 // FormGroup
 $cui-formGroup-separation: 1em !default;
-$cui-formGroup-label-color: $cui-color-gray-7 !default;
+$cui-formGroup-label-color: $cui-color-gray-8 !default;
 $cui-formGroup-labelDescription-color: $cui-color-gray-4 !default;
 $cui-formGroup-description-color: $cui-color-gray-4 !default;
 
@@ -372,6 +372,7 @@ $cui-collapsible-transition-duration: .2s !default;
 
 // Heading
 $cui-heading-color: $cui-color-gray-9 !default;
+$cui-heading-color-subtle: $cui-color-gray-8 !default;
 
 $cui-heading-1-fontSize-default: 2em !default;
 $cui-heading-2-fontSize-default: 1.75em !default;

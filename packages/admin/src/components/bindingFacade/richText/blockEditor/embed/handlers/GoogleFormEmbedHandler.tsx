@@ -1,7 +1,7 @@
 import { SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
-import { EmbedHandler, PopulateEmbedDataOptions, RenderEmbedProps } from '../core'
+import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
 class GoogleFormEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'GoogleForm'
@@ -17,7 +17,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 		}
 	}
 
-	public getStaticFields() {
+	public staticRender() {
 		return <SugaredField field={this.options.googleFormIdField} />
 	}
 
@@ -66,24 +66,22 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 		return false
 	}
 
-	public renderEmbed(props: RenderEmbedProps) {
+	public renderEmbed() {
 		if (this.options.render) {
-			return this.options.render(props)
+			return this.options.render()
 		}
-		return <GoogleFormEmbedHandler.Renderer googleFormIdField={this.options.googleFormIdField} entity={props.entity} />
+		return <GoogleFormEmbedHandler.Renderer googleFormIdField={this.options.googleFormIdField} />
 	}
 
-	public populateEmbedData({ batchUpdates, embedArtifacts }: PopulateEmbedDataOptions<string>) {
-		batchUpdates(getAccessor => {
-			getAccessor().getField<string>(this.options.googleFormIdField).updateValue(embedArtifacts)
-		})
+	public populateEmbedData({ entity, embedArtifacts }: PopulateEmbedDataOptions<string>) {
+		entity.getField<string>(this.options.googleFormIdField).updateValue(embedArtifacts)
 	}
 }
 
 namespace GoogleFormEmbedHandler {
 	export type Options = {
 		nonEmbedLinkWarning?: string
-		render?: (props: RenderEmbedProps) => React.ReactNode
+		render?: () => React.ReactNode
 		googleFormIdField: SugaredFieldProps['field']
 	} & (
 		| {
@@ -94,7 +92,7 @@ namespace GoogleFormEmbedHandler {
 		  }
 	)
 
-	export interface RendererOptions extends RenderEmbedProps {
+	export interface RendererOptions {
 		googleFormIdField: SugaredFieldProps['field']
 	}
 

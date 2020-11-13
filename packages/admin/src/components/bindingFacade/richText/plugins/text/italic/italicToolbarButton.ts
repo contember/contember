@@ -1,7 +1,7 @@
-import { ToolbarButton } from '../../../toolbars'
+import { ToolbarButtonSpec } from '../../../toolbars'
 import { italicMark } from './withItalic'
 
-export const italicToolbarButton: ToolbarButton = {
+export const italicToolbarButton: ToolbarButtonSpec = {
 	marks: { [italicMark]: true },
 	label: 'Italic',
 	title: 'Italic',

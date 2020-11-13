@@ -29,13 +29,20 @@ export const Collapsible = React.memo((props: CollapsibleProps) => {
 	}
 
 	React.useEffect(() => {
+		let isMounted = true
 		if (props.expanded !== delayedExpanded) {
 			setIsTransitioning(true)
 			updateContentHeight()
 			requestAnimationFrame(() => {
+				if (!isMounted) {
+					return
+				}
 				forceReflow(contentRef.current!)
 				setDelayedExpanded(props.expanded)
 			})
+		}
+		return () => {
+			isMounted = false
 		}
 	}, [delayedExpanded, props.expanded])
 

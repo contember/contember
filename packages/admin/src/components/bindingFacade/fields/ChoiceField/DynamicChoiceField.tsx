@@ -40,10 +40,25 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		let reference: React.ReactNode
 		let entityListDataProvider: React.ReactNode
 
+		const renderedOption =
+			'renderOption' in props
+				? typeof props.optionsStaticRender === 'function'
+					? props.optionsStaticRender(environment)
+					: props.optionsStaticRender
+				: undefined
+
 		if (props.arity === 'single') {
-			reference = <HasOne field={props.field} expectedMutation="connectOrDisconnect" />
+			reference = (
+				<HasOne field={props.field} expectedMutation="connectOrDisconnect">
+					{renderedOption}
+				</HasOne>
+			)
 		} else if (props.arity === 'multiple') {
-			reference = <HasMany field={props.field} expectedMutation="connectOrDisconnect" initialEntityCount={0} />
+			reference = (
+				<HasMany field={props.field} expectedMutation="connectOrDisconnect" initialEntityCount={0}>
+					{renderedOption}
+				</HasMany>
+			)
 		} else {
 			assertNever(props)
 		}
@@ -59,9 +74,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 					: props.options
 			entityListDataProvider = (
 				<EntityListSubTree {...sugaredEntityList} expectedMutation="none">
-					{typeof props.optionsStaticRender === 'function'
-						? props.optionsStaticRender(environment)
-						: props.optionsStaticRender}
+					{renderedOption}
 				</EntityListSubTree>
 			)
 		} else {

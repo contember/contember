@@ -8,6 +8,10 @@
 	color: $cui-heading-color
 	margin: ((1em - $line-height) / 2) 0
 
+	&.view-subtle
+		color: $cui-heading-color-subtle
+		text-transform: uppercase
+
 @for $depth from 1 through 6
 	h#{$depth}.#{$cui-conf-globalPrefix}heading
 		@each $name, $fontSizes in $cui-heading-sizes
@@ -15,3 +19,6 @@
 			$view: toView($name)
 			&#{$view}
 				font-size: nth($fontSizes, $depth)
+
+				&.view-subtle
+					font-size: (nth($fontSizes, $depth) * .6)

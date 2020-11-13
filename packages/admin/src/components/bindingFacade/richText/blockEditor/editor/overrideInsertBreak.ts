@@ -1,14 +1,4 @@
-import {
-	Editor,
-	Element as SlateElement,
-	Node as SlateNode,
-	NodeEntry,
-	Path as SlatePath,
-	Point,
-	Range as SlateRange,
-	Text,
-	Transforms,
-} from 'slate'
+import { Editor, Node as SlateNode, Path as SlatePath, Point, Range as SlateRange, Transforms } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
@@ -21,6 +11,16 @@ export const overrideInsertBreak = <E extends BlockSlateEditor>(editor: E, optio
 		if (!editor.selection || !SlateRange.isCollapsed(editor.selection)) {
 			return insertBreak()
 		}
+
+		for (const [node] of SlateNode.levels(editor, editor.selection.focus.path, { reverse: true })) {
+			if ('referenceId' in node) {
+				return // No splitting of references. We'd have to clone the reference and we don't know how to do that yet.
+			}
+			if (Editor.isBlock(editor, node)) {
+				break
+			}
+		}
+
 		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor, editor.selection)
 
 		if (closestBlockEntry === undefined) {

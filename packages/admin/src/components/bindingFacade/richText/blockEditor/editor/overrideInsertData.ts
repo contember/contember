@@ -69,8 +69,7 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 			embedHandler!.datum.populateEmbedData({
 				embedArtifacts,
 				source: text,
-				batchUpdates: reference.batchUpdates,
-				environment: reference.environment,
+				entity: reference,
 			})
 		})
 	}

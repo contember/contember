@@ -1,7 +1,7 @@
-import { ToolbarButton } from '../../../toolbars'
+import { ToolbarButtonSpec } from '../../../toolbars'
 import { boldMark } from './withBold'
 
-export const boldToolbarButton: ToolbarButton = {
+export const boldToolbarButton: ToolbarButtonSpec = {
 	marks: { [boldMark]: true },
 	label: 'Bold',
 	title: 'Bold',

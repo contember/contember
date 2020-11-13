@@ -13,14 +13,13 @@ import {
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEnvironment,
-	useMutationState,
 	useParentEntityAccessor,
 	useRelativeEntityList,
 	useRelativeSingleField,
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { emptyArray, useConstantLengthInvariant } from '@contember/react-utils'
+import { emptyArray, noop, useConstantLengthInvariant } from '@contember/react-utils'
 import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
 import { PathRef } from 'slate'
@@ -31,13 +30,18 @@ import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discriminatio
 import { ElementNode } from '../baseEditor'
 import { CreateEditorPublicOptions } from '../editorFactory'
 import { RichEditor } from '../RichEditor'
-import { HoveringToolbars, HoveringToolbarsProps } from '../toolbars'
+import {
+	HoveringToolbars,
+	HoveringToolbarsProps,
+	InitializeReferenceToolbarButton,
+	ToolbarButtonSpec,
+} from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
 import { createBlockEditor } from './editor'
 import { ContemberFieldElement } from './elements'
 import { EmbedHandler } from './embed'
 import { FieldBackedElement } from './FieldBackedElement'
-import { ContentOutlet, ContentOutletProps, TextFieldProps, useEditorReferenceBlocks } from './templating'
+import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
@@ -257,6 +261,12 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 
 		const embedHandlers = Array.from(props.embedHandlers || [])
 
+		const inlineButtons: ToolbarButtonSpec[] = props.inlineButtons
+			? ((Array.isArray(props.inlineButtons[0])
+					? props.inlineButtons
+					: [props.inlineButtons]) as ToolbarButtonSpec[][]).flat()
+			: emptyArray
+
 		return (
 			<>
 				{props.leadingFieldBackedElements?.map((item, i) => (
@@ -274,13 +284,20 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 						{...(typeof props.referencesField === 'string' ? { field: props.referencesField } : props.referencesField)}
 						initialEntityCount={0}
 					>
+						{inlineButtons
+							.filter((button): button is InitializeReferenceToolbarButton => 'referenceContent' in button)
+							.map(({ referenceContent: Content }, i) => {
+								return (
+									<Content key={i} referenceId="" editor={0 as any} selection={null} onSuccess={noop} onCancel={noop} />
+								)
+							})}
 						<SugaredField field={props.referenceDiscriminationField} />
 						{props.children}
 						{props.embedContentDiscriminationField && (
 							<>
 								<SugaredField field={props.embedContentDiscriminationField} />
 								{embedHandlers.map((handler, i) => (
-									<React.Fragment key={i}>{handler.getStaticFields(environment)}</React.Fragment>
+									<React.Fragment key={i}>{handler.staticRender(environment)}</React.Fragment>
 								))}
 							</>
 						)}

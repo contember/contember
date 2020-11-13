@@ -3,6 +3,28 @@ import * as React from 'react'
 export const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: boolean, close: () => void) => {
 	const buttonRef = React.useRef<T>(null)
 	const contentRef = React.useRef<K>(null)
+
+	useRawCloseOnEscapeOrClickOutside<T, K>({
+		reference: buttonRef.current,
+		content: contentRef.current,
+		isOpen,
+		close,
+	})
+
+	return { buttonRef, contentRef }
+}
+
+export const useRawCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>({
+	isOpen,
+	close,
+	reference,
+	content,
+}: {
+	isOpen: boolean
+	close: () => void
+	reference: Node | null
+	content: Node | null
+}) => {
 	React.useEffect(() => {
 		if (isOpen) {
 			const closeOnEscapeKey = (event: KeyboardEvent) => {
@@ -12,15 +34,18 @@ export const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(i
 			}
 			const closeOnClickOutside = (event: MouseEvent) => {
 				if (
-					!(
-						buttonRef.current &&
-						contentRef.current &&
-						event.target instanceof Node &&
-						(buttonRef.current.contains(event.target) || contentRef.current.contains(event.target))
-					)
+					reference &&
+					content &&
+					event.target instanceof Node &&
+					(!document.body.contains(event.target) ||
+						reference === event.target ||
+						content === event.target ||
+						reference.contains(event.target) ||
+						content.contains(event.target))
 				) {
-					close()
+					return
 				}
+				close()
 			}
 			window.addEventListener('keydown', closeOnEscapeKey)
 			window.addEventListener('click', closeOnClickOutside)
@@ -29,6 +54,5 @@ export const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(i
 				window.removeEventListener('click', closeOnClickOutside)
 			}
 		}
-	}, [close, isOpen])
-	return { buttonRef, contentRef }
+	}, [close, content, isOpen, reference])
 }

@@ -1,0 +1,18 @@
+@import '../common'
+
+.#{$cui-conf-globalPrefix}editorBox
+	//background: $cui-box-depth-1-background
+	//border-radius: $cui-box-depth-1-border-radius
+	//box-shadow: 0 0 0 em(1px) rgba($cui-color-gray-8, .05), 0 em(1px) em(2px) 0 rgba($cui-color-gray-8, .05)
+	//padding: .75em
+	+box
+	display: flex
+	flex-direction: column
+
+	&-heading + &-content
+		margin-top: .75em
+
+	&.is-active
+		transition: box-shadow .15s
+		box-shadow: 0 0 0 .2em rgba($cui-box-active-color, .3)
+		z-index: 1

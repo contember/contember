@@ -1,2 +1,2 @@
-export * from './ToolbarButton'
+export * from './ToolbarButtonSpec'
 export * from './HoveringToolbars'

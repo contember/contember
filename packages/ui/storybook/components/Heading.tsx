@@ -14,6 +14,16 @@ const headingSizeKnob = (): 'small' | 'default' =>
 		'default',
 	)
 
+const headingDistinctionKnob = (): 'subtle' | 'default' =>
+	radios(
+		'Distinction',
+		{
+			Subtle: 'subtle',
+			Default: 'default',
+		},
+		'default',
+	)
+
 storiesOf('Heading', module).add('simple', () => {
 	const depth = number('Depth', 1, {
 		step: 1,
@@ -23,7 +33,7 @@ storiesOf('Heading', module).add('simple', () => {
 	}) as HeadingDepth
 
 	return (
-		<Heading depth={depth} size={headingSizeKnob()}>
+		<Heading depth={depth} size={headingSizeKnob()} distinction={headingDistinctionKnob()}>
 			{text('Text', 'Lorem ipsum dolor')}
 		</Heading>
 	)

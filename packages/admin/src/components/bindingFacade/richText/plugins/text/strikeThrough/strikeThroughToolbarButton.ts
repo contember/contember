@@ -1,7 +1,7 @@
-import { ToolbarButton } from '../../../toolbars'
+import { ToolbarButtonSpec } from '../../../toolbars'
 import { strikeThroughMark } from './withStrikeThrough'
 
-export const strikeThroughToolbarButton: ToolbarButton = {
+export const strikeThroughToolbarButton: ToolbarButtonSpec = {
 	marks: { [strikeThroughMark]: true },
 	label: 'Strikethrough',
 	title: 'Strikethrough',

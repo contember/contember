@@ -3,7 +3,7 @@ import { assertNever } from '../../utils'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import WhereBuilder from '../select/WhereBuilder'
 import { Client, DeleteBuilder, ForeignKeyViolationError, SelectBuilder } from '@contember/database'
-import Path from '../select/Path'
+import { PathFactory } from '../select/Path'
 import PredicateFactory from '../../acl/PredicateFactory'
 import UpdateBuilderFactory from '../update/UpdateBuilderFactory'
 import {
@@ -24,6 +24,7 @@ export class DeleteExecutor {
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
+		private readonly pathFactory: PathFactory,
 	) {}
 
 	public async execute(
@@ -89,7 +90,9 @@ export class DeleteExecutor {
 		const inQb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')
 			.select(['root_', entity.primaryColumn])
-		const inQbWithWhere = this.whereBuilder.build(inQb, entity, new Path([]), { and: [where, predicate] })
+		const inQbWithWhere = this.whereBuilder.build(inQb, entity, this.pathFactory.create([]), {
+			and: [where, predicate],
+		})
 
 		const qb = DeleteBuilder.create()
 			.from(entity.tableName)

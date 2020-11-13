@@ -1,5 +1,5 @@
 import { getEntity } from '@contember/schema-utils'
-import Path from './select/Path'
+import { PathFactory } from './select/Path'
 import WhereBuilder from './select/WhereBuilder'
 import PredicateFactory from '../acl/PredicateFactory'
 import {
@@ -30,6 +30,7 @@ class JunctionTableManager {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly connectJunctionHandler: JunctionTableManager.JunctionConnectHandler,
 		private readonly disconnectJunctionHandler: JunctionTableManager.JunctionDisconnectHandler,
+		private readonly pathFactory: PathFactory,
 	) {}
 
 	public async connectJunction(
@@ -114,8 +115,8 @@ class JunctionTableManager {
 
 					.join(owningEntity.tableName, 'owning', condition => condition.raw('true'))
 					.join(inversedEntity.tableName, 'inversed', condition => condition.raw('true'))
-				qb = this.whereBuilder.build(qb, owningEntity, new Path([], 'owning'), ownerWhere)
-				qb = this.whereBuilder.build(qb, inversedEntity, new Path([], 'inversed'), inversedWhere)
+				qb = this.whereBuilder.build(qb, owningEntity, this.pathFactory.create([], 'owning'), ownerWhere)
+				qb = this.whereBuilder.build(qb, inversedEntity, this.pathFactory.create([], 'inversed'), inversedWhere)
 				return qb
 			}
 

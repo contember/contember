@@ -1,18 +1,44 @@
-import farmhash from 'farmhash'
 const MAX_IDENTIFIER_LENGTH = 63
-const HASH_LENGTH = 8
+
+export class AliasContext {
+	private aliasIndex = new Map<string, number>()
+
+	public getAliasIndex(alias: string): number {
+		const index = this.aliasIndex.get(alias)
+		if (index !== undefined) {
+			return index
+		}
+		const newIndex = this.aliasIndex.size + 1
+		this.aliasIndex.set(alias, newIndex)
+		return newIndex
+	}
+}
+
+export class PathFactory {
+	private aliasContext = new AliasContext()
+
+	public constructor() {}
+
+	public create(path: string[], rootAlias = 'root_') {
+		return new Path(path, this.aliasContext, rootAlias)
+	}
+}
 
 export default class Path {
-	constructor(public readonly path: string[], public readonly rootAlias = 'root_') {}
+	constructor(
+		public readonly path: string[],
+		private readonly aliasContext: AliasContext,
+		public readonly rootAlias = 'root_',
+	) {}
 
 	public back() {
 		const newPath = [...this.path]
 		newPath.pop()
-		return new Path(newPath, this.rootAlias)
+		return new Path(newPath, this.aliasContext, this.rootAlias)
 	}
 
 	public for(path: string) {
-		return new Path([...this.path, path], this.rootAlias)
+		return new Path([...this.path, path], this.aliasContext, this.rootAlias)
 	}
 
 	public getAlias(): string {
@@ -22,9 +48,7 @@ export default class Path {
 		if (alias.length < MAX_IDENTIFIER_LENGTH) {
 			return alias
 		}
-
-		const hash = farmhash.hash32(alias).toString(16)
-
-		return alias.substr(0, MAX_IDENTIFIER_LENGTH - HASH_LENGTH - 1) + '_' + hash
+		const index = this.aliasContext.getAliasIndex(alias).toString()
+		return alias.substr(0, MAX_IDENTIFIER_LENGTH - index.length - 1) + '_' + index
 	}
 }

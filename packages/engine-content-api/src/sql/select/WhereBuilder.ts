@@ -1,16 +1,17 @@
 import { isIt } from '../../utils'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Input, Model } from '@contember/schema'
-import Path from './Path'
+import Path, { PathFactory } from './Path'
 import JoinBuilder from './JoinBuilder'
 import ConditionBuilder from './ConditionBuilder'
-import { SelectBuilder, ConditionBuilder as SqlConditionBuilder, Operator } from '@contember/database'
+import { ConditionBuilder as SqlConditionBuilder, Operator, SelectBuilder } from '@contember/database'
 
 class WhereBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly conditionBuilder: ConditionBuilder,
+		private readonly pathFactory: PathFactory,
 	) {}
 
 	public build(
@@ -164,7 +165,7 @@ class WhereBuilder {
 								.select(['root_', targetRelation.joiningColumn.columnName])
 								.from(targetEntity.tableName, 'root_'),
 							targetEntity,
-							new Path([]),
+							this.pathFactory.create([]),
 							relationWhere,
 							true,
 						),
@@ -200,7 +201,7 @@ class WhereBuilder {
 		)
 		return this.buildAdvanced(
 			targetEntity,
-			new Path([]),
+			this.pathFactory.create([]),
 			relationWhere,
 			cb => augmentedBuilder.where(clause => cb(clause)),
 			true,

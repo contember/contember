@@ -1,12 +1,11 @@
 import { Input, Model } from '@contember/schema'
 import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import SelectHydrator from './SelectHydrator'
-import Path from './Path'
+import Path, { PathFactory } from './Path'
 import WhereBuilder from './WhereBuilder'
-import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
+import { Client, LimitByGroupWrapper, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import OrderByBuilder from './OrderByBuilder'
 import FieldsVisitorFactory from './handlers/FieldsVisitorFactory'
-import { LimitByGroupWrapper } from '@contember/database'
 import SelectExecutionHandler from './SelectExecutionHandler'
 import MetaHandler from './handlers/MetaHandler'
 import Mapper from '../Mapper'
@@ -29,6 +28,7 @@ export default class SelectBuilder {
 		private readonly hydrator: SelectHydrator,
 		private readonly fieldsVisitorFactory: FieldsVisitorFactory,
 		private readonly selectHandlers: { [key: string]: SelectExecutionHandler<any> },
+		private readonly pathFactory: PathFactory,
 	) {}
 
 	public async execute(db: Client): Promise<SelectHydrator.Rows> {
@@ -62,7 +62,7 @@ export default class SelectBuilder {
 				[path.getAlias(), groupByColumn],
 				(orderable, qb) => {
 					if (orderBy.length > 0) {
-						;[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, new Path([]), orderBy)
+						;[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
 					}
 					return [orderable, qb]
 				},

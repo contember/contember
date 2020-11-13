@@ -1,14 +1,14 @@
 import { GraphQLFieldConfig } from 'graphql'
 import { Model } from '@contember/schema'
 
-interface EntityFieldsProvider<MetaArgs extends object = {}> {
-	getFields(entity: Model.Entity, accessibleFields: string[]): EntityFieldsProvider.FieldMap<MetaArgs>
+interface EntityFieldsProvider<ExtensionArg extends object = {}> {
+	getFields(entity: Model.Entity, accessibleFields: string[]): EntityFieldsProvider.FieldMap<ExtensionArg>
 }
 
 namespace EntityFieldsProvider {
-	export type FieldMap<MetaArgs extends object> = {
+	export type FieldMap<ExtensionArg extends object> = {
 		[fieldName: string]: GraphQLFieldConfig<any, any> & {
-			meta: MetaArgs
+			extensions: ExtensionArg
 		}
 	}
 }

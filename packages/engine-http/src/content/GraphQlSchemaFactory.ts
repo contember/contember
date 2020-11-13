@@ -65,7 +65,7 @@ class GraphQlSchemaFactory {
 		const contentSchema = makeExecutableSchema({
 			...contentSchemaFactory.create(),
 			resolverValidationOptions: {
-				requireResolversForResolveType: false,
+				requireResolversForResolveType: 'ignore',
 			},
 		})
 

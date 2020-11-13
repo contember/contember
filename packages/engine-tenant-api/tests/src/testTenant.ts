@@ -96,7 +96,7 @@ export const executeTenantTest = async (test: Test) => {
 		typeDefs: typeDefs,
 		resolvers: tenantContainer.resolvers as any,
 		resolverValidationOptions: {
-			requireResolversForResolveType: false,
+			requireResolversForResolveType: 'ignore',
 		},
 	})
 	await executeGraphQlTest({

@@ -101,9 +101,9 @@ class EntityTypeProvider {
 		return Object.entries(this.entityFieldProviders)
 			.map(([key, provider]) =>
 				Object.entries(provider.getFields(entity, accessibleFields))
-					.map(([fieldName, fieldConfig]): [string, GraphQLFieldConfig<any, any> & { meta: any }] => [
+					.map(([fieldName, fieldConfig]): [string, GraphQLFieldConfig<any, any>] => [
 						fieldName,
-						{ ...fieldConfig, meta: { ...(fieldConfig.meta || {}), extensionKey: key } },
+						{ ...fieldConfig, extensions: { ...(fieldConfig.extensions || {}), extensionKey: key } },
 					])
 					.reduce((result, [name, value]) => ({ ...result, [name]: value }), {}),
 			)

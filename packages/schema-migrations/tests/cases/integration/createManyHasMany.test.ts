@@ -72,7 +72,7 @@ testMigrations('create many has many relation (post with categories)', {
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "category"
 		FOR EACH ROW
-	EXECUTE PROCEDURE "system"."trigger_event"($pg1$id$pg1$);
+	EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
 	CREATE TRIGGER "log_event_statement"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "category"
@@ -89,7 +89,7 @@ testMigrations('create many has many relation (post with categories)', {
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "post_categories"
 		FOR EACH ROW
-	EXECUTE PROCEDURE "system"."trigger_event"($pg1$post_id$pg1$, $pg1$category_id$pg1$);
+	EXECUTE PROCEDURE "system"."trigger_event"($pga$post_id$pga$, $pga$category_id$pga$);
 	CREATE TRIGGER "log_event_statement"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "post_categories"

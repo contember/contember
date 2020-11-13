@@ -1,15 +1,26 @@
 import { Acl, Input, Model } from '@contember/schema'
 import VariableInjector from './VariableInjector'
-import { ImplementationException } from '../exception'
+
+const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
 
 class PredicateFactory {
 	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {}
+
+	public shouldApplyCellLevelPredicate(
+		entity: Model.Entity,
+		operation: Acl.Operation.read,
+		fieldName: string,
+	): boolean {
+		const rowLevelField = getRowLevelPredicatePseudoField(entity)
+		const permissions = this.permissions[entity.name]?.operations?.[operation]
+		return permissions?.[fieldName] !== permissions?.[rowLevelField]
+	}
 
 	public create(entity: Model.Entity, operation: Acl.Operation.delete): Input.Where
 	public create(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
-		fieldNames: string[],
+		fieldNames?: string[],
 	): Input.Where
 	public create(entity: Model.Entity, operation: Acl.Operation, fieldNames?: string[]): Input.Where {
 		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
@@ -31,7 +42,7 @@ class PredicateFactory {
 			predicates = [deletePredicate]
 		} else {
 			if (fieldNames === undefined) {
-				throw new ImplementationException('PredicateFactory: fieldNames are required for operations other than delete')
+				fieldNames = [getRowLevelPredicatePseudoField(entity)]
 			}
 			const fieldPermissions = entityPermissions.operations[operation]
 			if (fieldPermissions === undefined) {

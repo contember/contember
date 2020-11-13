@@ -4,7 +4,14 @@ import { readConfig, run } from './index'
 import { Server } from 'net'
 import loadPlugins from './loadPlugins'
 import { ConfigProcessor } from '@contember/engine-plugins'
+import { join } from 'path'
 ;(async () => {
+	const packageJsonFile = join(__dirname, '../../package.json')
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	const version = require(packageJsonFile).version
+	// eslint-disable-next-line no-console
+	console.log(`Starting Contember ${version}`)
+
 	const configFile = process.env['CONTEMBER_CONFIG_FILE']
 	if (!configFile) {
 		throw new Error('env variable CONTEMBER_CONFIG_FILE is not set')
@@ -31,6 +38,14 @@ import { ConfigProcessor } from '@contember/engine-plugins'
 		})
 	}
 	const debug = process.env.NODE_ENV === 'development'
+	// eslint-disable-next-line no-console
+	console.log(`NODE_ENV is set to ${process.env.NODE_ENV}`)
+	if (debug) {
+		// eslint-disable-next-line no-console
+		console.log('Starting Contember in debug mode')
+		// eslint-disable-next-line no-console
+		console.log('NEVER USE debug mode in production environment')
+	}
 	const plugins = await loadPlugins()
 	const configProcessors = plugins
 		.map(it => (it.getConfigProcessor ? it.getConfigProcessor() : null))

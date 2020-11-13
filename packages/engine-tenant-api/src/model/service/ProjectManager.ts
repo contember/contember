@@ -1,6 +1,6 @@
 import { DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
-import { CommandBus } from '../commands/CommandBus'
+import { CommandBus } from '../commands'
 import { PermissionContext } from '../authorization'
 import { Project } from '../type'
 import { CreateOrUpdateProjectCommand } from '../commands'
@@ -12,8 +12,8 @@ export class ProjectManager {
 		private readonly commandBus: CommandBus,
 	) {}
 
-	public async createOrUpdateProject(project: Pick<Project, 'name' | 'slug'>) {
-		await this.commandBus.execute(new CreateOrUpdateProjectCommand(project))
+	public async createOrUpdateProject(project: Pick<Project, 'name' | 'slug'>): Promise<boolean> {
+		return await this.commandBus.execute(new CreateOrUpdateProjectCommand(project))
 	}
 
 	public async getProjectBySlug(slug: string): Promise<Project | null> {

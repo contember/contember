@@ -28,14 +28,13 @@ export async function createPgClient(cfg: ClientConfig): Promise<Client> {
 	return new client(cfg)
 }
 
-export const createDatabaseIfNotExists = async (db: DatabaseCredentials) => {
+export const createDatabaseIfNotExists = async (db: DatabaseCredentials, log: (message: string) => void) => {
 	const Connection = (await import('@contember/database')).Connection
 	const connection = new Connection({ ...db, database: 'postgres' }, {})
 	const result = await connection.query('SELECT 1 FROM "pg_database" WHERE "datname" = ?', [db.database])
 
 	if (result.rowCount === 0) {
-		// eslint-disable-next-line no-console
-		console.warn(`Database ${db.database} does not exist, attempting to create it...`)
+		log(`Database ${db.database} does not exist, attempting to create it...`)
 		await connection.query(`CREATE DATABASE ${wrapIdentifier(db.database)}`)
 	}
 

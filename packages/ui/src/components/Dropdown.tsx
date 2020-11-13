@@ -16,7 +16,7 @@ export interface DropdownRenderProps {
 export interface DropdownProps {
 	renderToggle?: (props: {
 		ref: React.Ref<HTMLElement>
-		onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+		onClick: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
 	}) => React.ReactNode
 	renderContent?: (props: DropdownRenderProps) => React.ReactNode
 	buttonProps?: ButtonBasedButtonProps

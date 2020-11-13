@@ -1,7 +1,7 @@
-import { ToolbarButton } from '../../../toolbars'
+import { ToolbarButtonSpec } from '../../../toolbars'
 import { highlightMark } from './withHighlight'
 
-export const highlightToolbarButton: ToolbarButton = {
+export const highlightToolbarButton: ToolbarButtonSpec = {
 	marks: { [highlightMark]: true },
 	label: 'Highlight',
 	title: 'Highlight',

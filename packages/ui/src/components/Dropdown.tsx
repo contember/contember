@@ -24,6 +24,7 @@ export interface DropdownProps {
 	contentContainer?: HTMLElement
 	children?: React.ReactElement | ((props: DropdownRenderProps) => React.ReactNode)
 	styledContent?: boolean
+	onDismiss?: () => void
 }
 
 const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
@@ -47,6 +48,7 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 	const [isOpen, setIsOpen] = React.useState(false)
 	const [isTransitioning, setIsTransitioning] = React.useState(false)
 
+	const onDismiss = props.onDismiss
 	const isActive = isOpen || isTransitioning
 
 	const [referenceElement, setReferenceElement] = React.useState<HTMLElement | null>(null)
@@ -57,12 +59,12 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 	)
 
 	const suppliedButtonOnClickHandler = props.buttonProps && props.buttonProps.onClick
-	const onButtonClick = React.useCallback<MouseEventHandler<HTMLButtonElement>>(
+	const onButtonClick = React.useCallback<MouseEventHandler<HTMLElement>>(
 		e => {
 			forceUpdate?.()
 			setIsOpen(isOpen => !isOpen)
 			setIsTransitioning(true)
-			suppliedButtonOnClickHandler && suppliedButtonOnClickHandler(e)
+			suppliedButtonOnClickHandler && suppliedButtonOnClickHandler(e as React.MouseEvent<HTMLButtonElement>)
 		},
 		[forceUpdate, suppliedButtonOnClickHandler],
 	)
@@ -71,9 +73,14 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 		setIsTransitioning(true)
 	}, [])
 
+	const dismiss = React.useCallback(() => {
+		close()
+		onDismiss?.()
+	}, [close, onDismiss])
+
 	useRawCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>({
 		isOpen,
-		close,
+		close: dismiss,
 		reference: referenceElement,
 		content: popperElement,
 	})

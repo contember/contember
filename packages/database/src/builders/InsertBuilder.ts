@@ -8,6 +8,7 @@ import { SelectBuilder } from './SelectBuilder'
 import { resolveValues } from './utils'
 import { ConflictActionType } from './ConflictActionType'
 import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
+import { Where } from './internal/Where'
 
 class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.Aware, QueryBuilder {
 	private constructor(private readonly options: InsertBuilder.Options) {}
@@ -36,21 +37,29 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.A
 	}
 
 	public onConflict(
-		type: ConflictActionType.update,
+		action: ConflictActionType.update,
 		target: InsertBuilder.ConflictTarget,
 		values: QueryBuilder.Values,
+		where?: Where.Expression,
 	): InsertBuilder<Result>
-	public onConflict(type: ConflictActionType.doNothing, target?: InsertBuilder.ConflictTarget): InsertBuilder<Result>
+	public onConflict(action: ConflictActionType.doNothing, target?: InsertBuilder.ConflictTarget): InsertBuilder<Result>
 	public onConflict(
-		type: ConflictActionType,
+		action: ConflictActionType,
 		target?: InsertBuilder.ConflictTarget,
 		values?: QueryBuilder.Values,
+		where?: Where.Expression,
 	): InsertBuilder<Result> {
 		let conflictAction: InsertBuilder.ConflictAction
-		if (type === ConflictActionType.update && values && target) {
-			conflictAction = { type, values: resolveValues(values), target }
-		} else if (type === ConflictActionType.doNothing) {
-			conflictAction = { type, target }
+		if (action === ConflictActionType.update && values && target) {
+			const whereStm = new Where.Statement([])
+			conflictAction = {
+				type: action,
+				values: resolveValues(values),
+				target,
+				where: where ? whereStm.withWhere(where) : whereStm,
+			}
+		} else if (action === ConflictActionType.doNothing) {
+			conflictAction = { type: action, target }
 		} else {
 			throw Error()
 		}
@@ -121,7 +130,11 @@ namespace InsertBuilder {
 
 	export type ConflictAction =
 		| { type: ConflictActionType.doNothing; target?: ConflictTarget }
-		| { type: ConflictActionType.update; values: QueryBuilder.ResolvedValues; target: ConflictTarget }
+		| (Where.Options & {
+				type: ConflictActionType.update
+				values: QueryBuilder.ResolvedValues
+				target: ConflictTarget
+		  })
 
 	export type IndexColumns = string[]
 	export type ConflictTarget = IndexColumns | { constraint: string }

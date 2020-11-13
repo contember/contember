@@ -178,6 +178,41 @@ test('query builder: construct insert with on conflict update', async () => {
 	})
 })
 
+test('query builder: construct insert with on conflict update with where', async () => {
+	await execute({
+		query: async wrapper => {
+			const builder = wrapper
+				.insertBuilder()
+				.into('author')
+				.values({
+					id: expr => expr.selectValue('123'),
+					title: expr => expr.select('title'),
+				})
+				.from(qb => {
+					return qb.from('foo')
+				})
+				.returning('id')
+				.onConflict(
+					ConflictActionType.update,
+					['id'],
+					{
+						id: expr => expr.selectValue('123'),
+						title: expr => expr.select('title'),
+					},
+					expr => expr.raw('true'),
+				)
+			await builder.execute(wrapper)
+		},
+		sql: SQL`insert into "public"."author" ("id", "title")
+        select
+          ?,
+          "title"
+        from "public"."foo"
+      on conflict ("id") do update set "id" = ?, "title" = "title" where true returning "id"`,
+		parameters: ['123', '123'],
+	})
+})
+
 test('query builder: construct insert with on conflict do nothing', async () => {
 	await execute({
 		query: async wrapper => {

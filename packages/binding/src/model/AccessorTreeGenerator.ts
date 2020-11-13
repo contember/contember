@@ -1043,6 +1043,11 @@ export class AccessorTreeGenerator {
 
 		const batchUpdatesImplementation: EntityAccessor.BatchUpdates = performUpdates => {
 			if (entityState.isScheduledForDeletion) {
+				if (entityState.hasPendingUpdate) {
+					// If hasPendingUpdate, we've likely just deleted the entity as a part of this transaction, so don't worry
+					// about it and just do nothing.
+					return
+				}
 				throw new BindingError(`Trying to update an entity (or something within said entity) that has been deleted.`)
 			}
 			entityState.batchUpdateDepth++

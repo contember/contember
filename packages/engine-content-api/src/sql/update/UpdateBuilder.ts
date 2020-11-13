@@ -3,7 +3,7 @@ import { Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { Client, Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
-import Path from '../select/Path'
+import { PathFactory } from '../select/Path'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { AbortUpdate } from './Updater'
 
@@ -30,6 +30,7 @@ export default class UpdateBuilder {
 		private readonly entity: Model.Entity,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly uniqueWhere: Input.Where,
+		private readonly pathFactory: PathFactory,
 	) {}
 
 	public async addFieldValue(
@@ -87,7 +88,7 @@ export default class UpdateBuilder {
 
 					qb = remainingColumns.reduce((qb, columnName) => qb.select(['root_', columnName]), qb)
 
-					qb = this.whereBuilder.build(qb, this.entity, new Path([]), {
+					qb = this.whereBuilder.build(qb, this.entity, this.pathFactory.create([]), {
 						and: [this.uniqueWhere, this.oldWhere],
 					})
 
@@ -108,7 +109,7 @@ export default class UpdateBuilder {
 					const col1 = tuple(this.entity.tableName, this.entity.primaryColumn)
 					const col2 = tuple('newData_', this.entity.primaryColumn)
 					qb = qb.where(expr => expr.compareColumns(col1, Operator.eq, col2))
-					qb = this.whereBuilder.build(qb, this.entity, new Path([], 'newData_'), this.newWhere)
+					qb = this.whereBuilder.build(qb, this.entity, this.pathFactory.create([], 'newData_'), this.newWhere)
 					return qb
 				})
 

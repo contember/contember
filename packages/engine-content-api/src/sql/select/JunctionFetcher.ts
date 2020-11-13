@@ -1,4 +1,4 @@
-import Path from '../select/Path'
+import Path, { PathFactory } from '../select/Path'
 import Mapper from '../Mapper'
 import WhereBuilder from '../select/WhereBuilder'
 import { Client, LimitByGroupWrapper, Operator, SelectBuilder } from '@contember/database'
@@ -12,6 +12,7 @@ class JunctionFetcher {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly orderBuilder: OrderByBuilder,
 		private readonly predicateInjector: PredicatesInjector,
+		private readonly pathFactory: PathFactory,
 	) {}
 
 	public async fetchJunction(
@@ -44,7 +45,7 @@ class JunctionFetcher {
 			object.args.orderBy[0]._randomSeeded === undefined
 
 		if (hasWhere || hasFieldOrderBy) {
-			const path = new Path([])
+			const path = this.pathFactory.create([])
 			qb = qb.join(targetEntity.tableName, path.getAlias(), condition =>
 				condition.compareColumns(['junction_', column.targetColumn.columnName], Operator.eq, [
 					path.getAlias(),
@@ -54,14 +55,20 @@ class JunctionFetcher {
 		}
 
 		if (where && hasWhere) {
-			qb = this.whereBuilder.build(qb, targetEntity, new Path([]), where)
+			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), where)
 		}
 
 		const wrapper = new LimitByGroupWrapper(
 			['junction_', column.sourceColumn.columnName],
 			(orderable, qb) => {
 				if (object.args.orderBy) {
-					;[qb, orderable] = this.orderBuilder.build(qb, orderable, targetEntity, new Path([]), object.args.orderBy)
+					;[qb, orderable] = this.orderBuilder.build(
+						qb,
+						orderable,
+						targetEntity,
+						this.pathFactory.create([]),
+						object.args.orderBy,
+					)
 				}
 				return [orderable, qb]
 			},

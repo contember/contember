@@ -25,6 +25,7 @@ import { Builder } from '@contember/dic'
 import { Acl, Schema } from '@contember/schema'
 import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { Providers } from '@contember/schema-utils'
+import { PathFactory } from '../sql/select/Path'
 
 type MapperContainerArgs = {
 	schema: Schema
@@ -45,15 +46,17 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		.addService('predicatesInjector', ({ predicateFactory }) => new PredicatesInjector(schema.model, predicateFactory))
 		.addService('joinBuilder', () => new JoinBuilder(schema.model))
 		.addService('conditionBuilder', () => new ConditionBuilder())
+		.addService('pathFactory', () => new PathFactory())
 		.addService(
 			'whereBuilder',
-			({ joinBuilder, conditionBuilder }) => new WhereBuilder(schema.model, joinBuilder, conditionBuilder),
+			({ joinBuilder, conditionBuilder, pathFactory }) =>
+				new WhereBuilder(schema.model, joinBuilder, conditionBuilder, pathFactory),
 		)
 		.addService('orderByBuilder', ({ joinBuilder }) => new OrderByBuilder(schema.model, joinBuilder))
 		.addService(
 			'junctionFetcher',
-			({ whereBuilder, orderByBuilder, predicatesInjector }) =>
-				new JunctionFetcher(whereBuilder, orderByBuilder, predicatesInjector),
+			({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>
+				new JunctionFetcher(whereBuilder, orderByBuilder, predicatesInjector, pathFactory),
 		)
 		.addService(
 			'fieldsVisitorFactory',
@@ -71,7 +74,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		}))
 		.addService(
 			'selectBuilderFactory',
-			({ whereBuilder, orderByBuilder, fieldsVisitorFactory, metaHandler, selectHandlers }) =>
+			({ whereBuilder, orderByBuilder, fieldsVisitorFactory, metaHandler, selectHandlers, pathFactory }) =>
 				new (class implements SelectBuilderFactory {
 					create(qb: DbSelectBuilder, hydrator: SelectHydrator): SelectBuilder {
 						return new SelectBuilder(
@@ -83,30 +86,38 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 							hydrator,
 							fieldsVisitorFactory,
 							selectHandlers,
+							pathFactory,
 						)
 					}
 				})(),
 		)
-		.addService('insertBuilderFactory', ({ whereBuilder }) => new InsertBuilderFactory(schema.model, whereBuilder))
-		.addService('updateBuilderFactory', ({ whereBuilder }) => new UpdateBuilderFactory(schema.model, whereBuilder))
+		.addService(
+			'insertBuilderFactory',
+			({ whereBuilder, pathFactory }) => new InsertBuilderFactory(schema.model, whereBuilder, pathFactory),
+		)
+		.addService(
+			'updateBuilderFactory',
+			({ whereBuilder, pathFactory }) => new UpdateBuilderFactory(schema.model, whereBuilder, pathFactory),
+		)
 
 		.addService('connectJunctionHandler', () => new JunctionTableManager.JunctionConnectHandler())
 		.addService('disconnectJunctionHandler', ({}) => new JunctionTableManager.JunctionDisconnectHandler())
 		.addService(
 			'junctionTableManager',
-			({ predicateFactory, whereBuilder, connectJunctionHandler, disconnectJunctionHandler }) =>
+			({ predicateFactory, whereBuilder, connectJunctionHandler, disconnectJunctionHandler, pathFactory }) =>
 				new JunctionTableManager(
 					schema.model,
 					predicateFactory,
 					whereBuilder,
 					connectJunctionHandler,
 					disconnectJunctionHandler,
+					pathFactory,
 				),
 		)
 		.addService(
 			'deleteExecutor',
-			({ predicateFactory, updateBuilderFactory, whereBuilder }) =>
-				new DeleteExecutor(schema.model, predicateFactory, whereBuilder, updateBuilderFactory),
+			({ predicateFactory, updateBuilderFactory, whereBuilder, pathFactory }) =>
+				new DeleteExecutor(schema.model, predicateFactory, whereBuilder, updateBuilderFactory, pathFactory),
 		)
 		.addService(
 			'updater',
@@ -130,6 +141,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 				deleteExecutor,
 				updater,
 				inserter,
+				pathFactory,
 			}) => {
 				return (db: Client) =>
 					new Mapper(
@@ -143,6 +155,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 						deleteExecutor,
 						updater,
 						inserter,
+						pathFactory,
 					)
 			},
 		)

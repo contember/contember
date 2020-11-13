@@ -1,7 +1,7 @@
 import { Input, Model } from '@contember/schema'
 import { getColumnName } from '@contember/schema-utils'
 import SelectHydrator from './select/SelectHydrator'
-import Path from './select/Path'
+import Path, { PathFactory } from './select/Path'
 import * as database from '@contember/database'
 import { Client, SelectBuilder } from '@contember/database'
 import SelectBuilderFactory from './select/SelectBuilderFactory'
@@ -32,6 +32,7 @@ class Mapper {
 		private readonly deleteExecutor: DeleteExecutor,
 		private readonly updater: Updater,
 		private readonly inserter: Inserter,
+		private readonly pathFactory: PathFactory,
 	) {}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
@@ -41,7 +42,7 @@ class Mapper {
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		const builtQb = this.whereBuilder.build(qb, entity, new Path([]), expandedWhere)
+		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), expandedWhere)
 		const result = await builtQb.getResult(this.db)
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
@@ -65,7 +66,7 @@ class Mapper {
 		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 		let indexByAlias: string | null = null
 		if (indexBy) {
-			const path = new Path([])
+			const path = this.pathFactory.create([])
 			indexByAlias = path.for(indexBy).getAlias()
 			qb = qb.select([path.getAlias(), getColumnName(this.schema, entity, indexBy)], indexByAlias)
 		}
@@ -91,7 +92,7 @@ class Mapper {
 	) {
 		const hydrator = new SelectHydrator()
 		let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
-		const path = new Path([])
+		const path = this.pathFactory.create([])
 		const groupingKey = '__grouping_key'
 		qb = qb.select([path.getAlias(), relation.joiningColumn.columnName], groupingKey)
 
@@ -107,7 +108,7 @@ class Mapper {
 		groupBy?: string,
 	) {
 		const inputWithOrder = OrderByHelper.appendDefaultOrderBy(entity, input, [])
-		const path = new Path([])
+		const path = this.pathFactory.create([])
 		const augmentedBuilder = qb.from(entity.tableName, path.getAlias()).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator)
@@ -121,7 +122,7 @@ class Mapper {
 	}
 
 	public async count(entity: Model.Entity, filter: Input.Where) {
-		const path = new Path([])
+		const path = this.pathFactory.create([])
 		const qb = SelectBuilder.create()
 			.from(entity.tableName, path.getAlias())
 			.select(expr => expr.raw('count(*)'), 'row_count')

@@ -25,18 +25,22 @@ export const createConnectionMock = (
 			const actualSql = sql.replace(/\s+/g, ' ').toLowerCase()
 			const expectedSql = expected.sql.replace(/\s+/g, ' ').toLowerCase()
 
-			assert.is(actualSql, expectedSql)
+			const expectedMsg = `Expected query does not match SQL:
+${sql}
+with following parameters
+${JSON.stringify(parameters, undefined, '  ')}`
+			assert.is(actualSql, expectedSql, expectedMsg)
 
 			if (expected.parameters) {
-				assert.is((parameters || []).length, expected.parameters.length)
+				assert.is((parameters || []).length, expected.parameters.length, expectedMsg)
 
 				for (let index in expected.parameters) {
 					const expectedParameter = expected.parameters[index]
 					const actualParameter = (parameters || [])[index]
 					if (typeof expectedParameter === 'function') {
-						assert.is(expectedParameter(actualParameter), true)
+						assert.is(expectedParameter(actualParameter), true, expectedMsg)
 					} else {
-						assert.equal(actualParameter, expectedParameter)
+						assert.equal(actualParameter, expectedParameter, expectedMsg)
 					}
 				}
 			}

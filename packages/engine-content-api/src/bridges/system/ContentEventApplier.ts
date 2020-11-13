@@ -7,7 +7,7 @@ import assert from 'assert'
 import { assertNever } from '../../utils'
 import PredicateFactory from '../../acl/PredicateFactory'
 import WhereBuilder from '../../sql/select/WhereBuilder'
-import Path from '../../sql/select/Path'
+import Path, { PathFactory } from '../../sql/select/Path'
 import UpdateBuilderFactory from '../../sql/update/UpdateBuilderFactory'
 import InsertBuilderFactory from '../../sql/insert/InsertBuilderFactory'
 import JoinBuilder from '../../sql/select/JoinBuilder'
@@ -113,6 +113,7 @@ export interface ContentApplyDependencies {
 	junctionTableManager: JunctionTableManager
 	insertBuilderFactory: InsertBuilderFactory
 	updateBuilderFactory: UpdateBuilderFactory
+	pathFactory: PathFactory
 }
 export interface ContentApplyDependenciesFactory {
 	create(schema: Schema, roles: string[], identityVariables: Acl.VariablesMap): ContentApplyDependencies
@@ -120,28 +121,36 @@ export interface ContentApplyDependenciesFactory {
 
 export class ContentApplyDependenciesFactoryImpl implements ContentApplyDependenciesFactory {
 	create(schema: Schema, roles: string[], identityVariables: Acl.VariablesMap): ContentApplyDependencies {
-		const whereBuilder = new WhereBuilder(schema.model, new JoinBuilder(schema.model), new ConditionBuilder())
+		const pathFactory = new PathFactory()
+		const whereBuilder = new WhereBuilder(
+			schema.model,
+			new JoinBuilder(schema.model),
+			new ConditionBuilder(),
+			pathFactory,
+		)
 		const permissionsFactory = new PermissionsByIdentityFactory()
 		const { permissions } = permissionsFactory.createPermissions(schema, {
 			projectRoles: roles,
 		})
 
 		const predicateFactory = new PredicateFactory(permissions, new VariableInjector(schema.model, identityVariables))
-		const insertBuilderFactory = new InsertBuilderFactory(schema.model, whereBuilder)
+		const insertBuilderFactory = new InsertBuilderFactory(schema.model, whereBuilder, pathFactory)
 		const junctionTableManager = new JunctionTableManager(
 			schema.model,
 			predicateFactory,
 			whereBuilder,
 			new JunctionTableManager.JunctionConnectHandler(),
 			new JunctionTableManager.JunctionDisconnectHandler(),
+			pathFactory,
 		)
-		const updateBuilderFactory = new UpdateBuilderFactory(schema.model, whereBuilder)
+		const updateBuilderFactory = new UpdateBuilderFactory(schema.model, whereBuilder, pathFactory)
 		return {
 			insertBuilderFactory,
 			junctionTableManager,
 			predicateFactory,
 			updateBuilderFactory,
 			whereBuilder,
+			pathFactory,
 		}
 	}
 }
@@ -179,6 +188,7 @@ export class ContentEventApplier {
 			junctionTableManager: JunctionTableManager
 			insertBuilderFactory: InsertBuilderFactory
 			updateBuilderFactory: UpdateBuilderFactory
+			pathFactory: PathFactory
 		},
 		event: ContentEvent,
 	): Promise<MutationResult> {
@@ -211,6 +221,7 @@ export class ContentEventApplier {
 			entityTable: EntityTable
 			insertBuilderFactory: InsertBuilderFactory
 			updateBuilderFactory: UpdateBuilderFactory
+			pathFactory: PathFactory
 		},
 		event: ContentEvent,
 	): Promise<MutationResult> {
@@ -291,6 +302,7 @@ export class ContentEventApplier {
 			predicateFactory: PredicateFactory
 			whereBuilder: WhereBuilder
 			entityTable: EntityTable
+			pathFactory: PathFactory
 		},
 		event: DeleteEvent,
 	): Promise<MutationResult> {
@@ -301,7 +313,7 @@ export class ContentEventApplier {
 			.from(entity.tableName, 'root_')
 			.select(['root_', entity.primaryColumn])
 		const primary = event.rowId[0]
-		const inQbWithWhere = context.whereBuilder.build(inQb, entity, new Path([]), {
+		const inQbWithWhere = context.whereBuilder.build(inQb, entity, context.pathFactory.create([]), {
 			and: [
 				{
 					[entity.primary]: { eq: primary },

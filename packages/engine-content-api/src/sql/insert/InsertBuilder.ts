@@ -1,7 +1,7 @@
 import { Input, Model, Value } from '@contember/schema'
 import { Client, InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
 import WhereBuilder from '../select/WhereBuilder'
-import Path from '../select/Path'
+import Path, { PathFactory } from '../select/Path'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { ImplementationException } from '../../exception'
@@ -27,6 +27,7 @@ export default class InsertBuilder {
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
 		private readonly whereBuilder: WhereBuilder,
+		private readonly pathFactory: PathFactory,
 	) {}
 
 	public addFieldValue(fieldName: string, value: Value.GenericValueLike<Value.AtomicValue<AbortInsert | undefined>>) {
@@ -65,7 +66,7 @@ export default class InsertBuilder {
 				.values(insertData)
 				.from(qb => {
 					qb = qb.from('root_')
-					return this.whereBuilder.build(qb, this.entity, new Path([]), this.where)
+					return this.whereBuilder.build(qb, this.entity, this.pathFactory.create([]), this.where)
 				})
 				.returning(this.entity.primaryColumn)
 

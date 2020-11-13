@@ -34,15 +34,18 @@ export const useRawCloseOnEscapeOrClickOutside = <T extends Node, K extends Node
 			}
 			const closeOnClickOutside = (event: MouseEvent) => {
 				if (
-					!(
-						reference &&
-						content &&
-						event.target instanceof Node &&
-						(reference.contains(event.target) || content.contains(event.target))
-					)
+					reference &&
+					content &&
+					event.target instanceof Node &&
+					(!document.body.contains(event.target) ||
+						reference === event.target ||
+						content === event.target ||
+						reference.contains(event.target) ||
+						content.contains(event.target))
 				) {
-					close()
+					return
 				}
+				close()
 			}
 			window.addEventListener('keydown', closeOnEscapeKey)
 			window.addEventListener('click', closeOnClickOutside)

@@ -28,7 +28,10 @@ export const useApiRequest = <SuccessData>(
 				type: ApiRequestActionType.Initialize,
 			})
 			return client
-				.sendRequest<SuccessData>(query, variables, apiToken)
+				.sendRequest<SuccessData>(query, {
+					variables,
+					apiTokenOverride: apiToken,
+				})
 				.then(data => {
 					dispatch({
 						type: ApiRequestActionType.ResolveSuccessfully,

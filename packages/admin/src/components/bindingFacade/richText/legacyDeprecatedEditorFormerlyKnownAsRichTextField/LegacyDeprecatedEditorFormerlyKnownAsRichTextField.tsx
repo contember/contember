@@ -68,7 +68,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField = Component<
 					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
 
 					if (SlateNode.string({ children: value }) === '') {
-						fieldAccessor.updateValue(fieldAccessor.persistedValue === null ? null : '')
+						fieldAccessor.updateValue(fieldAccessor.valueOnServer === null ? null : '')
 						return
 					}
 

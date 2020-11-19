@@ -9,7 +9,7 @@ export type ColorFieldProps = SimpleRelativeSingleFieldProps &
 export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
 	(fieldMetadata, { defaultValue, name, label, ...props }) => {
 		const generateOnChange = (data: FieldAccessor<string>) => (e: React.ChangeEvent<HTMLInputElement>) => {
-			data.updateValue(!e.target.value && data.persistedValue === null ? null : e.target.value)
+			data.updateValue(!e.target.value && data.valueOnServer === null ? null : e.target.value)
 		}
 		return (
 			<TextInput

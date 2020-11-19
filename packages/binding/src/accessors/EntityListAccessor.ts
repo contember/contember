@@ -7,6 +7,7 @@ import { ErrorAccessor } from './ErrorAccessor'
 class EntityListAccessor implements Errorable {
 	public constructor(
 		private readonly children: ReadonlySet<EntityListAccessor.EntityDatum>,
+		private readonly keysPersistedOnServer: ReadonlySet<string>,
 		public readonly errors: ErrorAccessor[],
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
@@ -40,6 +41,14 @@ class EntityListAccessor implements Errorable {
 
 	public get length(): number {
 		return this.children.size
+	}
+
+	public get keysOnServer(): Set<string> {
+		return new Set(this.keysPersistedOnServer)
+	}
+
+	public hasEntityOnServer(entity: string | EntityAccessor): boolean {
+		return this.keysPersistedOnServer.has(typeof entity === 'string' ? entity : entity.key)
 	}
 
 	public deleteAll() {

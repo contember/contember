@@ -9,7 +9,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 	constructor(
 		public readonly fieldName: FieldName,
 		public readonly currentValue: Persisted | null,
-		public readonly persistedValue: Persisted | null,
+		public readonly valueOnServer: Persisted | null,
 		public readonly defaultValue: Persisted | undefined,
 		public readonly errors: ErrorAccessor[],
 		public readonly hasUnpersistedChanges: boolean,

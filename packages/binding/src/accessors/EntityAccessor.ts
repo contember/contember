@@ -1,4 +1,9 @@
-import { ClientGeneratedUuid, ServerGeneratedUuid, UnpersistedEntityKey } from '../accessorTree'
+import {
+	ClientGeneratedUuid,
+	ServerGeneratedUuid,
+	SingleEntityPersistedData,
+	UnpersistedEntityKey,
+} from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
@@ -27,6 +32,7 @@ class EntityAccessor implements Errorable {
 		public readonly runtimeId: EntityAccessor.RuntimeId,
 		public readonly typeName: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
+		private readonly dataFromServer: SingleEntityPersistedData | undefined,
 		public readonly errors: ErrorAccessor[],
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
@@ -78,6 +84,21 @@ class EntityAccessor implements Errorable {
 		return this.getRelativeEntityList(QueryLanguage.desugarRelativeEntityList(entityList, this.environment))
 	}
 
+	public getKeyConnectedOnServer(entity: SugaredRelativeSingleEntity | string): string | null {
+		const desugared = QueryLanguage.desugarRelativeSingleEntity(entity, this.environment)
+		const lastHasOne = desugared.hasOneRelationPath[desugared.hasOneRelationPath.length - 1]
+		const lastHasOnePlaceholder = PlaceholderGenerator.getHasOneRelationPlaceholder(lastHasOne)
+
+		let containingAccessor: EntityAccessor = this
+
+		if (desugared.hasOneRelationPath.length > 1) {
+			containingAccessor = this.getRelativeSingleEntity({
+				hasOneRelationPath: desugared.hasOneRelationPath.slice(0, -1),
+			})
+		}
+		return containingAccessor.retrievePersistedHasOneKeyByPlaceholder(lastHasOnePlaceholder)
+	}
+
 	//
 
 	/**
@@ -127,6 +148,44 @@ class EntityAccessor implements Errorable {
 			)
 		}
 		return record.getAccessor()
+	}
+
+	/**
+	 * The jarring method name is a not-so-subtle way to inform you that you probably shouldn't be using it.
+	 * @internal
+	 */
+	public retrievePersistedHasOneKeyByPlaceholder(placeholderName: string): string | null {
+		if (this.dataFromServer === undefined) {
+			return null
+		}
+		const key = this.dataFromServer.get(placeholderName)
+
+		if (key instanceof ServerGeneratedUuid) {
+			return key.value
+		}
+		if (key === null) {
+			// TODO this also returns null and fails to throw when placeholderName points to a regular scalar field that
+			// 	happens to be also null.
+			return null
+		}
+
+		// From now on, we're past the happy path, way into error land.
+		if (key === undefined) {
+			throw new BindingError(
+				`EntityAccessor.getKeyConnectedOnServer: unknown placeholder '${placeholderName}'. Unless this is just ` +
+					`a typo, this typically happens when a has-one relation hasn't been registered during static render.`,
+			)
+		}
+		if (key instanceof Set) {
+			throw new BindingError(
+				`EntityAccessor.getKeyConnectedOnServer: the placeholder '${placeholderName}' refers to a has-many relation, ` +
+					`not a has-one. This method is meant exclusively for has-one relations.`,
+			)
+		}
+		throw new BindingError(
+			`EntityAccessor.getKeyConnectedOnServer: the placeholder '${placeholderName}' refers to a scalar field, not a` +
+				`has-one relation. This method is meant exclusively for has-one relations.`,
+		)
 	}
 }
 

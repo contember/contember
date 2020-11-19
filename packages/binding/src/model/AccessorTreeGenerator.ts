@@ -867,6 +867,7 @@ export class AccessorTreeGenerator {
 							// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 							// keep in sync two copies of the same data. TS hides the extra info anyway.
 							entityState.fields,
+							entityState.persistedData,
 							entityState.errors,
 							entityState.environment,
 							entityState.addEventListener,
@@ -1246,6 +1247,7 @@ export class AccessorTreeGenerator {
 						entityListState.hasStaleAccessor = false
 						accessor = new EntityListAccessor(
 							entityListState.children,
+							entityListState.persistedEntityIds,
 							entityListState.errors,
 							entityListState.environment,
 							entityListState.addEventListener,

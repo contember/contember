@@ -1,4 +1,4 @@
-import { GraphQlBuilder, TreeFilter } from '@contember/client'
+import { GraphQlBuilder, GraphQlClient, TreeFilter } from '@contember/client'
 import { emptyArray, noop } from '@contember/react-utils'
 import * as ReactDOM from 'react-dom'
 import { validate as uuidValidate } from 'uuid'
@@ -6,10 +6,16 @@ import { BindingOperations, EntityAccessor, EntityListAccessor, FieldAccessor, T
 import {
 	ClientGeneratedUuid,
 	EntityFieldPersistedData,
+	metadataToRequestError,
 	MutationDataResponse,
+	MutationErrorType,
+	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
+	PersistResultSuccessType,
 	QueryRequestResponse,
+	RequestError,
 	ServerGeneratedUuid,
+	SuccessfulPersistResult,
 	UnpersistedEntityKey,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
@@ -54,6 +60,7 @@ import {
 } from './internalState'
 import { MarkerMerger } from './MarkerMerger'
 import { MutationGenerator } from './MutationGenerator'
+import { QueryGenerator } from './QueryGenerator'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeParameterMerger } from './TreeParameterMerger'
@@ -78,6 +85,7 @@ export class AccessorTreeGenerator {
 	private readonly accessorErrorManager: AccessorErrorManager
 
 	private updateData: ((newData: TreeRootAccessor) => void) | undefined = undefined
+	private yieldError: ((error: RequestError) => void) | undefined = undefined
 	private persistedEntityData: PersistedEntityDataStore = new Map()
 
 	// TODO deletes and disconnects cause memory leaks here as they don't traverse the tree to remove nested states.
@@ -148,33 +156,103 @@ export class AccessorTreeGenerator {
 				performUpdates(this.bindingOperations)
 			})
 		},
+		persistAll: async ({ signal } = {}) => {
+			if (this.isMutating) {
+				throw {
+					type: MutationErrorType.AlreadyMutating,
+				}
+			}
+			if (this.unpersistedChangesCount === 0) {
+				return {
+					type: PersistResultSuccessType.NothingToPersist,
+				}
+			}
+			// TODO if the tree is in an inconsistent state, schedule a persist
+
+			const hasBeforePersist = this.triggerOnBeforePersist()
+
+			const generator = new MutationGenerator(this.markerTree, this.subTreeStates)
+			const mutation = generator.getPersistMutation()
+
+			if (hasBeforePersist || mutation === undefined) {
+				// TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
+				Promise.resolve().then(() => {
+					this.unpersistedChangesCount = 0
+					this.isMutating = false
+					this.updateTreeRoot()
+				})
+			}
+
+			if (mutation === undefined) {
+				return {
+					type: PersistResultSuccessType.NothingToPersist,
+				}
+			}
+			this.isMutating = true
+			this.updateTreeRoot() // Let the world know that we're mutating
+
+			const data = await this.client.sendRequest(mutation, { signal })
+			const normalizedData = data.data === null ? {} : data.data
+			const aliases = Object.keys(normalizedData)
+			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
+
+			if (!allSubMutationsOk) {
+				this.setErrors(data.data)
+				throw {
+					type: MutationErrorType.InvalidInput,
+				}
+			}
+			const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
+			const successfulResult: SuccessfulPersistResult = {
+				type: PersistResultSuccessType.JustSuccess,
+				persistedEntityIds,
+			}
+
+			try {
+				const persistedData = await this.fetchNewPersistedData()
+				this.isMutating = false
+				this.updatePersistedData(persistedData)
+				return successfulResult
+			} catch {
+				this.isMutating = false
+				this.unpersistedChangesCount = 0
+				this.updateTreeRoot()
+
+				// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
+				// data made it successfully to the server. Thus we'll just resolve from here no matter what.
+				return successfulResult
+			}
+		},
 	})
 
 	private readonly getNewTreeRootInstance = () =>
-		new TreeRootAccessor(this.unpersistedChangesCount !== 0, this.bindingOperations)
+		new TreeRootAccessor(this.unpersistedChangesCount !== 0, this.isMutating, this.bindingOperations)
 
 	// This is currently useless but potentially future-compatible
 	// private readonly addTreeRootEventListener: TreeRootAccessor.AddTreeRootEventListener = this.getAddEventListener(
 	// 	this.treeRootListeners,
 	// )
 
+	private isMutating = false
 	private isFrozenWhileUpdating = false
 	private treeWideBatchUpdateDepth = 0
 	private unpersistedChangesCount = 0
 
-	public constructor(private readonly markerTree: MarkerTreeRoot) {
+	public constructor(private readonly markerTree: MarkerTreeRoot, private readonly client: GraphQlClient) {
 		this.treeFilterGenerator = new TreeFilterGenerator(this.markerTree, this.subTreeStates)
 		this.accessorErrorManager = new AccessorErrorManager(this.subTreeStates, this.entityStore)
 	}
 
-	public initializeLiveTree(
-		queryResponse: QueryRequestResponse | undefined,
-		updateData: (newData: TreeRootAccessor) => void,
-	): void {
-		const persistedData = QueryResponseNormalizer.normalizeResponse(queryResponse)
+	public async initializeLiveTree(
+		updateData: (newTree: TreeRootAccessor) => void,
+		yieldError: (error: RequestError) => void,
+	) {
+		this.updateData = updateData
+		this.yieldError = yieldError
+
+		const persistedData = await this.fetchNewPersistedData()
 
 		this.persistedEntityData = persistedData.persistedEntityDataStore
-		this.updateData = updateData
 
 		for (const [placeholderName, marker] of this.markerTree.subTrees) {
 			const subTreeState = this.initializeSubTree(marker, persistedData.subTreeDataStore.get(placeholderName))
@@ -185,34 +263,14 @@ export class AccessorTreeGenerator {
 		this.updateTreeRoot()
 	}
 
-	public generatePersistMutation() {
-		if (this.unpersistedChangesCount === 0) {
-			return undefined
-		}
-		const hasBeforePersist = this.triggerOnBeforePersist()
-		const generator = new MutationGenerator(this.markerTree, this.subTreeStates)
-		const mutation = generator.getPersistMutation()
-
-		if (hasBeforePersist || mutation === undefined) {
-			// TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
-			this.unpersistedChangesCount = 0
-			Promise.resolve().then(() => {
-				this.updateTreeRoot()
-			})
-		}
-
-		return mutation
-	}
-
-	public setErrors(data: MutationDataResponse | undefined) {
+	private setErrors(data: MutationDataResponse | undefined) {
 		this.performRootTreeOperation(() => {
 			this.accessorErrorManager.setErrors(data)
 		})
 	}
 
-	public updatePersistedData(queryResponse: QueryRequestResponse | undefined) {
+	private updatePersistedData(normalizedResponse: NormalizedQueryResponseData) {
 		this.performRootTreeOperation(() => {
-			const normalizedResponse = QueryResponseNormalizer.normalizeResponse(queryResponse)
 			this.persistedEntityData = normalizedResponse.persistedEntityDataStore
 
 			const alreadyProcessed: Set<InternalEntityState> = new Set()
@@ -1700,6 +1758,7 @@ export class AccessorTreeGenerator {
 			}
 		})
 
+		// TODO if the newly initialized entities have beforePersist handlers, they won't fire.
 		return this.triggerOnInitialize() || hasBeforePersist
 	}
 
@@ -1796,5 +1855,19 @@ export class AccessorTreeGenerator {
 					assertNever(state)
 			}
 		}
+	}
+
+	private async fetchNewPersistedData(): Promise<NormalizedQueryResponseData> {
+		const queryGenerator = new QueryGenerator(this.markerTree)
+		const query = queryGenerator.getReadQuery()
+
+		let queryResponse: QueryRequestResponse | undefined
+
+		try {
+			queryResponse = query === undefined ? undefined : await this.client.sendRequest(query)
+		} catch (metadata) {
+			this.yieldError?.(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
+		}
+		return QueryResponseNormalizer.normalizeResponse(queryResponse)
 	}
 }

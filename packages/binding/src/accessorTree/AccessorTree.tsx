@@ -13,11 +13,11 @@ export interface AccessorTreeProps {
 export function AccessorTree({ state, children }: AccessorTreeProps) {
 	// It is *CRUCIAL* that both branches differ only in props, not structurally. Otherwise there would be far too many
 	// remounts.
-	if (state.name === AccessorTreeStateName.Interactive || state.name === AccessorTreeStateName.Mutating) {
+	if (state.name === AccessorTreeStateName.Initialized) {
 		return (
-			<TriggerPersistContext.Provider value={state.triggerPersist}>
+			<TriggerPersistContext.Provider value={state.data.bindingOperations.persistAll}>
 				<DirtinessContext.Provider value={state.data.hasUnpersistedChanges}>
-					<MutationStateContext.Provider value={state.name === AccessorTreeStateName.Mutating}>
+					<MutationStateContext.Provider value={state.data.isMutating}>
 						<BindingOperationsProvider bindingOperations={state.data.bindingOperations}>
 							{children}
 						</BindingOperationsProvider>

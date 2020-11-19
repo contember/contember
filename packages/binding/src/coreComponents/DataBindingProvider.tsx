@@ -23,9 +23,9 @@ export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps 
 export const DataBindingProvider = React.memo(function DataBindingProvider<
 	StateProps extends DataBindingStateComponentProps
 >(props: DataBindingProviderProps<StateProps>) {
-	const [accessorTreeState] = useAccessorTreeState({
+	const accessorTreeState = useAccessorTreeState({
 		nodeTree: props.children,
-		unstable_onSuccessfulPersist: props.onSuccessfulPersist,
+		unstable_onSuccessfulPersist: props.onSuccessfulPersist, // TODO!!!
 	})
 
 	const children =

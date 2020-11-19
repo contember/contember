@@ -1,34 +1,18 @@
-import { GraphQlClient } from '@contember/client'
-import { ApiRequestReadyState, useContentApiRequest } from '@contember/react-client'
-import { noop } from '@contember/react-utils'
+import { useCurrentContentGraphQlClient } from '@contember/react-client'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
-import { BindingError } from '../BindingError'
-import { AccessorTreeGenerator, MarkerTreeGenerator, QueryGenerator } from '../model'
+import { AccessorTreeGenerator, MarkerTreeGenerator } from '../model'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
-import { AccessorTreeStateMetadata } from './AccessorTreeStateMetadata'
 import { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
-import { metadataToRequestError } from './metadataToRequestError'
-import { MutationRequestResponse } from './MutationRequestResponse'
-import {
-	MutationErrorType,
-	NothingToPersistPersistResult,
-	PersistResultSuccessType,
-	SuccessfulPersistResult,
-} from './PersistResult'
-import { QueryRequestResponse } from './QueryRequestResponse'
 
 const initialState: AccessorTreeState = {
-	name: AccessorTreeStateName.Uninitialized,
+	name: AccessorTreeStateName.Initializing,
 }
 
-export const useAccessorTreeState = ({
-	nodeTree,
-	autoInitialize = true,
-	unstable_onSuccessfulPersist = noop,
-}: AccessorTreeStateOptions): [AccessorTreeState, AccessorTreeStateMetadata] => {
+export const useAccessorTreeState = ({ nodeTree }: AccessorTreeStateOptions): AccessorTreeState => {
+	const client = useCurrentContentGraphQlClient()
 	const environment = useEnvironment()
 
 	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, environment).generate(), [
@@ -37,196 +21,39 @@ export const useAccessorTreeState = ({
 	])
 
 	// TODO this REALLY should be useState.
-	const accessorTreeGenerator = React.useMemo(() => new AccessorTreeGenerator(markerTree), [markerTree])
-	const query = React.useMemo(() => new QueryGenerator(markerTree).getReadQuery(), [markerTree])
+	const accessorTreeGenerator = React.useMemo(() => new AccessorTreeGenerator(markerTree, client), [client, markerTree])
 	const [state, dispatch] = React.useReducer(accessorTreeStateReducer, initialState)
-	const [queryState, sendQuery] = useContentApiRequest<QueryRequestResponse>()
-	const [mutationState, sendMutation] = useContentApiRequest<MutationRequestResponse>()
 
-	const [isInitialized, setIsInitialized] = React.useState(autoInitialize)
-
-	// This ref is really just an implementation of the advice from https://reactjs.org/docs/hooks-faq.html#can-i-run-an-effect-only-on-updates
-	const isFirstRenderRef = React.useRef(true)
 	const isMountedRef = React.useRef(true)
-	const isForcingRefreshRef = React.useRef(false) // This ref is described in detail below.
 
-	const queryRef = React.useRef(query)
-	const stateRef = React.useRef(state)
-	const queryStateRef = React.useRef(queryState)
-
-	stateRef.current = state
-	queryStateRef.current = queryState
-
-	const initialize = React.useCallback(() => {
-		if (!isInitialized) {
-			setIsInitialized(true)
-		}
-	}, [isInitialized])
-	const stateMetadata: AccessorTreeStateMetadata = {
-		initialize: autoInitialize ? undefined : initialize,
-	}
-
-	const rejectFailedRequest = React.useCallback((metadata: GraphQlClient.FailedRequestMetadata | BindingError) => {
-		if (metadata instanceof BindingError) {
-			throw metadata
-		}
-		const error = metadataToRequestError(metadata)
-		dispatch({
-			type: AccessorTreeStateActionType.ResolveRequestWithError,
-			error,
-		})
-		return error
-	}, [])
-
-	const triggerPersistRef = React.useRef<(() => Promise<SuccessfulPersistResult>) | undefined>(undefined)
-
-	// TODO re-think the whole onSuccessfulPersist API. This is more of a temporary hotfix
-	const triggerPersist = React.useCallback(async () => {
-		try {
-			const result = await triggerPersistRef.current!()
-			unstable_onSuccessfulPersist(result)
-			return Promise.resolve(result)
-		} catch (e) {
-			return Promise.reject(e)
-		}
-	}, [unstable_onSuccessfulPersist])
-
-	const initializeAccessorTree = React.useCallback(
-		(data: QueryRequestResponse | undefined) => {
-			accessorTreeGenerator.initializeLiveTree(data, accessor => {
+	React.useEffect(() => {
+		accessorTreeGenerator.initializeLiveTree(
+			accessor => {
+				if (!isMountedRef.current) {
+					return
+				}
 				dispatch({
 					type: AccessorTreeStateActionType.SetData,
 					data: accessor,
-					triggerPersist,
 				})
-			})
-		},
-		[accessorTreeGenerator, triggerPersist],
-	)
-
-	triggerPersistRef.current = async (): Promise<SuccessfulPersistResult> => {
-		if (stateRef.current.name !== AccessorTreeStateName.Interactive) {
-			return Promise.resolve<NothingToPersistPersistResult>({
-				type: PersistResultSuccessType.NothingToPersist,
-			})
-		}
-		const latestAccessorTree = stateRef.current.data
-		const mutation = accessorTreeGenerator.generatePersistMutation()
-
-		if (mutation === undefined) {
-			return Promise.resolve<NothingToPersistPersistResult>({
-				type: PersistResultSuccessType.NothingToPersist,
-			})
-		}
-		dispatch({
-			type: AccessorTreeStateActionType.InitializeMutation,
-		})
-		try {
-			const data = await sendMutation(mutation)
-			const normalizedData = data.data === null ? {} : data.data
-			const aliases = Object.keys(normalizedData)
-			const allSubMutationsOk = aliases.every(item => data.data[item].ok)
-
-			if (!allSubMutationsOk) {
-				accessorTreeGenerator.setErrors(data.data)
-				dispatch({
-					type: AccessorTreeStateActionType.SetData,
-					data: latestAccessorTree,
-					triggerPersist,
-				})
-				return Promise.reject({
-					type: MutationErrorType.InvalidInput,
-				})
-			}
-			const persistedEntityIds = aliases.map(alias => data.data[alias].node.id)
-
-			if (!query) {
-				dispatch({
-					type: AccessorTreeStateActionType.SetData,
-					data: latestAccessorTree,
-					triggerPersist,
-				})
-				return Promise.resolve({
-					type: PersistResultSuccessType.JustSuccess,
-					persistedEntityIds,
-				})
-			}
-
-			try {
-				const queryData = await sendQuery(query)
-				accessorTreeGenerator.updatePersistedData(queryData)
-				return Promise.resolve({
-					type: PersistResultSuccessType.JustSuccess,
-					persistedEntityIds,
-				})
-			} catch {
-				dispatch({
-					type: AccessorTreeStateActionType.SetData,
-					data: latestAccessorTree,
-					triggerPersist,
-				})
-				// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
-				// data made it successfully to the server. Thus we'll just resolve from here no matter what.
-				return Promise.resolve({
-					type: PersistResultSuccessType.JustSuccess,
-					persistedEntityIds,
-				})
-			}
-		} catch (metadata) {
-			return Promise.reject(rejectFailedRequest(metadata))
-		}
-	}
-
-	// We're using the ref to react to a *change* of the query (e.g. due to changed dimensions).
-	if (query !== queryRef.current) {
-		isForcingRefreshRef.current = true
-		dispatch({
-			type: AccessorTreeStateActionType.Uninitialize,
-		})
-	}
-	queryRef.current = query
-
-	React.useEffect(() => {
-		const performEffect = async () => {
-			if (
-				isInitialized &&
-				state.name === AccessorTreeStateName.Uninitialized &&
-				// There can be updates while state.name is still AccessorTreeStateName.Uninitialized, and so that condition is
-				// not sufficient on its own. Thus we typically also enforce that queryStateRef.current.readyState is
-				// ApiRequestReadyState.Uninitialized. However, we may need to force a change even while both conditions hold,
-				// e.g. while a query is loading. For that we have a special ref which we always reset after we're done.
-				(isForcingRefreshRef.current || queryStateRef.current.readyState === 'uninitialized')
-			) {
-				if (query === undefined) {
-					// We're creating AND there are no subqueries
-					initializeAccessorTree(undefined)
-					isForcingRefreshRef.current = false
-				} else {
-					dispatch({
-						type: AccessorTreeStateActionType.InitializeQuery,
-					})
-					try {
-						const data = await sendQuery(query)
-						isMountedRef.current && initializeAccessorTree(data)
-					} catch (metadata) {
-						rejectFailedRequest(metadata)
-					} finally {
-						isForcingRefreshRef.current = false
-					}
+			},
+			error => {
+				if (!isMountedRef.current) {
+					return
 				}
-			}
-		}
-		performEffect()
-	}, [initializeAccessorTree, isInitialized, query, rejectFailedRequest, sendQuery, state.name])
+				dispatch({
+					type: AccessorTreeStateActionType.FailWithError,
+					error,
+				})
+			},
+		)
+	}, [accessorTreeGenerator])
 
-	// For this to work, this effect must be the last one to run.
 	React.useEffect(() => {
-		isFirstRenderRef.current = false
-
 		return () => {
 			isMountedRef.current = false
 		}
 	}, [])
 
-	return [state, stateMetadata]
+	return state
 }

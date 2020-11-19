@@ -5,21 +5,10 @@ import { RequestError } from './RequestError'
 
 export type AccessorTreeStateAction =
 	| {
-			type: AccessorTreeStateActionType.Uninitialize
-	  }
-	| {
 			type: AccessorTreeStateActionType.SetData
 			data: TreeRootAccessor
-			getEntityByKey?: GetEntityByKey
-			triggerPersist: () => Promise<SuccessfulPersistResult>
 	  }
 	| {
-			type: AccessorTreeStateActionType.InitializeQuery
-	  }
-	| {
-			type: AccessorTreeStateActionType.ResolveRequestWithError
+			type: AccessorTreeStateActionType.FailWithError
 			error: RequestError
-	  }
-	| {
-			type: AccessorTreeStateActionType.InitializeMutation
 	  }

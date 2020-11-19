@@ -96,7 +96,7 @@ class EntityAccessor implements Errorable {
 				hasOneRelationPath: desugared.hasOneRelationPath.slice(0, -1),
 			})
 		}
-		return containingAccessor.retrievePersistedHasOneKeyByPlaceholder(lastHasOnePlaceholder)
+		return containingAccessor.getPersistedKeyByPlaceholder(lastHasOnePlaceholder)
 	}
 
 	//
@@ -107,7 +107,7 @@ class EntityAccessor implements Errorable {
 	public getRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 		field: RelativeSingleField | DesugaredRelativeSingleField,
 	): FieldAccessor<Persisted, Produced> {
-		return (this.getRelativeSingleEntity(field).retrieveNestedAccessorByPlaceholder(
+		return (this.getRelativeSingleEntity(field).getAccessorByPlaceholder(
 			PlaceholderGenerator.getFieldPlaceholder(field.field),
 		) as unknown) as FieldAccessor<Persisted, Produced>
 	}
@@ -118,7 +118,7 @@ class EntityAccessor implements Errorable {
 		let relativeTo: EntityAccessor = this
 
 		for (const hasOneRelation of relativeSingleEntity.hasOneRelationPath) {
-			relativeTo = relativeTo.retrieveNestedAccessorByPlaceholder(
+			relativeTo = relativeTo.getAccessorByPlaceholder(
 				PlaceholderGenerator.getHasOneRelationPlaceholder(hasOneRelation),
 			) as EntityAccessor
 		}
@@ -126,16 +126,12 @@ class EntityAccessor implements Errorable {
 	}
 
 	public getRelativeEntityList(entityList: RelativeEntityList | DesugaredRelativeEntityList): EntityListAccessor {
-		return this.getRelativeSingleEntity(entityList).retrieveNestedAccessorByPlaceholder(
+		return this.getRelativeSingleEntity(entityList).getAccessorByPlaceholder(
 			PlaceholderGenerator.getHasManyRelationPlaceholder(entityList.hasManyRelation),
 		) as EntityListAccessor
 	}
 
-	/**
-	 * The jarring method name is a not-so-subtle way to inform you that you probably shouldn't be using it.
-	 * @internal
-	 */
-	public retrieveNestedAccessorByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor {
+	private getAccessorByPlaceholder(placeholderName: FieldName): EntityAccessor.NestedAccessor {
 		const record = this.fieldData.get(placeholderName)
 		if (record === undefined) {
 			throw new BindingError(
@@ -150,11 +146,7 @@ class EntityAccessor implements Errorable {
 		return record.getAccessor()
 	}
 
-	/**
-	 * The jarring method name is a not-so-subtle way to inform you that you probably shouldn't be using it.
-	 * @internal
-	 */
-	public retrievePersistedHasOneKeyByPlaceholder(placeholderName: string): string | null {
+	private getPersistedKeyByPlaceholder(placeholderName: string): string | null {
 		if (this.dataFromServer === undefined) {
 			return null
 		}

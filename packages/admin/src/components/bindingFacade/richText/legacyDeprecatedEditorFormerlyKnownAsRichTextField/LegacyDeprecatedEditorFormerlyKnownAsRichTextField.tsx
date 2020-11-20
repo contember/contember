@@ -4,8 +4,8 @@ import {
 	FieldAccessor,
 	FieldBasicProps,
 	QueryLanguage,
+	useEntity,
 	useMutationState,
-	useParentEntityAccessor,
 } from '@contember/binding'
 import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
@@ -28,7 +28,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField = Component<
 	LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps
 >(
 	props => {
-		const entity = useParentEntityAccessor()
+		const entity = useEntity()
 		const environment = entity.environment
 		const batchUpdates = entity.batchUpdates
 

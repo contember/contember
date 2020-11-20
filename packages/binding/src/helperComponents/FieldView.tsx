@@ -1,6 +1,6 @@
 import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useParentEntityAccessor } from '../accessorPropagation'
+import { useEntity } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { throwBindingError } from '../BindingError'
 import { Component } from '../coreComponents'
@@ -46,7 +46,8 @@ export const FieldView = Component<FieldViewProps>(
 			`The number of fields in the 'fields' prop of the 'FieldView' must remain constant between renders!`,
 		)
 
-		const entityAccessor = useParentEntityAccessor()
+		// TODO over-subscribe less
+		const entityAccessor = useEntity()
 		const environment = entityAccessor.environment
 
 		const desugarField = React.useCallback((rsf: SRSF) => QueryLanguage.desugarRelativeSingleField(rsf, environment), [

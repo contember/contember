@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useRelativeSingleEntity } from '../accessorPropagation'
+import { useEntity } from '../accessorPropagation'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
@@ -21,7 +21,7 @@ export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 
 export const HasOne = Component(
 	<EntityProps extends {}>(props: HasOneProps<EntityProps>) => {
-		const entity = useRelativeSingleEntity(props)
+		const entity = useEntity(props)
 
 		return <Entity {...props} accessor={entity} />
 	},

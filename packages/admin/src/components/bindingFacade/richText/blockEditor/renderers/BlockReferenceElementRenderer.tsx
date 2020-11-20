@@ -1,4 +1,4 @@
-import { BindingError, Entity, RelativeSingleField, useParentEntityAccessor } from '@contember/binding'
+import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
@@ -18,7 +18,7 @@ export interface BlockReferenceElementRendererProps extends RenderElementProps {
 export const BlockReferenceElementRenderer = React.memo((props: BlockReferenceElementRendererProps) => {
 	const editor = useEditor() as BlockSlateEditor
 
-	const referencedEntity = useParentEntityAccessor()
+	const referencedEntity = useEntity()
 
 	const discriminationField = referencedEntity.getRelativeSingleField(props.referenceDiscriminationField)
 	const discriminatedBlock = getDiscriminatedDatum(props.editorReferenceBlocks, discriminationField)

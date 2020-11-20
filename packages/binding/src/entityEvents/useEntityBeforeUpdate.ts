@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useEntityKey, useGetEntityByKey, useParentEntityAccessor } from '../accessorPropagation'
+import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
 
 export const useEntityBeforeUpdate = (listener: EntityAccessor.EntityEventListenerMap['beforeUpdate']) => {

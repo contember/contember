@@ -1,4 +1,4 @@
-import { BindingError, FieldValue, RelativeSingleField, Entity, useParentEntityAccessor } from '@contember/binding'
+import { BindingError, FieldValue, RelativeSingleField, Entity, useEntity } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
@@ -44,7 +44,7 @@ export const EmbedElementRenderer = React.memo(
 		const editor = useEditor() as BlockSlateEditor
 		const selected = useSelected()
 
-		const referencedEntity = useParentEntityAccessor()
+		const referencedEntity = useEntity()
 		const embedTypeDiscriminant = referencedEntity.getRelativeSingleField(embedContentDiscriminationField)
 
 		const embedHandler = getDiscriminatedDatum(embedHandlers, embedTypeDiscriminant)

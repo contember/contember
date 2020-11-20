@@ -12,8 +12,8 @@ import {
 	useBindingOperations,
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
+	useEntity,
 	useEnvironment,
-	useParentEntityAccessor,
 	useRelativeEntityList,
 	useRelativeSingleField,
 	useSortedEntities,
@@ -103,7 +103,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 			...blockListProps
 		} = props
 
-		const parentEntity = useParentEntityAccessor() // TODO this is over-subscribing
+		const parentEntity = useEntity() // TODO this is over-subscribing
 		const referenceList = useRelativeEntityList(referencesField) // TODO this is over-subscribing
 
 		const batchUpdates = parentEntity.batchUpdates

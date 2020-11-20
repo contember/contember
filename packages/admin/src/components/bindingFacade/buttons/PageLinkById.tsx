@@ -1,4 +1,4 @@
-import { useParentEntityAccessor } from '@contember/binding'
+import { useEntity } from '@contember/binding'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { InnerProps } from '../../Link'
@@ -11,7 +11,7 @@ interface PageLinkByIdProps {
 }
 
 export const PageLinkById = React.memo(function (props: PageLinkByIdProps) {
-	const parentEntity = useParentEntityAccessor()
+	const parentEntity = useEntity()
 	const id = parentEntity.primaryKey
 
 	if (typeof id === 'string') {

@@ -1,4 +1,4 @@
-import { BindingError, Entity, RelativeSingleField, useParentEntityAccessor } from '@contember/binding'
+import { BindingError, Entity, RelativeSingleField, useEntity } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
@@ -19,7 +19,7 @@ export const BlockVoidReferenceElementRenderer = React.memo((props: BlockVoidRef
 	const editor = useEditor() as BlockSlateEditor
 	const selected = useSelected()
 
-	const referencedEntity = useParentEntityAccessor()
+	const referencedEntity = useEntity()
 
 	// TODO remove button, dragHandle, etc.
 	const discriminationField = referencedEntity.getRelativeSingleField(props.referenceDiscriminationField)

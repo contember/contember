@@ -3,7 +3,7 @@ import {
 	Component,
 	EntityAccessor,
 	Environment,
-	useParentEntityAccessor,
+	useEntity,
 	useEnvironment,
 	useMutationState,
 	useRelativeSingleField,
@@ -37,7 +37,7 @@ export const UploadField = Component<UploadFieldProps>(
 			maxUpdateFrequency: 100,
 		})
 		const environment = useEnvironment()
-		const entity = useParentEntityAccessor()
+		const entity = useEntity()
 		const isMutating = useMutationState()
 
 		const singleFileUploadState = uploadState.get(staticFileId)

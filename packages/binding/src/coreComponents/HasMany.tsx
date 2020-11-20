@@ -38,11 +38,11 @@ export const HasMany = Component(
 			return oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, props.variables))
 		},
 		staticRender: props => (
-			<>
+			<EntityList {...props} accessor={undefined as any}>
 				<Field field={PRIMARY_KEY_NAME} />
 				<Field field={TYPENAME_KEY_NAME} />
 				{props.children}
-			</>
+			</EntityList>
 		),
 		generateRelationMarker: (props, fields, environment) =>
 			MarkerFactory.createRelativeEntityListFields(props, environment, fields),

@@ -58,9 +58,16 @@ export const EntityList = Component(
 		if ('listComponent' in props && props.listComponent) {
 			return React.createElement(props.listComponent, {
 				...props.listProps!,
-				accessor: props.accessor,
+				accessor: undefined as any,
 				children: props.children,
 			})
+		}
+		if ('entityComponent' in props && props.entityComponent) {
+			return (
+				<Entity accessor={undefined as any} entityComponent={props.entityComponent} entityProps={props.entityProps}>
+					{props.children}
+				</Entity>
+			)
 		}
 		return <>{props.children}</>
 	},

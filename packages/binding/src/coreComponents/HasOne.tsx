@@ -33,11 +33,11 @@ export const HasOne = Component(
 			return oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, props.variables))
 		},
 		staticRender: props => (
-			<>
+			<Entity {...props} accessor={undefined as any}>
 				<Field field={PRIMARY_KEY_NAME} />
 				<Field field={TYPENAME_KEY_NAME} />
 				{props.children}
-			</>
+			</Entity>
 		),
 		generateRelationMarker: (props, fields, environment) =>
 			MarkerFactory.createRelativeSingleEntityFields(props, environment, fields),

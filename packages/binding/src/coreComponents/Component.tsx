@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Environment } from '../dao'
 import { assertNever } from '../utils'
-import { MarkerProvider, StaticRenderProps, StaticRenderProvider } from './MarkerProvider'
+import { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from './MarkerProvider'
 
 function Component<Props extends {}>(
 	statelessRender: React.FunctionComponent<Props>,
@@ -10,7 +10,7 @@ function Component<Props extends {}>(
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	statefulRender: React.FunctionComponent<Props>,
 	staticRender: (
-		props: StaticRenderProps<Props, NonStaticPropNames>,
+		props: StaticRenderProviderProps<Props, NonStaticPropNames>,
 		environment: Environment,
 	) => React.ReactElement | null,
 	displayName?: string,
@@ -24,7 +24,10 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	render: React.FunctionComponent<Props>,
 	decider?:
 		| string
-		| ((props: StaticRenderProps<Props, NonStaticPropNames>, environment: Environment) => React.ReactElement | null)
+		| ((
+				props: StaticRenderProviderProps<Props, NonStaticPropNames>,
+				environment: Environment,
+		  ) => React.ReactElement | null)
 		| MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
 ) {

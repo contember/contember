@@ -43,7 +43,7 @@ export interface RelationMarkerProvider<Props extends {} = any> {
 
 // See https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379091887 about the never trick
 // This is just to make the typings less confusing and verbose downstream.
-export type StaticRenderProps<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = [
+export type StaticRenderProviderProps<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = [
 	NonStaticPropNames,
 ] extends [never]
 	? Props
@@ -51,7 +51,7 @@ export type StaticRenderProps<Props extends {} = any, NonStaticPropNames extends
 
 export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> {
 	staticRender: (
-		props: StaticRenderProps<Props, NonStaticPropNames>,
+		props: StaticRenderProviderProps<Props, NonStaticPropNames>,
 		environment: Environment,
 	) => React.ReactElement | null
 }

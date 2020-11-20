@@ -3,8 +3,8 @@ import {
 	Entity,
 	EntityListAccessor,
 	RemovalType,
-	StaticRenderProps,
 	StaticRenderProvider,
+	StaticRenderProviderProps,
 	SugaredField,
 	SugaredFieldProps,
 	useMutationState,
@@ -140,7 +140,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 		)
 	},
 	<ContainerExtraProps, ItemExtraProps>(
-		props: StaticRenderProps<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, NonStaticPropNames>, // TODO emptyMessage, etc.
+		props: StaticRenderProviderProps<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, NonStaticPropNames>, // TODO emptyMessage, etc.
 	) => (
 		<>
 			{props.sortableBy && <SugaredField field={props.sortableBy} defaultValue={0} isNonbearing />}

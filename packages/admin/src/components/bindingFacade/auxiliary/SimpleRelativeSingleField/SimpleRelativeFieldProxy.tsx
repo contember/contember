@@ -1,10 +1,4 @@
-import {
-	Environment,
-	SugaredRelativeSingleField,
-	useEnvironment,
-	useMutationState,
-	useRelativeSingleField,
-} from '@contember/binding'
+import { Environment, SugaredRelativeSingleField, useEnvironment, useMutationState, useField } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as React from 'react'
 import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
@@ -33,7 +27,7 @@ export type SimpleRelativeSingleFieldProxyProps = Omit<FormGroupProps, 'children
 export const SimpleRelativeSingleFieldProxy = React.memo(
 	({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => {
 		const environment = useEnvironment()
-		const field = useRelativeSingleField(props)
+		const field = useField(props)
 
 		const normalizedLabel = React.useMemo(() => contextualizeNode(label, environment, 'labelMiddleware'), [
 			environment,

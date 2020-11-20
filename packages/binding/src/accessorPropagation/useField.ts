@@ -8,19 +8,19 @@ import { FieldValue } from '../treeParameters/primitives'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
 
-function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+function useField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
 ): FieldAccessor<Persisted, Produced>
-function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+function useField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
 ): FieldAccessor<Persisted, Produced> | undefined
-function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+function useField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
 ): FieldAccessor<Persisted, Produced> | undefined {
 	const relativeSingleField = useDesugaredRelativeSingleField(sugaredRelativeSingleField)
 	useConstantValueInvariant(
 		!!relativeSingleField,
-		'useRelativeSingleField: cannot alternate between providing and omitting the argument.',
+		'useField: cannot alternate between providing and omitting the argument.',
 	)
 
 	const entityKey = useEntityKey()
@@ -49,4 +49,4 @@ function useRelativeSingleField<Persisted extends FieldValue = FieldValue, Produ
 	return undefined
 }
 
-export { useRelativeSingleField }
+export { useField }

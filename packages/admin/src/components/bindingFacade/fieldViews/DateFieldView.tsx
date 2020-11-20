@@ -1,4 +1,4 @@
-import { Component, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
 
 export type DateFieldViewProps = {
@@ -11,7 +11,7 @@ export type DateFieldViewProps = {
 
 export const DateFieldView = Component<DateFieldViewProps>(
 	({ field, locale, format, fallback = null }) => {
-		const dateField = useRelativeSingleField<string>(field)
+		const dateField = useField<string>(field)
 
 		if (!dateField.currentValue) {
 			return <>{fallback}</>

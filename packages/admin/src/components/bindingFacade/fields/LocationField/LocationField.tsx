@@ -1,4 +1,4 @@
-import { Component, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as Leaflet from 'leaflet'
 import * as React from 'react'
@@ -33,8 +33,8 @@ export const LocationField = Component<LocationFieldProps>(
 		markerProps,
 		...formGroupProps
 	}) => {
-		const latitude = useRelativeSingleField<number>(latitudeField)
-		const longitude = useRelativeSingleField<number>(longitudeField)
+		const latitude = useField<number>(latitudeField)
+		const longitude = useField<number>(longitudeField)
 
 		const moveMarker = (e: { latlng?: Leaflet.LatLng }) => {
 			const latLng = e.latlng

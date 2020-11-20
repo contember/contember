@@ -79,7 +79,7 @@ export const bindingExportedMembers = [
 	'useOptionalRelativeSingleField',
 	'useEntityList',
 	'useRelativeSingleEntity',
-	'useRelativeSingleField',
+	'useField',
 	'useSortedEntities',
 	'useTriggerPersist',
 	'VariableInputTransformer',

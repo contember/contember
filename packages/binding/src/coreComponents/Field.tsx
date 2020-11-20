@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import * as React from 'react'
-import { useRelativeSingleField } from '../accessorPropagation'
+import { useField } from '../accessorPropagation'
 import { MarkerFactory } from '../queryLanguage'
 import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 import { Component } from './Component'
@@ -17,7 +17,7 @@ export interface FieldProps<Persisted extends FieldValue = FieldValue>
 
 export const Field = Component(
 	<Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => {
-		const field = useRelativeSingleField<Persisted>(props)
+		const field = useField<Persisted>(props)
 
 		if (props.format !== undefined) {
 			return <>{props.format(field.currentValue)}</>

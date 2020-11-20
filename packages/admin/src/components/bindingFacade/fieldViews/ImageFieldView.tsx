@@ -1,4 +1,4 @@
-import { Component, FieldValue, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { Component, FieldValue, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
 
 export interface ImageFieldViewProps<SrcField extends FieldValue = string>
@@ -19,9 +19,9 @@ export const ImageFieldView = Component(
 		fallback,
 		...imgProps
 	}: ImageFieldViewProps<SrcField>) => {
-		const srcAccessor = useRelativeSingleField<SrcField>(srcField)
-		const altAccessor = useRelativeSingleField<string>(altField)
-		const titleAccessor = useRelativeSingleField<string>(titleField)
+		const srcAccessor = useField<SrcField>(srcField)
+		const altAccessor = useField<string>(altField)
+		const titleAccessor = useField<string>(titleField)
 
 		if (!srcAccessor.currentValue) {
 			return <>{fallback}</>

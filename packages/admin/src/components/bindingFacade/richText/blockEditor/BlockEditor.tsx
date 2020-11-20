@@ -15,7 +15,7 @@ import {
 	useEntity,
 	useEnvironment,
 	useEntityList,
-	useRelativeSingleField,
+	useField,
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
@@ -326,7 +326,7 @@ const useFieldBackedElements = (entity: EntityAccessor, original: FieldBackedEle
 	)
 	const unstableAccessorArray = original.map(fieldBackedElement => {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return useRelativeSingleField<string>(fieldBackedElement.field)
+		return useField<string>(fieldBackedElement.field)
 	})
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps

@@ -6,7 +6,7 @@ import {
 	useDerivedField,
 	useEnvironment,
 	useMutationState,
-	useRelativeSingleField,
+	useField,
 } from '@contember/binding'
 import { FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
@@ -62,7 +62,7 @@ export const SlugField = Component<SlugFieldProps>(
 		)
 		useDerivedField<string>(derivedFrom, field, transform)
 
-		const slugField = useRelativeSingleField<string>(field)
+		const slugField = useField<string>(field)
 		const isMutating = useMutationState()
 
 		const completeHardPrefix = `${normalizedUnpersistedHardPrefix}${normalizedPersistedHardPrefix}`

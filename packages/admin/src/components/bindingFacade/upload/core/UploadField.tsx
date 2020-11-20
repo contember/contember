@@ -6,7 +6,7 @@ import {
 	useEntity,
 	useEnvironment,
 	useMutationState,
-	useRelativeSingleField,
+	useField,
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
@@ -51,7 +51,7 @@ export const UploadField = Component<UploadFieldProps>(
 
 		// We're giving the FileUrlDataPopulator special treatment here since it's going to be by far the most used one.
 		// Other populators pay the price of an additional hook which isn't that big of a deal.
-		const fileUrlField = useRelativeSingleField(
+		const fileUrlField = useField(
 			populators.find(populator => populator instanceof FileUrlDataPopulator) && 'fileUrlField' in props
 				? props.fileUrlField
 				: undefined,

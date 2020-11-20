@@ -18,14 +18,14 @@ export type UnconstrainedQualifiedSingleEntityProps = {
 	isCreating: true
 } & SugaredUnconstrainedQualifiedSingleEntity
 
-export function useSingleEntitySubTreeParameters(qualifiedSingleEntityAlias: Alias): Alias
-export function useSingleEntitySubTreeParameters(
+export function useEntitySubTreeParameters(qualifiedSingleEntityAlias: Alias): Alias
+export function useEntitySubTreeParameters(
 	qualifiedSingleEntity: QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps,
 ): BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity
-export function useSingleEntitySubTreeParameters(
+export function useEntitySubTreeParameters(
 	qualifiedSingleEntityOrAlias: Alias | QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps,
 ): Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity
-export function useSingleEntitySubTreeParameters(
+export function useEntitySubTreeParameters(
 	qualifiedSingleEntity: Alias | QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps,
 ): Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity {
 	useConstantValueInvariant(typeof qualifiedSingleEntity)
@@ -38,10 +38,7 @@ export function useSingleEntitySubTreeParameters(
 	const environment = useEnvironment()
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
-	useConstantValueInvariant(
-		qualifiedSingleEntity.isCreating,
-		`SingleEntitySubTree: cannot alternate the 'isCreating' value.`,
-	)
+	useConstantValueInvariant(qualifiedSingleEntity.isCreating, `EntitySubTree: cannot alternate the 'isCreating' value.`)
 
 	let parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity
 

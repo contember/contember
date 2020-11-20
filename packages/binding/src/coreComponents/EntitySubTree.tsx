@@ -1,11 +1,7 @@
 import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import {
-	useAccessorUpdateSubscription,
-	useGetEntitySubTree,
-	useSingleEntitySubTreeParameters,
-} from '../accessorPropagation'
+import { useAccessorUpdateSubscription, useGetEntitySubTree, useEntitySubTreeParameters } from '../accessorPropagation'
 import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
 import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
@@ -16,15 +12,15 @@ import { Field } from './Field'
 import { HasOne } from './HasOne'
 import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
-export interface SingleEntitySubTreeAdditionalProps {
+export interface EntitySubTreeAdditionalProps {
 	variables?: Environment.DeltaFactory
 }
 
-export type SingleEntitySubTreeAdditionalCreationProps = {} | SetOrderFieldOnCreateOwnProps
+export type EntitySubTreeAdditionalCreationProps = {} | SetOrderFieldOnCreateOwnProps
 
-export type SingleEntitySubTreeProps<EntityProps> = {
+export type EntitySubTreeProps<EntityProps> = {
 	children?: React.ReactNode
-} & SingleEntitySubTreeAdditionalProps &
+} & EntitySubTreeAdditionalProps &
 	(
 		| ({
 				isCreating?: false
@@ -32,7 +28,7 @@ export type SingleEntitySubTreeProps<EntityProps> = {
 		| ({
 				isCreating: true
 		  } & SugaredUnconstrainedQualifiedSingleEntity &
-				SingleEntitySubTreeAdditionalCreationProps)
+				EntitySubTreeAdditionalCreationProps)
 	) &
 	(
 		| {}
@@ -42,12 +38,12 @@ export type SingleEntitySubTreeProps<EntityProps> = {
 		  }
 	)
 
-export const SingleEntitySubTree = Component(
-	<EntityProps extends {}>(props: SingleEntitySubTreeProps<EntityProps>) => {
-		useConstantValueInvariant(props.isCreating, 'SingleEntitySubTree: cannot update isCreating')
+export const EntitySubTree = Component(
+	<EntityProps extends {}>(props: EntitySubTreeProps<EntityProps>) => {
+		useConstantValueInvariant(props.isCreating, 'EntitySubTree: cannot update isCreating')
 
 		const getSubTree = useGetEntitySubTree()
-		const parameters = useSingleEntitySubTreeParameters(props)
+		const parameters = useEntitySubTreeParameters(props)
 		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 		const accessor = useAccessorUpdateSubscription(getAccessor)
 
@@ -64,9 +60,9 @@ export const SingleEntitySubTree = Component(
 	{
 		generateSubTreeMarker: (props, fields, environment) => {
 			if ('isCreating' in props && props.isCreating) {
-				return MarkerFactory.createUnconstrainedSingleEntitySubTreeMarker(environment, props, fields)
+				return MarkerFactory.createUnconstrainedEntitySubTreeMarker(environment, props, fields)
 			}
-			return MarkerFactory.createSingleEntitySubTreeMarker(environment, props, fields)
+			return MarkerFactory.createEntitySubTreeMarker(environment, props, fields)
 		},
 		staticRender: props => (
 			<>
@@ -108,5 +104,5 @@ export const SingleEntitySubTree = Component(
 			})
 		},
 	},
-	'SingleEntitySubTree',
-) as <EntityProps>(pros: SingleEntitySubTreeProps<EntityProps>) => React.ReactElement
+	'EntitySubTree',
+) as <EntityProps>(pros: EntitySubTreeProps<EntityProps>) => React.ReactElement

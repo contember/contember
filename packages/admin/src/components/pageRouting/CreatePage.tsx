@@ -1,9 +1,9 @@
 import {
 	DataBindingProvider,
+	EntitySubTree,
+	EntitySubTreeAdditionalCreationProps,
+	EntitySubTreeAdditionalProps,
 	PersistResultSuccessType,
-	SingleEntitySubTree,
-	SingleEntitySubTreeAdditionalCreationProps,
-	SingleEntitySubTreeAdditionalProps,
 	SuccessfulPersistResult,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
@@ -14,8 +14,8 @@ import { PageProvider } from './PageProvider'
 import { useRedirect } from './useRedirect'
 
 export type CreatePageProps = SugaredUnconstrainedQualifiedSingleEntity &
-	SingleEntitySubTreeAdditionalProps &
-	SingleEntitySubTreeAdditionalCreationProps & {
+	EntitySubTreeAdditionalProps &
+	EntitySubTreeAdditionalCreationProps & {
 		pageName: string
 		children: React.ReactNode
 		redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState
@@ -40,14 +40,14 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<C
 
 		return (
 			<DataBindingProvider stateComponent={FeedbackRenderer} onSuccessfulPersist={onSuccessfulPersist}>
-				<SingleEntitySubTree
+				<EntitySubTree
 					{...entityProps}
 					entityComponent={MutableSingleEntityRenderer}
 					entityProps={rendererProps}
 					isCreating
 				>
 					{children}
-				</SingleEntitySubTree>
+				</EntitySubTree>
 			</DataBindingProvider>
 		)
 	},

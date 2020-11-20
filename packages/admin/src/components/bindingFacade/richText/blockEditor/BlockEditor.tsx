@@ -14,7 +14,7 @@ import {
 	useDesugaredRelativeSingleField,
 	useEntity,
 	useEnvironment,
-	useRelativeEntityList,
+	useEntityList,
 	useRelativeSingleField,
 	useSortedEntities,
 	VariableInputTransformer,
@@ -104,10 +104,10 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 		} = props
 
 		const parentEntity = useEntity() // TODO this is over-subscribing
-		const referenceList = useRelativeEntityList(referencesField) // TODO this is over-subscribing
+		const referenceList = useEntityList(referencesField) // TODO this is over-subscribing
 
 		const batchUpdates = parentEntity.batchUpdates
-		const blockList = useRelativeEntityList(blockListProps)
+		const blockList = useEntityList(blockListProps)
 
 		const desugaredBlockList = useDesugaredRelativeEntityList(blockListProps)
 		const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)

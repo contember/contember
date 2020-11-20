@@ -77,7 +77,7 @@ export const bindingExportedMembers = [
 	'useOptionalRelativeEntityList',
 	'useOptionalRelativeSingleEntity',
 	'useOptionalRelativeSingleField',
-	'useRelativeEntityList',
+	'useEntityList',
 	'useRelativeSingleEntity',
 	'useRelativeSingleField',
 	'useSortedEntities',

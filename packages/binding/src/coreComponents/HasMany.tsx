@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useRelativeEntityList } from '../accessorPropagation'
+import { useEntityList } from '../accessorPropagation'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
@@ -26,7 +26,7 @@ export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelati
 
 export const HasMany = Component(
 	<ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => {
-		const entity = useRelativeEntityList(props)
+		const entity = useEntityList(props)
 
 		return <EntityList {...props} accessor={entity} />
 	},

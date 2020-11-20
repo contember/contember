@@ -7,17 +7,17 @@ import { SugaredRelativeEntityList } from '../treeParameters'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useDesugaredRelativeEntityList } from './useDesugaredRelativeEntityList'
 
-function useRelativeEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): EntityListAccessor
-function useRelativeEntityList(
+function useEntityList(sugaredRelativeEntityList: string | SugaredRelativeEntityList): EntityListAccessor
+function useEntityList(
 	sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined,
 ): EntityListAccessor | undefined
-function useRelativeEntityList(
+function useEntityList(
 	sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined,
 ): EntityListAccessor | undefined {
 	const relativeEntityList = useDesugaredRelativeEntityList(sugaredRelativeEntityList)
 	useConstantValueInvariant(
 		!!relativeEntityList,
-		'useRelativeEntityList: cannot alternate between providing and omitting the argument.',
+		'useEntityList: cannot alternate between providing and omitting the argument.',
 	)
 
 	const entityKey = useEntityKey()
@@ -46,4 +46,4 @@ function useRelativeEntityList(
 	return undefined
 }
 
-export { useRelativeEntityList }
+export { useEntityList }

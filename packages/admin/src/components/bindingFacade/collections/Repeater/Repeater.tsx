@@ -1,4 +1,4 @@
-import { BindingError, Component, HasMany, SugaredRelativeEntityList, useRelativeEntityList } from '@contember/binding'
+import { BindingError, Component, HasMany, SugaredRelativeEntityList, useEntityList } from '@contember/binding'
 import * as React from 'react'
 import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 
@@ -32,7 +32,7 @@ export const Repeater = Component(
 			}
 		}
 
-		const entityList = useRelativeEntityList(props)
+		const entityList = useEntityList(props)
 
 		return <RepeaterInner {...props} accessor={entityList} />
 	},

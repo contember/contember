@@ -141,5 +141,20 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		)
 	}
 
+	e.pastePlugins.push({
+		blockProcessors: [
+			(element, next, cumulativeTextAttrs) => {
+				const match = element.nodeName.match(/^H(?<level>[1234])$/)
+				if (match !== null) {
+					return {
+						type: headingElementType,
+						level: parseInt(match.groups!.level),
+						children: next(element.childNodes, cumulativeTextAttrs),
+					}
+				}
+			},
+		],
+	})
+
 	return (e as unknown) as EditorWithHeadings<E>
 }

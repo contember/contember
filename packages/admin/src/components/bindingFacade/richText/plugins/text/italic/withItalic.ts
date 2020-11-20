@@ -27,5 +27,23 @@ export const withItalic = <E extends BaseEditor>(editor: E): E => {
 		onKeyDown(event)
 	}
 
+	editor.pastePlugins.push({
+		attributeProcessors: [
+			(element: HTMLElement) => {
+				if (element.style.fontStyle) {
+					const isItalic = ['italic', 'oblique'].includes(element.style.fontStyle)
+					return { [italicMark]: isItalic }
+				}
+			},
+		],
+		inlineProcessors: [
+			(element, next, cumulativeTextAttrs) => {
+				if (element.nodeName === 'EM' || element.nodeName === 'I') {
+					return next(element.childNodes, { ...cumulativeTextAttrs, [italicMark]: true })
+				}
+			},
+		],
+	})
+
 	return editor
 }

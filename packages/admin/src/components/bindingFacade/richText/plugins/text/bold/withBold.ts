@@ -27,5 +27,23 @@ export const withBold = <E extends BaseEditor>(editor: E): E => {
 		onKeyDown(event)
 	}
 
+	editor.pastePlugins.push({
+		attributeProcessors: [
+			(element: HTMLElement) => {
+				if (element.style.fontWeight) {
+					const isBold = ['700', 'bold'].includes(element.style.fontWeight)
+					return { [boldMark]: isBold }
+				}
+			},
+		],
+		inlineProcessors: [
+			(element, next, cumulativeTextAttrs) => {
+				if (element.nodeName === 'STRONG' || (element.nodeName === 'B' && !element.id.startsWith('docs-internal-guid'))) {
+					return next(element.childNodes, { ...cumulativeTextAttrs, [boldMark]: true })
+				}
+			},
+		],
+	})
+
 	return editor
 }

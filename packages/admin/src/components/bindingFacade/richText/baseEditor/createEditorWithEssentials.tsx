@@ -7,6 +7,7 @@ import { BaseEditor } from './BaseEditor'
 import { DefaultElement } from './DefaultElement'
 import { ElementNode, ElementSpecifics, TextNode, TextSpecifics, UnderlyingEditor } from './Node'
 import { overrideDeleteBackward } from './overrides'
+import { defaultPastePlugins } from '../blockEditor/editor/paste/defaultPlugins'
 
 export const createEditorWithEssentials = (defaultElementType: string): BaseEditor => {
 	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor())) as BaseEditor
@@ -124,6 +125,8 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		},
 		onFocus: () => {},
 		onBlur: () => {},
+
+		pastePlugins: [defaultPastePlugins],
 	})
 
 	overrideDeleteBackward(editorWithEssentials)

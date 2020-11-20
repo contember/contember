@@ -79,5 +79,15 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 		)
 	}
 
+	e.pastePlugins.push({
+		blockProcessors: [
+			(element, next, cumulativeTextAttrs) => {
+				if (element.nodeName === 'P') {
+					return { type: 'paragraph', children: next(element.childNodes, cumulativeTextAttrs) }
+				}
+			},
+		],
+	})
+
 	return e as EditorWithParagraphs<E>
 }

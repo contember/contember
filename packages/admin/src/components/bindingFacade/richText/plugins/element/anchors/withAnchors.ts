@@ -100,5 +100,23 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 		}
 	}
 
+	e.pastePlugins.push({
+		inlineProcessors: [
+			(element, next, cumulativeTextAttrs) => {
+				if (element.tagName === 'A' && element.getAttribute('href')) {
+					const href = element.getAttribute('href')
+
+					return [
+						{
+							type: 'anchor',
+							href,
+							children: next(element.childNodes, cumulativeTextAttrs),
+						},
+					]
+				}
+			},
+		],
+	})
+
 	return (e as unknown) as EditorWithAnchors<E>
 }

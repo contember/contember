@@ -27,5 +27,23 @@ export const withStrikeThrough = <E extends BaseEditor>(editor: E): E => {
 		onKeyDown(event)
 	}
 
+	editor.pastePlugins.push({
+		attributeProcessors: [
+			(element: HTMLElement) => {
+				if (element.style.textDecoration) {
+					return { [strikeThroughMark]: element.style.textDecoration === 'line-through' }
+				}
+			},
+		],
+		inlineProcessors: [
+			(element, next, cumulativeTextAttrs) => {
+				if (element.nodeName === 'S') {
+					return next(element.childNodes, { ...cumulativeTextAttrs, [strikeThroughMark]: true })
+				}
+			},
+		],
+	})
+
+
 	return editor
 }

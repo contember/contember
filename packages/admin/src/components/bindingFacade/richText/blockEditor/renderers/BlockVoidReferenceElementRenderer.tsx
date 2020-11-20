@@ -1,4 +1,4 @@
-import { BindingError, RelativeSingleField, SingleEntity, useParentEntityAccessor } from '@contember/binding'
+import { BindingError, Entity, RelativeSingleField, useParentEntityAccessor } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
@@ -51,13 +51,13 @@ export const BlockVoidReferenceElementRenderer = React.memo((props: BlockVoidRef
 		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
 			{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 			<div contentEditable={false} data-slate-editor={false}>
-				<SingleEntity accessor={referencedEntity}>
+				<Entity accessor={referencedEntity}>
 					<ActionableBox editContents={alternate} onRemove={onRemove}>
 						<EditorBox heading={selectedBlock.label} isActive={selected} onClick={onContainerClick}>
 							{selectedBlock.children}
 						</EditorBox>
 					</ActionableBox>
-				</SingleEntity>
+				</Entity>
 			</div>
 			{props.children}
 		</BlockElement>

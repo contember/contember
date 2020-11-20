@@ -11,10 +11,10 @@ import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
 import { Component } from './Component'
+import { EntityBaseProps } from './Entity'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
 import { HasOne } from './HasOne'
-import { SingleEntityBaseProps } from './SingleEntity'
 
 export interface EntityListSubTreeAdditionalProps {
 	variables?: Environment.DeltaFactory
@@ -34,7 +34,7 @@ export type EntityListSubTreeProps<ListProps, EntityProps> = {
 	(
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
+				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 		| {

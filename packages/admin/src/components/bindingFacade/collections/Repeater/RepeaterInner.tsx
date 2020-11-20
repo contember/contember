@@ -1,8 +1,8 @@
 import {
 	Component,
+	Entity,
 	EntityListAccessor,
 	RemovalType,
-	SingleEntity,
 	StaticRenderProps,
 	StaticRenderProvider,
 	SugaredField,
@@ -84,7 +84,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					entities={entities}
 				>
 					{entities.map(entity => (
-						<SingleEntity accessor={entity} key={entity.key}>
+						<Entity accessor={entity} key={entity.key}>
 							<Item
 								{...props.itemComponentExtraProps!}
 								removalType={removalType}
@@ -93,7 +93,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 							>
 								{props.children}
 							</Item>
-						</SingleEntity>
+						</Entity>
 					))}
 				</Container>
 			)
@@ -123,7 +123,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 				>
 					{entities.map((entity, i) => (
 						<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
-							<SingleEntity accessor={entity}>
+							<Entity accessor={entity}>
 								<Item
 									{...props.itemComponentExtraProps!}
 									removalType={removalType}
@@ -132,7 +132,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 								>
 									{props.children}
 								</Item>
-							</SingleEntity>
+							</Entity>
 						</SortableRepeaterItem>
 					))}
 				</Container>

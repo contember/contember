@@ -5,9 +5,9 @@ import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeEntityList } from '../treeParameters'
 import { Component } from './Component'
+import { EntityBaseProps } from './Entity'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
-import { SingleEntityBaseProps } from './SingleEntity'
 
 export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelativeEntityList & {
 	children?: React.ReactNode
@@ -15,7 +15,7 @@ export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelati
 } & (
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
+				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 		| {

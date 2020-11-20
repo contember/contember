@@ -1,16 +1,16 @@
 import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
-import { useAccessorUpdateSubscription, useGetEntitySubTree, useEntitySubTreeParameters } from '../accessorPropagation'
+import { useAccessorUpdateSubscription, useEntitySubTreeParameters, useGetEntitySubTree } from '../accessorPropagation'
 import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
 import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory, QueryLanguage } from '../queryLanguage'
 import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
 import { Component } from './Component'
+import { Entity, EntityBaseProps } from './Entity'
 import { Field } from './Field'
 import { HasOne } from './HasOne'
-import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
 export interface EntitySubTreeAdditionalProps {
 	variables?: Environment.DeltaFactory
@@ -33,7 +33,7 @@ export type EntitySubTreeProps<EntityProps> = {
 	(
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
+				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 	)
@@ -48,13 +48,13 @@ export const EntitySubTree = Component(
 		const accessor = useAccessorUpdateSubscription(getAccessor)
 
 		return (
-			<SingleEntity {...props} accessor={accessor}>
+			<Entity {...props} accessor={accessor}>
 				{parameters.value.hasOneRelationPath.length ? (
 					<HasOne field={parameters.value.hasOneRelationPath}>{props.children}</HasOne>
 				) : (
 					props.children
 				)}
-			</SingleEntity>
+			</Entity>
 		)
 	},
 	{
@@ -66,11 +66,11 @@ export const EntitySubTree = Component(
 		},
 		staticRender: props => (
 			<>
-				<SingleEntity {...props} accessor={0 as any}>
+				<Entity {...props} accessor={0 as any}>
 					<Field field={PRIMARY_KEY_NAME} />
 					<Field field={TYPENAME_KEY_NAME} />
 					{props.children}
-				</SingleEntity>
+				</Entity>
 				{props.isCreating && 'orderField' in props && (
 					<SetOrderFieldOnCreate
 						orderField={props.orderField}

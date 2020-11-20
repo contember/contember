@@ -1,9 +1,8 @@
-import { BindingError, RelativeSingleField, SingleEntity, useParentEntityAccessor } from '@contember/binding'
+import { BindingError, Entity, RelativeSingleField, useParentEntityAccessor } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
-import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
-import { getDiscriminatedBlock } from '../../../blocks'
+import { ReactEditor, RenderElementProps, useEditor } from 'slate-react'
 import { getDiscriminatedDatum } from '../../../discrimination'
 import { BlockElement } from '../../baseEditor'
 import { BlockSlateEditor } from '../editor'
@@ -56,7 +55,7 @@ export const BlockReferenceElementRenderer = React.memo((props: BlockReferenceEl
 
 	return (
 		<BlockElement element={props.element} attributes={props.attributes} withBoundaries>
-			<SingleEntity accessor={referencedEntity}>
+			<Entity accessor={referencedEntity}>
 				<ActionableBox editContents={alternate} onRemove={onRemove}>
 					<EditorBox heading={selectedBlock.label}>
 						{!!contentTemplate.nodeBefore && <div contentEditable={false}>{contentTemplate.nodeBefore}</div>}
@@ -64,7 +63,7 @@ export const BlockReferenceElementRenderer = React.memo((props: BlockReferenceEl
 						{!!contentTemplate.nodeAfter && <div contentEditable={false}>{contentTemplate.nodeAfter}</div>}
 					</EditorBox>
 				</ActionableBox>
-			</SingleEntity>
+			</Entity>
 		</BlockElement>
 	)
 })

@@ -5,8 +5,8 @@ import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeSingleEntity } from '../treeParameters'
 import { Component } from './Component'
+import { Entity, EntityBaseProps } from './Entity'
 import { Field } from './Field'
-import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
 export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 	children?: React.ReactNode
@@ -14,7 +14,7 @@ export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 } & (
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
+				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 	)
@@ -23,7 +23,7 @@ export const HasOne = Component(
 	<EntityProps extends {}>(props: HasOneProps<EntityProps>) => {
 		const entity = useRelativeSingleEntity(props)
 
-		return <SingleEntity {...props} accessor={entity} />
+		return <Entity {...props} accessor={entity} />
 	},
 	{
 		generateEnvironment: (props, oldEnvironment) => {

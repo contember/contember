@@ -1,10 +1,4 @@
-import {
-	BindingError,
-	FieldValue,
-	RelativeSingleField,
-	SingleEntity,
-	useParentEntityAccessor,
-} from '@contember/binding'
+import { BindingError, FieldValue, RelativeSingleField, Entity, useParentEntityAccessor } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
@@ -85,7 +79,7 @@ export const EmbedElementRenderer = React.memo(
 			<BlockElement element={element} attributes={attributes} withBoundaries>
 				{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 				<div contentEditable={false} data-slate-editor={false}>
-					<SingleEntity accessor={referencedEntity}>
+					<Entity accessor={referencedEntity}>
 						<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
 							<ActionableBox editContents={alternate || null} onRemove={onRemove}>
 								<EditorBox heading={selectedBlock?.label} isActive={selected} onClick={onContainerClick}>
@@ -99,7 +93,7 @@ export const EmbedElementRenderer = React.memo(
 								</EditorBox>
 							</ActionableBox>
 						</div>
-					</SingleEntity>
+					</Entity>
 				</div>
 				{children}
 			</BlockElement>

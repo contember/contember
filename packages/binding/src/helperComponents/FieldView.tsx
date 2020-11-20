@@ -2,32 +2,48 @@ import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-ut
 import * as React from 'react'
 import { useParentEntityAccessor } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
+import { throwBindingError } from '../BindingError'
 import { Component } from '../coreComponents'
 import { QueryLanguage } from '../queryLanguage'
 import { FieldValue, RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
 import { SugaredField } from './SugaredField'
 
-interface RenderFieldsCommonProps {
+interface FieldViewCommonProps {
 	fallbackIfUnpersisted?: React.ReactNode
 }
 
-interface RenderFieldsProps extends RenderFieldsCommonProps {
-	fields: Array<string | SugaredRelativeSingleField>
-	render: (...accessors: FieldAccessor[]) => React.ReactNode
-}
+type FieldViewProps = FieldViewCommonProps &
+	(
+		| {
+				render: (...accessors: FieldAccessor[]) => React.ReactNode
+				field: string | SugaredRelativeSingleField
+		  }
+		| {
+				render: (...accessors: FieldAccessor[]) => React.ReactNode
+				fields: Array<string | SugaredRelativeSingleField>
+		  }
+	)
 
 // Just short type aliases so that we can type the overloads in a tractable fashion.
 type FV = FieldValue
 type SRSF = string | SugaredRelativeSingleField
-type CP = RenderFieldsCommonProps
+type CP = FieldViewCommonProps
 type RN = React.ReactNode
 type REN = React.ReactElement | null
 
-export const RenderFields = Component<RenderFieldsProps>(
-	({ fields, render, fallbackIfUnpersisted }) => {
+export const FieldView = Component<FieldViewProps>(
+	props => {
+		const { fallbackIfUnpersisted, render } = props
+		const fields =
+			'fields' in props && Array.isArray(props.fields)
+				? props.fields
+				: 'field' in props && props.field
+				? [props.field]
+				: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
+
 		useConstantLengthInvariant(
 			fields,
-			`The number of fields in the 'fields' prop of the 'RenderFields' must remain constant between renders!`,
+			`The number of fields in the 'fields' prop of the 'FieldView' must remain constant between renders!`,
 		)
 
 		const entityAccessor = useParentEntityAccessor()
@@ -55,16 +71,25 @@ export const RenderFields = Component<RenderFieldsProps>(
 
 		return <>{output}</>
 	},
-	props => (
-		<>
-			{props.fallbackIfUnpersisted}
-			{props.fields.map((field, i) => (
-				<SugaredField key={i} field={field} />
-			))}
-		</>
-	),
-	'RenderFields',
+	props => {
+		const fields =
+			'fields' in props && Array.isArray(props.fields)
+				? props.fields
+				: 'field' in props && props.field
+				? [props.field]
+				: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
+		return (
+			<>
+				{props.fallbackIfUnpersisted}
+				{fields.map((field, i) => (
+					<SugaredField key={i} field={field} />
+				))}
+			</>
+		)
+	},
+	'FieldView',
 ) as {
+	<FV1 extends FV>(props: CP & { field: SRSF; render: (field1: FieldAccessor<FV1>) => RN }): REN
 	<FV1 extends FV>(props: CP & { fields: [SRSF]; render: (field1: FieldAccessor<FV1>) => RN }): REN
 	<FV1 extends FV, FV2 extends FV>(
 		props: CP & { fields: [SRSF, SRSF]; render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>) => RN },
@@ -98,5 +123,5 @@ export const RenderFields = Component<RenderFieldsProps>(
 			) => RN
 		},
 	): REN
-	(props: RenderFieldsProps): REN
+	(props: FieldViewProps): REN
 }

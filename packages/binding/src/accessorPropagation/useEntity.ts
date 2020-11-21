@@ -12,24 +12,19 @@ function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEn
 function useEntity(
 	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined,
 ): EntityAccessor | undefined
-function useEntity(
-	sugaredRelativeSingleEntity?: string | SugaredRelativeSingleEntity | undefined,
-): EntityAccessor | undefined {
-	// TODO It would be much better if it was possible to use argument spreading instead but as far as I can tell, TS
-	//		doesn't support that in conjunction with overloads. Help welcome.
-	const argumentCount = arguments.length
-
-	useConstantValueInvariant(argumentCount, 'useEntity: cannot alternate between providing and omitting the argument.')
+function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undefined]): EntityAccessor | undefined {
+	useConstantValueInvariant(entity.length, 'useEntity: cannot alternate between providing and omitting the argument.')
 
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
 
-	if (argumentCount === 0) {
+	if (entity.length === 0) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const getEntityAccessor = React.useCallback(() => getEntityByKey(entityKey), [entityKey, getEntityByKey])
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useAccessorUpdateSubscription(getEntityAccessor)
 	}
+	const sugaredRelativeSingleEntity = entity[0]
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const relativeSingleEntity = useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity)

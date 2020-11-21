@@ -56,8 +56,7 @@ export const UploadField = Component<UploadFieldProps>(
 				? props.fileUrlField
 				: undefined,
 		)
-		const hasPersistedFile =
-			props.hasPersistedFile || (fileUrlField ? () => fileUrlField.currentValue !== null : undefined)
+		const hasPersistedFile = props.hasPersistedFile || (fileUrlField ? () => fileUrlField.value !== null : undefined)
 
 		const onDrop = React.useCallback(
 			([file]: File[]) => {
@@ -83,7 +82,7 @@ export const UploadField = Component<UploadFieldProps>(
 		// non-nullable. We cannot easily detect from here what exactly to set to null, remove or disconnect.
 
 		// const clearField = React.useMemo<undefined | React.MouseEventHandler>(() => {
-		// 	return fileUrlField && fileUrlField.currentValue !== null
+		// 	return fileUrlField && fileUrlField.value !== null
 		// 		? e => {
 		// 				e.stopPropagation()
 		// 				fileUrlField.updateValue(null)

@@ -78,7 +78,7 @@ namespace YouTubeEmbedHandler {
 	}
 
 	export const Renderer = React.memo(function YouTubeRenderer(props: RendererOptions) {
-		const youTubeId = useField<string>(props.youTubeIdField).currentValue
+		const youTubeId = useField<string>(props.youTubeIdField).value
 
 		if (youTubeId === null) {
 			return null

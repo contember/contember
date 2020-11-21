@@ -72,7 +72,7 @@ export const EmbedElementRenderer = React.memo(
 		const alternate = selectedBlock?.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 		if (embedHandler === undefined) {
-			throw new BindingError(`BlockEditor: Missing handler for embed of type '${embedTypeDiscriminant.currentValue}'.`)
+			throw new BindingError(`BlockEditor: Missing handler for embed of type '${embedTypeDiscriminant.value}'.`)
 		}
 
 		return (

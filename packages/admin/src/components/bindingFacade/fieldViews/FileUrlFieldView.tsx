@@ -8,7 +8,7 @@ export interface FileUrlFieldViewProps extends Omit<React.AnchorHTMLAttributes<H
 export const FileUrlFieldView = Component<FileUrlFieldViewProps>(
 	({ fileUrlField, ...props }) => {
 		const fieldAccessor = useField<string>(fileUrlField)
-		const url = fieldAccessor.currentValue!
+		const url = fieldAccessor.value!
 		return (
 			<a
 				style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'rtl' }}

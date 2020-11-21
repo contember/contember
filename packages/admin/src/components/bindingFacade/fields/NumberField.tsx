@@ -13,9 +13,7 @@ export const NumberField = SimpleRelativeSingleField<NumberFieldProps, number>(
 		}
 		return (
 			<TextInput
-				value={
-					typeof fieldMetadata.field.currentValue === 'number' ? fieldMetadata.field.currentValue.toString(10) : '0'
-				}
+				value={typeof fieldMetadata.field.value === 'number' ? fieldMetadata.field.value.toString(10) : '0'}
 				onChange={generateOnChange(fieldMetadata.field)}
 				validationState={fieldMetadata.field.errors.length ? 'invalid' : undefined}
 				type="number"

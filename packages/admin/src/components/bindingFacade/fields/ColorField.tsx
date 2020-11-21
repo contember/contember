@@ -13,7 +13,7 @@ export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
 		}
 		return (
 			<TextInput
-				value={fieldMetadata.field.currentValue || ''}
+				value={fieldMetadata.field.value || ''}
 				onChange={generateOnChange(fieldMetadata.field)}
 				validationState={fieldMetadata.field.errors.length ? 'invalid' : undefined}
 				readOnly={fieldMetadata.isMutating}

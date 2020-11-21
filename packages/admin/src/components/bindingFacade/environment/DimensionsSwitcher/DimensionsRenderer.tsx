@@ -118,8 +118,8 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 				continue
 			}
 			const slugField = entity.getField(props.slugField)
-			if (typeof slugField.currentValue === 'string') {
-				const slugValue = slugField.currentValue
+			if (typeof slugField.value === 'string') {
+				const slugValue = slugField.value
 				normalized.push({
 					slug: slugValue,
 					isSelected: currentDimensions.indexOf(slugValue) !== -1,

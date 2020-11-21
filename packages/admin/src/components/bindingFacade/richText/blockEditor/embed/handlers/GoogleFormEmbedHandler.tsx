@@ -97,7 +97,7 @@ namespace GoogleFormEmbedHandler {
 	}
 
 	export const Renderer = React.memo(function GoogleFormRenderer(props: RendererOptions) {
-		const googleFormId = useField<string>(props.googleFormIdField).currentValue
+		const googleFormId = useField<string>(props.googleFormIdField).value
 
 		if (googleFormId === null) {
 			return null

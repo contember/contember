@@ -58,7 +58,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 							const entities = Array.from(listSubTree)
 							const newOrderFieldValue = !entities.length
 								? 0
-								: (entities[0].getRelativeSingleField<number>(desugaredOrderField).currentValue ?? 0) + 1
+								: (entities[0].getRelativeSingleField<number>(desugaredOrderField).value ?? 0) + 1
 							getAccessor().getRelativeSingleField<number>(desugaredOrderField).updateValue(newOrderFieldValue)
 						}}
 					>

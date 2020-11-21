@@ -20,17 +20,13 @@ export const Field = Component(
 		const field = useField<Persisted>(props)
 
 		if (props.format !== undefined) {
-			return <>{props.format(field.currentValue)}</>
+			return <>{props.format(field.value)}</>
 		}
 
-		if (
-			field.currentValue instanceof GraphQlBuilder.Literal ||
-			field.currentValue === null ||
-			typeof field.currentValue === 'boolean'
-		) {
+		if (field.value instanceof GraphQlBuilder.Literal || field.value === null || typeof field.value === 'boolean') {
 			return null
 		}
-		return <>{field.currentValue}</>
+		return <>{field.value}</>
 	},
 	{
 		generateFieldMarker: (props, environment) => MarkerFactory.createFieldMarker(props, environment),

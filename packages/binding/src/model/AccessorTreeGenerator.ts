@@ -362,7 +362,7 @@ export class AccessorTreeGenerator {
 					if (!(newFieldDatum instanceof Set) && !(newFieldDatum instanceof ServerGeneratedUuid)) {
 						if (fieldState.persistedValue !== newFieldDatum) {
 							fieldState.persistedValue = newFieldDatum
-							fieldState.currentValue = newFieldDatum ?? fieldState.fieldMarker.defaultValue ?? null
+							fieldState.value = newFieldDatum ?? fieldState.fieldMarker.defaultValue ?? null
 							fieldState.hasUnpersistedChanges = false
 
 							didChildUpdate = true
@@ -898,7 +898,7 @@ export class AccessorTreeGenerator {
 						}
 						entityState.hasIdSetInStone = true
 						const previousKey = entityState.id.value
-						const newKey = updatedState.currentValue as string
+						const newKey = updatedState.value as string
 						entityState.id = new ClientGeneratedUuid(newKey)
 						this.entityStore.delete(previousKey)
 						this.entityStore.set(newKey, entityState)
@@ -1481,7 +1481,7 @@ export class AccessorTreeGenerator {
 			onFieldUpdate,
 			placeholderName,
 			persistedValue,
-			currentValue: resolvedFieldValue,
+			value: resolvedFieldValue,
 			addEventListener: undefined as any,
 			eventListeners: {
 				beforeUpdate: undefined,
@@ -1499,7 +1499,7 @@ export class AccessorTreeGenerator {
 						fieldState.hasStaleAccessor = false
 						accessor = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
 							fieldState.placeholderName,
-							fieldState.currentValue,
+							fieldState.value,
 							fieldState.persistedValue === undefined ? null : fieldState.persistedValue,
 							fieldState.fieldMarker.defaultValue,
 							fieldState.errors,
@@ -1520,7 +1520,7 @@ export class AccessorTreeGenerator {
 					if (fieldState.touchLog === undefined) {
 						fieldState.touchLog = new Map()
 					} else if (__DEV_MODE__) {
-						if (placeholderName === PRIMARY_KEY_NAME && newValue !== fieldState.currentValue) {
+						if (placeholderName === PRIMARY_KEY_NAME && newValue !== fieldState.value) {
 							throw new BindingError(
 								`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n` +
 									`Once set, it is immutable.`,
@@ -1545,10 +1545,10 @@ export class AccessorTreeGenerator {
 						}
 					}
 					fieldState.touchLog.set(agent, true)
-					if (newValue === fieldState.currentValue) {
+					if (newValue === fieldState.value) {
 						return
 					}
-					fieldState.currentValue = newValue
+					fieldState.value = newValue
 					fieldState.hasPendingUpdate = true
 					fieldState.hasStaleAccessor = true
 

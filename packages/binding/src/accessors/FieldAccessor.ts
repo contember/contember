@@ -8,7 +8,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 	implements Errorable {
 	constructor(
 		public readonly fieldName: FieldName,
-		public readonly currentValue: Persisted | null,
+		public readonly value: Persisted | null,
 		public readonly valueOnServer: Persisted | null,
 		public readonly defaultValue: Persisted | undefined,
 		public readonly errors: ErrorAccessor[],
@@ -18,8 +18,8 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly updateValue: FieldAccessor.UpdateValue<Produced>,
 	) {}
 
-	public hasValue(candidate: this['currentValue']): boolean {
-		const currentValue = this.currentValue
+	public hasValue(candidate: this['value']): boolean {
+		const currentValue = this.value
 
 		// This may seem like absolute bogus but it is indeed desirable because when updating entities with fields whose
 		// values are supposed to be literals, we still get strings from the API, and so, at least for now, this sort of
@@ -36,9 +36,9 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 
 	public get resolvedValue() {
 		if (this.defaultValue === undefined) {
-			return this.currentValue
+			return this.value
 		}
-		return this.currentValue === null ? this.defaultValue : this.currentValue
+		return this.value === null ? this.defaultValue : this.value
 	}
 
 	// helpers

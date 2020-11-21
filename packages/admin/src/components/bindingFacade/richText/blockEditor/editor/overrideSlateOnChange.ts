@@ -158,7 +158,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 
 							if (
 								originalElement !== currentElement ||
-								originalBlock.getRelativeSingleField(sortableByField).currentValue !== newBlockOrder
+								originalBlock.getRelativeSingleField(sortableByField).value !== newBlockOrder
 							) {
 								getEntityByKey(blockKey).getRelativeSingleField(sortableByField).updateValue(newBlockOrder)
 								saveBlockElement(blockKey, currentElement)

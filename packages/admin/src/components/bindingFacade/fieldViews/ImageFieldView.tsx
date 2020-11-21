@@ -23,15 +23,15 @@ export const ImageFieldView = Component(
 		const altAccessor = useField<string>(altField)
 		const titleAccessor = useField<string>(titleField)
 
-		if (!srcAccessor.currentValue) {
+		if (!srcAccessor.value) {
 			return <>{fallback}</>
 		}
 		return (
 			// The spread intentionally comes after alt and title so that it's possible to provide just static string values.
 			<img
-				src={formatUrl ? formatUrl(srcAccessor.currentValue) : (srcAccessor.currentValue as string)}
-				alt={altAccessor?.currentValue || undefined}
-				title={titleAccessor?.currentValue || undefined}
+				src={formatUrl ? formatUrl(srcAccessor.value) : (srcAccessor.value as string)}
+				alt={altAccessor?.value || undefined}
+				title={titleAccessor?.value || undefined}
 				{...imgProps}
 			/>
 		)

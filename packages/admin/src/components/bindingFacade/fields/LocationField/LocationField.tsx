@@ -49,8 +49,8 @@ export const LocationField = Component<LocationFieldProps>(
 			if (mapCenter !== undefined) {
 				return mapCenter
 			}
-			if (latitude.currentValue !== null && longitude.currentValue !== null) {
-				return [latitude.currentValue, longitude.currentValue]
+			if (latitude.value !== null && longitude.value !== null) {
+				return [latitude.value, longitude.value]
 			}
 			return [50.102223, 9.254419] // Center of Europe.
 		})
@@ -70,11 +70,11 @@ export const LocationField = Component<LocationFieldProps>(
 							attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 							{...(tileLayerProps ?? {})}
 						/>
-						{latitude.currentValue !== null && longitude.currentValue !== null && (
+						{latitude.value !== null && longitude.value !== null && (
 							<Marker
 								icon={markerIcon}
 								{...(markerProps ?? {})}
-								position={[latitude.currentValue, longitude.currentValue]}
+								position={[latitude.value, longitude.value]}
 								onmove={moveMarker as any}
 								draggable
 							/>

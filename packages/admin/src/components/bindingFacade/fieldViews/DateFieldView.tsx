@@ -13,12 +13,12 @@ export const DateFieldView = Component<DateFieldViewProps>(
 	({ field, locale, format, fallback = null }) => {
 		const dateField = useField<string>(field)
 
-		if (!dateField.currentValue) {
+		if (!dateField.value) {
 			return <>{fallback}</>
 		}
 
-		// dateField.currentValue is created on server by Date.toISOString() and therefore always in UTC
-		const date = new Date(dateField.currentValue)
+		// dateField.value is created on server by Date.toISOString() and therefore always in UTC
+		const date = new Date(dateField.value)
 
 		if (locale === undefined) {
 			if (format === undefined) {

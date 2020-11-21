@@ -17,7 +17,7 @@ export interface InternalFieldState {
 	hasPendingUpdate: boolean
 	hasUnpersistedChanges: boolean
 	onFieldUpdate: OnFieldUpdate // To be called by this field to inform the parent entity
-	currentValue: FieldValue
+	value: FieldValue
 	persistedValue: FieldValue | undefined // Undefined means that the parent entity doesn't exist on server
 	placeholderName: FieldName
 	touchLog: Map<string, boolean> | undefined

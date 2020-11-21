@@ -7,7 +7,7 @@ export const getDiscriminatedDatum = <Datum>(
 	data: NormalizedDiscriminatedData<Datum>,
 	discriminant: FieldAccessor | FieldValue,
 ): ResolvedDiscriminatedDatum<Datum> | undefined => {
-	const discriminantValue: FieldValue = discriminant instanceof FieldAccessor ? discriminant.currentValue : discriminant
+	const discriminantValue: FieldValue = discriminant instanceof FieldAccessor ? discriminant.value : discriminant
 
 	if (discriminantValue instanceof GraphQlBuilder.Literal) {
 		return data.get(discriminantValue.value)

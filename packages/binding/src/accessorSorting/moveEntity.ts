@@ -58,7 +58,7 @@ const computeEntityOrder = (
 			targetValue = i
 		}
 
-		if (typeof orderField.currentValue !== 'number' || orderField.currentValue !== targetValue) {
+		if (typeof orderField.value !== 'number' || orderField.value !== targetValue) {
 			order.set(entity.key, targetValue)
 		}
 	}

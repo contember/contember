@@ -66,7 +66,7 @@ export const SlugField = Component<SlugFieldProps>(
 		const isMutating = useMutationState()
 
 		const completeHardPrefix = `${normalizedUnpersistedHardPrefix}${normalizedPersistedHardPrefix}`
-		const presentedValue = `${normalizedUnpersistedHardPrefix}${slugField.currentValue || ''}`
+		const presentedValue = `${normalizedUnpersistedHardPrefix}${slugField.value || ''}`
 
 		return (
 			<ConcealableField

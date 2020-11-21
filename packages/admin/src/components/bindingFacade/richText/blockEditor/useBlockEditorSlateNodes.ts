@@ -62,7 +62,7 @@ export const useBlockEditorSlateNodes = ({
 			}
 
 			let element: ContemberFieldElement
-			const fieldValue = accessor.currentValue
+			const fieldValue = accessor.value
 
 			if (fieldValue === null || fieldValue === '' || normalizedElement.format === 'plainText') {
 				element = {
@@ -104,13 +104,13 @@ export const useBlockEditorSlateNodes = ({
 
 				let blockElement: ElementNode
 
-				if (contentField.currentValue === null || contentField.currentValue === '') {
+				if (contentField.value === null || contentField.value === '') {
 					blockElement = editor.createDefaultElement([{ text: '' }])
-				} else if (typeof contentField.currentValue !== 'string') {
+				} else if (typeof contentField.value !== 'string') {
 					throw new BindingError(`BlockEditor: The 'textBlockField' does not contain a string value.`)
 				} else {
 					blockElement = editor.deserializeNodes(
-						contentField.currentValue,
+						contentField.value,
 						`BlockEditor: The 'contentField' of a block contains invalid data.`,
 					)[0] as ElementNode
 				}

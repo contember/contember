@@ -20,14 +20,14 @@ export const VideoFieldView = Component(
 		const srcAccessor = useField<SrcField>(srcField)
 		const titleAccessor = useField<string>(titleField)
 
-		if (!srcAccessor.currentValue) {
+		if (!srcAccessor.value) {
 			return <>{fallback}</>
 		}
 		return (
 			// The spread intentionally comes after alt and title so that it's possible to provide just static string values.
 			<video
-				src={formatUrl ? formatUrl(srcAccessor.currentValue) : (srcAccessor.currentValue as string)}
-				title={titleAccessor?.currentValue || undefined}
+				src={formatUrl ? formatUrl(srcAccessor.value) : (srcAccessor.value as string)}
+				title={titleAccessor?.value || undefined}
 				controls
 				{...videoProps}
 			/>

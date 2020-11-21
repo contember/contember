@@ -78,7 +78,7 @@ namespace VimeoEmbedHandler {
 	}
 
 	export const Renderer = React.memo(function VimeoRenderer(props: RendererOptions) {
-		const vimeoId = useField<string>(props.vimeoIdField).currentValue
+		const vimeoId = useField<string>(props.vimeoIdField).value
 
 		if (vimeoId === null) {
 			return null

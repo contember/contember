@@ -220,8 +220,10 @@ namespace EntityAccessor {
 		(type: 'beforePersist', listener: EntityEventListenerMap['beforePersist']): () => void
 		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
 		(type: 'connectionUpdate', hasOneField: FieldName, listener: EntityEventListenerMap['connectionUpdate']): () => void
-		(type: 'initialize', listener: EntityEventListenerMap['initialize']): () => void
 		(type: 'update', listener: EntityEventListenerMap['update']): () => void
+
+		// It's too late to add this by the time the accessor exists…
+		//(type: 'initialize', listener: EntityEventListenerMap['initialize']): () => void
 	}
 }
 

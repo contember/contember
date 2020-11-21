@@ -101,8 +101,10 @@ namespace EntityListAccessor {
 		(type: 'beforePersist', listener: EntityListEventListenerMap['beforePersist']): () => void
 		(type: 'beforeUpdate', listener: EntityListEventListenerMap['beforeUpdate']): () => void
 		(type: 'childInitialize', listener: EntityListEventListenerMap['childInitialize']): () => void
-		(type: 'initialize', listener: EntityListEventListenerMap['initialize']): () => void
 		(type: 'update', listener: EntityListEventListenerMap['update']): () => void
+
+		// It's too late to add this by the time the accessor exists…
+		// (type: 'initialize', listener: EntityListEventListenerMap['initialize']): () => void
 	}
 }
 

@@ -287,6 +287,8 @@ export class TreeParameterMerger {
 			connectionUpdate: this.mergeFieldScopedListeners(original.connectionUpdate, fresh.connectionUpdate),
 			initialize: this.mergeEventListeners(original.initialize, fresh.initialize),
 			update: this.mergeEventListeners(original.update, fresh.update),
+			persistError: this.mergeEventListeners(original.persistError, fresh.persistError),
+			persistSuccess: this.mergeEventListeners(original.persistSuccess, fresh.persistSuccess),
 		}
 	}
 
@@ -312,6 +314,8 @@ export class TreeParameterMerger {
 			update: this.cloneOptionalSet(listeners?.update),
 			beforeUpdate: this.cloneOptionalSet(listeners?.beforeUpdate),
 			initialize: this.cloneOptionalSet(listeners?.initialize),
+			persistError: this.cloneOptionalSet(listeners?.persistError),
+			persistSuccess: this.cloneOptionalSet(listeners?.persistSuccess),
 		}
 	}
 

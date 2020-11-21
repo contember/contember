@@ -26,6 +26,7 @@ import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
+import { ScheduleAnotherPersist } from './ScheduleAnotherPersist'
 
 class EntityAccessor implements Errorable {
 	public constructor(
@@ -208,11 +209,22 @@ namespace EntityAccessor {
 	) => void
 	export type UpdateListener = (accessor: EntityAccessor) => void
 
+	export interface PersistErrorOptions extends Omit<BindingOperations, 'persistAll'> {
+		attemptNumber: number
+		tryAgain: ScheduleAnotherPersist
+	}
+	export type PersistErrorHandler = (
+		getAccessor: GetEntityAccessor,
+		options: PersistErrorOptions,
+	) => void | Promise<void>
+
 	export interface EntityEventListenerMap {
 		beforePersist: BatchUpdatesHandler
 		beforeUpdate: BatchUpdatesHandler
 		connectionUpdate: UpdateListener
 		initialize: BatchUpdatesHandler
+		persistError: PersistErrorHandler
+		persistSuccess: UpdateListener
 		update: UpdateListener
 	}
 	export type EntityEventType = keyof EntityEventListenerMap

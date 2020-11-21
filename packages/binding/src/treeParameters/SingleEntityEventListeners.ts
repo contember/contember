@@ -16,11 +16,25 @@ export interface SingleEntityEventListeners {
 export interface SugarableSingleEntityEventListeners {}
 
 export interface UnsugarableSingleEntityEventListeners {
-	onBeforePersist?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
-	onBeforeUpdate?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
+	onBeforePersist?:
+		| EntityAccessor.EntityEventListenerMap['beforePersist']
+		| Set<EntityAccessor.EntityEventListenerMap['beforePersist']>
+	onBeforeUpdate?:
+		| EntityAccessor.EntityEventListenerMap['beforePersist']
+		| Set<EntityAccessor.EntityEventListenerMap['beforePersist']>
 	onConnectionUpdate?: {
-		[fieldName: string]: EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>
+		[fieldName: string]:
+			| EntityAccessor.EntityEventListenerMap['connectionUpdate']
+			| Set<EntityAccessor.EntityEventListenerMap['connectionUpdate']>
 	}
-	onInitialize?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
-	onUpdate?: EntityAccessor.UpdateListener | Set<EntityAccessor.UpdateListener>
+	onInitialize?:
+		| EntityAccessor.EntityEventListenerMap['initialize']
+		| Set<EntityAccessor.EntityEventListenerMap['initialize']>
+	onPersistError?:
+		| EntityAccessor.EntityEventListenerMap['persistError']
+		| Set<EntityAccessor.EntityEventListenerMap['persistError']>
+	onPersistSuccess?:
+		| EntityAccessor.EntityEventListenerMap['persistSuccess']
+		| Set<EntityAccessor.EntityEventListenerMap['persistSuccess']>
+	onUpdate?: EntityAccessor.EntityEventListenerMap['update'] | Set<EntityAccessor.EntityEventListenerMap['update']>
 }

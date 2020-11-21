@@ -58,6 +58,8 @@ export function useEntitySubTreeParameters(
 				onBeforeUpdate: qualifiedSingleEntity.onBeforeUpdate!,
 				onUpdate: qualifiedSingleEntity.onUpdate!,
 				onBeforePersist: qualifiedSingleEntity.onBeforePersist!,
+				onPersistError: qualifiedSingleEntity.onPersistError!,
+				onPersistSuccess: qualifiedSingleEntity.onPersistSuccess!,
 			}
 			return new BoxedUnconstrainedQualifiedSingleEntity(
 				QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(singleEntity, environment),
@@ -73,6 +75,8 @@ export function useEntitySubTreeParameters(
 			qualifiedSingleEntity.onBeforeUpdate,
 			qualifiedSingleEntity.onUpdate,
 			qualifiedSingleEntity.onBeforePersist,
+			qualifiedSingleEntity.onPersistSuccess,
+			qualifiedSingleEntity.onPersistError,
 			qualifiedSingleEntity.alias,
 			environment,
 		])
@@ -91,6 +95,8 @@ export function useEntitySubTreeParameters(
 				onBeforeUpdate: qualifiedSingleEntity.onBeforeUpdate!,
 				onUpdate: qualifiedSingleEntity.onUpdate!,
 				onBeforePersist: qualifiedSingleEntity.onBeforePersist!,
+				onPersistError: qualifiedSingleEntity.onPersistError!,
+				onPersistSuccess: qualifiedSingleEntity.onPersistSuccess!,
 			}
 			return new BoxedQualifiedSingleEntity(QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment))
 		}, [
@@ -105,6 +111,8 @@ export function useEntitySubTreeParameters(
 			qualifiedSingleEntity.onBeforeUpdate,
 			qualifiedSingleEntity.onUpdate,
 			qualifiedSingleEntity.onBeforePersist,
+			qualifiedSingleEntity.onPersistError,
+			qualifiedSingleEntity.onPersistSuccess,
 			environment,
 		])
 	}

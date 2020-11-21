@@ -68,6 +68,8 @@ describe('Marker tree generator', () => {
 			initialize: undefined,
 			connectionUpdate: undefined,
 			beforeUpdate: undefined,
+			persistSuccess: undefined,
+			persistError: undefined,
 			update: undefined,
 		} as const
 		const listListeners = {

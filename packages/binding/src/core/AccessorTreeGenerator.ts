@@ -1708,6 +1708,8 @@ export class AccessorTreeGenerator {
 			beforeUpdate: undefined,
 			update: undefined,
 			connectionUpdate: undefined,
+			persistError: undefined,
+			persistSuccess: undefined,
 		})
 
 		let eventListeners: SingleEntityEventListeners['eventListeners'] = create(containingListState)

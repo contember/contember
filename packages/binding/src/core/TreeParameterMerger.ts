@@ -301,6 +301,8 @@ export class TreeParameterMerger {
 			beforeUpdate: this.mergeEventListeners(original.beforeUpdate, fresh.beforeUpdate),
 			childInitialize: this.mergeEventListeners(original.childInitialize, fresh.childInitialize),
 			initialize: this.mergeEventListeners(original.initialize, fresh.initialize),
+			persistError: this.mergeEventListeners(original.persistError, fresh.persistError),
+			persistSuccess: this.mergeEventListeners(original.persistSuccess, fresh.persistSuccess),
 			update: this.mergeEventListeners(original.update, fresh.update),
 		}
 	}
@@ -327,6 +329,8 @@ export class TreeParameterMerger {
 			beforeUpdate: this.cloneOptionalSet(listeners?.beforeUpdate),
 			childInitialize: this.cloneOptionalSet(listeners?.childInitialize),
 			initialize: this.cloneOptionalSet(listeners?.initialize),
+			persistError: this.cloneOptionalSet(listeners?.persistError),
+			persistSuccess: this.cloneOptionalSet(listeners?.persistSuccess),
 			update: this.cloneOptionalSet(listeners?.update),
 		}
 	}

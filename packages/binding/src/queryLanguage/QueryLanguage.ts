@@ -137,6 +137,8 @@ export namespace QueryLanguage {
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
 			childInitialize: desugarEventListener(unsugarable.onChildInitialize),
 			initialize: desugarEventListener(unsugarable.onInitialize),
+			persistError: desugarEventListener(unsugarable.onPersistError),
+			persistSuccess: desugarEventListener(unsugarable.onPersistSuccess),
 			update: desugarEventListener(unsugarable.onUpdate),
 		}
 	}

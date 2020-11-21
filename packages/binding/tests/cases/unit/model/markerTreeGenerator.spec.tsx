@@ -77,6 +77,8 @@ describe('Marker tree generator', () => {
 			initialize: undefined,
 			childInitialize: undefined,
 			beforeUpdate: undefined,
+			persistSuccess: undefined,
+			persistError: undefined,
 			update: undefined,
 		} as const
 		const innerHasMany = new HasManyRelationMarker(

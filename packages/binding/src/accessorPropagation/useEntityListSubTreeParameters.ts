@@ -62,6 +62,8 @@ export function useEntityListSubTreeParameters(
 				expectedMutation: qualifiedEntityList.expectedMutation!,
 				alias: qualifiedEntityList.alias!,
 				onInitialize: qualifiedEntityList.onInitialize!,
+				onPersistError: qualifiedEntityList.onPersistError!,
+				onPersistSuccess: qualifiedEntityList.onPersistSuccess!,
 			}
 			return new BoxedUnconstrainedQualifiedEntityList(
 				QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment),
@@ -79,6 +81,8 @@ export function useEntityListSubTreeParameters(
 			qualifiedEntityList.expectedMutation,
 			qualifiedEntityList.alias,
 			qualifiedEntityList.onInitialize,
+			qualifiedEntityList.onPersistError,
+			qualifiedEntityList.onPersistSuccess,
 			environment,
 		])
 	} else {
@@ -100,6 +104,8 @@ export function useEntityListSubTreeParameters(
 				onBeforeUpdate: qualifiedEntityList.onBeforeUpdate!,
 				onBeforePersist: qualifiedEntityList.onBeforePersist!,
 				onChildInitialize: qualifiedEntityList.onChildInitialize!,
+				onPersistSuccess: qualifiedEntityList.onPersistSuccess!,
+				onPersistError: qualifiedEntityList.onPersistError!,
 			}
 			return new BoxedQualifiedEntityList(QueryLanguage.desugarQualifiedEntityList(entityList, environment))
 		}, [
@@ -118,6 +124,8 @@ export function useEntityListSubTreeParameters(
 			qualifiedEntityList.onBeforeUpdate,
 			qualifiedEntityList.onBeforePersist,
 			qualifiedEntityList.onChildInitialize,
+			qualifiedEntityList.onPersistError,
+			qualifiedEntityList.onPersistSuccess,
 			environment,
 		])
 	}

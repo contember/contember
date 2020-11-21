@@ -1,4 +1,4 @@
-import { EntityAccessor, EntityListAccessor } from '../accessors'
+import { EntityListAccessor } from '../accessors'
 
 export interface DesugaredEntityListEventListeners {}
 
@@ -13,9 +13,25 @@ export interface EntityListEventListeners {
 export interface SugarableEntityListEventListeners {}
 
 export interface UnsugarableEntityListEventListeners {
-	onBeforePersist?: EntityListAccessor.BatchUpdatesHandler | Set<EntityListAccessor.BatchUpdatesHandler>
-	onBeforeUpdate?: EntityListAccessor.BatchUpdatesHandler | Set<EntityListAccessor.BatchUpdatesHandler>
-	onChildInitialize?: EntityAccessor.BatchUpdatesHandler | Set<EntityAccessor.BatchUpdatesHandler>
-	onInitialize?: EntityListAccessor.BatchUpdatesHandler | Set<EntityListAccessor.BatchUpdatesHandler>
-	onUpdate?: EntityListAccessor.UpdateListener | Set<EntityListAccessor.UpdateListener>
+	onBeforePersist?:
+		| EntityListAccessor.EntityListEventListenerMap['beforePersist']
+		| Set<EntityListAccessor.EntityListEventListenerMap['beforePersist']>
+	onBeforeUpdate?:
+		| EntityListAccessor.EntityListEventListenerMap['beforeUpdate']
+		| Set<EntityListAccessor.EntityListEventListenerMap['beforeUpdate']>
+	onChildInitialize?:
+		| EntityListAccessor.EntityListEventListenerMap['childInitialize']
+		| Set<EntityListAccessor.EntityListEventListenerMap['childInitialize']>
+	onInitialize?:
+		| EntityListAccessor.EntityListEventListenerMap['initialize']
+		| Set<EntityListAccessor.EntityListEventListenerMap['initialize']>
+	onPersistError?:
+		| EntityListAccessor.EntityListEventListenerMap['persistError']
+		| Set<EntityListAccessor.EntityListEventListenerMap['persistError']>
+	onPersistSuccess?:
+		| EntityListAccessor.EntityListEventListenerMap['persistSuccess']
+		| Set<EntityListAccessor.EntityListEventListenerMap['persistSuccess']>
+	onUpdate?:
+		| EntityListAccessor.EntityListEventListenerMap['update']
+		| Set<EntityListAccessor.EntityListEventListenerMap['update']>
 }

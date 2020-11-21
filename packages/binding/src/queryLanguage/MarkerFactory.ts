@@ -7,7 +7,7 @@ import {
 	Marker,
 	SubTreeMarker,
 } from '../markers'
-import { MarkerMerger, TreeParameterMerger } from '../model'
+import { MarkerMerger, TreeParameterMerger } from '../core'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,

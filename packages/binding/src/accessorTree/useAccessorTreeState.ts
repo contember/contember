@@ -1,7 +1,7 @@
 import { useCurrentContentGraphQlClient } from '@contember/react-client'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
-import { AccessorTreeGenerator, MarkerTreeGenerator } from '../model'
+import { AccessorTreeGenerator, MarkerTreeGenerator } from '../core'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { AccessorTreeStateOptions } from './AccessorTreeStateOptions'

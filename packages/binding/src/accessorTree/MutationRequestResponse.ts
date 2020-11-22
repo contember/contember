@@ -15,7 +15,7 @@ export type ErrorPathNodeType = FieldPathErrorFragment | IndexPathErrorFragment
 
 export type MutationErrorPath = ErrorPathNodeType[]
 
-export interface MutationError {
+export interface ValidationError {
 	path: MutationErrorPath
 	message: {
 		text: string
@@ -34,7 +34,7 @@ export interface MutationResponse {
 	errors: ExecutionError[]
 	validation: {
 		valid: boolean
-		errors: MutationError[]
+		errors: ValidationError[]
 	}
 	node: {
 		id: string

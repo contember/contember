@@ -1,5 +1,5 @@
 import { ErrorAccessor } from '../accessors'
-import { ExecutionError, MutationDataResponse, MutationError } from '../accessorTree'
+import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { InternalEntityListState, InternalEntityState, InternalRootStateNode, InternalStateType } from './internalState'
 
@@ -141,11 +141,11 @@ export class AccessorErrorManager {
 		// TODO this is just temporary
 		for (const subTreePlaceholder in data) {
 			const treeDatum = data[subTreePlaceholder]
-			const executionErrors: Array<ExecutionError | MutationError> = treeDatum.errors
+			const executionErrors: Array<ExecutionError | ValidationError> = treeDatum.errors
 			const allErrors = treeDatum?.validation?.errors
 				? executionErrors.concat(treeDatum.validation.errors)
 				: executionErrors
-			const normalizedErrors = allErrors.map((error: ExecutionError | MutationError) => {
+			const normalizedErrors = allErrors.map((error: ExecutionError | ValidationError) => {
 				return {
 					path: error.path
 						.map(pathPart => {
@@ -172,7 +172,7 @@ export class AccessorErrorManager {
 	}
 
 	private getErrorAccessor(errorNode: ErrorsPreprocessor.BaseErrorNode): ErrorAccessor | undefined {
-		if (errorNode.validation === undefined || errorNode.execution === undefined) {
+		if (errorNode.validation === undefined && errorNode.execution === undefined) {
 			return undefined
 		}
 		return new ErrorAccessor(errorNode.validation, errorNode.execution)

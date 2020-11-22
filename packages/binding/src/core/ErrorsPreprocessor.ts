@@ -36,7 +36,8 @@ class ErrorsPreprocessor {
 					treeRoot.set(treeId, {
 						nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
 						children: new Map([[itemKey, processedResponse]]),
-						validation: [],
+						validation: undefined,
+						execution: undefined,
 					})
 				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
 					child.children.set(itemKey, processedResponse)
@@ -126,7 +127,11 @@ class ErrorsPreprocessor {
 					assertNever(pathNode)
 				}
 			}
-			currentNode.validation.push({ message: mutationError.message.text })
+			if (currentNode.validation === undefined) {
+				currentNode.validation = [{ message: mutationError.message.text }]
+			} else {
+				currentNode.validation.push({ message: mutationError.message.text })
+			}
 		}
 
 		return rootNode
@@ -135,6 +140,7 @@ class ErrorsPreprocessor {
 	private getRootNode(error: MutationError, startIndex: number = 0): ErrorsPreprocessor.ErrorNode {
 		let rootNode: ErrorsPreprocessor.ErrorNode = {
 			validation: [{ message: error.message.text }],
+			execution: undefined,
 			nodeType: ErrorsPreprocessor.ErrorNodeType.Leaf,
 		}
 
@@ -142,7 +148,8 @@ class ErrorsPreprocessor {
 			const pathNode = error.path[i]
 			if (pathNode.__typename === '_FieldPathFragment') {
 				rootNode = {
-					validation: [],
+					validation: undefined,
+					execution: undefined,
 					nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
 					children: new Map([[pathNode.field, rootNode]]),
 				}
@@ -156,7 +163,8 @@ class ErrorsPreprocessor {
 				}
 
 				rootNode = {
-					validation: [],
+					validation: undefined,
+					execution: undefined,
 					nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
 					children: new Map([[AliasTransformer.aliasToEntityKey(alias), rootNode]]),
 				}
@@ -176,14 +184,17 @@ class ErrorsPreprocessor {
 }
 
 namespace ErrorsPreprocessor {
-	export interface LeafErrorNode {
-		nodeType: ErrorNodeType.Leaf
-		validation: ErrorAccessor.ValidationError[]
+	export interface BaseErrorNode {
+		validation: ErrorAccessor.ValidationErrors | undefined
+		execution: ErrorAccessor.ExecutionError | undefined
 	}
 
-	export interface ErrorINode {
+	export interface LeafErrorNode extends BaseErrorNode {
+		nodeType: ErrorNodeType.Leaf
+	}
+
+	export interface ErrorINode extends BaseErrorNode {
 		nodeType: ErrorNodeType.INode
-		validation: ErrorAccessor.ValidationError[]
 		children: Map<string, ErrorNode>
 	}
 

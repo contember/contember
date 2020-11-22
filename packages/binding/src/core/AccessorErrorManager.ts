@@ -57,7 +57,7 @@ export class AccessorErrorManager {
 	) {
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === ErrorPopulationMode.Add ? new ErrorAccessor(errors.validation) : undefined
+		state.errors = mode === ErrorPopulationMode.Add ? this.getErrorAccessor(errors) : undefined
 
 		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
 			return
@@ -74,7 +74,7 @@ export class AccessorErrorManager {
 				if (fieldState?.type === InternalStateType.Field) {
 					fieldState.hasStaleAccessor = true
 					fieldState.hasPendingUpdate = true
-					fieldState.errors = mode === ErrorPopulationMode.Add ? new ErrorAccessor(child.validation) : undefined
+					fieldState.errors = mode === ErrorPopulationMode.Add ? this.getErrorAccessor(errors) : undefined
 					state.childrenWithPendingUpdates.add(fieldState)
 					continue
 				}
@@ -113,7 +113,7 @@ export class AccessorErrorManager {
 	) {
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === ErrorPopulationMode.Add ? new ErrorAccessor(errors.validation) : undefined
+		state.errors = mode === ErrorPopulationMode.Add ? this.getErrorAccessor(errors) : undefined
 
 		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
 			return
@@ -169,5 +169,12 @@ export class AccessorErrorManager {
 				console.error(treeDatum.errorMessage)
 			}
 		}
+	}
+
+	private getErrorAccessor(errorNode: ErrorsPreprocessor.BaseErrorNode): ErrorAccessor | undefined {
+		if (errorNode.validation === undefined || errorNode.execution === undefined) {
+			return undefined
+		}
+		return new ErrorAccessor(errorNode.validation, errorNode.execution)
 	}
 }

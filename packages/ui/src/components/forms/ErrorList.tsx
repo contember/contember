@@ -14,7 +14,7 @@ export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
 		return null
 	}
 	const fieldErrors = Array.isArray(errors) ? errors : errors.validation
-	if (!fieldErrors.length) {
+	if (!fieldErrors || !fieldErrors.length) {
 		return null
 	}
 	return (

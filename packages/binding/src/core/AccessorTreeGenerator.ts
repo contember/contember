@@ -1517,9 +1517,7 @@ export class AccessorTreeGenerator {
 				{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
 			) => {
 				this.performRootTreeOperation(() => {
-					if (fieldState.touchLog === undefined) {
-						fieldState.touchLog = new Map()
-					} else if (__DEV_MODE__) {
+					if (__DEV_MODE__) {
 						if (placeholderName === PRIMARY_KEY_NAME && newValue !== fieldState.value) {
 							throw new BindingError(
 								`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n` +
@@ -1544,10 +1542,13 @@ export class AccessorTreeGenerator {
 							}
 						}
 					}
-					fieldState.touchLog.set(agent, true)
 					if (newValue === fieldState.value) {
 						return
 					}
+					if (fieldState.touchLog === undefined) {
+						fieldState.touchLog = new Map()
+					}
+					fieldState.touchLog.set(agent, true)
 					fieldState.value = newValue
 					fieldState.hasPendingUpdate = true
 					fieldState.hasStaleAccessor = true

@@ -31,8 +31,7 @@ export class AccessorErrorManager {
 	}
 
 	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot, mode: ErrorPopulationMode) {
-		for (const subTreePlaceholder in errorTreeRoot) {
-			const rootError = errorTreeRoot[subTreePlaceholder]
+		for (const [subTreePlaceholder, rootError] of errorTreeRoot) {
 			const rootState = this.subTreeStates.get(subTreePlaceholder)
 
 			if (!rootState) {
@@ -72,9 +71,7 @@ export class AccessorErrorManager {
 			state.childrenWithPendingUpdates = new Set()
 		}
 
-		for (const childKey in errors.children) {
-			const child = errors.children[childKey]
-
+		for (const [childKey, child] of errors.children) {
 			if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
 				const fieldState = state.fields.get(childKey)
 
@@ -131,8 +128,7 @@ export class AccessorErrorManager {
 			state.childrenWithPendingUpdates = new Set()
 		}
 
-		for (const childKey in errors.children) {
-			const childError = errors.children[childKey]
+		for (const [childKey, childError] of errors.children) {
 			const childState = this.entityStore.get(childKey)
 
 			if (childState && childError.nodeType === ErrorsPreprocessor.ErrorNodeType.FieldIndexed) {

@@ -7,7 +7,7 @@ class ErrorsPreprocessor {
 	public constructor(private readonly requestResponse?: MutationDataResponse) {}
 
 	public preprocess(): ErrorsPreprocessor.ErrorTreeRoot {
-		const treeRoot: ErrorsPreprocessor.ErrorTreeRoot = {}
+		const treeRoot: ErrorsPreprocessor.ErrorTreeRoot = new Map()
 
 		if (this.requestResponse === undefined) {
 			return treeRoot
@@ -24,24 +24,22 @@ class ErrorsPreprocessor {
 			const [treeId, itemKeyAlias] = AliasTransformer.splitAliasSections(mutationAlias)
 
 			if (itemKeyAlias === undefined) {
-				if (treeId in treeRoot) {
+				if (treeRoot.has(treeId)) {
 					return this.rejectCorruptData()
 				}
-				treeRoot[treeId] = processedResponse
+				treeRoot.set(treeId, processedResponse)
 			} else {
 				const itemKey = AliasTransformer.aliasToEntityKey(itemKeyAlias)
-				const child = treeRoot[treeId]
+				const child = treeRoot.get(treeId)
 
-				if (!(treeId in treeRoot) || child === undefined) {
-					treeRoot[treeId] = {
+				if (child === undefined) {
+					treeRoot.set(treeId, {
 						nodeType: ErrorsPreprocessor.ErrorNodeType.KeyIndexed,
-						children: {
-							[itemKey]: processedResponse,
-						},
+						children: new Map([[itemKey, processedResponse]]),
 						errors: [],
-					}
+					})
 				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.KeyIndexed) {
-					child.children[itemKey] = processedResponse
+					child.children.set(itemKey, processedResponse)
 				}
 			}
 		}
@@ -69,7 +67,7 @@ class ErrorsPreprocessor {
 				if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
 					;((currentNode as any) as ErrorsPreprocessor.ErrorINode).nodeType =
 						ErrorsPreprocessor.ErrorNodeType.FieldIndexed
-					;((currentNode as any) as ErrorsPreprocessor.ErrorINode).children = {}
+					;((currentNode as any) as ErrorsPreprocessor.ErrorINode).children = new Map()
 				}
 
 				if (pathNode.__typename === '_FieldPathFragment') {
@@ -92,13 +90,13 @@ class ErrorsPreprocessor {
 						}
 
 						if (!(alias in currentNode.children)) {
-							currentNode.children[alias] = this.getRootNode(mutationError, nextIndex)
+							currentNode.children.set(alias, this.getRootNode(mutationError, nextIndex))
 							if (nextIndex <= mutationError.path.length) {
 								// This path has been handled by getRootNode
 								continue errorLoop
 							}
 						}
-						currentNode = currentNode.children[alias]
+						currentNode = currentNode.children.get(alias)!
 					} else {
 						this.rejectCorruptData()
 					}
@@ -115,13 +113,13 @@ class ErrorsPreprocessor {
 						const aliasKey = AliasTransformer.aliasToEntityKey(alias)
 
 						if (!(aliasKey in currentNode.children)) {
-							currentNode.children[aliasKey] = this.getRootNode(mutationError, i + 1)
+							currentNode.children.set(aliasKey, this.getRootNode(mutationError, i + 1))
 							if (i + 1 <= mutationError.path.length) {
 								// This path has been handled by getRootNode
 								continue errorLoop
 							}
 						}
-						currentNode = currentNode.children[aliasKey]
+						currentNode = currentNode.children.get(aliasKey)!
 					} else {
 						this.rejectCorruptData()
 					}
@@ -147,9 +145,7 @@ class ErrorsPreprocessor {
 				rootNode = {
 					errors: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.FieldIndexed,
-					children: {
-						[pathNode.field]: rootNode,
-					},
+					children: new Map([[pathNode.field, rootNode]]),
 				}
 			} else if (pathNode.__typename === '_IndexPathFragment') {
 				const alias = pathNode.alias
@@ -163,9 +159,7 @@ class ErrorsPreprocessor {
 				rootNode = {
 					errors: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.KeyIndexed,
-					children: {
-						[AliasTransformer.aliasToEntityKey(alias)]: rootNode,
-					},
+					children: new Map([[AliasTransformer.aliasToEntityKey(alias), rootNode]]),
 				}
 			} else {
 				assertNever(pathNode)
@@ -190,9 +184,7 @@ namespace ErrorsPreprocessor {
 
 	interface StringIndexedINode {
 		errors: ErrorAccessor[]
-		children: {
-			[key: string]: ErrorNode
-		}
+		children: Map<string, ErrorNode>
 	}
 
 	export interface KeyIndexedErrorNode extends StringIndexedINode {
@@ -212,9 +204,7 @@ namespace ErrorsPreprocessor {
 		FieldIndexed = 'FieldIndexed',
 	}
 
-	export interface ErrorTreeRoot {
-		[rootId: string]: ErrorNode
-	}
+	export type ErrorTreeRoot = Map<string, ErrorNode>
 
 	export class ErrorsPreprocessorError extends Error {}
 }

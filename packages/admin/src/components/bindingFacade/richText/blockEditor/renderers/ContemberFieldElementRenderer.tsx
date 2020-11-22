@@ -40,7 +40,7 @@ export const ContemberFieldElementRenderer = React.memo((props: ContemberFieldEl
 					</>
 				),
 			})}
-			{!!accessor.errors.length && (
+			{!!accessor.errors && (
 				<div contentEditable={false} data-slate-editor={false}>
 					<ErrorList errors={accessor.errors} size="small" />
 				</div>

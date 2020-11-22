@@ -11,7 +11,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly value: Persisted | null,
 		public readonly valueOnServer: Persisted | null,
 		public readonly defaultValue: Persisted | undefined,
-		public readonly errors: ErrorAccessor[],
+		public readonly errors: ErrorAccessor | undefined,
 		public readonly hasUnpersistedChanges: boolean,
 		public readonly isTouchedBy: FieldAccessor.IsTouchedBy,
 		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Persisted, Produced>,

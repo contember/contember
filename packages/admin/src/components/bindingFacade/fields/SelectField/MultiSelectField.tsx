@@ -46,7 +46,7 @@ export interface MultiSelectFieldInnerPublicProps extends Omit<FormGroupProps, '
 export interface MultiSelectFieldInnerProps
 	extends ChoiceFieldData.MultipleChoiceFieldMetadata,
 		MultiSelectFieldInnerPublicProps {
-	errors: ErrorAccessor[]
+	errors: ErrorAccessor | undefined
 }
 
 const MultiSelectFieldInner = React.memo(

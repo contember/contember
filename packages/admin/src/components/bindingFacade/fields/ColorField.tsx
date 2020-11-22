@@ -15,7 +15,7 @@ export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
 			<TextInput
 				value={fieldMetadata.field.value || ''}
 				onChange={generateOnChange(fieldMetadata.field)}
-				validationState={fieldMetadata.field.errors.length ? 'invalid' : undefined}
+				validationState={fieldMetadata.field.errors ? 'invalid' : undefined}
 				readOnly={fieldMetadata.isMutating}
 				type="color"
 				{...props}

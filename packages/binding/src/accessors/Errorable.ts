@@ -1,5 +1,5 @@
 import { ErrorAccessor } from './ErrorAccessor'
 
 export interface Errorable {
-	errors: ErrorAccessor[]
+	errors: ErrorAccessor | undefined
 }

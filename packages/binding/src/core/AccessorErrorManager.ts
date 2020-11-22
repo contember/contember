@@ -1,4 +1,4 @@
-import { emptyArray } from '@contember/react-utils'
+import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, MutationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { InternalEntityListState, InternalEntityState, InternalRootStateNode, InternalStateType } from './internalState'
@@ -57,7 +57,7 @@ export class AccessorErrorManager {
 	) {
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === ErrorPopulationMode.Add ? errors.errors : emptyArray
+		state.errors = mode === ErrorPopulationMode.Add ? new ErrorAccessor(errors.validation) : undefined
 
 		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
 			return
@@ -74,7 +74,7 @@ export class AccessorErrorManager {
 				if (fieldState?.type === InternalStateType.Field) {
 					fieldState.hasStaleAccessor = true
 					fieldState.hasPendingUpdate = true
-					fieldState.errors = mode === ErrorPopulationMode.Add ? child.errors : emptyArray
+					fieldState.errors = mode === ErrorPopulationMode.Add ? new ErrorAccessor(child.validation) : undefined
 					state.childrenWithPendingUpdates.add(fieldState)
 					continue
 				}
@@ -113,7 +113,7 @@ export class AccessorErrorManager {
 	) {
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === ErrorPopulationMode.Add ? errors.errors : emptyArray
+		state.errors = mode === ErrorPopulationMode.Add ? new ErrorAccessor(errors.validation) : undefined
 
 		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
 			return

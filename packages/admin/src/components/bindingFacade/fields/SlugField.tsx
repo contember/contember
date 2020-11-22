@@ -91,7 +91,7 @@ export const SlugField = Component<SlugFieldProps>(
 								slugField.updateValue(`${normalizedPersistedHardPrefix}${valueWithoutHardPrefix}`)
 							}}
 							readOnly={isMutating}
-							validationState={slugField.errors.length ? 'invalid' : undefined}
+							validationState={slugField.errors ? 'invalid' : undefined}
 							size="small"
 							ref={inputRef}
 							onFocus={onFocus}

@@ -36,7 +36,7 @@ class ErrorsPreprocessor {
 					treeRoot.set(treeId, {
 						nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
 						children: new Map([[itemKey, processedResponse]]),
-						errors: [],
+						validation: [],
 					})
 				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
 					child.children.set(itemKey, processedResponse)
@@ -126,7 +126,7 @@ class ErrorsPreprocessor {
 					assertNever(pathNode)
 				}
 			}
-			currentNode.errors.push(new ErrorAccessor(mutationError.message.text))
+			currentNode.validation.push({ message: mutationError.message.text })
 		}
 
 		return rootNode
@@ -134,7 +134,7 @@ class ErrorsPreprocessor {
 
 	private getRootNode(error: MutationError, startIndex: number = 0): ErrorsPreprocessor.ErrorNode {
 		let rootNode: ErrorsPreprocessor.ErrorNode = {
-			errors: [new ErrorAccessor(error.message.text)],
+			validation: [{ message: error.message.text }],
 			nodeType: ErrorsPreprocessor.ErrorNodeType.Leaf,
 		}
 
@@ -142,7 +142,7 @@ class ErrorsPreprocessor {
 			const pathNode = error.path[i]
 			if (pathNode.__typename === '_FieldPathFragment') {
 				rootNode = {
-					errors: [],
+					validation: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
 					children: new Map([[pathNode.field, rootNode]]),
 				}
@@ -156,7 +156,7 @@ class ErrorsPreprocessor {
 				}
 
 				rootNode = {
-					errors: [],
+					validation: [],
 					nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
 					children: new Map([[AliasTransformer.aliasToEntityKey(alias), rootNode]]),
 				}
@@ -178,12 +178,12 @@ class ErrorsPreprocessor {
 namespace ErrorsPreprocessor {
 	export interface LeafErrorNode {
 		nodeType: ErrorNodeType.Leaf
-		errors: ErrorAccessor[]
+		validation: ErrorAccessor.ValidationError[]
 	}
 
 	export interface ErrorINode {
 		nodeType: ErrorNodeType.INode
-		errors: ErrorAccessor[]
+		validation: ErrorAccessor.ValidationError[]
 		children: Map<string, ErrorNode>
 	}
 

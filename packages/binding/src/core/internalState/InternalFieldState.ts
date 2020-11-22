@@ -9,7 +9,7 @@ export interface InternalFieldState {
 	hasStaleAccessor: boolean
 	getAccessor: () => FieldAccessor
 	addEventListener: FieldAccessor.AddFieldEventListener
-	errors: ErrorAccessor[]
+	errors: ErrorAccessor | undefined
 	eventListeners: {
 		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
 	}

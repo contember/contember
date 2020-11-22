@@ -10,12 +10,16 @@ export interface ErrorListProps {
 
 export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
 	const prefix = useClassNamePrefix()
-	if (!errors || !errors.length) {
+	if (!errors) {
+		return null
+	}
+	const fieldErrors = Array.isArray(errors) ? errors : errors.validation
+	if (!fieldErrors.length) {
 		return null
 	}
 	return (
 		<ul className={`${prefix}errorList`}>
-			{errors.map(error => (
+			{fieldErrors.map(error => (
 				<li className={`${prefix}errorList-item`} key={error.message}>
 					<Message type="danger" size={size}>
 						{error.message}

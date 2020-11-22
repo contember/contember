@@ -9,7 +9,7 @@ class EntityListAccessor implements Errorable {
 	public constructor(
 		private readonly children: ReadonlySet<EntityListAccessor.EntityDatum>,
 		private readonly keysPersistedOnServer: ReadonlySet<string>,
-		public readonly errors: ErrorAccessor[],
+		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,

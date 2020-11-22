@@ -34,7 +34,7 @@ class EntityAccessor implements Errorable {
 		public readonly typeName: string | undefined,
 		private readonly fieldData: EntityAccessor.FieldData,
 		private readonly dataFromServer: SingleEntityPersistedData | undefined,
-		public readonly errors: ErrorAccessor[],
+		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: EntityAccessor.BatchUpdates,

@@ -1,36 +1,56 @@
 import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
-import { InternalEntityListState, InternalEntityState, InternalRootStateNode, InternalStateType } from './internalState'
-
-enum ErrorPopulationMode {
-	Add = 'add',
-	Clear = 'clear',
-}
+import {
+	InternalEntityListState,
+	InternalEntityState,
+	InternalRootStateNode,
+	InternalStateNode,
+	InternalStateType,
+} from './internalState'
 
 export class AccessorErrorManager {
-	private currentErrors: ErrorsPreprocessor.ErrorTreeRoot | undefined = undefined
+	private statesWithErrors: Set<InternalStateNode> = new Set()
 
 	public constructor(
 		private readonly subTreeStates: Map<string, InternalRootStateNode>,
 		private readonly entityStore: Map<string, InternalEntityState>,
 	) {}
 
-	public setErrors(data: MutationDataResponse | undefined) {
-		if (this.currentErrors) {
-			this.setRootStateErrors(this.currentErrors, ErrorPopulationMode.Clear)
+	public clearErrors() {
+		for (const stateNode of this.statesWithErrors) {
+			stateNode.errors = undefined
+			stateNode.hasStaleAccessor = true
+			stateNode.hasPendingUpdate = true
+			switch (stateNode.type) {
+				case InternalStateType.Field:
+					stateNode.onFieldUpdate(stateNode)
+					break
+				case InternalStateType.SingleEntity:
+					for (const realm of stateNode.realms) {
+						realm(stateNode)
+					}
+					break
+				case InternalStateType.EntityList:
+					stateNode.onEntityListUpdate(stateNode)
+					break
+			}
 		}
+		this.statesWithErrors.clear()
+	}
+
+	public setErrors(data: MutationDataResponse | undefined) {
+		this.clearErrors()
 
 		const preprocessor = new ErrorsPreprocessor(data)
 		const errorTreeRoot = preprocessor.preprocess()
-		this.currentErrors = errorTreeRoot
 
-		this.setRootStateErrors(errorTreeRoot, ErrorPopulationMode.Add)
+		this.setRootStateErrors(errorTreeRoot)
 
 		this.dumpErrorData(data)
 	}
 
-	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot, mode: ErrorPopulationMode) {
+	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot) {
 		for (const [subTreePlaceholder, rootError] of errorTreeRoot) {
 			const rootState = this.subTreeStates.get(subTreePlaceholder)
 
@@ -39,11 +59,11 @@ export class AccessorErrorManager {
 			}
 			switch (rootState.type) {
 				case InternalStateType.SingleEntity: {
-					this.setEntityStateErrors(rootState, rootError, mode)
+					this.setEntityStateErrors(rootState, rootError)
 					break
 				}
 				case InternalStateType.EntityList: {
-					this.setEntityListStateErrors(rootState, rootError, mode)
+					this.setEntityListStateErrors(rootState, rootError)
 					break
 				}
 			}
@@ -53,11 +73,15 @@ export class AccessorErrorManager {
 	private setEntityStateErrors(
 		state: InternalEntityState,
 		errors: ErrorsPreprocessor.ErrorINode | ErrorsPreprocessor.LeafErrorNode,
-		mode: ErrorPopulationMode,
 	) {
+		const errorAccessor = this.getErrorAccessor(errors)
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === ErrorPopulationMode.Add ? this.getErrorAccessor(errors) : undefined
+		state.errors = errorAccessor
+
+		if (errorAccessor) {
+			this.statesWithErrors.add(state)
+		}
 
 		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
 			return
@@ -72,10 +96,14 @@ export class AccessorErrorManager {
 				const fieldState = state.fields.get(childKey)
 
 				if (fieldState?.type === InternalStateType.Field) {
-					fieldState.hasStaleAccessor = true
-					fieldState.hasPendingUpdate = true
-					fieldState.errors = mode === ErrorPopulationMode.Add ? this.getErrorAccessor(errors) : undefined
-					state.childrenWithPendingUpdates.add(fieldState)
+					const fieldError = this.getErrorAccessor(child)
+					if (fieldError) {
+						fieldState.hasStaleAccessor = true
+						fieldState.hasPendingUpdate = true
+						fieldState.errors = fieldError
+						state.childrenWithPendingUpdates.add(fieldState)
+						this.statesWithErrors.add(fieldState)
+					}
 					continue
 				}
 			}
@@ -95,11 +123,11 @@ export class AccessorErrorManager {
 				switch (fieldState.type) {
 					case InternalStateType.SingleEntity:
 						state.childrenWithPendingUpdates.add(fieldState)
-						this.setEntityStateErrors(fieldState, child, mode)
+						this.setEntityStateErrors(fieldState, child)
 						break
 					case InternalStateType.EntityList:
 						state.childrenWithPendingUpdates.add(fieldState)
-						this.setEntityListStateErrors(fieldState, child, mode)
+						this.setEntityListStateErrors(fieldState, child)
 						break
 				}
 			}
@@ -109,11 +137,15 @@ export class AccessorErrorManager {
 	private setEntityListStateErrors(
 		state: InternalEntityListState,
 		errors: ErrorsPreprocessor.ErrorINode | ErrorsPreprocessor.LeafErrorNode,
-		mode: ErrorPopulationMode,
 	) {
+		const listErrors = this.getErrorAccessor(errors)
 		state.hasStaleAccessor = true
 		state.hasPendingUpdate = true
-		state.errors = mode === ErrorPopulationMode.Add ? this.getErrorAccessor(errors) : undefined
+		state.errors = listErrors
+
+		if (listErrors) {
+			this.statesWithErrors.add(state)
+		}
 
 		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
 			return
@@ -128,7 +160,7 @@ export class AccessorErrorManager {
 
 			if (childState && childError.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
 				state.childrenWithPendingUpdates.add(childState)
-				this.setEntityStateErrors(childState, childError, mode)
+				this.setEntityStateErrors(childState, childError)
 			}
 		}
 	}

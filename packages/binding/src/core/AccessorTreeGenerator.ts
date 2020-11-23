@@ -200,8 +200,9 @@ export class AccessorTreeGenerator {
 				const allSubMutationsOk = aliases.every(item => mutationResponse.data[item].ok)
 
 				if (!allSubMutationsOk) {
-					this.setErrors(mutationResponse.data)
 					// TODO try again?
+					this.isMutating = false
+					this.setErrors(mutationResponse.data)
 					throw {
 						type: MutationErrorType.InvalidInput,
 					}
@@ -573,7 +574,7 @@ export class AccessorTreeGenerator {
 
 	private performRootTreeOperation(operation: () => void) {
 		this.batchSyncTreeWideUpdates(operation)
-		this.updateSubTrees()
+		this.flushUpdates()
 	}
 
 	private batchSyncTreeWideUpdates(operation: () => void) {
@@ -587,7 +588,7 @@ export class AccessorTreeGenerator {
 		this.treeWideBatchUpdateDepth--
 	}
 
-	private updateSubTrees() {
+	private flushUpdates() {
 		if (this.treeWideBatchUpdateDepth > 0) {
 			return
 		}

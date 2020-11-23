@@ -44,7 +44,7 @@ export interface SelectFieldInnerPublicProps extends Omit<FormGroupProps, 'child
 }
 
 export interface SelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, SelectFieldInnerPublicProps {
-	errors: ErrorAccessor[]
+	errors: ErrorAccessor | undefined
 }
 
 const SelectFieldInner = React.memo(

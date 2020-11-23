@@ -1,4 +1,4 @@
-import { Component, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as Leaflet from 'leaflet'
 import * as React from 'react'
@@ -33,8 +33,8 @@ export const LocationField = Component<LocationFieldProps>(
 		markerProps,
 		...formGroupProps
 	}) => {
-		const latitude = useRelativeSingleField<number>(latitudeField)
-		const longitude = useRelativeSingleField<number>(longitudeField)
+		const latitude = useField<number>(latitudeField)
+		const longitude = useField<number>(longitudeField)
 
 		const moveMarker = (e: { latlng?: Leaflet.LatLng }) => {
 			const latLng = e.latlng
@@ -49,8 +49,8 @@ export const LocationField = Component<LocationFieldProps>(
 			if (mapCenter !== undefined) {
 				return mapCenter
 			}
-			if (latitude.currentValue !== null && longitude.currentValue !== null) {
-				return [latitude.currentValue, longitude.currentValue]
+			if (latitude.value !== null && longitude.value !== null) {
+				return [latitude.value, longitude.value]
 			}
 			return [50.102223, 9.254419] // Center of Europe.
 		})
@@ -70,11 +70,11 @@ export const LocationField = Component<LocationFieldProps>(
 							attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 							{...(tileLayerProps ?? {})}
 						/>
-						{latitude.currentValue !== null && longitude.currentValue !== null && (
+						{latitude.value !== null && longitude.value !== null && (
 							<Marker
 								icon={markerIcon}
 								{...(markerProps ?? {})}
-								position={[latitude.currentValue, longitude.currentValue]}
+								position={[latitude.value, longitude.value]}
 								onmove={moveMarker as any}
 								draggable
 							/>

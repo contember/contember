@@ -8,6 +8,7 @@ export class TreeRootAccessor {
 	 */
 	public constructor(
 		public readonly hasUnpersistedChanges: boolean,
+		public readonly isMutating: boolean,
 		public readonly bindingOperations: BindingOperations,
 	) {}
 

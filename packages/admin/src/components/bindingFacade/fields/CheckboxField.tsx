@@ -19,7 +19,7 @@ export const CheckboxField = Component<CheckboxFieldProps>(
 				}
 				return (
 					<Checkbox
-						checked={!!fieldMetadata.field.currentValue}
+						checked={!!fieldMetadata.field.value}
 						onChange={generateOnChange(fieldMetadata.field)}
 						readOnly={fieldMetadata.isMutating}
 						errors={fieldMetadata.field.errors}

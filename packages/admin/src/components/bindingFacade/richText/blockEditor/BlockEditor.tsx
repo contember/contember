@@ -12,10 +12,10 @@ import {
 	useBindingOperations,
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
+	useEntity,
 	useEnvironment,
-	useParentEntityAccessor,
-	useRelativeEntityList,
-	useRelativeSingleField,
+	useEntityList,
+	useField,
 	useSortedEntities,
 	VariableInputTransformer,
 } from '@contember/binding'
@@ -103,11 +103,11 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 			...blockListProps
 		} = props
 
-		const parentEntity = useParentEntityAccessor() // TODO this is over-subscribing
-		const referenceList = useRelativeEntityList(referencesField) // TODO this is over-subscribing
+		const parentEntity = useEntity() // TODO this is over-subscribing
+		const referenceList = useEntityList(referencesField) // TODO this is over-subscribing
 
 		const batchUpdates = parentEntity.batchUpdates
-		const blockList = useRelativeEntityList(blockListProps)
+		const blockList = useEntityList(blockListProps)
 
 		const desugaredBlockList = useDesugaredRelativeEntityList(blockListProps)
 		const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
@@ -326,7 +326,7 @@ const useFieldBackedElements = (entity: EntityAccessor, original: FieldBackedEle
 	)
 	const unstableAccessorArray = original.map(fieldBackedElement => {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return useRelativeSingleField<string>(fieldBackedElement.field)
+		return useField<string>(fieldBackedElement.field)
 	})
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps

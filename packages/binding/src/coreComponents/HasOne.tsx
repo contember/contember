@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { useRelativeSingleEntity } from '../accessorPropagation'
+import { useEntity } from '../accessorPropagation'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeSingleEntity } from '../treeParameters'
 import { Component } from './Component'
+import { Entity, EntityBaseProps } from './Entity'
 import { Field } from './Field'
-import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
 
 export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 	children?: React.ReactNode
@@ -14,16 +14,16 @@ export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {
 } & (
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
+				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 	)
 
 export const HasOne = Component(
 	<EntityProps extends {}>(props: HasOneProps<EntityProps>) => {
-		const entity = useRelativeSingleEntity(props)
+		const entity = useEntity(props)
 
-		return <SingleEntity {...props} accessor={entity} />
+		return <Entity {...props} accessor={entity} />
 	},
 	{
 		generateEnvironment: (props, oldEnvironment) => {
@@ -33,11 +33,11 @@ export const HasOne = Component(
 			return oldEnvironment.putDelta(Environment.generateDelta(oldEnvironment, props.variables))
 		},
 		staticRender: props => (
-			<>
+			<Entity {...props} accessor={undefined as any}>
 				<Field field={PRIMARY_KEY_NAME} />
 				<Field field={TYPENAME_KEY_NAME} />
 				{props.children}
-			</>
+			</Entity>
 		),
 		generateRelationMarker: (props, fields, environment) =>
 			MarkerFactory.createRelativeSingleEntityFields(props, environment, fields),

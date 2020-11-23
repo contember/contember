@@ -1,4 +1,4 @@
-import { SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
 import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
@@ -78,7 +78,7 @@ namespace YouTubeEmbedHandler {
 	}
 
 	export const Renderer = React.memo(function YouTubeRenderer(props: RendererOptions) {
-		const youTubeId = useRelativeSingleField<string>(props.youTubeIdField).currentValue
+		const youTubeId = useField<string>(props.youTubeIdField).value
 
 		if (youTubeId === null) {
 			return null

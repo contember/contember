@@ -1,10 +1,10 @@
 import {
 	Component,
+	Entity,
 	EntityListAccessor,
 	RemovalType,
-	SingleEntity,
-	StaticRenderProps,
 	StaticRenderProvider,
+	StaticRenderProviderProps,
 	SugaredField,
 	SugaredFieldProps,
 	useMutationState,
@@ -84,7 +84,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					entities={entities}
 				>
 					{entities.map(entity => (
-						<SingleEntity accessor={entity} key={entity.key}>
+						<Entity accessor={entity} key={entity.key}>
 							<Item
 								{...props.itemComponentExtraProps!}
 								removalType={removalType}
@@ -93,7 +93,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 							>
 								{props.children}
 							</Item>
-						</SingleEntity>
+						</Entity>
 					))}
 				</Container>
 			)
@@ -123,7 +123,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 				>
 					{entities.map((entity, i) => (
 						<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
-							<SingleEntity accessor={entity}>
+							<Entity accessor={entity}>
 								<Item
 									{...props.itemComponentExtraProps!}
 									removalType={removalType}
@@ -132,7 +132,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 								>
 									{props.children}
 								</Item>
-							</SingleEntity>
+							</Entity>
 						</SortableRepeaterItem>
 					))}
 				</Container>
@@ -140,7 +140,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 		)
 	},
 	<ContainerExtraProps, ItemExtraProps>(
-		props: StaticRenderProps<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, NonStaticPropNames>, // TODO emptyMessage, etc.
+		props: StaticRenderProviderProps<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, NonStaticPropNames>, // TODO emptyMessage, etc.
 	) => (
 		<>
 			{props.sortableBy && <SugaredField field={props.sortableBy} defaultValue={0} isNonbearing />}

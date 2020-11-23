@@ -13,7 +13,7 @@ import {
 	MarkerTreeGenerator,
 	MarkerTreeRoot,
 	PRIMARY_KEY_NAME,
-	SingleEntitySubTree,
+	EntitySubTree,
 	SubTreeMarker,
 	TYPENAME_KEY_NAME,
 } from '../../../../src'
@@ -29,7 +29,7 @@ describe('Marker tree generator', () => {
 		const generator = new MarkerTreeGenerator(
 			(
 				<>
-					<SingleEntitySubTree entity="Foo(bar = 123)">
+					<EntitySubTree entity="Foo(bar = 123)">
 						<HasMany field="hasMany[x > 50]">
 							<Field field="hasManyField" />
 							<HasOne field="hasOne">
@@ -40,8 +40,8 @@ describe('Marker tree generator', () => {
 							</HasOne>
 						</HasMany>
 						<Field field="fooField" />
-					</SingleEntitySubTree>
-					<SingleEntitySubTree entity="Foo(bar = 123)">
+					</EntitySubTree>
+					<EntitySubTree entity="Foo(bar = 123)">
 						<HasMany field="hasMany[x > 50]">
 							<HasOne field="hasOne">
 								<HasMany field="common">
@@ -51,7 +51,7 @@ describe('Marker tree generator', () => {
 								<Field field="hasOneField" />
 							</HasOne>
 						</HasMany>
-					</SingleEntitySubTree>
+					</EntitySubTree>
 				</>
 			),
 		)
@@ -68,6 +68,8 @@ describe('Marker tree generator', () => {
 			initialize: undefined,
 			connectionUpdate: undefined,
 			beforeUpdate: undefined,
+			persistSuccess: undefined,
+			persistError: undefined,
 			update: undefined,
 		} as const
 		const listListeners = {
@@ -75,6 +77,8 @@ describe('Marker tree generator', () => {
 			initialize: undefined,
 			childInitialize: undefined,
 			beforeUpdate: undefined,
+			persistSuccess: undefined,
+			persistError: undefined,
 			update: undefined,
 		} as const
 		const innerHasMany = new HasManyRelationMarker(

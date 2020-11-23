@@ -1,6 +1,6 @@
 import { emptyObject } from '@contember/react-utils'
 import { Environment } from '../dao'
-import { TreeParameterMerger, VariableInputTransformer } from '../model'
+import { TreeParameterMerger, VariableInputTransformer } from '../core'
 import {
 	Alias,
 	DesugaredHasManyRelation,
@@ -123,6 +123,8 @@ export namespace QueryLanguage {
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
 			connectionUpdate,
 			initialize: desugarEventListener(unsugarable.onInitialize),
+			persistError: desugarEventListener(unsugarable.onPersistError),
+			persistSuccess: desugarEventListener(unsugarable.onPersistSuccess),
 			update: desugarEventListener(unsugarable.onUpdate),
 		}
 	}
@@ -135,6 +137,8 @@ export namespace QueryLanguage {
 			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
 			childInitialize: desugarEventListener(unsugarable.onChildInitialize),
 			initialize: desugarEventListener(unsugarable.onInitialize),
+			persistError: desugarEventListener(unsugarable.onPersistError),
+			persistSuccess: desugarEventListener(unsugarable.onPersistSuccess),
 			update: desugarEventListener(unsugarable.onUpdate),
 		}
 	}

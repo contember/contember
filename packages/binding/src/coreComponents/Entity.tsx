@@ -3,21 +3,21 @@ import { AccessorProvider } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
 import { Component } from './Component'
 
-export interface SingleEntityBaseProps {
+export interface EntityBaseProps {
 	accessor: EntityAccessor
 	children?: React.ReactNode
 }
 
-export type SingleEntityProps<EntityProps> = SingleEntityBaseProps &
+export type EntityProps<EntityComponentProps> = EntityBaseProps &
 	(
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
-				entityProps?: EntityProps
+				entityComponent: React.ComponentType<EntityComponentProps & EntityBaseProps>
+				entityProps?: EntityComponentProps
 		  }
 	)
 
-export const SingleEntity = Component(<EntityProps extends {}>(props: SingleEntityProps<EntityProps>) => {
+export const Entity = Component(<EntityComponentProps extends {}>(props: EntityProps<EntityComponentProps>) => {
 	if ('entityComponent' in props && props.entityComponent) {
 		return React.createElement(props.entityComponent, {
 			...props.entityProps!,
@@ -26,4 +26,4 @@ export const SingleEntity = Component(<EntityProps extends {}>(props: SingleEnti
 		})
 	}
 	return <AccessorProvider accessor={props.accessor}>{props.children}</AccessorProvider>
-}, 'SingleEntity') as <EntityProps extends {}>(props: SingleEntityProps<EntityProps>) => React.ReactElement
+}, 'Entity') as <EntityComponentProps extends {}>(props: EntityProps<EntityComponentProps>) => React.ReactElement

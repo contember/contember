@@ -16,7 +16,7 @@ export const useRichTextFieldNodes = ({
 		return contemberFieldElementCache.get(fieldAccessor)!
 	}
 
-	const fieldValue = fieldAccessor.currentValue
+	const fieldValue = fieldAccessor.value
 	if (typeof fieldValue !== 'string' && fieldValue !== null) {
 		throw new BindingError(`RichTextField: the underlying field does not contain a string value.`)
 	}

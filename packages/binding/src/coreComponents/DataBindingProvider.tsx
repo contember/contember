@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { AccessorTree, AccessorTreeState, SuccessfulPersistResult, useAccessorTreeState } from '../accessorTree'
+import { AccessorTree, AccessorTreeState, useAccessorTreeState } from '../accessorTree'
 
 export interface DataBindingProviderBaseProps {
 	children?: React.ReactNode
-	onSuccessfulPersist?: (result: SuccessfulPersistResult) => void
 }
 
 export interface DataBindingStateComponentProps {
@@ -23,9 +22,8 @@ export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps 
 export const DataBindingProvider = React.memo(function DataBindingProvider<
 	StateProps extends DataBindingStateComponentProps
 >(props: DataBindingProviderProps<StateProps>) {
-	const [accessorTreeState] = useAccessorTreeState({
+	const accessorTreeState = useAccessorTreeState({
 		nodeTree: props.children,
-		unstable_onSuccessfulPersist: props.onSuccessfulPersist,
 	})
 
 	const children =

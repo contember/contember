@@ -117,14 +117,14 @@ export const useNormalizedOptions = (
 					const label = renderOption
 						? renderOption(item)
 						: 'field' in desugaredOptionPath
-						? `${item.getField(desugaredOptionPath.field).currentValue ?? ''}`
+						? `${item.getField(desugaredOptionPath.field).value ?? ''}`
 						: ''
 
 					let searchKeywords: string
 
 					if (desugaredFields.length) {
 						searchKeywords = desugaredFields
-							.map(desugared => item.getRelativeSingleField<string>(desugared).currentValue ?? '')
+							.map(desugared => item.getRelativeSingleField<string>(desugared).value ?? '')
 							.join(' ')
 					} else if (typeof label === 'string') {
 						searchKeywords = label

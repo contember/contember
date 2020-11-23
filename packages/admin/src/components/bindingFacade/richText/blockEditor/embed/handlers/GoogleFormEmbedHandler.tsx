@@ -1,4 +1,4 @@
-import { SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
 import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
@@ -97,7 +97,7 @@ namespace GoogleFormEmbedHandler {
 	}
 
 	export const Renderer = React.memo(function GoogleFormRenderer(props: RendererOptions) {
-		const googleFormId = useRelativeSingleField<string>(props.googleFormIdField).currentValue
+		const googleFormId = useField<string>(props.googleFormIdField).value
 
 		if (googleFormId === null) {
 			return null

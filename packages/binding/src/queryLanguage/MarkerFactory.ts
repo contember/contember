@@ -7,7 +7,7 @@ import {
 	Marker,
 	SubTreeMarker,
 } from '../markers'
-import { MarkerMerger, TreeParameterMerger } from '../model'
+import { MarkerMerger, TreeParameterMerger } from '../core'
 import {
 	BoxedQualifiedEntityList,
 	BoxedQualifiedSingleEntity,
@@ -27,7 +27,7 @@ import {
 import { QueryLanguage } from './QueryLanguage'
 
 export namespace MarkerFactory {
-	export const createSingleEntitySubTreeMarker = (
+	export const createEntitySubTreeMarker = (
 		environment: Environment,
 		singleEntity: SugaredQualifiedSingleEntity,
 		fields: EntityFieldMarkersContainer,
@@ -87,7 +87,7 @@ export namespace MarkerFactory {
 		)
 	}
 
-	export const createUnconstrainedSingleEntitySubTreeMarker = (
+	export const createUnconstrainedEntitySubTreeMarker = (
 		environment: Environment,
 		entityList: SugaredUnconstrainedQualifiedSingleEntity,
 		fields: EntityFieldMarkersContainer,

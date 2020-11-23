@@ -1,4 +1,4 @@
-import { EntityAccessor, EntityListAccessor, SingleEntity, useEnvironment } from '@contember/binding'
+import { EntityAccessor, EntityListAccessor, Entity, useEnvironment } from '@contember/binding'
 import { emptyArray } from '@contember/react-utils'
 import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown } from '@contember/ui'
 import * as React from 'react'
@@ -118,12 +118,12 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 				continue
 			}
 			const slugField = entity.getField(props.slugField)
-			if (typeof slugField.currentValue === 'string') {
-				const slugValue = slugField.currentValue
+			if (typeof slugField.value === 'string') {
+				const slugValue = slugField.value
 				normalized.push({
 					slug: slugValue,
 					isSelected: currentDimensions.indexOf(slugValue) !== -1,
-					label: <SingleEntity accessor={entity}>{props.labelFactory}</SingleEntity>,
+					label: <Entity accessor={entity}>{props.labelFactory}</Entity>,
 				})
 			}
 		}

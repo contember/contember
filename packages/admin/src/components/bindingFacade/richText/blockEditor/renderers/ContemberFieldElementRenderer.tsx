@@ -1,4 +1,4 @@
-import { useRelativeSingleField } from '@contember/binding'
+import { useField } from '@contember/binding'
 import { EditorPlaceholder, ErrorList } from '@contember/ui'
 import * as React from 'react'
 import { Node as SlateNode, Path as SlatePath } from 'slate'
@@ -27,7 +27,7 @@ export const ContemberFieldElementRenderer = React.memo((props: ContemberFieldEl
 			? props.leadingFields[lastIndex]
 			: props.trailingFields[props.trailingFields.length - (parent.children.length - lastIndex)]
 
-	const accessor = useRelativeSingleField(fieldBackedElement.field)
+	const accessor = useField(fieldBackedElement.field)
 
 	return (
 		<BlockElement attributes={props.attributes} element={props.element}>
@@ -40,7 +40,7 @@ export const ContemberFieldElementRenderer = React.memo((props: ContemberFieldEl
 					</>
 				),
 			})}
-			{!!accessor.errors.length && (
+			{!!accessor.errors && (
 				<div contentEditable={false} data-slate-editor={false}>
 					<ErrorList errors={accessor.errors} size="small" />
 				</div>

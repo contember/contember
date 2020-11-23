@@ -8,7 +8,7 @@ import {
 	SugaredRelativeSingleField,
 	useEnvironment,
 	useMutationState,
-	useRelativeSingleField,
+	useField,
 	VariableInputTransformer,
 } from '@contember/binding'
 import * as React from 'react'
@@ -54,7 +54,7 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
-	const field = useRelativeSingleField(props)
+	const field = useField(props)
 	const options = React.useMemo(() => normalizeOptions(props.options, environment), [environment, props.options])
 	const currentValue: ChoiceFieldData.ValueRepresentation = options.findIndex(({ value }) => field.hasValue(value))
 	const data = React.useMemo(

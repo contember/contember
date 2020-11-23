@@ -44,7 +44,7 @@ export interface NativeSelectFieldInnerPublicProps extends Omit<FormGroupProps, 
 export interface NativeSelectFieldInnerProps
 	extends ChoiceFieldData.SingleChoiceFieldMetadata,
 		NativeSelectFieldInnerPublicProps {
-	errors: ErrorAccessor[]
+	errors: ErrorAccessor | undefined
 }
 
 export const NativeSelectFieldInner = React.memo((props: NativeSelectFieldInnerProps) => {

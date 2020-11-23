@@ -18,14 +18,14 @@ export type UnconstrainedQualifiedSingleEntityProps = {
 	isCreating: true
 } & SugaredUnconstrainedQualifiedSingleEntity
 
-export function useSingleEntitySubTreeParameters(qualifiedSingleEntityAlias: Alias): Alias
-export function useSingleEntitySubTreeParameters(
+export function useEntitySubTreeParameters(qualifiedSingleEntityAlias: Alias): Alias
+export function useEntitySubTreeParameters(
 	qualifiedSingleEntity: QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps,
 ): BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity
-export function useSingleEntitySubTreeParameters(
+export function useEntitySubTreeParameters(
 	qualifiedSingleEntityOrAlias: Alias | QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps,
 ): Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity
-export function useSingleEntitySubTreeParameters(
+export function useEntitySubTreeParameters(
 	qualifiedSingleEntity: Alias | QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps,
 ): Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity {
 	useConstantValueInvariant(typeof qualifiedSingleEntity)
@@ -38,10 +38,7 @@ export function useSingleEntitySubTreeParameters(
 	const environment = useEnvironment()
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
-	useConstantValueInvariant(
-		qualifiedSingleEntity.isCreating,
-		`SingleEntitySubTree: cannot alternate the 'isCreating' value.`,
-	)
+	useConstantValueInvariant(qualifiedSingleEntity.isCreating, `EntitySubTree: cannot alternate the 'isCreating' value.`)
 
 	let parameters: BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity
 
@@ -61,6 +58,8 @@ export function useSingleEntitySubTreeParameters(
 				onBeforeUpdate: qualifiedSingleEntity.onBeforeUpdate!,
 				onUpdate: qualifiedSingleEntity.onUpdate!,
 				onBeforePersist: qualifiedSingleEntity.onBeforePersist!,
+				onPersistError: qualifiedSingleEntity.onPersistError!,
+				onPersistSuccess: qualifiedSingleEntity.onPersistSuccess!,
 			}
 			return new BoxedUnconstrainedQualifiedSingleEntity(
 				QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(singleEntity, environment),
@@ -76,6 +75,8 @@ export function useSingleEntitySubTreeParameters(
 			qualifiedSingleEntity.onBeforeUpdate,
 			qualifiedSingleEntity.onUpdate,
 			qualifiedSingleEntity.onBeforePersist,
+			qualifiedSingleEntity.onPersistSuccess,
+			qualifiedSingleEntity.onPersistError,
 			qualifiedSingleEntity.alias,
 			environment,
 		])
@@ -94,6 +95,8 @@ export function useSingleEntitySubTreeParameters(
 				onBeforeUpdate: qualifiedSingleEntity.onBeforeUpdate!,
 				onUpdate: qualifiedSingleEntity.onUpdate!,
 				onBeforePersist: qualifiedSingleEntity.onBeforePersist!,
+				onPersistError: qualifiedSingleEntity.onPersistError!,
+				onPersistSuccess: qualifiedSingleEntity.onPersistSuccess!,
 			}
 			return new BoxedQualifiedSingleEntity(QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment))
 		}, [
@@ -108,6 +111,8 @@ export function useSingleEntitySubTreeParameters(
 			qualifiedSingleEntity.onBeforeUpdate,
 			qualifiedSingleEntity.onUpdate,
 			qualifiedSingleEntity.onBeforePersist,
+			qualifiedSingleEntity.onPersistError,
+			qualifiedSingleEntity.onPersistSuccess,
 			environment,
 		])
 	}

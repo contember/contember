@@ -1,4 +1,4 @@
-import { Component, FieldValue, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { Component, FieldValue, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
 
 export interface VideoFieldViewProps<SrcField extends FieldValue = string>
@@ -17,17 +17,17 @@ export const VideoFieldView = Component(
 		fallback,
 		...videoProps
 	}: VideoFieldViewProps<SrcField>) => {
-		const srcAccessor = useRelativeSingleField<SrcField>(srcField)
-		const titleAccessor = useRelativeSingleField<string>(titleField)
+		const srcAccessor = useField<SrcField>(srcField)
+		const titleAccessor = useField<string>(titleField)
 
-		if (!srcAccessor.currentValue) {
+		if (!srcAccessor.value) {
 			return <>{fallback}</>
 		}
 		return (
 			// The spread intentionally comes after alt and title so that it's possible to provide just static string values.
 			<video
-				src={formatUrl ? formatUrl(srcAccessor.currentValue) : (srcAccessor.currentValue as string)}
-				title={titleAccessor?.currentValue || undefined}
+				src={formatUrl ? formatUrl(srcAccessor.value) : (srcAccessor.value as string)}
+				title={titleAccessor?.value || undefined}
 				controls
 				{...videoProps}
 			/>

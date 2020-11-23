@@ -1,6 +1,6 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
 import * as React from 'react'
-import { EntityAccessor, useParentEntityAccessor, useMutationState } from '@contember/binding'
+import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
 import { useTriggerPersistWithFeedback } from '../../../ui'
 
 export type DeleteEntityButtonProps = ButtonProps & {
@@ -10,24 +10,24 @@ export type DeleteEntityButtonProps = ButtonProps & {
 
 export const DeleteEntityButton = React.memo((props: DeleteEntityButtonProps) => {
 	const { children, immediatePersist, ...rest } = props
-	const parentEntityAccessor = useParentEntityAccessor()
+	const parentEntity = useEntity()
 	const triggerPersist = useTriggerPersistWithFeedback()
 	const isMutating = useMutationState()
 	const onClick = React.useCallback(() => {
-		if (!parentEntityAccessor.deleteEntity) {
+		if (!parentEntity.deleteEntity) {
 			return
 		}
 		if (props.immediatePersist && !confirm('Really?')) {
 			return
 		}
-		parentEntityAccessor.deleteEntity()
+		parentEntity.deleteEntity()
 
 		if (props.immediatePersist && triggerPersist) {
 			triggerPersist().catch(() => {})
 		}
-	}, [triggerPersist, props.immediatePersist, parentEntityAccessor])
+	}, [triggerPersist, props.immediatePersist, parentEntity])
 
-	if (!(parentEntityAccessor instanceof EntityAccessor)) {
+	if (!(parentEntity instanceof EntityAccessor)) {
 		return null
 	}
 

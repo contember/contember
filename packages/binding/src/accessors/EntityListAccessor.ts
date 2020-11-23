@@ -3,12 +3,16 @@ import { BindingOperations } from './BindingOperations'
 import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
+import { PersistErrorOptions } from './PersistErrorOptions'
+import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
 		private readonly children: ReadonlySet<EntityListAccessor.EntityDatum>,
-		public readonly errors: ErrorAccessor[],
+		private readonly keysPersistedOnServer: ReadonlySet<string>,
+		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
+		public readonly addError: EntityListAccessor.AddError,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
 		public readonly connectEntity: EntityListAccessor.ConnectEntity,
@@ -42,6 +46,14 @@ class EntityListAccessor implements Errorable {
 		return this.children.size
 	}
 
+	public get keysOnServer(): Set<string> {
+		return new Set(this.keysPersistedOnServer)
+	}
+
+	public hasEntityOnServer(entity: string | EntityAccessor): boolean {
+		return this.keysPersistedOnServer.has(typeof entity === 'string' ? entity : entity.key)
+	}
+
 	public deleteAll() {
 		this.batchUpdates(getAccessor => {
 			const list = getAccessor()
@@ -68,23 +80,36 @@ namespace EntityListAccessor {
 		getAccessor(): EntityAccessor
 	}
 
+	export type GetEntityListAccessor = () => EntityListAccessor
+	export type AddError = ErrorAccessor.AddError
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
-	export type BatchUpdatesHandler = (
-		getAccessor: () => EntityListAccessor,
-		bindingOperations: BindingOperations,
-	) => void
+	export type BatchUpdatesHandler = (getAccessor: GetEntityListAccessor, bindingOperations: BindingOperations) => void
 	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	export type DisconnectEntity = (childEntityOrItsKey: EntityAccessor | string) => void
 	export type GetChildEntityByKey = (key: string) => EntityAccessor
 	export type UpdateListener = (accessor: EntityListAccessor) => void
 
+	export type BeforePersistHandler = (
+		getAccessor: GetEntityListAccessor,
+		bindingOperations: BindingOperations,
+	) => void | Promise<BeforePersistHandler>
+
+	export type PersistErrorHandler = (
+		getAccessor: GetEntityListAccessor,
+		options: PersistErrorOptions,
+	) => void | Promise<void>
+
+	export type PersistSuccessHandler = (getAccessor: GetEntityListAccessor, options: PersistSuccessOptions) => void
+
 	export interface EntityListEventListenerMap {
-		beforePersist: BatchUpdatesHandler
+		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		childInitialize: EntityAccessor.BatchUpdatesHandler
 		//childListUpdate: UpdateListener
 		initialize: BatchUpdatesHandler
+		persistError: PersistErrorHandler
+		persistSuccess: PersistSuccessHandler
 		update: UpdateListener
 	}
 	export type EntityListEventType = keyof EntityListEventListenerMap
@@ -92,8 +117,10 @@ namespace EntityListAccessor {
 		(type: 'beforePersist', listener: EntityListEventListenerMap['beforePersist']): () => void
 		(type: 'beforeUpdate', listener: EntityListEventListenerMap['beforeUpdate']): () => void
 		(type: 'childInitialize', listener: EntityListEventListenerMap['childInitialize']): () => void
-		(type: 'initialize', listener: EntityListEventListenerMap['initialize']): () => void
 		(type: 'update', listener: EntityListEventListenerMap['update']): () => void
+
+		// It's too late to add this by the time the accessor exists…
+		// (type: 'initialize', listener: EntityListEventListenerMap['initialize']): () => void
 	}
 }
 

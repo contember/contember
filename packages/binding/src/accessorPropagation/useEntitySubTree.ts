@@ -6,19 +6,19 @@ import { useGetEntitySubTree } from './useGetEntitySubTree'
 import {
 	QualifiedSingleEntityProps,
 	UnconstrainedQualifiedSingleEntityProps,
-	useSingleEntitySubTreeParameters,
-} from './useSingleEntitySubTreeParameters'
+	useEntitySubTreeParameters,
+} from './useEntitySubTreeParameters'
 
-export type UseSingleEntitySubTreeProps = Alias | QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps
+export type UseEntitySubTreeProps = Alias | QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps
 
-export const useSingleEntitySubTree = (qualifiedSingleEntity: UseSingleEntitySubTreeProps) => {
+export const useEntitySubTree = (qualifiedSingleEntity: UseEntitySubTreeProps) => {
 	const getSubTree = useGetEntitySubTree()
-	const parameters = useSingleEntitySubTreeParameters(qualifiedSingleEntity)
+	const parameters = useEntitySubTreeParameters(qualifiedSingleEntity)
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 	const accessor = useAccessorUpdateSubscription(getAccessor)
 
 	if (typeof parameters !== 'string' && parameters.value.hasOneRelationPath.length) {
-		throw new BindingError(`useSingleEntitySubTree: cannot use hasOneRelationPath!`)
+		throw new BindingError(`useEntitySubTree: cannot use hasOneRelationPath!`)
 	}
 	return accessor
 }

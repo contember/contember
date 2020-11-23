@@ -1,4 +1,4 @@
-import { SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
 import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
@@ -78,7 +78,7 @@ namespace VimeoEmbedHandler {
 	}
 
 	export const Renderer = React.memo(function VimeoRenderer(props: RendererOptions) {
-		const vimeoId = useRelativeSingleField<string>(props.vimeoIdField).currentValue
+		const vimeoId = useField<string>(props.vimeoIdField).value
 
 		if (vimeoId === null) {
 			return null

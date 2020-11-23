@@ -1,4 +1,4 @@
-import { Component, FieldValue, SugaredField, SugaredFieldProps, useRelativeSingleField } from '@contember/binding'
+import { Component, FieldValue, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
 
 export interface ImageFieldViewProps<SrcField extends FieldValue = string>
@@ -19,19 +19,19 @@ export const ImageFieldView = Component(
 		fallback,
 		...imgProps
 	}: ImageFieldViewProps<SrcField>) => {
-		const srcAccessor = useRelativeSingleField<SrcField>(srcField)
-		const altAccessor = useRelativeSingleField<string>(altField)
-		const titleAccessor = useRelativeSingleField<string>(titleField)
+		const srcAccessor = useField<SrcField>(srcField)
+		const altAccessor = useField<string>(altField)
+		const titleAccessor = useField<string>(titleField)
 
-		if (!srcAccessor.currentValue) {
+		if (!srcAccessor.value) {
 			return <>{fallback}</>
 		}
 		return (
 			// The spread intentionally comes after alt and title so that it's possible to provide just static string values.
 			<img
-				src={formatUrl ? formatUrl(srcAccessor.currentValue) : (srcAccessor.currentValue as string)}
-				alt={altAccessor?.currentValue || undefined}
-				title={titleAccessor?.currentValue || undefined}
+				src={formatUrl ? formatUrl(srcAccessor.value) : (srcAccessor.value as string)}
+				alt={altAccessor?.value || undefined}
+				title={titleAccessor?.value || undefined}
 				{...imgProps}
 			/>
 		)

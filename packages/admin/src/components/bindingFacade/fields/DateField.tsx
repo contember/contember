@@ -52,9 +52,7 @@ export const DateFieldInner = React.memo(
 		)
 		return (
 			<DatePicker
-				selected={
-					props.fieldMetadata.field.currentValue !== null ? new Date(props.fieldMetadata.field.currentValue) : null
-				}
+				selected={props.fieldMetadata.field.value !== null ? new Date(props.fieldMetadata.field.value) : null}
 				onChange={generateOnChange(props.fieldMetadata.field)}
 				readOnly={props.fieldMetadata.isMutating}
 				isClearable={true}

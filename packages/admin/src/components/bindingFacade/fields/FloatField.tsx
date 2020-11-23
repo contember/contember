@@ -13,11 +13,9 @@ export const FloatField = SimpleRelativeSingleField<FloatFieldProps, number>(
 		}
 		return (
 			<TextInput
-				value={
-					typeof fieldMetadata.field.currentValue === 'number' ? fieldMetadata.field.currentValue.toString(10) : '0'
-				}
+				value={typeof fieldMetadata.field.value === 'number' ? fieldMetadata.field.value.toString(10) : '0'}
 				onChange={generateOnChange(fieldMetadata.field)}
-				validationState={fieldMetadata.field.errors.length ? 'invalid' : undefined}
+				validationState={fieldMetadata.field.errors ? 'invalid' : undefined}
 				{...props}
 			/>
 		)

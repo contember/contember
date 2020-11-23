@@ -1,6 +1,6 @@
 import { CrudQueryBuilder, Input } from '@contember/client'
 import * as React from 'react'
-import { Component, EntityListSubTree, Field, SingleEntitySubTree } from '../coreComponents'
+import { Component, EntityListSubTree, Field, EntitySubTree } from '../coreComponents'
 import { Literal } from '../dao'
 import { SugaredField } from '../helperComponents'
 import { QueryLanguage } from '../queryLanguage'
@@ -48,7 +48,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 			}
 			return (
 				<>
-					<SingleEntitySubTree
+					<EntitySubTree
 						entity={entity}
 						isCreating
 						onBeforePersist={(getAccessor, bindingOperations) => {
@@ -58,12 +58,12 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 							const entities = Array.from(listSubTree)
 							const newOrderFieldValue = !entities.length
 								? 0
-								: (entities[0].getRelativeSingleField<number>(desugaredOrderField).currentValue ?? 0) + 1
+								: (entities[0].getRelativeSingleField<number>(desugaredOrderField).value ?? 0) + 1
 							getAccessor().getRelativeSingleField<number>(desugaredOrderField).updateValue(newOrderFieldValue)
 						}}
 					>
 						<SugaredField field={orderField} />
-					</SingleEntitySubTree>
+					</EntitySubTree>
 					<EntityListSubTree {...qel}>
 						<SugaredField field={orderField} />
 					</EntityListSubTree>

@@ -18,7 +18,10 @@ export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken
 					finished: false,
 					error: false,
 				})
-				const response = client.sendRequest<{ data: R }>(query, variables, apiToken)
+				const response = client.sendRequest<{ data: R }>(query, {
+					variables,
+					apiTokenOverride: apiToken,
+				})
 				return response.then(
 					data => {
 						setState({

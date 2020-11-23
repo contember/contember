@@ -13,20 +13,17 @@ export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRender
 
 	React.useEffect(() => {
 		if (
-			accessorTreeState.name === AccessorTreeStateName.RequestError &&
+			accessorTreeState.name === AccessorTreeStateName.Error &&
 			accessorTreeState.error.type === RequestErrorType.Unauthorized
 		) {
 			redirect(() => ({ name: 'login' }))
 		}
 	}, [accessorTreeState, redirect])
 
-	if (
-		accessorTreeState.name === AccessorTreeStateName.Uninitialized ||
-		accessorTreeState.name === AccessorTreeStateName.Querying
-	) {
+	if (accessorTreeState.name === AccessorTreeStateName.Initializing) {
 		return <ContainerSpinner />
 	}
-	if (accessorTreeState.name === AccessorTreeStateName.RequestError) {
+	if (accessorTreeState.name === AccessorTreeStateName.Error) {
 		switch (accessorTreeState.error.type) {
 			case RequestErrorType.Unauthorized:
 				return null // This results in a redirect for now, and so the actual handling is in an effect

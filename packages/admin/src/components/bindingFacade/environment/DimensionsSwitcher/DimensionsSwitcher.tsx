@@ -25,7 +25,7 @@ export interface DimensionsSwitcherBaseProps
 export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {}
 
 const DimensionsStateRenderer = (props: DataBindingStateComponentProps) => {
-	if (props.accessorTreeState.name === AccessorTreeStateName.Interactive) {
+	if (props.accessorTreeState.name === AccessorTreeStateName.Initialized) {
 		return <>{props.children}</>
 	}
 	return <Spinner />

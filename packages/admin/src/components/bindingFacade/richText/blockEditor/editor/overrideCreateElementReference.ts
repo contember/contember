@@ -34,7 +34,7 @@ export const overrideCreateElementReference = <E extends BlockSlateEditor>(
 				getNewReference().getField('id').asUuid.setToUuid()
 				getNewReference().getField(referenceDiscriminationField).updateValue(referenceDiscriminant)
 
-				referenceUuid = getNewReference().getField<string>('id').currentValue!
+				referenceUuid = getNewReference().getField<string>('id').value!
 
 				initialize?.(getNewReference, bindingOperations)
 			})

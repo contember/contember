@@ -1,10 +1,4 @@
-import {
-	BindingError,
-	FieldValue,
-	RelativeSingleField,
-	SingleEntity,
-	useParentEntityAccessor,
-} from '@contember/binding'
+import { BindingError, FieldValue, RelativeSingleField, Entity, useEntity } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import * as React from 'react'
 import { Transforms } from 'slate'
@@ -50,7 +44,7 @@ export const EmbedElementRenderer = React.memo(
 		const editor = useEditor() as BlockSlateEditor
 		const selected = useSelected()
 
-		const referencedEntity = useParentEntityAccessor()
+		const referencedEntity = useEntity()
 		const embedTypeDiscriminant = referencedEntity.getRelativeSingleField(embedContentDiscriminationField)
 
 		const embedHandler = getDiscriminatedDatum(embedHandlers, embedTypeDiscriminant)
@@ -78,14 +72,14 @@ export const EmbedElementRenderer = React.memo(
 		const alternate = selectedBlock?.alternate ? <Box>{selectedBlock.alternate}</Box> : undefined
 
 		if (embedHandler === undefined) {
-			throw new BindingError(`BlockEditor: Missing handler for embed of type '${embedTypeDiscriminant.currentValue}'.`)
+			throw new BindingError(`BlockEditor: Missing handler for embed of type '${embedTypeDiscriminant.value}'.`)
 		}
 
 		return (
 			<BlockElement element={element} attributes={attributes} withBoundaries>
 				{/* https://github.com/ianstormtaylor/slate/issues/3426#issuecomment-573939245 */}
 				<div contentEditable={false} data-slate-editor={false}>
-					<SingleEntity accessor={referencedEntity}>
+					<Entity accessor={referencedEntity}>
 						<div style={{ display: 'flex', justifyContent: 'flex-start' }}>
 							<ActionableBox editContents={alternate || null} onRemove={onRemove}>
 								<EditorBox heading={selectedBlock?.label} isActive={selected} onClick={onContainerClick}>
@@ -99,7 +93,7 @@ export const EmbedElementRenderer = React.memo(
 								</EditorBox>
 							</ActionableBox>
 						</div>
-					</SingleEntity>
+					</Entity>
 				</div>
 				{children}
 			</BlockElement>

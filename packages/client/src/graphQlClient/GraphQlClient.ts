@@ -3,8 +3,7 @@ class GraphQlClient {
 
 	async sendRequest<T = any>(
 		query: string,
-		variables: GraphQlClient.Variables = {},
-		apiTokenOverride: string | undefined = undefined,
+		{ apiTokenOverride, signal, variables }: GraphQlClient.RequestOptions = {},
 	): Promise<T> {
 		const headers: {
 			[header: string]: string
@@ -22,6 +21,7 @@ class GraphQlClient {
 		const response = await fetch(this.apiUrl, {
 			method: 'POST',
 			headers,
+			signal,
 			body: JSON.stringify({ query, variables }),
 		})
 		if (response.ok) {
@@ -39,6 +39,12 @@ class GraphQlClient {
 }
 
 namespace GraphQlClient {
+	export interface RequestOptions {
+		variables?: GraphQlClient.Variables
+		apiTokenOverride?: string
+		signal?: AbortSignal
+	}
+
 	export type Variables = { [name: string]: any }
 
 	export type FailedRequestMetadata = Pick<Response, 'status' | 'statusText'> & {

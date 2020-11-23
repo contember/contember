@@ -7,23 +7,28 @@ import { SugaredRelativeSingleEntity } from '../treeParameters'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity'
 
-function useRelativeSingleEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity): EntityAccessor
-function useRelativeSingleEntity(
+function useEntity(): EntityAccessor
+function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity): EntityAccessor
+function useEntity(
 	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined,
 ): EntityAccessor | undefined
-function useRelativeSingleEntity(
-	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined,
-): EntityAccessor | undefined {
-	const relativeSingleEntity = useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity)
-
-	useConstantValueInvariant(
-		!!relativeSingleEntity,
-		'useRelativeSingleEntity: cannot alternate between providing and omitting the argument.',
-	)
+function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undefined]): EntityAccessor | undefined {
+	useConstantValueInvariant(entity.length, 'useEntity: cannot alternate between providing and omitting the argument.')
 
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
 
+	if (entity.length === 0) {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const getEntityAccessor = React.useCallback(() => getEntityByKey(entityKey), [entityKey, getEntityByKey])
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		return useAccessorUpdateSubscription(getEntityAccessor)
+	}
+	const sugaredRelativeSingleEntity = entity[0]
+
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const relativeSingleEntity = useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity)
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const getEntity = React.useCallback(() => {
 		const parent = getEntityByKey(entityKey)
 		return parent.getRelativeSingleEntity(relativeSingleEntity!)
@@ -48,4 +53,4 @@ function useRelativeSingleEntity(
 	return undefined
 }
 
-export { useRelativeSingleEntity }
+export { useEntity }

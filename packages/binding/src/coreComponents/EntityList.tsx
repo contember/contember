@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { EntityListAccessor } from '../accessors'
 import { Component } from './Component'
-import { SingleEntity, SingleEntityBaseProps } from './SingleEntity'
+import { Entity, EntityBaseProps } from './Entity'
 
 export interface EntityListBaseProps {
 	accessor: EntityListAccessor
@@ -12,7 +12,7 @@ export type EntityListProps<ListProps, EntityProps> = EntityListBaseProps &
 	(
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & SingleEntityBaseProps>
+				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 		| {
@@ -35,20 +35,20 @@ export const EntityList = Component(
 				{Array.from(props.accessor, entity => {
 					if ('entityComponent' in props && props.entityComponent) {
 						return (
-							<SingleEntity
+							<Entity
 								key={entity.key}
 								accessor={entity}
 								entityComponent={props.entityComponent}
 								entityProps={props.entityProps}
 							>
 								{props.children}
-							</SingleEntity>
+							</Entity>
 						)
 					}
 					return (
-						<SingleEntity key={entity.key} accessor={entity}>
+						<Entity key={entity.key} accessor={entity}>
 							{props.children}
-						</SingleEntity>
+						</Entity>
 					)
 				})}
 			</>
@@ -58,9 +58,16 @@ export const EntityList = Component(
 		if ('listComponent' in props && props.listComponent) {
 			return React.createElement(props.listComponent, {
 				...props.listProps!,
-				accessor: props.accessor,
+				accessor: undefined as any,
 				children: props.children,
 			})
+		}
+		if ('entityComponent' in props && props.entityComponent) {
+			return (
+				<Entity accessor={undefined as any} entityComponent={props.entityComponent} entityProps={props.entityProps}>
+					{props.children}
+				</Entity>
+			)
 		}
 		return <>{props.children}</>
 	},

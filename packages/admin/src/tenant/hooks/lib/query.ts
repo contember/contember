@@ -25,26 +25,31 @@ export const useQuery = <R, V>(
 		error: false,
 	})
 	const vars = useJsonEqualMemo(() => variables, variables)
-	const fetch = React.useCallback((client: GraphQlClient, query: string, vars: V, apiToken?: string) => {
+	const fetch = React.useCallback((client: GraphQlClient, query: string, variables: V, apiToken?: string) => {
 		if (client) {
 			setState({ loading: true, finished: false, error: false })
-			client.sendRequest<{ data: R }>(query, vars, apiToken).then(
-				data => {
-					setState({
-						data: data.data,
-						loading: false,
-						finished: true,
-						error: false,
-					})
-				},
-				() => {
-					setState({
-						loading: false,
-						finished: true,
-						error: true,
-					})
-				},
-			)
+			client
+				.sendRequest<{ data: R }>(query, {
+					variables,
+					apiTokenOverride: apiToken,
+				})
+				.then(
+					data => {
+						setState({
+							data: data.data,
+							loading: false,
+							finished: true,
+							error: false,
+						})
+					},
+					() => {
+						setState({
+							loading: false,
+							finished: true,
+							error: true,
+						})
+					},
+				)
 		}
 	}, [])
 

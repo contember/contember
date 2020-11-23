@@ -158,7 +158,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 
 							if (
 								originalElement !== currentElement ||
-								originalBlock.getRelativeSingleField(sortableByField).currentValue !== newBlockOrder
+								originalBlock.getRelativeSingleField(sortableByField).value !== newBlockOrder
 							) {
 								getEntityByKey(blockKey).getRelativeSingleField(sortableByField).updateValue(newBlockOrder)
 								saveBlockElement(blockKey, currentElement)
@@ -207,11 +207,14 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 		fieldBackedElement: FieldBackedElement,
 		editorElement: ContemberFieldElement,
 	) => {
-		const targetValue =
+		const targetField = getParentEntity().getField(fieldBackedElement.field)
+		const bareValue =
 			fieldBackedElement.format === 'richText'
 				? editor.serializeNodes(editorElement.children)
 				: SlateNode.string(editorElement)
-		getParentEntity().getField(fieldBackedElement.field).updateValue(targetValue)
+		const targetValue = !bareValue && targetField.valueOnServer === null ? null : bareValue
+
+		targetField.updateValue(targetValue)
 		contemberFieldElementCache.set(getParentEntity().getField(fieldBackedElement.field), editorElement)
 	}
 

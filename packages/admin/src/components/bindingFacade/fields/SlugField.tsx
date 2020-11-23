@@ -6,7 +6,7 @@ import {
 	useDerivedField,
 	useEnvironment,
 	useMutationState,
-	useRelativeSingleField,
+	useField,
 } from '@contember/binding'
 import { FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
@@ -62,11 +62,11 @@ export const SlugField = Component<SlugFieldProps>(
 		)
 		useDerivedField<string>(derivedFrom, field, transform)
 
-		const slugField = useRelativeSingleField<string>(field)
+		const slugField = useField<string>(field)
 		const isMutating = useMutationState()
 
 		const completeHardPrefix = `${normalizedUnpersistedHardPrefix}${normalizedPersistedHardPrefix}`
-		const presentedValue = `${normalizedUnpersistedHardPrefix}${slugField.currentValue || ''}`
+		const presentedValue = `${normalizedUnpersistedHardPrefix}${slugField.value || ''}`
 
 		return (
 			<ConcealableField
@@ -91,7 +91,7 @@ export const SlugField = Component<SlugFieldProps>(
 								slugField.updateValue(`${normalizedPersistedHardPrefix}${valueWithoutHardPrefix}`)
 							}}
 							readOnly={isMutating}
-							validationState={slugField.errors.length ? 'invalid' : undefined}
+							validationState={slugField.errors ? 'invalid' : undefined}
 							size="small"
 							ref={inputRef}
 							onFocus={onFocus}

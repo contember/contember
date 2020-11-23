@@ -17,6 +17,7 @@ export const defaultBindingOperations = Object.freeze<BindingOperations>({
 	getEntityByKey: getRejecter('retrieve an entity by key'),
 	getTreeFilters: getRejecter('retrieve tree filters'),
 	batchDeferredUpdates: getRejecter('batch deferred updates'),
+	persistAll: getRejecter('persist all'),
 })
 
 export const BindingOperationsContext = React.createContext<BindingOperations>(defaultBindingOperations)

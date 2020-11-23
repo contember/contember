@@ -135,16 +135,14 @@ class ErrorsPreprocessor {
 			}
 			if (this.isExecutionError(error)) {
 				if (currentNode.execution === undefined) {
-					currentNode.execution = [{ type: error.type, developerMessage: error.message }]
-				} else {
-					currentNode.execution.push({ type: error.type, developerMessage: error.message })
+					currentNode.execution = []
 				}
+				currentNode.execution.push({ type: error.type, developerMessage: error.message })
 			} else {
 				if (currentNode.validation === undefined) {
-					currentNode.validation = [{ message: error.message.text }]
-				} else {
-					currentNode.validation.push({ message: error.message.text })
+					currentNode.validation = []
 				}
+				currentNode.validation.push({ message: error.message.text })
 			}
 		}
 
@@ -203,8 +201,8 @@ class ErrorsPreprocessor {
 
 namespace ErrorsPreprocessor {
 	export interface BaseErrorNode {
-		validation: ErrorAccessor.ValidationErrors | undefined
-		execution: ErrorAccessor.ExecutionErrors | undefined
+		validation: ErrorAccessor.SugaredValidationError[] | undefined
+		execution: ErrorAccessor.SugaredExecutionError[] | undefined
 	}
 
 	export interface LeafErrorNode extends BaseErrorNode {

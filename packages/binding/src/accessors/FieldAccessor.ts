@@ -60,7 +60,7 @@ namespace FieldAccessor {
 	}
 
 	export type IsTouchedBy = (agent: string) => boolean
-	export type AddError = (error: ErrorAccessor.ValidationError) => () => void
+	export type AddError = ErrorAccessor.AddError
 	export type BeforeUpdateListener<
 		Persisted extends FieldValue = FieldValue,
 		Produced extends Persisted = Persisted

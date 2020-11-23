@@ -8,11 +8,18 @@ class ErrorAccessor {
 		const validation: ErrorAccessor.ValidationError[] = []
 		const execution: ErrorAccessor.ExecutionError[] = []
 
-		for (const [, boxed] of errors) {
+		for (const [key, boxed] of errors) {
 			if (boxed.type === ErrorAccessor.ErrorType.Validation) {
-				validation.push(boxed.error)
+				validation.push({
+					key,
+					message: typeof boxed.error === 'string' ? boxed.error : boxed.error.message,
+				})
 			} else {
-				execution.push(boxed.error)
+				execution.push({
+					key,
+					type: typeof boxed.error === 'string' ? boxed.error : boxed.error.type,
+					developerMessage: typeof boxed.error === 'string' ? null : boxed.error.developerMessage,
+				})
 			}
 		}
 		this.validation = validation.length ? (validation as ErrorAccessor.ValidationErrors) : undefined
@@ -20,6 +27,7 @@ class ErrorAccessor {
 	}
 }
 namespace ErrorAccessor {
+	export type AddError = (error: ErrorAccessor.SugaredValidationError) => () => void
 	export enum ErrorType {
 		Validation = 'validation',
 		Execution = 'execution',
@@ -31,9 +39,11 @@ namespace ErrorAccessor {
 	export type ExecutionErrors = [ExecutionError, ...ExecutionError[]]
 	export type BoxedExecutionError = {
 		type: ErrorType.Execution
-		error: ExecutionError
+		error: SugaredExecutionError
 	}
+	export type SugaredExecutionError = Result.ExecutionErrorType | Omit<ExecutionError, 'key'>
 	export interface ExecutionError {
+		key: ErrorId
 		type: Result.ExecutionErrorType
 		developerMessage: string | null
 	}
@@ -41,9 +51,11 @@ namespace ErrorAccessor {
 	export type ValidationErrors = [ValidationError, ...ValidationError[]]
 	export type BoxedValidationError = {
 		type: ErrorType.Validation
-		error: ValidationError
+		error: SugaredValidationError
 	}
+	export type SugaredValidationError = string | Omit<ValidationError, 'key'>
 	export interface ValidationError {
+		key: ErrorId
 		message: string
 	}
 }

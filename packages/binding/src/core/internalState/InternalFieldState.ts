@@ -1,6 +1,6 @@
 import { ErrorAccessor, FieldAccessor } from '../../accessors'
 import { FieldMarker } from '../../markers'
-import { FieldName, FieldValue, Scalar } from '../../treeParameters/primitives'
+import { FieldName, FieldValue } from '../../treeParameters'
 import { InternalStateType } from './InternalStateType'
 
 export type OnFieldUpdate = (state: InternalFieldState) => void

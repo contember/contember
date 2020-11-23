@@ -80,7 +80,7 @@ namespace EntityListAccessor {
 	}
 
 	export type GetEntityListAccessor = () => EntityListAccessor
-	export type AddError = (error: ErrorAccessor.ValidationError) => () => void
+	export type AddError = ErrorAccessor.AddError
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: GetEntityListAccessor, bindingOperations: BindingOperations) => void
 	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void

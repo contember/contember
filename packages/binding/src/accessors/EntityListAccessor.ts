@@ -87,6 +87,11 @@ namespace EntityListAccessor {
 	export type GetChildEntityByKey = (key: string) => EntityAccessor
 	export type UpdateListener = (accessor: EntityListAccessor) => void
 
+	export type BeforePersistHandler = (
+		getAccessor: GetEntityListAccessor,
+		bindingOperations: BindingOperations,
+	) => void | Promise<BeforePersistHandler>
+
 	export interface PersistErrorOptions extends Omit<BindingOperations, 'persistAll'> {
 		attemptNumber: number
 		tryAgain: ScheduleAnotherPersist
@@ -97,7 +102,7 @@ namespace EntityListAccessor {
 	) => void | Promise<void>
 
 	export interface EntityListEventListenerMap {
-		beforePersist: BatchUpdatesHandler
+		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		childInitialize: EntityAccessor.BatchUpdatesHandler
 		//childListUpdate: UpdateListener

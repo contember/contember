@@ -209,6 +209,11 @@ namespace EntityAccessor {
 	) => void
 	export type UpdateListener = (accessor: EntityAccessor) => void
 
+	export type BeforePersistHandler = (
+		getAccessor: GetEntityAccessor,
+		bindingOperations: BindingOperations,
+	) => void | Promise<BeforePersistHandler>
+
 	export interface PersistErrorOptions extends Omit<BindingOperations, 'persistAll'> {
 		attemptNumber: number
 		tryAgain: ScheduleAnotherPersist
@@ -219,7 +224,7 @@ namespace EntityAccessor {
 	) => void | Promise<void>
 
 	export interface EntityEventListenerMap {
-		beforePersist: BatchUpdatesHandler
+		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		connectionUpdate: UpdateListener
 		initialize: BatchUpdatesHandler

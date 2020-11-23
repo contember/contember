@@ -11,6 +11,7 @@ import {
 	PersistErrorOptions,
 	TreeRootAccessor,
 } from '../accessors'
+import { PersistSuccessOptions } from '../accessors/PersistSuccessOptions'
 import {
 	ClientGeneratedUuid,
 	EntityFieldPersistedData,
@@ -221,9 +222,9 @@ export class AccessorTreeGenerator {
 				const mutation = generator.getPersistMutation()
 
 				if (mutation === undefined) {
+					this.unpersistedChangesCount = 0 // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
+					this.isMutating = false
 					Promise.resolve().then(() => {
-						this.unpersistedChangesCount = 0 // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
-						this.isMutating = false
 						this.flushUpdates()
 					})
 					return {
@@ -237,7 +238,14 @@ export class AccessorTreeGenerator {
 				const allSubMutationsOk = aliases.every(item => mutationResponse.data[item].ok)
 
 				if (allSubMutationsOk) {
+					const persistedEntityIds = aliases.map(alias => mutationResponse.data[alias].node.id)
+					successfulResult = {
+						type: PersistResultSuccessType.JustSuccess,
+						persistedEntityIds,
+					}
+
 					this.batchSyncTreeWideUpdates(() => this.accessorErrorManager.clearErrors())
+					break
 				} else {
 					this.batchSyncTreeWideUpdates(() => this.accessorErrorManager.replaceErrors(mutationResponse.data))
 					await this.triggerOnPersistError(persistErrorOptions)
@@ -259,26 +267,33 @@ export class AccessorTreeGenerator {
 						type: MutationErrorType.InvalidInput,
 					}
 				}
-				const persistedEntityIds = aliases.map(alias => mutationResponse.data[alias].node.id)
-				successfulResult = {
-					type: PersistResultSuccessType.JustSuccess,
-					persistedEntityIds,
-				}
 			}
 
 			if (successfulResult === undefined) {
 				// Max attempts exceeded
 				throw new BindingError() // TODO msg
 			}
+			const result = successfulResult
+			this.isMutating = false
+			this.unpersistedChangesCount = 0
 
 			try {
 				const persistedData = await this.fetchNewPersistedData()
-				this.isMutating = false
-				this.updatePersistedData(persistedData)
+				this.performSyncRootTreeOperation(() => {
+					this.updatePersistedData(persistedData)
+					this.triggerOnPersistSuccess({
+						...this.bindingOperations,
+						successType: result.type,
+						unstable_persistedEntityIds: result.persistedEntityIds,
+					})
+				})
 				return successfulResult
 			} catch {
-				this.isMutating = false
-				this.unpersistedChangesCount = 0
+				this.triggerOnPersistSuccess({
+					...this.bindingOperations,
+					successType: result.type,
+					unstable_persistedEntityIds: result.persistedEntityIds,
+				})
 				this.updateTreeRoot()
 
 				// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
@@ -1970,6 +1985,21 @@ export class AccessorTreeGenerator {
 				}
 				return resolve()
 			})
+		})
+	}
+
+	private triggerOnPersistSuccess(options: PersistSuccessOptions) {
+		this.batchSyncTreeWideUpdates(() => {
+			const iNodeHasPersistSuccessHandler = (iNode: InternalEntityState | InternalEntityListState) =>
+				iNode.eventListeners.persistSuccess !== undefined
+
+			for (const [, subTreeState] of this.subTreeStates) {
+				for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasPersistSuccessHandler)) {
+					for (const listener of iNode.eventListeners.persistSuccess!) {
+						listener(iNode.getAccessor as any, options)
+					}
+				}
+			}
 		})
 	}
 

@@ -4,6 +4,7 @@ import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { PersistErrorOptions } from './PersistErrorOptions'
+import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
@@ -99,6 +100,8 @@ namespace EntityListAccessor {
 		options: PersistErrorOptions,
 	) => void | Promise<void>
 
+	export type PersistSuccessHandler = (getAccessor: GetEntityListAccessor, options: PersistSuccessOptions) => void
+
 	export interface EntityListEventListenerMap {
 		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
@@ -106,7 +109,7 @@ namespace EntityListAccessor {
 		//childListUpdate: UpdateListener
 		initialize: BatchUpdatesHandler
 		persistError: PersistErrorHandler
-		persistSuccess: UpdateListener
+		persistSuccess: PersistSuccessHandler
 		update: UpdateListener
 	}
 	export type EntityListEventType = keyof EntityListEventListenerMap

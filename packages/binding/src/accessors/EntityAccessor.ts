@@ -27,6 +27,7 @@ import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
 import { PersistErrorOptions } from './PersistErrorOptions'
+import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityAccessor implements Errorable {
 	public constructor(
@@ -221,13 +222,15 @@ namespace EntityAccessor {
 		options: PersistErrorOptions,
 	) => void | Promise<void>
 
+	export type PersistSuccessHandler = (getAccessor: GetEntityAccessor, options: PersistSuccessOptions) => void
+
 	export interface EntityEventListenerMap {
 		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		connectionUpdate: UpdateListener
 		initialize: BatchUpdatesHandler
 		persistError: PersistErrorHandler
-		persistSuccess: UpdateListener
+		persistSuccess: PersistSuccessHandler
 		update: UpdateListener
 	}
 	export type EntityEventType = keyof EntityEventListenerMap

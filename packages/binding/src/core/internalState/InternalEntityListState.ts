@@ -30,6 +30,7 @@ export interface InternalEntityListState {
 	onChildEntityUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
 	onEntityListUpdate: OnEntityListUpdate // To be called by this entity list to inform the parent entity
 
+	addError: EntityListAccessor.AddError
 	addEventListener: EntityListAccessor.AddEntityListEventListener
 	batchUpdates: EntityListAccessor.BatchUpdates
 	connectEntity: EntityListAccessor.ConnectEntity

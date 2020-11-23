@@ -36,6 +36,7 @@ class EntityAccessor implements Errorable {
 		private readonly dataFromServer: SingleEntityPersistedData | undefined,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
+		public readonly addError: EntityAccessor.AddError,
 		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
 		public readonly batchUpdates: EntityAccessor.BatchUpdates,
 		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField,
@@ -199,6 +200,7 @@ namespace EntityAccessor {
 	export type FieldData = Map<FieldName, FieldDatum>
 
 	export type GetEntityAccessor = () => EntityAccessor
+	export type AddError = (error: ErrorAccessor.ValidationError) => () => void
 	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: GetEntityAccessor, bindingOperations: BindingOperations) => void
 	export type ConnectEntityAtField = (field: FieldName, entityToConnectOrItsKey: EntityAccessor | string) => void

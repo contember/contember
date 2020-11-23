@@ -14,6 +14,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly hasUnpersistedChanges: boolean,
 		public readonly isTouchedBy: FieldAccessor.IsTouchedBy,
+		public readonly addError: FieldAccessor.AddError,
 		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Persisted, Produced>,
 		public readonly updateValue: FieldAccessor.UpdateValue<Produced>,
 	) {}
@@ -59,6 +60,7 @@ namespace FieldAccessor {
 	}
 
 	export type IsTouchedBy = (agent: string) => boolean
+	export type AddError = (error: ErrorAccessor.ValidationError) => () => void
 	export type BeforeUpdateListener<
 		Persisted extends FieldValue = FieldValue,
 		Produced extends Persisted = Persisted

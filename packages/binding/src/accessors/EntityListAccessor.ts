@@ -11,6 +11,7 @@ class EntityListAccessor implements Errorable {
 		private readonly keysPersistedOnServer: ReadonlySet<string>,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
+		public readonly addError: EntityListAccessor.AddError,
 		public readonly addEventListener: EntityListAccessor.AddEntityListEventListener,
 		public readonly batchUpdates: EntityListAccessor.BatchUpdates,
 		public readonly connectEntity: EntityListAccessor.ConnectEntity,
@@ -79,6 +80,7 @@ namespace EntityListAccessor {
 	}
 
 	export type GetEntityListAccessor = () => EntityListAccessor
+	export type AddError = (error: ErrorAccessor.ValidationError) => () => void
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: GetEntityListAccessor, bindingOperations: BindingOperations) => void
 	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void

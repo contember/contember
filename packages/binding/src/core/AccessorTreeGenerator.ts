@@ -2,7 +2,14 @@ import { GraphQlBuilder, GraphQlClient, TreeFilter } from '@contember/client'
 import { emptyArray, noop } from '@contember/react-utils'
 import * as ReactDOM from 'react-dom'
 import { validate as uuidValidate } from 'uuid'
-import { BindingOperations, EntityAccessor, EntityListAccessor, FieldAccessor, TreeRootAccessor } from '../accessors'
+import {
+	BindingOperations,
+	EntityAccessor,
+	EntityListAccessor,
+	ErrorAccessor,
+	FieldAccessor,
+	TreeRootAccessor,
+} from '../accessors'
 import {
 	ClientGeneratedUuid,
 	EntityFieldPersistedData,
@@ -178,7 +185,18 @@ export class AccessorTreeGenerator {
 
 			let successfulResult: SuccessfulPersistResult | undefined = undefined
 			for (let attemptNumber = 1; attemptNumber <= MAX_PERSIST_ATTEMPTS; attemptNumber++) {
+				this.batchSyncTreeWideUpdates(() => {
+					this.accessorErrorManager.clearErrors()
+				})
 				await this.triggerOnBeforePersist()
+
+				if (this.accessorErrorManager.hasErrors()) {
+					this.isMutating = false
+					this.flushUpdates()
+					throw {
+						type: MutationErrorType.InvalidInput,
+					}
+				}
 
 				const generator = new MutationGenerator(this.markerTree, this.subTreeStates)
 				const mutation = generator.getPersistMutation()
@@ -187,7 +205,7 @@ export class AccessorTreeGenerator {
 					Promise.resolve().then(() => {
 						this.unpersistedChangesCount = 0 // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
 						this.isMutating = false
-						this.updateTreeRoot()
+						this.flushUpdates()
 					})
 					return {
 						type: PersistResultSuccessType.NothingToPersist,
@@ -202,7 +220,7 @@ export class AccessorTreeGenerator {
 				if (!allSubMutationsOk) {
 					// TODO try again?
 					this.isMutating = false
-					this.setErrors(mutationResponse.data)
+					this.replaceErrors(mutationResponse.data)
 					throw {
 						type: MutationErrorType.InvalidInput,
 					}
@@ -274,7 +292,7 @@ export class AccessorTreeGenerator {
 		this.updateTreeRoot()
 	}
 
-	private setErrors(data: MutationDataResponse | undefined) {
+	private replaceErrors(data: MutationDataResponse | undefined) {
 		this.performRootTreeOperation(() => {
 			this.accessorErrorManager.setErrors(data)
 		})
@@ -886,6 +904,7 @@ export class AccessorTreeGenerator {
 							entityState.persistedData,
 							entityState.errors,
 							entityState.environment,
+							entityState.addError,
 							entityState.addEventListener,
 							entityState.batchUpdates,
 							entityState.connectEntityAtField,
@@ -936,6 +955,8 @@ export class AccessorTreeGenerator {
 					entityState.hasPendingParentNotification = true
 				})
 			},
+			addError: error =>
+				this.accessorErrorManager.addError(entityState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			addEventListener: (type: EntityAccessor.EntityEventType, ...args: unknown[]) => {
 				if (type === 'connectionUpdate') {
 					if (entityState.eventListeners.connectionUpdate === undefined) {
@@ -1266,6 +1287,7 @@ export class AccessorTreeGenerator {
 							entityListState.persistedEntityIds,
 							entityListState.errors,
 							entityListState.environment,
+							entityListState.addError,
 							entityListState.addEventListener,
 							entityListState.batchUpdates,
 							entityListState.connectEntity,
@@ -1293,6 +1315,8 @@ export class AccessorTreeGenerator {
 					entityListState.hasStaleAccessor = true
 				})
 			},
+			addError: error =>
+				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			batchUpdates: performUpdates => {
 				this.performRootTreeOperation(() => {
 					performOperationWithBeforeUpdate(() => {
@@ -1521,6 +1545,7 @@ export class AccessorTreeGenerator {
 							fieldState.errors,
 							fieldState.hasUnpersistedChanges,
 							fieldState.isTouchedBy,
+							fieldState.addError,
 							fieldState.addEventListener,
 							fieldState.updateValue,
 						)
@@ -1528,6 +1553,8 @@ export class AccessorTreeGenerator {
 					return accessor
 				}
 			})(),
+			addError: error =>
+				this.accessorErrorManager.addError(fieldState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			updateValue: (
 				newValue: Scalar | GraphQlBuilder.Literal,
 				{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},

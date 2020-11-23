@@ -36,6 +36,7 @@ export interface InternalEntityState {
 	realms: Set<OnEntityUpdate>
 	typeName: string | undefined
 
+	addError: EntityAccessor.AddError
 	addEventListener: EntityAccessor.AddEntityEventListener
 	batchUpdates: EntityAccessor.BatchUpdates
 	connectEntityAtField: EntityAccessor.ConnectEntityAtField

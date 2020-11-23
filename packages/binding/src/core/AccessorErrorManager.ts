@@ -35,7 +35,7 @@ export class AccessorErrorManager {
 		this.errorsByState.clear()
 	}
 
-	public setErrors(data: MutationDataResponse | undefined) {
+	public replaceErrors(data: MutationDataResponse | undefined) {
 		this.clearErrors()
 
 		const preprocessor = new ErrorsPreprocessor(data)

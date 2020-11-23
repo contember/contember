@@ -26,7 +26,7 @@ import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 import { FieldAccessor } from './FieldAccessor'
-import { ScheduleAnotherPersist } from './ScheduleAnotherPersist'
+import { PersistErrorOptions } from './PersistErrorOptions'
 
 class EntityAccessor implements Errorable {
 	public constructor(
@@ -216,10 +216,6 @@ namespace EntityAccessor {
 		bindingOperations: BindingOperations,
 	) => void | Promise<BeforePersistHandler>
 
-	export interface PersistErrorOptions extends Omit<BindingOperations, 'persistAll'> {
-		attemptNumber: number
-		tryAgain: ScheduleAnotherPersist
-	}
 	export type PersistErrorHandler = (
 		getAccessor: GetEntityAccessor,
 		options: PersistErrorOptions,

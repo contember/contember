@@ -841,7 +841,7 @@ export class AccessorTreeGenerator {
 			}
 			this.mergeInEntityFieldsContainer(existingEntityState, markersContainer)
 
-			if (existingEntityState.eventListeners.initialize?.size) {
+			if (Object.values(existingEntityState.eventListeners).filter(listeners => !!listeners).length) {
 				this.newlyInitializedWithListeners.add(existingEntityState)
 			}
 
@@ -1223,7 +1223,7 @@ export class AccessorTreeGenerator {
 
 		this.initializeEntityFields(entityState, markersContainer)
 
-		if (entityState.eventListeners.initialize?.size) {
+		if (Object.values(entityState.eventListeners).filter(listeners => !!listeners).length) {
 			this.newlyInitializedWithListeners.add(entityState)
 		}
 
@@ -1810,10 +1810,18 @@ export class AccessorTreeGenerator {
 					}
 					const newCallbacks = await Promise.allSettled(callbackReturns)
 
-					// TODO if the newly initialized entities have beforePersist handlers, they won't fire.
-					this.triggerOnInitialize()
-
 					callbackQueue.length = 0
+
+					// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
+					for (const state of this.newlyInitializedWithListeners) {
+						if (state.eventListeners.beforePersist) {
+							for (const listener of state.eventListeners.beforePersist) {
+								callbackQueue.push([state, listener])
+							}
+						}
+					}
+
+					this.triggerOnInitialize()
 
 					for (let i = 0; i < newCallbacks.length; i++) {
 						const result = newCallbacks[i]
@@ -1851,9 +1859,11 @@ export class AccessorTreeGenerator {
 
 		this.batchSyncTreeWideUpdates(() => {
 			for (const state of this.newlyInitializedWithListeners) {
-				for (const listener of state.eventListeners.initialize!) {
-					listener(state.getAccessor as any, this.bindingOperations)
-					hasOnInitialize = true
+				if (state.eventListeners.initialize) {
+					for (const listener of state.eventListeners.initialize) {
+						listener(state.getAccessor as any, this.bindingOperations)
+						hasOnInitialize = true
+					}
 				}
 				if (state.type === InternalStateType.SingleEntity) {
 					state.hasIdSetInStone = true

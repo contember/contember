@@ -38,7 +38,6 @@ export interface WithPaste {
 	deserializeTextNode: (node: Node, cumulativeTextAttrs: TextAttrs) => (TextNode | ElementNode)[] | null
 	deserializeTextFromNodeList: (list: NodeList, cumulativeTextAttrs: TextAttrs) => (TextNode | ElementNode)[]
 	flattenNodesWithType: (withType: NodesWithType[]) => NodesWithType
-	wrapWithDefault: (children: (TextNode | ElementNode)[]) => ElementNode
 }
 
 const ignoredElements = ['SCRIPT', 'STYLE', 'TEMPLATE']
@@ -128,7 +127,7 @@ export const withPaste: <E extends EditorNode>(
 				return {
 					elements: processed.flatMap(item => {
 						if (item.element === undefined) {
-							return item.isWhiteSpace ? [] : [editorWithEssentials.wrapWithDefault([item.text])]
+							return item.isWhiteSpace ? [] : [editorWithEssentials.createDefaultElement([item.text])]
 						} else {
 							return [item.element]
 						}
@@ -144,12 +143,13 @@ export const withPaste: <E extends EditorNode>(
 				const text = node.textContent ?? ''
 				return [{ ...cumulativeTextAttrs, text: text.replace(/( +\n+ *|\n+ +|\n+)/g, ' ') }]
 			} else if (node instanceof HTMLElement) {
-				const attrs = editorWithEssentials.processWithAttributeProcessor(node, cumulativeTextAttrs)
-				// TODO: Does CTA work correctly here?
 				const result = editorWithEssentials.processInlinePaste(
 					node,
-					(list, cta) => editorWithEssentials.deserializeTextFromNodeList(list, cta),
-					attrs,
+					(list, cta) => {
+						const attrs = editorWithEssentials.processWithAttributeProcessor(node, cta)
+						return editorWithEssentials.deserializeTextFromNodeList(list, attrs)
+					},
+					cumulativeTextAttrs,
 				)
 				if (result !== null) {
 					return Array.isArray(result) ? result : [result]
@@ -184,7 +184,7 @@ export const withPaste: <E extends EditorNode>(
 				return {
 					elements: withTypeFiltered.flatMap<ElementNode>(item => {
 						if (item.elements === undefined) {
-							return [editorWithEssentials.wrapWithDefault(item.texts)]
+							return [editorWithEssentials.createDefaultElement(item.texts)]
 						} else {
 							return item.elements
 						}
@@ -193,10 +193,6 @@ export const withPaste: <E extends EditorNode>(
 			} else {
 				return { texts: withTypeFiltered.flatMap(item => item.texts!) }
 			}
-		},
-
-		wrapWithDefault: (children: (TextNode | ElementNode)[]): ElementNode => {
-			return { type: editorWithEssentials.defaultElementType, children: children }
 		},
 
 		insertData: data => {

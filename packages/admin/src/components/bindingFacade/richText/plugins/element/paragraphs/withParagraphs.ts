@@ -81,7 +81,7 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 
 	e.processBlockPaste = (element, next, cumulativeTextAttrs) => {
 		if (element.nodeName === 'P') {
-			return { type: 'paragraph', children: next(element.childNodes, cumulativeTextAttrs) }
+			return { type: paragraphElementType, children: next(element.childNodes, cumulativeTextAttrs) }
 		}
 		return processBlockPaste(element, next, cumulativeTextAttrs)
 	}

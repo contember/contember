@@ -71,24 +71,19 @@ import {
 	StateNode,
 	StateType,
 } from './state'
+import { StateStore } from './StateStore'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
 export class DataBinding {
 	private readonly config: Config
+	private readonly stateStore: StateStore
 	private readonly treeFilterGenerator: TreeFilterGenerator
 	private readonly accessorErrorManager: AccessorErrorManager
 	private readonly eventManager: EventManager
 	private readonly dirtinessTracker: DirtinessTracker
 
 	private persistedEntityData: PersistedEntityDataStore = new Map()
-
-	// TODO deletes and disconnects cause memory leaks here as they don't traverse the tree to remove nested states.
-	//  This could theoretically also be intentional given that both operations happen relatively infrequently,
-	//  or at least rarely enough that we could potentially just ignore the problem (which we're doing now).
-	//  Nevertheless, no real analysis has been done and it could turn out to be a problem.
-	private entityStore: Map<string, EntityState> = new Map()
-	private subTreeStates: Map<string, RootStateNode> = new Map()
 
 	// private treeRootListeners: {
 	// 	eventListeners: {}
@@ -97,15 +92,15 @@ export class DataBinding {
 	// }
 
 	private readonly bindingOperations = Object.freeze<BindingOperations>({
-		getAllEntities: (accessorTreeGenerator => {
+		getAllEntities: (stateStore => {
 			return function* (): Generator<EntityAccessor> {
-				for (const [, entity] of accessorTreeGenerator.entityStore) {
+				for (const [, entity] of stateStore.entityStore) {
 					yield entity.getAccessor()
 				}
 			}
-		})(this),
+		})(this.stateStore),
 		getEntityByKey: (key: string) => {
-			const entity = this.entityStore.get(key)
+			const entity = this.stateStore.entityStore.get(key)
 
 			if (entity === undefined) {
 				throw new BindingError(`Trying to retrieve a non-existent entity: key '${key}' was not found.`)
@@ -184,7 +179,7 @@ export class DataBinding {
 						}
 					}
 
-					const generator = new MutationGenerator(this.markerTree, this.subTreeStates)
+					const generator = new MutationGenerator(this.markerTree, this.stateStore.subTreeStates)
 					const mutation = generator.getPersistMutation()
 
 					if (mutation === undefined) {
@@ -274,11 +269,12 @@ export class DataBinding {
 		private readonly onError: (error: RequestError) => void,
 	) {
 		this.config = new Config()
-		this.treeFilterGenerator = new TreeFilterGenerator(this.markerTree, this.subTreeStates)
-		this.accessorErrorManager = new AccessorErrorManager(this.subTreeStates, this.entityStore)
+		this.stateStore = new StateStore()
+		this.treeFilterGenerator = new TreeFilterGenerator(this.markerTree, this.stateStore)
+		this.accessorErrorManager = new AccessorErrorManager(this.stateStore)
 		this.dirtinessTracker = new DirtinessTracker()
 		this.eventManager = new EventManager(
-			this.subTreeStates,
+			this.stateStore,
 			this.config,
 			this.dirtinessTracker,
 			this.bindingOperations,
@@ -294,7 +290,7 @@ export class DataBinding {
 
 		for (const [placeholderName, marker] of this.markerTree.subTrees) {
 			const subTreeState = this.initializeSubTree(marker, persistedData.subTreeDataStore.get(placeholderName))
-			this.subTreeStates.set(placeholderName, subTreeState)
+			this.stateStore.subTreeStates.set(placeholderName, subTreeState)
 		}
 
 		this.eventManager.triggerOnInitialize()
@@ -308,7 +304,7 @@ export class DataBinding {
 			const alreadyProcessed: Set<EntityState> = new Set()
 
 			let didUpdateSomething = false
-			for (const [subTreePlaceholder, subTreeState] of this.subTreeStates) {
+			for (const [subTreePlaceholder, subTreeState] of this.stateStore.subTreeStates) {
 				const newSubTreeData = normalizedResponse.subTreeDataStore.get(subTreePlaceholder)
 
 				if (subTreeState.type === StateType.SingleEntity) {
@@ -328,7 +324,7 @@ export class DataBinding {
 									?.value,
 							)
 							newSubTreeState.hasPendingUpdate = true
-							this.subTreeStates.set(subTreePlaceholder, newSubTreeState)
+							this.stateStore.subTreeStates.set(subTreePlaceholder, newSubTreeState)
 							didUpdateSomething = true
 						}
 					}
@@ -554,7 +550,7 @@ export class DataBinding {
 
 				didUpdate = true
 			} else {
-				let childState = this.entityStore.get(newPersistedId)
+				let childState = this.stateStore.entityStore.get(newPersistedId)
 
 				if (childState === undefined) {
 					childState = this.initializeEntityAccessor(
@@ -619,7 +615,7 @@ export class DataBinding {
 				tree.parameters.value,
 			)
 		}
-		this.subTreeStates.set(tree.placeholderName, subTreeState)
+		this.stateStore.subTreeStates.set(tree.placeholderName, subTreeState)
 
 		return subTreeState
 	}
@@ -788,7 +784,7 @@ export class DataBinding {
 		initialEventListeners: SingleEntityEventListeners | undefined,
 	): EntityState {
 		const entityKey = id.value
-		const existingEntityState = this.entityStore.get(entityKey)
+		const existingEntityState = this.stateStore.entityStore.get(entityKey)
 
 		if (existingEntityState !== undefined) {
 			existingEntityState.markersContainer = MarkerMerger.mergeEntityFieldsContainers(
@@ -884,8 +880,8 @@ export class DataBinding {
 						const previousKey = entityState.id.value
 						const newKey = updatedState.value as string
 						entityState.id = new ClientGeneratedUuid(newKey)
-						this.entityStore.delete(previousKey)
-						this.entityStore.set(newKey, entityState)
+						this.stateStore.entityStore.delete(previousKey)
+						this.stateStore.entityStore.set(newKey, entityState)
 					}
 					if (updatedState.type === StateType.SingleEntity && updatedState.maidenKey !== updatedState.id.value) {
 						const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, updatedState)
@@ -1069,7 +1065,7 @@ export class DataBinding {
 				})
 			},
 		}
-		this.entityStore.set(entityKey, entityState)
+		this.stateStore.entityStore.set(entityKey, entityState)
 
 		const typeName = entityState.persistedData?.get(TYPENAME_KEY_NAME)
 
@@ -1306,7 +1302,7 @@ export class DataBinding {
 						const disconnectedChildKey =
 							typeof childEntityOrItsKey === 'string' ? childEntityOrItsKey : childEntityOrItsKey.key
 
-						const disconnectedChildState = this.entityStore.get(disconnectedChildKey)
+						const disconnectedChildState = this.stateStore.entityStore.get(disconnectedChildKey)
 						if (disconnectedChildState === undefined) {
 							throw new BindingError(
 								`EntityListAccessor: Cannot remove entity with key '${disconnectedChildKey}' as it doesn't exist.`,
@@ -1342,13 +1338,17 @@ export class DataBinding {
 					})
 				})
 			},
-			getChildEntityByKey: key => {
-				const childState = this.entityStore.get(key)
-				if (childState === undefined || !entityListState.children.has(childState)) {
-					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as it is not on the list.`)
-				}
-				return childState.getAccessor()
-			},
+			getChildEntityByKey: __DEV_MODE__
+				? key => {
+						const childState = this.stateStore.entityStore.get(key)
+						if (childState === undefined || !entityListState.children.has(childState)) {
+							throw new BindingError(
+								`EntityList: cannot retrieve an entity with key '${key}' as it is not on the list.`,
+							)
+						}
+						return childState.getAccessor()
+				  }
+				: this.bindingOperations.getEntityByKey,
 		}
 		entityListState.addEventListener = this.getAddEventListener(entityListState)
 
@@ -1518,7 +1518,7 @@ export class DataBinding {
 										`Hint: you may use 'FieldAccessor.asUuid.setToUuid()'.`,
 								)
 							}
-							if (this.entityStore.has(newValue)) {
+							if (this.stateStore.entityStore.has(newValue)) {
 								throw new BindingError(
 									`Trying to set the '${PRIMARY_KEY_NAME}' field to '${newValue}' which is a valid uuid but is not unique. ` +
 										`It is already in use by an existing entity.`,
@@ -1659,7 +1659,7 @@ export class DataBinding {
 			connectedEntityKey = entityToConnectOrItsKey.key
 		}
 
-		const connectedState = this.entityStore.get(connectedEntityKey)
+		const connectedState = this.stateStore.entityStore.get(connectedEntityKey)
 		if (connectedState === undefined) {
 			throw new BindingError(`Attempting to connect an entity with key '${connectedEntityKey}' but it doesn't exist.`)
 		}
@@ -1714,7 +1714,7 @@ export class DataBinding {
 		} else {
 			placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters)
 		}
-		const subTreeState = this.subTreeStates.get(placeholderName)
+		const subTreeState = this.stateStore.subTreeStates.get(placeholderName)
 
 		if (subTreeState === undefined) {
 			throw new BindingError(`Trying to retrieve a non-existent sub-tree '${placeholderName}'.`)

@@ -1,7 +1,8 @@
 import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
-import { EntityListState, EntityState, RootStateNode, StateNode, StateType } from './state'
+import { EntityListState, EntityState, StateNode, StateType } from './state'
+import { StateStore } from './StateStore'
 
 export class AccessorErrorManager {
 	private errorsByState: Map<StateNode, ErrorAccessor.ErrorsById> = new Map()
@@ -12,10 +13,7 @@ export class AccessorErrorManager {
 		return () => errorId++
 	})()
 
-	public constructor(
-		private readonly subTreeStates: Map<string, RootStateNode>,
-		private readonly entityStore: Map<string, EntityState>,
-	) {}
+	public constructor(private readonly stateStore: StateStore) {}
 
 	public hasErrors() {
 		return !!this.errorsByState.size
@@ -82,7 +80,7 @@ export class AccessorErrorManager {
 
 	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot) {
 		for (const [subTreePlaceholder, rootError] of errorTreeRoot) {
-			const rootState = this.subTreeStates.get(subTreePlaceholder)
+			const rootState = this.stateStore.subTreeStates.get(subTreePlaceholder)
 
 			if (!rootState) {
 				continue
@@ -166,7 +164,7 @@ export class AccessorErrorManager {
 		}
 
 		for (const [childKey, childError] of errors.children) {
-			const childState = this.entityStore.get(childKey)
+			const childState = this.stateStore.entityStore.get(childKey)
 
 			if (childState && childError.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
 				state.childrenWithPendingUpdates.add(childState)

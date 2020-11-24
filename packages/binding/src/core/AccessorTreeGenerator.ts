@@ -1,6 +1,5 @@
 import { GraphQlBuilder, GraphQlClient, TreeFilter } from '@contember/client'
-import { emptyArray, noop } from '@contember/react-utils'
-import * as ReactDOM from 'react-dom'
+import { noop } from '@contember/react-utils'
 import { validate as uuidValidate } from 'uuid'
 import {
 	BindingOperations,
@@ -11,12 +10,10 @@ import {
 	PersistErrorOptions,
 	TreeRootAccessor,
 } from '../accessors'
-import { PersistSuccessOptions } from '../accessors/PersistSuccessOptions'
 import {
 	ClientGeneratedUuid,
 	EntityFieldPersistedData,
 	metadataToRequestError,
-	MutationDataResponse,
 	MutationErrorType,
 	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
@@ -55,12 +52,14 @@ import {
 } from '../treeParameters'
 import { assertNever } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
+import { Config } from './Config'
+import { DirtinessTracker } from './DirtinessTracker'
+import { EventManager } from './EventManager'
 import {
 	InternalEntityListState,
 	InternalEntityState,
 	InternalFieldState,
 	InternalRootStateNode,
-	InternalStateIterator,
 	InternalStateNode,
 	InternalStateType,
 	OnEntityListUpdate,
@@ -74,30 +73,13 @@ import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
-// This only applies to the 'beforeUpdate' event:
-
-// If the listeners mutate the entity/list, other listeners may want to respond to that, which in turn may trigger
-// further responses, etc. We don't want the order of addition of event listeners to matter and we don't have
-// the necessary information to perform some sort of a topological sort. We wouldn't want to do that anyway
-// though.
-
-// To get around all this, we just trigger all event listeners repeatedly until things settle and they stop
-// mutating the accessor. If, however, that doesn't happen until some number of iterations (I think the limit
-// is actually fairly generous), we conclude that there is an infinite feedback loop and just shut things down.
-
-// Notice also that we effectively shift the responsibility to check whether an update concerns them to the
-// listeners.
-const BEFORE_UPDATE_SETTLE_LIMIT = 20
-
-const MAX_PERSIST_ATTEMPTS = 5
-const BEFORE_PERSIST_SETTLE_LIMIT = 20
-
 export class AccessorTreeGenerator {
+	private readonly config: Config
 	private readonly treeFilterGenerator: TreeFilterGenerator
 	private readonly accessorErrorManager: AccessorErrorManager
+	private readonly eventManager: EventManager
+	private readonly dirtinessTracker: DirtinessTracker
 
-	private updateData: ((newData: TreeRootAccessor) => void) | undefined = undefined
-	private yieldError: ((error: RequestError) => void) | undefined = undefined
 	private persistedEntityData: PersistedEntityDataStore = new Map()
 
 	// TODO deletes and disconnects cause memory leaks here as they don't traverse the tree to remove nested states.
@@ -106,8 +88,6 @@ export class AccessorTreeGenerator {
 	//  Nevertheless, no real analysis has been done and it could turn out to be a problem.
 	private entityStore: Map<string, InternalEntityState> = new Map()
 	private subTreeStates: Map<string, InternalRootStateNode> = new Map()
-
-	private newlyInitializedWithListeners: Set<InternalEntityListState | InternalEntityState> = new Set()
 
 	// private treeRootListeners: {
 	// 	eventListeners: {}
@@ -118,9 +98,6 @@ export class AccessorTreeGenerator {
 	private readonly bindingOperations = Object.freeze<BindingOperations>({
 		getAllEntities: (accessorTreeGenerator => {
 			return function* (): Generator<EntityAccessor> {
-				if (accessorTreeGenerator.isFrozenWhileUpdating) {
-					throw new BindingError(`Cannot query all entities while the tree is updating.`)
-				}
 				for (const [, entity] of accessorTreeGenerator.entityStore) {
 					yield entity.getAccessor()
 				}
@@ -164,170 +141,152 @@ export class AccessorTreeGenerator {
 			return this.treeFilterGenerator.generateTreeFilter()
 		},
 		batchDeferredUpdates: performUpdates => {
-			this.batchSyncTreeWideUpdates(() => {
-				performUpdates(this.bindingOperations)
-			})
+			this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
 		},
 		persistAll: async ({ signal } = {}) => {
-			if (this.isMutating) {
-				throw {
-					type: MutationErrorType.AlreadyMutating,
-				}
-			}
-			if (this.unpersistedChangesCount === 0) {
+			if (!this.dirtinessTracker.hasChanges()) {
 				return {
 					type: PersistResultSuccessType.NothingToPersist,
 				}
 			}
-			this.isMutating = true
-			this.updateTreeRoot() // Let the world know that we're mutating
+			return await this.eventManager.persistOperation(async () => {
+				let successfulResult: SuccessfulPersistResult | undefined = undefined
+				for (let attemptNumber = 1; attemptNumber <= this.config.getValue('maxPersistAttempts'); attemptNumber++) {
+					// TODO if the tree is in an inconsistent state, wait for lock releases
 
-			//
-			// TODO if the tree is in an inconsistent state, schedule a persist
-
-			let successfulResult: SuccessfulPersistResult | undefined = undefined
-			for (let attemptNumber = 1; attemptNumber <= MAX_PERSIST_ATTEMPTS; attemptNumber++) {
-				this.batchSyncTreeWideUpdates(() => {
-					this.accessorErrorManager.clearErrors()
-				})
-				await this.triggerOnBeforePersist()
-
-				let shouldTryAgain = false
-				const proposedBackOffs: number[] = []
-				const persistErrorOptions: PersistErrorOptions = {
-					...this.bindingOperations,
-					tryAgain: options => {
-						shouldTryAgain = true
-						if (options?.proposedBackoff !== undefined && options.proposedBackoff > 0) {
-							proposedBackOffs.push(options.proposedBackoff)
-						}
-					},
-					attemptNumber,
-				}
-
-				if (this.accessorErrorManager.hasErrors()) {
-					await this.triggerOnPersistError(persistErrorOptions)
-					if (shouldTryAgain) {
-						continue // Trying again immediately
-					}
-
-					this.isMutating = false
-					this.flushUpdates()
-					throw {
-						type: MutationErrorType.InvalidInput,
-					}
-				}
-
-				const generator = new MutationGenerator(this.markerTree, this.subTreeStates)
-				const mutation = generator.getPersistMutation()
-
-				if (mutation === undefined) {
-					this.unpersistedChangesCount = 0 // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
-					this.isMutating = false
-					Promise.resolve().then(() => {
-						this.flushUpdates()
+					this.eventManager.syncTransaction(() => {
+						this.accessorErrorManager.clearErrors()
 					})
-					return {
-						type: PersistResultSuccessType.NothingToPersist,
-					}
-				}
+					await this.eventManager.triggerOnBeforePersist()
 
-				const mutationResponse = await this.client.sendRequest(mutation, { signal })
-				const normalizedMutationResponse = mutationResponse.data === null ? {} : mutationResponse.data
-				const aliases = Object.keys(normalizedMutationResponse)
-				const allSubMutationsOk = aliases.every(item => mutationResponse.data[item].ok)
-
-				if (allSubMutationsOk) {
-					const persistedEntityIds = aliases.map(alias => mutationResponse.data[alias].node.id)
-					successfulResult = {
-						type: PersistResultSuccessType.JustSuccess,
-						persistedEntityIds,
+					let shouldTryAgain = false
+					const proposedBackOffs: number[] = []
+					const persistErrorOptions: PersistErrorOptions = {
+						...this.bindingOperations,
+						tryAgain: options => {
+							shouldTryAgain = true
+							if (options?.proposedBackoff !== undefined && options.proposedBackoff > 0) {
+								proposedBackOffs.push(options.proposedBackoff)
+							}
+						},
+						attemptNumber,
 					}
 
-					this.batchSyncTreeWideUpdates(() => this.accessorErrorManager.clearErrors())
-					break
-				} else {
-					this.batchSyncTreeWideUpdates(() => this.accessorErrorManager.replaceErrors(mutationResponse.data))
-					await this.triggerOnPersistError(persistErrorOptions)
-					if (shouldTryAgain) {
-						if (proposedBackOffs.length) {
-							const geometricMean = Math.round(
-								Math.pow(
-									proposedBackOffs.reduce((a, b) => a * b, 1),
-									1 / proposedBackOffs.length,
-								),
-							)
-							await new Promise(resolve => setTimeout(resolve, geometricMean))
+					if (this.accessorErrorManager.hasErrors()) {
+						await this.eventManager.triggerOnPersistError(persistErrorOptions)
+						if (shouldTryAgain) {
+							continue // Trying again immediately
 						}
-						continue
+
+						throw {
+							type: MutationErrorType.InvalidInput,
+						}
 					}
-					this.isMutating = false
-					this.flushUpdates()
-					throw {
-						type: MutationErrorType.InvalidInput,
+
+					const generator = new MutationGenerator(this.markerTree, this.subTreeStates)
+					const mutation = generator.getPersistMutation()
+
+					if (mutation === undefined) {
+						this.dirtinessTracker.reset() // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
+						return {
+							type: PersistResultSuccessType.NothingToPersist,
+						}
+					}
+
+					const mutationResponse = await this.client.sendRequest(mutation, { signal })
+					const normalizedMutationResponse = mutationResponse.data === null ? {} : mutationResponse.data
+					const aliases = Object.keys(normalizedMutationResponse)
+					const allSubMutationsOk = aliases.every(item => mutationResponse.data[item].ok)
+
+					if (allSubMutationsOk) {
+						const persistedEntityIds = aliases.map(alias => mutationResponse.data[alias].node.id)
+						successfulResult = {
+							type: PersistResultSuccessType.JustSuccess,
+							persistedEntityIds,
+						}
+
+						this.eventManager.syncTransaction(() => this.accessorErrorManager.clearErrors())
+						break
+					} else {
+						this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationResponse.data))
+						await this.eventManager.triggerOnPersistError(persistErrorOptions)
+						if (shouldTryAgain) {
+							if (proposedBackOffs.length) {
+								const geometricMean = Math.round(
+									Math.pow(
+										proposedBackOffs.reduce((a, b) => a * b, 1),
+										1 / proposedBackOffs.length,
+									),
+								)
+								await new Promise(resolve => setTimeout(resolve, geometricMean))
+							}
+							continue
+						}
+						throw {
+							type: MutationErrorType.InvalidInput,
+						}
 					}
 				}
-			}
 
-			if (successfulResult === undefined) {
-				// Max attempts exceeded
-				throw new BindingError() // TODO msg
-			}
-			const result = successfulResult
-			this.isMutating = false
-			this.unpersistedChangesCount = 0
+				if (successfulResult === undefined) {
+					// Max attempts exceeded
+					throw new BindingError() // TODO msg
+				}
+				const result = successfulResult
+				this.dirtinessTracker.reset()
 
-			try {
-				const persistedData = await this.fetchNewPersistedData()
-				this.performSyncRootTreeOperation(() => {
-					this.updatePersistedData(persistedData)
-					this.triggerOnPersistSuccess({
+				try {
+					const persistedData = await this.fetchNewPersistedData()
+					this.eventManager.syncOperation(() => {
+						this.updatePersistedData(persistedData)
+						this.eventManager.triggerOnPersistSuccess({
+							...this.bindingOperations,
+							successType: result.type,
+							unstable_persistedEntityIds: result.persistedEntityIds,
+						})
+					})
+					return successfulResult
+				} catch {
+					this.eventManager.triggerOnPersistSuccess({
 						...this.bindingOperations,
 						successType: result.type,
 						unstable_persistedEntityIds: result.persistedEntityIds,
 					})
-				})
-				return successfulResult
-			} catch {
-				this.triggerOnPersistSuccess({
-					...this.bindingOperations,
-					successType: result.type,
-					unstable_persistedEntityIds: result.persistedEntityIds,
-				})
-				this.updateTreeRoot()
 
-				// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
-				// data made it successfully to the server. Thus we'll just resolve from here no matter what.
-				return successfulResult
-			}
+					// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
+					// data made it successfully to the server. Thus we'll just resolve from here no matter what.
+					return successfulResult
+				}
+			})
 		},
 	})
-
-	private readonly getNewTreeRootInstance = () =>
-		new TreeRootAccessor(this.unpersistedChangesCount !== 0, this.isMutating, this.bindingOperations)
 
 	// This is currently useless but potentially future-compatible
 	// private readonly addTreeRootEventListener: TreeRootAccessor.AddTreeRootEventListener = this.getAddEventListener(
 	// 	this.treeRootListeners,
 	// )
 
-	private isMutating = false
-	private isFrozenWhileUpdating = false
-	private treeWideBatchUpdateDepth = 0
-	private unpersistedChangesCount = 0
-
-	public constructor(private readonly markerTree: MarkerTreeRoot, private readonly client: GraphQlClient) {
+	public constructor(
+		private readonly markerTree: MarkerTreeRoot,
+		private readonly client: GraphQlClient,
+		private readonly onUpdate: (newData: TreeRootAccessor) => void,
+		private readonly onError: (error: RequestError) => void,
+	) {
+		this.config = new Config()
 		this.treeFilterGenerator = new TreeFilterGenerator(this.markerTree, this.subTreeStates)
 		this.accessorErrorManager = new AccessorErrorManager(this.subTreeStates, this.entityStore)
+		this.dirtinessTracker = new DirtinessTracker()
+		this.eventManager = new EventManager(
+			this.subTreeStates,
+			this.config,
+			this.dirtinessTracker,
+			this.bindingOperations,
+			this.onUpdate,
+			this.onError,
+		)
 	}
 
-	public async initializeLiveTree(
-		updateData: (newTree: TreeRootAccessor) => void,
-		yieldError: (error: RequestError) => void,
-	) {
-		this.updateData = updateData
-		this.yieldError = yieldError
-
+	public async initializeLiveTree() {
 		const persistedData = await this.fetchNewPersistedData()
 
 		this.persistedEntityData = persistedData.persistedEntityDataStore
@@ -337,12 +296,12 @@ export class AccessorTreeGenerator {
 			this.subTreeStates.set(placeholderName, subTreeState)
 		}
 
-		this.batchSyncTreeWideUpdates(() => this.triggerOnInitialize())
-		this.updateTreeRoot()
+		this.eventManager.triggerOnInitialize()
+		this.eventManager.updateTreeRoot()
 	}
 
 	private updatePersistedData(normalizedResponse: NormalizedQueryResponseData) {
-		this.performSyncRootTreeOperation(() => {
+		this.eventManager.syncOperation(() => {
 			this.persistedEntityData = normalizedResponse.persistedEntityDataStore
 
 			const alreadyProcessed: Set<InternalEntityState> = new Set()
@@ -381,11 +340,10 @@ export class AccessorTreeGenerator {
 					assertNever(subTreeState)
 				}
 			}
-			if (!didUpdateSomething) {
-				this.updateTreeRoot() // Still force an update, albeit without update events.
-			}
-
-			this.unpersistedChangesCount = 0
+			// TODO was this ever even necessary?
+			// if (!didUpdateSomething) {
+			// 	this.updateTreeRoot() // Still force an update, albeit without update events.
+			// }
 		})
 	}
 
@@ -633,59 +591,6 @@ export class AccessorTreeGenerator {
 		return didUpdate
 	}
 
-	private performSyncRootTreeOperation(operation: () => void) {
-		this.batchSyncTreeWideUpdates(operation)
-		this.flushUpdates()
-	}
-
-	private async performAsyncRootTreeOperation(operation: () => Promise<void>) {
-		await this.batchAsyncTreeWideUpdates(operation)
-		this.flushUpdates()
-	}
-
-	private batchSyncTreeWideUpdates(operation: () => void) {
-		this.treeWideBatchUpdateDepth++
-		operation()
-		this.treeWideBatchUpdateDepth--
-	}
-	private async batchAsyncTreeWideUpdates(operation: () => Promise<void>) {
-		this.treeWideBatchUpdateDepth++
-		await operation()
-		this.treeWideBatchUpdateDepth--
-	}
-
-	private flushUpdates() {
-		if (this.treeWideBatchUpdateDepth > 0) {
-			return
-		}
-
-		if (this.isFrozenWhileUpdating) {
-			throw new BindingError(
-				`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
-					`by updating the accessor tree during rendering or in the 'update' event handler, which is a no-op. ` +
-					`If you wish to mutate the tree in reaction to changes, use the 'beforeUpdate' event handler.`,
-			)
-		}
-
-		const rootsWithPendingUpdates = Array.from(this.subTreeStates.values()).filter(state => state.hasPendingUpdate)
-
-		if (!rootsWithPendingUpdates.length) {
-			return
-		}
-
-		ReactDOM.unstable_batchedUpdates(() => {
-			this.isFrozenWhileUpdating = true
-			this.triggerOnInitialize()
-			this.updateTreeRoot()
-			this.flushPendingAccessorUpdates(rootsWithPendingUpdates)
-			this.isFrozenWhileUpdating = false
-		})
-	}
-
-	private updateTreeRoot() {
-		this.updateData?.(this.getNewTreeRootInstance())
-	}
-
 	private initializeSubTree(
 		tree: SubTreeMarker,
 		persistedRootData: ServerGeneratedUuid | Set<string> | undefined,
@@ -908,9 +813,7 @@ export class AccessorTreeGenerator {
 			}
 			this.mergeInEntityFieldsContainer(existingEntityState, markersContainer)
 
-			if (Object.values(existingEntityState.eventListeners).filter(listeners => !!listeners).length) {
-				this.newlyInitializedWithListeners.add(existingEntityState)
-			}
+			this.eventManager.registerNewlyInitialized(existingEntityState)
 
 			return existingEntityState
 		}
@@ -1044,14 +947,14 @@ export class AccessorTreeGenerator {
 				}
 			},
 			batchUpdates: performUpdates => {
-				this.performSyncRootTreeOperation(() => {
+				this.eventManager.syncOperation(() => {
 					performOperationWithBeforeUpdate(() => {
 						batchUpdatesImplementation(performUpdates)
 					})
 				})
 			},
 			connectEntityAtField: (fieldName, entityToConnectOrItsKey) => {
-				this.performSyncRootTreeOperation(() => {
+				this.eventManager.syncOperation(() => {
 					performOperationWithBeforeUpdate(() => {
 						const hasOneMarkers = resolveHasOneRelationMarkers(
 							fieldName,
@@ -1079,9 +982,9 @@ export class AccessorTreeGenerator {
 							const persistedKey = entityState.persistedData?.get(hasOneMarker.placeholderName)
 							if (persistedKey instanceof ServerGeneratedUuid) {
 								if (persistedKey.value === connectedEntityKey) {
-									this.unpersistedChangesCount-- // It was removed from the list but now we're adding it back.
+									this.dirtinessTracker.decrement() // It was removed from the list but now we're adding it back.
 								} else if (persistedKey.value === previouslyConnectedState.id.value) {
-									this.unpersistedChangesCount++ // We're changing it from the persisted id.
+									this.dirtinessTracker.increment() // We're changing it from the persisted id.
 								}
 							} else if (!previouslyConnectedState.id.existsOnServer) {
 								// This assumes the invariant enforced above that we cannot connect unpersisted entities.
@@ -1092,7 +995,7 @@ export class AccessorTreeGenerator {
 									(persistedKey === undefined && // We're creating.
 										(!entityState.markersContainer.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing))
 								) {
-									this.unpersistedChangesCount++
+									this.dirtinessTracker.increment()
 								}
 							}
 
@@ -1111,7 +1014,7 @@ export class AccessorTreeGenerator {
 				})
 			},
 			disconnectEntityAtField: (fieldName, initializeReplacement) => {
-				this.performSyncRootTreeOperation(() => {
+				this.eventManager.syncOperation(() => {
 					performOperationWithBeforeUpdate(() => {
 						const hasOneMarkers = resolveHasOneRelationMarkers(
 							fieldName,
@@ -1130,7 +1033,7 @@ export class AccessorTreeGenerator {
 							const persistedKey = entityState.persistedData?.get(hasOneMarker.placeholderName)
 
 							if (persistedKey instanceof ServerGeneratedUuid && persistedKey.value === stateToDisconnect.id.value) {
-								this.unpersistedChangesCount++
+								this.dirtinessTracker.increment()
 							} else {
 								// Do nothing. Disconnecting unpersisted entities doesn't change the count.
 							}
@@ -1162,11 +1065,11 @@ export class AccessorTreeGenerator {
 				})
 			},
 			deleteEntity: () => {
-				this.performSyncRootTreeOperation(() => {
+				this.eventManager.syncOperation(() => {
 					// Deliberately not calling performOperationWithBeforeUpdate ‒ no beforeUpdate events after deletion
 					batchUpdatesImplementation(() => {
 						if (entityState.id.existsOnServer) {
-							this.unpersistedChangesCount++
+							this.dirtinessTracker.increment()
 						}
 						entityState.isScheduledForDeletion = true
 						entityState.hasPendingParentNotification = true
@@ -1182,7 +1085,7 @@ export class AccessorTreeGenerator {
 			entityState.typeName = typeName
 		}
 		if (creationParameters.forceCreation && !id.existsOnServer) {
-			this.unpersistedChangesCount++
+			this.dirtinessTracker.increment()
 		}
 
 		const batchUpdatesImplementation: EntityAccessor.BatchUpdates = performUpdates => {
@@ -1226,7 +1129,7 @@ export class AccessorTreeGenerator {
 				}
 
 				let currentAccessor: EntityAccessor
-				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
+				for (let i = 0; i < this.config.getValue('beforeUpdateSettleLimit'); i++) {
 					currentAccessor = getAccessor()
 					for (const listener of entityState.eventListeners.beforeUpdate) {
 						listener(getAccessor, this.bindingOperations)
@@ -1293,9 +1196,7 @@ export class AccessorTreeGenerator {
 
 		this.initializeEntityFields(entityState, markersContainer)
 
-		if (Object.values(entityState.eventListeners).filter(listeners => !!listeners).length) {
-			this.newlyInitializedWithListeners.add(entityState)
-		}
+		this.eventManager.registerNewlyInitialized(entityState)
 
 		return entityState
 	}
@@ -1366,14 +1267,14 @@ export class AccessorTreeGenerator {
 			addError: error =>
 				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			batchUpdates: performUpdates => {
-				this.performSyncRootTreeOperation(() => {
+				this.eventManager.syncOperation(() => {
 					performOperationWithBeforeUpdate(() => {
 						batchUpdatesImplementation(performUpdates)
 					})
 				})
 			},
 			connectEntity: entityToConnectOrItsKey => {
-				this.performSyncRootTreeOperation(() => {
+				this.eventManager.syncOperation(() => {
 					performOperationWithBeforeUpdate(() => {
 						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
 
@@ -1387,9 +1288,9 @@ export class AccessorTreeGenerator {
 
 						if (entityListState.persistedEntityIds.has(connectedEntityKey)) {
 							// It was removed from the list but now we're adding it back.
-							this.unpersistedChangesCount--
+							this.dirtinessTracker.decrement()
 						} else {
-							this.unpersistedChangesCount++
+							this.dirtinessTracker.increment()
 						}
 
 						entityListState.hasPendingParentNotification = true
@@ -1408,7 +1309,7 @@ export class AccessorTreeGenerator {
 			},
 			disconnectEntity: childEntityOrItsKey => {
 				// TODO disallow this if the EntityList is at the top level
-				this.performSyncRootTreeOperation(() => {
+				this.eventManager.syncOperation(() => {
 					performOperationWithBeforeUpdate(() => {
 						const disconnectedChildKey =
 							typeof childEntityOrItsKey === 'string' ? childEntityOrItsKey : childEntityOrItsKey.key
@@ -1437,10 +1338,10 @@ export class AccessorTreeGenerator {
 						}
 
 						if (entityListState.persistedEntityIds.has(disconnectedChildKey)) {
-							this.unpersistedChangesCount++
+							this.dirtinessTracker.increment()
 						} else {
 							// It wasn't on the list, then it was, and now we're removing it again.
-							this.unpersistedChangesCount--
+							this.dirtinessTracker.decrement()
 						}
 
 						entityListState.children.delete(disconnectedChildState)
@@ -1488,7 +1389,7 @@ export class AccessorTreeGenerator {
 				}
 
 				let currentAccessor: EntityListAccessor
-				for (let i = 0; i < BEFORE_UPDATE_SETTLE_LIMIT; i++) {
+				for (let i = 0; i < this.config.getValue('beforeUpdateSettleLimit'); i++) {
 					currentAccessor = getAccessor()
 					for (const listener of entityListState.eventListeners.beforeUpdate) {
 						listener(getAccessor, this.bindingOperations)
@@ -1603,7 +1504,7 @@ export class AccessorTreeGenerator {
 				newValue: Scalar | GraphQlBuilder.Literal,
 				{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
 			) => {
-				this.performSyncRootTreeOperation(() => {
+				this.eventManager.syncOperation(() => {
 					if (__DEV_MODE__) {
 						if (
 							placeholderName === PRIMARY_KEY_NAME &&
@@ -1662,9 +1563,9 @@ export class AccessorTreeGenerator {
 
 					if (shouldInfluenceUpdateCount) {
 						if (!hadUnpersistedChangesBefore && hasUnpersistedChangesNow) {
-							this.unpersistedChangesCount++
+							this.dirtinessTracker.increment()
 						} else if (hadUnpersistedChangesBefore && !hasUnpersistedChangesNow) {
-							this.unpersistedChangesCount--
+							this.dirtinessTracker.decrement()
 						}
 					}
 
@@ -1837,172 +1738,6 @@ export class AccessorTreeGenerator {
 		return subTreeState
 	}
 
-	private async triggerOnBeforePersist() {
-		return new Promise<void>(async resolve => {
-			await this.batchAsyncTreeWideUpdates(async () => {
-				const iNodeHasBeforePersist = (iNode: InternalEntityState | InternalEntityListState) =>
-					iNode.eventListeners.beforePersist !== undefined
-
-				// TODO if an entity from here (or its parent) gets deleted, we need to remove stale handlers from here.
-				const callbackQueue: Array<[
-					// The typings could be nicer but TS…
-					InternalEntityState | InternalEntityListState,
-					EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler,
-				]> = []
-
-				for (const [, subTreeState] of this.subTreeStates) {
-					for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
-						for (const listener of iNode.eventListeners.beforePersist!) {
-							callbackQueue.push([iNode, listener])
-						}
-					}
-				}
-				for (let waterfallDepth = 0; waterfallDepth < BEFORE_PERSIST_SETTLE_LIMIT; waterfallDepth++) {
-					const callbackReturns: Array<Promise<
-						EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler
-					>> = []
-					const correspondingStates: Array<InternalEntityState | InternalEntityListState> = []
-
-					for (const [state, callback] of callbackQueue) {
-						const changesCountBefore = this.unpersistedChangesCount
-						const result = callback(state.getAccessor as any, this.bindingOperations) // TS can't quite handle this but this is sound.
-						const changesCountAfter = this.unpersistedChangesCount
-
-						if (result instanceof Promise) {
-							if (__DEV_MODE__) {
-								if (changesCountBefore !== changesCountAfter) {
-									// This isn't bulletproof. They could e.g. undo a change and make another one which would
-									// slip through this detection. But for most cases, it should be good enough and not too expensive.
-									throw new BindingError(
-										`A beforePersist event handler cannot be asynchronous and alter the accessor tree at the same time. ` +
-											`To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.`,
-									)
-								}
-							}
-
-							callbackReturns.push(result)
-							correspondingStates.push(state)
-						}
-					}
-					const newCallbacks = await Promise.allSettled(callbackReturns)
-
-					callbackQueue.length = 0
-
-					// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
-					for (const state of this.newlyInitializedWithListeners) {
-						if (state.eventListeners.beforePersist) {
-							for (const listener of state.eventListeners.beforePersist) {
-								callbackQueue.push([state, listener])
-							}
-						}
-					}
-
-					this.triggerOnInitialize()
-
-					for (let i = 0; i < newCallbacks.length; i++) {
-						const result = newCallbacks[i]
-						const correspondingState = correspondingStates[i]
-
-						if (result.status === 'fulfilled') {
-							callbackQueue.push([correspondingState as any, result.value])
-						} else {
-							// We just silently stop.
-							// That's NOT ideal but what else exactly do we do so that it's even remotely recoverable?
-							if (__DEV_MODE__) {
-								throw new BindingError(
-									`A beforePersist handler returned a promise that rejected. ` +
-										`This is a no-op that will fail silently in production.`,
-								)
-							}
-						}
-					}
-				}
-				if (__DEV_MODE__) {
-					if (callbackQueue.length) {
-						throw new BindingError(
-							`Exceeded the beforePersist settle limit. Your code likely contains a deadlock. ` +
-								`If that's not the case, raise the settle limit from DataBindingProvider.`,
-						)
-					}
-				}
-			})
-			resolve()
-		})
-	}
-
-	private triggerOnInitialize(): boolean {
-		let hasOnInitialize = false
-
-		this.batchSyncTreeWideUpdates(() => {
-			for (const state of this.newlyInitializedWithListeners) {
-				if (state.eventListeners.initialize) {
-					for (const listener of state.eventListeners.initialize) {
-						listener(state.getAccessor as any, this.bindingOperations)
-						hasOnInitialize = true
-					}
-				}
-				if (state.type === InternalStateType.SingleEntity) {
-					state.hasIdSetInStone = true
-				}
-			}
-		})
-		this.newlyInitializedWithListeners.clear()
-
-		return hasOnInitialize
-	}
-
-	private async triggerOnPersistError(options: PersistErrorOptions) {
-		return new Promise<void>(async resolve => {
-			await this.batchAsyncTreeWideUpdates(async () => {
-				const iNodeHasPersistErrorHandler = (iNode: InternalEntityState | InternalEntityListState) =>
-					iNode.eventListeners.persistError !== undefined
-
-				const handlerPromises: Array<Promise<void>> = []
-
-				for (const [, subTreeState] of this.subTreeStates) {
-					for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasPersistErrorHandler)) {
-						for (const listener of iNode.eventListeners.persistError!) {
-							const result = listener(iNode.getAccessor as any, options)
-
-							if (result instanceof Promise) {
-								handlerPromises.push(result)
-							}
-						}
-					}
-				}
-
-				const handlerResults = await Promise.allSettled(handlerPromises)
-
-				if (__DEV_MODE__) {
-					for (const result of handlerResults) {
-						if (result.status === 'rejected') {
-							throw new BindingError(
-								`A persistError handler returned a promise that rejected. ` +
-									`This is a no-op that will fail silently in production.`,
-							)
-						}
-					}
-				}
-				return resolve()
-			})
-		})
-	}
-
-	private triggerOnPersistSuccess(options: PersistSuccessOptions) {
-		this.batchSyncTreeWideUpdates(() => {
-			const iNodeHasPersistSuccessHandler = (iNode: InternalEntityState | InternalEntityListState) =>
-				iNode.eventListeners.persistSuccess !== undefined
-
-			for (const [, subTreeState] of this.subTreeStates) {
-				for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasPersistSuccessHandler)) {
-					for (const listener of iNode.eventListeners.persistSuccess!) {
-						listener(iNode.getAccessor as any, options)
-					}
-				}
-			}
-		})
-	}
-
 	private getAddEventListener(state: {
 		eventListeners: {
 			[eventType: string]: Set<Function> | undefined
@@ -2025,60 +1760,6 @@ export class AccessorTreeGenerator {
 		}
 	}
 
-	private flushPendingAccessorUpdates(rootStates: Array<InternalEntityState | InternalEntityListState>) {
-		// It is *CRUCIAL* that this is a BFS so that we update the components in top-down order.
-		const agenda: InternalStateNode[] = rootStates
-
-		for (const state of agenda) {
-			if (!state.hasPendingUpdate) {
-				continue
-			}
-			state.hasPendingUpdate = false
-
-			if (state.eventListeners.update !== undefined) {
-				//console.log(state)
-				for (const handler of state.eventListeners.update) {
-					// TS can't quite handle the polymorphism here but this is fine.
-					handler(state.getAccessor() as any)
-				}
-			}
-			if (
-				state.type === InternalStateType.SingleEntity &&
-				state.fieldsWithPendingConnectionUpdates &&
-				state.eventListeners.connectionUpdate
-			) {
-				for (const updatedField of state.fieldsWithPendingConnectionUpdates) {
-					const listenersMap = state.eventListeners.connectionUpdate
-					const listeners = listenersMap.get(updatedField)
-					if (!listeners) {
-						continue
-					}
-					for (const listener of listeners) {
-						listener(state.getAccessor())
-					}
-				}
-			}
-
-			switch (state.type) {
-				case InternalStateType.SingleEntity:
-				case InternalStateType.EntityList: {
-					if (state.childrenWithPendingUpdates !== undefined) {
-						for (const childState of state.childrenWithPendingUpdates) {
-							agenda.push(childState)
-						}
-						state.childrenWithPendingUpdates = undefined
-					}
-					break
-				}
-				case InternalStateType.Field:
-					// Do nothing
-					break
-				default:
-					assertNever(state)
-			}
-		}
-	}
-
 	private async fetchNewPersistedData(): Promise<NormalizedQueryResponseData> {
 		const queryGenerator = new QueryGenerator(this.markerTree)
 		const query = queryGenerator.getReadQuery()
@@ -2088,7 +1769,7 @@ export class AccessorTreeGenerator {
 		try {
 			queryResponse = query === undefined ? undefined : await this.client.sendRequest(query)
 		} catch (metadata) {
-			this.yieldError?.(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
+			this.onError(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
 		}
 		return QueryResponseNormalizer.normalizeResponse(queryResponse)
 	}

@@ -207,9 +207,7 @@ export const withPaste: <E extends EditorNode>(
 			} else {
 				return insertData(data)
 			}
-		}
+		},
 	}
 	Object.assign(editorWithEssentials, impl)
-
-
 }

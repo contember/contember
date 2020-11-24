@@ -36,7 +36,6 @@ export interface WithEssentials<E extends EditorNode> {
 	onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
 	onFocus: (event: React.FocusEvent<HTMLDivElement>) => void
 	onBlur: (event: React.FocusEvent<HTMLDivElement>) => void
-
 }
 
 export type EditorWithEssentials<E extends EditorNode> = WithEssentials<E> & WithPaste & EditorNode

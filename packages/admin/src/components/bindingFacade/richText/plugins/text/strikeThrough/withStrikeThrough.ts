@@ -28,7 +28,6 @@ export const withStrikeThrough = <E extends BaseEditor>(editor: E): E => {
 		onKeyDown(event)
 	}
 
-
 	editor.processAttributesPaste = (element, cta) => {
 		if (element.style.textDecoration) {
 			cta[strikeThroughMark] = element.style.textDecoration === 'line-through'

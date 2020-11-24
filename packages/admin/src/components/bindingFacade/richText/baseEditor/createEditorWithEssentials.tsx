@@ -125,7 +125,6 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		},
 		onFocus: () => {},
 		onBlur: () => {},
-
 	})
 
 	overrideDeleteBackward(editorWithEssentials)

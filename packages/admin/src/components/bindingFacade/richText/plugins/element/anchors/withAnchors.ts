@@ -10,7 +10,7 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 	type BaseAnchorEditor = WithAnotherNodeType<E, AnchorElement>
 
 	const e: E & Partial<WithAnchors<BaseAnchorEditor>> = editor
-	const { isInline, insertText, insertData, renderElement, toggleElement, isElementActive } = editor
+	const { isInline, insertText, insertData, renderElement, toggleElement, isElementActive, processInlinePaste } = editor
 
 	const isAnchor = (element: SlateNode | ElementNode): element is AnchorElement => element.type === anchorElementType
 	const isAnchorActive = (editor: BaseAnchorEditor) => {
@@ -100,23 +100,20 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 		}
 	}
 
-	e.pastePlugins.push({
-		inlineProcessors: [
-			(element, next, cumulativeTextAttrs) => {
-				if (element.tagName === 'A' && element.getAttribute('href')) {
-					const href = element.getAttribute('href')
+	editor.processInlinePaste = (element, next, cumulativeTextAttrs) => {
+		if (element.tagName === 'A' && element.getAttribute('href')) {
+			const href = element.getAttribute('href')
 
-					return [
-						{
-							type: 'anchor',
-							href,
-							children: next(element.childNodes, cumulativeTextAttrs),
-						},
-					]
-				}
-			},
-		],
-	})
+			return [
+				{
+					type: 'anchor',
+					href,
+					children: next(element.childNodes, cumulativeTextAttrs),
+				},
+			]
+		}
+		return processInlinePaste(element, next, cumulativeTextAttrs)
+	}
 
 	return (e as unknown) as EditorWithAnchors<E>
 }

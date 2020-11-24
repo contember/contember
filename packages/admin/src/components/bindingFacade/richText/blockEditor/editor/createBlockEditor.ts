@@ -24,7 +24,6 @@ import { overrideNormalizeNode, OverrideNormalizeNodeOptions } from './overrideN
 import { overrideOnKeyDown } from './overrideOnKeyDown'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
-import { overridePaste } from './overridePaste'
 import * as Slate from 'slate'
 
 export interface CreateEditorOptions
@@ -68,7 +67,6 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			overrideCreateElementReference(e, options)
 			overrideInsertBreak(e, options)
 			overrideInsertData(e, options)
-			overridePaste(e, options)
 			overrideInsertElementWithReference(e, options)
 			overrideInsertNode(e)
 			overrideIsVoid(e)

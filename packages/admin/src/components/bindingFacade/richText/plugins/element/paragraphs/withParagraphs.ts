@@ -8,7 +8,7 @@ import { ParagraphRenderer, ParagraphRendererProps } from './ParagraphRenderer'
 
 export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParagraphs<E> => {
 	const e: E & Partial<WithParagraphs<WithAnotherNodeType<E, ParagraphElement>>> = editor
-	const { renderElement, toggleElement, deleteBackward } = editor
+	const { renderElement, toggleElement, deleteBackward, processBlockPaste } = editor
 
 	const isParagraph = (
 		element: ElementNode | SlateNode,
@@ -79,15 +79,12 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 		)
 	}
 
-	e.pastePlugins.push({
-		blockProcessors: [
-			(element, next, cumulativeTextAttrs) => {
-				if (element.nodeName === 'P') {
-					return { type: 'paragraph', children: next(element.childNodes, cumulativeTextAttrs) }
-				}
-			},
-		],
-	})
+	e.processBlockPaste = (element, next, cumulativeTextAttrs) => {
+		if (element.nodeName === 'P') {
+			return { type: 'paragraph', children: next(element.childNodes, cumulativeTextAttrs) }
+		}
+		return processBlockPaste(element, next, cumulativeTextAttrs)
+	}
 
 	return e as EditorWithParagraphs<E>
 }

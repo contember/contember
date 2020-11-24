@@ -1609,7 +1609,11 @@ export class AccessorTreeGenerator {
 			) => {
 				this.performSyncRootTreeOperation(() => {
 					if (__DEV_MODE__) {
-						if (placeholderName === PRIMARY_KEY_NAME && newValue !== fieldState.value) {
+						if (
+							placeholderName === PRIMARY_KEY_NAME &&
+							newValue !== fieldState.value &&
+							fieldState.touchLog !== undefined
+						) {
 							throw new BindingError(
 								`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n` +
 									`Once set, it is immutable.`,

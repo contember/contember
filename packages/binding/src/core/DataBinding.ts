@@ -55,21 +55,22 @@ import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
 import { EventManager } from './EventManager'
-import {
-	InternalEntityListState,
-	InternalEntityState,
-	InternalFieldState,
-	InternalRootStateNode,
-	InternalStateNode,
-	InternalStateType,
-	OnEntityListUpdate,
-	OnEntityUpdate,
-	OnFieldUpdate,
-} from './internalState'
 import { MarkerMerger } from './MarkerMerger'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
+import {
+	EntityListState,
+	EntityState,
+	FieldState,
+	OnEntityListUpdate,
+	OnEntityUpdate,
+	OnFieldUpdate,
+	RootStateNode,
+	StateINode,
+	StateNode,
+	StateType,
+} from './state'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
@@ -86,8 +87,8 @@ export class DataBinding {
 	//  This could theoretically also be intentional given that both operations happen relatively infrequently,
 	//  or at least rarely enough that we could potentially just ignore the problem (which we're doing now).
 	//  Nevertheless, no real analysis has been done and it could turn out to be a problem.
-	private entityStore: Map<string, InternalEntityState> = new Map()
-	private subTreeStates: Map<string, InternalRootStateNode> = new Map()
+	private entityStore: Map<string, EntityState> = new Map()
+	private subTreeStates: Map<string, RootStateNode> = new Map()
 
 	// private treeRootListeners: {
 	// 	eventListeners: {}
@@ -304,13 +305,13 @@ export class DataBinding {
 		this.eventManager.syncOperation(() => {
 			this.persistedEntityData = normalizedResponse.persistedEntityDataStore
 
-			const alreadyProcessed: Set<InternalEntityState> = new Set()
+			const alreadyProcessed: Set<EntityState> = new Set()
 
 			let didUpdateSomething = false
 			for (const [subTreePlaceholder, subTreeState] of this.subTreeStates) {
 				const newSubTreeData = normalizedResponse.subTreeDataStore.get(subTreePlaceholder)
 
-				if (subTreeState.type === InternalStateType.SingleEntity) {
+				if (subTreeState.type === StateType.SingleEntity) {
 					if (newSubTreeData instanceof ServerGeneratedUuid) {
 						if (newSubTreeData.value === subTreeState.id.value) {
 							didUpdateSomething =
@@ -331,7 +332,7 @@ export class DataBinding {
 							didUpdateSomething = true
 						}
 					}
-				} else if (subTreeState.type === InternalStateType.EntityList) {
+				} else if (subTreeState.type === StateType.EntityList) {
 					if (newSubTreeData instanceof Set) {
 						didUpdateSomething =
 							didUpdateSomething || this.updateEntityListPersistedData(alreadyProcessed, subTreeState, newSubTreeData)
@@ -348,8 +349,8 @@ export class DataBinding {
 	}
 
 	private updateSingleEntityPersistedData(
-		alreadyProcessed: Set<InternalEntityState>,
-		state: InternalEntityState,
+		alreadyProcessed: Set<EntityState>,
+		state: EntityState,
 		newPersistedId: ServerGeneratedUuid,
 	): boolean {
 		if (alreadyProcessed.has(state)) {
@@ -374,7 +375,7 @@ export class DataBinding {
 
 		if (state.childrenWithPendingUpdates) {
 			for (const child of state.childrenWithPendingUpdates) {
-				if (child.type === InternalStateType.SingleEntity && !child.id.existsOnServer) {
+				if (child.type === StateType.SingleEntity && !child.id.existsOnServer) {
 					state.childrenWithPendingUpdates.delete(child) // We should delete it completely.
 					didUpdate = true
 				}
@@ -388,7 +389,7 @@ export class DataBinding {
 			const newFieldDatum = newPersistedData?.get(fieldPlaceholder)
 
 			switch (fieldState.type) {
-				case InternalStateType.Field: {
+				case StateType.Field: {
 					if (!(newFieldDatum instanceof Set) && !(newFieldDatum instanceof ServerGeneratedUuid)) {
 						if (fieldState.persistedValue !== newFieldDatum) {
 							fieldState.persistedValue = newFieldDatum
@@ -400,7 +401,7 @@ export class DataBinding {
 					}
 					break
 				}
-				case InternalStateType.SingleEntity: {
+				case StateType.SingleEntity: {
 					const marker = state.markersContainer.markers.get(fieldPlaceholder)
 
 					if (!(marker instanceof HasOneRelationMarker)) {
@@ -451,7 +452,7 @@ export class DataBinding {
 
 					break
 				}
-				case InternalStateType.EntityList: {
+				case StateType.EntityList: {
 					if (newFieldDatum instanceof Set || newFieldDatum === undefined) {
 						didChildUpdate = this.updateEntityListPersistedData(
 							alreadyProcessed,
@@ -485,8 +486,8 @@ export class DataBinding {
 	}
 
 	private updateEntityListPersistedData(
-		alreadyProcessed: Set<InternalEntityState>,
-		state: InternalEntityListState,
+		alreadyProcessed: Set<EntityState>,
+		state: EntityListState,
 		newPersistedData: Set<string>,
 	): boolean {
 		let didUpdate = false
@@ -594,8 +595,8 @@ export class DataBinding {
 	private initializeSubTree(
 		tree: SubTreeMarker,
 		persistedRootData: ServerGeneratedUuid | Set<string> | undefined,
-	): InternalRootStateNode {
-		let subTreeState: InternalEntityState | InternalEntityListState
+	): RootStateNode {
+		let subTreeState: RootStateNode
 
 		if (tree.parameters.type === 'qualifiedEntityList' || tree.parameters.type === 'unconstrainedQualifiedEntityList') {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
@@ -624,7 +625,7 @@ export class DataBinding {
 	}
 
 	private initializeFromFieldMarker(
-		entityState: InternalEntityState,
+		entityState: EntityState,
 		field: FieldMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
 	) {
@@ -650,7 +651,7 @@ export class DataBinding {
 	}
 
 	private initializeFromHasOneRelationMarker(
-		entityState: InternalEntityState,
+		entityState: EntityState,
 		field: HasOneRelationMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
 	) {
@@ -681,7 +682,7 @@ export class DataBinding {
 	}
 
 	private initializeFromHasManyRelationMarker(
-		entityState: InternalEntityState,
+		entityState: EntityState,
 		field: HasManyRelationMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
 	) {
@@ -714,10 +715,7 @@ export class DataBinding {
 		}
 	}
 
-	private initializeEntityFields(
-		entityState: InternalEntityState,
-		markersContainer: EntityFieldMarkersContainer,
-	): void {
+	private initializeEntityFields(entityState: EntityState, markersContainer: EntityFieldMarkersContainer): void {
 		for (const [placeholderName, field] of markersContainer.markers) {
 			const fieldDatum = entityState.persistedData?.get(placeholderName)
 			if (field instanceof FieldMarker) {
@@ -735,7 +733,7 @@ export class DataBinding {
 	}
 
 	private mergeInEntityFieldsContainer(
-		existingEntityState: InternalEntityState,
+		existingEntityState: EntityState,
 		newMarkersContainer: EntityFieldMarkersContainer,
 	): void {
 		for (const [placeholderName, field] of newMarkersContainer.markers) {
@@ -746,18 +744,18 @@ export class DataBinding {
 				// Merge markers but don't re-initialize the state. It shouldn't be needed.
 				if (fieldState === undefined) {
 					this.initializeFromFieldMarker(existingEntityState, field, fieldDatum)
-				} else if (fieldState.type === InternalStateType.Field) {
+				} else if (fieldState.type === StateType.Field) {
 					fieldState.fieldMarker = MarkerMerger.mergeFieldMarkers(fieldState.fieldMarker, field)
 				}
 			} else if (field instanceof HasOneRelationMarker) {
-				if (fieldState === undefined || fieldState.type === InternalStateType.SingleEntity) {
+				if (fieldState === undefined || fieldState.type === StateType.SingleEntity) {
 					// This method calls initializeEntityAccessor which handles the merging on its own.
 					this.initializeFromHasOneRelationMarker(existingEntityState, field, fieldDatum)
 				}
 			} else if (field instanceof HasManyRelationMarker) {
 				if (fieldState === undefined) {
 					this.initializeFromHasManyRelationMarker(existingEntityState, field, fieldDatum)
-				} else if (fieldState.type === InternalStateType.EntityList) {
+				} else if (fieldState.type === StateType.EntityList) {
 					for (const childState of fieldState.children) {
 						this.initializeEntityAccessor(
 							childState.id,
@@ -788,7 +786,7 @@ export class DataBinding {
 		creationParameters: EntityCreationParameters,
 		onEntityUpdate: OnEntityUpdate,
 		initialEventListeners: SingleEntityEventListeners | undefined,
-	): InternalEntityState {
+	): EntityState {
 		const entityKey = id.value
 		const existingEntityState = this.entityStore.get(entityKey)
 
@@ -818,8 +816,8 @@ export class DataBinding {
 			return existingEntityState
 		}
 
-		const entityState: InternalEntityState = {
-			type: InternalStateType.SingleEntity,
+		const entityState: EntityState = {
+			type: StateType.SingleEntity,
 			batchUpdateDepth: 0,
 			fieldsWithPendingConnectionUpdates: undefined,
 			childrenWithPendingUpdates: undefined,
@@ -866,10 +864,10 @@ export class DataBinding {
 					return accessor
 				}
 			})(),
-			onChildFieldUpdate: (updatedState: InternalStateNode) => {
+			onChildFieldUpdate: (updatedState: StateNode) => {
 				// No before update for child updates!
 				batchUpdatesImplementation(() => {
-					if (updatedState.type === InternalStateType.Field && updatedState.placeholderName === PRIMARY_KEY_NAME) {
+					if (updatedState.type === StateType.Field && updatedState.placeholderName === PRIMARY_KEY_NAME) {
 						if (entityState.id.existsOnServer) {
 							throw new BindingError(
 								`Trying to change the id of an entity that already exists on the server. ` +
@@ -889,15 +887,12 @@ export class DataBinding {
 						this.entityStore.delete(previousKey)
 						this.entityStore.set(newKey, entityState)
 					}
-					if (
-						updatedState.type === InternalStateType.SingleEntity &&
-						updatedState.maidenKey !== updatedState.id.value
-					) {
+					if (updatedState.type === StateType.SingleEntity && updatedState.maidenKey !== updatedState.id.value) {
 						const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, updatedState)
 						this.markPendingConnections(entityState, relevantPlaceholders)
 					}
 
-					if (updatedState.type === InternalStateType.SingleEntity && updatedState.isScheduledForDeletion) {
+					if (updatedState.type === StateType.SingleEntity && updatedState.isScheduledForDeletion) {
 						processEntityDeletion(updatedState)
 					} else {
 						this.markChildStateInNeedOfUpdate(entityState, updatedState)
@@ -963,10 +958,7 @@ export class DataBinding {
 						for (const hasOneMarker of hasOneMarkers) {
 							const previouslyConnectedState = entityState.fields.get(hasOneMarker.placeholderName)
 
-							if (
-								previouslyConnectedState === undefined ||
-								previouslyConnectedState.type !== InternalStateType.SingleEntity
-							) {
+							if (previouslyConnectedState === undefined || previouslyConnectedState.type !== StateType.SingleEntity) {
 								this.rejectInvalidAccessorTree()
 							}
 
@@ -1026,7 +1018,7 @@ export class DataBinding {
 							if (stateToDisconnect === undefined) {
 								throw new BindingError(`Cannot disconnect field '${hasOneMarker.placeholderName}' as it doesn't exist.`)
 							}
-							if (stateToDisconnect.type !== InternalStateType.SingleEntity) {
+							if (stateToDisconnect.type !== StateType.SingleEntity) {
 								this.rejectInvalidAccessorTree()
 							}
 
@@ -1145,7 +1137,7 @@ export class DataBinding {
 			})
 		}
 
-		const processEntityDeletion = (deletedState: InternalEntityState) => {
+		const processEntityDeletion = (deletedState: EntityState) => {
 			const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, deletedState)
 
 			if (deletedState.id.existsOnServer) {
@@ -1208,9 +1200,9 @@ export class DataBinding {
 		onEntityListUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
 		initialEventListeners: EntityListEventListeners | undefined,
-	): InternalEntityListState {
-		const entityListState: InternalEntityListState = {
-			type: InternalStateType.EntityList,
+	): EntityListState {
+		const entityListState: EntityListState = {
+			type: StateType.EntityList,
 			creationParameters,
 			markersContainer,
 			onEntityListUpdate,
@@ -1249,7 +1241,7 @@ export class DataBinding {
 				}
 			})(),
 			onChildEntityUpdate: updatedState => {
-				if (updatedState.type !== InternalStateType.SingleEntity) {
+				if (updatedState.type !== StateType.SingleEntity) {
 					throw new BindingError(`Illegal entity list value.`)
 				}
 
@@ -1405,7 +1397,7 @@ export class DataBinding {
 			})
 		}
 
-		const processEntityDeletion = (stateForDeletion: InternalEntityState) => {
+		const processEntityDeletion = (stateForDeletion: EntityState) => {
 			// We don't remove entities from the store so as to allow their re-connection.
 			entityListState.childrenWithPendingUpdates?.delete(stateForDeletion)
 
@@ -1423,7 +1415,7 @@ export class DataBinding {
 			entityListState.plannedRemovals.set(stateForDeletion, 'delete')
 		}
 
-		const generateNewEntityState = (persistedId: string | undefined): InternalEntityState => {
+		const generateNewEntityState = (persistedId: string | undefined): EntityState => {
 			const id = persistedId === undefined ? new UnpersistedEntityKey() : new ServerGeneratedUuid(persistedId)
 
 			const entityState = this.initializeEntityAccessor(
@@ -1457,11 +1449,11 @@ export class DataBinding {
 		fieldMarker: FieldMarker,
 		onFieldUpdate: OnFieldUpdate,
 		persistedValue: Scalar | undefined,
-	): InternalFieldState {
+	): FieldState {
 		const resolvedFieldValue = persistedValue ?? fieldMarker.defaultValue ?? null
 
-		const fieldState: InternalFieldState = {
-			type: InternalStateType.Field,
+		const fieldState: FieldState = {
+			type: StateType.Field,
 			fieldMarker,
 			onFieldUpdate,
 			placeholderName,
@@ -1593,22 +1585,16 @@ export class DataBinding {
 		)
 	}
 
-	private markChildStateInNeedOfUpdate(
-		entityListState: InternalEntityListState,
-		updatedState: InternalEntityState,
-	): void
-	private markChildStateInNeedOfUpdate(entityState: InternalEntityState, updatedState: InternalStateNode): void
-	private markChildStateInNeedOfUpdate(
-		state: InternalEntityListState | InternalEntityState,
-		updatedState: InternalStateNode,
-	): void {
+	private markChildStateInNeedOfUpdate(entityListState: EntityListState, updatedState: EntityState): void
+	private markChildStateInNeedOfUpdate(entityState: EntityState, updatedState: StateNode): void
+	private markChildStateInNeedOfUpdate(state: StateINode, updatedState: StateNode): void {
 		if (state.childrenWithPendingUpdates === undefined) {
 			state.childrenWithPendingUpdates = new Set()
 		}
-		state.childrenWithPendingUpdates.add(updatedState as InternalEntityState)
+		state.childrenWithPendingUpdates.add(updatedState as EntityState)
 	}
 
-	private findChildPlaceholdersByState(containingState: InternalEntityState, childState: InternalStateNode) {
+	private findChildPlaceholdersByState(containingState: EntityState, childState: StateNode) {
 		const relevantPlaceholders = new Set<FieldName>()
 
 		// All has one relations where this entity is present.
@@ -1622,7 +1608,7 @@ export class DataBinding {
 	}
 
 	private runImmediateUserInitialization(
-		newEntityState: InternalEntityState,
+		newEntityState: EntityState,
 		initialize: EntityAccessor.BatchUpdatesHandler | undefined,
 	) {
 		newEntityState.hasIdSetInStone = false
@@ -1633,7 +1619,7 @@ export class DataBinding {
 		}
 	}
 
-	private markPendingConnections(parentState: InternalEntityState, connectionPlaceholders: Set<FieldName>) {
+	private markPendingConnections(parentState: EntityState, connectionPlaceholders: Set<FieldName>) {
 		if (parentState.fieldsWithPendingConnectionUpdates === undefined) {
 			parentState.fieldsWithPendingConnectionUpdates = new Set()
 		}
@@ -1656,9 +1642,7 @@ export class DataBinding {
 		}
 	}
 
-	private resolveAndPrepareEntityToConnect(
-		entityToConnectOrItsKey: string | EntityAccessor,
-	): [string, InternalEntityState] {
+	private resolveAndPrepareEntityToConnect(entityToConnectOrItsKey: string | EntityAccessor): [string, EntityState] {
 		let connectedEntityKey: string
 
 		if (typeof entityToConnectOrItsKey === 'string') {
@@ -1690,7 +1674,7 @@ export class DataBinding {
 	}
 
 	private getEventListenersForListEntity(
-		containingListState: InternalEntityListState,
+		containingListState: EntityListState,
 		additionalMarker?: HasManyRelationMarker,
 	): SingleEntityEventListeners {
 		const create = (base: {
@@ -1717,7 +1701,7 @@ export class DataBinding {
 		}
 	}
 
-	private getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): InternalRootStateNode {
+	private getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): RootStateNode {
 		let placeholderName: string
 
 		if (typeof aliasOrParameters === 'string') {

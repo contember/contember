@@ -3,20 +3,20 @@ import { SingleEntityPersistedData } from '../../accessorTree'
 import { Environment } from '../../dao'
 import { EntityFieldMarkersContainer } from '../../markers'
 import { EntityCreationParameters, FieldName, SingleEntityEventListeners } from '../../treeParameters'
-import { InternalStateNode } from './InternalStateNode'
-import { InternalStateType } from './InternalStateType'
+import { StateNode } from './StateNode'
+import { StateType } from './StateType'
 
-export type OnEntityUpdate = (state: InternalStateNode) => void
-export type OnEntityFieldUpdate = (state: InternalStateNode) => void
-export interface InternalEntityState {
-	type: InternalStateType.SingleEntity
+export type OnEntityUpdate = (state: StateNode) => void
+export type OnEntityFieldUpdate = (state: StateNode) => void
+export interface EntityState {
+	type: StateType.SingleEntity
 	eventListeners: SingleEntityEventListeners['eventListeners']
 	environment: Environment
 	batchUpdateDepth: number
-	childrenWithPendingUpdates: Set<InternalStateNode> | undefined
+	childrenWithPendingUpdates: Set<StateNode> | undefined
 	creationParameters: EntityCreationParameters
 	errors: ErrorAccessor | undefined
-	fields: Map<FieldName, InternalStateNode>
+	fields: Map<FieldName, StateNode>
 	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
 	getAccessor: () => EntityAccessor
 	hasIdSetInStone: boolean // Initially, ids may be changed but only up to a certain point. This marks that point.
@@ -29,7 +29,7 @@ export interface InternalEntityState {
 	maidenKey: string | undefined // undefined for persisted entities
 	markersContainer: EntityFieldMarkersContainer
 	persistedData: SingleEntityPersistedData | undefined
-	plannedHasOneDeletions: Map<FieldName, InternalEntityState> | undefined
+	plannedHasOneDeletions: Map<FieldName, EntityState> | undefined
 
 	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
 	// completely different contexts. Even with different fields.

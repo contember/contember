@@ -12,21 +12,15 @@ import {
 } from '../markers'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
-import {
-	InternalEntityListState,
-	InternalEntityState,
-	InternalFieldState,
-	InternalRootStateNode,
-	InternalStateType,
-} from './internalState'
+import { EntityListState, EntityState, FieldState, RootStateNode, StateType } from './state'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
-type ProcessedEntities = Set<InternalEntityState>
+type ProcessedEntities = Set<EntityState>
 
 // TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
-	public constructor(private markerTree: MarkerTreeRoot, private allSubTrees: Map<string, InternalRootStateNode>) {}
+	public constructor(private markerTree: MarkerTreeRoot, private allSubTrees: Map<string, RootStateNode>) {}
 
 	public getPersistMutation(): string | undefined {
 		try {
@@ -50,12 +44,12 @@ export class MutationGenerator {
 
 	private addSubMutation(
 		processedEntities: ProcessedEntities,
-		rootState: InternalRootStateNode,
+		rootState: RootStateNode,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder,
 	): QueryBuilder {
-		if (rootState.type === InternalStateType.SingleEntity) {
+		if (rootState.type === StateType.SingleEntity) {
 			if (rootState.isScheduledForDeletion) {
 				queryBuilder = this.addDeleteMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			} else if (!rootState.getAccessor().existsOnServer) {
@@ -63,7 +57,7 @@ export class MutationGenerator {
 			} else {
 				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			}
-		} else if (rootState.type === InternalStateType.EntityList) {
+		} else if (rootState.type === StateType.EntityList) {
 			for (const childState of rootState.children) {
 				queryBuilder = this.addSubMutation(
 					processedEntities,
@@ -97,7 +91,7 @@ export class MutationGenerator {
 
 	private addDeleteMutation(
 		processedEntities: ProcessedEntities,
-		entityState: InternalEntityState,
+		entityState: EntityState,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder?: QueryBuilder,
@@ -131,7 +125,7 @@ export class MutationGenerator {
 
 	private addUpdateMutation(
 		processedEntities: ProcessedEntities,
-		entityState: InternalEntityState,
+		entityState: EntityState,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder?: QueryBuilder,
@@ -173,7 +167,7 @@ export class MutationGenerator {
 
 	private addCreateMutation(
 		processedEntities: ProcessedEntities,
-		entityState: InternalEntityState,
+		entityState: EntityState,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder?: QueryBuilder,
@@ -219,7 +213,7 @@ export class MutationGenerator {
 
 	private registerCreateMutationPart(
 		processedEntities: ProcessedEntities,
-		currentState: InternalEntityState,
+		currentState: EntityState,
 		builder: CrudQueryBuilder.WriteDataBuilder<
 			CrudQueryBuilder.WriteOperation.Create
 		> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
@@ -231,9 +225,9 @@ export class MutationGenerator {
 
 		// It shouldn't
 		const nonbearingFields: Array<
-			| { type: 'field'; marker: FieldMarker; fieldState: InternalFieldState }
-			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: InternalEntityState }
-			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: InternalEntityListState }
+			| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
+			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityState }
+			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
 		> = []
 
 		for (const [placeholderName, marker] of currentState.markersContainer.markers) {
@@ -250,7 +244,7 @@ export class MutationGenerator {
 			}
 
 			if (marker instanceof FieldMarker) {
-				if (fieldState.type !== InternalStateType.Field) {
+				if (fieldState.type !== StateType.Field) {
 					continue
 				}
 				if (marker.isNonbearing) {
@@ -263,7 +257,7 @@ export class MutationGenerator {
 				}
 				builder = this.registerCreateFieldPart(fieldState, marker, builder)
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState.type !== InternalStateType.SingleEntity) {
+				if (fieldState.type !== StateType.SingleEntity) {
 					continue
 				}
 				if (marker.relation.isNonbearing) {
@@ -276,7 +270,7 @@ export class MutationGenerator {
 				}
 				builder = this.registerCreateEntityPart(processedEntities, fieldState, marker, builder)
 			} else if (marker instanceof HasManyRelationMarker) {
-				if (fieldState.type !== InternalStateType.EntityList) {
+				if (fieldState.type !== StateType.EntityList) {
 					continue
 				}
 				if (marker.relation.isNonbearing) {
@@ -345,7 +339,7 @@ export class MutationGenerator {
 	}
 
 	private registerCreateFieldPart(
-		fieldState: InternalFieldState,
+		fieldState: FieldState,
 		marker: FieldMarker,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
@@ -359,7 +353,7 @@ export class MutationGenerator {
 
 	private registerCreateEntityPart(
 		processedEntities: ProcessedEntities,
-		fieldState: InternalEntityState,
+		fieldState: EntityState,
 		marker: HasOneRelationMarker,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
@@ -386,7 +380,7 @@ export class MutationGenerator {
 
 	private registerCreateEntityListPart(
 		processedEntities: ProcessedEntities,
-		fieldState: InternalEntityListState,
+		fieldState: EntityListState,
 		marker: HasManyRelationMarker,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
@@ -406,7 +400,7 @@ export class MutationGenerator {
 
 	private registerUpdateMutationPart(
 		processedEntities: ProcessedEntities,
-		currentState: InternalEntityState,
+		currentState: EntityState,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
 		if (processedEntities.has(currentState)) {
@@ -425,7 +419,7 @@ export class MutationGenerator {
 			}
 
 			if (marker instanceof FieldMarker) {
-				if (fieldState.type !== InternalStateType.Field) {
+				if (fieldState.type !== StateType.Field) {
 					continue
 				}
 				if (fieldState.persistedValue !== undefined) {
@@ -435,7 +429,7 @@ export class MutationGenerator {
 					}
 				}
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState.type !== InternalStateType.SingleEntity) {
+				if (fieldState.type !== StateType.SingleEntity) {
 					continue
 				}
 
@@ -528,7 +522,7 @@ export class MutationGenerator {
 					})
 				}
 			} else if (marker instanceof HasManyRelationMarker) {
-				if (fieldState.type !== InternalStateType.EntityList) {
+				if (fieldState.type !== StateType.EntityList) {
 					continue
 				}
 				builder = builder.many(marker.relation.field, builder => {

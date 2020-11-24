@@ -1,14 +1,14 @@
 import { RelationFilter, TreeFilter } from '@contember/client'
 import { EntityFieldMarkersContainer, HasManyRelationMarker, HasOneRelationMarker, MarkerTreeRoot } from '../markers'
 import { assertNever } from '../utils'
-import { InternalEntityState, InternalRootStateNode, InternalStateType } from './internalState'
+import { EntityState, RootStateNode, StateType } from './state'
 
 type RawRelationFilters = Map<string, RawRelationFilters>
 
 export class TreeFilterGenerator {
 	public constructor(
 		private readonly markerTree: MarkerTreeRoot,
-		private readonly subTreeStates: Map<string, InternalRootStateNode>,
+		private readonly subTreeStates: Map<string, RootStateNode>,
 	) {}
 
 	public generateTreeFilter(): TreeFilter[] {
@@ -18,16 +18,16 @@ export class TreeFilterGenerator {
 			.flat()
 	}
 
-	private generateSubTreeFilter(subTree: InternalRootStateNode): TreeFilter[] {
+	private generateSubTreeFilter(subTree: RootStateNode): TreeFilter[] {
 		const filters: TreeFilter[] = []
 
 		switch (subTree.type) {
-			case InternalStateType.SingleEntity: {
+			case StateType.SingleEntity: {
 				const filter = this.generateTopLevelEntityFilter(subTree)
 				filter && filters.push(filter)
 				break
 			}
-			case InternalStateType.EntityList: {
+			case StateType.EntityList: {
 				for (const entityState of subTree.children) {
 					const filter = this.generateTopLevelEntityFilter(entityState)
 					filter && filters.push(filter)
@@ -41,7 +41,7 @@ export class TreeFilterGenerator {
 		return filters
 	}
 
-	private generateTopLevelEntityFilter(topLevelEntity: InternalEntityState): TreeFilter | undefined {
+	private generateTopLevelEntityFilter(topLevelEntity: EntityState): TreeFilter | undefined {
 		const { id, typeName } = topLevelEntity
 
 		if (!id.existsOnServer || typeName === undefined) {

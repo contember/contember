@@ -1,16 +1,10 @@
 import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
-import {
-	InternalEntityListState,
-	InternalEntityState,
-	InternalRootStateNode,
-	InternalStateNode,
-	InternalStateType,
-} from './internalState'
+import { EntityListState, EntityState, RootStateNode, StateNode, StateType } from './state'
 
 export class AccessorErrorManager {
-	private errorsByState: Map<InternalStateNode, ErrorAccessor.ErrorsById> = new Map()
+	private errorsByState: Map<StateNode, ErrorAccessor.ErrorsById> = new Map()
 
 	private getNewErrorId = (() => {
 		let errorId = 1
@@ -19,8 +13,8 @@ export class AccessorErrorManager {
 	})()
 
 	public constructor(
-		private readonly subTreeStates: Map<string, InternalRootStateNode>,
-		private readonly entityStore: Map<string, InternalEntityState>,
+		private readonly subTreeStates: Map<string, RootStateNode>,
+		private readonly entityStore: Map<string, EntityState>,
 	) {}
 
 	public hasErrors() {
@@ -46,7 +40,7 @@ export class AccessorErrorManager {
 		this.dumpErrorData(data)
 	}
 
-	public addError(state: InternalStateNode, error: ErrorAccessor.BoxedError): () => void {
+	public addError(state: StateNode, error: ErrorAccessor.BoxedError): () => void {
 		const errorId = this.getNewErrorId()
 
 		let errorsById: ErrorAccessor.ErrorsById | undefined = this.errorsByState.get(state)
@@ -73,7 +67,7 @@ export class AccessorErrorManager {
 		}
 	}
 
-	private addSeveralErrors(state: InternalStateNode, errors: ErrorsPreprocessor.BaseErrorNode) {
+	private addSeveralErrors(state: StateNode, errors: ErrorsPreprocessor.BaseErrorNode) {
 		if (errors.validation) {
 			for (const error of errors.validation) {
 				this.addError(state, { type: ErrorAccessor.ErrorType.Validation, error })
@@ -94,11 +88,11 @@ export class AccessorErrorManager {
 				continue
 			}
 			switch (rootState.type) {
-				case InternalStateType.SingleEntity: {
+				case StateType.SingleEntity: {
 					this.setEntityStateErrors(rootState, rootError)
 					break
 				}
-				case InternalStateType.EntityList: {
+				case StateType.EntityList: {
 					this.setEntityListStateErrors(rootState, rootError)
 					break
 				}
@@ -107,7 +101,7 @@ export class AccessorErrorManager {
 	}
 
 	private setEntityStateErrors(
-		state: InternalEntityState,
+		state: EntityState,
 		errors: ErrorsPreprocessor.ErrorINode | ErrorsPreprocessor.LeafErrorNode,
 	) {
 		this.addSeveralErrors(state, errors)
@@ -124,7 +118,7 @@ export class AccessorErrorManager {
 			if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
 				const fieldState = state.fields.get(childKey)
 
-				if (fieldState?.type === InternalStateType.Field) {
+				if (fieldState?.type === StateType.Field) {
 					state.childrenWithPendingUpdates.add(fieldState)
 					this.addSeveralErrors(fieldState, child)
 					continue
@@ -144,11 +138,11 @@ export class AccessorErrorManager {
 					continue
 				}
 				switch (fieldState.type) {
-					case InternalStateType.SingleEntity:
+					case StateType.SingleEntity:
 						state.childrenWithPendingUpdates.add(fieldState)
 						this.setEntityStateErrors(fieldState, child)
 						break
-					case InternalStateType.EntityList:
+					case StateType.EntityList:
 						state.childrenWithPendingUpdates.add(fieldState)
 						this.setEntityListStateErrors(fieldState, child)
 						break
@@ -158,7 +152,7 @@ export class AccessorErrorManager {
 	}
 
 	private setEntityListStateErrors(
-		state: InternalEntityListState,
+		state: EntityListState,
 		errors: ErrorsPreprocessor.ErrorINode | ErrorsPreprocessor.LeafErrorNode,
 	) {
 		this.addSeveralErrors(state, errors)
@@ -219,19 +213,19 @@ export class AccessorErrorManager {
 		}
 	}
 
-	private triggerUpdate(stateNode: InternalStateNode) {
+	private triggerUpdate(stateNode: StateNode) {
 		stateNode.hasStaleAccessor = true
 		stateNode.hasPendingUpdate = true
 		switch (stateNode.type) {
-			case InternalStateType.Field:
+			case StateType.Field:
 				stateNode.onFieldUpdate(stateNode)
 				break
-			case InternalStateType.SingleEntity:
+			case StateType.SingleEntity:
 				for (const realm of stateNode.realms) {
 					realm(stateNode)
 				}
 				break
-			case InternalStateType.EntityList:
+			case StateType.EntityList:
 				stateNode.onEntityListUpdate(stateNode)
 				break
 		}

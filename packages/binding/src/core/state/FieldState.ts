@@ -1,11 +1,11 @@
 import { ErrorAccessor, FieldAccessor } from '../../accessors'
 import { FieldMarker } from '../../markers'
 import { FieldName, FieldValue } from '../../treeParameters'
-import { InternalStateType } from './InternalStateType'
+import { StateType } from './StateType'
 
-export type OnFieldUpdate = (state: InternalFieldState) => void
-export interface InternalFieldState {
-	type: InternalStateType.Field
+export type OnFieldUpdate = (state: FieldState) => void
+export interface FieldState {
+	type: StateType.Field
 	hasStaleAccessor: boolean
 	getAccessor: () => FieldAccessor
 	addEventListener: FieldAccessor.AddFieldEventListener

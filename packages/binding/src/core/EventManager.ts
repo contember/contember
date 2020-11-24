@@ -12,14 +12,7 @@ import { BindingError } from '../BindingError'
 import { assertNever } from '../utils'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
-import {
-	InternalEntityListState,
-	InternalEntityState,
-	InternalRootStateNode,
-	InternalStateIterator,
-	InternalStateNode,
-	InternalStateType,
-} from './internalState'
+import { RootStateNode, StateINode, StateIterator, StateNode, StateType } from './state'
 
 export class EventManager {
 	private transactionDepth = 0
@@ -27,10 +20,10 @@ export class EventManager {
 
 	private ongoingPersistOperation: Promise<SuccessfulPersistResult> | undefined = undefined
 
-	private newlyInitializedWithListeners: Set<InternalEntityListState | InternalEntityState> = new Set()
+	private newlyInitializedWithListeners: Set<StateINode> = new Set()
 
 	public constructor(
-		private readonly subTreeStates: Map<string, InternalRootStateNode>,
+		private readonly subTreeStates: Map<string, RootStateNode>,
 		private readonly config: Config,
 		private readonly dirtinessTracker: DirtinessTracker,
 		private readonly bindingOperations: BindingOperations,
@@ -113,7 +106,7 @@ export class EventManager {
 		})
 	}
 
-	public registerNewlyInitialized(state: InternalEntityState | InternalEntityListState) {
+	public registerNewlyInitialized(state: StateINode) {
 		if (Object.values(state.eventListeners).filter(listeners => !!listeners).length) {
 			this.newlyInitializedWithListeners.add(state)
 		}
@@ -129,9 +122,9 @@ export class EventManager {
 		)
 	}
 
-	private flushPendingAccessorUpdates(rootStates: Array<InternalEntityState | InternalEntityListState>) {
+	private flushPendingAccessorUpdates(rootStates: Array<StateINode>) {
 		// It is *CRUCIAL* that this is a BFS so that we update the components in top-down order.
-		const agenda: InternalStateNode[] = rootStates
+		const agenda: StateNode[] = rootStates
 
 		for (const state of agenda) {
 			if (!state.hasPendingUpdate) {
@@ -147,7 +140,7 @@ export class EventManager {
 				}
 			}
 			if (
-				state.type === InternalStateType.SingleEntity &&
+				state.type === StateType.SingleEntity &&
 				state.fieldsWithPendingConnectionUpdates &&
 				state.eventListeners.connectionUpdate
 			) {
@@ -164,8 +157,8 @@ export class EventManager {
 			}
 
 			switch (state.type) {
-				case InternalStateType.SingleEntity:
-				case InternalStateType.EntityList: {
+				case StateType.SingleEntity:
+				case StateType.EntityList: {
 					if (state.childrenWithPendingUpdates !== undefined) {
 						for (const childState of state.childrenWithPendingUpdates) {
 							agenda.push(childState)
@@ -174,7 +167,7 @@ export class EventManager {
 					}
 					break
 				}
-				case InternalStateType.Field:
+				case StateType.Field:
 					// Do nothing
 					break
 				default:
@@ -186,18 +179,17 @@ export class EventManager {
 	public async triggerOnBeforePersist() {
 		return new Promise<void>(async resolve => {
 			await this.asyncTransaction(async () => {
-				const iNodeHasBeforePersist = (iNode: InternalEntityState | InternalEntityListState) =>
-					iNode.eventListeners.beforePersist !== undefined
+				const iNodeHasBeforePersist = (iNode: StateINode) => iNode.eventListeners.beforePersist !== undefined
 
 				// TODO if an entity from here (or its parent) gets deleted, we need to remove stale handlers from here.
 				const callbackQueue: Array<[
 					// The typings could be nicer but TS…
-					InternalEntityState | InternalEntityListState,
+					StateINode,
 					EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler,
 				]> = []
 
 				for (const [, subTreeState] of this.subTreeStates) {
-					for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
+					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
 						for (const listener of iNode.eventListeners.beforePersist!) {
 							callbackQueue.push([iNode, listener])
 						}
@@ -211,7 +203,7 @@ export class EventManager {
 					const callbackReturns: Array<Promise<
 						EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler
 					>> = []
-					const correspondingStates: Array<InternalEntityState | InternalEntityListState> = []
+					const correspondingStates: Array<StateINode> = []
 
 					for (const [state, callback] of callbackQueue) {
 						const changesCountBefore = this.dirtinessTracker.getChangesCount()
@@ -291,7 +283,7 @@ export class EventManager {
 						hasOnInitialize = true
 					}
 				}
-				if (state.type === InternalStateType.SingleEntity) {
+				if (state.type === StateType.SingleEntity) {
 					state.hasIdSetInStone = true
 				}
 			}
@@ -302,13 +294,12 @@ export class EventManager {
 	public async triggerOnPersistError(options: PersistErrorOptions) {
 		return new Promise<void>(async resolve => {
 			await this.asyncTransaction(async () => {
-				const iNodeHasPersistErrorHandler = (iNode: InternalEntityState | InternalEntityListState) =>
-					iNode.eventListeners.persistError !== undefined
+				const iNodeHasPersistErrorHandler = (iNode: StateINode) => iNode.eventListeners.persistError !== undefined
 
 				const handlerPromises: Array<Promise<void>> = []
 
 				for (const [, subTreeState] of this.subTreeStates) {
-					for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasPersistErrorHandler)) {
+					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistErrorHandler)) {
 						for (const listener of iNode.eventListeners.persistError!) {
 							const result = listener(iNode.getAccessor as any, options)
 
@@ -338,11 +329,10 @@ export class EventManager {
 
 	public triggerOnPersistSuccess(options: PersistSuccessOptions) {
 		this.syncTransaction(() => {
-			const iNodeHasPersistSuccessHandler = (iNode: InternalEntityState | InternalEntityListState) =>
-				iNode.eventListeners.persistSuccess !== undefined
+			const iNodeHasPersistSuccessHandler = (iNode: StateINode) => iNode.eventListeners.persistSuccess !== undefined
 
 			for (const [, subTreeState] of this.subTreeStates) {
-				for (const iNode of InternalStateIterator.depthFirstINodes(subTreeState, iNodeHasPersistSuccessHandler)) {
+				for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistSuccessHandler)) {
 					for (const listener of iNode.eventListeners.persistSuccess!) {
 						listener(iNode.getAccessor as any, options)
 					}

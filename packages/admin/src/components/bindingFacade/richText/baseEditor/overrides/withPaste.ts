@@ -68,7 +68,7 @@ export const withPaste: <E extends EditorNode>(
 				return []
 			}
 			if (element.tagName === 'BR') {
-				return { ...cumulativeTextAttrs, text: '\n' }
+				return { ...cumulativeTextAttrs, text: ' ' }
 			}
 			return null
 		},

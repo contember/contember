@@ -61,7 +61,7 @@ export const bindingExportedMembers = [
 	'tokens',
 	'TriggerPersistContext',
 	'TYPENAME_KEY_NAME',
-	'useAccessorTreeState',
+	'useDataBinding',
 	'useDesugaredRelativeEntityList',
 	'useDesugaredRelativeSingleEntity',
 	'useDesugaredRelativeSingleField',

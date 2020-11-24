@@ -73,7 +73,7 @@ import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
-export class AccessorTreeGenerator {
+export class DataBinding {
 	private readonly config: Config
 	private readonly treeFilterGenerator: TreeFilterGenerator
 	private readonly accessorErrorManager: AccessorErrorManager

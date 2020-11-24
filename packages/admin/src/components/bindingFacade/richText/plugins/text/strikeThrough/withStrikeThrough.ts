@@ -1,11 +1,12 @@
 import isHotkey from 'is-hotkey'
 import * as React from 'react'
 import { BaseEditor } from '../../../baseEditor'
+import { boldMark } from '../bold'
 
 export const strikeThroughMark = 'isStruckThrough'
 
 export const withStrikeThrough = <E extends BaseEditor>(editor: E): E => {
-	const { onKeyDown, renderLeafChildren } = editor
+	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
 
 	const isStruckThroughHotkey = isHotkey('mod+opt+s')
 
@@ -25,6 +26,20 @@ export const withStrikeThrough = <E extends BaseEditor>(editor: E): E => {
 			event.preventDefault()
 		}
 		onKeyDown(event)
+	}
+
+	editor.processAttributesPaste = (element, cta) => {
+		if (element.style.textDecoration) {
+			cta[strikeThroughMark] = element.style.textDecoration === 'line-through'
+		}
+		return processAttributesPaste(element, cta)
+	}
+
+	editor.processInlinePaste = (element, next, cumulativeTextAttrs) => {
+		if (element.nodeName === 'S') {
+			return next(element.childNodes, { ...cumulativeTextAttrs, [strikeThroughMark]: true })
+		}
+		return processInlinePaste(element, next, cumulativeTextAttrs)
 	}
 
 	return editor

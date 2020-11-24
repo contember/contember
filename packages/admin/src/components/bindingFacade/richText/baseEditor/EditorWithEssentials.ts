@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Element as SlateElement, Node as SlateNode, NodeEntry } from 'slate'
 import { RenderElementProps, RenderLeafProps } from 'slate-react'
 import { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
+import { WithPaste } from './overrides/withPaste'
 
 export interface WithEssentials<E extends EditorNode> {
 	formatVersion: SerializableEditorNode['formatVersion']
@@ -37,4 +38,4 @@ export interface WithEssentials<E extends EditorNode> {
 	onBlur: (event: React.FocusEvent<HTMLDivElement>) => void
 }
 
-export type EditorWithEssentials<E extends EditorNode> = WithEssentials<E> & EditorNode
+export type EditorWithEssentials<E extends EditorNode> = WithEssentials<E> & WithPaste & EditorNode

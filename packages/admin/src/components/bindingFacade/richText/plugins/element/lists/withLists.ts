@@ -8,7 +8,7 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import { BaseEditor, BlockElement } from '../../../baseEditor'
+import { BaseEditor, BlockElement, NodesWithType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
@@ -25,6 +25,8 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		isElementActive,
 		toggleElement,
 		onKeyDown,
+		processBlockPaste,
+		processNodeListPaste,
 	} = editor
 
 	const e = (editor as any) as EditorWithLists<E>
@@ -328,6 +330,95 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			return onKeyDown(event)
 		},
 	})
+
+	editor.processBlockPaste = (element, next, cumulativeTextAttrs) => {
+		if (element.tagName === 'UL') {
+			return [{ type: unorderedListElementType, children: next(element.childNodes, cumulativeTextAttrs) }]
+		}
+		if (element.tagName === 'OL') {
+			return [{ type: orderedListElementType, children: next(element.childNodes, cumulativeTextAttrs) }]
+		}
+		if (element.tagName === 'LI') {
+			return [{ type: listItemElementType, children: next(element.childNodes, cumulativeTextAttrs) }]
+		}
+		return processBlockPaste(element, next, cumulativeTextAttrs)
+	}
+
+	// Word list handling
+	editor.processNodeListPaste = (nodeList, cumulativeTextAttrs) => {
+		const result: NodesWithType[] = []
+		let group: Node[] = []
+		let groupWasList = false
+		let lastGroupIsOrderedList = false
+		let includesList = false
+
+		const processGroup = (): NodesWithType => {
+			if (groupWasList) {
+				return {
+					elements: [
+						{
+							type: lastGroupIsOrderedList ? orderedListElementType : unorderedListElementType,
+							children: group.map(item => {
+								const nodes: Node[] = []
+								let ignoring = false
+								for (const node of Array.from(item.childNodes)) {
+									const isStartIgnore = node.nodeType === Node.COMMENT_NODE && node.nodeValue === '[if !supportLists]'
+									if (isStartIgnore) {
+										ignoring = true
+									} else {
+										const isEndIgnore = node.nodeType === Node.COMMENT_NODE && node.nodeValue === '[endif]'
+										if (isEndIgnore) {
+											ignoring = false
+										} else {
+											if (!ignoring) {
+												nodes.push(node)
+											}
+										}
+									}
+								}
+								return {
+									type: listItemElementType,
+									children: editor.deserializeFromNodeListToPure(nodes, cumulativeTextAttrs),
+								}
+							}),
+						},
+					],
+				}
+			} else {
+				return editor.processNodeListPaste(group, cumulativeTextAttrs)
+			}
+		}
+
+		for (let i = 0; i < nodeList.length; i++) {
+			const curr = nodeList[i]
+			const isWhiteSpace = curr.nodeType === Node.TEXT_NODE && curr.textContent?.match(/^\s*$/) !== null
+			if (groupWasList && isWhiteSpace) {
+				continue
+			}
+			const isList = curr instanceof HTMLElement && curr.className.match(/MsoListParagraph/) !== null
+			const firstChar = isList ? (curr as HTMLElement).textContent![0] : ' '
+			const isOrderedList: boolean = isList
+				? firstChar === 'o'
+					? lastGroupIsOrderedList
+					: firstChar.match(/^\w$/) !== null
+				: false
+			if (isList !== groupWasList || lastGroupIsOrderedList !== isOrderedList) {
+				includesList = true
+				result.push(processGroup())
+				group = []
+			}
+			groupWasList = isList
+			lastGroupIsOrderedList = isOrderedList
+			group.push(curr)
+		}
+
+		if (includesList) {
+			result.push(processGroup())
+			return editor.flattenNodesWithType(result)
+		} else {
+			return processNodeListPaste(nodeList, cumulativeTextAttrs)
+		}
+	}
 
 	return (editor as unknown) as EditorWithLists<E>
 }

@@ -17,7 +17,7 @@ import { HeadingRenderer, HeadingRendererProps } from './HeadingRenderer'
 
 export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeadings<E> => {
 	const e: E & Partial<WithHeadings<WithAnotherNodeType<E, HeadingElement>>> = editor
-	const { renderElement, insertBreak, isElementActive, toggleElement, deleteBackward } = editor
+	const { renderElement, insertBreak, isElementActive, toggleElement, deleteBackward, processBlockPaste } = editor
 
 	const isHeading = (
 		element: SlateNode | ElementNode,
@@ -139,6 +139,18 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 			{ isNumbered: null }, // null removes the key altogether
 			{ at: headingPath },
 		)
+	}
+
+	e.processBlockPaste = (element, next, cumulativeTextAttrs) => {
+		const match = element.nodeName.match(/^H(?<level>[1-6])$/)
+		if (match !== null) {
+			return {
+				type: headingElementType,
+				level: parseInt(match.groups!.level),
+				children: next(element.childNodes, cumulativeTextAttrs),
+			}
+		}
+		return processBlockPaste(element, next, cumulativeTextAttrs)
 	}
 
 	return (e as unknown) as EditorWithHeadings<E>

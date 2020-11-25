@@ -255,20 +255,19 @@ export class DataBinding {
 	// )
 
 	public async initialize() {
-		const persistedData = await this.fetchNewPersistedData()
+		return await this.eventManager.asyncOperation(async () => {
+			const persistedData = await this.fetchNewPersistedData()
 
-		this.treeStore.persistedEntityData = persistedData.persistedEntityDataStore
+			this.treeStore.persistedEntityData = persistedData.persistedEntityDataStore
 
-		for (const [placeholderName, marker] of this.treeStore.markerTree.subTrees) {
-			const subTreeState = this.stateInitializer.initializeSubTree(
-				marker,
-				persistedData.subTreeDataStore.get(placeholderName),
-			)
-			this.treeStore.subTreeStates.set(placeholderName, subTreeState)
-		}
-
-		this.eventManager.triggerOnInitialize()
-		this.eventManager.updateTreeRoot()
+			for (const [placeholderName, marker] of this.treeStore.markerTree.subTrees) {
+				const subTreeState = this.stateInitializer.initializeSubTree(
+					marker,
+					persistedData.subTreeDataStore.get(placeholderName),
+				)
+				this.treeStore.subTreeStates.set(placeholderName, subTreeState)
+			}
+		})
 	}
 
 	private getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): RootStateNode {

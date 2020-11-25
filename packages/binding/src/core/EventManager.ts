@@ -24,6 +24,7 @@ export class EventManager {
 	private isFrozenWhileUpdating = false
 
 	private ongoingPersistOperation: Promise<SuccessfulPersistResult> | undefined = undefined
+	private hasUpdated = false
 
 	private newlyInitializedWithListeners: Set<StateINode> = new Set()
 
@@ -100,9 +101,10 @@ export class EventManager {
 			state => state.hasPendingUpdate,
 		)
 
-		if (!rootsWithPendingUpdates.length) {
+		if (this.hasUpdated && !rootsWithPendingUpdates.length) {
 			return
 		}
+		this.hasUpdated = true
 
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
@@ -119,7 +121,7 @@ export class EventManager {
 		}
 	}
 
-	public updateTreeRoot() {
+	private updateTreeRoot() {
 		this.onUpdate(
 			new TreeRootAccessor(
 				this.dirtinessTracker.hasChanges(),

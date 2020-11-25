@@ -254,7 +254,7 @@ export class DataBinding {
 	// 	this.treeRootListeners,
 	// )
 
-	public async initializeLiveTree() {
+	public async initialize() {
 		const persistedData = await this.fetchNewPersistedData()
 
 		this.treeStore.persistedEntityData = persistedData.persistedEntityDataStore

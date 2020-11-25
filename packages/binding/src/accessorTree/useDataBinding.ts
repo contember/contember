@@ -52,7 +52,7 @@ export const useDataBinding = ({ nodeTree }: AccessorTreeStateOptions): Accessor
 	const [state, dispatch] = React.useReducer(accessorTreeStateReducer, initialState)
 
 	React.useEffect(() => {
-		dataBinding.initializeLiveTree()
+		dataBinding.initialize()
 	}, [dataBinding])
 
 	React.useEffect(() => {

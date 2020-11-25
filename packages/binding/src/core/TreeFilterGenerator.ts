@@ -2,17 +2,17 @@ import { RelationFilter, TreeFilter } from '@contember/client'
 import { EntityFieldMarkersContainer, HasManyRelationMarker, HasOneRelationMarker, MarkerTreeRoot } from '../markers'
 import { assertNever } from '../utils'
 import { EntityState, RootStateNode, StateType } from './state'
-import { StateStore } from './StateStore'
+import { TreeStore } from './TreeStore'
 
 type RawRelationFilters = Map<string, RawRelationFilters>
 
 export class TreeFilterGenerator {
-	public constructor(private readonly markerTree: MarkerTreeRoot, private readonly stateStore: StateStore) {}
+	public constructor(private readonly treeStore: TreeStore) {}
 
 	public generateTreeFilter(): TreeFilter[] {
-		return Array.from(this.markerTree.subTrees)
+		return Array.from(this.treeStore.markerTree.subTrees)
 			.filter(([, tree]) => tree.parameters.value.expectedMutation !== 'none')
-			.map(([placeholder]) => this.generateSubTreeFilter(this.stateStore.subTreeStates.get(placeholder)!))
+			.map(([placeholder]) => this.generateSubTreeFilter(this.treeStore.subTreeStates.get(placeholder)!))
 			.flat()
 	}
 

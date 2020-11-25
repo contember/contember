@@ -9,11 +9,15 @@ import {
 import { PersistSuccessOptions } from '../accessors/PersistSuccessOptions'
 import { RequestError, SuccessfulPersistResult } from '../accessorTree'
 import { BindingError } from '../BindingError'
+import { HasManyRelationMarker } from '../markers'
+import { EntityListEventListeners, SingleEntityEventListeners } from '../treeParameters'
+import { FieldName } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
-import { StateINode, StateIterator, StateNode, StateType } from './state'
-import { StateStore } from './StateStore'
+import { EntityListState, EntityState, StateINode, StateIterator, StateNode, StateType } from './state'
+import { TreeStore } from './TreeStore'
+import { TreeParameterMerger } from './TreeParameterMerger'
 
 export class EventManager {
 	private transactionDepth = 0
@@ -24,12 +28,12 @@ export class EventManager {
 	private newlyInitializedWithListeners: Set<StateINode> = new Set()
 
 	public constructor(
-		private readonly stateStore: StateStore,
+		private readonly bindingOperations: BindingOperations,
 		private readonly config: Config,
 		private readonly dirtinessTracker: DirtinessTracker,
-		private readonly bindingOperations: BindingOperations,
-		private readonly onUpdate: (newData: TreeRootAccessor) => void,
 		private readonly onError: (error: RequestError) => void,
+		private readonly onUpdate: (newData: TreeRootAccessor) => void,
+		private readonly treeStore: TreeStore,
 	) {}
 
 	public async persistOperation(operation: () => Promise<SuccessfulPersistResult>): Promise<SuccessfulPersistResult> {
@@ -92,7 +96,7 @@ export class EventManager {
 			)
 		}
 
-		const rootsWithPendingUpdates = Array.from(this.stateStore.subTreeStates.values()).filter(
+		const rootsWithPendingUpdates = Array.from(this.treeStore.subTreeStates.values()).filter(
 			state => state.hasPendingUpdate,
 		)
 
@@ -191,7 +195,7 @@ export class EventManager {
 					EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler,
 				]> = []
 
-				for (const [, subTreeState] of this.stateStore.subTreeStates) {
+				for (const [, subTreeState] of this.treeStore.subTreeStates) {
 					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
 						for (const listener of iNode.eventListeners.beforePersist!) {
 							callbackQueue.push([iNode, listener])
@@ -301,7 +305,7 @@ export class EventManager {
 
 				const handlerPromises: Array<Promise<void>> = []
 
-				for (const [, subTreeState] of this.stateStore.subTreeStates) {
+				for (const [, subTreeState] of this.treeStore.subTreeStates) {
 					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistErrorHandler)) {
 						for (const listener of iNode.eventListeners.persistError!) {
 							const result = listener(iNode.getAccessor as any, options)
@@ -334,7 +338,7 @@ export class EventManager {
 		this.syncTransaction(() => {
 			const iNodeHasPersistSuccessHandler = (iNode: StateINode) => iNode.eventListeners.persistSuccess !== undefined
 
-			for (const [, subTreeState] of this.stateStore.subTreeStates) {
+			for (const [, subTreeState] of this.treeStore.subTreeStates) {
 				for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistSuccessHandler)) {
 					for (const listener of iNode.eventListeners.persistSuccess!) {
 						listener(iNode.getAccessor as any, options)
@@ -342,5 +346,56 @@ export class EventManager {
 				}
 			}
 		})
+	}
+
+	public markPendingConnections(parentState: EntityState, connectionPlaceholders: Set<FieldName>) {
+		if (parentState.fieldsWithPendingConnectionUpdates === undefined) {
+			parentState.fieldsWithPendingConnectionUpdates = new Set()
+		}
+		placeholders: for (const [fieldName, placeholderNames] of parentState.markersContainer.placeholders) {
+			if (typeof placeholderNames === 'string') {
+				if (connectionPlaceholders.has(placeholderNames)) {
+					parentState.fieldsWithPendingConnectionUpdates.add(fieldName)
+				}
+			} else {
+				for (const placeholderName of placeholderNames) {
+					if (connectionPlaceholders.has(placeholderName)) {
+						parentState.fieldsWithPendingConnectionUpdates.add(fieldName)
+						continue placeholders
+					}
+				}
+			}
+		}
+		if (parentState.fieldsWithPendingConnectionUpdates.size === 0) {
+			parentState.fieldsWithPendingConnectionUpdates = undefined
+		}
+	}
+
+	public getEventListenersForListEntity(
+		containingListState: EntityListState,
+		additionalMarker?: HasManyRelationMarker,
+	): SingleEntityEventListeners {
+		const create = (base: {
+			eventListeners: EntityListEventListeners['eventListeners']
+		}): SingleEntityEventListeners['eventListeners'] => ({
+			beforePersist: undefined,
+			initialize: base.eventListeners.childInitialize,
+			beforeUpdate: undefined,
+			update: undefined,
+			connectionUpdate: undefined,
+			persistError: undefined,
+			persistSuccess: undefined,
+		})
+
+		let eventListeners: SingleEntityEventListeners['eventListeners'] = create(containingListState)
+		if (additionalMarker) {
+			eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
+				eventListeners,
+				create(additionalMarker.relation),
+			)
+		}
+		return {
+			eventListeners,
+		}
 	}
 }

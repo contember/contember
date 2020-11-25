@@ -13,6 +13,7 @@ import {
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import { EntityListState, EntityState, FieldState, RootStateNode, StateType } from './state'
+import { TreeStore } from './TreeStore'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
@@ -20,17 +21,17 @@ type ProcessedEntities = Set<EntityState>
 
 // TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
-	public constructor(private markerTree: MarkerTreeRoot, private allSubTrees: Map<string, RootStateNode>) {}
+	public constructor(private readonly treeStore: TreeStore) {}
 
 	public getPersistMutation(): string | undefined {
 		try {
 			let builder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 			const processedEntities: ProcessedEntities = new Set()
 
-			for (const [placeholderName, subTreeMarker] of this.markerTree.subTrees) {
+			for (const [placeholderName, subTreeMarker] of this.treeStore.markerTree.subTrees) {
 				builder = this.addSubMutation(
 					processedEntities,
-					this.allSubTrees.get(placeholderName)!,
+					this.treeStore.subTreeStates.get(placeholderName)!,
 					placeholderName,
 					subTreeMarker.parameters,
 					builder,

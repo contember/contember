@@ -131,7 +131,7 @@ export class DataBinding {
 		batchDeferredUpdates: performUpdates => {
 			this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
 		},
-		persistAll: async ({ signal } = {}) => {
+		persist: async ({ signal } = {}) => {
 			if (!this.dirtinessTracker.hasChanges()) {
 				return {
 					type: PersistResultSuccessType.NothingToPersist,

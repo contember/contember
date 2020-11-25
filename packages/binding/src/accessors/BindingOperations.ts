@@ -3,7 +3,7 @@ import { EntityAccessor } from './EntityAccessor'
 import { GetEntityByKey } from './GetEntityByKey'
 import { GetEntityListSubTree } from './GetEntityListSubTree'
 import { GetEntitySubTree } from './GetEntitySubTree'
-import { PersistAll } from './PersistAll'
+import { Persist } from './Persist'
 
 export interface BindingOperations {
 	// addEventListener: ...
@@ -14,5 +14,5 @@ export interface BindingOperations {
 	getTreeFilters: () => TreeFilter[]
 
 	batchDeferredUpdates: (performUpdates: (bindingOperations: BindingOperations) => void) => void
-	persistAll: PersistAll
+	persist: Persist
 }

@@ -6,7 +6,7 @@ export interface ScheduleAnotherPersistOptions {
 
 export type ScheduleAnotherPersist = (options?: ScheduleAnotherPersistOptions) => void
 
-export interface PersistErrorOptions extends Omit<BindingOperations, 'persistAll'> {
+export interface PersistErrorOptions extends Omit<BindingOperations, 'persist'> {
 	attemptNumber: number
 	tryAgain: ScheduleAnotherPersist
 }

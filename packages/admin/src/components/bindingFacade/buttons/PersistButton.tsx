@@ -1,14 +1,14 @@
 import { Button, ButtonProps, FormGroup } from '@contember/ui'
 import * as React from 'react'
 import { useDirtinessState, useMutationState } from '@contember/binding'
-import { useTriggerPersistWithFeedback } from '../../ui'
+import { usePersistWithFeedback } from '../../ui'
 
 export type PersistButtonProps = ButtonProps
 
 export const PersistButton = React.memo((props: PersistButtonProps) => {
 	const isMutating = useMutationState()
 	const isDirty = useDirtinessState()
-	const triggerPersist = useTriggerPersistWithFeedback()
+	const triggerPersist = usePersistWithFeedback()
 	const buttonRef = React.useRef<HTMLButtonElement | null>(null)
 	const onClick = React.useCallback(() => {
 		triggerPersist().catch(() => {})

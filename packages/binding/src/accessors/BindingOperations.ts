@@ -1,5 +1,6 @@
 import { TreeFilter } from '@contember/client'
 import { EntityAccessor } from './EntityAccessor'
+import { ExtendTree } from './ExtendTree'
 import { GetEntityByKey } from './GetEntityByKey'
 import { GetEntityListSubTree } from './GetEntityListSubTree'
 import { GetEntitySubTree } from './GetEntitySubTree'
@@ -13,6 +14,8 @@ export interface BindingOperations {
 	getAllEntities: () => Generator<EntityAccessor>
 	getTreeFilters: () => TreeFilter[]
 
+	extendTree: ExtendTree
 	batchDeferredUpdates: (performUpdates: (bindingOperations: BindingOperations) => void) => void
+	// discardSubTree: ...
 	persist: Persist
 }

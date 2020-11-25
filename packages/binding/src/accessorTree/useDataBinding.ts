@@ -2,7 +2,7 @@ import { useCurrentContentGraphQlClient } from '@contember/react-client'
 import * as React from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import { TreeRootAccessor } from '../accessors'
-import { DataBinding, MarkerTreeGenerator } from '../core'
+import { DataBinding } from '../core'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
@@ -17,10 +17,9 @@ export const useDataBinding = ({ nodeTree }: AccessorTreeStateOptions): Accessor
 	const client = useCurrentContentGraphQlClient()
 	const environment = useEnvironment()
 
-	const markerTree = React.useMemo(() => new MarkerTreeGenerator(nodeTree, environment).generate(), [
-		environment,
-		nodeTree,
-	])
+	const [state, dispatch] = React.useReducer(accessorTreeStateReducer, initialState)
+
+	const isFirstRenderRef = React.useRef(true)
 	const isMountedRef = React.useRef(true)
 
 	const onUpdate = React.useCallback((accessor: TreeRootAccessor) => {
@@ -42,20 +41,19 @@ export const useDataBinding = ({ nodeTree }: AccessorTreeStateOptions): Accessor
 		})
 	}, [])
 
-	// TODO this REALLY should be useState.
-	const dataBinding = React.useMemo(() => new DataBinding(markerTree, client, onUpdate, onError), [
-		client,
-		markerTree,
-		onError,
-		onUpdate,
-	])
-	const [state, dispatch] = React.useReducer(accessorTreeStateReducer, initialState)
+	// TODO This won't react to changes of the params
+	const [dataBinding] = React.useState(() => new DataBinding(client, environment, onUpdate, onError))
 
 	React.useEffect(() => {
-		dataBinding.initialize()
-	}, [dataBinding])
+		if (!isFirstRenderRef.current) {
+			return
+		}
+		dataBinding.extendTree(nodeTree)
+	}, [nodeTree, dataBinding])
 
 	React.useEffect(() => {
+		isFirstRenderRef.current = false
+
 		return () => {
 			isMountedRef.current = false
 		}

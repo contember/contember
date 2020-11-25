@@ -10,7 +10,7 @@ export class TreeStore {
 	public readonly entityStore: Map<string, EntityState> = new Map()
 	public readonly subTreeStates: Map<string, RootStateNode> = new Map()
 
+	// TODO !!!
+	public markerTree: MarkerTreeRoot = new MarkerTreeRoot(new Map(), new Map())
 	public persistedEntityData: PersistedEntityDataStore = new Map()
-
-	public constructor(public readonly markerTree: MarkerTreeRoot) {}
 }

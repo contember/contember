@@ -1,4 +1,5 @@
 import { GraphQlClient, TreeFilter } from '@contember/client'
+import * as React from 'react'
 import {
 	BindingOperations,
 	EntityAccessor,
@@ -16,6 +17,7 @@ import {
 	SuccessfulPersistResult,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
+import { Environment } from '../dao'
 import { MarkerTreeRoot, PlaceholderGenerator, SubTreeMarkerParameters } from '../markers'
 import {
 	Alias,
@@ -28,6 +30,7 @@ import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
 import { EventManager } from './EventManager'
+import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { PersistedDataUpdater } from './PersistedDataUpdater'
 import { QueryGenerator } from './QueryGenerator'
@@ -54,13 +57,13 @@ export class DataBinding {
 	// }
 
 	public constructor(
-		markerTree: MarkerTreeRoot,
 		private readonly client: GraphQlClient,
+		private readonly environment: Environment,
 		private readonly onUpdate: (newData: TreeRootAccessor) => void,
 		private readonly onError: (error: RequestError) => void,
 	) {
 		this.config = new Config()
-		this.treeStore = new TreeStore(markerTree)
+		this.treeStore = new TreeStore()
 		this.treeFilterGenerator = new TreeFilterGenerator(this.treeStore)
 		this.accessorErrorManager = new AccessorErrorManager(this.treeStore)
 		this.dirtinessTracker = new DirtinessTracker()
@@ -131,6 +134,7 @@ export class DataBinding {
 		batchDeferredUpdates: performUpdates => {
 			this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
 		},
+		extendTree: async (...args) => await this.extendTree(...args),
 		persist: async ({ signal } = {}) => {
 			if (!this.dirtinessTracker.hasChanges()) {
 				return {
@@ -224,7 +228,7 @@ export class DataBinding {
 				this.dirtinessTracker.reset()
 
 				try {
-					const persistedData = await this.fetchNewPersistedData()
+					const persistedData = await this.fetchPersistedData(this.treeStore.markerTree)
 					this.eventManager.syncOperation(() => {
 						this.persistedDataUpdater.updatePersistedData(persistedData)
 						this.eventManager.triggerOnPersistSuccess({
@@ -254,9 +258,13 @@ export class DataBinding {
 	// 	this.treeRootListeners,
 	// )
 
-	public async initialize() {
+	public async extendTree(newFragment: React.ReactNode) {
 		return await this.eventManager.asyncOperation(async () => {
-			const persistedData = await this.fetchNewPersistedData()
+			const markerTree = new MarkerTreeGenerator(newFragment, this.environment).generate()
+
+			this.treeStore.markerTree = markerTree // TODO
+
+			const persistedData = await this.fetchPersistedData(markerTree)
 
 			this.treeStore.persistedEntityData = persistedData.persistedEntityDataStore
 
@@ -291,8 +299,8 @@ export class DataBinding {
 		return subTreeState
 	}
 
-	private async fetchNewPersistedData(): Promise<NormalizedQueryResponseData> {
-		const queryGenerator = new QueryGenerator(this.treeStore.markerTree)
+	private async fetchPersistedData(tree: MarkerTreeRoot): Promise<NormalizedQueryResponseData> {
+		const queryGenerator = new QueryGenerator(tree)
 		const query = queryGenerator.getReadQuery()
 
 		let queryResponse: QueryRequestResponse | undefined

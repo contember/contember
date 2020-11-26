@@ -1449,17 +1449,13 @@ export class AccessorTreeGenerator {
 					})
 				})
 			},
-			getChildEntityByKey: __DEV_MODE__
-				? key => {
-						const childState = this.entityStore.get(key)
-						if (childState === undefined || !entityListState.children.has(childState)) {
-							throw new BindingError(
-								`EntityList: cannot retrieve an entity with key '${key}' as it is not on the list.`,
-							)
-						}
-						return childState.getAccessor()
-				  }
-				: this.bindingOperations.getEntityByKey,
+			getChildEntityByKey: key => {
+				const childState = this.entityStore.get(key)
+				if (childState === undefined || !entityListState.children.has(childState)) {
+					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as it is not on the list.`)
+				}
+				return childState.getAccessor()
+			},
 		}
 		entityListState.addEventListener = this.getAddEventListener(entityListState)
 

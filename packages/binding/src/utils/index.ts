@@ -1,3 +1,4 @@
+export * from './assert'
 export * from './assertNever'
 export * from './Hashing'
 export * from './isEmptyObject'

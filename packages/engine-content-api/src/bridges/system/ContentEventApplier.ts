@@ -162,7 +162,13 @@ export class ContentEventApplier {
 		const tables = buildTables(context.schema.model)
 		const deps = this.contentApplyDependenciesFactory.create(context.schema, context.roles, context.identityVariables)
 		const applied: ContentEvent[] = []
+		let trxId: string | null = null
 		for (const event of events) {
+			if (event.transactionId !== trxId) {
+				await context.db.query('SET CONSTRAINTS ALL IMMEDIATE')
+				await context.db.query('SET CONSTRAINTS ALL DEFERRED')
+				trxId = event.transactionId
+			}
 			const result = await this.applyEvent(
 				{
 					tables,
@@ -176,6 +182,7 @@ export class ContentEventApplier {
 			}
 			applied.push(event)
 		}
+		await context.db.query('SET CONSTRAINTS ALL IMMEDIATE')
 		return new ContentEventApplyOkResult(applied)
 	}
 

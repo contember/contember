@@ -10,7 +10,7 @@ testMigrations('update enum', {
 				.column('title', c => c.type(Model.ColumnType.String))
 				.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
 		)
-		.enum('postStatus', ['publish', 'draft', 'auto-draft'])
+		.enum('postStatus', ['publish', 'draft', 'autodraft'])
 		.buildSchema(),
 	updatedSchema: new SchemaBuilder()
 		.entity('Post', e =>
@@ -18,15 +18,15 @@ testMigrations('update enum', {
 				.column('title', c => c.type(Model.ColumnType.String))
 				.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
 		)
-		.enum('postStatus', ['publish', 'draft', 'auto-draft', "SQL', 'injection"])
+		.enum('postStatus', ['publish', 'draft'])
 		.buildSchema(),
 	diff: [
 		{
 			modification: 'updateEnum',
 			enumName: 'postStatus',
-			values: ['publish', 'draft', 'auto-draft', "SQL', 'injection"],
+			values: ['publish', 'draft'],
 		},
 	],
 	sql: SQL`ALTER DOMAIN "postStatus" DROP CONSTRAINT postStatus_check;
-	ALTER DOMAIN "postStatus" ADD CONSTRAINT postStatus_check CHECK (VALUE IN('publish','draft','auto-draft','SQL'', ''injection'));`,
+	ALTER DOMAIN "postStatus" ADD CONSTRAINT postStatus_check CHECK (VALUE IN('publish','draft'));`,
 })

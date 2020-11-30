@@ -42,23 +42,23 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const workspaceDirectory = process.cwd()
-		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
+		const instanceLocalEnvironment = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
 
-		const composeConfig = await readDefaultDockerComposeConfig(instanceDirectory)
+		const composeConfig = await readDefaultDockerComposeConfig(instanceLocalEnvironment.instanceDirectory)
 		if (!composeConfig.services) {
 			throw 'docker-compose is not configured'
 		}
 
 		const { adminEnv } = await interactiveInstanceConfigure({
 			composeConfig,
-			instanceDirectory,
+			instanceDirectory: instanceLocalEnvironment.instanceDirectory,
 			host: input.getOption('host'),
 			ports: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
 		})
 
 		const withAdmin = !!composeConfig.services.admin
 
-		let dockerCompose = new DockerCompose(instanceDirectory)
+		let dockerCompose = new DockerCompose(instanceLocalEnvironment.instanceDirectory)
 
 		const nodeAdminRuntime = withAdmin && input.getOption('admin-runtime') === 'node'
 		const mainServices = ['api', ...(!withAdmin || nodeAdminRuntime ? [] : ['admin'])]
@@ -88,7 +88,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 		await new Promise(resolve => setTimeout(resolve, 2000))
 
-		const status = await getInstanceStatus({ instanceDirectory })
+		const status = await getInstanceStatus(instanceLocalEnvironment)
 		const notRunning = status.filter(it => it.name !== 'admin' || !nodeAdminRuntime).filter(it => !it.running)
 		if (notRunning.length > 0) {
 			const notRunningNames = notRunning.map(it => it.name)
@@ -113,7 +113,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				clearTimeout(timeoutRef)
 			}
 			timeoutRef = setTimeout(async () => {
-				await printInstanceStatus({ instanceDirectory })
+				await printInstanceStatus(instanceLocalEnvironment)
 				printNodeAdminStatus()
 			}, 2000)
 		}
@@ -136,7 +136,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		}
 
 		printNodeAdminStatus()
-		await printInstanceStatus({ instanceDirectory })
+		await printInstanceStatus(instanceLocalEnvironment)
 
 		if (input.getOption('detach')) {
 			return

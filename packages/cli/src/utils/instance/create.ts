@@ -2,7 +2,7 @@ import { getWorkspaceApiVersion, workspaceHasAdmin } from '../workspace'
 import { join } from 'path'
 import { resourcesDir } from '../../pathUtils'
 import { installTemplate } from '../template'
-import { InstanceLocalEnvironment, resolveInstanceEnvironment } from './enviornment'
+import { InstanceLocalEnvironment, resolveInstanceEnvironment } from './environment'
 import { getInstanceDir, validateInstanceName } from './common'
 import { updateMainDockerComposeConfig } from '../dockerCompose'
 

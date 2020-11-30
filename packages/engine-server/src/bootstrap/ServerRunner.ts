@@ -1,6 +1,5 @@
 import { Config } from '../config/config'
 import { Server } from 'http'
-import { success } from '../core/console/messages'
 import { Koa } from '@contember/engine-http'
 
 export class ServerRunner {
@@ -14,23 +13,16 @@ export class ServerRunner {
 		const port = this.config.server.port
 		const contemberServer = this.contemberKoa.listen(port, () => {
 			// eslint-disable-next-line no-console
-			console.log(success(`Tenant API running on http://localhost:${port}/tenant`))
-			Object.values(this.config.projects).forEach(project => {
-				const url = `http://localhost:${port}/system/${project.slug}`
-				// eslint-disable-next-line no-console
-				console.log(success(`System API for project ${project.slug} running on ${url}`))
-				project.stages.forEach(stage => {
-					const url = `http://localhost:${port}/content/${project.slug}/${stage.slug}`
-					// eslint-disable-next-line no-console
-					console.log(success(`Content API for project ${project.slug} and stage ${stage.slug} running on ${url}`))
-				})
-			})
+			console.log(`Contember API running on http://localhost:${port}`)
+			const projectSlugs = Object.values(this.config.projects).map(it => it.slug)
+			// eslint-disable-next-line no-console
+			console.log(`Initialized projects: ${projectSlugs.join(', ')}`)
 		})
 
 		const monitoringPort = this.config.server.monitoringPort
 		const monitoringServer = this.monitoringKoa.listen(monitoringPort, () => {
 			// eslint-disable-next-line no-console
-			console.log(success(`Monitoring running on http://localhost:${monitoringPort}`))
+			console.log(`Monitoring running on http://localhost:${monitoringPort}`)
 		})
 
 		return [contemberServer, monitoringServer]

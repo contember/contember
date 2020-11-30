@@ -182,31 +182,34 @@ export default async (options: RunnerOption): Promise<{ name: string }[]> => {
 		const toRun: Migration[] = getMigrationsToRun(options, runNames, migrations)
 
 		if (!toRun.length) {
-			logger.info('No migrations to run!')
 			return []
 		}
 
-		logger.info('Migrating files:')
-		toRun.forEach(m => {
-			logger.info(`- ${m.name}`)
-		})
+		logger.info(`Migrating ${toRun.length} file(s):`)
 
 		await db.query('BEGIN')
 		try {
 			for (const migration of toRun) {
-				const migrationsBuilder = createMigrationBuilder()
-				await migration.migration(migrationsBuilder, options.migrationArgs)
-				const steps = migrationsBuilder.getSqlSteps()
+				try {
+					logger.info(`  Executing migration ${migration.name}...`)
+					const migrationsBuilder = createMigrationBuilder()
+					await migration.migration(migrationsBuilder, options.migrationArgs)
+					const steps = migrationsBuilder.getSqlSteps()
 
-				for (const sql of steps) {
-					await db.query(sql)
+					for (const sql of steps) {
+						await db.query(sql)
+					}
+
+					await db.query(
+						`INSERT INTO ${getMigrationsTableName(options)} (${nameColumn}, ${runOnColumn}) VALUES ('${
+							migration.name
+						}', NOW());`,
+					)
+					logger.info(`  Done`)
+				} catch (e) {
+					logger.warn(`  FAILED`)
+					throw e
 				}
-
-				await db.query(
-					`INSERT INTO ${getMigrationsTableName(options)} (${nameColumn}, ${runOnColumn}) VALUES ('${
-						migration.name
-					}', NOW());`,
-				)
 			}
 			await db.query('COMMIT')
 		} catch (err) {
@@ -220,6 +223,6 @@ export default async (options: RunnerOption): Promise<{ name: string }[]> => {
 		}))
 	} finally {
 		await unlock(db).catch(error => logger.warn(error.message))
-		db.close()
+		await db.close()
 	}
 }

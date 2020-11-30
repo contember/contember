@@ -11,13 +11,16 @@ export class MigrationsRunner {
 		private readonly dbClient?: ClientBase,
 	) {}
 
-	public async migrate<MigrationArgs>(log: boolean = true, migrationArgs?: MigrationArgs) {
-		await this.createDatabaseIfNotExists()
+	public async migrate<MigrationArgs>(
+		log: (msg: string) => void,
+		migrationArgs?: MigrationArgs,
+	): Promise<{ name: string }[]> {
+		await this.createDatabaseIfNotExists(log)
 		const dbParams: RunnerOptionClient | RunnerOptionUrl = this.dbClient
 			? { dbClient: this.dbClient }
 			: { databaseUrl: this.db }
 		const migrate = (await import('./runner')).default
-		await migrate({
+		return await migrate({
 			...dbParams,
 			dir: this.dir,
 			schema: this.schema,
@@ -25,14 +28,11 @@ export class MigrationsRunner {
 			ignorePattern: '(\\..*)|(.+\\.ts)|tsconfig\\..+|.+\\.map|.+\\.test\\.js',
 			createSchema: true,
 			migrationArgs,
-			log: (msg: string) => {
-				// eslint-disable-next-line no-console
-				log && console.log(msg)
-			},
+			log,
 		})
 	}
 
-	private async createDatabaseIfNotExists() {
-		await createDatabaseIfNotExists(this.db)
+	private async createDatabaseIfNotExists(log: (msg: string) => void) {
+		await createDatabaseIfNotExists(this.db, log)
 	}
 }

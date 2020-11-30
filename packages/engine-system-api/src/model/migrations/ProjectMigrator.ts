@@ -35,7 +35,7 @@ export class ProjectMigrator {
 		db: DatabaseContext,
 		project: ProjectConfig,
 		migrationsToExecute: readonly Migration[],
-		progressCb: (version: string) => void,
+		logger: (message: string) => void,
 	) {
 		const stageTree = createStageTree(project)
 		if (migrationsToExecute.length === 0) {
@@ -53,7 +53,7 @@ export class ProjectMigrator {
 
 		let previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
 		for (const migration of sorted) {
-			progressCb(migration.version)
+			logger(`Executing migration ${migration.name}...`)
 			const formatVersion = migration.formatVersion
 
 			for (const modification of migration.modifications) {
@@ -78,11 +78,14 @@ export class ProjectMigrator {
 				),
 			)
 			await db.commandBus.execute(new SaveMigrationCommand(migration))
+			logger(`Done`)
 		}
 
 		await db.commandBus.execute(new UpdateStageEventCommand(rootStage.slug, previousId))
 
+		logger(`Recreating events...`)
 		await this.reCreateEvents(db, stageTree, { ...rootStage, event_id: previousId }, stageEvents)
+		logger(`Done`)
 	}
 
 	private async validateMigrations(

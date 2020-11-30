@@ -118,7 +118,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		uuid: createUuidGenerator(),
 	}
 
-	await migrationsRunner.migrate<TenantMigrationArgs>(false, {
+	await migrationsRunner.migrate<TenantMigrationArgs>(() => {}, {
 		credentials: {},
 		providers,
 	})

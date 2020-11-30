@@ -4,8 +4,10 @@ import { createMigrationResolver } from '@contember/engine-api-tester'
 import { ProjectConfig, StageConfig } from '../../../../src'
 import { suite } from 'uvu'
 import * as assert from '../../../src/asserts'
+import { Logger } from '@contember/engine-common'
 
 const projectInitializerTest = suite('Project initializer')
+const nullLogger = new Logger(() => {})
 
 projectInitializerTest('create preview stage', async () => {
 	const prodStage: StageConfig = {
@@ -23,7 +25,7 @@ projectInitializerTest('create preview stage', async () => {
 		},
 	})
 
-	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project)
+	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project, nullLogger)
 	const createdStagesA = await tester.stages.refreshCreatedStages()
 	assert.contains(createdStagesA, 'prod')
 	assert.not.contains(createdStagesA, 'preview')
@@ -51,7 +53,7 @@ projectInitializerTest('create preview stage', async () => {
 		],
 	}
 
-	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project2)
+	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project2, nullLogger)
 	await tester.stages.refreshCreatedStages()
 
 	const createdStagesB = await tester.stages.refreshCreatedStages()
@@ -97,7 +99,7 @@ projectInitializerTest('create second preview stage', async () => {
 		project: config1,
 	})
 
-	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, config1)
+	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, config1, nullLogger)
 	const createdStagesA = await tester.stages.refreshCreatedStages()
 
 	assert.contains(createdStagesA, 'prod')
@@ -144,7 +146,7 @@ projectInitializerTest('create second preview stage', async () => {
 		stages: [prodStage, previewStage, preview2Stage],
 	}
 
-	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, config2)
+	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, config2, nullLogger)
 
 	await tester.stages.refreshCreatedStages()
 
@@ -234,7 +236,7 @@ projectInitializerTest('migrate stages with rebase', async () => {
 		migrationsResolver,
 	})
 
-	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project)
+	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project, nullLogger)
 	await tester.stages.refreshCreatedStages()
 
 	const response = await tester.content.queryContent(
@@ -273,7 +275,7 @@ projectInitializerTest('migrate stages with rebase', async () => {
 		],
 	})
 
-	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project)
+	await tester.systemContainer.projectInitializer.initialize(tester.databaseContextFactory, project, nullLogger)
 	await tester.stages.refreshCreatedStages()
 
 	await tester.sequences.verifySequence(

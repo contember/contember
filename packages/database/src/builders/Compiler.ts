@@ -211,6 +211,7 @@ class Compiler {
 					.append(this.compileOnConflictTarget(onConflict.target))
 					.appendString(' do update set ')
 					.append(this.createSet(onConflict.values))
+					.append(onConflict.where.compile())
 			default:
 				return assertNever(onConflict)
 		}

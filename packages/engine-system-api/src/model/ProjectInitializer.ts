@@ -14,6 +14,7 @@ import {
 } from '@contember/database'
 import { MigrationArgs } from '../migrations'
 import { createDatabaseIfNotExists, createPgClient } from '@contember/database-migrations'
+import { Logger } from '@contember/engine-common'
 
 export class ProjectInitializer {
 	constructor(
@@ -27,13 +28,13 @@ export class ProjectInitializer {
 	public async initialize(
 		databaseContextFactory: DatabaseContextFactory,
 		project: ProjectConfig & { db?: DatabaseCredentials },
+		logger: Logger,
 	) {
 		const dbContext = databaseContextFactory.create(unnamedIdentity)
 		if (project.db) {
 			// todo: use dbContext
-			// eslint-disable-next-line no-console
-			console.group(`Executing system schema migration`)
-			await createDatabaseIfNotExists(project.db)
+			logger.group(`Executing system schema migration`)
+			await createDatabaseIfNotExists(project.db, logger.write.bind(logger))
 			const pgClient = await createPgClient(project.db)
 			await pgClient.connect()
 			const singleConnection = new SingleConnection(pgClient, {}, new EventManagerImpl(), true)
@@ -42,44 +43,43 @@ export class ProjectInitializer {
 				.create(unnamedIdentity)
 
 			const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
-			await this.systemDbMigrationsRunnerFactory(project.db, pgClient).migrate<MigrationArgs>(true, {
-				schemaResolver,
-				project,
-				queryHandler: dbContextMigrations.queryHandler,
-				migrationsResolverFactory: this.projectMigrationInfoResolver?.migrationsResolverFactory,
-			})
+			await this.systemDbMigrationsRunnerFactory(project.db, pgClient).migrate<MigrationArgs>(
+				logger.write.bind(logger),
+				{
+					schemaResolver,
+					project,
+					queryHandler: dbContextMigrations.queryHandler,
+					migrationsResolverFactory: this.projectMigrationInfoResolver?.migrationsResolverFactory,
+				},
+			)
 			await pgClient.end()
-			// eslint-disable-next-line no-console
-			console.groupEnd()
+			logger.groupEnd()
 		}
 		return await retryTransaction(() =>
 			dbContext.transaction(async trx => {
-				await this.createInitEvent(trx)
-				await this.initStages(trx, project)
+				await this.createInitEvent(trx, logger)
+				await this.initStages(trx, project, logger)
 			}),
 		)
 	}
 
-	private async createInitEvent(db: DatabaseContext<Connection.TransactionLike>) {
+	private async createInitEvent(db: DatabaseContext<Connection.TransactionLike>, logger: Logger) {
 		const rowId = await db.commandBus.execute(new CreateInitEventCommand())
 		if (rowId) {
-			// eslint-disable-next-line no-console
-			console.log(`Created init event`)
+			logger.write(`Created init event`)
 		}
 	}
 
-	private async initStages(db: DatabaseContext<Connection.TransactionLike>, project: ProjectConfig) {
+	private async initStages(db: DatabaseContext<Connection.TransactionLike>, project: ProjectConfig, logger: Logger) {
 		const stageTree = createStageTree(project)
 		const root = stageTree.getRoot()
 
 		const createStage = async (parent: StageConfig | null, stage: StageConfig) => {
 			const created = await this.stageCreator.createStage(db, parent, stage)
 			if (created) {
-				// eslint-disable-next-line no-console
-				console.log(`Created stage ${stage.slug} `)
+				logger.write(`Created stage ${stage.slug} `)
 			} else {
-				// eslint-disable-next-line no-console
-				console.log(`Updated stage ${stage.slug}`)
+				logger.breadcrumb(`Updated stage ${stage.slug}`)
 			}
 		}
 
@@ -90,20 +90,16 @@ export class ProjectInitializer {
 			}
 		}
 
-		// eslint-disable-next-line no-console
-		console.group(`Creating stages`)
+		logger.group(`Creating stages`)
 		await createRecursive(null, root)
-		// eslint-disable-next-line no-console
-		console.groupEnd()
+		logger.groupEnd()
 
-		// eslint-disable-next-line no-console
-		console.group(`Executing project migrations`)
-		await this.runMigrations(db, project)
-		// eslint-disable-next-line no-console
-		console.groupEnd()
+		logger.group(`Executing project migrations`)
+		await this.runMigrations(db, project, logger)
+		logger.groupEnd()
 	}
 
-	private async runMigrations(db: DatabaseContext, project: ProjectConfig) {
+	private async runMigrations(db: DatabaseContext, project: ProjectConfig, logger: Logger) {
 		if (!this.projectMigrationInfoResolver) {
 			return
 		}
@@ -114,28 +110,25 @@ export class ProjectInitializer {
 			badMigrations,
 		} = await this.projectMigrationInfoResolver.getMigrationsInfo(db, project)
 
-		// eslint-disable-next-line no-console
-		console.log(`Reading migrations from directory "${migrationsDirectory}"`)
-		for (const bad of badMigrations) {
-			// eslint-disable-next-line no-console
-			console.warn(bad.error)
-		}
+		try {
+			logger.group(`Reading migrations from directory "${migrationsDirectory}"`)
+			for (const bad of badMigrations) {
+				logger.write(bad.error)
+			}
 
-		if (allMigrations.length === 0) {
-			// eslint-disable-next-line no-console
-			console.warn(`No migrations for project found.`)
-			return
-		}
+			if (allMigrations.length === 0) {
+				logger.write(`No migrations for project found.`)
+				return
+			}
 
-		if (migrationsToExecute.length === 0) {
-			// eslint-disable-next-line no-console
-			console.log(`No migrations to execute for project`)
-			return
-		}
+			if (migrationsToExecute.length === 0) {
+				logger.breadcrumb(`No migrations to execute for project`)
+				return
+			}
 
-		await this.projectMigrator.migrate(db, project, migrationsToExecute, version =>
-			// eslint-disable-next-line no-console
-			console.log(`Executing migration ${version}`),
-		)
+			await this.projectMigrator.migrate(db, project, migrationsToExecute, logger.write.bind(logger))
+		} finally {
+			logger.groupEnd()
+		}
 	}
 }

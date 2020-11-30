@@ -15,8 +15,8 @@ export class InstanceInfoCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const workspaceDirectory = process.cwd()
-		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
+		const instanceLocalEnvironment = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
 
-		await printInstanceStatus({ instanceDirectory })
+		await printInstanceStatus(instanceLocalEnvironment)
 	}
 }

@@ -59,24 +59,19 @@ export const resolveInstanceListEnvironmentFromInput = async ({
 		}
 	>
 }): Promise<InstanceLocalEnvironment[]> => {
-	let instances: string[]
 	if (input.getOption('no-instance')) {
-		instances = []
+		return []
 	} else if (input.getOption('instance')) {
-		instances = input.getOption('instance')
+		return await Promise.all(
+			input.getOption('instance').map(instanceName => resolveInstanceEnvironment({ workspaceDirectory, instanceName })),
+		)
 	} else if (input.getOption('all-instances')) {
-		instances = await listInstances({ workspaceDirectory })
+		return await listInstances({ workspaceDirectory })
 	} else if (process.env.CONTEMBER_INSTANCE) {
-		instances = [process.env.CONTEMBER_INSTANCE]
+		return [await resolveInstanceEnvironment({ workspaceDirectory, instanceName: process.env.CONTEMBER_INSTANCE })]
 	} else {
-		instances = [await getDefaultInstance({ workspaceDirectory })]
+		return [await getDefaultInstance({ workspaceDirectory })]
 	}
-	return await Promise.all(
-		instances.map(
-			(instanceName): Promise<InstanceLocalEnvironment> =>
-				resolveInstanceEnvironment({ instanceName, workspaceDirectory }),
-		),
-	)
 }
 
 export const resolveInstanceEnvironmentFromInput = async ({
@@ -88,10 +83,9 @@ export const resolveInstanceEnvironmentFromInput = async ({
 	}>
 	workspaceDirectory: string
 }): Promise<InstanceLocalEnvironment> => {
-	let [instanceName] = [
-		input.getArgument('instanceName') ||
-			process.env.CONTEMBER_INSTANCE ||
-			(await getDefaultInstance({ workspaceDirectory })),
-	]
-	return await resolveInstanceEnvironment({ workspaceDirectory, instanceName })
+	const instanceName = input.getArgument('instanceName') || process.env.CONTEMBER_INSTANCE
+	if (instanceName) {
+		return await resolveInstanceEnvironment({ workspaceDirectory, instanceName })
+	}
+	return await getDefaultInstance({ workspaceDirectory })
 }

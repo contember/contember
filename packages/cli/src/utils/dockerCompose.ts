@@ -3,7 +3,6 @@ import { join } from 'path'
 import { runCommand, RunningCommand } from './commands'
 import { Readable, Writable } from 'stream'
 import { JsonUpdateCallback, readMultipleYaml, updateYaml } from './yaml'
-import { dump } from 'js-yaml'
 import { tuple } from './tuple'
 
 const OVERRIDE_CONFIGS = ['docker-compose.override.yaml', 'docker-compose.override.yml']
@@ -20,7 +19,7 @@ const resolvePath = async (dir: string, possibleFileNames: string[], fallbackFil
 }
 
 export const updateOverrideConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
-	const path = await resolvePath(dir, OVERRIDE_CONFIGS, OVERRIDE_CONFIGS[0])
+	const path = process.env.COMPOSE_FILE || (await resolvePath(dir, OVERRIDE_CONFIGS, OVERRIDE_CONFIGS[0]))
 	return updateYaml(path, updater, { createMissing: true })
 }
 
@@ -28,12 +27,12 @@ export const updateMainDockerComposeConfig = async (
 	dir: string,
 	updater: JsonUpdateCallback<DockerComposeConfig>,
 ): Promise<void> => {
-	const path = await resolvePath(dir, MAIN_CONFIGS, MAIN_CONFIGS[0])
+	const path = process.env.COMPOSE_FILE || (await resolvePath(dir, MAIN_CONFIGS, MAIN_CONFIGS[0]))
 	return updateYaml(path, updater, { createMissing: true })
 }
 
 export const readDefaultDockerComposeConfig = async (dir: string): Promise<any> => {
-	const candidates = [...MAIN_CONFIGS, ...OVERRIDE_CONFIGS]
+	const candidates = process.env.COMPOSE_FILE ? [process.env.COMPOSE_FILE] : [...MAIN_CONFIGS, ...OVERRIDE_CONFIGS]
 
 	return await readMultipleYaml(candidates.map(it => join(dir, it)))
 }

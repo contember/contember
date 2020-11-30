@@ -1,15 +1,14 @@
 import { ContainerStatus, getContainersStatus } from '../docker'
 import { execDockerCompose } from '../dockerCompose'
-import { instanceDirectoryToName } from './common'
+import { InstanceLocalEnvironment } from './environment'
 
 export type ServiceStatus = ContainerStatus
 
 export const getInstanceStatus = async ({
 	instanceDirectory,
-}: {
-	instanceDirectory: string
-}): Promise<ServiceStatus[]> => {
-	const instanceName = process.env.COMPOSE_PROJECT_NAME || instanceDirectoryToName(instanceDirectory)
+	instanceName,
+}: InstanceLocalEnvironment): Promise<ServiceStatus[]> => {
+	instanceName = process.env.COMPOSE_PROJECT_NAME || instanceName
 	const runningContainers = (
 		await execDockerCompose(['ps', '-q'], {
 			cwd: instanceDirectory,
@@ -28,7 +27,7 @@ export const getInstanceStatus = async ({
 		.map(it => ({ ...it, name: it.name.substring(instanceName.length + 1, it.name.lastIndexOf('_')) }))
 }
 
-export const printInstanceStatus = async (args: { instanceDirectory: string }) => {
+export const printInstanceStatus = async (args: InstanceLocalEnvironment) => {
 	const statusList = await getInstanceStatus(args)
 	if (statusList.length === 0) {
 		console.log('There is no running service.')

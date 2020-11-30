@@ -1,8 +1,8 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { join } from 'path'
-import { createWorkspace, getWorkspaceApiVersion, updateWorkspaceApiVersion } from '../../utils/workspace'
+import { getWorkspaceApiVersion, updateWorkspaceApiVersion } from '../../utils/workspace'
 import { runCommand } from '../../utils/commands'
-import { listInstances, resolveInstanceEnvironment } from '../../utils/instance'
+import { listInstances } from '../../utils/instance'
 import { updateMainDockerComposeConfig } from '../../utils/dockerCompose'
 
 type Args = {
@@ -55,8 +55,7 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 		const instances = await listInstances({ workspaceDirectory })
 		console.log('Updating instance docker-compose')
 		for (const instance of instances) {
-			const instanceEnv = await resolveInstanceEnvironment({ workspaceDirectory, instanceName: instance })
-			await updateMainDockerComposeConfig(instanceEnv.instanceDirectory, (data: any) => {
+			await updateMainDockerComposeConfig(instance.instanceDirectory, (data: any) => {
 				if (!data.services?.api) {
 					console.log(`docker-compose.yaml file in instance ${instance} not found, skipping`)
 					return

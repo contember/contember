@@ -1,24 +1,50 @@
 import { basename, join } from 'path'
 import { listDirectories } from '../fs'
-
-export const instanceDirectoryToName = (instanceDirectory: string) =>
-	basename(instanceDirectory)
-		.toLocaleLowerCase()
-		.replace(/[^-_a-z0-9]/, '')
+import { pathExists } from 'fs-extra'
+import { InstanceLocalEnvironment, resolveInstanceEnvironment } from './environment'
 
 export const validateInstanceName = (name: string) => {
-	if (!name.match(/^[a-z][a-z0-9]*$/)) {
+	if (!name.match(/^[a-z][-_a-z0-9]*$/)) {
 		throw 'Invalid instance name. It can contain only alphanumeric letters and cannot start with a number'
 	}
 }
 
-export const listInstances = async (args: { workspaceDirectory: string }) => {
-	return (await listDirectories(join(args.workspaceDirectory, 'instances'))).map(it => basename(it))
+export const listInstances = async ({
+	workspaceDirectory,
+}: {
+	workspaceDirectory: string
+}): Promise<InstanceLocalEnvironment[]> => {
+	const instanceDir = join(workspaceDirectory, 'instances')
+	if (!(await pathExists(instanceDir))) {
+		// possibly single instance environment (todo: validate)
+		return [
+			{
+				instanceName: basename(workspaceDirectory)
+					.toLocaleLowerCase()
+					.replace(/[^-_a-z0-9]/, ''),
+				instanceDirectory: workspaceDirectory,
+			},
+		]
+	}
+	const instanceDirs = await listDirectories(instanceDir)
+	return await Promise.all(
+		instanceDirs.map(
+			async it =>
+				await resolveInstanceEnvironment({
+					workspaceDirectory,
+					instanceName: basename(it),
+				}),
+		),
+	)
 }
 
-export const getDefaultInstance = async ({ workspaceDirectory }: { workspaceDirectory: string }): Promise<string> => {
+export const getDefaultInstance = async ({
+	workspaceDirectory,
+}: {
+	workspaceDirectory: string
+}): Promise<InstanceLocalEnvironment> => {
 	const instances = await listInstances({ workspaceDirectory })
-	if (instances.length > 1) {
+	if (instances.length !== 1) {
 		throw 'Please specify an instance'
 	}
 	return instances[0]

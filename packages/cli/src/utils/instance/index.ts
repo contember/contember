@@ -1,4 +1,4 @@
-export * from './enviornment'
+export * from './environment'
 export * from './configure'
 export { listInstances, validateInstanceName } from './common'
 export * from './config'

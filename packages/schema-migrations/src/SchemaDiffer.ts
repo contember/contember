@@ -163,15 +163,12 @@ export class SchemaDiffer {
 								builder.createField(updatedEntity, fieldName)
 							},
 							visitRelation: ({}, originalRelation: Model.AnyRelation, {}, _) => {
-								if (
-									deepEqual(
-										{ ...updatedRelation, inversedBy: undefined },
-										{ ...originalRelation, inversedBy: undefined },
-									)
-								) {
+								const updatedWithoutInverse = { ...updatedRelation, inversedBy: undefined }
+								const originalWithoutInverse = { ...originalRelation, inversedBy: undefined }
+								if (deepEqual(updatedWithoutInverse, originalWithoutInverse)) {
 									return
 								}
-								const partialUpdateResult = tryPartialUpdate(updatedRelation, originalRelation)
+								const partialUpdateResult = tryPartialUpdate(updatedWithoutInverse, originalWithoutInverse)
 
 								if (!partialUpdateResult) {
 									builder.removeField(entityName, fieldName)

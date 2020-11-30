@@ -3,6 +3,9 @@ import { ErrorBuilder, ValidationError } from './errors'
 import { everyIs, isObject, UnknownObject } from './utils'
 import { getTargetEntity, isInversedRelation, isOwnerRelation } from '../model'
 
+const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
+const RESERVED_WORDS = ['and', 'or', 'not']
+
 export class ModelValidator {
 	constructor(private readonly model: Model.Schema) {}
 
@@ -31,10 +34,16 @@ export class ModelValidator {
 			return {}
 		}
 		const validEnums: Model.Schema['enums'] = {}
-		for (const [enumName, enumValues] of Object.entries(enums)) {
+		enums: for (const [enumName, enumValues] of Object.entries(enums)) {
 			if (!Array.isArray(enumValues) || !everyIs(enumValues, (it): it is string => typeof it === 'string')) {
 				errors.for(enumName).add('Enum values must be an array of strings')
 				continue
+			}
+			for (const value of enumValues) {
+				const valueErrors = errors.for(value)
+				if (!this.validateIdentifier(value, valueErrors)) {
+					continue enums
+				}
 			}
 			validEnums[enumName] = enumValues
 		}
@@ -74,6 +83,9 @@ export class ModelValidator {
 		}
 		if (typeof entity.name !== 'string') {
 			errors.for('name').add('Entity name must be a string')
+			return undefined
+		}
+		if (!this.validateIdentifier(entity.name, errors)) {
 			return undefined
 		}
 		if (typeof entity.primary !== 'string') {
@@ -178,6 +190,13 @@ export class ModelValidator {
 		}
 		if (typeof field.type !== 'string') {
 			errors.add('Field type must be a string')
+			return undefined
+		}
+		if (typeof field.name !== 'string') {
+			errors.for('name').add('Field name must be a string')
+			return undefined
+		}
+		if (!this.validateIdentifier(field.name, errors)) {
 			return undefined
 		}
 		if (isRelation(field as any)) {
@@ -316,6 +335,18 @@ export class ModelValidator {
 			}
 		}
 		return (field as any) as Model.AnyRelation // todo
+	}
+
+	private validateIdentifier(value: string, errorBuilder: ErrorBuilder) {
+		if (!value.match(IDENTIFIER_PATTERN)) {
+			errorBuilder.add(`${value} must match pattern ${IDENTIFIER_PATTERN.source}`)
+			return false
+		}
+		if (RESERVED_WORDS.includes(value)) {
+			errorBuilder.add(`${value} is reserved word`)
+			return false
+		}
+		return true
 	}
 }
 

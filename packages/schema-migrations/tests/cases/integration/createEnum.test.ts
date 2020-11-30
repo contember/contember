@@ -13,13 +13,13 @@ testMigrations('create enum', {
 				.column('title', c => c.type(Model.ColumnType.String))
 				.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
 		)
-		.enum('postStatus', ['publish', 'draft', 'auto-draft'])
+		.enum('postStatus', ['publish', 'draft'])
 		.buildSchema(),
 	diff: [
 		{
 			modification: 'createEnum',
 			enumName: 'postStatus',
-			values: ['publish', 'draft', 'auto-draft'],
+			values: ['publish', 'draft'],
 		},
 		{
 			modification: 'createColumn',
@@ -34,7 +34,7 @@ testMigrations('create enum', {
 			},
 		},
 	],
-	sql: SQL`CREATE DOMAIN "postStatus" AS text CONSTRAINT "poststatus_check" CHECK (VALUE IN('publish','draft','auto-draft'));
+	sql: SQL`CREATE DOMAIN "postStatus" AS text CONSTRAINT "poststatus_check" CHECK (VALUE IN('publish','draft'));
 	ALTER TABLE "post"
 		ADD "status" "postStatus";`,
 })

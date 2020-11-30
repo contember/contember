@@ -10,7 +10,7 @@ testMigrations('remove enum', {
 				.column('title', c => c.type(Model.ColumnType.String))
 				.column('status', c => c.type(Model.ColumnType.Enum, { enumName: 'postStatus' })),
 		)
-		.enum('postStatus', ['publish', 'draft', 'auto-draft'])
+		.enum('postStatus', ['publish', 'draft'])
 		.buildSchema(),
 	updatedSchema: new SchemaBuilder()
 		.entity('Post', e => e.column('title', c => c.type(Model.ColumnType.String)))

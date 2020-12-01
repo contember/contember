@@ -191,6 +191,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 				blockElementPathRefs,
 				contemberFieldElementCache,
 				createNewReference: referenceList?.createNewEntity,
+				referencesAccessor: referenceList,
 				desugaredBlockList,
 				editorReferenceBlocks,
 				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,

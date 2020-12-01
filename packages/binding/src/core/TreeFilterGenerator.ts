@@ -20,7 +20,7 @@ export class TreeFilterGenerator {
 		const filters: TreeFilter[] = []
 
 		switch (subTree.type) {
-			case StateType.SingleEntity: {
+			case StateType.Entity: {
 				const filter = this.generateTopLevelEntityFilter(subTree)
 				filter && filters.push(filter)
 				break

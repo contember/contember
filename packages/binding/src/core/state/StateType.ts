@@ -1,5 +1,5 @@
 export enum StateType {
 	Field = 'field',
-	SingleEntity = 'singleEntity',
+	Entity = 'entity',
 	EntityList = 'entityList',
 }

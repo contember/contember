@@ -50,7 +50,7 @@ export class MutationGenerator {
 		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder,
 	): QueryBuilder {
-		if (rootState.type === StateType.SingleEntity) {
+		if (rootState.type === StateType.Entity) {
 			if (rootState.isScheduledForDeletion) {
 				queryBuilder = this.addDeleteMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			} else if (!rootState.getAccessor().existsOnServer) {
@@ -258,7 +258,7 @@ export class MutationGenerator {
 				}
 				builder = this.registerCreateFieldPart(fieldState, marker, builder)
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState.type !== StateType.SingleEntity) {
+				if (fieldState.type !== StateType.Entity) {
 					continue
 				}
 				if (marker.relation.isNonbearing) {
@@ -433,7 +433,7 @@ export class MutationGenerator {
 					}
 				}
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState.type !== StateType.SingleEntity) {
+				if (fieldState.type !== StateType.Entity) {
 					continue
 				}
 

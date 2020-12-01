@@ -24,7 +24,7 @@ export class PersistedDataUpdater {
 			for (const [subTreePlaceholder, subTreeState] of this.treeStore.subTreeStates) {
 				const newSubTreeData = normalizedResponse.subTreeDataStore.get(subTreePlaceholder)
 
-				if (subTreeState.type === StateType.SingleEntity) {
+				if (subTreeState.type === StateType.Entity) {
 					if (newSubTreeData instanceof ServerGeneratedUuid) {
 						if (newSubTreeData.value === subTreeState.id.value) {
 							didUpdateSomething =
@@ -89,7 +89,7 @@ export class PersistedDataUpdater {
 
 		if (state.childrenWithPendingUpdates) {
 			for (const child of state.childrenWithPendingUpdates) {
-				if (child.type === StateType.SingleEntity && !child.id.existsOnServer) {
+				if (child.type === StateType.Entity && !child.id.existsOnServer) {
 					state.childrenWithPendingUpdates.delete(child) // We should delete it completely.
 					didUpdate = true
 				}
@@ -115,7 +115,7 @@ export class PersistedDataUpdater {
 					}
 					break
 				}
-				case StateType.SingleEntity: {
+				case StateType.Entity: {
 					const marker = state.combinedMarkersContainer.markers.get(fieldPlaceholder)
 
 					if (!(marker instanceof HasOneRelationMarker)) {

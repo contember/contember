@@ -86,7 +86,7 @@ export class AccessorErrorManager {
 				continue
 			}
 			switch (rootState.type) {
-				case StateType.SingleEntity: {
+				case StateType.Entity: {
 					this.setEntityStateErrors(rootState, rootError)
 					break
 				}
@@ -136,7 +136,7 @@ export class AccessorErrorManager {
 					continue
 				}
 				switch (fieldState.type) {
-					case StateType.SingleEntity:
+					case StateType.Entity:
 						state.childrenWithPendingUpdates.add(fieldState)
 						this.setEntityStateErrors(fieldState, child)
 						break
@@ -218,7 +218,7 @@ export class AccessorErrorManager {
 			case StateType.Field:
 				stateNode.onFieldUpdate(stateNode)
 				break
-			case StateType.SingleEntity:
+			case StateType.Entity:
 				for (const [onUpdate] of stateNode.realms) {
 					onUpdate(stateNode)
 				}

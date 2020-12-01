@@ -122,7 +122,7 @@ export class StateInitializer {
 		}
 
 		const entityState: EntityState = {
-			type: StateType.SingleEntity,
+			type: StateType.Entity,
 			batchUpdateDepth: 0,
 			fieldsWithPendingConnectionUpdates: undefined,
 			childrenWithPendingUpdates: undefined,
@@ -192,12 +192,12 @@ export class StateInitializer {
 						this.treeStore.entityStore.delete(previousKey)
 						this.treeStore.entityStore.set(newKey, entityState)
 					}
-					if (updatedState.type === StateType.SingleEntity && updatedState.maidenKey !== updatedState.id.value) {
+					if (updatedState.type === StateType.Entity && updatedState.maidenKey !== updatedState.id.value) {
 						const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, updatedState)
 						this.eventManager.markPendingConnections(entityState, relevantPlaceholders)
 					}
 
-					if (updatedState.type === StateType.SingleEntity && updatedState.isScheduledForDeletion) {
+					if (updatedState.type === StateType.Entity && updatedState.isScheduledForDeletion) {
 						processChildEntityDeletion(updatedState)
 					} else {
 						this.markChildStateInNeedOfUpdate(entityState, updatedState)
@@ -263,7 +263,7 @@ export class StateInitializer {
 						for (const hasOneMarker of hasOneMarkers) {
 							const previouslyConnectedState = entityState.fields.get(hasOneMarker.placeholderName)
 
-							if (previouslyConnectedState === undefined || previouslyConnectedState.type !== StateType.SingleEntity) {
+							if (previouslyConnectedState === undefined || previouslyConnectedState.type !== StateType.Entity) {
 								this.rejectInvalidAccessorTree()
 							}
 
@@ -329,7 +329,7 @@ export class StateInitializer {
 							if (stateToDisconnect === undefined) {
 								throw new BindingError(`Cannot disconnect field '${hasOneMarker.placeholderName}' as it doesn't exist.`)
 							}
-							if (stateToDisconnect.type !== StateType.SingleEntity) {
+							if (stateToDisconnect.type !== StateType.Entity) {
 								this.rejectInvalidAccessorTree()
 							}
 
@@ -552,7 +552,7 @@ export class StateInitializer {
 				}
 			})(),
 			onChildEntityUpdate: updatedState => {
-				if (updatedState.type !== StateType.SingleEntity) {
+				if (updatedState.type !== StateType.Entity) {
 					throw new BindingError(`Illegal entity list value.`)
 				}
 
@@ -1059,7 +1059,7 @@ export class StateInitializer {
 					fieldState.fieldMarker = MarkerMerger.mergeFieldMarkers(fieldState.fieldMarker, field)
 				}
 			} else if (field instanceof HasOneRelationMarker) {
-				if (fieldState === undefined || fieldState.type === StateType.SingleEntity) {
+				if (fieldState === undefined || fieldState.type === StateType.Entity) {
 					// This method calls initializeEntityAccessor which handles the merging on its own.
 					this.initializeFromHasOneRelationMarker(existingEntityState, field, fieldDatum)
 				}

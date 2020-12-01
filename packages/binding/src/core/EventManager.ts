@@ -149,7 +149,7 @@ export class EventManager {
 				}
 			}
 			if (
-				state.type === StateType.SingleEntity &&
+				state.type === StateType.Entity &&
 				state.fieldsWithPendingConnectionUpdates &&
 				state.eventListeners.connectionUpdate
 			) {
@@ -166,7 +166,7 @@ export class EventManager {
 			}
 
 			switch (state.type) {
-				case StateType.SingleEntity:
+				case StateType.Entity:
 				case StateType.EntityList: {
 					if (state.childrenWithPendingUpdates !== undefined) {
 						for (const childState of state.childrenWithPendingUpdates) {
@@ -292,7 +292,7 @@ export class EventManager {
 						hasOnInitialize = true
 					}
 				}
-				if (state.type === StateType.SingleEntity) {
+				if (state.type === StateType.Entity) {
 					state.hasIdSetInStone = true
 				}
 			}

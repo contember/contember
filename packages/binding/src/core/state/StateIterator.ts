@@ -19,9 +19,9 @@ export class StateIterator {
 			return
 		}
 		visitedINodes.add(root)
-		if (root.type === StateType.SingleEntity) {
+		if (root.type === StateType.Entity) {
 			for (const [, childState] of root.fields) {
-				if (childState.type === StateType.SingleEntity || childState.type === StateType.EntityList) {
+				if (childState.type === StateType.Entity || childState.type === StateType.EntityList) {
 					yield* this.depthFirstINodesImplementation(childState, match, visitedINodes)
 				}
 			}

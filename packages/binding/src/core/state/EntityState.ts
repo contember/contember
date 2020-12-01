@@ -10,7 +10,7 @@ import { StateType } from './StateType'
 export type OnEntityUpdate = (state: StateNode) => void
 export type OnEntityFieldUpdate = (state: StateNode) => void
 export interface EntityState {
-	type: StateType.SingleEntity
+	type: StateType.Entity
 	eventListeners: SingleEntityEventListeners['eventListeners']
 	environment: Environment
 	batchUpdateDepth: number

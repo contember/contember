@@ -34,8 +34,8 @@ export class PersistedDataUpdater {
 							const newSubTreeState = this.stateInitializer.initializeEntityAccessor(
 								newSubTreeData,
 								subTreeState.environment,
-								subTreeState.markersContainer,
-								subTreeState.creationParameters,
+								subTreeState.combinedMarkersContainer, // TODO this is wrong - we need to take it from a realm
+								subTreeState.combinedCreationParameters, // TODO this is wrong - we need to take it from a realm
 								subTreeState.onChildFieldUpdate,
 								(this.treeStore.markerTree.subTrees.get(subTreePlaceholder)?.parameters as
 									| BoxedQualifiedSingleEntity
@@ -116,7 +116,7 @@ export class PersistedDataUpdater {
 					break
 				}
 				case StateType.SingleEntity: {
-					const marker = state.markersContainer.markers.get(fieldPlaceholder)
+					const marker = state.combinedMarkersContainer.markers.get(fieldPlaceholder)
 
 					if (!(marker instanceof HasOneRelationMarker)) {
 						break

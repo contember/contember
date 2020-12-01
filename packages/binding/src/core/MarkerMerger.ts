@@ -122,6 +122,9 @@ export class MarkerMerger {
 		original: EntityFieldMarkersContainer,
 		fresh: EntityFieldMarkersContainer,
 	): EntityFieldMarkersContainer {
+		if (original === fresh) {
+			return original
+		}
 		return new EntityFieldMarkersContainer(
 			original.hasAtLeastOneBearingField || fresh.hasAtLeastOneBearingField,
 			this.mergeEntityFields(original.markers, fresh.markers),

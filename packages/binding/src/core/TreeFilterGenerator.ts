@@ -48,7 +48,7 @@ export class TreeFilterGenerator {
 		return {
 			entity: typeName,
 			id: id.value,
-			relations: this.generateEntityRelations(topLevelEntity.markersContainer),
+			relations: this.generateEntityRelations(topLevelEntity.combinedMarkersContainer),
 		}
 	}
 

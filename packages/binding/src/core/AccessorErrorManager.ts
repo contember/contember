@@ -124,7 +124,7 @@ export class AccessorErrorManager {
 			}
 			// Deliberately letting flow get here as well. Leaf errors *CAN* refer to relations as well.
 
-			const placeholders = state.markersContainer.placeholders.get(childKey)
+			const placeholders = state.combinedMarkersContainer.placeholders.get(childKey)
 			if (placeholders === undefined) {
 				continue
 			}
@@ -219,8 +219,8 @@ export class AccessorErrorManager {
 				stateNode.onFieldUpdate(stateNode)
 				break
 			case StateType.SingleEntity:
-				for (const realm of stateNode.realms) {
-					realm(stateNode)
+				for (const [onUpdate] of stateNode.realms) {
+					onUpdate(stateNode)
 				}
 				break
 			case StateType.EntityList:

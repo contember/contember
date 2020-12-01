@@ -354,7 +354,7 @@ export class EventManager {
 		if (parentState.fieldsWithPendingConnectionUpdates === undefined) {
 			parentState.fieldsWithPendingConnectionUpdates = new Set()
 		}
-		placeholders: for (const [fieldName, placeholderNames] of parentState.markersContainer.placeholders) {
+		placeholders: for (const [fieldName, placeholderNames] of parentState.combinedMarkersContainer.placeholders) {
 			if (typeof placeholderNames === 'string') {
 				if (connectionPlaceholders.has(placeholderNames)) {
 					parentState.fieldsWithPendingConnectionUpdates.add(fieldName)

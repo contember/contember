@@ -231,7 +231,7 @@ export class MutationGenerator {
 			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
 		> = []
 
-		for (const [placeholderName, marker] of currentState.markersContainer.markers) {
+		for (const [placeholderName, marker] of currentState.combinedMarkersContainer.markers) {
 			if (
 				placeholderName === TYPENAME_KEY_NAME ||
 				(placeholderName === PRIMARY_KEY_NAME && !(currentState.id instanceof ClientGeneratedUuid))
@@ -290,13 +290,16 @@ export class MutationGenerator {
 			}
 		}
 
-		if (currentState.creationParameters.forceCreation && (builder.data === undefined || isEmptyObject(builder.data))) {
+		if (
+			currentState.combinedCreationParameters.forceCreation &&
+			(builder.data === undefined || isEmptyObject(builder.data))
+		) {
 			builder = builder.set('_dummy_field_', true)
 		}
 
 		if (
 			(builder.data !== undefined && !isEmptyObject(builder.data)) ||
-			!currentState.markersContainer.hasAtLeastOneBearingField
+			!currentState.combinedMarkersContainer.hasAtLeastOneBearingField
 		) {
 			for (const field of nonbearingFields) {
 				switch (field.type) {
@@ -318,7 +321,7 @@ export class MutationGenerator {
 			}
 		}
 
-		const setOnCreate = currentState.creationParameters.setOnCreate
+		const setOnCreate = currentState.combinedCreationParameters.setOnCreate
 		if (setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
 			for (const key in setOnCreate) {
 				const field = setOnCreate[key]
@@ -409,7 +412,7 @@ export class MutationGenerator {
 		}
 		processedEntities.add(currentState)
 
-		for (const [placeholderName, marker] of currentState.markersContainer.markers) {
+		for (const [placeholderName, marker] of currentState.combinedMarkersContainer.markers) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}

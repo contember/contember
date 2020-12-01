@@ -1,4 +1,5 @@
 export * from './EntityListState'
+export * from './EntityRealm'
 export * from './EntityState'
 export * from './FieldState'
 export * from './StateIterator'

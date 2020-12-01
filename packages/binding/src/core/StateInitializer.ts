@@ -34,6 +34,7 @@ import { EventManager } from './EventManager'
 import { MarkerMerger } from './MarkerMerger'
 import {
 	EntityListState,
+	EntityRealm,
 	EntityState,
 	FieldState,
 	OnEntityListUpdate,
@@ -99,26 +100,20 @@ export class StateInitializer {
 	): EntityState {
 		const entityKey = id.value
 		const existingEntityState = this.treeStore.entityStore.get(entityKey)
+		const newRealm: EntityRealm = {
+			creationParameters,
+			environment,
+			initialEventListeners,
+			markersContainer,
+		}
 
 		if (existingEntityState !== undefined) {
-			existingEntityState.markersContainer = MarkerMerger.mergeEntityFieldsContainers(
-				existingEntityState.markersContainer,
-				markersContainer,
-			)
-			existingEntityState.realms.add(onEntityUpdate)
-			existingEntityState.hasStaleAccessor = true
-			existingEntityState.eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
-				TreeParameterMerger.cloneSingleEntityEventListeners(existingEntityState.eventListeners),
-				TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
-			)
-			existingEntityState.creationParameters = {
-				forceCreation: existingEntityState.creationParameters.forceCreation || creationParameters.forceCreation,
-				isNonbearing: existingEntityState.creationParameters.isNonbearing && creationParameters.isNonbearing, // If either is false, it's bearing
-				setOnCreate: TreeParameterMerger.mergeSetOnCreate(
-					existingEntityState.creationParameters.setOnCreate,
-					creationParameters.setOnCreate,
-				),
+			if (existingEntityState.realms.has(onEntityUpdate)) {
+				// TODO we need to handle this!
+				// console.log(existingEntityState)
 			}
+			this.addEntityRealm(onEntityUpdate, existingEntityState, newRealm)
+			existingEntityState.hasStaleAccessor = true
 			this.mergeInEntityFieldsContainer(existingEntityState, markersContainer)
 
 			this.eventManager.registerNewlyInitialized(existingEntityState)
@@ -131,7 +126,8 @@ export class StateInitializer {
 			batchUpdateDepth: 0,
 			fieldsWithPendingConnectionUpdates: undefined,
 			childrenWithPendingUpdates: undefined,
-			creationParameters,
+			combinedCreationParameters: newRealm.creationParameters,
+			combinedMarkersContainer: newRealm.markersContainer,
 			environment,
 			errors: undefined,
 			eventListeners: TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
@@ -143,10 +139,9 @@ export class StateInitializer {
 			id,
 			isScheduledForDeletion: false,
 			maidenKey: id instanceof UnpersistedEntityKey ? id.value : undefined,
-			markersContainer,
 			persistedData: this.treeStore.persistedEntityData.get(entityKey),
 			plannedHasOneDeletions: undefined,
-			realms: new Set([onEntityUpdate]),
+			realms: new Map([[onEntityUpdate, newRealm]]),
 			typeName: undefined,
 			getAccessor: (() => {
 				let accessor: EntityAccessor | undefined = undefined
@@ -203,7 +198,7 @@ export class StateInitializer {
 					}
 
 					if (updatedState.type === StateType.SingleEntity && updatedState.isScheduledForDeletion) {
-						processEntityDeletion(updatedState)
+						processChildEntityDeletion(updatedState)
 					} else {
 						this.markChildStateInNeedOfUpdate(entityState, updatedState)
 					}
@@ -295,7 +290,8 @@ export class StateInitializer {
 								if (
 									persistedKey === null || // We're updating.
 									(persistedKey === undefined && // We're creating.
-										(!entityState.markersContainer.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing))
+										(!entityState.combinedMarkersContainer.hasAtLeastOneBearingField ||
+											!hasOneMarker.relation.isNonbearing))
 								) {
 									this.dirtinessTracker.increment()
 								}
@@ -303,7 +299,12 @@ export class StateInitializer {
 
 							// TODO do something about the existing state…
 
-							newlyConnectedState.realms.add(entityState.onChildFieldUpdate)
+							this.addEntityRealm(entityState.onChildFieldUpdate, newlyConnectedState, {
+								environment: hasOneMarker.environment,
+								initialEventListeners: hasOneMarker.relation,
+								markersContainer: hasOneMarker.fields,
+								creationParameters: hasOneMarker.relation,
+							})
 							entityState.fields.set(hasOneMarker.placeholderName, newlyConnectedState)
 							entityState.hasStaleAccessor = true
 							entityState.hasPendingParentNotification = true
@@ -412,7 +413,7 @@ export class StateInitializer {
 			) {
 				entityState.hasPendingUpdate = true
 				entityState.hasPendingParentNotification = false
-				for (const onUpdate of entityState.realms) {
+				for (const [onUpdate] of entityState.realms) {
 					onUpdate(entityState)
 				}
 			}
@@ -447,37 +448,37 @@ export class StateInitializer {
 			})
 		}
 
-		const processEntityDeletion = (deletedState: EntityState) => {
-			const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, deletedState)
+		const processChildEntityDeletion = (deletedChildState: EntityState) => {
+			const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, deletedChildState)
 
-			if (deletedState.id.existsOnServer) {
+			if (deletedChildState.id.existsOnServer) {
 				if (entityState.plannedHasOneDeletions === undefined) {
 					entityState.plannedHasOneDeletions = new Map()
 				}
 				for (const placeholderName of relevantPlaceholders) {
-					entityState.plannedHasOneDeletions.set(placeholderName, deletedState)
+					entityState.plannedHasOneDeletions.set(placeholderName, deletedChildState)
 				}
 			}
 
 			for (const placeholderName of relevantPlaceholders) {
 				const newEntityState = this.initializeEntityAccessor(
 					new UnpersistedEntityKey(),
-					deletedState.environment,
-					deletedState.markersContainer,
-					deletedState.creationParameters,
+					deletedChildState.environment,
+					deletedChildState.combinedMarkersContainer, // TODO this is wrong!!!
+					deletedChildState.combinedCreationParameters, // TODO this is wrong!!!
 					entityState.onChildFieldUpdate,
 					initialEventListeners, // TODO this is wrong!!!
 				)
 				entityState.fields.set(placeholderName, newEntityState)
 			}
 			// TODO update the changes count
-			entityState.childrenWithPendingUpdates?.delete(deletedState)
+			entityState.childrenWithPendingUpdates?.delete(deletedChildState)
 
 			this.eventManager.markPendingConnections(entityState, relevantPlaceholders)
 		}
 
 		const resolveHasOneRelationMarkers = (field: FieldName, message: string): Set<HasOneRelationMarker> => {
-			const placeholders = entityState.markersContainer.placeholders.get(field)
+			const placeholders = entityState.combinedMarkersContainer.placeholders.get(field)
 
 			if (placeholders === undefined) {
 				throw new BindingError(message)
@@ -486,7 +487,7 @@ export class StateInitializer {
 
 			return new Set(
 				placeholderArray.map(placeholderName => {
-					const hasOneRelation = entityState.markersContainer.markers.get(placeholderName)
+					const hasOneRelation = entityState.combinedMarkersContainer.markers.get(placeholderName)
 
 					if (!(hasOneRelation instanceof HasOneRelationMarker)) {
 						throw new BindingError(message)
@@ -584,7 +585,12 @@ export class StateInitializer {
 							return
 						}
 
-						connectedState.realms.add(entityListState.onChildEntityUpdate)
+						this.addEntityRealm(entityListState.onChildEntityUpdate, connectedState, {
+							markersContainer: entityListState.markersContainer,
+							creationParameters: entityListState.creationParameters,
+							environment: entityListState.environment,
+							initialEventListeners: this.eventManager.getEventListenersForListEntity(entityListState),
+						})
 						entityListState.children.add(connectedState)
 						entityListState.plannedRemovals?.delete(connectedState)
 
@@ -1104,6 +1110,27 @@ export class StateInitializer {
 				}
 			}
 		}
+	}
+
+	private addEntityRealm(onUpdate: OnEntityUpdate, targetState: EntityState, newRealm: EntityRealm) {
+		const { creationParameters, markersContainer, initialEventListeners, environment } = newRealm
+		targetState.combinedMarkersContainer = MarkerMerger.mergeEntityFieldsContainers(
+			targetState.combinedMarkersContainer,
+			markersContainer,
+		)
+		targetState.combinedCreationParameters = {
+			forceCreation: targetState.combinedCreationParameters.forceCreation || creationParameters.forceCreation,
+			isNonbearing: targetState.combinedCreationParameters.isNonbearing && creationParameters.isNonbearing, // If either is false, it's bearing
+			setOnCreate: TreeParameterMerger.mergeSetOnCreate(
+				targetState.combinedCreationParameters.setOnCreate,
+				creationParameters.setOnCreate,
+			),
+		}
+		targetState.realms.set(onUpdate, newRealm)
+		targetState.eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
+			TreeParameterMerger.cloneSingleEntityEventListeners(targetState.eventListeners),
+			TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
+		)
 	}
 
 	private resolveAndPrepareEntityToConnect(entityToConnectOrItsKey: string | EntityAccessor): [string, EntityState] {

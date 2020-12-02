@@ -311,14 +311,14 @@ test('query builder: constructs delete', async () => {
 				.from('bar')
 				.using('data')
 				.where(cond => cond.compare(['data', 'a'], Operator.gte, 1))
-				.returning('xyz')
+				.returning('abc', 'xyz')
 			await qb.execute(wrapper)
 		},
 		sql: SQL`with "data" as
 			(select * from "public"."abc")
 			delete from "public"."bar"
 			using "data" as "data"
-			where "data"."a" >= ? returning "xyz"`,
+			where "data"."a" >= ? returning "abc", "xyz"`,
 		parameters: [1],
 	})
 })

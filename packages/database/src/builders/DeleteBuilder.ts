@@ -37,8 +37,8 @@ class DeleteBuilder<Result extends DeleteBuilder.DeleteResult>
 		return this.withOption('using', { ...this.options.using, [alias || tableName]: tableName })
 	}
 
-	public returning(column: QueryBuilder.ColumnIdentifier | Literal): DeleteBuilder<Returning.Result[]> {
-		return this.withOption('returning', new Returning(column)) as DeleteBuilder<Returning.Result[]>
+	public returning<R = Returning.Result>(...columns: Returning.ReturningColumn[]): DeleteBuilder<R[]> {
+		return this.withOption('returning', new Returning(columns)) as DeleteBuilder<any>
 	}
 
 	public createQuery(context: Compiler.Context): Literal {

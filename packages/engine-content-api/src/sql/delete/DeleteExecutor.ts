@@ -99,7 +99,7 @@ export class DeleteExecutor {
 			.where(condition => condition.in(entity.primaryColumn, inQbWithWhere))
 			.returning(entity.primaryColumn)
 
-		return (await qb.execute(db)) as string[]
+		return (await qb.execute(db)).map(it => it[entity.primaryColumn]) as string[]
 	}
 
 	private async setNull(

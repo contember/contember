@@ -50,7 +50,7 @@ const schema: DocumentNode = gql`
 
 	enum _RelationSide {
 		owning
-		inversed
+		inverse
 	}
 	enum _OrderByDirection {
 		asc

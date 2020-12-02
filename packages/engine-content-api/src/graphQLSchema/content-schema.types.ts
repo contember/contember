@@ -108,7 +108,7 @@ export type _Relation = _Field & {
 
 export enum _RelationSide {
 	Owning = 'owning',
-	Inversed = 'inversed',
+	Inverse = 'inverse',
 }
 
 export type _Rule = {

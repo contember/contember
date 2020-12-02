@@ -49,7 +49,7 @@ export class ContentSchemaFactory {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
-					side: ContentSchema._RelationSide.Inversed,
+					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
@@ -77,7 +77,7 @@ export class ContentSchemaFactory {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
-					side: ContentSchema._RelationSide.Inversed,
+					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
@@ -86,7 +86,7 @@ export class ContentSchemaFactory {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
-					side: ContentSchema._RelationSide.Inversed,
+					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					nullable: relation.nullable,
 				}

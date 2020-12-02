@@ -30,6 +30,10 @@ export class HistoryQueryResolver implements QueryResolver<'history'> {
 				return {
 					ok: false,
 					errors: [HistoryErrorCode.StageNotFound],
+					error: {
+						code: HistoryErrorCode.StageNotFound,
+						message: `Stage ${args.stage} not found`,
+					},
 				}
 			}
 			await context.requireAccess(

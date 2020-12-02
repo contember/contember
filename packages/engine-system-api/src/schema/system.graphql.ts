@@ -49,9 +49,15 @@ const schema: DocumentNode = gql`
 		STAGE_NOT_FOUND
 	}
 
+	type HistoryError {
+		code: HistoryErrorCode!
+		message: String
+	}
+
 	type HistoryResponse {
 		ok: Boolean
-		errors: [HistoryErrorCode!]!
+		errors: [HistoryErrorCode!]! @deprecated
+		error: HistoryError
 		result: HistoryResult
 	}
 
@@ -134,9 +140,15 @@ const schema: DocumentNode = gql`
 		NOT_REBASED
 	}
 
+	type DiffError {
+		code: DiffErrorCode!
+		message: String
+	}
+
 	type DiffResponse {
 		ok: Boolean!
-		errors: [DiffErrorCode!]!
+		errors: [DiffErrorCode!]! @deprecated
+		error: DiffError
 		result: DiffResult
 	}
 
@@ -182,7 +194,8 @@ const schema: DocumentNode = gql`
 
 	type MigrateResponse {
 		ok: Boolean!
-		errors: [MigrateError!]!
+		errors: [MigrateError!]! @deprecated
+		error: MigrateError
 		result: MigrateResult
 	}
 
@@ -198,9 +211,15 @@ const schema: DocumentNode = gql`
 		FORBIDDEN
 	}
 
+	type ReleaseError {
+		code: ReleaseErrorCode!
+		message: String
+	}
+
 	type ReleaseResponse {
 		ok: Boolean!
-		errors: [ReleaseErrorCode!]!
+		errors: [ReleaseErrorCode!]! @deprecated
+		error: ReleaseError
 	}
 
 	# === releaseTree ===
@@ -212,9 +231,15 @@ const schema: DocumentNode = gql`
 		NOT_REBASED
 	}
 
+	type ReleaseTreeError {
+		code: ReleaseTreeErrorCode!
+		message: String
+	}
+
 	type ReleaseTreeResponse {
 		ok: Boolean!
-		errors: [ReleaseTreeErrorCode!]!
+		errors: [ReleaseTreeErrorCode!]! @deprecated
+		error: ReleaseTreeError
 	}
 
 	# === rebase ===

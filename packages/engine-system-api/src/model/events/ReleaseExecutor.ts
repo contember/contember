@@ -64,7 +64,7 @@ export class ReleaseExecutor {
 			events,
 		)
 		if (!result.ok) {
-			return new ReleaseExecutorErrorResult([ReleaseExecutorErrorCode.forbidden])
+			return new ReleaseExecutorErrorResult(ReleaseExecutorErrorCode.forbidden)
 		}
 
 		const newBase = await db.queryHandler.fetch(new StageBySlugQuery(targetStage.slug))
@@ -161,7 +161,7 @@ export enum ReleaseExecutorErrorCode {
 
 export class ReleaseExecutorErrorResult {
 	public readonly ok = false
-	constructor(public readonly errors: ReleaseExecutorErrorCode[]) {}
+	constructor(public readonly error: ReleaseExecutorErrorCode) {}
 }
 
 export type ReleaseExecutorResult = ReleaseExecutorOkResult | ReleaseExecutorErrorResult

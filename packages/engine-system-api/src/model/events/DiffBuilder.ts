@@ -29,19 +29,17 @@ export class DiffBuilder {
 		baseStage: Stage,
 		headStage: Stage,
 		filter: ReadonlyArray<EventFilter> | null,
-	): Promise<DiffBuilderResponseResponse> {
+	): Promise<DiffBuilderResponse> {
+		const schema = await this.schemaVersionBuilder.buildSchema(db)
 		const count = await db.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
 
-		if (count.ok === false) {
-			return {
-				ok: false,
-				errors: count.errors.map(
-					it =>
-						({
-							[DiffCountQuery.ErrorCode.notRebased]: DiffBuilderErrorCode.notRebased,
-						}[it]),
-				),
-			}
+		if (!count.ok) {
+			return new DiffBuilderErrorResponse(
+				{
+					[DiffCountQuery.ErrorCode.notRebased]: DiffBuilderErrorCode.notRebased,
+				}[count.error],
+				`Stage ${headStage.slug} is not rebased`,
+			)
 		}
 
 		if (count.diff === 0) {
@@ -53,7 +51,6 @@ export class DiffBuilder {
 
 		const events = await db.queryHandler.fetch(new DiffQuery(baseStage.event_id, headStage.event_id))
 		assertEveryIsContentEvent(events)
-		const schema = await this.schemaVersionBuilder.buildSchema(db)
 		const dependencies = await this.dependencyBuilder.build(schema, events)
 		const eventsWithDependencies = events.map(it => ({
 			...it,
@@ -148,7 +145,7 @@ export class DiffBuilder {
 	}
 }
 
-export type DiffBuilderResponseResponse = DiffBuilderOkResponse | DiffBuilderErrorResponse
+export type DiffBuilderResponse = DiffBuilderOkResponse | DiffBuilderErrorResponse
 
 export enum DiffBuilderErrorCode {
 	notRebased = 'notRebased',
@@ -157,7 +154,7 @@ export enum DiffBuilderErrorCode {
 export class DiffBuilderErrorResponse {
 	public readonly ok: false = false
 
-	constructor(public readonly errors: DiffBuilderErrorCode[]) {}
+	constructor(public readonly error: DiffBuilderErrorCode, public readonly message?: string) {}
 }
 
 export type EventWithDependencies = ContentEvent & { dependencies: string[] }

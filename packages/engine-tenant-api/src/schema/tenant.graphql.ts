@@ -97,14 +97,15 @@ const schema: DocumentNode = gql`
 	# === signUp ===
 	type SignUpResponse {
 		ok: Boolean!
-		errors: [SignUpError!]!
+		errors: [SignUpError!]! @deprecated
+		error: SignUpError
 		result: SignUpResult
 	}
 
 	type SignUpError {
 		code: SignUpErrorCode!
-		endPersonMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endPersonMessage: String @deprecated
 	}
 
 	enum SignUpErrorCode {
@@ -119,14 +120,15 @@ const schema: DocumentNode = gql`
 	# === signIn ===
 	type SignInResponse {
 		ok: Boolean!
-		errors: [SignInError!]!
+		errors: [SignInError!]! @deprecated
+		error: SignInError
 		result: SignInResult
 	}
 
 	type SignInError {
 		code: SignInErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum SignInErrorCode {
@@ -145,13 +147,14 @@ const schema: DocumentNode = gql`
 
 	type SignOutResponse {
 		ok: Boolean!
-		errors: [SignOutError!]!
+		errors: [SignOutError!]! @deprecated
+		error: SignOutError
 	}
 
 	type SignOutError {
 		code: SignOutErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum SignOutErrorCode {
@@ -162,13 +165,14 @@ const schema: DocumentNode = gql`
 
 	type ChangePasswordResponse {
 		ok: Boolean!
-		errors: [ChangePasswordError!]!
+		errors: [ChangePasswordError!]! @deprecated
+		error: ChangePasswordError
 	}
 
 	type ChangePasswordError {
 		code: ChangePasswordErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum ChangePasswordErrorCode {
@@ -180,7 +184,8 @@ const schema: DocumentNode = gql`
 
 	type InitSignInIDPResponse {
 		ok: Boolean!
-		errors: [InitSignInIDPError!]!
+		errors: [InitSignInIDPError!]! @deprecated
+		error: InitSignInIDPError
 		result: InitSignInIDPResult
 	}
 
@@ -191,8 +196,8 @@ const schema: DocumentNode = gql`
 
 	type InitSignInIDPError {
 		code: InitSignInIDPErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum InitSignInIDPErrorCode {
@@ -205,14 +210,15 @@ const schema: DocumentNode = gql`
 
 	type SignInIDPResponse {
 		ok: Boolean!
-		errors: [SignInIDPError!]!
+		errors: [SignInIDPError!]! @deprecated
+		error: SignInIDPError
 		result: SignInIDPResult
 	}
 
 	type SignInIDPError {
 		code: SignInIDPErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum SignInIDPErrorCode {
@@ -231,22 +237,26 @@ const schema: DocumentNode = gql`
 
 	type InviteResponse {
 		ok: Boolean!
-		errors: [InviteError!]!
+		errors: [InviteError!]! @deprecated
+		error: InviteError
 		result: InviteResult
 	}
 
 	type InviteError {
 		code: InviteErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		membershipValidation: [MembershipValidationError!]
+		endUserMessage: String @deprecated
 	}
 
 	enum InviteErrorCode {
 		PROJECT_NOT_FOUND
-		ROLE_NOT_FOUND
-		VARIABLE_NOT_FOUND
-		VARIABLE_EMPTY
 		ALREADY_MEMBER
+		INVALID_MEMBERSHIP
+
+		ROLE_NOT_FOUND @deprecated
+		VARIABLE_NOT_FOUND @deprecated
+		VARIABLE_EMPTY @deprecated
 	}
 
 	type InviteResult {
@@ -263,42 +273,50 @@ const schema: DocumentNode = gql`
 	type AddProjectMemberResponse {
 		ok: Boolean!
 		errors: [AddProjectMemberError!]!
+		error: AddProjectMemberError
 	}
 
 	type AddProjectMemberError {
 		code: AddProjectMemberErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		membershipValidation: [MembershipValidationError!]
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum AddProjectMemberErrorCode {
 		PROJECT_NOT_FOUND
 		IDENTITY_NOT_FOUND
-		ROLE_NOT_FOUND
-		VARIABLE_EMPTY
-		VARIABLE_NOT_FOUND
 		ALREADY_MEMBER
+		INVALID_MEMBERSHIP
+
+		ROLE_NOT_FOUND @deprecated
+		VARIABLE_EMPTY @deprecated
+		VARIABLE_NOT_FOUND @deprecated
 	}
 
 	# === updateProjectMember ===
 
 	type UpdateProjectMemberResponse {
 		ok: Boolean!
-		errors: [UpdateProjectMemberError!]!
+		errors: [UpdateProjectMemberError!]! @deprecated
+		error: UpdateProjectMemberError
 	}
 
 	type UpdateProjectMemberError {
 		code: UpdateProjectMemberErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		membershipValidation: [MembershipValidationError!]
+		endUserMessage: String @deprecated
 	}
 
 	enum UpdateProjectMemberErrorCode {
 		PROJECT_NOT_FOUND
-		VARIABLE_NOT_FOUND
-		ROLE_NOT_FOUND
-		VARIABLE_EMPTY
 		NOT_MEMBER
+		INVALID_MEMBERSHIP
+
+		ROLE_NOT_FOUND @deprecated
+		VARIABLE_EMPTY @deprecated
+		VARIABLE_NOT_FOUND @deprecated
 	}
 
 	# === removeProjectMember ===
@@ -306,12 +324,13 @@ const schema: DocumentNode = gql`
 	type RemoveProjectMemberResponse {
 		ok: Boolean!
 		errors: [RemoveProjectMemberError!]!
+		error: RemoveProjectMemberError
 	}
 
 	type RemoveProjectMemberError {
 		code: RemoveProjectMemberErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum RemoveProjectMemberErrorCode {
@@ -323,21 +342,25 @@ const schema: DocumentNode = gql`
 
 	type CreateApiKeyResponse {
 		ok: Boolean!
-		errors: [CreateApiKeyError!]!
+		errors: [CreateApiKeyError!]! @deprecated
+		error: CreateApiKeyError
 		result: CreateApiKeyResult
 	}
 
 	type CreateApiKeyError {
 		code: CreateApiKeyErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		membershipValidation: [MembershipValidationError!]
+		endUserMessage: String @deprecated
 	}
 
 	enum CreateApiKeyErrorCode {
 		PROJECT_NOT_FOUND
-		VARIABLE_NOT_FOUND
-		ROLE_NOT_FOUND
-		VARIABLE_EMPTY
+		INVALID_MEMBERSHIP
+
+		VARIABLE_NOT_FOUND @deprecated
+		ROLE_NOT_FOUND @deprecated
+		VARIABLE_EMPTY @deprecated
 	}
 
 	type CreateApiKeyResult {
@@ -348,13 +371,14 @@ const schema: DocumentNode = gql`
 
 	type DisableApiKeyResponse {
 		ok: Boolean!
-		errors: [DisableApiKeyError!]!
+		errors: [DisableApiKeyError!]! @deprecated
+		error: DisableApiKeyError
 	}
 
 	type DisableApiKeyError {
 		code: DisableApiKeyErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum DisableApiKeyErrorCode {
@@ -385,6 +409,18 @@ const schema: DocumentNode = gql`
 	type Membership {
 		role: String!
 		variables: [VariableEntry!]!
+	}
+
+	type MembershipValidationError {
+		code: MembershipValidationErrorCode!
+		role: String!
+		variable: String
+	}
+
+	enum MembershipValidationErrorCode {
+		ROLE_NOT_FOUND
+		VARIABLE_NOT_FOUND
+		VARIABLE_EMPTY
 	}
 
 	# === person ====
@@ -470,13 +506,14 @@ const schema: DocumentNode = gql`
 
 	type ConfirmOtpResponse {
 		ok: Boolean!
-		errors: [ConfirmOtpError!]!
+		errors: [ConfirmOtpError!]! @deprecated
+		error: ConfirmOtpError
 	}
 
 	type ConfirmOtpError {
 		code: ConfirmOtpErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum ConfirmOtpErrorCode {
@@ -486,13 +523,14 @@ const schema: DocumentNode = gql`
 
 	type DisableOtpResponse {
 		ok: Boolean!
-		errors: [DisableOtpError!]!
+		errors: [DisableOtpError!]! @deprecated
+		error: DisableOtpError
 	}
 
 	type DisableOtpError {
 		code: DisableOtpErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum DisableOtpErrorCode {
@@ -525,13 +563,14 @@ const schema: DocumentNode = gql`
 
 	type AddMailTemplateResponse {
 		ok: Boolean!
-		errors: [AddMailTemplateError!]!
+		errors: [AddMailTemplateError!]! @deprecated
+		error: AddMailTemplateError
 	}
 
 	type AddMailTemplateError {
 		code: AddMailTemplateErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum AddMailTemplateErrorCode {
@@ -542,12 +581,13 @@ const schema: DocumentNode = gql`
 	type RemoveMailTemplateResponse {
 		ok: Boolean!
 		errors: [RemoveMailTemplateError!]!
+		error: RemoveMailTemplateError
 	}
 
 	type RemoveMailTemplateError {
 		code: RemoveMailTemplateErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum RemoveMailTemplateErrorCode {
@@ -570,13 +610,14 @@ const schema: DocumentNode = gql`
 
 	type CreatePasswordResetRequestResponse {
 		ok: Boolean!
-		errors: [CreatePasswordResetRequestError!]!
+		errors: [CreatePasswordResetRequestError!]! @deprecated
+		error: CreatePasswordResetRequestError
 	}
 
 	type CreatePasswordResetRequestError {
 		code: CreatePasswordResetRequestErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum CreatePasswordResetRequestErrorCode {
@@ -585,12 +626,13 @@ const schema: DocumentNode = gql`
 
 	type ResetPasswordResponse {
 		ok: Boolean!
-		errors: [ResetPasswordError!]!
+		errors: [ResetPasswordError!]! @deprecated
+		error: ResetPasswordError
 	}
 	type ResetPasswordError {
 		code: ResetPasswordErrorCode!
-		endUserMessage: String
-		developerMessage: String
+		developerMessage: String!
+		endUserMessage: String @deprecated
 	}
 
 	enum ResetPasswordErrorCode {

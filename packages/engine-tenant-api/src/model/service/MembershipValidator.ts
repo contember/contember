@@ -33,10 +33,6 @@ export class MembershipValidator {
 				const inputVariable = membership.variables.find(it => it.name === variable)
 				if (!inputVariable || inputVariable.values.length === 0) {
 					errors.push(
-						new MembershipValidationError(membership.role, MembershipValidationErrorType.VARIABLE_NOT_SET, variable),
-					)
-				} else if (inputVariable.values.length === 0) {
-					errors.push(
 						new MembershipValidationError(membership.role, MembershipValidationErrorType.VARIABLE_EMPTY, variable),
 					)
 				}
@@ -57,6 +53,5 @@ export class MembershipValidationError {
 export enum MembershipValidationErrorType {
 	ROLE_NOT_FOUND = 'roleNotFound',
 	VARIABLE_NOT_FOUND = 'variableNotFound',
-	VARIABLE_NOT_SET = 'variableEmpty',
 	VARIABLE_EMPTY = 'variableEmpty',
 }

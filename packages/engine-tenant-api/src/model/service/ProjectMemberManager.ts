@@ -6,7 +6,9 @@ import {
 	CommandBus,
 	MembershipUpdateInput,
 	RemoveProjectMemberCommand,
+	RemoveProjectMemberResponse,
 	UpdateProjectMemberCommand,
+	UpdateProjectMemberResponse,
 } from '../commands'
 import { ProjectMembershipByIdentityQuery } from '../queries/ProjectMembershipByIdentityQuery'
 import { Membership, MembershipVariable } from '../type/Membership'
@@ -17,24 +19,22 @@ import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
 import { indexListBy, notEmpty } from '../../utils/array'
 import { createSetMembershipVariables } from './membershipUtils'
 import { ProjectRole } from '@contember/schema'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
 
-class ProjectMemberManager {
+export class ProjectMemberManager {
 	constructor(
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly commandBus: CommandBus,
 	) {}
 
-	async getProjectRoles(projectId: string, identityId: string): Promise<ProjectMemberManager.GetProjectRolesResponse> {
+	async getProjectRoles(projectId: string, identityId: string): Promise<GetProjectRolesResponse> {
 		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery({ id: projectId }, identityId))
-		return new ProjectMemberManager.GetProjectRolesResponse(row.roles)
+		return new GetProjectRolesResponse(row.roles)
 	}
 
-	async getProjectBySlugRoles(
-		projectSlug: string,
-		identityId: string,
-	): Promise<ProjectMemberManager.GetProjectRolesResponse> {
+	async getProjectBySlugRoles(projectSlug: string, identityId: string): Promise<GetProjectRolesResponse> {
 		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery({ slug: projectSlug }, identityId))
-		return new ProjectMemberManager.GetProjectRolesResponse(row.roles)
+		return new GetProjectRolesResponse(row.roles)
 	}
 
 	async addProjectMember(
@@ -47,15 +47,15 @@ class ProjectMemberManager {
 				new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
 			)
 			if (result.ok) {
-				return new AddProjectMemberResponseOk()
+				return new ResponseOk(null)
 			}
 			switch (result.error) {
 				case AddProjectMemberCommandError.alreadyMember:
-					return new AddProjectMemberResponseError([AddProjectMemberErrorCode.AlreadyMember])
+					return new ResponseError(AddProjectMemberErrorCode.AlreadyMember, result.errorMessage)
 				case AddProjectMemberCommandError.projectNotFound:
-					return new AddProjectMemberResponseError([AddProjectMemberErrorCode.ProjectNotFound])
+					return new ResponseError(AddProjectMemberErrorCode.ProjectNotFound, result.errorMessage)
 				case AddProjectMemberCommandError.identityNotfound:
-					return new AddProjectMemberResponseError([AddProjectMemberErrorCode.IdentityNotFound])
+					return new ResponseError(AddProjectMemberErrorCode.IdentityNotFound, result.errorMessage)
 			}
 		})
 	}
@@ -64,16 +64,13 @@ class ProjectMemberManager {
 		projectId: string,
 		identityId: string,
 		memberships: readonly MembershipUpdateInput[],
-	): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
+	): Promise<UpdateProjectMemberResponse> {
 		return await this.commandBus.transaction(
 			async bus => await bus.execute(new UpdateProjectMemberCommand(projectId, identityId, memberships)),
 		)
 	}
 
-	async removeProjectMember(
-		projectId: string,
-		identityId: string,
-	): Promise<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
+	async removeProjectMember(projectId: string, identityId: string): Promise<RemoveProjectMemberResponse> {
 		return await this.commandBus.transaction(
 			async bus => await bus.execute(new RemoveProjectMemberCommand(projectId, identityId)),
 		)
@@ -94,10 +91,7 @@ class ProjectMemberManager {
 		return await this.filterMemberships(memberships, verifier)
 	}
 
-	async getProjectMembers(
-		projectId: string,
-		accessVerifier: AccessVerifier,
-	): Promise<ProjectMemberManager.GetProjectMembersResponse> {
+	async getProjectMembers(projectId: string, accessVerifier: AccessVerifier): Promise<GetProjectMembersResponse> {
 		const members = await this.queryHandler.fetch(new ProjectMembersQuery(projectId))
 		const memberships = await this.queryHandler.fetch(
 			new ProjectMembershipByIdentityQuery(
@@ -165,29 +159,13 @@ class ProjectMemberManager {
 	}
 }
 
-export type AddProjectMemberResponse = AddProjectMemberResponseOk | AddProjectMemberResponseError
+export type AddProjectMemberResponse = Response<null, AddProjectMemberErrorCode>
 
-export class AddProjectMemberResponseOk {
-	readonly ok = true
-
-	constructor() {}
+export class GetProjectRolesResponse {
+	constructor(public readonly roles: string[]) {}
 }
 
-export class AddProjectMemberResponseError {
-	readonly ok = false
-
-	constructor(public readonly errors: Array<AddProjectMemberErrorCode>) {}
-}
-
-namespace ProjectMemberManager {
-	export class GetProjectRolesResponse {
-		constructor(public readonly roles: string[]) {}
-	}
-
-	export type GetProjectMembersResponse = {
-		identity: { id: string }
-		memberships: readonly Membership[]
-	}[]
-}
-
-export { ProjectMemberManager }
+export type GetProjectMembersResponse = {
+	identity: { id: string }
+	memberships: readonly Membership[]
+}[]

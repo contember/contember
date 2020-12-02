@@ -2,7 +2,7 @@ import { Command } from './Command'
 import { ApiKey } from '../type'
 import { UpdateBuilder } from '@contember/database'
 
-class DisableOneOffApiKeyCommand implements Command<void> {
+export class DisableOneOffApiKeyCommand implements Command<void> {
 	constructor(private readonly apiKeyId: string) {}
 
 	async execute({ db }: Command.Args): Promise<void> {
@@ -17,5 +17,3 @@ class DisableOneOffApiKeyCommand implements Command<void> {
 		await qb.execute(db)
 	}
 }
-
-export { DisableOneOffApiKeyCommand }

@@ -2,30 +2,33 @@ import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
 import { PersonQuery, PersonRow } from '../queries'
-import { SignUpErrorCode } from '../../schema'
-import { CommandBus } from '../commands/CommandBus'
-import { TenantRole } from '../authorization/Roles'
-import { isWeakPassword } from '../utils/password'
+import { ChangePasswordErrorCode, SignUpErrorCode } from '../../schema'
+import { CommandBus } from '../commands'
+import { TenantRole } from '../authorization'
+import { isWeakPassword, MIN_PASSWORD_LENGTH } from '../utils/password'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
 
-class SignUpManager {
+export class SignUpManager {
 	constructor(
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly commandBus: CommandBus,
 	) {}
 
-	async signUp(email: string, password: string, roles: string[] = []): Promise<SignUpManager.SignUpResult> {
+	async signUp(email: string, password: string, roles: string[] = []): Promise<SignUpResponse> {
 		if (await this.isEmailAlreadyUsed(email)) {
-			return new SignUpManager.SignUpResultError([SignUpErrorCode.EmailAlreadyExists])
+			return new ResponseError(SignUpErrorCode.EmailAlreadyExists, `User with email ${email} already exists`)
 		}
 		if (isWeakPassword(password)) {
-			return new SignUpManager.SignUpResultError([SignUpErrorCode.TooWeak])
+			return new ResponseError(
+				SignUpErrorCode.TooWeak,
+				`Password is too weak. Minimum length is ${MIN_PASSWORD_LENGTH}`,
+			)
 		}
 		const person = await this.commandBus.transaction(async bus => {
 			const identityId = await bus.execute(new CreateIdentityCommand([...roles, TenantRole.PERSON]))
 			return await bus.execute(new CreatePersonCommand(identityId, email, password))
 		})
-
-		return new SignUpManager.SignUpResultOk(person)
+		return new ResponseOk(new SignUpResult(person))
 	}
 
 	private async isEmailAlreadyUsed(email: string): Promise<boolean> {
@@ -34,20 +37,7 @@ class SignUpManager {
 	}
 }
 
-namespace SignUpManager {
-	export type SignUpResult = SignUpResultOk | SignUpResultError
-
-	export class SignUpResultOk {
-		readonly ok = true
-
-		constructor(public readonly person: Omit<PersonRow, 'roles'>) {}
-	}
-
-	export class SignUpResultError {
-		readonly ok = false
-
-		constructor(public readonly errors: Array<SignUpErrorCode>) {}
-	}
+export class SignUpResult {
+	constructor(public readonly person: Omit<PersonRow, 'roles'>) {}
 }
-
-export { SignUpManager }
+export type SignUpResponse = Response<SignUpResult, SignUpErrorCode>

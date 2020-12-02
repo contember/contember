@@ -1,6 +1,7 @@
 import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
 import { PermissionActions, ApiKeyManager, SignUpManager } from '../../../model'
+import { createErrorResponse } from '../../errorUtils'
 
 export class SignUpMutationResolver implements MutationResolvers {
 	constructor(private readonly signUpManager: SignUpManager, private readonly apiKeyManager: ApiKeyManager) {}
@@ -11,15 +12,12 @@ export class SignUpMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign up',
 		})
 
-		const result = await this.signUpManager.signUp(args.email, args.password)
+		const response = await this.signUpManager.signUp(args.email, args.password)
 
-		if (!result.ok) {
-			return {
-				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode })),
-			}
+		if (!response.ok) {
+			return createErrorResponse(response.error, response.errorMessage)
 		}
-
+		const result = response.result
 		await this.apiKeyManager.disableOneOffApiKey(context.apiKeyId)
 
 		return {

@@ -6,6 +6,7 @@ import {
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
 import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 
 export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -25,10 +26,7 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to remove a project member',
 		})
 		if (!project) {
-			return {
-				ok: false,
-				errors: [{ code: RemoveProjectMemberErrorCode.ProjectNotFound }],
-			}
+			return createProjectNotFoundResponse(RemoveProjectMemberErrorCode.ProjectNotFound, projectSlug)
 		}
 		const memberships = await this.projectMemberManager.getProjectMemberships(
 			{ id: project.id },
@@ -44,10 +42,7 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 		const result = await this.projectMemberManager.removeProjectMember(project.id, identityId)
 
 		if (!result.ok) {
-			return {
-				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode })),
-			}
+			return createErrorResponse(result.error, result.errorMessage)
 		}
 
 		return {

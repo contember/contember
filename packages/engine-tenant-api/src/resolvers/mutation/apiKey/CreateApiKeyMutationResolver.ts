@@ -8,7 +8,8 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
 import { ApiKeyManager, PermissionActions, ProjectManager, ProjectScope } from '../../../model'
 import { MembershipValidator } from '../../../model/service/MembershipValidator'
-import { createMembershipValidationErrorResult } from '../../utils'
+import { createMembershipValidationErrorResult } from '../../membershipUtils'
+import { createProjectNotFoundResponse } from '../../errorUtils'
 
 export class CreateApiKeyMutationResolver implements MutationResolvers {
 	constructor(
@@ -30,28 +31,20 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to create an API key for this project',
 		})
 		if (!project) {
-			return {
-				ok: false,
-				errors: [{ code: CreateApiKeyErrorCode.ProjectNotFound }],
-			}
+			return createProjectNotFoundResponse(CreateApiKeyErrorCode.ProjectNotFound, projectSlug)
 		}
 
 		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
 		if (validationResult.length > 0) {
+			const errors = createMembershipValidationErrorResult<CreateApiKeyErrorCode>(validationResult)
 			return {
 				ok: false,
-				errors: createMembershipValidationErrorResult(validationResult),
+				errors: errors,
+				error: errors[0],
 			}
 		}
 
 		const result = await this.apiKeyManager.createProjectPermanentApiKey(project.id, memberships, description)
-
-		if (!result.ok) {
-			return {
-				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode })),
-			}
-		}
 
 		return {
 			ok: true,

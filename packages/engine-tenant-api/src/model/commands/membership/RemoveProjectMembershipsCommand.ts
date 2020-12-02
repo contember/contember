@@ -1,6 +1,5 @@
 import { Command } from '../Command'
 import { DeleteBuilder } from '@contember/database'
-import { MembershipInput } from './types'
 
 export class RemoveProjectMembershipCommand implements Command<void> {
 	constructor(private readonly projectId: string, private readonly identityId: string, private readonly role: string) {}

@@ -3,6 +3,7 @@ import { ResolverContext } from '../../ResolverContext'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 import { PermissionActions, ApiKeyManager, PersonQuery } from '../../../model'
+import { createErrorResponse } from '../../errorUtils'
 
 export class SignOutMutationResolver implements MutationResolvers {
 	constructor(
@@ -13,7 +14,7 @@ export class SignOutMutationResolver implements MutationResolvers {
 	async signOut(parent: any, args: MutationSignOutArgs, context: ResolverContext): Promise<SignOutResponse> {
 		const person = await this.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
-			return { ok: false, errors: [{ code: SignOutErrorCode.NotAPerson }] }
+			return createErrorResponse(SignOutErrorCode.NotAPerson, 'Only a person can sign out')
 		}
 
 		await context.requireAccess({

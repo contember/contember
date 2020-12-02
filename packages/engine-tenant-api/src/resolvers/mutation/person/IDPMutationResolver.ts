@@ -9,6 +9,7 @@ import { ResolverContext } from '../../ResolverContext'
 import { IDPSignInManager, PermissionActions, PermissionContextFactory } from '../../../model'
 import { createResolverContext } from '../../ResolverContextFactory'
 import { IdentityTypeResolver } from '../../types'
+import { createErrorResponse } from '../../errorUtils'
 
 export class IDPMutationResolver implements MutationResolvers {
 	constructor(
@@ -28,7 +29,7 @@ export class IDPMutationResolver implements MutationResolvers {
 		})
 		const result = await this.idpSignInManager.initSignInIDP(args.identityProvider, args.redirectUrl)
 		if (!result.ok) {
-			return { ok: false, errors: [{ code: result.error }] }
+			return createErrorResponse(result.error, result.errorMessage)
 		}
 		return { ok: true, errors: [], result: result.result }
 	}
@@ -46,7 +47,7 @@ export class IDPMutationResolver implements MutationResolvers {
 			args.expiration ?? undefined,
 		)
 		if (!signIn.ok) {
-			return { ok: false, errors: [{ code: signIn.error, developerMessage: signIn.errorMessage }] }
+			return createErrorResponse(signIn.error, signIn.errorMessage)
 		}
 		const result = signIn.result
 		const identityId = result.person.identity_id

@@ -1,7 +1,7 @@
 import { Command } from './Command'
 import { UpdateBuilder } from '@contember/database'
 
-class DisableApiKeyCommand implements Command<boolean> {
+export class DisableApiKeyCommand implements Command<boolean> {
 	constructor(private readonly apiKeyId: string) {}
 
 	async execute({ db }: Command.Args): Promise<boolean> {
@@ -15,5 +15,3 @@ class DisableApiKeyCommand implements Command<boolean> {
 		return (await qb.execute(db)) > 0
 	}
 }
-
-export { DisableApiKeyCommand }

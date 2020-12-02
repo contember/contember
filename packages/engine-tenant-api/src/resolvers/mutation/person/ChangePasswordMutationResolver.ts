@@ -9,6 +9,7 @@ import { ResolverContext } from '../../ResolverContext'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 import { PermissionActions, IdentityScope, PasswordChangeManager, PersonQuery } from '../../../model'
+import { createErrorResponse } from '../../errorUtils'
 
 export class ChangePasswordMutationResolver implements MutationResolvers {
 	constructor(
@@ -24,10 +25,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 	): Promise<ChangePasswordResponse> {
 		const person = await this.queryHandler.fetch(PersonQuery.byId(args.personId))
 		if (!person) {
-			return {
-				ok: false,
-				errors: [{ code: ChangePasswordErrorCode.PersonNotFound }],
-			}
+			return createErrorResponse(ChangePasswordErrorCode.PersonNotFound, 'Person not found')
 		}
 
 		await context.requireAccess({
@@ -38,10 +36,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 		const result = await this.passwordChangeManager.changePassword(args.personId, args.password)
 
 		if (!result.ok) {
-			return {
-				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode })),
-			}
+			return createErrorResponse(result.error, result.errorMessage)
 		}
 
 		return { ok: true, errors: [] }

@@ -9,6 +9,7 @@ import { UserMailer } from '../mailing'
 import { Project } from '../type'
 import { createAppendMembershipVariables } from './membershipUtils'
 import { CreateOrUpdateProjectMembershipCommand } from '../commands/membership/CreateOrUpdateProjectMembershipCommand'
+import { Response, ResponseOk } from '../utils/Response'
 
 export interface InviteOptions {
 	noEmail?: boolean
@@ -56,21 +57,13 @@ export class InviteManager {
 					await this.mailer.sendExistingUserInvitedEmail({ email, project: project.name }, customMailOptions)
 				}
 			}
-			return new InviteResponseOk(person, isNew)
+			return new ResponseOk(new InviteResult(person, isNew))
 		})
 	}
 }
 
-export type InviteResponse = InviteResponseOk | InviteResponseError
+export type InviteResponse = Response<InviteResult, InviteErrorCode>
 
-export class InviteResponseOk {
-	readonly ok = true
-
+export class InviteResult {
 	constructor(public readonly person: Omit<PersonRow, 'roles'>, public readonly isNew: boolean) {}
-}
-
-export class InviteResponseError {
-	readonly ok = false
-
-	constructor(public readonly errors: Array<InviteErrorCode>) {}
 }

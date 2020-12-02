@@ -3,7 +3,7 @@ import { ApiKey } from '../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
 import { UpdateBuilder } from '@contember/database'
 
-class ProlongApiKeyCommand implements Command<void> {
+export class ProlongApiKeyCommand implements Command<void> {
 	constructor(private readonly id: string, private readonly type: ApiKey.Type, private readonly expiration?: number) {}
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
@@ -20,5 +20,3 @@ class ProlongApiKeyCommand implements Command<void> {
 		await qb.execute(db)
 	}
 }
-
-export { ProlongApiKeyCommand }

@@ -6,10 +6,11 @@ import {
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
 import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
-import { createMembershipValidationErrorResult } from '../../utils'
+import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { MembershipValidationErrorType, MembershipValidator } from '../../../model/service/MembershipValidator'
 import { createMembershipModification } from '../../../model/service/membershipUtils'
 import { Membership } from '../../../model/type/Membership'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 
 export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -31,10 +32,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update project member variables',
 		})
 		if (!project) {
-			return {
-				ok: false,
-				errors: [{ code: UpdateProjectMemberErrorCode.ProjectNotFound }],
-			}
+			return createProjectNotFoundResponse(UpdateProjectMemberErrorCode.ProjectNotFound, projectSlug)
 		}
 		const visibleMemberships = await this.projectMemberManager.getProjectMemberships(
 			{ id: project.id },
@@ -57,29 +55,22 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update project member variables',
 		})
 
-		if (!project) {
-			return {
-				ok: false,
-				errors: [{ code: UpdateProjectMemberErrorCode.ProjectNotFound }],
-			}
-		}
 		const validationResult = (await this.membershipValidator.validate(project.slug, memberships)).filter(
 			it => it.error !== MembershipValidationErrorType.VARIABLE_EMPTY,
 		)
 		if (validationResult.length > 0) {
+			const errors = createMembershipValidationErrorResult<UpdateProjectMemberErrorCode>(validationResult)
 			return {
 				ok: false,
-				errors: createMembershipValidationErrorResult(validationResult),
+				errors: errors,
+				error: errors[0],
 			}
 		}
 
 		const result = await this.projectMemberManager.updateProjectMember(project.id, identityId, membershipPatch)
 
 		if (!result.ok) {
-			return {
-				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode })),
-			}
+			return createErrorResponse(result.error, result.errorMessage)
 		}
 
 		return {

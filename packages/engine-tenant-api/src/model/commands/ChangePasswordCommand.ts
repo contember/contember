@@ -1,7 +1,7 @@
 import { Command } from './Command'
 import { UpdateBuilder } from '@contember/database'
 
-class ChangePasswordCommand implements Command<void> {
+export class ChangePasswordCommand implements Command<void> {
 	constructor(private readonly personId: string, private readonly password: string) {}
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
@@ -16,5 +16,3 @@ class ChangePasswordCommand implements Command<void> {
 			.execute(db)
 	}
 }
-
-export { ChangePasswordCommand }

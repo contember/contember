@@ -1,7 +1,7 @@
 import { Command } from '../../Command'
 import { ConflictActionType, InsertBuilder, Literal } from '@contember/database'
 
-class PatchProjectMembershipVariableValuesCommand implements Command<string[]> {
+export class PatchProjectMembershipVariableValuesCommand implements Command<string[]> {
 	constructor(
 		private readonly membershipId: string,
 		private readonly name: string,
@@ -44,5 +44,3 @@ class PatchProjectMembershipVariableValuesCommand implements Command<string[]> {
 		return result as string[]
 	}
 }
-
-export { PatchProjectMembershipVariableValuesCommand }

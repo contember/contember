@@ -2,7 +2,7 @@ import { ConflictActionType, InsertBuilder, Operator } from '@contember/database
 import { Command } from './Command'
 import { Project } from '../type'
 
-class CreateOrUpdateProjectCommand implements Command<boolean> {
+export class CreateOrUpdateProjectCommand implements Command<boolean> {
 	constructor(private readonly project: Pick<Project, 'name' | 'slug'>) {}
 
 	public async execute({ db, providers }: Command.Args): Promise<boolean> {
@@ -25,5 +25,3 @@ class CreateOrUpdateProjectCommand implements Command<boolean> {
 		return result > 0
 	}
 }
-
-export { CreateOrUpdateProjectCommand }

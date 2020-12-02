@@ -2,7 +2,7 @@ import { DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
 import {
 	AddProjectMemberCommand,
-	AddProjectMemberCommandError,
+	CommandBus,
 	CreateApiKeyCommand,
 	CreateIdentityCommand,
 	DisableApiKeyCommand,
@@ -11,33 +11,35 @@ import {
 	ProlongApiKeyCommand,
 } from '../commands'
 import { ApiKey } from '../type'
-import { CreateApiKeyErrorCode } from '../../schema'
 import { ImplementationException } from '../../exceptions'
-import { CommandBus } from '../commands/CommandBus'
 import { Membership } from '../type/Membership'
-import { TenantRole } from '../authorization/Roles'
+import { TenantRole } from '../authorization'
 import { ApiKeyByTokenQuery } from '../queries'
 import { createSetMembershipVariables } from './membershipUtils'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
 
-class ApiKeyManager {
+export class ApiKeyManager {
 	constructor(
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly commandBus: CommandBus,
 	) {}
 
-	async verifyAndProlong(token: string): Promise<ApiKeyManager.VerifyResult> {
+	async verifyAndProlong(token: string): Promise<VerifyResponse> {
 		const apiKeyRow = await this.queryHandler.fetch(new ApiKeyByTokenQuery(token))
 		if (apiKeyRow === null) {
-			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.NOT_FOUND)
+			return new ResponseError(VerifyErrorCode.NOT_FOUND, 'API key was not found')
 		}
 
 		if (apiKeyRow.disabled_at !== null) {
-			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.DISABLED)
+			return new ResponseError(
+				VerifyErrorCode.DISABLED,
+				`API key was disabled at ${apiKeyRow.disabled_at.toISOString()}`,
+			)
 		}
 
 		const now = new Date()
 		if (apiKeyRow.expires_at !== null && apiKeyRow.expires_at <= now) {
-			return new ApiKeyManager.VerifyResultError(ApiKeyManager.VerifyErrorCode.EXPIRED)
+			return new ResponseError(VerifyErrorCode.DISABLED, `API key expired at ${apiKeyRow.expires_at.toISOString()}`)
 		}
 
 		setImmediate(async () => {
@@ -46,17 +48,17 @@ class ApiKeyManager {
 			)
 		})
 
-		return new ApiKeyManager.VerifyResultOk(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles)
+		return new ResponseOk(new VerifyResult(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles))
 	}
 
 	async createSessionApiKey(identityId: string, expiration?: number): Promise<string> {
 		return (await this.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.SESSION, identityId, expiration))).token
 	}
 
-	async createLoginApiKey(): Promise<ApiKeyManager.CreateApiKeyResult> {
+	async createLoginApiKey(): Promise<CreateApiKeyResult> {
 		const response = await this.createGlobalApiKey([TenantRole.LOGIN])
 		if (!response.ok) {
-			throw new ImplementationException(response.errors.join(', '))
+			throw new ImplementationException()
 		}
 		return response.result
 	}
@@ -77,7 +79,7 @@ class ApiKeyManager {
 		projectId: string,
 		memberships: readonly Membership[],
 		description: string,
-	): Promise<ApiKeyManager.CreateApiKeyResponse> {
+	): Promise<CreateApiKeyResponse> {
 		return await this.commandBus.transaction(async bus => {
 			const identityId = await bus.execute(new CreateIdentityCommand([], description))
 			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
@@ -86,74 +88,41 @@ class ApiKeyManager {
 				new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
 			)
 			if (!addMemberResult.ok) {
-				bus.client.connection.rollback()
-				switch (addMemberResult.error) {
-					case AddProjectMemberCommandError.projectNotFound:
-						return new ApiKeyManager.CreateApiKeyResponseError([CreateApiKeyErrorCode.ProjectNotFound])
-					case AddProjectMemberCommandError.alreadyMember:
-					case AddProjectMemberCommandError.identityNotfound:
-						throw new ImplementationException()
-				}
+				throw new ImplementationException()
 			}
 
-			return new ApiKeyManager.CreateApiKeyResponseOk(new ApiKeyManager.CreateApiKeyResult(identityId, apiKeyResult))
+			return new ResponseOk(new CreateApiKeyResult(identityId, apiKeyResult))
 		})
 	}
 
-	async createGlobalApiKey(roles: TenantRole[]): Promise<ApiKeyManager.CreateApiKeyResponse> {
+	async createGlobalApiKey(roles: TenantRole[]): Promise<CreateApiKeyResponse> {
 		return await this.commandBus.transaction(async bus => {
 			const identityId = await bus.execute(new CreateIdentityCommand(roles))
 			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
 
-			return new ApiKeyManager.CreateApiKeyResponseOk(new ApiKeyManager.CreateApiKeyResult(identityId, apiKeyResult))
+			return new ResponseOk(new CreateApiKeyResult(identityId, apiKeyResult))
 		})
 	}
 }
 
-namespace ApiKeyManager {
-	export type VerifyResult = VerifyResultOk | VerifyResultError
+export type VerifyResponse = Response<VerifyResult, VerifyErrorCode>
 
-	export class VerifyResultOk {
-		readonly valid = true
+export class VerifyResult {
+	readonly valid = true
 
-		constructor(
-			public readonly identityId: string,
-			public readonly apiKeyId: string,
-			public readonly roles: string[],
-		) {}
-	}
-
-	export class VerifyResultError {
-		readonly valid = false
-
-		constructor(public readonly error: VerifyErrorCode) {}
-	}
-
-	export const enum VerifyErrorCode {
-		NOT_FOUND = 'not_found',
-		DISABLED = 'disabled',
-		EXPIRED = 'expired',
-		NO_AUTH_HEADER = 'no_auth_header',
-		INVALID_AUTH_HEADER = 'invalid_auth_header',
-	}
-
-	export type CreateApiKeyResponse = CreateApiKeyResponseOk | CreateApiKeyResponseError
-
-	export class CreateApiKeyResponseOk {
-		public readonly ok = true
-
-		constructor(public readonly result: CreateApiKeyResult) {}
-	}
-
-	export class CreateApiKeyResponseError {
-		public readonly ok = false
-
-		constructor(public readonly errors: CreateApiKeyErrorCode[]) {}
-	}
-
-	export class CreateApiKeyResult {
-		constructor(public readonly identityId: string, public readonly apiKey: CreateApiKeyCommand.Result) {}
-	}
+	constructor(public readonly identityId: string, public readonly apiKeyId: string, public readonly roles: string[]) {}
 }
 
-export { ApiKeyManager }
+export const enum VerifyErrorCode {
+	NOT_FOUND = 'not_found',
+	DISABLED = 'disabled',
+	EXPIRED = 'expired',
+	NO_AUTH_HEADER = 'no_auth_header',
+	INVALID_AUTH_HEADER = 'invalid_auth_header',
+}
+
+export type CreateApiKeyResponse = Response<CreateApiKeyResult, never>
+
+export class CreateApiKeyResult {
+	constructor(public readonly identityId: string, public readonly apiKey: { id: string; token: string }) {}
+}

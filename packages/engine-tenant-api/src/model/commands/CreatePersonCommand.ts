@@ -2,7 +2,7 @@ import { Command } from './Command'
 import { PersonRow } from '../queries'
 import { InsertBuilder } from '@contember/database'
 
-class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
+export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 	constructor(private readonly identityId: string, private readonly email: string, private readonly password: string) {}
 
 	async execute({ db, providers }: Command.Args): Promise<Omit<PersonRow, 'roles'>> {
@@ -22,5 +22,3 @@ class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 		return { id, email: this.email, password_hash, identity_id: this.identityId, otp_uri: null, otp_activated_at: null }
 	}
 }
-
-export { CreatePersonCommand }

@@ -4,7 +4,7 @@ import { ApiKeyHelper } from './ApiKeyHelper'
 import { InsertBuilder } from '@contember/database'
 import { computeTokenHash, generateToken } from '../utils'
 
-class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
+export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 	private readonly type: ApiKey.Type
 	private readonly identityId: string
 	private readonly expiration: number | undefined
@@ -17,7 +17,7 @@ class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 		this.expiration = expiration
 	}
 
-	async execute({ db, providers }: Command.Args): Promise<CreateApiKeyCommand.Result> {
+	async execute({ db, providers }: Command.Args): Promise<CreateApiKeyCommandResult> {
 		const apiKeyId = providers.uuid()
 		const token = await generateToken(providers)
 		const tokenHash = computeTokenHash(token)
@@ -36,14 +36,9 @@ class CreateApiKeyCommand implements Command<CreateApiKeyCommand.Result> {
 			})
 			.execute(db)
 
-		return new CreateApiKeyCommand.Result(apiKeyId, token)
+		return new CreateApiKeyCommandResult(apiKeyId, token)
 	}
 }
-
-namespace CreateApiKeyCommand {
-	export class Result {
-		constructor(public readonly id: string, public readonly token: string) {}
-	}
+export class CreateApiKeyCommandResult {
+	constructor(public readonly id: string, public readonly token: string) {}
 }
-
-export { CreateApiKeyCommand }

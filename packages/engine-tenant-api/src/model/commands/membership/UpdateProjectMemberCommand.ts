@@ -4,15 +4,16 @@ import { CreateOrUpdateProjectMembershipCommand } from './CreateOrUpdateProjectM
 import { SelectBuilder } from '@contember/database'
 import { MembershipUpdateInput } from './types'
 import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipsCommand'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 
-class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
+export class UpdateProjectMemberCommand implements Command<UpdateProjectMemberResponse> {
 	constructor(
 		private readonly projectId: string,
 		private readonly identityId: string,
 		private readonly memberships: readonly MembershipUpdateInput[],
 	) {}
 
-	async execute({ db, bus, providers }: Command.Args): Promise<UpdateProjectMemberCommand.UpdateProjectMemberResponse> {
+	async execute({ db, bus, providers }: Command.Args): Promise<UpdateProjectMemberResponse> {
 		const result = await SelectBuilder.create()
 			.select('id')
 			.from('project_membership')
@@ -22,7 +23,7 @@ class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.U
 			})
 			.getResult(db)
 		if (result.length === 0) {
-			return new UpdateProjectMemberCommand.UpdateProjectMemberResponseError([UpdateProjectMemberErrorCode.NotMember])
+			return new ResponseError(UpdateProjectMemberErrorCode.NotMember, 'Not a project member')
 		}
 
 		try {
@@ -36,37 +37,15 @@ class UpdateProjectMemberCommand implements Command<UpdateProjectMemberCommand.U
 				}
 			}
 
-			return new UpdateProjectMemberCommand.UpdateProjectMemberResponseOk()
+			return new ResponseOk(null)
 		} catch (e) {
 			switch (e.constraint) {
 				case 'project_membership_project':
-					return new UpdateProjectMemberCommand.UpdateProjectMemberResponseError([
-						UpdateProjectMemberErrorCode.ProjectNotFound,
-					])
-
+					return new ResponseError(UpdateProjectMemberErrorCode.ProjectNotFound, 'Project not found')
 				default:
 					throw e
 			}
 		}
-
-		return new UpdateProjectMemberCommand.UpdateProjectMemberResponseOk()
 	}
 }
-
-namespace UpdateProjectMemberCommand {
-	export type UpdateProjectMemberResponse = UpdateProjectMemberResponseOk | UpdateProjectMemberResponseError
-
-	export class UpdateProjectMemberResponseOk {
-		readonly ok = true
-
-		constructor() {}
-	}
-
-	export class UpdateProjectMemberResponseError {
-		readonly ok = false
-
-		constructor(public readonly errors: Array<UpdateProjectMemberErrorCode>) {}
-	}
-}
-
-export { UpdateProjectMemberCommand }
+export type UpdateProjectMemberResponse = Response<null, UpdateProjectMemberErrorCode>

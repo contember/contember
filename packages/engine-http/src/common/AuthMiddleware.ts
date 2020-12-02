@@ -1,4 +1,4 @@
-import { ApiKeyManager } from '@contember/engine-tenant-api'
+import { VerifyResult } from '@contember/engine-tenant-api'
 import { KoaMiddleware } from '../koa'
 import { ErrorResponseMiddlewareState } from './ErrorResponseMiddleware'
 import { ApiKeyManagerState } from '../services'
@@ -24,15 +24,18 @@ export const createAuthMiddleware = (): KoaMiddleware<KoaState> => {
 		}
 		const [, token] = match
 		const authResult = await ctx.state.timer('Auth', () => ctx.state.apiKeyManager.verifyAndProlong(token))
-		if (!authResult.valid) {
-			return ctx.state.fail.authorizationFailure(authResult.error)
+		if (!authResult.ok) {
+			return ctx.state.fail.authorizationFailure(authResult.errorMessage)
 		}
-		ctx.state.authResult = { ...authResult, assumedIdentityId: ctx.request.get(assumeIdentityHeader) || undefined }
+		ctx.state.authResult = {
+			...authResult.result,
+			assumedIdentityId: ctx.request.get(assumeIdentityHeader) || undefined,
+		}
 		await next()
 	}
 	return auth
 }
 
 export interface AuthMiddlewareState {
-	authResult: ApiKeyManager.VerifyResultOk & { assumedIdentityId?: string }
+	authResult: VerifyResult & { assumedIdentityId?: string }
 }

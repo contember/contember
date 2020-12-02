@@ -118,17 +118,17 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 			}
 		} else if ('referenceId' in node && node.referenceId !== undefined) {
 			const referenceId = node.referenceId
-			const removeReference = () => {
-				console.warn(`Removing referenced node '${referenceId}'.`)
+			const deleteNode = () => {
+				console.warn(`Removing a node linking a non-existent reference id '${referenceId}'.`)
 				Transforms.delete(editor, { at: path })
 			}
 			if (getReferenceByKey === undefined) {
-				removeReference()
+				deleteNode()
 			} else {
 				try {
 					getReferenceByKey(referenceId)
 				} catch {
-					removeReference()
+					deleteNode()
 				}
 			}
 		}

@@ -39,12 +39,12 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasMany: () => {},
-			visitOneHasOneOwner: (entity, relation, {}, _) => {
+			visitOneHasOneOwning: (entity, relation, {}, _) => {
 				builder.dropConstraint(entity.tableName, NamingHelper.createUniqueConstraintName(entity.name, [relation.name]))
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasOneInverse: () => {},
-			visitManyHasManyOwner: ({}, relation, {}, _) => {
+			visitManyHasManyOwning: ({}, relation, {}, _) => {
 				builder.dropTable(relation.joiningTable.tableName)
 			},
 			visitManyHasManyInverse: () => {},

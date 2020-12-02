@@ -10,12 +10,12 @@ export interface ManyHasManyInverseContext {
 	entity: Model.Entity
 	relation: Model.ManyHasManyInverseRelation
 	targetEntity: Model.Entity
-	targetRelation: Model.ManyHasManyOwnerRelation
+	targetRelation: Model.ManyHasManyOwningRelation
 }
 
-export interface ManyHasManyOwnerContext {
+export interface ManyHasManyOwningContext {
 	entity: Model.Entity
-	relation: Model.ManyHasManyOwnerRelation
+	relation: Model.ManyHasManyOwningRelation
 	targetEntity: Model.Entity
 	targetRelation: Model.ManyHasManyInverseRelation | null
 }
@@ -38,12 +38,12 @@ export interface OneHasOneInverseContext {
 	entity: Model.Entity
 	relation: Model.OneHasOneInverseRelation
 	targetEntity: Model.Entity
-	targetRelation: Model.OneHasOneOwnerRelation
+	targetRelation: Model.OneHasOneOwningRelation
 }
 
-export interface OneHasOneOwnerContext {
+export interface OneHasOneOwningContext {
 	entity: Model.Entity
-	relation: Model.OneHasOneOwnerRelation
+	relation: Model.OneHasOneOwningRelation
 	targetEntity: Model.Entity
 	targetRelation: Model.OneHasOneInverseRelation | null
 }

@@ -20,7 +20,7 @@ export class CreateInputPreValidationProcessor implements CreateInputProcessor<R
 		create: context => this.validateCreate(context),
 	}
 
-	manyHasManyOwner: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyOwnerContext, Result> = {
+	manyHasManyOwning: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyOwningContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
@@ -38,7 +38,7 @@ export class CreateInputPreValidationProcessor implements CreateInputProcessor<R
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
-	oneHasOneOwner: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneOwnerContext, Result> = {
+	oneHasOneOwning: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneOwningContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}

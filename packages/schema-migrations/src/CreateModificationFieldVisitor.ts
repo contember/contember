@@ -45,9 +45,9 @@ export default class CreateFieldVisitor
 		}
 	}
 
-	public visitOneHasOneOwner(
+	public visitOneHasOneOwning(
 		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
+		relation: Model.OneHasOneOwningRelation,
 		{},
 		targetRelation: Model.OneHasOneInverseRelation | null,
 	): Migration.Modification<CreateRelationModification.Data> {
@@ -70,9 +70,9 @@ export default class CreateFieldVisitor
 		}
 	}
 
-	public visitManyHasManyOwner(
+	public visitManyHasManyOwning(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		{},
 		targetRelation: Model.ManyHasManyInverseRelation | null,
 	): Migration.Modification<CreateRelationModification.Data> {

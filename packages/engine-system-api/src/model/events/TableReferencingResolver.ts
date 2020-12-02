@@ -15,13 +15,13 @@ export class TableReferencingResolver {
 						result[entity.tableName][relation.joiningColumn.columnName] = targetEntity.tableName
 					}
 
-					visitOneHasOneOwner({}, relation: Model.OneHasOneOwnerRelation, targetEntity: Model.Entity) {
+					visitOneHasOneOwning({}, relation: Model.OneHasOneOwningRelation, targetEntity: Model.Entity) {
 						result[entity.tableName][relation.joiningColumn.columnName] = targetEntity.tableName
 					}
 
-					visitManyHasManyOwner(
+					visitManyHasManyOwning(
 						entity: Model.Entity,
-						relation: Model.ManyHasManyOwnerRelation,
+						relation: Model.ManyHasManyOwningRelation,
 						targetEntity: Model.Entity,
 					) {
 						result[relation.joiningTable.tableName] = {

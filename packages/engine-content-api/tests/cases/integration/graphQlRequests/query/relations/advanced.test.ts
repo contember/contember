@@ -5,7 +5,7 @@ import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
-test('Posts with categories and its cz locale (many has many owner + one has many)', async () => {
+test('Posts with categories and its cz locale (many has many owning + one has many)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
 			.enum('locale', ['cs', 'en'])

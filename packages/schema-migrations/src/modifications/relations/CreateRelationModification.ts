@@ -44,7 +44,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 				builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasMany: () => {},
-			visitOneHasOneOwner: ({}, relation, {}, _) => {
+			visitOneHasOneOwning: ({}, relation, {}, _) => {
 				builder.addColumn(entity.tableName, {
 					[relation.joiningColumn.columnName]: {
 						type: getPrimaryType(targetEntity),
@@ -72,7 +72,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 				})
 			},
 			visitOneHasOneInverse: () => {},
-			visitManyHasManyOwner: ({}, relation, {}, _) => {
+			visitManyHasManyOwning: ({}, relation, {}, _) => {
 				const primaryColumns = [
 					relation.joiningTable.joiningColumn.columnName,
 					relation.joiningTable.inverseJoiningColumn.columnName,
@@ -134,7 +134,7 @@ namespace CreateRelationModification {
 
 	export interface Data {
 		entityName: string
-		owningSide: Model.AnyRelation & Model.OwnerRelation
+		owningSide: Model.AnyRelation & Model.OwningRelation
 		inverseSide?: Model.AnyRelation & Model.InverseRelation
 	}
 }

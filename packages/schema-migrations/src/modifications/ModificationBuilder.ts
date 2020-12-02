@@ -74,9 +74,9 @@ class ModificationBuilder {
 					visitColumn: () => 0,
 					visitManyHasOne: () => 10,
 					visitOneHasMany: () => 0,
-					visitOneHasOneOwner: () => 10,
+					visitOneHasOneOwning: () => 10,
 					visitOneHasOneInverse: () => 0,
-					visitManyHasManyOwner: () => 10,
+					visitManyHasManyOwning: () => 10,
 					visitManyHasManyInverse: () => 0,
 				}
 				return (

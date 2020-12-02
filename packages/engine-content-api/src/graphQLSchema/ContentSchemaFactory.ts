@@ -54,7 +54,7 @@ export class ContentSchemaFactory {
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
 			},
-			visitManyHasManyOwner(entity: Model.Entity, relation: Model.ManyHasManyOwnerRelation) {
+			visitManyHasManyOwning(entity: Model.Entity, relation: Model.ManyHasManyOwningRelation) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -91,7 +91,7 @@ export class ContentSchemaFactory {
 					nullable: relation.nullable,
 				}
 			},
-			visitOneHasOneOwner(entity: Model.Entity, relation: Model.OneHasOneOwnerRelation) {
+			visitOneHasOneOwning(entity: Model.Entity, relation: Model.OneHasOneOwningRelation) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,

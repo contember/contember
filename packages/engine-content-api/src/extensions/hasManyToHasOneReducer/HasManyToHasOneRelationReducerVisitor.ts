@@ -28,7 +28,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		return {}
 	}
 
-	public visitOneHasOneOwner() {
+	public visitOneHasOneOwning() {
 		return {}
 	}
 
@@ -44,7 +44,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		return {}
 	}
 
-	public visitManyHasManyOwner() {
+	public visitManyHasManyOwning() {
 		return {}
 	}
 

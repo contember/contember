@@ -98,7 +98,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 		}),
 	}
 
-	manyHasManyOwner: UpdateInputProcessor<MutationResultList>['manyHasManyOwner'] = {
+	manyHasManyOwning: UpdateInputProcessor<MutationResultList>['manyHasManyOwning'] = {
 		connect: hasManyProcessor(async ({ input, entity, relation, targetEntity }) => {
 			const primaryValue = await this.mapper.getPrimaryValue(targetEntity, input)
 			if (!primaryValue) {
@@ -364,7 +364,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 		}),
 	}
 
-	oneHasOneOwner: UpdateInputProcessor<MutationResultList>['oneHasOneOwner'] = {
+	oneHasOneOwning: UpdateInputProcessor<MutationResultList>['oneHasOneOwning'] = {
 		connect: hasOneProcessor(async ({ targetEntity, input, entity, relation, targetRelation }) => {
 			const result: MutationResultList = []
 

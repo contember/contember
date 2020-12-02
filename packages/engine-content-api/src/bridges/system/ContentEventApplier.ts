@@ -54,7 +54,7 @@ type EntityTables = Record<string, EntityTable>
 
 type JunctionTable = {
 	entity: Model.Entity
-	relation: Model.ManyHasManyOwnerRelation
+	relation: Model.ManyHasManyOwningRelation
 }
 type JunctionTables = Record<string, JunctionTable>
 
@@ -82,11 +82,11 @@ const buildTables = (schema: Model.Schema): Tables => {
 					entityResult.columns[relation.joiningColumn.columnName] = relation
 				}
 
-				visitOneHasOneOwner({}, relation: Model.OneHasOneOwnerRelation) {
+				visitOneHasOneOwning({}, relation: Model.OneHasOneOwningRelation) {
 					entityResult.columns[relation.joiningColumn.columnName] = relation
 				}
 
-				visitManyHasManyOwner({}, relation: Model.ManyHasManyOwnerRelation) {
+				visitManyHasManyOwning({}, relation: Model.ManyHasManyOwningRelation) {
 					result.junctions[relation.joiningTable.tableName] = {
 						entity,
 						relation,

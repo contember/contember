@@ -28,7 +28,7 @@ export class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasManyInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation,
+		targetRelation: Model.ManyHasManyOwningRelation,
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyInverseContext>(
 			this.createInputProcessor.manyHasManyInverse,
@@ -42,14 +42,14 @@ export class CreateInputVisitor<Result>
 		)
 	}
 
-	public visitManyHasManyOwner(
+	public visitManyHasManyOwning(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyInverseRelation | null,
 	) {
-		return this.processManyRelationInput<Context.ManyHasManyOwnerContext>(
-			this.createInputProcessor.manyHasManyOwner,
+		return this.processManyRelationInput<Context.ManyHasManyOwningContext>(
+			this.createInputProcessor.manyHasManyOwning,
 			{
 				entity,
 				relation,
@@ -100,7 +100,7 @@ export class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation,
+		targetRelation: Model.OneHasOneOwningRelation,
 	) {
 		return this.processRelationInput<Context.OneHasOneInverseContext>(
 			this.createInputProcessor.oneHasOneInverse,
@@ -114,14 +114,14 @@ export class CreateInputVisitor<Result>
 		)
 	}
 
-	public visitOneHasOneOwner(
+	public visitOneHasOneOwning(
 		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
+		relation: Model.OneHasOneOwningRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneInverseRelation | null,
 	) {
-		return this.processRelationInput<Context.OneHasOneOwnerContext>(
-			this.createInputProcessor.oneHasOneOwner,
+		return this.processRelationInput<Context.OneHasOneOwningContext>(
+			this.createInputProcessor.oneHasOneOwning,
 			{
 				entity,
 				relation,

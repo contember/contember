@@ -26,7 +26,7 @@ export class UpdateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasManyInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation,
+		targetRelation: Model.ManyHasManyOwningRelation,
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyInverseContext>(
 			this.updateInputProcessor.manyHasManyInverse,
@@ -35,14 +35,14 @@ export class UpdateInputVisitor<Result>
 		)
 	}
 
-	public visitManyHasManyOwner(
+	public visitManyHasManyOwning(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyInverseRelation | null,
 	) {
-		return this.processManyRelationInput<Context.ManyHasManyOwnerContext>(
-			this.updateInputProcessor.manyHasManyOwner,
+		return this.processManyRelationInput<Context.ManyHasManyOwningContext>(
+			this.updateInputProcessor.manyHasManyOwning,
 			{ entity, relation, targetEntity, targetRelation },
 			this.data[relation.name] as Input.CreateManyRelationInput,
 		)
@@ -83,7 +83,7 @@ export class UpdateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation,
+		targetRelation: Model.OneHasOneOwningRelation,
 	) {
 		return this.processRelationInput<Context.OneHasOneInverseContext>(
 			this.updateInputProcessor.oneHasOneInverse,
@@ -97,14 +97,14 @@ export class UpdateInputVisitor<Result>
 		)
 	}
 
-	public visitOneHasOneOwner(
+	public visitOneHasOneOwning(
 		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
+		relation: Model.OneHasOneOwningRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneInverseRelation | null,
 	) {
-		return this.processRelationInput<Context.OneHasOneOwnerContext>(
-			this.updateInputProcessor.oneHasOneOwner,
+		return this.processRelationInput<Context.OneHasOneOwningContext>(
+			this.updateInputProcessor.oneHasOneOwning,
 			{
 				entity,
 				relation,

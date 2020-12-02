@@ -16,7 +16,7 @@ import {
 } from '../Result'
 import Mapper from '../Mapper'
 
-type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwnerRelation]
+type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwningRelation]
 
 export class DeleteExecutor {
 	constructor(
@@ -122,10 +122,10 @@ export class DeleteExecutor {
 				acceptEveryFieldVisitor<null | EntityRelationTuple>(this.schema, entity, {
 					visitColumn: () => null,
 					visitManyHasManyInverse: () => null,
-					visitManyHasManyOwner: () => null,
+					visitManyHasManyOwning: () => null,
 					visitOneHasOneInverse: () => null,
 					visitOneHasMany: () => null,
-					visitOneHasOneOwner: ({}, relation): EntityRelationTuple => [entity, relation],
+					visitOneHasOneOwning: ({}, relation): EntityRelationTuple => [entity, relation],
 					visitManyHasOne: ({}, relation): EntityRelationTuple => [entity, relation],
 				}),
 			)

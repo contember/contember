@@ -59,7 +59,7 @@ class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mode
 		return false
 	}
 
-	visitManyHasManyOwner(): boolean {
+	visitManyHasManyOwning(): boolean {
 		return false
 	}
 
@@ -75,7 +75,7 @@ class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mode
 		return !relation.nullable
 	}
 
-	visitOneHasOneOwner(entity: Model.Entity, relation: Model.OneHasOneOwnerRelation): boolean {
+	visitOneHasOneOwning(entity: Model.Entity, relation: Model.OneHasOneOwningRelation): boolean {
 		return !relation.nullable
 	}
 }

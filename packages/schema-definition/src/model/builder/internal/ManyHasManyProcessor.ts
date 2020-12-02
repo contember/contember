@@ -16,7 +16,7 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 		options: ManyHasManyBuilder.Options,
 		registerField: FieldProcessor.FieldRegistrar,
 	): void {
-		registerField(entityName, this.createManyHasManyOwner(options, entityName, fieldName))
+		registerField(entityName, this.createManyHasManyOwning(options, entityName, fieldName))
 		if (options.inversedBy) {
 			registerField(options.target, this.createManyHasManyInverse(options.inversedBy, entityName, fieldName))
 		}
@@ -35,11 +35,11 @@ export default class ManyHasManyProcessor implements FieldProcessor<ManyHasManyB
 		}
 	}
 
-	private createManyHasManyOwner(
+	private createManyHasManyOwning(
 		options: ManyHasManyBuilder.Options,
 		entityName: string,
 		fieldName: string,
-	): Model.ManyHasManyOwnerRelation {
+	): Model.ManyHasManyOwningRelation {
 		let joiningTable: Model.JoiningTable | undefined = options.joiningTable
 		if (!joiningTable) {
 			const columnNames = this.conventions.getJoiningTableColumnNames(

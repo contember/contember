@@ -56,7 +56,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		entity: Model.Entity,
 		relation: Model.ManyHasManyInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation,
+		targetRelation: Model.ManyHasManyOwningRelation,
 	): void {
 		const joiningTable = targetRelation.joiningTable
 		const columns: Mapper.JoiningColumns = {
@@ -67,9 +67,9 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		this.createManyHasManyGroups(targetEntity, targetRelation, columns, relation.orderBy || [])
 	}
 
-	public visitManyHasManyOwner(
+	public visitManyHasManyOwning(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		targetEntity: Model.Entity,
 	): void {
 		const joiningTable = relation.joiningTable
@@ -113,7 +113,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 
 	private createManyHasManyGroups(
 		targetEntity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		joiningColumns: Mapper.JoiningColumns,
 		defaultOrderBy: Model.OrderBy[],
 	): void {
@@ -185,7 +185,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		entity: Model.Entity,
 		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation,
+		targetRelation: Model.OneHasOneOwningRelation,
 	): void {
 		this.executionContext.addData(
 			entity.primary,
@@ -209,9 +209,9 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		)
 	}
 
-	public visitOneHasOneOwner(
+	public visitOneHasOneOwning(
 		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
+		relation: Model.OneHasOneOwningRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneInverseRelation | null,
 	): void {

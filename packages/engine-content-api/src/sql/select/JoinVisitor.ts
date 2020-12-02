@@ -4,9 +4,9 @@ import Path from './Path'
 class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinition[]> {
 	constructor(private readonly path: Path) {}
 
-	visitOneHasOneOwner(
+	visitOneHasOneOwning(
 		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
+		relation: Model.OneHasOneOwningRelation,
 		targetEntity: Model.Entity,
 	): JoinVisitor.JoinDefinition[] {
 		return [
@@ -22,7 +22,7 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 		entity: Model.Entity,
 		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation,
+		targetRelation: Model.OneHasOneOwningRelation,
 	): JoinVisitor.JoinDefinition[] {
 		return [
 			{
@@ -63,9 +63,9 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 		]
 	}
 
-	visitManyHasManyOwner(
+	visitManyHasManyOwning(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		targetEntity: Model.Entity,
 	): JoinVisitor.JoinDefinition[] {
 		const sourceAlias = this.path.back().getAlias()
@@ -94,7 +94,7 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 		entity: Model.Entity,
 		relation: Model.ManyHasManyInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation,
+		targetRelation: Model.ManyHasManyOwningRelation,
 	): JoinVisitor.JoinDefinition[] {
 		const sourceAlias = this.path.back().getAlias()
 		const targetAlias = this.path.getAlias()

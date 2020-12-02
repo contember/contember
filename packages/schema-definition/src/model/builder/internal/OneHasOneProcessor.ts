@@ -43,7 +43,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 		}
 	}
 
-	private createOneHasOneOwner(options: OneHasOneBuilder.Options, fieldName: string): Model.OneHasOneOwnerRelation {
+	private createOneHasOneOwner(options: OneHasOneBuilder.Options, fieldName: string): Model.OneHasOneOwningRelation {
 		const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
 
 		return {

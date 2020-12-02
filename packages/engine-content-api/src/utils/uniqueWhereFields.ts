@@ -6,11 +6,11 @@ export const getFieldsForUniqueWhere = (schema: Model.Schema, entity: Model.Enti
 		acceptEveryFieldVisitor<undefined | [string]>(schema, entity, {
 			visitColumn: () => undefined,
 			visitManyHasManyInverse: () => undefined,
-			visitManyHasManyOwner: () => undefined,
+			visitManyHasManyOwning: () => undefined,
 			visitOneHasMany: ({}, relation) => [relation.name],
 			visitManyHasOne: () => undefined,
 			visitOneHasOneInverse: ({}, relation) => [relation.name],
-			visitOneHasOneOwner: ({}, relation) => [relation.name],
+			visitOneHasOneOwning: ({}, relation) => [relation.name],
 		}),
 	).filter((it): it is [string] => !!it)
 

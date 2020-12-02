@@ -86,18 +86,7 @@ const schema: DocumentNode = gql`
 
 	type SetupResponse {
 		ok: Boolean!
-		errors: [SetupErrorCode!]!
 		result: SetupResult
-	}
-
-	type SetupError {
-		code: SetupErrorCode!
-		endPersonMessage: String
-		developerMessage: String
-	}
-
-	enum SetupErrorCode {
-		SETUP_ALREADY_DONE
 	}
 
 	type SetupResult {

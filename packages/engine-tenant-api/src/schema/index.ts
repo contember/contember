@@ -174,19 +174,7 @@ export type AdminCredentials = {
 export type SetupResponse = {
 	readonly __typename?: 'SetupResponse'
 	readonly ok: Scalars['Boolean']
-	readonly errors: ReadonlyArray<SetupErrorCode>
 	readonly result?: Maybe<SetupResult>
-}
-
-export type SetupError = {
-	readonly __typename?: 'SetupError'
-	readonly code: SetupErrorCode
-	readonly endPersonMessage?: Maybe<Scalars['String']>
-	readonly developerMessage?: Maybe<Scalars['String']>
-}
-
-export enum SetupErrorCode {
-	SetupAlreadyDone = 'SETUP_ALREADY_DONE',
 }
 
 export type SetupResult = {
@@ -815,8 +803,6 @@ export type ResolversTypes = {
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
 	AdminCredentials: AdminCredentials
 	SetupResponse: ResolverTypeWrapper<SetupResponse>
-	SetupError: ResolverTypeWrapper<SetupError>
-	SetupErrorCode: SetupErrorCode
 	SetupResult: ResolverTypeWrapper<SetupResult>
 	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
 	SignUpError: ResolverTypeWrapper<SignUpError>
@@ -915,7 +901,6 @@ export type ResolversParentTypes = {
 	Boolean: Scalars['Boolean']
 	AdminCredentials: AdminCredentials
 	SetupResponse: SetupResponse
-	SetupError: SetupError
 	SetupResult: SetupResult
 	SignUpResponse: SignUpResponse
 	SignUpError: SignUpError
@@ -1145,18 +1130,7 @@ export type SetupResponseResolvers<
 	ParentType extends ResolversParentTypes['SetupResponse'] = ResolversParentTypes['SetupResponse']
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	errors?: Resolver<ReadonlyArray<ResolversTypes['SetupErrorCode']>, ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['SetupResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type SetupErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SetupError'] = ResolversParentTypes['SetupError']
-> = {
-	code?: Resolver<ResolversTypes['SetupErrorCode'], ParentType, ContextType>
-	endPersonMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1719,7 +1693,6 @@ export type Resolvers<ContextType = any> = {
 	Query?: QueryResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>
 	SetupResponse?: SetupResponseResolvers<ContextType>
-	SetupError?: SetupErrorResolvers<ContextType>
 	SetupResult?: SetupResultResolvers<ContextType>
 	SignUpResponse?: SignUpResponseResolvers<ContextType>
 	SignUpError?: SignUpErrorResolvers<ContextType>

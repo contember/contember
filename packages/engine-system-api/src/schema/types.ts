@@ -181,6 +181,7 @@ export enum DiffErrorCode {
 	StageNotFound = 'STAGE_NOT_FOUND',
 	MissingBase = 'MISSING_BASE',
 	NotRebased = 'NOT_REBASED',
+	InvalidFilter = 'INVALID_FILTER',
 }
 
 export type DiffError = {
@@ -277,6 +278,7 @@ export enum ReleaseTreeErrorCode {
 	MissingBase = 'MISSING_BASE',
 	Forbidden = 'FORBIDDEN',
 	NotRebased = 'NOT_REBASED',
+	InvalidFilter = 'INVALID_FILTER',
 }
 
 export type ReleaseTreeError = {

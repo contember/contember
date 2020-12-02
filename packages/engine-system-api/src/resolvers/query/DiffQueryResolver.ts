@@ -64,6 +64,7 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 			if (!diff.ok) {
 				const code = {
 					[DiffBuilderErrorCode.notRebased]: DiffErrorCode.NotRebased,
+					[DiffBuilderErrorCode.invalidFilter]: DiffErrorCode.InvalidFilter,
 				}[diff.error]
 				return {
 					ok: false,

@@ -47,7 +47,7 @@ export class SystemApiTester {
 			throw result.errors.length === 1 ? result.errors[0] : result.errors
 		}
 
-		return result
+		return JSON.parse(JSON.stringify(result))
 	}
 
 	public async diff(stage: string): Promise<Schema.DiffResult> {

@@ -65,6 +65,7 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 			if (!diff.ok) {
 				const code = {
 					[DiffBuilderErrorCode.notRebased]: ReleaseTreeErrorCode.NotRebased,
+					[DiffBuilderErrorCode.invalidFilter]: ReleaseTreeErrorCode.InvalidFilter,
 				}[diff.error]
 				return {
 					ok: false,

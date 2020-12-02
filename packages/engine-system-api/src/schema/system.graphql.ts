@@ -138,6 +138,7 @@ const schema: DocumentNode = gql`
 		STAGE_NOT_FOUND
 		MISSING_BASE
 		NOT_REBASED
+		INVALID_FILTER
 	}
 
 	type DiffError {
@@ -229,6 +230,7 @@ const schema: DocumentNode = gql`
 		MISSING_BASE
 		FORBIDDEN
 		NOT_REBASED
+		INVALID_FILTER
 	}
 
 	type ReleaseTreeError {

@@ -10,6 +10,7 @@ import { Acl, Schema } from '@contember/schema'
 import { formatSchemaName } from '../helpers'
 import { filterSchemaByStage } from '@contember/schema-utils'
 import { Identity } from '../authorization'
+import { EventFilterValidator, InvalidFilterError } from './EventFilterValidator'
 
 export type EventsPermissionsVerifierContext = {
 	variables: Acl.VariablesMap
@@ -31,6 +32,17 @@ export class DiffBuilder {
 		filter: ReadonlyArray<EventFilter> | null,
 	): Promise<DiffBuilderResponse> {
 		const schema = await this.schemaVersionBuilder.buildSchema(db)
+		if (filter !== null) {
+			try {
+				filter.forEach(it => EventFilterValidator.validateFilter(schema.model, it))
+			} catch (e) {
+				if (e instanceof InvalidFilterError) {
+					return new DiffBuilderErrorResponse(DiffBuilderErrorCode.invalidFilter, e.message)
+				}
+				throw e
+			}
+		}
+
 		const count = await db.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
 
 		if (!count.ok) {
@@ -149,6 +161,7 @@ export type DiffBuilderResponse = DiffBuilderOkResponse | DiffBuilderErrorRespon
 
 export enum DiffBuilderErrorCode {
 	notRebased = 'notRebased',
+	invalidFilter = 'invalidFilter',
 }
 
 export class DiffBuilderErrorResponse {

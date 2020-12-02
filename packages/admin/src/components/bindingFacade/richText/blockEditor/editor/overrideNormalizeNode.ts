@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Node as SlateNode, Path as SlatePath, Text, Transforms } from 'slate'
+import { EntityListAccessor } from '@contember/binding'
 import { EditorNode } from '../../baseEditor'
 import { ContemberEditor } from '../../ContemberEditor'
 import {
@@ -15,11 +16,12 @@ export interface OverrideNormalizeNodeOptions {
 	leadingFields: FieldBackedElement[]
 	trailingFields: FieldBackedElement[]
 	placeholder: ContemberContentPlaceholderElement['placeholder']
+	getReferenceByKey: EntityListAccessor.GetChildEntityByKey | undefined
 }
 
 export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 	editor: E,
-	{ leadingFields, trailingFields, placeholder }: OverrideNormalizeNodeOptions,
+	{ leadingFields, trailingFields, placeholder, getReferenceByKey }: OverrideNormalizeNodeOptions,
 ) => {
 	const { normalizeNode } = editor
 
@@ -113,6 +115,21 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 					at: path,
 				})
 				Transforms.unwrapNodes(editor, { at: path.concat(0) })
+			}
+		} else if ('referenceId' in node && node.referenceId !== undefined) {
+			const referenceId = node.referenceId
+			const deleteNode = () => {
+				console.warn(`Removing a node linking a non-existent reference id '${referenceId}'.`)
+				Transforms.delete(editor, { at: path })
+			}
+			if (getReferenceByKey === undefined) {
+				deleteNode()
+			} else {
+				try {
+					getReferenceByKey(referenceId)
+				} catch {
+					deleteNode()
+				}
 			}
 		}
 		return normalizeNode(nodeEntry)

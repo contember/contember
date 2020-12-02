@@ -202,12 +202,12 @@ test('update m:n', async () => {
 				sql: SQL`with "data" as
             (select
                "owning"."id" as "post_id",
-               "inversed"."id" as "category_id",
+               "inverse"."id" as "category_id",
                true as "selected"
              from (values (null)) as "t" inner join "public"."post" as "owning" on true
-               inner join "public"."category" as "inversed" on true
-             where "owning"."name" in (?, ?) and "owning"."id" = ? and "inversed"."name" in (?, ?) and
-                   "inversed"."id" = ?),
+               inner join "public"."category" as "inverse" on true
+             where "owning"."name" in (?, ?) and "owning"."id" = ? and "inverse"."name" in (?, ?) and
+                   "inverse"."id" = ?),
 								"insert" as
               (insert into "public"."post_categories" ("post_id", "category_id")
                 select
@@ -235,12 +235,12 @@ test('update m:n', async () => {
 				sql: SQL`with "data" as
             (select
                "owning"."id" as "post_id",
-               "inversed"."id" as "category_id",
+               "inverse"."id" as "category_id",
                true as "selected"
              from (values (null)) as "t" inner join "public"."post" as "owning" on true
-               inner join "public"."category" as "inversed" on true
-             where "owning"."name" in (?, ?) and "owning"."id" = ? and "inversed"."name" in (?, ?) and
-                   "inversed"."id" = ?),
+               inner join "public"."category" as "inverse" on true
+             where "owning"."name" in (?, ?) and "owning"."id" = ? and "inverse"."name" in (?, ?) and
+                   "inverse"."id" = ?),
                 "delete" as
               (delete from "public"."post_categories"
               using "data" as "data"

@@ -32,7 +32,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		return {}
 	}
 
-	public visitOneHasOneInversed() {
+	public visitOneHasOneInverse() {
 		return {}
 	}
 
@@ -40,7 +40,7 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		return {}
 	}
 
-	public visitManyHasManyInversed() {
+	public visitManyHasManyInverse() {
 		return {}
 	}
 

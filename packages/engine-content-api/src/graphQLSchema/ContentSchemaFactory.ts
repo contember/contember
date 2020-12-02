@@ -45,7 +45,7 @@ export class ContentSchemaFactory {
 			}
 		}
 		const additionalInfo = acceptEveryFieldVisitor<AdditionalFieldInfo>(this.model, entityName, {
-			visitManyHasManyInversed(entity: Model.Entity, relation: Model.ManyHasManyInversedRelation) {
+			visitManyHasManyInverse(entity: Model.Entity, relation: Model.ManyHasManyInverseRelation) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -82,7 +82,7 @@ export class ContentSchemaFactory {
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
 			},
-			visitOneHasOneInversed(entity: Model.Entity, relation: Model.OneHasOneInversedRelation) {
+			visitOneHasOneInverse(entity: Model.Entity, relation: Model.OneHasOneInverseRelation) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,

@@ -10,7 +10,7 @@ const schema = new SchemaBuilder()
 		e
 			.column('slug', c => c.unique().type(Model.ColumnType.String))
 
-			.oneHasOne('contactPage', r => r.target('ContactPage').inversedBy('site').inversedNotNull()),
+			.oneHasOne('contactPage', r => r.target('ContactPage').inversedBy('site').inverseNotNull()),
 	)
 	.entity('ContactPage', e => e.column('title'))
 	.buildSchema()

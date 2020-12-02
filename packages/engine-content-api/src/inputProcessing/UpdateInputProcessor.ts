@@ -4,7 +4,7 @@ import * as Context from './InputContext'
 interface UpdateInputProcessor<Result = void> {
 	column(context: Context.ColumnContext): Promise<Result>
 
-	manyHasManyInversed: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyInversedContext, Result>
+	manyHasManyInverse: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyInverseContext, Result>
 
 	manyHasManyOwner: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyOwnerContext, Result>
 
@@ -12,7 +12,7 @@ interface UpdateInputProcessor<Result = void> {
 
 	oneHasMany: UpdateInputProcessor.HasManyRelationInputProcessor<Context.OneHasManyContext, Result>
 
-	oneHasOneInversed: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneInversedContext, Result>
+	oneHasOneInverse: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneInverseContext, Result>
 
 	oneHasOneOwner: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneOwnerContext, Result>
 }

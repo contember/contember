@@ -194,13 +194,13 @@ export class SchemaDiffer {
 					visitOneHasOneOwner: () => {
 						builder.removeField(entityName, fieldName)
 					},
-					visitOneHasOneInversed: () => {
+					visitOneHasOneInverse: () => {
 						builder.removeField(entityName, fieldName, true)
 					},
 					visitManyHasManyOwner: () => {
 						builder.removeField(entityName, fieldName)
 					},
-					visitManyHasManyInversed: () => {
+					visitManyHasManyInverse: () => {
 						builder.removeField(entityName, fieldName, true)
 					},
 				})

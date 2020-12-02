@@ -1,7 +1,7 @@
 import FieldProcessor from './FieldProcessor'
 import { Model } from '@contember/schema'
 import ManyHasOneBuilder from '../ManyHasOneBuilder'
-import NamingConventions from '../NamingConventions'
+import NamingConventions from '../../definition/NamingConventions'
 
 export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBuilder.Options> {
 	private conventions: NamingConventions
@@ -18,16 +18,16 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 	): void {
 		registerField(entityName, this.createManyHasOneOwning(options, fieldName))
 		if (options.inversedBy) {
-			const inversed = this.createManyHasOneInversed(
+			const inverse = this.createManyHasOneInverse(
 				options as ManyHasOneBuilder.Options & { inversedBy: string },
 				entityName,
 				fieldName,
 			)
-			registerField(options.target, inversed)
+			registerField(options.target, inverse)
 		}
 	}
 
-	private createManyHasOneInversed(
+	private createManyHasOneInverse(
 		options: ManyHasOneBuilder.Options & { inversedBy: string },
 		entityName: string,
 		fieldName: string,

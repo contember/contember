@@ -3,10 +3,10 @@ import { Interface } from './types'
 import FieldDefinition from './FieldDefinition'
 import { RelationTarget } from './types'
 
-class OneHasOneInversedDefinition extends FieldDefinition<OneHasOneInversedDefinition.Options> {
-	type = 'OneHasOneInversedDefinition' as const
+class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverseDefinition.Options> {
+	type = 'OneHasOneInverseDefinition' as const
 
-	notNull(): Interface<OneHasOneInversedDefinition> {
+	notNull(): Interface<OneHasOneInverseDefinition> {
 		return this.withOption('nullable', false)
 	}
 
@@ -22,7 +22,7 @@ class OneHasOneInversedDefinition extends FieldDefinition<OneHasOneInversedDefin
 	}
 }
 
-namespace OneHasOneInversedDefinition {
+namespace OneHasOneInverseDefinition {
 	export type Options = {
 		target: RelationTarget
 		ownedBy: string
@@ -30,4 +30,4 @@ namespace OneHasOneInversedDefinition {
 	}
 }
 
-export default OneHasOneInversedDefinition
+export default OneHasOneInverseDefinition

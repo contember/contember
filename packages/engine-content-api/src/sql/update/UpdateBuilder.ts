@@ -76,9 +76,9 @@ export default class UpdateBuilder {
 							visitColumn: (entity, column) => column.columnName,
 							visitManyHasOne: (entity, relation) => relation.joiningColumn.columnName,
 							visitOneHasOneOwner: (entity, relation) => relation.joiningColumn.columnName,
-							visitManyHasManyInversed: () => null,
+							visitManyHasManyInverse: () => null,
 							visitManyHasManyOwner: () => null,
-							visitOneHasOneInversed: () => null,
+							visitOneHasOneInverse: () => null,
 							visitOneHasMany: () => null,
 						}),
 					).filter((it): it is string => it !== null)

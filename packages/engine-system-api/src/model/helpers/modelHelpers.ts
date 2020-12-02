@@ -9,11 +9,11 @@ export const getJunctionTables = (model: Model.Schema): Model.JoiningTable[] => 
 				tables.push(relation.joiningTable)
 			},
 			visitColumn: () => {},
-			visitManyHasManyInversed: () => {},
+			visitManyHasManyInverse: () => {},
 			visitOneHasMany: () => {},
 			visitManyHasOne: () => {},
 			visitOneHasOneOwner: () => {},
-			visitOneHasOneInversed: () => {},
+			visitOneHasOneInverse: () => {},
 		})
 	})
 	return tables

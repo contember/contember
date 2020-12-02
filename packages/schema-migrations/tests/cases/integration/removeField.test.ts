@@ -115,7 +115,7 @@ testMigrations('remove relation (one has one)', {
 						ALTER TABLE "site" DROP "setting_id";`,
 })
 
-testMigrations('remove relation inversed side', {
+testMigrations('remove relation inverse side', {
 	originalSchema: new SchemaBuilder()
 		.entity('Site', entity =>
 			entity

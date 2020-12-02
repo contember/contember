@@ -5,7 +5,7 @@ import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
-test('insert category with posts (many has many, inversed)', async () => {
+test('insert category with posts (many has many, inverse)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
 			.entity('Post', e =>

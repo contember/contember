@@ -121,9 +121,9 @@ export class DeleteExecutor {
 			.map(entity =>
 				acceptEveryFieldVisitor<null | EntityRelationTuple>(this.schema, entity, {
 					visitColumn: () => null,
-					visitManyHasManyInversed: () => null,
+					visitManyHasManyInverse: () => null,
 					visitManyHasManyOwner: () => null,
-					visitOneHasOneInversed: () => null,
+					visitOneHasOneInverse: () => null,
 					visitOneHasMany: () => null,
 					visitOneHasOneOwner: ({}, relation): EntityRelationTuple => [entity, relation],
 					visitManyHasOne: ({}, relation): EntityRelationTuple => [entity, relation],

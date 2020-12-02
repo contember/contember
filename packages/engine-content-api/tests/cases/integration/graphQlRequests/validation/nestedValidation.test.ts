@@ -14,7 +14,7 @@ nestedValidationTest('validates nested m:n create with an alias', async () => {
 	class Tag {
 		@v.required('Tag label is required')
 		label = d.stringColumn()
-		posts = d.manyHasManyInversed(Post, 'tags')
+		posts = d.manyHasManyInverse(Post, 'tags')
 	}
 
 	const schema = createSchema({ Post, Tag })
@@ -57,7 +57,7 @@ nestedValidationTest('validates nested m:n update', async () => {
 	class Tag {
 		@v.required('Tag label is required')
 		label = d.stringColumn()
-		posts = d.manyHasManyInversed(Post, 'tags')
+		posts = d.manyHasManyInverse(Post, 'tags')
 	}
 
 	const schema = createSchema({ Post, Tag })

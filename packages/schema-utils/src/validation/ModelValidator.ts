@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
 import { ErrorBuilder, ValidationError } from './errors'
 import { everyIs, isObject, UnknownObject } from './utils'
-import { getTargetEntity, isInversedRelation, isOwnerRelation } from '../model'
+import { getTargetEntity, isInverseRelation, isOwnerRelation } from '../model'
 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 const RESERVED_WORDS = ['and', 'or', 'not']
@@ -238,7 +238,7 @@ export class ModelValidator {
 				}
 			})
 		}
-		if (isInversedRelation((field as any) as Model.Relation)) {
+		if (isInverseRelation((field as any) as Model.Relation)) {
 			// todo
 			const ownedBy = field.ownedBy
 			if (typeof ownedBy !== 'string') {
@@ -266,7 +266,7 @@ export class ModelValidator {
 				return undefined
 			}
 			if (!targetField.inversedBy) {
-				errors.add(`${relationDescription} inversed relation is not set`)
+				errors.add(`${relationDescription} inverse relation is not set`)
 				return undefined
 			}
 			if (targetField.inversedBy !== field.name) {
@@ -306,8 +306,8 @@ export class ModelValidator {
 					)
 					return undefined
 				}
-				if (!isInversedRelation(targetField)) {
-					errors.add(`${relationDescription} not an inversed relation`)
+				if (!isInverseRelation(targetField)) {
+					errors.add(`${relationDescription} not an inverse relation`)
 					return undefined
 				}
 				if (!targetField.ownedBy) {

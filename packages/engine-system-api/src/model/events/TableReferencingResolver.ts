@@ -32,11 +32,11 @@ export class TableReferencingResolver {
 
 					visitColumn() {}
 
-					visitManyHasManyInversed() {}
+					visitManyHasManyInverse() {}
 
 					visitOneHasMany() {}
 
-					visitOneHasOneInversed() {}
+					visitOneHasOneInverse() {}
 				})(),
 			)
 		}

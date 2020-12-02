@@ -113,10 +113,10 @@ class WhereBuilder {
 					const subWhere: Input.Condition<Input.ColumnValue> = where[column.name] as Input.Condition<Input.ColumnValue>
 					return this.conditionBuilder.build(conditionBuilder, tableName, column.columnName, subWhere)
 				},
-				visitOneHasOneInversed: joinedWhere,
+				visitOneHasOneInverse: joinedWhere,
 				visitOneHasOneOwner: joinedWhere,
 				visitManyHasOne: joinedWhere,
-				visitManyHasManyInversed: (entity, relation, targetEntity, targetRelation) => {
+				visitManyHasManyInverse: (entity, relation, targetEntity, targetRelation) => {
 					if (allowManyJoin) {
 						return joinedWhere(entity, relation, targetEntity)
 					}
@@ -129,7 +129,7 @@ class WhereBuilder {
 							relationWhere,
 							targetEntity,
 							targetRelation.joiningTable,
-							'inversed',
+							'inverse',
 						),
 					)
 				},
@@ -181,7 +181,7 @@ class WhereBuilder {
 		relationWhere: Input.Where,
 		targetEntity: Model.Entity,
 		joiningTable: Model.JoiningTable,
-		fromSide: 'owner' | 'inversed',
+		fromSide: 'owner' | 'inverse',
 	) {
 		let augmentedBuilder: SelectBuilder<SelectBuilder.Result> = qb
 		const fromColumn =

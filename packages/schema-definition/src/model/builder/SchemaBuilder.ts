@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import EntityBuilder from './EntityBuilder'
-import NamingConventions from './NamingConventions'
+import NamingConventions from './../definition/NamingConventions'
 import SchemaBuilderInternal from './SchemaBuilderInternal'
 import { EntityConfigurator } from './types'
 

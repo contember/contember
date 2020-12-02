@@ -18,9 +18,9 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 		]
 	}
 
-	visitOneHasOneInversed(
+	visitOneHasOneInverse(
 		entity: Model.Entity,
-		relation: Model.OneHasOneInversedRelation,
+		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneOwnerRelation,
 	): JoinVisitor.JoinDefinition[] {
@@ -90,9 +90,9 @@ class JoinVisitor implements Model.RelationByTypeVisitor<JoinVisitor.JoinDefinit
 		]
 	}
 
-	visitManyHasManyInversed(
+	visitManyHasManyInverse(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyInversedRelation,
+		relation: Model.ManyHasManyInverseRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyOwnerRelation,
 	): JoinVisitor.JoinDefinition[] {

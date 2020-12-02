@@ -20,10 +20,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		return []
 	}
 
-	manyHasManyInversed: UpdateInputProcessor.HasManyRelationInputProcessor<
-		Context.ManyHasManyInversedContext,
-		Result
-	> = {
+	manyHasManyInverse: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyInverseContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate({ ...ctx, input: ctx.input.data }),
 		upsert: ctx => this.processUpsert(ctx),
@@ -55,7 +52,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		disconnect: NoResult,
 		['delete']: NoResult,
 	}
-	oneHasOneInversed: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneInversedContext, Result> = {
+	oneHasOneInverse: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneInverseContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate(ctx),
 		upsert: ctx => this.processUpsert(ctx),

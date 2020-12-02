@@ -36,7 +36,7 @@ namespace CreateRelationInverseSideModification {
 
 	export interface Data {
 		entityName: string
-		relation: Model.AnyRelation & Model.InversedRelation
+		relation: Model.AnyRelation & Model.InverseRelation
 	}
 }
 

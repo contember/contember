@@ -75,9 +75,9 @@ class ModificationBuilder {
 					visitManyHasOne: () => 10,
 					visitOneHasMany: () => 0,
 					visitOneHasOneOwner: () => 10,
-					visitOneHasOneInversed: () => 0,
+					visitOneHasOneInverse: () => 0,
 					visitManyHasManyOwner: () => 10,
-					visitManyHasManyInversed: () => 0,
+					visitManyHasManyInverse: () => 0,
 				}
 				return (
 					acceptFieldVisitor(this.originalSchema.model, a.entityName, a.fieldName, visitor) -
@@ -87,7 +87,7 @@ class ModificationBuilder {
 		}
 		const modifications = this.modifications.filter(it => {
 			if (it.modification === CreateRelationInverseSideModification.id) {
-				// remove creation of inversed side if owning side is created
+				// remove creation of inverse side if owning side is created
 				const relation = (it as Migration.Modification<CreateRelationInverseSideModification.Data>).relation
 				return !this.modifications.find(
 					it =>

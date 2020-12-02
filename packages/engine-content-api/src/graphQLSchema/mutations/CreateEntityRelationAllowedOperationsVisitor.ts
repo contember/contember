@@ -10,7 +10,7 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 		throw new ImplementationException('CreateEntityRelationAllowedOperationsVisitor: Not applicable for a column')
 	}
 
-	public visitManyHasManyInversed({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwnerRelation) {
+	public visitManyHasManyInverse({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwnerRelation) {
 		return this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 	}
 
@@ -30,9 +30,9 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 		return this.getAllowedOperations(targetEntity, entity, relation)
 	}
 
-	public visitOneHasOneInversed(
+	public visitOneHasOneInverse(
 		{},
-		relation: Model.OneHasOneInversedRelation,
+		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneOwnerRelation,
 	) {
@@ -47,7 +47,7 @@ export default class CreateEntityRelationAllowedOperationsVisitor
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null,
+		targetRelation: Model.OneHasOneInverseRelation | null,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
 		if (!targetRelation || targetRelation.nullable || relation.nullable) {

@@ -97,11 +97,11 @@ const buildTables = (schema: Model.Schema): Tables => {
 					entityResult.columns[column.columnName] = column
 				}
 
-				visitManyHasManyInversed() {}
+				visitManyHasManyInverse() {}
 
 				visitOneHasMany() {}
 
-				visitOneHasOneInversed() {}
+				visitOneHasOneInverse() {}
 			})(),
 		)
 	}

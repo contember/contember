@@ -123,7 +123,7 @@ export const acceptFieldVisitor = <T>(
 		let targetRelation = null
 		if (isOwnerRelation(fieldObj)) {
 			targetRelation = fieldObj.inversedBy ? targetEntity.fields[fieldObj.inversedBy] || null : null
-		} else if (isInversedRelation(fieldObj)) {
+		} else if (isInverseRelation(fieldObj)) {
 			targetRelation = targetEntity.fields[fieldObj.ownedBy]
 		} else {
 			throw new Error('Invalid relaton type')
@@ -136,16 +136,16 @@ export const acceptFieldVisitor = <T>(
 
 	if (isIt<Model.ColumnVisitor<T> & Model.RelationByGenericTypeVisitor<T>>(visitor, 'visitHasMany')) {
 		return acceptRelationTypeVisitor(schema, entityObj, fieldObj, {
-			visitManyHasManyInversed: visitor.visitHasMany.bind(visitor),
+			visitManyHasManyInverse: visitor.visitHasMany.bind(visitor),
 			visitManyHasManyOwner: visitor.visitHasMany.bind(visitor),
 			visitOneHasMany: visitor.visitHasMany.bind(visitor),
-			visitOneHasOneInversed: visitor.visitHasOne.bind(visitor),
+			visitOneHasOneInverse: visitor.visitHasOne.bind(visitor),
 			visitOneHasOneOwner: visitor.visitHasOne.bind(visitor),
 			visitManyHasOne: visitor.visitHasOne.bind(visitor),
 		})
 	}
 
-	if (isIt<Model.ColumnVisitor<T> & Model.RelationByTypeVisitor<T>>(visitor, 'visitManyHasManyInversed')) {
+	if (isIt<Model.ColumnVisitor<T> & Model.RelationByTypeVisitor<T>>(visitor, 'visitManyHasManyInverse')) {
 		return acceptRelationTypeVisitor(schema, entityObj, fieldObj, visitor)
 	}
 	throw new Error('Invalid field type')
@@ -173,30 +173,30 @@ export const acceptRelationTypeVisitor = <T>(
 	}
 	const targetEntity = getEntity(schema, relationObj.target)
 
-	if (isInversedRelation(relationObj)) {
+	if (isInverseRelation(relationObj)) {
 		const targetRelation = targetEntity.fields[relationObj.ownedBy]
 		if (!isRelation(targetRelation)) {
 			throw new Error('Invalid target relation')
 		}
 		switch (relationObj.type) {
 			case Model.RelationType.ManyHasMany:
-				return visitor.visitManyHasManyInversed(
+				return visitor.visitManyHasManyInverse(
 					entityObj,
-					relationObj as Model.ManyHasManyInversedRelation,
+					relationObj,
 					targetEntity,
 					targetRelation as Model.ManyHasManyOwnerRelation,
 				)
 			case Model.RelationType.OneHasOne:
-				return visitor.visitOneHasOneInversed(
+				return visitor.visitOneHasOneInverse(
 					entityObj,
-					relationObj as Model.OneHasOneInversedRelation,
+					relationObj,
 					targetEntity,
 					targetRelation as Model.OneHasOneOwnerRelation,
 				)
 			case Model.RelationType.OneHasMany:
 				return visitor.visitOneHasMany(
-					entityObj,
-					relationObj as Model.OneHasManyRelation,
+					entityObj, //
+					relationObj,
 					targetEntity,
 					targetRelation as Model.ManyHasOneRelation,
 				)
@@ -210,21 +210,21 @@ export const acceptRelationTypeVisitor = <T>(
 			case Model.RelationType.ManyHasMany:
 				return visitor.visitManyHasManyOwner(
 					entityObj,
-					relationObj as Model.ManyHasManyOwnerRelation,
+					relationObj,
 					targetEntity,
-					targetRelation as Model.ManyHasManyInversedRelation,
+					targetRelation as Model.ManyHasManyInverseRelation,
 				)
 			case Model.RelationType.OneHasOne:
 				return visitor.visitOneHasOneOwner(
 					entityObj,
-					relationObj as Model.OneHasOneOwnerRelation,
+					relationObj,
 					targetEntity,
-					targetRelation as Model.OneHasOneInversedRelation,
+					targetRelation as Model.OneHasOneInverseRelation,
 				)
 			case Model.RelationType.ManyHasOne:
 				return visitor.visitManyHasOne(
-					entityObj,
-					relationObj as Model.ManyHasOneRelation,
+					entityObj, //
+					relationObj,
 					targetEntity,
 					targetRelation as Model.OneHasManyRelation,
 				)
@@ -240,12 +240,12 @@ export const isRelation = (field: Model.AnyField): field is Model.AnyRelation =>
 	return isIt<Model.Relation>(field, 'target')
 }
 
-export const isInversedRelation = (relation: Model.Relation): relation is Model.InversedRelation => {
-	return (relation as Model.InversedRelation).ownedBy !== undefined
+export const isInverseRelation = (relation: Model.Relation): relation is Model.InverseRelation => {
+	return (relation as Model.InverseRelation).ownedBy !== undefined
 }
 
 export const isOwnerRelation = (relation: Model.Relation): relation is Model.OwnerRelation => {
-	return !isInversedRelation(relation)
+	return !isInverseRelation(relation)
 }
 
 export const emptyModelSchema: Model.Schema = { entities: {}, enums: {} }

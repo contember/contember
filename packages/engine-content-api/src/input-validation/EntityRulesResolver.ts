@@ -55,7 +55,7 @@ class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mode
 		return !column.nullable
 	}
 
-	visitManyHasManyInversed(): boolean {
+	visitManyHasManyInverse(): boolean {
 		return false
 	}
 
@@ -71,7 +71,7 @@ class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mode
 		return false
 	}
 
-	visitOneHasOneInversed(entity: Model.Entity, relation: Model.OneHasOneInversedRelation): boolean {
+	visitOneHasOneInverse(entity: Model.Entity, relation: Model.OneHasOneInverseRelation): boolean {
 		return !relation.nullable
 	}
 

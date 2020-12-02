@@ -1,7 +1,7 @@
 import FieldProcessor from './FieldProcessor'
 import OneHasManyBuilder from '../OneHasManyBuilder'
 import { Model } from '@contember/schema'
-import NamingConventions from '../NamingConventions'
+import NamingConventions from '../../definition/NamingConventions'
 
 export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBuilder.Options> {
 	private conventions: NamingConventions
@@ -21,10 +21,10 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 			ownedBy: options.ownedBy || entityName,
 		}
 		registerField(optionsFinalized.target, this.createOwning(optionsFinalized, entityName, fieldName))
-		registerField(entityName, this.createInversed(optionsFinalized, fieldName))
+		registerField(entityName, this.createInverse(optionsFinalized, fieldName))
 	}
 
-	private createInversed(
+	private createInverse(
 		options: OneHasManyBuilder.Options & { ownedBy: string },
 		fieldName: string,
 	): Model.OneHasManyRelation {

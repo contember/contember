@@ -125,12 +125,12 @@ namespace Model {
 			entity: Entity,
 			relation: OneHasOneOwnerRelation,
 			targetEntity: Entity,
-			targetRelation: OneHasOneInversedRelation | null,
+			targetRelation: OneHasOneInverseRelation | null,
 		): T
 
-		visitOneHasOneInversed(
+		visitOneHasOneInverse(
 			entity: Entity,
-			relation: OneHasOneInversedRelation,
+			relation: OneHasOneInverseRelation,
 			targetEntity: Entity,
 			targetRelation: OneHasOneOwnerRelation,
 		): T
@@ -139,12 +139,12 @@ namespace Model {
 			entity: Entity,
 			relation: ManyHasManyOwnerRelation,
 			targetEntity: Entity,
-			targetRelation: ManyHasManyInversedRelation | null,
+			targetRelation: ManyHasManyInverseRelation | null,
 		): T
 
-		visitManyHasManyInversed(
+		visitManyHasManyInverse(
 			entity: Entity,
-			relation: ManyHasManyInversedRelation,
+			relation: ManyHasManyInverseRelation,
 			targetEntity: Entity,
 			targetRelation: ManyHasManyOwnerRelation,
 		): T
@@ -168,11 +168,14 @@ namespace Model {
 		ManyHasMany = 'ManyHasMany',
 	}
 
-	export type AnyInversedRelation = OneHasManyRelation | OneHasOneInversedRelation | ManyHasManyInversedRelation
+	export type AnyInverseRelation = OneHasManyRelation | OneHasOneInverseRelation | ManyHasManyInverseRelation
+
+	/** @deprecated */
+	export type AnyInversedRelation = AnyInverseRelation
 
 	export type AnyOwningRelation = ManyHasOneRelation | OneHasOneOwnerRelation | ManyHasManyOwnerRelation
 
-	export type AnyRelation = AnyInversedRelation | AnyOwningRelation
+	export type AnyRelation = AnyInverseRelation | AnyOwningRelation
 
 	export interface Relation<T extends RelationType = RelationType> extends Field<T> {
 		name: string
@@ -180,9 +183,12 @@ namespace Model {
 		target: string
 	}
 
-	export interface InversedRelation extends Relation {
+	export interface InverseRelation extends Relation {
 		ownedBy: string
 	}
+
+	/** @deprecated */
+	export interface InversedRelation extends InverseRelation {}
 
 	export interface OwnerRelation extends Relation {
 		inversedBy?: string
@@ -224,17 +230,21 @@ namespace Model {
 		orderBy?: OrderBy[]
 	}
 
-	export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InversedRelation & OrderableRelation
+	export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InverseRelation & OrderableRelation
 	export type ManyHasOneRelation = Relation<RelationType.ManyHasOne> &
 		OwnerRelation &
 		JoiningColumnRelation &
 		NullableRelation
-	export type OneHasOneInversedRelation = Relation<RelationType.OneHasOne> & InversedRelation & NullableRelation
+	export type OneHasOneInverseRelation = Relation<RelationType.OneHasOne> & InverseRelation & NullableRelation
+	/** @deprecated */
+	export type OneHasOneInversedRelation = OneHasOneInverseRelation
 	export type OneHasOneOwnerRelation = Relation<RelationType.OneHasOne> &
 		OwnerRelation &
 		JoiningColumnRelation &
 		NullableRelation
-	export type ManyHasManyInversedRelation = Relation<RelationType.ManyHasMany> & InversedRelation & OrderableRelation
+	export type ManyHasManyInverseRelation = Relation<RelationType.ManyHasMany> & InverseRelation & OrderableRelation
+	/** @deprecated */
+	export type ManyHasManyInversedRelation = ManyHasManyInverseRelation
 	export type ManyHasManyOwnerRelation = Relation<RelationType.ManyHasMany> &
 		OwnerRelation &
 		JoiningTableRelation &

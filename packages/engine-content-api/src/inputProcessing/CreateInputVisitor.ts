@@ -24,14 +24,14 @@ export class CreateInputVisitor<Result>
 		})
 	}
 
-	public visitManyHasManyInversed(
+	public visitManyHasManyInverse(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyInversedRelation,
+		relation: Model.ManyHasManyInverseRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasManyOwnerRelation,
 	) {
-		return this.processManyRelationInput<Context.ManyHasManyInversedContext>(
-			this.createInputProcessor.manyHasManyInversed,
+		return this.processManyRelationInput<Context.ManyHasManyInverseContext>(
+			this.createInputProcessor.manyHasManyInverse,
 			{
 				entity,
 				relation,
@@ -46,7 +46,7 @@ export class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyInversedRelation | null,
+		targetRelation: Model.ManyHasManyInverseRelation | null,
 	) {
 		return this.processManyRelationInput<Context.ManyHasManyOwnerContext>(
 			this.createInputProcessor.manyHasManyOwner,
@@ -96,14 +96,14 @@ export class CreateInputVisitor<Result>
 		)
 	}
 
-	public visitOneHasOneInversed(
+	public visitOneHasOneInverse(
 		entity: Model.Entity,
-		relation: Model.OneHasOneInversedRelation,
+		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneOwnerRelation,
 	) {
-		return this.processRelationInput<Context.OneHasOneInversedContext>(
-			this.createInputProcessor.oneHasOneInversed,
+		return this.processRelationInput<Context.OneHasOneInverseContext>(
+			this.createInputProcessor.oneHasOneInverse,
 			{
 				entity,
 				relation,
@@ -118,7 +118,7 @@ export class CreateInputVisitor<Result>
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null,
+		targetRelation: Model.OneHasOneInverseRelation | null,
 	) {
 		return this.processRelationInput<Context.OneHasOneOwnerContext>(
 			this.createInputProcessor.oneHasOneOwner,

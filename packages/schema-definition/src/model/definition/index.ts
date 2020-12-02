@@ -6,13 +6,14 @@ import OneHasManyDefinition from './OneHasManyDefinition'
 import ManyHasManyDefinition from './ManyHasManyDefinition'
 import EnumDefinition from './EnumDefinition'
 import OneHasOneDefinition from './OneHasOneDefinition'
-import ManyHasManyInversedDefinition from './ManyHasManyInversedDefinition'
-import OneHasOneInversedDefinition from './OneHasOneInversedDefinition'
+import ManyHasManyInverseDefinition from './ManyHasManyInverseDefinition'
+import OneHasOneInverseDefinition from './OneHasOneInverseDefinition'
 import { EntityConstructor, EntityType } from './types'
 import SchemaBuilder from './SchemaBuilder'
 import NamingConventions from './NamingConventions'
 import FieldDefinition from './FieldDefinition'
 import 'reflect-metadata'
+export * from './interfaces'
 
 export function column(type: Model.ColumnType, typeOptions: ColumnDefinition.TypeOptions = {}) {
 	return ColumnDefinition.create(type, typeOptions)
@@ -64,30 +65,46 @@ export function oneHasMany<T extends EntityType<T>>(
 
 export function manyHasMany<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
-	inversedBy?: KeysOfType<T, Interface<ManyHasManyInversedDefinition>> & string,
+	inversedBy?: KeysOfType<T, Interface<ManyHasManyInverseDefinition>> & string,
 ): ManyHasManyDefinition {
 	return new ManyHasManyDefinition({ target, inversedBy })
 }
 
+export function manyHasManyInverse<T extends EntityType<T>>(
+	target: EntityConstructor<T>,
+	ownedBy: KeysOfType<T, Interface<ManyHasManyDefinition>> & string,
+): ManyHasManyInverseDefinition {
+	return new ManyHasManyInverseDefinition({ target, ownedBy })
+}
+
+/** @deprecated use manyHasManyInverse */
 export function manyHasManyInversed<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
 	ownedBy: KeysOfType<T, Interface<ManyHasManyDefinition>> & string,
-): ManyHasManyInversedDefinition {
-	return new ManyHasManyInversedDefinition({ target, ownedBy })
+): ManyHasManyInverseDefinition {
+	return new ManyHasManyInverseDefinition({ target, ownedBy })
 }
 
 export function oneHasOne<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
-	inversedBy?: KeysOfType<T, Interface<OneHasOneInversedDefinition>> & string,
+	inversedBy?: KeysOfType<T, Interface<OneHasOneInverseDefinition>> & string,
 ): OneHasOneDefinition {
 	return new OneHasOneDefinition({ target, inversedBy })
 }
 
+export function oneHasOneInverse<T extends EntityType<T>>(
+	target: EntityConstructor<T>,
+	ownedBy: KeysOfType<T, Interface<OneHasOneDefinition>> & string,
+): OneHasOneInverseDefinition {
+	return new OneHasOneInverseDefinition({ target, ownedBy })
+}
+
+/** @deprecated use oneHasOneInverse */
 export function oneHasOneInversed<T extends EntityType<T>>(
 	target: EntityConstructor<T>,
 	ownedBy: KeysOfType<T, Interface<OneHasOneDefinition>> & string,
-): OneHasOneInversedDefinition {
-	return new OneHasOneInversedDefinition({ target, ownedBy })
+): OneHasOneInverseDefinition {
+	return new OneHasOneInverseDefinition({ target, ownedBy })
 }
 
 export function createEnum(...values: string[]) {
@@ -140,20 +157,4 @@ export function createModel<M extends ModelDefinition<M>>(definitions: M): Model
 
 export const OnDelete = Model.OnDelete
 export const OrderDirection = Model.OrderDirection
-
-type OneHasManyDefinitionInterface = Interface<OneHasManyDefinition>
-type OneHasOneDefinitionInterface = Interface<OneHasOneDefinition>
-type ManyHasOneDefinitionInterface = Interface<ManyHasOneDefinition>
-type ManyHasManyDefinitionInterface = Interface<ManyHasManyDefinition>
-type ManyHasManyInversedDefinitionInterface = Interface<ManyHasManyInversedDefinition>
-type OneHasOneInversedDefinitionInterface = Interface<OneHasOneInversedDefinition>
-
-export {
-	OneHasManyDefinitionInterface as OneHasManyDefinition,
-	OneHasOneDefinitionInterface as OneHasOneDefinition,
-	ManyHasOneDefinitionInterface as ManyHasOneDefinition,
-	ManyHasManyDefinitionInterface as ManyHasManyDefinition,
-	ManyHasManyInversedDefinitionInterface as ManyHasManyInversedDefinition,
-	OneHasOneInversedDefinitionInterface as OneHasOneInversedDefinition,
-	EnumDefinition,
-}
+export { EnumDefinition }

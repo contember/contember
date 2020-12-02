@@ -71,7 +71,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 					deferred: false,
 				})
 			},
-			visitOneHasOneInversed: () => {},
+			visitOneHasOneInverse: () => {},
 			visitManyHasManyOwner: ({}, relation, {}, _) => {
 				const primaryColumns = [
 					relation.joiningTable.joiningColumn.columnName,
@@ -102,7 +102,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 				createEventTrigger(builder, relation.joiningTable.tableName, primaryColumns)
 				createEventStatementTrigger(builder, relation.joiningTable.tableName)
 			},
-			visitManyHasManyInversed: () => {},
+			visitManyHasManyInverse: () => {},
 		})
 	}
 
@@ -135,7 +135,7 @@ namespace CreateRelationModification {
 	export interface Data {
 		entityName: string
 		owningSide: Model.AnyRelation & Model.OwnerRelation
-		inverseSide?: Model.AnyRelation & Model.InversedRelation
+		inverseSide?: Model.AnyRelation & Model.InverseRelation
 	}
 }
 

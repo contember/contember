@@ -9,7 +9,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		throw new Error('UpdateEntityRelationAllowedOperationsVisitor: Not applicable for a column')
 	}
 
-	public visitManyHasManyInversed({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwnerRelation) {
+	public visitManyHasManyInverse({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwnerRelation) {
 		return this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 	}
 
@@ -37,9 +37,9 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		return operations.filter(it => !forbiddenOperations.includes(it))
 	}
 
-	public visitOneHasOneInversed(
+	public visitOneHasOneInverse(
 		{},
-		relation: Model.OneHasOneInversedRelation,
+		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
 		targetRelation: Model.OneHasOneOwnerRelation,
 	) {
@@ -54,7 +54,7 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		entity: Model.Entity,
 		relation: Model.OneHasOneOwnerRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null,
+		targetRelation: Model.OneHasOneInverseRelation | null,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
 		if (relation.nullable || (targetRelation && targetRelation.nullable)) {

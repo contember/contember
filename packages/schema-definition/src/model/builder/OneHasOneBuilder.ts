@@ -31,8 +31,13 @@ class OneHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> 
 		return this.withOption('nullable', false)
 	}
 
+	inverseNotNull(): OneHasOneBuilder<O> {
+		return this.withOption('inverseNullable', false)
+	}
+
+	/** @deprecated use inverseNotNull*/
 	inversedNotNull(): OneHasOneBuilder<O> {
-		return this.withOption('inversedNullable', false)
+		return this.withOption('inverseNullable', false)
 	}
 
 	getOption(): O {
@@ -53,7 +58,7 @@ namespace OneHasOneBuilder {
 		inversedBy?: string
 		joiningColumn?: Partial<Model.JoiningColumn>
 		nullable?: boolean
-		inversedNullable?: boolean
+		inverseNullable?: boolean
 	}
 }
 

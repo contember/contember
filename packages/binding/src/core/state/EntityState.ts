@@ -3,11 +3,10 @@ import { SingleEntityPersistedData } from '../../accessorTree'
 import { Environment } from '../../dao'
 import { EntityFieldMarkersContainer } from '../../markers'
 import { EntityCreationParameters, FieldName, SingleEntityEventListeners } from '../../treeParameters'
-import { EntityRealm } from './EntityRealm'
+import { EntityRealmSet } from './EntityRealmSet'
 import { StateNode } from './StateNode'
 import { StateType } from './StateType'
 
-export type OnEntityUpdate = (state: StateNode) => void
 export type OnEntityFieldUpdate = (state: StateNode) => void
 export interface EntityState {
 	type: StateType.Entity
@@ -18,7 +17,6 @@ export interface EntityState {
 	errors: ErrorAccessor | undefined
 	fields: Map<FieldName, StateNode>
 	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
-	getAccessor: EntityAccessor.GetEntityAccessor
 	hasIdSetInStone: boolean // Initially, ids may be changed but only up to a certain point. This marks that point.
 	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean
@@ -27,12 +25,9 @@ export interface EntityState {
 	isScheduledForDeletion: boolean
 	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	maidenKey: string | undefined // undefined for persisted entities
-	persistedData: SingleEntityPersistedData | undefined
+	persistedData: SingleEntityPersistedData | undefined // TODO remove this
 	plannedHasOneDeletions: Map<FieldName, EntityState> | undefined
-
-	// Entity realms address the fact that a single particular entity may appear several times throughout the tree in
-	// completely different contexts. Even with different fields.
-	realms: Map<OnEntityUpdate, EntityRealm> // TODO this should be indexed by something like [OnEntityUpdate, PlaceholderName]
+	realms: EntityRealmSet
 	typeName: string | undefined
 
 	// TODO these are really caches of values computed from the realms. This needs fixed.
@@ -45,4 +40,5 @@ export interface EntityState {
 	connectEntityAtField: EntityAccessor.ConnectEntityAtField
 	deleteEntity: EntityAccessor.DeleteEntity
 	disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField
+	getAccessor: EntityAccessor.GetEntityAccessor
 }

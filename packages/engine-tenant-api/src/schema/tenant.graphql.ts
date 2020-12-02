@@ -31,6 +31,7 @@ const schema: DocumentNode = gql`
 			idpResponse: IDPResponseInput!
 			redirectUrl: String!
 			sessionData: Json!
+			expiration: Int
 		): SignInIDPResponse
 
 		prepareOtp(label: String): PrepareOtpResponse

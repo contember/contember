@@ -19,6 +19,7 @@ class IDPSignInManager {
 		redirectUrl: string,
 		idpResponse: IDPResponse,
 		sessionData: any,
+		expiration?: number,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
 		const provider = await this.queryHandler.fetch(new IdentityProviderQuery(idpSlug))
 		if (!provider) {
@@ -37,7 +38,7 @@ class IDPSignInManager {
 				return new ResponseError(SignInIdpErrorCode.PersonNotFound)
 			}
 
-			const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id)
+			const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id, expiration)
 			return new ResponseOk({ person: personRow, token: sessionToken })
 		} catch (e) {
 			if (e instanceof IDPResponseError) {

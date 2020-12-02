@@ -43,6 +43,7 @@ export class IDPMutationResolver implements MutationResolvers {
 			args.redirectUrl,
 			args.idpResponse,
 			args.sessionData,
+			args.expiration ?? undefined,
 		)
 		if (!signIn.ok) {
 			return { ok: false, errors: [{ code: signIn.error, developerMessage: signIn.errorMessage }] }

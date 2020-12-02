@@ -7,11 +7,11 @@ import { EntityRealmSet } from './EntityRealmSet'
 import { StateNode } from './StateNode'
 import { StateType } from './StateType'
 
+export type OnEntityUpdate = (state: StateNode) => void
 export type OnEntityFieldUpdate = (state: StateNode) => void
 export interface EntityState {
 	type: StateType.Entity
 	eventListeners: SingleEntityEventListeners['eventListeners']
-	environment: Environment
 	batchUpdateDepth: number
 	childrenWithPendingUpdates: Set<StateNode> | undefined
 	errors: ErrorAccessor | undefined
@@ -33,6 +33,7 @@ export interface EntityState {
 	// TODO these are really caches of values computed from the realms. This needs fixed.
 	combinedMarkersContainer: EntityFieldMarkersContainer // Includes all realms
 	combinedCreationParameters: EntityCreationParameters
+	combinedEnvironment: Environment
 
 	addError: EntityAccessor.AddError
 	addEventListener: EntityAccessor.AddEntityEventListener

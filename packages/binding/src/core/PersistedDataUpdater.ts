@@ -22,6 +22,7 @@ export class PersistedDataUpdater {
 
 			let didUpdateSomething = false
 			for (const [subTreePlaceholder, subTreeState] of this.treeStore.subTreeStates) {
+				const subTreeMarker = this.treeStore.markerTree.subTrees.get(subTreePlaceholder)!
 				const newSubTreeData = normalizedResponse.subTreeDataStore.get(subTreePlaceholder)
 
 				if (subTreeState.type === StateType.Entity) {
@@ -31,16 +32,15 @@ export class PersistedDataUpdater {
 								didUpdateSomething ||
 								this.updateSingleEntityPersistedData(alreadyProcessed, subTreeState, newSubTreeData)
 						} else {
-							const newSubTreeState = this.stateInitializer.initializeEntityAccessor(
-								newSubTreeData,
-								subTreeState.environment,
-								subTreeState.combinedMarkersContainer, // TODO this is wrong - we need to take it from a realm
-								subTreeState.combinedCreationParameters, // TODO this is wrong - we need to take it from a realm
-								subTreeState.onChildFieldUpdate,
-								(this.treeStore.markerTree.subTrees.get(subTreePlaceholder)?.parameters as
-									| BoxedQualifiedSingleEntity
-									| undefined)?.value,
-							)
+							const parameters = (subTreeMarker.parameters as BoxedQualifiedSingleEntity).value
+							const newSubTreeState = this.stateInitializer.initializeEntityAccessor(newSubTreeData, {
+								creationParameters: parameters,
+								environment: subTreeMarker.environment,
+								initialEventListeners: parameters,
+								markersContainer: subTreeMarker.fields,
+								realmKey: subTreePlaceholder,
+								parent: undefined,
+							})
 							newSubTreeState.hasPendingUpdate = true
 							this.treeStore.subTreeStates.set(subTreePlaceholder, newSubTreeState)
 							didUpdateSomething = true
@@ -152,11 +152,14 @@ export class PersistedDataUpdater {
 							fieldPlaceholder,
 							(fieldState = this.stateInitializer.initializeEntityAccessor(
 								newFieldDatum instanceof ServerGeneratedUuid ? newFieldDatum : new UnpersistedEntityKey(),
-								marker.environment,
-								marker.fields,
-								marker.relation,
-								state.onChildFieldUpdate,
-								marker.relation,
+								{
+									creationParameters: marker.relation,
+									environment: marker.environment,
+									initialEventListeners: marker.relation,
+									markersContainer: marker.fields,
+									parent: state,
+									realmKey: fieldPlaceholder,
+								},
 							)),
 						)
 						this.eventManager.markPendingConnections(state, new Set([fieldPlaceholder]))
@@ -256,14 +259,14 @@ export class PersistedDataUpdater {
 			if (newPersistedId === undefined) {
 				const newKey = new UnpersistedEntityKey()
 
-				const childState = this.stateInitializer.initializeEntityAccessor(
-					newKey,
-					state.environment,
-					state.markersContainer,
-					state.creationParameters,
-					state.onChildEntityUpdate,
-					this.eventManager.getEventListenersForListEntity(state),
-				)
+				const childState = this.stateInitializer.initializeEntityAccessor(newKey, {
+					creationParameters: state.creationParameters,
+					environment: state.environment,
+					initialEventListeners: this.eventManager.getEventListenersForListEntity(state),
+					markersContainer: state.markersContainer,
+					parent: state,
+					realmKey: newKey.value,
+				})
 				state.children.add(childState)
 
 				didUpdate = true
@@ -271,14 +274,15 @@ export class PersistedDataUpdater {
 				let childState = this.treeStore.entityStore.get(newPersistedId)
 
 				if (childState === undefined) {
-					childState = this.stateInitializer.initializeEntityAccessor(
-						new ServerGeneratedUuid(newPersistedId),
-						state.environment,
-						state.markersContainer,
-						state.creationParameters,
-						state.onChildEntityUpdate,
-						this.eventManager.getEventListenersForListEntity(state),
-					)
+					const newKey = new ServerGeneratedUuid(newPersistedId)
+					childState = this.stateInitializer.initializeEntityAccessor(newKey, {
+						creationParameters: state.creationParameters,
+						environment: state.environment,
+						initialEventListeners: this.eventManager.getEventListenersForListEntity(state),
+						markersContainer: state.markersContainer,
+						parent: state,
+						realmKey: newKey.value,
+					})
 					didUpdate = true
 				} else {
 					const didChildUpdate = this.updateSingleEntityPersistedData(

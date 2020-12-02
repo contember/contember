@@ -65,7 +65,6 @@ export class DataBinding {
 		this.config = new Config()
 		this.treeStore = new TreeStore()
 		this.treeFilterGenerator = new TreeFilterGenerator(this.treeStore)
-		this.accessorErrorManager = new AccessorErrorManager(this.treeStore)
 		this.dirtinessTracker = new DirtinessTracker()
 		this.eventManager = new EventManager(
 			this.bindingOperations,
@@ -75,6 +74,7 @@ export class DataBinding {
 			this.onUpdate,
 			this.treeStore,
 		)
+		this.accessorErrorManager = new AccessorErrorManager(this.eventManager, this.treeStore)
 		this.stateInitializer = new StateInitializer(
 			this.accessorErrorManager,
 			this.bindingOperations,

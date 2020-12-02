@@ -1,6 +1,7 @@
 import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
+import { EventManager } from './EventManager'
 import { EntityListState, EntityState, StateNode, StateType } from './state'
 import { TreeStore } from './TreeStore'
 
@@ -13,7 +14,7 @@ export class AccessorErrorManager {
 		return () => errorId++
 	})()
 
-	public constructor(private readonly treeStore: TreeStore) {}
+	public constructor(private readonly eventManager: EventManager, private readonly treeStore: TreeStore) {}
 
 	public hasErrors() {
 		return !!this.errorsByState.size
@@ -214,18 +215,6 @@ export class AccessorErrorManager {
 	private triggerUpdate(stateNode: StateNode) {
 		stateNode.hasStaleAccessor = true
 		stateNode.hasPendingUpdate = true
-		switch (stateNode.type) {
-			case StateType.Field:
-				stateNode.onFieldUpdate(stateNode)
-				break
-			case StateType.Entity:
-				for (const [onUpdate] of stateNode.realms) {
-					onUpdate(stateNode)
-				}
-				break
-			case StateType.EntityList:
-				stateNode.onEntityListUpdate(stateNode)
-				break
-		}
+		this.eventManager.notifyParents(stateNode)
 	}
 }

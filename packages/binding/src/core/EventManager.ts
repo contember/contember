@@ -336,6 +336,35 @@ export class EventManager {
 		})
 	}
 
+	public notifyParents(childState: StateNode) {
+		switch (childState.type) {
+			case StateType.Entity: {
+				for (const [parent, [key, realm]] of childState.realms) {
+					if (parent === undefined) {
+						continue
+					}
+					switch (parent.type) {
+						case StateType.EntityList:
+							parent.onChildEntityUpdate(childState)
+							break
+						case StateType.Entity:
+							parent.onChildFieldUpdate(childState)
+							break
+					}
+				}
+				break
+			}
+			case StateType.EntityList: {
+				childState.onEntityListUpdate(childState)
+				break
+			}
+			case StateType.Field: {
+				childState.onFieldUpdate(childState)
+				break
+			}
+		}
+	}
+
 	public triggerOnPersistSuccess(options: PersistSuccessOptions) {
 		this.syncTransaction(() => {
 			const iNodeHasPersistSuccessHandler = (iNode: StateINode) => iNode.eventListeners.persistSuccess !== undefined

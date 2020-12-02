@@ -1,4 +1,5 @@
-import { PlaceholderName } from '../../treeParameters'
-import { EntityRealm, OnEntityUpdate } from './EntityRealm'
+import { EntityRealm } from './EntityRealm'
+import { EntityRealmKey } from './EntityRealmKey'
+import { EntityRealmParent } from './EntityRealmParent'
 
-export type EntityRealmSet = EntityRealm | Map<OnEntityUpdate, Map<PlaceholderName, EntityRealm>>
+export type EntityRealmSet = Map<EntityRealmParent, Map<EntityRealmKey, EntityRealm>>

@@ -20,15 +20,17 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 		return context.db.transaction(async db => {
 			const stagesResult = await fetchStages(args.stage, db, context.project)
 			if (!stagesResult.ok) {
+				const code = {
+					[FetchStageErrors.missingBase]: DiffErrorCode.MissingBase,
+					[FetchStageErrors.headNotFound]: DiffErrorCode.StageNotFound,
+				}[stagesResult.error]
 				return {
 					ok: false,
-					errors: stagesResult.errors.map(
-						it =>
-							({
-								[FetchStageErrors.missingBase]: DiffErrorCode.MissingBase,
-								[FetchStageErrors.headNotFound]: DiffErrorCode.StageNotFound,
-							}[it]),
-					),
+					errors: [code],
+					error: {
+						code,
+						message: stagesResult.message,
+					},
 				}
 			}
 
@@ -60,14 +62,17 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 				filter,
 			)
 			if (!diff.ok) {
+				const code = {
+					[DiffBuilderErrorCode.notRebased]: DiffErrorCode.NotRebased,
+					[DiffBuilderErrorCode.invalidFilter]: DiffErrorCode.InvalidFilter,
+				}[diff.error]
 				return {
 					ok: false,
-					errors: diff.errors.map(
-						it =>
-							({
-								[DiffBuilderErrorCode.notRebased]: DiffErrorCode.NotRebased,
-							}[it]),
-					),
+					errors: [code],
+					error: {
+						code,
+						message: diff.message,
+					},
 				}
 			}
 

@@ -11,10 +11,10 @@ export const fetchStages = async (
 ): Promise<FetchStageResult> => {
 	const headStageConfig = project.stages.find(it => it.slug === stage)
 	if (!headStageConfig) {
-		return new FetchStageErrorResponse([FetchStageErrors.headNotFound])
+		return new FetchStageErrorResponse(FetchStageErrors.headNotFound, `Stage ${stage} not found`)
 	}
 	if (!headStageConfig.base) {
-		return new FetchStageErrorResponse([FetchStageErrors.missingBase])
+		return new FetchStageErrorResponse(FetchStageErrors.missingBase, `Stage ${stage} is a root stage`)
 	}
 	const [baseStage, headStage] = await Promise.all([
 		db.queryHandler.fetch(new StageBySlugQuery(headStageConfig.base)),
@@ -38,7 +38,7 @@ export enum FetchStageErrors {
 export class FetchStageErrorResponse {
 	public readonly ok = false
 
-	constructor(public readonly errors: FetchStageErrors[]) {}
+	constructor(public readonly error: FetchStageErrors, public readonly message?: string) {}
 }
 
 export class FetchStageOkResponse {

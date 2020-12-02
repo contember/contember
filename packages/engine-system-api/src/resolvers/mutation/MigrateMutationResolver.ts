@@ -23,15 +23,15 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 			} catch (e) {
 				if (e instanceof MigrationError) {
 					await trx.client.connection.rollback()
+					const error = {
+						code: e.code,
+						migration: e.version,
+						message: e.message,
+					}
 					return {
 						ok: false,
-						errors: [
-							{
-								code: e.code,
-								migration: e.version,
-								message: e.message,
-							},
-						],
+						errors: [error],
+						error,
 					}
 				} else {
 					throw e

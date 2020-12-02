@@ -6,6 +6,7 @@ import {
 	AuthorizationActions,
 	DiffBuilder,
 	DiffBuilderErrorCode,
+	DiffBuilderResponse,
 	RebaseExecutor,
 	ReleaseExecutor,
 	ReleaseExecutorErrorCode,
@@ -28,15 +29,17 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 		return context.db.transaction(async db => {
 			const stagesResult = await fetchStages(args.stage, db, context.project)
 			if (!stagesResult.ok) {
+				const code = {
+					[FetchStageErrors.missingBase]: ReleaseTreeErrorCode.MissingBase,
+					[FetchStageErrors.headNotFound]: ReleaseTreeErrorCode.StageNotFound,
+				}[stagesResult.error]
 				return {
 					ok: false,
-					errors: stagesResult.errors.map(
-						it =>
-							({
-								[FetchStageErrors.missingBase]: ReleaseTreeErrorCode.MissingBase,
-								[FetchStageErrors.headNotFound]: ReleaseTreeErrorCode.StageNotFound,
-							}[it]),
-					),
+					errors: [code],
+					error: {
+						code,
+						message: stagesResult.message,
+					},
 				}
 			}
 			const { head, base } = stagesResult
@@ -60,14 +63,17 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 				filter,
 			)
 			if (!diff.ok) {
+				const code = {
+					[DiffBuilderErrorCode.notRebased]: ReleaseTreeErrorCode.NotRebased,
+					[DiffBuilderErrorCode.invalidFilter]: ReleaseTreeErrorCode.InvalidFilter,
+				}[diff.error]
 				return {
 					ok: false,
-					errors: diff.errors.map(
-						it =>
-							({
-								[DiffBuilderErrorCode.notRebased]: ReleaseTreeErrorCode.NotRebased,
-							}[it]),
-					),
+					errors: [code],
+					error: {
+						code,
+						message: diff.message,
+					},
 				}
 			}
 
@@ -85,14 +91,13 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 			)
 			if (!result.ok) {
 				await db.client.connection.rollback()
+				const code = {
+					[ReleaseExecutorErrorCode.forbidden]: ReleaseTreeErrorCode.Forbidden,
+				}[result.error]
 				return {
 					ok: false,
-					errors: result.errors.map(
-						it =>
-							({
-								[ReleaseExecutorErrorCode.forbidden]: ReleaseTreeErrorCode.Forbidden,
-							}[it]),
-					),
+					errors: [code],
+					error: { code },
 				}
 			}
 

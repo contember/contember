@@ -1,4 +1,4 @@
-import { ApiTester, GQL } from '@contember/engine-api-tester'
+import { ApiTester, GQL, testUuid } from '@contember/engine-api-tester'
 import { VERSION_LATEST } from '@contember/schema-migrations'
 import { Acl } from '@contember/schema'
 import SystemPermissionsLevel = Acl.SystemPermissionsLevel
@@ -88,6 +88,68 @@ diffTest('get filtered diff', async () => {
 
 	assert.is(diffWithRelations.data.diff.result.events.length, 3)
 	assert.is(diffWithRelations.data.diff.result.events[0].type, 'CREATE')
+	await tester.cleanup()
+})
+
+diffTest('invalid filter', async () => {
+	const tester = await ApiTester.create({
+		project: {
+			stages: [
+				{
+					name: 'Prod',
+					slug: 'prod',
+				},
+				{
+					name: 'Preview',
+					slug: 'preview',
+					base: 'prod',
+				},
+			],
+		},
+	})
+	await tester.stages.createAll()
+	await tester.stages.migrate('2019-02-01-163923')
+	await tester.stages.migrate('2019-11-04-130244')
+
+	const invalidEntity = await tester.system.querySystem(GQL`query {
+			diff(stage: "preview", filter: [{entity: "User", id: "${testUuid(1)}"}]) {
+				error {
+					code
+					message
+				}
+			}
+		}`)
+	assert.equal(invalidEntity, {
+		data: {
+			diff: {
+				error: {
+					code: 'INVALID_FILTER',
+					message: 'User: entity not found',
+				},
+			},
+		},
+	})
+	const invalidRelation = await tester.system.querySystem(GQL`query {
+			diff(stage: "preview", filter: [{entity: "Author", id: "${testUuid(
+				1,
+			)}", relations: [{name: "articles", relations: []}]}]) {
+				error {
+					code
+					message
+				}
+			}
+		}`)
+	assert.equal(invalidRelation, {
+		data: {
+			diff: {
+				error: {
+					code: 'INVALID_FILTER',
+					message: 'Author.articles: field not found',
+				},
+			},
+		},
+	})
+
 	await tester.cleanup()
 })
 
@@ -227,3 +289,5 @@ diffTest('check ACL', async () => {
 
 	await tester.cleanup()
 })
+
+diffTest.run()

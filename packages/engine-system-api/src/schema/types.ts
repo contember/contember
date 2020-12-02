@@ -86,10 +86,18 @@ export enum HistoryErrorCode {
 	StageNotFound = 'STAGE_NOT_FOUND',
 }
 
+export type HistoryError = {
+	readonly __typename?: 'HistoryError'
+	readonly code: HistoryErrorCode
+	readonly message?: Maybe<Scalars['String']>
+}
+
 export type HistoryResponse = {
 	readonly __typename?: 'HistoryResponse'
 	readonly ok?: Maybe<Scalars['Boolean']>
+	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<HistoryErrorCode>
+	readonly error?: Maybe<HistoryError>
 	readonly result?: Maybe<HistoryResult>
 }
 
@@ -173,12 +181,21 @@ export enum DiffErrorCode {
 	StageNotFound = 'STAGE_NOT_FOUND',
 	MissingBase = 'MISSING_BASE',
 	NotRebased = 'NOT_REBASED',
+	InvalidFilter = 'INVALID_FILTER',
+}
+
+export type DiffError = {
+	readonly __typename?: 'DiffError'
+	readonly code: DiffErrorCode
+	readonly message?: Maybe<Scalars['String']>
 }
 
 export type DiffResponse = {
 	readonly __typename?: 'DiffResponse'
 	readonly ok: Scalars['Boolean']
+	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<DiffErrorCode>
+	readonly error?: Maybe<DiffError>
 	readonly result?: Maybe<DiffResult>
 }
 
@@ -224,7 +241,9 @@ export type MigrateError = {
 export type MigrateResponse = {
 	readonly __typename?: 'MigrateResponse'
 	readonly ok: Scalars['Boolean']
+	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<MigrateError>
+	readonly error?: Maybe<MigrateError>
 	readonly result?: Maybe<MigrateResult>
 }
 
@@ -240,10 +259,18 @@ export enum ReleaseErrorCode {
 	Forbidden = 'FORBIDDEN',
 }
 
+export type ReleaseError = {
+	readonly __typename?: 'ReleaseError'
+	readonly code: ReleaseErrorCode
+	readonly message?: Maybe<Scalars['String']>
+}
+
 export type ReleaseResponse = {
 	readonly __typename?: 'ReleaseResponse'
 	readonly ok: Scalars['Boolean']
+	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ReleaseErrorCode>
+	readonly error?: Maybe<ReleaseError>
 }
 
 export enum ReleaseTreeErrorCode {
@@ -251,12 +278,21 @@ export enum ReleaseTreeErrorCode {
 	MissingBase = 'MISSING_BASE',
 	Forbidden = 'FORBIDDEN',
 	NotRebased = 'NOT_REBASED',
+	InvalidFilter = 'INVALID_FILTER',
+}
+
+export type ReleaseTreeError = {
+	readonly __typename?: 'ReleaseTreeError'
+	readonly code: ReleaseTreeErrorCode
+	readonly message?: Maybe<Scalars['String']>
 }
 
 export type ReleaseTreeResponse = {
 	readonly __typename?: 'ReleaseTreeResponse'
 	readonly ok: Scalars['Boolean']
+	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ReleaseTreeErrorCode>
+	readonly error?: Maybe<ReleaseTreeError>
 }
 
 export type RebaseAllResponse = {
@@ -416,6 +452,7 @@ export type ResolversTypes = {
 	TreeFilter: TreeFilter
 	TreeFilterRelation: TreeFilterRelation
 	HistoryErrorCode: HistoryErrorCode
+	HistoryError: ResolverTypeWrapper<HistoryError>
 	HistoryResponse: ResolverTypeWrapper<HistoryResponse>
 	HistoryResult: ResolverTypeWrapper<HistoryResult>
 	HistoryEvent:
@@ -429,6 +466,7 @@ export type ResolversTypes = {
 	HistoryCreateEvent: ResolverTypeWrapper<HistoryCreateEvent>
 	HistoryRunMigrationEvent: ResolverTypeWrapper<HistoryRunMigrationEvent>
 	DiffErrorCode: DiffErrorCode
+	DiffError: ResolverTypeWrapper<DiffError>
 	DiffResponse: ResolverTypeWrapper<DiffResponse>
 	DiffResult: ResolverTypeWrapper<DiffResult>
 	ExecutedMigration: ResolverTypeWrapper<ExecutedMigration>
@@ -439,8 +477,10 @@ export type ResolversTypes = {
 	MigrateResponse: ResolverTypeWrapper<MigrateResponse>
 	MigrateResult: ResolverTypeWrapper<MigrateResult>
 	ReleaseErrorCode: ReleaseErrorCode
+	ReleaseError: ResolverTypeWrapper<ReleaseError>
 	ReleaseResponse: ResolverTypeWrapper<ReleaseResponse>
 	ReleaseTreeErrorCode: ReleaseTreeErrorCode
+	ReleaseTreeError: ResolverTypeWrapper<ReleaseTreeError>
 	ReleaseTreeResponse: ResolverTypeWrapper<ReleaseTreeResponse>
 	RebaseAllResponse: ResolverTypeWrapper<RebaseAllResponse>
 	DiffEvent: ResolversTypes['DiffUpdateEvent'] | ResolversTypes['DiffDeleteEvent'] | ResolversTypes['DiffCreateEvent']
@@ -463,6 +503,7 @@ export type ResolversParentTypes = {
 	HistoryFilter: HistoryFilter
 	TreeFilter: TreeFilter
 	TreeFilterRelation: TreeFilterRelation
+	HistoryError: HistoryError
 	HistoryResponse: HistoryResponse
 	HistoryResult: HistoryResult
 	HistoryEvent:
@@ -474,6 +515,7 @@ export type ResolversParentTypes = {
 	HistoryDeleteEvent: HistoryDeleteEvent
 	HistoryCreateEvent: HistoryCreateEvent
 	HistoryRunMigrationEvent: HistoryRunMigrationEvent
+	DiffError: DiffError
 	DiffResponse: DiffResponse
 	DiffResult: DiffResult
 	ExecutedMigration: ExecutedMigration
@@ -482,7 +524,9 @@ export type ResolversParentTypes = {
 	MigrateError: MigrateError
 	MigrateResponse: MigrateResponse
 	MigrateResult: MigrateResult
+	ReleaseError: ReleaseError
 	ReleaseResponse: ReleaseResponse
+	ReleaseTreeError: ReleaseTreeError
 	ReleaseTreeResponse: ReleaseTreeResponse
 	RebaseAllResponse: RebaseAllResponse
 	DiffEvent:
@@ -557,12 +601,22 @@ export type QueryResolvers<
 	>
 }
 
+export type HistoryErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['HistoryError'] = ResolversParentTypes['HistoryError']
+> = {
+	code?: Resolver<ResolversTypes['HistoryErrorCode'], ParentType, ContextType>
+	message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type HistoryResponseResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['HistoryResponse'] = ResolversParentTypes['HistoryResponse']
 > = {
 	ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['HistoryErrorCode']>, ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['HistoryError']>, ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['HistoryResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -659,12 +713,22 @@ export type HistoryRunMigrationEventResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type DiffErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DiffError'] = ResolversParentTypes['DiffError']
+> = {
+	code?: Resolver<ResolversTypes['DiffErrorCode'], ParentType, ContextType>
+	message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type DiffResponseResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['DiffResponse'] = ResolversParentTypes['DiffResponse']
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['DiffErrorCode']>, ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['DiffError']>, ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['DiffResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -708,6 +772,7 @@ export type MigrateResponseResolvers<
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['MigrateError']>, ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['MigrateError']>, ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['MigrateResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -720,12 +785,31 @@ export type MigrateResultResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type ReleaseErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ReleaseError'] = ResolversParentTypes['ReleaseError']
+> = {
+	code?: Resolver<ResolversTypes['ReleaseErrorCode'], ParentType, ContextType>
+	message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type ReleaseResponseResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ReleaseResponse'] = ResolversParentTypes['ReleaseResponse']
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ReleaseErrorCode']>, ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['ReleaseError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ReleaseTreeErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ReleaseTreeError'] = ResolversParentTypes['ReleaseTreeError']
+> = {
+	code?: Resolver<ResolversTypes['ReleaseTreeErrorCode'], ParentType, ContextType>
+	message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -735,6 +819,7 @@ export type ReleaseTreeResponseResolvers<
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ReleaseTreeErrorCode']>, ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['ReleaseTreeError']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -822,6 +907,7 @@ export type Resolvers<ContextType = any> = {
 	DateTime?: GraphQLScalarType
 	Json?: GraphQLScalarType
 	Query?: QueryResolvers<ContextType>
+	HistoryError?: HistoryErrorResolvers<ContextType>
 	HistoryResponse?: HistoryResponseResolvers<ContextType>
 	HistoryResult?: HistoryResultResolvers<ContextType>
 	HistoryEvent?: HistoryEventResolvers<ContextType>
@@ -829,13 +915,16 @@ export type Resolvers<ContextType = any> = {
 	HistoryDeleteEvent?: HistoryDeleteEventResolvers<ContextType>
 	HistoryCreateEvent?: HistoryCreateEventResolvers<ContextType>
 	HistoryRunMigrationEvent?: HistoryRunMigrationEventResolvers<ContextType>
+	DiffError?: DiffErrorResolvers<ContextType>
 	DiffResponse?: DiffResponseResolvers<ContextType>
 	DiffResult?: DiffResultResolvers<ContextType>
 	ExecutedMigration?: ExecutedMigrationResolvers<ContextType>
 	MigrateError?: MigrateErrorResolvers<ContextType>
 	MigrateResponse?: MigrateResponseResolvers<ContextType>
 	MigrateResult?: MigrateResultResolvers<ContextType>
+	ReleaseError?: ReleaseErrorResolvers<ContextType>
 	ReleaseResponse?: ReleaseResponseResolvers<ContextType>
+	ReleaseTreeError?: ReleaseTreeErrorResolvers<ContextType>
 	ReleaseTreeResponse?: ReleaseTreeResponseResolvers<ContextType>
 	RebaseAllResponse?: RebaseAllResponseResolvers<ContextType>
 	DiffEvent?: DiffEventResolvers<ContextType>

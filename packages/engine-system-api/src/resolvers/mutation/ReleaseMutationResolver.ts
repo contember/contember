@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
-import { MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse } from '../../schema'
+import { MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse, ReleaseTreeErrorCode } from '../../schema'
 import { AuthorizationActions, RebaseExecutor, ReleaseExecutor, ReleaseExecutorErrorCode } from '../../model'
 import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
@@ -17,15 +17,17 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 		return context.db.transaction(async db => {
 			const stagesResult = await fetchStages(args.stage, db, context.project)
 			if (!stagesResult.ok) {
+				const code = {
+					[FetchStageErrors.missingBase]: ReleaseErrorCode.MissingBase,
+					[FetchStageErrors.headNotFound]: ReleaseErrorCode.StageNotFound,
+				}[stagesResult.error]
 				return {
 					ok: false,
-					errors: stagesResult.errors.map(
-						it =>
-							({
-								[FetchStageErrors.missingBase]: ReleaseErrorCode.MissingBase,
-								[FetchStageErrors.headNotFound]: ReleaseErrorCode.StageNotFound,
-							}[it]),
-					),
+					errors: [code],
+					error: {
+						code,
+						message: stagesResult.message,
+					},
 				}
 			}
 			const { head, base } = stagesResult
@@ -51,14 +53,13 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 			)
 			if (!result.ok) {
 				await db.client.connection.rollback()
+				const code = {
+					[ReleaseExecutorErrorCode.forbidden]: ReleaseErrorCode.Forbidden,
+				}[result.error]
 				return {
 					ok: false,
-					errors: result.errors.map(
-						it =>
-							({
-								[ReleaseExecutorErrorCode.forbidden]: ReleaseErrorCode.Forbidden,
-							}[it]),
-					),
+					errors: [code],
+					error: { code },
 				}
 			}
 

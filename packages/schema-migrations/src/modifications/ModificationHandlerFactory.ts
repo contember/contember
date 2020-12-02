@@ -24,6 +24,8 @@ import PatchValidationSchemaModification from './validation/PatchValidationSchem
 import MakeRelationNotNullModification from './relations/MakeRelationNotNullModification'
 import UpdateRelationOrderByModification from './relations/UpdateRelationOrderByModification'
 import MakeRelationNullableModification from './relations/MakeRelationNullableModification'
+import EnableOrphanRemovalModification from './relations/EnableOrphanRemovalModification'
+import DisableOrphanRemovalModification from './relations/DisableOrphanRemovalModification'
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: ModificationHandlerFactory.FactoryMap<any>) {}
@@ -72,6 +74,8 @@ namespace ModificationHandlerFactory {
 		[UpdateRelationOrderByModification.id]: ({ data, schema }) => new UpdateRelationOrderByModification(data, schema),
 		[MakeRelationNotNullModification.id]: ({ data, schema }) => new MakeRelationNotNullModification(data, schema),
 		[MakeRelationNullableModification.id]: ({ data, schema }) => new MakeRelationNullableModification(data, schema),
+		[EnableOrphanRemovalModification.id]: ({ data, schema }) => new EnableOrphanRemovalModification(data, schema),
+		[DisableOrphanRemovalModification.id]: ({ data, schema }) => new DisableOrphanRemovalModification(data, schema),
 
 		[UpdateValidationSchemaModification.id]: ({ data }) => new UpdateValidationSchemaModification(data),
 		[PatchValidationSchemaModification.id]: ({ data }) => new PatchValidationSchemaModification(data),

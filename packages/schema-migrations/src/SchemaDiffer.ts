@@ -1,5 +1,5 @@
 import { Model, Schema } from '@contember/schema'
-import { acceptFieldVisitor, SchemaValidator, ValidationError } from '@contember/schema-utils'
+import { acceptFieldVisitor, isOwningRelation, SchemaValidator, ValidationError } from '@contember/schema-utils'
 import { isIt } from './utils/isIt'
 import { SchemaMigrator } from './SchemaMigrator'
 import ModificationBuilder from './modifications/ModificationBuilder'
@@ -110,6 +110,21 @@ export class SchemaDiffer {
 				) {
 					;(tmpRelation as Model.AnyRelation & Model.OrderableRelation).orderBy = updatedRelation.orderBy || []
 					builder.updateRelationOrderBy(entityName, updatedRelation.name, updatedRelation.orderBy || [])
+				}
+				if (
+					isOwningRelation(originalRelation) &&
+					originalRelation.type === Model.RelationType.OneHasOne &&
+					isOwningRelation(updatedRelation) &&
+					updatedRelation.type === Model.RelationType.OneHasOne &&
+					updatedRelation.orphanRemoval !== originalRelation.orphanRemoval
+				) {
+					if (updatedRelation.orphanRemoval) {
+						;(tmpRelation as Model.OneHasOneOwningRelation).orphanRemoval = updatedRelation.orphanRemoval
+						builder.enableOrphanRemoval(entityName, updatedRelation.name)
+					} else {
+						delete (tmpRelation as Model.OneHasOneOwningRelation).orphanRemoval
+						builder.disableOrphanRemoval(entityName, updatedRelation.name)
+					}
 				}
 
 				if (!deepEqual(tmpRelation, updatedRelation)) {

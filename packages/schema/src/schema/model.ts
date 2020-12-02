@@ -244,7 +244,9 @@ namespace Model {
 	export type OneHasOneOwningRelation = Relation<RelationType.OneHasOne> &
 		OwningRelation &
 		JoiningColumnRelation &
-		NullableRelation
+		NullableRelation & {
+			orphanRemoval?: true
+		}
 	/** @deprecated */
 	export type OneHasOneOwnerRelation = OneHasOneOwningRelation
 	export type ManyHasManyInverseRelation = Relation<RelationType.ManyHasMany> & InverseRelation & OrderableRelation

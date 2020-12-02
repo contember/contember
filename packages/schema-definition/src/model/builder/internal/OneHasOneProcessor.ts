@@ -56,6 +56,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 				columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
+			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
 		}
 	}
 }

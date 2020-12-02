@@ -28,6 +28,8 @@ import deepCopy from '../utils/deepCopy'
 import MakeRelationNotNullModification from './relations/MakeRelationNotNullModification'
 import UpdateRelationOrderByModification from './relations/UpdateRelationOrderByModification'
 import MakeRelationNullableModification from './relations/MakeRelationNullableModification'
+import EnableOrphanRemovalModification from './relations/EnableOrphanRemovalModification'
+import DisableOrphanRemovalModification from './relations/DisableOrphanRemovalModification'
 
 class ModificationBuilder {
 	private modifications: Migration.Modification[] = []
@@ -51,6 +53,8 @@ class ModificationBuilder {
 			UpdateRelationOrderByModification.id,
 			MakeRelationNotNullModification.id,
 			MakeRelationNullableModification.id,
+			EnableOrphanRemovalModification.id,
+			DisableOrphanRemovalModification.id,
 			UpdateEnumModification.id,
 
 			CreateEntityModification.id,
@@ -250,6 +254,22 @@ class ModificationBuilder {
 			entityName,
 			fieldName,
 			orderBy,
+		})
+	}
+
+	public enableOrphanRemoval(entityName: string, fieldName: string) {
+		this.modifications.push({
+			modification: EnableOrphanRemovalModification.id,
+			entityName,
+			fieldName,
+		})
+	}
+
+	public disableOrphanRemoval(entityName: string, fieldName: string) {
+		this.modifications.push({
+			modification: DisableOrphanRemovalModification.id,
+			entityName,
+			fieldName,
 		})
 	}
 

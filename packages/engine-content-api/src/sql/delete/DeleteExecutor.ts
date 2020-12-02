@@ -16,7 +16,8 @@ import {
 } from '../Result'
 import Mapper from '../Mapper'
 
-type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwningRelation]
+type EntityOwningRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwningRelation]
+type OneHasOneOwningRelationTuple = [Model.Entity, Model.OneHasOneOwningRelation]
 
 export class DeleteExecutor {
 	constructor(
@@ -68,13 +69,21 @@ export class DeleteExecutor {
 		const inQbWithWhere = this.whereBuilder.build(inQb, entity, this.pathFactory.create([]), {
 			and: [where, predicate],
 		})
+		const orphanRemovals = this.findRelationsWithOrphanRemoval(entity)
+		const orphanColumns = orphanRemovals.map(([, rel]) => rel.joiningColumn.columnName)
 		const qb = DeleteBuilder.create()
 			.from(entity.tableName)
 			.where(condition => condition.in(entity.primaryColumn, inQbWithWhere))
-			.returning(entity.primaryColumn)
+			.returning(entity.primaryColumn, ...orphanColumns)
 		const result = await qb.execute(db)
 		const ids = result.map(it => it[entity.primaryColumn]) as string[]
 		await this.executeOnDelete(db, entity, ids)
+
+		for (const [entity, relation] of orphanRemovals) {
+			const ids = result.map(it => it[relation.joiningColumn.columnName]).filter(it => it !== null)
+			const where: Input.Where = { [entity.primary]: { in: ids } }
+			await this.delete(db, entity, where)
+		}
 
 		return ids as string[]
 	}
@@ -115,26 +124,43 @@ export class DeleteExecutor {
 		await updateBuilder.execute(db)
 	}
 
-	private findOwningRelations(entity: Model.Entity): EntityRelationTuple[] {
+	private findOwningRelations(entity: Model.Entity): EntityOwningRelationTuple[] {
 		return Object.values(this.schema.entities)
 			.map(entity =>
-				acceptEveryFieldVisitor<null | EntityRelationTuple>(this.schema, entity, {
+				acceptEveryFieldVisitor<null | EntityOwningRelationTuple>(this.schema, entity, {
 					visitColumn: () => null,
 					visitManyHasManyInverse: () => null,
 					visitManyHasManyOwning: () => null,
 					visitOneHasOneInverse: () => null,
 					visitOneHasMany: () => null,
-					visitOneHasOneOwning: ({}, relation): EntityRelationTuple => [entity, relation],
-					visitManyHasOne: ({}, relation): EntityRelationTuple => [entity, relation],
+					visitOneHasOneOwning: ({}, relation): EntityOwningRelationTuple => [entity, relation],
+					visitManyHasOne: ({}, relation): EntityOwningRelationTuple => [entity, relation],
 				}),
 			)
-			.reduce<EntityRelationTuple[]>(
+			.reduce<EntityOwningRelationTuple[]>(
 				(acc, value) => [
 					...acc,
-					...Object.values(value).filter<EntityRelationTuple>((it): it is EntityRelationTuple => it !== null),
+					...Object.values(value).filter<EntityOwningRelationTuple>(
+						(it): it is EntityOwningRelationTuple => it !== null,
+					),
 				],
 				[],
 			)
 			.filter(([{}, relation]) => relation.target === entity.name)
+	}
+
+	private findRelationsWithOrphanRemoval(entity: Model.Entity): OneHasOneOwningRelationTuple[] {
+		return Object.values(
+			acceptEveryFieldVisitor<OneHasOneOwningRelationTuple | null>(this.schema, entity, {
+				visitColumn: () => null,
+				visitManyHasManyInverse: () => null,
+				visitManyHasManyOwning: () => null,
+				visitOneHasOneInverse: () => null,
+				visitOneHasMany: () => null,
+				visitOneHasOneOwning: ({}, relation, targetEntity) =>
+					relation.orphanRemoval ? [targetEntity, relation] : null,
+				visitManyHasOne: () => null,
+			}),
+		).filter((it): it is OneHasOneOwningRelationTuple => it !== null)
 	}
 }

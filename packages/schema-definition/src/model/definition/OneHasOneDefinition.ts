@@ -30,6 +30,10 @@ class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinition.Options> {
 		return this.withOption('nullable', false)
 	}
 
+	removeOrphan(): Interface<OneHasOneDefinition> {
+		return this.withOption('orphanRemoval', true)
+	}
+
 	createField({ name, conventions, entityRegistry }: FieldDefinition.CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
@@ -44,6 +48,7 @@ class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinition.Options> {
 				columnName: joiningColumn.columnName || conventions.getJoiningColumnName(name),
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
+			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
 		}
 	}
 }
@@ -54,6 +59,7 @@ namespace OneHasOneDefinition {
 		inversedBy?: string
 		joiningColumn?: Partial<Model.JoiningColumn>
 		nullable?: boolean
+		orphanRemoval?: true
 	}
 }
 

@@ -16,12 +16,12 @@ export interface OverrideNormalizeNodeOptions {
 	leadingFields: FieldBackedElement[]
 	trailingFields: FieldBackedElement[]
 	placeholder: ContemberContentPlaceholderElement['placeholder']
-	referencesAccessor?: EntityListAccessor
+	getReferenceByKey: EntityListAccessor.GetChildEntityByKey | undefined
 }
 
 export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 	editor: E,
-	{ leadingFields, trailingFields, placeholder, referencesAccessor }: OverrideNormalizeNodeOptions,
+	{ leadingFields, trailingFields, placeholder, getReferenceByKey }: OverrideNormalizeNodeOptions,
 ) => {
 	const { normalizeNode } = editor
 
@@ -118,9 +118,18 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 			}
 		} else if ('referenceId' in node && node.referenceId !== undefined) {
 			const referenceId = node.referenceId
-			if (referencesAccessor === undefined || !referencesAccessor.hasEntityKey(referenceId)) {
-				console.warn(`Removing block referenced node ${referenceId}`)
+			const removeReference = () => {
+				console.warn(`Removing referenced node '${referenceId}'.`)
 				Transforms.delete(editor, { at: path })
+			}
+			if (getReferenceByKey === undefined) {
+				removeReference()
+			} else {
+				try {
+					getReferenceByKey(referenceId)
+				} catch {
+					removeReference()
+				}
 			}
 		}
 		return normalizeNode(nodeEntry)

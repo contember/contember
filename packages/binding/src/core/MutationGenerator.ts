@@ -6,13 +6,12 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	MarkerTreeRoot,
 	SubTreeMarker,
 	SubTreeMarkerParameters,
 } from '../markers'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
-import { EntityListState, EntityState, FieldState, RootStateNode, StateType } from './state'
+import { EntityListState, EntityState, EntityStateStub, FieldState, RootStateNode, StateType } from './state'
 import { TreeStore } from './TreeStore'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
@@ -45,7 +44,7 @@ export class MutationGenerator {
 
 	private addSubMutation(
 		processedEntities: ProcessedEntities,
-		rootState: RootStateNode,
+		rootState: RootStateNode | EntityStateStub,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder,
@@ -59,11 +58,11 @@ export class MutationGenerator {
 				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			}
 		} else if (rootState.type === StateType.EntityList) {
-			for (const childState of rootState.children) {
+			for (const [, childState] of rootState.children) {
 				queryBuilder = this.addSubMutation(
 					processedEntities,
 					childState,
-					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.getAccessor())),
+					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.id)),
 					parameters,
 					queryBuilder,
 				)
@@ -74,7 +73,7 @@ export class MutationGenerator {
 						queryBuilder = this.addDeleteMutation(
 							processedEntities,
 							removedEntity,
-							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.getAccessor())),
+							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.id)),
 							parameters,
 							queryBuilder,
 						)
@@ -83,6 +82,9 @@ export class MutationGenerator {
 					}
 				}
 			}
+		} else if (rootState.type === StateType.EntityStub) {
+			// Do nothing. For now.
+			// TODO there can be a forceCreate somewhere in there that we're hereby ignoring.
 		} else {
 			assertNever(rootState)
 		}
@@ -214,11 +216,15 @@ export class MutationGenerator {
 
 	private registerCreateMutationPart(
 		processedEntities: ProcessedEntities,
-		currentState: EntityState,
+		currentState: EntityState | EntityStateStub,
 		builder: CrudQueryBuilder.WriteDataBuilder<
 			CrudQueryBuilder.WriteOperation.Create
 		> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
+		if (currentState.type === StateType.EntityStub) {
+			// TODO If there's a forceCreate, this is wrong.
+			return builder
+		}
 		if (processedEntities.has(currentState)) {
 			return builder
 		}
@@ -238,7 +244,7 @@ export class MutationGenerator {
 			) {
 				continue
 			}
-			const fieldState = currentState.fields.get(placeholderName)
+			const fieldState = currentState.children.get(placeholderName)
 
 			if (fieldState === undefined) {
 				continue
@@ -373,7 +379,7 @@ export class MutationGenerator {
 			})
 		}
 		return builder.many(marker.relation.field, builder => {
-			const alias = AliasTransformer.entityToAlias(fieldState.getAccessor())
+			const alias = AliasTransformer.entityToAlias(fieldState.id)
 			if (fieldState.id.existsOnServer) {
 				// TODO also potentially update
 				return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id.value }, alias)
@@ -389,8 +395,8 @@ export class MutationGenerator {
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
 		return builder.many(marker.relation.field, builder => {
-			for (const entityState of fieldState.children) {
-				const alias = AliasTransformer.entityToAlias(entityState.getAccessor())
+			for (const [, entityState] of fieldState.children) {
+				const alias = AliasTransformer.entityToAlias(entityState.id)
 				if (entityState.id.existsOnServer) {
 					// TODO also potentially update
 					builder = builder.connect({ [PRIMARY_KEY_NAME]: entityState.id.value }, alias)
@@ -416,7 +422,7 @@ export class MutationGenerator {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}
-			const fieldState = currentState.fields.get(placeholderName)
+			const fieldState = currentState.children.get(placeholderName)
 
 			if (fieldState === undefined) {
 				continue
@@ -493,7 +499,7 @@ export class MutationGenerator {
 					// This is a reduced has many relation.
 					builder = builder.many(marker.relation.field, builder => {
 						const persistedValue = currentState.persistedData?.get?.(placeholderName)
-						const alias = AliasTransformer.entityToAlias(fieldState.getAccessor())
+						const alias = AliasTransformer.entityToAlias(fieldState.id)
 
 						if (persistedValue instanceof ServerGeneratedUuid) {
 							if (persistedValue.value === fieldState.id.value) {
@@ -530,16 +536,19 @@ export class MutationGenerator {
 					continue
 				}
 				builder = builder.many(marker.relation.field, builder => {
-					for (const childEntityState of fieldState.children) {
-						const alias = AliasTransformer.entityToAlias(childEntityState.getAccessor())
+					for (const [, childEntityState] of fieldState.children) {
+						const alias = AliasTransformer.entityToAlias(childEntityState.id)
 
 						if (childEntityState.id.existsOnServer) {
 							if (fieldState.persistedEntityIds.has(childEntityState.id.value)) {
-								builder = builder.update(
-									{ [PRIMARY_KEY_NAME]: childEntityState.id.value },
-									builder => this.registerUpdateMutationPart(processedEntities, childEntityState, builder),
-									alias,
-								)
+								if (childEntityState.type !== StateType.EntityStub) {
+									// A stub cannot have any pending changes.
+									builder = builder.update(
+										{ [PRIMARY_KEY_NAME]: childEntityState.id.value },
+										builder => this.registerUpdateMutationPart(processedEntities, childEntityState, builder),
+										alias,
+									)
+								}
 							} else {
 								// TODO also potentially update
 								builder = builder.connect({ [PRIMARY_KEY_NAME]: childEntityState.id.value }, alias)
@@ -550,7 +559,7 @@ export class MutationGenerator {
 					}
 					if (fieldState.plannedRemovals) {
 						for (const [entityToRemove, removalType] of fieldState.plannedRemovals) {
-							const alias = AliasTransformer.entityToAlias(entityToRemove.getAccessor())
+							const alias = AliasTransformer.entityToAlias(entityToRemove.id)
 							if (removalType === 'delete') {
 								builder = builder.delete({ [PRIMARY_KEY_NAME]: entityToRemove.id.value }, alias)
 							} else if (removalType === 'disconnect') {

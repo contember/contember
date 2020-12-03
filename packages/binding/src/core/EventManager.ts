@@ -339,27 +339,27 @@ export class EventManager {
 	public notifyParents(childState: StateNode) {
 		switch (childState.type) {
 			case StateType.Entity: {
-				for (const [parent, [key, realm]] of childState.realms) {
+				for (const [parent] of childState.realms) {
 					if (parent === undefined) {
 						continue
 					}
 					switch (parent.type) {
 						case StateType.EntityList:
-							parent.onChildEntityUpdate(childState)
-							break
 						case StateType.Entity:
-							parent.onChildFieldUpdate(childState)
+							parent.onChildUpdate(childState)
 							break
+						default:
+							assertNever(parent)
 					}
 				}
 				break
 			}
 			case StateType.EntityList: {
-				childState.onEntityListUpdate(childState)
+				childState.onSelfUpdate(childState)
 				break
 			}
 			case StateType.Field: {
-				childState.onFieldUpdate(childState)
+				childState.onSelfUpdate(childState)
 				break
 			}
 		}

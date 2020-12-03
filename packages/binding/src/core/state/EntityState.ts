@@ -4,6 +4,7 @@ import { Environment } from '../../dao'
 import { EntityFieldMarkersContainer } from '../../markers'
 import { EntityCreationParameters, FieldName, SingleEntityEventListeners } from '../../treeParameters'
 import { EntityRealmSet } from './EntityRealmSet'
+import { EntityStateStub } from './EntityStateStub'
 import { StateNode } from './StateNode'
 import { StateType } from './StateType'
 
@@ -15,7 +16,7 @@ export interface EntityState {
 	batchUpdateDepth: number
 	childrenWithPendingUpdates: Set<StateNode> | undefined
 	errors: ErrorAccessor | undefined
-	fields: Map<FieldName, StateNode>
+	children: Map<FieldName, StateNode | EntityStateStub>
 	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
 	hasIdSetInStone: boolean // Initially, ids may be changed but only up to a certain point. This marks that point.
 	hasPendingUpdate: boolean
@@ -23,7 +24,7 @@ export interface EntityState {
 	hasStaleAccessor: boolean
 	id: EntityAccessor.RuntimeId
 	isScheduledForDeletion: boolean
-	onChildFieldUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
+	onChildUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	maidenKey: string | undefined // undefined for persisted entities
 	persistedData: SingleEntityPersistedData | undefined // TODO remove this
 	plannedHasOneDeletions: Map<FieldName, EntityState> | undefined

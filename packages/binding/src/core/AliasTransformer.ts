@@ -6,8 +6,8 @@ export class AliasTransformer {
 
 	private static ALIAS_SECTION_SEPARATOR = '__'
 
-	public static entityToAlias(accessor: EntityAccessor): string {
-		return `${this.COMMON_PREFIX}${accessor.key.replace(/-/g, '_')}`
+	public static entityToAlias(entityKey: EntityAccessor.RuntimeId): string {
+		return `${this.COMMON_PREFIX}${entityKey.value.replace(/-/g, '_')}`
 	}
 
 	public static aliasToEntityKey(alias: string): string {

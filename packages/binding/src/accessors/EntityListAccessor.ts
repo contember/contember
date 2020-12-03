@@ -8,7 +8,7 @@ import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
-		private readonly children: ReadonlySet<EntityListAccessor.EntityDatum>,
+		private readonly children: ReadonlyMap<string, EntityListAccessor.EntityDatum>,
 		private readonly keysPersistedOnServer: ReadonlySet<string>,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
@@ -22,20 +22,13 @@ class EntityListAccessor implements Errorable {
 	) {}
 
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
-		for (const childDatum of this.children) {
+		for (const [, childDatum] of this.children) {
 			yield childDatum.getAccessor()
 		}
 	}
 
 	public hasEntityKey(childEntityKey: string): boolean {
-		// This is an absolutely awful, awful implementation.
-		// We should probably just pass global binding operations to here as well.
-		try {
-			this.getChildEntityByKey(childEntityKey)
-			return true
-		} catch {
-			return false
-		}
+		return this.children.has(childEntityKey)
 	}
 
 	public isEmpty(): boolean {

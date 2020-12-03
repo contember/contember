@@ -1,2 +1,2 @@
-// PlaceholderName for top-level and entities, entity key for lists
+// PlaceholderName for top-level and for entities, entity key for entities in lists
 export type EntityRealmKey = string

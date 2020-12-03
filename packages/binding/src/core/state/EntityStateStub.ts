@@ -6,4 +6,5 @@ export interface EntityStateStub {
 	type: StateType.EntityStub
 	id: EntityAccessor.RuntimeId
 	realms: EntityRealmSet
+	getAccessor: EntityAccessor.GetEntityAccessor
 }

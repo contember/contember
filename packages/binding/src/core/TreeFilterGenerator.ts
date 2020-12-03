@@ -1,5 +1,5 @@
 import { RelationFilter, TreeFilter } from '@contember/client'
-import { EntityFieldMarkersContainer, HasManyRelationMarker, HasOneRelationMarker, MarkerTreeRoot } from '../markers'
+import { EntityFieldMarkersContainer, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
 import { assertNever } from '../utils'
 import { EntityState, RootStateNode, StateType } from './state'
 import { TreeStore } from './TreeStore'
@@ -26,7 +26,11 @@ export class TreeFilterGenerator {
 				break
 			}
 			case StateType.EntityList: {
-				for (const entityState of subTree.children) {
+				for (const [, entityState] of subTree.children) {
+					if (entityState.type === StateType.EntityStub) {
+						// TODO this is *WRONG*.
+						continue
+					}
 					const filter = this.generateTopLevelEntityFilter(entityState)
 					filter && filters.push(filter)
 				}

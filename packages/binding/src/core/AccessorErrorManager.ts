@@ -115,7 +115,7 @@ export class AccessorErrorManager {
 
 		for (const [childKey, child] of errors.children) {
 			if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
-				const fieldState = state.fields.get(childKey)
+				const fieldState = state.children.get(childKey)
 
 				if (fieldState?.type === StateType.Field) {
 					state.childrenWithPendingUpdates.add(fieldState)
@@ -132,7 +132,7 @@ export class AccessorErrorManager {
 			const normalizedPlaceholders = typeof placeholders === 'string' ? new Set([placeholders]) : placeholders
 
 			for (const normalizedPlaceholder of normalizedPlaceholders) {
-				const fieldState = state.fields.get(normalizedPlaceholder)
+				const fieldState = state.children.get(normalizedPlaceholder)
 				if (fieldState === undefined) {
 					continue
 				}

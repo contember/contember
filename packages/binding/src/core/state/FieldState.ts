@@ -16,7 +16,7 @@ export interface FieldState {
 	fieldMarker: FieldMarker
 	hasPendingUpdate: boolean
 	hasUnpersistedChanges: boolean
-	onFieldUpdate: OnFieldUpdate // To be called by this field to inform the parent entity
+	onSelfUpdate: OnFieldUpdate // To be called by this field to inform the parent entity
 	value: FieldValue
 	persistedValue: FieldValue | undefined // Undefined means that the parent entity doesn't exist on server
 	placeholderName: FieldName

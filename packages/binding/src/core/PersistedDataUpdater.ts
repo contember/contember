@@ -33,7 +33,7 @@ export class PersistedDataUpdater {
 								this.updateSingleEntityPersistedData(alreadyProcessed, subTreeState, newSubTreeData)
 						} else {
 							const parameters = (subTreeMarker.parameters as BoxedQualifiedSingleEntity).value
-							const newSubTreeState = this.stateInitializer.initializeEntityAccessor(newSubTreeData, {
+							const newSubTreeState = this.stateInitializer.initializeEntityState(newSubTreeData, {
 								creationParameters: parameters,
 								environment: subTreeMarker.environment,
 								initialEventListeners: parameters,
@@ -98,7 +98,7 @@ export class PersistedDataUpdater {
 
 		const newPersistedData = this.treeStore.persistedEntityData.get(state.id.value)
 
-		for (let [fieldPlaceholder, fieldState] of state.fields) {
+		for (let [fieldPlaceholder, fieldState] of state.children) {
 			let didChildUpdate = false
 			const newFieldDatum = newPersistedData?.get(fieldPlaceholder)
 
@@ -148,9 +148,9 @@ export class PersistedDataUpdater {
 					}
 
 					if (shouldInitializeNewEntity) {
-						state.fields.set(
+						state.children.set(
 							fieldPlaceholder,
-							(fieldState = this.stateInitializer.initializeEntityAccessor(
+							(fieldState = this.stateInitializer.initializeEntityState(
 								newFieldDatum instanceof ServerGeneratedUuid ? newFieldDatum : new UnpersistedEntityKey(),
 								{
 									creationParameters: marker.relation,
@@ -178,6 +178,11 @@ export class PersistedDataUpdater {
 						)
 					}
 					break
+				}
+				case StateType.EntityStub: {
+					// Do nothing.
+					// TODO
+					continue
 				}
 				default:
 					assertNever(fieldState)
@@ -227,8 +232,7 @@ export class PersistedDataUpdater {
 
 		if (haveSameKeySets) {
 			const newKeyIterator = newPersistedData[Symbol.iterator]()
-			for (const childState of state.children) {
-				const oldKey = childState.id.value
+			for (const [oldKey] of state.children) {
 				if (!newPersistedData.has(oldKey)) {
 					haveSameKeySets = false
 					// TODO delete the corresponding state
@@ -253,13 +257,13 @@ export class PersistedDataUpdater {
 
 		state.children.clear()
 
-		// TODO instead of calling initializeEntityAccessor we might be able to perform some Longest Common Subsequence
+		// TODO instead of calling initializeEntityState we might be able to perform some Longest Common Subsequence
 		// 	wizardry and match the id sets in order to convert the unpersisted
 		for (const newPersistedId of initialData) {
 			if (newPersistedId === undefined) {
 				const newKey = new UnpersistedEntityKey()
 
-				const childState = this.stateInitializer.initializeEntityAccessor(newKey, {
+				const childState = this.stateInitializer.initializeEntityState(newKey, {
 					creationParameters: state.creationParameters,
 					environment: state.environment,
 					initialEventListeners: this.eventManager.getEventListenersForListEntity(state),
@@ -267,7 +271,7 @@ export class PersistedDataUpdater {
 					parent: state,
 					realmKey: newKey.value,
 				})
-				state.children.add(childState)
+				state.children.set(newKey.value, childState)
 
 				didUpdate = true
 			} else {
@@ -275,7 +279,7 @@ export class PersistedDataUpdater {
 
 				if (childState === undefined) {
 					const newKey = new ServerGeneratedUuid(newPersistedId)
-					childState = this.stateInitializer.initializeEntityAccessor(newKey, {
+					childState = this.stateInitializer.initializeEntityState(newKey, {
 						creationParameters: state.creationParameters,
 						environment: state.environment,
 						initialEventListeners: this.eventManager.getEventListenersForListEntity(state),
@@ -299,7 +303,7 @@ export class PersistedDataUpdater {
 						state.childrenWithPendingUpdates.add(childState)
 					}
 				}
-				state.children.add(childState)
+				state.children.set(childState.id.value, childState)
 			}
 		}
 

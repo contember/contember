@@ -266,7 +266,8 @@ export class DataBinding {
 
 			const persistedData = await this.fetchPersistedData(markerTree)
 
-			this.treeStore.persistedEntityData = persistedData.persistedEntityDataStore
+			this.treeStore.subTreePersistedData = persistedData.subTreeDataStore // TODO
+			this.treeStore.persistedEntityData = persistedData.persistedEntityDataStore // TODO
 
 			for (const [placeholderName, marker] of this.treeStore.markerTree.subTrees) {
 				const subTreeState = this.stateInitializer.initializeSubTree(

@@ -1,4 +1,4 @@
-import { PersistedEntityDataStore } from '../accessorTree'
+import { PersistedEntityDataStore, SubTreeDataStore } from '../accessorTree'
 import { MarkerTreeRoot } from '../markers'
 import { EntityState, RootStateNode } from './state'
 
@@ -13,4 +13,5 @@ export class TreeStore {
 	// TODO !!!
 	public markerTree: MarkerTreeRoot = new MarkerTreeRoot(new Map(), new Map())
 	public persistedEntityData: PersistedEntityDataStore = new Map()
+	public subTreePersistedData: SubTreeDataStore = new Map()
 }

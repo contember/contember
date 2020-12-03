@@ -1,7 +1,8 @@
 import { RelationFilter, TreeFilter } from '@contember/client'
-import { EntityFieldMarkersContainer, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
+import { EntityListPersistedData, ServerGeneratedUuid } from '../accessorTree'
+import { EntityFieldMarkersContainer, HasManyRelationMarker, HasOneRelationMarker, SubTreeMarker } from '../markers'
+import { EntityName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { EntityState, RootStateNode, StateType } from './state'
 import { TreeStore } from './TreeStore'
 
 type RawRelationFilters = Map<string, RawRelationFilters>
@@ -12,47 +13,52 @@ export class TreeFilterGenerator {
 	public generateTreeFilter(): TreeFilter[] {
 		return Array.from(this.treeStore.markerTree.subTrees)
 			.filter(([, tree]) => tree.parameters.value.expectedMutation !== 'none')
-			.map(([placeholder]) => this.generateSubTreeFilter(this.treeStore.subTreeStates.get(placeholder)!))
+			.map(([placeholderName, tree]) =>
+				this.generateSubTreeFilter(tree, this.treeStore.subTreePersistedData.get(placeholderName)),
+			)
 			.flat()
 	}
 
-	private generateSubTreeFilter(subTree: RootStateNode): TreeFilter[] {
+	private generateSubTreeFilter(
+		subTree: SubTreeMarker,
+		persistedData: ServerGeneratedUuid | EntityListPersistedData | undefined,
+	): TreeFilter[] {
 		const filters: TreeFilter[] = []
 
-		switch (subTree.type) {
-			case StateType.Entity: {
-				const filter = this.generateTopLevelEntityFilter(subTree)
+		if (
+			persistedData === undefined ||
+			subTree.parameters.type === 'unconstrainedQualifiedEntityList' ||
+			subTree.parameters.type === 'unconstrainedQualifiedSingleEntity'
+		) {
+			return filters // Do nothing
+		}
+
+		if (persistedData instanceof ServerGeneratedUuid) {
+			const filter = this.generateTopLevelEntityFilter(
+				persistedData.value,
+				subTree.parameters.value.entityName,
+				subTree.fields,
+			)
+			filter && filters.push(filter)
+		} else {
+			for (const id of persistedData) {
+				const filter = this.generateTopLevelEntityFilter(id, subTree.parameters.value.entityName, subTree.fields)
 				filter && filters.push(filter)
-				break
 			}
-			case StateType.EntityList: {
-				for (const [, entityState] of subTree.children) {
-					if (entityState.type === StateType.EntityStub) {
-						// TODO this is *WRONG*.
-						continue
-					}
-					const filter = this.generateTopLevelEntityFilter(entityState)
-					filter && filters.push(filter)
-				}
-				break
-			}
-			default:
-				return assertNever(subTree)
 		}
 
 		return filters
 	}
 
-	private generateTopLevelEntityFilter(topLevelEntity: EntityState): TreeFilter | undefined {
-		const { id, typeName } = topLevelEntity
-
-		if (!id.existsOnServer || typeName === undefined) {
-			return undefined
-		}
+	private generateTopLevelEntityFilter(
+		id: string,
+		entityName: EntityName,
+		fields: EntityFieldMarkersContainer,
+	): TreeFilter | undefined {
 		return {
-			entity: typeName,
-			id: id.value,
-			relations: this.generateEntityRelations(topLevelEntity.combinedMarkersContainer),
+			entity: entityName,
+			id: id,
+			relations: this.generateEntityRelations(fields),
 		}
 	}
 

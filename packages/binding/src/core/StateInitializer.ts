@@ -688,8 +688,8 @@ export class StateInitializer {
 				})
 			},
 			getChildEntityByKey: key => {
-				const childState = this.treeStore.entityStore.get(key)
-				if (childState === undefined || !entityListState.children.has(key)) {
+				const childState = entityListState.children.get(key)
+				if (childState === undefined) {
 					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as it is not on the list.`)
 				}
 				return childState.getAccessor()

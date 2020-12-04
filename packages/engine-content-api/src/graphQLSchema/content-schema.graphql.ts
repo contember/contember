@@ -50,7 +50,7 @@ const schema: DocumentNode = gql`
 
 	enum _RelationSide {
 		owning
-		inversed
+		inverse
 	}
 	enum _OrderByDirection {
 		asc
@@ -70,6 +70,7 @@ const schema: DocumentNode = gql`
 		inversedBy: String
 		nullable: Boolean
 		onDelete: _OnDeleteBehaviour
+		orphanRemoval: Boolean
 		orderBy: [_OrderBy!]
 		rules: [_Rule!]!
 		validators: [_Validator!]!

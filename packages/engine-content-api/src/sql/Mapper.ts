@@ -165,30 +165,30 @@ class Mapper {
 
 	public async connectJunction(
 		owningEntity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
-		ownerPrimary: Input.PrimaryValue,
+		relation: Model.ManyHasManyOwningRelation,
+		owningPrimary: Input.PrimaryValue,
 		inversePrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
 		return await this.junctionTableManager.connectJunction(
 			this.db,
 			owningEntity,
 			relation,
-			ownerPrimary,
+			owningPrimary,
 			inversePrimary,
 		)
 	}
 
 	public async disconnectJunction(
 		owningEntity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
-		ownerPrimary: Input.PrimaryValue,
+		relation: Model.ManyHasManyOwningRelation,
+		owningPrimary: Input.PrimaryValue,
 		inversePrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
 		return await this.junctionTableManager.disconnectJunction(
 			this.db,
 			owningEntity,
 			relation,
-			ownerPrimary,
+			owningPrimary,
 			inversePrimary,
 		)
 	}

@@ -9,13 +9,13 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		throw new Error('UpdateEntityRelationAllowedOperationsVisitor: Not applicable for a column')
 	}
 
-	public visitManyHasManyInversed({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwnerRelation) {
+	public visitManyHasManyInverse({}, {}, targetEntity: Model.Entity, targetRelation: Model.ManyHasManyOwningRelation) {
 		return this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 	}
 
-	public visitManyHasManyOwner(
+	public visitManyHasManyOwning(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		targetEntity: Model.Entity,
 	) {
 		return this.getAllowedOperations(targetEntity, entity, relation)
@@ -37,11 +37,11 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		return operations.filter(it => !forbiddenOperations.includes(it))
 	}
 
-	public visitOneHasOneInversed(
+	public visitOneHasOneInverse(
 		{},
-		relation: Model.OneHasOneInversedRelation,
+		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation,
+		targetRelation: Model.OneHasOneOwningRelation,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
 		if (relation.nullable || targetRelation.nullable) {
@@ -50,11 +50,11 @@ export default class UpdateEntityRelationAllowedOperationsVisitor
 		return operations.filter(it => it === Input.UpdateRelationOperation.update)
 	}
 
-	public visitOneHasOneOwner(
+	public visitOneHasOneOwning(
 		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
+		relation: Model.OneHasOneOwningRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null,
+		targetRelation: Model.OneHasOneInverseRelation | null,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
 		if (relation.nullable || (targetRelation && targetRelation.nullable)) {

@@ -1,6 +1,8 @@
 import { Model } from '@contember/schema'
 import FieldBuilder from './FieldBuilder'
 import { AddEntityCallback, EntityConfigurator } from './types'
+import { Interface } from '../definition/types'
+import OneHasOneDefinition from '../definition/OneHasOneDefinition'
 
 type PartialOptions<K extends keyof OneHasOneBuilder.Options> = Partial<OneHasOneBuilder.Options> &
 	Pick<OneHasOneBuilder.Options, K>
@@ -31,8 +33,17 @@ class OneHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> 
 		return this.withOption('nullable', false)
 	}
 
+	inverseNotNull(): OneHasOneBuilder<O> {
+		return this.withOption('inverseNullable', false)
+	}
+
+	/** @deprecated use inverseNotNull*/
 	inversedNotNull(): OneHasOneBuilder<O> {
-		return this.withOption('inversedNullable', false)
+		return this.withOption('inverseNullable', false)
+	}
+
+	removeOrphan(): OneHasOneBuilder<O> {
+		return this.withOption('orphanRemoval', true)
 	}
 
 	getOption(): O {
@@ -53,7 +64,8 @@ namespace OneHasOneBuilder {
 		inversedBy?: string
 		joiningColumn?: Partial<Model.JoiningColumn>
 		nullable?: boolean
-		inversedNullable?: boolean
+		inverseNullable?: boolean
+		orphanRemoval?: true
 	}
 }
 

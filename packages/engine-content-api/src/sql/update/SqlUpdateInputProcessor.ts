@@ -32,7 +32,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 		return Promise.resolve([])
 	}
 
-	manyHasManyInversed: UpdateInputProcessor<MutationResultList>['manyHasManyInversed'] = {
+	manyHasManyInverse: UpdateInputProcessor<MutationResultList>['manyHasManyInverse'] = {
 		connect: hasManyProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
 			const primaryValue = await this.mapper.getPrimaryValue(targetEntity, input)
 			if (!primaryValue) {
@@ -98,7 +98,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 		}),
 	}
 
-	manyHasManyOwner: UpdateInputProcessor<MutationResultList>['manyHasManyOwner'] = {
+	manyHasManyOwning: UpdateInputProcessor<MutationResultList>['manyHasManyOwning'] = {
 		connect: hasManyProcessor(async ({ input, entity, relation, targetEntity }) => {
 			const primaryValue = await this.mapper.getPrimaryValue(targetEntity, input)
 			if (!primaryValue) {
@@ -186,15 +186,15 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 			return await insert
 		}),
 		update: hasOneProcessor(async ({ targetEntity, input, entity, relation }) => {
-			const inversedPrimary = await this.mapper.selectField(
+			const inversePrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
 			)
-			if (!inversedPrimary) {
+			if (!inversePrimary) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
 			}
-			return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, input)
+			return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversePrimary }, input)
 		}),
 		upsert: hasOneProcessor(async ({ targetEntity, input: { create, update }, entity, relation }) => {
 			const select = this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
@@ -215,9 +215,9 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 				return AbortUpdate
 			})
 
-			const inversedPrimary = await select
-			if (inversedPrimary) {
-				return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, update)
+			const inversePrimary = await select
+			if (inversePrimary) {
+				return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversePrimary }, update)
 			} else {
 				return result
 			}
@@ -233,13 +233,13 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 				)
 				this.updateBuilder.addFieldValue(relation.name, null)
 			}
-			const inversedPrimary = await this.mapper.selectField(
+			const inversePrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
 			)
 			await this.updateBuilder.update
-			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversedPrimary })
+			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary })
 		}),
 		disconnect: hasOneProcessor(async ({ entity, relation }) => {
 			if (!relation.nullable) {
@@ -304,7 +304,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 		}),
 	}
 
-	oneHasOneInversed: UpdateInputProcessor<MutationResultList>['oneHasOneInversed'] = {
+	oneHasOneInverse: UpdateInputProcessor<MutationResultList>['oneHasOneInverse'] = {
 		connect: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
 			return await this.mapper.update(targetEntity, input, {
 				[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
@@ -364,7 +364,7 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 		}),
 	}
 
-	oneHasOneOwner: UpdateInputProcessor<MutationResultList>['oneHasOneOwner'] = {
+	oneHasOneOwning: UpdateInputProcessor<MutationResultList>['oneHasOneOwning'] = {
 		connect: hasOneProcessor(async ({ targetEntity, input, entity, relation, targetRelation }) => {
 			const result: MutationResultList = []
 
@@ -449,15 +449,15 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 			return result
 		}),
 		update: hasOneProcessor(async ({ targetEntity, input, entity, relation }) => {
-			const inversedPrimary = await this.mapper.selectField(
+			const inversePrimary = await this.mapper.selectField(
 				entity,
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
 			)
-			if (!inversedPrimary) {
+			if (!inversePrimary) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
 			}
-			return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, input)
+			return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversePrimary }, input)
 		}),
 		upsert: hasOneProcessor(async ({ targetEntity, input: { create, update }, entity, relation }) => {
 			const select = this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
@@ -478,9 +478,9 @@ export default class SqlUpdateInputProcessor implements UpdateInputProcessor<Mut
 				return AbortUpdate
 			})
 
-			const inversedPrimary = await select
-			if (inversedPrimary) {
-				return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversedPrimary }, update)
+			const inversePrimary = await select
+			if (inversePrimary) {
+				return await this.mapper.update(targetEntity, { [targetEntity.primary]: inversePrimary }, update)
 			}
 			return result
 		}),

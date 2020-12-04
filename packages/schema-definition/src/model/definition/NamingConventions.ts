@@ -12,8 +12,8 @@ interface NamingConventions {
 	getJoiningTableColumnNames(
 		owningEntity: string,
 		owningRelation: string,
-		inversedEntity: string,
-		inversedRelation?: string,
+		inverseEntity: string,
+		inverseRelation?: string,
 	): [string, string]
 }
 
@@ -44,12 +44,12 @@ namespace NamingConventions {
 		getJoiningTableColumnNames(
 			owningEntity: string,
 			owningRelation: string,
-			inversedEntity: string,
-			inversedRelation?: string,
+			inverseEntity: string,
+			inverseRelation?: string,
 		): [string, string] {
 			return [
 				toUnderscore(owningEntity) + '_id',
-				toUnderscore(inversedEntity === owningEntity ? owningRelation : inversedEntity) + '_id',
+				toUnderscore(inverseEntity === owningEntity ? owningRelation : inverseEntity) + '_id',
 			]
 		}
 	}

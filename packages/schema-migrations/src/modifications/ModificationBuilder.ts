@@ -28,6 +28,8 @@ import deepCopy from '../utils/deepCopy'
 import MakeRelationNotNullModification from './relations/MakeRelationNotNullModification'
 import UpdateRelationOrderByModification from './relations/UpdateRelationOrderByModification'
 import MakeRelationNullableModification from './relations/MakeRelationNullableModification'
+import EnableOrphanRemovalModification from './relations/EnableOrphanRemovalModification'
+import DisableOrphanRemovalModification from './relations/DisableOrphanRemovalModification'
 
 class ModificationBuilder {
 	private modifications: Migration.Modification[] = []
@@ -51,6 +53,8 @@ class ModificationBuilder {
 			UpdateRelationOrderByModification.id,
 			MakeRelationNotNullModification.id,
 			MakeRelationNullableModification.id,
+			EnableOrphanRemovalModification.id,
+			DisableOrphanRemovalModification.id,
 			UpdateEnumModification.id,
 
 			CreateEntityModification.id,
@@ -74,10 +78,10 @@ class ModificationBuilder {
 					visitColumn: () => 0,
 					visitManyHasOne: () => 10,
 					visitOneHasMany: () => 0,
-					visitOneHasOneOwner: () => 10,
-					visitOneHasOneInversed: () => 0,
-					visitManyHasManyOwner: () => 10,
-					visitManyHasManyInversed: () => 0,
+					visitOneHasOneOwning: () => 10,
+					visitOneHasOneInverse: () => 0,
+					visitManyHasManyOwning: () => 10,
+					visitManyHasManyInverse: () => 0,
 				}
 				return (
 					acceptFieldVisitor(this.originalSchema.model, a.entityName, a.fieldName, visitor) -
@@ -87,7 +91,7 @@ class ModificationBuilder {
 		}
 		const modifications = this.modifications.filter(it => {
 			if (it.modification === CreateRelationInverseSideModification.id) {
-				// remove creation of inversed side if owning side is created
+				// remove creation of inverse side if owning side is created
 				const relation = (it as Migration.Modification<CreateRelationInverseSideModification.Data>).relation
 				return !this.modifications.find(
 					it =>
@@ -111,7 +115,7 @@ class ModificationBuilder {
 
 	public createEntity(updatedEntity: Model.Entity) {
 		this.modifications.push({
-			modification: 'createEntity',
+			modification: CreateEntityModification.id,
 			entity: {
 				name: updatedEntity.name,
 				primary: updatedEntity.primary,
@@ -134,7 +138,7 @@ class ModificationBuilder {
 
 	public updateEntityTableName(entityName: string, tableName: string) {
 		this.modifications.push({
-			modification: 'updateEntityTableName',
+			modification: UpdateEntityNameModification.id,
 			entityName: entityName,
 			tableName: tableName,
 		})
@@ -150,7 +154,7 @@ class ModificationBuilder {
 
 	public removeField(entityName: string, fieldName: string, prepend: boolean = false) {
 		const modification = {
-			modification: 'removeField',
+			modification: RemoveFieldModification.id,
 			entityName: entityName,
 			fieldName: fieldName,
 		}
@@ -163,7 +167,7 @@ class ModificationBuilder {
 
 	public updateColumnName(entityName: string, fieldName: string, columnName: string) {
 		this.modifications.push({
-			modification: 'updateColumnName',
+			modification: UpdateColumnNameModification.id,
 			entityName: entityName,
 			fieldName: fieldName,
 			columnName: columnName,
@@ -172,7 +176,7 @@ class ModificationBuilder {
 
 	public updateColumnDefinition(entityName: string, fieldName: string, definition: Model.AnyColumnDefinition) {
 		this.modifications.push({
-			modification: 'updateColumnDefinition',
+			modification: UpdateColumnDefinitionModification.id,
 			entityName: entityName,
 			fieldName: fieldName,
 			definition: definition,
@@ -182,7 +186,7 @@ class ModificationBuilder {
 	public createUnique(updatedEntity: Model.Entity, uniqueName: string) {
 		const unique = updatedEntity.unique[uniqueName]
 		this.modifications.push({
-			modification: 'createUniqueConstraint',
+			modification: CreateUniqueConstraintModification.id,
 			entityName: updatedEntity.name,
 			unique: deepCopy(unique),
 		})
@@ -190,7 +194,7 @@ class ModificationBuilder {
 
 	public removeUnique(entityName: string, uniqueName: string) {
 		this.modifications.push({
-			modification: 'removeUniqueConstraint',
+			modification: RemoveUniqueConstraintModification.id,
 			entityName: entityName,
 			constraintName: uniqueName,
 		})
@@ -198,7 +202,7 @@ class ModificationBuilder {
 
 	public createEnum(enumName: string) {
 		this.modifications.push({
-			modification: 'createEnum',
+			modification: CreateEnumModification.id,
 			enumName: enumName,
 			values: deepCopy(this.updatedSchema.model.enums[enumName]),
 		})
@@ -206,14 +210,14 @@ class ModificationBuilder {
 
 	public removeEnum(enumName: string) {
 		this.modifications.push({
-			modification: 'removeEnum',
+			modification: RemoveEnumModification.id,
 			enumName: enumName,
 		})
 	}
 
 	public updateEnum(enumName: string) {
 		this.modifications.push({
-			modification: 'updateEnum',
+			modification: UpdateEnumModification.id,
 			enumName: enumName,
 			values: deepCopy(this.updatedSchema.model.enums[enumName]),
 		})
@@ -221,7 +225,7 @@ class ModificationBuilder {
 
 	public updateRelationOnDelete(entityName: string, fieldName: string, onDelete: Model.OnDelete) {
 		this.modifications.push({
-			modification: 'updateRelationOnDelete',
+			modification: UpdateRelationOnDeleteModification.id,
 			entityName,
 			fieldName,
 			onDelete,
@@ -253,9 +257,25 @@ class ModificationBuilder {
 		})
 	}
 
+	public enableOrphanRemoval(entityName: string, fieldName: string) {
+		this.modifications.push({
+			modification: EnableOrphanRemovalModification.id,
+			entityName,
+			fieldName,
+		})
+	}
+
+	public disableOrphanRemoval(entityName: string, fieldName: string) {
+		this.modifications.push({
+			modification: DisableOrphanRemovalModification.id,
+			entityName,
+			fieldName,
+		})
+	}
+
 	public updateAclSchema(schema: Acl.Schema) {
 		this.modifications.push({
-			modification: 'updateAclSchema',
+			modification: UpdateAclSchemaModification.id,
 			schema,
 		})
 	}
@@ -269,7 +289,7 @@ class ModificationBuilder {
 
 	public updateValidationSchema(schema: Validation.Schema) {
 		this.modifications.push({
-			modification: 'updateValidationSchema',
+			modification: UpdateValidationSchemaModification.id,
 			schema,
 		})
 	}

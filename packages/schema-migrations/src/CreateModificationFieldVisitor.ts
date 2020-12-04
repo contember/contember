@@ -45,11 +45,11 @@ export default class CreateFieldVisitor
 		}
 	}
 
-	public visitOneHasOneOwner(
+	public visitOneHasOneOwning(
 		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
+		relation: Model.OneHasOneOwningRelation,
 		{},
-		targetRelation: Model.OneHasOneInversedRelation | null,
+		targetRelation: Model.OneHasOneInverseRelation | null,
 	): Migration.Modification<CreateRelationModification.Data> {
 		return {
 			modification: CreateRelationModification.id,
@@ -59,9 +59,9 @@ export default class CreateFieldVisitor
 		}
 	}
 
-	public visitOneHasOneInversed(
+	public visitOneHasOneInverse(
 		entity: Model.Entity,
-		relation: Model.OneHasOneInversedRelation,
+		relation: Model.OneHasOneInverseRelation,
 	): Migration.Modification<CreateRelationInverseSideModification.Data> {
 		return {
 			modification: CreateRelationInverseSideModification.id,
@@ -70,11 +70,11 @@ export default class CreateFieldVisitor
 		}
 	}
 
-	public visitManyHasManyOwner(
+	public visitManyHasManyOwning(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		{},
-		targetRelation: Model.ManyHasManyInversedRelation | null,
+		targetRelation: Model.ManyHasManyInverseRelation | null,
 	): Migration.Modification<CreateRelationModification.Data> {
 		return {
 			modification: CreateRelationModification.id,
@@ -84,9 +84,9 @@ export default class CreateFieldVisitor
 		}
 	}
 
-	public visitManyHasManyInversed(
+	public visitManyHasManyInverse(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyInversedRelation,
+		relation: Model.ManyHasManyInverseRelation,
 	): Migration.Modification<CreateRelationInverseSideModification.Data> {
 		return {
 			modification: CreateRelationInverseSideModification.id,

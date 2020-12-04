@@ -66,8 +66,8 @@ class InsertBuilder<Result extends InsertBuilder.InsertResult> implements With.A
 		return this.withOption('onConflict', conflictAction)
 	}
 
-	public returning(column: string | Literal): InsertBuilder<Returning.Result[]> {
-		return this.withOption('returning', new Returning(column)) as InsertBuilder<Returning.Result[]>
+	public returning<R = Returning.Result>(...columns: Returning.ReturningColumn[]): InsertBuilder<R[]> {
+		return this.withOption('returning', new Returning(columns)) as InsertBuilder<any>
 	}
 
 	public from(from: SelectBuilder.Callback): InsertBuilder<Result> {

@@ -6,18 +6,18 @@ export interface ColumnContext {
 	input: Input.ColumnValue | undefined
 }
 
-export interface ManyHasManyInversedContext {
+export interface ManyHasManyInverseContext {
 	entity: Model.Entity
-	relation: Model.ManyHasManyInversedRelation
+	relation: Model.ManyHasManyInverseRelation
 	targetEntity: Model.Entity
-	targetRelation: Model.ManyHasManyOwnerRelation
+	targetRelation: Model.ManyHasManyOwningRelation
 }
 
-export interface ManyHasManyOwnerContext {
+export interface ManyHasManyOwningContext {
 	entity: Model.Entity
-	relation: Model.ManyHasManyOwnerRelation
+	relation: Model.ManyHasManyOwningRelation
 	targetEntity: Model.Entity
-	targetRelation: Model.ManyHasManyInversedRelation | null
+	targetRelation: Model.ManyHasManyInverseRelation | null
 }
 
 export interface ManyHasOneContext {
@@ -34,16 +34,16 @@ export interface OneHasManyContext {
 	targetRelation: Model.ManyHasOneRelation
 }
 
-export interface OneHasOneInversedContext {
+export interface OneHasOneInverseContext {
 	entity: Model.Entity
-	relation: Model.OneHasOneInversedRelation
+	relation: Model.OneHasOneInverseRelation
 	targetEntity: Model.Entity
-	targetRelation: Model.OneHasOneOwnerRelation
+	targetRelation: Model.OneHasOneOwningRelation
 }
 
-export interface OneHasOneOwnerContext {
+export interface OneHasOneOwningContext {
 	entity: Model.Entity
-	relation: Model.OneHasOneOwnerRelation
+	relation: Model.OneHasOneOwningRelation
 	targetEntity: Model.Entity
-	targetRelation: Model.OneHasOneInversedRelation | null
+	targetRelation: Model.OneHasOneInverseRelation | null
 }

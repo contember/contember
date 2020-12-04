@@ -23,19 +23,19 @@ class CreateUniqueConstraintModification implements Modification<CreateUniqueCon
 				visitOneHasMany: () => {
 					throw new Error(`Cannot create unique key on 1:m relation in ${entity.name}.${fieldName}`)
 				},
-				visitOneHasOneOwner: () => {
+				visitOneHasOneOwning: () => {
 					throw new Error(
 						`Cannot create unique key on 1:1 relation, this relation has unique key by default in ${entity.name}.${fieldName}`,
 					)
 				},
-				visitOneHasOneInversed: () => {
-					throw new Error(`Cannot create unique key on 1:1 inversed relation in ${entity.name}.${fieldName}`)
+				visitOneHasOneInverse: () => {
+					throw new Error(`Cannot create unique key on 1:1 inverse relation in ${entity.name}.${fieldName}`)
 				},
-				visitManyHasManyOwner: () => {
+				visitManyHasManyOwning: () => {
 					throw new Error(`Cannot create unique key on m:m relation in ${entity.name}.${fieldName}`)
 				},
-				visitManyHasManyInversed: () => {
-					throw new Error(`Cannot create unique key on m:m inversed relation in ${entity.name}.${fieldName}`)
+				visitManyHasManyInverse: () => {
+					throw new Error(`Cannot create unique key on m:m inverse relation in ${entity.name}.${fieldName}`)
 				},
 			})
 		})

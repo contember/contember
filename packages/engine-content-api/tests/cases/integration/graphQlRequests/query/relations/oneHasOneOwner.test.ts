@@ -5,7 +5,7 @@ import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
-test('Sites with settings (one-has-one owner)', async () => {
+test('Sites with settings (one-has-one owning)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
 			.entity('Site', entity =>

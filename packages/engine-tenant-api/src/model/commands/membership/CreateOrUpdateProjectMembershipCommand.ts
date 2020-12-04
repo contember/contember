@@ -29,7 +29,7 @@ export class CreateOrUpdateProjectMembershipCommand implements Command<void> {
 		if (result.length !== 1) {
 			throw new ImplementationException()
 		}
-		const membershipId = result[0] as string
+		const membershipId = result[0].id as string
 		const variables = await bus.execute(
 			new PatchProjectMembershipVariablesCommand(membershipId, this.membership.variables),
 		)

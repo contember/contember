@@ -52,11 +52,11 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		})
 	}
 
-	public visitManyHasManyInversed(
+	public visitManyHasManyInverse(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyInversedRelation,
+		relation: Model.ManyHasManyInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.ManyHasManyOwnerRelation,
+		targetRelation: Model.ManyHasManyOwningRelation,
 	): void {
 		const joiningTable = targetRelation.joiningTable
 		const columns: Mapper.JoiningColumns = {
@@ -67,9 +67,9 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		this.createManyHasManyGroups(targetEntity, targetRelation, columns, relation.orderBy || [])
 	}
 
-	public visitManyHasManyOwner(
+	public visitManyHasManyOwning(
 		entity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		targetEntity: Model.Entity,
 	): void {
 		const joiningTable = relation.joiningTable
@@ -113,7 +113,7 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 
 	private createManyHasManyGroups(
 		targetEntity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		joiningColumns: Mapper.JoiningColumns,
 		defaultOrderBy: Model.OrderBy[],
 	): void {
@@ -136,15 +136,15 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 				}
 
 				const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary, {})
-				const inversedJoiningColumn = joiningColumns.targetColumn.columnName
-				const inversedIds = junctionValues
-					.map(it => it[inversedJoiningColumn])
+				const inverseJoiningColumn = joiningColumns.targetColumn.columnName
+				const inverseIds = junctionValues
+					.map(it => it[inverseJoiningColumn])
 					.filter((it, index, arr) => arr.indexOf(it) === index)
 
 				const queryWithWhere = objectNode
 					.withArgs({
 						filter: {
-							[targetEntity.primary]: { in: inversedIds },
+							[targetEntity.primary]: { in: inverseIds },
 						},
 					})
 					.withField(primaryField)
@@ -181,11 +181,11 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		return groupedResult
 	}
 
-	public visitOneHasOneInversed(
+	public visitOneHasOneInverse(
 		entity: Model.Entity,
-		relation: Model.OneHasOneInversedRelation,
+		relation: Model.OneHasOneInverseRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneOwnerRelation,
+		targetRelation: Model.OneHasOneOwningRelation,
 	): void {
 		this.executionContext.addData(
 			entity.primary,
@@ -209,11 +209,11 @@ class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVi
 		)
 	}
 
-	public visitOneHasOneOwner(
+	public visitOneHasOneOwning(
 		entity: Model.Entity,
-		relation: Model.OneHasOneOwnerRelation,
+		relation: Model.OneHasOneOwningRelation,
 		targetEntity: Model.Entity,
-		targetRelation: Model.OneHasOneInversedRelation | null,
+		targetRelation: Model.OneHasOneInverseRelation | null,
 	): void {
 		this.executionContext.addData(
 			relation.name,

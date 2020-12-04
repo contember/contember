@@ -1,15 +1,14 @@
 import { Model } from '@contember/schema'
 import FieldDefinition from './FieldDefinition'
 import { Interface, RelationTarget } from './types'
-import ManyHasManyDefinition from './ManyHasManyDefinition'
 
-class ManyHasManyInversedDefinition extends FieldDefinition<ManyHasManyInversedDefinition.Options> {
-	type = 'ManyHasManyInversedDefinition' as const
+class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInverseDefinition.Options> {
+	type = 'ManyHasManyInverseDefinition' as const
 
 	orderBy(
 		field: string | string[],
 		direction: Model.OrderDirection = Model.OrderDirection.asc,
-	): Interface<ManyHasManyInversedDefinition> {
+	): Interface<ManyHasManyInverseDefinition> {
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
@@ -26,7 +25,7 @@ class ManyHasManyInversedDefinition extends FieldDefinition<ManyHasManyInversedD
 	}
 }
 
-namespace ManyHasManyInversedDefinition {
+namespace ManyHasManyInverseDefinition {
 	export type Options = {
 		target: RelationTarget
 		ownedBy: string
@@ -34,4 +33,4 @@ namespace ManyHasManyInversedDefinition {
 	}
 }
 
-export default ManyHasManyInversedDefinition
+export default ManyHasManyInverseDefinition

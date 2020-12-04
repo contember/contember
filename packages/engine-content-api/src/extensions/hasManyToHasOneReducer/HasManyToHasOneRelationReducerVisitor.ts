@@ -28,11 +28,11 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		return {}
 	}
 
-	public visitOneHasOneOwner() {
+	public visitOneHasOneOwning() {
 		return {}
 	}
 
-	public visitOneHasOneInversed() {
+	public visitOneHasOneInverse() {
 		return {}
 	}
 
@@ -40,11 +40,11 @@ class HasManyToHasOneRelationReducerFieldVisitor
 		return {}
 	}
 
-	public visitManyHasManyInversed() {
+	public visitManyHasManyInverse() {
 		return {}
 	}
 
-	public visitManyHasManyOwner() {
+	public visitManyHasManyOwning() {
 		return {}
 	}
 

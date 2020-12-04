@@ -17,7 +17,7 @@ class JunctionFetcher {
 
 	public async fetchJunction(
 		db: Client,
-		relation: Model.ManyHasManyOwnerRelation,
+		relation: Model.ManyHasManyOwningRelation,
 		values: Input.PrimaryValue[],
 		column: Mapper.JoiningColumns,
 		targetEntity: Model.Entity,

@@ -5,7 +5,7 @@ import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
-test('Post by category name (where many has many owner)', async () => {
+test('Post by category name (where many has many owning)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
 			.entity('Post', entity =>
@@ -55,7 +55,7 @@ test('Post by category name (where many has many owner)', async () => {
 	})
 })
 
-test('Post by category ids (where many has many owner)', async () => {
+test('Post by category ids (where many has many owning)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
 			.entity('Post', entity =>

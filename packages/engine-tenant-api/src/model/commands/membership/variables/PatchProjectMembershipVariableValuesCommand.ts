@@ -41,6 +41,6 @@ export class PatchProjectMembershipVariableValuesCommand implements Command<stri
 			})
 			.returning('value')
 			.execute(db)
-		return result as string[]
+		return result.map(it => it.value) as string[]
 	}
 }

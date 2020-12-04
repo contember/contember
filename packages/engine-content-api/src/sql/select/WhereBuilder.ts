@@ -113,10 +113,10 @@ class WhereBuilder {
 					const subWhere: Input.Condition<Input.ColumnValue> = where[column.name] as Input.Condition<Input.ColumnValue>
 					return this.conditionBuilder.build(conditionBuilder, tableName, column.columnName, subWhere)
 				},
-				visitOneHasOneInversed: joinedWhere,
-				visitOneHasOneOwner: joinedWhere,
+				visitOneHasOneInverse: joinedWhere,
+				visitOneHasOneOwning: joinedWhere,
 				visitManyHasOne: joinedWhere,
-				visitManyHasManyInversed: (entity, relation, targetEntity, targetRelation) => {
+				visitManyHasManyInverse: (entity, relation, targetEntity, targetRelation) => {
 					if (allowManyJoin) {
 						return joinedWhere(entity, relation, targetEntity)
 					}
@@ -129,11 +129,11 @@ class WhereBuilder {
 							relationWhere,
 							targetEntity,
 							targetRelation.joiningTable,
-							'inversed',
+							'inverse',
 						),
 					)
 				},
-				visitManyHasManyOwner: (entity, relation, targetEntity) => {
+				visitManyHasManyOwning: (entity, relation, targetEntity) => {
 					if (allowManyJoin) {
 						return joinedWhere(entity, relation, targetEntity)
 					}
@@ -147,7 +147,7 @@ class WhereBuilder {
 							relationWhere,
 							targetEntity,
 							relation.joiningTable,
-							'owner',
+							'owning',
 						),
 					)
 				},
@@ -181,13 +181,13 @@ class WhereBuilder {
 		relationWhere: Input.Where,
 		targetEntity: Model.Entity,
 		joiningTable: Model.JoiningTable,
-		fromSide: 'owner' | 'inversed',
+		fromSide: 'owning' | 'inverse',
 	) {
 		let augmentedBuilder: SelectBuilder<SelectBuilder.Result> = qb
 		const fromColumn =
-			fromSide === 'owner' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
+			fromSide === 'owning' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
 		const toColumn =
-			fromSide === 'owner' ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
+			fromSide === 'owning' ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
 		augmentedBuilder = augmentedBuilder.from(joiningTable.tableName, 'junction_').select(['junction_', fromColumn])
 		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
 		if (primaryCondition !== null) {

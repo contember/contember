@@ -5,7 +5,7 @@ import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
-test('Settings with sites (one-has-one inversed)', async () => {
+test('Settings with sites (one-has-one inverse)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
 			.entity('Site', entity =>

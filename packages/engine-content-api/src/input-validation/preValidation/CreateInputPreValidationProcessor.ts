@@ -15,12 +15,12 @@ export class CreateInputPreValidationProcessor implements CreateInputProcessor<R
 		private readonly mapper: Mapper,
 	) {}
 
-	manyHasManyInversed: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyInversedContext, Result> = {
+	manyHasManyInverse: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyInverseContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
 
-	manyHasManyOwner: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyOwnerContext, Result> = {
+	manyHasManyOwning: CreateInputProcessor.HasManyRelationProcessor<Context.ManyHasManyOwningContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
@@ -34,11 +34,11 @@ export class CreateInputPreValidationProcessor implements CreateInputProcessor<R
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
-	oneHasOneInversed: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneInversedContext, Result> = {
+	oneHasOneInverse: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneInverseContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}
-	oneHasOneOwner: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneOwnerContext, Result> = {
+	oneHasOneOwning: CreateInputProcessor.HasOneRelationProcessor<Context.OneHasOneOwningContext, Result> = {
 		connect: NoResult,
 		create: context => this.validateCreate(context),
 	}

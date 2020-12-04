@@ -36,17 +36,17 @@ class JunctionTableManager {
 	public async connectJunction(
 		db: Client,
 		owningEntity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
-		ownerUnique: Input.PrimaryValue,
-		inversedUnique: Input.PrimaryValue,
+		relation: Model.ManyHasManyOwningRelation,
+		owningUnique: Input.PrimaryValue,
+		inverseUnique: Input.PrimaryValue,
 	): Promise<MutationResultList> {
 		return [
 			await this.executeJunctionModification(
 				db,
 				owningEntity,
 				relation,
-				ownerUnique,
-				inversedUnique,
+				owningUnique,
+				inverseUnique,
 				this.connectJunctionHandler,
 			),
 		]
@@ -55,17 +55,17 @@ class JunctionTableManager {
 	public async disconnectJunction(
 		db: Client,
 		owningEntity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
-		ownerUnique: Input.PrimaryValue,
-		inversedUnique: Input.PrimaryValue,
+		relation: Model.ManyHasManyOwningRelation,
+		owningUnique: Input.PrimaryValue,
+		inverseUnique: Input.PrimaryValue,
 	): Promise<MutationResultList> {
 		return [
 			await this.executeJunctionModification(
 				db,
 				owningEntity,
 				relation,
-				ownerUnique,
-				inversedUnique,
+				owningUnique,
+				inverseUnique,
 				this.disconnectJunctionHandler,
 			),
 		]
@@ -74,49 +74,49 @@ class JunctionTableManager {
 	private async executeJunctionModification(
 		db: Client,
 		owningEntity: Model.Entity,
-		relation: Model.ManyHasManyOwnerRelation,
-		ownerPrimary: Input.PrimaryValue,
-		inversedPrimary: Input.PrimaryValue,
+		relation: Model.ManyHasManyOwningRelation,
+		owningPrimary: Input.PrimaryValue,
+		inversePrimary: Input.PrimaryValue,
 		handler: JunctionTableManager.JunctionHandler,
 	): Promise<MutationResult> {
 		const joiningTable = relation.joiningTable
-		const inversedEntity = getEntity(this.schema, relation.target)
+		const inverseEntity = getEntity(this.schema, relation.target)
 
 		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
 		let inversePredicate: Input.Where = {}
 		if (relation.inversedBy) {
-			inversePredicate = this.predicateFactory.create(inversedEntity, Acl.Operation.update, [relation.inversedBy])
+			inversePredicate = this.predicateFactory.create(inverseEntity, Acl.Operation.update, [relation.inversedBy])
 		}
 
 		const hasNoPredicates = Object.keys(owningPredicate).length === 0 && Object.keys(inversePredicate).length === 0
 
 		const okResultFactory = () =>
-			new MutationJunctionUpdateOk([], owningEntity, relation, ownerPrimary, inversedPrimary)
+			new MutationJunctionUpdateOk([], owningEntity, relation, owningPrimary, inversePrimary)
 		if (hasNoPredicates) {
-			return await handler.executeSimple({ db, joiningTable, ownerPrimary, inversedPrimary, okResultFactory })
+			return await handler.executeSimple({ db, joiningTable, owningPrimary, inversePrimary, okResultFactory })
 		} else {
-			const ownerWhere: Input.Where = {
-				and: [owningPredicate, { [owningEntity.primary]: { eq: ownerPrimary } }],
+			const owningWhere: Input.Where = {
+				and: [owningPredicate, { [owningEntity.primary]: { eq: owningPrimary } }],
 			}
 
-			const inversedWhere: Input.Where = {
-				and: [inversePredicate, { [inversedEntity.primary]: { eq: inversedPrimary } }],
+			const inverseWhere: Input.Where = {
+				and: [inversePredicate, { [inverseEntity.primary]: { eq: inversePrimary } }],
 			}
 
 			const dataCallback: SelectBuilder.Callback = qb => {
 				qb = qb
 					.select(expr => expr.select(['owning', owningEntity.primaryColumn]), joiningTable.joiningColumn.columnName)
 					.select(
-						expr => expr.select(['inversed', inversedEntity.primaryColumn]),
+						expr => expr.select(['inverse', inverseEntity.primaryColumn]),
 						joiningTable.inverseJoiningColumn.columnName,
 					)
 					.select(expr => expr.raw('true'), 'selected')
 					.from(new Literal('(values (null))'), 't')
 
 					.join(owningEntity.tableName, 'owning', condition => condition.raw('true'))
-					.join(inversedEntity.tableName, 'inversed', condition => condition.raw('true'))
-				qb = this.whereBuilder.build(qb, owningEntity, this.pathFactory.create([], 'owning'), ownerWhere)
-				qb = this.whereBuilder.build(qb, inversedEntity, this.pathFactory.create([], 'inversed'), inversedWhere)
+					.join(inverseEntity.tableName, 'inverse', condition => condition.raw('true'))
+				qb = this.whereBuilder.build(qb, owningEntity, this.pathFactory.create([], 'owning'), owningWhere)
+				qb = this.whereBuilder.build(qb, inverseEntity, this.pathFactory.create([], 'inverse'), inverseWhere)
 				return qb
 			}
 
@@ -129,8 +129,8 @@ namespace JunctionTableManager {
 	interface JunctionSimpleExecutionArgs {
 		db: Client
 		joiningTable: Model.JoiningTable
-		ownerPrimary: Input.PrimaryValue
-		inversedPrimary: Input.PrimaryValue
+		owningPrimary: Input.PrimaryValue
+		inversePrimary: Input.PrimaryValue
 		okResultFactory: OkResultFactory
 	}
 
@@ -151,15 +151,15 @@ namespace JunctionTableManager {
 		async executeSimple({
 			db,
 			joiningTable,
-			ownerPrimary,
-			inversedPrimary,
+			owningPrimary,
+			inversePrimary,
 			okResultFactory,
 		}: JunctionSimpleExecutionArgs): Promise<MutationResult> {
 			const result = await InsertBuilder.create()
 				.into(joiningTable.tableName)
 				.values({
-					[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(ownerPrimary),
-					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversedPrimary),
+					[joiningTable.joiningColumn.columnName]: expr => expr.selectValue(owningPrimary),
+					[joiningTable.inverseJoiningColumn.columnName]: expr => expr.selectValue(inversePrimary),
 				})
 				.onConflict(ConflictActionType.doNothing)
 				.execute(db)
@@ -210,14 +210,14 @@ namespace JunctionTableManager {
 		public async executeSimple({
 			db,
 			joiningTable,
-			ownerPrimary,
-			inversedPrimary,
+			owningPrimary,
+			inversePrimary,
 			okResultFactory,
 		}: JunctionSimpleExecutionArgs): Promise<MutationResult> {
 			const qb = DeleteBuilder.create()
 				.from(joiningTable.tableName)
-				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, Operator.eq, ownerPrimary))
-				.where(cond => cond.compare(joiningTable.inverseJoiningColumn.columnName, Operator.eq, inversedPrimary))
+				.where(cond => cond.compare(joiningTable.joiningColumn.columnName, Operator.eq, owningPrimary))
+				.where(cond => cond.compare(joiningTable.inverseJoiningColumn.columnName, Operator.eq, inversePrimary))
 
 			const result = await qb.execute(db)
 			if (result === 0) {

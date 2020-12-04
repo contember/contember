@@ -55,11 +55,11 @@ class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mode
 		return !column.nullable
 	}
 
-	visitManyHasManyInversed(): boolean {
+	visitManyHasManyInverse(): boolean {
 		return false
 	}
 
-	visitManyHasManyOwner(): boolean {
+	visitManyHasManyOwning(): boolean {
 		return false
 	}
 
@@ -71,11 +71,11 @@ class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mode
 		return false
 	}
 
-	visitOneHasOneInversed(entity: Model.Entity, relation: Model.OneHasOneInversedRelation): boolean {
+	visitOneHasOneInverse(entity: Model.Entity, relation: Model.OneHasOneInverseRelation): boolean {
 		return !relation.nullable
 	}
 
-	visitOneHasOneOwner(entity: Model.Entity, relation: Model.OneHasOneOwnerRelation): boolean {
+	visitOneHasOneOwning(entity: Model.Entity, relation: Model.OneHasOneOwningRelation): boolean {
 		return !relation.nullable
 	}
 }

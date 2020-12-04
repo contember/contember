@@ -5,7 +5,7 @@ import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
-test('insert setting with site (one has one inversed relation)', async () => {
+test('insert setting with site (one has one inverse relation)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
 			.entity('Site', entity =>

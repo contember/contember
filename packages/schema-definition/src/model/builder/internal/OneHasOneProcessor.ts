@@ -1,7 +1,7 @@
 import OneHasOneBuilder from '../OneHasOneBuilder'
 import FieldProcessor from './FieldProcessor'
 import { Model } from '@contember/schema'
-import NamingConventions from '../NamingConventions'
+import NamingConventions from '../../definition/NamingConventions'
 
 export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuilder.Options> {
 	private conventions: NamingConventions
@@ -20,7 +20,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 		if (options.inversedBy) {
 			registerField(
 				options.target,
-				this.createOneHasOneInversed(
+				this.createOneHasOneInverse(
 					options as OneHasOneBuilder.Options & { inversedBy: string },
 					entityName,
 					fieldName,
@@ -29,21 +29,21 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 		}
 	}
 
-	private createOneHasOneInversed(
+	private createOneHasOneInverse(
 		options: OneHasOneBuilder.Options & { inversedBy: string },
 		entityName: string,
 		fieldName: string,
-	): Model.OneHasOneInversedRelation {
+	): Model.OneHasOneInverseRelation {
 		return {
 			name: options.inversedBy,
 			ownedBy: fieldName,
 			target: entityName,
 			type: Model.RelationType.OneHasOne,
-			nullable: options.inversedNullable === undefined ? true : options.inversedNullable,
+			nullable: options.inverseNullable === undefined ? true : options.inverseNullable,
 		}
 	}
 
-	private createOneHasOneOwner(options: OneHasOneBuilder.Options, fieldName: string): Model.OneHasOneOwnerRelation {
+	private createOneHasOneOwner(options: OneHasOneBuilder.Options, fieldName: string): Model.OneHasOneOwningRelation {
 		const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
 
 		return {
@@ -56,6 +56,7 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 				columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
+			...(options.orphanRemoval ? { orphanRemoval: true } : {}),
 		}
 	}
 }

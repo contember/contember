@@ -4,38 +4,32 @@ import { Connection } from '../../client'
 import { toFqnWrap } from '../utils'
 
 class Returning {
-	constructor(private readonly column: QueryBuilder.ColumnIdentifier | Literal | null = null) {}
+	constructor(private readonly columns: (QueryBuilder.ColumnIdentifier | Literal)[] = []) {}
 
 	public compile(): Literal {
-		if (this.column === null) {
+		if (this.columns.length === 0) {
 			return new Literal('')
 		}
-		if (this.column instanceof Literal) {
-			return new Literal(' returning ').append(this.column)
-		}
-		return new Literal(' returning ' + toFqnWrap(this.column))
+		const columns = this.columns.map(it => (it instanceof Literal ? it : new Literal(toFqnWrap(it))))
+		return new Literal(' returning ').appendAll(columns, ', ')
 	}
 
 	public parseResponse<ProcessedResult extends number | Returning.Result[]>(
 		result: Connection.Result,
 	): ProcessedResult {
-		const returningColumn = this.column
-		if (returningColumn) {
-			return (typeof returningColumn === 'string'
-				? result.rows.map(it => it[returningColumn])
-				: result.rows) as ProcessedResult
-		} else {
+		if (this.columns.length === 0) {
 			return result.rowCount as ProcessedResult
 		}
+		return result.rows as ProcessedResult
 	}
 }
 
 namespace Returning {
 	export interface Aware {
-		returning(column: QueryBuilder.ColumnIdentifier | Literal): any
+		returning(...columns: ReturningColumn[]): any
 	}
-
-	export type Result = number | string
+	export type Result = Record<string, any>
+	export type ReturningColumn = QueryBuilder.ColumnIdentifier | Literal
 }
 
 export { Returning }

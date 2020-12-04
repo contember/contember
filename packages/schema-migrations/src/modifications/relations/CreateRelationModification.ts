@@ -44,7 +44,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 				builder.addIndex(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasMany: () => {},
-			visitOneHasOneOwner: ({}, relation, {}, _) => {
+			visitOneHasOneOwning: ({}, relation, {}, _) => {
 				builder.addColumn(entity.tableName, {
 					[relation.joiningColumn.columnName]: {
 						type: getPrimaryType(targetEntity),
@@ -71,8 +71,8 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 					deferred: false,
 				})
 			},
-			visitOneHasOneInversed: () => {},
-			visitManyHasManyOwner: ({}, relation, {}, _) => {
+			visitOneHasOneInverse: () => {},
+			visitManyHasManyOwning: ({}, relation, {}, _) => {
 				const primaryColumns = [
 					relation.joiningTable.joiningColumn.columnName,
 					relation.joiningTable.inverseJoiningColumn.columnName,
@@ -102,7 +102,7 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 				createEventTrigger(builder, relation.joiningTable.tableName, primaryColumns)
 				createEventStatementTrigger(builder, relation.joiningTable.tableName)
 			},
-			visitManyHasManyInversed: () => {},
+			visitManyHasManyInverse: () => {},
 		})
 	}
 
@@ -134,8 +134,8 @@ namespace CreateRelationModification {
 
 	export interface Data {
 		entityName: string
-		owningSide: Model.AnyRelation & Model.OwnerRelation
-		inverseSide?: Model.AnyRelation & Model.InversedRelation
+		owningSide: Model.AnyRelation & Model.OwningRelation
+		inverseSide?: Model.AnyRelation & Model.InverseRelation
 	}
 }
 

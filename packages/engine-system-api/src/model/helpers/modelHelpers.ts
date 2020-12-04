@@ -5,15 +5,15 @@ export const getJunctionTables = (model: Model.Schema): Model.JoiningTable[] => 
 	const tables: Model.JoiningTable[] = []
 	Object.values(model.entities).forEach(entity => {
 		acceptEveryFieldVisitor(model, entity, {
-			visitManyHasManyOwner: ({}, relation) => {
+			visitManyHasManyOwning: ({}, relation) => {
 				tables.push(relation.joiningTable)
 			},
 			visitColumn: () => {},
-			visitManyHasManyInversed: () => {},
+			visitManyHasManyInverse: () => {},
 			visitOneHasMany: () => {},
 			visitManyHasOne: () => {},
-			visitOneHasOneOwner: () => {},
-			visitOneHasOneInversed: () => {},
+			visitOneHasOneOwning: () => {},
+			visitOneHasOneInverse: () => {},
 		})
 	})
 	return tables

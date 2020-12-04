@@ -45,16 +45,16 @@ export class ContentSchemaFactory {
 			}
 		}
 		const additionalInfo = acceptEveryFieldVisitor<AdditionalFieldInfo>(this.model, entityName, {
-			visitManyHasManyInversed(entity: Model.Entity, relation: Model.ManyHasManyInversedRelation) {
+			visitManyHasManyInverse(entity: Model.Entity, relation: Model.ManyHasManyInverseRelation) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
-					side: ContentSchema._RelationSide.Inversed,
+					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
 			},
-			visitManyHasManyOwner(entity: Model.Entity, relation: Model.ManyHasManyOwnerRelation) {
+			visitManyHasManyOwning(entity: Model.Entity, relation: Model.ManyHasManyOwningRelation) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -77,21 +77,21 @@ export class ContentSchemaFactory {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
-					side: ContentSchema._RelationSide.Inversed,
+					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					orderBy: relation.orderBy?.map(convertOrderBy),
 				}
 			},
-			visitOneHasOneInversed(entity: Model.Entity, relation: Model.OneHasOneInversedRelation) {
+			visitOneHasOneInverse(entity: Model.Entity, relation: Model.OneHasOneInverseRelation) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
-					side: ContentSchema._RelationSide.Inversed,
+					side: ContentSchema._RelationSide.Inverse,
 					ownedBy: relation.ownedBy,
 					nullable: relation.nullable,
 				}
 			},
-			visitOneHasOneOwner(entity: Model.Entity, relation: Model.OneHasOneOwnerRelation) {
+			visitOneHasOneOwning(entity: Model.Entity, relation: Model.OneHasOneOwningRelation) {
 				return {
 					__typename: '_Relation',
 					targetEntity: relation.target,
@@ -99,6 +99,7 @@ export class ContentSchemaFactory {
 					inversedBy: relation.inversedBy,
 					onDelete: convertOnDelete(relation.joiningColumn.onDelete),
 					nullable: relation.nullable,
+					orphanRemoval: relation.orphanRemoval === true,
 				}
 			},
 			visitColumn(entity: Model.Entity, column: Model.AnyColumn) {

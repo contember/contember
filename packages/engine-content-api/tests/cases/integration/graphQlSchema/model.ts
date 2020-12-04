@@ -28,5 +28,5 @@ export class PostLocale {
 export class Category {
 	name = d.stringColumn().unique()
 
-	posts: d.ManyHasManyInversedDefinition = d.manyHasManyInversed(Post, 'categories')
+	posts: d.ManyHasManyInverseDefinition = d.manyHasManyInverse(Post, 'categories')
 }

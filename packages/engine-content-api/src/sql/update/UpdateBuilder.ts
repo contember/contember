@@ -75,10 +75,10 @@ export default class UpdateBuilder {
 						acceptEveryFieldVisitor(this.schema, this.entity, {
 							visitColumn: (entity, column) => column.columnName,
 							visitManyHasOne: (entity, relation) => relation.joiningColumn.columnName,
-							visitOneHasOneOwner: (entity, relation) => relation.joiningColumn.columnName,
-							visitManyHasManyInversed: () => null,
-							visitManyHasManyOwner: () => null,
-							visitOneHasOneInversed: () => null,
+							visitOneHasOneOwning: (entity, relation) => relation.joiningColumn.columnName,
+							visitManyHasManyInverse: () => null,
+							visitManyHasManyOwning: () => null,
+							visitOneHasOneInverse: () => null,
 							visitOneHasMany: () => null,
 						}),
 					).filter((it): it is string => it !== null)

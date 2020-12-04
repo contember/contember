@@ -20,10 +20,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		return []
 	}
 
-	manyHasManyInversed: UpdateInputProcessor.HasManyRelationInputProcessor<
-		Context.ManyHasManyInversedContext,
-		Result
-	> = {
+	manyHasManyInverse: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyInverseContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate({ ...ctx, input: ctx.input.data }),
 		upsert: ctx => this.processUpsert(ctx),
@@ -31,7 +28,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		disconnect: NoResult,
 		['delete']: NoResult,
 	}
-	manyHasManyOwner: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyOwnerContext, Result> = {
+	manyHasManyOwning: UpdateInputProcessor.HasManyRelationInputProcessor<Context.ManyHasManyOwningContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate({ ...ctx, input: ctx.input.data }),
 		upsert: ctx => this.processUpsert(ctx),
@@ -55,7 +52,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		disconnect: NoResult,
 		['delete']: NoResult,
 	}
-	oneHasOneInversed: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneInversedContext, Result> = {
+	oneHasOneInverse: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneInverseContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate(ctx),
 		upsert: ctx => this.processUpsert(ctx),
@@ -64,7 +61,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		['delete']: NoResult,
 	}
 
-	oneHasOneOwner: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneOwnerContext, Result> = {
+	oneHasOneOwning: UpdateInputProcessor.HasOneRelationInputProcessor<Context.OneHasOneOwningContext, Result> = {
 		create: ctx => this.processCreate(ctx),
 		update: ctx => this.processUpdate(ctx),
 		upsert: ctx => this.processUpsert(ctx),

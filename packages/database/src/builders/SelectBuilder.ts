@@ -170,7 +170,7 @@ class SelectBuilder<Result = SelectBuilder.Result>
 namespace SelectBuilder {
 	export type Callback = (qb: SelectBuilder<any>) => SelectBuilder<any>
 
-	export type Result = { [columnName: string]: any }
+	export type Result = Record<string, any>
 
 	export type Options = Readonly<
 		With.Options &

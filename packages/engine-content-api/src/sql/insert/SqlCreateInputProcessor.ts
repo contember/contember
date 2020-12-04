@@ -25,39 +25,39 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 		return []
 	}
 
-	manyHasManyInversed: CreateInputProcessor<MutationResultList>['manyHasManyInversed'] = {
+	manyHasManyInverse: CreateInputProcessor<MutationResultList>['manyHasManyInverse'] = {
 		connect: hasManyProcessor(
 			async (context): Promise<MutationResultList> => {
-				const primaryInversed = await this.insertBuilder.insert
-				if (!primaryInversed) {
+				const inversePrimary = await this.insertBuilder.insert
+				if (!inversePrimary) {
 					return []
 				}
-				const primaryOwner = await this.mapper.getPrimaryValue(context.entity, context.input)
-				if (!primaryOwner) {
+				const owningPrimary = await this.mapper.getPrimaryValue(context.entity, context.input)
+				if (!owningPrimary) {
 					return [new MutationEntryNotFoundError([], context.input)]
 				}
 				return await this.mapper.connectJunction(
 					context.targetEntity,
 					context.targetRelation,
-					primaryOwner,
-					primaryInversed,
+					owningPrimary,
+					inversePrimary,
 				)
 			},
 		),
 		create: hasOneProcessor(
 			async (context): Promise<MutationResultList> => {
-				const primaryInversed = await this.insertBuilder.insert
-				if (!primaryInversed) {
+				const inversePrimary = await this.insertBuilder.insert
+				if (!inversePrimary) {
 					return []
 				}
 				const insertResult = await this.mapper.insert(context.targetEntity, context.input)
-				const primaryOwner = getInsertPrimary(insertResult)
-				if (primaryOwner) {
+				const owningPrimary = getInsertPrimary(insertResult)
+				if (owningPrimary) {
 					const connectResult = await this.mapper.connectJunction(
 						context.targetEntity,
 						context.targetRelation,
-						primaryOwner,
-						primaryInversed,
+						owningPrimary,
+						inversePrimary,
 					)
 					return [...insertResult, ...connectResult]
 				}
@@ -66,18 +66,18 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 		),
 	}
 
-	manyHasManyOwner: CreateInputProcessor<MutationResultList>['manyHasManyOwner'] = {
+	manyHasManyOwning: CreateInputProcessor<MutationResultList>['manyHasManyOwning'] = {
 		connect: hasManyProcessor(
 			async (context): Promise<MutationResultList> => {
 				const primary = await this.insertBuilder.insert
 				if (!primary) {
 					return []
 				}
-				const primaryInversed = await this.mapper.getPrimaryValue(context.targetEntity, context.input)
-				if (!primaryInversed) {
+				const inversePrimary = await this.mapper.getPrimaryValue(context.targetEntity, context.input)
+				if (!inversePrimary) {
 					return [new MutationEntryNotFoundError([], context.input)]
 				}
-				return await this.mapper.connectJunction(context.entity, context.relation, primary, primaryInversed)
+				return await this.mapper.connectJunction(context.entity, context.relation, primary, inversePrimary)
 			},
 		),
 		create: hasManyProcessor(
@@ -87,13 +87,13 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 					return []
 				}
 				const insertResult = await this.mapper.insert(context.targetEntity, context.input)
-				const primaryInversed = getInsertPrimary(insertResult)
-				if (primaryInversed) {
+				const inversePrimary = getInsertPrimary(insertResult)
+				if (inversePrimary) {
 					const connectResult = await this.mapper.connectJunction(
 						context.entity,
 						context.relation,
 						primary,
-						primaryInversed,
+						inversePrimary,
 					)
 					return [...insertResult, ...connectResult]
 				}
@@ -169,13 +169,13 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 		),
 	}
 
-	oneHasOneOwner: CreateInputProcessor<MutationResultList>['oneHasOneOwner'] = {
+	oneHasOneOwning: CreateInputProcessor<MutationResultList>['oneHasOneOwning'] = {
 		nothing: async ctx => {
 			this.insertBuilder.addFieldValue(ctx.relation.name, null)
 			return []
 		},
 		connect: hasOneProcessor(
-			async (context: Context.OneHasOneOwnerContext & { input: Input.UniqueWhere }): Promise<MutationResultList> => {
+			async (context: Context.OneHasOneOwningContext & { input: Input.UniqueWhere }): Promise<MutationResultList> => {
 				const primaryValue = this.mapper.getPrimaryValue(context.targetEntity, context.input)
 				this.insertBuilder.addFieldValue(context.relation.name, async () => {
 					const value = await primaryValue
@@ -206,7 +206,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 		),
 	}
 
-	oneHasOneInversed: CreateInputProcessor<MutationResultList>['oneHasOneInversed'] = {
+	oneHasOneInverse: CreateInputProcessor<MutationResultList>['oneHasOneInverse'] = {
 		connect: hasOneProcessor(
 			async (context): Promise<MutationResultList> => {
 				const value = await this.insertBuilder.insert

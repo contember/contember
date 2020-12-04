@@ -39,15 +39,15 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
 			visitOneHasMany: () => {},
-			visitOneHasOneOwner: (entity, relation, {}, _) => {
+			visitOneHasOneOwning: (entity, relation, {}, _) => {
 				builder.dropConstraint(entity.tableName, NamingHelper.createUniqueConstraintName(entity.name, [relation.name]))
 				builder.dropColumn(entity.tableName, relation.joiningColumn.columnName)
 			},
-			visitOneHasOneInversed: () => {},
-			visitManyHasManyOwner: ({}, relation, {}, _) => {
+			visitOneHasOneInverse: () => {},
+			visitManyHasManyOwning: ({}, relation, {}, _) => {
 				builder.dropTable(relation.joiningTable.tableName)
 			},
-			visitManyHasManyInversed: () => {},
+			visitManyHasManyInverse: () => {},
 		})
 	}
 
@@ -61,7 +61,7 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 					const { [this.data.fieldName]: removed, ...fields } = entity.fields
 					return { ...entity, fields }
 				}),
-				isIt<Model.InversedRelation>(field, 'ownedBy')
+				isIt<Model.InverseRelation>(field, 'ownedBy')
 					? updateEntity(
 							field.target,
 							updateField<Model.AnyOwningRelation>(field.ownedBy, ({ inversedBy, ...field }) => field),

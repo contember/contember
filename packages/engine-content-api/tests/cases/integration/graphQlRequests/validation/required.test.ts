@@ -64,7 +64,7 @@ requiredValidationTest('create fails when required has-one relation is not set',
 
 	class AuthorContact {
 		email = d.stringColumn()
-		author = d.oneHasOneInversed(Author, 'contact')
+		author = d.oneHasOneInverse(Author, 'contact')
 	}
 
 	const schema = createSchema({
@@ -87,7 +87,7 @@ requiredValidationTest('create succeeds when required has-one relation is set', 
 
 	class AuthorContact {
 		email = d.stringColumn()
-		author = d.oneHasOneInversed(Author, 'contact')
+		author = d.oneHasOneInverse(Author, 'contact')
 	}
 
 	const schema = createSchema({
@@ -163,7 +163,7 @@ requiredValidationTest('update succeeds when required has-one relation is not se
 
 	class AuthorContact {
 		email = d.stringColumn()
-		author = d.oneHasOneInversed(Author, 'contact')
+		author = d.oneHasOneInverse(Author, 'contact')
 	}
 
 	const schema = createSchema({
@@ -187,7 +187,7 @@ requiredValidationTest('update succeeds when required has-one relation is set', 
 
 	class AuthorContact {
 		email = d.stringColumn()
-		author = d.oneHasOneInversed(Author, 'contact')
+		author = d.oneHasOneInverse(Author, 'contact')
 	}
 
 	const schema = createSchema({

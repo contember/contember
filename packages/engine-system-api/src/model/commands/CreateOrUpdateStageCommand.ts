@@ -26,6 +26,6 @@ export class CreateOrUpdateStageCommand implements Command<boolean> {
 
 		await db.query('CREATE SCHEMA IF NOT EXISTS ' + wrapIdentifier(formatSchemaName(this.stage)))
 
-		return result.length === 1 && result[0] === eventId
+		return result.length === 1 && result[0].event_id === eventId
 	}
 }

@@ -75,22 +75,22 @@ class UpdateFieldNameModification implements Modification<UpdateFieldNameModific
 							? { ...relation, ownedBy: this.data.newFieldName }
 							: relation
 					},
-					visitOneHasOneOwner: (entity, relation, targetEntity, targetRelation) => {
+					visitOneHasOneOwning: (entity, relation, targetEntity, targetRelation) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, inversedBy: this.data.newFieldName }
 							: relation
 					},
-					visitOneHasOneInversed: (entity, relation, targetEntity, targetRelation) => {
+					visitOneHasOneInverse: (entity, relation, targetEntity, targetRelation) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, ownedBy: this.data.newFieldName }
 							: relation
 					},
-					visitManyHasManyOwner: (entity, relation, targetEntity, targetRelation) => {
+					visitManyHasManyOwning: (entity, relation, targetEntity, targetRelation) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, inversedBy: this.data.newFieldName }
 							: relation
 					},
-					visitManyHasManyInversed: (entity, relation, targetEntity, targetRelation) => {
+					visitManyHasManyInverse: (entity, relation, targetEntity, targetRelation) => {
 						return isUpdatedRelation(targetEntity, targetRelation)
 							? { ...relation, ownedBy: this.data.newFieldName }
 							: relation

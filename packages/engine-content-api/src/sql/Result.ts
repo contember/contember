@@ -88,9 +88,9 @@ export class MutationJunctionUpdateOk implements MutationResultInterface {
 	constructor(
 		public readonly path: Path,
 		public readonly entity: Model.Entity,
-		public readonly relation: Model.ManyHasManyOwnerRelation,
-		public readonly ownerUnique: Input.PrimaryValue,
-		public readonly inversedUnique: Input.PrimaryValue,
+		public readonly relation: Model.ManyHasManyOwningRelation,
+		public readonly owningUnique: Input.PrimaryValue,
+		public readonly inverseUnique: Input.PrimaryValue,
 	) {}
 }
 

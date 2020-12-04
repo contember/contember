@@ -16,7 +16,8 @@ import {
 } from '../Result'
 import Mapper from '../Mapper'
 
-type EntityRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwnerRelation]
+type EntityOwningRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwningRelation]
+type OneHasOneOwningRelationTuple = [Model.Entity, Model.OneHasOneOwningRelation]
 
 export class DeleteExecutor {
 	constructor(
@@ -47,7 +48,6 @@ export class DeleteExecutor {
 		if (result.length === 0) {
 			return [new MutationNoResultError([])]
 		}
-		await this.executeCascade(db, entity, result)
 
 		try {
 			await db.query('SET CONSTRAINTS ALL IMMEDIATE')
@@ -61,30 +61,6 @@ export class DeleteExecutor {
 		}
 	}
 
-	private async executeCascade(db: Client, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
-		const owningRelations = this.findOwningRelations(entity)
-		await Promise.all(
-			owningRelations.map(async ([owningEntity, relation]) => {
-				const relationWhere: Input.Where = { [relation.name]: { [entity.primary]: { in: values } } }
-				switch (relation.joiningColumn.onDelete) {
-					case Model.OnDelete.restrict:
-						break
-					case Model.OnDelete.cascade:
-						const result = await this.delete(db, owningEntity, relationWhere)
-						if (result.length > 0) {
-							await this.executeCascade(db, owningEntity, result)
-						}
-						break
-					case Model.OnDelete.setNull:
-						await this.setNull(db, owningEntity, relation, relationWhere)
-						break
-					default:
-						assertNever(relation.joiningColumn.onDelete)
-				}
-			}),
-		)
-	}
-
 	private async delete(db: Client, entity: Model.Entity, where: Input.Where): Promise<string[]> {
 		const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
 		const inQb = SelectBuilder.create() //
@@ -93,13 +69,45 @@ export class DeleteExecutor {
 		const inQbWithWhere = this.whereBuilder.build(inQb, entity, this.pathFactory.create([]), {
 			and: [where, predicate],
 		})
-
+		const orphanRemovals = this.findRelationsWithOrphanRemoval(entity)
+		const orphanColumns = orphanRemovals.map(([, rel]) => rel.joiningColumn.columnName)
 		const qb = DeleteBuilder.create()
 			.from(entity.tableName)
 			.where(condition => condition.in(entity.primaryColumn, inQbWithWhere))
-			.returning(entity.primaryColumn)
+			.returning(entity.primaryColumn, ...orphanColumns)
+		const result = await qb.execute(db)
+		const ids = result.map(it => it[entity.primaryColumn]) as string[]
+		await this.executeOnDelete(db, entity, ids)
 
-		return (await qb.execute(db)) as string[]
+		for (const [entity, relation] of orphanRemovals) {
+			const ids = result.map(it => it[relation.joiningColumn.columnName]).filter(it => it !== null)
+			const where: Input.Where = { [entity.primary]: { in: ids } }
+			await this.delete(db, entity, where)
+		}
+
+		return ids as string[]
+	}
+
+	private async executeOnDelete(db: Client, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
+		if (values.length === 0) {
+			return
+		}
+		const owningRelations = this.findOwningRelations(entity)
+		for (const [owningEntity, relation] of owningRelations) {
+			const relationWhere: Input.Where = { [relation.name]: { [entity.primary]: { in: values } } }
+			switch (relation.joiningColumn.onDelete) {
+				case Model.OnDelete.restrict:
+					break
+				case Model.OnDelete.cascade:
+					await this.delete(db, owningEntity, relationWhere)
+					break
+				case Model.OnDelete.setNull:
+					await this.setNull(db, owningEntity, relation, relationWhere)
+					break
+				default:
+					assertNever(relation.joiningColumn.onDelete)
+			}
+		}
 	}
 
 	private async setNull(
@@ -116,26 +124,43 @@ export class DeleteExecutor {
 		await updateBuilder.execute(db)
 	}
 
-	private findOwningRelations(entity: Model.Entity): EntityRelationTuple[] {
+	private findOwningRelations(entity: Model.Entity): EntityOwningRelationTuple[] {
 		return Object.values(this.schema.entities)
 			.map(entity =>
-				acceptEveryFieldVisitor<null | EntityRelationTuple>(this.schema, entity, {
+				acceptEveryFieldVisitor<null | EntityOwningRelationTuple>(this.schema, entity, {
 					visitColumn: () => null,
-					visitManyHasManyInversed: () => null,
-					visitManyHasManyOwner: () => null,
-					visitOneHasOneInversed: () => null,
+					visitManyHasManyInverse: () => null,
+					visitManyHasManyOwning: () => null,
+					visitOneHasOneInverse: () => null,
 					visitOneHasMany: () => null,
-					visitOneHasOneOwner: ({}, relation): EntityRelationTuple => [entity, relation],
-					visitManyHasOne: ({}, relation): EntityRelationTuple => [entity, relation],
+					visitOneHasOneOwning: ({}, relation): EntityOwningRelationTuple => [entity, relation],
+					visitManyHasOne: ({}, relation): EntityOwningRelationTuple => [entity, relation],
 				}),
 			)
-			.reduce<EntityRelationTuple[]>(
+			.reduce<EntityOwningRelationTuple[]>(
 				(acc, value) => [
 					...acc,
-					...Object.values(value).filter<EntityRelationTuple>((it): it is EntityRelationTuple => it !== null),
+					...Object.values(value).filter<EntityOwningRelationTuple>(
+						(it): it is EntityOwningRelationTuple => it !== null,
+					),
 				],
 				[],
 			)
 			.filter(([{}, relation]) => relation.target === entity.name)
+	}
+
+	private findRelationsWithOrphanRemoval(entity: Model.Entity): OneHasOneOwningRelationTuple[] {
+		return Object.values(
+			acceptEveryFieldVisitor<OneHasOneOwningRelationTuple | null>(this.schema, entity, {
+				visitColumn: () => null,
+				visitManyHasManyInverse: () => null,
+				visitManyHasManyOwning: () => null,
+				visitOneHasOneInverse: () => null,
+				visitOneHasMany: () => null,
+				visitOneHasOneOwning: ({}, relation, targetEntity) =>
+					relation.orphanRemoval ? [targetEntity, relation] : null,
+				visitManyHasOne: () => null,
+			}),
+		).filter((it): it is OneHasOneOwningRelationTuple => it !== null)
 	}
 }

@@ -16,7 +16,7 @@ export class AuthorContact {
 		'E-mail is invalid',
 	)
 	email = d.stringColumn()
-	author = d.oneHasOneInversed(Author, 'contact')
+	author = d.oneHasOneInverse(Author, 'contact')
 }
 
 export class Post {
@@ -34,7 +34,7 @@ export class Post {
 export class Tag {
 	@v.required('Tag label is required')
 	label = d.stringColumn()
-	posts = d.manyHasManyInversed(Post, 'tags')
+	posts = d.manyHasManyInverse(Post, 'tags')
 }
 
 export class Entry {

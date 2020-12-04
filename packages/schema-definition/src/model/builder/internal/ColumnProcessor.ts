@@ -1,6 +1,6 @@
 import FieldProcessor from './FieldProcessor'
 import ColumnBuilder from '../ColumnBuilder'
-import NamingConventions from '../NamingConventions'
+import NamingConventions from '../../definition/NamingConventions'
 import { Model } from '@contember/schema'
 
 export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Options> {

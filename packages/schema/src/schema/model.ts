@@ -121,32 +121,32 @@ namespace Model {
 			targetRelation: ManyHasOneRelation,
 		): T
 
-		visitOneHasOneOwner(
+		visitOneHasOneOwning(
 			entity: Entity,
-			relation: OneHasOneOwnerRelation,
+			relation: OneHasOneOwningRelation,
 			targetEntity: Entity,
-			targetRelation: OneHasOneInversedRelation | null,
+			targetRelation: OneHasOneInverseRelation | null,
 		): T
 
-		visitOneHasOneInversed(
+		visitOneHasOneInverse(
 			entity: Entity,
-			relation: OneHasOneInversedRelation,
+			relation: OneHasOneInverseRelation,
 			targetEntity: Entity,
-			targetRelation: OneHasOneOwnerRelation,
+			targetRelation: OneHasOneOwningRelation,
 		): T
 
-		visitManyHasManyOwner(
+		visitManyHasManyOwning(
 			entity: Entity,
-			relation: ManyHasManyOwnerRelation,
+			relation: ManyHasManyOwningRelation,
 			targetEntity: Entity,
-			targetRelation: ManyHasManyInversedRelation | null,
+			targetRelation: ManyHasManyInverseRelation | null,
 		): T
 
-		visitManyHasManyInversed(
+		visitManyHasManyInverse(
 			entity: Entity,
-			relation: ManyHasManyInversedRelation,
+			relation: ManyHasManyInverseRelation,
 			targetEntity: Entity,
-			targetRelation: ManyHasManyOwnerRelation,
+			targetRelation: ManyHasManyOwningRelation,
 		): T
 	}
 
@@ -168,11 +168,14 @@ namespace Model {
 		ManyHasMany = 'ManyHasMany',
 	}
 
-	export type AnyInversedRelation = OneHasManyRelation | OneHasOneInversedRelation | ManyHasManyInversedRelation
+	export type AnyInverseRelation = OneHasManyRelation | OneHasOneInverseRelation | ManyHasManyInverseRelation
 
-	export type AnyOwningRelation = ManyHasOneRelation | OneHasOneOwnerRelation | ManyHasManyOwnerRelation
+	/** @deprecated */
+	export type AnyInversedRelation = AnyInverseRelation
 
-	export type AnyRelation = AnyInversedRelation | AnyOwningRelation
+	export type AnyOwningRelation = ManyHasOneRelation | OneHasOneOwningRelation | ManyHasManyOwningRelation
+
+	export type AnyRelation = AnyInverseRelation | AnyOwningRelation
 
 	export interface Relation<T extends RelationType = RelationType> extends Field<T> {
 		name: string
@@ -180,13 +183,19 @@ namespace Model {
 		target: string
 	}
 
-	export interface InversedRelation extends Relation {
+	export interface InverseRelation extends Relation {
 		ownedBy: string
 	}
 
-	export interface OwnerRelation extends Relation {
+	/** @deprecated */
+	export interface InversedRelation extends InverseRelation {}
+
+	export interface OwningRelation extends Relation {
 		inversedBy?: string
 	}
+
+	/** @deprecated */
+	export interface OwnerRelation extends OwningRelation {}
 
 	export enum OnDelete {
 		cascade = 'cascade',
@@ -224,21 +233,31 @@ namespace Model {
 		orderBy?: OrderBy[]
 	}
 
-	export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InversedRelation & OrderableRelation
+	export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InverseRelation & OrderableRelation
 	export type ManyHasOneRelation = Relation<RelationType.ManyHasOne> &
-		OwnerRelation &
+		OwningRelation &
 		JoiningColumnRelation &
 		NullableRelation
-	export type OneHasOneInversedRelation = Relation<RelationType.OneHasOne> & InversedRelation & NullableRelation
-	export type OneHasOneOwnerRelation = Relation<RelationType.OneHasOne> &
-		OwnerRelation &
+	export type OneHasOneInverseRelation = Relation<RelationType.OneHasOne> & InverseRelation & NullableRelation
+	/** @deprecated */
+	export type OneHasOneInversedRelation = OneHasOneInverseRelation
+	export type OneHasOneOwningRelation = Relation<RelationType.OneHasOne> &
+		OwningRelation &
 		JoiningColumnRelation &
-		NullableRelation
-	export type ManyHasManyInversedRelation = Relation<RelationType.ManyHasMany> & InversedRelation & OrderableRelation
-	export type ManyHasManyOwnerRelation = Relation<RelationType.ManyHasMany> &
-		OwnerRelation &
+		NullableRelation & {
+			orphanRemoval?: true
+		}
+	/** @deprecated */
+	export type OneHasOneOwnerRelation = OneHasOneOwningRelation
+	export type ManyHasManyInverseRelation = Relation<RelationType.ManyHasMany> & InverseRelation & OrderableRelation
+	/** @deprecated */
+	export type ManyHasManyInversedRelation = ManyHasManyInverseRelation
+	export type ManyHasManyOwningRelation = Relation<RelationType.ManyHasMany> &
+		OwningRelation &
 		JoiningTableRelation &
 		OrderableRelation
+
+	export type ManyHasManyOwnerRelation = ManyHasManyOwningRelation
 
 	export interface Schema {
 		enums: { [name: string]: string[] }

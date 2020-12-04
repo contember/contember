@@ -14,7 +14,7 @@ class CreateRelationInverseSideModification implements Modification<CreateRelati
 			updateEntity(this.data.entityName, addField(this.data.relation)),
 			updateEntity(
 				this.data.relation.target,
-				updateField<Model.AnyRelation & Model.OwnerRelation>(this.data.relation.ownedBy, field => ({
+				updateField<Model.AnyRelation & Model.OwningRelation>(this.data.relation.ownedBy, field => ({
 					...field,
 					inversedBy: this.data.relation.name,
 				})),
@@ -36,7 +36,7 @@ namespace CreateRelationInverseSideModification {
 
 	export interface Data {
 		entityName: string
-		relation: Model.AnyRelation & Model.InversedRelation
+		relation: Model.AnyRelation & Model.InverseRelation
 	}
 }
 

@@ -43,7 +43,10 @@ export const createMembershipValidationErrorResult = <Code>(
 	return [
 		{
 			code: (MembershipErrorCode.InvalidMembership as unknown) as Code,
-			developerMessage: legacyErrors.map(it => it.developerMessage).join('. '),
+			developerMessage:
+				'Provided membership is invalid: ' +
+				legacyErrors.map(it => it.developerMessage).join('. ') +
+				'. You can also check membershipValidation field for structured details.',
 			membershipValidation: result.map(it => {
 				switch (it.error) {
 					case MembershipValidationErrorType.ROLE_NOT_FOUND:

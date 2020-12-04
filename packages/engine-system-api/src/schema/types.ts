@@ -89,7 +89,7 @@ export enum HistoryErrorCode {
 export type HistoryError = {
 	readonly __typename?: 'HistoryError'
 	readonly code: HistoryErrorCode
-	readonly message?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
 }
 
 export type HistoryResponse = {
@@ -187,7 +187,7 @@ export enum DiffErrorCode {
 export type DiffError = {
 	readonly __typename?: 'DiffError'
 	readonly code: DiffErrorCode
-	readonly message?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
 }
 
 export type DiffResponse = {
@@ -235,7 +235,7 @@ export type MigrateError = {
 	readonly __typename?: 'MigrateError'
 	readonly code: MigrateErrorCode
 	readonly migration: Scalars['String']
-	readonly message: Scalars['String']
+	readonly developerMessage: Scalars['String']
 }
 
 export type MigrateResponse = {
@@ -249,7 +249,7 @@ export type MigrateResponse = {
 
 export type MigrateResult = {
 	readonly __typename?: 'MigrateResult'
-	readonly message: Scalars['String']
+	readonly developerMessage: Scalars['String']
 }
 
 export enum ReleaseErrorCode {
@@ -262,7 +262,7 @@ export enum ReleaseErrorCode {
 export type ReleaseError = {
 	readonly __typename?: 'ReleaseError'
 	readonly code: ReleaseErrorCode
-	readonly message?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
 }
 
 export type ReleaseResponse = {
@@ -284,7 +284,7 @@ export enum ReleaseTreeErrorCode {
 export type ReleaseTreeError = {
 	readonly __typename?: 'ReleaseTreeError'
 	readonly code: ReleaseTreeErrorCode
-	readonly message?: Maybe<Scalars['String']>
+	readonly developerMessage?: Maybe<Scalars['String']>
 }
 
 export type ReleaseTreeResponse = {
@@ -606,7 +606,7 @@ export type HistoryErrorResolvers<
 	ParentType extends ResolversParentTypes['HistoryError'] = ResolversParentTypes['HistoryError']
 > = {
 	code?: Resolver<ResolversTypes['HistoryErrorCode'], ParentType, ContextType>
-	message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -718,7 +718,7 @@ export type DiffErrorResolvers<
 	ParentType extends ResolversParentTypes['DiffError'] = ResolversParentTypes['DiffError']
 > = {
 	code?: Resolver<ResolversTypes['DiffErrorCode'], ParentType, ContextType>
-	message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -762,7 +762,7 @@ export type MigrateErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['MigrateErrorCode'], ParentType, ContextType>
 	migration?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	message?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -781,7 +781,7 @@ export type MigrateResultResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['MigrateResult'] = ResolversParentTypes['MigrateResult']
 > = {
-	message?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -790,7 +790,7 @@ export type ReleaseErrorResolvers<
 	ParentType extends ResolversParentTypes['ReleaseError'] = ResolversParentTypes['ReleaseError']
 > = {
 	code?: Resolver<ResolversTypes['ReleaseErrorCode'], ParentType, ContextType>
-	message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -809,7 +809,7 @@ export type ReleaseTreeErrorResolvers<
 	ParentType extends ResolversParentTypes['ReleaseTreeError'] = ResolversParentTypes['ReleaseTreeError']
 > = {
 	code?: Resolver<ResolversTypes['ReleaseTreeErrorCode'], ParentType, ContextType>
-	message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	developerMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

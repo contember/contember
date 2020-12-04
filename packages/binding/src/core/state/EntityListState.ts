@@ -26,7 +26,7 @@ export interface EntityListState {
 	hasStaleAccessor: boolean
 	markersContainer: EntityFieldMarkersContainer
 	persistedEntityIds: Set<string>
-	plannedRemovals: Map<EntityState, RemovalType> | undefined
+	plannedRemovals: Map<EntityState | EntityStateStub, RemovalType> | undefined
 
 	onChildUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
 	onSelfUpdate: OnEntityListUpdate // To be called by this entity list to inform the parent entity

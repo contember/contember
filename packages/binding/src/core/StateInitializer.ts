@@ -282,22 +282,26 @@ export class StateInitializer {
 						for (const hasOneMarker of hasOneMarkers) {
 							const previouslyConnectedState = entityState.children.get(hasOneMarker.placeholderName)
 
-							if (previouslyConnectedState === undefined || previouslyConnectedState.type !== StateType.Entity) {
+							if (
+								previouslyConnectedState === undefined ||
+								previouslyConnectedState.type === StateType.Field ||
+								previouslyConnectedState.type === StateType.EntityList
+							) {
 								this.rejectInvalidAccessorTree()
 							}
 
-							const [connectedEntityKey, newlyConnectedState] = this.resolveAndPrepareEntityToConnect(
+							const [entityToConnectKey, stateToConnect] = this.resolveAndPrepareEntityToConnect(
 								entityToConnectOrItsKey,
 							)
 
-							if (previouslyConnectedState === newlyConnectedState) {
+							if (previouslyConnectedState === stateToConnect) {
 								return // Do nothing.
 							}
 							// TODO remove from planned deletions if appropriate
 
 							const persistedKey = entityState.persistedData?.get(hasOneMarker.placeholderName)
 							if (persistedKey instanceof ServerGeneratedUuid) {
-								if (persistedKey.value === connectedEntityKey) {
+								if (persistedKey.value === entityToConnectKey) {
 									this.dirtinessTracker.decrement() // It was removed from the list but now we're adding it back.
 								} else if (persistedKey.value === previouslyConnectedState.id.value) {
 									this.dirtinessTracker.increment() // We're changing it from the persisted id.
@@ -318,7 +322,7 @@ export class StateInitializer {
 
 							// TODO do something about the existing state…
 
-							this.addEntityRealm(newlyConnectedState, {
+							this.addEntityRealm(stateToConnect, {
 								creationParameters: hasOneMarker.relation,
 								environment: hasOneMarker.environment,
 								initialEventListeners: hasOneMarker.relation,
@@ -326,7 +330,7 @@ export class StateInitializer {
 								parent: entityState,
 								realmKey: hasOneMarker.placeholderName,
 							})
-							entityState.children.set(hasOneMarker.placeholderName, newlyConnectedState)
+							entityState.children.set(hasOneMarker.placeholderName, stateToConnect)
 							entityState.hasStaleAccessor = true
 							entityState.hasPendingParentNotification = true
 						}
@@ -650,14 +654,9 @@ export class StateInitializer {
 						const disconnectedChildKey =
 							typeof childEntityOrItsKey === 'string' ? childEntityOrItsKey : childEntityOrItsKey.key
 
-						const disconnectedChildState = this.treeStore.entityStore.get(disconnectedChildKey)
-						if (disconnectedChildState === undefined) {
-							throw new BindingError(
-								`EntityListAccessor: Cannot remove entity with key '${disconnectedChildKey}' as it doesn't exist.`,
-							)
-						}
+						const disconnectedChildState = entityListState.children.get(disconnectedChildKey)
 
-						if (!entityListState.children.has(disconnectedChildKey)) {
+						if (disconnectedChildState === undefined) {
 							throw new BindingError(
 								`Entity list doesn't include an entity with key '${disconnectedChildKey}' and so it cannot remove it.`,
 							)
@@ -1182,10 +1181,10 @@ export class StateInitializer {
 	}
 
 	private resolveAndPrepareEntityToConnect(entityToConnectOrItsKey: string | EntityAccessor): [string, EntityState] {
-		let connectedEntityKey: string
+		let entityToConnectKey: string
 
 		if (typeof entityToConnectOrItsKey === 'string') {
-			connectedEntityKey = entityToConnectOrItsKey
+			entityToConnectKey = entityToConnectOrItsKey
 		} else {
 			// TODO This is commented out for now in order to at least somewhat mitigate the limitations of dealing with
 			//		inverse relations. However, once that has been addressed systemically, this code needs to be re-enabled.
@@ -1195,20 +1194,20 @@ export class StateInitializer {
 			// 			`doesn't exist on server. That is currently impossible.`, // At least for now.
 			// 	)
 			// }
-			connectedEntityKey = entityToConnectOrItsKey.key
+			entityToConnectKey = entityToConnectOrItsKey.key
 		}
 
-		const connectedState = this.treeStore.entityStore.get(connectedEntityKey)
-		if (connectedState === undefined) {
-			throw new BindingError(`Attempting to connect an entity with key '${connectedEntityKey}' but it doesn't exist.`)
+		const stateToConnect = this.treeStore.entityStore.get(entityToConnectKey)
+		if (stateToConnect === undefined) {
+			throw new BindingError(`Attempting to connect an entity with key '${entityToConnectKey}' but it doesn't exist.`)
 		}
-		if (connectedState.isScheduledForDeletion) {
+		if (stateToConnect.isScheduledForDeletion) {
 			// As far as the other realms are concerned, this entity is deleted. We don't want to just make it re-appear
 			// for them just because some other random relation decided to connect it.
-			connectedState.realms.clear()
-			connectedState.isScheduledForDeletion = false
+			stateToConnect.realms.clear()
+			stateToConnect.isScheduledForDeletion = false
 		}
 
-		return [connectedEntityKey, connectedState]
+		return [entityToConnectKey, stateToConnect]
 	}
 }

@@ -166,6 +166,7 @@ export class AccessorErrorManager {
 
 		for (const [childKey, childError] of errors.children) {
 			const childState = this.treeStore.entityStore.get(childKey)
+			// TODO this will fail when the error points to an entity stub since stubs aren't present in the entity store.
 
 			if (childState && childError.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
 				state.childrenWithPendingUpdates.add(childState)

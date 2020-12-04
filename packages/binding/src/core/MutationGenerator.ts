@@ -16,7 +16,7 @@ import { TreeStore } from './TreeStore'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
-type ProcessedEntities = Set<EntityState>
+type ProcessedEntities = Set<EntityState | EntityStateStub>
 
 // TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
@@ -52,7 +52,7 @@ export class MutationGenerator {
 		if (rootState.type === StateType.Entity) {
 			if (rootState.isScheduledForDeletion) {
 				queryBuilder = this.addDeleteMutation(processedEntities, rootState, alias, parameters, queryBuilder)
-			} else if (!rootState.getAccessor().existsOnServer) {
+			} else if (!rootState.id.existsOnServer) {
 				queryBuilder = this.addCreateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			} else {
 				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
@@ -94,14 +94,11 @@ export class MutationGenerator {
 
 	private addDeleteMutation(
 		processedEntities: ProcessedEntities,
-		entityState: EntityState,
+		entityState: EntityState | EntityStateStub,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
-		queryBuilder?: QueryBuilder,
+		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (!queryBuilder) {
-			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
-		}
 		if (processedEntities.has(entityState)) {
 			return queryBuilder
 		}
@@ -118,7 +115,7 @@ export class MutationGenerator {
 				return builder
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
-					.by({ ...where, [PRIMARY_KEY_NAME]: entityState.getAccessor().primaryKey! })
+					.by({ ...where, [PRIMARY_KEY_NAME]: entityState.id.value })
 					.errors()
 					.errorMessage()
 			},
@@ -131,11 +128,8 @@ export class MutationGenerator {
 		entityState: EntityState,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
-		queryBuilder?: QueryBuilder,
+		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (!queryBuilder) {
-			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
-		}
 		if (processedEntities.has(entityState)) {
 			return queryBuilder
 		}
@@ -173,11 +167,8 @@ export class MutationGenerator {
 		entityState: EntityState,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
-		queryBuilder?: QueryBuilder,
+		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (!queryBuilder) {
-			queryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
-		}
 		if (processedEntities.has(entityState)) {
 			return queryBuilder
 		}
@@ -221,14 +212,15 @@ export class MutationGenerator {
 			CrudQueryBuilder.WriteOperation.Create
 		> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		if (currentState.type === StateType.EntityStub) {
-			// TODO If there's a forceCreate, this is wrong.
-			return builder
-		}
 		if (processedEntities.has(currentState)) {
 			return builder
 		}
 		processedEntities.add(currentState)
+
+		if (currentState.type === StateType.EntityStub) {
+			// TODO If there's a forceCreate, this is wrong.
+			return builder
+		}
 
 		// It shouldn't
 		const nonbearingFields: Array<

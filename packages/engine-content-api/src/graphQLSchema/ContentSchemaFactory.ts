@@ -99,6 +99,7 @@ export class ContentSchemaFactory {
 					inversedBy: relation.inversedBy,
 					onDelete: convertOnDelete(relation.joiningColumn.onDelete),
 					nullable: relation.nullable,
+					orphanRemoval: relation.orphanRemoval === true,
 				}
 			},
 			visitColumn(entity: Model.Entity, column: Model.AnyColumn) {

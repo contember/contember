@@ -135,7 +135,7 @@ export class StateInitializer {
 			existingEntityState.hasStaleAccessor = true
 			this.mergeInEntityFieldsContainer(existingEntityState, realm.markersContainer)
 
-			this.eventManager.registerNewlyInitialized(existingEntityState)
+			this.eventManager.registerNewlyInitialized([existingEntityState, realm])
 
 			return existingEntityState
 		}
@@ -526,7 +526,7 @@ export class StateInitializer {
 
 		this.initializeEntityFields(entityState, realm.markersContainer)
 
-		this.eventManager.registerNewlyInitialized(entityState)
+		this.eventManager.registerNewlyInitialized([entityState, realm])
 
 		return entityState
 	}
@@ -1159,8 +1159,7 @@ export class StateInitializer {
 			if (byKey === undefined) {
 				byParent.set(newRealm.realmKey, newRealm)
 			} else {
-				// Do nothing.
-				// TODO is this always necessarily the correct behavior?
+				byParent.set(newRealm.realmKey, MarkerMerger.mergeRealms(byKey, newRealm))
 			}
 		}
 	}

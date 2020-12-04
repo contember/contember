@@ -7,6 +7,7 @@ import {
 	BoxedQualifiedSingleEntity,
 	BoxedUnconstrainedQualifiedEntityList,
 	BoxedUnconstrainedQualifiedSingleEntity,
+	EntityCreationParameters,
 	EntityListEventListeners,
 	ExpectedQualifiedEntityMutation,
 	ExpectedRelationMutation,
@@ -91,8 +92,6 @@ export class TreeParameterMerger {
 			})
 		}
 		if (original instanceof BoxedQualifiedEntityList && fresh instanceof BoxedQualifiedEntityList) {
-			const originalListeners = original.value.eventListeners
-			const freshListeners = fresh.value.eventListeners
 			if (original.value.initialEntityCount !== fresh.value.initialEntityCount) {
 				throw new BindingError(
 					`Detected sub trees of the same entity '${original.value.entityName}' with different preferred initial ` +
@@ -146,8 +145,6 @@ export class TreeParameterMerger {
 			original instanceof BoxedUnconstrainedQualifiedEntityList &&
 			fresh instanceof BoxedUnconstrainedQualifiedEntityList
 		) {
-			const originalListeners = original.value.eventListeners
-			const freshListeners = fresh.value.eventListeners
 			if (original.value.initialEntityCount !== fresh.value.initialEntityCount) {
 				throw new BindingError(
 					`Detected sub trees of the same entity '${original.value.entityName}' with different preferred initial ` +
@@ -173,6 +170,17 @@ export class TreeParameterMerger {
 			})
 		}
 		throw new BindingError()
+	}
+
+	public static mergeEntityCreationParameters(
+		original: EntityCreationParameters,
+		fresh: EntityCreationParameters,
+	): EntityCreationParameters {
+		return {
+			forceCreation: original.forceCreation || fresh.forceCreation,
+			isNonbearing: original.isNonbearing && fresh.isNonbearing,
+			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
+		}
 	}
 
 	public static mergeSetOnCreate(original: SetOnCreate, fresh: SetOnCreate): SetOnCreate {

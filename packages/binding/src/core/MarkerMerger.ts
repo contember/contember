@@ -13,6 +13,7 @@ import {
 } from '../markers'
 import { FieldName } from '../treeParameters'
 import { assertNever } from '../utils'
+import { EntityRealm } from './state'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
 export class MarkerMerger {
@@ -188,6 +189,33 @@ export class MarkerMerger {
 			return original
 		}
 		return original.putDelta(fresh.getAllNames())
+	}
+
+	public static mergeRealms(original: EntityRealm, fresh: EntityRealm): EntityRealm {
+		// Assuming the key and parent are the same
+		if (original === fresh) {
+			return original
+		}
+		return {
+			realmKey: original.realmKey,
+			parent: original.parent,
+			initialEventListeners: original.initialEventListeners
+				? fresh.initialEventListeners
+					? {
+							eventListeners: TreeParameterMerger.mergeSingleEntityEventListeners(
+								original.initialEventListeners.eventListeners,
+								fresh.initialEventListeners.eventListeners,
+							),
+					  }
+					: original.initialEventListeners
+				: fresh.initialEventListeners,
+			creationParameters: TreeParameterMerger.mergeEntityCreationParameters(
+				original.creationParameters,
+				fresh.creationParameters,
+			),
+			markersContainer: this.mergeEntityFieldsContainers(original.markersContainer, fresh.markersContainer),
+			environment: this.mergeEnvironments(original.environment, fresh.environment),
+		}
 	}
 
 	private static rejectRelationScalarCombo(fieldName: FieldName): never {

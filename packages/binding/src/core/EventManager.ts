@@ -15,7 +15,7 @@ import { FieldName } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
-import { EntityListState, EntityState, StateINode, StateIterator, StateNode, StateType } from './state'
+import { EntityListState, EntityRealm, EntityState, StateINode, StateIterator, StateNode, StateType } from './state'
 import { TreeStore } from './TreeStore'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
@@ -26,7 +26,7 @@ export class EventManager {
 	private ongoingPersistOperation: Promise<SuccessfulPersistResult> | undefined = undefined
 	private hasUpdated = false
 
-	private newlyInitializedWithListeners: Set<StateINode> = new Set()
+	private newlyInitializedWithListeners: Set<EntityListState | [EntityState, EntityRealm]> = new Set()
 
 	public constructor(
 		private readonly bindingOperations: BindingOperations,
@@ -115,9 +115,11 @@ export class EventManager {
 		})
 	}
 
-	public registerNewlyInitialized(state: StateINode) {
-		if (Object.values(state.eventListeners).filter(listeners => !!listeners).length) {
-			this.newlyInitializedWithListeners.add(state)
+	public registerNewlyInitialized(newlyInitialized: EntityListState | [EntityState, EntityRealm]) {
+		const listeners = Array.isArray(newlyInitialized) ? newlyInitialized[1].initialEventListeners : newlyInitialized
+
+		if (listeners && Object.values(listeners.eventListeners).filter(listeners => !!listeners).length) {
+			this.newlyInitializedWithListeners.add(newlyInitialized)
 		}
 	}
 
@@ -240,10 +242,13 @@ export class EventManager {
 					callbackQueue.length = 0
 
 					// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
-					for (const state of this.newlyInitializedWithListeners) {
-						if (state.eventListeners.beforePersist) {
-							for (const listener of state.eventListeners.beforePersist) {
-								callbackQueue.push([state, listener])
+					for (const newlyInitialized of this.newlyInitializedWithListeners) {
+						const listeners = Array.isArray(newlyInitialized)
+							? newlyInitialized[1].initialEventListeners
+							: newlyInitialized
+						if (listeners && listeners.eventListeners.beforePersist) {
+							for (const listener of listeners.eventListeners.beforePersist) {
+								callbackQueue.push([Array.isArray(newlyInitialized) ? newlyInitialized[0] : newlyInitialized, listener])
 							}
 						}
 					}
@@ -285,9 +290,12 @@ export class EventManager {
 		let hasOnInitialize = false
 
 		this.syncTransaction(() => {
-			for (const state of this.newlyInitializedWithListeners) {
-				if (state.eventListeners.initialize) {
-					for (const listener of state.eventListeners.initialize) {
+			for (const newlyInitialized of this.newlyInitializedWithListeners) {
+				const listeners = Array.isArray(newlyInitialized) ? newlyInitialized[1].initialEventListeners : newlyInitialized
+				const state = Array.isArray(newlyInitialized) ? newlyInitialized[0] : newlyInitialized
+
+				if (listeners && listeners.eventListeners.initialize) {
+					for (const listener of listeners.eventListeners.initialize) {
 						listener(state.getAccessor as any, this.bindingOperations)
 						hasOnInitialize = true
 					}

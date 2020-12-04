@@ -104,11 +104,13 @@ export class RebaseExecutor {
 	): Promise<boolean> {
 		const dependencies = await this.dependencyBuilder.build(schema, [...eventsA, ...eventsB])
 		const ids = new Set(eventsA.map(it => it.id))
-
-		return (
-			eventsB
-				.map(it => dependencies[it.id])
-				.find(dependencies => dependencies.find(id => ids.has(id)) !== undefined) === undefined
-		)
+		for (const event of eventsB) {
+			for (const dep of dependencies.get(event.id)?.values() || []) {
+				if (ids.has(dep)) {
+					return false
+				}
+			}
+		}
+		return true
 	}
 }

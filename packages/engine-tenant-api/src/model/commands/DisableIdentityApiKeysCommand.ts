@@ -1,7 +1,7 @@
 import { Command } from './Command'
 import { UpdateBuilder } from '@contember/database'
 
-class DisableIdentityApiKeysCommand implements Command<void> {
+export class DisableIdentityApiKeysCommand implements Command<void> {
 	constructor(private readonly identityId: string) {}
 
 	async execute({ db }: Command.Args): Promise<void> {
@@ -15,5 +15,3 @@ class DisableIdentityApiKeysCommand implements Command<void> {
 		await qb.execute(db)
 	}
 }
-
-export { DisableIdentityApiKeysCommand }

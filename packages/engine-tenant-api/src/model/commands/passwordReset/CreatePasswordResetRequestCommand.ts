@@ -5,10 +5,10 @@ import { plusMinutes } from '../../utils/time'
 
 const PASSWORD_RESET_EXPIRATION = 60
 
-class CreatePasswordResetRequestCommand implements Command<CreatePasswordResetRequestCommand.Result> {
+export class CreatePasswordResetRequestCommand implements Command<CreatePasswordResetRequestResult> {
 	constructor(private readonly personId: string) {}
 
-	async execute({ db, providers }: Command.Args): Promise<CreatePasswordResetRequestCommand.Result> {
+	async execute({ db, providers }: Command.Args): Promise<CreatePasswordResetRequestResult> {
 		const token = await generateToken(providers)
 		const tokenHash = computeTokenHash(token)
 
@@ -24,14 +24,9 @@ class CreatePasswordResetRequestCommand implements Command<CreatePasswordResetRe
 			})
 			.execute(db)
 
-		return new CreatePasswordResetRequestCommand.Result(token)
+		return new CreatePasswordResetRequestResult(token)
 	}
 }
-
-namespace CreatePasswordResetRequestCommand {
-	export class Result {
-		constructor(public readonly token: string) {}
-	}
+export class CreatePasswordResetRequestResult {
+	constructor(public readonly token: string) {}
 }
-
-export { CreatePasswordResetRequestCommand }

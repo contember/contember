@@ -23,14 +23,20 @@ export class ResetPasswordCommand implements Command<ResetPasswordCommandRespons
 					.getResult(db)
 			)[0] || null
 		if (!result) {
-			return new ResponseError(ResetPasswordCommandErrorCode.TOKEN_NOT_FOUND)
+			return new ResponseError(ResetPasswordCommandErrorCode.TOKEN_NOT_FOUND, 'Token was not found')
 		}
 		if (result.used_at) {
-			return new ResponseError(ResetPasswordCommandErrorCode.TOKEN_USED)
+			return new ResponseError(
+				ResetPasswordCommandErrorCode.TOKEN_USED,
+				`Token was used at ${result.used_at.toISOString()}`,
+			)
 		}
 		const now = providers.now()
 		if (result.expires_at < now) {
-			return new ResponseError(ResetPasswordCommandErrorCode.TOKEN_EXPIRED)
+			return new ResponseError(
+				ResetPasswordCommandErrorCode.TOKEN_EXPIRED,
+				`Token expired at ${result.expires_at.toISOString()}`,
+			)
 		}
 		const count = await UpdateBuilder.create()
 			.table('person_password_reset')

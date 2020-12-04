@@ -35,7 +35,7 @@ class IDPSignInManager {
 			)
 			const personRow = await this.queryHandler.fetch(PersonQuery.byEmail(claim.email))
 			if (!personRow) {
-				return new ResponseError(SignInIdpErrorCode.PersonNotFound)
+				return new ResponseError(SignInIdpErrorCode.PersonNotFound, `Person ${claim.email} not found`)
 			}
 
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id, expiration)
@@ -54,7 +54,7 @@ class IDPSignInManager {
 	async initSignInIDP(idpSlug: string, redirectUrl: string): Promise<IDPSignInManager.InitSignInIDPResponse> {
 		const provider = await this.queryHandler.fetch(new IdentityProviderQuery(idpSlug))
 		if (!provider) {
-			return new ResponseError(InitSignInIdpErrorCode.ProviderNotFound)
+			return new ResponseError(InitSignInIdpErrorCode.ProviderNotFound, `IDP provider ${idpSlug} was not found`)
 		}
 		const initResponse = await this.idpManager.initAuth(provider.type, provider.configuration, redirectUrl)
 		return new ResponseOk(initResponse)

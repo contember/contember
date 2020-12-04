@@ -20,9 +20,9 @@ export class SetupMutationResolver implements MutationResolvers {
 		})
 
 		const { email, password } = args.superadmin
-		const result = await this.signUpManager.signUp(email, password, [TenantRole.SUPER_ADMIN])
+		const response = await this.signUpManager.signUp(email, password, [TenantRole.SUPER_ADMIN])
 
-		if (!result.ok) {
+		if (!response.ok) {
 			throw new ImplementationException()
 		}
 
@@ -30,9 +30,9 @@ export class SetupMutationResolver implements MutationResolvers {
 
 		await this.apiKeyManager.disableOneOffApiKey(context.apiKeyId)
 
+		const result = response.result
 		return {
 			ok: true,
-			errors: [],
 			result: {
 				loginKey: {
 					id: loginToken.apiKey.id,

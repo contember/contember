@@ -26,7 +26,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 					const error = {
 						code: e.code,
 						migration: e.version,
-						message: e.message,
+						developerMessage: e.message,
 					}
 					return {
 						ok: false,

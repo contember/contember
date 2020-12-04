@@ -14,6 +14,7 @@ import { DatabaseQueryable } from '@contember/database'
 import { PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { OtpManager } from '../../../model/service'
 import { ImplementationException } from '../../../exceptions'
+import { createErrorResponse } from '../../errorUtils'
 
 export class OtpMutationResolver implements MutationResolvers {
 	constructor(
@@ -36,10 +37,13 @@ export class OtpMutationResolver implements MutationResolvers {
 	async confirmOtp(parent: any, args: MutationConfirmOtpArgs, context: ResolverContext): Promise<ConfirmOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		if (!person.otp_uri) {
-			return { ok: false, errors: [{ code: ConfirmOtpErrorCode.NotPrepared }] }
+			return createErrorResponse(
+				ConfirmOtpErrorCode.NotPrepared,
+				`OTP setup was not initialized. Call prepareOtp first.`,
+			)
 		}
 		if (!this.otpManager.verifyOtp(person, args.otpToken)) {
-			return { ok: false, errors: [{ code: ConfirmOtpErrorCode.InvalidOtpToken }] }
+			return createErrorResponse(ConfirmOtpErrorCode.InvalidOtpToken, 'Provided token is not correct.')
 		}
 		await this.otpManager.confirmOtp(person)
 		return {
@@ -51,7 +55,7 @@ export class OtpMutationResolver implements MutationResolvers {
 	async disableOtp(parent: any, args: {}, context: ResolverContext): Promise<DisableOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		if (!person.otp_uri) {
-			return { ok: false, errors: [{ code: DisableOtpErrorCode.OtpNotActive }] }
+			return createErrorResponse(DisableOtpErrorCode.OtpNotActive, 'OTP is not active, you cannot disable it.')
 		}
 		await this.otpManager.disableOtp(person)
 		return {
@@ -63,7 +67,7 @@ export class OtpMutationResolver implements MutationResolvers {
 	private async getPersonFromContext(context: ResolverContext): Promise<PersonRow> {
 		await context.requireAccess({
 			action: PermissionActions.PERSON_SETUP_OTP,
-			message: 'You are not allowed to setup a otp',
+			message: 'You are not allowed to setup a OTP',
 		})
 		const person = await this.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {

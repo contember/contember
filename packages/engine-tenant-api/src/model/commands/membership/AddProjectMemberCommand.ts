@@ -23,7 +23,10 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 			})
 			.getResult(db)
 		if (result.length > 0) {
-			return new ResponseError(AddProjectMemberCommandError.alreadyMember)
+			return new ResponseError(
+				AddProjectMemberCommandError.alreadyMember,
+				`This identity is already a project member. Use updateProjectMember mutation to change memberships.`,
+			)
 		}
 
 		try {
@@ -34,9 +37,9 @@ export class AddProjectMemberCommand implements Command<CommandResponse> {
 		} catch (e) {
 			switch (e.constraint) {
 				case 'project_membership_project':
-					return new ResponseError(AddProjectMemberCommandError.projectNotFound)
+					return new ResponseError(AddProjectMemberCommandError.projectNotFound, 'Project not found')
 				case 'project_membership_identity':
-					return new ResponseError(AddProjectMemberCommandError.identityNotfound)
+					return new ResponseError(AddProjectMemberCommandError.identityNotfound, 'Identity not found')
 				default:
 					throw e
 			}

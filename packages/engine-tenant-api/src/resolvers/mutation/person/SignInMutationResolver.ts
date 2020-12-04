@@ -3,6 +3,7 @@ import { ResolverContext } from '../../ResolverContext'
 import { PermissionActions, PermissionContextFactory, SignInManager } from '../../../model'
 import { IdentityTypeResolver } from '../../types'
 import { createResolverContext } from '../../ResolverContextFactory'
+import { createErrorResponse } from '../../errorUtils'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(
@@ -17,20 +18,17 @@ export class SignInMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign in',
 		})
 
-		const result = await this.signInManager.signIn(
+		const response = await this.signInManager.signIn(
 			args.email,
 			args.password,
 			args.expiration || undefined,
 			args.otpToken || undefined,
 		)
 
-		if (!result.ok) {
-			return {
-				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode })),
-			}
+		if (!response.ok) {
+			return createErrorResponse(response.error, response.errorMessage)
 		}
-
+		const result = response.result
 		const identityId = result.person.identity_id
 		const permissionContext = this.permissionContextFactory.create({ id: identityId, roles: result.person.roles })
 		const projects = await this.identityTypeResolver.projects(

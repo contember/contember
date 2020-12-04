@@ -1,7 +1,7 @@
 import { Command } from './Command'
 import { InsertBuilder } from '@contember/database'
 
-class CreateIdentityCommand implements Command<string> {
+export class CreateIdentityCommand implements Command<string> {
 	constructor(private readonly roles: string[], private readonly description?: string) {}
 
 	public async execute({ db, providers }: Command.Args): Promise<string> {
@@ -20,5 +20,3 @@ class CreateIdentityCommand implements Command<string> {
 		return identityId
 	}
 }
-
-export { CreateIdentityCommand }

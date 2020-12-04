@@ -5,9 +5,9 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, ProjectMemberManager, ProjectScope } from '../../../model'
-import { createMembershipValidationErrorResult } from '../../utils'
-import { MembershipValidator } from '../../../model/service/MembershipValidator'
+import { MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
+import { createMembershipValidationErrorResult } from '../../membershipUtils'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 
 export class AddProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -28,26 +28,22 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to add a project member',
 		})
 		if (!project) {
-			return {
-				ok: false,
-				errors: [{ code: AddProjectMemberErrorCode.ProjectNotFound }],
-			}
+			return createProjectNotFoundResponse(AddProjectMemberErrorCode.ProjectNotFound, projectSlug)
 		}
 		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
 		if (validationResult.length > 0) {
+			const errors = createMembershipValidationErrorResult<AddProjectMemberErrorCode>(validationResult)
 			return {
 				ok: false,
-				errors: createMembershipValidationErrorResult(validationResult),
+				errors: errors,
+				error: errors[0],
 			}
 		}
 
 		const result = await this.projectMemberManager.addProjectMember(project.id, identityId, memberships)
 
 		if (!result.ok) {
-			return {
-				ok: false,
-				errors: result.errors.map(errorCode => ({ code: errorCode })),
-			}
+			return createErrorResponse(result.error, result.errorMessage)
 		}
 
 		return {

@@ -18,6 +18,7 @@ import {
 	ResetPasswordErrorCode,
 	ResetPasswordCommandErrorCode,
 } from '../../../model'
+import { createErrorResponse } from '../../errorUtils'
 
 export class ResetPasswordMutationResolver implements MutationResolvers {
 	constructor(
@@ -37,10 +38,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 		})
 		const person = await this.queryHandler.fetch(PersonQuery.byEmail(args.email))
 		if (!person) {
-			return {
-				ok: false,
-				errors: [{ code: CreatePasswordResetRequestErrorCode.PersonNotFound }],
-			}
+			return createErrorResponse(CreatePasswordResetRequestErrorCode.PersonNotFound, 'Person was not found.')
 		}
 
 		await this.passwordResetManager.createPasswordResetRequest(person, {
@@ -66,18 +64,12 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 			return { ok: true, errors: [] }
 		}
 		const err = result.error
-		return {
-			ok: false,
-			errors: [
-				{
-					code: {
-						[ResetPasswordErrorCode.PASSWORD_TOO_WEAK]: SchemaResetPasswordErrorCode.PasswordTooWeak,
-						[ResetPasswordCommandErrorCode.TOKEN_EXPIRED]: SchemaResetPasswordErrorCode.TokenExpired,
-						[ResetPasswordCommandErrorCode.TOKEN_NOT_FOUND]: SchemaResetPasswordErrorCode.TokenNotFound,
-						[ResetPasswordCommandErrorCode.TOKEN_USED]: SchemaResetPasswordErrorCode.TokenUsed,
-					}[err],
-				},
-			],
-		}
+		const code = {
+			[ResetPasswordErrorCode.PASSWORD_TOO_WEAK]: SchemaResetPasswordErrorCode.PasswordTooWeak,
+			[ResetPasswordCommandErrorCode.TOKEN_EXPIRED]: SchemaResetPasswordErrorCode.TokenExpired,
+			[ResetPasswordCommandErrorCode.TOKEN_NOT_FOUND]: SchemaResetPasswordErrorCode.TokenNotFound,
+			[ResetPasswordCommandErrorCode.TOKEN_USED]: SchemaResetPasswordErrorCode.TokenUsed,
+		}[err]
+		return createErrorResponse(code, result.errorMessage)
 	}
 }

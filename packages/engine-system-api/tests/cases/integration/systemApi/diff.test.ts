@@ -115,7 +115,7 @@ diffTest('invalid filter', async () => {
 			diff(stage: "preview", filter: [{entity: "User", id: "${testUuid(1)}"}]) {
 				error {
 					code
-					message
+					developerMessage
 				}
 			}
 		}`)
@@ -124,7 +124,7 @@ diffTest('invalid filter', async () => {
 			diff: {
 				error: {
 					code: 'INVALID_FILTER',
-					message: 'User: entity not found',
+					developerMessage: 'User: entity not found',
 				},
 			},
 		},
@@ -135,7 +135,7 @@ diffTest('invalid filter', async () => {
 			)}", relations: [{name: "articles", relations: []}]}]) {
 				error {
 					code
-					message
+					developerMessage
 				}
 			}
 		}`)
@@ -144,7 +144,7 @@ diffTest('invalid filter', async () => {
 			diff: {
 				error: {
 					code: 'INVALID_FILTER',
-					message: 'Author.articles: field not found',
+					developerMessage: 'Author.articles: field not found',
 				},
 			},
 		},

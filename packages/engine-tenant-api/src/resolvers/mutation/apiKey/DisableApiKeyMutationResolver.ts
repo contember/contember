@@ -7,6 +7,7 @@ import {
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
 import { PermissionActions, ApiKeyManager } from '../../../model'
+import { createErrorResponse } from '../../errorUtils'
 
 export class DisableApiKeyMutationResolver implements MutationResolvers {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
@@ -25,10 +26,7 @@ export class DisableApiKeyMutationResolver implements MutationResolvers {
 		const result = await this.apiKeyManager.disableApiKey(id)
 
 		if (!result) {
-			return {
-				ok: false,
-				errors: [{ code: DisableApiKeyErrorCode.KeyNotFound }],
-			}
+			return createErrorResponse(DisableApiKeyErrorCode.KeyNotFound, 'API key not found')
 		}
 
 		return {

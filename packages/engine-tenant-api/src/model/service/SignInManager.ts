@@ -4,7 +4,8 @@ import { DatabaseQueryable } from '@contember/database'
 import { ApiKeyManager } from '../service'
 import { PersonQuery, PersonRow } from '../queries'
 import { Providers } from '../providers'
-import { verifyOtp } from '../utils/otp'
+import { verifyOtp } from '../utils'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
 
 class SignInManager {
 	constructor(
@@ -13,49 +14,36 @@ class SignInManager {
 		private readonly providers: Providers,
 	) {}
 
-	async signIn(
-		email: string,
-		password: string,
-		expiration?: number,
-		otpCode?: string,
-	): Promise<SignInManager.SignInResult> {
+	async signIn(email: string, password: string, expiration?: number, otpCode?: string): Promise<SignInResponse> {
 		const personRow = await this.queryHandler.fetch(PersonQuery.byEmail(email))
 		if (personRow === null) {
-			return new SignInManager.SignInResultError([SignInErrorCode.UnknownEmail])
+			return new ResponseError(SignInErrorCode.UnknownEmail, `Person with email ${email} not found`)
 		}
 
 		const passwordValid = await this.providers.bcryptCompare(password, personRow.password_hash)
 		if (!passwordValid) {
-			return new SignInManager.SignInResultError([SignInErrorCode.InvalidPassword])
+			return new ResponseError(SignInErrorCode.InvalidPassword, `Password does not match`)
 		}
 		if (personRow.otp_uri && personRow.otp_activated_at) {
 			if (!otpCode) {
-				return new SignInManager.SignInResultError([SignInErrorCode.OtpRequired])
+				return new ResponseError(SignInErrorCode.OtpRequired, `2FA is enabled. OTP token is required`)
 			}
 			if (!verifyOtp({ uri: personRow.otp_uri }, otpCode)) {
-				return new SignInManager.SignInResultError([SignInErrorCode.InvalidOtpToken])
+				return new ResponseError(SignInErrorCode.InvalidOtpToken, 'OTP token validation has failed')
 			}
 		}
 
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id, expiration)
-		return new SignInManager.SignInResultOk(personRow, sessionToken)
+		return new ResponseOk(new SignInResult(personRow, sessionToken))
 	}
 }
 
-namespace SignInManager {
-	export type SignInResult = SignInResultOk | SignInResultError
+export class SignInResult {
+	readonly ok = true
 
-	export class SignInResultOk {
-		readonly ok = true
-
-		constructor(public readonly person: PersonRow, public readonly token: string) {}
-	}
-
-	export class SignInResultError {
-		readonly ok = false
-
-		constructor(public readonly errors: Array<SignInErrorCode>) {}
-	}
+	constructor(public readonly person: PersonRow, public readonly token: string) {}
 }
+
+export type SignInResponse = Response<SignInResult, SignInErrorCode>
 
 export { SignInManager }

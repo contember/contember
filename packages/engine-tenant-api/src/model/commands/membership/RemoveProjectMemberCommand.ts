@@ -1,11 +1,12 @@
 import { Command } from '../Command'
 import { RemoveProjectMemberErrorCode } from '../../../schema'
 import { DeleteBuilder } from '@contember/database'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 
-class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
+export class RemoveProjectMemberCommand implements Command<RemoveProjectMemberResponse> {
 	constructor(private readonly projectId: string, private readonly identityId: string) {}
 
-	async execute({ db, bus }: Command.Args): Promise<RemoveProjectMemberCommand.RemoveProjectMemberResponse> {
+	async execute({ db, bus }: Command.Args): Promise<RemoveProjectMemberResponse> {
 		const memberWhere = {
 			project_id: this.projectId,
 			identity_id: this.identityId,
@@ -16,27 +17,10 @@ class RemoveProjectMemberCommand implements Command<RemoveProjectMemberCommand.R
 			.execute(db)
 
 		if (result === 0) {
-			return new RemoveProjectMemberCommand.RemoveProjectMemberResponseError([RemoveProjectMemberErrorCode.NotMember])
+			return new ResponseError(RemoveProjectMemberErrorCode.NotMember, 'Not a project member')
 		}
-
-		return new RemoveProjectMemberCommand.RemoveProjectMemberResponseOk()
+		return new ResponseOk(null)
 	}
 }
 
-namespace RemoveProjectMemberCommand {
-	export type RemoveProjectMemberResponse = RemoveProjectMemberResponseOk | RemoveProjectMemberResponseError
-
-	export class RemoveProjectMemberResponseOk {
-		readonly ok = true
-
-		constructor() {}
-	}
-
-	export class RemoveProjectMemberResponseError {
-		readonly ok = false
-
-		constructor(public readonly errors: Array<RemoveProjectMemberErrorCode>) {}
-	}
-}
-
-export { RemoveProjectMemberCommand }
+export type RemoveProjectMemberResponse = Response<null, RemoveProjectMemberErrorCode>

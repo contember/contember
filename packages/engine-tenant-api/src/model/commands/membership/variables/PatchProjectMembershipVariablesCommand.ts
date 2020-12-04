@@ -3,7 +3,7 @@ import { SetProjectMembershipVariableValuesCommand } from './SetProjectMembershi
 import { PatchProjectMembershipVariableValuesCommand } from './PatchProjectMembershipVariableValuesCommand'
 import { VariableUpdateInput } from '../types'
 
-class PatchProjectMembershipVariablesCommand implements Command<Record<string, string[]>> {
+export class PatchProjectMembershipVariablesCommand implements Command<Record<string, string[]>> {
 	constructor(private readonly membershipId: string, private readonly variables: readonly VariableUpdateInput[]) {}
 
 	async execute({ db, providers, bus }: Command.Args): Promise<Record<string, string[]>> {
@@ -26,5 +26,3 @@ class PatchProjectMembershipVariablesCommand implements Command<Record<string, s
 		return Object.fromEntries(results)
 	}
 }
-
-export { PatchProjectMembershipVariablesCommand }

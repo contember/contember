@@ -10,6 +10,7 @@ import {
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
 import { MailTemplateManager, MailType, PermissionActions, ProjectManager } from '../../../model'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 
 export class MailTemplateMutationResolver implements MutationResolvers {
 	constructor(
@@ -29,10 +30,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to add a mail template',
 		})
 		if (!project) {
-			return {
-				ok: false,
-				errors: [{ code: AddMailTemplateErrorCode.ProjectNotFound }],
-			}
+			return createProjectNotFoundResponse(AddMailTemplateErrorCode.ProjectNotFound, projectSlug)
 		}
 
 		await this.mailTemplateManager.addMailTemplate({
@@ -62,10 +60,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to remove a mail template',
 		})
 		if (!project) {
-			return {
-				ok: false,
-				errors: [{ code: RemoveMailTemplateErrorCode.ProjectNotFound }],
-			}
+			return createProjectNotFoundResponse(RemoveMailTemplateErrorCode.ProjectNotFound, projectSlug)
 		}
 
 		const removed = await this.mailTemplateManager.removeMailTemplate({
@@ -74,10 +69,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			type: this.mapMailType(type),
 		})
 		if (!removed) {
-			return {
-				ok: false,
-				errors: [{ code: RemoveMailTemplateErrorCode.TemplateNotFound }],
-			}
+			return createErrorResponse(RemoveMailTemplateErrorCode.TemplateNotFound, 'Mail template not found')
 		}
 
 		return {

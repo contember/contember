@@ -62,3 +62,5 @@ test('update name', async () => {
 		},
 	})
 })
+
+test.run()

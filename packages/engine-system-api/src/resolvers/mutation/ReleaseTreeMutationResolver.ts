@@ -38,7 +38,7 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 					errors: [code],
 					error: {
 						code,
-						message: stagesResult.message,
+						developerMessage: stagesResult.message,
 					},
 				}
 			}
@@ -72,7 +72,7 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 					errors: [code],
 					error: {
 						code,
-						message: diff.message,
+						developerMessage: diff.message,
 					},
 				}
 			}
@@ -97,7 +97,10 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 				return {
 					ok: false,
 					errors: [code],
-					error: { code },
+					error: {
+						code,
+						developerMessage: 'You are not allowed to release some of events.',
+					},
 				}
 			}
 

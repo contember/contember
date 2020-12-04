@@ -167,7 +167,7 @@ export enum DiffBuilderErrorCode {
 export class DiffBuilderErrorResponse {
 	public readonly ok: false = false
 
-	constructor(public readonly error: DiffBuilderErrorCode, public readonly message?: string) {}
+	constructor(public readonly error: DiffBuilderErrorCode, public readonly message: string) {}
 }
 
 export type EventWithDependencies = ContentEvent & { dependencies: string[] }

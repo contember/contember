@@ -32,7 +32,7 @@ export class HistoryQueryResolver implements QueryResolver<'history'> {
 					errors: [HistoryErrorCode.StageNotFound],
 					error: {
 						code: HistoryErrorCode.StageNotFound,
-						message: `Stage ${args.stage} not found`,
+						developerMessage: `Stage ${args.stage} not found`,
 					},
 				}
 			}

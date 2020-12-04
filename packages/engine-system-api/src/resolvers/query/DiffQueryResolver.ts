@@ -29,7 +29,7 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 					errors: [code],
 					error: {
 						code,
-						message: stagesResult.message,
+						developerMessage: stagesResult.message,
 					},
 				}
 			}
@@ -71,7 +71,7 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 					errors: [code],
 					error: {
 						code,
-						message: diff.message,
+						developerMessage: diff.message,
 					},
 				}
 			}

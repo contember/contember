@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../ResolverContext'
 import { MutationResolver } from '../Resolver'
-import { MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse, ReleaseTreeErrorCode } from '../../schema'
+import { MutationReleaseArgs, ReleaseErrorCode, ReleaseResponse } from '../../schema'
 import { AuthorizationActions, RebaseExecutor, ReleaseExecutor, ReleaseExecutorErrorCode } from '../../model'
 import { FetchStageErrors, fetchStages } from '../helpers/StageFetchHelper'
 
@@ -26,7 +26,7 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 					errors: [code],
 					error: {
 						code,
-						message: stagesResult.message,
+						developerMessage: stagesResult.message,
 					},
 				}
 			}
@@ -56,10 +56,14 @@ export class ReleaseMutationResolver implements MutationResolver<'release'> {
 				const code = {
 					[ReleaseExecutorErrorCode.forbidden]: ReleaseErrorCode.Forbidden,
 				}[result.error]
+
 				return {
 					ok: false,
 					errors: [code],
-					error: { code },
+					error: {
+						code,
+						developerMessage: 'You are not allowed to release some of events.',
+					},
 				}
 			}
 

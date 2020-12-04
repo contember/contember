@@ -38,7 +38,7 @@ export enum FetchStageErrors {
 export class FetchStageErrorResponse {
 	public readonly ok = false
 
-	constructor(public readonly error: FetchStageErrors, public readonly message?: string) {}
+	constructor(public readonly error: FetchStageErrors, public readonly message: string) {}
 }
 
 export class FetchStageOkResponse {

@@ -51,7 +51,7 @@ const schema: DocumentNode = gql`
 
 	type HistoryError {
 		code: HistoryErrorCode!
-		developerMessage: String
+		developerMessage: String!
 	}
 
 	type HistoryResponse {
@@ -143,7 +143,7 @@ const schema: DocumentNode = gql`
 
 	type DiffError {
 		code: DiffErrorCode!
-		developerMessage: String
+		developerMessage: String!
 	}
 
 	type DiffResponse {
@@ -201,7 +201,7 @@ const schema: DocumentNode = gql`
 	}
 
 	type MigrateResult {
-		developerMessage: String!
+		message: String!
 	}
 
 	# === release ===
@@ -214,7 +214,7 @@ const schema: DocumentNode = gql`
 
 	type ReleaseError {
 		code: ReleaseErrorCode!
-		developerMessage: String
+		developerMessage: String!
 	}
 
 	type ReleaseResponse {
@@ -235,7 +235,7 @@ const schema: DocumentNode = gql`
 
 	type ReleaseTreeError {
 		code: ReleaseTreeErrorCode!
-		developerMessage: String
+		developerMessage: String!
 	}
 
 	type ReleaseTreeResponse {

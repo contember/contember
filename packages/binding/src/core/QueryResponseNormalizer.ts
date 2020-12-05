@@ -1,8 +1,11 @@
 import {
+	EntityFieldPersistedData,
+	EntityListPersistedData,
 	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
 	QueryRequestResponse,
 	ReceivedEntityData,
+	ReceivedFieldData,
 	ServerGeneratedUuid,
 	SingleEntityPersistedData,
 	SubTreeDataStore,
@@ -27,91 +30,107 @@ export class QueryResponseNormalizer {
 			if (treeDatum === undefined || treeDatum === null) {
 				continue
 			}
-			if (Array.isArray(treeDatum)) {
-				const subTreeListIds = new Set<string>()
-				for (const entityDatum of treeDatum) {
-					subTreeListIds.add(this.addEntityResponse(entityMap, entityDatum))
-				}
-				subTreeMap.set(treeId, subTreeListIds)
-			} else {
-				subTreeMap.set(treeId, new ServerGeneratedUuid(this.addEntityResponse(entityMap, treeDatum)))
-			}
+			subTreeMap.set(
+				treeId,
+				this.createFieldData(entityMap, treeDatum) as ServerGeneratedUuid | EntityListPersistedData,
+			)
 		}
 
 		return new NormalizedQueryResponseData(subTreeMap, entityMap)
 	}
 
-	private static addEntityResponse(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData): string {
-		const fieldsMap: SingleEntityPersistedData = new Map()
-		let primaryKey: string | undefined = undefined
-
-		for (const field in entityData) {
-			const fieldDatum = entityData[field]
-
-			if (field === PRIMARY_KEY_NAME) {
-				primaryKey = fieldDatum as string
+	private static createFieldData(
+		entityMap: PersistedEntityDataStore,
+		fieldData: ReceivedFieldData,
+	): EntityFieldPersistedData {
+		if (Array.isArray(fieldData)) {
+			const subTreeListIds = new Set<string>()
+			for (const entityDatum of fieldData) {
+				subTreeListIds.add(this.createEntityData(entityMap, entityDatum))
 			}
-			if (Array.isArray(fieldDatum)) {
-				const ids = new Set<string>()
-
-				for (const entityDatum of fieldDatum) {
-					ids.add(this.addEntityResponse(entityMap, entityDatum))
-				}
-
-				fieldsMap.set(field, ids)
-			} else if (fieldDatum !== null && typeof fieldDatum === 'object') {
-				fieldsMap.set(field, new ServerGeneratedUuid(this.addEntityResponse(entityMap, fieldDatum)))
-			} else {
-				fieldsMap.set(field, fieldDatum)
-			}
+			return subTreeListIds
+		} else if (fieldData !== null && typeof fieldData === 'object') {
+			return new ServerGeneratedUuid(this.createEntityData(entityMap, fieldData))
+		} else {
+			return fieldData
 		}
+	}
+
+	private static createEntityData(entityMap: PersistedEntityDataStore, entityData: ReceivedEntityData): string {
+		const primaryKey: string | undefined = entityData[PRIMARY_KEY_NAME]
+
 		if (primaryKey === undefined) {
 			throw new BindingError(`The server has responded with an entity that lacks a primary key.`)
 		}
 
 		const presentEntityData = entityMap.get(primaryKey)
+
 		if (presentEntityData === undefined) {
+			const fieldsMap: SingleEntityPersistedData = new Map()
 			entityMap.set(primaryKey, fieldsMap)
+			for (const field in entityData) {
+				const fieldDatum = entityData[field]
+
+				fieldsMap.set(field, this.createFieldData(entityMap, fieldDatum))
+			}
 		} else {
-			entityMap.set(primaryKey, this.mergeEntityData(entityMap, entityData, presentEntityData, fieldsMap))
+			this.mergeInEntityData(entityMap, presentEntityData, entityData)
 		}
 		return primaryKey
 	}
 
-	private static mergeEntityData(
+	private static mergeInEntityData(
 		entityMap: PersistedEntityDataStore,
-		freshEntityData: ReceivedEntityData,
-		original: SingleEntityPersistedData,
-		fresh: SingleEntityPersistedData,
+		target: SingleEntityPersistedData,
+		newData: ReceivedEntityData,
 	): SingleEntityPersistedData {
-		for (const [field, fromFresh] of fresh) {
-			const fromOriginal = original.get(field)
-			if (fromOriginal === undefined) {
-				original.set(field, fromFresh)
-			} else if (fromOriginal instanceof ServerGeneratedUuid) {
-				if (fromFresh instanceof ServerGeneratedUuid) {
+		for (const field in newData) {
+			const fromTarget = target.get(field)
+			const newDatum = newData[field]
+
+			if (fromTarget === undefined) {
+				target.set(field, this.createFieldData(entityMap, newDatum))
+			} else if (fromTarget instanceof ServerGeneratedUuid) {
+				if (newDatum === null) {
+					target.set(field, null)
+				} else if (typeof newDatum === 'object' && !Array.isArray(newDatum)) {
+					const target = entityMap.get(fromTarget.value)
+					if (target === undefined) {
+						this.rejectData()
+					}
 					// Assuming the ids are the same.
-					this.addEntityResponse(entityMap, freshEntityData[field] as ReceivedEntityData)
+					this.mergeInEntityData(entityMap, target, newDatum)
 				} else {
-					throw new BindingError()
+					this.rejectData()
 				}
-			} else if (fromOriginal instanceof Set) {
-				if (fromFresh instanceof Set) {
+			} else if (fromTarget instanceof Set) {
+				if (Array.isArray(newDatum)) {
 					// Assuming the set themselves are the same. This should be encoded in the placeholder. If that isn't the case,
 					// our hash function has had a conflict or something else has gone horribly wrong beyond repair.
 
-					for (const listEntityDatum of freshEntityData[field] as ReceivedEntityData[]) {
-						this.addEntityResponse(entityMap, listEntityDatum)
+					let i = 0
+					for (const listId of fromTarget) {
+						const target = entityMap.get(listId)
+						if (target === undefined) {
+							this.rejectData()
+						}
+						const listEntityDatum = newDatum[i]
+						this.mergeInEntityData(entityMap, target!, listEntityDatum)
+						i++
 					}
 				} else {
-					throw new BindingError()
+					this.rejectData()
 				}
-			} else if (fromOriginal === fromFresh) {
+			} else if (fromTarget === newDatum) {
 				// They are both scalars. Do nothing.
-			} else if (__DEV_MODE__) {
-				throw new BindingError(`Failed to process data received from the API.`)
+			} else {
+				this.rejectData()
 			}
 		}
-		return original
+		return target
+	}
+
+	private static rejectData(extraMessage?: string): never {
+		throw new BindingError(`Failed to process data received from the API.${extraMessage ? `\n${extraMessage}` : ''}`)
 	}
 }

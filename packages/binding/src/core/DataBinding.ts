@@ -87,6 +87,15 @@ export class DataBinding {
 	}
 
 	private readonly bindingOperations = Object.freeze<BindingOperations>({
+		hasEntityKey: key => {
+			return this.treeStore.entityStore.has(key)
+		},
+		hasSubTree: aliasOrParameters => {
+			if (typeof aliasOrParameters === 'string') {
+				return this.treeStore.markerTree.placeholdersByAliases.has(aliasOrParameters)
+			}
+			return this.treeStore.markerTree.subTrees.has(PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters))
+		},
 		getAllEntities: (treeStore => {
 			return function* (): Generator<EntityAccessor> {
 				for (const [, entity] of treeStore.entityStore) {

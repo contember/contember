@@ -20,6 +20,9 @@ import { TreeParameterMerger } from './TreeParameterMerger'
 export class MarkerMerger {
 	// This method assumes their placeholder names are the same
 	public static mergeMarkers(original: Marker, fresh: Marker): Marker {
+		if (original === fresh) {
+			return original
+		}
 		if (original instanceof FieldMarker) {
 			if (fresh instanceof FieldMarker) {
 				return this.mergeFieldMarkers(original, fresh)
@@ -62,6 +65,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeMarkerTreeRoots(original: MarkerTreeRoot, fresh: MarkerTreeRoot): MarkerTreeRoot {
+		if (original === fresh) {
+			return original
+		}
 		const newSubTrees = this.mergeEntityFields(original.subTrees, fresh.subTrees) as Map<PlaceholderName, SubTreeMarker>
 
 		const newOriginalAliases = new Map(original.placeholdersByAliases)
@@ -79,6 +85,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers {
+		if (original === fresh) {
+			return original
+		}
 		const newOriginal: EntityFieldMarkers = new Map(original)
 		for (const [placeholderName, freshMarker] of fresh) {
 			const markerFromOriginal = newOriginal.get(placeholderName)
@@ -94,6 +103,9 @@ export class MarkerMerger {
 		original: EntityFieldPlaceholders,
 		fresh: EntityFieldPlaceholders,
 	): EntityFieldPlaceholders {
+		if (original === fresh) {
+			return original
+		}
 		const newOriginal: EntityFieldPlaceholders = new Map(original)
 		for (const [fieldName, freshPlaceholders] of fresh) {
 			const placeholderFromOriginal = newOriginal.get(fieldName)
@@ -152,6 +164,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeHasOneRelationMarkers(original: HasOneRelationMarker, fresh: HasOneRelationMarker) {
+		if (original === fresh) {
+			return original
+		}
 		return new HasOneRelationMarker(
 			TreeParameterMerger.mergeHasOneRelationsWithSamePlaceholders(original.relation, fresh.relation),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
@@ -160,6 +175,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeHasManyRelationMarkers(original: HasManyRelationMarker, fresh: HasManyRelationMarker) {
+		if (original === fresh) {
+			return original
+		}
 		return new HasManyRelationMarker(
 			TreeParameterMerger.mergeHasManyRelationsWithSamePlaceholders(original.relation, fresh.relation),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
@@ -168,6 +186,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeSubTreeMarkers(original: SubTreeMarker, fresh: SubTreeMarker) {
+		if (original === fresh) {
+			return original
+		}
 		return new SubTreeMarker(
 			TreeParameterMerger.mergeSubTreeParametersWithSamePlaceholders(original.parameters, fresh.parameters),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
@@ -176,6 +197,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeFieldMarkers(original: FieldMarker, fresh: FieldMarker) {
+		if (original === fresh) {
+			return original
+		}
 		if (original.isNonbearing !== fresh.isNonbearing && original.isNonbearing) {
 			// If only one isNonbearing, then the whole field is bearing
 			return fresh

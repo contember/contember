@@ -168,7 +168,8 @@ type CategoryCreateResult {
 }
 
 type _MutationError {
-  path: [_PathFragment!]!
+  path: [_PathFragment!]! @deprecated(reason: "Use `paths`.")
+  paths: [[_PathFragment!]!]!
   type: _MutationErrorType!
   message: String
 }

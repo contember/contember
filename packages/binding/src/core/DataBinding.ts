@@ -32,11 +32,11 @@ import { DirtinessTracker } from './DirtinessTracker'
 import { EventManager } from './EventManager'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
-import { PersistedDataUpdater } from './PersistedDataUpdater'
 import { QueryGenerator } from './QueryGenerator'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
-import { RootStateNode } from './state'
+import { RootStateNode, StateType } from './state'
 import { StateInitializer } from './StateInitializer'
+import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
 
@@ -45,8 +45,8 @@ export class DataBinding {
 	private readonly config: Config
 	private readonly dirtinessTracker: DirtinessTracker
 	private readonly eventManager: EventManager
-	private readonly persistedDataUpdater: PersistedDataUpdater
 	private readonly stateInitializer: StateInitializer
+	private readonly treeAugmenter: TreeAugmenter
 	private readonly treeFilterGenerator: TreeFilterGenerator
 	private readonly treeStore: TreeStore
 
@@ -83,7 +83,7 @@ export class DataBinding {
 			this.eventManager,
 			this.treeStore,
 		)
-		this.persistedDataUpdater = new PersistedDataUpdater(this.eventManager, this.stateInitializer, this.treeStore)
+		this.treeAugmenter = new TreeAugmenter(this.eventManager, this.stateInitializer, this.treeStore)
 	}
 
 	private readonly bindingOperations = Object.freeze<BindingOperations>({
@@ -227,10 +227,20 @@ export class DataBinding {
 				const result = successfulResult
 				this.dirtinessTracker.reset()
 
+				// TODO do this cleanup somewhere else and in a less brittle fashion.
+				for (const [, entityState] of this.treeStore.entityStore) {
+					entityState.plannedHasOneDeletions = undefined
+					for (const [, child] of entityState.children) {
+						if (child.type === StateType.EntityList) {
+							child.plannedRemovals = undefined
+						}
+					}
+				}
+
 				try {
 					const persistedData = await this.fetchPersistedData(this.treeStore.markerTree)
 					this.eventManager.syncOperation(() => {
-						this.persistedDataUpdater.updatePersistedData(persistedData)
+						this.treeAugmenter.augmentTree(this.treeStore.markerTree, persistedData)
 						this.eventManager.triggerOnPersistSuccess({
 							...this.bindingOperations,
 							successType: result.type,
@@ -238,7 +248,7 @@ export class DataBinding {
 						})
 					})
 					return successfulResult
-				} catch {
+				} catch (e) {
 					this.eventManager.triggerOnPersistSuccess({
 						...this.bindingOperations,
 						successType: result.type,
@@ -260,22 +270,10 @@ export class DataBinding {
 
 	public async extendTree(newFragment: React.ReactNode) {
 		return await this.eventManager.asyncOperation(async () => {
-			const markerTree = new MarkerTreeGenerator(newFragment, this.environment).generate()
+			const newMarkerTree = new MarkerTreeGenerator(newFragment, this.environment).generate()
+			const newPersistedData = await this.fetchPersistedData(newMarkerTree)
 
-			this.treeStore.markerTree = markerTree // TODO
-
-			const persistedData = await this.fetchPersistedData(markerTree)
-
-			this.treeStore.subTreePersistedData = persistedData.subTreeDataStore // TODO
-			this.treeStore.persistedEntityData = persistedData.persistedEntityDataStore // TODO
-
-			for (const [placeholderName, marker] of this.treeStore.markerTree.subTrees) {
-				const subTreeState = this.stateInitializer.initializeSubTree(
-					marker,
-					persistedData.subTreeDataStore.get(placeholderName),
-				)
-				this.treeStore.subTreeStates.set(placeholderName, subTreeState)
-			}
+			this.treeAugmenter.augmentTree(newMarkerTree, newPersistedData)
 		})
 	}
 
@@ -300,17 +298,17 @@ export class DataBinding {
 		return subTreeState
 	}
 
-	private async fetchPersistedData(tree: MarkerTreeRoot): Promise<NormalizedQueryResponseData> {
+	private async fetchPersistedData(tree: MarkerTreeRoot): Promise<QueryRequestResponse | undefined> {
 		const queryGenerator = new QueryGenerator(tree)
 		const query = queryGenerator.getReadQuery()
 
-		let queryResponse: QueryRequestResponse | undefined
+		let queryResponse: QueryRequestResponse | undefined = undefined
 
 		try {
 			queryResponse = query === undefined ? undefined : await this.client.sendRequest(query)
 		} catch (metadata) {
 			this.onError(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
 		}
-		return QueryResponseNormalizer.normalizeResponse(queryResponse)
+		return queryResponse
 	}
 }

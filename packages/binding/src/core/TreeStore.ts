@@ -1,5 +1,12 @@
-import { PersistedEntityDataStore, SubTreeDataStore } from '../accessorTree'
+import {
+	NormalizedQueryResponseData,
+	PersistedEntityDataStore,
+	QueryRequestResponse,
+	SubTreeDataStore,
+} from '../accessorTree'
 import { MarkerTreeRoot } from '../markers'
+import { MarkerMerger } from './MarkerMerger'
+import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { EntityState, RootStateNode } from './state'
 
 export class TreeStore {
@@ -10,8 +17,23 @@ export class TreeStore {
 	public readonly entityStore: Map<string, EntityState> = new Map()
 	public readonly subTreeStates: Map<string, RootStateNode> = new Map()
 
-	// TODO !!!
-	public markerTree: MarkerTreeRoot = new MarkerTreeRoot(new Map(), new Map())
-	public persistedEntityData: PersistedEntityDataStore = new Map()
-	public subTreePersistedData: SubTreeDataStore = new Map()
+	private _markerTree: MarkerTreeRoot = new MarkerTreeRoot(new Map(), new Map())
+	private persistedData: NormalizedQueryResponseData = new NormalizedQueryResponseData(new Map(), new Map())
+
+	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: QueryRequestResponse | undefined) {
+		this._markerTree = MarkerMerger.mergeMarkerTreeRoots(this._markerTree, newMarkerTree)
+		QueryResponseNormalizer.mergeInResponse(this.persistedData, newPersistedData)
+	}
+
+	public get markerTree() {
+		return this._markerTree
+	}
+
+	public get persistedEntityData() {
+		return this.persistedData.persistedEntityDataStore
+	}
+
+	public get subTreePersistedData() {
+		return this.persistedData.subTreeDataStore
+	}
 }

@@ -1,6 +1,5 @@
 import {
 	EntityFieldPersistedData,
-	EntityListPersistedData,
 	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
 	QueryRequestResponse,
@@ -8,20 +7,16 @@ import {
 	ReceivedFieldData,
 	ServerGeneratedUuid,
 	SingleEntityPersistedData,
-	SubTreeDataStore,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 
 export class QueryResponseNormalizer {
-	public static normalizeResponse(response: QueryRequestResponse | undefined): NormalizedQueryResponseData {
-		const entityMap: PersistedEntityDataStore = new Map()
-		const subTreeMap: SubTreeDataStore = new Map()
-
+	public static mergeInResponse(original: NormalizedQueryResponseData, response: QueryRequestResponse | undefined) {
 		if (response === undefined) {
-			return new NormalizedQueryResponseData(subTreeMap, entityMap)
+			return original
 		}
-
+		const { subTreeDataStore, persistedEntityDataStore } = original
 		const { data } = response
 
 		for (const treeId in data) {
@@ -30,13 +25,15 @@ export class QueryResponseNormalizer {
 			if (treeDatum === undefined || treeDatum === null) {
 				continue
 			}
-			subTreeMap.set(
-				treeId,
-				this.createFieldData(entityMap, treeDatum) as ServerGeneratedUuid | EntityListPersistedData,
-			)
-		}
+			const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
 
-		return new NormalizedQueryResponseData(subTreeMap, entityMap)
+			if (fieldData instanceof Set || (typeof fieldData === 'object' && fieldData !== null)) {
+				subTreeDataStore.set(treeId, fieldData)
+			} else {
+				this.rejectData()
+			}
+		}
+		return original
 	}
 
 	private static createFieldData(
@@ -105,26 +102,19 @@ export class QueryResponseNormalizer {
 				}
 			} else if (fromTarget instanceof Set) {
 				if (Array.isArray(newDatum)) {
-					// Assuming the set themselves are the same. This should be encoded in the placeholder. If that isn't the case,
-					// our hash function has had a conflict or something else has gone horribly wrong beyond repair.
-
-					let i = 0
-					for (const listId of fromTarget) {
-						const target = entityMap.get(listId)
-						if (target === undefined) {
-							this.rejectData()
-						}
-						const listEntityDatum = newDatum[i]
-						this.mergeInEntityData(entityMap, target!, listEntityDatum)
-						i++
+					fromTarget.clear()
+					for (const entityData of newDatum) {
+						fromTarget.add(this.createEntityData(entityMap, entityData))
 					}
 				} else {
 					this.rejectData()
 				}
-			} else if (fromTarget === newDatum) {
-				// They are both scalars. Do nothing.
 			} else {
-				this.rejectData()
+				if (Array.isArray(newDatum) || (typeof newDatum === 'object' && newDatum !== null)) {
+					this.rejectData()
+				} else {
+					target.set(field, newDatum)
+				}
 			}
 		}
 		return target

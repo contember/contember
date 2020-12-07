@@ -5,6 +5,7 @@ import { BindingOperations, EntityAccessor, EntityListAccessor, ErrorAccessor, F
 import {
 	ClientGeneratedUuid,
 	EntityFieldPersistedData,
+	EntityListPersistedData,
 	ServerGeneratedUuid,
 	UnpersistedEntityKey,
 } from '../accessorTree'
@@ -16,6 +17,7 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
+	Marker,
 	SubTreeMarker,
 } from '../markers'
 import {
@@ -60,11 +62,9 @@ export class StateInitializer {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public initializeSubTree(
-		tree: SubTreeMarker,
-		persistedRootData: ServerGeneratedUuid | Set<string> | undefined,
-	): RootStateNode {
+	public initializeSubTree(tree: SubTreeMarker): RootStateNode {
 		let subTreeState: RootStateNode
+		const persistedRootData = this.treeStore.subTreePersistedData.get(tree.placeholderName)
 
 		if (tree.parameters.type === 'qualifiedEntityList' || tree.parameters.type === 'unconstrainedQualifiedEntityList') {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
@@ -204,16 +204,8 @@ export class StateInitializer {
 									`In order to change it, it needs to be set immediately after initialization of the entity.`,
 							)
 						}
-						entityState.hasIdSetInStone = true
-						const previousKey = entityState.id.value
-						const newKey = updatedState.value as string
-						entityState.id = new ClientGeneratedUuid(newKey)
-						this.treeStore.entityStore.delete(previousKey)
-						this.treeStore.entityStore.set(newKey, entityState)
-					}
-					if (updatedState.type === StateType.Entity && updatedState.maidenKey !== updatedState.id.value) {
-						const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, updatedState)
-						this.eventManager.markPendingConnections(entityState, relevantPlaceholders)
+						const newId = new ClientGeneratedUuid(updatedState.value as string)
+						this.changeEntityId(entityState, newId)
 					}
 
 					if (updatedState.type === StateType.Entity && updatedState.isScheduledForDeletion) {
@@ -524,7 +516,9 @@ export class StateInitializer {
 			)
 		}
 
-		this.initializeEntityFields(entityState, realm.markersContainer)
+		for (const [placeholderName, field] of realm.markersContainer.markers) {
+			this.initializeEntityField(entityState, field, entityState.persistedData?.get(placeholderName))
+		}
 
 		this.eventManager.registerNewlyInitialized([entityState, realm])
 
@@ -586,7 +580,7 @@ export class StateInitializer {
 				// No beforeUpdate for child updates!
 				batchUpdatesImplementation(() => {
 					if (updatedState.isScheduledForDeletion) {
-						processEntityDeletion(updatedState)
+						this.processEntityDeletion(entityListState, updatedState)
 					} else {
 						this.markChildStateInNeedOfUpdate(entityListState, updatedState)
 					}
@@ -662,7 +656,7 @@ export class StateInitializer {
 							)
 						}
 
-						const didDelete = disconnectedChildState.realms.get(entityListState)?.delete(disconnectedChildKey)
+						const didDelete = disconnectedChildState.realms.delete(entityListState)
 						if (!didDelete) {
 							this.rejectInvalidAccessorTree()
 						}
@@ -741,36 +735,12 @@ export class StateInitializer {
 			})
 		}
 
-		const processEntityDeletion = (stateForDeletion: EntityState) => {
-			// We don't remove entities from the store so as to allow their re-connection.
-			entityListState.childrenWithPendingUpdates?.delete(stateForDeletion)
-
-			const key = stateForDeletion.id.value
-			entityListState.children.delete(key)
-			entityListState.hasPendingParentNotification = true
-
-			if (!stateForDeletion.id.existsOnServer) {
-				return
-			}
-
-			if (entityListState.plannedRemovals === undefined) {
-				entityListState.plannedRemovals = new Map()
-			}
-			entityListState.plannedRemovals.set(stateForDeletion, 'delete')
-		}
-
 		const initialData: Set<string | undefined> =
 			persistedEntityIds.size === 0
 				? new Set(Array.from({ length: creationParameters.initialEntityCount }))
 				: persistedEntityIds
 		for (const entityId of initialData) {
-			const id = entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityKey()
-			const stub = this.initializeEntityStateStub(
-				id,
-				this.createRealmSet(entityListState, id.value, this.createListEntityRealm(entityListState, id)),
-			)
-			entityListState.hasStaleAccessor = true
-			entityListState.children.set(id.value, stub)
+			this.initializeListEntityStub(entityListState, entityId)
 		}
 
 		return entityListState
@@ -1042,20 +1012,21 @@ export class StateInitializer {
 		}
 	}
 
-	private initializeEntityFields(entityState: EntityState, markersContainer: EntityFieldMarkersContainer): void {
-		for (const [placeholderName, field] of markersContainer.markers) {
-			const fieldDatum = entityState.persistedData?.get(placeholderName)
-			if (field instanceof FieldMarker) {
-				this.initializeFromFieldMarker(entityState, field, fieldDatum)
-			} else if (field instanceof HasOneRelationMarker) {
-				this.initializeFromHasOneRelationMarker(entityState, field, fieldDatum)
-			} else if (field instanceof HasManyRelationMarker) {
-				this.initializeFromHasManyRelationMarker(entityState, field, fieldDatum)
-			} else if (field instanceof SubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
-			} else {
-				assertNever(field)
-			}
+	public initializeEntityField(
+		entityState: EntityState,
+		field: Marker,
+		fieldDatum: EntityFieldPersistedData | undefined,
+	): void {
+		if (field instanceof FieldMarker) {
+			this.initializeFromFieldMarker(entityState, field, fieldDatum)
+		} else if (field instanceof HasOneRelationMarker) {
+			this.initializeFromHasOneRelationMarker(entityState, field, fieldDatum)
+		} else if (field instanceof HasManyRelationMarker) {
+			this.initializeFromHasManyRelationMarker(entityState, field, fieldDatum)
+		} else if (field instanceof SubTreeMarker) {
+			// Do nothing: all sub trees have been hoisted and shouldn't appear here.
+		} else {
+			assertNever(field)
 		}
 	}
 
@@ -1164,6 +1135,18 @@ export class StateInitializer {
 		}
 	}
 
+	public initializeListEntityStub(entityListState: EntityListState, entityId: string | undefined): EntityStateStub {
+		const id = entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityKey()
+		const stub = this.initializeEntityStateStub(
+			id,
+			this.createRealmSet(entityListState, id.value, this.createListEntityRealm(entityListState, id)),
+		)
+		entityListState.hasStaleAccessor = true
+		entityListState.children.set(id.value, stub)
+
+		return stub
+	}
+
 	private createRealmSet(parent: EntityRealmParent, key: EntityRealmKey, realm: EntityRealm): EntityRealmSet {
 		return new Map([[parent, new Map([[key, realm]])]])
 	}
@@ -1208,5 +1191,62 @@ export class StateInitializer {
 		}
 
 		return [entityToConnectKey, stateToConnect]
+	}
+
+	public changeEntityId(entityState: EntityState, newId: EntityAccessor.RuntimeId) {
+		const previousKey = entityState.id.value
+		const newKey = newId.value
+
+		entityState.hasIdSetInStone = true
+		entityState.id = newId
+		this.treeStore.entityStore.delete(previousKey)
+		this.treeStore.entityStore.set(newKey, entityState)
+
+		for (const [parentState] of entityState.realms) {
+			// We're touching the parents and not letting *their* onChildUpdate handle this because we really need
+			// to make sure this gets processed which wouldn't happen if before the id change we had told the parent
+			// about another update.
+			if (parentState?.type === StateType.Entity) {
+				const relevantPlaceholders = this.findChildPlaceholdersByState(parentState, entityState)
+				this.eventManager.markPendingConnections(parentState, relevantPlaceholders)
+			} else if (parentState?.type === StateType.EntityList) {
+				// This is tricky. We need to change the key but at the same time preserve the order of the entities.
+				// We find the index of this entity (knowing there's exactly one occurrence), then convert the children
+				// to an array, perform the replacement and put the data back into the map, preserving its referential
+				// identity.
+				let childIndex = -1
+				for (const [key] of parentState.children) {
+					childIndex++
+					if (key === previousKey) {
+						break
+					}
+				}
+				const childrenArray = Array.from(parentState.children)
+				childrenArray[childIndex] = [newKey, entityState]
+
+				parentState.children.clear()
+				for (const [key, state] of childrenArray) {
+					parentState.children.set(key, state)
+				}
+			}
+		}
+	}
+
+	private processEntityDeletion(entityListState: EntityListState, stateForDeletion: EntityState) {
+		// We don't remove entities from the store so as to allow their re-connection.
+		entityListState.childrenWithPendingUpdates?.delete(stateForDeletion)
+
+		const key = stateForDeletion.id.value
+		entityListState.children.delete(key)
+		entityListState.hasPendingParentNotification = true
+
+		if (!stateForDeletion.id.existsOnServer) {
+			return
+		}
+
+		if (entityListState.plannedRemovals === undefined) {
+			entityListState.plannedRemovals = new Map()
+		}
+		entityListState.plannedRemovals.set(stateForDeletion, 'delete')
 	}
 }

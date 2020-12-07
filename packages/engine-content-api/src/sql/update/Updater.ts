@@ -57,7 +57,7 @@ export class Updater {
 		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, data, values)
 		const mutationResultPromise = Updater.executeUpdate(updateBuilder, mapper.db, okResultFactory)
 
-		return await collectResults([mutationResultPromise, ...Object.values(promises)])
+		return await collectResults(mutationResultPromise, Object.values(promises))
 	}
 
 	public async updateCb(

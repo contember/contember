@@ -56,8 +56,18 @@ export class ResultSchemaTypeProvider {
 		name: '_MutationError',
 		fields: {
 			path: {
+				deprecationReason: 'Use `paths`.',
 				type: this.graphqlObjectFactories.createNotNull(
 					this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.pathFragmentType)),
+				),
+			},
+			paths: {
+				type: this.graphqlObjectFactories.createNotNull(
+					this.graphqlObjectFactories.createList(
+						this.graphqlObjectFactories.createNotNull(
+							this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.pathFragmentType)),
+						),
+					),
 				),
 			},
 			type: {

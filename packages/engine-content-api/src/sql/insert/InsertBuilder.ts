@@ -6,6 +6,7 @@ import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData } from '../ColumnValue'
 import { ImplementationException } from '../../exception'
 import { AbortInsert } from './Inserter'
+import { EnrichedError } from '../ErrorUtils'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]
@@ -45,11 +46,13 @@ export default class InsertBuilder {
 	}
 
 	public async execute(db: Client): Promise<InsertResult> {
+		let resolvedDataFinal: ResolvedColumnValue[] | null = null
 		try {
 			const resolvedData = await this.getResolvedData()
 			if (resolvedData.find(it => it.resolvedValue === AbortInsert)) {
 				return { aborted: true, executed: false, primaryValue: null, values: [] }
 			}
+			resolvedDataFinal = resolvedData as ResolvedColumnValue[]
 			const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
 				(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
 				{},
@@ -76,7 +79,7 @@ export default class InsertBuilder {
 			return { values: resolvedData as ResolvedColumnValue[], executed: true, primaryValue: result, aborted: false }
 		} catch (e) {
 			this.resolver(null)
-			throw e
+			throw new EnrichedError(this.entity, resolvedDataFinal, e)
 		}
 	}
 }

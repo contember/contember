@@ -55,7 +55,7 @@ export class Inserter {
 			new MutationCreateOk([], entity, primary, data, values)
 		const insertPromise = this.executeInsert(insertBuilder, mapper.db, okResultFactory)
 
-		return await collectResults([insertPromise, ...Object.values(promises)])
+		return await collectResults(insertPromise, Object.values(promises))
 	}
 
 	private async executeInsert(

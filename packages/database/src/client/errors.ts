@@ -25,3 +25,5 @@ export class UniqueViolationError extends ConnectionError {}
 export class SerializationFailureError extends ConnectionError {}
 
 export class InvalidDataError extends ConnectionError {}
+
+export class TransactionAbortedError extends ConnectionError {}

@@ -2,7 +2,7 @@ import { EntityAccessor, ErrorAccessor } from '../../accessors'
 import { SingleEntityPersistedData } from '../../accessorTree'
 import { Environment } from '../../dao'
 import { EntityFieldMarkersContainer } from '../../markers'
-import { EntityCreationParameters, FieldName, SingleEntityEventListeners } from '../../treeParameters'
+import { EntityCreationParameters, PlaceholderName, SingleEntityEventListeners } from '../../treeParameters'
 import { EntityRealmSet } from './EntityRealmSet'
 import { EntityStateStub } from './EntityStateStub'
 import { StateNode } from './StateNode'
@@ -16,8 +16,8 @@ export interface EntityState {
 	batchUpdateDepth: number
 	childrenWithPendingUpdates: Set<StateNode> | undefined
 	errors: ErrorAccessor | undefined
-	children: Map<FieldName, StateNode | EntityStateStub>
-	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
+	children: Map<PlaceholderName, StateNode | EntityStateStub>
+	fieldsWithPendingConnectionUpdates: Set<PlaceholderName> | undefined
 	hasIdSetInStone: boolean // Initially, ids may be changed but only up to a certain point. This marks that point.
 	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean
@@ -27,7 +27,7 @@ export interface EntityState {
 	onChildUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	maidenKey: string | undefined // undefined for persisted entities
 	persistedData: SingleEntityPersistedData | undefined // TODO remove this
-	plannedHasOneDeletions: Map<FieldName, EntityState> | undefined
+	plannedHasOneDeletions: Map<PlaceholderName, EntityState> | undefined
 	realms: EntityRealmSet
 	typeName: string | undefined
 

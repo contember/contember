@@ -10,7 +10,6 @@ import {
 import {
 	metadataToRequestError,
 	MutationErrorType,
-	NormalizedQueryResponseData,
 	PersistResultSuccessType,
 	QueryRequestResponse,
 	RequestError,
@@ -33,7 +32,6 @@ import { EventManager } from './EventManager'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
-import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { RootStateNode, StateType } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
@@ -242,6 +240,8 @@ export class DataBinding {
 					for (const [, child] of entityState.children) {
 						if (child.type === StateType.EntityList) {
 							child.plannedRemovals = undefined
+						} else if (child.type === StateType.Field) {
+							child.hasUnpersistedChanges = false
 						}
 					}
 				}

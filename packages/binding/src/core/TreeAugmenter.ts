@@ -43,41 +43,41 @@ export class TreeAugmenter {
 
 				assert(completeTreeMarker !== undefined)
 
+				let didUpdateTree = false
+
 				if (subTreeState === undefined) {
 					this.stateInitializer.initializeSubTree(newSubTreeMarker)
-					didUpdateSomething = true
+					didUpdateTree = true
 				} else if (subTreeState.type === StateType.Entity) {
 					assert(
 						newSubTreeData === null || newSubTreeData === undefined || newSubTreeData instanceof ServerGeneratedUuid,
 					)
 
-					didUpdateSomething =
-						didUpdateSomething ||
-						this.updateSingleEntityPersistedData(
-							alreadyProcessed,
-							undefined,
-							subTreePlaceholder,
-							subTreeState,
-							completeTreeMarker.fields,
-							newSubTreeMarker.fields,
-							newSubTreeData || new UnpersistedEntityKey(),
-						)
+					didUpdateTree = this.updateSingleEntityPersistedData(
+						alreadyProcessed,
+						undefined,
+						subTreePlaceholder,
+						subTreeState,
+						completeTreeMarker.fields,
+						newSubTreeMarker.fields,
+						newSubTreeData || new UnpersistedEntityKey(),
+					)
 				} else if (subTreeState.type === StateType.EntityList) {
 					assert(newSubTreeData instanceof Set)
 
-					didUpdateSomething =
-						didUpdateSomething ||
-						this.updateEntityListPersistedData(
-							alreadyProcessed,
-							subTreeState,
-							completeTreeMarker.fields,
-							newSubTreeMarker.fields,
-							newSubTreeData,
-						)
+					didUpdateTree = this.updateEntityListPersistedData(
+						alreadyProcessed,
+						subTreeState,
+						completeTreeMarker.fields,
+						newSubTreeMarker.fields,
+						newSubTreeData,
+					)
 				} else {
 					assertNever(subTreeState)
 				}
+				didUpdateSomething = didUpdateSomething || didUpdateTree
 			}
+			// TODO use didUpdateSomething
 		})
 	}
 
@@ -110,6 +110,7 @@ export class TreeAugmenter {
 		}
 
 		const newPersistedData = this.treeStore.persistedEntityData.get(state.id.value)
+		state.persistedData = newPersistedData
 
 		for (let [placeholderName, marker] of newMarkersContainer.markers) {
 			const completeMarker = completeMarkersContainer?.markers.get(placeholderName)
@@ -141,8 +142,6 @@ export class TreeAugmenter {
 						break
 					}
 					case StateType.Entity: {
-						const marker = state.combinedMarkersContainer.markers.get(placeholderName)
-
 						assert(marker instanceof HasOneRelationMarker)
 						assert(completeMarker === undefined || completeMarker instanceof HasOneRelationMarker)
 						assert(
@@ -213,9 +212,6 @@ export class TreeAugmenter {
 		}
 
 		if (didUpdate) {
-			// This should be unnecessary because it has already been mutated in.
-			// state.persistedData = newPersistedData
-
 			state.hasStaleAccessor = true
 			state.hasPendingUpdate = true
 		}
@@ -240,7 +236,6 @@ export class TreeAugmenter {
 				if (!newPersistedData.has(oldKey)) {
 					haveSameKeySets = false
 					break
-					// TODO delete the corresponding state
 				}
 				// We also check the order
 				const newKeyResult = newKeyIterator.next()
@@ -254,9 +249,6 @@ export class TreeAugmenter {
 			didUpdate = true
 		}
 
-		// This should be unnecessary because it has already been mutated in.
-		// state.persistedEntityIds = newPersistedData
-
 		const initialData: Set<string | undefined> =
 			newPersistedData.size > 0
 				? newPersistedData
@@ -267,6 +259,7 @@ export class TreeAugmenter {
 			: newMarkersContainer
 		// TODO also update other init params.
 		state.markersContainer = mergedContainer
+		state.persistedEntityIds = newPersistedData
 
 		state.children.clear() // Preserving the reference!
 
@@ -274,7 +267,6 @@ export class TreeAugmenter {
 		// 	wizardry and match the id sets in order to convert the unpersisted
 		for (const newPersistedId of initialData) {
 			if (newPersistedId === undefined) {
-				console.log('init list', state)
 				// This already ads the stub to the children map.
 				this.stateInitializer.initializeListEntityStub(state, newPersistedId)
 				didUpdate = true

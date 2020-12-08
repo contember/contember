@@ -4,6 +4,7 @@ import {
 	BindingOperations,
 	EntityAccessor,
 	EntityListAccessor,
+	ExtendTreeOptions,
 	PersistErrorOptions,
 	TreeRootAccessor,
 } from '../accessors'
@@ -277,10 +278,17 @@ export class DataBinding {
 	// 	this.treeRootListeners,
 	// )
 
-	public async extendTree(newFragment: React.ReactNode) {
+	public async extendTree(newFragment: React.ReactNode, { signal }: ExtendTreeOptions = {}) {
 		return await this.eventManager.asyncOperation(async () => {
+			if (signal?.aborted) {
+				return Promise.reject()
+			}
 			const newMarkerTree = new MarkerTreeGenerator(newFragment, this.environment).generate()
-			const newPersistedData = await this.fetchPersistedData(newMarkerTree)
+			const newPersistedData = await this.fetchPersistedData(newMarkerTree, signal)
+
+			if (signal?.aborted) {
+				return Promise.reject()
+			}
 
 			this.treeAugmenter.augmentTree(newMarkerTree, newPersistedData)
 		})
@@ -307,14 +315,22 @@ export class DataBinding {
 		return subTreeState
 	}
 
-	private async fetchPersistedData(tree: MarkerTreeRoot): Promise<QueryRequestResponse | undefined> {
+	private async fetchPersistedData(
+		tree: MarkerTreeRoot,
+		signal?: AbortSignal,
+	): Promise<QueryRequestResponse | undefined> {
 		const queryGenerator = new QueryGenerator(tree)
 		const query = queryGenerator.getReadQuery()
 
 		let queryResponse: QueryRequestResponse | undefined = undefined
 
 		try {
-			queryResponse = query === undefined ? undefined : await this.client.sendRequest(query)
+			queryResponse =
+				query === undefined
+					? undefined
+					: await this.client.sendRequest(query, {
+							signal,
+					  })
 		} catch (metadata) {
 			this.onError(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
 		}

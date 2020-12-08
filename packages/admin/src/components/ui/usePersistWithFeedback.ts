@@ -1,19 +1,13 @@
-import { ErrorPersistResult, RequestErrorType, SuccessfulPersistResult, useTriggerPersist } from '@contember/binding'
+import { ErrorPersistResult, SuccessfulPersistResult, usePersist } from '@contember/binding'
 import * as React from 'react'
 import { useShowToastWithTimeout } from './useShowToastWithTimeout'
 
-export const useTriggerPersistWithFeedback = () => {
-	const triggerPersist = useTriggerPersist()
+export const usePersistWithFeedback = () => {
+	const persistAll = usePersist()
 	const showToast = useShowToastWithTimeout()
 
 	return React.useCallback((): Promise<SuccessfulPersistResult> => {
-		if (!triggerPersist) {
-			return Promise.reject({
-				type: RequestErrorType.UnknownError,
-			})
-		}
-
-		return triggerPersist()
+		return persistAll()
 			.then(result => {
 				console.debug('persist success', result)
 				showToast({
@@ -30,5 +24,5 @@ export const useTriggerPersistWithFeedback = () => {
 				})
 				return Promise.reject(result)
 			})
-	}, [showToast, triggerPersist])
+	}, [showToast, persistAll])
 }

@@ -1,56 +1,64 @@
 import { RelationFilter, TreeFilter } from '@contember/client'
-import { EntityFieldMarkersContainer, HasManyRelationMarker, HasOneRelationMarker, MarkerTreeRoot } from '../markers'
+import { EntityListPersistedData, ServerGeneratedUuid } from '../accessorTree'
+import { EntityFieldMarkersContainer, HasManyRelationMarker, HasOneRelationMarker, SubTreeMarker } from '../markers'
+import { EntityName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { InternalEntityState, InternalRootStateNode, InternalStateType } from './internalState'
+import { TreeStore } from './TreeStore'
 
 type RawRelationFilters = Map<string, RawRelationFilters>
 
 export class TreeFilterGenerator {
-	public constructor(
-		private readonly markerTree: MarkerTreeRoot,
-		private readonly subTreeStates: Map<string, InternalRootStateNode>,
-	) {}
+	public constructor(private readonly treeStore: TreeStore) {}
 
 	public generateTreeFilter(): TreeFilter[] {
-		return Array.from(this.markerTree.subTrees)
+		return Array.from(this.treeStore.markerTree.subTrees)
 			.filter(([, tree]) => tree.parameters.value.expectedMutation !== 'none')
-			.map(([placeholder]) => this.generateSubTreeFilter(this.subTreeStates.get(placeholder)!))
+			.map(([placeholderName, tree]) =>
+				this.generateSubTreeFilter(tree, this.treeStore.subTreePersistedData.get(placeholderName)),
+			)
 			.flat()
 	}
 
-	private generateSubTreeFilter(subTree: InternalRootStateNode): TreeFilter[] {
+	private generateSubTreeFilter(
+		subTree: SubTreeMarker,
+		persistedData: ServerGeneratedUuid | EntityListPersistedData | undefined,
+	): TreeFilter[] {
 		const filters: TreeFilter[] = []
 
-		switch (subTree.type) {
-			case InternalStateType.SingleEntity: {
-				const filter = this.generateTopLevelEntityFilter(subTree)
+		if (
+			persistedData === undefined ||
+			subTree.parameters.type === 'unconstrainedQualifiedEntityList' ||
+			subTree.parameters.type === 'unconstrainedQualifiedSingleEntity'
+		) {
+			return filters // Do nothing
+		}
+
+		if (persistedData instanceof ServerGeneratedUuid) {
+			const filter = this.generateTopLevelEntityFilter(
+				persistedData.value,
+				subTree.parameters.value.entityName,
+				subTree.fields,
+			)
+			filter && filters.push(filter)
+		} else {
+			for (const id of persistedData) {
+				const filter = this.generateTopLevelEntityFilter(id, subTree.parameters.value.entityName, subTree.fields)
 				filter && filters.push(filter)
-				break
 			}
-			case InternalStateType.EntityList: {
-				for (const entityState of subTree.children) {
-					const filter = this.generateTopLevelEntityFilter(entityState)
-					filter && filters.push(filter)
-				}
-				break
-			}
-			default:
-				return assertNever(subTree)
 		}
 
 		return filters
 	}
 
-	private generateTopLevelEntityFilter(topLevelEntity: InternalEntityState): TreeFilter | undefined {
-		const { id, typeName } = topLevelEntity
-
-		if (!id.existsOnServer || typeName === undefined) {
-			return undefined
-		}
+	private generateTopLevelEntityFilter(
+		id: string,
+		entityName: EntityName,
+		fields: EntityFieldMarkersContainer,
+	): TreeFilter | undefined {
 		return {
-			entity: typeName,
-			id: id.value,
-			relations: this.generateEntityRelations(topLevelEntity.markersContainer),
+			entity: entityName,
+			id: id,
+			relations: this.generateEntityRelations(fields),
 		}
 	}
 

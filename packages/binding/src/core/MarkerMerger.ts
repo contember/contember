@@ -9,15 +9,20 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	Marker,
+	MarkerTreeRoot,
 	SubTreeMarker,
 } from '../markers'
-import { FieldName } from '../treeParameters'
+import { FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
+import { EntityRealm } from './state'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
 export class MarkerMerger {
 	// This method assumes their placeholder names are the same
 	public static mergeMarkers(original: Marker, fresh: Marker): Marker {
+		if (original === fresh) {
+			return original
+		}
 		if (original instanceof FieldMarker) {
 			if (fresh instanceof FieldMarker) {
 				return this.mergeFieldMarkers(original, fresh)
@@ -59,7 +64,30 @@ export class MarkerMerger {
 		assertNever(original)
 	}
 
+	public static mergeMarkerTreeRoots(original: MarkerTreeRoot, fresh: MarkerTreeRoot): MarkerTreeRoot {
+		if (original === fresh) {
+			return original
+		}
+		const newSubTrees = this.mergeEntityFields(original.subTrees, fresh.subTrees) as Map<PlaceholderName, SubTreeMarker>
+
+		const newOriginalAliases = new Map(original.placeholdersByAliases)
+		for (const [alias, placeholder] of fresh.placeholdersByAliases) {
+			const fromOriginal = newOriginalAliases.get(alias)
+			if (fromOriginal === undefined) {
+				newOriginalAliases.set(alias, placeholder)
+			} else if (fromOriginal === placeholder) {
+				// Do nothing
+			} else {
+				throw new BindingError(`Illegal subTree alias '${alias}' points to distinct subTrees.`)
+			}
+		}
+		return new MarkerTreeRoot(newSubTrees, newOriginalAliases)
+	}
+
 	public static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers {
+		if (original === fresh) {
+			return original
+		}
 		const newOriginal: EntityFieldMarkers = new Map(original)
 		for (const [placeholderName, freshMarker] of fresh) {
 			const markerFromOriginal = newOriginal.get(placeholderName)
@@ -75,6 +103,9 @@ export class MarkerMerger {
 		original: EntityFieldPlaceholders,
 		fresh: EntityFieldPlaceholders,
 	): EntityFieldPlaceholders {
+		if (original === fresh) {
+			return original
+		}
 		const newOriginal: EntityFieldPlaceholders = new Map(original)
 		for (const [fieldName, freshPlaceholders] of fresh) {
 			const placeholderFromOriginal = newOriginal.get(fieldName)
@@ -122,6 +153,9 @@ export class MarkerMerger {
 		original: EntityFieldMarkersContainer,
 		fresh: EntityFieldMarkersContainer,
 	): EntityFieldMarkersContainer {
+		if (original === fresh) {
+			return original
+		}
 		return new EntityFieldMarkersContainer(
 			original.hasAtLeastOneBearingField || fresh.hasAtLeastOneBearingField,
 			this.mergeEntityFields(original.markers, fresh.markers),
@@ -130,6 +164,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeHasOneRelationMarkers(original: HasOneRelationMarker, fresh: HasOneRelationMarker) {
+		if (original === fresh) {
+			return original
+		}
 		return new HasOneRelationMarker(
 			TreeParameterMerger.mergeHasOneRelationsWithSamePlaceholders(original.relation, fresh.relation),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
@@ -138,6 +175,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeHasManyRelationMarkers(original: HasManyRelationMarker, fresh: HasManyRelationMarker) {
+		if (original === fresh) {
+			return original
+		}
 		return new HasManyRelationMarker(
 			TreeParameterMerger.mergeHasManyRelationsWithSamePlaceholders(original.relation, fresh.relation),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
@@ -146,6 +186,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeSubTreeMarkers(original: SubTreeMarker, fresh: SubTreeMarker) {
+		if (original === fresh) {
+			return original
+		}
 		return new SubTreeMarker(
 			TreeParameterMerger.mergeSubTreeParametersWithSamePlaceholders(original.parameters, fresh.parameters),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
@@ -154,6 +197,9 @@ export class MarkerMerger {
 	}
 
 	public static mergeFieldMarkers(original: FieldMarker, fresh: FieldMarker) {
+		if (original === fresh) {
+			return original
+		}
 		if (original.isNonbearing !== fresh.isNonbearing && original.isNonbearing) {
 			// If only one isNonbearing, then the whole field is bearing
 			return fresh
@@ -185,6 +231,33 @@ export class MarkerMerger {
 			return original
 		}
 		return original.putDelta(fresh.getAllNames())
+	}
+
+	public static mergeRealms(original: EntityRealm, fresh: EntityRealm): EntityRealm {
+		// Assuming the key and parent are the same
+		if (original === fresh) {
+			return original
+		}
+		return {
+			realmKey: original.realmKey,
+			parent: original.parent,
+			initialEventListeners: original.initialEventListeners
+				? fresh.initialEventListeners
+					? {
+							eventListeners: TreeParameterMerger.mergeSingleEntityEventListeners(
+								original.initialEventListeners.eventListeners,
+								fresh.initialEventListeners.eventListeners,
+							),
+					  }
+					: original.initialEventListeners
+				: fresh.initialEventListeners,
+			creationParameters: TreeParameterMerger.mergeEntityCreationParameters(
+				original.creationParameters,
+				fresh.creationParameters,
+			),
+			markersContainer: this.mergeEntityFieldsContainers(original.markersContainer, fresh.markersContainer),
+			environment: this.mergeEnvironments(original.environment, fresh.environment),
+		}
 	}
 
 	private static rejectRelationScalarCombo(fieldName: FieldName): never {

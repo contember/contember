@@ -11,13 +11,16 @@ const getRejecter = (operation: string) => () => {
 }
 
 export const defaultBindingOperations = Object.freeze<BindingOperations>({
+	hasEntityKey: getRejecter('query an entity key'),
+	hasSubTree: getRejecter('query a sub tree'),
 	getEntityListSubTree: getRejecter('retrieve an entity list sub tree'),
 	getEntitySubTree: getRejecter('retrieve a single entity sub tree'),
 	getAllEntities: getRejecter('retrieve all entities'),
 	getEntityByKey: getRejecter('retrieve an entity by key'),
 	getTreeFilters: getRejecter('retrieve tree filters'),
 	batchDeferredUpdates: getRejecter('batch deferred updates'),
-	persistAll: getRejecter('persist all'),
+	extendTree: getRejecter('extendTree'),
+	persist: getRejecter('persist'),
 })
 
 export const BindingOperationsContext = React.createContext<BindingOperations>(defaultBindingOperations)

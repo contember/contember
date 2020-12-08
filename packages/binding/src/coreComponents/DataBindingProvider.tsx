@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { AccessorTree, AccessorTreeState, useAccessorTreeState } from '../accessorTree'
+import { AccessorTree, AccessorTreeState, useDataBinding } from '../accessorTree'
 
 export interface DataBindingProviderBaseProps {
 	children?: React.ReactNode
@@ -22,7 +22,7 @@ export type DataBindingProviderProps<StateProps> = DataBindingProviderBaseProps 
 export const DataBindingProvider = React.memo(function DataBindingProvider<
 	StateProps extends DataBindingStateComponentProps
 >(props: DataBindingProviderProps<StateProps>) {
-	const accessorTreeState = useAccessorTreeState({
+	const accessorTreeState = useDataBinding({
 		nodeTree: props.children,
 	})
 

@@ -1,16 +1,12 @@
 import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
-import {
-	InternalEntityListState,
-	InternalEntityState,
-	InternalRootStateNode,
-	InternalStateNode,
-	InternalStateType,
-} from './internalState'
+import { EventManager } from './EventManager'
+import { EntityListState, EntityState, StateNode, StateType } from './state'
+import { TreeStore } from './TreeStore'
 
 export class AccessorErrorManager {
-	private errorsByState: Map<InternalStateNode, ErrorAccessor.ErrorsById> = new Map()
+	private errorsByState: Map<StateNode, ErrorAccessor.ErrorsById> = new Map()
 
 	private getNewErrorId = (() => {
 		let errorId = 1
@@ -18,10 +14,7 @@ export class AccessorErrorManager {
 		return () => errorId++
 	})()
 
-	public constructor(
-		private readonly subTreeStates: Map<string, InternalRootStateNode>,
-		private readonly entityStore: Map<string, InternalEntityState>,
-	) {}
+	public constructor(private readonly eventManager: EventManager, private readonly treeStore: TreeStore) {}
 
 	public hasErrors() {
 		return !!this.errorsByState.size
@@ -46,7 +39,7 @@ export class AccessorErrorManager {
 		this.dumpErrorData(data)
 	}
 
-	public addError(state: InternalStateNode, error: ErrorAccessor.BoxedError): () => void {
+	public addError(state: StateNode, error: ErrorAccessor.BoxedError): () => void {
 		const errorId = this.getNewErrorId()
 
 		let errorsById: ErrorAccessor.ErrorsById | undefined = this.errorsByState.get(state)
@@ -73,7 +66,7 @@ export class AccessorErrorManager {
 		}
 	}
 
-	private addSeveralErrors(state: InternalStateNode, errors: ErrorsPreprocessor.BaseErrorNode) {
+	private addSeveralErrors(state: StateNode, errors: ErrorsPreprocessor.BaseErrorNode) {
 		if (errors.validation) {
 			for (const error of errors.validation) {
 				this.addError(state, { type: ErrorAccessor.ErrorType.Validation, error })
@@ -88,17 +81,17 @@ export class AccessorErrorManager {
 
 	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot) {
 		for (const [subTreePlaceholder, rootError] of errorTreeRoot) {
-			const rootState = this.subTreeStates.get(subTreePlaceholder)
+			const rootState = this.treeStore.subTreeStates.get(subTreePlaceholder)
 
 			if (!rootState) {
 				continue
 			}
 			switch (rootState.type) {
-				case InternalStateType.SingleEntity: {
+				case StateType.Entity: {
 					this.setEntityStateErrors(rootState, rootError)
 					break
 				}
-				case InternalStateType.EntityList: {
+				case StateType.EntityList: {
 					this.setEntityListStateErrors(rootState, rootError)
 					break
 				}
@@ -107,7 +100,7 @@ export class AccessorErrorManager {
 	}
 
 	private setEntityStateErrors(
-		state: InternalEntityState,
+		state: EntityState,
 		errors: ErrorsPreprocessor.ErrorINode | ErrorsPreprocessor.LeafErrorNode,
 	) {
 		this.addSeveralErrors(state, errors)
@@ -122,9 +115,9 @@ export class AccessorErrorManager {
 
 		for (const [childKey, child] of errors.children) {
 			if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
-				const fieldState = state.fields.get(childKey)
+				const fieldState = state.children.get(childKey)
 
-				if (fieldState?.type === InternalStateType.Field) {
+				if (fieldState?.type === StateType.Field) {
 					state.childrenWithPendingUpdates.add(fieldState)
 					this.addSeveralErrors(fieldState, child)
 					continue
@@ -132,23 +125,23 @@ export class AccessorErrorManager {
 			}
 			// Deliberately letting flow get here as well. Leaf errors *CAN* refer to relations as well.
 
-			const placeholders = state.markersContainer.placeholders.get(childKey)
+			const placeholders = state.combinedMarkersContainer.placeholders.get(childKey)
 			if (placeholders === undefined) {
 				continue
 			}
 			const normalizedPlaceholders = typeof placeholders === 'string' ? new Set([placeholders]) : placeholders
 
 			for (const normalizedPlaceholder of normalizedPlaceholders) {
-				const fieldState = state.fields.get(normalizedPlaceholder)
+				const fieldState = state.children.get(normalizedPlaceholder)
 				if (fieldState === undefined) {
 					continue
 				}
 				switch (fieldState.type) {
-					case InternalStateType.SingleEntity:
+					case StateType.Entity:
 						state.childrenWithPendingUpdates.add(fieldState)
 						this.setEntityStateErrors(fieldState, child)
 						break
-					case InternalStateType.EntityList:
+					case StateType.EntityList:
 						state.childrenWithPendingUpdates.add(fieldState)
 						this.setEntityListStateErrors(fieldState, child)
 						break
@@ -158,7 +151,7 @@ export class AccessorErrorManager {
 	}
 
 	private setEntityListStateErrors(
-		state: InternalEntityListState,
+		state: EntityListState,
 		errors: ErrorsPreprocessor.ErrorINode | ErrorsPreprocessor.LeafErrorNode,
 	) {
 		this.addSeveralErrors(state, errors)
@@ -172,7 +165,8 @@ export class AccessorErrorManager {
 		}
 
 		for (const [childKey, childError] of errors.children) {
-			const childState = this.entityStore.get(childKey)
+			const childState = this.treeStore.entityStore.get(childKey)
+			// TODO this will fail when the error points to an entity stub since stubs aren't present in the entity store.
 
 			if (childState && childError.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
 				state.childrenWithPendingUpdates.add(childState)
@@ -219,21 +213,9 @@ export class AccessorErrorManager {
 		}
 	}
 
-	private triggerUpdate(stateNode: InternalStateNode) {
+	private triggerUpdate(stateNode: StateNode) {
 		stateNode.hasStaleAccessor = true
 		stateNode.hasPendingUpdate = true
-		switch (stateNode.type) {
-			case InternalStateType.Field:
-				stateNode.onFieldUpdate(stateNode)
-				break
-			case InternalStateType.SingleEntity:
-				for (const realm of stateNode.realms) {
-					realm(stateNode)
-				}
-				break
-			case InternalStateType.EntityList:
-				stateNode.onEntityListUpdate(stateNode)
-				break
-		}
+		this.eventManager.notifyParents(stateNode)
 	}
 }

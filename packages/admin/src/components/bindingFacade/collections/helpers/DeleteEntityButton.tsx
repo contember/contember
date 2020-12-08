@@ -1,7 +1,7 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
 import * as React from 'react'
 import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
-import { useTriggerPersistWithFeedback } from '../../../ui'
+import { usePersistWithFeedback } from '../../../ui'
 
 export type DeleteEntityButtonProps = ButtonProps & {
 	immediatePersist?: true
@@ -11,7 +11,7 @@ export type DeleteEntityButtonProps = ButtonProps & {
 export const DeleteEntityButton = React.memo((props: DeleteEntityButtonProps) => {
 	const { children, immediatePersist, ...rest } = props
 	const parentEntity = useEntity()
-	const triggerPersist = useTriggerPersistWithFeedback()
+	const triggerPersist = usePersistWithFeedback()
 	const isMutating = useMutationState()
 	const onClick = React.useCallback(() => {
 		if (!parentEntity.deleteEntity) {

@@ -1,6 +1,6 @@
 {
   "name": "@contember/binding",
-  "version": "0.5.33",
+  "version": "0.5.34",
   "type": "module",
   "main": "dist/src/index.js",
   "scripts": {
@@ -9,10 +9,10 @@
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/client": "0.5.33",
-    "@contember/react-client": "0.5.33",
-    "@contember/react-multipass-rendering": "0.5.33",
-    "@contember/react-utils": "0.5.33",
+    "@contember/client": "0.5.34",
+    "@contember/react-client": "0.5.34",
+    "@contember/react-multipass-rendering": "0.5.34",
+    "@contember/react-utils": "0.5.34",
     "chevrotain": "6.5.0",
     "uuid": "8.3.1"
   },

@@ -40,12 +40,23 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		let reference: React.ReactNode
 		let entityListDataProvider: React.ReactNode
 
-		const renderedOption =
-			'renderOption' in props
-				? typeof props.optionsStaticRender === 'function'
-					? props.optionsStaticRender(environment)
-					: props.optionsStaticRender
-				: undefined
+		const searchByFields =
+			props.searchByFields !== undefined &&
+			(Array.isArray(props.searchByFields) ? (
+				props.searchByFields.map((field, i) => <Field field={field} key={i} />)
+			) : (
+				<Field field={props.searchByFields} />
+			))
+		const renderedOption = (
+			<>
+				{searchByFields}
+				{'renderOption' in props
+					? typeof props.optionsStaticRender === 'function'
+						? props.optionsStaticRender(environment)
+						: props.optionsStaticRender
+					: undefined}
+			</>
+		)
 
 		if (props.arity === 'single') {
 			reference = (
@@ -63,8 +74,6 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 			assertNever(props)
 		}
 
-		// TODO const sugaredFields =
-		// 		searchByFields === undefined ? [] : Array.isArray(searchByFields) ? searchByFields : [searchByFields]
 		if ('renderOption' in props) {
 			const sugaredEntityList: SugaredQualifiedEntityList =
 				typeof props.options === 'string' || !('entities' in props.options)
@@ -87,6 +96,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 			const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
 			entityListDataProvider = (
 				<EntityListSubTree {...fieldList} entities={fieldList} expectedMutation="none">
+					{searchByFields}
 					<Field field={fieldList.field} />
 				</EntityListSubTree>
 			)

@@ -40,8 +40,6 @@ import {
 	EntityState,
 	EntityStateStub,
 	FieldState,
-	OnEntityListUpdate,
-	OnFieldUpdate,
 	RootStateNode,
 	StateINode,
 	StateNode,
@@ -747,9 +745,9 @@ export class StateInitializer {
 	}
 
 	private initializeFieldState(
+		parent: EntityState,
 		placeholderName: FieldName,
 		fieldMarker: FieldMarker,
-		onSelfUpdate: OnFieldUpdate,
 		persistedValue: Scalar | undefined,
 	): FieldState {
 		const resolvedFieldValue = persistedValue ?? fieldMarker.defaultValue ?? null
@@ -757,9 +755,9 @@ export class StateInitializer {
 		const fieldState: FieldState = {
 			type: StateType.Field,
 			fieldMarker,
-			onSelfUpdate,
 			placeholderName,
 			persistedValue,
+			parent,
 			value: resolvedFieldValue,
 			addEventListener: undefined as any,
 			eventListeners: {
@@ -863,7 +861,7 @@ export class StateInitializer {
 						}
 					}
 
-					fieldState.onSelfUpdate(fieldState)
+					fieldState.parent.onChildUpdate(fieldState)
 
 					// Deliberately firing this *AFTER* letting the parent know.
 					// Listeners are likely to invoke a parent's batchUpdates, and so the parents should be up to date.
@@ -937,7 +935,7 @@ export class StateInitializer {
 					`Perhaps you wanted to use <HasOne />?`,
 			)
 		} else {
-			const fieldState = this.initializeFieldState(field.placeholderName, field, entityState.onChildUpdate, fieldDatum)
+			const fieldState = this.initializeFieldState(entityState, field.placeholderName, field, fieldDatum)
 			entityState.children.set(field.placeholderName, fieldState)
 		}
 	}

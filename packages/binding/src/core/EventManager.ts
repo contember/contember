@@ -371,12 +371,9 @@ export class EventManager {
 				}
 				break
 			}
+			case StateType.Field:
 			case StateType.EntityList: {
 				childState.parent?.onChildUpdate(childState)
-				break
-			}
-			case StateType.Field: {
-				childState.onSelfUpdate(childState)
 				break
 			}
 		}

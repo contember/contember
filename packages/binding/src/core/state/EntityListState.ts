@@ -6,7 +6,6 @@ import { EntityState, OnEntityUpdate } from './EntityState'
 import { EntityStateStub } from './EntityStateStub'
 import { StateType } from './StateType'
 
-export type OnEntityListUpdate = (state: EntityListState) => void
 export interface EntityListState {
 	type: StateType.EntityList
 	batchUpdateDepth: number

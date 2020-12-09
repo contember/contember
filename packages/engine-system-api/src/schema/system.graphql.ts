@@ -35,7 +35,8 @@ const schema: DocumentNode = gql`
 	input TreeFilter {
 		entity: String!
 		relations: [TreeFilterRelation!]
-		id: String!
+		id: String
+		filter: Json
 	}
 
 	input TreeFilterRelation {

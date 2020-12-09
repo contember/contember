@@ -74,7 +74,8 @@ export type HistoryFilter = {
 export type TreeFilter = {
 	readonly entity: Scalars['String']
 	readonly relations?: Maybe<ReadonlyArray<TreeFilterRelation>>
-	readonly id: Scalars['String']
+	readonly id?: Maybe<Scalars['String']>
+	readonly filter?: Maybe<Scalars['Json']>
 }
 
 export type TreeFilterRelation = {

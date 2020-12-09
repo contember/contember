@@ -1,5 +1,5 @@
 import { Client } from '@contember/database'
-import { Acl, Model, Schema } from '@contember/schema'
+import { Acl, Model, Schema, Input } from '@contember/schema'
 import Mapper from '../../sql/Mapper'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { FieldNode, ObjectNode } from '../../inputProcessing'
@@ -19,7 +19,7 @@ export interface EntitiesSelectorContext {
 
 export interface EntitiesSelectorInput {
 	entity: string
-	id: string
+	filter: Input.Where
 	relations: EntitiesRelationsInput
 }
 
@@ -29,18 +29,16 @@ export class EntitiesSelector {
 		private readonly permissionsByIdentityFactory: PermissionsByIdentityFactory,
 	) {}
 
-	async getEntities(context: EntitiesSelectorContext, input: EntitiesSelectorInput): Promise<EntitiesResult | null> {
+	async getEntities(context: EntitiesSelectorContext, input: EntitiesSelectorInput): Promise<EntitiesResult[]> {
 		const { permissions } = this.permissionsByIdentityFactory.createPermissions(context.schema, {
 			projectRoles: context.roles,
 		})
 		const mapper = this.mapperFactory(context.db, context.schema, context.identityVariables, permissions)
 		const entity = getEntity(context.schema.model, input.entity)
-		const node = this.createObjectNode(context.schema, entity, input.relations).withArg('by', {
-			[entity.primary]: input.id,
-		})
+		const node = this.createObjectNode(context.schema, entity, input.relations).withArg('filter', input.filter)
 
-		const result = await mapper.selectUnique(entity, node)
-		return (result as unknown) as EntitiesResult | null
+		const result = await mapper.select(entity, node)
+		return (result as unknown) as EntitiesResult[]
 	}
 
 	private createObjectNode(schema: Schema, entity: Model.Entity, relations: EntitiesRelationsInput): ObjectNode {

@@ -1,11 +1,9 @@
 import { GraphQlBuilder } from '@contember/client'
-import { noop } from '@contember/react-utils'
 import { validate as uuidValidate } from 'uuid'
 import { BindingOperations, EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
 import {
 	ClientGeneratedUuid,
 	EntityFieldPersistedData,
-	EntityListPersistedData,
 	ServerGeneratedUuid,
 	UnpersistedEntityKey,
 } from '../accessorTree'
@@ -849,9 +847,10 @@ export class StateInitializer {
 					const hasUnpersistedChangesNow = normalizedValue !== normalizedPersistedValue
 					fieldState.hasUnpersistedChanges = hasUnpersistedChangesNow
 
-					// TODO if the entity only has nonbearing fields, this should be true.
 					const shouldInfluenceUpdateCount =
-						!fieldState.fieldMarker.isNonbearing || fieldState.persistedValue !== undefined
+						!parent.combinedMarkersContainer.hasAtLeastOneBearingField ||
+						!fieldState.fieldMarker.isNonbearing ||
+						fieldState.persistedValue !== undefined
 
 					if (shouldInfluenceUpdateCount) {
 						if (!hadUnpersistedChangesBefore && hasUnpersistedChangesNow) {

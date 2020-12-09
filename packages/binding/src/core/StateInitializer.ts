@@ -69,10 +69,10 @@ export class StateInitializer {
 		if (tree.parameters.type === 'qualifiedEntityList' || tree.parameters.type === 'unconstrainedQualifiedEntityList') {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
 			subTreeState = this.initializeEntityListState(
+				undefined,
 				tree.environment,
 				tree.fields,
 				tree.parameters.value,
-				noop,
 				persistedEntityIds,
 				tree.parameters.value,
 			)
@@ -526,10 +526,10 @@ export class StateInitializer {
 	}
 
 	public initializeEntityListState(
+		parent: EntityState | undefined,
 		environment: Environment,
 		markersContainer: EntityFieldMarkersContainer,
 		creationParameters: EntityCreationParameters & EntityListPreferences,
-		onSelfUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
 		initialEventListeners: EntityListEventListeners | undefined,
 	): EntityListState {
@@ -537,7 +537,6 @@ export class StateInitializer {
 			type: StateType.EntityList,
 			creationParameters,
 			markersContainer,
-			onSelfUpdate,
 			persistedEntityIds,
 			addEventListener: undefined as any,
 			batchUpdateDepth: 0,
@@ -550,6 +549,7 @@ export class StateInitializer {
 			hasPendingParentNotification: false,
 			hasPendingUpdate: false,
 			hasStaleAccessor: true,
+			parent,
 			getAccessor: (() => {
 				let accessor: EntityListAccessor | undefined = undefined
 				return () => {
@@ -702,7 +702,7 @@ export class StateInitializer {
 			) {
 				entityListState.hasPendingUpdate = true
 				entityListState.hasPendingParentNotification = false
-				entityListState.onSelfUpdate(entityListState)
+				entityListState.parent?.onChildUpdate(entityListState)
 			}
 		}
 
@@ -989,10 +989,10 @@ export class StateInitializer {
 			entityState.children.set(
 				field.placeholderName,
 				this.initializeEntityListState(
+					entityState,
 					field.environment,
 					field.fields,
 					relation,
-					entityState.onChildUpdate,
 					fieldDatum || new Set(),
 					field.relation,
 				),

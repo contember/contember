@@ -15,7 +15,16 @@ import { FieldName } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
-import { EntityListState, EntityRealm, EntityState, StateINode, StateIterator, StateNode, StateType } from './state'
+import {
+	EntityListState,
+	EntityRealm,
+	EntityState,
+	FieldState,
+	StateINode,
+	StateIterator,
+	StateNode,
+	StateType,
+} from './state'
 import { TreeParameterMerger } from './TreeParameterMerger'
 import { TreeStore } from './TreeStore'
 
@@ -363,7 +372,7 @@ export class EventManager {
 				break
 			}
 			case StateType.EntityList: {
-				childState.onSelfUpdate(childState)
+				childState.parent?.onChildUpdate(childState)
 				break
 			}
 			case StateType.Field: {

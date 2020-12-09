@@ -4,7 +4,7 @@ import { assertNever } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 
 class ErrorsPreprocessor {
-	public constructor(private readonly requestResponse?: MutationDataResponse) {}
+	public constructor(private readonly requestResponse: MutationDataResponse) {}
 
 	public preprocess(): ErrorsPreprocessor.ErrorTreeRoot {
 		const treeRoot: ErrorsPreprocessor.ErrorTreeRoot = new Map()

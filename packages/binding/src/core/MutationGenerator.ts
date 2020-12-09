@@ -36,7 +36,7 @@ export class MutationGenerator {
 					builder,
 				)
 			}
-			return builder.getGql()
+			return builder.inTransaction().getGql()
 		} catch (e) {
 			return undefined
 		}

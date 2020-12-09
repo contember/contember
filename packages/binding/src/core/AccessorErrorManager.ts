@@ -28,7 +28,7 @@ export class AccessorErrorManager {
 		this.errorsByState.clear()
 	}
 
-	public replaceErrors(data: MutationDataResponse | undefined) {
+	public replaceErrors(data: MutationDataResponse) {
 		this.clearErrors()
 
 		const preprocessor = new ErrorsPreprocessor(data)
@@ -175,11 +175,7 @@ export class AccessorErrorManager {
 		}
 	}
 
-	private dumpErrorData(data: MutationDataResponse | undefined) {
-		if (!data) {
-			return
-		}
-
+	private dumpErrorData(data: MutationDataResponse) {
 		// TODO this is just temporary
 		for (const subTreePlaceholder in data) {
 			const treeDatum = data[subTreePlaceholder]

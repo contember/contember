@@ -11,6 +11,7 @@ import {
 import {
 	metadataToRequestError,
 	MutationErrorType,
+	MutationRequestResponse,
 	PersistResultSuccessType,
 	QueryRequestResponse,
 	RequestError,
@@ -193,13 +194,13 @@ export class DataBinding {
 						}
 					}
 
-					const mutationResponse = await this.client.sendRequest(mutation, { signal })
-					const normalizedMutationResponse = mutationResponse.data === null ? {} : mutationResponse.data
-					const aliases = Object.keys(normalizedMutationResponse)
-					const allSubMutationsOk = aliases.every(item => mutationResponse.data[item].ok)
+					const mutationResponse: MutationRequestResponse = await this.client.sendRequest(mutation, { signal })
+					const mutationData = mutationResponse.data?.transaction ?? {}
+					const aliases = Object.keys(mutationData)
+					const allSubMutationsOk = aliases.every(item => mutationData[item].ok)
 
 					if (allSubMutationsOk) {
-						const persistedEntityIds = aliases.map(alias => mutationResponse.data[alias].node.id)
+						const persistedEntityIds = aliases.map(alias => mutationData[alias].node.id)
 						successfulResult = {
 							type: PersistResultSuccessType.JustSuccess,
 							persistedEntityIds,
@@ -208,7 +209,7 @@ export class DataBinding {
 						this.eventManager.syncTransaction(() => this.accessorErrorManager.clearErrors())
 						break
 					} else {
-						this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationResponse.data))
+						this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData))
 						await this.eventManager.triggerOnPersistError(persistErrorOptions)
 						if (shouldTryAgain) {
 							if (proposedBackOffs.length) {

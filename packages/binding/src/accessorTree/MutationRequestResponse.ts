@@ -45,6 +45,10 @@ export interface MutationDataResponse {
 	[alias: string]: MutationResponse
 }
 
+export interface MutationTransactionResponse {
+	transaction: MutationDataResponse | null
+}
+
 export interface MutationRequestResponse {
-	data: MutationDataResponse
+	data: MutationTransactionResponse | null
 }

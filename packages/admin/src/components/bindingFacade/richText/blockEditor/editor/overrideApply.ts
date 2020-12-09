@@ -1,4 +1,4 @@
-import { BindingOperations } from '@contember/binding'
+import { BindingOperations, EntityListAccessor } from '@contember/binding'
 import * as React from 'react'
 import { Element as SlateElement, Operation } from 'slate'
 import { ElementNode, TextNode } from '../../baseEditor'
@@ -6,12 +6,13 @@ import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideApplyOptions {
 	bindingOperations: BindingOperations
+	getReferenceByKey: EntityListAccessor.GetChildEntityByKey | undefined
 	isMutatingRef: React.MutableRefObject<boolean>
 }
 
 export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {
 	const { apply } = editor
-	const { bindingOperations, isMutatingRef } = options
+	const { bindingOperations, isMutatingRef, getReferenceByKey } = options
 
 	editor.apply = (operation: Operation) => {
 		if (operation.type === 'set_selection') {
@@ -25,8 +26,8 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			if (!SlateElement.isElement(element)) {
 				return
 			}
-			if ('referenceId' in element && element.referenceId !== undefined) {
-				const referencedEntity = bindingOperations.getEntityByKey(element.referenceId)
+			if ('referenceId' in element && element.referenceId !== undefined && getReferenceByKey) {
+				const referencedEntity = getReferenceByKey(element.referenceId)
 				referencedEntity.deleteEntity()
 			}
 			for (const child of element.children) {

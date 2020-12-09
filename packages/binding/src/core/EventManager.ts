@@ -4,9 +4,9 @@ import {
 	EntityAccessor,
 	EntityListAccessor,
 	PersistErrorOptions,
+	PersistSuccessOptions,
 	TreeRootAccessor,
 } from '../accessors'
-import { PersistSuccessOptions } from '../accessors/PersistSuccessOptions'
 import { RequestError, SuccessfulPersistResult } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { HasManyRelationMarker } from '../markers'
@@ -16,8 +16,8 @@ import { assertNever } from '../utils'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
 import { EntityListState, EntityRealm, EntityState, StateINode, StateIterator, StateNode, StateType } from './state'
-import { TreeStore } from './TreeStore'
 import { TreeParameterMerger } from './TreeParameterMerger'
+import { TreeStore } from './TreeStore'
 
 export class EventManager {
 	private transactionDepth = 0

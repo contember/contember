@@ -255,14 +255,12 @@ export class StateInitializer {
 			},
 			batchUpdates: performUpdates => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
-						batchUpdatesImplementation(performUpdates)
-					})
+					batchUpdatesImplementation(performUpdates)
 				})
 			},
 			connectEntityAtField: (fieldName, entityToConnectOrItsKey) => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
+					batchUpdatesImplementation(() => {
 						const hasOneMarkers = resolveHasOneRelationMarkers(
 							fieldName,
 							`Cannot connect at field '${fieldName}' as it doesn't refer to a has one relation.`,
@@ -331,7 +329,7 @@ export class StateInitializer {
 			},
 			disconnectEntityAtField: (fieldName, initializeReplacement) => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
+					batchUpdatesImplementation(() => {
 						const hasOneMarkers = resolveHasOneRelationMarkers(
 							fieldName,
 							`Cannot disconnect the field '${fieldName}' as it doesn't refer to a has one relation.`,
@@ -426,37 +424,9 @@ export class StateInitializer {
 			) {
 				entityState.hasPendingUpdate = true
 				entityState.hasPendingParentNotification = false
+				this.eventManager.registerJustUpdated(entityState)
 				this.eventManager.notifyParents(entityState)
 			}
-		}
-
-		const performOperationWithBeforeUpdate = (operation: () => void) => {
-			batchUpdatesImplementation(getAccessor => {
-				operation()
-
-				if (
-					!entityState.hasPendingParentNotification || // That means the operation hasn't done anything
-					entityState.eventListeners.beforeUpdate === undefined ||
-					entityState.eventListeners.beforeUpdate.size === 0
-				) {
-					return
-				}
-
-				let currentAccessor: EntityAccessor
-				for (let i = 0; i < this.config.getValue('beforeUpdateSettleLimit'); i++) {
-					currentAccessor = getAccessor()
-					for (const listener of entityState.eventListeners.beforeUpdate) {
-						listener(getAccessor, this.bindingOperations)
-					}
-					if (currentAccessor === getAccessor()) {
-						return
-					}
-				}
-				throw new BindingError(
-					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
-						`This likely means an infinite feedback loop in your code.`,
-				)
-			})
 		}
 
 		const processChildEntityDeletion = (deletedChildState: EntityState) => {
@@ -588,14 +558,12 @@ export class StateInitializer {
 				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			batchUpdates: performUpdates => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
-						batchUpdatesImplementation(performUpdates)
-					})
+					batchUpdatesImplementation(performUpdates)
 				})
 			},
 			connectEntity: entityToConnectOrItsKey => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
+					batchUpdatesImplementation(() => {
 						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
 
 						if (entityListState.children.has(connectedEntityKey)) {
@@ -640,7 +608,7 @@ export class StateInitializer {
 			},
 			disconnectEntity: childEntityOrItsKey => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
+					batchUpdatesImplementation(() => {
 						const disconnectedChildKey =
 							typeof childEntityOrItsKey === 'string' ? childEntityOrItsKey : childEntityOrItsKey.key
 
@@ -698,37 +666,9 @@ export class StateInitializer {
 			) {
 				entityListState.hasPendingUpdate = true
 				entityListState.hasPendingParentNotification = false
-				entityListState.parent?.onChildUpdate(entityListState)
+				this.eventManager.registerJustUpdated(entityListState)
+				this.eventManager.notifyParents(entityListState)
 			}
-		}
-
-		const performOperationWithBeforeUpdate = (operation: () => void) => {
-			batchUpdatesImplementation(getAccessor => {
-				operation()
-
-				if (
-					!entityListState.hasPendingParentNotification || // That means the operation hasn't done anything.
-					entityListState.eventListeners.beforeUpdate === undefined ||
-					entityListState.eventListeners.beforeUpdate.size === 0
-				) {
-					return
-				}
-
-				let currentAccessor: EntityListAccessor
-				for (let i = 0; i < this.config.getValue('beforeUpdateSettleLimit'); i++) {
-					currentAccessor = getAccessor()
-					for (const listener of entityListState.eventListeners.beforeUpdate) {
-						listener(getAccessor, this.bindingOperations)
-					}
-					if (currentAccessor === getAccessor()) {
-						return
-					}
-				}
-				throw new BindingError(
-					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
-						`This likely means an infinite feedback loop in your code.`,
-				)
-			})
 		}
 
 		const initialData: Set<string | undefined> =
@@ -860,15 +800,8 @@ export class StateInitializer {
 						}
 					}
 
-					fieldState.parent.onChildUpdate(fieldState)
-
-					// Deliberately firing this *AFTER* letting the parent know.
-					// Listeners are likely to invoke a parent's batchUpdates, and so the parents should be up to date.
-					if (fieldState.eventListeners.beforeUpdate) {
-						for (const listener of fieldState.eventListeners.beforeUpdate) {
-							listener(fieldState.getAccessor())
-						}
-					}
+					this.eventManager.registerJustUpdated(fieldState)
+					this.eventManager.notifyParents(fieldState)
 				})
 			},
 			isTouchedBy: (agent: string) =>

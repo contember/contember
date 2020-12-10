@@ -14,7 +14,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		public readonly defaultValue: Persisted | undefined,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly hasUnpersistedChanges: boolean,
-		public readonly isTouchedBy: FieldAccessor.IsTouchedBy,
+		private readonly touchLog: ReadonlySet<string> | undefined,
 		public readonly addError: FieldAccessor.AddError,
 		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Persisted, Produced>,
 		public readonly updateValue: FieldAccessor.UpdateValue<Produced>,
@@ -30,6 +30,10 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 		const right = candidate instanceof GraphQlBuilder.Literal ? candidate.value : candidate
 
 		return left === right
+	}
+
+	public isTouchedBy(agent: string) {
+		return this.touchLog?.has(agent) ?? false
 	}
 
 	public get isTouched() {
@@ -60,7 +64,6 @@ namespace FieldAccessor {
 		agent?: string
 	}
 
-	export type IsTouchedBy = (agent: string) => boolean
 	export type AddError = ErrorAccessor.AddError
 	export type BeforeUpdateListener<
 		Persisted extends FieldValue = FieldValue,

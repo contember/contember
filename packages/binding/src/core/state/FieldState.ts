@@ -19,11 +19,10 @@ export interface FieldState {
 	parent: EntityState
 	persistedValue: FieldValue | undefined // Undefined means that the parent entity doesn't exist on server
 	placeholderName: FieldName
-	touchLog: Map<string, boolean> | undefined
+	touchLog: Set<string> | undefined
 	value: FieldValue
 
 	addError: FieldAccessor.AddError
 	addEventListener: FieldAccessor.AddFieldEventListener
-	isTouchedBy: FieldAccessor.IsTouchedBy
 	updateValue: FieldAccessor.UpdateValue
 }

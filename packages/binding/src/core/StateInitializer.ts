@@ -719,7 +719,7 @@ export class StateInitializer {
 							fieldState.fieldMarker.defaultValue,
 							fieldState.errors,
 							fieldState.hasUnpersistedChanges,
-							fieldState.isTouchedBy,
+							fieldState.touchLog,
 							fieldState.addError,
 							fieldState.addEventListener,
 							fieldState.updateValue,
@@ -768,9 +768,9 @@ export class StateInitializer {
 						return
 					}
 					if (fieldState.touchLog === undefined) {
-						fieldState.touchLog = new Map()
+						fieldState.touchLog = new Set()
 					}
-					fieldState.touchLog.set(agent, true)
+					fieldState.touchLog.add(agent)
 					fieldState.value = newValue
 					fieldState.hasPendingUpdate = true
 					fieldState.hasStaleAccessor = true
@@ -804,8 +804,6 @@ export class StateInitializer {
 					this.eventManager.notifyParents(fieldState)
 				})
 			},
-			isTouchedBy: (agent: string) =>
-				fieldState.touchLog === undefined ? false : fieldState.touchLog.get(agent) || false,
 		}
 		fieldState.addEventListener = this.getAddEventListener(fieldState)
 		return fieldState

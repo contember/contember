@@ -196,7 +196,7 @@ namespace EntityAccessor {
 		| {
 				[field: string]: FieldValue
 		  }
-		| Array<[SugaredRelativeSingleField | string, FieldValue]>
+		| Iterable<[SugaredRelativeSingleField | string, FieldValue]>
 
 	export type FieldData = Map<FieldName, FieldDatum>
 

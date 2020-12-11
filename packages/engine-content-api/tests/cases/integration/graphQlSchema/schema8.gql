@@ -467,6 +467,7 @@ type VideoUpdateResult {
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
+  errors: [_MutationError!]!
   validation: _ValidationResult!
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
   deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!

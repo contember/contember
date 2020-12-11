@@ -394,6 +394,7 @@ type PostLocaleUpdateResult {
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
+  errors: [_MutationError!]!
   validation: _ValidationResult!
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!

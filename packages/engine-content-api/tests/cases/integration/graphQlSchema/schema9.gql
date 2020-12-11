@@ -799,6 +799,7 @@ type AuthorUpdateResult {
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
+  errors: [_MutationError!]!
   validation: _ValidationResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!

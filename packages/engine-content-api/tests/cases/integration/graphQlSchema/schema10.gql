@@ -208,6 +208,7 @@ type AuthorCreateResult {
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
+  errors: [_MutationError!]!
   validation: _ValidationResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!

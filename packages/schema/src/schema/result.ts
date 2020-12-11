@@ -1,6 +1,8 @@
 import Value from './value'
 
 namespace Result {
+	export type MutationFieldResult = CreateResult | UpdateResult | DeleteResult
+
 	export interface CreateResult {
 		ok: boolean
 		errorMessage?: string
@@ -27,6 +29,7 @@ namespace Result {
 	export interface TransactionResult {
 		ok: boolean
 		errorMessage?: string
+		errors: ExecutionError[]
 		validation: ValidationResult
 	}
 

@@ -34,6 +34,7 @@ export default class GraphQlSchemaBuilder {
 						fields: {
 							ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
 							errorMessage: { type: this.graphqlObjectFactories.string },
+							errors: { type: this.resultSchemaTypeProvider.errorListResultType },
 							validation: {
 								type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 							},

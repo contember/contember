@@ -26,7 +26,7 @@ export default class MutationResolver {
 	public async resolveTransaction(info: GraphQLResolveInfo): Promise<Result.TransactionResult> {
 		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
 			return (
-				(path.length === 1 && !['ok', 'validation', 'errorMessage'].includes(node.name.value)) ||
+				(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors'].includes(node.name.value)) ||
 				(path.length === 2 && node.name.value === 'node') ||
 				path.length > 2 ||
 				path.length === 0
@@ -41,10 +41,7 @@ export default class MutationResolver {
 			}))
 
 		return this.transaction(async (mapper, trx) => {
-			const validationResult: Record<
-				string,
-				{ ok: boolean; validation?: Result.ValidationResult; errorMessage?: string }
-			> = {}
+			const validationResult: Record<string, Result.MutationFieldResult> = {}
 			const validationErrors: Result.ValidationError[] = []
 			for (const field of queryAst.fields) {
 				if (!(field instanceof ObjectNode)) {
@@ -67,7 +64,7 @@ export default class MutationResolver {
 						case Operation.get:
 						case Operation.paginate:
 						case Operation.list:
-							throw new ImplementationException()
+							throw new ImplementationException(`Invalid OperationMeta: ${String(meta)}`)
 					}
 					return assertNever(meta.operation)
 				})()
@@ -75,17 +72,20 @@ export default class MutationResolver {
 					validationResult[field.alias] = {
 						ok: false,
 						validation: result,
+						errors: [],
 						errorMessage: this.stringifyValidationErrors(result.errors),
+						node: null,
 					}
 					validationErrors.push(...prefixErrors(result.errors, field.alias))
 				} else {
-					validationResult[field.alias] = { ok: false, validation: { valid: true, errors: [] } }
+					validationResult[field.alias] = { ok: false, errors: [], validation: { valid: true, errors: [] }, node: null }
 				}
 			}
 			if (validationErrors.length) {
 				return {
 					ok: false,
 					errorMessage: this.stringifyValidationErrors(validationErrors),
+					errors: [],
 					validation: {
 						valid: false,
 						errors: validationErrors,
@@ -127,8 +127,10 @@ export default class MutationResolver {
 
 				if (!result.ok) {
 					const validationErrors = result.validation ? prefixErrors(result.validation.errors, field.alias) : []
+					const executionErrors = prefixErrors(result.errors, field.alias)
 					return {
 						ok: false,
+						errors: executionErrors,
 						validation: result.validation
 							? {
 									valid: result.validation.valid,
@@ -137,7 +139,7 @@ export default class MutationResolver {
 							: { valid: true, errors: [] },
 						errorMessage: [
 							this.stringifyValidationErrors(validationErrors),
-							this.stringifyExecutionErrors(prefixErrors(result.errors, field.alias)),
+							this.stringifyExecutionErrors(executionErrors),
 						]
 							.filter(it => it !== undefined)
 							.join('\n'),
@@ -148,7 +150,7 @@ export default class MutationResolver {
 				trxResult[field.alias] = result
 			}
 
-			return { ok: true, validation: { valid: true, errors: [] }, ...trxResult }
+			return { ok: true, errors: [], validation: { valid: true, errors: [] }, ...trxResult }
 		})
 	}
 

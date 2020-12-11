@@ -57,6 +57,7 @@ type Mutation {
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
+  errors: [_MutationError!]!
   validation: _ValidationResult!
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!

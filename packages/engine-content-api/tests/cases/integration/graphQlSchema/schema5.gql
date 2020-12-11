@@ -60,6 +60,7 @@ type Mutation {
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
+  errors: [_MutationError!]!
   validation: _ValidationResult!
   createRoot(data: RootCreateInput!): RootCreateResult!
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!

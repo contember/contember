@@ -13,7 +13,7 @@ export const readOperationMeta = (data: Record<string, unknown> | undefined | nu
 	}
 	const meta = data[ExtensionKey]
 	if (!(meta instanceof OperationMeta)) {
-		throw new ImplementationException()
+		throw new ImplementationException('OperationMeta not found')
 	}
 	return meta
 }

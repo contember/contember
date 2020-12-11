@@ -5,17 +5,7 @@ import {
 	HistoryUpdateEventResolvers,
 } from '../../schema'
 import { ResolverContext } from '../ResolverContext'
-import { createBatchLoader } from '../../utils/batchQuery'
-import { DatabaseContext } from '../../model/database'
-import { OldValuesQuery } from '../../model/queries/events'
-
-const oldValuesLoaderFactory = (db: DatabaseContext) =>
-	createBatchLoader<string, Record<string, object>, object>(
-		async ids => {
-			return db.queryHandler.fetch(new OldValuesQuery(ids[ids.length - 1] /* fixme*/, ids))
-		},
-		(id, items) => items[id],
-	)
+import { oldValuesLoaderFactory } from './OldValuesHelpers'
 
 export class HistoryEventTypeResolver
 	implements HistoryUpdateEventResolvers<ResolverContext>, HistoryDeleteEventResolvers<ResolverContext> {

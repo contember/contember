@@ -1,4 +1,5 @@
 import { SelectBuilder } from '@contember/database'
+import { Logger } from '@contember/engine-common'
 import {
 	DatabaseContext,
 	MigrationsResolver,
@@ -47,7 +48,8 @@ export class TesterStageManager {
 
 	public async createStage(slug: string): Promise<void> {
 		const stage = this.getStageInternal(slug)
-		await this.stageCreator.createStage(this.db, stage.base ? this.getStage(stage.base) : null, stage)
+		const nullLogger = new Logger(() => {})
+		await this.stageCreator.createStage(this.db, stage.base ? this.getStage(stage.base) : null, stage, nullLogger)
 		this.createdStages.add(slug)
 	}
 

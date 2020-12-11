@@ -75,7 +75,7 @@ export class ProjectInitializer {
 		const root = stageTree.getRoot()
 
 		const createStage = async (parent: StageConfig | null, stage: StageConfig) => {
-			const created = await this.stageCreator.createStage(db, parent, stage)
+			const created = await this.stageCreator.createStage(db, parent, stage, logger)
 			if (created) {
 				logger.write(`Created stage ${stage.slug} `)
 			} else {

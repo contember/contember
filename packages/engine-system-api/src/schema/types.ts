@@ -328,6 +328,10 @@ export type DiffUpdateEvent = DiffEvent & {
 	readonly type: DiffEventType
 	readonly description: Scalars['String']
 	readonly createdAt: Scalars['DateTime']
+	readonly tableName: Scalars['String']
+	readonly primaryKeys: ReadonlyArray<Scalars['String']>
+	readonly oldValues: Scalars['Json']
+	readonly diffValues: Scalars['Json']
 }
 
 export type DiffDeleteEvent = DiffEvent & {
@@ -340,6 +344,9 @@ export type DiffDeleteEvent = DiffEvent & {
 	readonly type: DiffEventType
 	readonly description: Scalars['String']
 	readonly createdAt: Scalars['DateTime']
+	readonly tableName: Scalars['String']
+	readonly primaryKeys: ReadonlyArray<Scalars['String']>
+	readonly oldValues: Scalars['Json']
 }
 
 export type DiffCreateEvent = DiffEvent & {
@@ -352,6 +359,9 @@ export type DiffCreateEvent = DiffEvent & {
 	readonly type: DiffEventType
 	readonly description: Scalars['String']
 	readonly createdAt: Scalars['DateTime']
+	readonly tableName: Scalars['String']
+	readonly primaryKeys: ReadonlyArray<Scalars['String']>
+	readonly newValues: Scalars['Json']
 }
 
 export type Stage = {
@@ -859,6 +869,10 @@ export type DiffUpdateEventResolvers<
 	type?: Resolver<ResolversTypes['DiffEventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	diffValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -874,6 +888,9 @@ export type DiffDeleteEventResolvers<
 	type?: Resolver<ResolversTypes['DiffEventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	oldValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -889,6 +906,9 @@ export type DiffCreateEventResolvers<
 	type?: Resolver<ResolversTypes['DiffEventType'], ParentType, ContextType>
 	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	tableName?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	primaryKeys?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	newValues?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

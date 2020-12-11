@@ -1,4 +1,12 @@
-import { AnyEvent, CreateEvent, DeleteEvent, EventType, RunMigrationEvent, UpdateEvent } from '@contember/engine-common'
+import {
+	AnyEvent,
+	CreateEvent,
+	DeleteEvent,
+	EventType,
+	Logger,
+	RunMigrationEvent,
+	UpdateEvent,
+} from '@contember/engine-common'
 import { Stage } from '../dtos'
 import { assertNever, ImplementationException } from '../../utils'
 import { DeleteBuilder, InsertBuilder, UpdateBuilder } from '@contember/database'

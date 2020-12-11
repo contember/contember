@@ -49,7 +49,7 @@ export class QueryGenerator {
 		baseQueryBuilder: BaseQueryBuilder,
 		subTree: SubTreeMarker<BoxedQualifiedSingleEntity>,
 	): BaseQueryBuilder {
-		const populatedListQueryBuilder = this.registerQueryPart(
+		const populatedListQueryBuilder = QueryGenerator.registerQueryPart(
 			subTree.fields.markers,
 			CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.parameters.value.where),
 		)
@@ -94,12 +94,12 @@ export class QueryGenerator {
 
 		return baseQueryBuilder.list(
 			subTree.entityName,
-			this.registerQueryPart(subTree.fields.markers, finalBuilder),
+			QueryGenerator.registerQueryPart(subTree.fields.markers, finalBuilder),
 			subTree.placeholderName,
 		)
 	}
 
-	private registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): ReadBuilder {
+	public static registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): ReadBuilder {
 		builder = builder.column(PRIMARY_KEY_NAME)
 		builder = builder.column(TYPENAME_KEY_NAME)
 

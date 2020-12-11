@@ -11,6 +11,7 @@ import {
 } from '../markers'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
+import { QueryGenerator } from './QueryGenerator'
 import { EntityListState, EntityState, EntityStateStub, FieldState, RootStateNode, StateType } from './state'
 import { TreeStore } from './TreeStore'
 
@@ -152,7 +153,7 @@ export class MutationGenerator {
 				return builder
 					.data(builder => this.registerUpdateMutationPart(processedEntities, entityState, builder))
 					.by({ ...where, [PRIMARY_KEY_NAME]: runtimeId.value })
-					.node(builder => builder.column(PRIMARY_KEY_NAME))
+					.node(builder => QueryGenerator.registerQueryPart(entityState.combinedMarkersContainer.markers, builder))
 					.ok()
 					.validation()
 					.errors()
@@ -195,7 +196,7 @@ export class MutationGenerator {
 
 				return builder
 					.data(writeBuilder)
-					.node(builder => builder.column(PRIMARY_KEY_NAME))
+					.node(builder => QueryGenerator.registerQueryPart(entityState.combinedMarkersContainer.markers, builder))
 					.ok()
 					.validation()
 					.errors()

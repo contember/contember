@@ -2,7 +2,7 @@ import {
 	EntityFieldPersistedData,
 	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
-	QueryRequestResponse,
+	ReceivedDataTree,
 	ReceivedEntityData,
 	ReceivedFieldData,
 	ServerGeneratedUuid,
@@ -12,15 +12,11 @@ import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 
 export class QueryResponseNormalizer {
-	public static mergeInResponse(original: NormalizedQueryResponseData, response: QueryRequestResponse | undefined) {
-		if (response === undefined) {
-			return original
-		}
+	public static mergeInResponse(original: NormalizedQueryResponseData, newPersistedData: ReceivedDataTree) {
 		const { subTreeDataStore, persistedEntityDataStore } = original
-		const { data } = response
 
-		for (const treeId in data) {
-			const treeDatum = data[treeId]
+		for (const treeId in newPersistedData) {
+			const treeDatum = newPersistedData[treeId]
 
 			if (treeDatum === undefined || treeDatum === null) {
 				continue

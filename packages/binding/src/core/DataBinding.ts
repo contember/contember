@@ -151,7 +151,6 @@ export class DataBinding {
 				}
 			}
 			return await this.eventManager.persistOperation(async () => {
-				let successfulResult: SuccessfulPersistResult | undefined = undefined
 				for (let attemptNumber = 1; attemptNumber <= this.config.getValue('maxPersistAttempts'); attemptNumber++) {
 					// TODO if the tree is in an inconsistent state, wait for lock releases
 
@@ -201,13 +200,29 @@ export class DataBinding {
 
 					if (allSubMutationsOk) {
 						const persistedEntityIds = aliases.map(alias => mutationData[alias].node.id)
-						successfulResult = {
+						const result: SuccessfulPersistResult = {
 							type: PersistResultSuccessType.JustSuccess,
 							persistedEntityIds,
 						}
 
-						this.eventManager.syncTransaction(() => this.accessorErrorManager.clearErrors())
-						break
+						this.eventManager.syncTransaction(() => {
+							this.accessorErrorManager.clearErrors()
+							this.dirtinessTracker.reset()
+							this.treeAugmenter.updatePersistedData(
+								Object.fromEntries(
+									Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
+										placeholderName,
+										subTreeResponse.node,
+									]),
+								),
+							)
+							this.eventManager.triggerOnPersistSuccess({
+								...this.bindingOperations,
+								successType: result.type,
+								unstable_persistedEntityIds: persistedEntityIds,
+							})
+						})
+						return result
 					} else {
 						this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData))
 						await this.eventManager.triggerOnPersistError(persistErrorOptions)
@@ -228,47 +243,9 @@ export class DataBinding {
 						}
 					}
 				}
-
-				if (successfulResult === undefined) {
-					// Max attempts exceeded
-					throw new BindingError() // TODO msg
-				}
-				const result = successfulResult
-				this.dirtinessTracker.reset()
-
-				// TODO do this cleanup somewhere else and in a less brittle fashion.
-				for (const [, entityState] of this.treeStore.entityStore) {
-					entityState.plannedHasOneDeletions = undefined
-					for (const [, child] of entityState.children) {
-						if (child.type === StateType.EntityList) {
-							child.plannedRemovals = undefined
-						} else if (child.type === StateType.Field) {
-							child.hasUnpersistedChanges = false
-						}
-					}
-				}
-
-				try {
-					const persistedData = await this.fetchPersistedData(this.treeStore.markerTree)
-					this.eventManager.syncOperation(() => {
-						this.treeAugmenter.augmentTree(this.treeStore.markerTree, persistedData)
-						this.eventManager.triggerOnPersistSuccess({
-							...this.bindingOperations,
-							successType: result.type,
-							unstable_persistedEntityIds: result.persistedEntityIds,
-						})
-					})
-					return successfulResult
-				} catch (e) {
-					this.eventManager.triggerOnPersistSuccess({
-						...this.bindingOperations,
-						successType: result.type,
-						unstable_persistedEntityIds: result.persistedEntityIds,
-					})
-
-					// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
-					// data made it successfully to the server. Thus we'll just resolve from here no matter what.
-					return successfulResult
+				// Max attempts exceeded
+				throw {
+					type: MutationErrorType.GivenUp,
 				}
 			})
 		},
@@ -291,7 +268,7 @@ export class DataBinding {
 				return Promise.reject()
 			}
 
-			this.treeAugmenter.augmentTree(newMarkerTree, newPersistedData)
+			this.treeAugmenter.extendTree(newMarkerTree, newPersistedData?.data ?? {})
 		})
 	}
 

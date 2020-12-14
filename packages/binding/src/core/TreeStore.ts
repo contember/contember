@@ -1,9 +1,4 @@
-import {
-	NormalizedQueryResponseData,
-	PersistedEntityDataStore,
-	QueryRequestResponse,
-	SubTreeDataStore,
-} from '../accessorTree'
+import { MutationDataResponse, NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
 import { MarkerTreeRoot } from '../markers'
 import { MarkerMerger } from './MarkerMerger'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
@@ -20,7 +15,11 @@ export class TreeStore {
 	private _markerTree: MarkerTreeRoot = new MarkerTreeRoot(new Map(), new Map())
 	private persistedData: NormalizedQueryResponseData = new NormalizedQueryResponseData(new Map(), new Map())
 
-	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: QueryRequestResponse | undefined) {
+	public updatePersistedData(response: ReceivedDataTree) {
+		QueryResponseNormalizer.mergeInResponse(this.persistedData, response)
+	}
+
+	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: ReceivedDataTree) {
 		this._markerTree = MarkerMerger.mergeMarkerTreeRoots(this._markerTree, newMarkerTree)
 		QueryResponseNormalizer.mergeInResponse(this.persistedData, newPersistedData)
 	}

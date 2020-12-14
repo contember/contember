@@ -16,12 +16,17 @@ export interface JustSuccessPersistResult {
 
 export enum MutationErrorType {
 	InvalidInput = 'invalidInput',
+	GivenUp = 'givenUp',
 }
 
 export interface InvalidInputPersistResult {
 	type: MutationErrorType.InvalidInput
 }
 
+export interface GivenUpPersistResult {
+	type: MutationErrorType.GivenUp
+}
+
 export type SuccessfulPersistResult = NothingToPersistPersistResult | JustSuccessPersistResult
 
-export type ErrorPersistResult = InvalidInputPersistResult | RequestError
+export type ErrorPersistResult = InvalidInputPersistResult | GivenUpPersistResult | RequestError

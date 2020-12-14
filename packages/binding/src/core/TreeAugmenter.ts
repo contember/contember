@@ -1,4 +1,10 @@
-import { QueryRequestResponse, ServerGeneratedUuid, UnpersistedEntityKey } from '../accessorTree'
+import {
+	MutationDataResponse,
+	QueryRequestResponse,
+	ReceivedDataTree,
+	ServerGeneratedUuid,
+	UnpersistedEntityKey,
+} from '../accessorTree'
 import {
 	EntityFieldMarkersContainer,
 	FieldMarker,
@@ -24,7 +30,13 @@ export class TreeAugmenter {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public augmentTree(newMarkerTree: MarkerTreeRoot, newPersistedData: QueryRequestResponse | undefined) {
+	public updatePersistedData(response: ReceivedDataTree) {
+		this.eventManager.syncOperation(() => {
+			this.treeStore.updatePersistedData(response)
+		})
+	}
+
+	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: ReceivedDataTree) {
 		this.eventManager.syncOperation(() => {
 			this.treeStore.extendTree(newMarkerTree, newPersistedData)
 

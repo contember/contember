@@ -1,12 +1,12 @@
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
-import DependencyCollector from './dependencies/DependencyCollector'
+import { Dependencies } from './dependencies'
 import { FieldNode, ObjectNode } from '../inputProcessing'
 
-class QueryAstFactory {
+export class QueryAstFactory {
 	constructor(private readonly model: Model.Schema) {}
 
-	create(entityName: string, dependencies: DependencyCollector.Dependencies): ObjectNode {
+	create(entityName: string, dependencies: Dependencies): ObjectNode {
 		const entity = getEntity(this.model, entityName)
 		let node = new ObjectNode(entityName, entityName, [], {}, {}, [])
 		for (const [fieldName, deps] of Object.entries(dependencies)) {
@@ -15,11 +15,7 @@ class QueryAstFactory {
 		return node
 	}
 
-	private createField(
-		entity: Model.Entity,
-		fieldName: string,
-		dependency: DependencyCollector.Dependencies,
-	): ObjectNode | FieldNode {
+	private createField(entity: Model.Entity, fieldName: string, dependency: Dependencies): ObjectNode | FieldNode {
 		let [targetEntity, newField] = acceptFieldVisitor<[Model.Entity | null, FieldNode | ObjectNode]>(
 			this.model,
 			entity,
@@ -46,5 +42,3 @@ class QueryAstFactory {
 		return newField
 	}
 }
-
-export default QueryAstFactory

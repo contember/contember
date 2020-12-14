@@ -1,8 +1,8 @@
-import { filterObject, mapObject } from '../utils/object'
+import { filterObject, mapObject } from '../utils'
 import { Model, Validation } from '@contember/schema'
 import { acceptEveryFieldVisitor, acceptFieldVisitor } from '@contember/schema-utils'
 import { InputValidation } from '@contember/schema-definition'
-import DependencyCollector from './dependencies/DependencyCollector'
+import { DependencyCollector } from './dependencies'
 import { NotSupportedError } from './exceptions'
 
 export class EntityRulesResolver {

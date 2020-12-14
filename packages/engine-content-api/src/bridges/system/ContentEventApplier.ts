@@ -2,19 +2,13 @@ import { ContentEvent, CreateEvent, DeleteEvent, EventType, UpdateEvent } from '
 import { Client, DeleteBuilder, SelectBuilder } from '@contember/database'
 import { Acl, Model, Schema } from '@contember/schema'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
-import JunctionTableManager from '../../sql/JunctionTableManager'
-import assert from 'assert'
-import { assertNever } from '../../utils'
-import PredicateFactory from '../../acl/PredicateFactory'
-import WhereBuilder from '../../sql/select/WhereBuilder'
-import { PathFactory } from '../../sql/select/Path'
-import UpdateBuilderFactory from '../../sql/update/UpdateBuilderFactory'
-import InsertBuilderFactory from '../../sql/insert/InsertBuilderFactory'
-import JoinBuilder from '../../sql/select/JoinBuilder'
-import ConditionBuilder from '../../sql/select/ConditionBuilder'
-import { PermissionsByIdentityFactory } from '../../acl'
-import VariableInjector from '../../acl/VariableInjector'
 import {
+	ConditionBuilder,
+	InsertBuilderFactory,
+	JoinBuilder,
+	JunctionConnectHandler,
+	JunctionDisconnectHandler,
+	JunctionTableManager,
 	MutationCreateOk,
 	MutationDeleteOk,
 	MutationNoResultError,
@@ -24,7 +18,13 @@ import {
 	MutationResultType,
 	MutationUpdateOk,
 	NothingToDoReason,
-} from '../../sql/Result'
+	PathFactory,
+	UpdateBuilderFactory,
+	WhereBuilder,
+} from '../../mapper'
+import assert from 'assert'
+import { assertNever } from '../../utils'
+import { PermissionsByIdentityFactory, PredicateFactory, VariableInjector } from '../../acl'
 
 export interface ContentEventApplierContext {
 	db: Client
@@ -139,8 +139,8 @@ export class ContentApplyDependenciesFactoryImpl implements ContentApplyDependen
 			schema.model,
 			predicateFactory,
 			whereBuilder,
-			new JunctionTableManager.JunctionConnectHandler(),
-			new JunctionTableManager.JunctionDisconnectHandler(),
+			new JunctionConnectHandler(),
+			new JunctionDisconnectHandler(),
 			pathFactory,
 		)
 		const updateBuilderFactory = new UpdateBuilderFactory(schema.model, whereBuilder, pathFactory)

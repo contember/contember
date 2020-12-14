@@ -1,6 +1,6 @@
 import { Acl } from '@contember/schema'
 
-interface Authorizator {
+export interface Authorizator {
 	isAllowed(operation: Acl.Operation, entity: string): boolean
 
 	isAllowed(
@@ -11,5 +11,3 @@ interface Authorizator {
 
 	isCustomPrimaryAllowed(entity: string): boolean
 }
-
-export default Authorizator

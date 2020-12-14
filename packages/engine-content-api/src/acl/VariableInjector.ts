@@ -1,7 +1,7 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { PredicateDefinitionProcessor } from '@contember/schema-utils'
 
-class VariableInjector {
+export class VariableInjector {
 	constructor(private readonly schema: Model.Schema, private readonly variables: Acl.VariablesMap) {}
 
 	public inject(entity: Model.Entity, where: Acl.PredicateDefinition): Input.Where {
@@ -36,5 +36,3 @@ class VariableInjector {
 		throw new Error('not implemented')
 	}
 }
-
-export default VariableInjector

@@ -1,9 +1,9 @@
-import QueryAstFactory from './QueryAstFactory'
-import Mapper from '../sql/Mapper'
-import DependencyCollector from './dependencies/DependencyCollector'
+import { QueryAstFactory } from './QueryAstFactory'
+import { Mapper } from '../mapper'
+import { Dependencies, DependencyCollector } from './dependencies'
 import { Input, Model, Value } from '@contember/schema'
 
-export default class ValidationDataSelector {
+export class ValidationDataSelector {
 	constructor(private readonly model: Model.Schema, private readonly queryAstFactory: QueryAstFactory) {}
 
 	public async getPrimaryValue(mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere) {
@@ -14,7 +14,7 @@ export default class ValidationDataSelector {
 		mapper: Mapper,
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
-		dependencies: DependencyCollector.Dependencies,
+		dependencies: Dependencies,
 	): Promise<Value.Object | null> {
 		if (Object.keys(dependencies).length === 0) {
 			return {}

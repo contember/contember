@@ -1,9 +1,9 @@
 import { Acl, Model } from '@contember/schema'
 import { getEntity, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { mapObject } from '../utils/object'
+import { mapObject } from '../utils'
 import { prefixVariable } from './VariableUtils'
 
-export default class PermissionFactory {
+export class PermissionFactory {
 	constructor(private readonly schema: Model.Schema) {}
 
 	public create(acl: Acl.Schema, roles: string[], prefix?: string): Acl.Permissions {

@@ -1,10 +1,9 @@
-import VariableInjector from '../../../src/acl/VariableInjector'
+import { PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
-import PredicatesInjector from '../../../src/acl/PredicatesInjector'
-import PredicateFactory from '../../../src/acl/PredicateFactory'
 import * as assert from 'uvu/assert'
 import { suite } from 'uvu'
+
 const predicateInjectorTest = suite('Predicates injector')
 
 const schema = new SchemaBuilder()

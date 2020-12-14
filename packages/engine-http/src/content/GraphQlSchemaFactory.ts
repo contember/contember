@@ -4,6 +4,7 @@ import {
 	ContentSchemaFactory,
 	GraphQlSchemaBuilderFactory,
 	PermissionsByIdentityFactory,
+	Identity,
 } from '@contember/engine-content-api'
 import { makeExecutableSchema, mergeSchemas } from 'graphql-tools'
 import { GraphQLSchemaContributor } from '@contember/engine-plugins'
@@ -11,7 +12,7 @@ import { EntityRulesResolver } from '@contember/engine-content-api'
 import { StaticAuthorizator } from '@contember/engine-content-api'
 import { JSONType } from '@contember/graphql-utils'
 
-type Context = { schema: Schema; identity: PermissionsByIdentityFactory.Identity }
+type Context = { schema: Schema; identity: Identity }
 class GraphQlSchemaFactory {
 	private cache: {
 		schema: Schema
@@ -19,7 +20,7 @@ class GraphQlSchemaFactory {
 		entries: {
 			graphQlSchema: GraphQLSchema
 			permissions: Acl.Permissions
-			verifier: (identity: PermissionsByIdentityFactory.Identity) => boolean
+			verifier: (identity: Identity) => boolean
 		}[]
 	}[] = []
 
@@ -33,7 +34,7 @@ class GraphQlSchemaFactory {
 		return JSON.stringify(this.schemaContributors.map(it => it.getCacheKey(ctx)))
 	}
 
-	public create(schema: Schema, identity: PermissionsByIdentityFactory.Identity): [GraphQLSchema, Acl.Permissions] {
+	public create(schema: Schema, identity: Identity): [GraphQLSchema, Acl.Permissions] {
 		const contributorsCacheKey = this.getContributorsCacheKey({ schema, identity })
 		let schemaCacheEntry = this.cache.find(
 			it => it.schema.model === schema.model && it.schema.acl === schema.acl && contributorsCacheKey === it.cacheKey,

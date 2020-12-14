@@ -1,4 +1,4 @@
-import VariableInjector from '../../../src/acl/VariableInjector'
+import { VariableInjector } from '../../../src/acl'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import * as assert from 'uvu/assert'

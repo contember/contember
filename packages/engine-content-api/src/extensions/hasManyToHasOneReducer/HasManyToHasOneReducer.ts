@@ -1,9 +1,9 @@
-import EntityFieldsProvider from '../EntityFieldsProvider'
+import { EntityFieldsProvider, FieldMap } from '../EntityFieldsProvider'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
-import HasManyToHasOneRelationReducerFieldVisitor from './HasManyToHasOneRelationReducerVisitor'
+import { HasManyToHasOneRelationReducerFieldVisitor } from './HasManyToHasOneRelationReducerVisitor'
 
-class HasManyToHasOneReducer implements EntityFieldsProvider<HasManyToHasOneReducer.Extension> {
+export class HasManyToHasOneReducer implements EntityFieldsProvider<HasManyToHasOneReducerExtension> {
 	static extensionName: string = 'HasManyToHasOneReducer'
 
 	constructor(
@@ -11,7 +11,7 @@ class HasManyToHasOneReducer implements EntityFieldsProvider<HasManyToHasOneRedu
 		private readonly visitor: HasManyToHasOneRelationReducerFieldVisitor,
 	) {}
 
-	getFields(entity: Model.Entity, fields: string[]): EntityFieldsProvider.FieldMap<HasManyToHasOneReducer.Extension> {
+	getFields(entity: Model.Entity, fields: string[]): FieldMap<HasManyToHasOneReducerExtension> {
 		return fields.reduce(
 			(result, field) => ({ ...result, ...acceptFieldVisitor(this.schema, entity, field, this.visitor) }),
 			{},
@@ -19,10 +19,6 @@ class HasManyToHasOneReducer implements EntityFieldsProvider<HasManyToHasOneRedu
 	}
 }
 
-namespace HasManyToHasOneReducer {
-	export interface Extension {
-		relationName: string
-	}
+export interface HasManyToHasOneReducerExtension {
+	relationName: string
 }
-
-export default HasManyToHasOneReducer

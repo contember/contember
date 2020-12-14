@@ -1,11 +1,14 @@
 import { Model } from '@contember/schema'
 import { InputValidation as validation, SchemaBuilder } from '@contember/schema-definition'
 
-import DependencyCollector from '../../../src/input-validation/dependencies/DependencyCollector'
-import QueryAstFactory from '../../../src/input-validation/QueryAstFactory'
-import DependencyMerger from '../../../src/input-validation/dependencies/DependencyMerger'
-import { evaluateValidation } from '../../../src/input-validation/ValidationEvaluation'
-import ValidationContext from '../../../src/input-validation/ValidationContext'
+import {
+	Dependencies,
+	DependencyCollector,
+	DependencyMerger,
+	evaluateValidation,
+	QueryAstFactory,
+	ValidationContext,
+} from '../../../src/input-validation'
 import { FieldNode, ObjectNode } from '../../../src/inputProcessing'
 import * as assert from 'uvu/assert'
 import { suite } from 'uvu'
@@ -110,7 +113,7 @@ inputValidationTest('constructs query AST', () => {
 				.column('published', c => c.type(Model.ColumnType.Bool)),
 		)
 		.buildSchema()
-	const dependencies: DependencyCollector.Dependencies = {
+	const dependencies: Dependencies = {
 		books: {
 			deleted: {},
 			published: {},

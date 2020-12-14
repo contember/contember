@@ -1,9 +1,9 @@
 import { Acl, Input, Model } from '@contember/schema'
-import VariableInjector from './VariableInjector'
+import { VariableInjector } from './VariableInjector'
 
 const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
 
-class PredicateFactory {
+export class PredicateFactory {
 	constructor(private readonly permissions: Acl.Permissions, private readonly variableInjector: VariableInjector) {}
 
 	public shouldApplyCellLevelPredicate(
@@ -95,5 +95,3 @@ class PredicateFactory {
 		return predicates
 	}
 }
-
-export default PredicateFactory

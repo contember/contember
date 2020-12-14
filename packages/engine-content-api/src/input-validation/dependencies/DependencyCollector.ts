@@ -2,16 +2,13 @@ import { Validation } from '@contember/schema'
 import { assertNever } from '../../utils'
 import { InputValidation } from '@contember/schema-definition'
 
-class DependencyCollector {
-	public static collect(validator: Validation.Validator): DependencyCollector.Dependencies {
+export class DependencyCollector {
+	public static collect(validator: Validation.Validator): Dependencies {
 		const dependenciesList = DependencyCollector.doCollect(validator, [])
 		return dependenciesList.reduce((acc, deps) => this.withDependency(acc, deps), {})
 	}
 
-	private static withDependency(
-		object: DependencyCollector.Dependencies,
-		dependency: string[],
-	): DependencyCollector.Dependencies {
+	private static withDependency(object: Dependencies, dependency: string[]): Dependencies {
 		const part = dependency.shift()
 		if (!part) {
 			return object
@@ -23,7 +20,7 @@ class DependencyCollector {
 		}
 	}
 
-	private static doCollect(validator: Validation.Validator, prefix: string[]): DependencyCollector.DependenciesList {
+	private static doCollect(validator: Validation.Validator, prefix: string[]): DependenciesList {
 		if (validator.operation === InputValidation.InContextOperation) {
 			const [pathArg, validatorArg] = validator.args
 			const newPrefix = [...prefix, ...pathArg.path]
@@ -32,7 +29,7 @@ class DependencyCollector {
 			return [newPrefix, ...dependencies]
 		}
 
-		const result: DependencyCollector.DependenciesList = []
+		const result: DependenciesList = []
 		for (const arg of validator.args) {
 			switch (arg.type) {
 				//case Validation.ArgumentType.path:
@@ -51,12 +48,8 @@ class DependencyCollector {
 	}
 }
 
-namespace DependencyCollector {
-	export type DependenciesList = string[][]
+export type DependenciesList = string[][]
 
-	export interface Dependencies {
-		[field: string]: Dependencies
-	}
+export interface Dependencies {
+	[field: string]: Dependencies
 }
-
-export default DependencyCollector

@@ -3,7 +3,7 @@ import { Acl, Model } from '@contember/schema'
 import * as path from 'path'
 
 import { SchemaBuilder, AllowAllPermissionFactory, SchemaDefinition } from '@contember/schema-definition'
-import GraphQlSchemaBuilderFactory from '../../../../src/graphQLSchema/GraphQlSchemaBuilderFactory'
+import { GraphQlSchemaBuilderFactory } from '../../../../src/schema'
 import * as model from './model'
 import { graphqlObjectFactories } from '../../../src/graphqlObjectFactories'
 import { StaticAuthorizator } from '../../../../src'

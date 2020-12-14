@@ -1,8 +1,8 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import PredicateFactory from './PredicateFactory'
+import { PredicateFactory } from './PredicateFactory'
 
-class PredicatesInjector {
+export class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
 	public inject(entity: Model.Entity, where: Input.Where): Input.Where {
@@ -52,5 +52,3 @@ class PredicatesInjector {
 		return this.createWhere(entity, fields, resultWhere)
 	}
 }
-
-export default PredicatesInjector

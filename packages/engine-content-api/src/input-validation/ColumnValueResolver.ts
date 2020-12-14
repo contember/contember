@@ -1,5 +1,5 @@
 import { NoDataError, Providers, resolveColumnValue } from '@contember/schema-utils'
-import * as Context from '../inputProcessing/InputContext'
+import * as Context from '../inputProcessing'
 import { Value } from '@contember/schema'
 
 export class ColumnValueResolver {

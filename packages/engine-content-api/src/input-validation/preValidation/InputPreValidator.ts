@@ -4,18 +4,18 @@ import { Input, Model, Validation, Value } from '@contember/schema'
 import { InputValidation } from '@contember/schema-definition'
 import { CreateInputVisitor, UpdateInputVisitor } from '../../inputProcessing'
 import { CreateInputPreValidationProcessor } from './CreateInputPreValidationProcessor'
-import ValidationContext from '../ValidationContext'
+import { ValidationContext } from '../ValidationContext'
 import { evaluateValidation } from '../ValidationEvaluation'
 import { ValidationPath } from '../ValidationPath'
 import { EntityRulesResolver } from '../EntityRulesResolver'
 import { FieldValidationResult, ValidationResult } from '../InputValidator'
 import { UpdateInputPreValidationProcessor } from './UpdateInputPreValidationProcessor'
 import { ColumnValueResolver } from '../ColumnValueResolver'
-import Mapper from '../../sql/Mapper'
-import DependencyCollector from '../dependencies/DependencyCollector'
-import DependencyMerger from '../dependencies/DependencyMerger'
+import { Mapper } from '../../mapper'
+import { Dependencies, DependencyCollector } from '../dependencies'
+import { DependencyMerger } from '../dependencies'
 import { NotSupportedError } from '../exceptions'
-import ValidationDataSelector from '../ValidationDataSelector'
+import { ValidationDataSelector } from '../ValidationDataSelector'
 
 export interface CreateValidationArgs {
 	mapper: Mapper
@@ -98,7 +98,7 @@ export class InputPreValidator {
 		entity: Model.Entity,
 		where: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
-		dependencies: DependencyCollector.Dependencies,
+		dependencies: Dependencies,
 	): Promise<ValidationContext.NodeContext> {
 		const inputNodeData = acceptEveryFieldVisitor(this.model, entity, {
 			visitColumn: (entity, column) => {
@@ -185,7 +185,7 @@ export class InputPreValidator {
 		)
 	}
 
-	private buildDependencies(rules: Validation.EntityRules): DependencyCollector.Dependencies {
+	private buildDependencies(rules: Validation.EntityRules): Dependencies {
 		const baseFieldsAsDeps = Object.keys(rules).reduce((acc, field) => ({ ...acc, [field]: {} }), {})
 
 		return Object.values(rules)

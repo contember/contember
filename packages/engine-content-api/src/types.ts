@@ -1,7 +1,7 @@
 import { Acl } from '@contember/schema'
 import { Client } from '@contember/database'
 import { Container } from '@contember/dic'
-import { ExecutionContainer } from './graphQlResolver/ExecutionContainerFactory'
+import { ExecutionContainer } from './resolvers'
 
 export interface Context {
 	db: Client

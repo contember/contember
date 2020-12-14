@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { OrderByHelper } from '../../../src/sql/select/OrderByHelper'
+import { OrderByHelper } from '../../../src/mapper'
 import { ObjectNode } from '../../../src/inputProcessing'
 import * as assert from 'uvu/assert'
 import { suite } from 'uvu'

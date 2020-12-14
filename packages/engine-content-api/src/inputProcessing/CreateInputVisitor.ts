@@ -2,7 +2,7 @@ import { isIt } from '../utils'
 import { Input, Model } from '@contember/schema'
 import { CreateInputProcessor } from './CreateInputProcessor'
 import * as Context from './InputContext'
-import { filterObject } from '../utils/object'
+import { filterObject } from '../utils'
 import { UserError } from '../exception'
 import { ImplementationException } from '../exception'
 

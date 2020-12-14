@@ -148,4 +148,4 @@ namespace ValidationContext {
 	}
 }
 
-export default ValidationContext
+export { ValidationContext }

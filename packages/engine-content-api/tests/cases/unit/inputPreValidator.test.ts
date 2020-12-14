@@ -1,13 +1,16 @@
-import { InputPreValidator } from '../../../src/input-validation/preValidation/InputPreValidator'
+import {
+	ColumnValueResolver,
+	Dependencies,
+	InputPreValidator,
+	ValidationDataSelector,
+} from '../../../src/input-validation'
 import { InputValidation as v, SchemaBuilder } from '@contember/schema-definition'
 import { Input, Model, Validation, Value } from '@contember/schema'
 import { EntityRulesResolver } from '../../../src'
 import { getEntity } from '@contember/schema-utils'
-import { ColumnValueResolver } from '../../../src/input-validation/ColumnValueResolver'
-import Mapper from '../../../src/sql/Mapper'
-import DependencyCollector from '../../../src/input-validation/dependencies/DependencyCollector'
+import { Mapper } from '../../../src/mapper'
+import { DependencyCollector } from '../../../src/input-validation'
 import { createMock } from '../../src/utils'
-import ValidationDataSelector from '../../../src/input-validation/ValidationDataSelector'
 import { testUuid } from '../../src/testUuid'
 import * as assert from 'uvu/assert'
 import { suite } from 'uvu'
@@ -16,7 +19,7 @@ type PrimaryValueExpectation = { entity: string; where: Input.UniqueWhere; resul
 type SelectExpectation = {
 	entity: string
 	where: Input.UniqueWhere
-	dependencies: DependencyCollector.Dependencies
+	dependencies: Dependencies
 	result: Value.Object
 }
 
@@ -36,7 +39,7 @@ const createDataSelectorMock = (primaryValues: PrimaryValueExpectation[], select
 			mapper: Mapper,
 			entity: Model.Entity,
 			where: Input.UniqueWhere<never>,
-			dependencies: DependencyCollector.Dependencies,
+			dependencies: Dependencies,
 		) => {
 			if (Object.keys(dependencies).length === 0) {
 				return {}

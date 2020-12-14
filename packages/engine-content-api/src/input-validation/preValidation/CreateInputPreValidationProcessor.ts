@@ -1,8 +1,8 @@
 import { CreateInputProcessor } from '../../inputProcessing'
-import * as Context from '../../inputProcessing/InputContext'
+import * as Context from '../../inputProcessing'
 import { Input, Model } from '@contember/schema'
 import { appendRelationToPath, ValidationPath } from '../ValidationPath'
-import Mapper from '../../sql/Mapper'
+import { Mapper } from '../../mapper'
 import { InputPreValidator } from './InputPreValidator'
 
 type Result = any

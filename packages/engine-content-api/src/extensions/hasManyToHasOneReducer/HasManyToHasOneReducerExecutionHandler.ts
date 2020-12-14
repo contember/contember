@@ -1,14 +1,14 @@
 import { Input, Model } from '@contember/schema'
 import { isIt } from '../../utils'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import SelectExecutionHandler from '../../sql/select/SelectExecutionHandler'
+import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper'
 import { ImplementationException } from '../../exception'
 import { ObjectNode, UniqueWhereExpander } from '../../inputProcessing'
 
-class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {
+export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {
 	constructor(private readonly schema: Model.Schema, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
-	process(context: SelectExecutionHandler.Context): void {
+	process(context: SelectExecutionHandlerContext): void {
 		const { addData, entity, field } = context
 		const objectNode = field as ObjectNode
 
@@ -57,5 +57,3 @@ class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{
 		})
 	}
 }
-
-export default HasManyToHasOneReducerExecutionHandler

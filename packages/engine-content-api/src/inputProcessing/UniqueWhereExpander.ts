@@ -1,7 +1,7 @@
 import { Input, Model } from '@contember/schema'
 import { getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../exception'
-import { getFieldsForUniqueWhere } from '../utils/uniqueWhereFields'
+import { getFieldsForUniqueWhere } from '../utils'
 
 export class UniqueWhereExpander {
 	constructor(private readonly schema: Model.Schema) {}

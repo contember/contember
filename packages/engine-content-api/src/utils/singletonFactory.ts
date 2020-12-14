@@ -1,4 +1,4 @@
-const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, args: Args) => T) => {
+export const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, args: Args) => T) => {
 	const created: { [name: string]: T } = {}
 	const createdIds = new Set<string>()
 	const recursionGuard: string[] = []
@@ -21,5 +21,3 @@ const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, args: A
 		return val
 	}
 }
-
-export default singletonFactory

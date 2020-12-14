@@ -1,5 +1,5 @@
 import { Validation } from '@contember/schema'
-import ValidationContext from './ValidationContext'
+import { ValidationContext } from './ValidationContext'
 import acceptContextVisitor = ValidationContext.acceptContextVisitor
 
 const getValueOrLiteral = (

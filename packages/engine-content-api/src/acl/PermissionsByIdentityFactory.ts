@@ -1,12 +1,9 @@
-import PermissionFactory from './PermissionFactory'
+import { PermissionFactory } from './PermissionFactory'
 import { arrayEquals } from '../utils'
 import { Acl, Schema } from '@contember/schema'
 
-class PermissionsByIdentityFactory {
-	public createPermissions(
-		schema: Schema,
-		identity: PermissionsByIdentityFactory.Identity,
-	): PermissionsByIdentityFactory.PermissionResult {
+export class PermissionsByIdentityFactory {
+	public createPermissions(schema: Schema, identity: Identity): PermissionResult {
 		return {
 			permissions: new PermissionFactory(schema.model).create(schema.acl, identity.projectRoles),
 			verifier: otherIdentity => arrayEquals(identity.projectRoles, otherIdentity.projectRoles),
@@ -14,15 +11,11 @@ class PermissionsByIdentityFactory {
 	}
 }
 
-namespace PermissionsByIdentityFactory {
-	export interface Identity {
-		projectRoles: string[]
-	}
-
-	export interface PermissionResult {
-		permissions: Acl.Permissions
-		verifier: (identity: Identity) => boolean
-	}
+export interface Identity {
+	projectRoles: string[]
 }
 
-export default PermissionsByIdentityFactory
+export interface PermissionResult {
+	permissions: Acl.Permissions
+	verifier: (identity: Identity) => boolean
+}

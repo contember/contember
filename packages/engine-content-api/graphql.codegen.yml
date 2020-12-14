@@ -1,10 +1,10 @@
 schema:
-  - "./src/graphQLSchema/content-schema.graphql.ts"
+  - "./src/introspection/content-schema.graphql.ts"
 documents: []
 config:
   immutableTypes: "1"
 generates:
-  ./src/graphQLSchema/content-schema.types.ts:
+  ./src/introspection/content-schema.types.ts:
     config:
       immutableTypes: "1"
     plugins:

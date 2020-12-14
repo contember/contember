@@ -52,6 +52,9 @@ export default class QueryProvider {
 				by: {
 					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
 				},
+				filter: {
+					type: this.whereTypeProvider.getEntityWhereType(entityName),
+				},
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },
 			resolve: (parent, args, context, info) => {
@@ -74,14 +77,20 @@ export default class QueryProvider {
 				this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(entityType)),
 			),
 			args: {
-				filter: { type: this.whereTypeProvider.getEntityWhereType(entityName) },
+				filter: {
+					type: this.whereTypeProvider.getEntityWhereType(entityName),
+				},
 				orderBy: {
 					type: this.graphqlObjectFactories.createList(
 						this.graphqlObjectFactories.createNotNull(this.orderByTypeProvider.getEntityOrderByType(entityName)),
 					),
 				},
-				offset: { type: this.graphqlObjectFactories.int },
-				limit: { type: this.graphqlObjectFactories.int },
+				offset: {
+					type: this.graphqlObjectFactories.int,
+				},
+				limit: {
+					type: this.graphqlObjectFactories.int,
+				},
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },
 			resolve: (parent, args, context, info) => {

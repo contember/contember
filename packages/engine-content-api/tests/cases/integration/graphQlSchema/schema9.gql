@@ -1,20 +1,20 @@
 type Query {
-  getCategory(by: CategoryUniqueWhere!): Category
+  getCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): Category
   listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
   paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
   validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
   validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
-  getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  getPostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
   listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
-  getPost(by: PostUniqueWhere!): Post
+  getPost(by: PostUniqueWhere!, filter: PostWhere): Post
   listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
   paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
   validateCreatePost(data: PostCreateInput!): _ValidationResult!
   validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
-  getAuthor(by: AuthorUniqueWhere!): Author
+  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
   listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
   paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
@@ -645,22 +645,22 @@ input AuthorUpsertPostsRelationInput {
 }
 
 type QueryTransaction {
-  getCategory(by: CategoryUniqueWhere!): Category
+  getCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): Category
   listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
   paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
   validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
   validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
-  getPostLocale(by: PostLocaleUniqueWhere!): PostLocale
+  getPostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
   listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
-  getPost(by: PostUniqueWhere!): Post
+  getPost(by: PostUniqueWhere!, filter: PostWhere): Post
   listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
   paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
   validateCreatePost(data: PostCreateInput!): _ValidationResult!
   validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
-  getAuthor(by: AuthorUniqueWhere!): Author
+  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
   listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
   paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!

@@ -1,9 +1,9 @@
 type Query {
-  getRoot(by: RootUniqueWhere!): Root
+  getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
   listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
   paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
   validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
-  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
   paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
   validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
@@ -213,11 +213,11 @@ input RootWithoutRUpdateInput {
 }
 
 type QueryTransaction {
-  getRoot(by: RootUniqueWhere!): Root
+  getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
   listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
   paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
   validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
-  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!): OneHasManyEntity
+  getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
   paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
   validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!

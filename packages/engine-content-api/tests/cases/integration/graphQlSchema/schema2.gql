@@ -1,5 +1,5 @@
 type Query {
-  getTest(by: TestUniqueWhere!): Test
+  getTest(by: TestUniqueWhere!, filter: TestWhere): Test
   listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
   paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
   validateCreateTest(data: TestCreateInput!): _ValidationResult!
@@ -137,7 +137,7 @@ input TestUpdateInput {
 }
 
 type QueryTransaction {
-  getTest(by: TestUniqueWhere!): Test
+  getTest(by: TestUniqueWhere!, filter: TestWhere): Test
   listTest(filter: TestWhere, orderBy: [TestOrderBy!], offset: Int, limit: Int): [Test!]!
   paginateTest(filter: TestWhere, orderBy: [TestOrderBy!], skip: Int, first: Int): TestConnection!
   validateCreateTest(data: TestCreateInput!): _ValidationResult!

@@ -90,6 +90,7 @@ namespace Input {
 
 	export interface UniqueQueryInput<E = never> {
 		by: UniqueWhere<E>
+		filter?: Where<Condition<Value.FieldValue<E>>>
 	}
 
 	export interface ListQueryInput<E = never> {

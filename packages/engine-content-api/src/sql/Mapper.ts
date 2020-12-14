@@ -79,7 +79,8 @@ class Mapper {
 		entity: Model.Entity,
 		query: ObjectNode<Input.UniqueQueryInput>,
 	): Promise<SelectHydrator.ResultObject | null> {
-		const where = this.uniqueWhereExpander.expand(entity, query.args.by)
+		const uniqueWhere = this.uniqueWhereExpander.expand(entity, query.args.by)
+		const where = query.args.filter ? { and: [uniqueWhere, query.args.filter] } : uniqueWhere
 		const queryExpanded = query.withArg<Input.ListQueryInput>('filter', where)
 
 		return (await this.select(entity, queryExpanded))[0] || null

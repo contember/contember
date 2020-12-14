@@ -1,10 +1,10 @@
 type Query {
-  getFrontPage(by: FrontPageUniqueWhere!): FrontPage
+  getFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPage
   listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
   paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
   validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
   validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
-  getVideo(by: VideoUniqueWhere!): Video
+  getVideo(by: VideoUniqueWhere!, filter: VideoWhere): Video
   listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
   paginateVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
@@ -375,12 +375,12 @@ input VideoUpdateInput {
 }
 
 type QueryTransaction {
-  getFrontPage(by: FrontPageUniqueWhere!): FrontPage
+  getFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPage
   listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
   paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
   validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
   validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
-  getVideo(by: VideoUniqueWhere!): Video
+  getVideo(by: VideoUniqueWhere!, filter: VideoWhere): Video
   listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
   paginateVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!

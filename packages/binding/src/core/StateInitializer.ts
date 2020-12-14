@@ -88,7 +88,7 @@ export class StateInitializer {
 		return subTreeState
 	}
 
-	public initializeEntityStateStub(id: EntityAccessor.RuntimeId, realms: EntityRealmSet): EntityStateStub {
+	private initializeEntityStateStub(id: EntityAccessor.RuntimeId, realms: EntityRealmSet): EntityStateStub {
 		return {
 			type: StateType.EntityStub,
 			id,
@@ -122,7 +122,7 @@ export class StateInitializer {
 		}
 	}
 
-	public initializeEntityState(id: EntityAccessor.RuntimeId, realm: EntityRealm): EntityState {
+	private initializeEntityState(id: EntityAccessor.RuntimeId, realm: EntityRealm): EntityState {
 		const entityKey = id.value
 		const existingEntityState = this.treeStore.entityStore.get(entityKey)
 
@@ -487,7 +487,7 @@ export class StateInitializer {
 		return entityState
 	}
 
-	public initializeEntityListState(
+	private initializeEntityListState(
 		parent: EntityState | undefined,
 		environment: Environment,
 		markersContainer: EntityFieldMarkersContainer,

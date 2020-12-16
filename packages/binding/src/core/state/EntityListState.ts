@@ -6,9 +6,9 @@ import { EntityState, OnEntityUpdate } from './EntityState'
 import { EntityStateStub } from './EntityStateStub'
 import { StateType } from './StateType'
 
-export type OnEntityListUpdate = (state: EntityListState) => void
 export interface EntityListState {
 	type: StateType.EntityList
+
 	batchUpdateDepth: number
 	children: Map<string, EntityState | EntityStateStub>
 	childrenWithPendingUpdates: Set<EntityState> | undefined
@@ -25,11 +25,10 @@ export interface EntityListState {
 	hasPendingUpdate: boolean
 	hasStaleAccessor: boolean
 	markersContainer: EntityFieldMarkersContainer
+	onChildUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
+	parent: EntityState | undefined // Undefined if we're at the top-level.
 	persistedEntityIds: Set<string>
 	plannedRemovals: Map<EntityState | EntityStateStub, RemovalType> | undefined
-
-	onChildUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
-	onSelfUpdate: OnEntityListUpdate // To be called by this entity list to inform the parent entity
 
 	addError: EntityListAccessor.AddError
 	addEventListener: EntityListAccessor.AddEntityListEventListener

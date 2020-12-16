@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Editor, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, Path, Range as SlateRange, Transforms } from 'slate'
 import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { AnchorElement, anchorElementType } from './AnchorElement'
 import { AnchorRenderer, AnchorRendererProps } from './AnchorRenderer'
@@ -9,8 +9,17 @@ import { isUrl } from './isUrl'
 export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<E> => {
 	type BaseAnchorEditor = WithAnotherNodeType<E, AnchorElement>
 
-	const e: E & Partial<WithAnchors<BaseAnchorEditor>> = editor
-	const { isInline, insertText, insertData, renderElement, toggleElement, isElementActive, processInlinePaste } = editor
+	const e = editor as E & WithAnchors<BaseAnchorEditor>
+	const {
+		insertData,
+		insertText,
+		isElementActive,
+		isInline,
+		normalizeNode,
+		processInlinePaste,
+		renderElement,
+		toggleElement,
+	} = editor
 
 	const isAnchor = (element: SlateNode | ElementNode): element is AnchorElement => element.type === anchorElementType
 	const isAnchorActive = (editor: BaseAnchorEditor) => {
@@ -97,6 +106,22 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 			wrapAnchor((e as unknown) as BaseAnchorEditor, text)
 		} else {
 			insertData(data)
+		}
+	}
+	e.normalizeNode = entry => {
+		const [node, path] = entry
+
+		if (!SlateElement.isElement(node) || !e.isAnchor(node)) {
+			return normalizeNode(entry)
+		}
+		if (SlateNode.string(node) === '') {
+			const selection = e.selection
+			Transforms.removeNodes(e, {
+				at: path,
+			})
+			if (selection && SlateRange.isCollapsed(selection) && Path.isCommon(path, selection.focus.path)) {
+				Transforms.select(e, Path.parent(path))
+			}
 		}
 	}
 

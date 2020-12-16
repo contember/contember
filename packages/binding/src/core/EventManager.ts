@@ -4,9 +4,9 @@ import {
 	EntityAccessor,
 	EntityListAccessor,
 	PersistErrorOptions,
+	PersistSuccessOptions,
 	TreeRootAccessor,
 } from '../accessors'
-import { PersistSuccessOptions } from '../accessors/PersistSuccessOptions'
 import { RequestError, SuccessfulPersistResult } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { HasManyRelationMarker } from '../markers'
@@ -15,9 +15,18 @@ import { FieldName } from '../treeParameters/primitives'
 import { assertNever } from '../utils'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
-import { EntityListState, EntityRealm, EntityState, StateINode, StateIterator, StateNode, StateType } from './state'
-import { TreeStore } from './TreeStore'
+import {
+	EntityListState,
+	EntityRealm,
+	EntityState,
+	FieldState,
+	StateINode,
+	StateIterator,
+	StateNode,
+	StateType,
+} from './state'
 import { TreeParameterMerger } from './TreeParameterMerger'
+import { TreeStore } from './TreeStore'
 
 export class EventManager {
 	private transactionDepth = 0
@@ -27,6 +36,7 @@ export class EventManager {
 	private hasUpdated = false
 
 	private newlyInitializedWithListeners: Set<EntityListState | [EntityState, EntityRealm]> = new Set()
+	private pendingWithBeforeUpdate: Set<EntityState | EntityListState | FieldState> = new Set()
 
 	public constructor(
 		private readonly bindingOperations: BindingOperations,
@@ -108,7 +118,7 @@ export class EventManager {
 
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
-			this.triggerOnInitialize()
+			this.triggerBeforeFlushEvents()
 			this.updateTreeRoot()
 			this.flushPendingAccessorUpdates(rootsWithPendingUpdates)
 			this.isFrozenWhileUpdating = false
@@ -120,6 +130,12 @@ export class EventManager {
 
 		if (listeners && Object.values(listeners.eventListeners).filter(listeners => !!listeners).length) {
 			this.newlyInitializedWithListeners.add(newlyInitialized)
+		}
+	}
+
+	public registerJustUpdated(justUpdated: FieldState | EntityState | EntityListState) {
+		if (justUpdated.eventListeners.beforeUpdate) {
+			this.pendingWithBeforeUpdate.add(justUpdated)
 		}
 	}
 
@@ -253,7 +269,7 @@ export class EventManager {
 						}
 					}
 
-					this.triggerOnInitialize()
+					this.triggerBeforeFlushEvents()
 
 					for (let i = 0; i < newCallbacks.length; i++) {
 						const result = newCallbacks[i]
@@ -286,7 +302,48 @@ export class EventManager {
 		})
 	}
 
-	public triggerOnInitialize() {
+	private triggerBeforeFlushEvents() {
+		this.syncTransaction(() => {
+			const settleLimit = this.config.getValue('beforeUpdateSettleLimit')
+
+			for (let attemptNumber = 0; attemptNumber < settleLimit; attemptNumber++) {
+				if (!this.pendingWithBeforeUpdate.size) {
+					this.triggerOnInitialize()
+					return
+				}
+				const withBeforeUpdate = this.pendingWithBeforeUpdate
+				this.pendingWithBeforeUpdate = new Set()
+
+				for (const state of withBeforeUpdate) {
+					switch (state.type) {
+						case StateType.Field:
+							for (const listener of state.eventListeners.beforeUpdate!) {
+								listener(state.getAccessor())
+							}
+							break
+						case StateType.Entity:
+							for (const listener of state.eventListeners.beforeUpdate!) {
+								state.batchUpdates(listener)
+							}
+							break
+						case StateType.EntityList:
+							for (const listener of state.eventListeners.beforeUpdate!) {
+								state.batchUpdates(listener)
+							}
+							break
+					}
+				}
+
+				this.triggerOnInitialize()
+			}
+			throw new BindingError(
+				`Maximum stabilization limit of updates caused by 'beforeUpdate' exceeded. ` +
+					`This likely means there is an infinite feedback loop in your code.`,
+			)
+		})
+	}
+
+	private triggerOnInitialize() {
 		let hasOnInitialize = false
 
 		this.syncTransaction(() => {
@@ -362,12 +419,9 @@ export class EventManager {
 				}
 				break
 			}
+			case StateType.Field:
 			case StateType.EntityList: {
-				childState.onSelfUpdate(childState)
-				break
-			}
-			case StateType.Field: {
-				childState.onSelfUpdate(childState)
+				childState.parent?.onChildUpdate(childState)
 				break
 			}
 		}

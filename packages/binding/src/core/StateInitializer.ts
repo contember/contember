@@ -1,11 +1,9 @@
 import { GraphQlBuilder } from '@contember/client'
-import { noop } from '@contember/react-utils'
 import { validate as uuidValidate } from 'uuid'
 import { BindingOperations, EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
 import {
 	ClientGeneratedUuid,
 	EntityFieldPersistedData,
-	EntityListPersistedData,
 	ServerGeneratedUuid,
 	UnpersistedEntityKey,
 } from '../accessorTree'
@@ -40,8 +38,6 @@ import {
 	EntityState,
 	EntityStateStub,
 	FieldState,
-	OnEntityListUpdate,
-	OnFieldUpdate,
 	RootStateNode,
 	StateINode,
 	StateNode,
@@ -69,10 +65,10 @@ export class StateInitializer {
 		if (tree.parameters.type === 'qualifiedEntityList' || tree.parameters.type === 'unconstrainedQualifiedEntityList') {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
 			subTreeState = this.initializeEntityListState(
+				undefined,
 				tree.environment,
 				tree.fields,
 				tree.parameters.value,
-				noop,
 				persistedEntityIds,
 				tree.parameters.value,
 			)
@@ -132,10 +128,6 @@ export class StateInitializer {
 
 		if (existingEntityState !== undefined) {
 			this.addEntityRealm(existingEntityState, realm)
-			existingEntityState.hasStaleAccessor = true
-			this.mergeInEntityFieldsContainer(existingEntityState, realm.markersContainer)
-
-			this.eventManager.registerNewlyInitialized([existingEntityState, realm])
 
 			return existingEntityState
 		}
@@ -259,14 +251,12 @@ export class StateInitializer {
 			},
 			batchUpdates: performUpdates => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
-						batchUpdatesImplementation(performUpdates)
-					})
+					batchUpdatesImplementation(performUpdates)
 				})
 			},
 			connectEntityAtField: (fieldName, entityToConnectOrItsKey) => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
+					batchUpdatesImplementation(() => {
 						const hasOneMarkers = resolveHasOneRelationMarkers(
 							fieldName,
 							`Cannot connect at field '${fieldName}' as it doesn't refer to a has one relation.`,
@@ -335,7 +325,7 @@ export class StateInitializer {
 			},
 			disconnectEntityAtField: (fieldName, initializeReplacement) => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
+					batchUpdatesImplementation(() => {
 						const hasOneMarkers = resolveHasOneRelationMarkers(
 							fieldName,
 							`Cannot disconnect the field '${fieldName}' as it doesn't refer to a has one relation.`,
@@ -430,37 +420,9 @@ export class StateInitializer {
 			) {
 				entityState.hasPendingUpdate = true
 				entityState.hasPendingParentNotification = false
+				this.eventManager.registerJustUpdated(entityState)
 				this.eventManager.notifyParents(entityState)
 			}
-		}
-
-		const performOperationWithBeforeUpdate = (operation: () => void) => {
-			batchUpdatesImplementation(getAccessor => {
-				operation()
-
-				if (
-					!entityState.hasPendingParentNotification || // That means the operation hasn't done anything
-					entityState.eventListeners.beforeUpdate === undefined ||
-					entityState.eventListeners.beforeUpdate.size === 0
-				) {
-					return
-				}
-
-				let currentAccessor: EntityAccessor
-				for (let i = 0; i < this.config.getValue('beforeUpdateSettleLimit'); i++) {
-					currentAccessor = getAccessor()
-					for (const listener of entityState.eventListeners.beforeUpdate) {
-						listener(getAccessor, this.bindingOperations)
-					}
-					if (currentAccessor === getAccessor()) {
-						return
-					}
-				}
-				throw new BindingError(
-					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
-						`This likely means an infinite feedback loop in your code.`,
-				)
-			})
 		}
 
 		const processChildEntityDeletion = (deletedChildState: EntityState) => {
@@ -526,10 +488,10 @@ export class StateInitializer {
 	}
 
 	public initializeEntityListState(
+		parent: EntityState | undefined,
 		environment: Environment,
 		markersContainer: EntityFieldMarkersContainer,
 		creationParameters: EntityCreationParameters & EntityListPreferences,
-		onSelfUpdate: OnEntityListUpdate,
 		persistedEntityIds: Set<string>,
 		initialEventListeners: EntityListEventListeners | undefined,
 	): EntityListState {
@@ -537,7 +499,6 @@ export class StateInitializer {
 			type: StateType.EntityList,
 			creationParameters,
 			markersContainer,
-			onSelfUpdate,
 			persistedEntityIds,
 			addEventListener: undefined as any,
 			batchUpdateDepth: 0,
@@ -550,6 +511,7 @@ export class StateInitializer {
 			hasPendingParentNotification: false,
 			hasPendingUpdate: false,
 			hasStaleAccessor: true,
+			parent,
 			getAccessor: (() => {
 				let accessor: EntityListAccessor | undefined = undefined
 				return () => {
@@ -592,14 +554,12 @@ export class StateInitializer {
 				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			batchUpdates: performUpdates => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
-						batchUpdatesImplementation(performUpdates)
-					})
+					batchUpdatesImplementation(performUpdates)
 				})
 			},
 			connectEntity: entityToConnectOrItsKey => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
+					batchUpdatesImplementation(() => {
 						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
 
 						if (entityListState.children.has(connectedEntityKey)) {
@@ -644,7 +604,7 @@ export class StateInitializer {
 			},
 			disconnectEntity: childEntityOrItsKey => {
 				this.eventManager.syncOperation(() => {
-					performOperationWithBeforeUpdate(() => {
+					batchUpdatesImplementation(() => {
 						const disconnectedChildKey =
 							typeof childEntityOrItsKey === 'string' ? childEntityOrItsKey : childEntityOrItsKey.key
 
@@ -702,37 +662,9 @@ export class StateInitializer {
 			) {
 				entityListState.hasPendingUpdate = true
 				entityListState.hasPendingParentNotification = false
-				entityListState.onSelfUpdate(entityListState)
+				this.eventManager.registerJustUpdated(entityListState)
+				this.eventManager.notifyParents(entityListState)
 			}
-		}
-
-		const performOperationWithBeforeUpdate = (operation: () => void) => {
-			batchUpdatesImplementation(getAccessor => {
-				operation()
-
-				if (
-					!entityListState.hasPendingParentNotification || // That means the operation hasn't done anything.
-					entityListState.eventListeners.beforeUpdate === undefined ||
-					entityListState.eventListeners.beforeUpdate.size === 0
-				) {
-					return
-				}
-
-				let currentAccessor: EntityListAccessor
-				for (let i = 0; i < this.config.getValue('beforeUpdateSettleLimit'); i++) {
-					currentAccessor = getAccessor()
-					for (const listener of entityListState.eventListeners.beforeUpdate) {
-						listener(getAccessor, this.bindingOperations)
-					}
-					if (currentAccessor === getAccessor()) {
-						return
-					}
-				}
-				throw new BindingError(
-					`EntityAccessor beforeUpdate event: maximum stabilization limit exceeded. ` +
-						`This likely means an infinite feedback loop in your code.`,
-				)
-			})
 		}
 
 		const initialData: Set<string | undefined> =
@@ -747,9 +679,9 @@ export class StateInitializer {
 	}
 
 	private initializeFieldState(
+		parent: EntityState,
 		placeholderName: FieldName,
 		fieldMarker: FieldMarker,
-		onSelfUpdate: OnFieldUpdate,
 		persistedValue: Scalar | undefined,
 	): FieldState {
 		const resolvedFieldValue = persistedValue ?? fieldMarker.defaultValue ?? null
@@ -757,9 +689,9 @@ export class StateInitializer {
 		const fieldState: FieldState = {
 			type: StateType.Field,
 			fieldMarker,
-			onSelfUpdate,
 			placeholderName,
 			persistedValue,
+			parent,
 			value: resolvedFieldValue,
 			addEventListener: undefined as any,
 			eventListeners: {
@@ -783,7 +715,7 @@ export class StateInitializer {
 							fieldState.fieldMarker.defaultValue,
 							fieldState.errors,
 							fieldState.hasUnpersistedChanges,
-							fieldState.isTouchedBy,
+							fieldState.touchLog,
 							fieldState.addError,
 							fieldState.addEventListener,
 							fieldState.updateValue,
@@ -832,9 +764,9 @@ export class StateInitializer {
 						return
 					}
 					if (fieldState.touchLog === undefined) {
-						fieldState.touchLog = new Map()
+						fieldState.touchLog = new Set()
 					}
-					fieldState.touchLog.set(agent, true)
+					fieldState.touchLog.add(agent)
 					fieldState.value = newValue
 					fieldState.hasPendingUpdate = true
 					fieldState.hasStaleAccessor = true
@@ -851,9 +783,10 @@ export class StateInitializer {
 					const hasUnpersistedChangesNow = normalizedValue !== normalizedPersistedValue
 					fieldState.hasUnpersistedChanges = hasUnpersistedChangesNow
 
-					// TODO if the entity only has nonbearing fields, this should be true.
 					const shouldInfluenceUpdateCount =
-						!fieldState.fieldMarker.isNonbearing || fieldState.persistedValue !== undefined
+						!parent.combinedMarkersContainer.hasAtLeastOneBearingField ||
+						!fieldState.fieldMarker.isNonbearing ||
+						fieldState.persistedValue !== undefined
 
 					if (shouldInfluenceUpdateCount) {
 						if (!hadUnpersistedChangesBefore && hasUnpersistedChangesNow) {
@@ -863,19 +796,10 @@ export class StateInitializer {
 						}
 					}
 
-					fieldState.onSelfUpdate(fieldState)
-
-					// Deliberately firing this *AFTER* letting the parent know.
-					// Listeners are likely to invoke a parent's batchUpdates, and so the parents should be up to date.
-					if (fieldState.eventListeners.beforeUpdate) {
-						for (const listener of fieldState.eventListeners.beforeUpdate) {
-							listener(fieldState.getAccessor())
-						}
-					}
+					this.eventManager.registerJustUpdated(fieldState)
+					this.eventManager.notifyParents(fieldState)
 				})
 			},
-			isTouchedBy: (agent: string) =>
-				fieldState.touchLog === undefined ? false : fieldState.touchLog.get(agent) || false,
 		}
 		fieldState.addEventListener = this.getAddEventListener(fieldState)
 		return fieldState
@@ -937,7 +861,7 @@ export class StateInitializer {
 					`Perhaps you wanted to use <HasOne />?`,
 			)
 		} else {
-			const fieldState = this.initializeFieldState(field.placeholderName, field, entityState.onChildUpdate, fieldDatum)
+			const fieldState = this.initializeFieldState(entityState, field.placeholderName, field, fieldDatum)
 			entityState.children.set(field.placeholderName, fieldState)
 		}
 	}
@@ -989,10 +913,10 @@ export class StateInitializer {
 			entityState.children.set(
 				field.placeholderName,
 				this.initializeEntityListState(
+					entityState,
 					field.environment,
 					field.fields,
 					relation,
-					entityState.onChildUpdate,
 					fieldDatum || new Set(),
 					field.relation,
 				),
@@ -1100,6 +1024,19 @@ export class StateInitializer {
 	}
 
 	private addEntityRealm(targetState: EntityState | EntityStateStub, newRealm: EntityRealm) {
+		const byParent = targetState.realms.get(newRealm.parent)
+		if (byParent === undefined) {
+			targetState.realms.set(newRealm.parent, new Map([[newRealm.realmKey, newRealm]]))
+		} else {
+			const byKey = byParent.get(newRealm.realmKey)
+
+			if (byKey === undefined) {
+				byParent.set(newRealm.realmKey, newRealm)
+			} else {
+				byParent.set(newRealm.realmKey, MarkerMerger.mergeRealms(byKey, newRealm))
+			}
+		}
+
 		if (targetState.type === StateType.Entity) {
 			const { creationParameters, markersContainer, initialEventListeners, environment } = newRealm
 			targetState.combinedMarkersContainer = MarkerMerger.mergeEntityFieldsContainers(
@@ -1119,19 +1056,10 @@ export class StateInitializer {
 				TreeParameterMerger.cloneSingleEntityEventListeners(targetState.eventListeners),
 				TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
 			)
-		}
+			targetState.hasStaleAccessor = true
+			this.mergeInEntityFieldsContainer(targetState, newRealm.markersContainer)
 
-		const byParent = targetState.realms.get(newRealm.parent)
-		if (byParent === undefined) {
-			targetState.realms.set(newRealm.parent, new Map([[newRealm.realmKey, newRealm]]))
-		} else {
-			const byKey = byParent.get(newRealm.realmKey)
-
-			if (byKey === undefined) {
-				byParent.set(newRealm.realmKey, newRealm)
-			} else {
-				byParent.set(newRealm.realmKey, MarkerMerger.mergeRealms(byKey, newRealm))
-			}
+			this.eventManager.registerNewlyInitialized([targetState, newRealm])
 		}
 	}
 

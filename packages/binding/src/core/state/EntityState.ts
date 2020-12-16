@@ -12,20 +12,21 @@ export type OnEntityUpdate = (state: StateNode) => void
 export type OnEntityFieldUpdate = (state: StateNode) => void
 export interface EntityState {
 	type: StateType.Entity
-	eventListeners: SingleEntityEventListeners['eventListeners']
+
 	batchUpdateDepth: number
+	children: Map<PlaceholderName, StateNode | EntityStateStub>
 	childrenWithPendingUpdates: Set<StateNode> | undefined
 	errors: ErrorAccessor | undefined
-	children: Map<PlaceholderName, StateNode | EntityStateStub>
+	eventListeners: SingleEntityEventListeners['eventListeners']
 	fieldsWithPendingConnectionUpdates: Set<PlaceholderName> | undefined
 	hasIdSetInStone: boolean // Initially, ids may be changed but only up to a certain point. This marks that point.
-	hasPendingUpdate: boolean
 	hasPendingParentNotification: boolean
+	hasPendingUpdate: boolean
 	hasStaleAccessor: boolean
 	id: EntityAccessor.RuntimeId
 	isScheduledForDeletion: boolean
-	onChildUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	maidenKey: string | undefined // undefined for persisted entities
+	onChildUpdate: OnEntityFieldUpdate // To be called by the child to inform this entity
 	persistedData: SingleEntityPersistedData | undefined // TODO remove this
 	plannedHasOneDeletions: Map<PlaceholderName, EntityState> | undefined
 	realms: EntityRealmSet

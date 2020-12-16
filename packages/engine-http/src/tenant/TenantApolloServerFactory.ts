@@ -23,7 +23,8 @@ class TenantApolloServerFactory {
 		return new ApolloServer({
 			typeDefs,
 			introspection: true,
-			tracing: true,
+			playground: false,
+			uploads: false,
 			extensions: [() => new ErrorHandlerExtension(undefined, 'tenant', this.errorLogger)],
 			plugins: [new GraphqlInfoProviderPlugin()],
 			resolvers: this.resolvers as Config['resolvers'],

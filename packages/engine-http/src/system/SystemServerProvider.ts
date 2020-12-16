@@ -31,6 +31,9 @@ class SystemServerProvider {
 			return this.server
 		}
 		return (this.server = new ApolloServer({
+			introspection: true,
+			playground: false,
+			uploads: false,
 			typeDefs,
 			resolvers: this.resolvers as Config['resolvers'],
 			extensions: [

@@ -37,10 +37,9 @@ class ContentApolloServerFactory {
 			extensions.push(() => new DbQueriesExtension())
 		}
 		return new ApolloServer({
-			uploads: false,
-			playground: false,
 			introspection: true,
-			tracing: this.debug,
+			playground: false,
+			uploads: false,
 			extensions,
 			schema: dataSchema,
 			plugins: [new GraphqlInfoProviderPlugin()],

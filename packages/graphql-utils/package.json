@@ -1,6 +1,6 @@
 {
   "name": "@contember/graphql-utils",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "scripts": {},

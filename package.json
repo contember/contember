@@ -1,5 +1,5 @@
 {
-  "version": "0.9.1",
+  "version": "0.9.2",
   "private": true,
   "scripts": {
     "oao": "oao",
@@ -14,7 +14,7 @@
     "test": "oao run-script test",
     "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
     "eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
-    "tag-version": "oao publish --no-npm-publish --no-changelog"
+    "tag-version": "oao publish --no-npm-publish --no-changelog --no-check-uncommitted --no-master"
   },
   "husky": {
     "hooks": {

@@ -7,7 +7,7 @@ import assert from 'assert'
 import { assertNever } from '../../utils'
 import PredicateFactory from '../../acl/PredicateFactory'
 import WhereBuilder from '../../sql/select/WhereBuilder'
-import Path, { PathFactory } from '../../sql/select/Path'
+import { PathFactory } from '../../sql/select/Path'
 import UpdateBuilderFactory from '../../sql/update/UpdateBuilderFactory'
 import InsertBuilderFactory from '../../sql/insert/InsertBuilderFactory'
 import JoinBuilder from '../../sql/select/JoinBuilder'
@@ -160,23 +160,53 @@ export class ContentEventApplier {
 
 	public async apply(context: ContentEventApplierContext, events: ContentEvent[]): Promise<ContentEventApplyResult> {
 		const tables = buildTables(context.schema.model)
-		const deps = this.contentApplyDependenciesFactory.create(context.schema, context.roles, context.identityVariables)
+		const deps = {
+			...this.contentApplyDependenciesFactory.create(context.schema, context.roles, context.identityVariables),
+			db: context.db,
+		}
 		const applied: ContentEvent[] = []
 		let trxId: string | null = null
+		let deletedEntities = new Set<string>()
+		const getEntityRef = (name: string, id: string) => `${name}#${id}`
 		for (const event of events) {
 			if (event.transactionId !== trxId) {
+				deletedEntities = new Set<string>()
 				await context.db.query('SET CONSTRAINTS ALL IMMEDIATE')
 				await context.db.query('SET CONSTRAINTS ALL DEFERRED')
 				trxId = event.transactionId
 			}
-			const result = await this.applyEvent(
-				{
-					tables,
-					db: context.db,
-					...deps,
-				},
-				event,
-			)
+			let result
+			const entityTable = tables.entities[event.tableName]
+			const junctionTable = tables.junctions[event.tableName]
+			if (entityTable) {
+				if (event.type === EventType.delete) {
+					deletedEntities.add(getEntityRef(tables.entities[event.tableName].entity.name, event.rowId[0]))
+				}
+				result = await this.applyEntityEvent(
+					{
+						...deps,
+						entityTable: entityTable,
+					},
+					event,
+				)
+			} else if (junctionTable) {
+				const primaryRef = getEntityRef(junctionTable.entity.name, event.rowId[0])
+				const inverseRef = getEntityRef(junctionTable.relation.target, event.rowId[1])
+				if (deletedEntities.has(primaryRef) || deletedEntities.has(inverseRef)) {
+					// already deleted using cascade
+					continue
+				}
+				result = await this.applyJunctionEvent(
+					{
+						...deps,
+						junctionTable: junctionTable,
+					},
+					event,
+				)
+			} else {
+				throw new Error()
+			}
+
 			if (result.result !== MutationResultType.ok) {
 				return new ContentEventApplyErrorResult(applied, event)
 			}
@@ -184,40 +214,6 @@ export class ContentEventApplier {
 		}
 		await context.db.query('SET CONSTRAINTS ALL IMMEDIATE')
 		return new ContentEventApplyOkResult(applied)
-	}
-
-	private async applyEvent(
-		context: {
-			db: Client
-			tables: Tables
-			whereBuilder: WhereBuilder
-			predicateFactory: PredicateFactory
-			junctionTableManager: JunctionTableManager
-			insertBuilderFactory: InsertBuilderFactory
-			updateBuilderFactory: UpdateBuilderFactory
-			pathFactory: PathFactory
-		},
-		event: ContentEvent,
-	): Promise<MutationResult> {
-		if (context.tables.entities[event.tableName]) {
-			return await this.applyEntityEvent(
-				{
-					...context,
-					entityTable: context.tables.entities[event.tableName],
-				},
-				event,
-			)
-		} else if (context.tables.junctions[event.tableName]) {
-			return await this.applyJunctionEvent(
-				{
-					...context,
-					junctionTable: context.tables.junctions[event.tableName],
-				},
-				event,
-			)
-		} else {
-			throw new Error()
-		}
 	}
 
 	private async applyEntityEvent(

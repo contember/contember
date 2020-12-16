@@ -6,17 +6,20 @@ type Query = { sql: string; bindings: any; elapsed: number; error?: string; meta
 
 type Context = { db?: Client }
 export default class DbQueriesPlugin implements ApolloServerPlugin<Context> {
-	requestDidStart({ context: { db } }: GraphQLRequestContext<Context>): GraphQLRequestListener<Context> {
+	constructor(private readonly dbResolver: (context: Record<string, any>) => Client) {}
+
+	requestDidStart({ context }: GraphQLRequestContext): GraphQLRequestListener<Context> {
+		const db = this.dbResolver(context)
 		if (!db) {
 			return {}
 		}
 		const queries: Query[] = []
 		const listener: EventManager.QueryEndCallback = ({ sql, parameters, meta }, { timing }) =>
 			queries.push({ sql, bindings: parameters, elapsed: timing ? timing.selfDuration : 0, meta })
-
 		db.eventManager.on(EventManager.Event.queryEnd, listener)
 		return {
-			willSendResponse: ({ response, context: { db } }) => {
+			willSendResponse: ({ response, context }) => {
+				const db = this.dbResolver(context)
 				if (!db) {
 					return
 				}

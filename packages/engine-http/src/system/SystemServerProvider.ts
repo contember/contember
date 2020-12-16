@@ -14,6 +14,8 @@ import { flattenVariables } from '@contember/engine-content-api'
 import { ErrorContextProvider, ErrorHandlerPlugin, ErrorLogger } from '../graphql/ErrorHandlerPlugin'
 import { ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
 import { AuthMiddlewareState, GraphqlInfoProviderPlugin, GraphQLInfoState } from '../common'
+import DbQueriesPlugin from '../graphql/DbQueriesPlugin'
+import { ApolloServerPlugin } from 'apollo-server-plugin-base'
 
 type InputKoaContext = KoaContext<
 	AuthMiddlewareState & ProjectMemberMiddlewareState & ProjectResolveMiddlewareState & GraphQLInfoState
@@ -42,11 +44,18 @@ class SystemServerProvider {
 		if (this.debugMode) {
 			schemas.push(devTypeDefs)
 		}
+		const plugins: ApolloServerPlugin[] = [
+			new GraphqlInfoProviderPlugin(),
+			new ErrorHandlerPlugin(undefined, 'system', this.errorLogger),
+		]
+		if (this.debugMode) {
+			plugins.push(new DbQueriesPlugin(context => context.db.client))
+		}
 		const resolvers = this.resolversFactory.create(this.debugMode)
 		const mergedSchema = mergeSchemas({ schemas, resolvers: resolvers as Config['resolvers'] })
 		return (this.server = new ApolloServer({
 			schema: mergedSchema,
-			plugins: [new GraphqlInfoProviderPlugin(), new ErrorHandlerPlugin(undefined, 'system', this.errorLogger)],
+			plugins: plugins,
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createContext(ctx),
 		}))
 	}

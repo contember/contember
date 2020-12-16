@@ -1,6 +1,6 @@
 {
   "name": "@contember/template-instance",
-  "version": "0.10.0-alpha.3",
+  "version": "0.10.0-alpha.4",
   "license": "Apache-2.0",
   "scripts": {
     "test": "echo 'No tests'"

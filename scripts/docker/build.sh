@@ -17,8 +17,7 @@ if [[ $VERSION =~ ^v((([0-9]+)\.([0-9]+))\.[0-9]+)((-([a-z]+))\.[0-9]+)?$ ]]; th
 else
   ALL_VERSIONS=( "$VERSION" )
 fi
-echo ${ALL_VERSIONS[*]}
-exit 1
+
 MAIN_VERSION=${ALL_VERSIONS[0]}
 
 REPO="contember/contember"

@@ -128,10 +128,6 @@ export class StateInitializer {
 
 		if (existingEntityState !== undefined) {
 			this.addEntityRealm(existingEntityState, realm)
-			existingEntityState.hasStaleAccessor = true
-			this.mergeInEntityFieldsContainer(existingEntityState, realm.markersContainer)
-
-			this.eventManager.registerNewlyInitialized([existingEntityState, realm])
 
 			return existingEntityState
 		}
@@ -1028,6 +1024,19 @@ export class StateInitializer {
 	}
 
 	private addEntityRealm(targetState: EntityState | EntityStateStub, newRealm: EntityRealm) {
+		const byParent = targetState.realms.get(newRealm.parent)
+		if (byParent === undefined) {
+			targetState.realms.set(newRealm.parent, new Map([[newRealm.realmKey, newRealm]]))
+		} else {
+			const byKey = byParent.get(newRealm.realmKey)
+
+			if (byKey === undefined) {
+				byParent.set(newRealm.realmKey, newRealm)
+			} else {
+				byParent.set(newRealm.realmKey, MarkerMerger.mergeRealms(byKey, newRealm))
+			}
+		}
+
 		if (targetState.type === StateType.Entity) {
 			const { creationParameters, markersContainer, initialEventListeners, environment } = newRealm
 			targetState.combinedMarkersContainer = MarkerMerger.mergeEntityFieldsContainers(
@@ -1047,19 +1056,10 @@ export class StateInitializer {
 				TreeParameterMerger.cloneSingleEntityEventListeners(targetState.eventListeners),
 				TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
 			)
-		}
+			targetState.hasStaleAccessor = true
+			this.mergeInEntityFieldsContainer(targetState, newRealm.markersContainer)
 
-		const byParent = targetState.realms.get(newRealm.parent)
-		if (byParent === undefined) {
-			targetState.realms.set(newRealm.parent, new Map([[newRealm.realmKey, newRealm]]))
-		} else {
-			const byKey = byParent.get(newRealm.realmKey)
-
-			if (byKey === undefined) {
-				byParent.set(newRealm.realmKey, newRealm)
-			} else {
-				byParent.set(newRealm.realmKey, MarkerMerger.mergeRealms(byKey, newRealm))
-			}
+			this.eventManager.registerNewlyInitialized([targetState, newRealm])
 		}
 	}
 

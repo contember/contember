@@ -42,7 +42,6 @@ class ContentApolloServerFactory {
 			uploads: false,
 			playground: false,
 			introspection: true,
-			tracing: this.debug,
 			schema: dataSchema,
 			plugins,
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createGraphqlContext(permissions, schema, ctx),

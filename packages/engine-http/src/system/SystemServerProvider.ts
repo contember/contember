@@ -54,6 +54,9 @@ class SystemServerProvider {
 		const resolvers = this.resolversFactory.create(this.debugMode)
 		const mergedSchema = mergeSchemas({ schemas, resolvers: resolvers as Config['resolvers'] })
 		return (this.server = new ApolloServer({
+			uploads: false,
+			playground: false,
+			introspection: true,
 			schema: mergedSchema,
 			plugins: plugins,
 			context: ({ ctx }: { ctx: InputKoaContext }) => this.createContext(ctx),

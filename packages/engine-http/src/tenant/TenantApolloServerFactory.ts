@@ -27,8 +27,9 @@ class TenantApolloServerFactory {
 		})
 		return new ApolloServer({
 			schema,
+			uploads: false,
+			playground: false,
 			introspection: true,
-			tracing: true,
 			plugins: [new GraphqlInfoProviderPlugin(), new ErrorHandlerPlugin(undefined, 'tenant', this.errorLogger)],
 			context: ({ ctx }: { ctx: InputKoaContext }): ExtendedGraphqlContext => {
 				return {

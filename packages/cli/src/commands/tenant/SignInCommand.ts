@@ -2,6 +2,7 @@ import { Command, CommandConfiguration, Input } from '../../cli'
 import { interactiveResolveLoginToken, interactiveSignIn } from '../../utils/tenant'
 import prompt from 'prompts'
 import { interactiveResolveInstanceEnvironmentFromInput, updateInstanceLocalConfig } from '../../utils/instance'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	instance?: string
@@ -22,7 +23,8 @@ export class SignInCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(input.getArgument('instance'))
+		const workspace = await Workspace.get(process.cwd())
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
 		const loginToken = await interactiveResolveLoginToken(instance)
 		const { sessionToken } = await interactiveSignIn({ apiUrl: instance.baseUrl, loginToken })
 		console.log('Session token:')

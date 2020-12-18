@@ -1,6 +1,7 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { interactiveInvite, interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	instance?: string
@@ -21,7 +22,8 @@ export class InviteCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(input.getArgument('instance'))
+		const workspace = await Workspace.get(process.cwd())
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
 		const apiToken = await interactiveResolveApiToken({ instance })
 		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 		await interactiveInvite({ client: tenantClient })

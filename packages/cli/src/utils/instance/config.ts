@@ -4,6 +4,12 @@ import { JsonUpdateCallback, readMultipleYaml, updateYaml } from '../yaml'
 const INSTANCE_LOCAL_FILE = 'contember.instance.local.yaml'
 
 export interface InstanceConfig {
+	api?: {
+		configFile?: string
+	}
+	admin?: {
+		projectsFile?: string
+	}
 	loginToken?: string
 	apiToken?: string
 }

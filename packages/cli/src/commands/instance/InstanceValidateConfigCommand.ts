@@ -2,6 +2,7 @@ import { Command, CommandConfiguration, Input } from '../../cli'
 import { resolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { DockerCompose } from '../../utils/dockerCompose'
 import { ChildProcessError } from '../../utils/commands'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	instanceName?: string
@@ -16,10 +17,10 @@ export class InstanceValidateConfigCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const workspaceDirectory = process.cwd()
-		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
+		const workspace = await Workspace.get(process.cwd())
+		const { directory } = await resolveInstanceEnvironmentFromInput({ input, workspace })
 		try {
-			const dockerCompose = new DockerCompose(instanceDirectory)
+			const dockerCompose = new DockerCompose(directory)
 
 			await dockerCompose.run(['run', '--no-deps', '--rm', 'api', 'node', './dist/src/start.js', 'validate']).output
 			console.log('Configuration is valid')

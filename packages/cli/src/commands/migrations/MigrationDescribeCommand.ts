@@ -1,10 +1,10 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { getProjectDirectories } from '../../NamingHelper'
 import { getLatestMigration, getMigrationByName } from '../../utils/migrations'
 import chalk from 'chalk'
 import { Migration, MigrationDescriber } from '@contember/schema-migrations'
 import { Schema } from '@contember/schema'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	project: string
@@ -59,7 +59,9 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const projectName = input.getArgument('project')
 
-		const { migrationsDir } = getProjectDirectories(projectName)
+		const workspace = await Workspace.get(process.cwd())
+		const project = await workspace.projects.getProject(projectName)
+		const migrationsDir = await project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 
 		const migrationArg = input.getArgument('migration')

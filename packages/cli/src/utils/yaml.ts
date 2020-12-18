@@ -4,7 +4,6 @@ import { promises as fs } from 'fs'
 import YAWN from 'yawn-yaml/cjs'
 import { Merger } from '@contember/config-loader'
 import jsyaml from 'js-yaml'
-import { join } from 'path'
 
 export type JsonUpdateCallback<Value = JSONObject> = (
 	data: Partial<Value>,

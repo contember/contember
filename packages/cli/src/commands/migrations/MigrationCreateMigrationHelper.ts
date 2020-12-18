@@ -1,8 +1,8 @@
 import { CommandConfiguration, Input } from '../../cli'
-import { listProjects } from '../../utils/project'
-import { getProjectDirectories } from '../../NamingHelper'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { MigrationCreator, MigrationDescriber } from '@contember/schema-migrations'
+import { Workspace } from '../../utils/Workspace'
+import path from 'path'
 
 type Args = {
 	projectName: string
@@ -32,20 +32,22 @@ export const executeCreateMigrationCommand = async (
 		migrationDescriber: MigrationDescriber
 	}) => Promise<number>,
 ) => {
-	const [projectArg, migrationName] = [input.getArgument('projectName'), input.getArgument('migrationName')]
-	const allProjects = projectArg === '.'
-	const projects = allProjects ? await listProjects({ workspaceDirectory: process.cwd() }) : [projectArg]
+	const [projectName, migrationName] = [input.getArgument('projectName'), input.getArgument('migrationName')]
+	const workspace = await Workspace.get(process.cwd())
+	const allProjects = projectName === '.'
+	const projects = allProjects
+		? await workspace.projects.listProjects()
+		: [await workspace.projects.getProject(projectName)]
+
 	const projectDirArg = input.getOption('project-dir')
 	const migrationsDirArg = input.getOption('migrations-dir')
 	if (allProjects && (projectDirArg || migrationsDirArg)) {
 		throw 'Migrations dir and project dir options are not allowed when using "*" as a project name'
 	}
-	for (const projectName of projects) {
+	for (const project of projects) {
 		console.group(`Project ${projectName}:`)
-		const { migrationsDir, projectDir } = getProjectDirectories(projectName, {
-			projectDir: projectDirArg,
-			migrationsDir: migrationsDirArg,
-		})
+		const projectDir = projectDirArg ? path.resolve(process.cwd(), projectDirArg) : project.directory
+		const migrationsDir = migrationsDirArg ? path.resolve(process.cwd(), migrationsDirArg) : project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 
 		const result = await createMigrationCallback({

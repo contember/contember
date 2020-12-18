@@ -1,6 +1,6 @@
-import { pathExists } from 'fs-extra'
 import { Input } from '../../cli'
-import { getDefaultInstance, getInstanceDir, listInstances, validateInstanceName } from './common'
+import { Workspace } from '../Workspace'
+import { Instance } from '../Instance'
 
 export interface InstanceLocalEnvironment {
 	instanceDirectory: string
@@ -24,32 +24,11 @@ export interface InstanceRemoteApiEnvironment extends BaseInstanceApiEnvironment
 
 export type InstanceApiEnvironment = InstanceLocalApiEnvironment | InstanceRemoteApiEnvironment
 
-export const resolveInstanceEnvironment = async (args: {
-	workspaceDirectory: string
-	instanceName: string
-}): Promise<InstanceLocalEnvironment> => {
-	validateInstanceName(args.instanceName)
-	const instanceDirectory = getInstanceDir(args)
-	await verifyInstanceExists({ instanceDirectory, instanceName: args.instanceName })
-	return { instanceName: args.instanceName, instanceDirectory }
-}
-const verifyInstanceExists = async ({
-	instanceDirectory,
-	instanceName,
-}: {
-	instanceDirectory: string
-	instanceName: string
-}) => {
-	if (!(await pathExists(instanceDirectory))) {
-		throw `Instance ${instanceName} not found.`
-	}
-}
-
 export const resolveInstanceListEnvironmentFromInput = async ({
 	input,
-	workspaceDirectory,
+	workspace,
 }: {
-	workspaceDirectory: string
+	workspace: Workspace
 	input: Input<
 		{},
 		{
@@ -58,34 +37,34 @@ export const resolveInstanceListEnvironmentFromInput = async ({
 			['instance']: string[]
 		}
 	>
-}): Promise<InstanceLocalEnvironment[]> => {
+}): Promise<Instance[]> => {
 	if (input.getOption('no-instance')) {
 		return []
 	} else if (input.getOption('instance')) {
 		return await Promise.all(
-			input.getOption('instance').map(instanceName => resolveInstanceEnvironment({ workspaceDirectory, instanceName })),
+			input.getOption('instance').map(instanceName => workspace.instances.getInstance(instanceName)),
 		)
 	} else if (input.getOption('all-instances')) {
-		return await listInstances({ workspaceDirectory })
+		return await workspace.instances.listInstances()
 	} else if (process.env.CONTEMBER_INSTANCE) {
-		return [await resolveInstanceEnvironment({ workspaceDirectory, instanceName: process.env.CONTEMBER_INSTANCE })]
+		return [await workspace.instances.getInstance(process.env.CONTEMBER_INSTANCE)]
 	} else {
-		return [await getDefaultInstance({ workspaceDirectory })]
+		return [await workspace.instances.getDefaultInstance()]
 	}
 }
 
 export const resolveInstanceEnvironmentFromInput = async ({
 	input,
-	workspaceDirectory,
+	workspace,
 }: {
 	input: Input<{
 		instanceName?: string
 	}>
-	workspaceDirectory: string
-}): Promise<InstanceLocalEnvironment> => {
+	workspace: Workspace
+}): Promise<Instance> => {
 	const instanceName = input.getArgument('instanceName') || process.env.CONTEMBER_INSTANCE
 	if (instanceName) {
-		return await resolveInstanceEnvironment({ workspaceDirectory, instanceName })
+		return await workspace.instances.getInstance(instanceName)
 	}
-	return await getDefaultInstance({ workspaceDirectory })
+	return await workspace.instances.getDefaultInstance()
 }

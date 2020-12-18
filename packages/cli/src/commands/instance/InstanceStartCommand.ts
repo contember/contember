@@ -2,11 +2,12 @@ import { Command, CommandConfiguration, Input } from '../../cli'
 import {
 	getInstanceStatus,
 	interactiveInstanceConfigure,
-	printInstanceStatus,
 	resolveInstanceEnvironmentFromInput,
 } from '../../utils/instance'
 import { DockerCompose, readDefaultDockerComposeConfig } from '../../utils/dockerCompose'
 import { runCommand } from '../../utils/commands'
+import { Workspace } from '../../utils/Workspace'
+import { printContainersStatus } from '../../utils/docker'
 
 type Args = {
 	instanceName: string
@@ -41,24 +42,24 @@ export class InstanceStartCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const workspaceDirectory = process.cwd()
-		const instanceLocalEnvironment = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
+		const workspace = await Workspace.get(process.cwd())
+		const instance = await resolveInstanceEnvironmentFromInput({ input, workspace })
 
-		const composeConfig = await readDefaultDockerComposeConfig(instanceLocalEnvironment.instanceDirectory)
+		const composeConfig = await readDefaultDockerComposeConfig(instance.directory)
 		if (!composeConfig.services) {
 			throw 'docker-compose is not configured'
 		}
 
 		const { adminEnv } = await interactiveInstanceConfigure({
 			composeConfig,
-			instanceDirectory: instanceLocalEnvironment.instanceDirectory,
+			instance,
 			host: input.getOption('host'),
 			ports: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
 		})
 
 		const withAdmin = !!composeConfig.services.admin
 
-		let dockerCompose = new DockerCompose(instanceLocalEnvironment.instanceDirectory)
+		let dockerCompose = new DockerCompose(instance.directory)
 
 		const nodeAdminRuntime = withAdmin && input.getOption('admin-runtime') === 'node'
 		const mainServices = ['api', ...(!withAdmin || nodeAdminRuntime ? [] : ['admin'])]
@@ -88,7 +89,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 
 		await new Promise(resolve => setTimeout(resolve, 2000))
 
-		const status = await getInstanceStatus(instanceLocalEnvironment)
+		const status = await getInstanceStatus(instance)
 		const notRunning = status.filter(it => it.name !== 'admin' || !nodeAdminRuntime).filter(it => !it.running)
 		if (notRunning.length > 0) {
 			const notRunningNames = notRunning.map(it => it.name)
@@ -113,7 +114,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 				clearTimeout(timeoutRef)
 			}
 			timeoutRef = setTimeout(async () => {
-				await printInstanceStatus(instanceLocalEnvironment)
+				printContainersStatus(await instance.getStatus())
 				printNodeAdminStatus()
 			}, 2000)
 		}
@@ -136,7 +137,7 @@ export class InstanceStartCommand extends Command<Args, Options> {
 		}
 
 		printNodeAdminStatus()
-		await printInstanceStatus(instanceLocalEnvironment)
+		printContainersStatus(await instance.getStatus())
 
 		if (input.getOption('detach')) {
 			return

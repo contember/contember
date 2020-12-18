@@ -1,5 +1,6 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { createInstance, validateInstanceName } from '../../utils/instance'
+import { validateInstanceName } from '../../utils/instance'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	instanceName: string
@@ -19,9 +20,9 @@ export class InstanceCreateCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const [instanceName] = [input.getArgument('instanceName')]
 		validateInstanceName(instanceName)
-		const workspaceDirectory = process.cwd()
+		const workspace = await Workspace.get(process.cwd())
 		const template = input.getOption('template')
-		await createInstance({ workspaceDirectory, instanceName, template })
+		await workspace.instances.createInstance(instanceName, { template })
 		console.log(`Instance ${instanceName} created.`)
 	}
 }

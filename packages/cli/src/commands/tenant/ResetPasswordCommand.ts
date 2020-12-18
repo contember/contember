@@ -1,6 +1,7 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { interactiveResetPassword, interactiveResolveLoginToken } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	instance?: string
@@ -21,7 +22,8 @@ export class ResetPasswordCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'This command is interactive and requires TTY'
 		}
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(input.getArgument('instance'))
+		const workspace = await Workspace.get(process.cwd())
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getArgument('instance'))
 		const loginToken = await interactiveResolveLoginToken(instance)
 		await interactiveResetPassword({ apiUrl: instance.baseUrl, loginToken })
 	}

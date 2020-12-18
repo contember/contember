@@ -1,8 +1,7 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { join } from 'path'
-import { getWorkspaceApiVersion, updateWorkspaceApiVersion } from '../../utils/workspace'
+import { Workspace } from '../../utils/Workspace'
 import { runCommand } from '../../utils/commands'
-import { listInstances } from '../../utils/instance'
 import { updateMainDockerComposeConfig } from '../../utils/dockerCompose'
 
 type Args = {
@@ -19,9 +18,9 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const version = input.getArgument('version')
-		const workspaceDirectory = process.cwd()
+		const workspace = await Workspace.get(process.cwd())
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const packageJson = require(join(workspaceDirectory, 'package.json')) as any
+		const packageJson = require(join(workspace.directory, 'package.json')) as any
 		const upgradablePackages = ['@contember/schema', '@contember/schema-definition', '@contember/cli']
 		const upgradeDeps = async (type: 'dependencies' | 'devDependencies') => {
 			const packages = Object.keys(packageJson[type])
@@ -36,7 +35,7 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 				'npm',
 				['install', type === 'devDependencies' ? '--save-dev' : '--save', ...packages],
 				{
-					cwd: workspaceDirectory,
+					cwd: workspace.directory,
 					stderr: process.stderr,
 					stdout: process.stdout,
 				},
@@ -46,16 +45,16 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 		}
 		await upgradeDeps('dependencies')
 		await upgradeDeps('devDependencies')
-		const prevVersion = await getWorkspaceApiVersion({ workspaceDirectory })
-		if (await updateWorkspaceApiVersion({ workspaceDirectory, version })) {
+		const prevVersion = workspace.apiVersion
+		if (await workspace.updateApiVersion(version)) {
 			console.log('contember.workspace.yaml updated')
 		} else {
 			console.log('contember.workspace.yaml not found, skipping')
 		}
-		const instances = await listInstances({ workspaceDirectory })
+		const instances = await workspace.instances.listInstances()
 		console.log('Updating instance docker-compose')
 		for (const instance of instances) {
-			await updateMainDockerComposeConfig(instance.instanceDirectory, (data: any) => {
+			await updateMainDockerComposeConfig(instance.directory, (data: any) => {
 				if (!data.services?.api) {
 					console.log(`docker-compose.yaml file in instance ${instance} not found, skipping`)
 					return

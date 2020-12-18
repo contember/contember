@@ -1,4 +1,6 @@
 import { runCommand } from './commands'
+import { Instance } from './Instance'
+import { getInstanceStatus } from './instance'
 
 type DockerNetworkPorts = Record<string, null | Array<{ HostIp: string; HostPort: number }>>
 
@@ -53,4 +55,18 @@ export const getContainersStatus = async ({
 		})
 	}
 	return statusList
+}
+
+export const printContainersStatus = (statusList: ContainerStatus[]) => {
+	if (statusList.length === 0) {
+		console.log('There is no running service.')
+		return
+	}
+	console.log('Following services are running:')
+	statusList.forEach(it => {
+		const addressStr = it.ports.map(it => `http://${it.hostIp}:${it.hostPort}`).join(' ')
+
+		const addressInfo = it.running && addressStr.length > 0 ? ` on ${addressStr}` : ''
+		console.log(`${it.name}: ${it.status}${addressInfo}`)
+	})
 }

@@ -1,6 +1,7 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { resolveInstanceListEnvironmentFromInput } from '../../utils/instance'
-import { createProject, registerProjectToInstance, validateProjectName } from '../../utils/project'
+import { validateProjectName } from '../../utils/Project'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	projectName: string
@@ -26,19 +27,19 @@ export class ProjectCreateCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const [projectName] = [input.getArgument('projectName')]
 		validateProjectName(projectName)
-		const workspaceDirectory = process.cwd()
+		const workspace = await Workspace.get(process.cwd())
 
-		const instances = await resolveInstanceListEnvironmentFromInput({ input, workspaceDirectory })
+		const instances = await resolveInstanceListEnvironmentFromInput({ input, workspace })
 
 		const template = input.getOption('template')
-		await createProject({ workspaceDirectory, projectName, template })
+		const project = await workspace.projects.createProject(projectName, { template })
 		for (const instance of instances) {
-			await registerProjectToInstance({ projectName, ...instance })
+			await project.registerToInstance(instance)
 		}
 
 		console.log(
 			`Project ${projectName} created and registered into following instances: ${instances
-				.map(it => it.instanceName)
+				.map(it => it.name)
 				.join(', ')}`,
 		)
 	}

@@ -1,5 +1,7 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { printInstanceStatus, resolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { resolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { Workspace } from '../../utils/Workspace'
+import { printContainersStatus } from '../../utils/docker'
 
 type Args = {
 	instanceName?: string
@@ -14,9 +16,8 @@ export class InstanceInfoCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const workspaceDirectory = process.cwd()
-		const instanceLocalEnvironment = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
-
-		await printInstanceStatus(instanceLocalEnvironment)
+		const workspace = await Workspace.get(process.cwd())
+		const instance = await resolveInstanceEnvironmentFromInput({ input, workspace })
+		printContainersStatus(await instance.getStatus())
 	}
 }

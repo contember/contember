@@ -1,6 +1,7 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { interactiveInstanceConfigure, resolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { readDefaultDockerComposeConfig } from '../../utils/dockerCompose'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	instanceName: string
@@ -23,15 +24,15 @@ export class InstanceConfigureCommand extends Command<Args, Options> {
 		if (!process.stdin.isTTY) {
 			throw 'TTY is required'
 		}
-		const workspaceDirectory = process.cwd()
-		const { instanceDirectory } = await resolveInstanceEnvironmentFromInput({ input, workspaceDirectory })
-		const composeConfig = await readDefaultDockerComposeConfig(instanceDirectory)
+		const workspace = await Workspace.get(process.cwd())
+		const instance = await resolveInstanceEnvironmentFromInput({ input, workspace })
+		const composeConfig = await readDefaultDockerComposeConfig(instance.directory)
 		if (!composeConfig.services) {
 			throw 'docker-compose is not configured'
 		}
 		await interactiveInstanceConfigure({
 			composeConfig,
-			instanceDirectory,
+			instance,
 			host: input.getOption('host'),
 			ports: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
 		})

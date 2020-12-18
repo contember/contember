@@ -1,11 +1,11 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { getProjectDirectories } from '../../NamingHelper'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken } from '../../utils/tenant'
 import { SystemClient } from '../../utils/system'
 import { createMigrationStatusTable, getMigrationsStatus, MigrationState, sortMigrations } from '../../utils/migrations'
 import chalk from 'chalk'
+import { Workspace } from '../../utils/Workspace'
 
 type Args = {
 	project: string
@@ -48,10 +48,12 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		const projectName = input.getArgument('project')
 
-		const { migrationsDir } = getProjectDirectories(projectName)
+		const workspace = await Workspace.get(process.cwd())
+		const project = await workspace.projects.getProject(projectName)
+		const migrationsDir = await project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(input.getOption('instance'))
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getOption('instance'))
 		const apiToken = await interactiveResolveApiToken({ instance })
 		const remoteProject = input.getOption('remote-project') || projectName
 		const client = SystemClient.create(instance.baseUrl, remoteProject, apiToken)

@@ -8,7 +8,7 @@ import EnumDefinition from './EnumDefinition'
 import OneHasOneDefinition from './OneHasOneDefinition'
 import ManyHasManyInverseDefinition from './ManyHasManyInverseDefinition'
 import OneHasOneInverseDefinition from './OneHasOneInverseDefinition'
-import { EntityConstructor, EntityType } from './types'
+import { EntityConstructor } from './types'
 import SchemaBuilder from './SchemaBuilder'
 import NamingConventions from './NamingConventions'
 import FieldDefinition from './FieldDefinition'
@@ -47,63 +47,37 @@ export function enumColumn(enumDefinition: EnumDefinition) {
 	return column(Model.ColumnType.Enum, { enumDefinition })
 }
 
-type KeysOfType<T, TProp> = { [P in keyof T]: T[P] extends TProp ? P : never }[keyof T]
-
-export function manyHasOne<T extends EntityType<T>>(
-	target: EntityConstructor<T>,
-	inversedBy?: KeysOfType<T, Interface<OneHasManyDefinition>> & string,
-): ManyHasOneDefinition {
+export function manyHasOne(target: EntityConstructor, inversedBy?: string): ManyHasOneDefinition {
 	return new ManyHasOneDefinition({ target, inversedBy })
 }
 
-export function oneHasMany<T extends EntityType<T>>(
-	target: EntityConstructor<T>,
-	ownedBy: KeysOfType<T, Interface<ManyHasOneDefinition>> & string,
-): OneHasManyDefinition {
+export function oneHasMany(target: EntityConstructor, ownedBy: string): OneHasManyDefinition {
 	return new OneHasManyDefinition({ target, ownedBy })
 }
 
-export function manyHasMany<T extends EntityType<T>>(
-	target: EntityConstructor<T>,
-	inversedBy?: KeysOfType<T, Interface<ManyHasManyInverseDefinition>> & string,
-): ManyHasManyDefinition {
+export function manyHasMany(target: EntityConstructor, inversedBy?: string): ManyHasManyDefinition {
 	return new ManyHasManyDefinition({ target, inversedBy })
 }
 
-export function manyHasManyInverse<T extends EntityType<T>>(
-	target: EntityConstructor<T>,
-	ownedBy: KeysOfType<T, Interface<ManyHasManyDefinition>> & string,
-): ManyHasManyInverseDefinition {
+export function manyHasManyInverse(target: EntityConstructor, ownedBy: string): ManyHasManyInverseDefinition {
 	return new ManyHasManyInverseDefinition({ target, ownedBy })
 }
 
 /** @deprecated use manyHasManyInverse */
-export function manyHasManyInversed<T extends EntityType<T>>(
-	target: EntityConstructor<T>,
-	ownedBy: KeysOfType<T, Interface<ManyHasManyDefinition>> & string,
-): ManyHasManyInverseDefinition {
+export function manyHasManyInversed(target: EntityConstructor, ownedBy: string): ManyHasManyInverseDefinition {
 	return new ManyHasManyInverseDefinition({ target, ownedBy })
 }
 
-export function oneHasOne<T extends EntityType<T>>(
-	target: EntityConstructor<T>,
-	inversedBy?: KeysOfType<T, Interface<OneHasOneInverseDefinition>> & string,
-): OneHasOneDefinition {
+export function oneHasOne(target: EntityConstructor, inversedBy?: string): OneHasOneDefinition {
 	return new OneHasOneDefinition({ target, inversedBy })
 }
 
-export function oneHasOneInverse<T extends EntityType<T>>(
-	target: EntityConstructor<T>,
-	ownedBy: KeysOfType<T, Interface<OneHasOneDefinition>> & string,
-): OneHasOneInverseDefinition {
+export function oneHasOneInverse(target: EntityConstructor, ownedBy: string): OneHasOneInverseDefinition {
 	return new OneHasOneInverseDefinition({ target, ownedBy })
 }
 
 /** @deprecated use oneHasOneInverse */
-export function oneHasOneInversed<T extends EntityType<T>>(
-	target: EntityConstructor<T>,
-	ownedBy: KeysOfType<T, Interface<OneHasOneDefinition>> & string,
-): OneHasOneInverseDefinition {
+export function oneHasOneInversed(target: EntityConstructor, ownedBy: string): OneHasOneInverseDefinition {
 	return new OneHasOneInverseDefinition({ target, ownedBy })
 }
 
@@ -112,21 +86,18 @@ export function createEnum(...values: string[]) {
 }
 
 type UniqueOptions<T> = { name?: string; fields: (keyof T)[] }
-type DecoratorFunction<T extends EntityType<T>> = (cls: EntityConstructor<T>) => void
+type DecoratorFunction<T> = (cls: EntityConstructor<T>) => void
 
-export function Unique<T extends EntityType<T>>(options: UniqueOptions<T>): DecoratorFunction<T>
-export function Unique<T extends EntityType<T>>(...fields: (keyof T)[]): DecoratorFunction<T>
-export function Unique<T extends EntityType<T>>(
-	options: UniqueOptions<T> | keyof T,
-	...fields: (keyof T)[]
-): DecoratorFunction<T> {
+export function Unique<T>(options: UniqueOptions<T>): DecoratorFunction<T>
+export function Unique<T>(...fields: (keyof T)[]): DecoratorFunction<T>
+export function Unique<T>(options: UniqueOptions<T> | keyof T, ...fields: (keyof T)[]): DecoratorFunction<T> {
 	if (typeof options !== 'object') {
 		options = {
 			fields: [options, ...fields],
 		}
 	}
 
-	return function (cls: { new (): T }) {
+	return function (cls: EntityConstructor<T>) {
 		const keys = Reflect.getMetadata('uniqueKeys', cls) || []
 		Reflect.defineMetadata('uniqueKeys', [...keys, options], cls)
 	}
@@ -137,9 +108,7 @@ export abstract class Entity {
 }
 
 export type ModelDefinition<M> = {
-	[K in keyof M]:
-		| EnumDefinition
-		| EntityConstructor<EntityType<M[K] extends { new (): any } ? InstanceType<M[K]> : never>>
+	[K in keyof M]: EnumDefinition | EntityConstructor
 }
 
 export function createModel<M extends ModelDefinition<M>>(definitions: M): Model.Schema {

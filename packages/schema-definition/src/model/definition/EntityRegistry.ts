@@ -1,20 +1,20 @@
-import { EntityConstructor, EntityType } from './types'
+import { EntityConstructor } from './types'
 
 export class EntityRegistry {
-	public readonly entities: Record<string, EntityConstructor<EntityType<any>>> = {}
+	public readonly entities: Record<string, EntityConstructor> = {}
 
-	register(name: string, definition: EntityConstructor<EntityType<any>>) {
+	register(name: string, definition: EntityConstructor) {
 		if (this.entities[name]) {
 			throw new Error(`Entity with name ${name} is already registered`)
 		}
 		this.entities[name] = definition
 	}
 
-	has(definition: EntityConstructor<EntityType<any>>): boolean {
+	has(definition: EntityConstructor): boolean {
 		return Object.values(this.entities).includes(definition)
 	}
 
-	getName(definition: EntityConstructor<EntityType<any>>): string {
+	getName(definition: EntityConstructor): string {
 		for (const [name, def] of Object.entries(this.entities)) {
 			if (def === definition) {
 				return name

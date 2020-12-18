@@ -1,11 +1,10 @@
 import { Model } from '@contember/schema'
 import { NamingHelper } from '@contember/schema-utils'
 import { tuple } from '../../utils'
-import { Interface } from './types'
+import { EntityConstructor, Interface } from './types'
 import NamingConventions from './NamingConventions'
 import FieldDefinition from './FieldDefinition'
 import UniqueDefinition from './UniqueDefinition'
-import { EntityConstructor } from './types'
 import ColumnDefinition from './ColumnDefinition'
 import EnumDefinition from './EnumDefinition'
 import 'reflect-metadata'
@@ -19,7 +18,7 @@ class SchemaBuilder {
 
 	constructor(private readonly conventions: NamingConventions) {}
 
-	public addEntity(name: string, entity: EntityConstructor<any>): void {
+	public addEntity(name: string, entity: EntityConstructor): void {
 		this.entityRegistry.register(name, entity)
 	}
 
@@ -30,7 +29,7 @@ class SchemaBuilder {
 	public createSchema(): Model.Schema {
 		const entities = Object.entries(this.entityRegistry.entities).map(
 			([entityName, definition]): Model.Entity => {
-				const definitionInstance = new definition()
+				const definitionInstance: Record<string, Interface<FieldDefinition<any>>> = new definition()
 
 				const unique = Reflect.getMetadata('uniqueKeys', definition) || []
 

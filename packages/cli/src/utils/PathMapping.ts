@@ -38,7 +38,7 @@ export const listEntriesInMapping = async (config: PathMapping): Promise<string[
 		await Promise.all(
 			Object.entries(config).map(async ([name, path]) => {
 				if (name === '*') {
-					return await listDirectories(path)
+					return (await listDirectories(path)).map(it => basename(it))
 				} else {
 					return [name]
 				}

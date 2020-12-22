@@ -8,17 +8,29 @@ import { Workspace } from './Workspace'
 import { projectNameToEnvName } from '@contember/engine-common'
 
 export class Project {
-	constructor(public readonly name: string, public readonly directory: string, private readonly workspace: Workspace) {}
+	constructor(
+		public readonly name: string,
+		private readonly directory: string,
+		private readonly workspace: Workspace,
+	) {}
+
+	get adminDir() {
+		return path.join(this.directory, 'admin')
+	}
+
+	get apiDir() {
+		return path.join(this.directory, 'api')
+	}
 
 	get migrationsDir() {
-		return path.join(this.directory, 'migrations')
+		return path.join(this.apiDir, 'migrations')
 	}
 
 	async registerToInstance(instance: Instance) {
 		const adminPath = instance.adminProjectsFile
 		if (await pathExists(adminPath)) {
-			const relativePath = path.relative(path.dirname(adminPath), this.directory)
-			const code = `export { default as ${this.name.replace('-', '_')} } from '${relativePath}/admin'\n`
+			const relativePath = path.relative(path.dirname(adminPath), this.adminDir)
+			const code = `export { default as ${this.name.replace('-', '_')} } from '${relativePath}'\n`
 			await fs.appendFile(adminPath, code, { encoding: 'utf8' })
 		}
 

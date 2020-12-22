@@ -46,7 +46,7 @@ export const executeCreateMigrationCommand = async (
 	}
 	for (const project of projects) {
 		console.group(`Project ${projectName}:`)
-		const projectDir = projectDirArg ? path.resolve(process.cwd(), projectDirArg) : project.directory
+		const projectDir = projectDirArg ? path.resolve(process.cwd(), projectDirArg) : project.apiDir
 		const migrationsDir = migrationsDirArg ? path.resolve(process.cwd(), migrationsDirArg) : project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 

@@ -51,7 +51,14 @@ export class ReleaseTreeMutationResolver implements MutationResolver<'releaseTre
 			)
 
 			await this.rebaseExecutor.rebaseAll(db, context.project)
-			const filter = args.tree ? args.tree.map(it => ({ ...it, relations: it.relations || [] })) : null
+			const filter = args.tree
+				? args.tree.map(it => ({
+						...it,
+						id: it.id || undefined,
+						filter: it.filter as any,
+						relations: it.relations || [],
+				  }))
+				: null
 			const diff = await this.diffBuilder.build(
 				db,
 				{

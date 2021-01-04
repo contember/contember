@@ -1,9 +1,16 @@
 import { EventType } from '@contember/engine-common'
-import { DiffEvent as ApiEvent, DiffEventType as ApiEventType } from '../../schema'
+import {
+	DiffCreateEvent,
+	DiffDeleteEvent,
+	DiffEvent as ApiEvent,
+	DiffEventType as ApiEventType,
+	DiffUpdateEvent,
+} from '../../schema'
 import { assertNever } from '../../utils'
 import { EventWithDependencies } from './DiffBuilder'
 import { IdentityFetcher } from '../dependencies/tenant/IdentityFetcher'
 import { formatIdentity } from './identityUtils'
+import { appendCreateSpecificData, appendDeleteSpecificData, appendUpdateSpecificData } from './EventResponseHelper'
 
 export class DiffEventResponseBuilder {
 	constructor(private readonly identityFetcher: IdentityFetcher) {}
@@ -18,16 +25,27 @@ export class DiffEventResponseBuilder {
 		const identities = await this.identityFetcher.fetchIdentities(identityIds)
 		const identitiesMap = Object.fromEntries(identities.map(it => [it.identityId, it]))
 
-		return events.map(it => ({
-			createdAt: it.createdAt,
-			dependencies: [...it.dependencies.values()],
-			id: it.id,
-			type: apiEventTypeMapping[it.type],
-			description: this.formatDescription(it),
-			transactionId: it.transactionId,
-			identityId: it.identityId,
-			identityDescription: formatIdentity(identitiesMap[it.identityId]),
-		}))
+		return events.map(it => {
+			const commonData = {
+				createdAt: it.createdAt,
+				dependencies: [...it.dependencies.values()],
+				id: it.id,
+				type: apiEventTypeMapping[it.type],
+				description: this.formatDescription(it),
+				transactionId: it.transactionId,
+				identityId: it.identityId,
+				identityDescription: formatIdentity(identitiesMap[it.identityId]),
+			}
+			switch (it.type) {
+				case EventType.create:
+					return ((): DiffCreateEvent => appendCreateSpecificData(commonData, it))()
+				case EventType.update:
+					return ((): DiffUpdateEvent => appendUpdateSpecificData(commonData, it))()
+				case EventType.delete:
+					return ((): DiffDeleteEvent => appendDeleteSpecificData(commonData, it))()
+			}
+			assertNever(it)
+		})
 	}
 
 	private formatDescription(event: EventWithDependencies): string {

@@ -50,7 +50,7 @@ import { ClientBase } from 'pg'
 import { ReleaseTreeMutationResolver, TruncateMutationResolver } from './resolvers/mutation'
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
 import { ExecutedMigrationsQueryResolver, HistoryQueryResolver } from './resolvers/query'
-import { HistoryEventTypeResolver } from './resolvers/types/HistoryEventTypeResolver'
+import { DiffEventTypeResolver, HistoryEventTypeResolver } from './resolvers/types'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
@@ -194,6 +194,7 @@ export class SystemContainerFactory {
 				({ projectTruncateExecutor }) => new TruncateMutationResolver(projectTruncateExecutor),
 			)
 			.addService('historyEventTypeResolver', () => new HistoryEventTypeResolver())
+			.addService('diffEventTypeResolver', () => new DiffEventTypeResolver())
 			.addService(
 				'systemResolversFactory',
 				({
@@ -207,6 +208,7 @@ export class SystemContainerFactory {
 					releaseTreeMutationResolver,
 					truncateMutationResolver,
 					historyEventTypeResolver,
+					diffEventTypeResolver,
 				}) =>
 					new ResolverFactory(
 						stagesQueryResolver,
@@ -219,6 +221,7 @@ export class SystemContainerFactory {
 						releaseTreeMutationResolver,
 						truncateMutationResolver,
 						historyEventTypeResolver,
+						diffEventTypeResolver,
 					),
 			)
 			.addService(

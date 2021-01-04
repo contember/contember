@@ -50,7 +50,14 @@ export class DiffQueryResolver implements QueryResolver<'diff'> {
 				)
 			}
 
-			const filter = args.filter ? args.filter.map(it => ({ ...it, relations: it.relations || [] })) : null
+			const filter = args.filter
+				? args.filter.map(it => ({
+						...it,
+						id: it.id || undefined,
+						filter: it.filter as any,
+						relations: it.relations || [],
+				  }))
+				: null
 			const diff = await this.diffBuilder.build(
 				db,
 				{

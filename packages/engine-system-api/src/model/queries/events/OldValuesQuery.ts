@@ -1,8 +1,5 @@
-import { DatabaseQuery, DatabaseQueryable, Literal, Operator, SelectBuilder } from '@contember/database'
-import { AnyEvent, ContentEvent } from '@contember/engine-common'
-import { createEventsFromRows, createEventsQueryBuilder } from './EventQueryHelpers'
-import { assertEveryIsContentEvent } from '../../events'
-import { ImplementationException } from '../../../utils'
+import { DatabaseQuery, DatabaseQueryable, Literal } from '@contember/database'
+import { createEventsQueryBuilder } from './EventQueryHelpers'
 
 export class OldValuesQuery extends DatabaseQuery<Record<string, any>> {
 	constructor(private readonly headEvent: string, private readonly ids: string[]) {

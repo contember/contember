@@ -5,10 +5,10 @@ import { DiffCountQuery, DiffQuery } from '../queries'
 import { assertEveryIsContentEvent } from './eventUtils'
 import { DatabaseContext } from '../database'
 import { SchemaVersionBuilder } from '../migrations'
-import { EntitiesResult, EntitiesSelector, EntitiesSelectorInput } from '../dependencies'
-import { Acl, Schema } from '@contember/schema'
+import { EntitiesRelationsInput, EntitiesResult, EntitiesSelector, EntitiesSelectorInput } from '../dependencies'
+import { Acl, Input, Schema } from '@contember/schema'
 import { formatSchemaName } from '../helpers'
-import { filterSchemaByStage } from '@contember/schema-utils'
+import { filterSchemaByStage, getEntity } from '@contember/schema-utils'
 import { Identity } from '../authorization'
 import { EventFilterValidator, InvalidFilterError } from './EventFilterValidator'
 import { emptyImmutableSet, ImmutableSet } from '../../utils/set'
@@ -125,20 +125,30 @@ export class DiffBuilder {
 		stage: Stage,
 		filter: readonly EventFilter[],
 	): Promise<string[]> {
-		const affectedEntities = await Promise.all(
-			filter.map(
-				async it =>
-					await this.entitiesSelector.getEntities(
-						{
-							db: db.client.forSchema(formatSchemaName(stage)),
-							schema: filterSchemaByStage(schema, stage.slug),
-							identityVariables: permissionContext.variables,
-							roles: permissionContext.identity.roles,
-						},
-						it,
-					),
-			),
-		)
+		const affectedEntities = (
+			await Promise.all(
+				filter.map(
+					async it =>
+						await this.entitiesSelector.getEntities(
+							{
+								db: db.client.forSchema(formatSchemaName(stage)),
+								schema: filterSchemaByStage(schema, stage.slug),
+								identityVariables: permissionContext.variables,
+								roles: permissionContext.identity.roles,
+							},
+							{
+								entity: it.entity,
+								relations: it.relations,
+								filter: it.id
+									? {
+											[getEntity(schema.model, it.entity).primary]: { eq: it.id },
+									  }
+									: it.filter || {},
+							},
+						),
+				),
+			)
+		).flatMap(it => it)
 		const collectIds = (result: EntitiesResult): string[] => {
 			const { id, ...rest } = result
 			return [
@@ -179,4 +189,9 @@ export class DiffBuilderOkResponse {
 	constructor(public readonly events: EventWithDependencies[]) {}
 }
 
-export type EventFilter = EntitiesSelectorInput
+export type EventFilter = {
+	entity: string
+	id?: string
+	filter?: Input.Where
+	relations: EntitiesRelationsInput
+}

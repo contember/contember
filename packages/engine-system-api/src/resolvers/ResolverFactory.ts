@@ -10,7 +10,7 @@ import {
 	ReleaseTreeMutationResolver,
 	TruncateMutationResolver,
 } from './mutation'
-import { HistoryEventTypeResolver } from './types/HistoryEventTypeResolver'
+import { DiffEventTypeResolver, HistoryEventTypeResolver } from './types'
 import { DateTimeType, JSONType } from '@contember/graphql-utils'
 
 class ResolverFactory {
@@ -25,6 +25,7 @@ class ResolverFactory {
 		private readonly releaseTreeMutationResolver: ReleaseTreeMutationResolver,
 		private readonly truncateMutationResolver: TruncateMutationResolver,
 		private readonly historyEventTypeResolver: HistoryEventTypeResolver,
+		private readonly diffEventTypeResolver: DiffEventTypeResolver,
 	) {}
 
 	create(debugMode: boolean): Resolvers {
@@ -94,6 +95,14 @@ class ResolverFactory {
 			HistoryUpdateEvent: {
 				oldValues: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
 					this.historyEventTypeResolver.oldValues(parent, args, context),
+			},
+			DiffDeleteEvent: {
+				oldValues: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.diffEventTypeResolver.oldValues(parent, args, context),
+			},
+			DiffUpdateEvent: {
+				oldValues: (parent: any, args: any, context: ResolverContext, info: GraphQLResolveInfo) =>
+					this.diffEventTypeResolver.oldValues(parent, args, context),
 			},
 		}
 		if (debugMode) {

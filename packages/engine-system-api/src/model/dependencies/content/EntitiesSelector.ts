@@ -1,5 +1,5 @@
 import { Client } from '@contember/database'
-import { Acl, Schema } from '@contember/schema'
+import { Acl, Input, Schema } from '@contember/schema'
 
 export type EntitiesRelationsInput = readonly {
 	name: string
@@ -15,12 +15,12 @@ export interface EntitiesSelectorContext {
 
 export interface EntitiesSelectorInput {
 	entity: string
-	id: string
+	filter: Input.Where
 	relations: EntitiesRelationsInput
 }
 
 export interface EntitiesSelector {
-	getEntities(context: EntitiesSelectorContext, input: EntitiesSelectorInput): Promise<EntitiesResult | null>
+	getEntities(context: EntitiesSelectorContext, input: EntitiesSelectorInput): Promise<EntitiesResult[]>
 }
 
 interface EntitiesResultRelations {

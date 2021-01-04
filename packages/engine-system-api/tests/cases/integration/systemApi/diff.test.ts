@@ -73,6 +73,22 @@ diffTest('get filtered diff', async () => {
 	assert.is(diff.data.diff.result.events.length, 2)
 	assert.is(diff.data.diff.result.events[0].type, 'CREATE')
 
+	const diffWithGenericFilter = await tester.system.querySystem(GQL`query {
+			diff(stage: "preview", filter: [{entity: "Author", filter: {name: {eq: "John Doe"}}}]) {
+				result {
+					events {
+						id
+						dependencies
+						description
+						type
+					}
+				}
+			}
+		}`)
+
+	assert.is(diffWithGenericFilter.data.diff.result.events.length, 2)
+	assert.is(diffWithGenericFilter.data.diff.result.events[0].type, 'CREATE')
+
 	const diffWithRelations = await tester.system.querySystem(GQL`query {
 			diff(stage: "preview", filter: [{entity: "Author", id: "${response.createAuthor.node.id}", relations: [{name: "posts", relations: []}]}]) {
 				result {

@@ -10,6 +10,7 @@ import {
 import { assertNever } from '../../utils'
 import { IdentityFetcher } from '../dependencies/tenant/IdentityFetcher'
 import { formatIdentity } from './identityUtils'
+import { appendCreateSpecificData, appendDeleteSpecificData, appendUpdateSpecificData } from './EventResponseHelper'
 
 export class HistoryEventResponseBuilder {
 	constructor(private readonly identityFetcher: IdentityFetcher) {}
@@ -37,27 +38,11 @@ export class HistoryEventResponseBuilder {
 			}
 			switch (it.type) {
 				case EventType.create:
-					return ((): HistoryCreateEvent => ({
-						...commonData,
-						tableName: it.tableName,
-						primaryKeys: it.rowId,
-						newValues: it.values,
-					}))()
+					return ((): HistoryCreateEvent => appendCreateSpecificData(commonData, it))()
 				case EventType.update:
-					return ((): HistoryUpdateEvent => ({
-						...commonData,
-						tableName: it.tableName,
-						primaryKeys: it.rowId,
-						diffValues: it.values,
-						oldValues: {},
-					}))()
+					return ((): HistoryUpdateEvent => appendUpdateSpecificData(commonData, it))()
 				case EventType.delete:
-					return ((): HistoryDeleteEvent => ({
-						...commonData,
-						tableName: it.tableName,
-						primaryKeys: it.rowId,
-						oldValues: {},
-					}))()
+					return ((): HistoryDeleteEvent => appendDeleteSpecificData(commonData, it))()
 				case EventType.runMigration:
 					return ((): HistoryRunMigrationEvent => commonData)()
 			}

@@ -35,7 +35,8 @@ const schema: DocumentNode = gql`
 	input TreeFilter {
 		entity: String!
 		relations: [TreeFilterRelation!]
-		id: String!
+		id: String
+		filter: Json
 	}
 
 	input TreeFilterRelation {
@@ -278,6 +279,10 @@ const schema: DocumentNode = gql`
 		type: DiffEventType!
 		description: String!
 		createdAt: DateTime!
+		tableName: String!
+		primaryKeys: [String!]!
+		oldValues: Json!
+		diffValues: Json!
 	}
 
 	type DiffDeleteEvent implements DiffEvent {
@@ -289,6 +294,9 @@ const schema: DocumentNode = gql`
 		type: DiffEventType!
 		description: String!
 		createdAt: DateTime!
+		tableName: String!
+		primaryKeys: [String!]!
+		oldValues: Json!
 	}
 
 	type DiffCreateEvent implements DiffEvent {
@@ -300,6 +308,9 @@ const schema: DocumentNode = gql`
 		type: DiffEventType!
 		description: String!
 		createdAt: DateTime!
+		tableName: String!
+		primaryKeys: [String!]!
+		newValues: Json!
 	}
 
 	# === stage ===

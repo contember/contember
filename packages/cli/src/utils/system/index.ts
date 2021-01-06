@@ -48,7 +48,7 @@ mutation($migrations: [Migration!]!) {
 		errors {
 			code
 			migration
-			message
+			message: developerMessage
 		}
 	}
 }

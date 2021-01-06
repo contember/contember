@@ -117,7 +117,11 @@ export const patchInstanceOverrideConfig = (config: any, portsMapping: ServicePo
 				...config.services,
 				admin: {
 					...config.services.admin,
-					user: config.services.admin.user || String(process.getuid()),
+					...(!config.services.admin.user && process.getuid
+						? {
+								user: String(process.getuid()),
+						  }
+						: {}),
 					environment: {
 						...config.services.admin.environment,
 						CONTEMBER_PORT: portsMapping.admin[0]?.containerPort || config.services.admin.environment?.CONTEMBER_PORT,
@@ -135,7 +139,11 @@ export const patchInstanceOverrideConfig = (config: any, portsMapping: ServicePo
 			...config.services,
 			api: {
 				...config.services.api,
-				user: config.services.api?.user || String(process.getuid()),
+				...(!config.services.api.user && process.getuid
+					? {
+							user: String(process.getuid()),
+					  }
+					: {}),
 				environment: {
 					...config.services.api?.environment,
 					DEFAULT_S3_ENDPOINT: 'http://localhost:' + portsMapping.s3[0].hostPort,

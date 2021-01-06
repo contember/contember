@@ -125,6 +125,15 @@ export class EventManager {
 		})
 	}
 
+	public registerChildInNeedOfUpdate(entityListState: EntityListState, updatedState: EntityState): void
+	public registerChildInNeedOfUpdate(entityState: EntityState, updatedState: StateNode): void
+	public registerChildInNeedOfUpdate(state: StateINode, updatedState: StateNode): void {
+		if (state.childrenWithPendingUpdates === undefined) {
+			state.childrenWithPendingUpdates = new Set()
+		}
+		state.childrenWithPendingUpdates.add(updatedState as EntityState)
+	}
+
 	public registerNewlyInitialized(newlyInitialized: EntityListState | [EntityState, EntityRealm]) {
 		const listeners = Array.isArray(newlyInitialized) ? newlyInitialized[1].initialEventListeners : newlyInitialized
 

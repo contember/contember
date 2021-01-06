@@ -1,14 +1,8 @@
 import { GraphQlBuilder } from '@contember/client'
-import { validate as uuidValidate } from 'uuid'
 import { BindingOperations, EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
-import {
-	ClientGeneratedUuid,
-	EntityFieldPersistedData,
-	ServerGeneratedUuid,
-	UnpersistedEntityKey,
-} from '../accessorTree'
+import { EntityFieldPersistedData, ServerGeneratedUuid, UnpersistedEntityKey } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkersContainer,
@@ -29,9 +23,8 @@ import { assertNever } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
-import { ElementaryFieldOperations } from './ElementaryFieldOperations'
 import { EventManager } from './EventManager'
-import { MarkerMerger } from './MarkerMerger'
+import { EntityOperations, FieldOperations, ListOperations } from './operations'
 import {
 	EntityListState,
 	EntityRealm,
@@ -40,7 +33,6 @@ import {
 	EntityStateStub,
 	FieldState,
 	RootStateNode,
-	StateINode,
 	StateNode,
 	StateType,
 } from './state'
@@ -50,7 +42,9 @@ import { TreeParameterMerger } from './TreeParameterMerger'
 import { TreeStore } from './TreeStore'
 
 export class StateInitializer {
-	private readonly elementaryFieldOperations: ElementaryFieldOperations
+	private readonly fieldOperations: FieldOperations
+	private readonly entityOperations: EntityOperations
+	private readonly listOperations: ListOperations
 
 	public constructor(
 		private readonly accessorErrorManager: AccessorErrorManager,
@@ -60,7 +54,22 @@ export class StateInitializer {
 		private readonly eventManager: EventManager,
 		private readonly treeStore: TreeStore,
 	) {
-		this.elementaryFieldOperations = new ElementaryFieldOperations(dirtinessTracker, eventManager, treeStore)
+		this.fieldOperations = new FieldOperations(this.dirtinessTracker, this.eventManager, this.treeStore)
+		this.entityOperations = new EntityOperations(
+			this.bindingOperations,
+			this.dirtinessTracker,
+			this.eventManager,
+			this,
+			this.treeStore,
+		)
+		this.listOperations = new ListOperations(
+			this.bindingOperations,
+			this.dirtinessTracker,
+			this.entityOperations,
+			this.eventManager,
+			this,
+			this.treeStore,
+		)
 	}
 
 	public initializeSubTree(tree: SubTreeMarker): RootStateNode {
@@ -93,7 +102,7 @@ export class StateInitializer {
 		return subTreeState
 	}
 
-	private initializeEntityStateStub(id: EntityAccessor.RuntimeId, realms: EntityRealmSet): EntityStateStub {
+	public initializeEntityStateStub(id: EntityAccessor.RuntimeId, realms: EntityRealmSet): EntityStateStub {
 		return {
 			type: StateType.EntityStub,
 			id,
@@ -127,12 +136,12 @@ export class StateInitializer {
 		}
 	}
 
-	private initializeEntityState(id: EntityAccessor.RuntimeId, realm: EntityRealm): EntityState {
+	public initializeEntityState(id: EntityAccessor.RuntimeId, realm: EntityRealm): EntityState {
 		const entityKey = id.value
 		const existingEntityState = this.treeStore.entityStore.get(entityKey)
 
 		if (existingEntityState !== undefined) {
-			this.addEntityRealm(existingEntityState, realm)
+			this.entityOperations.addEntityRealm(existingEntityState, realm)
 
 			return existingEntityState
 		}
@@ -185,211 +194,25 @@ export class StateInitializer {
 					return accessor
 				}
 			})(),
-			onChildUpdate: (updatedState: StateNode) => {
-				// No before update for child updates!
-				batchUpdatesImplementation(() => {
-					if (updatedState.type === StateType.Field && updatedState.placeholderName === PRIMARY_KEY_NAME) {
-						if (entityState.id.existsOnServer) {
-							throw new BindingError(
-								`Trying to change the id of an entity that already exists on the server. ` +
-									`That is strictly prohibited. Once created, an entity's id cannot be changed.`,
-							)
-						}
-						if (entityState.hasIdSetInStone) {
-							throw new BindingError(
-								`Trying to change the id of an entity at a time it's no longer allowed. ` +
-									`In order to change it, it needs to be set immediately after initialization of the entity.`,
-							)
-						}
-						const newId = new ClientGeneratedUuid(updatedState.value as string)
-						this.changeEntityId(entityState, newId)
-					}
-
-					if (updatedState.type === StateType.Entity && updatedState.isScheduledForDeletion) {
-						processChildEntityDeletion(updatedState)
-					} else {
-						this.markChildStateInNeedOfUpdate(entityState, updatedState)
-					}
-					entityState.hasStaleAccessor = true
-					entityState.hasPendingParentNotification = true
-				})
+			onChildUpdate: updatedState => {
+				this.entityOperations.onChildUpdate(entityState, updatedState)
 			},
 			addError: error =>
 				this.accessorErrorManager.addError(entityState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			addEventListener: (type: EntityAccessor.EntityEventType, ...args: unknown[]) => {
-				if (type === 'connectionUpdate') {
-					if (entityState.eventListeners.connectionUpdate === undefined) {
-						entityState.eventListeners.connectionUpdate = new Map()
-					}
-					const fieldName = args[0] as FieldName
-					const listener = args[1] as EntityAccessor.UpdateListener
-					const existingListeners = entityState.eventListeners.connectionUpdate.get(fieldName)
-
-					if (existingListeners === undefined) {
-						entityState.eventListeners.connectionUpdate.set(fieldName, new Set([listener]))
-					} else {
-						existingListeners.add(listener)
-					}
-					return () => {
-						const existingListeners = entityState.eventListeners.connectionUpdate?.get(fieldName)
-						if (existingListeners === undefined) {
-							return // Throw an error? This REALLY should not happen.
-						}
-						existingListeners.delete(listener)
-					}
-				} else {
-					const listener = args[0] as EntityAccessor.EntityEventListenerMap[typeof type]
-					if (entityState.eventListeners[type] === undefined) {
-						entityState.eventListeners[type] = new Set<never>()
-					}
-					entityState.eventListeners[type]!.add(listener as any)
-					return () => {
-						if (entityState.eventListeners[type] === undefined) {
-							return // Throw an error? This REALLY should not happen.
-						}
-						entityState.eventListeners[type]!.delete(listener as any)
-						if (entityState.eventListeners[type]!.size === 0) {
-							entityState.eventListeners[type] = undefined
-						}
-					}
-				}
+				return this.entityOperations.addEventListener(entityState, type, ...args)
 			},
 			batchUpdates: performUpdates => {
-				this.eventManager.syncOperation(() => {
-					batchUpdatesImplementation(performUpdates)
-				})
+				this.entityOperations.batchUpdates(entityState, performUpdates)
 			},
 			connectEntityAtField: (fieldName, entityToConnectOrItsKey) => {
-				this.eventManager.syncOperation(() => {
-					batchUpdatesImplementation(() => {
-						const hasOneMarkers = resolveHasOneRelationMarkers(
-							fieldName,
-							`Cannot connect at field '${fieldName}' as it doesn't refer to a has one relation.`,
-						)
-						for (const hasOneMarker of hasOneMarkers) {
-							const previouslyConnectedState = entityState.children.get(hasOneMarker.placeholderName)
-
-							if (
-								previouslyConnectedState === undefined ||
-								previouslyConnectedState.type === StateType.Field ||
-								previouslyConnectedState.type === StateType.EntityList
-							) {
-								this.rejectInvalidAccessorTree()
-							}
-
-							const [entityToConnectKey, stateToConnect] = this.resolveAndPrepareEntityToConnect(
-								entityToConnectOrItsKey,
-							)
-
-							if (previouslyConnectedState === stateToConnect) {
-								return // Do nothing.
-							}
-							// TODO remove from planned deletions if appropriate
-
-							const persistedKey = entityState.persistedData?.get(hasOneMarker.placeholderName)
-							if (persistedKey instanceof ServerGeneratedUuid) {
-								if (persistedKey.value === entityToConnectKey) {
-									this.dirtinessTracker.decrement() // It was removed from the list but now we're adding it back.
-								} else if (persistedKey.value === previouslyConnectedState.id.value) {
-									this.dirtinessTracker.increment() // We're changing it from the persisted id.
-								}
-							} else if (!previouslyConnectedState.id.existsOnServer) {
-								// This assumes the invariant enforced above that we cannot connect unpersisted entities.
-								// Hence the previouslyConnectedState still refers to the entity created initially.
-
-								if (
-									persistedKey === null || // We're updating.
-									(persistedKey === undefined && // We're creating.
-										(!entityState.combinedMarkersContainer.hasAtLeastOneBearingField ||
-											!hasOneMarker.relation.isNonbearing))
-								) {
-									this.dirtinessTracker.increment()
-								}
-							}
-
-							// TODO do something about the existing state…
-
-							this.addEntityRealm(stateToConnect, {
-								creationParameters: hasOneMarker.relation,
-								environment: hasOneMarker.environment,
-								initialEventListeners: hasOneMarker.relation,
-								markersContainer: hasOneMarker.fields,
-								parent: entityState,
-								realmKey: hasOneMarker.placeholderName,
-							})
-							entityState.children.set(hasOneMarker.placeholderName, stateToConnect)
-							entityState.hasStaleAccessor = true
-							entityState.hasPendingParentNotification = true
-						}
-						if (entityState.fieldsWithPendingConnectionUpdates === undefined) {
-							entityState.fieldsWithPendingConnectionUpdates = new Set()
-						}
-						entityState.fieldsWithPendingConnectionUpdates.add(fieldName)
-					})
-				})
+				this.entityOperations.connectEntityAtField(entityState, fieldName, entityToConnectOrItsKey)
 			},
 			disconnectEntityAtField: (fieldName, initializeReplacement) => {
-				this.eventManager.syncOperation(() => {
-					batchUpdatesImplementation(() => {
-						const hasOneMarkers = resolveHasOneRelationMarkers(
-							fieldName,
-							`Cannot disconnect the field '${fieldName}' as it doesn't refer to a has one relation.`,
-						)
-						for (const hasOneMarker of hasOneMarkers) {
-							const stateToDisconnect = entityState.children.get(hasOneMarker.placeholderName)
-
-							if (stateToDisconnect === undefined) {
-								throw new BindingError(`Cannot disconnect field '${hasOneMarker.placeholderName}' as it doesn't exist.`)
-							}
-							if (stateToDisconnect.type !== StateType.Entity) {
-								this.rejectInvalidAccessorTree()
-							}
-
-							const persistedKey = entityState.persistedData?.get(hasOneMarker.placeholderName)
-
-							if (persistedKey instanceof ServerGeneratedUuid && persistedKey.value === stateToDisconnect.id.value) {
-								this.dirtinessTracker.increment()
-							} else {
-								// Do nothing. Disconnecting unpersisted entities doesn't change the count.
-							}
-
-							stateToDisconnect.realms.get(entityState)?.delete(hasOneMarker.placeholderName)
-
-							// TODO update changes count?
-
-							const newEntityState = this.initializeEntityState(new UnpersistedEntityKey(), {
-								creationParameters: hasOneMarker.relation,
-								environment: hasOneMarker.environment,
-								initialEventListeners: hasOneMarker.relation,
-								markersContainer: hasOneMarker.fields,
-								parent: entityState,
-								realmKey: hasOneMarker.placeholderName,
-							})
-							entityState.children.set(hasOneMarker.placeholderName, newEntityState)
-
-							entityState.hasStaleAccessor = true
-							entityState.hasPendingParentNotification = true
-
-							this.runImmediateUserInitialization(newEntityState, initializeReplacement)
-						}
-						if (entityState.fieldsWithPendingConnectionUpdates === undefined) {
-							entityState.fieldsWithPendingConnectionUpdates = new Set()
-						}
-						entityState.fieldsWithPendingConnectionUpdates.add(fieldName)
-					})
-				})
+				this.entityOperations.disconnectEntityAtField(entityState, fieldName, initializeReplacement)
 			},
 			deleteEntity: () => {
-				this.eventManager.syncOperation(() => {
-					// Deliberately not calling performOperationWithBeforeUpdate ‒ no beforeUpdate events after deletion
-					batchUpdatesImplementation(() => {
-						if (entityState.id.existsOnServer) {
-							this.dirtinessTracker.increment()
-						}
-						entityState.isScheduledForDeletion = true
-						entityState.hasPendingParentNotification = true
-					})
-				})
+				this.entityOperations.deleteEntity(entityState)
 			},
 		}
 		this.treeStore.entityStore.set(entityKey, entityState)
@@ -401,86 +224,6 @@ export class StateInitializer {
 		}
 		if (realm.creationParameters.forceCreation && !id.existsOnServer) {
 			this.dirtinessTracker.increment()
-		}
-
-		const batchUpdatesImplementation: EntityAccessor.BatchUpdates = performUpdates => {
-			if (entityState.isScheduledForDeletion) {
-				if (entityState.hasPendingUpdate) {
-					// If hasPendingUpdate, we've likely just deleted the entity as a part of this transaction, so don't worry
-					// about it and just do nothing.
-					return
-				}
-				throw new BindingError(`Trying to update an entity (or something within said entity) that has been deleted.`)
-			}
-			entityState.batchUpdateDepth++
-			performUpdates(entityState.getAccessor, this.bindingOperations)
-			entityState.batchUpdateDepth--
-
-			if (
-				entityState.batchUpdateDepth === 0 &&
-				// We must have already told the parent if hasPendingUpdate is true. However, we may have updated the entity
-				// and then subsequently deleted it, in which case we want to let the parent know regardless.
-				(!entityState.hasPendingUpdate || entityState.isScheduledForDeletion) &&
-				entityState.hasPendingParentNotification
-			) {
-				entityState.hasPendingUpdate = true
-				entityState.hasPendingParentNotification = false
-				this.eventManager.registerJustUpdated(entityState)
-				this.eventManager.notifyParents(entityState)
-			}
-		}
-
-		const processChildEntityDeletion = (deletedChildState: EntityState) => {
-			const relevantPlaceholders = this.findChildPlaceholdersByState(entityState, deletedChildState)
-
-			if (deletedChildState.id.existsOnServer) {
-				if (entityState.plannedHasOneDeletions === undefined) {
-					entityState.plannedHasOneDeletions = new Map()
-				}
-				for (const placeholderName of relevantPlaceholders) {
-					entityState.plannedHasOneDeletions.set(placeholderName, deletedChildState)
-				}
-			}
-
-			const realmsByPlaceholder = deletedChildState.realms.get(entityState)
-			for (const placeholderName of relevantPlaceholders) {
-				const realm = realmsByPlaceholder?.get(placeholderName)
-				if (!realm) {
-					continue // TODO is this correct?
-				}
-
-				entityState.children.set(
-					placeholderName,
-					this.initializeEntityStateStub(
-						new UnpersistedEntityKey(),
-						this.createRealmSet(entityState, placeholderName, realm),
-					),
-				)
-			}
-			// TODO update the changes count
-			entityState.childrenWithPendingUpdates?.delete(deletedChildState)
-
-			this.eventManager.markPendingConnections(entityState, relevantPlaceholders)
-		}
-
-		const resolveHasOneRelationMarkers = (field: FieldName, message: string): Set<HasOneRelationMarker> => {
-			const placeholders = entityState.combinedMarkersContainer.placeholders.get(field)
-
-			if (placeholders === undefined) {
-				throw new BindingError(message)
-			}
-			const placeholderArray = placeholders instanceof Set ? Array.from(placeholders) : [placeholders]
-
-			return new Set(
-				placeholderArray.map(placeholderName => {
-					const hasOneRelation = entityState.combinedMarkersContainer.markers.get(placeholderName)
-
-					if (!(hasOneRelation instanceof HasOneRelationMarker)) {
-						throw new BindingError(message)
-					}
-					return hasOneRelation
-				}),
-			)
 		}
 
 		for (const [placeholderName, field] of realm.markersContainer.markers) {
@@ -540,137 +283,27 @@ export class StateInitializer {
 				}
 			})(),
 			onChildUpdate: updatedState => {
-				if (updatedState.type !== StateType.Entity) {
-					throw new BindingError(`Illegal entity list value.`)
-				}
-
-				// No beforeUpdate for child updates!
-				batchUpdatesImplementation(() => {
-					if (updatedState.isScheduledForDeletion) {
-						this.processEntityDeletion(entityListState, updatedState)
-					} else {
-						this.markChildStateInNeedOfUpdate(entityListState, updatedState)
-					}
-					entityListState.hasPendingParentNotification = true
-					entityListState.hasStaleAccessor = true
-				})
+				this.listOperations.onChildUpdate(entityListState, updatedState)
 			},
 			addError: error =>
 				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			batchUpdates: performUpdates => {
-				this.eventManager.syncOperation(() => {
-					batchUpdatesImplementation(performUpdates)
-				})
+				this.listOperations.batchUpdates(entityListState, performUpdates)
 			},
 			connectEntity: entityToConnectOrItsKey => {
-				this.eventManager.syncOperation(() => {
-					batchUpdatesImplementation(() => {
-						const [connectedEntityKey, connectedState] = this.resolveAndPrepareEntityToConnect(entityToConnectOrItsKey)
-
-						if (entityListState.children.has(connectedEntityKey)) {
-							return
-						}
-
-						this.addEntityRealm(connectedState, {
-							markersContainer: entityListState.markersContainer,
-							creationParameters: entityListState.creationParameters,
-							environment: entityListState.environment,
-							initialEventListeners: this.eventManager.getEventListenersForListEntity(entityListState),
-							parent: entityListState,
-							realmKey: connectedEntityKey,
-						})
-						entityListState.children.set(connectedEntityKey, connectedState)
-						entityListState.plannedRemovals?.delete(connectedState)
-
-						if (entityListState.persistedEntityIds.has(connectedEntityKey)) {
-							// It was removed from the list but now we're adding it back.
-							this.dirtinessTracker.decrement()
-						} else {
-							this.dirtinessTracker.increment()
-						}
-
-						entityListState.hasPendingParentNotification = true
-						entityListState.hasStaleAccessor = true
-					})
-				})
+				this.listOperations.connectEntity(entityListState, entityToConnectOrItsKey)
 			},
 			createNewEntity: initialize => {
-				entityListState.batchUpdates(() => {
-					const id = new UnpersistedEntityKey()
-					const newState = this.initializeEntityState(id, this.createListEntityRealm(entityListState, id))
-
-					entityListState.hasStaleAccessor = true
-					entityListState.hasPendingParentNotification = true
-					entityListState.children.set(id.value, newState)
-					this.markChildStateInNeedOfUpdate(entityListState, newState)
-
-					this.runImmediateUserInitialization(newState, initialize)
-				})
+				this.listOperations.createNewEntity(entityListState, initialize)
 			},
 			disconnectEntity: childEntityOrItsKey => {
-				this.eventManager.syncOperation(() => {
-					batchUpdatesImplementation(() => {
-						const disconnectedChildKey =
-							typeof childEntityOrItsKey === 'string' ? childEntityOrItsKey : childEntityOrItsKey.key
-
-						const disconnectedChildState = entityListState.children.get(disconnectedChildKey)
-
-						if (disconnectedChildState === undefined) {
-							throw new BindingError(
-								`Entity list doesn't include an entity with key '${disconnectedChildKey}' and so it cannot remove it.`,
-							)
-						}
-
-						const didDelete = disconnectedChildState.realms.delete(entityListState)
-						if (!didDelete) {
-							this.rejectInvalidAccessorTree()
-						}
-						if (entityListState.persistedEntityIds.has(disconnectedChildKey)) {
-							if (entityListState.plannedRemovals === undefined) {
-								entityListState.plannedRemovals = new Map()
-							}
-							entityListState.plannedRemovals.set(disconnectedChildState, 'disconnect')
-						}
-
-						if (entityListState.persistedEntityIds.has(disconnectedChildKey)) {
-							this.dirtinessTracker.increment()
-						} else {
-							// It wasn't on the list, then it was, and now we're removing it again.
-							this.dirtinessTracker.decrement()
-						}
-
-						entityListState.children.delete(disconnectedChildKey)
-						entityListState.hasPendingParentNotification = true
-						entityListState.hasStaleAccessor = true
-					})
-				})
+				this.listOperations.disconnectEntity(entityListState, childEntityOrItsKey)
 			},
 			getChildEntityByKey: key => {
-				const childState = entityListState.children.get(key)
-				if (childState === undefined) {
-					throw new BindingError(`EntityList: cannot retrieve an entity with key '${key}' as it is not on the list.`)
-				}
-				return childState.getAccessor()
+				return this.listOperations.getChildEntityByKey(entityListState, key)
 			},
 		}
 		entityListState.addEventListener = this.getAddEventListener(entityListState)
-
-		const batchUpdatesImplementation: EntityListAccessor.BatchUpdates = performUpdates => {
-			entityListState.batchUpdateDepth++
-			performUpdates(entityListState.getAccessor, this.bindingOperations)
-			entityListState.batchUpdateDepth--
-
-			if (
-				entityListState.batchUpdateDepth === 0 &&
-				!entityListState.hasPendingUpdate && // We must have already told the parent if this is true.
-				entityListState.hasPendingParentNotification
-			) {
-				entityListState.hasPendingUpdate = true
-				entityListState.hasPendingParentNotification = false
-				this.eventManager.registerJustUpdated(entityListState)
-				this.eventManager.notifyParents(entityListState)
-			}
-		}
 
 		const initialData: Set<string | undefined> =
 			persistedEntityIds.size === 0
@@ -732,29 +365,14 @@ export class StateInitializer {
 			addError: error =>
 				this.accessorErrorManager.addError(fieldState, { type: ErrorAccessor.ErrorType.Validation, error }),
 			updateValue: (newValue, options) => {
-				this.elementaryFieldOperations.updateValue(fieldState, newValue, options)
+				this.fieldOperations.updateValue(fieldState, newValue, options)
 			},
 		}
 		fieldState.addEventListener = this.getAddEventListener(fieldState)
 		return fieldState
 	}
 
-	private rejectInvalidAccessorTree(): never {
-		throw new BindingError(
-			`The accessor tree does not correspond to the MarkerTree. This should absolutely never happen.`,
-		)
-	}
-
-	private markChildStateInNeedOfUpdate(entityListState: EntityListState, updatedState: EntityState): void
-	private markChildStateInNeedOfUpdate(entityState: EntityState, updatedState: StateNode): void
-	private markChildStateInNeedOfUpdate(state: StateINode, updatedState: StateNode): void {
-		if (state.childrenWithPendingUpdates === undefined) {
-			state.childrenWithPendingUpdates = new Set()
-		}
-		state.childrenWithPendingUpdates.add(updatedState as EntityState)
-	}
-
-	private findChildPlaceholdersByState(containingState: EntityState, childState: StateNode) {
+	public findChildPlaceholdersByState(containingState: EntityState, childState: StateNode) {
 		const relevantPlaceholders = new Set<FieldName>()
 
 		// All has one relations where this entity is present.
@@ -767,19 +385,7 @@ export class StateInitializer {
 		return relevantPlaceholders
 	}
 
-	private runImmediateUserInitialization(
-		newEntityState: EntityState,
-		initialize: EntityAccessor.BatchUpdatesHandler | undefined,
-	) {
-		newEntityState.hasIdSetInStone = false
-		initialize && newEntityState.batchUpdates(initialize)
-
-		if (!newEntityState.eventListeners.initialize) {
-			newEntityState.hasIdSetInStone = true
-		}
-	}
-
-	private initializeFromFieldMarker(
+	public initializeFromFieldMarker(
 		entityState: EntityState,
 		field: FieldMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
@@ -800,7 +406,7 @@ export class StateInitializer {
 		}
 	}
 
-	private initializeFromHasOneRelationMarker(
+	public initializeFromHasOneRelationMarker(
 		entityState: EntityState,
 		field: HasOneRelationMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
@@ -836,7 +442,7 @@ export class StateInitializer {
 		}
 	}
 
-	private initializeFromHasManyRelationMarker(
+	public initializeFromHasManyRelationMarker(
 		entityState: EntityState,
 		field: HasManyRelationMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
@@ -888,53 +494,6 @@ export class StateInitializer {
 		}
 	}
 
-	private mergeInEntityFieldsContainer(
-		existingEntityState: EntityState,
-		newMarkersContainer: EntityFieldMarkersContainer,
-	): void {
-		for (const [placeholderName, field] of newMarkersContainer.markers) {
-			const fieldState = existingEntityState.children.get(placeholderName)
-			const fieldDatum = existingEntityState.persistedData?.get(placeholderName)
-
-			if (field instanceof FieldMarker) {
-				// Merge markers but don't re-initialize the state. It shouldn't be needed.
-				if (fieldState === undefined) {
-					this.initializeFromFieldMarker(existingEntityState, field, fieldDatum)
-				} else if (fieldState.type === StateType.Field) {
-					fieldState.fieldMarker = MarkerMerger.mergeFieldMarkers(fieldState.fieldMarker, field)
-				}
-			} else if (field instanceof HasOneRelationMarker) {
-				if (fieldState === undefined || fieldState.type === StateType.Entity) {
-					// This method calls initializeEntityState which handles the merging on its own.
-					this.initializeFromHasOneRelationMarker(existingEntityState, field, fieldDatum)
-				}
-			} else if (field instanceof HasManyRelationMarker) {
-				if (fieldState === undefined) {
-					this.initializeFromHasManyRelationMarker(existingEntityState, field, fieldDatum)
-				} else if (fieldState.type === StateType.EntityList) {
-					for (const [childKey, childState] of fieldState.children) {
-						this.initializeEntityState(childState.id, {
-							environment: fieldState.environment,
-							markersContainer: newMarkersContainer,
-							creationParameters: fieldState.creationParameters,
-							initialEventListeners: this.eventManager.getEventListenersForListEntity(fieldState, field),
-							parent: fieldState,
-							realmKey: childKey,
-						})
-					}
-					fieldState.markersContainer = MarkerMerger.mergeEntityFieldsContainers(
-						fieldState.markersContainer,
-						newMarkersContainer,
-					)
-				}
-			} else if (field instanceof SubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
-			} else {
-				assertNever(field)
-			}
-		}
-	}
-
 	private getAddEventListener(state: {
 		eventListeners: {
 			[eventType: string]: Set<Function> | undefined
@@ -957,46 +516,6 @@ export class StateInitializer {
 		}
 	}
 
-	private addEntityRealm(targetState: EntityState | EntityStateStub, newRealm: EntityRealm) {
-		const byParent = targetState.realms.get(newRealm.parent)
-		if (byParent === undefined) {
-			targetState.realms.set(newRealm.parent, new Map([[newRealm.realmKey, newRealm]]))
-		} else {
-			const byKey = byParent.get(newRealm.realmKey)
-
-			if (byKey === undefined) {
-				byParent.set(newRealm.realmKey, newRealm)
-			} else {
-				byParent.set(newRealm.realmKey, MarkerMerger.mergeRealms(byKey, newRealm))
-			}
-		}
-
-		if (targetState.type === StateType.Entity) {
-			const { creationParameters, markersContainer, initialEventListeners, environment } = newRealm
-			targetState.combinedMarkersContainer = MarkerMerger.mergeEntityFieldsContainers(
-				targetState.combinedMarkersContainer,
-				markersContainer,
-			)
-			targetState.combinedEnvironment = MarkerMerger.mergeEnvironments(targetState.combinedEnvironment, environment)
-			targetState.combinedCreationParameters = {
-				forceCreation: targetState.combinedCreationParameters.forceCreation || creationParameters.forceCreation,
-				isNonbearing: targetState.combinedCreationParameters.isNonbearing && creationParameters.isNonbearing, // If either is false, it's bearing
-				setOnCreate: TreeParameterMerger.mergeSetOnCreate(
-					targetState.combinedCreationParameters.setOnCreate,
-					creationParameters.setOnCreate,
-				),
-			}
-			targetState.eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
-				TreeParameterMerger.cloneSingleEntityEventListeners(targetState.eventListeners),
-				TreeParameterMerger.cloneSingleEntityEventListeners(initialEventListeners?.eventListeners),
-			)
-			targetState.hasStaleAccessor = true
-			this.mergeInEntityFieldsContainer(targetState, newRealm.markersContainer)
-
-			this.eventManager.registerNewlyInitialized([targetState, newRealm])
-		}
-	}
-
 	public initializeListEntityStub(entityListState: EntityListState, entityId: string | undefined): EntityStateStub {
 		const id = entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityKey()
 		const stub = this.initializeEntityStateStub(
@@ -1013,7 +532,7 @@ export class StateInitializer {
 		return new Map([[parent, new Map([[key, realm]])]])
 	}
 
-	private createListEntityRealm(parent: EntityListState, id: UnpersistedEntityKey | ServerGeneratedUuid): EntityRealm {
+	public createListEntityRealm(parent: EntityListState, id: UnpersistedEntityKey | ServerGeneratedUuid): EntityRealm {
 		return {
 			creationParameters: parent.creationParameters,
 			environment: parent.environment,
@@ -1022,37 +541,6 @@ export class StateInitializer {
 			parent: parent,
 			realmKey: id.value,
 		}
-	}
-
-	private resolveAndPrepareEntityToConnect(entityToConnectOrItsKey: string | EntityAccessor): [string, EntityState] {
-		let entityToConnectKey: string
-
-		if (typeof entityToConnectOrItsKey === 'string') {
-			entityToConnectKey = entityToConnectOrItsKey
-		} else {
-			// TODO This is commented out for now in order to at least somewhat mitigate the limitations of dealing with
-			//		inverse relations. However, once that has been addressed systemically, this code needs to be re-enabled.
-			// if (!entityToConnectOrItsKey.existsOnServer) {
-			// 	throw new BindingError(
-			// 		`Attempting to connect an entity with key '${entityToConnectOrItsKey.key}' that ` +
-			// 			`doesn't exist on server. That is currently impossible.`, // At least for now.
-			// 	)
-			// }
-			entityToConnectKey = entityToConnectOrItsKey.key
-		}
-
-		const stateToConnect = this.treeStore.entityStore.get(entityToConnectKey)
-		if (stateToConnect === undefined) {
-			throw new BindingError(`Attempting to connect an entity with key '${entityToConnectKey}' but it doesn't exist.`)
-		}
-		if (stateToConnect.isScheduledForDeletion) {
-			// As far as the other realms are concerned, this entity is deleted. We don't want to just make it re-appear
-			// for them just because some other random relation decided to connect it.
-			stateToConnect.realms.clear()
-			stateToConnect.isScheduledForDeletion = false
-		}
-
-		return [entityToConnectKey, stateToConnect]
 	}
 
 	public changeEntityId(entityState: EntityState, newId: EntityAccessor.RuntimeId) {
@@ -1092,23 +580,5 @@ export class StateInitializer {
 				}
 			}
 		}
-	}
-
-	private processEntityDeletion(entityListState: EntityListState, stateForDeletion: EntityState) {
-		// We don't remove entities from the store so as to allow their re-connection.
-		entityListState.childrenWithPendingUpdates?.delete(stateForDeletion)
-
-		const key = stateForDeletion.id.value
-		entityListState.children.delete(key)
-		entityListState.hasPendingParentNotification = true
-
-		if (!stateForDeletion.id.existsOnServer) {
-			return
-		}
-
-		if (entityListState.plannedRemovals === undefined) {
-			entityListState.plannedRemovals = new Map()
-		}
-		entityListState.plannedRemovals.set(stateForDeletion, 'delete')
 	}
 }

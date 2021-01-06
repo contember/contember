@@ -1,15 +1,15 @@
 import { GraphQlBuilder } from '@contember/client'
 import { validate as uuidValidate } from 'uuid'
-import { FieldAccessor } from '../accessors'
-import { BindingError } from '../BindingError'
-import { PRIMARY_KEY_NAME } from '../bindingTypes'
-import { Scalar } from '../treeParameters/primitives'
-import { DirtinessTracker } from './DirtinessTracker'
-import { EventManager } from './EventManager'
-import { FieldState } from './state'
-import { TreeStore } from './TreeStore'
+import { FieldAccessor } from '../../accessors'
+import { BindingError } from '../../BindingError'
+import { PRIMARY_KEY_NAME } from '../../bindingTypes'
+import { Scalar } from '../../treeParameters'
+import { DirtinessTracker } from '../DirtinessTracker'
+import { EventManager } from '../EventManager'
+import { FieldState } from '../state'
+import { TreeStore } from '../TreeStore'
 
-export class ElementaryFieldOperations {
+export class FieldOperations {
 	public constructor(
 		private readonly dirtinessTracker: DirtinessTracker,
 		private readonly eventManager: EventManager,

@@ -43,14 +43,14 @@ export class Project {
 				},
 			}),
 		)
-		await updateMainDockerComposeConfig(instance.directory, (config: any) => ({
+		await updateMainDockerComposeConfig(instance.directory, config => ({
 			...config,
 			services: {
 				...config.services,
 				api: {
-					...config.services.api,
+					...config.services?.api,
 					environment: {
-						...config.services.api.environment,
+						...config.services?.api.environment,
 						[projectNameToEnvName(this.name) + '_DB_NAME']: this.name,
 					},
 				},

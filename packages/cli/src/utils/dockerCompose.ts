@@ -18,7 +18,10 @@ const resolvePath = async (dir: string, possibleFileNames: string[], fallbackFil
 	return join(dir, fallbackFileName)
 }
 
-export const updateOverrideConfig = async (dir: string, updater: JsonUpdateCallback): Promise<void> => {
+export const updateOverrideConfig = async (
+	dir: string,
+	updater: JsonUpdateCallback<DockerComposeConfig>,
+): Promise<void> => {
 	const path = process.env.COMPOSE_FILE || (await resolvePath(dir, OVERRIDE_CONFIGS, OVERRIDE_CONFIGS[0]))
 	return updateYaml(path, updater, { createMissing: true })
 }
@@ -31,10 +34,10 @@ export const updateMainDockerComposeConfig = async (
 	return updateYaml(path, updater, { createMissing: true })
 }
 
-export const readDefaultDockerComposeConfig = async (dir: string): Promise<any> => {
+export const readDefaultDockerComposeConfig = async (dir: string): Promise<DockerComposeConfig> => {
 	const candidates = process.env.COMPOSE_FILE ? [process.env.COMPOSE_FILE] : [...MAIN_CONFIGS, ...OVERRIDE_CONFIGS]
 
-	return await readMultipleYaml(candidates.map(it => join(dir, it)))
+	return await readMultipleYaml<DockerComposeConfig>(candidates.map(it => join(dir, it)))
 }
 
 export type PortsMapping = {
@@ -105,13 +108,15 @@ export const runDockerCompose = (args: string[], options: DockerComposeRunOption
 export interface DockerComposeServiceConfig {
 	image?: string
 	command?: string
+	user?: string
 	environment?: Record<string, string>
 	ports?: (string | {})[] // todo long syntax
 }
 
 export interface DockerComposeConfig {
+	[key: string]: unknown
 	version?: string
-	services: Record<string, DockerComposeServiceConfig>
+	services?: Record<string, DockerComposeServiceConfig>
 }
 
 export class DockerCompose {

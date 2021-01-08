@@ -35,13 +35,13 @@ export const updateYaml = async <Value = JSONObject>(
 	await fs.writeFile(path, newConfig, { encoding: 'utf8' })
 }
 
-export const readYaml = async (path: string): Promise<JSONObject> => {
+export const readYaml = async <T = JSONObject>(path: string): Promise<T> => {
 	const content = await fs.readFile(path, { encoding: 'utf8' })
 	return jsyaml.load(content)
 }
 
-export const readMultipleYaml = async (paths: string[]): Promise<JSONObject> => {
-	const configs: any = []
+export const readMultipleYaml = async <T extends JSONObject = JSONObject>(paths: string[]): Promise<T> => {
+	const configs: T[] = []
 	for (const path of paths) {
 		const exists = await pathExists(path)
 		if (!exists) {
@@ -51,8 +51,8 @@ export const readMultipleYaml = async (paths: string[]): Promise<JSONObject> => 
 		if (!stats.isFile()) {
 			continue
 		}
-		const config = await readYaml(path)
+		const config = await readYaml<T>(path)
 		configs.push(config)
 	}
-	return Merger.merge(...configs)
+	return (Merger.merge(...configs) as unknown) as T
 }

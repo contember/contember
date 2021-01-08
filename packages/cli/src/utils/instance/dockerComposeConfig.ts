@@ -1,12 +1,12 @@
 import { PortMapping } from '../docker'
-import { getConfiguredPortsMap } from '../dockerCompose'
+import { DockerComposeConfig, getConfiguredPortsMap } from '../dockerCompose'
 import getPort from 'get-port'
 
 type ServicePortsMapping = Record<string, PortMapping[]>
 
 export const resolvePortsMapping = async (args: {
 	instanceDirectory: string
-	config: any
+	config: DockerComposeConfig
 	startPort?: number
 	host?: string[]
 }): Promise<ServicePortsMapping> => {
@@ -24,7 +24,7 @@ export const resolvePortsMapping = async (args: {
 	let startPort = args.startPort || 1480
 	const servicePortMapping: ServicePortsMapping = {}
 	for (const { service, port: containerPort } of exposedServices) {
-		if (!args.config.services[service]) {
+		if (!args.config.services?.[service]) {
 			continue
 		}
 		const serviceConfiguredPorts = configuredPorts[service] || []
@@ -71,10 +71,13 @@ const updateConfigWithPorts = (config: any, portsMapping: ServicePortsMapping): 
 	)
 }
 
-const filterUndefinedEntries = (input: Record<string, string | undefined>) =>
-	Object.fromEntries(Object.entries(input).filter(([key, val]) => val !== undefined))
+const filterUndefinedEntries = (input: Record<string, string | undefined>): Record<string, string> =>
+	Object.fromEntries(Object.entries(input).filter((item): item is [string, string] => item[1] !== undefined))
 
-export const patchInstanceOverrideCredentials = (config: any, tenantCredentials: TenantCredentials) => {
+export const patchInstanceOverrideCredentials = (
+	config: DockerComposeConfig,
+	tenantCredentials: TenantCredentials,
+): DockerComposeConfig => {
 	if (config.services?.admin) {
 		config = {
 			...config,
@@ -108,9 +111,9 @@ export const patchInstanceOverrideCredentials = (config: any, tenantCredentials:
 	}
 }
 
-export const patchInstanceOverrideConfig = (config: any, portsMapping: ServicePortsMapping) => {
+export const patchInstanceOverrideConfig = (config: DockerComposeConfig, portsMapping: ServicePortsMapping) => {
 	config = updateConfigWithPorts(config, portsMapping)
-	if (config.services.admin) {
+	if (config.services?.admin) {
 		config = {
 			...config,
 			services: {
@@ -124,7 +127,9 @@ export const patchInstanceOverrideConfig = (config: any, portsMapping: ServicePo
 						: {}),
 					environment: {
 						...config.services.admin.environment,
-						CONTEMBER_PORT: portsMapping.admin[0]?.containerPort || config.services.admin.environment?.CONTEMBER_PORT,
+						CONTEMBER_PORT: String(
+							portsMapping.admin[0]?.containerPort || config.services.admin.environment?.CONTEMBER_PORT || '',
+						),
 						CONTEMBER_API_SERVER: `http://127.0.0.1:${portsMapping.api[0].hostPort}`,
 					},
 				},
@@ -138,19 +143,19 @@ export const patchInstanceOverrideConfig = (config: any, portsMapping: ServicePo
 		services: {
 			...config.services,
 			api: {
-				...config.services.api,
-				...(!config.services.api.user && process.getuid
+				...config.services?.api,
+				...(!config.services?.api.user && process.getuid
 					? {
 							user: String(process.getuid()),
 					  }
 					: {}),
 				environment: {
-					...config.services.api?.environment,
+					...config.services?.api?.environment,
 					DEFAULT_S3_ENDPOINT: 'http://localhost:' + portsMapping.s3[0].hostPort,
 				},
 			},
 			s3: {
-				...config.services.s3,
+				...config.services?.s3,
 				command: `server --address :${portsMapping.s3[0].containerPort} /data`,
 			},
 		},

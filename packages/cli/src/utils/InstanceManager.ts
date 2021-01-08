@@ -5,7 +5,7 @@ import { join } from 'path'
 import { pathExists } from 'fs-extra'
 import { resourcesDir } from '../pathUtils'
 import { installTemplate } from './template'
-import { updateMainDockerComposeConfig } from './dockerCompose'
+import { DockerComposeConfig, updateMainDockerComposeConfig } from './dockerCompose'
 import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from './PathMapping'
 
 export class InstanceManager {
@@ -33,12 +33,12 @@ export class InstanceManager {
 		const instanceDirectory = await this.getDirectory(name)
 		await installTemplate(template, instanceDirectory, 'instance')
 		const version = await this.workspace.apiVersion
-		await updateMainDockerComposeConfig(instanceDirectory, (config: any) => ({
+		await updateMainDockerComposeConfig(instanceDirectory, config => ({
 			...config,
 			services: {
 				...config.services,
 				api: {
-					...config.services.api,
+					...config.services?.api,
 					image: 'contember/contember:' + (version || 'latest'),
 				},
 			},

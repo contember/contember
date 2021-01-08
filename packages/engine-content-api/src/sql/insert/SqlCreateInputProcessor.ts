@@ -32,7 +32,7 @@ export default class SqlCreateInputProcessor implements CreateInputProcessor<Mut
 				if (!primaryInversed) {
 					return []
 				}
-				const primaryOwner = await this.mapper.getPrimaryValue(context.entity, context.input)
+				const primaryOwner = await this.mapper.getPrimaryValue(context.targetEntity, context.input)
 				if (!primaryOwner) {
 					return [new MutationEntryNotFoundError([], context.input)]
 				}

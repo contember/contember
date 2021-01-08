@@ -32,7 +32,9 @@ export const interactiveInstanceConfigure = async ({
 			host: host,
 			startPort: ports,
 		})
-		await updateOverrideConfig(instance.directory, config => patchInstanceOverrideConfig(config, portsMapping))
+		await updateOverrideConfig(instance.directory, config =>
+			patchInstanceOverrideConfig(config, portsMapping, composeConfig.version),
+		)
 	}
 
 	if (!instanceConfig.loginToken && adminEnv.CONTEMBER_LOGIN_TOKEN) {

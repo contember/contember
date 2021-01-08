@@ -111,7 +111,11 @@ export const patchInstanceOverrideCredentials = (
 	}
 }
 
-export const patchInstanceOverrideConfig = (config: DockerComposeConfig, portsMapping: ServicePortsMapping) => {
+export const patchInstanceOverrideConfig = (
+	config: DockerComposeConfig,
+	portsMapping: ServicePortsMapping,
+	version?: string,
+) => {
 	config = updateConfigWithPorts(config, portsMapping)
 	if (config.services?.admin) {
 		config = {
@@ -139,7 +143,7 @@ export const patchInstanceOverrideConfig = (config: DockerComposeConfig, portsMa
 
 	return {
 		...config,
-		version: config.version || '3.7',
+		version: config.version || version || '3.7',
 		services: {
 			...config.services,
 			api: {

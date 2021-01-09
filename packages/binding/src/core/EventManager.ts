@@ -69,9 +69,12 @@ export class EventManager {
 	}
 
 	public syncTransaction(transaction: () => void) {
-		this.transactionDepth++
-		transaction()
-		this.transactionDepth--
+		try {
+			this.transactionDepth++
+			transaction()
+		} finally {
+			this.transactionDepth--
+		}
 	}
 	public syncOperation(operation: () => void) {
 		this.syncTransaction(operation)

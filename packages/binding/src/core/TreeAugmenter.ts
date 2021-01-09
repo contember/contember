@@ -27,8 +27,8 @@ export class TreeAugmenter {
 	public constructor(private readonly stateInitializer: StateInitializer, private readonly treeStore: TreeStore) {}
 
 	public updatePersistedData(response: ReceivedDataTree) {
-		this.treeStore.updatePersistedData(response)
-		// TODO!!!!
+		//this.treeStore.updatePersistedData(response)
+		this.extendTree(this.treeStore.markerTree, response) // TODO!!!
 	}
 
 	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: ReceivedDataTree) {

@@ -24,73 +24,57 @@ import { TreeStore } from './TreeStore'
 type AlreadyProcessed = Map<EntityRealmParent, Set<EntityRealmKey>>
 
 export class TreeAugmenter {
-	public constructor(
-		private readonly eventManager: EventManager,
-		private readonly stateInitializer: StateInitializer,
-		private readonly treeStore: TreeStore,
-	) {}
+	public constructor(private readonly stateInitializer: StateInitializer, private readonly treeStore: TreeStore) {}
 
 	public updatePersistedData(response: ReceivedDataTree) {
-		this.eventManager.syncOperation(() => {
-			this.treeStore.updatePersistedData(response)
-		})
+		this.treeStore.updatePersistedData(response)
 	}
 
 	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: ReceivedDataTree) {
-		this.eventManager.syncOperation(() => {
-			this.treeStore.extendTree(newMarkerTree, newPersistedData)
+		this.treeStore.extendTree(newMarkerTree, newPersistedData)
 
-			// TODO this whole process fails to:
-			//		- Properly update realms
-			//		- Update creationParameters
-			//		- Update environment
-			//		- Update initialEventListeners
+		// TODO this whole process fails to:
+		//		- Properly update realms
+		//		- Update creationParameters
+		//		- Update environment
+		//		- Update initialEventListeners
 
-			const alreadyProcessed: AlreadyProcessed = new Map()
-			let didUpdateSomething = false
-			for (const [subTreePlaceholder, newSubTreeMarker] of newMarkerTree.subTrees) {
-				const completeTreeMarker = this.treeStore.markerTree.subTrees.get(subTreePlaceholder)
-				const subTreeState = this.treeStore.subTreeStates.get(subTreePlaceholder)
-				const newSubTreeData = this.treeStore.subTreePersistedData.get(subTreePlaceholder)
+		const alreadyProcessed: AlreadyProcessed = new Map()
+		for (const [subTreePlaceholder, newSubTreeMarker] of newMarkerTree.subTrees) {
+			const completeTreeMarker = this.treeStore.markerTree.subTrees.get(subTreePlaceholder)
+			const subTreeState = this.treeStore.subTreeStates.get(subTreePlaceholder)
+			const newSubTreeData = this.treeStore.subTreePersistedData.get(subTreePlaceholder)
 
-				assert(completeTreeMarker !== undefined)
+			assert(completeTreeMarker !== undefined)
 
-				let didUpdateTree = false
+			if (subTreeState === undefined) {
+				this.stateInitializer.initializeSubTree(newSubTreeMarker)
+			} else if (subTreeState.type === StateType.Entity) {
+				assert(newSubTreeData === null || newSubTreeData === undefined || newSubTreeData instanceof ServerGeneratedUuid)
 
-				if (subTreeState === undefined) {
-					this.stateInitializer.initializeSubTree(newSubTreeMarker)
-					didUpdateTree = true
-				} else if (subTreeState.type === StateType.Entity) {
-					assert(
-						newSubTreeData === null || newSubTreeData === undefined || newSubTreeData instanceof ServerGeneratedUuid,
-					)
+				this.updateSingleEntityPersistedData(
+					alreadyProcessed,
+					undefined,
+					subTreePlaceholder,
+					subTreeState,
+					completeTreeMarker.fields,
+					newSubTreeMarker.fields,
+					newSubTreeData || new UnpersistedEntityKey(),
+				)
+			} else if (subTreeState.type === StateType.EntityList) {
+				assert(newSubTreeData instanceof Set)
 
-					didUpdateTree = this.updateSingleEntityPersistedData(
-						alreadyProcessed,
-						undefined,
-						subTreePlaceholder,
-						subTreeState,
-						completeTreeMarker.fields,
-						newSubTreeMarker.fields,
-						newSubTreeData || new UnpersistedEntityKey(),
-					)
-				} else if (subTreeState.type === StateType.EntityList) {
-					assert(newSubTreeData instanceof Set)
-
-					didUpdateTree = this.updateEntityListPersistedData(
-						alreadyProcessed,
-						subTreeState,
-						completeTreeMarker.fields,
-						newSubTreeMarker.fields,
-						newSubTreeData,
-					)
-				} else {
-					assertNever(subTreeState)
-				}
-				didUpdateSomething = didUpdateSomething || didUpdateTree
+				this.updateEntityListPersistedData(
+					alreadyProcessed,
+					subTreeState,
+					completeTreeMarker.fields,
+					newSubTreeMarker.fields,
+					newSubTreeData,
+				)
+			} else {
+				assertNever(subTreeState)
 			}
-			// TODO use didUpdateSomething
-		})
+		}
 	}
 
 	private updateSingleEntityPersistedData(

@@ -83,7 +83,7 @@ export class DataBinding {
 			this.eventManager,
 			this.treeStore,
 		)
-		this.treeAugmenter = new TreeAugmenter(this.eventManager, this.stateInitializer, this.treeStore)
+		this.treeAugmenter = new TreeAugmenter(this.stateInitializer, this.treeStore)
 	}
 
 	private readonly bindingOperations = Object.freeze<BindingOperations>({

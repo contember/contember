@@ -1,4 +1,4 @@
-import { MutationDataResponse, NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
+import { NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
 import { MarkerTreeRoot } from '../markers'
 import { MarkerMerger } from './MarkerMerger'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'

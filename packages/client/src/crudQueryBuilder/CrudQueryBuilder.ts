@@ -10,6 +10,7 @@ import {
 	GetQueryArguments,
 	ListQueryArguments,
 	Mutations,
+	PaginateQueryArguments,
 	Queries,
 	UpdateMutationArguments,
 	UpdateMutationFields,
@@ -37,6 +38,23 @@ export class CrudQueryBuilder {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `list${name}`
+		query = ReadBuilder.instantiateFromFactory(query)
+
+		const [objectName, objectBuilder] =
+			typeof alias === 'string' ? [alias, query.objectBuilder.name(name)] : [name, query.objectBuilder]
+
+		return new CrudQueryBuilder('query', this.rootObjectBuilder.object(objectName, objectBuilder))
+	}
+
+	public paginate(
+		name: string,
+		query: ReadBuilder.BuilderFactory<PaginateQueryArguments>,
+		alias?: string,
+	): Omit<CrudQueryBuilder, Mutations> {
+		if (this.type === 'mutation') {
+			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
+		}
+		name = `paginate${name}`
 		query = ReadBuilder.instantiateFromFactory(query)
 
 		const [objectName, objectBuilder] =

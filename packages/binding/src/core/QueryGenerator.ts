@@ -92,6 +92,12 @@ export class QueryGenerator {
 			finalBuilder = CrudQueryBuilder.ReadBuilder.instantiate()
 		}
 
+		// const fullyPopulated = withAllParams
+		// 	.anyRelation('pageInfo', builder => builder.column('totalCount'))
+		// 	.anyRelation('edges', builder =>
+		// 		builder.anyRelation('node', builder => QueryGenerator.registerQueryPart(subTree.fields.markers, builder)),
+		// 	)
+
 		return baseQueryBuilder.list(
 			subTree.entityName,
 			QueryGenerator.registerQueryPart(subTree.fields.markers, finalBuilder),

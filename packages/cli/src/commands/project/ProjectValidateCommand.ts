@@ -29,7 +29,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 		}
 		const projects = allProjects
 			? await workspace.projects.listProjects()
-			: [await workspace.projects.getProject(projectName)]
+			: [await workspace.projects.getProject(projectName, { fuzzy: true })]
 		let valid = true
 		const invalidProjects = []
 		for (const project of projects) {

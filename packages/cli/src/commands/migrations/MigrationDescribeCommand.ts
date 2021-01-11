@@ -60,7 +60,7 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 		const projectName = input.getArgument('project')
 
 		const workspace = await Workspace.get(process.cwd())
-		const project = await workspace.projects.getProject(projectName)
+		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
 		const migrationsDir = await project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 

@@ -37,7 +37,7 @@ export const executeCreateMigrationCommand = async (
 	const allProjects = projectName === '.'
 	const projects = allProjects
 		? await workspace.projects.listProjects()
-		: [await workspace.projects.getProject(projectName)]
+		: [await workspace.projects.getProject(projectName, { fuzzy: true })]
 
 	const projectDirArg = input.getOption('project-dir')
 	const migrationsDirArg = input.getOption('migrations-dir')

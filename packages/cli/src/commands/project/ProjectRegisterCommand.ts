@@ -24,7 +24,7 @@ export class ProjectRegisterCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const [projectName] = [input.getArgument('projectName')]
 		const workspace = await Workspace.get(process.cwd())
-		const project = await workspace.projects.getProject(projectName)
+		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
 		const instances = await resolveInstanceListEnvironmentFromInput({ input, workspace })
 		for (const instance of instances) {
 			await project.registerToInstance(instance)

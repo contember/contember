@@ -9,15 +9,33 @@ import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } fr
 export class ProjectManager {
 	constructor(private readonly workspace: Workspace) {}
 	public async listProjects(): Promise<Project[]> {
-		const projectMapping = await this.getProjectPathMapping()
-		const projects = await listEntriesInMapping(projectMapping)
+		const projects = await this.listProjectPaths()
 		return await Promise.all(projects.map(it => this.getProject(it)))
 	}
 
-	public async getProject(name: string): Promise<Project> {
+	public async getProject(name: string, options: { fuzzy?: boolean } = {}): Promise<Project> {
 		validateProjectName(name)
-		const projectDir = await this.getDirectory(name)
-		await this.verifyProjectExists(projectDir, name)
+		let projectDir = await this.getDirectory(name)
+		if (!(await pathExists(projectDir))) {
+			if (!options.fuzzy) {
+				throw `Project ${name} not found.`
+			}
+			const projects = await this.listProjectPaths()
+			const matcher = new RegExp(
+				'^' +
+					name
+						.split('')
+						.map(it => it.replace(/[-\\/\\\\^$*+?.()|[\\]{}]/g, '\\\\$&') + '.*')
+						.join(''),
+			)
+			const matched = projects.filter(it => it.match(matcher))
+			if (matched.length === 0) {
+				throw `Project ${name} not found.`
+			} else if (matched.length > 1) {
+				throw `Project name ${name} is ambiguous. Did you mean one of these?\n - ` + matched.join('\n - ') + '\n'
+			}
+			return this.getProject(matched[0])
+		}
 		return new Project(name, projectDir, this.workspace)
 	}
 
@@ -36,13 +54,12 @@ export class ProjectManager {
 		return getPathFromMapping(await this.getProjectPathMapping(), name)
 	}
 
-	private async getProjectPathMapping(): Promise<Record<string, string>> {
-		return resolvePathMappingConfig(this.workspace.directory, 'projects', this.workspace.config.projects)
+	private async listProjectPaths() {
+		const projectMapping = await this.getProjectPathMapping()
+		return await listEntriesInMapping(projectMapping)
 	}
 
-	private async verifyProjectExists(dir: string, name: string) {
-		if (!(await pathExists(dir))) {
-			throw `Project ${name} not found.`
-		}
+	private async getProjectPathMapping(): Promise<Record<string, string>> {
+		return resolvePathMappingConfig(this.workspace.directory, 'projects', this.workspace.config.projects)
 	}
 }

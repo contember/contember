@@ -33,7 +33,7 @@ export class Updater {
 		entity: Model.Entity,
 		by: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
-		filter?: Input.Where,
+		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		const primaryValue = await mapper.getPrimaryValue(entity, by)
 

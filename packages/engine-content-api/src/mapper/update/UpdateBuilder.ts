@@ -22,8 +22,8 @@ export class UpdateBuilder {
 
 	private rowData: ColumnValue<AbortUpdate>[] = []
 
-	private newWhere: Input.Where = {}
-	private oldWhere: Input.Where = {}
+	private newWhere: Input.OptionalWhere = {}
+	private oldWhere: Input.OptionalWhere = {}
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -44,11 +44,11 @@ export class UpdateBuilder {
 		return resolvedValue
 	}
 
-	public addNewWhere(where: Input.Where): void {
+	public addNewWhere(where: Input.OptionalWhere): void {
 		this.newWhere = { and: [where, this.newWhere] }
 	}
 
-	public addOldWhere(where: Input.Where): void {
+	public addOldWhere(where: Input.OptionalWhere): void {
 		this.oldWhere = { and: [where, this.oldWhere] }
 	}
 

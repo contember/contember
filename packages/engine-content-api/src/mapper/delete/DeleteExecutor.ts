@@ -31,7 +31,7 @@ export class DeleteExecutor {
 		mapper: Mapper,
 		entity: Model.Entity,
 		by: Input.UniqueWhere,
-		filter?: Input.Where,
+		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		const db = mapper.db
 		await db.query('SET CONSTRAINTS ALL DEFERRED')
@@ -60,7 +60,7 @@ export class DeleteExecutor {
 		}
 	}
 
-	private async delete(db: Client, entity: Model.Entity, where: Input.Where): Promise<string[]> {
+	private async delete(db: Client, entity: Model.Entity, where: Input.OptionalWhere): Promise<string[]> {
 		const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
 		const inQb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')

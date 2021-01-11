@@ -5,12 +5,16 @@ import { PredicateFactory } from './PredicateFactory'
 export class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
-	public inject(entity: Model.Entity, where: Input.Where): Input.Where {
+	public inject(entity: Model.Entity, where: Input.OptionalWhere): Input.OptionalWhere {
 		const restrictedWhere = this.injectToWhere(where, entity)
 		return this.createWhere(entity, undefined, restrictedWhere)
 	}
 
-	private createWhere(entity: Model.Entity, fieldNames: string[] | undefined, where: Input.Where): Input.Where {
+	private createWhere(
+		entity: Model.Entity,
+		fieldNames: string[] | undefined,
+		where: Input.OptionalWhere,
+	): Input.OptionalWhere {
 		const predicatesWhere: Input.Where = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames)
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
@@ -23,13 +27,13 @@ export class PredicatesInjector {
 		return { and: and }
 	}
 
-	private injectToWhere(where: Input.Where, entity: Model.Entity): Input.Where {
-		const resultWhere: Input.Where = {}
+	private injectToWhere(where: Input.OptionalWhere, entity: Model.Entity): Input.OptionalWhere {
+		const resultWhere: Input.OptionalWhere = {}
 		if (where.and) {
-			resultWhere.and = where.and.map(it => this.injectToWhere(it, entity))
+			resultWhere.and = where.and.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity))
 		}
 		if (where.or) {
-			resultWhere.or = where.or.map(it => this.injectToWhere(it, entity))
+			resultWhere.or = where.or.filter((it): it is Input.Where => !!it).map(it => this.injectToWhere(it, entity))
 		}
 		if (where.not) {
 			resultWhere.not = this.injectToWhere(where.not, entity)

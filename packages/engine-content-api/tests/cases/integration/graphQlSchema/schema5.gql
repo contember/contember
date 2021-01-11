@@ -46,8 +46,8 @@ type OneHasManyEntityMeta {
 input RootWhere {
   id: UUIDCondition
   r: OneHasManyEntityWhere
-  and: [RootWhere!]
-  or: [RootWhere!]
+  and: [RootWhere]
+  or: [RootWhere]
   not: RootWhere
 }
 
@@ -71,8 +71,8 @@ input OneHasManyEntityWhere {
   id: UUIDCondition
   a: StringCondition
   r2: RootWhere
-  and: [OneHasManyEntityWhere!]
-  or: [OneHasManyEntityWhere!]
+  and: [OneHasManyEntityWhere]
+  or: [OneHasManyEntityWhere]
   not: OneHasManyEntityWhere
 }
 

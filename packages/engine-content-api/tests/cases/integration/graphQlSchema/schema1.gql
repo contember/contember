@@ -67,8 +67,8 @@ input PostWhere {
   publishedAt: DateTimeCondition
   locales: PostLocaleWhere
   categories: CategoryWhere
-  and: [PostWhere!]
-  or: [PostWhere!]
+  and: [PostWhere]
+  or: [PostWhere]
   not: PostWhere
 }
 
@@ -76,8 +76,8 @@ input AuthorWhere {
   id: UUIDCondition
   name: StringCondition
   posts: PostWhere
-  and: [AuthorWhere!]
-  or: [AuthorWhere!]
+  and: [AuthorWhere]
+  or: [AuthorWhere]
   not: AuthorWhere
 }
 
@@ -141,8 +141,8 @@ input PostLocaleWhere {
   id: UUIDCondition
   title: StringCondition
   Post: PostWhere
-  and: [PostLocaleWhere!]
-  or: [PostLocaleWhere!]
+  and: [PostLocaleWhere]
+  or: [PostLocaleWhere]
   not: PostLocaleWhere
 }
 
@@ -150,8 +150,8 @@ input CategoryWhere {
   id: UUIDCondition
   name: StringCondition
   posts: PostWhere
-  and: [CategoryWhere!]
-  or: [CategoryWhere!]
+  and: [CategoryWhere]
+  or: [CategoryWhere]
   not: CategoryWhere
 }
 

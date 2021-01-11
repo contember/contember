@@ -55,8 +55,8 @@ input PostWhere {
   id: UUIDCondition
   publishedAt: DateTimeCondition
   locales: PostLocaleWhere
-  and: [PostWhere!]
-  or: [PostWhere!]
+  and: [PostWhere]
+  or: [PostWhere]
   not: PostWhere
 }
 
@@ -97,8 +97,8 @@ input PostLocaleWhere {
   locale: StringCondition
   title: StringCondition
   post: PostWhere
-  and: [PostLocaleWhere!]
-  or: [PostLocaleWhere!]
+  and: [PostLocaleWhere]
+  or: [PostLocaleWhere]
   not: PostLocaleWhere
 }
 

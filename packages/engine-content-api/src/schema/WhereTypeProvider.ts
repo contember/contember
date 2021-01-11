@@ -114,8 +114,8 @@ export class WhereTypeProvider {
 			} as Model.FieldVisitor<GraphQLInputFieldConfig>)
 		}
 
-		fields.and = { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(where)) }
-		fields.or = { type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(where)) }
+		fields.and = { type: this.graphqlObjectFactories.createList(where) }
+		fields.or = { type: this.graphqlObjectFactories.createList(where) }
 		fields.not = { type: where }
 
 		return fields

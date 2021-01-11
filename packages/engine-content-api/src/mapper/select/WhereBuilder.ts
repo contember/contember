@@ -18,7 +18,7 @@ export class WhereBuilder {
 		qb: SelectBuilder<SelectBuilder.Result>,
 		entity: Model.Entity,
 		path: Path,
-		where: Input.Where,
+		where: Input.OptionalWhere,
 		allowManyJoin: boolean = false,
 	) {
 		return this.buildAdvanced(entity, path, where, cb => qb.where(clause => cb(clause)), allowManyJoin)
@@ -27,7 +27,7 @@ export class WhereBuilder {
 	public buildAdvanced(
 		entity: Model.Entity,
 		path: Path,
-		where: Input.Where,
+		where: Input.OptionalWhere,
 		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<SelectBuilder.Result>,
 		allowManyJoin: boolean = false,
 	) {
@@ -44,7 +44,7 @@ export class WhereBuilder {
 		conditionBuilder: SqlConditionBuilder,
 		entity: Model.Entity,
 		path: Path,
-		where: Input.Where,
+		where: Input.OptionalWhere,
 		allowManyJoin: boolean,
 		joinList: WhereJoinDefinition[],
 	): SqlConditionBuilder {
@@ -54,7 +54,8 @@ export class WhereBuilder {
 			const expr = where.and
 			conditionBuilder = conditionBuilder.and(clause =>
 				expr.reduce(
-					(clause2, where: Input.Where) => this.buildInternal(clause2, entity, path, where, allowManyJoin, joinList),
+					(clause2, where) =>
+						!where ? clause2 : this.buildInternal(clause2, entity, path, where, allowManyJoin, joinList),
 					clause,
 				),
 			)
@@ -63,8 +64,10 @@ export class WhereBuilder {
 			const expr = where.or
 			conditionBuilder = conditionBuilder.or(clause =>
 				expr.reduce(
-					(clause2, where: Input.Where) =>
-						clause2.and(clause3 => this.buildInternal(clause3, entity, path, where, allowManyJoin, joinList)),
+					(clause2, where) =>
+						!where
+							? clause2
+							: clause2.and(clause3 => this.buildInternal(clause3, entity, path, where, allowManyJoin, joinList)),
 					clause,
 				),
 			)
@@ -215,14 +218,18 @@ export class WhereBuilder {
 		}
 		let condition: Input.Condition<never> = {}
 		if (where.and) {
-			const conditions = where.and.map(it => this.transformWhereToPrimaryCondition(it, primaryField))
+			const conditions = where.and
+				.filter((it): it is Input.Where => !!it)
+				.map(it => this.transformWhereToPrimaryCondition(it, primaryField))
 			if (conditions.includes(null)) {
 				return null
 			}
 			condition.and = conditions as Input.Condition<never>[]
 		}
 		if (where.or) {
-			const conditions = where.or.map(it => this.transformWhereToPrimaryCondition(it, primaryField))
+			const conditions = where.or
+				.filter((it): it is Input.Where => !!it)
+				.map(it => this.transformWhereToPrimaryCondition(it, primaryField))
 			if (conditions.includes(null)) {
 				return null
 			}

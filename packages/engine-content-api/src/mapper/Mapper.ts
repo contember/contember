@@ -119,7 +119,7 @@ export class Mapper {
 		return rows
 	}
 
-	public async count(entity: Model.Entity, filter: Input.Where) {
+	public async count(entity: Model.Entity, filter: Input.OptionalWhere) {
 		const path = this.pathFactory.create([])
 		const qb = SelectBuilder.create()
 			.from(entity.tableName, path.getAlias())
@@ -143,7 +143,7 @@ export class Mapper {
 		entity: Model.Entity,
 		by: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
-		filter?: Input.Where,
+		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return tryMutation(() => this.updater.update(this, entity, by, data, filter))
 	}
@@ -157,7 +157,11 @@ export class Mapper {
 		return tryMutation(() => this.updater.updateCb(this, entity, by, predicateFields, builderCb))
 	}
 
-	public async delete(entity: Model.Entity, by: Input.UniqueWhere, filter?: Input.Where): Promise<MutationResultList> {
+	public async delete(
+		entity: Model.Entity,
+		by: Input.UniqueWhere,
+		filter?: Input.OptionalWhere,
+	): Promise<MutationResultList> {
 		return tryMutation(() => this.deleteExecutor.execute(this, entity, by, filter))
 	}
 

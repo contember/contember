@@ -75,7 +75,7 @@ namespace Input {
 
 	export interface UpdateInput<E = never> {
 		by: UniqueWhere<E>
-		filter?: Where<Condition<Value.FieldValue<E>>>
+		filter?: OptionalWhere<E>
 		data: UpdateDataInput<E>
 	}
 
@@ -85,23 +85,23 @@ namespace Input {
 
 	export interface DeleteInput<E = never> {
 		by: UniqueWhere<E>
-		filter?: Where<Condition<Value.FieldValue<E>>>
+		filter?: OptionalWhere<E>
 	}
 
 	export interface UniqueQueryInput<E = never> {
 		by: UniqueWhere<E>
-		filter?: Where<Condition<Value.FieldValue<E>>>
+		filter?: OptionalWhere<E>
 	}
 
 	export interface ListQueryInput<E = never> {
-		filter?: Where<Condition<Value.FieldValue<E>>>
+		filter?: OptionalWhere<E>
 		orderBy?: OrderBy[]
 		offset?: number
 		limit?: number
 	}
 
 	export interface SelectQueryInput<E = never> {
-		filter?: Where<Condition<Value.FieldValue<E>>>
+		filter?: OptionalWhere<E>
 		orderBy?: OrderBy[]
 		skip?: number
 		first?: number
@@ -169,17 +169,19 @@ namespace Input {
 		[field: string]: Value.PrimaryValue<E> | UniqueWhere<E>
 	}
 
-	export type ComposedWhere<C> = {
-		and?: Where<C>[]
-		or?: Where<C>[]
-		not?: Where<C>
+	export type ComposedWhere<C, Opt> = {
+		and?: (Where<C, Opt> | Opt)[]
+		or?: (Where<C, Opt> | Opt)[]
+		not?: Where<C, Opt>
 	}
 
-	export interface FieldWhere<C = Condition> {
-		[name: string]: C | Where<C> | undefined | Where<C>[] //last one if for ComposedWhere
+	export interface FieldWhere<C, Opt> {
+		[name: string]: C | Where<C, Opt> | undefined | Where<C, Opt>[] //last one if for ComposedWhere
 	}
 
-	export type Where<C = Condition> = ComposedWhere<C> & FieldWhere<C>
+	export type Where<C = Condition, Opt = never> = ComposedWhere<C, Opt> & FieldWhere<C, Opt>
+
+	export type OptionalWhere<E = never> = Where<Condition<Value.FieldValue<E>>, null | undefined>
 
 	export enum FieldMeta {
 		readable = 'readable',

@@ -8,17 +8,9 @@ import { Authorizator } from '../acl'
 import { OrderByTypeProvider } from './OrderByTypeProvider'
 import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
-import { aliasAwareResolver, GqlTypeName } from './utils'
 import { ImplementationException } from '../exception'
 
 export class QueryProvider {
-	private PageInfo = this.graphqlObjectFactories.createObjectType({
-		name: 'PageInfo',
-		fields: {
-			totalCount: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.int) },
-		},
-	})
-
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
@@ -107,36 +99,8 @@ export class QueryProvider {
 	private getPaginationQuery(entityName: string): GraphQLFieldConfig<any, Context, Input.ListQueryInput> {
 		const entity = getEntity(this.schema, entityName)
 
-		const entityType = this.entityTypeProvider.getEntity(entityName)
 		return {
-			type: this.graphqlObjectFactories.createNotNull(
-				this.graphqlObjectFactories.createObjectType({
-					name: GqlTypeName`${entityName}Connection`,
-					fields: {
-						pageInfo: {
-							type: this.graphqlObjectFactories.createNotNull(this.PageInfo),
-						},
-						edges: {
-							type: this.graphqlObjectFactories.createNotNull(
-								this.graphqlObjectFactories.createList(
-									this.graphqlObjectFactories.createNotNull(
-										this.graphqlObjectFactories.createObjectType({
-											name: GqlTypeName`${entityName}Edge`,
-											fields: {
-												node: {
-													type: this.graphqlObjectFactories.createNotNull(entityType),
-													resolve: aliasAwareResolver,
-												},
-											},
-										}),
-									),
-								),
-							),
-							resolve: aliasAwareResolver,
-						},
-					},
-				}),
-			),
+			type: this.graphqlObjectFactories.createNotNull(this.entityTypeProvider.getConnection(entityName)),
 
 			args: {
 				filter: { type: this.whereTypeProvider.getEntityWhereType(entityName) },

@@ -15,6 +15,13 @@ import { ImplementationException } from '../exception'
 
 export class EntityTypeProvider {
 	private entities = singletonFactory(name => this.createEntity(name))
+	private connections = singletonFactory(name => this.createConnection(name))
+	private PageInfo = this.graphqlObjectFactories.createObjectType({
+		name: 'PageInfo',
+		fields: {
+			totalCount: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.int) },
+		},
+	})
 
 	private fieldMeta = this.graphqlObjectFactories.createObjectType({
 		name: 'FieldMeta',
@@ -39,6 +46,13 @@ export class EntityTypeProvider {
 			throw new ImplementationException()
 		}
 		return this.entities(entityName)
+	}
+
+	public getConnection(entityName: string): GraphQLObjectType {
+		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
+			throw new ImplementationException()
+		}
+		return this.connections(entityName)
 	}
 
 	private createEntity(entityName: string) {
@@ -107,5 +121,35 @@ export class EntityTypeProvider {
 					.reduce((result, [name, value]) => ({ ...result, [name]: value }), {}),
 			)
 			.reduce((result, providerFields) => ({ ...result, ...providerFields }), fields)
+	}
+
+	private createConnection(entityName: string) {
+		const entityType = this.getEntity(entityName)
+		return this.graphqlObjectFactories.createObjectType({
+			name: GqlTypeName`${entityName}Connection`,
+			fields: {
+				pageInfo: {
+					type: this.graphqlObjectFactories.createNotNull(this.PageInfo),
+				},
+				edges: {
+					type: this.graphqlObjectFactories.createNotNull(
+						this.graphqlObjectFactories.createList(
+							this.graphqlObjectFactories.createNotNull(
+								this.graphqlObjectFactories.createObjectType({
+									name: GqlTypeName`${entityName}Edge`,
+									fields: {
+										node: {
+											type: this.graphqlObjectFactories.createNotNull(entityType),
+											resolve: aliasAwareResolver,
+										},
+									},
+								}),
+							),
+						),
+					),
+					resolve: aliasAwareResolver,
+				},
+			},
+		})
 	}
 }

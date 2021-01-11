@@ -1,46 +1,28 @@
 import { assertNever, Command, CommandConfiguration, Input } from '../../cli'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import {
-	createMigrationStatusTable,
-	findMigration,
-	getMigrationsStatus,
-	MigrationState,
-	printMigrationDescription,
-} from '../../utils/migrations'
-import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { interactiveResolveApiToken } from '../../utils/tenant'
-import { SystemClient } from '../../utils/system'
-import prompts from 'prompts'
 import { Workspace } from '../../utils/Workspace'
+import {
+	configureExecuteMigrationCommand,
+	ExecuteMigrationOptions,
+	executeMigrations,
+	resolveMigrationStatus,
+} from './MigrationExecuteHelper'
+import { resolveSystemApiClient } from './SystemApiClientResolver'
+import { createMigrationStatusTable, findMigration, MigrationState } from '../../utils/migrations'
 
 type Args = {
 	project: string
 	migration?: string
 }
 
-type Options = {
-	instance?: string
-	['remote-project']?: string
-	yes?: true
-}
+type Options = ExecuteMigrationOptions
 
 export class MigrationExecuteCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Executes migrations on an instance')
 		configuration.argument('project')
 		configuration.argument('migration').optional()
-		configuration //
-			.option('instance')
-			.valueRequired()
-			.description('Local instance name or remote Contember API URL')
-		configuration //
-			.option('remote-project')
-			.valueRequired()
-			.description('Specify this when remote project name does not match local project name.')
-		configuration //
-			.option('yes')
-			.valueNone()
-			.description('Do not ask for confirmation.')
+		configureExecuteMigrationCommand(configuration)
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
@@ -50,16 +32,13 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
 		const migrationsDir = await project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
-
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input.getOption('instance'))
-		const apiToken = await interactiveResolveApiToken({ instance })
-		const remoteProject = input.getOption('remote-project') || projectName
-		const client = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
-
-		const executedMigrations = await client.listExecutedMigrations()
-		const localMigrations = await container.migrationsResolver.getMigrations()
-		const status = getMigrationsStatus(executedMigrations, localMigrations)
 		const migrationArg = input.getArgument('migration')
+		const client = await resolveSystemApiClient(workspace, project, input)
+		const status = await resolveMigrationStatus(client, container.migrationsResolver)
+		if (status.errorMigrations.length > 0) {
+			console.error(createMigrationStatusTable(status.errorMigrations))
+			throw `Cannot execute migrations`
+		}
 
 		const migrations = (() => {
 			if (migrationArg) {
@@ -80,10 +59,6 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 						assertNever(migration)
 				}
 			} else {
-				if (status.errorMigrations.length > 0) {
-					console.error(createMigrationStatusTable(status.errorMigrations))
-					throw `Cannot execute migrations`
-				}
 				return status.migrationsToExecute
 			}
 		})()
@@ -91,44 +66,13 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 			console.log('No migrations to execute')
 			return 0
 		}
-		console.log('Will execute following migrations:')
-		migrations.forEach(it => console.error(it.name))
-		if (!input.getOption('yes')) {
-			if (!process.stdin.isTTY) {
-				throw 'TTY not available. Pass --yes option to confirm execution.'
-			}
-			do {
-				const { action } = await prompts({
-					type: 'select',
-					name: 'action',
-					message: 'Do you want to continue?',
-					choices: [
-						{ value: 'yes', title: 'Execute migrations' },
-						{ value: 'describe', title: 'Describe migrations' },
-						{ value: 'no', title: 'Abort' },
-					],
-				})
-				if (action === 'describe') {
-					const schema = await container.schemaVersionBuilder.buildSchemaUntil(migrations[0].version)
-					for (const migration of migrations) {
-						await printMigrationDescription(container.migrationsDescriber, schema, migration.localMigration, {
-							noSql: true,
-						})
-					}
-				} else if (action === 'yes') {
-					break
-				} else {
-					return 1
-				}
-			} while (true)
-		}
 
-		const result = await client.migrate(migrations.map(it => it.localMigration))
-		if (result.ok) {
-			console.log('Migration executed')
-			return 0
-		}
-		console.error(result.errors)
-		return 1
+		return await executeMigrations({
+			migrationDescriber: container.migrationDescriber,
+			schemaVersionBuilder: container.schemaVersionBuilder,
+			client,
+			migrations,
+			requireConfirmation: !input.getOption('yes'),
+		})
 	}
 }

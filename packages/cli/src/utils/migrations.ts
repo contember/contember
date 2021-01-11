@@ -75,7 +75,7 @@ export enum MigrationState {
 	EXECUTED_MISSING = 'executed_missing',
 }
 
-interface MigrationToExecuteOkStatus extends MigrationInfo {
+export interface MigrationToExecuteOkStatus extends MigrationInfo {
 	state: MigrationState.TO_EXECUTE_OK
 	localMigration: Migration
 }

@@ -12,7 +12,7 @@ import {
 
 export interface MigrationsContainer {
 	migrationCreator: MigrationCreator
-	migrationsDescriber: MigrationDescriber
+	migrationDescriber: MigrationDescriber
 	schemaVersionBuilder: SchemaVersionBuilder
 	schemaDiffer: SchemaDiffer
 	migrationsResolver: MigrationsResolver
@@ -43,13 +43,13 @@ export class MigrationsContainerFactory {
 					new MigrationCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer),
 			)
 			.addService(
-				'migrationsDescriber',
+				'migrationDescriber',
 				({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory),
 			)
 			.build()
 			.pick(
 				'migrationCreator',
-				'migrationsDescriber',
+				'migrationDescriber',
 				'schemaVersionBuilder',
 				'schemaDiffer',
 				'migrationsResolver',

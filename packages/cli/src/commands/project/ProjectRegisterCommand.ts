@@ -3,7 +3,7 @@ import { resolveInstanceListEnvironmentFromInput } from '../../utils/instance'
 import { Workspace } from '../../utils/Workspace'
 
 type Args = {
-	projectName: string
+	project: string
 }
 
 type Options = {
@@ -15,14 +15,14 @@ type Options = {
 export class ProjectRegisterCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Registers a project to an instance')
-		configuration.argument('projectName')
+		configuration.argument('project')
 		configuration.option('instance').valueArray()
 		configuration.option('all-instances').valueNone()
 		configuration.option('no-instance').valueNone()
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const [projectName] = [input.getArgument('projectName')]
+		const [projectName] = [input.getArgument('project')]
 		const workspace = await Workspace.get(process.cwd())
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
 		const instances = await resolveInstanceListEnvironmentFromInput({ input, workspace })
@@ -31,7 +31,7 @@ export class ProjectRegisterCommand extends Command<Args, Options> {
 		}
 
 		console.log(
-			`Project ${projectName} registered into following instances: ${instances.map(it => it.name).join(', ')}`,
+			`Project ${project.name} registered into following instances: ${instances.map(it => it.name).join(', ')}`,
 		)
 	}
 }

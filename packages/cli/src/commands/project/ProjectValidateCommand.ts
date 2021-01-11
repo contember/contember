@@ -8,7 +8,7 @@ import { SchemaUpdateError } from '@contember/schema-migrations/dist/src/modific
 import { Workspace } from '../../utils/Workspace'
 
 type Args = {
-	projectName: string
+	project: string
 }
 
 type Options = {}
@@ -16,11 +16,11 @@ type Options = {}
 export class ProjectValidateCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Validates project schema')
-		configuration.argument('projectName')
+		configuration.argument('project')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
-		const [projectName] = [input.getArgument('projectName')]
+		const [projectName] = [input.getArgument('project')]
 		const workspace = await Workspace.get(process.cwd())
 
 		const allProjects = projectName === '.'
@@ -41,7 +41,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 			for (const migration of await container.migrationsResolver.getMigrations()) {
 				try {
 					// just a check that it does not fail
-					await container.migrationsDescriber.describeModifications(migratedSchema, migration)
+					await container.migrationDescriber.describeModifications(migratedSchema, migration)
 
 					migratedSchema = container.schemaMigrator.applyModifications(
 						migratedSchema,
@@ -78,7 +78,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 			if (projectValid) {
 				console.log('Project schema is valid')
 			} else {
-				invalidProjects.push(projectName)
+				invalidProjects.push(project.name)
 			}
 			console.groupEnd()
 			valid = valid && projectValid

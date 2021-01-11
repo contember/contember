@@ -75,6 +75,6 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 		const schema = await container.schemaVersionBuilder.buildSchemaUntil(migration.version)
 		const sqlOnly = input.getOption('sql-only')
 		const noSql = input.getOption('no-sql')
-		await printMigrationDescription(container.migrationsDescriber, schema, migration, { sqlOnly, noSql })
+		await printMigrationDescription(container.migrationDescriber, schema, migration, { sqlOnly, noSql })
 	}
 }

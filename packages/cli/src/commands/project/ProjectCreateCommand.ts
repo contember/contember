@@ -4,7 +4,7 @@ import { validateProjectName } from '../../utils/Project'
 import { Workspace } from '../../utils/Workspace'
 
 type Args = {
-	projectName: string
+	project: string
 }
 
 type Options = {
@@ -17,7 +17,7 @@ type Options = {
 export class ProjectCreateCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Creates a new Contember project')
-		configuration.argument('projectName')
+		configuration.argument('project')
 		configuration.option('instance').valueArray()
 		configuration.option('all-instances').valueNone()
 		configuration.option('no-instance').valueNone()
@@ -25,7 +25,7 @@ export class ProjectCreateCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-		const [projectName] = [input.getArgument('projectName')]
+		const [projectName] = [input.getArgument('project')]
 		validateProjectName(projectName)
 		const workspace = await Workspace.get(process.cwd())
 

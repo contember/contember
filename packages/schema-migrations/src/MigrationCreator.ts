@@ -15,16 +15,16 @@ export class MigrationCreator {
 
 	async createEmpty(migrationName: string): Promise<string> {
 		await this.migrationFilesManager.createDirIfNotExist()
-		const jsonDiff = MigrationCreator.createContent([])
+		const migration = this.createMigration([], migrationName)
+		const jsonDiff = MigrationCreator.createContent(migration)
 
-		const version = MigrationVersionHelper.createVersion(migrationName)
-		return await this.migrationFilesManager.createFile(jsonDiff, version, 'json')
+		return await this.migrationFilesManager.createFile(jsonDiff, migration.version, 'json')
 	}
 
-	async createDiff(
+	async prepareDiff(
 		newSchema: Schema,
 		migrationName: string,
-	): Promise<{ migration: Migration; filename: string; initialSchema: Schema } | null> {
+	): Promise<{ migration: Migration; initialSchema: Schema } | null> {
 		await this.migrationFilesManager.createDirIfNotExist()
 
 		const initialSchema = await this.schemaVersionBuilder.buildSchema()
@@ -34,15 +34,23 @@ export class MigrationCreator {
 			return null
 		}
 
-		const jsonDiff = MigrationCreator.createContent(modifications)
-		const version = MigrationVersionHelper.createVersion(migrationName)
-		const migration: Migration = { formatVersion: VERSION_LATEST, modifications, version, name: migrationName }
+		const migration = this.createMigration(modifications, migrationName)
 
-		const filename = await this.migrationFilesManager.createFile(jsonDiff, version, 'json')
-		return { filename, initialSchema, migration }
+		return { initialSchema, migration }
 	}
 
-	public static createContent(modifications: Migration.Modification[]): string {
-		return JSON.stringify({ formatVersion: VERSION_LATEST, modifications }, undefined, '\t') + '\n'
+	async saveDiff(migration: Migration): Promise<string> {
+		const jsonDiff = MigrationCreator.createContent(migration)
+		const filename = await this.migrationFilesManager.createFile(jsonDiff, migration.version, 'json')
+		return filename
+	}
+
+	private createMigration(modifications: Migration.Modification[], name: string): Migration {
+		const version = MigrationVersionHelper.createVersion(name)
+		return { formatVersion: VERSION_LATEST, modifications, version, name }
+	}
+
+	public static createContent({ modifications, formatVersion }: Migration): string {
+		return JSON.stringify({ formatVersion, modifications }, undefined, '\t') + '\n'
 	}
 }

@@ -1,8 +1,8 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateMigrationHelper'
+import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper'
 
 type Args = {
-	projectName: string
+	project: string
 	migrationName: string
 }
 
@@ -18,7 +18,7 @@ export class MigrationCreateCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
-		return await executeCreateMigrationCommand(input, async ({ projectDir, migrationName, migrationCreator }) => {
+		return await executeCreateMigrationCommand(input, async ({ migrationName, migrationCreator }) => {
 			const result = await migrationCreator.createEmpty(migrationName)
 			console.log(`${result} created`)
 			return 0

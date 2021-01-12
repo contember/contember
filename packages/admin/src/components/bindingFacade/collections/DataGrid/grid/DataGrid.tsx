@@ -1,12 +1,14 @@
 import { Component, useBindingOperations } from '@contember/binding'
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
+import { DataGridOrderBys } from '../base'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
 import { DataGridState } from './DataGridState'
 import { normalizeInitialFilters } from './normalizeInitialFilters'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
 import { renderGrid, RenderGridOptions } from './renderGrid'
+import { useOrderBys } from './useOrderBys'
 
 export interface DataGridProps {
 	entityName: string
@@ -25,13 +27,15 @@ export const DataGrid = Component<DataGridProps>(
 		const [pageState, updatePaging] = useGridPagingState({
 			itemsPerPage: props.itemsPerPage ?? null,
 		})
+		const [orderBys, setOrderBy] = useOrderBys(columns, updatePaging)
+
 		const gridOptions = React.useMemo(
 			(): RenderGridOptions => ({
 				entityName: props.entityName,
 				updatePaging,
-				setOrderBy: noop,
+				setOrderBy,
 			}),
-			[props.entityName, updatePaging],
+			[props.entityName, updatePaging, setOrderBy],
 		)
 
 		const loadAbortControllerRef = React.useRef<AbortController | undefined>(undefined)
@@ -41,9 +45,9 @@ export const DataGrid = Component<DataGridProps>(
 				paging: pageState,
 				columns,
 				filters: new Map(),
-				orderBys: new Map(),
+				orderBys,
 			}),
-			[columns, pageState],
+			[orderBys, pageState, columns],
 		)
 
 		const [displayedState, setDisplayedState] = React.useState(desiredState)

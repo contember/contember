@@ -4,7 +4,7 @@ export const normalizeInitialFilters = (columns: DataGridColumns): DataGridFilte
 	const filters: DataGridFilters = new Map()
 
 	for (const [i, value] of columns) {
-		if (value.enableFiltering) {
+		if (value.enableFiltering !== false && value.initialFilter) {
 			filters.set(i, value.initialFilter)
 		}
 	}

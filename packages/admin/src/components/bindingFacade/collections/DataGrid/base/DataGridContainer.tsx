@@ -4,8 +4,8 @@ import * as React from 'react'
 import { DataGridState } from '../grid/DataGridState'
 import { GridPagingAction } from '../paging'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
+import { getOrderDirection } from './DataGridOrderDirection'
 import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
-import { getOrderDirection } from './getOrderDirection'
 
 export interface DataGridContainerOwnProps {
 	dataGridState: DataGridState

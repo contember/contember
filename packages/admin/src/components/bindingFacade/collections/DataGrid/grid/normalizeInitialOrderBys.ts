@@ -4,7 +4,7 @@ export const normalizeInitialOrderBys = (columns: DataGridColumns): DataGridOrde
 	const orderBys: DataGridOrderBys = new Map()
 
 	for (const [i, value] of columns) {
-		if (value.enableOrdering) {
+		if (value.enableOrdering !== false && value.initialOrder) {
 			orderBys.set(i, value.initialOrder)
 		}
 	}

@@ -1,6 +1,6 @@
 import { EntityListSubTree } from '@contember/binding'
 import * as React from 'react'
-import { DataGridContainer, DataGridContainerOwnProps, DataGridSetColumnOrderBy } from '../base'
+import { DataGridContainer, DataGridSetColumnOrderBy } from '../base'
 import { GridPagingAction } from '../paging'
 import { collectFilters } from './collectFilters'
 import { collectOrderBys } from './collectOrderBys'

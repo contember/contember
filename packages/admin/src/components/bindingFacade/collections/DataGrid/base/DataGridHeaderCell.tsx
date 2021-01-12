@@ -1,6 +1,6 @@
-import { CrudQueryBuilder } from '@contember/client'
 import { Button, Icon } from '@contember/ui'
 import * as React from 'react'
+import { DataGridOrderDirection, toggleOrderDirection } from './DataGridOrderDirection'
 import { DataGridSetOrderBy } from './DataGridSetOrderBy'
 import { SingleColumnOrderBy } from './SingleColumnOrderBy'
 
@@ -13,7 +13,7 @@ export interface DataGridHeaderCellPublicProps {
 
 export interface DataGridHeaderCellInternalProps {
 	orderBy: SingleColumnOrderBy | undefined
-	orderDirection: CrudQueryBuilder.OrderDirection | undefined
+	orderDirection: DataGridOrderDirection
 	setOrderBy: DataGridSetOrderBy
 }
 
@@ -22,14 +22,19 @@ export interface DataGridHeaderCellProps extends DataGridHeaderCellInternalProps
 export function DataGridHeaderCell(props: DataGridHeaderCellProps): React.ReactElement {
 	return (
 		<th scope="col">
-			<Button distinction="seamless" flow="block" intent="dark" onClick={() => props.setOrderBy()}>
+			<Button
+				distinction="seamless"
+				flow="block"
+				intent="dark"
+				onClick={() => props.setOrderBy(toggleOrderDirection(props.orderDirection))}
+			>
 				{props.children}
 				&nbsp;
 				{props.orderDirection &&
 					{
 						asc: props.ascOrderIcon ?? defaultAscIcon,
 						desc: props.descOrderIcon ?? defaultDescIcon,
-					}[props.orderDirection.value]}
+					}[props.orderDirection]}
 			</Button>
 		</th>
 	)

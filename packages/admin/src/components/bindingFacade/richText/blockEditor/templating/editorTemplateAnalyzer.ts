@@ -20,5 +20,3 @@ const catchAllJSXLeaf = new Leaf(node => new BoxedCatchAllJSX(node))
 export const editorTemplateAnalyzer = new ChildrenAnalyzer<
 	/*BoxedTextFieldProps |*/ BoxedContentOutletProps | BoxedCatchAllJSX
 >([/*textFieldLeaf,*/ outletLeaf, catchAllJSXLeaf])
-
-const x = editorTemplateAnalyzer.processChildren(123, undefined)

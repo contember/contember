@@ -5,8 +5,9 @@ import { DataGridColumn, DataGridColumnProps } from '../base'
 export type TextCellProps = Omit<DataGridColumnProps, 'children'> & SugaredRelativeSingleField
 
 export const TextCell = Component<TextCellProps>(
+	props => <Field {...props} />,
 	props => (
-		<DataGridColumn>
+		<DataGridColumn {...(props as any)}>
 			<Field {...props} />
 		</DataGridColumn>
 	),

@@ -1,11 +1,12 @@
 import { Component, useBindingOperations } from '@contember/binding'
+import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
 import { DataGridState } from './DataGridState'
 import { normalizeInitialFilters } from './normalizeInitialFilters'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
-import { renderGrid } from './renderGrid'
+import { renderGrid, RenderGridOptions } from './renderGrid'
 
 export interface DataGridProps {
 	entityName: string
@@ -16,7 +17,7 @@ export interface DataGridProps {
 
 export const DataGrid = Component<DataGridProps>(
 	props => {
-		const { hasSubTree, extendTree } = useBindingOperations()
+		const { extendTree } = useBindingOperations()
 		const isMountedRef = React.useRef(true)
 
 		const columns = React.useMemo(() => extractDataGridColumns(props.children), [props.children])
@@ -24,6 +25,14 @@ export const DataGrid = Component<DataGridProps>(
 		const [pageState, updatePaging] = useGridPagingState({
 			itemsPerPage: props.itemsPerPage ?? null,
 		})
+		const gridOptions = React.useMemo(
+			(): RenderGridOptions => ({
+				entityName: props.entityName,
+				updatePaging,
+				setOrderBy: noop,
+			}),
+			[props.entityName, updatePaging],
+		)
 
 		const loadAbortControllerRef = React.useRef<AbortController | undefined>(undefined)
 
@@ -50,7 +59,7 @@ export const DataGrid = Component<DataGridProps>(
 				loadAbortControllerRef.current = newController
 
 				try {
-					await extendTree(renderGrid(props.entityName, desiredState), {
+					await extendTree(renderGrid(gridOptions, desiredState), {
 						signal: newController.signal,
 					})
 				} catch {
@@ -62,22 +71,29 @@ export const DataGrid = Component<DataGridProps>(
 				setDisplayedState(desiredState)
 			}
 			extend()
-		}, [desiredState, displayedState, extendTree, props.entityName])
+		}, [desiredState, displayedState, extendTree, gridOptions])
 
-		return renderGrid(props.entityName, displayedState)
+		return renderGrid(gridOptions, displayedState)
 	},
 	props => {
 		const columns = extractDataGridColumns(props.children)
 
-		return renderGrid(props.entityName, {
-			columns,
-			paging: {
-				itemsPerPage: props.itemsPerPage ?? null,
-				pageIndex: 0,
+		return renderGrid(
+			{
+				entityName: props.entityName,
+				updatePaging: noop,
+				setOrderBy: noop,
 			},
-			filters: normalizeInitialFilters(columns),
-			orderBys: normalizeInitialOrderBys(columns),
-		})
+			{
+				columns,
+				paging: {
+					itemsPerPage: props.itemsPerPage ?? null,
+					pageIndex: 0,
+				},
+				filters: normalizeInitialFilters(columns),
+				orderBys: normalizeInitialOrderBys(columns),
+			},
+		)
 	},
 	'DataGrid',
 )

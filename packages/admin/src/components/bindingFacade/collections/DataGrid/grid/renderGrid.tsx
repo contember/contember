@@ -1,13 +1,27 @@
 import { EntityListSubTree } from '@contember/binding'
 import * as React from 'react'
+import { DataGridContainer, DataGridContainerOwnProps, DataGridSetColumnOrderBy } from '../base'
+import { GridPagingAction } from '../paging'
 import { collectFilters } from './collectFilters'
 import { collectOrderBys } from './collectOrderBys'
 import { DataGridState } from './DataGridState'
 
+export interface RenderGridOptions {
+	entityName: string
+	setOrderBy: DataGridSetColumnOrderBy
+	updatePaging: (action: GridPagingAction) => void
+}
+
 export const renderGrid = (
-	entityName: string,
-	{ paging: { pageIndex, itemsPerPage }, filters, orderBys, columns }: DataGridState,
+	{ entityName, setOrderBy, updatePaging }: RenderGridOptions,
+	dataGridState: DataGridState,
 ): React.ReactElement => {
+	const {
+		paging: { pageIndex, itemsPerPage },
+		filters,
+		orderBys,
+		columns,
+	} = dataGridState
 	return (
 		<EntityListSubTree
 			entities={{
@@ -17,6 +31,12 @@ export const renderGrid = (
 			offset={itemsPerPage === null ? undefined : itemsPerPage * pageIndex}
 			limit={itemsPerPage === null ? undefined : itemsPerPage}
 			orderBy={collectOrderBys(orderBys)}
+			listComponent={DataGridContainer}
+			listProps={{
+				dataGridState,
+				setOrderBy,
+				updatePaging,
+			}}
 		>
 			{Array.from(columns, ([key, props]) => (
 				<React.Fragment key={key}>

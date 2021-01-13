@@ -1,7 +1,6 @@
-import { Component, useBindingOperations } from '@contember/binding'
+import { Component, SugaredQualifiedEntityList, useBindingOperations, useEnvironment } from '@contember/binding'
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
-import { DataGridOrderBys } from '../base'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
 import { DataGridState } from './DataGridState'
@@ -11,7 +10,7 @@ import { renderGrid, RenderGridOptions } from './renderGrid'
 import { useOrderBys } from './useOrderBys'
 
 export interface DataGridProps {
-	entityName: string
+	entities: SugaredQualifiedEntityList['entities']
 	children: React.ReactNode
 
 	itemsPerPage?: number | null
@@ -21,6 +20,7 @@ export const DataGrid = Component<DataGridProps>(
 	props => {
 		const { extendTree } = useBindingOperations()
 		const isMountedRef = React.useRef(true)
+		const environment = useEnvironment()
 
 		const columns = React.useMemo(() => extractDataGridColumns(props.children), [props.children])
 
@@ -31,11 +31,11 @@ export const DataGrid = Component<DataGridProps>(
 
 		const gridOptions = React.useMemo(
 			(): RenderGridOptions => ({
-				entityName: props.entityName,
+				entities: props.entities,
 				updatePaging,
 				setOrderBy,
 			}),
-			[props.entityName, updatePaging, setOrderBy],
+			[props.entities, updatePaging, setOrderBy],
 		)
 
 		const loadAbortControllerRef = React.useRef<AbortController | undefined>(undefined)
@@ -63,7 +63,7 @@ export const DataGrid = Component<DataGridProps>(
 				loadAbortControllerRef.current = newController
 
 				try {
-					await extendTree(renderGrid(gridOptions, desiredState), {
+					await extendTree(renderGrid(gridOptions, desiredState, environment), {
 						signal: newController.signal,
 					})
 				} catch {
@@ -75,16 +75,16 @@ export const DataGrid = Component<DataGridProps>(
 				setDisplayedState(desiredState)
 			}
 			extend()
-		}, [desiredState, displayedState, extendTree, gridOptions])
+		}, [desiredState, displayedState, environment, extendTree, gridOptions])
 
-		return renderGrid(gridOptions, displayedState)
+		return renderGrid(gridOptions, displayedState, environment)
 	},
-	props => {
+	(props, environment) => {
 		const columns = extractDataGridColumns(props.children)
 
 		return renderGrid(
 			{
-				entityName: props.entityName,
+				entities: props.entities,
 				updatePaging: noop,
 				setOrderBy: noop,
 			},
@@ -97,6 +97,7 @@ export const DataGrid = Component<DataGridProps>(
 				filters: normalizeInitialFilters(columns),
 				orderBys: normalizeInitialOrderBys(columns),
 			},
+			environment,
 		)
 	},
 	'DataGrid',

@@ -1,4 +1,4 @@
-import { EntityListSubTree } from '@contember/binding'
+import { EntityListSubTree, Environment, QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
 import * as React from 'react'
 import { DataGridContainer, DataGridSetColumnOrderBy } from '../base'
 import { GridPagingAction } from '../paging'
@@ -7,14 +7,15 @@ import { collectOrderBys } from './collectOrderBys'
 import { DataGridState } from './DataGridState'
 
 export interface RenderGridOptions {
-	entityName: string
+	entities: SugaredQualifiedEntityList['entities']
 	setOrderBy: DataGridSetColumnOrderBy
 	updatePaging: (action: GridPagingAction) => void
 }
 
 export const renderGrid = (
-	{ entityName, setOrderBy, updatePaging }: RenderGridOptions,
+	{ entities, setOrderBy, updatePaging }: RenderGridOptions,
 	dataGridState: DataGridState,
+	environment: Environment,
 ): React.ReactElement => {
 	const {
 		paging: { pageIndex, itemsPerPage },
@@ -22,11 +23,17 @@ export const renderGrid = (
 		orderBys,
 		columns,
 	} = dataGridState
+	const desugared = QueryLanguage.desugarQualifiedEntityList({ entities }, environment)
+	const columnFilters = collectFilters(filters)
+
 	return (
 		<EntityListSubTree
 			entities={{
-				entityName,
-				filter: collectFilters(filters),
+				...desugared,
+				filter:
+					desugared.filter && columnFilters
+						? { and: [desugared.filter, columnFilters] }
+						: desugared.filter ?? columnFilters,
 			}}
 			offset={itemsPerPage === null ? undefined : itemsPerPage * pageIndex}
 			limit={itemsPerPage === null ? undefined : itemsPerPage}

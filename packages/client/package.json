@@ -9,6 +9,6 @@
 		"test": "jest dist/tests/bundle.spec.js"
 	},
 	"dependencies": {
-		"@contember/schema": "0.8.3"
+		"@contember/schema": "^0.9.2"
 	}
 }

@@ -1,4 +1,4 @@
-import { Button, Icon } from '@contember/ui'
+import { Icon, TableHeaderCell } from '@contember/ui'
 import * as React from 'react'
 import { DataGridOrderDirection, toggleOrderDirection } from './DataGridOrderDirection'
 import { DataGridSetOrderBy } from './DataGridSetOrderBy'
@@ -21,24 +21,17 @@ export interface DataGridHeaderCellProps extends DataGridHeaderCellInternalProps
 
 export function DataGridHeaderCell(props: DataGridHeaderCellProps): React.ReactElement {
 	return (
-		<th scope="col">
-			<Button
-				distinction="seamless"
-				flow="block"
-				intent="dark"
-				onClick={() => props.setOrderBy(toggleOrderDirection(props.orderDirection))}
-			>
-				{props.children}
-				&nbsp;
-				{props.orderDirection &&
-					{
-						asc: props.ascOrderIcon ?? defaultAscIcon,
-						desc: props.descOrderIcon ?? defaultDescIcon,
-					}[props.orderDirection]}
-			</Button>
-		</th>
+		<TableHeaderCell scope="col" onClick={() => props.setOrderBy(toggleOrderDirection(props.orderDirection))}>
+			{props.children}
+			&nbsp;
+			{props.orderDirection &&
+				{
+					asc: props.ascOrderIcon ?? defaultAscIcon,
+					desc: props.descOrderIcon ?? defaultDescIcon,
+				}[props.orderDirection]}
+		</TableHeaderCell>
 	)
 }
 
-const defaultAscIcon = <Icon blueprintIcon="sort-asc" size="small" />
-const defaultDescIcon = <Icon blueprintIcon="sort-desc" size="small" />
+const defaultAscIcon = <Icon blueprintIcon="caret-up" size="small" alignWithLowercase />
+const defaultDescIcon = <Icon blueprintIcon="caret-down" size="small" alignWithLowercase />

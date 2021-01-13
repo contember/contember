@@ -1,5 +1,5 @@
 import { Component, Entity, EntityListBaseProps } from '@contember/binding'
-import { Button, ButtonList } from '@contember/ui'
+import { Button, ButtonList, Table, TableCell, TableRow } from '@contember/ui'
 import * as React from 'react'
 import { DataGridState } from '../grid/DataGridState'
 import { GridPagingAction } from '../paging'
@@ -30,9 +30,9 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 	}) => {
 		return (
 			<div>
-				<table>
+				<Table>
 					<thead>
-						<tr>
+						<TableRow>
 							{Array.from(columns, ([columnKey, column]) => {
 								const orderBy = orderBys.get(columnKey)
 								return (
@@ -48,7 +48,7 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 									</DataGridHeaderCell>
 								)
 							})}
-						</tr>
+						</TableRow>
 					</thead>
 					<tbody>
 						{Array.from(accessor, entity => (
@@ -58,15 +58,15 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 								//entityComponent={}
 								//entityProps={}
 							>
-								<tr>
+								<TableRow>
 									{Array.from(columns, ([columnKey, column]) => (
-										<td key={columnKey}>{column.children}</td>
+										<TableCell key={columnKey}>{column.children}</TableCell>
 									))}
-								</tr>
+								</TableRow>
 							</Entity>
 						))}
 					</tbody>
-				</table>
+				</Table>
 				<ButtonList>
 					{pageIndex > 1 && <Button onClick={() => updatePaging({ type: 'goToFirstPage' })}>First</Button>}
 					{pageIndex > 0 && <Button onClick={() => updatePaging({ type: 'goToPreviousPage' })}>Previous</Button>}

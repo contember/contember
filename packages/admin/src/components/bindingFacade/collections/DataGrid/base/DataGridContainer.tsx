@@ -5,10 +5,12 @@ import { DataGridState } from '../grid/DataGridState'
 import { GridPagingAction } from '../paging'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { getOrderDirection } from './DataGridOrderDirection'
+import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
 
 export interface DataGridContainerOwnProps {
 	dataGridState: DataGridState
+	setFilter: DataGridSetColumnFilter
 	setOrderBy: DataGridSetColumnOrderBy
 	updatePaging: (action: GridPagingAction) => void
 }
@@ -19,6 +21,7 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 	({
 		children,
 		accessor,
+		setFilter,
 		setOrderBy,
 		updatePaging,
 		dataGridState: {
@@ -34,12 +37,15 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 					<thead>
 						<TableRow>
 							{Array.from(columns, ([columnKey, column]) => {
+								const filter = filters.get(columnKey)
 								const orderBy = orderBys.get(columnKey)
 								return (
 									<DataGridHeaderCell
 										key={columnKey}
+										filter={filter}
 										orderBy={orderBy}
 										orderDirection={getOrderDirection(orderBy)}
+										setFilter={newFilter => setFilter(columnKey, newFilter)}
 										setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}
 										ascOrderIcon={column.ascOrderIcon}
 										descOrderIcon={column.descOrderIcon}

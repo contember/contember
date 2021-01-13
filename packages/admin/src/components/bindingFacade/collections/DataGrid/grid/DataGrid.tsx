@@ -7,6 +7,7 @@ import { DataGridState } from './DataGridState'
 import { normalizeInitialFilters } from './normalizeInitialFilters'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
 import { renderGrid, RenderGridOptions } from './renderGrid'
+import { useFilters } from './useFilters'
 import { useOrderBys } from './useOrderBys'
 
 export interface DataGridProps {
@@ -28,14 +29,16 @@ export const DataGrid = Component<DataGridProps>(
 			itemsPerPage: props.itemsPerPage ?? null,
 		})
 		const [orderBys, setOrderBy] = useOrderBys(columns, updatePaging)
+		const [filters, setFilter] = useFilters(columns, updatePaging)
 
 		const gridOptions = React.useMemo(
 			(): RenderGridOptions => ({
 				entities: props.entities,
 				updatePaging,
+				setFilter,
 				setOrderBy,
 			}),
-			[props.entities, updatePaging, setOrderBy],
+			[props.entities, updatePaging, setFilter, setOrderBy],
 		)
 
 		const loadAbortControllerRef = React.useRef<AbortController | undefined>(undefined)
@@ -44,10 +47,10 @@ export const DataGrid = Component<DataGridProps>(
 			(): DataGridState => ({
 				paging: pageState,
 				columns,
-				filters: new Map(),
+				filters,
 				orderBys,
 			}),
-			[orderBys, pageState, columns],
+			[filters, orderBys, pageState, columns],
 		)
 
 		const [displayedState, setDisplayedState] = React.useState(desiredState)
@@ -87,6 +90,7 @@ export const DataGrid = Component<DataGridProps>(
 				entities: props.entities,
 				updatePaging: noop,
 				setOrderBy: noop,
+				setFilter: noop,
 			},
 			{
 				columns,

@@ -1,6 +1,8 @@
+import { Filter } from '@contember/binding'
 import { Icon, TableHeaderCell } from '@contember/ui'
 import * as React from 'react'
 import { DataGridOrderDirection, toggleOrderDirection } from './DataGridOrderDirection'
+import { DataGridSetFilter } from './DataGridSetFilter'
 import { DataGridSetOrderBy } from './DataGridSetOrderBy'
 import { SingleColumnOrderBy } from './SingleColumnOrderBy'
 
@@ -12,8 +14,10 @@ export interface DataGridHeaderCellPublicProps {
 }
 
 export interface DataGridHeaderCellInternalProps {
+	filter: Filter | undefined
 	orderBy: SingleColumnOrderBy | undefined
 	orderDirection: DataGridOrderDirection
+	setFilter: DataGridSetFilter
 	setOrderBy: DataGridSetOrderBy
 }
 

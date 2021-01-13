@@ -11,19 +11,29 @@
 
 	display: table
 	border-collapse: collapse
-	margin: calc(-1 * var(--cui-boxNesting-paddingY, 0) + .25em) calc(-1 * var(--cui-boxNesting-paddingX, 0))
-	width: calc(100% + 2 * var(--cui-boxNesting-paddingX, 0))
+	width: 100%
+
+	&-wrapper
+		overflow-x: auto
+		margin: calc(-1 * var(--cui-boxNesting-paddingY, 0)) calc(-1 * var(--cui-boxNesting-paddingX, 0))
+		width: calc(100% + 2 * var(--cui-boxNesting-paddingX, 0))
 
 	&-row
 		display: table-row
 
 		&:nth-child(even)
-			background-color: rgba(#000000, 0.02)
+			background-color: rgba(#000000, .02)
+
+	& thead &-row
+		background-color: rgba(#000000, .05)
 
 	&-cell
 		display: table-cell
 		white-space: nowrap
 		padding: calc(var(--cui-table-spacingY) / 2) var(--cui-boxNesting-paddingX, var(--cui-table-spacingX))
+
+		th#{&}
+			font-weight: $fw-semiBold
 
 		&:not(:first-child)
 			padding-left: calc(var(--cui-table-spacingX) / 2)

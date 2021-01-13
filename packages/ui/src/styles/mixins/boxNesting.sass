@@ -2,6 +2,7 @@
 	@for $depth from 1 through $maxDepth
 		$depthConfig: nth($cui-box-depths, $depth)
 
+		$borderRadius: map_get($depthConfig, borderRadius)
 		$background: map_get($depthConfig, background)
 		$separation: map_get($depthConfig, separation)
 		$separationColor: map_get($depthConfig, separationColor)
@@ -12,6 +13,7 @@
 		&.view-depth-#{$depth}
 			+box($depth)
 
+			--cui-boxNesting-borderRadius: #{$borderRadius}
 			--cui-boxNesting-paddingX: #{$paddingX}
 			--cui-boxNesting-paddingY: #{$paddingY}
 

@@ -30,7 +30,7 @@ export const renderGrid = (
 			}}
 			offset={itemsPerPage === null ? undefined : itemsPerPage * pageIndex}
 			limit={itemsPerPage === null ? undefined : itemsPerPage}
-			orderBy={collectOrderBys(orderBys)}
+			orderBy={collectOrderBys(columns, orderBys)}
 			listComponent={DataGridContainer}
 			listProps={{
 				dataGridState,

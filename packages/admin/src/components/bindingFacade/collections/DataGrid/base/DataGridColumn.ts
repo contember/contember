@@ -1,8 +1,15 @@
-import { BindingError, Filter } from '@contember/binding'
+import { BindingError, Environment, Filter } from '@contember/binding'
 import * as React from 'react'
 import { DataGridColumnKey } from './DataGridColumnKey'
 import { DataGridHeaderCellPublicProps } from './DataGridHeaderCell'
+import { DataGridSetFilter } from './DataGridSetFilter'
 import { GetNewOrderBy, SingleColumnOrderBy } from './SingleColumnOrderBy'
+
+export interface FilterRendererProps<F extends Filter = Filter> {
+	filter: F | undefined
+	setFilter: DataGridSetFilter<F>
+	environment: Environment
+}
 
 export type DataGridColumnFiltering<F extends Filter = Filter> =
 	| {
@@ -11,7 +18,7 @@ export type DataGridColumnFiltering<F extends Filter = Filter> =
 	| {
 			enableFiltering?: true
 			initialFilter?: F
-			filterRenderer: React.ReactElement
+			filterRenderer: React.ComponentType<FilterRendererProps<F>>
 	  }
 
 export type DataGridColumnOrdering<O extends SingleColumnOrderBy = SingleColumnOrderBy> =

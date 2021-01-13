@@ -1,4 +1,4 @@
-import { Component, Entity, EntityListBaseProps } from '@contember/binding'
+import { Component, Entity, EntityListBaseProps, useEnvironment } from '@contember/binding'
 import { Button, ButtonList, Table, TableCell, TableRow } from '@contember/ui'
 import * as React from 'react'
 import { DataGridState } from '../grid/DataGridState'
@@ -42,6 +42,7 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 								return (
 									<DataGridHeaderCell
 										key={columnKey}
+										environment={accessor.environment}
 										filter={filter}
 										orderBy={orderBy}
 										orderDirection={getOrderDirection(orderBy)}
@@ -49,6 +50,7 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 										setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}
 										ascOrderIcon={column.ascOrderIcon}
 										descOrderIcon={column.descOrderIcon}
+										filterRenderer={column.enableFiltering !== false ? column.filterRenderer : undefined}
 									>
 										{column.header}
 									</DataGridHeaderCell>

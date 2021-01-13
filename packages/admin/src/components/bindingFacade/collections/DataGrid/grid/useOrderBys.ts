@@ -1,3 +1,4 @@
+import { useEnvironment } from '@contember/binding'
 import * as React from 'react'
 import { DataGridColumns, DataGridOrderBys, DataGridSetColumnOrderBy } from '../base'
 import { GridPagingAction } from '../paging'
@@ -6,6 +7,7 @@ export const useOrderBys = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
 ): [DataGridOrderBys, DataGridSetColumnOrderBy] => {
+	const environment = useEnvironment()
 	const [orderBys, setOrderBys] = React.useState<DataGridOrderBys>(new Map())
 
 	return [
@@ -32,7 +34,12 @@ export const useOrderBys = (
 						clone.delete(columnKey)
 					} else if (typeof columnOrderBy === 'string') {
 						if (column.getNewOrderBy) {
-							clone.set(columnKey, column.getNewOrderBy(columnOrderBy))
+							clone.set(
+								columnKey,
+								column.getNewOrderBy(columnOrderBy, {
+									environment,
+								}),
+							)
 						} else {
 							// TODO
 						}
@@ -48,7 +55,7 @@ export const useOrderBys = (
 					})
 				}
 			},
-			[columns, updatePaging],
+			[columns, environment, updatePaging],
 		),
 	]
 }

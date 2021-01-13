@@ -71,6 +71,7 @@ export const DataGrid = Component<DataGridProps>(
 					})
 				} catch {
 					// TODO Distinguish abort vs actual error
+					return
 				}
 				if (!isMountedRef.current) {
 					return
@@ -79,6 +80,13 @@ export const DataGrid = Component<DataGridProps>(
 			}
 			extend()
 		}, [desiredState, displayedState, environment, extendTree, gridOptions])
+
+		React.useEffect(
+			() => () => {
+				isMountedRef.current = false
+			},
+			[],
+		)
 
 		return renderGrid(gridOptions, displayedState, environment)
 	},

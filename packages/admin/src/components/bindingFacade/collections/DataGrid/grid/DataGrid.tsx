@@ -1,6 +1,7 @@
 import { Component, SugaredQualifiedEntityList, useBindingOperations, useEnvironment } from '@contember/binding'
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
+import { DataGridContainerPublicProps } from '../base'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
 import { DataGridState } from './DataGridState'
@@ -10,7 +11,7 @@ import { renderGrid, RenderGridOptions } from './renderGrid'
 import { useFilters } from './useFilters'
 import { useOrderBys } from './useOrderBys'
 
-export interface DataGridProps {
+export interface DataGridProps extends DataGridContainerPublicProps {
 	entities: SugaredQualifiedEntityList['entities']
 	children: React.ReactNode
 
@@ -31,14 +32,23 @@ export const DataGrid = Component<DataGridProps>(
 		const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging)
 		const [filterArtifacts, setFilter] = useFilters(columns, updatePaging)
 
+		const containerProps: DataGridContainerPublicProps = React.useMemo(
+			() => ({
+				emptyMessageComponentExtraProps: props.emptyMessageComponentExtraProps,
+				emptyMessage: props.emptyMessage,
+				emptyMessageComponent: props.emptyMessageComponent,
+			}),
+			[props.emptyMessage, props.emptyMessageComponent, props.emptyMessageComponentExtraProps],
+		)
 		const gridOptions = React.useMemo(
 			(): RenderGridOptions => ({
 				entities: props.entities,
 				updatePaging,
 				setFilter,
 				setOrderBy,
+				containerProps,
 			}),
-			[props.entities, updatePaging, setFilter, setOrderBy],
+			[props.entities, containerProps, updatePaging, setFilter, setOrderBy],
 		)
 
 		const loadAbortControllerRef = React.useRef<AbortController | undefined>(undefined)
@@ -108,6 +118,7 @@ export const DataGrid = Component<DataGridProps>(
 				updatePaging: noop,
 				setOrderBy: noop,
 				setFilter: noop,
+				containerProps: props,
 			},
 			fakeState,
 			fakeState,

@@ -1,6 +1,11 @@
 import { EntityListSubTree, Environment, QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
 import * as React from 'react'
-import { DataGridContainer, DataGridSetColumnFilter, DataGridSetColumnOrderBy } from '../base'
+import {
+	DataGridContainer,
+	DataGridContainerPublicProps,
+	DataGridSetColumnFilter,
+	DataGridSetColumnOrderBy,
+} from '../base'
 import { GridPagingAction } from '../paging'
 import { collectFilters } from './collectFilters'
 import { collectOrderBy } from './collectOrderBy'
@@ -11,10 +16,11 @@ export interface RenderGridOptions {
 	setFilter: DataGridSetColumnFilter
 	setOrderBy: DataGridSetColumnOrderBy
 	updatePaging: (action: GridPagingAction) => void
+	containerProps: DataGridContainerPublicProps
 }
 
 export const renderGrid = (
-	{ entities, setFilter, setOrderBy, updatePaging }: RenderGridOptions,
+	{ entities, setFilter, setOrderBy, updatePaging, containerProps }: RenderGridOptions,
 	displayedState: DataGridState,
 	desiredState: DataGridState,
 	environment: Environment,
@@ -46,6 +52,9 @@ export const renderGrid = (
 				setFilter,
 				setOrderBy,
 				updatePaging,
+				emptyMessageComponentExtraProps: containerProps.emptyMessageComponentExtraProps,
+				emptyMessageComponent: containerProps.emptyMessageComponent,
+				emptyMessage: containerProps.emptyMessage,
 			}}
 		>
 			{Array.from(columns, ([key, props]) => (

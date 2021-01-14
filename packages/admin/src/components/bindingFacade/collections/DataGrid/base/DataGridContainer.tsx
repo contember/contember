@@ -1,13 +1,20 @@
 import { Component, Entity, EntityListBaseProps } from '@contember/binding'
 import { Button, ButtonList, Table, TableCell, TableRow } from '@contember/ui'
 import * as React from 'react'
+import { EmptyMessage, EmptyMessageProps } from '../../helpers'
 import { DataGridState } from '../grid/DataGridState'
 import { GridPagingAction } from '../paging'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
 
-export interface DataGridContainerOwnProps {
+export interface DataGridContainerPublicProps {
+	emptyMessage?: React.ReactNode
+	emptyMessageComponent?: React.ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
+	emptyMessageComponentExtraProps?: {}
+}
+
+export interface DataGridContainerOwnProps extends DataGridContainerPublicProps {
 	dataGridState: DataGridState
 	setFilter: DataGridSetColumnFilter
 	setOrderBy: DataGridSetColumnOrderBy
@@ -29,6 +36,10 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 			orderDirections,
 			columns,
 		},
+
+		emptyMessage = 'No data to display.',
+		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
+		emptyMessageComponentExtraProps,
 	}) => {
 		return (
 			<div>
@@ -57,20 +68,28 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 						</TableRow>
 					}
 				>
-					{Array.from(accessor, entity => (
-						<Entity
-							key={entity.key}
-							accessor={entity}
-							//entityComponent={}
-							//entityProps={}
-						>
-							<TableRow>
-								{Array.from(columns, ([columnKey, column]) => (
-									<TableCell key={columnKey}>{column.children}</TableCell>
-								))}
-							</TableRow>
-						</Entity>
-					))}
+					{!!accessor.length &&
+						Array.from(accessor, entity => (
+							<Entity
+								key={entity.key}
+								accessor={entity}
+								//entityComponent={}
+								//entityProps={}
+							>
+								<TableRow>
+									{Array.from(columns, ([columnKey, column]) => (
+										<TableCell key={columnKey}>{column.children}</TableCell>
+									))}
+								</TableRow>
+							</Entity>
+						))}
+					{!accessor.length && (
+						<TableRow>
+							<TableCell colSpan={columns.size}>
+								<EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>
+							</TableCell>
+						</TableRow>
+					)}
 				</Table>
 				<ButtonList>
 					{pageIndex > 1 && <Button onClick={() => updatePaging({ type: 'goToFirstPage' })}>First</Button>}

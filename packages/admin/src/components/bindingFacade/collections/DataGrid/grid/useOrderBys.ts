@@ -8,7 +8,6 @@ export const useOrderBys = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
 ): [DataGridOrderDirectionStore, DataGridSetColumnOrderBy] => {
-	const environment = useEnvironment()
 	const [orderBys, setOrderBys] = React.useState<DataGridOrderDirectionStore>(() => normalizeInitialOrderBys(columns))
 
 	return [
@@ -46,7 +45,7 @@ export const useOrderBys = (
 					})
 				}
 			},
-			[columns, environment, updatePaging],
+			[columns, updatePaging],
 		),
 	]
 }

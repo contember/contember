@@ -9,6 +9,7 @@ export interface TableCellProps {
 	children?: React.ReactNode
 	justification?: Justification
 	shrunk?: boolean
+	colSpan?: number
 }
 
 export const TableCell = React.memo(({ shrunk = false, ...props }: TableCellProps) => {
@@ -20,7 +21,11 @@ export const TableCell = React.memo(({ shrunk = false, ...props }: TableCellProp
 	)
 
 	if (useTableElement) {
-		return <td className={className}>{props.children}</td>
+		return (
+			<td className={className} colSpan={props.colSpan}>
+				{props.children}
+			</td>
+		)
 	}
 	return <div className={className}>{props.children}</div>
 })

@@ -23,13 +23,15 @@ const wrapFilter = (path: HasOneRelation[], filter: Filter): Filter => {
 	for (let i = path.length - 1; i >= 0; i--) {
 		const current = path[i]
 
-		filter = {
-			[current.field]: filter,
-		}
-
-		if (current.reducedBy !== undefined) {
+		if (current.reducedBy === undefined) {
 			filter = {
-				and: [filter, whereToFilter(current.reducedBy)],
+				[current.field]: filter,
+			}
+		} else {
+			filter = {
+				[current.field]: {
+					and: [filter, whereToFilter(current.reducedBy)],
+				},
 			}
 		}
 	}
@@ -55,7 +57,8 @@ export const TextCell = Component<TextCellProps>(props => {
 				<TextInput
 					value={filter ?? ''}
 					onChange={e => {
-						setFilter(e.currentTarget.value)
+						const value = e.currentTarget.value
+						setFilter(value === '' ? undefined : value)
 					}}
 				/>
 			)}

@@ -66,7 +66,7 @@ export const DataGrid = Component<DataGridProps>(
 				loadAbortControllerRef.current = newController
 
 				try {
-					await extendTree(renderGrid(gridOptions, desiredState, environment), {
+					await extendTree(renderGrid(gridOptions, desiredState, desiredState, environment), {
 						signal: newController.signal,
 					})
 				} catch {
@@ -88,10 +88,19 @@ export const DataGrid = Component<DataGridProps>(
 			[],
 		)
 
-		return renderGrid(gridOptions, displayedState, environment)
+		return renderGrid(gridOptions, displayedState, desiredState, environment)
 	},
 	(props, environment) => {
 		const columns = extractDataGridColumns(props.children)
+		const fakeState: DataGridState = {
+			columns,
+			paging: {
+				itemsPerPage: props.itemsPerPage ?? null,
+				pageIndex: 0,
+			},
+			filterArtifacts: normalizeInitialFilters(columns),
+			orderDirections: normalizeInitialOrderBys(columns),
+		}
 
 		return renderGrid(
 			{
@@ -100,15 +109,8 @@ export const DataGrid = Component<DataGridProps>(
 				setOrderBy: noop,
 				setFilter: noop,
 			},
-			{
-				columns,
-				paging: {
-					itemsPerPage: props.itemsPerPage ?? null,
-					pageIndex: 0,
-				},
-				filterArtifacts: normalizeInitialFilters(columns),
-				orderDirections: normalizeInitialOrderBys(columns),
-			},
+			fakeState,
+			fakeState,
 			environment,
 		)
 	},

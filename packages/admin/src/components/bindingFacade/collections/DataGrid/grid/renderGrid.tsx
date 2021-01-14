@@ -15,7 +15,8 @@ export interface RenderGridOptions {
 
 export const renderGrid = (
 	{ entities, setFilter, setOrderBy, updatePaging }: RenderGridOptions,
-	dataGridState: DataGridState,
+	displayedState: DataGridState,
+	desiredState: DataGridState,
 	environment: Environment,
 ): React.ReactElement => {
 	const {
@@ -23,7 +24,7 @@ export const renderGrid = (
 		filterArtifacts,
 		orderDirections,
 		columns,
-	} = dataGridState
+	} = displayedState
 	const desugared = QueryLanguage.desugarQualifiedEntityList({ entities }, environment)
 	const columnFilters = collectFilters(columns, filterArtifacts, environment)
 
@@ -41,7 +42,7 @@ export const renderGrid = (
 			orderBy={collectOrderBy(columns, orderDirections, environment)}
 			listComponent={DataGridContainer}
 			listProps={{
-				dataGridState,
+				dataGridState: desiredState,
 				setFilter,
 				setOrderBy,
 				updatePaging,

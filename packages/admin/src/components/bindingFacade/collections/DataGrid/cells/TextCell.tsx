@@ -1,7 +1,7 @@
 import {
 	Component,
-	Environment,
 	Field,
+	FieldValue,
 	Filter,
 	HasOneRelation,
 	QueryLanguage,
@@ -12,9 +12,12 @@ import { TextInput } from '@contember/ui'
 import * as React from 'react'
 import { DataGridColumn, DataGridOrderDirection } from '../base'
 
-export type TextCellProps = SugaredRelativeSingleField & {
+export type TextCellProps<Persisted extends FieldValue = FieldValue> = SugaredRelativeSingleField & {
 	header?: React.ReactNode
 	initialOrder?: DataGridOrderDirection
+	disableOrder?: boolean
+	format?: (value: Persisted) => React.ReactNode
+	fallback?: React.ReactNode
 }
 
 // Literal
@@ -41,9 +44,11 @@ const wrapFilter = (path: HasOneRelation[], filter: Filter): Filter => {
 export const TextCell = Component<TextCellProps>(props => {
 	return (
 		<DataGridColumn<string>
-			{...(props as any)}
+			header={props.header}
+			enableOrdering={!props.disableOrder as true}
+			initialOrder={props.initialOrder}
 			getNewOrderBy={(newDirection, { environment }) =>
-				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)[0]
+				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)
 			}
 			getNewFilter={(filterArtifact, { environment }) => {
 				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
@@ -63,7 +68,18 @@ export const TextCell = Component<TextCellProps>(props => {
 				/>
 			)}
 		>
-			<Field {...props} format={value => (value === null ? <i>Nothing</i> : String(value))} />
+			<Field
+				{...props}
+				format={value => {
+					if (props.fallback !== undefined && value === null) {
+						return props.fallback
+					}
+					if (props.format) {
+						return props.format(value)
+					}
+					return value === null ? <i style={{ opacity: 0.4, fontSize: '0.75em' }}>N/A</i> : value
+				}}
+			/>
 		</DataGridColumn>
 	)
-}, 'TextCell')
+}, 'TextCell') as <Persisted extends FieldValue = FieldValue>(props: TextCellProps<Persisted>) => React.ReactElement

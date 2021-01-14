@@ -1,5 +1,5 @@
 import { Component, Entity, EntityListBaseProps } from '@contember/binding'
-import { Button, ButtonList, Table, TableCell, TableRow } from '@contember/ui'
+import { Button, ButtonList, Justification, Table, TableCell, TableRow } from '@contember/ui'
 import * as React from 'react'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
 import { DataGridState } from '../grid/DataGridState'
@@ -7,6 +7,11 @@ import { GridPagingAction } from '../paging'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
+
+export interface DataGridCellPublicProps {
+	justification?: Justification
+	shrunk?: boolean
+}
 
 export interface DataGridContainerPublicProps {
 	emptyMessage?: React.ReactNode
@@ -57,12 +62,13 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 										orderDirection={orderDirection}
 										setFilter={newFilter => setFilter(columnKey, newFilter)}
 										setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}
+										headerJustification={column.headerJustification || column.justification}
+										shrunk={column.shrunk}
+										header={column.header}
 										ascOrderIcon={column.ascOrderIcon}
 										descOrderIcon={column.descOrderIcon}
 										filterRenderer={column.enableFiltering !== false ? column.filterRenderer : undefined}
-									>
-										{column.header}
-									</DataGridHeaderCell>
+									/>
 								)
 							})}
 						</TableRow>
@@ -78,7 +84,9 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 							>
 								<TableRow>
 									{Array.from(columns, ([columnKey, column]) => (
-										<TableCell key={columnKey}>{column.children}</TableCell>
+										<TableCell key={columnKey} shrunk={column.shrunk} justification={column.justification}>
+											{column.children}
+										</TableCell>
 									))}
 								</TableRow>
 							</Entity>

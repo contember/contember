@@ -1,6 +1,7 @@
 import { BindingError, Environment } from '@contember/binding'
 import * as React from 'react'
 import { DataGridColumnKey } from './DataGridColumnKey'
+import { DataGridCellPublicProps } from './DataGridContainer'
 import { DataGridFilterArtifact } from './DataGridFilterArtifact'
 import { DataGridHeaderCellPublicProps } from './DataGridHeaderCell'
 import { DataGridOrderDirection } from './DataGridOrderDirection'
@@ -37,11 +38,12 @@ export type DataGridColumnOrdering =
 
 export type DataGridColumnProps<
 	FA extends DataGridFilterArtifact = DataGridFilterArtifact
-> = DataGridHeaderCellPublicProps & {
-	header?: React.ReactNode
-	children?: React.ReactNode
-} & DataGridColumnFiltering<FA> &
-	DataGridColumnOrdering
+> = DataGridHeaderCellPublicProps &
+	DataGridCellPublicProps &
+	DataGridColumnFiltering<FA> &
+	DataGridColumnOrdering & {
+		children: React.ReactNode
+	}
 
 export type DataGridColumns = Map<DataGridColumnKey, DataGridColumnProps>
 

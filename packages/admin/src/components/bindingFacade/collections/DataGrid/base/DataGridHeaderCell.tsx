@@ -1,5 +1,5 @@
 import { Environment } from '@contember/binding'
-import { Dropdown, Icon, TableHeaderCell } from '@contember/ui'
+import { Dropdown, Icon, Justification, TableHeaderCell } from '@contember/ui'
 import * as React from 'react'
 import { FilterRendererProps } from './DataGridColumn'
 import { DataGridFilterArtifact } from './DataGridFilterArtifact'
@@ -8,8 +8,9 @@ import { DataGridSetFilter } from './DataGridSetFilter'
 import { DataGridSetOrderBy } from './DataGridSetOrderBy'
 
 export interface DataGridHeaderCellPublicProps {
-	children: React.ReactNode
-
+	header?: React.ReactNode
+	shrunk?: boolean
+	headerJustification?: Justification
 	ascOrderIcon?: React.ReactNode
 	descOrderIcon?: React.ReactNode
 }
@@ -25,24 +26,36 @@ export interface DataGridHeaderCellInternalProps {
 
 export interface DataGridHeaderCellProps extends DataGridHeaderCellInternalProps, DataGridHeaderCellPublicProps {}
 
-export function DataGridHeaderCell(props: DataGridHeaderCellProps): React.ReactElement {
+export function DataGridHeaderCell({
+	ascOrderIcon,
+	descOrderIcon,
+	environment,
+	filterArtifact,
+	filterRenderer,
+	header,
+	headerJustification,
+	orderDirection,
+	setFilter,
+	setOrderBy,
+	shrunk,
+}: DataGridHeaderCellProps): React.ReactElement {
 	return (
-		<TableHeaderCell scope="col">
-			<span onClick={() => props.setOrderBy(cycleOrderDirection(props.orderDirection))}>
-				{props.children}
+		<TableHeaderCell scope="col" justification={headerJustification} shrunk={shrunk}>
+			<span onClick={() => setOrderBy(cycleOrderDirection(orderDirection))}>
+				{header}
 				&nbsp;
-				{props.orderDirection &&
+				{orderDirection &&
 					{
-						asc: props.ascOrderIcon ?? defaultAscIcon,
-						desc: props.descOrderIcon ?? defaultDescIcon,
-					}[props.orderDirection]}
+						asc: ascOrderIcon ?? defaultAscIcon,
+						desc: descOrderIcon ?? defaultDescIcon,
+					}[orderDirection]}
 			</span>
-			{props.filterRenderer && (
+			{filterRenderer && (
 				<Dropdown buttonProps={{ children: 'F' }}>
-					{React.createElement(props.filterRenderer, {
-						filter: props.filterArtifact,
-						setFilter: props.setFilter,
-						environment: props.environment,
+					{React.createElement(filterRenderer, {
+						filter: filterArtifact,
+						setFilter: setFilter,
+						environment: environment,
 					})}
 				</Dropdown>
 			)}

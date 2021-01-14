@@ -10,15 +10,16 @@ import {
 import { whereToFilter } from '@contember/client'
 import { TextInput } from '@contember/ui'
 import * as React from 'react'
-import { DataGridColumn, DataGridOrderDirection } from '../base'
+import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 
-export type TextCellProps<Persisted extends FieldValue = FieldValue> = SugaredRelativeSingleField & {
-	header?: React.ReactNode
-	initialOrder?: DataGridOrderDirection
-	disableOrder?: boolean
-	format?: (value: Persisted) => React.ReactNode
-	fallback?: React.ReactNode
-}
+export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridHeaderCellPublicProps &
+	DataGridCellPublicProps &
+	SugaredRelativeSingleField & {
+		disableOrder?: boolean
+		initialOrder?: DataGridOrderDirection
+		format?: (value: Persisted) => React.ReactNode
+		fallback?: React.ReactNode
+	}
 
 // Literal
 
@@ -44,9 +45,8 @@ const wrapFilter = (path: HasOneRelation[], filter: Filter): Filter => {
 export const TextCell = Component<TextCellProps>(props => {
 	return (
 		<DataGridColumn<string>
-			header={props.header}
+			{...props}
 			enableOrdering={!props.disableOrder as true}
-			initialOrder={props.initialOrder}
 			getNewOrderBy={(newDirection, { environment }) =>
 				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)
 			}

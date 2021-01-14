@@ -1,4 +1,13 @@
-import { Component, Environment, Field, QueryLanguage, SugaredRelativeSingleField } from '@contember/binding'
+import {
+	Component,
+	Environment,
+	Field,
+	Filter,
+	HasOneRelation,
+	QueryLanguage,
+	SugaredRelativeSingleField,
+} from '@contember/binding'
+import { whereToFilter } from '@contember/client'
 import { TextInput } from '@contember/ui'
 import * as React from 'react'
 import { DataGridColumn, DataGridOrderDirection } from '../base'
@@ -8,65 +17,48 @@ export type TextCellProps = SugaredRelativeSingleField & {
 	initialOrder?: DataGridOrderDirection
 }
 
-const getFullPath = (field: SugaredRelativeSingleField['field'], env: Environment): string[] => {
-	const desugared = QueryLanguage.desugarRelativeSingleField(field, env)
-	const path: string[] = desugared.hasOneRelationPath.map(item => item.field)
-	path.push(desugared.field)
+// Literal
 
-	return path
-}
+const wrapFilter = (path: HasOneRelation[], filter: Filter): Filter => {
+	for (let i = path.length - 1; i >= 0; i--) {
+		const current = path[i]
 
-interface ContainsCIFilter {
-	containsCI: string
-}
-interface SimpleContainsCIFilter {
-	[field: string]: SimpleContainsCIFilter | ContainsCIFilter
+		filter = {
+			[current.field]: filter,
+		}
+
+		if (current.reducedBy !== undefined) {
+			filter = {
+				and: [filter, whereToFilter(current.reducedBy)],
+			}
+		}
+	}
+	return filter
 }
 
 export const TextCell = Component<TextCellProps>(props => {
 	return (
-		<DataGridColumn<SimpleContainsCIFilter>
+		<DataGridColumn<string>
 			{...(props as any)}
 			getNewOrderBy={(newDirection, { environment }) =>
 				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)[0]
 			}
-			filterRenderer={({ filter, setFilter, environment }) => {
-				const fullPath = getFullPath(props.field, environment)
-				let query: string
-
-				if (filter === undefined) {
-					query = ''
-				} else {
-					let f: SimpleContainsCIFilter[string] = filter
-					for (const field of fullPath) {
-						f = (f as SimpleContainsCIFilter)[field]
-					}
-					query = (f as ContainsCIFilter).containsCI
-				}
-				return (
-					<TextInput
-						value={query}
-						onChange={e => {
-							const value = e.target.value
-
-							if (value === '') {
-								return setFilter(undefined)
-							}
-
-							let newFilter: SimpleContainsCIFilter[string] = {
-								containsCI: value,
-							}
-
-							for (let i = fullPath.length - 1; i >= 0; i--) {
-								newFilter = {
-									[fullPath[i]]: newFilter,
-								}
-							}
-							setFilter(newFilter as SimpleContainsCIFilter)
-						}}
-					/>
-				)
+			getNewFilter={(filterArtifact, { environment }) => {
+				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
+				return wrapFilter(desugared.hasOneRelationPath, {
+					[desugared.field]: {
+						containsCI: filterArtifact,
+					},
+				})
 			}}
+			filterRenderer={({ filter, setFilter }) => (
+				<TextInput
+					value={filter ?? ''}
+					onChange={e => {
+						setFilter(e.currentTarget.value)
+					}}
+				/>
+			)}
 		>
 			<Field {...props} format={value => (value === null ? <i>Nothing</i> : String(value))} />
 		</DataGridColumn>

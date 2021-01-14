@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { DataGridColumns, DataGridFilters, DataGridSetColumnFilter } from '../base'
+import { DataGridColumns, DataGridFilterArtifactStore, DataGridSetColumnFilter } from '../base'
 import { GridPagingAction } from '../paging'
 
 export const useFilters = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
-): [DataGridFilters, DataGridSetColumnFilter] => {
-	const [filters, setFilters] = React.useState<DataGridFilters>(new Map())
+): [DataGridFilterArtifactStore, DataGridSetColumnFilter] => {
+	const [filters, setFilters] = React.useState<DataGridFilterArtifactStore>(new Map())
 
 	return [
 		filters,
@@ -22,7 +22,6 @@ export const useFilters = (
 					const existingValue = filters.get(columnKey)
 
 					if (existingValue === columnFilter) {
-						// TODO perform better comparisons by value
 						didBailOut = true
 						return filters
 					}

@@ -1,9 +1,11 @@
-import { Filter } from '@contember/binding'
 import { DataGridColumnKey } from './DataGridColumnKey'
+import { DataGridFilterArtifact } from './DataGridFilterArtifact'
 
-export type DataGridSetFilter<F extends Filter = Filter> = (filter: F | undefined) => void
+export type DataGridSetFilter<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = (
+	filter: FA | undefined,
+) => void
 
-export type DataGridSetColumnFilter<F extends Filter = Filter> = (
+export type DataGridSetColumnFilter<FA extends DataGridFilterArtifact = DataGridFilterArtifact> = (
 	columnKey: DataGridColumnKey,
-	columnFilter: F | undefined,
+	columnFilter: FA | undefined,
 ) => void

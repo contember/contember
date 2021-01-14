@@ -28,8 +28,8 @@ export const DataGrid = Component<DataGridProps>(
 		const [pageState, updatePaging] = useGridPagingState({
 			itemsPerPage: props.itemsPerPage ?? null,
 		})
-		const [orderBys, setOrderBy] = useOrderBys(columns, updatePaging)
-		const [filters, setFilter] = useFilters(columns, updatePaging)
+		const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging)
+		const [filterArtifacts, setFilter] = useFilters(columns, updatePaging)
 
 		const gridOptions = React.useMemo(
 			(): RenderGridOptions => ({
@@ -47,10 +47,10 @@ export const DataGrid = Component<DataGridProps>(
 			(): DataGridState => ({
 				paging: pageState,
 				columns,
-				filters,
-				orderBys,
+				filterArtifacts,
+				orderDirections,
 			}),
-			[filters, orderBys, pageState, columns],
+			[filterArtifacts, orderDirections, pageState, columns],
 		)
 
 		const [displayedState, setDisplayedState] = React.useState(desiredState)
@@ -106,8 +106,8 @@ export const DataGrid = Component<DataGridProps>(
 					itemsPerPage: props.itemsPerPage ?? null,
 					pageIndex: 0,
 				},
-				filters: normalizeInitialFilters(columns),
-				orderBys: normalizeInitialOrderBys(columns, environment),
+				filterArtifacts: normalizeInitialFilters(columns),
+				orderDirections: normalizeInitialOrderBys(columns),
 			},
 			environment,
 		)

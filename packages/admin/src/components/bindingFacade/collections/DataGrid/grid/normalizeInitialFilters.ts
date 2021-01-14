@@ -1,10 +1,10 @@
-import { DataGridColumns, DataGridFilters } from '../base'
+import { DataGridColumns, DataGridFilterArtifactStore } from '../base'
 
-export const normalizeInitialFilters = (columns: DataGridColumns): DataGridFilters => {
-	const filters: DataGridFilters = new Map()
+export const normalizeInitialFilters = (columns: DataGridColumns): DataGridFilterArtifactStore => {
+	const filters: DataGridFilterArtifactStore = new Map()
 
 	for (const [i, value] of columns) {
-		if (value.enableFiltering !== false && value.initialFilter) {
+		if (value.enableFiltering !== false && value.initialFilter !== undefined) {
 			filters.set(i, value.initialFilter)
 		}
 	}

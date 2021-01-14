@@ -1,15 +1,15 @@
 import { useEnvironment } from '@contember/binding'
 import * as React from 'react'
-import { DataGridColumns, DataGridOrderBys, DataGridSetColumnOrderBy } from '../base'
+import { DataGridColumns, DataGridOrderDirectionStore, DataGridSetColumnOrderBy } from '../base'
 import { GridPagingAction } from '../paging'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
 
 export const useOrderBys = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
-): [DataGridOrderBys, DataGridSetColumnOrderBy] => {
+): [DataGridOrderDirectionStore, DataGridSetColumnOrderBy] => {
 	const environment = useEnvironment()
-	const [orderBys, setOrderBys] = React.useState<DataGridOrderBys>(() => normalizeInitialOrderBys(columns, environment))
+	const [orderBys, setOrderBys] = React.useState<DataGridOrderDirectionStore>(() => normalizeInitialOrderBys(columns))
 
 	return [
 		orderBys,
@@ -29,21 +29,11 @@ export const useOrderBys = (
 						didBailOut = true
 						return orderBys
 					}
-					const clone = new Map(orderBys)
+					//const clone = new Map(orderBys)
+					const clone: DataGridOrderDirectionStore = new Map()
 
 					if (columnOrderBy === undefined) {
 						clone.delete(columnKey)
-					} else if (typeof columnOrderBy === 'string') {
-						if (column.getNewOrderBy) {
-							clone.set(
-								columnKey,
-								column.getNewOrderBy(columnOrderBy, {
-									environment,
-								}),
-							)
-						} else {
-							// TODO
-						}
 					} else {
 						clone.set(columnKey, columnOrderBy)
 					}

@@ -1,53 +1,55 @@
-import { BindingError, Environment, Filter } from '@contember/binding'
+import { BindingError, Environment } from '@contember/binding'
 import * as React from 'react'
 import { DataGridColumnKey } from './DataGridColumnKey'
+import { DataGridFilterArtifact } from './DataGridFilterArtifact'
 import { DataGridHeaderCellPublicProps } from './DataGridHeaderCell'
 import { DataGridOrderDirection } from './DataGridOrderDirection'
 import { DataGridSetFilter } from './DataGridSetFilter'
-import { GetNewOrderBy, SingleColumnOrderBy } from './SingleColumnOrderBy'
+import { GetNewFilter } from './GetNewFilter'
+import { GetNewOrderBy } from './GetNewOrderBy'
 
-export interface FilterRendererProps<F extends Filter = Filter> {
-	filter: F | undefined
-	setFilter: DataGridSetFilter<F>
+export interface FilterRendererProps<FA extends DataGridFilterArtifact> {
+	filter: FA | undefined
+	setFilter: DataGridSetFilter<FA>
 	environment: Environment
 }
 
-export type DataGridColumnFiltering<F extends Filter = Filter> =
+export type DataGridColumnFiltering<FA extends DataGridFilterArtifact = DataGridFilterArtifact> =
 	| {
 			enableFiltering: false
 	  }
 	| {
 			enableFiltering?: true
-			initialFilter?: F
-			filterRenderer: React.ComponentType<FilterRendererProps<F>>
+			initialFilter?: FA
+			getNewFilter: GetNewFilter<FA>
+			filterRenderer: React.ComponentType<FilterRendererProps<FA>>
 	  }
 
-export type DataGridColumnOrdering<O extends SingleColumnOrderBy = SingleColumnOrderBy> =
+export type DataGridColumnOrdering =
 	| {
 			enableOrdering: false
 	  }
 	| {
 			enableOrdering?: true
 			initialOrder?: DataGridOrderDirection
-			getNewOrderBy?: GetNewOrderBy
+			getNewOrderBy: GetNewOrderBy
 	  }
 
 export type DataGridColumnProps<
-	F extends Filter = Filter,
-	O extends SingleColumnOrderBy = SingleColumnOrderBy
+	FA extends DataGridFilterArtifact = DataGridFilterArtifact
 > = DataGridHeaderCellPublicProps & {
 	header?: React.ReactNode
 	children?: React.ReactNode
-} & DataGridColumnFiltering<F> &
-	DataGridColumnOrdering<O>
+} & DataGridColumnFiltering<FA> &
+	DataGridColumnOrdering
 
 export type DataGridColumns = Map<DataGridColumnKey, DataGridColumnProps>
 
 // This is deliberately not a Component!
-export const DataGridColumn: <F extends Filter = Filter, O extends SingleColumnOrderBy = SingleColumnOrderBy>(
-	props: DataGridColumnProps<F, O>,
-) => React.ReactElement = <F extends Filter = Filter, O extends SingleColumnOrderBy = SingleColumnOrderBy>(
-	props: DataGridColumnProps<F, O>,
+export const DataGridColumn: <FA extends DataGridFilterArtifact = DataGridFilterArtifact>(
+	props: DataGridColumnProps<FA>,
+) => React.ReactElement = <FA extends DataGridFilterArtifact = DataGridFilterArtifact>(
+	props: DataGridColumnProps<FA>,
 ): React.ReactElement => {
 	throw new BindingError()
 }

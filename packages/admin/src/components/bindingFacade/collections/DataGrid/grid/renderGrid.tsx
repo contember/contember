@@ -3,7 +3,7 @@ import * as React from 'react'
 import { DataGridContainer, DataGridSetColumnFilter, DataGridSetColumnOrderBy } from '../base'
 import { GridPagingAction } from '../paging'
 import { collectFilters } from './collectFilters'
-import { collectOrderBys } from './collectOrderBys'
+import { collectOrderBy } from './collectOrderBy'
 import { DataGridState } from './DataGridState'
 
 export interface RenderGridOptions {
@@ -20,12 +20,12 @@ export const renderGrid = (
 ): React.ReactElement => {
 	const {
 		paging: { pageIndex, itemsPerPage },
-		filters,
-		orderBys,
+		filterArtifacts,
+		orderDirections,
 		columns,
 	} = dataGridState
 	const desugared = QueryLanguage.desugarQualifiedEntityList({ entities }, environment)
-	const columnFilters = collectFilters(filters)
+	const columnFilters = collectFilters(columns, filterArtifacts, environment)
 
 	return (
 		<EntityListSubTree
@@ -38,7 +38,7 @@ export const renderGrid = (
 			}}
 			offset={itemsPerPage === null ? undefined : itemsPerPage * pageIndex}
 			limit={itemsPerPage === null ? undefined : itemsPerPage}
-			orderBy={collectOrderBys(columns, orderBys)}
+			orderBy={collectOrderBy(columns, orderDirections, environment)}
 			listComponent={DataGridContainer}
 			listProps={{
 				dataGridState,

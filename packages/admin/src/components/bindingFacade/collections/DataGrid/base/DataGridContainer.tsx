@@ -1,10 +1,9 @@
-import { Component, Entity, EntityListBaseProps, useEnvironment } from '@contember/binding'
+import { Component, Entity, EntityListBaseProps } from '@contember/binding'
 import { Button, ButtonList, Table, TableCell, TableRow } from '@contember/ui'
 import * as React from 'react'
 import { DataGridState } from '../grid/DataGridState'
 import { GridPagingAction } from '../paging'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
-import { getOrderDirection } from './DataGridOrderDirection'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
 
@@ -26,8 +25,8 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 		updatePaging,
 		dataGridState: {
 			paging: { pageIndex, itemsPerPage },
-			filters,
-			orderBys,
+			filterArtifacts,
+			orderDirections,
 			columns,
 		},
 	}) => {
@@ -37,15 +36,14 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 					tableHead={
 						<TableRow>
 							{Array.from(columns, ([columnKey, column]) => {
-								const filter = filters.get(columnKey)
-								const orderBy = orderBys.get(columnKey)
+								const filterArtifact = filterArtifacts.get(columnKey)
+								const orderDirection = orderDirections.get(columnKey)
 								return (
 									<DataGridHeaderCell
 										key={columnKey}
 										environment={accessor.environment}
-										filter={filter}
-										orderBy={orderBy}
-										orderDirection={getOrderDirection(orderBy)}
+										filterArtifact={filterArtifact}
+										orderDirection={orderDirection}
 										setFilter={newFilter => setFilter(columnKey, newFilter)}
 										setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}
 										ascOrderIcon={column.ascOrderIcon}

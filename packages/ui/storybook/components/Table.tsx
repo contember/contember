@@ -16,7 +16,7 @@ const radiosJustification = (label: string): TableProps['justification'] =>
 	)
 
 storiesOf('Table', module).add('simple', () => {
-	const useTableElement = boolean('Use table element', true)
+	//const useTableElement = boolean('Use table element', true)
 	const useExampleHeading = boolean('Use example heading', true)
 	const size = sizeKnob()
 	const justification: TableProps['justification'] = radiosJustification('Table justification')
@@ -27,7 +27,7 @@ storiesOf('Table', module).add('simple', () => {
 	const heading = useExampleHeading ? <span>Simple table</span> : undefined
 
 	return (
-		<Table useTableElement={useTableElement} heading={heading} size={size} justification={justification}>
+		<Table /*useTableElement={useTableElement}*/ heading={heading} size={size} justification={justification}>
 			{[1, 2, 3, 4, 5, 6].map(row => (
 				<TableRow justification={row === 6 ? justificationLastRow : undefined}>
 					{['A', 'B', 'C', 'D'].map(column => (

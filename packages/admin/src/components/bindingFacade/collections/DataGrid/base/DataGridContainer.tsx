@@ -33,8 +33,8 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 	}) => {
 		return (
 			<div>
-				<Table>
-					<thead>
+				<Table
+					tableHead={
 						<TableRow>
 							{Array.from(columns, ([columnKey, column]) => {
 								const filter = filters.get(columnKey)
@@ -57,23 +57,22 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 								)
 							})}
 						</TableRow>
-					</thead>
-					<tbody>
-						{Array.from(accessor, entity => (
-							<Entity
-								key={entity.key}
-								accessor={entity}
-								//entityComponent={}
-								//entityProps={}
-							>
-								<TableRow>
-									{Array.from(columns, ([columnKey, column]) => (
-										<TableCell key={columnKey}>{column.children}</TableCell>
-									))}
-								</TableRow>
-							</Entity>
-						))}
-					</tbody>
+					}
+				>
+					{Array.from(accessor, entity => (
+						<Entity
+							key={entity.key}
+							accessor={entity}
+							//entityComponent={}
+							//entityProps={}
+						>
+							<TableRow>
+								{Array.from(columns, ([columnKey, column]) => (
+									<TableCell key={columnKey}>{column.children}</TableCell>
+								))}
+							</TableRow>
+						</Entity>
+					))}
 				</Table>
 				<ButtonList>
 					{pageIndex > 1 && <Button onClick={() => updatePaging({ type: 'goToFirstPage' })}>First</Button>}

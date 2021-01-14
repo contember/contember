@@ -9,6 +9,7 @@ export * from './entityEvents'
 export * from './helperComponents'
 export * from './markers'
 export * from './queryLanguage'
+export * from './treeParameterHelpers'
 export * from './treeParameters'
 
 export * from './bindingTypes'

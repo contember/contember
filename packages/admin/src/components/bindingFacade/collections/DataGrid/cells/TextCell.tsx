@@ -2,12 +2,10 @@ import {
 	Component,
 	Field,
 	FieldValue,
-	Filter,
-	HasOneRelation,
 	QueryLanguage,
 	SugaredRelativeSingleField,
+	wrapFilterInHasOnes,
 } from '@contember/binding'
-import { whereToFilter } from '@contember/client'
 import { TextInput } from '@contember/ui'
 import * as React from 'react'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
@@ -21,27 +19,6 @@ export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridH
 		fallback?: React.ReactNode
 	}
 
-// Literal
-
-const wrapFilter = (path: HasOneRelation[], filter: Filter): Filter => {
-	for (let i = path.length - 1; i >= 0; i--) {
-		const current = path[i]
-
-		if (current.reducedBy === undefined) {
-			filter = {
-				[current.field]: filter,
-			}
-		} else {
-			filter = {
-				[current.field]: {
-					and: [filter, whereToFilter(current.reducedBy)],
-				},
-			}
-		}
-	}
-	return filter
-}
-
 export const TextCell = Component<TextCellProps>(props => {
 	return (
 		<DataGridColumn<string>
@@ -52,7 +29,7 @@ export const TextCell = Component<TextCellProps>(props => {
 			}
 			getNewFilter={(filterArtifact, { environment }) => {
 				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
-				return wrapFilter(desugared.hasOneRelationPath, {
+				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
 					[desugared.field]: {
 						containsCI: filterArtifact,
 					},

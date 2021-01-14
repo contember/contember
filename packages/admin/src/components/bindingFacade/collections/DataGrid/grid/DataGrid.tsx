@@ -107,7 +107,7 @@ export const DataGrid = Component<DataGridProps>(
 					pageIndex: 0,
 				},
 				filters: normalizeInitialFilters(columns),
-				orderBys: normalizeInitialOrderBys(columns),
+				orderBys: normalizeInitialOrderBys(columns, environment),
 			},
 			environment,
 		)

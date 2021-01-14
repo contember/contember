@@ -1,9 +1,12 @@
 import { Component, Environment, Field, QueryLanguage, SugaredRelativeSingleField } from '@contember/binding'
 import { TextInput } from '@contember/ui'
 import * as React from 'react'
-import { DataGridColumn, DataGridColumnProps } from '../base'
+import { DataGridColumn, DataGridOrderDirection } from '../base'
 
-export type TextCellProps = Omit<DataGridColumnProps, 'children'> & SugaredRelativeSingleField
+export type TextCellProps = SugaredRelativeSingleField & {
+	header?: React.ReactNode
+	initialOrder?: DataGridOrderDirection
+}
 
 const getFullPath = (field: SugaredRelativeSingleField['field'], env: Environment): string[] => {
 	const desugared = QueryLanguage.desugarRelativeSingleField(field, env)
@@ -65,7 +68,7 @@ export const TextCell = Component<TextCellProps>(props => {
 				)
 			}}
 		>
-			<Field {...props} format={value => (value === null ? <i>Nothing</i> : value)} />
+			<Field {...props} format={value => (value === null ? <i>Nothing</i> : String(value))} />
 		</DataGridColumn>
 	)
 }, 'TextCell')

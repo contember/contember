@@ -2,6 +2,7 @@ import { BindingError, Environment, Filter } from '@contember/binding'
 import * as React from 'react'
 import { DataGridColumnKey } from './DataGridColumnKey'
 import { DataGridHeaderCellPublicProps } from './DataGridHeaderCell'
+import { DataGridOrderDirection } from './DataGridOrderDirection'
 import { DataGridSetFilter } from './DataGridSetFilter'
 import { GetNewOrderBy, SingleColumnOrderBy } from './SingleColumnOrderBy'
 
@@ -27,7 +28,7 @@ export type DataGridColumnOrdering<O extends SingleColumnOrderBy = SingleColumnO
 	  }
 	| {
 			enableOrdering?: true
-			initialOrder?: O
+			initialOrder?: DataGridOrderDirection
 			getNewOrderBy?: GetNewOrderBy
 	  }
 
@@ -36,7 +37,7 @@ export type DataGridColumnProps<
 	O extends SingleColumnOrderBy = SingleColumnOrderBy
 > = DataGridHeaderCellPublicProps & {
 	header?: React.ReactNode
-	children: React.ReactNode
+	children?: React.ReactNode
 } & DataGridColumnFiltering<F> &
 	DataGridColumnOrdering<O>
 

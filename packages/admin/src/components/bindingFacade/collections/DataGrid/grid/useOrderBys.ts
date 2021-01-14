@@ -2,13 +2,14 @@ import { useEnvironment } from '@contember/binding'
 import * as React from 'react'
 import { DataGridColumns, DataGridOrderBys, DataGridSetColumnOrderBy } from '../base'
 import { GridPagingAction } from '../paging'
+import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
 
 export const useOrderBys = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
 ): [DataGridOrderBys, DataGridSetColumnOrderBy] => {
 	const environment = useEnvironment()
-	const [orderBys, setOrderBys] = React.useState<DataGridOrderBys>(new Map())
+	const [orderBys, setOrderBys] = React.useState<DataGridOrderBys>(() => normalizeInitialOrderBys(columns, environment))
 
 	return [
 		orderBys,

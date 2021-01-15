@@ -332,6 +332,9 @@ export class DataBinding {
 							signal,
 					  })
 		} catch (metadata) {
+			if (metadata.name === 'AbortError') {
+				return
+			}
 			this.onError(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
 		}
 		return queryResponse

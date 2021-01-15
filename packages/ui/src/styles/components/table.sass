@@ -11,19 +11,30 @@
 
 	display: table
 	border-collapse: collapse
-	margin: calc(-1 * var(--cui-boxNesting-paddingY, 0) + .25em) calc(-1 * var(--cui-boxNesting-paddingX, 0))
-	width: calc(100% + 2 * var(--cui-boxNesting-paddingX, 0))
+	width: 100%
+
+	&-wrapper
+		overflow-x: auto
+		border-radius: var(--cui-boxNesting-borderRadius, 0)
+		margin: calc(-1 * var(--cui-boxNesting-paddingY, 0)) calc(-1 * var(--cui-boxNesting-paddingX, 0))
+		width: calc(100% + 2 * var(--cui-boxNesting-paddingX, 0))
 
 	&-row
 		display: table-row
 
 		&:nth-child(even)
-			background-color: rgba(#000000, 0.02)
+			background-color: rgba(#000000, .02)
+
+	& thead &-row
+		background-color: rgba(#000000, .05)
 
 	&-cell
 		display: table-cell
 		white-space: nowrap
 		padding: calc(var(--cui-table-spacingY) / 2) var(--cui-boxNesting-paddingX, var(--cui-table-spacingX))
+
+		th#{&}
+			font-weight: $fw-semiBold
 
 		&:not(:first-child)
 			padding-left: calc(var(--cui-table-spacingX) / 2)
@@ -31,6 +42,8 @@
 		&:not(:last-child)
 			padding-right: calc(var(--cui-table-spacingX) / 2)
 
+		&.view-numeric
+			font-variant-numeric: tabular-nums
 		&.view-shrunk
 			width: 0.001px // Forces table cell to be as narrow as possible without content overflow and wrapping. 0px gets ignored.
 

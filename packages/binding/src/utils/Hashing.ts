@@ -13,6 +13,7 @@ import {
 } from '../treeParameters'
 import { assertNever } from './assertNever'
 
+// TODO update hashing so that for offset, 0 == undefined
 export class Hashing {
 	public static hashHasOneRelation(relation: HasOneRelation | DesugaredHasOneRelation): number {
 		const where: Array<Filter | UniqueWhere | string | undefined> = [

@@ -5,30 +5,29 @@ import cn from 'classnames'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { UseTableElementContext } from './Table'
 
-export interface TableCellProps {
+export interface TableHeaderCellProps {
 	children?: React.ReactNode
 	justification?: Justification
 	shrunk?: boolean
-	numeric?: boolean
-	colSpan?: number
+	scope?: 'col' | 'row'
+	onClick?: React.MouseEventHandler<HTMLTableHeaderCellElement>
 }
 
-export const TableCell = React.memo(({ shrunk = false, numeric = false, ...props }: TableCellProps) => {
+export const TableHeaderCell = React.memo(({ shrunk = false, ...props }: TableHeaderCellProps) => {
 	const useTableElement = React.useContext(UseTableElementContext)
 	const className = cn(
 		useComponentClassName('table-cell'),
 		toEnumViewClass(props.justification),
-		toViewClass('numeric', numeric),
 		toViewClass('shrunk', shrunk),
 	)
 
 	if (useTableElement) {
 		return (
-			<td className={className} colSpan={props.colSpan}>
+			<th scope={props.scope} className={className} onClick={props.onClick}>
 				{props.children}
-			</td>
+			</th>
 		)
 	}
 	return <div className={className}>{props.children}</div>
 })
-TableCell.displayName = 'TableCell'
+TableHeaderCell.displayName = 'TableHeaderCell'

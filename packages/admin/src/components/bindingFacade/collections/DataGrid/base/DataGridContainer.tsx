@@ -99,14 +99,31 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 						</TableRow>
 					)}
 				</Table>
-				<ButtonList>
-					{pageIndex > 1 && <Button onClick={() => updatePaging({ type: 'goToFirstPage' })}>First</Button>}
-					{pageIndex > 0 && <Button onClick={() => updatePaging({ type: 'goToPreviousPage' })}>Previous</Button>}
-					<span>Page {pageIndex + 1}</span>
-					{itemsPerPage !== null && accessor.length === itemsPerPage && (
-						<Button onClick={() => updatePaging({ type: 'goToNextPage' })}>Next</Button>
-					)}
-				</ButtonList>
+				<div style={{ margin: '1em 0', display: 'flex', justifyContent: 'space-between' }}>
+					<div>
+						<span>Page {pageIndex + 1}</span>
+					</div>
+					<div style={{ display: 'flex', gap: '.5em' }}>
+						<Button
+							distinction="seamless"
+							disabled={pageIndex === 0}
+							onClick={() => updatePaging({ type: 'goToFirstPage' })}
+						>
+							First
+						</Button>
+						<Button disabled={pageIndex === 0} onClick={() => updatePaging({ type: 'goToPreviousPage' })}>
+							Previous
+						</Button>
+						{itemsPerPage !== null && (
+							<Button
+								disabled={accessor.length !== itemsPerPage}
+								onClick={() => updatePaging({ type: 'goToNextPage' })}
+							>
+								Next
+							</Button>
+						)}
+					</div>
+				</div>
 			</div>
 		)
 	},

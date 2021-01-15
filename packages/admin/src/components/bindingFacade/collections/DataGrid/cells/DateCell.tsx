@@ -14,7 +14,7 @@ import DatePicker from 'react-datepicker'
 import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 
-export type DateCellProps<Persisted extends FieldValue = FieldValue> = DataGridHeaderCellPublicProps &
+export type DateCellProps = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
 	DateFieldViewProps & {
 		disableOrder?: boolean
@@ -88,7 +88,7 @@ export const DateCell = Component<DateCellProps>(props => {
 			<DateFieldView {...props} />
 		</DataGridColumn>
 	)
-}, 'DateCell') as <Persisted extends FieldValue = FieldValue>(props: DateCellProps<Persisted>) => React.ReactElement
+}, 'DateCell')
 
 const DateBoundInput = React.memo(
 	React.forwardRef(({ className, label, style, ...props }: any, ref: any) => (

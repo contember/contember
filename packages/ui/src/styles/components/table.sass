@@ -42,6 +42,8 @@
 		&:not(:last-child)
 			padding-right: calc(var(--cui-table-spacingX) / 2)
 
+		&.view-numeric
+			font-variant-numeric: tabular-nums
 		&.view-shrunk
 			width: 0.001px // Forces table cell to be as narrow as possible without content overflow and wrapping. 0px gets ignored.
 

@@ -9,14 +9,16 @@ export interface TableCellProps {
 	children?: React.ReactNode
 	justification?: Justification
 	shrunk?: boolean
+	numeric?: boolean
 	colSpan?: number
 }
 
-export const TableCell = React.memo(({ shrunk = false, ...props }: TableCellProps) => {
+export const TableCell = React.memo(({ shrunk = false, numeric = false, ...props }: TableCellProps) => {
 	const useTableElement = React.useContext(UseTableElementContext)
 	const className = cn(
 		useComponentClassName('table-cell'),
 		toEnumViewClass(props.justification),
+		toViewClass('numeric', numeric),
 		toViewClass('shrunk', shrunk),
 	)
 

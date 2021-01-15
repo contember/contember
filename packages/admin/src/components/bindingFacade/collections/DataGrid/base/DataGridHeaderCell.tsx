@@ -1,5 +1,5 @@
 import { Environment } from '@contember/binding'
-import { Dropdown, Icon, Justification, TableHeaderCell } from '@contember/ui'
+import { ActionableBox, Box, Dropdown, Icon, Justification, TableHeaderCell } from '@contember/ui'
 import * as React from 'react'
 import { FilterRendererProps } from './DataGridColumn'
 import { DataGridFilterArtifact } from './DataGridFilterArtifact'
@@ -41,24 +41,51 @@ export function DataGridHeaderCell({
 }: DataGridHeaderCellProps): React.ReactElement {
 	return (
 		<TableHeaderCell scope="col" justification={headerJustification} shrunk={shrunk}>
-			<span onClick={() => setOrderBy(cycleOrderDirection(orderDirection))}>
-				{header}
-				&nbsp;
-				{orderDirection &&
-					{
-						asc: ascOrderIcon ?? defaultAscIcon,
-						desc: descOrderIcon ?? defaultDescIcon,
-					}[orderDirection]}
+			<span style={{ display: 'flex', justifyContent: 'flex-start', gap: '.25em' }}>
+				<span onClick={() => setOrderBy(cycleOrderDirection(orderDirection))} style={{ cursor: 'pointer' }}>
+					{header}
+					&nbsp;
+					{orderDirection &&
+						{
+							asc: ascOrderIcon ?? defaultAscIcon,
+							desc: descOrderIcon ?? defaultDescIcon,
+						}[orderDirection]}
+				</span>
+				{filterRenderer && (
+					<Dropdown
+						buttonProps={{
+							intent: filterArtifact === undefined ? 'default' : 'primary',
+							distinction: 'seamless',
+							size: 'small',
+							children: (
+								<Icon
+									blueprintIcon="filter"
+									alignWithLowercase
+									style={{
+										opacity: filterArtifact === undefined ? '0.5' : '1',
+									}}
+								/>
+							),
+						}}
+						renderContent={({ requestClose }) => (
+							<ActionableBox
+								onRemove={() => {
+									setFilter(undefined)
+									requestClose()
+								}}
+							>
+								<Box heading="Filter">
+									{React.createElement(filterRenderer, {
+										filter: filterArtifact,
+										setFilter: setFilter,
+										environment: environment,
+									})}
+								</Box>
+							</ActionableBox>
+						)}
+					/>
+				)}
 			</span>
-			{filterRenderer && (
-				<Dropdown buttonProps={{ children: 'F' }}>
-					{React.createElement(filterRenderer, {
-						filter: filterArtifact,
-						setFilter: setFilter,
-						environment: environment,
-					})}
-				</Dropdown>
-			)}
 		</TableHeaderCell>
 	)
 }

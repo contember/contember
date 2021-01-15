@@ -6,7 +6,7 @@ import {
 	SugaredRelativeSingleField,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
-import { TextInput } from '@contember/ui'
+import { FormGroup, TextInput } from '@contember/ui'
 import * as React from 'react'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 
@@ -36,13 +36,15 @@ export const TextCell = Component<TextCellProps>(props => {
 				})
 			}}
 			filterRenderer={({ filter, setFilter }) => (
-				<TextInput
-					value={filter ?? ''}
-					onChange={e => {
-						const value = e.currentTarget.value
-						setFilter(value === '' ? undefined : value)
-					}}
-				/>
+				<FormGroup label={props.header}>
+					<TextInput
+						value={filter ?? ''}
+						onChange={e => {
+							const value = e.currentTarget.value
+							setFilter(value === '' ? undefined : value)
+						}}
+					/>
+				</FormGroup>
 			)}
 		>
 			<Field

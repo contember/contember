@@ -4,8 +4,8 @@ import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'
 import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper'
 import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations'
-import { configureExecuteMigrationCommand, executeMigrations, resolveMigrationStatus } from './MigrationExecuteHelper'
-import { resolveSystemApiClient } from './SystemApiClientResolver'
+import { executeMigrations, resolveMigrationStatus } from './MigrationExecuteHelper'
+import { resolveLocalSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
 
 type Args = {
@@ -18,7 +18,6 @@ type Options = {
 	['project-dir']?: string
 	execute?: true
 	instance?: string
-	['remote-project']?: string
 	yes?: true
 }
 
@@ -27,7 +26,14 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		configuration.description('Creates schema migration diff for given project')
 		configureCreateMigrationCommand(configuration)
 		configuration.option('execute').valueNone()
-		configureExecuteMigrationCommand(configuration)
+		configuration //
+			.option('instance')
+			.valueRequired()
+			.description('Local instance name')
+		configuration //
+			.option('yes')
+			.valueNone()
+			.description('Do not ask for confirmation.')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
@@ -76,7 +82,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 						console.log(`${filename} created`)
 
 						if (shouldExecute) {
-							const client = await resolveSystemApiClient(workspace, project, input)
+							const client = await resolveLocalSystemApiClient(workspace, project, input)
 							const status = await resolveMigrationStatus(client, migrationsResolver)
 							if (status.errorMigrations.length > 0) {
 								console.error(createMigrationStatusTable(status.errorMigrations))

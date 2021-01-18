@@ -98,9 +98,7 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 			{renderToggle ? (
 				renderToggle({ ref: setReferenceElement, onClick: onButtonClick })
 			) : (
-				<div className={`${prefix}dropdown-button`} ref={setReferenceElement}>
-					<Button {...props.buttonProps} onClick={onButtonClick} />
-				</div>
+				<Button {...props.buttonProps} onClick={onButtonClick} ref={setReferenceElement} />
 			)}
 			{isActive && (
 				<Portal to={contentContainer}>

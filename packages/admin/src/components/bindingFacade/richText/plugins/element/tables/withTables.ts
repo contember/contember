@@ -104,6 +104,20 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				}
 			})
 		},
+		justifyTableColumn: (element: TableElement, columnIndex: number, direction: TableCellElement['justify']) => {
+			const tablePath = ReactEditor.findPath(e, element)
+			const rowCount = e.getTableRowCount(element)
+
+			Editor.withoutNormalizing(e, () => {
+				for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+					Transforms.setNodes(
+						editor,
+						{ justify: direction ?? null },
+						{ match: node => e.isTableCell(node), at: [...tablePath, rowIndex, columnIndex] },
+					)
+				}
+			})
+		},
 		deleteTableRow: (element: TableElement, index: number) => {
 			const tablePath = ReactEditor.findPath(e, element)
 			Transforms.removeNodes(e, {

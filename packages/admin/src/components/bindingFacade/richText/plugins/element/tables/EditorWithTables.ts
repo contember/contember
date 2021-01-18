@@ -28,6 +28,7 @@ export interface WithTables<
 
 	addTableRow: (element: TableElement, index?: number) => void
 	addTableColumn: (element: TableElement, index?: number) => void
+	justifyTableColumn: (element: TableElement, index: number, direction: TableCellElement['justify']) => void
 	deleteTableRow: (element: TableElement, index: number) => void
 	deleteTableColumn: (element: TableElement, index: number) => void
 }

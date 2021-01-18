@@ -1,9 +1,10 @@
 import { EditorTableElement } from '@contember/ui'
 import * as React from 'react'
-import { Transforms, Editor as SlateEditor, Range as SlateRange } from 'slate'
-import { ReactEditor, RenderElementProps, useEditor, useFocused, useSelected } from 'slate-react'
+import { Transforms } from 'slate'
+import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
 import { BaseEditor, BlockElement } from '../../../baseEditor'
 import { EditorWithTables } from './EditorWithTables'
+import { TableCellElement } from './TableCellElement'
 import { TableElement } from './TableElement'
 import { TableRowElement } from './TableRowElement'
 
@@ -24,6 +25,11 @@ export const TableElementRenderer = React.memo(function TableElementRenderer(pro
 		editor,
 		props.element,
 	])
+	const justifyColumn = React.useCallback(
+		(index: number, direction: TableCellElement['justify']) =>
+			editor.justifyTableColumn(props.element, index, direction),
+		[editor, props.element],
+	)
 	const deleteRow = React.useCallback((index: number) => editor.deleteTableRow(props.element, index), [
 		editor,
 		props.element,
@@ -74,6 +80,7 @@ export const TableElementRenderer = React.memo(function TableElementRenderer(pro
 				columnCount={(props.element.children[0] as TableRowElement | undefined)?.children.length ?? 0}
 				addRow={addRow}
 				addColumn={addColumn}
+				justifyColumn={justifyColumn}
 				deleteRow={deleteRow}
 				deleteColumn={deleteColumn}
 				//selectTable={selectTable}

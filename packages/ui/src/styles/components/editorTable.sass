@@ -73,13 +73,18 @@
 			&-last
 				border-top-right-radius: $removeDimensionBorderRadius
 		&-item:hover + * + &-line,
-		&-item:hover + * + * + * + * + &-line // I know…
+		&-item:hover + * + * + * + * + * + &-line // I know…
 			background-color: $removeColor
 			z-index: 1
 		&-item:hover + * + &-line
 			transform: translateX(150%) scaleX(2)
-		&-item:hover + * + * + * + * + &-line
+		&-item:hover + * + * + * + * + * + &-line
 			transform: translateX(-150%) scaleX(2)
+		&-more
+			grid-row: 1 / span 1
+			grid-column: calc(2 * #{$column} + 3) / span 1
+			justify-self: center
+			place-self: center
 		&-line
 			grid-row: 2 / -2
 			grid-column: calc(2 * #{$column} + 2) / span 1
@@ -114,6 +119,7 @@
 			z-index: 1
 	&-rowControls-add,
 	&-columnControls-add,
+	&-columnControls-more,
 	&-handle,
 	&-remove
 		> *
@@ -132,6 +138,12 @@
 		// grid-row: calc(2 * #{$row} + 3) / span 1
 		// grid-column: calc(2 * #{$column} + 3) / span 1
 		padding: em(2px) em(6px)
+		&.view-justify-start
+			text-align: left
+		&.view-justify-center
+			text-align: center
+		&.view-justify-end
+			text-align: right
 	&-appendRow
 		grid-row: -2 / span 1
 		grid-column: 2 / -2
@@ -177,6 +189,7 @@
 	&-rowControls-item,
 	&-columnControls-add,
 	&-columnControls-item,
+	&-columnControls-more,
 	&-appendRow,
 	&-appendColumn,
 	&-handle,
@@ -192,6 +205,7 @@
 		&-rowControls-item,
 		&-columnControls-add,
 		&-columnControls-item,
+		&-columnControls-more,
 		&-appendRow,
 		&-appendColumn,
 		&-handle,

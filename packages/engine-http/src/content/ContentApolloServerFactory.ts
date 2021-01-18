@@ -36,7 +36,7 @@ class ContentApolloServerFactory {
 			new ErrorHandlerPlugin(this.projectName, 'content', this.errorLogger),
 		]
 		if (this.debug) {
-			plugins.push(new DbQueriesPlugin(context => context.db))
+			plugins.push(new DbQueriesPlugin<ExtendedGraphqlContext>(context => context.db))
 		}
 		return new ApolloServer({
 			uploads: false,

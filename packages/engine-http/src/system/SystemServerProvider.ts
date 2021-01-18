@@ -6,7 +6,6 @@ import {
 	ResolverContext,
 	ResolverContextFactory,
 	ResolverFactory,
-	Schema,
 	typeDefs,
 } from '@contember/engine-system-api'
 import { KoaContext } from '../koa'
@@ -49,7 +48,7 @@ class SystemServerProvider {
 			new ErrorHandlerPlugin(undefined, 'system', this.errorLogger),
 		]
 		if (this.debugMode) {
-			plugins.push(new DbQueriesPlugin(context => context.db.client))
+			plugins.push(new DbQueriesPlugin<ExtendedGraphqlContext>(context => context.db.client))
 		}
 		const resolvers = this.resolversFactory.create(this.debugMode)
 		const mergedSchema = mergeSchemas({ schemas, resolvers: resolvers as Config['resolvers'] })

@@ -1,5 +1,5 @@
 import { UpdateBuilder } from '@contember/database'
-import { Command } from './Command'
+import { Command } from '../Command'
 
 export class UpdateStageEventCommand implements Command<void> {
 	constructor(private readonly stageSlug: string, private readonly eventId: string) {}

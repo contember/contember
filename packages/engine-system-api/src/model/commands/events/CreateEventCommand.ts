@@ -1,6 +1,6 @@
 import { InsertBuilder } from '@contember/database'
 import { EventType } from '@contember/engine-common'
-import { Command } from './Command'
+import { Command } from '../Command'
 
 export class CreateEventCommand implements Command<string> {
 	constructor(

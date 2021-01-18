@@ -62,6 +62,11 @@ class SelectBuilder<Result = SelectBuilder.Result>
 		return this.withOption('from', [...(this.options.from || []), [tableName, alias]])
 	}
 
+	public distinct(...on: (QueryBuilder.ColumnIdentifier | QueryBuilder.ColumnExpression)[]): SelectBuilder<Result> {
+		const onLiterals = on.map(columnExpressionToLiteral).filter((it): it is Literal => it !== undefined)
+		return this.withOption('distinct', onLiterals)
+	}
+
 	public select(columnName: QueryBuilder.ColumnIdentifier, alias?: string): SelectBuilder<Result>
 	public select(callback: QueryBuilder.ColumnExpression, alias?: string): SelectBuilder<Result>
 	public select(
@@ -175,6 +180,7 @@ namespace SelectBuilder {
 	export type Options = Readonly<
 		With.Options &
 			Where.Options & {
+				distinct?: Literal[]
 				select: Literal[]
 				limit: [number | undefined, number | undefined]
 				from: undefined | [Literal | string, string | undefined][]

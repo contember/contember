@@ -15,6 +15,7 @@ class Compiler {
 			Literal.empty
 				.append(withLiteral)
 				.appendString(' select')
+				.append(this.compileDistinctStatement(options.distinct))
 				.append(this.compileSelectStatement(options.select))
 				.append(this.compileFromStatement(options.from, namespaceContextFinal))
 				.append(this.compileJoin(options.join, namespaceContextFinal))
@@ -168,6 +169,13 @@ class Compiler {
 					return assertNever(type)
 			}
 		}, Literal.empty)
+	}
+
+	private compileDistinctStatement(distinct: SelectBuilder.Options['distinct']): Literal {
+		if (distinct === undefined) {
+			return Literal.empty
+		}
+		return new Literal(' distinct').appendAll(distinct, ', ', [' on (', ')'])
 	}
 
 	private compileSelectStatement(select: SelectBuilder.Options['select']): Literal {

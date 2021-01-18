@@ -33,8 +33,14 @@ export const overrideInsertBreak = <E extends BlockSlateEditor>(editor: E, optio
 		) {
 			return insertBreak()
 		}
-		const nextSibling = SlatePath.next(path)
-		const nextSiblingEnd = Editor.end(editor, nextSibling)
+		const nextSiblingPath = SlatePath.next(path)
+		const nextSibling = SlateNode.get(editor, nextSiblingPath)
+
+		if (!editor.isContemberFieldElement(nextSibling) && SlateNode.string(nextSibling) !== '') {
+			return insertBreak()
+		}
+
+		const nextSiblingEnd = Editor.end(editor, nextSiblingPath)
 
 		return Transforms.select(editor, nextSiblingEnd)
 	}

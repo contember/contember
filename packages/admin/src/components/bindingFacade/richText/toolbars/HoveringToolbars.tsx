@@ -4,6 +4,7 @@ import { useToolbarState } from '../editorSelection'
 import { HoveringToolbarContents, HoveringToolbarContentsProps } from './HoveringToolbarContents'
 
 export interface HoveringToolbarsProps {
+	shouldDisplayInlineToolbar?: () => boolean
 	inlineButtons?: HoveringToolbarContentsProps['buttons']
 	blockButtons?: HoveringToolbarContentsProps['buttons'] | React.ReactElement // TODO this is NASTY
 }
@@ -11,11 +12,14 @@ export interface HoveringToolbarsProps {
 export const HoveringToolbars = React.memo((props: HoveringToolbarsProps) => {
 	const { inlineToolbarRef, blockToolbarActive, inlineToolbarActive } = useToolbarState()
 
+	const shouldDisplayInlineToolbar =
+		inlineToolbarActive && (props.shouldDisplayInlineToolbar === undefined || props.shouldDisplayInlineToolbar())
+
 	return (
 		<>
 			<Portal>
 				{props.inlineButtons && (
-					<UIToolbar isActive={inlineToolbarActive} ref={inlineToolbarRef} scope="contextual">
+					<UIToolbar isActive={shouldDisplayInlineToolbar} ref={inlineToolbarRef} scope="contextual">
 						<HoveringToolbarContents buttons={props.inlineButtons} />
 					</UIToolbar>
 				)}

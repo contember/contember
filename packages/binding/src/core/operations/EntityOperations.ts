@@ -236,7 +236,7 @@ export class EntityOperations {
 					)
 				}
 				const newId = new ClientGeneratedUuid(updatedState.value as string)
-				this.stateInitializer.changeEntityId(state, newId)
+				this.changeEntityId(state, newId)
 			}
 
 			if (updatedState.type === StateType.Entity && updatedState.isScheduledForDeletion) {
@@ -388,7 +388,7 @@ export class EntityOperations {
 	}
 
 	private processEntityDeletion(state: EntityState, deletedChildState: EntityState) {
-		const relevantPlaceholders = this.stateInitializer.findChildPlaceholdersByState(state, deletedChildState)
+		const relevantPlaceholders = this.findChildPlaceholdersByState(state, deletedChildState)
 
 		if (deletedChildState.id.existsOnServer) {
 			if (state.plannedHasOneDeletions === undefined) {
@@ -418,5 +418,57 @@ export class EntityOperations {
 		state.childrenWithPendingUpdates?.delete(deletedChildState)
 
 		this.eventManager.markPendingConnections(state, relevantPlaceholders)
+	}
+
+	public changeEntityId(entityState: EntityState, newId: EntityAccessor.RuntimeId) {
+		const previousKey = entityState.id.value
+		const newKey = newId.value
+
+		entityState.hasIdSetInStone = true
+		entityState.id = newId
+		this.treeStore.entityStore.delete(previousKey)
+		this.treeStore.entityStore.set(newKey, entityState)
+
+		for (const [parentState] of entityState.realms) {
+			// We're touching the parents and not letting *their* onChildUpdate handle this because we really need
+			// to make sure this gets processed which wouldn't happen if before the id change we had told the parent
+			// about another update.
+			if (parentState?.type === StateType.Entity) {
+				const relevantPlaceholders = this.findChildPlaceholdersByState(parentState, entityState)
+				this.eventManager.markPendingConnections(parentState, relevantPlaceholders)
+			} else if (parentState?.type === StateType.EntityList) {
+				// This is tricky. We need to change the key but at the same time preserve the order of the entities.
+				// We find the index of this entity (knowing there's exactly one occurrence), then convert the children
+				// to an array, perform the replacement and put the data back into the map, preserving its referential
+				// identity.
+				let childIndex = -1
+				for (const [key] of parentState.children) {
+					childIndex++
+					if (key === previousKey) {
+						break
+					}
+				}
+				const childrenArray = Array.from(parentState.children)
+				childrenArray[childIndex] = [newKey, entityState]
+
+				parentState.children.clear()
+				for (const [key, state] of childrenArray) {
+					parentState.children.set(key, state)
+				}
+			}
+		}
+	}
+
+	public findChildPlaceholdersByState(containingState: EntityState, childState: StateNode) {
+		const relevantPlaceholders = new Set<FieldName>()
+
+		// All has one relations where this entity is present.
+		for (const [placeholderName, candidateState] of containingState.children) {
+			if (candidateState === childState) {
+				relevantPlaceholders.add(placeholderName)
+			}
+		}
+
+		return relevantPlaceholders
 	}
 }

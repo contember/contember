@@ -13,8 +13,8 @@ import {
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEntity,
-	useEnvironment,
 	useEntityList,
+	useEnvironment,
 	useField,
 	useSortedEntities,
 	VariableInputTransformer,
@@ -22,7 +22,7 @@ import {
 import { emptyArray, noop, useConstantLengthInvariant } from '@contember/react-utils'
 import { EditorCanvas } from '@contember/ui'
 import * as React from 'react'
-import { PathRef } from 'slate'
+import { Editor, PathRef, Range as SlateRange } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater } from '../../collections'
@@ -223,6 +223,30 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 			trailingFieldBackedAccessors: trailingAccessors,
 		})
 
+		// TODO this is a bit of a hack.
+		const shouldDisplayInlineToolbar = React.useCallback(() => {
+			const selection = editor.selection
+
+			if (!selection || SlateRange.isCollapsed(selection)) {
+				return false
+			}
+			if (leadingFieldBackedElements.length === 0) {
+				return true
+			}
+
+			// TODO This shouldn't be hardcoded like this.
+			const rangeOfFieldBacked: SlateRange = {
+				anchor: Editor.start(editor, [0]),
+				focus: Editor.end(editor, [leadingFieldBackedElements.length - 1]),
+			}
+			const intersection = SlateRange.intersection(selection, rangeOfFieldBacked)
+
+			// This is a bit of set theory. If A is a subset of B if and only if their intersection is equal to A.
+			// We don't want to disable the toolbar if some part of the selection is outside of rangeOfFieldBacked,
+			// and so we disable the toolbar only if the entirety of the selection is contained within rangeOfFieldBacked.
+			return intersection === null || !SlateRange.equals(selection, intersection)
+		}, [editor, leadingFieldBackedElements.length])
+
 		// TODO label?
 		return (
 			<Slate editor={editor} value={nodes} onChange={editor.slateOnChange}>
@@ -241,6 +265,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 					{React.useMemo(
 						() => (
 							<HoveringToolbars
+								shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
 								inlineButtons={inlineButtons}
 								blockButtons={
 									<BlockHoveringToolbarContents
@@ -251,7 +276,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 								}
 							/>
 						),
-						[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons],
+						[blockButtons, editorReferenceBlocks, inlineButtons, otherBlockButtons, shouldDisplayInlineToolbar],
 					)}
 				</EditorCanvas>
 			</Slate>

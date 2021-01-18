@@ -2,14 +2,16 @@ import * as React from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import cn from 'classnames'
 import { toStateClass } from '../../../utils'
+import { Dropdown } from '../../Dropdown'
 import { Icon } from '../../Icon'
-import { Button } from '../../forms'
+import { Button, ButtonGroup, ButtonList } from '../../forms'
 
 export interface EditorTableElementProps {
 	rowCount: number
 	columnCount: number
 	addRow: (index?: number) => void
 	addColumn: (index?: number) => void
+	justifyColumn: (index: number, direction: 'start' | 'center' | 'end' | undefined) => void
 	deleteTable: () => void
 	deleteRow: (index: number) => void
 	deleteColumn: (index: number) => void
@@ -24,6 +26,7 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 	columnCount,
 	addRow,
 	addColumn,
+	justifyColumn,
 	deleteTable,
 	deleteRow,
 	deleteColumn,
@@ -58,6 +61,33 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 					const columnStyle = { [`--${prefix}editorTable-column`]: columnNumber } as React.CSSProperties
 					return (
 						<React.Fragment key={columnNumber}>
+							{columnNumber < columnCount ? (
+								<Dropdown
+									buttonProps={{
+										className: cn(`${prefix}editorTable-columnControls-more`),
+										flow: 'circular',
+										size: 'small',
+										distinction: 'seamless',
+										style: columnStyle,
+										children: <Icon blueprintIcon="more" />,
+									}}
+									styledContent={false}
+								>
+									<ButtonGroup>
+										<Button flow="circular" size="small" onClick={() => justifyColumn(columnNumber, 'start')}>
+											<Icon blueprintIcon="align-left" size="small" />
+										</Button>
+										<Button flow="circular" size="small" onClick={() => justifyColumn(columnNumber, 'center')}>
+											<Icon blueprintIcon="align-center" size="small" />
+										</Button>
+										<Button flow="circular" size="small" onClick={() => justifyColumn(columnNumber, 'end')}>
+											<Icon blueprintIcon="align-right" size="small" />
+										</Button>
+									</ButtonGroup>
+								</Dropdown>
+							) : (
+								<span className={cn(`${prefix}editorTable-stub`)} />
+							)}
 							{columnNumber < columnCount ? (
 								<button
 									type="button"

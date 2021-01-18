@@ -214,7 +214,33 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		insertBreak: () => {
 			const closestBlockEntry = ContemberEditor.closestBlockEntry(e)
 			if (closestBlockEntry && e.isTableCell(closestBlockEntry[0])) {
-				return // TODO insert <br />
+				const selection = editor.selection
+				const [, closestBlockPath] = closestBlockEntry
+				const [cellStart, cellEnd] = Editor.edges(editor, closestBlockPath)
+
+				if (!selection) {
+					return insertBreak()
+				}
+
+				return Editor.withoutNormalizing(e, () => {
+					Transforms.wrapNodes(e, e.createDefaultElement([]), {
+						at: {
+							anchor: cellStart,
+							focus: cellEnd,
+						},
+						match: node => Text.isText(node) || e.isInline(node),
+					})
+
+					const relative = SlatePath.relative(selection.focus.path, closestBlockPath)
+					Transforms.splitNodes(e, {
+						// The zero should be the newly created default element.
+						at: {
+							path: [...closestBlockPath, 0, ...relative],
+							offset: selection.focus.offset,
+						},
+						always: true,
+					})
+				})
 			}
 			insertBreak()
 		},
@@ -260,8 +286,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			deleteFragment()
 		},
 		onKeyDown: event => {
+			const selection = editor.selection
 			if (
-				!editor.selection ||
+				!selection ||
 				!(
 					event.key === 'Tab' ||
 					event.key === 'ArrowUp' ||
@@ -272,14 +299,25 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			) {
 				return onKeyDown(event)
 			}
-			const closestBlockEntry = Editor.above(editor, {
-				at: editor.selection,
-				match: node => Editor.isBlock(editor, node),
-			})
-			if (!closestBlockEntry || !e.isTableCell(closestBlockEntry[0])) {
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, selection)
+
+			if (!closestBlockEntry) {
 				return onKeyDown(event)
 			}
-			const [cellElement, cellPath] = closestBlockEntry
+			let cellElement: TableCellElement
+			let cellPath: SlatePath
+
+			if (!e.isTableCell(closestBlockEntry[0])) {
+				const parent = SlateNode.parent(e, closestBlockEntry[1])
+				if (e.isDefaultElement(closestBlockEntry[0]) && e.isTableCell(parent)) {
+					cellElement = parent
+					cellPath = SlatePath.parent(closestBlockEntry[1])
+				} else {
+					return onKeyDown(event)
+				}
+			} else {
+				;[cellElement, cellPath] = closestBlockEntry
+			}
 			if (cellPath.length < 3) {
 				return onKeyDown(event)
 			}
@@ -339,7 +377,6 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 					}
 				}
 			}
-			const selection = editor.selection
 
 			if (event.key === 'ArrowLeft') {
 				if (!SlateRange.isCollapsed(selection)) {
@@ -374,37 +411,50 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 						}
 					}
 				}
-			} else if (event.key === 'ArrowUp') {
-				if (rowIndex > 0) {
-					event.preventDefault()
-					const rowAboveEndPoint = Editor.end(e, [...tablePath, rowIndex - 1, columnIndex])
-
-					if (!SlateRange.isCollapsed(selection)) {
-						return Transforms.select(e, rowAboveEndPoint)
+			} else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+				const withinDefault = e.isDefaultElement(closestBlockEntry[0])
+				if (withinDefault) {
+					const relative = SlatePath.relative(closestBlockEntry[1], cellPath)
+					const defaultIndex = relative[0]
+					if (
+						(event.key === 'ArrowUp' && defaultIndex !== 0) ||
+						(event.key === 'ArrowDown' && defaultIndex !== cellElement.children.length - 1)
+					) {
+						return onKeyDown(event)
 					}
-					const minOffset = Math.min(selection.focus.offset, rowAboveEndPoint.offset)
-					return Transforms.select(e, {
-						path: rowAboveEndPoint.path,
-						offset: minOffset,
-					})
 				}
-				return moveSelectionBeforeTable()
-			} else if (event.key === 'ArrowDown') {
-				if (rowIndex < rowCount - 1) {
-					event.preventDefault()
-					const rowBelowStatPoint = Editor.start(e, [...tablePath, rowIndex + 1, columnIndex])
+				if (event.key === 'ArrowUp') {
+					if (rowIndex > 0) {
+						event.preventDefault()
+						const rowAboveEndPoint = Editor.end(e, [...tablePath, rowIndex - 1, columnIndex])
 
-					if (!SlateRange.isCollapsed(selection)) {
-						return Transforms.select(e, rowBelowStatPoint)
+						if (!SlateRange.isCollapsed(selection)) {
+							return Transforms.select(e, rowAboveEndPoint)
+						}
+						const minOffset = Math.min(selection.focus.offset, rowAboveEndPoint.offset)
+						return Transforms.select(e, {
+							path: rowAboveEndPoint.path,
+							offset: minOffset,
+						})
 					}
-					const [rowBelowStatPointNode] = Editor.node(e, rowBelowStatPoint) as NodeEntry<Text>
+					return moveSelectionBeforeTable()
+				} else if (event.key === 'ArrowDown') {
+					if (rowIndex < rowCount - 1) {
+						event.preventDefault()
+						const rowBelowStatPoint = Editor.start(e, [...tablePath, rowIndex + 1, columnIndex])
 
-					return Transforms.select(e, {
-						path: rowBelowStatPoint.path,
-						offset: Math.min(selection.focus.offset, rowBelowStatPointNode.text.length),
-					})
+						if (!SlateRange.isCollapsed(selection)) {
+							return Transforms.select(e, rowBelowStatPoint)
+						}
+						const [rowBelowStatPointNode] = Editor.node(e, rowBelowStatPoint) as NodeEntry<Text>
+
+						return Transforms.select(e, {
+							path: rowBelowStatPoint.path,
+							offset: Math.min(selection.focus.offset, rowBelowStatPointNode.text.length),
+						})
+					}
+					return moveSelectionAfterTable()
 				}
-				return moveSelectionAfterTable()
 			}
 			onKeyDown(event)
 		},

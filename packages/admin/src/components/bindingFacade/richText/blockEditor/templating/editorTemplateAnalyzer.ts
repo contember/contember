@@ -2,6 +2,7 @@ import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import * as React from 'react'
 import { ContentOutlet, ContentOutletProps } from './ContentOutlet'
 import { TextFieldProps } from './TextField'
+import { Environment } from '@contember/binding'
 
 export class BoxedTextFieldProps {
 	public constructor(public readonly value: TextFieldProps) {}
@@ -18,5 +19,7 @@ const outletLeaf = new Leaf(node => new BoxedContentOutletProps(node.props), Con
 const catchAllJSXLeaf = new Leaf(node => new BoxedCatchAllJSX(node))
 
 export const editorTemplateAnalyzer = new ChildrenAnalyzer<
-	/*BoxedTextFieldProps |*/ BoxedContentOutletProps | BoxedCatchAllJSX
+	/*BoxedTextFieldProps |*/ BoxedContentOutletProps | BoxedCatchAllJSX,
+	never,
+	Environment
 >([/*textFieldLeaf,*/ outletLeaf, catchAllJSXLeaf])

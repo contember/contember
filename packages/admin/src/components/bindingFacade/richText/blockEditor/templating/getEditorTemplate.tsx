@@ -4,6 +4,7 @@ import * as React from 'react'
 import { assertNever } from '../../../../../utils'
 import { ContentOutletProps } from './ContentOutlet'
 import { BoxedCatchAllJSX, BoxedContentOutletProps, editorTemplateAnalyzer } from './editorTemplateAnalyzer'
+import { Environment } from '../../../../../../../binding'
 
 export interface EditorTemplateAtom<Value> {
 	nodeBefore: React.ReactNode
@@ -19,9 +20,9 @@ export type EditorTemplate =
 			//trailing: EditorTemplateAtom<TextFieldProps>[]
 	  }
 
-export const getEditorTemplate = (blockContents: React.ReactNode): EditorTemplate => {
+export const getEditorTemplate = (blockContents: React.ReactNode, env: Environment): EditorTemplate => {
 	let contentOutlet: ContentOutletProps | undefined = undefined
-	const processed = editorTemplateAnalyzer.processChildren(blockContents, undefined)
+	const processed = editorTemplateAnalyzer.processChildren(blockContents, env)
 
 	const nodesBefore: React.ReactNode[] = []
 	const nodesAfter: React.ReactNode[] = []

@@ -17,6 +17,8 @@ export type Scalars = {
 export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly migrate: MigrateResponse
+	readonly migrationDelete: MigrationDeleteResponse
+	readonly migrationModify: MigrationModifyResponse
 	readonly rebaseAll: RebaseAllResponse
 	readonly release: ReleaseResponse
 	readonly releaseTree: ReleaseTreeResponse
@@ -25,6 +27,15 @@ export type Mutation = {
 
 export type MutationMigrateArgs = {
 	migrations: ReadonlyArray<Migration>
+}
+
+export type MutationMigrationDeleteArgs = {
+	migration: Scalars['String']
+}
+
+export type MutationMigrationModifyArgs = {
+	migration: Scalars['String']
+	modification: MigrationModification
 }
 
 export type MutationReleaseArgs = {
@@ -40,6 +51,46 @@ export type MutationReleaseTreeArgs = {
 export type TruncateResponse = {
 	readonly __typename?: 'TruncateResponse'
 	readonly ok: Scalars['Boolean']
+}
+
+export type MigrationModification = {
+	readonly version?: Maybe<Scalars['String']>
+	readonly name?: Maybe<Scalars['String']>
+	readonly formatVersion?: Maybe<Scalars['Int']>
+	readonly modifications?: Maybe<ReadonlyArray<Scalars['Json']>>
+}
+
+export enum MigrationModifyErrorCode {
+	NotFound = 'NOT_FOUND',
+}
+
+export type MigrationModifyError = {
+	readonly __typename?: 'MigrationModifyError'
+	readonly code: MigrationModifyErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export type MigrationModifyResponse = {
+	readonly __typename?: 'MigrationModifyResponse'
+	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<MigrationModifyError>
+}
+
+export enum MigrationDeleteErrorCode {
+	NotFound = 'NOT_FOUND',
+	InvalidFormat = 'INVALID_FORMAT',
+}
+
+export type MigrationDeleteError = {
+	readonly __typename?: 'MigrationDeleteError'
+	readonly code: MigrationDeleteErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export type MigrationDeleteResponse = {
+	readonly __typename?: 'MigrationDeleteResponse'
+	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<MigrationDeleteError>
 }
 
 export type Query = {
@@ -456,6 +507,14 @@ export type ResolversTypes = {
 	String: ResolverTypeWrapper<Scalars['String']>
 	TruncateResponse: ResolverTypeWrapper<TruncateResponse>
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+	MigrationModification: MigrationModification
+	Int: ResolverTypeWrapper<Scalars['Int']>
+	MigrationModifyErrorCode: MigrationModifyErrorCode
+	MigrationModifyError: ResolverTypeWrapper<MigrationModifyError>
+	MigrationModifyResponse: ResolverTypeWrapper<MigrationModifyResponse>
+	MigrationDeleteErrorCode: MigrationDeleteErrorCode
+	MigrationDeleteError: ResolverTypeWrapper<MigrationDeleteError>
+	MigrationDeleteResponse: ResolverTypeWrapper<MigrationDeleteResponse>
 	DateTime: ResolverTypeWrapper<Scalars['DateTime']>
 	Json: ResolverTypeWrapper<Scalars['Json']>
 	Query: ResolverTypeWrapper<{}>
@@ -481,7 +540,6 @@ export type ResolversTypes = {
 	DiffResponse: ResolverTypeWrapper<DiffResponse>
 	DiffResult: ResolverTypeWrapper<DiffResult>
 	ExecutedMigration: ResolverTypeWrapper<ExecutedMigration>
-	Int: ResolverTypeWrapper<Scalars['Int']>
 	Migration: Migration
 	MigrateErrorCode: MigrateErrorCode
 	MigrateError: ResolverTypeWrapper<MigrateError>
@@ -508,6 +566,12 @@ export type ResolversParentTypes = {
 	String: Scalars['String']
 	TruncateResponse: TruncateResponse
 	Boolean: Scalars['Boolean']
+	MigrationModification: MigrationModification
+	Int: Scalars['Int']
+	MigrationModifyError: MigrationModifyError
+	MigrationModifyResponse: MigrationModifyResponse
+	MigrationDeleteError: MigrationDeleteError
+	MigrationDeleteResponse: MigrationDeleteResponse
 	DateTime: Scalars['DateTime']
 	Json: Scalars['Json']
 	Query: {}
@@ -530,7 +594,6 @@ export type ResolversParentTypes = {
 	DiffResponse: DiffResponse
 	DiffResult: DiffResult
 	ExecutedMigration: ExecutedMigration
-	Int: Scalars['Int']
 	Migration: Migration
 	MigrateError: MigrateError
 	MigrateResponse: MigrateResponse
@@ -560,6 +623,18 @@ export type MutationResolvers<
 		ContextType,
 		RequireFields<MutationMigrateArgs, 'migrations'>
 	>
+	migrationDelete?: Resolver<
+		ResolversTypes['MigrationDeleteResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<MutationMigrationDeleteArgs, 'migration'>
+	>
+	migrationModify?: Resolver<
+		ResolversTypes['MigrationModifyResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<MutationMigrationModifyArgs, 'migration' | 'modification'>
+	>
 	rebaseAll?: Resolver<ResolversTypes['RebaseAllResponse'], ParentType, ContextType>
 	release?: Resolver<
 		ResolversTypes['ReleaseResponse'],
@@ -581,6 +656,42 @@ export type TruncateResponseResolvers<
 	ParentType extends ResolversParentTypes['TruncateResponse'] = ResolversParentTypes['TruncateResponse']
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type MigrationModifyErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MigrationModifyError'] = ResolversParentTypes['MigrationModifyError']
+> = {
+	code?: Resolver<ResolversTypes['MigrationModifyErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type MigrationModifyResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MigrationModifyResponse'] = ResolversParentTypes['MigrationModifyResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['MigrationModifyError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type MigrationDeleteErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MigrationDeleteError'] = ResolversParentTypes['MigrationDeleteError']
+> = {
+	code?: Resolver<ResolversTypes['MigrationDeleteErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type MigrationDeleteResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MigrationDeleteResponse'] = ResolversParentTypes['MigrationDeleteResponse']
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['MigrationDeleteError']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -925,6 +1036,10 @@ export type StageResolvers<
 export type Resolvers<ContextType = any> = {
 	Mutation?: MutationResolvers<ContextType>
 	TruncateResponse?: TruncateResponseResolvers<ContextType>
+	MigrationModifyError?: MigrationModifyErrorResolvers<ContextType>
+	MigrationModifyResponse?: MigrationModifyResponseResolvers<ContextType>
+	MigrationDeleteError?: MigrationDeleteErrorResolvers<ContextType>
+	MigrationDeleteResponse?: MigrationDeleteResponseResolvers<ContextType>
 	DateTime?: GraphQLScalarType
 	Json?: GraphQLScalarType
 	Query?: QueryResolvers<ContextType>

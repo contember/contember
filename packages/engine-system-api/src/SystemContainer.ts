@@ -20,6 +20,7 @@ import {
 	EventsRebaser,
 	ExecutedMigrationsResolver,
 	HistoryEventResponseBuilder,
+	MigrationAlterer,
 	MigrationExecutor,
 	MigrationsResolverFactory,
 	PermissionsFactory,
@@ -51,6 +52,7 @@ import { ReleaseTreeMutationResolver, TruncateMutationResolver } from './resolve
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
 import { ExecutedMigrationsQueryResolver, HistoryQueryResolver } from './resolvers/query'
 import { DiffEventTypeResolver, HistoryEventTypeResolver } from './resolvers/types'
+import { MigrationAlterMutationResolver } from './resolvers/mutation/MigrationAlterMutationResolver'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
@@ -163,6 +165,7 @@ export class SystemContainerFactory {
 				'projectTruncateExecutor',
 				({ executedMigrationsResolver }) => new ProjectTruncateExecutor(executedMigrationsResolver),
 			)
+			.addService('migrationAlterer', () => new MigrationAlterer())
 
 			.addService('stagesQueryResolver', () => new StagesQueryResolver())
 			.addService('executedMigrationsQueryResolver', () => new ExecutedMigrationsQueryResolver())
@@ -196,6 +199,10 @@ export class SystemContainerFactory {
 			.addService('historyEventTypeResolver', () => new HistoryEventTypeResolver())
 			.addService('diffEventTypeResolver', () => new DiffEventTypeResolver())
 			.addService(
+				'migrationAlterMutationResolver',
+				({ migrationAlterer }) => new MigrationAlterMutationResolver(migrationAlterer),
+			)
+			.addService(
 				'systemResolversFactory',
 				({
 					stagesQueryResolver,
@@ -209,6 +216,7 @@ export class SystemContainerFactory {
 					truncateMutationResolver,
 					historyEventTypeResolver,
 					diffEventTypeResolver,
+					migrationAlterMutationResolver,
 				}) =>
 					new ResolverFactory(
 						stagesQueryResolver,
@@ -222,6 +230,7 @@ export class SystemContainerFactory {
 						truncateMutationResolver,
 						historyEventTypeResolver,
 						diffEventTypeResolver,
+						migrationAlterMutationResolver,
 					),
 			)
 			.addService(

@@ -1,4 +1,5 @@
 export * from './ExecutedMigrationsResolver'
+export * from './MigrationAlterer'
 export * from './MigrationExecutor'
 export * from './MigrationsResolverFactory'
 export * from './ProjectMigrationInfoResolver'

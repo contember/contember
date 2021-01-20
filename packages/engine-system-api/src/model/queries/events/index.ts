@@ -1,5 +1,6 @@
 export * from './DiffCountQuery'
 export * from './DiffQuery'
+export * from './EventIdsByMigrationQuery'
 export * from './HistoryQuery'
 export * from './InitEventQuery'
 export * from './LatestEventIdByStageQuery'

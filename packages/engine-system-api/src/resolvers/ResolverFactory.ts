@@ -12,6 +12,7 @@ import {
 } from './mutation'
 import { DiffEventTypeResolver, HistoryEventTypeResolver } from './types'
 import { DateTimeType, JSONType } from '@contember/graphql-utils'
+import { MigrationAlterMutationResolver } from './mutation/MigrationAlterMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -26,6 +27,7 @@ class ResolverFactory {
 		private readonly truncateMutationResolver: TruncateMutationResolver,
 		private readonly historyEventTypeResolver: HistoryEventTypeResolver,
 		private readonly diffEventTypeResolver: DiffEventTypeResolver,
+		private readonly migrationAlterMutationResolver: MigrationAlterMutationResolver,
 	) {}
 
 	create(debugMode: boolean): Resolvers {
@@ -107,6 +109,12 @@ class ResolverFactory {
 		}
 		if (debugMode) {
 			resolvers.Mutation.truncate = this.truncateMutationResolver.truncate.bind(this.truncateMutationResolver)
+			resolvers.Mutation.migrationDelete = this.migrationAlterMutationResolver.migrationDelete.bind(
+				this.migrationAlterMutationResolver,
+			)
+			resolvers.Mutation.migrationModify = this.migrationAlterMutationResolver.migrationModify.bind(
+				this.migrationAlterMutationResolver,
+			)
 		}
 		return resolvers
 	}

@@ -23,18 +23,17 @@ export const configureCreateMigrationCommand = (configuration: CommandConfigurat
 }
 
 export const executeCreateMigrationCommand = async (
-	input: Input<Args, Options>,
+	input: Input<Pick<Args, 'project'>, Options>,
 	createMigrationCallback: (args: {
 		workspace: Workspace
 		project: Project
-		migrationName: string
 		migrationCreator: MigrationCreator
 		migrationDescriber: MigrationDescriber
 		migrationsResolver: MigrationsResolver
 		schemaVersionBuilder: SchemaVersionBuilder
 	}) => Promise<number>,
 ) => {
-	const [projectName, migrationName] = [input.getArgument('project'), input.getArgument('migrationName')]
+	const projectName = input.getArgument('project')
 	const workspace = await Workspace.get(process.cwd())
 	const allProjects = projectName === '.'
 	const projects = allProjects
@@ -47,7 +46,6 @@ export const executeCreateMigrationCommand = async (
 
 		const result = await createMigrationCallback({
 			project,
-			migrationName,
 			migrationCreator: container.migrationCreator,
 			migrationDescriber: container.migrationDescriber,
 			migrationsResolver: container.migrationsResolver,

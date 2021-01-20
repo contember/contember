@@ -77,7 +77,6 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 						'\t',
 					) + '\n',
 					fullMigration.name,
-					'json',
 				)
 			}
 			localMigrations = await container.migrationsResolver.getMigrations()

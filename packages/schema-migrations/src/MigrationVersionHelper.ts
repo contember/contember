@@ -5,9 +5,10 @@ export class MigrationVersionHelper {
 		return filename.substring(0, this.prefixLength)
 	}
 
-	public static createVersion(name: string): string {
-		name = MigrationVersionHelper.normalizeMigrationLabel(name)
-		return `${MigrationVersionHelper.createTimePrefix()}-${name}`
+	public static createVersion(name: string): [string, string] {
+		const normalizedName = MigrationVersionHelper.normalizeMigrationLabel(name)
+		const version = MigrationVersionHelper.createTimePrefix()
+		return [version, `${version}-${normalizedName}`]
 	}
 
 	public static extractName(filename: string): string {

@@ -14,8 +14,6 @@ type Args = {
 }
 
 type Options = {
-	['migrations-dir']?: string
-	['project-dir']?: string
 	execute?: true
 	instance?: string
 	yes?: true
@@ -44,58 +42,59 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 				migrationsResolver,
 				workspace,
 				project,
-				migrationName,
 				migrationCreator,
 				migrationDescriber,
 			}) => {
 				// eslint-disable-next-line @typescript-eslint/no-var-requires
 				const schema: Schema = require(project.apiDir).default
 				try {
-					const result = await migrationCreator.prepareDiff(schema, migrationName)
+					const migrationName = input.getArgument('migrationName')
+					const initialSchema = await schemaVersionBuilder.buildSchema()
+					const result = await migrationCreator.prepareMigration(initialSchema, schema, migrationName)
 					if (result === null) {
 						console.log('Nothing to do')
-					} else {
-						await printMigrationDescription(migrationDescriber, result.initialSchema, result.migration, { noSql: true })
-						const yes = input.getOption('yes')
-						let shouldExecute = input.getOption('execute')
-						if (!yes) {
-							const { action } = await prompts({
-								type: 'select',
-								name: 'action',
-								message: 'Do you want to continue?',
-								choices: [
-									{ value: 'yes', title: 'Yes' },
-									...(!shouldExecute ? [{ value: 'execute', title: 'Yes and execute immediately' }] : []),
-									{ value: 'no', title: 'Abort' },
-								],
-							})
-							if (!action || action === 'no') {
-								console.log('Aborting')
-								return 1
-							}
-							if (action === 'execute') {
-								shouldExecute = true
-							}
+						return 0
+					}
+					await printMigrationDescription(migrationDescriber, result.initialSchema, result.migration, { noSql: true })
+					const yes = input.getOption('yes')
+					let shouldExecute = input.getOption('execute')
+					if (!yes) {
+						const { action } = await prompts({
+							type: 'select',
+							name: 'action',
+							message: 'Do you want to continue?',
+							choices: [
+								{ value: 'yes', title: 'Yes' },
+								...(!shouldExecute ? [{ value: 'execute', title: 'Yes and execute immediately' }] : []),
+								{ value: 'no', title: 'Abort' },
+							],
+						})
+						if (!action || action === 'no') {
+							console.log('Aborting')
+							return 1
 						}
-						const filename = await migrationCreator.saveDiff(result.migration)
-
-						console.log(`${filename} created`)
-
-						if (shouldExecute) {
-							const client = await resolveLocalSystemApiClient(workspace, project, input)
-							const status = await resolveMigrationStatus(client, migrationsResolver)
-							if (status.errorMigrations.length > 0) {
-								console.error(createMigrationStatusTable(status.errorMigrations))
-								throw `Cannot execute migrations`
-							}
-							await executeMigrations({
-								client,
-								migrations: status.migrationsToExecute,
-								requireConfirmation: !yes,
-								schemaVersionBuilder,
-								migrationDescriber,
-							})
+						if (action === 'execute') {
+							shouldExecute = true
 						}
+					}
+					const filename = await migrationCreator.saveMigration(result.migration)
+
+					console.log(`${filename} created`)
+
+					if (shouldExecute) {
+						const client = await resolveLocalSystemApiClient(workspace, project, input)
+						const status = await resolveMigrationStatus(client, migrationsResolver)
+						if (status.errorMigrations.length > 0) {
+							console.error(createMigrationStatusTable(status.errorMigrations))
+							throw `Cannot execute migrations`
+						}
+						await executeMigrations({
+							client,
+							migrations: status.migrationsToExecute,
+							requireConfirmation: !yes,
+							schemaVersionBuilder,
+							migrationDescriber,
+						})
 					}
 					return 0
 				} catch (e) {

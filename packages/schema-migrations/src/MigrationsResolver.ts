@@ -11,7 +11,7 @@ export class MigrationsResolver {
 	}
 
 	public async getMigrations(): Promise<Migration[]> {
-		return (await this.migrationFilesManager.readFiles('json')).map(({ filename, content }) => {
+		return (await this.migrationFilesManager.readFiles()).map(({ filename, content }) => {
 			const parsed = JSON.parse(content)
 			return {
 				version: MigrationVersionHelper.extractVersion(filename),

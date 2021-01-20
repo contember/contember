@@ -30,6 +30,7 @@ import {
 } from './commands'
 import { Application } from './cli'
 import { VersionCommand } from './commands/misc'
+import { MigrationAmendCommand } from './commands/migrations/MigrationAmendCommand'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -42,6 +43,7 @@ import { VersionCommand } from './commands/misc'
 	const commandManager = new CommandManager({
 		['version']: () => new VersionCommand(),
 		['migrations:diff']: diffCommandFactory,
+		['migrations:amend']: () => new MigrationAmendCommand(),
 		['migrations:describe']: migrationsDescribeFactory,
 		['migrations:create']: () => new MigrationCreateCommand(),
 		['migrations:execute']: () => new MigrationExecuteCommand(),

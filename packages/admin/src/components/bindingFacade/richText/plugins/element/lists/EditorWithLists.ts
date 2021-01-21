@@ -23,6 +23,8 @@ export interface WithLists<
 		element: ElementNode | SlateNode,
 		suchThat?: ElementSpecifics<ListItemElement>,
 	) => element is ListItemElement
+
+	pastedHtmlOrderedListElementSpecifics: (textContent: string) => ElementSpecifics<OrderedListElement>
 }
 
 export type EditorWithLists<E extends BaseEditor> = WithAnotherNodeType<

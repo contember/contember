@@ -37,6 +37,9 @@ export interface WithPaste {
 	processWithAttributeProcessor: (element: Node, cta: TextAttrs) => TextAttrs
 	deserializeTextNode: (node: Node, cumulativeTextAttrs: TextAttrs) => (TextNode | ElementNode)[] | null
 	deserializeTextFromNodeList: (list: NodeList, cumulativeTextAttrs: TextAttrs) => (TextNode | ElementNode)[]
+
+	// Utils
+	wordPasteListItemContent: (allNodes: Iterable<Node> | ArrayLike<Node>) => Node[]
 	flattenNodesWithType: (withType: NodesWithType[]) => NodesWithType
 }
 
@@ -207,6 +210,35 @@ export const withPaste: <E extends EditorNode>(
 			} else {
 				return insertData(data)
 			}
+		},
+
+		wordPasteListItemContent: allNodes => {
+			const nodes: Node[] = []
+			let ignoring = false
+			let forProcessing = Array.from(allNodes)
+			if (
+				(forProcessing.length === 1 && forProcessing[0].nodeName === 'SPAN') ||
+				(forProcessing.length === 2 && forProcessing[0].nodeName === 'SPAN' && forProcessing[1].nodeName === 'O:P')
+			) {
+				forProcessing = Array.from(forProcessing[0].childNodes)
+			}
+
+			for (const node of forProcessing) {
+				const isStartIgnore = node.nodeType === Node.COMMENT_NODE && node.nodeValue === '[if !supportLists]'
+				if (isStartIgnore) {
+					ignoring = true
+				} else {
+					const isEndIgnore = node.nodeType === Node.COMMENT_NODE && node.nodeValue === '[endif]'
+					if (isEndIgnore) {
+						ignoring = false
+					} else {
+						if (!ignoring) {
+							nodes.push(node)
+						}
+					}
+				}
+			}
+			return nodes
 		},
 	}
 	Object.assign(editorWithEssentials, impl)

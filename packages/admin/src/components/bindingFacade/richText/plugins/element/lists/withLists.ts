@@ -8,7 +8,7 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import { BaseEditor, BlockElement, NodesWithType } from '../../../baseEditor'
+import { BaseEditor, BlockElement, ElementNode, ElementSpecifics, NodesWithType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
@@ -40,6 +40,10 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			ContemberEditor.isElementType(element, orderedListElementType, suchThat),
 		isList: (element, suchThat): element is OrderedListElement | UnorderedListElement =>
 			e.isUnorderedList(element, suchThat) || e.isOrderedList(element, suchThat),
+
+		pastedHtmlOrderedListElementSpecifics: textContent => {
+			return {}
+		},
 
 		renderElement: props => {
 			switch (props.element.type) {
@@ -349,39 +353,27 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		const result: NodesWithType[] = []
 		let group: Node[] = []
 		let groupWasList = false
-		let lastGroupIsOrderedList = false
+		let currentListSpecifics: boolean | ElementSpecifics<OrderedListElement> = false
 		let includesList = false
+		let lastListId: string | null = null
 
 		const processGroup = (): NodesWithType => {
 			if (groupWasList) {
 				return {
 					elements: [
 						{
-							type: lastGroupIsOrderedList ? orderedListElementType : unorderedListElementType,
+							type: currentListSpecifics === false ? unorderedListElementType : orderedListElementType,
+							...(typeof currentListSpecifics === 'boolean' ? {} : currentListSpecifics),
 							children: group.map(item => {
-								const nodes: Node[] = []
-								let ignoring = false
-								for (const node of Array.from(item.childNodes)) {
-									const isStartIgnore = node.nodeType === Node.COMMENT_NODE && node.nodeValue === '[if !supportLists]'
-									if (isStartIgnore) {
-										ignoring = true
-									} else {
-										const isEndIgnore = node.nodeType === Node.COMMENT_NODE && node.nodeValue === '[endif]'
-										if (isEndIgnore) {
-											ignoring = false
-										} else {
-											if (!ignoring) {
-												nodes.push(node)
-											}
-										}
-									}
-								}
 								return {
 									type: listItemElementType,
-									children: editor.deserializeFromNodeListToPure(nodes, cumulativeTextAttrs),
+									children: editor.deserializeFromNodeListToPure(
+										editor.wordPasteListItemContent(item.childNodes),
+										cumulativeTextAttrs,
+									),
 								}
 							}),
-						},
+						} as ElementNode,
 					],
 				}
 			} else {
@@ -395,20 +387,37 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			if (groupWasList && isWhiteSpace) {
 				continue
 			}
-			const isList = curr instanceof HTMLElement && curr.className.match(/MsoListParagraph/) !== null
-			const firstChar = isList ? (curr as HTMLElement).textContent![0] : ' '
-			const isOrderedList: boolean = isList
-				? firstChar === 'o'
-					? lastGroupIsOrderedList
-					: firstChar.match(/^\w$/) !== null
-				: false
-			if (isList !== groupWasList || lastGroupIsOrderedList !== isOrderedList) {
+			let isList = false
+			let listId: string | null = null
+			if (curr instanceof HTMLElement && curr.nodeName === 'P') {
+				const match = curr.getAttribute('style')?.match(/mso-list:(\w+ level\d+ \w+)/) ?? null
+				if (match !== null) {
+					isList = true
+					listId = match[1]
+
+					if (!groupWasList || lastListId === listId) {
+						const textContent = (curr as HTMLElement).textContent!
+						const firstChar = isList ? textContent[0] : ' '
+						currentListSpecifics = isList
+							? firstChar === 'o'
+								? currentListSpecifics
+								: firstChar.match(/^\w$/) !== null
+								? e.pastedHtmlOrderedListElementSpecifics(textContent)
+								: false
+							: false
+					}
+				}
+			}
+
+			if (isList !== groupWasList || listId !== lastListId) {
 				includesList = true
-				result.push(processGroup())
-				group = []
+				if (group.length > 0) {
+					result.push(processGroup())
+					group = []
+				}
 			}
 			groupWasList = isList
-			lastGroupIsOrderedList = isOrderedList
+			lastListId = listId
 			group.push(curr)
 		}
 

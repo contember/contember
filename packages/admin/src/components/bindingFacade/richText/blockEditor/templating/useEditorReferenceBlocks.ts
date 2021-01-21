@@ -3,6 +3,7 @@ import * as React from 'react'
 import { BlockCommonProps, useBlockProps } from '../../../blocks'
 import { NormalizedDiscriminatedData, useDiscriminatedData } from '../../../discrimination'
 import { EditorTemplate, getEditorTemplate } from './getEditorTemplate'
+import { useEnvironment } from '@contember/binding'
 
 export type NormalizedBlocks = NormalizedDiscriminatedData<BlockCommonProps>
 
@@ -14,16 +15,17 @@ export type EditorReferenceBlocks = NormalizedDiscriminatedData<EditorReferenceB
 
 export const useEditorReferenceBlocks = (children: React.ReactNode): EditorReferenceBlocks => {
 	useConstantValueInvariant(children, `BlockEditor: cannot change the set of Blocks between renders!`)
+	const env = useEnvironment()
 
 	const propList = useBlockProps(children)
 	const propsWithTemplates = React.useMemo(() => {
 		return propList.map(
 			(props): EditorReferenceBlock => ({
 				...props,
-				template: getEditorTemplate(props.children),
+				template: getEditorTemplate(props.children, env),
 			}),
 		)
-	}, [propList])
+	}, [env, propList])
 
 	return useDiscriminatedData<EditorReferenceBlock>(propsWithTemplates, {
 		undiscriminatedItemMessage:

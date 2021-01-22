@@ -68,7 +68,10 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 				}
 				return {
 					...it,
-					[this.data.field.columnName]: value,
+					values: {
+						...it.values,
+						[this.data.field.columnName]: value,
+					},
 				}
 			} catch (e) {
 				// if (e instanceof NoDataError) {

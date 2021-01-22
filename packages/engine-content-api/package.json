@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-content-api",
-  "version": "0.10.0-alpha.6",
+  "version": "0.10.0-alpha.7",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -9,19 +9,19 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/database": "^0.10.0-alpha.6",
-    "@contember/dic": "^0.10.0-alpha.6",
-    "@contember/engine-common": "^0.10.0-alpha.6",
-    "@contember/graphql-utils": "^0.10.0-alpha.6",
-    "@contember/schema": "^0.10.0-alpha.6",
-    "@contember/schema-utils": "^0.10.0-alpha.6",
+    "@contember/database": "^0.10.0-alpha.7",
+    "@contember/dic": "^0.10.0-alpha.7",
+    "@contember/engine-common": "^0.10.0-alpha.7",
+    "@contember/graphql-utils": "^0.10.0-alpha.7",
+    "@contember/schema": "^0.10.0-alpha.7",
+    "@contember/schema-utils": "^0.10.0-alpha.7",
     "apollo-server-core": "^2.9.1",
     "graphql-tools": "^7.0.1"
   },
   "devDependencies": {
-    "@contember/database-tester": "^0.10.0-alpha.6",
-    "@contember/engine-api-tester": "^0.10.0-alpha.6",
-    "@contember/schema-definition": "^0.10.0-alpha.6",
+    "@contember/database-tester": "^0.10.0-alpha.7",
+    "@contember/engine-api-tester": "^0.10.0-alpha.7",
+    "@contember/schema-definition": "^0.10.0-alpha.7",
     "@graphql-codegen/cli": "^1.15.2",
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",

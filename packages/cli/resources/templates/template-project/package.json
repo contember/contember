@@ -1,11 +1,11 @@
 {
   "name": "@contember/template-project",
-  "version": "0.10.0-alpha.6",
+  "version": "0.10.0-alpha.7",
   "license": "Apache-2.0",
   "devDependencies": {},
   "dependencies": {
-    "@contember/schema": "^0.10.0-alpha.6",
-    "@contember/schema-definition": "^0.10.0-alpha.6"
+    "@contember/schema": "^0.10.0-alpha.7",
+    "@contember/schema-definition": "^0.10.0-alpha.7"
   },
   "scripts": {
     "test": "echo 'No tests'"

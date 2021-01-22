@@ -30,7 +30,6 @@ testMigrations('create enum', {
 				nullable: true,
 				type: Model.ColumnType.Enum,
 				columnType: 'postStatus',
-				enumName: 'postStatus',
 			},
 		},
 	],

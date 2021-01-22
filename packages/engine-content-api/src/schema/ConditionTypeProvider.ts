@@ -15,7 +15,7 @@ export class ConditionTypeProvider {
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
-	public getCondition(column: Model.AnyColumnDefinition): GraphQLInputObjectType {
+	public getCondition(column: Model.AnyColumn): GraphQLInputObjectType {
 		const basicType = this.columnTypeResolver.getType(column)
 		return this.conditions(basicType.name, basicType)
 	}

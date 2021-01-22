@@ -154,12 +154,12 @@ export class SchemaDiffer {
 									name: {},
 									columnName: {},
 									...updatedDefinition
-								} = updatedColumn
+								} = updatedColumn as any
 								const {
 									name: {},
 									columnName: {},
 									...originalDefinition
-								} = originalColumn
+								} = originalColumn as any
 
 								if (!deepEqual(updatedDefinition, originalDefinition)) {
 									builder.updateColumnDefinition(entityName, fieldName, updatedDefinition)

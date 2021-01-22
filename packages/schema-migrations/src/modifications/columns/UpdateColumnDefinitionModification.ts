@@ -59,7 +59,7 @@ namespace UpdateColumnDefinitionModification {
 	export interface Data {
 		entityName: string
 		fieldName: string
-		definition: Model.AnyColumnDefinition
+		definition: Model.AnyColumn
 	}
 }
 

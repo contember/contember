@@ -106,7 +106,7 @@ export class ContentSchemaFactory {
 				return {
 					__typename: '_Column',
 					defaultValue: column.default ?? undefined,
-					enumName: column.type === ColumnType.Enum ? column.enumName : null,
+					enumName: column.type === ColumnType.Enum ? column.columnType : null,
 					nullable: column.nullable,
 				}
 			},

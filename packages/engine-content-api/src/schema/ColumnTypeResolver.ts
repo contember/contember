@@ -19,8 +19,9 @@ export class ColumnTypeResolver {
 		this.enumsProvider = enumsProvider
 	}
 
-	public getType(column: Model.AnyColumnDefinition): GraphQLScalarType | GraphQLEnumType {
-		switch (column.type) {
+	public getType(column: Model.AnyColumn): GraphQLScalarType | GraphQLEnumType {
+		const type = column.type
+		switch (type) {
 			case Model.ColumnType.Int:
 				return this.graphqlObjectFactories.int
 			case Model.ColumnType.String:
@@ -36,14 +37,14 @@ export class ColumnTypeResolver {
 			case Model.ColumnType.Date:
 				return this.customTypeProvider.dateType
 			case Model.ColumnType.Enum:
-				if (this.enumsProvider.hasEnum(column.enumName)) {
-					return this.enumsProvider.getEnum(column.enumName)
+				if (this.enumsProvider.hasEnum(column.columnType)) {
+					return this.enumsProvider.getEnum(column.columnType)
 				}
-				throw new Error(`Undefined enum ${column.enumName}`)
+				throw new Error(`Undefined enum ${column.columnType}`)
 			default:
 				;(({}: never): never => {
 					throw new ImplementationException('Invalid column type')
-				})(column)
+				})(type)
 		}
 	}
 }

@@ -174,7 +174,7 @@ class ModificationBuilder {
 		})
 	}
 
-	public updateColumnDefinition(entityName: string, fieldName: string, definition: Model.AnyColumnDefinition) {
+	public updateColumnDefinition(entityName: string, fieldName: string, definition: Model.AnyColumn) {
 		this.modifications.push({
 			modification: UpdateColumnDefinitionModification.id,
 			entityName: entityName,

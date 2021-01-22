@@ -6,7 +6,8 @@ export interface Providers {
 }
 
 export const resolveDefaultValue = (column: Model.AnyColumn, providers: Pick<Providers, 'now'>) => {
-	switch (column.type) {
+	const type = column.type
+	switch (type) {
 		case Model.ColumnType.String:
 		case Model.ColumnType.Int:
 		case Model.ColumnType.Enum:
@@ -25,7 +26,7 @@ export const resolveDefaultValue = (column: Model.AnyColumn, providers: Pick<Pro
 		case Model.ColumnType.Uuid:
 			break
 		default:
-			;((x: never) => {})(column)
+			;((x: never) => {})(type)
 	}
 
 	if (column.nullable) {

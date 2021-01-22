@@ -17,15 +17,6 @@ namespace Model {
 
 	export type AnyField = AnyColumn | AnyRelation
 	export type AnyColumn = Column<ColumnType>
-	export type AnyColumnDefinition =
-		| UuidColumnDefinition
-		| StringColumnDefinition
-		| IntColumnDefinition
-		| DoubleColumnDefinition
-		| BoolColumnDefinition
-		| EnumColumnDefinition
-		| DateTimeColumnDefinition
-		| DateColumnDefinition
 
 	export enum ColumnType {
 		Uuid = 'Uuid',
@@ -38,61 +29,15 @@ namespace Model {
 		Date = 'Date',
 	}
 
-	export type Column<T extends ColumnType> = Field<T> &
-		ColumnDefinitionByType<T> & {
-			name: string
-			columnName: string
-		}
+	export type Column<T extends ColumnType> = ColumnTypeDefinition & {
+		name: string
+		columnName: string
+	}
 
-	export interface ColumnTypeDefinition<T extends ColumnType = ColumnType> {
-		type: T
+	export interface ColumnTypeDefinition extends Field<ColumnType> {
 		columnType: string
 		nullable: boolean
 		default?: string | number | boolean | null
-	}
-
-	export type ColumnByType<T extends ColumnType, A = AnyColumn> = A extends { type: T } ? A : never
-	export type ColumnDefinitionByType<T extends ColumnType, A = AnyColumnDefinition> = A extends { type: T } ? A : never
-
-	export interface UuidColumnDefinition extends ColumnTypeDefinition<ColumnType.Uuid> {
-		columnType: 'uuid'
-		default?: undefined
-	}
-
-	export interface StringColumnDefinition extends ColumnTypeDefinition<ColumnType.String> {
-		columnType: 'text'
-		default?: string
-	}
-
-	export interface IntColumnDefinition extends ColumnTypeDefinition<ColumnType.Int> {
-		columnType: 'integer'
-		default?: number
-	}
-
-	export interface DoubleColumnDefinition extends ColumnTypeDefinition<ColumnType.Double> {
-		columnType: 'double precision'
-		default?: number
-	}
-
-	export interface BoolColumnDefinition extends ColumnTypeDefinition<ColumnType.Bool> {
-		columnType: 'boolean'
-		default?: boolean
-	}
-
-	export interface EnumColumnDefinition extends ColumnTypeDefinition<ColumnType.Enum> {
-		columnType: string
-		enumName: string
-		default?: string
-	}
-
-	export interface DateTimeColumnDefinition extends ColumnTypeDefinition<ColumnType.DateTime> {
-		columnType: 'timestamptz'
-		default?: 'now'
-	}
-
-	export interface DateColumnDefinition extends ColumnTypeDefinition<ColumnType.Date> {
-		columnType: 'date'
-		default?: 'now'
 	}
 
 	export interface ColumnVisitor<T> {

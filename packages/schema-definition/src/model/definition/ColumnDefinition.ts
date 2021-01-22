@@ -42,7 +42,7 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
 			nullable: nullable === undefined ? true : nullable,
-			...(defaultValue !== undefined ? { default: defaultValue as any } : {}),
+			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 		}
 
 		switch (type) {
@@ -72,7 +72,7 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 					enumRegistry.register(enumName, enumDefinition)
 				}
 
-				return { ...common, type: type, columnType: enumName, enumName: enumName }
+				return { ...common, type: type, columnType: enumName }
 			default:
 				;(({}: never): never => {
 					throw new Error()
@@ -91,7 +91,7 @@ namespace ColumnDefinition {
 		columnName?: string
 		unique?: boolean
 		nullable?: boolean
-		default?: Model.ColumnByType<Type>['default']
+		default?: Model.ColumnTypeDefinition['default']
 	} & TypeOptions
 }
 

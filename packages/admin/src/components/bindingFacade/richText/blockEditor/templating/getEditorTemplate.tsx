@@ -4,7 +4,7 @@ import * as React from 'react'
 import { assertNever } from '../../../../../utils'
 import { ContentOutletProps } from './ContentOutlet'
 import { BoxedCatchAllJSX, BoxedContentOutletProps, editorTemplateAnalyzer } from './editorTemplateAnalyzer'
-import { Environment } from '../../../../../../../binding'
+import { Environment } from '@contember/binding'
 
 export interface EditorTemplateAtom<Value> {
 	nodeBefore: React.ReactNode

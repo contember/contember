@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
 import { ErrorBuilder, ValidationError } from './errors'
 import { everyIs, isObject, UnknownObject } from './utils'
-import { getTargetEntity, isInverseRelation, isOwningRelation } from '../model'
+import { acceptEveryFieldVisitor, getTargetEntity, isInverseRelation, isOwningRelation } from '../model'
 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 const RESERVED_WORDS = ['and', 'or', 'not']
@@ -21,6 +21,7 @@ export class ModelValidator {
 			const entities = this.validateEntities(model.entities, errorBuilder.for('entities'))
 			validModel = { enums, entities }
 		}
+		this.validateCollisions(Object.values(validModel.entities), errorBuilder.for('entities'))
 		return [validModel, errorBuilder.errors]
 	}
 
@@ -347,6 +348,50 @@ export class ModelValidator {
 			return false
 		}
 		return true
+	}
+
+	private validateCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
+		const tableNames: Record<string, string> = {}
+		for (const entity of entities) {
+			const description = `entity ${entity.name}`
+			if (tableNames[entity.tableName]) {
+				errorBuilder
+					.for(entity.name)
+					.add(
+						`Table name ${entity.tableName} of ${description} collides with a table name of ${
+							tableNames[entity.tableName]
+						}`,
+					)
+			} else {
+				tableNames[entity.tableName] = description
+			}
+		}
+		for (const entity of entities) {
+			const entityErrorBuilder = errorBuilder.for(entity.name)
+			acceptEveryFieldVisitor(this.model, entity, {
+				visitManyHasManyOwning: (entity, relation) => {
+					const joiningTable = relation.joiningTable
+					const description = `relation ${entity.name}::${relation.name}`
+					if (tableNames[joiningTable.tableName]) {
+						entityErrorBuilder
+							.for(relation.name)
+							.add(
+								`Joining table name ${joiningTable.tableName} of ${description} collides with a table name of ${
+									tableNames[joiningTable.tableName]
+								}. Consider using plural for a relation name or change the joining table name using .joiningTable(...) in schema definition.`,
+							)
+					} else {
+						tableNames[joiningTable.tableName] = description
+					}
+				},
+				visitColumn: () => {},
+				visitManyHasManyInverse: () => {},
+				visitOneHasMany: () => {},
+				visitOneHasOneInverse: () => {},
+				visitOneHasOneOwning: () => {},
+				visitManyHasOne: () => {},
+			})
+		}
 	}
 }
 

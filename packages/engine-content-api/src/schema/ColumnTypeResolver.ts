@@ -36,6 +36,8 @@ export class ColumnTypeResolver {
 				return this.customTypeProvider.dateTimeType
 			case Model.ColumnType.Date:
 				return this.customTypeProvider.dateType
+			case Model.ColumnType.Json:
+				return this.customTypeProvider.jsonType
 			case Model.ColumnType.Enum:
 				if (this.enumsProvider.hasEnum(column.columnType)) {
 					return this.enumsProvider.getEnum(column.columnType)

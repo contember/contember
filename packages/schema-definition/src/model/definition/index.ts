@@ -43,6 +43,10 @@ export function dateTimeColumn() {
 	return column(Model.ColumnType.DateTime)
 }
 
+export function jsonColumn() {
+	return column(Model.ColumnType.Json)
+}
+
 export function enumColumn(enumDefinition: EnumDefinition) {
 	return column(Model.ColumnType.Enum, { enumDefinition })
 }

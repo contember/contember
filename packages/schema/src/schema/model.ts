@@ -27,6 +27,7 @@ namespace Model {
 		Enum = 'Enum',
 		DateTime = 'DateTime',
 		Date = 'Date',
+		Json = 'Json',
 	}
 
 	export type Column<T extends ColumnType> = ColumnTypeDefinition & {

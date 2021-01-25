@@ -2,6 +2,7 @@ import { Model } from '@contember/schema'
 import { Interface } from './types'
 import FieldDefinition from './FieldDefinition'
 import EnumDefinition from './EnumDefinition'
+import { getColumnType } from '../utils/getColumnType'
 
 class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<ColumnDefinition.Options<Type>> {
 	type = 'ColumnDefinition' as const
@@ -44,40 +45,21 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 			nullable: nullable === undefined ? true : nullable,
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 		}
+		if (type === Model.ColumnType.Enum) {
+			let enumName: string
+			if (!enumDefinition) {
+				throw new Error()
+			}
+			if (enumRegistry.has(enumDefinition)) {
+				enumName = enumRegistry.getName(enumDefinition)
+			} else {
+				enumName = entityName + name.substring(0, 1).toUpperCase() + name.substring(1)
+				enumRegistry.register(enumName, enumDefinition)
+			}
 
-		switch (type) {
-			case Model.ColumnType.Int:
-				return { ...common, type: type, columnType: 'integer' }
-			case Model.ColumnType.Double:
-				return { ...common, type: type, columnType: 'double precision' }
-			case Model.ColumnType.String:
-				return { ...common, type: type, columnType: 'text' }
-			case Model.ColumnType.Uuid:
-				return { ...common, type: type, columnType: 'uuid' }
-			case Model.ColumnType.Bool:
-				return { ...common, type: type, columnType: 'boolean' }
-			case Model.ColumnType.DateTime:
-				return { ...common, type: type, columnType: 'timestamptz' }
-			case Model.ColumnType.Date:
-				return { ...common, type: type, columnType: 'date' }
-			case Model.ColumnType.Enum:
-				let enumName: string
-				if (!enumDefinition) {
-					throw new Error()
-				}
-				if (enumRegistry.has(enumDefinition)) {
-					enumName = enumRegistry.getName(enumDefinition)
-				} else {
-					enumName = entityName + name.substring(0, 1).toUpperCase() + name.substring(1)
-					enumRegistry.register(enumName, enumDefinition)
-				}
-
-				return { ...common, type: type, columnType: enumName }
-			default:
-				;(({}: never): never => {
-					throw new Error()
-				})(type)
+			return { ...common, type: type, columnType: enumName }
 		}
+		return { ...common, type: type, columnType: getColumnType(type) }
 	}
 }
 

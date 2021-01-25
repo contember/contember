@@ -2,6 +2,7 @@ import FieldProcessor from './FieldProcessor'
 import ColumnBuilder from '../ColumnBuilder'
 import NamingConventions from '../../definition/NamingConventions'
 import { Model } from '@contember/schema'
+import { getColumnType } from '../../utils/getColumnType'
 
 export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Options> {
 	private conventions: NamingConventions
@@ -26,29 +27,10 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 			columnName: options.columnName || this.conventions.getColumnName(fieldName),
 			nullable: options.nullable === undefined ? true : options.nullable,
 		}
-
-		switch (type) {
-			case Model.ColumnType.Int:
-				return { ...common, type: type, columnType: 'integer' }
-			case Model.ColumnType.Double:
-				return { ...common, type: type, columnType: 'double precision' }
-			case Model.ColumnType.String:
-				return { ...common, type: type, columnType: 'text' }
-			case Model.ColumnType.Uuid:
-				return { ...common, type: type, columnType: 'uuid' }
-			case Model.ColumnType.Bool:
-				return { ...common, type: type, columnType: 'boolean' }
-			case Model.ColumnType.DateTime:
-				return { ...common, type: type, columnType: 'timestamptz' }
-			case Model.ColumnType.Date:
-				return { ...common, type: type, columnType: 'date' }
-			case Model.ColumnType.Enum:
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				return { ...common, type: type, columnType: options.enumName! }
-			default:
-				;(({}: never): never => {
-					throw new Error()
-				})(type)
+		if (type === Model.ColumnType.Enum) {
+			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+			return { ...common, type: type, columnType: options.enumName! }
 		}
+		return { ...common, type, columnType: getColumnType(type) }
 	}
 }

@@ -13,11 +13,15 @@ export default class CreateFieldVisitor
 		entity: Model.Entity,
 		updatedColumn: Model.AnyColumn,
 	): Migration.Modification<CreateColumnModification.Data> {
-		return {
+		const createColumn: Migration.Modification<CreateColumnModification.Data> = {
 			modification: CreateColumnModification.id,
 			entityName: entity.name,
 			field: deepCopy(updatedColumn),
 		}
+		if (updatedColumn.default !== undefined) {
+			createColumn.fillValue = updatedColumn.default
+		}
+		return createColumn
 	}
 
 	public visitManyHasOne(

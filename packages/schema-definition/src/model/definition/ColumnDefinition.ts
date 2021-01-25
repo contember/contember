@@ -21,6 +21,10 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 		return this.withOption('columnName', columnName)
 	}
 
+	public columnType(columnType: string): Interface<ColumnDefinition<Type>> {
+		return this.withOption('columnType', columnType)
+	}
+
 	public nullable(): Interface<ColumnDefinition<Type>> {
 		return this.withOption('nullable', true)
 	}
@@ -38,7 +42,7 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 	}
 
 	createField({ name, conventions, enumRegistry, entityName }: FieldDefinition.CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition, default: defaultValue } = this.options
+		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType } = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
@@ -59,7 +63,7 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 
 			return { ...common, type: type, columnType: enumName }
 		}
-		return { ...common, type: type, columnType: getColumnType(type) }
+		return { ...common, type: type, columnType: columnType || getColumnType(type) }
 	}
 }
 
@@ -70,6 +74,7 @@ namespace ColumnDefinition {
 
 	export type Options<Type extends Model.ColumnType> = {
 		type: Model.ColumnType
+		columnType?: string
 		columnName?: string
 		unique?: boolean
 		nullable?: boolean

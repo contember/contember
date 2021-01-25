@@ -5,7 +5,7 @@ import chalk from 'chalk'
 export type RunningCommand = { child: ChildProcessWithoutNullStreams; output: Promise<string> }
 export const runCommand = (
 	command: string,
-	args: string[],
+	args: (string | undefined)[],
 	options: {
 		cwd: string
 		stdin?: Readable
@@ -15,10 +15,11 @@ export const runCommand = (
 		detached?: boolean
 	},
 ): RunningCommand => {
+	const args2 = args.filter((it): it is string => it !== undefined)
 	if (!process.env.DISABLE_COMMAND_PRINTING) {
-		console.error(chalk.gray(`$ ${command} ${args.map(it => `'${it.replace(/'/g, `'\\''`)}'`).join(' ')}`))
+		console.error(chalk.gray(`$ ${command} ${args2.map(it => `'${it.replace(/'/g, `'\\''`)}'`).join(' ')}`))
 	}
-	const child = spawn(command, args, {
+	const child = spawn(command, args2, {
 		cwd: options.cwd,
 		env: { ...process.env, ...(options.env || {}) },
 		detached: options.detached,

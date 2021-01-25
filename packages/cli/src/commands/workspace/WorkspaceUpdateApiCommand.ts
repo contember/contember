@@ -3,6 +3,8 @@ import { join } from 'path'
 import { Workspace } from '../../utils/Workspace'
 import { runCommand } from '../../utils/commands'
 import { updateMainDockerComposeConfig } from '../../utils/dockerCompose'
+import { pathExists } from 'fs-extra'
+import { updateNpmPackages } from '../../utils/npm'
 
 type Args = {
 	version: string
@@ -19,32 +21,12 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>): Promise<void> {
 		const version = input.getArgument('version')
 		const workspace = await Workspace.get(process.cwd())
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const packageJson = require(join(workspace.directory, 'package.json')) as any
 		const upgradablePackages = ['@contember/schema', '@contember/schema-definition', '@contember/cli']
-		const upgradeDeps = async (type: 'dependencies' | 'devDependencies') => {
-			const packages = Object.keys(packageJson[type])
-				.filter(it => upgradablePackages.includes(it))
-				.map(it => `${it}@${version}`)
-			if (packages.length === 0) {
-				console.log(`No npm ${type} to update.`)
-				return
-			}
-			console.log(`Updating npm ${type}: ${packages.join(', ')}`)
-			const { output } = runCommand(
-				'npm',
-				['install', type === 'devDependencies' ? '--save-dev' : '--save', ...packages],
-				{
-					cwd: workspace.directory,
-					stderr: process.stderr,
-					stdout: process.stdout,
-				},
-			)
-			await output
-			console.log('npm update done')
-		}
-		await upgradeDeps('dependencies')
-		await upgradeDeps('devDependencies')
+
+		await updateNpmPackages(
+			upgradablePackages.map(it => ({ name: it, version })),
+			workspace.directory,
+		)
 		const prevVersion = workspace.apiVersion
 		if (await workspace.updateApiVersion(version)) {
 			console.log('contember.workspace.yaml updated')

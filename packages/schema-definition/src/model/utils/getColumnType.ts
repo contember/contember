@@ -18,7 +18,7 @@ export const getColumnType = (type: Exclude<Model.ColumnType, Model.ColumnType.E
 		case Model.ColumnType.Date:
 			return 'date'
 		case Model.ColumnType.Json:
-			return 'json'
+			return 'jsonb'
 		default:
 			return assertNever(type)
 	}

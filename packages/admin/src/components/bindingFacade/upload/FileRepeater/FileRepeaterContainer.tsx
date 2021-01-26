@@ -33,6 +33,7 @@ export type FileRepeaterContainerPublicProps = Omit<UploadConfigProps, 'accept'>
 	Pick<FormGroupProps, 'description' | 'labelDescription'> & {
 		discriminationField?: SugaredFieldProps['field']
 		removalType?: RemovalType
+		addButtonSubText?: React.ReactNode
 	}
 
 export type FileRepeaterContainerProps = FileRepeaterContainerPublicProps &
@@ -47,6 +48,7 @@ export const FileRepeaterContainer = React.memo(
 		addButtonComponentExtraProps,
 		addButtonProps,
 		addButtonText = 'Select files to upload',
+		addButtonSubText = 'or drag & drop',
 		createNewEntity,
 		discriminationField,
 		children,
@@ -192,7 +194,7 @@ export const FileRepeaterContainer = React.memo(
 									children={addButtonText}
 									{...addButtonProps}
 								/>
-								<span className="fileInput-cta-label">or drag & drop</span>
+								{addButtonSubText && <span className="fileInput-cta-label">{addButtonSubText}</span>}
 							</div>
 						</FileDropZone>
 					)}

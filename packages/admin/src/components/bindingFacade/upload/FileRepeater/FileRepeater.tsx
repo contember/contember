@@ -55,6 +55,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 
 				discriminationField: props.discriminationField!,
 				removalType: props.removalType!,
+				addButtonSubText: props.addButtonSubText!,
 
 				fileUrlField: fileUrlProps.fileUrlField!,
 				audioFileUrlField: fileUrlProps.audioFileUrlField!,
@@ -77,6 +78,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 			props.renderFilePreview,
 			props.discriminationField,
 			props.removalType,
+			props.addButtonSubText,
 			props.description,
 			props.labelDescription,
 			fileUrlProps.fileUrlField,

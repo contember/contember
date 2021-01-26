@@ -1,17 +1,17 @@
 import { Component } from '@contember/binding'
 import * as React from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
-import { FileUrlFieldView } from '../../fieldViews'
 import {
 	FileDataPopulator,
 	FileUrlDataPopulator,
 	GenericFileMetadataPopulator,
 	GenericFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
-import { UploadField } from '../core'
+import { UploadField, UploadFieldRenderingProps } from '../core'
 import { getGenericFileDefaults } from '../stockFileKindDefaults'
 
 export type FileUploadFieldProps = SimpleRelativeSingleFieldProps &
+	UploadFieldRenderingProps &
 	GenericFileMetadataPopulatorProps & {
 		additionalFileDataPopulators?: Iterable<FileDataPopulator>
 	}

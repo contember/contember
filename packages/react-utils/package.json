@@ -1,6 +1,6 @@
 {
   "name": "@contember/react-utils",
-  "version": "0.5.41",
+  "version": "0.5.42",
   "type": "module",
   "main": "dist/src/index.js",
   "scripts": {

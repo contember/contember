@@ -23,16 +23,24 @@ import { UploadConfigProps } from './UploadConfigProps'
 import { UploadedFilePreview } from './UploadedFilePreview'
 import { UploadingFilePreview } from './UploadingFilePreview'
 
+export type UploadFieldRenderingProps = {
+	uploadButtonText?: React.ReactNode
+	uploadButtonSubText?: React.ReactNode
+}
+
 export type UploadFieldProps = UploadConfigProps &
 	SingleFileUploadProps &
 	Omit<FormGroupProps, 'children'> &
-	ResolvablePopulatorProps & {
+	ResolvablePopulatorProps &
+	UploadFieldRenderingProps & {
 		hasPersistedFile?: (entity: EntityAccessor, environment: Environment) => boolean
 	}
 
 const staticFileId = 'file'
 export const UploadField = Component<UploadFieldProps>(
 	props => {
+		const { uploadButtonText = 'Select a file to upload', uploadButtonSubText = 'or drag & drop' } = props
+
 		const [uploadState, { startUpload }] = useFileUpload({
 			maxUpdateFrequency: 100,
 		})
@@ -127,8 +135,8 @@ export const UploadField = Component<UploadFieldProps>(
 						)}
 						<FileDropZone isActive={isDragActive} className="fileInput-dropZone">
 							<div className="fileInput-cta">
-								<Button size="small">Select a file to upload</Button>
-								<span className="fileInput-cta-label">or drag & drop</span>
+								<Button size="small">{uploadButtonText}</Button>
+								<span className="fileInput-cta-label">{uploadButtonSubText}</span>
 							</div>
 						</FileDropZone>
 					</div>

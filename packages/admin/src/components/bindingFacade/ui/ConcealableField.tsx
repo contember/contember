@@ -14,6 +14,7 @@ export type ConcealableFieldProps = {
 	renderConcealedValue: () => React.ReactNode
 	children: (rendererProps: ConcealableFieldRendererProps) => React.ReactNode
 	isExtended?: boolean
+	editButtonLabel?: React.ReactNode
 }
 
 export const ConcealableField = React.memo(

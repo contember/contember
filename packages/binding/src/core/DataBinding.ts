@@ -34,7 +34,7 @@ import { EventManager } from './EventManager'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
-import { RootStateNode, StateType } from './state'
+import { RootStateNode } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
@@ -47,7 +47,6 @@ export class DataBinding {
 	private readonly eventManager: EventManager
 	private readonly stateInitializer: StateInitializer
 	private readonly treeAugmenter: TreeAugmenter
-	private readonly treeFilterGenerator: TreeFilterGenerator
 	private readonly treeStore: TreeStore
 
 	// private treeRootListeners: {
@@ -64,14 +63,12 @@ export class DataBinding {
 	) {
 		this.config = new Config()
 		this.treeStore = new TreeStore()
-		this.treeFilterGenerator = new TreeFilterGenerator(this.treeStore)
 		this.dirtinessTracker = new DirtinessTracker()
 		this.eventManager = new EventManager(
 			this.bindingOperations,
 			this.config,
 			this.dirtinessTracker,
-			this.onError,
-			this.onUpdate,
+			this.resolvedOnUpdate,
 			this.treeStore,
 		)
 		this.accessorErrorManager = new AccessorErrorManager(this.eventManager, this.treeStore)
@@ -79,11 +76,14 @@ export class DataBinding {
 			this.accessorErrorManager,
 			this.bindingOperations,
 			this.config,
-			this.dirtinessTracker,
 			this.eventManager,
 			this.treeStore,
 		)
-		this.treeAugmenter = new TreeAugmenter(this.stateInitializer, this.treeStore)
+		this.treeAugmenter = new TreeAugmenter(this.eventManager, this.stateInitializer, this.treeStore)
+	}
+
+	private resolvedOnUpdate = (isMutating: boolean) => {
+		this.onUpdate(new TreeRootAccessor(this.dirtinessTracker.hasChanges(), isMutating, this.bindingOperations))
 	}
 
 	private readonly bindingOperations = Object.freeze<BindingOperations>({
@@ -96,25 +96,18 @@ export class DataBinding {
 			}
 			return this.treeStore.markerTree.subTrees.has(PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters))
 		},
-		getAllEntities: (treeStore => {
-			return function* (): Generator<EntityAccessor> {
-				for (const [, entity] of treeStore.entityStore) {
-					yield entity.getAccessor()
-				}
-			}
-		})(this.treeStore),
-		getEntityByKey: (key: string) => {
-			const entity = this.treeStore.entityStore.get(key)
+		getEntityByKey: key => {
+			const realm = this.treeStore.entityRealmStore.get(key)
 
-			if (entity === undefined) {
+			if (realm === undefined) {
 				throw new BindingError(`Trying to retrieve a non-existent entity: key '${key}' was not found.`)
 			}
-			return entity.getAccessor()
+			return realm.getAccessor()
 		},
 		getEntityListSubTree: (
 			aliasOrParameters: Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList,
 		): EntityListAccessor => {
-			const subTreeState = this.getSubTreeState(aliasOrParameters)
+			const subTreeState = this.treeStore.getSubTreeState(aliasOrParameters)
 			const accessor = subTreeState.getAccessor()
 			if (!(accessor instanceof EntityListAccessor)) {
 				throw new BindingError(
@@ -127,7 +120,7 @@ export class DataBinding {
 		getEntitySubTree: (
 			aliasOrParameters: Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity,
 		): EntityAccessor => {
-			const subTreeState = this.getSubTreeState(aliasOrParameters)
+			const subTreeState = this.treeStore.getSubTreeState(aliasOrParameters)
 			const accessor = subTreeState.getAccessor()
 			if (!(accessor instanceof EntityAccessor)) {
 				throw new BindingError(
@@ -138,7 +131,8 @@ export class DataBinding {
 			return accessor
 		},
 		getTreeFilters: (): TreeFilter[] => {
-			return this.treeFilterGenerator.generateTreeFilter()
+			const generator = new TreeFilterGenerator(this.treeStore)
+			return generator.generateTreeFilter()
 		},
 		batchDeferredUpdates: performUpdates => {
 			this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
@@ -208,6 +202,7 @@ export class DataBinding {
 						this.eventManager.syncTransaction(() => {
 							this.accessorErrorManager.clearErrors()
 							this.dirtinessTracker.reset()
+							// TODO clear thoroughly. Planned removals, everything.
 							this.treeAugmenter.updatePersistedData(
 								Object.fromEntries(
 									Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
@@ -270,27 +265,6 @@ export class DataBinding {
 
 			this.treeAugmenter.extendTree(newMarkerTree, newPersistedData?.data ?? {})
 		})
-	}
-
-	private getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): RootStateNode {
-		let placeholderName: string
-
-		if (typeof aliasOrParameters === 'string') {
-			const placeholderByAlias = this.treeStore.markerTree.placeholdersByAliases.get(aliasOrParameters)
-
-			if (placeholderByAlias === undefined) {
-				throw new BindingError(`Undefined sub-tree alias '${aliasOrParameters}'.`)
-			}
-			placeholderName = placeholderByAlias
-		} else {
-			placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters)
-		}
-		const subTreeState = this.treeStore.subTreeStates.get(placeholderName)
-
-		if (subTreeState === undefined) {
-			throw new BindingError(`Trying to retrieve a non-existent sub-tree '${placeholderName}'.`)
-		}
-		return subTreeState
 	}
 
 	private async fetchPersistedData(

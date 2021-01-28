@@ -1,23 +1,23 @@
-export interface RuntimeId {
+interface RuntimeIdSpec {
 	existsOnServer: boolean
 	value: string
 }
 
-export class ServerGeneratedUuid implements RuntimeId {
+export class ServerGeneratedUuid implements RuntimeIdSpec {
 	public get existsOnServer(): true {
 		return true
 	}
 	public constructor(public readonly value: string) {}
 }
 
-export class ClientGeneratedUuid implements RuntimeId {
+export class ClientGeneratedUuid implements RuntimeIdSpec {
 	public get existsOnServer(): false {
 		return false
 	}
 	public constructor(public readonly value: string) {}
 }
 
-export class UnpersistedEntityKey implements RuntimeId {
+export class UnpersistedEntityDummyId implements RuntimeIdSpec {
 	public get existsOnServer(): false {
 		return false
 	}
@@ -29,6 +29,9 @@ export class UnpersistedEntityKey implements RuntimeId {
 	})()
 
 	public constructor() {
-		this.value = `unpersistedEntity-${UnpersistedEntityKey.getNextSeed()}`
+		const enumerabilityPreventingEntropy = (Math.random() * 1e5).toFixed(0)
+		this.value = `adminOnlyDummyId-${enumerabilityPreventingEntropy}-${UnpersistedEntityDummyId.getNextSeed()}`
 	}
 }
+
+export type RuntimeId = ServerGeneratedUuid | ClientGeneratedUuid | UnpersistedEntityDummyId

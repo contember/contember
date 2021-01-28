@@ -15,7 +15,6 @@ export const defaultBindingOperations = Object.freeze<BindingOperations>({
 	hasSubTree: getRejecter('query a sub tree'),
 	getEntityListSubTree: getRejecter('retrieve an entity list sub tree'),
 	getEntitySubTree: getRejecter('retrieve a single entity sub tree'),
-	getAllEntities: getRejecter('retrieve all entities'),
 	getEntityByKey: getRejecter('retrieve an entity by key'),
 	getTreeFilters: getRejecter('retrieve tree filters'),
 	batchDeferredUpdates: getRejecter('batch deferred updates'),

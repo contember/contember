@@ -77,12 +77,14 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 					entities={entity}
 					expectedMutation="anyMutation"
 					orderBy={getOrderBy('asc')}
-					onBeforePersist={getAccessor => {
+					onBeforePersist={(getAccessor, bindingOperations) => {
+						// We're creating a new entity which adjusts the numbering of the other ones if applicable
+						// and then deleting it again which leaves a hole for newOrderFieldValue that is set above.
 						let newEntityKey: string | undefined = undefined
 						addEntityAtIndex(getAccessor(), desugaredOrderField, newOrderFieldValue, getNewEntity => {
 							newEntityKey = getNewEntity().key
 						})
-						newEntityKey && getAccessor().getChildEntityByKey(newEntityKey).deleteEntity()
+						newEntityKey && bindingOperations.getEntityByKey(newEntityKey).deleteEntity()
 					}}
 				>
 					<SugaredField field={orderField} />

@@ -197,7 +197,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
 				embedSubBlocks,
-				getReferenceByKey: referenceList?.getChildEntityByKey,
+				getReferenceById: referenceList?.getChildEntityById,
 				isMutatingRef,
 				leadingFields: leadingFieldBackedElements,
 				trailingFields: trailingFieldBackedElements,

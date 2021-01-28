@@ -11,15 +11,4 @@ export class TreeRootAccessor {
 		public readonly isMutating: boolean,
 		public readonly bindingOperations: BindingOperations,
 	) {}
-
-	public getAllTypeNames(): Set<string> {
-		const typeNames = new Set<string>()
-		const allEntities = this.bindingOperations.getAllEntities()
-
-		for (const { typeName } of allEntities) {
-			typeName && typeNames.add(typeName)
-		}
-
-		return typeNames
-	}
 }

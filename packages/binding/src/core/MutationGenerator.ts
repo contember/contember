@@ -12,12 +12,21 @@ import {
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import { QueryGenerator } from './QueryGenerator'
-import { EntityListState, EntityState, EntityStateStub, FieldState, RootStateNode, StateType } from './state'
+import {
+	EntityListState,
+	EntityRealmState,
+	EntityRealmStateStub,
+	EntityState,
+	FieldState,
+	RootStateNode,
+	StateType,
+} from './state'
 import { TreeStore } from './TreeStore'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
-type ProcessedEntities = Set<EntityState | EntityStateStub>
+// TODO abolish this
+type ProcessedEntities = Set<EntityRealmState | EntityRealmStateStub>
 
 // TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
@@ -45,15 +54,24 @@ export class MutationGenerator {
 
 	private addSubMutation(
 		processedEntities: ProcessedEntities,
-		rootState: RootStateNode | EntityStateStub,
+		rootState: RootStateNode | EntityRealmStateStub,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder,
 	): QueryBuilder {
-		if (rootState.type === StateType.Entity) {
-			if (rootState.isScheduledForDeletion) {
+		if (rootState.type === StateType.EntityRealmStub) {
+			// Do nothing. For now.
+			// TODO there can be a forceCreate somewhere in there that we're hereby ignoring.
+			return queryBuilder
+		}
+		if (rootState.unpersistedChangesCount === 0) {
+			// Bail out early
+			return queryBuilder
+		}
+		if (rootState.type === StateType.EntityRealm) {
+			if (rootState.entity.isScheduledForDeletion) {
 				queryBuilder = this.addDeleteMutation(processedEntities, rootState, alias, parameters, queryBuilder)
-			} else if (!rootState.id.existsOnServer) {
+			} else if (!rootState.entity.id.existsOnServer) {
 				queryBuilder = this.addCreateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
 			} else {
 				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
@@ -63,7 +81,7 @@ export class MutationGenerator {
 				queryBuilder = this.addSubMutation(
 					processedEntities,
 					childState,
-					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.id)),
+					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.entity.id)),
 					parameters,
 					queryBuilder,
 				)
@@ -74,7 +92,7 @@ export class MutationGenerator {
 						queryBuilder = this.addDeleteMutation(
 							processedEntities,
 							removedEntity,
-							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.id)),
+							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.entity.id)),
 							parameters,
 							queryBuilder,
 						)
@@ -83,9 +101,6 @@ export class MutationGenerator {
 					}
 				}
 			}
-		} else if (rootState.type === StateType.EntityStub) {
-			// Do nothing. For now.
-			// TODO there can be a forceCreate somewhere in there that we're hereby ignoring.
 		} else {
 			assertNever(rootState)
 		}
@@ -95,15 +110,15 @@ export class MutationGenerator {
 
 	private addDeleteMutation(
 		processedEntities: ProcessedEntities,
-		entityState: EntityState | EntityStateStub,
+		entityRealm: EntityRealmState | EntityRealmStateStub,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (processedEntities.has(entityState)) {
+		if (processedEntities.has(entityRealm)) {
 			return queryBuilder
 		}
-		processedEntities.add(entityState)
+		processedEntities.add(entityRealm)
 
 		return queryBuilder.delete(
 			parameters.value.entityName,
@@ -116,7 +131,7 @@ export class MutationGenerator {
 				return builder
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
-					.by({ ...where, [PRIMARY_KEY_NAME]: entityState.id.value })
+					.by({ ...where, [PRIMARY_KEY_NAME]: entityRealm.entity.id.value })
 					.errors()
 					.errorMessage()
 			},
@@ -126,17 +141,17 @@ export class MutationGenerator {
 
 	private addUpdateMutation(
 		processedEntities: ProcessedEntities,
-		entityState: EntityState,
+		entityRealm: EntityRealmState,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (processedEntities.has(entityState)) {
+		if (processedEntities.has(entityRealm)) {
 			return queryBuilder
 		}
 		// Deliberately not adding the entity to processedEntities - it will be done by registerUpdateMutationPart.
 
-		const runtimeId = entityState.id
+		const runtimeId = entityRealm.entity.id
 
 		if (!runtimeId.existsOnServer) {
 			return queryBuilder
@@ -151,9 +166,9 @@ export class MutationGenerator {
 				}
 
 				return builder
-					.data(builder => this.registerUpdateMutationPart(processedEntities, entityState, builder))
+					.data(builder => this.registerUpdateMutationPart(processedEntities, entityRealm, builder))
 					.by({ ...where, [PRIMARY_KEY_NAME]: runtimeId.value })
-					.node(builder => QueryGenerator.registerQueryPart(entityState.combinedMarkersContainer.markers, builder))
+					.node(builder => QueryGenerator.registerQueryPart(entityRealm.blueprint.markersContainer.markers, builder))
 					.ok()
 					.validation()
 					.errors()
@@ -165,12 +180,12 @@ export class MutationGenerator {
 
 	private addCreateMutation(
 		processedEntities: ProcessedEntities,
-		entityState: EntityState,
+		entityRealm: EntityRealmState,
 		alias: string,
 		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (processedEntities.has(entityState)) {
+		if (processedEntities.has(entityRealm)) {
 			return queryBuilder
 		}
 		// Deliberately not adding the entity to processedEntities - it will be done by registerCreateMutationPart.
@@ -180,7 +195,7 @@ export class MutationGenerator {
 			builder => {
 				let writeBuilder = this.registerCreateMutationPart(
 					processedEntities,
-					entityState,
+					entityRealm,
 					new CrudQueryBuilder.WriteDataBuilder(),
 				)
 				if (
@@ -196,7 +211,7 @@ export class MutationGenerator {
 
 				return builder
 					.data(writeBuilder)
-					.node(builder => QueryGenerator.registerQueryPart(entityState.combinedMarkersContainer.markers, builder))
+					.node(builder => QueryGenerator.registerQueryPart(entityRealm.blueprint.markersContainer.markers, builder))
 					.ok()
 					.validation()
 					.errors()
@@ -208,7 +223,7 @@ export class MutationGenerator {
 
 	private registerCreateMutationPart(
 		processedEntities: ProcessedEntities,
-		currentState: EntityState | EntityStateStub,
+		currentState: EntityRealmState | EntityRealmStateStub,
 		builder: CrudQueryBuilder.WriteDataBuilder<
 			CrudQueryBuilder.WriteOperation.Create
 		> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
@@ -218,7 +233,7 @@ export class MutationGenerator {
 		}
 		processedEntities.add(currentState)
 
-		if (currentState.type === StateType.EntityStub) {
+		if (currentState.type === StateType.EntityRealmStub) {
 			// TODO If there's a forceCreate, this is wrong.
 			return builder
 		}
@@ -226,14 +241,14 @@ export class MutationGenerator {
 		// It shouldn't
 		const nonbearingFields: Array<
 			| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
-			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityState }
+			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState }
 			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
 		> = []
 
-		for (const [placeholderName, marker] of currentState.combinedMarkersContainer.markers) {
+		for (const [placeholderName, marker] of currentState.blueprint.markersContainer.markers) {
 			if (
 				placeholderName === TYPENAME_KEY_NAME ||
-				(placeholderName === PRIMARY_KEY_NAME && !(currentState.id instanceof ClientGeneratedUuid))
+				(placeholderName === PRIMARY_KEY_NAME && !(currentState.entity.id instanceof ClientGeneratedUuid))
 			) {
 				continue
 			}
@@ -257,7 +272,7 @@ export class MutationGenerator {
 				}
 				builder = this.registerCreateFieldPart(fieldState, marker, builder)
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState.type !== StateType.Entity) {
+				if (fieldState.type !== StateType.EntityRealm) {
 					continue
 				}
 				if (marker.relation.isNonbearing) {
@@ -290,7 +305,7 @@ export class MutationGenerator {
 		}
 
 		if (
-			currentState.combinedCreationParameters.forceCreation &&
+			currentState.blueprint.creationParameters.forceCreation &&
 			(builder.data === undefined || isEmptyObject(builder.data))
 		) {
 			builder = builder.set('_dummy_field_', true)
@@ -298,7 +313,7 @@ export class MutationGenerator {
 
 		if (
 			(builder.data !== undefined && !isEmptyObject(builder.data)) ||
-			!currentState.combinedMarkersContainer.hasAtLeastOneBearingField
+			!currentState.blueprint.markersContainer.hasAtLeastOneBearingField
 		) {
 			for (const field of nonbearingFields) {
 				switch (field.type) {
@@ -320,7 +335,7 @@ export class MutationGenerator {
 			}
 		}
 
-		const setOnCreate = currentState.combinedCreationParameters.setOnCreate
+		const setOnCreate = currentState.blueprint.creationParameters.setOnCreate
 		if (setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
 			for (const key in setOnCreate) {
 				const field = setOnCreate[key]
@@ -356,26 +371,27 @@ export class MutationGenerator {
 
 	private registerCreateEntityPart(
 		processedEntities: ProcessedEntities,
-		fieldState: EntityState,
+		fieldState: EntityRealmState,
 		marker: HasOneRelationMarker,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
 		const reducedBy = marker.relation.reducedBy
+		const runtimeId = fieldState.entity.id
 
 		if (reducedBy === undefined) {
 			return builder.one(marker.relation.field, builder => {
-				if (fieldState.id.existsOnServer) {
+				if (runtimeId.existsOnServer) {
 					// TODO also potentially update
-					return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id.value })
+					return builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value })
 				}
 				return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 			})
 		}
 		return builder.many(marker.relation.field, builder => {
-			const alias = AliasTransformer.entityToAlias(fieldState.id)
-			if (fieldState.id.existsOnServer) {
+			const alias = AliasTransformer.entityToAlias(runtimeId)
+			if (runtimeId.existsOnServer) {
 				// TODO also potentially update
-				return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id.value }, alias)
+				return builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
 			}
 			return builder.create(this.registerCreateMutationPart(processedEntities, fieldState), alias)
 		})
@@ -388,13 +404,13 @@ export class MutationGenerator {
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
 		return builder.many(marker.relation.field, builder => {
-			for (const [, entityState] of fieldState.children) {
-				const alias = AliasTransformer.entityToAlias(entityState.id)
-				if (entityState.id.existsOnServer) {
+			for (const [, entityRealm] of fieldState.children) {
+				const alias = AliasTransformer.entityToAlias(entityRealm.entity.id)
+				if (entityRealm.entity.id.existsOnServer) {
 					// TODO also potentially update
-					builder = builder.connect({ [PRIMARY_KEY_NAME]: entityState.id.value }, alias)
+					builder = builder.connect({ [PRIMARY_KEY_NAME]: entityRealm.entity.id.value }, alias)
 				} else {
-					builder = builder.create(this.registerCreateMutationPart(processedEntities, entityState), alias)
+					builder = builder.create(this.registerCreateMutationPart(processedEntities, entityRealm), alias)
 				}
 			}
 			return builder
@@ -403,7 +419,7 @@ export class MutationGenerator {
 
 	private registerUpdateMutationPart(
 		processedEntities: ProcessedEntities,
-		currentState: EntityState,
+		currentState: EntityRealmState,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
 		if (processedEntities.has(currentState)) {
@@ -411,7 +427,7 @@ export class MutationGenerator {
 		}
 		processedEntities.add(currentState)
 
-		for (const [placeholderName, marker] of currentState.combinedMarkersContainer.markers) {
+		for (const [placeholderName, marker] of currentState.blueprint.markersContainer.markers) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}
@@ -432,19 +448,20 @@ export class MutationGenerator {
 					}
 				}
 			} else if (marker instanceof HasOneRelationMarker) {
-				if (fieldState.type !== StateType.Entity) {
+				if (fieldState.type !== StateType.EntityRealm) {
 					continue
 				}
 
+				const runtimeId = fieldState.entity.id
 				const reducedBy = marker.relation.reducedBy
 				if (reducedBy === undefined) {
 					const subBuilder = ((
 						builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
 					) => {
-						const persistedValue = currentState.persistedData?.get?.(placeholderName)
+						const persistedValue = this.treeStore.persistedEntityData.get(runtimeId.value)?.get?.(placeholderName)
 
 						if (persistedValue instanceof ServerGeneratedUuid) {
-							if (persistedValue.value === fieldState.id.value) {
+							if (persistedValue.value === runtimeId.value) {
 								// The persisted and currently referenced ids match, and so this is an update.
 								return builder.update(builder =>
 									this.registerUpdateMutationPart(processedEntities, fieldState, builder),
@@ -458,11 +475,11 @@ export class MutationGenerator {
 								// TODO also potentially do something about the current entity
 								return builder.delete()
 							}
-							if (fieldState.id.existsOnServer) {
+							if (runtimeId.existsOnServer) {
 								// This isn't the persisted entity but it does exist on the server. Thus this is a connect.
 								// TODO also potentially update
 								return builder.connect({
-									[PRIMARY_KEY_NAME]: fieldState.id.value,
+									[PRIMARY_KEY_NAME]: runtimeId.value,
 								})
 							}
 							// The currently present entity doesn't exist on the server. Try if creating yields anything…
@@ -473,12 +490,12 @@ export class MutationGenerator {
 							}
 							// …but if it does, we return the create, disconnecting implicitly.
 							return subBuilder
-						} else if (fieldState.id.existsOnServer) {
+						} else if (runtimeId.existsOnServer) {
 							// There isn't a linked entity on the server but we're seeing one that exists there.
 							// Thus this is a connect.
 							// TODO also potentially update
 							return builder.connect({
-								[PRIMARY_KEY_NAME]: fieldState.id.value,
+								[PRIMARY_KEY_NAME]: runtimeId.value,
 							})
 						} else {
 							return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
@@ -491,11 +508,11 @@ export class MutationGenerator {
 				} else {
 					// This is a reduced has many relation.
 					builder = builder.many(marker.relation.field, builder => {
-						const persistedValue = currentState.persistedData?.get?.(placeholderName)
-						const alias = AliasTransformer.entityToAlias(fieldState.id)
+						const persistedValue = this.treeStore.persistedEntityData.get(runtimeId.value)?.get?.(placeholderName)
+						const alias = AliasTransformer.entityToAlias(runtimeId)
 
 						if (persistedValue instanceof ServerGeneratedUuid) {
-							if (persistedValue.value === fieldState.id.value) {
+							if (persistedValue.value === runtimeId.value) {
 								return builder.update(
 									reducedBy,
 									builder => this.registerUpdateMutationPart(processedEntities, fieldState, builder),
@@ -507,18 +524,18 @@ export class MutationGenerator {
 								// TODO also potentially do something about the current entity
 								return builder.delete(reducedBy, alias)
 							}
-							if (fieldState.id.existsOnServer) {
+							if (runtimeId.existsOnServer) {
 								// TODO will re-using the alias like this work?
 								// TODO also potentially update
-								return builder.disconnect(reducedBy, alias).connect({ [PRIMARY_KEY_NAME]: fieldState.id.value }, alias)
+								return builder.disconnect(reducedBy, alias).connect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
 							}
 							const subBuilder = builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 							if (isEmptyObject(subBuilder.data)) {
 								return builder.disconnect(reducedBy, alias)
 							}
 							return subBuilder
-						} else if (fieldState.id.existsOnServer) {
-							return builder.connect({ [PRIMARY_KEY_NAME]: fieldState.id.value }, alias)
+						} else if (runtimeId.existsOnServer) {
+							return builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
 						} else {
 							return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 						}
@@ -529,35 +546,37 @@ export class MutationGenerator {
 					continue
 				}
 				builder = builder.many(marker.relation.field, builder => {
-					for (const [, childEntityState] of fieldState.children) {
-						const alias = AliasTransformer.entityToAlias(childEntityState.id)
+					for (const [, childState] of fieldState.children) {
+						const runtimeId = childState.entity.id
+						const alias = AliasTransformer.entityToAlias(runtimeId)
 
-						if (childEntityState.id.existsOnServer) {
-							if (fieldState.persistedEntityIds.has(childEntityState.id.value)) {
-								if (childEntityState.type !== StateType.EntityStub) {
+						if (runtimeId.existsOnServer) {
+							if (fieldState.persistedEntityIds.has(runtimeId.value)) {
+								if (childState.type !== StateType.EntityRealmStub) {
 									// A stub cannot have any pending changes.
 									builder = builder.update(
-										{ [PRIMARY_KEY_NAME]: childEntityState.id.value },
-										builder => this.registerUpdateMutationPart(processedEntities, childEntityState, builder),
+										{ [PRIMARY_KEY_NAME]: runtimeId.value },
+										builder => this.registerUpdateMutationPart(processedEntities, childState, builder),
 										alias,
 									)
 								}
 							} else {
 								// TODO also potentially update
-								builder = builder.connect({ [PRIMARY_KEY_NAME]: childEntityState.id.value }, alias)
+								builder = builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
 							}
 						} else {
-							builder = builder.create(this.registerCreateMutationPart(processedEntities, childEntityState), alias)
+							builder = builder.create(this.registerCreateMutationPart(processedEntities, childState), alias)
 						}
 					}
 					if (fieldState.plannedRemovals) {
-						for (const [entityToRemove, removalType] of fieldState.plannedRemovals) {
-							const alias = AliasTransformer.entityToAlias(entityToRemove.id)
+						for (const [realmToRemove, removalType] of fieldState.plannedRemovals) {
+							const runtimeId = realmToRemove.entity.id
+							const alias = AliasTransformer.entityToAlias(runtimeId)
 							if (removalType === 'delete') {
-								builder = builder.delete({ [PRIMARY_KEY_NAME]: entityToRemove.id.value }, alias)
+								builder = builder.delete({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
 							} else if (removalType === 'disconnect') {
 								// TODO also potentially update
-								builder = builder.disconnect({ [PRIMARY_KEY_NAME]: entityToRemove.id.value }, alias)
+								builder = builder.disconnect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
 							} else {
 								assertNever(removalType)
 							}

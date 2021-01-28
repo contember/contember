@@ -84,7 +84,7 @@ export const useCurrentValues = (
 		for (const entity of currentlyChosenEntities) {
 			const currentKey = entity.key
 			const index = topLevelOptionAccessors.findIndex((entity: EntityAccessor) => {
-				const key = entity.primaryKey
+				const key = entity.key
 				return !!key && key === currentKey
 			})
 			if (index > -1) {

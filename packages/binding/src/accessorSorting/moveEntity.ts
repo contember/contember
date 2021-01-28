@@ -21,9 +21,9 @@ export const moveEntityInArray = (
 	const sorted = sortEntities(entities, sortByField)
 	const order = computeEntityOrder(sorted, sortByField, oldIndex, newIndex)
 
-	batchUpdates(getAccessor => {
+	batchUpdates((getAccessor, { getEntityByKey }) => {
 		for (const [entityKey, newOrderValue] of order) {
-			const targetEntity = getAccessor().getChildEntityByKey(entityKey)
+			const targetEntity = getEntityByKey(entityKey)
 			const orderField = targetEntity.getRelativeSingleField<number>(sortByField)
 
 			orderField.updateValue(newOrderValue)

@@ -1,6 +1,8 @@
 import { EntityAccessor } from '../../accessors'
 import { BindingError } from '../../BindingError'
-import { EntityState } from '../state'
+import { assertNever } from '../../utils'
+import { EntityRealmState, EntityRealmStateStub, EntityState, StateType } from '../state'
+import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
 
 export class OperationsHelpers {
@@ -45,14 +47,19 @@ export class OperationsHelpers {
 	}
 
 	public static runImmediateUserInitialization(
-		newEntityState: EntityState,
+		stateInitializer: StateInitializer,
+		realmStub: EntityRealmStateStub,
 		initialize: EntityAccessor.BatchUpdatesHandler | undefined,
 	) {
-		newEntityState.hasIdSetInStone = false
-		initialize && newEntityState.batchUpdates(initialize)
+		if (initialize === undefined) {
+			return
+		}
+		const entityRealm = stateInitializer.initializeEntityRealm(realmStub)
 
-		if (!newEntityState.eventListeners.initialize) {
-			newEntityState.hasIdSetInStone = true
+		realmStub.getAccessor().batchUpdates(initialize)
+
+		if (entityRealm.eventListeners.initialize === undefined || entityRealm.eventListeners.initialize.size === 0) {
+			realmStub.entity.hasIdSetInStone = true
 		}
 	}
 }

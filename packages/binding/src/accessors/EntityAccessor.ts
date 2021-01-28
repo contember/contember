@@ -1,10 +1,6 @@
-import {
-	ClientGeneratedUuid,
-	ServerGeneratedUuid,
-	SingleEntityPersistedData,
-	UnpersistedEntityKey,
-} from '../accessorTree'
+import { ClientGeneratedUuid, RuntimeId, ServerGeneratedUuid, SingleEntityPersistedData } from '../accessorTree'
 import { BindingError } from '../BindingError'
+import { TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
@@ -31,8 +27,8 @@ import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityAccessor implements Errorable {
 	public constructor(
-		public readonly runtimeId: EntityAccessor.RuntimeId,
-		public readonly typeName: string | undefined,
+		private readonly runtimeId: RuntimeId,
+		public readonly key: string,
 		private readonly fieldData: EntityAccessor.FieldData,
 		private readonly dataFromServer: SingleEntityPersistedData | undefined,
 		public readonly errors: ErrorAccessor | undefined,
@@ -45,16 +41,20 @@ class EntityAccessor implements Errorable {
 		public readonly deleteEntity: EntityAccessor.DeleteEntity,
 	) {}
 
-	public get primaryKey(): string | undefined {
+	public get idOnServer(): string | undefined {
 		return this.runtimeId.existsOnServer ? this.runtimeId.value : undefined
+	}
+
+	public get id(): string {
+		return this.runtimeId.value
 	}
 
 	public get existsOnServer(): boolean {
 		return this.runtimeId.existsOnServer
 	}
 
-	public get key(): string {
-		return this.runtimeId.value
+	public get typeName(): string | undefined {
+		return this.getField<string>(TYPENAME_KEY_NAME).value ?? undefined
 	}
 
 	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs) {
@@ -185,8 +185,6 @@ class EntityAccessor implements Errorable {
 }
 
 namespace EntityAccessor {
-	export type RuntimeId = ServerGeneratedUuid | ClientGeneratedUuid | UnpersistedEntityKey
-
 	export interface FieldDatum {
 		getAccessor(): NestedAccessor
 	}

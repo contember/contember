@@ -15,7 +15,6 @@ export interface BindingOperations {
 	getEntityByKey: GetEntityByKey
 	getEntityListSubTree: GetEntityListSubTree
 	getEntitySubTree: GetEntitySubTree
-	getAllEntities: () => Generator<EntityAccessor>
 	getTreeFilters: () => TreeFilter[]
 
 	extendTree: ExtendTree

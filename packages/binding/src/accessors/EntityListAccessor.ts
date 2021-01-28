@@ -8,7 +8,7 @@ import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
-		private readonly children: ReadonlyMap<string, EntityListAccessor.EntityDatum>,
+		private readonly _children: ReadonlyMap<string, { getAccessor: EntityAccessor.GetEntityAccessor }>,
 		private readonly keysPersistedOnServer: ReadonlySet<string>,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
@@ -18,17 +18,33 @@ class EntityListAccessor implements Errorable {
 		public readonly connectEntity: EntityListAccessor.ConnectEntity,
 		public readonly createNewEntity: EntityListAccessor.CreateNewEntity,
 		public readonly disconnectEntity: EntityListAccessor.DisconnectEntity,
-		public readonly getChildEntityByKey: EntityListAccessor.GetChildEntityByKey,
+		public readonly getChildEntityById: EntityListAccessor.GetChildEntityById,
 	) {}
 
+	public keys(): IterableIterator<string> {
+		return this._children.keys()
+	}
+
+	public *ids(): Generator<string> {
+		for (const accessor of this) {
+			yield accessor.id
+		}
+	}
+
+	public *idsOnServer(): Generator<string | undefined> {
+		for (const accessor of this) {
+			yield accessor.idOnServer
+		}
+	}
+
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
-		for (const [, childDatum] of this.children) {
-			yield childDatum.getAccessor()
+		for (const [, { getAccessor }] of this._children) {
+			yield getAccessor()
 		}
 	}
 
 	public hasEntityKey(childEntityKey: string): boolean {
-		return this.children.has(childEntityKey)
+		return this._children.has(childEntityKey)
 	}
 
 	public isEmpty(): boolean {
@@ -36,7 +52,7 @@ class EntityListAccessor implements Errorable {
 	}
 
 	public get length(): number {
-		return this.children.size
+		return this._children.size
 	}
 
 	public get keysOnServer(): Set<string> {
@@ -69,10 +85,6 @@ class EntityListAccessor implements Errorable {
 }
 
 namespace EntityListAccessor {
-	export interface EntityDatum {
-		getAccessor(): EntityAccessor
-	}
-
 	export type GetEntityListAccessor = () => EntityListAccessor
 	export type AddError = ErrorAccessor.AddError
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
@@ -80,7 +92,7 @@ namespace EntityListAccessor {
 	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void
 	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	export type DisconnectEntity = (childEntityOrItsKey: EntityAccessor | string) => void
-	export type GetChildEntityByKey = (key: string) => EntityAccessor
+	export type GetChildEntityById = (key: string) => EntityAccessor
 	export type UpdateListener = (accessor: EntityListAccessor) => void
 
 	export type BeforePersistHandler = (

@@ -4,17 +4,12 @@ import { FieldAccessor } from '../../accessors'
 import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import { Scalar } from '../../treeParameters'
-import { DirtinessTracker } from '../DirtinessTracker'
 import { EventManager } from '../EventManager'
 import { FieldState } from '../state'
 import { TreeStore } from '../TreeStore'
 
 export class FieldOperations {
-	public constructor(
-		private readonly dirtinessTracker: DirtinessTracker,
-		private readonly eventManager: EventManager,
-		private readonly treeStore: TreeStore,
-	) {}
+	public constructor(private readonly eventManager: EventManager, private readonly treeStore: TreeStore) {}
 
 	public updateValue(
 		fieldState: FieldState,
@@ -60,7 +55,6 @@ export class FieldOperations {
 			}
 			fieldState.touchLog.add(agent)
 			fieldState.value = newValue
-			fieldState.hasPendingUpdate = true
 			fieldState.hasStaleAccessor = true
 
 			const resolvedValue =
@@ -76,20 +70,21 @@ export class FieldOperations {
 			fieldState.hasUnpersistedChanges = hasUnpersistedChangesNow
 
 			const shouldInfluenceUpdateCount =
-				!parent.combinedMarkersContainer.hasAtLeastOneBearingField ||
+				!parent.blueprint.markersContainer.hasAtLeastOneBearingField ||
 				!fieldState.fieldMarker.isNonbearing ||
 				fieldState.persistedValue !== undefined
 
+			let changesDelta = EventManager.NO_CHANGES_DIFFERENCE
+
 			if (shouldInfluenceUpdateCount) {
 				if (!hadUnpersistedChangesBefore && hasUnpersistedChangesNow) {
-					this.dirtinessTracker.increment()
+					changesDelta = 1
 				} else if (hadUnpersistedChangesBefore && !hasUnpersistedChangesNow) {
-					this.dirtinessTracker.decrement()
+					changesDelta = -1
 				}
 			}
 
-			this.eventManager.registerJustUpdated(fieldState)
-			this.eventManager.notifyParents(fieldState)
+			this.eventManager.registerJustUpdated(fieldState, changesDelta)
 		})
 	}
 }

@@ -10,7 +10,7 @@ import { BlockSlateEditor } from './BlockSlateEditor'
 export interface OverrideRenderElementOptions {
 	editorReferenceBlocks: EditorReferenceBlocks
 	referenceDiscriminationField: RelativeSingleField | undefined
-	getReferenceByKey: EntityListAccessor.GetChildEntityByKey | undefined
+	getReferenceById: EntityListAccessor.GetChildEntityById | undefined
 
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks | undefined
@@ -42,10 +42,8 @@ export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, opt
 			/>
 		)
 
-		if ('referenceId' in props.element && props.element.referenceId && options.getReferenceByKey) {
-			return (
-				<AccessorProvider accessor={options.getReferenceByKey(props.element.referenceId)}>{child}</AccessorProvider>
-			)
+		if ('referenceId' in props.element && props.element.referenceId && options.getReferenceById) {
+			return <AccessorProvider accessor={options.getReferenceById(props.element.referenceId)}>{child}</AccessorProvider>
 		}
 		return child
 	}

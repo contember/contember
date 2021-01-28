@@ -1,7 +1,7 @@
 import { ErrorAccessor, FieldAccessor } from '../../accessors'
 import { FieldMarker } from '../../markers'
 import { FieldName, FieldValue } from '../../treeParameters'
-import { EntityState } from './EntityState'
+import { EntityRealmState } from './EntityRealmState'
 import { StateType } from './StateType'
 
 export interface FieldState {
@@ -13,10 +13,9 @@ export interface FieldState {
 	}
 	fieldMarker: FieldMarker
 	getAccessor: () => FieldAccessor
-	hasPendingUpdate: boolean
 	hasStaleAccessor: boolean
 	hasUnpersistedChanges: boolean
-	parent: EntityState
+	parent: EntityRealmState
 	persistedValue: FieldValue | undefined // Undefined means that the parent entity doesn't exist on server
 	placeholderName: FieldName
 	touchLog: Set<string> | undefined

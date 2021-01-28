@@ -1,5 +1,5 @@
 import { assertNever } from '../../utils'
-import { EntityStateStub } from './EntityStateStub'
+import { EntityRealmStateStub } from './EntityRealmState'
 import { StateINode } from './StateNode'
 import { StateType } from './StateType'
 
@@ -12,19 +12,19 @@ export class StateIterator {
 	}
 
 	private static *depthFirstINodesImplementation(
-		root: StateINode | EntityStateStub,
+		root: StateINode | EntityRealmStateStub,
 		match: (iNode: StateINode) => boolean,
 		visitedINodes: Set<StateINode>,
 	): Generator<StateINode, void> {
 		// Ignore uninitialized. Is that always correct though? This should probably be configurable.
-		if (root.type === StateType.EntityStub || visitedINodes.has(root)) {
+		if (root.type === StateType.EntityRealmStub || visitedINodes.has(root)) {
 			return
 		}
 		visitedINodes.add(root)
 		switch (root.type) {
-			case StateType.Entity:
+			case StateType.EntityRealm:
 				for (const [, childState] of root.children) {
-					if (childState.type === StateType.Entity || childState.type === StateType.EntityList) {
+					if (childState.type === StateType.EntityRealm || childState.type === StateType.EntityList) {
 						yield* this.depthFirstINodesImplementation(childState, match, visitedINodes)
 					}
 				}

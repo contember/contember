@@ -438,7 +438,7 @@ export namespace QueryLanguage {
 				: undefined
 		const isNonbearing: boolean =
 			unsugarableSingleEntity.isNonbearing !== undefined
-				? unsugarableSingleEntity.isNonbearing !== undefined
+				? unsugarableSingleEntity.isNonbearing
 				: EntityCreationParametersDefaults.isNonbearing
 		const eventListeners = desugarSingleEntityEventListeners(unsugarableSingleEntity)
 		const expectedMutation =

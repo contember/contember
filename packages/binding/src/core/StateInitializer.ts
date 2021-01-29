@@ -105,8 +105,10 @@ export class StateInitializer {
 			realmKey,
 			getAccessor: () => this.materializeEntityRealm(stub).getAccessor(),
 		}
-		entity.realms.set(realmKey, stub)
 		this.treeStore.entityRealmStore.set(realmKey, stub)
+		blueprint.parent?.children.set(blueprint.placeholderName, stub)
+		entity.realms.set(realmKey, stub)
+
 		return stub
 	}
 
@@ -183,6 +185,8 @@ export class StateInitializer {
 		}
 
 		this.treeStore.entityRealmStore.set(realmKey, entityRealm)
+		blueprint.parent?.children.set(blueprint.placeholderName, entityRealm)
+		entity.realms.set(realmKey, entityRealm)
 
 		// if (blueprint.creationParameters.forceCreation && !entity.id.existsOnServer) {
 		// 	entityRealm.unpersistedChangesCount += 1
@@ -194,10 +198,6 @@ export class StateInitializer {
 		}
 
 		this.eventManager.registerNewlyInitialized(entityRealm)
-
-		this.treeStore.entityRealmStore.set(realmKey, entityRealm)
-		blueprint.parent?.children.set(blueprint.placeholderName, entityRealm)
-		entity.realms.set(realmKey, entityRealm)
 
 		return entityRealm
 	}

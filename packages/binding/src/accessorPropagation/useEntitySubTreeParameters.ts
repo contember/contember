@@ -47,7 +47,7 @@ export function useEntitySubTreeParameters(
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		parameters = React.useMemo(() => {
 			const singleEntity: Required<SugaredUnconstrainedQualifiedSingleEntity> = {
-				forceCreation: qualifiedSingleEntity.forceCreation!,
+				// forceCreation: qualifiedSingleEntity.forceCreation!,
 				isNonbearing: qualifiedSingleEntity.isNonbearing!,
 				entity: qualifiedSingleEntity.entity,
 				setOnCreate: qualifiedSingleEntity.setOnCreate!,
@@ -67,7 +67,7 @@ export function useEntitySubTreeParameters(
 		}, [
 			qualifiedSingleEntity.entity,
 			qualifiedSingleEntity.setOnCreate,
-			qualifiedSingleEntity.forceCreation,
+			// qualifiedSingleEntity.forceCreation,
 			qualifiedSingleEntity.isNonbearing,
 			qualifiedSingleEntity.expectedMutation,
 			qualifiedSingleEntity.onInitialize,
@@ -84,7 +84,7 @@ export function useEntitySubTreeParameters(
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		parameters = React.useMemo(() => {
 			const singleEntity: Required<SugaredQualifiedSingleEntity> = {
-				forceCreation: qualifiedSingleEntity.forceCreation!,
+				// forceCreation: qualifiedSingleEntity.forceCreation!,
 				isNonbearing: qualifiedSingleEntity.isNonbearing!,
 				entity: qualifiedSingleEntity.entity,
 				setOnCreate: qualifiedSingleEntity.setOnCreate!,
@@ -102,7 +102,7 @@ export function useEntitySubTreeParameters(
 		}, [
 			qualifiedSingleEntity.entity,
 			qualifiedSingleEntity.setOnCreate,
-			qualifiedSingleEntity.forceCreation,
+			// qualifiedSingleEntity.forceCreation,
 			qualifiedSingleEntity.isNonbearing,
 			qualifiedSingleEntity.expectedMutation,
 			qualifiedSingleEntity.onInitialize,

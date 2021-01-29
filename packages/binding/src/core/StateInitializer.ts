@@ -184,9 +184,9 @@ export class StateInitializer {
 
 		this.treeStore.entityRealmStore.set(realmKey, entityRealm)
 
-		if (blueprint.creationParameters.forceCreation && !entity.id.existsOnServer) {
-			entityRealm.unpersistedChangesCount += 1
-		}
+		// if (blueprint.creationParameters.forceCreation && !entity.id.existsOnServer) {
+		// 	entityRealm.unpersistedChangesCount += 1
+		// }
 
 		const persistedData = this.treeStore.persistedEntityData.get(entity.id.value)
 		for (const [placeholderName, field] of blueprint.markersContainer.markers) {

@@ -34,7 +34,7 @@ export class TreeParameterMerger {
 			expectedMutation: this.mergeExpectedRelationMutation(original.expectedMutation, fresh.expectedMutation),
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
-			forceCreation: original.forceCreation || fresh.forceCreation,
+			// forceCreation: original.forceCreation || fresh.forceCreation,
 			eventListeners: this.mergeSingleEntityEventListeners(original.eventListeners, fresh.eventListeners),
 		}
 	}
@@ -60,7 +60,7 @@ export class TreeParameterMerger {
 			// Not encoded within the placeholder
 			expectedMutation: this.mergeExpectedRelationMutation(original.expectedMutation, fresh.expectedMutation),
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
-			forceCreation: original.forceCreation || fresh.forceCreation,
+			// forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
 			eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
@@ -81,7 +81,7 @@ export class TreeParameterMerger {
 				// Not encoded within the placeholder
 				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
-				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				// forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
 					original.value.expectedMutation,
 					fresh.value.expectedMutation,
@@ -109,7 +109,7 @@ export class TreeParameterMerger {
 				// Not encoded within the placeholder
 				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
-				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				// forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
 					original.value.expectedMutation,
 					fresh.value.expectedMutation,
@@ -131,7 +131,7 @@ export class TreeParameterMerger {
 				// Not encoded within the placeholder
 				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
-				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				// forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
 					original.value.expectedMutation,
 					fresh.value.expectedMutation,
@@ -158,7 +158,7 @@ export class TreeParameterMerger {
 				// Not encoded within the placeholder
 				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
 				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
-				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				// forceCreation: original.value.forceCreation || fresh.value.forceCreation,
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
 					original.value.expectedMutation,
 					fresh.value.expectedMutation,
@@ -177,7 +177,7 @@ export class TreeParameterMerger {
 		fresh: EntityCreationParameters,
 	): EntityCreationParameters {
 		return {
-			forceCreation: original.forceCreation || fresh.forceCreation,
+			// forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 		}

@@ -304,12 +304,12 @@ export class MutationGenerator {
 			}
 		}
 
-		if (
-			currentState.blueprint.creationParameters.forceCreation &&
-			(builder.data === undefined || isEmptyObject(builder.data))
-		) {
-			builder = builder.set('_dummy_field_', true)
-		}
+		// if (
+		// 	currentState.blueprint.creationParameters.forceCreation &&
+		// 	(builder.data === undefined || isEmptyObject(builder.data))
+		// ) {
+		// 	builder = builder.set('_dummy_field_', true)
+		// }
 
 		if (
 			(builder.data !== undefined && !isEmptyObject(builder.data)) ||

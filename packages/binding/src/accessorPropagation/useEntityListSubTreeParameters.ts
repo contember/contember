@@ -51,7 +51,7 @@ export function useEntityListSubTreeParameters(
 		parameters = React.useMemo(() => {
 			const entityList: Required<SugaredUnconstrainedQualifiedEntityList> = {
 				entities: qualifiedEntityList.entities,
-				forceCreation: qualifiedEntityList.forceCreation!,
+				// forceCreation: qualifiedEntityList.forceCreation!,
 				initialEntityCount: qualifiedEntityList.initialEntityCount!,
 				isNonbearing: qualifiedEntityList.isNonbearing!,
 				onBeforePersist: qualifiedEntityList.onBeforePersist!,
@@ -70,7 +70,7 @@ export function useEntityListSubTreeParameters(
 			)
 		}, [
 			qualifiedEntityList.entities,
-			qualifiedEntityList.forceCreation,
+			// qualifiedEntityList.forceCreation,
 			qualifiedEntityList.initialEntityCount,
 			qualifiedEntityList.isNonbearing,
 			qualifiedEntityList.onBeforePersist,
@@ -89,7 +89,7 @@ export function useEntityListSubTreeParameters(
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		parameters = React.useMemo(() => {
 			const entityList: Required<SugaredQualifiedEntityList> = {
-				forceCreation: qualifiedEntityList.forceCreation!,
+				// forceCreation: qualifiedEntityList.forceCreation!,
 				isNonbearing: qualifiedEntityList.isNonbearing!,
 				initialEntityCount: qualifiedEntityList.initialEntityCount!,
 				setOnCreate: qualifiedEntityList.setOnCreate!,
@@ -114,7 +114,7 @@ export function useEntityListSubTreeParameters(
 			qualifiedEntityList.orderBy,
 			qualifiedEntityList.offset,
 			qualifiedEntityList.limit,
-			qualifiedEntityList.forceCreation,
+			// qualifiedEntityList.forceCreation,
 			qualifiedEntityList.isNonbearing,
 			qualifiedEntityList.initialEntityCount,
 			qualifiedEntityList.alias,

@@ -21,4 +21,5 @@ export interface DatabaseCredentials {
 	readonly user: string
 	readonly password: string
 	readonly database: string
+	readonly ssl?: boolean
 }

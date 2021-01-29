@@ -21,6 +21,13 @@ export function hasStringProperty<Input extends UnknownObject, Property extends 
 	return typeof input[property] === 'string'
 }
 
+export function hasBooleanProperty<Input extends UnknownObject, Property extends string>(
+	input: Input,
+	property: Property,
+): input is Input & { [key in Property]: boolean } {
+	return typeof input[property] === 'boolean'
+}
+
 export function hasNumberProperty<Input extends UnknownObject, Property extends string>(
 	input: Input,
 	property: Property,

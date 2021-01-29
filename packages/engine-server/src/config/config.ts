@@ -10,7 +10,13 @@ import { DatabaseCredentials } from '@contember/database'
 import { tuple, upperCaseFirst } from '../utils'
 import { MailerOptions, TenantCredentials } from '@contember/engine-tenant-api'
 import { ConfigProcessor } from '@contember/engine-plugins'
-import { isObject, typeConfigError, hasStringProperty, hasNumberProperty } from '@contember/engine-common'
+import {
+	isObject,
+	typeConfigError,
+	hasStringProperty,
+	hasNumberProperty,
+	hasBooleanProperty,
+} from '@contember/engine-common'
 
 export { Project }
 
@@ -63,6 +69,9 @@ function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredenti
 	}
 	if (!hasStringProperty(json, 'database')) {
 		return typeConfigError(path + '.database', json.database, 'string')
+	}
+	if (json.ssl !== undefined && !hasBooleanProperty(json, 'ssl')) {
+		return typeConfigError(path + '.ssl', json.ssl, 'boolean')
 	}
 	return json
 }
@@ -253,6 +262,7 @@ export async function readConfig(filenames: string[], configProcessors: ConfigPr
 				user: `%tenant.env.DB_USER%`,
 				password: `%tenant.env.DB_PASSWORD%`,
 				database: `%tenant.env.DB_NAME%`,
+				ssl: `%?tenant.env.DB_SSL::bool%`,
 			},
 			mailer: {
 				from: '%?tenant.env.MAILER_FROM%',
@@ -276,6 +286,7 @@ export async function readConfig(filenames: string[], configProcessors: ConfigPr
 				user: `%project.env.DB_USER%`,
 				password: `%project.env.DB_PASSWORD%`,
 				database: `%project.env.DB_NAME%`,
+				ssl: `%?project.env.DB_SSL::bool%`,
 			},
 		},
 		server: {

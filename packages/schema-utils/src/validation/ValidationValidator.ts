@@ -181,7 +181,7 @@ export class ValidationValidator {
 			case 'range':
 				const rangeArgA = this.validateLiteralArgument(errorBuilder.for('min'), validatorCast.args[0])
 				const rangeArgB = this.validateLiteralArgument(errorBuilder.for('max'), validatorCast.args[1])
-				if (lengthArgA === undefined || lengthArgB === undefined) {
+				if (rangeArgA === undefined || rangeArgB === undefined) {
 					return undefined
 				}
 				return {

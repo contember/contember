@@ -26,16 +26,7 @@ export const createProjectContainer = (
 		.addService('project', () => project)
 		.addService('graphqlObjectsFactory', () => graphqlObjectFactories)
 		.addService('connection', ({ project }) => {
-			return new Connection(
-				{
-					host: project.db.host,
-					port: project.db.port,
-					user: project.db.user,
-					password: project.db.password,
-					database: project.db.database,
-				},
-				{ timing: true },
-			)
+			return new Connection(project.db, { timing: true })
 		})
 		.addService(
 			'modificationHandlerFactory',

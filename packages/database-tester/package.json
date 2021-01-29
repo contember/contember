@@ -1,11 +1,11 @@
 {
   "name": "@contember/database-tester",
-  "version": "0.10.0-alpha.9",
+  "version": "0.10.0-alpha.10",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/database": "^0.10.0-alpha.9",
+    "@contember/database": "^0.10.0-alpha.10",
     "uvu": "^0.4.1"
   },
   "scripts": {

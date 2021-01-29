@@ -77,15 +77,15 @@ export class ListOperations {
 		this.eventManager.syncOperation(() => {
 			const id = new UnpersistedEntityDummyId()
 			// const newState = this.stateInitializer.initializeEntityRealm(
-			// 	this.stateInitializer.initializeEntityRealmStub(id, this.stateInitializer.createListEntityBlueprint(state, id)),
+			// 	this.stateInitializer.initializeEntityRealm(id, this.stateInitializer.createListEntityBlueprint(state, id)),
 			// )
-			const newStub = this.stateInitializer.initializeEntityRealmStub(
+			const newEntity = this.stateInitializer.initializeEntityRealm(
 				id,
 				this.stateInitializer.createListEntityBlueprint(state, id),
 			)
 
 			state.hasStaleAccessor = true
-			OperationsHelpers.runImmediateUserInitialization(this.stateInitializer, newStub, initialize)
+			OperationsHelpers.runImmediateUserInitialization(this.stateInitializer, newEntity, initialize)
 
 			// The act of creating the entity doesn't constitute a change unless there's something inside to persist.
 			// TODO forceCreate

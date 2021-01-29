@@ -48,18 +48,18 @@ export class OperationsHelpers {
 
 	public static runImmediateUserInitialization(
 		stateInitializer: StateInitializer,
-		realmStub: EntityRealmStateStub,
+		realm: EntityRealmState | EntityRealmStateStub,
 		initialize: EntityAccessor.BatchUpdatesHandler | undefined,
 	) {
 		if (initialize === undefined) {
 			return
 		}
-		const entityRealm = stateInitializer.initializeEntityRealm(realmStub)
+		const entityRealm = stateInitializer.materializeEntityRealm(realm)
 
-		realmStub.getAccessor().batchUpdates(initialize)
+		realm.getAccessor().batchUpdates(initialize)
 
 		if (entityRealm.eventListeners.initialize === undefined || entityRealm.eventListeners.initialize.size === 0) {
-			realmStub.entity.hasIdSetInStone = true
+			realm.entity.hasIdSetInStone = true
 		}
 	}
 }

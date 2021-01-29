@@ -226,7 +226,7 @@ export class EntityOperations {
 					}
 					parent.children.set(
 						placeholderName,
-						this.stateInitializer.initializeEntityRealmStub(new UnpersistedEntityDummyId(), deletedRealm.blueprint),
+						this.stateInitializer.initializeEntityRealm(new UnpersistedEntityDummyId(), deletedRealm.blueprint),
 					)
 
 					this.eventManager.registerUpdatedConnection(parent, placeholderName)

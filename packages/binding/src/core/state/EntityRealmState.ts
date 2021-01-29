@@ -49,7 +49,6 @@ export interface EntityRealmState {
 	errors: ErrorAccessor | undefined
 	readonly eventListeners: SingleEntityEventListeners['eventListeners']
 	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
-	hasPendingParentNotification: boolean
 	hasStaleAccessor: boolean
 	plannedHasOneDeletions: Map<PlaceholderName, EntityRealmState | EntityRealmStateStub> | undefined
 	unpersistedChangesCount: number

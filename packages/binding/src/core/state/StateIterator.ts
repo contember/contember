@@ -1,9 +1,35 @@
+import { PlaceholderName } from '../../treeParameters/primitives'
 import { assertNever } from '../../utils'
-import { EntityRealmStateStub } from './EntityRealmState'
-import { StateINode } from './StateNode'
+import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
+import { StateINode, StateNode } from './StateNode'
 import { StateType } from './StateType'
 
 export class StateIterator {
+	public static *eachSiblingRealmChild<T extends StateType>(
+		parent: EntityRealmState,
+		type: T,
+		placeholderName: PlaceholderName,
+	): Generator<StateNode & { type: T }, void> {
+		for (let [realmKey, realm] of parent.entity.realms) {
+			if (realm.type === StateType.EntityRealmStub) {
+				if (realm.blueprint.markersContainer.placeholders.has(placeholderName)) {
+					realm.getAccessor()
+					realm = parent.entity.realms.get(realmKey) as EntityRealmState
+				} else {
+					// This realm is irrelevant. No need to force-initialize it.
+					continue
+				}
+			}
+			const child = realm.children.get(placeholderName)
+			if (child === undefined) {
+				continue
+			}
+			if (child.type === type) {
+				yield child as StateNode & { type: T }
+			}
+		}
+	}
+
 	public static *depthFirstINodes(
 		root: StateINode,
 		match: (iNode: StateINode) => boolean,

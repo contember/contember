@@ -5,7 +5,7 @@ import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import { Scalar } from '../../treeParameters'
 import { EventManager } from '../EventManager'
-import { FieldState } from '../state'
+import { FieldState, StateIterator, StateType } from '../state'
 import { TreeStore } from '../TreeStore'
 
 export class FieldOperations {
@@ -47,44 +47,50 @@ export class FieldOperations {
 					}
 				}
 			}
-			if (newValue === fieldState.value) {
-				return
-			}
-			if (fieldState.touchLog === undefined) {
-				fieldState.touchLog = new Set()
-			}
-			fieldState.touchLog.add(agent)
-			fieldState.value = newValue
-			fieldState.hasStaleAccessor = true
-
-			const resolvedValue =
-				fieldState.fieldMarker.defaultValue === undefined
-					? newValue
-					: newValue === null
-					? fieldState.fieldMarker.defaultValue
-					: newValue
-			const normalizedValue = resolvedValue instanceof GraphQlBuilder.Literal ? resolvedValue.value : resolvedValue
-			const normalizedPersistedValue = fieldState.persistedValue === undefined ? null : fieldState.persistedValue
-			const hadUnpersistedChangesBefore = fieldState.hasUnpersistedChanges
-			const hasUnpersistedChangesNow = normalizedValue !== normalizedPersistedValue
-			fieldState.hasUnpersistedChanges = hasUnpersistedChangesNow
-
-			const shouldInfluenceUpdateCount =
-				!parent.blueprint.markersContainer.hasAtLeastOneBearingField ||
-				!fieldState.fieldMarker.isNonbearing ||
-				fieldState.persistedValue !== undefined
-
-			let changesDelta = EventManager.NO_CHANGES_DIFFERENCE
-
-			if (shouldInfluenceUpdateCount) {
-				if (!hadUnpersistedChangesBefore && hasUnpersistedChangesNow) {
-					changesDelta = 1
-				} else if (hadUnpersistedChangesBefore && !hasUnpersistedChangesNow) {
-					changesDelta = -1
+			for (const field of StateIterator.eachSiblingRealmChild(
+				fieldState.parent,
+				StateType.Field,
+				fieldState.placeholderName,
+			)) {
+				if (newValue === field.value) {
+					continue
 				}
-			}
+				if (field.touchLog === undefined) {
+					field.touchLog = new Set()
+				}
+				field.touchLog.add(agent)
+				field.value = newValue
+				field.hasStaleAccessor = true
 
-			this.eventManager.registerJustUpdated(fieldState, changesDelta)
+				const resolvedValue =
+					field.fieldMarker.defaultValue === undefined
+						? newValue
+						: newValue === null
+						? field.fieldMarker.defaultValue
+						: newValue
+				const normalizedValue = resolvedValue instanceof GraphQlBuilder.Literal ? resolvedValue.value : resolvedValue
+				const normalizedPersistedValue = field.persistedValue === undefined ? null : field.persistedValue
+				const hadUnpersistedChangesBefore = field.hasUnpersistedChanges
+				const hasUnpersistedChangesNow = normalizedValue !== normalizedPersistedValue
+				field.hasUnpersistedChanges = hasUnpersistedChangesNow
+
+				const shouldInfluenceUpdateCount =
+					!parent.blueprint.markersContainer.hasAtLeastOneBearingField ||
+					!field.fieldMarker.isNonbearing ||
+					field.persistedValue !== undefined
+
+				let changesDelta = EventManager.NO_CHANGES_DIFFERENCE
+
+				if (shouldInfluenceUpdateCount) {
+					if (!hadUnpersistedChangesBefore && hasUnpersistedChangesNow) {
+						changesDelta = 1
+					} else if (hadUnpersistedChangesBefore && !hasUnpersistedChangesNow) {
+						changesDelta = -1
+					}
+				}
+
+				this.eventManager.registerJustUpdated(field, changesDelta)
+			}
 		})
 	}
 }

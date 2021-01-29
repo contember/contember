@@ -74,24 +74,27 @@ export class StateInitializer {
 				parent: undefined,
 				placeholderName: tree.placeholderName,
 			}
-			subTreeState = this.initializeEntityRealm(this.initializeEntityRealmStub(id, blueprint))
+			subTreeState = this.materializeEntityRealm(this.initializeEntityRealm(id, blueprint))
 		}
 		this.treeStore.subTreeStates.set(tree.placeholderName, subTreeState)
 
 		return subTreeState
 	}
 
-	public initializeEntityRealmStub(id: RuntimeId, blueprint: EntityRealmBlueprint): EntityRealmStateStub {
+	public initializeEntityRealm(
+		id: RuntimeId,
+		blueprint: EntityRealmBlueprint,
+	): EntityRealmState | EntityRealmStateStub {
+		// This is counter-intuitive a bit. The method can also return an EntityRealmState, not just a stub.
+		// The reason is so that each call-site can just default to trying to initialize a stub without having to keep
+		// in mind that the realm might have already been initialized.
+
 		const entity = this.initializeEntityState(id)
 		const realmKey = RealmKeyGenerator.getRealmKey(id, blueprint)
 
-		const existing = entity.realms.get(realmKey)
-
+		const existing = this.treeStore.entityRealmStore.get(realmKey)
 		if (existing !== undefined) {
-			if (existing.type === StateType.EntityRealmStub) {
-				return existing
-			}
-			throw new BindingError() // TODO
+			return existing
 		}
 
 		const stub: EntityRealmStateStub = {
@@ -100,29 +103,23 @@ export class StateInitializer {
 			blueprint,
 			entity,
 			realmKey,
-			getAccessor: () => this.initializeEntityRealm(stub).getAccessor(),
+			getAccessor: () => this.materializeEntityRealm(stub).getAccessor(),
 		}
-		// if (__DEV_MODE__) {
-		// 	const fromParent = entity.realms.get(realmKey)
-		// 	const fromStore = this.treeStore.entityRealmStore.get(realmKey)
-		// 	const sameBlueprintParent = fromParent?.blueprint === blueprint
-		// 	const sameBlueprintStore = fromParent?.blueprint === blueprint
-		// 	if (fromParent !== undefined || fromStore !== undefined) {
-		// 		// TODO As far as I can tell, these shouldn't happen. To the point that this check may even be unnecessary.
-		// 		//		Let's see if the reality has something to say about that.
-		// 		console.log(sameBlueprintParent, sameBlueprintStore)
-		// 		throw new BindingError()
-		// 	}
-		// }
 		entity.realms.set(realmKey, stub)
 		this.treeStore.entityRealmStore.set(realmKey, stub)
 		return stub
 	}
 
-	public initializeEntityRealm({ realmKey, entity, blueprint }: EntityRealmStateStub): EntityRealmState {
-		// TODO can there already legally be a realm with the same key?
-		//		If the realms were clearly identical, it should have been caught at the marker level. Otherwise,
-		//		they should be different realms. So how does this ever reasonably happen?
+	public materializeEntityRealm(state: EntityRealmState | EntityRealmStateStub): EntityRealmState {
+		if (state.type === StateType.EntityRealm) {
+			return state
+		}
+		const { realmKey, entity, blueprint } = state
+
+		const existing = this.treeStore.entityRealmStore.get(realmKey)
+		if (existing !== undefined && existing.type === StateType.EntityRealm) {
+			return existing
+		}
 
 		const entityRealm: EntityRealmState = {
 			type: StateType.EntityRealm,
@@ -138,7 +135,6 @@ export class StateInitializer {
 				blueprint.initialEventListeners?.eventListeners,
 			),
 			fieldsWithPendingConnectionUpdates: undefined,
-			hasPendingParentNotification: false,
 			hasStaleAccessor: true,
 			plannedHasOneDeletions: undefined,
 			unpersistedChangesCount: 0,
@@ -199,17 +195,19 @@ export class StateInitializer {
 
 		this.eventManager.registerNewlyInitialized(entityRealm)
 
+		this.treeStore.entityRealmStore.set(realmKey, entityRealm)
 		blueprint.parent?.children.set(blueprint.placeholderName, entityRealm)
+		entity.realms.set(realmKey, entityRealm)
 
 		return entityRealm
 	}
 
 	private initializeEntityState(id: RuntimeId): EntityState {
-		const entityKey = id.value
-		const existingState = this.treeStore.entityStore.get(entityKey)
+		const entityId = id.value
 
-		if (existingState) {
-			return existingState
+		const existing = this.treeStore.entityStore.get(entityId)
+		if (existing !== undefined) {
+			return existing
 		}
 
 		const entityState: EntityState = {
@@ -223,7 +221,7 @@ export class StateInitializer {
 				this.entityOperations.deleteEntity(entityState)
 			},
 		}
-		this.treeStore.entityStore.set(entityKey, entityState)
+		this.treeStore.entityStore.set(entityId, entityState)
 
 		return entityState
 	}
@@ -241,7 +239,6 @@ export class StateInitializer {
 			),
 			errors: undefined,
 			plannedRemovals: undefined,
-			hasPendingParentNotification: false,
 			hasStaleAccessor: true,
 			unpersistedChangesCount: 0, // TODO force creation?
 			getAccessor: (() => {
@@ -291,7 +288,7 @@ export class StateInitializer {
 				? new Set(Array.from({ length: blueprint.creationParameters.initialEntityCount }))
 				: persistedEntityIds
 		for (const entityId of initialData) {
-			this.initializeListEntityStub(entityListState, entityId)
+			this.initializeListEntity(entityListState, entityId)
 		}
 
 		return entityListState
@@ -391,7 +388,7 @@ export class StateInitializer {
 			const entityId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityDummyId()
 			entityRealm.children.set(
 				field.placeholderName,
-				this.initializeEntityRealmStub(entityId, {
+				this.initializeEntityRealm(entityId, {
 					creationParameters: field.relation,
 					environment: field.environment,
 					initialEventListeners: field.relation,
@@ -485,16 +482,16 @@ export class StateInitializer {
 		}
 	}
 
-	private initializeListEntityStub(
+	private initializeListEntity(
 		entityListState: EntityListState,
 		entityId: string | undefined,
-	): EntityRealmStateStub {
+	): EntityRealmState | EntityRealmStateStub {
 		const id = entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityDummyId()
-		const stub = this.initializeEntityRealmStub(id, this.createListEntityBlueprint(entityListState, id))
+		const listEntity = this.initializeEntityRealm(id, this.createListEntityBlueprint(entityListState, id))
 		entityListState.hasStaleAccessor = true
-		entityListState.children.set(id.value, stub)
+		entityListState.children.set(id.value, listEntity)
 
-		return stub
+		return listEntity
 	}
 
 	public createListEntityBlueprint(

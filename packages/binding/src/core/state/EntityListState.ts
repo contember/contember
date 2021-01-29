@@ -34,7 +34,6 @@ export interface EntityListState {
 			| undefined
 	}
 	getAccessor: () => EntityListAccessor
-	hasPendingParentNotification: boolean
 	hasStaleAccessor: boolean
 	persistedEntityIds: Set<string>
 	plannedRemovals: Map<EntityRealmState | EntityRealmStateStub, RemovalType> | undefined

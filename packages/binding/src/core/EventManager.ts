@@ -156,13 +156,6 @@ export class EventManager {
 	}
 
 	public registerJustUpdated(justUpdated: StateNode, changesDelta: number) {
-		if (justUpdated.type === StateType.EntityRealm || justUpdated.type === StateType.EntityList) {
-			justUpdated.hasPendingParentNotification = true
-		}
-		this.propagateUpdateNecessity(justUpdated, changesDelta)
-	}
-
-	private propagateUpdateNecessity(justUpdated: StateNode, changesDelta: number) {
 		if (justUpdated.eventListeners.beforeUpdate) {
 			this.pendingWithBeforeUpdate.add(justUpdated)
 		}
@@ -171,23 +164,20 @@ export class EventManager {
 		switch (justUpdated.type) {
 			case StateType.EntityRealm:
 			case StateType.EntityList: {
-				if (justUpdated.hasPendingParentNotification || changesDelta !== 0) {
-					justUpdated.hasPendingParentNotification = false
-					const parent = justUpdated.blueprint.parent
+				justUpdated.unpersistedChangesCount += changesDelta
 
-					justUpdated.unpersistedChangesCount += changesDelta
+				const parent = justUpdated.blueprint.parent
 
-					if (parent !== undefined) {
-						if (!parent.childrenWithPendingUpdates) {
-							parent.childrenWithPendingUpdates = new Set()
-						}
-						parent.childrenWithPendingUpdates.add(justUpdated as any)
-
-						this.propagateUpdateNecessity(parent, changesDelta)
-					} else {
-						this.rootsWithPendingUpdates.add(justUpdated)
-						this.dirtinessTracker.increaseBy(changesDelta)
+				if (parent === undefined) {
+					this.rootsWithPendingUpdates.add(justUpdated)
+					this.dirtinessTracker.increaseBy(changesDelta)
+				} else if (!parent.childrenWithPendingUpdates?.size || changesDelta !== 0) {
+					if (!parent.childrenWithPendingUpdates) {
+						parent.childrenWithPendingUpdates = new Set()
 					}
+					parent.childrenWithPendingUpdates.add(justUpdated as any)
+
+					this.registerJustUpdated(parent, changesDelta)
 				}
 				break
 			}
@@ -197,7 +187,7 @@ export class EventManager {
 					parent.childrenWithPendingUpdates = new Set()
 				}
 				parent.childrenWithPendingUpdates.add(justUpdated as any)
-				this.propagateUpdateNecessity(justUpdated.parent, changesDelta)
+				this.registerJustUpdated(justUpdated.parent, changesDelta)
 				break
 			}
 		}

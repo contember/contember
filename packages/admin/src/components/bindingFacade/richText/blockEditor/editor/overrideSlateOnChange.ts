@@ -112,7 +112,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 								const getReferenceById = getEntity().getRelativeEntityList(desugaredBlockList).getChildEntityById
 								saveBlockElement(
 									getReferenceById,
-									topLevelBlocks[topLevelIndex - leadingCount].key,
+									topLevelBlocks[topLevelIndex - leadingCount].id,
 									children[topLevelIndex] as EditorNode,
 								)
 							}
@@ -189,7 +189,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 					const isProcessed = processedAccessors[blockOrder]
 					if (!isProcessed) {
 						blockList.createNewEntity(getAccessor => {
-							const newKey = getAccessor().key
+							const newKey = getAccessor().id
 							getAccessor().getRelativeSingleField(sortableByField).updateValue(blockOrder)
 							saveBlockElement(getReferenceById, newKey, child as EditorNode)
 							blockElementPathRefs.set(newKey, Editor.pathRef(editor, [blockOrder], { affinity: 'backward' }))
@@ -220,12 +220,12 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 
 	const saveBlockElement = (
 		getReferenceById: EntityListAccessor.GetChildEntityById,
-		key: string,
+		id: string,
 		element: EditorNode,
 	) => {
-		getReferenceById(key)
+		getReferenceById(id)
 			.getRelativeSingleField(blockContentField)
 			.updateValue(editor.serializeNodes([element]))
-		blockElementCache.set(getReferenceById(key), element)
+		blockElementCache.set(getReferenceById(id), element)
 	}
 }

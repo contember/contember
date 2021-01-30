@@ -249,6 +249,7 @@ export class StateInitializer {
 						accessor = new EntityListAccessor(
 							entityListState.children,
 							entityListState.persistedEntityIds,
+							this.bindingOperations,
 							entityListState.errors,
 							entityListState.blueprint.environment,
 							entityListState.addError,

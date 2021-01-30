@@ -9,7 +9,8 @@ import { PersistSuccessOptions } from './PersistSuccessOptions'
 class EntityListAccessor implements Errorable {
 	public constructor(
 		private readonly _children: ReadonlyMap<string, { getAccessor: EntityAccessor.GetEntityAccessor }>,
-		private readonly keysPersistedOnServer: ReadonlySet<string>,
+		private readonly _idsPersistedOnServer: ReadonlySet<string>,
+		private readonly _bindingOperations: BindingOperations,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
 		public readonly addError: EntityListAccessor.AddError,
@@ -21,6 +22,11 @@ class EntityListAccessor implements Errorable {
 		public readonly getChildEntityById: EntityListAccessor.GetChildEntityById,
 	) {}
 
+	/**
+	 * Returns all entity keys that are on the list.
+	 * **KEYS ARE NOT IDS!**
+	 * @see EntityAccessor.key
+	 */
 	public keys(): IterableIterator<string> {
 		return this._children.keys()
 	}
@@ -31,10 +37,12 @@ class EntityListAccessor implements Errorable {
 		}
 	}
 
-	public *idsOnServer(): Generator<string | undefined> {
-		for (const accessor of this) {
-			yield accessor.idOnServer
-		}
+	/**
+	 * This will only contain the ids that the server knows about. Not necessarily the ids that have been added on
+	 * the list since the last server query.
+	 */
+	public get idsPersistedOnServer(): Set<string> {
+		return new Set(this._idsPersistedOnServer)
 	}
 
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
@@ -55,12 +63,15 @@ class EntityListAccessor implements Errorable {
 		return this._children.size
 	}
 
-	public get keysOnServer(): Set<string> {
-		return new Set(this.keysPersistedOnServer)
-	}
-
-	public hasEntityOnServer(entity: string | EntityAccessor): boolean {
-		return this.keysPersistedOnServer.has(typeof entity === 'string' ? entity : entity.key)
+	public hasEntityOnServer(entityOrItsId: EntityAccessor | string): boolean {
+		if (typeof entityOrItsId === 'string') {
+			return this.idsPersistedOnServer.has(entityOrItsId)
+		}
+		const idOnServer = entityOrItsId.idOnServer
+		if (idOnServer === undefined) {
+			return false
+		}
+		return this.idsPersistedOnServer.has(idOnServer)
 	}
 
 	public deleteAll() {

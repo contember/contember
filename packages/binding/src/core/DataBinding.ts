@@ -19,7 +19,7 @@ import {
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
-import { MarkerTreeRoot, PlaceholderGenerator, SubTreeMarkerParameters } from '../markers'
+import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
 import {
 	Alias,
 	BoxedQualifiedEntityList,
@@ -34,7 +34,6 @@ import { EventManager } from './EventManager'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
-import { RootStateNode } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
@@ -88,7 +87,7 @@ export class DataBinding {
 
 	private readonly bindingOperations = Object.freeze<BindingOperations>({
 		hasEntityKey: key => {
-			return this.treeStore.entityStore.has(key)
+			return this.treeStore.entityRealmStore.has(key)
 		},
 		hasSubTree: aliasOrParameters => {
 			if (typeof aliasOrParameters === 'string') {

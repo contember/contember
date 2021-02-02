@@ -52,7 +52,9 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 		emptyMessageComponentExtraProps,
 	}) => {
 		const totalCount = useHackyTotalCount(entityName, filter)
-		const normalizedCount = itemsPerPage === null ? accessor.length : totalCount
+		const normalizedItemCount = itemsPerPage === null ? accessor.length : totalCount
+		const pagesCount =
+			totalCount !== undefined && itemsPerPage !== null ? Math.ceil(totalCount / itemsPerPage) : undefined
 
 		return (
 			<div>
@@ -112,10 +114,8 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 						<div>
 							<span>
 								Page {pageIndex + 1}
-								{totalCount !== undefined &&
-									itemsPerPage !== null &&
-									` out of ${Math.ceil(totalCount / itemsPerPage).toFixed(0)} `}
-								{normalizedCount !== undefined && `(${normalizedCount} items)`}
+								{pagesCount !== undefined && ` out of ${pagesCount.toFixed(0)} `}
+								{normalizedItemCount !== undefined && `(${normalizedItemCount} items)`}
 							</span>
 						</div>
 						<div style={{ display: 'flex', gap: '.5em' }}>
@@ -130,12 +130,23 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 								Previous
 							</Button>
 							{itemsPerPage !== null && (
-								<Button
-									disabled={accessor.length !== itemsPerPage}
-									onClick={() => updatePaging({ type: 'goToNextPage' })}
-								>
-									Next
-								</Button>
+								<>
+									<Button
+										disabled={accessor.length !== itemsPerPage}
+										onClick={() => updatePaging({ type: 'goToNextPage' })}
+									>
+										Next
+									</Button>
+									<Button
+										distinction="seamless"
+										disabled={pagesCount === undefined || pageIndex === pagesCount - 1}
+										onClick={() =>
+											pagesCount !== undefined && updatePaging({ type: 'goToPage', newPageIndex: pagesCount - 1 })
+										}
+									>
+										Last
+									</Button>
+								</>
 							)}
 						</div>
 					</div>

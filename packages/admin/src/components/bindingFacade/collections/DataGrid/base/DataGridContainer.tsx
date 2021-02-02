@@ -1,4 +1,4 @@
-import { Component, Entity, EntityListBaseProps } from '@contember/binding'
+import { Component, Entity, EntityListBaseProps, EntityName, Filter, QualifiedEntityList } from '@contember/binding'
 import { Button, ButtonList, Justification, Table, TableCell, TableRow } from '@contember/ui'
 import * as React from 'react'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
@@ -7,6 +7,7 @@ import { GridPagingAction } from '../paging'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
+import { useHackyTotalCount } from './useHackyTotalCount'
 
 export interface DataGridCellPublicProps {
 	justification?: Justification
@@ -21,6 +22,8 @@ export interface DataGridContainerPublicProps {
 
 export interface DataGridContainerOwnProps extends DataGridContainerPublicProps {
 	dataGridState: DataGridState
+	entityName: EntityName
+	filter: Filter | undefined
 	setFilter: DataGridSetColumnFilter
 	setOrderBy: DataGridSetColumnOrderBy
 	updatePaging: (action: GridPagingAction) => void
@@ -41,11 +44,16 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 			orderDirections,
 			columns,
 		},
+		entityName,
+		filter,
 
 		emptyMessage = 'No data to display.',
 		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
 		emptyMessageComponentExtraProps,
 	}) => {
+		const totalCount = useHackyTotalCount(entityName, filter)
+		const normalizedCount = itemsPerPage === null ? accessor.length : totalCount
+
 		return (
 			<div>
 				<Table
@@ -99,31 +107,39 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 						</TableRow>
 					)}
 				</Table>
-				<div style={{ margin: '1em 0', display: 'flex', justifyContent: 'space-between' }}>
-					<div>
-						<span>Page {pageIndex + 1}</span>
-					</div>
-					<div style={{ display: 'flex', gap: '.5em' }}>
-						<Button
-							distinction="seamless"
-							disabled={pageIndex === 0}
-							onClick={() => updatePaging({ type: 'goToFirstPage' })}
-						>
-							First
-						</Button>
-						<Button disabled={pageIndex === 0} onClick={() => updatePaging({ type: 'goToPreviousPage' })}>
-							Previous
-						</Button>
-						{itemsPerPage !== null && (
+				{!!accessor.length && (
+					<div style={{ margin: '1em 0', display: 'flex', justifyContent: 'space-between' }}>
+						<div>
+							<span>
+								Page {pageIndex + 1}
+								{totalCount !== undefined &&
+									itemsPerPage !== null &&
+									` out of ${Math.ceil(totalCount / itemsPerPage).toFixed(0)} `}
+								{normalizedCount !== undefined && `(${normalizedCount} items)`}
+							</span>
+						</div>
+						<div style={{ display: 'flex', gap: '.5em' }}>
 							<Button
-								disabled={accessor.length !== itemsPerPage}
-								onClick={() => updatePaging({ type: 'goToNextPage' })}
+								distinction="seamless"
+								disabled={pageIndex === 0}
+								onClick={() => updatePaging({ type: 'goToFirstPage' })}
 							>
-								Next
+								First
 							</Button>
-						)}
+							<Button disabled={pageIndex === 0} onClick={() => updatePaging({ type: 'goToPreviousPage' })}>
+								Previous
+							</Button>
+							{itemsPerPage !== null && (
+								<Button
+									disabled={accessor.length !== itemsPerPage}
+									onClick={() => updatePaging({ type: 'goToNextPage' })}
+								>
+									Next
+								</Button>
+							)}
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
 		)
 	},

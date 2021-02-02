@@ -1,4 +1,4 @@
-import { EntityListSubTree, Environment, QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
+import { EntityListSubTree, Environment, Filter, QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
 import * as React from 'react'
 import {
 	DataGridContainer,
@@ -34,14 +34,14 @@ export const renderGrid = (
 	const desugared = QueryLanguage.desugarQualifiedEntityList({ entities }, environment)
 	const columnFilters = collectFilters(columns, filterArtifacts, environment)
 
+	const filter: Filter | undefined =
+		desugared.filter && columnFilters ? { and: [desugared.filter, columnFilters] } : desugared.filter ?? columnFilters
+
 	return (
 		<EntityListSubTree
 			entities={{
 				...desugared,
-				filter:
-					desugared.filter && columnFilters
-						? { and: [desugared.filter, columnFilters] }
-						: desugared.filter ?? columnFilters,
+				filter,
 			}}
 			offset={itemsPerPage === null ? undefined : itemsPerPage * pageIndex}
 			limit={itemsPerPage === null ? undefined : itemsPerPage}
@@ -49,6 +49,8 @@ export const renderGrid = (
 			listComponent={DataGridContainer}
 			listProps={{
 				dataGridState: desiredState,
+				entityName: desugared.entityName,
+				filter,
 				setFilter,
 				setOrderBy,
 				updatePaging,

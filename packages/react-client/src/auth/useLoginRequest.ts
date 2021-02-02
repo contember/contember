@@ -20,7 +20,7 @@ export const useLoginRequest = (): [
 					password,
 					expiration: 3600 * 24 * 14, // Two weeks
 				},
-				loginToken,
+				{ apiTokenOverride: loginToken },
 			),
 		[sendRequest, loginToken],
 	)

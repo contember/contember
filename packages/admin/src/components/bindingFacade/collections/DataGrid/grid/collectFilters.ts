@@ -10,8 +10,12 @@ export const collectFilters = (
 	const mapped: Filter[] = []
 
 	for (const [key, artifact] of filters) {
-		const filter = getColumnFilter(columns, key, artifact, environment)
+		const column = columns.get(key)
+		if (column === undefined) {
+			continue
+		}
 
+		const filter = getColumnFilter(column, artifact, environment)
 		if (filter !== undefined) {
 			mapped.push(filter)
 		}

@@ -1,7 +1,8 @@
 import { Environment } from '@contember/binding'
 import { ActionableBox, Box, Dropdown, Icon, Justification, TableHeaderCell } from '@contember/ui'
 import * as React from 'react'
-import { FilterRendererProps } from './DataGridColumn'
+import { getColumnFilter } from '../grid/getColumnFilter'
+import { DataGridColumnProps, DataGridColumns, FilterRendererProps } from './DataGridColumn'
 import { DataGridFilterArtifact } from './DataGridFilterArtifact'
 import { cycleOrderDirection, DataGridOrderDirection } from './DataGridOrderDirection'
 import { DataGridSetFilter } from './DataGridSetFilter'
@@ -17,6 +18,7 @@ export interface DataGridHeaderCellPublicProps {
 
 export interface DataGridHeaderCellInternalProps {
 	environment: Environment
+	hasFilter: boolean
 	filterArtifact: DataGridFilterArtifact
 	orderDirection: DataGridOrderDirection
 	setFilter: DataGridSetFilter
@@ -32,6 +34,7 @@ export function DataGridHeaderCell({
 	environment,
 	filterArtifact,
 	filterRenderer,
+	hasFilter,
 	header,
 	headerJustification,
 	orderDirection,
@@ -54,7 +57,7 @@ export function DataGridHeaderCell({
 				{filterRenderer && (
 					<Dropdown
 						buttonProps={{
-							intent: filterArtifact === undefined ? 'default' : 'primary',
+							intent: hasFilter ? 'primary' : 'default',
 							distinction: 'seamless',
 							size: 'small',
 							children: (
@@ -62,7 +65,7 @@ export function DataGridHeaderCell({
 									blueprintIcon="filter"
 									alignWithLowercase
 									style={{
-										opacity: filterArtifact === undefined ? '0.5' : '1',
+										opacity: hasFilter ? '1' : '0.5',
 									}}
 								/>
 							),

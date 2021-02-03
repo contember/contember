@@ -3,6 +3,7 @@ import { Button, Justification, Spinner, Table, TableCell, TableRow } from '@con
 import * as React from 'react'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
 import { DataGridState } from '../grid/DataGridState'
+import { getColumnFilter } from '../grid/getColumnFilter'
 import { GridPagingAction } from '../paging'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
@@ -85,6 +86,7 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 											setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}
 											headerJustification={column.headerJustification || column.justification}
 											shrunk={column.shrunk}
+											hasFilter={getColumnFilter(column, filterArtifact, accessor.environment) !== undefined}
 											header={column.header}
 											ascOrderIcon={column.ascOrderIcon}
 											descOrderIcon={column.descOrderIcon}

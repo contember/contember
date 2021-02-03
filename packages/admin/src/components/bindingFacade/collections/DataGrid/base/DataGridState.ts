@@ -3,7 +3,7 @@ import {
 	DataGridFilterArtifactStore,
 	DataGridHiddenColumnsStateStore,
 	DataGridOrderDirectionStore,
-} from '../base'
+} from './index'
 import { GridPagingState } from '../paging'
 
 export interface DataGridState {

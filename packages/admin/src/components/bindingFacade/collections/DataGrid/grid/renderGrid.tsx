@@ -6,11 +6,11 @@ import {
 	DataGridSetColumnFilter,
 	DataGridSetColumnOrderBy,
 	DataGridSetIsColumnHidden,
+	DataGridState,
 } from '../base'
 import { GridPagingAction } from '../paging'
 import { collectFilters } from './collectFilters'
 import { collectOrderBy } from './collectOrderBy'
-import { DataGridState } from './DataGridState'
 
 export interface RenderGridOptions {
 	entities: SugaredQualifiedEntityList['entities']

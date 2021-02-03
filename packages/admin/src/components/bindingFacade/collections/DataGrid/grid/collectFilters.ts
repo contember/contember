@@ -1,6 +1,5 @@
 import { Environment, Filter } from '@contember/binding'
-import { DataGridColumns, DataGridFilterArtifactStore } from '../base'
-import { getColumnFilter } from './getColumnFilter'
+import { DataGridColumns, DataGridFilterArtifactStore, getColumnFilter } from '../base'
 
 export const collectFilters = (
 	columns: DataGridColumns,

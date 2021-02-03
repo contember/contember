@@ -1,16 +1,16 @@
 import { Component, Entity, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
-import { Button, Justification, Spinner, Table, TableCell, TableRow } from '@contember/ui'
+import { Button, Justification, Table, TableCell, TableRow } from '@contember/ui'
 import * as React from 'react'
+import { Checkbox } from '../../../../ui'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
-import { DataGridState } from '../grid/DataGridState'
-import { getColumnFilter } from '../grid/getColumnFilter'
 import { GridPagingAction } from '../paging'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
 import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
+import { DataGridState } from './DataGridState'
+import { getColumnFilter } from './getColumnFilter'
 import { useHackyTotalCount } from './useHackyTotalCount'
-import { Checkbox } from '../../../../ui'
 
 export interface DataGridCellPublicProps {
 	justification?: Justification

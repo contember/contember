@@ -6,9 +6,11 @@ import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
 import { DataGridState } from './DataGridState'
 import { normalizeInitialFilters } from './normalizeInitialFilters'
+import { normalizeInitialHiddenColumnsState } from './normalizeInitialHiddenColumnsState'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
 import { renderGrid, RenderGridOptions } from './renderGrid'
 import { useFilters } from './useFilters'
+import { useHiddenColumnsState } from './useHiddenColumnsState'
 import { useOrderBys } from './useOrderBys'
 
 export interface DataGridProps extends DataGridContainerPublicProps {
@@ -29,6 +31,7 @@ export const DataGrid = Component<DataGridProps>(
 		const [pageState, updatePaging] = useGridPagingState({
 			itemsPerPage: props.itemsPerPage ?? null,
 		})
+		const [hiddenColumns, setIsColumnHidden] = useHiddenColumnsState(columns)
 		const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging)
 		const [filterArtifacts, setFilter] = useFilters(columns, updatePaging)
 
@@ -43,12 +46,13 @@ export const DataGrid = Component<DataGridProps>(
 		const gridOptions = React.useMemo(
 			(): RenderGridOptions => ({
 				entities: props.entities,
+				setIsColumnHidden,
 				updatePaging,
 				setFilter,
 				setOrderBy,
 				containerProps,
 			}),
-			[props.entities, containerProps, updatePaging, setFilter, setOrderBy],
+			[props.entities, setIsColumnHidden, updatePaging, setFilter, setOrderBy, containerProps],
 		)
 
 		const loadAbortControllerRef = React.useRef<AbortController | undefined>(undefined)
@@ -57,10 +61,11 @@ export const DataGrid = Component<DataGridProps>(
 			(): DataGridState => ({
 				paging: pageState,
 				columns,
+				hiddenColumns,
 				filterArtifacts,
 				orderDirections,
 			}),
-			[filterArtifacts, orderDirections, pageState, columns],
+			[pageState, columns, hiddenColumns, filterArtifacts, orderDirections],
 		)
 
 		const [displayedState, setDisplayedState] = React.useState(desiredState)
@@ -108,6 +113,7 @@ export const DataGrid = Component<DataGridProps>(
 				itemsPerPage: props.itemsPerPage ?? null,
 				pageIndex: 0,
 			},
+			hiddenColumns: normalizeInitialHiddenColumnsState(columns),
 			filterArtifacts: normalizeInitialFilters(columns),
 			orderDirections: normalizeInitialOrderBys(columns),
 		}
@@ -116,6 +122,7 @@ export const DataGrid = Component<DataGridProps>(
 			{
 				entities: props.entities,
 				updatePaging: noop,
+				setIsColumnHidden: noop,
 				setOrderBy: noop,
 				setFilter: noop,
 				containerProps: props,

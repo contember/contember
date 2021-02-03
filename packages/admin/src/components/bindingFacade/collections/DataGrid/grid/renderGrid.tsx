@@ -5,6 +5,7 @@ import {
 	DataGridContainerPublicProps,
 	DataGridSetColumnFilter,
 	DataGridSetColumnOrderBy,
+	DataGridSetIsColumnHidden,
 } from '../base'
 import { GridPagingAction } from '../paging'
 import { collectFilters } from './collectFilters'
@@ -13,6 +14,7 @@ import { DataGridState } from './DataGridState'
 
 export interface RenderGridOptions {
 	entities: SugaredQualifiedEntityList['entities']
+	setIsColumnHidden: DataGridSetIsColumnHidden
 	setFilter: DataGridSetColumnFilter
 	setOrderBy: DataGridSetColumnOrderBy
 	updatePaging: (action: GridPagingAction) => void
@@ -20,13 +22,14 @@ export interface RenderGridOptions {
 }
 
 export const renderGrid = (
-	{ entities, setFilter, setOrderBy, updatePaging, containerProps }: RenderGridOptions,
+	{ entities, setIsColumnHidden, setFilter, setOrderBy, updatePaging, containerProps }: RenderGridOptions,
 	displayedState: DataGridState,
 	desiredState: DataGridState,
 	environment: Environment,
 ): React.ReactElement => {
 	const {
 		paging: { pageIndex, itemsPerPage },
+		hiddenColumns,
 		filterArtifacts,
 		orderDirections,
 		columns,
@@ -48,9 +51,11 @@ export const renderGrid = (
 			orderBy={collectOrderBy(columns, orderDirections, environment)}
 			listComponent={DataGridContainer}
 			listProps={{
-				dataGridState: desiredState,
+				desiredState,
+				displayedState,
 				entityName: desugared.entityName,
 				filter,
+				setIsColumnHidden,
 				setFilter,
 				setOrderBy,
 				updatePaging,
@@ -59,12 +64,14 @@ export const renderGrid = (
 				emptyMessage: containerProps.emptyMessage,
 			}}
 		>
-			{Array.from(columns, ([key, props]) => (
-				<React.Fragment key={key}>
-					{props.header}
-					{props.children}
-				</React.Fragment>
-			))}
+			{Array.from(columns)
+				.filter(([key]) => !hiddenColumns.has(key))
+				.map(([key, props]) => (
+					<React.Fragment key={key}>
+						{props.header}
+						{props.children}
+					</React.Fragment>
+				))}
 		</EntityListSubTree>
 	)
 }

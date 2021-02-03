@@ -1,14 +1,6 @@
-import {
-	Component,
-	Field,
-	FieldValue,
-	Literal,
-	QueryLanguage,
-	SugaredRelativeSingleField,
-	wrapFilterInHasOnes,
-} from '@contember/binding'
-import { FormGroup, TextInput } from '@contember/ui'
+import { Component, Literal, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import { Input } from '@contember/client'
+import { FormGroup, TextInput } from '@contember/ui'
 import * as React from 'react'
 import DatePicker from 'react-datepicker'
 import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'

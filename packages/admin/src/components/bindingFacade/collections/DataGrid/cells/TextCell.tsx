@@ -8,15 +8,16 @@ import {
 } from '@contember/binding'
 import { FormGroup, TextInput } from '@contember/ui'
 import * as React from 'react'
+import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 
 export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
+	FieldFallbackViewPublicProps &
 	SugaredRelativeSingleField & {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
 		format?: (value: Persisted) => React.ReactNode
-		fallback?: React.ReactNode
 	}
 
 export const TextCell = Component<TextCellProps>(props => {
@@ -50,13 +51,13 @@ export const TextCell = Component<TextCellProps>(props => {
 			<Field
 				{...props}
 				format={value => {
-					if (props.fallback !== undefined && value === null) {
-						return props.fallback
+					if (value === null) {
+						return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 					}
 					if (props.format) {
 						return props.format(value)
 					}
-					return value === null ? <i style={{ opacity: 0.4, fontSize: '0.75em' }}>N/A</i> : value
+					return value
 				}}
 			/>
 		</DataGridColumn>

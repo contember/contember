@@ -1,22 +1,16 @@
-import {
-	Component,
-	Field,
-	FieldValue,
-	QueryLanguage,
-	SugaredRelativeSingleField,
-	wrapFilterInHasOnes,
-} from '@contember/binding'
+import { Component, Field, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
 import * as React from 'react'
 import { Checkbox } from '../../../../ui'
+import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 
 export type BooleanCellProps = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
+	FieldFallbackViewPublicProps &
 	SugaredRelativeSingleField & {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
 		format?: (value: boolean | null) => React.ReactNode
-		fallback?: React.ReactNode
 		booleanStyle?: 'yesNo' | 'checkCross' | 'oneZero'
 	}
 
@@ -60,14 +54,11 @@ export const BooleanCell = Component<BooleanCellProps>(props => {
 			<Field
 				{...props}
 				format={value => {
-					if (props.fallback !== undefined && value === null) {
-						return props.fallback
+					if (value === null) {
+						return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 					}
 					if (props.format) {
 						return props.format(value as boolean)
-					}
-					if (value === null) {
-						return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>N/A</i>
 					}
 					switch (props.booleanStyle) {
 						case 'checkCross':

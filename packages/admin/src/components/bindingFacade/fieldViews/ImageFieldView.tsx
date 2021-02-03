@@ -1,13 +1,14 @@
 import { Component, FieldValue, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
+import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 
 export interface ImageFieldViewProps<SrcField extends FieldValue = string>
-	extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
+	extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'>,
+		FieldFallbackViewPublicProps {
 	srcField: SugaredFieldProps['field']
 	altField?: SugaredFieldProps['field']
 	titleField?: SugaredFieldProps['field']
 	formatUrl?: (srcFieldValue: SrcField) => string
-	fallback?: React.ReactNode
 }
 
 export const ImageFieldView = Component(
@@ -17,14 +18,15 @@ export const ImageFieldView = Component(
 		titleField,
 		formatUrl,
 		fallback,
+		fallbackStyle,
 		...imgProps
 	}: ImageFieldViewProps<SrcField>) => {
 		const srcAccessor = useField<SrcField>(srcField)
 		const altAccessor = useField<string>(altField)
 		const titleAccessor = useField<string>(titleField)
 
-		if (!srcAccessor.value) {
-			return <>{fallback}</>
+		if (srcAccessor.value === null) {
+			return <FieldFallbackView fallback={fallback} fallbackStyle={fallbackStyle} />
 		}
 		return (
 			// The spread intentionally comes after alt and title so that it's possible to provide just static string values.
@@ -36,11 +38,12 @@ export const ImageFieldView = Component(
 			/>
 		)
 	},
-	({ altField, srcField, titleField }) => (
+	({ altField, srcField, titleField, fallback, fallbackStyle }) => (
 		<>
 			<SugaredField field={srcField} />
 			{altField && <SugaredField field={altField} />}
 			{titleField && <SugaredField field={titleField} />}
+			<FieldFallbackView fallback={fallback} fallbackStyle={fallbackStyle} />
 		</>
 	),
 	'ImageFieldView',

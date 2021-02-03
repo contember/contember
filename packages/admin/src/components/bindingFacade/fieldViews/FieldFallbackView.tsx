@@ -18,12 +18,11 @@ export const FieldFallbackView = Component<FieldFallbackViewProps>(
 		switch (props.fallbackStyle) {
 			case 'nothing':
 				return null
-			case 'n/a':
-				return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>N/A</i>
 			case 'unknown':
 				return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>unknown</i>
+			case 'n/a':
 			default:
-				return null
+				return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>N/A</i>
 		}
 	},
 	props => <>{props.fallback}</>,

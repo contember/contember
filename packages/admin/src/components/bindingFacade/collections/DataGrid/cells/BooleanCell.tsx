@@ -1,5 +1,7 @@
 import { Component, Field, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
+import { FormGroup } from '@contember/ui'
 import * as React from 'react'
+import { Input } from '@contember/client'
 import { Checkbox } from '../../../../ui'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
@@ -14,9 +16,13 @@ export type BooleanCellProps = DataGridHeaderCellPublicProps &
 		booleanStyle?: 'yesNo' | 'checkCross' | 'oneZero'
 	}
 
+type SingleBooleanFilterArtifact = 'includeTrue' | 'includeFalse' | 'includeNull'
+
+type BooleanFilterArtifacts = Set<SingleBooleanFilterArtifact>
+
 export const BooleanCell = Component<BooleanCellProps>(props => {
 	return (
-		<DataGridColumn<boolean>
+		<DataGridColumn<BooleanFilterArtifacts>
 			shrunk
 			{...props}
 			enableOrdering={!props.disableOrder as true}
@@ -24,31 +30,56 @@ export const BooleanCell = Component<BooleanCellProps>(props => {
 				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)
 			}
 			getNewFilter={(filterArtifact, { environment }) => {
+				const conditions: Input.Condition<boolean>[] = []
+
+				if (filterArtifact.has('includeTrue')) {
+					conditions.push({ eq: true })
+				}
+				if (filterArtifact.has('includeFalse')) {
+					conditions.push({ eq: false })
+				}
+				if (filterArtifact.has('includeNull')) {
+					conditions.push({ isNull: true })
+				}
+				if (conditions.length === 0 || conditions.length === 3) {
+					return undefined
+				}
+
 				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-					[desugared.field]: filterArtifact
-						? {
-								eq: filterArtifact,
-						  }
-						: {
-								or: [
-									{
-										eq: filterArtifact,
-									},
-									{ isNull: true },
-								],
-						  },
+					[desugared.field]: conditions.length > 1 ? { or: conditions } : conditions[0],
 				})
 			}}
 			filterRenderer={({ filter, setFilter }) => (
-				<Checkbox
-					checked={filter ?? false}
-					onChange={checked => {
-						setFilter(checked)
-					}}
-				>
-					{props.header}
-				</Checkbox>
+				<FormGroup label={props.header}>
+					{([
+						['includeTrue', 'Yes'],
+						['includeFalse', 'No'],
+						['includeNull', 'N/A'],
+					] as const).map(([item, label]) => (
+						<Checkbox
+							key={item}
+							checked={filter?.has(item) ?? false}
+							onChange={checked => {
+								if (filter) {
+									const clone: BooleanFilterArtifacts = new Set(filter)
+
+									if (checked) {
+										clone.add(item)
+									} else {
+										clone.delete(item)
+									}
+
+									setFilter(clone)
+								} else if (checked) {
+									setFilter(new Set([item]))
+								}
+							}}
+						>
+							{label}
+						</Checkbox>
+					))}
+				</FormGroup>
 			)}
 		>
 			<Field

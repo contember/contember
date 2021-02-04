@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Checkbox } from '../../../../ui'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
 import { GridPagingAction } from '../paging'
+import { DataGridFullFilters } from './DataGridFullFilters'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
@@ -65,8 +66,27 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 		const pagesCount =
 			totalCount !== undefined && itemsPerPage !== null ? Math.ceil(totalCount / itemsPerPage) : undefined
 
+		const pagingSummary = (
+			<>
+				Page {pageIndex + 1}
+				{pagesCount !== undefined && ` / ${pagesCount.toFixed(0)}`}
+				{normalizedItemCount !== undefined && ` (${normalizedItemCount} items)`}
+			</>
+		)
+
 		return (
 			<div>
+				<div style={{ display: 'flex', justifyContent: 'space-between', gap: '1em', flexWrap: 'wrap' }}>
+					<div>{pagingSummary}</div>
+					<DataGridFullFilters
+						desiredState={desiredState}
+						displayedState={displayedState}
+						environment={accessor.environment}
+						setFilter={setFilter}
+						setIsColumnHidden={setIsColumnHidden}
+						setOrderBy={setOrderBy}
+					/>
+				</div>
 				<Table
 					tableHead={
 						<TableRow>
@@ -137,13 +157,7 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 				</Table>
 				{!!accessor.length && (
 					<div style={{ margin: '1em 0', display: 'flex', justifyContent: 'space-between' }}>
-						<div>
-							<span>
-								Page {pageIndex + 1}
-								{pagesCount !== undefined && ` out of ${pagesCount.toFixed(0)} `}
-								{normalizedItemCount !== undefined && `(${normalizedItemCount} items)`}
-							</span>
-						</div>
+						<div>{pagingSummary}</div>
 						<div style={{ display: 'flex', gap: '.5em' }}>
 							<Button
 								distinction="seamless"

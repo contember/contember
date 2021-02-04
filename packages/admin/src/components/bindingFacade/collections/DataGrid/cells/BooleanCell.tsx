@@ -1,7 +1,6 @@
 import { Component, Field, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
-import { FormGroup } from '@contember/ui'
-import * as React from 'react'
 import { Input } from '@contember/client'
+import * as React from 'react'
 import { Checkbox } from '../../../../ui'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
@@ -52,7 +51,7 @@ export const BooleanCell = Component<BooleanCellProps>(props => {
 			}}
 			emptyFilter={new Set()}
 			filterRenderer={({ filter, setFilter }) => (
-				<FormGroup label={props.header}>
+				<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
 					{([
 						['includeTrue', 'Yes'],
 						['includeFalse', 'No'],
@@ -76,7 +75,7 @@ export const BooleanCell = Component<BooleanCellProps>(props => {
 							{label}
 						</Checkbox>
 					))}
-				</FormGroup>
+				</div>
 			)}
 		>
 			<Field

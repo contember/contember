@@ -6,10 +6,9 @@ import {
 	SugaredRelativeSingleField,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
-import { FormGroup, TextInput, Select } from '@contember/ui'
-import { assertNever } from '@contember/utils'
-import * as React from 'react'
 import { Input } from '@contember/client'
+import { Select, TextInput } from '@contember/ui'
+import * as React from 'react'
 import { Checkbox } from '../../../../ui'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
@@ -75,7 +74,7 @@ export const TextCell = Component<TextCellProps>(props => {
 			}}
 			filterRenderer={({ filter, setFilter }) => {
 				return (
-					<FormGroup label={props.header}>
+					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
 						<Select
 							value={filter.mode}
 							options={[
@@ -94,6 +93,7 @@ export const TextCell = Component<TextCellProps>(props => {
 						/>
 						<TextInput
 							value={filter.query}
+							placeholder="Query"
 							onChange={e => {
 								const value = e.currentTarget.value
 								setFilter({
@@ -111,9 +111,9 @@ export const TextCell = Component<TextCellProps>(props => {
 								})
 							}}
 						>
-							<b>{filter.mode === 'matches' ? 'Include' : 'Exclude'}</b> N/A
+							<b>{filter.mode === 'matches' ? 'Include' : 'Exclude'}</b>&nbsp;N/A
 						</Checkbox>
-					</FormGroup>
+					</div>
 				)
 			}}
 		>

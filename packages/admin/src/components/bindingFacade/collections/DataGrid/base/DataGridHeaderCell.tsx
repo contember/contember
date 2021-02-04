@@ -78,7 +78,7 @@ export function DataGridHeaderCell({
 									requestClose()
 								}}
 							>
-								<Box heading="Filter">
+								<Box heading={<>Filter: {header}</>}>
 									{React.createElement(filterRenderer, {
 										filter: filterArtifact === undefined ? emptyFilterArtifact : filterArtifact,
 										setFilter: setFilter,

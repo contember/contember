@@ -32,13 +32,15 @@ export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
 	return (
 		<FormGroup label={undefined}>
 			<Dropdown buttonProps={buttonProps} alignment="center">
-				{({ requestClose }) => (
+				{({ requestClose, forceUpdate, update }) => (
 					<AddNewBlockButtonInner
 						normalizedBlocks={props.normalizedBlocks}
 						createNewEntity={props.createNewEntity}
 						isMutating={props.isMutating}
 						discriminationField={props.discriminationField}
 						requestClose={requestClose}
+						forceUpdate={forceUpdate}
+						update={update}
 					/>
 				)}
 			</Dropdown>

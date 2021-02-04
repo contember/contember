@@ -1,14 +1,12 @@
 import { Environment, Filter, QueryLanguage } from '@contember/binding'
-import { DataGridColumnKey, DataGridColumns, DataGridFilterArtifact } from '../base'
+import { DataGridColumnKey, DataGridColumnProps, DataGridColumns, DataGridFilterArtifact } from './index'
 
 export const getColumnFilter = (
-	columns: DataGridColumns,
-	key: DataGridColumnKey,
-	artifact: DataGridFilterArtifact,
+	column: DataGridColumnProps,
+	artifact: DataGridFilterArtifact | undefined,
 	environment: Environment,
 ): Filter | undefined => {
-	const column = columns.get(key)
-	if (column === undefined || column.enableFiltering === false) {
+	if (column.enableFiltering === false || artifact === undefined) {
 		return undefined
 	}
 	const sugaredFilter = column.getNewFilter(artifact, {

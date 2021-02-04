@@ -10,7 +10,7 @@ import { GetNewFilter } from './GetNewFilter'
 import { GetNewOrderBy } from './GetNewOrderBy'
 
 export interface FilterRendererProps<FA extends DataGridFilterArtifact> {
-	filter: FA | undefined
+	filter: FA
 	setFilter: DataGridSetFilter<FA>
 	environment: Environment
 }
@@ -23,6 +23,7 @@ export type DataGridColumnFiltering<FA extends DataGridFilterArtifact = DataGrid
 			enableFiltering?: true
 			initialFilter?: FA
 			getNewFilter: GetNewFilter<FA>
+			emptyFilter: FA
 			filterRenderer: React.ComponentType<FilterRendererProps<FA>>
 	  }
 

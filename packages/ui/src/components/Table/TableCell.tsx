@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { Justification } from '../../types'
+import { Alignment, Justification } from '../../types'
 import cn from 'classnames'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { UseTableElementContext } from './Table'
 
 export interface TableCellProps {
 	children?: React.ReactNode
+	alignment?: Alignment
 	justification?: Justification
 	shrunk?: boolean
 	numeric?: boolean
@@ -17,6 +18,7 @@ export const TableCell = React.memo(({ shrunk = false, numeric = false, ...props
 	const useTableElement = React.useContext(UseTableElementContext)
 	const className = cn(
 		useComponentClassName('table-cell'),
+		toEnumViewClass(props.alignment),
 		toEnumViewClass(props.justification),
 		toViewClass('numeric', numeric),
 		toViewClass('shrunk', shrunk),

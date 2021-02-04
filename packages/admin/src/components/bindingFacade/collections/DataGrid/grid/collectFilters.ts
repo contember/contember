@@ -1,6 +1,5 @@
 import { Environment, Filter } from '@contember/binding'
-import { DataGridColumns, DataGridFilterArtifactStore } from '../base'
-import { getColumnFilter } from './getColumnFilter'
+import { DataGridColumns, DataGridFilterArtifactStore, getColumnFilter } from '../base'
 
 export const collectFilters = (
 	columns: DataGridColumns,
@@ -10,8 +9,12 @@ export const collectFilters = (
 	const mapped: Filter[] = []
 
 	for (const [key, artifact] of filters) {
-		const filter = getColumnFilter(columns, key, artifact, environment)
+		const column = columns.get(key)
+		if (column === undefined) {
+			continue
+		}
 
+		const filter = getColumnFilter(column, artifact, environment)
 		if (filter !== undefined) {
 			mapped.push(filter)
 		}

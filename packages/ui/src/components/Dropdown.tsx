@@ -11,6 +11,8 @@ import { Portal } from './Portal'
 
 export interface DropdownRenderProps {
 	requestClose: () => void
+	update: () => void
+	forceUpdate: () => void
 }
 
 export interface DropdownProps {
@@ -21,6 +23,7 @@ export interface DropdownProps {
 	renderContent?: (props: DropdownRenderProps) => React.ReactNode
 	buttonProps?: ButtonBasedButtonProps
 	alignment?: DropdownAlignment
+	strategy?: 'absolute' | 'fixed'
 	contentContainer?: HTMLElement
 	children?: React.ReactElement | ((props: DropdownRenderProps) => React.ReactNode)
 	styledContent?: boolean
@@ -33,13 +36,15 @@ const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 	} else if (alignment === 'end') {
 		return 'bottom-end'
 	} else if (alignment === 'center' || alignment === 'default' || alignment === undefined) {
-		return 'auto'
+		return 'bottom'
 	} else if (alignment === 'top') {
 		return 'top'
 	} else {
 		return assertNever(alignment)
 	}
 }
+
+const noop = () => {}
 
 export const DropdownContentContainerContext = React.createContext<HTMLElement | undefined>(undefined)
 DropdownContentContainerContext.displayName = 'DropdownContentContainerContext'
@@ -53,9 +58,12 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 
 	const [referenceElement, setReferenceElement] = React.useState<HTMLElement | null>(null)
 	const [popperElement, setPopperElement] = React.useState<HTMLElement | null>(null)
-	const { styles, attributes, forceUpdate } = usePopper(
+
+	const placement = alignmentToPlacement(props.alignment)
+	const { styles, attributes, forceUpdate, update } = usePopper(
 		isActive ? referenceElement : null,
 		isActive ? popperElement : null,
+		{ placement, strategy: props.strategy },
 	)
 
 	const suppliedButtonOnClickHandler = props.buttonProps && props.buttonProps.onClick
@@ -91,7 +99,12 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 	const prefix = useClassNamePrefix()
 
 	const { children, renderContent, renderToggle, styledContent = true } = props
-	const placement = 'top' || alignmentToPlacement(props.alignment)
+
+	const renderProps: DropdownRenderProps = {
+		requestClose: close,
+		forceUpdate: forceUpdate ?? noop,
+		update: update ?? noop,
+	}
 
 	return (
 		<>
@@ -120,10 +133,10 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 							}}
 						>
 							{renderContent ? (
-								renderContent({ requestClose: close })
+								renderContent(renderProps)
 							) : (
 								<div className={cn(`${prefix}dropdown-content-in`, toViewClass('unstyled', !styledContent))}>
-									{typeof children === 'function' ? children({ requestClose: close }) : children}
+									{typeof children === 'function' ? children(renderProps) : children}
 								</div>
 							)}
 						</Collapsible>

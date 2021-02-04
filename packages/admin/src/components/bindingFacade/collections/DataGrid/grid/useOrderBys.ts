@@ -1,4 +1,3 @@
-import { useEnvironment } from '@contember/binding'
 import * as React from 'react'
 import { DataGridColumns, DataGridOrderDirectionStore, DataGridSetColumnOrderBy } from '../base'
 import { GridPagingAction } from '../paging'

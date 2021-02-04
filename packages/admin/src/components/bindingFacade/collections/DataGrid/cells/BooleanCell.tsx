@@ -1,28 +1,27 @@
-import {
-	Component,
-	Field,
-	FieldValue,
-	QueryLanguage,
-	SugaredRelativeSingleField,
-	wrapFilterInHasOnes,
-} from '@contember/binding'
+import { Component, Field, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
+import { Input } from '@contember/client'
 import * as React from 'react'
 import { Checkbox } from '../../../../ui'
+import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 
 export type BooleanCellProps = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
+	FieldFallbackViewPublicProps &
 	SugaredRelativeSingleField & {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
 		format?: (value: boolean | null) => React.ReactNode
-		fallback?: React.ReactNode
 		booleanStyle?: 'yesNo' | 'checkCross' | 'oneZero'
 	}
 
+type SingleBooleanFilterArtifact = 'includeTrue' | 'includeFalse' | 'includeNull'
+
+type BooleanFilterArtifacts = Set<SingleBooleanFilterArtifact>
+
 export const BooleanCell = Component<BooleanCellProps>(props => {
 	return (
-		<DataGridColumn<boolean>
+		<DataGridColumn<BooleanFilterArtifacts>
 			shrunk
 			{...props}
 			enableOrdering={!props.disableOrder as true}
@@ -30,44 +29,63 @@ export const BooleanCell = Component<BooleanCellProps>(props => {
 				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)
 			}
 			getNewFilter={(filterArtifact, { environment }) => {
+				const conditions: Input.Condition<boolean>[] = []
+
+				if (filterArtifact.has('includeTrue')) {
+					conditions.push({ eq: true })
+				}
+				if (filterArtifact.has('includeFalse')) {
+					conditions.push({ eq: false })
+				}
+				if (filterArtifact.has('includeNull')) {
+					conditions.push({ isNull: true })
+				}
+				if (conditions.length === 0 || conditions.length === 3) {
+					return undefined
+				}
+
 				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
-					[desugared.field]: filterArtifact
-						? {
-								eq: filterArtifact,
-						  }
-						: {
-								or: [
-									{
-										eq: filterArtifact,
-									},
-									{ isNull: true },
-								],
-						  },
+					[desugared.field]: conditions.length > 1 ? { or: conditions } : conditions[0],
 				})
 			}}
+			emptyFilter={new Set()}
 			filterRenderer={({ filter, setFilter }) => (
-				<Checkbox
-					checked={filter ?? false}
-					onChange={checked => {
-						setFilter(checked)
-					}}
-				>
-					{props.header}
-				</Checkbox>
+				<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
+					{([
+						['includeTrue', 'Yes'],
+						['includeFalse', 'No'],
+						['includeNull', 'N/A'],
+					] as const).map(([item, label]) => (
+						<Checkbox
+							key={item}
+							checked={filter.has(item)}
+							onChange={checked => {
+								const clone: BooleanFilterArtifacts = new Set(filter)
+
+								if (checked) {
+									clone.add(item)
+								} else {
+									clone.delete(item)
+								}
+
+								setFilter(clone)
+							}}
+						>
+							{label}
+						</Checkbox>
+					))}
+				</div>
 			)}
 		>
 			<Field
 				{...props}
 				format={value => {
-					if (props.fallback !== undefined && value === null) {
-						return props.fallback
+					if (value === null) {
+						return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 					}
 					if (props.format) {
 						return props.format(value as boolean)
-					}
-					if (value === null) {
-						return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>N/A</i>
 					}
 					switch (props.booleanStyle) {
 						case 'checkCross':

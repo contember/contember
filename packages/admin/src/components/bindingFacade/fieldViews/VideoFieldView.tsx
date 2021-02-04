@@ -1,12 +1,13 @@
 import { Component, FieldValue, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import * as React from 'react'
+import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 
 export interface VideoFieldViewProps<SrcField extends FieldValue = string>
-	extends Omit<React.VideoHTMLAttributes<HTMLVideoElement>, 'src'> {
+	extends Omit<React.VideoHTMLAttributes<HTMLVideoElement>, 'src'>,
+		FieldFallbackViewPublicProps {
 	srcField: SugaredFieldProps['field']
 	titleField?: SugaredFieldProps['field']
 	formatUrl?: (srcFieldValue: SrcField) => string
-	fallback?: React.ReactNode
 }
 
 export const VideoFieldView = Component(
@@ -15,13 +16,14 @@ export const VideoFieldView = Component(
 		titleField,
 		formatUrl,
 		fallback,
+		fallbackStyle,
 		...videoProps
 	}: VideoFieldViewProps<SrcField>) => {
 		const srcAccessor = useField<SrcField>(srcField)
 		const titleAccessor = useField<string>(titleField)
 
-		if (!srcAccessor.value) {
-			return <>{fallback}</>
+		if (srcAccessor.value === null) {
+			return <FieldFallbackView fallback={fallback} fallbackStyle={fallbackStyle} />
 		}
 		return (
 			// The spread intentionally comes after alt and title so that it's possible to provide just static string values.
@@ -33,10 +35,11 @@ export const VideoFieldView = Component(
 			/>
 		)
 	},
-	({ srcField, titleField }) => (
+	({ srcField, titleField, fallback, fallbackStyle }) => (
 		<>
 			<SugaredField field={srcField} />
 			{titleField && <SugaredField field={titleField} />}
+			<FieldFallbackView fallback={fallback} fallbackStyle={fallbackStyle} />
 		</>
 	),
 	'VideoFieldView',

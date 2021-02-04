@@ -17,6 +17,8 @@ export interface DataGridHeaderCellPublicProps {
 
 export interface DataGridHeaderCellInternalProps {
 	environment: Environment
+	hasFilter: boolean
+	emptyFilterArtifact: DataGridFilterArtifact
 	filterArtifact: DataGridFilterArtifact
 	orderDirection: DataGridOrderDirection
 	setFilter: DataGridSetFilter
@@ -29,9 +31,11 @@ export interface DataGridHeaderCellProps extends DataGridHeaderCellInternalProps
 export function DataGridHeaderCell({
 	ascOrderIcon,
 	descOrderIcon,
+	emptyFilterArtifact,
 	environment,
 	filterArtifact,
 	filterRenderer,
+	hasFilter,
 	header,
 	headerJustification,
 	orderDirection,
@@ -54,7 +58,7 @@ export function DataGridHeaderCell({
 				{filterRenderer && (
 					<Dropdown
 						buttonProps={{
-							intent: filterArtifact === undefined ? 'default' : 'primary',
+							intent: hasFilter ? 'primary' : 'default',
 							distinction: 'seamless',
 							size: 'small',
 							children: (
@@ -62,7 +66,7 @@ export function DataGridHeaderCell({
 									blueprintIcon="filter"
 									alignWithLowercase
 									style={{
-										opacity: filterArtifact === undefined ? '0.5' : '1',
+										opacity: hasFilter ? '1' : '0.5',
 									}}
 								/>
 							),
@@ -74,9 +78,9 @@ export function DataGridHeaderCell({
 									requestClose()
 								}}
 							>
-								<Box heading="Filter">
+								<Box heading={<>Filter: {header}</>}>
 									{React.createElement(filterRenderer, {
-										filter: filterArtifact,
+										filter: filterArtifact === undefined ? emptyFilterArtifact : filterArtifact,
 										setFilter: setFilter,
 										environment: environment,
 									})}

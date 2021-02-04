@@ -1,9 +1,9 @@
 import { Component, Entity, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
-import { Button, Justification, Table, TableCell, TableRow } from '@contember/ui'
+import { Button, ButtonList, Justification, Table, TableCell, TableRow } from '@contember/ui'
 import * as React from 'react'
-import { Checkbox } from '../../../../ui'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
 import { GridPagingAction } from '../paging'
+import { DataGridColumnHiding } from './DataGridColumnHiding'
 import { DataGridFullFilters } from './DataGridFullFilters'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
@@ -17,9 +17,13 @@ export interface DataGridCellPublicProps {
 	justification?: Justification
 	shrunk?: boolean
 	hidden?: boolean
+	canBeHidden?: boolean
 }
 
 export interface DataGridContainerPublicProps {
+	allowColumnVisibilityControls?: boolean
+	allowAggregateFilterControls?: boolean
+
 	emptyMessage?: React.ReactNode
 	emptyMessageComponent?: React.ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
 	emptyMessageComponentExtraProps?: {}
@@ -51,6 +55,8 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 		entityName,
 		filter,
 
+		allowAggregateFilterControls,
+		allowColumnVisibilityControls,
 		emptyMessage = 'No data to display.',
 		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
 		emptyMessageComponentExtraProps,
@@ -78,14 +84,18 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 			<div>
 				<div style={{ display: 'flex', justifyContent: 'space-between', gap: '1em', flexWrap: 'wrap' }}>
 					<div>{pagingSummary}</div>
-					<DataGridFullFilters
-						desiredState={desiredState}
-						displayedState={displayedState}
-						environment={accessor.environment}
-						setFilter={setFilter}
-						setIsColumnHidden={setIsColumnHidden}
-						setOrderBy={setOrderBy}
-					/>
+					<ButtonList>
+						{allowColumnVisibilityControls !== false && (
+							<DataGridColumnHiding desiredState={desiredState} setIsColumnHidden={setIsColumnHidden} />
+						)}
+						{allowAggregateFilterControls !== false && (
+							<DataGridFullFilters
+								desiredState={desiredState}
+								environment={accessor.environment}
+								setFilter={setFilter}
+							/>
+						)}
+					</ButtonList>
 				</div>
 				<Table
 					tableHead={

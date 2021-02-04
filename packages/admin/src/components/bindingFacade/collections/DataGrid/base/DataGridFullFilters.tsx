@@ -11,22 +11,16 @@ export interface DataGridFullFiltersPublicProps {}
 
 export interface DataGridFullFiltersInternalProps {
 	desiredState: DataGridState
-	displayedState: DataGridState
 	environment: Environment
 	setFilter: DataGridSetColumnFilter
-	setIsColumnHidden: DataGridSetIsColumnHidden
-	setOrderBy: DataGridSetColumnOrderBy
 }
 
 export interface DataGridFullFiltersProps extends DataGridFullFiltersInternalProps, DataGridFullFiltersPublicProps {}
 
 export function DataGridFullFilters({
 	desiredState,
-	displayedState,
 	environment,
 	setFilter,
-	setIsColumnHidden,
-	setOrderBy,
 }: DataGridFullFiltersProps): React.ReactElement | null {
 	const remainingColumns = Array.from(desiredState.columns).filter(
 		([key, column]) => column.enableFiltering !== false && !desiredState.filterArtifacts.has(key),

@@ -45,15 +45,18 @@ export const DateCell = Component<DateCellProps>(props => {
 					[desugared.field]: conditions.length > 1 ? { and: conditions } : conditions[0],
 				})
 			}}
+			emptyFilter={{
+				start: undefined,
+				end: undefined,
+			}}
 			filterRenderer={({ filter, setFilter }) => {
-				const start = filter?.start ?? null
-				const end = filter?.end ?? null
+				const { start, end } = filter
 				return (
 					<div style={{ display: 'flex', gap: '10px' }}>
 						<DatePicker
 							selected={start}
 							onChange={date => {
-								setFilter({ start: (date as Date | null) ?? undefined, end: filter?.end })
+								setFilter({ ...filter, start: (date as Date | null) ?? undefined })
 							}}
 							selectsStart
 							startDate={start}
@@ -64,7 +67,7 @@ export const DateCell = Component<DateCellProps>(props => {
 						<DatePicker
 							selected={end}
 							onChange={date => {
-								setFilter({ start: filter?.start, end: (date as Date | null) ?? undefined })
+								setFilter({ ...filter, end: (date as Date | null) ?? undefined })
 							}}
 							selectsEnd
 							startDate={start}

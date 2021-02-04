@@ -50,6 +50,7 @@ export const BooleanCell = Component<BooleanCellProps>(props => {
 					[desugared.field]: conditions.length > 1 ? { or: conditions } : conditions[0],
 				})
 			}}
+			emptyFilter={new Set()}
 			filterRenderer={({ filter, setFilter }) => (
 				<FormGroup label={props.header}>
 					{([
@@ -59,21 +60,17 @@ export const BooleanCell = Component<BooleanCellProps>(props => {
 					] as const).map(([item, label]) => (
 						<Checkbox
 							key={item}
-							checked={filter?.has(item) ?? false}
+							checked={filter.has(item)}
 							onChange={checked => {
-								if (filter) {
-									const clone: BooleanFilterArtifacts = new Set(filter)
+								const clone: BooleanFilterArtifacts = new Set(filter)
 
-									if (checked) {
-										clone.add(item)
-									} else {
-										clone.delete(item)
-									}
-
-									setFilter(clone)
-								} else if (checked) {
-									setFilter(new Set([item]))
+								if (checked) {
+									clone.add(item)
+								} else {
+									clone.delete(item)
 								}
+
+								setFilter(clone)
 							}}
 						>
 							{label}

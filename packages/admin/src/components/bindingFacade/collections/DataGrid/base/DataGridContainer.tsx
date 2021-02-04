@@ -81,6 +81,7 @@ export const DataGridContainer = Component<DataGridContainerProps>(
 											key={columnKey}
 											environment={accessor.environment}
 											filterArtifact={filterArtifact}
+											emptyFilterArtifact={column.enableFiltering !== false ? column.emptyFilter : undefined}
 											orderDirection={orderDirection}
 											setFilter={newFilter => setFilter(columnKey, newFilter)}
 											setOrderBy={newOrderBy => setOrderBy(columnKey, newOrderBy)}

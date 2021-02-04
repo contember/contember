@@ -68,16 +68,16 @@ export const TextCell = Component<TextCellProps>(props => {
 					[desugared.field]: condition,
 				})
 			}}
+			emptyFilter={{
+				mode: 'matches',
+				query: '',
+				nullCondition: false,
+			}}
 			filterRenderer={({ filter, setFilter }) => {
-				const normalizedFilter: TextFilterArtifacts = filter ?? {
-					mode: 'matches',
-					query: '',
-					nullCondition: false,
-				}
 				return (
 					<FormGroup label={props.header}>
 						<Select
-							value={normalizedFilter.mode}
+							value={filter.mode}
 							options={[
 								{ value: 'matches', label: 'Matches' },
 								{ value: 'doesNotMatch', label: "Doesn't match" },
@@ -86,32 +86,32 @@ export const TextCell = Component<TextCellProps>(props => {
 								const value = e.currentTarget.value as TextFilterArtifacts['mode']
 
 								setFilter({
-									...normalizedFilter,
+									...filter,
 									mode: value,
-									nullCondition: normalizedFilter.mode === value ? normalizedFilter.nullCondition : false,
+									nullCondition: filter.mode === value ? filter.nullCondition : false,
 								})
 							}}
 						/>
 						<TextInput
-							value={normalizedFilter.query}
+							value={filter.query}
 							onChange={e => {
 								const value = e.currentTarget.value
 								setFilter({
-									...normalizedFilter,
+									...filter,
 									query: value,
 								})
 							}}
 						/>
 						<Checkbox
-							checked={normalizedFilter.nullCondition}
+							checked={filter.nullCondition}
 							onChange={checked => {
 								setFilter({
-									...normalizedFilter,
+									...filter,
 									nullCondition: checked,
 								})
 							}}
 						>
-							<b>{normalizedFilter.mode === 'matches' ? 'Include' : 'Exclude'}</b> N/A
+							<b>{filter.mode === 'matches' ? 'Include' : 'Exclude'}</b> N/A
 						</Checkbox>
 					</FormGroup>
 				)

@@ -18,6 +18,7 @@ export interface DataGridHeaderCellPublicProps {
 export interface DataGridHeaderCellInternalProps {
 	environment: Environment
 	hasFilter: boolean
+	emptyFilterArtifact: DataGridFilterArtifact
 	filterArtifact: DataGridFilterArtifact
 	orderDirection: DataGridOrderDirection
 	setFilter: DataGridSetFilter
@@ -30,6 +31,7 @@ export interface DataGridHeaderCellProps extends DataGridHeaderCellInternalProps
 export function DataGridHeaderCell({
 	ascOrderIcon,
 	descOrderIcon,
+	emptyFilterArtifact,
 	environment,
 	filterArtifact,
 	filterRenderer,
@@ -78,7 +80,7 @@ export function DataGridHeaderCell({
 							>
 								<Box heading="Filter">
 									{React.createElement(filterRenderer, {
-										filter: filterArtifact,
+										filter: filterArtifact === undefined ? emptyFilterArtifact : filterArtifact,
 										setFilter: setFilter,
 										environment: environment,
 									})}

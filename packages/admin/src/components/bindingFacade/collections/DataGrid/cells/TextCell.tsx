@@ -23,7 +23,7 @@ export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridH
 	}
 
 interface TextFilterArtifacts {
-	mode: 'matches' | 'doesNotMatch'
+	mode: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
 	query: string
 	nullCondition: boolean
 }
@@ -37,29 +37,34 @@ export const TextCell = Component<TextCellProps>(props => {
 				newDirection && QueryLanguage.desugarOrderBy(`${props.field as string} ${newDirection}`, environment)
 			}
 			getNewFilter={(filter, { environment }) => {
-				let condition: Input.Condition<string> = {
-					containsCI: filter.query,
-				}
-
 				if (filter.query === '' && filter.nullCondition === false) {
 					return undefined
 				}
 
-				if (filter.mode === 'matches') {
-					if (filter.nullCondition) {
-						condition = {
-							or: [condition, { isNull: true }],
-						}
-					}
-				} else if (filter.mode === 'doesNotMatch') {
+				const baseOperators = {
+					matches: 'containsCI',
+					doesNotMatch: 'containsCI',
+					startsWith: 'startsWithCI',
+					endsWith: 'endsWithCI',
+					matchesExactly: 'eq',
+				}
+
+				let condition: Input.Condition<string> = {
+					[baseOperators[filter.mode]]: filter.query,
+				}
+
+				if (filter.mode === 'doesNotMatch') {
 					condition = { not: condition }
+
 					if (filter.nullCondition) {
 						condition = {
 							and: [condition, { isNull: false }],
 						}
 					}
-				} else {
-					return undefined
+				} else if (filter.nullCondition) {
+					condition = {
+						or: [condition, { isNull: true }],
+					}
 				}
 
 				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
@@ -73,14 +78,21 @@ export const TextCell = Component<TextCellProps>(props => {
 				nullCondition: false,
 			}}
 			filterRenderer={({ filter, setFilter }) => {
+				const options: Array<{
+					value: TextFilterArtifacts['mode']
+					label: string
+				}> = [
+					{ value: 'matches', label: 'Contains' },
+					{ value: 'doesNotMatch', label: "Doesn't contain" },
+					{ value: 'matchesExactly', label: 'Matches exactly' },
+					{ value: 'startsWith', label: 'Starts with' },
+					{ value: 'endsWith', label: 'Ends with' },
+				]
 				return (
 					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
 						<Select
 							value={filter.mode}
-							options={[
-								{ value: 'matches', label: 'Matches' },
-								{ value: 'doesNotMatch', label: "Doesn't match" },
-							]}
+							options={options}
 							onChange={e => {
 								const value = e.currentTarget.value as TextFilterArtifacts['mode']
 
@@ -111,7 +123,7 @@ export const TextCell = Component<TextCellProps>(props => {
 								})
 							}}
 						>
-							<b>{filter.mode === 'matches' ? 'Include' : 'Exclude'}</b>&nbsp;N/A
+							<b>{filter.mode === 'doesNotMatch' ? 'Exclude' : 'Include'}</b>&nbsp;N/A
 						</Checkbox>
 					</div>
 				)

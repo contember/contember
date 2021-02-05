@@ -1,12 +1,13 @@
 import { Instance } from './Instance'
-import { readInstanceConfig, validateInstanceName } from './instance'
-import { Workspace } from './Workspace'
+import { Workspace } from '../Workspace'
 import { join } from 'path'
 import { pathExists } from 'fs-extra'
-import { resourcesDir } from '../pathUtils'
-import { installTemplate } from './template'
-import { DockerComposeConfig, updateMainDockerComposeConfig } from './dockerCompose'
-import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from './PathMapping'
+import { resourcesDir } from '../../pathUtils'
+import { installTemplate } from '../template'
+import { updateMainDockerComposeConfig } from '../dockerCompose'
+import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from '../PathMapping'
+import { validateInstanceName } from './common'
+import { readInstanceConfig } from './config'
 
 export class InstanceManager {
 	constructor(private readonly workspace: Workspace) {}

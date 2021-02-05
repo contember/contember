@@ -3,7 +3,7 @@ import * as path from 'path'
 import { promises as fs } from 'fs'
 import { updateYaml } from './yaml'
 import { updateMainDockerComposeConfig } from './dockerCompose'
-import { Instance } from './Instance'
+import { Instance } from './instance'
 import { Workspace } from './Workspace'
 import { projectNameToEnvName } from '@contember/engine-common'
 

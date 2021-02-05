@@ -1,6 +1,6 @@
 import { ContainerStatus, getContainersStatus } from '../docker'
 import { execDockerCompose } from '../dockerCompose'
-import { Instance } from '../Instance'
+import { Instance } from './Instance'
 
 export type ServiceStatus = ContainerStatus
 

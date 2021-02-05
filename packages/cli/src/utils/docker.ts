@@ -1,6 +1,4 @@
 import { runCommand } from './commands'
-import { Instance } from './Instance'
-import { getInstanceStatus } from './instance'
 
 type DockerNetworkPorts = Record<string, null | Array<{ HostIp: string; HostPort: number }>>
 

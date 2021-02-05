@@ -1,5 +1,6 @@
-import { getInstanceStatus, InstanceConfig, readInstanceConfig, ServiceStatus } from './instance'
 import * as path from 'path'
+import { InstanceConfig } from './config'
+import { getInstanceStatus, ServiceStatus } from './status'
 
 export class Instance {
 	constructor(

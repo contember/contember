@@ -1,7 +1,6 @@
-import { InstanceLocalApiEnvironment } from '../instance'
 import prompts from 'prompts'
-import { InstanceApiEnvironment } from './environment'
-import { Instance } from '../Instance'
+import { InstanceApiEnvironment, InstanceLocalApiEnvironment } from './environment'
+import { Instance } from './Instance'
 import { Workspace } from '../Workspace'
 
 const createRemoteInstanceEnvironment = (instanceName: string): InstanceApiEnvironment => {

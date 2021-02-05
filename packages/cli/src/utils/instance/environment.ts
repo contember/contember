@@ -1,6 +1,6 @@
 import { Input } from '../../cli'
 import { Workspace } from '../Workspace'
-import { Instance } from '../Instance'
+import { Instance } from './Instance'
 
 export interface InstanceLocalEnvironment {
 	instanceDirectory: string

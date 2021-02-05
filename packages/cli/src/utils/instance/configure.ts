@@ -7,7 +7,7 @@ import {
 	patchInstanceOverrideCredentials,
 	resolvePortsMapping,
 } from './dockerComposeConfig'
-import { Instance } from '../Instance'
+import { Instance } from './Instance'
 
 export const interactiveInstanceConfigure = async ({
 	composeConfig,

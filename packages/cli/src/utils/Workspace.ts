@@ -3,7 +3,7 @@ import { join } from 'path'
 import { readYaml, updateYaml } from './yaml'
 import { installTemplate } from './template'
 import { resourcesDir } from '../pathUtils'
-import { InstanceManager } from './InstanceManager'
+import { InstanceManager } from './instance'
 import { ProjectManager } from './ProjectManager'
 import { PathMapping } from './PathMapping'
 

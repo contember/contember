@@ -41,10 +41,16 @@ export class MutationResolver {
 		})
 		const fields = GraphQlQueryAstFactory.resolveObjectType(info.returnType).getFields()
 
-		const prefixErrors = <T extends { path: Result.PathFragment[] }>(errors: T[], field: string): T[] =>
+		const prefixErrors = <T extends { path: Result.PathFragment[]; paths?: Result.PathFragment[][] }>(
+			errors: T[],
+			field: string,
+		): T[] =>
 			errors.map(it => ({
 				...it,
 				path: [{ __typename: '_FieldPathFragment', field }, ...it.path],
+				paths: it.paths
+					? (it.paths.length === 0 ? [[]] : it.paths)?.map(it => [{ __typename: '_FieldPathFragment', field }, ...it])
+					: undefined,
 			}))
 
 		return this.transaction(async (mapper, trx) => {
@@ -417,7 +423,7 @@ export class MutationResolver {
 					}
 				case MutationResultType.noResultError:
 				case MutationResultType.notFoundError:
-					return { path, paths, type: Result.ExecutionErrorType.NotFoundOrDenied }
+					return { path, paths, type: Result.ExecutionErrorType.NotFoundOrDenied, message: it.message }
 				case MutationResultType.inputError:
 					switch (it.kind) {
 						case InputErrorKind.nonUniqueWhere:
@@ -455,7 +461,7 @@ export class MutationResolver {
 		}
 		return (
 			'Execution has failed:\n' +
-			executionErrors.map(it => `${this.stringifyPath(it.path)}: ${it.type} (${it.message || ''})`)
+			executionErrors.map(it => `${this.stringifyPath(it.paths[0] || [])}: ${it.type} (${it.message || ''})`)
 		)
 	}
 

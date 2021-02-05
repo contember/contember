@@ -167,20 +167,27 @@ export class MutationConstraintViolationError implements MutationResultInterface
 export class MutationEntryNotFoundError implements MutationResultInterface {
 	result = MutationResultType.notFoundError as const
 	hints: MutationResultHint[] = []
+	message: string
 
-	constructor(public readonly paths: Path[], public readonly where: Input.UniqueWhere) {}
+	constructor(public readonly paths: Path[], public readonly where: Input.UniqueWhere) {
+		this.message = 'for input ' + JSON.stringify(where)
+	}
 }
 
 // possibly denied by acl
 export class MutationNoResultError implements MutationResultInterface {
 	result = MutationResultType.noResultError as const
 	hints: MutationResultHint[] = []
+	message = undefined
 
 	constructor(public readonly paths: Path[]) {}
 }
 
 export const prependPath = (path: Path, results: MutationResultList): MutationResultList =>
-	results.map(it => ({ ...it, paths: it.paths.map(it => [...path, ...it]) }))
+	results.map(it => ({
+		...it,
+		paths: (it.paths.length === 0 ? [[]] : it.paths).map(it => [...path, ...it]),
+	}))
 
 export const getInsertPrimary = (result: MutationResultList) =>
 	result[0] && result[0].result === MutationResultType.ok && result[0].type === ModificationType.create

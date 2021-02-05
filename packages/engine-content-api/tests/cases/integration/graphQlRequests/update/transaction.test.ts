@@ -184,7 +184,7 @@ test('executes fails a transaction', async () => {
 						author: null,
 					},
 					ok: false,
-					errorMessage: 'Execution has failed:\nupdate2: NotFoundOrDenied ()',
+					errorMessage: `Execution has failed:\nupdate2: NotFoundOrDenied (for input {"id":"123e4567-e89b-12d3-a456-000000000002"})`,
 				},
 			},
 		},

@@ -1,6 +1,7 @@
 import { Input } from '../../cli'
 import { Workspace } from '../Workspace'
 import { Instance } from './Instance'
+import { isRemoteInstance } from './common'
 
 export interface InstanceLocalEnvironment {
 	instanceDirectory: string
@@ -38,6 +39,7 @@ export const resolveInstanceListEnvironmentFromInput = async ({
 		}
 	>
 }): Promise<Instance[]> => {
+	const instanceFromEnv = getInstanceFromEnv(false)
 	if (input.getOption('no-instance')) {
 		return []
 	} else if (input.getOption('instance')) {
@@ -46,8 +48,8 @@ export const resolveInstanceListEnvironmentFromInput = async ({
 		)
 	} else if (input.getOption('all-instances')) {
 		return await workspace.instances.listInstances()
-	} else if (process.env.CONTEMBER_INSTANCE) {
-		return [await workspace.instances.getInstance(process.env.CONTEMBER_INSTANCE)]
+	} else if (instanceFromEnv) {
+		return [await workspace.instances.getInstance(instanceFromEnv)]
 	} else {
 		return [await workspace.instances.getDefaultInstance()]
 	}
@@ -62,9 +64,17 @@ export const resolveInstanceEnvironmentFromInput = async ({
 	}>
 	workspace: Workspace
 }): Promise<Instance> => {
-	const instanceName = input.getArgument('instanceName') || process.env.CONTEMBER_INSTANCE
+	const instanceName = input.getArgument('instanceName') || getInstanceFromEnv(false)
 	if (instanceName) {
 		return await workspace.instances.getInstance(instanceName)
 	}
 	return await workspace.instances.getDefaultInstance()
+}
+
+export const getInstanceFromEnv = (allowRemote: boolean = true): string | undefined => {
+	let instance = process.env.CONTEMBER_INSTANCE
+	if (!allowRemote && instance && isRemoteInstance(instance)) {
+		return undefined
+	}
+	return instance
 }

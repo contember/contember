@@ -1,7 +1,8 @@
 import prompts from 'prompts'
-import { InstanceApiEnvironment, InstanceLocalApiEnvironment } from './environment'
+import { getInstanceFromEnv, InstanceApiEnvironment, InstanceLocalApiEnvironment } from './environment'
 import { Instance } from './Instance'
 import { Workspace } from '../Workspace'
+import { isRemoteInstance } from './common'
 
 const createRemoteInstanceEnvironment = (instanceName: string): InstanceApiEnvironment => {
 	let baseUrl = instanceName
@@ -30,9 +31,9 @@ export const interactiveResolveInstanceEnvironmentFromInput = async (
 	workspace: Workspace,
 	instance?: string,
 ): Promise<InstanceApiEnvironment> => {
-	let instanceName = instance || process.env.CONTEMBER_INSTANCE
+	let instanceName = instance || getInstanceFromEnv()
 	if (instanceName) {
-		if (instanceName.includes('://')) {
+		if (isRemoteInstance(instanceName)) {
 			return createRemoteInstanceEnvironment(instanceName)
 		} else {
 			const instance = await workspace.instances.getInstance(instanceName)

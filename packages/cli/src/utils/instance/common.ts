@@ -3,3 +3,5 @@ export const validateInstanceName = (name: string) => {
 		throw 'Invalid instance name. It can contain only alphanumeric letters and cannot start with a number'
 	}
 }
+
+export const isRemoteInstance = (name: string) => name.includes('://')

@@ -47,24 +47,31 @@ type EntityAclFieldPermissionsUpdater = (
 	entityName: string,
 	operation: Acl.Operation,
 ) => Acl.FieldPermissions
+type EntityOperationHandler = {
+	[K in keyof Required<Acl.EntityOperations>]: (
+		value: Exclude<Acl.EntityOperations[K], undefined>,
+	) => Acl.EntityOperations[K]
+}
 
 export const updateAclFieldPermissions = (updater: EntityAclFieldPermissionsUpdater): EntityPermissionsUpdater => (
 	entityPermissions,
 	entityName,
 ) => {
 	const operations: Acl.EntityOperations = {}
-	if (entityPermissions.operations.create) {
-		operations.create = updater(entityPermissions.operations.create, entityName, Acl.Operation.create)
+	const handlers: EntityOperationHandler = {
+		create: value => updater(value, entityName, Acl.Operation.create),
+		update: value => updater(value, entityName, Acl.Operation.update),
+		read: value => updater(value, entityName, Acl.Operation.read),
+		delete: value => value,
+		customPrimary: value => value,
 	}
-	if (entityPermissions.operations.update) {
-		operations.update = updater(entityPermissions.operations.update, entityName, Acl.Operation.update)
+	const types: (keyof Acl.EntityOperations)[] = ['create', 'update', 'read', 'delete', 'customPrimary']
+	for (const key of types) {
+		if (key in entityPermissions.operations) {
+			operations[key] = handlers[key](entityPermissions.operations[key] as any) as any
+		}
 	}
-	if (entityPermissions.operations.read) {
-		operations.read = updater(entityPermissions.operations.read, entityName, Acl.Operation.read)
-	}
-	if ('delete' in entityPermissions.operations) {
-		operations.delete = entityPermissions.operations.delete
-	}
+
 	return {
 		...entityPermissions,
 		operations,

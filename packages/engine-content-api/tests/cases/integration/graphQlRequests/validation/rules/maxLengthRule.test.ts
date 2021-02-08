@@ -1,6 +1,6 @@
 import { suite } from 'uvu'
 import { InputValidation as v } from '@contember/schema-definition'
-import { SchemaDefinition as d } from '@contember/schema-definition/dist/src/model'
+import { SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from '../utils'
 
 const test = suite('Max length rule')

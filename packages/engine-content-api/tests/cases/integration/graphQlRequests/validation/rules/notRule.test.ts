@@ -1,5 +1,4 @@
-import { InputValidation as v } from '@contember/schema-definition'
-import { SchemaDefinition as d } from '@contember/schema-definition/dist/src/model'
+import { InputValidation as v, SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from '../utils'
 import { suite } from 'uvu'
 

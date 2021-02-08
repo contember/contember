@@ -1,12 +1,11 @@
 import { IExecutableSchemaDefinition } from 'graphql-tools'
 import schema from './content-schema.graphql'
 import * as ContentSchema from './content-schema.types'
-import { Model, Validation } from '@contember/schema'
+import { Acl, Model, Validation } from '@contember/schema'
 import { assertNever } from '../utils'
 import { EntityRulesResolver } from '../input-validation'
 import { acceptEveryFieldVisitor, getEntity } from '@contember/schema-utils'
 import { Authorizator } from '../acl'
-import Acl from '@contember/schema/dist/src/schema/acl'
 import ColumnType = Model.ColumnType
 import Operation = Acl.Operation
 

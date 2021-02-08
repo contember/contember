@@ -2,7 +2,7 @@ import { ProjectManager, Providers as TenantProviders } from '@contember/engine-
 import { MigrationsRunner } from '@contember/database-migrations'
 import { ProjectInitializer } from '@contember/engine-system-api'
 import { ProjectContainer } from '@contember/engine-http'
-import { TenantCredentials, TenantMigrationArgs } from '@contember/engine-tenant-api/src'
+import { TenantCredentials, TenantMigrationArgs } from '@contember/engine-tenant-api'
 import { Logger } from '@contember/engine-common'
 
 export class Initializer {

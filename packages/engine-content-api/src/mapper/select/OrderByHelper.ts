@@ -1,5 +1,4 @@
-import { Input } from '@contember/schema'
-import Model from '@contember/schema/dist/src/schema/model'
+import { Input, Model } from '@contember/schema'
 import { ObjectNode } from '../../inputProcessing'
 
 export class OrderByHelper {

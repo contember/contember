@@ -73,9 +73,7 @@ export class SelectBuilder {
 			if (orderBy.length > 0) {
 				;[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy)
 			}
-			if (input.args.limit) {
-				this.qb = this.qb.limit(input.args.limit, input.args.offset)
-			}
+			this.qb = this.qb.limit(input.args.limit, input.args.offset)
 		}
 
 		await promise

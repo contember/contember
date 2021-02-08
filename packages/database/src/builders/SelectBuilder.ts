@@ -21,7 +21,7 @@ class SelectBuilder<Result = SelectBuilder.Result>
 			from: undefined,
 			orderBy: [],
 			join: [],
-			limit: undefined,
+			limit: [undefined, undefined],
 			select: [],
 			with: new With.Statement({}),
 			where: new Where.Statement([]),
@@ -127,8 +127,8 @@ class SelectBuilder<Result = SelectBuilder.Result>
 		})
 	}
 
-	public limit(limit: number, offset?: number): SelectBuilder<Result> {
-		return this.withOption('limit', [limit, offset || 0])
+	public limit(limit?: number, offset?: number): SelectBuilder<Result> {
+		return this.withOption('limit', [limit, offset])
 	}
 
 	public lock(type: LockType): SelectBuilder<Result> {
@@ -176,7 +176,7 @@ namespace SelectBuilder {
 		With.Options &
 			Where.Options & {
 				select: Literal[]
-				limit: undefined | [number, number]
+				limit: [number | undefined, number | undefined]
 				from: undefined | [Literal | string, string | undefined][]
 				orderBy: [Literal, 'asc' | 'desc'][]
 				join: {

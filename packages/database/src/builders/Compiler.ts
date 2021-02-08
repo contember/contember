@@ -100,7 +100,9 @@ class Compiler {
 			return Literal.empty
 		}
 		const [limit, offset] = limitExpr
-		return new Literal(' limit ' + Number(limit) + (offset ? ' offset ' + Number(offset) : ''))
+		const limitSql = limit !== undefined ? ' limit ' + Number(limit) : ''
+		const offsetSql = offset !== undefined ? ' offset ' + Number(offset) : ''
+		return new Literal(limitSql + offsetSql)
 	}
 
 	private compileOrderBy(orderBy: SelectBuilder.Options['orderBy']): Literal {

@@ -100,9 +100,9 @@ namespace EntityListAccessor {
 	export type AddError = ErrorAccessor.AddError
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: GetEntityListAccessor, bindingOperations: BindingOperations) => void
-	export type ConnectEntity = (entityToConnectOrItsKey: EntityAccessor | string) => void
+	export type ConnectEntity = (entityToConnect: EntityAccessor) => void
 	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
-	export type DisconnectEntity = (childEntityOrItsKey: EntityAccessor | string) => void
+	export type DisconnectEntity = (childEntity: EntityAccessor) => void
 	export type GetChildEntityById = (key: string) => EntityAccessor
 	export type UpdateListener = (accessor: EntityListAccessor) => void
 

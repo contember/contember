@@ -47,11 +47,7 @@ export class FieldOperations {
 					}
 				}
 			}
-			for (const field of StateIterator.eachSiblingRealmChild(
-				fieldState.parent,
-				StateType.Field,
-				fieldState.placeholderName,
-			)) {
+			for (const field of StateIterator.eachSiblingRealmChild(fieldState)) {
 				if (newValue === field.value) {
 					continue
 				}

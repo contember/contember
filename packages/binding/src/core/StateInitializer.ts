@@ -150,8 +150,8 @@ export class StateInitializer {
 			batchUpdates: performUpdates => {
 				this.entityOperations.batchUpdates(entityRealm, performUpdates)
 			},
-			connectEntityAtField: (fieldName, entityToConnectOrItsKey) => {
-				// this.entityOperations.connectEntityAtField(entityRealm, fieldName, entityToConnectOrItsKey)
+			connectEntityAtField: (fieldName, entityToConnect) => {
+				// this.entityOperations.connectEntityAtField(entityRealm, fieldName, entityToConnect)
 			},
 			disconnectEntityAtField: (fieldName, initializeReplacement) => {
 				// this.entityOperations.disconnectEntityAtField(entityRealm, fieldName, initializeReplacement)
@@ -269,14 +269,14 @@ export class StateInitializer {
 			batchUpdates: performUpdates => {
 				this.listOperations.batchUpdates(entityListState, performUpdates)
 			},
-			connectEntity: entityToConnectOrItsKey => {
-				// this.listOperations.connectEntity(entityListState, entityToConnectOrItsKey)
+			connectEntity: entityToConnect => {
+				this.listOperations.connectEntity(entityListState, entityToConnect)
 			},
 			createNewEntity: initialize => {
 				this.listOperations.createNewEntity(entityListState, initialize)
 			},
-			disconnectEntity: childEntityOrItsKey => {
-				// this.listOperations.disconnectEntity(entityListState, childEntityOrItsKey)
+			disconnectEntity: childEntity => {
+				this.listOperations.disconnectEntity(entityListState, childEntity)
 			},
 			getChildEntityById: id => {
 				return this.listOperations.getChildEntityById(entityListState, id)
@@ -289,7 +289,8 @@ export class StateInitializer {
 				? new Set(Array.from({ length: blueprint.creationParameters.initialEntityCount }))
 				: persistedEntityIds
 		for (const entityId of initialData) {
-			this.initializeListEntity(entityListState, entityId)
+			const id = entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityDummyId()
+			this.initializeListEntity(entityListState, id)
 		}
 
 		return entityListState
@@ -483,14 +484,13 @@ export class StateInitializer {
 		}
 	}
 
-	private initializeListEntity(
+	public initializeListEntity(
 		entityListState: EntityListState,
-		entityId: string | undefined,
+		entityId: RuntimeId,
 	): EntityRealmState | EntityRealmStateStub {
-		const id = entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityDummyId()
-		const listEntity = this.initializeEntityRealm(id, this.createListEntityBlueprint(entityListState, id))
+		const listEntity = this.initializeEntityRealm(entityId, this.createListEntityBlueprint(entityListState, entityId))
 		entityListState.hasStaleAccessor = true
-		entityListState.children.set(id.value, listEntity)
+		entityListState.children.set(entityId.value, listEntity)
 
 		return listEntity
 	}

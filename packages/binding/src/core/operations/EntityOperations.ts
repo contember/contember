@@ -208,7 +208,7 @@ export class EntityOperations {
 		this.eventManager.syncOperation(() => {
 			state.isScheduledForDeletion = true
 
-			for (const [realmKey, deletedRealm] of state.realms) {
+			for (const [, deletedRealm] of state.realms) {
 				const parent = deletedRealm.blueprint.parent
 				if (parent === undefined) {
 					// TODO handle top-level entities better
@@ -228,7 +228,7 @@ export class EntityOperations {
 
 					this.eventManager.registerUpdatedConnection(parent, placeholderName)
 				} else if (parent.type === StateType.EntityList) {
-					parent.children.delete(realmKey)
+					parent.children.delete(state.id.value)
 
 					if (state.id.existsOnServer) {
 						if (parent.plannedRemovals === undefined) {
@@ -240,7 +240,7 @@ export class EntityOperations {
 					assertNever(parent)
 				}
 
-				let changesDelta
+				let changesDelta = 0
 				if (deletedRealm.type === StateType.EntityRealmStub) {
 					changesDelta = EventManager.NO_CHANGES_DIFFERENCE
 				} else {

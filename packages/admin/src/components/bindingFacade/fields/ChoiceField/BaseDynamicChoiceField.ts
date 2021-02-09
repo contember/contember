@@ -82,10 +82,10 @@ export const useCurrentValues = (
 		const values: ChoiceFieldData.ValueRepresentation[] = []
 
 		for (const entity of currentlyChosenEntities) {
-			const currentKey = entity.key
+			const currentId = entity.id
 			const index = topLevelOptionAccessors.findIndex((entity: EntityAccessor) => {
-				const key = entity.key
-				return !!key && key === currentKey
+				const id = entity.id
+				return !!id && id === currentId
 			})
 			if (index > -1) {
 				values.push(index)
@@ -137,7 +137,7 @@ export const useNormalizedOptions = (
 						key: i,
 						label,
 						searchKeywords,
-						actualValue: item.key,
+						actualValue: item.id,
 					}
 				},
 			),

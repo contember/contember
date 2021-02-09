@@ -27,14 +27,14 @@ class EntityListAccessor implements Errorable {
 	 * **KEYS ARE NOT IDS!**
 	 * @see EntityAccessor.key
 	 */
-	public keys(): IterableIterator<string> {
-		return this._children.keys()
+	public *keys(): Generator<string> {
+		for (const accessor of this) {
+			yield accessor.key
+		}
 	}
 
-	public *ids(): Generator<string> {
-		for (const accessor of this) {
-			yield accessor.id
-		}
+	public *ids(): IterableIterator<string> {
+		return this._children.keys()
 	}
 
 	/**

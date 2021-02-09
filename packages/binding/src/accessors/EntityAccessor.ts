@@ -45,6 +45,9 @@ class EntityAccessor implements Errorable {
 		return this.runtimeId.existsOnServer ? this.runtimeId.value : undefined
 	}
 
+	/**
+	 * Note that for entities that don't yet exist on server this will return a dummy id.
+	 */
 	public get id(): string {
 		return this.runtimeId.value
 	}

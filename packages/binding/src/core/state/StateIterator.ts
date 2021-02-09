@@ -1,20 +1,44 @@
-import { PlaceholderName } from '../../treeParameters/primitives'
+import { PlaceholderName } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import { StateINode, StateNode } from './StateNode'
 import { StateType } from './StateType'
 
 export class StateIterator {
-	public static *eachSiblingRealmChild<T extends StateType>(
-		parent: EntityRealmState,
-		type: T,
-		placeholderName: PlaceholderName,
-	): Generator<StateNode & { type: T }, void> {
-		for (let [realmKey, realm] of parent.entity.realms) {
+	// Note that this only yields siblings with the same placeholderName!
+	public static *eachSiblingRealmChild<S extends StateNode>(state: S & StateNode): Generator<S, void> {
+		let closestEntityRealm: EntityRealmState
+		let placeholderName: PlaceholderName
+
+		switch (state.type) {
+			case StateType.Field: {
+				closestEntityRealm = state.parent
+				placeholderName = state.placeholderName
+				break
+			}
+			case StateType.EntityRealm: {
+				closestEntityRealm = state
+				placeholderName = state.blueprint.placeholderName
+				break
+			}
+			case StateType.EntityList: {
+				const candidate = state.blueprint.parent
+				if (candidate === undefined) {
+					yield state
+					return
+				}
+				closestEntityRealm = candidate
+				placeholderName = state.blueprint.placeholderName
+				break
+			}
+			default:
+				assertNever(state)
+		}
+		for (let [realmKey, realm] of closestEntityRealm.entity.realms) {
 			if (realm.type === StateType.EntityRealmStub) {
 				if (realm.blueprint.markersContainer.placeholders.has(placeholderName)) {
 					realm.getAccessor()
-					realm = parent.entity.realms.get(realmKey) as EntityRealmState
+					realm = closestEntityRealm.entity.realms.get(realmKey) as EntityRealmState
 				} else {
 					// This realm is irrelevant. No need to force-initialize it.
 					continue
@@ -24,8 +48,8 @@ export class StateIterator {
 			if (child === undefined) {
 				continue
 			}
-			if (child.type === type) {
-				yield child as StateNode & { type: T }
+			if (child.type === state.type) {
+				yield child as S
 			}
 		}
 	}

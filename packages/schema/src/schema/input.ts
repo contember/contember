@@ -169,13 +169,13 @@ namespace Input {
 		[field: string]: Value.PrimaryValue<E> | UniqueWhere<E>
 	}
 
-	export type ComposedWhere<C, Opt> = {
+	export type ComposedWhere<C, Opt = never> = {
 		and?: (Where<C, Opt> | Opt)[]
 		or?: (Where<C, Opt> | Opt)[]
 		not?: Where<C, Opt>
 	}
 
-	export interface FieldWhere<C, Opt> {
+	export interface FieldWhere<C = Condition, Opt = never> {
 		[name: string]: C | Where<C, Opt> | undefined | Where<C, Opt>[] //last one if for ComposedWhere
 	}
 

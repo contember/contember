@@ -1,7 +1,6 @@
 import {
 	Component,
 	EntityListBaseProps,
-	FieldValue,
 	HasMany,
 	QueryLanguage,
 	SugaredRelativeEntityList,
@@ -12,7 +11,7 @@ import { Checkbox } from '../../../../ui'
 import { FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps } from '../base'
 
-export type HasManyAbsentCellProps<Persisted extends FieldValue = FieldValue> = DataGridHeaderCellPublicProps &
+export type HasManyAbsentCellProps = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
 	FieldFallbackViewPublicProps &
 	SugaredRelativeEntityList & {
@@ -51,6 +50,4 @@ export const HasManyAbsentCell = Component<HasManyAbsentCellProps>(props => {
 			<HasMany {...props} listComponent={props.render} />
 		</DataGridColumn>
 	)
-}, 'HasManyAbsentCell') as <Persisted extends FieldValue = FieldValue>(
-	props: HasManyAbsentCellProps<Persisted>,
-) => React.ReactElement
+}, 'HasManyAbsentCell') as (props: HasManyAbsentCellProps) => React.ReactElement

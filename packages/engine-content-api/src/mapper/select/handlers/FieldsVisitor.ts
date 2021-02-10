@@ -1,18 +1,16 @@
-import { Acl, Input, Model, Value } from '@contember/schema'
-import { SelectGroupedObjects, SelectResultObject, SelectRow } from '../SelectHydrator'
+import { Acl, Input, Model } from '@contember/schema'
 import { Mapper } from '../../Mapper'
-import { JunctionFetcher } from '../JunctionFetcher'
+import { RelationFetcher } from '../RelationFetcher'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
 import { PredicateFactory } from '../../../acl'
 import { WhereBuilder } from '../WhereBuilder'
-import { OrderByHelper } from '../OrderByHelper'
-import { FieldNode, ObjectNode } from '../../../inputProcessing'
+import { ObjectNode } from '../../../inputProcessing'
 import { JoiningColumns } from '../../types'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
 		private readonly schema: Model.Schema,
-		private readonly junctionFetcher: JunctionFetcher,
+		private readonly relationFetcher: RelationFetcher,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly mapper: Mapper,
@@ -65,7 +63,17 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			targetColumn: joiningTable.joiningColumn,
 		}
 
-		this.createManyHasManyGroups(targetEntity, targetRelation, columns, relation.orderBy || [])
+		this.executionContext.addData(entity.primary, async ids =>
+			this.relationFetcher.fetchManyHasManyGroups(
+				this.mapper,
+				this.executionContext.field as ObjectNode,
+				targetEntity,
+				relation,
+				targetRelation,
+				columns,
+				ids,
+			),
+		)
 	}
 
 	public visitManyHasManyOwning(
@@ -79,7 +87,20 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			targetColumn: joiningTable.inverseJoiningColumn,
 		}
 
-		this.createManyHasManyGroups(targetEntity, relation, columns, relation.orderBy || [])
+		this.executionContext.addData(
+			entity.primary,
+			async ids =>
+				this.relationFetcher.fetchManyHasManyGroups(
+					this.mapper,
+					this.executionContext.field as ObjectNode,
+					targetEntity,
+					relation,
+					relation,
+					columns,
+					ids,
+				),
+			[],
+		)
 	}
 
 	public visitOneHasMany(
@@ -90,96 +111,17 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 	): void {
 		this.executionContext.addData(
 			entity.primary,
-			async ids => {
-				const objectNode = this.executionContext.field as ObjectNode
-				const targetRelationFilter = { [entity.primary]: { in: ids } }
-				const whereWithParentId = {
-					...objectNode.args.filter,
-					[targetRelation.name]: !objectNode.args.filter?.[targetRelation.name]
-						? targetRelationFilter
-						: { and: [objectNode.args.filter[targetRelation.name], targetRelationFilter] },
-				}
-				const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('filter', whereWithParentId)
-				const objectNodeWithOrder = OrderByHelper.appendDefaultOrderBy(
-					entity,
-					objectNodeWithWhere,
-					relation.orderBy || [],
-				)
-
-				return this.mapper.selectGrouped(targetEntity, objectNodeWithOrder, targetRelation)
-			},
-			[],
-		)
-	}
-
-	private createManyHasManyGroups(
-		targetEntity: Model.Entity,
-		relation: Model.ManyHasManyOwningRelation,
-		joiningColumns: JoiningColumns,
-		defaultOrderBy: Model.OrderBy[],
-	): void {
-		this.executionContext.addData(
-			this.executionContext.entity.primary,
-			async ids => {
-				const baseObjectNode = this.executionContext.field as ObjectNode<Input.ListQueryInput>
-				const objectNode = OrderByHelper.appendDefaultOrderBy(targetEntity, baseObjectNode, defaultOrderBy)
-
-				const junctionValues = await this.junctionFetcher.fetchJunction(
-					this.mapper.db,
-					relation,
-					ids,
-					joiningColumns,
+			async ids =>
+				this.relationFetcher.fetchOneHasManyGroups(
+					this.mapper,
+					this.executionContext.field as ObjectNode,
 					targetEntity,
-					objectNode,
-				)
-				if (junctionValues.length === 0) {
-					return {}
-				}
-
-				const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary, {})
-				const inverseJoiningColumn = joiningColumns.targetColumn.columnName
-				const inverseIds = junctionValues
-					.map(it => it[inverseJoiningColumn])
-					.filter((it, index, arr) => arr.indexOf(it) === index)
-
-				const queryWithWhere = objectNode
-					.withArgs({
-						filter: {
-							[targetEntity.primary]: { in: inverseIds },
-						},
-					})
-					.withField(primaryField)
-				const result = await this.mapper.select(targetEntity, queryWithWhere)
-
-				return this.buildManyHasManyGroups(targetEntity, joiningColumns, result, junctionValues)
-			},
+					relation,
+					targetRelation,
+					ids,
+				),
 			[],
 		)
-	}
-
-	private buildManyHasManyGroups(
-		entity: Model.Entity,
-		joiningColumns: JoiningColumns,
-		resultObjects: SelectResultObject[],
-		junctionValues: SelectRow[],
-	): SelectGroupedObjects {
-		const dataById: { [id: string]: SelectResultObject } = {}
-		for (let object of resultObjects) {
-			dataById[object[entity.primary] as Value.PrimaryValue] = object
-		}
-		const sourceColumn = joiningColumns.sourceColumn.columnName
-		const targetColumn = joiningColumns.targetColumn.columnName
-		const groupedResult: SelectGroupedObjects = {}
-		for (let pair of junctionValues) {
-			if (!groupedResult[pair[sourceColumn] as Value.PrimaryValue]) {
-				groupedResult[pair[sourceColumn] as Value.PrimaryValue] = []
-			}
-			const resultObject = dataById[pair[targetColumn] as Value.PrimaryValue]
-			if (resultObject) {
-				groupedResult[pair[sourceColumn] as Value.PrimaryValue].push(resultObject)
-			}
-		}
-		return groupedResult
 	}
 
 	public visitOneHasOneInverse(

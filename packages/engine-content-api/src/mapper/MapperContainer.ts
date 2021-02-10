@@ -3,7 +3,7 @@ import {
 	ConditionBuilder,
 	FieldsVisitorFactory,
 	JoinBuilder,
-	JunctionFetcher,
+	RelationFetcher,
 	MetaHandler,
 	OrderByBuilder,
 	WhereBuilder,
@@ -58,14 +58,14 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		)
 		.addService('orderByBuilder', ({ joinBuilder }) => new OrderByBuilder(schema.model, joinBuilder))
 		.addService(
-			'junctionFetcher',
+			'relationFetcher',
 			({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>
-				new JunctionFetcher(whereBuilder, orderByBuilder, predicatesInjector, pathFactory),
+				new RelationFetcher(whereBuilder, orderByBuilder, predicatesInjector, pathFactory),
 		)
 		.addService(
 			'fieldsVisitorFactory',
-			({ junctionFetcher, predicateFactory, whereBuilder }) =>
-				new FieldsVisitorFactory(schema.model, junctionFetcher, predicateFactory, whereBuilder),
+			({ relationFetcher, predicateFactory, whereBuilder }) =>
+				new FieldsVisitorFactory(schema.model, relationFetcher, predicateFactory, whereBuilder),
 		)
 		.addService('metaHandler', ({ whereBuilder, predicateFactory }) => new MetaHandler(whereBuilder, predicateFactory))
 		.addService('uniqueWhereExpander', () => new UniqueWhereExpander(schema.model))

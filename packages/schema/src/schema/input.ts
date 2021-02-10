@@ -176,7 +176,7 @@ namespace Input {
 	}
 
 	export interface FieldWhere<C = Condition, Opt = never> {
-		[name: string]: C | Where<C, Opt> | undefined | Where<C, Opt>[] //last one if for ComposedWhere
+		[name: string]: C | Where<C, Opt> | undefined | (Where<C, Opt> | Opt)[] //last one if for ComposedWhere
 	}
 
 	export type Where<C = Condition, Opt = never> = ComposedWhere<C, Opt> & FieldWhere<C, Opt>

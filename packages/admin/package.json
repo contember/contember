@@ -1,6 +1,6 @@
 {
   "name": "@contember/admin",
-  "version": "0.5.45",
+  "version": "0.5.46",
   "type": "module",
   "main": "dist/src/index.js",
   "scripts": {
@@ -10,13 +10,13 @@
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/binding": "0.5.45",
-    "@contember/client": "0.5.45",
-    "@contember/react-client": "0.5.45",
-    "@contember/react-multipass-rendering": "0.5.45",
-    "@contember/react-utils": "0.5.45",
-    "@contember/ui": "0.5.45",
-    "@contember/utils": "0.5.45",
+    "@contember/binding": "0.5.46",
+    "@contember/client": "0.5.46",
+    "@contember/react-client": "0.5.46",
+    "@contember/react-multipass-rendering": "0.5.46",
+    "@contember/react-utils": "0.5.46",
+    "@contember/ui": "0.5.46",
+    "@contember/utils": "0.5.46",
     "@mangoweb/sass-base": "0.0.5",
     "@sindresorhus/slugify": "0.9.1",
     "attr-accept": "2.1.0",

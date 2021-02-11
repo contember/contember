@@ -1,23 +1,11 @@
 import { BindingOperations, EntityAccessor } from '../../accessors'
-import { ClientGeneratedUuid, ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
-import { BindingError } from '../../BindingError'
-import { PRIMARY_KEY_NAME } from '../../bindingTypes'
-import {
-	EntityFieldMarkersContainer,
-	FieldMarker,
-	HasManyRelationMarker,
-	HasOneRelationMarker,
-	SubTreeMarker,
-} from '../../markers'
-import { FieldName } from '../../treeParameters/primitives'
+import { UnpersistedEntityDummyId } from '../../accessorTree'
+import { FieldName } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import { EventManager } from '../EventManager'
-import { MarkerMerger } from '../MarkerMerger'
-import { EntityRealmBlueprint, EntityRealmState, EntityState, StateNode, StateType } from '../state'
+import { EntityRealmState, EntityState, StateType } from '../state'
 import { StateInitializer } from '../StateInitializer'
-import { TreeParameterMerger } from '../TreeParameterMerger'
 import { TreeStore } from '../TreeStore'
-import { OperationsHelpers } from './OperationsHelpers'
 
 export class EntityOperations {
 	public constructor(
@@ -72,80 +60,76 @@ export class EntityOperations {
 		})
 	}
 
-	// public connectEntityAtField(
-	// 	state: EntityRealmState,
-	// 	fieldName: FieldName,
-	// 	entityToConnectOrItsKey: EntityAccessor | string,
-	// ) {
-	// 	this.eventManager.syncOperation(() => {
-	// 		this.batchUpdatesImplementation(state, () => {
-	// 			const hasOneMarkers = this.resolveHasOneRelationMarkers(
-	// 				state,
-	// 				fieldName,
-	// 				`Cannot connect at field '${fieldName}' as it doesn't refer to a has one relation.`,
-	// 			)
-	// 			for (const hasOneMarker of hasOneMarkers) {
-	// 				const previouslyConnectedState = state.children.get(hasOneMarker.placeholderName)
-	//
-	// 				if (
-	// 					previouslyConnectedState === undefined ||
-	// 					previouslyConnectedState.type === StateType.Field ||
-	// 					previouslyConnectedState.type === StateType.EntityList
-	// 				) {
-	// 					OperationsHelpers.rejectInvalidAccessorTree()
-	// 				}
-	//
-	// 				const [entityToConnectKey, stateToConnect] = OperationsHelpers.resolveAndPrepareEntityToConnect(
-	// 					this.treeStore,
-	// 					entityToConnectOrItsKey,
-	// 				)
-	//
-	// 				if (previouslyConnectedState === stateToConnect) {
-	// 					return // Do nothing.
-	// 				}
-	// 				// TODO remove from planned deletions if appropriate
-	//
-	// 				const persistedKey = state.persistedData?.get(hasOneMarker.placeholderName)
-	// 				if (persistedKey instanceof ServerGeneratedUuid) {
-	// 					if (persistedKey.value === entityToConnectKey) {
-	// 						this.dirtinessTracker.decrement() // It was removed from the list but now we're adding it back.
-	// 					} else if (persistedKey.value === previouslyConnectedState.id.value) {
-	// 						this.dirtinessTracker.increment() // We're changing it from the persisted id.
-	// 					}
-	// 				} else if (!previouslyConnectedState.id.existsOnServer) {
-	// 					// This assumes the invariant enforced above that we cannot connect unpersisted entities.
-	// 					// Hence the previouslyConnectedState still refers to the entity created initially.
-	//
-	// 					if (
-	// 						persistedKey === null || // We're updating.
-	// 						(persistedKey === undefined && // We're creating.
-	// 							(!state.combinedMarkersContainer.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing))
-	// 					) {
-	// 						this.dirtinessTracker.increment()
-	// 					}
-	// 				}
-	//
-	// 				// TODO do something about the existing state…
-	//
-	// 				this.addEntityRealm(stateToConnect, {
-	// 					creationParameters: hasOneMarker.relation,
-	// 					environment: hasOneMarker.environment,
-	// 					initialEventListeners: hasOneMarker.relation,
-	// 					markersContainer: hasOneMarker.fields,
-	// 					parent: state,
-	// 					realmKey: hasOneMarker.placeholderName,
-	// 				})
-	// 				state.children.set(hasOneMarker.placeholderName, stateToConnect)
-	// 				state.hasStaleAccessor = true
-	// 				state.hasPendingParentNotification = true
-	// 			}
-	// 			if (state.fieldsWithPendingConnectionUpdates === undefined) {
-	// 				state.fieldsWithPendingConnectionUpdates = new Set()
-	// 			}
-	// 			state.fieldsWithPendingConnectionUpdates.add(fieldName)
-	// 		})
-	// 	})
-	// }
+	public connectEntityAtField(outerState: EntityRealmState, fieldName: FieldName, entityToConnect: EntityAccessor) {
+		// this.eventManager.syncOperation(() => {
+		// 	for (const state of StateIterator.eachSiblingRealmChild(outerState)) {
+		// 		const hasOneMarkers = this.resolveHasOneRelationMarkers(
+		// 			state,
+		// 			fieldName,
+		// 			`Cannot connect at field '${fieldName}' as it doesn't refer to a has one relation.`,
+		// 		)
+		// 		for (const hasOneMarker of hasOneMarkers) {
+		// 			const previouslyConnectedState = state.children.get(hasOneMarker.placeholderName)
+		//
+		// 			if (
+		// 				previouslyConnectedState === undefined ||
+		// 				previouslyConnectedState.type === StateType.Field ||
+		// 				previouslyConnectedState.type === StateType.EntityList
+		// 			) {
+		// 				OperationsHelpers.rejectInvalidAccessorTree()
+		// 			}
+		//
+		// 			const [entityToConnectKey, stateToConnect] = OperationsHelpers.resolveAndPrepareEntityToConnect(
+		// 				this.treeStore,
+		// 				entityToConnectOrItsKey,
+		// 			)
+		//
+		// 			if (previouslyConnectedState === stateToConnect) {
+		// 				return // Do nothing.
+		// 			}
+		// 			// TODO remove from planned deletions if appropriate
+		//
+		// 			const persistedKey = state.persistedData?.get(hasOneMarker.placeholderName)
+		// 			if (persistedKey instanceof ServerGeneratedUuid) {
+		// 				if (persistedKey.value === entityToConnectKey) {
+		// 					this.dirtinessTracker.decrement() // It was removed from the list but now we're adding it back.
+		// 				} else if (persistedKey.value === previouslyConnectedState.id.value) {
+		// 					this.dirtinessTracker.increment() // We're changing it from the persisted id.
+		// 				}
+		// 			} else if (!previouslyConnectedState.id.existsOnServer) {
+		// 				// This assumes the invariant enforced above that we cannot connect unpersisted entities.
+		// 				// Hence the previouslyConnectedState still refers to the entity created initially.
+		//
+		// 				if (
+		// 					persistedKey === null || // We're updating.
+		// 					(persistedKey === undefined && // We're creating.
+		// 						(!state.combinedMarkersContainer.hasAtLeastOneBearingField || !hasOneMarker.relation.isNonbearing))
+		// 				) {
+		// 					this.dirtinessTracker.increment()
+		// 				}
+		// 			}
+		//
+		// 			// TODO do something about the existing state…
+		//
+		// 			this.addEntityRealm(stateToConnect, {
+		// 				creationParameters: hasOneMarker.relation,
+		// 				environment: hasOneMarker.environment,
+		// 				initialEventListeners: hasOneMarker.relation,
+		// 				markersContainer: hasOneMarker.fields,
+		// 				parent: state,
+		// 				realmKey: hasOneMarker.placeholderName,
+		// 			})
+		// 			state.children.set(hasOneMarker.placeholderName, stateToConnect)
+		// 			state.hasStaleAccessor = true
+		// 			state.hasPendingParentNotification = true
+		// 		}
+		// 		if (state.fieldsWithPendingConnectionUpdates === undefined) {
+		// 			state.fieldsWithPendingConnectionUpdates = new Set()
+		// 		}
+		// 		state.fieldsWithPendingConnectionUpdates.add(fieldName)
+		// 	}
+		// })
+	}
 
 	// public disconnectEntityAtField(
 	// 	state: EntityRealmState,

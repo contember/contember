@@ -19,19 +19,13 @@ export class FieldOperations {
 		this.eventManager.syncOperation(() => {
 			const { placeholderName, parent } = fieldState
 			if (__DEV_MODE__) {
-				if (
-					placeholderName === PRIMARY_KEY_NAME &&
-					newValue !== fieldState.value &&
-					fieldState.touchLog !== undefined
-				) {
-					throw new BindingError(
-						`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n` +
-							`Once set, it is immutable.`,
-					)
-				}
-			}
-			if (__DEV_MODE__) {
 				if (placeholderName === PRIMARY_KEY_NAME) {
+					if (newValue !== fieldState.value && fieldState.touchLog !== undefined) {
+						throw new BindingError(
+							`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n` +
+								`Once set, it is immutable.`,
+						)
+					}
 					if (typeof newValue !== 'string' || !uuidValidate(newValue)) {
 						throw new BindingError(
 							`Invalid value supplied for the '${PRIMARY_KEY_NAME}' field. ` +

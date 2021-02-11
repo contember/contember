@@ -34,7 +34,7 @@ import { EventManager } from './EventManager'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
-import { Schema, SchemaLoader } from './schema'
+import { Schema, SchemaLoader, SchemaValidator } from './schema'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
@@ -263,22 +263,25 @@ export class DataBinding {
 			const schemaOrPromise = this.getOrLoadSchema()
 
 			let newPersistedData: QueryRequestResponse | undefined
-			let schema: Schema
 
 			if (schemaOrPromise instanceof Promise) {
 				// We don't have a schema yet. We'll still optimistically fire the request so as to prevent a waterfall
 				// in the most likely case that things will go fine and the query matches the schema.
 				const newPersistedDataPromise = this.fetchPersistedData(newMarkerTree, signal)
 
-				schema = await schemaOrPromise
+				const schema = await schemaOrPromise
 
 				// TODO we shouldn't just CHANGE the schema like that.
 				this.treeStore.updateSchema(schema)
-				// TODO now we can validate the markerTree
+
+				if (__DEV_MODE__) {
+					SchemaValidator.assertTreeValid(schema, newMarkerTree)
+				}
 				newPersistedData = await newPersistedDataPromise
 			} else {
-				// TODO validate newMarkerTree before the query
-				schema = schemaOrPromise
+				if (__DEV_MODE__) {
+					SchemaValidator.assertTreeValid(schemaOrPromise, newMarkerTree)
+				}
 				newPersistedData = await this.fetchPersistedData(newMarkerTree, signal)
 			}
 

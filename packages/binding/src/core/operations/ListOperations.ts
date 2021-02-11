@@ -38,17 +38,19 @@ export class ListOperations {
 
 				try {
 					MarkerComparator.assertEntityMarkersSubsetOf(
-						stateToConnect.blueprint.markersContainer,
 						state.blueprint.markersContainer,
+						stateToConnect.blueprint.markersContainer,
 					)
 				} catch (error) {
 					if (error instanceof LocalizedBindingError) {
 						throw new BindingError(
 							`Entity list: cannot connect entity with key '${entityToConnect.key}' because its fields ` +
-								` are incompatible with entities found on this list. Make sure both trees are equivalent.\n` +
-								`${error.message}\n` +
-								`Incompatibility found at: ${ErrorLocator.locateMarkerPath(error.markerPath)}.\n`,
-							// `Entity list located at: ${}.\n`,
+								` are incompatible with entities found on this list. Make sure both trees are equivalent.\n\n` +
+								`${error.message}\n\n` +
+								(error.markerPath.length > 1
+									? `Incompatibility found at: ${ErrorLocator.locateMarkerPath(error.markerPath)}.\n\n`
+									: '') +
+								`Entity list located at: ${ErrorLocator.locateInternalState(state)}.`,
 						)
 					}
 					throw error

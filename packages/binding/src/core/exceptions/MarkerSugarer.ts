@@ -20,23 +20,28 @@ export class MarkerSugarer {
 	}
 
 	public static sugarFieldMarker(field: FieldMarker) {
-		return field.fieldName
+		return TreeParameterSugarer.sugarField(field.fieldName)
 	}
 
 	public static sugarHasOneRelationMarker(hasOne: HasOneRelationMarker) {
-		return `${hasOne.relation.field}${TreeParameterSugarer.sugarUniqueWhere(
+		return TreeParameterSugarer.sugarHasOneRelation(
+			hasOne.relation.field,
 			hasOne.relation.reducedBy,
-		)}${TreeParameterSugarer.sugarFilter(hasOne.relation.filter)}`
+			hasOne.relation.filter,
+		)
 	}
 
 	public static sugarHasManyRelationMarker(hasMany: HasManyRelationMarker) {
-		return `${hasMany.relation.field}${TreeParameterSugarer.sugarFilter(hasMany.relation.filter)}`
+		return TreeParameterSugarer.sugarHasManyRelation(hasMany.relation.field, hasMany.relation.filter)
 	}
 
 	public static sugarSubTreeMarker(subTree: SubTreeMarker) {
 		if (subTree.parameters.type === 'qualifiedEntityList') {
-			return `${subTree.entityName}${subTree.parameters.value.filter}`
+			return TreeParameterSugarer.sugarRootEntityList(subTree.entityName, subTree.parameters.value.filter)
 		}
-		return subTree.entityName
+		if (subTree.parameters.isConstrained) {
+			return TreeParameterSugarer.sugarRootEntity(subTree.entityName, subTree.parameters.value.where)
+		}
+		return TreeParameterSugarer.sugarRootEntity(subTree.entityName, undefined)
 	}
 }

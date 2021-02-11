@@ -1,5 +1,5 @@
 class GraphQlClient {
-	constructor(private readonly apiUrl: string, private readonly apiToken?: string) {}
+	constructor(public readonly apiUrl: string, private readonly apiToken?: string) {}
 
 	async sendRequest<T = any>(
 		query: string,

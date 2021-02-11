@@ -1,18 +1,11 @@
 import { NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { MarkerTreeRoot, PlaceholderGenerator, SubTreeMarkerParameters } from '../markers'
-import { Alias } from '../treeParameters/primitives'
+import { Alias } from '../treeParameters'
 import { MarkerMerger } from './MarkerMerger'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
-import { RealmKeyGenerator } from './RealmKeyGenerator'
-import {
-	EntityListState,
-	EntityRealmKey,
-	EntityRealmState,
-	EntityRealmStateStub,
-	EntityState,
-	RootStateNode,
-} from './state'
+import { Schema } from './schema'
+import { EntityRealmKey, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
 
 export class TreeStore {
 	// TODO deletes and disconnects cause memory leaks here as they don't traverse the tree to remove nested states.
@@ -23,11 +16,20 @@ export class TreeStore {
 	public readonly entityRealmStore: Map<EntityRealmKey, EntityRealmState | EntityRealmStateStub> = new Map()
 	public readonly subTreeStates: Map<string, RootStateNode> = new Map()
 
+	private _schema: Schema = {
+		entities: new Map(),
+		enums: new Map(),
+	}
+
 	private _markerTree: MarkerTreeRoot = new MarkerTreeRoot(new Map(), new Map())
 	private persistedData: NormalizedQueryResponseData = new NormalizedQueryResponseData(new Map(), new Map())
 
 	public updatePersistedData(response: ReceivedDataTree) {
 		QueryResponseNormalizer.mergeInResponse(this.persistedData, response)
+	}
+
+	public updateSchema(newSchema: Schema) {
+		this._schema = newSchema
 	}
 
 	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: ReceivedDataTree) {
@@ -45,6 +47,10 @@ export class TreeStore {
 
 	public get subTreePersistedData() {
 		return this.persistedData.subTreeDataStore
+	}
+
+	public get schema() {
+		return this._schema
 	}
 
 	public getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): RootStateNode {

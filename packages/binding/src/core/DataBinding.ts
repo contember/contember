@@ -34,12 +34,15 @@ import { EventManager } from './EventManager'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
+import { Schema, SchemaLoader } from './schema'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
 
 export class DataBinding {
+	private static readonly schemaLoadCache: Map<string, Schema | Promise<Schema>> = new Map()
+
 	private readonly accessorErrorManager: AccessorErrorManager
 	private readonly config: Config
 	private readonly dirtinessTracker: DirtinessTracker
@@ -256,7 +259,28 @@ export class DataBinding {
 				return Promise.reject()
 			}
 			const newMarkerTree = new MarkerTreeGenerator(newFragment, this.environment).generate()
-			const newPersistedData = await this.fetchPersistedData(newMarkerTree, signal)
+
+			const schemaOrPromise = this.getOrLoadSchema()
+
+			let newPersistedData: QueryRequestResponse | undefined
+			let schema: Schema
+
+			if (schemaOrPromise instanceof Promise) {
+				// We don't have a schema yet. We'll still optimistically fire the request so as to prevent a waterfall
+				// in the most likely case that things will go fine and the query matches the schema.
+				const newPersistedDataPromise = this.fetchPersistedData(newMarkerTree, signal)
+
+				schema = await schemaOrPromise
+
+				// TODO we shouldn't just CHANGE the schema like that.
+				this.treeStore.updateSchema(schema)
+				// TODO now we can validate the markerTree
+				newPersistedData = await newPersistedDataPromise
+			} else {
+				// TODO validate newMarkerTree before the query
+				schema = schemaOrPromise
+				newPersistedData = await this.fetchPersistedData(newMarkerTree, signal)
+			}
 
 			if (signal?.aborted) {
 				return Promise.reject()
@@ -289,5 +313,18 @@ export class DataBinding {
 			this.onError(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
 		}
 		return queryResponse
+	}
+
+	private getOrLoadSchema(): Schema | Promise<Schema> {
+		const existing = DataBinding.schemaLoadCache.get(this.client.apiUrl)
+		if (existing !== undefined) {
+			return existing
+		}
+
+		const schemaPromise = SchemaLoader.loadSchema(this.client, this.config.getValue('maxSchemaLoadAttempts'))
+		schemaPromise.then(schema => {
+			DataBinding.schemaLoadCache.set(this.client.apiUrl, schema)
+		})
+		return schemaPromise
 	}
 }

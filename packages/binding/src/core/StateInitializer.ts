@@ -151,7 +151,7 @@ export class StateInitializer {
 				this.entityOperations.batchUpdates(entityRealm, performUpdates)
 			},
 			connectEntityAtField: (fieldName, entityToConnect) => {
-				// this.entityOperations.connectEntityAtField(entityRealm, fieldName, entityToConnect)
+				this.entityOperations.connectEntityAtField(entityRealm, fieldName, entityToConnect)
 			},
 			disconnectEntityAtField: (fieldName, initializeReplacement) => {
 				// this.entityOperations.disconnectEntityAtField(entityRealm, fieldName, initializeReplacement)

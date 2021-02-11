@@ -1,5 +1,5 @@
 import { CrudQueryBuilder } from '@contember/client'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFieldMarkers,
 	FieldMarker,
@@ -107,11 +107,10 @@ export class QueryGenerator {
 
 	public static registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): ReadBuilder {
 		builder = builder.column(PRIMARY_KEY_NAME)
-		builder = builder.column(TYPENAME_KEY_NAME)
 
 		for (const [, fieldValue] of fields) {
 			if (fieldValue instanceof FieldMarker) {
-				if (fieldValue.fieldName !== PRIMARY_KEY_NAME && fieldValue.fieldName !== TYPENAME_KEY_NAME) {
+				if (fieldValue.fieldName !== PRIMARY_KEY_NAME) {
 					builder = builder.column(fieldValue.fieldName)
 				}
 			} else if (fieldValue instanceof HasOneRelationMarker) {

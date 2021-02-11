@@ -3,7 +3,7 @@ import { BindingOperations, EntityAccessor, EntityListAccessor, ErrorAccessor, F
 import { EntityFieldPersistedData, RuntimeId, ServerGeneratedUuid, UnpersistedEntityDummyId } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker, Marker, SubTreeMarker } from '../markers'
-import { FieldName, Scalar } from '../treeParameters'
+import { EntityName, FieldName, Scalar } from '../treeParameters'
 import { assertNever } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
@@ -62,6 +62,7 @@ export class StateInitializer {
 					parent: undefined,
 					placeholderName: tree.placeholderName,
 				},
+				tree.entityName,
 				persistedEntityIds,
 			)
 		} else {
@@ -74,7 +75,7 @@ export class StateInitializer {
 				parent: undefined,
 				placeholderName: tree.placeholderName,
 			}
-			subTreeState = this.materializeEntityRealm(this.initializeEntityRealm(id, blueprint))
+			subTreeState = this.materializeEntityRealm(this.initializeEntityRealm(id, tree.entityName, blueprint))
 		}
 		this.treeStore.subTreeStates.set(tree.placeholderName, subTreeState)
 
@@ -83,13 +84,14 @@ export class StateInitializer {
 
 	public initializeEntityRealm(
 		id: RuntimeId,
+		entityName: EntityName,
 		blueprint: EntityRealmBlueprint,
 	): EntityRealmState | EntityRealmStateStub {
 		// This is counter-intuitive a bit. The method can also return an EntityRealmState, not just a stub.
 		// The reason is so that each call-site can just default to trying to initialize a stub without having to keep
 		// in mind that the realm might have already been initialized.
 
-		const entity = this.initializeEntityState(id)
+		const entity = this.initializeEntityState(id, entityName)
 		const realmKey = RealmKeyGenerator.getRealmKey(id, blueprint)
 
 		const existing = this.treeStore.entityRealmStore.get(realmKey)
@@ -161,14 +163,16 @@ export class StateInitializer {
 				return () => {
 					if (entityRealm.hasStaleAccessor || accessor === undefined) {
 						entityRealm.hasStaleAccessor = false
+						const entity = entityRealm.entity
 						accessor = new EntityAccessor(
-							entityRealm.entity.id,
+							entity.id,
 							entityRealm.realmKey,
+							entity.entityName,
 
 							// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
 							// keep in sync two copies of the same data. TS hides the extra info anyway.
 							entityRealm.children,
-							this.treeStore.persistedEntityData.get(entityRealm.entity.id.value),
+							this.treeStore.persistedEntityData.get(entity.id.value),
 							entityRealm.errors,
 							entityRealm.blueprint.environment,
 							entityRealm.addError,
@@ -176,7 +180,7 @@ export class StateInitializer {
 							entityRealm.batchUpdates,
 							entityRealm.connectEntityAtField,
 							entityRealm.disconnectEntityAtField,
-							entityRealm.entity.deleteEntity,
+							entity.deleteEntity,
 						)
 					}
 					return accessor
@@ -202,7 +206,7 @@ export class StateInitializer {
 		return entityRealm
 	}
 
-	private initializeEntityState(id: RuntimeId): EntityState {
+	private initializeEntityState(id: RuntimeId, entityName: EntityName): EntityState {
 		const entityId = id.value
 
 		const existing = this.treeStore.entityStore.get(entityId)
@@ -211,6 +215,7 @@ export class StateInitializer {
 		}
 
 		const entityState: EntityState = {
+			entityName,
 			hasIdSetInStone: false,
 			id,
 			isScheduledForDeletion: false,
@@ -226,7 +231,11 @@ export class StateInitializer {
 		return entityState
 	}
 
-	private initializeEntityListState(blueprint: EntityListBlueprint, persistedEntityIds: Set<string>): EntityListState {
+	private initializeEntityListState(
+		blueprint: EntityListBlueprint,
+		entityName: EntityName,
+		persistedEntityIds: Set<string>,
+	): EntityListState {
 		const entityListState: EntityListState = {
 			type: StateType.EntityList,
 			blueprint,
@@ -234,6 +243,7 @@ export class StateInitializer {
 			addEventListener: undefined as any,
 			children: new Map(),
 			childrenWithPendingUpdates: undefined,
+			entityName,
 			eventListeners: TreeParameterMerger.cloneEntityListEventListeners(
 				blueprint.initialEventListeners?.eventListeners,
 			),
@@ -388,9 +398,10 @@ export class StateInitializer {
 			)
 		} else if (fieldDatum instanceof ServerGeneratedUuid || fieldDatum === null || fieldDatum === undefined) {
 			const entityId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityDummyId()
+
 			entityRealm.children.set(
 				field.placeholderName,
-				this.initializeEntityRealm(entityId, {
+				this.initializeEntityRealm(entityId, this.getRelationTargetEntityName(entityRealm, field), {
 					creationParameters: field.relation,
 					environment: field.environment,
 					initialEventListeners: field.relation,
@@ -426,6 +437,7 @@ export class StateInitializer {
 						environment: field.environment,
 						creationParameters: field.relation,
 					},
+					this.getRelationTargetEntityName(entityRealm, field),
 					fieldDatum || new Set(),
 				),
 			)
@@ -442,6 +454,20 @@ export class StateInitializer {
 					`Perhaps you meant to use a variant of <Field />?`,
 			)
 		}
+	}
+
+	private getRelationTargetEntityName(
+		entityRealm: EntityRealmState,
+		field: HasOneRelationMarker | HasManyRelationMarker,
+	): EntityName {
+		const targetField = this.treeStore.schema.entities
+			.get(entityRealm.entity.entityName)
+			?.fields?.get(field.relation.field)
+		if (targetField?.__typename !== '_Relation') {
+			// This should have been validated elsewhere.
+			throw new BindingError()
+		}
+		return targetField.targetEntity
 	}
 
 	public initializeEntityField(
@@ -488,7 +514,11 @@ export class StateInitializer {
 		entityListState: EntityListState,
 		entityId: RuntimeId,
 	): EntityRealmState | EntityRealmStateStub {
-		const listEntity = this.initializeEntityRealm(entityId, this.createListEntityBlueprint(entityListState, entityId))
+		const listEntity = this.initializeEntityRealm(
+			entityId,
+			entityListState.entityName,
+			this.createListEntityBlueprint(entityListState, entityId),
+		)
 		entityListState.hasStaleAccessor = true
 		entityListState.children.set(entityId.value, listEntity)
 

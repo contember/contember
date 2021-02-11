@@ -224,7 +224,11 @@ export class EntityOperations {
 						}
 						parent.plannedHasOneDeletions.set(placeholderName, deletedRealm)
 					}
-					this.stateInitializer.initializeEntityRealm(new UnpersistedEntityDummyId(), deletedRealm.blueprint)
+					this.stateInitializer.initializeEntityRealm(
+						new UnpersistedEntityDummyId(),
+						state.entityName,
+						deletedRealm.blueprint,
+					)
 
 					this.eventManager.registerUpdatedConnection(parent, placeholderName)
 				} else if (parent.type === StateType.EntityList) {

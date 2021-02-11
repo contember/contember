@@ -6,7 +6,7 @@ import {
 	useEntityListSubTreeParameters,
 	useGetEntityListSubTree,
 } from '../accessorPropagation'
-import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
@@ -72,7 +72,6 @@ export const EntityListSubTree = Component(
 		staticRender: props => (
 			<EntityList {...props} accessor={0 as any}>
 				<Field field={PRIMARY_KEY_NAME} />
-				<Field field={TYPENAME_KEY_NAME} />
 				{props.children}
 			</EntityList>
 		),

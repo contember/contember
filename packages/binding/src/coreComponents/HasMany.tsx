@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useEntityList } from '../accessorPropagation'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeEntityList } from '../treeParameters'
@@ -40,7 +40,6 @@ export const HasMany = Component(
 		staticRender: props => (
 			<EntityList {...props} accessor={undefined as any}>
 				<Field field={PRIMARY_KEY_NAME} />
-				<Field field={TYPENAME_KEY_NAME} />
 				{props.children}
 			</EntityList>
 		),

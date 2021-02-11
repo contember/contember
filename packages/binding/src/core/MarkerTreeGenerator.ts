@@ -11,7 +11,7 @@ import {
 	SubTreeMarker,
 } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
-import { Alias } from '../treeParameters/primitives'
+import { Alias } from '../treeParameters'
 import { MarkerMerger } from './MarkerMerger'
 
 type Fragment = EntityFieldMarkersContainer

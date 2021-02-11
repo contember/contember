@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useEntity } from '../accessorPropagation'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredRelativeSingleEntity } from '../treeParameters'
@@ -35,7 +35,6 @@ export const HasOne = Component(
 		staticRender: props => (
 			<Entity {...props} accessor={undefined as any}>
 				<Field field={PRIMARY_KEY_NAME} />
-				<Field field={TYPENAME_KEY_NAME} />
 				{props.children}
 			</Entity>
 		),

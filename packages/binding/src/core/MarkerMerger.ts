@@ -1,5 +1,5 @@
 import { BindingError } from '../BindingError'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkers,
@@ -210,18 +210,11 @@ export class MarkerMerger {
 
 	public static mergeInSystemFields(original: EntityFieldMarkersContainer): EntityFieldMarkersContainer {
 		const primaryKey = new FieldMarker(PRIMARY_KEY_NAME, undefined, true)
-		const typeName = new FieldMarker(TYPENAME_KEY_NAME, undefined, true)
 		// We could potentially share this instance for all fields. Maybe sometime later.
 		const freshFields = new EntityFieldMarkersContainer(
 			false,
-			new Map([
-				[primaryKey.placeholderName, primaryKey],
-				[typeName.placeholderName, typeName],
-			]),
-			new Map([
-				[PRIMARY_KEY_NAME, primaryKey.placeholderName],
-				[TYPENAME_KEY_NAME, typeName.placeholderName],
-			]),
+			new Map([[primaryKey.placeholderName, primaryKey]]),
+			new Map([[PRIMARY_KEY_NAME, primaryKey.placeholderName]]),
 		)
 		return this.mergeEntityFieldsContainers(original, freshFields)
 	}

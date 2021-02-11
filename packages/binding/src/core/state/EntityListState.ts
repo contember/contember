@@ -5,11 +5,11 @@ import {
 	EntityCreationParameters,
 	EntityListEventListeners,
 	EntityListPreferences,
+	EntityName,
 	PlaceholderName,
 	RemovalType,
 } from '../../treeParameters'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
-import { EntityState } from './EntityState'
 import { StateType } from './StateType'
 
 export interface EntityListBlueprint {
@@ -27,6 +27,7 @@ export interface EntityListState {
 	blueprint: EntityListBlueprint
 	children: Map<string, EntityRealmState | EntityRealmStateStub>
 	childrenWithPendingUpdates: Set<EntityRealmState> | undefined
+	entityName: EntityName
 	errors: ErrorAccessor | undefined
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:

@@ -3,7 +3,7 @@ import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { useAccessorUpdateSubscription, useEntitySubTreeParameters, useGetEntitySubTree } from '../accessorPropagation'
 import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
-import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory, QueryLanguage } from '../queryLanguage'
 import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
@@ -68,7 +68,6 @@ export const EntitySubTree = Component(
 			<>
 				<Entity {...props} accessor={0 as any}>
 					<Field field={PRIMARY_KEY_NAME} />
-					<Field field={TYPENAME_KEY_NAME} />
 					{props.children}
 				</Entity>
 				{props.isCreating && 'orderField' in props && (

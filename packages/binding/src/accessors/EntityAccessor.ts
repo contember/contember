@@ -1,6 +1,5 @@
-import { ClientGeneratedUuid, RuntimeId, ServerGeneratedUuid, SingleEntityPersistedData } from '../accessorTree'
+import { RuntimeId, ServerGeneratedUuid, SingleEntityPersistedData } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { TYPENAME_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
@@ -8,6 +7,7 @@ import {
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
 	DesugaredRelativeSingleField,
+	EntityName,
 	FieldName,
 	FieldValue,
 	RelativeEntityList,
@@ -29,6 +29,7 @@ class EntityAccessor implements Errorable {
 	public constructor(
 		private readonly runtimeId: RuntimeId,
 		public readonly key: string,
+		public readonly name: EntityName,
 		private readonly fieldData: EntityAccessor.FieldData,
 		private readonly dataFromServer: SingleEntityPersistedData | undefined,
 		public readonly errors: ErrorAccessor | undefined,
@@ -54,10 +55,6 @@ class EntityAccessor implements Errorable {
 
 	public get existsOnServer(): boolean {
 		return this.runtimeId.existsOnServer
-	}
-
-	public get typeName(): string | undefined {
-		return this.getField<string>(TYPENAME_KEY_NAME).value ?? undefined
 	}
 
 	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs) {
@@ -184,6 +181,14 @@ class EntityAccessor implements Errorable {
 			`EntityAccessor.getKeyConnectedOnServer: the placeholder '${placeholderName}' refers to a scalar field, not a` +
 				`has-one relation. This method is meant exclusively for has-one relations.`,
 		)
+	}
+
+	/**
+	 * @deprecated
+	 * @see EntityAccessor.name
+	 */
+	public get typeName() {
+		return this.name
 	}
 }
 

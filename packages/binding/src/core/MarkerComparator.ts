@@ -1,4 +1,3 @@
-import { BindingError } from '../BindingError'
 import {
 	EntityFieldMarkersContainer,
 	FieldMarker,
@@ -7,15 +6,7 @@ import {
 	SubTreeMarker,
 } from '../markers'
 import { assertNever } from '../utils'
-
-export class MarkerComparisonError extends BindingError {
-	public constructor(
-		message: string,
-		public readonly stackPath: Array<FieldMarker | HasOneRelationMarker | HasManyRelationMarker>,
-	) {
-		super(message)
-	}
-}
+import { LocalizedBindingError } from './exceptions'
 
 export class MarkerComparator {
 	public static assertEntityMarkersSubsetOf(
@@ -35,24 +26,27 @@ export class MarkerComparator {
 
 			if (fromSuperset === undefined) {
 				if (candidateMarker instanceof FieldMarker) {
-					throw new MarkerComparisonError(`The field '${candidateMarker.fieldName}' is missing.`, [candidateMarker])
+					throw new LocalizedBindingError(`The field '${candidateMarker.fieldName}' is missing.`, [candidateMarker])
 				}
 				if (candidateMarker instanceof HasOneRelationMarker || candidateMarker instanceof HasManyRelationMarker) {
 					const differentPlaceholders = superset.placeholders.get(candidateMarker.relation.field)
 
 					if (differentPlaceholders === undefined) {
-						throw new MarkerComparisonError(`The relation '${candidateMarker.relation.field}' is missing.`, [
+						throw new LocalizedBindingError(`The relation '${candidateMarker.relation.field}' is missing.`, [
 							candidateMarker,
 						])
 					}
 					// TODO be more specific
-					throw new MarkerComparisonError(
+					throw new LocalizedBindingError(
 						`The relation '${candidateMarker.relation.field}' exists but its parameters don't match exactly. ` +
 							`Check that all relation parameters are the same.`,
 						[candidateMarker],
 					)
 				}
 				assertNever(candidateMarker)
+			}
+			if (candidateMarker instanceof FieldMarker) {
+				continue
 			}
 			try {
 				if (
@@ -62,8 +56,8 @@ export class MarkerComparator {
 					this.assertSubsetOf(candidateMarker.fields, fromSuperset.fields)
 				}
 			} catch (e) {
-				if (e instanceof MarkerComparisonError) {
-					throw new MarkerComparisonError(e.message, [...e.stackPath, candidateMarker])
+				if (e instanceof LocalizedBindingError) {
+					throw e.nestedIn(candidateMarker)
 				}
 				throw e
 			}

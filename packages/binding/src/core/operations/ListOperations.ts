@@ -2,7 +2,8 @@ import { BindingOperations, EntityAccessor, EntityListAccessor } from '../../acc
 import { UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EventManager } from '../EventManager'
-import { MarkerComparator, MarkerComparisonError } from '../MarkerComparator'
+import { ErrorLocator, LocalizedBindingError, MarkerSugarer } from '../exceptions'
+import { MarkerComparator } from '../MarkerComparator'
 import { RealmKeyGenerator } from '../RealmKeyGenerator'
 import { EntityListState, StateIterator, StateType } from '../state'
 import { StateInitializer } from '../StateInitializer'
@@ -41,11 +42,13 @@ export class ListOperations {
 						state.blueprint.markersContainer,
 					)
 				} catch (error) {
-					if (error instanceof MarkerComparisonError) {
+					if (error instanceof LocalizedBindingError) {
 						throw new BindingError(
-							`EntityListAccessor: cannot connect entity with key '${entityToConnect.key}' because its fields ` +
+							`Entity list: cannot connect entity with key '${entityToConnect.key}' because its fields ` +
 								` are incompatible with entities found on this list. Make sure both trees are equivalent.\n` +
-								`${error.message}`,
+								`${error.message}\n` +
+								`Incompatibility found at: ${ErrorLocator.locateMarkerPath(error.markerPath)}.\n`,
+							// `Entity list located at: ${}.\n`,
 						)
 					}
 					throw error

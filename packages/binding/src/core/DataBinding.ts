@@ -325,6 +325,7 @@ export class DataBinding {
 		schemaPromise.then(schema => {
 			DataBinding.schemaLoadCache.set(this.client.apiUrl, schema)
 		})
+		DataBinding.schemaLoadCache.set(this.client.apiUrl, schemaPromise)
 		return schemaPromise
 	}
 }

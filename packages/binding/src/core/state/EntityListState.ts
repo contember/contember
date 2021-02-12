@@ -1,25 +1,18 @@
 import { EntityListAccessor, ErrorAccessor } from '../../accessors'
-import { Environment } from '../../dao'
-import { EntityFieldMarkersContainer } from '../../markers'
-import {
-	EntityCreationParameters,
-	EntityListEventListeners,
-	EntityListPreferences,
-	EntityName,
-	PlaceholderName,
-	RemovalType,
-} from '../../treeParameters'
+import { EntityListSubTreeMarker, HasManyRelationMarker } from '../../markers'
+import { EntityName, RemovalType } from '../../treeParameters'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import { StateType } from './StateType'
 
-export interface EntityListBlueprint {
-	creationParameters: EntityCreationParameters & EntityListPreferences
-	environment: Environment
-	initialEventListeners: EntityListEventListeners | undefined
-	markersContainer: EntityFieldMarkersContainer
-	parent: EntityRealmState | undefined // Undefined if we're at the top-level.
-	placeholderName: PlaceholderName
-}
+export type EntityListBlueprint =
+	| {
+			marker: HasManyRelationMarker
+			parent: EntityRealmState
+	  }
+	| {
+			marker: EntityListSubTreeMarker
+			parent: undefined
+	  }
 
 export interface EntityListState {
 	type: StateType.EntityList

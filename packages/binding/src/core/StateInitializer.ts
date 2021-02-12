@@ -61,14 +61,7 @@ export class StateInitializer {
 		if (tree instanceof EntityListSubTreeMarker) {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
 			subTreeState = this.initializeEntityListState(
-				{
-					creationParameters: tree.parameters,
-					environment: tree.environment,
-					initialEventListeners: tree.parameters,
-					markersContainer: tree.fields,
-					parent: undefined,
-					placeholderName: tree.placeholderName,
-				},
+				{ marker: tree, parent: undefined },
 				tree.entityName,
 				persistedEntityIds,
 			)
@@ -251,9 +244,7 @@ export class StateInitializer {
 			children: new Map(),
 			childrenWithPendingUpdates: undefined,
 			entityName,
-			eventListeners: TreeParameterMerger.cloneEntityListEventListeners(
-				blueprint.initialEventListeners?.eventListeners,
-			),
+			eventListeners: TreeParameterMerger.cloneEntityListEventListeners(blueprint.marker.parameters.eventListeners),
 			errors: undefined,
 			plannedRemovals: undefined,
 			hasStaleAccessor: true,
@@ -268,7 +259,7 @@ export class StateInitializer {
 							entityListState.persistedEntityIds,
 							this.bindingOperations,
 							entityListState.errors,
-							entityListState.blueprint.environment,
+							entityListState.blueprint.marker.environment,
 							entityListState.addError,
 							entityListState.addEventListener,
 							entityListState.batchUpdates,
@@ -303,7 +294,7 @@ export class StateInitializer {
 
 		const initialData: Set<string | undefined> =
 			persistedEntityIds.size === 0
-				? new Set(Array.from({ length: blueprint.creationParameters.initialEntityCount }))
+				? new Set(Array.from({ length: blueprint.marker.parameters.initialEntityCount }))
 				: persistedEntityIds
 		for (const entityId of initialData) {
 			const id = entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityDummyId()
@@ -437,12 +428,8 @@ export class StateInitializer {
 				field.placeholderName,
 				this.initializeEntityListState(
 					{
-						markersContainer: field.fields,
-						initialEventListeners: field.parameters,
+						marker: field,
 						parent: entityRealm,
-						placeholderName: field.placeholderName,
-						environment: field.environment,
-						creationParameters: field.parameters,
 					},
 					this.getRelationTargetEntityName(entityRealm, field),
 					fieldDatum || new Set(),
@@ -536,11 +523,12 @@ export class StateInitializer {
 		parent: EntityListState,
 		id: UnpersistedEntityDummyId | ServerGeneratedUuid,
 	): EntityRealmBlueprint {
+		const parentMarker = parent.blueprint.marker
 		return {
-			creationParameters: parent.blueprint.creationParameters,
-			environment: parent.blueprint.environment,
+			creationParameters: parentMarker.parameters,
+			environment: parentMarker.environment,
 			initialEventListeners: this.eventManager.getEventListenersForListEntity(parent),
-			markersContainer: parent.blueprint.markersContainer,
+			markersContainer: parentMarker.fields,
 			parent: parent,
 			placeholderName: id.value,
 		}

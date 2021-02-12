@@ -37,7 +37,7 @@ export class ListOperations {
 
 				try {
 					MarkerComparator.assertEntityMarkersSubsetOf(
-						state.blueprint.markersContainer,
+						state.blueprint.marker.fields,
 						stateToConnect.blueprint.markersContainer,
 					)
 				} catch (error) {

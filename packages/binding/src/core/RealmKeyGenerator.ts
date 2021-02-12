@@ -39,7 +39,7 @@ export class RealmKeyGenerator {
 	}
 
 	public static getListEntityRealmKey(id: RuntimeId | string, blueprint: EntityListBlueprint): EntityRealmKey {
-		return this.generateKey(typeof id === 'string' ? id : id.value, blueprint.markersContainer)
+		return this.generateKey(typeof id === 'string' ? id : id.value, blueprint.marker.fields)
 	}
 
 	public static getRealmKey(id: RuntimeId, blueprint: EntityRealmBlueprint): EntityRealmKey {

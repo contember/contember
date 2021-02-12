@@ -28,7 +28,7 @@ export class StateIterator {
 					return
 				}
 				closestEntityRealm = candidate
-				placeholderName = state.blueprint.placeholderName
+				placeholderName = state.blueprint.marker.placeholderName
 				break
 			}
 			default:

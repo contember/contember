@@ -1,4 +1,4 @@
-import { HasManyRelationMarker, HasOneRelationMarker } from '../../markers'
+import { EntityListSubTreeMarker, HasManyRelationMarker, HasOneRelationMarker } from '../../markers'
 import { assertNever } from '../../utils'
 import { StateNode, StateType } from '../state'
 import { MarkerSugarer } from './MarkerSugarer'
@@ -39,15 +39,21 @@ export class ErrorLocator {
 					return assertNever(parent)
 				}
 				case StateType.EntityList: {
-					const parent = state.blueprint.parent
-					if (parent === undefined) {
+					const blueprint = state.blueprint
+
+					if (blueprint.parent === undefined) {
 						// TODO get the filter
-						return [TreeParameterSugarer.sugarRootEntityList(state.entityName, undefined)]
+						return [
+							TreeParameterSugarer.sugarRootEntityList(
+								state.entityName,
+								blueprint.marker.parameters.isCreating ? undefined : blueprint.marker.parameters.filter,
+							),
+						]
 					}
-					const hasMany = parent.blueprint.markersContainer.markers.get(
-						state.blueprint.placeholderName,
+					const hasMany = blueprint.parent.blueprint.markersContainer.markers.get(
+						state.blueprint.marker.placeholderName,
 					) as HasManyRelationMarker
-					return [...stateToPath(parent), MarkerSugarer.sugarHasManyRelationMarker(hasMany)]
+					return [...stateToPath(blueprint.parent), MarkerSugarer.sugarHasManyRelationMarker(hasMany)]
 				}
 			}
 		}

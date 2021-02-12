@@ -4,7 +4,6 @@ import { RelationFetcher } from '../RelationFetcher'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
 import { PredicateFactory } from '../../../acl'
 import { WhereBuilder } from '../WhereBuilder'
-import { ObjectNode } from '../../../inputProcessing'
 import { JoiningColumns } from '../../types'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
@@ -62,11 +61,14 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			sourceColumn: joiningTable.inverseJoiningColumn,
 			targetColumn: joiningTable.joiningColumn,
 		}
-
+		const field = this.executionContext.objectNode
+		if (!field) {
+			throw new Error()
+		}
 		this.executionContext.addData(entity.primary, async ids =>
 			this.relationFetcher.fetchManyHasManyGroups(
 				this.mapper,
-				this.executionContext.field as ObjectNode,
+				field,
 				targetEntity,
 				relation,
 				targetRelation,
@@ -86,19 +88,15 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			sourceColumn: joiningTable.joiningColumn,
 			targetColumn: joiningTable.inverseJoiningColumn,
 		}
+		const field = this.executionContext.objectNode
+		if (!field) {
+			throw new Error()
+		}
 
 		this.executionContext.addData(
 			entity.primary,
 			async ids =>
-				this.relationFetcher.fetchManyHasManyGroups(
-					this.mapper,
-					this.executionContext.field as ObjectNode,
-					targetEntity,
-					relation,
-					relation,
-					columns,
-					ids,
-				),
+				this.relationFetcher.fetchManyHasManyGroups(this.mapper, field, targetEntity, relation, relation, columns, ids),
 			[],
 		)
 	}
@@ -109,17 +107,15 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		targetEntity: Model.Entity,
 		targetRelation: Model.ManyHasOneRelation,
 	): void {
+		const field = this.executionContext.objectNode
+		if (!field) {
+			throw new Error()
+		}
+
 		this.executionContext.addData(
 			entity.primary,
 			async ids =>
-				this.relationFetcher.fetchOneHasManyGroups(
-					this.mapper,
-					this.executionContext.field as ObjectNode,
-					targetEntity,
-					relation,
-					targetRelation,
-					ids,
-				),
+				this.relationFetcher.fetchOneHasManyGroups(this.mapper, field, targetEntity, relation, targetRelation, ids),
 			[],
 		)
 	}
@@ -140,11 +136,14 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 						},
 					},
 				}
-				const objectNode = this.executionContext.field as ObjectNode
-				const where: Input.Where = {
-					and: [idsWhere, objectNode.args.filter].filter((it): it is Input.Where => it !== undefined),
+				const field = this.executionContext.objectNode
+				if (!field) {
+					throw new Error()
 				}
-				const objectWithWhere = objectNode.withArg('filter', where)
+				const where: Input.Where = {
+					and: [idsWhere, field.args.filter].filter((it): it is Input.Where => it !== undefined),
+				}
+				const objectWithWhere = field.withArg('filter', where)
 
 				return this.mapper.select(targetEntity, objectWithWhere, targetRelation.name)
 			},
@@ -166,7 +165,10 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 						in: ids,
 					},
 				}
-				const objectNode = this.executionContext.field as ObjectNode
+				const objectNode = this.executionContext.objectNode
+				if (!objectNode) {
+					throw new Error()
+				}
 				const where: Input.Where = {
 					and: [idsWhere, objectNode.args.filter].filter((it): it is Input.Where => it !== undefined),
 				}
@@ -187,7 +189,10 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 						in: ids,
 					},
 				}
-				const objectNode = this.executionContext.field as ObjectNode
+				const objectNode = this.executionContext.objectNode
+				if (!objectNode) {
+					throw new Error()
+				}
 				const where: Input.Where = {
 					and: [idsWhere, objectNode.args.filter].filter((it): it is Input.Where => it !== undefined),
 				}

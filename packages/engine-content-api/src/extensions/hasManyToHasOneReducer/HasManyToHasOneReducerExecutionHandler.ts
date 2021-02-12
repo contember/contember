@@ -3,20 +3,22 @@ import { isIt } from '../../utils'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper'
 import { ImplementationException } from '../../exception'
-import { ObjectNode, UniqueWhereExpander } from '../../inputProcessing'
+import { UniqueWhereExpander } from '../../inputProcessing'
+import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
 
-export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<{}> {
+export class HasManyToHasOneReducerExecutionHandler
+	implements SelectExecutionHandler<Input.UniqueQueryInput, HasManyToHasOneReducerExtension> {
 	constructor(private readonly schema: Model.Schema, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
-	process(context: SelectExecutionHandlerContext): void {
-		const { addData, entity, field } = context
-		const objectNode = field as ObjectNode
-
+	process(context: SelectExecutionHandlerContext<Input.UniqueQueryInput, HasManyToHasOneReducerExtension>): void {
+		const { addData, entity, objectNode } = context
+		if (!objectNode) {
+			throw new Error()
+		}
 		addData(
 			entity.primary,
 			async (ids: Input.PrimaryValue[]) => {
 				const [targetEntity, targetRelation] = this.getRelationTarget(entity, objectNode.extensions.relationName)
-
 				const uniqueWhere = this.uniqueWhereExpander.expand(targetEntity, {
 					...objectNode.args.by,
 					[targetRelation.name]: { [entity.primary]: ids },

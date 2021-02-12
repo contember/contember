@@ -1,7 +1,6 @@
 import { TreeFilter } from '@contember/client'
 import { SubTreeMarkerParameters } from '../markers'
-import { Alias } from '../treeParameters/primitives'
-import { EntityAccessor } from './EntityAccessor'
+import { Alias } from '../treeParameters'
 import { ExtendTree } from './ExtendTree'
 import { GetEntityByKey } from './GetEntityByKey'
 import { GetEntityListSubTree } from './GetEntityListSubTree'

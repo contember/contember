@@ -5,7 +5,7 @@ import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import { Scalar } from '../../treeParameters'
 import { EventManager } from '../EventManager'
-import { FieldState, StateIterator, StateType } from '../state'
+import { FieldState, StateIterator } from '../state'
 import { TreeStore } from '../TreeStore'
 
 export class FieldOperations {

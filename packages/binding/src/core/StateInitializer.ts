@@ -10,7 +10,7 @@ import {
 	HasOneRelationMarker,
 	Marker,
 } from '../markers'
-import { EntityName, FieldName, Scalar } from '../treeParameters'
+import { EntityName, FieldName, Scalar, SingleEntityEventListeners } from '../treeParameters'
 import { assertNever } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
@@ -21,10 +21,12 @@ import {
 	EntityListBlueprint,
 	EntityListState,
 	EntityRealmBlueprint,
+	EntityRealmKey,
 	EntityRealmState,
 	EntityRealmStateStub,
 	EntityState,
 	FieldState,
+	getEntityMarker,
 	RootStateNode,
 	StateType,
 } from './state'
@@ -66,16 +68,17 @@ export class StateInitializer {
 				persistedEntityIds,
 			)
 		} else {
-			const id = persistedRootData instanceof ServerGeneratedUuid ? persistedRootData : new UnpersistedEntityDummyId()
-			const blueprint: EntityRealmBlueprint = {
-				creationParameters: tree.parameters,
-				environment: tree.environment,
-				initialEventListeners: tree.parameters,
-				markersContainer: tree.fields,
-				parent: undefined,
-				placeholderName: tree.placeholderName,
-			}
-			subTreeState = this.materializeEntityRealm(this.initializeEntityRealm(id, tree.entityName, blueprint))
+			subTreeState = this.materializeEntityRealm(
+				this.initializeEntityRealm(
+					persistedRootData instanceof ServerGeneratedUuid ? persistedRootData : new UnpersistedEntityDummyId(),
+					tree.entityName,
+					{
+						type: 'subTree',
+						marker: tree,
+						parent: undefined,
+					},
+				),
+			)
 		}
 		this.treeStore.subTreeStates.set(tree.placeholderName, subTreeState)
 
@@ -107,9 +110,7 @@ export class StateInitializer {
 			realmKey,
 			getAccessor: () => this.materializeEntityRealm(stub).getAccessor(),
 		}
-		this.treeStore.entityRealmStore.set(realmKey, stub)
-		blueprint.parent?.children.set(blueprint.placeholderName, stub)
-		entity.realms.set(realmKey, stub)
+		this.registerEntityRealm(stub)
 
 		return stub
 	}
@@ -135,9 +136,7 @@ export class StateInitializer {
 			children: new Map(),
 			childrenWithPendingUpdates: undefined,
 			errors: undefined,
-			eventListeners: TreeParameterMerger.cloneSingleEntityEventListeners(
-				blueprint.initialEventListeners?.eventListeners,
-			),
+			eventListeners: this.initializeEntityEventListeners(blueprint),
 			fieldsWithPendingConnectionUpdates: undefined,
 			hasStaleAccessor: true,
 			plannedHasOneDeletions: undefined,
@@ -174,7 +173,7 @@ export class StateInitializer {
 							entityRealm.children,
 							this.treeStore.persistedEntityData.get(entity.id.value),
 							entityRealm.errors,
-							entityRealm.blueprint.environment,
+							getEntityMarker(entityRealm).environment,
 							entityRealm.addError,
 							entityRealm.addEventListener,
 							entityRealm.batchUpdates,
@@ -188,22 +187,37 @@ export class StateInitializer {
 			})(),
 		}
 
-		this.treeStore.entityRealmStore.set(realmKey, entityRealm)
-		blueprint.parent?.children.set(blueprint.placeholderName, entityRealm)
-		entity.realms.set(realmKey, entityRealm)
+		this.registerEntityRealm(entityRealm)
 
 		// if (blueprint.creationParameters.forceCreation && !entity.id.existsOnServer) {
 		// 	entityRealm.unpersistedChangesCount += 1
 		// }
 
 		const persistedData = this.treeStore.persistedEntityData.get(entity.id.value)
-		for (const [placeholderName, field] of blueprint.markersContainer.markers) {
+		const markers =
+			blueprint.type === 'listEntity'
+				? blueprint.parent.blueprint.marker.fields.markers
+				: blueprint.marker.fields.markers
+		for (const [placeholderName, field] of markers) {
 			this.initializeEntityField(entityRealm, field, persistedData?.get(placeholderName))
 		}
 
 		this.eventManager.registerNewlyInitialized(entityRealm)
 
 		return entityRealm
+	}
+
+	private registerEntityRealm(entityRealm: EntityRealmState | EntityRealmStateStub) {
+		const { realmKey, blueprint, entity } = entityRealm
+
+		this.treeStore.entityRealmStore.set(entityRealm.realmKey, entityRealm)
+
+		if (blueprint.type === 'listEntity') {
+			blueprint.parent.children.set(blueprint.id.value, entityRealm)
+		} else if (blueprint.type === 'hasOne') {
+			blueprint.parent.children.set(blueprint.marker.placeholderName, entityRealm)
+		}
+		entity.realms.set(realmKey, entityRealm)
 	}
 
 	private initializeEntityState(id: RuntimeId, entityName: EntityName): EntityState {
@@ -400,12 +414,9 @@ export class StateInitializer {
 			entityRealm.children.set(
 				field.placeholderName,
 				this.initializeEntityRealm(entityId, this.getRelationTargetEntityName(entityRealm, field), {
-					creationParameters: field.parameters,
-					environment: field.environment,
-					initialEventListeners: field.parameters,
-					markersContainer: field.fields,
+					type: 'hasOne',
 					parent: entityRealm,
-					placeholderName: field.placeholderName,
+					marker: field,
 				}),
 			)
 		} else {
@@ -508,29 +519,19 @@ export class StateInitializer {
 		entityListState: EntityListState,
 		entityId: RuntimeId,
 	): EntityRealmState | EntityRealmStateStub {
-		const listEntity = this.initializeEntityRealm(
-			entityId,
-			entityListState.entityName,
-			this.createListEntityBlueprint(entityListState, entityId),
-		)
-		entityListState.hasStaleAccessor = true
-		entityListState.children.set(entityId.value, listEntity)
-
-		return listEntity
+		return this.initializeEntityRealm(entityId, entityListState.entityName, {
+			type: 'listEntity',
+			parent: entityListState,
+			id: entityId,
+		})
 	}
 
-	public createListEntityBlueprint(
-		parent: EntityListState,
-		id: UnpersistedEntityDummyId | ServerGeneratedUuid,
-	): EntityRealmBlueprint {
-		const parentMarker = parent.blueprint.marker
-		return {
-			creationParameters: parentMarker.parameters,
-			environment: parentMarker.environment,
-			initialEventListeners: this.eventManager.getEventListenersForListEntity(parent),
-			markersContainer: parentMarker.fields,
-			parent: parent,
-			placeholderName: id.value,
+	private initializeEntityEventListeners(
+		blueprint: EntityRealmBlueprint,
+	): SingleEntityEventListeners['eventListeners'] {
+		if (blueprint.type === 'listEntity') {
+			return this.eventManager.getEventListenersForListEntity(blueprint.parent)
 		}
+		return TreeParameterMerger.cloneSingleEntityEventListeners(blueprint.marker.parameters.eventListeners)
 	}
 }

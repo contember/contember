@@ -3,7 +3,7 @@ import { ExecutionError, MutationDataResponse, ValidationError } from '../access
 import { BindingError } from '../BindingError'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { EventManager } from './EventManager'
-import { EntityListState, EntityRealmState, StateNode, StateType } from './state'
+import { EntityListState, EntityRealmState, getEntityMarker, StateNode, StateType } from './state'
 import { TreeStore } from './TreeStore'
 
 export class AccessorErrorManager {
@@ -128,7 +128,8 @@ export class AccessorErrorManager {
 			}
 			// Deliberately letting flow get here as well. Leaf errors *CAN* refer to relations as well.
 
-			const placeholders = state.blueprint.markersContainer.placeholders.get(childKey)
+			const fields = getEntityMarker(state).fields
+			const placeholders = fields.placeholders.get(childKey)
 			if (placeholders === undefined) {
 				continue
 			}

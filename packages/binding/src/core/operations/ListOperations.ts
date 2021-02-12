@@ -4,7 +4,7 @@ import { BindingError } from '../../BindingError'
 import { EventManager } from '../EventManager'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
 import { MarkerComparator } from '../MarkerComparator'
-import { EntityListState, StateIterator, StateType } from '../state'
+import { EntityListState, getEntityMarker, StateIterator, StateType } from '../state'
 import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
 import { EntityOperations } from './EntityOperations'
@@ -38,7 +38,7 @@ export class ListOperations {
 				try {
 					MarkerComparator.assertEntityMarkersSubsetOf(
 						state.blueprint.marker.fields,
-						stateToConnect.blueprint.markersContainer,
+						getEntityMarker(stateToConnect).fields,
 					)
 				} catch (error) {
 					if (error instanceof LocalizedBindingError) {

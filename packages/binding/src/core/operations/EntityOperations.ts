@@ -1,9 +1,10 @@
 import { BindingOperations, EntityAccessor } from '../../accessors'
 import { UnpersistedEntityDummyId } from '../../accessorTree'
+import { BindingError } from '../../BindingError'
 import { FieldName } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import { EventManager } from '../EventManager'
-import { EntityRealmState, EntityState, StateType } from '../state'
+import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, StateType } from '../state'
 import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
 
@@ -193,14 +194,20 @@ export class EntityOperations {
 			state.isScheduledForDeletion = true
 
 			for (const [, deletedRealm] of state.realms) {
-				const parent = deletedRealm.blueprint.parent
-				if (parent === undefined) {
-					// TODO handle top-level entities better
-					continue
-				}
+				let parent: EntityRealmState | EntityRealmStateStub | EntityListState
+				if (deletedRealm.blueprint.type === 'listEntity') {
+					parent = deletedRealm.blueprint.parent
+					parent.children.delete(state.id.value)
 
-				if (parent.type === StateType.EntityRealm) {
-					const placeholderName = deletedRealm.blueprint.placeholderName
+					if (state.id.existsOnServer) {
+						if (parent.plannedRemovals === undefined) {
+							parent.plannedRemovals = new Map()
+						}
+						parent.plannedRemovals.set(deletedRealm, 'delete')
+					}
+				} else if (deletedRealm.blueprint.type === 'hasOne') {
+					parent = deletedRealm.blueprint.parent
+					const placeholderName = deletedRealm.blueprint.marker.placeholderName
 
 					if (state.id.existsOnServer) {
 						if (parent.plannedHasOneDeletions === undefined) {
@@ -215,17 +222,10 @@ export class EntityOperations {
 					)
 
 					this.eventManager.registerUpdatedConnection(parent, placeholderName)
-				} else if (parent.type === StateType.EntityList) {
-					parent.children.delete(state.id.value)
-
-					if (state.id.existsOnServer) {
-						if (parent.plannedRemovals === undefined) {
-							parent.plannedRemovals = new Map()
-						}
-						parent.plannedRemovals.set(deletedRealm, 'delete')
-					}
+				} else if (deletedRealm.blueprint.type === 'subTree') {
+					throw new BindingError('Deleting top-level entities is not yet implemented.')
 				} else {
-					assertNever(parent)
+					return assertNever(deletedRealm.blueprint)
 				}
 
 				let changesDelta = 0

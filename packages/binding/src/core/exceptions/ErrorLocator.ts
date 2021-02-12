@@ -1,4 +1,3 @@
-import { EntityListSubTreeMarker, HasManyRelationMarker, HasOneRelationMarker } from '../../markers'
 import { assertNever } from '../../utils'
 import { StateNode, StateType } from '../state'
 import { MarkerSugarer } from './MarkerSugarer'
@@ -22,27 +21,27 @@ export class ErrorLocator {
 				case StateType.Field:
 					return [...stateToPath(state.parent), TreeParameterSugarer.sugarField(state.fieldMarker.fieldName)]
 				case StateType.EntityRealm: {
-					const parent = state.blueprint.parent
-					if (parent === undefined) {
-						// TODO get the where
-						return [TreeParameterSugarer.sugarRootEntity(state.entity.entityName, undefined)]
+					const blueprint = state.blueprint
+					if (blueprint.type === 'subTree') {
+						return [
+							TreeParameterSugarer.sugarRootEntity(
+								state.entity.entityName,
+								blueprint.marker.parameters.isCreating ? undefined : blueprint.marker.parameters.where,
+							),
+						]
 					}
-					if (parent.type === StateType.EntityList) {
-						return [...stateToPath(parent)]
+					if (blueprint.type === 'listEntity') {
+						return [...stateToPath(blueprint.parent)]
 					}
-					if (parent.type === StateType.EntityRealm) {
-						const hasOne = parent.blueprint.markersContainer.markers.get(
-							state.blueprint.placeholderName,
-						) as HasOneRelationMarker
-						return [...stateToPath(parent), MarkerSugarer.sugarHasOneRelationMarker(hasOne)]
+					if (blueprint.type === 'hasOne') {
+						return [...stateToPath(blueprint.parent), MarkerSugarer.sugarHasOneRelationMarker(blueprint.marker)]
 					}
-					return assertNever(parent)
+					return assertNever(blueprint)
 				}
 				case StateType.EntityList: {
 					const blueprint = state.blueprint
 
 					if (blueprint.parent === undefined) {
-						// TODO get the filter
 						return [
 							TreeParameterSugarer.sugarRootEntityList(
 								state.entityName,
@@ -50,9 +49,7 @@ export class ErrorLocator {
 							),
 						]
 					}
-					const hasMany = blueprint.parent.blueprint.markersContainer.markers.get(
-						state.blueprint.marker.placeholderName,
-					) as HasManyRelationMarker
+					const hasMany = blueprint.marker
 					return [...stateToPath(blueprint.parent), MarkerSugarer.sugarHasManyRelationMarker(hasMany)]
 				}
 			}

@@ -3,19 +3,12 @@ import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	EntitySubTreeMarker,
-	EntityListSubTreeMarker,
 } from '../markers'
-import {
-	QualifiedEntityList,
-	QualifiedSingleEntity,
-	UnconstrainedQualifiedEntityList,
-	UnconstrainedQualifiedSingleEntity,
-	UniqueWhere,
-} from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import { QueryGenerator } from './QueryGenerator'
@@ -23,8 +16,8 @@ import {
 	EntityListState,
 	EntityRealmState,
 	EntityRealmStateStub,
-	EntityState,
 	FieldState,
+	getEntityMarker,
 	RootStateNode,
 	StateType,
 } from './state'
@@ -158,7 +151,7 @@ export class MutationGenerator {
 				return builder
 					.data(builder => this.registerUpdateMutationPart(processedEntities, entityRealm, builder))
 					.by({ [PRIMARY_KEY_NAME]: runtimeId.value })
-					.node(builder => QueryGenerator.registerQueryPart(entityRealm.blueprint.markersContainer.markers, builder))
+					.node(builder => QueryGenerator.registerQueryPart(getEntityMarker(entityRealm).fields.markers, builder))
 					.ok()
 					.validation()
 					.errors()
@@ -195,7 +188,7 @@ export class MutationGenerator {
 
 				return builder
 					.data(writeBuilder)
-					.node(builder => QueryGenerator.registerQueryPart(entityRealm.blueprint.markersContainer.markers, builder))
+					.node(builder => QueryGenerator.registerQueryPart(getEntityMarker(entityRealm).fields.markers, builder))
 					.ok()
 					.validation()
 					.errors()
@@ -229,7 +222,7 @@ export class MutationGenerator {
 			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
 		> = []
 
-		for (const [placeholderName, marker] of currentState.blueprint.markersContainer.markers) {
+		for (const [placeholderName, marker] of getEntityMarker(currentState).fields.markers) {
 			if (
 				placeholderName === TYPENAME_KEY_NAME ||
 				(placeholderName === PRIMARY_KEY_NAME && !(currentState.entity.id instanceof ClientGeneratedUuid))
@@ -297,7 +290,7 @@ export class MutationGenerator {
 
 		if (
 			(builder.data !== undefined && !isEmptyObject(builder.data)) ||
-			!currentState.blueprint.markersContainer.hasAtLeastOneBearingField
+			!getEntityMarker(currentState).fields.hasAtLeastOneBearingField
 		) {
 			for (const field of nonbearingFields) {
 				switch (field.type) {
@@ -319,7 +312,7 @@ export class MutationGenerator {
 			}
 		}
 
-		const setOnCreate = currentState.blueprint.creationParameters.setOnCreate
+		const setOnCreate = getEntityMarker(currentState).parameters.setOnCreate
 		if (setOnCreate && builder.data !== undefined && !isEmptyObject(builder.data)) {
 			for (const key in setOnCreate) {
 				const field = setOnCreate[key]
@@ -411,7 +404,7 @@ export class MutationGenerator {
 		}
 		processedEntities.add(currentState)
 
-		for (const [placeholderName, marker] of currentState.blueprint.markersContainer.markers) {
+		for (const [placeholderName, marker] of getEntityMarker(currentState).fields.markers) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}

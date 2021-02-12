@@ -16,6 +16,7 @@ import { DirtinessTracker } from './DirtinessTracker'
 import {
 	EntityListState,
 	EntityRealmState,
+	getEntityMarker,
 	RootStateNode,
 	StateINode,
 	StateIterator,
@@ -139,7 +140,8 @@ export class EventManager {
 			parentState.fieldsWithPendingConnectionUpdates = new Set()
 		}
 
-		placeholders: for (const [fieldName, placeholdersByField] of parentState.blueprint.markersContainer.placeholders) {
+		const marker = getEntityMarker(parentState)
+		placeholders: for (const [fieldName, placeholdersByField] of marker.fields.placeholders) {
 			if (typeof placeholdersByField === 'string') {
 				if (placeholdersByField === placeholderName) {
 					parentState.fieldsWithPendingConnectionUpdates.add(fieldName)
@@ -458,7 +460,7 @@ export class EventManager {
 	public getEventListenersForListEntity(
 		containingListState: EntityListState,
 		additionalMarker?: HasManyRelationMarker,
-	): SingleEntityEventListeners {
+	): SingleEntityEventListeners['eventListeners'] {
 		const create = (base: {
 			eventListeners: EntityListEventListeners['eventListeners']
 		}): SingleEntityEventListeners['eventListeners'] => ({
@@ -478,8 +480,6 @@ export class EventManager {
 				create(additionalMarker.parameters),
 			)
 		}
-		return {
-			eventListeners,
-		}
+		return eventListeners
 	}
 }

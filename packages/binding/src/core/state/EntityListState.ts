@@ -6,12 +6,12 @@ import { StateType } from './StateType'
 
 export type EntityListBlueprint =
 	| {
-			marker: HasManyRelationMarker
-			parent: EntityRealmState
+			readonly marker: HasManyRelationMarker
+			readonly parent: EntityRealmState
 	  }
 	| {
-			marker: EntityListSubTreeMarker
-			parent: undefined
+			readonly marker: EntityListSubTreeMarker
+			readonly parent: undefined
 	  }
 
 export interface EntityListState {

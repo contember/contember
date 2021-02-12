@@ -1,7 +1,7 @@
 import { EntityAccessor, ErrorAccessor } from '../../accessors'
-import { Environment } from '../../dao'
-import { EntityFieldMarkersContainer } from '../../markers'
-import { EntityCreationParameters, FieldName, PlaceholderName, SingleEntityEventListeners } from '../../treeParameters'
+import { RuntimeId } from '../../accessorTree'
+import { EntitySubTreeMarker, HasOneRelationMarker } from '../../markers'
+import { FieldName, PlaceholderName, SingleEntityEventListeners } from '../../treeParameters'
 import { EntityListState } from './EntityListState'
 import { EntityState } from './EntityState'
 import { StateNode } from './StateNode'
@@ -14,14 +14,22 @@ export type EntityRealmKey = string
 
 export type EntityRealmParent = EntityRealmState | EntityListState | undefined
 
-export interface EntityRealmBlueprint {
-	readonly creationParameters: EntityCreationParameters
-	readonly environment: Environment
-	readonly initialEventListeners: SingleEntityEventListeners | undefined
-	readonly markersContainer: EntityFieldMarkersContainer
-	readonly parent: EntityRealmParent
-	readonly placeholderName: PlaceholderName
-}
+export type EntityRealmBlueprint =
+	| {
+			readonly type: 'hasOne'
+			readonly marker: HasOneRelationMarker
+			readonly parent: EntityRealmState
+	  }
+	| {
+			readonly type: 'listEntity'
+			readonly parent: EntityListState
+			readonly id: RuntimeId
+	  }
+	| {
+			readonly type: 'subTree'
+			readonly marker: EntitySubTreeMarker
+			readonly parent: undefined
+	  }
 
 export interface EntityRealmStateStub {
 	readonly type: StateType.EntityRealmStub

@@ -5,7 +5,7 @@ import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import { Scalar } from '../../treeParameters'
 import { EventManager } from '../EventManager'
-import { FieldState, StateIterator } from '../state'
+import { FieldState, getEntityMarker, StateIterator } from '../state'
 import { TreeStore } from '../TreeStore'
 
 export class FieldOperations {
@@ -65,7 +65,7 @@ export class FieldOperations {
 				field.hasUnpersistedChanges = hasUnpersistedChangesNow
 
 				const shouldInfluenceUpdateCount =
-					!parent.blueprint.markersContainer.hasAtLeastOneBearingField ||
+					!getEntityMarker(parent).fields.hasAtLeastOneBearingField ||
 					!field.fieldMarker.isNonbearing ||
 					field.persistedValue !== undefined
 

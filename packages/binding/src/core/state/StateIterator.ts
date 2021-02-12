@@ -1,6 +1,7 @@
 import { PlaceholderName } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
+import { getEntityMarker } from './getEntityMarker'
 import { StateINode, StateNode } from './StateNode'
 import { StateType } from './StateType'
 
@@ -17,8 +18,9 @@ export class StateIterator {
 				break
 			}
 			case StateType.EntityRealm: {
+				// TODO this is probably wrong
 				closestEntityRealm = state
-				placeholderName = state.blueprint.placeholderName
+				placeholderName = getEntityMarker(state).placeholderName
 				break
 			}
 			case StateType.EntityList: {
@@ -36,7 +38,8 @@ export class StateIterator {
 		}
 		for (let [realmKey, realm] of closestEntityRealm.entity.realms) {
 			if (realm.type === StateType.EntityRealmStub) {
-				if (realm.blueprint.markersContainer.placeholders.has(placeholderName)) {
+				const marker = getEntityMarker(realm)
+				if (marker.fields.placeholders.has(placeholderName)) {
 					realm.getAccessor()
 					realm = closestEntityRealm.entity.realms.get(realmKey) as EntityRealmState
 				} else {

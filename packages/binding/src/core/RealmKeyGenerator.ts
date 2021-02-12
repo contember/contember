@@ -6,6 +6,7 @@ import {
 	EntityRealmKey,
 	EntityRealmState,
 	EntityRealmStateStub,
+	getEntityMarker,
 } from './state'
 
 const GLUE = '--'
@@ -31,11 +32,11 @@ export class RealmKeyGenerator {
 	}
 
 	public static getRealmStateKey(realm: EntityRealmState): EntityRealmKey {
-		return this.generateKey(realm.entity.id.value, realm.blueprint.markersContainer)
+		return this.generateKey(realm.entity.id.value, getEntityMarker(realm).fields)
 	}
 
 	public static getRealmStubKey(stub: EntityRealmStateStub): EntityRealmKey {
-		return this.generateKey(stub.entity.id.value, stub.blueprint.markersContainer)
+		return this.generateKey(stub.entity.id.value, getEntityMarker(stub).fields)
 	}
 
 	public static getListEntityRealmKey(id: RuntimeId | string, blueprint: EntityListBlueprint): EntityRealmKey {
@@ -43,6 +44,9 @@ export class RealmKeyGenerator {
 	}
 
 	public static getRealmKey(id: RuntimeId, blueprint: EntityRealmBlueprint): EntityRealmKey {
-		return this.generateKey(id.value, blueprint.markersContainer)
+		return this.generateKey(
+			id.value,
+			blueprint.type === 'listEntity' ? blueprint.parent.blueprint.marker.fields : blueprint.marker.fields,
+		)
 	}
 }

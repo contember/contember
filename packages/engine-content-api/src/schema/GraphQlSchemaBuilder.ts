@@ -1,4 +1,4 @@
-import { GraphQLFieldConfigMap, GraphQLSchema } from 'graphql'
+import { GraphQLFieldConfig, GraphQLSchema } from 'graphql'
 import { Model } from '@contember/schema'
 import { MutationProvider } from './MutationProvider'
 import { QueryProvider } from './QueryProvider'
@@ -18,16 +18,38 @@ export class GraphQlSchemaBuilder {
 	) {}
 
 	public build(): GraphQLSchema {
-		const mutations = {
-			...Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((mutations, entityName) => {
-				return {
-					...this.mutationProvider.getMutations(entityName),
-					...mutations,
-				}
-			}, {}),
+		const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>()
+		const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>()
+		for (const entity of Object.values(this.schema.entities)) {
+			const queryFields = this.queryProvider.getQueries(entity)
+			for (const name in queryFields) {
+				queries.set(name, queryFields[name])
+			}
+			const validationFields = this.validationQueriesProvider.getQueries(entity)
+			for (const name in validationFields) {
+				queries.set(name, validationFields[name])
+			}
+			const mutationFields = this.mutationProvider.getMutations(entity)
+			for (const name in mutationFields) {
+				mutations.set(name, mutationFields[name])
+			}
 		}
-		if (Object.keys(mutations).length > 0) {
-			mutations.transaction = {
+
+		if (queries.size > 0) {
+			queries.set('transaction', {
+				type: this.graphqlObjectFactories.createObjectType({
+					name: 'QueryTransaction',
+					fields: Object.fromEntries(queries),
+				}),
+				resolve: async (parent, args, context: Context, info) => {
+					return context.timer(`GraphQL.query.${info.fieldName}`, () =>
+						context.executionContainer.readResolver.resolveTransaction(info),
+					)
+				},
+			})
+		}
+		if (mutations.size > 0) {
+			mutations.set('transaction', {
 				type: this.graphqlObjectFactories.createNotNull(
 					this.graphqlObjectFactories.createObjectType({
 						name: 'MutationTransaction',
@@ -38,7 +60,7 @@ export class GraphQlSchemaBuilder {
 							validation: {
 								type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
 							},
-							...mutations,
+							...Object.fromEntries(mutations),
 						},
 					}),
 				),
@@ -47,31 +69,9 @@ export class GraphQlSchemaBuilder {
 						context.executionContainer.mutationResolver.resolveTransaction(info),
 					)
 				},
-			}
+			})
 		}
-
-		const queries = Object.keys(this.schema.entities).reduce<GraphQLFieldConfigMap<any, any>>((queries, entityName) => {
-			return {
-				...this.queryProvider.getQueries(entityName),
-				...this.validationQueriesProvider.getQueries(entityName),
-				...queries,
-			}
-		}, {})
-		if (Object.keys(queries).length > 0) {
-			queries.transaction = {
-				type: this.graphqlObjectFactories.createObjectType({
-					name: 'QueryTransaction',
-					fields: { ...queries },
-				}),
-				resolve: async (parent, args, context: Context, info) => {
-					return context.timer(`GraphQL.query.${info.fieldName}`, () =>
-						context.executionContainer.readResolver.resolveTransaction(info),
-					)
-				},
-			}
-		}
-
-		queries['_info'] = {
+		queries.set('_info', {
 			type: this.graphqlObjectFactories.createObjectType({
 				name: 'Info',
 				fields: () => ({
@@ -81,18 +81,18 @@ export class GraphQlSchemaBuilder {
 			resolve: () => ({
 				description: 'TODO',
 			}),
-		}
+		})
 
 		return this.graphqlObjectFactories.createSchema({
 			query: this.graphqlObjectFactories.createObjectType({
 				name: 'Query',
-				fields: () => queries,
+				fields: () => Object.fromEntries(queries),
 			}),
-			...(Object.keys(mutations).length > 0
+			...(mutations.size > 0
 				? {
 						mutation: this.graphqlObjectFactories.createObjectType({
 							name: 'Mutation',
-							fields: () => mutations,
+							fields: () => Object.fromEntries(mutations),
 						}),
 				  }
 				: {}),

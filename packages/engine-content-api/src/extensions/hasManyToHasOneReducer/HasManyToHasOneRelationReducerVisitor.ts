@@ -9,11 +9,10 @@ import {
 } from '../../schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { Authorizator } from '../../acl'
-import { Accessor } from '../../utils'
-import { HasManyToHasOneReducer, HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
-import { EntityFieldsProvider, FieldMap } from '../EntityFieldsProvider'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { getFieldsForUniqueWhere } from '../../utils'
+import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
+import { FieldMap } from '../EntityFieldsProvider'
+import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export class HasManyToHasOneRelationReducerFieldVisitor
 	implements
@@ -22,7 +21,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
-		private readonly entityTypeProviderAccessor: Accessor<EntityTypeProvider>,
+		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
@@ -90,7 +89,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor
 					},
 				})
 
-				const entityType = this.entityTypeProviderAccessor.get().getEntity(targetEntity.name)
+				const entityType = this.entityTypeProvider.getEntity(targetEntity.name)
 
 				return {
 					...fields,

@@ -1,40 +1,17 @@
 type Query {
-  getPost(by: PostUniqueWhere!, filter: PostWhere): Post
-  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
-  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
-  validateCreatePost(data: PostCreateInput!): _ValidationResult!
-  validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
   getPostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
   listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
+  getPost(by: PostUniqueWhere!, filter: PostWhere): Post
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
+  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
   transaction: QueryTransaction
   _info: Info
 }
-
-type Post {
-  _meta: PostMeta
-  id: UUID!
-  publishedAt: DateTime
-  locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
-  localesByLocale(by: PostLocalesByLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
-}
-
-type PostMeta {
-  id: FieldMeta
-  publishedAt: FieldMeta
-  locales: FieldMeta
-}
-
-type FieldMeta {
-  readable: Boolean
-  updatable: Boolean
-}
-
-scalar UUID
-
-scalar DateTime
 
 type PostLocale {
   _meta: PostLocaleMeta
@@ -51,13 +28,37 @@ type PostLocaleMeta {
   post: FieldMeta
 }
 
-input PostWhere {
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+type Post {
+  _meta: PostMeta
+  id: UUID!
+  publishedAt: DateTime
+  locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
+  localesByLocale(by: PostLocalesByLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
+}
+
+type PostMeta {
+  id: FieldMeta
+  publishedAt: FieldMeta
+  locales: FieldMeta
+}
+
+scalar DateTime
+
+input PostLocaleWhere {
   id: UUIDCondition
-  publishedAt: DateTimeCondition
-  locales: PostLocaleWhere
-  and: [PostWhere]
-  or: [PostWhere]
-  not: PostWhere
+  locale: StringCondition
+  title: StringCondition
+  post: PostWhere
+  and: [PostLocaleWhere]
+  or: [PostLocaleWhere]
+  not: PostLocaleWhere
 }
 
 input UUIDCondition {
@@ -74,32 +75,6 @@ input UUIDCondition {
   lte: UUID
   gt: UUID
   gte: UUID
-}
-
-input DateTimeCondition {
-  and: [DateTimeCondition!]
-  or: [DateTimeCondition!]
-  not: DateTimeCondition
-  eq: DateTime
-  null: Boolean
-  isNull: Boolean
-  notEq: DateTime
-  in: [DateTime!]
-  notIn: [DateTime!]
-  lt: DateTime
-  lte: DateTime
-  gt: DateTime
-  gte: DateTime
-}
-
-input PostLocaleWhere {
-  id: UUIDCondition
-  locale: StringCondition
-  title: StringCondition
-  post: PostWhere
-  and: [PostLocaleWhere]
-  or: [PostLocaleWhere]
-  not: PostLocaleWhere
 }
 
 input StringCondition {
@@ -122,6 +97,31 @@ input StringCondition {
   containsCI: String
   startsWithCI: String
   endsWithCI: String
+}
+
+input PostWhere {
+  id: UUIDCondition
+  publishedAt: DateTimeCondition
+  locales: PostLocaleWhere
+  and: [PostWhere]
+  or: [PostWhere]
+  not: PostWhere
+}
+
+input DateTimeCondition {
+  and: [DateTimeCondition!]
+  or: [DateTimeCondition!]
+  not: DateTimeCondition
+  eq: DateTime
+  null: Boolean
+  isNull: Boolean
+  notEq: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
 }
 
 input PostLocaleOrderBy {
@@ -149,28 +149,28 @@ input PostLocalesByLocaleUniqueWhere {
   locale: String
 }
 
-input PostUniqueWhere {
-  id: UUID
-  locales: PostLocaleUniqueWhere
-}
-
 input PostLocaleUniqueWhere {
   id: UUID
   locale: String
   post: PostUniqueWhere
 }
 
-type PostConnection {
+input PostUniqueWhere {
+  id: UUID
+  locales: PostLocaleUniqueWhere
+}
+
+type PostLocaleConnection {
   pageInfo: PageInfo!
-  edges: [PostEdge!]!
+  edges: [PostLocaleEdge!]!
 }
 
 type PageInfo {
   totalCount: Int!
 }
 
-type PostEdge {
-  node: Post!
+type PostLocaleEdge {
+  node: PostLocale!
 }
 
 type _ValidationResult {
@@ -196,6 +196,58 @@ type _IndexPathFragment {
 
 type _ValidationMessage {
   text: String!
+}
+
+input PostLocaleCreateInput {
+  locale: String
+  title: String
+  post: PostLocaleCreatePostEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input PostLocaleCreatePostEntityRelationInput {
+  connect: PostUniqueWhere
+  create: PostWithoutLocalesCreateInput
+}
+
+input PostWithoutLocalesCreateInput {
+  publishedAt: DateTime
+  _dummy_field_: Boolean
+}
+
+input PostLocaleUpdateInput {
+  locale: String
+  title: String
+  post: PostLocaleUpdatePostEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input PostLocaleUpdatePostEntityRelationInput {
+  create: PostWithoutLocalesCreateInput
+  update: PostWithoutLocalesUpdateInput
+  upsert: PostLocaleUpsertPostRelationInput
+  connect: PostUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input PostWithoutLocalesUpdateInput {
+  publishedAt: DateTime
+  _dummy_field_: Boolean
+}
+
+input PostLocaleUpsertPostRelationInput {
+  update: PostWithoutLocalesUpdateInput
+  create: PostWithoutLocalesCreateInput
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge!]!
+}
+
+type PostEdge {
+  node: Post!
 }
 
 input PostCreateInput {
@@ -249,69 +301,17 @@ input PostUpsertLocalesRelationInput {
   create: PostLocaleWithoutPostCreateInput
 }
 
-type PostLocaleConnection {
-  pageInfo: PageInfo!
-  edges: [PostLocaleEdge!]!
-}
-
-type PostLocaleEdge {
-  node: PostLocale!
-}
-
-input PostLocaleCreateInput {
-  locale: String
-  title: String
-  post: PostLocaleCreatePostEntityRelationInput
-  _dummy_field_: Boolean
-}
-
-input PostLocaleCreatePostEntityRelationInput {
-  connect: PostUniqueWhere
-  create: PostWithoutLocalesCreateInput
-}
-
-input PostWithoutLocalesCreateInput {
-  publishedAt: DateTime
-  _dummy_field_: Boolean
-}
-
-input PostLocaleUpdateInput {
-  locale: String
-  title: String
-  post: PostLocaleUpdatePostEntityRelationInput
-  _dummy_field_: Boolean
-}
-
-input PostLocaleUpdatePostEntityRelationInput {
-  create: PostWithoutLocalesCreateInput
-  update: PostWithoutLocalesUpdateInput
-  upsert: PostLocaleUpsertPostRelationInput
-  connect: PostUniqueWhere
-  disconnect: Boolean
-  delete: Boolean
-}
-
-input PostWithoutLocalesUpdateInput {
-  publishedAt: DateTime
-  _dummy_field_: Boolean
-}
-
-input PostLocaleUpsertPostRelationInput {
-  update: PostWithoutLocalesUpdateInput
-  create: PostWithoutLocalesCreateInput
-}
-
 type QueryTransaction {
-  getPost(by: PostUniqueWhere!, filter: PostWhere): Post
-  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
-  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
-  validateCreatePost(data: PostCreateInput!): _ValidationResult!
-  validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
   getPostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
   listPostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   paginatePostLocale(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
   validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
   validateUpdatePostLocale(by: PostLocaleUniqueWhere!, data: PostLocaleUpdateInput!): _ValidationResult!
+  getPost(by: PostUniqueWhere!, filter: PostWhere): Post
+  listPost(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
+  paginatePost(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateUpdatePost(by: PostUniqueWhere!, data: PostUpdateInput!): _ValidationResult!
 }
 
 type Info {
@@ -319,20 +319,20 @@ type Info {
 }
 
 type Mutation {
-  createPost(data: PostCreateInput!): PostCreateResult!
-  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
-  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  createPost(data: PostCreateInput!): PostCreateResult!
+  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
   transaction: MutationTransaction!
 }
 
-type PostCreateResult {
+type PostLocaleCreateResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
-  node: Post
+  node: PostLocale
   validation: _ValidationResult!
 }
 
@@ -353,29 +353,6 @@ enum _MutationErrorType {
   SqlError
 }
 
-type PostDeleteResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  node: Post
-}
-
-type PostUpdateResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  node: Post
-  validation: _ValidationResult!
-}
-
-type PostLocaleCreateResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  node: PostLocale
-  validation: _ValidationResult!
-}
-
 type PostLocaleDeleteResult {
   ok: Boolean!
   errorMessage: String
@@ -391,15 +368,38 @@ type PostLocaleUpdateResult {
   validation: _ValidationResult!
 }
 
+type PostCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Post
+  validation: _ValidationResult!
+}
+
+type PostDeleteResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Post
+}
+
+type PostUpdateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Post
+  validation: _ValidationResult!
+}
+
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
-  createPost(data: PostCreateInput!): PostCreateResult!
-  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
-  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  createPost(data: PostCreateInput!): PostCreateResult!
+  deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
+  updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
 }

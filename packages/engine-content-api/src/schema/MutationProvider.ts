@@ -1,6 +1,5 @@
 import { GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
-import { getEntity } from '@contember/schema-utils'
 import { Context } from '../types'
 import { EntityTypeProvider } from './EntityTypeProvider'
 import { WhereTypeProvider } from './WhereTypeProvider'
@@ -16,7 +15,6 @@ type FieldConfig<TArgs> = GraphQLFieldConfig<any, Context, TArgs>
 
 export class MutationProvider {
 	constructor(
-		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
@@ -26,17 +24,18 @@ export class MutationProvider {
 		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
-	public getMutations(entityName: string): { [fieldName: string]: FieldConfig<any> } {
+	public getMutations(entity: Model.Entity): { [fieldName: string]: FieldConfig<any> } {
+		const entityName = entity.name
 		const mutations: { [fieldName: string]: FieldConfig<any> | undefined } = {}
-		mutations[`create${entityName}`] = this.getCreateMutation(entityName)
-		mutations[`delete${entityName}`] = this.getDeleteMutation(entityName)
-		mutations[`update${entityName}`] = this.getUpdateMutation(entityName)
+		mutations[`create${entityName}`] = this.getCreateMutation(entity)
+		mutations[`delete${entityName}`] = this.getDeleteMutation(entity)
+		mutations[`update${entityName}`] = this.getUpdateMutation(entity)
 
 		return filterObject(mutations, (key, value): value is FieldConfig<any> => value !== undefined)
 	}
 
-	private getCreateMutation(entityName: string): FieldConfig<Input.CreateInput> | undefined {
-		const entity = getEntity(this.schema, entityName)
+	private getCreateMutation(entity: Model.Entity): FieldConfig<Input.CreateInput> | undefined {
+		const entityName = entity.name
 		const dataType = this.createEntityInputProvider.getInput(entityName)
 		if (dataType === undefined) {
 			return undefined
@@ -59,11 +58,11 @@ export class MutationProvider {
 		}
 	}
 
-	private getDeleteMutation(entityName: string): FieldConfig<Input.DeleteInput> | undefined {
+	private getDeleteMutation(entity: Model.Entity): FieldConfig<Input.DeleteInput> | undefined {
+		const entityName = entity.name
 		if (!this.authorizator.isAllowed(Acl.Operation.delete, entityName)) {
 			return undefined
 		}
-		const entity = getEntity(this.schema, entityName)
 		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
 		if (!uniqueWhere) {
 			return undefined
@@ -90,8 +89,8 @@ export class MutationProvider {
 		}
 	}
 
-	public getUpdateMutation(entityName: string): FieldConfig<Input.UpdateInput> | undefined {
-		const entity = getEntity(this.schema, entityName)
+	public getUpdateMutation(entity: Model.Entity): FieldConfig<Input.UpdateInput> | undefined {
+		const entityName = entity.name
 		const dataType = this.updateEntityInputProvider.getInput(entityName)
 		if (dataType === undefined) {
 			return undefined

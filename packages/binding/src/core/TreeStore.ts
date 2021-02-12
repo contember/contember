@@ -1,11 +1,26 @@
 import { NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { MarkerTreeRoot, PlaceholderGenerator, SubTreeMarkerParameters } from '../markers'
-import { Alias } from '../treeParameters'
+import { Environment } from '../dao'
+import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
+import { QueryLanguage } from '../queryLanguage'
+import {
+	Alias,
+	SugaredQualifiedEntityList,
+	SugaredQualifiedSingleEntity,
+	SugaredUnconstrainedQualifiedEntityList,
+	SugaredUnconstrainedQualifiedSingleEntity,
+} from '../treeParameters'
 import { MarkerMerger } from './MarkerMerger'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { Schema } from './schema'
-import { EntityRealmKey, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
+import {
+	EntityListState,
+	EntityRealmKey,
+	EntityRealmState,
+	EntityRealmStateStub,
+	EntityState,
+	RootStateNode,
+} from './state'
 
 export class TreeStore {
 	// TODO deletes and disconnects cause memory leaks here as they don't traverse the tree to remove nested states.
@@ -16,10 +31,7 @@ export class TreeStore {
 	public readonly entityRealmStore: Map<EntityRealmKey, EntityRealmState | EntityRealmStateStub> = new Map()
 	public readonly subTreeStates: Map<string, RootStateNode> = new Map()
 
-	private _schema: Schema = {
-		entities: new Map(),
-		enums: new Map(),
-	}
+	private _schema: Schema | undefined
 
 	private _markerTree: MarkerTreeRoot = new MarkerTreeRoot(new Map(), new Map())
 	private persistedData: NormalizedQueryResponseData = new NormalizedQueryResponseData(new Map(), new Map())
@@ -29,7 +41,10 @@ export class TreeStore {
 	}
 
 	public updateSchema(newSchema: Schema) {
-		this._schema = newSchema
+		// TODO
+		if (this._schema === undefined) {
+			this._schema = newSchema
+		}
 	}
 
 	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: ReceivedDataTree) {
@@ -49,11 +64,33 @@ export class TreeStore {
 		return this.persistedData.subTreeDataStore
 	}
 
-	public get schema() {
+	public get schema(): Schema {
+		if (this._schema === undefined) {
+			throw new BindingError(`Fatal error: failed to load api schema.`)
+		}
 		return this._schema
 	}
 
-	public getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): RootStateNode {
+	public getSubTreeState(
+		mode: 'entity',
+		aliasOrParameters: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,
+		environment: Environment,
+	): EntityRealmState
+	public getSubTreeState(
+		mode: 'entityList',
+		aliasOrParameters: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList,
+		environment: Environment,
+	): EntityListState
+	public getSubTreeState(
+		mode: 'entity' | 'entityList',
+		aliasOrParameters:
+			| Alias
+			| SugaredQualifiedSingleEntity
+			| SugaredUnconstrainedQualifiedSingleEntity
+			| SugaredQualifiedEntityList
+			| SugaredUnconstrainedQualifiedEntityList,
+		environment: Environment,
+	): RootStateNode {
 		let placeholderName: string
 
 		if (typeof aliasOrParameters === 'string') {
@@ -63,8 +100,26 @@ export class TreeStore {
 				throw new BindingError(`Undefined sub-tree alias '${aliasOrParameters}'.`)
 			}
 			placeholderName = placeholderByAlias
+		} else if (mode === 'entityList') {
+			placeholderName = PlaceholderGenerator.getEntityListSubTreePlaceholder(
+				aliasOrParameters.isCreating
+					? QueryLanguage.desugarUnconstrainedQualifiedEntityList(
+							aliasOrParameters as SugaredUnconstrainedQualifiedEntityList,
+							environment,
+					  )
+					: QueryLanguage.desugarQualifiedEntityList(aliasOrParameters as SugaredQualifiedEntityList, environment),
+			)
+		} else if (mode === 'entity') {
+			placeholderName = PlaceholderGenerator.getEntitySubTreePlaceholder(
+				aliasOrParameters.isCreating
+					? QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(
+							aliasOrParameters as SugaredUnconstrainedQualifiedSingleEntity,
+							environment,
+					  )
+					: QueryLanguage.desugarQualifiedSingleEntity(aliasOrParameters as SugaredQualifiedSingleEntity, environment),
+			)
 		} else {
-			placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters)
+			throw new BindingError()
 		}
 		const subTreeState = this.subTreeStates.get(placeholderName)
 

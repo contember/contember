@@ -4,11 +4,12 @@ import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkersContainer,
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
-	SubTreeMarker,
 } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
 import { Alias } from '../treeParameters'
@@ -16,7 +17,12 @@ import { MarkerMerger } from './MarkerMerger'
 
 type Fragment = EntityFieldMarkersContainer
 type Terminals = FieldMarker | Fragment
-type Nonterminals = SubTreeMarker | HasOneRelationMarker | HasManyRelationMarker | Fragment
+type Nonterminals =
+	| EntitySubTreeMarker
+	| EntityListSubTreeMarker
+	| HasOneRelationMarker
+	| HasManyRelationMarker
+	| Fragment
 
 type NodeResult = Terminals | Nonterminals
 
@@ -27,7 +33,7 @@ export class MarkerTreeGenerator {
 
 	public generate(): MarkerTreeRoot {
 		const processed = MarkerTreeGenerator.childrenAnalyzer.processChildren(this.sourceTree, this.environment)
-		const subTreeMap: Map<string, SubTreeMarker> = new Map()
+		const subTreeMap: Map<string, EntitySubTreeMarker | EntityListSubTreeMarker> = new Map()
 
 		if (processed.length === 0) {
 			throw new BindingError('Empty data tree discovered. Try adding some fields…')
@@ -35,11 +41,21 @@ export class MarkerTreeGenerator {
 
 		// TODO allow Fragment from here as well as handle it correctly from reportInvalidTopLevelError
 		for (const marker of processed) {
-			if (marker instanceof SubTreeMarker) {
+			if (marker instanceof EntityListSubTreeMarker) {
 				const presentSubTree = subTreeMap.get(marker.placeholderName)
 				subTreeMap.set(
 					marker.placeholderName,
-					presentSubTree === undefined ? marker : MarkerMerger.mergeSubTreeMarkers(presentSubTree, marker),
+					presentSubTree === undefined
+						? marker
+						: MarkerMerger.mergeEntityListSubTreeMarkers(presentSubTree as EntityListSubTreeMarker, marker),
+				)
+			} else if (marker instanceof EntitySubTreeMarker) {
+				const presentSubTree = subTreeMap.get(marker.placeholderName)
+				subTreeMap.set(
+					marker.placeholderName,
+					presentSubTree === undefined
+						? marker
+						: MarkerMerger.mergeEntitySubTreeMarkers(presentSubTree as EntitySubTreeMarker, marker),
 				)
 			} else {
 				this.reportInvalidTopLevelError(marker)
@@ -52,8 +68,10 @@ export class MarkerTreeGenerator {
 		return new MarkerTreeRoot(hoistedSubTreeMap, placeholdersByAliases)
 	}
 
-	private hoistDeepSubTrees(subTreeMap: Map<string, SubTreeMarker>): Map<string, SubTreeMarker> {
-		const hoistedMap: Map<string, SubTreeMarker> = new Map(subTreeMap)
+	private hoistDeepSubTrees(
+		subTreeMap: Map<string, EntitySubTreeMarker | EntityListSubTreeMarker>,
+	): Map<string, EntitySubTreeMarker | EntityListSubTreeMarker> {
+		const hoistedMap: Map<string, EntitySubTreeMarker | EntityListSubTreeMarker> = new Map(subTreeMap)
 		for (const [, subTree] of hoistedMap) {
 			for (const nestedSubTree of this.hoistSubTeesFromEntityFields(subTree.fields)) {
 				const presentSubTree = hoistedMap.get(nestedSubTree.placeholderName)
@@ -61,7 +79,9 @@ export class MarkerTreeGenerator {
 					nestedSubTree.placeholderName,
 					presentSubTree === undefined
 						? nestedSubTree
-						: MarkerMerger.mergeSubTreeMarkers(presentSubTree, nestedSubTree),
+						: presentSubTree instanceof EntityListSubTreeMarker
+						? MarkerMerger.mergeEntityListSubTreeMarkers(presentSubTree, nestedSubTree as EntityListSubTreeMarker)
+						: MarkerMerger.mergeEntitySubTreeMarkers(presentSubTree, nestedSubTree as EntitySubTreeMarker),
 				)
 			}
 		}
@@ -69,9 +89,11 @@ export class MarkerTreeGenerator {
 		return hoistedMap
 	}
 
-	private *hoistSubTeesFromEntityFields(fields: EntityFieldMarkersContainer): Generator<SubTreeMarker, void> {
+	private *hoistSubTeesFromEntityFields(
+		fields: EntityFieldMarkersContainer,
+	): Generator<EntitySubTreeMarker | EntityListSubTreeMarker, void> {
 		for (const [placeholderName, marker] of fields.markers) {
-			if (marker instanceof SubTreeMarker) {
+			if (marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
 				yield marker
 				yield* this.hoistSubTeesFromEntityFields(marker.fields)
 				fields.markers.delete(placeholderName)
@@ -81,11 +103,13 @@ export class MarkerTreeGenerator {
 		}
 	}
 
-	private generatePlaceholdersByAliases(hoistedSubTrees: Map<string, SubTreeMarker>): Map<Alias, string> {
+	private generatePlaceholdersByAliases(
+		hoistedSubTrees: Map<string, EntitySubTreeMarker | EntityListSubTreeMarker>,
+	): Map<Alias, string> {
 		const placeholders = new Map<Alias, string>()
 
 		for (const [placeholderName, subTree] of hoistedSubTrees) {
-			const aliases = subTree.parameters.value.alias
+			const aliases = subTree.parameters.alias
 			if (aliases === undefined || aliases.size === 0) {
 				continue
 			}
@@ -133,7 +157,9 @@ export class MarkerTreeGenerator {
 		return fieldsContainer
 	}
 
-	private reportInvalidTopLevelError(marker: Exclude<NodeResult, SubTreeMarker>): never {
+	private reportInvalidTopLevelError(
+		marker: Exclude<NodeResult, EntitySubTreeMarker | EntityListSubTreeMarker>,
+	): never {
 		const kind = marker instanceof FieldMarker ? 'field' : 'relation'
 
 		throw new BindingError(

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-	BoxedQualifiedSingleEntity,
 	EntityFieldMarkersContainer,
 	Environment,
 	Field,
@@ -14,8 +13,8 @@ import {
 	MarkerTreeRoot,
 	PRIMARY_KEY_NAME,
 	EntitySubTree,
-	SubTreeMarker,
 	TYPENAME_KEY_NAME,
+	EntitySubTreeMarker,
 } from '../../../../src'
 
 describe('Marker tree generator', () => {
@@ -175,19 +174,20 @@ describe('Marker tree generator', () => {
 			),
 			environment,
 		)
-		const subTreeMarker = new SubTreeMarker(
-			new BoxedQualifiedSingleEntity({
+		const subTreeMarker = new EntitySubTreeMarker(
+			{
 				entityName: 'Foo',
 				where: { bar: 123 },
 				filter: undefined,
 				hasOneRelationPath: [],
+				isCreating: false,
 				isNonbearing: false,
 				setOnCreate: { bar: 123 },
 				// forceCreation: false,
 				eventListeners: singleListeners,
 				expectedMutation: 'anyMutation',
 				alias: undefined,
-			}),
+			},
 			new EntityFieldMarkersContainer(
 				true,
 				new Map<string, Marker>([

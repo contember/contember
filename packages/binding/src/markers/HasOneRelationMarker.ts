@@ -12,6 +12,6 @@ export class HasOneRelationMarker {
 		public readonly fields: EntityFieldMarkersContainer,
 		public readonly environment: Environment,
 	) {
-		this.placeholderName = PlaceholderGenerator.generateHasOneRelationMarkerPlaceholder(this)
+		this.placeholderName = PlaceholderGenerator.getHasOneRelationPlaceholder(this.relation)
 	}
 }

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Filter, UniqueWhere } from '../treeParameters/primitives'
+import { Filter, UniqueWhere } from '../treeParameters'
 
 class Environment {
 	private readonly names: Environment.NameStore

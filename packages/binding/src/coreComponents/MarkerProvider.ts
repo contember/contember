@@ -1,12 +1,12 @@
-
 import * as React from 'react'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkersContainer,
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	SubTreeMarker,
 } from '../markers'
 
 export interface EnvironmentDeltaProvider<Props extends {} = any> {
@@ -30,7 +30,7 @@ export interface SubTreeMarkerProvider<Props extends {} = any> {
 		props: Props,
 		fields: EntityFieldMarkersContainer,
 		environment: Environment,
-	) => SubTreeMarker | EntityFieldMarkersContainer
+	) => EntitySubTreeMarker | EntityListSubTreeMarker | EntityFieldMarkersContainer
 }
 
 export interface RelationMarkerProvider<Props extends {} = any> {

@@ -1,24 +1,18 @@
 import * as React from 'react'
-import { BindingError } from '../BindingError'
-import { Alias } from '../treeParameters'
+import { Alias, SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
+import { useEntitySubTreeParameters } from './useEntitySubTreeParameters'
 import { useGetEntitySubTree } from './useGetEntitySubTree'
-import {
-	QualifiedSingleEntityProps,
-	UnconstrainedQualifiedSingleEntityProps,
-	useEntitySubTreeParameters,
-} from './useEntitySubTreeParameters'
 
-export type UseEntitySubTreeProps = Alias | QualifiedSingleEntityProps | UnconstrainedQualifiedSingleEntityProps
-
-export const useEntitySubTree = (qualifiedSingleEntity: UseEntitySubTreeProps) => {
+export const useEntitySubTree = (
+	qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,
+) => {
 	const getSubTree = useGetEntitySubTree()
 	const parameters = useEntitySubTreeParameters(qualifiedSingleEntity)
 	const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
-	const accessor = useAccessorUpdateSubscription(getAccessor)
 
-	if (typeof parameters !== 'string' && parameters.value.hasOneRelationPath.length) {
-		throw new BindingError(`useEntitySubTree: cannot use hasOneRelationPath!`)
-	}
-	return accessor
+	// if (typeof parameters !== 'string' && parameters.hasOneRelationPath.length) {
+	// 	throw new BindingError(`useEntitySubTree: cannot use hasOneRelationPath!`)
+	// }
+	return useAccessorUpdateSubscription(getAccessor)
 }

@@ -11,8 +11,6 @@ const getRejecter = (operation: string) => () => {
 }
 
 export const defaultBindingOperations = Object.freeze<BindingOperations>({
-	hasEntityKey: getRejecter('query an entity key'),
-	hasSubTree: getRejecter('query a sub tree'),
 	getEntityListSubTree: getRejecter('retrieve an entity list sub tree'),
 	getEntitySubTree: getRejecter('retrieve a single entity sub tree'),
 	getEntityByKey: getRejecter('retrieve an entity by key'),

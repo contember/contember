@@ -2,7 +2,14 @@ import { GraphQlBuilder } from '@contember/client'
 import { BindingOperations, EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
 import { EntityFieldPersistedData, RuntimeId, ServerGeneratedUuid, UnpersistedEntityDummyId } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker, Marker, SubTreeMarker } from '../markers'
+import {
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
+	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+	Marker,
+} from '../markers'
 import { EntityName, FieldName, Scalar } from '../treeParameters'
 import { assertNever } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
@@ -47,17 +54,17 @@ export class StateInitializer {
 		)
 	}
 
-	public initializeSubTree(tree: SubTreeMarker): RootStateNode {
+	public initializeSubTree(tree: EntitySubTreeMarker | EntityListSubTreeMarker): RootStateNode {
 		let subTreeState: RootStateNode
 		const persistedRootData = this.treeStore.subTreePersistedData.get(tree.placeholderName)
 
-		if (tree.parameters.type === 'qualifiedEntityList' || tree.parameters.type === 'unconstrainedQualifiedEntityList') {
+		if (tree instanceof EntityListSubTreeMarker) {
 			const persistedEntityIds: Set<string> = persistedRootData instanceof Set ? persistedRootData : new Set()
 			subTreeState = this.initializeEntityListState(
 				{
-					creationParameters: tree.parameters.value,
+					creationParameters: tree.parameters,
 					environment: tree.environment,
-					initialEventListeners: tree.parameters.value,
+					initialEventListeners: tree.parameters,
 					markersContainer: tree.fields,
 					parent: undefined,
 					placeholderName: tree.placeholderName,
@@ -68,9 +75,9 @@ export class StateInitializer {
 		} else {
 			const id = persistedRootData instanceof ServerGeneratedUuid ? persistedRootData : new UnpersistedEntityDummyId()
 			const blueprint: EntityRealmBlueprint = {
-				creationParameters: tree.parameters.value,
+				creationParameters: tree.parameters,
 				environment: tree.environment,
-				initialEventListeners: tree.parameters.value,
+				initialEventListeners: tree.parameters,
 				markersContainer: tree.fields,
 				parent: undefined,
 				placeholderName: tree.placeholderName,
@@ -481,7 +488,7 @@ export class StateInitializer {
 			this.initializeFromHasOneRelationMarker(entityRealm, field, fieldDatum)
 		} else if (field instanceof HasManyRelationMarker) {
 			this.initializeFromHasManyRelationMarker(entityRealm, field, fieldDatum)
-		} else if (field instanceof SubTreeMarker) {
+		} else if (field instanceof EntityListSubTreeMarker || field instanceof EntitySubTreeMarker) {
 			// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 		} else {
 			assertNever(field)

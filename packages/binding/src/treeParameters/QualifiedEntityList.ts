@@ -37,6 +37,7 @@ export interface QualifiedEntityList
 		QualifiedEntityParameters,
 		EntityCreationParameters,
 		EntityListEventListeners {
+	isCreating: false
 	hasOneRelationPath: HasOneRelation[]
 }
 
@@ -53,20 +54,11 @@ export interface UnsugarableQualifiedEntityList
 		UnsugarableQualifiedEntityParameters,
 		UnsugarableEntityCreationParameters,
 		UnsugarableEntityListEventListeners {
+	isCreating?: false
 	// Deliberately leaving out UnsugarableHasOneRelation
 }
 
 // E.g. Author[age < 123].son.sisters(name = 'Jane')
 export interface SugaredQualifiedEntityList extends UnsugarableQualifiedEntityList {
 	entities: string | SugarableQualifiedEntityList
-}
-
-export class BoxedQualifiedEntityList {
-	public constructor(public readonly value: QualifiedEntityList) {}
-	public get type() {
-		return 'qualifiedEntityList' as const
-	}
-	public get isConstrained(): true {
-		return true
-	}
 }

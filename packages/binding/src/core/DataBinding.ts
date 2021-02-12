@@ -19,13 +19,13 @@ import {
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
-import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
+import { MarkerTreeRoot } from '../markers'
 import {
 	Alias,
-	BoxedQualifiedEntityList,
-	BoxedQualifiedSingleEntity,
-	BoxedUnconstrainedQualifiedEntityList,
-	BoxedUnconstrainedQualifiedSingleEntity,
+	SugaredQualifiedEntityList,
+	SugaredQualifiedSingleEntity,
+	SugaredUnconstrainedQualifiedEntityList,
+	SugaredUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
@@ -89,15 +89,6 @@ export class DataBinding {
 	}
 
 	private readonly bindingOperations = Object.freeze<BindingOperations>({
-		hasEntityKey: key => {
-			return this.treeStore.entityRealmStore.has(key)
-		},
-		hasSubTree: aliasOrParameters => {
-			if (typeof aliasOrParameters === 'string') {
-				return this.treeStore.markerTree.placeholdersByAliases.has(aliasOrParameters)
-			}
-			return this.treeStore.markerTree.subTrees.has(PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters))
-		},
 		getEntityByKey: key => {
 			const realm = this.treeStore.entityRealmStore.get(key)
 
@@ -107,30 +98,16 @@ export class DataBinding {
 			return realm.getAccessor()
 		},
 		getEntityListSubTree: (
-			aliasOrParameters: Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList,
+			aliasOrParameters: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList,
+			environment = this.environment,
 		): EntityListAccessor => {
-			const subTreeState = this.treeStore.getSubTreeState(aliasOrParameters)
-			const accessor = subTreeState.getAccessor()
-			if (!(accessor instanceof EntityListAccessor)) {
-				throw new BindingError(
-					`Trying to retrieve an entity list sub-tree but resolves to a single entity.\n` +
-						`Perhaps you meant to use 'getEntitySubTree'?`,
-				)
-			}
-			return accessor
+			return this.treeStore.getSubTreeState('entityList', aliasOrParameters, environment).getAccessor()
 		},
 		getEntitySubTree: (
-			aliasOrParameters: Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity,
+			aliasOrParameters: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,
+			environment = this.environment,
 		): EntityAccessor => {
-			const subTreeState = this.treeStore.getSubTreeState(aliasOrParameters)
-			const accessor = subTreeState.getAccessor()
-			if (!(accessor instanceof EntityAccessor)) {
-				throw new BindingError(
-					`Trying to retrieve an entity sub-tree but resolves to an entity list.\n` +
-						`Perhaps you meant to use 'getEntityListSubTree'?`,
-				)
-			}
-			return accessor
+			return this.treeStore.getSubTreeState('entity', aliasOrParameters, environment).getAccessor()
 		},
 		getTreeFilters: (): TreeFilter[] => {
 			const generator = new TreeFilterGenerator(this.treeStore)
@@ -253,12 +230,12 @@ export class DataBinding {
 	// 	this.treeRootListeners,
 	// )
 
-	public async extendTree(newFragment: React.ReactNode, { signal }: ExtendTreeOptions = {}) {
+	public async extendTree(newFragment: React.ReactNode, { signal, environment }: ExtendTreeOptions = {}) {
 		return await this.eventManager.asyncOperation(async () => {
 			if (signal?.aborted) {
 				return Promise.reject()
 			}
-			const newMarkerTree = new MarkerTreeGenerator(newFragment, this.environment).generate()
+			const newMarkerTree = new MarkerTreeGenerator(newFragment, environment ?? this.environment).generate()
 
 			const schemaOrPromise = this.getOrLoadSchema()
 
@@ -271,14 +248,13 @@ export class DataBinding {
 
 				const schema = await schemaOrPromise
 
-				// TODO we shouldn't just CHANGE the schema like that.
 				this.treeStore.updateSchema(schema)
-
 				if (__DEV_MODE__) {
 					SchemaValidator.assertTreeValid(schema, newMarkerTree)
 				}
 				newPersistedData = await newPersistedDataPromise
 			} else {
+				this.treeStore.updateSchema(schemaOrPromise)
 				if (__DEV_MODE__) {
 					SchemaValidator.assertTreeValid(schemaOrPromise, newMarkerTree)
 				}

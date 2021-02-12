@@ -1,4 +1,11 @@
-import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker, Marker, SubTreeMarker } from '../../markers'
+import {
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
+	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+	Marker,
+} from '../../markers'
 import { assertNever } from '../../utils'
 import { TreeParameterSugarer } from './TreeParameterSugarer'
 
@@ -13,8 +20,11 @@ export class MarkerSugarer {
 		if (marker instanceof HasManyRelationMarker) {
 			return this.sugarHasManyRelationMarker(marker)
 		}
-		if (marker instanceof SubTreeMarker) {
-			return this.sugarSubTreeMarker(marker)
+		if (marker instanceof EntityListSubTreeMarker) {
+			return this.sugarEntityListSubTreeMarker(marker)
+		}
+		if (marker instanceof EntitySubTreeMarker) {
+			return this.sugarEntitySubTreeMarker(marker)
 		}
 		return assertNever(marker)
 	}
@@ -35,13 +45,17 @@ export class MarkerSugarer {
 		return TreeParameterSugarer.sugarHasManyRelation(hasMany.relation.field, hasMany.relation.filter)
 	}
 
-	public static sugarSubTreeMarker(subTree: SubTreeMarker) {
-		if (subTree.parameters.type === 'qualifiedEntityList') {
-			return TreeParameterSugarer.sugarRootEntityList(subTree.entityName, subTree.parameters.value.filter)
+	public static sugarEntitySubTreeMarker(subTree: EntitySubTreeMarker) {
+		if (subTree.parameters.isCreating) {
+			return TreeParameterSugarer.sugarRootEntity(subTree.entityName, undefined)
 		}
-		if (subTree.parameters.isConstrained) {
-			return TreeParameterSugarer.sugarRootEntity(subTree.entityName, subTree.parameters.value.where)
+		return TreeParameterSugarer.sugarRootEntity(subTree.entityName, subTree.parameters.where)
+	}
+
+	public static sugarEntityListSubTreeMarker(subTree: EntityListSubTreeMarker) {
+		if (subTree.parameters.isCreating) {
+			return TreeParameterSugarer.sugarRootEntityList(subTree.entityName, undefined)
 		}
-		return TreeParameterSugarer.sugarRootEntity(subTree.entityName, undefined)
+		return TreeParameterSugarer.sugarRootEntityList(subTree.entityName, subTree.parameters.filter)
 	}
 }

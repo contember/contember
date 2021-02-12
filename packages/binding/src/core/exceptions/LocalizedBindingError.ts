@@ -1,5 +1,10 @@
 import { BindingError } from '../../BindingError'
-import { HasManyRelationMarker, HasOneRelationMarker, SubTreeMarker } from '../../markers'
+import {
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+} from '../../markers'
 import { RawMarkerPath } from './RawMarkerPath'
 
 export class LocalizedBindingError extends BindingError {
@@ -7,7 +12,9 @@ export class LocalizedBindingError extends BindingError {
 		super(message)
 	}
 
-	public nestedIn(wrapper: SubTreeMarker | HasOneRelationMarker | HasManyRelationMarker): LocalizedBindingError {
+	public nestedIn(
+		wrapper: EntitySubTreeMarker | EntityListSubTreeMarker | HasOneRelationMarker | HasManyRelationMarker,
+	): LocalizedBindingError {
 		return new LocalizedBindingError(this.message, [wrapper, ...this.markerPath])
 	}
 }

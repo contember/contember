@@ -262,6 +262,7 @@ export namespace QueryLanguage {
 		}
 
 		return {
+			isCreating: true,
 			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarableEntityList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			setOnCreate: unsugarableEntityList.setOnCreate
@@ -297,6 +298,7 @@ export namespace QueryLanguage {
 		}
 
 		return {
+			isCreating: true,
 			isNonbearing: unsugarableSingleEntity.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarableSingleEntity.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			setOnCreate: unsugarableSingleEntity.setOnCreate
@@ -342,6 +344,7 @@ export namespace QueryLanguage {
 				environment,
 			),
 			alias: desugarSubTreeAlias(unsugarableEntityList.alias),
+			isCreating: false,
 			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarableEntityList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			setOnCreate: unsugarableEntityList.setOnCreate
@@ -380,6 +383,7 @@ export namespace QueryLanguage {
 			entityName,
 			hasOneRelationPath,
 			alias: desugarSubTreeAlias(unsugarableFieldList.alias),
+			isCreating: false,
 			isNonbearing: unsugarableFieldList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarableFieldList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
 			setOnCreate: unsugarableFieldList.setOnCreate
@@ -448,6 +452,7 @@ export namespace QueryLanguage {
 		return {
 			alias,
 			entityName,
+			isCreating: false,
 			where,
 			filter,
 			hasOneRelationPath,

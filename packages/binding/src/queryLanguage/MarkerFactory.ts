@@ -1,18 +1,15 @@
+import { MarkerMerger, TreeParameterMerger } from '../core'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkersContainer,
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	Marker,
-	SubTreeMarker,
 } from '../markers'
-import { MarkerMerger, TreeParameterMerger } from '../core'
 import {
-	BoxedQualifiedEntityList,
-	BoxedQualifiedSingleEntity,
-	BoxedUnconstrainedQualifiedEntityList,
-	BoxedUnconstrainedQualifiedSingleEntity,
 	HasManyRelation,
 	HasOneRelation,
 	RelativeSingleField,
@@ -34,14 +31,14 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
 
-		return new SubTreeMarker(
-			new BoxedQualifiedSingleEntity({
+		return new EntitySubTreeMarker(
+			{
 				...qualifiedSingleEntity,
 				setOnCreate: TreeParameterMerger.mergeSetOnCreate(
 					qualifiedSingleEntity.setOnCreate || {},
 					qualifiedSingleEntity.where,
 				),
-			}),
+			},
 			wrapRelativeEntityFieldMarkers(
 				qualifiedSingleEntity.hasOneRelationPath,
 				environment,
@@ -58,8 +55,8 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(entityList, environment)
 
-		return new SubTreeMarker(
-			new BoxedQualifiedEntityList(qualifiedEntityList),
+		return new EntityListSubTreeMarker(
+			qualifiedEntityList,
 			wrapRelativeEntityFieldMarkers(
 				qualifiedEntityList.hasOneRelationPath,
 				environment,
@@ -76,8 +73,8 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedEntityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment)
 
-		return new SubTreeMarker(
-			new BoxedUnconstrainedQualifiedEntityList(qualifiedEntityList),
+		return new EntityListSubTreeMarker(
+			qualifiedEntityList,
 			wrapRelativeEntityFieldMarkers(
 				qualifiedEntityList.hasOneRelationPath,
 				environment,
@@ -94,8 +91,8 @@ export namespace MarkerFactory {
 	) => {
 		const qualifiedSingleEntity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entityList, environment)
 
-		return new SubTreeMarker(
-			new BoxedUnconstrainedQualifiedSingleEntity(qualifiedSingleEntity),
+		return new EntitySubTreeMarker(
+			qualifiedSingleEntity,
 			wrapRelativeEntityFieldMarkers(
 				qualifiedSingleEntity.hasOneRelationPath,
 				environment,
@@ -169,7 +166,7 @@ export namespace MarkerFactory {
 				new Map([[marker.placeholderName, marker]]),
 				new Map([[marker.fieldName, marker.placeholderName]]),
 			)
-		} else if (marker instanceof SubTreeMarker) {
+		} else if (marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
 			return new EntityFieldMarkersContainer(
 				false,
 				new Map([[marker.placeholderName, marker]]),

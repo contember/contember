@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
-import { FieldName } from '../treeParameters/primitives'
+import { FieldName } from '../treeParameters'
 
 export const useOnConnectionUpdate = (
 	fieldName: FieldName,

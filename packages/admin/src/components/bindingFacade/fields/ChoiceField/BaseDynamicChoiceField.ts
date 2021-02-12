@@ -1,5 +1,4 @@
 import {
-	BoxedQualifiedEntityList,
 	EntityAccessor,
 	Environment,
 	QualifiedEntityList,
@@ -53,13 +52,14 @@ export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 }
 
 export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldList | QualifiedEntityList) => {
-	const getSubTree = useGetEntityListSubTree()
-	const getSubTreeData = React.useCallback(() => getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath)), [
-		desugaredOptionPath,
-		getSubTree,
-	])
-	const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
-	return React.useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
+	return [] // TODO
+	// const getSubTree = useGetEntityListSubTree()
+	// const getSubTreeData = React.useCallback(() => getSubTree(desugaredOptionPath), [
+	// 	desugaredOptionPath,
+	// 	getSubTree,
+	// ])
+	// const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
+	// return React.useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
 }
 
 export const useOptionEntities = (

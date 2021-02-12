@@ -18,6 +18,6 @@ export class HasManyRelationMarker {
 				throw new BindingError(`The preferred 'initialEntityCount' for a relation must be a non-negative integer!`)
 			}
 		}
-		this.placeholderName = PlaceholderGenerator.generateHasManyRelationMarkerPlaceholder(this)
+		this.placeholderName = PlaceholderGenerator.getHasManyRelationPlaceholder(this.relation)
 	}
 }

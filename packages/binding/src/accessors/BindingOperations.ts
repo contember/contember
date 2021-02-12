@@ -1,6 +1,4 @@
 import { TreeFilter } from '@contember/client'
-import { SubTreeMarkerParameters } from '../markers'
-import { Alias } from '../treeParameters'
 import { ExtendTree } from './ExtendTree'
 import { GetEntityByKey } from './GetEntityByKey'
 import { GetEntityListSubTree } from './GetEntityListSubTree'
@@ -9,8 +7,6 @@ import { Persist } from './Persist'
 
 export interface BindingOperations {
 	// addEventListener: ...
-	hasEntityKey: (key: string) => boolean
-	hasSubTree: (aliasOrParameters: Alias | SubTreeMarkerParameters) => boolean
 	getEntityByKey: GetEntityByKey
 	getEntityListSubTree: GetEntityListSubTree
 	getEntitySubTree: GetEntitySubTree

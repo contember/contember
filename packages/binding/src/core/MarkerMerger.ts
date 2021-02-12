@@ -5,16 +5,16 @@ import {
 	EntityFieldMarkers,
 	EntityFieldMarkersContainer,
 	EntityFieldPlaceholders,
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	Marker,
 	MarkerTreeRoot,
-	SubTreeMarker,
 } from '../markers'
 import { FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { EntityRealmState } from './state'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
 export class MarkerMerger {
@@ -28,7 +28,7 @@ export class MarkerMerger {
 				return this.mergeFieldMarkers(original, fresh)
 			} else if (fresh instanceof HasOneRelationMarker || fresh instanceof HasManyRelationMarker) {
 				return this.rejectRelationScalarCombo(original.fieldName)
-			} else if (fresh instanceof SubTreeMarker) {
+			} else if (fresh instanceof EntitySubTreeMarker || fresh instanceof EntityListSubTreeMarker) {
 				throw new BindingError('Merging fields and sub trees is an undefined operation.')
 			}
 			assertNever(fresh)
@@ -39,7 +39,7 @@ export class MarkerMerger {
 				return this.rejectRelationScalarCombo(original.relation.field)
 			} else if (fresh instanceof HasManyRelationMarker) {
 				throw new BindingError() // TODO not implemented
-			} else if (fresh instanceof SubTreeMarker) {
+			} else if (fresh instanceof EntitySubTreeMarker || fresh instanceof EntityListSubTreeMarker) {
 				throw new BindingError('MarkerTreeGenerator merging: SubTreeMarkers can only be merged with other sub trees.')
 			}
 			assertNever(fresh)
@@ -50,15 +50,25 @@ export class MarkerMerger {
 				return this.rejectRelationScalarCombo(original.relation.field)
 			} else if (fresh instanceof HasOneRelationMarker) {
 				throw new BindingError() // TODO not implemented
-			} else if (fresh instanceof SubTreeMarker) {
+			} else if (fresh instanceof EntitySubTreeMarker || fresh instanceof EntityListSubTreeMarker) {
 				throw new BindingError('MarkerTreeGenerator merging: SubTreeMarkers can only be merged with other sub trees.')
 			}
 			assertNever(fresh)
-		} else if (original instanceof SubTreeMarker) {
-			if (fresh instanceof SubTreeMarker) {
-				return this.mergeSubTreeMarkers(original, fresh)
+		} else if (original instanceof EntitySubTreeMarker) {
+			if (fresh instanceof EntitySubTreeMarker) {
+				return this.mergeEntitySubTreeMarkers(original, fresh)
 			} else {
-				throw new BindingError('MarkerTreeGenerator merging: SubTreeMarkers can only be merged with other sub trees.')
+				throw new BindingError(
+					'MarkerTreeGenerator merging: EntitySubTreeMarker can only be merged with other entity sub trees.',
+				)
+			}
+		} else if (original instanceof EntityListSubTreeMarker) {
+			if (fresh instanceof EntityListSubTreeMarker) {
+				return this.mergeEntityListSubTreeMarkers(original, fresh)
+			} else {
+				throw new BindingError(
+					'MarkerTreeGenerator merging: EntityListSubTreeMarker can only be merged with other list sub trees.',
+				)
 			}
 		}
 		assertNever(original)
@@ -68,7 +78,10 @@ export class MarkerMerger {
 		if (original === fresh) {
 			return original
 		}
-		const newSubTrees = this.mergeEntityFields(original.subTrees, fresh.subTrees) as Map<PlaceholderName, SubTreeMarker>
+		const newSubTrees = this.mergeEntityFields(original.subTrees, fresh.subTrees) as Map<
+			PlaceholderName,
+			EntitySubTreeMarker | EntityListSubTreeMarker
+		>
 
 		const newOriginalAliases = new Map(original.placeholdersByAliases)
 		for (const [alias, placeholder] of fresh.placeholdersByAliases) {
@@ -185,12 +198,23 @@ export class MarkerMerger {
 		)
 	}
 
-	public static mergeSubTreeMarkers(original: SubTreeMarker, fresh: SubTreeMarker) {
+	public static mergeEntitySubTreeMarkers(original: EntitySubTreeMarker, fresh: EntitySubTreeMarker) {
 		if (original === fresh) {
 			return original
 		}
-		return new SubTreeMarker(
-			TreeParameterMerger.mergeSubTreeParametersWithSamePlaceholders(original.parameters, fresh.parameters),
+		return new EntitySubTreeMarker(
+			TreeParameterMerger.mergeEntitySubTreeParametersWithSamePlaceholders(original.parameters, fresh.parameters),
+			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
+			this.mergeEnvironments(original.environment, fresh.environment),
+		)
+	}
+
+	public static mergeEntityListSubTreeMarkers(original: EntityListSubTreeMarker, fresh: EntityListSubTreeMarker) {
+		if (original === fresh) {
+			return original
+		}
+		return new EntityListSubTreeMarker(
+			TreeParameterMerger.mergeEntityListSubTreeParametersWithSamePlaceholders(original.parameters, fresh.parameters),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
 			this.mergeEnvironments(original.environment, fresh.environment),
 		)

@@ -5,7 +5,6 @@ import { Literal } from '../dao'
 import { SugaredField } from '../helperComponents'
 import { QueryLanguage } from '../queryLanguage'
 import {
-	BoxedQualifiedEntityList,
 	SugaredOrderBy,
 	SugaredQualifiedEntityList,
 	SugaredRelativeSingleField,
@@ -52,9 +51,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 						entity={entity}
 						isCreating
 						onBeforePersist={(getAccessor, bindingOperations) => {
-							const listSubTree = bindingOperations.getEntityListSubTree(
-								new BoxedQualifiedEntityList(QueryLanguage.desugarQualifiedEntityList(qel, environment)),
-							)
+							const listSubTree = bindingOperations.getEntityListSubTree(qel)
 							const entities = Array.from(listSubTree)
 							const newOrderFieldValue = !entities.length
 								? 0

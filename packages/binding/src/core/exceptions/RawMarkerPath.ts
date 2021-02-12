@@ -1,3 +1,3 @@
-import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker, SubTreeMarker } from '../../markers'
+import { Marker } from '../../markers'
 
-export type RawMarkerPath = Array<SubTreeMarker | HasOneRelationMarker | HasManyRelationMarker | FieldMarker>
+export type RawMarkerPath = Marker[]

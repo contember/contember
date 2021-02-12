@@ -14,7 +14,6 @@ import { Component } from './Component'
 import { EntityBaseProps } from './Entity'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
-import { HasOne } from './HasOne'
 
 export interface EntityListSubTreeAdditionalProps {
 	variables?: Environment.DeltaFactory
@@ -23,14 +22,7 @@ export interface EntityListSubTreeAdditionalProps {
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
 	children?: React.ReactNode
 } & EntityListSubTreeAdditionalProps &
-	(
-		| ({
-				isCreating?: false
-		  } & SugaredQualifiedEntityList)
-		| ({
-				isCreating: true
-		  } & SugaredUnconstrainedQualifiedEntityList)
-	) &
+	(SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList) &
 	(
 		| {}
 		| {
@@ -52,15 +44,13 @@ export const EntityListSubTree = Component(
 		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
 		const accessor = useAccessorUpdateSubscription(getAccessor)
 
-		return (
-			<EntityList {...props} accessor={accessor}>
-				{parameters.value.hasOneRelationPath.length ? (
-					<HasOne field={parameters.value.hasOneRelationPath}>{props.children}</HasOne>
-				) : (
-					props.children
-				)}
-			</EntityList>
-		)
+		//  TODO revive top level hasOneRelationPath
+		// {parameters.value.hasOneRelationPath.length ?
+		// 	<HasOne field={parameters.value.hasOneRelationPath}>{props.children}</HasOne
+		// ) :
+		// 	props.children
+		// )
+		return <EntityList {...props} accessor={accessor} />
 	},
 	{
 		generateSubTreeMarker: (props, fields, environment) => {

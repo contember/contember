@@ -6,9 +6,16 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	SubTreeMarker,
-	SubTreeMarkerParameters,
+	EntitySubTreeMarker,
+	EntityListSubTreeMarker,
 } from '../markers'
+import {
+	QualifiedEntityList,
+	QualifiedSingleEntity,
+	UnconstrainedQualifiedEntityList,
+	UnconstrainedQualifiedSingleEntity,
+	UniqueWhere,
+} from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import { QueryGenerator } from './QueryGenerator'
@@ -42,7 +49,6 @@ export class MutationGenerator {
 					processedEntities,
 					this.treeStore.subTreeStates.get(placeholderName)!,
 					placeholderName,
-					subTreeMarker.parameters,
 					builder,
 				)
 			}
@@ -56,7 +62,6 @@ export class MutationGenerator {
 		processedEntities: ProcessedEntities,
 		rootState: RootStateNode | EntityRealmStateStub,
 		alias: string,
-		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder,
 	): QueryBuilder {
 		if (rootState.type === StateType.EntityRealmStub) {
@@ -70,11 +75,11 @@ export class MutationGenerator {
 		}
 		if (rootState.type === StateType.EntityRealm) {
 			if (rootState.entity.isScheduledForDeletion) {
-				queryBuilder = this.addDeleteMutation(processedEntities, rootState, alias, parameters, queryBuilder)
+				queryBuilder = this.addDeleteMutation(processedEntities, rootState, alias, queryBuilder)
 			} else if (!rootState.entity.id.existsOnServer) {
-				queryBuilder = this.addCreateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
+				queryBuilder = this.addCreateMutation(processedEntities, rootState, alias, queryBuilder)
 			} else {
-				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, parameters, queryBuilder)
+				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, queryBuilder)
 			}
 		} else if (rootState.type === StateType.EntityList) {
 			for (const [, childState] of rootState.children) {
@@ -82,7 +87,6 @@ export class MutationGenerator {
 					processedEntities,
 					childState,
 					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.entity.id)),
-					parameters,
 					queryBuilder,
 				)
 			}
@@ -93,7 +97,6 @@ export class MutationGenerator {
 							processedEntities,
 							removedEntity,
 							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.entity.id)),
-							parameters,
 							queryBuilder,
 						)
 					} else if (removalType === 'disconnect') {
@@ -112,7 +115,6 @@ export class MutationGenerator {
 		processedEntities: ProcessedEntities,
 		entityRealm: EntityRealmState | EntityRealmStateStub,
 		alias: string,
-		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
 		if (processedEntities.has(entityRealm)) {
@@ -121,20 +123,14 @@ export class MutationGenerator {
 		processedEntities.add(entityRealm)
 
 		return queryBuilder.delete(
-			parameters.value.entityName,
-			builder => {
-				let where = {}
-				if (parameters && parameters.type === 'qualifiedSingleEntity') {
-					where = parameters.value.where
-				}
-
-				return builder
+			entityRealm.entity.entityName,
+			builder =>
+				builder
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
-					.by({ ...where, [PRIMARY_KEY_NAME]: entityRealm.entity.id.value })
+					.by({ [PRIMARY_KEY_NAME]: entityRealm.entity.id.value })
 					.errors()
-					.errorMessage()
-			},
+					.errorMessage(),
 			alias,
 		)
 	}
@@ -143,7 +139,6 @@ export class MutationGenerator {
 		processedEntities: ProcessedEntities,
 		entityRealm: EntityRealmState,
 		alias: string,
-		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
 		if (processedEntities.has(entityRealm)) {
@@ -158,16 +153,11 @@ export class MutationGenerator {
 		}
 
 		return queryBuilder.update(
-			parameters.value.entityName,
+			entityRealm.entity.entityName,
 			builder => {
-				let where = {}
-				if (parameters && parameters.type === 'qualifiedSingleEntity') {
-					where = parameters.value.where
-				}
-
 				return builder
 					.data(builder => this.registerUpdateMutationPart(processedEntities, entityRealm, builder))
-					.by({ ...where, [PRIMARY_KEY_NAME]: runtimeId.value })
+					.by({ [PRIMARY_KEY_NAME]: runtimeId.value })
 					.node(builder => QueryGenerator.registerQueryPart(entityRealm.blueprint.markersContainer.markers, builder))
 					.ok()
 					.validation()
@@ -182,7 +172,6 @@ export class MutationGenerator {
 		processedEntities: ProcessedEntities,
 		entityRealm: EntityRealmState,
 		alias: string,
-		parameters: SubTreeMarkerParameters,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
 		if (processedEntities.has(entityRealm)) {
@@ -191,23 +180,18 @@ export class MutationGenerator {
 		// Deliberately not adding the entity to processedEntities - it will be done by registerCreateMutationPart.
 
 		return queryBuilder.create(
-			parameters.value.entityName,
+			entityRealm.entity.entityName,
 			builder => {
 				let writeBuilder = this.registerCreateMutationPart(
 					processedEntities,
 					entityRealm,
 					new CrudQueryBuilder.WriteDataBuilder(),
 				)
-				if (
-					parameters &&
-					parameters.type === 'qualifiedSingleEntity' &&
-					writeBuilder.data !== undefined &&
-					!isEmptyObject(writeBuilder.data)
-				) {
-					// Shallow cloning the parameters like this IS too naïve but it will likely last surprisingly long before we
-					// run into issues.
-					writeBuilder = new CrudQueryBuilder.WriteDataBuilder({ ...writeBuilder.data, ...parameters.value.where })
-				}
+				// if (where && writeBuilder.data !== undefined && !isEmptyObject(writeBuilder.data)) {
+				// 	// Shallow cloning the parameters like this IS too naïve but it will likely last surprisingly long before we
+				// 	// run into issues.
+				// 	writeBuilder = new CrudQueryBuilder.WriteDataBuilder({ ...writeBuilder.data, ...where })
+				// }
 
 				return builder
 					.data(writeBuilder)
@@ -297,7 +281,7 @@ export class MutationGenerator {
 					continue
 				}
 				builder = this.registerCreateEntityListPart(processedEntities, fieldState, marker, builder)
-			} else if (marker instanceof SubTreeMarker) {
+			} else if (marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
 				// All sub trees have been hoisted and are handled elsewhere.
 			} else {
 				assertNever(marker)
@@ -584,7 +568,7 @@ export class MutationGenerator {
 					}
 					return builder
 				})
-			} else if (marker instanceof SubTreeMarker) {
+			} else if (marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
 				// Do nothing: all sub trees have been hoisted and are handled elsewhere.
 			} else {
 				assertNever(marker)

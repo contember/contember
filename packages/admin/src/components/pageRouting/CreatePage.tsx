@@ -12,7 +12,7 @@ import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntit
 import { PageProvider } from './PageProvider'
 import { useRedirect } from './useRedirect'
 
-export type CreatePageProps = SugaredUnconstrainedQualifiedSingleEntity &
+export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> &
 	EntitySubTreeAdditionalProps &
 	EntitySubTreeAdditionalCreationProps & {
 		pageName: string

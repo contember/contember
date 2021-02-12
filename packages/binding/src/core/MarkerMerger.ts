@@ -36,7 +36,7 @@ export class MarkerMerger {
 			if (fresh instanceof HasOneRelationMarker) {
 				return this.mergeHasOneRelationMarkers(original, fresh)
 			} else if (fresh instanceof FieldMarker) {
-				return this.rejectRelationScalarCombo(original.relation.field)
+				return this.rejectRelationScalarCombo(original.parameters.field)
 			} else if (fresh instanceof HasManyRelationMarker) {
 				throw new BindingError() // TODO not implemented
 			} else if (fresh instanceof EntitySubTreeMarker || fresh instanceof EntityListSubTreeMarker) {
@@ -47,7 +47,7 @@ export class MarkerMerger {
 			if (fresh instanceof HasManyRelationMarker) {
 				return this.mergeHasManyRelationMarkers(original, fresh)
 			} else if (fresh instanceof FieldMarker) {
-				return this.rejectRelationScalarCombo(original.relation.field)
+				return this.rejectRelationScalarCombo(original.parameters.field)
 			} else if (fresh instanceof HasOneRelationMarker) {
 				throw new BindingError() // TODO not implemented
 			} else if (fresh instanceof EntitySubTreeMarker || fresh instanceof EntityListSubTreeMarker) {
@@ -181,7 +181,7 @@ export class MarkerMerger {
 			return original
 		}
 		return new HasOneRelationMarker(
-			TreeParameterMerger.mergeHasOneRelationsWithSamePlaceholders(original.relation, fresh.relation),
+			TreeParameterMerger.mergeHasOneRelationsWithSamePlaceholders(original.parameters, fresh.parameters),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
 			this.mergeEnvironments(original.environment, fresh.environment),
 		)
@@ -192,7 +192,7 @@ export class MarkerMerger {
 			return original
 		}
 		return new HasManyRelationMarker(
-			TreeParameterMerger.mergeHasManyRelationsWithSamePlaceholders(original.relation, fresh.relation),
+			TreeParameterMerger.mergeHasManyRelationsWithSamePlaceholders(original.parameters, fresh.parameters),
 			this.mergeEntityFieldsContainers(original.fields, fresh.fields),
 			this.mergeEnvironments(original.environment, fresh.environment),
 		)

@@ -8,10 +8,10 @@ export class HasOneRelationMarker {
 	public readonly placeholderName: string
 
 	public constructor(
-		public readonly relation: HasOneRelation,
+		public readonly parameters: HasOneRelation,
 		public readonly fields: EntityFieldMarkersContainer,
 		public readonly environment: Environment,
 	) {
-		this.placeholderName = PlaceholderGenerator.getHasOneRelationPlaceholder(this.relation)
+		this.placeholderName = PlaceholderGenerator.getHasOneRelationPlaceholder(this.parameters)
 	}
 }

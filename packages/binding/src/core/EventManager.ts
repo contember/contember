@@ -475,7 +475,7 @@ export class EventManager {
 		if (additionalMarker) {
 			eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
 				eventListeners,
-				create(additionalMarker.relation),
+				create(additionalMarker.parameters),
 			)
 		}
 		return {

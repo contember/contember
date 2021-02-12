@@ -30,16 +30,16 @@ export class MarkerComparator {
 					throw new LocalizedBindingError(`The field '${candidateMarker.fieldName}' is missing.`, [candidateMarker])
 				}
 				if (candidateMarker instanceof HasOneRelationMarker || candidateMarker instanceof HasManyRelationMarker) {
-					const differentPlaceholders = superset.placeholders.get(candidateMarker.relation.field)
+					const differentPlaceholders = superset.placeholders.get(candidateMarker.parameters.field)
 
 					if (differentPlaceholders === undefined) {
-						throw new LocalizedBindingError(`The relation '${candidateMarker.relation.field}' is missing.`, [
+						throw new LocalizedBindingError(`The relation '${candidateMarker.parameters.field}' is missing.`, [
 							candidateMarker,
 						])
 					}
 					// TODO be more specific
 					throw new LocalizedBindingError(
-						`The relation '${candidateMarker.relation.field}' exists but its parameters don't match exactly. ` +
+						`The relation '${candidateMarker.parameters.field}' exists but its parameters don't match exactly. ` +
 							`Check that all relation parameters are the same.`,
 						[candidateMarker],
 					)

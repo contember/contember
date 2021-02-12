@@ -169,7 +169,7 @@ describe('Marker tree generator', () => {
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
 					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
 					['hasManyField', 'hasManyField'],
-					[hasOne.relation.field, hasOne.placeholderName],
+					[hasOne.parameters.field, hasOne.placeholderName],
 				]),
 			),
 			environment,
@@ -199,7 +199,7 @@ describe('Marker tree generator', () => {
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
 					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
-					[outerHasMany.relation.field, outerHasMany.placeholderName],
+					[outerHasMany.parameters.field, outerHasMany.placeholderName],
 					['fooField', 'fooField'],
 				]),
 			),

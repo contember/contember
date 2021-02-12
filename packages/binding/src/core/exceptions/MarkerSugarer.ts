@@ -35,14 +35,14 @@ export class MarkerSugarer {
 
 	public static sugarHasOneRelationMarker(hasOne: HasOneRelationMarker) {
 		return TreeParameterSugarer.sugarHasOneRelation(
-			hasOne.relation.field,
-			hasOne.relation.reducedBy,
-			hasOne.relation.filter,
+			hasOne.parameters.field,
+			hasOne.parameters.reducedBy,
+			hasOne.parameters.filter,
 		)
 	}
 
 	public static sugarHasManyRelationMarker(hasMany: HasManyRelationMarker) {
-		return TreeParameterSugarer.sugarHasManyRelation(hasMany.relation.field, hasMany.relation.filter)
+		return TreeParameterSugarer.sugarHasManyRelation(hasMany.parameters.field, hasMany.parameters.filter)
 	}
 
 	public static sugarEntitySubTreeMarker(subTree: EntitySubTreeMarker) {

@@ -174,9 +174,9 @@ export namespace MarkerFactory {
 			)
 		} else {
 			return new EntityFieldMarkersContainer(
-				!marker.relation.isNonbearing,
+				!marker.parameters.isNonbearing,
 				new Map([[marker.placeholderName, marker]]),
-				new Map([[marker.relation.field, marker.placeholderName]]),
+				new Map([[marker.parameters.field, marker.placeholderName]]),
 			)
 		}
 	}

@@ -396,7 +396,7 @@ export class StateInitializer {
 		field: HasOneRelationMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
 	) {
-		const relation = field.relation
+		const relation = field.parameters
 
 		if (fieldDatum instanceof Set) {
 			throw new BindingError(
@@ -409,9 +409,9 @@ export class StateInitializer {
 			entityRealm.children.set(
 				field.placeholderName,
 				this.initializeEntityRealm(entityId, this.getRelationTargetEntityName(entityRealm, field), {
-					creationParameters: field.relation,
+					creationParameters: field.parameters,
 					environment: field.environment,
-					initialEventListeners: field.relation,
+					initialEventListeners: field.parameters,
 					markersContainer: field.fields,
 					parent: entityRealm,
 					placeholderName: field.placeholderName,
@@ -430,7 +430,7 @@ export class StateInitializer {
 		field: HasManyRelationMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
 	) {
-		const relation = field.relation
+		const relation = field.parameters
 
 		if (fieldDatum === undefined || fieldDatum instanceof Set) {
 			entityRealm.children.set(
@@ -438,11 +438,11 @@ export class StateInitializer {
 				this.initializeEntityListState(
 					{
 						markersContainer: field.fields,
-						initialEventListeners: field.relation,
+						initialEventListeners: field.parameters,
 						parent: entityRealm,
 						placeholderName: field.placeholderName,
 						environment: field.environment,
-						creationParameters: field.relation,
+						creationParameters: field.parameters,
 					},
 					this.getRelationTargetEntityName(entityRealm, field),
 					fieldDatum || new Set(),
@@ -469,7 +469,7 @@ export class StateInitializer {
 	): EntityName {
 		const targetField = this.treeStore.schema.entities
 			.get(entityRealm.entity.entityName)
-			?.fields?.get(field.relation.field)
+			?.fields?.get(field.parameters.field)
 		if (targetField?.__typename !== '_Relation') {
 			// This should have been validated elsewhere.
 			throw new BindingError()

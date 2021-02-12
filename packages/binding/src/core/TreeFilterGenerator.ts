@@ -84,19 +84,22 @@ export class TreeFilterGenerator {
 			if (!(marker instanceof HasOneRelationMarker) && !(marker instanceof HasManyRelationMarker)) {
 				continue
 			}
-			if (marker.relation.expectedMutation === 'none' || marker.relation.expectedMutation === 'connectOrDisconnect') {
+			if (
+				marker.parameters.expectedMutation === 'none' ||
+				marker.parameters.expectedMutation === 'connectOrDisconnect'
+			) {
 				continue
 			} else if (
-				marker.relation.expectedMutation === 'anyMutation' ||
-				marker.relation.expectedMutation === 'createOrDelete'
+				marker.parameters.expectedMutation === 'anyMutation' ||
+				marker.parameters.expectedMutation === 'createOrDelete'
 			) {
 			} else {
-				return assertNever(marker.relation.expectedMutation)
+				return assertNever(marker.parameters.expectedMutation)
 			}
-			let existingRelation = relations.get(marker.relation.field)
+			let existingRelation = relations.get(marker.parameters.field)
 
 			if (existingRelation === undefined) {
-				relations.set(marker.relation.field, (existingRelation = new Map()))
+				relations.set(marker.parameters.field, (existingRelation = new Map()))
 			}
 			this.populateRawRelationFilters(marker.fields, existingRelation)
 		}

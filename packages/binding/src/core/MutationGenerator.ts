@@ -259,7 +259,7 @@ export class MutationGenerator {
 				if (fieldState.type !== StateType.EntityRealm) {
 					continue
 				}
-				if (marker.relation.isNonbearing) {
+				if (marker.parameters.isNonbearing) {
 					nonbearingFields.push({
 						type: 'hasOne',
 						marker,
@@ -272,7 +272,7 @@ export class MutationGenerator {
 				if (fieldState.type !== StateType.EntityList) {
 					continue
 				}
-				if (marker.relation.isNonbearing) {
+				if (marker.parameters.isNonbearing) {
 					nonbearingFields.push({
 						type: 'hasMany',
 						marker,
@@ -359,11 +359,11 @@ export class MutationGenerator {
 		marker: HasOneRelationMarker,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
-		const reducedBy = marker.relation.reducedBy
+		const reducedBy = marker.parameters.reducedBy
 		const runtimeId = fieldState.entity.id
 
 		if (reducedBy === undefined) {
-			return builder.one(marker.relation.field, builder => {
+			return builder.one(marker.parameters.field, builder => {
 				if (runtimeId.existsOnServer) {
 					// TODO also potentially update
 					return builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value })
@@ -371,7 +371,7 @@ export class MutationGenerator {
 				return builder.create(this.registerCreateMutationPart(processedEntities, fieldState))
 			})
 		}
-		return builder.many(marker.relation.field, builder => {
+		return builder.many(marker.parameters.field, builder => {
 			const alias = AliasTransformer.entityToAlias(runtimeId)
 			if (runtimeId.existsOnServer) {
 				// TODO also potentially update
@@ -387,7 +387,7 @@ export class MutationGenerator {
 		marker: HasManyRelationMarker,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
-		return builder.many(marker.relation.field, builder => {
+		return builder.many(marker.parameters.field, builder => {
 			for (const [, entityRealm] of fieldState.children) {
 				const alias = AliasTransformer.entityToAlias(entityRealm.entity.id)
 				if (entityRealm.entity.id.existsOnServer) {
@@ -437,7 +437,7 @@ export class MutationGenerator {
 				}
 
 				const runtimeId = fieldState.entity.id
-				const reducedBy = marker.relation.reducedBy
+				const reducedBy = marker.parameters.reducedBy
 				if (reducedBy === undefined) {
 					const subBuilder = ((
 						builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
@@ -487,11 +487,11 @@ export class MutationGenerator {
 					})(CrudQueryBuilder.WriteOneRelationBuilder.instantiate<CrudQueryBuilder.WriteOperation.Update>())
 
 					if (subBuilder.data) {
-						builder = builder.one(marker.relation.field, subBuilder)
+						builder = builder.one(marker.parameters.field, subBuilder)
 					}
 				} else {
 					// This is a reduced has many relation.
-					builder = builder.many(marker.relation.field, builder => {
+					builder = builder.many(marker.parameters.field, builder => {
 						const persistedValue = this.treeStore.persistedEntityData.get(runtimeId.value)?.get?.(placeholderName)
 						const alias = AliasTransformer.entityToAlias(runtimeId)
 
@@ -529,7 +529,7 @@ export class MutationGenerator {
 				if (fieldState.type !== StateType.EntityList) {
 					continue
 				}
-				builder = builder.many(marker.relation.field, builder => {
+				builder = builder.many(marker.parameters.field, builder => {
 					for (const [, childState] of fieldState.children) {
 						const runtimeId = childState.entity.id
 						const alias = AliasTransformer.entityToAlias(runtimeId)

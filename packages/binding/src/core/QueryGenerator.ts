@@ -119,7 +119,7 @@ export class QueryGenerator {
 					builder = builder.column(fieldValue.fieldName)
 				}
 			} else if (fieldValue instanceof HasOneRelationMarker) {
-				const relation = fieldValue.relation
+				const relation = fieldValue.parameters
 				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
 					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
 				)
@@ -146,7 +146,7 @@ export class QueryGenerator {
 					)
 				}
 			} else if (fieldValue instanceof HasManyRelationMarker) {
-				const relation = fieldValue.relation
+				const relation = fieldValue.parameters
 				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
 					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
 				)

@@ -1,10 +1,11 @@
-import { EntityName } from '../../treeParameters'
-import { SchemaEntity } from './SchemaEntity'
-import { SchemaEnums } from './SchemaEnums'
+import { EntityName, FieldName } from '../../treeParameters'
+import { SchemaField } from './SchemaField'
+import { SchemaStore } from './SchemaStore'
 
-export type SchemaEntities = Map<EntityName, SchemaEntity>
+export class Schema {
+	public constructor(public readonly store: SchemaStore) {}
 
-export interface Schema {
-	enums: SchemaEnums
-	entities: SchemaEntities
+	public getEntityField(entityName: EntityName, field: FieldName): SchemaField | undefined {
+		return this.store.entities.get(entityName)?.fields.get(field)
+	}
 }

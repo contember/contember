@@ -52,7 +52,8 @@ export class SchemaLoader {
 			for (let attemptNumber = 0; attemptNumber < Math.max(1, maxAttempts); attemptNumber++) {
 				try {
 					const raw: { data: { schema: RawSchema } } = await client.sendRequest(this.schemaQuery, options)
-					return resolve(SchemaPreprocessor.processRawSchema(raw.data.schema))
+					const schema = new Schema(SchemaPreprocessor.processRawSchema(raw.data.schema))
+					return resolve(schema)
 				} catch {}
 			}
 			reject()

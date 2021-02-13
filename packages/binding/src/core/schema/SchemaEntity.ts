@@ -1,9 +1,6 @@
-import { EntityName, FieldName } from '../../treeParameters'
-import { SchemaColumn } from './SchemaColumn'
-import { SchemaRelation } from './SchemaRelation'
+import { EntityName } from '../../treeParameters'
+import { SchemaFields } from './SchemaFields'
 import { SchemaUniqueConstraint } from './SchemaUniqueConstraint'
-
-export type SchemaFields = Map<FieldName, SchemaRelation | SchemaColumn>
 
 export interface SchemaEntity {
 	name: EntityName

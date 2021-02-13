@@ -1,12 +1,13 @@
 import { RawSchema } from './RawSchema'
 import { RawSchemaEntity, RawSchemaFields } from './RawSchemaEntity'
 import { RawSchemaEnum } from './RawSchemaEnum'
-import { Schema, SchemaEntities } from './Schema'
-import { SchemaFields } from './SchemaEntity'
+import { SchemaEntities } from './SchemaEntities'
 import { SchemaEnums } from './SchemaEnums'
+import { SchemaFields } from './SchemaFields'
+import { SchemaStore } from './SchemaStore'
 
 export class SchemaPreprocessor {
-	public static processRawSchema(rawSchema: RawSchema): Schema {
+	public static processRawSchema(rawSchema: RawSchema): SchemaStore {
 		return {
 			enums: this.processRawEnums(rawSchema.enums),
 			entities: this.processRawEntities(rawSchema.entities),

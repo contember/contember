@@ -465,12 +465,10 @@ export class StateInitializer {
 		entityRealm: EntityRealmState,
 		field: HasOneRelationMarker | HasManyRelationMarker,
 	): EntityName {
-		const targetField = this.treeStore.schema.entities
-			.get(entityRealm.entity.entityName)
-			?.fields?.get(field.parameters.field)
+		const targetField = this.treeStore.schema.getEntityField(entityRealm.entity.entityName, field.parameters.field)
+
 		if (targetField?.__typename !== '_Relation') {
-			// This should have been validated elsewhere.
-			throw new BindingError()
+			throw new BindingError() // This should have been validated elsewhere.
 		}
 		return targetField.targetEntity
 	}

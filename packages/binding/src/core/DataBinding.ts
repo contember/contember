@@ -28,6 +28,7 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '../treeParameters'
+import { generateEnumerabilityPreventingEntropy } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
@@ -272,7 +273,10 @@ export class DataBinding {
 			}
 
 			// TODO this is an awful, awful hack.
-			const newTreeRootId = this.treeStore.markerTrees.size === 0 ? undefined : newMarkerTree.treeId
+			const newTreeRootId =
+				this.treeStore.markerTrees.size === 0
+					? undefined
+					: `treeRoot-${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
 			this.treeAugmenter.extendTree(newTreeRootId, newMarkerTree, newPersistedData?.data ?? {})
 
 			return newTreeRootId
@@ -317,4 +321,9 @@ export class DataBinding {
 		DataBinding.schemaLoadCache.set(this.client.apiUrl, schemaPromise)
 		return schemaPromise
 	}
+
+	private static getNextTreeRootIdSeed = (() => {
+		let seed = 0
+		return () => seed++
+	})()
 }

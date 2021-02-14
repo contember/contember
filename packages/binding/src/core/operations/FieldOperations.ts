@@ -41,7 +41,7 @@ export class FieldOperations {
 					}
 				}
 			}
-			for (const field of StateIterator.eachSiblingRealmChild(fieldState)) {
+			for (const field of StateIterator.eachSiblingRealmChild(this.treeStore, fieldState)) {
 				if (newValue === field.value) {
 					continue
 				}

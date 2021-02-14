@@ -30,7 +30,7 @@ export class ListOperations {
 			const stateToConnect = OperationsHelpers.resolveAndPrepareEntityToConnect(this.treeStore, entityToConnect)
 			const idToConnect = stateToConnect.entity.id
 
-			for (const state of StateIterator.eachSiblingRealmChild(outerState)) {
+			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, outerState)) {
 				if (state.children.has(idToConnect.value)) {
 					return
 				}
@@ -43,8 +43,8 @@ export class ListOperations {
 				} catch (error) {
 					if (error instanceof LocalizedBindingError) {
 						throw new BindingError(
-							`Entity list: cannot connect entity with key '${entityToConnect.key}' because its fields ` +
-								` are incompatible with entities found on this list. Make sure both trees are equivalent.\n\n` +
+							`Entity list: cannot connect entity with key '${entityToConnect.key}' because its fields are ` +
+								`incompatible with entities found on this list. Make sure both trees are equivalent.\n\n` +
 								`${error.message}\n\n` +
 								(error.markerPath.length > 1
 									? `Incompatibility found at: ${ErrorLocator.locateMarkerPath(error.markerPath)}.\n\n`
@@ -77,7 +77,7 @@ export class ListOperations {
 
 	public disconnectEntity(listState: EntityListState, childEntity: EntityAccessor) {
 		this.eventManager.syncOperation(() => {
-			for (const state of StateIterator.eachSiblingRealmChild(listState)) {
+			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, listState)) {
 				const disconnectedChildIdValue = childEntity.id
 				const disconnectedChildRealm = state.children.get(disconnectedChildIdValue)
 
@@ -122,7 +122,7 @@ export class ListOperations {
 			// All siblings need to have the same id.
 			const id = new UnpersistedEntityDummyId()
 
-			for (const state of StateIterator.eachSiblingRealmChild(outerState)) {
+			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, outerState)) {
 				const newEntity = this.stateInitializer.initializeListEntity(state, id)
 
 				OperationsHelpers.runImmediateUserInitialization(this.stateInitializer, newEntity, initialize)

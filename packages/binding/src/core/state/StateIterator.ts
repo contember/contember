@@ -1,53 +1,62 @@
 import { PlaceholderName } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import { TreeStore } from '../TreeStore'
+import { EntityListState } from './EntityListState'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
+import { FieldState } from './FieldState'
 import { getEntityMarker } from './getEntityMarker'
 import { RootStateNode, StateINode, StateNode } from './StateNode'
 import { StateType } from './StateType'
 
 export class StateIterator {
-	// Note that this only yields siblings with the same placeholderName!
-	public static *eachSiblingRealmChild<S extends StateNode>(state: S & StateNode): Generator<S, void> {
-		let closestEntityRealm: EntityRealmState
-		let placeholderName: PlaceholderName
-
-		switch (state.type) {
-			case StateType.Field: {
-				closestEntityRealm = state.parent
-				placeholderName = state.placeholderName
-				break
-			}
-			case StateType.EntityRealm: {
-				// TODO this is probably wrong
-				closestEntityRealm = state
-				placeholderName = getEntityMarker(state).placeholderName
-				break
-			}
-			case StateType.EntityList: {
-				const candidate = state.blueprint.parent
-				if (candidate === undefined) {
-					yield state
-					return
-				}
-				closestEntityRealm = candidate
-				placeholderName = state.blueprint.marker.placeholderName
-				break
-			}
-			default:
-				assertNever(state)
-		}
-		for (let [realmKey, realm] of closestEntityRealm.entity.realms) {
+	public static *eachSiblingRealm(
+		state: EntityRealmState,
+		relevantPlaceholder?: PlaceholderName,
+	): Generator<EntityRealmState, void> {
+		for (let [realmKey, realm] of state.entity.realms) {
 			if (realm.type === StateType.EntityRealmStub) {
-				const marker = getEntityMarker(realm)
-				if (marker.fields.placeholders.has(placeholderName)) {
+				if (relevantPlaceholder === undefined || getEntityMarker(realm).fields.placeholders.has(relevantPlaceholder)) {
 					realm.getAccessor()
-					realm = closestEntityRealm.entity.realms.get(realmKey) as EntityRealmState
+					realm = state.entity.realms.get(realmKey) as EntityRealmState
 				} else {
 					// This realm is irrelevant. No need to force-initialize it.
 					continue
 				}
 			}
+			yield realm
+		}
+	}
+
+	// Note that this only yields siblings with the same placeholderName!
+	public static *eachSiblingRealmChild<S extends EntityListState | FieldState>(
+		treeStore: TreeStore,
+		state: S & StateNode,
+	): Generator<S, void> {
+		if (state.type === StateType.EntityList && state.blueprint.parent === undefined) {
+			// Top-level entity list
+			for (const [, rootStates] of treeStore.subTreeStatesByRoot) {
+				const rootList = rootStates.get(state.blueprint.marker.placeholderName)
+				if (rootList?.type === StateType.EntityList) {
+					yield rootList as S
+				}
+			}
+			return
+		}
+
+		let closestEntityRealm: EntityRealmState
+		let placeholderName: PlaceholderName
+
+		if (state.type === StateType.Field) {
+			closestEntityRealm = state.parent
+			placeholderName = state.placeholderName
+		} else if (state.type === StateType.EntityList) {
+			closestEntityRealm = state.blueprint.parent! // The parent-less case is handled above. Hence the assertion.
+			placeholderName = state.blueprint.marker.placeholderName
+		} else {
+			return assertNever(state)
+		}
+
+		for (const realm of this.eachSiblingRealm(closestEntityRealm, placeholderName)) {
 			const child = realm.children.get(placeholderName)
 			if (child === undefined) {
 				continue

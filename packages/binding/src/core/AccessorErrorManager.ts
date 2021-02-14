@@ -1,6 +1,5 @@
 import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
-import { BindingError } from '../BindingError'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { EventManager } from './EventManager'
 import { EntityListState, EntityRealmState, getEntityMarker, StateNode, StateType } from './state'
@@ -88,20 +87,22 @@ export class AccessorErrorManager {
 	}
 
 	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot) {
-		for (const [subTreePlaceholder, rootError] of errorTreeRoot) {
-			const rootState = this.treeStore.subTreeStates.get(subTreePlaceholder)
+		for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {
+			for (const [subTreePlaceholder, rootError] of errorTreeRoot) {
+				const rootState = rootStates.get(subTreePlaceholder)
 
-			if (!rootState) {
-				continue
-			}
-			switch (rootState.type) {
-				case StateType.EntityRealm: {
-					this.setEntityStateErrors(rootState, rootError)
-					break
+				if (!rootState) {
+					continue
 				}
-				case StateType.EntityList: {
-					this.setEntityListStateErrors(rootState, rootError)
-					break
+				switch (rootState.type) {
+					case StateType.EntityRealm: {
+						this.setEntityStateErrors(rootState, rootError)
+						break
+					}
+					case StateType.EntityList: {
+						this.setEntityListStateErrors(rootState, rootError)
+						break
+					}
 				}
 			}
 		}
@@ -166,7 +167,7 @@ export class AccessorErrorManager {
 			let childState = state.children.get(childKey)
 
 			if (childState === undefined) {
-				throw new BindingError()
+				continue
 			}
 			if (childState.type === StateType.EntityRealmStub) {
 				childState.getAccessor() // Force init

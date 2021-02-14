@@ -1,8 +1,7 @@
-import { Alias, PlaceholderName } from '../treeParameters'
+import { Alias, PlaceholderName, TreeRootId } from '../treeParameters'
+import { generateEnumerabilityPreventingEntropy } from '../utils'
 import { EntityListSubTreeMarker } from './EntityListSubTreeMarker'
 import { EntitySubTreeMarker } from './EntitySubTreeMarker'
-
-export type MarkerTreeRootId = string
 
 export class MarkerTreeRoot {
 	private static getNextSeed = (() => {
@@ -10,13 +9,13 @@ export class MarkerTreeRoot {
 		return () => seed++
 	})()
 
-	public readonly treeId: MarkerTreeRootId
+	public readonly treeId: TreeRootId
 
 	public constructor(
 		public readonly subTrees: Map<PlaceholderName, EntitySubTreeMarker | EntityListSubTreeMarker>,
 		public readonly placeholdersByAliases: Map<Alias, PlaceholderName>,
 	) {
-		const enumerabilityPreventingEntropy = (Math.random() * 1e5).toFixed(0)
-		this.treeId = `tree-${enumerabilityPreventingEntropy}-${MarkerTreeRoot.getNextSeed()}`
+		const enumerabilityPreventingEntropy = generateEnumerabilityPreventingEntropy()
+		this.treeId = `treeRoot-${enumerabilityPreventingEntropy}-${MarkerTreeRoot.getNextSeed()}`
 	}
 }

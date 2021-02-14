@@ -6,10 +6,12 @@ import {
 	HasOneRelationMarker,
 	MarkerTreeRoot,
 } from '../markers'
+import { PlaceholderName, TreeRootId } from '../treeParameters'
 import { assert, assertNever } from '../utils'
 import { EventManager } from './EventManager'
 import { MarkerMerger } from './MarkerMerger'
-import { EntityListState, EntityRealmKey, EntityRealmParent, EntityState, StateType } from './state'
+import { QueryResponseNormalizer } from './QueryResponseNormalizer'
+import { EntityListState, EntityRealmKey, EntityRealmParent, EntityState, RootStateNode, StateType } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeStore } from './TreeStore'
 
@@ -24,56 +26,33 @@ export class TreeAugmenter {
 
 	public updatePersistedData(response: ReceivedDataTree) {
 		//this.treeStore.updatePersistedData(response)
-		this.extendTree(this.treeStore.markerTree, response) // TODO!!!
+		//this.extendTree(this.treeStore.markerTree, response) // TODO!!!
 	}
 
-	public extendTree(newMarkerTree: MarkerTreeRoot, newPersistedData: ReceivedDataTree) {
-		this.treeStore.extendTree(newMarkerTree, newPersistedData)
+	public extendTree(
+		newTreeId: TreeRootId | undefined,
+		newMarkerTree: MarkerTreeRoot,
+		newPersistedData: ReceivedDataTree,
+	) {
+		// TODO this doesn't yet handle updates for entities whose persisted data just gets magically changed without notice.
+		QueryResponseNormalizer.mergeInResponse(this.treeStore.persistedData, newPersistedData)
 
-		// TODO this whole process fails to:
-		//		- Properly update realms
-		//		- Update creationParameters
-		//		- Update environment
-		//		- Update initialEventListeners
+		const subTreeStates: Map<PlaceholderName, RootStateNode> = new Map()
 
-		const alreadyProcessed: AlreadyProcessed = new Map()
-		for (const [subTreePlaceholder, newSubTreeMarker] of newMarkerTree.subTrees) {
-			const completeTreeMarker = this.treeStore.markerTree.subTrees.get(subTreePlaceholder)
-			const subTreeState = this.treeStore.subTreeStates.get(subTreePlaceholder)
-			const newSubTreeData = this.treeStore.subTreePersistedData.get(subTreePlaceholder)
+		this.treeStore.markerTrees.set(newTreeId, newMarkerTree)
+		this.treeStore.subTreeStatesByRoot.set(newTreeId, subTreeStates)
 
-			assert(completeTreeMarker !== undefined)
-
-			if (subTreeState === undefined) {
-				this.stateInitializer.initializeSubTree(newSubTreeMarker)
-			} else if (subTreeState.type === StateType.EntityRealm) {
-				assert(newSubTreeData === null || newSubTreeData === undefined || newSubTreeData instanceof ServerGeneratedUuid)
-
-				// this.updateSingleEntityPersistedData(
-				// 	alreadyProcessed,
-				// 	undefined,
-				// 	subTreePlaceholder,
-				// 	subTreeState,
-				// 	completeTreeMarker.fields,
-				// 	newSubTreeMarker.fields,
-				// 	newSubTreeData || new UnpersistedEntityDummyId(),
-				// )
-			} else if (subTreeState.type === StateType.EntityList) {
-				assert(newSubTreeData instanceof Set)
-
-				// this.updateEntityListPersistedData(
-				// 	alreadyProcessed,
-				// 	subTreeState,
-				// 	completeTreeMarker.fields,
-				// 	newSubTreeMarker.fields,
-				// 	newSubTreeData,
-				// )
-			} else {
-				assertNever(subTreeState)
-			}
+		for (const [placeholderName, newSubTreeMarker] of newMarkerTree.subTrees) {
+			const newState = this.stateInitializer.initializeSubTree(newSubTreeMarker)
+			subTreeStates.set(placeholderName, newState)
 		}
 	}
 
+	// TODO this whole process fails to:
+	//		- Properly update realms
+	//		- Update creationParameters
+	//		- Update environment
+	//		- Update initialEventListeners
 	// private updateSingleEntityPersistedData(
 	// 	alreadyProcessed: AlreadyProcessed,
 	// 	parent: EntityRealmParent,

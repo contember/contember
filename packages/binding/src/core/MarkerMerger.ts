@@ -13,7 +13,7 @@ import {
 	Marker,
 	MarkerTreeRoot,
 } from '../markers'
-import { FieldName, PlaceholderName } from '../treeParameters'
+import { Alias, FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
@@ -83,8 +83,18 @@ export class MarkerMerger {
 			EntitySubTreeMarker | EntityListSubTreeMarker
 		>
 
-		const newOriginalAliases = new Map(original.placeholdersByAliases)
-		for (const [alias, placeholder] of fresh.placeholdersByAliases) {
+		return new MarkerTreeRoot(
+			newSubTrees,
+			this.mergeSubTreePlaceholdersByAliases(original.placeholdersByAliases, fresh.placeholdersByAliases),
+		)
+	}
+
+	public static mergeSubTreePlaceholdersByAliases(
+		original: Map<Alias, PlaceholderName>,
+		fresh: Map<Alias, PlaceholderName>,
+	) {
+		const newOriginalAliases = new Map(original)
+		for (const [alias, placeholder] of fresh) {
 			const fromOriginal = newOriginalAliases.get(alias)
 			if (fromOriginal === undefined) {
 				newOriginalAliases.set(alias, placeholder)
@@ -94,7 +104,7 @@ export class MarkerMerger {
 				throw new BindingError(`Illegal subTree alias '${alias}' points to distinct subTrees.`)
 			}
 		}
-		return new MarkerTreeRoot(newSubTrees, newOriginalAliases)
+		return newOriginalAliases
 	}
 
 	public static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers {

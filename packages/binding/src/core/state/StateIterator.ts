@@ -1,8 +1,9 @@
 import { PlaceholderName } from '../../treeParameters'
 import { assertNever } from '../../utils'
+import { TreeStore } from '../TreeStore'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import { getEntityMarker } from './getEntityMarker'
-import { StateINode, StateNode } from './StateNode'
+import { RootStateNode, StateINode, StateNode } from './StateNode'
 import { StateType } from './StateType'
 
 export class StateIterator {
@@ -92,6 +93,12 @@ export class StateIterator {
 		}
 		if (match(root)) {
 			yield root
+		}
+	}
+
+	public static *eachRootState(treeStore: TreeStore): Generator<[PlaceholderName, RootStateNode], void, undefined> {
+		for (const rootStates of treeStore.subTreeStatesByRoot.values()) {
+			yield* rootStates.entries()
 		}
 	}
 }

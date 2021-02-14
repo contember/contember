@@ -9,6 +9,7 @@ import {
 } from '../markers'
 import { EntityName } from '../treeParameters'
 import { assertNever } from '../utils'
+import { StateIterator } from './state'
 import { TreeStore } from './TreeStore'
 
 type RawRelationFilters = Map<string, RawRelationFilters>
@@ -17,12 +18,18 @@ export class TreeFilterGenerator {
 	public constructor(private readonly treeStore: TreeStore) {}
 
 	public generateTreeFilter(): TreeFilter[] {
-		return Array.from(this.treeStore.markerTree.subTrees)
-			.filter(([, tree]) => tree.parameters.expectedMutation !== 'none')
-			.map(([placeholderName, tree]) =>
-				this.generateSubTreeFilter(tree, this.treeStore.subTreePersistedData.get(placeholderName)),
-			)
-			.flat()
+		const filters: TreeFilter[][] = []
+
+		for (const [placeholderName, state] of StateIterator.eachRootState(this.treeStore)) {
+			const blueprint = state.blueprint
+
+			if (blueprint.parent || blueprint.marker.parameters.expectedMutation === 'none') {
+				continue
+			}
+			const marker = blueprint.marker
+			filters.push(this.generateSubTreeFilter(marker, this.treeStore.subTreePersistedData.get(placeholderName)))
+		}
+		return filters.flat()
 	}
 
 	private generateSubTreeFilter(

@@ -26,6 +26,7 @@ import {
 	SugaredQualifiedSingleEntity,
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUnconstrainedQualifiedSingleEntity,
+	TreeRootId,
 } from '../treeParameters'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
@@ -99,15 +100,17 @@ export class DataBinding {
 		},
 		getEntityListSubTree: (
 			aliasOrParameters: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList,
+			treeId: TreeRootId | undefined,
 			environment = this.environment,
 		): EntityListAccessor => {
-			return this.treeStore.getSubTreeState('entityList', aliasOrParameters, environment).getAccessor()
+			return this.treeStore.getSubTreeState('entityList', treeId, aliasOrParameters, environment).getAccessor()
 		},
 		getEntitySubTree: (
 			aliasOrParameters: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,
+			treeId: TreeRootId | undefined,
 			environment = this.environment,
 		): EntityAccessor => {
-			return this.treeStore.getSubTreeState('entity', aliasOrParameters, environment).getAccessor()
+			return this.treeStore.getSubTreeState('entity', treeId, aliasOrParameters, environment).getAccessor()
 		},
 		getTreeFilters: (): TreeFilter[] => {
 			const generator = new TreeFilterGenerator(this.treeStore)
@@ -230,7 +233,10 @@ export class DataBinding {
 	// 	this.treeRootListeners,
 	// )
 
-	public async extendTree(newFragment: React.ReactNode, { signal, environment }: ExtendTreeOptions = {}) {
+	public async extendTree(
+		newFragment: React.ReactNode,
+		{ signal, environment }: ExtendTreeOptions = {},
+	): Promise<TreeRootId | undefined> {
 		return await this.eventManager.asyncOperation(async () => {
 			if (signal?.aborted) {
 				return Promise.reject()
@@ -248,13 +254,13 @@ export class DataBinding {
 
 				const schema = await schemaOrPromise
 
-				this.treeStore.updateSchema(schema)
+				this.treeStore.setSchema(schema)
 				if (__DEV_MODE__) {
 					SchemaValidator.assertTreeValid(schema, newMarkerTree)
 				}
 				newPersistedData = await newPersistedDataPromise
 			} else {
-				this.treeStore.updateSchema(schemaOrPromise)
+				this.treeStore.setSchema(schemaOrPromise)
 				if (__DEV_MODE__) {
 					SchemaValidator.assertTreeValid(schemaOrPromise, newMarkerTree)
 				}
@@ -265,7 +271,11 @@ export class DataBinding {
 				return Promise.reject()
 			}
 
-			this.treeAugmenter.extendTree(newMarkerTree, newPersistedData?.data ?? {})
+			// TODO this is an awful, awful hack.
+			const newTreeRootId = this.treeStore.markerTrees.size === 0 ? undefined : newMarkerTree.treeId
+			this.treeAugmenter.extendTree(newTreeRootId, newMarkerTree, newPersistedData?.data ?? {})
+
+			return newTreeRootId
 		})
 	}
 

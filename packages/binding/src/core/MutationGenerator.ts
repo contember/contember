@@ -19,6 +19,7 @@ import {
 	FieldState,
 	getEntityMarker,
 	RootStateNode,
+	StateIterator,
 	StateType,
 } from './state'
 import { TreeStore } from './TreeStore'
@@ -37,13 +38,9 @@ export class MutationGenerator {
 			let builder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 			const processedEntities: ProcessedEntities = new Set()
 
-			for (const [placeholderName, subTreeMarker] of this.treeStore.markerTree.subTrees) {
-				builder = this.addSubMutation(
-					processedEntities,
-					this.treeStore.subTreeStates.get(placeholderName)!,
-					placeholderName,
-					builder,
-				)
+			for (const [placeholderName, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
+				// TODO there *CAN* be duplicate placeholders. Need to handle this later.
+				builder = this.addSubMutation(processedEntities, subTreeState, placeholderName, builder)
 			}
 			return builder.inTransaction().getGql()
 		} catch (e) {

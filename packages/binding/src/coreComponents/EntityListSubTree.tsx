@@ -9,7 +9,7 @@ import {
 import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
-import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
+import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '../treeParameters'
 import { Component } from './Component'
 import { EntityBaseProps } from './Entity'
 import { EntityList, EntityListBaseProps } from './EntityList'
@@ -20,6 +20,7 @@ export interface EntityListSubTreeAdditionalProps {
 }
 
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
+	treeRootId?: TreeRootId
 	children?: React.ReactNode
 } & EntityListSubTreeAdditionalProps &
 	(SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList) &
@@ -41,7 +42,11 @@ export const EntityListSubTree = Component(
 
 		const getSubTree = useGetEntityListSubTree()
 		const parameters = useEntityListSubTreeParameters(props)
-		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
+		const getAccessor = React.useCallback(() => getSubTree(parameters, props.treeRootId), [
+			getSubTree,
+			parameters,
+			props.treeRootId,
+		])
 		const accessor = useAccessorUpdateSubscription(getAccessor)
 
 		//  TODO revive top level hasOneRelationPath

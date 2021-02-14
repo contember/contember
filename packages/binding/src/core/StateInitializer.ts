@@ -80,7 +80,6 @@ export class StateInitializer {
 				),
 			)
 		}
-		this.treeStore.subTreeStates.set(tree.placeholderName, subTreeState)
 
 		return subTreeState
 	}
@@ -473,7 +472,7 @@ export class StateInitializer {
 		return targetField.targetEntity
 	}
 
-	public initializeEntityField(
+	private initializeEntityField(
 		entityRealm: EntityRealmState,
 		field: Marker,
 		fieldDatum: EntityFieldPersistedData | undefined,

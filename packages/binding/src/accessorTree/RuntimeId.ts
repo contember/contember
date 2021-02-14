@@ -1,3 +1,5 @@
+import { generateEnumerabilityPreventingEntropy } from '../utils'
+
 interface RuntimeIdSpec {
 	existsOnServer: boolean
 	value: string
@@ -29,7 +31,7 @@ export class UnpersistedEntityDummyId implements RuntimeIdSpec {
 	})()
 
 	public constructor() {
-		const enumerabilityPreventingEntropy = (Math.random() * 1e5).toFixed(0)
+		const enumerabilityPreventingEntropy = generateEnumerabilityPreventingEntropy()
 		this.value = `adminOnlyDummyId-${enumerabilityPreventingEntropy}-${UnpersistedEntityDummyId.getNextSeed()}`
 	}
 }

@@ -6,7 +6,7 @@ import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accesso
 import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory, QueryLanguage } from '../queryLanguage'
-import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
+import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity, TreeRootId } from '../treeParameters'
 import { Component } from './Component'
 import { Entity, EntityBaseProps } from './Entity'
 import { Field } from './Field'
@@ -18,6 +18,7 @@ export interface EntitySubTreeAdditionalProps {
 export type EntitySubTreeAdditionalCreationProps = {} | SetOrderFieldOnCreateOwnProps
 
 export type EntitySubTreeProps<EntityProps> = {
+	treeRootId?: TreeRootId
 	children?: React.ReactNode
 } & EntitySubTreeAdditionalProps &
 	(SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps)) &
@@ -35,7 +36,11 @@ export const EntitySubTree = Component(
 
 		const getSubTree = useGetEntitySubTree()
 		const parameters = useEntitySubTreeParameters(props)
-		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
+		const getAccessor = React.useCallback(() => getSubTree(parameters, props.treeRootId), [
+			getSubTree,
+			parameters,
+			props.treeRootId,
+		])
 		const accessor = useAccessorUpdateSubscription(getAccessor)
 
 		// TODO revive top-level hasOneRelationPath

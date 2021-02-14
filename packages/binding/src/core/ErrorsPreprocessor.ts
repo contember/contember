@@ -1,5 +1,6 @@
 import { ErrorAccessor } from '../accessors'
 import { MutationDataResponse, ValidationError, MutationResponse, ExecutionError } from '../accessorTree'
+import { PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 
@@ -221,7 +222,7 @@ namespace ErrorsPreprocessor {
 		INode = 'INode',
 	}
 
-	export type ErrorTreeRoot = Map<string, ErrorNode>
+	export type ErrorTreeRoot = Map<PlaceholderName, ErrorNode>
 
 	export class ErrorsPreprocessorError extends Error {}
 }

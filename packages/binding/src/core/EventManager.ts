@@ -260,7 +260,7 @@ export class EventManager {
 					EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler,
 				]> = []
 
-				for (const [, subTreeState] of this.treeStore.subTreeStates) {
+				for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
 					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
 						for (const listener of iNode.eventListeners.beforePersist!) {
 							callbackQueue.push([iNode, listener])
@@ -414,7 +414,7 @@ export class EventManager {
 
 				const handlerPromises: Array<Promise<void>> = []
 
-				for (const [, subTreeState] of this.treeStore.subTreeStates) {
+				for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
 					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistErrorHandler)) {
 						for (const listener of iNode.eventListeners.persistError!) {
 							const result = listener(iNode.getAccessor as any, options)
@@ -447,7 +447,7 @@ export class EventManager {
 		this.syncTransaction(() => {
 			const iNodeHasPersistSuccessHandler = (iNode: StateINode) => iNode.eventListeners.persistSuccess !== undefined
 
-			for (const [, subTreeState] of this.treeStore.subTreeStates) {
+			for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
 				for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistSuccessHandler)) {
 					for (const listener of iNode.eventListeners.persistSuccess!) {
 						listener(iNode.getAccessor as any, options)

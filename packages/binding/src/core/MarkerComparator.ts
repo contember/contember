@@ -1,3 +1,4 @@
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFieldMarkersContainer,
 	EntityListSubTreeMarker,
@@ -27,6 +28,9 @@ export class MarkerComparator {
 
 			if (fromSuperset === undefined) {
 				if (candidateMarker instanceof FieldMarker) {
+					if (candidateMarker.fieldName === PRIMARY_KEY_NAME || candidateMarker.fieldName === TYPENAME_KEY_NAME) {
+						continue
+					}
 					throw new LocalizedBindingError(`The field '${candidateMarker.fieldName}' is missing.`, [candidateMarker])
 				}
 				if (candidateMarker instanceof HasOneRelationMarker || candidateMarker instanceof HasManyRelationMarker) {

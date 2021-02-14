@@ -6,6 +6,7 @@ import {
 	QueryLanguage,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
+	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 	useAccessorUpdateSubscription,
 	useEnvironment,
@@ -52,14 +53,13 @@ export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 }
 
 export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldList | QualifiedEntityList) => {
-	return [] // TODO
-	// const getSubTree = useGetEntityListSubTree()
-	// const getSubTreeData = React.useCallback(() => getSubTree(desugaredOptionPath), [
-	// 	desugaredOptionPath,
-	// 	getSubTree,
-	// ])
-	// const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
-	// return React.useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
+	const getSubTree = useGetEntityListSubTree()
+	const entityList = React.useMemo<SugaredQualifiedEntityList>(() => ({ entities: desugaredOptionPath }), [
+		desugaredOptionPath,
+	])
+	const getSubTreeData = React.useCallback(() => getSubTree(entityList), [entityList, getSubTree])
+	const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
+	return React.useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
 }
 
 export const useOptionEntities = (
@@ -67,12 +67,13 @@ export const useOptionEntities = (
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
 ) =>
 	React.useMemo(() => {
+		const relativeEntity: SugaredRelativeSingleEntity = { field: desugaredOptionPath.hasOneRelationPath }
 		const entities: EntityAccessor[] = []
 		for (const entity of topLevelOptionAccessors) {
-			entities.push(entity.getRelativeSingleEntity(desugaredOptionPath))
+			entities.push(entity.getEntity(relativeEntity))
 		}
 		return entities
-	}, [desugaredOptionPath, topLevelOptionAccessors])
+	}, [desugaredOptionPath.hasOneRelationPath, topLevelOptionAccessors])
 
 export const useCurrentValues = (
 	currentlyChosenEntities: EntityAccessor[],

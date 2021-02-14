@@ -1,6 +1,8 @@
 import * as React from 'react'
 import {
 	EntityFieldMarkersContainer,
+	EntitySubTree,
+	EntitySubTreeMarker,
 	Environment,
 	Field,
 	FieldMarker,
@@ -12,9 +14,6 @@ import {
 	MarkerTreeGenerator,
 	MarkerTreeRoot,
 	PRIMARY_KEY_NAME,
-	EntitySubTree,
-	TYPENAME_KEY_NAME,
-	EntitySubTreeMarker,
 } from '../../../../src'
 
 describe('Marker tree generator', () => {
@@ -60,7 +59,6 @@ describe('Marker tree generator', () => {
 			rootWhereAsFilter: { bar: { eq: 123 } },
 		})
 		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
-		const typeNameMarker = [TYPENAME_KEY_NAME, new FieldMarker(TYPENAME_KEY_NAME)] as const
 
 		const singleListeners = {
 			beforePersist: undefined,
@@ -98,14 +96,12 @@ describe('Marker tree generator', () => {
 				true,
 				new Map([
 					idMarker,
-					typeNameMarker,
 					['same', new FieldMarker('same')],
 					['name', new FieldMarker('name')],
 					['surname', new FieldMarker('surname')],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
 					['same', 'same'],
 					['name', 'name'],
 					['surname', 'surname'],
@@ -129,13 +125,11 @@ describe('Marker tree generator', () => {
 				true,
 				new Map<string, Marker>([
 					idMarker,
-					typeNameMarker,
 					[innerHasMany.placeholderName, innerHasMany],
 					['hasOneField', new FieldMarker('hasOneField')],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
 					['common', innerHasMany.placeholderName],
 					['hasOneField', 'hasOneField'],
 				]),
@@ -161,13 +155,11 @@ describe('Marker tree generator', () => {
 				true,
 				new Map<string, Marker>([
 					idMarker,
-					typeNameMarker,
 					['hasManyField', new FieldMarker('hasManyField')],
 					[hasOne.placeholderName, hasOne],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
 					['hasManyField', 'hasManyField'],
 					[hasOne.parameters.field, hasOne.placeholderName],
 				]),
@@ -192,13 +184,11 @@ describe('Marker tree generator', () => {
 				true,
 				new Map<string, Marker>([
 					idMarker,
-					typeNameMarker,
 					[outerHasMany.placeholderName, outerHasMany],
 					['fooField', new FieldMarker('fooField')],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
 					[outerHasMany.parameters.field, outerHasMany.placeholderName],
 					['fooField', 'fooField'],
 				]),

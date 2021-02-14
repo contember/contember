@@ -47,14 +47,26 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 			) : (
 				<Field field={props.searchByFields} />
 			))
+
+		let renderedOptionBase: React.ReactNode
+
+		if ('renderOption' in props) {
+			renderedOptionBase =
+				typeof props.optionsStaticRender === 'function'
+					? props.optionsStaticRender(environment)
+					: props.optionsStaticRender
+		} else {
+			// TODO this is wasteful
+			const sugaredFieldList: SugaredQualifiedFieldList =
+				typeof props.options === 'string' || !('fields' in props.options) ? { fields: props.options } : props.options
+			const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
+			renderedOptionBase = <Field field={fieldList} />
+		}
+
 		const renderedOption = (
 			<>
 				{searchByFields}
-				{'renderOption' in props
-					? typeof props.optionsStaticRender === 'function'
-						? props.optionsStaticRender(environment)
-						: props.optionsStaticRender
-					: undefined}
+				{renderedOptionBase}
 			</>
 		)
 
@@ -77,9 +89,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		if ('renderOption' in props) {
 			const sugaredEntityList: SugaredQualifiedEntityList =
 				typeof props.options === 'string' || !('entities' in props.options)
-					? {
-							entities: props.options,
-					  }
+					? { entities: props.options }
 					: props.options
 			entityListDataProvider = (
 				<EntityListSubTree {...sugaredEntityList} expectedMutation="none">
@@ -88,16 +98,18 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 			)
 		} else {
 			const sugaredFieldList: SugaredQualifiedFieldList =
-				typeof props.options === 'string' || !('fields' in props.options)
-					? {
-							fields: props.options,
-					  }
-					: props.options
+				typeof props.options === 'string' || !('fields' in props.options) ? { fields: props.options } : props.options
 			const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
 			entityListDataProvider = (
-				<EntityListSubTree {...fieldList} entities={fieldList} expectedMutation="none">
-					{searchByFields}
-					<Field field={fieldList.field} />
+				<EntityListSubTree
+					{...fieldList}
+					entities={{
+						entityName: fieldList.entityName,
+						filter: fieldList.filter,
+					}}
+					expectedMutation="none"
+				>
+					{renderedOption}
 				</EntityListSubTree>
 			)
 		}

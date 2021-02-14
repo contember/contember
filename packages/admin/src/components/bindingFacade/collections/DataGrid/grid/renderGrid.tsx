@@ -1,4 +1,11 @@
-import { EntityListSubTree, Environment, Filter, QueryLanguage, SugaredQualifiedEntityList } from '@contember/binding'
+import {
+	EntityListSubTree,
+	Environment,
+	Filter,
+	QueryLanguage,
+	SugaredQualifiedEntityList,
+	TreeRootId,
+} from '@contember/binding'
 import * as React from 'react'
 import {
 	DataGridContainer,
@@ -23,6 +30,7 @@ export interface RenderGridOptions {
 
 export const renderGrid = (
 	{ entities, setIsColumnHidden, setFilter, setOrderBy, updatePaging, containerProps }: RenderGridOptions,
+	treeRootId: TreeRootId | undefined,
 	displayedState: DataGridState,
 	desiredState: DataGridState,
 	environment: Environment,
@@ -46,6 +54,7 @@ export const renderGrid = (
 				...desugared,
 				filter,
 			}}
+			treeRootId={treeRootId}
 			offset={itemsPerPage === null ? undefined : itemsPerPage * pageIndex}
 			limit={itemsPerPage === null ? undefined : itemsPerPage}
 			orderBy={collectOrderBy(columns, orderDirections, environment)}

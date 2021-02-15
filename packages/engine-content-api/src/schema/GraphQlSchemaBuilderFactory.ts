@@ -26,6 +26,8 @@ import { CustomTypesProvider } from './CustomTypesProvider'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 import { Authorizator } from '../acl'
 import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory'
+import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
+import { PaginatedHasManyFieldProviderVisitor } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProviderVisitor'
 
 export class GraphQlSchemaBuilderFactory {
 	constructor(private readonly graphqlObjectFactories: GraphQLObjectsFactory) {}
@@ -73,6 +75,16 @@ export class GraphQlSchemaBuilderFactory {
 		)
 		const hasManyToOneReducer = new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor)
 		entityTypeProvider.registerEntityFieldProvider(HasManyToHasOneReducer.extensionName, hasManyToOneReducer)
+
+		const paginatedHasManyFieldProviderVisitor = new PaginatedHasManyFieldProviderVisitor(paginatedFieldConfigFactory)
+		const paginatedHasManyFieldProvider = new PaginatedHasManyFieldProvider(
+			schema,
+			paginatedHasManyFieldProviderVisitor,
+		)
+		entityTypeProvider.registerEntityFieldProvider(
+			PaginatedHasManyFieldProvider.extensionName,
+			paginatedHasManyFieldProvider,
+		)
 
 		const queryProvider = new QueryProvider(
 			authorizator,

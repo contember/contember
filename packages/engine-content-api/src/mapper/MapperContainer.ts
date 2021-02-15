@@ -30,6 +30,8 @@ import { Builder } from '@contember/dic'
 import { Acl, Schema } from '@contember/schema'
 import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { Providers } from '@contember/schema-utils'
+import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
+import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
 
 type MapperContainerArgs = {
 	schema: Schema
@@ -73,8 +75,13 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 			'hasManyToHasOneReducer',
 			({ uniqueWhereExpander }) => new HasManyToHasOneReducerExecutionHandler(schema.model, uniqueWhereExpander),
 		)
-		.addService('selectHandlers', ({ hasManyToHasOneReducer }) => ({
+		.addService(
+			'paginatedHasManyExecutionHandler',
+			({ relationFetcher }) => new PaginatedHasManyExecutionHandler(schema.model, relationFetcher),
+		)
+		.addService('selectHandlers', ({ hasManyToHasOneReducer, paginatedHasManyExecutionHandler }) => ({
 			[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,
+			[PaginatedHasManyFieldProvider.extensionName]: paginatedHasManyExecutionHandler,
 		}))
 		.addService(
 			'selectBuilderFactory',

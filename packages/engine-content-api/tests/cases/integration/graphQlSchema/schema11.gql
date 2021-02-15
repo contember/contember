@@ -29,6 +29,7 @@ type Author {
   name: String
   posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
   postsByLocales(by: AuthorPostsByLocalesUniqueWhere!, filter: PostWhere): Post
+  paginatePosts(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
 }
 
 type AuthorMeta {
@@ -51,6 +52,8 @@ type Post {
   publishedAt: DateTime
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   categories(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
+  paginateLocales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
+  paginateCategories(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
 }
 
 type PostMeta {
@@ -201,6 +204,7 @@ type Category {
   id: UUID!
   name: String
   posts(filter: PostWhere, orderBy: [PostOrderBy!], offset: Int, limit: Int): [Post!]!
+  paginatePosts(filter: PostWhere, orderBy: [PostOrderBy!], skip: Int, first: Int): PostConnection!
 }
 
 type CategoryMeta {
@@ -209,11 +213,42 @@ type CategoryMeta {
   posts: FieldMeta
 }
 
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type PostEdge {
+  node: Post!
+}
+
 input CategoryOrderBy {
   _random: Boolean
   _randomSeeded: Int
   id: OrderDirection
   name: OrderDirection
+}
+
+type PostLocaleConnection {
+  pageInfo: PageInfo!
+  edges: [PostLocaleEdge!]!
+}
+
+type PostLocaleEdge {
+  node: PostLocale!
+}
+
+type CategoryConnection {
+  pageInfo: PageInfo!
+  edges: [CategoryEdge!]!
+}
+
+type CategoryEdge {
+  node: Category!
 }
 
 input AuthorPostsByLocalesUniqueWhere {
@@ -237,10 +272,6 @@ input PostUniqueWhere {
 type AuthorConnection {
   pageInfo: PageInfo!
   edges: [AuthorEdge!]!
-}
-
-type PageInfo {
-  totalCount: Int!
 }
 
 type AuthorEdge {
@@ -407,15 +438,6 @@ input AuthorUpsertPostsRelationInput {
   create: PostWithoutAuthorCreateInput
 }
 
-type CategoryConnection {
-  pageInfo: PageInfo!
-  edges: [CategoryEdge!]!
-}
-
-type CategoryEdge {
-  node: Category!
-}
-
 input CategoryCreateInput {
   id: UUID
   name: String
@@ -501,15 +523,6 @@ input CategoryUpsertPostsRelationInput {
   create: PostWithoutCategoriesCreateInput
 }
 
-type PostLocaleConnection {
-  pageInfo: PageInfo!
-  edges: [PostLocaleEdge!]!
-}
-
-type PostLocaleEdge {
-  node: PostLocale!
-}
-
 input PostLocaleCreateInput {
   id: UUID
   title: String
@@ -555,15 +568,6 @@ input PostWithoutLocalesUpdateInput {
 input PostLocaleUpsertPostRelationInput {
   update: PostWithoutLocalesUpdateInput
   create: PostWithoutLocalesCreateInput
-}
-
-type PostConnection {
-  pageInfo: PageInfo!
-  edges: [PostEdge!]!
-}
-
-type PostEdge {
-  node: Post!
 }
 
 input PostCreateInput {

@@ -36,6 +36,7 @@ type Root {
   _meta: RootMeta
   id: UUID!
   r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
+  paginateR(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
 }
 
 type RootMeta {
@@ -117,10 +118,6 @@ input RootOrderBy {
   id: OrderDirection
 }
 
-input OneHasManyEntityUniqueWhere {
-  id: UUID
-}
-
 type OneHasManyEntityConnection {
   pageInfo: PageInfo!
   edges: [OneHasManyEntityEdge!]!
@@ -132,6 +129,10 @@ type PageInfo {
 
 type OneHasManyEntityEdge {
   node: OneHasManyEntity!
+}
+
+input OneHasManyEntityUniqueWhere {
+  id: UUID
 }
 
 type _ValidationResult {

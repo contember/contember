@@ -42,6 +42,7 @@ type FrontPage {
   introVideo(filter: VideoWhere): Video
   inHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
   inHouseVideosByFrontPageForIntro(by: FrontPageInHouseVideosByFrontPageForIntroUniqueWhere!, filter: VideoWhere): Video
+  paginateInHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
 }
 
 type FrontPageMeta {

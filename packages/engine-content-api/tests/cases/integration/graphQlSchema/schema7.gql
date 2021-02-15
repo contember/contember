@@ -41,6 +41,7 @@ type Post {
   publishedAt: DateTime
   locales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], offset: Int, limit: Int): [PostLocale!]!
   localesByLocale(by: PostLocalesByLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocale
+  paginateLocales(filter: PostLocaleWhere, orderBy: [PostLocaleOrderBy!], skip: Int, first: Int): PostLocaleConnection!
 }
 
 type PostMeta {
@@ -149,17 +150,6 @@ input PostLocalesByLocaleUniqueWhere {
   locale: String
 }
 
-input PostLocaleUniqueWhere {
-  id: UUID
-  locale: String
-  post: PostUniqueWhere
-}
-
-input PostUniqueWhere {
-  id: UUID
-  locales: PostLocaleUniqueWhere
-}
-
 type PostLocaleConnection {
   pageInfo: PageInfo!
   edges: [PostLocaleEdge!]!
@@ -171,6 +161,17 @@ type PageInfo {
 
 type PostLocaleEdge {
   node: PostLocale!
+}
+
+input PostLocaleUniqueWhere {
+  id: UUID
+  locale: String
+  post: PostUniqueWhere
+}
+
+input PostUniqueWhere {
+  id: UUID
+  locales: PostLocaleUniqueWhere
 }
 
 type _ValidationResult {

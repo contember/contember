@@ -144,14 +144,14 @@ export class EntityTypeProvider {
 									fields: {
 										node: {
 											type: this.graphqlObjectFactories.createNotNull(entityType),
-											resolve: aliasAwareResolver,
+											// resolve: aliasAwareResolver,
 										},
 									},
 								}),
 							),
 						),
 					),
-					resolve: aliasAwareResolver,
+					// resolve: aliasAwareResolver,
 				},
 			},
 		})

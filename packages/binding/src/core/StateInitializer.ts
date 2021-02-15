@@ -29,6 +29,7 @@ import {
 	RootStateNode,
 	StateType,
 } from './state'
+import { BijectiveIndexedMap } from './structures'
 import { TreeParameterMerger } from './TreeParameterMerger'
 import { TreeStore } from './TreeStore'
 
@@ -253,7 +254,7 @@ export class StateInitializer {
 			blueprint,
 			persistedEntityIds,
 			addEventListener: undefined as any,
-			children: new Map(),
+			children: new BijectiveIndexedMap(realm => realm.entity.id.value),
 			childrenWithPendingUpdates: undefined,
 			entityName,
 			eventListeners: TreeParameterMerger.cloneEntityListEventListeners(blueprint.marker.parameters.eventListeners),

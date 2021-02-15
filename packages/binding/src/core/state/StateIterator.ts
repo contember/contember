@@ -86,15 +86,11 @@ export class StateIterator {
 		visitedINodes.add(root)
 		switch (root.type) {
 			case StateType.EntityRealm:
-				for (const [, childState] of root.children) {
+			case StateType.EntityList:
+				for (const childState of root.children.values()) {
 					if (childState.type === StateType.EntityRealm || childState.type === StateType.EntityList) {
 						yield* this.depthFirstINodesImplementation(childState, match, visitedINodes)
 					}
-				}
-				break
-			case StateType.EntityList:
-				for (const [, childState] of root.children) {
-					yield* this.depthFirstINodesImplementation(childState, match, visitedINodes)
 				}
 				break
 			default:

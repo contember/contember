@@ -87,9 +87,7 @@ export class ListOperations {
 					)
 				}
 
-				const disconnectedRealmKey = disconnectedChildRealm.realmKey
-				this.treeStore.entityRealmStore.delete(disconnectedRealmKey)
-				disconnectedChildRealm.entity.realms.delete(disconnectedRealmKey)
+				this.treeStore.disposeOfRealm(disconnectedChildRealm)
 				listState.children.delete(disconnectedChildIdValue)
 
 				// TODO handle zero realms after the delete

@@ -1,6 +1,7 @@
 import { EntityListAccessor, ErrorAccessor } from '../../accessors'
 import { EntityListSubTreeMarker, HasManyRelationMarker } from '../../markers'
 import { EntityId, EntityName, RemovalType } from '../../treeParameters'
+import { BijectiveIndexedMap } from '../structures'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import { StateType } from './StateType'
 
@@ -18,7 +19,7 @@ export interface EntityListState {
 	type: StateType.EntityList
 
 	blueprint: EntityListBlueprint
-	children: Map<string, EntityRealmState | EntityRealmStateStub>
+	children: BijectiveIndexedMap<EntityId, EntityRealmState | EntityRealmStateStub>
 	childrenWithPendingUpdates: Set<EntityRealmState> | undefined
 	entityName: EntityName
 	errors: ErrorAccessor | undefined

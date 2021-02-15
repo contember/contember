@@ -9,7 +9,7 @@ import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
-		private readonly _children: ReadonlyMap<string, { getAccessor: EntityAccessor.GetEntityAccessor }>,
+		private readonly _children: ReadonlyMap<EntityId, { getAccessor: EntityAccessor.GetEntityAccessor }>,
 		private readonly _idsPersistedOnServer: ReadonlySet<string>,
 		private readonly _bindingOperations: BindingOperations,
 		public readonly errors: ErrorAccessor | undefined,
@@ -47,13 +47,13 @@ class EntityListAccessor implements Errorable {
 	}
 
 	public *[Symbol.iterator](): Generator<EntityAccessor> {
-		for (const [, { getAccessor }] of this._children) {
+		for (const { getAccessor } of this._children.values()) {
 			yield getAccessor()
 		}
 	}
 
-	public hasEntityKey(childEntityKey: string): boolean {
-		return this._children.has(childEntityKey)
+	public hasEntityId(id: EntityId): boolean {
+		return this._children.has(id)
 	}
 
 	public isEmpty(): boolean {

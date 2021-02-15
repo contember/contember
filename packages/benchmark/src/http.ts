@@ -14,7 +14,7 @@ export const httpRequest = (options: request.OptionsWithUrl) => {
 export const createHttpOptions = (options: {
 	endpoint: string
 	query: string
-	variables?: any[]
+	variables?: Record<string, any>
 	authorizationToken: string
 }): request.OptionsWithUrl => {
 	return {
@@ -31,7 +31,7 @@ export const createHttpOptions = (options: {
 export const graphqlRequest = async (options: {
 	endpoint: string
 	query: string
-	variables?: any[]
+	variables?: Record<string, any>
 	authorizationToken: string
 	noTrx?: boolean
 }) => {

@@ -10,19 +10,37 @@ const fileRead = promisify(readFile)
 const dirCreate = promisify(mkdir)
 const fileWrite = promisify(writeFile)
 
+const readStdin = (): Promise<string> => {
+	return new Promise(resolve => {
+		let data = ''
+
+		process.stdin.resume()
+		process.stdin.setEncoding('utf8')
+
+		process.stdin.on('data', function (chunk) {
+			data += chunk
+		})
+
+		process.stdin.on('end', function () {
+			resolve(data)
+		})
+	})
+}
+
 const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, delay))
 ;(async () => {
-	const testName = process.argv[2]
+	const testName = process.argv[3]
 	if (testName) {
 		await dirCreate(join(__dirname, '/../../results/', testName))
 	}
 
-	const serverPort = process.env.CONTEMBER_PORT
-	const contentEndpoint = `http://localhost:${serverPort}/content/app/prod`
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const accessToken = process.env.ACCESS_TOKEN!
+	const variables = {}
 
-	const queryGql = await fileRead(join(__dirname, '/../../src/query.graphql'), { encoding: 'utf8' })
+	const contentEndpoint = process.argv[2]
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const accessToken = process.env.CONTEMBER_TOKEN!
+
+	const queryGql = await readStdin()
 
 	// const queryResponse = await graphqlRequest({
 	// 	endpoint: contentEndpoint,
@@ -39,6 +57,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 					endpoint: contentEndpoint,
 					query: queryGql,
 					authorizationToken: accessToken,
+					variables,
 				}),
 			),
 		)
@@ -55,6 +74,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 				endpoint: contentEndpoint,
 				query: queryGql,
 				authorizationToken: accessToken,
+				variables,
 			}),
 		})
 

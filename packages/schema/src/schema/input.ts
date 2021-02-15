@@ -100,12 +100,15 @@ namespace Input {
 		limit?: number
 	}
 
-	export interface SelectQueryInput<E = never> {
+	export interface PaginationQueryInput<E = never> {
 		filter?: OptionalWhere<E>
 		orderBy?: OrderBy[]
 		skip?: number
 		first?: number
 	}
+
+	/** @deprecated */
+	export type SelectQueryInput<E = never> = PaginationQueryInput<E>
 
 	export type UpdateOneRelationInput<E = never> =
 		| CreateRelationInput<E>

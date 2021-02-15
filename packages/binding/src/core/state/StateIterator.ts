@@ -1,3 +1,10 @@
+import {
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
+	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+} from '../../markers'
 import { PlaceholderName } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import { TreeStore } from '../TreeStore'
@@ -63,6 +70,29 @@ export class StateIterator {
 			}
 			if (child.type === state.type) {
 				yield child as S
+			}
+		}
+	}
+
+	public static *eachDistinctEntityFieldWithMarker(
+		realm: EntityRealmState | EntityRealmStateStub,
+	): IterableIterator<[PlaceholderName, FieldMarker | HasOneRelationMarker | HasManyRelationMarker]> {
+		if (realm.type === StateType.EntityRealmStub) {
+			return
+		}
+		const visited: Set<PlaceholderName> = new Set()
+
+		for (const siblingRealm of realm.entity.realms.values()) {
+			for (const [placeholderName, marker] of getEntityMarker(siblingRealm).fields.markers) {
+				if (
+					marker instanceof EntitySubTreeMarker ||
+					marker instanceof EntityListSubTreeMarker ||
+					visited.has(placeholderName)
+				) {
+					continue
+				}
+				visited.add(placeholderName)
+				yield [placeholderName, marker]
 			}
 		}
 	}

@@ -218,7 +218,7 @@ export class MutationGenerator {
 			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
 		> = []
 
-		for (const [placeholderName, marker] of getEntityMarker(currentState).fields.markers) {
+		for (const [placeholderName, marker] of StateIterator.eachDistinctEntityFieldWithMarker(currentState)) {
 			if (
 				placeholderName === TYPENAME_KEY_NAME ||
 				(placeholderName === PRIMARY_KEY_NAME && !(currentState.entity.id instanceof ClientGeneratedUuid))
@@ -270,8 +270,6 @@ export class MutationGenerator {
 					continue
 				}
 				builder = this.registerCreateEntityListPart(processedEntities, fieldState, marker, builder)
-			} else if (marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
-				// All sub trees have been hoisted and are handled elsewhere.
 			} else {
 				assertNever(marker)
 			}
@@ -402,7 +400,7 @@ export class MutationGenerator {
 
 		const entityData = this.treeStore.persistedEntityData.get(currentState.entity.id.value)
 
-		for (const [placeholderName, marker] of getEntityMarker(currentState).fields.markers) {
+		for (const [placeholderName, marker] of StateIterator.eachDistinctEntityFieldWithMarker(currentState)) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
 				continue
 			}
@@ -559,8 +557,6 @@ export class MutationGenerator {
 					}
 					return builder
 				})
-			} else if (marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and are handled elsewhere.
 			} else {
 				assertNever(marker)
 			}

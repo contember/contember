@@ -227,7 +227,7 @@ export class StateInitializer {
 
 		const entityState: EntityState = {
 			entityName,
-			hasIdSetInStone: false,
+			hasIdSetInStone: id instanceof ServerGeneratedUuid,
 			id,
 			isScheduledForDeletion: false,
 			maidenId: id instanceof UnpersistedEntityDummyId ? id : undefined,

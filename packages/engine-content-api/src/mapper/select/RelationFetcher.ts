@@ -10,6 +10,8 @@ import { OrderByHelper } from './OrderByHelper'
 import { SelectGroupedObjects, SelectResultObject, SelectRow } from './SelectHydrator'
 import { Mapper } from '../Mapper'
 
+export type GroupedCounts = Record<Input.PrimaryValue, number>
+
 export class RelationFetcher {
 	constructor(
 		private readonly whereBuilder: WhereBuilder,
@@ -17,6 +19,17 @@ export class RelationFetcher {
 		private readonly predicateInjector: PredicatesInjector,
 		private readonly pathFactory: PathFactory,
 	) {}
+
+	public async countOneHasManyGroups(
+		mapper: Mapper,
+		filter: Input.OptionalWhere | undefined,
+		targetEntity: Model.Entity,
+		targetRelation: Model.ManyHasOneRelation,
+		ids: Input.PrimaryValue[],
+	): Promise<GroupedCounts> {
+		const filterWithParent = this.createOneHasManyFilter(targetEntity, targetRelation, ids, filter)
+		return mapper.countGrouped(targetEntity, filterWithParent, targetRelation)
+	}
 
 	public async fetchOneHasManyGroups(
 		mapper: Mapper,
@@ -26,14 +39,8 @@ export class RelationFetcher {
 		targetRelation: Model.ManyHasOneRelation,
 		ids: Input.PrimaryValue[],
 	): Promise<SelectGroupedObjects> {
-		const targetRelationFilter: Input.OptionalWhere = { [targetEntity.primary]: { in: ids } }
-		const whereWithParentId: Input.OptionalWhere = {
-			...objectNode.args.filter,
-			[targetRelation.name]: !objectNode.args.filter?.[targetRelation.name]
-				? targetRelationFilter
-				: ({ and: [objectNode.args.filter[targetRelation.name], targetRelationFilter] } as Input.OptionalWhere),
-		}
-		const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('filter', whereWithParentId)
+		const filter = this.createOneHasManyFilter(targetEntity, targetRelation, ids, objectNode.args.filter)
+		const objectNodeWithWhere = objectNode.withArg<Input.ListQueryInput>('filter', filter)
 		const objectNodeWithOrder = OrderByHelper.appendDefaultOrderBy(
 			targetEntity,
 			objectNodeWithWhere,
@@ -41,6 +48,41 @@ export class RelationFetcher {
 		)
 
 		return mapper.selectGrouped(targetEntity, objectNodeWithOrder, targetRelation)
+	}
+
+	private createOneHasManyFilter(
+		targetEntity: Model.Entity,
+		targetRelation: Model.ManyHasOneRelation,
+		ids: Input.PrimaryValue[],
+		filter: Input.OptionalWhere | undefined,
+	): Input.OptionalWhere {
+		const targetRelationFilter: Input.OptionalWhere = { [targetEntity.primary]: { in: ids } }
+		return {
+			...filter,
+			[targetRelation.name]: !filter?.[targetRelation.name]
+				? targetRelationFilter
+				: ({ and: [filter[targetRelation.name], targetRelationFilter] } as Input.OptionalWhere),
+		}
+	}
+
+	public async countManyHasManyGroups(
+		mapper: Mapper,
+		filter: Input.OptionalWhere | undefined,
+		targetEntity: Model.Entity,
+		owningRelation: Model.ManyHasManyOwningRelation,
+		ids: Input.PrimaryValue[],
+		joiningColumns: JoiningColumns,
+	): Promise<GroupedCounts> {
+		const qb = this.buildJunctionQb(owningRelation, ids, joiningColumns, targetEntity, { filter })
+			.select(['junction_', joiningColumns.sourceColumn.columnName])
+			.select(expr => expr.raw('count(*)'), 'row_count')
+			.groupBy(['junction_', joiningColumns.sourceColumn.columnName])
+		const result = new Map<string, number>()
+		const rows = await qb.getResult(mapper.db)
+		for (const row of rows) {
+			result.set(String(row[joiningColumns.sourceColumn.columnName]), Number(row.row_count))
+		}
+		return Object.fromEntries(result)
 	}
 
 	public async fetchManyHasManyGroups(
@@ -119,40 +161,9 @@ export class RelationFetcher {
 		object: ObjectNode<Input.ListQueryInput>,
 	): Promise<Record<string, Value.AtomicValue>[]> {
 		const joiningTable = relation.joiningTable
-
-		const whereColumn = column.sourceColumn.columnName
-		let qb = SelectBuilder.create()
-			.from(joiningTable.tableName, 'junction_')
+		const qb = this.buildJunctionQb(relation, values, column, targetEntity, object.args)
 			.select(['junction_', joiningTable.inverseJoiningColumn.columnName])
 			.select(['junction_', joiningTable.joiningColumn.columnName])
-			.where(clause => clause.in(['junction_', whereColumn], values))
-
-		const queryWithPredicates = object.withArg(
-			'filter',
-			this.predicateInjector.inject(targetEntity, object.args.filter || {}),
-		)
-		const where = queryWithPredicates.args.filter
-		const hasWhere = where && Object.keys(where).length > 0
-		const hasFieldOrderBy =
-			object.args.orderBy &&
-			object.args.orderBy.length > 0 &&
-			!object.args.orderBy[0]._random &&
-			object.args.orderBy[0]._randomSeeded === undefined
-
-		if (hasWhere || hasFieldOrderBy) {
-			const path = this.pathFactory.create([])
-			qb = qb.join(targetEntity.tableName, path.getAlias(), condition =>
-				condition.compareColumns(['junction_', column.targetColumn.columnName], Operator.eq, [
-					path.getAlias(),
-					targetEntity.primaryColumn,
-				]),
-			)
-		}
-
-		if (where && hasWhere) {
-			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), where)
-		}
-
 		const wrapper = new LimitByGroupWrapper(
 			['junction_', column.sourceColumn.columnName],
 			(orderable, qb) => {
@@ -172,5 +183,43 @@ export class RelationFetcher {
 		)
 
 		return await wrapper.getResult(qb, db)
+	}
+
+	private buildJunctionQb(
+		relation: Model.ManyHasManyOwningRelation,
+		ids: Input.PrimaryValue[],
+		column: JoiningColumns,
+		targetEntity: Model.Entity,
+		objectArgs: Input.ListQueryInput,
+	): SelectBuilder {
+		const joiningTable = relation.joiningTable
+
+		const whereColumn = column.sourceColumn.columnName
+		let qb = SelectBuilder.create()
+			.from(joiningTable.tableName, 'junction_')
+			.where(clause => clause.in(['junction_', whereColumn], ids))
+
+		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {})
+		const hasWhere = where && Object.keys(where).length > 0
+		const hasFieldOrderBy =
+			objectArgs.orderBy &&
+			objectArgs.orderBy.length > 0 &&
+			!objectArgs.orderBy[0]._random &&
+			objectArgs.orderBy[0]._randomSeeded === undefined
+
+		if (hasWhere || hasFieldOrderBy) {
+			const path = this.pathFactory.create([])
+			qb = qb.join(targetEntity.tableName, path.getAlias(), condition =>
+				condition.compareColumns(['junction_', column.targetColumn.columnName], Operator.eq, [
+					path.getAlias(),
+					targetEntity.primaryColumn,
+				]),
+			)
+		}
+
+		if (where && hasWhere) {
+			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), where)
+		}
+		return qb
 	}
 }

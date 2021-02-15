@@ -1,17 +1,9 @@
-import { ReceivedDataTree, ServerGeneratedUuid, UnpersistedEntityDummyId } from '../accessorTree'
-import {
-	EntityFieldMarkersContainer,
-	FieldMarker,
-	HasManyRelationMarker,
-	HasOneRelationMarker,
-	MarkerTreeRoot,
-} from '../markers'
-import { PlaceholderName, TreeRootId } from '../treeParameters'
-import { assert, assertNever } from '../utils'
+import { ReceivedDataTree } from '../accessorTree'
+import { MarkerTreeRoot } from '../markers'
+import { EntityRealmKey, PlaceholderName, TreeRootId } from '../treeParameters'
 import { EventManager } from './EventManager'
-import { MarkerMerger } from './MarkerMerger'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
-import { EntityListState, EntityRealmKey, EntityRealmParent, EntityState, RootStateNode, StateType } from './state'
+import { EntityRealmParent, RootStateNode } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeStore } from './TreeStore'
 

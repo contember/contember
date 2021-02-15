@@ -1,16 +1,11 @@
 import { EntityAccessor, ErrorAccessor } from '../../accessors'
 import { RuntimeId } from '../../accessorTree'
 import { EntitySubTreeMarker, HasOneRelationMarker } from '../../markers'
-import { FieldName, PlaceholderName, SingleEntityEventListeners } from '../../treeParameters'
+import { EntityRealmKey, FieldName, PlaceholderName, SingleEntityEventListeners } from '../../treeParameters'
 import { EntityListState } from './EntityListState'
 import { EntityState } from './EntityState'
 import { StateNode } from './StateNode'
 import { StateType } from './StateType'
-
-/**
- * @see RealmKeyGenerator
- */
-export type EntityRealmKey = string
 
 export type EntityRealmParent = EntityRealmState | EntityListState | undefined
 

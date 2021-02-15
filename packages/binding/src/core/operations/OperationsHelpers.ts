@@ -1,7 +1,6 @@
 import { EntityAccessor } from '../../accessors'
 import { BindingError } from '../../BindingError'
-import { assertNever } from '../../utils'
-import { EntityRealmKey, EntityRealmState, EntityRealmStateStub, EntityState, StateType } from '../state'
+import { EntityRealmState, EntityRealmStateStub } from '../state'
 import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
 

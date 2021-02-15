@@ -1,4 +1,5 @@
 import { Environment } from '../dao'
+import { EntityId } from '../treeParameters'
 import { BindingOperations } from './BindingOperations'
 import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
@@ -33,7 +34,7 @@ class EntityListAccessor implements Errorable {
 		}
 	}
 
-	public *ids(): IterableIterator<string> {
+	public *ids(): IterableIterator<EntityId> {
 		return this._children.keys()
 	}
 

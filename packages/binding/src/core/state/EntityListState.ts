@@ -1,6 +1,6 @@
 import { EntityListAccessor, ErrorAccessor } from '../../accessors'
 import { EntityListSubTreeMarker, HasManyRelationMarker } from '../../markers'
-import { EntityName, RemovalType } from '../../treeParameters'
+import { EntityId, EntityName, RemovalType } from '../../treeParameters'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import { StateType } from './StateType'
 

@@ -5,6 +5,7 @@ import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
 import {
 	Alias,
+	EntityRealmKey,
 	PlaceholderName,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedSingleEntity,
@@ -14,14 +15,7 @@ import {
 } from '../treeParameters'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { Schema } from './schema'
-import {
-	EntityListState,
-	EntityRealmKey,
-	EntityRealmState,
-	EntityRealmStateStub,
-	EntityState,
-	RootStateNode,
-} from './state'
+import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
 
 export class TreeStore {
 	// Indexed by IDs (including unpersisted dummy IDs)

@@ -1,5 +1,7 @@
 export * from './Alias'
+export * from './EntityId'
 export * from './EntityName'
+export * from './EntityRealmKey'
 export * from './ExpectedEntityCount'
 export * from './ExpectedQualifiedEntityMutation'
 export * from './ExpectedRelationMutation'

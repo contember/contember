@@ -1,9 +1,9 @@
 import { RuntimeId } from '../accessorTree'
 import { EntityFieldMarkersContainer } from '../markers'
+import { EntityRealmKey } from '../treeParameters'
 import {
 	EntityListBlueprint,
 	EntityRealmBlueprint,
-	EntityRealmKey,
 	EntityRealmState,
 	EntityRealmStateStub,
 	getEntityMarker,

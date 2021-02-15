@@ -7,7 +7,9 @@ import {
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
 	DesugaredRelativeSingleField,
+	EntityId,
 	EntityName,
+	EntityRealmKey,
 	FieldName,
 	FieldValue,
 	RelativeEntityList,
@@ -28,7 +30,7 @@ import { PersistSuccessOptions } from './PersistSuccessOptions'
 class EntityAccessor implements Errorable {
 	public constructor(
 		private readonly runtimeId: RuntimeId,
-		public readonly key: string,
+		public readonly key: EntityRealmKey, // ⚠️ This is *NOT* the id! ⚠️
 		public readonly name: EntityName,
 		private readonly fieldData: EntityAccessor.FieldData,
 		private readonly dataFromServer: SingleEntityPersistedData | undefined,
@@ -49,7 +51,7 @@ class EntityAccessor implements Errorable {
 	/**
 	 * Note that for entities that don't yet exist on server this will return a dummy id.
 	 */
-	public get id(): string {
+	public get id(): EntityId {
 		return this.runtimeId.value
 	}
 

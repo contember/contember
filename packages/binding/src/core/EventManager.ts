@@ -123,6 +123,7 @@ export class EventManager {
 			this.triggerBeforeFlushEvents()
 			this.updateTreeRoot()
 			this.flushPendingAccessorUpdates(Array.from(this.rootsWithPendingUpdates))
+			this.rootsWithPendingUpdates.clear()
 			this.isFrozenWhileUpdating = false
 		})
 	}
@@ -173,12 +174,11 @@ export class EventManager {
 				if (parent === undefined) {
 					this.rootsWithPendingUpdates.add(justUpdated)
 					this.dirtinessTracker.increaseBy(changesDelta)
-				} else if (!parent.childrenWithPendingUpdates?.size || changesDelta !== 0) {
+				} else {
 					if (!parent.childrenWithPendingUpdates) {
 						parent.childrenWithPendingUpdates = new Set()
 					}
 					parent.childrenWithPendingUpdates.add(justUpdated as any)
-
 					this.registerJustUpdated(parent, changesDelta)
 				}
 				break

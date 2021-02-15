@@ -371,7 +371,7 @@ export class StateInitializer {
 	}
 
 	private initializeFromFieldMarker(
-		entityRealm: EntityRealmState,
+		parent: EntityRealmState,
 		field: FieldMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
 	) {
@@ -387,14 +387,14 @@ export class StateInitializer {
 					`Perhaps you wanted to use <HasOne />?`,
 			)
 		}
-		entityRealm.children.set(
+		parent.children.set(
 			field.placeholderName,
-			this.initializeFieldState(entityRealm, field.placeholderName, field, fieldDatum),
+			this.initializeFieldState(parent, field.placeholderName, field, fieldDatum),
 		)
 	}
 
 	private initializeFromHasOneRelationMarker(
-		entityRealm: EntityRealmState,
+		parent: EntityRealmState,
 		field: HasOneRelationMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
 	) {
@@ -408,11 +408,11 @@ export class StateInitializer {
 		} else if (fieldDatum instanceof ServerGeneratedUuid || fieldDatum === null || fieldDatum === undefined) {
 			const entityId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityDummyId()
 
-			entityRealm.children.set(
+			parent.children.set(
 				field.placeholderName,
-				this.initializeEntityRealm(entityId, this.getRelationTargetEntityName(entityRealm, field), {
+				this.initializeEntityRealm(entityId, this.getRelationTargetEntityName(parent, field), {
 					type: 'hasOne',
-					parent: entityRealm,
+					parent,
 					marker: field,
 				}),
 			)
@@ -425,21 +425,21 @@ export class StateInitializer {
 	}
 
 	private initializeFromHasManyRelationMarker(
-		entityRealm: EntityRealmState,
+		parent: EntityRealmState,
 		field: HasManyRelationMarker,
 		fieldDatum: EntityFieldPersistedData | undefined,
 	) {
 		const relation = field.parameters
 
 		if (fieldDatum === undefined || fieldDatum instanceof Set) {
-			entityRealm.children.set(
+			parent.children.set(
 				field.placeholderName,
 				this.initializeEntityListState(
 					{
 						marker: field,
-						parent: entityRealm,
+						parent,
 					},
-					this.getRelationTargetEntityName(entityRealm, field),
+					this.getRelationTargetEntityName(parent, field),
 					fieldDatum || new Set(),
 				),
 			)

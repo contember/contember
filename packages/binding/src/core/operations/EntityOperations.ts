@@ -213,7 +213,7 @@ export class EntityOperations {
 
 					const newEntity = this.stateInitializer.initializeEntityRealm(
 						new UnpersistedEntityDummyId(),
-						outerState.entity.entityName,
+						stateToDisconnect.entity.entityName,
 						stateToDisconnect.blueprint,
 					)
 					OperationsHelpers.runImmediateUserInitialization(this.stateInitializer, newEntity, initializeReplacement)

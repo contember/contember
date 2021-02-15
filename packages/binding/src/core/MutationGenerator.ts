@@ -16,6 +16,7 @@ import {
 	EntityListState,
 	EntityRealmState,
 	EntityRealmStateStub,
+	EntityState,
 	FieldState,
 	getEntityMarker,
 	RootStateNode,
@@ -26,8 +27,7 @@ import { TreeStore } from './TreeStore'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 
-// TODO abolish this
-type ProcessedEntities = Set<EntityRealmState | EntityRealmStateStub>
+type ProcessedEntities = Set<EntityState>
 
 // TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
@@ -107,10 +107,10 @@ export class MutationGenerator {
 		alias: string,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (processedEntities.has(entityRealm)) {
+		if (processedEntities.has(entityRealm.entity)) {
 			return queryBuilder
 		}
-		processedEntities.add(entityRealm)
+		processedEntities.add(entityRealm.entity)
 
 		return queryBuilder.delete(
 			entityRealm.entity.entityName,
@@ -131,7 +131,7 @@ export class MutationGenerator {
 		alias: string,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (processedEntities.has(entityRealm)) {
+		if (processedEntities.has(entityRealm.entity)) {
 			return queryBuilder
 		}
 		// Deliberately not adding the entity to processedEntities - it will be done by registerUpdateMutationPart.
@@ -164,7 +164,7 @@ export class MutationGenerator {
 		alias: string,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (processedEntities.has(entityRealm)) {
+		if (processedEntities.has(entityRealm.entity)) {
 			return queryBuilder
 		}
 		// Deliberately not adding the entity to processedEntities - it will be done by registerCreateMutationPart.
@@ -202,17 +202,16 @@ export class MutationGenerator {
 			CrudQueryBuilder.WriteOperation.Create
 		> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
-		if (processedEntities.has(currentState)) {
+		if (processedEntities.has(currentState.entity)) {
 			return builder
 		}
-		processedEntities.add(currentState)
+		processedEntities.add(currentState.entity)
 
 		if (currentState.type === StateType.EntityRealmStub) {
 			// TODO If there's a forceCreate, this is wrong.
 			return builder
 		}
 
-		// It shouldn't
 		const nonbearingFields: Array<
 			| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
 			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState }
@@ -396,10 +395,12 @@ export class MutationGenerator {
 		currentState: EntityRealmState,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update>,
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> {
-		if (processedEntities.has(currentState)) {
+		if (processedEntities.has(currentState.entity)) {
 			return builder
 		}
-		processedEntities.add(currentState)
+		processedEntities.add(currentState.entity)
+
+		const entityData = this.treeStore.persistedEntityData.get(currentState.entity.id.value)
 
 		for (const [placeholderName, marker] of getEntityMarker(currentState).fields.markers) {
 			if (placeholderName === PRIMARY_KEY_NAME || placeholderName === TYPENAME_KEY_NAME) {
@@ -432,7 +433,7 @@ export class MutationGenerator {
 					const subBuilder = ((
 						builder: CrudQueryBuilder.WriteOneRelationBuilder<CrudQueryBuilder.WriteOperation.Update>,
 					) => {
-						const persistedValue = this.treeStore.persistedEntityData.get(runtimeId.value)?.get?.(placeholderName)
+						const persistedValue = entityData?.get?.(placeholderName)
 
 						if (persistedValue instanceof ServerGeneratedUuid) {
 							if (persistedValue.value === runtimeId.value) {
@@ -482,7 +483,7 @@ export class MutationGenerator {
 				} else {
 					// This is a reduced has many relation.
 					builder = builder.many(marker.parameters.field, builder => {
-						const persistedValue = this.treeStore.persistedEntityData.get(runtimeId.value)?.get?.(placeholderName)
+						const persistedValue = entityData?.get?.(placeholderName)
 						const alias = AliasTransformer.entityToAlias(runtimeId)
 
 						if (persistedValue instanceof ServerGeneratedUuid) {

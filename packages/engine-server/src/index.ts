@@ -1,21 +1,17 @@
 import CompositionRoot from './CompositionRoot'
 import Project from './config/Project'
 import { Config, readConfig } from './config/config'
-import { Server } from 'http'
-import { initSentry } from './utils'
 import { Plugin } from '@contember/engine-plugins'
+import { ProcessType } from './utils'
 
 export { CompositionRoot, Project, readConfig }
 
-export async function run(
+export const createContainer = (
 	debug: boolean,
 	config: Config,
 	projectsDirectory: string,
 	plugins: Plugin[],
-): Promise<Server[]> {
-	initSentry(config.server.logging.sentry?.dsn)
-	const container = new CompositionRoot().createMasterContainer(debug, config, projectsDirectory, plugins)
-	await container.initializer.initialize()
-
-	return await container.serverRunner.run()
+	processType: ProcessType = ProcessType.singleNode,
+) => {
+	return new CompositionRoot().createMasterContainer(debug, config, projectsDirectory, plugins, processType)
 }

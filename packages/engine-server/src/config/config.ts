@@ -32,6 +32,7 @@ export interface Config {
 	server: {
 		port: number
 		monitoringPort: number
+		workerCount?: number | string
 		logging: {
 			sentry?: {
 				dsn: string
@@ -292,6 +293,7 @@ export async function readConfig(filenames: string[], configProcessors: ConfigPr
 		server: {
 			port: '%env.CONTEMBER_PORT::number%',
 			monitoringPort: '%env.CONTEMBER_MONITORING_PORT::number%',
+			workerCount: '%?env.CONTEMBER_WORKER_COUNT::string%',
 			logging: {
 				sentry: {
 					dsn: '%?env.SENTRY_DSN%',

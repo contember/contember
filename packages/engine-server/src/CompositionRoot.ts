@@ -15,9 +15,9 @@ import {
 } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
 import { Config, Project, TenantConfig } from './config/config'
-import { logSentryError, tuple } from './utils'
+import { ProcessType, logSentryError, tuple } from './utils'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
-import { Initializer, ServerRunner } from './bootstrap'
+import { Initializer } from './bootstrap'
 import { createProjectContainer } from './ProjectContainer'
 import { Plugin } from '@contember/engine-plugins'
 import { MigrationsRunner } from '@contember/database-migrations'
@@ -31,12 +31,12 @@ import {
 	TenantApolloServerFactory,
 } from '@contember/engine-http'
 import prom from 'prom-client'
-import { registerDbMetrics } from './utils/dbMetrics'
+import { registerDbMetrics } from './utils'
 
 export interface MasterContainer {
 	initializer: Initializer
-	serverRunner: ServerRunner
 	koa: Koa
+	monitoringKoa: Koa
 }
 
 class CompositionRoot {
@@ -45,6 +45,7 @@ class CompositionRoot {
 		config: Config,
 		projectsDirectory: string,
 		plugins: Plugin[],
+		processType: ProcessType = ProcessType.singleNode,
 	): MasterContainer {
 		let projectSchemaResolverInner: ProjectSchemaResolver = () => {
 			throw new Error('called too soon')
@@ -133,10 +134,15 @@ class CompositionRoot {
 			)
 
 			.addService('promRegistry', () => {
-				const registry = new prom.Registry()
-				prom.collectDefaultMetrics({ register: registry })
-				registerDbMetrics(registry, tenantContainer.connection, containerList)
-				return registry
+				if (processType === ProcessType.clusterMaster) {
+					const register = new prom.AggregatorRegistry()
+					prom.collectDefaultMetrics({ register })
+					return register
+				}
+				const register = prom.register
+				prom.collectDefaultMetrics({ register })
+				registerDbMetrics(register, tenantContainer.connection, containerList)
+				return register
 			})
 			.addService(
 				'koa',
@@ -189,11 +195,9 @@ class CompositionRoot {
 						providers,
 					),
 			)
-			.addService('serverRunner', ({ koa, monitoringKoa }) => new ServerRunner(koa, monitoringKoa, config))
-
 			.build()
 
-		return masterContainer.pick('initializer', 'serverRunner', 'koa')
+		return masterContainer.pick('initializer', 'koa', 'monitoringKoa')
 	}
 
 	createProjectContainers(

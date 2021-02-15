@@ -193,11 +193,9 @@ export class StateInitializer {
 		// }
 
 		const persistedData = this.treeStore.persistedEntityData.get(entity.id.value)
-		const markers =
-			blueprint.type === 'listEntity'
-				? blueprint.parent.blueprint.marker.fields.markers
-				: blueprint.marker.fields.markers
-		for (const [placeholderName, field] of markers) {
+
+		const marker = getEntityMarker(state)
+		for (const [placeholderName, field] of marker.fields.markers) {
 			this.initializeEntityField(entityRealm, field, persistedData?.get(placeholderName))
 		}
 

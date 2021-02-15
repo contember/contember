@@ -7,6 +7,7 @@ import { Client, Connection } from '@contember/database'
 import { Operation, readOperationMeta } from '../schema'
 import { assertNever } from '../utils'
 import { ObjectNode } from '../inputProcessing'
+import { createPaginationHelper } from '../utils'
 
 export class ReadResolver {
 	constructor(
@@ -62,45 +63,18 @@ export class ReadResolver {
 	}
 
 	public async resolvePaginationQuery(entity: Model.Entity, info: GraphQLResolveInfo) {
-		const queryAst: ObjectNode<Input.SelectQueryInput> = this.queryAstFactory.create(info)
+		const queryAst: ObjectNode<Input.PaginationQueryInput> = this.queryAstFactory.create(info)
 		const mapper = this.mapperFactory(this.db)
 		return await this.doPaginate(mapper, entity, queryAst)
 	}
 
-	private async doPaginate(mapper: Mapper, entity: Model.Entity, queryAst: ObjectNode<Input.SelectQueryInput>) {
-		const pageInfoField = queryAst.findFieldByName('pageInfo')
-		const result: any = {}
+	private async doPaginate(mapper: Mapper, entity: Model.Entity, queryAst: ObjectNode<Input.PaginationQueryInput>) {
+		const paginationHelper = createPaginationHelper(queryAst)
+		const totalCount = paginationHelper.requiresTotalCount
+			? await mapper.count(entity, queryAst.args.filter || {})
+			: undefined
+		const nodes = paginationHelper.nodeField ? await mapper.select(entity, paginationHelper.nodeField) : undefined
 
-		if (pageInfoField.length > 0) {
-			result.pageInfo = {
-				totalCount: await mapper.count(entity, queryAst.args.filter || {}),
-			}
-		}
-
-		const edges = queryAst.findFieldByName('edges')
-		if (edges.length > 1) {
-			throw new Error('You cannot fetch edges more than once')
-		}
-		for (const edgeField of edges) {
-			result[edgeField.alias] = {}
-			const nodes = (edgeField as ObjectNode).findFieldByName('node')
-			if (nodes.length > 1) {
-				throw new Error('You cannot fetch node more than once')
-			}
-			for (const nodeField of nodes) {
-				result[edgeField.alias] = (
-					await mapper.select(
-						entity,
-						(nodeField as ObjectNode).withArgs({
-							filter: queryAst.args.filter,
-							orderBy: queryAst.args.orderBy,
-							limit: queryAst.args.first,
-							offset: queryAst.args.skip,
-						}),
-					)
-				).map(it => ({ [nodeField.alias]: it }))
-			}
-		}
-		return result
+		return paginationHelper.createResponse(totalCount, nodes)
 	}
 }

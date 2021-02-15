@@ -277,6 +277,10 @@ export class EventManager {
 					>> = []
 					const correspondingStates: Array<StateINode> = []
 
+					if (callbackQueue.length === 0) {
+						break
+					}
+
 					for (const [state, callback] of callbackQueue) {
 						const changesCountBefore = this.dirtinessTracker.getChangesCount()
 						const result = callback(state.getAccessor as any, this.bindingOperations) // TS can't quite handle this but this is sound.
@@ -298,18 +302,16 @@ export class EventManager {
 							correspondingStates.push(state)
 						}
 					}
+					// TODO timeout
 					const newCallbacks = await Promise.allSettled(callbackReturns)
 
-					callbackQueue.length = 0
+					callbackQueue.length = 0 // Empties the queue
 
 					// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
 					for (const newlyInitialized of this.newlyInitializedWithListeners) {
-						const listeners = Array.isArray(newlyInitialized)
-							? newlyInitialized[1].initialEventListeners
-							: newlyInitialized
-						if (listeners && listeners.eventListeners.beforePersist) {
-							for (const listener of listeners.eventListeners.beforePersist) {
-								callbackQueue.push([Array.isArray(newlyInitialized) ? newlyInitialized[0] : newlyInitialized, listener])
+						if (newlyInitialized.eventListeners.beforePersist) {
+							for (const listener of newlyInitialized.eventListeners.beforePersist) {
+								callbackQueue.push([newlyInitialized, listener])
 							}
 						}
 					}
@@ -321,7 +323,7 @@ export class EventManager {
 						const correspondingState = correspondingStates[i]
 
 						if (result.status === 'fulfilled') {
-							callbackQueue.push([correspondingState as any, result.value])
+							callbackQueue.push([correspondingState, result.value])
 						} else {
 							// We just silently stop.
 							// That's NOT ideal but what else exactly do we do so that it's even remotely recoverable?
@@ -404,6 +406,7 @@ export class EventManager {
 					state.entity.hasIdSetInStone = true
 				}
 			}
+			this.newlyInitializedWithListeners.clear()
 		})
 	}
 
@@ -426,6 +429,7 @@ export class EventManager {
 					}
 				}
 
+				// TODO timeout
 				const handlerResults = await Promise.allSettled(handlerPromises)
 
 				if (__DEV_MODE__) {

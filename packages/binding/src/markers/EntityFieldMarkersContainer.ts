@@ -32,7 +32,7 @@ export class EntityFieldMarkersContainer {
 		return assertNever(marker)
 	}
 
-	public *getPlaceholdersByField(field: FieldName): Generator<PlaceholderName, void, undefined> {
+	public *getPlaceholdersByField(field: FieldName): IterableIterator<PlaceholderName> {
 		const placeholders = this.placeholders.get(field)
 
 		if (placeholders === undefined) {

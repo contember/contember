@@ -12,7 +12,7 @@ export class StateIterator {
 	public static *eachSiblingRealm(
 		state: EntityRealmState,
 		relevantPlaceholder?: PlaceholderName,
-	): Generator<EntityRealmState, void> {
+	): IterableIterator<EntityRealmState> {
 		for (let [realmKey, realm] of state.entity.realms) {
 			if (realm.type === StateType.EntityRealmStub) {
 				if (relevantPlaceholder === undefined || getEntityMarker(realm).fields.placeholders.has(relevantPlaceholder)) {
@@ -31,7 +31,7 @@ export class StateIterator {
 	public static *eachSiblingRealmChild<S extends EntityListState | FieldState>(
 		treeStore: TreeStore,
 		state: S & StateNode,
-	): Generator<S, void> {
+	): IterableIterator<S> {
 		if (state.type === StateType.EntityList && state.blueprint.parent === undefined) {
 			// Top-level entity list
 			for (const [, rootStates] of treeStore.subTreeStatesByRoot) {
@@ -70,7 +70,7 @@ export class StateIterator {
 	public static *depthFirstINodes(
 		root: StateINode,
 		match: (iNode: StateINode) => boolean,
-	): Generator<StateINode, void> {
+	): IterableIterator<StateINode> {
 		yield* this.depthFirstINodesImplementation(root, match, new Set())
 	}
 
@@ -78,7 +78,7 @@ export class StateIterator {
 		root: StateINode | EntityRealmStateStub,
 		match: (iNode: StateINode) => boolean,
 		visitedINodes: Set<StateINode>,
-	): Generator<StateINode, void> {
+	): IterableIterator<StateINode> {
 		// Ignore uninitialized. Is that always correct though? This should probably be configurable.
 		if (root.type === StateType.EntityRealmStub || visitedINodes.has(root)) {
 			return
@@ -101,7 +101,7 @@ export class StateIterator {
 		}
 	}
 
-	public static *eachRootState(treeStore: TreeStore): Generator<[PlaceholderName, RootStateNode], void, undefined> {
+	public static *eachRootState(treeStore: TreeStore): IterableIterator<[PlaceholderName, RootStateNode]> {
 		for (const rootStates of treeStore.subTreeStatesByRoot.values()) {
 			yield* rootStates.entries()
 		}

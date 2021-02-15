@@ -1,5 +1,5 @@
 import { Environment } from '../dao'
-import { EntityId } from '../treeParameters'
+import { EntityId, EntityRealmKey } from '../treeParameters'
 import { BindingOperations } from './BindingOperations'
 import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
@@ -28,7 +28,7 @@ class EntityListAccessor implements Errorable {
 	 * **KEYS ARE NOT IDS!**
 	 * @see EntityAccessor.key
 	 */
-	public *keys(): Generator<string> {
+	public *keys(): IterableIterator<EntityRealmKey> {
 		for (const accessor of this) {
 			yield accessor.key
 		}
@@ -46,7 +46,7 @@ class EntityListAccessor implements Errorable {
 		return new Set(this._idsPersistedOnServer)
 	}
 
-	public *[Symbol.iterator](): Generator<EntityAccessor> {
+	public *[Symbol.iterator](): IterableIterator<EntityAccessor> {
 		for (const { getAccessor } of this._children.values()) {
 			yield getAccessor()
 		}

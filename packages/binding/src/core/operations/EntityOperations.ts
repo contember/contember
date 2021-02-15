@@ -280,7 +280,7 @@ export class EntityOperations {
 		container: EntityFieldMarkersContainer,
 		field: FieldName,
 		message: string,
-	): Generator<HasOneRelationMarker, void, undefined> {
+	): IterableIterator<HasOneRelationMarker> {
 		const placeholders = container.placeholders.get(field)
 
 		if (placeholders === undefined) {

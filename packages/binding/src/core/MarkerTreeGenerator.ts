@@ -91,7 +91,7 @@ export class MarkerTreeGenerator {
 
 	private *hoistSubTeesFromEntityFields(
 		fields: EntityFieldMarkersContainer,
-	): Generator<EntitySubTreeMarker | EntityListSubTreeMarker, void> {
+	): IterableIterator<EntitySubTreeMarker | EntityListSubTreeMarker> {
 		for (const [placeholderName, marker] of fields.markers) {
 			if (marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
 				yield marker

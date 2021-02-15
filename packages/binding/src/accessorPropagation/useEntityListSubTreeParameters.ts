@@ -58,7 +58,7 @@ export function useEntityListSubTreeParameters(
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return React.useMemo(
 			() => ({
-				entities: { entityName: entities },
+				entities: entities,
 				orderBy: qualifiedEntityList.orderBy,
 				offset: qualifiedEntityList.offset,
 				limit: qualifiedEntityList.limit,

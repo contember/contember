@@ -134,4 +134,13 @@ export class TreeStore {
 		}
 		return subTreeState
 	}
+
+	public disposeOfRealm(realmToDisconnect: EntityRealmState | EntityRealmStateStub) {
+		this.entityRealmStore.delete(realmToDisconnect.realmKey)
+		realmToDisconnect.entity.realms.delete(realmToDisconnect.realmKey)
+
+		if (realmToDisconnect.entity.realms.size === 0) {
+			// TODO dispose of this
+		}
+	}
 }

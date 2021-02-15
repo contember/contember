@@ -135,12 +135,7 @@ export class EntityOperations {
 
 					// TODO remove from planned deletions if appropriate
 
-					this.treeStore.entityRealmStore.delete(previouslyConnectedState.realmKey)
-					previouslyConnectedState.entity.realms.delete(previouslyConnectedState.realmKey)
-
-					if (previouslyConnectedState.entity.realms.size === 0) {
-						// TODO dispose of this
-					}
+					this.treeStore.disposeOfRealm(previouslyConnectedState)
 
 					let changesDelta =
 						previouslyConnectedState.type === 'entityRealm' ? -1 * previouslyConnectedState.unpersistedChangesCount : 0
@@ -180,62 +175,55 @@ export class EntityOperations {
 		})
 	}
 
-	// public disconnectEntityAtField(
-	// 	state: EntityRealmState,
-	// 	fieldName: FieldName,
-	// 	initializeReplacement: EntityAccessor.BatchUpdatesHandler | undefined,
-	// ) {
-	// 	this.eventManager.syncOperation(() => {
-	// 		this.batchUpdatesImplementation(state, () => {
-	// 			const hasOneMarkers = this.resolveHasOneRelationMarkers(
-	// 				state,
-	// 				fieldName,
-	// 				`Cannot disconnect the field '${fieldName}' as it doesn't refer to a has one relation.`,
-	// 			)
-	// 			for (const hasOneMarker of hasOneMarkers) {
-	// 				const stateToDisconnect = state.children.get(hasOneMarker.placeholderName)
-	//
-	// 				if (stateToDisconnect === undefined) {
-	// 					throw new BindingError(`Cannot disconnect field '${hasOneMarker.placeholderName}' as it doesn't exist.`)
-	// 				}
-	// 				if (stateToDisconnect.type !== StateType.Entity) {
-	// 					OperationsHelpers.rejectInvalidAccessorTree()
-	// 				}
-	//
-	// 				const persistedKey = state.persistedData?.get(hasOneMarker.placeholderName)
-	//
-	// 				if (persistedKey instanceof ServerGeneratedUuid && persistedKey.value === stateToDisconnect.id.value) {
-	// 					this.dirtinessTracker.increment()
-	// 				} else {
-	// 					// Do nothing. Disconnecting unpersisted entities doesn't change the count.
-	// 				}
-	//
-	// 				stateToDisconnect.realms.get(state)?.delete(hasOneMarker.placeholderName)
-	//
-	// 				// TODO update changes count?
-	//
-	// 				const newEntityState = this.stateInitializer.initializeEntityRealm(new UnpersistedEntityDummyId(), {
-	// 					creationParameters: hasOneMarker.relation,
-	// 					environment: hasOneMarker.environment,
-	// 					initialEventListeners: hasOneMarker.relation,
-	// 					markersContainer: hasOneMarker.fields,
-	// 					parent: state,
-	// 					realmKey: hasOneMarker.placeholderName,
-	// 				})
-	// 				state.children.set(hasOneMarker.placeholderName, newEntityState)
-	//
-	// 				state.hasStaleAccessor = true
-	// 				state.hasPendingParentNotification = true
-	//
-	// 				OperationsHelpers.runImmediateUserInitialization(newEntityState, initializeReplacement)
-	// 			}
-	// 			if (state.fieldsWithPendingConnectionUpdates === undefined) {
-	// 				state.fieldsWithPendingConnectionUpdates = new Set()
-	// 			}
-	// 			state.fieldsWithPendingConnectionUpdates.add(fieldName)
-	// 		})
-	// 	})
-	// }
+	public disconnectEntityAtField(
+		outerState: EntityRealmState,
+		fieldName: FieldName,
+		initializeReplacement: EntityAccessor.BatchUpdatesHandler | undefined,
+	) {
+		this.eventManager.syncOperation(() => {
+			const persistedData = this.treeStore.persistedEntityData.get(outerState.entity.id.value)
+
+			for (const state of StateIterator.eachSiblingRealm(outerState)) {
+				const targetHasOneMarkers = this.resolveHasOneRelationMarkers(
+					getEntityMarker(state).fields,
+					fieldName,
+					`Cannot disconnect at field '${fieldName}' as it doesn't refer to a has one relation.`,
+				)
+				for (const targetHasOneMarker of targetHasOneMarkers) {
+					const stateToDisconnect = state.children.get(targetHasOneMarker.placeholderName)
+
+					if (
+						stateToDisconnect === undefined ||
+						(stateToDisconnect.type !== StateType.EntityRealm && stateToDisconnect.type !== StateType.EntityRealmStub)
+					) {
+						OperationsHelpers.rejectInvalidAccessorTree()
+					}
+
+					this.treeStore.disposeOfRealm(stateToDisconnect)
+
+					let changesDelta =
+						stateToDisconnect.type === 'entityRealm' ? -1 * stateToDisconnect.unpersistedChangesCount : 0
+					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
+
+					if (persistedId instanceof ServerGeneratedUuid && persistedId.value === stateToDisconnect.entity.id.value) {
+						changesDelta++
+					} else {
+						// Do nothing. Disconnecting unpersisted entities doesn't change the count.
+					}
+
+					const newEntity = this.stateInitializer.initializeEntityRealm(
+						new UnpersistedEntityDummyId(),
+						outerState.entity.entityName,
+						stateToDisconnect.blueprint,
+					)
+					OperationsHelpers.runImmediateUserInitialization(this.stateInitializer, newEntity, initializeReplacement)
+
+					this.eventManager.registerUpdatedConnection(state, targetHasOneMarker.placeholderName)
+					this.eventManager.registerJustUpdated(state, changesDelta)
+				}
+			}
+		})
+	}
 
 	public deleteEntity(state: EntityState) {
 		this.eventManager.syncOperation(() => {

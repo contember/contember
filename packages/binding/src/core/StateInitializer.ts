@@ -154,7 +154,7 @@ export class StateInitializer {
 				this.entityOperations.connectEntityAtField(entityRealm, fieldName, entityToConnect)
 			},
 			disconnectEntityAtField: (fieldName, initializeReplacement) => {
-				// this.entityOperations.disconnectEntityAtField(entityRealm, fieldName, initializeReplacement)
+				this.entityOperations.disconnectEntityAtField(entityRealm, fieldName, initializeReplacement)
 			},
 			getAccessor: (() => {
 				let accessor: EntityAccessor | undefined = undefined

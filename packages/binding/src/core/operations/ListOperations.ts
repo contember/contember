@@ -30,9 +30,18 @@ export class ListOperations {
 			const stateToConnect = OperationsHelpers.resolveAndPrepareEntityToConnect(this.treeStore, entityToConnect)
 			const idToConnect = stateToConnect.entity.id
 
+			// TODO disable this at the top-level.
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, outerState)) {
 				if (state.children.has(idToConnect.value)) {
 					return
+				}
+
+				if (state.entityName !== stateToConnect.entity.entityName) {
+					throw new BindingError(
+						`EntityListAccessor.connectEntity: Attempting to connect at an entity of type ` +
+							`'${stateToConnect.entity.entityName}' but '${state.entityName}' is expected.\n\n` +
+							`Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
+					)
 				}
 
 				try {
@@ -77,6 +86,7 @@ export class ListOperations {
 
 	public disconnectEntity(listState: EntityListState, childEntity: EntityAccessor) {
 		this.eventManager.syncOperation(() => {
+			// TODO disable this at the top-level.
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, listState)) {
 				const disconnectedChildIdValue = childEntity.id
 				const disconnectedChildRealm = state.children.get(disconnectedChildIdValue)

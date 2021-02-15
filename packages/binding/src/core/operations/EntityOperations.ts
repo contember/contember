@@ -116,6 +116,15 @@ export class EntityOperations {
 						continue // Do nothing.
 					}
 
+					if (previouslyConnectedState.entity.entityName !== stateToConnect.entity.entityName) {
+						throw new BindingError(
+							`EntityAccessor.connectEntityAtField: Attempting to connect at field ${entityName}.${fieldName} ` +
+								`an entity of type '${stateToConnect.entity.entityName}' but ` +
+								`'${previouslyConnectedState.entity.entityName}' is expected.\n\n` +
+								`Entity located at: ${ErrorLocator.locateInternalState(outerState)}.`,
+						)
+					}
+
 					try {
 						MarkerComparator.assertEntityMarkersSubsetOf(targetHasOneMarker.fields, fieldsToConnect)
 					} catch (error) {

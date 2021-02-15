@@ -8,28 +8,34 @@ import { BindingError } from '../../BindingError'
 // a new one [K2, V]. That would however change the order of iteration. This main purpose of this data structure is
 // the ability to avoid that and enable the value V to preserve its original place.
 export class BijectiveIndexedMap<K, V> implements Map<K, V> {
-	private valueStore: V[] = []
+	private valueStore: Map<number, V> = new Map()
 	private index: Map<K, number> = new Map()
+	private indexSeed: number = 0
 
 	public readonly [Symbol.toStringTag] = 'BijectiveIndexedMap'
 
 	public constructor(private readonly inverse: (value: V) => K) {}
 
+	private getNewIndex() {
+		return this.indexSeed++
+	}
+
 	public get size(): number {
-		return this.valueStore.length
+		return this.valueStore.size
 	}
 
 	public clear(): void {
-		this.valueStore = []
+		this.valueStore.clear()
 		this.index.clear()
 	}
 	public delete(key: K): boolean {
 		const index = this.index.get(key)
 
-		if (!index) {
+		if (index === undefined) {
 			return false
 		}
-		this.valueStore.splice(index, 1)
+		this.valueStore.delete(index)
+		this.index.delete(key)
 		return true
 	}
 	public forEach(callback: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void {
@@ -44,7 +50,7 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 		if (index === undefined) {
 			return undefined
 		}
-		return this.valueStore[index]
+		return this.valueStore.get(index)
 	}
 	public has(key: K): boolean {
 		return this.index.has(key)
@@ -53,11 +59,11 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 		const existingIndex = this.index.get(key)
 
 		if (existingIndex === undefined) {
-			// Push returns new length, hence the -1
-			const newIndex = this.valueStore.push(value) - 1
+			const newIndex = this.getNewIndex()
 			this.index.set(key, newIndex)
+			this.valueStore.set(newIndex, value)
 		} else {
-			this.valueStore[existingIndex] = value
+			this.valueStore.set(existingIndex, value)
 		}
 		return this
 	}
@@ -69,6 +75,7 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 		if (index === undefined) {
 			throw new BindingError()
 		}
+		this.index.delete(oldKey)
 		this.index.set(newKey, index)
 		return this
 	}
@@ -89,7 +96,12 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	public values(): IterableIterator<V> {
-		return this.valueStore.values()
+	public *values(): IterableIterator<V> {
+		for (const value of this.valueStore.values()) {
+			if (value === undefined) {
+				continue
+			}
+			yield value
+		}
 	}
 }

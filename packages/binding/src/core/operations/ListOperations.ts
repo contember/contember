@@ -1,9 +1,11 @@
+import { validate as uuidValidate } from 'uuid'
 import { BindingOperations, EntityAccessor, EntityListAccessor } from '../../accessors'
 import { UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EventManager } from '../EventManager'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
 import { MarkerComparator } from '../MarkerComparator'
+import { RealmKeyGenerator } from '../RealmKeyGenerator'
 import { EntityListState, getEntityMarker, StateIterator, StateType } from '../state'
 import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
@@ -147,7 +149,19 @@ export class ListOperations {
 	public getChildEntityById(state: EntityListState, id: string) {
 		const realm = state.children.get(id)
 		if (realm === undefined) {
-			throw new BindingError(`EntityList: cannot retrieve an entity with id '${id}' as it is not on the list.`)
+			const isRuntimeId = uuidValidate(id) || UnpersistedEntityDummyId.matchesDummyId(id)
+			if (isRuntimeId) {
+				throw new BindingError(`EntityList: cannot retrieve an entity with id '${id}' as it is not on the list.`)
+			}
+			const looksLikeKey = this.treeStore.entityRealmStore.has(id) || RealmKeyGenerator.vaguelyAppearsToBeAKey(id)
+			throw new BindingError(
+				`EntityList: cannot retrieve an entity with id '${id}' because it's not a valid id.` +
+					(looksLikeKey
+						? `\nThe supplied value appears to be an entity *key*, not an *id*. List accessors are indexed by ids ` +
+						  `and you can use \`EntityAccessor.id\` to obtain one. Keys, on the other hand, are globally unique and ` +
+						  `you can use \`getEntityByKey\` to get its EntityAccessor.`
+						: ''),
+			)
 		}
 		return realm.getAccessor()
 	}

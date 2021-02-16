@@ -8,7 +8,6 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	Marker,
 } from '../markers'
 import { EntityName, FieldName, Scalar, SingleEntityEventListeners } from '../treeParameters'
 import { assertNever } from '../utils'
@@ -195,13 +194,89 @@ export class StateInitializer {
 		const persistedData = this.treeStore.persistedEntityData.get(entity.id.value)
 
 		const marker = getEntityMarker(state)
+		const pathBack = this.getPathBackToParent(entityRealm)
+
 		for (const [placeholderName, field] of marker.fields.markers) {
-			this.initializeEntityField(entityRealm, field, persistedData?.get(placeholderName))
+			const fieldDatum = persistedData?.get(placeholderName)
+
+			if (field instanceof FieldMarker) {
+				this.initializeFromFieldMarker(entityRealm, field, fieldDatum)
+			} else if (field instanceof EntityListSubTreeMarker || field instanceof EntitySubTreeMarker) {
+				// Do nothing: all sub trees have been hoisted and aren't handled from here.
+			} else if (field instanceof HasManyRelationMarker) {
+				// if (pathBack?.fieldBackToParent === field.parameters.field) {
+				// 	// TODO this is probably wrong?
+				// 	const ids = pathBack.parent.children.get(field.placeholderName)
+				// 	const newData = this.treeStore.persistedEntityData.get(pathBack.parent.entity.id.value)
+				// 	console.log('many?', pathBack, field, entityRealm, fieldDatum, ids)
+				// }
+				this.initializeFromHasManyRelationMarker(entityRealm, field, fieldDatum instanceof Set ? fieldDatum : new Set())
+			} else if (field instanceof HasOneRelationMarker) {
+				let runtimeId: RuntimeId
+				if (pathBack?.fieldBackToParent === field.parameters.field) {
+					runtimeId = pathBack.parent.entity.id
+				} else {
+					runtimeId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityDummyId()
+				}
+				this.initializeFromHasOneRelationMarker(entityRealm, field, runtimeId)
+			} else {
+				assertNever(field)
+			}
 		}
 
 		this.eventManager.registerNewlyInitialized(entityRealm)
 
 		return entityRealm
+	}
+
+	private getPathBackToParent(
+		entityRealm: EntityRealmState,
+	):
+		| {
+				fieldBackToParent: FieldName
+				parent: EntityRealmState
+		  }
+		| undefined {
+		const blueprint = entityRealm.blueprint
+		if (blueprint.parent === undefined) {
+			return undefined
+		}
+		let parentEntityName: EntityName
+		let relationFromParent: FieldName
+		let parent: EntityRealmState
+
+		if (blueprint.type === 'hasOne') {
+			parentEntityName = blueprint.parent.entity.entityName
+			relationFromParent = blueprint.marker.parameters.field
+			parent = blueprint.parent
+		} else if (blueprint.type === 'listEntity') {
+			const grandparentBlueprint = blueprint.parent.blueprint
+
+			if (grandparentBlueprint.parent === undefined) {
+				return undefined
+			}
+			parentEntityName = grandparentBlueprint.parent.entity.entityName
+			relationFromParent = grandparentBlueprint.marker.parameters.field
+			parent = grandparentBlueprint.parent
+		} else {
+			return assertNever(blueprint)
+		}
+
+		const relationSchema = this.treeStore.schema.getEntityField(parentEntityName, relationFromParent)
+
+		if (relationSchema?.__typename !== '_Relation') {
+			throw new BindingError()
+		}
+		const fieldBack = (relationSchema.ownedBy || relationSchema.inversedBy) ?? null
+
+		// console.log(parentEntityName, relationFromParent, entityRealm.entity.entityName, fieldBack)
+		if (fieldBack === null) {
+			return undefined
+		}
+		return {
+			parent,
+			fieldBackToParent: fieldBack,
+		}
 	}
 
 	private registerEntityRealm(entityRealm: EntityRealmState | EntityRealmStateStub) {
@@ -396,66 +471,63 @@ export class StateInitializer {
 	private initializeFromHasOneRelationMarker(
 		parent: EntityRealmState,
 		field: HasOneRelationMarker,
-		fieldDatum: EntityFieldPersistedData | undefined,
+		entityId: RuntimeId,
 	) {
-		const relation = field.parameters
-
-		if (fieldDatum instanceof Set) {
-			throw new BindingError(
-				`Received a collection of entities for field '${relation.field}' where a single entity was expected. ` +
-					`Perhaps you wanted to use a <Repeater />?`,
-			)
-		} else if (fieldDatum instanceof ServerGeneratedUuid || fieldDatum === null || fieldDatum === undefined) {
-			const entityId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityDummyId()
-
-			parent.children.set(
-				field.placeholderName,
-				this.initializeEntityRealm(entityId, this.getRelationTargetEntityName(parent, field), {
-					type: 'hasOne',
-					parent,
-					marker: field,
-				}),
-			)
-		} else {
-			throw new BindingError(
-				`Received a scalar value for field '${relation.field}' where a single entity was expected.` +
-					`Perhaps you meant to use a variant of <Field />?`,
-			)
-		}
+		parent.children.set(
+			field.placeholderName,
+			this.initializeEntityRealm(entityId, this.getRelationTargetEntityName(parent, field), {
+				type: 'hasOne',
+				parent,
+				marker: field,
+			}),
+		)
+		// if (fieldDatum instanceof ServerGeneratedUuid || fieldDatum === null || fieldDatum === undefined) {
+		// 	const entityId = fieldDatum instanceof ServerGeneratedUuid ? fieldDatum : new UnpersistedEntityDummyId()
+		//
+		//
+		// } else if (fieldDatum instanceof Set) {
+		// 	throw new BindingError(
+		// 		`Received a collection of entities for field '${relation.field}' where a single entity was expected. ` +
+		// 			`Perhaps you wanted to use a <Repeater />?`,
+		// 	)
+		// } else {
+		// 	throw new BindingError(
+		// 		`Received a scalar value for field '${relation.field}' where a single entity was expected.` +
+		// 			`Perhaps you meant to use a variant of <Field />?`,
+		// 	)
+		// }
 	}
 
 	private initializeFromHasManyRelationMarker(
 		parent: EntityRealmState,
 		field: HasManyRelationMarker,
-		fieldDatum: EntityFieldPersistedData | undefined,
+		persistedEntityIds: Set<string>,
 	) {
-		const relation = field.parameters
-
-		if (fieldDatum === undefined || fieldDatum instanceof Set) {
-			parent.children.set(
-				field.placeholderName,
-				this.initializeEntityListState(
-					{
-						marker: field,
-						parent,
-					},
-					this.getRelationTargetEntityName(parent, field),
-					fieldDatum || new Set(),
-				),
-			)
-		} else if (typeof fieldDatum === 'object') {
-			// Intentionally allowing `fieldDatum === null` here as well since this should only happen when a *hasOne
-			// relation is unlinked, e.g. a Person does not have a linked Nationality.
-			throw new BindingError(
-				`Received a referenced entity for field '${relation.field}' where a collection of entities was expected.` +
-					`Perhaps you wanted to use a <HasOne />?`,
-			)
-		} else {
-			throw new BindingError(
-				`Received a scalar value for field '${relation.field}' where a collection of entities was expected.` +
-					`Perhaps you meant to use a variant of <Field />?`,
-			)
-		}
+		parent.children.set(
+			field.placeholderName,
+			this.initializeEntityListState(
+				{ marker: field, parent },
+				this.getRelationTargetEntityName(parent, field),
+				persistedEntityIds,
+			),
+		)
+		// const relation = field.parameters
+		//
+		// if (fieldDatum === undefined || fieldDatum instanceof Set) {
+		//
+		// } else if (typeof fieldDatum === 'object') {
+		// 	// Intentionally allowing `fieldDatum === null` here as well since this should only happen when a *hasOne
+		// 	// relation is unlinked, e.g. a Person does not have a linked Nationality.
+		// 	throw new BindingError(
+		// 		`Received a referenced entity for field '${relation.field}' where a collection of entities was expected.` +
+		// 			`Perhaps you wanted to use a <HasOne />?`,
+		// 	)
+		// } else {
+		// 	throw new BindingError(
+		// 		`Received a scalar value for field '${relation.field}' where a collection of entities was expected.` +
+		// 			`Perhaps you meant to use a variant of <Field />?`,
+		// 	)
+		// }
 	}
 
 	private getRelationTargetEntityName(
@@ -468,24 +540,6 @@ export class StateInitializer {
 			throw new BindingError() // This should have been validated elsewhere.
 		}
 		return targetField.targetEntity
-	}
-
-	private initializeEntityField(
-		entityRealm: EntityRealmState,
-		field: Marker,
-		fieldDatum: EntityFieldPersistedData | undefined,
-	): void {
-		if (field instanceof FieldMarker) {
-			this.initializeFromFieldMarker(entityRealm, field, fieldDatum)
-		} else if (field instanceof HasOneRelationMarker) {
-			this.initializeFromHasOneRelationMarker(entityRealm, field, fieldDatum)
-		} else if (field instanceof HasManyRelationMarker) {
-			this.initializeFromHasManyRelationMarker(entityRealm, field, fieldDatum)
-		} else if (field instanceof EntityListSubTreeMarker || field instanceof EntitySubTreeMarker) {
-			// Do nothing: all sub trees have been hoisted and shouldn't appear here.
-		} else {
-			assertNever(field)
-		}
 	}
 
 	private getAddEventListener(state: {

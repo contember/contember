@@ -35,7 +35,7 @@ export interface EntityRealmStateStub {
 
 	readonly blueprint: EntityRealmBlueprint
 	readonly entity: EntityState
-	readonly realmKey: EntityRealmKey
+	realmKey: EntityRealmKey
 
 	readonly getAccessor: EntityAccessor.GetEntityAccessor
 }
@@ -49,7 +49,7 @@ export interface EntityRealmState {
 
 	readonly blueprint: EntityRealmBlueprint
 	entity: EntityState
-	readonly realmKey: EntityRealmKey
+	realmKey: EntityRealmKey
 
 	readonly children: Map<PlaceholderName, StateNode | EntityRealmStateStub>
 	childrenWithPendingUpdates: Set<StateNode> | undefined

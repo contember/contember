@@ -313,43 +313,4 @@ export class EntityOperations {
 			yield hasOneRelation
 		}
 	}
-
-	// public changeEntityId(entityRealm: EntityRealmState, newId: EntityAccessor.RuntimeId) {
-	// 	const previousKey = entityRealm.id.value
-	// 	const newKey = newId.value
-	//
-	// 	entityRealm.hasIdSetInStone = true
-	// 	entityRealm.id = newId
-	// 	this.treeStore.entityStore.delete(previousKey)
-	// 	this.treeStore.entityStore.set(newKey, entityRealm)
-	//
-	// 	for (const [parentState] of entityRealm.realms) {
-	// 		// We're touching the parents and not letting *their* onChildUpdate handle this because we really need
-	// 		// to make sure this gets processed which wouldn't happen if before the id change we had told the parent
-	// 		// about another update.
-	// 		if (parentState?.type === StateType.Entity) {
-	// 			const relevantPlaceholders = this.findChildPlaceholdersByState(parentState, entityRealm)
-	// 			this.eventManager.markPendingConnections(parentState, relevantPlaceholders)
-	// 		} else if (parentState?.type === StateType.EntityList) {
-	// 			// This is tricky. We need to change the key but at the same time preserve the order of the entities.
-	// 			// We find the index of this entity (knowing there's exactly one occurrence), then convert the children
-	// 			// to an array, perform the replacement and put the data back into the map, preserving its referential
-	// 			// identity.
-	// 			let childIndex = -1
-	// 			for (const [key] of parentState.children) {
-	// 				childIndex++
-	// 				if (key === previousKey) {
-	// 					break
-	// 				}
-	// 			}
-	// 			const childrenArray = Array.from(parentState.children)
-	// 			childrenArray[childIndex] = [newKey, entityRealm]
-	//
-	// 			parentState.children.clear()
-	// 			for (const [key, state] of childrenArray) {
-	// 				parentState.children.set(key, state)
-	// 			}
-	// 		}
-	// 	}
-	// }
 }

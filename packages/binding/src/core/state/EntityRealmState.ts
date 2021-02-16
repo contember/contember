@@ -9,22 +9,28 @@ import { StateType } from './StateType'
 
 export type EntityRealmParent = EntityRealmState | EntityListState | undefined
 
+export interface HasOneEntityRealmBlueprint {
+	readonly type: 'hasOne'
+	readonly marker: HasOneRelationMarker
+	readonly parent: EntityRealmState
+}
+
+export interface ListEntityEntityRealmBlueprint {
+	readonly type: 'listEntity'
+	readonly parent: EntityListState
+	readonly id: RuntimeId
+}
+
+export interface SubTreeEntityRealmBlueprint {
+	readonly type: 'subTree'
+	readonly marker: EntitySubTreeMarker
+	readonly parent: undefined
+}
+
 export type EntityRealmBlueprint =
-	| {
-			readonly type: 'hasOne'
-			readonly marker: HasOneRelationMarker
-			readonly parent: EntityRealmState
-	  }
-	| {
-			readonly type: 'listEntity'
-			readonly parent: EntityListState
-			readonly id: RuntimeId
-	  }
-	| {
-			readonly type: 'subTree'
-			readonly marker: EntitySubTreeMarker
-			readonly parent: undefined
-	  }
+	| HasOneEntityRealmBlueprint
+	| ListEntityEntityRealmBlueprint
+	| SubTreeEntityRealmBlueprint
 
 export interface EntityRealmStateStub {
 	readonly type: StateType.EntityRealmStub

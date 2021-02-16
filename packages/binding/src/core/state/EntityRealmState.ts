@@ -1,5 +1,4 @@
 import { EntityAccessor, ErrorAccessor } from '../../accessors'
-import { RuntimeId } from '../../accessorTree'
 import { EntitySubTreeMarker, HasOneRelationMarker } from '../../markers'
 import { EntityRealmKey, FieldName, PlaceholderName, SingleEntityEventListeners } from '../../treeParameters'
 import { EntityListState } from './EntityListState'
@@ -18,7 +17,6 @@ export interface HasOneEntityRealmBlueprint {
 export interface ListEntityEntityRealmBlueprint {
 	readonly type: 'listEntity'
 	readonly parent: EntityListState
-	readonly id: RuntimeId
 }
 
 export interface SubTreeEntityRealmBlueprint {

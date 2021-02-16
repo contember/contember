@@ -285,7 +285,7 @@ export class StateInitializer {
 		this.treeStore.entityRealmStore.set(entityRealm.realmKey, entityRealm)
 
 		if (blueprint.type === 'listEntity') {
-			blueprint.parent.children.set(blueprint.id.value, entityRealm)
+			blueprint.parent.children.set(entity.id.value, entityRealm)
 		} else if (blueprint.type === 'hasOne') {
 			blueprint.parent.children.set(blueprint.marker.placeholderName, entityRealm)
 		}
@@ -571,7 +571,6 @@ export class StateInitializer {
 		return this.initializeEntityRealm(entityId, entityListState.entityName, {
 			type: 'listEntity',
 			parent: entityListState,
-			id: entityId,
 		})
 	}
 

@@ -26,9 +26,9 @@ export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelati
 
 export const HasMany = Component(
 	<ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => {
-		const entity = useEntityList(props)
+		const entityList = useEntityList(props)
 
-		return <EntityList {...props} accessor={entity} />
+		return <EntityList {...props} accessor={entityList} />
 	},
 	{
 		generateEnvironment: (props, oldEnvironment) => {

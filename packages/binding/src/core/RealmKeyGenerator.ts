@@ -10,6 +10,7 @@ import {
 } from './state'
 
 const GLUE = '--'
+const keyEndRegex = new RegExp(`${GLUE}\\d+$`)
 
 export class RealmKeyGenerator {
 	private static getMarkerId = (() => {
@@ -25,6 +26,11 @@ export class RealmKeyGenerator {
 			return existing
 		}
 	})()
+
+	public static vaguelyAppearsToBeAKey(candidate: string): boolean {
+		// This is just for error messages. No need to be super precise.
+		return candidate.startsWith(`key${GLUE}`) && keyEndRegex.test(candidate)
+	}
 
 	private static generateKey(id: string, container: EntityFieldMarkersContainer) {
 		// The static prefix serves to really emphasize that this is *NOT* just a uuid

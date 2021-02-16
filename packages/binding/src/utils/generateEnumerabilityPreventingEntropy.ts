@@ -1,3 +1,3 @@
-export const generateEnumerabilityPreventingEntropy = (): string => {
-	return (Math.random() * 1e5).toFixed(0).padStart(5, '0')
+export const generateEnumerabilityPreventingEntropy = (length: number = 5): string => {
+	return (Math.random() * Math.pow(10, length)).toFixed(0).padStart(length, '0')
 }

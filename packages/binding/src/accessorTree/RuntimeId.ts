@@ -31,8 +31,18 @@ export class UnpersistedEntityDummyId implements RuntimeIdSpec {
 	})()
 
 	public constructor() {
-		const enumerabilityPreventingEntropy = generateEnumerabilityPreventingEntropy()
+		const enumerabilityPreventingEntropy = generateEnumerabilityPreventingEntropy(
+			UnpersistedEntityDummyId.entropyLength,
+		)
+
+		// KEEP THIS IN SYNC WITH THE REGEX BELOW!!!
 		this.value = `adminOnlyDummyId-${enumerabilityPreventingEntropy}-${UnpersistedEntityDummyId.getNextSeed()}`
+	}
+
+	private static entropyLength = 5
+	private static dummyIdRegex = new RegExp(`^adminOnlyDummyId-\\d{${UnpersistedEntityDummyId.entropyLength}}-\\d+$`)
+	public static matchesDummyId(candidate: string): boolean {
+		return UnpersistedEntityDummyId.dummyIdRegex.test(candidate)
 	}
 }
 

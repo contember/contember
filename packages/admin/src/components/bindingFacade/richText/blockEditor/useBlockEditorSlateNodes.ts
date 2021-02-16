@@ -84,16 +84,16 @@ export const useBlockEditorSlateNodes = ({
 		? topLevelBlocks.map((entity, index) => {
 				const existingBlockElement = blockElementCache.get(entity)
 
-				const blockPathRef = blockElementPathRefs.get(entity.key)
+				const blockPathRef = blockElementPathRefs.get(entity.id)
 				const desiredIndex = index + leadingFieldBackedElements.length
 
 				if (blockPathRef === undefined) {
-					blockElementPathRefs.set(entity.key, Editor.pathRef(editor, [desiredIndex], { affinity: 'backward' }))
+					blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [desiredIndex], { affinity: 'backward' }))
 				} else {
 					const current = blockPathRef.current
 					if (current === null || current.length !== 1 || current[0] !== desiredIndex) {
 						blockPathRef.unref()
-						blockElementPathRefs.set(entity.key, Editor.pathRef(editor, [desiredIndex], { affinity: 'backward' }))
+						blockElementPathRefs.set(entity.id, Editor.pathRef(editor, [desiredIndex], { affinity: 'backward' }))
 					}
 				}
 

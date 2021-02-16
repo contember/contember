@@ -130,13 +130,13 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 			const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
 			const getReferenceById = blockList.getChildEntityById
 
-			for (const [blockKey, pathRef] of blockElementPathRefs) {
+			for (const [blockId, pathRef] of blockElementPathRefs) {
 				const current = pathRef.current
-				const originalBlock = getReferenceById(blockKey)
+				const originalBlock = getReferenceById(blockId)
 				const cleanUp = () => {
 					originalBlock.deleteEntity()
 					pathRef.unref()
-					blockElementPathRefs.delete(blockKey)
+					blockElementPathRefs.delete(blockId)
 				}
 
 				if (current === null || current.length > 1) {
@@ -160,8 +160,8 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 								originalElement !== currentElement ||
 								originalBlock.getRelativeSingleField(sortableByField).value !== newBlockOrder
 							) {
-								getReferenceById(blockKey).getRelativeSingleField(sortableByField).updateValue(newBlockOrder)
-								saveBlockElement(getReferenceById, blockKey, currentElement)
+								getReferenceById(blockId).getRelativeSingleField(sortableByField).updateValue(newBlockOrder)
+								saveBlockElement(getReferenceById, blockId, currentElement)
 							}
 							processedAccessors[newBlockOrder] = true
 						}
@@ -189,10 +189,10 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 					const isProcessed = processedAccessors[blockOrder]
 					if (!isProcessed) {
 						blockList.createNewEntity(getAccessor => {
-							const newKey = getAccessor().id
+							const newId = getAccessor().id
 							getAccessor().getRelativeSingleField(sortableByField).updateValue(blockOrder)
-							saveBlockElement(getReferenceById, newKey, child as EditorNode)
-							blockElementPathRefs.set(newKey, Editor.pathRef(editor, [blockOrder], { affinity: 'backward' }))
+							saveBlockElement(getReferenceById, newId, child as EditorNode)
+							blockElementPathRefs.set(newId, Editor.pathRef(editor, [blockOrder], { affinity: 'backward' }))
 						})
 					}
 				}

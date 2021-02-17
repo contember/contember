@@ -83,11 +83,11 @@ export class QueryResponseNormalizer {
 
 			if (fromTarget === undefined) {
 				target.set(field, this.createFieldData(entityMap, newDatum))
-			} else if (fromTarget instanceof ServerGeneratedUuid) {
+			} else if (fromTarget instanceof ServerGeneratedUuid || (fromTarget === null && typeof newDatum === 'object')) {
 				if (newDatum === null) {
 					target.set(field, null)
 				} else if (typeof newDatum === 'object' && !Array.isArray(newDatum)) {
-					const target = entityMap.get(fromTarget.value)
+					const target = entityMap.get(newDatum[PRIMARY_KEY_NAME])
 					if (target === undefined) {
 						this.rejectData()
 					}

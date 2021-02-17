@@ -1,4 +1,4 @@
-import { Scalar } from '../treeParameters'
+import { EntityId, PlaceholderName, Scalar } from '../treeParameters'
 import { ServerGeneratedUuid } from './RuntimeId'
 
 // HasMany relations are encoded as sets of entity ids.
@@ -6,15 +6,14 @@ import { ServerGeneratedUuid } from './RuntimeId'
 //		Not sure whether that is a reasonable precaution or just pure overhead.
 export type EntityFieldPersistedData = Scalar | ServerGeneratedUuid | EntityListPersistedData
 
-export type SingleEntityPersistedData = Map<string, EntityFieldPersistedData>
+export type SingleEntityPersistedData = Map<PlaceholderName, EntityFieldPersistedData>
 
-export type EntityListPersistedData = Set<string>
+export type EntityListPersistedData = Set<EntityId>
 
-// The key is the entity id
-export type PersistedEntityDataStore = Map<string, SingleEntityPersistedData>
+export type PersistedEntityDataStore = Map<EntityId, SingleEntityPersistedData>
 
 // The key is the subTree placeholder name
-export type SubTreeDataStore = Map<string, ServerGeneratedUuid | EntityListPersistedData>
+export type SubTreeDataStore = Map<PlaceholderName, ServerGeneratedUuid | EntityListPersistedData>
 
 export class NormalizedQueryResponseData {
 	public constructor(

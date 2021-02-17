@@ -96,6 +96,22 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
 		return this
 	}
 
+	public changeKeyOrder(newOrder: Iterable<K>) {
+		for (const key of newOrder) {
+			const keyIndex = this.index.get(key)
+			if (keyIndex === undefined) {
+				throw new BindingError()
+			}
+			const value = this.valueStore.get(keyIndex)!
+
+			// This effectively removes value from wherever it was and puts it at the end.
+			// Provided newOrder.size is the same as valueStore, by the end of this loop
+			// the values will be in the correct order.
+			this.valueStore.delete(keyIndex)
+			this.valueStore.set(keyIndex, value)
+		}
+	}
+
 	public *[Symbol.iterator](): IterableIterator<[K, V]> {
 		yield* this.entries()
 	}

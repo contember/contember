@@ -134,6 +134,8 @@ export class TreeStore {
 		realmToDisconnect.entity.realms.delete(realmToDisconnect.realmKey)
 
 		if (realmToDisconnect.type === StateType.EntityRealm) {
+			realmToDisconnect.blueprint.parent?.childrenWithPendingUpdates?.delete(realmToDisconnect)
+
 			for (const child of realmToDisconnect.children.values()) {
 				switch (child.type) {
 					case StateType.Field:

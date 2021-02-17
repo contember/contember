@@ -136,34 +136,32 @@ export class StateIterator {
 
 	public static *depthFirstINodes(
 		root: StateINode,
-		match: (iNode: StateINode) => boolean,
+		match?: (iNode: StateINode) => boolean,
 	): IterableIterator<StateINode> {
-		yield* this.depthFirstINodesImplementation(root, match, new Set())
+		yield* this.depthFirstINodesImplementation(root, match)
 	}
 
 	private static *depthFirstINodesImplementation(
 		root: StateINode | EntityRealmStateStub,
-		match: (iNode: StateINode) => boolean,
-		visitedINodes: Set<StateINode>,
+		match?: (iNode: StateINode) => boolean,
 	): IterableIterator<StateINode> {
 		// Ignore uninitialized. Is that always correct though? This should probably be configurable.
-		if (root.type === StateType.EntityRealmStub || visitedINodes.has(root)) {
+		if (root.type === StateType.EntityRealmStub) {
 			return
 		}
-		visitedINodes.add(root)
 		switch (root.type) {
 			case StateType.EntityRealm:
 			case StateType.EntityList:
 				for (const childState of root.children.values()) {
 					if (childState.type === StateType.EntityRealm || childState.type === StateType.EntityList) {
-						yield* this.depthFirstINodesImplementation(childState, match, visitedINodes)
+						yield* this.depthFirstINodesImplementation(childState, match)
 					}
 				}
 				break
 			default:
 				return assertNever(root)
 		}
-		if (match(root)) {
+		if (match === undefined || match(root)) {
 			yield root
 		}
 	}

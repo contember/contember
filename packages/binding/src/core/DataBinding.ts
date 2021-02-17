@@ -37,6 +37,7 @@ import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
 import { Schema, SchemaLoader, SchemaValidator } from './schema'
+import { StateIterator, StateType } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
@@ -183,9 +184,7 @@ export class DataBinding {
 						}
 
 						this.eventManager.syncTransaction(() => {
-							this.accessorErrorManager.clearErrors()
-							this.dirtinessTracker.reset()
-							// TODO clear thoroughly. Planned removals, everything.
+							this.resetTreeAfterSuccessfulPersist()
 							this.treeAugmenter.updatePersistedData(
 								Object.fromEntries(
 									Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
@@ -306,6 +305,25 @@ export class DataBinding {
 			this.onError(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
 		}
 		return queryResponse
+	}
+
+	private resetTreeAfterSuccessfulPersist() {
+		this.eventManager.syncTransaction(() => {
+			this.accessorErrorManager.clearErrors()
+			this.dirtinessTracker.reset()
+
+			for (const [, rootState] of StateIterator.eachRootState(this.treeStore)) {
+				for (const state of StateIterator.depthFirstINodes(rootState)) {
+					state.unpersistedChangesCount = 0
+
+					if (state.type === StateType.EntityRealm) {
+						state.plannedHasOneDeletions?.clear()
+					} else if (state.type === StateType.EntityList) {
+						state.plannedRemovals?.clear()
+					}
+				}
+			}
+		})
 	}
 
 	private getOrLoadSchema(): Schema | Promise<Schema> {

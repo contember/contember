@@ -30,6 +30,7 @@ export class EntityTypeProvider {
 			[Input.FieldMeta.updatable]: { type: this.graphqlObjectFactories.boolean, resolve: aliasAwareResolver },
 		},
 	})
+	private readonly entityFieldProviders: { [key: string]: EntityFieldsProvider } = {}
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -37,9 +38,12 @@ export class EntityTypeProvider {
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
-		private readonly entityFieldProviders: { [key: string]: EntityFieldsProvider },
 		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
+
+	public registerEntityFieldProvider(key: string, provider: EntityFieldsProvider): void {
+		this.entityFieldProviders[key] = provider
+	}
 
 	public getEntity(entityName: string): GraphQLObjectType {
 		if (!this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
@@ -140,14 +144,14 @@ export class EntityTypeProvider {
 									fields: {
 										node: {
 											type: this.graphqlObjectFactories.createNotNull(entityType),
-											resolve: aliasAwareResolver,
+											// resolve: aliasAwareResolver,
 										},
 									},
 								}),
 							),
 						),
 					),
-					resolve: aliasAwareResolver,
+					// resolve: aliasAwareResolver,
 				},
 			},
 		})

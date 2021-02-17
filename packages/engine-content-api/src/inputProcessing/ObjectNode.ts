@@ -1,12 +1,12 @@
 import { FieldNode } from './FieldNode'
 
-export class ObjectNode<Args = any> {
+export class ObjectNode<Args = any, Extensions extends Record<string, any> = Record<string, any>> {
 	constructor(
 		public readonly name: string,
 		public readonly alias: string,
 		public readonly fields: (ObjectNode | FieldNode)[],
 		public readonly args: Args,
-		public readonly extensions: { [key: string]: any },
+		public readonly extensions: Extensions,
 		public readonly path: string[],
 	) {}
 

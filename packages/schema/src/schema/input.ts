@@ -100,12 +100,15 @@ namespace Input {
 		limit?: number
 	}
 
-	export interface SelectQueryInput<E = never> {
+	export interface PaginationQueryInput<E = never> {
 		filter?: OptionalWhere<E>
 		orderBy?: OrderBy[]
 		skip?: number
 		first?: number
 	}
+
+	/** @deprecated */
+	export type SelectQueryInput<E = never> = PaginationQueryInput<E>
 
 	export type UpdateOneRelationInput<E = never> =
 		| CreateRelationInput<E>
@@ -176,7 +179,7 @@ namespace Input {
 	}
 
 	export interface FieldWhere<C = Condition, Opt = never> {
-		[name: string]: C | Where<C, Opt> | undefined | Where<C, Opt>[] //last one if for ComposedWhere
+		[name: string]: C | Where<C, Opt> | undefined | (Where<C, Opt> | Opt)[] //last one if for ComposedWhere
 	}
 
 	export type Where<C = Condition, Opt = never> = ComposedWhere<C, Opt> & FieldWhere<C, Opt>

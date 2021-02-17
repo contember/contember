@@ -3,7 +3,7 @@ import {
 	ConditionBuilder,
 	FieldsVisitorFactory,
 	JoinBuilder,
-	JunctionFetcher,
+	RelationFetcher,
 	MetaHandler,
 	OrderByBuilder,
 	WhereBuilder,
@@ -30,6 +30,8 @@ import { Builder } from '@contember/dic'
 import { Acl, Schema } from '@contember/schema'
 import { Client, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { Providers } from '@contember/schema-utils'
+import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
+import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
 
 type MapperContainerArgs = {
 	schema: Schema
@@ -58,14 +60,14 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		)
 		.addService('orderByBuilder', ({ joinBuilder }) => new OrderByBuilder(schema.model, joinBuilder))
 		.addService(
-			'junctionFetcher',
+			'relationFetcher',
 			({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>
-				new JunctionFetcher(whereBuilder, orderByBuilder, predicatesInjector, pathFactory),
+				new RelationFetcher(whereBuilder, orderByBuilder, predicatesInjector, pathFactory),
 		)
 		.addService(
 			'fieldsVisitorFactory',
-			({ junctionFetcher, predicateFactory, whereBuilder }) =>
-				new FieldsVisitorFactory(schema.model, junctionFetcher, predicateFactory, whereBuilder),
+			({ relationFetcher, predicateFactory, whereBuilder }) =>
+				new FieldsVisitorFactory(schema.model, relationFetcher, predicateFactory, whereBuilder),
 		)
 		.addService('metaHandler', ({ whereBuilder, predicateFactory }) => new MetaHandler(whereBuilder, predicateFactory))
 		.addService('uniqueWhereExpander', () => new UniqueWhereExpander(schema.model))
@@ -73,8 +75,13 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 			'hasManyToHasOneReducer',
 			({ uniqueWhereExpander }) => new HasManyToHasOneReducerExecutionHandler(schema.model, uniqueWhereExpander),
 		)
-		.addService('selectHandlers', ({ hasManyToHasOneReducer }) => ({
+		.addService(
+			'paginatedHasManyExecutionHandler',
+			({ relationFetcher }) => new PaginatedHasManyExecutionHandler(schema.model, relationFetcher),
+		)
+		.addService('selectHandlers', ({ hasManyToHasOneReducer, paginatedHasManyExecutionHandler }) => ({
 			[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,
+			[PaginatedHasManyFieldProvider.extensionName]: paginatedHasManyExecutionHandler,
 		}))
 		.addService(
 			'selectBuilderFactory',

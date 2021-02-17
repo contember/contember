@@ -3,10 +3,12 @@ import { getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../exception'
 import { getFieldsForUniqueWhere } from '../utils'
 
+type ExtendedUniqueWhere = Input.UniqueWhere<Input.PrimaryValue[]>
+
 export class UniqueWhereExpander {
 	constructor(private readonly schema: Model.Schema) {}
 
-	expand(entity: Model.Entity, where: Input.UniqueWhere, path: string[] = []): Input.Where {
+	expand(entity: Model.Entity, where: ExtendedUniqueWhere, path: string[] = []): Input.Where {
 		const isFilled = (field: string) => where[field] !== undefined && where[field] !== null
 
 		const isUnique = (() => {
@@ -44,7 +46,7 @@ export class UniqueWhereExpander {
 		return whereExpanded
 	}
 
-	private formatErrorMessage(entity: Model.Entity, where: Input.UniqueWhere, path: string[]): string {
+	private formatErrorMessage(entity: Model.Entity, where: ExtendedUniqueWhere, path: string[]): string {
 		const knownUniqueKeys = getFieldsForUniqueWhere(this.schema, entity)
 			.map(it => it.join(', '))
 			.map(it => `\t - ${it}`)

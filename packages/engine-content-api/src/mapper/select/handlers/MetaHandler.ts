@@ -9,8 +9,11 @@ export class MetaHandler implements SelectExecutionHandler<{}> {
 	constructor(private readonly whereBuilder: WhereBuilder, private readonly predicateFactory: PredicateFactory) {}
 
 	process(context: SelectExecutionHandlerContext): void {
-		const { field, path } = context
-		for (let metaField of (field as ObjectNode).fields) {
+		const { objectNode, path } = context
+		if (!objectNode) {
+			throw new Error()
+		}
+		for (let metaField of objectNode.fields) {
 			const columnPath = path.for(metaField.alias)
 			for (let metaInfo of (metaField as ObjectNode).fields) {
 				if (metaInfo.name === Input.FieldMeta.updatable) {

@@ -1,8 +1,8 @@
 type Query {
-  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
-  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
-  validateCreatePost(data: PostCreateInput!): _ValidationResult!
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
   transaction: QueryTransaction
   _info: Info
 }
@@ -32,21 +32,21 @@ type _ValidationMessage {
   text: String!
 }
 
-input CategoryCreateInput {
+input AuthorCreateInput {
   name: String
-  posts: [CategoryCreatePostsEntityRelationInput!]
+  posts: [AuthorCreatePostsEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
-input CategoryCreatePostsEntityRelationInput {
-  create: PostWithoutCategoriesCreateInput
+input AuthorCreatePostsEntityRelationInput {
+  create: PostWithoutAuthorCreateInput
   alias: String
 }
 
-input PostWithoutCategoriesCreateInput {
+input PostWithoutAuthorCreateInput {
   state: PostState
   publishedAt: DateTime
-  author: PostCreateAuthorEntityRelationInput
+  categories: [PostCreateCategoriesEntityRelationInput!]
   locales: [PostCreateLocalesEntityRelationInput!]
   _dummy_field_: Boolean
 }
@@ -59,11 +59,12 @@ enum PostState {
 
 scalar DateTime
 
-input PostCreateAuthorEntityRelationInput {
-  create: AuthorWithoutPostsCreateInput
+input PostCreateCategoriesEntityRelationInput {
+  create: CategoryWithoutPostsCreateInput
+  alias: String
 }
 
-input AuthorWithoutPostsCreateInput {
+input CategoryWithoutPostsCreateInput {
   name: String
   _dummy_field_: Boolean
 }
@@ -82,6 +83,24 @@ input PostLocaleWithoutPostCreateInput {
 enum Locale {
   cs
   en
+}
+
+input PostCreateInput {
+  state: PostState
+  publishedAt: DateTime
+  categories: [PostCreateCategoriesEntityRelationInput!]
+  author: PostCreateAuthorEntityRelationInput
+  locales: [PostCreateLocalesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input PostCreateAuthorEntityRelationInput {
+  create: AuthorWithoutPostsCreateInput
+}
+
+input AuthorWithoutPostsCreateInput {
+  name: String
+  _dummy_field_: Boolean
 }
 
 input PostLocaleCreateInput {
@@ -103,49 +122,30 @@ input PostWithoutLocalesCreateInput {
   _dummy_field_: Boolean
 }
 
-input PostCreateCategoriesEntityRelationInput {
-  create: CategoryWithoutPostsCreateInput
-  alias: String
-}
-
-input CategoryWithoutPostsCreateInput {
+input CategoryCreateInput {
   name: String
+  posts: [CategoryCreatePostsEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
-input PostCreateInput {
+input CategoryCreatePostsEntityRelationInput {
+  create: PostWithoutCategoriesCreateInput
+  alias: String
+}
+
+input PostWithoutCategoriesCreateInput {
   state: PostState
   publishedAt: DateTime
-  categories: [PostCreateCategoriesEntityRelationInput!]
   author: PostCreateAuthorEntityRelationInput
   locales: [PostCreateLocalesEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
-input AuthorCreateInput {
-  name: String
-  posts: [AuthorCreatePostsEntityRelationInput!]
-  _dummy_field_: Boolean
-}
-
-input AuthorCreatePostsEntityRelationInput {
-  create: PostWithoutAuthorCreateInput
-  alias: String
-}
-
-input PostWithoutAuthorCreateInput {
-  state: PostState
-  publishedAt: DateTime
-  categories: [PostCreateCategoriesEntityRelationInput!]
-  locales: [PostCreateLocalesEntityRelationInput!]
-  _dummy_field_: Boolean
-}
-
 type QueryTransaction {
-  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
-  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
-  validateCreatePost(data: PostCreateInput!): _ValidationResult!
   validateCreateAuthor(data: AuthorCreateInput!): _ValidationResult!
+  validateCreatePost(data: PostCreateInput!): _ValidationResult!
+  validateCreatePostLocale(data: PostLocaleCreateInput!): _ValidationResult!
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
 }
 
 type Info {
@@ -153,14 +153,14 @@ type Info {
 }
 
 type Mutation {
-  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
-  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
-  createPost(data: PostCreateInput!): PostCreateResult!
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
+  createPost(data: PostCreateInput!): PostCreateResult!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   transaction: MutationTransaction!
 }
 
-type CategoryCreateResult {
+type AuthorCreateResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -184,13 +184,6 @@ enum _MutationErrorType {
   SqlError
 }
 
-type PostLocaleCreateResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  validation: _ValidationResult!
-}
-
 type PostCreateResult {
   ok: Boolean!
   errorMessage: String
@@ -198,7 +191,14 @@ type PostCreateResult {
   validation: _ValidationResult!
 }
 
-type AuthorCreateResult {
+type PostLocaleCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+}
+
+type CategoryCreateResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -210,8 +210,8 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
-  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
-  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
-  createPost(data: PostCreateInput!): PostCreateResult!
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
+  createPost(data: PostCreateInput!): PostCreateResult!
+  createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
 }

@@ -10,6 +10,7 @@ import { SelectExecutionHandler, SelectExecutionHandlerContext } from './SelectE
 import { MetaHandler } from './handlers'
 import { Mapper } from '../Mapper'
 import { FieldNode, ObjectNode } from '../../inputProcessing'
+import { assertNever } from '../../utils'
 
 export class SelectBuilder {
 	private resolver: (value: SelectRow[]) => void = () => {
@@ -86,9 +87,17 @@ export class SelectBuilder {
 
 		for (let field of input.fields) {
 			const fieldPath = path.for(field.alias)
+			const fieldProperty = (() => {
+				if (field instanceof ObjectNode) {
+					return { objectNode: field }
+				}
+				if (field instanceof FieldNode) {
+					return { fieldNode: field }
+				}
+				return assertNever(field)
+			})()
 			const executionContext: SelectExecutionHandlerContext = {
 				mapper,
-				field: field,
 				addData: async (fieldName, cb, defaultValue = null) => {
 					const columnName = getColumnName(this.schema, entity, fieldName)
 					const ids = (await this.getColumnValues(path.for(fieldName), columnName)).filter(it => it !== null)
@@ -102,6 +111,7 @@ export class SelectBuilder {
 				},
 				path: fieldPath,
 				entity: entity,
+				...fieldProperty,
 			}
 
 			if (field.name === '_meta') {

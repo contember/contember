@@ -130,6 +130,27 @@ export class Mapper {
 		return result[0].row_count
 	}
 
+	public async countGrouped(
+		entity: Model.Entity,
+		filter: Input.OptionalWhere,
+		relation: Model.JoiningColumnRelation & Model.Relation,
+	): Promise<Record<string, number>> {
+		const path = this.pathFactory.create([])
+		const qb = SelectBuilder.create()
+			.from(entity.tableName, path.getAlias())
+			.select(expr => expr.raw('count(*)'), 'row_count')
+			.select([path.getAlias(), relation.joiningColumn.columnName])
+			.groupBy([path.getAlias(), relation.joiningColumn.columnName])
+		const withPredicates = this.predicatesInjector.inject(entity, filter)
+		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
+		const rows = await qbWithWhere.getResult(this.db)
+		const result = new Map<string, number>()
+		for (const row of rows) {
+			result.set(String(row[relation.joiningColumn.columnName]), Number(row.row_count))
+		}
+		return Object.fromEntries(result)
+	}
+
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<MutationResultList> {
 		return tryMutation(() =>
 			this.inserter.insert(this, entity, data, id => {

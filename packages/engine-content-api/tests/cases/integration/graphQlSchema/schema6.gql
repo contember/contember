@@ -1,33 +1,15 @@
 type Query {
-  getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
-  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
-  paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
-  validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
   getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
   paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
   validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
+  getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
+  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
+  paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
+  validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
   transaction: QueryTransaction
   _info: Info
 }
-
-type Root {
-  _meta: RootMeta
-  id: UUID!
-  r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
-}
-
-type RootMeta {
-  id: FieldMeta
-  r: FieldMeta
-}
-
-type FieldMeta {
-  readable: Boolean
-  updatable: Boolean
-}
-
-scalar UUID
 
 type OneHasManyEntity {
   _meta: OneHasManyEntityMeta
@@ -42,12 +24,32 @@ type OneHasManyEntityMeta {
   r2: FieldMeta
 }
 
-input RootWhere {
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+type Root {
+  _meta: RootMeta
+  id: UUID!
+  r(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
+  paginateR(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
+}
+
+type RootMeta {
+  id: FieldMeta
+  r: FieldMeta
+}
+
+input OneHasManyEntityWhere {
   id: UUIDCondition
-  r: OneHasManyEntityWhere
-  and: [RootWhere]
-  or: [RootWhere]
-  not: RootWhere
+  a: StringCondition
+  r2: RootWhere
+  and: [OneHasManyEntityWhere]
+  or: [OneHasManyEntityWhere]
+  not: OneHasManyEntityWhere
 }
 
 input UUIDCondition {
@@ -64,15 +66,6 @@ input UUIDCondition {
   lte: UUID
   gt: UUID
   gte: UUID
-}
-
-input OneHasManyEntityWhere {
-  id: UUIDCondition
-  a: StringCondition
-  r2: RootWhere
-  and: [OneHasManyEntityWhere]
-  or: [OneHasManyEntityWhere]
-  not: OneHasManyEntityWhere
 }
 
 input StringCondition {
@@ -97,6 +90,14 @@ input StringCondition {
   endsWithCI: String
 }
 
+input RootWhere {
+  id: UUIDCondition
+  r: OneHasManyEntityWhere
+  and: [RootWhere]
+  or: [RootWhere]
+  not: RootWhere
+}
+
 input OneHasManyEntityOrderBy {
   _random: Boolean
   _randomSeeded: Int
@@ -116,26 +117,21 @@ input RootOrderBy {
   id: OrderDirection
 }
 
-input RootUniqueWhere {
-  id: UUID
-  r: OneHasManyEntityUniqueWhere
-}
-
-input OneHasManyEntityUniqueWhere {
-  id: UUID
-}
-
-type RootConnection {
+type OneHasManyEntityConnection {
   pageInfo: PageInfo!
-  edges: [RootEdge!]!
+  edges: [OneHasManyEntityEdge!]!
 }
 
 type PageInfo {
   totalCount: Int!
 }
 
-type RootEdge {
-  node: Root!
+type OneHasManyEntityEdge {
+  node: OneHasManyEntity!
+}
+
+input OneHasManyEntityUniqueWhere {
+  id: UUID
 }
 
 type _ValidationResult {
@@ -163,6 +159,37 @@ type _ValidationMessage {
   text: String!
 }
 
+input OneHasManyEntityUpdateInput {
+  a: String
+  r2: OneHasManyEntityUpdateR2EntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input OneHasManyEntityUpdateR2EntityRelationInput {
+  update: RootWithoutRUpdateInput
+  connect: RootUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input RootWithoutRUpdateInput {
+  _dummy_field_: Boolean
+}
+
+input RootUniqueWhere {
+  id: UUID
+  r: OneHasManyEntityUniqueWhere
+}
+
+type RootConnection {
+  pageInfo: PageInfo!
+  edges: [RootEdge!]!
+}
+
+type RootEdge {
+  node: Root!
+}
+
 input RootUpdateInput {
   r: [RootUpdateREntityRelationInput!]
   _dummy_field_: Boolean
@@ -186,41 +213,15 @@ input OneHasManyEntityWithoutR2UpdateInput {
   _dummy_field_: Boolean
 }
 
-type OneHasManyEntityConnection {
-  pageInfo: PageInfo!
-  edges: [OneHasManyEntityEdge!]!
-}
-
-type OneHasManyEntityEdge {
-  node: OneHasManyEntity!
-}
-
-input OneHasManyEntityUpdateInput {
-  a: String
-  r2: OneHasManyEntityUpdateR2EntityRelationInput
-  _dummy_field_: Boolean
-}
-
-input OneHasManyEntityUpdateR2EntityRelationInput {
-  update: RootWithoutRUpdateInput
-  connect: RootUniqueWhere
-  disconnect: Boolean
-  delete: Boolean
-}
-
-input RootWithoutRUpdateInput {
-  _dummy_field_: Boolean
-}
-
 type QueryTransaction {
-  getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
-  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
-  paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
-  validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
   getOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntity
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
   paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
   validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
+  getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
+  listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
+  paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
+  validateUpdateRoot(by: RootUniqueWhere!, data: RootUpdateInput!): _ValidationResult!
 }
 
 type Info {
@@ -228,18 +229,18 @@ type Info {
 }
 
 type Mutation {
-  deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
-  updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntityDeleteResult!
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
+  deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
+  updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   transaction: MutationTransaction!
 }
 
-type RootDeleteResult {
+type OneHasManyEntityDeleteResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
-  node: Root
+  node: OneHasManyEntity
 }
 
 type _MutationError {
@@ -259,21 +260,6 @@ enum _MutationErrorType {
   SqlError
 }
 
-type RootUpdateResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  node: Root
-  validation: _ValidationResult!
-}
-
-type OneHasManyEntityDeleteResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  node: OneHasManyEntity
-}
-
 type OneHasManyEntityUpdateResult {
   ok: Boolean!
   errorMessage: String
@@ -282,13 +268,28 @@ type OneHasManyEntityUpdateResult {
   validation: _ValidationResult!
 }
 
+type RootDeleteResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Root
+}
+
+type RootUpdateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Root
+  validation: _ValidationResult!
+}
+
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
-  deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
-  updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntityDeleteResult!
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
+  deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
+  updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
 }

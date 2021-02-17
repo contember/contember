@@ -5,16 +5,21 @@ import { SelectBuilder } from '@contember/database'
 import { Mapper } from '../Mapper'
 import { FieldNode, ObjectNode } from '../../inputProcessing'
 
-export interface SelectExecutionHandler<MetaArgs> {
-	process(context: SelectExecutionHandlerContext): void
+export interface SelectExecutionHandler<
+	FieldArgs = unknown,
+	FieldExtensions extends Record<string, any> = Record<string, any>
+> {
+	process(context: SelectExecutionHandlerContext<FieldArgs, FieldExtensions>): void
 }
 
 export type DataCallback = (ids: Input.PrimaryValue[]) => Promise<SelectNestedData>
 
-export interface SelectExecutionHandlerContext {
+export type SelectExecutionHandlerContext<
+	FieldArgs = any,
+	FieldExtensions extends Record<string, any> = Record<string, any>
+> = {
 	mapper: Mapper
 	path: Path
-	field: ObjectNode | FieldNode
 	entity: Model.Entity
 
 	addColumn: (
@@ -22,4 +27,13 @@ export interface SelectExecutionHandlerContext {
 		path?: Path,
 	) => void
 	addData: (parentField: string, cb: DataCallback, defaultValue?: SelectNestedDefaultValue) => void
-}
+} & (
+	| {
+			fieldNode: FieldNode<FieldExtensions>
+			objectNode?: never
+	  }
+	| {
+			fieldNode?: never
+			objectNode: ObjectNode<FieldArgs, FieldExtensions>
+	  }
+)

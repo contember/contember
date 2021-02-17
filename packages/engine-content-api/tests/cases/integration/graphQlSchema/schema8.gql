@@ -1,43 +1,16 @@
 type Query {
-  getFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPage
-  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
-  paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
-  validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
-  validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
   getVideo(by: VideoUniqueWhere!, filter: VideoWhere): Video
   listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
   paginateVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
   validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
+  getFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPage
+  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
+  paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
+  validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
+  validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
   transaction: QueryTransaction
   _info: Info
-}
-
-type FrontPage {
-  _meta: FrontPageMeta
-  id: UUID!
-  unique: One!
-  introVideo(filter: VideoWhere): Video
-  inHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
-  inHouseVideosByFrontPageForIntro(by: FrontPageInHouseVideosByFrontPageForIntroUniqueWhere!, filter: VideoWhere): Video
-}
-
-type FrontPageMeta {
-  id: FieldMeta
-  unique: FieldMeta
-  introVideo: FieldMeta
-  inHouseVideos: FieldMeta
-}
-
-type FieldMeta {
-  readable: Boolean
-  updatable: Boolean
-}
-
-scalar UUID
-
-enum One {
-  one
 }
 
 type Video {
@@ -55,14 +28,42 @@ type VideoMeta {
   frontPage: FieldMeta
 }
 
-input FrontPageWhere {
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+type FrontPage {
+  _meta: FrontPageMeta
+  id: UUID!
+  unique: One!
+  introVideo(filter: VideoWhere): Video
+  inHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
+  inHouseVideosByFrontPageForIntro(by: FrontPageInHouseVideosByFrontPageForIntroUniqueWhere!, filter: VideoWhere): Video
+  paginateInHouseVideos(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
+}
+
+type FrontPageMeta {
+  id: FieldMeta
+  unique: FieldMeta
+  introVideo: FieldMeta
+  inHouseVideos: FieldMeta
+}
+
+enum One {
+  one
+}
+
+input VideoWhere {
   id: UUIDCondition
-  unique: OneEnumCondition
-  introVideo: VideoWhere
-  inHouseVideos: VideoWhere
-  and: [FrontPageWhere]
-  or: [FrontPageWhere]
-  not: FrontPageWhere
+  vimeoId: StringCondition
+  frontPageForIntro: FrontPageWhere
+  frontPage: FrontPageWhere
+  and: [VideoWhere]
+  or: [VideoWhere]
+  not: VideoWhere
 }
 
 input UUIDCondition {
@@ -79,32 +80,6 @@ input UUIDCondition {
   lte: UUID
   gt: UUID
   gte: UUID
-}
-
-input OneEnumCondition {
-  and: [OneEnumCondition!]
-  or: [OneEnumCondition!]
-  not: OneEnumCondition
-  eq: One
-  null: Boolean
-  isNull: Boolean
-  notEq: One
-  in: [One!]
-  notIn: [One!]
-  lt: One
-  lte: One
-  gt: One
-  gte: One
-}
-
-input VideoWhere {
-  id: UUIDCondition
-  vimeoId: StringCondition
-  frontPageForIntro: FrontPageWhere
-  frontPage: FrontPageWhere
-  and: [VideoWhere]
-  or: [VideoWhere]
-  not: VideoWhere
 }
 
 input StringCondition {
@@ -127,6 +102,32 @@ input StringCondition {
   containsCI: String
   startsWithCI: String
   endsWithCI: String
+}
+
+input FrontPageWhere {
+  id: UUIDCondition
+  unique: OneEnumCondition
+  introVideo: VideoWhere
+  inHouseVideos: VideoWhere
+  and: [FrontPageWhere]
+  or: [FrontPageWhere]
+  not: FrontPageWhere
+}
+
+input OneEnumCondition {
+  and: [OneEnumCondition!]
+  or: [OneEnumCondition!]
+  not: OneEnumCondition
+  eq: One
+  null: Boolean
+  isNull: Boolean
+  notEq: One
+  in: [One!]
+  notIn: [One!]
+  lt: One
+  lte: One
+  gt: One
+  gte: One
 }
 
 input VideoOrderBy {
@@ -167,17 +168,17 @@ input VideoUniqueWhere {
   frontPageForIntro: FrontPageUniqueWhere
 }
 
-type FrontPageConnection {
+type VideoConnection {
   pageInfo: PageInfo!
-  edges: [FrontPageEdge!]!
+  edges: [VideoEdge!]!
 }
 
 type PageInfo {
   totalCount: Int!
 }
 
-type FrontPageEdge {
-  node: FrontPage!
+type VideoEdge {
+  node: Video!
 }
 
 type _ValidationResult {
@@ -205,32 +206,21 @@ type _ValidationMessage {
   text: String!
 }
 
-input FrontPageCreateInput {
-  unique: One
-  introVideo: FrontPageCreateIntroVideoEntityRelationInput
-  inHouseVideos: [FrontPageCreateInHouseVideosEntityRelationInput!]
-  _dummy_field_: Boolean
-}
-
-input FrontPageCreateIntroVideoEntityRelationInput {
-  connect: VideoUniqueWhere
-  create: VideoWithoutFrontPageForIntroCreateInput
-}
-
-input VideoWithoutFrontPageForIntroCreateInput {
+input VideoCreateInput {
   vimeoId: String
+  frontPageForIntro: VideoCreateFrontPageForIntroEntityRelationInput
   frontPage: VideoCreateFrontPageEntityRelationInput
   _dummy_field_: Boolean
 }
 
-input VideoCreateFrontPageEntityRelationInput {
+input VideoCreateFrontPageForIntroEntityRelationInput {
   connect: FrontPageUniqueWhere
-  create: FrontPageWithoutInHouseVideosCreateInput
+  create: FrontPageWithoutIntroVideoCreateInput
 }
 
-input FrontPageWithoutInHouseVideosCreateInput {
+input FrontPageWithoutIntroVideoCreateInput {
   unique: One
-  introVideo: FrontPageCreateIntroVideoEntityRelationInput
+  inHouseVideos: [FrontPageCreateInHouseVideosEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
@@ -246,62 +236,48 @@ input VideoWithoutFrontPageCreateInput {
   _dummy_field_: Boolean
 }
 
-input VideoCreateFrontPageForIntroEntityRelationInput {
+input VideoCreateFrontPageEntityRelationInput {
   connect: FrontPageUniqueWhere
-  create: FrontPageWithoutIntroVideoCreateInput
+  create: FrontPageWithoutInHouseVideosCreateInput
 }
 
-input FrontPageWithoutIntroVideoCreateInput {
+input FrontPageWithoutInHouseVideosCreateInput {
   unique: One
-  inHouseVideos: [FrontPageCreateInHouseVideosEntityRelationInput!]
+  introVideo: FrontPageCreateIntroVideoEntityRelationInput
   _dummy_field_: Boolean
 }
 
-input FrontPageUpdateInput {
-  unique: One
-  introVideo: FrontPageUpdateIntroVideoEntityRelationInput
-  inHouseVideos: [FrontPageUpdateInHouseVideosEntityRelationInput!]
-  _dummy_field_: Boolean
-}
-
-input FrontPageUpdateIntroVideoEntityRelationInput {
-  create: VideoWithoutFrontPageForIntroCreateInput
-  update: VideoWithoutFrontPageForIntroUpdateInput
-  upsert: FrontPageUpsertIntroVideoRelationInput
+input FrontPageCreateIntroVideoEntityRelationInput {
   connect: VideoUniqueWhere
-  disconnect: Boolean
-  delete: Boolean
+  create: VideoWithoutFrontPageForIntroCreateInput
 }
 
-input VideoWithoutFrontPageForIntroUpdateInput {
+input VideoWithoutFrontPageForIntroCreateInput {
   vimeoId: String
+  frontPage: VideoCreateFrontPageEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input VideoUpdateInput {
+  vimeoId: String
+  frontPageForIntro: VideoUpdateFrontPageForIntroEntityRelationInput
   frontPage: VideoUpdateFrontPageEntityRelationInput
   _dummy_field_: Boolean
 }
 
-input VideoUpdateFrontPageEntityRelationInput {
-  create: FrontPageWithoutInHouseVideosCreateInput
-  update: FrontPageWithoutInHouseVideosUpdateInput
-  upsert: VideoUpsertFrontPageRelationInput
+input VideoUpdateFrontPageForIntroEntityRelationInput {
+  create: FrontPageWithoutIntroVideoCreateInput
+  update: FrontPageWithoutIntroVideoUpdateInput
+  upsert: VideoUpsertFrontPageForIntroRelationInput
   connect: FrontPageUniqueWhere
   disconnect: Boolean
   delete: Boolean
 }
 
-input FrontPageWithoutInHouseVideosUpdateInput {
+input FrontPageWithoutIntroVideoUpdateInput {
   unique: One
-  introVideo: FrontPageUpdateIntroVideoEntityRelationInput
+  inHouseVideos: [FrontPageUpdateInHouseVideosEntityRelationInput!]
   _dummy_field_: Boolean
-}
-
-input VideoUpsertFrontPageRelationInput {
-  update: FrontPageWithoutInHouseVideosUpdateInput
-  create: FrontPageWithoutInHouseVideosCreateInput
-}
-
-input FrontPageUpsertIntroVideoRelationInput {
-  update: VideoWithoutFrontPageForIntroUpdateInput
-  create: VideoWithoutFrontPageForIntroCreateInput
 }
 
 input FrontPageUpdateInHouseVideosEntityRelationInput {
@@ -325,19 +301,10 @@ input VideoWithoutFrontPageUpdateInput {
   _dummy_field_: Boolean
 }
 
-input VideoUpdateFrontPageForIntroEntityRelationInput {
-  create: FrontPageWithoutIntroVideoCreateInput
-  update: FrontPageWithoutIntroVideoUpdateInput
-  upsert: VideoUpsertFrontPageForIntroRelationInput
-  connect: FrontPageUniqueWhere
-  disconnect: Boolean
-  delete: Boolean
-}
-
-input FrontPageWithoutIntroVideoUpdateInput {
-  unique: One
-  inHouseVideos: [FrontPageUpdateInHouseVideosEntityRelationInput!]
-  _dummy_field_: Boolean
+input FrontPageUpsertInHouseVideosRelationInput {
+  by: VideoUniqueWhere
+  update: VideoWithoutFrontPageUpdateInput
+  create: VideoWithoutFrontPageCreateInput
 }
 
 input VideoUpsertFrontPageForIntroRelationInput {
@@ -345,46 +312,80 @@ input VideoUpsertFrontPageForIntroRelationInput {
   create: FrontPageWithoutIntroVideoCreateInput
 }
 
-input FrontPageUpsertInHouseVideosRelationInput {
-  by: VideoUniqueWhere
-  update: VideoWithoutFrontPageUpdateInput
-  create: VideoWithoutFrontPageCreateInput
+input VideoUpdateFrontPageEntityRelationInput {
+  create: FrontPageWithoutInHouseVideosCreateInput
+  update: FrontPageWithoutInHouseVideosUpdateInput
+  upsert: VideoUpsertFrontPageRelationInput
+  connect: FrontPageUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
 }
 
-type VideoConnection {
-  pageInfo: PageInfo!
-  edges: [VideoEdge!]!
-}
-
-type VideoEdge {
-  node: Video!
-}
-
-input VideoCreateInput {
-  vimeoId: String
-  frontPageForIntro: VideoCreateFrontPageForIntroEntityRelationInput
-  frontPage: VideoCreateFrontPageEntityRelationInput
+input FrontPageWithoutInHouseVideosUpdateInput {
+  unique: One
+  introVideo: FrontPageUpdateIntroVideoEntityRelationInput
   _dummy_field_: Boolean
 }
 
-input VideoUpdateInput {
+input FrontPageUpdateIntroVideoEntityRelationInput {
+  create: VideoWithoutFrontPageForIntroCreateInput
+  update: VideoWithoutFrontPageForIntroUpdateInput
+  upsert: FrontPageUpsertIntroVideoRelationInput
+  connect: VideoUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input VideoWithoutFrontPageForIntroUpdateInput {
   vimeoId: String
-  frontPageForIntro: VideoUpdateFrontPageForIntroEntityRelationInput
   frontPage: VideoUpdateFrontPageEntityRelationInput
   _dummy_field_: Boolean
 }
 
+input FrontPageUpsertIntroVideoRelationInput {
+  update: VideoWithoutFrontPageForIntroUpdateInput
+  create: VideoWithoutFrontPageForIntroCreateInput
+}
+
+input VideoUpsertFrontPageRelationInput {
+  update: FrontPageWithoutInHouseVideosUpdateInput
+  create: FrontPageWithoutInHouseVideosCreateInput
+}
+
+type FrontPageConnection {
+  pageInfo: PageInfo!
+  edges: [FrontPageEdge!]!
+}
+
+type FrontPageEdge {
+  node: FrontPage!
+}
+
+input FrontPageCreateInput {
+  unique: One
+  introVideo: FrontPageCreateIntroVideoEntityRelationInput
+  inHouseVideos: [FrontPageCreateInHouseVideosEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input FrontPageUpdateInput {
+  unique: One
+  introVideo: FrontPageUpdateIntroVideoEntityRelationInput
+  inHouseVideos: [FrontPageUpdateInHouseVideosEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
 type QueryTransaction {
-  getFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPage
-  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
-  paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
-  validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
-  validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
   getVideo(by: VideoUniqueWhere!, filter: VideoWhere): Video
   listVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], offset: Int, limit: Int): [Video!]!
   paginateVideo(filter: VideoWhere, orderBy: [VideoOrderBy!], skip: Int, first: Int): VideoConnection!
   validateCreateVideo(data: VideoCreateInput!): _ValidationResult!
   validateUpdateVideo(by: VideoUniqueWhere!, data: VideoUpdateInput!): _ValidationResult!
+  getFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPage
+  listFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], offset: Int, limit: Int): [FrontPage!]!
+  paginateFrontPage(filter: FrontPageWhere, orderBy: [FrontPageOrderBy!], skip: Int, first: Int): FrontPageConnection!
+  validateCreateFrontPage(data: FrontPageCreateInput!): _ValidationResult!
+  validateUpdateFrontPage(by: FrontPageUniqueWhere!, data: FrontPageUpdateInput!): _ValidationResult!
 }
 
 type Info {
@@ -392,20 +393,20 @@ type Info {
 }
 
 type Mutation {
-  createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
-  deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
-  updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   createVideo(data: VideoCreateInput!): VideoCreateResult!
   deleteVideo(by: VideoUniqueWhere!, filter: VideoWhere): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, filter: VideoWhere, data: VideoUpdateInput!): VideoUpdateResult!
+  createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
+  deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
+  updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   transaction: MutationTransaction!
 }
 
-type FrontPageCreateResult {
+type VideoCreateResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
-  node: FrontPage
+  node: Video
   validation: _ValidationResult!
 }
 
@@ -426,29 +427,6 @@ enum _MutationErrorType {
   SqlError
 }
 
-type FrontPageDeleteResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  node: FrontPage
-}
-
-type FrontPageUpdateResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  node: FrontPage
-  validation: _ValidationResult!
-}
-
-type VideoCreateResult {
-  ok: Boolean!
-  errorMessage: String
-  errors: [_MutationError!]!
-  node: Video
-  validation: _ValidationResult!
-}
-
 type VideoDeleteResult {
   ok: Boolean!
   errorMessage: String
@@ -464,15 +442,38 @@ type VideoUpdateResult {
   validation: _ValidationResult!
 }
 
+type FrontPageCreateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: FrontPage
+  validation: _ValidationResult!
+}
+
+type FrontPageDeleteResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: FrontPage
+}
+
+type FrontPageUpdateResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: FrontPage
+  validation: _ValidationResult!
+}
+
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
-  createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
-  deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
-  updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   createVideo(data: VideoCreateInput!): VideoCreateResult!
   deleteVideo(by: VideoUniqueWhere!, filter: VideoWhere): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, filter: VideoWhere, data: VideoUpdateInput!): VideoUpdateResult!
+  createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
+  deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
+  updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
 }

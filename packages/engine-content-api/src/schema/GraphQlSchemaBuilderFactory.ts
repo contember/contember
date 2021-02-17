@@ -1,4 +1,4 @@
-import { Acl, Model } from '@contember/schema'
+import { Model } from '@contember/schema'
 import { EntityTypeProvider } from './EntityTypeProvider'
 import { ColumnTypeResolver } from './ColumnTypeResolver'
 import { EnumsProvider } from './EnumsProvider'
@@ -25,6 +25,9 @@ import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { CustomTypesProvider } from './CustomTypesProvider'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 import { Authorizator } from '../acl'
+import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory'
+import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
+import { PaginatedHasManyFieldProviderVisitor } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProviderVisitor'
 
 export class GraphQlSchemaBuilderFactory {
 	constructor(private readonly graphqlObjectFactories: GraphQLObjectsFactory) {}
@@ -47,15 +50,6 @@ export class GraphQlSchemaBuilderFactory {
 			this.graphqlObjectFactories,
 		)
 		const orderByTypeProvider = new OrderByTypeProvider(schema, authorizator, this.graphqlObjectFactories)
-		const entityTypeProviderAccessor = new Accessor<EntityTypeProvider>()
-		const hasManyToOneReducerVisitor = new HasManyToHasOneRelationReducerFieldVisitor(
-			schema,
-			authorizator,
-			entityTypeProviderAccessor,
-			whereTypeProvider,
-			this.graphqlObjectFactories,
-		)
-		const hasManyToOneReducer = new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor)
 
 		const entityTypeProvider = new EntityTypeProvider(
 			schema,
@@ -63,20 +57,42 @@ export class GraphQlSchemaBuilderFactory {
 			columnTypeResolver,
 			whereTypeProvider,
 			orderByTypeProvider,
-			{
-				[HasManyToHasOneReducer.extensionName]: hasManyToOneReducer,
-			},
 			this.graphqlObjectFactories,
 		)
-		entityTypeProviderAccessor.set(entityTypeProvider)
+
+		const paginatedFieldConfigFactory = new PaginatedFieldConfigFactory(
+			whereTypeProvider,
+			orderByTypeProvider,
+			entityTypeProvider,
+			this.graphqlObjectFactories,
+		)
+		const hasManyToOneReducerVisitor = new HasManyToHasOneRelationReducerFieldVisitor(
+			schema,
+			authorizator,
+			entityTypeProvider,
+			whereTypeProvider,
+			this.graphqlObjectFactories,
+		)
+		const hasManyToOneReducer = new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor)
+		entityTypeProvider.registerEntityFieldProvider(HasManyToHasOneReducer.extensionName, hasManyToOneReducer)
+
+		const paginatedHasManyFieldProviderVisitor = new PaginatedHasManyFieldProviderVisitor(paginatedFieldConfigFactory)
+		const paginatedHasManyFieldProvider = new PaginatedHasManyFieldProvider(
+			schema,
+			paginatedHasManyFieldProviderVisitor,
+		)
+		entityTypeProvider.registerEntityFieldProvider(
+			PaginatedHasManyFieldProvider.extensionName,
+			paginatedHasManyFieldProvider,
+		)
 
 		const queryProvider = new QueryProvider(
-			schema,
 			authorizator,
 			whereTypeProvider,
 			orderByTypeProvider,
 			entityTypeProvider,
 			this.graphqlObjectFactories,
+			paginatedFieldConfigFactory,
 		)
 
 		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<EntityInputType.create>>()
@@ -140,7 +156,6 @@ export class GraphQlSchemaBuilderFactory {
 
 		const resultSchemaTypeProvider = new ResultSchemaTypeProvider(this.graphqlObjectFactories)
 		const mutationProvider = new MutationProvider(
-			schema,
 			authorizator,
 			whereTypeProvider,
 			entityTypeProvider,
@@ -150,7 +165,6 @@ export class GraphQlSchemaBuilderFactory {
 			resultSchemaTypeProvider,
 		)
 		const validationQueriesProvider = new ValidationQueriesProvider(
-			schema,
 			whereTypeProvider,
 			createEntityInputProvider,
 			updateEntityInputProvider,

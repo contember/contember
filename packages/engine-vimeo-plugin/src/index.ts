@@ -17,6 +17,6 @@ export default class VimeoPlugin implements Plugin {
 			return undefined
 		}
 		const vimeoServiceFactory = new VimeoServiceFactory()
-		return new VimeoSchemaContributor(container.graphqlObjectsFactory, projectConfig.vimeo, vimeoServiceFactory)
+		return new VimeoSchemaContributor(projectConfig.vimeo, vimeoServiceFactory)
 	}
 }

@@ -1,11 +1,10 @@
-import { GraphQLFieldConfig } from 'graphql'
+import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
 import { Context } from '../types'
 import { EntityTypeProvider } from './EntityTypeProvider'
 import { WhereTypeProvider } from './WhereTypeProvider'
 import { Authorizator } from '../acl'
 import { OrderByTypeProvider } from './OrderByTypeProvider'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
 import { ImplementationException } from '../exception'
 import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory'
@@ -16,7 +15,6 @@ export class QueryProvider {
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 		private readonly paginatedFieldConfigFactory: PaginatedFieldConfigFactory,
 	) {}
 
@@ -42,7 +40,7 @@ export class QueryProvider {
 			type: entityType,
 			args: {
 				by: {
-					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
+					type: new GraphQLNonNull(uniqueWhere),
 				},
 				filter: {
 					type: this.whereTypeProvider.getEntityWhereType(entityName),
@@ -65,23 +63,19 @@ export class QueryProvider {
 
 		const entityType = this.entityTypeProvider.getEntity(entityName)
 		return {
-			type: this.graphqlObjectFactories.createNotNull(
-				this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(entityType)),
-			),
+			type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(entityType))),
 			args: {
 				filter: {
 					type: this.whereTypeProvider.getEntityWhereType(entityName),
 				},
 				orderBy: {
-					type: this.graphqlObjectFactories.createList(
-						this.graphqlObjectFactories.createNotNull(this.orderByTypeProvider.getEntityOrderByType(entityName)),
-					),
+					type: new GraphQLList(new GraphQLNonNull(this.orderByTypeProvider.getEntityOrderByType(entityName))),
 				},
 				offset: {
-					type: this.graphqlObjectFactories.int,
+					type: GraphQLInt,
 				},
 				limit: {
-					type: this.graphqlObjectFactories.int,
+					type: GraphQLInt,
 				},
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },

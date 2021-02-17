@@ -1,9 +1,15 @@
-import { GraphQLFieldConfig, GraphQLSchema } from 'graphql'
+import {
+	GraphQLFieldConfig,
+	GraphQLBoolean,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLSchema,
+	GraphQLString,
+} from 'graphql'
 import { Model } from '@contember/schema'
 import { MutationProvider } from './MutationProvider'
 import { QueryProvider } from './QueryProvider'
 import { ValidationQueriesProvider } from './ValidationQueriesProvider'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { Context } from '../types'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 
@@ -13,7 +19,6 @@ export class GraphQlSchemaBuilder {
 		private readonly queryProvider: QueryProvider,
 		private readonly validationQueriesProvider: ValidationQueriesProvider,
 		private readonly mutationProvider: MutationProvider,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
@@ -37,7 +42,7 @@ export class GraphQlSchemaBuilder {
 
 		if (queries.size > 0) {
 			queries.set('transaction', {
-				type: this.graphqlObjectFactories.createObjectType({
+				type: new GraphQLObjectType({
 					name: 'QueryTransaction',
 					fields: Object.fromEntries(queries),
 				}),
@@ -50,15 +55,15 @@ export class GraphQlSchemaBuilder {
 		}
 		if (mutations.size > 0) {
 			mutations.set('transaction', {
-				type: this.graphqlObjectFactories.createNotNull(
-					this.graphqlObjectFactories.createObjectType({
+				type: new GraphQLNonNull(
+					new GraphQLObjectType({
 						name: 'MutationTransaction',
 						fields: {
-							ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
-							errorMessage: { type: this.graphqlObjectFactories.string },
+							ok: { type: new GraphQLNonNull(GraphQLBoolean) },
+							errorMessage: { type: GraphQLString },
 							errors: { type: this.resultSchemaTypeProvider.errorListResultType },
 							validation: {
-								type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
+								type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
 							},
 							...Object.fromEntries(mutations),
 						},
@@ -72,10 +77,10 @@ export class GraphQlSchemaBuilder {
 			})
 		}
 		queries.set('_info', {
-			type: this.graphqlObjectFactories.createObjectType({
+			type: new GraphQLObjectType({
 				name: 'Info',
 				fields: () => ({
-					description: { type: this.graphqlObjectFactories.string },
+					description: { type: GraphQLString },
 				}),
 			}),
 			resolve: () => ({
@@ -83,14 +88,14 @@ export class GraphQlSchemaBuilder {
 			}),
 		})
 
-		return this.graphqlObjectFactories.createSchema({
-			query: this.graphqlObjectFactories.createObjectType({
+		return new GraphQLSchema({
+			query: new GraphQLObjectType({
 				name: 'Query',
 				fields: () => Object.fromEntries(queries),
 			}),
 			...(mutations.size > 0
 				? {
-						mutation: this.graphqlObjectFactories.createObjectType({
+						mutation: new GraphQLObjectType({
 							name: 'Mutation',
 							fields: () => Object.fromEntries(mutations),
 						}),

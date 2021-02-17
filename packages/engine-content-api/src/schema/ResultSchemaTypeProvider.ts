@@ -1,90 +1,85 @@
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { Result } from '@contember/schema'
+import {
+	GraphQLBoolean,
+	GraphQLEnumType,
+	GraphQLInt,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLString,
+	GraphQLUnionType,
+} from 'graphql'
 
 export class ResultSchemaTypeProvider {
-	private pathFragmentType = this.graphqlObjectFactories.createUnion({
+	private pathFragmentType = new GraphQLUnionType({
 		name: '_PathFragment',
 		types: () => [
-			this.graphqlObjectFactories.createObjectType({
+			new GraphQLObjectType({
 				name: '_FieldPathFragment',
 				fields: {
-					field: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.string) },
+					field: { type: new GraphQLNonNull(GraphQLString) },
 				},
 			}),
-			this.graphqlObjectFactories.createObjectType({
+			new GraphQLObjectType({
 				name: '_IndexPathFragment',
 				fields: {
-					index: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.int) },
-					alias: { type: this.graphqlObjectFactories.string },
+					index: { type: new GraphQLNonNull(GraphQLInt) },
+					alias: { type: GraphQLString },
 				},
 			}),
 		],
 	})
-	private validationErrorType = this.graphqlObjectFactories.createObjectType({
+	private validationErrorType = new GraphQLObjectType({
 		name: '_ValidationError',
 		fields: {
 			path: {
-				type: this.graphqlObjectFactories.createNotNull(
-					this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.pathFragmentType)),
-				),
+				type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.pathFragmentType))),
 			},
 			message: {
-				type: this.graphqlObjectFactories.createNotNull(
-					this.graphqlObjectFactories.createObjectType({
+				type: new GraphQLNonNull(
+					new GraphQLObjectType({
 						name: '_ValidationMessage',
 						fields: {
-							text: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.string) },
+							text: { type: new GraphQLNonNull(GraphQLString) },
 						},
 					}),
 				),
 			},
 		},
 	})
-	public validationResultType = this.graphqlObjectFactories.createObjectType({
+	public validationResultType = new GraphQLObjectType({
 		name: '_ValidationResult',
 		fields: {
-			valid: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
+			valid: { type: new GraphQLNonNull(GraphQLBoolean) },
 			errors: {
-				type: this.graphqlObjectFactories.createNotNull(
-					this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.validationErrorType)),
-				),
+				type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.validationErrorType))),
 			},
 		},
 	})
 
-	public errorResultType = this.graphqlObjectFactories.createObjectType({
+	public errorResultType = new GraphQLObjectType({
 		name: '_MutationError',
 		fields: {
 			path: {
 				deprecationReason: 'Use `paths`.',
-				type: this.graphqlObjectFactories.createNotNull(
-					this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.pathFragmentType)),
-				),
+				type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.pathFragmentType))),
 			},
 			paths: {
-				type: this.graphqlObjectFactories.createNotNull(
-					this.graphqlObjectFactories.createList(
-						this.graphqlObjectFactories.createNotNull(
-							this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.pathFragmentType)),
-						),
-					),
+				type: new GraphQLNonNull(
+					new GraphQLList(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.pathFragmentType)))),
 				),
 			},
 			type: {
-				type: this.graphqlObjectFactories.createNotNull(
-					this.graphqlObjectFactories.createEnumType({
+				type: new GraphQLNonNull(
+					new GraphQLEnumType({
 						name: '_MutationErrorType',
 						values: Object.values(Result.ExecutionErrorType).reduce((acc, type) => ({ ...acc, [type]: {} }), {}),
 					}),
 				),
 			},
-			message: { type: this.graphqlObjectFactories.string },
+			message: { type: GraphQLString },
 		},
 	})
 
-	public errorListResultType = this.graphqlObjectFactories.createNotNull(
-		this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(this.errorResultType)),
-	)
-
-	constructor(private readonly graphqlObjectFactories: GraphQLObjectsFactory) {}
+	public errorListResultType = new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.errorResultType)))
 }

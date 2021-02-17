@@ -2,7 +2,7 @@ import { Model } from '@contember/schema'
 import { WhereTypeProvider } from '../WhereTypeProvider'
 import { GraphQLFieldConfigArgumentMap } from 'graphql/type/definition'
 import { OrderByTypeProvider } from '../OrderByTypeProvider'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
+import { GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
 
 export class FieldArgsVisitor
 	implements
@@ -11,7 +11,6 @@ export class FieldArgsVisitor
 	constructor(
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {
 		this.whereTypeProvider = whereTypeProvider
 	}
@@ -26,8 +25,8 @@ export class FieldArgsVisitor
 		return {
 			filter,
 			orderBy,
-			offset: { type: this.graphqlObjectFactories.int },
-			limit: { type: this.graphqlObjectFactories.int },
+			offset: { type: GraphQLInt },
+			limit: { type: GraphQLInt },
 		}
 	}
 
@@ -42,9 +41,7 @@ export class FieldArgsVisitor
 
 	private getOrderByArgs(relation: Model.Relation) {
 		return {
-			type: this.graphqlObjectFactories.createList(
-				this.graphqlObjectFactories.createNotNull(this.orderByTypeProvider.getEntityOrderByType(relation.target)),
-			),
+			type: new GraphQLList(new GraphQLNonNull(this.orderByTypeProvider.getEntityOrderByType(relation.target))),
 		}
 	}
 }

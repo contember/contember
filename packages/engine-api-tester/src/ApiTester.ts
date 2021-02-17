@@ -25,7 +25,6 @@ import { TesterStageManager } from './TesterStageManager'
 import { SequenceTester } from './SequenceTester'
 import { Client, EventManagerImpl, SingleConnection } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
-import { graphqlObjectFactories } from './graphqlObjectFactories'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 import { join } from 'path'
@@ -61,7 +60,7 @@ export class ApiTester {
 		// await setupSystemVariables(projectDb, unnamedIdentity, { uuid: createUuidGenerator('a450') })
 
 		const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
-		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories)
+		const gqlSchemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 
 		const systemContainerFactory = new SystemContainerFactory()
 		const projectSlug = options.project?.slug || ApiTester.project.slug

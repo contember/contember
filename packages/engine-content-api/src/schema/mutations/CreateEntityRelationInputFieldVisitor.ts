@@ -1,4 +1,4 @@
-import { GraphQLInputObjectType } from 'graphql'
+import { GraphQLInputObjectType, GraphQLString } from 'graphql'
 import { Input, Model } from '@contember/schema'
 import { GqlTypeName } from '../utils'
 import { WhereTypeProvider } from '../WhereTypeProvider'
@@ -7,7 +7,6 @@ import { EntityInputProvider, EntityInputType } from './EntityInputProvider'
 import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import { CreateEntityRelationAllowedOperationsVisitor } from './CreateEntityRelationAllowedOperationsVisitor'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../../exception'
 
 export class CreateEntityRelationInputFieldVisitor
@@ -17,7 +16,6 @@ export class CreateEntityRelationInputFieldVisitor
 		private readonly whereTypeBuilder: WhereTypeProvider,
 		private readonly createEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputType.create>>,
 		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
 	public visitColumn(): never {
@@ -76,13 +74,13 @@ export class CreateEntityRelationInputFieldVisitor
 		if (Object.keys(fields).length === 0) {
 			return undefined
 		}
-		return this.graphqlObjectFactories.createInputObjectType({
+		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
 			fields: () =>
 				withAliasField
 					? {
 							...fields,
-							alias: { type: this.graphqlObjectFactories.string },
+							alias: { type: GraphQLString },
 					  }
 					: fields,
 		})

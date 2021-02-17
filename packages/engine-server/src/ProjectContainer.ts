@@ -12,7 +12,6 @@ import {
 	GraphQlSchemaFactory,
 	ContentServerProvider,
 	providers,
-	graphqlObjectFactories,
 } from '@contember/engine-http'
 
 export const createProjectContainer = (
@@ -24,7 +23,6 @@ export const createProjectContainer = (
 	const projectContainer = new Builder({})
 		.addService('providers', () => providers)
 		.addService('project', () => project)
-		.addService('graphqlObjectsFactory', () => graphqlObjectFactories)
 		.addService('connection', ({ project }) => {
 			return new Connection(project.db, { timing: true })
 		})
@@ -33,17 +31,14 @@ export const createProjectContainer = (
 			() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
 		)
 
-		.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory(graphqlObjectFactories))
+		.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
 		.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
-		.addService(
-			'graphQlSchemaFactory',
-			({ graphqlObjectsFactory, project, permissionsByIdentityFactory, graphQlSchemaBuilderFactory }) => {
-				const contributors = plugins
-					.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ graphqlObjectsFactory, project }) : null))
-					.filter((it): it is GraphQLSchemaContributor => !!it)
-				return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
-			},
-		)
+		.addService('graphQlSchemaFactory', ({ project, permissionsByIdentityFactory, graphQlSchemaBuilderFactory }) => {
+			const contributors = plugins
+				.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ project }) : null))
+				.filter((it): it is GraphQLSchemaContributor => !!it)
+			return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
+		})
 		.addService('apolloServerFactory', () => new ContentApolloServerFactory(project.slug, debug, logSentryError))
 		.addService('contentSchemaResolver', () => new ContentSchemaResolver(schemaVersionBuilder))
 		.addService(

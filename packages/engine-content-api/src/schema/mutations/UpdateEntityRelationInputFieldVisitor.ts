@@ -1,4 +1,4 @@
-import { GraphQLInputObjectType } from 'graphql'
+import { GraphQLBoolean, GraphQLInputObjectType, GraphQLString } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
 import { GqlTypeName } from '../utils'
 import { WhereTypeProvider } from '../WhereTypeProvider'
@@ -7,7 +7,6 @@ import { EntityInputProvider, EntityInputType } from './EntityInputProvider'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { UpdateEntityRelationAllowedOperationsVisitor } from './UpdateEntityRelationAllowedOperationsVisitor'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { Authorizator } from '../../acl'
 import { ImplementationException } from '../../exception'
 
@@ -20,7 +19,6 @@ export class UpdateEntityRelationInputFieldVisitor
 		private readonly updateEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputType.update>>,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputType.create>,
 		private readonly updateEntityRelationAllowedOperationsVisitor: UpdateEntityRelationAllowedOperationsVisitor,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
 	public visitColumn(): never {
@@ -51,7 +49,7 @@ export class UpdateEntityRelationInputFieldVisitor
 		const upsertInput =
 			updateInput && createInput
 				? {
-						type: this.graphqlObjectFactories.createInputObjectType({
+						type: new GraphQLInputObjectType({
 							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 							fields: () => ({
 								update: updateInput,
@@ -61,7 +59,7 @@ export class UpdateEntityRelationInputFieldVisitor
 				  }
 				: undefined
 		const booleanInput = {
-			type: this.graphqlObjectFactories.boolean,
+			type: GraphQLBoolean,
 		}
 
 		const fields = {
@@ -78,7 +76,7 @@ export class UpdateEntityRelationInputFieldVisitor
 			return undefined
 		}
 
-		return this.graphqlObjectFactories.createInputObjectType({
+		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
 			fields: () => filteredFields,
 		})
@@ -109,7 +107,7 @@ export class UpdateEntityRelationInputFieldVisitor
 		const updateSpecifiedInput =
 			updateInput && whereInput
 				? {
-						type: this.graphqlObjectFactories.createInputObjectType({
+						type: new GraphQLInputObjectType({
 							name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
 							fields: () => ({
 								by: whereInput,
@@ -122,7 +120,7 @@ export class UpdateEntityRelationInputFieldVisitor
 		const upsertInput =
 			updateInput && createInput && whereInput
 				? {
-						type: this.graphqlObjectFactories.createInputObjectType({
+						type: new GraphQLInputObjectType({
 							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
 							fields: () => ({
 								by: whereInput,
@@ -146,11 +144,11 @@ export class UpdateEntityRelationInputFieldVisitor
 			return undefined
 		}
 
-		return this.graphqlObjectFactories.createInputObjectType({
+		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
 			fields: () => ({
 				...filteredFields,
-				alias: { type: this.graphqlObjectFactories.string },
+				alias: { type: GraphQLString },
 			}),
 		})
 	}

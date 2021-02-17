@@ -1,15 +1,11 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
-import { GraphQlSchemaBuilderFactory } from '../../src/schema'
-import { AllowAllPermissionFactory } from '@contember/schema-utils'
+import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, StaticAuthorizator } from '../../src'
+import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
-import { ExecutionContainerFactory } from '../../src/resolvers'
-import { emptySchema } from '@contember/schema-utils'
 import { createUuidGenerator } from '@contember/engine-api-tester'
-import { graphqlObjectFactories } from './graphqlObjectFactories'
 import { getArgumentValues } from 'graphql/execution/values'
-import { StaticAuthorizator } from '../../src/acl'
 
 export interface SqlQuery {
 	sql: string
@@ -68,7 +64,7 @@ export const failedTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 export const execute = async (test: Test) => {
 	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
 	const authorizator = new StaticAuthorizator(permissions)
-	const builder = new GraphQlSchemaBuilderFactory(graphqlObjectFactories).create(test.schema, authorizator)
+	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator)
 	const graphQLSchema = builder.build()
 
 	const connection = createConnectionMock(test.executes)

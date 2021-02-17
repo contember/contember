@@ -1,5 +1,13 @@
-import { GraphQLFieldConfig, GraphQLSchema } from 'graphql'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
+import {
+	GraphQLBoolean,
+	GraphQLFieldConfig,
+	GraphQLInt,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLSchema,
+	GraphQLString,
+} from 'graphql'
 import { VimeoService, VimeoServiceFactory } from './VimeoService'
 import { VimeoConfig } from './Config'
 import { GraphQLSchemaContributor, SchemaContext } from '@contember/engine-plugins'
@@ -10,7 +18,6 @@ interface VimeoAcl {
 
 export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 	constructor(
-		private readonly objectsFactory: GraphQLObjectsFactory,
 		private readonly vimeoConfig: VimeoConfig | undefined,
 		private readonly vimeoServiceFactory: VimeoServiceFactory,
 	) {}
@@ -40,16 +47,16 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 		const mutation = {
 			generateVimeoUploadUrl: uploadMutation as GraphQLFieldConfig<any, any, any>,
 		}
-		return this.objectsFactory.createSchema({
-			mutation: this.objectsFactory.createObjectType({
+		return new GraphQLSchema({
+			mutation: new GraphQLObjectType({
 				name: 'Mutation',
 				fields: () => mutation,
 			}),
-			query: this.objectsFactory.createObjectType({
+			query: new GraphQLObjectType({
 				name: 'Query',
 				fields: () => ({
 					vimeoDummyQuery: {
-						type: this.objectsFactory.string,
+						type: GraphQLString,
 					},
 				}),
 			}),
@@ -58,21 +65,21 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 
 	private createMutation(vimeoService: VimeoService): GraphQLFieldConfig<any, any, any> {
 		return {
-			type: this.objectsFactory.createNotNull(
-				this.objectsFactory.createObjectType({
+			type: new GraphQLNonNull(
+				new GraphQLObjectType({
 					name: 'VimeoUploadResponse',
 					fields: {
-						ok: { type: this.objectsFactory.createNotNull(this.objectsFactory.boolean) },
+						ok: { type: new GraphQLNonNull(GraphQLBoolean) },
 						errors: {
-							type: this.objectsFactory.createNotNull(
-								this.objectsFactory.createList(
-									this.objectsFactory.createNotNull(
-										this.objectsFactory.createObjectType({
+							type: new GraphQLNonNull(
+								new GraphQLList(
+									new GraphQLNonNull(
+										new GraphQLObjectType({
 											name: 'VimeoUploadError',
 											fields: {
-												endUserMessage: { type: this.objectsFactory.string },
-												developerMessage: { type: this.objectsFactory.string },
-												code: { type: this.objectsFactory.int },
+												endUserMessage: { type: GraphQLString },
+												developerMessage: { type: GraphQLString },
+												code: { type: GraphQLInt },
 											},
 										}),
 									),
@@ -80,11 +87,11 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 							),
 						},
 						result: {
-							type: this.objectsFactory.createObjectType({
+							type: new GraphQLObjectType({
 								name: 'VimeoUploadResult',
 								fields: {
-									uploadUrl: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
-									vimeoId: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
+									uploadUrl: { type: new GraphQLNonNull(GraphQLString) },
+									vimeoId: { type: new GraphQLNonNull(GraphQLString) },
 								},
 							}),
 						},
@@ -93,7 +100,7 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 			),
 			args: {
 				size: {
-					type: this.objectsFactory.createNotNull(this.objectsFactory.int),
+					type: new GraphQLNonNull(GraphQLInt),
 				},
 			},
 			resolve: async (parent: any, args: { size: number }) => {

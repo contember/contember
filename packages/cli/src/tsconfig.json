@@ -11,6 +11,9 @@
 			"path": "../../dic/src"
 		},
 		{
+			"path": "../../engine-content-api/src"
+		},
+		{
 			"path": "../../schema/src"
 		},
 		{

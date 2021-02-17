@@ -1,14 +1,8 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
+import { ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import {
-	EntityListSubTreeMarker,
-	EntitySubTreeMarker,
-	FieldMarker,
-	HasManyRelationMarker,
-	HasOneRelationMarker,
-} from '../markers'
+import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import { QueryGenerator } from './QueryGenerator'
@@ -214,7 +208,7 @@ export class MutationGenerator {
 
 		const nonbearingFields: Array<
 			| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
-			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState }
+			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
 			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
 		> = []
 
@@ -238,6 +232,7 @@ export class MutationGenerator {
 					builder = this.registerCreateFieldPart(fieldState, marker, builder)
 					break
 				}
+				case StateType.EntityRealmStub:
 				case StateType.EntityRealm: {
 					const { marker, fieldState } = fieldMeta
 					if (marker.parameters.isNonbearing) {
@@ -337,7 +332,7 @@ export class MutationGenerator {
 
 	private registerCreateEntityPart(
 		processedEntities: ProcessedEntities,
-		fieldState: EntityRealmState,
+		fieldState: EntityRealmState | EntityRealmStateStub,
 		marker: HasOneRelationMarker,
 		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>,
 	) {
@@ -412,6 +407,7 @@ export class MutationGenerator {
 					}
 					break
 				}
+				case StateType.EntityRealmStub:
 				case StateType.EntityRealm: {
 					const { fieldState, marker } = fieldMeta
 					const runtimeId = fieldState.entity.id
@@ -426,6 +422,9 @@ export class MutationGenerator {
 							if (persistedValue instanceof ServerGeneratedUuid) {
 								if (persistedValue.value === runtimeId.value) {
 									// The persisted and currently referenced ids match, and so this is an update.
+									if (fieldState.type === StateType.EntityRealmStub) {
+										return builder // …unless we're dealing with a stub. There cannot be any updates there.
+									}
 									return builder.update(builder =>
 										this.registerUpdateMutationPart(processedEntities, fieldState, builder),
 									)
@@ -476,6 +475,9 @@ export class MutationGenerator {
 
 							if (persistedValue instanceof ServerGeneratedUuid) {
 								if (persistedValue.value === runtimeId.value) {
+									if (fieldState.type === StateType.EntityRealmStub) {
+										return builder
+									}
 									return builder.update(
 										reducedBy,
 										builder => this.registerUpdateMutationPart(processedEntities, fieldState, builder),

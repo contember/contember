@@ -77,6 +77,7 @@ export class StateIterator {
 	public static *eachDistinctEntityFieldState(
 		realm: EntityRealmState | EntityRealmStateStub,
 	): IterableIterator<
+		| { type: StateType.EntityRealmStub; marker: HasOneRelationMarker; fieldState: EntityRealmStateStub }
 		| { type: StateType.EntityRealm; marker: HasOneRelationMarker; fieldState: EntityRealmState }
 		| { type: StateType.Field; marker: FieldMarker; fieldState: FieldState }
 		| { type: StateType.EntityList; marker: HasManyRelationMarker; fieldState: EntityListState }
@@ -90,7 +91,7 @@ export class StateIterator {
 			const fields = getEntityMarker(siblingRealm).fields.markers
 
 			for (const [placeholderName, fieldState] of realm.children) {
-				if (fieldState.type === StateType.EntityRealmStub || visited.has(placeholderName)) {
+				if (visited.has(placeholderName)) {
 					continue
 				}
 				const marker = fields.get(placeholderName)
@@ -113,6 +114,12 @@ export class StateIterator {
 				} else if (fieldState.type === StateType.EntityRealm && marker instanceof HasOneRelationMarker) {
 					yield {
 						type: StateType.EntityRealm,
+						marker,
+						fieldState,
+					}
+				} else if (fieldState.type === StateType.EntityRealmStub && marker instanceof HasOneRelationMarker) {
+					yield {
+						type: StateType.EntityRealmStub,
 						marker,
 						fieldState,
 					}

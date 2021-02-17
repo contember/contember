@@ -377,8 +377,14 @@ export class StateInitializer {
 				? new Set(Array.from({ length: blueprint.marker.parameters.initialEntityCount }))
 				: persistedEntityIds
 		for (const entityId of initialData) {
-			const id = entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityDummyId()
-			this.initializeListEntity(entityListState, id)
+			this.initializeEntityRealm(
+				entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityDummyId(),
+				entityListState.entityName,
+				{
+					type: 'listEntity',
+					parent: entityListState,
+				},
+			)
 		}
 
 		return entityListState
@@ -556,16 +562,6 @@ export class StateInitializer {
 				}
 			}
 		}
-	}
-
-	public initializeListEntity(
-		entityListState: EntityListState,
-		entityId: RuntimeId,
-	): EntityRealmState | EntityRealmStateStub {
-		return this.initializeEntityRealm(entityId, entityListState.entityName, {
-			type: 'listEntity',
-			parent: entityListState,
-		})
 	}
 
 	public runImmediateUserInitialization(

@@ -63,7 +63,10 @@ export class ListOperations {
 					}
 					throw error
 				}
-				this.stateInitializer.initializeListEntity(state, idToConnect)
+				this.stateInitializer.initializeEntityRealm(idToConnect, state.entityName, {
+					type: 'listEntity',
+					parent: state,
+				})
 
 				state.plannedRemovals?.delete(stateToConnect)
 
@@ -130,7 +133,10 @@ export class ListOperations {
 			const id = new UnpersistedEntityDummyId()
 
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, outerState)) {
-				const newEntity = this.stateInitializer.initializeListEntity(state, id)
+				const newEntity = this.stateInitializer.initializeEntityRealm(id, state.entityName, {
+					type: 'listEntity',
+					parent: state,
+				})
 
 				this.stateInitializer.runImmediateUserInitialization(newEntity, initialize)
 

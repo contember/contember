@@ -9,13 +9,11 @@ import { RealmKeyGenerator } from '../RealmKeyGenerator'
 import { EntityListState, getEntityMarker, StateIterator, StateType } from '../state'
 import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
-import { EntityOperations } from './EntityOperations'
 import { OperationsHelpers } from './OperationsHelpers'
 
 export class ListOperations {
 	public constructor(
 		private readonly bindingOperations: BindingOperations,
-		private readonly entityOperations: EntityOperations,
 		private readonly eventManager: EventManager,
 		private readonly stateInitializer: StateInitializer,
 		private readonly treeStore: TreeStore,

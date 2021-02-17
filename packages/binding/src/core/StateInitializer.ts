@@ -46,13 +46,7 @@ export class StateInitializer {
 	) {
 		this.fieldOperations = new FieldOperations(this.eventManager, this.treeStore)
 		this.entityOperations = new EntityOperations(this.bindingOperations, this.eventManager, this, this.treeStore)
-		this.listOperations = new ListOperations(
-			this.bindingOperations,
-			this.entityOperations,
-			this.eventManager,
-			this,
-			this.treeStore,
-		)
+		this.listOperations = new ListOperations(this.bindingOperations, this.eventManager, this, this.treeStore)
 	}
 
 	public initializeSubTree(tree: EntitySubTreeMarker | EntityListSubTreeMarker): RootStateNode {

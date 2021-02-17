@@ -102,8 +102,6 @@ export class ListOperations {
 				this.treeStore.disposeOfRealm(disconnectedChildRealm)
 				listState.children.delete(disconnectedChildIdValue)
 
-				// TODO handle zero realms after the delete
-
 				let changesDelta = 0
 
 				if (state.persistedEntityIds.has(disconnectedChildIdValue)) {

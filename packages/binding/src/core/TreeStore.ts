@@ -15,7 +15,7 @@ import {
 } from '../treeParameters'
 import { QueryResponseNormalizer } from './QueryResponseNormalizer'
 import { Schema } from './schema'
-import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
+import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode, StateType } from './state'
 
 export class TreeStore {
 	// Indexed by IDs (including unpersisted dummy IDs)
@@ -133,8 +133,28 @@ export class TreeStore {
 		this.entityRealmStore.delete(realmToDisconnect.realmKey)
 		realmToDisconnect.entity.realms.delete(realmToDisconnect.realmKey)
 
-		if (realmToDisconnect.entity.realms.size === 0) {
-			// TODO dispose of this
+		if (realmToDisconnect.type === StateType.EntityRealm) {
+			for (const child of realmToDisconnect.children.values()) {
+				switch (child.type) {
+					case StateType.Field:
+						continue
+					case StateType.EntityRealm:
+					case StateType.EntityRealmStub: {
+						this.disposeOfRealm(realmToDisconnect)
+						break
+					}
+					case StateType.EntityList: {
+						for (const listChild of child.children.values()) {
+							this.disposeOfRealm(listChild)
+						}
+					}
+				}
+			}
+		}
+
+		const entity = realmToDisconnect.entity
+		if (entity.realms.size === 0) {
+			this.entityStore.delete(entity.id.value)
 		}
 	}
 }

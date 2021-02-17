@@ -291,11 +291,11 @@ export class EntityOperations {
 				}
 				this.eventManager.registerJustUpdated(parent, changesDelta)
 
-				// TODO connection update?
-
 				if (realmToDelete.type === StateType.EntityRealm) {
 					parent.childrenWithPendingUpdates?.delete(realmToDelete)
 				}
+
+				this.treeStore.disposeOfRealm(realmToDelete)
 			}
 		})
 	}

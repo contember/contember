@@ -7,7 +7,7 @@ import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import { Scalar } from '../../treeParameters'
 import { EventManager } from '../EventManager'
 import { RealmKeyGenerator } from '../RealmKeyGenerator'
-import { FieldState, getEntityMarker, StateIterator } from '../state'
+import { FieldState, getEntityMarker, StateIterator, StateType } from '../state'
 import { TreeStore } from '../TreeStore'
 
 export class FieldOperations {
@@ -98,6 +98,7 @@ export class FieldOperations {
 			this.treeStore.entityStore.delete(previousId.value)
 			this.treeStore.entityStore.set(newId.value, entity)
 			entity.hasIdSetInStone = true
+			entity.id = newId
 
 			const existingRealms = new Map(entity.realms)
 			entity.realms.clear()
@@ -115,6 +116,9 @@ export class FieldOperations {
 					realm.blueprint.parent.children.changeKey(previousId.value, newId.value) // 😎
 				} else if (realm.blueprint.type === 'hasOne') {
 					this.eventManager.registerUpdatedConnection(realm.blueprint.parent, realm.blueprint.marker.placeholderName)
+				}
+				if (realm.type === StateType.EntityRealm) {
+					this.eventManager.registerJustUpdated(realm, EventManager.NO_CHANGES_DIFFERENCE)
 				}
 			}
 		})

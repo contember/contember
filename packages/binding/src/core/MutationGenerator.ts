@@ -510,6 +510,11 @@ export class MutationGenerator {
 				}
 				case StateType.EntityList: {
 					const { marker, fieldState } = fieldMeta
+					const persistedEntityIds = entityData?.get?.(placeholderName) ?? new Set()
+
+					if (!(persistedEntityIds instanceof Set)) {
+						continue
+					}
 
 					builder = builder.many(marker.parameters.field, builder => {
 						for (const childState of fieldState.children.values()) {
@@ -517,7 +522,7 @@ export class MutationGenerator {
 							const alias = AliasTransformer.entityToAlias(runtimeId)
 
 							if (runtimeId.existsOnServer) {
-								if (fieldState.persistedEntityIds.has(runtimeId.value)) {
+								if (persistedEntityIds.has(runtimeId.value)) {
 									if (childState.type !== StateType.EntityRealmStub) {
 										// A stub cannot have any pending changes.
 										builder = builder.update(

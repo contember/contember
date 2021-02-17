@@ -27,6 +27,7 @@ export class ListOperations {
 
 	public connectEntity(outerState: EntityListState, entityToConnect: EntityAccessor) {
 		this.eventManager.syncOperation(() => {
+			const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, outerState)
 			const stateToConnect = OperationsHelpers.resolveAndPrepareEntityToConnect(this.treeStore, entityToConnect)
 			const idToConnect = stateToConnect.entity.id
 
@@ -72,7 +73,7 @@ export class ListOperations {
 
 				let changesDelta = 0
 
-				if (state.persistedEntityIds.has(idToConnect.value)) {
+				if (persistedEntityIds.has(idToConnect.value)) {
 					// It was removed from the list but now we're adding it back.
 					changesDelta--
 				} else {
@@ -90,6 +91,7 @@ export class ListOperations {
 	public disconnectEntity(listState: EntityListState, childEntity: EntityAccessor) {
 		this.eventManager.syncOperation(() => {
 			// TODO disable this at the top-level.
+			const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, listState)
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, listState)) {
 				const disconnectedChildIdValue = childEntity.id
 				const disconnectedChildRealm = state.children.get(disconnectedChildIdValue)
@@ -105,7 +107,7 @@ export class ListOperations {
 
 				let changesDelta = 0
 
-				if (state.persistedEntityIds.has(disconnectedChildIdValue)) {
+				if (persistedEntityIds.has(disconnectedChildIdValue)) {
 					changesDelta++
 
 					if (state.plannedRemovals === undefined) {

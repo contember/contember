@@ -30,7 +30,6 @@ export interface EntityListState {
 	}
 	getAccessor: () => EntityListAccessor
 	hasStaleAccessor: boolean
-	persistedEntityIds: Set<string>
 	plannedRemovals: Map<EntityRealmState | EntityRealmStateStub, RemovalType> | undefined
 	unpersistedChangesCount: number
 

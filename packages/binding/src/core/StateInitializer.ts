@@ -15,6 +15,7 @@ import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { EventManager } from './EventManager'
 import { EntityOperations, FieldOperations, ListOperations } from './operations'
+import { OperationsHelpers } from './operations/OperationsHelpers'
 import { RealmKeyGenerator } from './RealmKeyGenerator'
 import {
 	EntityListBlueprint,
@@ -314,12 +315,11 @@ export class StateInitializer {
 	private initializeEntityListState(
 		blueprint: EntityListBlueprint,
 		entityName: EntityName,
-		persistedEntityIds: Set<string>,
+		initialEntityIds: Set<string>,
 	): EntityListState {
 		const entityListState: EntityListState = {
 			type: StateType.EntityList,
 			blueprint,
-			persistedEntityIds,
 			addEventListener: undefined as any,
 			children: new BijectiveIndexedMap(realm => realm.entity.id.value),
 			childrenWithPendingUpdates: undefined,
@@ -333,10 +333,11 @@ export class StateInitializer {
 				let accessor: EntityListAccessor | undefined = undefined
 				return () => {
 					if (entityListState.hasStaleAccessor || accessor === undefined) {
+						const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, entityListState)
 						entityListState.hasStaleAccessor = false
 						accessor = new EntityListAccessor(
 							entityListState.children,
-							entityListState.persistedEntityIds,
+							persistedEntityIds,
 							this.bindingOperations,
 							entityListState.errors,
 							entityListState.blueprint.marker.environment,
@@ -373,9 +374,9 @@ export class StateInitializer {
 		entityListState.addEventListener = this.getAddEventListener(entityListState)
 
 		const initialData: Set<string | undefined> =
-			persistedEntityIds.size === 0
+			initialEntityIds.size === 0
 				? new Set(Array.from({ length: blueprint.marker.parameters.initialEntityCount }))
-				: persistedEntityIds
+				: initialEntityIds
 		for (const entityId of initialData) {
 			this.initializeEntityRealm(
 				entityId ? new ServerGeneratedUuid(entityId) : new UnpersistedEntityDummyId(),

@@ -113,7 +113,7 @@ export class StateInitializer {
 		return stub
 	}
 
-	public materializeEntityRealm(state: EntityRealmState | EntityRealmStateStub): EntityRealmState {
+	private materializeEntityRealm(state: EntityRealmState | EntityRealmStateStub): EntityRealmState {
 		if (state.type === StateType.EntityRealm) {
 			return state
 		}
@@ -572,6 +572,22 @@ export class StateInitializer {
 			type: 'listEntity',
 			parent: entityListState,
 		})
+	}
+
+	public runImmediateUserInitialization(
+		realm: EntityRealmState | EntityRealmStateStub,
+		initialize: EntityAccessor.BatchUpdatesHandler | undefined,
+	) {
+		if (initialize === undefined) {
+			return
+		}
+		const entityRealm = this.materializeEntityRealm(realm)
+
+		realm.getAccessor().batchUpdates(initialize)
+
+		if (entityRealm.eventListeners.initialize === undefined || entityRealm.eventListeners.initialize.size === 0) {
+			realm.entity.hasIdSetInStone = true
+		}
 	}
 
 	private initializeEntityEventListeners(

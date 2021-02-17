@@ -44,23 +44,6 @@ export class OperationsHelpers {
 		return stateToConnect
 	}
 
-	public static runImmediateUserInitialization(
-		stateInitializer: StateInitializer,
-		realm: EntityRealmState | EntityRealmStateStub,
-		initialize: EntityAccessor.BatchUpdatesHandler | undefined,
-	) {
-		if (initialize === undefined) {
-			return
-		}
-		const entityRealm = stateInitializer.materializeEntityRealm(realm)
-
-		realm.getAccessor().batchUpdates(initialize)
-
-		if (entityRealm.eventListeners.initialize === undefined || entityRealm.eventListeners.initialize.size === 0) {
-			realm.entity.hasIdSetInStone = true
-		}
-	}
-
 	public static changeEntityId(
 		treeStore: TreeStore,
 		eventManager: EventManager,

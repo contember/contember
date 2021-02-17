@@ -231,7 +231,7 @@ export class EntityOperations {
 						stateToDisconnect.entity.entityName,
 						stateToDisconnect.blueprint,
 					)
-					OperationsHelpers.runImmediateUserInitialization(this.stateInitializer, newEntity, initializeReplacement)
+					this.stateInitializer.runImmediateUserInitialization(newEntity, initializeReplacement)
 
 					this.eventManager.registerUpdatedConnection(state, targetHasOneMarker.placeholderName)
 					this.eventManager.registerJustUpdated(state, changesDelta)

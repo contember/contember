@@ -134,7 +134,7 @@ export class ListOperations {
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, outerState)) {
 				const newEntity = this.stateInitializer.initializeListEntity(state, id)
 
-				OperationsHelpers.runImmediateUserInitialization(this.stateInitializer, newEntity, initialize)
+				this.stateInitializer.runImmediateUserInitialization(newEntity, initialize)
 
 				// The act of creating the entity doesn't constitute a change unless there's something inside to persist.
 				// TODO forceCreate

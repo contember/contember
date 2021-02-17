@@ -8,13 +8,29 @@ import { BindingError } from '../../BindingError'
 // a new one [K2, V]. That would however change the order of iteration. This main purpose of this data structure is
 // the ability to avoid that and enable the value V to preserve its original place.
 export class BijectiveIndexedMap<K, V> implements Map<K, V> {
-	private valueStore: Map<number, V> = new Map()
-	private index: Map<K, number> = new Map()
-	private indexSeed: number = 0
+	private readonly valueStore: Map<number, V>
+	private readonly index: Map<K, number>
+	private indexSeed: number
+
+	private readonly inverse: (value: V) => K
 
 	public readonly [Symbol.toStringTag] = 'BijectiveIndexedMap'
 
-	public constructor(private readonly inverse: (value: V) => K) {}
+	public constructor(originalMap: BijectiveIndexedMap<K, V>)
+	public constructor(inverse: (value: V) => K)
+	public constructor(inverseOrMap: BijectiveIndexedMap<K, V> | ((value: V) => K)) {
+		if (inverseOrMap instanceof BijectiveIndexedMap) {
+			this.valueStore = new Map(inverseOrMap.valueStore)
+			this.index = new Map(inverseOrMap.index)
+			this.indexSeed = inverseOrMap.indexSeed
+			this.inverse = inverseOrMap.inverse
+		} else {
+			this.valueStore = new Map()
+			this.index = new Map()
+			this.indexSeed = 0
+			this.inverse = inverseOrMap
+		}
+	}
 
 	private getNewIndex() {
 		return this.indexSeed++

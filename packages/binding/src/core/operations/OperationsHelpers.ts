@@ -1,6 +1,9 @@
 import { EntityAccessor } from '../../accessors'
+import { RuntimeId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
-import { EntityRealmState, EntityRealmStateStub } from '../state'
+import { EventManager } from '../EventManager'
+import { RealmKeyGenerator } from '../RealmKeyGenerator'
+import { EntityRealmState, EntityRealmStateStub, EntityState, StateType } from '../state'
 import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
 
@@ -55,6 +58,42 @@ export class OperationsHelpers {
 
 		if (entityRealm.eventListeners.initialize === undefined || entityRealm.eventListeners.initialize.size === 0) {
 			realm.entity.hasIdSetInStone = true
+		}
+	}
+
+	public static changeEntityId(
+		treeStore: TreeStore,
+		eventManager: EventManager,
+		entity: EntityState,
+		newId: RuntimeId,
+	) {
+		const previousId = entity.id
+
+		treeStore.entityStore.delete(previousId.value)
+		treeStore.entityStore.set(newId.value, entity)
+		entity.hasIdSetInStone = true
+		entity.id = newId
+
+		const existingRealms = new Map(entity.realms)
+		entity.realms.clear()
+
+		for (const [oldRealmKey, realm] of existingRealms) {
+			const newRealmKey = RealmKeyGenerator.getRealmKey(newId, realm.blueprint)
+
+			realm.realmKey = newRealmKey
+			entity.realms.set(newRealmKey, realm)
+
+			treeStore.entityRealmStore.delete(oldRealmKey)
+			treeStore.entityRealmStore.set(newRealmKey, realm)
+
+			if (realm.blueprint.type === 'listEntity') {
+				realm.blueprint.parent.children.changeKey(previousId.value, newId.value) // 😎
+			} else if (realm.blueprint.type === 'hasOne') {
+				eventManager.registerUpdatedConnection(realm.blueprint.parent, realm.blueprint.marker.placeholderName)
+			}
+			if (realm.type === StateType.EntityRealm) {
+				eventManager.registerJustUpdated(realm, EventManager.NO_CHANGES_DIFFERENCE)
+			}
 		}
 	}
 }

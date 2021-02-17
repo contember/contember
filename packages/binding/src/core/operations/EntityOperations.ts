@@ -146,8 +146,11 @@ export class EntityOperations {
 
 					this.treeStore.disposeOfRealm(previouslyConnectedState)
 
-					let changesDelta =
-						previouslyConnectedState.type === 'entityRealm' ? -1 * previouslyConnectedState.unpersistedChangesCount : 0
+					let changesDelta = 0
+
+					if (previouslyConnectedState.type === 'entityRealm') {
+						changesDelta -= previouslyConnectedState.unpersistedChangesCount
+					}
 
 					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
 					if (persistedId instanceof ServerGeneratedUuid) {
@@ -210,8 +213,11 @@ export class EntityOperations {
 
 					this.treeStore.disposeOfRealm(stateToDisconnect)
 
-					let changesDelta =
-						stateToDisconnect.type === 'entityRealm' ? -1 * stateToDisconnect.unpersistedChangesCount : 0
+					let changesDelta = 0
+
+					if (stateToDisconnect.type === 'entityRealm') {
+						changesDelta -= stateToDisconnect.unpersistedChangesCount
+					}
 					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
 
 					if (persistedId instanceof ServerGeneratedUuid && persistedId.value === stateToDisconnect.entity.id.value) {
@@ -242,6 +248,8 @@ export class EntityOperations {
 
 			for (const realmToDelete of outerState.realms.values()) {
 				let parent: EntityRealmState | EntityRealmStateStub | EntityListState
+				let changesDelta = 0
+
 				if (realmToDelete.blueprint.type === 'listEntity') {
 					parent = realmToDelete.blueprint.parent
 					parent.children.delete(entityId.value)
@@ -250,6 +258,7 @@ export class EntityOperations {
 						if (parent.plannedRemovals === undefined) {
 							parent.plannedRemovals = new Map()
 						}
+						changesDelta++
 						parent.plannedRemovals.set(realmToDelete, 'delete')
 					}
 				} else if (realmToDelete.blueprint.type === 'hasOne') {
@@ -260,6 +269,7 @@ export class EntityOperations {
 						if (parent.plannedHasOneDeletions === undefined) {
 							parent.plannedHasOneDeletions = new Map()
 						}
+						changesDelta++
 						parent.plannedHasOneDeletions.set(placeholderName, realmToDelete)
 					}
 					this.stateInitializer.initializeEntityRealm(
@@ -275,11 +285,9 @@ export class EntityOperations {
 					return assertNever(realmToDelete.blueprint)
 				}
 
-				let changesDelta = 0
-				if (realmToDelete.type === StateType.EntityRealmStub) {
-					changesDelta = EventManager.NO_CHANGES_DIFFERENCE
-				} else {
-					changesDelta = -1 * realmToDelete.unpersistedChangesCount // Undoing whatever this had caused
+				if (realmToDelete.type === StateType.EntityRealm) {
+					// Undoing whatever this had caused
+					changesDelta -= realmToDelete.unpersistedChangesCount
 				}
 				this.eventManager.registerJustUpdated(parent, changesDelta)
 

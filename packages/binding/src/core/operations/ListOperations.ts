@@ -73,9 +73,9 @@ export class ListOperations {
 
 				if (state.persistedEntityIds.has(idToConnect.value)) {
 					// It was removed from the list but now we're adding it back.
-					changesDelta = -1
+					changesDelta--
 				} else {
-					changesDelta = 1
+					changesDelta++
 				}
 				if (stateToConnect.type === StateType.EntityRealm) {
 					changesDelta += stateToConnect.unpersistedChangesCount

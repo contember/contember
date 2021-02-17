@@ -55,9 +55,9 @@ export class FieldOperations {
 
 				if (shouldInfluenceUpdateCount) {
 					if (!hadUnpersistedChangesBefore && hasUnpersistedChangesNow) {
-						changesDelta = 1
+						changesDelta++
 					} else if (hadUnpersistedChangesBefore && !hasUnpersistedChangesNow) {
-						changesDelta = -1
+						changesDelta--
 					}
 				}
 

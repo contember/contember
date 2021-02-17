@@ -129,20 +129,20 @@ export class TreeStore {
 		return subTreeState
 	}
 
-	public disposeOfRealm(realmToDisconnect: EntityRealmState | EntityRealmStateStub) {
-		this.entityRealmStore.delete(realmToDisconnect.realmKey)
-		realmToDisconnect.entity.realms.delete(realmToDisconnect.realmKey)
+	public disposeOfRealm(realmToDisposeOf: EntityRealmState | EntityRealmStateStub) {
+		this.entityRealmStore.delete(realmToDisposeOf.realmKey)
+		realmToDisposeOf.entity.realms.delete(realmToDisposeOf.realmKey)
 
-		if (realmToDisconnect.type === StateType.EntityRealm) {
-			realmToDisconnect.blueprint.parent?.childrenWithPendingUpdates?.delete(realmToDisconnect)
+		if (realmToDisposeOf.type === StateType.EntityRealm) {
+			realmToDisposeOf.blueprint.parent?.childrenWithPendingUpdates?.delete(realmToDisposeOf)
 
-			for (const child of realmToDisconnect.children.values()) {
+			for (const child of realmToDisposeOf.children.values()) {
 				switch (child.type) {
 					case StateType.Field:
 						continue
 					case StateType.EntityRealm:
 					case StateType.EntityRealmStub: {
-						this.disposeOfRealm(realmToDisconnect)
+						this.disposeOfRealm(child)
 						break
 					}
 					case StateType.EntityList: {
@@ -154,9 +154,16 @@ export class TreeStore {
 			}
 		}
 
-		const entity = realmToDisconnect.entity
+		const entity = realmToDisposeOf.entity
 		if (entity.realms.size === 0) {
-			this.entityStore.delete(entity.id.value)
+			this.disposeOfEntity(entity)
 		}
+	}
+
+	public disposeOfEntity(entity: EntityState) {
+		for (const realm of entity.realms.values()) {
+			this.disposeOfRealm(realm)
+		}
+		this.entityStore.delete(entity.id.value)
 	}
 }

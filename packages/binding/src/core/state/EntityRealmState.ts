@@ -34,7 +34,7 @@ export interface EntityRealmStateStub {
 	readonly type: StateType.EntityRealmStub
 
 	readonly blueprint: EntityRealmBlueprint
-	readonly entity: EntityState
+	entity: EntityState
 	realmKey: EntityRealmKey
 
 	readonly getAccessor: EntityAccessor.GetEntityAccessor

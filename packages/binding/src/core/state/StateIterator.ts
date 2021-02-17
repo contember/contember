@@ -74,25 +74,62 @@ export class StateIterator {
 		}
 	}
 
-	public static *eachDistinctEntityFieldWithMarker(
+	public static *eachDistinctEntityFieldState(
 		realm: EntityRealmState | EntityRealmStateStub,
-	): IterableIterator<[PlaceholderName, FieldMarker | HasOneRelationMarker | HasManyRelationMarker]> {
+	): IterableIterator<
+		| { type: StateType.EntityRealm; marker: HasOneRelationMarker; fieldState: EntityRealmState }
+		| { type: StateType.Field; marker: FieldMarker; fieldState: FieldState }
+		| { type: StateType.EntityList; marker: HasManyRelationMarker; fieldState: EntityListState }
+	> {
 		if (realm.type === StateType.EntityRealmStub) {
 			return
 		}
 		const visited: Set<PlaceholderName> = new Set()
 
 		for (const siblingRealm of realm.entity.realms.values()) {
-			for (const [placeholderName, marker] of getEntityMarker(siblingRealm).fields.markers) {
+			const fields = getEntityMarker(siblingRealm).fields.markers
+
+			for (const [placeholderName, fieldState] of realm.children) {
+				if (fieldState.type === StateType.EntityRealmStub || visited.has(placeholderName)) {
+					continue
+				}
+				const marker = fields.get(placeholderName)
+
 				if (
+					marker === undefined ||
 					marker instanceof EntitySubTreeMarker ||
-					marker instanceof EntityListSubTreeMarker ||
-					visited.has(placeholderName)
+					marker instanceof EntityListSubTreeMarker
 				) {
 					continue
 				}
 				visited.add(placeholderName)
-				yield [placeholderName, marker]
+
+				if (fieldState.type === StateType.Field && marker instanceof FieldMarker) {
+					yield {
+						type: StateType.Field,
+						marker,
+						fieldState,
+					}
+				} else if (fieldState.type === StateType.EntityRealm && marker instanceof HasOneRelationMarker) {
+					yield {
+						type: StateType.EntityRealm,
+						marker,
+						fieldState,
+					}
+				} else if (fieldState.type === StateType.EntityList && marker instanceof HasManyRelationMarker) {
+					yield {
+						type: StateType.EntityList,
+						marker,
+						fieldState,
+					}
+				} else {
+					console.warn(
+						`You have encountered an edge case that is so far being deliberately ignored because it appears to be ` +
+							`rare enough. Please report this bug.`,
+						fieldState,
+						marker,
+					)
+				}
 			}
 		}
 	}

@@ -45,7 +45,7 @@ export class StateInitializer {
 		private readonly eventManager: EventManager,
 		private readonly treeStore: TreeStore,
 	) {
-		this.fieldOperations = new FieldOperations(this.eventManager, this.treeStore)
+		this.fieldOperations = new FieldOperations(this.eventManager, this, this.treeStore)
 		this.entityOperations = new EntityOperations(this.bindingOperations, this.eventManager, this, this.treeStore)
 		this.listOperations = new ListOperations(this.bindingOperations, this.eventManager, this, this.treeStore)
 	}
@@ -287,7 +287,7 @@ export class StateInitializer {
 		entity.realms.set(realmKey, entityRealm)
 	}
 
-	private initializeEntityState(id: RuntimeId, entityName: EntityName): EntityState {
+	public initializeEntityState(id: RuntimeId, entityName: EntityName): EntityState {
 		const entityId = id.value
 
 		const existing = this.treeStore.entityStore.get(entityId)

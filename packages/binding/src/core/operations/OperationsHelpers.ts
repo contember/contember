@@ -61,6 +61,7 @@ export class OperationsHelpers {
 	public static changeEntityId(
 		treeStore: TreeStore,
 		eventManager: EventManager,
+		stateInitializer: StateInitializer,
 		entity: EntityState,
 		newId: RuntimeId,
 	) {
@@ -68,29 +69,62 @@ export class OperationsHelpers {
 
 		treeStore.entityStore.delete(previousId.value)
 		treeStore.entityStore.set(newId.value, entity)
+
+		let counter = 0
+		for (const realm of entity.realms.values()) {
+			this.changeRealmId(treeStore, eventManager, stateInitializer, realm, newId)
+
+			if (++counter === entity.realms.size) {
+				break
+			}
+		}
+
 		entity.hasIdSetInStone = true
 		entity.id = newId
+	}
 
-		const existingRealms = new Map(entity.realms)
-		entity.realms.clear()
+	public static changeRealmId(
+		treeStore: TreeStore,
+		eventManager: EventManager,
+		stateInitializer: StateInitializer,
+		realm: EntityRealmState | EntityRealmStateStub,
+		newId: RuntimeId,
+	) {
+		const oldEntity = realm.entity
+		const oldRealmKey = realm.realmKey
+		const oldId = oldEntity.id
 
-		for (const [oldRealmKey, realm] of existingRealms) {
-			const newRealmKey = RealmKeyGenerator.getRealmKey(newId, realm.blueprint)
+		const newEntity = stateInitializer.initializeEntityState(newId, oldEntity.entityName)
+		const newRealmKey = RealmKeyGenerator.getRealmKey(newId, realm.blueprint)
 
-			realm.realmKey = newRealmKey
-			entity.realms.set(newRealmKey, realm)
+		realm.realmKey = newRealmKey
+		realm.entity = newEntity
 
-			treeStore.entityRealmStore.delete(oldRealmKey)
-			treeStore.entityRealmStore.set(newRealmKey, realm)
+		// This may still actually be necessary if we're going from a client to server generated uuid.
+		// They both may have the same value but still be different.
+		newEntity.id = newId
+		oldEntity.realms.delete(oldRealmKey)
+		newEntity.realms.set(newRealmKey, realm)
 
-			if (realm.blueprint.type === 'listEntity') {
-				realm.blueprint.parent.children.changeKey(previousId.value, newId.value) // 😎
-			} else if (realm.blueprint.type === 'hasOne') {
-				eventManager.registerUpdatedConnection(realm.blueprint.parent, realm.blueprint.marker.placeholderName)
-			}
-			if (realm.type === StateType.EntityRealm) {
-				eventManager.registerJustUpdated(realm, EventManager.NO_CHANGES_DIFFERENCE)
-			}
+		if (oldEntity.realms.size === 0) {
+			treeStore.disposeOfEntity(oldEntity)
+		}
+
+		treeStore.entityRealmStore.delete(oldRealmKey)
+		treeStore.entityRealmStore.set(newRealmKey, realm)
+
+		if (realm.blueprint.type === 'listEntity') {
+			const list = realm.blueprint.parent
+			list.children.changeKey(oldId.value, newId.value) // 😎
+		} else if (realm.blueprint.type === 'hasOne') {
+			eventManager.registerUpdatedConnection(realm.blueprint.parent, realm.blueprint.marker.placeholderName)
+		}
+		const parent = realm.blueprint.parent
+		if (parent) {
+			eventManager.registerJustUpdated(parent, EventManager.NO_CHANGES_DIFFERENCE)
+		}
+		if (realm.type === StateType.EntityRealm) {
+			eventManager.registerJustUpdated(realm, EventManager.NO_CHANGES_DIFFERENCE)
 		}
 	}
 }

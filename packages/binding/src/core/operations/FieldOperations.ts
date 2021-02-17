@@ -1,18 +1,22 @@
 import { GraphQlBuilder } from '@contember/client'
 import { validate as uuidValidate } from 'uuid'
 import { FieldAccessor } from '../../accessors'
-import { ClientGeneratedUuid, RuntimeId } from '../../accessorTree'
+import { ClientGeneratedUuid } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import { Scalar } from '../../treeParameters'
 import { EventManager } from '../EventManager'
-import { RealmKeyGenerator } from '../RealmKeyGenerator'
-import { FieldState, getEntityMarker, StateIterator, StateType } from '../state'
+import { FieldState, getEntityMarker, StateIterator } from '../state'
+import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
 
 export class FieldOperations {
-	public constructor(private readonly eventManager: EventManager, private readonly treeStore: TreeStore) {}
+	public constructor(
+		private readonly eventManager: EventManager,
+		private readonly stateInitializer: StateInitializer,
+		private readonly treeStore: TreeStore,
+	) {}
 
 	public updateValue(
 		fieldState: FieldState,
@@ -48,7 +52,13 @@ export class FieldOperations {
 				if (typeof newValue !== 'string') {
 					throw new BindingError()
 				}
-				OperationsHelpers.changeEntityId(this.treeStore, this.eventManager, entity, new ClientGeneratedUuid(newValue))
+				OperationsHelpers.changeEntityId(
+					this.treeStore,
+					this.eventManager,
+					this.stateInitializer,
+					entity,
+					new ClientGeneratedUuid(newValue),
+				)
 			}
 			for (const field of StateIterator.eachSiblingRealmChild(this.treeStore, fieldState)) {
 				if (newValue === field.value) {

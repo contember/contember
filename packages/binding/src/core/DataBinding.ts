@@ -28,7 +28,7 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '../treeParameters'
-import { generateEnumerabilityPreventingEntropy } from '../utils'
+import { assertNever, generateEnumerabilityPreventingEntropy } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
@@ -313,13 +313,23 @@ export class DataBinding {
 			this.dirtinessTracker.reset()
 
 			for (const [, rootState] of StateIterator.eachRootState(this.treeStore)) {
-				for (const state of StateIterator.depthFirstINodes(rootState)) {
-					state.unpersistedChangesCount = 0
-
-					if (state.type === StateType.EntityRealm) {
-						state.plannedHasOneDeletions?.clear()
-					} else if (state.type === StateType.EntityList) {
-						state.plannedRemovals?.clear()
+				for (const state of StateIterator.depthFirstAllNodes(rootState)) {
+					switch (state.type) {
+						case StateType.Field: {
+							state.hasUnpersistedChanges = false
+							break
+						}
+						case StateType.EntityList:
+							state.unpersistedChangesCount = 0
+							state.plannedRemovals?.clear()
+							break
+						case StateType.EntityRealm: {
+							state.unpersistedChangesCount = 0
+							state.plannedHasOneDeletions?.clear()
+							break
+						}
+						default:
+							assertNever(state)
 					}
 				}
 			}

@@ -1,5 +1,5 @@
 import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
-import { ServerGeneratedUuid } from '../accessorTree'
+import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
@@ -218,7 +218,10 @@ export class MutationGenerator {
 					const { marker, fieldState } = fieldMeta
 					const placeholderName = marker.placeholderName
 
-					if (placeholderName === TYPENAME_KEY_NAME || (placeholderName === PRIMARY_KEY_NAME && !fieldState.touchLog)) {
+					if (
+						placeholderName === TYPENAME_KEY_NAME ||
+						(placeholderName === PRIMARY_KEY_NAME && !(currentState.entity.id instanceof ClientGeneratedUuid))
+					) {
 						continue
 					}
 					if (marker.isNonbearing) {

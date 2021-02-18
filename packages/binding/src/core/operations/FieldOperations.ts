@@ -69,7 +69,6 @@ export class FieldOperations {
 				}
 				field.touchLog.add(agent)
 				field.value = newValue
-				field.hasStaleAccessor = true
 
 				const resolvedValue =
 					field.fieldMarker.defaultValue === undefined

@@ -1,6 +1,6 @@
 import { validate as uuidValidate } from 'uuid'
 import { BindingOperations, EntityAccessor, EntityListAccessor } from '../../accessors'
-import { UnpersistedEntityDummyId } from '../../accessorTree'
+import { ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EventManager } from '../EventManager'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
@@ -114,7 +114,9 @@ export class ListOperations {
 						state.plannedRemovals = new Map()
 					}
 					state.plannedRemovals.set(disconnectedChildRealm, 'disconnect')
-				} else {
+				} else if (disconnectedChildRealm.entity.id.existsOnServer) {
+					// Disconnecting unpersisted entities doesn't constitute a change.
+
 					// It wasn't on the list, then it was, and now we're removing it again.
 					changesDelta--
 				}

@@ -60,6 +60,7 @@ export class EventManager {
 			try {
 				resolve(await this.asyncOperation(operation))
 			} catch (e) {
+				console.error('PersistError', e)
 				reject(e)
 			} finally {
 				this.ongoingPersistOperation = undefined

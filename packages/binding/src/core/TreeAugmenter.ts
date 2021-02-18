@@ -112,8 +112,15 @@ export class TreeAugmenter {
 					if (childData instanceof ServerGeneratedUuid || childData instanceof Set) {
 						continue
 					}
+
 					if (child.persistedValue !== childData) {
+						// TODO this doesn't handle literals
+						const shouldChangeBothValues = child.persistedValue === child.value
+
 						child.persistedValue = childData
+						if (shouldChangeBothValues) {
+							child.value = childData ?? null
+						}
 						this.eventManager.registerJustUpdated(child, EventManager.NO_CHANGES_DIFFERENCE)
 					}
 					break

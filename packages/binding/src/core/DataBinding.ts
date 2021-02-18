@@ -316,6 +316,7 @@ export class DataBinding {
 				for (const state of StateIterator.depthFirstAllNodes(rootState)) {
 					switch (state.type) {
 						case StateType.Field: {
+							state.touchLog?.clear()
 							state.hasUnpersistedChanges = false
 							break
 						}

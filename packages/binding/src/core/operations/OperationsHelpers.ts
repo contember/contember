@@ -1,6 +1,7 @@
 import { EntityAccessor } from '../../accessors'
 import { RuntimeId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
+import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import { EntityId } from '../../treeParameters'
 import { EventManager } from '../EventManager'
 import { RealmKeyGenerator } from '../RealmKeyGenerator'
@@ -105,6 +106,14 @@ export class OperationsHelpers {
 		newEntity.id = newId
 		oldEntity.realms.delete(oldRealmKey)
 		newEntity.realms.set(newRealmKey, realm)
+
+		if (realm.type === StateType.EntityRealm) {
+			const childIdState = realm.children.get(PRIMARY_KEY_NAME)
+			if (childIdState?.type === StateType.Field) {
+				childIdState.value = newId.value
+				eventManager.registerJustUpdated(childIdState, EventManager.NO_CHANGES_DIFFERENCE)
+			}
+		}
 
 		if (oldEntity.realms.size === 0) {
 			treeStore.disposeOfEntity(oldEntity)

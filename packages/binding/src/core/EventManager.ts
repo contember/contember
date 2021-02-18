@@ -3,6 +3,7 @@ import {
 	BindingOperations,
 	EntityAccessor,
 	EntityListAccessor,
+	FieldAccessor,
 	PersistErrorOptions,
 	PersistSuccessOptions,
 } from '../accessors'
@@ -363,20 +364,21 @@ export class EventManager {
 				this.pendingWithBeforeUpdate = new Set()
 
 				for (const state of withBeforeUpdate) {
+					const listeners = state.eventListeners.beforeUpdate
+					if (listeners === undefined) {
+						// This can happen if the listener has unsubscribed since we added it to the set.
+						continue
+					}
 					switch (state.type) {
 						case StateType.Field:
-							for (const listener of state.eventListeners.beforeUpdate!) {
-								listener(state.getAccessor())
+							for (const listener of listeners) {
+								;(listener as FieldAccessor.BeforeUpdateListener)(state.getAccessor())
 							}
 							break
 						case StateType.EntityRealm:
-							for (const listener of state.eventListeners.beforeUpdate!) {
-								state.batchUpdates(listener)
-							}
-							break
 						case StateType.EntityList:
-							for (const listener of state.eventListeners.beforeUpdate!) {
-								state.batchUpdates(listener)
+							for (const listener of listeners) {
+								state.batchUpdates(listener as any)
 							}
 							break
 						default:

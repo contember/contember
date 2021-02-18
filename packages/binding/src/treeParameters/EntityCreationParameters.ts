@@ -1,7 +1,7 @@
 import { SetOnCreate, SugaredSetOnCreate } from './SetOnCreate'
 
 export const EntityCreationParametersDefaults = {
-	forceCreation: false,
+	// forceCreation: false,
 	isNonbearing: false,
 } as const
 
@@ -13,7 +13,7 @@ a new entity*, NOT during updates.
 
 First, it is determined if any *bearing* field/relation has anything to be persisted. This occurs:
 - For fields if the resolved value (taking defaultValue into account) is not null
-- For relations if its children have anything to persist or if forceCreation is true.
+- For relations if its children have anything to persist (TODO or if forceCreation is true.)
 
 If at least one of the bearing fields/relations have anything to persist or in the rare case when all fields/relations
 are nonbearing, the nonbearing fields/relations are also processed using the same method as described for bearing
@@ -23,7 +23,7 @@ Lastly, setOnCreate comes to play. It doesn't influence whether the entity will 
 all of the above it is concluded that it will, the values from it are used.
  */
 export interface EntityCreationParameters {
-	forceCreation: boolean
+	// forceCreation: boolean
 	isNonbearing: boolean
 	setOnCreate: SetOnCreate
 }
@@ -31,7 +31,7 @@ export interface EntityCreationParameters {
 export interface SugarableEntityCreationParameters {}
 
 export interface UnsugarableEntityCreationParameters {
-	forceCreation?: boolean
+	// forceCreation?: boolean
 	isNonbearing?: boolean
 	setOnCreate?: SugaredSetOnCreate
 }

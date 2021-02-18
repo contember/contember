@@ -1,21 +1,19 @@
-import { QueryRequestResponse, ServerGeneratedUuid, UnpersistedEntityKey } from '../accessorTree'
 import {
-	EntityFieldMarkersContainer,
-	FieldMarker,
-	HasManyRelationMarker,
-	HasOneRelationMarker,
-	MarkerTreeRoot,
-} from '../markers'
-import { assert, assertNever } from '../utils'
+	ClientGeneratedUuid,
+	EntityListPersistedData,
+	ReceivedDataTree,
+	RuntimeId,
+	ServerGeneratedUuid,
+	UnpersistedEntityDummyId,
+} from '../accessorTree'
+import { MarkerTreeRoot } from '../markers'
+import { EntityId, PlaceholderName, TreeRootId } from '../treeParameters'
+import { assertNever } from '../utils'
 import { EventManager } from './EventManager'
-import { MarkerMerger } from './MarkerMerger'
-import { EntityListState, EntityState, EntityStateStub, StateType } from './state'
-import { EntityRealmKey } from './state/EntityRealmKey'
-import { EntityRealmParent } from './state/EntityRealmParent'
+import { OperationsHelpers } from './operations/OperationsHelpers'
+import { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode, StateType } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeStore } from './TreeStore'
-
-type AlreadyProcessed = Map<EntityRealmParent, Set<EntityRealmKey>>
 
 export class TreeAugmenter {
 	public constructor(
@@ -24,330 +22,187 @@ export class TreeAugmenter {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public augmentTree(newMarkerTree: MarkerTreeRoot, newPersistedData: QueryRequestResponse | undefined) {
-		this.eventManager.syncOperation(() => {
-			this.treeStore.extendTree(newMarkerTree, newPersistedData)
+	public extendTree(
+		newTreeId: TreeRootId | undefined,
+		newMarkerTree: MarkerTreeRoot,
+		newPersistedData: ReceivedDataTree,
+	) {
+		// TODO this doesn't yet handle updates for entities whose persisted data just gets magically changed without notice.
+		this.treeStore.updatePersistedData(newPersistedData)
 
-			// TODO this whole process fails to:
-			//		- Properly update realms
-			//		- Update creationParameters
-			//		- Update environment
-			//		- Update initialEventListeners
+		const subTreeStates: Map<PlaceholderName, RootStateNode> = new Map()
 
-			const alreadyProcessed: AlreadyProcessed = new Map()
-			let didUpdateSomething = false
-			for (const [subTreePlaceholder, newSubTreeMarker] of newMarkerTree.subTrees) {
-				const completeTreeMarker = this.treeStore.markerTree.subTrees.get(subTreePlaceholder)
-				const subTreeState = this.treeStore.subTreeStates.get(subTreePlaceholder)
-				const newSubTreeData = this.treeStore.subTreePersistedData.get(subTreePlaceholder)
+		this.treeStore.markerTrees.set(newTreeId, newMarkerTree)
+		this.treeStore.subTreeStatesByRoot.set(newTreeId, subTreeStates)
 
-				assert(completeTreeMarker !== undefined)
+		for (const [placeholderName, newSubTreeMarker] of newMarkerTree.subTrees) {
+			const newState = this.stateInitializer.initializeSubTree(newSubTreeMarker)
+			subTreeStates.set(placeholderName, newState)
+		}
+	}
 
-				let didUpdateTree = false
+	public updatePersistedData(response: ReceivedDataTree) {
+		this.treeStore.updatePersistedData(response)
 
-				if (subTreeState === undefined) {
-					this.stateInitializer.initializeSubTree(newSubTreeMarker)
-					didUpdateTree = true
-				} else if (subTreeState.type === StateType.Entity) {
-					assert(
-						newSubTreeData === null || newSubTreeData === undefined || newSubTreeData instanceof ServerGeneratedUuid,
-					)
+		this.eventManager.syncTransaction(() => {
+			for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {
+				for (const rootPlaceholder in response) {
+					const rootState = rootStates.get(rootPlaceholder)
 
-					didUpdateTree = this.updateSingleEntityPersistedData(
-						alreadyProcessed,
-						undefined,
-						subTreePlaceholder,
-						subTreeState,
-						completeTreeMarker.fields,
-						newSubTreeMarker.fields,
-						newSubTreeData || new UnpersistedEntityKey(),
-					)
-				} else if (subTreeState.type === StateType.EntityList) {
-					assert(newSubTreeData instanceof Set)
+					if (rootState === undefined) {
+						continue
+					}
+					const rootData = this.treeStore.subTreePersistedData.get(rootPlaceholder)
 
-					didUpdateTree = this.updateEntityListPersistedData(
-						alreadyProcessed,
-						subTreeState,
-						completeTreeMarker.fields,
-						newSubTreeMarker.fields,
-						newSubTreeData,
-					)
-				} else {
-					assertNever(subTreeState)
+					if (rootState.type === StateType.EntityList) {
+						if (!(rootData instanceof Set)) {
+							continue // This should never happen.
+						}
+						this.updateEntityListPersistedData(rootState, rootData)
+					} else if (rootState.type === StateType.EntityRealm) {
+						if (rootData !== undefined && !(rootData instanceof ServerGeneratedUuid)) {
+							continue // This should never happen.
+						}
+						this.updateRealmIdIfNecessary(rootState, rootData)
+						this.updateEntityRealmPersistedData(rootState)
+					} else {
+						return assertNever(rootState)
+					}
 				}
-				didUpdateSomething = didUpdateSomething || didUpdateTree
 			}
-			// TODO use didUpdateSomething
 		})
 	}
 
-	private updateSingleEntityPersistedData(
-		alreadyProcessed: AlreadyProcessed,
-		parent: EntityRealmParent,
-		parentKey: EntityRealmKey,
-		state: EntityState,
-		completeMarkersContainer: EntityFieldMarkersContainer | undefined,
-		newMarkersContainer: EntityFieldMarkersContainer,
-		newId: ServerGeneratedUuid | UnpersistedEntityKey,
-	): boolean {
-		const byParent = alreadyProcessed.get(parent)
-		if (byParent === undefined) {
-			alreadyProcessed.set(parent, new Set([parentKey]))
-		} else if (byParent.has(parentKey)) {
-			return false
-		} else {
-			byParent.add(parentKey)
-		}
+	private updateRealmIdIfNecessary(
+		realm: EntityRealmState | EntityRealmStateStub,
+		newId: ServerGeneratedUuid | undefined,
+	) {
+		const currentId = realm.entity.id
+		let idToChangeTo: RuntimeId | undefined = undefined
 
-		let didUpdate = false
-
-		if (
-			newId.value !== state.id.value &&
-			!(newId instanceof UnpersistedEntityKey && state.id instanceof UnpersistedEntityKey)
-		) {
-			this.stateInitializer.changeEntityId(state, newId)
-			didUpdate = true
-		}
-
-		const newPersistedData = this.treeStore.persistedEntityData.get(state.id.value)
-		state.persistedData = newPersistedData
-
-		for (let [placeholderName, marker] of newMarkersContainer.markers) {
-			const completeMarker = completeMarkersContainer?.markers.get(placeholderName)
-			const newFieldDatum = newPersistedData?.get(placeholderName)
-			const fieldState = state.children.get(placeholderName)
-
-			if (fieldState === undefined) {
-				this.stateInitializer.initializeEntityField(
-					state,
-					completeMarker ? MarkerMerger.mergeMarkers(completeMarker, marker) : marker,
-					newFieldDatum,
-				)
-				didUpdate = true
-			} else {
-				let didChildUpdate = false
-
-				switch (fieldState.type) {
-					case StateType.Field: {
-						assert(marker instanceof FieldMarker)
-						assert(!(newFieldDatum instanceof Set) && !(newFieldDatum instanceof ServerGeneratedUuid))
-
-						if (fieldState.persistedValue !== newFieldDatum) {
-							fieldState.persistedValue = newFieldDatum
-							fieldState.value = newFieldDatum ?? marker.defaultValue ?? null
-							fieldState.hasUnpersistedChanges = false
-
-							didChildUpdate = true
-						}
-						break
-					}
-					case StateType.Entity: {
-						assert(marker instanceof HasOneRelationMarker)
-						assert(completeMarker === undefined || completeMarker instanceof HasOneRelationMarker)
-						assert(
-							newFieldDatum === null || newFieldDatum === undefined || newFieldDatum instanceof ServerGeneratedUuid,
-						)
-
-						didChildUpdate = this.updateSingleEntityPersistedData(
-							alreadyProcessed,
-							state,
-							placeholderName,
-							fieldState,
-							completeMarker?.fields,
-							marker.fields,
-							newFieldDatum || new UnpersistedEntityKey(),
-						)
-
-						break
-					}
-					case StateType.EntityList: {
-						assert(marker instanceof HasManyRelationMarker)
-						assert(completeMarker === undefined || completeMarker instanceof HasManyRelationMarker)
-						assert(newFieldDatum instanceof Set || newFieldDatum === undefined)
-						didChildUpdate = this.updateEntityListPersistedData(
-							alreadyProcessed,
-							fieldState,
-							completeMarker?.fields,
-							marker.fields,
-							newFieldDatum || new Set(),
-						)
-						break
-					}
-					case StateType.EntityStub: {
-						assert(marker instanceof HasOneRelationMarker)
-
-						const realmsByKey = fieldState.realms.get(state)
-						assert(realmsByKey !== undefined)
-						const realm = realmsByKey.get(parentKey)
-						if (realm === undefined) {
-							realmsByKey.set(parentKey, {
-								parent: state,
-								realmKey: parentKey,
-								markersContainer: marker.fields,
-								initialEventListeners: marker.relation,
-								environment: marker.environment,
-								creationParameters: marker.relation,
-							})
-						} else {
-							realm.markersContainer = MarkerMerger.mergeEntityFieldsContainers(realm.markersContainer, marker.fields)
-						}
-						didChildUpdate = true
-						break
-					}
-					default:
-						assertNever(fieldState)
-				}
-				if (didChildUpdate) {
-					if (state.childrenWithPendingUpdates === undefined) {
-						state.childrenWithPendingUpdates = new Set()
-					}
-					if (fieldState.type !== StateType.EntityStub) {
-						fieldState.hasPendingUpdate = true
-						fieldState.hasStaleAccessor = true
-						state.childrenWithPendingUpdates.add(fieldState)
-					}
-					didUpdate = true
-				}
+		if (currentId instanceof ServerGeneratedUuid) {
+			if (newId === undefined) {
+				idToChangeTo = new UnpersistedEntityDummyId()
+			} else if (currentId.value !== newId.value) {
+				idToChangeTo = newId
 			}
+		} else if (currentId instanceof ClientGeneratedUuid) {
+			idToChangeTo = newId ?? new UnpersistedEntityDummyId()
+		} else if (currentId instanceof UnpersistedEntityDummyId) {
+			if (newId) {
+				idToChangeTo = newId
+			}
+		} else {
+			return assertNever(currentId)
 		}
-
-		if (didUpdate) {
-			state.hasStaleAccessor = true
-			state.hasPendingUpdate = true
+		if (idToChangeTo) {
+			OperationsHelpers.changeRealmId(this.treeStore, this.eventManager, this.stateInitializer, realm, idToChangeTo)
 		}
-		return didUpdate
 	}
 
-	private updateEntityListPersistedData(
-		alreadyProcessed: AlreadyProcessed,
-		state: EntityListState,
-		completeMarkersContainer: EntityFieldMarkersContainer | undefined,
-		newMarkersContainer: EntityFieldMarkersContainer,
-		newPersistedData: Set<string>,
-	): boolean {
-		let didUpdate = false
-		const unaccountedForChildren = new Map(state.children)
+	private updateEntityRealmPersistedData(realm: EntityRealmState) {
+		const realmId = realm.entity.id
+		const persistedData = realmId.existsOnServer ? this.treeStore.persistedEntityData.get(realmId.value) : undefined
 
-		let haveSameKeySets = state.children.size === newPersistedData.size
+		for (const [placeholderName, child] of realm.children) {
+			const childData = persistedData?.get(placeholderName)
 
-		if (haveSameKeySets) {
-			const newKeyIterator = newPersistedData[Symbol.iterator]()
-			for (const [oldKey] of state.children) {
-				if (!newPersistedData.has(oldKey)) {
-					haveSameKeySets = false
+			switch (child.type) {
+				case StateType.Field: {
+					if (childData instanceof ServerGeneratedUuid || childData instanceof Set) {
+						continue
+					}
+
+					if (child.persistedValue !== childData) {
+						// TODO this doesn't handle literals
+						const shouldChangeBothValues = child.persistedValue === child.value
+
+						child.persistedValue = childData
+						if (shouldChangeBothValues) {
+							child.value = childData ?? null
+						}
+						this.eventManager.registerJustUpdated(child, EventManager.NO_CHANGES_DIFFERENCE)
+					}
 					break
 				}
-				// We also check the order
-				const newKeyResult = newKeyIterator.next()
-				if (!newKeyResult.done && newKeyResult.value !== oldKey) {
-					haveSameKeySets = false
+				case StateType.EntityRealm:
+				case StateType.EntityRealmStub: {
+					if (!(childData instanceof ServerGeneratedUuid) && childData !== undefined) {
+						continue
+					}
+					this.updateRealmIdIfNecessary(child, childData)
+					if (child.type === StateType.EntityRealm) {
+						this.updateEntityRealmPersistedData(child)
+					}
 					break
+				}
+				case StateType.EntityList: {
+					if (childData !== undefined && !(childData instanceof Set)) {
+						continue
+					}
+					this.updateEntityListPersistedData(child, childData ?? new Set()) // TODO!!
+					break
+				}
+				default: {
+					return assertNever(child)
 				}
 			}
 		}
-		if (!haveSameKeySets) {
-			didUpdate = true
+	}
+
+	private updateEntityListPersistedData(state: EntityListState, newPersistedIds: EntityListPersistedData) {
+		const persistedWithoutState: EntityId[] = []
+
+		// TODO This isn't particularly efficient. We should probably use something like diff-sequence here.
+
+		for (const persistedId of newPersistedIds) {
+			if (!state.children.has(persistedId)) {
+				persistedWithoutState.push(persistedId)
+			}
 		}
-
-		const initialData: Set<string | undefined> =
-			newPersistedData.size > 0
-				? newPersistedData
-				: new Set(Array.from({ length: state.creationParameters.initialEntityCount }))
-
-		const mergedContainer = completeMarkersContainer
-			? MarkerMerger.mergeEntityFieldsContainers(completeMarkersContainer, newMarkersContainer)
-			: newMarkersContainer
-		// TODO also update other init params.
-		state.markersContainer = mergedContainer
-		state.persistedEntityIds = newPersistedData
-
-		state.children.clear() // Preserving the reference!
-
-		// TODO instead of calling initializeEntityState we might be able to perform some Longest Common Subsequence
-		// 	wizardry and match the id sets in order to convert the unpersisted
-		for (const newPersistedId of initialData) {
-			if (newPersistedId === undefined) {
-				// This already ads the stub to the children map.
-				this.stateInitializer.initializeListEntityStub(state, newPersistedId)
-				didUpdate = true
-			} else {
-				let didChildUpdate = false
-				let childState = unaccountedForChildren.get(newPersistedId)
-
-				if (childState === undefined) {
-					// It wasn't connected before but that doesn't mean that it hasn't been loaded so we check the entity store.
-					childState = this.treeStore.entityStore.get(newPersistedId)
-
-					if (childState === undefined) {
-						// This already adds it to the children set so we're technically overwriting it but it doesn't matter.
-						childState = this.stateInitializer.initializeListEntityStub(state, newPersistedId)
-					} else if (childState.type === StateType.Entity) {
-						didChildUpdate = this.updateSingleEntityPersistedData(
-							alreadyProcessed,
-							state,
-							newPersistedId,
-							childState,
-							completeMarkersContainer,
-							newMarkersContainer,
-							new ServerGeneratedUuid(newPersistedId),
-						)
-					} else {
-						assertNever(childState)
-					}
-				} else if (childState.type === StateType.Entity) {
-					didChildUpdate = this.updateSingleEntityPersistedData(
-						alreadyProcessed,
-						state,
-						newPersistedId,
-						childState,
-						completeMarkersContainer,
-						newMarkersContainer,
-						new ServerGeneratedUuid(newPersistedId),
+		for (const [stateId, child] of state.children) {
+			const childRuntimeId = child.entity.id
+			if (!newPersistedIds.has(stateId)) {
+				if (
+					// It's a uuid but it's not among the persisted so either it got deleted/disconnected or the client-side
+					// id generation didn't quite pan out.
+					childRuntimeId instanceof ServerGeneratedUuid ||
+					childRuntimeId instanceof ClientGeneratedUuid ||
+					// No persisted entity id to allocate to this so that's a goodbye.
+					persistedWithoutState.length === 0
+				) {
+					state.getAccessor().disconnectEntity(child.getAccessor())
+					continue
+				} else {
+					const drawnId = persistedWithoutState.shift()!
+					OperationsHelpers.changeRealmId(
+						this.treeStore,
+						this.eventManager,
+						this.stateInitializer,
+						child,
+						new ServerGeneratedUuid(drawnId),
 					)
-				} else if (childState.type === StateType.EntityStub) {
-					const realmsByKey = childState.realms.get(state)
-					assert(realmsByKey !== undefined)
-					const realm = realmsByKey.get(newPersistedId)
-					assert(realm !== undefined)
-					realm.markersContainer = mergedContainer
-					didChildUpdate = true
 				}
-
-				unaccountedForChildren.delete(newPersistedId)
-				state.children.set(newPersistedId, childState)
-				if (didChildUpdate) {
-					didUpdate = true
-					if (state.childrenWithPendingUpdates === undefined) {
-						state.childrenWithPendingUpdates = new Set()
-					}
-					if (childState.type === StateType.Entity) {
-						state.childrenWithPendingUpdates.add(childState)
-					}
-				}
+			} else if (childRuntimeId instanceof ClientGeneratedUuid) {
+				OperationsHelpers.changeRealmId(
+					this.treeStore,
+					this.eventManager,
+					this.stateInitializer,
+					child,
+					new ServerGeneratedUuid(childRuntimeId.value),
+				)
+			}
+			if (child.type === StateType.EntityRealm) {
+				this.updateEntityRealmPersistedData(child)
 			}
 		}
-
-		if (unaccountedForChildren.size) {
-			didUpdate = true
-			// TODO this should be WAY MORE thorough.
-			for (const [key, child] of unaccountedForChildren) {
-				state.plannedRemovals?.delete(child)
-
-				if (child.type === StateType.Entity) {
-					state.childrenWithPendingUpdates?.delete(child)
-				}
-
-				child.realms.delete(state)
-				if (!child.realms.size) {
-					state.children.delete(key)
-				}
-			}
+		for (const unclaimedPersistedId of persistedWithoutState) {
+			this.stateInitializer.initializeEntityRealm(new ServerGeneratedUuid(unclaimedPersistedId), state.entityName, {
+				type: 'listEntity',
+				parent: state,
+			})
 		}
-
-		if (didUpdate) {
-			state.hasStaleAccessor = true
-			state.hasPendingUpdate = true
-		}
-		return didUpdate
+		// All that remains now is the order.
+		state.children.changeKeyOrder(newPersistedIds)
 	}
 }

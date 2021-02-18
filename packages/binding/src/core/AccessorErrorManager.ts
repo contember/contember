@@ -2,7 +2,7 @@ import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { EventManager } from './EventManager'
-import { EntityListState, EntityState, StateNode, StateType } from './state'
+import { EntityListState, EntityRealmState, getEntityMarker, StateNode, StateType } from './state'
 import { TreeStore } from './TreeStore'
 
 export class AccessorErrorManager {
@@ -21,49 +21,56 @@ export class AccessorErrorManager {
 	}
 
 	public clearErrors() {
-		for (const [stateNode] of this.errorsByState) {
-			stateNode.errors = undefined
-			this.triggerUpdate(stateNode)
-		}
-		this.errorsByState.clear()
+		this.eventManager.syncOperation(() => {
+			for (const [stateNode] of this.errorsByState) {
+				stateNode.errors = undefined
+				this.eventManager.registerJustUpdated(stateNode, EventManager.NO_CHANGES_DIFFERENCE)
+			}
+			this.errorsByState.clear()
+		})
 	}
 
-	public replaceErrors(data: MutationDataResponse | undefined) {
-		this.clearErrors()
+	public replaceErrors(data: MutationDataResponse) {
+		this.eventManager.syncOperation(() => {
+			this.clearErrors()
 
-		const preprocessor = new ErrorsPreprocessor(data)
-		const errorTreeRoot = preprocessor.preprocess()
+			const preprocessor = new ErrorsPreprocessor(data)
+			const errorTreeRoot = preprocessor.preprocess()
 
-		this.setRootStateErrors(errorTreeRoot)
+			this.setRootStateErrors(errorTreeRoot)
 
-		this.dumpErrorData(data)
+			this.dumpErrorData(data)
+		})
 	}
 
 	public addError(state: StateNode, error: ErrorAccessor.BoxedError): () => void {
-		const errorId = this.getNewErrorId()
+		return this.eventManager.syncOperation(() => {
+			const errorId = this.getNewErrorId()
 
-		let errorsById: ErrorAccessor.ErrorsById | undefined = this.errorsByState.get(state)
-		if (errorsById === undefined) {
-			this.errorsByState.set(state, (errorsById = new Map()))
-		}
-		errorsById.set(errorId, error)
-		state.errors = new ErrorAccessor(errorsById)
-		this.triggerUpdate(state)
-
-		return () => {
-			const errorsById = this.errorsByState.get(state)
+			let errorsById: ErrorAccessor.ErrorsById | undefined = this.errorsByState.get(state)
 			if (errorsById === undefined) {
-				return
+				this.errorsByState.set(state, (errorsById = new Map()))
 			}
-			errorsById.delete(errorId)
-			if (errorsById.size) {
-				state.errors = new ErrorAccessor(errorsById)
-			} else {
-				state.errors = undefined
-				this.errorsByState.delete(state)
-			}
-			this.triggerUpdate(state)
-		}
+			errorsById.set(errorId, error)
+			state.errors = new ErrorAccessor(errorsById)
+			this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
+
+			return () =>
+				this.eventManager.syncOperation(() => {
+					const errorsById = this.errorsByState.get(state)
+					if (errorsById === undefined) {
+						return
+					}
+					errorsById.delete(errorId)
+					if (errorsById.size) {
+						state.errors = new ErrorAccessor(errorsById)
+					} else {
+						state.errors = undefined
+						this.errorsByState.delete(state)
+					}
+					this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
+				})
+		})
 	}
 
 	private addSeveralErrors(state: StateNode, errors: ErrorsPreprocessor.BaseErrorNode) {
@@ -80,27 +87,29 @@ export class AccessorErrorManager {
 	}
 
 	private setRootStateErrors(errorTreeRoot: ErrorsPreprocessor.ErrorTreeRoot) {
-		for (const [subTreePlaceholder, rootError] of errorTreeRoot) {
-			const rootState = this.treeStore.subTreeStates.get(subTreePlaceholder)
+		for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {
+			for (const [subTreePlaceholder, rootError] of errorTreeRoot) {
+				const rootState = rootStates.get(subTreePlaceholder)
 
-			if (!rootState) {
-				continue
-			}
-			switch (rootState.type) {
-				case StateType.Entity: {
-					this.setEntityStateErrors(rootState, rootError)
-					break
+				if (!rootState) {
+					continue
 				}
-				case StateType.EntityList: {
-					this.setEntityListStateErrors(rootState, rootError)
-					break
+				switch (rootState.type) {
+					case StateType.EntityRealm: {
+						this.setEntityStateErrors(rootState, rootError)
+						break
+					}
+					case StateType.EntityList: {
+						this.setEntityListStateErrors(rootState, rootError)
+						break
+					}
 				}
 			}
 		}
 	}
 
 	private setEntityStateErrors(
-		state: EntityState,
+		state: EntityRealmState,
 		errors: ErrorsPreprocessor.ErrorINode | ErrorsPreprocessor.LeafErrorNode,
 	) {
 		this.addSeveralErrors(state, errors)
@@ -109,23 +118,19 @@ export class AccessorErrorManager {
 			return
 		}
 
-		if (state.childrenWithPendingUpdates === undefined) {
-			state.childrenWithPendingUpdates = new Set()
-		}
-
 		for (const [childKey, child] of errors.children) {
 			if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
 				const fieldState = state.children.get(childKey)
 
 				if (fieldState?.type === StateType.Field) {
-					state.childrenWithPendingUpdates.add(fieldState)
 					this.addSeveralErrors(fieldState, child)
 					continue
 				}
 			}
 			// Deliberately letting flow get here as well. Leaf errors *CAN* refer to relations as well.
 
-			const placeholders = state.combinedMarkersContainer.placeholders.get(childKey)
+			const fields = getEntityMarker(state).fields
+			const placeholders = fields.placeholders.get(childKey)
 			if (placeholders === undefined) {
 				continue
 			}
@@ -137,12 +142,10 @@ export class AccessorErrorManager {
 					continue
 				}
 				switch (fieldState.type) {
-					case StateType.Entity:
-						state.childrenWithPendingUpdates.add(fieldState)
+					case StateType.EntityRealm:
 						this.setEntityStateErrors(fieldState, child)
 						break
 					case StateType.EntityList:
-						state.childrenWithPendingUpdates.add(fieldState)
 						this.setEntityListStateErrors(fieldState, child)
 						break
 				}
@@ -160,26 +163,24 @@ export class AccessorErrorManager {
 			return
 		}
 
-		if (state.childrenWithPendingUpdates === undefined) {
-			state.childrenWithPendingUpdates = new Set()
-		}
-
 		for (const [childKey, childError] of errors.children) {
-			const childState = this.treeStore.entityStore.get(childKey)
-			// TODO this will fail when the error points to an entity stub since stubs aren't present in the entity store.
+			let childState = state.children.get(childKey)
 
-			if (childState && childError.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
-				state.childrenWithPendingUpdates.add(childState)
-				this.setEntityStateErrors(childState, childError)
+			if (childState === undefined) {
+				continue
+			}
+			if (childState.type === StateType.EntityRealmStub) {
+				childState.getAccessor() // Force init
+				childState = state.children.get(childKey)!
+			}
+
+			if (childError.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
+				this.setEntityStateErrors(childState as EntityRealmState, childError)
 			}
 		}
 	}
 
-	private dumpErrorData(data: MutationDataResponse | undefined) {
-		if (!data) {
-			return
-		}
-
+	private dumpErrorData(data: MutationDataResponse) {
 		// TODO this is just temporary
 		for (const subTreePlaceholder in data) {
 			const treeDatum = data[subTreePlaceholder]
@@ -211,11 +212,5 @@ export class AccessorErrorManager {
 				console.error(treeDatum.errorMessage)
 			}
 		}
-	}
-
-	private triggerUpdate(stateNode: StateNode) {
-		stateNode.hasStaleAccessor = true
-		stateNode.hasPendingUpdate = true
-		this.eventManager.notifyParents(stateNode)
 	}
 }

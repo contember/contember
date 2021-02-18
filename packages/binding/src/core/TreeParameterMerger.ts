@@ -1,12 +1,7 @@
 import { GraphQlBuilder } from '@contember/client'
 import { BindingError } from '../BindingError'
-import { SubTreeMarkerParameters } from '../markers'
 import {
 	Alias,
-	BoxedQualifiedEntityList,
-	BoxedQualifiedSingleEntity,
-	BoxedUnconstrainedQualifiedEntityList,
-	BoxedUnconstrainedQualifiedSingleEntity,
 	EntityCreationParameters,
 	EntityListEventListeners,
 	ExpectedQualifiedEntityMutation,
@@ -14,8 +9,12 @@ import {
 	FieldName,
 	HasManyRelation,
 	HasOneRelation,
+	QualifiedEntityList,
+	QualifiedSingleEntity,
 	SetOnCreate,
 	SingleEntityEventListeners,
+	UnconstrainedQualifiedEntityList,
+	UnconstrainedQualifiedSingleEntity,
 	UniqueWhere,
 } from '../treeParameters'
 
@@ -34,7 +33,7 @@ export class TreeParameterMerger {
 			expectedMutation: this.mergeExpectedRelationMutation(original.expectedMutation, fresh.expectedMutation),
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
-			forceCreation: original.forceCreation || fresh.forceCreation,
+			// forceCreation: original.forceCreation || fresh.forceCreation,
 			eventListeners: this.mergeSingleEntityEventListeners(original.eventListeners, fresh.eventListeners),
 		}
 	}
@@ -60,116 +59,98 @@ export class TreeParameterMerger {
 			// Not encoded within the placeholder
 			expectedMutation: this.mergeExpectedRelationMutation(original.expectedMutation, fresh.expectedMutation),
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
-			forceCreation: original.forceCreation || fresh.forceCreation,
+			// forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
 			eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
 		}
 	}
 
-	public static mergeSubTreeParametersWithSamePlaceholders(
-		original: SubTreeMarkerParameters,
-		fresh: SubTreeMarkerParameters,
-	): SubTreeMarkerParameters {
-		if (original instanceof BoxedQualifiedSingleEntity && fresh instanceof BoxedQualifiedSingleEntity) {
-			return new BoxedQualifiedSingleEntity({
+	public static mergeEntitySubTreeParametersWithSamePlaceholders(
+		original: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity,
+		fresh: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity,
+	): QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity {
+		if (original.isCreating) {
+			return {
 				// Encoded within the placeholder
-				where: original.value.where,
-				entityName: original.value.entityName,
-				filter: original.value.filter,
+				isCreating: original.isCreating,
+				entityName: original.entityName,
 
 				// Not encoded within the placeholder
-				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
-				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
-				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
-				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
-					original.value.expectedMutation,
-					fresh.value.expectedMutation,
-				),
-				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
-				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: this.mergeSingleEntityEventListeners(original.value.eventListeners, fresh.value.eventListeners),
-			})
-		}
-		if (original instanceof BoxedQualifiedEntityList && fresh instanceof BoxedQualifiedEntityList) {
-			if (original.value.initialEntityCount !== fresh.value.initialEntityCount) {
-				throw new BindingError(
-					`Detected sub trees of the same entity '${original.value.entityName}' with different preferred initial ` +
-						`entity counts: '${original.value.initialEntityCount}' and '${fresh.value.initialEntityCount}' respectively.`,
-				)
+				alias: this.mergeSubTreeAliases(original.alias, fresh.alias),
+				setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
+				// forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
+				isNonbearing: original.isNonbearing && fresh.isNonbearing,
+				hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
+				eventListeners: this.mergeSingleEntityEventListeners(original.eventListeners, fresh.eventListeners),
 			}
-			return new BoxedQualifiedEntityList({
+		}
+		return {
+			// Encoded within the placeholder
+			isCreating: original.isCreating,
+			where: original.where,
+			entityName: original.entityName,
+			filter: original.filter,
+
+			// Not encoded within the placeholder
+			alias: this.mergeSubTreeAliases(original.alias, fresh.alias),
+			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
+			// forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+			expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
+			isNonbearing: original.isNonbearing && fresh.isNonbearing,
+			hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
+			eventListeners: this.mergeSingleEntityEventListeners(original.eventListeners, fresh.eventListeners),
+		}
+	}
+
+	public static mergeEntityListSubTreeParametersWithSamePlaceholders(
+		original: QualifiedEntityList | UnconstrainedQualifiedEntityList,
+		fresh: QualifiedEntityList | UnconstrainedQualifiedEntityList,
+	): QualifiedEntityList | UnconstrainedQualifiedEntityList {
+		if (original.initialEntityCount !== fresh.initialEntityCount) {
+			throw new BindingError(
+				`Detected sub trees of the same entity '${original.entityName}' with different preferred initial ` +
+					`entity counts: '${original.initialEntityCount}' and '${fresh.initialEntityCount}' respectively.`,
+			)
+		}
+
+		if (original.isCreating) {
+			return {
 				// Encoded within the placeholder
-				entityName: original.value.entityName,
-				filter: original.value.filter,
-				orderBy: original.value.orderBy,
-				offset: original.value.offset,
-				limit: original.value.limit,
+				isCreating: original.isCreating,
+				entityName: original.entityName,
 
 				// Not encoded within the placeholder
-				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
-				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
-				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
-				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
-					original.value.expectedMutation,
-					fresh.value.expectedMutation,
-				),
-				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
-				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: this.mergeEntityListEventListeners(original.value.eventListeners, fresh.value.eventListeners),
-				initialEntityCount: original.value.initialEntityCount, // Handled above
-			})
-		}
-		if (
-			original instanceof BoxedUnconstrainedQualifiedSingleEntity &&
-			fresh instanceof BoxedUnconstrainedQualifiedSingleEntity
-		) {
-			return new BoxedUnconstrainedQualifiedSingleEntity({
-				// Encoded within the placeholder
-				entityName: original.value.entityName,
-
-				// Not encoded within the placeholder
-				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
-				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
-				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
-				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
-					original.value.expectedMutation,
-					fresh.value.expectedMutation,
-				),
-				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
-				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: this.mergeSingleEntityEventListeners(original.value.eventListeners, fresh.value.eventListeners),
-			})
-		}
-		if (
-			original instanceof BoxedUnconstrainedQualifiedEntityList &&
-			fresh instanceof BoxedUnconstrainedQualifiedEntityList
-		) {
-			if (original.value.initialEntityCount !== fresh.value.initialEntityCount) {
-				throw new BindingError(
-					`Detected sub trees of the same entity '${original.value.entityName}' with different preferred initial ` +
-						`entity counts: '${original.value.initialEntityCount}' and '${fresh.value.initialEntityCount}' respectively.`,
-				)
+				alias: this.mergeSubTreeAliases(original.alias, fresh.alias),
+				setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
+				// forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+				expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
+				isNonbearing: original.isNonbearing && fresh.isNonbearing,
+				hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
+				eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
+				initialEntityCount: original.initialEntityCount, // Handled above
 			}
-			return new BoxedUnconstrainedQualifiedEntityList({
-				// Encoded within the placeholder
-				entityName: original.value.entityName,
-
-				// Not encoded within the placeholder
-				alias: this.mergeSubTreeAliases(original.value.alias, fresh.value.alias),
-				setOnCreate: this.mergeSetOnCreate(original.value.setOnCreate, fresh.value.setOnCreate),
-				forceCreation: original.value.forceCreation || fresh.value.forceCreation,
-				expectedMutation: this.mergeExpectedQualifiedEntityMutation(
-					original.value.expectedMutation,
-					fresh.value.expectedMutation,
-				),
-				isNonbearing: original.value.isNonbearing && fresh.value.isNonbearing,
-				hasOneRelationPath: original.value.hasOneRelationPath, // TODO this is completely wrong.
-				eventListeners: this.mergeEntityListEventListeners(original.value.eventListeners, fresh.value.eventListeners),
-				initialEntityCount: original.value.initialEntityCount, // Handled above
-			})
 		}
-		throw new BindingError()
+		return {
+			// Encoded within the placeholder
+			isCreating: original.isCreating,
+			entityName: original.entityName,
+			filter: original.filter,
+			orderBy: original.orderBy,
+			offset: original.offset,
+			limit: original.limit,
+
+			// Not encoded within the placeholder
+			alias: this.mergeSubTreeAliases(original.alias, fresh.alias),
+			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
+			// forceCreation: original.value.forceCreation || fresh.value.forceCreation,
+			expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
+			isNonbearing: original.isNonbearing && fresh.isNonbearing,
+			hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
+			eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
+			initialEntityCount: original.initialEntityCount, // Handled above
+		}
 	}
 
 	public static mergeEntityCreationParameters(
@@ -177,7 +158,7 @@ export class TreeParameterMerger {
 		fresh: EntityCreationParameters,
 	): EntityCreationParameters {
 		return {
-			forceCreation: original.forceCreation || fresh.forceCreation,
+			// forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			setOnCreate: this.mergeSetOnCreate(original.setOnCreate, fresh.setOnCreate),
 		}

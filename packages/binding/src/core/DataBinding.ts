@@ -11,6 +11,7 @@ import {
 import {
 	metadataToRequestError,
 	MutationErrorType,
+	MutationRequestResponse,
 	PersistResultSuccessType,
 	QueryRequestResponse,
 	RequestError,
@@ -18,14 +19,16 @@ import {
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
-import { MarkerTreeRoot, PlaceholderGenerator, SubTreeMarkerParameters } from '../markers'
+import { MarkerTreeRoot } from '../markers'
 import {
 	Alias,
-	BoxedQualifiedEntityList,
-	BoxedQualifiedSingleEntity,
-	BoxedUnconstrainedQualifiedEntityList,
-	BoxedUnconstrainedQualifiedSingleEntity,
+	SugaredQualifiedEntityList,
+	SugaredQualifiedSingleEntity,
+	SugaredUnconstrainedQualifiedEntityList,
+	SugaredUnconstrainedQualifiedSingleEntity,
+	TreeRootId,
 } from '../treeParameters'
+import { assertNever, generateEnumerabilityPreventingEntropy } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
@@ -33,20 +36,22 @@ import { EventManager } from './EventManager'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
-import { RootStateNode, StateType } from './state'
+import { Schema, SchemaLoader, SchemaValidator } from './schema'
+import { StateIterator, StateType } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
 
 export class DataBinding {
+	private static readonly schemaLoadCache: Map<string, Schema | Promise<Schema>> = new Map()
+
 	private readonly accessorErrorManager: AccessorErrorManager
 	private readonly config: Config
 	private readonly dirtinessTracker: DirtinessTracker
 	private readonly eventManager: EventManager
 	private readonly stateInitializer: StateInitializer
 	private readonly treeAugmenter: TreeAugmenter
-	private readonly treeFilterGenerator: TreeFilterGenerator
 	private readonly treeStore: TreeStore
 
 	// private treeRootListeners: {
@@ -63,14 +68,12 @@ export class DataBinding {
 	) {
 		this.config = new Config()
 		this.treeStore = new TreeStore()
-		this.treeFilterGenerator = new TreeFilterGenerator(this.treeStore)
 		this.dirtinessTracker = new DirtinessTracker()
 		this.eventManager = new EventManager(
 			this.bindingOperations,
 			this.config,
 			this.dirtinessTracker,
-			this.onError,
-			this.onUpdate,
+			this.resolvedOnUpdate,
 			this.treeStore,
 		)
 		this.accessorErrorManager = new AccessorErrorManager(this.eventManager, this.treeStore)
@@ -78,66 +81,42 @@ export class DataBinding {
 			this.accessorErrorManager,
 			this.bindingOperations,
 			this.config,
-			this.dirtinessTracker,
 			this.eventManager,
 			this.treeStore,
 		)
 		this.treeAugmenter = new TreeAugmenter(this.eventManager, this.stateInitializer, this.treeStore)
 	}
 
-	private readonly bindingOperations = Object.freeze<BindingOperations>({
-		hasEntityKey: key => {
-			return this.treeStore.entityStore.has(key)
-		},
-		hasSubTree: aliasOrParameters => {
-			if (typeof aliasOrParameters === 'string') {
-				return this.treeStore.markerTree.placeholdersByAliases.has(aliasOrParameters)
-			}
-			return this.treeStore.markerTree.subTrees.has(PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters))
-		},
-		getAllEntities: (treeStore => {
-			return function* (): Generator<EntityAccessor> {
-				for (const [, entity] of treeStore.entityStore) {
-					yield entity.getAccessor()
-				}
-			}
-		})(this.treeStore),
-		getEntityByKey: (key: string) => {
-			const entity = this.treeStore.entityStore.get(key)
+	private resolvedOnUpdate = (isMutating: boolean) => {
+		this.onUpdate(new TreeRootAccessor(this.dirtinessTracker.hasChanges(), isMutating, this.bindingOperations))
+	}
 
-			if (entity === undefined) {
+	private readonly bindingOperations = Object.freeze<BindingOperations>({
+		getEntityByKey: key => {
+			const realm = this.treeStore.entityRealmStore.get(key)
+
+			if (realm === undefined) {
 				throw new BindingError(`Trying to retrieve a non-existent entity: key '${key}' was not found.`)
 			}
-			return entity.getAccessor()
+			return realm.getAccessor()
 		},
 		getEntityListSubTree: (
-			aliasOrParameters: Alias | BoxedQualifiedEntityList | BoxedUnconstrainedQualifiedEntityList,
+			aliasOrParameters: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList,
+			treeId: TreeRootId | undefined,
+			environment = this.environment,
 		): EntityListAccessor => {
-			const subTreeState = this.getSubTreeState(aliasOrParameters)
-			const accessor = subTreeState.getAccessor()
-			if (!(accessor instanceof EntityListAccessor)) {
-				throw new BindingError(
-					`Trying to retrieve an entity list sub-tree but resolves to a single entity.\n` +
-						`Perhaps you meant to use 'getEntitySubTree'?`,
-				)
-			}
-			return accessor
+			return this.treeStore.getSubTreeState('entityList', treeId, aliasOrParameters, environment).getAccessor()
 		},
 		getEntitySubTree: (
-			aliasOrParameters: Alias | BoxedQualifiedSingleEntity | BoxedUnconstrainedQualifiedSingleEntity,
+			aliasOrParameters: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,
+			treeId: TreeRootId | undefined,
+			environment = this.environment,
 		): EntityAccessor => {
-			const subTreeState = this.getSubTreeState(aliasOrParameters)
-			const accessor = subTreeState.getAccessor()
-			if (!(accessor instanceof EntityAccessor)) {
-				throw new BindingError(
-					`Trying to retrieve an entity sub-tree but resolves to an entity list.\n` +
-						`Perhaps you meant to use 'getEntityListSubTree'?`,
-				)
-			}
-			return accessor
+			return this.treeStore.getSubTreeState('entity', treeId, aliasOrParameters, environment).getAccessor()
 		},
 		getTreeFilters: (): TreeFilter[] => {
-			return this.treeFilterGenerator.generateTreeFilter()
+			const generator = new TreeFilterGenerator(this.treeStore)
+			return generator.generateTreeFilter()
 		},
 		batchDeferredUpdates: performUpdates => {
 			this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
@@ -150,7 +129,6 @@ export class DataBinding {
 				}
 			}
 			return await this.eventManager.persistOperation(async () => {
-				let successfulResult: SuccessfulPersistResult | undefined = undefined
 				for (let attemptNumber = 1; attemptNumber <= this.config.getValue('maxPersistAttempts'); attemptNumber++) {
 					// TODO if the tree is in an inconsistent state, wait for lock releases
 
@@ -193,22 +171,37 @@ export class DataBinding {
 						}
 					}
 
-					const mutationResponse = await this.client.sendRequest(mutation, { signal })
-					const normalizedMutationResponse = mutationResponse.data === null ? {} : mutationResponse.data
-					const aliases = Object.keys(normalizedMutationResponse)
-					const allSubMutationsOk = aliases.every(item => mutationResponse.data[item].ok)
+					const mutationResponse: MutationRequestResponse = await this.client.sendRequest(mutation, { signal })
+					const mutationData = mutationResponse.data?.transaction ?? {}
+					const aliases = Object.keys(mutationData)
+					const allSubMutationsOk = aliases.every(item => mutationData[item].ok)
 
 					if (allSubMutationsOk) {
-						const persistedEntityIds = aliases.map(alias => mutationResponse.data[alias].node.id)
-						successfulResult = {
+						const persistedEntityIds = aliases.map(alias => mutationData[alias].node.id)
+						const result: SuccessfulPersistResult = {
 							type: PersistResultSuccessType.JustSuccess,
 							persistedEntityIds,
 						}
 
-						this.eventManager.syncTransaction(() => this.accessorErrorManager.clearErrors())
-						break
+						this.eventManager.syncTransaction(() => {
+							this.resetTreeAfterSuccessfulPersist()
+							this.treeAugmenter.updatePersistedData(
+								Object.fromEntries(
+									Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
+										placeholderName,
+										subTreeResponse.node,
+									]),
+								),
+							)
+							this.eventManager.triggerOnPersistSuccess({
+								...this.bindingOperations,
+								successType: result.type,
+								unstable_persistedEntityIds: persistedEntityIds,
+							})
+						})
+						return result
 					} else {
-						this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationResponse.data))
+						this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData))
 						await this.eventManager.triggerOnPersistError(persistErrorOptions)
 						if (shouldTryAgain) {
 							if (proposedBackOffs.length) {
@@ -227,47 +220,9 @@ export class DataBinding {
 						}
 					}
 				}
-
-				if (successfulResult === undefined) {
-					// Max attempts exceeded
-					throw new BindingError() // TODO msg
-				}
-				const result = successfulResult
-				this.dirtinessTracker.reset()
-
-				// TODO do this cleanup somewhere else and in a less brittle fashion.
-				for (const [, entityState] of this.treeStore.entityStore) {
-					entityState.plannedHasOneDeletions = undefined
-					for (const [, child] of entityState.children) {
-						if (child.type === StateType.EntityList) {
-							child.plannedRemovals = undefined
-						} else if (child.type === StateType.Field) {
-							child.hasUnpersistedChanges = false
-						}
-					}
-				}
-
-				try {
-					const persistedData = await this.fetchPersistedData(this.treeStore.markerTree)
-					this.eventManager.syncOperation(() => {
-						this.treeAugmenter.augmentTree(this.treeStore.markerTree, persistedData)
-						this.eventManager.triggerOnPersistSuccess({
-							...this.bindingOperations,
-							successType: result.type,
-							unstable_persistedEntityIds: result.persistedEntityIds,
-						})
-					})
-					return successfulResult
-				} catch (e) {
-					this.eventManager.triggerOnPersistSuccess({
-						...this.bindingOperations,
-						successType: result.type,
-						unstable_persistedEntityIds: result.persistedEntityIds,
-					})
-
-					// This is rather tricky. Since the mutation went well, we don't care how the subsequent query goes as the
-					// data made it successfully to the server. Thus we'll just resolve from here no matter what.
-					return successfulResult
+				// Max attempts exceeded
+				throw {
+					type: MutationErrorType.GivenUp,
 				}
 			})
 		},
@@ -278,41 +233,53 @@ export class DataBinding {
 	// 	this.treeRootListeners,
 	// )
 
-	public async extendTree(newFragment: React.ReactNode, { signal }: ExtendTreeOptions = {}) {
+	public async extendTree(
+		newFragment: React.ReactNode,
+		{ signal, environment }: ExtendTreeOptions = {},
+	): Promise<TreeRootId | undefined> {
 		return await this.eventManager.asyncOperation(async () => {
 			if (signal?.aborted) {
 				return Promise.reject()
 			}
-			const newMarkerTree = new MarkerTreeGenerator(newFragment, this.environment).generate()
-			const newPersistedData = await this.fetchPersistedData(newMarkerTree, signal)
+			const newMarkerTree = new MarkerTreeGenerator(newFragment, environment ?? this.environment).generate()
+
+			const schemaOrPromise = this.getOrLoadSchema()
+
+			let newPersistedData: QueryRequestResponse | undefined
+
+			if (schemaOrPromise instanceof Promise) {
+				// We don't have a schema yet. We'll still optimistically fire the request so as to prevent a waterfall
+				// in the most likely case that things will go fine and the query matches the schema.
+				const newPersistedDataPromise = this.fetchPersistedData(newMarkerTree, signal)
+
+				const schema = await schemaOrPromise
+
+				this.treeStore.setSchema(schema)
+				if (__DEV_MODE__) {
+					SchemaValidator.assertTreeValid(schema, newMarkerTree)
+				}
+				newPersistedData = await newPersistedDataPromise
+			} else {
+				this.treeStore.setSchema(schemaOrPromise)
+				if (__DEV_MODE__) {
+					SchemaValidator.assertTreeValid(schemaOrPromise, newMarkerTree)
+				}
+				newPersistedData = await this.fetchPersistedData(newMarkerTree, signal)
+			}
 
 			if (signal?.aborted) {
 				return Promise.reject()
 			}
 
-			this.treeAugmenter.augmentTree(newMarkerTree, newPersistedData)
+			// TODO this is an awful, awful hack.
+			const newTreeRootId =
+				this.treeStore.markerTrees.size === 0
+					? undefined
+					: `treeRoot-${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
+			this.treeAugmenter.extendTree(newTreeRootId, newMarkerTree, newPersistedData?.data ?? {})
+
+			return newTreeRootId
 		})
-	}
-
-	private getSubTreeState(aliasOrParameters: Alias | SubTreeMarkerParameters): RootStateNode {
-		let placeholderName: string
-
-		if (typeof aliasOrParameters === 'string') {
-			const placeholderByAlias = this.treeStore.markerTree.placeholdersByAliases.get(aliasOrParameters)
-
-			if (placeholderByAlias === undefined) {
-				throw new BindingError(`Undefined sub-tree alias '${aliasOrParameters}'.`)
-			}
-			placeholderName = placeholderByAlias
-		} else {
-			placeholderName = PlaceholderGenerator.getSubTreeMarkerPlaceholder(aliasOrParameters)
-		}
-		const subTreeState = this.treeStore.subTreeStates.get(placeholderName)
-
-		if (subTreeState === undefined) {
-			throw new BindingError(`Trying to retrieve a non-existent sub-tree '${placeholderName}'.`)
-		}
-		return subTreeState
 	}
 
 	private async fetchPersistedData(
@@ -339,4 +306,53 @@ export class DataBinding {
 		}
 		return queryResponse
 	}
+
+	private resetTreeAfterSuccessfulPersist() {
+		this.eventManager.syncTransaction(() => {
+			this.accessorErrorManager.clearErrors()
+			this.dirtinessTracker.reset()
+
+			for (const [, rootState] of StateIterator.eachRootState(this.treeStore)) {
+				for (const state of StateIterator.depthFirstAllNodes(rootState)) {
+					switch (state.type) {
+						case StateType.Field: {
+							state.touchLog?.clear()
+							state.hasUnpersistedChanges = false
+							break
+						}
+						case StateType.EntityList:
+							state.unpersistedChangesCount = 0
+							state.plannedRemovals?.clear()
+							break
+						case StateType.EntityRealm: {
+							state.unpersistedChangesCount = 0
+							state.plannedHasOneDeletions?.clear()
+							break
+						}
+						default:
+							assertNever(state)
+					}
+				}
+			}
+		})
+	}
+
+	private getOrLoadSchema(): Schema | Promise<Schema> {
+		const existing = DataBinding.schemaLoadCache.get(this.client.apiUrl)
+		if (existing !== undefined) {
+			return existing
+		}
+
+		const schemaPromise = SchemaLoader.loadSchema(this.client, this.config.getValue('maxSchemaLoadAttempts'))
+		schemaPromise.then(schema => {
+			DataBinding.schemaLoadCache.set(this.client.apiUrl, schema)
+		})
+		DataBinding.schemaLoadCache.set(this.client.apiUrl, schemaPromise)
+		return schemaPromise
+	}
+
+	private static getNextTreeRootIdSeed = (() => {
+		let seed = 0
+		return () => seed++
+	})()
 }

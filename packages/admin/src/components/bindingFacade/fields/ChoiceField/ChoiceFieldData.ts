@@ -12,7 +12,7 @@ export namespace ChoiceFieldData {
 	export type ChoiceArity = 'single' | 'multiple'
 
 	export type StaticValue = FieldValue
-	export type DynamicValue = EntityAccessor['primaryKey']
+	export type DynamicValue = EntityAccessor['idOnServer']
 
 	// This is just the JS array index as specified in options or as returned from the server.
 	export type ValueRepresentation = number

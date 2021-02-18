@@ -3,14 +3,13 @@ import { useConstantValueInvariant } from '@contember/react-utils'
 import * as React from 'react'
 import { useAccessorUpdateSubscription, useEntitySubTreeParameters, useGetEntitySubTree } from '../accessorPropagation'
 import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
-import { NIL_UUID, PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory, QueryLanguage } from '../queryLanguage'
-import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
+import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity, TreeRootId } from '../treeParameters'
 import { Component } from './Component'
 import { Entity, EntityBaseProps } from './Entity'
 import { Field } from './Field'
-import { HasOne } from './HasOne'
 
 export interface EntitySubTreeAdditionalProps {
 	variables?: Environment.DeltaFactory
@@ -19,17 +18,10 @@ export interface EntitySubTreeAdditionalProps {
 export type EntitySubTreeAdditionalCreationProps = {} | SetOrderFieldOnCreateOwnProps
 
 export type EntitySubTreeProps<EntityProps> = {
+	treeRootId?: TreeRootId
 	children?: React.ReactNode
 } & EntitySubTreeAdditionalProps &
-	(
-		| ({
-				isCreating?: false
-		  } & SugaredQualifiedSingleEntity)
-		| ({
-				isCreating: true
-		  } & SugaredUnconstrainedQualifiedSingleEntity &
-				EntitySubTreeAdditionalCreationProps)
-	) &
+	(SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps)) &
 	(
 		| {}
 		| {
@@ -44,18 +36,20 @@ export const EntitySubTree = Component(
 
 		const getSubTree = useGetEntitySubTree()
 		const parameters = useEntitySubTreeParameters(props)
-		const getAccessor = React.useCallback(() => getSubTree(parameters), [getSubTree, parameters])
+		const getAccessor = React.useCallback(() => getSubTree(parameters, props.treeRootId), [
+			getSubTree,
+			parameters,
+			props.treeRootId,
+		])
 		const accessor = useAccessorUpdateSubscription(getAccessor)
 
-		return (
-			<Entity {...props} accessor={accessor}>
-				{parameters.value.hasOneRelationPath.length ? (
-					<HasOne field={parameters.value.hasOneRelationPath}>{props.children}</HasOne>
-				) : (
-					props.children
-				)}
-			</Entity>
-		)
+		// TODO revive top-level hasOneRelationPath
+		// {parameters.value.hasOneRelationPath.length ? (
+		// 	<HasOne field={parameters.value.hasOneRelationPath}>{props.children}</HasOne>
+		// ) : (
+		// 	props.children
+		// )}
+		return <Entity {...props} accessor={accessor} />
 	},
 	{
 		generateSubTreeMarker: (props, fields, environment) => {
@@ -68,7 +62,6 @@ export const EntitySubTree = Component(
 			<>
 				<Entity {...props} accessor={0 as any}>
 					<Field field={PRIMARY_KEY_NAME} />
-					<Field field={TYPENAME_KEY_NAME} />
 					{props.children}
 				</Entity>
 				{props.isCreating && 'orderField' in props && (

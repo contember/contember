@@ -1,7 +1,4 @@
-import { SubTreeMarkerParameters } from '../markers'
 import {
-	BoxedQualifiedEntityList,
-	BoxedQualifiedSingleEntity,
 	DesugaredHasManyRelation,
 	DesugaredHasOneRelation,
 	ExpectedEntityCount,
@@ -9,9 +6,12 @@ import {
 	HasManyRelation,
 	HasOneRelation,
 	OrderBy,
+	QualifiedEntityList,
+	QualifiedSingleEntity,
+	UnconstrainedQualifiedEntityList,
+	UnconstrainedQualifiedSingleEntity,
 	UniqueWhere,
 } from '../treeParameters'
-import { assertNever } from './assertNever'
 
 // TODO update hashing so that for offset, 0 == undefined
 export class Hashing {
@@ -39,30 +39,29 @@ export class Hashing {
 		return Hashing.hashArray(where)
 	}
 
-	public static hashMarkerTreeParameters(parameters: SubTreeMarkerParameters): number {
-		if (parameters.isConstrained) {
-			if (parameters instanceof BoxedQualifiedSingleEntity) {
-				return Hashing.hashArray([
-					parameters.type,
-					parameters.value.where,
-					parameters.value.entityName,
-					parameters.value.filter,
-				])
-			} else if (parameters instanceof BoxedQualifiedEntityList) {
-				const value = parameters.value
-				return Hashing.hashArray([
-					parameters.type,
-					value.entityName,
-					value.filter,
-					value.orderBy,
-					value.offset,
-					value.limit,
-				])
-			}
-		} else {
-			return Hashing.hashArray([parameters.type, parameters.value.entityName])
+	public static hashEntityListSubTreeParameters(
+		parameters: QualifiedEntityList | UnconstrainedQualifiedEntityList,
+	): number {
+		if (parameters.isCreating) {
+			return Hashing.hashArray([parameters.isCreating, parameters.entityName])
 		}
-		return assertNever(parameters)
+		return Hashing.hashArray([
+			parameters.isCreating,
+			parameters.entityName,
+			parameters.filter,
+			parameters.orderBy,
+			parameters.offset,
+			parameters.limit,
+		])
+	}
+
+	public static hashEntitySubTreeParameters(
+		parameters: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity,
+	): number {
+		if (parameters.isCreating) {
+			return Hashing.hashArray([parameters.isCreating, parameters.entityName])
+		}
+		return Hashing.hashArray([parameters.isCreating, parameters.where, parameters.entityName, parameters.filter])
 	}
 
 	private static hashArray(array: any[]): number {

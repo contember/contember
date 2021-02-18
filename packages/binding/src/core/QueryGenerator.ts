@@ -1,14 +1,14 @@
 import { CrudQueryBuilder } from '@contember/client'
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
+import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import {
 	EntityFieldMarkers,
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
-	SubTreeMarker,
 } from '../markers'
-import { BoxedQualifiedEntityList, BoxedQualifiedSingleEntity } from '../treeParameters'
 import { assertNever, ucfirst } from '../utils'
 
 type BaseQueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Mutations>
@@ -31,27 +31,31 @@ export class QueryGenerator {
 		}
 	}
 
-	private addSubQuery(subTree: SubTreeMarker, baseQueryBuilder: BaseQueryBuilder): BaseQueryBuilder {
-		switch (subTree.parameters.type) {
-			case 'qualifiedSingleEntity':
-				return this.addGetQuery(baseQueryBuilder, subTree as SubTreeMarker<BoxedQualifiedSingleEntity>)
-			case 'qualifiedEntityList':
-				return this.addListQuery(baseQueryBuilder, subTree as SubTreeMarker<BoxedQualifiedEntityList>)
-			case 'unconstrainedQualifiedSingleEntity':
-			case 'unconstrainedQualifiedEntityList':
-				// Unconstrained trees, by definition, don't have any queries.
-				return baseQueryBuilder
+	private addSubQuery(
+		subTree: EntitySubTreeMarker | EntityListSubTreeMarker,
+		baseQueryBuilder: BaseQueryBuilder,
+	): BaseQueryBuilder {
+		if (subTree.parameters.isCreating) {
+			// Unconstrained trees, by definition, don't have any queries.
+			return baseQueryBuilder
 		}
-		assertNever(subTree.parameters)
+
+		if (subTree instanceof EntityListSubTreeMarker) {
+			return this.addListQuery(baseQueryBuilder, subTree)
+		} else if (subTree instanceof EntitySubTreeMarker) {
+			return this.addGetQuery(baseQueryBuilder, subTree)
+		}
+
+		assertNever(subTree)
 	}
 
-	private addGetQuery(
-		baseQueryBuilder: BaseQueryBuilder,
-		subTree: SubTreeMarker<BoxedQualifiedSingleEntity>,
-	): BaseQueryBuilder {
-		const populatedListQueryBuilder = this.registerQueryPart(
+	private addGetQuery(baseQueryBuilder: BaseQueryBuilder, subTree: EntitySubTreeMarker): BaseQueryBuilder {
+		if (subTree.parameters.isCreating) {
+			return baseQueryBuilder
+		}
+		const populatedListQueryBuilder = QueryGenerator.registerQueryPart(
 			subTree.fields.markers,
-			CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.parameters.value.where),
+			CrudQueryBuilder.ReadBuilder.instantiate<CrudQueryBuilder.GetQueryArguments>().by(subTree.parameters.where),
 		)
 		return baseQueryBuilder.get(
 			subTree.entityName,
@@ -62,54 +66,60 @@ export class QueryGenerator {
 		)
 	}
 
-	private addListQuery(
-		baseQueryBuilder: BaseQueryBuilder,
-		subTree: SubTreeMarker<BoxedQualifiedEntityList>,
-	): BaseQueryBuilder {
+	private addListQuery(baseQueryBuilder: BaseQueryBuilder, subTree: EntityListSubTreeMarker): BaseQueryBuilder {
+		if (subTree.parameters.isCreating) {
+			return baseQueryBuilder
+		}
+
 		let finalBuilder: ReadBuilder
 
 		if (subTree.parameters) {
-			const parametersValue = subTree.parameters.value
+			const parameters = subTree.parameters
 			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter'
-			>> = parametersValue.filter
-				? CrudQueryBuilder.ReadBuilder.instantiate().filter(parametersValue.filter)
+			>> = parameters.filter
+				? CrudQueryBuilder.ReadBuilder.instantiate().filter(parameters.filter)
 				: CrudQueryBuilder.ReadBuilder.instantiate()
 
 			const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter' | 'orderBy'
-			>> = parametersValue.orderBy ? withFilter.orderBy(parametersValue.orderBy) : withFilter
+			>> = parameters.orderBy ? withFilter.orderBy(parameters.orderBy) : withFilter
 
 			const withOffset: CrudQueryBuilder.ReadBuilder.Builder<Exclude<
 				CrudQueryBuilder.ReadArguments,
 				'filter' | 'orderBy' | 'offset'
-			>> = parametersValue.offset === undefined ? withOrderBy : withOrderBy.offset(parametersValue.offset)
+			>> = parameters.offset === undefined ? withOrderBy : withOrderBy.offset(parameters.offset)
 
-			finalBuilder = parametersValue.limit === undefined ? withOffset : withOffset.limit(parametersValue.limit)
+			finalBuilder = parameters.limit === undefined ? withOffset : withOffset.limit(parameters.limit)
 		} else {
 			finalBuilder = CrudQueryBuilder.ReadBuilder.instantiate()
 		}
 
+		// const fullyPopulated = withAllParams
+		// 	.anyRelation('pageInfo', builder => builder.column('totalCount'))
+		// 	.anyRelation('edges', builder =>
+		// 		builder.anyRelation('node', builder => QueryGenerator.registerQueryPart(subTree.fields.markers, builder)),
+		// 	)
+
 		return baseQueryBuilder.list(
 			subTree.entityName,
-			this.registerQueryPart(subTree.fields.markers, finalBuilder),
+			QueryGenerator.registerQueryPart(subTree.fields.markers, finalBuilder),
 			subTree.placeholderName,
 		)
 	}
 
-	private registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): ReadBuilder {
+	public static registerQueryPart(fields: EntityFieldMarkers, builder: ReadBuilder): ReadBuilder {
 		builder = builder.column(PRIMARY_KEY_NAME)
-		builder = builder.column(TYPENAME_KEY_NAME)
 
 		for (const [, fieldValue] of fields) {
 			if (fieldValue instanceof FieldMarker) {
-				if (fieldValue.fieldName !== PRIMARY_KEY_NAME && fieldValue.fieldName !== TYPENAME_KEY_NAME) {
+				if (fieldValue.fieldName !== PRIMARY_KEY_NAME) {
 					builder = builder.column(fieldValue.fieldName)
 				}
 			} else if (fieldValue instanceof HasOneRelationMarker) {
-				const relation = fieldValue.relation
+				const relation = fieldValue.parameters
 				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
 					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
 				)
@@ -136,7 +146,7 @@ export class QueryGenerator {
 					)
 				}
 			} else if (fieldValue instanceof HasManyRelationMarker) {
-				const relation = fieldValue.relation
+				const relation = fieldValue.parameters
 				const builderWithBody = CrudQueryBuilder.ReadBuilder.instantiate(
 					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
 				)
@@ -163,7 +173,7 @@ export class QueryGenerator {
 					withLimit,
 					fieldValue.placeholderName === relation.field ? undefined : fieldValue.placeholderName,
 				)
-			} else if (fieldValue instanceof SubTreeMarker) {
+			} else if (fieldValue instanceof EntityListSubTreeMarker || fieldValue instanceof EntitySubTreeMarker) {
 				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {
 				assertNever(fieldValue)

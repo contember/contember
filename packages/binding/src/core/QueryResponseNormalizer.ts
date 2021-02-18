@@ -2,7 +2,7 @@ import {
 	EntityFieldPersistedData,
 	NormalizedQueryResponseData,
 	PersistedEntityDataStore,
-	QueryRequestResponse,
+	ReceivedDataTree,
 	ReceivedEntityData,
 	ReceivedFieldData,
 	ServerGeneratedUuid,
@@ -12,15 +12,11 @@ import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 
 export class QueryResponseNormalizer {
-	public static mergeInResponse(original: NormalizedQueryResponseData, response: QueryRequestResponse | undefined) {
-		if (response === undefined) {
-			return original
-		}
+	public static mergeInResponse(original: NormalizedQueryResponseData, newPersistedData: ReceivedDataTree) {
 		const { subTreeDataStore, persistedEntityDataStore } = original
-		const { data } = response
 
-		for (const treeId in data) {
-			const treeDatum = data[treeId]
+		for (const treeId in newPersistedData) {
+			const treeDatum = newPersistedData[treeId]
 
 			if (treeDatum === undefined || treeDatum === null) {
 				continue
@@ -87,11 +83,11 @@ export class QueryResponseNormalizer {
 
 			if (fromTarget === undefined) {
 				target.set(field, this.createFieldData(entityMap, newDatum))
-			} else if (fromTarget instanceof ServerGeneratedUuid) {
+			} else if (fromTarget instanceof ServerGeneratedUuid || (fromTarget === null && typeof newDatum === 'object')) {
 				if (newDatum === null) {
 					target.set(field, null)
 				} else if (typeof newDatum === 'object' && !Array.isArray(newDatum)) {
-					const target = entityMap.get(fromTarget.value)
+					const target = entityMap.get(newDatum[PRIMARY_KEY_NAME])
 					if (target === undefined) {
 						this.rejectData()
 					}

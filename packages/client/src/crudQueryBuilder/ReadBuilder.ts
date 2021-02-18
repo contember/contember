@@ -46,6 +46,14 @@ class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 		return this.instantiate<Exclude<AllowedArgs, 'limit'>>(this.objectBuilder.argument('limit', limit))
 	}
 
+	public skip(offset: number) {
+		return this.instantiate<Exclude<AllowedArgs, 'skip'>>(this.objectBuilder.argument('skip', offset))
+	}
+
+	public first(limit: number) {
+		return this.instantiate<Exclude<AllowedArgs, 'first'>>(this.objectBuilder.argument('first', limit))
+	}
+
 	public column(name: string) {
 		return this.instantiate<AllowedArgs>(this.objectBuilder.field(name))
 	}

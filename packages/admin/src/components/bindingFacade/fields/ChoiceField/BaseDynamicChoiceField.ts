@@ -1,5 +1,4 @@
 import {
-	BoxedQualifiedEntityList,
 	EntityAccessor,
 	Environment,
 	QualifiedEntityList,
@@ -7,6 +6,7 @@ import {
 	QueryLanguage,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
+	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 	useAccessorUpdateSubscription,
 	useEnvironment,
@@ -54,10 +54,10 @@ export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 
 export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldList | QualifiedEntityList) => {
 	const getSubTree = useGetEntityListSubTree()
-	const getSubTreeData = React.useCallback(() => getSubTree(new BoxedQualifiedEntityList(desugaredOptionPath)), [
+	const entityList = React.useMemo<SugaredQualifiedEntityList>(() => ({ entities: desugaredOptionPath }), [
 		desugaredOptionPath,
-		getSubTree,
 	])
+	const getSubTreeData = React.useCallback(() => getSubTree(entityList), [entityList, getSubTree])
 	const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
 	return React.useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
 }
@@ -67,12 +67,13 @@ export const useOptionEntities = (
 	desugaredOptionPath: QualifiedFieldList | QualifiedEntityList,
 ) =>
 	React.useMemo(() => {
+		const relativeEntity: SugaredRelativeSingleEntity = { field: desugaredOptionPath.hasOneRelationPath }
 		const entities: EntityAccessor[] = []
 		for (const entity of topLevelOptionAccessors) {
-			entities.push(entity.getRelativeSingleEntity(desugaredOptionPath))
+			entities.push(entity.getEntity(relativeEntity))
 		}
 		return entities
-	}, [desugaredOptionPath, topLevelOptionAccessors])
+	}, [desugaredOptionPath.hasOneRelationPath, topLevelOptionAccessors])
 
 export const useCurrentValues = (
 	currentlyChosenEntities: EntityAccessor[],
@@ -82,10 +83,10 @@ export const useCurrentValues = (
 		const values: ChoiceFieldData.ValueRepresentation[] = []
 
 		for (const entity of currentlyChosenEntities) {
-			const currentKey = entity.key
+			const currentId = entity.id
 			const index = topLevelOptionAccessors.findIndex((entity: EntityAccessor) => {
-				const key = entity.primaryKey
-				return !!key && key === currentKey
+				const id = entity.id
+				return !!id && id === currentId
 			})
 			if (index > -1) {
 				values.push(index)
@@ -137,7 +138,7 @@ export const useNormalizedOptions = (
 						key: i,
 						label,
 						searchKeywords,
-						actualValue: item.key,
+						actualValue: item.id,
 					}
 				},
 			),

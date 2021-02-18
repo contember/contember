@@ -1,5 +1,5 @@
+import { ObjectBuilder, QueryBuilder, RootObjectBuilder } from '../graphQlBuilder'
 import { isEmptyObject } from '../utils'
-import { QueryBuilder, RootObjectBuilder } from '../graphQlBuilder'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
 import { ReadBuilder } from './ReadBuilder'
 import {
@@ -10,6 +10,7 @@ import {
 	GetQueryArguments,
 	ListQueryArguments,
 	Mutations,
+	PaginateQueryArguments,
 	Queries,
 	UpdateMutationArguments,
 	UpdateMutationFields,
@@ -37,6 +38,23 @@ export class CrudQueryBuilder {
 			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
 		}
 		name = `list${name}`
+		query = ReadBuilder.instantiateFromFactory(query)
+
+		const [objectName, objectBuilder] =
+			typeof alias === 'string' ? [alias, query.objectBuilder.name(name)] : [name, query.objectBuilder]
+
+		return new CrudQueryBuilder('query', this.rootObjectBuilder.object(objectName, objectBuilder))
+	}
+
+	public paginate(
+		name: string,
+		query: ReadBuilder.BuilderFactory<PaginateQueryArguments>,
+		alias?: string,
+	): Omit<CrudQueryBuilder, Mutations> {
+		if (this.type === 'mutation') {
+			throw new CrudQueryBuilderError('Cannot combine queries and mutations')
+		}
+		name = `paginate${name}`
 		query = ReadBuilder.instantiateFromFactory(query)
 
 		const [objectName, objectBuilder] =
@@ -119,6 +137,20 @@ export class CrudQueryBuilder {
 			typeof alias === 'string' ? [alias, query.objectBuilder.name(name)] : [name, query.objectBuilder]
 
 		return new CrudQueryBuilder('mutation', this.rootObjectBuilder.object(objectName, objectBuilder))
+	}
+
+	public inTransaction(alias?: string): CrudQueryBuilder {
+		const name = 'transaction'
+		const [objectName, objectBuilder] =
+			typeof alias === 'string'
+				? [alias, new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }, undefined, undefined, name)]
+				: [name, new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects })]
+		return new CrudQueryBuilder(
+			this.type,
+			new RootObjectBuilder({
+				[objectName]: objectBuilder,
+			}),
+		)
 	}
 
 	getGql(): string {

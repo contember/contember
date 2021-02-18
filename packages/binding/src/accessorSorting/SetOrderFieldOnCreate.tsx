@@ -5,7 +5,6 @@ import { Literal } from '../dao'
 import { SugaredField } from '../helperComponents'
 import { QueryLanguage } from '../queryLanguage'
 import {
-	BoxedQualifiedEntityList,
 	SugaredOrderBy,
 	SugaredQualifiedEntityList,
 	SugaredRelativeSingleField,
@@ -52,9 +51,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 						entity={entity}
 						isCreating
 						onBeforePersist={(getAccessor, bindingOperations) => {
-							const listSubTree = bindingOperations.getEntityListSubTree(
-								new BoxedQualifiedEntityList(QueryLanguage.desugarQualifiedEntityList(qel, environment)),
-							)
+							const listSubTree = bindingOperations.getEntityListSubTree(qel)
 							const entities = Array.from(listSubTree)
 							const newOrderFieldValue = !entities.length
 								? 0
@@ -77,12 +74,14 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 					entities={entity}
 					expectedMutation="anyMutation"
 					orderBy={getOrderBy('asc')}
-					onBeforePersist={getAccessor => {
+					onBeforePersist={(getAccessor, bindingOperations) => {
+						// We're creating a new entity which adjusts the numbering of the other ones if applicable
+						// and then deleting it again which leaves a hole for newOrderFieldValue that is set above.
 						let newEntityKey: string | undefined = undefined
 						addEntityAtIndex(getAccessor(), desugaredOrderField, newOrderFieldValue, getNewEntity => {
 							newEntityKey = getNewEntity().key
 						})
-						newEntityKey && getAccessor().getChildEntityByKey(newEntityKey).deleteEntity()
+						newEntityKey && bindingOperations.getEntityByKey(newEntityKey).deleteEntity()
 					}}
 				>
 					<SugaredField field={orderField} />

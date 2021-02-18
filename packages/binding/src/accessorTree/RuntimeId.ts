@@ -1,23 +1,25 @@
-export interface RuntimeId {
+import { generateEnumerabilityPreventingEntropy } from '../utils'
+
+interface RuntimeIdSpec {
 	existsOnServer: boolean
 	value: string
 }
 
-export class ServerGeneratedUuid implements RuntimeId {
+export class ServerGeneratedUuid implements RuntimeIdSpec {
 	public get existsOnServer(): true {
 		return true
 	}
 	public constructor(public readonly value: string) {}
 }
 
-export class ClientGeneratedUuid implements RuntimeId {
+export class ClientGeneratedUuid implements RuntimeIdSpec {
 	public get existsOnServer(): false {
 		return false
 	}
 	public constructor(public readonly value: string) {}
 }
 
-export class UnpersistedEntityKey implements RuntimeId {
+export class UnpersistedEntityDummyId implements RuntimeIdSpec {
 	public get existsOnServer(): false {
 		return false
 	}
@@ -29,6 +31,19 @@ export class UnpersistedEntityKey implements RuntimeId {
 	})()
 
 	public constructor() {
-		this.value = `unpersistedEntity-${UnpersistedEntityKey.getNextSeed()}`
+		const enumerabilityPreventingEntropy = generateEnumerabilityPreventingEntropy(
+			UnpersistedEntityDummyId.entropyLength,
+		)
+
+		// KEEP THIS IN SYNC WITH THE REGEX BELOW!!!
+		this.value = `adminOnlyDummyId-${enumerabilityPreventingEntropy}-${UnpersistedEntityDummyId.getNextSeed()}`
+	}
+
+	private static entropyLength = 5
+	private static dummyIdRegex = new RegExp(`^adminOnlyDummyId-\\d{${UnpersistedEntityDummyId.entropyLength}}-\\d+$`)
+	public static matchesDummyId(candidate: string): boolean {
+		return UnpersistedEntityDummyId.dummyIdRegex.test(candidate)
 	}
 }
+
+export type RuntimeId = ServerGeneratedUuid | ClientGeneratedUuid | UnpersistedEntityDummyId

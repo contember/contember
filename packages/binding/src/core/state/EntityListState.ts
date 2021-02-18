@@ -1,19 +1,27 @@
 import { EntityListAccessor, ErrorAccessor } from '../../accessors'
-import { Environment } from '../../dao'
-import { EntityFieldMarkersContainer } from '../../markers'
-import { EntityCreationParameters, EntityListPreferences, RemovalType } from '../../treeParameters'
-import { EntityState, OnEntityUpdate } from './EntityState'
-import { EntityStateStub } from './EntityStateStub'
+import { EntityListSubTreeMarker, HasManyRelationMarker } from '../../markers'
+import { EntityId, EntityName, RemovalType } from '../../treeParameters'
+import { BijectiveIndexedMap } from '../structures'
+import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import { StateType } from './StateType'
+
+export type EntityListBlueprint =
+	| {
+			readonly marker: HasManyRelationMarker
+			readonly parent: EntityRealmState
+	  }
+	| {
+			readonly marker: EntityListSubTreeMarker
+			readonly parent: undefined
+	  }
 
 export interface EntityListState {
 	type: StateType.EntityList
 
-	batchUpdateDepth: number
-	children: Map<string, EntityState | EntityStateStub>
-	childrenWithPendingUpdates: Set<EntityState> | undefined
-	creationParameters: EntityCreationParameters & EntityListPreferences
-	environment: Environment
+	blueprint: EntityListBlueprint
+	children: BijectiveIndexedMap<EntityId, EntityRealmState | EntityRealmStateStub>
+	childrenWithPendingUpdates: Set<EntityRealmState> | undefined
+	entityName: EntityName
 	errors: ErrorAccessor | undefined
 	eventListeners: {
 		[Type in EntityListAccessor.EntityListEventType]:
@@ -21,14 +29,9 @@ export interface EntityListState {
 			| undefined
 	}
 	getAccessor: () => EntityListAccessor
-	hasPendingParentNotification: boolean
-	hasPendingUpdate: boolean
 	hasStaleAccessor: boolean
-	markersContainer: EntityFieldMarkersContainer
-	onChildUpdate: OnEntityUpdate // To be called by the child entity to inform this entity list
-	parent: EntityState | undefined // Undefined if we're at the top-level.
-	persistedEntityIds: Set<string>
-	plannedRemovals: Map<EntityState | EntityStateStub, RemovalType> | undefined
+	plannedRemovals: Map<EntityRealmState | EntityRealmStateStub, RemovalType> | undefined
+	unpersistedChangesCount: number
 
 	addError: EntityListAccessor.AddError
 	addEventListener: EntityListAccessor.AddEntityListEventListener
@@ -36,5 +39,5 @@ export interface EntityListState {
 	connectEntity: EntityListAccessor.ConnectEntity
 	createNewEntity: EntityListAccessor.CreateNewEntity
 	disconnectEntity: EntityListAccessor.DisconnectEntity
-	getChildEntityByKey: EntityListAccessor.GetChildEntityByKey
+	getChildEntityById: EntityListAccessor.GetChildEntityById
 }

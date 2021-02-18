@@ -1,9 +1,4 @@
-import {
-	ClientGeneratedUuid,
-	ServerGeneratedUuid,
-	SingleEntityPersistedData,
-	UnpersistedEntityKey,
-} from '../accessorTree'
+import { RuntimeId, ServerGeneratedUuid, SingleEntityPersistedData } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
@@ -12,6 +7,9 @@ import {
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
 	DesugaredRelativeSingleField,
+	EntityId,
+	EntityName,
+	EntityRealmKey,
 	FieldName,
 	FieldValue,
 	RelativeEntityList,
@@ -31,8 +29,9 @@ import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityAccessor implements Errorable {
 	public constructor(
-		public readonly runtimeId: EntityAccessor.RuntimeId,
-		public readonly typeName: string | undefined,
+		private readonly runtimeId: RuntimeId,
+		public readonly key: EntityRealmKey, // ⚠️ This is *NOT* the id! ⚠️
+		public readonly name: EntityName,
 		private readonly fieldData: EntityAccessor.FieldData,
 		private readonly dataFromServer: SingleEntityPersistedData | undefined,
 		public readonly errors: ErrorAccessor | undefined,
@@ -45,16 +44,19 @@ class EntityAccessor implements Errorable {
 		public readonly deleteEntity: EntityAccessor.DeleteEntity,
 	) {}
 
-	public get primaryKey(): string | undefined {
+	public get idOnServer(): string | undefined {
 		return this.runtimeId.existsOnServer ? this.runtimeId.value : undefined
+	}
+
+	/**
+	 * Note that for entities that don't yet exist on server this will return a dummy id.
+	 */
+	public get id(): EntityId {
+		return this.runtimeId.value
 	}
 
 	public get existsOnServer(): boolean {
 		return this.runtimeId.existsOnServer
-	}
-
-	public get key(): string {
-		return this.runtimeId.value
 	}
 
 	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs) {
@@ -182,11 +184,17 @@ class EntityAccessor implements Errorable {
 				`has-one relation. This method is meant exclusively for has-one relations.`,
 		)
 	}
+
+	/**
+	 * @deprecated
+	 * @see EntityAccessor.name
+	 */
+	public get typeName() {
+		return this.name
+	}
 }
 
 namespace EntityAccessor {
-	export type RuntimeId = ServerGeneratedUuid | ClientGeneratedUuid | UnpersistedEntityKey
-
 	export interface FieldDatum {
 		getAccessor(): NestedAccessor
 	}
@@ -204,7 +212,7 @@ namespace EntityAccessor {
 	export type AddError = ErrorAccessor.AddError
 	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: GetEntityAccessor, bindingOperations: BindingOperations) => void
-	export type ConnectEntityAtField = (field: FieldName, entityToConnectOrItsKey: EntityAccessor | string) => void
+	export type ConnectEntityAtField = (field: FieldName, entityToConnect: EntityAccessor) => void
 	export type DeleteEntity = () => void
 	export type DisconnectEntityAtField = (
 		field: FieldName,

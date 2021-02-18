@@ -2,11 +2,13 @@ import { GraphQlBuilder } from '../index'
 
 export type Mutations = 'create' | 'update' | 'delete'
 
-export type Queries = 'get' | 'list'
+export type Queries = 'get' | 'list' | 'paginate'
 
 export type GetQueryArguments = 'by'
 
 export type ListQueryArguments = 'filter' | 'orderBy' | 'offset' | 'limit'
+
+export type PaginateQueryArguments = 'filter' | 'orderBy' | 'skip' | 'first'
 
 export type CreateMutationArguments = 'data'
 
@@ -30,7 +32,12 @@ export type WriteArguments = CreateMutationArguments | UpdateMutationArguments |
 
 export type WriteFields = UpdateMutationFields | CreateMutationFields
 
-export type ReadArguments = GetQueryArguments | ListQueryArguments | HasOneArguments | HasManyArguments
+export type ReadArguments =
+	| GetQueryArguments
+	| ListQueryArguments
+	| PaginateQueryArguments
+	| HasOneArguments
+	| HasManyArguments
 
 export interface WriteRelationOps {
 	create: 'create' | 'connect'

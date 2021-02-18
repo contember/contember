@@ -1,6 +1,6 @@
 export enum StateType {
 	Field = 'field',
-	Entity = 'entity',
-	EntityStub = 'entityStub',
+	EntityRealm = 'entityRealm',
+	EntityRealmStub = 'entityRealmStub',
 	EntityList = 'entityList',
 }

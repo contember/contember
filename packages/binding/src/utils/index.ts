@@ -1,5 +1,6 @@
 export * from './assert'
 export * from './assertNever'
+export * from './generateEnumerabilityPreventingEntropy'
 export * from './Hashing'
 export * from './isEmptyObject'
 export * from './ucfirst'

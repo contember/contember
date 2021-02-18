@@ -1,4 +1,4 @@
+import { PlaceholderName } from '../treeParameters'
 import { Marker } from './Marker'
 
-// Indexed by placeholder names
-export type EntityFieldMarkers = Map<string, Marker>
+export type EntityFieldMarkers = Map<PlaceholderName, Marker>

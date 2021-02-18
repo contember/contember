@@ -12,7 +12,7 @@ interface PageLinkByIdProps {
 
 export const PageLinkById = React.memo(function (props: PageLinkByIdProps) {
 	const parentEntity = useEntity()
-	const id = parentEntity.primaryKey
+	const id = parentEntity.id
 
 	if (typeof id === 'string') {
 		return (

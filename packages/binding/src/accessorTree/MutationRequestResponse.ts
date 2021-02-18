@@ -1,4 +1,5 @@
 import { Result } from '@contember/client'
+import { ReceivedData, ReceivedEntityData } from './QueryRequestResponse'
 
 export interface FieldPathErrorFragment {
 	__typename: '_FieldPathFragment'
@@ -36,15 +37,17 @@ export interface MutationResponse {
 		valid: boolean
 		errors: ValidationError[]
 	}
-	node: {
-		id: string
-	}
+	node: ReceivedEntityData
 }
 
 export interface MutationDataResponse {
 	[alias: string]: MutationResponse
 }
 
+export interface MutationTransactionResponse {
+	transaction: MutationDataResponse | null
+}
+
 export interface MutationRequestResponse {
-	data: MutationDataResponse
+	data: MutationTransactionResponse | null
 }

@@ -1,4 +1,10 @@
-import { Component, SugaredQualifiedEntityList, useBindingOperations, useEnvironment } from '@contember/binding'
+import {
+	Component,
+	SugaredQualifiedEntityList,
+	TreeRootId,
+	useBindingOperations,
+	useEnvironment,
+} from '@contember/binding'
 import { noop } from '@contember/react-utils'
 import * as React from 'react'
 import { DataGridContainerPublicProps, DataGridState } from '../base'
@@ -67,11 +73,17 @@ export const DataGrid = Component<DataGridProps>(
 			[pageState, columns, hiddenColumns, filterArtifacts, orderDirections],
 		)
 
-		const [displayedState, setDisplayedState] = React.useState(desiredState)
+		const [displayedState, setDisplayedState] = React.useState<{
+			gridState: DataGridState
+			treeRootId: TreeRootId | undefined
+		}>({
+			gridState: desiredState,
+			treeRootId: undefined,
+		})
 
 		React.useEffect(() => {
 			const extend = async () => {
-				if (displayedState === desiredState) {
+				if (displayedState.gridState === desiredState) {
 					return
 				}
 				loadAbortControllerRef.current?.abort()
@@ -79,10 +91,15 @@ export const DataGrid = Component<DataGridProps>(
 				const newController = new AbortController()
 				loadAbortControllerRef.current = newController
 
+				let newTreeRootId: TreeRootId | undefined = undefined
+
 				try {
-					await extendTree(renderGrid(gridOptions, desiredState, desiredState, environment), {
-						signal: newController.signal,
-					})
+					newTreeRootId = await extendTree(
+						renderGrid(gridOptions, undefined, desiredState, desiredState, environment),
+						{
+							signal: newController.signal,
+						},
+					)
 				} catch {
 					// TODO Distinguish abort vs actual error
 					return
@@ -90,7 +107,10 @@ export const DataGrid = Component<DataGridProps>(
 				if (!isMountedRef.current) {
 					return
 				}
-				setDisplayedState(desiredState)
+				setDisplayedState({
+					gridState: desiredState,
+					treeRootId: newTreeRootId,
+				})
 			}
 			extend()
 		}, [desiredState, displayedState, environment, extendTree, gridOptions])
@@ -102,7 +122,7 @@ export const DataGrid = Component<DataGridProps>(
 			[],
 		)
 
-		return renderGrid(gridOptions, displayedState, desiredState, environment)
+		return renderGrid(gridOptions, displayedState.treeRootId, displayedState.gridState, desiredState, environment)
 	},
 	(props, environment) => {
 		const columns = extractDataGridColumns(props.children)
@@ -126,6 +146,7 @@ export const DataGrid = Component<DataGridProps>(
 				setFilter: noop,
 				containerProps: props,
 			},
+			undefined,
 			fakeState,
 			fakeState,
 			environment,

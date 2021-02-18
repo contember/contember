@@ -5,6 +5,7 @@ export class Config {
 		beforePersistSettleLimit: 20,
 		beforeUpdateSettleLimit: 20,
 		maxPersistAttempts: 5,
+		maxSchemaLoadAttempts: 3,
 	}
 
 	private readonly config: BindingConfig

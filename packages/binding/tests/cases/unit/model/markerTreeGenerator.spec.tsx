@@ -1,7 +1,8 @@
 import * as React from 'react'
 import {
-	BoxedQualifiedSingleEntity,
 	EntityFieldMarkersContainer,
+	EntitySubTree,
+	EntitySubTreeMarker,
 	Environment,
 	Field,
 	FieldMarker,
@@ -13,9 +14,6 @@ import {
 	MarkerTreeGenerator,
 	MarkerTreeRoot,
 	PRIMARY_KEY_NAME,
-	EntitySubTree,
-	SubTreeMarker,
-	TYPENAME_KEY_NAME,
 } from '../../../../src'
 
 describe('Marker tree generator', () => {
@@ -61,7 +59,6 @@ describe('Marker tree generator', () => {
 			rootWhereAsFilter: { bar: { eq: 123 } },
 		})
 		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker(PRIMARY_KEY_NAME)] as const
-		const typeNameMarker = [TYPENAME_KEY_NAME, new FieldMarker(TYPENAME_KEY_NAME)] as const
 
 		const singleListeners = {
 			beforePersist: undefined,
@@ -86,7 +83,7 @@ describe('Marker tree generator', () => {
 				field: 'common',
 				filter: undefined,
 				setOnCreate: undefined,
-				forceCreation: false,
+				// forceCreation: false,
 				isNonbearing: false,
 				initialEntityCount: 0,
 				orderBy: undefined,
@@ -99,14 +96,12 @@ describe('Marker tree generator', () => {
 				true,
 				new Map([
 					idMarker,
-					typeNameMarker,
 					['same', new FieldMarker('same')],
 					['name', new FieldMarker('name')],
 					['surname', new FieldMarker('surname')],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
 					['same', 'same'],
 					['name', 'name'],
 					['surname', 'surname'],
@@ -120,7 +115,7 @@ describe('Marker tree generator', () => {
 				field: 'hasOne',
 				setOnCreate: undefined,
 				filter: undefined,
-				forceCreation: false,
+				// forceCreation: false,
 				isNonbearing: false,
 				reducedBy: undefined,
 				eventListeners: singleListeners,
@@ -130,13 +125,11 @@ describe('Marker tree generator', () => {
 				true,
 				new Map<string, Marker>([
 					idMarker,
-					typeNameMarker,
 					[innerHasMany.placeholderName, innerHasMany],
 					['hasOneField', new FieldMarker('hasOneField')],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
 					['common', innerHasMany.placeholderName],
 					['hasOneField', 'hasOneField'],
 				]),
@@ -149,7 +142,7 @@ describe('Marker tree generator', () => {
 				field: 'hasMany',
 				filter: { x: { gt: 50 } },
 				setOnCreate: undefined,
-				forceCreation: false,
+				// forceCreation: false,
 				isNonbearing: false,
 				initialEntityCount: 0,
 				orderBy: undefined,
@@ -162,44 +155,41 @@ describe('Marker tree generator', () => {
 				true,
 				new Map<string, Marker>([
 					idMarker,
-					typeNameMarker,
 					['hasManyField', new FieldMarker('hasManyField')],
 					[hasOne.placeholderName, hasOne],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
 					['hasManyField', 'hasManyField'],
-					[hasOne.relation.field, hasOne.placeholderName],
+					[hasOne.parameters.field, hasOne.placeholderName],
 				]),
 			),
 			environment,
 		)
-		const subTreeMarker = new SubTreeMarker(
-			new BoxedQualifiedSingleEntity({
+		const subTreeMarker = new EntitySubTreeMarker(
+			{
 				entityName: 'Foo',
 				where: { bar: 123 },
 				filter: undefined,
 				hasOneRelationPath: [],
+				isCreating: false,
 				isNonbearing: false,
 				setOnCreate: { bar: 123 },
-				forceCreation: false,
+				// forceCreation: false,
 				eventListeners: singleListeners,
 				expectedMutation: 'anyMutation',
 				alias: undefined,
-			}),
+			},
 			new EntityFieldMarkersContainer(
 				true,
 				new Map<string, Marker>([
 					idMarker,
-					typeNameMarker,
 					[outerHasMany.placeholderName, outerHasMany],
 					['fooField', new FieldMarker('fooField')],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
-					[TYPENAME_KEY_NAME, typeNameMarker[1].placeholderName],
-					[outerHasMany.relation.field, outerHasMany.placeholderName],
+					[outerHasMany.parameters.field, outerHasMany.placeholderName],
 					['fooField', 'fooField'],
 				]),
 			),

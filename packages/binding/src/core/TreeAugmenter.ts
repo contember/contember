@@ -46,12 +46,16 @@ export class TreeAugmenter {
 
 		this.eventManager.syncTransaction(() => {
 			for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {
-				for (const rootPlaceholder in response) {
-					const rootState = rootStates.get(rootPlaceholder)
-
-					if (rootState === undefined) {
-						continue
-					}
+				// for (const rootPlaceholder in response) {
+				// 	const rootState = rootStates.get(rootPlaceholder)
+				//
+				// 	if (rootState === undefined) {
+				// 		continue
+				// 	}
+				// TODO the above would be better, only refreshing roots which participated in the mutation. However, due to
+				// 	how mutations are currently generated, we cannot assume that only roots present in the response need
+				// 	refreshed. So we just refresh all.
+				for (const [rootPlaceholder, rootState] of rootStates) {
 					const rootData = this.treeStore.subTreePersistedData.get(rootPlaceholder)
 
 					if (rootState.type === StateType.EntityList) {

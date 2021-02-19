@@ -1,19 +1,15 @@
-import { IExecutableSchemaDefinition } from 'graphql-tools'
-import schema from './content-schema.graphql'
-import * as ContentSchema from './content-schema.types'
 import { Acl, Model, Validation } from '@contember/schema'
-import { assertNever } from '../utils'
 import { EntityRulesResolver } from '../input-validation'
-import { acceptEveryFieldVisitor, getEntity } from '@contember/schema-utils'
 import { Authorizator } from '../acl'
-import ColumnType = Model.ColumnType
-import Operation = Acl.Operation
+import * as ContentSchema from './content-schema.types'
+import { assertNever } from '../utils'
+import { acceptEveryFieldVisitor, getEntity } from '@contember/schema-utils'
 
 type AdditionalFieldInfo =
 	| Omit<ContentSchema._Relation, 'name' | 'type' | 'rules' | 'validators'>
 	| Omit<ContentSchema._Column, 'name' | 'type' | 'rules' | 'validators'>
 
-export class ContentSchemaFactory {
+export class IntrospectionSchemaFactory {
 	constructor(
 		private readonly model: Model.Schema,
 		private readonly rulesResolver: EntityRulesResolver,
@@ -105,13 +101,13 @@ export class ContentSchemaFactory {
 				return {
 					__typename: '_Column',
 					defaultValue: column.default ?? undefined,
-					enumName: column.type === ColumnType.Enum ? column.columnType : null,
+					enumName: column.type === Model.ColumnType.Enum ? column.columnType : null,
 					nullable: column.nullable,
 				}
 			},
 		})
 		return Object.values(getEntity(this.model, entityName).fields)
-			.filter(it => this.authorizator.isAllowed(Operation.read, entityName, it.name))
+			.filter(it => this.authorizator.isAllowed(Acl.Operation.read, entityName, it.name))
 			.map((it): ContentSchema._Column | ContentSchema._Relation => ({
 				...additionalInfo[it.name],
 				name: it.name,
@@ -174,36 +170,27 @@ export class ContentSchemaFactory {
 		}
 	}
 
-	public create(): IExecutableSchemaDefinition {
+	public create(): ContentSchema._Schema {
+		const entities = Object.values(this.model.entities)
+			.filter(it => this.authorizator.isAllowed(Acl.Operation.read, it.name))
+			.map(entity => ({
+				name: entity.name,
+				customPrimaryAllowed: this.authorizator.isCustomPrimaryAllowed(entity.name),
+				fields: this.createFieldsSchema(entity.name),
+				unique: Object.values(entity.unique).map(({ fields }) => ({ fields })),
+			}))
+		const usedEnums = new Set(
+			entities
+				.flatMap(it => it.fields)
+				.map(it => (it.__typename === '_Column' ? it.enumName : undefined))
+				.filter((it): it is string => !!it),
+		)
+		const enums = Object.entries(this.model.enums)
+			.filter(([name]) => usedEnums.has(name))
+			.map(([name, values]) => ({ name, values }))
 		return {
-			typeDefs: schema,
-			resolvers: {
-				Query: {
-					schema: (): ContentSchema._Schema => {
-						const entities = Object.values(this.model.entities)
-							.filter(it => this.authorizator.isAllowed(Operation.read, it.name))
-							.map(entity => ({
-								name: entity.name,
-								customPrimaryAllowed: this.authorizator.isCustomPrimaryAllowed(entity.name),
-								fields: this.createFieldsSchema(entity.name),
-								unique: Object.values(entity.unique).map(({ fields }) => ({ fields })),
-							}))
-						const usedEnums = new Set(
-							entities
-								.flatMap(it => it.fields)
-								.map(it => (it.__typename === '_Column' ? it.enumName : undefined))
-								.filter((it): it is string => !!it),
-						)
-						const enums = Object.entries(this.model.enums)
-							.filter(([name]) => usedEnums.has(name))
-							.map(([name, values]) => ({ name, values }))
-						return {
-							enums,
-							entities,
-						}
-					},
-				},
-			},
+			enums,
+			entities,
 		}
 	}
 }

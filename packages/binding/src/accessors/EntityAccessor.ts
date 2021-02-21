@@ -19,7 +19,7 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 } from '../treeParameters'
-import { BindingOperations } from './BindingOperations'
+import { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
@@ -211,7 +211,7 @@ namespace EntityAccessor {
 	export type GetEntityAccessor = () => EntityAccessor
 	export type AddError = ErrorAccessor.AddError
 	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
-	export type BatchUpdatesHandler = (getAccessor: GetEntityAccessor, bindingOperations: BindingOperations) => void
+	export type BatchUpdatesHandler = (getAccessor: GetEntityAccessor, options: BatchUpdatesOptions) => void
 	export type ConnectEntityAtField = (field: FieldName, entityToConnect: EntityAccessor) => void
 	export type DeleteEntity = () => void
 	export type DisconnectEntityAtField = (
@@ -222,7 +222,7 @@ namespace EntityAccessor {
 
 	export type BeforePersistHandler = (
 		getAccessor: GetEntityAccessor,
-		bindingOperations: BindingOperations,
+		options: BatchUpdatesOptions,
 	) => void | Promise<BeforePersistHandler>
 
 	export type PersistErrorHandler = (

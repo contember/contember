@@ -1,3 +1,4 @@
+export * from './BatchUpdatesOptions'
 export * from './BindingConfig'
 export * from './BindingOperations'
 export * from './EntityAccessor'

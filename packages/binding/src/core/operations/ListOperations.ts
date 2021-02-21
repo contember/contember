@@ -1,6 +1,6 @@
 import { validate as uuidValidate } from 'uuid'
-import { BindingOperations, EntityAccessor, EntityListAccessor } from '../../accessors'
-import { ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
+import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor } from '../../accessors'
+import { UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EventManager } from '../EventManager'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
@@ -13,7 +13,7 @@ import { OperationsHelpers } from './OperationsHelpers'
 
 export class ListOperations {
 	public constructor(
-		private readonly bindingOperations: BindingOperations,
+		private readonly batchUpdatesOptions: BatchUpdatesOptions,
 		private readonly eventManager: EventManager,
 		private readonly stateInitializer: StateInitializer,
 		private readonly treeStore: TreeStore,
@@ -21,7 +21,7 @@ export class ListOperations {
 
 	public batchUpdates(state: EntityListState, performUpdates: EntityListAccessor.BatchUpdatesHandler) {
 		this.eventManager.syncOperation(() => {
-			performUpdates(state.getAccessor, this.bindingOperations)
+			performUpdates(state.getAccessor, this.batchUpdatesOptions)
 		})
 	}
 

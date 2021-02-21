@@ -3,7 +3,6 @@ import { FieldHelpers } from '../fieldHelpers'
 import { FieldName, FieldValue } from '../treeParameters'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
-import { PersistErrorOptions } from './PersistErrorOptions'
 
 class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>
 	implements Errorable {

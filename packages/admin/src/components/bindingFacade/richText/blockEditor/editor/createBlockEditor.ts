@@ -1,14 +1,9 @@
 import { BindingError } from '@contember/binding'
 import { noop } from '@contember/react-utils'
+import * as Slate from 'slate'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
-import {
-	isBlockReferenceElement,
-	isBlockVoidReferenceElement,
-	isContemberContentPlaceholderElement,
-	isContemberFieldElement,
-	isEmbedElement,
-} from '../elements'
+import { isContemberContentPlaceholderElement, isContemberFieldElement, isReferenceElement } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
 import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference'
@@ -19,12 +14,11 @@ import {
 	OverrideInsertElementWithReferenceOptions,
 } from './overrideInsertElementWithReference'
 import { overrideInsertNode } from './overrideInsertNode'
-import { overrideIsVoid } from './overrideIsVoid'
+import { overrideIsVoid, OverrideIsVoidOptions } from './overrideIsVoid'
 import { overrideNormalizeNode, OverrideNormalizeNodeOptions } from './overrideNormalizeNode'
 import { overrideOnKeyDown } from './overrideOnKeyDown'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
-import * as Slate from 'slate'
 
 export interface CreateEditorOptions
 	extends OverrideOnChangeOptions,
@@ -34,6 +28,7 @@ export interface CreateEditorOptions
 		OverrideNormalizeNodeOptions,
 		OverrideInsertDataOptions,
 		OverrideInsertElementWithReferenceOptions,
+		OverrideIsVoidOptions,
 		CreateEditorPublicOptions {}
 
 export const createBlockEditor = (options: CreateEditorOptions) => {
@@ -49,10 +44,8 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 
 		addEditorBuiltins: editor => {
 			const e = editor as BlockSlateEditor
-			e.isBlockReferenceElement = isBlockReferenceElement
-			e.isBlockVoidReferenceElement = isBlockVoidReferenceElement
+			e.isReferenceElement = isReferenceElement
 			e.isContemberContentPlaceholderElement = isContemberContentPlaceholderElement
-			e.isEmbedElement = isEmbedElement
 			e.isContemberFieldElement = isContemberFieldElement
 			e.insertElementWithReference = () => {
 				throw new BindingError(
@@ -69,7 +62,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			overrideInsertData(e, options)
 			overrideInsertElementWithReference(e, options)
 			overrideInsertNode(e)
-			overrideIsVoid(e)
+			overrideIsVoid(e, options)
 			overrideNormalizeNode(e, options)
 			overrideOnKeyDown(e, options)
 			overrideRenderElement(e, options)

@@ -4,20 +4,12 @@ import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlocks } from '../../../blocks'
 import { BlockElement, ElementNode } from '../../baseEditor'
-import {
-	isBlockReferenceElement,
-	isBlockVoidReferenceElement,
-	isContemberContentPlaceholderElement,
-	isContemberFieldElement,
-	isEmbedElement,
-} from '../elements'
-import { NormalizedEmbedHandlers } from '../embed/core'
+import { isContemberContentPlaceholderElement, isContemberFieldElement, isReferenceElement } from '../elements'
+import { NormalizedEmbedHandlers } from '../embed'
 import { FieldBackedElement } from '../FieldBackedElement'
 import { EditorReferenceBlocks } from '../templating'
-import { BlockReferenceElementRenderer } from './BlockReferenceElementRenderer'
-import { BlockVoidReferenceElementRenderer } from './BlockVoidReferenceElementRenderer'
 import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
-import { EmbedElementRenderer } from './EmbedElementRenderer'
+import { ReferenceElementRenderer } from './ReferenceElementRenderer'
 
 export interface BlockEditorElementRendererProps extends RenderElementProps {
 	element: ElementNode
@@ -47,31 +39,21 @@ export function BlockEditorElementRenderer({
 	...renderElementProps
 }: BlockEditorElementRendererProps) {
 	const { attributes, children, element } = renderElementProps
-	if (isBlockVoidReferenceElement(element)) {
+	if (isReferenceElement(element)) {
 		if (referenceDiscriminationField === undefined) {
 			throw new BindingError()
 		}
 		return (
-			<BlockVoidReferenceElementRenderer
+			<ReferenceElementRenderer
 				attributes={attributes}
 				children={children}
 				element={element}
 				editorReferenceBlocks={editorReferenceBlocks}
 				referenceDiscriminationField={referenceDiscriminationField}
-			/>
-		)
-	}
-	if (isBlockReferenceElement(element)) {
-		if (referenceDiscriminationField === undefined) {
-			throw new BindingError()
-		}
-		return (
-			<BlockReferenceElementRenderer
-				attributes={attributes}
-				children={children}
-				element={element}
-				editorReferenceBlocks={editorReferenceBlocks}
-				referenceDiscriminationField={referenceDiscriminationField}
+				embedSubBlocks={embedSubBlocks}
+				embedHandlers={embedHandlers}
+				embedContentDiscriminationField={embedContentDiscriminationField}
+				embedReferenceDiscriminateBy={embedReferenceDiscriminateBy}
 			/>
 		)
 	}
@@ -83,19 +65,6 @@ export function BlockEditorElementRenderer({
 				element={element}
 				leadingFields={leadingFields}
 				trailingFields={trailingFields}
-			/>
-		)
-	}
-	if (isEmbedElement(element)) {
-		return (
-			<EmbedElementRenderer
-				attributes={attributes}
-				children={children}
-				element={element}
-				embedSubBlocks={embedSubBlocks}
-				embedHandlers={embedHandlers}
-				embedContentDiscriminationField={embedContentDiscriminationField}
-				embedReferenceDiscriminateBy={embedReferenceDiscriminateBy}
 			/>
 		)
 	}

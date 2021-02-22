@@ -38,7 +38,7 @@ import {
 } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
 import { createBlockEditor } from './editor'
-import { ContemberFieldElement } from './elements'
+import { ContemberFieldElement, ReferenceElement } from './elements'
 import { EmbedHandler } from './embed'
 import { FieldBackedElement } from './FieldBackedElement'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
@@ -180,6 +180,17 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 			[addBlockListListener, blockElementPathRefs],
 		)
 
+		const getReferenceById = referenceList?.getChildEntityById
+		const getReferencedEntity = React.useCallback(
+			(element: ReferenceElement): EntityAccessor => {
+				if (getReferenceById === undefined) {
+					throw new BindingError()
+				}
+				return getReferenceById(element.referenceId)
+			},
+			[getReferenceById],
+		)
+
 		const [editor] = React.useState(() =>
 			createBlockEditor({
 				augmentEditor,
@@ -197,6 +208,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
 				embedSubBlocks,
+				getReferencedEntity,
 				getReferenceById: referenceList?.getChildEntityById,
 				isMutatingRef,
 				leadingFields: leadingFieldBackedElements,

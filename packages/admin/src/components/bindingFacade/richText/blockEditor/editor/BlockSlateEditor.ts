@@ -1,26 +1,14 @@
 import { EntityAccessor, FieldValue } from '@contember/binding'
 import * as Slate from 'slate'
 import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../baseEditor'
-import {
-	BlockReferenceElement,
-	BlockVoidReferenceElement,
-	ContemberContentPlaceholderElement,
-	ContemberFieldElement,
-	EmbedElement,
-} from '../elements'
+import { ContemberContentPlaceholderElement, ContemberFieldElement, ReferenceElement } from '../elements'
 
-export type BlockEditorElements =
-	| BlockVoidReferenceElement
-	| ContemberContentPlaceholderElement
-	| ContemberFieldElement
-	| EmbedElement
+export type BlockEditorElements = ReferenceElement | ContemberContentPlaceholderElement | ContemberFieldElement
 
 export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, BlockEditorElements>> {
 	slate: typeof Slate
-	isBlockReferenceElement: (node: Slate.Node) => node is BlockReferenceElement
-	isBlockVoidReferenceElement: (node: Slate.Node) => node is BlockVoidReferenceElement
+	isReferenceElement: (node: Slate.Node) => node is ReferenceElement
 	isContemberContentPlaceholderElement: (node: Slate.Node) => node is ContemberContentPlaceholderElement
-	isEmbedElement: (node: Slate.Node) => node is EmbedElement
 	isContemberFieldElement: (node: Slate.Node) => node is ContemberFieldElement
 	createElementReference: (referenceDiscriminant: FieldValue, initialize?: EntityAccessor.BatchUpdatesHandler) => string
 	insertElementWithReference: <Element extends ElementNode>(

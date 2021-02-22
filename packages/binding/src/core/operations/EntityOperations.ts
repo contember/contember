@@ -1,4 +1,4 @@
-import { BindingOperations, EntityAccessor } from '../../accessors'
+import { BatchUpdatesOptions, BindingOperations, EntityAccessor } from '../../accessors'
 import { ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EntityFieldMarkersContainer, HasOneRelationMarker } from '../../markers'
@@ -22,7 +22,7 @@ import { OperationsHelpers } from './OperationsHelpers'
 
 export class EntityOperations {
 	public constructor(
-		private readonly bindingOperations: BindingOperations,
+		private readonly batchUpdatesOptions: BatchUpdatesOptions,
 		private readonly eventManager: EventManager,
 		private readonly stateInitializer: StateInitializer,
 		private readonly treeStore: TreeStore,
@@ -69,7 +69,7 @@ export class EntityOperations {
 
 	public batchUpdates(state: EntityRealmState, performUpdates: EntityAccessor.BatchUpdatesHandler) {
 		this.eventManager.syncOperation(() => {
-			performUpdates(state.getAccessor, this.bindingOperations)
+			performUpdates(state.getAccessor, this.batchUpdatesOptions)
 		})
 	}
 

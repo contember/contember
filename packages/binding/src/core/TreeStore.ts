@@ -1,3 +1,4 @@
+import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor } from '../accessors'
 import { NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
@@ -29,6 +30,8 @@ export class TreeStore {
 
 	private _schema: Schema | undefined
 	public readonly persistedData: NormalizedQueryResponseData = new NormalizedQueryResponseData(new Map(), new Map())
+
+	public constructor() {}
 
 	public updatePersistedData(response: ReceivedDataTree) {
 		QueryResponseNormalizer.mergeInResponse(this.persistedData, response)

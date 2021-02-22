@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom'
 import {
-	BindingOperations,
+	BatchUpdatesOptions,
 	EntityAccessor,
 	EntityListAccessor,
 	FieldAccessor,
@@ -41,7 +41,7 @@ export class EventManager {
 	private rootsWithPendingUpdates: Set<RootStateNode> = new Set()
 
 	public constructor(
-		private readonly bindingOperations: BindingOperations,
+		private readonly batchUpdatesOptions: BatchUpdatesOptions,
 		private readonly config: Config,
 		private readonly dirtinessTracker: DirtinessTracker,
 		private readonly onUpdate: (isMutating: boolean) => void,
@@ -285,7 +285,7 @@ export class EventManager {
 
 					for (const [state, callback] of callbackQueue) {
 						const changesCountBefore = this.dirtinessTracker.getChangesCount()
-						const result = callback(state.getAccessor as any, this.bindingOperations) // TS can't quite handle this but this is sound.
+						const result = callback(state.getAccessor as any, this.batchUpdatesOptions) // TS can't quite handle this but this is sound.
 						const changesCountAfter = this.dirtinessTracker.getChangesCount()
 
 						if (result instanceof Promise) {
@@ -402,7 +402,7 @@ export class EventManager {
 
 				if (listeners) {
 					for (const listener of listeners) {
-						listener(state.getAccessor as any, this.bindingOperations)
+						listener(state.getAccessor as any, this.batchUpdatesOptions)
 					}
 				}
 				if (state.type === StateType.EntityRealm) {

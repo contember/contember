@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
-import { BindingOperations, EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
+import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
 import { EntityFieldPersistedData, RuntimeId, ServerGeneratedUuid, UnpersistedEntityDummyId } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import {
@@ -40,14 +40,14 @@ export class StateInitializer {
 
 	public constructor(
 		private readonly accessorErrorManager: AccessorErrorManager,
-		private readonly bindingOperations: BindingOperations,
+		private readonly batchUpdatesOptions: BatchUpdatesOptions,
 		private readonly config: Config,
 		private readonly eventManager: EventManager,
 		private readonly treeStore: TreeStore,
 	) {
 		this.fieldOperations = new FieldOperations(this.eventManager, this, this.treeStore)
-		this.entityOperations = new EntityOperations(this.bindingOperations, this.eventManager, this, this.treeStore)
-		this.listOperations = new ListOperations(this.bindingOperations, this.eventManager, this, this.treeStore)
+		this.entityOperations = new EntityOperations(this.batchUpdatesOptions, this.eventManager, this, this.treeStore)
+		this.listOperations = new ListOperations(this.batchUpdatesOptions, this.eventManager, this, this.treeStore)
 	}
 
 	public initializeSubTree(tree: EntitySubTreeMarker | EntityListSubTreeMarker): RootStateNode {
@@ -338,7 +338,6 @@ export class StateInitializer {
 						accessor = new EntityListAccessor(
 							entityListState.children,
 							persistedEntityIds,
-							this.bindingOperations,
 							entityListState.errors,
 							entityListState.blueprint.marker.environment,
 							entityListState.addError,

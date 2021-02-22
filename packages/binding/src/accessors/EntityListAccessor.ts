@@ -1,6 +1,6 @@
 import { Environment } from '../dao'
 import { EntityId, EntityRealmKey } from '../treeParameters'
-import { BindingOperations } from './BindingOperations'
+import { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
@@ -11,7 +11,6 @@ class EntityListAccessor implements Errorable {
 	public constructor(
 		private readonly _children: ReadonlyMap<EntityId, { getAccessor: EntityAccessor.GetEntityAccessor }>,
 		private readonly _idsPersistedOnServer: ReadonlySet<string>,
-		private readonly _bindingOperations: BindingOperations,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
 		public readonly addError: EntityListAccessor.AddError,
@@ -100,7 +99,7 @@ namespace EntityListAccessor {
 	export type GetEntityListAccessor = () => EntityListAccessor
 	export type AddError = ErrorAccessor.AddError
 	export type BatchUpdates = (performUpdates: EntityListAccessor.BatchUpdatesHandler) => void
-	export type BatchUpdatesHandler = (getAccessor: GetEntityListAccessor, bindingOperations: BindingOperations) => void
+	export type BatchUpdatesHandler = (getAccessor: GetEntityListAccessor, options: BatchUpdatesOptions) => void
 	export type ConnectEntity = (entityToConnect: EntityAccessor) => void
 	export type CreateNewEntity = (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	export type DisconnectEntity = (childEntity: EntityAccessor) => void
@@ -109,7 +108,7 @@ namespace EntityListAccessor {
 
 	export type BeforePersistHandler = (
 		getAccessor: GetEntityListAccessor,
-		bindingOperations: BindingOperations,
+		options: BatchUpdatesOptions,
 	) => void | Promise<BeforePersistHandler>
 
 	export type PersistErrorHandler = (

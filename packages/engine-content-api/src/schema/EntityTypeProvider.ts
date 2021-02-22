@@ -1,4 +1,13 @@
-import { GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig, GraphQLOutputType } from 'graphql'
+import {
+	GraphQLBoolean,
+	GraphQLFieldConfig,
+	GraphQLInt,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLObjectTypeConfig,
+	GraphQLOutputType,
+} from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
 import { acceptFieldVisitor, getEntity as getEntityFromSchema } from '@contember/schema-utils'
 import { singletonFactory } from '../utils'
@@ -10,24 +19,23 @@ import { Authorizator } from '../acl'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
 import { OrderByTypeProvider } from './OrderByTypeProvider'
 import { EntityFieldsProvider } from '../extensions'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../exception'
 
 export class EntityTypeProvider {
 	private entities = singletonFactory(name => this.createEntity(name))
 	private connections = singletonFactory(name => this.createConnection(name))
-	private PageInfo = this.graphqlObjectFactories.createObjectType({
+	private PageInfo = new GraphQLObjectType({
 		name: 'PageInfo',
 		fields: {
-			totalCount: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.int) },
+			totalCount: { type: new GraphQLNonNull(GraphQLInt) },
 		},
 	})
 
-	private fieldMeta = this.graphqlObjectFactories.createObjectType({
+	private fieldMeta = new GraphQLObjectType({
 		name: 'FieldMeta',
 		fields: {
-			[Input.FieldMeta.readable]: { type: this.graphqlObjectFactories.boolean, resolve: aliasAwareResolver },
-			[Input.FieldMeta.updatable]: { type: this.graphqlObjectFactories.boolean, resolve: aliasAwareResolver },
+			[Input.FieldMeta.readable]: { type: GraphQLBoolean, resolve: aliasAwareResolver },
+			[Input.FieldMeta.updatable]: { type: GraphQLBoolean, resolve: aliasAwareResolver },
 		},
 	})
 	private readonly entityFieldProviders: { [key: string]: EntityFieldsProvider } = {}
@@ -38,7 +46,6 @@ export class EntityTypeProvider {
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
 	public registerEntityFieldProvider(key: string, provider: EntityFieldsProvider): void {
@@ -60,7 +67,7 @@ export class EntityTypeProvider {
 	}
 
 	private createEntity(entityName: string) {
-		return this.graphqlObjectFactories.createObjectType({
+		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}`,
 			fields: () => this.getEntityFields(entityName),
 		} as GraphQLObjectTypeConfig<any, any>)
@@ -84,7 +91,7 @@ export class EntityTypeProvider {
 		)
 
 		const metaField = {
-			type: this.graphqlObjectFactories.createObjectType({
+			type: new GraphQLObjectType({
 				name: GqlTypeName`${entityName}Meta`,
 				fields: metaFields,
 			}),
@@ -93,14 +100,10 @@ export class EntityTypeProvider {
 
 		const fields: { [field: string]: GraphQLFieldConfig<any, any> } = accessibleFields.reduce(
 			(result, fieldName) => {
-				const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this, this.graphqlObjectFactories)
+				const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this)
 				const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, fieldName, fieldTypeVisitor)
 
-				const fieldArgsVisitor = new FieldArgsVisitor(
-					this.whereTypeProvider,
-					this.orderByTypeProvider,
-					this.graphqlObjectFactories,
-				)
+				const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider, this.orderByTypeProvider)
 				return {
 					...result,
 					[fieldName]: {
@@ -129,21 +132,21 @@ export class EntityTypeProvider {
 
 	private createConnection(entityName: string) {
 		const entityType = this.getEntity(entityName)
-		return this.graphqlObjectFactories.createObjectType({
+		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}Connection`,
 			fields: {
 				pageInfo: {
-					type: this.graphqlObjectFactories.createNotNull(this.PageInfo),
+					type: new GraphQLNonNull(this.PageInfo),
 				},
 				edges: {
-					type: this.graphqlObjectFactories.createNotNull(
-						this.graphqlObjectFactories.createList(
-							this.graphqlObjectFactories.createNotNull(
-								this.graphqlObjectFactories.createObjectType({
+					type: new GraphQLNonNull(
+						new GraphQLList(
+							new GraphQLNonNull(
+								new GraphQLObjectType({
 									name: GqlTypeName`${entityName}Edge`,
 									fields: {
 										node: {
-											type: this.graphqlObjectFactories.createNotNull(entityType),
+											type: new GraphQLNonNull(entityType),
 											// resolve: aliasAwareResolver,
 										},
 									},

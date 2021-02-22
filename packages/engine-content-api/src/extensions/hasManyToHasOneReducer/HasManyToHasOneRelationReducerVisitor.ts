@@ -1,4 +1,4 @@
-import { GraphQLInputObjectType } from 'graphql'
+import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import {
 	aliasAwareResolver,
@@ -12,7 +12,6 @@ import { Authorizator } from '../../acl'
 import { getFieldsForUniqueWhere } from '../../utils'
 import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
 import { FieldMap } from '../EntityFieldsProvider'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export class HasManyToHasOneRelationReducerFieldVisitor
 	implements
@@ -23,7 +22,6 @@ export class HasManyToHasOneRelationReducerFieldVisitor
 		private readonly authorizator: Authorizator,
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly whereTypeProvider: WhereTypeProvider,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
 	public visitColumn() {
@@ -81,7 +79,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor
 			)
 			.reduce<FieldMap<HasManyToHasOneReducerExtension>>((fields, fieldName) => {
 				const graphQlName = relation.name + GqlTypeName`By${fieldName}`
-				const uniqueWhere: GraphQLInputObjectType = this.graphqlObjectFactories.createInputObjectType({
+				const uniqueWhere: GraphQLInputObjectType = new GraphQLInputObjectType({
 					//todo this can be simplified to ${targetEntity.name}By${fieldName}, but singleton must be used
 					name: GqlTypeName`${entity.name}${relation.name}By${fieldName}UniqueWhere`,
 					fields: () => {
@@ -99,7 +97,7 @@ export class HasManyToHasOneRelationReducerFieldVisitor
 							relationName: relation.name,
 						},
 						args: {
-							by: { type: this.graphqlObjectFactories.createNotNull(uniqueWhere) },
+							by: { type: new GraphQLNonNull(uniqueWhere) },
 							filter: { type: this.whereTypeProvider.getEntityWhereType(targetEntity.name) },
 						},
 						resolve: aliasAwareResolver,

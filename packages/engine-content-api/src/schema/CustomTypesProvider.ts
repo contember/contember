@@ -1,5 +1,5 @@
 import { GraphQLScalarType, Kind } from 'graphql'
-import { GraphQLObjectsFactory, JSONType } from '@contember/graphql-utils'
+import { JSONType } from '@contember/graphql-utils'
 
 //todo: implement serialize, parseValue and parseLiteral properly
 
@@ -9,8 +9,8 @@ export class CustomTypesProvider {
 	public readonly dateTimeType: GraphQLScalarType
 	public readonly jsonType: GraphQLScalarType
 
-	constructor(private readonly graphqlObjectFactories: GraphQLObjectsFactory) {
-		this.uuidType = this.graphqlObjectFactories.createScalarType({
+	constructor() {
+		this.uuidType = new GraphQLScalarType({
 			name: 'UUID',
 			serialize: str => String(str),
 			parseValue: str => String(str),
@@ -19,7 +19,7 @@ export class CustomTypesProvider {
 			},
 		})
 
-		this.dateType = this.graphqlObjectFactories.createScalarType({
+		this.dateType = new GraphQLScalarType({
 			name: 'Date',
 			serialize: str => String(str),
 			parseValue: str => String(str),
@@ -28,7 +28,7 @@ export class CustomTypesProvider {
 			},
 		})
 
-		this.dateTimeType = this.graphqlObjectFactories.createScalarType({
+		this.dateTimeType = new GraphQLScalarType({
 			name: 'DateTime',
 			serialize: str => String(str),
 			parseValue: str => String(str),

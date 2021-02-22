@@ -1,10 +1,9 @@
-import { GraphQLFieldConfig } from 'graphql'
+import { GraphQLFieldConfig, GraphQLNonNull } from 'graphql'
 import { Context } from '../types'
 import { WhereTypeProvider } from './WhereTypeProvider'
 import { EntityInputProvider, EntityInputType } from './mutations'
 import { Input, Model } from '@contember/schema'
 import { filterObject } from '../utils'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
@@ -14,7 +13,6 @@ export class ValidationQueriesProvider {
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputType.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputType.update>,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
@@ -34,9 +32,9 @@ export class ValidationQueriesProvider {
 			return undefined
 		}
 		return {
-			type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
+			type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
 			args: {
-				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
+				data: { type: new GraphQLNonNull(dataType) },
 			},
 			resolve: (parent, args, context: Context, info) =>
 				context.timer(`GraphQL.query.${info.fieldName}`, () =>
@@ -56,12 +54,12 @@ export class ValidationQueriesProvider {
 			return undefined
 		}
 		return {
-			type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
+			type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
 			args: {
 				by: {
-					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
+					type: new GraphQLNonNull(uniqueWhere),
 				},
-				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
+				data: { type: new GraphQLNonNull(dataType) },
 			},
 			resolve: (parent, args, context: Context, info) =>
 				context.timer(`GraphQL.query.${info.fieldName}`, () =>

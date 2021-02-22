@@ -2,11 +2,9 @@ import { graphql, printSchema } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import * as path from 'path'
 
-import { SchemaBuilder, AllowAllPermissionFactory, SchemaDefinition } from '@contember/schema-definition'
-import { GraphQlSchemaBuilderFactory } from '../../../../src/schema'
+import { AllowAllPermissionFactory, SchemaBuilder, SchemaDefinition } from '@contember/schema-definition'
+import { GraphQlSchemaBuilderFactory, StaticAuthorizator } from '../../../../src'
 import * as model from './model'
-import { graphqlObjectFactories } from '../../../src/graphqlObjectFactories'
-import { StaticAuthorizator } from '../../../../src'
 import { promises as fs } from 'fs'
 import * as assert from 'uvu/assert'
 import { suite } from 'uvu'
@@ -20,7 +18,7 @@ interface Test {
 const testSchema = async (test: Test) => {
 	const schemaResult = test.schema(new SchemaBuilder())
 
-	const schemaFactory = new GraphQlSchemaBuilderFactory(graphqlObjectFactories)
+	const schemaFactory = new GraphQlSchemaBuilderFactory()
 	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)

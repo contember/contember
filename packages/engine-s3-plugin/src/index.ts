@@ -17,6 +17,6 @@ export default class S3 implements Plugin {
 			return undefined
 		}
 		const s3ServiceFactory = new S3ServiceFactory()
-		return new S3SchemaContributor(container.graphqlObjectsFactory, projectConfig.s3, s3ServiceFactory)
+		return new S3SchemaContributor(projectConfig.s3, s3ServiceFactory)
 	}
 }

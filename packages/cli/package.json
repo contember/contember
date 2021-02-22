@@ -18,6 +18,7 @@
     "@contember/config-loader": "^0.10.1",
     "@contember/database-migrations": "^0.10.1",
     "@contember/dic": "^0.10.1",
+    "@contember/engine-content-api": "^0.10.1",
     "@contember/schema": "^0.10.1",
     "@contember/schema-definition": "^0.10.1",
     "@contember/schema-migrations": "^0.10.1",

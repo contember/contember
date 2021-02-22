@@ -5,12 +5,12 @@ import { singletonFactory } from '../utils'
 import { GqlTypeName } from './utils'
 import { Authorizator } from '../acl'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
+import { GraphQLBoolean, GraphQLEnumType, GraphQLInputObjectType, GraphQLInt } from 'graphql'
 
 export class OrderByTypeProvider {
 	private orderBySingleton = singletonFactory(name => this.createEntityOrderByType(name))
 
-	private orderDirectionEnum = this.graphqlObjectFactories.createEnumType({
+	private orderDirectionEnum = new GraphQLEnumType({
 		name: 'OrderDirection',
 		values: {
 			asc: { value: 'asc' },
@@ -18,18 +18,14 @@ export class OrderByTypeProvider {
 		},
 	})
 
-	constructor(
-		private readonly schema: Model.Schema,
-		private readonly authorizator: Authorizator,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
-	) {}
+	constructor(private readonly schema: Model.Schema, private readonly authorizator: Authorizator) {}
 
 	public getEntityOrderByType(entityName: string): GraphQLInputType {
 		return this.orderBySingleton(entityName)
 	}
 
 	private createEntityOrderByType(entityName: string): GraphQLInputType {
-		return this.graphqlObjectFactories.createInputObjectType({
+		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entityName}OrderBy`,
 			fields: () => this.getEntityOrderByFields(entityName),
 		})
@@ -37,8 +33,8 @@ export class OrderByTypeProvider {
 
 	private getEntityOrderByFields(name: string) {
 		const fields: GraphQLInputFieldConfigMap = {
-			_random: { type: this.graphqlObjectFactories.boolean },
-			_randomSeeded: { type: this.graphqlObjectFactories.int },
+			_random: { type: GraphQLBoolean },
+			_randomSeeded: { type: GraphQLInt },
 		}
 		const entity = this.schema.entities[name]
 

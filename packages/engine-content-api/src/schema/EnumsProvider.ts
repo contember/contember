@@ -3,14 +3,13 @@ import { GraphQLEnumValueConfigMap } from 'graphql/type/definition'
 import { Model } from '@contember/schema'
 import { singletonFactory } from '../utils'
 import { capitalizeFirstLetter } from '../utils'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export class EnumsProvider {
 	private schema: Model.Schema
 
 	private enums = singletonFactory(name => this.createEnum(name))
 
-	constructor(schema: Model.Schema, private readonly graphqlObjectFactories: GraphQLObjectsFactory) {
+	constructor(schema: Model.Schema) {
 		this.schema = schema
 	}
 
@@ -28,7 +27,7 @@ export class EnumsProvider {
 			valuesConfig[val] = { value: val }
 		}
 
-		return this.graphqlObjectFactories.createEnumType({
+		return new GraphQLEnumType({
 			name: capitalizeFirstLetter(name),
 			values: valuesConfig,
 		})

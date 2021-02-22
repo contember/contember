@@ -1,10 +1,15 @@
-import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputType } from 'graphql'
+import {
+	GraphQLBoolean,
+	GraphQLInputFieldConfig,
+	GraphQLInputFieldConfigMap,
+	GraphQLInputObjectType,
+	GraphQLInputType,
+} from 'graphql'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { GqlTypeName } from '../utils'
 import { Acl, Model } from '@contember/schema'
 import { Authorizator } from '../../acl'
 import { singletonFactory } from '../../utils'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../../exception'
 
 export class EntityInputProvider<Operation extends EntityInputType> {
@@ -21,7 +26,6 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly visitor: Model.FieldVisitor<GraphQLInputFieldConfig | undefined>,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
 	public getInput(entityName: string, withoutRelation?: string): GraphQLInputType | undefined {
@@ -48,7 +52,7 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 
 		const fieldNames = Object.keys(entity.fields).filter(it => it !== withoutRelation)
 
-		return this.graphqlObjectFactories.createInputObjectType({
+		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entityName}${withoutSuffix}${this.operation}Input`,
 			fields: () => this.createEntityFields(entityName, fieldNames),
 		})
@@ -63,7 +67,7 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 			}
 		}
 
-		fields['_dummy_field_'] = { type: this.graphqlObjectFactories.boolean }
+		fields['_dummy_field_'] = { type: GraphQLBoolean }
 
 		return fields
 	}

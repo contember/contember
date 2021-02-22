@@ -1,9 +1,8 @@
-import { GraphQLInputFieldConfig } from 'graphql'
+import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import { ColumnTypeResolver } from '../ColumnTypeResolver'
 import { CreateEntityRelationInputProvider } from './CreateEntityRelationInputProvider'
 import { Authorizator } from '../../acl'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 
 export class CreateEntityInputFieldVisitor
 	implements
@@ -14,7 +13,6 @@ export class CreateEntityInputFieldVisitor
 		private readonly authorizator: Authorizator,
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly createEntityRelationInputProvider: CreateEntityRelationInputProvider,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
 	public visitColumn(entity: Model.Entity, column: Model.AnyColumn): GraphQLInputFieldConfig | undefined {
@@ -49,7 +47,7 @@ export class CreateEntityInputFieldVisitor
 			return undefined
 		}
 		return {
-			type: this.graphqlObjectFactories.createList(this.graphqlObjectFactories.createNotNull(type)),
+			type: new GraphQLList(new GraphQLNonNull(type)),
 		}
 	}
 }

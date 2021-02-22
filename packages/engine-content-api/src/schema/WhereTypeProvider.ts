@@ -1,17 +1,14 @@
 import { Acl, Model } from '@contember/schema'
-import { acceptEveryFieldVisitor, acceptFieldVisitor, getEntity } from '@contember/schema-utils'
-import { GraphQLInputObjectType } from 'graphql'
+import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
+import { GraphQLInputObjectType, GraphQLList } from 'graphql'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql/type/definition'
-import { singletonFactory } from '../utils'
-import { capitalizeFirstLetter } from '../utils'
+import { capitalizeFirstLetter, getFieldsForUniqueWhere, singletonFactory } from '../utils'
 import { ColumnTypeResolver } from './ColumnTypeResolver'
 import { ConditionTypeProvider } from './ConditionTypeProvider'
 import { GqlTypeName } from './utils'
 import { Authorizator } from '../acl'
 import { FieldAccessVisitor } from './FieldAccessVisitor'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ImplementationException } from '../exception'
-import { getFieldsForUniqueWhere } from '../utils'
 
 export class WhereTypeProvider {
 	private whereSingleton = singletonFactory(name => this.createEntityWhereType(name))
@@ -22,7 +19,6 @@ export class WhereTypeProvider {
 		private readonly authorizator: Authorizator,
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly conditionTypeProvider: ConditionTypeProvider,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 	) {}
 
 	public getEntityWhereType(entityName: string): GraphQLInputObjectType {
@@ -40,7 +36,7 @@ export class WhereTypeProvider {
 	}
 
 	private createEntityWhereType(entityName: string) {
-		const where: GraphQLInputObjectType = this.graphqlObjectFactories.createInputObjectType({
+		const where: GraphQLInputObjectType = new GraphQLInputObjectType({
 			name: GqlTypeName`${entityName}Where`,
 			fields: () => this.getEntityWhereFields(entityName, where),
 		})
@@ -63,7 +59,7 @@ export class WhereTypeProvider {
 			combinations.push(uniqueKey.join(', '))
 		}
 
-		return this.graphqlObjectFactories.createInputObjectType({
+		return new GraphQLInputObjectType({
 			name: capitalizeFirstLetter(entityName) + 'UniqueWhere',
 			// description: `Valid combinations are: (${combinations.join('), (')})`, generates invalid schema file
 			fields: () => this.getUniqueWhereFields(entity, uniqueKeys),
@@ -118,8 +114,8 @@ export class WhereTypeProvider {
 			} as Model.FieldVisitor<GraphQLInputFieldConfig>)
 		}
 
-		fields.and = { type: this.graphqlObjectFactories.createList(where) }
-		fields.or = { type: this.graphqlObjectFactories.createList(where) }
+		fields.and = { type: new GraphQLList(where) }
+		fields.or = { type: new GraphQLList(where) }
 		fields.not = { type: where }
 
 		return fields

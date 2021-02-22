@@ -1,4 +1,11 @@
-import { GraphQLFieldConfig, GraphQLObjectType, GraphQLObjectTypeConfig } from 'graphql'
+import {
+	GraphQLBoolean,
+	GraphQLFieldConfig,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLObjectTypeConfig,
+	GraphQLString,
+} from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
 import { Context } from '../types'
 import { EntityTypeProvider } from './EntityTypeProvider'
@@ -7,9 +14,8 @@ import { Authorizator } from '../acl'
 import { EntityInputProvider, EntityInputType } from './mutations'
 import { filterObject } from '../utils'
 import { aliasAwareResolver, GqlTypeName } from './utils'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
-import { ExtensionKey, OperationMeta, Operation } from './OperationExtension'
+import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<any, Context, TArgs>
 
@@ -20,7 +26,6 @@ export class MutationProvider {
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputType.create>,
 		private readonly updateEntityInputProvider: EntityInputProvider<EntityInputType.update>,
-		private readonly graphqlObjectFactories: GraphQLObjectsFactory,
 		private readonly resultSchemaTypeProvider: ResultSchemaTypeProvider,
 	) {}
 
@@ -42,9 +47,9 @@ export class MutationProvider {
 		}
 		const resultType = this.createResultType(entityName, 'create')
 		return {
-			type: this.graphqlObjectFactories.createNotNull(resultType),
+			type: new GraphQLNonNull(resultType),
 			args: {
-				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
+				data: { type: new GraphQLNonNull(dataType) },
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.create, entity) },
 			resolve: (parent, args, context: Context, info) => {
@@ -68,10 +73,10 @@ export class MutationProvider {
 			return undefined
 		}
 		return {
-			type: this.graphqlObjectFactories.createNotNull(this.createResultType(entityName, 'delete')),
+			type: new GraphQLNonNull(this.createResultType(entityName, 'delete')),
 			args: {
 				by: {
-					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
+					type: new GraphQLNonNull(uniqueWhere),
 				},
 				filter: {
 					type: this.whereTypeProvider.getEntityWhereType(entityName),
@@ -101,15 +106,15 @@ export class MutationProvider {
 			return undefined
 		}
 		return {
-			type: this.graphqlObjectFactories.createNotNull(resultType),
+			type: new GraphQLNonNull(resultType),
 			args: {
 				by: {
-					type: this.graphqlObjectFactories.createNotNull(uniqueWhere),
+					type: new GraphQLNonNull(uniqueWhere),
 				},
 				filter: {
 					type: this.whereTypeProvider.getEntityWhereType(entityName),
 				},
-				data: { type: this.graphqlObjectFactories.createNotNull(dataType) },
+				data: { type: new GraphQLNonNull(dataType) },
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.update, entity) },
 			resolve: (parent, args, context: Context, info) => {
@@ -125,8 +130,8 @@ export class MutationProvider {
 
 	private createResultType(entityName: string, operation: 'create' | 'update' | 'delete'): GraphQLObjectType {
 		const fields: GraphQLObjectTypeConfig<any, any>['fields'] = {
-			ok: { type: this.graphqlObjectFactories.createNotNull(this.graphqlObjectFactories.boolean) },
-			errorMessage: { type: this.graphqlObjectFactories.string },
+			ok: { type: new GraphQLNonNull(GraphQLBoolean) },
+			errorMessage: { type: GraphQLString },
 			errors: { type: this.resultSchemaTypeProvider.errorListResultType },
 		}
 		if (this.authorizator.isAllowed(Acl.Operation.read, entityName)) {
@@ -135,10 +140,10 @@ export class MutationProvider {
 		}
 		if (operation !== 'delete') {
 			fields.validation = {
-				type: this.graphqlObjectFactories.createNotNull(this.resultSchemaTypeProvider.validationResultType),
+				type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
 			}
 		}
-		return this.graphqlObjectFactories.createObjectType({
+		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}${operation}Result`,
 			fields: fields,
 		})

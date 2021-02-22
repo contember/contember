@@ -1,9 +1,17 @@
-import { GraphQLFieldConfig, GraphQLSchema } from 'graphql'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
+import {
+	GraphQLEnumType,
+	GraphQLFieldConfig,
+	GraphQLInt,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLSchema,
+	GraphQLString,
+} from 'graphql'
 import { S3Acl, S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
 import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier'
-import { SchemaContext, GraphQLSchemaContributor } from '@contember/engine-plugins'
+import { GraphQLSchemaContributor, SchemaContext } from '@contember/engine-plugins'
 
 interface Identity {
 	projectRoles: string[]
@@ -19,14 +27,14 @@ type S3SchemaAcl = Record<
 
 export class S3SchemaContributor implements GraphQLSchemaContributor {
 	private s3HeadersType: GraphQLFieldConfig<any, any> = {
-		type: this.objectsFactory.createNotNull(
-			this.objectsFactory.createList(
-				this.objectsFactory.createNotNull(
-					this.objectsFactory.createObjectType({
+		type: new GraphQLNonNull(
+			new GraphQLList(
+				new GraphQLNonNull(
+					new GraphQLObjectType({
 						name: 'S3Header',
 						fields: {
-							key: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
-							value: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
+							key: { type: new GraphQLNonNull(GraphQLString) },
+							value: { type: new GraphQLNonNull(GraphQLString) },
 						},
 					}),
 				),
@@ -34,11 +42,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		),
 	}
 
-	constructor(
-		private readonly objectsFactory: GraphQLObjectsFactory,
-		private readonly s3Config: S3Config | undefined,
-		private readonly s3Factory: S3ServiceFactory,
-	) {}
+	constructor(private readonly s3Config: S3Config | undefined, private readonly s3Factory: S3ServiceFactory) {}
 
 	getCacheKey(context: SchemaContext): string {
 		const roles = context.identity.projectRoles
@@ -69,16 +73,16 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 			generateUploadUrl: uploadMutation as GraphQLFieldConfig<any, any, any>,
 			generateReadUrl: readMutation,
 		}
-		return this.objectsFactory.createSchema({
-			mutation: this.objectsFactory.createObjectType({
+		return new GraphQLSchema({
+			mutation: new GraphQLObjectType({
 				name: 'Mutation',
 				fields: () => mutation,
 			}),
-			query: this.objectsFactory.createObjectType({
+			query: new GraphQLObjectType({
 				name: 'Query',
 				fields: () => ({
 					s3DummyQuery: {
-						type: this.objectsFactory.string,
+						type: GraphQLString,
 					},
 				}),
 			}),
@@ -88,27 +92,27 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 	private createReadMutation(s3: S3Service, allowedKeyPatterns: string[]): GraphQLFieldConfig<any, any, any> {
 		let verifier: ObjectKeyVerifier
 		return {
-			type: this.objectsFactory.createNotNull(
-				this.objectsFactory.createObjectType({
+			type: new GraphQLNonNull(
+				new GraphQLObjectType({
 					name: 'S3SignedRead',
 					fields: {
-						url: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
+						url: { type: new GraphQLNonNull(GraphQLString) },
 						headers: this.s3HeadersType,
-						method: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
+						method: { type: new GraphQLNonNull(GraphQLString) },
 						objectKey: {
-							type: this.objectsFactory.createNotNull(this.objectsFactory.string),
+							type: new GraphQLNonNull(GraphQLString),
 							description: `Allowed patterns:\n${allowedKeyPatterns.join('\n')}`,
 						},
-						bucket: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
+						bucket: { type: new GraphQLNonNull(GraphQLString) },
 					},
 				}),
 			),
 			args: {
 				objectKey: {
-					type: this.objectsFactory.createNotNull(this.objectsFactory.string),
+					type: new GraphQLNonNull(GraphQLString),
 				},
 				expiration: {
-					type: this.objectsFactory.int,
+					type: GraphQLInt,
 				},
 			},
 			resolve: async (parent: any, args: { objectKey: string; expiration?: number }) => {
@@ -127,37 +131,37 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 	): GraphQLFieldConfig<any, any, any> {
 		let verifier: ObjectKeyVerifier
 		return {
-			type: this.objectsFactory.createNotNull(
-				this.objectsFactory.createObjectType({
+			type: new GraphQLNonNull(
+				new GraphQLObjectType({
 					name: 'S3SignedUpload',
 					fields: {
-						url: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
+						url: { type: new GraphQLNonNull(GraphQLString) },
 						headers: this.s3HeadersType,
-						method: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
+						method: { type: new GraphQLNonNull(GraphQLString) },
 						objectKey: {
-							type: this.objectsFactory.createNotNull(this.objectsFactory.string),
+							type: new GraphQLNonNull(GraphQLString),
 							description: `Allowed patterns:\n${allowedKeyPatterns.join('\n')}`,
 						},
-						bucket: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
-						publicUrl: { type: this.objectsFactory.createNotNull(this.objectsFactory.string) },
+						bucket: { type: new GraphQLNonNull(GraphQLString) },
+						publicUrl: { type: new GraphQLNonNull(GraphQLString) },
 					},
 				}),
 			),
 			args: {
 				contentType: {
-					type: this.objectsFactory.createNotNull(this.objectsFactory.string),
+					type: new GraphQLNonNull(GraphQLString),
 				},
 				expiration: {
-					type: this.objectsFactory.int,
+					type: GraphQLInt,
 				},
 				prefix: {
-					type: this.objectsFactory.string,
+					type: GraphQLString,
 				},
 				...(s3Config.noAcl
 					? {}
 					: {
 							acl: {
-								type: this.objectsFactory.createEnumType({
+								type: new GraphQLEnumType({
 									name: 'S3Acl',
 									values: {
 										PUBLIC_READ: {},

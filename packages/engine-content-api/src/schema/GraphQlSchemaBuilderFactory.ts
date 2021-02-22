@@ -21,7 +21,6 @@ import { OrderByTypeProvider } from './OrderByTypeProvider'
 import { HasManyToHasOneReducer } from '../extensions'
 import { HasManyToHasOneRelationReducerFieldVisitor } from '../extensions'
 import { ValidationQueriesProvider } from './ValidationQueriesProvider'
-import { GraphQLObjectsFactory } from '@contember/graphql-utils'
 import { CustomTypesProvider } from './CustomTypesProvider'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
 import { Authorizator } from '../acl'
@@ -30,26 +29,15 @@ import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/Pa
 import { PaginatedHasManyFieldProviderVisitor } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProviderVisitor'
 
 export class GraphQlSchemaBuilderFactory {
-	constructor(private readonly graphqlObjectFactories: GraphQLObjectsFactory) {}
+	constructor() {}
 
 	public create(schema: Model.Schema, authorizator: Authorizator): GraphQlSchemaBuilder {
-		const customTypesProvider = new CustomTypesProvider(this.graphqlObjectFactories)
-		const enumsProvider = new EnumsProvider(schema, this.graphqlObjectFactories)
-		const columnTypeResolver = new ColumnTypeResolver(
-			schema,
-			enumsProvider,
-			customTypesProvider,
-			this.graphqlObjectFactories,
-		)
-		const conditionTypeProvider = new ConditionTypeProvider(columnTypeResolver, this.graphqlObjectFactories)
-		const whereTypeProvider = new WhereTypeProvider(
-			schema,
-			authorizator,
-			columnTypeResolver,
-			conditionTypeProvider,
-			this.graphqlObjectFactories,
-		)
-		const orderByTypeProvider = new OrderByTypeProvider(schema, authorizator, this.graphqlObjectFactories)
+		const customTypesProvider = new CustomTypesProvider()
+		const enumsProvider = new EnumsProvider(schema)
+		const columnTypeResolver = new ColumnTypeResolver(schema, enumsProvider, customTypesProvider)
+		const conditionTypeProvider = new ConditionTypeProvider(columnTypeResolver)
+		const whereTypeProvider = new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider)
+		const orderByTypeProvider = new OrderByTypeProvider(schema, authorizator)
 
 		const entityTypeProvider = new EntityTypeProvider(
 			schema,
@@ -57,21 +45,18 @@ export class GraphQlSchemaBuilderFactory {
 			columnTypeResolver,
 			whereTypeProvider,
 			orderByTypeProvider,
-			this.graphqlObjectFactories,
 		)
 
 		const paginatedFieldConfigFactory = new PaginatedFieldConfigFactory(
 			whereTypeProvider,
 			orderByTypeProvider,
 			entityTypeProvider,
-			this.graphqlObjectFactories,
 		)
 		const hasManyToOneReducerVisitor = new HasManyToHasOneRelationReducerFieldVisitor(
 			schema,
 			authorizator,
 			entityTypeProvider,
 			whereTypeProvider,
-			this.graphqlObjectFactories,
 		)
 		const hasManyToOneReducer = new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor)
 		entityTypeProvider.registerEntityFieldProvider(HasManyToHasOneReducer.extensionName, hasManyToOneReducer)
@@ -91,7 +76,6 @@ export class GraphQlSchemaBuilderFactory {
 			whereTypeProvider,
 			orderByTypeProvider,
 			entityTypeProvider,
-			this.graphqlObjectFactories,
 			paginatedFieldConfigFactory,
 		)
 
@@ -102,7 +86,6 @@ export class GraphQlSchemaBuilderFactory {
 			whereTypeProvider,
 			createEntityInputProviderAccessor,
 			createEntityRelationAllowedOperationsVisitor,
-			this.graphqlObjectFactories,
 		)
 		const createEntityRelationInputProvider = new CreateEntityRelationInputProvider(
 			schema,
@@ -113,14 +96,12 @@ export class GraphQlSchemaBuilderFactory {
 			authorizator,
 			columnTypeResolver,
 			createEntityRelationInputProvider,
-			this.graphqlObjectFactories,
 		)
 		const createEntityInputProvider = new EntityInputProvider(
 			EntityInputType.create,
 			schema,
 			authorizator,
 			createEntityInputFieldVisitor,
-			this.graphqlObjectFactories,
 		)
 		createEntityInputProviderAccessor.set(createEntityInputProvider)
 
@@ -133,7 +114,6 @@ export class GraphQlSchemaBuilderFactory {
 			updateEntityInputProviderAccessor,
 			createEntityInputProvider,
 			updateEntityRelationAllowedOperationsVisitor,
-			this.graphqlObjectFactories,
 		)
 		const updateEntityRelationInputProvider = new UpdateEntityRelationInputProvider(
 			schema,
@@ -143,32 +123,28 @@ export class GraphQlSchemaBuilderFactory {
 			authorizator,
 			columnTypeResolver,
 			updateEntityRelationInputProvider,
-			this.graphqlObjectFactories,
 		)
 		const updateEntityInputProvider = new EntityInputProvider(
 			EntityInputType.update,
 			schema,
 			authorizator,
 			updateEntityInputFieldVisitor,
-			this.graphqlObjectFactories,
 		)
 		updateEntityInputProviderAccessor.set(updateEntityInputProvider)
 
-		const resultSchemaTypeProvider = new ResultSchemaTypeProvider(this.graphqlObjectFactories)
+		const resultSchemaTypeProvider = new ResultSchemaTypeProvider()
 		const mutationProvider = new MutationProvider(
 			authorizator,
 			whereTypeProvider,
 			entityTypeProvider,
 			createEntityInputProvider,
 			updateEntityInputProvider,
-			this.graphqlObjectFactories,
 			resultSchemaTypeProvider,
 		)
 		const validationQueriesProvider = new ValidationQueriesProvider(
 			whereTypeProvider,
 			createEntityInputProvider,
 			updateEntityInputProvider,
-			this.graphqlObjectFactories,
 			resultSchemaTypeProvider,
 		)
 
@@ -177,7 +153,6 @@ export class GraphQlSchemaBuilderFactory {
 			queryProvider,
 			validationQueriesProvider,
 			mutationProvider,
-			this.graphqlObjectFactories,
 			resultSchemaTypeProvider,
 		)
 	}

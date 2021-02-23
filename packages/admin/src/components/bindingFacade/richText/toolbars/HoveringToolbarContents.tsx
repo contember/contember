@@ -1,10 +1,10 @@
-import { EntityKeyProvider, useBindingOperations, useEnvironment, VariableInputTransformer } from '@contember/binding'
+import { AccessorProvider, useBindingOperations, useEnvironment, VariableInputTransformer } from '@contember/binding'
 import { Dropdown, EditorToolbar, Icon, ToolbarGroup } from '@contember/ui'
 import * as React from 'react'
 import { Range as SlateRange } from 'slate'
 import { useEditor, useSlate } from 'slate-react'
 import { BaseEditor } from '../baseEditor'
-import { BlockSlateEditor } from '../blockEditor/editor'
+import { BlockSlateEditor } from '../blockEditor'
 import { InitializeReferenceToolbarButton, ToolbarButtonSpec } from './ToolbarButtonSpec'
 
 export interface HoveringToolbarContentsProps {
@@ -28,8 +28,8 @@ const RefButton = React.memo(({ button }: { button: InitializeReferenceToolbarBu
 				}
 				setEditorSelection(null)
 				setReferenceId(undefined)
-				bindingOperations.batchDeferredUpdates(({ getEntityByKey }) => getEntityByKey(referenceId).deleteEntity())
-			}, [bindingOperations, referenceId])}
+				bindingOperations.batchDeferredUpdates(() => editor.getReferencedEntity(referenceId).deleteEntity())
+			}, [bindingOperations, editor, referenceId])}
 			renderToggle={({ ref, onClick }) => (
 				<Icon
 					blueprintIcon={button.blueprintIcon}
@@ -41,7 +41,12 @@ const RefButton = React.memo(({ button }: { button: InitializeReferenceToolbarBu
 							return
 						}
 						const discriminateBy = VariableInputTransformer.transformVariableLiteral(button.discriminateBy, environment)
-						setReferenceId(editor.createElementReference(discriminateBy, button.initializeReference))
+
+						// const preppedPath = editor.prepareElementForInsertion({
+						// 	type: button,
+						// })
+						const preppedPath = editorSelection?.focus.path || [] // TODO this is awful.
+						setReferenceId(editor.createElementReference(preppedPath, discriminateBy, button.initializeReference))
 						setEditorSelection(editor.selection)
 						onClick(e)
 					}}
@@ -58,20 +63,20 @@ const RefButton = React.memo(({ button }: { button: InitializeReferenceToolbarBu
 					setReferenceId(undefined)
 				}
 				return (
-					<EntityKeyProvider entityKey={referenceId}>
+					<AccessorProvider accessor={editor.getReferencedEntity(referenceId)}>
 						<Content
 							referenceId={referenceId}
 							editor={editor}
 							selection={editorSelection}
 							onSuccess={cleanUp}
 							onCancel={() => {
-								bindingOperations.batchDeferredUpdates(({ getEntityByKey }) =>
-									getEntityByKey(referenceId).deleteEntity(),
+								bindingOperations.batchDeferredUpdates(() =>
+									bindingOperations.batchDeferredUpdates(() => editor.getReferencedEntity(referenceId).deleteEntity()),
 								)
 								cleanUp()
 							}}
 						/>
-					</EntityKeyProvider>
+					</AccessorProvider>
 				)
 			}}
 		</Dropdown>

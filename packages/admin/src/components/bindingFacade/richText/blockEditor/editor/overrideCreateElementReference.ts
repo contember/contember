@@ -1,16 +1,9 @@
-import {
-	BindingError,
-	BindingOperations,
-	EntityAccessor,
-	EntityListAccessor,
-	FieldValue,
-	RelativeSingleField,
-} from '@contember/binding'
+import { BindingError, BindingOperations, RelativeSingleField } from '@contember/binding'
+import { Editor } from 'slate'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideCreateElementReferenceOptions {
 	bindingOperations: BindingOperations
-	createNewReference: EntityListAccessor.CreateNewEntity | undefined
 	referenceDiscriminationField: RelativeSingleField | undefined
 }
 
@@ -18,30 +11,31 @@ export const overrideCreateElementReference = <E extends BlockSlateEditor>(
 	editor: E,
 	options: OverrideCreateElementReferenceOptions,
 ) => {
-	const { bindingOperations, createNewReference, referenceDiscriminationField } = options
-	if (referenceDiscriminationField === undefined || createNewReference === undefined) {
+	const { bindingOperations, referenceDiscriminationField } = options
+	if (referenceDiscriminationField === undefined) {
 		return
 	}
-	editor.createElementReference = (
-		referenceDiscriminant: FieldValue,
-		initialize?: EntityAccessor.BatchUpdatesHandler,
-	) => {
+	editor.createElementReference = (targetPath, referenceDiscriminant, initialize) => {
 		const invalidFallbackUuid = 'richEditorIsBroken'
 		let referenceUuid = invalidFallbackUuid
 
-		bindingOperations.batchDeferredUpdates(() => {
-			createNewReference((getNewReference, bindingOperations) => {
-				getNewReference().getField('id').asUuid.setToUuid()
-				getNewReference().getField(referenceDiscriminationField).updateValue(referenceDiscriminant)
+		Editor.withoutNormalizing(editor, () => {
+			bindingOperations.batchDeferredUpdates(() => {
+				const [topLevelIndex] = targetPath
 
-				referenceUuid = getNewReference().getField<string>('id').value!
+				editor.createReferencedEntity(topLevelIndex, (getNewReference, bindingOperations) => {
+					getNewReference().getField('id').asUuid.setToUuid()
+					getNewReference().getField(referenceDiscriminationField).updateValue(referenceDiscriminant)
 
-				initialize?.(getNewReference, bindingOperations)
+					referenceUuid = getNewReference().getField<string>('id').value!
+
+					initialize?.(getNewReference, bindingOperations)
+				})
 			})
 		})
 
 		if (referenceUuid === invalidFallbackUuid) {
-			throw new BindingError(``)
+			throw new BindingError()
 		}
 
 		return referenceUuid

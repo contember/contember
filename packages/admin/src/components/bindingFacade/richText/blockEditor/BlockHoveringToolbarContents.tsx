@@ -11,15 +11,9 @@ import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember
 import * as React from 'react'
 import { useEditor } from 'slate-react'
 import { getDiscriminatedDatum } from '../../discrimination'
-import { EditorNode } from '../baseEditor'
 import { ElementSpecificToolbarButton } from '../toolbars'
 import { BlockSlateEditor } from './editor'
-import {
-	BlockReferenceElement,
-	blockReferenceElementType,
-	BlockVoidReferenceElement,
-	blockVoidReferenceElementType,
-} from './elements'
+import { ReferenceElement, referenceElementType } from './elements'
 import { EditorReferenceBlocks } from './templating'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
@@ -75,16 +69,16 @@ function toToolbarGroups(
 									`BlockEditor: Trying to insert a block discriminated by '${discriminateBy}' but nu such block has been found!`,
 								)
 							}
-							let insertedElement: Omit<BlockVoidReferenceElement | BlockReferenceElement, 'referenceId'>
+							let insertedElement: Omit<ReferenceElement, 'referenceId'>
 
 							if (targetBlock.datum.template === undefined) {
 								insertedElement = {
-									type: blockVoidReferenceElementType,
+									type: referenceElementType,
 									children: [{ text: '' }],
 								}
 							} else {
 								insertedElement = {
-									type: blockReferenceElementType,
+									type: referenceElementType,
 									children: [editor.createDefaultElement([{ text: '' }])],
 								}
 							}

@@ -1,9 +1,9 @@
-import { EntityAccessor, EntityListAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
+import { EntityAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
+import { Editor, Transforms } from 'slate'
 import { ElementNode } from '../../baseEditor'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertElementWithReferenceOptions {
-	createNewReference: EntityListAccessor.CreateNewEntity | undefined
 	referenceDiscriminationField: RelativeSingleField | undefined
 }
 
@@ -11,8 +11,8 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 	editor: E,
 	options: OverrideInsertElementWithReferenceOptions,
 ) => {
-	const { createNewReference, referenceDiscriminationField } = options
-	if (referenceDiscriminationField === undefined || createNewReference === undefined) {
+	const { referenceDiscriminationField } = options
+	if (referenceDiscriminationField === undefined) {
 		return
 	}
 	editor.insertElementWithReference = <Element extends ElementNode>(
@@ -20,9 +20,10 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 		referenceDiscriminant: FieldValue,
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => {
-		editor.insertNode({
-			...element,
-			referenceId: editor.createElementReference(referenceDiscriminant, initialize),
+		Editor.withoutNormalizing(editor, () => {
+			const preppedPath = editor.prepareElementForInsertion(element)
+			const referenceId = editor.createElementReference(preppedPath, referenceDiscriminant, initialize)
+			Transforms.insertNodes(editor, { ...element, referenceId }, { at: preppedPath })
 		})
 	}
 }

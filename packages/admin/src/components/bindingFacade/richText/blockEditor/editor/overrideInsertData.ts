@@ -1,6 +1,6 @@
 import { FieldValue, RelativeSingleField } from '@contember/binding'
 import { ResolvedDiscriminatedDatum } from '../../../discrimination'
-import { EmbedElement, embedElementType } from '../elements'
+import { ReferenceElement, referenceElementType } from '../elements'
 import { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
@@ -56,12 +56,12 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 			return insertData(data)
 		}
 
-		const partialEmbed: Omit<EmbedElement, 'referenceId'> = {
-			type: embedElementType,
+		const partialEmbedReference: Omit<ReferenceElement, 'referenceId'> = {
+			type: referenceElementType,
 			children: [{ text: '' }],
 		}
 
-		return editor.insertElementWithReference(partialEmbed, embedReferenceDiscriminateBy, getEmbedReference => {
+		return editor.insertElementWithReference(partialEmbedReference, embedReferenceDiscriminateBy, getEmbedReference => {
 			getEmbedReference()
 				.getRelativeSingleField(embedContentDiscriminationField)
 				.updateValue(embedHandler!.discriminateBy)

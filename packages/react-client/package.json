@@ -1,6 +1,6 @@
 {
   "name": "@contember/react-client",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "type": "module",
   "main": "dist/src/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/client": "0.6.1"
+    "@contember/client": "0.6.2"
   },
   "peerDependencies": {
     "react": "16.13.1"

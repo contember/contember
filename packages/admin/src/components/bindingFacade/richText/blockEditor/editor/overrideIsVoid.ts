@@ -1,18 +1,16 @@
-import { BindingError, EntityAccessor, RelativeSingleField } from '@contember/binding'
+import { BindingError, RelativeSingleField } from '@contember/binding'
 import { getDiscriminatedDatum } from '../../../discrimination'
-import { ReferenceElement } from '../elements'
 import { EditorReferenceBlocks } from '../templating'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideIsVoidOptions {
-	getReferencedEntity: (element: ReferenceElement) => EntityAccessor
 	referenceDiscriminationField: RelativeSingleField | undefined
 	editorReferenceBlocks: EditorReferenceBlocks
 }
 
 export const overrideIsVoid = <E extends BlockSlateEditor>(
 	editor: E,
-	{ editorReferenceBlocks, getReferencedEntity, referenceDiscriminationField }: OverrideIsVoidOptions,
+	{ editorReferenceBlocks, referenceDiscriminationField }: OverrideIsVoidOptions,
 ) => {
 	const { isVoid } = editor
 
@@ -21,7 +19,7 @@ export const overrideIsVoid = <E extends BlockSlateEditor>(
 			if (referenceDiscriminationField === undefined) {
 				throw new BindingError()
 			}
-			const referencedEntity = getReferencedEntity(element)
+			const referencedEntity = editor.getReferencedEntity(element)
 			const discriminationField = referencedEntity.getRelativeSingleField(referenceDiscriminationField)
 			const selectedReference = getDiscriminatedDatum(editorReferenceBlocks, discriminationField)?.datum
 

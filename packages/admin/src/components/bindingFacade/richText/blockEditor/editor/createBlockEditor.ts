@@ -1,12 +1,15 @@
 import { BindingError } from '@contember/binding'
 import { noop } from '@contember/react-utils'
 import * as Slate from 'slate'
+import { Element as SlateElement } from 'slate'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
 import { isContemberContentPlaceholderElement, isContemberFieldElement, isReferenceElement } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
 import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference'
+import { overrideCreateReferencedEntity, OverrideCreateReferencedEntityOptions } from './overrideCreateReferencedEntity'
+import { overrideGetReferencedEntity, OverrideGetReferencedEntityOptions } from './overrideGetReferencedEntity'
 import { overrideInsertBreak } from './overrideInsertBreak'
 import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData'
 import {
@@ -17,12 +20,15 @@ import { overrideInsertNode } from './overrideInsertNode'
 import { overrideIsVoid, OverrideIsVoidOptions } from './overrideIsVoid'
 import { overrideNormalizeNode, OverrideNormalizeNodeOptions } from './overrideNormalizeNode'
 import { overrideOnKeyDown } from './overrideOnKeyDown'
+import { overridePrepareElementForInsertion } from './overridePrepareElementForInsertion'
 import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
 
 export interface CreateEditorOptions
 	extends OverrideOnChangeOptions,
 		OverrideCreateElementReferenceOptions,
+		OverrideCreateReferencedEntityOptions,
+		OverrideGetReferencedEntityOptions,
 		OverrideApplyOptions,
 		OverrideRenderElementOptions,
 		OverrideNormalizeNodeOptions,
@@ -47,17 +53,49 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			e.isReferenceElement = isReferenceElement
 			e.isContemberContentPlaceholderElement = isContemberContentPlaceholderElement
 			e.isContemberFieldElement = isContemberFieldElement
+			e.prepareElementForInsertion = () => {
+				throw new BindingError()
+			}
 			e.insertElementWithReference = () => {
 				throw new BindingError(
 					`BlockEditor: trying to insert a referenced element but referencing has not been correctly set up. ` +
 						`Check the BlockEditor props.`,
 				)
 			}
+			e.createReferencedEntity = () => {
+				throw new BindingError(
+					`BlockEditor: trying to create a referenced entity but referencing has not been correctly set up. ` +
+						`Check the BlockEditor props.`,
+				)
+			}
+			e.getReferencedEntity = () => {
+				throw new BindingError(
+					`BlockEditor: trying to access a referenced entity but referencing has not been correctly set up. ` +
+						`Check the BlockEditor props.`,
+				)
+			}
+
+			const { upgradeFormatBySingleVersion } = e
+			e.upgradeFormatBySingleVersion = (node, oldVersion) => {
+				if (oldVersion !== 0 || !SlateElement.isElement(node)) {
+					return upgradeFormatBySingleVersion(node, oldVersion)
+				}
+				if (node.type === 'embed' || node.type === 'blockReference' || node.type === 'blockVoidReference') {
+					return {
+						...node,
+						type: 'reference',
+						children: node.children.map((child: any) => editor.upgradeFormatBySingleVersion(child, oldVersion)),
+					}
+				}
+				return upgradeFormatBySingleVersion(node, oldVersion)
+			}
 			e.slateOnChange = noop
 			e.slate = Slate
 
 			overrideApply(e, options)
 			overrideCreateElementReference(e, options)
+			overrideCreateReferencedEntity(e, options)
+			overrideGetReferencedEntity(e, options)
 			overrideInsertBreak(e, options)
 			overrideInsertData(e, options)
 			overrideInsertElementWithReference(e, options)
@@ -65,6 +103,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			overrideIsVoid(e, options)
 			overrideNormalizeNode(e, options)
 			overrideOnKeyDown(e, options)
+			overridePrepareElementForInsertion(e)
 			overrideRenderElement(e, options)
 			overrideSlateOnChange(e, options)
 

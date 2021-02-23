@@ -38,7 +38,7 @@ import {
 } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
 import { createBlockEditor } from './editor'
-import { ContemberFieldElement, ReferenceElement } from './elements'
+import { ContemberFieldElement } from './elements'
 import { EmbedHandler } from './embed'
 import { FieldBackedElement } from './FieldBackedElement'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
@@ -55,6 +55,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 
 	referencesField?: SugaredRelativeEntityList | string
 	referenceDiscriminationField?: SugaredFieldProps['field']
+	monolithicReferencesMode?: boolean
 
 	embedReferenceDiscriminateBy?: SugaredDiscriminateBy
 	embedContentDiscriminationField?: SugaredFieldProps['field']
@@ -104,7 +105,9 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 		} = props
 
 		const parentEntity = useEntity() // TODO this is over-subscribing
-		const referenceList = useEntityList(referencesField) // TODO this is over-subscribing
+
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const referenceList = props.monolithicReferencesMode ? useEntityList(referencesField) : undefined
 
 		const batchUpdates = parentEntity.batchUpdates
 		const blockList = useEntityList(blockListProps)
@@ -180,17 +183,6 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 			[addBlockListListener, blockElementPathRefs],
 		)
 
-		const getReferenceById = referenceList?.getChildEntityById
-		const getReferencedEntity = React.useCallback(
-			(element: ReferenceElement): EntityAccessor => {
-				if (getReferenceById === undefined) {
-					throw new BindingError()
-				}
-				return getReferenceById(element.referenceId)
-			},
-			[getReferenceById],
-		)
-
 		const [editor] = React.useState(() =>
 			createBlockEditor({
 				augmentEditor,
@@ -201,21 +193,21 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 				blockElementCache,
 				blockElementPathRefs,
 				contemberFieldElementCache,
-				createNewReference: referenceList?.createNewEntity,
+				createMonolithicReference: referenceList?.createNewEntity,
 				desugaredBlockList,
 				editorReferenceBlocks,
 				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
 				embedSubBlocks,
-				getReferencedEntity,
-				getReferenceById: referenceList?.getChildEntityById,
+				getMonolithicReferenceById: referenceList?.getChildEntityById,
 				isMutatingRef,
 				leadingFields: leadingFieldBackedElements,
 				trailingFields: trailingFieldBackedElements,
 				placeholder: label,
 				plugins,
 				referenceDiscriminationField: desugaredReferenceDiscriminationField,
+				referencesField,
 				sortableByField: desugaredSortableByField,
 				sortedBlocksRef,
 			}),
@@ -305,6 +297,31 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 					: [props.inlineButtons]) as ToolbarButtonSpec[][]).flat()
 			: emptyArray
 
+		const references = !!(props.referencesField && props.referenceDiscriminationField) && (
+			<HasMany
+				{...(typeof props.referencesField === 'string' ? { field: props.referencesField } : props.referencesField)}
+				initialEntityCount={0}
+			>
+				{inlineButtons
+					.filter((button): button is InitializeReferenceToolbarButton => 'referenceContent' in button)
+					.map(({ referenceContent: Content }, i) => {
+						return (
+							<Content key={i} referenceId="" editor={0 as any} selection={null} onSuccess={noop} onCancel={noop} />
+						)
+					})}
+				<SugaredField field={props.referenceDiscriminationField} />
+				{props.children}
+				{props.embedContentDiscriminationField && (
+					<>
+						<SugaredField field={props.embedContentDiscriminationField} />
+						{embedHandlers.map((handler, i) => (
+							<React.Fragment key={i}>{handler.staticRender(environment)}</React.Fragment>
+						))}
+					</>
+				)}
+			</HasMany>
+		)
+
 		return (
 			<>
 				{props.leadingFieldBackedElements?.map((item, i) => (
@@ -316,31 +333,9 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 				<Repeater {...props} initialEntityCount={0}>
 					<SugaredField field={props.sortableBy} />
 					<SugaredField field={props.contentField} />
+					{!props.monolithicReferencesMode && references}
 				</Repeater>
-				{!!(props.referencesField && props.referenceDiscriminationField) && (
-					<HasMany
-						{...(typeof props.referencesField === 'string' ? { field: props.referencesField } : props.referencesField)}
-						initialEntityCount={0}
-					>
-						{inlineButtons
-							.filter((button): button is InitializeReferenceToolbarButton => 'referenceContent' in button)
-							.map(({ referenceContent: Content }, i) => {
-								return (
-									<Content key={i} referenceId="" editor={0 as any} selection={null} onSuccess={noop} onCancel={noop} />
-								)
-							})}
-						<SugaredField field={props.referenceDiscriminationField} />
-						{props.children}
-						{props.embedContentDiscriminationField && (
-							<>
-								<SugaredField field={props.embedContentDiscriminationField} />
-								{embedHandlers.map((handler, i) => (
-									<React.Fragment key={i}>{handler.staticRender(environment)}</React.Fragment>
-								))}
-							</>
-						)}
-					</HasMany>
-				)}
+				{props.monolithicReferencesMode && references}
 			</>
 		)
 	},

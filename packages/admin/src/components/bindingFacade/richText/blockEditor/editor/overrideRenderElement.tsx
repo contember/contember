@@ -1,6 +1,7 @@
-import { AccessorProvider, EntityListAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
+import { AccessorProvider, FieldValue, RelativeSingleField } from '@contember/binding'
 import * as React from 'react'
 import { NormalizedBlocks } from '../../../blocks'
+import { isElementWithReference } from '../elements'
 import { NormalizedEmbedHandlers } from '../embed/core'
 import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockEditorElementRenderer } from '../renderers'
@@ -10,7 +11,6 @@ import { BlockSlateEditor } from './BlockSlateEditor'
 export interface OverrideRenderElementOptions {
 	editorReferenceBlocks: EditorReferenceBlocks
 	referenceDiscriminationField: RelativeSingleField | undefined
-	getReferenceById: EntityListAccessor.GetChildEntityById | undefined
 
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks | undefined
@@ -42,8 +42,8 @@ export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, opt
 			/>
 		)
 
-		if ('referenceId' in props.element && props.element.referenceId && options.getReferenceById) {
-			return <AccessorProvider accessor={options.getReferenceById(props.element.referenceId)}>{child}</AccessorProvider>
+		if (isElementWithReference(props.element)) {
+			return <AccessorProvider accessor={editor.getReferencedEntity(props.element)}>{child}</AccessorProvider>
 		}
 		return child
 	}

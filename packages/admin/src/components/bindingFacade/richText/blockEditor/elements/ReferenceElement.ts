@@ -1,11 +1,11 @@
 import { Element, Node } from 'slate'
+import { ElementWithReference } from './ElementWithReference'
 
 type ReferenceElementType = 'reference'
 export const referenceElementType: ReferenceElementType = 'reference'
 
-export interface ReferenceElement extends Element {
+export interface ReferenceElement extends ElementWithReference {
 	type: ReferenceElementType
-	referenceId: string
 }
 
 export const isReferenceElement = (node: Node): node is ReferenceElement =>

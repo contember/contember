@@ -62,7 +62,7 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(e
 			Transforms.removeNodes(editor, {
 				at: [topLevelIndex],
 			})
-			return targetPoint.path
+			return [topLevelIndex]
 			// Transforms.insertNodes(editor, node, {
 			// 	at: [topLevelIndex],
 			// })

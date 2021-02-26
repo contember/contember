@@ -1,10 +1,11 @@
 // export * from './BindingOperationsContext' // Deliberately not exporting it
 // export * from './EntityKeyContext' // Deliberately not exporting it
+// export * from './TreeRootIdContext' // Deliberately not exporting it
 export * from './AccessorProvider'
 export * from './BindingOperationsProvider'
 export * from './EntityKeyProvider'
 export * from './EnvironmentContext'
-export * from './TreeRootIdContext'
+export * from './TreeRootIdProvider'
 export * from './useAccessorUpdateSubscription'
 export * from './useBindingOperations'
 export * from './useDesugaredRelativeEntityList'
@@ -24,3 +25,4 @@ export * from './useGetEntityListSubTree'
 export * from './useGetEntitySubTree'
 export * from './useGetTreeFilters'
 export * from './usePersist'
+export * from './useTreeRootId'

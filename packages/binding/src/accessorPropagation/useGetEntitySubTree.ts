@@ -7,16 +7,18 @@ import {
 } from '../treeParameters'
 import { useBindingOperations } from './useBindingOperations'
 import { useEnvironment } from './useEnvironment'
+import { useTreeRootId } from './useTreeRootId'
 
 export const useGetEntitySubTree = () => {
 	const environment = useEnvironment()
 	const getEntitySubTree = useBindingOperations().getEntitySubTree
+	const treeRootId = useTreeRootId()
 
 	return React.useCallback(
 		(
 			parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,
-			treeId?: TreeRootId,
-		) => getEntitySubTree(parametersOrAlias, treeId, environment),
-		[environment, getEntitySubTree],
+			...treeId: [TreeRootId | undefined] | []
+		) => getEntitySubTree(parametersOrAlias, treeId.length === 0 ? treeRootId : treeId[0], environment),
+		[environment, getEntitySubTree, treeRootId],
 	)
 }

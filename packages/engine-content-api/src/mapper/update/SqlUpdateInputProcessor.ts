@@ -15,7 +15,6 @@ import {
 } from '../Result'
 import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
 import { AbortUpdate } from './Updater'
-import { ImplementationException } from '../../exception'
 
 export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationResultList> {
 	constructor(
@@ -306,24 +305,74 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 
 	oneHasOneInverse: UpdateInputProcessor<MutationResultList>['oneHasOneInverse'] = {
 		connect: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
-			return await this.mapper.update(targetEntity, input, {
-				[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
+			const newOwner = await this.mapper.getPrimaryValue(targetEntity, input)
+			if (!newOwner) {
+				return [new MutationEntryNotFoundError([], input)]
+			}
+			const currentOwner = await this.mapper.getPrimaryValue(targetEntity, {
+				[targetRelation.name]: { [entity.primary]: this.primaryValue },
 			})
-		}),
-		create: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
-			return [
-				...(
-					await this.mapper.update(
-						targetEntity,
-						{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
-						{ [targetRelation.name]: { disconnect: true } },
-					)
-				).filter(it => it.result !== MutationResultType.notFoundError),
-				...(await this.mapper.insert(targetEntity, {
-					...input,
-					[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
+			if (newOwner === currentOwner) {
+				return [new MutationNothingToDo([], NothingToDoReason.alreadyExists)]
+			}
+			const result: MutationResultList = []
+			if (currentOwner) {
+				if (!targetRelation.nullable) {
+					// todo cascade delete support?
+					return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+				}
+				result.push(
+					...(await this.mapper.update(targetEntity, { [targetEntity.primary]: currentOwner }, {}, {}, builder => {
+						builder.addPredicates([targetRelation.name])
+						builder.addFieldValue(targetRelation.name, null)
+					})),
+				)
+			}
+			if (targetRelation.orphanRemoval) {
+				const currentInverseSideOfNewOwner = await this.mapper.selectField(
+					targetEntity,
+					{
+						[targetEntity.primary]: newOwner,
+					},
+					targetRelation.name,
+				)
+				if (currentInverseSideOfNewOwner) {
+					result.push(...(await this.mapper.delete(entity, { [entity.primary]: currentInverseSideOfNewOwner })))
+				}
+			}
+			result.push(
+				...(await this.mapper.update(targetEntity, { [targetEntity.primary]: newOwner }, {}, {}, builder => {
+					builder.addPredicates([targetRelation.name])
+					builder.addFieldValue(targetRelation.name, this.primaryValue)
 				})),
-			]
+			)
+			return result
+		}),
+		create: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity, relation }) => {
+			const currentOwner = await this.mapper.getPrimaryValue(targetEntity, {
+				[targetRelation.name]: { [entity.primary]: this.primaryValue },
+			})
+			if (currentOwner && !targetRelation.nullable) {
+				// todo cascade delete support?
+				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+			}
+			const result: MutationResultList = []
+			if (currentOwner) {
+				result.push(
+					...(await this.mapper.update(targetEntity, { [targetEntity.primary]: currentOwner }, {}, {}, builder => {
+						builder.addPredicates([targetRelation.name])
+						builder.addFieldValue(targetRelation.name, null)
+					})),
+				)
+			}
+
+			result.push(
+				...(await this.mapper.insert(targetEntity, input, builder => {
+					builder.addFieldValue(targetRelation.name, this.primaryValue)
+					builder.addPredicates([targetRelation.name])
+				})),
+			)
+			return result
 		}),
 		update: hasOneProcessor(async ({ targetEntity, targetRelation, input, entity }) => {
 			return await this.mapper.update(
@@ -332,120 +381,151 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 				input,
 			)
 		}),
-		upsert: hasOneProcessor(async ({ targetEntity, targetRelation, input: { create, update }, entity }) => {
+		upsert: hasOneProcessor(async ({ targetEntity, targetRelation, input: { create, update }, entity, relation }) => {
 			const result = await this.mapper.update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				update,
 			)
 			if (result[0].result === MutationResultType.notFoundError) {
-				return await this.mapper.insert(targetEntity, {
-					...create,
-					[targetRelation.name]: { connect: { [entity.primary]: this.primaryValue } },
+				return await this.oneHasOneInverse.create({
+					entity,
+					targetEntity,
+					targetRelation,
+					relation,
+					input: create,
 				})
 			}
 			return result
 		}),
 		delete: hasOneProcessor(async ({ targetEntity, targetRelation, entity, relation }) => {
-			if (!relation.nullable) {
+			if (!relation.nullable && !targetRelation.orphanRemoval) {
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			return await this.mapper.delete(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } })
 		}),
 		disconnect: hasOneProcessor(async ({ targetEntity, targetRelation, entity, relation }) => {
-			if (!relation.nullable) {
+			if (!relation.nullable && !targetRelation.orphanRemoval) {
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
-			return await this.mapper.update(
+			const currentOwner = await this.mapper.getPrimaryValue(targetEntity, {
+				[targetRelation.name]: { [entity.primary]: this.primaryValue },
+			})
+			if (!currentOwner) {
+				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
+			}
+			if (currentOwner && !targetRelation.nullable) {
+				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+			}
+
+			const result = await this.mapper.update(
 				targetEntity,
-				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
-				{ [targetRelation.name]: { disconnect: true } },
+				{ [targetEntity.primary]: currentOwner },
+				{},
+				{},
+				builder => {
+					builder.addPredicates([targetRelation.name])
+					builder.addFieldValue(targetRelation.name, null)
+				},
 			)
+			if (targetRelation.orphanRemoval) {
+				result.push(...(await this.mapper.delete(entity, { [entity.primary]: this.primaryValue })))
+			}
+			return result
 		}),
 	}
 
 	oneHasOneOwning: UpdateInputProcessor<MutationResultList>['oneHasOneOwning'] = {
 		connect: hasOneProcessor(async ({ targetEntity, input, entity, relation, targetRelation }) => {
 			const result: MutationResultList = []
-
-			await this.updateBuilder.addFieldValue(relation.name, async () => {
-				const targetPrimary = (await this.mapper.getPrimaryValue(targetEntity, input)) as Input.PrimaryValue
-				if (!targetPrimary) {
+			const currentInverseSide =
+				(targetRelation && !targetRelation.nullable) || relation.orphanRemoval
+					? this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
+					: Promise.resolve(undefined)
+			const newInverseSide = await this.updateBuilder.addFieldValue(relation.name, async () => {
+				const newInverseSide = await this.mapper.getPrimaryValue(targetEntity, input)
+				if (!newInverseSide) {
 					result.push(new MutationEntryNotFoundError([], input))
 					return AbortUpdate
 				}
-
-				const currentOwnerOfTarget = await this.mapper.getPrimaryValue(entity, {
-					[relation.name]: { [targetEntity.primary]: targetPrimary },
-				})
-
-				if (currentOwnerOfTarget === this.primaryValue) {
-					// same owner, nothing to do
+				const inverseSidePrimary = await currentInverseSide
+				if (inverseSidePrimary === newInverseSide) {
+					// the relation exists, nothing to do
 					return undefined
 				}
-				if (targetRelation && !targetRelation.nullable) {
-					const currentTargetPrimary = await this.mapper.selectField(
-						entity,
-						{ [entity.primary]: this.primaryValue },
-						relation.name,
-					)
-					if (currentTargetPrimary === targetPrimary) {
-						// should be already handled in a currentOwnerOfTarget === this.primaryValue branch
-						throw new ImplementationException()
-					}
-					if (currentTargetPrimary) {
-						result.push(new MutationConstraintViolationError([], ConstraintType.uniqueKey))
-						return AbortUpdate
-					}
+
+				const currentOwnerOfNewInverseSide = await this.mapper.getPrimaryValue(entity, {
+					[relation.name]: { [targetEntity.primary]: newInverseSide },
+				})
+
+				if (currentOwnerOfNewInverseSide === this.primaryValue) {
+					// the relation exists, nothing to do
+					return undefined
 				}
 
-				if (currentOwnerOfTarget) {
+				// orphan removal handled bellow
+				if (targetRelation && !targetRelation.nullable && !relation.orphanRemoval && inverseSidePrimary) {
+					result.push(new MutationConstraintViolationError([], ConstraintType.notNull))
+					return AbortUpdate
+				}
+
+				if (currentOwnerOfNewInverseSide) {
 					if (!relation.nullable) {
 						result.push(new MutationConstraintViolationError([], ConstraintType.notNull))
 						return AbortUpdate
 					}
 
 					result.push(
-						...(await this.mapper.updateInternal(
+						...(await this.mapper.update(
 							entity,
 							{
-								[entity.primary]: currentOwnerOfTarget,
+								[entity.primary]: currentOwnerOfNewInverseSide,
 							},
-							[relation.name],
+							{},
+							{},
 							builder => {
+								builder.addPredicates([relation.name])
 								builder.addFieldValue(relation.name, null)
 							},
 						)),
 					)
 				}
-				return targetPrimary
+				return newInverseSide
 			})
+			const inverseSidePrimary = await currentInverseSide
+			if (relation.orphanRemoval && newInverseSide && inverseSidePrimary) {
+				await this.updateBuilder.update
+				result.push(...(await this.mapper.delete(targetEntity, { [targetEntity.primary]: inverseSidePrimary })))
+			}
 			return result
 		}),
 		create: hasOneProcessor(async ({ targetEntity, input, relation, entity, targetRelation }) => {
 			const insert = this.mapper.insert(targetEntity, input)
 			const result: MutationResultList = []
-			this.updateBuilder.addFieldValue(relation.name, async () => {
-				if (targetRelation && !targetRelation.nullable) {
-					const currentTargetPrimary = await this.mapper.selectField(
-						entity,
-						{ [entity.primary]: this.primaryValue },
-						relation.name,
-					)
-					if (currentTargetPrimary) {
-						result.push(new MutationConstraintViolationError([], ConstraintType.uniqueKey))
-						return AbortUpdate
-					}
+			const currentInverseSide =
+				(targetRelation && !targetRelation.nullable) || relation.orphanRemoval
+					? this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
+					: Promise.resolve(undefined)
+			await this.updateBuilder.addFieldValue(relation.name, async () => {
+				const inversePrimary = await currentInverseSide
+				if (targetRelation && !targetRelation.nullable && !relation.orphanRemoval && inversePrimary) {
+					result.push(new MutationConstraintViolationError([], ConstraintType.notNull))
+					return AbortUpdate
 				}
 
 				const insertResult = await insert
-				const insertPrimary = getInsertPrimary(insertResult)
-				if (insertPrimary) {
-					return insertPrimary
+				const newInverseSide = getInsertPrimary(insertResult)
+				if (newInverseSide) {
+					return newInverseSide
 				}
 				return AbortUpdate
 			})
 			result.push(...(await insert))
+			const inversePrimary = await currentInverseSide
+			if (relation.orphanRemoval && inversePrimary) {
+				await this.updateBuilder.update
+				result.push(...(await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary })))
+			}
 			return result
 		}),
 		update: hasOneProcessor(async ({ targetEntity, input, entity, relation }) => {
@@ -506,22 +586,33 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 			await this.updateBuilder.update
 			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: targetPrimary })
 		}),
-		disconnect: hasOneProcessor(async ({ entity, relation, targetRelation, input }) => {
+		disconnect: hasOneProcessor(async ({ entity, relation, targetRelation, targetEntity, input }) => {
 			if (!relation.nullable) {
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
-			if (targetRelation && !targetRelation.nullable) {
-				const targetPrimary = await this.mapper.selectField(
-					entity,
-					{ [entity.primary]: this.primaryValue },
-					relation.name,
-				)
-				if (targetPrimary) {
-					return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+			const result: MutationResultList = []
+
+			const currentInverseSide =
+				(targetRelation && !targetRelation.nullable) || relation.orphanRemoval
+					? this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
+					: Promise.resolve(undefined)
+
+			this.updateBuilder.addFieldValue(relation.name, async () => {
+				const inversePrimary = await currentInverseSide
+				if (inversePrimary && targetRelation && !targetRelation.nullable && !relation.orphanRemoval) {
+					result.push(new MutationConstraintViolationError([], ConstraintType.notNull))
+					return AbortUpdate
+				}
+				return null
+			})
+			if (relation.orphanRemoval) {
+				const inversePrimary = await currentInverseSide
+				if (inversePrimary) {
+					await this.updateBuilder.update
+					result.push(...(await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary })))
 				}
 			}
-			this.updateBuilder.addFieldValue(relation.name, null)
-			return []
+			return result
 		}),
 	}
 }

@@ -12,6 +12,7 @@ export const createConnectionMock = (
 	queries: ExpectedQuery[],
 ): Connection.TransactionLike & Connection.ClientFactory & Connection.PoolStatusProvider => {
 	return new (class implements Connection.TransactionLike {
+		private counter = 0
 		public readonly eventManager = new EventManagerImpl()
 
 		async query<Row extends Record<string, any>>(
@@ -24,8 +25,9 @@ export const createConnectionMock = (
 
 			const actualSql = sql.replace(/\s+/g, ' ').toLowerCase()
 			const expectedSql = expected.sql.replace(/\s+/g, ' ').toLowerCase()
-
-			const expectedMsg = `Expected query does not match SQL:
+			this.counter++
+			// console.log({sql, parameters, response: {}})
+			const expectedMsg = `Expected query #${this.counter} does not match SQL:
 ${sql}
 with following parameters
 ${JSON.stringify(parameters, undefined, '  ')}`
@@ -44,6 +46,7 @@ ${JSON.stringify(parameters, undefined, '  ')}`
 					}
 				}
 			}
+			// console.log('ok')
 			await new Promise(resolve => setTimeout(resolve, 1))
 
 			return expected.response as any

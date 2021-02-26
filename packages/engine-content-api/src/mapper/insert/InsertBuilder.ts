@@ -1,4 +1,4 @@
-import { Input, Model, Value } from '@contember/schema'
+import { Acl, Input, Model, Value } from '@contember/schema'
 import { Client, InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
@@ -6,6 +6,7 @@ import { ColumnValue, ResolvedColumnValue, resolveGenericValue, resolveRowData }
 import { ImplementationException } from '../../exception'
 import { AbortInsert } from './Inserter'
 import { EnrichedError } from '../ErrorUtils'
+import { PredicateFactory } from '../../acl'
 
 export interface InsertResult {
 	values: ResolvedColumnValue[]
@@ -20,28 +21,34 @@ export class InsertBuilder {
 	}
 	public readonly insert: Promise<Value.PrimaryValue | null> = new Promise(resolve => (this.resolver = resolve))
 
-	private rowData: ColumnValue<AbortInsert | undefined>[] = []
-	private where: Input.Where = {}
+	private rowData: Map<string, ColumnValue<AbortInsert | undefined>> = new Map()
+	private where: { and: Input.Where[] } = { and: [] }
 
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly entity: Model.Entity,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly pathFactory: PathFactory,
+		private readonly predicateFactory: PredicateFactory,
 	) {}
 
 	public addFieldValue(fieldName: string, value: Value.GenericValueLike<Value.AtomicValue<AbortInsert | undefined>>) {
 		const columnName = getColumnName(this.schema, this.entity, fieldName)
 		const columnType = getColumnType(this.schema, this.entity, fieldName)
-		this.rowData.push({ columnName, value: resolveGenericValue(value), columnType, fieldName })
+		this.rowData.set(columnName, { columnName, value: resolveGenericValue(value), columnType, fieldName })
+	}
+
+	public addPredicates(fields: string[]): void {
+		const where = this.predicateFactory.create(this.entity, Acl.Operation.create, fields)
+		this.addWhere(where)
 	}
 
 	public addWhere(where: Input.Where): void {
-		this.where = { and: [where, this.where] }
+		this.where.and.push(where)
 	}
 
 	public async getResolvedData(): Promise<ResolvedColumnValue<AbortInsert>[]> {
-		return resolveRowData(this.rowData)
+		return resolveRowData([...this.rowData.values()])
 	}
 
 	public async execute(db: Client): Promise<InsertResult> {

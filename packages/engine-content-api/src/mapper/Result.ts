@@ -194,11 +194,6 @@ export const getInsertPrimary = (result: MutationResultList) =>
 		? result[0].primary
 		: undefined
 
-export const getUpdatePrimary = (result: MutationResultList) =>
-	result[0] && result[0].result === MutationResultType.ok && result[0].type === ModificationType.update
-		? result[0].primary
-		: undefined
-
 export const flattenResult = (result: (MutationResultList | MutationResultList[])[]): MutationResultList =>
 	result
 		.reduce<(MutationResult | MutationResult[])[]>((acc, it) => [...acc, ...it], [])

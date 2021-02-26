@@ -4,7 +4,13 @@ import { InsertBuilder } from './InsertBuilder'
 import { Providers, resolveColumnValue } from '@contember/schema-utils'
 import { CreateInputProcessor } from '../../inputProcessing'
 import * as Context from '../../inputProcessing'
-import { getInsertPrimary, MutationEntryNotFoundError, MutationResultList } from '../Result'
+import {
+	ConstraintType,
+	getInsertPrimary,
+	MutationConstraintViolationError,
+	MutationEntryNotFoundError,
+	MutationResultList,
+} from '../Result'
 import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
 import { AbortInsert } from './Inserter'
 
@@ -176,18 +182,40 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 		},
 		connect: hasOneProcessor(
 			async (context: Context.OneHasOneOwningContext & { input: Input.UniqueWhere }): Promise<MutationResultList> => {
-				const primaryValue = this.mapper.getPrimaryValue(context.targetEntity, context.input)
+				const result: MutationResultList = []
 				this.insertBuilder.addFieldValue(context.relation.name, async () => {
-					const value = await primaryValue
-					if (!value) {
+					const inverseSide = await this.mapper.getPrimaryValue(context.targetEntity, context.input)
+					if (!inverseSide) {
+						result.push(new MutationEntryNotFoundError([], context.input))
 						return AbortInsert
 					}
-					return value
+					const currentOwnerOfInverseSide = await this.mapper.getPrimaryValue(context.entity, {
+						[context.relation.name]: { [context.targetEntity.primary]: inverseSide },
+					})
+					if (currentOwnerOfInverseSide) {
+						if (!context.relation.nullable) {
+							result.push(new MutationConstraintViolationError([], ConstraintType.notNull))
+							return AbortInsert
+						}
+
+						result.push(
+							...(await this.mapper.update(
+								context.entity,
+								{
+									[context.entity.primary]: currentOwnerOfInverseSide,
+								},
+								{},
+								{},
+								builder => {
+									builder.addPredicates([context.relation.name])
+									builder.addFieldValue(context.relation.name, null)
+								},
+							)),
+						)
+					}
+					return inverseSide
 				})
-				if (!(await primaryValue)) {
-					return [new MutationEntryNotFoundError([], context.input)]
-				}
-				return []
+				return result
 			},
 		),
 		create: hasOneProcessor(
@@ -213,10 +241,29 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 				if (!value) {
 					return []
 				}
-				return await this.mapper.update(context.targetEntity, context.input, {
-					[context.targetRelation.name]: {
-						connect: { [context.entity.primary]: value },
-					},
+				const owner = await this.mapper.getPrimaryValue(context.targetEntity, context.input)
+				if (!owner) {
+					return [new MutationEntryNotFoundError([], context.input)]
+				}
+				const currentInverseSideOfOwner = await this.mapper.selectField(
+					context.targetEntity,
+					context.input,
+					context.targetRelation.name,
+				)
+				const result: MutationResultList = []
+				if (currentInverseSideOfOwner) {
+					if (context.targetRelation.orphanRemoval) {
+						result.push(
+							...(await this.mapper.delete(context.entity, { [context.entity.primary]: currentInverseSideOfOwner })),
+						)
+					} else if (!context.relation.nullable) {
+						return [new MutationConstraintViolationError([], ConstraintType.notNull)]
+					}
+				}
+
+				return await this.mapper.update(context.targetEntity, context.input, {}, {}, update => {
+					update.addPredicates([context.targetRelation.name])
+					update.addFieldValue(context.targetRelation.name, value)
 				})
 			},
 		),
@@ -226,11 +273,9 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<MutationRes
 				if (!primary) {
 					return []
 				}
-				return await this.mapper.insert(context.targetEntity, {
-					...context.input,
-					[context.targetRelation.name]: {
-						connect: { [context.entity.primary]: primary },
-					},
+				return await this.mapper.insert(context.targetEntity, context.input, builder => {
+					builder.addPredicates([context.targetRelation.name])
+					builder.addFieldValue(context.targetRelation.name, primary)
 				})
 			},
 		),

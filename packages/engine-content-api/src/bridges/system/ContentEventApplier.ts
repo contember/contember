@@ -134,7 +134,7 @@ export class ContentApplyDependenciesFactoryImpl implements ContentApplyDependen
 		})
 
 		const predicateFactory = new PredicateFactory(permissions, new VariableInjector(schema.model, identityVariables))
-		const insertBuilderFactory = new InsertBuilderFactory(schema.model, whereBuilder, pathFactory)
+		const insertBuilderFactory = new InsertBuilderFactory(schema.model, whereBuilder, pathFactory, predicateFactory)
 		const junctionTableManager = new JunctionTableManager(
 			schema.model,
 			predicateFactory,
@@ -143,7 +143,7 @@ export class ContentApplyDependenciesFactoryImpl implements ContentApplyDependen
 			new JunctionDisconnectHandler(),
 			pathFactory,
 		)
-		const updateBuilderFactory = new UpdateBuilderFactory(schema.model, whereBuilder, pathFactory)
+		const updateBuilderFactory = new UpdateBuilderFactory(schema.model, whereBuilder, pathFactory, predicateFactory)
 		return {
 			insertBuilderFactory,
 			junctionTableManager,
@@ -243,7 +243,6 @@ export class ContentEventApplier {
 	private async applyEntityCreate(
 		context: {
 			db: Client
-			predicateFactory: PredicateFactory
 			entityTable: EntityTable
 			insertBuilderFactory: InsertBuilderFactory
 		},
@@ -252,9 +251,8 @@ export class ContentEventApplier {
 		assert.equal(event.rowId.length, 1)
 		const entity = context.entityTable.entity
 		const affectedField = Object.keys(event.values).map(it => context.entityTable.columns[it].name)
-		const predicate = context.predicateFactory.create(entity, Acl.Operation.create, affectedField)
 		const insertBuilder = context.insertBuilderFactory.create(entity)
-		insertBuilder.addWhere(predicate)
+		insertBuilder.addPredicates(affectedField)
 		insertBuilder.addFieldValue(entity.primaryColumn, event.rowId[0])
 		for (const [col, value] of Object.entries(event.values)) {
 			insertBuilder.addFieldValue(context.entityTable.columns[col].name, value)
@@ -270,7 +268,6 @@ export class ContentEventApplier {
 	private async applyEntityUpdate(
 		context: {
 			db: Client
-			predicateFactory: PredicateFactory
 			updateBuilderFactory: UpdateBuilderFactory
 			entityTable: EntityTable
 		},
@@ -283,9 +280,7 @@ export class ContentEventApplier {
 			[entity.primary]: { eq: primary },
 		})
 		const affectedField = Object.keys(event.values).map(it => context.entityTable.columns[it].name)
-		const predicate = context.predicateFactory.create(entity, Acl.Operation.update, affectedField)
-		updateBuilder.addOldWhere(predicate)
-		updateBuilder.addNewWhere(predicate)
+		updateBuilder.addPredicates(affectedField)
 		for (const [col, value] of Object.entries(event.values)) {
 			updateBuilder.addFieldValue(context.entityTable.columns[col].name, value)
 		}

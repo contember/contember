@@ -16,6 +16,7 @@ import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select'
 import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 import { UpdateBuilder } from './update'
+import { InsertBuilder } from './insert'
 
 export class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
@@ -151,31 +152,26 @@ export class Mapper {
 		return Object.fromEntries(result)
 	}
 
-	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<MutationResultList> {
-		return tryMutation(() =>
-			this.inserter.insert(this, entity, data, id => {
-				const where = { [entity.primary]: id }
-				this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
-			}),
-		)
+	public async insert(
+		entity: Model.Entity,
+		data: Input.CreateDataInput,
+		builderCb: (builder: InsertBuilder) => void = () => {},
+	): Promise<MutationResultList> {
+		const pushId = (id: string) => {
+			const where = { [entity.primary]: id }
+			this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
+		}
+		return tryMutation(() => this.inserter.insert(this, entity, data, pushId, builderCb))
 	}
 
 	public async update(
 		entity: Model.Entity,
 		by: Input.UniqueWhere,
 		data: Input.UpdateDataInput,
-		filter?: Input.OptionalWhere,
+		filter: Input.OptionalWhere = {},
+		builderCb: (builder: UpdateBuilder) => void = () => {},
 	): Promise<MutationResultList> {
-		return tryMutation(() => this.updater.update(this, entity, by, data, filter))
-	}
-
-	public async updateInternal(
-		entity: Model.Entity,
-		by: Input.UniqueWhere,
-		predicateFields: string[],
-		builderCb: (builder: UpdateBuilder) => void,
-	): Promise<MutationResultList> {
-		return tryMutation(() => this.updater.updateCb(this, entity, by, predicateFields, builderCb))
+		return tryMutation(() => this.updater.update(this, entity, by, data, filter, builderCb))
 	}
 
 	public async delete(

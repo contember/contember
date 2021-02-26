@@ -18,7 +18,7 @@ export const useGetEntityListSubTree = () => {
 		(
 			parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList,
 			...treeId: [TreeRootId | undefined] | []
-		) => getEntityListSubTree(parametersOrAlias, treeId.length === 1 ? treeId[0] : treeRootId, environment),
-		[treeRootId, environment, getEntityListSubTree],
+		) => getEntityListSubTree(parametersOrAlias, treeId.length === 0 ? treeRootId : treeId[0], environment),
+		[environment, getEntityListSubTree, treeRootId],
 	)
 }

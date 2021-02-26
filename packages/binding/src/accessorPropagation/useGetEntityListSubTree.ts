@@ -7,12 +7,12 @@ import {
 } from '../treeParameters'
 import { useBindingOperations } from './useBindingOperations'
 import { useEnvironment } from './useEnvironment'
-import { TreeRootIdContext } from './TreeRootIdContext'
+import { useTreeRootId } from './useTreeRootId'
 
 export const useGetEntityListSubTree = () => {
 	const environment = useEnvironment()
 	const getEntityListSubTree = useBindingOperations().getEntityListSubTree
-	const treeRootId = React.useContext(TreeRootIdContext)
+	const treeRootId = useTreeRootId()
 
 	return React.useCallback(
 		(

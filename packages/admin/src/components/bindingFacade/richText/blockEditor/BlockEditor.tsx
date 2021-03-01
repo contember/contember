@@ -14,6 +14,7 @@ import {
 	useDesugaredRelativeSingleField,
 	useEntity,
 	useEntityList,
+	useEntityPersistSuccess,
 	useEnvironment,
 	useField,
 	useSortedEntities,
@@ -165,22 +166,14 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 			sortedBlocksRef.current = topLevelBlocks
 		}) // Deliberately no deps array
 
-		// TODO This is the epitome of *BRITTLE*.
-		//		We need the path refs to reflect the ID changes of newly created entities. As far as this component is
-		//		concerned, this happens right after persist. Unfortunately, we don't have an event that would fire at just
-		//		the right moment quite yet, and so we do this. This works as long as there aren't any re-renders between
-		//		the event and the actual moment we're after. For now, that holds but it can break at any time in the most
-		//		unpredictable and sinister fashion. We *REALLY* need to change this.
-		const addBlockListListener = blockList.addEventListener
-		React.useEffect(
-			() =>
-				addBlockListListener('beforePersist', () => {
-					for (const [, ref] of blockElementPathRefs) {
-						ref.unref()
-					}
-					blockElementPathRefs.clear()
-				}),
-			[addBlockListListener, blockElementPathRefs],
+		// TODO this isn't particularly great. We should probably react to id changes more directly.
+		useEntityPersistSuccess(
+			React.useCallback(() => {
+				for (const [, ref] of blockElementPathRefs) {
+					ref.unref()
+				}
+				blockElementPathRefs.clear()
+			}, [blockElementPathRefs]),
 		)
 
 		const [editor] = React.useState(() =>

@@ -54,7 +54,7 @@ export interface EntityRealmState {
 	readonly children: Map<PlaceholderName, StateNode | EntityRealmStateStub>
 	childrenWithPendingUpdates: Set<StateNode> | undefined
 	errors: ErrorAccessor | undefined
-	readonly eventListeners: SingleEntityEventListeners['eventListeners']
+	eventListeners: SingleEntityEventListeners['eventListeners']
 	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
 	hasStaleAccessor: boolean
 	plannedHasOneDeletions: Map<PlaceholderName, EntityRealmState | EntityRealmStateStub> | undefined

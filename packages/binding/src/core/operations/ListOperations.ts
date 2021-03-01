@@ -69,7 +69,7 @@ export class ListOperations {
 					parent: state,
 				})
 
-				state.plannedRemovals?.delete(stateToConnect)
+				state.plannedRemovals?.delete(idToConnect.value)
 
 				let changesDelta = 0
 
@@ -113,7 +113,7 @@ export class ListOperations {
 					if (state.plannedRemovals === undefined) {
 						state.plannedRemovals = new Map()
 					}
-					state.plannedRemovals.set(disconnectedChildRealm, 'disconnect')
+					state.plannedRemovals.set(disconnectedChildIdValue, 'disconnect')
 				} else if (disconnectedChildRealm.entity.id.existsOnServer) {
 					// Disconnecting unpersisted entities doesn't constitute a change.
 

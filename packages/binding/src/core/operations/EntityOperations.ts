@@ -270,7 +270,7 @@ export class EntityOperations {
 							parent.plannedRemovals = new Map()
 						}
 						changesDelta++
-						parent.plannedRemovals.set(realmToDelete, 'delete')
+						parent.plannedRemovals.set(entityId.value, 'delete')
 					}
 				} else if (realmToDelete.blueprint.type === 'hasOne') {
 					parent = realmToDelete.blueprint.parent

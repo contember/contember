@@ -57,6 +57,8 @@ export interface EntityRealmState {
 	eventListeners: SingleEntityEventListeners['eventListeners']
 	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
 	hasStaleAccessor: boolean
+
+	// TODO Why does this even exist?
 	plannedHasOneDeletions: Map<PlaceholderName, EntityRealmState | EntityRealmStateStub> | undefined
 	unpersistedChangesCount: number
 

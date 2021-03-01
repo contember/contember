@@ -1,9 +1,8 @@
 {
-  "name": "@contember/template-workspace",
+  "name": "@contember/template-workspace-single-instance",
   "version": "0.10.1",
   "license": "Apache-2.0",
   "scripts": {
-    "version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml && git add contember.workspace.yaml",
     "test": "echo 'No tests'"
   },
   "scripts-template": {

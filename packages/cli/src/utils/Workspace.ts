@@ -6,6 +6,8 @@ import { resourcesDir } from '../pathUtils'
 import { InstanceManager } from './instance'
 import { ProjectManager } from './ProjectManager'
 import { PathMapping } from './PathMapping'
+import * as path from 'path'
+import { getCliVersion } from './contember'
 
 interface WorkspaceDirectoryArgument {
 	workspaceDirectory: string
@@ -13,19 +15,34 @@ interface WorkspaceDirectoryArgument {
 
 export const createWorkspace = async ({
 	workspaceDirectory,
+	singleInstance,
 	withAdmin,
 	template,
 }: {
+	singleInstance: boolean
 	withAdmin: boolean
 	template: string
 } & WorkspaceDirectoryArgument) => {
+	if (singleInstance && withAdmin) {
+		throw 'Single instance and admin is not supported combination'
+	}
 	template =
 		template ||
-		(withAdmin ? '@contember/template-workspace-with-admin' : join(resourcesDir, 'templates/template-workspace'))
-	await installTemplate(template, workspaceDirectory, 'workspace')
-
+		(withAdmin
+			? '@contember/template-workspace-with-admin'
+			: join(
+					resourcesDir,
+					singleInstance ? 'templates/template-workspace-single-instance' : 'templates/template-workspace',
+			  ))
+	const instanceName = path.basename(workspaceDirectory)
+	await installTemplate(template, workspaceDirectory, 'workspace', {
+		instanceName: instanceName,
+		version: getCliVersion(),
+	})
 	const workspace = await Workspace.get(workspaceDirectory)
-	const instance = await workspace.instances.createInstance('default', {})
+	const instance = singleInstance
+		? await workspace.instances.getInstance(instanceName)
+		: await workspace.instances.createInstance(instanceName, {})
 	const project = await workspace.projects.createProject('sandbox', {})
 	await project.registerToInstance(instance)
 }

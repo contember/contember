@@ -1,6 +1,7 @@
-type: instance
+type: workspace
 remove:
-  - package.json
   - package-lock.json
+patchPackageJson: true
 replaceVariables:
+  - contember.workspace.yaml
   - docker-compose.yaml

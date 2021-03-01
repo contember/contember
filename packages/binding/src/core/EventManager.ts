@@ -120,11 +120,6 @@ export class EventManager {
 		}
 		this.hasEverUpdated = true
 
-		console.log({
-			realms: this.treeStore.entityRealmStore.size,
-			entities: this.treeStore.entityStore.size,
-		})
-
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
 			this.triggerBeforeFlushEvents()
@@ -175,10 +170,6 @@ export class EventManager {
 			case StateType.EntityRealm:
 			case StateType.EntityList: {
 				justUpdated.unpersistedChangesCount += changesDelta
-
-				if (justUpdated.unpersistedChangesCount < 0) {
-					debugger
-				}
 
 				const parent = justUpdated.blueprint.parent
 

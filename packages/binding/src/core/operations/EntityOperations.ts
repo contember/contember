@@ -220,8 +220,19 @@ export class EntityOperations {
 					}
 					const persistedId = persistedData?.get(targetHasOneMarker.placeholderName)
 
-					if (persistedId instanceof ServerGeneratedUuid && persistedId.value === stateToDisconnect.entity.id.value) {
-						changesDelta++
+					if (persistedId instanceof ServerGeneratedUuid) {
+						if (persistedId.value === stateToDisconnect.entity.id.value) {
+							changesDelta++ // Disconnecting the persisted entity.
+						} else {
+							// Do nothing. The entity that is being disconnected is already different from the one that is persisted,
+							// and so we must have already accounted for this change.
+						}
+					} else if (persistedId === undefined || persistedId === null) {
+						if (stateToDisconnect.entity.id.existsOnServer) {
+							// We had connected a persisted entity, which increased the changes count,
+							// but now are disconnecting it again.
+							changesDelta--
+						}
 					} else {
 						// Do nothing. Disconnecting unpersisted entities doesn't change the count.
 					}

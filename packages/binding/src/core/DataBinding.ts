@@ -291,17 +291,26 @@ export class DataBinding {
 				for (const state of StateIterator.depthFirstAllNodes(rootState)) {
 					switch (state.type) {
 						case StateType.Field: {
-							state.touchLog?.clear()
-							state.hasUnpersistedChanges = false
+							if (state.hasUnpersistedChanges || state.touchLog?.size) {
+								state.touchLog?.clear()
+								state.hasUnpersistedChanges = false
+								this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
+							}
 							break
 						}
 						case StateType.EntityList:
-							state.unpersistedChangesCount = 0
-							state.plannedRemovals?.clear()
+							if (state.unpersistedChangesCount > 0 || state.plannedRemovals?.size) {
+								state.unpersistedChangesCount = 0
+								state.plannedRemovals?.clear()
+								this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
+							}
 							break
 						case StateType.EntityRealm: {
-							state.unpersistedChangesCount = 0
-							state.plannedHasOneDeletions?.clear()
+							if (state.unpersistedChangesCount > 0 || state.plannedHasOneDeletions?.size) {
+								state.unpersistedChangesCount = 0
+								state.plannedHasOneDeletions?.clear()
+								this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
+							}
 							break
 						}
 						default:

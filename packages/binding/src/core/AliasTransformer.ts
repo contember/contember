@@ -6,12 +6,11 @@ export class AliasTransformer {
 
 	private static ALIAS_SECTION_SEPARATOR = '__'
 
-	public static entityToAlias(entityKey: RuntimeId): string {
-		return `${this.COMMON_PREFIX}${entityKey.value.replace(/-/g, '_')}`
+	public static entityToAlias(entityId: RuntimeId): string {
+		return `${this.COMMON_PREFIX}${entityId.value.replace(/-/g, '_')}`
 	}
 
-	public static aliasToEntityKey(alias: string): string {
-		// TODO this method is wrong now.
+	public static aliasToEntityId(alias: string): string {
 		return `${alias.substring(this.COMMON_PREFIX.length).replace(/_/g, '-')}`
 	}
 

@@ -6,6 +6,7 @@ import {
 	ServerGeneratedUuid,
 	UnpersistedEntityDummyId,
 } from '../accessorTree'
+import { BindingError } from '../BindingError'
 import { MarkerTreeRoot } from '../markers'
 import { EntityId, PlaceholderName, TreeRootId } from '../treeParameters'
 import { assertNever } from '../utils'
@@ -79,13 +80,13 @@ export class TreeAugmenter {
 
 	private updateRealmIdIfNecessary(
 		realm: EntityRealmState | EntityRealmStateStub,
-		newId: ServerGeneratedUuid | undefined,
+		newId: ServerGeneratedUuid | undefined | null,
 	) {
 		const currentId = realm.entity.id
 		let idToChangeTo: RuntimeId | undefined = undefined
 
 		if (currentId instanceof ServerGeneratedUuid) {
-			if (newId === undefined) {
+			if (newId === undefined || newId === null) {
 				idToChangeTo = new UnpersistedEntityDummyId()
 			} else if (currentId.value !== newId.value) {
 				idToChangeTo = newId
@@ -114,7 +115,7 @@ export class TreeAugmenter {
 			switch (child.type) {
 				case StateType.Field: {
 					if (childData instanceof ServerGeneratedUuid || childData instanceof Set) {
-						continue
+						throw new BindingError()
 					}
 
 					if (child.persistedValue !== childData) {
@@ -131,8 +132,8 @@ export class TreeAugmenter {
 				}
 				case StateType.EntityRealm:
 				case StateType.EntityRealmStub: {
-					if (!(childData instanceof ServerGeneratedUuid) && childData !== undefined) {
-						continue
+					if (!(childData instanceof ServerGeneratedUuid) && childData !== undefined && childData !== null) {
+						throw new BindingError()
 					}
 					this.updateRealmIdIfNecessary(child, childData)
 					if (child.type === StateType.EntityRealm) {
@@ -142,7 +143,7 @@ export class TreeAugmenter {
 				}
 				case StateType.EntityList: {
 					if (childData !== undefined && !(childData instanceof Set)) {
-						continue
+						throw new BindingError()
 					}
 					this.updateEntityListPersistedData(child, childData ?? new Set()) // TODO!!
 					break

@@ -62,35 +62,21 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(e
 			Transforms.removeNodes(editor, {
 				at: [topLevelIndex],
 			})
-			return targetPoint.path
-			// Transforms.insertNodes(editor, node, {
-			// 	at: [topLevelIndex],
-			// })
+			return [topLevelIndex]
 		} else {
 			const [start, end] = Editor.edges(editor, [topLevelIndex])
 
 			if (Point.equals(start, targetPoint)) {
 				// We're at the beginning of a block so we insert above it
-
-				// Transforms.insertNodes(editor, node, {
-				// 	at: [topLevelIndex],
-				// })
 				return [topLevelIndex]
 			} else if (Point.equals(end, targetPoint)) {
 				// We're at the end of a block so we insert underneath it.
-
-				// Transforms.insertNodes(editor, node, {
-				// 	at: [topLevelIndex + 1],
-				// })
 				return [topLevelIndex + 1]
 			} else {
 				// We're in the middle so we split it and then insert between the two resulting chunks.
 				Transforms.splitNodes(editor, {
 					at: targetPoint,
 				})
-				// Transforms.insertNodes(editor, node, {
-				// 	at: [topLevelIndex + 1],
-				// })
 				return [topLevelIndex + 1]
 			}
 		}

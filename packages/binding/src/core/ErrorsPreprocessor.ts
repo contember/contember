@@ -30,7 +30,7 @@ class ErrorsPreprocessor {
 				}
 				treeRoot.set(treeId, processedResponse)
 			} else {
-				const itemKey = AliasTransformer.aliasToEntityKey(itemKeyAlias)
+				const itemKey = AliasTransformer.aliasToEntityId(itemKeyAlias)
 				const child = treeRoot.get(treeId)
 
 				if (child === undefined) {
@@ -117,7 +117,7 @@ class ErrorsPreprocessor {
 							)
 						}
 
-						const aliasKey = AliasTransformer.aliasToEntityKey(alias)
+						const aliasKey = AliasTransformer.aliasToEntityId(alias)
 
 						if (!(aliasKey in currentNode.children)) {
 							currentNode.children.set(aliasKey, this.getRootNode(error, i + 1))
@@ -179,7 +179,7 @@ class ErrorsPreprocessor {
 					validation: undefined,
 					execution: undefined,
 					nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
-					children: new Map([[AliasTransformer.aliasToEntityKey(alias), rootNode]]),
+					children: new Map([[AliasTransformer.aliasToEntityId(alias), rootNode]]),
 				}
 			} else {
 				assertNever(pathNode)

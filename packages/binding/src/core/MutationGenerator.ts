@@ -3,6 +3,7 @@ import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
+import { EntityId, EntityName } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import { QueryGenerator } from './QueryGenerator'
@@ -59,7 +60,12 @@ export class MutationGenerator {
 		}
 		if (rootState.type === StateType.EntityRealm) {
 			if (rootState.entity.isScheduledForDeletion) {
-				queryBuilder = this.addDeleteMutation(processedEntities, rootState, alias, queryBuilder)
+				queryBuilder = this.addDeleteMutation(
+					rootState.entity.entityName,
+					rootState.entity.id.value,
+					alias,
+					queryBuilder,
+				)
 			} else if (!rootState.entity.id.existsOnServer) {
 				queryBuilder = this.addCreateMutation(processedEntities, rootState, alias, queryBuilder)
 			} else {
@@ -75,12 +81,15 @@ export class MutationGenerator {
 				)
 			}
 			if (rootState.plannedRemovals) {
-				for (const [removedEntity, removalType] of rootState.plannedRemovals) {
+				for (const [removedId, removalType] of rootState.plannedRemovals) {
 					if (removalType === 'delete') {
 						queryBuilder = this.addDeleteMutation(
-							processedEntities,
-							removedEntity,
-							AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(removedEntity.entity.id)),
+							rootState.entityName,
+							removedId,
+							AliasTransformer.joinAliasSections(
+								alias,
+								AliasTransformer.entityToAlias(new ServerGeneratedUuid(removedId)),
+							),
 							queryBuilder,
 						)
 					} else if (removalType === 'disconnect') {
@@ -96,23 +105,18 @@ export class MutationGenerator {
 	}
 
 	private addDeleteMutation(
-		processedEntities: ProcessedEntities,
-		entityRealm: EntityRealmState | EntityRealmStateStub,
+		entityName: EntityName,
+		deletedId: EntityId,
 		alias: string,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		if (processedEntities.has(entityRealm.entity)) {
-			return queryBuilder
-		}
-		processedEntities.add(entityRealm.entity)
-
 		return queryBuilder.delete(
-			entityRealm.entity.entityName,
+			entityName,
 			builder =>
 				builder
 					.ok()
 					.node(builder => builder.column(PRIMARY_KEY_NAME))
-					.by({ [PRIMARY_KEY_NAME]: entityRealm.entity.id.value })
+					.by({ [PRIMARY_KEY_NAME]: deletedId })
 					.errors()
 					.errorMessage(),
 			alias,
@@ -543,14 +547,13 @@ export class MutationGenerator {
 							}
 						}
 						if (fieldState.plannedRemovals) {
-							for (const [realmToRemove, removalType] of fieldState.plannedRemovals) {
-								const runtimeId = realmToRemove.entity.id
-								const alias = AliasTransformer.entityToAlias(runtimeId)
+							for (const [removedId, removalType] of fieldState.plannedRemovals) {
+								const alias = AliasTransformer.entityToAlias(new ServerGeneratedUuid(removedId))
 								if (removalType === 'delete') {
-									builder = builder.delete({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
+									builder = builder.delete({ [PRIMARY_KEY_NAME]: removedId }, alias)
 								} else if (removalType === 'disconnect') {
 									// TODO also potentially update
-									builder = builder.disconnect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
+									builder = builder.disconnect({ [PRIMARY_KEY_NAME]: removedId }, alias)
 								} else {
 									assertNever(removalType)
 								}

@@ -10,26 +10,62 @@ import {
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
+import { assertNever } from '../utils'
+import { AliasTransformer } from './AliasTransformer'
 
 export class QueryResponseNormalizer {
-	public static mergeInResponse(original: NormalizedQueryResponseData, newPersistedData: ReceivedDataTree) {
+	public static mergeInResponse(
+		original: NormalizedQueryResponseData,
+		newPersistedData: ReceivedDataTree,
+	): Set<string> {
 		const { subTreeDataStore, persistedEntityDataStore } = original
+		const presentIds: Set<string> = new Set()
 
-		for (const treeId in newPersistedData) {
-			const treeDatum = newPersistedData[treeId]
+		for (const treeAlias in newPersistedData) {
+			const treeDatum = newPersistedData[treeAlias]
 
 			if (treeDatum === undefined || treeDatum === null) {
 				continue
 			}
-			const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
+			const [treeId, itemIdAlias] = AliasTransformer.splitAliasSections(treeAlias)
 
-			if (fieldData instanceof Set || (typeof fieldData === 'object' && fieldData !== null)) {
-				subTreeDataStore.set(treeId, fieldData)
+			if (itemIdAlias === undefined) {
+				//const existingData = subTreeDataStore.get(treeId)
+
+				const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
+
+				if (fieldData instanceof Set || (typeof fieldData === 'object' && fieldData !== null)) {
+					subTreeDataStore.set(treeId, fieldData)
+				} else {
+					this.rejectData()
+				}
+				// TODO finish this
+				// if (existingData === undefined) {
+				// 	const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
+				//
+				// 	if (fieldData instanceof Set || (typeof fieldData === 'object' && fieldData !== null)) {
+				// 		subTreeDataStore.set(treeId, fieldData)
+				// 	} else {
+				// 		this.rejectData()
+				// 	}
+				// } else if (existingData instanceof ServerGeneratedUuid) {
+				// 	//
+				// } else if (existingData instanceof Set) {
+				// } else {
+				// 	return assertNever(existingData)
+				// }
 			} else {
-				this.rejectData()
+				const entityId = AliasTransformer.aliasToEntityId(itemIdAlias)
+				const existingData = persistedEntityDataStore.get(entityId)
+
+				if (!Array.isArray(treeDatum) && existingData) {
+					this.mergeInEntityData(persistedEntityDataStore, existingData, treeDatum)
+				} else {
+					this.rejectData()
+				}
 			}
 		}
-		return original
+		return presentIds
 	}
 
 	private static createFieldData(
@@ -72,6 +108,45 @@ export class QueryResponseNormalizer {
 		return primaryKey
 	}
 
+	private static mergeInFieldData(
+		entityMap: PersistedEntityDataStore,
+		fromTarget: EntityFieldPersistedData | undefined,
+		newDatum: ReceivedFieldData,
+	): EntityFieldPersistedData {
+		if (fromTarget === undefined) {
+			return this.createFieldData(entityMap, newDatum)
+		}
+		if (fromTarget instanceof ServerGeneratedUuid || (fromTarget === null && typeof newDatum === 'object')) {
+			if (newDatum === null) {
+				return null
+			} else if (typeof newDatum === 'object' && !Array.isArray(newDatum)) {
+				const newId = newDatum[PRIMARY_KEY_NAME]
+				const target = entityMap.get(newId)
+				if (target === undefined) {
+					return this.rejectData()
+				}
+
+				if (fromTarget?.value === newId) {
+					this.mergeInEntityData(entityMap, target, newDatum)
+					return fromTarget
+				} else {
+					return new ServerGeneratedUuid(this.createEntityData(entityMap, newDatum))
+				}
+			}
+		} else if (fromTarget instanceof Set) {
+			if (Array.isArray(newDatum)) {
+				fromTarget.clear()
+				for (const entityData of newDatum) {
+					fromTarget.add(this.createEntityData(entityMap, entityData))
+				}
+				return fromTarget
+			}
+		} else if (!Array.isArray(newDatum) && (newDatum === null || typeof newDatum !== 'object')) {
+			return newDatum
+		}
+		return this.rejectData()
+	}
+
 	private static mergeInEntityData(
 		entityMap: PersistedEntityDataStore,
 		target: SingleEntityPersistedData,
@@ -81,37 +156,7 @@ export class QueryResponseNormalizer {
 			const fromTarget = target.get(field)
 			const newDatum = newData[field]
 
-			if (fromTarget === undefined) {
-				target.set(field, this.createFieldData(entityMap, newDatum))
-			} else if (fromTarget instanceof ServerGeneratedUuid || (fromTarget === null && typeof newDatum === 'object')) {
-				if (newDatum === null) {
-					target.set(field, null)
-				} else if (typeof newDatum === 'object' && !Array.isArray(newDatum)) {
-					const target = entityMap.get(newDatum[PRIMARY_KEY_NAME])
-					if (target === undefined) {
-						this.rejectData()
-					}
-					// Assuming the ids are the same.
-					this.mergeInEntityData(entityMap, target, newDatum)
-				} else {
-					this.rejectData()
-				}
-			} else if (fromTarget instanceof Set) {
-				if (Array.isArray(newDatum)) {
-					fromTarget.clear()
-					for (const entityData of newDatum) {
-						fromTarget.add(this.createEntityData(entityMap, entityData))
-					}
-				} else {
-					this.rejectData()
-				}
-			} else {
-				if (Array.isArray(newDatum) || (typeof newDatum === 'object' && newDatum !== null)) {
-					this.rejectData()
-				} else {
-					target.set(field, newDatum)
-				}
-			}
+			target.set(field, this.mergeInFieldData(entityMap, fromTarget, newDatum))
 		}
 		return target
 	}

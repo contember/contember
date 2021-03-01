@@ -232,20 +232,24 @@ namespace EntityAccessor {
 
 	export type PersistSuccessHandler = (getAccessor: GetEntityAccessor, options: PersistSuccessOptions) => void
 
-	export interface EntityEventListenerMap {
+	export interface RuntimeEntityEventListenerMap {
 		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		connectionUpdate: UpdateListener
-		initialize: BatchUpdatesHandler
 		persistError: PersistErrorHandler
 		persistSuccess: PersistSuccessHandler
 		update: UpdateListener
+	}
+	export interface EntityEventListenerMap extends RuntimeEntityEventListenerMap {
+		initialize: BatchUpdatesHandler
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
 	export interface AddEntityEventListener {
 		(type: 'beforePersist', listener: EntityEventListenerMap['beforePersist']): () => void
 		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
 		(type: 'connectionUpdate', hasOneField: FieldName, listener: EntityEventListenerMap['connectionUpdate']): () => void
+		(type: 'persistError', listener: EntityEventListenerMap['persistError']): () => void
+		(type: 'persistSuccess', listener: EntityEventListenerMap['persistSuccess']): () => void
 		(type: 'update', listener: EntityEventListenerMap['update']): () => void
 
 		// It's too late to add this by the time the accessor exists…

@@ -1,3 +1,7 @@
 export * from './useDerivedField'
+export * from './useEntityBeforePersist'
 export * from './useEntityBeforeUpdate'
+export * from './useEntityEvent'
+export * from './useEntityPersistError'
+export * from './useEntityPersistSuccess'
 export * from './useOnConnectionUpdate'

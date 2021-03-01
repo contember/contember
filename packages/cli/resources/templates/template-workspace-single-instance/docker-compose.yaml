@@ -4,7 +4,7 @@ services:
     image: contember/contember:{version}
     volumes:
       - ./api/config.yaml:/src/config.yaml:cached
-      - ../../projects:/src/projects:cached
+      - ./projects:/src/projects:cached
     environment:
       NODE_ENV: 'development'
       CONTEMBER_S3_SERVER: minio
@@ -54,8 +54,8 @@ services:
     command: 'server /data'
     volumes:
       - s3-data:/data
-      - ./s3-policy.json:/bucket-policy.json
-      - ./s3-entrypoint.sh:/minio-entrypoint.sh
+      - ./api/s3-policy.json:/bucket-policy.json
+      - ./api/s3-entrypoint.sh:/minio-entrypoint.sh
     entrypoint: /minio-entrypoint.sh
     environment:
       MINIO_ACCESS_KEY: contember

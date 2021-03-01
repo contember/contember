@@ -10,9 +10,6 @@ export const installTemplate = async (
 	requiredTemplateType: string,
 	variables: Record<string, string> = {},
 ) => {
-	if (await pathExists(targetDir)) {
-		throw `${targetDir} already exists`
-	}
 	if (isAbsolute(template)) {
 		const nodeModulesDir = join(template, 'node_modules')
 		await copy(template, targetDir, {

@@ -8,6 +8,7 @@ import { updateMainDockerComposeConfig } from '../dockerCompose'
 import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from '../PathMapping'
 import { validateInstanceName } from './common'
 import { readInstanceConfig } from './config'
+import { getCliVersion } from '../contember'
 
 export class InstanceManager {
 	constructor(private readonly workspace: Workspace) {}
@@ -32,7 +33,9 @@ export class InstanceManager {
 			options.template ||
 			(withAdmin ? '@contember/template-instance-with-admin' : join(resourcesDir, 'templates/template-instance'))
 		const instanceDirectory = await this.getDirectory(name)
-		await installTemplate(template, instanceDirectory, 'instance')
+		await installTemplate(template, instanceDirectory, 'instance', {
+			version: getCliVersion(),
+		})
 		const version = await this.workspace.apiVersion
 		await updateMainDockerComposeConfig(instanceDirectory, config => ({
 			...config,

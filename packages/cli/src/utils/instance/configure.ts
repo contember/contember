@@ -23,7 +23,7 @@ export const interactiveInstanceConfigure = async ({
 	const withAdmin = !!composeConfig.services?.admin
 	const adminEnv = !withAdmin ? {} : { ...composeConfig.services?.admin.environment }
 
-	const instanceConfig = await instance.config
+	const instanceConfig = instance.config
 
 	if (!composeConfig.services?.api?.ports) {
 		const portsMapping = await resolvePortsMapping({
@@ -55,7 +55,10 @@ export const interactiveInstanceConfigure = async ({
 			updater: json => ({ ...json, apiToken: rootToken, loginToken: loginToken }),
 		})
 		adminEnv.CONTEMBER_LOGIN_TOKEN = loginToken
-	} else if (!adminEnv.CONTEMBER_LOGIN_TOKEN || !composeConfig.services?.api?.environment?.CONTEMBER_LOGIN_TOKEN) {
+	} else if (
+		(!adminEnv.CONTEMBER_LOGIN_TOKEN && withAdmin) ||
+		!composeConfig.services?.api?.environment?.CONTEMBER_LOGIN_TOKEN
+	) {
 		await updateOverrideConfig(instance.directory, config =>
 			patchInstanceOverrideCredentials(config, { loginToken: instanceConfig.loginToken }),
 		)

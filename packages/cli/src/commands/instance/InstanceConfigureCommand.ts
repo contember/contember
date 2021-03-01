@@ -36,5 +36,6 @@ export class InstanceConfigureCommand extends Command<Args, Options> {
 			host: input.getOption('host'),
 			ports: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
 		})
+		console.log('Instance configured. Check corresponding docker-compose.override.yaml for details.')
 	}
 }

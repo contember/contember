@@ -13,7 +13,7 @@
     "test": "oao run-script --relative-time test",
     "eslint:lint": "eslint \"**/*.{ts,tsx}\" ",
     "eslint:fix": "eslint --fix \"**/*.{ts,tsx}\" ",
-    "tag-version": "oao publish --no-npm-publish --no-changelog --no-check-uncommitted"
+    "tag-version": "oao publish --no-npm-publish --no-changelog --no-check-uncommitted --no-master"
   },
   "husky": {
     "hooks": {

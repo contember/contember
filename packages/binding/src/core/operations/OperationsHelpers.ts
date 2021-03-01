@@ -7,6 +7,7 @@ import { EventManager } from '../EventManager'
 import { RealmKeyGenerator } from '../RealmKeyGenerator'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, StateType } from '../state'
 import { StateInitializer } from '../StateInitializer'
+import { TreeParameterMerger } from '../TreeParameterMerger'
 import { TreeStore } from '../TreeStore'
 
 const emptyEntityIdSet: ReadonlySet<EntityId> = new Set()
@@ -95,8 +96,10 @@ export class OperationsHelpers {
 		const oldRealmKey = realm.realmKey
 		const oldId = oldEntity.id
 
+		const realmBlueprint = realm.blueprint
+
 		const newEntity = stateInitializer.initializeEntityState(newId, oldEntity.entityName)
-		const newRealmKey = RealmKeyGenerator.getRealmKey(newId, realm.blueprint)
+		const newRealmKey = RealmKeyGenerator.getRealmKey(newId, realmBlueprint)
 
 		realm.realmKey = newRealmKey
 		realm.entity = newEntity
@@ -122,13 +125,13 @@ export class OperationsHelpers {
 		treeStore.entityRealmStore.delete(oldRealmKey)
 		treeStore.entityRealmStore.set(newRealmKey, realm)
 
-		if (realm.blueprint.type === 'listEntity') {
-			const list = realm.blueprint.parent
+		if (realmBlueprint.type === 'listEntity') {
+			const list = realmBlueprint.parent
 			list.children.changeKey(oldId.value, newId.value) // 😎
-		} else if (realm.blueprint.type === 'hasOne') {
-			eventManager.registerUpdatedConnection(realm.blueprint.parent, realm.blueprint.marker.placeholderName)
+		} else if (realmBlueprint.type === 'hasOne') {
+			eventManager.registerUpdatedConnection(realmBlueprint.parent, realmBlueprint.marker.placeholderName)
 		}
-		const parent = realm.blueprint.parent
+		const parent = realmBlueprint.parent
 		if (parent) {
 			eventManager.registerJustUpdated(parent, EventManager.NO_CHANGES_DIFFERENCE)
 		}

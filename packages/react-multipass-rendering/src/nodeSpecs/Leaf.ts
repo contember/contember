@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ElementType } from 'react'
 import {
 	ConstrainedLeafRepresentationFactory,
 	RepresentationFactorySite,
@@ -18,11 +18,11 @@ class Leaf<
 	public constructor(staticFactory: UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>)
 	public constructor(
 		staticFactory: ConstrainedLeafRepresentationFactory<Props, Representation, StaticContext>,
-		ComponentType: React.ElementType<Props>,
+		ComponentType: ElementType<Props>,
 	)
 	public constructor(
 		factory: FactoryMethodName | UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>,
-		ComponentType?: React.ElementType<Props>,
+		ComponentType?: ElementType<Props>,
 	) {
 		if (typeof factory === 'function') {
 			this.specification = {
@@ -53,7 +53,7 @@ namespace Leaf {
 		| {
 				type: RepresentationFactorySite.UseSite
 				factory: UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>
-				ComponentType?: React.ElementType<Props>
+				ComponentType?: ElementType<Props>
 		  }
 }
 

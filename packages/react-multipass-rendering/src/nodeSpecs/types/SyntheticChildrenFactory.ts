@@ -1,6 +1,6 @@
-import * as React from 'react'
+import { ReactNode, ReactElement } from 'react'
 
 export type SyntheticChildrenFactory<Props extends {}, StaticContext> = (
 	props: Props,
 	staticContext: StaticContext,
-) => React.ReactNode
+) => ReactNode

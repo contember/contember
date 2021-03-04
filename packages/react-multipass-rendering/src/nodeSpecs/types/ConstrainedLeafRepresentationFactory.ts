@@ -1,6 +1,6 @@
-import * as React from 'react'
+import { ReactNode, ReactElement } from 'react'
 
 export type ConstrainedLeafRepresentationFactory<Props extends {}, Representation, StaticContext> = (
-	node: React.ReactElement<Props, any>,
+	node: ReactElement<Props, any>,
 	staticContext: StaticContext,
 ) => Representation

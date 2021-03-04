@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ElementType, ReactNode } from 'react'
 import { assertNever } from './assertNever'
 import { BranchNodeList } from './BranchNodeList'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
@@ -7,11 +7,11 @@ import { getErrorMessage } from './helpers'
 import { LeafList } from './LeafList'
 import {
 	DeclarationSiteNodeRepresentationFactory,
-	UnconstrainedLeafRepresentationFactory,
 	RawNodeRepresentation,
 	RepresentationFactorySite,
 	StaticContextFactory,
 	SyntheticChildrenFactory,
+	UnconstrainedLeafRepresentationFactory,
 	ValidFactoryName,
 } from './nodeSpecs'
 
@@ -63,7 +63,7 @@ export class ChildrenAnalyzer<
 	}
 
 	public processChildren(
-		children: React.ReactNode,
+		children: ReactNode,
 		initialStaticContext: StaticContext,
 	): Array<AllLeavesRepresentation | AllBranchNodesRepresentation> {
 		const processed = this.processNode(children, initialStaticContext)
@@ -80,7 +80,7 @@ export class ChildrenAnalyzer<
 	}
 
 	private processNode(
-		node: React.ReactNode | Function,
+		node: ReactNode | Function,
 		staticContext: StaticContext,
 	): RawNodeRepresentation<AllLeavesRepresentation, AllBranchNodesRepresentation> {
 		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
@@ -124,7 +124,7 @@ export class ChildrenAnalyzer<
 			return mapped
 		}
 
-		let children: React.ReactNode = undefined
+		let children: ReactNode = undefined
 
 		if (!('type' in node)) {
 			return this.processNode(children, staticContext)
@@ -132,7 +132,7 @@ export class ChildrenAnalyzer<
 		children = node.props.children
 
 		if (typeof node.type === 'symbol') {
-			// React.Fragment, React.Portal or other non-component
+			// Fragment, Portal or other non-component
 			return this.processNode(children, staticContext)
 		}
 		// if (typeof node.type === 'string') {
@@ -143,9 +143,9 @@ export class ChildrenAnalyzer<
 		// 	return this.processNode(children, staticContext)
 		// }
 
-		// React.Component, React.PureComponent, React.FunctionComponent
+		// Component, PureComponent, FunctionComponent
 
-		const treeNode = node.type as React.ElementType &
+		const treeNode = node.type as ElementType &
 			{
 				[staticMethod in ValidFactoryName]:
 					| StaticContextFactory<any, StaticContext>

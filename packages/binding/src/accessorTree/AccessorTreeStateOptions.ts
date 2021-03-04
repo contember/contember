@@ -1,5 +1,5 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 
 export interface AccessorTreeStateOptions {
-	nodeTree: React.ReactNode
+	nodeTree: ReactNode
 }

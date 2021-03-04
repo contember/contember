@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { Filter, UniqueWhere } from '../treeParameters'
 
 class Environment {
@@ -146,10 +146,10 @@ class Environment {
 namespace Environment {
 	export type Name = string | number
 
-	export type Value = React.ReactNode
+	export type Value = ReactNode
 
 	export interface SystemVariables {
-		labelMiddleware?: (label: React.ReactNode) => React.ReactNode
+		labelMiddleware?: (label: ReactNode) => ReactNode
 		rootWhere?: UniqueWhere
 		rootWhereAsFilter?: Filter
 	}

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkersContainer,

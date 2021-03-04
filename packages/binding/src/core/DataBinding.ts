@@ -1,5 +1,5 @@
 import { GraphQlClient, TreeFilter } from '@contember/client'
-import * as React from 'react'
+import { ReactNode } from 'react'
 import {
 	BatchUpdatesOptions,
 	BindingOperations,
@@ -209,7 +209,7 @@ export class DataBinding {
 	// )
 
 	public async extendTree(
-		newFragment: React.ReactNode,
+		newFragment: ReactNode,
 		{ signal, environment }: ExtendTreeOptions = {},
 	): Promise<TreeRootId | undefined> {
 		return await this.eventManager.asyncOperation(async () => {

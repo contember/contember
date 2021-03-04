@@ -1,10 +1,10 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { BindingOperations } from '../accessors'
 import { BindingOperationsContext, defaultBindingOperations } from './BindingOperationsContext'
 
 export interface BindingOperationsProviderProps {
 	bindingOperations: BindingOperations | undefined
-	children: React.ReactNode
+	children: ReactNode
 }
 
 export function BindingOperationsProvider(props: BindingOperationsProviderProps) {

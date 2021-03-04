@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { useEntityList } from '../accessorPropagation'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
@@ -10,7 +10,7 @@ import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
 
 export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelativeEntityList & {
-	children?: React.ReactNode
+	children?: ReactNode
 	variables?: Environment.DeltaFactory
 } & (
 		| {}

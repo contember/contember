@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { Component } from '../coreComponents'
 
 export interface StaticRenderProps {
-	children?: React.ReactNode
+	children?: ReactNode
 }
 
 export const StaticRender = Component<StaticRenderProps>(

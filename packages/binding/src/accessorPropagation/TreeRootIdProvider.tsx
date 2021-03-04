@@ -1,10 +1,10 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { TreeRootId } from '../treeParameters'
 import { TreeRootIdContext } from './TreeRootIdContext'
 
 export interface TreeRootIdProviderProps {
 	treeRootId: TreeRootId | undefined
-	children: React.ReactNode
+	children: ReactNode
 }
 
 export function TreeRootIdProvider(props: TreeRootIdProviderProps) {

@@ -1,5 +1,5 @@
 import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { ReactElement, ReactNode, useCallback, useMemo } from 'react'
 import { useEntity } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { throwBindingError } from '../BindingError'
@@ -9,17 +9,17 @@ import { FieldValue, RelativeSingleField, SugaredRelativeSingleField } from '../
 import { SugaredField } from './SugaredField'
 
 interface FieldViewCommonProps {
-	fallbackIfUnpersisted?: React.ReactNode
+	fallbackIfUnpersisted?: ReactNode
 }
 
 type FieldViewProps = FieldViewCommonProps &
 	(
 		| {
-				render: (...accessors: FieldAccessor[]) => React.ReactNode
+				render: (...accessors: FieldAccessor[]) => ReactNode
 				field: string | SugaredRelativeSingleField
 		  }
 		| {
-				render: (...accessors: FieldAccessor[]) => React.ReactNode
+				render: (...accessors: FieldAccessor[]) => ReactNode
 				fields: Array<string | SugaredRelativeSingleField>
 		  }
 	)
@@ -28,8 +28,8 @@ type FieldViewProps = FieldViewCommonProps &
 type FV = FieldValue
 type SRSF = string | SugaredRelativeSingleField
 type CP = FieldViewCommonProps
-type RN = React.ReactNode
-type REN = React.ReactElement | null
+type RN = ReactNode
+type REN = ReactElement | null
 
 export const FieldView = Component<FieldViewProps>(
 	props => {
@@ -50,12 +50,12 @@ export const FieldView = Component<FieldViewProps>(
 		const entityAccessor = useEntity()
 		const environment = entityAccessor.environment
 
-		const desugarField = React.useCallback((rsf: SRSF) => QueryLanguage.desugarRelativeSingleField(rsf, environment), [
+		const desugarField = useCallback((rsf: SRSF) => QueryLanguage.desugarRelativeSingleField(rsf, environment), [
 			environment,
 		])
 		const desugaredFields = useArrayMapMemo(fields, desugarField)
 
-		const retrieveField = React.useCallback(
+		const retrieveField = useCallback(
 			(desugaredRsf: RelativeSingleField) => entityAccessor.getRelativeSingleField(desugaredRsf),
 			[entityAccessor],
 		)
@@ -63,7 +63,7 @@ export const FieldView = Component<FieldViewProps>(
 
 		// TODO we probably want something like useDeferredValue from here.
 		//      Will probably just wait for Concurrent React though.
-		const output = React.useMemo(() => {
+		const output = useMemo(() => {
 			if (!entityAccessor.existsOnServer && fallbackIfUnpersisted !== undefined) {
 				return fallbackIfUnpersisted
 			}

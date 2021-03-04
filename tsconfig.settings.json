@@ -4,6 +4,7 @@
 		"declarationMap": true,
 		"sourceMap": true,
 		"composite": true,
+		"skipLibCheck": true,
 		"noEmitOnError": true,
 		"experimentalDecorators": true,
 		"esModuleInterop": true,

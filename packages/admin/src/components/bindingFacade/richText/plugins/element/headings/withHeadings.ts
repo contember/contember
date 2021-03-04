@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createElement } from 'react'
 import {
 	Editor,
 	Editor as SlateEditor,
@@ -90,7 +90,7 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 
 	e.renderElement = props => {
 		if (isHeading(props.element)) {
-			return React.createElement(HeadingRenderer, props as HeadingRendererProps)
+			return createElement(HeadingRenderer, props as HeadingRendererProps)
 		}
 		return renderElement(props)
 	}

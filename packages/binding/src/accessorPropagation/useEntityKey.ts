@@ -1,9 +1,9 @@
-import * as React from 'react'
+import { useContext } from 'react'
 import { BindingError } from '../BindingError'
 import { EntityKeyContext } from './EntityKeyContext'
 
 export const useEntityKey = () => {
-	const entityKey = React.useContext(EntityKeyContext)
+	const entityKey = useContext(EntityKeyContext)
 
 	if (entityKey === undefined) {
 		throw new BindingError(

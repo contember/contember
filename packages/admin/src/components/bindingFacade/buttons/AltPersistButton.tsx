@@ -1,15 +1,15 @@
 import { useDirtinessState, useMutationState } from '@contember/binding'
 import { ButtonProps, PersistControl } from '@contember/ui'
-import * as React from 'react'
+import { memo, useCallback } from 'react'
 import { usePersistWithFeedback } from '../../ui'
 
 export type AltPersistButtonProps = ButtonProps
 
-export const AltPersistButton = React.memo((props: AltPersistButtonProps) => {
+export const AltPersistButton = memo((props: AltPersistButtonProps) => {
 	const isMutating = useMutationState()
 	const isDirty = useDirtinessState()
 	const triggerPersist = usePersistWithFeedback()
-	const onClick = React.useCallback(() => {
+	const onClick = useCallback(() => {
 		triggerPersist().catch(() => {})
 	}, [triggerPersist])
 

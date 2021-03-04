@@ -1,3 +1,3 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
-export const ApiBaseUrlContext = React.createContext<string | undefined>(undefined)
+export const ApiBaseUrlContext = createContext<string | undefined>(undefined)

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 import { BindingOperations } from '../accessors'
 import { BindingError } from '../BindingError'
 
@@ -20,4 +20,4 @@ export const defaultBindingOperations = Object.freeze<BindingOperations>({
 	persist: getRejecter('persist'),
 })
 
-export const BindingOperationsContext = React.createContext<BindingOperations>(defaultBindingOperations)
+export const BindingOperationsContext = createContext<BindingOperations>(defaultBindingOperations)

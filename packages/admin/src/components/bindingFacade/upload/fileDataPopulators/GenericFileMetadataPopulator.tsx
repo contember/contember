@@ -1,5 +1,4 @@
 import { QueryLanguage, SugaredField, SugaredFieldProps } from '@contember/binding'
-import * as React from 'react'
 import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
 
 export interface GenericFileMetadataPopulatorProps {

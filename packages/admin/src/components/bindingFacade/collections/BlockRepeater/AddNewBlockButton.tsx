@@ -1,12 +1,12 @@
 import { Dropdown, DropdownProps, FormGroup } from '@contember/ui'
-import * as React from 'react'
+import { memo, useMemo } from 'react'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
 import { Icon } from '@contember/ui'
 
 export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps, 'requestClose'> {}
 
-export const AddNewBlockButton = React.memo<AddNewBlockButtonProps>(props => {
-	const buttonProps: DropdownProps['buttonProps'] = React.useMemo(
+export const AddNewBlockButton = memo<AddNewBlockButtonProps>(props => {
+	const buttonProps: DropdownProps['buttonProps'] = useMemo(
 		() => ({
 			children: (
 				<>

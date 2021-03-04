@@ -1,9 +1,9 @@
 import { Aether, Box, BoxOwnProps } from '@contember/ui'
-import * as React from 'react'
+import { memo } from 'react'
 
 export interface MiscPageLayoutProps extends BoxOwnProps {}
 
-export const MiscPageLayout = React.memo<MiscPageLayoutProps>(props => (
+export const MiscPageLayout = memo<MiscPageLayoutProps>(props => (
 	<Aether>
 		<div className="centerCard">
 			<div className="centerCard-in">

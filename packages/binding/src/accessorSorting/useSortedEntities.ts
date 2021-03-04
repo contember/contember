@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo, useCallback } from 'react'
 import { useDesugaredRelativeSingleField } from '../accessorPropagation'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { SugaredFieldProps } from '../helperComponents'
@@ -41,11 +41,11 @@ export const useSortedEntities = (
 	sortableByField: SugaredFieldProps['field'] | undefined,
 ): SortedEntities => {
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableByField)
-	const sortedEntities = React.useMemo(() => {
+	const sortedEntities = useMemo(() => {
 		return sortEntities(Array.from(entityList), desugaredSortableByField)
 	}, [desugaredSortableByField, entityList])
 
-	const addNewAtIndex = React.useCallback<SortedEntities['addNewAtIndex']>(
+	const addNewAtIndex = useCallback<SortedEntities['addNewAtIndex']>(
 		(index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => {
 			addNewAtIndexImplementation(
 				'addNewAtIndex',
@@ -58,7 +58,7 @@ export const useSortedEntities = (
 		},
 		[desugaredSortableByField, entityList, sortedEntities.length],
 	)
-	const prependNew = React.useCallback<SortedEntities['prependNew']>(
+	const prependNew = useCallback<SortedEntities['prependNew']>(
 		preprocess => {
 			addNewAtIndexImplementation(
 				'prependNew',
@@ -71,7 +71,7 @@ export const useSortedEntities = (
 		},
 		[desugaredSortableByField, entityList, sortedEntities.length],
 	)
-	const appendNew = React.useCallback<SortedEntities['appendNew']>(
+	const appendNew = useCallback<SortedEntities['appendNew']>(
 		preprocess => {
 			addNewAtIndexImplementation(
 				'appendNew',
@@ -84,7 +84,7 @@ export const useSortedEntities = (
 		},
 		[desugaredSortableByField, entityList, sortedEntities.length],
 	)
-	const normalizedMoveEntity = React.useCallback<SortedEntities['moveEntity']>(
+	const normalizedMoveEntity = useCallback<SortedEntities['moveEntity']>(
 		(oldIndex, newIndex) => {
 			if (!desugaredSortableByField) {
 				return throwNoopError('moveEntity')
@@ -102,7 +102,7 @@ export const useSortedEntities = (
 	// 	repairEntitiesOrder(desugaredSortableByField, entityList, sortedEntities)
 	// }, [desugaredSortableByField, entityList, sortedEntities])
 
-	return React.useMemo<SortedEntities>(
+	return useMemo<SortedEntities>(
 		() => ({
 			entities: sortedEntities,
 			addNewAtIndex,

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useCallback } from 'react'
 import {
 	Alias,
 	SugaredQualifiedEntityList,
@@ -14,7 +14,7 @@ export const useGetEntityListSubTree = () => {
 	const getEntityListSubTree = useBindingOperations().getEntityListSubTree
 	const treeRootId = useTreeRootId()
 
-	return React.useCallback(
+	return useCallback(
 		(
 			parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList,
 			...treeId: [TreeRootId | undefined] | []

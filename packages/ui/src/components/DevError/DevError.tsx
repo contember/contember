@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 
 export interface DevErrorProps {

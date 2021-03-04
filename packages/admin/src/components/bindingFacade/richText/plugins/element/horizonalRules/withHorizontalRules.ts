@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createElement } from 'react'
 import {
 	Editor,
 	Element as SlateElement,
@@ -53,7 +53,7 @@ export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWith
 
 	e.renderElement = props => {
 		if (isHorizontalRule(props.element)) {
-			return React.createElement(HorizontalRuleRenderer, props as HorizontalRuleRendererProps)
+			return createElement(HorizontalRuleRenderer, props as HorizontalRuleRendererProps)
 		}
 		return renderElement(props)
 	}

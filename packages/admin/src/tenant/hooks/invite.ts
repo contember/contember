@@ -1,5 +1,5 @@
 import { MutationRequestState, useAuthedTenantMutation } from './lib'
-import * as React from 'react'
+import { useCallback } from 'react'
 
 const INVITE_MUTATION = `
 	mutation (
@@ -50,7 +50,7 @@ export const useInvite = (
 	const [addUser, state] = useAuthedTenantMutation<CreateUserMutationResult, CreateUserMutationVariables>(
 		INVITE_MUTATION,
 	)
-	const cb = React.useCallback(
+	const cb = useCallback(
 		(email: string, memberships: InviteMembershipInput[]) => {
 			return addUser({
 				email,

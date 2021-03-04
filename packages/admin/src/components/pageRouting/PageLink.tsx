@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { memo } from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
 import { pageRequest } from '../../state/request'
@@ -12,7 +12,7 @@ export type PageConfig = {
 
 export type PageChange = () => PageConfig
 
-const PageLink = React.memo(({ project, to, stage, ...props }: Props) => {
+const PageLink = memo(({ project, to, stage, ...props }: Props) => {
 	const changed =
 		typeof to === 'string'
 			? {

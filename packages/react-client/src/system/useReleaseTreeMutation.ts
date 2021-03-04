@@ -1,5 +1,5 @@
 import { releaseTreeMutation, ReleaseTreeMutationResponse, TreeFilter } from '@contember/client'
-import * as React from 'react'
+import { useCallback } from 'react'
 import { ApiRequestState } from '../apiRequest'
 import { useStageSlug } from '../project'
 import { useSystemApiRequest } from './useSystemApiRequest'
@@ -10,7 +10,7 @@ export const useReleaseTreeMutation = (): [
 ] => {
 	const [requestState, sendRequest] = useSystemApiRequest<ReleaseTreeMutationResponse>()
 	const stage = useStageSlug()
-	const sendMutation = React.useCallback(
+	const sendMutation = useCallback(
 		(treeFilter: TreeFilter[]) =>
 			sendRequest(releaseTreeMutation, {
 				stage,

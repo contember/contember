@@ -1,5 +1,5 @@
 import { Button, ButtonBasedButtonProps, FormGroup, Icon, IconProps } from '@contember/ui'
-import * as React from 'react'
+import { memo } from 'react'
 import { EntityListAccessor, useMutationState } from '@contember/binding'
 
 export type CreateNewEntityButtonProps = ButtonBasedButtonProps & {
@@ -16,7 +16,7 @@ const defaultIconProps: IconProps = {
 	},
 }
 
-export const CreateNewEntityButton = React.memo(
+export const CreateNewEntityButton = memo(
 	({ createNewEntity, iconProps, children = 'Add', ...buttonProps }: CreateNewEntityButtonProps) => {
 		const isMutating = useMutationState()
 

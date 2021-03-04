@@ -1,6 +1,6 @@
 import { FieldValue } from '@contember/binding'
 import Fuse from 'fuse.js'
-import * as React from 'react'
+import { useMemo } from 'react'
 import { Props as SelectProps } from 'react-select'
 import { Props as AsyncProps } from 'react-select/async'
 import { ChoiceFieldData } from '../ChoiceField'
@@ -17,7 +17,7 @@ export const useCommonReactSelectAsyncProps = ({
 	placeholder,
 	data,
 }: UseCommonReactSelectAsyncPropsProps): AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>> => {
-	const fuse = React.useMemo(
+	const fuse = useMemo(
 		() =>
 			new Fuse(data, {
 				keys: ['searchKeywords'],

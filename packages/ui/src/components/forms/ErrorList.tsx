@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { memo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { FieldErrors } from '../../types'
 import { Message, MessageProps } from './Message'
@@ -8,7 +8,7 @@ export interface ErrorListProps {
 	size?: MessageProps['size']
 }
 
-export const ErrorList = React.memo(({ errors, size }: ErrorListProps) => {
+export const ErrorList = memo(({ errors, size }: ErrorListProps) => {
 	const prefix = useClassNamePrefix()
 	if (!errors) {
 		return null

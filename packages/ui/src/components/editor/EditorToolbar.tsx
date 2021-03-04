@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import * as React from 'react'
+import { useCallback, memo, forwardRef } from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
@@ -39,7 +39,7 @@ export interface EditorToolbarProps {
 
 function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 	const className = useComponentClassName('editorToolbar-button')
-	const renderToggle = React.useCallback<Exclude<DropdownProps['renderToggle'], undefined>>(
+	const renderToggle = useCallback<Exclude<DropdownProps['renderToggle'], undefined>>(
 		({ ref, onClick }) => {
 			return (
 				<EditorToolbarButton
@@ -77,8 +77,8 @@ function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 	)
 }
 
-export const EditorToolbar = React.memo(
-	React.forwardRef<HTMLDivElement, EditorToolbarProps>(
+export const EditorToolbar = memo(
+	forwardRef<HTMLDivElement, EditorToolbarProps>(
 		({ isActive, scope, groups, showLabels, restGroups, layout }: EditorToolbarProps, ref) => {
 			layout = layout ?? EditorToolbarLayout.BAR
 			const buttonLayout = layout === EditorToolbarLayout.LIST ? ToolbarButtonLayout.LIST : ToolbarButtonLayout.GRID

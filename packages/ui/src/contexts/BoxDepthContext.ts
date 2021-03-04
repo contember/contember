@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 import { BoxDepth } from '../types'
 
-export const BoxDepthContext = React.createContext<BoxDepth>(1)
+export const BoxDepthContext = createContext<BoxDepth>(1)

@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey'
-import * as React from 'react'
+import { createElement } from 'react'
 import { BaseEditor } from '../../../baseEditor'
 
 export const codeMark = 'isCode'
@@ -13,7 +13,7 @@ export const withCode = <E extends BaseEditor>(editor: E): E => {
 		const children = renderLeafChildren(props)
 
 		if (props.leaf[codeMark] === true) {
-			return React.createElement('code', undefined, children)
+			return createElement('code', undefined, children)
 		}
 		return children
 	}

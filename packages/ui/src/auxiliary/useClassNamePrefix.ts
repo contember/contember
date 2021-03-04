@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useContext } from 'react'
 import { GlobalClassNamePrefixContext } from '../contexts'
 
-export const useClassNamePrefix = () => React.useContext(GlobalClassNamePrefixContext)
+export const useClassNamePrefix = () => useContext(GlobalClassNamePrefixContext)

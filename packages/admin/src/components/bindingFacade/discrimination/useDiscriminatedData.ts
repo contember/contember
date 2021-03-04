@@ -1,5 +1,5 @@
 import { BindingError, Scalar, useEnvironment, VariableInputTransformer } from '@contember/binding'
-import * as React from 'react'
+import { useMemo } from 'react'
 import { LiteralDiscriminatedDatum } from './LiteralDiscriminatedDatum'
 import { NormalizedDiscriminatedData } from './NormalizedDiscriminatedData'
 import { ResolvedDiscriminatedDatum } from './ResolvedDiscriminatedDatum'
@@ -29,7 +29,7 @@ export const useDiscriminatedData = <
 		`Detected a set of discriminated items of non-uniform discrimination methods. ` +
 			`They all have to use either 'discriminateBy' or 'discriminateByScalar'.`
 
-	return React.useMemo<NormalizedDiscriminatedData<BaseData>>(() => {
+	return useMemo<NormalizedDiscriminatedData<BaseData>>(() => {
 		const literalBased: Map<string, ResolvedDiscriminatedDatum<LiteralBased>> = new Map()
 		const scalarBased: Map<Scalar, ResolvedDiscriminatedDatum<ScalarBased>> = new Map()
 

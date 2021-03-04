@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { AggregateDataPopulatorProps } from './AggregateDataPopulatorProps'
 import { CustomDataPopulatorProps } from './CustomDataPopulatorProps'
 import { FileDataPopulator } from './FileDataPopulator'
@@ -23,7 +23,7 @@ export const resolvePopulators = (props: ResolvablePopulatorProps): FileDataPopu
 export const useResolvedPopulators = (props: ResolvablePopulatorProps): FileDataPopulator[] => {
 	const p = props as CustomDataPopulatorProps & AggregateDataPopulatorProps // Note the &
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	return React.useMemo<FileDataPopulator[]>(() => resolvePopulators(p), [
+	return useMemo<FileDataPopulator[]>(() => resolvePopulators(p), [
 		p.audioDurationField,
 		p.fileNameField,
 		p.fileSizeField,

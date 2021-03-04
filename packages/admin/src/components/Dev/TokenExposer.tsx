@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState } from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
 import { Button } from '@contember/ui'
@@ -13,7 +13,7 @@ interface TokenExposerOwnProps {}
 interface TokenExposerProps extends TokenExposerStateProps, TokenExposerOwnProps {}
 
 const TokenExposerComponent = (props: TokenExposerProps) => {
-	const [isCopying, setIsCopying] = React.useState(false)
+	const [isCopying, setIsCopying] = useState(false)
 
 	if (!navigator.clipboard || !isDevMode()) {
 		return null

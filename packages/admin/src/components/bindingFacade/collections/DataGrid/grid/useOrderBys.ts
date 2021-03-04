@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useCallback } from 'react'
 import { DataGridColumns, DataGridOrderDirectionStore, DataGridSetColumnOrderBy } from '../base'
 import { GridPagingAction } from '../paging'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
@@ -7,11 +7,11 @@ export const useOrderBys = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
 ): [DataGridOrderDirectionStore, DataGridSetColumnOrderBy] => {
-	const [orderBys, setOrderBys] = React.useState<DataGridOrderDirectionStore>(() => normalizeInitialOrderBys(columns))
+	const [orderBys, setOrderBys] = useState<DataGridOrderDirectionStore>(() => normalizeInitialOrderBys(columns))
 
 	return [
 		orderBys,
-		React.useCallback(
+		useCallback(
 			(columnKey, columnOrderBy) => {
 				const column = columns.get(columnKey)
 				if (column === undefined || column.enableOrdering === false) {

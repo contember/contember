@@ -1,17 +1,17 @@
-import * as React from 'react'
+import { useState, useCallback } from 'react'
 import { DataGridColumns, DataGridHiddenColumnsStateStore, DataGridSetIsColumnHidden } from '../base'
 import { normalizeInitialHiddenColumnsState } from './normalizeInitialHiddenColumnsState'
 
 export const useHiddenColumnsState = (
 	columns: DataGridColumns,
 ): [DataGridHiddenColumnsStateStore, DataGridSetIsColumnHidden] => {
-	const [hiddenColumns, setHiddenColumns] = React.useState<DataGridHiddenColumnsStateStore>(() =>
+	const [hiddenColumns, setHiddenColumns] = useState<DataGridHiddenColumnsStateStore>(() =>
 		normalizeInitialHiddenColumnsState(columns),
 	)
 
 	return [
 		hiddenColumns,
-		React.useCallback(
+		useCallback(
 			(columnKey, isToBeHidden) => {
 				const column = columns.get(columnKey)
 				if (column === undefined) {

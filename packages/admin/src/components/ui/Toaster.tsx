@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import ToastsState, { ToastId, ToastType } from '../../state/toasts'
 import State from '../../state'
@@ -19,7 +19,7 @@ const toastTypeToIntent: { [K in ToastType]: Intent } = {
 	info: 'primary',
 }
 
-class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & Toaster.ToasterDispatcherProps> {
+class ToasterConnected extends PureComponent<Toaster.ToasterStateProps & Toaster.ToasterDispatcherProps> {
 	render() {
 		return (
 			<div className="toaster">

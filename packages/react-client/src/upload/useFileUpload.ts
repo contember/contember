@@ -1,5 +1,5 @@
 import { S3FileUploader, UploadedFileMetadata } from '@contember/client'
-import * as React from 'react'
+import { useRef, useReducer, useEffect, useCallback, useMemo } from 'react'
 import { useSessionToken } from '../auth'
 import { useCurrentContentGraphQlClient } from '../content'
 import { FileId } from './FileId'
@@ -21,23 +21,23 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 
 	const contentApiClient = useCurrentContentGraphQlClient()
 
-	const updateTimeoutRef = React.useRef<number | undefined>(undefined)
-	const isFirstRenderRef = React.useRef(true)
+	const updateTimeoutRef = useRef<number | undefined>(undefined)
+	const isFirstRenderRef = useRef(true)
 
-	const [multiTemporalState, dispatch] = React.useReducer(fileUploadReducer, undefined, initializeFileUploadState)
-	const multiTemporalStateRef = React.useRef(multiTemporalState)
+	const [multiTemporalState, dispatch] = useReducer(fileUploadReducer, undefined, initializeFileUploadState)
+	const multiTemporalStateRef = useRef(multiTemporalState)
 
-	React.useEffect(() => {
+	useEffect(() => {
 		multiTemporalStateRef.current = multiTemporalState
 	})
 
-	const abortUpload = React.useCallback<AbortUpload>(files => {
+	const abortUpload = useCallback<AbortUpload>(files => {
 		dispatch({
 			type: FileUploadActionType.Abort,
 			files,
 		})
 	}, [])
-	const startUpload = React.useCallback<StartUpload>(
+	const startUpload = useCallback<StartUpload>(
 		(files, options = {}) => {
 			const newFileIds = new Set<FileId>()
 			const { uploader = new S3FileUploader() } = options
@@ -108,7 +108,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 		[contentApiClient],
 	)
 
-	const operations = React.useMemo<FileUploadOperations>(
+	const operations = useMemo<FileUploadOperations>(
 		() => ({
 			startUpload,
 			abortUpload,
@@ -116,7 +116,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 		[abortUpload, startUpload],
 	)
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (isFirstRenderRef.current) {
 			return
 		}
@@ -150,7 +150,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 		maxUpdateFrequency,
 	])
 
-	React.useEffect(
+	useEffect(
 		() => () => {
 			for (const [, state] of multiTemporalStateRef.current.liveState) {
 				URL.revokeObjectURL(state.previewUrl)
@@ -163,7 +163,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 	)
 
 	// For this to work, this effect must be the last one to run.
-	React.useEffect(() => {
+	useEffect(() => {
 		isFirstRenderRef.current = false
 	}, [])
 

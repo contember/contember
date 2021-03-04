@@ -1,4 +1,4 @@
-import React from 'react'
+import { createElement } from 'react'
 import { createEditor, Editor, Element as SlateElement, Path, Range as SlateRange, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
@@ -79,10 +79,10 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			return node
 		},
 
-		renderElement: props => React.createElement(DefaultElement, props),
+		renderElement: props => createElement(DefaultElement, props),
 
 		renderLeafChildren: props => props.children,
-		renderLeaf: props => React.createElement('span', props.attributes, editorWithEssentials.renderLeafChildren(props)),
+		renderLeaf: props => createElement('span', props.attributes, editorWithEssentials.renderLeafChildren(props)),
 
 		// Just noop functions so that other plugins can safely bubble-call
 		onDOMBeforeInput: () => {},

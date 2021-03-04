@@ -10,7 +10,7 @@ import {
 	useEnvironment,
 } from '@contember/binding'
 import { Spinner } from '@contember/ui'
-import * as React from 'react'
+import { memo } from 'react'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
 export interface DimensionsSwitcherBaseProps
@@ -31,7 +31,7 @@ const DimensionsStateRenderer = (props: DataBindingStateComponentProps) => {
 	return <Spinner />
 }
 
-export const DimensionsSwitcher = React.memo((props: DimensionsSwitcherProps) => {
+export const DimensionsSwitcher = memo((props: DimensionsSwitcherProps) => {
 	const minItems = props.minItems === undefined ? 1 : props.minItems
 	const maxItems = props.maxItems === undefined ? 2 : props.maxItems
 

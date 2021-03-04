@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { DateFieldProps, DateFieldInner } from './DateField'
 import { SimpleRelativeSingleField } from '../auxiliary'
 

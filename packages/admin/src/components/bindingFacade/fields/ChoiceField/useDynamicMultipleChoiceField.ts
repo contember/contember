@@ -11,7 +11,7 @@ import {
 	useGetEntityByKey,
 	useMutationState,
 } from '@contember/binding'
-import * as React from 'react'
+import { useMemo, useCallback } from 'react'
 import {
 	BaseDynamicChoiceField,
 	useCurrentValues,
@@ -32,12 +32,12 @@ export const useDynamicMultipleChoiceField = (
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 
-	const desugaredRelativePath = React.useMemo<RelativeEntityList>(
+	const desugaredRelativePath = useMemo<RelativeEntityList>(
 		() => QueryLanguage.desugarRelativeEntityList(props, environment),
 		[environment, props],
 	)
 
-	const getCurrentValueEntity = React.useCallback((): EntityListAccessor => {
+	const getCurrentValueEntity = useCallback((): EntityListAccessor => {
 		const parentEntity = getEntityByKey(entityKey)
 
 		return parentEntity.getRelativeEntityList(desugaredRelativePath as RelativeEntityList)
@@ -61,7 +61,7 @@ export const useDynamicMultipleChoiceField = (
 
 	const { batchUpdates, connectEntity, disconnectEntity } = currentValueEntity
 
-	const clear = React.useCallback(() => {
+	const clear = useCallback(() => {
 		batchUpdates(getListAccessor => {
 			for (const child of getListAccessor()) {
 				getListAccessor().disconnectEntity(child)
@@ -69,7 +69,7 @@ export const useDynamicMultipleChoiceField = (
 		})
 	}, [batchUpdates])
 
-	const onChange = React.useCallback(
+	const onChange = useCallback(
 		(optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
 			if (isChosen) {
 				connectEntity(optionEntities[optionKey])

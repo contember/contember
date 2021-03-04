@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useCallback } from 'react'
 import { useProjectSlug } from '@contember/react-client'
 import { MutationRequestState, useAuthedTenantMutation } from './lib'
 
@@ -39,7 +39,7 @@ export const useRemoveProjectMembership = (): [
 	MutationRequestState<UpdateMembershipResult>,
 ] => {
 	const [update, state] = useRemoveMembership()
-	const cb = React.useCallback(
+	const cb = useCallback(
 		(project: string, identityId: string) => {
 			if (update) {
 				return update({
@@ -60,7 +60,7 @@ export const useRemoveCurrentProjectMembership = (): [
 ] => {
 	const project = useProjectSlug()
 	const [update, state] = useRemoveProjectMembership()
-	const cb = React.useCallback(
+	const cb = useCallback(
 		(identityId: string) => {
 			if (project !== undefined) {
 				return update(project, identityId)

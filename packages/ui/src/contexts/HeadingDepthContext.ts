@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 import { HeadingDepth } from '../types'
 
-export const HeadingDepthContext = React.createContext<HeadingDepth>(1)
+export const HeadingDepthContext = createContext<HeadingDepth>(1)

@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey'
-import * as React from 'react'
+import { createElement } from 'react'
 import { BaseEditor } from '../../../baseEditor'
 import { boldMark } from '../bold'
 
@@ -14,7 +14,7 @@ export const withStrikeThrough = <E extends BaseEditor>(editor: E): E => {
 		const children = renderLeafChildren(props)
 
 		if (props.leaf[strikeThroughMark] === true) {
-			return React.createElement('s', undefined, children)
+			return createElement('s', undefined, children)
 		}
 		return children
 	}

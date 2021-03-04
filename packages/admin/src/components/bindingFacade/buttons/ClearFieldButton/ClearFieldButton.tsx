@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { ClearFieldButtonInner, ClearFieldButtonInnerPublicProps } from './ClearFieldButtonInner'
 

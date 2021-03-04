@@ -1,3 +1,3 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
-export const LoginTokenContext = React.createContext<string | undefined>(undefined)
+export const LoginTokenContext = createContext<string | undefined>(undefined)

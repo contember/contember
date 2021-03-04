@@ -1,5 +1,4 @@
 import { EditorParagraph } from '@contember/ui'
-import * as React from 'react'
 import { RenderElementProps } from 'slate-react'
 import { ParagraphElement } from './ParagraphElement'
 

@@ -1,5 +1,5 @@
-import * as React from 'react'
+import { memo } from 'react'
 import { DragHandle } from '../../../ui'
 
-export const RepeaterHandle = React.memo(DragHandle)
+export const RepeaterHandle = memo(DragHandle)
 RepeaterHandle.displayName = 'RepeaterHandle'

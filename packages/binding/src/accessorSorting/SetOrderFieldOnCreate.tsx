@@ -1,5 +1,4 @@
 import { CrudQueryBuilder, Input } from '@contember/client'
-import * as React from 'react'
 import { Component, EntityListSubTree, Field, EntitySubTree } from '../coreComponents'
 import { Literal } from '../dao'
 import { SugaredField } from '../helperComponents'

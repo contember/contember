@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { QueryLanguage } from '../queryLanguage'
 import { RelativeSingleEntity, SugaredRelativeSingleEntity } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
@@ -29,7 +29,7 @@ function useDesugaredRelativeSingleEntity(
 		normalizedSugared = sugaredRelativeSingleEntity
 	}
 
-	return React.useMemo(
+	return useMemo(
 		() =>
 			hasEntity
 				? QueryLanguage.desugarRelativeSingleEntity(

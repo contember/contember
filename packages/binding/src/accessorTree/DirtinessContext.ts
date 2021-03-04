@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
-export const DirtinessContext = React.createContext<boolean>(false)
+export const DirtinessContext = createContext<boolean>(false)
 DirtinessContext.displayName = 'DirtinessContext'

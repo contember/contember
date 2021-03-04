@@ -1,9 +1,9 @@
 import { GraphQlClient } from '@contember/client'
-import * as React from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { QueryRequestObject, QueryRequestState } from './requestState'
 
 export const useJsonEqualMemo = <V>(memoFn: () => V, key: any): V => {
-	const ref = React.useRef<{ key: string; value: V }>()
+	const ref = useRef<{ key: string; value: V }>()
 
 	const jsonKey = JSON.stringify(key)
 	if (!ref.current || ref.current.key !== jsonKey) {
@@ -19,13 +19,13 @@ export const useQuery = <R, V>(
 	variables: V,
 	apiToken?: string,
 ): QueryRequestObject<R> => {
-	const [state, setState] = React.useState<QueryRequestState<R>>({
+	const [state, setState] = useState<QueryRequestState<R>>({
 		loading: true,
 		finished: false,
 		error: false,
 	})
 	const vars = useJsonEqualMemo(() => variables, variables)
-	const fetch = React.useCallback((client: GraphQlClient, query: string, variables: V, apiToken?: string) => {
+	const fetch = useCallback((client: GraphQlClient, query: string, variables: V, apiToken?: string) => {
 		if (client) {
 			setState({ loading: true, finished: false, error: false })
 			client
@@ -53,11 +53,11 @@ export const useQuery = <R, V>(
 		}
 	}, [])
 
-	React.useEffect(() => {
+	useEffect(() => {
 		fetch(client, query, vars, apiToken)
 	}, [client, query, vars, apiToken, fetch])
 
-	const refetch = React.useCallback(() => {
+	const refetch = useCallback(() => {
 		fetch(client, query, vars, apiToken)
 	}, [client, query, vars, apiToken, fetch])
 

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createElement } from 'react'
 import { Editor, Element as SlateElement, Node as SlateNode, Point, Range as SlateRange, Transforms } from 'slate'
 import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
@@ -47,7 +47,7 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 
 	e.renderElement = props => {
 		if (isParagraph(props.element)) {
-			return React.createElement(ParagraphRenderer, props as ParagraphRendererProps)
+			return createElement(ParagraphRenderer, props as ParagraphRendererProps)
 		}
 		return renderElement(props)
 	}

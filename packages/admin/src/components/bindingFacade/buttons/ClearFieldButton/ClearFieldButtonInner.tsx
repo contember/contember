@@ -1,5 +1,5 @@
 import { Button, ButtonProps, Icon } from '@contember/ui'
-import * as React from 'react'
+import { useCallback } from 'react'
 import { FieldAccessor } from '@contember/binding'
 
 export type ClearFieldButtonInnerPublicProps = ButtonProps
@@ -13,7 +13,7 @@ export type ClearFieldButtonInnerProps = ClearFieldButtonInnerPublicProps & Clea
 
 export const ClearFieldButtonInner = (props: ClearFieldButtonInnerProps) => {
 	const { field, isMutating, ...buttonProps } = props
-	const onClick = React.useCallback(() => {
+	const onClick = useCallback(() => {
 		field.updateValue(null)
 	}, [field])
 

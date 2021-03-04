@@ -1,5 +1,4 @@
 import { BindingError, SugaredFieldProps } from '@contember/binding'
-import * as React from 'react'
 import { ImageFieldView } from '../../fieldViews'
 import { noFileUrlMessage } from './noFileUrlMessage'
 import { StockFileKindDefault } from './StockFileKindDefault'

@@ -1,5 +1,4 @@
 import { AccessorProvider, FieldValue, RelativeSingleField } from '@contember/binding'
-import * as React from 'react'
 import { NormalizedBlocks } from '../../../blocks'
 import { isElementWithReference } from '../elements'
 import { NormalizedEmbedHandlers } from '../embed/core'

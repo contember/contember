@@ -95,7 +95,7 @@ export const useSortedEntities = (
 	)
 
 	// This wasn't such a great idea…
-	// React.useEffect(() => {
+	// useEffect(() => {
 	// 	if (!desugaredSortableByField) {
 	// 		return
 	// 	}

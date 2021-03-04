@@ -1,5 +1,5 @@
 import { GraphQlBuilder } from '@contember/client'
-import { ReactNode } from 'react'
+import { ReactNode, ReactElement } from 'react'
 import { useField } from '../accessorPropagation'
 import { MarkerFactory } from '../queryLanguage'
 import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
@@ -32,4 +32,4 @@ export const Field = Component(
 		generateFieldMarker: (props, environment) => MarkerFactory.createFieldMarker(props, environment),
 	},
 	'Field',
-) as <Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => React.ReactElement
+) as <Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => ReactElement

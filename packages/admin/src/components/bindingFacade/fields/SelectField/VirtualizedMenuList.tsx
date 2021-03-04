@@ -4,7 +4,9 @@ import { MenuListComponentProps } from 'react-select'
 import { FixedSizeList, ListChildComponentProps } from 'react-window'
 import { ChoiceFieldData } from '../ChoiceField'
 
-export const VirtualizedMenuList = React.memo(function VirtualizedMenuList(
+export const VirtualizedMenuList: React.ComponentType<MenuListComponentProps<
+	ChoiceFieldData.SingleDatum<FieldValue | undefined>
+>> = React.memo(function VirtualizedMenuList(
 	props: MenuListComponentProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>>,
 ) {
 	const { children, maxHeight, innerRef } = props

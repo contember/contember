@@ -2,8 +2,8 @@
 
 module.exports = {
 	parser: '@typescript-eslint/parser',
-	extends: ['plugin:@typescript-eslint/recommended', 'prettier/@typescript-eslint', 'plugin:prettier/recommended'],
-	plugins: ['react-hooks'],
+	extends: ['plugin:@typescript-eslint/recommended', 'prettier', 'plugin:prettier/recommended'],
+	plugins: ['react-hooks', '@typescript-eslint'],
 	parserOptions: {
 		ecmaVersion: 2018,
 		sourceType: 'module',

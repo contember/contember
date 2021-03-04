@@ -1,10 +1,8 @@
 import { Environment } from '@contember/binding'
 import { Box, Button, ButtonGroup, Dropdown, Icon, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
-import * as React from 'react'
+import { createElement, Fragment, ReactElement } from 'react'
 import { EmptyMessage } from '../../helpers'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
-import { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
-import { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
 import { DataGridState } from './DataGridState'
 
 export interface DataGridFullFiltersPublicProps {}
@@ -21,7 +19,7 @@ export function DataGridFullFilters({
 	desiredState,
 	environment,
 	setFilter,
-}: DataGridFullFiltersProps): React.ReactElement | null {
+}: DataGridFullFiltersProps): ReactElement | null {
 	const remainingColumns = Array.from(desiredState.columns).filter(
 		([key, column]) => column.enableFiltering !== false && !desiredState.filterArtifacts.has(key),
 	)
@@ -72,14 +70,14 @@ export function DataGridFullFilters({
 								const filterRenderer = column.enableFiltering !== false ? column.filterRenderer : undefined
 
 								if (!filterRenderer) {
-									return <React.Fragment key={key} />
+									return <Fragment key={key} />
 								}
 
 								return (
 									<TableRow key={key}>
 										<TableCell justification="justifyStart">{column.header}</TableCell>
 										<TableCell>
-											{React.createElement(filterRenderer, {
+											{createElement(filterRenderer, {
 												filter: filterArtifact,
 												setFilter: newArtifact => setFilter(key, newArtifact),
 												environment: environment,

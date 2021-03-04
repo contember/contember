@@ -1,15 +1,15 @@
 import { BindingError } from '@contember/binding'
 import { useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { assertNever } from '../../../../../utils'
 import { ContentOutletProps } from './ContentOutlet'
 import { BoxedCatchAllJSX, BoxedContentOutletProps, editorTemplateAnalyzer } from './editorTemplateAnalyzer'
 import { Environment } from '@contember/binding'
 
 export interface EditorTemplateAtom<Value> {
-	nodeBefore: React.ReactNode
+	nodeBefore: ReactNode
 	value: Value
-	nodeAfter: React.ReactNode
+	nodeAfter: ReactNode
 }
 
 export type EditorTemplate =
@@ -20,13 +20,13 @@ export type EditorTemplate =
 			//trailing: EditorTemplateAtom<TextFieldProps>[]
 	  }
 
-export const getEditorTemplate = (blockContents: React.ReactNode, env: Environment): EditorTemplate => {
+export const getEditorTemplate = (blockContents: ReactNode, env: Environment): EditorTemplate => {
 	let contentOutlet: ContentOutletProps | undefined = undefined
 	const processed = editorTemplateAnalyzer.processChildren(blockContents, env)
 
-	const nodesBefore: React.ReactNode[] = []
-	const nodesAfter: React.ReactNode[] = []
-	let currentTarget: React.ReactNode[] = nodesBefore
+	const nodesBefore: ReactNode[] = []
+	const nodesAfter: ReactNode[] = []
+	let currentTarget: ReactNode[] = nodesBefore
 
 	for (const node of processed) {
 		if (node instanceof BoxedContentOutletProps) {

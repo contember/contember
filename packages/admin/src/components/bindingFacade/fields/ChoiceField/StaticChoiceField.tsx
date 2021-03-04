@@ -11,12 +11,12 @@ import {
 	useField,
 	VariableInputTransformer,
 } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export interface StaticOption {
-	label: React.ReactNode
-	description?: React.ReactNode
+	label: ReactNode
+	description?: ReactNode
 }
 
 export interface NormalizedStaticOption extends StaticOption {
@@ -55,9 +55,9 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 	const field = useField(props)
-	const options = React.useMemo(() => normalizeOptions(props.options, environment), [environment, props.options])
+	const options = useMemo(() => normalizeOptions(props.options, environment), [environment, props.options])
 	const currentValue: ChoiceFieldData.ValueRepresentation = options.findIndex(({ value }) => field.hasValue(value))
-	const data = React.useMemo(
+	const data = useMemo(
 		() =>
 			options.map(({ label, description, value: actualValue, searchKeywords }, i) => ({
 				key: i,
@@ -68,13 +68,13 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 			})),
 		[options],
 	)
-	const onChange = React.useCallback(
+	const onChange = useCallback(
 		(newValue: ChoiceFieldData.ValueRepresentation) => {
 			field.updateValue(newValue === -1 ? null : options[newValue].value)
 		},
 		[field, options],
 	)
-	const metadata = React.useMemo<ChoiceFieldData.MetadataByArity['single']>(
+	const metadata = useMemo<ChoiceFieldData.MetadataByArity['single']>(
 		() => ({
 			currentValue,
 			data,
@@ -89,7 +89,7 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 	return metadata as any // TS… 🙁
 }
 
-export const StaticChoiceField: React.FunctionComponent<
+export const StaticChoiceField: FunctionComponent<
 	StaticChoiceFieldProps<any> & ChoiceFieldData.MetadataPropsByArity
 > = Component(
 	props => {

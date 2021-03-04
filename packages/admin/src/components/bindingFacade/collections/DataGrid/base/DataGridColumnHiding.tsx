@@ -1,5 +1,5 @@
 import { Box, Dropdown, Icon } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Checkbox } from '../../../../ui'
 import { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
 import { DataGridState } from './DataGridState'
@@ -12,7 +12,7 @@ export interface DataGridColumnHidingProps {
 export function DataGridColumnHiding({
 	desiredState,
 	setIsColumnHidden,
-}: DataGridColumnHidingProps): React.ReactElement | null {
+}: DataGridColumnHidingProps): ReactElement | null {
 	return (
 		<Dropdown
 			alignment="end"
@@ -30,7 +30,7 @@ export function DataGridColumnHiding({
 			<Box heading="Columns">
 				{Array.from(desiredState.columns, ([key, column]) => {
 					if (column.canBeHidden === false) {
-						return <React.Fragment key={key} />
+						return <Fragment key={key} />
 					}
 					return (
 						<Checkbox

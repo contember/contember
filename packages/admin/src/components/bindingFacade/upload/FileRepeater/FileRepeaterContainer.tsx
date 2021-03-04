@@ -10,7 +10,7 @@ import { useFileUpload } from '@contember/react-client'
 import { FileId } from '@contember/react-client/dist/src/upload/FileId'
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import attrAccept from 'attr-accept'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { NormalizedBlocks } from '../../blocks'
 import { RepeaterContainerProps, SortableRepeaterItem } from '../../collections'
@@ -33,16 +33,16 @@ export type FileRepeaterContainerPublicProps = Omit<UploadConfigProps, 'accept'>
 	Pick<FormGroupProps, 'description' | 'labelDescription'> & {
 		discriminationField?: SugaredFieldProps['field']
 		removalType?: RemovalType
-		addButtonSubText?: React.ReactNode
+		addButtonSubText?: ReactNode
 	}
 
 export type FileRepeaterContainerProps = FileRepeaterContainerPublicProps &
 	FileRepeaterContainerPrivateProps &
 	Omit<RepeaterContainerProps, 'children'> & {
-		children?: React.ReactNode
+		children?: ReactNode
 	}
 
-export const FileRepeaterContainer = React.memo(
+export const FileRepeaterContainer = memo(
 	({
 		addButtonComponent: AddButton = Button,
 		addButtonComponentExtraProps,
@@ -79,8 +79,8 @@ export const FileRepeaterContainer = React.memo(
 		const batchUpdates = accessor.batchUpdates
 		const desugaredDiscriminant = useDesugaredRelativeSingleField(discriminationField)
 		const environment = useEnvironment()
-		const fileKinds = React.useMemo(() => Array.from(iterableFileKinds), [iterableFileKinds])
-		const resolvedAccept = React.useMemo<string[] | undefined>(() => {
+		const fileKinds = useMemo(() => Array.from(iterableFileKinds), [iterableFileKinds])
+		const resolvedAccept = useMemo<string[] | undefined>(() => {
 			const resolved = fileKinds.flatMap(fileKind => {
 				if (fileKind.accept === undefined) {
 					return []
@@ -96,7 +96,7 @@ export const FileRepeaterContainer = React.memo(
 			return resolved
 		}, [fileKinds])
 
-		const onDrop = React.useCallback(
+		const onDrop = useCallback(
 			(files: File[]) => {
 				const filesWithIds: [FileId, File][] = []
 				batchUpdates(getListAccessor => {
@@ -147,8 +147,8 @@ export const FileRepeaterContainer = React.memo(
 			noKeyboard: true, // This would normally be absolutely henious but there is a keyboard-focusable button inside.
 		})
 
-		const previews: React.ReactNode[] = []
-		const genericFileDefaults = React.useMemo(() => getGenericFileDefaults(fileUrlField), [fileUrlField])
+		const previews: ReactNode[] = []
+		const genericFileDefaults = useMemo(() => getGenericFileDefaults(fileUrlField), [fileUrlField])
 		const defaultFileKind: DiscriminatedFileUploadProps = {
 			renderFilePreview: renderFilePreview || genericFileDefaults.renderFilePreview,
 			renderFile: renderFile || genericFileDefaults.renderFile,

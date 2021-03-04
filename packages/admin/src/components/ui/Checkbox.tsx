@@ -1,15 +1,15 @@
 import { ErrorList, FieldErrors } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 
 export interface CheckboxProps {
 	checked: boolean
 	readOnly?: boolean
 	errors?: FieldErrors
 	onChange: (isChecked: boolean) => void
-	children: React.ReactNode
+	children: ReactNode
 }
 
-export const Checkbox = React.memo((props: CheckboxProps) => (
+export const Checkbox = memo((props: CheckboxProps) => (
 	<div className="checkbox">
 		<ErrorList errors={props.errors} />
 		<label className="checkbox-in">

@@ -1,17 +1,17 @@
 import { AccessorTreeState, AccessorTreeStateName, RequestErrorType } from '@contember/binding'
 import { ContainerSpinner, Message } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { useRedirect } from '../../pageRouting'
 
 export interface FeedbackRendererProps {
 	accessorTreeState: AccessorTreeState
-	children: React.ReactNode
+	children: ReactNode
 }
 
 export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRendererProps) {
 	const redirect = useRedirect()
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (
 			accessorTreeState.name === AccessorTreeStateName.Error &&
 			accessorTreeState.error.type === RequestErrorType.Unauthorized

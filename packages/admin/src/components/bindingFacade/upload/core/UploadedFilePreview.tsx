@@ -1,11 +1,11 @@
 import { FilePreview } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 
 export interface UploadedFilePreviewProps {
-	renderFile: undefined | (() => React.ReactNode)
+	renderFile: undefined | (() => ReactNode)
 }
 
-export const UploadedFilePreview = React.memo(({ renderFile }: UploadedFilePreviewProps) => {
+export const UploadedFilePreview = memo(({ renderFile }: UploadedFilePreviewProps) => {
 	return <FilePreview>{renderFile?.()}</FilePreview> // TODO render file default
 })
 UploadedFilePreview.displayName = 'UploadedFilePreview'

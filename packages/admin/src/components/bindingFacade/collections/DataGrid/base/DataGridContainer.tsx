@@ -1,6 +1,6 @@
 import { Component, Entity, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
 import { Button, ButtonList, Justification, Table, TableCell, TableRow } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
 import { GridPagingAction } from '../paging'
 import { DataGridColumnHiding } from './DataGridColumnHiding'
@@ -24,8 +24,8 @@ export interface DataGridContainerPublicProps {
 	allowColumnVisibilityControls?: boolean
 	allowAggregateFilterControls?: boolean
 
-	emptyMessage?: React.ReactNode
-	emptyMessageComponent?: React.ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
+	emptyMessage?: ReactNode
+	emptyMessageComponent?: ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
 	emptyMessageComponentExtraProps?: {}
 }
 
@@ -42,7 +42,7 @@ export interface DataGridContainerOwnProps extends DataGridContainerPublicProps 
 
 export interface DataGridContainerProps extends DataGridContainerOwnProps, EntityListBaseProps {}
 
-export const DataGridContainer: React.FunctionComponent<DataGridContainerProps> = Component(
+export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Component(
 	({
 		children,
 		accessor,

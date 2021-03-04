@@ -10,7 +10,7 @@ import {
 } from '@contember/binding'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { assertNever } from '@contember/utils'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicMultipleChoiceFieldProps, useDynamicMultipleChoiceField } from './useDynamicMultipleChoiceField'
 import { DynamicSingleChoiceFieldProps, useDynamicSingleChoiceField } from './useDynamicSingleChoiceField'
@@ -23,7 +23,7 @@ export type DynamicChoiceFieldProps =
 			arity: 'multiple'
 	  } & DynamicMultipleChoiceFieldProps)
 
-export const DynamicChoiceField: React.FunctionComponent<
+export const DynamicChoiceField: FunctionComponent<
 	DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity
 > = Component(
 	props => {
@@ -39,8 +39,8 @@ export const DynamicChoiceField: React.FunctionComponent<
 		return assertNever(props)
 	},
 	(props: DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity, environment) => {
-		let reference: React.ReactNode
-		let entityListDataProvider: React.ReactNode
+		let reference: ReactNode
+		let entityListDataProvider: ReactNode
 
 		const searchByFields =
 			props.searchByFields !== undefined &&
@@ -50,7 +50,7 @@ export const DynamicChoiceField: React.FunctionComponent<
 				<Field field={props.searchByFields} />
 			))
 
-		let renderedOptionBase: React.ReactNode
+		let renderedOptionBase: ReactNode
 
 		if ('renderOption' in props) {
 			renderedOptionBase =

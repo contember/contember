@@ -1,5 +1,5 @@
 import { SingleLineTextInputProps, TextInput } from '@contember/ui'
-import * as React from 'react'
+import { ChangeEvent } from 'react'
 import { FieldAccessor } from '@contember/binding'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
@@ -8,7 +8,7 @@ export type NumberFieldProps = SimpleRelativeSingleFieldProps &
 
 export const NumberField = SimpleRelativeSingleField<NumberFieldProps, number>(
 	(fieldMetadata, { defaultValue, ...props }) => {
-		const generateOnChange = (data: FieldAccessor<number>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+		const generateOnChange = (data: FieldAccessor<number>) => (e: ChangeEvent<HTMLInputElement>) => {
 			data.updateValue(parseInt(e.target.value, 10))
 		}
 		return (

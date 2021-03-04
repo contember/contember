@@ -6,7 +6,7 @@ import {
 	EntitySubTreeAdditionalProps,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import RequestState from '../../state/request'
 import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
@@ -16,16 +16,16 @@ export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'i
 	EntitySubTreeAdditionalProps &
 	EntitySubTreeAdditionalCreationProps & {
 		pageName: string
-		children: React.ReactNode
+		children: ReactNode
 		redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState
 		rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
 	}
 
-const CreatePage: Partial<PageProvider<CreatePageProps>> & React.ComponentType<CreatePageProps> = React.memo(
+const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreatePageProps> = memo(
 	({ pageName, children, rendererProps, redirectOnSuccess, ...entityProps }: CreatePageProps) => {
 		const redirect = useRedirect()
 
-		const onPersistSuccess = React.useMemo<EntityAccessor.PersistSuccessHandler | undefined>(() => {
+		const onPersistSuccess = useMemo<EntityAccessor.PersistSuccessHandler | undefined>(() => {
 			if (!redirectOnSuccess) {
 				return undefined
 			}

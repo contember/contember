@@ -1,13 +1,13 @@
 import { Button, ButtonList } from '@contember/ui'
-import * as React from 'react'
 import { connect } from 'react-redux'
-import { MiscPageLayout } from './MiscPageLayout'
 import { pushRequest } from '../actions/request'
 import { Dispatch } from '../actions/types'
 import State from '../state'
+import { ProjectConfig } from '../state/projectsConfigs'
 import { RequestChange } from '../state/request'
 import { Link } from './Link'
-import { ProjectConfig } from '../state/projectsConfigs'
+import { Component as ReactComponent } from 'react'
+import { MiscPageLayout } from './MiscPageLayout'
 
 interface ProjectsListProps {
 	configs: ProjectConfig[]
@@ -23,7 +23,7 @@ const selectProjectRequest = (project: ProjectConfig): RequestChange => () => ({
 	dimensions: {},
 })
 
-class ProjectsList extends React.Component<ProjectsListProps, {}> {
+class ProjectsList extends ReactComponent<ProjectsListProps, {}> {
 	componentDidMount(): void {
 		if (this.props.configs.length === 1) {
 			this.props.onSelectProject(this.props.configs[0])

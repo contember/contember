@@ -1,6 +1,6 @@
 import { Component, ErrorAccessor } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
 
@@ -10,7 +10,7 @@ import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps
 export type MultiSelectFieldProps = MultiSelectFieldInnerPublicProps &
 	(Omit<StaticChoiceFieldProps<'multiple'>, 'arity'> | DynamicMultipleChoiceFieldProps)
 
-export const MultiSelectField: React.FunctionComponent<MultiSelectFieldProps> = Component(
+export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} arity="multiple">
 			{({
@@ -49,7 +49,7 @@ export interface MultiSelectFieldInnerProps
 	errors: ErrorAccessor | undefined
 }
 
-const MultiSelectFieldInner = React.memo(
+const MultiSelectFieldInner = memo(
 	({
 		currentValues,
 		data,

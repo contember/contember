@@ -1,16 +1,16 @@
-import * as React from 'react'
+import { RefObject, useLayoutEffect, useRef } from 'react'
 import { EditorSelectionStateName } from './EditorSelectionState'
 import { useEditorSelection } from './useEditorSelection'
 
 export interface ToolbarsState {
-	inlineToolbarRef: React.RefObject<HTMLDivElement>
+	inlineToolbarRef: RefObject<HTMLDivElement>
 	inlineToolbarActive: boolean
 	blockToolbarActive: boolean
 }
 
 // TODO use a container so that it doesn't break during resize.
 export const useToolbarState = (): ToolbarsState => {
-	const inlineToolbarRef = React.useRef<HTMLDivElement>(null)
+	const inlineToolbarRef = useRef<HTMLDivElement>(null)
 	const selectionState = useEditorSelection()
 
 	const inlineToolbarActive =
@@ -20,7 +20,7 @@ export const useToolbarState = (): ToolbarsState => {
 		selectionState.name === EditorSelectionStateName.CollapsedSelection ||
 		selectionState.name === EditorSelectionStateName.EmergingPointerSelection
 
-	React.useLayoutEffect(() => {
+	useLayoutEffect(() => {
 		const container = inlineToolbarRef.current
 
 		if (!container) {

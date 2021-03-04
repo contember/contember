@@ -1,12 +1,12 @@
 import { BindingError, EntityAccessor, EntityListAccessor, SugaredRelativeEntityList } from '@contember/binding'
-import * as React from 'react'
+import { MutableRefObject } from 'react'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideCreateReferencedEntityOptions {
 	//getMonolithicReferenceById: EntityListAccessor.GetChildEntityById | undefined
 	createMonolithicReference: EntityListAccessor.CreateNewEntity | undefined
 	referencesField: string | SugaredRelativeEntityList | undefined
-	sortedBlocksRef: React.MutableRefObject<EntityAccessor[]>
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
 export const overrideCreateReferencedEntity = <E extends BlockSlateEditor>(

@@ -1,6 +1,6 @@
 import { EntityAccessor } from '@contember/binding'
 import { IconSourceSpecification } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Range as SlateRange } from 'slate'
 import { SugaredDiscriminateBy } from '../../discrimination'
 import { ElementNode, ElementSpecifics, TextNode, TextSpecifics } from '../baseEditor'
@@ -25,11 +25,11 @@ export interface InitializeReferenceContentProps {
 export interface InitializeReferenceSpecificToolbarButton {
 	discriminateBy: SugaredDiscriminateBy
 	initializeReference?: EntityAccessor.BatchUpdatesHandler
-	referenceContent: React.FunctionComponent<InitializeReferenceContentProps>
+	referenceContent: FunctionComponent<InitializeReferenceContentProps>
 }
 
 export interface CommonToolbarButton extends IconSourceSpecification {
-	label: React.ReactNode
+	label: ReactNode
 	title?: string
 }
 

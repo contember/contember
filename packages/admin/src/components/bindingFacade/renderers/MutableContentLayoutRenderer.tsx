@@ -1,16 +1,16 @@
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Component } from '@contember/binding'
 import { PersistButton } from '../buttons'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 
 export interface MutableContentLayoutRendererProps extends ImmutableContentLayoutRendererProps {
-	persistButtonComponent?: React.ComponentType
+	persistButtonComponent?: ComponentType
 }
 
-export const MutableContentLayoutRenderer: React.FunctionComponent<MutableContentLayoutRendererProps> = Component(
+export const MutableContentLayoutRenderer: FunctionComponent<MutableContentLayoutRendererProps> = Component(
 	({ persistButtonComponent, side, children, ...immutableProps }) => {
 		const PersistComponent = persistButtonComponent || PersistButton
-		const augmentedSide = React.useMemo(
+		const augmentedSide = useMemo(
 			() => (
 				<>
 					{side}

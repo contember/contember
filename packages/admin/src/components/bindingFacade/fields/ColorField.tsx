@@ -1,6 +1,6 @@
-import { TextInput, SingleLineTextInputProps } from '@contember/ui'
-import * as React from 'react'
 import { FieldAccessor } from '@contember/binding'
+import { SingleLineTextInputProps, TextInput } from '@contember/ui'
+import { ChangeEvent } from 'react'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export type ColorFieldProps = SimpleRelativeSingleFieldProps &
@@ -8,7 +8,7 @@ export type ColorFieldProps = SimpleRelativeSingleFieldProps &
 
 export const ColorField = SimpleRelativeSingleField<ColorFieldProps, string>(
 	(fieldMetadata, { defaultValue, name, label, ...props }) => {
-		const generateOnChange = (data: FieldAccessor<string>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+		const generateOnChange = (data: FieldAccessor<string>) => (e: ChangeEvent<HTMLInputElement>) => {
 			data.updateValue(!e.target.value && data.valueOnServer === null ? null : e.target.value)
 		}
 		return (

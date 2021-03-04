@@ -1,12 +1,12 @@
 import { Component, EntityListAccessor } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { RepeaterInner, RepeaterInnerProps } from '../collections/Repeater'
 
 // TODO properly unify with repeaters
 export interface MutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>
 	extends Omit<RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>, 'label'> {
-	beforeContent?: React.ReactNode
-	afterContent?: React.ReactNode
+	beforeContent?: ReactNode
+	afterContent?: ReactNode
 }
 
 export const MutableEntityListRenderer = Component(
@@ -39,4 +39,4 @@ export const MutableEntityListRenderer = Component(
 	'MutableEntityListRenderer',
 ) as <ContainerExtraProps, ItemExtraProps>(
 	props: MutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
-) => React.ReactElement
+) => ReactElement

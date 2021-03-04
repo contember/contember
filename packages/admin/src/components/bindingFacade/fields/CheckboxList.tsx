@@ -1,13 +1,13 @@
 import { Component } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Checkbox } from '../../ui'
 import { ChoiceField, ChoiceFieldData, DynamicMultipleChoiceFieldProps, StaticChoiceFieldProps } from './ChoiceField'
 
 export type CheckboxListProps = Omit<FormGroupProps, 'children'> &
 	(Omit<StaticChoiceFieldProps<'multiple'>, 'arity'> | DynamicMultipleChoiceFieldProps)
 
-export const CheckboxList: React.FunctionComponent<CheckboxListProps> = Component(
+export const CheckboxList: FunctionComponent<CheckboxListProps> = Component(
 	props => (
 		<ChoiceField {...(props as any)} arity="multiple">
 			{({ data, currentValues, onChange, isMutating }: ChoiceFieldData.MultipleChoiceFieldMetadata) => {

@@ -1,5 +1,5 @@
 import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
 import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
@@ -62,7 +62,7 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 
 namespace VimeoEmbedHandler {
 	export type Options = {
-		render?: () => React.ReactNode
+		render?: () => ReactNode
 		vimeoIdField: SugaredFieldProps['field']
 	} & (
 		| {
@@ -77,7 +77,7 @@ namespace VimeoEmbedHandler {
 		vimeoIdField: SugaredFieldProps['field']
 	}
 
-	export const Renderer = React.memo(function VimeoRenderer(props: RendererOptions) {
+	export const Renderer = memo(function VimeoRenderer(props: RendererOptions) {
 		const vimeoId = useField<string>(props.vimeoIdField).value
 
 		if (vimeoId === null) {

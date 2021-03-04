@@ -1,7 +1,7 @@
 import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import * as Leaflet from 'leaflet'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Map, MapProps, Marker, MarkerProps, TileLayer, TileLayerProps } from 'react-leaflet'
 
 export interface LocationFieldProps extends Omit<FormGroupProps, 'children'> {
@@ -22,7 +22,7 @@ const markerIcon = Leaflet.divIcon({
 
 const defaultZoom = 5
 
-export const LocationField: React.FunctionComponent<LocationFieldProps> = Component(
+export const LocationField: FunctionComponent<LocationFieldProps> = Component(
 	({
 		latitudeField,
 		longitudeField,
@@ -45,7 +45,7 @@ export const LocationField: React.FunctionComponent<LocationFieldProps> = Compon
 			longitude.updateValue(latLng.lng)
 		}
 
-		const [resolvedCenter] = React.useState((): [number, number] => {
+		const [resolvedCenter] = useState((): [number, number] => {
 			if (mapCenter !== undefined) {
 				return mapCenter
 			}

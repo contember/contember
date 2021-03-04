@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import {
 	EntityAccessor,
 	Environment,
@@ -19,9 +19,9 @@ export namespace ChoiceFieldData {
 
 	export interface SingleDatum<ActualValue extends Environment.Value = string> {
 		key: ValueRepresentation
-		label: React.ReactNode
+		label: ReactNode
 		searchKeywords: string
-		description?: React.ReactNode
+		description?: ReactNode
 		actualValue: ActualValue
 	}
 
@@ -53,10 +53,10 @@ export namespace ChoiceFieldData {
 	export type MetadataPropsByArity =
 		| {
 				arity: 'single'
-				children: (metadata: ChoiceFieldData.SingleChoiceFieldMetadata) => React.ReactElement | null
+				children: (metadata: ChoiceFieldData.SingleChoiceFieldMetadata) => ReactElement | null
 		  }
 		| {
 				arity: 'multiple'
-				children: (metadata: ChoiceFieldData.MultipleChoiceFieldMetadata) => React.ReactElement | null
+				children: (metadata: ChoiceFieldData.MultipleChoiceFieldMetadata) => ReactElement | null
 		  }
 }

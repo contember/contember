@@ -1,5 +1,5 @@
 import { Box, Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Component, EntityAccessor } from '@contember/binding'
 import { EmptyMessage, DeleteEntityButton } from '../collections/helpers'
 import { RepeaterContainerProps, RepeaterItemProps } from '../collections/Repeater'
@@ -63,16 +63,16 @@ export const TableRenderer = Component(
 	'TableRenderer',
 ) as <ContainerExtraProps, ItemExtraProps>(
 	props: TableRendererProps<ContainerExtraProps, ItemExtraProps>,
-) => React.ReactElement
+) => ReactElement
 
-const EmptyTable = React.memo((props: { children: React.ReactNode }) => (
+const EmptyTable = memo((props: { children: ReactNode }) => (
 	<Box>
 		<EmptyMessage>{props.children}</EmptyMessage>
 	</Box>
 ))
 EmptyTable.displayName = 'EmptyTable'
 
-const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => {
+const Container = memo((props: RepeaterContainerProps & Omit<TableProps, 'children'>) => {
 	// TODO solve this via preferences
 	const isEmpty = !Array.from(props.accessor).some(entity => entity instanceof EntityAccessor && entity.existsOnServer)
 
@@ -89,7 +89,7 @@ const Container = React.memo((props: RepeaterContainerProps & Omit<TableProps, '
 })
 Container.displayName = 'Container'
 
-const Row = React.memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & { enableRemoving: boolean }) => (
+const Row = memo((props: RepeaterItemProps & Omit<TableRowProps, 'children'> & { enableRemoving: boolean }) => (
 	<TableRow {...props}>
 		{props.children}
 		{props.enableRemoving && (

@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import {
 	FileDataPopulator,
@@ -17,7 +17,7 @@ export type FileUploadFieldProps = SimpleRelativeSingleFieldProps &
 	}
 
 // TODO this is super temporary
-export const FileUploadField: React.FunctionComponent<FileUploadFieldProps> = Component(props => {
+export const FileUploadField: FunctionComponent<FileUploadFieldProps> = Component(props => {
 	const defaults = getGenericFileDefaults(props.field)
 	return (
 		<UploadField

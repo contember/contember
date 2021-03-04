@@ -1,7 +1,7 @@
 import { EntityAccessor, Environment } from '@contember/binding'
 import { FileUploadReadyState, SingleFileUploadState } from '@contember/react-client'
 import { FilePreview, UploadProgress } from '@contember/ui'
-import * as React from 'react'
+import { memo, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { FileDataPopulator } from '../fileDataPopulators'
 import { getRelevantPopulators } from './getRelevantPopulators'
 
@@ -10,7 +10,7 @@ export interface UploadingFilePreviewProps {
 	environment: Environment
 	uploadState: SingleFileUploadState
 	populators: Iterable<FileDataPopulator>
-	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
+	renderFilePreview?: (file: File, previewUrl: string) => ReactNode
 }
 
 type PopulatorDataState =
@@ -27,26 +27,26 @@ type PopulatorDataState =
 			data?: never
 	  }
 
-export const UploadingFilePreview = React.memo(
+export const UploadingFilePreview = memo(
 	({ uploadState, batchUpdates, environment, populators, renderFilePreview }: UploadingFilePreviewProps) => {
-		const uploadStateRef = React.useRef(uploadState)
-		const [preparedPopulatorData, setPreparedPopulatorData] = React.useState<PopulatorDataState>({
+		const uploadStateRef = useRef(uploadState)
+		const [preparedPopulatorData, setPreparedPopulatorData] = useState<PopulatorDataState>({
 			name: 'uninitialized',
 		})
 		const uploadedFile = uploadState.file
 		const readyState = uploadState.readyState
-		const isMountedRef = React.useRef(true)
+		const isMountedRef = useRef(true)
 
-		const relevantPopulators = React.useMemo(() => getRelevantPopulators(populators, uploadedFile), [
+		const relevantPopulators = useMemo(() => getRelevantPopulators(populators, uploadedFile), [
 			populators,
 			uploadedFile,
 		])
 
-		React.useLayoutEffect(() => {
+		useLayoutEffect(() => {
 			uploadStateRef.current = uploadState
 		}, [uploadState])
 
-		React.useEffect(() => {
+		useEffect(() => {
 			const currentUploadState = uploadStateRef.current
 			const preparePopulators = async () => {
 				if (readyState === FileUploadReadyState.Uploading && currentUploadState) {
@@ -75,7 +75,7 @@ export const UploadingFilePreview = React.memo(
 			preparePopulators()
 		}, [readyState, relevantPopulators])
 
-		React.useEffect(() => {
+		useEffect(() => {
 			if (
 				uploadState.readyState !== FileUploadReadyState.Success ||
 				preparedPopulatorData.name !== 'ready' ||
@@ -110,14 +110,14 @@ export const UploadingFilePreview = React.memo(
 			uploadState,
 		])
 
-		React.useEffect(
+		useEffect(
 			() => () => {
 				isMountedRef.current = false
 			},
 			[],
 		)
 
-		const getOverlay = (): React.ReactNode => {
+		const getOverlay = (): ReactNode => {
 			if (uploadState.readyState === FileUploadReadyState.Error && uploadState.error?.endUserMessage) {
 				return uploadState.error.endUserMessage
 			}

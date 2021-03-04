@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Component } from '@contember/binding'
 import { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
@@ -10,7 +10,7 @@ export type ChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceF
 ) &
 	ChoiceFieldData.MetadataPropsByArity
 
-export const ChoiceField: React.FunctionComponent<ChoiceFieldProps> = Component(props => {
+export const ChoiceField: FunctionComponent<ChoiceFieldProps> = Component(props => {
 	if (Array.isArray(props.options)) {
 		return <StaticChoiceField {...(props as StaticChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity)} />
 	}

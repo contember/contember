@@ -1,11 +1,3 @@
-import * as React from 'react'
-import cn from 'classnames'
-import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
-import LogoutLink from './LogoutLink'
-import { Avatar, AvatarSize } from './ui'
-import { default as PageLink } from './pageRouting/PageLink'
-import { useSelector } from 'react-redux'
-import State from '../state'
 import {
 	Aether,
 	Button,
@@ -14,31 +6,39 @@ import {
 	DropdownContentContainerProvider,
 	forceReflow,
 	Heading,
+	Icon,
 } from '@contember/ui'
+import cn from 'classnames'
+import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useRef, useState } from 'react'
+import { useSelector } from 'react-redux'
+import State from '../state'
+import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
+import LogoutLink from './LogoutLink'
+import { default as PageLink } from './pageRouting/PageLink'
 import SwitchProjectLink from './SwitchProjectLink'
-import { Icon } from '@contember/ui'
+import { Avatar, AvatarSize } from './ui'
 
 export interface LayoutProps {
 	header: {
-		title?: React.ReactNode
-		left: React.ReactNode
-		center?: React.ReactNode
-		right: React.ReactNode
+		title?: ReactNode
+		left: ReactNode
+		center?: ReactNode
+		right: ReactNode
 	}
-	side: React.ReactNode
-	content: React.ReactNode
-	userMenu?: React.ReactNode
+	side: ReactNode
+	content: ReactNode
+	userMenu?: ReactNode
 }
 
-export const LayoutDefault = React.memo((props: LayoutProps) => {
-	const [isMenuOpen, setIsMenuOpen] = React.useState(false)
+export const LayoutDefault = memo((props: LayoutProps) => {
+	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const email = useSelector<State, string | undefined>(state =>
 		state.auth.identity ? state.auth.identity.email : undefined,
 	)
-	const sideRef = React.useRef<HTMLElement>(null)
+	const sideRef = useRef<HTMLElement>(null)
 
-	const toggleMenu = React.useCallback(
-		(event: React.MouseEvent) => {
+	const toggleMenu = useCallback(
+		(event: ReactMouseEvent) => {
 			event.preventDefault()
 			setIsMenuOpen(!isMenuOpen)
 

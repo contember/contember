@@ -34,7 +34,7 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 	])
 	// TODO this kind of works but ends up generating tons of operations when used to delete the whole table.
 	// 		it would require more testing to ensure that it works well so it will have to wait for now.
-	// const selectTable = React.useCallback(() => {
+	// const selectTable = useCallback(() => {
 	// 	const tablePath = ReactEditor.findPath(editor, props.element)
 	// 	const firstTablePoint = SlateEditor.start(editor, tablePath)
 	// 	const lastTablePoint = SlateEditor.end(editor, tablePath)

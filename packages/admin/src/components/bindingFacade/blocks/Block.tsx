@@ -1,12 +1,12 @@
 import { Component } from '@contember/binding'
-import * as React from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../discrimination'
 
 export interface BlockCommonProps {
-	label?: React.ReactNode
-	description?: React.ReactNode
-	alternate?: React.ReactNode
-	children?: React.ReactNode
+	label?: ReactNode
+	description?: ReactNode
+	alternate?: ReactNode
+	children?: ReactNode
 }
 
 export interface LiteralBasedBlockProps extends BlockCommonProps {
@@ -18,7 +18,7 @@ export interface ScalarBasedBlockProps extends BlockCommonProps {
 
 export type BlockProps = LiteralBasedBlockProps | ScalarBasedBlockProps
 
-export const Block: React.FunctionComponent<BlockProps> = Component(
+export const Block: FunctionComponent<BlockProps> = Component(
 	props => <>{props.children}</>,
 	props => (
 		<>

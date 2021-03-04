@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
 import { BlockElement } from '../../../baseEditor'
 import { HorizontalRuleElement } from './HorizontalRuleElement'
@@ -7,7 +7,7 @@ export interface HorizontalRuleRendererProps extends Omit<RenderElementProps, 'e
 	element: HorizontalRuleElement
 }
 
-export const HorizontalRuleRenderer: React.FunctionComponent<HorizontalRuleRendererProps> = (
+export const HorizontalRuleRenderer: FunctionComponent<HorizontalRuleRendererProps> = (
 	props: HorizontalRuleRendererProps,
 ) => {
 	const isSelected = useSelected()

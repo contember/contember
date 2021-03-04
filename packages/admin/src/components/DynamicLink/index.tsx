@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { pushRequest } from '../../actions/request'
 import { Dispatch } from '../../actions/types'
@@ -10,7 +10,7 @@ import { isUrlActive } from '../../utils/isUrlActive'
 
 export interface DynamicLinkInnerProps {
 	onClick: () => void
-	children: React.ReactElement | null
+	children: ReactElement | null
 	isActive: boolean
 }
 
@@ -24,8 +24,8 @@ export interface DynamicLinkDispatchProps {
 
 export interface DynamicLinkOwnProps {
 	requestChange: RequestChange
-	children?: React.ReactElement | null
-	Component: React.ComponentType<DynamicLinkInnerProps>
+	children?: ReactElement | null
+	Component: ComponentType<DynamicLinkInnerProps>
 }
 
 export type DynamicLinkProps = DynamicLinkDispatchProps & DynamicLinkStateProps & DynamicLinkOwnProps

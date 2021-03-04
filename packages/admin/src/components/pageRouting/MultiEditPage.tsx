@@ -4,7 +4,7 @@ import {
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { FeedbackRenderer, MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/renderers'
 import { PageProvider } from './PageProvider'
 
@@ -12,11 +12,11 @@ export interface MultiEditPageProps<ContainerExtraProps, ItemExtraProps>
 	extends SugaredQualifiedEntityList,
 		EntityListSubTreeAdditionalProps {
 	pageName: string
-	children?: React.ReactNode
+	children?: ReactNode
 	rendererProps?: Omit<MultiEditRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 }
 
-const MultiEditPage = React.memo(
+const MultiEditPage = memo(
 	<ContainerExtraProps, ItemExtraProps>({
 		children,
 		rendererProps,
@@ -31,7 +31,7 @@ const MultiEditPage = React.memo(
 	),
 ) as (<ContainerExtraProps, ItemExtraProps>(
 	props: MultiEditPageProps<ContainerExtraProps, ItemExtraProps>,
-) => React.ReactElement) &
+) => ReactElement) &
 	Partial<PageProvider<MultiEditPageProps<never, never>>>
 
 MultiEditPage.getPageName = (props: MultiEditPageProps<never, never>) => props.pageName

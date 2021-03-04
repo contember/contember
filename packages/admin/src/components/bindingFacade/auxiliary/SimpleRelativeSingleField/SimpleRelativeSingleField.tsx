@@ -1,6 +1,3 @@
-import { GraphQlBuilder } from '@contember/client'
-import { FormGroupProps } from '@contember/ui'
-import * as React from 'react'
 import {
 	Component,
 	Environment,
@@ -10,6 +7,9 @@ import {
 	Scalar,
 	StaticRenderProvider,
 } from '@contember/binding'
+import { GraphQlBuilder } from '@contember/client'
+import { FormGroupProps } from '@contember/ui'
+import { NamedExoticComponent, ReactNode } from 'react'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
 
 export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FormGroupProps, 'children'>
@@ -28,10 +28,10 @@ export const SimpleRelativeSingleField = function <
 	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
 	Produced extends Persisted = Persisted
 >(
-	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Persisted, Produced>, props: P) => React.ReactNode,
+	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Persisted, Produced>, props: P) => ReactNode,
 	displayName: string,
 	defaultProps?: Partial<P>,
-): React.NamedExoticComponent<P> & StaticRenderProvider<P> {
+): NamedExoticComponent<P> & StaticRenderProvider<P> {
 	return Component<P>(
 		props => <SimpleRelativeSingleFieldProxy {...defaultProps} {...props} render={render} />,
 		(props: P) => {

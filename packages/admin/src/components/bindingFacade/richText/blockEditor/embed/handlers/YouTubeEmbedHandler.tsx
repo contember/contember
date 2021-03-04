@@ -1,5 +1,5 @@
 import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
 import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
@@ -62,7 +62,7 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 
 namespace YouTubeEmbedHandler {
 	export type Options = {
-		render?: () => React.ReactNode
+		render?: () => ReactNode
 		youTubeIdField: SugaredFieldProps['field']
 	} & (
 		| {
@@ -77,7 +77,7 @@ namespace YouTubeEmbedHandler {
 		youTubeIdField: SugaredFieldProps['field']
 	}
 
-	export const Renderer = React.memo(function YouTubeRenderer(props: RendererOptions) {
+	export const Renderer = memo(function YouTubeRenderer(props: RendererOptions) {
 		const youTubeId = useField<string>(props.youTubeIdField).value
 
 		if (youTubeId === null) {

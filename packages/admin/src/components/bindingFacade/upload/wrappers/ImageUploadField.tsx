@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { ImageFieldView, ImageFieldViewProps } from '../../fieldViews'
 import {
@@ -22,7 +22,7 @@ export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
 		previewTitle?: string
 	}
 
-export const ImageUploadField: React.FunctionComponent<ImageUploadFieldProps> = Component(props => {
+export const ImageUploadField: FunctionComponent<ImageUploadFieldProps> = Component(props => {
 	const defaults = getImageFileDefaults(props.field)
 	return (
 		<UploadField

@@ -10,7 +10,7 @@ import {
 } from '@contember/binding'
 import { FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 
@@ -23,7 +23,7 @@ export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concea
 		concealTimeout?: number
 	}
 
-export const SlugField: React.FunctionComponent<SlugFieldProps> = Component(
+export const SlugField: FunctionComponent<SlugFieldProps> = Component(
 	({
 		buttonProps,
 		concealTimeout,
@@ -39,7 +39,7 @@ export const SlugField: React.FunctionComponent<SlugFieldProps> = Component(
 			normalizedUnpersistedHardPrefix,
 			normalizedPersistedHardPrefix,
 			normalizedPersistedSoftPrefix,
-		} = React.useMemo(
+		} = useMemo(
 			() => ({
 				normalizedUnpersistedHardPrefix:
 					typeof unpersistedHardPrefix === 'function'
@@ -52,7 +52,7 @@ export const SlugField: React.FunctionComponent<SlugFieldProps> = Component(
 			}),
 			[environment, persistedHardPrefix, persistedSoftPrefix, unpersistedHardPrefix],
 		)
-		const transform = React.useCallback(
+		const transform = useCallback(
 			(driverFieldValue: string | null) => {
 				const slugValue = slugify(driverFieldValue || '')
 

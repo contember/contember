@@ -10,7 +10,7 @@ import {
 	useMutationState,
 	useSortedEntities,
 } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Axis, SortEndHandler } from 'react-sortable-hoc'
 import { RepeaterContainer, RepeaterContainerProps, RepeaterContainerPublicProps } from './RepeaterContainer'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
@@ -24,17 +24,17 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	extends RepeaterContainerPublicProps,
 		Omit<RepeaterItemProps, 'children' | 'canBeRemoved' | 'label'> {
 	accessor: EntityListAccessor
-	label: React.ReactNode
-	children?: React.ReactNode
+	label: ReactNode
+	children?: ReactNode
 
 	sortableBy?: SugaredFieldProps['field']
 
 	enableRemoving?: boolean
 
-	containerComponent?: React.ComponentType<RepeaterContainerProps & ContainerExtraProps>
+	containerComponent?: ComponentType<RepeaterContainerProps & ContainerExtraProps>
 	containerComponentExtraProps?: ContainerExtraProps
 
-	itemComponent?: React.ComponentType<RepeaterItemProps & ItemExtraProps>
+	itemComponent?: ComponentType<RepeaterItemProps & ItemExtraProps>
 	itemComponentExtraProps?: ItemExtraProps
 
 	unstable__sortAxis?: Axis
@@ -47,22 +47,22 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>) => {
 		const isMutating = useMutationState()
 		const { entities, moveEntity, appendNew } = useSortedEntities(props.accessor, props.sortableBy)
-		const onSortEnd = React.useCallback<SortEndHandler>(
+		const onSortEnd = useCallback<SortEndHandler>(
 			({ oldIndex, newIndex }) => {
 				moveEntity(oldIndex, newIndex)
 			},
 			[moveEntity],
 		)
 
-		const Handle: React.ComponentType<{ children: React.ReactNode }> = props.dragHandleComponent || React.Fragment
-		const Item: React.ComponentType<RepeaterItemProps & ItemExtraProps> = props.itemComponent || RepeaterItem
-		const Container: React.ComponentType<RepeaterContainerProps & ContainerExtraProps> =
+		const Handle: ComponentType<{ children: ReactNode }> = props.dragHandleComponent || Fragment
+		const Item: ComponentType<RepeaterItemProps & ItemExtraProps> = props.itemComponent || RepeaterItem
+		const Container: ComponentType<RepeaterContainerProps & ContainerExtraProps> =
 			props.containerComponent || RepeaterContainer
 
 		const isEmpty = entities.length === 0
 		const itemRemovingEnabled = props.enableRemoving !== false
 
-		const sortableHandle = React.useCallback(
+		const sortableHandle = useCallback(
 			({ children }) => (
 				<SortableRepeaterItemHandle>
 					<Handle>{children}</Handle>
@@ -150,5 +150,5 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 	'RepeaterInner',
 ) as (<ContainerExtraProps, ItemExtraProps>(
 	props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>,
-) => React.ReactElement) &
+) => ReactElement) &
 	StaticRenderProvider<RepeaterInnerProps<unknown, unknown>, NonStaticPropNames>

@@ -1,5 +1,5 @@
 import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
 import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
@@ -81,7 +81,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 namespace GoogleFormEmbedHandler {
 	export type Options = {
 		nonEmbedLinkWarning?: string
-		render?: () => React.ReactNode
+		render?: () => ReactNode
 		googleFormIdField: SugaredFieldProps['field']
 	} & (
 		| {
@@ -96,7 +96,7 @@ namespace GoogleFormEmbedHandler {
 		googleFormIdField: SugaredFieldProps['field']
 	}
 
-	export const Renderer = React.memo(function GoogleFormRenderer(props: RendererOptions) {
+	export const Renderer = memo(function GoogleFormRenderer(props: RendererOptions) {
 		const googleFormId = useField<string>(props.googleFormIdField).value
 
 		if (googleFormId === null) {

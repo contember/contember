@@ -1,32 +1,32 @@
 import { EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { Box, BoxSection, ErrorList } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 
 export interface RepeaterContainerPrivateProps {
 	accessor: EntityListAccessor
 	entities: EntityAccessor[]
 	isEmpty: boolean
-	label: React.ReactNode
+	label: ReactNode
 	createNewEntity: EntityListAccessor.CreateNewEntity
-	children: React.ReactNode
+	children: ReactNode
 }
 export interface RepeaterContainerPublicProps {
 	enableAddingNew?: boolean
 
-	emptyMessage?: React.ReactNode
-	emptyMessageComponent?: React.ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
+	emptyMessage?: ReactNode
+	emptyMessageComponent?: ComponentType<EmptyMessageProps & any> // This can override 'emptyMessage'
 	emptyMessageComponentExtraProps?: {}
 
-	addButtonText?: React.ReactNode
+	addButtonText?: ReactNode
 	addButtonProps?: CreateNewEntityButtonProps // Children here override 'addButtonText'
-	addButtonComponent?: React.ComponentType<CreateNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
+	addButtonComponent?: ComponentType<CreateNewEntityButtonProps & any> // This can override 'addButtonText' and 'addButtonProps'
 	addButtonComponentExtraProps?: {}
 }
 
 export interface RepeaterContainerProps extends RepeaterContainerPublicProps, RepeaterContainerPrivateProps {}
 
-export const RepeaterContainer = React.memo(
+export const RepeaterContainer = memo(
 	({
 		accessor,
 		children,

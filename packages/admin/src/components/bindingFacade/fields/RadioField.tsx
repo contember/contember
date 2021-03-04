@@ -1,5 +1,5 @@
 import { FormGroupProps } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Component, RelativeSingleField } from '@contember/binding'
 import { ChoiceFieldProps } from './ChoiceField'
 
@@ -14,6 +14,6 @@ export interface RadioFieldInternalProps {
 
 export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 
-export const RadioField: React.FunctionComponent<RadioFieldProps> = Component(props => {
+export const RadioField: FunctionComponent<RadioFieldProps> = Component(props => {
 	throw new Error('Not implemented')
 }, 'RadioField')

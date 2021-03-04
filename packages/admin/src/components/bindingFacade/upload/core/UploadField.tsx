@@ -10,7 +10,7 @@ import {
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import {
 	FileUrlDataPopulator,
@@ -24,8 +24,8 @@ import { UploadedFilePreview } from './UploadedFilePreview'
 import { UploadingFilePreview } from './UploadingFilePreview'
 
 export type UploadFieldRenderingProps = {
-	uploadButtonText?: React.ReactNode
-	uploadButtonSubText?: React.ReactNode
+	uploadButtonText?: ReactNode
+	uploadButtonSubText?: ReactNode
 }
 
 export type UploadFieldProps = UploadConfigProps &
@@ -37,7 +37,7 @@ export type UploadFieldProps = UploadConfigProps &
 	}
 
 const staticFileId = 'file'
-export const UploadField: React.FunctionComponent<UploadFieldProps> = Component(
+export const UploadField: FunctionComponent<UploadFieldProps> = Component(
 	props => {
 		const { uploadButtonText = 'Select a file to upload', uploadButtonSubText = 'or drag & drop' } = props
 
@@ -66,7 +66,7 @@ export const UploadField: React.FunctionComponent<UploadFieldProps> = Component(
 		)
 		const hasPersistedFile = props.hasPersistedFile || (fileUrlField ? () => fileUrlField.value !== null : undefined)
 
-		const onDrop = React.useCallback(
+		const onDrop = useCallback(
 			([file]: File[]) => {
 				const fileById: [string, File] = [staticFileId, file]
 				startUpload([fileById], {
@@ -89,7 +89,7 @@ export const UploadField: React.FunctionComponent<UploadFieldProps> = Component(
 		// This doesn't actually work well: the urlField could be something like 'mainFile.url' where the 'url' field is
 		// non-nullable. We cannot easily detect from here what exactly to set to null, remove or disconnect.
 
-		// const clearField = React.useMemo<undefined | React.MouseEventHandler>(() => {
+		// const clearField = useMemo<undefined | MouseEventHandler>(() => {
 		// 	return fileUrlField && fileUrlField.value !== null
 		// 		? e => {
 		// 				e.stopPropagation()
@@ -147,7 +147,7 @@ export const UploadField: React.FunctionComponent<UploadFieldProps> = Component(
 	(props, environment) => (
 		<>
 			{resolvePopulators(props).map((item, i) => (
-				<React.Fragment key={i}>{item.getStaticFields(environment)}</React.Fragment>
+				<Fragment key={i}>{item.getStaticFields(environment)}</Fragment>
 			))}
 			{props.renderFile?.()}
 		</>

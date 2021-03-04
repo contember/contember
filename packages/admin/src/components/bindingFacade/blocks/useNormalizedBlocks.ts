@@ -1,11 +1,11 @@
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { NormalizedDiscriminatedData, useDiscriminatedData } from '../discrimination'
 import { BlockCommonProps, LiteralBasedBlockProps, ScalarBasedBlockProps } from './Block'
 import { useBlockProps } from './useBlockProps'
 
 export type NormalizedBlocks = NormalizedDiscriminatedData<BlockCommonProps>
 
-export const useNormalizedBlocks = (children: React.ReactNode): NormalizedBlocks => {
+export const useNormalizedBlocks = (children: ReactNode): NormalizedBlocks => {
 	const propList = useBlockProps(children)
 
 	return useDiscriminatedData<BlockCommonProps, LiteralBasedBlockProps, ScalarBasedBlockProps>(propList, {

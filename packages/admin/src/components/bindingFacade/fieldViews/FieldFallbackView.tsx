@@ -1,16 +1,16 @@
 import { Component } from '@contember/binding'
-import * as React from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 
 export type FieldFallbackViewStyle = 'n/a' | 'nothing' | 'unknown'
 
 export interface FieldFallbackViewProps {
-	fallback: React.ReactNode | undefined
+	fallback: ReactNode | undefined
 	fallbackStyle: FieldFallbackViewStyle | undefined
 }
 
 export type FieldFallbackViewPublicProps = Partial<FieldFallbackViewProps>
 
-export const FieldFallbackView: React.FunctionComponent<FieldFallbackViewProps> = Component(
+export const FieldFallbackView: FunctionComponent<FieldFallbackViewProps> = Component(
 	props => {
 		if (props.fallback !== undefined) {
 			return <>{props.fallback}</>

@@ -1,5 +1,5 @@
 import { Component, SugaredFieldProps, SugaredRelativeSingleField } from '@contember/binding'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { DiscriminatedBlocks, useNormalizedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../Repeater'
 import { AddNewBlockButton } from './AddNewBlockButton'
@@ -13,7 +13,7 @@ export interface BlockRepeaterProps
 	discriminationField: SugaredFieldProps['field']
 }
 
-export const BlockRepeater: React.FunctionComponent<BlockRepeaterProps> = Component(
+export const BlockRepeater: FunctionComponent<BlockRepeaterProps> = Component(
 	({ discriminationField, ...props }) => {
 		const normalizedBlocks = useNormalizedBlocks(props.children)
 

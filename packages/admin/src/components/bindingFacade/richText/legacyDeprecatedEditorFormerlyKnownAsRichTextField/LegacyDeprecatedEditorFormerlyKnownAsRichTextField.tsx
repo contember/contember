@@ -8,7 +8,7 @@ import {
 	useMutationState,
 } from '@contember/binding'
 import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Node as SlateNode } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { ElementNode } from '../baseEditor'
@@ -24,26 +24,26 @@ export interface LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps
 		CreateEditorPublicOptions,
 		HoveringToolbarsProps {}
 
-export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: React.FunctionComponent<LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps> = Component(
+export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionComponent<LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps> = Component(
 	props => {
 		const entity = useEntity()
 		const environment = entity.environment
 		const batchUpdates = entity.batchUpdates
 
-		const desugaredField = React.useMemo(() => QueryLanguage.desugarRelativeSingleField(props, environment), [
+		const desugaredField = useMemo(() => QueryLanguage.desugarRelativeSingleField(props, environment), [
 			environment,
 			props,
 		])
-		const fieldAccessor = React.useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [
+		const fieldAccessor = useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [
 			entity,
 			desugaredField,
 		])
 
 		// The cache is questionable, really.
-		const [contemberFieldElementCache] = React.useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
+		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
 		const isMutating = useMutationState()
 
-		const [editor] = React.useState(() => {
+		const [editor] = useState(() => {
 			return createEditor({
 				plugins: props.plugins,
 				augmentEditor: props.augmentEditor,
@@ -60,7 +60,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: React.FunctionC
 		})
 
 		const serialize = editor.serializeNodes
-		const onChange = React.useCallback(
+		const onChange = useCallback(
 			(value: SlateNode[]) => {
 				batchUpdates(getAccessor => {
 					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)

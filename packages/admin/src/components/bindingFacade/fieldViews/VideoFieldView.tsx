@@ -1,9 +1,9 @@
 import { Component, FieldValue, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import * as React from 'react'
+import { ReactElement, VideoHTMLAttributes } from 'react'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 
 export interface VideoFieldViewProps<SrcField extends FieldValue = string>
-	extends Omit<React.VideoHTMLAttributes<HTMLVideoElement>, 'src'>,
+	extends Omit<VideoHTMLAttributes<HTMLVideoElement>, 'src'>,
 		FieldFallbackViewPublicProps {
 	srcField: SugaredFieldProps['field']
 	titleField?: SugaredFieldProps['field']
@@ -43,4 +43,4 @@ export const VideoFieldView = Component(
 		</>
 	),
 	'VideoFieldView',
-) as <SrcField extends FieldValue = string>(props: VideoFieldViewProps<SrcField>) => React.ReactElement
+) as <SrcField extends FieldValue = string>(props: VideoFieldViewProps<SrcField>) => ReactElement

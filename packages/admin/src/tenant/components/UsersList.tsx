@@ -1,6 +1,8 @@
 import { getTenantErrorMessage } from '@contember/client'
-import * as React from 'react'
 import { useProjectSlug } from '@contember/react-client'
+import { Button, ContainerSpinner, Table, TableCell, TableRow, Tag, TitleBar } from '@contember/ui'
+import { ComponentType, FC, Fragment, memo, useCallback } from 'react'
+import { PageLinkButton } from '../../components/pageRouting'
 import {
 	Membership,
 	useAddToast,
@@ -9,9 +11,6 @@ import {
 	useRemoveProjectMembership,
 	useUpdateCurrentProjectMembership,
 } from '../hooks'
-import { Button, ButtonList, ContainerSpinner, Tag, TitleBar, Table, TableCell, TableRow } from '@contember/ui'
-import { PageLinkButton } from '../../components/pageRouting'
-import { ToastType } from '../../state/toasts'
 
 export interface UsersListProps<T> {
 	project: string
@@ -25,15 +24,15 @@ interface Variables {
 }
 
 interface RoleRenderers<T> {
-	[role: string]: React.ComponentType<{ variables: Variables; rolesData: T }>
+	[role: string]: ComponentType<{ variables: Variables; rolesData: T }>
 }
 
-export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRenderers, rolesDataQuery }) => {
+export const UsersList = memo<UsersListProps<any>>(({ project, roleRenderers, rolesDataQuery }) => {
 	const addToast = useAddToast()
 	const { state: query, refetch: refetchUserList } = useListUsersQuery(project)
 	const { state: rolesData } = useAuthedContentQuery<any, {}>(rolesDataQuery, {})
 	const [updateMembership, updateMembershipState] = useUpdateCurrentProjectMembership()
-	const removeMembership = React.useCallback(
+	const removeMembership = useCallback(
 		async (identityId: string, memberships: Membership[], membershipToRemove: Membership) => {
 			const confirmed = confirm(`Do you want to remove user's role in project?`)
 			if (!confirmed) {
@@ -61,7 +60,7 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 		[addToast, refetchUserList, updateMembership],
 	)
 	const [removeMemberInner, removeMemberState] = useRemoveProjectMembership()
-	const removeMember = React.useCallback(
+	const removeMember = useCallback(
 		async (id: string) => {
 			const confirmed = confirm('Do you want to remove user from project?')
 			if (!confirmed) {
@@ -100,7 +99,7 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 			<Table>
 				{query.data.project.members.map(member => {
 					if (!member.identity.person) {
-						return <React.Fragment key={member.identity.id} />
+						return <Fragment key={member.identity.id} />
 					}
 					return (
 						<TableRow key={member.identity.id}>
@@ -154,7 +153,7 @@ export const UsersList = React.memo<UsersListProps<any>>(({ project, roleRendere
 
 type UsersManagementProps<T> = Omit<UsersListProps<T>, 'project'>
 
-export const UsersManagement: React.FC<UsersManagementProps<any>> = <T extends {}>(props: UsersManagementProps<T>) => {
+export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(props: UsersManagementProps<T>) => {
 	const project = useProjectSlug()
 	if (project) {
 		return <UsersList project={project} {...props} />

@@ -1,15 +1,15 @@
 import { HoveringToolbar as UIToolbar, Portal } from '@contember/ui'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { useToolbarState } from '../editorSelection'
 import { HoveringToolbarContents, HoveringToolbarContentsProps } from './HoveringToolbarContents'
 
 export interface HoveringToolbarsProps {
 	shouldDisplayInlineToolbar?: () => boolean
 	inlineButtons?: HoveringToolbarContentsProps['buttons']
-	blockButtons?: HoveringToolbarContentsProps['buttons'] | React.ReactElement // TODO this is NASTY
+	blockButtons?: HoveringToolbarContentsProps['buttons'] | ReactElement // TODO this is NASTY
 }
 
-export const HoveringToolbars = React.memo((props: HoveringToolbarsProps) => {
+export const HoveringToolbars = memo((props: HoveringToolbarsProps) => {
 	const { inlineToolbarRef, blockToolbarActive, inlineToolbarActive } = useToolbarState()
 
 	const shouldDisplayInlineToolbar =

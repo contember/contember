@@ -1,4 +1,5 @@
 import { getTenantErrorMessage } from '@contember/client'
+import { useProjectSlug } from '@contember/react-client'
 import {
 	Box,
 	Button,
@@ -10,11 +11,8 @@ import {
 	TextInput,
 	TitleBar,
 } from '@contember/ui'
-import * as React from 'react'
-import { useEffect } from 'react'
-import { useProjectSlug } from '@contember/react-client'
+import { ComponentType, Dispatch, FC, memo, SetStateAction, useCallback, useEffect, useState } from 'react'
 import { NavigateBackButton } from '../../components/pageRouting'
-import { ToastType } from '../../state/toasts'
 import {
 	RoleVariableDefinition,
 	useAddToast,
@@ -26,7 +24,7 @@ import {
 import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
 
 interface VariableConfig {
-	render: React.ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
+	render: ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
 }
 
 type VariablesConfig = {
@@ -50,13 +48,13 @@ interface Membership {
 	}[]
 }
 
-const VariableSelector: React.FC<{
+const VariableSelector: FC<{
 	rolesConfig: RolesConfig
 	membership: Membership
 	variable: RoleVariableDefinition
 	onChange: (newMembership: Membership) => void
 }> = ({ rolesConfig, membership, variable, onChange }) => {
-	const innerOnChange = React.useCallback(
+	const innerOnChange = useCallback(
 		(newValues: string[]) => {
 			const newMembership: Membership = {
 				...membership,
@@ -97,14 +95,14 @@ interface EditUserMembershipProps {
 	project: string
 	memberships: (Membership | undefined)[]
 	email?: string
-	setMemberships: React.Dispatch<React.SetStateAction<(Membership | undefined)[]>>
+	setMemberships: Dispatch<SetStateAction<(Membership | undefined)[]>>
 	rolesConfig: RolesConfig
 	setEmail?: (newEmail: string) => void
 	submit: () => void
 	submitState?: SubmitState
 }
 
-const EditUserMembership: React.FC<EditUserMembershipProps> = ({
+const EditUserMembership: FC<EditUserMembershipProps> = ({
 	project,
 	memberships,
 	email,
@@ -116,7 +114,7 @@ const EditUserMembership: React.FC<EditUserMembershipProps> = ({
 }) => {
 	const { state: roleDefinitionState } = useListRolesQuery(project)
 
-	const addMembership = React.useCallback(() => {
+	const addMembership = useCallback(() => {
 		setMemberships(memberships => [...memberships, undefined])
 	}, [setMemberships])
 
@@ -236,16 +234,16 @@ const EditUserMembership: React.FC<EditUserMembershipProps> = ({
 	)
 }
 
-export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }> = ({ project, rolesConfig }) => {
-	const [email, setEmailInner] = React.useState('')
+export const InviteUser: FC<{ project: string; rolesConfig: RolesConfig }> = ({ project, rolesConfig }) => {
+	const [email, setEmailInner] = useState('')
 	const { goTo: goToUsersList } = usePageLink('tenantUsers')
 	const addToast = useAddToast()
-	const [emailNotValidError, setEmailNotValidError] = React.useState(false)
-	const setEmail = React.useCallback((email: string) => {
+	const [emailNotValidError, setEmailNotValidError] = useState(false)
+	const setEmail = useCallback((email: string) => {
 		setEmailNotValidError(false)
 		setEmailInner(email)
 	}, [])
-	const [memberships, setMemberships] = React.useState<(Membership | undefined)[]>([undefined])
+	const [memberships, setMemberships] = useState<(Membership | undefined)[]>([undefined])
 
 	const [invite, inviteState] = useInvite(project)
 	const submitState: SubmitState | undefined = {
@@ -259,7 +257,7 @@ export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }>
 			: undefined,
 	}
 
-	const submit = React.useCallback(async () => {
+	const submit = useCallback(async () => {
 		setEmailNotValidError(false)
 		const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
 		if (
@@ -294,13 +292,13 @@ export const InviteUser: React.FC<{ project: string; rolesConfig: RolesConfig }>
 	return <EditUserMembership {...props} />
 }
 
-export const EditUser: React.FC<{ project: string; rolesConfig: RolesConfig; identityId: string }> = ({
+export const EditUser: FC<{ project: string; rolesConfig: RolesConfig; identityId: string }> = ({
 	project,
 	rolesConfig,
 	identityId,
 }) => {
 	const { state: previousMembershipsState } = useProjectMembershipsQuery(project, identityId)
-	const [memberships, setMemberships] = React.useState<(Membership | undefined)[]>([undefined])
+	const [memberships, setMemberships] = useState<(Membership | undefined)[]>([undefined])
 
 	const [updateMembership, updateMembershipElement] = useUpdateProjectMembership()
 	const submitState: SubmitState | undefined = {
@@ -333,7 +331,7 @@ export const EditUser: React.FC<{ project: string; rolesConfig: RolesConfig; ide
 	const { goTo: goToUsersList } = usePageLink('tenantUsers')
 	const addToast = useAddToast()
 
-	const submit = React.useCallback(async () => {
+	const submit = useCallback(async () => {
 		const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
 		if (membershipsToSave.length === 0) {
 			return
@@ -362,7 +360,7 @@ export const EditUser: React.FC<{ project: string; rolesConfig: RolesConfig; ide
 	return <EditUserMembership {...props} />
 }
 
-export const InviteUserToProject: React.FC<{ rolesConfig: RolesConfig }> = React.memo(({ rolesConfig }) => {
+export const InviteUserToProject: FC<{ rolesConfig: RolesConfig }> = memo(({ rolesConfig }) => {
 	const project = useProjectSlug()
 	if (!project) {
 		return <>Not in project.</>
@@ -370,7 +368,7 @@ export const InviteUserToProject: React.FC<{ rolesConfig: RolesConfig }> = React
 	return <InviteUser project={project} rolesConfig={rolesConfig} />
 })
 
-export const EditUserInProject: React.FC<{ rolesConfig: RolesConfig; identityId: string }> = React.memo(
+export const EditUserInProject: FC<{ rolesConfig: RolesConfig; identityId: string }> = memo(
 	({ rolesConfig, identityId }) => {
 		const project = useProjectSlug()
 		if (!project) {

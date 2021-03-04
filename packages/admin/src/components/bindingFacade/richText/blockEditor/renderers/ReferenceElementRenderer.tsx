@@ -1,6 +1,6 @@
 import { BindingError, Entity, FieldValue, RelativeSingleField, useEntity } from '@contember/binding'
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
-import * as React from 'react'
+import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
 import { BlockCommonProps, getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
@@ -22,7 +22,7 @@ export interface ReferenceElementRendererProps extends RenderElementProps {
 	embedSubBlocks: NormalizedBlocks | undefined
 }
 
-export const ReferenceElementRenderer = React.memo((props: ReferenceElementRendererProps) => {
+export const ReferenceElementRenderer = memo((props: ReferenceElementRendererProps) => {
 	const editor = useEditor() as BlockSlateEditor
 	const selected = useSelected()
 
@@ -37,8 +37,8 @@ export const ReferenceElementRenderer = React.memo((props: ReferenceElementRende
 	const elementTemplate = selectedReference.template
 	const isEditable = elementTemplate !== undefined
 
-	const onContainerClick = React.useCallback(
-		(e: React.MouseEvent<HTMLElement>) => {
+	const onContainerClick = useCallback(
+		(e: ReactMouseEvent<HTMLElement>) => {
 			if (e.target === e.currentTarget) {
 				const path = ReactEditor.findPath(editor, props.element)
 				Transforms.select(editor, path)
@@ -46,14 +46,14 @@ export const ReferenceElementRenderer = React.memo((props: ReferenceElementRende
 		},
 		[editor, props.element],
 	)
-	const onRemove = React.useCallback(() => {
+	const onRemove = useCallback(() => {
 		const path = ReactEditor.findPath(editor, props.element)
 		Transforms.removeNodes(editor, {
 			at: path,
 		})
 	}, [editor, props.element])
 
-	let blockBody: React.ReactNode
+	let blockBody: ReactNode
 	let renderedBlock: BlockCommonProps = selectedReference
 	let isFullWidth = true
 

@@ -1,6 +1,6 @@
 import { Component, Field, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
 import { Input } from '@contember/client'
-import * as React from 'react'
+import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { Checkbox } from '../../../../ui'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
@@ -11,7 +11,7 @@ export type BooleanCellProps = DataGridHeaderCellPublicProps &
 	SugaredRelativeSingleField & {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
-		format?: (value: boolean | null) => React.ReactNode
+		format?: (value: boolean | null) => ReactNode
 		booleanStyle?: 'yesNo' | 'checkCross' | 'oneZero'
 	}
 
@@ -19,7 +19,7 @@ type SingleBooleanFilterArtifact = 'includeTrue' | 'includeFalse' | 'includeNull
 
 type BooleanFilterArtifacts = Set<SingleBooleanFilterArtifact>
 
-export const BooleanCell: React.FunctionComponent<BooleanCellProps> = Component(props => {
+export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props => {
 	return (
 		<DataGridColumn<BooleanFilterArtifacts>
 			shrunk

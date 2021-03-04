@@ -1,6 +1,6 @@
-import { SingleLineTextInputProps, TextInput } from '@contember/ui'
-import * as React from 'react'
 import { FieldAccessor } from '@contember/binding'
+import { SingleLineTextInputProps, TextInput } from '@contember/ui'
+import { ChangeEvent as ReactChangeEvent } from 'react'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export type FloatFieldProps = SimpleRelativeSingleFieldProps &
@@ -8,7 +8,7 @@ export type FloatFieldProps = SimpleRelativeSingleFieldProps &
 
 export const FloatField = SimpleRelativeSingleField<FloatFieldProps, number>(
 	(fieldMetadata, { defaultValue, ...props }) => {
-		const generateOnChange = (data: FieldAccessor<number>) => (e: React.ChangeEvent<HTMLInputElement>) => {
+		const generateOnChange = (data: FieldAccessor<number>) => (e: ReactChangeEvent<HTMLInputElement>) => {
 			data.updateValue(parseFloat(e.target.value))
 		}
 		return (

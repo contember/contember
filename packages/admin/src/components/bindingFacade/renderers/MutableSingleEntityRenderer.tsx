@@ -6,7 +6,7 @@ export interface MutableSingleEntityRendererProps extends MutableContentLayoutRe
 	accessor: EntityAccessor
 }
 
-export const MutableSingleEntityRenderer = Component<MutableSingleEntityRendererProps>(
+export const MutableSingleEntityRenderer: React.FunctionComponent<MutableSingleEntityRendererProps> = Component(
 	({ accessor, children, ...contentLayoutProps }) => (
 		<Entity accessor={accessor}>
 			<MutableContentLayoutRenderer {...contentLayoutProps}>{children}</MutableContentLayoutRenderer>

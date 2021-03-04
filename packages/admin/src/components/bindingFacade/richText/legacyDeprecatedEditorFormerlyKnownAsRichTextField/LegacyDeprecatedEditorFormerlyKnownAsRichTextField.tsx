@@ -24,9 +24,7 @@ export interface LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps
 		CreateEditorPublicOptions,
 		HoveringToolbarsProps {}
 
-export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField = Component<
-	LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps
->(
+export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: React.FunctionComponent<LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps> = Component(
 	props => {
 		const entity = useEntity()
 		const environment = entity.environment

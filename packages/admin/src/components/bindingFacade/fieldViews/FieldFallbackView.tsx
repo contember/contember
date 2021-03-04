@@ -10,7 +10,7 @@ export interface FieldFallbackViewProps {
 
 export type FieldFallbackViewPublicProps = Partial<FieldFallbackViewProps>
 
-export const FieldFallbackView = Component<FieldFallbackViewProps>(
+export const FieldFallbackView: React.FunctionComponent<FieldFallbackViewProps> = Component(
 	props => {
 		if (props.fallback !== undefined) {
 			return <>{props.fallback}</>

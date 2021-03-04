@@ -19,7 +19,7 @@ export type HasManyAbsentCellProps = DataGridHeaderCellPublicProps &
 		children: React.ReactNode
 	}
 
-export const HasManyAbsentCell = Component<HasManyAbsentCellProps>(props => {
+export const HasManyAbsentCell: React.FunctionComponent<HasManyAbsentCellProps> = Component(props => {
 	return (
 		<DataGridColumn<boolean>
 			{...props}

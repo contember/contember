@@ -23,7 +23,9 @@ export type DynamicChoiceFieldProps =
 			arity: 'multiple'
 	  } & DynamicMultipleChoiceFieldProps)
 
-export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity>(
+export const DynamicChoiceField: React.FunctionComponent<
+	DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity
+> = Component(
 	props => {
 		useConstantValueInvariant(props.arity, `Cannot change dynamic choice field arity between renders!`)
 

@@ -42,7 +42,7 @@ export interface DataGridContainerOwnProps extends DataGridContainerPublicProps 
 
 export interface DataGridContainerProps extends DataGridContainerOwnProps, EntityListBaseProps {}
 
-export const DataGridContainer = Component<DataGridContainerProps>(
+export const DataGridContainer: React.FunctionComponent<DataGridContainerProps> = Component(
 	({
 		children,
 		accessor,

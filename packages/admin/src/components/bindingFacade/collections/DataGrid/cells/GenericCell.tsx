@@ -7,7 +7,7 @@ export type GenericCellProps = DataGridHeaderCellPublicProps &
 		children: React.ReactNode
 	}
 
-export const GenericCell = Component<GenericCellProps>(props => {
+export const GenericCell: React.FunctionComponent<GenericCellProps> = Component(props => {
 	return (
 		<DataGridColumn<string> {...props} enableOrdering={false} enableFiltering={false}>
 			{props.children}

@@ -6,7 +6,7 @@ export interface ImmutableSingleEntityRendererProps extends ImmutableContentLayo
 	accessor: EntityAccessor
 }
 
-export const ImmutableSingleEntityRenderer = Component<ImmutableSingleEntityRendererProps>(
+export const ImmutableSingleEntityRenderer: React.FunctionComponent<ImmutableSingleEntityRendererProps> = Component(
 	({ accessor, children, ...contentLayoutProps }) => (
 		<Entity accessor={accessor}>
 			<ImmutableContentLayoutRenderer {...contentLayoutProps}>{children}</ImmutableContentLayoutRenderer>

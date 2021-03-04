@@ -28,7 +28,7 @@ interface TextFilterArtifacts {
 	nullCondition: boolean
 }
 
-export const TextCell = Component<TextCellProps>(props => {
+export const TextCell: React.FunctionComponent<TextCellProps> = Component(props => {
 	return (
 		<DataGridColumn<TextFilterArtifacts>
 			{...props}
@@ -136,7 +136,7 @@ export const TextCell = Component<TextCellProps>(props => {
 						return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 					}
 					if (props.format) {
-						return props.format(value)
+						return props.format(value as any)
 					}
 					return value
 				}}

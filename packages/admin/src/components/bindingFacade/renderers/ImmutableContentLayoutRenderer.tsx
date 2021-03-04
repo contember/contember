@@ -9,7 +9,7 @@ export interface ImmutableContentLayoutRendererProps extends Omit<TitleBarProps,
 	children?: React.ReactNode
 }
 
-export const ImmutableContentLayoutRenderer = Component<ImmutableContentLayoutRendererProps>(
+export const ImmutableContentLayoutRenderer: React.FunctionComponent<ImmutableContentLayoutRendererProps> = Component(
 	({ side, children, title, navigation, actions, headingProps }) => {
 		const content = React.useMemo(() => <IncreaseHeadingDepth currentDepth={1}>{children}</IncreaseHeadingDepth>, [
 			children,

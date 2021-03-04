@@ -6,10 +6,11 @@ import {
 	SimpleRelativeSingleFieldProps,
 	SimpleRelativeSingleFieldProxy,
 } from '../auxiliary'
+import { BlockProps } from '../blocks'
 
 export type CheckboxFieldProps = SimpleRelativeSingleFieldProps
 
-export const CheckboxField = Component<CheckboxFieldProps>(
+export const CheckboxField: React.FunctionComponent<CheckboxFieldProps> = Component(
 	props => (
 		<SimpleRelativeSingleFieldProxy
 			{...props}

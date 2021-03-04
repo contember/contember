@@ -14,6 +14,6 @@ export interface RadioFieldInternalProps {
 
 export type RadioFieldProps = RadioFieldPublicProps & RadioFieldInternalProps
 
-export const RadioField = Component<RadioFieldProps>(props => {
+export const RadioField: React.FunctionComponent<RadioFieldProps> = Component(props => {
 	throw new Error('Not implemented')
 }, 'RadioField')

@@ -10,7 +10,7 @@ export type ChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceF
 ) &
 	ChoiceFieldData.MetadataPropsByArity
 
-export const ChoiceField = Component<ChoiceFieldProps>(props => {
+export const ChoiceField: React.FunctionComponent<ChoiceFieldProps> = Component(props => {
 	if (Array.isArray(props.options)) {
 		return <StaticChoiceField {...(props as StaticChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity)} />
 	}

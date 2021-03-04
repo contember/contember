@@ -10,7 +10,7 @@ export type DateFieldViewProps = {
 ) &
 	FieldFallbackViewPublicProps
 
-export const DateFieldView = Component<DateFieldViewProps>(
+export const DateFieldView: React.FunctionComponent<DateFieldViewProps> = Component(
 	({ field, locale, format, fallback, fallbackStyle }) => {
 		const dateField = useField<string>(field)
 

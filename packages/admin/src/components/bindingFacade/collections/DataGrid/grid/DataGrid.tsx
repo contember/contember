@@ -25,7 +25,7 @@ export interface DataGridProps extends DataGridContainerPublicProps {
 	itemsPerPage?: number | null
 }
 
-export const DataGrid = Component<DataGridProps>(
+export const DataGrid: React.FunctionComponent<DataGridProps> = Component(
 	props => {
 		const { extendTree } = useBindingOperations()
 		const isMountedRef = React.useRef(true)

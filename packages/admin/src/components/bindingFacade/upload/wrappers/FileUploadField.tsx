@@ -17,7 +17,7 @@ export type FileUploadFieldProps = SimpleRelativeSingleFieldProps &
 	}
 
 // TODO this is super temporary
-export const FileUploadField = Component<FileUploadFieldProps>(props => {
+export const FileUploadField: React.FunctionComponent<FileUploadFieldProps> = Component(props => {
 	const defaults = getGenericFileDefaults(props.field)
 	return (
 		<UploadField

@@ -23,7 +23,7 @@ export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concea
 		concealTimeout?: number
 	}
 
-export const SlugField = Component<SlugFieldProps>(
+export const SlugField: React.FunctionComponent<SlugFieldProps> = Component(
 	({
 		buttonProps,
 		concealTimeout,

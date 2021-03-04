@@ -18,7 +18,7 @@ export interface ScalarBasedBlockProps extends BlockCommonProps {
 
 export type BlockProps = LiteralBasedBlockProps | ScalarBasedBlockProps
 
-export const Block = Component<BlockProps>(
+export const Block: React.FunctionComponent<BlockProps> = Component(
 	props => <>{props.children}</>,
 	props => (
 		<>

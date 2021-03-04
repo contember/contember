@@ -12,7 +12,7 @@ export class Portal extends React.PureComponent {
 		document.body.removeChild(this.el)
 	}
 
-	render() {
+	render(): React.ReactElement {
 		return ReactDOM.createPortal(this.props.children, this.el)
 	}
 }

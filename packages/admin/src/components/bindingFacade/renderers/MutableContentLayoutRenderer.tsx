@@ -7,7 +7,7 @@ export interface MutableContentLayoutRendererProps extends ImmutableContentLayou
 	persistButtonComponent?: React.ComponentType
 }
 
-export const MutableContentLayoutRenderer = Component<MutableContentLayoutRendererProps>(
+export const MutableContentLayoutRenderer: React.FunctionComponent<MutableContentLayoutRendererProps> = Component(
 	({ persistButtonComponent, side, children, ...immutableProps }) => {
 		const PersistComponent = persistButtonComponent || PersistButton
 		const augmentedSide = React.useMemo(

@@ -69,7 +69,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 }
 
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
-const BlockEditorComponent = Component<BlockEditorProps>(
+const BlockEditorComponent: React.FunctionComponent<BlockEditorProps> = Component(
 	props => {
 		const environment = useEnvironment()
 		//const isMutating = useMutationState()

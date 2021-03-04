@@ -40,9 +40,8 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	}
 
 	render.displayName = displayName
-	const augmentedRender: React.NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames> = React.memo<
-		Props
-	>(render)
+	const augmentedRender: React.NamedExoticComponent<Props> &
+		MarkerProvider<Props, NonStaticPropNames> = React.memo<Props>(render)
 
 	if (typeof decider === 'function') {
 		augmentedRender.staticRender = decider

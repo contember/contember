@@ -10,7 +10,7 @@ export type NativeSelectFieldProps = SelectFieldInnerPublicProps &
 		searchByFields?: never
 	}
 
-export const NativeSelectField = Component<NativeSelectFieldProps>(
+export const NativeSelectField: React.FunctionComponent<NativeSelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} arity="single">
 			{({

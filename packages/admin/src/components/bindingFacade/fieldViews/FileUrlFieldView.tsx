@@ -5,7 +5,7 @@ export interface FileUrlFieldViewProps extends Omit<React.AnchorHTMLAttributes<H
 	fileUrlField: SugaredFieldProps['field']
 }
 
-export const FileUrlFieldView = Component<FileUrlFieldViewProps>(
+export const FileUrlFieldView: React.FunctionComponent<FileUrlFieldViewProps> = Component(
 	({ fileUrlField, ...props }) => {
 		const fieldAccessor = useField<string>(fileUrlField)
 		const url = fieldAccessor.value!

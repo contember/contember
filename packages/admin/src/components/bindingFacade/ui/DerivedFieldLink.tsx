@@ -8,7 +8,7 @@ export interface DerivedFieldLinkProps<SourcePersisted extends FieldValue = Fiel
 	agent?: string
 }
 
-export const DerivedFieldLink = Component<DerivedFieldLinkProps>(
+export const DerivedFieldLink: React.FunctionComponent<DerivedFieldLinkProps> = Component(
 	props => {
 		useDerivedField(props.sourceField, props.derivedField, props.transform, props.agent)
 		return null

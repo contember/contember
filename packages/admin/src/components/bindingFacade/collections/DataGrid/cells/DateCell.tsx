@@ -18,7 +18,7 @@ interface DateRange {
 	end: Date | undefined
 }
 
-export const DateCell = Component<DateCellProps>(props => {
+export const DateCell: React.FunctionComponent<DateCellProps> = Component(props => {
 	return (
 		<DataGridColumn<DateRange>
 			{...props}

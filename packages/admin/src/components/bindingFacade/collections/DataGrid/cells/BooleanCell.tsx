@@ -19,7 +19,7 @@ type SingleBooleanFilterArtifact = 'includeTrue' | 'includeFalse' | 'includeNull
 
 type BooleanFilterArtifacts = Set<SingleBooleanFilterArtifact>
 
-export const BooleanCell = Component<BooleanCellProps>(props => {
+export const BooleanCell: React.FunctionComponent<BooleanCellProps> = Component(props => {
 	return (
 		<DataGridColumn<BooleanFilterArtifacts>
 			shrunk

@@ -9,7 +9,7 @@ export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children
 	allowBlockTypeChange?: boolean
 }
 
-export const DiscriminatedBlocks = Component<DiscriminatedBlocksProps>(
+export const DiscriminatedBlocks: React.FunctionComponent<DiscriminatedBlocksProps> = Component(
 	props => {
 		const normalizedBlocks = useNormalizedBlocks(props.children)
 		const blocksArray = React.useMemo(() => Array.from(normalizedBlocks.values()), [normalizedBlocks])

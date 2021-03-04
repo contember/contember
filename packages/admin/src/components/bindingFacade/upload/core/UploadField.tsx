@@ -37,7 +37,7 @@ export type UploadFieldProps = UploadConfigProps &
 	}
 
 const staticFileId = 'file'
-export const UploadField = Component<UploadFieldProps>(
+export const UploadField: React.FunctionComponent<UploadFieldProps> = Component(
 	props => {
 		const { uploadButtonText = 'Select a file to upload', uploadButtonSubText = 'or drag & drop' } = props
 

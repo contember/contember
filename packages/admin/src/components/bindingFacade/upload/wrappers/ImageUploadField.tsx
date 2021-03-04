@@ -22,7 +22,7 @@ export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
 		previewTitle?: string
 	}
 
-export const ImageUploadField = Component<ImageUploadFieldProps>(props => {
+export const ImageUploadField: React.FunctionComponent<ImageUploadFieldProps> = Component(props => {
 	const defaults = getImageFileDefaults(props.field)
 	return (
 		<UploadField

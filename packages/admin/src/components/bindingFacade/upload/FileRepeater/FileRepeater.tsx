@@ -35,7 +35,7 @@ type FileRepeaterProps = Omit<
 	} & ((CustomDataPopulatorProps & CustomFileKindProps) | (AggregateDataPopulatorProps & StockFileKindProps))
 
 // TODO configurable container/item components
-export const FileRepeater = Component<FileRepeaterProps>(
+export const FileRepeater: React.FunctionComponent<FileRepeaterProps> = Component(
 	props => {
 		const fileUrlProps = props as Partial<FileUrlDataPopulatorProps>
 

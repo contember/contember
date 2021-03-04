@@ -22,7 +22,7 @@ const markerIcon = Leaflet.divIcon({
 
 const defaultZoom = 5
 
-export const LocationField = Component<LocationFieldProps>(
+export const LocationField: React.FunctionComponent<LocationFieldProps> = Component(
 	({
 		latitudeField,
 		longitudeField,

@@ -6,6 +6,6 @@ export type TextareaFieldProps = TextFieldProps
 
 const TF: any = TextField // TODO this is a shitty hotfix
 
-export const TextAreaField = Component<TextareaFieldProps>(props => (
+export const TextAreaField: React.FunctionComponent<TextFieldProps> = Component(props => (
 	<TF {...props} allowNewlines={true} minRows={(props as any).minRows || 3} />
 ))

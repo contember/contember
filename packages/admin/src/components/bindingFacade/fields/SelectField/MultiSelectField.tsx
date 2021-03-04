@@ -10,7 +10,7 @@ import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps
 export type MultiSelectFieldProps = MultiSelectFieldInnerPublicProps &
 	(Omit<StaticChoiceFieldProps<'multiple'>, 'arity'> | DynamicMultipleChoiceFieldProps)
 
-export const MultiSelectField = Component<MultiSelectFieldProps>(
+export const MultiSelectField: React.FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} arity="multiple">
 			{({

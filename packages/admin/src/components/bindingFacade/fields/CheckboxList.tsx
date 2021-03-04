@@ -7,7 +7,7 @@ import { ChoiceField, ChoiceFieldData, DynamicMultipleChoiceFieldProps, StaticCh
 export type CheckboxListProps = Omit<FormGroupProps, 'children'> &
 	(Omit<StaticChoiceFieldProps<'multiple'>, 'arity'> | DynamicMultipleChoiceFieldProps)
 
-export const CheckboxList = Component<CheckboxListProps>(
+export const CheckboxList: React.FunctionComponent<CheckboxListProps> = Component(
 	props => (
 		<ChoiceField {...(props as any)} arity="multiple">
 			{({ data, currentValues, onChange, isMutating }: ChoiceFieldData.MultipleChoiceFieldMetadata) => {

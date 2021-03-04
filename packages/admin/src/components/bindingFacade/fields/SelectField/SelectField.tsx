@@ -11,7 +11,7 @@ import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps
 export type SelectFieldProps = SelectFieldInnerPublicProps &
 	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | DynamicSingleChoiceFieldProps)
 
-export const SelectField = Component<SelectFieldProps>(
+export const SelectField: React.FunctionComponent<SelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} arity="single">
 			{({

@@ -13,7 +13,7 @@ export interface BlockRepeaterProps
 	discriminationField: SugaredFieldProps['field']
 }
 
-export const BlockRepeater = Component<BlockRepeaterProps>(
+export const BlockRepeater: React.FunctionComponent<BlockRepeaterProps> = Component(
 	({ discriminationField, ...props }) => {
 		const normalizedBlocks = useNormalizedBlocks(props.children)
 

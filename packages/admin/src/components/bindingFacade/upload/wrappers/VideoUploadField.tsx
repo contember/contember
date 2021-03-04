@@ -18,7 +18,7 @@ export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps &
 		additionalFileDataPopulators?: Iterable<FileDataPopulator>
 	}
 
-export const VideoUploadField = Component<VideoUploadFieldProps>(props => {
+export const VideoUploadField: React.FunctionComponent<VideoUploadFieldProps> = Component(props => {
 	const defaults = getVideoFileDefaults(props.field)
 	return (
 		<UploadField

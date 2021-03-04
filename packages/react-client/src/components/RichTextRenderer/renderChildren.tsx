@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { ReactElement } from 'react'
 import { BuiltinElements } from './BuiltinElements'
 import { BuiltinLeaves } from './BuiltinLeaves'
 import { ElementRenderer, RenderElement } from './ElementRenderer'
@@ -26,7 +27,7 @@ export const renderChildren = <
 		| BuiltinLeaves
 		| Array<CustomElements | BuiltinElements<CustomElements, CustomLeaves> | CustomLeaves | BuiltinLeaves>,
 	options: RenderChildrenOptions<CustomElements, CustomLeaves>,
-): React.ReactElement | null => {
+): ReactElement | null => {
 	if (!Array.isArray(children)) {
 		children = [children]
 	}

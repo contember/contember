@@ -1,17 +1,15 @@
 import * as React from 'react'
+import { ComponentType, createElement, FunctionComponent, ReactElement } from 'react'
 import { BuiltinElements } from './BuiltinElements'
 import { RenderElementFallback, RenderElementFallbackProps } from './RenderElementFallback'
 import { RichTextElement } from './RichTextElement'
 import { RichTextLeaf } from './RichTextLeaf'
 
-export type RenderElement<
-	CustomElements extends RichTextElement,
-	CustomLeaves extends RichTextLeaf
-> = React.ComponentType<{
+export type RenderElement<CustomElements extends RichTextElement, CustomLeaves extends RichTextLeaf> = ComponentType<{
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
-	fallback: React.FunctionComponent<RenderElementFallbackProps<CustomElements, CustomLeaves>>
+	fallback: FunctionComponent<RenderElementFallbackProps<CustomElements, CustomLeaves>>
 	formatVersion: number
-	children: React.ReactElement | null
+	children: ReactElement | null
 }>
 
 export interface ElementRendererProps<
@@ -21,7 +19,7 @@ export interface ElementRendererProps<
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
 	formatVersion: number
-	children: React.ReactElement | null
+	children: ReactElement | null
 }
 
 export function ElementRenderer<
@@ -29,7 +27,7 @@ export function ElementRenderer<
 	CustomLeaves extends RichTextLeaf = never
 >({ element, formatVersion, renderElement, children }: ElementRendererProps<CustomElements, CustomLeaves>) {
 	if (renderElement) {
-		return React.createElement(renderElement, {
+		return createElement(renderElement, {
 			element,
 			formatVersion,
 			fallback: RenderElementFallback,

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createElement, ReactElement } from 'react'
 import { BuiltinElements } from './BuiltinElements'
 import { RichTextElement } from './RichTextElement'
 import { RichTextLeaf } from './RichTextLeaf'
@@ -8,19 +8,19 @@ export interface RenderElementFallbackProps<
 	CustomLeaves extends RichTextLeaf = never
 > {
 	element: BuiltinElements<CustomElements, CustomLeaves>
-	children: React.ReactElement | null
+	children: ReactElement | null
 }
 
 export function RenderElementFallback<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never
 >({ element, children }: RenderElementFallbackProps<CustomElements, CustomLeaves>) {
-	// const formatVersion = React.useContext(RichTextFormatVersionContext)
+	// const formatVersion = useContext(RichTextFormatVersionContext)
 	switch (element.type) {
 		case 'anchor':
 			return <a href={element.href}>{children}</a>
 		case 'heading':
-			return React.createElement(`h${element.level}`, null, children) // TODO numbered
+			return createElement(`h${element.level}`, null, children) // TODO numbered
 		case 'horizontalRule':
 			return <hr />
 		case 'listItem':

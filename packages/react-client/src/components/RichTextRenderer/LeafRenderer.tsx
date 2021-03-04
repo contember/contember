@@ -1,11 +1,12 @@
+import * as React from 'react'
+import { ComponentType, createElement, FunctionComponent } from 'react'
 import { BuiltinLeaves } from './BuiltinLeaves'
 import { RenderLeafFallback, RenderLeafFallbackProps } from './RenderLeafFallback'
 import { RichTextLeaf } from './RichTextLeaf'
-import * as React from 'react'
 
-export type RenderLeaf<CustomLeaves extends RichTextLeaf> = React.ComponentType<{
+export type RenderLeaf<CustomLeaves extends RichTextLeaf> = ComponentType<{
 	leaf: CustomLeaves | BuiltinLeaves
-	fallback: React.FunctionComponent<RenderLeafFallbackProps>
+	fallback: FunctionComponent<RenderLeafFallbackProps>
 	formatVersion: number
 }>
 
@@ -21,7 +22,7 @@ export function LeafRenderer<CustomLeaves extends RichTextLeaf = never>({
 	renderLeaf,
 }: LeafRendererProps<CustomLeaves>) {
 	if (renderLeaf) {
-		return React.createElement(
+		return createElement(
 			renderLeaf,
 			{
 				formatVersion,

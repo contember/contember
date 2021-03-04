@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { memo, ReactElement, useMemo } from 'react'
 import { defaultDeserialize } from './defaultDeserialize'
 import { RenderElement } from './ElementRenderer'
 import { RenderLeaf } from './LeafRenderer'
@@ -18,11 +19,11 @@ export interface RichTextRendererProps<
 	renderLeaf?: RenderLeaf<CustomLeaves>
 }
 
-export const RichTextRenderer = React.memo(function RichTextRenderer<
+export const RichTextRenderer = memo(function RichTextRenderer<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never
 >({ source, deserialize, renderElement, renderLeaf }: RichTextRendererProps<CustomElements, CustomLeaves>) {
-	const rootNode = React.useMemo(() => {
+	const rootNode = useMemo(() => {
 		if (deserialize) {
 			return deserialize(source)
 		}
@@ -40,4 +41,4 @@ export const RichTextRenderer = React.memo(function RichTextRenderer<
 	)
 }) as <CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = never>(
 	props: RichTextRendererProps<CustomElements, CustomLeaves>,
-) => React.ReactElement | null
+) => ReactElement | null

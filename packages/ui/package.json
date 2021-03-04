@@ -13,31 +13,33 @@
   },
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@blueprintjs/icons": "3.11.0",
+    "@blueprintjs/icons": "3.24.0",
     "@contember/react-multipass-rendering": "0.6.5",
-    "@mangoweb/sass-base": "0.0.5",
-    "@popperjs/core": "2.3.3",
+    "@mangoweb/sass-base": "0.0.7",
+    "@popperjs/core": "2.9.0",
     "classnames": "2.2.6",
-    "react-popper": "2.2.3",
-    "react-textarea-autosize": "7.1.2"
+    "react-popper": "2.2.4",
+    "react-textarea-autosize": "8.3.2"
   },
   "peerDependencies": {
-    "react": "16.13.1",
-    "react-dom": "16.13.1"
+    "react": "17.0.1",
+    "react-dom": "17.0.1"
   },
   "devDependencies": {
     "@storybook/addon-info": "6.0.0-alpha.2",
-    "@storybook/addon-knobs": "6.0.21",
-    "@storybook/react": "6.0.21",
-    "@types/node": "14.6.0",
+    "@storybook/addon-knobs": "6.1.21",
+    "@storybook/react": "6.1.21",
+    "@types/node": "14.14.31",
+    "@types/react": "17.0.2",
+    "@types/react-dom": "17.0.1",
     "@types/react-textarea-autosize": "4.3.5",
-    "babel-loader": "8.1.0",
-    "css-loader": "4.3.0",
+    "babel-loader": "8.2.2",
+    "css-loader": "5.1.1",
     "fibers": "5.0.0",
     "manrope": "2.0.0",
-    "resolve-url-loader": "3.1.1",
-    "sass-loader": "10.0.2",
-    "source-map-loader": "1.1.0",
-    "style-loader": "1.2.1"
+    "resolve-url-loader": "3.1.2",
+    "sass-loader": "11.0.1",
+    "source-map-loader": "2.0.1",
+    "style-loader": "2.0.0"
   }
 }

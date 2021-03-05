@@ -123,6 +123,7 @@ export const sortMigrations = <M extends { version: string }>(migrations: M[]): 
 export const getMigrationsStatus = (
 	executedMigrations: ExecutedMigrationInfo[],
 	localMigrations: Migration[],
+	force: boolean = false,
 ): {
 	allMigrations: AnyMigrationStatus[]
 	errorMigrations: ErrorMigrationStatus[]
@@ -198,7 +199,8 @@ export const getMigrationsStatus = (
 		allMigrations: allMigrationsSorted,
 		errorMigrations: allMigrationsSorted.filter(isErrorMigrationStatus),
 		migrationsToExecute: allMigrationsSorted.filter(
-			(it): it is MigrationToExecuteOkStatus => it.state === MigrationState.TO_EXECUTE_OK,
+			(it): it is MigrationToExecuteOkStatus =>
+				it.state === MigrationState.TO_EXECUTE_OK || (force && it.state === MigrationState.TO_EXECUTE_ERROR),
 		),
 	}
 }

@@ -28,10 +28,11 @@ export const configureExecuteMigrationCommand = (configuration: CommandConfigura
 export const resolveMigrationStatus = async (
 	client: SystemClient,
 	migrationsResolver: MigrationsResolver,
+	force: boolean = false,
 ): Promise<ReturnType<typeof getMigrationsStatus>> => {
 	const executedMigrations = await client.listExecutedMigrations()
 	const localMigrations = await migrationsResolver.getMigrations()
-	return getMigrationsStatus(executedMigrations, localMigrations)
+	return getMigrationsStatus(executedMigrations, localMigrations, force)
 }
 
 export const executeMigrations = async ({
@@ -40,12 +41,14 @@ export const executeMigrations = async ({
 	requireConfirmation,
 	schemaVersionBuilder,
 	migrationDescriber,
+	force,
 }: {
 	client: SystemClient
 	migrations: MigrationToExecuteOkStatus[]
 	requireConfirmation: boolean
 	schemaVersionBuilder: SchemaVersionBuilder
 	migrationDescriber: MigrationDescriber
+	force?: boolean
 }) => {
 	console.log('Will execute following migrations:')
 	migrations.forEach(it => console.log(it.name))
@@ -79,7 +82,10 @@ export const executeMigrations = async ({
 		} while (true)
 	}
 
-	const result = await client.migrate(migrations.map(it => it.localMigration))
+	const result = await client.migrate(
+		migrations.map(it => it.localMigration),
+		force,
+	)
 	if (result.ok) {
 		console.log('Migration executed')
 		return 0

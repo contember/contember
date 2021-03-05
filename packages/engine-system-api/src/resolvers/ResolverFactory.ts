@@ -115,6 +115,7 @@ class ResolverFactory {
 			resolvers.Mutation.migrationModify = this.migrationAlterMutationResolver.migrationModify.bind(
 				this.migrationAlterMutationResolver,
 			)
+			resolvers.Mutation.forceMigrate = this.migrateMutationResolver.migrateForce.bind(this.migrateMutationResolver)
 		}
 		return resolvers
 	}

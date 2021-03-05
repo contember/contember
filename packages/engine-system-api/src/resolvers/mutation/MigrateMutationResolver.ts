@@ -7,11 +7,22 @@ import { AuthorizationActions, createStageTree, MigrationError, ProjectMigrator 
 
 export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	constructor(private readonly projectMigrator: ProjectMigrator) {}
+
+	async migrateForce(
+		parent: any,
+		args: MutationMigrateArgs,
+		context: ResolverContext,
+		info: GraphQLResolveInfo,
+	): Promise<MigrateResponse> {
+		return this.migrate(parent, args, context, info, true)
+	}
+
 	async migrate(
 		parent: any,
 		args: MutationMigrateArgs,
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
+		force = false,
 	): Promise<MigrateResponse> {
 		const rootStageSlug = createStageTree(context.project).getRoot().slug
 		await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, rootStageSlug)
@@ -19,7 +30,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 
 		return context.db.transaction(async trx => {
 			try {
-				await this.projectMigrator.migrate(trx, context.project, migrations, () => null)
+				await this.projectMigrator.migrate(trx, context.project, migrations, () => null, force)
 			} catch (e) {
 				if (e instanceof MigrationError) {
 					await trx.client.connection.rollback()

@@ -8,6 +8,7 @@ const schema: DocumentNode = gql`
 
 	type Mutation {
 		truncate: TruncateResponse!
+		forceMigrate(migrations: [Migration!]!): MigrateResponse!
 		migrationModify(migration: String!, modification: MigrationModification!): MigrationModifyResponse!
 		migrationDelete(migration: String!): MigrationDeleteResponse!
 	}

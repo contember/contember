@@ -40,10 +40,10 @@ export class SystemClient {
 		return new SystemClient(graphqlClient)
 	}
 
-	public async migrate(migrations: Migration[]): Promise<MigrateResponse> {
+	public async migrate(migrations: Migration[], force = false): Promise<MigrateResponse> {
 		const query = `
 mutation($migrations: [Migration!]!) {
-	migrate(migrations: $migrations) {
+	migrate: ${force ? 'forceMigrate' : 'migrate'}(migrations: $migrations) {
 		ok
 		errors {
 			code

@@ -16,6 +16,7 @@ export type Scalars = {
 
 export type Mutation = {
 	readonly __typename?: 'Mutation'
+	readonly forceMigrate: MigrateResponse
 	readonly migrate: MigrateResponse
 	readonly migrationDelete: MigrationDeleteResponse
 	readonly migrationModify: MigrationModifyResponse
@@ -23,6 +24,10 @@ export type Mutation = {
 	readonly release: ReleaseResponse
 	readonly releaseTree: ReleaseTreeResponse
 	readonly truncate: TruncateResponse
+}
+
+export type MutationForceMigrateArgs = {
+	migrations: ReadonlyArray<Migration>
 }
 
 export type MutationMigrateArgs = {
@@ -617,6 +622,12 @@ export type MutationResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
 > = {
+	forceMigrate?: Resolver<
+		ResolversTypes['MigrateResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<MutationForceMigrateArgs, 'migrations'>
+	>
 	migrate?: Resolver<
 		ResolversTypes['MigrateResponse'],
 		ParentType,

@@ -1,20 +1,6 @@
 import { BindingError, FieldValue, RelativeSingleField } from '@contember/binding'
 import { EditorPlaceholder } from '@contember/ui'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { ReactElement } from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlocks } from '../../../blocks'
 import { BlockElement, ElementNode } from '../../baseEditor'

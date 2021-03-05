@@ -1,20 +1,6 @@
 import { Component, EntityListAccessor } from '@contember/binding'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
-import { RepeaterInner, RepeaterInnerProps } from '../collections/Repeater'
+import { ReactElement, ReactNode } from 'react'
+import { RepeaterInner, RepeaterInnerProps } from '../collections'
 
 export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>
 	extends Omit<

@@ -1,21 +1,8 @@
 import { Component } from '@contember/binding'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { FunctionComponent } from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { ImageFieldView, ImageFieldViewProps } from '../../fieldViews'
+import { UploadField } from '../core'
 import {
 	FileDataPopulator,
 	FileUrlDataPopulator,
@@ -24,7 +11,6 @@ import {
 	ImageFileMetadataPopulator,
 	ImageFileMetadataPopulatorProps,
 } from '../fileDataPopulators'
-import { UploadField } from '../core'
 import { getImageFileDefaults } from '../stockFileKindDefaults'
 
 export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &

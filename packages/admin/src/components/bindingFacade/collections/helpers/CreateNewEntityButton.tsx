@@ -1,6 +1,6 @@
+import { EntityListAccessor, useMutationState } from '@contember/binding'
 import { Button, ButtonBasedButtonProps, FormGroup, Icon, IconProps } from '@contember/ui'
 import { memo } from 'react'
-import { EntityListAccessor, useMutationState } from '@contember/binding'
 
 export type CreateNewEntityButtonProps = ButtonBasedButtonProps & {
 	createNewEntity: EntityListAccessor.CreateNewEntity

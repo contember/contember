@@ -1,18 +1,7 @@
-import {
-	ReactNode,
-	ReactElement,
-	useMemo,
-	useCallback,
-	useEffect,
-	useRef,
-	ComponentType,
-	MouseEvent as ReactMouseEvent,
-	memo,
-	useState,
-	useContext,
-} from 'react'
+import { ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { ContemberLogo } from './ContemberLogo'
+
 export interface LayoutHeadingProps {
 	label?: ReactNode
 }

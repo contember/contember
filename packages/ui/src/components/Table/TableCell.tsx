@@ -1,19 +1,7 @@
-import {
-	ReactNode,
-	ReactElement,
-	useMemo,
-	useCallback,
-	useEffect,
-	useRef,
-	ComponentType,
-	MouseEvent as ReactMouseEvent,
-	memo,
-	useState,
-	useContext,
-} from 'react'
+import cn from 'classnames'
+import { memo, ReactNode, useContext } from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { Alignment, Justification } from '../../types'
-import cn from 'classnames'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { UseTableElementContext } from './Table'
 

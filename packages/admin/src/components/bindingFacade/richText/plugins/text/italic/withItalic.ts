@@ -1,7 +1,6 @@
 import isHotkey from 'is-hotkey'
 import { createElement } from 'react'
 import { BaseEditor } from '../../../baseEditor'
-import { boldMark } from '../bold'
 
 export const italicMark = 'isItalic'
 

@@ -5,26 +5,12 @@ import {
 	Environment,
 	useEntity,
 	useEnvironment,
-	useMutationState,
 	useField,
+	useMutationState,
 } from '@contember/binding'
 import { useFileUpload } from '@contember/react-client'
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { Fragment, FunctionComponent, ReactNode, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import {
 	FileUrlDataPopulator,

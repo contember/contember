@@ -6,21 +6,7 @@ import {
 	useEnvironment,
 } from '@contember/binding'
 import { noop } from '@contember/react-utils'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { FunctionComponent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { DataGridContainerPublicProps, DataGridState } from '../base'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'

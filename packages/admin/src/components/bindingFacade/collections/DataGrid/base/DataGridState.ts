@@ -1,10 +1,10 @@
+import { GridPagingState } from '../paging'
 import {
 	DataGridColumns,
 	DataGridFilterArtifactStore,
 	DataGridHiddenColumnsStateStore,
 	DataGridOrderDirectionStore,
 } from './index'
-import { GridPagingState } from '../paging'
 
 export interface DataGridState {
 	paging: GridPagingState

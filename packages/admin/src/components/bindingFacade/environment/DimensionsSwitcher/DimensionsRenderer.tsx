@@ -1,21 +1,7 @@
-import { EntityAccessor, EntityListAccessor, Entity, useEnvironment } from '@contember/binding'
+import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@contember/binding'
 import { emptyArray } from '@contember/react-utils'
 import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown } from '@contember/ui'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { Fragment, ReactNode, useEffect } from 'react'
 import { RequestChange } from '../../../../state/request'
 import { Link } from '../../../Link'
 import { useRedirect } from '../../../pageRouting'

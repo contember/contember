@@ -16,5 +16,29 @@ services:
       POSTGRES_DB: contember
     volumes:
     - pgsql-data:/var/lib/postgresql/data
+  api:
+    image: node:12
+    working_dir: /src
+    volumes:
+      - .:/src
+    environment:
+      NODE_ENV: development
+      CONTEMBER_PORT: 4000
+      CONTEMBER_MONITORING_PORT: 4001
+      CONTEMBER_PROJECTS_DIRECTORY: /src/projects
+      CONTEMBER_CONFIG_FILE: /src/projects/config.yaml
+      CONTEMBER_ROOT_EMAIL: 'admin@localhost'
+      CONTEMBER_ROOT_PASSWORD: 'admin@localhost'
+      CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+      CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+      DEFAULT_DB_HOST: 'db'
+      DEFAULT_DB_PORT: '5432'
+      DEFAULT_DB_USER: 'contember'
+      DEFAULT_DB_PASSWORD: 'contember'
+      TENANT_DB_NAME: 'tenant'
+    command:
+      - node
+      - ./packages/engine-server/dist/src/start.js
+
 volumes:
   pgsql-data: ~

@@ -1,3 +1,4 @@
+import { FunctionComponent, ReactElement, ReactNode } from 'react'
 import * as React from 'react'
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '../../../src'
 
@@ -38,7 +39,7 @@ enum Op {
 }
 interface CalculatorBranchNodeProps {
 	op: number
-	children: React.ReactNode
+	children: ReactNode
 }
 const CalculatorBranchNode = (props: CalculatorBranchNodeProps) => null
 CalculatorBranchNode.compute = (props: CalculatorBranchNodeProps, [operand1, operand2]: [number, number]) => {
@@ -75,7 +76,7 @@ const calculatorFormula = ( // 10 * ((5 - 3) + (2 * 6)) === 140
 
 describe('children analyzer', () => {
 	it('should gather children props', () => {
-		const fooLeaf = new Leaf<FooComponentProps>(node => (node as React.ReactElement<FooComponentProps>).props)
+		const fooLeaf = new Leaf<FooComponentProps>(node => (node as ReactElement<FooComponentProps>).props)
 		const analyzer = new ChildrenAnalyzer<FooComponentProps>([fooLeaf])
 
 		expect(analyzer.processChildren(simpleFooComponentTree, undefined)).toEqual([
@@ -117,7 +118,7 @@ describe('children analyzer', () => {
 	})
 	it('should not ignore unhandled nodes when appropriate', () => {
 		const fooLeaf = new Leaf(node => node.props, FooComponent)
-		const Container: React.FunctionComponent = props => <>{props.children}</>
+		const Container: FunctionComponent = props => <>{props.children}</>
 		;(Container as any).staticRender = (props: any) => props.children
 
 		const analyzer = new ChildrenAnalyzer<FooComponentProps>([fooLeaf], {

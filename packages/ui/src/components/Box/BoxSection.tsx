@@ -1,17 +1,5 @@
 import cn from 'classnames'
-import {
-	ReactNode,
-	ReactElement,
-	useMemo,
-	useCallback,
-	useEffect,
-	useRef,
-	ComponentType,
-	MouseEvent as ReactMouseEvent,
-	memo,
-	useState,
-	useContext,
-} from 'react'
+import { ComponentType, memo, ReactNode, useContext } from 'react'
 import { IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
 import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
 import { toViewClass } from '../../utils'

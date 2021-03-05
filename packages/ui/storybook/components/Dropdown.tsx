@@ -1,7 +1,6 @@
-import { storiesOf } from '@storybook/react'
-import * as React from 'react'
-import { Dropdown, DropdownProps } from '../../src'
 import { radios } from '@storybook/addon-knobs'
+import { storiesOf } from '@storybook/react'
+import { Dropdown, DropdownProps } from '../../src'
 
 const Component = () => {
 	const alignment: DropdownProps['alignment'] = radios(

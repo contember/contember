@@ -1,6 +1,6 @@
+import { Component } from '@contember/binding'
 import { FormGroupProps } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
-import { Component, RelativeSingleField } from '@contember/binding'
+import { FunctionComponent } from 'react'
 import { ChoiceFieldProps } from './ChoiceField'
 
 export interface RadioFieldPublicProps extends Omit<FormGroupProps, 'children'> {

@@ -1,5 +1,5 @@
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
 import { useEnvironment } from '@contember/binding'
+import { ReactNode, useMemo } from 'react'
 import { BlockProps } from './Block'
 import { blockAnalyzer } from './blockAnalyzer'
 

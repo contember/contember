@@ -12,7 +12,7 @@ import {
 	useEnvironment,
 	useGetEntityListSubTree,
 } from '@contember/binding'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { ReactElement, ReactNode, useCallback, useMemo } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export type BaseDynamicChoiceField = (

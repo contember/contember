@@ -1,6 +1,20 @@
 import { Component } from '@contember/binding'
 import { IncreaseHeadingDepth, TitleBar, TitleBarProps } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { LayoutInner, LayoutSide } from '../../LayoutInner'
 
 export interface ImmutableContentLayoutRendererProps extends Omit<TitleBarProps, 'children'> {
@@ -11,9 +25,7 @@ export interface ImmutableContentLayoutRendererProps extends Omit<TitleBarProps,
 
 export const ImmutableContentLayoutRenderer: FunctionComponent<ImmutableContentLayoutRendererProps> = Component(
 	({ side, children, title, navigation, actions, headingProps }) => {
-		const content = useMemo(() => <IncreaseHeadingDepth currentDepth={1}>{children}</IncreaseHeadingDepth>, [
-			children,
-		])
+		const content = useMemo(() => <IncreaseHeadingDepth currentDepth={1}>{children}</IncreaseHeadingDepth>, [children])
 
 		return (
 			<>

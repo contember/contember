@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
 import { Button, FormGroup, MultiButton } from '../../src'
 
 storiesOf('MultiButton', module)

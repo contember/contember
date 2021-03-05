@@ -1,4 +1,4 @@
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { ComponentType, memo, ReactNode } from 'react'
 import { LayoutInner } from '../LayoutInner'
 import { PageProvider } from './PageProvider'
 
@@ -8,9 +8,7 @@ interface GenericPageProps {
 }
 
 const GenericPage: Partial<PageProvider<GenericPageProps>> &
-	ComponentType<GenericPageProps> = memo((props: GenericPageProps) => (
-	<LayoutInner>{props.children}</LayoutInner>
-))
+	ComponentType<GenericPageProps> = memo((props: GenericPageProps) => <LayoutInner>{props.children}</LayoutInner>)
 
 GenericPage.displayName = 'GenericPage'
 GenericPage.getPageName = (props: GenericPageProps) => props.pageName

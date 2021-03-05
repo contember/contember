@@ -8,7 +8,21 @@ import {
 } from '@contember/binding'
 import { Input } from '@contember/client'
 import { Select, TextInput } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { Checkbox } from '../../../../ui'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'

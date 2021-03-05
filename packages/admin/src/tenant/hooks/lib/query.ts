@@ -1,5 +1,5 @@
 import { GraphQlClient } from '@contember/client'
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { QueryRequestObject, QueryRequestState } from './requestState'
 
 export const useJsonEqualMemo = <V>(memoFn: () => V, key: any): V => {

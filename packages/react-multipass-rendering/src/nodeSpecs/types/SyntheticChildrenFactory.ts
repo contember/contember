@@ -1,4 +1,4 @@
-import { ReactNode, ReactElement } from 'react'
+import { ReactNode } from 'react'
 
 export type SyntheticChildrenFactory<Props extends {}, StaticContext> = (
 	props: Props,

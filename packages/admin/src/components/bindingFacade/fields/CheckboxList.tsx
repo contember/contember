@@ -1,6 +1,20 @@
 import { Component } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { Checkbox } from '../../ui'
 import { ChoiceField, ChoiceFieldData, DynamicMultipleChoiceFieldProps, StaticChoiceFieldProps } from './ChoiceField'
 

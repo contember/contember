@@ -5,17 +5,17 @@ import {
 	UnsugarableEntityCreationParameters,
 } from './EntityCreationParameters'
 import {
-	DesugaredEntityListPreferences,
-	EntityListPreferences,
-	SugarableEntityListPreferences,
-	UnsugarableEntityListPreferences,
-} from './EntityListPreferences'
-import {
 	DesugaredEntityListEventListeners,
 	EntityListEventListeners,
 	SugarableEntityListEventListeners,
 	UnsugarableEntityListEventListeners,
 } from './EntityListEventListeners'
+import {
+	DesugaredEntityListPreferences,
+	EntityListPreferences,
+	SugarableEntityListPreferences,
+	UnsugarableEntityListPreferences,
+} from './EntityListPreferences'
 import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import {
 	DesugaredQualifiedEntityParameters,

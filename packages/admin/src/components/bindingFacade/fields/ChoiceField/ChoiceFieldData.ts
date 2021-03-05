@@ -1,12 +1,5 @@
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
-import {
-	EntityAccessor,
-	Environment,
-	ErrorAccessor,
-	FieldAccessor,
-	FieldValue,
-	SugaredRelativeSingleField,
-} from '@contember/binding'
+import { EntityAccessor, Environment, ErrorAccessor, FieldValue } from '@contember/binding'
+import { ReactElement, ReactNode } from 'react'
 
 export namespace ChoiceFieldData {
 	export type ChoiceArity = 'single' | 'multiple'

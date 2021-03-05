@@ -10,7 +10,6 @@ import {
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
-import { assertNever } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 
 export class QueryResponseNormalizer {

@@ -1,6 +1,6 @@
 import { Component, ErrorAccessor } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { FunctionComponent, memo } from 'react'
 import { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
 

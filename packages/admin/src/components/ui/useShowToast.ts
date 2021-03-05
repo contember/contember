@@ -1,7 +1,7 @@
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { addToast } from '../../actions/toasts'
 import { ToastDefinition, ToastId } from '../../state/toasts'
-import { useCallback } from 'react'
 
 // TODO this is a very bad place for this file
 export const useShowToast = () => {

@@ -1,5 +1,19 @@
 import { HoveringToolbar as UIToolbar, Portal } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { useToolbarState } from '../editorSelection'
 import { HoveringToolbarContents, HoveringToolbarContentsProps } from './HoveringToolbarContents'
 

@@ -1,4 +1,18 @@
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
 import { BlockElement } from '../../../baseEditor'
 import { HorizontalRuleElement } from './HorizontalRuleElement'

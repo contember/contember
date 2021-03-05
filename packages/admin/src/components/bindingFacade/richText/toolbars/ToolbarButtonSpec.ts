@@ -1,6 +1,20 @@
 import { EntityAccessor } from '@contember/binding'
 import { IconSourceSpecification } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { Range as SlateRange } from 'slate'
 import { SugaredDiscriminateBy } from '../../discrimination'
 import { ElementNode, ElementSpecifics, TextNode, TextSpecifics } from '../baseEditor'

@@ -1,5 +1,5 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
-import { useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
 import { FieldValue } from '../treeParameters'
 

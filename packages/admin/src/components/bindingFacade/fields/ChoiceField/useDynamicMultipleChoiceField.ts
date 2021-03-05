@@ -2,16 +2,14 @@ import {
 	EntityListAccessor,
 	QueryLanguage,
 	RelativeEntityList,
-	SugaredQualifiedEntityList,
 	SugaredRelativeEntityList,
-	SugaredRelativeSingleEntity,
 	useAccessorUpdateSubscription,
 	useEntityKey,
 	useEnvironment,
 	useGetEntityByKey,
 	useMutationState,
 } from '@contember/binding'
-import { useMemo, useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import {
 	BaseDynamicChoiceField,
 	useCurrentValues,

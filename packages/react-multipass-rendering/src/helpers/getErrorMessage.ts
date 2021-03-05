@@ -1,4 +1,4 @@
-import { ReactNode, ReactElement } from 'react'
+import { ReactNode } from 'react'
 import { ErrorMessageFactory } from '../ErrorMessageFactory'
 
 export const getErrorMessage = <StaticContext>(

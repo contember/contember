@@ -1,5 +1,19 @@
 import { Component } from '@contember/binding'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { ImageFieldView, ImageFieldViewProps } from '../../fieldViews'
 import {

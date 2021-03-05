@@ -5,12 +5,12 @@ import {
 	SugaredRelativeSingleField,
 	useDerivedField,
 	useEnvironment,
-	useMutationState,
 	useField,
+	useMutationState,
 } from '@contember/binding'
 import { FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { FunctionComponent, useCallback, useMemo } from 'react'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 
@@ -35,11 +35,7 @@ export const SlugField: FunctionComponent<SlugFieldProps> = Component(
 		...props
 	}) => {
 		const environment = useEnvironment()
-		const {
-			normalizedUnpersistedHardPrefix,
-			normalizedPersistedHardPrefix,
-			normalizedPersistedSoftPrefix,
-		} = useMemo(
+		const { normalizedUnpersistedHardPrefix, normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix } = useMemo(
 			() => ({
 				normalizedUnpersistedHardPrefix:
 					typeof unpersistedHardPrefix === 'function'

@@ -1,12 +1,12 @@
-import { Button, Icon, TableRow, Table, TableCell, Spinner } from '@contember/ui'
+import { Button, Icon, Spinner, Table, TableCell, TableRow } from '@contember/ui'
+import { assertNever } from '@contember/utils'
+import cn from 'classnames'
 import { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import cn from 'classnames'
-import { AnyStageDiff, StageDiffState, EventType } from '../../state/system'
-import State from '../../state'
 import { executeRelease, fetchDiff } from '../../actions/system'
 import { Dispatch } from '../../actions/types'
-import { assertNever } from '@contember/utils'
+import State from '../../state'
+import { AnyStageDiff, EventType, StageDiffState } from '../../state/system'
 
 enum SelectionType {
 	explicit = 'explicit',

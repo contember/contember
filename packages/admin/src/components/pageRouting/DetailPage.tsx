@@ -4,7 +4,7 @@ import {
 	EntitySubTreeAdditionalProps,
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { ComponentType, memo, ReactNode } from 'react'
 import { FeedbackRenderer, ImmutableContentLayoutRendererProps, ImmutableSingleEntityRenderer } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 

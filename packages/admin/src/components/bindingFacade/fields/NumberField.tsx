@@ -1,6 +1,6 @@
+import { FieldAccessor } from '@contember/binding'
 import { SingleLineTextInputProps, TextInput } from '@contember/ui'
 import { ChangeEvent } from 'react'
-import { FieldAccessor } from '@contember/binding'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export type NumberFieldProps = SimpleRelativeSingleFieldProps &

@@ -1,5 +1,5 @@
 import { GraphQlClient } from '@contember/client'
-import { useReducer, useRef, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { ApiRequestActionType } from './ApiRequestActionType'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
 import { ApiRequestState } from './ApiRequestState'

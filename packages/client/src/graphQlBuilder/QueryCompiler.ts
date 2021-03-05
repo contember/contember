@@ -1,5 +1,5 @@
-import { ObjectBuilder } from './ObjectBuilder'
 import { Literal } from './Literal'
+import { ObjectBuilder } from './ObjectBuilder'
 import { RootObjectBuilder } from './RootObjectBuilder'
 
 export class QueryCompiler {

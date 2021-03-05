@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useDesugaredRelativeSingleField } from '../accessorPropagation'
 import { EntityAccessor, EntityListAccessor } from '../accessors'
 import { SugaredFieldProps } from '../helperComponents'

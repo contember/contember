@@ -1,9 +1,9 @@
 import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
+import { memo } from 'react'
 import { Aether, Box, BoxSection } from '../../src'
 
-const BoxStoryWrapper = React.memo(props => <Aether style={{ padding: '2em' }}>{props.children}</Aether>)
+const BoxStoryWrapper = memo(props => <Aether style={{ padding: '2em' }}>{props.children}</Aether>)
 
 const loremIpsum = (
 	<span>

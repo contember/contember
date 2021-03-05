@@ -1,6 +1,6 @@
 import { boolean, radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
+import { useState } from 'react'
 import { TextInput, TextInputOwnProps } from '../../src/components'
 import { sizeKnob } from '../utils/knobs'
 
@@ -10,7 +10,7 @@ export interface SimpleTextInputStoryProps {
 }
 
 export const SimpleTextInputStory = ({ size, validationState }: SimpleTextInputStoryProps) => {
-	const [value, setValue] = React.useState('')
+	const [value, setValue] = useState('')
 
 	// The cast is frankly just TS inference being insufficient but in practice that won't matter as the value of
 	// the 'allowNewlines' props will typically be a constant which TS handles just fine.

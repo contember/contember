@@ -1,5 +1,19 @@
 import { Component, SugaredFieldProps, SugaredRelativeSingleField } from '@contember/binding'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { DiscriminatedBlocks, useNormalizedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../Repeater'
 import { AddNewBlockButton } from './AddNewBlockButton'

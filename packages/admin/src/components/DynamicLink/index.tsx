@@ -1,12 +1,12 @@
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { ComponentType, ReactElement } from 'react'
 import { connect } from 'react-redux'
 import { pushRequest } from '../../actions/request'
 import { Dispatch } from '../../actions/types'
+import routes from '../../routes'
 import State from '../../state'
 import { RequestChange } from '../../state/request'
-import { requestStateToPath } from '../../utils/url'
-import routes from '../../routes'
 import { isUrlActive } from '../../utils/isUrlActive'
+import { requestStateToPath } from '../../utils/url'
 
 export interface DynamicLinkInnerProps {
 	onClick: () => void

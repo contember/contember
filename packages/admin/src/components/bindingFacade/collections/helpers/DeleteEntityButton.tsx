@@ -1,5 +1,19 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
 import { usePersistWithFeedback } from '../../../ui'
 

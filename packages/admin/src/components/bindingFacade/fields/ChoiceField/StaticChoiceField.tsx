@@ -7,11 +7,11 @@ import {
 	OptionallyVariableFieldValue,
 	SugaredRelativeSingleField,
 	useEnvironment,
-	useMutationState,
 	useField,
+	useMutationState,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { FunctionComponent, ReactNode, useCallback, useMemo } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 
 export interface StaticOption {

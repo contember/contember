@@ -1,5 +1,5 @@
 import { ErrorAccessor } from '../accessors'
-import { MutationDataResponse, ValidationError, MutationResponse, ExecutionError } from '../accessorTree'
+import { ExecutionError, MutationDataResponse, MutationResponse, ValidationError } from '../accessorTree'
 import { PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { AliasTransformer } from './AliasTransformer'

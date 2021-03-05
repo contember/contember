@@ -10,7 +10,21 @@ import { useFileUpload } from '@contember/react-client'
 import { FileId } from '@contember/react-client/dist/src/upload/FileId'
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import attrAccept from 'attr-accept'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { useDropzone } from 'react-dropzone'
 import { NormalizedBlocks } from '../../blocks'
 import { RepeaterContainerProps, SortableRepeaterItem } from '../../collections'

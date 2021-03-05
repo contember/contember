@@ -1,6 +1,20 @@
 import { Environment, SugaredRelativeSingleField, useEnvironment, useMutationState, useField } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
 const contextualizeNode = (
@@ -37,10 +51,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 			environment,
 			labelDescription,
 		])
-		const normalizedDescription = useMemo(() => contextualizeNode(description, environment), [
-			environment,
-			description,
-		])
+		const normalizedDescription = useMemo(() => contextualizeNode(description, environment), [environment, description])
 		const isMutating = useMutationState()
 
 		const fieldMetadata: SimpleRelativeSingleFieldMetadata = useMemo(

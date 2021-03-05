@@ -1,5 +1,5 @@
-import { MutationRequestState, useAuthedTenantMutation } from './lib'
 import { useCallback } from 'react'
+import { MutationRequestState, useAuthedTenantMutation } from './lib'
 
 const INVITE_MUTATION = `
 	mutation (

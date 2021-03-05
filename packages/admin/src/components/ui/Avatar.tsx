@@ -1,6 +1,6 @@
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
-import cn from 'classnames'
 import md5 from 'blueimp-md5'
+import cn from 'classnames'
+import { FunctionComponent } from 'react'
 
 export enum AvatarSize {
 	Size1 = 1,

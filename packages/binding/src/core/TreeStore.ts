@@ -1,4 +1,3 @@
-import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor } from '../accessors'
 import { NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'

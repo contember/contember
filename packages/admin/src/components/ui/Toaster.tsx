@@ -1,10 +1,10 @@
+import { Button, Icon, Intent, Message, MessageProps } from '@contember/ui'
 import { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import ToastsState, { ToastId, ToastType } from '../../state/toasts'
-import State from '../../state'
-import { Dispatch } from '../../actions/types'
 import { dismissToast } from '../../actions/toasts'
-import { Button, Icon, Intent, Message, MessageProps } from '@contember/ui'
+import { Dispatch } from '../../actions/types'
+import State from '../../state'
+import ToastsState, { ToastId, ToastType } from '../../state/toasts'
 
 const toastTypeToMessageType: { [K in ToastType]: MessageProps['type'] } = {
 	success: 'success',

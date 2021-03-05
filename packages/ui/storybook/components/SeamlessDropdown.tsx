@@ -1,6 +1,5 @@
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
-import { SeamlessDropdown, ContemberLogo, UserMiniControl } from '../../src'
+import { ContemberLogo, SeamlessDropdown, UserMiniControl } from '../../src'
 
 storiesOf('SeamlessDropdown', module)
 	.add('default', () => (

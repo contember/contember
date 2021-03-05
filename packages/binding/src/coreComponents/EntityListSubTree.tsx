@@ -1,6 +1,6 @@
 import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
-import { ReactNode, useCallback, ComponentType, ReactElement } from 'react'
+import { ComponentType, ReactElement, ReactNode, useCallback } from 'react'
 import {
 	useAccessorUpdateSubscription,
 	useEntityListSubTreeParameters,

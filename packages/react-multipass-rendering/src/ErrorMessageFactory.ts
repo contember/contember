@@ -1,4 +1,4 @@
-import { ReactNode, ReactElement } from 'react'
+import { ReactNode } from 'react'
 
 export type ErrorMessageFactory<StaticContext = any> =
 	| string

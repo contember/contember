@@ -6,7 +6,7 @@ import {
 	SugaredQualifiedEntityList,
 	TreeRootId,
 } from '@contember/binding'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { Fragment, ReactElement } from 'react'
 import {
 	DataGridContainer,
 	DataGridContainerPublicProps,

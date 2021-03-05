@@ -1,6 +1,5 @@
 import { S3FileUploader, UploadedFileMetadata } from '@contember/client'
-import { useRef, useReducer, useEffect, useCallback, useMemo } from 'react'
-import { useSessionToken } from '../auth'
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { useCurrentContentGraphQlClient } from '../content'
 import { FileId } from './FileId'
 import { FileUploadActionType } from './FileUploadActionType'

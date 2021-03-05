@@ -2,10 +2,10 @@ import { RelationFilter, TreeFilter } from '@contember/client'
 import { EntityListPersistedData, ServerGeneratedUuid } from '../accessorTree'
 import {
 	EntityFieldMarkersContainer,
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	EntitySubTreeMarker,
-	EntityListSubTreeMarker,
 } from '../markers'
 import { EntityName } from '../treeParameters'
 import { assertNever } from '../utils'

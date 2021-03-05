@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { addToast } from '../../actions/toasts'
 import { useDispatch } from 'react-redux'
+import { addToast } from '../../actions/toasts'
 import { ToastDefinition } from '../../state/toasts'
 
 export const useAddToast = (): ((toast: ToastDefinition) => void) => {

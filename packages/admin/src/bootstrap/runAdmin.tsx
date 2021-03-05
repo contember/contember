@@ -1,5 +1,5 @@
 import { DevError } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { ReactElement } from 'react'
 import * as ReactDOM from 'react-dom'
 import { Admin } from '../components'
 import { ProjectConfig } from '../state/projectsConfigs'

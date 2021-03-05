@@ -1,5 +1,5 @@
-import { UnsugarableEntityListParameters } from './EntityListParameters'
 import { UnsugarableEntityListEventListeners } from './EntityListEventListeners'
+import { UnsugarableEntityListParameters } from './EntityListParameters'
 import { DesugaredHasManyRelation, HasManyRelation, SugarableHasManyRelation } from './HasManyRelation'
 import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import { UnsugarableRelation } from './Relation'

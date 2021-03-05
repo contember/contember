@@ -1,6 +1,5 @@
 import { ApiRequestAction } from './ApiRequestAction'
 import { ApiRequestActionType } from './ApiRequestActionType'
-import { ApiRequestReadyState } from './ApiRequestReadyState'
 import { ApiRequestState } from './ApiRequestState'
 
 export type ApiRequestReducer<SuccessData> = (

@@ -8,7 +8,21 @@ import {
 	useMutationState,
 } from '@contember/binding'
 import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { Node as SlateNode } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { ElementNode } from '../baseEditor'
@@ -34,10 +48,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 			environment,
 			props,
 		])
-		const fieldAccessor = useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [
-			entity,
-			desugaredField,
-		])
+		const fieldAccessor = useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [entity, desugaredField])
 
 		// The cache is questionable, really.
 		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())

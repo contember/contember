@@ -1,5 +1,5 @@
 import { useCurrentContentGraphQlClient } from '@contember/react-client'
-import { useReducer, useRef, useCallback, useState, useEffect } from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import { TreeRootAccessor } from '../accessors'
 import { DataBinding } from '../core'

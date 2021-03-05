@@ -10,7 +10,7 @@ import {
 } from '@contember/binding'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { assertNever } from '@contember/utils'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicMultipleChoiceFieldProps, useDynamicMultipleChoiceField } from './useDynamicMultipleChoiceField'
 import { DynamicSingleChoiceFieldProps, useDynamicSingleChoiceField } from './useDynamicSingleChoiceField'

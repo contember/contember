@@ -1,6 +1,6 @@
 import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import { FormGroupProps } from '@contember/ui'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { FunctionComponent, ReactNode, useMemo } from 'react'
 import { NativeSelectFieldInner, NormalizedStaticOption, StaticChoiceField, useStaticChoiceField } from '../fields'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
 

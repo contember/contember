@@ -1,5 +1,19 @@
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { ContentOutlet, ContentOutletProps } from './ContentOutlet'
 import { TextFieldProps } from './TextField'
 import { Environment } from '@contember/binding'

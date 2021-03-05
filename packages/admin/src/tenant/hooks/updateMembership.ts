@@ -1,5 +1,5 @@
-import { useCallback } from 'react'
 import { useProjectSlug } from '@contember/react-client'
+import { useCallback } from 'react'
 import { MutationRequestState, useAuthedTenantMutation } from './lib'
 
 const UPDATE_MEMBERSHIP_QUERY = `

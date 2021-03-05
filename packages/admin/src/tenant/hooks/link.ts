@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { RequestChange } from '../../state/request'
-import { requestStateToPath, RouteMap } from '../../utils/url'
-import routes from '../../routes'
-import State from '../../state'
 import { pushRequest } from '../../actions/request'
 import { PageChange } from '../../components/pageRouting/PageLink'
+import routes from '../../routes'
+import State from '../../state'
+import { RequestChange } from '../../state/request'
+import { requestStateToPath, RouteMap } from '../../utils/url'
 
 interface UseLinkReturn {
 	goTo: () => void

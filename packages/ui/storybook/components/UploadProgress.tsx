@@ -1,9 +1,9 @@
 import { number } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
+import { CSSProperties } from 'react'
 import { UploadProgress } from '../../src'
 
-const borderStyle: React.CSSProperties = {
+const borderStyle: CSSProperties = {
 	height: '167px',
 	width: '167px',
 	border: '1px solid',

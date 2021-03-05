@@ -1,10 +1,10 @@
 import { boolean, number } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { FilePreview, UploadProgress } from '../../src'
 
 const dummyImg = <img src="http://placekitten.com/200/300" />
-const Wrap = (props: { children: React.ReactNode }) => (
+const Wrap = (props: { children: ReactNode }) => (
 	<div style={{ width: '167px', margin: '50px auto' }}>{props.children}</div>
 )
 

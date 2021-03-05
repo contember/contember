@@ -4,7 +4,7 @@ import {
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
-import { ReactNode, ComponentType, ReactElement, memo, useCallback, useMemo, useRef, useState, FC, FunctionComponent, Fragment, PureComponent, useEffect } from 'react'
+import { memo, ReactElement, ReactNode } from 'react'
 import { FeedbackRenderer, ListRenderer, ListRendererProps } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 

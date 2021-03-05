@@ -1,15 +1,15 @@
-import * as React from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
 import cn from 'classnames'
+import { forwardRef, HTMLAttributes, memo, ReactNode } from 'react'
+import { useClassNamePrefix } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
 
-export interface FileDropZoneProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface FileDropZoneProps extends HTMLAttributes<HTMLDivElement> {
 	isActive?: boolean
-	children?: React.ReactNode
+	children?: ReactNode
 }
 
-export const FileDropZone = React.memo(
-	React.forwardRef<HTMLDivElement, FileDropZoneProps>(({ isActive, className, ...props }, ref) => {
+export const FileDropZone = memo(
+	forwardRef<HTMLDivElement, FileDropZoneProps>(({ isActive, className, ...props }, ref) => {
 		const prefix = useClassNamePrefix()
 		return (
 			<div {...props} className={cn(`${prefix}fileDropZone`, toStateClass('active', isActive), className)} ref={ref} />

@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import * as React from 'react'
+import { forwardRef, memo, MouseEventHandler, ReactNode } from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { toViewClass } from '../../utils'
 import { Icon, IconSourceSpecification } from '../Icon'
@@ -11,16 +11,16 @@ export enum ToolbarButtonLayout {
 
 export interface ToolbarButton extends IconSourceSpecification {
 	showLabel?: boolean
-	label: React.ReactNode
+	label: ReactNode
 	title?: string
 	layout?: ToolbarButtonLayout
 	isActive?: boolean
-	onClick?: React.MouseEventHandler
-	onMouseDown?: React.MouseEventHandler
+	onClick?: MouseEventHandler
+	onMouseDown?: MouseEventHandler
 }
 
-export const EditorToolbarButton = React.memo(
-	React.forwardRef<any, ToolbarButton>(
+export const EditorToolbarButton = memo(
+	forwardRef<any, ToolbarButton>(
 		(
 			{ label, title, contemberIcon, customIcon, blueprintIcon, showLabel, isActive, layout, onClick, onMouseDown },
 			ref,

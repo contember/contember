@@ -1,6 +1,18 @@
 import cn from 'classnames'
-import * as React from 'react'
-import { MouseEventHandler } from 'react'
+import {
+	createContext,
+	memo,
+	MouseEvent as ReactMouseEvent,
+	MouseEventHandler,
+	ReactElement,
+	ReactNode,
+	Ref,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from 'react'
 import { usePopper } from 'react-popper'
 import { useClassNamePrefix, useRawCloseOnEscapeOrClickOutside } from '../auxiliary'
 import { DropdownAlignment } from '../types'
@@ -17,15 +29,15 @@ export interface DropdownRenderProps {
 
 export interface DropdownProps {
 	renderToggle?: (props: {
-		ref: React.Ref<HTMLElement>
-		onClick: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void
-	}) => React.ReactNode
-	renderContent?: (props: DropdownRenderProps) => React.ReactNode
+		ref: Ref<HTMLElement>
+		onClick: (event: ReactMouseEvent<HTMLElement, MouseEvent>) => void
+	}) => ReactNode
+	renderContent?: (props: DropdownRenderProps) => ReactNode
 	buttonProps?: ButtonBasedButtonProps
 	alignment?: DropdownAlignment
 	strategy?: 'absolute' | 'fixed'
 	contentContainer?: HTMLElement
-	children?: React.ReactElement | ((props: DropdownRenderProps) => React.ReactNode)
+	children?: ReactElement | ((props: DropdownRenderProps) => ReactNode)
 	styledContent?: boolean
 	onDismiss?: () => void
 }
@@ -46,18 +58,18 @@ const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 
 const noop = () => {}
 
-export const DropdownContentContainerContext = React.createContext<HTMLElement | undefined>(undefined)
+export const DropdownContentContainerContext = createContext<HTMLElement | undefined>(undefined)
 DropdownContentContainerContext.displayName = 'DropdownContentContainerContext'
 
-export const Dropdown = React.memo((props: DropdownProps) => {
-	const [isOpen, setIsOpen] = React.useState(false)
-	const [isTransitioning, setIsTransitioning] = React.useState(false)
+export const Dropdown = memo((props: DropdownProps) => {
+	const [isOpen, setIsOpen] = useState(false)
+	const [isTransitioning, setIsTransitioning] = useState(false)
 
 	const onDismiss = props.onDismiss
 	const isActive = isOpen || isTransitioning
 
-	const [referenceElement, setReferenceElement] = React.useState<HTMLElement | null>(null)
-	const [popperElement, setPopperElement] = React.useState<HTMLElement | null>(null)
+	const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null)
+	const [popperElement, setPopperElement] = useState<HTMLElement | null>(null)
 
 	const placement = alignmentToPlacement(props.alignment)
 	const { styles, attributes, forceUpdate, update } = usePopper(
@@ -67,21 +79,21 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 	)
 
 	const suppliedButtonOnClickHandler = props.buttonProps && props.buttonProps.onClick
-	const onButtonClick = React.useCallback<MouseEventHandler<HTMLElement>>(
+	const onButtonClick = useCallback<MouseEventHandler<HTMLElement>>(
 		e => {
 			forceUpdate?.()
 			setIsOpen(isOpen => !isOpen)
 			setIsTransitioning(true)
-			suppliedButtonOnClickHandler && suppliedButtonOnClickHandler(e as React.MouseEvent<HTMLButtonElement>)
+			suppliedButtonOnClickHandler && suppliedButtonOnClickHandler(e as ReactMouseEvent<HTMLButtonElement>)
 		},
 		[forceUpdate, suppliedButtonOnClickHandler],
 	)
-	const close = React.useCallback(() => {
+	const close = useCallback(() => {
 		setIsOpen(false)
 		setIsTransitioning(true)
 	}, [])
 
-	const dismiss = React.useCallback(() => {
+	const dismiss = useCallback(() => {
 		close()
 		onDismiss?.()
 	}, [close, onDismiss])
@@ -93,7 +105,7 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 		content: popperElement,
 	})
 
-	const contentContainerFromContent = React.useContext(DropdownContentContainerContext)
+	const contentContainerFromContent = useContext(DropdownContentContainerContext)
 	const contentContainer = props.contentContainer || contentContainerFromContent || document.body
 
 	const prefix = useClassNamePrefix()
@@ -149,13 +161,13 @@ export const Dropdown = React.memo((props: DropdownProps) => {
 Dropdown.displayName = 'Dropdown'
 
 export interface DropdownContainerProviderProps {
-	children?: React.ReactNode
+	children?: ReactNode
 }
 
-export const DropdownContentContainerProvider = React.memo((props: DropdownContainerProviderProps) => {
-	const [contentContainer, setContentContainer] = React.useState<HTMLElement | undefined>(undefined)
-	const contentContainerRef = React.useRef<HTMLDivElement>(null)
-	React.useEffect(() => {
+export const DropdownContentContainerProvider = memo((props: DropdownContainerProviderProps) => {
+	const [contentContainer, setContentContainer] = useState<HTMLElement | undefined>(undefined)
+	const contentContainerRef = useRef<HTMLDivElement>(null)
+	useEffect(() => {
 		// Run once ref is set
 		setContentContainer(contentContainerRef.current || undefined)
 	}, [])

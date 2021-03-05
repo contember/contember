@@ -1,3 +1,3 @@
-import * as React from 'react'
+import { DetailedHTMLProps, HTMLAttributes } from 'react'
 
-export type NativeProps<El extends Element> = React.DetailedHTMLProps<React.HTMLAttributes<El>, El>
+export type NativeProps<El extends Element> = DetailedHTMLProps<HTMLAttributes<El>, El>

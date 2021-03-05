@@ -1,4 +1,5 @@
-import { BranchNode, ChildrenAnalyzer, RawNodeRepresentation, Leaf } from '@contember/react-multipass-rendering'
+import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
+import { ReactElement } from 'react'
 import { IllegalChildrenError } from '../../../errors'
 import { Button, ButtonProps } from '../Button'
 import { FormGroup, FormGroupProps } from '../FormGroup'
@@ -15,7 +16,7 @@ const buttonLeaf = new Leaf(node => new BoxedButtonProps(node.props), Button)
 
 const formGroupBranchNode = new BranchNode(
 	(
-		{ props }: React.ReactElement<FormGroupProps>,
+		{ props }: ReactElement<FormGroupProps>,
 		childrenRepresentation: RawNodeRepresentation<BoxedButtonProps, ButtonFormGroupProps>,
 	) => {
 		if (childrenRepresentation instanceof BoxedButtonProps) {

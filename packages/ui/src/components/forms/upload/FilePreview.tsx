@@ -1,16 +1,28 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import cn from 'classnames'
 import { toStateClass } from '../../../utils'
 
 export interface FilePreviewProps {
-	actions?: React.ReactNode
-	children?: React.ReactNode
+	actions?: ReactNode
+	children?: ReactNode
 	isActive?: boolean
-	overlay?: React.ReactNode
+	overlay?: ReactNode
 }
 
-export const FilePreview = React.memo(({ actions, children, isActive, overlay }: FilePreviewProps) => {
+export const FilePreview = memo(({ actions, children, isActive, overlay }: FilePreviewProps) => {
 	const prefix = useClassNamePrefix()
 	// TODO actions
 	return (

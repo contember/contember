@@ -1,20 +1,20 @@
-import * as React from 'react'
+import cn from 'classnames'
+import { memo, MouseEventHandler, ReactNode, useContext } from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { Justification } from '../../types'
-import cn from 'classnames'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { UseTableElementContext } from './Table'
 
 export interface TableHeaderCellProps {
-	children?: React.ReactNode
+	children?: ReactNode
 	justification?: Justification
 	shrunk?: boolean
 	scope?: 'col' | 'row'
-	onClick?: React.MouseEventHandler<HTMLTableHeaderCellElement>
+	onClick?: MouseEventHandler<HTMLTableHeaderCellElement>
 }
 
-export const TableHeaderCell = React.memo(({ shrunk = false, ...props }: TableHeaderCellProps) => {
-	const useTableElement = React.useContext(UseTableElementContext)
+export const TableHeaderCell = memo(({ shrunk = false, ...props }: TableHeaderCellProps) => {
+	const useTableElement = useContext(UseTableElementContext)
 	const className = cn(
 		useComponentClassName('table-cell'),
 		toEnumViewClass(props.justification),

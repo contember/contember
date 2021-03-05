@@ -1,12 +1,24 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 
 export interface TagProps {
 	onRemove?: () => void
-	children: React.ReactNode
+	children: ReactNode
 }
 
-export const Tag = React.memo<TagProps>(({ children, onRemove }) => {
+export const Tag = memo<TagProps>(({ children, onRemove }) => {
 	const prefix = useClassNamePrefix()
 	return (
 		<span className={`${prefix}tag`}>

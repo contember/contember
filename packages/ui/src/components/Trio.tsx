@@ -1,4 +1,16 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import cn from 'classnames'
 import { useClassNamePrefix } from '../auxiliary'
 import { toViewClass } from '../utils'
@@ -13,9 +25,9 @@ export function Trio({
 }: {
 	column?: boolean
 	className?: string
-	start?: React.ReactNode
-	center?: React.ReactNode
-	end?: React.ReactNode
+	start?: ReactNode
+	center?: ReactNode
+	end?: ReactNode
 	clickThroughSpace?: boolean
 }) {
 	const prefix = useClassNamePrefix()

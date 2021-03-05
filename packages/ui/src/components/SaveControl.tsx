@@ -1,24 +1,24 @@
-import * as React from 'react'
 import cn from 'classnames'
+import { ReactNode, useCallback, useState } from 'react'
 import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../auxiliary'
 import { toViewClass } from '../utils'
 
 export interface SaveControlProps {
-	primaryAction?: React.ReactNode
+	primaryAction?: ReactNode
 	isPrimaryDisabled?: boolean
 	onPrimary?: () => void
-	children?: React.ReactNode
+	children?: ReactNode
 }
 
 export function SaveControl({ primaryAction, children, onPrimary, isPrimaryDisabled }: SaveControlProps) {
 	const prefix = useClassNamePrefix()
-	const [open, setOpen] = React.useState(false)
+	const [open, setOpen] = useState(false)
 
-	const toggleOpen = React.useCallback(() => {
+	const toggleOpen = useCallback(() => {
 		setOpen(open => !open)
 	}, [])
 
-	const close = React.useCallback(() => {
+	const close = useCallback(() => {
 		setOpen(false)
 	}, [])
 

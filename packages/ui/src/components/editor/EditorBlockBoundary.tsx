@@ -1,17 +1,14 @@
-import * as React from 'react'
 import cn from 'classnames'
+import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'
 
 export interface EditorBlockBoundaryProps {
 	blockEdge: 'before' | 'after'
-	onClick: (e: React.MouseEvent<HTMLDivElement>) => void
+	onClick: (e: ReactMouseEvent<HTMLDivElement>) => void
 }
 
-export const EditorBlockBoundary = React.memo(function EditorBlockBoundary({
-	blockEdge,
-	onClick,
-}: EditorBlockBoundaryProps) {
+export const EditorBlockBoundary = memo(function EditorBlockBoundary({ blockEdge, onClick }: EditorBlockBoundaryProps) {
 	const prefix = useClassNamePrefix()
 	return (
 		<div

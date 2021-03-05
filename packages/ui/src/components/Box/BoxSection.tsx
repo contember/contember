@@ -1,5 +1,17 @@
 import cn from 'classnames'
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
 import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
 import { toViewClass } from '../../utils'
@@ -7,15 +19,15 @@ import { Heading } from '../Heading'
 import { Icon } from '../Icon'
 
 export interface BoxSectionProps {
-	heading: React.ReactNode
-	actions?: React.ReactNode
-	children: React.ReactNode
-	dragHandleComponent?: React.ComponentType<{ children: React.ReactNode }>
+	heading: ReactNode
+	actions?: ReactNode
+	children: ReactNode
+	dragHandleComponent?: ComponentType<{ children: ReactNode }>
 }
 
-export const BoxSection = React.memo(({ actions, children, heading, dragHandleComponent: Handle }: BoxSectionProps) => {
-	const boxDepth = React.useContext(BoxDepthContext)
-	const headingDepth = React.useContext(HeadingDepthContext)
+export const BoxSection = memo(({ actions, children, heading, dragHandleComponent: Handle }: BoxSectionProps) => {
+	const boxDepth = useContext(BoxDepthContext)
+	const headingDepth = useContext(HeadingDepthContext)
 	const prefix = useClassNamePrefix()
 
 	return (

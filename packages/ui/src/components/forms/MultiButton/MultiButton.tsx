@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Fragment, memo, MouseEvent as ReactMouseEvent, useMemo, useState } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import { Dropdown } from '../../Dropdown'
 import { Button } from '../Button'
@@ -10,16 +10,14 @@ export interface MultiButtonProps extends ButtonGroupProps {
 	triggerFromDropdown?: boolean
 }
 
-export const MultiButton = React.memo(({ triggerFromDropdown = false, ...props }: MultiButtonProps) => {
-	const [currentButtonIndex, setCurrentButtonIndex] = React.useState(0)
+export const MultiButton = memo(({ triggerFromDropdown = false, ...props }: MultiButtonProps) => {
+	const [currentButtonIndex, setCurrentButtonIndex] = useState(0)
 
-	const augmentedButtons = React.useMemo(() => buttonAnalyzer.processChildren(props.children, undefined), [
-		props.children,
-	])
-	const formGroupsPresent = React.useMemo(() => augmentedButtons.some(props => props instanceof ButtonFormGroupProps), [
+	const augmentedButtons = useMemo(() => buttonAnalyzer.processChildren(props.children, undefined), [props.children])
+	const formGroupsPresent = useMemo(() => augmentedButtons.some(props => props instanceof ButtonFormGroupProps), [
 		augmentedButtons,
 	])
-	const buttonFormGroupProps = React.useMemo(
+	const buttonFormGroupProps = useMemo(
 		() =>
 			augmentedButtons.map(item => {
 				if (item instanceof ButtonFormGroupProps) {
@@ -46,7 +44,7 @@ export const MultiButton = React.memo(({ triggerFromDropdown = false, ...props }
 	if (buttonFormGroupProps.length === 0) {
 		return null
 	}
-	const Wrapper = formGroupsPresent ? FormGroup : React.Fragment
+	const Wrapper = formGroupsPresent ? FormGroup : Fragment
 	const activeButtonFormGroupProps = buttonFormGroupProps[currentButtonIndex]
 	const activeWrapperProps = formGroupsPresent ? activeButtonFormGroupProps.formGroupProps : {}
 	return (
@@ -71,7 +69,7 @@ export const MultiButton = React.memo(({ triggerFromDropdown = false, ...props }
 								<Button
 									{...buttonFormGroupProps.buttonProps}
 									key={i}
-									onClick={(e: React.MouseEvent<any>) => {
+									onClick={(e: ReactMouseEvent<any>) => {
 										triggerFromDropdown &&
 											buttonFormGroupProps.buttonProps.onClick &&
 											buttonFormGroupProps.buttonProps.onClick(e)

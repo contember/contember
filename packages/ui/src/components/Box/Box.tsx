@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import * as React from 'react'
+import { forwardRef, memo, ReactNode, useContext } from 'react'
 import { IncreaseBoxDepth, IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
 import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
 import { BoxDistinction, NativeProps } from '../../types'
@@ -7,20 +7,20 @@ import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 import { Heading } from '../Heading'
 
 export interface BoxOwnProps {
-	heading?: React.ReactNode
-	actions?: React.ReactNode
-	children: React.ReactNode
+	heading?: ReactNode
+	actions?: ReactNode
+	children: ReactNode
 	distinction?: BoxDistinction
 	isActive?: boolean
 }
 
 export interface BoxProps extends BoxOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
 
-export const Box = React.memo(
-	React.forwardRef<HTMLDivElement, BoxProps>(
+export const Box = memo(
+	forwardRef<HTMLDivElement, BoxProps>(
 		({ actions, children, heading, distinction, isActive = false, className, ...divProps }: BoxProps, ref) => {
-			const boxDepth = React.useContext(BoxDepthContext)
-			const headingDepth = React.useContext(HeadingDepthContext)
+			const boxDepth = useContext(BoxDepthContext)
+			const headingDepth = useContext(HeadingDepthContext)
 			const prefix = useClassNamePrefix()
 
 			return (

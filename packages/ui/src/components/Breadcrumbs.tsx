@@ -1,11 +1,23 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 
 export interface BreadcrumbsProps {
-	items: React.ReactNode[]
+	items: ReactNode[]
 }
 
-export const Breadcrumbs = React.memo<BreadcrumbsProps>(({ items }) => {
+export const Breadcrumbs = memo<BreadcrumbsProps>(({ items }) => {
 	const prefix = useClassNamePrefix()
 	return (
 		<div className={`${prefix}breadcrumbs`}>

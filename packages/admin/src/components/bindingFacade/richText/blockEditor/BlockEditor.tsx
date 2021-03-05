@@ -144,7 +144,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const discriminatedEmbedHandlers = useDiscriminatedData<EmbedHandler>(embedHandlers)
 		const embedReferenceDiscriminant = useMemo<FieldValue | undefined>(() => {
 			if (embedReferenceDiscriminateBy !== undefined) {
-				return VariableInputTransformer.transformVariableLiteral(embedReferenceDiscriminateBy, environment)
+				return VariableInputTransformer.transformValue(embedReferenceDiscriminateBy, environment)
 			}
 			return undefined
 		}, [embedReferenceDiscriminateBy, environment])

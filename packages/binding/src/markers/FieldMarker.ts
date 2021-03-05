@@ -1,5 +1,4 @@
-import { GraphQlBuilder } from '@contember/client'
-import { FieldName, Scalar } from '../treeParameters'
+import { FieldName, FieldValue } from '../treeParameters'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 /**
@@ -12,7 +11,7 @@ export class FieldMarker {
 
 	constructor(
 		public readonly fieldName: FieldName,
-		public readonly defaultValue?: GraphQlBuilder.Literal | Scalar,
+		public readonly defaultValue?: FieldValue,
 		public readonly isNonbearing: boolean = false,
 	) {
 		this.placeholderName = PlaceholderGenerator.getFieldPlaceholder(this.fieldName)

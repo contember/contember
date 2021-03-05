@@ -1,16 +1,8 @@
-import {
-	BindingError,
-	Environment,
-	Scalar,
-	useEnvironment,
-	VariableInputTransformer,
-	VariableLiteral,
-} from '@contember/binding'
-import { GraphQlBuilder } from '@contember/client'
+import { BindingError, Environment, useEnvironment, VariableInputTransformer } from '@contember/binding'
 import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, useMemo } from 'react'
 import { useEditor } from 'slate-react'
-import { getDiscriminatedDatum } from '../../discrimination'
+import { getDiscriminatedDatum, SugaredDiscriminateBy } from '../../discrimination'
 import { ElementSpecificToolbarButton } from '../toolbars'
 import { BlockSlateEditor } from './editor'
 import { ReferenceElement, referenceElementType } from './elements'
@@ -20,10 +12,7 @@ export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	title?: string
 } & (
 		| {
-				discriminateBy: GraphQlBuilder.Literal | VariableLiteral | string
-		  }
-		| {
-				discriminateByScalar: Scalar
+				discriminateBy: SugaredDiscriminateBy
 		  }
 		| ElementSpecificToolbarButton<any>
 	)
@@ -57,11 +46,8 @@ function toToolbarGroups(
 						e.nativeEvent.preventDefault()
 						e.nativeEvent.stopPropagation()
 
-						if ('discriminateBy' in buttonProps || 'discriminateByScalar' in buttonProps) {
-							const discriminateBy =
-								'discriminateBy' in buttonProps
-									? VariableInputTransformer.transformVariableLiteral(buttonProps.discriminateBy, environment)
-									: VariableInputTransformer.transformValue(buttonProps.discriminateByScalar, environment)
+						if ('discriminateBy' in buttonProps) {
+							const discriminateBy = VariableInputTransformer.transformValue(buttonProps.discriminateBy, environment)
 							const targetBlock = getDiscriminatedDatum(editorReferenceBlocks, discriminateBy)
 
 							if (targetBlock === undefined) {

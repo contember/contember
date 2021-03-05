@@ -40,7 +40,7 @@ const RefButton = memo(({ button }: { button: InitializeReferenceToolbarButton }
 						if (referenceId) {
 							return
 						}
-						const discriminateBy = VariableInputTransformer.transformVariableLiteral(button.discriminateBy, environment)
+						const discriminateBy = VariableInputTransformer.transformValue(button.discriminateBy, environment)
 
 						// const preppedPath = editor.prepareElementForInsertion({
 						// 	type: button,

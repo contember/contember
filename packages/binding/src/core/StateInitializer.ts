@@ -419,7 +419,7 @@ export class StateInitializer {
 				return () => {
 					if (fieldState.hasStaleAccessor || accessor === undefined) {
 						fieldState.hasStaleAccessor = false
-						accessor = new FieldAccessor<Scalar | GraphQlBuilder.Literal>(
+						accessor = new FieldAccessor(
 							fieldState.placeholderName,
 							fieldState.value,
 							fieldState.persistedValue === undefined ? null : fieldState.persistedValue,

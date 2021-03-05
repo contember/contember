@@ -4,10 +4,9 @@ import {
 	Field,
 	FieldAccessor,
 	FieldBasicProps,
-	Scalar,
+	FieldValue,
 	StaticRenderProvider,
 } from '@contember/binding'
-import { GraphQlBuilder } from '@contember/client'
 import { FormGroupProps } from '@contember/ui'
 import { NamedExoticComponent, ReactNode } from 'react'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
@@ -15,7 +14,7 @@ import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
 export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FormGroupProps, 'children'>
 
 export interface SimpleRelativeSingleFieldMetadata<
-	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+	Persisted extends FieldValue = FieldValue,
 	Produced extends Persisted = Persisted
 > {
 	field: FieldAccessor<Persisted, Produced>
@@ -25,7 +24,7 @@ export interface SimpleRelativeSingleFieldMetadata<
 
 export const SimpleRelativeSingleField = function <
 	P extends FieldBasicProps & Omit<FormGroupProps, 'children'>,
-	Persisted extends Scalar | GraphQlBuilder.Literal = Scalar | GraphQlBuilder.Literal,
+	Persisted extends FieldValue = FieldValue,
 	Produced extends Persisted = Persisted
 >(
 	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Persisted, Produced>, props: P) => ReactNode,

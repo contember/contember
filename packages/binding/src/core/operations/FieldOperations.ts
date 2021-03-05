@@ -4,7 +4,7 @@ import { FieldAccessor } from '../../accessors'
 import { ClientGeneratedUuid } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
-import { Scalar } from '../../treeParameters'
+import { FieldValue } from '../../treeParameters'
 import { EventManager } from '../EventManager'
 import { FieldState, getEntityMarker, StateIterator } from '../state'
 import { StateInitializer } from '../StateInitializer'
@@ -20,7 +20,7 @@ export class FieldOperations {
 
 	public updateValue(
 		fieldState: FieldState,
-		newValue: Scalar | GraphQlBuilder.Literal,
+		newValue: FieldValue,
 		{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
 	) {
 		this.eventManager.syncOperation(() => {
@@ -76,10 +76,9 @@ export class FieldOperations {
 						: newValue === null
 						? field.fieldMarker.defaultValue
 						: newValue
-				const normalizedValue = resolvedValue instanceof GraphQlBuilder.Literal ? resolvedValue.value : resolvedValue
 				const normalizedPersistedValue = field.persistedValue === undefined ? null : field.persistedValue
 				const hadUnpersistedChangesBefore = field.hasUnpersistedChanges
-				const hasUnpersistedChangesNow = normalizedValue !== normalizedPersistedValue
+				const hasUnpersistedChangesNow = resolvedValue !== normalizedPersistedValue
 				field.hasUnpersistedChanges = hasUnpersistedChangesNow
 
 				const shouldInfluenceUpdateCount =

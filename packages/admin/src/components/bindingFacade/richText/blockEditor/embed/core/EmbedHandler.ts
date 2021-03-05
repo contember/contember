@@ -1,24 +1,6 @@
 import { EntityAccessor, Environment } from '@contember/binding'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
-import {
-	NormalizedDiscriminatedData,
-	SugaredDiscriminateBy,
-	SugaredDiscriminateByScalar,
-} from '../../../../discrimination'
+import { ReactNode } from 'react'
+import { NormalizedDiscriminatedData, SugaredDiscriminateBy } from '../../../../discrimination'
 
 export interface PopulateEmbedDataOptions<EmbedArtifacts = any> {
 	source: string
@@ -33,10 +15,7 @@ export interface EmbedHandler<EmbedArtifacts = any> {
 	canHandleSource: (source: string, url: URL | undefined) => boolean | EmbedArtifacts
 	renderEmbed: () => ReactNode
 	populateEmbedData: (options: PopulateEmbedDataOptions<EmbedArtifacts>) => void
-
-	// Exactly one of these *MUST* be defined
-	discriminateBy?: SugaredDiscriminateBy
-	discriminateByScalar?: SugaredDiscriminateByScalar
+	discriminateBy: SugaredDiscriminateBy
 }
 
 export type NormalizedEmbedHandlers = NormalizedDiscriminatedData<EmbedHandler>

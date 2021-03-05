@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
-export const EntityKeyContext = React.createContext<undefined | string>(undefined)
+export const EntityKeyContext = createContext<undefined | string>(undefined)
 EntityKeyContext.displayName = 'EntityKeyContext'

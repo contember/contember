@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useReducer } from 'react'
 import { gridPagingReducer } from './gridPagingReducer'
 import { GridPagingState } from './GridPagingState'
 
@@ -10,4 +10,4 @@ const stateDefaults: GridPagingState = {
 export const useGridPagingState = ({
 	itemsPerPage = stateDefaults.itemsPerPage,
 	pageIndex = stateDefaults.pageIndex,
-}: Partial<GridPagingState> = stateDefaults) => React.useReducer(gridPagingReducer, { pageIndex, itemsPerPage })
+}: Partial<GridPagingState> = stateDefaults) => useReducer(gridPagingReducer, { pageIndex, itemsPerPage })

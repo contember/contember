@@ -1,16 +1,28 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { ButtonList } from './forms'
 import { Heading, HeadingProps } from './Heading'
 
 export interface TitleBarProps {
-	navigation?: React.ReactNode // This can contain any number of buttons but only buttons
-	children: React.ReactNode
+	navigation?: ReactNode // This can contain any number of buttons but only buttons
+	children: ReactNode
 	headingProps?: HeadingProps
-	actions?: React.ReactNode // This can contain any number of buttons but only buttons
+	actions?: ReactNode // This can contain any number of buttons but only buttons
 }
 
-export const TitleBar = React.memo(({ navigation, children, headingProps, actions }: TitleBarProps) => {
+export const TitleBar = memo(({ navigation, children, headingProps, actions }: TitleBarProps) => {
 	const prefix = useClassNamePrefix()
 	return (
 		<div className={`${prefix}titleBar`}>

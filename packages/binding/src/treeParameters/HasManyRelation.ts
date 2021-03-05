@@ -1,15 +1,15 @@
 import {
-	DesugaredEntityListParameters,
-	EntityListParameters,
-	SugarableEntityListParameters,
-	UnsugarableEntityListParameters,
-} from './EntityListParameters'
-import {
 	DesugaredEntityListEventListeners,
 	EntityListEventListeners,
 	SugarableEntityListEventListeners,
 	UnsugarableEntityListEventListeners,
 } from './EntityListEventListeners'
+import {
+	DesugaredEntityListParameters,
+	EntityListParameters,
+	SugarableEntityListParameters,
+	UnsugarableEntityListParameters,
+} from './EntityListParameters'
 import { DesugaredRelation, Relation, SugarableRelation, UnsugarableRelation } from './Relation'
 
 export interface DesugaredHasManyRelation

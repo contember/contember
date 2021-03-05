@@ -1,5 +1,5 @@
 import { debounce } from 'debounce'
-import * as React from 'react'
+import { useReducer, useRef, useCallback, useEffect } from 'react'
 import { Editor, Range as SlateRange } from 'slate'
 import { ReactEditor, useEditor } from 'slate-react'
 import { EditorSelectionActionType } from './EditorSelectionActionType'
@@ -8,13 +8,13 @@ import { EditorSelectionState, EditorSelectionStateName } from './EditorSelectio
 
 export const useEditorSelection = (maxInterval: number = 100): EditorSelectionState => {
 	const editor = useEditor()
-	const [selectionState, dispatch] = React.useReducer(editorSelectionReducer, defaultEditorSelectionState)
-	const selectionStateRef = React.useRef<EditorSelectionState>(selectionState)
+	const [selectionState, dispatch] = useReducer(editorSelectionReducer, defaultEditorSelectionState)
+	const selectionStateRef = useRef<EditorSelectionState>(selectionState)
 
 	selectionStateRef.current = selectionState
 
 	const onDOMSelectionChange = debounce(
-		React.useCallback(() => {
+		useCallback(() => {
 			const domSelection = getSelection()
 			const isRelevant =
 				domSelection &&
@@ -52,7 +52,7 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 		}, [editor]),
 		maxInterval,
 	)
-	const onMouseDown = React.useCallback(
+	const onMouseDown = useCallback(
 		(e: MouseEvent) => {
 			e.target &&
 				e.target instanceof Node &&
@@ -64,7 +64,7 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 		},
 		[editor],
 	)
-	const onMouseUp = React.useCallback(
+	const onMouseUp = useCallback(
 		(e: MouseEvent) => {
 			const relevantTarget = !!e.target && e.target instanceof Node && ReactEditor.hasDOMNode(editor, e.target)
 			dispatch({
@@ -75,7 +75,7 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 		[editor],
 	)
 
-	React.useEffect(() => {
+	useEffect(() => {
 		document.addEventListener('selectionchange', onDOMSelectionChange)
 		document.addEventListener('mousedown', onMouseDown)
 		document.addEventListener('mouseup', onMouseUp)

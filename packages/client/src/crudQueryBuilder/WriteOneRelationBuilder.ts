@@ -26,7 +26,7 @@ class WriteOneRelationBuilder<
 		if (typeof builder === 'function') {
 			return builder(WriteOneRelationBuilder.instantiate())
 		}
-		if ('data' in builder) {
+		if (builder && 'data' in builder!) {
 			return WriteOneRelationBuilder.instantiate(builder.data)
 		}
 		return WriteOneRelationBuilder.instantiate(builder)

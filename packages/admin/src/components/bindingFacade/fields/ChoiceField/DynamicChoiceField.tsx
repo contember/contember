@@ -10,7 +10,7 @@ import {
 } from '@contember/binding'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { assertNever } from '@contember/utils'
-import * as React from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicMultipleChoiceFieldProps, useDynamicMultipleChoiceField } from './useDynamicMultipleChoiceField'
 import { DynamicSingleChoiceFieldProps, useDynamicSingleChoiceField } from './useDynamicSingleChoiceField'
@@ -23,7 +23,9 @@ export type DynamicChoiceFieldProps =
 			arity: 'multiple'
 	  } & DynamicMultipleChoiceFieldProps)
 
-export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity>(
+export const DynamicChoiceField: FunctionComponent<
+	DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity
+> = Component(
 	props => {
 		useConstantValueInvariant(props.arity, `Cannot change dynamic choice field arity between renders!`)
 
@@ -37,8 +39,8 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 		return assertNever(props)
 	},
 	(props: DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity, environment) => {
-		let reference: React.ReactNode
-		let entityListDataProvider: React.ReactNode
+		let reference: ReactNode
+		let entityListDataProvider: ReactNode
 
 		const searchByFields =
 			props.searchByFields !== undefined &&
@@ -48,7 +50,7 @@ export const DynamicChoiceField = Component<DynamicChoiceFieldProps & ChoiceFiel
 				<Field field={props.searchByFields} />
 			))
 
-		let renderedOptionBase: React.ReactNode
+		let renderedOptionBase: ReactNode
 
 		if ('renderOption' in props) {
 			renderedOptionBase =

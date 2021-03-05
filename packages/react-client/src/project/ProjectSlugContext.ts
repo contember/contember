@@ -1,3 +1,3 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
-export const ProjectSlugContext = React.createContext<string | undefined>(undefined)
+export const ProjectSlugContext = createContext<string | undefined>(undefined)

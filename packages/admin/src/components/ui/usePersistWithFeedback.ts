@@ -1,12 +1,12 @@
 import { ErrorPersistResult, SuccessfulPersistResult, usePersist } from '@contember/binding'
-import * as React from 'react'
+import { useCallback } from 'react'
 import { useShowToastWithTimeout } from './useShowToastWithTimeout'
 
 export const usePersistWithFeedback = () => {
 	const persistAll = usePersist()
 	const showToast = useShowToastWithTimeout()
 
-	return React.useCallback((): Promise<SuccessfulPersistResult> => {
+	return useCallback((): Promise<SuccessfulPersistResult> => {
 		return persistAll()
 			.then(result => {
 				console.debug('persist success', result)

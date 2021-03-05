@@ -1,5 +1,19 @@
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { DataGridColumn, DataGridColumnProps, DataGridColumns } from '../base'
 
 class BoxedGridColumnProps {
@@ -13,7 +27,7 @@ const gridTemplateAnalyzer = new ChildrenAnalyzer<BoxedGridColumnProps>([gridCol
 	unhandledNodeErrorMessage: `DataGrid: encountered an illegal child node.`,
 })
 
-export const extractDataGridColumns = (nodes: React.ReactNode): DataGridColumns => {
+export const extractDataGridColumns = (nodes: ReactNode): DataGridColumns => {
 	const processed = gridTemplateAnalyzer.processChildren(nodes, undefined)
 	return new Map(processed.map((column, i) => [i, column.value]))
 }

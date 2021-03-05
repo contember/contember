@@ -1,5 +1,5 @@
-import { RouteMap } from '../components/pageRouting/utils'
 import { ComponentType } from 'react'
+import { RouteMap } from '../components/pageRouting/utils'
 import { SelectedDimension } from './request'
 
 export interface ProjectConfig {

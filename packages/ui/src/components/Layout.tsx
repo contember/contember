@@ -1,31 +1,43 @@
 import cn from 'classnames'
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { toViewClass } from '../utils'
 import { Trio } from './Trio'
 
 interface LayoutProps {
-	children?: React.ReactNode
+	children?: ReactNode
 
-	top?: React.ReactNode
-	topStart?: React.ReactNode
-	topCenter?: React.ReactNode
-	topEnd?: React.ReactNode
+	top?: ReactNode
+	topStart?: ReactNode
+	topCenter?: ReactNode
+	topEnd?: ReactNode
 
-	sideBar?: React.ReactNode
-	sideBarStart?: React.ReactNode
-	sideBarCenter?: React.ReactNode
-	sideBarEnd?: React.ReactNode
+	sideBar?: ReactNode
+	sideBarStart?: ReactNode
+	sideBarCenter?: ReactNode
+	sideBarEnd?: ReactNode
 
-	actions?: React.ReactNode
-	actionsStart?: React.ReactNode
-	actionsCenter?: React.ReactNode
-	actionsEnd?: React.ReactNode
+	actions?: ReactNode
+	actionsStart?: ReactNode
+	actionsCenter?: ReactNode
+	actionsEnd?: ReactNode
 
-	main?: React.ReactNode
-	mainStart?: React.ReactNode
-	mainCenter?: React.ReactNode
-	mainEnd?: React.ReactNode
+	main?: ReactNode
+	mainStart?: ReactNode
+	mainCenter?: ReactNode
+	mainEnd?: ReactNode
 }
 
 export const Layout = ({
@@ -49,14 +61,14 @@ export const Layout = ({
 }: LayoutProps) => {
 	const prefix = useClassNamePrefix()
 
-	const [collapsed, setCollapsed] = React.useState(false)
+	const [collapsed, setCollapsed] = useState(false)
 
-	const toggleCollapsed = React.useCallback(() => {
+	const toggleCollapsed = useCallback(() => {
 		setCollapsed(!collapsed)
 	}, [collapsed, setCollapsed])
 
-	const spaced = React.useCallback(
-		(content?: React.ReactNode) => content && <div className={`${prefix}layout-space`}>{content}</div>,
+	const spaced = useCallback(
+		(content?: ReactNode) => content && <div className={`${prefix}layout-space`}>{content}</div>,
 		[prefix],
 	)
 

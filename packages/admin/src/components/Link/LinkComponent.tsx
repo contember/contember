@@ -1,9 +1,16 @@
-import * as React from 'react'
-import { RequestChange } from '../../state/request'
 import { isSpecialLinkClick } from '@contember/ui'
+import {
+	AnchorHTMLAttributes,
+	ComponentType,
+	FunctionComponent,
+	MouseEvent as ReactMouseEvent,
+	PureComponent,
+	ReactNode,
+} from 'react'
+import { RequestChange } from '../../state/request'
 
-class LinkComponent extends React.PureComponent<LinkComponent.Props> {
-	onClick = (e?: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+class LinkComponent extends PureComponent<LinkComponent.Props> {
+	onClick = (e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		if (e) {
 			if (this.props.onClick) {
 				this.props.onClick(e)
@@ -16,7 +23,7 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props> {
 		this.props.goTo()
 	}
 
-	defaultComponent: React.FunctionComponent<InnerProps> = ({ href, onClick, isActive, ...props }) => (
+	defaultComponent: FunctionComponent<InnerProps> = ({ href, onClick, isActive, ...props }) => (
 		// TODO do something with isActive?
 		<a href={href} onClick={onClick} {...props}>
 			{this.props.children}
@@ -29,7 +36,7 @@ class LinkComponent extends React.PureComponent<LinkComponent.Props> {
 	}
 }
 
-export type PublicAnchorProps = Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
+export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
 
 export interface InnerProps extends PublicAnchorProps {
 	href: string
@@ -39,8 +46,8 @@ export interface InnerProps extends PublicAnchorProps {
 namespace LinkComponent {
 	export interface OwnProps {
 		requestChange: RequestChange
-		Component?: React.ComponentType<InnerProps>
-		children?: React.ReactNode
+		Component?: ComponentType<InnerProps>
+		children?: ReactNode
 	}
 
 	export interface DispatchProps {

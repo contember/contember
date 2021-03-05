@@ -1,6 +1,5 @@
 import { number, radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
 import { Heading } from '../../src/components'
 import { HeadingDepth } from '../../src/types'
 

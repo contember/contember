@@ -1,18 +1,18 @@
 import { radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { ButtonGroup, FormGroup } from '../../src'
-import { sizeKnob } from '../utils/knobs'
-import { SimpleTextInputStory } from './TextInput'
-import { simpleButtonStory } from './Button'
 import { Size } from '../../src/types'
+import { sizeKnob } from '../utils/knobs'
+import { simpleButtonStory } from './Button'
+import { SimpleTextInputStory } from './TextInput'
 
 const FormGroupStory = (props: {
 	label: string
 	labelDescription: string
 	description: string
 	useLabelElement?: boolean
-	children: (childrenProps: { size: Size | undefined; error: string }) => React.ReactNode
+	children: (childrenProps: { size: Size | undefined; error: string }) => ReactNode
 }) => {
 	const label = text('Label', props.label)
 	const size = sizeKnob()

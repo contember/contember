@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { ReactNode } from 'react'
 import { BuiltinLeaves } from './BuiltinLeaves'
 
 export interface RenderLeafFallbackProps {
@@ -6,8 +7,8 @@ export interface RenderLeafFallbackProps {
 }
 
 export function RenderLeafFallback({ leaf }: RenderLeafFallbackProps) {
-	// const formatVersion = React.useContext(RichTextFormatVersionContext)
-	let element: React.ReactNode = leaf.text
+	// const formatVersion = useContext(RichTextFormatVersionContext)
+	let element: ReactNode = leaf.text
 
 	if ('isCode' in leaf && leaf.isCode === true) {
 		element = <code>{element}</code>

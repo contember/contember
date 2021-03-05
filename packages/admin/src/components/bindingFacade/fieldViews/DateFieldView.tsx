@@ -1,16 +1,16 @@
 import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import * as React from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 
 export type DateFieldViewProps = {
 	field: SugaredFieldProps['field']
 } & (
-	| { format?: ((date: Date) => React.ReactNode) | Intl.DateTimeFormatOptions; locale?: never }
+	| { format?: ((date: Date) => ReactNode) | Intl.DateTimeFormatOptions; locale?: never }
 	| { format?: Intl.DateTimeFormatOptions; locale: string | string[] }
 ) &
 	FieldFallbackViewPublicProps
 
-export const DateFieldView = Component<DateFieldViewProps>(
+export const DateFieldView: FunctionComponent<DateFieldViewProps> = Component(
 	({ field, locale, format, fallback, fallbackStyle }) => {
 		const dateField = useField<string>(field)
 

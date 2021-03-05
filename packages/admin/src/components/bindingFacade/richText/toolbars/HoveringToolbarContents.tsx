@@ -1,6 +1,6 @@
 import { AccessorProvider, useBindingOperations, useEnvironment, VariableInputTransformer } from '@contember/binding'
 import { Dropdown, EditorToolbar, Icon, ToolbarGroup } from '@contember/ui'
-import * as React from 'react'
+import { memo, MouseEvent as ReactMouseEvent, useCallback, useState } from 'react'
 import { Range as SlateRange } from 'slate'
 import { useEditor, useSlate } from 'slate-react'
 import { BaseEditor } from '../baseEditor'
@@ -11,18 +11,18 @@ export interface HoveringToolbarContentsProps {
 	buttons: ToolbarButtonSpec[] | ToolbarButtonSpec[][]
 }
 
-const RefButton = React.memo(({ button }: { button: InitializeReferenceToolbarButton }) => {
+const RefButton = memo(({ button }: { button: InitializeReferenceToolbarButton }) => {
 	const editor = useEditor() as BlockSlateEditor
 	const environment = useEnvironment()
 	const bindingOperations = useBindingOperations()
 
-	const [editorSelection, setEditorSelection] = React.useState<SlateRange | null>(null)
-	const [referenceId, setReferenceId] = React.useState<string | undefined>(undefined)
+	const [editorSelection, setEditorSelection] = useState<SlateRange | null>(null)
+	const [referenceId, setReferenceId] = useState<string | undefined>(undefined)
 
 	const Content = button.referenceContent
 	return (
 		<Dropdown
-			onDismiss={React.useCallback(() => {
+			onDismiss={useCallback(() => {
 				if (referenceId === undefined) {
 					return
 				}
@@ -83,7 +83,7 @@ const RefButton = React.memo(({ button }: { button: InitializeReferenceToolbarBu
 	)
 })
 
-export const HoveringToolbarContents = React.memo(({ buttons: rawButtons }: HoveringToolbarContentsProps) => {
+export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringToolbarContentsProps) => {
 	const editor = useSlate() as BaseEditor
 
 	if (!rawButtons.length) {
@@ -114,7 +114,7 @@ export const HoveringToolbarContents = React.memo(({ buttons: rawButtons }: Hove
 						return {
 							label: button.title,
 							isActive: false,
-							//onMouseDown: (e: React.MouseEvent) => {
+							//onMouseDown: (e: MouseEvent) => {
 							//	e.preventDefault() // This is crucial so that we don't unselect the selected text
 							//	e.nativeEvent.stopPropagation() // This is a bit of a hack ‒ so that we don't register this click as a start of a new selection
 							//},
@@ -132,7 +132,7 @@ export const HoveringToolbarContents = React.memo(({ buttons: rawButtons }: Hove
 						label: button.title,
 						//layout?: ToolbarButtonLayout
 						isActive,
-						onMouseDown: (e: React.MouseEvent) => {
+						onMouseDown: (e: ReactMouseEvent) => {
 							e.preventDefault() // This is crucial so that we don't unselect the selected text
 							e.nativeEvent.stopPropagation() // This is a bit of a hack ‒ so that we don't register this click as a start of a new selection
 							onMouseDown()

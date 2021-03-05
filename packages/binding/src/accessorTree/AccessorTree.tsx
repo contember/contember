@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { BindingOperationsProvider } from '../accessorPropagation'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { DirtinessContext } from './DirtinessContext'
@@ -6,7 +6,7 @@ import { MutationStateContext } from './MutationStateContext'
 
 export interface AccessorTreeProps {
 	state: AccessorTreeState
-	children: React.ReactNode
+	children: ReactNode
 }
 
 export function AccessorTree({ state, children }: AccessorTreeProps) {

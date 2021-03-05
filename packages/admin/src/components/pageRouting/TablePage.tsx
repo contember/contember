@@ -4,7 +4,7 @@ import {
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
-import * as React from 'react'
+import { memo, ReactElement, ReactNode } from 'react'
 import { FeedbackRenderer, TableRenderer, TableRendererProps } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 
@@ -12,11 +12,11 @@ export interface TablePageProps<ContainerExtraProps, ItemExtraProps>
 	extends SugaredQualifiedEntityList,
 		EntityListSubTreeAdditionalProps {
 	pageName: string
-	children?: React.ReactNode
+	children?: ReactNode
 	rendererProps?: Omit<TableRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 }
 
-const TablePage = React.memo(
+const TablePage = memo(
 	<ContainerExtraProps, ItemExtraProps>({
 		rendererProps,
 		children,
@@ -31,7 +31,7 @@ const TablePage = React.memo(
 	),
 ) as (<ContainerExtraProps, ItemExtraProps>(
 	props: TablePageProps<ContainerExtraProps, ItemExtraProps>,
-) => React.ReactElement) &
+) => ReactElement) &
 	Partial<PageProvider<TablePageProps<never, never>>>
 
 TablePage.getPageName = (props: TablePageProps<never, never>) => props.pageName

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { useConstantLengthInvariant } from './useConstantLengthInvariant'
 
 /**
@@ -21,8 +21,8 @@ export const useArrayMapMemo = <Item, OutputItem>(
 	// preserve the referential equality of the original. Hence the second memo.
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	const mapped = React.useMemo(() => items.map(map), [map, ...items])
+	const mapped = useMemo(() => items.map(map), [map, ...items])
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	return React.useMemo(() => mapped, mapped) // This is deliberately not `[mapped]`
+	return useMemo(() => mapped, mapped) // This is deliberately not `[mapped]`
 }

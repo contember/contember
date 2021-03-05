@@ -22,7 +22,17 @@ import {
 } from '@contember/binding'
 import { emptyArray, noop, useConstantLengthInvariant } from '@contember/react-utils'
 import { EditorCanvas } from '@contember/ui'
-import * as React from 'react'
+import {
+	Fragment,
+	FunctionComponent,
+	ReactElement,
+	ReactNode,
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from 'react'
 import { Editor, PathRef, Range as SlateRange } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
@@ -46,10 +56,10 @@ import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './t
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 
 export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEditorPublicOptions {
-	label: React.ReactNode
+	label: ReactNode
 	contentField: SugaredFieldProps['field']
 	sortableBy: SugaredFieldProps['field']
-	children?: React.ReactNode
+	children?: ReactNode
 
 	leadingFieldBackedElements?: FieldBackedElement[]
 	trailingFieldBackedElements?: FieldBackedElement[]
@@ -69,7 +79,7 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 }
 
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
-const BlockEditorComponent = Component<BlockEditorProps>(
+const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 	props => {
 		const environment = useEnvironment()
 		//const isMutating = useMutationState()
@@ -132,7 +142,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 		//
 
 		const discriminatedEmbedHandlers = useDiscriminatedData<EmbedHandler>(embedHandlers)
-		const embedReferenceDiscriminant = React.useMemo<FieldValue | undefined>(() => {
+		const embedReferenceDiscriminant = useMemo<FieldValue | undefined>(() => {
 			if (embedReferenceDiscriminateBy !== undefined) {
 				return VariableInputTransformer.transformVariableLiteral(embedReferenceDiscriminateBy, environment)
 			}
@@ -146,20 +156,18 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 
 		//
 
-		const [contemberFieldElementCache] = React.useState(
-			() => new WeakMap<FieldAccessor<string>, ContemberFieldElement>(),
-		)
-		const [blockElementCache] = React.useState(() => new WeakMap<EntityAccessor, ElementNode>())
-		const [blockElementPathRefs] = React.useState(() => new Map<string, PathRef>())
+		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ContemberFieldElement>())
+		const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, ElementNode>())
+		const [blockElementPathRefs] = useState(() => new Map<string, PathRef>())
 
 		//
 
-		const batchUpdatesRef = React.useRef(batchUpdates)
-		const blockListRef = React.useRef(blockList)
-		const isMutatingRef = React.useRef(isMutating)
-		const sortedBlocksRef = React.useRef(topLevelBlocks)
+		const batchUpdatesRef = useRef(batchUpdates)
+		const blockListRef = useRef(blockList)
+		const isMutatingRef = useRef(isMutating)
+		const sortedBlocksRef = useRef(topLevelBlocks)
 
-		React.useLayoutEffect(() => {
+		useLayoutEffect(() => {
 			batchUpdatesRef.current = batchUpdates
 			blockListRef.current = blockList
 			isMutatingRef.current = isMutating
@@ -168,7 +176,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 
 		// TODO this isn't particularly great. We should probably react to id changes more directly.
 		useEntityPersistSuccess(
-			React.useCallback(() => {
+			useCallback(() => {
 				for (const [, ref] of blockElementPathRefs) {
 					ref.unref()
 				}
@@ -176,7 +184,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 			}, [blockElementPathRefs]),
 		)
 
-		const [editor] = React.useState(() =>
+		const [editor] = useState(() =>
 			createBlockEditor({
 				augmentEditor,
 				augmentEditorBuiltins,
@@ -221,7 +229,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 		})
 
 		// TODO this is a bit of a hack.
-		const shouldDisplayInlineToolbar = React.useCallback(() => {
+		const shouldDisplayInlineToolbar = useCallback(() => {
 			const selection = editor.selection
 
 			if (!selection || SlateRange.isCollapsed(selection)) {
@@ -259,7 +267,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 					}}
 					size="large"
 				>
-					{React.useMemo(
+					{useMemo(
 						() => (
 							<HoveringToolbars
 								shouldDisplayInlineToolbar={shouldDisplayInlineToolbar}
@@ -308,7 +316,7 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 					<>
 						<SugaredField field={props.embedContentDiscriminationField} />
 						{embedHandlers.map((handler, i) => (
-							<React.Fragment key={i}>{handler.staticRender(environment)}</React.Fragment>
+							<Fragment key={i}>{handler.staticRender(environment)}</Fragment>
 						))}
 					</>
 				)}
@@ -338,8 +346,8 @@ const BlockEditorComponent = Component<BlockEditorProps>(
 export const BlockEditor = Object.assign<
 	typeof BlockEditorComponent,
 	{
-		ContentOutlet: (props: ContentOutletProps) => React.ReactElement | null
-		// TextField: (props: TextFieldProps) => React.ReactElement | null
+		ContentOutlet: (props: ContentOutletProps) => ReactElement | null
+		// TextField: (props: TextFieldProps) => ReactElement | null
 	}
 >(BlockEditorComponent, {
 	ContentOutlet,
@@ -356,7 +364,7 @@ const useFieldBackedElements = (entity: EntityAccessor, original: FieldBackedEle
 	})
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	return React.useMemo(() => unstableAccessorArray, unstableAccessorArray)
+	return useMemo(() => unstableAccessorArray, unstableAccessorArray)
 }
 
 const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment: Environment) => {

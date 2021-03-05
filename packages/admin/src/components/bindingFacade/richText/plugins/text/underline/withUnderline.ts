@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey'
-import * as React from 'react'
+import { createElement } from 'react'
 import { BaseEditor } from '../../../baseEditor'
 
 export const underlineMark = 'isUnderlined'
@@ -13,7 +13,7 @@ export const withUnderline = <E extends BaseEditor>(editor: E): E => {
 		const children = renderLeafChildren(props)
 
 		if (props.leaf[underlineMark] === true) {
-			return React.createElement('u', undefined, children)
+			return createElement('u', undefined, children)
 		}
 		return children
 	}

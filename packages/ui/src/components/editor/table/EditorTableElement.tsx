@@ -1,10 +1,10 @@
-import * as React from 'react'
-import { useClassNamePrefix } from '../../../auxiliary'
 import cn from 'classnames'
+import { CSSProperties, Fragment, memo, ReactNode } from 'react'
+import { useClassNamePrefix } from '../../../auxiliary'
 import { toStateClass } from '../../../utils'
 import { Dropdown } from '../../Dropdown'
+import { Button, ButtonGroup } from '../../forms'
 import { Icon } from '../../Icon'
-import { Button, ButtonGroup, ButtonList } from '../../forms'
 
 export interface EditorTableElementProps {
 	rowCount: number
@@ -18,10 +18,10 @@ export interface EditorTableElementProps {
 	//selectTable: () => void
 	isSelected: boolean
 	isFocused: boolean
-	children: React.ReactNode
+	children: ReactNode
 }
 
-export const EditorTableElement = React.memo(function EditorTableElement({
+export const EditorTableElement = memo(function EditorTableElement({
 	rowCount,
 	columnCount,
 	addRow,
@@ -43,7 +43,7 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 				{
 					[`--${prefix}editorTable-rowCount`]: rowCount,
 					[`--${prefix}editorTable-columnCount`]: columnCount,
-				} as React.CSSProperties
+				} as CSSProperties
 			}
 		>
 			<div className={cn(`${prefix}editorTable-handle`)} contentEditable={false}>
@@ -58,9 +58,9 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 			</div>
 			<div className={cn(`${prefix}editorTable-columnControls`)} contentEditable={false}>
 				{Array.from({ length: columnCount + 1 }, (_, columnNumber) => {
-					const columnStyle = { [`--${prefix}editorTable-column`]: columnNumber } as React.CSSProperties
+					const columnStyle = { [`--${prefix}editorTable-column`]: columnNumber } as CSSProperties
 					return (
-						<React.Fragment key={columnNumber}>
+						<Fragment key={columnNumber}>
 							{columnNumber < columnCount ? (
 								<Dropdown
 									buttonProps={{
@@ -115,15 +115,15 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 								<Icon blueprintIcon="plus" />
 							</Button>
 							<div className={cn(`${prefix}editorTable-columnControls-line`)} style={columnStyle} />
-						</React.Fragment>
+						</Fragment>
 					)
 				})}
 			</div>
 			<div className={cn(`${prefix}editorTable-rowControls`)} contentEditable={false}>
 				{Array.from({ length: rowCount + 1 }, (_, rowNumber) => {
-					const rowStyle = { [`--${prefix}editorTable-row`]: rowNumber } as React.CSSProperties
+					const rowStyle = { [`--${prefix}editorTable-row`]: rowNumber } as CSSProperties
 					return (
-						<React.Fragment key={rowNumber}>
+						<Fragment key={rowNumber}>
 							{rowNumber < rowCount ? (
 								<button
 									type="button"
@@ -151,7 +151,7 @@ export const EditorTableElement = React.memo(function EditorTableElement({
 								<Icon blueprintIcon="plus" />
 							</Button>
 							<div className={cn(`${prefix}editorTable-rowControls-line`)} style={rowStyle} />
-						</React.Fragment>
+						</Fragment>
 					)
 				})}
 			</div>

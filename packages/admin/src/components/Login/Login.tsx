@@ -1,34 +1,31 @@
 import { getTenantErrorMessage } from '@contember/client'
+import { useLoginRequest } from '@contember/react-client'
 import { Button, ErrorList, FormGroup, TextInput } from '@contember/ui'
-import * as React from 'react'
+import { ChangeEvent, FormEvent, memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { createAction } from 'redux-actions'
-import { useLoginRequest } from '@contember/react-client'
 import { SET_IDENTITY } from '../../reducer/auth'
 import { AuthIdentity, Project } from '../../state/auth'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { useRedirect } from '../pageRouting'
 
-export const Login = React.memo(() => {
+export const Login = memo(() => {
 	const [requestState, login] = useLoginRequest()
-	const [email, setEmail] = React.useState('')
-	const [password, setPassword] = React.useState('')
+	const [email, setEmail] = useState('')
+	const [password, setPassword] = useState('')
 	const isLoading = requestState.isLoading
 
-	const onSubmit = React.useCallback(
-		(e: React.FormEvent<HTMLFormElement>) => {
+	const onSubmit = useCallback(
+		(e: FormEvent<HTMLFormElement>) => {
 			e.preventDefault()
 			login(email, password)
 		},
 		[email, login, password],
 	)
-	const onEmailChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value), [])
-	const onPasswordChange = React.useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value),
-		[],
-	)
+	const onEmailChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value), [])
+	const onPasswordChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value), [])
 
-	const errorMessages = React.useMemo(() => {
+	const errorMessages = useMemo(() => {
 		let errors: string[] = []
 
 		if (requestState.readyState === 'networkError') {
@@ -46,7 +43,7 @@ export const Login = React.memo(() => {
 
 	const dispatch = useDispatch()
 	const redirect = useRedirect()
-	React.useEffect(() => {
+	useEffect(() => {
 		if (requestState.readyState === 'networkSuccess') {
 			const signIn = requestState.data.data.signIn
 			const { ok, result } = signIn

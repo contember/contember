@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Icon } from '@contember/ui'
 
 export const DragHandle = () => {

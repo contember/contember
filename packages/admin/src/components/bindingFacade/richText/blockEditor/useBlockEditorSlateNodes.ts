@@ -1,5 +1,19 @@
 import { BindingError, EntityAccessor, FieldAccessor, RelativeSingleField } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { Editor, Element as SlateElement, PathRef } from 'slate'
 import { ElementNode } from '../baseEditor'
 import { BlockSlateEditor } from './editor'
@@ -22,7 +36,7 @@ export interface UseBlockEditorSlateNodesOptions {
 	trailingFieldBackedElements: FieldBackedElement[]
 	leadingFieldBackedAccessors: FieldAccessor<string>[]
 	trailingFieldBackedAccessors: FieldAccessor<string>[]
-	placeholder: React.ReactNode
+	placeholder: ReactNode
 }
 
 export const useBlockEditorSlateNodes = ({

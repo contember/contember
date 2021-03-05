@@ -1,6 +1,6 @@
 import { EntityAccessor, SugaredRelativeSingleField, useDesugaredRelativeSingleField } from '@contember/binding'
 import { Button, ButtonGroup, DropdownRenderProps } from '@contember/ui'
-import * as React from 'react'
+import { memo } from 'react'
 import { NormalizedBlocks } from '../../blocks'
 import { CreateNewEntityButtonProps } from '../helpers'
 
@@ -10,7 +10,7 @@ export interface AddNewBlockButtonInnerProps extends DropdownRenderProps, Create
 	isMutating: boolean
 }
 
-export const AddNewBlockButtonInner = React.memo<AddNewBlockButtonInnerProps>(props => {
+export const AddNewBlockButtonInner = memo<AddNewBlockButtonInnerProps>(props => {
 	const desugaredDiscriminationField = useDesugaredRelativeSingleField(props.discriminationField)
 	return (
 		<ButtonGroup orientation="vertical">

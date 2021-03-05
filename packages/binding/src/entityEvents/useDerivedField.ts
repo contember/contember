@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useCallback, useEffect } from 'react'
 import { useDesugaredRelativeSingleField, useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
@@ -27,7 +27,7 @@ export const useDerivedField = <SourcePersisted extends FieldValue = FieldValue>
 	const potentiallyStaleSourceAccessor = potentiallyStaleParent.getRelativeSingleField<SourcePersisted>(desugaredSource)
 	const stableAddEventListenerReference = potentiallyStaleSourceAccessor.addEventListener
 
-	const onBeforeUpdate = React.useCallback<FieldAccessor.BeforeUpdateListener<SourcePersisted>>(
+	const onBeforeUpdate = useCallback<FieldAccessor.BeforeUpdateListener<SourcePersisted>>(
 		sourceAccessor => {
 			stableBatchUpdatesReference(getAccessor => {
 				// This is tricky: we're deliberately getting the Entity, and not the field
@@ -53,7 +53,7 @@ export const useDerivedField = <SourcePersisted extends FieldValue = FieldValue>
 		[agent, desugaredDerived, transform, stableBatchUpdatesReference],
 	)
 
-	React.useEffect(() => stableAddEventListenerReference('beforeUpdate', onBeforeUpdate), [
+	useEffect(() => stableAddEventListenerReference('beforeUpdate', onBeforeUpdate), [
 		onBeforeUpdate,
 		stableAddEventListenerReference,
 	])

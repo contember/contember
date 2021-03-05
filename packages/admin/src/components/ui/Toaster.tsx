@@ -1,10 +1,10 @@
-import * as React from 'react'
-import { connect } from 'react-redux'
-import ToastsState, { ToastId, ToastType } from '../../state/toasts'
-import State from '../../state'
-import { Dispatch } from '../../actions/types'
-import { dismissToast } from '../../actions/toasts'
 import { Button, Icon, Intent, Message, MessageProps } from '@contember/ui'
+import { PureComponent } from 'react'
+import { connect } from 'react-redux'
+import { dismissToast } from '../../actions/toasts'
+import { Dispatch } from '../../actions/types'
+import State from '../../state'
+import ToastsState, { ToastId, ToastType } from '../../state/toasts'
 
 const toastTypeToMessageType: { [K in ToastType]: MessageProps['type'] } = {
 	success: 'success',
@@ -19,7 +19,7 @@ const toastTypeToIntent: { [K in ToastType]: Intent } = {
 	info: 'primary',
 }
 
-class ToasterConnected extends React.PureComponent<Toaster.ToasterStateProps & Toaster.ToasterDispatcherProps> {
+class ToasterConnected extends PureComponent<Toaster.ToasterStateProps & Toaster.ToasterDispatcherProps> {
 	render() {
 		return (
 			<div className="toaster">

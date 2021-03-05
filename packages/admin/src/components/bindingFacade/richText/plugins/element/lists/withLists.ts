@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createElement } from 'react'
 import {
 	Editor,
 	Element as SlateElement,
@@ -48,21 +48,21 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		renderElement: props => {
 			switch (props.element.type) {
 				case listItemElementType:
-					return React.createElement(BlockElement, {
+					return createElement(BlockElement, {
 						element: props.element,
 						attributes: props.attributes,
 						domElement: 'li',
 						children: props.children,
 					})
 				case unorderedListElementType:
-					return React.createElement(BlockElement, {
+					return createElement(BlockElement, {
 						element: props.element,
 						attributes: props.attributes,
 						domElement: 'ul',
 						children: props.children,
 					})
 				case orderedListElementType:
-					return React.createElement(BlockElement, {
+					return createElement(BlockElement, {
 						element: props.element,
 						attributes: props.attributes,
 						domElement: 'ol',

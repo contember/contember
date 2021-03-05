@@ -1,17 +1,26 @@
 import { DevErrorBoundary } from '@contember/ui'
-import * as React from 'react'
+import {
+	ComponentType,
+	createContext,
+	Fragment,
+	isValidElement,
+	PureComponent,
+	ReactElement,
+	ReactNode,
+	ReactNodeArray,
+} from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
 import { Page, PageProps } from './Page'
 import { PageProvider } from './PageProvider'
 
-type PageProviderElement = React.ReactElement<any> & { type: PageProvider }
-type PageElement = React.ReactElement<PageProps>
+type PageProviderElement = ReactElement<any> & { type: PageProvider }
+type PageElement = ReactElement<PageProps>
 type PageChild = PageElement | PageProviderElement
 
 export interface PagesProps {
 	children: PageChild[] | PageChild
-	layout?: React.ComponentType<{ children?: React.ReactNode }>
+	layout?: ComponentType<{ children?: ReactNode }>
 }
 
 export interface PagesStateProps {
@@ -20,33 +29,31 @@ export interface PagesStateProps {
 }
 
 function isPageProvider(el: any): el is PageProviderElement {
-	return React.isValidElement(el) && typeof (el.type as any).getPageName === 'function'
+	return isValidElement(el) && typeof (el.type as any).getPageName === 'function'
 }
 
 function isPageElement(el: any): el is PageElement {
-	if (React.isValidElement<PageProps>(el)) {
+	if (isValidElement<PageProps>(el)) {
 		return el.type === Page
 	} else {
 		return false
 	}
 }
 
-function isPageList(children: React.ReactNodeArray): children is PageChild[] {
+function isPageList(children: ReactNodeArray): children is PageChild[] {
 	return children.every(child => isPageElement(child) || isPageProvider(child))
 }
 
 export type Parameters = any
-export const ParametersContext = React.createContext<Parameters>({})
+export const ParametersContext = createContext<Parameters>({})
 
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
-class Pages extends React.PureComponent<PagesProps & PagesStateProps> {
+class Pages extends PureComponent<PagesProps & PagesStateProps> {
 	render() {
 		if (!this.props.children) return null
-		const children: React.ReactNodeArray = Array.isArray(this.props.children)
-			? this.props.children
-			: [this.props.children]
+		const children: ReactNodeArray = Array.isArray(this.props.children) ? this.props.children : [this.props.children]
 
 		if (!isPageList(children)) {
 			throw new Error('Pages has a child which is not a Page')
@@ -64,18 +71,16 @@ class Pages extends React.PureComponent<PagesProps & PagesStateProps> {
 		const pageName = pageNames[matchedPageIndex]
 
 		const isProvider = isPageProvider(matchedPage)
-		const Layout = this.props.layout || React.Fragment
+		const Layout = this.props.layout || Fragment
 		return (
 			<DevErrorBoundary>
 				<Layout>
 					{isProvider && (
 						<ParametersContext.Provider value={this.props.parameters}>
-							<React.Fragment key={pageName}>{matchedPage}</React.Fragment>
+							<Fragment key={pageName}>{matchedPage}</Fragment>
 						</ParametersContext.Provider>
 					)}
-					{isProvider || (
-						<React.Fragment key={pageName}>{matchedPage.props.children(this.props.parameters)}</React.Fragment>
-					)}
+					{isProvider || <Fragment key={pageName}>{matchedPage.props.children(this.props.parameters)}</Fragment>}
 				</Layout>
 			</DevErrorBoundary>
 		)

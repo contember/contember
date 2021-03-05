@@ -1,5 +1,19 @@
 import { EntityAccessor, Environment } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import {
 	NormalizedDiscriminatedData,
 	SugaredDiscriminateBy,
@@ -15,9 +29,9 @@ export interface PopulateEmbedDataOptions<EmbedArtifacts = any> {
 export interface EmbedHandler<EmbedArtifacts = any> {
 	debugName: string // Optional for error messages
 
-	staticRender: (environment: Environment) => React.ReactNode
+	staticRender: (environment: Environment) => ReactNode
 	canHandleSource: (source: string, url: URL | undefined) => boolean | EmbedArtifacts
-	renderEmbed: () => React.ReactNode
+	renderEmbed: () => ReactNode
 	populateEmbedData: (options: PopulateEmbedDataOptions<EmbedArtifacts>) => void
 
 	// Exactly one of these *MUST* be defined

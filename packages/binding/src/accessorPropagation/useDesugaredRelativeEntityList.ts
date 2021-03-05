@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { QueryLanguage } from '../queryLanguage'
 import { RelativeEntityList, SugaredRelativeEntityList } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
@@ -29,7 +29,7 @@ function useDesugaredRelativeEntityList(
 		normalizedSugared = sugaredRelativeEntityList
 	}
 
-	return React.useMemo(
+	return useMemo(
 		() =>
 			hasList
 				? QueryLanguage.desugarRelativeEntityList(

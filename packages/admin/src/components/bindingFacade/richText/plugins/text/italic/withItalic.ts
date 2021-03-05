@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey'
-import * as React from 'react'
+import { createElement } from 'react'
 import { BaseEditor } from '../../../baseEditor'
 import { boldMark } from '../bold'
 
@@ -14,7 +14,7 @@ export const withItalic = <E extends BaseEditor>(editor: E): E => {
 		const children = renderLeafChildren(props)
 
 		if (props.leaf[italicMark] === true) {
-			return React.createElement('i', undefined, children)
+			return createElement('i', undefined, children)
 		}
 		return children
 	}

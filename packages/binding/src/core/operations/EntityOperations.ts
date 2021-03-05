@@ -1,4 +1,4 @@
-import { BatchUpdatesOptions, BindingOperations, EntityAccessor } from '../../accessors'
+import { BatchUpdatesOptions, EntityAccessor } from '../../accessors'
 import { ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EntityFieldMarkersContainer, HasOneRelationMarker } from '../../markers'

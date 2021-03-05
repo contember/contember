@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { Node as SlateNode, Path as SlatePath, Text, Transforms } from 'slate'
 import { EditorNode } from '../../baseEditor'
 import { ContemberEditor } from '../../ContemberEditor'
@@ -166,7 +166,7 @@ const ejectPlaceholder = <E extends BlockSlateEditor>(editor: E, path: SlatePath
 	})
 }
 
-const insertPlaceholderAt = <E extends BlockSlateEditor>(editor: E, placeholder: React.ReactNode, path: SlatePath) => {
+const insertPlaceholderAt = <E extends BlockSlateEditor>(editor: E, placeholder: ReactNode, path: SlatePath) => {
 	Transforms.insertNodes(
 		editor,
 		{

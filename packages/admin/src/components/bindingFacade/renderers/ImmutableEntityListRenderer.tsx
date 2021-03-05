@@ -1,5 +1,19 @@
 import { Component, EntityListAccessor } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { RepeaterInner, RepeaterInnerProps } from '../collections/Repeater'
 
 export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>
@@ -18,8 +32,8 @@ export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtra
 		| 'dragHandleComponent'
 		| 'useDragHandle'
 	> {
-	beforeContent?: React.ReactNode
-	afterContent?: React.ReactNode
+	beforeContent?: ReactNode
+	afterContent?: ReactNode
 	accessor: EntityListAccessor
 }
 
@@ -52,4 +66,4 @@ export const ImmutableEntityListRenderer = Component(
 	'ImmutableEntityListRenderer',
 ) as <ContainerExtraProps, ItemExtraProps>(
 	props: ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>,
-) => React.ReactElement
+) => ReactElement

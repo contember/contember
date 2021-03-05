@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useState, useCallback } from 'react'
 import { DataGridColumns, DataGridFilterArtifactStore, DataGridSetColumnFilter } from '../base'
 import { GridPagingAction } from '../paging'
 import { normalizeInitialFilters } from './normalizeInitialFilters'
@@ -7,11 +7,11 @@ export const useFilters = (
 	columns: DataGridColumns,
 	updatePaging: (action: GridPagingAction) => void,
 ): [DataGridFilterArtifactStore, DataGridSetColumnFilter] => {
-	const [filters, setFilters] = React.useState<DataGridFilterArtifactStore>(() => normalizeInitialFilters(columns))
+	const [filters, setFilters] = useState<DataGridFilterArtifactStore>(() => normalizeInitialFilters(columns))
 
 	return [
 		filters,
-		React.useCallback(
+		useCallback(
 			(columnKey, columnFilter) => {
 				const column = columns.get(columnKey)
 				if (column === undefined || column.enableFiltering === false) {

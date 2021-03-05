@@ -1,5 +1,5 @@
 import { GraphQlClient } from '@contember/client'
-import * as React from 'react'
+import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { ApiRequestActionType } from './ApiRequestActionType'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
 import { ApiRequestState } from './ApiRequestState'
@@ -20,10 +20,10 @@ export const useApiRequest = <SuccessData>(
 		options?: Omit<GraphQlClient.RequestOptions, 'variables'>,
 	) => Promise<SuccessData>,
 ] => {
-	const [state, dispatch] = React.useReducer(apiRequestReducer as ApiRequestReducer<SuccessData>, initialState)
+	const [state, dispatch] = useReducer(apiRequestReducer as ApiRequestReducer<SuccessData>, initialState)
 
-	const isUnmountedRef = React.useRef(false)
-	const sendRequest = React.useCallback(
+	const isUnmountedRef = useRef(false)
+	const sendRequest = useCallback(
 		async (
 			query: string,
 			variables: GraphQlClient.Variables = {},
@@ -58,7 +58,7 @@ export const useApiRequest = <SuccessData>(
 		[client],
 	)
 
-	React.useEffect(
+	useEffect(
 		() => () => {
 			isUnmountedRef.current = true
 		},

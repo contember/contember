@@ -1,4 +1,18 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { shallowEqual, useSelector } from 'react-redux'
 import { PageLink } from '../pageRouting'
 import { DynamicLink } from '../DynamicLink'
@@ -10,10 +24,10 @@ import { PageRequest, pageRequest } from '../../state/request'
 import { isUrlActive } from '../../utils/isUrlActive'
 
 export interface NavigationIsActiveProviderProps {
-	children?: React.ReactNode
+	children?: ReactNode
 }
 
-export const NavigationIsActiveProvider = React.memo(function NavigationIsActiveProvider(
+export const NavigationIsActiveProvider = memo(function NavigationIsActiveProvider(
 	props: NavigationIsActiveProviderProps,
 ) {
 	const viewRoute = useSelector((state: State): PageRequest<any> | undefined => {
@@ -24,7 +38,7 @@ export const NavigationIsActiveProvider = React.memo(function NavigationIsActive
 	}, shallowEqual)
 	const configs = useSelector((state: State) => state.projectsConfigs.configs, shallowEqual)
 	const request = useSelector((state: State) => state.request, shallowEqual)
-	const isActive = React.useCallback(
+	const isActive = useCallback(
 		(to: string | Navigation.CustomTo) => {
 			if (viewRoute === undefined) {
 				return false
@@ -48,10 +62,10 @@ export const NavigationIsActiveProvider = React.memo(function NavigationIsActive
 NavigationIsActiveProvider.displayName = 'NavigationIsActiveProvider'
 
 export interface NavigationProviderProps {
-	children?: React.ReactNode
+	children?: ReactNode
 }
 
-export const NavigationProvider = React.memo(function NavigationProvider(props: NavigationProviderProps) {
+export const NavigationProvider = memo(function NavigationProvider(props: NavigationProviderProps) {
 	return (
 		<NavigationIsActiveProvider>
 			<Navigation.MiddlewareContext.Provider

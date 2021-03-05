@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { FunctionComponent, MouseEvent as ReactMouseEvent } from 'react'
 import { RenderElementProps } from 'slate-react'
 import { AnchorElement } from './AnchorElement'
 
@@ -6,7 +6,7 @@ export interface AnchorRendererProps extends Omit<RenderElementProps, 'element'>
 	element: AnchorElement
 }
 
-const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+const onClick = (e: ReactMouseEvent<HTMLAnchorElement>) => {
 	// I cannot believe this works.
 	window.open(e.currentTarget.href, '_blank')
 }
@@ -15,7 +15,7 @@ const style = {
 	cursor: 'pointer',
 } as const
 
-export const AnchorRenderer: React.FunctionComponent<AnchorRendererProps> = (props: AnchorRendererProps) => (
+export const AnchorRenderer: FunctionComponent<AnchorRendererProps> = (props: AnchorRendererProps) => (
 	<a
 		{...props.attributes}
 		href={props.element.href}

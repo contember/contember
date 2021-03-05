@@ -1,14 +1,14 @@
 import { EntityName, Filter } from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
 import { useContentApiRequest } from '@contember/react-client'
-import * as React from 'react'
+import { useRef, useEffect } from 'react'
 
 export const useHackyTotalCount = (entityName: EntityName, filter: Filter | undefined): number | undefined => {
 	const [queryState, sendQuery] = useContentApiRequest<{
 		data: { paginate: { pageInfo: { totalCount: number } } }
 	}>()
 
-	const loadAbortControllerRef = React.useRef<AbortController | undefined>(undefined)
+	const loadAbortControllerRef = useRef<AbortController | undefined>(undefined)
 
 	const query = new GraphQlBuilder.QueryBuilder().query(builder =>
 		builder.object('paginate', builder => {
@@ -20,7 +20,7 @@ export const useHackyTotalCount = (entityName: EntityName, filter: Filter | unde
 		}),
 	)
 
-	React.useEffect(() => {
+	useEffect(() => {
 		loadAbortControllerRef.current?.abort()
 
 		const newController = new AbortController()

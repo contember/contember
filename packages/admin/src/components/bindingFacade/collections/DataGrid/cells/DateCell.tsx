@@ -1,7 +1,7 @@
 import { Component, Literal, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import { Input } from '@contember/client'
 import { FormGroup, TextInput } from '@contember/ui'
-import * as React from 'react'
+import { forwardRef, FunctionComponent, memo } from 'react'
 import DatePicker from 'react-datepicker'
 import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
@@ -18,7 +18,7 @@ interface DateRange {
 	end: Date | undefined
 }
 
-export const DateCell = Component<DateCellProps>(props => {
+export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 	return (
 		<DataGridColumn<DateRange>
 			{...props}
@@ -85,8 +85,8 @@ export const DateCell = Component<DateCellProps>(props => {
 	)
 }, 'DateCell')
 
-const DateBoundInput = React.memo(
-	React.forwardRef(({ className, label, style, ...props }: any, ref: any) => (
+const DateBoundInput = memo(
+	forwardRef(({ className, label, style, ...props }: any, ref: any) => (
 		<FormGroup label={label} labelPosition="labelInlineLeft">
 			<TextInput {...props} style={{ ...style, width: '130px' }} ref={ref} />
 		</FormGroup>

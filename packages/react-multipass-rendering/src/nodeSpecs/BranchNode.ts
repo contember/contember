@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ElementType } from 'react'
 import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError'
 import { BranchNodeOptions } from './BranchNodeOptions'
 import {
@@ -43,7 +43,7 @@ class BranchNode<
 			Representation,
 			StaticContext
 		>,
-		ComponentType?: React.ElementType<Props>,
+		ComponentType?: ElementType<Props>,
 		options?: Partial<BranchNodeOptions>,
 	)
 	public constructor(
@@ -52,7 +52,7 @@ class BranchNode<
 			| UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>,
 		componentOrReducer?:
 			| ChildrenRepresentationReducer<ChildrenRepresentation, ReducedChildrenRepresentation>
-			| React.ElementType<Props>,
+			| ElementType<Props>,
 		options?: Partial<BranchNodeOptions>,
 	) {
 		if (typeof factory !== 'function') {
@@ -68,7 +68,7 @@ class BranchNode<
 			this.specification = {
 				type: RepresentationFactorySite.UseSite,
 				factory,
-				ComponentType: componentOrReducer as React.ElementType<Props>,
+				ComponentType: componentOrReducer as ElementType<Props>,
 			}
 		} else {
 			throw new ChildrenAnalyzerError('Invalid arguments')
@@ -100,7 +100,7 @@ namespace BranchNode {
 		| {
 				type: RepresentationFactorySite.UseSite
 				factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>
-				ComponentType?: React.ElementType<Props>
+				ComponentType?: ElementType<Props>
 		  }
 }
 

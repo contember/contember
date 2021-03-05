@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Component as ReactComponent, ComponentType, FunctionComponent } from 'react'
 import { connect } from 'react-redux'
 import { logout } from '../actions/auth'
 import { Dispatch } from '../actions/types'
@@ -9,7 +9,7 @@ interface InnerProps {
 }
 
 interface LogoutLinkProps {
-	Component?: React.ComponentType<InnerProps>
+	Component?: ComponentType<InnerProps>
 }
 
 interface LogoutDispatchProps {
@@ -18,7 +18,7 @@ interface LogoutDispatchProps {
 
 type Props = LogoutDispatchProps & LogoutLinkProps
 
-class LogoutLink extends React.Component<Props, {}> {
+class LogoutLink extends ReactComponent<Props, {}> {
 	onClick = async () => {
 		if (navigator.credentials && navigator.credentials.preventSilentAccess) {
 			await navigator.credentials.preventSilentAccess()
@@ -27,7 +27,7 @@ class LogoutLink extends React.Component<Props, {}> {
 		this.props.logout()
 	}
 
-	defaultComponent: React.FunctionComponent<InnerProps> = () => (
+	defaultComponent: FunctionComponent<InnerProps> = () => (
 		<a href="#" onClick={this.props.logout}>
 			{this.props.children}
 		</a>

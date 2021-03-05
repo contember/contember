@@ -1,6 +1,14 @@
 import { IconName as BPIconName, IconSvgPaths16 } from '@blueprintjs/icons'
 import cn from 'classnames'
-import * as React from 'react'
+import {
+	CSSProperties,
+	forwardRef,
+	memo,
+	MouseEvent as ReactMouseEvent,
+	ReactElement,
+	RefCallback,
+	useMemo,
+} from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { IconSize } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
@@ -13,15 +21,15 @@ export type ContemberIconName = keyof typeof ContemberIcons
 export interface IconSourceSpecification {
 	blueprintIcon?: BlueprintIconName
 	contemberIcon?: ContemberIconName
-	customIcon?: React.ReactElement | string[]
+	customIcon?: ReactElement | string[]
 }
 
 export interface IconProps extends IconSourceSpecification {
 	title?: string
 	size?: IconSize
-	style?: React.CSSProperties
+	style?: CSSProperties
 	alignWithLowercase?: boolean
-	onClick?: (e: React.MouseEvent<HTMLElement>) => void
+	onClick?: (e: ReactMouseEvent<HTMLElement>) => void
 }
 
 const renderSvgPaths = (pathStrings: string[] | undefined): JSX.Element[] | null => {
@@ -31,10 +39,10 @@ const renderSvgPaths = (pathStrings: string[] | undefined): JSX.Element[] | null
 	return pathStrings.map((d, i) => <path key={i} d={d} fillRule="evenodd" />)
 }
 
-export const Icon = React.memo(
-	React.forwardRef<HTMLElement, IconProps>(function Icon(props, ref) {
+export const Icon = memo(
+	forwardRef<HTMLElement, IconProps>(function Icon(props, ref) {
 		const prefix = useClassNamePrefix()
-		const icon: React.ReactElement | null = React.useMemo(() => {
+		const icon: ReactElement | null = useMemo(() => {
 			if (props.customIcon && !Array.isArray(props.customIcon)) {
 				return props.customIcon
 			}
@@ -68,7 +76,7 @@ export const Icon = React.memo(
 					toViewClass('alignWithLowercase', props.alignWithLowercase),
 				)}
 				style={props.style}
-				ref={ref as React.RefCallback<HTMLDivElement>}
+				ref={ref as RefCallback<HTMLDivElement>}
 				onClick={props.onClick}
 			>
 				{icon}

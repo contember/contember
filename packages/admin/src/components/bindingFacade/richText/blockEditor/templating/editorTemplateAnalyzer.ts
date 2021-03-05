@@ -1,5 +1,19 @@
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { ContentOutlet, ContentOutletProps } from './ContentOutlet'
 import { TextFieldProps } from './TextField'
 import { Environment } from '@contember/binding'
@@ -11,7 +25,7 @@ export class BoxedContentOutletProps {
 	public constructor(public readonly value: ContentOutletProps) {}
 }
 export class BoxedCatchAllJSX {
-	public constructor(public readonly value: React.ReactNode) {}
+	public constructor(public readonly value: ReactNode) {}
 }
 
 //const textFieldLeaf = new Leaf(node => new BoxedTextFieldProps(node.props), TextField)

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createElement } from 'react'
 import {
 	Editor,
 	Element as SlateElement,
@@ -140,11 +140,11 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		renderElement: props => {
 			switch (props.element.type) {
 				case tableElementType:
-					return React.createElement(TableElementRenderer, props as TableElementRendererProps)
+					return createElement(TableElementRenderer, props as TableElementRendererProps)
 				case tableRowElementType:
-					return React.createElement(TableRowElementRenderer, props as TableRowElementRendererProps)
+					return createElement(TableRowElementRenderer, props as TableRowElementRendererProps)
 				case tableCellElementType:
-					return React.createElement(TableCellElementRenderer, props as TableCellElementRendererProps)
+					return createElement(TableCellElementRenderer, props as TableCellElementRendererProps)
 				default:
 					return renderElement(props)
 			}

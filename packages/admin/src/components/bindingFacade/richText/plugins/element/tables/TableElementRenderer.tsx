@@ -1,5 +1,5 @@
 import { EditorTableElement } from '@contember/ui'
-import * as React from 'react'
+import { memo, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
 import { BaseEditor, BlockElement } from '../../../baseEditor'
@@ -12,35 +12,29 @@ export interface TableElementRendererProps extends Omit<RenderElementProps, 'ele
 	element: TableElement
 }
 
-export const TableElementRenderer = React.memo(function TableElementRenderer(props: TableElementRendererProps) {
+export const TableElementRenderer = memo(function TableElementRenderer(props: TableElementRendererProps) {
 	const editor = useEditor() as EditorWithTables<BaseEditor>
 	const isSelected = useSelected()
 	const isFocused = false
 
-	const addRow = React.useCallback((index?: number) => editor.addTableRow(props.element, index), [
+	const addRow = useCallback((index?: number) => editor.addTableRow(props.element, index), [editor, props.element])
+	const addColumn = useCallback((index?: number) => editor.addTableColumn(props.element, index), [
 		editor,
 		props.element,
 	])
-	const addColumn = React.useCallback((index?: number) => editor.addTableColumn(props.element, index), [
-		editor,
-		props.element,
-	])
-	const justifyColumn = React.useCallback(
+	const justifyColumn = useCallback(
 		(index: number, direction: TableCellElement['justify']) =>
 			editor.justifyTableColumn(props.element, index, direction),
 		[editor, props.element],
 	)
-	const deleteRow = React.useCallback((index: number) => editor.deleteTableRow(props.element, index), [
-		editor,
-		props.element,
-	])
-	const deleteColumn = React.useCallback((index: number) => editor.deleteTableColumn(props.element, index), [
+	const deleteRow = useCallback((index: number) => editor.deleteTableRow(props.element, index), [editor, props.element])
+	const deleteColumn = useCallback((index: number) => editor.deleteTableColumn(props.element, index), [
 		editor,
 		props.element,
 	])
 	// TODO this kind of works but ends up generating tons of operations when used to delete the whole table.
 	// 		it would require more testing to ensure that it works well so it will have to wait for now.
-	// const selectTable = React.useCallback(() => {
+	// const selectTable = useCallback(() => {
 	// 	const tablePath = ReactEditor.findPath(editor, props.element)
 	// 	const firstTablePoint = SlateEditor.start(editor, tablePath)
 	// 	const lastTablePoint = SlateEditor.end(editor, tablePath)
@@ -67,7 +61,7 @@ export const TableElementRenderer = React.memo(function TableElementRenderer(pro
 	// 	}
 	// 	Transforms.select(editor, range)
 	// }, [editor, props.element])
-	const deleteTable = React.useCallback(() => {
+	const deleteTable = useCallback(() => {
 		Transforms.removeNodes(editor, {
 			at: ReactEditor.findPath(editor, props.element),
 			match: node => editor.isTable(node),

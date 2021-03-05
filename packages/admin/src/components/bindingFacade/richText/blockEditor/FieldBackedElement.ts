@@ -1,10 +1,24 @@
 import { SugaredRelativeSingleField } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 
 export type FieldBackedElement = {
 	field: SugaredRelativeSingleField | string
-	placeholder: React.ReactNode
-	render: (props: { isEmpty: boolean; children: React.ReactNode }) => React.ReactNode
+	placeholder: ReactNode
+	render: (props: { isEmpty: boolean; children: ReactNode }) => ReactNode
 } & (
 	| {
 			format: 'richText'

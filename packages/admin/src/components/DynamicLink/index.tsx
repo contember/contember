@@ -1,16 +1,16 @@
-import * as React from 'react'
+import { ComponentType, ReactElement } from 'react'
 import { connect } from 'react-redux'
 import { pushRequest } from '../../actions/request'
 import { Dispatch } from '../../actions/types'
+import routes from '../../routes'
 import State from '../../state'
 import { RequestChange } from '../../state/request'
-import { requestStateToPath } from '../../utils/url'
-import routes from '../../routes'
 import { isUrlActive } from '../../utils/isUrlActive'
+import { requestStateToPath } from '../../utils/url'
 
 export interface DynamicLinkInnerProps {
 	onClick: () => void
-	children: React.ReactElement | null
+	children: ReactElement | null
 	isActive: boolean
 }
 
@@ -24,8 +24,8 @@ export interface DynamicLinkDispatchProps {
 
 export interface DynamicLinkOwnProps {
 	requestChange: RequestChange
-	children?: React.ReactElement | null
-	Component: React.ComponentType<DynamicLinkInnerProps>
+	children?: ReactElement | null
+	Component: ComponentType<DynamicLinkInnerProps>
 }
 
 export type DynamicLinkProps = DynamicLinkDispatchProps & DynamicLinkStateProps & DynamicLinkOwnProps

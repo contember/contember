@@ -1,6 +1,5 @@
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
-import { ActionableBox, Aether } from '../../src'
+import { ActionableBox } from '../../src'
 
 const loremIpsum =
 	'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequatur provident, quis? Ad adipisci dolore ipsam\n' +

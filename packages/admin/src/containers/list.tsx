@@ -1,10 +1,10 @@
 import { Icon } from '@contember/ui'
 import moment from 'moment'
-import * as React from 'react'
+import { Component } from 'react'
 import ReactTable, { Column } from 'react-table'
 import 'react-table/react-table.css'
 
-export default class List extends React.Component {
+export default class List extends Component {
 	render() {
 		const columns: Column[] = [
 			{ Header: 'Title', accessor: 'title' },

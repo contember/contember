@@ -1,10 +1,11 @@
 import * as React from 'react'
+import { memo, ReactNode } from 'react'
 import { SessionTokenContext } from './auth'
 import { ApiBaseUrlContext, LoginTokenContext } from './config'
 import { ProjectSlugContext, StageSlugContext } from './project'
 
 export type ContemberClientProps = {
-	children: React.ReactNode
+	children: ReactNode
 	apiBaseUrl: string
 } & (
 	| {
@@ -21,7 +22,7 @@ export type ContemberClientProps = {
 	  }
 )
 
-export const ContemberClient = React.memo(function ContemberClient({
+export const ContemberClient = memo(function ContemberClient({
 	apiBaseUrl,
 	children,
 	loginToken,

@@ -1,9 +1,9 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { EntityKeyContext } from './EntityKeyContext'
 
 export interface EntityKeyProviderProps {
 	entityKey: string
-	children: React.ReactNode
+	children: ReactNode
 }
 
 export function EntityKeyProvider(props: EntityKeyProviderProps) {

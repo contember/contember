@@ -1,6 +1,20 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 
 export interface SingleFileUploadProps {
-	renderFile?: () => React.ReactNode
-	renderFilePreview?: (file: File, previewUrl: string) => React.ReactNode
+	renderFile?: () => ReactNode
+	renderFilePreview?: (file: File, previewUrl: string) => ReactNode
 }

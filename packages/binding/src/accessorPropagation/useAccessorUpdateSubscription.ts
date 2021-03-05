@@ -1,5 +1,5 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
 import { FieldValue } from '../treeParameters'
 
@@ -42,7 +42,7 @@ function useAccessorUpdateSubscription<
 	Produced extends Persisted = Persisted
 >(getAccessor: () => A, withForceUpdate?: true): A | [A, ForceAccessorUpdate] {
 	// This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
-	const [state, setState] = React.useState<{
+	const [state, setState] = useState<{
 		accessor: A
 		getAccessor: () => A
 	}>(() => ({
@@ -64,7 +64,7 @@ function useAccessorUpdateSubscription<
 	let forceUpdate: ForceAccessorUpdate | undefined = undefined
 	if (withForceUpdate) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		forceUpdate = React.useCallback(() => {
+		forceUpdate = useCallback(() => {
 			setState({
 				accessor: getAccessor(),
 				getAccessor,
@@ -76,7 +76,7 @@ function useAccessorUpdateSubscription<
 		eventType: 'update',
 		handler: (newAccessor: FieldAccessor<Persisted, Produced> | EntityListAccessor | EntityAccessor) => void,
 	) => () => void = accessor.addEventListener
-	React.useEffect(() => {
+	useEffect(() => {
 		let isStillSubscribed = true
 
 		const unsubscribe = addEventListener('update', newAccessor => {

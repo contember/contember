@@ -6,7 +6,21 @@ import {
 	SugaredRelativeEntityList,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { Checkbox } from '../../../../ui'
 import { FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps } from '../base'
@@ -15,11 +29,11 @@ export type HasManyAbsentCellProps = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
 	FieldFallbackViewPublicProps &
 	SugaredRelativeEntityList & {
-		render: React.ComponentType<EntityListBaseProps>
-		children: React.ReactNode
+		render: ComponentType<EntityListBaseProps>
+		children: ReactNode
 	}
 
-export const HasManyAbsentCell = Component<HasManyAbsentCellProps>(props => {
+export const HasManyAbsentCell: FunctionComponent<HasManyAbsentCellProps> = Component(props => {
 	return (
 		<DataGridColumn<boolean>
 			{...props}
@@ -50,4 +64,4 @@ export const HasManyAbsentCell = Component<HasManyAbsentCellProps>(props => {
 			<HasMany {...props} listComponent={props.render} />
 		</DataGridColumn>
 	)
-}, 'HasManyAbsentCell') as (props: HasManyAbsentCellProps) => React.ReactElement
+}, 'HasManyAbsentCell') as (props: HasManyAbsentCellProps) => ReactElement

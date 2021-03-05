@@ -11,9 +11,6 @@
     "@contember/client": "0.6.5"
   },
   "peerDependencies": {
-    "react": "16.13.1"
-  },
-  "devDependencies": {
-    "@types/webappsec-credential-management": "0.5.1"
+    "react": "17.0.1"
   }
 }

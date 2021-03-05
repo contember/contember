@@ -1,13 +1,25 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { Box } from '../Box'
 import { ErrorList, ErrorListProps } from './ErrorList'
 
 export interface FieldSetProps extends ErrorListProps {
-	legend: React.ReactNode
-	children: React.ReactNode
+	legend: ReactNode
+	children: ReactNode
 }
 
-export const FieldSet = React.memo<FieldSetProps>(props => (
+export const FieldSet = memo<FieldSetProps>(props => (
 	<Box heading={props.legend}>
 		<ErrorList size={props.size} errors={props.errors} />
 		{props.children}

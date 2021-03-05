@@ -196,9 +196,7 @@ export class MutationGenerator {
 	private registerCreateMutationPart(
 		processedEntities: ProcessedEntities,
 		currentState: EntityRealmState | EntityRealmStateStub,
-		builder: CrudQueryBuilder.WriteDataBuilder<
-			CrudQueryBuilder.WriteOperation.Create
-		> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
+		builder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> = new CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create>(),
 	): CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> {
 		if (processedEntities.has(currentState.entity)) {
 			return builder

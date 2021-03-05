@@ -1,6 +1,6 @@
-import { RootObjectBuilder } from './RootObjectBuilder'
-import { QueryCompiler } from './QueryCompiler'
 import { Literal } from './Literal'
+import { QueryCompiler } from './QueryCompiler'
+import { RootObjectBuilder } from './RootObjectBuilder'
 
 class QueryBuilder {
 	query(builder: ((builder: RootObjectBuilder) => RootObjectBuilder) | RootObjectBuilder): string {

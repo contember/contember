@@ -1,14 +1,14 @@
-import * as React from 'react'
-import { useChangePassword } from '../hooks'
 import { Box, Button, FormGroup, TextInput, TitleBar } from '@contember/ui'
+import { FC, useCallback, useState } from 'react'
+import { useChangePassword } from '../hooks'
 
-export const ChangePassword: React.FC<{}> = ({}) => {
-	const [newPassword, setNewPassword] = React.useState('')
-	const [newPasswordRepeated, setNewPasswordRepeated] = React.useState('')
+export const ChangePassword: FC<{}> = ({}) => {
+	const [newPassword, setNewPassword] = useState('')
+	const [newPasswordRepeated, setNewPasswordRepeated] = useState('')
 	const [changePassword, changePasswordState] = useChangePassword()
-	const [notEqualError, setNotEqualError] = React.useState(false)
-	const [errorsResolved, setErrorsResolved] = React.useState(false)
-	const onSubmit = React.useCallback(() => {
+	const [notEqualError, setNotEqualError] = useState(false)
+	const [errorsResolved, setErrorsResolved] = useState(false)
+	const onSubmit = useCallback(() => {
 		setErrorsResolved(false)
 		if (newPassword !== newPasswordRepeated) {
 			setNotEqualError(true)
@@ -16,18 +16,18 @@ export const ChangePassword: React.FC<{}> = ({}) => {
 			changePassword(newPassword)
 		}
 	}, [changePassword, newPassword, newPasswordRepeated])
-	const resolveErrors = React.useCallback(() => {
+	const resolveErrors = useCallback(() => {
 		setNotEqualError(false)
 		setErrorsResolved(true)
 	}, [setNotEqualError, setErrorsResolved])
-	const changeNewPasswordAndRemoveErrors = React.useCallback(
+	const changeNewPasswordAndRemoveErrors = useCallback(
 		newValue => {
 			resolveErrors()
 			setNewPassword(newValue)
 		},
 		[resolveErrors, setNewPassword],
 	)
-	const changeNewPasswordRepeatedAndRemoveErrors = React.useCallback(
+	const changeNewPasswordRepeatedAndRemoveErrors = useCallback(
 		newValue => {
 			resolveErrors()
 			setNewPasswordRepeated(newValue)

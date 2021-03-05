@@ -1,11 +1,11 @@
 import { boolean, radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
+import { useState } from 'react'
 import { Select } from '../../src/components'
 import { sizeKnob } from '../utils/knobs'
 
 export const SelectStory = () => {
-	const [value, setValue] = React.useState('')
+	const [value, setValue] = useState('')
 
 	return (
 		<Select

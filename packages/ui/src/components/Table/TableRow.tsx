@@ -1,4 +1,16 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useComponentClassName } from '../../auxiliary'
 import { Justification } from '../../types'
 import cn from 'classnames'
@@ -6,12 +18,12 @@ import { toEnumViewClass } from '../../utils'
 import { UseTableElementContext } from './Table'
 
 export interface TableRowProps {
-	children?: React.ReactNode
+	children?: ReactNode
 	justification?: Justification
 }
 
-export const TableRow = React.memo((props: TableRowProps) => {
-	const useTableElement = React.useContext(UseTableElementContext)
+export const TableRow = memo((props: TableRowProps) => {
+	const useTableElement = useContext(UseTableElementContext)
 	const className = cn(useComponentClassName('table-row'), toEnumViewClass(props.justification))
 
 	if (useTableElement) {

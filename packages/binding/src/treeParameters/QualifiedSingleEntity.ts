@@ -18,17 +18,17 @@ import {
 	UnsugarableQualifiedSingleEntityParameters,
 } from './QualifiedSingleEntityParameters'
 import {
-	DesugaredSingleEntityParameters,
-	SingleEntityParameters,
-	SugarableSingleEntityParameters,
-	UnsugarableSingleEntityParameters,
-} from './SingleEntityParameters'
-import {
 	DesugaredSingleEntityEventListeners,
 	SingleEntityEventListeners,
 	SugarableSingleEntityEventListeners,
 	UnsugarableSingleEntityEventListeners,
 } from './SingleEntityEventListeners'
+import {
+	DesugaredSingleEntityParameters,
+	SingleEntityParameters,
+	SugarableSingleEntityParameters,
+	UnsugarableSingleEntityParameters,
+} from './SingleEntityParameters'
 
 export interface DesugaredQualifiedSingleEntity
 	extends DesugaredQualifiedSingleEntityParameters,

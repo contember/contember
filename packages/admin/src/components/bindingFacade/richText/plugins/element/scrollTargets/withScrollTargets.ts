@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createElement } from 'react'
 import { Editor, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
 import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { EditorWithScrollTargets, WithScrollTargets } from './EditorWithScrollTargets'
@@ -70,7 +70,7 @@ export const withScrollTargets = <E extends BaseEditor>(editor: E): EditorWithSc
 
 	e.renderElement = props => {
 		if (isScrollTarget(props.element)) {
-			return React.createElement(ScrollTargetRenderer, props as ScrollTargetRendererProps)
+			return createElement(ScrollTargetRenderer, props as ScrollTargetRendererProps)
 		}
 		return renderElement(props)
 	}

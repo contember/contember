@@ -1,14 +1,14 @@
 import {
+	Entity,
 	EntityAccessor,
 	Environment,
 	RelativeSingleField,
 	RemovalType,
-	Entity,
 	VariableInputTransformer,
 } from '@contember/binding'
 import { SingleFileUploadState } from '@contember/react-client'
 import { ActionableBox, Box } from '@contember/ui'
-import * as React from 'react'
+import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
 import { UploadedFilePreview, UploadingFilePreview } from '../core'
 import { FileDataPopulator } from '../fileDataPopulators'
@@ -27,7 +27,7 @@ export interface FileRepeaterItemProps {
 	uploadingState: SingleFileUploadState | undefined
 }
 
-export const FileRepeaterItem = React.memo(
+export const FileRepeaterItem = memo(
 	({
 		canBeRemoved,
 		defaultFileKind,
@@ -40,7 +40,7 @@ export const FileRepeaterItem = React.memo(
 		uploadingState,
 	}: FileRepeaterItemProps) => {
 		let resolvedFileKind: Partial<DiscriminatedFileUploadProps> = defaultFileKind
-		let editContents: React.ReactNode = undefined
+		let editContents: ReactNode = undefined
 
 		if (desugaredDiscriminant) {
 			const discriminantField = entity.getRelativeSingleField(desugaredDiscriminant)
@@ -80,8 +80,8 @@ export const FileRepeaterItem = React.memo(
 		)
 
 		const deleteEntity = entity.deleteEntity
-		const onRemove = React.useCallback(
-			(e: React.MouseEvent) => {
+		const onRemove = useCallback(
+			(e: ReactMouseEvent) => {
 				e.stopPropagation()
 				deleteEntity?.()
 			},

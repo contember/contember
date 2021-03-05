@@ -1,5 +1,19 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { BlockCommonProps, useBlockProps } from '../../../blocks'
 import { NormalizedDiscriminatedData, useDiscriminatedData } from '../../../discrimination'
 import { EditorTemplate, getEditorTemplate } from './getEditorTemplate'
@@ -13,12 +27,12 @@ export interface EditorReferenceBlock extends BlockCommonProps {
 
 export type EditorReferenceBlocks = NormalizedDiscriminatedData<EditorReferenceBlock>
 
-export const useEditorReferenceBlocks = (children: React.ReactNode): EditorReferenceBlocks => {
+export const useEditorReferenceBlocks = (children: ReactNode): EditorReferenceBlocks => {
 	useConstantValueInvariant(children, `BlockEditor: cannot change the set of Blocks between renders!`)
 	const env = useEnvironment()
 
 	const propList = useBlockProps(children)
-	const propsWithTemplates = React.useMemo(() => {
+	const propsWithTemplates = useMemo(() => {
 		return propList.map(
 			(props): EditorReferenceBlock => ({
 				...props,

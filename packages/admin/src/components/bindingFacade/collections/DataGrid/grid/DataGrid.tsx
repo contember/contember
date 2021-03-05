@@ -6,7 +6,21 @@ import {
 	useEnvironment,
 } from '@contember/binding'
 import { noop } from '@contember/react-utils'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { DataGridContainerPublicProps, DataGridState } from '../base'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
@@ -20,18 +34,18 @@ import { useOrderBys } from './useOrderBys'
 
 export interface DataGridProps extends DataGridContainerPublicProps {
 	entities: SugaredQualifiedEntityList['entities']
-	children: React.ReactNode
+	children: ReactNode
 
 	itemsPerPage?: number | null
 }
 
-export const DataGrid = Component<DataGridProps>(
+export const DataGrid: FunctionComponent<DataGridProps> = Component(
 	props => {
 		const { extendTree } = useBindingOperations()
-		const isMountedRef = React.useRef(true)
+		const isMountedRef = useRef(true)
 		const environment = useEnvironment()
 
-		const columns = React.useMemo(() => extractDataGridColumns(props.children), [props.children])
+		const columns = useMemo(() => extractDataGridColumns(props.children), [props.children])
 
 		const [pageState, updatePaging] = useGridPagingState({
 			itemsPerPage: props.itemsPerPage ?? null,
@@ -40,7 +54,7 @@ export const DataGrid = Component<DataGridProps>(
 		const [orderDirections, setOrderBy] = useOrderBys(columns, updatePaging)
 		const [filterArtifacts, setFilter] = useFilters(columns, updatePaging)
 
-		const containerProps: DataGridContainerPublicProps = React.useMemo(
+		const containerProps: DataGridContainerPublicProps = useMemo(
 			() => ({
 				emptyMessageComponentExtraProps: props.emptyMessageComponentExtraProps,
 				emptyMessage: props.emptyMessage,
@@ -48,7 +62,7 @@ export const DataGrid = Component<DataGridProps>(
 			}),
 			[props.emptyMessage, props.emptyMessageComponent, props.emptyMessageComponentExtraProps],
 		)
-		const gridOptions = React.useMemo(
+		const gridOptions = useMemo(
 			(): RenderGridOptions => ({
 				entities: props.entities,
 				setIsColumnHidden,
@@ -60,9 +74,9 @@ export const DataGrid = Component<DataGridProps>(
 			[props.entities, setIsColumnHidden, updatePaging, setFilter, setOrderBy, containerProps],
 		)
 
-		const loadAbortControllerRef = React.useRef<AbortController | undefined>(undefined)
+		const loadAbortControllerRef = useRef<AbortController | undefined>(undefined)
 
-		const desiredState = React.useMemo(
+		const desiredState = useMemo(
 			(): DataGridState => ({
 				paging: pageState,
 				columns,
@@ -73,7 +87,7 @@ export const DataGrid = Component<DataGridProps>(
 			[pageState, columns, hiddenColumns, filterArtifacts, orderDirections],
 		)
 
-		const [displayedState, setDisplayedState] = React.useState<{
+		const [displayedState, setDisplayedState] = useState<{
 			gridState: DataGridState
 			treeRootId: TreeRootId | undefined
 		}>({
@@ -81,7 +95,7 @@ export const DataGrid = Component<DataGridProps>(
 			treeRootId: undefined,
 		})
 
-		React.useEffect(() => {
+		useEffect(() => {
 			const extend = async () => {
 				if (displayedState.gridState === desiredState) {
 					return
@@ -115,7 +129,7 @@ export const DataGrid = Component<DataGridProps>(
 			extend()
 		}, [desiredState, displayedState, environment, extendTree, gridOptions])
 
-		React.useEffect(
+		useEffect(
 			() => () => {
 				isMountedRef.current = false
 			},

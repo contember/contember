@@ -1,16 +1,16 @@
 import { IconSvgPaths16 } from '@blueprintjs/icons'
 import { boolean, color, number, select } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { BlueprintIconName, ContemberIconName, Icon } from '../../src'
-import { iconSizeKnob } from '../utils/knobs'
 import * as ContemberIcons from '../../src/components/Icon/contemberIcons'
+import { iconSizeKnob } from '../utils/knobs'
 
 const blueprintIconNames = Object.keys(IconSvgPaths16) as BlueprintIconName[]
 const contemberIconNames = Object.keys(ContemberIcons) as ContemberIconName[]
 
 const iconStory = (type: 'blueprint' | 'contember') => {
-	let icon: React.ReactNode
+	let icon: ReactNode
 
 	if (type === 'blueprint') {
 		const iconName = select<BlueprintIconName>('Blueprint icon name', blueprintIconNames, blueprintIconNames[0])

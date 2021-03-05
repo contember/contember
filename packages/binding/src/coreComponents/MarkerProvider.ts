@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ReactElement } from 'react'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkersContainer,
@@ -54,7 +54,7 @@ export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames
 	staticRender: (
 		props: StaticRenderProviderProps<Props, NonStaticPropNames>,
 		environment: Environment,
-	) => React.ReactElement | null
+	) => ReactElement | null
 }
 
 export type CompleteMarkerProvider<

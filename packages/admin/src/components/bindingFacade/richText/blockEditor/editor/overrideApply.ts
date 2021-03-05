@@ -1,5 +1,5 @@
 import { BindingOperations } from '@contember/binding'
-import * as React from 'react'
+import { MutableRefObject } from 'react'
 import { Element as SlateElement, Operation } from 'slate'
 import { ElementNode, TextNode } from '../../baseEditor'
 import { isElementWithReference } from '../elements'
@@ -7,7 +7,7 @@ import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideApplyOptions {
 	bindingOperations: BindingOperations
-	isMutatingRef: React.MutableRefObject<boolean>
+	isMutatingRef: MutableRefObject<boolean>
 }
 
 export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: OverrideApplyOptions) => {

@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { useEffect, useRef } from 'react'
 
 export const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: boolean, close: () => void) => {
-	const buttonRef = React.useRef<T>(null)
-	const contentRef = React.useRef<K>(null)
+	const buttonRef = useRef<T>(null)
+	const contentRef = useRef<K>(null)
 
 	useRawCloseOnEscapeOrClickOutside<T, K>({
 		reference: buttonRef.current,
@@ -25,7 +25,7 @@ export const useRawCloseOnEscapeOrClickOutside = <T extends Node, K extends Node
 	reference: Node | null
 	content: Node | null
 }) => {
-	React.useEffect(() => {
+	useEffect(() => {
 		if (isOpen) {
 			const closeOnEscapeKey = (event: KeyboardEvent) => {
 				if (event.key === 'Escape') {

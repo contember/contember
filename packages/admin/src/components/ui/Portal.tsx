@@ -1,7 +1,7 @@
-import * as React from 'react'
+import { PureComponent, ReactElement } from 'react'
 import * as ReactDOM from 'react-dom'
 
-export class Portal extends React.PureComponent {
+export class Portal extends PureComponent {
 	private el = document.createElement('div')
 
 	componentDidMount() {
@@ -12,7 +12,7 @@ export class Portal extends React.PureComponent {
 		document.body.removeChild(this.el)
 	}
 
-	render() {
+	render(): ReactElement {
 		return ReactDOM.createPortal(this.props.children, this.el)
 	}
 }

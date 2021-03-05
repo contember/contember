@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { Component, Field, FieldProps } from '../coreComponents'
 import { SugaredRelativeSingleField } from '../treeParameters'
 

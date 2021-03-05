@@ -1,4 +1,3 @@
-import * as React from 'react'
 import cn from 'classnames'
 import { useClassNamePrefix } from '../auxiliary'
 import { Size } from '../types'

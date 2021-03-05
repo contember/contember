@@ -1,5 +1,5 @@
 import { Component, FieldValue, SugaredField, SugaredRelativeSingleField, useDerivedField } from '@contember/binding'
-import * as React from 'react'
+import { FunctionComponent } from 'react'
 
 export interface DerivedFieldLinkProps<SourcePersisted extends FieldValue = FieldValue> {
 	sourceField: string | SugaredRelativeSingleField
@@ -8,7 +8,7 @@ export interface DerivedFieldLinkProps<SourcePersisted extends FieldValue = Fiel
 	agent?: string
 }
 
-export const DerivedFieldLink = Component<DerivedFieldLinkProps>(
+export const DerivedFieldLink: FunctionComponent<DerivedFieldLinkProps> = Component(
 	props => {
 		useDerivedField(props.sourceField, props.derivedField, props.transform, props.agent)
 		return null

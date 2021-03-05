@@ -1,48 +1,43 @@
-import * as React from 'react'
+import { FunctionComponent, memo, NamedExoticComponent, ReactElement } from 'react'
 import { Environment } from '../dao'
 import { assertNever } from '../utils'
 import { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from './MarkerProvider'
 
 function Component<Props extends {}>(
-	statelessRender: React.FunctionComponent<Props>,
+	statelessRender: FunctionComponent<Props>,
 	displayName?: string,
-): React.NamedExoticComponent<Props> & StaticRenderProvider<Props>
+): NamedExoticComponent<Props> & StaticRenderProvider<Props>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
-	statefulRender: React.FunctionComponent<Props>,
+	statefulRender: FunctionComponent<Props>,
 	staticRender: (
 		props: StaticRenderProviderProps<Props, NonStaticPropNames>,
 		environment: Environment,
-	) => React.ReactElement | null,
+	) => ReactElement | null,
 	displayName?: string,
-): React.NamedExoticComponent<Props> & StaticRenderProvider<Props, NonStaticPropNames>
+): NamedExoticComponent<Props> & StaticRenderProvider<Props, NonStaticPropNames>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
-	statefulRender: React.FunctionComponent<Props>,
+	statefulRender: FunctionComponent<Props>,
 	markerProvisions: MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
-): React.NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames>
+): NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
-	render: React.FunctionComponent<Props>,
+	render: FunctionComponent<Props>,
 	decider?:
 		| string
-		| ((
-				props: StaticRenderProviderProps<Props, NonStaticPropNames>,
-				environment: Environment,
-		  ) => React.ReactElement | null)
+		| ((props: StaticRenderProviderProps<Props, NonStaticPropNames>, environment: Environment) => ReactElement | null)
 		| MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
 ) {
 	if (decider === undefined || typeof decider === 'string') {
 		render.displayName = decider
-		const augmentedRender: React.NamedExoticComponent<Props> & MarkerProvider<Props> = React.memo<Props>(render)
+		const augmentedRender: NamedExoticComponent<Props> & MarkerProvider<Props> = memo<Props>(render)
 		augmentedRender.staticRender = render as StaticRenderProvider<Props>['staticRender']
 
 		return augmentedRender
 	}
 
 	render.displayName = displayName
-	const augmentedRender: React.NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames> = React.memo<
-		Props
-	>(render)
+	const augmentedRender: NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames> = memo<Props>(render)
 
 	if (typeof decider === 'function') {
 		augmentedRender.staticRender = decider

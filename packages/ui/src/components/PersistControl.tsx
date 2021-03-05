@@ -1,5 +1,4 @@
 import cn from 'classnames'
-import * as React from 'react'
 import { ContentStatus, SaveControl } from '.'
 import { useClassNamePrefix } from '../auxiliary'
 

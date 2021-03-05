@@ -1,10 +1,10 @@
 import { getTenantErrorMessage } from '@contember/client'
-import { useAuthedTenantMutation, useAuthIdentity } from './lib'
 import { useCallback, useMemo } from 'react'
+import { useAuthedTenantMutation, useAuthIdentity } from './lib'
 
 const CHANGE_PASSWORD_MUTATION = `
 	mutation(
-		$personId: String!, 
+		$personId: String!,
 		$password: String!
 	) {
 		changePassword(

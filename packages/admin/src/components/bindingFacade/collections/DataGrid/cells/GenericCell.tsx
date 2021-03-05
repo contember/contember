@@ -1,13 +1,27 @@
 import { Component } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps } from '../base'
 
 export type GenericCellProps = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps & {
-		children: React.ReactNode
+		children: ReactNode
 	}
 
-export const GenericCell = Component<GenericCellProps>(props => {
+export const GenericCell: FunctionComponent<GenericCellProps> = Component(props => {
 	return (
 		<DataGridColumn<string> {...props} enableOrdering={false} enableFiltering={false}>
 			{props.children}

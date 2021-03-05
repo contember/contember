@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import Server, { Configuration } from './Server.js'
 import { Server as HttpServer } from 'net'
+import Server, { Configuration } from './Server.js'
 ;(async () => {
 	try {
 		const server = new Server()

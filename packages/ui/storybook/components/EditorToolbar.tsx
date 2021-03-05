@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
 import { EditorToolbar, EditorToolbarLayout } from '../../src'
 
 const icons: any[] = [

@@ -1,14 +1,14 @@
 import cn from 'classnames'
-import * as React from 'react'
+import { createContext, PureComponent, ReactNode, useCallback, useContext, useState } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { GlobalClassNamePrefixContext } from '../contexts'
 import { Navigation } from '../Navigation'
 import { isSpecialLinkClick, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
 
-const DepthContext = React.createContext(0)
+const DepthContext = createContext(0)
 
-class Menu extends React.PureComponent<Menu.Props> {
+class Menu extends PureComponent<Menu.Props> {
 	public static displayName = 'Menu'
 
 	public render() {
@@ -28,20 +28,20 @@ class Menu extends React.PureComponent<Menu.Props> {
 
 namespace Menu {
 	export interface Props {
-		children?: React.ReactNode
+		children?: ReactNode
 		showCaret?: boolean
 	}
 
 	export interface ItemProps {
-		children?: React.ReactNode
-		title?: string | React.ReactNode
+		children?: ReactNode
+		title?: string | ReactNode
 		to?: Navigation.MiddlewareProps['to']
 		external?: boolean
 		expandedByDefault?: boolean
 	}
 
 	interface TitleProps {
-		children?: React.ReactNode
+		children?: ReactNode
 		className?: string
 	}
 
@@ -60,7 +60,7 @@ namespace Menu {
 		  }
 
 	function DepthSpecificItem(props: ItemProps) {
-		const depth = React.useContext(DepthContext)
+		const depth = useContext(DepthContext)
 
 		if (depth === 1) {
 			return <GroupItem {...props} />
@@ -74,7 +74,7 @@ namespace Menu {
 	}
 
 	function useTitle(options: TitleOptions) {
-		const Link = React.useContext(Navigation.MiddlewareContext)
+		const Link = useContext(Navigation.MiddlewareContext)
 		const { to, external, suppressTo, onClick } = options
 		const prefix = useClassNamePrefix()
 
@@ -112,7 +112,7 @@ namespace Menu {
 	}
 
 	function ItemWrapper(props: {
-		children?: React.ReactNode
+		children?: ReactNode
 		className: string
 		to: ItemProps['to']
 		suppressIsActive?: boolean
@@ -133,8 +133,8 @@ namespace Menu {
 	}
 
 	function SubGroupItem(props: ItemProps) {
-		const [expanded, setExpanded] = React.useState(!!props.expandedByDefault)
-		const onClick = React.useCallback(() => {
+		const [expanded, setExpanded] = useState(!!props.expandedByDefault)
+		const onClick = useCallback(() => {
 			setExpanded(!expanded)
 		}, [setExpanded, expanded])
 		const options: TitleOptions = {
@@ -185,7 +185,7 @@ namespace Menu {
 	}
 
 	export function Item(props: ItemProps) {
-		const depth = React.useContext(DepthContext)
+		const depth = useContext(DepthContext)
 
 		return (
 			<DepthContext.Provider value={depth + 1}>

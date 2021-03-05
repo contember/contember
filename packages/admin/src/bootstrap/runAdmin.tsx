@@ -1,12 +1,12 @@
 import { DevError } from '@contember/ui'
-import * as React from 'react'
+import { ReactElement } from 'react'
 import * as ReactDOM from 'react-dom'
 import { Admin } from '../components'
 import { ProjectConfig } from '../state/projectsConfigs'
 import { assertValidClientConfig } from './assertValidClientConfig'
 import { ClientConfig } from './ClientConfig'
 
-type ReactRootFactory = (config: ClientConfig, projects: ProjectConfig[]) => React.ReactElement
+type ReactRootFactory = (config: ClientConfig, projects: ProjectConfig[]) => ReactElement
 
 export const runAdmin = (
 	projects: Record<string, ProjectConfig[] | ProjectConfig>,

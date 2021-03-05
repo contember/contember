@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { ComponentType, ReactElement, ReactNode } from 'react'
 import { useEntityList } from '../accessorPropagation'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
@@ -10,16 +10,16 @@ import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
 
 export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelativeEntityList & {
-	children?: React.ReactNode
+	children?: ReactNode
 	variables?: Environment.DeltaFactory
 } & (
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
+				entityComponent: ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 		| {
-				listComponent: React.ComponentType<ListProps & EntityListBaseProps>
+				listComponent: ComponentType<ListProps & EntityListBaseProps>
 				listProps?: ListProps
 		  }
 	)
@@ -47,4 +47,4 @@ export const HasMany = Component(
 			MarkerFactory.createRelativeEntityListFields(props, environment, fields),
 	},
 	'HasMany',
-) as <ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => React.ReactElement
+) as <ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => ReactElement

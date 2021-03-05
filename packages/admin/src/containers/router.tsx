@@ -1,11 +1,11 @@
-import * as React from 'react'
+import { FunctionComponent, PureComponent } from 'react'
 import { connect } from 'react-redux'
 import State from '../state'
 import RequestState from '../state/request'
 
 type RouteName = RequestState['name']
 type RequestByName<K extends RouteName, T = RequestState> = T extends { name: K } ? T : never
-type RouteHandler<K extends RouteName> = React.FunctionComponent<{ route: RequestByName<K> }>
+type RouteHandler<K extends RouteName> = FunctionComponent<{ route: RequestByName<K> }>
 type RouteMap<N extends RouteName = RouteName> = { [K in N]: RouteHandler<K> }
 
 interface RoutesRendererStateProps {
@@ -19,7 +19,7 @@ interface RoutesRendererOwnProps {
 
 type RoutesRendererProps = RoutesRendererStateProps & RoutesRendererOwnProps
 
-class RoutesRenderer extends React.PureComponent<RoutesRendererProps> {
+class RoutesRenderer extends PureComponent<RoutesRendererProps> {
 	public render() {
 		const route = this.props.route
 		if (!route) {

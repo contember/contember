@@ -1,6 +1,5 @@
 import { BindingError, QueryLanguage, SugaredField, SugaredFieldProps } from '@contember/binding'
 import { S3FileUploader } from '@contember/client'
-import * as React from 'react'
 import { isAudio, isImage, isVideo } from '../utils'
 import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
 

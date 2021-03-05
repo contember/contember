@@ -1,11 +1,23 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import cn from 'classnames'
 import { useClassNamePrefix } from '../auxiliary'
 
 export interface UserMiniControlProps {
 	avatarUrl?: string
-	name: React.ReactNode
-	note?: React.ReactNode
+	name: ReactNode
+	note?: ReactNode
 }
 
 export function UserMiniControl({ name, note, avatarUrl }: UserMiniControlProps) {

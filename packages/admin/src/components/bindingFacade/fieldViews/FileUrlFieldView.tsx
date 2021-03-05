@@ -1,11 +1,11 @@
 import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import * as React from 'react'
+import { AnchorHTMLAttributes, FunctionComponent } from 'react'
 
-export interface FileUrlFieldViewProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+export interface FileUrlFieldViewProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
 	fileUrlField: SugaredFieldProps['field']
 }
 
-export const FileUrlFieldView = Component<FileUrlFieldViewProps>(
+export const FileUrlFieldView: FunctionComponent<FileUrlFieldViewProps> = Component(
 	({ fileUrlField, ...props }) => {
 		const fieldAccessor = useField<string>(fileUrlField)
 		const url = fieldAccessor.value!

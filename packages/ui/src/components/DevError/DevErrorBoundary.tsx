@@ -1,19 +1,19 @@
-import * as React from 'react'
+import { ErrorInfo, PureComponent } from 'react'
 import { Portal } from '../Portal'
 import { DevError } from './DevError'
 
 export interface DevErrorBoundaryProps {}
 
 interface DevErrorBoundaryState {
-	caughtErrors: [Error, React.ErrorInfo][]
+	caughtErrors: [Error, ErrorInfo][]
 }
 
-export class DevErrorBoundary extends React.PureComponent<DevErrorBoundaryProps, DevErrorBoundaryState> {
+export class DevErrorBoundary extends PureComponent<DevErrorBoundaryProps, DevErrorBoundaryState> {
 	state: DevErrorBoundaryState = {
 		caughtErrors: [],
 	}
 
-	public componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+	public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
 		this.setState({
 			caughtErrors: [...this.state.caughtErrors, [error, errorInfo]],
 		})

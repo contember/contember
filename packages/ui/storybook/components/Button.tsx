@@ -1,11 +1,11 @@
 import { boolean, radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
+import { ReactElement } from 'react'
 import { Button, ButtonProps } from '../../src'
 import { Size } from '../../src/types'
 import { allIntents, sizeKnob } from '../utils'
 
-export const simpleButtonStory = (size?: Size): React.ReactElement => {
+export const simpleButtonStory = (size?: Size): ReactElement => {
 	const content = text('Text', 'Pretty button')
 	const props: ButtonProps = {
 		size: size || sizeKnob(),

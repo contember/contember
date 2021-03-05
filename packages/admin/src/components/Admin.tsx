@@ -1,7 +1,7 @@
 import { Environment, EnvironmentContext } from '@contember/binding'
 import { ContemberClient } from '@contember/react-client'
 import { ContainerSpinner } from '@contember/ui'
-import * as React from 'react'
+import { ComponentType, lazy, LazyExoticComponent, memo, Suspense, useEffect, useState } from 'react'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
 import { assertValidClientConfig, ClientConfig } from '../bootstrap'
@@ -23,20 +23,20 @@ export interface AdminProps {
 	clientConfig: ClientConfig
 }
 
-export const Admin = React.memo((props: AdminProps) => {
-	const [] = React.useState(() => {
+export const Admin = memo((props: AdminProps) => {
+	const [] = useState(() => {
 		assertValidClientConfig(props.clientConfig)
 	})
-	const [store] = React.useState(() => {
+	const [store] = useState(() => {
 		const store: Store = configureStore(emptyState, props.clientConfig)
 		store.dispatch(createAction(PROJECT_CONFIGS_REPLACE, () => props.configs)())
 		store.dispatch(populateRequest(window.location))
 
 		return store
 	})
-	const [adminWideEnvironment] = React.useState(() => Environment.create(props.clientConfig.envVariables))
+	const [adminWideEnvironment] = useState(() => Environment.create(props.clientConfig.envVariables))
 
-	React.useEffect(() => {
+	useEffect(() => {
 		const onPopState = (e: PopStateEvent) => {
 			e.preventDefault()
 			store.dispatch(populateRequest(window.location))
@@ -61,7 +61,7 @@ export const Admin = React.memo((props: AdminProps) => {
 									const normalizedConfigs: {
 										[project: string]: {
 											[stage: string]: ProjectConfig & {
-												lazyComponent: React.LazyExoticComponent<React.ComponentType<any>>
+												lazyComponent: LazyExoticComponent<ComponentType<any>>
 												rootEnvironment: Environment
 											}
 										}
@@ -78,7 +78,7 @@ export const Admin = React.memo((props: AdminProps) => {
 										}
 										normalizedConfigs[config.project][config.stage] = {
 											...config,
-											lazyComponent: React.lazy(config.component),
+											lazyComponent: lazy(config.component),
 											rootEnvironment: adminWideEnvironment.putDelta({
 												dimensions: config.defaultDimensions || {},
 											}),
@@ -107,9 +107,9 @@ export const Admin = React.memo((props: AdminProps) => {
 													stage={route.stage}
 												>
 													<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
-														<React.Suspense fallback={<ContainerSpinner />}>
+														<Suspense fallback={<ContainerSpinner />}>
 															<Component />
-														</React.Suspense>
+														</Suspense>
 													</EnvironmentContext.Provider>
 												</ContemberClient>
 											)

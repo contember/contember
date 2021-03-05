@@ -1,18 +1,18 @@
 import cn from 'classnames'
-import * as React from 'react'
+import { ReactElement, ReactNode, TextareaHTMLAttributes } from 'react'
 import { IncreaseBoxDepth, useClassNamePrefix } from '../../auxiliary'
 import { EditorCanvasSize } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
-export interface EditorCanvasProps<P extends React.TextareaHTMLAttributes<HTMLDivElement>> {
-	underlyingComponent: (props: P) => React.ReactElement
+export interface EditorCanvasProps<P extends TextareaHTMLAttributes<HTMLDivElement>> {
+	underlyingComponent: (props: P) => ReactElement
 	componentProps: P
-	children?: React.ReactNode
+	children?: ReactNode
 	size?: EditorCanvasSize
 }
 
 // TODO add this to storybook
-export const EditorCanvas = (<P extends React.TextareaHTMLAttributes<HTMLDivElement>>({
+export const EditorCanvas = (<P extends TextareaHTMLAttributes<HTMLDivElement>>({
 	children,
 	size,
 	underlyingComponent: Component,
@@ -29,7 +29,7 @@ export const EditorCanvas = (<P extends React.TextareaHTMLAttributes<HTMLDivElem
 		</div>
 	)
 }) as {
-	<P extends React.TextareaHTMLAttributes<HTMLDivElement>>(props: EditorCanvasProps<P>): React.ReactElement
+	<P extends TextareaHTMLAttributes<HTMLDivElement>>(props: EditorCanvasProps<P>): ReactElement
 	displayName?: string
 }
 EditorCanvas.displayName = 'EditorCanvas'

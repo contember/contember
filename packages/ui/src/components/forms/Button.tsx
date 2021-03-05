@@ -1,8 +1,8 @@
 import cn from 'classnames'
-import * as React from 'react'
+import { ButtonHTMLAttributes, createElement, forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { ButtonDistinction, ButtonFlow, Intent, Justification, Size } from '../../types'
-import { toStateClass, toEnumViewClass, toViewClass } from '../../utils'
+import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 import { Spinner } from '../Spinner'
 
 type PropBlackList = 'ref' | 'size'
@@ -25,7 +25,7 @@ export interface ButtonOwnProps {
 	isActive?: boolean
 	disabled?: boolean
 	bland?: boolean
-	children?: React.ReactNode
+	children?: ReactNode
 }
 
 export type ButtonBasedButtonProps = ButtonOwnProps & ButtonBasedProps
@@ -33,8 +33,8 @@ export type AnchorBasedButtonProps = ButtonOwnProps & AnchorBasedProps
 
 export type ButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps)
 
-export const Button = React.memo(
-	React.forwardRef<any, ButtonProps>((props, ref) => {
+export const Button = memo(
+	forwardRef<any, ButtonProps>((props, ref) => {
 		const {
 			Component,
 			intent,
@@ -54,7 +54,7 @@ export const Button = React.memo(
 		}
 
 		if (props.Component === 'button' || !props.Component) {
-			;(rest as React.ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
+			;(rest as ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
 		}
 		const prefix = useClassNamePrefix()
 
@@ -84,7 +84,7 @@ export const Button = React.memo(
 			</>
 		)
 
-		return React.createElement(Component || 'button', { ...rest, ...attrs }, content)
+		return createElement(Component || 'button', { ...rest, ...attrs }, content)
 	}),
 )
 Button.displayName = 'Button'

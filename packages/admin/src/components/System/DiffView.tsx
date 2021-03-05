@@ -1,19 +1,19 @@
-import { Button, Icon, TableRow, Table, TableCell, Spinner } from '@contember/ui'
-import * as React from 'react'
-import { connect } from 'react-redux'
+import { Button, Icon, Spinner, Table, TableCell, TableRow } from '@contember/ui'
+import { assertNever } from '@contember/utils'
 import cn from 'classnames'
-import { AnyStageDiff, StageDiffState, EventType } from '../../state/system'
-import State from '../../state'
+import { PureComponent } from 'react'
+import { connect } from 'react-redux'
 import { executeRelease, fetchDiff } from '../../actions/system'
 import { Dispatch } from '../../actions/types'
-import { assertNever } from '@contember/utils'
+import State from '../../state'
+import { AnyStageDiff, EventType, StageDiffState } from '../../state/system'
 
 enum SelectionType {
 	explicit = 'explicit',
 	dependency = 'dependency',
 }
 
-class DiffViewInner extends React.PureComponent<DiffView.StateProps & DiffView.DispatchProps, DiffView.State> {
+class DiffViewInner extends PureComponent<DiffView.StateProps & DiffView.DispatchProps, DiffView.State> {
 	state: DiffView.State = {
 		selected: [],
 	}

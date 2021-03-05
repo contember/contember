@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useContext } from 'react'
 import { StageSlugContext } from './StageSlugContext'
 
-export const useStageSlug = () => React.useContext(StageSlugContext)
+export const useStageSlug = () => useContext(StageSlugContext)

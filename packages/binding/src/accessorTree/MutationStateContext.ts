@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
-export const MutationStateContext = React.createContext<boolean>(false)
+export const MutationStateContext = createContext<boolean>(false)
 MutationStateContext.displayName = 'MutationStateContext'

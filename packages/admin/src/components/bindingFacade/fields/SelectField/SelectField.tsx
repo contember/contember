@@ -1,8 +1,8 @@
 import { Component, ErrorAccessor, FieldValue } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
-import * as React from 'react'
-import AsyncSelect from 'react-select/async'
+import { FunctionComponent, memo } from 'react'
 import { Props as SelectProps } from 'react-select'
+import AsyncSelect from 'react-select/async'
 
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoiceFieldProps } from '../ChoiceField'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
@@ -11,7 +11,7 @@ import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps
 export type SelectFieldProps = SelectFieldInnerPublicProps &
 	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | DynamicSingleChoiceFieldProps)
 
-export const SelectField = Component<SelectFieldProps>(
+export const SelectField: FunctionComponent<SelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} arity="single">
 			{({
@@ -47,7 +47,7 @@ export interface SelectFieldInnerProps extends ChoiceFieldData.SingleChoiceField
 	errors: ErrorAccessor | undefined
 }
 
-const SelectFieldInner = React.memo(
+const SelectFieldInner = memo(
 	({
 		placeholder,
 		allowNull,

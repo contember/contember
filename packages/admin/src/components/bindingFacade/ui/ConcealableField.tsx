@@ -1,33 +1,33 @@
 import { Button, ButtonProps, toStateClass, toViewClass } from '@contember/ui'
 import cn from 'classnames'
-import * as React from 'react'
+import { memo, ReactNode, Ref, useCallback, useRef, useState } from 'react'
 
 export interface ConcealableFieldRendererProps {
 	onFocus: () => void
 	onBlur: () => void
-	inputRef: React.Ref<HTMLInputElement | undefined>
+	inputRef: Ref<HTMLInputElement | undefined>
 }
 
 export type ConcealableFieldProps = {
 	buttonProps?: ButtonProps
 	concealTimeout?: number
-	renderConcealedValue: () => React.ReactNode
-	children: (rendererProps: ConcealableFieldRendererProps) => React.ReactNode
+	renderConcealedValue: () => ReactNode
+	children: (rendererProps: ConcealableFieldRendererProps) => ReactNode
 	isExtended?: boolean
-	editButtonLabel?: React.ReactNode
+	editButtonLabel?: ReactNode
 }
 
-export const ConcealableField = React.memo(
+export const ConcealableField = memo(
 	({ buttonProps, concealTimeout = 2000, renderConcealedValue, isExtended, children }: ConcealableFieldProps) => {
-		const [isEditing, setIsEditing] = React.useState(false)
-		const [concealTimeoutId, setConcealTimeoutId] = React.useState<number | undefined>(undefined)
-		const inputRef = React.useRef<HTMLInputElement>()
-		const onFocus = React.useCallback(() => {
+		const [isEditing, setIsEditing] = useState(false)
+		const [concealTimeoutId, setConcealTimeoutId] = useState<number | undefined>(undefined)
+		const inputRef = useRef<HTMLInputElement>()
+		const onFocus = useCallback(() => {
 			if (concealTimeoutId !== undefined) {
 				clearTimeout(concealTimeoutId)
 			}
 		}, [concealTimeoutId])
-		const onBlur = React.useCallback(() => {
+		const onBlur = useCallback(() => {
 			setConcealTimeoutId((setTimeout(() => setIsEditing(false), concealTimeout) as any) as number)
 		}, [concealTimeout])
 

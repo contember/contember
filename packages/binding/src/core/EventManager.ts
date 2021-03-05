@@ -256,11 +256,13 @@ export class EventManager {
 				const iNodeHasBeforePersist = (iNode: StateINode) => iNode.eventListeners.beforePersist !== undefined
 
 				// TODO if an entity from here (or its parent) gets deleted, we need to remove stale handlers from here.
-				const callbackQueue: Array<[
-					// The typings could be nicer but TS…
-					StateINode,
-					EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler,
-				]> = []
+				const callbackQueue: Array<
+					[
+						// The typings could be nicer but TS…
+						StateINode,
+						EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler,
+					]
+				> = []
 
 				for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
 					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
@@ -274,9 +276,9 @@ export class EventManager {
 					waterfallDepth < this.config.getValue('beforePersistSettleLimit');
 					waterfallDepth++
 				) {
-					const callbackReturns: Array<Promise<
-						EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler
-					>> = []
+					const callbackReturns: Array<
+						Promise<EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler>
+					> = []
 					const correspondingStates: Array<StateINode> = []
 
 					if (callbackQueue.length === 0) {

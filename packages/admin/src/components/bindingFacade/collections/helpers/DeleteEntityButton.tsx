@@ -1,19 +1,33 @@
 import { Button, ButtonOwnProps, ButtonProps, Icon } from '@contember/ui'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { EntityAccessor, useEntity, useMutationState } from '@contember/binding'
 import { usePersistWithFeedback } from '../../../ui'
 
 export type DeleteEntityButtonProps = ButtonProps & {
 	immediatePersist?: true
-	children?: React.ReactNode
+	children?: ReactNode
 }
 
-export const DeleteEntityButton = React.memo((props: DeleteEntityButtonProps) => {
+export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 	const { children, immediatePersist, ...rest } = props
 	const parentEntity = useEntity()
 	const triggerPersist = usePersistWithFeedback()
 	const isMutating = useMutationState()
-	const onClick = React.useCallback(() => {
+	const onClick = useCallback(() => {
 		if (!parentEntity.deleteEntity) {
 			return
 		}

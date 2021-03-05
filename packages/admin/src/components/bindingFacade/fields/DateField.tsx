@@ -1,7 +1,7 @@
-import { SingleLineTextInputProps, TextInput } from '@contember/ui'
-import * as React from 'react'
-import DatePicker, { ReactDatePickerProps } from 'react-datepicker'
 import { FieldAccessor } from '@contember/binding'
+import { SingleLineTextInputProps, TextInput } from '@contember/ui'
+import { FocusEvent as ReactFocusEvent, forwardRef, memo, Ref, useMemo } from 'react'
+import DatePicker, { ReactDatePickerProps } from 'react-datepicker'
 import {
 	SimpleRelativeSingleField,
 	SimpleRelativeSingleFieldMetadata,
@@ -23,25 +23,25 @@ export interface DateFieldInnerProps extends Omit<DateFieldProps, 'field' | 'lab
 	fieldMetadata: SimpleRelativeSingleFieldMetadata<string>
 }
 
-export const DateFieldInner = React.memo(
-	React.forwardRef((props: DateFieldInnerProps, suppliedRef: React.Ref<any>) => {
+export const DateFieldInner = memo(
+	forwardRef((props: DateFieldInnerProps, suppliedRef: Ref<any>) => {
 		const generateOnChange = (data: FieldAccessor<string>) => (date: Date | null) => {
 			data.updateValue(date ? date.toISOString() : null)
 		}
 		const { onFocus: outerOnFocus, onBlur: outerOnBlur } = props
-		const UnderlyingTextInput = React.useMemo(
+		const UnderlyingTextInput = useMemo(
 			() =>
-				React.forwardRef<any, any>((innerProps, ref) => {
+				forwardRef<any, any>((innerProps, ref) => {
 					const { className, onFocus, onBlur, ...legalProps } = innerProps
 					return (
 						<TextInput
 							{...legalProps}
 							ref={suppliedRef}
-							onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
+							onFocus={(e: ReactFocusEvent<HTMLInputElement>) => {
 								outerOnFocus && outerOnFocus(e)
 								innerProps.onFocus && innerProps.onFocus(e)
 							}}
-							onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+							onBlur={(e: ReactFocusEvent<HTMLInputElement>) => {
 								outerOnBlur && outerOnBlur(e)
 								innerProps.onBlur && innerProps.onBlur(e)
 							}}

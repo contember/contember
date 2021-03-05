@@ -1,24 +1,36 @@
 import cn from 'classnames'
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { FormGroupLabelPosition, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 import { ErrorList, ErrorListProps } from './'
 
 export interface FormGroupProps extends ErrorListProps {
-	label: React.ReactNode
-	children: React.ReactNode // The actual field
+	label: ReactNode
+	children: ReactNode // The actual field
 
 	size?: Size
 	labelPosition?: FormGroupLabelPosition
 
-	labelDescription?: React.ReactNode // Expands on the label e.g. to provide the additional explanation
-	description?: React.ReactNode // Can explain e.g. the kinds of values to be filled
+	labelDescription?: ReactNode // Expands on the label e.g. to provide the additional explanation
+	description?: ReactNode // Can explain e.g. the kinds of values to be filled
 
 	useLabelElement?: boolean
 }
 
-export const FormGroup = React.memo(
+export const FormGroup = memo(
 	({
 		label,
 		children,

@@ -8,6 +8,6 @@
   },
   "typings": "dist/src/index.d.ts",
   "peerDependencies": {
-    "react": "16.13.1"
+    "react": "17.0.1"
   }
 }

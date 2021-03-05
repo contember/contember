@@ -1,5 +1,5 @@
 import { useConstantLengthInvariant, useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { useCallback } from 'react'
 import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { EntityListAccessor } from '../accessors'
 import { useOnConnectionUpdate } from '../entityEvents'
@@ -22,7 +22,7 @@ function useEntityList(
 
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
-	const getEntityList = React.useCallback(() => {
+	const getEntityList = useCallback(() => {
 		const parent = getEntityByKey(entityKey)
 		return parent.getRelativeEntityList(relativeEntityList!)
 	}, [entityKey, getEntityByKey, relativeEntityList])

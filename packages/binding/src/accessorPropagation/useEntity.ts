@@ -1,5 +1,5 @@
 import { useConstantLengthInvariant, useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { useCallback } from 'react'
 import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
 import { useOnConnectionUpdate } from '../entityEvents'
@@ -20,7 +20,7 @@ function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undef
 
 	if (entity.length === 0) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const getEntityAccessor = React.useCallback(() => getEntityByKey(entityKey), [entityKey, getEntityByKey])
+		const getEntityAccessor = useCallback(() => getEntityByKey(entityKey), [entityKey, getEntityByKey])
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useAccessorUpdateSubscription(getEntityAccessor)
 	}
@@ -29,7 +29,7 @@ function useEntity(...entity: [] | [string | SugaredRelativeSingleEntity | undef
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const relativeSingleEntity = useDesugaredRelativeSingleEntity(sugaredRelativeSingleEntity)
 	// eslint-disable-next-line react-hooks/rules-of-hooks
-	const getEntity = React.useCallback(() => {
+	const getEntity = useCallback(() => {
 		const parent = getEntityByKey(entityKey)
 		return parent.getRelativeSingleEntity(relativeSingleEntity!)
 	}, [entityKey, getEntityByKey, relativeSingleEntity])

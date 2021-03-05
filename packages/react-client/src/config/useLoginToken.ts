@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useContext } from 'react'
 import { LoginTokenContext } from './LoginTokenContext'
 
-export const useLoginToken = () => React.useContext(LoginTokenContext)
+export const useLoginToken = () => useContext(LoginTokenContext)

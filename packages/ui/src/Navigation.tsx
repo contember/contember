@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { AnchorHTMLAttributes, ComponentType, createContext, ReactNode, useContext } from 'react'
 
 namespace Navigation {
 	export interface CustomTo {
@@ -8,21 +8,21 @@ namespace Navigation {
 
 	export type MiddlewareProps = {
 		to: string | CustomTo
-		children?: React.ReactNode
+		children?: ReactNode
 	} & (
 		| {
-				Component: React.ComponentType<{
+				Component: ComponentType<{
 					navigate: () => void
 					isActive: boolean
-					children?: React.ReactNode
+					children?: ReactNode
 				}>
 		  }
-		| Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
+		| Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
 	)
 
-	export type Middleware = React.ComponentType<MiddlewareProps>
+	export type Middleware = ComponentType<MiddlewareProps>
 
-	export const MiddlewareContext = React.createContext<Middleware>(({ to, children, ...props }) => {
+	export const MiddlewareContext = createContext<Middleware>(({ to, children, ...props }) => {
 		if (typeof to !== 'string') {
 			throw new Error(`If you wish to support custom targets, implement your own navigation middleware.`)
 		}
@@ -49,10 +49,10 @@ namespace Navigation {
 
 	export type IsActive = (to: string | CustomTo) => boolean
 
-	export const IsActiveContext = React.createContext<IsActive>(to => false)
+	export const IsActiveContext = createContext<IsActive>(to => false)
 
 	export const useIsActive = (to: string | CustomTo | undefined) => {
-		const isActiveContext = React.useContext(IsActiveContext)
+		const isActiveContext = useContext(IsActiveContext)
 		if (to === undefined) {
 			return false
 		}

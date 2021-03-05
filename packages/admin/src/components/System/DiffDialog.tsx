@@ -1,13 +1,12 @@
 import { Button, FormGroup, TextInput } from '@contember/ui'
-import * as React from 'react'
+import { FormEvent, PureComponent } from 'react'
 import { connect } from 'react-redux'
-import { fetchDiff } from '../../actions/system'
+import { pushRequest } from '../../actions/request'
 import { Dispatch } from '../../actions/types'
 import State from '../../state'
-import { pushRequest } from '../../actions/request'
 import { pageRequest } from '../../state/request'
 
-class ConnectedDiffDialog extends React.PureComponent<
+class ConnectedDiffDialog extends PureComponent<
 	DiffDialog.Props & DiffDialog.StateProps & DiffDialog.DispatchProps,
 	DiffDialog.State
 > {
@@ -19,7 +18,7 @@ class ConnectedDiffDialog extends React.PureComponent<
 		this.setState({ targetStage: value })
 	}
 
-	onSubmit = (e: React.FormEvent<unknown>) => {
+	onSubmit = (e: FormEvent<unknown>) => {
 		e.preventDefault()
 		this.props.onShowDiff(this.props.project, this.props.stage, this.props.viewPageName, this.state.targetStage)
 	}

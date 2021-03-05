@@ -1,15 +1,30 @@
 import { Component, Field, FieldAccessor } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { Checkbox } from '../../ui'
 import {
 	SimpleRelativeSingleFieldMetadata,
 	SimpleRelativeSingleFieldProps,
 	SimpleRelativeSingleFieldProxy,
 } from '../auxiliary'
+import { BlockProps } from '../blocks'
 
 export type CheckboxFieldProps = SimpleRelativeSingleFieldProps
 
-export const CheckboxField = Component<CheckboxFieldProps>(
+export const CheckboxField: FunctionComponent<CheckboxFieldProps> = Component(
 	props => (
 		<SimpleRelativeSingleFieldProxy
 			{...props}

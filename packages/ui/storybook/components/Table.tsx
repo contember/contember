@@ -1,6 +1,5 @@
 import { boolean, radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
 import { Table, TableCell, TableProps, TableRow } from '../../src/components'
 import { sizeKnob } from '../utils/knobs'
 

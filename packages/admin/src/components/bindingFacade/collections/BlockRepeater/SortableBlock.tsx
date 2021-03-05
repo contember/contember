@@ -1,5 +1,5 @@
 import { SugaredRelativeSingleField, useField } from '@contember/binding'
-import * as React from 'react'
+import { memo } from 'react'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
 import { RepeaterItem, RepeaterItemProps } from '../Repeater'
 
@@ -10,7 +10,7 @@ export interface SortableBlockOwnProps {
 
 export interface SortableBlockProps extends RepeaterItemProps, SortableBlockOwnProps {}
 
-export const SortableBlock = React.memo<SortableBlockProps>(props => {
+export const SortableBlock = memo<SortableBlockProps>(props => {
 	const field = useField(props.discriminationField)
 	const selectedBlock = getDiscriminatedBlock(props.normalizedBlocks, field)
 

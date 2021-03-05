@@ -1,5 +1,5 @@
 import { Component, SugaredField, SugaredFieldProps } from '@contember/binding'
-import * as React from 'react'
+import { Fragment, FunctionComponent, ReactNode, useMemo } from 'react'
 import { DiscriminatedBlocks, useNormalizedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../../collections'
 import {
@@ -30,12 +30,12 @@ type FileRepeaterProps = Omit<
 	| 'useDragHandle'
 > &
 	FileRepeaterContainerPublicProps & {
-		children?: React.ReactNode
+		children?: ReactNode
 		discriminationField?: SugaredFieldProps['field']
 	} & ((CustomDataPopulatorProps & CustomFileKindProps) | (AggregateDataPopulatorProps & StockFileKindProps))
 
 // TODO configurable container/item components
-export const FileRepeater = Component<FileRepeaterProps>(
+export const FileRepeater: FunctionComponent<FileRepeaterProps> = Component(
 	props => {
 		const fileUrlProps = props as Partial<FileUrlDataPopulatorProps>
 
@@ -44,7 +44,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 		const normalizedBlocks = useNormalizedBlocks(props.children)
 
 		// Using Required and exclamation marks to make sure we don't forget any props. This is still sound though.
-		const containerExtraProps = React.useMemo((): Required<
+		const containerExtraProps = useMemo((): Required<
 			FileRepeaterContainerPublicProps & FileRepeaterContainerPrivateProps
 		> => {
 			return {
@@ -102,13 +102,13 @@ export const FileRepeater = Component<FileRepeaterProps>(
 	},
 	(props, environment) => {
 		const fileKinds = Array.from(resolveFileKinds(props, props as Partial<FileUrlDataPopulatorProps>))
-		let normalizedChildren: React.ReactNode = (
+		let normalizedChildren: ReactNode = (
 			<>
 				{resolvePopulators(props).map((item, i) => (
-					<React.Fragment key={i}>{item.getStaticFields(environment)}</React.Fragment>
+					<Fragment key={i}>{item.getStaticFields(environment)}</Fragment>
 				))}
 				{fileKinds.map((item, i) => (
-					<React.Fragment key={i}>{item.renderFile?.()}</React.Fragment>
+					<Fragment key={i}>{item.renderFile?.()}</Fragment>
 				))}
 				{props.discriminationField && <SugaredField field={props.discriminationField} />}
 

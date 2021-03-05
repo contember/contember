@@ -1,5 +1,4 @@
-import { QueryRequestObject, useAuthedTenantQuery } from './lib'
-import { useEffect, useState } from 'react'
+import { useAuthedTenantQuery } from './lib'
 
 const LIST_USERS_QUERY = `
 	query($slug: String!) {

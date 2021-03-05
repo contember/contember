@@ -1,11 +1,25 @@
 import { Scalar } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { SugaredDiscriminateBy } from '../../discrimination'
 
 export type DiscriminatedAudioFileUploadProps = {
 	acceptAudio?: string | string[]
-	renderAudioFile?: () => React.ReactNode
-	renderAudioFilePreview?: (file: File, previewUrl: string) => React.ReactNode
+	renderAudioFile?: () => ReactNode
+	renderAudioFilePreview?: (file: File, previewUrl: string) => ReactNode
 } & (
 	| {
 			discriminateAudioBy?: SugaredDiscriminateBy

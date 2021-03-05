@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { Component as ReactComponent, ReactNode } from 'react'
 import { connect } from 'react-redux'
 import State from '../state'
 import { SelectedDimension } from '../state/request'
@@ -8,10 +8,10 @@ interface DimensionsStateProps<D extends SelectedDimension> {
 }
 
 interface DimensionsOwnProps<D extends SelectedDimension> {
-	children: (dimensions: D) => React.ReactNode
+	children: (dimensions: D) => ReactNode
 }
 
-class Dimensions<D extends SelectedDimension> extends React.Component<DimensionsStateProps<D> & DimensionsOwnProps<D>> {
+class Dimensions<D extends SelectedDimension> extends ReactComponent<DimensionsStateProps<D> & DimensionsOwnProps<D>> {
 	public render() {
 		return this.props.children(this.props.dimensions)
 	}

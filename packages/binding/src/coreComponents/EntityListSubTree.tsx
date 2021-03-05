@@ -1,6 +1,6 @@
 import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { ComponentType, ReactElement, ReactNode, useCallback } from 'react'
 import {
 	useAccessorUpdateSubscription,
 	useEntityListSubTreeParameters,
@@ -21,17 +21,17 @@ export interface EntityListSubTreeAdditionalProps {
 
 export type EntityListSubTreeProps<ListProps, EntityProps> = {
 	treeRootId?: TreeRootId
-	children?: React.ReactNode
+	children?: ReactNode
 } & EntityListSubTreeAdditionalProps &
 	(SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList) &
 	(
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
+				entityComponent: ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 		| {
-				listComponent: React.ComponentType<ListProps & EntityListBaseProps>
+				listComponent: ComponentType<ListProps & EntityListBaseProps>
 				listProps?: ListProps
 		  }
 	)
@@ -42,7 +42,7 @@ export const EntityListSubTree = Component(
 
 		const getSubTree = useGetEntityListSubTree()
 		const parameters = useEntityListSubTreeParameters(props)
-		const getAccessor = React.useCallback(() => getSubTree(parameters, props.treeRootId), [
+		const getAccessor = useCallback(() => getSubTree(parameters, props.treeRootId), [
 			getSubTree,
 			parameters,
 			props.treeRootId,
@@ -88,4 +88,4 @@ export const EntityListSubTree = Component(
 		},
 	},
 	'EntityListSubTree',
-) as <ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => React.ReactElement
+) as <ListProps, EntityProps>(props: EntityListSubTreeProps<ListProps, EntityProps>) => ReactElement

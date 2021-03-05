@@ -9,7 +9,7 @@ import {
 	useGetEntityByKey,
 	useMutationState,
 } from '@contember/binding'
-import * as React from 'react'
+import { useCallback, useMemo } from 'react'
 import {
 	BaseDynamicChoiceField,
 	useCurrentValues,
@@ -30,7 +30,7 @@ export const useDynamicSingleChoiceField = (
 	const environment = useEnvironment()
 	const isMutating = useMutationState()
 
-	const desugaredRelativePath = React.useMemo<RelativeSingleEntity>(() => {
+	const desugaredRelativePath = useMemo<RelativeSingleEntity>(() => {
 		return QueryLanguage.desugarRelativeSingleEntity(props, environment)
 	}, [environment, props])
 
@@ -38,7 +38,7 @@ export const useDynamicSingleChoiceField = (
 		desugaredRelativePath.hasOneRelationPath[desugaredRelativePath.hasOneRelationPath.length - 1]
 	const currentValueFieldName = lastHasOneRelation.field
 
-	const getCurrentValueParent = React.useCallback((): EntityAccessor => {
+	const getCurrentValueParent = useCallback((): EntityAccessor => {
 		const parentEntity = getEntityByKey(entityKey)
 		return desugaredRelativePath.hasOneRelationPath.length > 1
 			? parentEntity.getRelativeSingleEntity({

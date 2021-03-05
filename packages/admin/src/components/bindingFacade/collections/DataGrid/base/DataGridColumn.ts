@@ -1,5 +1,19 @@
 import { BindingError, Environment } from '@contember/binding'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { DataGridColumnKey } from './DataGridColumnKey'
 import { DataGridCellPublicProps } from './DataGridContainer'
 import { DataGridFilterArtifact } from './DataGridFilterArtifact'
@@ -24,7 +38,7 @@ export type DataGridColumnFiltering<FA extends DataGridFilterArtifact = DataGrid
 			initialFilter?: FA
 			getNewFilter: GetNewFilter<FA>
 			emptyFilter: FA
-			filterRenderer: React.ComponentType<FilterRendererProps<FA>>
+			filterRenderer: ComponentType<FilterRendererProps<FA>>
 	  }
 
 export type DataGridColumnOrdering =
@@ -43,7 +57,7 @@ export type DataGridColumnProps<
 	DataGridCellPublicProps &
 	DataGridColumnFiltering<FA> &
 	DataGridColumnOrdering & {
-		children: React.ReactNode
+		children: ReactNode
 	}
 
 export type DataGridColumns = Map<DataGridColumnKey, DataGridColumnProps>
@@ -51,8 +65,8 @@ export type DataGridColumns = Map<DataGridColumnKey, DataGridColumnProps>
 // This is deliberately not a Component!
 export const DataGridColumn: <FA extends DataGridFilterArtifact = DataGridFilterArtifact>(
 	props: DataGridColumnProps<FA>,
-) => React.ReactElement = <FA extends DataGridFilterArtifact = DataGridFilterArtifact>(
+) => ReactElement = <FA extends DataGridFilterArtifact = DataGridFilterArtifact>(
 	props: DataGridColumnProps<FA>,
-): React.ReactElement => {
+): ReactElement => {
 	throw new BindingError()
 }

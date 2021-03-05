@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { QueryLanguage } from '../queryLanguage'
 import { RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
@@ -29,7 +29,7 @@ function useDesugaredRelativeSingleField(
 		normalizedSugared = sugaredRelativeSingleField
 	}
 
-	return React.useMemo(
+	return useMemo(
 		() =>
 			hasField
 				? QueryLanguage.desugarRelativeSingleField(

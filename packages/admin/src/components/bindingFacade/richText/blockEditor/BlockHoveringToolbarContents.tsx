@@ -8,7 +8,7 @@ import {
 } from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
 import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
-import * as React from 'react'
+import { memo, MouseEvent as ReactMouseEvent, useMemo } from 'react'
 import { useEditor } from 'slate-react'
 import { getDiscriminatedDatum } from '../../discrimination'
 import { ElementSpecificToolbarButton } from '../toolbars'
@@ -53,7 +53,7 @@ function toToolbarGroups(
 				return {
 					label: title,
 					...rest,
-					onClick: (e: React.MouseEvent) => {
+					onClick: (e: ReactMouseEvent) => {
 						e.nativeEvent.preventDefault()
 						e.nativeEvent.stopPropagation()
 
@@ -94,17 +94,17 @@ function toToolbarGroups(
 	})
 }
 
-export const BlockHoveringToolbarContents = React.memo((props: BlockHoveringToolbarContentsProps) => {
+export const BlockHoveringToolbarContents = memo((props: BlockHoveringToolbarContentsProps) => {
 	const editor = useEditor() as BlockSlateEditor
 	const environment = useEnvironment()
 
 	const { editorReferenceBlocks, blockButtons, otherBlockButtons } = props
 
-	const groups = React.useMemo<ToolbarGroup[]>(() => {
+	const groups = useMemo<ToolbarGroup[]>(() => {
 		return toToolbarGroups(editorReferenceBlocks, blockButtons, environment, editor)
 	}, [editorReferenceBlocks, blockButtons, environment, editor])
 
-	const restGroups = React.useMemo<ToolbarGroup[] | undefined>(() => {
+	const restGroups = useMemo<ToolbarGroup[] | undefined>(() => {
 		return otherBlockButtons
 			? toToolbarGroups(editorReferenceBlocks, otherBlockButtons, environment, editor)
 			: undefined

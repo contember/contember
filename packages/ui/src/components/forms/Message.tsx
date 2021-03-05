@@ -1,5 +1,17 @@
 import cn from 'classnames'
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { MessageDistinction, MessageFlow, MessageType, Size } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
@@ -10,11 +22,11 @@ export interface MessageProps {
 	flow?: MessageFlow
 	distinction?: MessageDistinction
 	lifted?: boolean
-	children?: React.ReactNode
-	action?: React.ReactNode
+	children?: ReactNode
+	action?: ReactNode
 }
 
-export const Message = React.memo(({ children, size, flow, distinction, type, lifted, action }: MessageProps) => {
+export const Message = memo(({ children, size, flow, distinction, type, lifted, action }: MessageProps) => {
 	const prefix = useClassNamePrefix()
 	return (
 		<div

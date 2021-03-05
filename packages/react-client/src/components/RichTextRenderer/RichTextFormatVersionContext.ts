@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { createContext } from 'react'
 
-export const RichTextFormatVersionContext = React.createContext<number>(0)
+export const RichTextFormatVersionContext = createContext<number>(0)
 RichTextFormatVersionContext.displayName = 'RichTextFormatVersionContext'

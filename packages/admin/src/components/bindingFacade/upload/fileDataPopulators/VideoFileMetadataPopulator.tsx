@@ -1,5 +1,4 @@
 import { QueryLanguage, SugaredField, SugaredFieldProps } from '@contember/binding'
-import * as React from 'react'
 import { isVideo } from '../utils'
 import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
 

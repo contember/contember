@@ -8,7 +8,21 @@ import {
 } from '@contember/binding'
 import { Input } from '@contember/client'
 import { Select, TextInput } from '@contember/ui'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { Checkbox } from '../../../../ui'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
@@ -19,7 +33,7 @@ export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridH
 	SugaredRelativeSingleField & {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
-		format?: (value: Persisted) => React.ReactNode
+		format?: (value: Persisted) => ReactNode
 	}
 
 interface TextFilterArtifacts {
@@ -28,7 +42,7 @@ interface TextFilterArtifacts {
 	nullCondition: boolean
 }
 
-export const TextCell = Component<TextCellProps>(props => {
+export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 	return (
 		<DataGridColumn<TextFilterArtifacts>
 			{...props}
@@ -136,11 +150,11 @@ export const TextCell = Component<TextCellProps>(props => {
 						return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
 					}
 					if (props.format) {
-						return props.format(value)
+						return props.format(value as any)
 					}
 					return value
 				}}
 			/>
 		</DataGridColumn>
 	)
-}, 'TextCell') as <Persisted extends FieldValue = FieldValue>(props: TextCellProps<Persisted>) => React.ReactElement
+}, 'TextCell') as <Persisted extends FieldValue = FieldValue>(props: TextCellProps<Persisted>) => ReactElement

@@ -1,6 +1,6 @@
 import { Environment } from '@contember/binding'
 import { ActionableBox, Box, Dropdown, Icon, Justification, TableHeaderCell } from '@contember/ui'
-import * as React from 'react'
+import { ComponentType, createElement, ReactElement, ReactNode } from 'react'
 import { FilterRendererProps } from './DataGridColumn'
 import { DataGridFilterArtifact } from './DataGridFilterArtifact'
 import { cycleOrderDirection, DataGridOrderDirection } from './DataGridOrderDirection'
@@ -8,11 +8,11 @@ import { DataGridSetFilter } from './DataGridSetFilter'
 import { DataGridSetOrderBy } from './DataGridSetOrderBy'
 
 export interface DataGridHeaderCellPublicProps {
-	header?: React.ReactNode
+	header?: ReactNode
 	shrunk?: boolean
 	headerJustification?: Justification
-	ascOrderIcon?: React.ReactNode
-	descOrderIcon?: React.ReactNode
+	ascOrderIcon?: ReactNode
+	descOrderIcon?: ReactNode
 }
 
 export interface DataGridHeaderCellInternalProps {
@@ -23,7 +23,7 @@ export interface DataGridHeaderCellInternalProps {
 	orderDirection: DataGridOrderDirection
 	setFilter: DataGridSetFilter
 	setOrderBy: DataGridSetOrderBy
-	filterRenderer: React.ComponentType<FilterRendererProps<DataGridFilterArtifact>> | undefined
+	filterRenderer: ComponentType<FilterRendererProps<DataGridFilterArtifact>> | undefined
 }
 
 export interface DataGridHeaderCellProps extends DataGridHeaderCellInternalProps, DataGridHeaderCellPublicProps {}
@@ -42,7 +42,7 @@ export function DataGridHeaderCell({
 	setFilter,
 	setOrderBy,
 	shrunk,
-}: DataGridHeaderCellProps): React.ReactElement {
+}: DataGridHeaderCellProps): ReactElement {
 	return (
 		<TableHeaderCell scope="col" justification={headerJustification} shrunk={shrunk}>
 			<span style={{ display: 'flex', justifyContent: 'flex-start', gap: '.25em' }}>
@@ -79,7 +79,7 @@ export function DataGridHeaderCell({
 								}}
 							>
 								<Box heading={<>Filter: {header}</>}>
-									{React.createElement(filterRenderer, {
+									{createElement(filterRenderer, {
 										filter: filterArtifact === undefined ? emptyFilterArtifact : filterArtifact,
 										setFilter: setFilter,
 										environment: environment,

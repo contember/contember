@@ -1,6 +1,5 @@
 import { text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
 import { Button, TitleBar } from '../../src/components'
 
 storiesOf('TitleBar', module).add('simple', () => {

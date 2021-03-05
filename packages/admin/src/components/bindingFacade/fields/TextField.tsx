@@ -1,6 +1,5 @@
-import { TextInput, TextInputProps } from '@contember/ui'
-import * as React from 'react'
 import { FieldAccessor } from '@contember/binding'
+import { TextInput, TextInputProps } from '@contember/ui'
 import { SimpleRelativeSingleField, SimpleRelativeSingleFieldProps } from '../auxiliary'
 
 export type TextFieldProps = SimpleRelativeSingleFieldProps &

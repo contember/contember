@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import * as React from 'react'
+import { CSSProperties, memo, ReactNode, useEffect, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { CollapsibleTransition } from '../types'
 import { forceReflow, toEnumViewClass, toStateClass } from '../utils'
@@ -7,15 +7,15 @@ import { forceReflow, toEnumViewClass, toStateClass } from '../utils'
 export interface CollapsibleProps {
 	expanded: boolean
 	transition?: CollapsibleTransition
-	children?: React.ReactNode
+	children?: ReactNode
 	onTransitionEnd?: () => void
 }
 
-export const Collapsible = React.memo((props: CollapsibleProps) => {
-	const contentRef = React.useRef<HTMLDivElement>(null)
-	const [isTransitioning, setIsTransitioning] = React.useState(false)
-	const [contentHeight, setContentHeight] = React.useState('auto')
-	const [delayedExpanded, setDelayedExpanded] = React.useState(props.expanded)
+export const Collapsible = memo((props: CollapsibleProps) => {
+	const contentRef = useRef<HTMLDivElement>(null)
+	const [isTransitioning, setIsTransitioning] = useState(false)
+	const [contentHeight, setContentHeight] = useState('auto')
+	const [delayedExpanded, setDelayedExpanded] = useState(props.expanded)
 
 	const onTransitionEnd = () => {
 		setContentHeight('auto')
@@ -28,7 +28,7 @@ export const Collapsible = React.memo((props: CollapsibleProps) => {
 		setContentHeight(contentHeight)
 	}
 
-	React.useEffect(() => {
+	useEffect(() => {
 		let isMounted = true
 		if (props.expanded !== delayedExpanded) {
 			setIsTransitioning(true)
@@ -59,7 +59,7 @@ export const Collapsible = React.memo((props: CollapsibleProps) => {
 			style={
 				{
 					'--cui-collapsible-content-height': contentHeight,
-				} as React.CSSProperties // Custom properties not supported workaround
+				} as CSSProperties // Custom properties not supported workaround
 			}
 			aria-hidden={!props.expanded}
 			onTransitionEnd={onTransitionEnd}

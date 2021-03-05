@@ -1,10 +1,22 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import cn from 'classnames'
 import { useClassNamePrefix } from '../auxiliary'
 import { Icon } from './Icon'
 
 export interface ContentStatusProps {
-	label?: React.ReactNode
+	label?: ReactNode
 }
 
 export function ContentStatus({ label }: ContentStatusProps) {

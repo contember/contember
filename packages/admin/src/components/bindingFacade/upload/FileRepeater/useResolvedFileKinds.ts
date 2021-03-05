@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import { FileUrlDataPopulatorProps } from '../fileDataPopulators'
 import { getAudioFileDefaults, getImageFileDefaults, getVideoFileDefaults } from '../stockFileKindDefaults'
 import { CustomFileKindProps } from './CustomFileKindProps'
@@ -15,7 +15,7 @@ export const useResolvedFileKinds = (
 	const p = props as CustomFileKindProps & StockFileKindProps // Note the &
 	const p2 = props as any
 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	return React.useMemo(() => resolveFileKinds(p, fileUrlProps), [
+	return useMemo(() => resolveFileKinds(p, fileUrlProps), [
 		p.fileKinds,
 		fileUrlProps.fileUrlField,
 		fileUrlProps.audioFileUrlField,

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { shallowEqual, useSelector } from 'react-redux'
 import State from '../state'
 

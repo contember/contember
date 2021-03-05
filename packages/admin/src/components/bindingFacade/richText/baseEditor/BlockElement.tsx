@@ -1,5 +1,5 @@
 import { EditorBlockBoundary } from '@contember/ui'
-import * as React from 'react'
+import { memo, createElement, Fragment } from 'react'
 import { ReactEditor, RenderElementProps, useEditor } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
 import { EditorWithEssentials } from './EditorWithEssentials'
@@ -10,7 +10,7 @@ export interface BlockElementProps extends RenderElementProps {
 	withBoundaries?: boolean
 }
 
-export const BlockElement = React.memo(function BlockElement({
+export const BlockElement = memo(function BlockElement({
 	element,
 	children,
 	attributes,
@@ -20,14 +20,14 @@ export const BlockElement = React.memo(function BlockElement({
 	const editor = useEditor() as EditorWithEssentials<EditorNode>
 	const dataAttributes = ContemberEditor.getElementDataAttributes(element)
 
-	return React.createElement(
+	return createElement(
 		domElement,
 		{
 			...dataAttributes,
 			...attributes,
 		},
 		[
-			<React.Fragment key="before">
+			<Fragment key="before">
 				{withBoundaries && (
 					<EditorBlockBoundary
 						blockEdge="before"
@@ -37,9 +37,9 @@ export const BlockElement = React.memo(function BlockElement({
 						}}
 					/>
 				)}
-			</React.Fragment>,
-			<React.Fragment key="block">{children}</React.Fragment>,
-			<React.Fragment key="after">
+			</Fragment>,
+			<Fragment key="block">{children}</Fragment>,
+			<Fragment key="after">
 				{withBoundaries && (
 					<EditorBlockBoundary
 						blockEdge="after"
@@ -49,7 +49,7 @@ export const BlockElement = React.memo(function BlockElement({
 						}}
 					/>
 				)}
-			</React.Fragment>,
+			</Fragment>,
 		],
 	)
 })

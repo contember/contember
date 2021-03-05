@@ -1,4 +1,18 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
 import { ScrollTargetElement } from './ScrollTargetElement'
 
@@ -6,7 +20,7 @@ export interface ScrollTargetRendererProps extends Omit<RenderElementProps, 'ele
 	element: ScrollTargetElement
 }
 
-export const ScrollTargetRenderer: React.FunctionComponent<ScrollTargetRendererProps> = (
+export const ScrollTargetRenderer: FunctionComponent<ScrollTargetRendererProps> = (
 	props: ScrollTargetRendererProps,
 ) => {
 	const isSelected = useSelected()

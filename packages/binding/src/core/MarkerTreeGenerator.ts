@@ -1,5 +1,5 @@
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import {
@@ -29,7 +29,7 @@ type NodeResult = Terminals | Nonterminals
 export class MarkerTreeGenerator {
 	private static childrenAnalyzer = MarkerTreeGenerator.initializeChildrenAnalyzer()
 
-	public constructor(private sourceTree: React.ReactNode, private environment: Environment = Environment.create()) {}
+	public constructor(private sourceTree: ReactNode, private environment: Environment = Environment.create()) {}
 
 	public generate(): MarkerTreeRoot {
 		const processed = MarkerTreeGenerator.childrenAnalyzer.processChildren(this.sourceTree, this.environment)

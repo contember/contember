@@ -1,6 +1,6 @@
-import * as React from 'react'
-import cn from 'classnames'
 import md5 from 'blueimp-md5'
+import cn from 'classnames'
+import { FunctionComponent } from 'react'
 
 export enum AvatarSize {
 	Size1 = 1,
@@ -21,7 +21,7 @@ export interface AvatarProps {
 	email?: string
 }
 
-export const Avatar: React.FunctionComponent<AvatarProps> = props => {
+export const Avatar: FunctionComponent<AvatarProps> = props => {
 	const { size = AvatarSize.Size1, shape = AvatarShape.Circle } = props
 	const email = props.email || ''
 

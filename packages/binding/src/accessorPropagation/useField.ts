@@ -1,5 +1,5 @@
 import { useConstantLengthInvariant, useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { useCallback } from 'react'
 import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { FieldAccessor } from '../accessors'
 import { useOnConnectionUpdate } from '../entityEvents'
@@ -24,7 +24,7 @@ function useField<Persisted extends FieldValue = FieldValue, Produced extends Pe
 
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
-	const getField = React.useCallback(() => {
+	const getField = useCallback(() => {
 		const parent = getEntityByKey(entityKey)
 		return parent.getRelativeSingleField<Persisted, Produced>(relativeSingleField!)
 	}, [entityKey, getEntityByKey, relativeSingleField])

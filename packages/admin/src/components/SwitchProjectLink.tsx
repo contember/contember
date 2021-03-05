@@ -1,10 +1,10 @@
-import * as React from 'react'
+import { Component as ReactComponent, ComponentType } from 'react'
 import { connect } from 'react-redux'
 import State from '../state'
 import { InnerProps, Link } from './Link'
 
 interface SwitchProjectLinkProps {
-	Component?: React.ComponentType<InnerProps>
+	Component?: ComponentType<InnerProps>
 }
 
 interface SwitchProjectStateProps {
@@ -13,7 +13,7 @@ interface SwitchProjectStateProps {
 
 type Props = SwitchProjectStateProps & SwitchProjectLinkProps
 
-class SwitchProjectLink extends React.Component<Props, {}> {
+class SwitchProjectLink extends ReactComponent<Props, {}> {
 	render() {
 		if (!this.props.hasMoreProjects) {
 			return null

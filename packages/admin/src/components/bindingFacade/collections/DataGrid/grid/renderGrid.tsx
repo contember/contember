@@ -6,7 +6,7 @@ import {
 	SugaredQualifiedEntityList,
 	TreeRootId,
 } from '@contember/binding'
-import * as React from 'react'
+import { Fragment, ReactElement } from 'react'
 import {
 	DataGridContainer,
 	DataGridContainerPublicProps,
@@ -34,7 +34,7 @@ export const renderGrid = (
 	displayedState: DataGridState,
 	desiredState: DataGridState,
 	environment: Environment,
-): React.ReactElement => {
+): ReactElement => {
 	const {
 		paging: { pageIndex, itemsPerPage },
 		hiddenColumns,
@@ -76,10 +76,10 @@ export const renderGrid = (
 			{Array.from(columns)
 				.filter(([key]) => !hiddenColumns.has(key))
 				.map(([key, props]) => (
-					<React.Fragment key={key}>
+					<Fragment key={key}>
 						{props.header}
 						{props.children}
-					</React.Fragment>
+					</Fragment>
 				))}
 		</EntityListSubTree>
 	)

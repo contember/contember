@@ -4,10 +4,11 @@
 		"declarationMap": true,
 		"sourceMap": true,
 		"composite": true,
+		"skipLibCheck": true,
 		"noEmitOnError": true,
 		"experimentalDecorators": true,
 		"esModuleInterop": true,
-		"jsx": "react",
+		"jsx": "react-jsx",
 
 		"target": "es2019",
 		"moduleResolution": "node",

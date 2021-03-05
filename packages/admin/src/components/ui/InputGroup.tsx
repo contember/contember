@@ -1,11 +1,11 @@
-import * as React from 'react'
 import cn from 'classnames'
+import { InputHTMLAttributes, PureComponent } from 'react'
 
 export interface InputGroupProps {
 	large?: boolean
 }
 
-export class InputGroup extends React.PureComponent<InputGroupProps & React.InputHTMLAttributes<HTMLInputElement>> {
+export class InputGroup extends PureComponent<InputGroupProps & InputHTMLAttributes<HTMLInputElement>> {
 	public render() {
 		const { large, children, ...rest } = this.props
 

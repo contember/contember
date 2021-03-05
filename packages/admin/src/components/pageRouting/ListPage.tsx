@@ -4,7 +4,7 @@ import {
 	EntityListSubTreeAdditionalProps,
 	SugaredQualifiedEntityList,
 } from '@contember/binding'
-import * as React from 'react'
+import { memo, ReactElement, ReactNode } from 'react'
 import { FeedbackRenderer, ListRenderer, ListRendererProps } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
 
@@ -12,11 +12,11 @@ export interface ListPageProps<ContainerExtraProps, ItemExtraProps>
 	extends SugaredQualifiedEntityList,
 		EntityListSubTreeAdditionalProps {
 	pageName: string
-	children?: React.ReactNode
+	children?: ReactNode
 	rendererProps?: Omit<ListRendererProps<ContainerExtraProps, ItemExtraProps>, 'accessor' | 'children'>
 }
 
-const ListPage = React.memo(
+const ListPage = memo(
 	<ContainerExtraProps, ItemExtraProps>({
 		children,
 		rendererProps,
@@ -31,7 +31,7 @@ const ListPage = React.memo(
 	),
 ) as (<ContainerExtraProps, ItemExtraProps>(
 	props: ListPageProps<ContainerExtraProps, ItemExtraProps>,
-) => React.ReactElement) &
+) => ReactElement) &
 	Partial<PageProvider<ListPageProps<never, never>>>
 
 ListPage.getPageName = (props: ListPageProps<never, never>) => props.pageName

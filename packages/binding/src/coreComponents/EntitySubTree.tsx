@@ -1,6 +1,6 @@
 import { whereToFilter } from '@contember/client'
 import { useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { ComponentType, ReactElement, ReactNode, useCallback } from 'react'
 import { useAccessorUpdateSubscription, useEntitySubTreeParameters, useGetEntitySubTree } from '../accessorPropagation'
 import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
 import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
@@ -19,13 +19,13 @@ export type EntitySubTreeAdditionalCreationProps = {} | SetOrderFieldOnCreateOwn
 
 export type EntitySubTreeProps<EntityProps> = {
 	treeRootId?: TreeRootId
-	children?: React.ReactNode
+	children?: ReactNode
 } & EntitySubTreeAdditionalProps &
 	(SugaredQualifiedSingleEntity | (SugaredUnconstrainedQualifiedSingleEntity & EntitySubTreeAdditionalCreationProps)) &
 	(
 		| {}
 		| {
-				entityComponent: React.ComponentType<EntityProps & EntityBaseProps>
+				entityComponent: ComponentType<EntityProps & EntityBaseProps>
 				entityProps?: EntityProps
 		  }
 	)
@@ -36,7 +36,7 @@ export const EntitySubTree = Component(
 
 		const getSubTree = useGetEntitySubTree()
 		const parameters = useEntitySubTreeParameters(props)
-		const getAccessor = React.useCallback(() => getSubTree(parameters, props.treeRootId), [
+		const getAccessor = useCallback(() => getSubTree(parameters, props.treeRootId), [
 			getSubTree,
 			parameters,
 			props.treeRootId,
@@ -98,4 +98,4 @@ export const EntitySubTree = Component(
 		},
 	},
 	'EntitySubTree',
-) as <EntityProps>(pros: EntitySubTreeProps<EntityProps>) => React.ReactElement
+) as <EntityProps>(pros: EntitySubTreeProps<EntityProps>) => ReactElement

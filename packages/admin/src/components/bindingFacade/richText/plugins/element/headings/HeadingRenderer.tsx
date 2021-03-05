@@ -1,5 +1,19 @@
 import { EditorHeading } from '@contember/ui'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { RenderElementProps } from 'slate-react'
 import { HeadingElement } from './HeadingElement'
 
@@ -7,7 +21,7 @@ export interface HeadingRendererProps extends Omit<RenderElementProps, 'element'
 	element: HeadingElement
 }
 
-export const HeadingRenderer: React.FunctionComponent<HeadingRendererProps> = ({
+export const HeadingRenderer: FunctionComponent<HeadingRendererProps> = ({
 	attributes,
 	element,
 	children,

@@ -1,8 +1,20 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { ContemberLogo } from './ContemberLogo'
 export interface LayoutHeadingProps {
-	label?: React.ReactNode
+	label?: ReactNode
 }
 export function LayoutHeading({ label }: LayoutHeadingProps) {
 	const prefix = useClassNamePrefix()

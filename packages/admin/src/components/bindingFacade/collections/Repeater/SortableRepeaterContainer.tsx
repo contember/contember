@@ -1,11 +1,25 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { SortableContainer } from 'react-sortable-hoc'
 
 export interface SortableRepeaterContainerProps {
-	children: React.ReactNode
+	children: ReactNode
 }
 
-export const SortableRepeaterContainer = React.memo(
+export const SortableRepeaterContainer = memo(
 	SortableContainer(({ children }: SortableRepeaterContainerProps) => <>{children}</>),
 )
 SortableRepeaterContainer.displayName = 'SortableRepeaterContainer'

@@ -1,8 +1,8 @@
-import * as React from 'react'
+import { memo } from 'react'
 import { useProjectUserRoles } from '../../acl'
 import { isDevMode } from './isDevMode'
 
-export const ProjectUserRolesRevealer = React.memo(() => {
+export const ProjectUserRolesRevealer = memo(() => {
 	const myRoles = useProjectUserRoles()
 	const hasRoles = myRoles.size !== 0
 

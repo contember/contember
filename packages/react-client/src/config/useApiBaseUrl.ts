@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useContext } from 'react'
 import { ApiBaseUrlContext } from './ApiBaseUrlContext'
 
-export const useApiBaseUrl = () => React.useContext(ApiBaseUrlContext)
+export const useApiBaseUrl = () => useContext(ApiBaseUrlContext)

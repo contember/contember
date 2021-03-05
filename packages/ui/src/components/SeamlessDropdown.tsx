@@ -1,11 +1,23 @@
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import cn from 'classnames'
 import { useClassNamePrefix, useCloseOnEscapeOrClickOutside } from '../auxiliary'
 import { toViewClass } from '../utils'
 
 export interface SeamlessDropdownProps {
-	label: React.ReactNode
-	children?: React.ReactNode
+	label: ReactNode
+	children?: ReactNode
 	hoverable?: boolean
 	inline?: boolean
 	caret?: boolean
@@ -13,13 +25,13 @@ export interface SeamlessDropdownProps {
 
 export function SeamlessDropdown({ label, children, hoverable, caret, inline }: SeamlessDropdownProps) {
 	const prefix = useClassNamePrefix()
-	const [open, setOpen] = React.useState(false)
+	const [open, setOpen] = useState(false)
 
-	const toggleOpen = React.useCallback(() => {
+	const toggleOpen = useCallback(() => {
 		setOpen(open => !open)
 	}, [])
 
-	const close = React.useCallback(() => {
+	const close = useCallback(() => {
 		setOpen(false)
 	}, [])
 

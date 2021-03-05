@@ -5,12 +5,12 @@ import {
 	SugaredRelativeSingleField,
 	useDerivedField,
 	useEnvironment,
-	useMutationState,
 	useField,
+	useMutationState,
 } from '@contember/binding'
 import { FormGroup, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
-import * as React from 'react'
+import { FunctionComponent, useCallback, useMemo } from 'react'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 
@@ -23,7 +23,7 @@ export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concea
 		concealTimeout?: number
 	}
 
-export const SlugField = Component<SlugFieldProps>(
+export const SlugField: FunctionComponent<SlugFieldProps> = Component(
 	({
 		buttonProps,
 		concealTimeout,
@@ -35,11 +35,7 @@ export const SlugField = Component<SlugFieldProps>(
 		...props
 	}) => {
 		const environment = useEnvironment()
-		const {
-			normalizedUnpersistedHardPrefix,
-			normalizedPersistedHardPrefix,
-			normalizedPersistedSoftPrefix,
-		} = React.useMemo(
+		const { normalizedUnpersistedHardPrefix, normalizedPersistedHardPrefix, normalizedPersistedSoftPrefix } = useMemo(
 			() => ({
 				normalizedUnpersistedHardPrefix:
 					typeof unpersistedHardPrefix === 'function'
@@ -52,7 +48,7 @@ export const SlugField = Component<SlugFieldProps>(
 			}),
 			[environment, persistedHardPrefix, persistedSoftPrefix, unpersistedHardPrefix],
 		)
-		const transform = React.useCallback(
+		const transform = useCallback(
 			(driverFieldValue: string | null) => {
 				const slugValue = slugify(driverFieldValue || '')
 

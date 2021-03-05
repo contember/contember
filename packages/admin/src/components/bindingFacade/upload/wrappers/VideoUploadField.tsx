@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import * as React from 'react'
+import { FunctionComponent } from 'react'
 import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { UploadField } from '../core'
 import {
@@ -18,7 +18,7 @@ export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps &
 		additionalFileDataPopulators?: Iterable<FileDataPopulator>
 	}
 
-export const VideoUploadField = Component<VideoUploadFieldProps>(props => {
+export const VideoUploadField: FunctionComponent<VideoUploadFieldProps> = Component(props => {
 	const defaults = getVideoFileDefaults(props.field)
 	return (
 		<UploadField

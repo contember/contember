@@ -1,5 +1,5 @@
-import * as GraphQlBuilder from './graphQlBuilder'
 import * as CrudQueryBuilder from './crudQueryBuilder'
+import * as GraphQlBuilder from './graphQlBuilder'
 
 export * from '@contember/schema'
 export { GraphQlBuilder, CrudQueryBuilder }

@@ -1,12 +1,5 @@
-import * as React from 'react'
-import {
-	EntityAccessor,
-	Environment,
-	ErrorAccessor,
-	FieldAccessor,
-	FieldValue,
-	SugaredRelativeSingleField,
-} from '@contember/binding'
+import { EntityAccessor, Environment, ErrorAccessor, FieldValue } from '@contember/binding'
+import { ReactElement, ReactNode } from 'react'
 
 export namespace ChoiceFieldData {
 	export type ChoiceArity = 'single' | 'multiple'
@@ -19,9 +12,9 @@ export namespace ChoiceFieldData {
 
 	export interface SingleDatum<ActualValue extends Environment.Value = string> {
 		key: ValueRepresentation
-		label: React.ReactNode
+		label: ReactNode
 		searchKeywords: string
-		description?: React.ReactNode
+		description?: ReactNode
 		actualValue: ActualValue
 	}
 
@@ -53,10 +46,10 @@ export namespace ChoiceFieldData {
 	export type MetadataPropsByArity =
 		| {
 				arity: 'single'
-				children: (metadata: ChoiceFieldData.SingleChoiceFieldMetadata) => React.ReactElement | null
+				children: (metadata: ChoiceFieldData.SingleChoiceFieldMetadata) => ReactElement | null
 		  }
 		| {
 				arity: 'multiple'
-				children: (metadata: ChoiceFieldData.MultipleChoiceFieldMetadata) => React.ReactElement | null
+				children: (metadata: ChoiceFieldData.MultipleChoiceFieldMetadata) => ReactElement | null
 		  }
 }

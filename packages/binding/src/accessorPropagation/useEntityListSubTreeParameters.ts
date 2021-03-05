@@ -1,5 +1,5 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
-import * as React from 'react'
+import { useMemo } from 'react'
 import { Alias, SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
 
 export function useEntityListSubTreeParameters(alias: Alias): Alias
@@ -35,7 +35,7 @@ export function useEntityListSubTreeParameters(
 
 		if (typeof entities === 'string') {
 			// eslint-disable-next-line react-hooks/rules-of-hooks
-			return React.useMemo(
+			return useMemo(
 				() => ({
 					isCreating: true,
 					entities,
@@ -44,7 +44,7 @@ export function useEntityListSubTreeParameters(
 			)
 		}
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return React.useMemo(
+		return useMemo(
 			() => ({
 				isCreating: true,
 				entities: { entityName: entities.entityName },
@@ -56,7 +56,7 @@ export function useEntityListSubTreeParameters(
 
 	if (typeof entities === 'string') {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		return React.useMemo(
+		return useMemo(
 			() => ({
 				entities: entities,
 				orderBy: qualifiedEntityList.orderBy,
@@ -67,7 +67,7 @@ export function useEntityListSubTreeParameters(
 		)
 	}
 	// eslint-disable-next-line react-hooks/rules-of-hooks
-	return React.useMemo(
+	return useMemo(
 		() => ({
 			entities: {
 				entityName: entities.entityName,

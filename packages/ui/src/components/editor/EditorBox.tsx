@@ -1,5 +1,17 @@
 import cn from 'classnames'
-import * as React from 'react'
+import {
+	ReactNode,
+	ReactElement,
+	useMemo,
+	useCallback,
+	useEffect,
+	useRef,
+	ComponentType,
+	MouseEvent as ReactMouseEvent,
+	memo,
+	useState,
+	useContext,
+} from 'react'
 import { IncreaseBoxDepth, IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
 import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
 import { NativeProps } from '../../types'
@@ -7,14 +19,14 @@ import { toStateClass } from '../../utils'
 import { Heading } from '../Heading'
 
 export interface EditorBoxOwnProps {
-	heading?: React.ReactNode
-	children: React.ReactNode
+	heading?: ReactNode
+	children: ReactNode
 	isActive?: boolean
 }
 
 export interface EditorBoxProps extends EditorBoxOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
 
-export const EditorBox = React.memo(function EditorBox({
+export const EditorBox = memo(function EditorBox({
 	children,
 	heading,
 	isActive = false,
@@ -22,8 +34,8 @@ export const EditorBox = React.memo(function EditorBox({
 	...divProps
 }: EditorBoxProps) {
 	const prefix = useClassNamePrefix()
-	const boxDepth = React.useContext(BoxDepthContext)
-	const headingDepth = React.useContext(HeadingDepthContext)
+	const boxDepth = useContext(BoxDepthContext)
+	const headingDepth = useContext(HeadingDepthContext)
 
 	return (
 		<div className={cn(`${prefix}editorBox`, toStateClass('active', isActive), className)} {...divProps}>

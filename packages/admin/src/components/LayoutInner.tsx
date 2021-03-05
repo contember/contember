@@ -1,9 +1,9 @@
 import { Box } from '@contember/ui'
-import * as React from 'react'
+import { memo } from 'react'
 
-export const LayoutInner = React.memo(({ children }) => <div className="layout-content-in">{children}</div>)
+export const LayoutInner = memo(({ children }) => <div className="layout-content-in">{children}</div>)
 
-export const LayoutSide = React.memo(({ children }) => (
+export const LayoutSide = memo(({ children }) => (
 	<div className="layout-content-side">
 		<Box>{children}</Box>
 	</div>

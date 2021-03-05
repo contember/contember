@@ -1,11 +1,11 @@
-import * as React from 'react'
+import { ReactNode } from 'react'
 import { EntityAccessor } from '../accessors'
 import { EntityKeyContext } from './EntityKeyContext'
 import { EnvironmentContext } from './EnvironmentContext'
 
 export interface EntityProviderProps {
 	accessor: EntityAccessor
-	children: React.ReactNode
+	children: ReactNode
 }
 
 export function AccessorProvider(props: EntityProviderProps) {

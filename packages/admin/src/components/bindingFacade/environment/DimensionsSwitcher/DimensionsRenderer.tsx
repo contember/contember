@@ -1,7 +1,21 @@
 import { EntityAccessor, EntityListAccessor, Entity, useEnvironment } from '@contember/binding'
 import { emptyArray } from '@contember/react-utils'
 import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown } from '@contember/ui'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { RequestChange } from '../../../../state/request'
 import { Link } from '../../../Link'
 import { useRedirect } from '../../../pageRouting'
@@ -13,7 +27,7 @@ export interface DimensionsRendererProps {
 	accessor: EntityListAccessor
 	buttonProps?: ButtonBasedButtonProps
 	dimension: string
-	labelFactory: React.ReactNode
+	labelFactory: ReactNode
 	maxItems: number
 	minItems: number
 	renderSelected?: SelectedDimensionRenderer
@@ -24,7 +38,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 	const environment = useEnvironment()
 	const redirect = useRedirect()
 
-	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): React.ReactNode => {
+	const renderSelected = (selectedDimensions: StatefulDimensionDatum<true>[]): ReactNode => {
 		const renderer = props.renderSelected || renderByJoining
 
 		return renderer(selectedDimensions)
@@ -106,7 +120,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		if (canSelectJustOne) {
 			return <ButtonGroup orientation="vertical">{renderedDimensions}</ButtonGroup>
 		}
-		return <React.Fragment key="multipleDimensions">{renderedDimensions}</React.Fragment>
+		return <Fragment key="multipleDimensions">{renderedDimensions}</Fragment>
 	}
 
 	const getNormalizedData = (currentDimensions: string[], accessor: EntityListAccessor): StatefulDimensionDatum[] => {
@@ -145,7 +159,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 				.filter((item): item is StatefulDimensionDatum<true> => !!item && item.isSelected)
 		: emptyArray
 
-	React.useEffect(() => {
+	useEffect(() => {
 		const redirectTarget = selectedDimensions.length === 0 ? normalizedData || [] : selectedDimensions
 
 		if (normalizedData !== undefined && selectedDimensions.length === 0 && redirectTarget.length > 0) {

@@ -7,18 +7,18 @@ import {
 	StaticRenderProvider,
 	SugaredRelativeSingleEntity,
 } from '@contember/binding'
-import * as React from 'react'
+import { PureComponent, ReactElement, ReactNode, ReactNodeArray } from 'react'
 
 type EnforceSubtypeRelation<Sub extends Super, Super> = never
 
 export interface SideDimensionsProps extends SideDimensions.CommonDimensionProps {
 	dimension?: string
 	staticOptions?: Array<Environment.Value>
-	children: React.ReactNode
+	children: ReactNode
 	alignChildren?: boolean
 }
 
-class SideDimensions extends React.PureComponent<SideDimensionsProps> {
+class SideDimensions extends PureComponent<SideDimensionsProps> {
 	static displayName = 'SideDimensions'
 
 	public render() {
@@ -31,7 +31,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 		)
 	}
 
-	public static staticRender(props: SideDimensionsProps, environment: Environment): React.ReactElement | null {
+	public static staticRender(props: SideDimensionsProps, environment: Environment): ReactElement | null {
 		if ((props.dimension === undefined) === (props.staticOptions === undefined)) {
 			throw new BindingError(
 				`The SideDimensions component needs to be passed exactly one of its 'dimension' or 'staticOptions' props.`,
@@ -54,8 +54,7 @@ class SideDimensions extends React.PureComponent<SideDimensionsProps> {
 		}
 
 		const alignChildren: boolean = props.alignChildren !== false
-		const children: React.ReactNodeArray =
-			Array.isArray(props.children) && alignChildren ? props.children : [props.children]
+		const children: ReactNodeArray = Array.isArray(props.children) && alignChildren ? props.children : [props.children]
 
 		return (
 			<div className="sideDimensions-dimensions">
@@ -90,12 +89,12 @@ namespace SideDimensions {
 	}
 
 	export interface SingleDimensionProps extends CommonDimensionProps {
-		children: React.ReactNode
+		children: ReactNode
 		environment: Environment
 		dimensionValue: Environment.Value
 	}
 
-	export class SingleDimension extends React.PureComponent<SingleDimensionProps> {
+	export class SingleDimension extends PureComponent<SingleDimensionProps> {
 		static displayName = 'SideDimension'
 
 		public render() {
@@ -107,7 +106,7 @@ namespace SideDimensions {
 			)
 		}
 
-		public static staticRender(props: SingleDimensionProps, environment: Environment): React.ReactNode {
+		public static staticRender(props: SingleDimensionProps, environment: Environment): ReactNode {
 			if (!props.hasOneField) {
 				return props.children
 			}

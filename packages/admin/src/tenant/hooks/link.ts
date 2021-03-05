@@ -1,12 +1,11 @@
-import * as React from 'react'
+import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { RequestChange } from '../../state/request'
-import { requestStateToPath, RouteMap } from '../../utils/url'
-import routes from '../../routes'
-import State from '../../state'
-import { useMemo } from 'react'
 import { pushRequest } from '../../actions/request'
 import { PageChange } from '../../components/pageRouting/PageLink'
+import routes from '../../routes'
+import State from '../../state'
+import { RequestChange } from '../../state/request'
+import { requestStateToPath, RouteMap } from '../../utils/url'
 
 interface UseLinkReturn {
 	goTo: () => void
@@ -25,7 +24,7 @@ export const useLink = (requestChange: RequestChange): UseLinkReturn => {
 	}, [request, requestChange, routeMap])
 
 	const dispatch = useDispatch()
-	const goTo = React.useCallback(() => {
+	const goTo = useCallback(() => {
 		dispatch(pushRequest(requestChange))
 	}, [dispatch, requestChange])
 
@@ -37,7 +36,7 @@ export const usePageLink = (pageChange: PageChange | string): UseLinkReturn => {
 		return typeof pageChange === 'string' ? () => ({ name: pageChange }) : pageChange
 	}, [pageChange])
 
-	const requestChange = React.useCallback(
+	const requestChange = useCallback(
 		currentState => {
 			if (currentState.name === 'project_page') {
 				const target = realPageChange()

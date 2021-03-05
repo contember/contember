@@ -1,6 +1,5 @@
 import { boolean, radios } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
 import { Collapsible, CollapsibleProps } from '../../src'
 
 storiesOf('Collapsible', module).add('simple', () => {

@@ -1,13 +1,13 @@
-import * as React from 'react'
+import { memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { Dropdown } from './Dropdown'
 import { Button, ButtonProps } from './forms'
 import { Icon, IconProps } from './Icon'
 
 export interface ActionableBoxProps {
-	editContents?: React.ReactNode
-	onRemove?: (e: React.MouseEvent<HTMLButtonElement>) => void
-	children: React.ReactNode
+	editContents?: ReactNode
+	onRemove?: (e: ReactMouseEvent<HTMLButtonElement>) => void
+	children: ReactNode
 }
 
 const commonButtonProps: ButtonProps = {
@@ -18,7 +18,7 @@ const commonIconProps: IconProps = {
 	size: 'small',
 }
 
-export const ActionableBox = React.memo(({ children, editContents, onRemove }: ActionableBoxProps) => {
+export const ActionableBox = memo(({ children, editContents, onRemove }: ActionableBoxProps) => {
 	const prefix = useClassNamePrefix()
 
 	if (editContents === undefined && onRemove === undefined) {

@@ -1,5 +1,4 @@
 import { storiesOf } from '@storybook/react'
-import * as React from 'react'
 import { DimensionSwitcher } from '../../src'
 
 storiesOf('DimensionSwitcher', module).add('simple', () => (

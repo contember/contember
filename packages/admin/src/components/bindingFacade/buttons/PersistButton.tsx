@@ -1,22 +1,22 @@
 import { Button, ButtonProps, FormGroup } from '@contember/ui'
-import * as React from 'react'
+import { memo, useRef, useCallback, useMemo } from 'react'
 import { useDirtinessState, useMutationState } from '@contember/binding'
 import { usePersistWithFeedback } from '../../ui'
 
 export type PersistButtonProps = ButtonProps
 
-export const PersistButton = React.memo((props: PersistButtonProps) => {
+export const PersistButton = memo((props: PersistButtonProps) => {
 	const isMutating = useMutationState()
 	const isDirty = useDirtinessState()
 	const triggerPersist = usePersistWithFeedback()
-	const buttonRef = React.useRef<HTMLButtonElement | null>(null)
-	const onClick = React.useCallback(() => {
+	const buttonRef = useRef<HTMLButtonElement | null>(null)
+	const onClick = useCallback(() => {
 		triggerPersist().catch(() => {})
 	}, [triggerPersist])
 
 	const isDisabled = isMutating || !isDirty
 
-	const message = React.useMemo(
+	const message = useMemo(
 		() => (
 			<div style={{ textAlign: 'center' }}>
 				{!isDirty ? 'There is nothing to submit.' : isMutating ? 'Submitting…' : 'There are unsaved changes.'}

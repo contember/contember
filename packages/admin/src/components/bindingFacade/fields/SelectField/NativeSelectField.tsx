@@ -1,7 +1,7 @@
 import { BindingError, ErrorAccessor } from '@contember/binding'
 import { Component } from '@contember/binding/dist/src/coreComponents/Component'
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
-import * as React from 'react'
+import { FunctionComponent, memo } from 'react'
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoiceFieldProps } from '../ChoiceField'
 import { SelectFieldInnerPublicProps } from './SelectField'
 
@@ -10,7 +10,7 @@ export type NativeSelectFieldProps = SelectFieldInnerPublicProps &
 		searchByFields?: never
 	}
 
-export const NativeSelectField = Component<NativeSelectFieldProps>(
+export const NativeSelectField: FunctionComponent<NativeSelectFieldProps> = Component(
 	props => (
 		<ChoiceField {...props} arity="single">
 			{({
@@ -47,7 +47,7 @@ export interface NativeSelectFieldInnerProps
 	errors: ErrorAccessor | undefined
 }
 
-export const NativeSelectFieldInner = React.memo((props: NativeSelectFieldInnerProps) => {
+export const NativeSelectFieldInner = memo((props: NativeSelectFieldInnerProps) => {
 	const options = Array<SelectOption>({
 		disabled: props.allowNull !== true,
 		value: -1,

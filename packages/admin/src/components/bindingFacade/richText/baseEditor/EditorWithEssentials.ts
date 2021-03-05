@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import { Element as SlateElement, Node as SlateNode, NodeEntry } from 'slate'
 import { RenderElementProps, RenderLeafProps } from 'slate-react'
 import { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
@@ -30,12 +30,12 @@ export interface WithEssentials<E extends EditorNode> {
 
 	// <Editable> props
 	onDOMBeforeInput: (event: Event) => void
-	renderElement: (props: RenderElementProps) => React.ReactElement
-	renderLeaf: (props: RenderLeafProps) => React.ReactElement
-	renderLeafChildren: (props: Omit<RenderLeafProps, 'attributes'>) => React.ReactElement
-	onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
-	onFocus: (event: React.FocusEvent<HTMLDivElement>) => void
-	onBlur: (event: React.FocusEvent<HTMLDivElement>) => void
+	renderElement: (props: RenderElementProps) => ReactElement
+	renderLeaf: (props: RenderLeafProps) => ReactElement
+	renderLeafChildren: (props: Omit<RenderLeafProps, 'attributes'>) => ReactElement
+	onKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void
+	onFocus: (event: ReactFocusEvent<HTMLDivElement>) => void
+	onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
 }
 
 export type EditorWithEssentials<E extends EditorNode> = WithEssentials<E> & WithPaste & EditorNode

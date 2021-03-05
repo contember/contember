@@ -1,10 +1,24 @@
 import { Environment, SugaredRelativeSingleField, useEnvironment, useMutationState, useField } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
-import * as React from 'react'
+import {
+	ReactNode,
+	ComponentType,
+	ReactElement,
+	memo,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	FC,
+	FunctionComponent,
+	Fragment,
+	PureComponent,
+	useEffect,
+} from 'react'
 import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
 const contextualizeNode = (
-	node: React.ReactNode,
+	node: ReactNode,
 	environment: Environment,
 	middlewareName?: Environment.SystemMiddlewareName,
 ) => {
@@ -21,29 +35,26 @@ const contextualizeNode = (
 
 export type SimpleRelativeSingleFieldProxyProps = Omit<FormGroupProps, 'children'> &
 	SugaredRelativeSingleField & {
-		render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any, any>, props: any) => React.ReactNode
+		render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any, any>, props: any) => ReactNode
 	}
 
-export const SimpleRelativeSingleFieldProxy = React.memo(
+export const SimpleRelativeSingleFieldProxy = memo(
 	({ render, label, labelDescription, labelPosition, description, ...props }: SimpleRelativeSingleFieldProxyProps) => {
 		const environment = useEnvironment()
 		const field = useField(props)
 
-		const normalizedLabel = React.useMemo(() => contextualizeNode(label, environment, 'labelMiddleware'), [
+		const normalizedLabel = useMemo(() => contextualizeNode(label, environment, 'labelMiddleware'), [
 			environment,
 			label,
 		])
-		const normalizedLabelDescription = React.useMemo(() => contextualizeNode(labelDescription, environment), [
+		const normalizedLabelDescription = useMemo(() => contextualizeNode(labelDescription, environment), [
 			environment,
 			labelDescription,
 		])
-		const normalizedDescription = React.useMemo(() => contextualizeNode(description, environment), [
-			environment,
-			description,
-		])
+		const normalizedDescription = useMemo(() => contextualizeNode(description, environment), [environment, description])
 		const isMutating = useMutationState()
 
-		const fieldMetadata: SimpleRelativeSingleFieldMetadata = React.useMemo(
+		const fieldMetadata: SimpleRelativeSingleFieldMetadata = useMemo(
 			() => ({
 				field,
 				environment,

@@ -10,6 +10,7 @@ const fsRealpath = promisify(fs.realpath)
 const mkdir = promisify(fs.mkdir)
 const lstatFile = promisify(fs.lstat)
 const readDir = promisify(fs.readdir)
+const mvFile = promisify(fs.rename)
 
 class MigrationFilesManager {
 	constructor(public readonly directory: string) {}
@@ -23,6 +24,10 @@ class MigrationFilesManager {
 	public async removeFile(name: string) {
 		const path = this.formatPath(name)
 		await fsRemove(path)
+	}
+
+	public async moveFile(oldName: string, newName: string) {
+		await mvFile(this.formatPath(oldName), this.formatPath(newName))
 	}
 
 	public async createDirIfNotExist(): Promise<void> {

@@ -3,7 +3,9 @@ import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import {
 	MigrationCreator,
 	MigrationDescriber,
+	MigrationFilesManager,
 	MigrationsResolver,
+	SchemaMigrator,
 	SchemaVersionBuilder,
 } from '@contember/schema-migrations'
 import { Workspace } from '../../utils/Workspace'
@@ -31,6 +33,8 @@ export const executeCreateMigrationCommand = async (
 		migrationDescriber: MigrationDescriber
 		migrationsResolver: MigrationsResolver
 		schemaVersionBuilder: SchemaVersionBuilder
+		schemaMigrator: SchemaMigrator
+		migrationFilesManager: MigrationFilesManager
 	}) => Promise<number>,
 ) => {
 	const projectName = input.getArgument('project')
@@ -50,6 +54,8 @@ export const executeCreateMigrationCommand = async (
 			migrationDescriber: container.migrationDescriber,
 			migrationsResolver: container.migrationsResolver,
 			schemaVersionBuilder: container.schemaVersionBuilder,
+			schemaMigrator: container.schemaMigrator,
+			migrationFilesManager: container.migrationFilesManager,
 			workspace,
 		})
 		console.groupEnd()

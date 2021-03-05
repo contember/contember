@@ -13,10 +13,12 @@ import {
 	InstanceStopCommand,
 	InstanceValidateConfigCommand,
 	InviteCommand,
+	MigrationAmendCommand,
 	MigrationCreateCommand,
 	MigrationDescribeCommand,
 	MigrationDiffCommand,
 	MigrationExecuteCommand,
+	MigrationRebaseCommand,
 	MigrationStatusCommand,
 	ProjectCreateCommand,
 	ProjectPrintSchemaCommand,
@@ -30,7 +32,6 @@ import {
 } from './commands'
 import { Application } from './cli'
 import { VersionCommand } from './commands/misc'
-import { MigrationAmendCommand } from './commands/migrations/MigrationAmendCommand'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -47,6 +48,7 @@ import { MigrationAmendCommand } from './commands/migrations/MigrationAmendComma
 		['migrations:describe']: migrationsDescribeFactory,
 		['migrations:create']: () => new MigrationCreateCommand(),
 		['migrations:execute']: () => new MigrationExecuteCommand(),
+		['migrations:rebase']: () => new MigrationRebaseCommand(),
 		['migrations:status']: () => new MigrationStatusCommand(),
 		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(),

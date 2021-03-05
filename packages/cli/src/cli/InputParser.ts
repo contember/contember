@@ -12,13 +12,15 @@ export class InputParser {
 
 		let i = 0
 		let argumentNumber = 0
-
+		const variadicArg = this._arguments[this._arguments.length - 1]?.variadic
+			? this._arguments[this._arguments.length - 1]
+			: undefined
 		for (; i < args.length; i++) {
 			const value = this.tryParseValue(args[i])
 			if (value === undefined) {
 				break
 			}
-			const argument = this._arguments[argumentNumber]
+			const argument = this._arguments[argumentNumber] || variadicArg
 			if (!argument) {
 				throw new InvalidInputError(`Unresolved argument for value "${value}"`)
 			}
@@ -30,8 +32,8 @@ export class InputParser {
 				;(argumentValues[argument.name] as Array<string>).push(value)
 			} else {
 				argumentValues[argument.name] = value
-				argumentNumber++
 			}
+			argumentNumber++
 		}
 		for (; argumentNumber < this._arguments.length; argumentNumber++) {
 			if (!this._arguments[argumentNumber].optional) {

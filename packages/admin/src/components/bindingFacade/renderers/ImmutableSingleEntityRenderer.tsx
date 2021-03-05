@@ -1,19 +1,5 @@
 import { Component, Entity, EntityAccessor } from '@contember/binding'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { FunctionComponent } from 'react'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 
 export interface ImmutableSingleEntityRendererProps extends ImmutableContentLayoutRendererProps {

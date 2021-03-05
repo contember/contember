@@ -1,18 +1,4 @@
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { ReactNode } from 'react'
 import { BlockSlateEditor } from '../editor'
 
 export interface BaseTextField {

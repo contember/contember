@@ -1,34 +1,14 @@
 import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
-import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
+import { memo, ReactNode } from 'react'
+import { SugaredDiscriminateBy } from '../../../../discrimination'
 import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
 class GoogleFormEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'GoogleForm'
-
-	public readonly discriminateBy: SugaredDiscriminateBy | undefined = undefined
-	public readonly discriminateByScalar: SugaredDiscriminateByScalar | undefined = undefined
+	public readonly discriminateBy: SugaredDiscriminateBy
 
 	public constructor(private readonly options: GoogleFormEmbedHandler.Options) {
-		if ('discriminateBy' in options) {
-			this.discriminateBy = options.discriminateBy
-		} else if ('discriminateByScalar' in options) {
-			this.discriminateByScalar = options.discriminateByScalar
-		}
+		this.discriminateBy = options.discriminateBy
 	}
 
 	public staticRender() {
@@ -97,14 +77,8 @@ namespace GoogleFormEmbedHandler {
 		nonEmbedLinkWarning?: string
 		render?: () => ReactNode
 		googleFormIdField: SugaredFieldProps['field']
-	} & (
-		| {
-				discriminateBy: SugaredDiscriminateBy
-		  }
-		| {
-				discriminateByScalar: SugaredDiscriminateByScalar
-		  }
-	)
+		discriminateBy: SugaredDiscriminateBy
+	}
 
 	export interface RendererOptions {
 		googleFormIdField: SugaredFieldProps['field']

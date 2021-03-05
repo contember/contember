@@ -30,7 +30,6 @@
     "@storybook/addon-knobs": "6.1.21",
     "@storybook/react": "6.1.21",
     "@types/node": "14.14.31",
-    "@types/react": "17.0.2",
     "@types/react-dom": "17.0.1",
     "@types/react-textarea-autosize": "4.3.5",
     "babel-loader": "8.2.2",

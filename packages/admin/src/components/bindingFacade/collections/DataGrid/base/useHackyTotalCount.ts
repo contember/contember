@@ -1,7 +1,7 @@
 import { EntityName, Filter } from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
 import { useContentApiRequest } from '@contember/react-client'
-import { useRef, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export const useHackyTotalCount = (entityName: EntityName, filter: Filter | undefined): number | undefined => {
 	const [queryState, sendQuery] = useContentApiRequest<{

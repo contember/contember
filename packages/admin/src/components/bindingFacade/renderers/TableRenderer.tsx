@@ -1,22 +1,7 @@
-import { Box, Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
 import { Component, EntityAccessor } from '@contember/binding'
-import { EmptyMessage, DeleteEntityButton } from '../collections/helpers'
-import { RepeaterContainerProps, RepeaterItemProps } from '../collections/Repeater'
+import { Box, Table, TableCell, TableProps, TableRow, TableRowProps } from '@contember/ui'
+import { memo, ReactElement, ReactNode } from 'react'
+import { DeleteEntityButton, EmptyMessage, RepeaterContainerProps, RepeaterItemProps } from '../collections'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
 

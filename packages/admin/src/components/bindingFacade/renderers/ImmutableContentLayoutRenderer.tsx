@@ -1,20 +1,6 @@
 import { Component } from '@contember/binding'
 import { IncreaseHeadingDepth, TitleBar, TitleBarProps } from '@contember/ui'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { FunctionComponent, ReactNode, useMemo } from 'react'
 import { LayoutInner, LayoutSide } from '../../LayoutInner'
 
 export interface ImmutableContentLayoutRendererProps extends Omit<TitleBarProps, 'children'> {

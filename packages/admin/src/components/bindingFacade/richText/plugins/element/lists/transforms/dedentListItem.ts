@@ -1,20 +1,8 @@
-import {
-	Editor,
-	Element as SlateElement,
-	Node as SlateNode,
-	NodeEntry,
-	Path as SlatePath,
-	Point,
-	Range as SlateRange,
-	Text,
-	Transforms,
-} from 'slate'
+import { Editor, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
 import { BaseEditor } from '../../../../baseEditor'
 import { ContemberEditor } from '../../../../ContemberEditor'
 import { EditorWithLists } from '../EditorWithLists'
 import { ListItemElement } from '../ListItemElement'
-import { OrderedListElement } from '../OrderedListElement'
-import { UnorderedListElement } from '../UnorderedListElement'
 import { indentListItem } from './indentListItem'
 
 export const dedentListItem = (

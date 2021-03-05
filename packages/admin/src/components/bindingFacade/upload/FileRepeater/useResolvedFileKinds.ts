@@ -36,10 +36,6 @@ export const useResolvedFileKinds = (
 		p2.discriminateGenericBy,
 		p2.discriminateImageBy,
 		p2.discriminateVideoBy,
-		p2.discriminateAudioByScalar,
-		p2.discriminateGenericByScalar,
-		p2.discriminateImageByScalar,
-		p2.discriminateVideoByScalar,
 	])
 }
 
@@ -65,57 +61,43 @@ const getResolvedStockFileKinds = (
 		? Array.from(props.additionalFileKinds)
 		: []
 
-	if (
-		('discriminateAudioBy' in props && props.discriminateAudioBy !== undefined) ||
-		('discriminateAudioByScalar' in props && props.discriminateAudioByScalar !== undefined)
-	) {
+	if ('discriminateAudioBy' in props && props.discriminateAudioBy !== undefined) {
 		const defaults = getAudioFileDefaults(fileUrlProps.audioFileUrlField || fileUrlProps.fileUrlField)
 		discriminatedProps.push({
 			renderFile: props.renderAudioFile || defaults.renderFile,
 			renderFilePreview: props.renderAudioFilePreview || defaults.renderFilePreview,
 			accept: props.acceptAudio || defaults.accept,
-			discriminateBy: 'discriminateAudioBy' in props ? props.discriminateAudioBy : undefined,
-			discriminateByScalar: 'discriminateAudioByScalar' in props ? props.discriminateAudioByScalar : undefined,
+			discriminateBy: props.discriminateAudioBy,
 		})
 	}
 
-	if (
-		('discriminateImageBy' in props && props.discriminateImageBy !== undefined) ||
-		('discriminateImageByScalar' in props && props.discriminateImageByScalar !== undefined)
-	) {
+	if ('discriminateImageBy' in props && props.discriminateImageBy !== undefined) {
 		const defaults = getImageFileDefaults(fileUrlProps.imageFileUrlField || fileUrlProps.fileUrlField)
 		discriminatedProps.push({
 			renderFile: props.renderImageFile || defaults.renderFile,
 			renderFilePreview: props.renderImageFilePreview || defaults.renderFilePreview,
 			accept: props.acceptImage || defaults.accept,
-			discriminateBy: 'discriminateImageBy' in props ? props.discriminateImageBy : undefined,
-			discriminateByScalar: 'discriminateImageByScalar' in props ? props.discriminateImageByScalar : undefined,
+			discriminateBy: props.discriminateImageBy,
 		})
 	}
 
-	if (
-		('discriminateVideoBy' in props && props.discriminateVideoBy !== undefined) ||
-		('discriminateVideoByScalar' in props && props.discriminateVideoByScalar !== undefined)
-	) {
+	if ('discriminateVideoBy' in props && props.discriminateVideoBy !== undefined) {
 		const defaults = getVideoFileDefaults(fileUrlProps.videoFileUrlField || fileUrlProps.fileUrlField)
 		discriminatedProps.push({
 			renderFile: props.renderVideoFile || defaults.renderFile,
 			renderFilePreview: props.renderVideoFilePreview || defaults.renderFilePreview,
 			accept: props.acceptVideo || defaults.accept,
-			discriminateBy: 'discriminateVideoBy' in props ? props.discriminateVideoBy : undefined,
-			discriminateByScalar: 'discriminateVideoByScalar' in props ? props.discriminateVideoByScalar : undefined,
+			discriminateBy: props.discriminateVideoBy,
 		})
 	}
 
 	if (
 		discriminatedProps.length === 0 ||
-		('discriminateGenericBy' in props && props.discriminateGenericBy !== undefined) ||
-		('discriminateGenericByScalar' in props && props.discriminateGenericByScalar !== undefined)
+		('discriminateGenericBy' in props && props.discriminateGenericBy !== undefined)
 	) {
 		discriminatedProps.push({
 			accept: props.accept ?? undefined,
-			discriminateBy: 'discriminateGenericBy' in props ? props.discriminateGenericBy : undefined,
-			discriminateByScalar: 'discriminateGenericByScalar' in props ? props.discriminateGenericByScalar : undefined,
+			discriminateBy: props.discriminateGenericBy,
 		})
 	}
 

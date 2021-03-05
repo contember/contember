@@ -1,6 +1,6 @@
+import { FieldAccessor } from '@contember/binding'
 import { Button, ButtonProps, Icon } from '@contember/ui'
 import { useCallback } from 'react'
-import { FieldAccessor } from '@contember/binding'
 
 export type ClearFieldButtonInnerPublicProps = ButtonProps
 

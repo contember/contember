@@ -1,19 +1,5 @@
+import { ReactNode } from 'react'
 import { Element, Node } from 'slate'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
 
 type ContemberContentPlaceholderType = '__contember_contentPlaceholder__'
 export const contemberContentPlaceholderType: ContemberContentPlaceholderType = '__contember_contentPlaceholder__'

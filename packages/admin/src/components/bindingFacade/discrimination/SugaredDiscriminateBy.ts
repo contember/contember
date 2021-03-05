@@ -1,4 +1,3 @@
-import { VariableLiteral } from '@contember/binding'
-import { GraphQlBuilder } from '@contember/client'
+import { OptionallyVariableFieldValue } from '@contember/binding'
 
-export type SugaredDiscriminateBy = GraphQlBuilder.Literal | VariableLiteral | string
+export type SugaredDiscriminateBy = OptionallyVariableFieldValue

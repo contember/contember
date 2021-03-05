@@ -1,34 +1,14 @@
 import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
-import { SugaredDiscriminateBy, SugaredDiscriminateByScalar } from '../../../../discrimination'
+import { memo, ReactNode } from 'react'
+import { SugaredDiscriminateBy } from '../../../../discrimination'
 import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
 class YouTubeEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'YouTube'
-
-	public readonly discriminateBy: SugaredDiscriminateBy | undefined = undefined
-	public readonly discriminateByScalar: SugaredDiscriminateByScalar | undefined = undefined
+	public readonly discriminateBy: SugaredDiscriminateBy
 
 	public constructor(private readonly options: YouTubeEmbedHandler.Options) {
-		if ('discriminateBy' in options) {
-			this.discriminateBy = options.discriminateBy
-		} else if ('discriminateByScalar' in options) {
-			this.discriminateByScalar = options.discriminateByScalar
-		}
+		this.discriminateBy = options.discriminateBy
 	}
 
 	public staticRender() {
@@ -78,14 +58,8 @@ namespace YouTubeEmbedHandler {
 	export type Options = {
 		render?: () => ReactNode
 		youTubeIdField: SugaredFieldProps['field']
-	} & (
-		| {
-				discriminateBy: SugaredDiscriminateBy
-		  }
-		| {
-				discriminateByScalar: SugaredDiscriminateByScalar
-		  }
-	)
+		discriminateBy: SugaredDiscriminateBy
+	}
 
 	export interface RendererOptions {
 		youTubeIdField: SugaredFieldProps['field']

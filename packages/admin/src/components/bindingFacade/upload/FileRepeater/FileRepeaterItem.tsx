@@ -46,11 +46,8 @@ export const FileRepeaterItem = memo(
 			const discriminantField = entity.getRelativeSingleField(desugaredDiscriminant)
 			const acceptingFileKind: DiscriminatedFileUploadProps | undefined = fileKinds.find(
 				fileKind =>
-					(fileKind.discriminateBy !== undefined &&
-						discriminantField.hasValue(
-							VariableInputTransformer.transformVariableLiteral(fileKind.discriminateBy, environment),
-						)) ||
-					(fileKind.discriminateByScalar !== undefined && discriminantField.hasValue(fileKind.discriminateByScalar)),
+					fileKind.discriminateBy !== undefined &&
+					discriminantField.hasValue(VariableInputTransformer.transformValue(fileKind.discriminateBy, environment)),
 			)
 			if (acceptingFileKind) {
 				resolvedFileKind = acceptingFileKind

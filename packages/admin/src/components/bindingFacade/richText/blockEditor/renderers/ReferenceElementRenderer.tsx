@@ -3,7 +3,7 @@ import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
-import { BlockCommonProps, getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
+import { BlockProps, getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
 import { getDiscriminatedDatum } from '../../../discrimination'
 import { BlockElement } from '../../baseEditor'
 import { BlockSlateEditor } from '../editor'
@@ -54,7 +54,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 	}, [editor, props.element])
 
 	let blockBody: ReactNode
-	let renderedBlock: BlockCommonProps = selectedReference
+	let renderedBlock: BlockProps = selectedReference
 	let isFullWidth = true
 
 	if (elementTemplate !== undefined) {

@@ -1,20 +1,6 @@
-import { Environment, SugaredRelativeSingleField, useEnvironment, useMutationState, useField } from '@contember/binding'
+import { Environment, SugaredRelativeSingleField, useEnvironment, useField, useMutationState } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { memo, ReactNode, useMemo } from 'react'
 import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
 const contextualizeNode = (

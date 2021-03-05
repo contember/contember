@@ -1,20 +1,6 @@
-import { BoxSection, BoxSectionProps } from '@contember/ui'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
 import { BindingError, RemovalType } from '@contember/binding'
+import { BoxSection, BoxSectionProps } from '@contember/ui'
+import { memo, ReactNode } from 'react'
 import { DeleteEntityButton } from '../helpers'
 
 export interface RepeaterItemProps {

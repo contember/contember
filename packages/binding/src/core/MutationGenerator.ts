@@ -3,7 +3,7 @@ import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
-import { EntityId, EntityName } from '../treeParameters'
+import { EntityId, EntityName, FieldValue } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { AliasTransformer } from './AliasTransformer'
 import { QueryGenerator } from './QueryGenerator'
@@ -330,7 +330,7 @@ export class MutationGenerator {
 		const resolvedValue = fieldState.getAccessor().resolvedValue
 
 		if (resolvedValue !== undefined && resolvedValue !== null) {
-			return builder.set(marker.fieldName, resolvedValue)
+			return builder.set(marker.fieldName, this.transformFieldValue(fieldState, resolvedValue))
 		}
 		return builder
 	}
@@ -407,7 +407,7 @@ export class MutationGenerator {
 					if (fieldState.persistedValue !== undefined) {
 						const resolvedValue = fieldState.getAccessor().resolvedValue
 						if (fieldState.persistedValue !== resolvedValue) {
-							builder = builder.set(placeholderName, resolvedValue)
+							builder = builder.set(placeholderName, this.transformFieldValue(fieldState, resolvedValue))
 						}
 					}
 					break
@@ -567,5 +567,19 @@ export class MutationGenerator {
 		}
 
 		return builder
+	}
+
+	private transformFieldValue(fieldState: FieldState, value: FieldValue): FieldValue | GraphQlBuilder.Literal {
+		if (typeof value !== 'string') {
+			return value
+		}
+		const fieldSchema = this.treeStore.schema.getEntityField(
+			fieldState.parent.entity.entityName,
+			fieldState.fieldMarker.fieldName,
+		)
+		if (fieldSchema === undefined || fieldSchema.__typename !== '_Column') {
+			throw new BindingError()
+		}
+		return fieldSchema.enumName === null ? value : new GraphQlBuilder.Literal(value)
 	}
 }

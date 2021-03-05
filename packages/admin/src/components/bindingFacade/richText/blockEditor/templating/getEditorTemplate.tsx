@@ -1,24 +1,8 @@
-import { BindingError } from '@contember/binding'
-import { useConstantValueInvariant } from '@contember/react-utils'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { BindingError, Environment } from '@contember/binding'
+import { ReactNode } from 'react'
 import { assertNever } from '../../../../../utils'
 import { ContentOutletProps } from './ContentOutlet'
 import { BoxedCatchAllJSX, BoxedContentOutletProps, editorTemplateAnalyzer } from './editorTemplateAnalyzer'
-import { Environment } from '@contember/binding'
 
 export interface EditorTemplateAtom<Value> {
 	nodeBefore: ReactNode

@@ -10,21 +10,7 @@ import { useFileUpload } from '@contember/react-client'
 import { FileId } from '@contember/react-client/dist/src/upload/FileId'
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import attrAccept from 'attr-accept'
-import {
-	ReactNode,
-	ComponentType,
-	ReactElement,
-	memo,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-	FC,
-	FunctionComponent,
-	Fragment,
-	PureComponent,
-	useEffect,
-} from 'react'
+import { memo, ReactNode, useCallback, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { NormalizedBlocks } from '../../blocks'
 import { RepeaterContainerProps, SortableRepeaterItem } from '../../collections'
@@ -134,14 +120,11 @@ export const FileRepeaterContainer = memo(
 						createNewEntity(getNewAccessor => {
 							filesWithIds.push([getNewAccessor().key, file])
 
-							if (
-								desugaredDiscriminant &&
-								acceptingFileKind &&
-								(acceptingFileKind.discriminateBy !== undefined || acceptingFileKind.discriminateByScalar !== undefined)
-							) {
-								const discriminateBy =
-									acceptingFileKind.discriminateByScalar ??
-									VariableInputTransformer.transformVariableLiteral(acceptingFileKind.discriminateBy!, environment)
+							if (desugaredDiscriminant && acceptingFileKind && acceptingFileKind.discriminateBy !== undefined) {
+								const discriminateBy = VariableInputTransformer.transformValue(
+									acceptingFileKind.discriminateBy,
+									environment,
+								)
 								getNewAccessor().getRelativeSingleField(desugaredDiscriminant).updateValue(discriminateBy)
 							}
 						})

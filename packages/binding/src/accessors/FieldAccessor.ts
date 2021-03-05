@@ -1,4 +1,3 @@
-import { GraphQlBuilder } from '@contember/client'
 import { FieldHelpers } from '../fieldHelpers'
 import { FieldName, FieldValue } from '../treeParameters'
 import { Errorable } from './Errorable'
@@ -20,15 +19,7 @@ class FieldAccessor<Persisted extends FieldValue = FieldValue, Produced extends 
 	) {}
 
 	public hasValue(candidate: this['value']): boolean {
-		const currentValue = this.value
-
-		// This may seem like absolute bogus but it is indeed desirable because when updating entities with fields whose
-		// values are supposed to be literals, we still get strings from the API, and so, at least for now, this sort of
-		// looser definition of equality is necessary.
-		const left = currentValue instanceof GraphQlBuilder.Literal ? currentValue.value : currentValue
-		const right = candidate instanceof GraphQlBuilder.Literal ? candidate.value : candidate
-
-		return left === right
+		return this.value === candidate
 	}
 
 	public isTouchedBy(agent: string) {

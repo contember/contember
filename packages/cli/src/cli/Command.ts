@@ -20,7 +20,7 @@ export abstract class Command<Args extends Arguments, TOptions extends Options> 
 
 	public async run(args: string[]): Promise<number> {
 		const parser = this.getConfiguration().createParser()
-		const input = parser.parse<Args, TOptions>(args, false)
+		const input = parser.parse<Args, TOptions>(args)
 		const result = await this.execute(input)
 		return result || 0
 	}

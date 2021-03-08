@@ -13,6 +13,7 @@ import { resolveMigrationStatus } from './MigrationExecuteHelper'
 import { resolveLocalSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
+import { validateMigrations } from './MigrationValidationHelper'
 
 type Args = {
 	project: string
@@ -51,6 +52,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 				project,
 				migrationCreator,
 				migrationDescriber,
+				schemaMigrator,
 			}) => {
 				const migrationName = input.getArgument('migration')
 				const amendMigration = migrationName
@@ -76,17 +78,37 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 				try {
 					const initialSchema = await schemaVersionBuilder.buildSchema()
 					const intermediateResult = await migrationCreator.prepareMigration(initialSchema, schema, '')
-
-					const prevSchema = await schemaVersionBuilder.buildSchemaAdvanced(
-						emptySchema,
-						version => amendMigration.version !== version,
-					)
-					const newMigrationResult = await migrationCreator.prepareMigration(prevSchema, schema, '')
-
 					if (intermediateResult === null) {
 						console.log('Nothing to do')
 						return 0
 					}
+					if (amendMigration.formatVersion !== intermediateResult.migration.formatVersion) {
+						throw 'Incompatible migration format version'
+					}
+					const prevSchema = await schemaVersionBuilder.buildSchemaAdvanced(
+						emptySchema,
+						version => version < amendMigration.version,
+					)
+					const newSchema = await schemaMigrator.applyModifications(
+						prevSchema,
+						[...amendMigration.modifications, ...intermediateResult.migration.modifications],
+						amendMigration.formatVersion,
+					)
+					const newMigrationResult = await migrationCreator.prepareMigration(prevSchema, newSchema, '')
+					const followingMigrations = (await migrationsResolver.getMigrations()).filter(
+						it => it.version > amendMigration.version,
+					)
+
+					const valid = await validateMigrations(
+						prevSchema,
+						[...(newMigrationResult ? [newMigrationResult.migration] : []), ...followingMigrations],
+						migrationDescriber,
+						schemaMigrator,
+					)
+					if (!valid) {
+						throw `Cannot amend migration`
+					}
+
 					await printMigrationDescription(
 						migrationDescriber,
 						intermediateResult.initialSchema,

@@ -9,7 +9,6 @@ import {
 	SchemaVersionBuilder,
 } from '@contember/schema-migrations'
 import { Workspace } from '../../utils/Workspace'
-import path from 'path'
 import { Project } from '../../utils/Project'
 
 type Args = {

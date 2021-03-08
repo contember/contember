@@ -24,7 +24,7 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		configuration.description('Executes migrations on an instance')
 		configuration.argument('project')
 		configuration.argument('migration').optional()
-		configuration.option('force').description('Do not check migrations order (dev only)')
+		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
 		configureExecuteMigrationCommand(configuration)
 	}
 

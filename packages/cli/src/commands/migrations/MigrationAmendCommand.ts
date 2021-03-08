@@ -22,6 +22,7 @@ type Args = {
 type Options = {
 	instance?: string
 	yes?: true
+	force: boolean
 }
 
 export class MigrationAmendCommand extends Command<Args, Options> {
@@ -29,6 +30,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 		configuration.description('Amends latest migration')
 		configuration.argument('project')
 		configuration.argument('migration').optional()
+		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
 		configuration //
 			.option('instance')
 			.valueRequired()
@@ -59,9 +61,12 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 				}
 				const client = await resolveLocalSystemApiClient(workspace, project, input)
 				const status = await resolveMigrationStatus(client, migrationsResolver)
+				const force = input.getOption('force')
 				if (status.errorMigrations.length > 0) {
 					console.error(createMigrationStatusTable(status.errorMigrations))
-					throw `Cannot execute migrations`
+					if (!force) {
+						throw `Cannot execute migrations`
+					}
 				}
 				if (status.migrationsToExecute.length > 0) {
 					throw `Some migrations are not executed. Unable to amend.`
@@ -93,7 +98,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 						console.log('Aborting')
 						return 1
 					}
-					await client.migrate([intermediateResult.migration])
+					await client.migrate([intermediateResult.migration], force)
 					await client.migrationDelete(intermediateResult.migration.version)
 
 					if (!newMigrationResult) {

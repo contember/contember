@@ -127,10 +127,33 @@ describe('children analyzer', () => {
 			unhandledNodeErrorMessage: 'Only foo children are supported.',
 		})
 
+		const RendersIgnoredNodes1: FunctionComponent = props => <>{props.children}</>
+		const RendersIgnoredNodes2: FunctionComponent = props => <>{props.children}</>
+		;(RendersIgnoredNodes1 as any).staticRender = () => (
+			<>
+				{null}
+				{[null, false]}
+			</>
+		)
+		;(RendersIgnoredNodes2 as any).staticRender = () => null
+
+		const nodesToBeIgnoredAnyway = (
+			<>
+				<RendersIgnoredNodes1 />
+				<RendersIgnoredNodes2 />
+				{[<RendersIgnoredNodes1 key={1} />, <RendersIgnoredNodes2 key={2} />]}
+				{void 0}
+				<></>
+				{null}
+				{/* */}
+				{false}
+			</>
+		)
 		const nodes = (
 			<>
 				<>
 					<Container>
+						{nodesToBeIgnoredAnyway}
 						<>
 							<FooComponent foo="123" baz={123} />
 							<FooComponent foo="456" baz={456} />
@@ -160,6 +183,7 @@ describe('children analyzer', () => {
 		const nodes = (
 			<>
 				<>
+					{0}
 					{123}
 					<FooComponent foo="123" baz={123} />
 					bar<a href="#baz">baz</a>
@@ -171,6 +195,7 @@ describe('children analyzer', () => {
 		)
 
 		expect(analyzer.processChildren(nodes, undefined)).toEqual([
+			0,
 			123,
 			{ foo: '123', baz: 123 },
 			'bar',

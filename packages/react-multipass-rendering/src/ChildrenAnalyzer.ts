@@ -93,6 +93,10 @@ export class ChildrenAnalyzer<
 					}
 				}
 			}
+			if (node === false || node === undefined || node === null) {
+				// This adds seamless support for conditionals and such.
+				return undefined
+			}
 			if (!this.options.ignoreUnhandledNodes) {
 				throw new ChildrenAnalyzerError(getErrorMessage(this.options.unhandledNodeErrorMessage, node, staticContext))
 			}
@@ -112,7 +116,7 @@ export class ChildrenAnalyzer<
 			for (const subNode of node) {
 				const processed = this.processNode(subNode, staticContext)
 
-				if (processed) {
+				if (processed !== undefined) {
 					if (Array.isArray(processed)) {
 						mapped = mapped.concat(processed)
 					} else {
@@ -206,7 +210,7 @@ export class ChildrenAnalyzer<
 					const { factoryMethodName, childrenRepresentationReducer } = specification
 
 					if (typeof treeNode !== 'string' && factoryMethodName in treeNode) {
-						if (!processedChildren) {
+						if (processedChildren === undefined) {
 							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 						}
 						const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
@@ -222,7 +226,7 @@ export class ChildrenAnalyzer<
 				case RepresentationFactorySite.UseSite: {
 					const { factory, ComponentType } = specification
 					if (ComponentType === undefined || node.type === ComponentType) {
-						if (!processedChildren) {
+						if (processedChildren === undefined) {
 							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 						}
 						return factory(node, processedChildren, staticContext)

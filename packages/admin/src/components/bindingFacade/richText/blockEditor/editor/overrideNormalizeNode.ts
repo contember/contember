@@ -100,6 +100,7 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 			if (
 				path.length !== 1 || // Can only appear at the top-level…
 				path[0] !== leadingFields.length || // …right after leading fields
+				editor.children.length > leadingFields.length + trailingFields.length + 1 || // if there aren't any content nodes
 				node.children.length !== 1 ||
 				!Text.isText(node.children[0]) ||
 				node.children[0].text !== ''

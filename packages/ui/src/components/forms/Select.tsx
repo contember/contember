@@ -1,5 +1,14 @@
 import cn from 'classnames'
-import { ChangeEventHandler, DetailedHTMLProps, forwardRef, memo, OptionHTMLAttributes, Ref } from 'react'
+import {
+	ChangeEventHandler,
+	ComponentType,
+	DetailedHTMLProps,
+	forwardRef,
+	memo,
+	OptionHTMLAttributes,
+	Ref,
+	RefAttributes,
+} from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { ControlDistinction, Size, ValidationState } from '../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../utils'
@@ -21,7 +30,7 @@ export type SelectProps = Omit<JSX.IntrinsicElements['select'], 'children' | 'si
 	readOnly?: boolean
 }
 
-export const Select = memo(
+export const Select: ComponentType<SelectProps & RefAttributes<HTMLSelectElement>> = memo(
 	forwardRef(
 		(
 			{ size, distinction, validationState, className, options, ...otherProps }: SelectProps,

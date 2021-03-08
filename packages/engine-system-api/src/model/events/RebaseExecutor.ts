@@ -23,8 +23,12 @@ export class RebaseExecutor {
 	public async rebaseAll(db: DatabaseContext, project: ProjectConfig) {
 		const stageTree = createStageTree(project)
 		const root = stageTree.getRoot()
+		const children = stageTree.getChildren(root)
+		if (children.length === 0) {
+			return
+		}
 		const commonEvents = await db.queryHandler.fetch(new StageCommonEventsMatrixQuery())
-		for (const stage of stageTree.getChildren(root)) {
+		for (const stage of children) {
 			await this.rebase(db, stageTree, commonEvents, stage, root)
 		}
 	}

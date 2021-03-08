@@ -119,35 +119,8 @@ export type _PathArgument = {
 
 export type _LiteralArgument = {
 	readonly __typename?: '_LiteralArgument'
-	readonly value?: Maybe<_AnyValue>
+	readonly value?: Maybe<Scalars['Json']>
 }
-
-export type _IntValue = {
-	readonly __typename?: '_IntValue'
-	readonly intValue: Scalars['Int']
-}
-
-export type _StringValue = {
-	readonly __typename?: '_StringValue'
-	readonly stringValue: Scalars['String']
-}
-
-export type _BooleanValue = {
-	readonly __typename?: '_BooleanValue'
-	readonly booleanValue: Scalars['Boolean']
-}
-
-export type _FloatValue = {
-	readonly __typename?: '_FloatValue'
-	readonly floatValue: Scalars['Float']
-}
-
-export type _UndefinedValue = {
-	readonly __typename?: '_UndefinedValue'
-	readonly undefinedValue: Scalars['Boolean']
-}
-
-export type _AnyValue = _IntValue | _StringValue | _BooleanValue | _FloatValue | _UndefinedValue
 
 export type _RuleMessage = {
 	readonly __typename?: '_RuleMessage'
@@ -263,21 +236,7 @@ export type ResolversTypes = {
 	_Argument: ResolversTypes['_ValidatorArgument'] | ResolversTypes['_PathArgument'] | ResolversTypes['_LiteralArgument']
 	_ValidatorArgument: ResolverTypeWrapper<_ValidatorArgument>
 	_PathArgument: ResolverTypeWrapper<_PathArgument>
-	_LiteralArgument: ResolverTypeWrapper<
-		Omit<_LiteralArgument, 'value'> & { value?: Maybe<ResolversTypes['_AnyValue']> }
-	>
-	_IntValue: ResolverTypeWrapper<_IntValue>
-	_StringValue: ResolverTypeWrapper<_StringValue>
-	_BooleanValue: ResolverTypeWrapper<_BooleanValue>
-	_FloatValue: ResolverTypeWrapper<_FloatValue>
-	Float: ResolverTypeWrapper<Scalars['Float']>
-	_UndefinedValue: ResolverTypeWrapper<_UndefinedValue>
-	_AnyValue:
-		| ResolversTypes['_IntValue']
-		| ResolversTypes['_StringValue']
-		| ResolversTypes['_BooleanValue']
-		| ResolversTypes['_FloatValue']
-		| ResolversTypes['_UndefinedValue']
+	_LiteralArgument: ResolverTypeWrapper<_LiteralArgument>
 	_RuleMessage: ResolverTypeWrapper<_RuleMessage>
 	_Enum: ResolverTypeWrapper<_Enum>
 }
@@ -304,19 +263,7 @@ export type ResolversParentTypes = {
 		| ResolversParentTypes['_LiteralArgument']
 	_ValidatorArgument: _ValidatorArgument
 	_PathArgument: _PathArgument
-	_LiteralArgument: Omit<_LiteralArgument, 'value'> & { value?: Maybe<ResolversParentTypes['_AnyValue']> }
-	_IntValue: _IntValue
-	_StringValue: _StringValue
-	_BooleanValue: _BooleanValue
-	_FloatValue: _FloatValue
-	Float: Scalars['Float']
-	_UndefinedValue: _UndefinedValue
-	_AnyValue:
-		| ResolversParentTypes['_IntValue']
-		| ResolversParentTypes['_StringValue']
-		| ResolversParentTypes['_BooleanValue']
-		| ResolversParentTypes['_FloatValue']
-		| ResolversParentTypes['_UndefinedValue']
+	_LiteralArgument: _LiteralArgument
 	_RuleMessage: _RuleMessage
 	_Enum: _Enum
 }
@@ -459,59 +406,8 @@ export type _LiteralArgumentResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['_LiteralArgument'] = ResolversParentTypes['_LiteralArgument']
 > = {
-	value?: Resolver<Maybe<ResolversTypes['_AnyValue']>, ParentType, ContextType>
+	value?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type _IntValueResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['_IntValue'] = ResolversParentTypes['_IntValue']
-> = {
-	intValue?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type _StringValueResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['_StringValue'] = ResolversParentTypes['_StringValue']
-> = {
-	stringValue?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type _BooleanValueResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['_BooleanValue'] = ResolversParentTypes['_BooleanValue']
-> = {
-	booleanValue?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type _FloatValueResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['_FloatValue'] = ResolversParentTypes['_FloatValue']
-> = {
-	floatValue?: Resolver<ResolversTypes['Float'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type _UndefinedValueResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['_UndefinedValue'] = ResolversParentTypes['_UndefinedValue']
-> = {
-	undefinedValue?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type _AnyValueResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['_AnyValue'] = ResolversParentTypes['_AnyValue']
-> = {
-	__resolveType: TypeResolveFn<
-		'_IntValue' | '_StringValue' | '_BooleanValue' | '_FloatValue' | '_UndefinedValue',
-		ParentType,
-		ContextType
-	>
 }
 
 export type _RuleMessageResolvers<
@@ -547,12 +443,6 @@ export type Resolvers<ContextType = any> = {
 	_ValidatorArgument?: _ValidatorArgumentResolvers<ContextType>
 	_PathArgument?: _PathArgumentResolvers<ContextType>
 	_LiteralArgument?: _LiteralArgumentResolvers<ContextType>
-	_IntValue?: _IntValueResolvers<ContextType>
-	_StringValue?: _StringValueResolvers<ContextType>
-	_BooleanValue?: _BooleanValueResolvers<ContextType>
-	_FloatValue?: _FloatValueResolvers<ContextType>
-	_UndefinedValue?: _UndefinedValueResolvers<ContextType>
-	_AnyValue?: _AnyValueResolvers<ContextType>
 	_RuleMessage?: _RuleMessageResolvers<ContextType>
 	_Enum?: _EnumResolvers<ContextType>
 }

@@ -119,24 +119,6 @@ export class IntrospectionSchemaFactory {
 	createValidationSchema(rules: Validation.ValidationRule[]): Pick<ContentSchema._Field, 'rules' | 'validators'> {
 		const validators: ContentSchema._Validator[] = []
 
-		const createValue = (value: number | string | boolean): ContentSchema._AnyValue & { __typename: string } => {
-			if (value === undefined) {
-				return { __typename: '_UndefinedValue', undefinedValue: true }
-			}
-			if (typeof value === 'string') {
-				return { __typename: '_StringValue', stringValue: value }
-			}
-			if (typeof value === 'number') {
-				return value % 1 === 0
-					? { __typename: '_IntValue', intValue: value }
-					: { __typename: '_FloatValue', floatValue: value }
-			}
-			if (typeof value === 'boolean') {
-				return { __typename: '_BooleanValue', booleanValue: value }
-			}
-			throw new Error(`Argument of type ${typeof value} is not supported yet`)
-		}
-
 		const processValidator = (validator: Validation.Validator) => {
 			const i = validators.length
 			const args: (ContentSchema._Argument & { __typename: string })[] = []
@@ -148,7 +130,7 @@ export class IntrospectionSchemaFactory {
 						args.push({ __typename: '_PathArgument', path: arg.path })
 						break
 					case Validation.ArgumentType.literal:
-						args.push({ __typename: '_LiteralArgument', value: createValue(arg.value) })
+						args.push({ __typename: '_LiteralArgument', value: arg.value })
 						break
 					case Validation.ArgumentType.validator:
 						args.push({ __typename: '_ValidatorArgument', validator: processValidator(arg.validator) })

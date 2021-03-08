@@ -97,30 +97,8 @@ const schema: DocumentNode = gql`
 	}
 
 	type _LiteralArgument {
-		value: _AnyValue
+		value: Json
 	}
-
-	type _IntValue {
-		intValue: Int!
-	}
-
-	type _StringValue {
-		stringValue: String!
-	}
-
-	type _BooleanValue {
-		booleanValue: Boolean!
-	}
-
-	type _FloatValue {
-		floatValue: Float!
-	}
-
-	type _UndefinedValue {
-		undefinedValue: Boolean!
-	}
-
-	union _AnyValue = _IntValue | _StringValue | _BooleanValue | _FloatValue | _UndefinedValue
 
 	type _RuleMessage {
 		text: String

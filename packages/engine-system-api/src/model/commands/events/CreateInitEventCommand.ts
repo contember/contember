@@ -1,6 +1,6 @@
 import { ConflictActionType, InsertBuilder } from '@contember/database'
 import { EventType } from '@contember/engine-common'
-import { Command } from './Command'
+import { Command } from '../Command'
 
 export class CreateInitEventCommand implements Command<string | null> {
 	public async execute({ db, providers }: Command.Args): Promise<string | null> {

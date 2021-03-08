@@ -8,6 +8,9 @@ export class Literal {
 	) {}
 
 	public append(literal: Literal) {
+		if (literal === Literal.empty) {
+			return this
+		}
 		return new Literal(this.sql.trimLeft() + ' ' + literal.sql, [...this.parameters, ...literal.parameters])
 	}
 

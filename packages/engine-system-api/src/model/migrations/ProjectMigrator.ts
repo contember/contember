@@ -36,13 +36,14 @@ export class ProjectMigrator {
 		project: ProjectConfig,
 		migrationsToExecute: readonly Migration[],
 		logger: (message: string) => void,
+		ignoreOrder: boolean = false,
 	) {
 		const stageTree = createStageTree(project)
 		if (migrationsToExecute.length === 0) {
 			return
 		}
 		let { version, ...schema } = await this.schemaVersionBuilder.buildSchema(db)
-		await this.validateMigrations(db, schema, version, migrationsToExecute)
+		await this.validateMigrations(db, schema, version, migrationsToExecute, ignoreOrder)
 
 		const sorted = [...migrationsToExecute].sort((a, b) => a.version.localeCompare(b.version))
 
@@ -93,13 +94,14 @@ export class ProjectMigrator {
 		schema: Schema,
 		version: string,
 		migrationsToExecute: readonly Migration[],
+		ignoreOrder: boolean = false,
 	) {
 		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
 		for (const migration of migrationsToExecute) {
 			if (executedMigrations.find(it => it.version === migration.version)) {
 				throw new AlreadyExecutedMigrationError(migration.version, `Migration is already executed`)
 			}
-			if (migration.version < version) {
+			if (migration.version < version && !ignoreOrder) {
 				throw new MustFollowLatestMigrationError(migration.version, `Must follow latest executed migration ${version}`)
 			}
 			const described = await this.migrationDescriber.describeModifications(schema, migration)

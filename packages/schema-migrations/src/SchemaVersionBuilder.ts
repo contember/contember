@@ -10,18 +10,18 @@ export class SchemaVersionBuilder {
 	) {}
 
 	async buildSchema(targetVersion?: string): Promise<Schema> {
-		return this.doBuild(emptySchema, version => !targetVersion || version <= targetVersion)
+		return this.buildSchemaAdvanced(emptySchema, version => !targetVersion || version <= targetVersion)
 	}
 
 	async buildSchemaUntil(targetVersion: string): Promise<Schema> {
-		return this.doBuild(emptySchema, version => version < targetVersion)
+		return this.buildSchemaAdvanced(emptySchema, version => version < targetVersion)
 	}
 
 	async continue(schema: Schema, previousVersion: string | null, targetVersion: string): Promise<Schema> {
-		return this.doBuild(schema, version => version <= targetVersion && version > (previousVersion || ''))
+		return this.buildSchemaAdvanced(schema, version => version <= targetVersion && version > (previousVersion || ''))
 	}
 
-	private async doBuild(initialSchema: Schema, condition: (version: string) => boolean): Promise<Schema> {
+	public async buildSchemaAdvanced(initialSchema: Schema, condition: (version: string) => boolean): Promise<Schema> {
 		return (await this.migrationsResolver.getMigrations())
 			.filter(({ version }) => condition(version))
 			.reduce<Schema>(

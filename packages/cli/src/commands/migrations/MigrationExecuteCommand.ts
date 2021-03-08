@@ -15,13 +15,16 @@ type Args = {
 	migration?: string
 }
 
-type Options = ExecuteMigrationOptions
+type Options = ExecuteMigrationOptions & {
+	force: boolean
+}
 
 export class MigrationExecuteCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Executes migrations on an instance')
 		configuration.argument('project')
 		configuration.argument('migration').optional()
+		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
 		configureExecuteMigrationCommand(configuration)
 	}
 
@@ -34,10 +37,13 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 		const migrationArg = input.getArgument('migration')
 		const client = await resolveSystemApiClient(workspace, project, input)
-		const status = await resolveMigrationStatus(client, container.migrationsResolver)
+		const force = input.getOption('force')
+		const status = await resolveMigrationStatus(client, container.migrationsResolver, force)
 		if (status.errorMigrations.length > 0) {
 			console.error(createMigrationStatusTable(status.errorMigrations))
-			throw `Cannot execute migrations`
+			if (!force) {
+				throw `Cannot execute migrations`
+			}
 		}
 
 		const migrations = (() => {
@@ -73,6 +79,7 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 			client,
 			migrations,
 			requireConfirmation: !input.getOption('yes'),
+			force: force,
 		})
 	}
 }

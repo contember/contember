@@ -6,6 +6,7 @@ import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { SchemaUpdateError } from '@contember/schema-migrations'
 import { Workspace } from '../../utils/Workspace'
+import { validateMigrations } from '../migrations/MigrationValidationHelper'
 
 type Args = {
 	project: string
@@ -36,28 +37,13 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 			console.group(`Project ${project.name}:`)
 			const migrationsDir = await project.migrationsDir
 			const container = new MigrationsContainerFactory(migrationsDir).create()
-			let projectValid = true
-			let migratedSchema = emptySchema
-			for (const migration of await container.migrationsResolver.getMigrations()) {
-				try {
-					// just a check that it does not fail
-					await container.migrationDescriber.describeModifications(migratedSchema, migration)
-
-					migratedSchema = container.schemaMigrator.applyModifications(
-						migratedSchema,
-						migration.modifications,
-						migration.formatVersion,
-					)
-				} catch (e) {
-					if (e instanceof SchemaUpdateError) {
-						console.error(`Migration ${migration.name} has failed`)
-					}
-					throw e
-				}
-				projectValid =
-					validateSchemaAndPrintErrors(migratedSchema, `Migration ${migration.name} produces invalid schema:`) &&
-					projectValid
-			}
+			const migrations = await container.migrationsResolver.getMigrations()
+			let projectValid = await validateMigrations(
+				emptySchema,
+				migrations,
+				container.migrationDescriber,
+				container.schemaMigrator,
+			)
 
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const schema: Schema = require(project.apiDir).default

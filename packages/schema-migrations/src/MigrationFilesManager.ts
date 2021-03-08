@@ -5,19 +5,29 @@ import * as path from 'path'
 
 const readFile = promisify(fs.readFile)
 const fsWrite = promisify(fs.writeFile)
+const fsRemove = promisify(fs.unlink)
 const fsRealpath = promisify(fs.realpath)
 const mkdir = promisify(fs.mkdir)
 const lstatFile = promisify(fs.lstat)
 const readDir = promisify(fs.readdir)
+const mvFile = promisify(fs.rename)
 
 class MigrationFilesManager {
 	constructor(public readonly directory: string) {}
 
-	public async createFile(content: string, version: string, extension: string): Promise<string> {
-		const filename = `${version}.${extension}`
-		const path = `${this.directory}/${filename}`
+	public async createFile(content: string, name: string): Promise<string> {
+		const path = this.formatPath(name)
 		await fsWrite(path, content, { encoding: 'utf8' })
 		return await fsRealpath(path)
+	}
+
+	public async removeFile(name: string) {
+		const path = this.formatPath(name)
+		await fsRemove(path)
+	}
+
+	public async moveFile(oldName: string, newName: string) {
+		await mvFile(this.formatPath(oldName), this.formatPath(newName))
 	}
 
 	public async createDirIfNotExist(): Promise<void> {
@@ -30,12 +40,12 @@ class MigrationFilesManager {
 		}
 	}
 
-	public async listFiles(extension: string): Promise<string[]> {
+	public async listFiles(): Promise<string[]> {
 		const files: string[] = await this.tryReadDir()
 
 		const filteredFiles: string[] = await Promise.all(
 			files
-				.filter(file => file.endsWith(`.${extension}`))
+				.filter(file => file.endsWith(`.json`))
 				.filter(async file => {
 					return (await lstatFile(`${this.directory}/${file}`)).isFile()
 				}),
@@ -54,11 +64,8 @@ class MigrationFilesManager {
 		}
 	}
 
-	public async readFiles(
-		extension: string,
-		predicate?: (version: string) => boolean,
-	): Promise<MigrationFilesManager.MigrationFile[]> {
-		let files = await this.listFiles(extension)
+	public async readFiles(predicate?: (version: string) => boolean): Promise<MigrationFilesManager.MigrationFile[]> {
+		let files = await this.listFiles()
 		if (predicate) {
 			files = files.filter(filename => predicate(MigrationVersionHelper.extractVersion(filename)))
 		}
@@ -74,6 +81,12 @@ class MigrationFilesManager {
 	public static createForProject(projectsDirectory: string, projectSlug: string): MigrationFilesManager {
 		const migrationsDir = path.join(projectsDirectory, projectSlug, 'migrations')
 		return new MigrationFilesManager(migrationsDir)
+	}
+
+	private formatPath(version: string) {
+		const filename = `${version}.json`
+		const path = `${this.directory}/${filename}`
+		return path
 	}
 }
 

@@ -9,7 +9,6 @@ import { MigrationVersionHelper } from './MigrationVersionHelper'
 export class MigrationCreator {
 	constructor(
 		private readonly migrationFilesManager: MigrationFilesManager,
-		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly schemaDiffer: SchemaDiffer,
 	) {}
 
@@ -18,16 +17,15 @@ export class MigrationCreator {
 		const migration = this.createMigration([], migrationName)
 		const jsonDiff = MigrationCreator.createContent(migration)
 
-		return await this.migrationFilesManager.createFile(jsonDiff, migration.version, 'json')
+		return await this.migrationFilesManager.createFile(jsonDiff, migration.version)
 	}
 
-	async prepareDiff(
+	async prepareMigration(
+		initialSchema: Schema,
 		newSchema: Schema,
 		migrationName: string,
 	): Promise<{ migration: Migration; initialSchema: Schema } | null> {
 		await this.migrationFilesManager.createDirIfNotExist()
-
-		const initialSchema = await this.schemaVersionBuilder.buildSchema()
 
 		const modifications = this.schemaDiffer.diffSchemas(initialSchema, newSchema)
 		if (modifications.length === 0) {
@@ -39,15 +37,19 @@ export class MigrationCreator {
 		return { initialSchema, migration }
 	}
 
-	async saveDiff(migration: Migration): Promise<string> {
+	async saveMigration(migration: Migration): Promise<string> {
 		const jsonDiff = MigrationCreator.createContent(migration)
-		const filename = await this.migrationFilesManager.createFile(jsonDiff, migration.version, 'json')
+		const filename = await this.migrationFilesManager.createFile(jsonDiff, migration.name)
 		return filename
 	}
 
+	async removeMigration(name: string): Promise<void> {
+		await this.migrationFilesManager.removeFile(name)
+	}
+
 	private createMigration(modifications: Migration.Modification[], name: string): Migration {
-		const version = MigrationVersionHelper.createVersion(name)
-		return { formatVersion: VERSION_LATEST, modifications, version, name }
+		const [version, fullName] = MigrationVersionHelper.createVersion(name)
+		return { formatVersion: VERSION_LATEST, modifications, version, name: fullName }
 	}
 
 	public static createContent({ modifications, formatVersion }: Migration): string {

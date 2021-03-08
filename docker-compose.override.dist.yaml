@@ -2,3 +2,8 @@ version: '3.7'
 services:
   ts_watch:
     user: "1000"
+  api:
+    environment:
+      BLOG_DB_NAME: 'blog'
+    ports:
+      - 127.0.0.1:7000:4000

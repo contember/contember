@@ -4,11 +4,10 @@ import { GraphQLRequestContext } from 'apollo-server-core'
 
 type Query = { sql: string; bindings: any; elapsed: number; error?: string; meta?: any; rowCount?: number }
 
-type Context = { db?: Client }
-export default class DbQueriesPlugin implements ApolloServerPlugin<Context> {
-	constructor(private readonly dbResolver: (context: Record<string, any>) => Client) {}
+export default class DbQueriesPlugin<Ctx extends Record<string, any>> implements ApolloServerPlugin<Ctx> {
+	constructor(private readonly dbResolver: (context: Ctx) => Client) {}
 
-	requestDidStart({ context }: GraphQLRequestContext): GraphQLRequestListener<Context> {
+	requestDidStart({ context }: GraphQLRequestContext<Ctx>): GraphQLRequestListener<Ctx> {
 		const db = this.dbResolver(context)
 		if (!db) {
 			return {}

@@ -30,10 +30,14 @@ const createLocalInstanceEnvironment = async (instance: Instance): Promise<Insta
 export const interactiveResolveInstanceEnvironmentFromInput = async (
 	workspace: Workspace,
 	instance?: string,
+	localOnly?: boolean,
 ): Promise<InstanceApiEnvironment> => {
 	let instanceName = instance || getInstanceFromEnv()
 	if (instanceName) {
 		if (isRemoteInstance(instanceName)) {
+			if (localOnly) {
+				throw 'Remote instance is not supported'
+			}
 			return createRemoteInstanceEnvironment(instanceName)
 		} else {
 			const instance = await workspace.instances.getInstance(instanceName)
@@ -41,6 +45,9 @@ export const interactiveResolveInstanceEnvironmentFromInput = async (
 		}
 	}
 	const instances = await workspace.instances.listInstances()
+	if (localOnly && instances.length === 1) {
+		return await createLocalInstanceEnvironment(instances[0])
+	}
 	const { instance: selectedInstance } = await prompts({
 		type: 'select',
 		message: 'Instance',

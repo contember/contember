@@ -7,6 +7,10 @@ export class ContentSchemaResolver {
 
 	constructor(private readonly schemaVersionBuilder: SchemaVersionBuilder) {}
 
+	public clearCache() {
+		this.schemaCache = {}
+	}
+
 	public async getSchema(db: DatabaseContext, stage: string): Promise<Schema> {
 		const cachedSchema = this.schemaCache[stage]
 		let newSchema = await this.schemaVersionBuilder.buildSchema(db, cachedSchema)

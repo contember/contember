@@ -18,7 +18,8 @@ export class MigrationCreateCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
-		return await executeCreateMigrationCommand(input, async ({ migrationName, migrationCreator }) => {
+		return await executeCreateMigrationCommand(input, async ({ migrationCreator }) => {
+			const migrationName = input.getArgument('migrationName')
 			const result = await migrationCreator.createEmpty(migrationName)
 			console.log(`${result} created`)
 			return 0

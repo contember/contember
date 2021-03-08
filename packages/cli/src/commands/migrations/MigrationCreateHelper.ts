@@ -3,11 +3,12 @@ import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import {
 	MigrationCreator,
 	MigrationDescriber,
+	MigrationFilesManager,
 	MigrationsResolver,
+	SchemaMigrator,
 	SchemaVersionBuilder,
 } from '@contember/schema-migrations'
 import { Workspace } from '../../utils/Workspace'
-import path from 'path'
 import { Project } from '../../utils/Project'
 
 type Args = {
@@ -23,18 +24,19 @@ export const configureCreateMigrationCommand = (configuration: CommandConfigurat
 }
 
 export const executeCreateMigrationCommand = async (
-	input: Input<Args, Options>,
+	input: Input<Pick<Args, 'project'>, Options>,
 	createMigrationCallback: (args: {
 		workspace: Workspace
 		project: Project
-		migrationName: string
 		migrationCreator: MigrationCreator
 		migrationDescriber: MigrationDescriber
 		migrationsResolver: MigrationsResolver
 		schemaVersionBuilder: SchemaVersionBuilder
+		schemaMigrator: SchemaMigrator
+		migrationFilesManager: MigrationFilesManager
 	}) => Promise<number>,
 ) => {
-	const [projectName, migrationName] = [input.getArgument('project'), input.getArgument('migrationName')]
+	const projectName = input.getArgument('project')
 	const workspace = await Workspace.get(process.cwd())
 	const allProjects = projectName === '.'
 	const projects = allProjects
@@ -47,11 +49,12 @@ export const executeCreateMigrationCommand = async (
 
 		const result = await createMigrationCallback({
 			project,
-			migrationName,
 			migrationCreator: container.migrationCreator,
 			migrationDescriber: container.migrationDescriber,
 			migrationsResolver: container.migrationsResolver,
 			schemaVersionBuilder: container.schemaVersionBuilder,
+			schemaMigrator: container.schemaMigrator,
+			migrationFilesManager: container.migrationFilesManager,
 			workspace,
 		})
 		console.groupEnd()

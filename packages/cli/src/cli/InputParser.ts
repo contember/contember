@@ -5,27 +5,23 @@ import { Arguments, Input, Options } from './Input'
 export class InputParser {
 	constructor(private _arguments: Argument[], private options: Option[]) {}
 
-	parse<Args extends Arguments, Opts extends Options>(args: string[], allowRest: boolean): Input<Args, Opts> {
+	parse<Args extends Arguments, Opts extends Options>(args: string[]): Input<Args, Opts> {
 		args = args.reduce<string[]>((acc, arg) => [...acc, ...(arg.startsWith('-') ? arg.split('=', 2) : [arg])], [])
 		let options: Options = {}
 		let argumentValues: Arguments = {}
 
 		let i = 0
 		let argumentNumber = 0
-		let rest: string[] = []
-
+		const variadicArg = this._arguments[this._arguments.length - 1]?.variadic
+			? this._arguments[this._arguments.length - 1]
+			: undefined
 		for (; i < args.length; i++) {
 			const value = this.tryParseValue(args[i])
 			if (value === undefined) {
 				break
 			}
-			const argument = this._arguments[argumentNumber]
+			const argument = this._arguments[argumentNumber] || variadicArg
 			if (!argument) {
-				if (allowRest) {
-					rest = args.slice(i)
-					i = args.length
-					break
-				}
 				throw new InvalidInputError(`Unresolved argument for value "${value}"`)
 			}
 			if (argument.validator && !argument.validator(value)) {
@@ -36,8 +32,8 @@ export class InputParser {
 				;(argumentValues[argument.name] as Array<string>).push(value)
 			} else {
 				argumentValues[argument.name] = value
-				argumentNumber++
 			}
+			argumentNumber++
 		}
 		for (; argumentNumber < this._arguments.length; argumentNumber++) {
 			if (!this._arguments[argumentNumber].optional) {
@@ -61,11 +57,7 @@ export class InputParser {
 				}
 			}
 			if (!option) {
-				if (!allowRest) {
-					throw new InvalidInputError(`Unexpected value "${args[i]}"`)
-				} else {
-					rest = args.slice(i)
-				}
+				throw new InvalidInputError(`Unexpected value "${args[i]}"`)
 			}
 			if (option) {
 				if (option.deprecated) {
@@ -107,7 +99,7 @@ export class InputParser {
 			}
 		}
 
-		return new Input<Args, Opts>(argumentValues as Args, options as Opts, rest)
+		return new Input<Args, Opts>(argumentValues as Args, options as Opts)
 	}
 
 	private tryParseValue(arg: string | undefined): string | undefined {

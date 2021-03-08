@@ -1,8 +1,8 @@
 import { ConflictActionType, InsertBuilder, wrapIdentifier } from '@contember/database'
-import { formatSchemaName } from '../helpers'
-import { InitEventQuery } from '../queries'
-import { StageConfig } from '../../types'
-import { Command } from './Command'
+import { formatSchemaName } from '../../helpers'
+import { InitEventQuery } from '../../queries'
+import { StageConfig } from '../../../types'
+import { Command } from '../Command'
 
 export class CreateOrUpdateStageCommand implements Command<boolean> {
 	constructor(private readonly stage: StageConfig, private readonly eventId?: string) {}

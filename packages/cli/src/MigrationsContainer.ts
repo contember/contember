@@ -39,8 +39,7 @@ export class MigrationsContainerFactory {
 			.addService('schemaDiffer', ({ schemaMigrator }) => new SchemaDiffer(schemaMigrator))
 			.addService(
 				'migrationCreator',
-				({ migrationFilesManager, schemaVersionBuilder, schemaDiffer }) =>
-					new MigrationCreator(migrationFilesManager, schemaVersionBuilder, schemaDiffer),
+				({ migrationFilesManager, schemaDiffer }) => new MigrationCreator(migrationFilesManager, schemaDiffer),
 			)
 			.addService(
 				'migrationDescriber',

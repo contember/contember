@@ -52,5 +52,11 @@ export const createProjectContainer = (
 				new DatabaseContextFactory(connection.createClient('system', { module: 'system' }), providers),
 		)
 		.build()
-	return projectContainer.pick('project', 'connection', 'contentServerProvider', 'systemDatabaseContextFactory')
+	return projectContainer.pick(
+		'project',
+		'connection',
+		'contentServerProvider',
+		'systemDatabaseContextFactory',
+		'contentSchemaResolver',
+	)
 }

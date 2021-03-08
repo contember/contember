@@ -3,3 +3,4 @@
 /packages/cli/resources/templates/*/node_modules
 /node_modules
 docker-compose.override.yaml
+projects

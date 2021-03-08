@@ -6,7 +6,6 @@ import {
 	ResolverContext,
 	ResolverContextFactory,
 	ResolverFactory,
-	Schema,
 	typeDefs,
 } from '@contember/engine-system-api'
 import { KoaContext } from '../koa'
@@ -16,12 +15,13 @@ import { ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../
 import { AuthMiddlewareState, GraphqlInfoProviderPlugin, GraphQLInfoState } from '../common'
 import DbQueriesPlugin from '../graphql/DbQueriesPlugin'
 import { ApolloServerPlugin } from 'apollo-server-plugin-base'
+import { SchemaCacheCleanerPlugin } from './SchemaCacheCleanerPlugin'
 
 type InputKoaContext = KoaContext<
 	AuthMiddlewareState & ProjectMemberMiddlewareState & ProjectResolveMiddlewareState & GraphQLInfoState
 >
 
-type ExtendedGraphqlContext = ResolverContext & {
+export type ExtendedGraphqlContext = ResolverContext & {
 	errorContextProvider: ErrorContextProvider
 	koaContext: InputKoaContext
 }
@@ -49,7 +49,8 @@ class SystemServerProvider {
 			new ErrorHandlerPlugin(undefined, 'system', this.errorLogger),
 		]
 		if (this.debugMode) {
-			plugins.push(new DbQueriesPlugin(context => context.db.client))
+			plugins.push(new DbQueriesPlugin<ExtendedGraphqlContext>(context => context.db.client))
+			plugins.push(new SchemaCacheCleanerPlugin())
 		}
 		const resolvers = this.resolversFactory.create(this.debugMode)
 		const mergedSchema = mergeSchemas({ schemas, resolvers: resolvers as Config['resolvers'] })

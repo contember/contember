@@ -1,7 +1,7 @@
 import { InsertBuilder } from '@contember/database'
 import { ContentEvent, EventType } from '@contember/engine-common'
-import { assertNever, Providers } from '../../utils'
-import { Command } from './Command'
+import { assertNever, Providers } from '../../../utils'
+import { Command } from '../Command'
 
 export class RecreateContentEvent implements Command<string> {
 	constructor(

@@ -5,17 +5,19 @@ export class MigrationVersionHelper {
 		return filename.substring(0, this.prefixLength)
 	}
 
-	public static createVersion(name: string): string {
-		name = MigrationVersionHelper.normalizeMigrationLabel(name)
-		return `${MigrationVersionHelper.createTimePrefix()}-${name}`
+	public static createVersion(name: string, increment: number = 0): [string, string] {
+		const normalizedName = MigrationVersionHelper.normalizeMigrationLabel(name)
+		const version = MigrationVersionHelper.createTimePrefix(increment)
+		return [version, `${version}-${normalizedName}`]
 	}
 
 	public static extractName(filename: string): string {
 		return filename.substring(0, filename.lastIndexOf('.'))
 	}
 
-	private static createTimePrefix(): string {
+	private static createTimePrefix(increment: number): string {
 		const now = new Date()
+		now.setSeconds(now.getSeconds() + increment)
 		const year = now.getFullYear()
 		const month = (now.getMonth() + 1).toString().padStart(2, '0')
 		const day = now //

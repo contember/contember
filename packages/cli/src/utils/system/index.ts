@@ -40,10 +40,10 @@ export class SystemClient {
 		return new SystemClient(graphqlClient)
 	}
 
-	public async migrate(migrations: Migration[]): Promise<MigrateResponse> {
+	public async migrate(migrations: Migration[], force = false): Promise<MigrateResponse> {
 		const query = `
 mutation($migrations: [Migration!]!) {
-	migrate(migrations: $migrations) {
+	migrate: ${force ? 'forceMigrate' : 'migrate'}(migrations: $migrations) {
 		ok
 		errors {
 			code
@@ -60,6 +60,53 @@ mutation($migrations: [Migration!]!) {
 				migrations,
 			})
 		).migrate
+	}
+
+	public async migrationDelete(version: string): Promise<void> {
+		const query = `
+mutation($version: String!) {
+	migrationDelete(migration: $version) {
+		ok
+		error {
+			developerMessage
+		}
+	}
+}
+`
+		const result = (
+			await this.apiClient.request<{
+				migrationDelete: { ok: boolean; error?: { developerMessage: string } }
+			}>(query, {
+				version,
+			})
+		).migrationDelete
+		if (!result.ok) {
+			throw result.error?.developerMessage
+		}
+	}
+
+	public async migrationModify(version: string, modification: Partial<Migration>): Promise<void> {
+		const query = `
+mutation($version: String!, $modification: MigrationModification!) {
+	migrationModify(migration: $version, modification: $modification) {
+		ok
+		error {
+			developerMessage
+		}
+	}
+}
+`
+		const result = (
+			await this.apiClient.request<{
+				migrationModify: { ok: boolean; error?: { developerMessage: string } }
+			}>(query, {
+				version,
+				modification,
+			})
+		).migrationModify
+		if (!result.ok) {
+			throw result.error?.developerMessage
+		}
 	}
 
 	public async listExecutedMigrations(): Promise<ExecutedMigrationInfo[]> {

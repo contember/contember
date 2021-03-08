@@ -1,6 +1,6 @@
 {
 	"name": "@contember/vimeo-file-uploader",
-	"version": "0.6.6",
+	"version": "0.6.7",
 	"main": "dist/src/index.js",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
@@ -8,7 +8,7 @@
 		"build": "rollup --config"
 	},
 	"dependencies": {
-		"@contember/client": "0.6.6",
+		"@contember/client": "0.6.7",
 		"tus-js-client": "1.8.0"
 	},
 	"devDependencies": {

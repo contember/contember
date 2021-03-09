@@ -14,7 +14,7 @@ import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideOnChangeOptions {
-	batchUpdatesRef: MutableRefObject<EntityAccessor['batchUpdates']>
+	batchUpdatesRef: MutableRefObject<EntityAccessor.BatchUpdates>
 	blockContentField: RelativeSingleField
 	blockElementCache: WeakMap<EntityAccessor, ElementNode>
 	blockElementPathRefs: Map<string, PathRef>

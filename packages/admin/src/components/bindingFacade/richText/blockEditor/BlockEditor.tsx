@@ -2,6 +2,8 @@ import {
 	BindingError,
 	Component,
 	EntityAccessor,
+	EntityId,
+	EntityRealmKey,
 	Environment,
 	FieldAccessor,
 	FieldValue,
@@ -13,6 +15,7 @@ import {
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEntity,
+	useEntityBeforeUpdate,
 	useEntityList,
 	useEntityPersistSuccess,
 	useEnvironment,
@@ -159,6 +162,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ContemberFieldElement>())
 		const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, ElementNode>())
 		const [blockElementPathRefs] = useState(() => new Map<string, PathRef>())
+		const [referencedEntityCache] = useState(() => new Map<EntityId, EntityRealmKey>())
 
 		//
 
@@ -181,7 +185,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 					ref.unref()
 				}
 				blockElementPathRefs.clear()
-			}, [blockElementPathRefs]),
+				referencedEntityCache.clear()
+			}, [blockElementPathRefs, referencedEntityCache]),
 		)
 
 		const [editor] = useState(() =>
@@ -207,6 +212,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				trailingFields: trailingFieldBackedElements,
 				placeholder: label,
 				plugins,
+				referencedEntityCache,
 				referenceDiscriminationField: desugaredReferenceDiscriminationField,
 				referencesField,
 				sortableByField: desugaredSortableByField,
@@ -227,6 +233,56 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			leadingFieldBackedAccessors: leadingAccessors,
 			trailingFieldBackedAccessors: trailingAccessors,
 		})
+
+		useEntityBeforeUpdate(
+			useCallback(
+				getAccessor => {
+					const hasPendingOperations = !!editor.operations.length // See the explanation in overrideSlateOnChange
+
+					// This could feasibly be over-eager and cause incorrect early returns (due to both sides of the or)
+					// but I cannot force the editor into a situation where this would actually be the case.
+					if (props.monolithicReferencesMode || hasPendingOperations) {
+						return
+					}
+					for (const blockEntity of getAccessor().getEntityList(blockListProps)) {
+						const cachedElement = blockElementCache.get(blockEntity)
+
+						if (cachedElement !== undefined) {
+							continue
+						}
+						const blockIndex = blockEntity.getRelativeSingleField<number>(desugaredSortableByField).value!
+						if (editor.children.length < blockIndex) {
+							continue
+						}
+
+						// Whenever something changes within the block, we get a new instance of the blockEntity accessor.
+						// Not all such changes are due to the editor though. Some could be just something within the reference.
+						// In those cases, we would get a cache miss and deserialize the block node again, thereby losing its
+						// referential equality. That, in turn, would cause Slate to re-mount the element during render which
+						// would completely ruin the UX. Thus we want to keep the old node if possible. We check whether it
+						// would be equivalent, and if so, just use the old one. That way Slate never gets a new node and no
+						// remounting ever takes place.
+						const previousNode = editor.children[blockIndex]
+						const contentField = blockEntity.getRelativeSingleField<string>(desugaredBlockContentField)
+						const currentNode = editor.deserializeNodes(
+							contentField.value!,
+							`BlockEditor: The 'contentField' of a block contains invalid data.`,
+						)[0] as ElementNode
+						if (JSON.stringify(previousNode) === JSON.stringify(currentNode)) {
+							blockElementCache.set(blockEntity, previousNode as ElementNode)
+						}
+					}
+				},
+				[
+					blockElementCache,
+					blockListProps,
+					desugaredBlockContentField,
+					desugaredSortableByField,
+					editor,
+					props.monolithicReferencesMode,
+				],
+			),
+		)
 
 		// TODO this is a bit of a hack.
 		const shouldDisplayInlineToolbar = useCallback(() => {

@@ -1,17 +1,35 @@
-import { BindingError, EntityAccessor, EntityListAccessor, SugaredRelativeEntityList } from '@contember/binding'
+import {
+	BindingError,
+	BindingOperations,
+	EntityAccessor,
+	EntityId,
+	EntityListAccessor,
+	EntityRealmKey,
+	RelativeEntityList,
+	SugaredRelativeEntityList,
+} from '@contember/binding'
 import { MutableRefObject } from 'react'
-import { ReactEditor } from 'slate-react'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideGetReferencedEntityOptions {
+	batchUpdatesRef: MutableRefObject<EntityAccessor.BatchUpdates>
+	bindingOperations: BindingOperations
+	desugaredBlockList: RelativeEntityList
 	getMonolithicReferenceById: EntityListAccessor.GetChildEntityById | undefined
+	referencedEntityCache: Map<EntityId, EntityRealmKey>
 	referencesField: string | SugaredRelativeEntityList | undefined
-	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
 export const overrideGetReferencedEntity = <E extends BlockSlateEditor>(
 	editor: E,
-	{ getMonolithicReferenceById, referencesField, sortedBlocksRef }: OverrideGetReferencedEntityOptions,
+	{
+		batchUpdatesRef,
+		bindingOperations,
+		desugaredBlockList,
+		getMonolithicReferenceById,
+		referencedEntityCache,
+		referencesField,
+	}: OverrideGetReferencedEntityOptions,
 ) => {
 	editor.getReferencedEntity = elementOrReferenceId => {
 		if (getMonolithicReferenceById) {
@@ -23,25 +41,28 @@ export const overrideGetReferencedEntity = <E extends BlockSlateEditor>(
 			throw new BindingError()
 		}
 
-		let topLevelIndex: number
-		let referenceId: string
-		if (typeof elementOrReferenceId === 'string') {
-			// TODO This entire branch is awful and needs to go.
-			const selection = editor.selection
-			if (!selection) {
+		const referenceId =
+			typeof elementOrReferenceId === 'string' ? elementOrReferenceId : elementOrReferenceId.referenceId
+
+		let containingBlockKey = referencedEntityCache.get(referenceId)
+
+		if (containingBlockKey === undefined) {
+			bindingOperations.batchDeferredUpdates(() => {
+				batchUpdatesRef.current(getEntity => {
+					const blockList = getEntity().getRelativeEntityList(desugaredBlockList)
+
+					for (const blockEntity of blockList) {
+						for (const referenceEntity of blockEntity.getEntityList(referencesField)) {
+							referencedEntityCache.set(referenceEntity.id, referenceEntity.key)
+						}
+					}
+				})
+			})
+			containingBlockKey = referencedEntityCache.get(referenceId)
+			if (containingBlockKey === undefined) {
 				throw new BindingError()
 			}
-			topLevelIndex = selection.focus.path[0] // ...
-			referenceId = elementOrReferenceId
-		} else {
-			const elementPath = ReactEditor.findPath(editor, elementOrReferenceId)
-			topLevelIndex = elementPath[0]
-			referenceId = elementOrReferenceId.referenceId
 		}
-		const sortedBlocks = sortedBlocksRef.current
-		const containingBlock = sortedBlocks[topLevelIndex]
-		const referenceList = containingBlock.getEntityList(referencesField)
-
-		return referenceList.getChildEntityById(referenceId)
+		return bindingOperations.getEntityByKey(containingBlockKey)
 	}
 }

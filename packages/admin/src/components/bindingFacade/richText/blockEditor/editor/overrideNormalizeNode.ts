@@ -122,11 +122,11 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 				console.warn(`Removing a node linking a non-existent reference id '${referenceId}'.`)
 				Transforms.delete(editor, { at: path })
 			}
-			try {
-				editor.getReferencedEntity(node)
-			} catch {
-				deleteNode()
-			}
+			// try {
+			// 	editor.getReferencedEntity(node)
+			// } catch {
+			// 	deleteNode()
+			// }
 		}
 		return normalizeNode(nodeEntry)
 	}

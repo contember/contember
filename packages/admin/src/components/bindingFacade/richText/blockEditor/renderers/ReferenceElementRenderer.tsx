@@ -118,7 +118,7 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 			<ActionableBox editContents={alternate} onRemove={onRemove}>
 				<EditorBox
 					heading={renderedBlock.label}
-					isActive={selected && !isEditable}
+					//isActive={selected && !isEditable}
 					onClick={isEditable ? onContainerClick : undefined}
 				>
 					{blockBody}

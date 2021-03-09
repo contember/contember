@@ -8,7 +8,6 @@ import { isContemberContentPlaceholderElement, isContemberFieldElement, isRefere
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
 import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference'
-import { overrideCreateReferencedEntity, OverrideCreateReferencedEntityOptions } from './overrideCreateReferencedEntity'
 import { overrideGetReferencedEntity, OverrideGetReferencedEntityOptions } from './overrideGetReferencedEntity'
 import { overrideInsertBreak } from './overrideInsertBreak'
 import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData'
@@ -27,7 +26,6 @@ import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateO
 export interface CreateEditorOptions
 	extends OverrideOnChangeOptions,
 		OverrideCreateElementReferenceOptions,
-		OverrideCreateReferencedEntityOptions,
 		OverrideGetReferencedEntityOptions,
 		OverrideApplyOptions,
 		OverrideRenderElementOptions,
@@ -94,7 +92,6 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 
 			overrideApply(e, options)
 			overrideCreateElementReference(e, options)
-			overrideCreateReferencedEntity(e, options)
 			overrideGetReferencedEntity(e, options)
 			overrideInsertBreak(e, options)
 			overrideInsertData(e, options)

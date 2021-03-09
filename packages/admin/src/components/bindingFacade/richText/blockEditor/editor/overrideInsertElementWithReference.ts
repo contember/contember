@@ -1,17 +1,47 @@
-import { EntityAccessor, FieldValue, RelativeSingleField } from '@contember/binding'
-import { Editor, Transforms } from 'slate'
+import {
+	addEntityAtIndex,
+	BindingOperations,
+	EntityAccessor,
+	EntityListAccessor,
+	FieldValue,
+	RelativeEntityList,
+	RelativeSingleField,
+} from '@contember/binding'
+import { MutableRefObject } from 'react'
+import { Editor, PathRef, Transforms } from 'slate'
 import { ElementNode } from '../../baseEditor'
+import { ElementWithReference } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertElementWithReferenceOptions {
+	batchUpdatesRef: MutableRefObject<EntityAccessor.BatchUpdates>
+	bindingOperations: BindingOperations
+	blockContentField: RelativeSingleField
+	blockElementCache: WeakMap<EntityAccessor, ElementNode>
+	blockElementPathRefs: Map<string, PathRef>
+	createMonolithicReference: EntityListAccessor.CreateNewEntity | undefined
+	desugaredBlockList: RelativeEntityList
 	referenceDiscriminationField: RelativeSingleField | undefined
+	sortableByField: RelativeSingleField
+	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
 }
 
 export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 	editor: E,
 	options: OverrideInsertElementWithReferenceOptions,
 ) => {
-	const { referenceDiscriminationField } = options
+	const {
+		batchUpdatesRef,
+		bindingOperations,
+		blockContentField,
+		blockElementCache,
+		blockElementPathRefs,
+		createMonolithicReference,
+		desugaredBlockList,
+		referenceDiscriminationField,
+		sortableByField,
+		sortedBlocksRef,
+	} = options
 	if (referenceDiscriminationField === undefined) {
 		return
 	}
@@ -22,8 +52,41 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 	) => {
 		Editor.withoutNormalizing(editor, () => {
 			const preppedPath = editor.prepareElementForInsertion(element)
+			const [blockOrder] = preppedPath
+			let newBlockId: string | undefined = undefined
+
+			if (preppedPath.length === 1 && !createMonolithicReference) {
+				// We're creating a top-level block and aren't in monolithic mode.
+				// Hence we need to first create the block entity.
+				bindingOperations.batchDeferredUpdates(() => {
+					batchUpdatesRef.current(getAccessor => {
+						const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
+						addEntityAtIndex(blockList, sortableByField, blockOrder, getNewBlock => {
+							newBlockId = getNewBlock().id
+							sortedBlocksRef.current.splice(blockOrder, 0, getNewBlock())
+						})
+					})
+				})
+			}
 			const referenceId = editor.createElementReference(preppedPath, referenceDiscriminant, initialize)
-			Transforms.insertNodes(editor, { ...element, referenceId }, { at: preppedPath })
+			const newNode: ElementWithReference = { ...element, referenceId }
+			Transforms.insertNodes(editor, newNode, { at: preppedPath })
+
+			if (preppedPath.length === 1 && !createMonolithicReference && newBlockId !== undefined) {
+				bindingOperations.batchDeferredUpdates(() => {
+					batchUpdatesRef.current(getAccessor => {
+						const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
+
+						blockElementPathRefs.set(newBlockId!, Editor.pathRef(editor, [blockOrder], { affinity: 'backward' }))
+						blockList
+							.getChildEntityById(newBlockId!)
+							.getRelativeSingleField(blockContentField)
+							.updateValue(editor.serializeNodes([newNode]))
+						blockElementCache.set(blockList.getChildEntityById(newBlockId!), newNode)
+						sortedBlocksRef.current.splice(blockOrder, 1, blockList.getChildEntityById(newBlockId!))
+					})
+				})
+			}
 		})
 	}
 }

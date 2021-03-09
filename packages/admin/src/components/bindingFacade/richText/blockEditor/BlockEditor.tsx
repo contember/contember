@@ -2,6 +2,8 @@ import {
 	BindingError,
 	Component,
 	EntityAccessor,
+	EntityId,
+	EntityRealmKey,
 	Environment,
 	FieldAccessor,
 	FieldValue,
@@ -160,6 +162,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ContemberFieldElement>())
 		const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, ElementNode>())
 		const [blockElementPathRefs] = useState(() => new Map<string, PathRef>())
+		const [referencedEntityCache] = useState(() => new Map<EntityId, EntityRealmKey>())
 
 		//
 
@@ -182,7 +185,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 					ref.unref()
 				}
 				blockElementPathRefs.clear()
-			}, [blockElementPathRefs]),
+				referencedEntityCache.clear()
+			}, [blockElementPathRefs, referencedEntityCache]),
 		)
 
 		const [editor] = useState(() =>
@@ -208,6 +212,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				trailingFields: trailingFieldBackedElements,
 				placeholder: label,
 				plugins,
+				referencedEntityCache,
 				referenceDiscriminationField: desugaredReferenceDiscriminationField,
 				referencesField,
 				sortableByField: desugaredSortableByField,

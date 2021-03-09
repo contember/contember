@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
 import { EntityAccessor } from '../accessors'
-import { FieldName } from '../treeParameters/primitives'
+import { FieldName } from '../treeParameters'
 
 export function useEntityEvent(
 	type: 'beforePersist',

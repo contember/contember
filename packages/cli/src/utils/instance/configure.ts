@@ -36,11 +36,20 @@ export const interactiveInstanceConfigure = async ({
 			patchInstanceOverrideConfig(config, portsMapping, composeConfig.version),
 		)
 	}
+	const apiEnv = composeConfig.services?.api?.environment || {}
 
-	if (!instanceConfig.loginToken && adminEnv.CONTEMBER_LOGIN_TOKEN) {
+	if (!instanceConfig.loginToken && (adminEnv.CONTEMBER_LOGIN_TOKEN || apiEnv.CONTEMBER_LOGIN_TOKEN)) {
 		await updateInstanceLocalConfig({
 			instanceDirectory: instance.directory,
-			updater: data => ({ ...data, loginToken: adminEnv.CONTEMBER_LOGIN_TOKEN }),
+			updater: data => ({
+				...data,
+				loginToken: adminEnv.CONTEMBER_LOGIN_TOKEN,
+				...(apiEnv.CONTEMBER_ROOT_TOKEN
+					? {
+							apiToken: apiEnv.CONTEMBER_ROOT_TOKEN,
+					  }
+					: {}),
+			}),
 		})
 	} else if (!instanceConfig.loginToken) {
 		const { email: rootEmail, password: rootPassword } = await interactiveAskForCredentials()
@@ -55,13 +64,12 @@ export const interactiveInstanceConfigure = async ({
 			updater: json => ({ ...json, apiToken: rootToken, loginToken: loginToken }),
 		})
 		adminEnv.CONTEMBER_LOGIN_TOKEN = loginToken
-	} else if (
-		(!adminEnv.CONTEMBER_LOGIN_TOKEN && withAdmin) ||
-		!composeConfig.services?.api?.environment?.CONTEMBER_LOGIN_TOKEN
-	) {
-		await updateOverrideConfig(instance.directory, config =>
-			patchInstanceOverrideCredentials(config, { loginToken: instanceConfig.loginToken }),
-		)
+	} else {
+		if ((!adminEnv.CONTEMBER_LOGIN_TOKEN && withAdmin) || !apiEnv?.CONTEMBER_LOGIN_TOKEN) {
+			await updateOverrideConfig(instance.directory, config =>
+				patchInstanceOverrideCredentials(config, { loginToken: instanceConfig.loginToken }),
+			)
+		}
 	}
 
 	return { adminEnv }

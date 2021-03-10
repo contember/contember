@@ -33,6 +33,7 @@
     "graphql-request": "^3.3.0",
     "js-yaml": "^3.13.1",
     "npm-package-arg": "^8.0.0",
+    "pg": "^8.5.0",
     "prompts": "^2.2.1",
     "registry-info": "^1.0.0",
     "ts-node": "^9.0.0",

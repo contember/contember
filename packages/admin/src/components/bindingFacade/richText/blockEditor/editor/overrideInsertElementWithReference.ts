@@ -11,6 +11,7 @@ import { MutableRefObject } from 'react'
 import { Editor, PathRef, Transforms } from 'slate'
 import { ElementNode } from '../../baseEditor'
 import { ElementWithReference } from '../elements'
+import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertElementWithReferenceOptions {
@@ -21,6 +22,7 @@ export interface OverrideInsertElementWithReferenceOptions {
 	blockElementPathRefs: Map<string, PathRef>
 	createMonolithicReference: EntityListAccessor.CreateNewEntity | undefined
 	desugaredBlockList: RelativeEntityList
+	leadingFields: FieldBackedElement[]
 	referenceDiscriminationField: RelativeSingleField | undefined
 	sortableByField: RelativeSingleField
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
@@ -38,6 +40,7 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 		blockElementPathRefs,
 		createMonolithicReference,
 		desugaredBlockList,
+		leadingFields,
 		referenceDiscriminationField,
 		sortableByField,
 		sortedBlocksRef,
@@ -52,7 +55,8 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 	) => {
 		Editor.withoutNormalizing(editor, () => {
 			const preppedPath = editor.prepareElementForInsertion(element)
-			const [blockOrder] = preppedPath
+			const [topLevelElementIndex] = preppedPath
+			const blockOrder = topLevelElementIndex - leadingFields.length
 			let newBlockId: string | undefined = undefined
 
 			if (preppedPath.length === 1 && !createMonolithicReference) {
@@ -77,7 +81,10 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 					batchUpdatesRef.current(getAccessor => {
 						const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
 
-						blockElementPathRefs.set(newBlockId!, Editor.pathRef(editor, [blockOrder], { affinity: 'backward' }))
+						blockElementPathRefs.set(
+							newBlockId!,
+							Editor.pathRef(editor, [topLevelElementIndex], { affinity: 'backward' }),
+						)
 						blockList
 							.getChildEntityById(newBlockId!)
 							.getRelativeSingleField(blockContentField)

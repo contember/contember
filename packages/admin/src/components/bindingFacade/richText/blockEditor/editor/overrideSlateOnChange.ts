@@ -192,7 +192,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 							const newId = getAccessor().id
 							getAccessor().getRelativeSingleField(sortableByField).updateValue(blockOrder)
 							saveBlockElement(getBlockById, newId, child as EditorNode)
-							blockElementPathRefs.set(newId, Editor.pathRef(editor, [blockOrder], { affinity: 'backward' }))
+							blockElementPathRefs.set(newId, Editor.pathRef(editor, [topLevelIndex], { affinity: 'backward' }))
 						})
 					}
 				}

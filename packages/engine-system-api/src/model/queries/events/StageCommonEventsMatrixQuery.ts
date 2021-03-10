@@ -15,6 +15,11 @@ class StageCommonEventsMatrixQuery extends DatabaseQuery<StageCommonEventsMatrix
 	}
 
 	async fetch(queryable: DatabaseQueryable): Promise<StageCommonEventsMatrixQuery.Result> {
+		/**
+		 * the stages join seems useless, but it stops postgresql from inlining the CTE
+		 * see https://git.postgresql.org/gitweb/?p=postgresql.git;a=commitdiff;h=608b167f9f9c4553c35bb1ec0eab9ddae643989b
+		 * it should be solved using stages AS MATERIALIZED, but currently we don't know the postgresql version
+		 */
 		const res = await queryable.db.query<MatrixRow>(`
 			WITH RECURSIVE
 				events(id, previous_id, index, stage) AS (
@@ -48,8 +53,9 @@ class StageCommonEventsMatrixQuery extends DatabaseQuery<StageCommonEventsMatrix
 						     JOIN events eventsA ON eventsA.stage = stages.stage_a_id
 						     JOIN events eventsB ON eventsB.id = eventsA.id AND eventsB.stage = stages.stage_b_id
 				)
-			SELECT stage_a_slug, stage_a_event_id, stage_b_slug, stage_b_event_id, distance, common_event_id
+			SELECT matrix.stage_a_slug, matrix.stage_a_event_id, matrix.stage_b_slug, matrix.stage_b_event_id, distance, common_event_id
 			FROM matrix
+			JOIN stages ON matrix.stage_a_slug = stages.stage_a_slug AND matrix.stage_b_slug = stages.stage_b_slug
 			WHERE num = 1
 		`)
 		const rows = res.rows

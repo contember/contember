@@ -42,12 +42,19 @@ const RefButton = memo(({ button }: { button: InitializeReferenceToolbarButton }
 						}
 						const discriminateBy = VariableInputTransformer.transformValue(button.discriminateBy, environment)
 
+						const selection = editor.selection
+
 						// const preppedPath = editor.prepareElementForInsertion({
 						// 	type: button,
 						// })
-						const preppedPath = editorSelection?.focus.path || [] // TODO this is awful.
-						setReferenceId(editor.createElementReference(preppedPath, discriminateBy, button.initializeReference))
-						setEditorSelection(editor.selection)
+						const targetPath = selection?.focus.path // TODO this is awful.
+
+						if (targetPath === undefined) {
+							return
+						}
+
+						setReferenceId(editor.createElementReference(targetPath, discriminateBy, button.initializeReference))
+						setEditorSelection(selection)
 						onClick(e)
 					}}
 				/>

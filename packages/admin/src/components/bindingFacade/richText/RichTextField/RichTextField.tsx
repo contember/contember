@@ -61,7 +61,9 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 
 			const { normalizeNode } = editor
 			Object.assign(editor, {
-				insertBreak: () => {}, // Nope!
+				insertBreak: () => {
+					Transforms.insertText(editor, '\n')
+				},
 				normalizeNode: (nodeEntry: NodeEntry) => {
 					const [node, path] = nodeEntry
 

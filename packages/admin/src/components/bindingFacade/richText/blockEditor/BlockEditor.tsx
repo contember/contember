@@ -250,7 +250,9 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 						if (cachedElement !== undefined) {
 							continue
 						}
-						const blockIndex = blockEntity.getRelativeSingleField<number>(desugaredSortableByField).value!
+						const blockIndex =
+							blockEntity.getRelativeSingleField<number>(desugaredSortableByField).value! +
+							leadingFieldBackedElements.length
 						if (editor.children.length < blockIndex) {
 							continue
 						}
@@ -279,6 +281,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 					desugaredBlockContentField,
 					desugaredSortableByField,
 					editor,
+					leadingFieldBackedElements.length,
 					props.monolithicReferencesMode,
 				],
 			),

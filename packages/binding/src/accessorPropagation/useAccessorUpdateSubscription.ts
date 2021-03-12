@@ -8,22 +8,18 @@ export type ForceAccessorUpdate = () => void
 /**
  * It is VERY IMPORTANT for the parameter to be referentially stable!
  */
-function useAccessorUpdateSubscription<
-	Persisted extends FieldValue = FieldValue,
-	Produced extends Persisted = Persisted
->(getFieldAccessor: () => FieldAccessor<Persisted, Produced>): FieldAccessor<Persisted, Produced>
+function useAccessorUpdateSubscription<Value extends FieldValue = FieldValue>(
+	getFieldAccessor: () => FieldAccessor<Value>,
+): FieldAccessor<Value>
 function useAccessorUpdateSubscription(getEntityAccessor: () => EntityAccessor): EntityAccessor
 function useAccessorUpdateSubscription(getListAccessor: () => EntityListAccessor): EntityListAccessor
 function useAccessorUpdateSubscription(
 	getAccessor: () => EntityListAccessor | EntityAccessor,
 ): EntityListAccessor | EntityAccessor
-function useAccessorUpdateSubscription<
-	Persisted extends FieldValue = FieldValue,
-	Produced extends Persisted = Persisted
->(
-	getFieldAccessor: () => FieldAccessor<Persisted, Produced>,
+function useAccessorUpdateSubscription<Value extends FieldValue = FieldValue>(
+	getFieldAccessor: () => FieldAccessor<Value>,
 	withForceUpdate: true,
-): [FieldAccessor<Persisted, Produced>, ForceAccessorUpdate]
+): [FieldAccessor<Value>, ForceAccessorUpdate]
 function useAccessorUpdateSubscription(
 	getEntityAccessor: () => EntityAccessor,
 	withForceUpdate: true,
@@ -37,9 +33,8 @@ function useAccessorUpdateSubscription(
 	withForceUpdate: true,
 ): [EntityListAccessor | EntityAccessor, ForceAccessorUpdate]
 function useAccessorUpdateSubscription<
-	A extends FieldAccessor<Persisted, Produced> | EntityListAccessor | EntityAccessor,
-	Persisted extends FieldValue = FieldValue,
-	Produced extends Persisted = Persisted
+	A extends FieldAccessor<Value> | EntityListAccessor | EntityAccessor,
+	Value extends FieldValue = FieldValue
 >(getAccessor: () => A, withForceUpdate?: true): A | [A, ForceAccessorUpdate] {
 	// This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
 	const [state, setState] = useState<{
@@ -74,7 +69,7 @@ function useAccessorUpdateSubscription<
 
 	const addEventListener: (
 		eventType: 'update',
-		handler: (newAccessor: FieldAccessor<Persisted, Produced> | EntityListAccessor | EntityAccessor) => void,
+		handler: (newAccessor: FieldAccessor<Value> | EntityListAccessor | EntityAccessor) => void,
 	) => () => void = accessor.addEventListener
 	useEffect(() => {
 		let isStillSubscribed = true

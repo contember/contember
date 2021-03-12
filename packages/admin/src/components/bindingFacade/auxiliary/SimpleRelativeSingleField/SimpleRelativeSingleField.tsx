@@ -13,21 +13,17 @@ import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
 
 export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FormGroupProps, 'children'>
 
-export interface SimpleRelativeSingleFieldMetadata<
-	Persisted extends FieldValue = FieldValue,
-	Produced extends Persisted = Persisted
-> {
-	field: FieldAccessor<Persisted, Produced>
+export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = FieldValue> {
+	field: FieldAccessor<Value>
 	environment: Environment
 	isMutating: boolean
 }
 
 export const SimpleRelativeSingleField = function <
 	P extends FieldBasicProps & Omit<FormGroupProps, 'children'>,
-	Persisted extends FieldValue = FieldValue,
-	Produced extends Persisted = Persisted
+	Value extends FieldValue = FieldValue
 >(
-	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Persisted, Produced>, props: P) => ReactNode,
+	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: P) => ReactNode,
 	displayName: string,
 	defaultProps?: Partial<P>,
 ): NamedExoticComponent<P> & StaticRenderProvider<P> {

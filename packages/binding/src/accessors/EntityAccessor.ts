@@ -70,15 +70,13 @@ class EntityAccessor implements Errorable {
 	}
 
 	/**
-	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameters
-	 * are really just a way to succinctly write a type cast. Nothing more, really.
+	 * Please keep in mind that this method signature is literally impossible to implement safely. The generic parameter
+	 * is really just a way to succinctly write a type cast. Nothing more, really.
 	 */
-	public getField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+	public getField<Value extends FieldValue = FieldValue>(
 		field: SugaredRelativeSingleField | string,
-	): FieldAccessor<Persisted, Produced> {
-		return this.getRelativeSingleField<Persisted, Produced>(
-			QueryLanguage.desugarRelativeSingleField(field, this.environment),
-		)
+	): FieldAccessor<Value> {
+		return this.getRelativeSingleField<Value>(QueryLanguage.desugarRelativeSingleField(field, this.environment))
 	}
 
 	public getEntity(entity: SugaredRelativeSingleEntity | string): EntityAccessor {
@@ -109,12 +107,12 @@ class EntityAccessor implements Errorable {
 	/**
 	 * @see EntityAccessor.getField
 	 */
-	public getRelativeSingleField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+	public getRelativeSingleField<Value extends FieldValue = FieldValue>(
 		field: RelativeSingleField | DesugaredRelativeSingleField,
-	): FieldAccessor<Persisted, Produced> {
+	): FieldAccessor<Value> {
 		return (this.getRelativeSingleEntity(field).getAccessorByPlaceholder(
 			PlaceholderGenerator.getFieldPlaceholder(field.field),
-		) as unknown) as FieldAccessor<Persisted, Produced>
+		) as unknown) as FieldAccessor<Value>
 	}
 
 	public getRelativeSingleEntity(

@@ -10,10 +10,10 @@ const identityFunction = <Value>(value: Value) => value
  * transformed value is then copied to the `derivedField`. This happens after each update until either the `derivedField`
  * is touched or until it is persisted at which point the tie between the fields is automatically severed.
  */
-export const useDerivedField = <SourcePersisted extends FieldValue = FieldValue>(
+export const useDerivedField = <SourceValue extends FieldValue = FieldValue>(
 	sourceField: string | SugaredRelativeSingleField,
 	derivedField: string | SugaredRelativeSingleField,
-	transform: (sourceValue: SourcePersisted | null) => SourcePersisted | null = identityFunction,
+	transform: (sourceValue: SourceValue | null) => SourceValue | null = identityFunction,
 	agent: string = 'derivedField',
 ) => {
 	const entityKey = useEntityKey()
@@ -24,10 +24,10 @@ export const useDerivedField = <SourcePersisted extends FieldValue = FieldValue>
 	const desugaredSource = useDesugaredRelativeSingleField(sourceField)
 	const desugaredDerived = useDesugaredRelativeSingleField(derivedField)
 
-	const potentiallyStaleSourceAccessor = potentiallyStaleParent.getRelativeSingleField<SourcePersisted>(desugaredSource)
+	const potentiallyStaleSourceAccessor = potentiallyStaleParent.getRelativeSingleField<SourceValue>(desugaredSource)
 	const stableAddEventListenerReference = potentiallyStaleSourceAccessor.addEventListener
 
-	const onBeforeUpdate = useCallback<FieldAccessor.BeforeUpdateListener<SourcePersisted>>(
+	const onBeforeUpdate = useCallback<FieldAccessor.BeforeUpdateListener<SourceValue>>(
 		sourceAccessor => {
 			stableBatchUpdatesReference(getAccessor => {
 				// This is tricky: we're deliberately getting the Entity, and not the field
@@ -37,7 +37,7 @@ export const useDerivedField = <SourcePersisted extends FieldValue = FieldValue>
 					return
 				}
 
-				const derivedAccessor = getAccessor().getRelativeSingleField<SourcePersisted, SourcePersisted>(desugaredDerived)
+				const derivedAccessor = getAccessor().getRelativeSingleField<SourceValue>(desugaredDerived)
 
 				if (derivedAccessor.isTouched) {
 					// Querying the user

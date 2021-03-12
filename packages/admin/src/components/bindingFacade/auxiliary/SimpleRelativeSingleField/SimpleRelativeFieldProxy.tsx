@@ -21,7 +21,7 @@ const contextualizeNode = (
 
 export type SimpleRelativeSingleFieldProxyProps = Omit<FormGroupProps, 'children'> &
 	SugaredRelativeSingleField & {
-		render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any, any>, props: any) => ReactNode
+		render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<any>, props: any) => ReactNode
 	}
 
 export const SimpleRelativeSingleFieldProxy = memo(

@@ -9,6 +9,7 @@ export interface FieldEventListenerStore
 	extends Map<keyof Events, { [E in keyof Events]: Set<Events[E]> }[keyof Events]> {
 	// Unfortunately, we have to enumerate these because otherwise, TS just can't handle the polymorphism.
 	get(key: 'beforeUpdate'): Set<Events['beforeUpdate']> | undefined
+	get(key: 'initialize'): Set<Events['initialize']> | undefined
 	get(key: 'update'): Set<Events['update']> | undefined
 	get<K extends keyof Events>(key: K): { [E in keyof Events]: Set<Events[E]> }[K] | undefined
 

@@ -1,5 +1,6 @@
 import { FieldHelpers } from '../fieldHelpers'
 import { FieldName, FieldValue } from '../treeParameters'
+import { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import { Errorable } from './Errorable'
 import { ErrorAccessor } from './ErrorAccessor'
 
@@ -53,9 +54,15 @@ namespace FieldAccessor {
 		agent?: string
 	}
 
+	export type GetFieldAccessor<Value extends FieldValue = FieldValue> = () => FieldAccessor<Value>
+
 	export type AddError = ErrorAccessor.AddError
 	export type BeforeUpdateListener<Value extends FieldValue = FieldValue> = (
 		updatedAccessor: FieldAccessor<Value>,
+	) => void
+	export type InitializeListener<Value extends FieldValue = FieldValue> = (
+		getAccessor: GetFieldAccessor<Value>,
+		options: BatchUpdatesOptions,
 	) => void
 	export type UpdateListener<Value extends FieldValue = FieldValue> = (accessor: FieldAccessor<Value>) => void
 	export type UpdateValue<Value extends FieldValue = FieldValue> = (
@@ -69,7 +76,7 @@ namespace FieldAccessor {
 	}
 	export interface FieldEventListenerMap<Value extends FieldValue = FieldValue>
 		extends RuntimeFieldEventListenerMap<Value> {
-		// TODO initialize: ...
+		initialize: InitializeListener<Value>
 	}
 	export type FieldEventType = keyof FieldEventListenerMap
 	export interface AddFieldEventListener<Value extends FieldValue = FieldValue> {

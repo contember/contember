@@ -393,6 +393,8 @@ export class StateInitializer {
 			)
 		}
 
+		this.eventManager.registerNewlyInitialized(entityListState)
+
 		return entityListState
 	}
 
@@ -445,6 +447,8 @@ export class StateInitializer {
 			},
 		}
 		fieldState.addEventListener = this.getAddEventListener(fieldState)
+
+		this.eventManager.registerNewlyInitialized(fieldState)
 		return fieldState
 	}
 

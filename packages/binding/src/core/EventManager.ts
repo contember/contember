@@ -16,6 +16,7 @@ import { DirtinessTracker } from './DirtinessTracker'
 import {
 	EntityListState,
 	EntityRealmState,
+	FieldState,
 	getEntityMarker,
 	RootStateNode,
 	StateINode,
@@ -34,7 +35,7 @@ export class EventManager {
 	private ongoingPersistOperation: Promise<SuccessfulPersistResult> | undefined = undefined
 	private hasEverUpdated = false
 
-	private newlyInitializedWithListeners: Set<EntityListState | EntityRealmState> = new Set()
+	private newlyInitializedWithListeners: Set<EntityListState | EntityRealmState | FieldState> = new Set()
 	private pendingWithBeforeUpdate: Set<StateNode> = new Set()
 	private rootsWithPendingUpdates: Set<RootStateNode> = new Set()
 
@@ -128,7 +129,7 @@ export class EventManager {
 		})
 	}
 
-	public registerNewlyInitialized(newlyInitialized: EntityListState | EntityRealmState) {
+	public registerNewlyInitialized(newlyInitialized: EntityListState | EntityRealmState | FieldState) {
 		if (!newlyInitialized.eventListeners || newlyInitialized.eventListeners.size === 0) {
 			return
 		}
@@ -314,6 +315,9 @@ export class EventManager {
 
 					// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
 					for (const newlyInitialized of this.newlyInitializedWithListeners) {
+						if (newlyInitialized.type === StateType.Field) {
+							continue
+						}
 						const beforePersistHandlers = newlyInitialized.eventListeners?.get('beforePersist')
 						if (beforePersistHandlers) {
 							for (const listener of beforePersistHandlers) {

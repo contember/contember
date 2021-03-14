@@ -6,8 +6,6 @@ import { EntityState } from './EntityState'
 import { StateNode } from './StateNode'
 import { StateType } from './StateType'
 
-export type EntityRealmParent = EntityRealmState | EntityListState | undefined
-
 export interface HasOneEntityRealmBlueprint {
 	readonly type: 'hasOne'
 	readonly marker: HasOneRelationMarker

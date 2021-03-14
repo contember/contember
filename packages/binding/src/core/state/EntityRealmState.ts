@@ -1,12 +1,10 @@
 import { EntityAccessor, ErrorAccessor } from '../../accessors'
 import { EntitySubTreeMarker, HasOneRelationMarker } from '../../markers'
-import { EntityRealmKey, FieldName, PlaceholderName, SingleEntityEventListeners } from '../../treeParameters'
+import { EntityEventListenerStore, EntityRealmKey, FieldName, PlaceholderName } from '../../treeParameters'
 import { EntityListState } from './EntityListState'
 import { EntityState } from './EntityState'
 import { StateNode } from './StateNode'
 import { StateType } from './StateType'
-
-export type EntityRealmParent = EntityRealmState | EntityListState | undefined
 
 export interface HasOneEntityRealmBlueprint {
 	readonly type: 'hasOne'
@@ -54,7 +52,7 @@ export interface EntityRealmState {
 	readonly children: Map<PlaceholderName, StateNode | EntityRealmStateStub>
 	childrenWithPendingUpdates: Set<StateNode> | undefined
 	errors: ErrorAccessor | undefined
-	eventListeners: SingleEntityEventListeners['eventListeners']
+	eventListeners: EntityEventListenerStore | undefined
 	fieldsWithPendingConnectionUpdates: Set<FieldName> | undefined
 	hasStaleAccessor: boolean
 

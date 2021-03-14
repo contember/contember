@@ -6,10 +6,12 @@ import {
 	DesugaredHasManyRelation,
 	DesugaredHasOneRelation,
 	EntityCreationParametersDefaults,
-	EntityListEventListeners,
+	EntityEventListenerStore,
+	EntityListEventListenerStore,
 	EntityListParameters,
 	EntityListPreferencesDefaults,
 	EntityName,
+	FieldEventListenerStore,
 	FieldName,
 	Filter,
 	HasManyRelation,
@@ -23,7 +25,6 @@ import {
 	RelativeEntityList,
 	RelativeSingleEntity,
 	RelativeSingleField,
-	SingleEntityEventListeners,
 	SugarableEntityListParameters,
 	SugarableHasManyRelation,
 	SugarableHasOneRelation,
@@ -42,6 +43,7 @@ import {
 	UniqueWhere,
 	UnsugarableEntityListEventListeners,
 	UnsugarableEntityListParameters,
+	UnsugarableFieldEventListeners,
 	UnsugarableHasManyRelation,
 	UnsugarableHasOneRelation,
 	UnsugarableSingleEntityEventListeners,
@@ -108,39 +110,131 @@ export namespace QueryLanguage {
 
 	const desugarSingleEntityEventListeners = (
 		unsugarable: UnsugarableSingleEntityEventListeners,
-	): SingleEntityEventListeners['eventListeners'] => {
-		const connectionUpdate = unsugarable.onConnectionUpdate
-			? new Map(
+	): EntityEventListenerStore | undefined => {
+		if (
+			unsugarable.onBeforePersist === undefined &&
+			unsugarable.onBeforeUpdate === undefined &&
+			unsugarable.onInitialize === undefined &&
+			unsugarable.onPersistError === undefined &&
+			unsugarable.onPersistSuccess === undefined &&
+			unsugarable.onUpdate === undefined
+		) {
+			return undefined
+		}
+
+		const store: EntityEventListenerStore = new Map()
+
+		if (unsugarable.onConnectionUpdate) {
+			store.set(
+				'connectionUpdate',
+				new Map(
 					Object.entries(unsugarable.onConnectionUpdate).map(([fieldName, listener]) => [
 						fieldName,
 						desugarEventListener(listener),
 					]),
-			  )
-			: undefined
-
-		return {
-			beforePersist: desugarEventListener(unsugarable.onBeforePersist),
-			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
-			connectionUpdate,
-			initialize: desugarEventListener(unsugarable.onInitialize),
-			persistError: desugarEventListener(unsugarable.onPersistError),
-			persistSuccess: desugarEventListener(unsugarable.onPersistSuccess),
-			update: desugarEventListener(unsugarable.onUpdate),
+				),
+			)
 		}
+
+		const beforePersist = desugarEventListener(unsugarable.onBeforePersist)
+		const beforeUpdate = desugarEventListener(unsugarable.onBeforeUpdate)
+		const initialize = desugarEventListener(unsugarable.onInitialize)
+		const persistError = desugarEventListener(unsugarable.onPersistError)
+		const persistSuccess = desugarEventListener(unsugarable.onPersistSuccess)
+		const update = desugarEventListener(unsugarable.onUpdate)
+
+		if (beforePersist) {
+			store.set('beforePersist', beforePersist)
+		}
+		if (beforeUpdate) {
+			store.set('beforeUpdate', beforeUpdate)
+		}
+		if (initialize) {
+			store.set('initialize', initialize)
+		}
+		if (persistError) {
+			store.set('persistError', persistError)
+		}
+		if (persistSuccess) {
+			store.set('persistSuccess', persistSuccess)
+		}
+		if (update) {
+			store.set('update', update)
+		}
+
+		return store
 	}
 
 	const desugarEntityListEventListeners = (
 		unsugarable: UnsugarableEntityListEventListeners,
-	): EntityListEventListeners['eventListeners'] => {
-		return {
-			beforePersist: desugarEventListener(unsugarable.onBeforePersist),
-			beforeUpdate: desugarEventListener(unsugarable.onBeforeUpdate),
-			childInitialize: desugarEventListener(unsugarable.onChildInitialize),
-			initialize: desugarEventListener(unsugarable.onInitialize),
-			persistError: desugarEventListener(unsugarable.onPersistError),
-			persistSuccess: desugarEventListener(unsugarable.onPersistSuccess),
-			update: desugarEventListener(unsugarable.onUpdate),
+	): EntityListEventListenerStore | undefined => {
+		if (
+			unsugarable.onBeforePersist === undefined &&
+			unsugarable.onBeforeUpdate === undefined &&
+			unsugarable.onChildInitialize === undefined &&
+			unsugarable.onInitialize === undefined &&
+			unsugarable.onPersistError === undefined &&
+			unsugarable.onPersistSuccess === undefined &&
+			unsugarable.onUpdate === undefined
+		) {
+			return undefined
 		}
+
+		const store: EntityListEventListenerStore = new Map()
+
+		const beforePersist = desugarEventListener(unsugarable.onBeforePersist)
+		const beforeUpdate = desugarEventListener(unsugarable.onBeforeUpdate)
+		const childInitialize = desugarEventListener(unsugarable.onChildInitialize)
+		const initialize = desugarEventListener(unsugarable.onInitialize)
+		const persistError = desugarEventListener(unsugarable.onPersistError)
+		const persistSuccess = desugarEventListener(unsugarable.onPersistSuccess)
+		const update = desugarEventListener(unsugarable.onUpdate)
+
+		if (beforePersist) {
+			store.set('beforePersist', beforePersist)
+		}
+		if (beforeUpdate) {
+			store.set('beforeUpdate', beforeUpdate)
+		}
+		if (childInitialize) {
+			store.set('childInitialize', childInitialize)
+		}
+		if (initialize) {
+			store.set('initialize', initialize)
+		}
+		if (persistError) {
+			store.set('persistError', persistError)
+		}
+		if (persistSuccess) {
+			store.set('persistSuccess', persistSuccess)
+		}
+		if (update) {
+			store.set('update', update)
+		}
+
+		return store
+	}
+
+	const desugarFieldEventListeners = (
+		unsugarable: UnsugarableFieldEventListeners,
+	): FieldEventListenerStore | undefined => {
+		if (unsugarable.onBeforeUpdate === undefined && unsugarable.onUpdate === undefined) {
+			return undefined
+		}
+
+		const store: FieldEventListenerStore = new Map()
+
+		const beforeUpdate = desugarEventListener(unsugarable.onBeforeUpdate)
+		const update = desugarEventListener(unsugarable.onUpdate)
+
+		if (beforeUpdate) {
+			store.set('beforeUpdate', beforeUpdate)
+		}
+		if (update) {
+			store.set('update', update)
+		}
+
+		return store
 	}
 
 	const desugarSubTreeAlias = (alias: Alias | Set<Alias> | undefined): Set<Alias> | undefined => {
@@ -383,18 +477,14 @@ export namespace QueryLanguage {
 			entityName,
 			hasOneRelationPath,
 			alias: desugarSubTreeAlias(unsugarableFieldList.alias),
-			isCreating: false,
 			isNonbearing: unsugarableFieldList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
 			// forceCreation: unsugarableFieldList.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
-			setOnCreate: unsugarableFieldList.setOnCreate
-				? desugarSetOnCreate(unsugarableFieldList.setOnCreate, environment)
-				: undefined,
 			defaultValue:
 				unsugarableFieldList.defaultValue !== undefined
 					? VariableInputTransformer.transformValue(unsugarableFieldList.defaultValue, environment)
 					: undefined,
 			expectedMutation: unsugarableFieldList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
-			eventListeners: desugarEntityListEventListeners(unsugarableFieldList),
+			eventListeners: desugarFieldEventListeners(unsugarableFieldList),
 			...desugarEntityListParameters(
 				{
 					filter,
@@ -511,18 +601,15 @@ export namespace QueryLanguage {
 		let fieldName: FieldName
 		if (typeof field === 'string') {
 			const desugaredField = desugarSugarableRelativeSingleField(field, environment)
-			hasOneRelationPath = augmentDesugaredHasOneRelationPath(
-				desugaredField.hasOneRelationPath,
-				unsugarableField,
-				environment,
-			)
+			hasOneRelationPath = augmentDesugaredHasOneRelationPath(desugaredField.hasOneRelationPath, {}, environment)
 			fieldName = desugaredField.field
 		} else {
-			hasOneRelationPath = desugarHasOneRelationPath(field.hasOneRelationPath, unsugarableField, environment)
+			hasOneRelationPath = desugarHasOneRelationPath(field.hasOneRelationPath, {}, environment)
 			fieldName = field.field
 		}
 
 		return {
+			eventListeners: desugarFieldEventListeners(unsugarableField),
 			hasOneRelationPath,
 			field: fieldName,
 			isNonbearing: unsugarableField.isNonbearing ?? LeafFieldDefaults.isNonbearing,

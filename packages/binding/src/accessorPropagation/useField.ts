@@ -7,15 +7,15 @@ import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useDesugaredRelativeSingleField } from './useDesugaredRelativeSingleField'
 
-function useField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+function useField<Value extends FieldValue = FieldValue>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
-): FieldAccessor<Persisted, Produced>
-function useField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+): FieldAccessor<Value>
+function useField<Value extends FieldValue = FieldValue>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
-): FieldAccessor<Persisted, Produced> | undefined
-function useField<Persisted extends FieldValue = FieldValue, Produced extends Persisted = Persisted>(
+): FieldAccessor<Value> | undefined
+function useField<Value extends FieldValue = FieldValue>(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
-): FieldAccessor<Persisted, Produced> | undefined {
+): FieldAccessor<Value> | undefined {
 	const relativeSingleField = useDesugaredRelativeSingleField(sugaredRelativeSingleField)
 	useConstantValueInvariant(
 		!!relativeSingleField,
@@ -26,7 +26,7 @@ function useField<Persisted extends FieldValue = FieldValue, Produced extends Pe
 	const getEntityByKey = useGetEntityByKey()
 	const getField = useCallback(() => {
 		const parent = getEntityByKey(entityKey)
-		return parent.getRelativeSingleField<Persisted, Produced>(relativeSingleField!)
+		return parent.getRelativeSingleField<Value>(relativeSingleField!)
 	}, [entityKey, getEntityByKey, relativeSingleField])
 
 	if (relativeSingleField) {
@@ -36,7 +36,7 @@ function useField<Persisted extends FieldValue = FieldValue, Produced extends Pe
 			'Cannot change the length of the hasOneRelation path!',
 		)
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [field, forceUpdate] = useAccessorUpdateSubscription<Persisted, Produced>(getField, true)
+		const [field, forceUpdate] = useAccessorUpdateSubscription<Value>(getField, true)
 
 		if (relativeSingleField.hasOneRelationPath.length) {
 			// eslint-disable-next-line react-hooks/rules-of-hooks

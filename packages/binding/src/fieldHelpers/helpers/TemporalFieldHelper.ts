@@ -13,7 +13,7 @@ class TemporalFieldHelper extends FieldHelper<string> {
 }
 namespace TemporalFieldHelper {
 	export const setToNow = (
-		field: FieldAccessor<FieldValue, string> | FieldAccessor.UpdateValue<string>,
+		field: FieldAccessor<string> | FieldAccessor.UpdateValue<string>,
 		options?: FieldAccessor.UpdateOptions,
 	) => {
 		new TemporalFieldHelper(field).setToNow(options)

@@ -119,10 +119,7 @@ export class OperationsHelpers {
 
 			// The listeners subscribed to a particular entity key so we no longer want to call these.
 			// The only positionally associated listeners are in the blueprint so we re-initialize those.
-			realm.eventListeners =
-				realmBlueprint.type === 'listEntity'
-					? eventManager.getEventListenersForListEntity(realmBlueprint.parent)
-					: TreeParameterMerger.cloneSingleEntityEventListeners(realmBlueprint.marker.parameters.eventListeners)
+			realm.eventListeners = stateInitializer.initializeEntityEventListenerStore(realmBlueprint)
 		}
 
 		if (oldEntity.realms.size === 0) {

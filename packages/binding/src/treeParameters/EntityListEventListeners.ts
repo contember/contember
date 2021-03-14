@@ -1,37 +1,30 @@
 import { EntityListAccessor } from '../accessors'
 
+type Events = EntityListAccessor.EntityListEventListenerMap
+
 export interface DesugaredEntityListEventListeners {}
 
+export interface EntityListEventListenerStore
+	extends Map<keyof Events, { [E in keyof Events]: Set<Events[E]> }[keyof Events]> {
+	// Unfortunately, we have to enumerate these because otherwise, TS just can't handle the polymorphism.
+	get(key: 'beforePersist'): Set<Events['beforePersist']> | undefined
+	get(key: 'beforeUpdate'): Set<Events['beforeUpdate']> | undefined
+	get(key: 'childInitialize'): Set<Events['childInitialize']> | undefined
+	get(key: 'persistError'): Set<Events['persistError']> | undefined
+	get(key: 'persistSuccess'): Set<Events['persistSuccess']> | undefined
+	get(key: 'update'): Set<Events['update']> | undefined
+	get(key: 'initialize'): Set<Events['initialize']> | undefined
+	get<K extends keyof Events>(key: K): { [E in keyof Events]: Set<Events[E]> }[K] | undefined
+
+	set<K extends keyof Events>(key: K, value: Set<Events[K]>): this
+}
+
 export interface EntityListEventListeners {
-	eventListeners: {
-		[Type in EntityListAccessor.EntityListEventType]:
-			| Set<EntityListAccessor.EntityListEventListenerMap[Type]>
-			| undefined
-	}
+	eventListeners: EntityListEventListenerStore | undefined
 }
 
 export interface SugarableEntityListEventListeners {}
 
-export interface UnsugarableEntityListEventListeners {
-	onBeforePersist?:
-		| EntityListAccessor.EntityListEventListenerMap['beforePersist']
-		| Set<EntityListAccessor.EntityListEventListenerMap['beforePersist']>
-	onBeforeUpdate?:
-		| EntityListAccessor.EntityListEventListenerMap['beforeUpdate']
-		| Set<EntityListAccessor.EntityListEventListenerMap['beforeUpdate']>
-	onChildInitialize?:
-		| EntityListAccessor.EntityListEventListenerMap['childInitialize']
-		| Set<EntityListAccessor.EntityListEventListenerMap['childInitialize']>
-	onInitialize?:
-		| EntityListAccessor.EntityListEventListenerMap['initialize']
-		| Set<EntityListAccessor.EntityListEventListenerMap['initialize']>
-	onPersistError?:
-		| EntityListAccessor.EntityListEventListenerMap['persistError']
-		| Set<EntityListAccessor.EntityListEventListenerMap['persistError']>
-	onPersistSuccess?:
-		| EntityListAccessor.EntityListEventListenerMap['persistSuccess']
-		| Set<EntityListAccessor.EntityListEventListenerMap['persistSuccess']>
-	onUpdate?:
-		| EntityListAccessor.EntityListEventListenerMap['update']
-		| Set<EntityListAccessor.EntityListEventListenerMap['update']>
+export type UnsugarableEntityListEventListeners = {
+	[EventName in keyof Events & string as `on${Capitalize<EventName>}`]?: Events[EventName] | Set<Events[EventName]>
 }

@@ -9,14 +9,14 @@ import {
 } from '../accessors'
 import { SuccessfulPersistResult } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { HasManyRelationMarker } from '../markers'
-import { EntityListEventListeners, PlaceholderName, SingleEntityEventListeners } from '../treeParameters'
+import { PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
 import {
 	EntityListState,
 	EntityRealmState,
+	FieldState,
 	getEntityMarker,
 	RootStateNode,
 	StateINode,
@@ -24,7 +24,6 @@ import {
 	StateNode,
 	StateType,
 } from './state'
-import { TreeParameterMerger } from './TreeParameterMerger'
 import { TreeStore } from './TreeStore'
 
 export class EventManager {
@@ -36,7 +35,7 @@ export class EventManager {
 	private ongoingPersistOperation: Promise<SuccessfulPersistResult> | undefined = undefined
 	private hasEverUpdated = false
 
-	private newlyInitializedWithListeners: Set<EntityListState | EntityRealmState> = new Set()
+	private newlyInitializedWithListeners: Set<EntityListState | EntityRealmState | FieldState> = new Set()
 	private pendingWithBeforeUpdate: Set<StateNode> = new Set()
 	private rootsWithPendingUpdates: Set<RootStateNode> = new Set()
 
@@ -130,12 +129,11 @@ export class EventManager {
 		})
 	}
 
-	public registerNewlyInitialized(newlyInitialized: EntityListState | EntityRealmState) {
-		const listeners = Array.isArray(newlyInitialized) ? newlyInitialized[1].initialEventListeners : newlyInitialized
-
-		if (listeners && Object.values(listeners.eventListeners).filter(listeners => !!listeners).length) {
-			this.newlyInitializedWithListeners.add(newlyInitialized)
+	public registerNewlyInitialized(newlyInitialized: EntityListState | EntityRealmState | FieldState) {
+		if (!newlyInitialized.eventListeners || newlyInitialized.eventListeners.size === 0) {
+			return
 		}
+		this.newlyInitializedWithListeners.add(newlyInitialized)
 	}
 
 	public registerUpdatedConnection(parentState: EntityRealmState, placeholderName: PlaceholderName) {
@@ -161,7 +159,7 @@ export class EventManager {
 	}
 
 	public registerJustUpdated(justUpdated: StateNode, changesDelta: number) {
-		if (justUpdated.eventListeners.beforeUpdate) {
+		if (justUpdated.eventListeners?.has('beforeUpdate')) {
 			this.pendingWithBeforeUpdate.add(justUpdated)
 		}
 		justUpdated.hasStaleAccessor = true
@@ -206,26 +204,29 @@ export class EventManager {
 		const agenda: StateNode[] = rootStates
 
 		for (const state of agenda) {
-			if (state.eventListeners.update !== undefined) {
-				//console.log(state)
-				for (const handler of state.eventListeners.update) {
-					// TS can't quite handle the polymorphism here but this is fine.
-					handler(state.getAccessor() as any)
-				}
-			}
-			if (
-				state.type === StateType.EntityRealm &&
-				state.fieldsWithPendingConnectionUpdates &&
-				state.eventListeners.connectionUpdate
-			) {
-				for (const updatedField of state.fieldsWithPendingConnectionUpdates) {
-					const listenersMap = state.eventListeners.connectionUpdate
-					const listeners = listenersMap.get(updatedField)
-					if (!listeners) {
-						continue
+			const listeners = state.eventListeners
+			if (listeners) {
+				const updateListeners = listeners.get('update')
+
+				if (updateListeners !== undefined) {
+					//console.log(state)
+					for (const handler of updateListeners) {
+						// TS can't quite handle the polymorphism here but this is fine.
+						handler(state.getAccessor() as any)
 					}
-					for (const listener of listeners) {
-						listener(state.getAccessor())
+				}
+				if (state.type === StateType.EntityRealm && state.fieldsWithPendingConnectionUpdates) {
+					const listenersMap = state.eventListeners!.get('connectionUpdate')
+					if (listenersMap) {
+						for (const updatedField of state.fieldsWithPendingConnectionUpdates) {
+							const listeners = listenersMap.get(updatedField)
+							if (!listeners) {
+								continue
+							}
+							for (const listener of listeners) {
+								listener(state.getAccessor())
+							}
+						}
 					}
 				}
 			}
@@ -253,7 +254,8 @@ export class EventManager {
 	public async triggerOnBeforePersist() {
 		return new Promise<void>(async resolve => {
 			await this.asyncTransaction(async () => {
-				const iNodeHasBeforePersist = (iNode: StateINode) => iNode.eventListeners.beforePersist !== undefined
+				const iNodeHasBeforePersist = (iNode: StateINode) =>
+					!!iNode.eventListeners && iNode.eventListeners.has('beforePersist')
 
 				// TODO if an entity from here (or its parent) gets deleted, we need to remove stale handlers from here.
 				const callbackQueue: Array<
@@ -266,7 +268,7 @@ export class EventManager {
 
 				for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
 					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
-						for (const listener of iNode.eventListeners.beforePersist!) {
+						for (const listener of iNode.eventListeners!.get('beforePersist')!) {
 							callbackQueue.push([iNode, listener])
 						}
 					}
@@ -313,8 +315,12 @@ export class EventManager {
 
 					// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
 					for (const newlyInitialized of this.newlyInitializedWithListeners) {
-						if (newlyInitialized.eventListeners.beforePersist) {
-							for (const listener of newlyInitialized.eventListeners.beforePersist) {
+						if (newlyInitialized.type === StateType.Field) {
+							continue
+						}
+						const beforePersistHandlers = newlyInitialized.eventListeners?.get('beforePersist')
+						if (beforePersistHandlers) {
+							for (const listener of beforePersistHandlers) {
 								callbackQueue.push([newlyInitialized, listener])
 							}
 						}
@@ -366,7 +372,7 @@ export class EventManager {
 				this.pendingWithBeforeUpdate = new Set()
 
 				for (const state of withBeforeUpdate) {
-					const listeners = state.eventListeners.beforeUpdate
+					const listeners = state.eventListeners?.get('beforeUpdate')
 					if (listeners === undefined) {
 						// This can happen if the listener has unsubscribed since we added it to the set.
 						continue
@@ -400,7 +406,7 @@ export class EventManager {
 	private triggerOnInitialize() {
 		this.syncTransaction(() => {
 			for (const state of this.newlyInitializedWithListeners) {
-				const listeners = state.eventListeners.initialize
+				const listeners = state.eventListeners?.get('initialize')
 
 				if (listeners) {
 					for (const listener of listeners) {
@@ -418,13 +424,14 @@ export class EventManager {
 	public async triggerOnPersistError(options: PersistErrorOptions) {
 		return new Promise<void>(async resolve => {
 			await this.asyncTransaction(async () => {
-				const iNodeHasPersistErrorHandler = (iNode: StateINode) => iNode.eventListeners.persistError !== undefined
+				const iNodeHasPersistErrorHandler = (iNode: StateINode) =>
+					!!iNode.eventListeners && iNode.eventListeners.has('persistError')
 
 				const handlerPromises: Array<Promise<void>> = []
 
 				for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
 					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistErrorHandler)) {
-						for (const listener of iNode.eventListeners.persistError!) {
+						for (const listener of iNode.eventListeners!.get('persistError')!) {
 							const result = listener(iNode.getAccessor as any, options)
 
 							if (result instanceof Promise) {
@@ -454,41 +461,16 @@ export class EventManager {
 
 	public triggerOnPersistSuccess(options: PersistSuccessOptions) {
 		this.syncTransaction(() => {
-			const iNodeHasPersistSuccessHandler = (iNode: StateINode) => iNode.eventListeners.persistSuccess !== undefined
+			const iNodeHasPersistSuccessHandler = (iNode: StateINode) =>
+				!!iNode.eventListeners && iNode.eventListeners.has('persistSuccess')
 
 			for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
 				for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistSuccessHandler)) {
-					for (const listener of iNode.eventListeners.persistSuccess!) {
+					for (const listener of iNode.eventListeners!.get('persistSuccess')!) {
 						listener(iNode.getAccessor as any, options)
 					}
 				}
 			}
 		})
-	}
-
-	public getEventListenersForListEntity(
-		containingListState: EntityListState,
-		additionalMarker?: HasManyRelationMarker,
-	): SingleEntityEventListeners['eventListeners'] {
-		const create = (base: {
-			eventListeners: EntityListEventListeners['eventListeners']
-		}): SingleEntityEventListeners['eventListeners'] => ({
-			beforePersist: undefined,
-			initialize: base.eventListeners.childInitialize,
-			beforeUpdate: undefined,
-			update: undefined,
-			connectionUpdate: undefined,
-			persistError: undefined,
-			persistSuccess: undefined,
-		})
-
-		let eventListeners: SingleEntityEventListeners['eventListeners'] = create(containingListState)
-		if (additionalMarker) {
-			eventListeners = TreeParameterMerger.mergeSingleEntityEventListeners(
-				eventListeners,
-				create(additionalMarker.parameters),
-			)
-		}
-		return eventListeners
 	}
 }

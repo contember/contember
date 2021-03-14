@@ -1,9 +1,11 @@
 import { GraphQlBuilder } from '@contember/client'
+import { EntityAccessor } from '../accessors'
 import { BindingError } from '../BindingError'
 import {
 	Alias,
 	EntityCreationParameters,
-	EntityListEventListeners,
+	EntityEventListenerStore,
+	EntityListEventListenerStore,
 	ExpectedQualifiedEntityMutation,
 	ExpectedRelationMutation,
 	FieldName,
@@ -12,11 +14,11 @@ import {
 	QualifiedEntityList,
 	QualifiedSingleEntity,
 	SetOnCreate,
-	SingleEntityEventListeners,
 	UnconstrainedQualifiedEntityList,
 	UnconstrainedQualifiedSingleEntity,
 	UniqueWhere,
 } from '../treeParameters'
+import { assertNever } from '../utils'
 
 export class TreeParameterMerger {
 	public static mergeHasOneRelationsWithSamePlaceholders(
@@ -250,10 +252,10 @@ export class TreeParameterMerger {
 		fresh: Set<F> | undefined,
 	): Set<F> | undefined {
 		if (original === undefined) {
-			return fresh
+			return new Set(fresh)
 		}
 		if (fresh === undefined) {
-			return original
+			return new Set(original)
 		}
 		return this.mergeSets(original, fresh)
 	}
@@ -267,74 +269,107 @@ export class TreeParameterMerger {
 	}
 
 	public static mergeSingleEntityEventListeners(
-		original: SingleEntityEventListeners['eventListeners'],
-		fresh: SingleEntityEventListeners['eventListeners'],
-	): SingleEntityEventListeners['eventListeners'] {
-		return {
-			beforePersist: this.mergeEventListeners(original.beforePersist, fresh.beforePersist),
-			beforeUpdate: this.mergeEventListeners(original.beforeUpdate, fresh.beforeUpdate),
-			connectionUpdate: this.mergeFieldScopedListeners(original.connectionUpdate, fresh.connectionUpdate),
-			initialize: this.mergeEventListeners(original.initialize, fresh.initialize),
-			update: this.mergeEventListeners(original.update, fresh.update),
-			persistError: this.mergeEventListeners(original.persistError, fresh.persistError),
-			persistSuccess: this.mergeEventListeners(original.persistSuccess, fresh.persistSuccess),
+		original: EntityEventListenerStore | undefined,
+		fresh: EntityEventListenerStore | undefined,
+	): EntityEventListenerStore | undefined {
+		if (original === undefined) {
+			if (fresh === undefined) {
+				return undefined
+			}
+			return this.cloneSingleEntityEventListeners(fresh)
 		}
+
+		if (fresh === undefined) {
+			return this.cloneSingleEntityEventListeners(original)
+		}
+
+		const merged: EntityEventListenerStore = new Map()
+
+		for (const [eventName, fromFresh] of fresh) {
+			const fromOriginal = original.get(eventName)
+
+			if (fromOriginal === undefined) {
+				merged.set(
+					eventName,
+					(fromFresh instanceof Set ? new Set(fromFresh as Set<unknown>) : this.cloneMapOfSets(fromFresh)) as any,
+				)
+			} else if (eventName === 'connectionUpdate') {
+				const newListeners = this.mergeFieldScopedListeners<EntityAccessor.EntityEventListenerMap['connectionUpdate']>(
+					fromOriginal as any,
+					fromFresh as any,
+				)
+				if (newListeners) {
+					merged.set(eventName, newListeners)
+				}
+			} else {
+				const newListeners = this.mergeEventListeners(fromOriginal as Set<any>, fromFresh as Set<any>)
+				if (newListeners) {
+					merged.set(eventName, newListeners as any)
+				}
+			}
+		}
+		return merged
 	}
 
 	public static mergeEntityListEventListeners(
-		original: EntityListEventListeners['eventListeners'],
-		fresh: EntityListEventListeners['eventListeners'],
-	): EntityListEventListeners['eventListeners'] {
-		return {
-			beforePersist: this.mergeEventListeners(original.beforePersist, fresh.beforePersist),
-			beforeUpdate: this.mergeEventListeners(original.beforeUpdate, fresh.beforeUpdate),
-			childInitialize: this.mergeEventListeners(original.childInitialize, fresh.childInitialize),
-			initialize: this.mergeEventListeners(original.initialize, fresh.initialize),
-			persistError: this.mergeEventListeners(original.persistError, fresh.persistError),
-			persistSuccess: this.mergeEventListeners(original.persistSuccess, fresh.persistSuccess),
-			update: this.mergeEventListeners(original.update, fresh.update),
+		original: EntityListEventListenerStore | undefined,
+		fresh: EntityListEventListenerStore | undefined,
+	): EntityListEventListenerStore | undefined {
+		if (original === undefined) {
+			if (fresh === undefined) {
+				return undefined
+			}
+			return this.cloneEntityListEventListeners(fresh)
 		}
+
+		if (fresh === undefined) {
+			return this.cloneEntityListEventListeners(original)
+		}
+
+		const merged: EntityListEventListenerStore = new Map()
+
+		for (const [eventName, fromFresh] of fresh) {
+			const fromOriginal = original.get(eventName)
+
+			if (fromOriginal === undefined) {
+				merged.set(eventName, new Set(fromFresh as any))
+			} else {
+				const newListeners = this.mergeEventListeners(fromOriginal as Set<any>, fromFresh as Set<any>)
+				if (newListeners) {
+					merged.set(eventName, newListeners as Set<any>)
+				}
+			}
+		}
+		return merged
 	}
 
-	public static cloneSingleEntityEventListeners(
-		listeners: SingleEntityEventListeners['eventListeners'] | undefined,
-	): SingleEntityEventListeners['eventListeners'] {
-		return {
-			beforePersist: this.cloneOptionalSet(listeners?.beforePersist),
-			connectionUpdate: this.cloneOptionalMapOfSets(listeners?.connectionUpdate),
-			update: this.cloneOptionalSet(listeners?.update),
-			beforeUpdate: this.cloneOptionalSet(listeners?.beforeUpdate),
-			initialize: this.cloneOptionalSet(listeners?.initialize),
-			persistError: this.cloneOptionalSet(listeners?.persistError),
-			persistSuccess: this.cloneOptionalSet(listeners?.persistSuccess),
+	public static cloneSingleEntityEventListeners(store: EntityEventListenerStore): EntityEventListenerStore {
+		const cloned: EntityEventListenerStore = new Map()
+
+		for (const [eventName, listeners] of store) {
+			if (listeners instanceof Set) {
+				cloned.set(eventName, new Set(listeners as any))
+			} else if (listeners instanceof Map) {
+				cloned.set(eventName, this.cloneMapOfSets(listeners) as any)
+			} else {
+				assertNever(listeners)
+			}
 		}
+
+		return cloned
 	}
 
-	public static cloneEntityListEventListeners(
-		listeners: EntityListEventListeners['eventListeners'] | undefined,
-	): EntityListEventListeners['eventListeners'] {
-		return {
-			beforePersist: this.cloneOptionalSet(listeners?.beforePersist),
-			beforeUpdate: this.cloneOptionalSet(listeners?.beforeUpdate),
-			childInitialize: this.cloneOptionalSet(listeners?.childInitialize),
-			initialize: this.cloneOptionalSet(listeners?.initialize),
-			persistError: this.cloneOptionalSet(listeners?.persistError),
-			persistSuccess: this.cloneOptionalSet(listeners?.persistSuccess),
-			update: this.cloneOptionalSet(listeners?.update),
+	public static cloneEntityListEventListeners(store: EntityListEventListenerStore): EntityListEventListenerStore {
+		const cloned: EntityListEventListenerStore = new Map()
+
+		for (const [eventName, listeners] of store) {
+			cloned.set(eventName, new Set(listeners as Set<any>))
 		}
+
+		return cloned
 	}
 
-	private static cloneOptionalSet<T>(set: Set<T> | undefined): Set<T> | undefined {
-		if (set === undefined) {
-			return undefined
-		}
-		return new Set(set)
-	}
-
-	private static cloneOptionalMapOfSets<K, T>(map: Map<K, Set<T>> | undefined): Map<K, Set<T>> | undefined {
-		if (map === undefined) {
-			return undefined
-		}
+	private static cloneMapOfSets<K, T>(map: Map<K, Set<T>>): Map<K, Set<T>> {
 		return new Map(Array.from(map, ([key, set]) => [key, new Set(set)]))
 	}
 

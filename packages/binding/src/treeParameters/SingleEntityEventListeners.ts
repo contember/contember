@@ -3,14 +3,31 @@ import { FieldName } from './primitives'
 
 export interface DesugaredSingleEntityEventListeners {}
 
+type StdEvents = Exclude<EntityAccessor.EntityEventListenerMap, 'connectionUpdate'>
+export interface EntityEventListenerStore
+	extends Map<
+		keyof StdEvents,
+		| {
+				[E in keyof StdEvents]: Set<StdEvents[E]>
+		  }[keyof StdEvents]
+		| Map<FieldName, Set<EntityAccessor.UpdateListener>>
+	> {
+	// Unfortunately, we have to enumerate these because otherwise, TS just can't handle the polymorphism.
+	get(key: 'connectionUpdate'): Map<FieldName, Set<EntityAccessor.UpdateListener>> | undefined
+	get(key: 'beforePersist'): Set<StdEvents['beforePersist']> | undefined
+	get(key: 'beforeUpdate'): Set<StdEvents['beforeUpdate']> | undefined
+	get(key: 'persistError'): Set<StdEvents['persistError']> | undefined
+	get(key: 'persistSuccess'): Set<StdEvents['persistSuccess']> | undefined
+	get(key: 'update'): Set<StdEvents['update']> | undefined
+	get(key: 'initialize'): Set<StdEvents['initialize']> | undefined
+	get<K extends keyof StdEvents>(key: K): { [E in keyof StdEvents]: Set<StdEvents[E]> }[K] | undefined
+
+	set(key: 'connectionUpdate', value: Map<FieldName, Set<EntityAccessor.UpdateListener>>): this
+	set<K extends keyof StdEvents>(key: K, value: Set<StdEvents[K]>): this
+}
+
 export interface SingleEntityEventListeners {
-	eventListeners: {
-		[Type in Exclude<EntityAccessor.EntityEventType, 'connectionUpdate'>]:
-			| Set<EntityAccessor.EntityEventListenerMap[Type]>
-			| undefined
-	} & {
-		connectionUpdate: Map<FieldName, Set<EntityAccessor.UpdateListener>> | undefined
-	}
+	eventListeners: EntityEventListenerStore | undefined
 }
 
 export interface SugarableSingleEntityEventListeners {}

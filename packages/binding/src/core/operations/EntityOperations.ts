@@ -28,41 +28,43 @@ export class EntityOperations {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public addEventListener(state: EntityRealmState, type: EntityAccessor.EntityEventType, ...args: unknown[]) {
+	public addEventListener(
+		state: EntityRealmState,
+		type: keyof EntityAccessor.RuntimeEntityEventListenerMap,
+		...args: unknown[]
+	) {
+		if (state.eventListeners === undefined) {
+			state.eventListeners = new Map()
+		}
+
 		if (type === 'connectionUpdate') {
-			if (state.eventListeners.connectionUpdate === undefined) {
-				state.eventListeners.connectionUpdate = new Map()
+			let listeners = state.eventListeners.get('connectionUpdate')
+			if (listeners === undefined) {
+				state.eventListeners.set('connectionUpdate', (listeners = new Map()))
 			}
 			const fieldName = args[0] as FieldName
 			const listener = args[1] as EntityAccessor.UpdateListener
-			const existingListeners = state.eventListeners.connectionUpdate.get(fieldName)
+			const fieldListeners = listeners.get(fieldName)
 
-			if (existingListeners === undefined) {
-				state.eventListeners.connectionUpdate.set(fieldName, new Set([listener]))
+			if (fieldListeners === undefined) {
+				listeners.set(fieldName, new Set([listener]))
 			} else {
-				existingListeners.add(listener)
+				fieldListeners.add(listener)
 			}
 			return () => {
-				const existingListeners = state.eventListeners.connectionUpdate?.get(fieldName)
-				if (existingListeners === undefined) {
-					return // Throw an error? This REALLY should not happen.
-				}
-				existingListeners.delete(listener)
+				state.eventListeners?.get('connectionUpdate')?.get(fieldName)?.delete(listener)
 			}
 		} else {
-			const listener = args[0] as EntityAccessor.EntityEventListenerMap[typeof type]
-			if (state.eventListeners[type] === undefined) {
-				state.eventListeners[type] = new Set<never>()
+			const listenerToAdd = args[0] as EntityAccessor.RuntimeEntityEventListenerMap[typeof type]
+			let existingListeners = state.eventListeners.get(type)
+
+			if (existingListeners === undefined) {
+				state.eventListeners.set(type, (existingListeners = new Set<never>()))
 			}
-			state.eventListeners[type]!.add(listener as any)
+
+			existingListeners.add(listenerToAdd as any)
 			return () => {
-				if (state.eventListeners[type] === undefined) {
-					return // Throw an error? This REALLY should not happen.
-				}
-				state.eventListeners[type]!.delete(listener as any)
-				if (state.eventListeners[type]!.size === 0) {
-					state.eventListeners[type] = undefined
-				}
+				state.eventListeners?.get(type)?.delete(listenerToAdd as any)
 			}
 		}
 	}

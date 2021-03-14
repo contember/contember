@@ -1,4 +1,3 @@
-import { GraphQlBuilder } from '@contember/client'
 import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
 import { EntityFieldPersistedData, RuntimeId, ServerGeneratedUuid, UnpersistedEntityDummyId } from '../accessorTree'
 import { BindingError } from '../BindingError'
@@ -9,7 +8,14 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 } from '../markers'
-import { EntityName, FieldName, Scalar, SingleEntityEventListeners } from '../treeParameters'
+import {
+	EntityEventListenerStore,
+	EntityListEventListenerStore,
+	EntityName,
+	FieldEventListenerStore,
+	FieldName,
+	Scalar,
+} from '../treeParameters'
 import { assertNever } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
@@ -129,7 +135,7 @@ export class StateInitializer {
 			children: new Map(),
 			childrenWithPendingUpdates: undefined,
 			errors: undefined,
-			eventListeners: this.initializeEntityEventListeners(blueprint),
+			eventListeners: this.initializeEntityEventListenerStore(blueprint),
 			fieldsWithPendingConnectionUpdates: undefined,
 			hasStaleAccessor: true,
 			plannedHasOneDeletions: undefined,
@@ -138,7 +144,7 @@ export class StateInitializer {
 			addError: error => {
 				return this.accessorErrorManager.addError(entityRealm, { type: ErrorAccessor.ErrorType.Validation, error })
 			},
-			addEventListener: (type: EntityAccessor.EntityEventType, ...args: unknown[]) => {
+			addEventListener: (type: keyof EntityAccessor.RuntimeEntityEventListenerMap, ...args: unknown[]) => {
 				return this.entityOperations.addEventListener(entityRealm, type, ...args)
 			},
 			batchUpdates: performUpdates => {
@@ -320,11 +326,11 @@ export class StateInitializer {
 		const entityListState: EntityListState = {
 			type: StateType.EntityList,
 			blueprint,
-			addEventListener: undefined as any,
+			addEventListener: undefined as any, // This is assigned properly immediately after
 			children: new BijectiveIndexedMap(realm => realm.entity.id.value),
 			childrenWithPendingUpdates: undefined,
 			entityName,
-			eventListeners: TreeParameterMerger.cloneEntityListEventListeners(blueprint.marker.parameters.eventListeners),
+			eventListeners: this.initializeEntityListEventListenerStore(blueprint),
 			errors: undefined,
 			plannedRemovals: undefined,
 			hasStaleAccessor: true,
@@ -405,11 +411,8 @@ export class StateInitializer {
 			persistedValue,
 			parent,
 			value: resolvedFieldValue,
-			addEventListener: undefined as any,
-			eventListeners: {
-				beforeUpdate: undefined,
-				update: undefined,
-			},
+			addEventListener: undefined as any, // This is assigned properly immediately after
+			eventListeners: this.initializeFieldEventListenerStore(fieldMarker),
 			errors: undefined,
 			touchLog: undefined,
 			hasUnpersistedChanges: false,
@@ -542,25 +545,19 @@ export class StateInitializer {
 		return targetField.targetEntity
 	}
 
-	private getAddEventListener(state: {
-		eventListeners: {
-			[eventType: string]: Set<Function> | undefined
-		}
-	}) {
+	private getAddEventListener(state: { eventListeners: Map<string, Set<Function>> | undefined }) {
 		return (type: string, listener: Function) => {
-			if (state.eventListeners[type] === undefined) {
-				state.eventListeners[type] = new Set<never>()
+			let listeners = state.eventListeners
+			if (!listeners) {
+				state.eventListeners = listeners = new Map()
 			}
-			state.eventListeners[type]!.add(listener as any)
-			return () => {
-				if (state.eventListeners[type] === undefined) {
-					return // Throw an error? This REALLY should not happen.
-				}
-				state.eventListeners[type]!.delete(listener as any)
-				if (state.eventListeners[type]!.size === 0) {
-					state.eventListeners[type] = undefined
-				}
+			let forThisEvent = listeners.get(type)
+			if (forThisEvent === undefined) {
+				listeners.set(type, (forThisEvent = new Set<never>()))
 			}
+			forThisEvent.add(listener)
+
+			return () => state.eventListeners?.get?.(type)?.delete(listener)
 		}
 	}
 
@@ -575,17 +572,43 @@ export class StateInitializer {
 
 		realm.getAccessor().batchUpdates(initialize)
 
-		if (entityRealm.eventListeners.initialize === undefined || entityRealm.eventListeners.initialize.size === 0) {
+		const initializeListeners = entityRealm.eventListeners?.get('initialize')
+		if (initializeListeners === undefined || initializeListeners.size === 0) {
 			realm.entity.hasIdSetInStone = true
 		}
 	}
 
-	private initializeEntityEventListeners(
-		blueprint: EntityRealmBlueprint,
-	): SingleEntityEventListeners['eventListeners'] {
+	public initializeEntityEventListenerStore(blueprint: EntityRealmBlueprint): EntityEventListenerStore | undefined {
 		if (blueprint.type === 'listEntity') {
-			return this.eventManager.getEventListenersForListEntity(blueprint.parent)
+			const blueprintListeners = blueprint.parent.blueprint.marker.parameters.eventListeners
+			const childInitialize = blueprintListeners?.get('childInitialize')
+
+			if (childInitialize === undefined) {
+				return undefined
+			}
+			return new Map([['initialize', new Set(childInitialize)]]) as EntityEventListenerStore
 		}
-		return TreeParameterMerger.cloneSingleEntityEventListeners(blueprint.marker.parameters.eventListeners)
+
+		const blueprintListeners = blueprint.marker.parameters.eventListeners
+		if (blueprintListeners === undefined) {
+			return undefined
+		}
+		return TreeParameterMerger.cloneSingleEntityEventListeners(blueprintListeners)
+	}
+
+	private initializeEntityListEventListenerStore(
+		blueprint: EntityListBlueprint,
+	): EntityListEventListenerStore | undefined {
+		const blueprintListeners = blueprint.marker.parameters.eventListeners
+
+		if (blueprintListeners === undefined) {
+			return undefined
+		}
+		return TreeParameterMerger.cloneEntityListEventListeners(blueprintListeners)
+	}
+
+	private initializeFieldEventListenerStore(marker: FieldMarker): FieldEventListenerStore | undefined {
+		// TODO !!!
+		return undefined
 	}
 }

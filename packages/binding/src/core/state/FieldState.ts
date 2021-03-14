@@ -1,6 +1,6 @@
 import { ErrorAccessor, FieldAccessor } from '../../accessors'
 import { FieldMarker } from '../../markers'
-import { FieldName, FieldValue, Scalar } from '../../treeParameters'
+import { FieldEventListenerStore, FieldName, FieldValue, Scalar } from '../../treeParameters'
 import { EntityRealmState } from './EntityRealmState'
 import { StateType } from './StateType'
 
@@ -8,9 +8,7 @@ export interface FieldState {
 	type: StateType.Field
 
 	errors: ErrorAccessor | undefined
-	eventListeners: {
-		[Type in FieldAccessor.FieldEventType]: Set<FieldAccessor.FieldEventListenerMap[Type]> | undefined
-	}
+	eventListeners: FieldEventListenerStore | undefined
 	fieldMarker: FieldMarker
 	getAccessor: () => FieldAccessor
 	hasStaleAccessor: boolean

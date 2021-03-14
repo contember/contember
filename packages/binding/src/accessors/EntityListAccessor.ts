@@ -118,15 +118,17 @@ namespace EntityListAccessor {
 
 	export type PersistSuccessHandler = (getAccessor: GetEntityListAccessor, options: PersistSuccessOptions) => void
 
-	export interface EntityListEventListenerMap {
+	export interface RuntimeEntityListEventListenerMap {
 		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		childInitialize: EntityAccessor.BatchUpdatesHandler
 		//childListUpdate: UpdateListener
-		initialize: BatchUpdatesHandler
 		persistError: PersistErrorHandler
 		persistSuccess: PersistSuccessHandler
 		update: UpdateListener
+	}
+	export interface EntityListEventListenerMap extends RuntimeEntityListEventListenerMap {
+		initialize: BatchUpdatesHandler
 	}
 	export type EntityListEventType = keyof EntityListEventListenerMap
 	export interface AddEntityListEventListener {

@@ -14,8 +14,8 @@ import { memo } from 'react'
 import { DimensionsRenderer, DimensionsRendererProps } from './DimensionsRenderer'
 
 export interface DimensionsSwitcherBaseProps
-	extends Omit<DimensionsRendererProps, 'accessor' | 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'>,
-		Omit<SugaredQualifiedFieldList, 'fields'> {
+	extends Omit<DimensionsRendererProps, 'accessor' | 'labelFactory' | 'minItems' | 'maxItems' | 'redirect'> {
+	orderBy?: SugaredQualifiedFieldList['orderBy']
 	optionEntities: SugaredQualifiedFieldList['fields']
 	minItems?: number
 	maxItems?: number
@@ -47,7 +47,7 @@ export const DimensionsSwitcher = memo((props: DimensionsSwitcherProps) => {
 	const environment = useEnvironment()
 	const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(
 		{
-			...props,
+			orderBy: props.orderBy,
 			entities: props.optionEntities,
 		},
 		environment,

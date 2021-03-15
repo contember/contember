@@ -55,11 +55,8 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		},
 		toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {}, // TODO
 
-		canContainAnyFlowContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
-			!editorWithEssentials.isPhrasingContent(elementType, suchThat),
-		isHeadingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => false,
-		isPhrasingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
-			editorWithEssentials.isInline({
+		canContainAnyBlocks: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
+			!editorWithEssentials.isInline({
 				...suchThat,
 				type: elementType,
 				children: [{ text: '' }],

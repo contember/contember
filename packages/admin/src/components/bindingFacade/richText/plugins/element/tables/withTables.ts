@@ -23,6 +23,7 @@ import { TableRowElementRenderer, TableRowElementRendererProps } from './TableRo
 
 export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E> => {
 	const {
+		canContainAnyBlocks,
 		renderElement,
 		deleteForward,
 		deleteBackward,
@@ -498,6 +499,17 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				}
 			}
 			normalizeNode(entry)
+		},
+		canContainAnyBlocks: (elementType, suchThat) => {
+			switch (elementType) {
+				case tableElementType:
+				case tableRowElementType:
+					return false
+				case tableCellElementType:
+					return true
+				default:
+					return canContainAnyBlocks(elementType, suchThat)
+			}
 		},
 	})
 

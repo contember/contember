@@ -1,15 +1,15 @@
 import {
 	Editor,
-	Element as SlateElement,
 	Location,
 	Node as SlateNode,
 	NodeEntry,
 	Path as SlatePath,
 	Point,
 	Range as SlateRange,
-	Text,
 	Transforms,
 } from 'slate'
+import { ElementNode } from '../../baseEditor'
+import { ContemberEditor } from '../../ContemberEditor'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverridePrepareElementForInsertionOptions {}
@@ -55,30 +55,43 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(e
 			return SlatePath.next(targetPoint.path)
 		}
 
+		const [closestBlockElement, closestBlockPath] = ContemberEditor.closestBlockEntry(
+			editor,
+			targetPoint,
+		)! as NodeEntry<ElementNode>
 		const [topLevelIndex] = targetPoint.path
 
-		if (SlateNode.string(editor.children[topLevelIndex]) === '') {
-			// The current element is empty so we replace remove it and insert the new one in its place.
-			Transforms.removeNodes(editor, {
-				at: [topLevelIndex],
-			})
-			return [topLevelIndex]
-		} else {
-			const [start, end] = Editor.edges(editor, [topLevelIndex])
+		const { type: closestBlockType, children: _, ...closestBlockSpecifics } = closestBlockElement
 
-			if (Point.equals(start, targetPoint)) {
-				// We're at the beginning of a block so we insert above it
-				return [topLevelIndex]
-			} else if (Point.equals(end, targetPoint)) {
-				// We're at the end of a block so we insert underneath it.
-				return [topLevelIndex + 1]
-			} else {
-				// We're in the middle so we split it and then insert between the two resulting chunks.
-				Transforms.splitNodes(editor, {
-					at: targetPoint,
-				})
-				return [topLevelIndex + 1]
-			}
+		if (editor.canContainAnyBlocks(closestBlockType, closestBlockSpecifics)) {
+			return targetPoint.path
+		}
+
+		if (SlateNode.string(closestBlockElement) === '') {
+			// The current element is empty and we also cannot insert inside it, and so we remove it
+			// and insert the new one in its place.
+			Transforms.removeNodes(editor, {
+				at: closestBlockPath,
+			})
+			return closestBlockPath
+		}
+
+		const [start, end] = Editor.edges(editor, closestBlockPath)
+
+		if (Point.equals(start, targetPoint)) {
+			// We're at the beginning of a block so we insert above it
+			return closestBlockPath
+		} else if (Point.equals(end, targetPoint)) {
+			// We're at the end of a block so we insert underneath it.
+			return SlatePath.next(closestBlockPath)
+		} else {
+			// We're in the middle so we split it and then insert between the two resulting chunks.
+			Transforms.splitNodes(editor, {
+				at: targetPoint,
+			})
+			// We get the parent because targetPoint original pointed at a point and so we want to get rid of the text path.
+			// TODO this likely breaks for inline inserts.
+			return SlatePath.next(SlatePath.parent(targetPoint.path))
 		}
 	}
 }

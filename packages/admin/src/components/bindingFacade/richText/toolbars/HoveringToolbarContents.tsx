@@ -88,9 +88,7 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 									},
 								})
 							} catch {
-								bindingOperations.batchDeferredUpdates(() =>
-									bindingOperations.batchDeferredUpdates(() => editor.getReferencedEntity(referenceId).deleteEntity()),
-								)
+								editor.getReferencedEntity(referenceId).deleteEntity()
 							}
 						}
 					} else {

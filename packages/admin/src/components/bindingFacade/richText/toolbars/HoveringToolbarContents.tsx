@@ -1,97 +1,26 @@
-import { AccessorProvider, useBindingOperations, useEnvironment, VariableInputTransformer } from '@contember/binding'
-import { Dropdown, EditorToolbar, Icon, ToolbarGroup } from '@contember/ui'
-import { memo, MouseEvent as ReactMouseEvent, useCallback, useState } from 'react'
-import { Range as SlateRange } from 'slate'
-import { useEditor, useSlate } from 'slate-react'
-import { BaseEditor } from '../baseEditor'
+import {
+	AccessorProvider,
+	BindingOperationsProvider,
+	useBindingOperations,
+	useEnvironment,
+	VariableInputTransformer,
+} from '@contember/binding'
+import { EditorToolbar, ToolbarGroup, useDialog } from '@contember/ui'
+import { memo, MouseEvent as ReactMouseEvent } from 'react'
+import { Transforms } from 'slate'
+import { useSlate } from 'slate-react'
 import { BlockSlateEditor } from '../blockEditor'
-import { InitializeReferenceToolbarButton, ToolbarButtonSpec } from './ToolbarButtonSpec'
+import { ToolbarButtonSpec } from './ToolbarButtonSpec'
 
 export interface HoveringToolbarContentsProps {
 	buttons: ToolbarButtonSpec[] | ToolbarButtonSpec[][]
 }
 
-const RefButton = memo(({ button }: { button: InitializeReferenceToolbarButton }) => {
-	const editor = useEditor() as BlockSlateEditor
+export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringToolbarContentsProps) => {
+	const editor = useSlate() as BlockSlateEditor
+	const { openDialog } = useDialog()
 	const environment = useEnvironment()
 	const bindingOperations = useBindingOperations()
-
-	const [editorSelection, setEditorSelection] = useState<SlateRange | null>(null)
-	const [referenceId, setReferenceId] = useState<string | undefined>(undefined)
-
-	const Content = button.referenceContent
-	return (
-		<Dropdown
-			onDismiss={useCallback(() => {
-				if (referenceId === undefined) {
-					return
-				}
-				setEditorSelection(null)
-				setReferenceId(undefined)
-				bindingOperations.batchDeferredUpdates(() => editor.getReferencedEntity(referenceId).deleteEntity())
-			}, [bindingOperations, editor, referenceId])}
-			renderToggle={({ ref, onClick }) => (
-				<Icon
-					blueprintIcon={button.blueprintIcon}
-					contemberIcon={button.contemberIcon}
-					customIcon={button.customIcon}
-					ref={ref}
-					onClick={e => {
-						if (referenceId) {
-							return
-						}
-						const discriminateBy = VariableInputTransformer.transformValue(button.discriminateBy, environment)
-
-						const selection = editor.selection
-
-						// const preppedPath = editor.prepareElementForInsertion({
-						// 	type: button,
-						// })
-						const targetPath = selection?.focus.path // TODO this is awful.
-
-						if (targetPath === undefined) {
-							return
-						}
-
-						setReferenceId(editor.createElementReference(targetPath, discriminateBy, button.initializeReference))
-						setEditorSelection(selection)
-						onClick(e)
-					}}
-				/>
-			)}
-		>
-			{({ requestClose }) => {
-				if (referenceId === undefined) {
-					return null
-				}
-				const cleanUp = () => {
-					requestClose()
-					setEditorSelection(null)
-					setReferenceId(undefined)
-				}
-				return (
-					<AccessorProvider accessor={editor.getReferencedEntity(referenceId)}>
-						<Content
-							referenceId={referenceId}
-							editor={editor}
-							selection={editorSelection}
-							onSuccess={cleanUp}
-							onCancel={() => {
-								bindingOperations.batchDeferredUpdates(() =>
-									bindingOperations.batchDeferredUpdates(() => editor.getReferencedEntity(referenceId).deleteEntity()),
-								)
-								cleanUp()
-							}}
-						/>
-					</AccessorProvider>
-				)
-			}}
-		</Dropdown>
-	)
-})
-
-export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringToolbarContentsProps) => {
-	const editor = useSlate() as BaseEditor
 
 	if (!rawButtons.length) {
 		return null
@@ -118,14 +47,51 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 							editor.toggleElement(button.elementType, button.suchThat)
 						}
 					} else if ('referenceContent' in button) {
-						return {
-							label: button.title,
-							isActive: false,
-							//onMouseDown: (e: MouseEvent) => {
-							//	e.preventDefault() // This is crucial so that we don't unselect the selected text
-							//	e.nativeEvent.stopPropagation() // This is a bit of a hack ‒ so that we don't register this click as a start of a new selection
-							//},
-							customIcon: <RefButton button={button} />,
+						shouldDisplay = true // TODO
+						isActive = false
+						onMouseDown = async () => {
+							const discriminateBy = VariableInputTransformer.transformValue(button.discriminateBy, environment)
+							const selection = editor.selection
+							const targetPath = selection?.focus.path // TODO this is awful.
+
+							if (targetPath === undefined) {
+								return
+							}
+
+							Transforms.deselect(editor)
+							const referenceId = editor.createElementReference(targetPath, discriminateBy, button.initializeReference)
+
+							try {
+								const Content = button.referenceContent
+								await openDialog({
+									heading: button.label,
+									content: props => {
+										return (
+											<BindingOperationsProvider
+												bindingOperations={
+													// TODO get rid of this.
+													// This is NOT public api. Don't use BindingOperationsProvider.
+													bindingOperations
+												}
+											>
+												<AccessorProvider accessor={editor.getReferencedEntity(referenceId)}>
+													<Content
+														referenceId={referenceId}
+														editor={editor}
+														selection={selection}
+														onSuccess={() => props.resolve(undefined)}
+														onCancel={() => props.reject()}
+													/>
+												</AccessorProvider>
+											</BindingOperationsProvider>
+										)
+									},
+								})
+							} catch {
+								bindingOperations.batchDeferredUpdates(() =>
+									bindingOperations.batchDeferredUpdates(() => editor.getReferencedEntity(referenceId).deleteEntity()),
+								)
+							}
 						}
 					} else {
 						return undefined

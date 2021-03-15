@@ -14,6 +14,7 @@ import {
 	NothingToDoReason,
 } from '../Result'
 import { Mapper } from '../Mapper'
+import { CheckedPrimary } from '../CheckedPrimary'
 
 type EntityOwningRelationTuple = [Model.Entity, Model.ManyHasOneRelation | Model.OneHasOneOwningRelation]
 type OneHasOneOwningRelationTuple = [Model.Entity, Model.OneHasOneOwningRelation]
@@ -30,7 +31,7 @@ export class DeleteExecutor {
 	public async execute(
 		mapper: Mapper,
 		entity: Model.Entity,
-		by: Input.UniqueWhere,
+		by: Input.UniqueWhere | CheckedPrimary,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
@@ -38,20 +39,19 @@ export class DeleteExecutor {
 			await db.query('SET CONSTRAINTS ALL DEFERRED')
 			const primaryValue = await mapper.getPrimaryValue(entity, by)
 			if (!primaryValue) {
-				return [new MutationEntryNotFoundError([], by)]
+				return [new MutationEntryNotFoundError([], by as Input.UniqueWhere)]
 			}
 			if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {
 				return [new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)]
 			}
 			const primaryWhere = { [entity.primary]: { eq: primaryValue } }
-			const result = await this.delete(db, entity, filter ? { and: [primaryWhere, filter] } : primaryWhere)
+			const result = await this.delete(mapper, entity, filter ? { and: [primaryWhere, filter] } : primaryWhere)
 			if (result.length === 0) {
 				return [new MutationNoResultError([])]
 			}
 
 			try {
 				await db.query('SET CONSTRAINTS ALL IMMEDIATE')
-				mapper.deletedEntities.markDeleted(entity.name, primaryValue)
 				return [new MutationDeleteOk([], entity, primaryValue)]
 			} catch (e) {
 				if (e instanceof ForeignKeyViolationError) {
@@ -62,7 +62,8 @@ export class DeleteExecutor {
 		})
 	}
 
-	private async delete(db: Client, entity: Model.Entity, where: Input.OptionalWhere): Promise<string[]> {
+	private async delete(mapper: Mapper, entity: Model.Entity, where: Input.OptionalWhere): Promise<string[]> {
+		const db = mapper.db
 		const predicate = this.predicateFactory.create(entity, Acl.Operation.delete)
 		const inQb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')
@@ -78,18 +79,21 @@ export class DeleteExecutor {
 			.returning(entity.primaryColumn, ...orphanColumns)
 		const result = await qb.execute(db)
 		const ids = result.map(it => it[entity.primaryColumn]) as string[]
-		await this.executeOnDelete(db, entity, ids)
+		for (const id of ids) {
+			mapper.deletedEntities.markDeleted(entity.name, id)
+		}
+		await this.executeOnDelete(mapper, entity, ids)
 
 		for (const [entity, relation] of orphanRemovals) {
 			const ids = result.map(it => it[relation.joiningColumn.columnName]).filter(it => it !== null)
 			const where: Input.Where = { [entity.primary]: { in: ids } }
-			await this.delete(db, entity, where)
+			await this.delete(mapper, entity, where)
 		}
 
 		return ids as string[]
 	}
 
-	private async executeOnDelete(db: Client, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
+	private async executeOnDelete(mapper: Mapper, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
 		if (values.length === 0) {
 			return
 		}
@@ -100,10 +104,10 @@ export class DeleteExecutor {
 				case Model.OnDelete.restrict:
 					break
 				case Model.OnDelete.cascade:
-					await this.delete(db, owningEntity, relationWhere)
+					await this.delete(mapper, owningEntity, relationWhere)
 					break
 				case Model.OnDelete.setNull:
-					await this.setNull(db, owningEntity, relation, relationWhere)
+					await this.setNull(mapper.db, owningEntity, relation, relationWhere)
 					break
 				default:
 					assertNever(relation.joiningColumn.onDelete)

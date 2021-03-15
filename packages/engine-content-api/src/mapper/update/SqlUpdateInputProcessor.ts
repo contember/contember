@@ -16,6 +16,7 @@ import {
 import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper'
 import { AbortUpdate } from './Updater'
 import { ImplementationException } from '../../exception'
+import { CheckedPrimary } from '../CheckedPrimary'
 
 export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationResultList> {
 	constructor(
@@ -504,7 +505,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<MutationRes
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
 			}
 			await this.updateBuilder.update
-			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: targetPrimary })
+			return await this.mapper.delete(targetEntity, new CheckedPrimary(targetPrimary))
 		}),
 		disconnect: hasOneProcessor(async ({ entity, relation, targetRelation, input }) => {
 			if (!relation.nullable) {

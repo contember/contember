@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react'
 
-export const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(isOpen: boolean, close: () => void) => {
-	const buttonRef = useRef<T>(null)
-	const contentRef = useRef<K>(null)
+export const useCloseOnEscapeOrClickOutside = <Reference extends Node, Content extends Node>(
+	isOpen: boolean,
+	close: () => void,
+) => {
+	const buttonRef = useRef<Reference>(null)
+	const contentRef = useRef<Content>(null)
 
-	useRawCloseOnEscapeOrClickOutside<T, K>({
+	useRawCloseOnEscapeOrClickOutside<Reference, Content>({
 		reference: buttonRef.current,
 		content: contentRef.current,
 		isOpen,
@@ -14,7 +17,7 @@ export const useCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>(i
 	return { buttonRef, contentRef }
 }
 
-export const useRawCloseOnEscapeOrClickOutside = <T extends Node, K extends Node>({
+export const useRawCloseOnEscapeOrClickOutside = <Reference extends Node, Content extends Node>({
 	isOpen,
 	close,
 	reference,
@@ -22,8 +25,8 @@ export const useRawCloseOnEscapeOrClickOutside = <T extends Node, K extends Node
 }: {
 	isOpen: boolean
 	close: () => void
-	reference: Node | null
-	content: Node | null
+	reference: Reference | null
+	content: Content | null
 }) => {
 	useEffect(() => {
 		if (isOpen) {
@@ -34,15 +37,15 @@ export const useRawCloseOnEscapeOrClickOutside = <T extends Node, K extends Node
 			}
 			const closeOnClickOutside = (event: MouseEvent) => {
 				if (
-					reference &&
-					content &&
 					event.target instanceof Node &&
 					(!document.body.contains(event.target) ||
-						reference === event.target ||
-						content === event.target ||
-						reference.contains(event.target) ||
-						content.contains(event.target))
+						event.target === document.body ||
+						(reference && reference.contains(event.target)) ||
+						(content && content.contains(event.target)))
 				) {
+					return
+				}
+				if (!content && !reference) {
 					return
 				}
 				close()

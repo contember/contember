@@ -2,7 +2,7 @@ import { FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, Rea
 import { Element as SlateElement, Node as SlateNode, NodeEntry } from 'slate'
 import { RenderElementProps, RenderLeafProps } from 'slate-react'
 import { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
-import { WithPaste } from './overrides/withPaste'
+import { WithPaste } from './overrides'
 
 export interface WithEssentials<E extends EditorNode> {
 	formatVersion: SerializableEditorNode['formatVersion']
@@ -19,9 +19,7 @@ export interface WithEssentials<E extends EditorNode> {
 	isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
 	toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => void
 
-	canContainAnyFlowContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
-	isHeadingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
-	isPhrasingContent: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
+	canContainAnyBlocks: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
 
 	serializeNodes: (nodes: Array<ElementNode | TextNode>, errorMessage?: string) => string
 	deserializeNodes: (serializedNodes: string, errorMessage?: string) => Array<ElementNode | TextNode>

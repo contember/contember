@@ -17,7 +17,7 @@ import { HeadingRenderer, HeadingRendererProps } from './HeadingRenderer'
 
 export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeadings<E> => {
 	const e: E & Partial<WithHeadings<WithAnotherNodeType<E, HeadingElement>>> = editor
-	const { renderElement, insertBreak, isElementActive, toggleElement, deleteBackward, processBlockPaste } = editor
+	const { canContainAnyBlocks, renderElement, insertBreak, toggleElement, deleteBackward, processBlockPaste } = editor
 
 	const isHeading = (
 		element: SlateNode | ElementNode,
@@ -87,6 +87,9 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		}
 		return toggleElement(elementType, suchThat)
 	}
+
+	e.canContainAnyBlocks = (elementType, suchThat) =>
+		elementType === headingElementType ? false : canContainAnyBlocks(elementType, suchThat)
 
 	e.renderElement = props => {
 		if (isHeading(props.element)) {

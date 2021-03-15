@@ -13,11 +13,12 @@ import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
 import { OrderedListElement, orderedListElementType } from './OrderedListElement'
-import { indentListItem, dedentListItem } from './transforms'
+import { dedentListItem, indentListItem } from './transforms'
 import { UnorderedListElement, unorderedListElementType } from './UnorderedListElement'
 
 export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> => {
 	const {
+		canContainAnyBlocks,
 		renderElement,
 		insertBreak,
 		deleteBackward,
@@ -332,6 +333,17 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				}
 			}
 			return onKeyDown(event)
+		},
+		canContainAnyBlocks: (elementType, suchThat) => {
+			switch (elementType) {
+				case unorderedListElementType:
+				case orderedListElementType:
+					return false
+				case listItemElementType:
+					return true
+				default:
+					return canContainAnyBlocks(elementType, suchThat)
+			}
 		},
 	})
 

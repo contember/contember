@@ -8,7 +8,7 @@ import { ParagraphRenderer, ParagraphRendererProps } from './ParagraphRenderer'
 
 export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParagraphs<E> => {
 	const e: E & Partial<WithParagraphs<WithAnotherNodeType<E, ParagraphElement>>> = editor
-	const { renderElement, toggleElement, deleteBackward, processBlockPaste } = editor
+	const { canContainAnyBlocks, renderElement, toggleElement, deleteBackward, processBlockPaste } = editor
 
 	const isParagraph = (
 		element: ElementNode | SlateNode,
@@ -51,6 +51,9 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 		}
 		return renderElement(props)
 	}
+
+	e.canContainAnyBlocks = (elementType, suchThat) =>
+		elementType === paragraphElementType ? false : canContainAnyBlocks(elementType, suchThat)
 
 	e.deleteBackward = unit => {
 		const selection = e.selection

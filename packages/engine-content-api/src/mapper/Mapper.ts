@@ -16,10 +16,12 @@ import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select'
 import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 import { UpdateBuilder } from './update'
+import { Mutex } from '../utils'
 
 export class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
 	public readonly deletedEntities = new DeletedEntitiesStorage()
+	public readonly mutex = new Mutex()
 
 	constructor(
 		private readonly schema: Model.Schema,

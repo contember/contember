@@ -33,31 +33,33 @@ export class DeleteExecutor {
 		by: Input.UniqueWhere,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		const db = mapper.db
-		await db.query('SET CONSTRAINTS ALL DEFERRED')
-		const primaryValue = await mapper.getPrimaryValue(entity, by)
-		if (!primaryValue) {
-			return [new MutationEntryNotFoundError([], by)]
-		}
-		if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {
-			return [new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)]
-		}
-		const primaryWhere = { [entity.primary]: { eq: primaryValue } }
-		const result = await this.delete(db, entity, filter ? { and: [primaryWhere, filter] } : primaryWhere)
-		if (result.length === 0) {
-			return [new MutationNoResultError([])]
-		}
-
-		try {
-			await db.query('SET CONSTRAINTS ALL IMMEDIATE')
-			mapper.deletedEntities.markDeleted(entity.name, primaryValue)
-			return [new MutationDeleteOk([], entity, primaryValue)]
-		} catch (e) {
-			if (e instanceof ForeignKeyViolationError) {
+		return mapper.mutex.execute(async () => {
+			const db = mapper.db
+			await db.query('SET CONSTRAINTS ALL DEFERRED')
+			const primaryValue = await mapper.getPrimaryValue(entity, by)
+			if (!primaryValue) {
+				return [new MutationEntryNotFoundError([], by)]
+			}
+			if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {
+				return [new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)]
+			}
+			const primaryWhere = { [entity.primary]: { eq: primaryValue } }
+			const result = await this.delete(db, entity, filter ? { and: [primaryWhere, filter] } : primaryWhere)
+			if (result.length === 0) {
 				return [new MutationNoResultError([])]
 			}
-			throw e
-		}
+
+			try {
+				await db.query('SET CONSTRAINTS ALL IMMEDIATE')
+				mapper.deletedEntities.markDeleted(entity.name, primaryValue)
+				return [new MutationDeleteOk([], entity, primaryValue)]
+			} catch (e) {
+				if (e instanceof ForeignKeyViolationError) {
+					return [new MutationNoResultError([])]
+				}
+				throw e
+			}
+		})
 	}
 
 	private async delete(db: Client, entity: Model.Entity, where: Input.OptionalWhere): Promise<string[]> {

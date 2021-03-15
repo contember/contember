@@ -98,7 +98,7 @@ export const Dropdown = memo((props: DropdownProps) => {
 		onDismiss?.()
 	}, [close, onDismiss])
 
-	useRawCloseOnEscapeOrClickOutside<HTMLDivElement, HTMLDivElement>({
+	useRawCloseOnEscapeOrClickOutside<HTMLElement, HTMLElement>({
 		isOpen,
 		close: dismiss,
 		reference: referenceElement,

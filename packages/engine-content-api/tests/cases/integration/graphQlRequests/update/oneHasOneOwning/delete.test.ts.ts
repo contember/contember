@@ -37,11 +37,6 @@ test('delete', async () => {
 					response: 1,
 				},
 				{
-					sql: SQL`select "root_"."id" from "public"."site_setting" as "root_" where "root_"."id" = ?`,
-					parameters: [testUuid(1)],
-					response: { rows: [{ id: testUuid(1) }] },
-				},
-				{
 					sql: SQL`delete from "public"."site_setting"
               where "id" in (select "root_"."id"
                              from "public"."site_setting" as "root_"

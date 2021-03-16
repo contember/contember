@@ -16,10 +16,13 @@ import { tryMutation } from './ErrorUtils'
 import { OrderByHelper } from './select'
 import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 import { UpdateBuilder } from './update'
+import { Mutex } from '../utils'
+import { CheckedPrimary } from './CheckedPrimary'
 
 export class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
 	public readonly deletedEntities = new DeletedEntitiesStorage()
+	public readonly mutex = new Mutex()
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -180,7 +183,7 @@ export class Mapper {
 
 	public async delete(
 		entity: Model.Entity,
-		by: Input.UniqueWhere,
+		by: Input.UniqueWhere | CheckedPrimary,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return tryMutation(() => this.deleteExecutor.execute(this, entity, by, filter))
@@ -218,8 +221,11 @@ export class Mapper {
 
 	public async getPrimaryValue(
 		entity: Model.Entity,
-		where: Input.UniqueWhere,
+		where: Input.UniqueWhere | CheckedPrimary,
 	): Promise<Input.PrimaryValue | undefined> {
+		if (where instanceof CheckedPrimary) {
+			return where.primaryValue
+		}
 		const hash = this.hashWhere(entity.name, where)
 		if (this.primaryKeyCache[hash]) {
 			return this.primaryKeyCache[hash]

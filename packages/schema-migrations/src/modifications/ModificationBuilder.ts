@@ -50,7 +50,6 @@ class ModificationBuilder {
 			UpdateColumnDefinitionModification.id,
 			UpdateColumnNameModification.id,
 			UpdateRelationOnDeleteModification.id,
-			UpdateRelationOrderByModification.id,
 			MakeRelationNotNullModification.id,
 			MakeRelationNullableModification.id,
 			EnableOrphanRemovalModification.id,
@@ -59,6 +58,7 @@ class ModificationBuilder {
 
 			CreateEntityModification.id,
 			CreateColumnModification.id,
+			UpdateRelationOrderByModification.id,
 			CreateRelationInverseSideModification.id,
 			CreateRelationModification.id,
 

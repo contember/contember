@@ -53,6 +53,7 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 					}
 					migrations.push(migration)
 				}
+				console.log('Rebasing: ' + migrations.map(it => it.name).join(', '))
 				const versions = migrations.map(it => it.version)
 				const schemaWithoutMigrations = await schemaVersionBuilder.buildSchemaAdvanced(
 					emptySchema,
@@ -76,6 +77,7 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 					await client.migrationModify(migration.version, newMigration)
 					await migrationFilesManager.moveFile(migration.name, newMigration.name)
 				}
+				console.log('Done')
 
 				return 0
 			},

@@ -1,3 +1,4 @@
+export * from './AsyncBatchUpdatesOptions'
 export * from './BatchUpdatesOptions'
 export * from './BindingConfig'
 export * from './BindingOperations'

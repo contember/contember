@@ -1,6 +1,6 @@
-import { BindingOperations } from './BindingOperations'
+import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 
-export interface PersistSuccessOptions extends Omit<BindingOperations, 'persist'> {
+export interface PersistSuccessOptions extends AsyncBatchUpdatesOptions {
 	successType: 'justSuccess' | 'nothingToPersist'
 	unstable_persistedEntityIds: string[]
 }

@@ -11,6 +11,9 @@ const getRejecter = (operation: string) => () => {
 }
 
 export const defaultBindingOperations = Object.freeze<BindingOperations>({
+	get contentClient() {
+		return getRejecter('retrieve the content api client')()
+	},
 	getEntityListSubTree: getRejecter('retrieve an entity list sub tree'),
 	getEntitySubTree: getRejecter('retrieve a single entity sub tree'),
 	getEntityByKey: getRejecter('retrieve an entity by key'),

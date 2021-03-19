@@ -70,9 +70,9 @@ input UUIDCondition {
   and: [UUIDCondition!]
   or: [UUIDCondition!]
   not: UUIDCondition
-  eq: UUID
   null: Boolean
   isNull: Boolean
+  eq: UUID
   notEq: UUID
   in: [UUID!]
   notIn: [UUID!]
@@ -86,9 +86,9 @@ input StringCondition {
   and: [StringCondition!]
   or: [StringCondition!]
   not: StringCondition
-  eq: String
   null: Boolean
   isNull: Boolean
+  eq: String
   notEq: String
   in: [String!]
   notIn: [String!]
@@ -118,9 +118,9 @@ input OneEnumCondition {
   and: [OneEnumCondition!]
   or: [OneEnumCondition!]
   not: OneEnumCondition
-  eq: One
   null: Boolean
   isNull: Boolean
+  eq: One
   notEq: One
   in: [One!]
   notIn: [One!]

@@ -105,9 +105,9 @@ input UUIDCondition {
   and: [UUIDCondition!]
   or: [UUIDCondition!]
   not: UUIDCondition
-  eq: UUID
   null: Boolean
   isNull: Boolean
+  eq: UUID
   notEq: UUID
   in: [UUID!]
   notIn: [UUID!]
@@ -121,9 +121,9 @@ input PostStateEnumCondition {
   and: [PostStateEnumCondition!]
   or: [PostStateEnumCondition!]
   not: PostStateEnumCondition
-  eq: PostState
   null: Boolean
   isNull: Boolean
+  eq: PostState
   notEq: PostState
   in: [PostState!]
   notIn: [PostState!]
@@ -137,9 +137,9 @@ input DateTimeCondition {
   and: [DateTimeCondition!]
   or: [DateTimeCondition!]
   not: DateTimeCondition
-  eq: DateTime
   null: Boolean
   isNull: Boolean
+  eq: DateTime
   notEq: DateTime
   in: [DateTime!]
   notIn: [DateTime!]
@@ -162,9 +162,9 @@ input StringCondition {
   and: [StringCondition!]
   or: [StringCondition!]
   not: StringCondition
-  eq: String
   null: Boolean
   isNull: Boolean
+  eq: String
   notEq: String
   in: [String!]
   notIn: [String!]
@@ -203,9 +203,9 @@ input LocaleEnumCondition {
   and: [LocaleEnumCondition!]
   or: [LocaleEnumCondition!]
   not: LocaleEnumCondition
-  eq: Locale
   null: Boolean
   isNull: Boolean
+  eq: Locale
   notEq: Locale
   in: [Locale!]
   notIn: [Locale!]

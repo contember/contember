@@ -56,9 +56,9 @@ input UUIDCondition {
   and: [UUIDCondition!]
   or: [UUIDCondition!]
   not: UUIDCondition
-  eq: UUID
   null: Boolean
   isNull: Boolean
+  eq: UUID
   notEq: UUID
   in: [UUID!]
   notIn: [UUID!]
@@ -72,9 +72,9 @@ input StringCondition {
   and: [StringCondition!]
   or: [StringCondition!]
   not: StringCondition
-  eq: String
   null: Boolean
   isNull: Boolean
+  eq: String
   notEq: String
   in: [String!]
   notIn: [String!]

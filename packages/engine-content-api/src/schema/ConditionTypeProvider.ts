@@ -36,16 +36,18 @@ export class ConditionTypeProvider {
 					or: { type: new GraphQLList(new GraphQLNonNull(condition)) },
 					not: { type: condition },
 
-					eq: { type: type },
 					null: { type: GraphQLBoolean },
 					isNull: { type: GraphQLBoolean },
-					notEq: { type: type },
-					in: { type: new GraphQLList(new GraphQLNonNull(type)) },
-					notIn: { type: new GraphQLList(new GraphQLNonNull(type)) },
-					lt: { type: type },
-					lte: { type: type },
-					gt: { type: type },
-					gte: { type: type },
+				}
+				if (type.name !== 'Json') {
+					conditions.eq = { type }
+					conditions.notEq = { type }
+					conditions.in = { type: new GraphQLList(new GraphQLNonNull(type)) }
+					conditions.notIn = { type: new GraphQLList(new GraphQLNonNull(type)) }
+					conditions.lt = { type: type }
+					conditions.lte = { type: type }
+					conditions.gt = { type: type }
+					conditions.gte = { type: type }
 				}
 				if (type.name === 'String') {
 					conditions.contains = { type: GraphQLString }

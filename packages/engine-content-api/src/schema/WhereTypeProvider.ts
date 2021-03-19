@@ -103,11 +103,6 @@ export class WhereTypeProvider {
 			if (!acceptFieldVisitor(this.schema, name, fieldName, accessVisitor)) {
 				continue
 			}
-			const field = entity.fields[fieldName]
-			if (field.type === Model.ColumnType.Json) {
-				continue
-			}
-
 			fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
 				visitColumn: (entity, column) => ({ type: this.conditionTypeProvider.getCondition(column) }),
 				visitRelation: (entity, relation) => ({ type: this.getEntityWhereType(relation.target) }),

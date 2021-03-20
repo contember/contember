@@ -6,11 +6,11 @@ import {
 	EntitySubTreeAdditionalProps,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
-import { ComponentType, memo, ReactNode, useMemo } from 'react'
+import { ComponentType, memo, ReactNode } from 'react'
 import RequestState from '../../state/request'
 import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
 import { PageProvider } from './PageProvider'
-import { useRedirect } from './useRedirect'
+import { useEntityRedirectOnPersistSuccess } from './useEntityRedirectOnPersistSuccess'
 
 export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> &
 	EntitySubTreeAdditionalProps &
@@ -22,35 +22,19 @@ export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'i
 	}
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreatePageProps> = memo(
-	({ pageName, children, rendererProps, redirectOnSuccess, ...entityProps }: CreatePageProps) => {
-		const redirect = useRedirect()
-
-		const onPersistSuccess = useMemo<EntityAccessor.PersistSuccessHandler | undefined>(() => {
-			if (!redirectOnSuccess) {
-				return undefined
-			}
-			return (getAccessor, options) => {
-				if (options.successType === 'nothingToPersist') {
-					return
-				}
-				redirect(request => redirectOnSuccess(request, options.unstable_persistedEntityIds[0], getAccessor()))
-			}
-		}, [redirectOnSuccess, redirect])
-
-		return (
-			<DataBindingProvider stateComponent={FeedbackRenderer}>
-				<EntitySubTree
-					{...entityProps}
-					entityComponent={MutableSingleEntityRenderer}
-					entityProps={rendererProps}
-					onPersistSuccess={onPersistSuccess}
-					isCreating
-				>
-					{children}
-				</EntitySubTree>
-			</DataBindingProvider>
-		)
-	},
+	({ pageName, children, rendererProps, redirectOnSuccess, ...entityProps }: CreatePageProps) => (
+		<DataBindingProvider stateComponent={FeedbackRenderer}>
+			<EntitySubTree
+				{...entityProps}
+				entityComponent={MutableSingleEntityRenderer}
+				entityProps={rendererProps}
+				onPersistSuccess={useEntityRedirectOnPersistSuccess(redirectOnSuccess)}
+				isCreating
+			>
+				{children}
+			</EntitySubTree>
+		</DataBindingProvider>
+	),
 )
 
 CreatePage.displayName = 'CreatePage'

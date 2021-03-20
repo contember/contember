@@ -17,7 +17,7 @@ export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'i
 	EntitySubTreeAdditionalCreationProps & {
 		pageName: string
 		children: ReactNode
-		redirectOnSuccess?: (currentState: RequestState, persistedId: string) => RequestState
+		redirectOnSuccess?: (currentState: RequestState, persistedId: string, entity: EntityAccessor) => RequestState
 		rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
 	}
 
@@ -33,7 +33,7 @@ const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreateP
 				if (options.successType === 'nothingToPersist') {
 					return
 				}
-				redirect(request => redirectOnSuccess(request, options.unstable_persistedEntityIds[0]))
+				redirect(request => redirectOnSuccess(request, options.unstable_persistedEntityIds[0], getAccessor()))
 			}
 		}, [redirectOnSuccess, redirect])
 

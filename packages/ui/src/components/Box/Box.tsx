@@ -9,7 +9,7 @@ import { Heading } from '../Heading'
 export interface BoxOwnProps {
 	heading?: ReactNode
 	actions?: ReactNode
-	children: ReactNode
+	children?: ReactNode
 	distinction?: BoxDistinction
 	isActive?: boolean
 }
@@ -47,13 +47,15 @@ export const Box = memo(
 							{actions}
 						</div>
 					)}
-					<div className={`${prefix}box-content`}>
-						<IncreaseHeadingDepth currentDepth={headingDepth} onlyIf={!!heading}>
-							<IncreaseBoxDepth currentDepth={boxDepth} onlyIf={distinction !== 'seamlessIfNested'}>
-								{children}
-							</IncreaseBoxDepth>
-						</IncreaseHeadingDepth>
-					</div>
+					{children && (
+						<div className={`${prefix}box-content`}>
+							<IncreaseHeadingDepth currentDepth={headingDepth} onlyIf={!!heading}>
+								<IncreaseBoxDepth currentDepth={boxDepth} onlyIf={distinction !== 'seamlessIfNested'}>
+									{children}
+								</IncreaseBoxDepth>
+							</IncreaseHeadingDepth>
+						</div>
+					)}
 				</div>
 			)
 		},

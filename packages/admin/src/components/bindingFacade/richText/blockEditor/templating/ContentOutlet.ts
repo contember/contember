@@ -1,6 +1,8 @@
 import { BindingError } from '@contember/binding'
 
-export interface ContentOutletProps {}
+export interface ContentOutletProps {
+	placeholder?: string
+}
 
 // This is deliberately not a Component!
 export const ContentOutlet = (props: ContentOutletProps) => {

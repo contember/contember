@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import { ChangeEventHandler, forwardRef, memo, Ref } from 'react'
+import { ChangeEventHandler, createElement, forwardRef, memo, Ref } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import { useComponentClassName } from '../../auxiliary'
 import { ControlDistinction, Size, ValidationState } from '../../types'
@@ -43,8 +43,17 @@ export const TextInput = memo(
 		)
 
 		if (otherProps.allowNewlines) {
-			const { allowNewlines, ...textareaProps } = otherProps
-			return <TextareaAutosize ref={ref} className={finalClassName} useCacheForDOMMeasurements {...textareaProps} />
+			const { allowNewlines, style, ...textareaProps } = otherProps
+
+			// Casting because the typings are currently just wrong. The actual library now supplies its own but
+			// a storybook dependency requires an ancient version of the definitely typed package from before that.
+			return createElement(TextareaAutosize, {
+				ref: ref,
+				className: finalClassName,
+				cacheMeasurements: true,
+				style: style as any,
+				...textareaProps,
+			} as any)
 		}
 		const { allowNewlines, ...inputProps } = otherProps
 		return <input ref={ref} type="text" className={finalClassName} {...inputProps} />

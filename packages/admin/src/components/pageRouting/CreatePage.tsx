@@ -4,6 +4,7 @@ import {
 	EntitySubTree,
 	EntitySubTreeAdditionalCreationProps,
 	EntitySubTreeAdditionalProps,
+	PersistSuccessOptions,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
@@ -17,7 +18,12 @@ export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'i
 	EntitySubTreeAdditionalCreationProps & {
 		pageName: string
 		children: ReactNode
-		redirectOnSuccess?: (currentState: RequestState, persistedId: string, entity: EntityAccessor) => RequestState
+		redirectOnSuccess?: (
+			currentState: RequestState,
+			persistedId: string,
+			entity: EntityAccessor,
+			options: PersistSuccessOptions,
+		) => RequestState
 		rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
 	}
 

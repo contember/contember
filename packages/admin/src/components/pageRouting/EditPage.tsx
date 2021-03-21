@@ -3,6 +3,7 @@ import {
 	EntityAccessor,
 	EntitySubTree,
 	EntitySubTreeAdditionalProps,
+	PersistSuccessOptions,
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
@@ -14,7 +15,12 @@ import { useEntityRedirectOnPersistSuccess } from './useEntityRedirectOnPersistS
 export interface EditPageProps extends SugaredQualifiedSingleEntity, EntitySubTreeAdditionalProps {
 	pageName: string
 	children: ReactNode
-	redirectOnSuccess?: (currentState: RequestState, persistedId: string, entity: EntityAccessor) => RequestState
+	redirectOnSuccess?: (
+		currentState: RequestState,
+		persistedId: string,
+		entity: EntityAccessor,
+		options: PersistSuccessOptions,
+	) => RequestState
 	rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
 }
 

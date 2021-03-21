@@ -470,7 +470,7 @@ export class MutationGenerator {
 						})(CrudQueryBuilder.WriteOneRelationBuilder.instantiate<CrudQueryBuilder.WriteOperation.Update>())
 
 						if (subBuilder.data) {
-							builder = builder.one(marker.parameters.field, subBuilder)
+							builder = builder.one(marker.parameters.field, subBuilder.data)
 						}
 					} else {
 						// This is a reduced has many relation.

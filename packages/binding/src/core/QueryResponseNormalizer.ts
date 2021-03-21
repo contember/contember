@@ -122,7 +122,7 @@ export class QueryResponseNormalizer {
 				const newId = newDatum[PRIMARY_KEY_NAME]
 				const target = entityMap.get(newId)
 				if (target === undefined) {
-					return this.rejectData()
+					return new ServerGeneratedUuid(this.createEntityData(entityMap, newDatum))
 				}
 
 				if (fromTarget?.value === newId) {

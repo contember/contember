@@ -1,4 +1,4 @@
-import { BindingOperations } from './BindingOperations'
+import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 
 export interface ScheduleAnotherPersistOptions {
 	proposedBackoff?: number
@@ -6,7 +6,7 @@ export interface ScheduleAnotherPersistOptions {
 
 export type ScheduleAnotherPersist = (options?: ScheduleAnotherPersistOptions) => void
 
-export interface PersistErrorOptions extends Omit<BindingOperations, 'persist'> {
+export interface PersistErrorOptions extends AsyncBatchUpdatesOptions {
 	attemptNumber: number
 	tryAgain: ScheduleAnotherPersist
 }

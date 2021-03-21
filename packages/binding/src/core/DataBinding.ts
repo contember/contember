@@ -1,6 +1,7 @@
 import { GraphQlClient, TreeFilter } from '@contember/client'
 import { ReactNode } from 'react'
 import {
+	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
 	BindingOperations,
 	ExtendTreeOptions,
@@ -40,6 +41,7 @@ export class DataBinding {
 
 	private readonly accessorErrorManager: AccessorErrorManager
 	private readonly batchUpdatesOptions: BatchUpdatesOptions
+	private readonly asyncBatchUpdatesOptions: AsyncBatchUpdatesOptions
 	private readonly bindingOperations: BindingOperations
 	private readonly config: Config
 	private readonly dirtinessTracker: DirtinessTracker
@@ -55,7 +57,7 @@ export class DataBinding {
 	// }
 
 	public constructor(
-		private readonly client: GraphQlClient,
+		private readonly contentApiClient: GraphQlClient,
 		private readonly environment: Environment,
 		private readonly onUpdate: (newData: TreeRootAccessor) => void,
 		private readonly onError: (error: RequestError) => void,
@@ -63,8 +65,13 @@ export class DataBinding {
 		this.config = new Config()
 		this.treeStore = new TreeStore()
 		this.batchUpdatesOptions = createBatchUpdatesOptions(environment, this.treeStore)
+		this.asyncBatchUpdatesOptions = {
+			...this.batchUpdatesOptions,
+			contentClient: contentApiClient,
+		}
 		this.dirtinessTracker = new DirtinessTracker()
 		this.eventManager = new EventManager(
+			this.asyncBatchUpdatesOptions,
 			this.batchUpdatesOptions,
 			this.config,
 			this.dirtinessTracker,
@@ -84,6 +91,7 @@ export class DataBinding {
 		// TODO move this elsewhere
 		this.bindingOperations = Object.freeze<BindingOperations>({
 			...this.batchUpdatesOptions,
+			contentClient: this.contentApiClient,
 			getTreeFilters: (): TreeFilter[] => {
 				const generator = new TreeFilterGenerator(this.treeStore)
 				return generator.generateTreeFilter()
@@ -141,7 +149,9 @@ export class DataBinding {
 							}
 						}
 
-						const mutationResponse: MutationRequestResponse = await this.client.sendRequest(mutation, { signal })
+						const mutationResponse: MutationRequestResponse = await this.contentApiClient.sendRequest(mutation, {
+							signal,
+						})
 						const mutationData = mutationResponse.data?.transaction ?? {}
 						const aliases = Object.keys(mutationData)
 						const allSubMutationsOk = aliases.every(item => mutationData[item].ok)
@@ -153,7 +163,7 @@ export class DataBinding {
 								persistedEntityIds,
 							}
 
-							this.eventManager.syncTransaction(() => {
+							await this.eventManager.asyncTransaction(async () => {
 								this.resetTreeAfterSuccessfulPersist()
 								this.treeAugmenter.updatePersistedData(
 									Object.fromEntries(
@@ -163,7 +173,7 @@ export class DataBinding {
 										]),
 									),
 								)
-								this.eventManager.triggerOnPersistSuccess({
+								await this.eventManager.triggerOnPersistSuccess({
 									...this.bindingOperations,
 									successType: result.type,
 									unstable_persistedEntityIds: persistedEntityIds,
@@ -270,7 +280,7 @@ export class DataBinding {
 			queryResponse =
 				query === undefined
 					? undefined
-					: await this.client.sendRequest(query, {
+					: await this.contentApiClient.sendRequest(query, {
 							signal,
 					  })
 		} catch (metadata) {
@@ -322,16 +332,16 @@ export class DataBinding {
 	}
 
 	private getOrLoadSchema(): Schema | Promise<Schema> {
-		const existing = DataBinding.schemaLoadCache.get(this.client.apiUrl)
+		const existing = DataBinding.schemaLoadCache.get(this.contentApiClient.apiUrl)
 		if (existing !== undefined) {
 			return existing
 		}
 
-		const schemaPromise = SchemaLoader.loadSchema(this.client, this.config.getValue('maxSchemaLoadAttempts'))
+		const schemaPromise = SchemaLoader.loadSchema(this.contentApiClient, this.config.getValue('maxSchemaLoadAttempts'))
 		schemaPromise.then(schema => {
-			DataBinding.schemaLoadCache.set(this.client.apiUrl, schema)
+			DataBinding.schemaLoadCache.set(this.contentApiClient.apiUrl, schema)
 		})
-		DataBinding.schemaLoadCache.set(this.client.apiUrl, schemaPromise)
+		DataBinding.schemaLoadCache.set(this.contentApiClient.apiUrl, schemaPromise)
 		return schemaPromise
 	}
 

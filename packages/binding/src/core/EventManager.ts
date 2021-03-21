@@ -1,5 +1,6 @@
 import * as ReactDOM from 'react-dom'
 import {
+	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
 	EntityAccessor,
 	EntityListAccessor,
@@ -40,6 +41,7 @@ export class EventManager {
 	private rootsWithPendingUpdates: Set<RootStateNode> = new Set()
 
 	public constructor(
+		private readonly asyncBatchUpdatesOptions: AsyncBatchUpdatesOptions,
 		private readonly batchUpdatesOptions: BatchUpdatesOptions,
 		private readonly config: Config,
 		private readonly dirtinessTracker: DirtinessTracker,
@@ -251,35 +253,47 @@ export class EventManager {
 		}
 	}
 
-	public async triggerOnBeforePersist() {
+	private async triggerAsyncMutatingEvent(eventType: 'beforePersist', options: AsyncBatchUpdatesOptions): Promise<void>
+	private async triggerAsyncMutatingEvent(eventType: 'persistSuccess', options: PersistSuccessOptions): Promise<void>
+	private async triggerAsyncMutatingEvent(
+		eventType: 'beforePersist' | 'persistSuccess',
+		options: AsyncBatchUpdatesOptions | PersistSuccessOptions,
+	): Promise<void> {
 		return new Promise<void>(async resolve => {
 			await this.asyncTransaction(async () => {
-				const iNodeHasBeforePersist = (iNode: StateINode) =>
-					!!iNode.eventListeners && iNode.eventListeners.has('beforePersist')
+				const iNodeHasRelevantListener = (iNode: StateINode) =>
+					!!iNode.eventListeners && iNode.eventListeners.has(eventType)
 
 				// TODO if an entity from here (or its parent) gets deleted, we need to remove stale handlers from here.
 				const callbackQueue: Array<
 					[
 						// The typings could be nicer but TS…
 						StateINode,
-						EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler,
+						(
+							| EntityAccessor.EntityEventListenerMap[typeof eventType]
+							| EntityListAccessor.EntityListEventListenerMap[typeof eventType]
+						),
 					]
 				> = []
 
 				for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
-					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasBeforePersist)) {
-						for (const listener of iNode.eventListeners!.get('beforePersist')!) {
+					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasRelevantListener)) {
+						for (const listener of iNode.eventListeners!.get(eventType as any)!) {
 							callbackQueue.push([iNode, listener])
 						}
 					}
 				}
 				for (
 					let waterfallDepth = 0;
-					waterfallDepth < this.config.getValue('beforePersistSettleLimit');
+					waterfallDepth < this.config.getValue(`${eventType}SettleLimit` as const);
 					waterfallDepth++
 				) {
-					const callbackReturns: Array<
-						Promise<EntityAccessor.BeforePersistHandler | EntityListAccessor.BeforePersistHandler>
+					const promiseReturns: Array<
+						Promise<
+							| void
+							| EntityAccessor.EntityEventListenerMap[typeof eventType]
+							| EntityListAccessor.EntityListEventListenerMap[typeof eventType]
+						>
 					> = []
 					const correspondingStates: Array<StateINode> = []
 
@@ -289,7 +303,7 @@ export class EventManager {
 
 					for (const [state, callback] of callbackQueue) {
 						const changesCountBefore = this.dirtinessTracker.getChangesCount()
-						const result = callback(state.getAccessor as any, this.batchUpdatesOptions) // TS can't quite handle this but this is sound.
+						const result = callback(state.getAccessor as any, options as any) // TS can't quite handle this but this is sound.
 						const changesCountAfter = this.dirtinessTracker.getChangesCount()
 
 						if (result instanceof Promise) {
@@ -298,18 +312,18 @@ export class EventManager {
 									// This isn't bulletproof. They could e.g. undo a change and make another one which would
 									// slip through this detection. But for most cases, it should be good enough and not too expensive.
 									throw new BindingError(
-										`A beforePersist event handler cannot be asynchronous and alter the accessor tree at the same time. ` +
+										`A ${eventType} event handler cannot be asynchronous and alter the accessor tree at the same time. ` +
 											`To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.`,
 									)
 								}
 							}
 
-							callbackReturns.push(result)
+							promiseReturns.push(result)
 							correspondingStates.push(state)
 						}
 					}
 					// TODO timeout
-					const newCallbacks = await Promise.allSettled(callbackReturns)
+					const newCallbacks = await Promise.allSettled(promiseReturns)
 
 					callbackQueue.length = 0 // Empties the queue
 
@@ -318,7 +332,7 @@ export class EventManager {
 						if (newlyInitialized.type === StateType.Field) {
 							continue
 						}
-						const beforePersistHandlers = newlyInitialized.eventListeners?.get('beforePersist')
+						const beforePersistHandlers = newlyInitialized.eventListeners?.get(eventType as any)
 						if (beforePersistHandlers) {
 							for (const listener of beforePersistHandlers) {
 								callbackQueue.push([newlyInitialized, listener])
@@ -333,13 +347,17 @@ export class EventManager {
 						const correspondingState = correspondingStates[i]
 
 						if (result.status === 'fulfilled') {
-							callbackQueue.push([correspondingState, result.value])
+							if (typeof result.value === 'function') {
+								callbackQueue.push([correspondingState, result.value])
+							}
+							// Otherwise do nothing. This is just a handler that albeit async, doesn't appear to
+							// interact with data binding.
 						} else {
 							// We just silently stop.
 							// That's NOT ideal but what else exactly do we do so that it's even remotely recoverable?
 							if (__DEV_MODE__) {
 								throw new BindingError(
-									`A beforePersist handler returned a promise that rejected. ` +
+									`A ${eventType} handler returned a promise that rejected. ` +
 										`This is a no-op that will fail silently in production.`,
 								)
 							}
@@ -349,7 +367,7 @@ export class EventManager {
 				if (__DEV_MODE__) {
 					if (callbackQueue.length) {
 						throw new BindingError(
-							`Exceeded the beforePersist settle limit. Your code likely contains a deadlock. ` +
+							`Exceeded the ${eventType} settle limit. Your code likely contains a deadlock. ` +
 								`If that's not the case, raise the settle limit from DataBindingProvider.`,
 						)
 					}
@@ -459,18 +477,11 @@ export class EventManager {
 		})
 	}
 
-	public triggerOnPersistSuccess(options: PersistSuccessOptions) {
-		this.syncTransaction(() => {
-			const iNodeHasPersistSuccessHandler = (iNode: StateINode) =>
-				!!iNode.eventListeners && iNode.eventListeners.has('persistSuccess')
+	public async triggerOnBeforePersist() {
+		return this.triggerAsyncMutatingEvent('beforePersist', this.asyncBatchUpdatesOptions)
+	}
 
-			for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
-				for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistSuccessHandler)) {
-					for (const listener of iNode.eventListeners!.get('persistSuccess')!) {
-						listener(iNode.getAccessor as any, options)
-					}
-				}
-			}
-		})
+	public async triggerOnPersistSuccess(options: PersistSuccessOptions) {
+		return this.triggerAsyncMutatingEvent('persistSuccess', options)
 	}
 }

@@ -117,9 +117,18 @@ export class OperationsHelpers {
 				eventManager.registerJustUpdated(childIdState, EventManager.NO_CHANGES_DIFFERENCE)
 			}
 
+			// Version 1.
 			// The listeners subscribed to a particular entity key so we no longer want to call these.
 			// The only positionally associated listeners are in the blueprint so we re-initialize those.
-			realm.eventListeners = stateInitializer.initializeEntityEventListenerStore(realmBlueprint)
+			//realm.eventListeners = stateInitializer.initializeEntityEventListenerStore(realmBlueprint)
+
+			// Version 2.
+			// This is version two of this terrible hack. We want to preserve e.g. persistSuccess handlers.
+			const listeners = realm.eventListeners
+			if (listeners) {
+				listeners.delete('update')
+				listeners.delete('connectionUpdate')
+			}
 		}
 
 		if (oldEntity.realms.size === 0) {

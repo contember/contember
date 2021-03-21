@@ -1,5 +1,6 @@
 import { Environment } from '../dao'
 import { EntityId, EntityRealmKey } from '../treeParameters'
+import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 import { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import { EntityAccessor } from './EntityAccessor'
 import { Errorable } from './Errorable'
@@ -108,15 +109,18 @@ namespace EntityListAccessor {
 
 	export type BeforePersistHandler = (
 		getAccessor: GetEntityListAccessor,
-		options: BatchUpdatesOptions,
-	) => void | Promise<BeforePersistHandler>
+		options: AsyncBatchUpdatesOptions,
+	) => void | Promise<void | BeforePersistHandler>
 
 	export type PersistErrorHandler = (
 		getAccessor: GetEntityListAccessor,
 		options: PersistErrorOptions,
 	) => void | Promise<void>
 
-	export type PersistSuccessHandler = (getAccessor: GetEntityListAccessor, options: PersistSuccessOptions) => void
+	export type PersistSuccessHandler = (
+		getAccessor: GetEntityListAccessor,
+		options: PersistSuccessOptions,
+	) => void | Promise<void | PersistSuccessHandler>
 
 	export interface RuntimeEntityListEventListenerMap {
 		beforePersist: BeforePersistHandler

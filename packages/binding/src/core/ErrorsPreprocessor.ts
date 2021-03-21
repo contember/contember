@@ -49,11 +49,11 @@ class ErrorsPreprocessor {
 	}
 
 	private processMutationResponse(mutationResponse: MutationResponse): ErrorsPreprocessor.ErrorNode | undefined {
-		if (mutationResponse.ok && mutationResponse.validation.valid && mutationResponse.errors.length === 0) {
+		if (mutationResponse.ok && mutationResponse.validation?.valid && mutationResponse.errors.length === 0) {
 			return undefined
 		}
-		if (mutationResponse.validation.errors.length) {
-			return this.getErrorNode(mutationResponse.validation.errors)
+		if (mutationResponse.validation?.errors.length) {
+			return this.getErrorNode(mutationResponse.validation?.errors)
 		}
 		if (mutationResponse.errors.length) {
 			return this.getErrorNode(mutationResponse.errors)

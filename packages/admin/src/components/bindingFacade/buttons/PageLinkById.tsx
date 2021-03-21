@@ -1,10 +1,10 @@
-import { useEntity } from '@contember/binding'
+import { EntityAccessor, useEntity } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
 import { InnerProps } from '../../Link'
 import PageLink, { PageConfig } from '../../pageRouting/PageLink'
 
 interface PageLinkByIdProps {
-	change: (id: string) => PageConfig
+	change: (id: string, entity: EntityAccessor) => PageConfig
 	Component?: ComponentType<InnerProps>
 	children?: ReactNode
 }
@@ -15,7 +15,7 @@ export const PageLinkById = memo(function (props: PageLinkByIdProps) {
 
 	if (typeof id === 'string') {
 		return (
-			<PageLink to={() => props.change(id)} Component={props.Component}>
+			<PageLink to={() => props.change(id, parentEntity)} Component={props.Component}>
 				{props.children}
 			</PageLink>
 		)

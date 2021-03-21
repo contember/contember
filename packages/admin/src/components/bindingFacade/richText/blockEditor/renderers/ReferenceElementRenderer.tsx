@@ -48,8 +48,13 @@ export const ReferenceElementRenderer = memo((props: ReferenceElementRendererPro
 	)
 	const onRemove = useCallback(() => {
 		const path = ReactEditor.findPath(editor, props.element)
-		Transforms.removeNodes(editor, {
-			at: path,
+		Promise.resolve().then(() => {
+			// This is a hack. Otherwise if the removed block is the last one, we get an exception from Slate whose onClick
+			// handler is also trying to do something with this element. So we just schedule a micro task, let it do its
+			// thing and just remove the node later.
+			Transforms.removeNodes(editor, {
+				at: path,
+			})
 		})
 	}, [editor, props.element])
 

@@ -41,15 +41,29 @@ export const useDataBinding = ({ nodeTree }: AccessorTreeStateOptions): Accessor
 		})
 	}, [])
 
-	// TODO This won't react to changes of the params
-	const [dataBinding] = useState(() => new DataBinding(client, environment, onUpdate, onError))
+	const [dataBinding, setDataBinding] = useState(() => new DataBinding(client, environment, onUpdate, onError))
 
 	useEffect(() => {
-		if (!isFirstRenderRef.current) {
+		if (state.name !== AccessorTreeStateName.Initializing) {
+			// Ideally, this condition shouldn't be necessary. However, people are nowhere near careful and diligent
+			// enough to maintain the contract that a change in referential identity of the children passed to
+			// DataBindingProvider will result in a new DataBinding instance (which typically involves a new query).
+			// To make their lives a bit easier, we do this.
 			return
 		}
 		dataBinding.extendTree(nodeTree)
-	}, [nodeTree, dataBinding])
+	}, [nodeTree, dataBinding, state.name])
+
+	useEffect(() => {
+		if (isFirstRenderRef.current) {
+			return
+		}
+		dispatch({
+			type: AccessorTreeStateActionType.Reset,
+		})
+		// This essentially just reacts to new environments.
+		setDataBinding(new DataBinding(client, environment, onUpdate, onError))
+	}, [client, environment, onError, onUpdate])
 
 	useEffect(() => {
 		isFirstRenderRef.current = false

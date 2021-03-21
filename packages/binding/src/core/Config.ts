@@ -4,6 +4,7 @@ export class Config {
 	private static defaultConfig: BindingConfig = {
 		beforePersistSettleLimit: 20,
 		beforeUpdateSettleLimit: 20,
+		persistSuccessSettleLimit: 20,
 		maxPersistAttempts: 5,
 		maxSchemaLoadAttempts: 3,
 	}

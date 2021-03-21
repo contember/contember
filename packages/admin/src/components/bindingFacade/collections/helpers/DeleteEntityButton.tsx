@@ -39,7 +39,7 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 	}
 
 	return (
-		<Button {...defaultProps} {...rest} disabled={isMutating} onClick={onClick}>
+		<Button {...defaultProps} {...rest} disabled={isMutating || rest.disabled} onClick={onClick}>
 			{children || <Icon blueprintIcon="trash" />}
 		</Button>
 	)

@@ -11,3 +11,6 @@ export type AccessorTreeStateAction =
 			type: AccessorTreeStateActionType.FailWithError
 			error: RequestError
 	  }
+	| {
+			type: AccessorTreeStateActionType.Reset
+	  }

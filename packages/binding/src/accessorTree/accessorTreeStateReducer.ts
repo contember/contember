@@ -20,5 +20,9 @@ export const accessorTreeStateReducer = (
 				name: AccessorTreeStateName.Error,
 				error: action.error,
 			}
+		case AccessorTreeStateActionType.Reset:
+			return {
+				name: AccessorTreeStateName.Initializing,
+			}
 	}
 }

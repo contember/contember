@@ -19,6 +19,7 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 } from '../treeParameters'
+import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 import { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import { EntityListAccessor } from './EntityListAccessor'
 import { Errorable } from './Errorable'
@@ -220,15 +221,18 @@ namespace EntityAccessor {
 
 	export type BeforePersistHandler = (
 		getAccessor: GetEntityAccessor,
-		options: BatchUpdatesOptions,
-	) => void | Promise<BeforePersistHandler>
+		options: AsyncBatchUpdatesOptions,
+	) => void | Promise<void | BeforePersistHandler>
 
 	export type PersistErrorHandler = (
 		getAccessor: GetEntityAccessor,
 		options: PersistErrorOptions,
 	) => void | Promise<void>
 
-	export type PersistSuccessHandler = (getAccessor: GetEntityAccessor, options: PersistSuccessOptions) => void
+	export type PersistSuccessHandler = (
+		getAccessor: GetEntityAccessor,
+		options: PersistSuccessOptions,
+	) => void | Promise<void | PersistSuccessHandler>
 
 	export interface RuntimeEntityEventListenerMap {
 		beforePersist: BeforePersistHandler

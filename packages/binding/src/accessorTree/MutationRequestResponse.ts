@@ -33,10 +33,12 @@ export interface MutationResponse {
 	ok: boolean
 	errorMessage: string | null
 	errors: ExecutionError[]
-	validation: {
-		valid: boolean
-		errors: ValidationError[]
-	}
+	validation:
+		| {
+				valid: boolean
+				errors: ValidationError[]
+		  }
+		| undefined
 	node: ReceivedEntityData
 }
 

@@ -57,7 +57,7 @@ export class UpdateEntityRelationAllowedOperationsVisitor
 		targetRelation: Model.OneHasOneInverseRelation | null,
 	) {
 		const operations = this.getAllowedOperations(targetEntity, entity, relation)
-		if (relation.nullable || (targetRelation && targetRelation.nullable)) {
+		if (relation.nullable || !targetRelation || targetRelation.nullable) {
 			return operations
 		}
 		const allowedOperations = [Input.UpdateRelationOperation.update]

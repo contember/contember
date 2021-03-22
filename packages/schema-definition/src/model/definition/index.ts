@@ -85,8 +85,8 @@ export function oneHasOneInversed(target: EntityConstructor, ownedBy: string): O
 	return new OneHasOneInverseDefinition({ target, ownedBy })
 }
 
-export function createEnum(...values: string[]) {
-	return new EnumDefinition(values)
+export function createEnum<Values extends string>(...values: Values[]): EnumDefinition<Values> {
+	return new EnumDefinition<Values>(values)
 }
 
 type UniqueOptions<T> = { name?: string; fields: (keyof T)[] }

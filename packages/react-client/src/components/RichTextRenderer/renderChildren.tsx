@@ -13,7 +13,6 @@ export interface RenderChildrenOptions<
 > {
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	renderLeaf?: RenderLeaf<CustomLeaves>
-	formatVersion: number
 }
 
 export const renderChildren = <
@@ -27,7 +26,7 @@ export const renderChildren = <
 		| BuiltinLeaves
 		| Array<CustomElements | BuiltinElements<CustomElements, CustomLeaves> | CustomLeaves | BuiltinLeaves>,
 	options: RenderChildrenOptions<CustomElements, CustomLeaves>,
-): ReactElement | null => {
+): ReactElement => {
 	if (!Array.isArray(children)) {
 		children = [children]
 	}
@@ -35,14 +34,7 @@ export const renderChildren = <
 		<>
 			{children.map((child, i) => {
 				if ('text' in child) {
-					return (
-						<LeafRenderer<CustomLeaves>
-							key={i}
-							leaf={child}
-							renderLeaf={options.renderLeaf}
-							formatVersion={options.formatVersion}
-						/>
-					)
+					return <LeafRenderer<CustomLeaves> key={i} leaf={child} renderLeaf={options.renderLeaf} />
 				}
 				if ('children' in child) {
 					return (
@@ -50,7 +42,6 @@ export const renderChildren = <
 							key={i}
 							element={child}
 							renderElement={options.renderElement}
-							formatVersion={options.formatVersion}
 						>
 							{renderChildren<CustomElements, CustomLeaves>(child.children as typeof children, options)}
 						</ElementRenderer>

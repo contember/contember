@@ -8,5 +8,5 @@ export interface RootEditorNode<
 	CustomLeaves extends RichTextLeaf = never
 > {
 	formatVersion: number
-	children: Array<BuiltinElements | CustomElements | BuiltinLeaves | CustomLeaves>
+	children: Array<BuiltinElements<CustomElements, CustomLeaves> | CustomElements | BuiltinLeaves | CustomLeaves>
 }

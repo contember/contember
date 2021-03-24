@@ -3,24 +3,27 @@ import { ComponentType, createElement, FunctionComponent } from 'react'
 import { BuiltinLeaves } from './BuiltinLeaves'
 import { RenderLeafFallback, RenderLeafFallbackProps } from './RenderLeafFallback'
 import { RichTextLeaf } from './RichTextLeaf'
+import { RichTextLeafMetadata } from './RichTextLeafMetadata'
+import { useRichTextRenderMetadata } from './RichTextRenderMetadataContext'
 
-export type RenderLeaf<CustomLeaves extends RichTextLeaf> = ComponentType<{
-	leaf: CustomLeaves | BuiltinLeaves
-	fallback: FunctionComponent<RenderLeafFallbackProps>
-	formatVersion: number
-}>
+export type RenderLeaf<CustomLeaves extends RichTextLeaf> = ComponentType<
+	{
+		leaf: CustomLeaves | BuiltinLeaves
+		fallback: FunctionComponent<RenderLeafFallbackProps>
+	} & RichTextLeafMetadata
+>
 
 export interface LeafRendererProps<CustomLeaves extends RichTextLeaf = never> {
 	renderLeaf?: RenderLeaf<CustomLeaves>
 	leaf: CustomLeaves | BuiltinLeaves
-	formatVersion: number
 }
 
 export function LeafRenderer<CustomLeaves extends RichTextLeaf = never>({
-	formatVersion,
 	leaf,
 	renderLeaf,
 }: LeafRendererProps<CustomLeaves>) {
+	const formatVersion = useRichTextRenderMetadata().formatVersion
+
 	if (renderLeaf) {
 		return createElement(
 			renderLeaf,

@@ -57,7 +57,11 @@ function ReferenceElementFallback<
 	const metadata = useRichTextRenderMetadata<CustomElements, CustomLeaves>()
 	const elementMetadata = resolveRichTextElementMetadata<CustomElements, CustomLeaves>(element, metadata)
 
-	if (elementMetadata.referenceRenderer === undefined) {
+	if (
+		elementMetadata.referenceRenderer === undefined ||
+		elementMetadata.referenceType === undefined ||
+		elementMetadata.reference === undefined
+	) {
 		if (__DEV_MODE__) {
 			throw new RichTextRendererError(
 				`RichTextRenderer: cannot render reference of type '${elementMetadata.referenceType}'.`,
@@ -70,7 +74,10 @@ function ReferenceElementFallback<
 	return (
 		<>
 			{elementMetadata.referenceRenderer?.({
-				...elementMetadata,
+				referenceType: elementMetadata.referenceType,
+				referenceRenderer: elementMetadata.referenceRenderer,
+				reference: elementMetadata.reference,
+				formatVersion: elementMetadata.formatVersion,
 				element,
 				children,
 			})}

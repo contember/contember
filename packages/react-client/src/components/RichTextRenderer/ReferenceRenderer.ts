@@ -12,7 +12,12 @@ export type ReferenceRendererProps<
 > = {
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
 	children: ReactElement
-} & RichTextElementMetadata<CustomElements, CustomLeaves, Reference>
+} & {
+	[Prop in keyof RichTextElementMetadata<CustomElements, CustomLeaves, Reference>]: Exclude<
+		RichTextElementMetadata<CustomElements, CustomLeaves, Reference>[Prop],
+		undefined
+	>
+}
 
 export type ReferenceRenderer<
 	Reference extends RichTextReference = RichTextReference,

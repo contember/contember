@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ComponentType, createElement, FunctionComponent, ReactElement } from 'react'
 import { BuiltinElements } from './BuiltinElements'
 import { RenderElementFallback, RenderElementFallbackProps } from './RenderElementFallback'

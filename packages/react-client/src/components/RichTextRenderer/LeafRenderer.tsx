@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { ComponentType, createElement, FunctionComponent } from 'react'
 import { BuiltinLeaves } from './BuiltinLeaves'
 import { RenderLeafFallback, RenderLeafFallbackProps } from './RenderLeafFallback'

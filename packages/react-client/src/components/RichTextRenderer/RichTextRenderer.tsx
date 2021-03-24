@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { memo, ReactElement, useMemo } from 'react'
 import { defaultDeserialize } from './defaultDeserialize'
 import { RenderElement } from './ElementRenderer'

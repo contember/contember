@@ -15,7 +15,7 @@ import { RichTextRenderMetadataContext } from './RichTextRenderMetadataContext'
 import { RootEditorNode } from './RootEditorNode'
 
 export interface RichTextRendererFieldProps {
-	source: string
+	source: string | null
 }
 
 export interface RichTextRendererBlockProps<
@@ -51,7 +51,12 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 		if ('source' in sourceProps && !('blocks' in sourceProps)) {
 			return [
 				{
-					content: deserialize(sourceProps.source),
+					content: sourceProps.source
+						? deserialize(sourceProps.source)
+						: {
+								formatVersion: 0,
+								children: [],
+						  },
 					id: undefined,
 					referenceDiscriminationField: undefined,
 					referenceRenderers: {},

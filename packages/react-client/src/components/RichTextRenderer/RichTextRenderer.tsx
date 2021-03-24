@@ -57,6 +57,7 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 								children: [],
 						  },
 					id: undefined,
+					referencesField: undefined,
 					referenceDiscriminationField: undefined,
 					referenceRenderers: {},
 					references: undefined,
@@ -121,6 +122,7 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 					content: deserialize(source),
 					referenceDiscriminationField,
 					referenceRenderers: sourceProps.referenceRenderers ?? {},
+					referencesField,
 					references: normalizedReferences,
 				}
 			})
@@ -136,6 +138,7 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 					value={{
 						formatVersion: block.content.formatVersion,
 						referenceRenderers: block.referenceRenderers,
+						referencesField: block.referencesField,
 						referenceDiscriminationField: block.referenceDiscriminationField,
 						references: block.references,
 					}}

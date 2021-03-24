@@ -11,6 +11,7 @@ export interface NormalizedRichTextBlock<
 	content: RootEditorNode<CustomElements, CustomLeaves>
 	referenceRenderers: Record<string, ReferenceRenderer<RichTextReference, CustomElements, CustomLeaves>>
 	references: Map<string, RichTextReference> | undefined
+	referencesField: string | undefined
 	referenceDiscriminationField: string | undefined
 	id: string | undefined
 }

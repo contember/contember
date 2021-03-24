@@ -6,6 +6,7 @@ import { RichTextRenderMetadata } from './RichTextRenderMetadata'
 
 export const RichTextRenderMetadataContext = createContext<RichTextRenderMetadata<any, any, any>>({
 	formatVersion: 0,
+	referencesField: undefined,
 	referenceDiscriminationField: undefined,
 	referenceRenderers: {},
 	references: undefined,

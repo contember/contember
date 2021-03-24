@@ -21,7 +21,12 @@ export const resolveRichTextElementMetadata = <
 		const resolved = metadata.references?.get(element['referenceId'])
 
 		if (resolved === undefined) {
-			throw new RichTextRendererError(`Cannot find reference id '${element['referenceId']}'.`)
+			throw new RichTextRendererError(
+				`Cannot find reference id '${element['referenceId']}'` +
+					(metadata.references === undefined
+						? ` because its containing block's lacks the '${metadata.referencesField}' field. `
+						: `.`),
+			)
 		}
 		reference = resolved as Reference
 	}

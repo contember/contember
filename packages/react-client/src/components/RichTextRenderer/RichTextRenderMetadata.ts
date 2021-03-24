@@ -11,5 +11,6 @@ export interface RichTextRenderMetadata<
 	formatVersion: number
 	referenceRenderers: Record<string, ReferenceRenderer<Reference, CustomElements, CustomLeaves>>
 	references: Map<string, RichTextReference> | undefined
+	referencesField: string | undefined
 	referenceDiscriminationField: string | undefined
 }

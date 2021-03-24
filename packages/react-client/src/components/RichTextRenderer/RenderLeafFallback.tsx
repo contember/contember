@@ -1,13 +1,25 @@
-import { ReactNode } from 'react'
+import { Fragment, ReactNode } from 'react'
 import { BuiltinLeaves } from './BuiltinLeaves'
 
 export interface RenderLeafFallbackProps {
 	leaf: BuiltinLeaves
 }
 
+function jsxN2br(text: string): ReactNode {
+	const lines = text.split('\n')
+	if (lines.length <= 1) {
+		return text
+	}
+	return lines.map((line, i) => (
+		<Fragment key={i}>
+			{!!i && <br />}
+			{line}
+		</Fragment>
+	))
+}
+
 export function RenderLeafFallback({ leaf }: RenderLeafFallbackProps) {
-	// const formatVersion = useContext(RichTextFormatVersionContext)
-	let element: ReactNode = leaf.text
+	let element = jsxN2br(leaf.text)
 
 	if ('isCode' in leaf && leaf.isCode === true) {
 		element = <code>{element}</code>

@@ -17,7 +17,7 @@ export class MigrationCreator {
 		const migration = this.createMigration([], migrationName)
 		const jsonDiff = MigrationCreator.createContent(migration)
 
-		return await this.migrationFilesManager.createFile(jsonDiff, migration.version)
+		return await this.migrationFilesManager.createFile(jsonDiff, migration.name)
 	}
 
 	async prepareMigration(

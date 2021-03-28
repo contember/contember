@@ -62,7 +62,9 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 				schemas: [contentSchema],
 				typeDefs: introspectionSchema.typeDefs as DocumentNode,
 			})
-			console.log(printSchema(gqlSchema))
+			gqlSchema.description = '' // this enforces schema definition print
+			const printedSchema = printSchema(gqlSchema).replace('""""""\n', '') // remove empty comment
+			console.log(printedSchema)
 		} else {
 			throw new Error(`Unknown format ${format}`)
 		}

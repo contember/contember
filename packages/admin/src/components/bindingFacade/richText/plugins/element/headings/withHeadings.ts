@@ -17,7 +17,15 @@ import { HeadingRenderer, HeadingRendererProps } from './HeadingRenderer'
 
 export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeadings<E> => {
 	const e: E & Partial<WithHeadings<WithAnotherNodeType<E, HeadingElement>>> = editor
-	const { canContainAnyBlocks, renderElement, insertBreak, toggleElement, deleteBackward, processBlockPaste } = editor
+	const {
+		canToggleElement,
+		canContainAnyBlocks,
+		renderElement,
+		insertBreak,
+		toggleElement,
+		deleteBackward,
+		processBlockPaste,
+	} = editor
 
 	const isHeading = (
 		element: SlateNode | ElementNode,
@@ -56,6 +64,24 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 	// 	// The map isn't really necessary for now but would be if we introduced deeper levels
 	// 	return normalizedPrevious.map(level => Math.max(level, 1))
 	// }
+
+	e.canToggleElement = (elementType, suchThat) => {
+		if (elementType !== headingElementType) {
+			return canToggleElement(elementType, suchThat)
+		}
+		if (!editor.selection) {
+			return false
+		}
+		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor, editor.selection)
+		if (closestBlockEntry === undefined) {
+			return true
+		}
+		const [closestBlockElement, closestBlockPath] = closestBlockEntry
+
+		return (
+			closestBlockPath.length === 1 && (e.isDefaultElement(closestBlockElement) || e.isHeading!(closestBlockElement))
+		)
+	}
 
 	// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
 	// 	include empty strings at the edges of top-level elements.

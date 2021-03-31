@@ -3,6 +3,7 @@ import { AccessorTree, AccessorTreeState, useDataBinding } from '../accessorTree
 
 export interface DataBindingProviderBaseProps {
 	children?: ReactNode
+	refreshOnEnvironmentChange?: boolean
 }
 
 export interface DataBindingStateComponentProps {
@@ -24,6 +25,7 @@ export const DataBindingProvider = memo(function DataBindingProvider<StateProps 
 ) {
 	const accessorTreeState = useDataBinding({
 		nodeTree: props.children,
+		refreshOnEnvironmentChange: props.refreshOnEnvironmentChange,
 	})
 
 	const children =

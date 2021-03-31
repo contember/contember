@@ -334,15 +334,15 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			}
 			return onKeyDown(event)
 		},
-		canContainAnyBlocks: (elementType, suchThat) => {
-			switch (elementType) {
+		canContainAnyBlocks: element => {
+			switch (element.type) {
 				case unorderedListElementType:
 				case orderedListElementType:
 					return false
 				case listItemElementType:
 					return true
 				default:
-					return canContainAnyBlocks(elementType, suchThat)
+					return canContainAnyBlocks(element)
 			}
 		},
 	})

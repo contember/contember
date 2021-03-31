@@ -59,11 +59,8 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(e
 			editor,
 			targetPoint,
 		)! as NodeEntry<ElementNode>
-		const [topLevelIndex] = targetPoint.path
 
-		const { type: closestBlockType, children: _, ...closestBlockSpecifics } = closestBlockElement
-
-		if (editor.canContainAnyBlocks(closestBlockType, closestBlockSpecifics)) {
+		if (editor.canContainAnyBlocks(closestBlockElement)) {
 			return targetPoint.path
 		}
 

@@ -19,7 +19,7 @@ export interface WithEssentials<E extends EditorNode> {
 	isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
 	toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => void
 
-	canContainAnyBlocks: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
+	canContainAnyBlocks: (element: ElementNode) => boolean
 
 	serializeNodes: (nodes: Array<ElementNode | TextNode>, errorMessage?: string) => string
 	deserializeNodes: (serializedNodes: string, errorMessage?: string) => Array<ElementNode | TextNode>

@@ -88,8 +88,7 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		return toggleElement(elementType, suchThat)
 	}
 
-	e.canContainAnyBlocks = (elementType, suchThat) =>
-		elementType === headingElementType ? false : canContainAnyBlocks(elementType, suchThat)
+	e.canContainAnyBlocks = element => (element.type === headingElementType ? false : canContainAnyBlocks(element))
 
 	e.renderElement = props => {
 		if (isHeading(props.element)) {

@@ -52,8 +52,7 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 		return renderElement(props)
 	}
 
-	e.canContainAnyBlocks = (elementType, suchThat) =>
-		elementType === paragraphElementType ? false : canContainAnyBlocks(elementType, suchThat)
+	e.canContainAnyBlocks = element => (element.type === paragraphElementType ? false : canContainAnyBlocks(element))
 
 	e.deleteBackward = unit => {
 		const selection = e.selection

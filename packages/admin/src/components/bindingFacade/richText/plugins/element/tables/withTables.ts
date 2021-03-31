@@ -500,15 +500,15 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			}
 			normalizeNode(entry)
 		},
-		canContainAnyBlocks: (elementType, suchThat) => {
-			switch (elementType) {
+		canContainAnyBlocks: element => {
+			switch (element.type) {
 				case tableElementType:
 				case tableRowElementType:
 					return false
 				case tableCellElementType:
 					return true
 				default:
-					return canContainAnyBlocks(elementType, suchThat)
+					return canContainAnyBlocks(element)
 			}
 		},
 	})

@@ -38,7 +38,7 @@ export class TreeFilterGenerator {
 	): TreeFilter[] {
 		const filters: TreeFilter[] = []
 
-		if (persistedData === undefined || subTree.parameters.isCreating) {
+		if (persistedData === undefined) {
 			return filters // Do nothing
 		}
 

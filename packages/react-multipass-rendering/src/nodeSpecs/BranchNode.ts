@@ -17,6 +17,7 @@ class BranchNode<
 	Representation = any
 > {
 	private static defaultOptions: BranchNodeOptions = {
+		childrenAreOptional: false,
 		childrenAbsentErrorMessage: 'Component must have children!',
 	}
 

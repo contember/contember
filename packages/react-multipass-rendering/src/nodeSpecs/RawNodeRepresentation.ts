@@ -1,4 +1,4 @@
-export type RawNodeRepresentation<AllLeavesRepresentation, AllBranchNodesRepresentation> =
+export type RawNodeRepresentation<AllLeavesRepresentation, AllBranchNodesRepresentation = AllLeavesRepresentation> =
 	| AllLeavesRepresentation
 	| AllBranchNodesRepresentation
 	| Array<AllLeavesRepresentation | AllBranchNodesRepresentation>

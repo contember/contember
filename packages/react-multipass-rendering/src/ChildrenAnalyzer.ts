@@ -210,7 +210,7 @@ export class ChildrenAnalyzer<
 					const { factoryMethodName, childrenRepresentationReducer } = specification
 
 					if (typeof treeNode !== 'string' && factoryMethodName in treeNode) {
-						if (processedChildren === undefined) {
+						if (processedChildren === undefined && !branchNode.options.childrenAreOptional) {
 							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 						}
 						const factory = treeNode[factoryMethodName] as DeclarationSiteNodeRepresentationFactory<
@@ -226,7 +226,7 @@ export class ChildrenAnalyzer<
 				case RepresentationFactorySite.UseSite: {
 					const { factory, ComponentType } = specification
 					if (ComponentType === undefined || node.type === ComponentType) {
-						if (processedChildren === undefined) {
+						if (processedChildren === undefined && !branchNode.options.childrenAreOptional) {
 							throw new ChildrenAnalyzerError(branchNode.options.childrenAbsentErrorMessage)
 						}
 						return factory(node, processedChildren, staticContext)

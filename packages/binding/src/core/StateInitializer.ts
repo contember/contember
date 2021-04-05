@@ -324,7 +324,6 @@ export class StateInitializer {
 		const entityListState: EntityListState = {
 			type: StateType.EntityList,
 			blueprint,
-			addEventListener: undefined as any, // This is assigned properly immediately after
 			children: new BijectiveIndexedMap(realm => realm.entity.id.value),
 			childrenWithPendingUpdates: undefined,
 			entityName,
@@ -359,6 +358,9 @@ export class StateInitializer {
 			})(),
 			addError: error =>
 				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
+			addEventListener: (...args: [any, ...any[]]) => {
+				return this.listOperations.addEventListener(entityListState, ...args)
+			},
 			batchUpdates: performUpdates => {
 				this.listOperations.batchUpdates(entityListState, performUpdates)
 			},
@@ -375,7 +377,6 @@ export class StateInitializer {
 				return this.listOperations.getChildEntityById(entityListState, id)
 			},
 		}
-		entityListState.addEventListener = this.getAddEventListener(entityListState)
 
 		const initialData: Set<string | undefined> =
 			initialEntityIds.size === 0

@@ -15,9 +15,9 @@ export interface EntityEventListenerStore
 	get(key: 'persistSuccess'): Set<StdEvents['persistSuccess']> | undefined
 	get(key: 'update'): Set<StdEvents['update']> | undefined
 	get(key: 'initialize'): Set<StdEvents['initialize']> | undefined
-	get<K extends `connectionUpdate_${FieldName}` | keyof StdEvents>(key: K): Set<AllEvents[keyof AllEvents]> | undefined
+	get(key: `connectionUpdate_${FieldName}` | keyof StdEvents): Set<AllEvents[keyof AllEvents]> | undefined
 
-	set<K extends `connectionUpdate_${FieldName}` | keyof StdEvents>(key: K, value: Set<AllEvents[keyof AllEvents]>): this
+	set(key: `connectionUpdate_${FieldName}` | keyof StdEvents, value: Set<AllEvents[keyof AllEvents]>): this
 }
 
 export interface SingleEntityEventListeners {

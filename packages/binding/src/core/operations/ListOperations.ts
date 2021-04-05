@@ -19,6 +19,53 @@ export class ListOperations {
 		private readonly treeStore: TreeStore,
 	) {}
 
+	public addEventListener(
+		state: EntityListState,
+		type:
+			| keyof EntityListAccessor.RuntimeEntityListEventListenerMap
+			| `child${Capitalize<EntityAccessor.EntityEventType>}`,
+		...args: unknown[]
+	) {
+		if (type.startsWith('child')) {
+			if (state.childEventListeners === undefined) {
+				state.childEventListeners = new Map()
+			}
+			const eventType = `${type.substring(5, 6).toLowerCase()}${type.substring(6)}` as Exclude<
+				EntityAccessor.EntityEventType,
+				'connectionUpdate'
+			>
+			const listenerToAdd = args[0] as EntityAccessor.EntityEventListenerMap[typeof eventType]
+			let existingListeners = state.childEventListeners.get(eventType)
+
+			if (existingListeners === undefined) {
+				state.childEventListeners.set(eventType, new Set([listenerToAdd]))
+			} else {
+				existingListeners.add(listenerToAdd)
+			}
+
+			return () => {
+				state.childEventListeners?.get(eventType)?.delete(listenerToAdd)
+			}
+		} else {
+			if (state.eventListeners === undefined) {
+				state.eventListeners = new Map()
+			}
+			const eventType = type as keyof EntityListAccessor.RuntimeEntityListEventListenerMap
+			const listenerToAdd = args[0] as EntityListAccessor.RuntimeEntityListEventListenerMap[typeof eventType]
+			let existingListeners = state.eventListeners.get(eventType)
+
+			if (existingListeners === undefined) {
+				state.eventListeners.set(eventType, new Set([listenerToAdd]))
+			} else {
+				existingListeners.add(listenerToAdd)
+			}
+
+			return () => {
+				state.eventListeners?.get(eventType)?.delete(listenerToAdd)
+			}
+		}
+	}
+
 	public batchUpdates(state: EntityListState, performUpdates: EntityListAccessor.BatchUpdatesHandler) {
 		this.eventManager.syncOperation(() => {
 			performUpdates(state.getAccessor, this.batchUpdatesOptions)

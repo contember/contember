@@ -1,5 +1,5 @@
 import { Environment } from '../dao'
-import { EntityId, EntityRealmKey, FieldName } from '../treeParameters'
+import { EntityId, EntityRealmKey } from '../treeParameters'
 import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 import { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import { EntityAccessor } from './EntityAccessor'

@@ -29,7 +29,7 @@ export const Field = Component(
 		return <>{field.value}</>
 	},
 	{
-		generateFieldMarker: (props, environment) => MarkerFactory.createFieldMarker(props, environment),
+		generateLeafMarker: (props, environment) => MarkerFactory.createFieldMarker(props, environment),
 	},
 	'Field',
 ) as <Persisted extends FieldValue = FieldValue>(props: FieldProps<Persisted>) => ReactElement

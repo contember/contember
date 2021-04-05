@@ -4,13 +4,13 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	Marker,
+	MeaningfulMarker,
 } from '../../markers'
 import { assertNever } from '../../utils'
 import { TreeParameterSugarer } from './TreeParameterSugarer'
 
 export class MarkerSugarer {
-	public static sugarMarker(marker: Marker): string {
+	public static sugarMarker(marker: MeaningfulMarker): string {
 		if (marker instanceof FieldMarker) {
 			return this.sugarFieldMarker(marker)
 		}

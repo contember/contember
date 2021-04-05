@@ -52,11 +52,11 @@ export const EntitySubTree = Component(
 		return <Entity {...props} accessor={accessor} />
 	},
 	{
-		generateSubTreeMarker: (props, fields, environment) => {
+		generateBranchMarker: (props, fields, environment) => {
 			if ('isCreating' in props && props.isCreating) {
-				return MarkerFactory.createUnconstrainedEntitySubTreeMarker(environment, props, fields)
+				return MarkerFactory.createUnconstrainedEntitySubTreeMarker(props, fields, environment)
 			}
-			return MarkerFactory.createEntitySubTreeMarker(environment, props, fields)
+			return MarkerFactory.createEntitySubTreeMarker(props, fields, environment)
 		},
 		staticRender: props => (
 			<>

@@ -1,4 +1,6 @@
 import {
+	EntityEventListenerStore,
+	EntityFieldMarker,
 	EntityFieldMarkersContainer,
 	EntitySubTree,
 	EntitySubTreeMarker,
@@ -9,9 +11,10 @@ import {
 	HasManyRelationMarker,
 	HasOne,
 	HasOneRelationMarker,
-	Marker,
 	MarkerTreeGenerator,
 	MarkerTreeRoot,
+	ParentEntity,
+	PlaceholderName,
 	PRIMARY_KEY_NAME,
 } from '../../../../src'
 
@@ -23,31 +26,52 @@ describe('Marker tree generator', () => {
 	})
 
 	it('combine nested markers', () => {
+		const onInit1 = () => {}
+		const onInit2 = () => {}
+		const onInit3 = () => {}
+		const onInit4 = () => {}
+		const onInit5 = () => {}
+		const onInit6 = () => {}
+		const onInit7 = () => {}
+		const onInit8 = () => {}
+
 		const generator = new MarkerTreeGenerator(
 			(
 				<>
 					<EntitySubTree entity="Foo(bar = 123)">
+						<ParentEntity onInitialize={onInit1} />
 						<HasMany field="hasMany[x > 50]">
 							<Field field="hasManyField" />
 							<HasOne field="hasOne">
+								<ParentEntity onInitialize={onInit7} />
 								<HasMany field="common">
 									<Field field="same" />
-									<Field field="name" />
+									<ParentEntity onInitialize={onInit5}>
+										<Field field="name" />
+									</ParentEntity>
 								</HasMany>
 							</HasOne>
 						</HasMany>
-						<Field field="fooField" />
+						<ParentEntity onInitialize={onInit2}>
+							<ParentEntity onInitialize={onInit3} />
+							<Field field="fooField" />
+						</ParentEntity>
 					</EntitySubTree>
 					<EntitySubTree entity="Foo(bar = 123)">
-						<HasMany field="hasMany[x > 50]">
-							<HasOne field="hasOne">
-								<HasMany field="common">
-									<Field field="surname" />
-									<Field field="same" />
-								</HasMany>
-								<Field field="hasOneField" />
-							</HasOne>
-						</HasMany>
+						<ParentEntity onInitialize={onInit4}>
+							<HasMany field="hasMany[x > 50]">
+								<HasOne field="hasOne">
+									<ParentEntity onInitialize={onInit8}>
+										<HasMany field="common">
+											<Field field="surname" />
+											<Field field="same" />
+											<ParentEntity onInitialize={onInit6} />
+										</HasMany>
+										<Field field="hasOneField" />
+									</ParentEntity>
+								</HasOne>
+							</HasMany>
+						</ParentEntity>
 					</EntitySubTree>
 				</>
 			),
@@ -70,6 +94,7 @@ describe('Marker tree generator', () => {
 				orderBy: undefined,
 				offset: undefined,
 				limit: undefined,
+				childEventListeners: new Map([['initialize', new Set([onInit5, onInit6])]]) as any,
 				eventListeners: undefined,
 				expectedMutation: 'anyMutation',
 			},
@@ -99,12 +124,12 @@ describe('Marker tree generator', () => {
 				// forceCreation: false,
 				isNonbearing: false,
 				reducedBy: undefined,
-				eventListeners: undefined,
+				eventListeners: new Map([['initialize', new Set([onInit7, onInit8])]]) as any,
 				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
 				true,
-				new Map<string, Marker>([
+				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
 					[innerHasMany.placeholderName, innerHasMany],
 					['hasOneField', new FieldMarker('hasOneField')],
@@ -129,12 +154,13 @@ describe('Marker tree generator', () => {
 				orderBy: undefined,
 				offset: undefined,
 				limit: undefined,
+				childEventListeners: undefined,
 				eventListeners: undefined,
 				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
 				true,
-				new Map<string, Marker>([
+				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
 					['hasManyField', new FieldMarker('hasManyField')],
 					[hasOne.placeholderName, hasOne],
@@ -157,13 +183,13 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				setOnCreate: { bar: 123 },
 				// forceCreation: false,
-				eventListeners: undefined,
+				eventListeners: new Map([['initialize', new Set([onInit1, onInit2, onInit3, onInit4])]]) as any,
 				expectedMutation: 'anyMutation',
 				alias: undefined,
 			},
 			new EntityFieldMarkersContainer(
 				true,
-				new Map<string, Marker>([
+				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
 					[outerHasMany.placeholderName, outerHasMany],
 					['fooField', new FieldMarker('fooField')],

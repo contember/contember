@@ -38,33 +38,33 @@ export class EntityOperations {
 		}
 
 		if (type === 'connectionUpdate') {
-			let listeners = state.eventListeners.get('connectionUpdate')
-			if (listeners === undefined) {
-				state.eventListeners.set('connectionUpdate', (listeners = new Map()))
-			}
 			const fieldName = args[0] as FieldName
-			const listener = args[1] as EntityAccessor.UpdateListener
-			const fieldListeners = listeners.get(fieldName)
+			const listenerToAdd = args[1] as EntityAccessor.UpdateListener
+			const eventType = `connectionUpdate_${fieldName}` as const
 
-			if (fieldListeners === undefined) {
-				listeners.set(fieldName, new Set([listener]))
+			let existingListeners = state.eventListeners.get(eventType)
+
+			if (existingListeners === undefined) {
+				state.eventListeners.set(eventType, new Set([listenerToAdd]))
 			} else {
-				fieldListeners.add(listener)
+				existingListeners.add(listenerToAdd)
 			}
+
 			return () => {
-				state.eventListeners?.get('connectionUpdate')?.get(fieldName)?.delete(listener)
+				state.eventListeners?.get(eventType)?.delete(listenerToAdd)
 			}
 		} else {
 			const listenerToAdd = args[0] as EntityAccessor.RuntimeEntityEventListenerMap[typeof type]
 			let existingListeners = state.eventListeners.get(type)
 
 			if (existingListeners === undefined) {
-				state.eventListeners.set(type, (existingListeners = new Set<never>()))
+				state.eventListeners.set(type, new Set([listenerToAdd]))
+			} else {
+				existingListeners.add(listenerToAdd)
 			}
 
-			existingListeners.add(listenerToAdd as any)
 			return () => {
-				state.eventListeners?.get(type)?.delete(listenerToAdd as any)
+				state.eventListeners?.get(type)?.delete(listenerToAdd)
 			}
 		}
 	}

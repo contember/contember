@@ -20,4 +20,8 @@ export class HasManyRelationMarker {
 		}
 		this.placeholderName = PlaceholderGenerator.getHasManyRelationPlaceholder(this.parameters)
 	}
+
+	public get isNonbearing() {
+		return this.parameters.isNonbearing
+	}
 }

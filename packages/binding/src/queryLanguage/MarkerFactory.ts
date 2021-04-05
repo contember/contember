@@ -1,18 +1,23 @@
+import { BindingError } from '../BindingError'
 import { MarkerMerger, TreeParameterMerger } from '../core'
 import { Environment } from '../dao'
 import {
+	EntityFieldMarker,
 	EntityFieldMarkersContainer,
+	EntityFieldsWithHoistablesMarker,
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	Marker,
 } from '../markers'
 import {
+	EntityEventListenerStore,
 	HasManyRelation,
 	HasOneRelation,
+	QualifiedSingleEntity,
 	RelativeSingleField,
+	SugaredParentEntityParameters,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedSingleEntity,
 	SugaredRelativeEntityList,
@@ -21,107 +26,176 @@ import {
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '../treeParameters'
+import { assertNever } from '../utils'
 import { QueryLanguage } from './QueryLanguage'
 
 export namespace MarkerFactory {
+	const createSubTreeMarker = <
+		Params extends Record<'hasOneRelationPath', HasOneRelation[]> & Record<Key, EntityEventListenerStore | undefined>,
+		Key extends keyof Params
+	>(
+		qualifiedParams: Params,
+		key: Key,
+		Marker: new (params: Params, fields: EntityFieldMarkersContainer, env: Environment) =>
+			| EntitySubTreeMarker
+			| EntityListSubTreeMarker,
+		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
+		environment: Environment,
+	): EntityFieldsWithHoistablesMarker => {
+		let entityFields: EntityFieldMarkersContainer | undefined
+
+		if (fields instanceof EntityFieldsWithHoistablesMarker) {
+			// TODO this is wrong with respect to hasOneRelationPath
+			qualifiedParams = TreeParameterMerger.mergeInParentEntity(qualifiedParams, key, fields.parentReference)
+			entityFields = fields.fields
+		} else {
+			entityFields = fields
+		}
+
+		const subTree = new Marker(
+			qualifiedParams,
+			wrapRelativeEntityFieldMarkers(
+				qualifiedParams.hasOneRelationPath,
+				environment,
+				MarkerMerger.mergeInSystemFields(entityFields),
+			),
+			environment,
+		)
+		return new EntityFieldsWithHoistablesMarker(
+			createEntityFieldMarkersContainer(undefined),
+			new Map([[subTree.placeholderName, subTree]]),
+			undefined,
+		)
+	}
+
 	export const createEntitySubTreeMarker = (
+		entity: SugaredQualifiedSingleEntity,
+		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
-		singleEntity: SugaredQualifiedSingleEntity,
-		fields: EntityFieldMarkersContainer,
-	) => {
-		const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(singleEntity, environment)
+	): EntityFieldsWithHoistablesMarker => {
+		const desugared = QueryLanguage.desugarQualifiedSingleEntity(entity, environment)
+		const qualifiedSingleEntity: QualifiedSingleEntity = {
+			...desugared,
+			setOnCreate: TreeParameterMerger.mergeSetOnCreate(desugared.setOnCreate || {}, desugared.where),
+		}
 
-		return new EntitySubTreeMarker(
-			{
-				...qualifiedSingleEntity,
-				setOnCreate: TreeParameterMerger.mergeSetOnCreate(
-					qualifiedSingleEntity.setOnCreate || {},
-					qualifiedSingleEntity.where,
-				),
-			},
-			wrapRelativeEntityFieldMarkers(
-				qualifiedSingleEntity.hasOneRelationPath,
-				environment,
-				MarkerMerger.mergeInSystemFields(fields),
-			),
-			environment,
-		)
-	}
-
-	export const createEntityListSubTreeMarker = (
-		environment: Environment,
-		entityList: SugaredQualifiedEntityList,
-		fields: EntityFieldMarkersContainer,
-	) => {
-		const qualifiedEntityList = QueryLanguage.desugarQualifiedEntityList(entityList, environment)
-
-		return new EntityListSubTreeMarker(
-			qualifiedEntityList,
-			wrapRelativeEntityFieldMarkers(
-				qualifiedEntityList.hasOneRelationPath,
-				environment,
-				MarkerMerger.mergeInSystemFields(fields),
-			),
-			environment,
-		)
-	}
-
-	export const createUnconstrainedEntityListSubTreeMarker = (
-		environment: Environment,
-		entityList: SugaredUnconstrainedQualifiedEntityList,
-		fields: EntityFieldMarkersContainer,
-	) => {
-		const qualifiedEntityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment)
-
-		return new EntityListSubTreeMarker(
-			qualifiedEntityList,
-			wrapRelativeEntityFieldMarkers(
-				qualifiedEntityList.hasOneRelationPath,
-				environment,
-				MarkerMerger.mergeInSystemFields(fields),
-			),
-			environment,
-		)
+		return createSubTreeMarker(qualifiedSingleEntity, 'eventListeners', EntitySubTreeMarker, fields, environment)
 	}
 
 	export const createUnconstrainedEntitySubTreeMarker = (
+		entity: SugaredUnconstrainedQualifiedSingleEntity,
+		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
-		entityList: SugaredUnconstrainedQualifiedSingleEntity,
-		fields: EntityFieldMarkersContainer,
-	) => {
-		const qualifiedSingleEntity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entityList, environment)
-
-		return new EntitySubTreeMarker(
-			qualifiedSingleEntity,
-			wrapRelativeEntityFieldMarkers(
-				qualifiedSingleEntity.hasOneRelationPath,
-				environment,
-				MarkerMerger.mergeInSystemFields(fields),
-			),
+	): EntityFieldsWithHoistablesMarker =>
+		createSubTreeMarker(
+			QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(entity, environment),
+			'eventListeners',
+			EntitySubTreeMarker,
+			fields,
 			environment,
+		)
+
+	export const createEntityListSubTreeMarker = (
+		entityList: SugaredQualifiedEntityList,
+		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
+		environment: Environment,
+	): EntityFieldsWithHoistablesMarker =>
+		createSubTreeMarker(
+			QueryLanguage.desugarQualifiedEntityList(entityList, environment),
+			'childEventListeners',
+			EntityListSubTreeMarker,
+			fields,
+			environment,
+		)
+
+	export const createUnconstrainedEntityListSubTreeMarker = (
+		entityList: SugaredUnconstrainedQualifiedEntityList,
+		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
+		environment: Environment,
+	): EntityFieldsWithHoistablesMarker =>
+		createSubTreeMarker(
+			QueryLanguage.desugarUnconstrainedQualifiedEntityList(entityList, environment),
+			'childEventListeners',
+			EntityListSubTreeMarker,
+			fields,
+			environment,
+		)
+
+	export const createParentEntityMarker = (
+		parentEntity: SugaredParentEntityParameters,
+		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
+		environment: Environment,
+	): EntityFieldsWithHoistablesMarker => {
+		const desugared = QueryLanguage.desugarParentEntityParameters(parentEntity, environment)
+		if (fields instanceof EntityFieldMarkersContainer) {
+			return new EntityFieldsWithHoistablesMarker(fields, undefined, desugared)
+		}
+		return new EntityFieldsWithHoistablesMarker(
+			fields.fields,
+			fields.subTrees,
+			TreeParameterMerger.mergeParentEntityParameters(fields.parentReference, desugared),
 		)
 	}
 
 	export const createRelativeSingleEntityFields = (
 		field: SugaredRelativeSingleEntity,
 		environment: Environment,
-		fields: EntityFieldMarkersContainer,
+		fields: EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer,
 	) => {
 		const relativeSingleEntity = QueryLanguage.desugarRelativeSingleEntity(field, environment)
-		return wrapRelativeEntityFieldMarkers(relativeSingleEntity.hasOneRelationPath, environment, fields)
+
+		if (fields instanceof EntityFieldMarkersContainer) {
+			return wrapRelativeEntityFieldMarkers(relativeSingleEntity.hasOneRelationPath, environment, fields)
+		}
+		relativeSingleEntity.hasOneRelationPath[
+			relativeSingleEntity.hasOneRelationPath.length - 1
+		] = TreeParameterMerger.mergeInParentEntity(
+			relativeSingleEntity.hasOneRelationPath[relativeSingleEntity.hasOneRelationPath.length - 1],
+			'eventListeners',
+			fields.parentReference,
+		)
+		return new EntityFieldsWithHoistablesMarker(
+			wrapRelativeEntityFieldMarkers(relativeSingleEntity.hasOneRelationPath, environment, fields.fields),
+			fields.subTrees,
+			undefined,
+		)
 	}
 
 	export const createRelativeEntityListFields = (
 		field: SugaredRelativeEntityList,
 		environment: Environment,
-		fields: EntityFieldMarkersContainer,
+		fields: EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer,
 	) => {
 		const relativeEntityList = QueryLanguage.desugarRelativeEntityList(field, environment)
-		const hasManyRelationMarker = createHasManyRelationMarker(relativeEntityList.hasManyRelation, environment, fields)
-		return wrapRelativeEntityFieldMarkers(
-			relativeEntityList.hasOneRelationPath,
+
+		if (fields instanceof EntityFieldMarkersContainer) {
+			const hasManyRelationMarker = createHasManyRelationMarker(relativeEntityList.hasManyRelation, environment, fields)
+			return wrapRelativeEntityFieldMarkers(
+				relativeEntityList.hasOneRelationPath,
+				environment,
+				createEntityFieldMarkersContainer(hasManyRelationMarker),
+			)
+		}
+
+		relativeEntityList.hasManyRelation = TreeParameterMerger.mergeInParentEntity(
+			relativeEntityList.hasManyRelation,
+			'childEventListeners',
+			fields.parentReference,
+		)
+
+		const hasManyRelationMarker = createHasManyRelationMarker(
+			relativeEntityList.hasManyRelation,
 			environment,
-			createEntityFieldMarkersContainer(hasManyRelationMarker),
+			fields.fields,
+		)
+		return new EntityFieldsWithHoistablesMarker(
+			wrapRelativeEntityFieldMarkers(
+				relativeEntityList.hasOneRelationPath,
+				environment,
+				createEntityFieldMarkersContainer(hasManyRelationMarker),
+			),
+			fields.subTrees,
+			undefined,
 		)
 	}
 
@@ -136,7 +210,7 @@ export namespace MarkerFactory {
 	const wrapRelativeSingleField = (
 		field: SugaredRelativeSingleField,
 		environment: Environment,
-		getMarker: (relativeSingleField: RelativeSingleField) => Marker,
+		getMarker: (relativeSingleField: RelativeSingleField) => EntityFieldMarker,
 	) => {
 		const relativeSingleField = QueryLanguage.desugarRelativeSingleField(field, environment)
 
@@ -159,33 +233,33 @@ export namespace MarkerFactory {
 		return fields
 	}
 
-	export const createEntityFieldMarkersContainer = (marker: Marker) => {
+	export const createEntityFieldMarkersContainer = (
+		marker: EntityFieldMarker | undefined,
+	): EntityFieldMarkersContainer => {
 		if (marker instanceof FieldMarker) {
 			return new EntityFieldMarkersContainer(
 				!marker.isNonbearing,
 				new Map([[marker.placeholderName, marker]]),
 				new Map([[marker.fieldName, marker.placeholderName]]),
 			)
-		} else if (marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
-			return new EntityFieldMarkersContainer(
-				false,
-				new Map([[marker.placeholderName, marker]]),
-				new Map(), // The subTree has no field associated with it.
-			)
-		} else {
+		} else if (marker instanceof HasOneRelationMarker || marker instanceof HasManyRelationMarker) {
 			return new EntityFieldMarkersContainer(
 				!marker.parameters.isNonbearing,
 				new Map([[marker.placeholderName, marker]]),
 				new Map([[marker.parameters.field, marker.placeholderName]]),
 			)
+		} else if (marker === undefined) {
+			return new EntityFieldMarkersContainer(false, new Map(), new Map())
+		} else {
+			return assertNever(marker)
 		}
 	}
 
-	export const createHasOneRelationMarker = (
+	const createHasOneRelationMarker = (
 		hasOneRelation: HasOneRelation,
 		environment: Environment,
 		fields: EntityFieldMarkersContainer,
-	) =>
+	): HasOneRelationMarker =>
 		new HasOneRelationMarker(
 			{
 				...hasOneRelation,
@@ -197,7 +271,7 @@ export namespace MarkerFactory {
 			environment,
 		)
 
-	export const createHasManyRelationMarker = (
+	const createHasManyRelationMarker = (
 		hasManyRelation: HasManyRelation,
 		environment: Environment,
 		fields: EntityFieldMarkersContainer,

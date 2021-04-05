@@ -14,4 +14,8 @@ export class HasOneRelationMarker {
 	) {
 		this.placeholderName = PlaceholderGenerator.getHasOneRelationPlaceholder(this.parameters)
 	}
+
+	public get isNonbearing() {
+		return this.parameters.isNonbearing
+	}
 }

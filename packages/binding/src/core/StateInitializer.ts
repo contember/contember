@@ -202,8 +202,6 @@ export class StateInitializer {
 
 			if (field instanceof FieldMarker) {
 				this.initializeFromFieldMarker(entityRealm, field, fieldDatum)
-			} else if (field instanceof EntityListSubTreeMarker || field instanceof EntitySubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and aren't handled from here.
 			} else if (field instanceof HasManyRelationMarker) {
 				// if (pathBack?.fieldBackToParent === field.parameters.field) {
 				// 	// TODO this is probably wrong?
@@ -326,11 +324,11 @@ export class StateInitializer {
 		const entityListState: EntityListState = {
 			type: StateType.EntityList,
 			blueprint,
-			addEventListener: undefined as any, // This is assigned properly immediately after
 			children: new BijectiveIndexedMap(realm => realm.entity.id.value),
 			childrenWithPendingUpdates: undefined,
 			entityName,
 			eventListeners: this.initializeEntityListEventListenerStore(blueprint),
+			childEventListeners: this.initializeEntityListChildEventListenerStore(blueprint),
 			errors: undefined,
 			plannedRemovals: undefined,
 			hasStaleAccessor: true,
@@ -360,6 +358,9 @@ export class StateInitializer {
 			})(),
 			addError: error =>
 				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
+			addEventListener: (...args: [any, ...any[]]) => {
+				return this.listOperations.addEventListener(entityListState, ...args)
+			},
 			batchUpdates: performUpdates => {
 				this.listOperations.batchUpdates(entityListState, performUpdates)
 			},
@@ -376,7 +377,6 @@ export class StateInitializer {
 				return this.listOperations.getChildEntityById(entityListState, id)
 			},
 		}
-		entityListState.addEventListener = this.getAddEventListener(entityListState)
 
 		const initialData: Set<string | undefined> =
 			initialEntityIds.size === 0
@@ -576,7 +576,7 @@ export class StateInitializer {
 
 		realm.getAccessor().batchUpdates(initialize)
 
-		const initializeListeners = entityRealm.eventListeners?.get('initialize')
+		const initializeListeners = this.eventManager.getEventListeners(entityRealm, 'initialize')
 		if (initializeListeners === undefined || initializeListeners.size === 0) {
 			realm.entity.hasIdSetInStone = true
 		}
@@ -609,6 +609,17 @@ export class StateInitializer {
 			return undefined
 		}
 		return TreeParameterMerger.cloneEntityListEventListeners(blueprintListeners)
+	}
+
+	private initializeEntityListChildEventListenerStore(
+		blueprint: EntityListBlueprint,
+	): EntityEventListenerStore | undefined {
+		const blueprintListeners = blueprint.marker.parameters.childEventListeners
+
+		if (blueprintListeners === undefined) {
+			return undefined
+		}
+		return TreeParameterMerger.cloneSingleEntityEventListeners(blueprintListeners)
 	}
 
 	private initializeFieldEventListenerStore(marker: FieldMarker): FieldEventListenerStore | undefined {

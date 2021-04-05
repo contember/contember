@@ -10,16 +10,17 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-	Marker,
 	MarkerTreeRoot,
+	MeaningfulMarker,
+	SubTreeMarkers,
 } from '../markers'
-import { Alias, FieldName, PlaceholderName } from '../treeParameters'
+import { Alias, FieldName, ParentEntityParameters, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { TreeParameterMerger } from './TreeParameterMerger'
 
 export class MarkerMerger {
 	// This method assumes their placeholder names are the same
-	public static mergeMarkers(original: Marker, fresh: Marker): Marker {
+	public static mergeMarkers(original: MeaningfulMarker, fresh: MeaningfulMarker): MeaningfulMarker {
 		if (original === fresh) {
 			return original
 		}
@@ -78,15 +79,40 @@ export class MarkerMerger {
 		if (original === fresh) {
 			return original
 		}
-		const newSubTrees = this.mergeEntityFields(original.subTrees, fresh.subTrees) as Map<
-			PlaceholderName,
-			EntitySubTreeMarker | EntityListSubTreeMarker
-		>
-
 		return new MarkerTreeRoot(
-			newSubTrees,
+			this.mergeEntityFields(original.subTrees, fresh.subTrees),
 			this.mergeSubTreePlaceholdersByAliases(original.placeholdersByAliases, fresh.placeholdersByAliases),
 		)
+	}
+
+	public static mergeSubTreeMarkers(
+		original: SubTreeMarkers | undefined,
+		fresh: SubTreeMarkers | undefined,
+	): SubTreeMarkers | undefined {
+		if (original === fresh) {
+			return original
+		}
+		if (original === undefined) {
+			return fresh
+		}
+		if (fresh === undefined) {
+			return original
+		}
+		const newOriginal = new Map(original)
+
+		for (const [placeholderName, fromFresh] of fresh) {
+			const fromOriginal = newOriginal.get(placeholderName)
+
+			newOriginal.set(
+				placeholderName,
+				fromOriginal === undefined
+					? fromFresh
+					: fromOriginal instanceof EntityListSubTreeMarker
+					? MarkerMerger.mergeEntityListSubTreeMarkers(fromOriginal, fromFresh as EntityListSubTreeMarker)
+					: MarkerMerger.mergeEntitySubTreeMarkers(fromOriginal, fromFresh as EntitySubTreeMarker),
+			)
+		}
+		return newOriginal
 	}
 
 	public static mergeSubTreePlaceholdersByAliases(
@@ -107,11 +133,16 @@ export class MarkerMerger {
 		return newOriginalAliases
 	}
 
-	public static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers {
+	public static mergeEntityFields(original: SubTreeMarkers, fresh: SubTreeMarkers): SubTreeMarkers
+	public static mergeEntityFields(original: EntityFieldMarkers, fresh: EntityFieldMarkers): EntityFieldMarkers
+	public static mergeEntityFields(
+		original: Map<PlaceholderName, MeaningfulMarker>,
+		fresh: Map<PlaceholderName, MeaningfulMarker>,
+	): Map<PlaceholderName, MeaningfulMarker> {
 		if (original === fresh) {
 			return original
 		}
-		const newOriginal: EntityFieldMarkers = new Map(original)
+		const newOriginal: Map<PlaceholderName, MeaningfulMarker> = new Map(original)
 		for (const [placeholderName, freshMarker] of fresh) {
 			const markerFromOriginal = newOriginal.get(placeholderName)
 			newOriginal.set(
@@ -242,7 +273,7 @@ export class MarkerMerger {
 		return original
 	}
 
-	public static mergeInSystemFields(original: EntityFieldMarkersContainer): EntityFieldMarkersContainer {
+	public static mergeInSystemFields(original: EntityFieldMarkersContainer | undefined): EntityFieldMarkersContainer {
 		const primaryKey = new FieldMarker(PRIMARY_KEY_NAME, undefined, true)
 		// We could potentially share this instance for all fields. Maybe sometime later.
 		const freshFields = new EntityFieldMarkersContainer(
@@ -250,7 +281,7 @@ export class MarkerMerger {
 			new Map([[primaryKey.placeholderName, primaryKey]]),
 			new Map([[PRIMARY_KEY_NAME, primaryKey.placeholderName]]),
 		)
-		return this.mergeEntityFieldsContainers(original, freshFields)
+		return original ? this.mergeEntityFieldsContainers(original, freshFields) : freshFields
 	}
 
 	public static mergeEnvironments(original: Environment, fresh: Environment): Environment {

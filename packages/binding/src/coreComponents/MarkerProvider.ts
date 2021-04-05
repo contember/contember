@@ -2,8 +2,7 @@ import { ReactElement } from 'react'
 import { Environment } from '../dao'
 import {
 	EntityFieldMarkersContainer,
-	EntityListSubTreeMarker,
-	EntitySubTreeMarker,
+	EntityFieldsWithHoistablesMarker,
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
@@ -17,29 +16,19 @@ export interface EnvironmentDeltaProvider<Props extends {} = any> {
  * Components may also return EntityFields which serve as something of a Fragment on the Marker level.
  */
 
-export interface FieldMarkerProvider<Props extends {} = any> {
-	// It may also return a HasOneRelationMarker so as to facilitate implementation of conditionally nested fields
-	generateFieldMarker: (
+export interface LeafMarkerProvider<Props extends {} = any> {
+	generateLeafMarker: (
 		props: Props,
 		environment: Environment,
 	) => FieldMarker | HasOneRelationMarker | EntityFieldMarkersContainer
 }
 
-export interface SubTreeMarkerProvider<Props extends {} = any> {
-	generateSubTreeMarker: (
+export interface BranchMarkerProvider<Props extends {} = any> {
+	generateBranchMarker: (
 		props: Props,
-		fields: EntityFieldMarkersContainer,
+		fields: EntityFieldsWithHoistablesMarker | EntityFieldMarkersContainer,
 		environment: Environment,
-	) => EntitySubTreeMarker | EntityListSubTreeMarker | EntityFieldMarkersContainer
-}
-
-export interface RelationMarkerProvider<Props extends {} = any> {
-	// It may also return a HasOneRelationMarker so as to facilitate implementation of conditionally nested connections
-	generateRelationMarker: (
-		props: Props,
-		fields: EntityFieldMarkersContainer,
-		environment: Environment,
-	) => HasOneRelationMarker | HasManyRelationMarker | EntityFieldMarkersContainer
+	) => HasOneRelationMarker | HasManyRelationMarker | EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker
 }
 
 // See https://github.com/microsoft/TypeScript/issues/23182#issuecomment-379091887 about the never trick
@@ -61,9 +50,8 @@ export type CompleteMarkerProvider<
 	Props extends {} = any,
 	NonStaticPropNames extends keyof Props = never
 > = EnvironmentDeltaProvider<Props> &
-	FieldMarkerProvider<Props> &
-	SubTreeMarkerProvider<Props> &
-	RelationMarkerProvider<Props> &
+	LeafMarkerProvider<Props> &
+	BranchMarkerProvider<Props> &
 	StaticRenderProvider<Props, NonStaticPropNames>
 
 export type MarkerProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = Partial<

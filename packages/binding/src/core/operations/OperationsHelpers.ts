@@ -127,7 +127,11 @@ export class OperationsHelpers {
 			const listeners = realm.eventListeners
 			if (listeners) {
 				listeners.delete('update')
-				listeners.delete('connectionUpdate')
+				for (const eventType of listeners.keys()) {
+					if (eventType.startsWith('connectionUpdate')) {
+						listeners.delete(eventType)
+					}
+				}
 			}
 		}
 

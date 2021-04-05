@@ -1,5 +1,4 @@
 import { GraphQlBuilder } from '@contember/client'
-import { EntityAccessor } from '../accessors'
 import { BindingError } from '../BindingError'
 import {
 	Alias,
@@ -8,7 +7,6 @@ import {
 	EntityListEventListenerStore,
 	ExpectedQualifiedEntityMutation,
 	ExpectedRelationMutation,
-	FieldName,
 	HasManyRelation,
 	HasOneRelation,
 	ParentEntityParameters,
@@ -19,7 +17,6 @@ import {
 	UnconstrainedQualifiedSingleEntity,
 	UniqueWhere,
 } from '../treeParameters'
-import { assertNever } from '../utils'
 
 export class TreeParameterMerger {
 	public static mergeHasOneRelationsWithSamePlaceholders(
@@ -238,28 +235,6 @@ export class TreeParameterMerger {
 		return originalCopy
 	}
 
-	private static mergeFieldScopedListeners<T extends Function>(
-		original: Map<FieldName, Set<T>> | undefined,
-		fresh: Map<FieldName, Set<T>> | undefined,
-	) {
-		if (original === undefined) {
-			return fresh
-		}
-		if (fresh === undefined) {
-			return original
-		}
-		const combinedMap = new Map(original)
-		for (const [fieldName, listeners] of fresh) {
-			const existing = combinedMap.get(fieldName)
-			if (existing === undefined) {
-				combinedMap.set(fieldName, listeners)
-			} else {
-				combinedMap.set(fieldName, this.mergeSets(existing, listeners))
-			}
-		}
-		return combinedMap
-	}
-
 	private static mergeEventListeners<F extends Function>(
 		original: Set<F> | undefined,
 		fresh: Set<F> | undefined,
@@ -337,18 +312,7 @@ export class TreeParameterMerger {
 			const fromOriginal = original.get(eventName)
 
 			if (fromOriginal === undefined) {
-				merged.set(
-					eventName,
-					(fromFresh instanceof Set ? new Set(fromFresh as Set<unknown>) : this.cloneMapOfSets(fromFresh)) as any,
-				)
-			} else if (eventName === 'connectionUpdate') {
-				const newListeners = this.mergeFieldScopedListeners<EntityAccessor.EntityEventListenerMap['connectionUpdate']>(
-					fromOriginal as any,
-					fromFresh as any,
-				)
-				if (newListeners) {
-					merged.set(eventName, newListeners)
-				}
+				merged.set(eventName, new Set(fromFresh))
 			} else {
 				const newListeners = this.mergeEventListeners(fromOriginal as Set<any>, fromFresh as Set<any>)
 				if (newListeners) {
@@ -392,19 +356,7 @@ export class TreeParameterMerger {
 	}
 
 	public static cloneSingleEntityEventListeners(store: EntityEventListenerStore): EntityEventListenerStore {
-		const cloned: EntityEventListenerStore = new Map()
-
-		for (const [eventName, listeners] of store) {
-			if (listeners instanceof Set) {
-				cloned.set(eventName, new Set(listeners as any))
-			} else if (listeners instanceof Map) {
-				cloned.set(eventName, this.cloneMapOfSets(listeners) as any)
-			} else {
-				assertNever(listeners)
-			}
-		}
-
-		return cloned
+		return new Map(store) as EntityEventListenerStore
 	}
 
 	public static cloneEntityListEventListeners(store: EntityListEventListenerStore): EntityListEventListenerStore {
@@ -415,10 +367,6 @@ export class TreeParameterMerger {
 		}
 
 		return cloned
-	}
-
-	private static cloneMapOfSets<K, T>(map: Map<K, Set<T>>): Map<K, Set<T>> {
-		return new Map(Array.from(map, ([key, set]) => [key, new Set(set)]))
 	}
 
 	private static mergeExpectedRelationMutation(

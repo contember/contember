@@ -575,7 +575,7 @@ export class StateInitializer {
 
 		realm.getAccessor().batchUpdates(initialize)
 
-		const initializeListeners = entityRealm.eventListeners?.get('initialize')
+		const initializeListeners = this.eventManager.getEventListeners(entityRealm, 'initialize')
 		if (initializeListeners === undefined || initializeListeners.size === 0) {
 			realm.entity.hasIdSetInStone = true
 		}

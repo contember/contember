@@ -127,15 +127,10 @@ export namespace QueryLanguage {
 		const store: EntityEventListenerStore = new Map()
 
 		if (unsugarable.onConnectionUpdate) {
-			store.set(
-				'connectionUpdate',
-				new Map(
-					Object.entries(unsugarable.onConnectionUpdate).map(([fieldName, listener]) => [
-						fieldName,
-						desugarEventListener(listener),
-					]),
-				),
-			)
+			for (const fieldName in unsugarable.onConnectionUpdate) {
+				const listener = desugarEventListener(unsugarable.onConnectionUpdate[fieldName])
+				store.set(`connectionUpdate_${fieldName}` as const, listener)
+			}
 		}
 
 		const beforePersist = desugarEventListener(unsugarable.onBeforePersist)

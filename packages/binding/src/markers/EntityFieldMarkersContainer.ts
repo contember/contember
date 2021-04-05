@@ -3,8 +3,6 @@ import { FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { EntityFieldMarkers } from './EntityFieldMarkers'
 import { EntityFieldPlaceholders } from './EntityFieldPlaceholders'
-import { EntityListSubTreeMarker } from './EntityListSubTreeMarker'
-import { EntitySubTreeMarker } from './EntitySubTreeMarker'
 import { FieldMarker } from './FieldMarker'
 import { HasManyRelationMarker } from './HasManyRelationMarker'
 import { HasOneRelationMarker } from './HasOneRelationMarker'
@@ -26,7 +24,7 @@ export class EntityFieldMarkersContainer {
 		if (marker instanceof HasOneRelationMarker || marker instanceof HasManyRelationMarker) {
 			return marker.parameters.field
 		}
-		if (marker === undefined || marker instanceof EntitySubTreeMarker || marker instanceof EntityListSubTreeMarker) {
+		if (marker === undefined) {
 			throw new BindingError()
 		}
 		return assertNever(marker)

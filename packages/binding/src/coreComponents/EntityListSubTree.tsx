@@ -58,11 +58,11 @@ export const EntityListSubTree = Component(
 		return <EntityList {...props} accessor={accessor} />
 	},
 	{
-		generateSubTreeMarker: (props, fields, environment) => {
+		generateBranchMarker: (props, fields, environment) => {
 			if ('isCreating' in props && props.isCreating) {
-				return MarkerFactory.createUnconstrainedEntityListSubTreeMarker(environment, props, fields)
+				return MarkerFactory.createUnconstrainedEntityListSubTreeMarker(props, fields, environment)
 			}
-			return MarkerFactory.createEntityListSubTreeMarker(environment, props, fields)
+			return MarkerFactory.createEntityListSubTreeMarker(props, fields, environment)
 		},
 		staticRender: props => (
 			<EntityList {...props} accessor={0 as any}>

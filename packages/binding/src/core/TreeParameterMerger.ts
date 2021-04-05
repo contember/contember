@@ -11,6 +11,7 @@ import {
 	FieldName,
 	HasManyRelation,
 	HasOneRelation,
+	ParentEntityParameters,
 	QualifiedEntityList,
 	QualifiedSingleEntity,
 	SetOnCreate,
@@ -64,6 +65,10 @@ export class TreeParameterMerger {
 			// forceCreation: original.forceCreation || fresh.forceCreation,
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			initialEntityCount: original.initialEntityCount, // Handled above
+			childEventListeners: this.mergeSingleEntityEventListeners(
+				original.childEventListeners,
+				fresh.childEventListeners,
+			),
 			eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
 		}
 	}
@@ -130,6 +135,10 @@ export class TreeParameterMerger {
 				expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
 				isNonbearing: original.isNonbearing && fresh.isNonbearing,
 				hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
+				childEventListeners: this.mergeSingleEntityEventListeners(
+					original.childEventListeners,
+					fresh.childEventListeners,
+				),
 				eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
 				initialEntityCount: original.initialEntityCount, // Handled above
 			}
@@ -150,6 +159,10 @@ export class TreeParameterMerger {
 			expectedMutation: this.mergeExpectedQualifiedEntityMutation(original.expectedMutation, fresh.expectedMutation),
 			isNonbearing: original.isNonbearing && fresh.isNonbearing,
 			hasOneRelationPath: original.hasOneRelationPath, // TODO this is completely wrong.
+			childEventListeners: this.mergeSingleEntityEventListeners(
+				original.childEventListeners,
+				fresh.childEventListeners,
+			),
 			eventListeners: this.mergeEntityListEventListeners(original.eventListeners, fresh.eventListeners),
 			initialEntityCount: original.initialEntityCount, // Handled above
 		}
@@ -266,6 +279,41 @@ export class TreeParameterMerger {
 			combinedSet.add(item)
 		}
 		return combinedSet
+	}
+
+	public static mergeParentEntityParameters(
+		original: ParentEntityParameters | undefined,
+		fresh: ParentEntityParameters | undefined,
+	): ParentEntityParameters | undefined {
+		if (original === fresh) {
+			return original
+		}
+		if (original === undefined) {
+			return fresh
+		}
+		if (fresh === undefined) {
+			return original
+		}
+		return {
+			eventListeners: TreeParameterMerger.mergeSingleEntityEventListeners(
+				original.eventListeners,
+				fresh.eventListeners,
+			),
+		}
+	}
+
+	public static mergeInParentEntity<
+		Original extends Record<Key, EntityEventListenerStore | undefined>,
+		Key extends keyof Original
+	>(original: Original, key: Key, parentEntity: ParentEntityParameters | undefined): Original {
+		if (!parentEntity) {
+			return original
+		}
+
+		return {
+			...original,
+			[key]: TreeParameterMerger.mergeSingleEntityEventListeners(original[key], parentEntity.eventListeners),
+		}
 	}
 
 	public static mergeSingleEntityEventListeners(

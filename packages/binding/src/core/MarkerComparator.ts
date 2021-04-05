@@ -1,12 +1,5 @@
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import {
-	EntityFieldMarkersContainer,
-	EntityListSubTreeMarker,
-	EntitySubTreeMarker,
-	FieldMarker,
-	HasManyRelationMarker,
-	HasOneRelationMarker,
-} from '../markers'
+import { EntityFieldMarkersContainer, FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
 import { assertNever } from '../utils'
 import { LocalizedBindingError } from './exceptions'
 
@@ -20,10 +13,6 @@ export class MarkerComparator {
 
 	private static assertSubsetOf(candidate: EntityFieldMarkersContainer, superset: EntityFieldMarkersContainer) {
 		for (const [placeholderName, candidateMarker] of candidate.markers) {
-			if (candidateMarker instanceof EntitySubTreeMarker || candidateMarker instanceof EntityListSubTreeMarker) {
-				continue // We don't handle sub trees from here.
-			}
-
 			const fromSuperset = superset.markers.get(placeholderName)
 
 			if (fromSuperset === undefined) {

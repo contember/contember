@@ -1,5 +1,5 @@
 import { Environment } from '../dao'
-import { EntityId, EntityRealmKey } from '../treeParameters'
+import { EntityId, EntityRealmKey, FieldName } from '../treeParameters'
 import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 import { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import { EntityAccessor } from './EntityAccessor'
@@ -122,11 +122,14 @@ namespace EntityListAccessor {
 		options: PersistSuccessOptions,
 	) => void | Promise<void | PersistSuccessHandler>
 
-	export interface RuntimeEntityListEventListenerMap {
+	export type ChildEventListenerMap = {
+		[EventType in keyof Pick<EntityAccessor.EntityEventListenerMap, 'beforeUpdate' | 'initialize' | 'update'> &
+			string as `child${Capitalize<EventType>}`]: EntityAccessor.EntityEventListenerMap[EventType]
+	}
+
+	export interface RuntimeEntityListEventListenerMap extends ChildEventListenerMap {
 		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
-		childInitialize: EntityAccessor.BatchUpdatesHandler
-		//childListUpdate: UpdateListener
 		persistError: PersistErrorHandler
 		persistSuccess: PersistSuccessHandler
 		update: UpdateListener
@@ -138,8 +141,13 @@ namespace EntityListAccessor {
 	export interface AddEntityListEventListener {
 		(type: 'beforePersist', listener: EntityListEventListenerMap['beforePersist']): () => void
 		(type: 'beforeUpdate', listener: EntityListEventListenerMap['beforeUpdate']): () => void
-		(type: 'childInitialize', listener: EntityListEventListenerMap['childInitialize']): () => void
+		(type: 'persistSuccess', listener: EntityListEventListenerMap['persistSuccess']): () => void
+		(type: 'persistError', listener: EntityListEventListenerMap['persistError']): () => void
 		(type: 'update', listener: EntityListEventListenerMap['update']): () => void
+
+		(type: 'childBeforeUpdate', listener: EntityAccessor.EntityEventListenerMap['beforeUpdate']): () => void
+		(type: 'childInitialize', listener: EntityAccessor.EntityEventListenerMap['initialize']): () => void
+		(type: 'childUpdate', listener: EntityAccessor.EntityEventListenerMap['update']): () => void
 
 		// It's too late to add this by the time the accessor exists…
 		// (type: 'initialize', listener: EntityListEventListenerMap['initialize']): () => void

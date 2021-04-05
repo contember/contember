@@ -38,7 +38,7 @@ export const HasOne = Component(
 				{props.children}
 			</Entity>
 		),
-		generateRelationMarker: (props, fields, environment) =>
+		generateBranchMarker: (props, fields, environment) =>
 			MarkerFactory.createRelativeSingleEntityFields(props, environment, fields),
 	},
 	'HasOne',

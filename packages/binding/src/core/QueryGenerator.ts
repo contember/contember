@@ -8,6 +8,7 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
+	ParentEntityMarker,
 } from '../markers'
 import { assertNever, ucfirst } from '../utils'
 
@@ -166,8 +167,6 @@ export class QueryGenerator {
 					withLimit,
 					fieldValue.placeholderName === relation.field ? undefined : fieldValue.placeholderName,
 				)
-			} else if (fieldValue instanceof EntityListSubTreeMarker || fieldValue instanceof EntitySubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and shouldn't appear here.
 			} else {
 				assertNever(fieldValue)
 			}

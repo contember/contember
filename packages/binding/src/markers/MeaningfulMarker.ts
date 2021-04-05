@@ -4,9 +4,9 @@ import { FieldMarker } from './FieldMarker'
 import { HasManyRelationMarker } from './HasManyRelationMarker'
 import { HasOneRelationMarker } from './HasOneRelationMarker'
 
-export type Marker =
+export type MeaningfulMarker =
 	| FieldMarker
 	| HasOneRelationMarker
 	| HasManyRelationMarker
-	| EntitySubTreeMarker
 	| EntityListSubTreeMarker
+	| EntitySubTreeMarker

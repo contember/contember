@@ -17,6 +17,7 @@ import {
 	HasManyRelation,
 	HasOneRelation,
 	LeafFieldDefaults,
+	ParentEntityParameters,
 	QualifiedEntityList,
 	QualifiedEntityParametersDefaults,
 	QualifiedFieldList,
@@ -29,6 +30,7 @@ import {
 	SugarableHasManyRelation,
 	SugarableHasOneRelation,
 	SugaredFilter,
+	SugaredParentEntityParameters,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedFieldList,
 	SugaredQualifiedSingleEntity,
@@ -167,11 +169,18 @@ export namespace QueryLanguage {
 
 	const desugarEntityListEventListeners = (
 		unsugarable: UnsugarableEntityListEventListeners,
-	): EntityListEventListenerStore | undefined => {
+	):
+		| {
+				eventListeners: EntityListEventListenerStore | undefined
+				childEventListeners: EntityEventListenerStore | undefined
+		  }
+		| undefined => {
 		if (
 			unsugarable.onBeforePersist === undefined &&
 			unsugarable.onBeforeUpdate === undefined &&
+			unsugarable.onChildBeforeUpdate === undefined &&
 			unsugarable.onChildInitialize === undefined &&
+			unsugarable.onChildUpdate === undefined &&
 			unsugarable.onInitialize === undefined &&
 			unsugarable.onPersistError === undefined &&
 			unsugarable.onPersistSuccess === undefined &&
@@ -180,39 +189,54 @@ export namespace QueryLanguage {
 			return undefined
 		}
 
-		const store: EntityListEventListenerStore = new Map()
+		const eventListeners: EntityListEventListenerStore = new Map()
 
 		const beforePersist = desugarEventListener(unsugarable.onBeforePersist)
 		const beforeUpdate = desugarEventListener(unsugarable.onBeforeUpdate)
-		const childInitialize = desugarEventListener(unsugarable.onChildInitialize)
 		const initialize = desugarEventListener(unsugarable.onInitialize)
 		const persistError = desugarEventListener(unsugarable.onPersistError)
 		const persistSuccess = desugarEventListener(unsugarable.onPersistSuccess)
 		const update = desugarEventListener(unsugarable.onUpdate)
 
 		if (beforePersist) {
-			store.set('beforePersist', beforePersist)
+			eventListeners.set('beforePersist', beforePersist)
 		}
 		if (beforeUpdate) {
-			store.set('beforeUpdate', beforeUpdate)
-		}
-		if (childInitialize) {
-			store.set('childInitialize', childInitialize)
+			eventListeners.set('beforeUpdate', beforeUpdate)
 		}
 		if (initialize) {
-			store.set('initialize', initialize)
+			eventListeners.set('initialize', initialize)
 		}
 		if (persistError) {
-			store.set('persistError', persistError)
+			eventListeners.set('persistError', persistError)
 		}
 		if (persistSuccess) {
-			store.set('persistSuccess', persistSuccess)
+			eventListeners.set('persistSuccess', persistSuccess)
 		}
 		if (update) {
-			store.set('update', update)
+			eventListeners.set('update', update)
 		}
 
-		return store
+		const childEventListeners: EntityEventListenerStore = new Map()
+
+		const childBeforeUpdate = desugarEventListener(unsugarable.onChildBeforeUpdate)
+		const childInitialize = desugarEventListener(unsugarable.onChildInitialize)
+		const childUpdate = desugarEventListener(unsugarable.onChildUpdate)
+
+		if (childBeforeUpdate) {
+			childEventListeners.set('beforeUpdate', childBeforeUpdate)
+		}
+		if (childInitialize) {
+			childEventListeners.set('initialize', childInitialize)
+		}
+		if (childUpdate) {
+			childEventListeners.set('update', childUpdate)
+		}
+
+		return {
+			eventListeners,
+			childEventListeners,
+		}
 	}
 
 	const desugarFieldEventListeners = (
@@ -276,19 +300,23 @@ export namespace QueryLanguage {
 		relation: DesugaredHasManyRelation,
 		unsugarable: UnsugarableHasManyRelation,
 		environment: Environment,
-	): HasManyRelation => ({
-		field: relation.field,
-		filter: relation.filter,
-		expectedMutation: unsugarable.expectedMutation ?? RelationDefaults.expectedMutation,
-		isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
-		// forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
-		initialEntityCount: unsugarable.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
-		setOnCreate: unsugarable.setOnCreate ? desugarSetOnCreate(unsugarable.setOnCreate, environment) : undefined,
-		orderBy: unsugarable.orderBy ? desugarOrderBy(unsugarable.orderBy, environment) : undefined,
-		offset: unsugarable.offset,
-		limit: unsugarable.limit,
-		eventListeners: desugarEntityListEventListeners(unsugarable),
-	})
+	): HasManyRelation => {
+		const eventListeners = desugarEntityListEventListeners(unsugarable)
+		return {
+			field: relation.field,
+			filter: relation.filter,
+			expectedMutation: unsugarable.expectedMutation ?? RelationDefaults.expectedMutation,
+			isNonbearing: unsugarable.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+			// forceCreation: unsugarable.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
+			initialEntityCount: unsugarable.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
+			setOnCreate: unsugarable.setOnCreate ? desugarSetOnCreate(unsugarable.setOnCreate, environment) : undefined,
+			orderBy: unsugarable.orderBy ? desugarOrderBy(unsugarable.orderBy, environment) : undefined,
+			offset: unsugarable.offset,
+			limit: unsugarable.limit,
+			childEventListeners: eventListeners?.childEventListeners,
+			eventListeners: eventListeners?.eventListeners,
+		}
+	}
 
 	const desugarHasOneRelationPath = (
 		input: SugarableHasOneRelation[] | SugarableHasOneRelation | undefined,
@@ -322,15 +350,21 @@ export namespace QueryLanguage {
 		sugarablePart: SugarableHasManyRelation,
 		unsugarablePart: UnsugarableHasManyRelation,
 		environment: Environment,
-	): HasManyRelation => ({
-		...desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
-		expectedMutation: unsugarablePart.expectedMutation ?? RelationDefaults.expectedMutation,
-		setOnCreate: unsugarablePart.setOnCreate ? desugarSetOnCreate(unsugarablePart.setOnCreate, environment) : undefined,
-		field: sugarablePart.field,
-		isNonbearing: unsugarablePart.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
-		// forceCreation: unsugarablePart.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
-		eventListeners: desugarEntityListEventListeners(unsugarablePart),
-	})
+	): HasManyRelation => {
+		const eventListeners = desugarEntityListEventListeners(unsugarablePart)
+		return {
+			...desugarEntityListParameters(sugarablePart, unsugarablePart, environment),
+			expectedMutation: unsugarablePart.expectedMutation ?? RelationDefaults.expectedMutation,
+			setOnCreate: unsugarablePart.setOnCreate
+				? desugarSetOnCreate(unsugarablePart.setOnCreate, environment)
+				: undefined,
+			field: sugarablePart.field,
+			isNonbearing: unsugarablePart.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
+			// forceCreation: unsugarablePart.forceCreation ?? EntityCreationParametersDefaults.forceCreation,
+			childEventListeners: eventListeners?.childEventListeners,
+			eventListeners: eventListeners?.eventListeners,
+		}
+	}
 
 	export const desugarUniqueWhere = preparePrimitiveEntryPoint(Parser.EntryPoint.UniqueWhere)
 	export const desugarFilter: (
@@ -355,6 +389,8 @@ export namespace QueryLanguage {
 			hasOneRelationPath = desugarHasOneRelationPath(entities.hasOneRelationPath, emptyObject, environment)
 		}
 
+		const eventListeners = desugarEntityListEventListeners(unsugarableEntityList)
+
 		return {
 			isCreating: true,
 			isNonbearing: unsugarableEntityList.isNonbearing ?? EntityCreationParametersDefaults.isNonbearing,
@@ -363,7 +399,8 @@ export namespace QueryLanguage {
 				? desugarSetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
 			expectedMutation: unsugarableEntityList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
-			eventListeners: desugarEntityListEventListeners(unsugarableEntityList),
+			childEventListeners: eventListeners?.childEventListeners,
+			eventListeners: eventListeners?.eventListeners,
 			initialEntityCount: unsugarableEntityList.initialEntityCount ?? EntityListPreferencesDefaults.initialEntityCount,
 			alias: desugarSubTreeAlias(unsugarableEntityList.alias),
 			entityName,
@@ -427,6 +464,8 @@ export namespace QueryLanguage {
 			hasOneRelationPath = desugarHasOneRelationPath(entities.hasOneRelationPath, emptyObject, environment)
 		}
 
+		const eventListeners = desugarEntityListEventListeners(unsugarableEntityList)
+
 		return {
 			entityName,
 			hasOneRelationPath,
@@ -445,7 +484,8 @@ export namespace QueryLanguage {
 				? desugarSetOnCreate(unsugarableEntityList.setOnCreate, environment)
 				: undefined,
 			expectedMutation: unsugarableEntityList.expectedMutation ?? QualifiedEntityParametersDefaults.expectedMutation,
-			eventListeners: desugarEntityListEventListeners(unsugarableEntityList),
+			childEventListeners: eventListeners?.childEventListeners,
+			eventListeners: eventListeners?.eventListeners,
 		}
 	}
 
@@ -553,6 +593,13 @@ export namespace QueryLanguage {
 			expectedMutation,
 		}
 	}
+
+	export const desugarParentEntityParameters = (
+		parentEntity: SugaredParentEntityParameters,
+		environment: Environment,
+	): ParentEntityParameters => ({
+		eventListeners: desugarSingleEntityEventListeners(parentEntity),
+	})
 
 	export const desugarRelativeSingleEntity = (
 		sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity,

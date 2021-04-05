@@ -132,10 +132,17 @@ export class EventManager {
 	}
 
 	public registerNewlyInitialized(newlyInitialized: EntityListState | EntityRealmState | FieldState) {
+		if (newlyInitialized.type === StateType.EntityRealm && newlyInitialized.blueprint.type === 'listEntity') {
+			console.log(newlyInitialized.blueprint.parent.childEventListeners)
+		}
 		if (!newlyInitialized.eventListeners || newlyInitialized.eventListeners.size === 0) {
 			return
 		}
 		this.newlyInitializedWithListeners.add(newlyInitialized)
+
+		if (this.transactionDepth === 0) {
+			this.triggerOnInitialize()
+		}
 	}
 
 	public registerUpdatedConnection(parentState: EntityRealmState, placeholderName: PlaceholderName) {

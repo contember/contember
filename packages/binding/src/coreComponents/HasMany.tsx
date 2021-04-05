@@ -43,7 +43,7 @@ export const HasMany = Component(
 				{props.children}
 			</EntityList>
 		),
-		generateRelationMarker: (props, fields, environment) =>
+		generateBranchMarker: (props, fields, environment) =>
 			MarkerFactory.createRelativeEntityListFields(props, environment, fields),
 	},
 	'HasMany',

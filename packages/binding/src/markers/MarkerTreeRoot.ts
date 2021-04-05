@@ -1,10 +1,9 @@
 import { Alias, PlaceholderName } from '../treeParameters'
-import { EntityListSubTreeMarker } from './EntityListSubTreeMarker'
-import { EntitySubTreeMarker } from './EntitySubTreeMarker'
+import { SubTreeMarkers } from './SubTreeMarkers'
 
 export class MarkerTreeRoot {
 	public constructor(
-		public readonly subTrees: Map<PlaceholderName, EntitySubTreeMarker | EntityListSubTreeMarker>,
+		public readonly subTrees: SubTreeMarkers,
 		public readonly placeholdersByAliases: Map<Alias, PlaceholderName>,
 	) {}
 }

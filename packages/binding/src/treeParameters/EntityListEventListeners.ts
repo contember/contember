@@ -1,4 +1,5 @@
 import { EntityListAccessor } from '../accessors'
+import { EntityEventListenerStore } from './SingleEntityEventListeners'
 
 type Events = EntityListAccessor.EntityListEventListenerMap
 
@@ -9,7 +10,6 @@ export interface EntityListEventListenerStore
 	// Unfortunately, we have to enumerate these because otherwise, TS just can't handle the polymorphism.
 	get(key: 'beforePersist'): Set<Events['beforePersist']> | undefined
 	get(key: 'beforeUpdate'): Set<Events['beforeUpdate']> | undefined
-	get(key: 'childInitialize'): Set<Events['childInitialize']> | undefined
 	get(key: 'persistError'): Set<Events['persistError']> | undefined
 	get(key: 'persistSuccess'): Set<Events['persistSuccess']> | undefined
 	get(key: 'update'): Set<Events['update']> | undefined
@@ -21,10 +21,11 @@ export interface EntityListEventListenerStore
 
 export interface EntityListEventListeners {
 	eventListeners: EntityListEventListenerStore | undefined
+	childEventListeners: EntityEventListenerStore | undefined
 }
 
 export interface SugarableEntityListEventListeners {}
 
 export type UnsugarableEntityListEventListeners = {
-	[EventName in keyof Events & string as `on${Capitalize<EventName>}`]?: Events[EventName] | Set<Events[EventName]>
+	[EventType in keyof Events & string as `on${Capitalize<EventType>}`]?: Events[EventType] | Set<Events[EventType]>
 }

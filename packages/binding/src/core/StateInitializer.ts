@@ -202,8 +202,6 @@ export class StateInitializer {
 
 			if (field instanceof FieldMarker) {
 				this.initializeFromFieldMarker(entityRealm, field, fieldDatum)
-			} else if (field instanceof EntityListSubTreeMarker || field instanceof EntitySubTreeMarker) {
-				// Do nothing: all sub trees have been hoisted and aren't handled from here.
 			} else if (field instanceof HasManyRelationMarker) {
 				// if (pathBack?.fieldBackToParent === field.parameters.field) {
 				// 	// TODO this is probably wrong?
@@ -331,6 +329,7 @@ export class StateInitializer {
 			childrenWithPendingUpdates: undefined,
 			entityName,
 			eventListeners: this.initializeEntityListEventListenerStore(blueprint),
+			childEventListeners: this.initializeEntityListChildEventListenerStore(blueprint),
 			errors: undefined,
 			plannedRemovals: undefined,
 			hasStaleAccessor: true,
@@ -609,6 +608,17 @@ export class StateInitializer {
 			return undefined
 		}
 		return TreeParameterMerger.cloneEntityListEventListeners(blueprintListeners)
+	}
+
+	private initializeEntityListChildEventListenerStore(
+		blueprint: EntityListBlueprint,
+	): EntityEventListenerStore | undefined {
+		const blueprintListeners = blueprint.marker.parameters.childEventListeners
+
+		if (blueprintListeners === undefined) {
+			return undefined
+		}
+		return TreeParameterMerger.cloneSingleEntityEventListeners(blueprintListeners)
 	}
 
 	private initializeFieldEventListenerStore(marker: FieldMarker): FieldEventListenerStore | undefined {

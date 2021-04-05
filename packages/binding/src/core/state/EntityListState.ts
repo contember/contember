@@ -1,6 +1,12 @@
 import { EntityListAccessor, ErrorAccessor } from '../../accessors'
 import { EntityListSubTreeMarker, HasManyRelationMarker } from '../../markers'
-import { EntityId, EntityListEventListenerStore, EntityName, RemovalType } from '../../treeParameters'
+import {
+	EntityEventListenerStore,
+	EntityId,
+	EntityListEventListenerStore,
+	EntityName,
+	RemovalType,
+} from '../../treeParameters'
 import { BijectiveIndexedMap } from '../structures'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import { StateType } from './StateType'
@@ -24,6 +30,7 @@ export interface EntityListState {
 	entityName: EntityName
 	errors: ErrorAccessor | undefined
 	eventListeners: EntityListEventListenerStore | undefined
+	childEventListeners: EntityEventListenerStore | undefined
 	getAccessor: () => EntityListAccessor
 	hasStaleAccessor: boolean
 	plannedRemovals: Map<EntityId, RemovalType> | undefined

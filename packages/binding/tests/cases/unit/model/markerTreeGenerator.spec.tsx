@@ -1,7 +1,8 @@
 import {
-	EntityEventListenerStore,
 	EntityFieldMarker,
 	EntityFieldMarkersContainer,
+	EntityListSubTree,
+	EntityListSubTreeMarker,
 	EntitySubTree,
 	EntitySubTreeMarker,
 	Environment,
@@ -16,6 +17,7 @@ import {
 	ParentEntity,
 	PlaceholderName,
 	PRIMARY_KEY_NAME,
+	SubTreeMarkers,
 } from '../../../../src'
 
 describe('Marker tree generator', () => {
@@ -34,6 +36,7 @@ describe('Marker tree generator', () => {
 		const onInit6 = () => {}
 		const onInit7 = () => {}
 		const onInit8 = () => {}
+		const onInit9 = () => {}
 
 		const generator = new MarkerTreeGenerator(
 			(
@@ -66,6 +69,11 @@ describe('Marker tree generator', () => {
 											<Field field="surname" />
 											<Field field="same" />
 											<ParentEntity onInitialize={onInit6} />
+											<EntityListSubTree entities="Bar">
+												<ParentEntity onInitialize={onInit9}>
+													<Field field="whatever" />
+												</ParentEntity>
+											</EntityListSubTree>
 										</HasMany>
 										<Field field="hasOneField" />
 									</ParentEntity>
@@ -202,9 +210,39 @@ describe('Marker tree generator', () => {
 			),
 			environment,
 		)
-		expect(generator.generate()).toEqual(
-			new MarkerTreeRoot(new Map([[subTreeMarker.placeholderName, subTreeMarker]]), new Map()),
+		const listSubTreeMarker = new EntityListSubTreeMarker(
+			{
+				entityName: 'Bar',
+				filter: undefined,
+				hasOneRelationPath: [],
+				isCreating: false,
+				isNonbearing: false,
+				setOnCreate: undefined,
+				// forceCreation: false,
+				childEventListeners: new Map([['initialize', new Set([onInit9])]]) as any,
+				eventListeners: undefined,
+				expectedMutation: 'anyMutation',
+				alias: undefined,
+				initialEntityCount: 0,
+				limit: undefined,
+				offset: undefined,
+				orderBy: undefined,
+			},
+			new EntityFieldMarkersContainer(
+				true,
+				new Map<PlaceholderName, EntityFieldMarker>([idMarker, ['whatever', new FieldMarker('whatever')]]),
+				new Map([
+					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
+					['whatever', 'whatever'],
+				]),
+			),
+			environment,
 		)
+		const subTreeMarkers: SubTreeMarkers = new Map()
+		subTreeMarkers.set(subTreeMarker.placeholderName, subTreeMarker)
+		subTreeMarkers.set(listSubTreeMarker.placeholderName, listSubTreeMarker)
+
+		expect(generator.generate()).toEqual(new MarkerTreeRoot(subTreeMarkers, new Map()))
 	})
 
 	it('should reject top-level fields and relations', () => {

@@ -14,7 +14,7 @@ import {
 	MeaningfulMarker,
 	SubTreeMarkers,
 } from '../markers'
-import { Alias, FieldName, ParentEntityParameters, PlaceholderName } from '../treeParameters'
+import { Alias, FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { TreeParameterMerger } from './TreeParameterMerger'
 

@@ -13,7 +13,10 @@ const initialState: AccessorTreeState = {
 	name: AccessorTreeStateName.Initializing,
 }
 
-export const useDataBinding = ({ nodeTree }: AccessorTreeStateOptions): AccessorTreeState => {
+export const useDataBinding = ({
+	nodeTree,
+	refreshOnEnvironmentChange = true,
+}: AccessorTreeStateOptions): AccessorTreeState => {
 	const client = useCurrentContentGraphQlClient()
 	const environment = useEnvironment()
 
@@ -55,7 +58,7 @@ export const useDataBinding = ({ nodeTree }: AccessorTreeStateOptions): Accessor
 	}, [nodeTree, dataBinding, state.name])
 
 	useEffect(() => {
-		if (isFirstRenderRef.current) {
+		if (isFirstRenderRef.current || !refreshOnEnvironmentChange) {
 			return
 		}
 		dispatch({
@@ -63,7 +66,7 @@ export const useDataBinding = ({ nodeTree }: AccessorTreeStateOptions): Accessor
 		})
 		// This essentially just reacts to new environments.
 		setDataBinding(new DataBinding(client, environment, onUpdate, onError))
-	}, [client, environment, onError, onUpdate])
+	}, [client, environment, onError, onUpdate, refreshOnEnvironmentChange])
 
 	useEffect(() => {
 		isFirstRenderRef.current = false

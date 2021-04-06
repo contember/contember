@@ -3,6 +3,7 @@ import {
 	Editor,
 	Element as SlateElement,
 	Node as SlateNode,
+	NodeEntry,
 	Path as SlatePath,
 	Range as SlateRange,
 	Text,
@@ -79,22 +80,28 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					return false
 				case unorderedListElementType:
 				case orderedListElementType: {
-					const closestNonDefaultEntry = ContemberEditor.closestBlockEntry(editor, {
-						match: node => !editor.isDefaultElement(node),
+					const closestNonDefaultEntry = ContemberEditor.closest(editor, {
+						match: node => Editor.isBlock(editor, node) && !editor.isDefaultElement(node),
 					})
 					if (!closestNonDefaultEntry) {
 						return false
 					}
 					const [closestNonDefaultElement, closestNonDefaultPath] = closestNonDefaultEntry
-					if (!e.isListItem(closestNonDefaultElement)) {
+
+					let parentList: ElementNode
+
+					if (e.isListItem(closestNonDefaultElement)) {
+						parentList = Editor.node(editor, SlatePath.parent(closestNonDefaultPath))[0] as ElementNode
+					} else if (e.isList(closestNonDefaultElement)) {
+						parentList = closestNonDefaultElement
+					} else {
 						return false
 					}
-					const [listParent] = Editor.node(editor, SlatePath.parent(closestNonDefaultPath))
 
 					if (elementType === unorderedListElementType) {
-						return e.isUnorderedList(listParent, suchThat)
+						return e.isUnorderedList(parentList, suchThat)
 					} else if (elementType === orderedListElementType) {
-						return e.isOrderedList(listParent, suchThat)
+						return e.isOrderedList(parentList, suchThat)
 					} else {
 						return false
 					}

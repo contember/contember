@@ -24,6 +24,7 @@ export type UnderlyingEditor = ReactEditor & HistoryEditor
 
 // We're effectively simply removing the index signature from Slate's original Editor type.
 export type EditorNode = Omit<Pick<UnderlyingEditor, KnownKeys<UnderlyingEditor>>, 'children'> & {
+	type?: never
 	children: Array<TextNode | ElementNode>
 }
 

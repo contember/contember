@@ -1,6 +1,7 @@
 import {
 	addMarks,
 	canToggleMark,
+	closest,
 	closestBlockEntry,
 	closestViableBlockContainerEntry,
 	ejectElement,
@@ -23,6 +24,7 @@ import {
 export const ContemberEditor = {
 	addMarks,
 	canToggleMark,
+	closest,
 	closestBlockEntry,
 	closestViableBlockContainerEntry,
 	ejectElement,

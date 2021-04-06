@@ -1,19 +1,14 @@
-import { Editor, Location as SlateLocation, NodeEntry, Text } from 'slate'
+import { Location as SlateLocation, NodeEntry } from 'slate'
 import { BaseEditor, EditorNode, ElementNode } from '../../baseEditor'
+import { closest } from './closest'
 
 export const closestViableBlockContainerEntry = <E extends BaseEditor>(
 	editor: E,
-	at?: SlateLocation,
-): NodeEntry<ElementNode | EditorNode> | undefined => {
-	for (const [node, path] of Editor.levels(editor, {
-		at,
-		match: node => !Text.isText(node) && editor.canContainAnyBlocks(node),
-		reverse: true,
-	})) {
-		if (!Text.isText(node)) {
-			return [node, path]
-		}
-	}
-
-	return undefined
-}
+	options?: {
+		at?: SlateLocation
+	},
+): NodeEntry<ElementNode | EditorNode> | undefined =>
+	closest(editor, {
+		at: options?.at,
+		match: node => editor.canContainAnyBlocks(node),
+	})

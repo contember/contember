@@ -1,5 +1,6 @@
 import { Editor, Location } from 'slate'
 import { BaseEditor, ElementNode } from '../../baseEditor'
+import { closest } from './closest'
 
 export const closestBlockEntry = <E extends BaseEditor>(
 	editor: E,
@@ -7,9 +8,8 @@ export const closestBlockEntry = <E extends BaseEditor>(
 		at?: Location
 		match?: (node: ElementNode) => boolean
 	},
-) => {
-	return Editor.above(editor, {
+) =>
+	closest(editor, {
 		at: options?.at,
 		match: node => Editor.isBlock(editor, node) && (options?.match ? options.match(node) : true),
 	})
-}

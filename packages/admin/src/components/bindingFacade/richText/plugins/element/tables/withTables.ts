@@ -488,6 +488,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 						return Transforms.removeNodes(e, { at: path })
 					}
 				}
+				if (!ContemberEditor.hasParentOfType(e, entry, tableElementType)) {
+					return Transforms.unwrapNodes(e, { at: path })
+				}
 			} else if (e.isTableCell(node)) {
 				if (node.children.length === 1) {
 					const onlyChild = node.children[0]
@@ -496,6 +499,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 							at: [...path, 0],
 						})
 					}
+				}
+				if (!ContemberEditor.hasParentOfType(e, entry, tableRowElementType)) {
+					return Transforms.unwrapNodes(e, { at: path })
 				}
 			}
 			normalizeNode(entry)

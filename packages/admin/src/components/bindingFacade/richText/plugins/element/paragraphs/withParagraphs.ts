@@ -8,7 +8,7 @@ import { ParagraphRenderer, ParagraphRendererProps } from './ParagraphRenderer'
 
 export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParagraphs<E> => {
 	const e: E & Partial<WithParagraphs<WithAnotherNodeType<E, ParagraphElement>>> = editor
-	const { canContainAnyBlocks, renderElement, toggleElement, deleteBackward, processBlockPaste } = editor
+	const { canContainAnyBlocks, normalizeNode, renderElement, toggleElement, deleteBackward, processBlockPaste } = editor
 
 	const isParagraph = (
 		element: ElementNode | SlateNode,
@@ -79,6 +79,19 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 			{ isNumbered: null }, // null removes the key altogether
 			{ at: paragraphPath },
 		)
+	}
+
+	e.normalizeNode = entry => {
+		const [node, path] = entry
+
+		if (!SlateElement.isElement(node) || !e.isParagraph!(node)) {
+			return normalizeNode(entry)
+		}
+		for (const [i, child] of node.children.entries()) {
+			if (Editor.isBlock(editor, child)) {
+				return Transforms.unwrapNodes(e, { at: [...path, i] })
+			}
+		}
 	}
 
 	e.processBlockPaste = (element, next, cumulativeTextAttrs) => {

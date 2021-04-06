@@ -55,10 +55,9 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(e
 			return SlatePath.next(targetPoint.path)
 		}
 
-		const [closestBlockElement, closestBlockPath] = ContemberEditor.closestBlockEntry(
-			editor,
-			targetPoint,
-		)! as NodeEntry<ElementNode>
+		const [closestBlockElement, closestBlockPath] = ContemberEditor.closestBlockEntry(editor, {
+			at: targetPoint,
+		})! as NodeEntry<ElementNode>
 
 		if (editor.canContainAnyBlocks(closestBlockElement)) {
 			return targetPoint.path

@@ -21,7 +21,7 @@ export const overrideOnKeyDown = <E extends BlockSlateEditor>(editor: E, options
 		if (event.key !== 'Tab' || !editor.selection || !SlateRange.isCollapsed(editor.selection)) {
 			return onKeyDown(event)
 		}
-		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor, editor.selection)
+		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor, { at: editor.selection })
 
 		if (closestBlockEntry === undefined) {
 			return onKeyDown(event)

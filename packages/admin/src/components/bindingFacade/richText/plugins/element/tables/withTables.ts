@@ -300,7 +300,7 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			) {
 				return onKeyDown(event)
 			}
-			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, selection)
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, { at: selection })
 
 			if (!closestBlockEntry) {
 				return onKeyDown(event)

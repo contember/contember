@@ -178,7 +178,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					}
 				}
 			} else if (e.isListItem(node)) {
-				const closestBlockEntry = ContemberEditor.closestBlockEntry(e, path)
+				const closestBlockEntry = ContemberEditor.closestBlockEntry(e, { at: path })
 				if (closestBlockEntry === undefined || !e.isList(closestBlockEntry[0])) {
 					return Editor.withoutNormalizing(e, () => {
 						const defaultElement = e.createDefaultElement([{ text: '' }])
@@ -304,7 +304,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				return onKeyDown(event)
 			}
 			const selection = editor.selection
-			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, selection.focus)
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, { at: selection.focus })
 
 			if (closestBlockEntry === undefined) {
 				return onKeyDown(event)

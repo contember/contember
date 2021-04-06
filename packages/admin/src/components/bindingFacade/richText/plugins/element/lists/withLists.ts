@@ -128,13 +128,21 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				}
 				return Editor.withoutNormalizing(editor, () => {
 					const [closestList, closestListPath] = closestListEntry
-					for (let i = 0; i < closestList.children.length; i++) {
-						Transforms.wrapNodes(editor, editor.createDefaultElement([]), {
-							at: [...closestListPath, i],
-						})
-						Transforms.unwrapNodes(editor, {
-							at: [...closestListPath, i, 0],
-						})
+
+					// It's important that we iterate backwards because otherwise we'd mangle the paths.
+					// We unwrap elements which may have more than one child.
+					for (let i = closestList.children.length - 1; i >= 0; i--) {
+						const currentItemPath = [...closestListPath, i]
+						if (Editor.hasInlines(editor, closestList.children[i] as ElementNode)) {
+							Transforms.wrapNodes(editor, editor.createDefaultElement([]), {
+								at: currentItemPath,
+							})
+							Transforms.unwrapNodes(editor, {
+								at: [...currentItemPath, 0],
+							})
+						} else {
+							Transforms.unwrapNodes(editor, { at: currentItemPath })
+						}
 					}
 					Transforms.unwrapNodes(editor, { at: closestListPath })
 				})

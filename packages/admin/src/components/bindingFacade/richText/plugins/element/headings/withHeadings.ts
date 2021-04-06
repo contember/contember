@@ -72,7 +72,7 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		if (!editor.selection) {
 			return false
 		}
-		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor, { at: editor.selection })
+		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor)
 		if (closestBlockEntry === undefined) {
 			return true
 		}

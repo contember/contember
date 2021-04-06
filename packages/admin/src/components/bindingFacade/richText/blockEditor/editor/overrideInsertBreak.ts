@@ -21,7 +21,7 @@ export const overrideInsertBreak = <E extends BlockSlateEditor>(editor: E, optio
 			}
 		}
 
-		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor, { at: editor.selection })
+		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor)
 
 		if (closestBlockEntry === undefined) {
 			return insertBreak()

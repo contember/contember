@@ -194,8 +194,8 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					}
 				}
 			} else if (e.isListItem(node)) {
-				const closestBlockEntry = ContemberEditor.closestBlockEntry(e, { at: path })
-				if (closestBlockEntry === undefined || !e.isList(closestBlockEntry[0])) {
+				const parentEntry = Editor.above(editor, { at: path })
+				if (parentEntry === undefined || !e.isList(parentEntry[0])) {
 					return Editor.withoutNormalizing(e, () => {
 						const defaultElement = e.createDefaultElement([{ text: '' }])
 						Transforms.wrapNodes(e, defaultElement, {

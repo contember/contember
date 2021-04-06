@@ -119,6 +119,26 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			}
 			const otherKindOfList = elementType === orderedListElementType ? unorderedListElementType : orderedListElementType
 
+			if (e.isElementActive(elementType, suchThat)) {
+				const closestListEntry = ContemberEditor.closest(editor, {
+					match: node => node.type === elementType,
+				}) as NodeEntry<UnorderedListElement | OrderedListElement>
+				if (!closestListEntry) {
+					return
+				}
+				return Editor.withoutNormalizing(editor, () => {
+					const [closestList, closestListPath] = closestListEntry
+					for (let i = 0; i < closestList.children.length; i++) {
+						Transforms.wrapNodes(editor, editor.createDefaultElement([]), {
+							at: [...closestListPath, i],
+						})
+						Transforms.unwrapNodes(editor, {
+							at: [...closestListPath, i, 0],
+						})
+					}
+					Transforms.unwrapNodes(editor, { at: closestListPath })
+				})
+			}
 			if (e.isElementActive(elementType, suchThat) || e.isElementActive(otherKindOfList, suchThat)) {
 				return // TODO nope. Just delete the list. :D
 			}

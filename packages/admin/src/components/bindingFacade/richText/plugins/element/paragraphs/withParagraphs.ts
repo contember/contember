@@ -8,7 +8,15 @@ import { ParagraphRenderer, ParagraphRendererProps } from './ParagraphRenderer'
 
 export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParagraphs<E> => {
 	const e: E & Partial<WithParagraphs<WithAnotherNodeType<E, ParagraphElement>>> = editor
-	const { canContainAnyBlocks, normalizeNode, renderElement, toggleElement, deleteBackward, processBlockPaste } = editor
+	const {
+		canContainAnyBlocks,
+		canToggleElement,
+		normalizeNode,
+		renderElement,
+		toggleElement,
+		deleteBackward,
+		processBlockPaste,
+	} = editor
 
 	const isParagraph = (
 		element: ElementNode | SlateNode,
@@ -16,6 +24,31 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 	): element is ParagraphElement => ContemberEditor.isElementType(element, paragraphElementType, suchThat)
 
 	e.isParagraph = isParagraph
+
+	e.canToggleElement = (elementType, suchThat) => {
+		// This only allows numbered paragraphs at the top level.
+		// TODO this is pretty bad but in order to fix this, we'd also have to fix toggleElement and there's no time now.
+
+		if (elementType !== paragraphElementType || suchThat === undefined) {
+			return canToggleElement(elementType, suchThat)
+		}
+		const isNumbered = (suchThat as Partial<ElementSpecifics<ParagraphElement>>).isNumbered
+
+		if (isNumbered !== true) {
+			return canToggleElement(elementType, suchThat)
+		}
+
+		if (!editor.selection) {
+			return false
+		}
+		const closestBlockEntry = ContemberEditor.closestBlockEntry(editor)
+		if (closestBlockEntry === undefined) {
+			return true
+		}
+		const [closestBlockElement, closestBlockPath] = closestBlockEntry
+
+		return closestBlockPath.length === 1 && closestBlockElement.type === paragraphElementType
+	}
 
 	e.toggleElement = (elementType, suchThat) => {
 		if (elementType === paragraphElementType) {

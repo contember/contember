@@ -147,8 +147,19 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					Transforms.unwrapNodes(editor, { at: closestListPath })
 				})
 			}
-			if (e.isElementActive(elementType, suchThat) || e.isElementActive(otherKindOfList, suchThat)) {
-				return // TODO nope. Just delete the list. :D
+			if (e.isElementActive(elementType) || e.isElementActive(otherKindOfList)) {
+				// We're in a list but a different one. Note the lack of 'suchThat'
+				const closestListEntry = ContemberEditor.closest(editor, {
+					match: node => e.isList(node),
+				}) as NodeEntry<UnorderedListElement | OrderedListElement>
+				if (!closestListEntry) {
+					return
+				}
+				return Editor.withoutNormalizing(editor, () => {
+					const [, closestListPath] = closestListEntry
+					ContemberEditor.ejectElement(editor, closestListPath)
+					Transforms.setNodes(editor, { ...suchThat, type: elementType }, { at: closestListPath })
+				})
 			}
 
 			const selection = editor.selection

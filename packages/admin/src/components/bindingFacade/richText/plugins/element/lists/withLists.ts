@@ -8,7 +8,7 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import { BaseEditor, BlockElement, EditorNode, ElementNode, ElementSpecifics, NodesWithType } from '../../../baseEditor'
+import { BaseEditor, BlockElement, ElementNode, ElementSpecifics, NodesWithType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
@@ -78,11 +78,27 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				case listItemElementType:
 					return false
 				case unorderedListElementType:
-					// TODO this is wonky and WILL fail for nested lists
-					return Array.from(ContemberEditor.topLevelNodes(e)).every(([node]) => e.isUnorderedList(node, suchThat))
-				case orderedListElementType:
-					// TODO this is wonky and WILL fail for nested lists
-					return Array.from(ContemberEditor.topLevelNodes(e)).every(([node]) => e.isOrderedList(node, suchThat))
+				case orderedListElementType: {
+					const closestNonDefaultEntry = ContemberEditor.closestBlockEntry(editor, {
+						match: node => !editor.isDefaultElement(node),
+					})
+					if (!closestNonDefaultEntry) {
+						return false
+					}
+					const [closestNonDefaultElement, closestNonDefaultPath] = closestNonDefaultEntry
+					if (!e.isListItem(closestNonDefaultElement)) {
+						return false
+					}
+					const [listParent] = Editor.node(editor, SlatePath.parent(closestNonDefaultPath))
+
+					if (elementType === unorderedListElementType) {
+						return e.isUnorderedList(listParent, suchThat)
+					} else if (elementType === orderedListElementType) {
+						return e.isOrderedList(listParent, suchThat)
+					} else {
+						return false
+					}
+				}
 				default:
 					return isElementActive(elementType, suchThat)
 			}

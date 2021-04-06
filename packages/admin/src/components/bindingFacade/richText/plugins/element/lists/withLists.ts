@@ -3,6 +3,7 @@ import {
 	Editor,
 	Element as SlateElement,
 	Node as SlateNode,
+	NodeEntry,
 	Path as SlatePath,
 	Range as SlateRange,
 	Text,
@@ -78,11 +79,33 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				case listItemElementType:
 					return false
 				case unorderedListElementType:
-					// TODO this is wonky and WILL fail for nested lists
-					return Array.from(ContemberEditor.topLevelNodes(e)).every(([node]) => e.isUnorderedList(node, suchThat))
-				case orderedListElementType:
-					// TODO this is wonky and WILL fail for nested lists
-					return Array.from(ContemberEditor.topLevelNodes(e)).every(([node]) => e.isOrderedList(node, suchThat))
+				case orderedListElementType: {
+					const closestNonDefaultEntry = ContemberEditor.closest(editor, {
+						match: node => Editor.isBlock(editor, node) && !editor.isDefaultElement(node),
+					})
+					if (!closestNonDefaultEntry) {
+						return false
+					}
+					const [closestNonDefaultElement, closestNonDefaultPath] = closestNonDefaultEntry
+
+					let parentList: ElementNode
+
+					if (e.isListItem(closestNonDefaultElement)) {
+						parentList = Editor.node(editor, SlatePath.parent(closestNonDefaultPath))[0] as ElementNode
+					} else if (e.isList(closestNonDefaultElement)) {
+						parentList = closestNonDefaultElement
+					} else {
+						return false
+					}
+
+					if (elementType === unorderedListElementType) {
+						return e.isUnorderedList(parentList, suchThat)
+					} else if (elementType === orderedListElementType) {
+						return e.isOrderedList(parentList, suchThat)
+					} else {
+						return false
+					}
+				}
 				default:
 					return isElementActive(elementType, suchThat)
 			}
@@ -96,34 +119,104 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			}
 			const otherKindOfList = elementType === orderedListElementType ? unorderedListElementType : orderedListElementType
 
-			if (e.isElementActive(elementType, suchThat) || e.isElementActive(otherKindOfList, suchThat)) {
-				return // TODO nope. Just delete the list. :D
+			if (e.isElementActive(elementType, suchThat)) {
+				const closestListEntry = ContemberEditor.closest(editor, {
+					match: node => node.type === elementType,
+				}) as NodeEntry<UnorderedListElement | OrderedListElement>
+				if (!closestListEntry) {
+					return
+				}
+				return Editor.withoutNormalizing(editor, () => {
+					const [closestList, closestListPath] = closestListEntry
+
+					// It's important that we iterate backwards because otherwise we'd mangle the paths.
+					// We unwrap elements which may have more than one child.
+					for (let i = closestList.children.length - 1; i >= 0; i--) {
+						const currentItemPath = [...closestListPath, i]
+						if (Editor.hasInlines(editor, closestList.children[i] as ElementNode)) {
+							Transforms.wrapNodes(editor, editor.createDefaultElement([]), {
+								at: currentItemPath,
+							})
+							Transforms.unwrapNodes(editor, {
+								at: [...currentItemPath, 0],
+							})
+						} else {
+							Transforms.unwrapNodes(editor, { at: currentItemPath })
+						}
+					}
+					Transforms.unwrapNodes(editor, { at: closestListPath })
+				})
+			}
+			if (e.isElementActive(elementType) || e.isElementActive(otherKindOfList)) {
+				// We're in a list but a different one. Note the lack of 'suchThat'
+				const closestListEntry = ContemberEditor.closest(editor, {
+					match: node => e.isList(node),
+				}) as NodeEntry<UnorderedListElement | OrderedListElement>
+				if (!closestListEntry) {
+					return
+				}
+				return Editor.withoutNormalizing(editor, () => {
+					const [, closestListPath] = closestListEntry
+					ContemberEditor.ejectElement(editor, closestListPath)
+					Transforms.setNodes(editor, { ...suchThat, type: elementType }, { at: closestListPath })
+				})
 			}
 
-			// TODO this is a grossly oversimplified implementation that just pulls a bunch of yolo assumptions ouf of a hat.
-			//      Most notably, that lists won't be nested. We just need to roll the most basic case out for now though.
-			Editor.withoutNormalizing(e, () => {
-				const selectedNodes = Editor.nodes(editor, {
-					match: node =>
-						SlateElement.isElement(node) &&
-						!e.isVoid(node) &&
-						!e.isUnorderedList(node) &&
-						!e.isOrderedList(node) &&
-						!e.isListItem(node),
-					mode: 'highest',
-					voids: false,
-				})
+			const selection = editor.selection
 
-				for (const [, path] of selectedNodes) {
-					ContemberEditor.ejectElement(e, path)
-					Transforms.setNodes(e, { type: listItemElementType }, { at: path })
+			if (!selection) {
+				return
+			}
+
+			const closestViableParentEntry = ContemberEditor.closestViableBlockContainerEntry(editor)
+
+			if (!closestViableParentEntry) {
+				return
+			}
+
+			Editor.withoutNormalizing(e, () => {
+				const [targetParent, targetParentPath] = closestViableParentEntry
+
+				if (Editor.hasInlines(editor, targetParent)) {
+					// We're deliberately widening the selection to include all the inlines.
+					const listItemPath = [...targetParentPath, 0]
+
+					// Not using wrapNodes because it appears to exhibit rather unpredictable treatment of text nodes.
+					Transforms.insertNodes(editor, { type: listItemElementType, children: [] }, { at: listItemPath })
+					Transforms.moveNodes(editor, {
+						to: [...listItemPath, 0],
+						match: node => Text.isText(node) || Editor.isInline(editor, node),
+						at: {
+							anchor: Editor.start(editor, [...targetParentPath, 1]),
+							focus: Editor.end(editor, [...targetParentPath, targetParent.children.length]),
+						},
+					})
+					Transforms.wrapNodes(editor, { type: elementType, children: [] }, { at: listItemPath })
+				} else {
+					const [selectionStart, selectionEnd] = Editor.edges(editor, selection)
+					const relativeStartIndex = selectionStart.path[targetParentPath.length]
+					const relativeEndIndex = selectionEnd.path[targetParentPath.length]
+
+					for (let i = relativeStartIndex; i <= relativeEndIndex; i++) {
+						Transforms.wrapNodes(editor, { type: listItemElementType, children: [] }, { at: [...targetParentPath, i] })
+					}
+
+					const emptyList: UnorderedListElement | OrderedListElement = {
+						...suchThat,
+						type: elementType as (UnorderedListElement | OrderedListElement)['type'],
+						children: [],
+					}
+					const listPath = [...targetParentPath, relativeStartIndex]
+					Transforms.insertNodes(editor, emptyList, { at: listPath })
+
+					for (let i = relativeStartIndex; i <= relativeEndIndex; i++) {
+						Transforms.moveNodes(editor, {
+							to: [...listPath, i - relativeStartIndex],
+							// The path doesn't depend on i because we keep moving the siblings away.
+							at: [...targetParentPath, relativeStartIndex + 1],
+						})
+					}
 				}
-				const emptyList: UnorderedListElement | OrderedListElement = {
-					...suchThat,
-					type: elementType as (UnorderedListElement | OrderedListElement)['type'],
-					children: [],
-				}
-				Transforms.wrapNodes(e, emptyList)
 			})
 		},
 		normalizeNode: entry => {
@@ -147,8 +240,8 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					}
 				}
 			} else if (e.isListItem(node)) {
-				const closestBlockEntry = ContemberEditor.closestBlockEntry(e, path)
-				if (closestBlockEntry === undefined || !e.isList(closestBlockEntry[0])) {
+				const parentEntry = Editor.above(editor, { at: path })
+				if (parentEntry === undefined || !e.isList(parentEntry[0])) {
 					return Editor.withoutNormalizing(e, () => {
 						const defaultElement = e.createDefaultElement([{ text: '' }])
 						Transforms.wrapNodes(e, defaultElement, {
@@ -273,7 +366,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				return onKeyDown(event)
 			}
 			const selection = editor.selection
-			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, selection.focus)
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, { at: selection.focus })
 
 			if (closestBlockEntry === undefined) {
 				return onKeyDown(event)
@@ -334,15 +427,15 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			}
 			return onKeyDown(event)
 		},
-		canContainAnyBlocks: (elementType, suchThat) => {
-			switch (elementType) {
+		canContainAnyBlocks: element => {
+			switch (element.type) {
 				case unorderedListElementType:
 				case orderedListElementType:
 					return false
 				case listItemElementType:
 					return true
 				default:
-					return canContainAnyBlocks(elementType, suchThat)
+					return canContainAnyBlocks(element)
 			}
 		},
 	})

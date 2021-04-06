@@ -300,7 +300,7 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			) {
 				return onKeyDown(event)
 			}
-			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, selection)
+			const closestBlockEntry = ContemberEditor.closestBlockEntry(e, { at: selection })
 
 			if (!closestBlockEntry) {
 				return onKeyDown(event)
@@ -488,6 +488,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 						return Transforms.removeNodes(e, { at: path })
 					}
 				}
+				if (!ContemberEditor.hasParentOfType(e, entry, tableElementType)) {
+					return Transforms.unwrapNodes(e, { at: path })
+				}
 			} else if (e.isTableCell(node)) {
 				if (node.children.length === 1) {
 					const onlyChild = node.children[0]
@@ -497,18 +500,21 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 						})
 					}
 				}
+				if (!ContemberEditor.hasParentOfType(e, entry, tableRowElementType)) {
+					return Transforms.unwrapNodes(e, { at: path })
+				}
 			}
 			normalizeNode(entry)
 		},
-		canContainAnyBlocks: (elementType, suchThat) => {
-			switch (elementType) {
+		canContainAnyBlocks: element => {
+			switch (element.type) {
 				case tableElementType:
 				case tableRowElementType:
 					return false
 				case tableCellElementType:
 					return true
 				default:
-					return canContainAnyBlocks(elementType, suchThat)
+					return canContainAnyBlocks(element)
 			}
 		},
 	})

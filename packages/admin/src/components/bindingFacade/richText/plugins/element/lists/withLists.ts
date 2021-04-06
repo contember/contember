@@ -8,7 +8,7 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import { BaseEditor, BlockElement, ElementNode, ElementSpecifics, NodesWithType } from '../../../baseEditor'
+import { BaseEditor, BlockElement, EditorNode, ElementNode, ElementSpecifics, NodesWithType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
@@ -100,30 +100,61 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				return // TODO nope. Just delete the list. :D
 			}
 
-			// TODO this is a grossly oversimplified implementation that just pulls a bunch of yolo assumptions ouf of a hat.
-			//      Most notably, that lists won't be nested. We just need to roll the most basic case out for now though.
-			Editor.withoutNormalizing(e, () => {
-				const selectedNodes = Editor.nodes(editor, {
-					match: node =>
-						SlateElement.isElement(node) &&
-						!e.isVoid(node) &&
-						!e.isUnorderedList(node) &&
-						!e.isOrderedList(node) &&
-						!e.isListItem(node),
-					mode: 'highest',
-					voids: false,
-				})
+			const selection = editor.selection
 
-				for (const [, path] of selectedNodes) {
-					ContemberEditor.ejectElement(e, path)
-					Transforms.setNodes(e, { type: listItemElementType }, { at: path })
+			if (!selection) {
+				return
+			}
+
+			const closestViableParentEntry = ContemberEditor.closestViableBlockContainerEntry(editor)
+
+			if (!closestViableParentEntry) {
+				return
+			}
+
+			Editor.withoutNormalizing(e, () => {
+				const [targetParent, targetParentPath] = closestViableParentEntry
+
+				if (Editor.hasInlines(editor, targetParent)) {
+					// We're deliberately widening the selection to include all the inlines.
+					const listItemPath = [...targetParentPath, 0]
+
+					// Not using wrapNodes because it appears to exhibit rather unpredictable treatment of text nodes.
+					Transforms.insertNodes(editor, { type: listItemElementType, children: [] }, { at: listItemPath })
+					Transforms.moveNodes(editor, {
+						to: [...listItemPath, 0],
+						match: node => Text.isText(node) || Editor.isInline(editor, node),
+						at: {
+							anchor: Editor.start(editor, [...targetParentPath, 1]),
+							focus: Editor.end(editor, [...targetParentPath, targetParent.children.length]),
+						},
+					})
+					Transforms.wrapNodes(editor, { type: elementType, children: [] }, { at: listItemPath })
+				} else {
+					const [selectionStart, selectionEnd] = Editor.edges(editor, selection)
+					const relativeStartIndex = selectionStart.path[targetParentPath.length]
+					const relativeEndIndex = selectionEnd.path[targetParentPath.length]
+
+					for (let i = relativeStartIndex; i <= relativeEndIndex; i++) {
+						Transforms.wrapNodes(editor, { type: listItemElementType, children: [] }, { at: [...targetParentPath, i] })
+					}
+
+					const emptyList: UnorderedListElement | OrderedListElement = {
+						...suchThat,
+						type: elementType as (UnorderedListElement | OrderedListElement)['type'],
+						children: [],
+					}
+					const listPath = [...targetParentPath, relativeStartIndex]
+					Transforms.insertNodes(editor, emptyList, { at: listPath })
+
+					for (let i = relativeStartIndex; i <= relativeEndIndex; i++) {
+						Transforms.moveNodes(editor, {
+							to: [...listPath, 0],
+							// The path doesn't depend on i because we keep moving the siblings away.
+							at: [...targetParentPath, relativeStartIndex + 1],
+						})
+					}
 				}
-				const emptyList: UnorderedListElement | OrderedListElement = {
-					...suchThat,
-					type: elementType as (UnorderedListElement | OrderedListElement)['type'],
-					children: [],
-				}
-				Transforms.wrapNodes(e, emptyList)
 			})
 		},
 		normalizeNode: entry => {

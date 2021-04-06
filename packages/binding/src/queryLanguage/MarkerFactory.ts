@@ -61,6 +61,13 @@ export namespace MarkerFactory {
 			),
 			environment,
 		)
+		if (fields instanceof EntityFieldsWithHoistablesMarker) {
+			return new EntityFieldsWithHoistablesMarker(
+				createEntityFieldMarkersContainer(undefined),
+				MarkerMerger.mergeSubTreeMarkers(fields.subTrees, new Map([[subTree.placeholderName, subTree]])),
+				undefined,
+			)
+		}
 		return new EntityFieldsWithHoistablesMarker(
 			createEntityFieldMarkersContainer(undefined),
 			new Map([[subTree.placeholderName, subTree]]),

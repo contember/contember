@@ -192,7 +192,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 
 					for (let i = relativeStartIndex; i <= relativeEndIndex; i++) {
 						Transforms.moveNodes(editor, {
-							to: [...listPath, 0],
+							to: [...listPath, i - relativeStartIndex],
 							// The path doesn't depend on i because we keep moving the siblings away.
 							at: [...targetParentPath, relativeStartIndex + 1],
 						})

@@ -122,7 +122,9 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 			if (selection && SlateRange.isCollapsed(selection) && Path.isCommon(path, selection.focus.path)) {
 				Transforms.select(e, Path.parent(path))
 			}
+			return
 		}
+		return normalizeNode(entry)
 	}
 
 	editor.processInlinePaste = (element, next, cumulativeTextAttrs) => {

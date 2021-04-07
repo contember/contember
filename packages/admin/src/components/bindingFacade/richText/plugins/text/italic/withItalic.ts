@@ -30,7 +30,7 @@ export const withItalic = <E extends BaseEditor>(editor: E): E => {
 	editor.processAttributesPaste = (element, cta) => {
 		if (element.style.fontWeight) {
 			const isItalic = ['italic', 'oblique'].includes(element.style.fontWeight)
-			cta[italicMark] = isItalic
+			cta = { ...cta, italicMark: isItalic }
 		}
 		return processAttributesPaste(element, cta)
 	}

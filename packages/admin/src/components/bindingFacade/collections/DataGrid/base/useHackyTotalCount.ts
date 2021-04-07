@@ -21,19 +21,22 @@ export const useHackyTotalCount = (entityName: EntityName, filter: Filter | unde
 	)
 
 	useEffect(() => {
-		loadAbortControllerRef.current?.abort()
+		async function performEffect() {
+			loadAbortControllerRef.current?.abort()
 
-		const newController = new AbortController()
-		loadAbortControllerRef.current = newController
+			const newController = new AbortController()
+			loadAbortControllerRef.current = newController
 
-		try {
-			sendQuery(query, undefined, {
-				signal: newController.signal,
-			})
-		} catch {
-			// TODO Distinguish abort vs actual error
-			return
+			try {
+				await sendQuery(query, undefined, {
+					signal: newController.signal,
+				})
+			} catch {
+				// TODO Distinguish abort vs actual error
+				return
+			}
 		}
+		performEffect()
 	}, [query, sendQuery])
 
 	if (queryState.readyState !== 'networkSuccess') {

@@ -125,6 +125,7 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 				return Transforms.unwrapNodes(e, { at: [...path, i] })
 			}
 		}
+		normalizeNode(entry)
 	}
 
 	e.processBlockPaste = (element, next, cumulativeTextAttrs) => {

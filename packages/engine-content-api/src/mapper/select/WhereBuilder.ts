@@ -165,6 +165,7 @@ export class WhereBuilder {
 						[tableName, entity.primaryColumn],
 						this.build(
 							SelectBuilder.create()
+								.distinct()
 								.select(['root_', targetRelation.joiningColumn.columnName])
 								.from(targetEntity.tableName, 'root_'),
 							targetEntity,
@@ -191,7 +192,10 @@ export class WhereBuilder {
 			fromSide === 'owning' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
 		const toColumn =
 			fromSide === 'owning' ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
-		augmentedBuilder = augmentedBuilder.from(joiningTable.tableName, 'junction_').select(['junction_', fromColumn])
+		augmentedBuilder = augmentedBuilder
+			.from(joiningTable.tableName, 'junction_')
+			.distinct()
+			.select(['junction_', fromColumn])
 		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
 		if (primaryCondition !== null) {
 			return augmentedBuilder.where(condition =>

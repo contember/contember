@@ -119,7 +119,6 @@ export class TreeAugmenter {
 					}
 
 					if (child.persistedValue !== childData) {
-						// TODO this doesn't handle literals
 						const shouldChangeBothValues = child.persistedValue === child.value
 
 						child.persistedValue = childData

@@ -3,7 +3,6 @@ import { FormGroup, FormGroupProps } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
-
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoiceFieldProps } from '../ChoiceField'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
 
@@ -89,8 +88,7 @@ const SelectFieldInner = memo(
 							}
 							case 'remove-value':
 							case 'pop-value':
-							case 'deselect-option':
-							case 'set-value': {
+							case 'deselect-option': {
 								// When is this even called? 🤔
 								break
 							}

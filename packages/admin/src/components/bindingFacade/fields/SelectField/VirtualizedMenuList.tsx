@@ -5,9 +5,9 @@ import { FixedSizeList, ListChildComponentProps } from 'react-window'
 import { ChoiceFieldData } from '../ChoiceField'
 
 export const VirtualizedMenuList: ComponentType<
-	MenuListComponentProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>>
+	MenuListComponentProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean>
 > = memo(function VirtualizedMenuList(
-	props: MenuListComponentProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>>,
+	props: MenuListComponentProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean>,
 ) {
 	const { children, maxHeight, innerRef } = props
 	const height = 40

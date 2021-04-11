@@ -1,0 +1,27 @@
+@import '../common'
+
+.selectField
+	&-search
+		display: inline-grid
+		&::before
+			content: attr(data-value) " "
+			visibility: hidden
+			white-space: pre-wrap
+		&::before,
+		&-input
+			background: transparent
+			border: none
+			color: inherit
+			font-size: inherit
+			-moz-appearance: none
+			-webkit-appearance: none
+			appearance: none
+			grid-area: 1/1
+			margin: 0
+			outline: 0
+			padding: 0 2px
+			resize: none
+			min-width: 1em
+			width: auto
+	&-search.is-hidden &-search-input
+		opacity: 0

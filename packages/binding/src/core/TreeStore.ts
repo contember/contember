@@ -23,7 +23,7 @@ export class TreeStore {
 	public readonly entityRealmStore: Map<EntityRealmKey, EntityRealmState | EntityRealmStateStub> = new Map()
 
 	// This is tricky. We allow placeholder name duplicates, only the (TreeRootId, PlaceholderName) tuple is unique.
-	// This is useful when the tree is extended to contain a tree with the same placeholder.
+	// This is useful when the tree is extended to contain a sub-tree with the same placeholder.
 	public readonly markerTrees: Map<TreeRootId | undefined, MarkerTreeRoot> = new Map()
 	public readonly subTreeStatesByRoot: Map<TreeRootId | undefined, Map<PlaceholderName, RootStateNode>> = new Map()
 

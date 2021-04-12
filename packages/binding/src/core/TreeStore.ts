@@ -5,6 +5,7 @@ import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
 import {
 	Alias,
+	EntityId,
 	EntityRealmKey,
 	PlaceholderName,
 	SugaredQualifiedEntityList,
@@ -18,8 +19,7 @@ import { Schema } from './schema'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode, StateType } from './state'
 
 export class TreeStore {
-	// Indexed by IDs (including unpersisted dummy IDs)
-	public readonly entityStore: Map<string, EntityState> = new Map()
+	public readonly entityStore: Map<EntityId, EntityState> = new Map()
 	public readonly entityRealmStore: Map<EntityRealmKey, EntityRealmState | EntityRealmStateStub> = new Map()
 
 	// This is tricky. We allow placeholder name duplicates, only the (TreeRootId, PlaceholderName) tuple is unique.

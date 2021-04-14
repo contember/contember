@@ -1,4 +1,4 @@
-import { NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
+import { NormalizedPersistedData, ReceivedDataTree } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
@@ -14,7 +14,7 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '../treeParameters'
-import { QueryResponseNormalizer } from './QueryResponseNormalizer'
+import { RequestResponseNormalizer } from './RequestResponseNormalizer'
 import { Schema } from './schema'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode, StateType } from './state'
 
@@ -28,12 +28,16 @@ export class TreeStore {
 	public readonly subTreeStatesByRoot: Map<TreeRootId | undefined, Map<PlaceholderName, RootStateNode>> = new Map()
 
 	private _schema: Schema | undefined
-	public readonly persistedData: NormalizedQueryResponseData = new NormalizedQueryResponseData(new Map(), new Map())
+	public readonly persistedData: NormalizedPersistedData = new NormalizedPersistedData(new Map(), new Map())
 
 	public constructor() {}
 
-	public updatePersistedData(response: ReceivedDataTree) {
-		QueryResponseNormalizer.mergeInResponse(this.persistedData, response)
+	public mergeInQueryResponse(response: ReceivedDataTree) {
+		RequestResponseNormalizer.mergeInQueryResponse(this.persistedData, response)
+	}
+
+	public mergeInMutationResponse(response: ReceivedDataTree) {
+		RequestResponseNormalizer.mergeInMutationResponse(this.persistedData, response)
 	}
 
 	public setSchema(newSchema: Schema) {

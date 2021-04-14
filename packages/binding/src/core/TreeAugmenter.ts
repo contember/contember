@@ -29,7 +29,7 @@ export class TreeAugmenter {
 		newPersistedData: ReceivedDataTree,
 	) {
 		// TODO this doesn't yet handle updates for entities whose persisted data just gets magically changed without notice.
-		this.treeStore.updatePersistedData(newPersistedData)
+		this.treeStore.mergeInQueryResponse(newPersistedData)
 
 		const subTreeStates: Map<PlaceholderName, RootStateNode> = new Map()
 
@@ -43,7 +43,7 @@ export class TreeAugmenter {
 	}
 
 	public updatePersistedData(response: ReceivedDataTree) {
-		this.treeStore.updatePersistedData(response)
+		this.treeStore.mergeInMutationResponse(response)
 
 		this.eventManager.syncTransaction(() => {
 			for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {

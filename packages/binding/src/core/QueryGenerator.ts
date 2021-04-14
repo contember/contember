@@ -8,7 +8,6 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 	MarkerTreeRoot,
-	ParentEntityMarker,
 } from '../markers'
 import { assertNever, ucfirst } from '../utils'
 

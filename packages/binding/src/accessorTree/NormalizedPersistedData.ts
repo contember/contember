@@ -15,7 +15,7 @@ export type PersistedEntityDataStore = Map<EntityId, SingleEntityPersistedData>
 // The key is the subTree placeholder name
 export type SubTreeDataStore = Map<PlaceholderName, ServerGeneratedUuid | EntityListPersistedData>
 
-export class NormalizedQueryResponseData {
+export class NormalizedPersistedData {
 	public constructor(
 		public readonly subTreeDataStore: SubTreeDataStore,
 		public readonly persistedEntityDataStore: PersistedEntityDataStore,

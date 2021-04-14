@@ -27,12 +27,12 @@ export class PlaceholderGenerator {
 	public static getEntitySubTreePlaceholder(
 		subTreeParameters: QualifiedSingleEntity | UnconstrainedQualifiedSingleEntity,
 	): string {
-		return `entitySubTree_${Hashing.hashEntitySubTreeParameters(subTreeParameters)}`
+		return `est_${Hashing.hashEntitySubTreeParameters(subTreeParameters)}`
 	}
 
 	public static getEntityListSubTreePlaceholder(
 		subTreeParameters: QualifiedEntityList | UnconstrainedQualifiedEntityList,
 	): string {
-		return `listSubTree_${Hashing.hashEntityListSubTreeParameters(subTreeParameters)}`
+		return `lst_${Hashing.hashEntityListSubTreeParameters(subTreeParameters)}`
 	}
 }

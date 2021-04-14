@@ -2,7 +2,7 @@ import { ErrorAccessor } from '../accessors'
 import { ExecutionError, MutationDataResponse, MutationResponse, ValidationError } from '../accessorTree'
 import { PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { AliasTransformer } from './AliasTransformer'
+import { MutationAlias, MutationOperationSubTreeType } from './requestAliases'
 
 class ErrorsPreprocessor {
 	public constructor(private readonly requestResponse: MutationDataResponse) {}
@@ -22,27 +22,34 @@ class ErrorsPreprocessor {
 				continue
 			}
 
-			const [treeId, itemKeyAlias] = AliasTransformer.splitAliasSections(mutationAlias)
+			const operation = MutationAlias.decodeTopLevel(mutationAlias)
 
-			if (itemKeyAlias === undefined) {
-				if (treeRoot.has(treeId)) {
+			if (operation === undefined) {
+				continue
+			}
+
+			const { subTreeType, subTreePlaceholder, entityId } = operation
+
+			if (subTreeType === MutationOperationSubTreeType.SingleEntity) {
+				if (treeRoot.has(subTreePlaceholder)) {
 					return this.rejectCorruptData()
 				}
-				treeRoot.set(treeId, processedResponse)
-			} else {
-				const itemKey = AliasTransformer.aliasToEntityId(itemKeyAlias)
-				const child = treeRoot.get(treeId)
+				treeRoot.set(subTreePlaceholder, processedResponse)
+			} else if (subTreeType === MutationOperationSubTreeType.EntityList) {
+				const child = treeRoot.get(subTreePlaceholder)
 
 				if (child === undefined) {
-					treeRoot.set(treeId, {
+					treeRoot.set(subTreePlaceholder, {
 						nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
-						children: new Map([[itemKey, processedResponse]]),
+						children: new Map([[entityId, processedResponse]]),
 						validation: undefined,
 						execution: undefined,
 					})
 				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
-					child.children.set(itemKey, processedResponse)
+					child.children.set(entityId, processedResponse)
 				}
+			} else {
+				return assertNever(subTreeType)
 			}
 		}
 		return treeRoot
@@ -117,16 +124,16 @@ class ErrorsPreprocessor {
 							)
 						}
 
-						const aliasKey = AliasTransformer.aliasToEntityId(alias)
+						const entityId = MutationAlias.decodeEntityId(alias)
 
-						if (!(aliasKey in currentNode.children)) {
-							currentNode.children.set(aliasKey, this.getRootNode(error, i + 1))
+						if (!(entityId in currentNode.children)) {
+							currentNode.children.set(entityId, this.getRootNode(error, i + 1))
 							if (i + 1 <= error.path.length) {
 								// This path has been handled by getRootNode
 								continue errorLoop
 							}
 						}
-						currentNode = currentNode.children.get(aliasKey)!
+						currentNode = currentNode.children.get(entityId)!
 					} else {
 						this.rejectCorruptData()
 					}
@@ -179,7 +186,7 @@ class ErrorsPreprocessor {
 					validation: undefined,
 					execution: undefined,
 					nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
-					children: new Map([[AliasTransformer.aliasToEntityId(alias), rootNode]]),
+					children: new Map([[MutationAlias.decodeEntityId(alias), rootNode]]),
 				}
 			} else {
 				assertNever(pathNode)

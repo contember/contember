@@ -1,10 +1,11 @@
-import { NormalizedQueryResponseData, ReceivedDataTree } from '../accessorTree'
+import { NormalizedPersistedData, ReceivedDataTree } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
 import {
 	Alias,
+	EntityId,
 	EntityRealmKey,
 	PlaceholderName,
 	SugaredQualifiedEntityList,
@@ -13,27 +14,30 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '../treeParameters'
-import { QueryResponseNormalizer } from './QueryResponseNormalizer'
+import { RequestResponseNormalizer } from './RequestResponseNormalizer'
 import { Schema } from './schema'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode, StateType } from './state'
 
 export class TreeStore {
-	// Indexed by IDs (including unpersisted dummy IDs)
-	public readonly entityStore: Map<string, EntityState> = new Map()
+	public readonly entityStore: Map<EntityId, EntityState> = new Map()
 	public readonly entityRealmStore: Map<EntityRealmKey, EntityRealmState | EntityRealmStateStub> = new Map()
 
 	// This is tricky. We allow placeholder name duplicates, only the (TreeRootId, PlaceholderName) tuple is unique.
-	// This is useful when the tree is extended to contain a tree with the same placeholder.
+	// This is useful when the tree is extended to contain a sub-tree with the same placeholder.
 	public readonly markerTrees: Map<TreeRootId | undefined, MarkerTreeRoot> = new Map()
 	public readonly subTreeStatesByRoot: Map<TreeRootId | undefined, Map<PlaceholderName, RootStateNode>> = new Map()
 
 	private _schema: Schema | undefined
-	public readonly persistedData: NormalizedQueryResponseData = new NormalizedQueryResponseData(new Map(), new Map())
+	public readonly persistedData: NormalizedPersistedData = new NormalizedPersistedData(new Map(), new Map())
 
 	public constructor() {}
 
-	public updatePersistedData(response: ReceivedDataTree) {
-		QueryResponseNormalizer.mergeInResponse(this.persistedData, response)
+	public mergeInQueryResponse(response: ReceivedDataTree) {
+		RequestResponseNormalizer.mergeInQueryResponse(this.persistedData, response)
+	}
+
+	public mergeInMutationResponse(response: ReceivedDataTree) {
+		RequestResponseNormalizer.mergeInMutationResponse(this.persistedData, response)
 	}
 
 	public setSchema(newSchema: Schema) {

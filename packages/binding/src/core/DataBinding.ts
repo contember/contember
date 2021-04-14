@@ -257,10 +257,11 @@ export class DataBinding {
 			}
 
 			// TODO this is an awful, awful hack.
+			// TODO the particular shape of the alias is relied on in MutationAlias. If you change this, change it there too.
 			const newTreeRootId =
 				this.treeStore.markerTrees.size === 0
 					? undefined
-					: `treeRoot-${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
+					: `${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
 			this.treeAugmenter.extendTree(newTreeRootId, newMarkerTree, newPersistedData?.data ?? {})
 
 			return newTreeRootId
@@ -346,7 +347,7 @@ export class DataBinding {
 	}
 
 	private static getNextTreeRootIdSeed = (() => {
-		let seed = 0
+		let seed = 1
 		return () => seed++
 	})()
 }

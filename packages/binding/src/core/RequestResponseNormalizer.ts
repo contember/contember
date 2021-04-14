@@ -1,6 +1,6 @@
 import {
 	EntityFieldPersistedData,
-	NormalizedQueryResponseData,
+	NormalizedPersistedData,
 	PersistedEntityDataStore,
 	ReceivedDataTree,
 	ReceivedEntityData,
@@ -10,58 +10,101 @@ import {
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
-import { AliasTransformer } from './AliasTransformer'
+import { assertNever } from '../utils'
+import { MutationAlias, MutationOperationSubTreeType, MutationOperationType } from './requestAliases'
 
-export class QueryResponseNormalizer {
-	public static mergeInResponse(
-		original: NormalizedQueryResponseData,
+export class RequestResponseNormalizer {
+	public static mergeInQueryResponse(
+		original: NormalizedPersistedData,
 		newPersistedData: ReceivedDataTree,
 	): Set<string> {
 		const { subTreeDataStore, persistedEntityDataStore } = original
 		const presentIds: Set<string> = new Set()
 
-		for (const treeAlias in newPersistedData) {
-			const treeDatum = newPersistedData[treeAlias]
+		for (const placeholderName in newPersistedData) {
+			const treeDatum = newPersistedData[placeholderName]
 
-			if (treeDatum === undefined || treeDatum === null) {
-				continue
-			}
-			const [treeId, itemIdAlias] = AliasTransformer.splitAliasSections(treeAlias)
+			const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
 
-			if (itemIdAlias === undefined) {
-				//const existingData = subTreeDataStore.get(treeId)
-
-				const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
-
-				if (fieldData instanceof Set || (typeof fieldData === 'object' && fieldData !== null)) {
-					subTreeDataStore.set(treeId, fieldData)
-				} else {
-					this.rejectData()
-				}
-				// TODO finish this
-				// if (existingData === undefined) {
-				// 	const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
-				//
-				// 	if (fieldData instanceof Set || (typeof fieldData === 'object' && fieldData !== null)) {
-				// 		subTreeDataStore.set(treeId, fieldData)
-				// 	} else {
-				// 		this.rejectData()
-				// 	}
-				// } else if (existingData instanceof ServerGeneratedUuid) {
-				// 	//
-				// } else if (existingData instanceof Set) {
-				// } else {
-				// 	return assertNever(existingData)
-				// }
+			if (fieldData === null) {
+				subTreeDataStore.delete(placeholderName)
+			} else if (fieldData instanceof Set || typeof fieldData === 'object') {
+				subTreeDataStore.set(placeholderName, fieldData)
 			} else {
-				const entityId = AliasTransformer.aliasToEntityId(itemIdAlias)
-				const existingData = persistedEntityDataStore.get(entityId)
+				this.rejectData()
+			}
+		}
+		return presentIds
+	}
 
-				if (!Array.isArray(treeDatum) && existingData) {
-					this.mergeInEntityData(persistedEntityDataStore, existingData, treeDatum)
-				} else {
-					this.rejectData()
+	public static mergeInMutationResponse(
+		original: NormalizedPersistedData,
+		newPersistedData: ReceivedDataTree,
+	): Set<string> {
+		const { subTreeDataStore, persistedEntityDataStore } = original
+		const presentIds: Set<string> = new Set()
+
+		for (const operationAlias in newPersistedData) {
+			const operation = MutationAlias.decodeTopLevel(operationAlias)
+
+			if (operation === undefined) {
+				return this.rejectData()
+			}
+			const { type, entityId, subTreeType, subTreePlaceholder } = operation
+
+			switch (type) {
+				case MutationOperationType.Update:
+				case MutationOperationType.Create: {
+					const treeDatum = newPersistedData[operationAlias]
+					const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
+
+					if (subTreeType === MutationOperationSubTreeType.SingleEntity) {
+						if (fieldData instanceof ServerGeneratedUuid) {
+							subTreeDataStore.set(subTreePlaceholder, fieldData)
+						} else {
+							return this.rejectData()
+						}
+					} else if (subTreeType === MutationOperationSubTreeType.EntityList) {
+						if (fieldData instanceof ServerGeneratedUuid) {
+							if (type === MutationOperationType.Create) {
+								const list = subTreeDataStore.get(subTreePlaceholder)
+								if (!(list instanceof Set)) {
+									return this.rejectData()
+								}
+
+								// TODO this is somewhat dubious because we're essentially just guessing the order of the entities
+								//		and just carelessly put the new one at the end.
+								list.add(fieldData.value)
+							}
+						} else {
+							return this.rejectData()
+						}
+					} else {
+						return assertNever(subTreeType)
+					}
+
+					break
 				}
+				case MutationOperationType.Delete: {
+					// TODO there are potentially some references to entityId that this whole process won't quite remove.
+					//		That's a memory leak. Probably not particularly severe in most cases but still.
+					persistedEntityDataStore.delete(entityId)
+					if (subTreeType === MutationOperationSubTreeType.SingleEntity) {
+						subTreeDataStore.delete(subTreePlaceholder)
+					} else if (subTreeType === MutationOperationSubTreeType.EntityList) {
+						const list = subTreeDataStore.get(subTreePlaceholder)
+
+						if (!(list instanceof Set)) {
+							return this.rejectData()
+						}
+						list.delete(entityId)
+					} else {
+						return assertNever(subTreeType)
+					}
+					break
+				}
+				default:
+					return assertNever(type)
 			}
 		}
 		return presentIds

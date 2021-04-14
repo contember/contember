@@ -3,10 +3,10 @@ import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
 import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
-import { EntityId, EntityName, FieldValue } from '../treeParameters'
+import { EntityId, EntityName, FieldValue, PlaceholderName, TreeRootId } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
-import { AliasTransformer } from './AliasTransformer'
 import { QueryGenerator } from './QueryGenerator'
+import { MutationAlias, MutationOperationSubTreeType, MutationOperationType } from './requestAliases'
 import {
 	EntityListState,
 	EntityRealmState,
@@ -14,7 +14,6 @@ import {
 	EntityState,
 	FieldState,
 	getEntityMarker,
-	RootStateNode,
 	StateIterator,
 	StateType,
 } from './state'
@@ -33,9 +32,61 @@ export class MutationGenerator {
 			let builder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder()
 			const processedEntities: ProcessedEntities = new Set()
 
-			for (const [placeholderName, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
-				// TODO there *CAN* be duplicate placeholders. Need to handle this later.
-				builder = this.addSubMutation(processedEntities, subTreeState, placeholderName, builder)
+			for (const [treeRootId, rootStates] of this.treeStore.subTreeStatesByRoot) {
+				for (const [placeholderName, subTreeState] of rootStates) {
+					if (subTreeState.type === StateType.EntityRealm) {
+						builder = this.addSubMutation(
+							processedEntities,
+							treeRootId,
+							placeholderName,
+							MutationOperationSubTreeType.SingleEntity,
+							subTreeState.entity.id.value,
+							subTreeState,
+							builder,
+						)
+					} else if (subTreeState.type === StateType.EntityList) {
+						for (const childState of subTreeState.children.values()) {
+							if (childState.type === StateType.EntityRealmStub) {
+								// TODO there can be a forceCreate somewhere in there that we're hereby ignoring.
+								continue
+							}
+							builder = this.addSubMutation(
+								processedEntities,
+								treeRootId,
+								placeholderName,
+								MutationOperationSubTreeType.EntityList,
+								childState.entity.id.value,
+								childState,
+								builder,
+							)
+						}
+						if (subTreeState.plannedRemovals) {
+							for (const [removedId, removalType] of subTreeState.plannedRemovals) {
+								if (removalType === 'disconnect') {
+									continue
+								}
+								if (removalType === 'delete') {
+									builder = this.addDeleteMutation(
+										subTreeState.entityName,
+										removedId,
+										MutationAlias.encodeTopLevel({
+											treeRootId,
+											subTreePlaceholder: placeholderName,
+											type: MutationOperationType.Delete,
+											subTreeType: MutationOperationSubTreeType.EntityList,
+											entityId: removedId,
+										}),
+										builder,
+									)
+								} else {
+									assertNever(removalType)
+								}
+							}
+						}
+					} else {
+						assertNever(subTreeState)
+					}
+				}
 			}
 			return builder.inTransaction().getGql()
 		} catch (e) {
@@ -45,63 +96,56 @@ export class MutationGenerator {
 
 	private addSubMutation(
 		processedEntities: ProcessedEntities,
-		rootState: RootStateNode | EntityRealmStateStub,
-		alias: string,
+		treeRootId: TreeRootId | undefined,
+		subTreePlaceholder: PlaceholderName,
+		subTreeType: MutationOperationSubTreeType,
+		entityId: EntityId,
+		realmState: EntityRealmState,
 		queryBuilder: QueryBuilder,
 	): QueryBuilder {
-		if (rootState.type === StateType.EntityRealmStub) {
-			// Do nothing. For now.
-			// TODO there can be a forceCreate somewhere in there that we're hereby ignoring.
-			return queryBuilder
-		}
-		if (rootState.unpersistedChangesCount === 0) {
+		if (realmState.unpersistedChangesCount === 0) {
 			// Bail out early
 			return queryBuilder
 		}
-		if (rootState.type === StateType.EntityRealm) {
-			if (rootState.entity.isScheduledForDeletion) {
-				queryBuilder = this.addDeleteMutation(
-					rootState.entity.entityName,
-					rootState.entity.id.value,
-					alias,
-					queryBuilder,
-				)
-			} else if (!rootState.entity.id.existsOnServer) {
-				queryBuilder = this.addCreateMutation(processedEntities, rootState, alias, queryBuilder)
-			} else {
-				queryBuilder = this.addUpdateMutation(processedEntities, rootState, alias, queryBuilder)
-			}
-		} else if (rootState.type === StateType.EntityList) {
-			for (const childState of rootState.children.values()) {
-				queryBuilder = this.addSubMutation(
-					processedEntities,
-					childState,
-					AliasTransformer.joinAliasSections(alias, AliasTransformer.entityToAlias(childState.entity.id)),
-					queryBuilder,
-				)
-			}
-			if (rootState.plannedRemovals) {
-				for (const [removedId, removalType] of rootState.plannedRemovals) {
-					if (removalType === 'delete') {
-						queryBuilder = this.addDeleteMutation(
-							rootState.entityName,
-							removedId,
-							AliasTransformer.joinAliasSections(
-								alias,
-								AliasTransformer.entityToAlias(new ServerGeneratedUuid(removedId)),
-							),
-							queryBuilder,
-						)
-					} else if (removalType === 'disconnect') {
-						throw new BindingError(`EntityList: cannot disconnect top-level entities.`)
-					}
-				}
-			}
-		} else {
-			assertNever(rootState)
+		if (realmState.entity.isScheduledForDeletion) {
+			return this.addDeleteMutation(
+				realmState.entity.entityName,
+				entityId,
+				MutationAlias.encodeTopLevel({
+					treeRootId,
+					subTreePlaceholder,
+					type: MutationOperationType.Delete,
+					subTreeType,
+					entityId,
+				}),
+				queryBuilder,
+			)
+		} else if (!realmState.entity.id.existsOnServer) {
+			return this.addCreateMutation(
+				processedEntities,
+				realmState,
+				MutationAlias.encodeTopLevel({
+					treeRootId,
+					subTreePlaceholder,
+					type: MutationOperationType.Create,
+					subTreeType,
+					entityId,
+				}),
+				queryBuilder,
+			)
 		}
-
-		return queryBuilder
+		return this.addUpdateMutation(
+			processedEntities,
+			realmState,
+			MutationAlias.encodeTopLevel({
+				treeRootId,
+				subTreePlaceholder,
+				type: MutationOperationType.Update,
+				subTreeType,
+				entityId,
+			}),
+			queryBuilder,
+		)
 	}
 
 	private addDeleteMutation(
@@ -354,7 +398,7 @@ export class MutationGenerator {
 			})
 		}
 		return builder.many(marker.parameters.field, builder => {
-			const alias = AliasTransformer.entityToAlias(runtimeId)
+			const alias = MutationAlias.encodeEntityId(runtimeId)
 			if (runtimeId.existsOnServer) {
 				// TODO also potentially update
 				return builder.connect({ [PRIMARY_KEY_NAME]: runtimeId.value }, alias)
@@ -371,7 +415,7 @@ export class MutationGenerator {
 	) {
 		return builder.many(marker.parameters.field, builder => {
 			for (const entityRealm of fieldState.children.values()) {
-				const alias = AliasTransformer.entityToAlias(entityRealm.entity.id)
+				const alias = MutationAlias.encodeEntityId(entityRealm.entity.id)
 				if (entityRealm.entity.id.existsOnServer) {
 					// TODO also potentially update
 					builder = builder.connect({ [PRIMARY_KEY_NAME]: entityRealm.entity.id.value }, alias)
@@ -476,7 +520,7 @@ export class MutationGenerator {
 						// This is a reduced has many relation.
 						builder = builder.many(marker.parameters.field, builder => {
 							const persistedValue = entityData?.get?.(placeholderName)
-							const alias = AliasTransformer.entityToAlias(runtimeId)
+							const alias = MutationAlias.encodeEntityId(runtimeId)
 
 							if (persistedValue instanceof ServerGeneratedUuid) {
 								if (persistedValue.value === runtimeId.value) {
@@ -524,7 +568,7 @@ export class MutationGenerator {
 					builder = builder.many(marker.parameters.field, builder => {
 						for (const childState of fieldState.children.values()) {
 							const runtimeId = childState.entity.id
-							const alias = AliasTransformer.entityToAlias(runtimeId)
+							const alias = MutationAlias.encodeEntityId(runtimeId)
 
 							if (runtimeId.existsOnServer) {
 								if (persistedEntityIds.has(runtimeId.value)) {
@@ -546,7 +590,7 @@ export class MutationGenerator {
 						}
 						if (fieldState.plannedRemovals) {
 							for (const [removedId, removalType] of fieldState.plannedRemovals) {
-								const alias = AliasTransformer.entityToAlias(new ServerGeneratedUuid(removedId))
+								const alias = MutationAlias.encodeEntityId(new ServerGeneratedUuid(removedId))
 								if (removalType === 'delete') {
 									builder = builder.delete({ [PRIMARY_KEY_NAME]: removedId }, alias)
 								} else if (removalType === 'disconnect') {

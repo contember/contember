@@ -1,5 +1,4 @@
 export * from './DataBinding'
-export * from './AliasTransformer'
 export * from './MarkerMerger'
 export * from './MarkerTreeGenerator'
 export * from './TreeParameterMerger'

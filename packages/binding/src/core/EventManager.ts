@@ -80,11 +80,9 @@ export class EventManager {
 		}
 	}
 	public syncOperation<T>(operation: () => T) {
-		try {
-			return this.syncTransaction(operation)
-		} finally {
-			this.flushUpdates()
-		}
+		const result = this.syncTransaction(operation)
+		this.flushUpdates()
+		return result
 	}
 
 	public async asyncTransaction<T>(transaction: () => Promise<T>): Promise<T> {
@@ -96,11 +94,9 @@ export class EventManager {
 		}
 	}
 	public async asyncOperation<T>(operation: () => Promise<T>): Promise<T> {
-		try {
-			return await this.asyncTransaction(operation)
-		} finally {
-			this.flushUpdates()
-		}
+		const result = await this.asyncTransaction(operation)
+		this.flushUpdates()
+		return result
 	}
 
 	private flushUpdates() {

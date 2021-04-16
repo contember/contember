@@ -14,6 +14,7 @@
     "@contember/react-multipass-rendering": "0.6.22",
     "@contember/react-utils": "0.6.22",
     "chevrotain": "6.5.0",
+    "js-levenshtein": "1.1.6",
     "uuid": "8.3.1"
   },
   "peerDependencies": {
@@ -23,7 +24,6 @@
   "devDependencies": {
     "@types/jest": "26.0.13",
     "@types/js-levenshtein": "1.1.0",
-    "@types/uuid": "8.3.0",
-    "js-levenshtein": "1.1.6"
+    "@types/uuid": "8.3.0"
   }
 }

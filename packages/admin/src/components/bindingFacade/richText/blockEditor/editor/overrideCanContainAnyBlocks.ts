@@ -8,7 +8,7 @@ export const overrideCanContainAnyBlocks = <E extends BlockSlateEditor>(
 ) => {
 	const { canContainAnyBlocks } = editor
 	editor.canContainAnyBlocks = element => {
-		if (editor.isContemberFieldElement(element)) {
+		if (editor.isContemberFieldElement(element) || editor.isContemberContentPlaceholderElement(element)) {
 			return false
 		}
 		return canContainAnyBlocks(element)

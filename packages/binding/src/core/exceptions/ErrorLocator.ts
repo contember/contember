@@ -5,8 +5,7 @@ import { RawMarkerPath } from './RawMarkerPath'
 import { TreeParameterSugarer } from './TreeParameterSugarer'
 
 export class ErrorLocator {
-	// Prefixed by a zero-width space so that the path doesn't overflow if it's too long.
-	private static readonly GLUE = '\u200B.'
+	private static readonly GLUE = '.'
 
 	public static locateMarkerPath(path: RawMarkerPath): string {
 		return path.map(marker => MarkerSugarer.sugarMarker(marker)).join(this.GLUE)

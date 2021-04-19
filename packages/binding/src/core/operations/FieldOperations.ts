@@ -10,7 +10,6 @@ import { FieldState, getEntityMarker, StateIterator } from '../state'
 import { StateInitializer } from '../StateInitializer'
 import { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
-import SugaredValidationError = ErrorAccessor.SugaredValidationError
 
 export class FieldOperations {
 	public constructor(
@@ -20,7 +19,7 @@ export class FieldOperations {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public addError(fieldState: FieldState, error: SugaredValidationError): () => void {
+	public addError(fieldState: FieldState, error: ErrorAccessor.SugaredValidationError): () => void {
 		return this.accessorErrorManager.addError(fieldState, { type: ErrorAccessor.ErrorType.Validation, error })
 	}
 

@@ -401,7 +401,7 @@ export class EventManager {
 						case StateType.EntityRealm:
 						case StateType.EntityList:
 							for (const listener of listeners) {
-								state.batchUpdates(listener as any)
+								state.getAccessor().batchUpdates(listener as any)
 							}
 							break
 						default:

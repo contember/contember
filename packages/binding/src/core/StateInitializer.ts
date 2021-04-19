@@ -345,40 +345,16 @@ export class StateInitializer {
 				if (entityListState.accessor === undefined) {
 					const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, entityListState)
 					entityListState.accessor = new EntityListAccessor(
+						entityListState,
+						this.listOperations,
 						entityListState.children,
 						persistedEntityIds,
 						entityListState.errors,
 						entityListState.blueprint.marker.environment,
-						entityListState.addError,
-						entityListState.addEventListener,
-						entityListState.batchUpdates,
-						entityListState.connectEntity,
-						entityListState.createNewEntity,
-						entityListState.disconnectEntity,
-						entityListState.getChildEntityById,
+						entityListState.getAccessor,
 					)
 				}
 				return entityListState.accessor
-			},
-			addError: error =>
-				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
-			addEventListener: (...args: [any, ...any[]]) => {
-				return this.listOperations.addEventListener(entityListState, ...args)
-			},
-			batchUpdates: performUpdates => {
-				this.listOperations.batchUpdates(entityListState, performUpdates)
-			},
-			connectEntity: entityToConnect => {
-				this.listOperations.connectEntity(entityListState, entityToConnect)
-			},
-			createNewEntity: initialize => {
-				this.listOperations.createNewEntity(entityListState, initialize)
-			},
-			disconnectEntity: childEntity => {
-				this.listOperations.disconnectEntity(entityListState, childEntity)
-			},
-			getChildEntityById: id => {
-				return this.listOperations.getChildEntityById(entityListState, id)
 			},
 		}
 

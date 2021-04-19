@@ -1,5 +1,5 @@
 import { validate as uuidValidate } from 'uuid'
-import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor } from '../../accessors'
+import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, ErrorAccessor } from '../../accessors'
 import { UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { AccessorErrorManager } from '../AccessorErrorManager'
@@ -20,6 +20,10 @@ export class ListOperations {
 		private readonly stateInitializer: StateInitializer,
 		private readonly treeStore: TreeStore,
 	) {}
+
+	public addError(listState: EntityListState, error: ErrorAccessor.SugaredValidationError): () => void {
+		return this.accessorErrorManager.addError(listState, { type: ErrorAccessor.ErrorType.Validation, error })
+	}
 
 	public addEventListener(
 		state: EntityListState,

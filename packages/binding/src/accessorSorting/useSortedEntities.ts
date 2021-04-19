@@ -10,8 +10,8 @@ import { sortEntities } from './sortEntities'
 
 export interface SortedEntities {
 	entities: EntityAccessor[]
-	prependNew: EntityListAccessor.CreateNewEntity
-	appendNew: EntityListAccessor.CreateNewEntity
+	prependNew: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
+	appendNew: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	addNewAtIndex: (index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void
 	moveEntity: (oldIndex: number, newIndex: number) => void
 }

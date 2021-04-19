@@ -35,12 +35,4 @@ export interface EntityListState {
 	getAccessor: () => EntityListAccessor
 	plannedRemovals: Map<EntityId, RemovalType> | undefined
 	unpersistedChangesCount: number
-
-	addError: EntityListAccessor.AddError
-	addEventListener: EntityListAccessor.AddEntityListEventListener
-	batchUpdates: EntityListAccessor.BatchUpdates
-	connectEntity: EntityListAccessor.ConnectEntity
-	createNewEntity: EntityListAccessor.CreateNewEntity
-	disconnectEntity: EntityListAccessor.DisconnectEntity
-	getChildEntityById: EntityListAccessor.GetChildEntityById
 }

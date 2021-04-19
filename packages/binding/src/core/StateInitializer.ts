@@ -51,9 +51,21 @@ export class StateInitializer {
 		private readonly eventManager: EventManager,
 		private readonly treeStore: TreeStore,
 	) {
-		this.fieldOperations = new FieldOperations(this.eventManager, this, this.treeStore)
-		this.entityOperations = new EntityOperations(this.batchUpdatesOptions, this.eventManager, this, this.treeStore)
-		this.listOperations = new ListOperations(this.batchUpdatesOptions, this.eventManager, this, this.treeStore)
+		this.fieldOperations = new FieldOperations(this.accessorErrorManager, this.eventManager, this, this.treeStore)
+		this.entityOperations = new EntityOperations(
+			this.accessorErrorManager,
+			this.batchUpdatesOptions,
+			this.eventManager,
+			this,
+			this.treeStore,
+		)
+		this.listOperations = new ListOperations(
+			this.accessorErrorManager,
+			this.batchUpdatesOptions,
+			this.eventManager,
+			this,
+			this.treeStore,
+		)
 	}
 
 	public initializeSubTree(tree: EntitySubTreeMarker | EntityListSubTreeMarker): RootStateNode {
@@ -406,7 +418,6 @@ export class StateInitializer {
 			persistedValue,
 			parent,
 			value: resolvedFieldValue,
-			addEventListener: undefined as any, // This is assigned properly immediately after
 			eventListeners: this.initializeFieldEventListenerStore(fieldMarker),
 			errors: undefined,
 			touchLog: undefined,
@@ -414,6 +425,8 @@ export class StateInitializer {
 			getAccessor: () => {
 				if (fieldState.accessor === undefined) {
 					fieldState.accessor = new FieldAccessor(
+						fieldState,
+						this.fieldOperations,
 						fieldState.placeholderName,
 						fieldState.value,
 						fieldState.persistedValue === undefined ? null : fieldState.persistedValue,
@@ -421,20 +434,12 @@ export class StateInitializer {
 						fieldState.errors,
 						fieldState.hasUnpersistedChanges,
 						fieldState.touchLog,
-						fieldState.addError,
-						fieldState.addEventListener,
-						fieldState.updateValue,
+						fieldState.getAccessor,
 					)
 				}
 				return fieldState.accessor
 			},
-			addError: error =>
-				this.accessorErrorManager.addError(fieldState, { type: ErrorAccessor.ErrorType.Validation, error }),
-			updateValue: (newValue, options) => {
-				this.fieldOperations.updateValue(fieldState, newValue, options)
-			},
 		}
-		fieldState.addEventListener = this.getAddEventListener(fieldState)
 
 		this.eventManager.registerNewlyInitialized(fieldState)
 		return fieldState
@@ -535,22 +540,6 @@ export class StateInitializer {
 			throw new BindingError() // This should have been validated elsewhere.
 		}
 		return targetField.targetEntity
-	}
-
-	private getAddEventListener(state: { eventListeners: Map<string, Set<Function>> | undefined }) {
-		return (type: string, listener: Function) => {
-			let listeners = state.eventListeners
-			if (!listeners) {
-				state.eventListeners = listeners = new Map()
-			}
-			let forThisEvent = listeners.get(type)
-			if (forThisEvent === undefined) {
-				listeners.set(type, (forThisEvent = new Set<never>()))
-			}
-			forThisEvent.add(listener)
-
-			return () => state.eventListeners?.get?.(type)?.delete(listener)
-		}
 	}
 
 	public runImmediateUserInitialization(

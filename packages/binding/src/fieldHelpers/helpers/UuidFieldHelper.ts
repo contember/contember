@@ -4,12 +4,12 @@ import { FieldHelper } from './FieldHelper'
 
 class UuidFieldHelper extends FieldHelper<string> {
 	public setToUuid(options?: FieldAccessor.UpdateOptions) {
-		this.updateValue(uuidV4(), options)
+		this.getAccessor().updateValue(uuidV4(), options)
 	}
 }
 namespace UuidFieldHelper {
 	export const setToUuid = (
-		field: FieldAccessor<string> | FieldAccessor.UpdateValue<string>,
+		field: FieldAccessor<string> | FieldAccessor.GetFieldAccessor<string>,
 		options?: FieldAccessor.UpdateOptions,
 	) => {
 		new UuidFieldHelper(field).setToUuid(options)

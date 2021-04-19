@@ -18,8 +18,4 @@ export interface FieldState {
 	placeholderName: FieldName
 	touchLog: Set<string> | undefined
 	value: FieldValue
-
-	addError: FieldAccessor.AddError
-	addEventListener: FieldAccessor.AddFieldEventListener
-	updateValue: FieldAccessor.UpdateValue
 }

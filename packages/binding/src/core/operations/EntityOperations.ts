@@ -4,6 +4,7 @@ import { BindingError } from '../../BindingError'
 import { EntityFieldMarkersContainer, HasOneRelationMarker } from '../../markers'
 import { FieldName } from '../../treeParameters'
 import { assertNever } from '../../utils'
+import { AccessorErrorManager } from '../AccessorErrorManager'
 import { EventManager } from '../EventManager'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
 import { MarkerComparator } from '../MarkerComparator'
@@ -22,6 +23,7 @@ import { OperationsHelpers } from './OperationsHelpers'
 
 export class EntityOperations {
 	public constructor(
+		private readonly accessorErrorManager: AccessorErrorManager,
 		private readonly batchUpdatesOptions: BatchUpdatesOptions,
 		private readonly eventManager: EventManager,
 		private readonly stateInitializer: StateInitializer,

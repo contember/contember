@@ -5,10 +5,14 @@ import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 
 const identityFunction = <Value>(value: Value) => value
 
+// TODO this is fundamentally wrong. This shouldn't only happen on beforeUpdate, but also on initialize.
+// 	we need a useEffect equivalent.
+
 /**
  * Derived fields are meant for cases when the user is expected to primarily edit the `sourceField` whose optionally
  * transformed value is then copied to the `derivedField`. This happens after each update until either the `derivedField`
  * is touched or until it is persisted at which point the tie between the fields is automatically severed.
+ * @deprecated
  */
 export const useDerivedField = <SourceValue extends FieldValue = FieldValue>(
 	sourceField: string | SugaredRelativeSingleField,

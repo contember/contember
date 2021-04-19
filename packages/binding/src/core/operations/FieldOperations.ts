@@ -1,4 +1,3 @@
-import { GraphQlBuilder } from '@contember/client'
 import { validate as uuidValidate } from 'uuid'
 import { FieldAccessor } from '../../accessors'
 import { ClientGeneratedUuid } from '../../accessorTree'

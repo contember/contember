@@ -24,6 +24,7 @@ export type EntityListBlueprint =
 export interface EntityListState {
 	type: StateType.EntityList
 
+	accessor: EntityListAccessor | undefined
 	blueprint: EntityListBlueprint
 	children: BijectiveIndexedMap<EntityId, EntityRealmState | EntityRealmStateStub>
 	childrenWithPendingUpdates: Set<EntityRealmState> | undefined
@@ -32,7 +33,6 @@ export interface EntityListState {
 	eventListeners: EntityListEventListenerStore | undefined
 	childEventListeners: EntityEventListenerStore | undefined
 	getAccessor: () => EntityListAccessor
-	hasStaleAccessor: boolean
 	plannedRemovals: Map<EntityId, RemovalType> | undefined
 	unpersistedChangesCount: number
 

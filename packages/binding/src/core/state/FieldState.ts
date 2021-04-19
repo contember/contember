@@ -7,11 +7,11 @@ import { StateType } from './StateType'
 export interface FieldState {
 	type: StateType.Field
 
+	accessor: FieldAccessor | undefined
 	errors: ErrorAccessor | undefined
 	eventListeners: FieldEventListenerStore | undefined
 	fieldMarker: FieldMarker
 	getAccessor: () => FieldAccessor
-	hasStaleAccessor: boolean
 	hasUnpersistedChanges: boolean
 	parent: EntityRealmState
 	persistedValue: Scalar | undefined // Undefined means that the parent entity doesn't exist on server

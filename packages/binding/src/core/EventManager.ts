@@ -168,7 +168,7 @@ export class EventManager {
 		if (beforeUpdateListeners !== undefined) {
 			this.pendingWithBeforeUpdate.add(justUpdated)
 		}
-		justUpdated.hasStaleAccessor = true
+		justUpdated.accessor = undefined
 
 		switch (justUpdated.type) {
 			case StateType.EntityRealm:

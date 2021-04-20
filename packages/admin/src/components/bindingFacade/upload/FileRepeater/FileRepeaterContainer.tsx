@@ -13,8 +13,7 @@ import attrAccept from 'attr-accept'
 import { memo, ReactNode, useCallback, useMemo } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { NormalizedBlocks } from '../../blocks'
-import { RepeaterContainerProps, SortableRepeaterItem } from '../../collections'
-import { EmptyMessage } from '../../collections/helpers'
+import { EmptyMessage, RepeaterContainerProps, SortableRepeaterItem } from '../../collections'
 import { SingleFileUploadProps, UploadConfigProps } from '../core'
 import { CustomDataPopulatorProps, FileUrlDataPopulatorProps } from '../fileDataPopulators'
 import { getGenericFileDefaults } from '../stockFileKindDefaults'
@@ -76,7 +75,7 @@ export const FileRepeaterContainer = memo(
 	}: FileRepeaterContainerProps) => {
 		const [uploadState, { startUpload, abortUpload }] = useFileUpload()
 		const isMutating = useMutationState()
-		const batchUpdates = accessor.batchUpdates
+		const getFiles = accessor.getAccessor
 		const desugaredDiscriminant = useDesugaredRelativeSingleField(discriminationField)
 		const environment = useEnvironment()
 		const fileKinds = useMemo(() => Array.from(iterableFileKinds), [iterableFileKinds])
@@ -99,7 +98,7 @@ export const FileRepeaterContainer = memo(
 		const onDrop = useCallback(
 			(files: File[]) => {
 				const filesWithIds: [FileId, File][] = []
-				batchUpdates(getListAccessor => {
+				getFiles().batchUpdates(getListAccessor => {
 					for (const file of files) {
 						let acceptingFileKind: DiscriminatedFileUploadProps | undefined = undefined
 						if (desugaredDiscriminant) {
@@ -134,7 +133,7 @@ export const FileRepeaterContainer = memo(
 					})
 				})
 			},
-			[createNewEntity, batchUpdates, desugaredDiscriminant, environment, fileKinds, startUpload, uploader],
+			[createNewEntity, desugaredDiscriminant, environment, fileKinds, getFiles, startUpload, uploader],
 		)
 		const { getRootProps, getInputProps, isDragActive } = useDropzone({
 			onDrop,

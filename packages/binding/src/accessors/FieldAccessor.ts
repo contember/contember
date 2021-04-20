@@ -1,4 +1,5 @@
-import { FieldHelpers } from '../fieldHelpers'
+import { FieldOperations } from '../core/operations'
+import { TemporalFieldHelper, UuidFieldHelper } from '../fieldHelpers'
 import { FieldName, FieldValue } from '../treeParameters'
 import { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import { Errorable } from './Errorable'
@@ -6,6 +7,8 @@ import { ErrorAccessor } from './ErrorAccessor'
 
 class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
 	constructor(
+		private readonly stateKey: any,
+		private readonly operations: FieldOperations,
 		public readonly fieldName: FieldName,
 		public readonly value: Value | null,
 		public readonly valueOnServer: Value | null,
@@ -13,10 +16,25 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly hasUnpersistedChanges: boolean,
 		private readonly touchLog: ReadonlySet<string> | undefined,
-		public readonly addError: FieldAccessor.AddError,
-		public readonly addEventListener: FieldAccessor.AddFieldEventListener<Value>,
-		public readonly updateValue: FieldAccessor.UpdateValue<Value>,
+		public readonly getAccessor: FieldAccessor.GetFieldAccessor<Value>,
 	) {}
+
+	public addError(error: ErrorAccessor.SugaredValidationError): () => void {
+		return this.operations.addError(this.stateKey, error)
+	}
+
+	public addEventListener(
+		type: 'beforeUpdate',
+		listener: FieldAccessor.FieldEventListenerMap<Value>['beforeUpdate'],
+	): () => void
+	public addEventListener(type: 'update', listener: FieldAccessor.FieldEventListenerMap<Value>['update']): () => void
+	public addEventListener(type: FieldAccessor.FieldEventType, listener: Function): () => void {
+		return this.operations.addEventListener(this.stateKey, type, listener)
+	}
+
+	public updateValue(newValue: Value | null, options?: FieldAccessor.UpdateOptions): void {
+		this.operations.updateValue(this.stateKey, newValue, options)
+	}
 
 	public hasValue(candidate: this['value']): boolean {
 		return this.value === candidate
@@ -39,12 +57,12 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 
 	// helpers
 
-	public get asTemporal() {
-		return new FieldHelpers.Temporal(this.updateValue as FieldAccessor.UpdateValue<string>)
+	public get asTemporal(): TemporalFieldHelper {
+		return new TemporalFieldHelper(this.getAccessor as FieldAccessor.GetFieldAccessor<string>)
 	}
 
-	public get asUuid() {
-		return new FieldHelpers.Uuid(this.updateValue as FieldAccessor.UpdateValue<string>)
+	public get asUuid(): UuidFieldHelper {
+		return new UuidFieldHelper(this.getAccessor as FieldAccessor.GetFieldAccessor<string>)
 	}
 }
 namespace FieldAccessor {
@@ -56,7 +74,6 @@ namespace FieldAccessor {
 
 	export type GetFieldAccessor<Value extends FieldValue = FieldValue> = () => FieldAccessor<Value>
 
-	export type AddError = ErrorAccessor.AddError
 	export type BeforeUpdateListener<Value extends FieldValue = FieldValue> = (
 		updatedAccessor: FieldAccessor<Value>,
 	) => void
@@ -65,10 +82,6 @@ namespace FieldAccessor {
 		options: BatchUpdatesOptions,
 	) => void
 	export type UpdateListener<Value extends FieldValue = FieldValue> = (accessor: FieldAccessor<Value>) => void
-	export type UpdateValue<Value extends FieldValue = FieldValue> = (
-		newValue: Value | null,
-		options?: FieldAccessor.UpdateOptions,
-	) => void
 
 	export interface RuntimeFieldEventListenerMap<Value extends FieldValue = FieldValue> {
 		beforeUpdate: BeforeUpdateListener<Value>
@@ -79,10 +92,6 @@ namespace FieldAccessor {
 		initialize: InitializeListener<Value>
 	}
 	export type FieldEventType = keyof FieldEventListenerMap
-	export interface AddFieldEventListener<Value extends FieldValue = FieldValue> {
-		(type: 'beforeUpdate', listener: FieldEventListenerMap<Value>['beforeUpdate']): () => void
-		(type: 'update', listener: FieldEventListenerMap<Value>['update']): () => void
-	}
 }
 
 export { FieldAccessor }

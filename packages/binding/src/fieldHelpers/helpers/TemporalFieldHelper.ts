@@ -1,10 +1,9 @@
 import { FieldAccessor } from '../../accessors'
-import { FieldValue } from '../../treeParameters'
 import { FieldHelper } from './FieldHelper'
 
 class TemporalFieldHelper extends FieldHelper<string> {
 	public setToNow(options?: FieldAccessor.UpdateOptions) {
-		this.updateValue(new Date().toISOString(), options)
+		this.getAccessor().updateValue(new Date().toISOString(), options)
 	}
 
 	//public setToDate() TODO
@@ -13,7 +12,7 @@ class TemporalFieldHelper extends FieldHelper<string> {
 }
 namespace TemporalFieldHelper {
 	export const setToNow = (
-		field: FieldAccessor<string> | FieldAccessor.UpdateValue<string>,
+		field: FieldAccessor<string> | FieldAccessor.GetFieldAccessor<string>,
 		options?: FieldAccessor.UpdateOptions,
 	) => {
 		new TemporalFieldHelper(field).setToNow(options)

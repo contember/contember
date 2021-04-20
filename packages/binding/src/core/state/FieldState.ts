@@ -7,19 +7,15 @@ import { StateType } from './StateType'
 export interface FieldState {
 	type: StateType.Field
 
+	accessor: FieldAccessor | undefined
 	errors: ErrorAccessor | undefined
 	eventListeners: FieldEventListenerStore | undefined
 	fieldMarker: FieldMarker
-	getAccessor: () => FieldAccessor
-	hasStaleAccessor: boolean
+	readonly getAccessor: () => FieldAccessor
 	hasUnpersistedChanges: boolean
 	parent: EntityRealmState
 	persistedValue: Scalar | undefined // Undefined means that the parent entity doesn't exist on server
 	placeholderName: FieldName
 	touchLog: Set<string> | undefined
 	value: FieldValue
-
-	addError: FieldAccessor.AddError
-	addEventListener: FieldAccessor.AddFieldEventListener
-	updateValue: FieldAccessor.UpdateValue
 }

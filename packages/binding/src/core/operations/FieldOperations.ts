@@ -1,10 +1,10 @@
-import { GraphQlBuilder } from '@contember/client'
 import { validate as uuidValidate } from 'uuid'
-import { FieldAccessor } from '../../accessors'
+import { ErrorAccessor, FieldAccessor } from '../../accessors'
 import { ClientGeneratedUuid } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import { FieldValue } from '../../treeParameters'
+import { AccessorErrorManager } from '../AccessorErrorManager'
 import { EventManager } from '../EventManager'
 import { FieldState, getEntityMarker, StateIterator } from '../state'
 import { StateInitializer } from '../StateInitializer'
@@ -13,10 +13,29 @@ import { OperationsHelpers } from './OperationsHelpers'
 
 export class FieldOperations {
 	public constructor(
+		private readonly accessorErrorManager: AccessorErrorManager,
 		private readonly eventManager: EventManager,
 		private readonly stateInitializer: StateInitializer,
 		private readonly treeStore: TreeStore,
 	) {}
+
+	public addError(fieldState: FieldState, error: ErrorAccessor.SugaredValidationError): () => void {
+		return this.accessorErrorManager.addError(fieldState, { type: ErrorAccessor.ErrorType.Validation, error })
+	}
+
+	public addEventListener(state: FieldState, type: FieldAccessor.FieldEventType, listener: Function): () => void {
+		let listeners = state.eventListeners
+		if (!listeners) {
+			state.eventListeners = listeners = new Map()
+		}
+		let forThisEvent = listeners.get(type)
+		if (forThisEvent === undefined) {
+			listeners.set(type, (forThisEvent = new Set<never>()))
+		}
+		forThisEvent.add(listener as any)
+
+		return () => state.eventListeners?.get?.(type)?.delete(listener as any)
+	}
 
 	public updateValue(
 		fieldState: FieldState,

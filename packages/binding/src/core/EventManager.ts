@@ -168,7 +168,7 @@ export class EventManager {
 		if (beforeUpdateListeners !== undefined) {
 			this.pendingWithBeforeUpdate.add(justUpdated)
 		}
-		justUpdated.hasStaleAccessor = true
+		justUpdated.accessor = undefined
 
 		switch (justUpdated.type) {
 			case StateType.EntityRealm:
@@ -401,7 +401,7 @@ export class EventManager {
 						case StateType.EntityRealm:
 						case StateType.EntityList:
 							for (const listener of listeners) {
-								state.batchUpdates(listener as any)
+								state.getAccessor().batchUpdates(listener as any)
 							}
 							break
 						default:

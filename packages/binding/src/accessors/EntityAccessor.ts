@@ -1,5 +1,6 @@
 import { RuntimeId, ServerGeneratedUuid, SingleEntityPersistedData } from '../accessorTree'
 import { BindingError } from '../BindingError'
+import { EntityOperations } from '../core/operations'
 import { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
@@ -30,19 +31,17 @@ import { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityAccessor implements Errorable {
 	public constructor(
+		private readonly stateKey: any,
+		private readonly operations: EntityOperations,
 		private readonly runtimeId: RuntimeId,
 		public readonly key: EntityRealmKey, // ⚠️ This is *NOT* the id! ⚠️
 		public readonly name: EntityName,
 		private readonly fieldData: EntityAccessor.FieldData,
 		private readonly dataFromServer: SingleEntityPersistedData | undefined,
+		public readonly hasUnpersistedChanges: boolean,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
-		public readonly addError: EntityAccessor.AddError,
-		public readonly addEventListener: EntityAccessor.AddEntityEventListener,
-		public readonly batchUpdates: EntityAccessor.BatchUpdates,
-		public readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField,
-		public readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField,
-		public readonly deleteEntity: EntityAccessor.DeleteEntity,
+		public readonly getAccessor: EntityAccessor.GetEntityAccessor,
 	) {}
 
 	public get idOnServer(): string | undefined {
@@ -60,7 +59,57 @@ class EntityAccessor implements Errorable {
 		return this.runtimeId.existsOnServer
 	}
 
-	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs) {
+	//
+
+	public addError(error: ErrorAccessor.SugaredValidationError): () => void {
+		return this.operations.addError(this.stateKey, error)
+	}
+
+	public addEventListener(
+		type: 'beforePersist',
+		listener: EntityAccessor.EntityEventListenerMap['beforePersist'],
+	): () => void
+	public addEventListener(
+		type: 'beforeUpdate',
+		listener: EntityAccessor.EntityEventListenerMap['beforeUpdate'],
+	): () => void
+	public addEventListener(
+		type: 'connectionUpdate',
+		hasOneField: FieldName,
+		listener: EntityAccessor.EntityEventListenerMap['connectionUpdate'],
+	): () => void
+	public addEventListener(
+		type: 'persistError',
+		listener: EntityAccessor.EntityEventListenerMap['persistError'],
+	): () => void
+	public addEventListener(
+		type: 'persistSuccess',
+		listener: EntityAccessor.EntityEventListenerMap['persistSuccess'],
+	): () => void
+	public addEventListener(type: 'update', listener: EntityAccessor.EntityEventListenerMap['update']): () => void
+	public addEventListener(type: keyof EntityAccessor.RuntimeEntityEventListenerMap, ...args: unknown[]): () => void {
+		return this.operations.addEventListener(this.stateKey, type, ...args)
+	}
+
+	public batchUpdates(performUpdates: EntityAccessor.BatchUpdatesHandler): void {
+		this.operations.batchUpdates(this.stateKey, performUpdates)
+	}
+
+	public connectEntityAtField(field: FieldName, entityToConnect: EntityAccessor): void {
+		this.operations.connectEntityAtField(this.stateKey, field, entityToConnect)
+	}
+
+	public disconnectEntityAtField(field: FieldName, initializeReplacement?: EntityAccessor.BatchUpdatesHandler): void {
+		this.operations.disconnectEntityAtField(this.stateKey, field, initializeReplacement)
+	}
+
+	public deleteEntity(): void {
+		this.operations.deleteEntity(this.stateKey)
+	}
+
+	//
+
+	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs): void {
 		this.batchUpdates(getAccessor => {
 			const entries = Array.isArray(fieldValuePairs) ? fieldValuePairs : Object.entries(fieldValuePairs)
 
@@ -208,15 +257,7 @@ namespace EntityAccessor {
 	export type FieldData = Map<FieldName, FieldDatum>
 
 	export type GetEntityAccessor = () => EntityAccessor
-	export type AddError = ErrorAccessor.AddError
-	export type BatchUpdates = (performUpdates: EntityAccessor.BatchUpdatesHandler) => void
 	export type BatchUpdatesHandler = (getAccessor: GetEntityAccessor, options: BatchUpdatesOptions) => void
-	export type ConnectEntityAtField = (field: FieldName, entityToConnect: EntityAccessor) => void
-	export type DeleteEntity = () => void
-	export type DisconnectEntityAtField = (
-		field: FieldName,
-		initializeReplacement?: EntityAccessor.BatchUpdatesHandler,
-	) => void
 	export type UpdateListener = (accessor: EntityAccessor) => void
 
 	export type BeforePersistHandler = (
@@ -246,17 +287,6 @@ namespace EntityAccessor {
 		initialize: BatchUpdatesHandler
 	}
 	export type EntityEventType = keyof EntityEventListenerMap
-	export interface AddEntityEventListener {
-		(type: 'beforePersist', listener: EntityEventListenerMap['beforePersist']): () => void
-		(type: 'beforeUpdate', listener: EntityEventListenerMap['beforeUpdate']): () => void
-		(type: 'connectionUpdate', hasOneField: FieldName, listener: EntityEventListenerMap['connectionUpdate']): () => void
-		(type: 'persistError', listener: EntityEventListenerMap['persistError']): () => void
-		(type: 'persistSuccess', listener: EntityEventListenerMap['persistSuccess']): () => void
-		(type: 'update', listener: EntityEventListenerMap['update']): () => void
-
-		// It's too late to add this by the time the accessor exists…
-		//(type: 'initialize', listener: EntityEventListenerMap['initialize']): () => void
-	}
 }
 
 export { EntityAccessor }

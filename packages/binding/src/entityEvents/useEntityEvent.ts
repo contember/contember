@@ -25,17 +25,17 @@ export function useEntityEvent(
 	listener: EntityAccessor.EntityEventListenerMap['persistSuccess'],
 ): void
 export function useEntityEvent(type: 'update', listener: EntityAccessor.EntityEventListenerMap['update']): void
-export function useEntityEvent(...args: any[]): void {
+export function useEntityEvent(type: keyof EntityAccessor.RuntimeEntityEventListenerMap, ...args: unknown[]): void {
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
 	const potentiallyStaleParent = getEntityByKey(entityKey)
 
 	// The identity of this function is guaranteed to be stable
-	const stableAddEventListenerReference = potentiallyStaleParent.addEventListener
+	const stableGetEntityReference = potentiallyStaleParent.getAccessor
 
 	useEffect(() => {
 		// addEventListener returns an unsubscribe function, which we're deliberately re-returning from here.
-		return (stableAddEventListenerReference as any)(...args)
+		return (stableGetEntityReference().addEventListener as any)(type, ...args)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [...args, stableAddEventListenerReference])
+	}, [...args, stableGetEntityReference])
 }

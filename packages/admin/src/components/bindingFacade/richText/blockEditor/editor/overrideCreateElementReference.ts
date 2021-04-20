@@ -13,7 +13,7 @@ import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideCreateElementReferenceOptions {
 	bindingOperations: BindingOperations
-	createMonolithicReference: EntityListAccessor.CreateNewEntity | undefined
+	createMonolithicReference: ((initialize: EntityAccessor.BatchUpdatesHandler) => void) | undefined
 	leadingFields: FieldBackedElement[]
 	referenceDiscriminationField: RelativeSingleField | undefined
 	referencesField: string | SugaredRelativeEntityList | undefined

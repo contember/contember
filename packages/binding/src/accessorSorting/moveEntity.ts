@@ -8,12 +8,12 @@ export const moveEntity = (
 	oldIndex: number,
 	newIndex: number,
 ) => {
-	moveEntityInArray(Array.from(entityList), entityList.batchUpdates, sortByField, oldIndex, newIndex)
+	moveEntityInArray(Array.from(entityList), entityList.getAccessor, sortByField, oldIndex, newIndex)
 }
 
 export const moveEntityInArray = (
 	entities: EntityAccessor[],
-	batchUpdates: EntityListAccessor.BatchUpdates,
+	getAccessor: EntityListAccessor.GetEntityListAccessor,
 	sortByField: RelativeSingleField,
 	oldIndex: number,
 	newIndex: number,
@@ -21,7 +21,7 @@ export const moveEntityInArray = (
 	const sorted = sortEntities(entities, sortByField)
 	const order = computeEntityOrder(sorted, sortByField, oldIndex, newIndex)
 
-	batchUpdates((getAccessor, { getEntityByKey }) => {
+	getAccessor().batchUpdates((getAccessor, { getEntityByKey }) => {
 		for (const [entityKey, newOrderValue] of order) {
 			const targetEntity = getEntityByKey(entityKey)
 			const orderField = targetEntity.getRelativeSingleField<number>(sortByField)

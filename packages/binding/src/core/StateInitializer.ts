@@ -51,9 +51,21 @@ export class StateInitializer {
 		private readonly eventManager: EventManager,
 		private readonly treeStore: TreeStore,
 	) {
-		this.fieldOperations = new FieldOperations(this.eventManager, this, this.treeStore)
-		this.entityOperations = new EntityOperations(this.batchUpdatesOptions, this.eventManager, this, this.treeStore)
-		this.listOperations = new ListOperations(this.batchUpdatesOptions, this.eventManager, this, this.treeStore)
+		this.fieldOperations = new FieldOperations(this.accessorErrorManager, this.eventManager, this, this.treeStore)
+		this.entityOperations = new EntityOperations(
+			this.accessorErrorManager,
+			this.batchUpdatesOptions,
+			this.eventManager,
+			this,
+			this.treeStore,
+		)
+		this.listOperations = new ListOperations(
+			this.accessorErrorManager,
+			this.batchUpdatesOptions,
+			this.eventManager,
+			this,
+			this.treeStore,
+		)
 	}
 
 	public initializeSubTree(tree: EntitySubTreeMarker | EntityListSubTreeMarker): RootStateNode {
@@ -132,58 +144,36 @@ export class StateInitializer {
 			realmKey,
 			entity,
 
+			accessor: undefined,
 			children: new Map(),
 			childrenWithPendingUpdates: undefined,
 			errors: undefined,
 			eventListeners: this.initializeEntityEventListenerStore(blueprint),
 			fieldsWithPendingConnectionUpdates: undefined,
-			hasStaleAccessor: true,
 			plannedHasOneDeletions: undefined,
 			unpersistedChangesCount: 0,
+			getAccessor: () => {
+				if (entityRealm.accessor === undefined) {
+					const entity = entityRealm.entity
+					entityRealm.accessor = new EntityAccessor(
+						entityRealm,
+						this.entityOperations,
+						entity.id,
+						entityRealm.realmKey,
+						entity.entityName,
 
-			addError: error => {
-				return this.accessorErrorManager.addError(entityRealm, { type: ErrorAccessor.ErrorType.Validation, error })
-			},
-			addEventListener: (type: keyof EntityAccessor.RuntimeEntityEventListenerMap, ...args: unknown[]) => {
-				return this.entityOperations.addEventListener(entityRealm, type, ...args)
-			},
-			batchUpdates: performUpdates => {
-				this.entityOperations.batchUpdates(entityRealm, performUpdates)
-			},
-			connectEntityAtField: (fieldName, entityToConnect) => {
-				this.entityOperations.connectEntityAtField(entityRealm, fieldName, entityToConnect)
-			},
-			disconnectEntityAtField: (fieldName, initializeReplacement) => {
-				this.entityOperations.disconnectEntityAtField(entityRealm, fieldName, initializeReplacement)
-			},
-			getAccessor: (() => {
-				let accessor: EntityAccessor | undefined = undefined
-				return () => {
-					if (entityRealm.hasStaleAccessor || accessor === undefined) {
-						entityRealm.hasStaleAccessor = false
-						const entity = entityRealm.entity
-						accessor = new EntityAccessor(
-							entity.id,
-							entityRealm.realmKey,
-							entity.entityName,
-
-							// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
-							// keep in sync two copies of the same data. TS hides the extra info anyway.
-							entityRealm.children,
-							this.treeStore.persistedEntityData.get(entity.id.value),
-							entityRealm.errors,
-							getEntityMarker(entityRealm).environment,
-							entityRealm.addError,
-							entityRealm.addEventListener,
-							entityRealm.batchUpdates,
-							entityRealm.connectEntityAtField,
-							entityRealm.disconnectEntityAtField,
-							entity.deleteEntity,
-						)
-					}
-					return accessor
+						// We're technically exposing more info in runtime than we'd like but that way we don't have to allocate and
+						// keep in sync two copies of the same data. TS hides the extra info anyway.
+						entityRealm.children,
+						this.treeStore.persistedEntityData.get(entity.id.value),
+						entityRealm.unpersistedChangesCount !== 0,
+						entityRealm.errors,
+						getEntityMarker(entityRealm).environment,
+						entityRealm.getAccessor,
+					)
 				}
-			})(),
+				return entityRealm.accessor
+			},
 		}
 
 		this.registerEntityRealm(entityRealm)
@@ -306,10 +296,6 @@ export class StateInitializer {
 			isScheduledForDeletion: false,
 			maidenId: id instanceof UnpersistedEntityDummyId ? id : undefined,
 			realms: new Map(),
-
-			deleteEntity: () => {
-				this.entityOperations.deleteEntity(entityState)
-			},
 		}
 		this.treeStore.entityStore.set(entityId, entityState)
 
@@ -323,6 +309,7 @@ export class StateInitializer {
 	): EntityListState {
 		const entityListState: EntityListState = {
 			type: StateType.EntityList,
+			accessor: undefined,
 			blueprint,
 			children: new BijectiveIndexedMap(realm => realm.entity.id.value),
 			childrenWithPendingUpdates: undefined,
@@ -331,50 +318,22 @@ export class StateInitializer {
 			childEventListeners: this.initializeEntityListChildEventListenerStore(blueprint),
 			errors: undefined,
 			plannedRemovals: undefined,
-			hasStaleAccessor: true,
 			unpersistedChangesCount: 0, // TODO force creation?
-			getAccessor: (() => {
-				let accessor: EntityListAccessor | undefined = undefined
-				return () => {
-					if (entityListState.hasStaleAccessor || accessor === undefined) {
-						const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, entityListState)
-						entityListState.hasStaleAccessor = false
-						accessor = new EntityListAccessor(
-							entityListState.children,
-							persistedEntityIds,
-							entityListState.errors,
-							entityListState.blueprint.marker.environment,
-							entityListState.addError,
-							entityListState.addEventListener,
-							entityListState.batchUpdates,
-							entityListState.connectEntity,
-							entityListState.createNewEntity,
-							entityListState.disconnectEntity,
-							entityListState.getChildEntityById,
-						)
-					}
-					return accessor
+			getAccessor: () => {
+				if (entityListState.accessor === undefined) {
+					const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, entityListState)
+					entityListState.accessor = new EntityListAccessor(
+						entityListState,
+						this.listOperations,
+						entityListState.children,
+						persistedEntityIds,
+						entityListState.unpersistedChangesCount !== 0,
+						entityListState.errors,
+						entityListState.blueprint.marker.environment,
+						entityListState.getAccessor,
+					)
 				}
-			})(),
-			addError: error =>
-				this.accessorErrorManager.addError(entityListState, { type: ErrorAccessor.ErrorType.Validation, error }),
-			addEventListener: (...args: [any, ...any[]]) => {
-				return this.listOperations.addEventListener(entityListState, ...args)
-			},
-			batchUpdates: performUpdates => {
-				this.listOperations.batchUpdates(entityListState, performUpdates)
-			},
-			connectEntity: entityToConnect => {
-				this.listOperations.connectEntity(entityListState, entityToConnect)
-			},
-			createNewEntity: initialize => {
-				this.listOperations.createNewEntity(entityListState, initialize)
-			},
-			disconnectEntity: childEntity => {
-				this.listOperations.disconnectEntity(entityListState, childEntity)
-			},
-			getChildEntityById: id => {
-				return this.listOperations.getChildEntityById(entityListState, id)
+				return entityListState.accessor
 			},
 		}
 
@@ -408,45 +367,34 @@ export class StateInitializer {
 
 		const fieldState: FieldState = {
 			type: StateType.Field,
+			accessor: undefined,
 			fieldMarker,
 			placeholderName,
 			persistedValue,
 			parent,
 			value: resolvedFieldValue,
-			addEventListener: undefined as any, // This is assigned properly immediately after
 			eventListeners: this.initializeFieldEventListenerStore(fieldMarker),
 			errors: undefined,
 			touchLog: undefined,
 			hasUnpersistedChanges: false,
-			hasStaleAccessor: true,
-			getAccessor: (() => {
-				let accessor: FieldAccessor | undefined = undefined
-				return () => {
-					if (fieldState.hasStaleAccessor || accessor === undefined) {
-						fieldState.hasStaleAccessor = false
-						accessor = new FieldAccessor(
-							fieldState.placeholderName,
-							fieldState.value,
-							fieldState.persistedValue === undefined ? null : fieldState.persistedValue,
-							fieldState.fieldMarker.defaultValue,
-							fieldState.errors,
-							fieldState.hasUnpersistedChanges,
-							fieldState.touchLog,
-							fieldState.addError,
-							fieldState.addEventListener,
-							fieldState.updateValue,
-						)
-					}
-					return accessor
+			getAccessor: () => {
+				if (fieldState.accessor === undefined) {
+					fieldState.accessor = new FieldAccessor(
+						fieldState,
+						this.fieldOperations,
+						fieldState.placeholderName,
+						fieldState.value,
+						fieldState.persistedValue === undefined ? null : fieldState.persistedValue,
+						fieldState.fieldMarker.defaultValue,
+						fieldState.errors,
+						fieldState.hasUnpersistedChanges,
+						fieldState.touchLog,
+						fieldState.getAccessor,
+					)
 				}
-			})(),
-			addError: error =>
-				this.accessorErrorManager.addError(fieldState, { type: ErrorAccessor.ErrorType.Validation, error }),
-			updateValue: (newValue, options) => {
-				this.fieldOperations.updateValue(fieldState, newValue, options)
+				return fieldState.accessor
 			},
 		}
-		fieldState.addEventListener = this.getAddEventListener(fieldState)
 
 		this.eventManager.registerNewlyInitialized(fieldState)
 		return fieldState
@@ -547,22 +495,6 @@ export class StateInitializer {
 			throw new BindingError() // This should have been validated elsewhere.
 		}
 		return targetField.targetEntity
-	}
-
-	private getAddEventListener(state: { eventListeners: Map<string, Set<Function>> | undefined }) {
-		return (type: string, listener: Function) => {
-			let listeners = state.eventListeners
-			if (!listeners) {
-				state.eventListeners = listeners = new Map()
-			}
-			let forThisEvent = listeners.get(type)
-			if (forThisEvent === undefined) {
-				listeners.set(type, (forThisEvent = new Set<never>()))
-			}
-			forThisEvent.add(listener)
-
-			return () => state.eventListeners?.get?.(type)?.delete(listener)
-		}
 	}
 
 	public runImmediateUserInitialization(

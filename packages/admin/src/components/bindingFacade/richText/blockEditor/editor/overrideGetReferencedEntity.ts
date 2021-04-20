@@ -3,7 +3,6 @@ import {
 	BindingOperations,
 	EntityAccessor,
 	EntityId,
-	EntityListAccessor,
 	EntityRealmKey,
 	RelativeEntityList,
 	SugaredRelativeEntityList,
@@ -12,10 +11,10 @@ import { MutableRefObject } from 'react'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideGetReferencedEntityOptions {
-	batchUpdatesRef: MutableRefObject<EntityAccessor.BatchUpdates>
 	bindingOperations: BindingOperations
 	desugaredBlockList: RelativeEntityList
-	getMonolithicReferenceById: EntityListAccessor.GetChildEntityById | undefined
+	getMonolithicReferenceById: ((id: EntityId) => EntityAccessor) | undefined
+	getParentEntityRef: MutableRefObject<EntityAccessor.GetEntityAccessor>
 	referencedEntityCache: Map<EntityId, EntityRealmKey>
 	referencesField: string | SugaredRelativeEntityList | undefined
 }
@@ -23,10 +22,10 @@ export interface OverrideGetReferencedEntityOptions {
 export const overrideGetReferencedEntity = <E extends BlockSlateEditor>(
 	editor: E,
 	{
-		batchUpdatesRef,
 		bindingOperations,
 		desugaredBlockList,
 		getMonolithicReferenceById,
+		getParentEntityRef,
 		referencedEntityCache,
 		referencesField,
 	}: OverrideGetReferencedEntityOptions,
@@ -47,17 +46,14 @@ export const overrideGetReferencedEntity = <E extends BlockSlateEditor>(
 		let containingBlockKey = referencedEntityCache.get(referenceId)
 
 		if (containingBlockKey === undefined) {
-			bindingOperations.batchDeferredUpdates(() => {
-				batchUpdatesRef.current(getEntity => {
-					const blockList = getEntity().getRelativeEntityList(desugaredBlockList)
+			const blockList = getParentEntityRef.current().getRelativeEntityList(desugaredBlockList)
 
-					for (const blockEntity of blockList) {
-						for (const referenceEntity of blockEntity.getEntityList(referencesField)) {
-							referencedEntityCache.set(referenceEntity.id, referenceEntity.key)
-						}
-					}
-				})
-			})
+			for (const blockEntity of blockList) {
+				for (const referenceEntity of blockEntity.getEntityList(referencesField)) {
+					referencedEntityCache.set(referenceEntity.id, referenceEntity.key)
+				}
+			}
+
 			containingBlockKey = referencedEntityCache.get(referenceId)
 			if (containingBlockKey === undefined) {
 				throw new BindingError()

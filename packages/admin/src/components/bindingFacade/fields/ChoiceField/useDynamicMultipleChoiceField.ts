@@ -41,8 +41,8 @@ export const useDynamicMultipleChoiceField = (
 		return parentEntity.getRelativeEntityList(desugaredRelativePath as RelativeEntityList)
 	}, [entityKey, desugaredRelativePath, getEntityByKey])
 
-	const currentValueEntity = useAccessorUpdateSubscription(getCurrentValueEntity)
-	const currentlyChosenEntities = Array.from(currentValueEntity)
+	const currentValueListAccessor = useAccessorUpdateSubscription(getCurrentValueEntity)
+	const currentlyChosenEntities = Array.from(currentValueListAccessor)
 
 	//
 	const desugaredOptionPath = useDesugaredOptionPath(props)
@@ -57,25 +57,25 @@ export const useDynamicMultipleChoiceField = (
 		props.searchByFields,
 	)
 
-	const { batchUpdates, connectEntity, disconnectEntity } = currentValueEntity
+	const getCurrentValues = currentValueListAccessor.getAccessor
 
 	const clear = useCallback(() => {
-		batchUpdates(getListAccessor => {
+		getCurrentValues().batchUpdates(getListAccessor => {
 			for (const child of getListAccessor()) {
 				getListAccessor().disconnectEntity(child)
 			}
 		})
-	}, [batchUpdates])
+	}, [getCurrentValues])
 
 	const onChange = useCallback(
 		(optionKey: ChoiceFieldData.ValueRepresentation, isChosen: boolean) => {
 			if (isChosen) {
-				connectEntity(optionEntities[optionKey])
+				getCurrentValues().connectEntity(optionEntities[optionKey])
 			} else {
-				disconnectEntity(optionEntities[optionKey])
+				getCurrentValues().disconnectEntity(optionEntities[optionKey])
 			}
 		},
-		[optionEntities, connectEntity, disconnectEntity],
+		[optionEntities, getCurrentValues],
 	)
 
 	return {
@@ -83,7 +83,7 @@ export const useDynamicMultipleChoiceField = (
 		environment,
 		currentValues,
 		data: normalizedOptions,
-		errors: currentValueEntity.errors,
+		errors: currentValueListAccessor.errors,
 		clear,
 		onChange,
 	}

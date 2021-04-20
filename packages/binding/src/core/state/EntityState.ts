@@ -1,4 +1,3 @@
-import { EntityAccessor } from '../../accessors'
 import { RuntimeId, UnpersistedEntityDummyId } from '../../accessorTree'
 import { EntityName, EntityRealmKey } from '../../treeParameters'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
@@ -10,6 +9,4 @@ export interface EntityState {
 	isScheduledForDeletion: boolean
 	maidenId: UnpersistedEntityDummyId | undefined
 	realms: Map<EntityRealmKey, EntityRealmState | EntityRealmStateStub>
-
-	deleteEntity: EntityAccessor.DeleteEntity
 }

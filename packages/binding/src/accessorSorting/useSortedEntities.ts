@@ -24,9 +24,6 @@ const addNewAtIndexImplementation = (
 	index: number,
 	preprocess?: EntityAccessor.BatchUpdatesHandler,
 ) => {
-	if (!entityList.createNewEntity) {
-		return throwNonWritableError(entityList)
-	}
 	if (!desugaredSortableByField) {
 		if (index === sortedEntitiesCount) {
 			return entityList.createNewEntity()

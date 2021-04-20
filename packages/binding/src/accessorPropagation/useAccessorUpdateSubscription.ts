@@ -67,14 +67,13 @@ function useAccessorUpdateSubscription<
 		}, [getAccessor])
 	}
 
-	const addEventListener: (
-		eventType: 'update',
-		handler: (newAccessor: FieldAccessor<Value> | EntityListAccessor | EntityAccessor) => void,
-	) => () => void = accessor.addEventListener
 	useEffect(() => {
 		let isStillSubscribed = true
 
-		const unsubscribe = addEventListener('update', newAccessor => {
+		const unsubscribe = (getAccessor().addEventListener as (
+			eventType: 'update',
+			handler: (newAccessor: FieldAccessor<Value> | EntityListAccessor | EntityAccessor) => void,
+		) => () => void)('update', newAccessor => {
 			if (!isStillSubscribed) {
 				return
 			}
@@ -95,7 +94,7 @@ function useAccessorUpdateSubscription<
 			isStillSubscribed = false
 			unsubscribe()
 		}
-	}, [addEventListener, getAccessor])
+	}, [getAccessor])
 
 	if (withForceUpdate && forceUpdate) {
 		return [accessor, forceUpdate]

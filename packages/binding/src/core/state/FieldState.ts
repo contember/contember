@@ -11,7 +11,7 @@ export interface FieldState {
 	errors: ErrorAccessor | undefined
 	eventListeners: FieldEventListenerStore | undefined
 	fieldMarker: FieldMarker
-	getAccessor: () => FieldAccessor
+	readonly getAccessor: () => FieldAccessor
 	hasUnpersistedChanges: boolean
 	parent: EntityRealmState
 	persistedValue: Scalar | undefined // Undefined means that the parent entity doesn't exist on server

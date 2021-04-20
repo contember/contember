@@ -60,10 +60,5 @@ export interface EntityRealmState {
 	plannedHasOneDeletions: Map<PlaceholderName, EntityRealmState | EntityRealmStateStub> | undefined
 	unpersistedChangesCount: number
 
-	readonly addError: EntityAccessor.AddError
-	readonly addEventListener: EntityAccessor.AddEntityEventListener
-	readonly batchUpdates: EntityAccessor.BatchUpdates
-	readonly connectEntityAtField: EntityAccessor.ConnectEntityAtField
-	readonly disconnectEntityAtField: EntityAccessor.DisconnectEntityAtField
 	readonly getAccessor: EntityAccessor.GetEntityAccessor
 }

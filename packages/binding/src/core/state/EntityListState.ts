@@ -32,7 +32,7 @@ export interface EntityListState {
 	errors: ErrorAccessor | undefined
 	eventListeners: EntityListEventListenerStore | undefined
 	childEventListeners: EntityEventListenerStore | undefined
-	getAccessor: () => EntityListAccessor
+	readonly getAccessor: () => EntityListAccessor
 	plannedRemovals: Map<EntityId, RemovalType> | undefined
 	unpersistedChangesCount: number
 }

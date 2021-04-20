@@ -23,17 +23,17 @@ export const useDerivedField = <SourceValue extends FieldValue = FieldValue>(
 	const entityKey = useEntityKey()
 	const getEntityByKey = useGetEntityByKey()
 	const potentiallyStaleParent = getEntityByKey(entityKey)
-	const stableBatchUpdatesReference = potentiallyStaleParent.batchUpdates
+	const stableGetEntityReference = potentiallyStaleParent.getAccessor
 
 	const desugaredSource = useDesugaredRelativeSingleField(sourceField)
 	const desugaredDerived = useDesugaredRelativeSingleField(derivedField)
 
 	const potentiallyStaleSourceAccessor = potentiallyStaleParent.getRelativeSingleField<SourceValue>(desugaredSource)
-	const stableAddEventListenerReference = potentiallyStaleSourceAccessor.addEventListener
+	const stableGetSourceReference = potentiallyStaleSourceAccessor.getAccessor
 
 	const onBeforeUpdate = useCallback<FieldAccessor.BeforeUpdateListener<SourceValue>>(
 		sourceAccessor => {
-			stableBatchUpdatesReference(getAccessor => {
+			stableGetEntityReference().batchUpdates(getAccessor => {
 				// This is tricky: we're deliberately getting the Entity, and not the field
 				const derivedHostEntity = getAccessor().getRelativeSingleEntity(desugaredDerived)
 
@@ -54,11 +54,11 @@ export const useDerivedField = <SourceValue extends FieldValue = FieldValue>(
 				})
 			})
 		},
-		[agent, desugaredDerived, transform, stableBatchUpdatesReference],
+		[stableGetEntityReference, desugaredDerived, transform, agent],
 	)
 
-	useEffect(() => stableAddEventListenerReference('beforeUpdate', onBeforeUpdate), [
+	useEffect(() => stableGetSourceReference().addEventListener('beforeUpdate', onBeforeUpdate), [
 		onBeforeUpdate,
-		stableAddEventListenerReference,
+		stableGetSourceReference,
 	])
 }

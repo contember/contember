@@ -1,4 +1,4 @@
-import { BatchUpdatesOptions, EntityAccessor } from '../../accessors'
+import { BatchUpdatesOptions, EntityAccessor, ErrorAccessor } from '../../accessors'
 import { ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EntityFieldMarkersContainer, HasOneRelationMarker } from '../../markers'
@@ -12,7 +12,6 @@ import {
 	EntityListState,
 	EntityRealmState,
 	EntityRealmStateStub,
-	EntityState,
 	getEntityMarker,
 	StateIterator,
 	StateType,
@@ -29,6 +28,10 @@ export class EntityOperations {
 		private readonly stateInitializer: StateInitializer,
 		private readonly treeStore: TreeStore,
 	) {}
+
+	public addError(entityRealm: EntityRealmState, error: ErrorAccessor.SugaredValidationError): () => void {
+		return this.accessorErrorManager.addError(entityRealm, { type: ErrorAccessor.ErrorType.Validation, error })
+	}
 
 	public addEventListener(
 		state: EntityRealmState,
@@ -255,8 +258,9 @@ export class EntityOperations {
 		})
 	}
 
-	public deleteEntity(outerState: EntityState) {
+	public deleteEntity(realm: EntityRealmState) {
 		this.eventManager.syncOperation(() => {
+			const outerState = realm.entity
 			outerState.isScheduledForDeletion = true
 
 			const entityId = outerState.id

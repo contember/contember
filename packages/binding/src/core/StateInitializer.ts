@@ -152,26 +152,12 @@ export class StateInitializer {
 			fieldsWithPendingConnectionUpdates: undefined,
 			plannedHasOneDeletions: undefined,
 			unpersistedChangesCount: 0,
-
-			addError: error => {
-				return this.accessorErrorManager.addError(entityRealm, { type: ErrorAccessor.ErrorType.Validation, error })
-			},
-			addEventListener: (type: keyof EntityAccessor.RuntimeEntityEventListenerMap, ...args: unknown[]) => {
-				return this.entityOperations.addEventListener(entityRealm, type, ...args)
-			},
-			batchUpdates: performUpdates => {
-				this.entityOperations.batchUpdates(entityRealm, performUpdates)
-			},
-			connectEntityAtField: (fieldName, entityToConnect) => {
-				this.entityOperations.connectEntityAtField(entityRealm, fieldName, entityToConnect)
-			},
-			disconnectEntityAtField: (fieldName, initializeReplacement) => {
-				this.entityOperations.disconnectEntityAtField(entityRealm, fieldName, initializeReplacement)
-			},
 			getAccessor: () => {
 				if (entityRealm.accessor === undefined) {
 					const entity = entityRealm.entity
 					entityRealm.accessor = new EntityAccessor(
+						entityRealm,
+						this.entityOperations,
 						entity.id,
 						entityRealm.realmKey,
 						entity.entityName,
@@ -182,12 +168,7 @@ export class StateInitializer {
 						this.treeStore.persistedEntityData.get(entity.id.value),
 						entityRealm.errors,
 						getEntityMarker(entityRealm).environment,
-						entityRealm.addError,
-						entityRealm.addEventListener,
-						entityRealm.batchUpdates,
-						entityRealm.connectEntityAtField,
-						entityRealm.disconnectEntityAtField,
-						entity.deleteEntity,
+						entityRealm.getAccessor,
 					)
 				}
 				return entityRealm.accessor
@@ -314,10 +295,6 @@ export class StateInitializer {
 			isScheduledForDeletion: false,
 			maidenId: id instanceof UnpersistedEntityDummyId ? id : undefined,
 			realms: new Map(),
-
-			deleteEntity: () => {
-				this.entityOperations.deleteEntity(entityState)
-			},
 		}
 		this.treeStore.entityStore.set(entityId, entityState)
 

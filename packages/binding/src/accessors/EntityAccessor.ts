@@ -38,6 +38,7 @@ class EntityAccessor implements Errorable {
 		public readonly name: EntityName,
 		private readonly fieldData: EntityAccessor.FieldData,
 		private readonly dataFromServer: SingleEntityPersistedData | undefined,
+		public readonly hasUnpersistedChanges: boolean,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
 		public readonly getAccessor: EntityAccessor.GetEntityAccessor,

@@ -166,6 +166,7 @@ export class StateInitializer {
 						// keep in sync two copies of the same data. TS hides the extra info anyway.
 						entityRealm.children,
 						this.treeStore.persistedEntityData.get(entity.id.value),
+						entityRealm.unpersistedChangesCount !== 0,
 						entityRealm.errors,
 						getEntityMarker(entityRealm).environment,
 						entityRealm.getAccessor,
@@ -326,6 +327,7 @@ export class StateInitializer {
 						this.listOperations,
 						entityListState.children,
 						persistedEntityIds,
+						entityListState.unpersistedChangesCount !== 0,
 						entityListState.errors,
 						entityListState.blueprint.marker.environment,
 						entityListState.getAccessor,

@@ -15,6 +15,7 @@ class EntityListAccessor implements Errorable {
 		private readonly operations: ListOperations,
 		private readonly _children: ReadonlyMap<EntityId, { getAccessor: EntityAccessor.GetEntityAccessor }>,
 		private readonly _idsPersistedOnServer: ReadonlySet<string>,
+		public readonly hasUnpersistedChanges: boolean,
 		public readonly errors: ErrorAccessor | undefined,
 		public readonly environment: Environment,
 		public readonly getAccessor: EntityListAccessor.GetEntityListAccessor,

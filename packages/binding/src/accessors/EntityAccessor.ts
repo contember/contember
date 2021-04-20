@@ -109,7 +109,7 @@ class EntityAccessor implements Errorable {
 
 	//
 
-	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs) {
+	public updateValues(fieldValuePairs: EntityAccessor.FieldValuePairs): void {
 		this.batchUpdates(getAccessor => {
 			const entries = Array.isArray(fieldValuePairs) ? fieldValuePairs : Object.entries(fieldValuePairs)
 

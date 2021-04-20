@@ -62,7 +62,7 @@ class EntityListAccessor implements Errorable {
 		return this._children.size
 	}
 
-	public hasEntityOnServer(entityOrItsId: EntityAccessor | string): boolean {
+	public hasEntityOnServer(entityOrItsId: EntityAccessor | EntityId): boolean {
 		if (typeof entityOrItsId === 'string') {
 			return this.idsPersistedOnServer.has(entityOrItsId)
 		}
@@ -73,24 +73,22 @@ class EntityListAccessor implements Errorable {
 		return this.idsPersistedOnServer.has(idOnServer)
 	}
 
-	public deleteAll() {
+	public deleteAll(): void {
 		this.batchUpdates(getAccessor => {
 			const list = getAccessor()
 			for (const entity of list) {
 				entity.deleteEntity()
 			}
 		})
-		return this
 	}
 
-	public disconnectAll() {
+	public disconnectAll(): void {
 		this.batchUpdates(getAccessor => {
 			const list = getAccessor()
 			for (const entity of list) {
 				list.disconnectEntity(entity)
 			}
 		})
-		return this
 	}
 
 	public addError(error: ErrorAccessor.SugaredValidationError): () => void {
@@ -132,21 +130,21 @@ class EntityListAccessor implements Errorable {
 		return this.operations.addEventListener(this.stateKey, type, ...args)
 	}
 
-	public batchUpdates(performUpdates: EntityListAccessor.BatchUpdatesHandler) {
+	public batchUpdates(performUpdates: EntityListAccessor.BatchUpdatesHandler): void {
 		this.operations.batchUpdates(this.stateKey, performUpdates)
 	}
 
-	public connectEntity(entityToConnect: EntityAccessor) {
+	public connectEntity(entityToConnect: EntityAccessor): void {
 		this.operations.connectEntity(this.stateKey, entityToConnect)
 	}
 
-	public createNewEntity(initialize?: EntityAccessor.BatchUpdatesHandler) {
+	public createNewEntity(initialize?: EntityAccessor.BatchUpdatesHandler): void {
 		this.operations.createNewEntity(this.stateKey, initialize)
 	}
-	public disconnectEntity(childEntity: EntityAccessor) {
+	public disconnectEntity(childEntity: EntityAccessor): void {
 		this.operations.disconnectEntity(this.stateKey, childEntity)
 	}
-	public getChildEntityById(id: EntityId) {
+	public getChildEntityById(id: EntityId): EntityAccessor {
 		return this.operations.getChildEntityById(this.stateKey, id)
 	}
 }

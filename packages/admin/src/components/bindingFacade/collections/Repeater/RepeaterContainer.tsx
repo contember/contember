@@ -8,7 +8,7 @@ export interface RepeaterContainerPrivateProps {
 	entities: EntityAccessor[]
 	isEmpty: boolean
 	label: ReactNode
-	createNewEntity: EntityListAccessor.CreateNewEntity
+	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	children: ReactNode
 }
 export interface RepeaterContainerPublicProps {

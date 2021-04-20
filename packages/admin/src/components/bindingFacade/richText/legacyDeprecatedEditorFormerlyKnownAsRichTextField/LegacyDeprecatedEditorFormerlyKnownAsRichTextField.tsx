@@ -28,7 +28,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 	props => {
 		const entity = useEntity()
 		const environment = entity.environment
-		const batchUpdates = entity.batchUpdates
+		const getParent = entity.getAccessor
 
 		const desugaredField = useMemo(() => QueryLanguage.desugarRelativeSingleField(props, environment), [
 			environment,
@@ -59,7 +59,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 		const serialize = editor.serializeNodes
 		const onChange = useCallback(
 			(value: SlateNode[]) => {
-				batchUpdates(getAccessor => {
+				getParent().batchUpdates(getAccessor => {
 					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
 
 					if (SlateNode.string({ children: value }) === '') {
@@ -71,7 +71,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 					contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as ElementNode[])
 				})
 			},
-			[batchUpdates, contemberFieldElementCache, desugaredField, serialize],
+			[getParent, contemberFieldElementCache, desugaredField, serialize],
 		)
 
 		return (

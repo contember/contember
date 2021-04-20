@@ -123,7 +123,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const referenceList = props.monolithicReferencesMode ? useEntityList(referencesField) : undefined
 
-		const batchUpdates = parentEntity.batchUpdates
+		const getParentEntity = parentEntity.getAccessor
 		const blockList = useEntityList(blockListProps)
 
 		const desugaredBlockList = useDesugaredRelativeEntityList(blockListProps)
@@ -166,13 +166,13 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 		//
 
-		const batchUpdatesRef = useRef(batchUpdates)
+		const getParentEntityRef = useRef(getParentEntity)
 		const blockListRef = useRef(blockList)
 		const isMutatingRef = useRef(isMutating)
 		const sortedBlocksRef = useRef(topLevelBlocks)
 
 		useLayoutEffect(() => {
-			batchUpdatesRef.current = batchUpdates
+			getParentEntityRef.current = getParentEntity
 			blockListRef.current = blockList
 			isMutatingRef.current = isMutating
 			sortedBlocksRef.current = topLevelBlocks
@@ -193,20 +193,24 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			createBlockEditor({
 				augmentEditor,
 				augmentEditorBuiltins,
-				batchUpdatesRef,
 				bindingOperations,
 				blockContentField: desugaredBlockContentField,
 				blockElementCache,
 				blockElementPathRefs,
 				contemberFieldElementCache,
-				createMonolithicReference: referenceList?.createNewEntity,
+				createMonolithicReference: referenceList
+					? initialize => referenceList.getAccessor().createNewEntity(initialize)
+					: undefined,
 				desugaredBlockList,
 				editorReferenceBlocks,
 				embedContentDiscriminationField: desugaredEmbedContentDiscriminationField,
 				embedHandlers: discriminatedEmbedHandlers,
 				embedReferenceDiscriminateBy: embedReferenceDiscriminant,
 				embedSubBlocks,
-				getMonolithicReferenceById: referenceList?.getChildEntityById,
+				getMonolithicReferenceById: referenceList
+					? id => referenceList.getAccessor().getChildEntityById(id)
+					: undefined,
+				getParentEntityRef,
 				isMutatingRef,
 				leadingFields: leadingFieldBackedElements,
 				trailingFields: trailingFieldBackedElements,

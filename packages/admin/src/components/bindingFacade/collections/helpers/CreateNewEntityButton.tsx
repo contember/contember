@@ -1,9 +1,9 @@
-import { EntityListAccessor, useMutationState } from '@contember/binding'
+import { EntityAccessor, useMutationState } from '@contember/binding'
 import { Button, ButtonBasedButtonProps, FormGroup, Icon, IconProps } from '@contember/ui'
 import { memo } from 'react'
 
 export type CreateNewEntityButtonProps = ButtonBasedButtonProps & {
-	createNewEntity: EntityListAccessor.CreateNewEntity
+	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	iconProps?: IconProps
 }
 
@@ -20,9 +20,6 @@ export const CreateNewEntityButton = memo(
 	({ createNewEntity, iconProps, children = 'Add', ...buttonProps }: CreateNewEntityButtonProps) => {
 		const isMutating = useMutationState()
 
-		if (!createNewEntity) {
-			return null
-		}
 		return (
 			<FormGroup label={undefined}>
 				<Button

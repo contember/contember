@@ -14,12 +14,12 @@ import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideOnChangeOptions {
-	batchUpdatesRef: MutableRefObject<EntityAccessor.BatchUpdates>
 	blockContentField: RelativeSingleField
 	blockElementCache: WeakMap<EntityAccessor, ElementNode>
 	blockElementPathRefs: Map<string, PathRef>
 	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	desugaredBlockList: RelativeEntityList
+	getParentEntityRef: MutableRefObject<EntityAccessor.GetEntityAccessor>
 	leadingFields: FieldBackedElement[]
 	trailingFields: FieldBackedElement[]
 	sortableByField: RelativeSingleField
@@ -29,12 +29,12 @@ export interface OverrideOnChangeOptions {
 export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 	editor: E,
 	{
-		batchUpdatesRef,
 		blockContentField,
 		blockElementCache,
 		blockElementPathRefs,
 		contemberFieldElementCache,
 		desugaredBlockList,
+		getParentEntityRef,
 		leadingFields,
 		trailingFields,
 		sortableByField,
@@ -89,7 +89,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 			// Fast path: we're just typing and need to at most update top-level blocks. Typically just one though.
 			// TODO nested leading/trailing will complicate this.
 
-			return batchUpdatesRef.current(getEntity => {
+			return getParentEntityRef.current().batchUpdates(getEntity => {
 				for (const operation of operations) {
 					switch (operation.type) {
 						case 'insert_text':
@@ -109,9 +109,8 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 								)
 							} else {
 								// This is a block
-								const getBlockById = getEntity().getRelativeEntityList(desugaredBlockList).getChildEntityById
 								saveBlockElement(
-									getBlockById,
+									getEntity().getRelativeEntityList(desugaredBlockList).getAccessor,
 									topLevelBlocks[topLevelIndex - leadingCount].id,
 									children[topLevelIndex] as EditorNode,
 								)
@@ -123,16 +122,16 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 			})
 		}
 
-		return batchUpdatesRef.current(getAccessor => {
+		return getParentEntityRef.current().batchUpdates(getAccessor => {
 			const processedAccessors: Array<true | undefined> = Array.from({
 				length: editor.children.length - leadingCount - trailingCount,
 			})
 			const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
-			const getBlockById = blockList.getChildEntityById
+			const getBlockList = blockList.getAccessor
 
 			for (const [blockId, pathRef] of blockElementPathRefs) {
 				const current = pathRef.current
-				const originalBlock = getBlockById(blockId)
+				const originalBlock = getBlockList().getChildEntityById(blockId)
 				const cleanUp = () => {
 					originalBlock.deleteEntity()
 					pathRef.unref()
@@ -160,8 +159,11 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 								originalElement !== currentElement ||
 								originalBlock.getRelativeSingleField(sortableByField).value !== newBlockOrder
 							) {
-								getBlockById(blockId).getRelativeSingleField(sortableByField).updateValue(newBlockOrder)
-								saveBlockElement(getBlockById, blockId, currentElement)
+								getBlockList()
+									.getChildEntityById(blockId)
+									.getRelativeSingleField(sortableByField)
+									.updateValue(newBlockOrder)
+								saveBlockElement(getBlockList, blockId, currentElement)
 							}
 							processedAccessors[newBlockOrder] = true
 						}
@@ -191,7 +193,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 						blockList.createNewEntity(getAccessor => {
 							const newId = getAccessor().id
 							getAccessor().getRelativeSingleField(sortableByField).updateValue(blockOrder)
-							saveBlockElement(getBlockById, newId, child as EditorNode)
+							saveBlockElement(getBlockList, newId, child as EditorNode)
 							blockElementPathRefs.set(newId, Editor.pathRef(editor, [topLevelIndex], { affinity: 'backward' }))
 						})
 					}
@@ -218,10 +220,11 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 		contemberFieldElementCache.set(getParentEntity().getField(fieldBackedElement.field), editorElement)
 	}
 
-	const saveBlockElement = (getBlockById: EntityListAccessor.GetChildEntityById, id: string, element: EditorNode) => {
-		getBlockById(id)
+	const saveBlockElement = (getBlockList: () => EntityListAccessor, id: string, element: EditorNode) => {
+		getBlockList()
+			.getChildEntityById(id)
 			.getRelativeSingleField(blockContentField)
 			.updateValue(editor.serializeNodes([element]))
-		blockElementCache.set(getBlockById(id), element)
+		blockElementCache.set(getBlockList().getChildEntityById(id), element)
 	}
 }

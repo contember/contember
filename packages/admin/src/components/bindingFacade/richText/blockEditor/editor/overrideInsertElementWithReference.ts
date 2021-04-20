@@ -2,7 +2,6 @@ import {
 	addEntityAtIndex,
 	BindingOperations,
 	EntityAccessor,
-	EntityListAccessor,
 	FieldValue,
 	RelativeEntityList,
 	RelativeSingleField,
@@ -15,13 +14,13 @@ import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertElementWithReferenceOptions {
-	batchUpdatesRef: MutableRefObject<EntityAccessor.BatchUpdates>
 	bindingOperations: BindingOperations
 	blockContentField: RelativeSingleField
 	blockElementCache: WeakMap<EntityAccessor, ElementNode>
 	blockElementPathRefs: Map<string, PathRef>
-	createMonolithicReference: EntityListAccessor.CreateNewEntity | undefined
+	createMonolithicReference: ((initialize: EntityAccessor.BatchUpdatesHandler) => void) | undefined
 	desugaredBlockList: RelativeEntityList
+	getParentEntityRef: MutableRefObject<EntityAccessor.GetEntityAccessor>
 	leadingFields: FieldBackedElement[]
 	referenceDiscriminationField: RelativeSingleField | undefined
 	sortableByField: RelativeSingleField
@@ -33,13 +32,13 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 	options: OverrideInsertElementWithReferenceOptions,
 ) => {
 	const {
-		batchUpdatesRef,
 		bindingOperations,
 		blockContentField,
 		blockElementCache,
 		blockElementPathRefs,
 		createMonolithicReference,
 		desugaredBlockList,
+		getParentEntityRef,
 		leadingFields,
 		referenceDiscriminationField,
 		sortableByField,
@@ -63,7 +62,7 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 				// We're creating a top-level block and aren't in monolithic mode.
 				// Hence we need to first create the block entity.
 				bindingOperations.batchDeferredUpdates(() => {
-					batchUpdatesRef.current(getAccessor => {
+					getParentEntityRef.current().batchUpdates(getAccessor => {
 						const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
 						addEntityAtIndex(blockList, sortableByField, blockOrder, getNewBlock => {
 							newBlockId = getNewBlock().id
@@ -78,7 +77,7 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 
 			if (preppedPath.length === 1 && !createMonolithicReference && newBlockId !== undefined) {
 				bindingOperations.batchDeferredUpdates(() => {
-					batchUpdatesRef.current(getAccessor => {
+					getParentEntityRef.current().batchUpdates(getAccessor => {
 						const blockList = getAccessor().getRelativeEntityList(desugaredBlockList)
 
 						blockElementPathRefs.set(

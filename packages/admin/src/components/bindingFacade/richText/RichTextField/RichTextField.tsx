@@ -9,7 +9,7 @@ import {
 } from '@contember/binding'
 import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
-import { Editor, Node as SlateNode, NodeEntry, Text, Transforms } from 'slate'
+import { Editor, Node as SlateNode, NodeEntry, Transforms } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { ElementNode } from '../baseEditor'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
@@ -28,7 +28,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 	props => {
 		const entity = useEntity()
 		const environment = entity.environment
-		const batchUpdates = entity.batchUpdates
+		const getParent = entity.getAccessor
 
 		const desugaredField = useMemo(() => QueryLanguage.desugarRelativeSingleField(props, environment), [
 			environment,
@@ -107,7 +107,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 		const serialize = editor.serializeNodes
 		const onChange = useCallback(
 			(value: SlateNode[]) => {
-				batchUpdates(getAccessor => {
+				getParent().batchUpdates(getAccessor => {
 					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
 
 					if (SlateNode.string({ children: value }) === '') {
@@ -119,7 +119,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 					contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as ElementNode[])
 				})
 			},
-			[batchUpdates, contemberFieldElementCache, desugaredField, serialize],
+			[getParent, contemberFieldElementCache, desugaredField, serialize],
 		)
 
 		return (

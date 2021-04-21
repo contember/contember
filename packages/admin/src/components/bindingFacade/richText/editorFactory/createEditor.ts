@@ -9,6 +9,7 @@ import {
 	withHorizontalRules,
 	withItalic,
 	withLists,
+	withNewline,
 	withParagraphs,
 	withScrollTargets,
 	withStrikeThrough,
@@ -33,6 +34,7 @@ const pluginAugmenters: {
 	code: withCode,
 	highlight: withHighlight,
 	italic: withItalic,
+	newline: withNewline,
 	strikeThrough: withStrikeThrough,
 	underline: withUnderline,
 }

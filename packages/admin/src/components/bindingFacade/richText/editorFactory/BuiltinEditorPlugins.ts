@@ -1,3 +1,3 @@
-type BuiltinLeaves = 'bold' | 'code' | 'italic' | 'highlight' | 'strikeThrough' | 'underline'
-type BuiltinElements = 'anchor' | 'heading' | 'list' | 'horizontalRule' | 'paragraph' | 'scrollTarget' | 'table'
-export type BuiltinEditorPlugins = BuiltinElements | BuiltinLeaves
+type BuiltinTextBased = 'bold' | 'code' | 'italic' | 'highlight' | 'newline' | 'strikeThrough' | 'underline'
+type BuiltinElementBased = 'anchor' | 'heading' | 'list' | 'horizontalRule' | 'paragraph' | 'scrollTarget' | 'table'
+export type BuiltinEditorPlugins = BuiltinElementBased | BuiltinTextBased

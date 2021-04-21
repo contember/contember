@@ -8,6 +8,7 @@ export const defaultEditorPluginPreset: BuiltinEditorPlugins[] = [
 	'italic',
 	'bold',
 	'scrollTarget',
+	'newline',
 	'table',
 
 	'anchor',

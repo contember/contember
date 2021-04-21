@@ -119,12 +119,12 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		} = props
 
 		const parentEntity = useEntity() // TODO this is over-subscribing
+		const blockList = useEntityList(blockListProps)
 
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const referenceList = props.monolithicReferencesMode ? useEntityList(referencesField) : undefined
 
 		const getParentEntity = parentEntity.getAccessor
-		const blockList = useEntityList(blockListProps)
 
 		const desugaredBlockList = useDesugaredRelativeEntityList(blockListProps)
 		const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
@@ -167,13 +167,11 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		//
 
 		const getParentEntityRef = useRef(getParentEntity)
-		const blockListRef = useRef(blockList)
 		const isMutatingRef = useRef(isMutating)
 		const sortedBlocksRef = useRef(topLevelBlocks)
 
 		useLayoutEffect(() => {
 			getParentEntityRef.current = getParentEntity
-			blockListRef.current = blockList
 			isMutatingRef.current = isMutating
 			sortedBlocksRef.current = topLevelBlocks
 		}) // Deliberately no deps array

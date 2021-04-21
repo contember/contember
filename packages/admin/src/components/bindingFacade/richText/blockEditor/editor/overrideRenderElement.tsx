@@ -1,7 +1,14 @@
-import { AccessorProvider, FieldValue, RelativeSingleField } from '@contember/binding'
+import {
+	AccessorProvider,
+	EntityAccessor,
+	FieldValue,
+	RelativeEntityList,
+	RelativeSingleField,
+} from '@contember/binding'
+import { MutableRefObject } from 'react'
 import { NormalizedBlocks } from '../../../blocks'
 import { isElementWithReference } from '../elements'
-import { NormalizedEmbedHandlers } from '../embed/core'
+import { NormalizedEmbedHandlers } from '../embed'
 import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockEditorElementRenderer } from '../renderers'
 import { EditorReferenceBlocks } from '../templating'
@@ -10,6 +17,8 @@ import { BlockSlateEditor } from './BlockSlateEditor'
 export interface OverrideRenderElementOptions {
 	editorReferenceBlocks: EditorReferenceBlocks
 	referenceDiscriminationField: RelativeSingleField | undefined
+	getParentEntityRef: MutableRefObject<EntityAccessor.GetEntityAccessor>
+	desugaredBlockList: RelativeEntityList
 
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks | undefined
@@ -31,6 +40,8 @@ export const overrideRenderElement = <E extends BlockSlateEditor>(editor: E, opt
 				element={props.element}
 				fallbackRenderer={renderElement}
 				referenceDiscriminationField={options.referenceDiscriminationField}
+				getParentEntityRef={options.getParentEntityRef}
+				desugaredBlockList={options.desugaredBlockList}
 				editorReferenceBlocks={options.editorReferenceBlocks}
 				embedContentDiscriminationField={options.embedContentDiscriminationField}
 				embedSubBlocks={options.embedSubBlocks}

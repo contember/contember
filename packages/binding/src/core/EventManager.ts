@@ -66,7 +66,7 @@ export class EventManager {
 				reject(e)
 			} finally {
 				this.ongoingPersistOperation = undefined
-				this.updateTreeRoot()
+				this.flushUpdates()
 			}
 		}))
 	}

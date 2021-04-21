@@ -7,6 +7,7 @@ import { paragraphElementType } from '../../plugins'
 import { isContemberContentPlaceholderElement, isContemberFieldElement, isReferenceElement } from '../elements'
 import { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
+import { overrideCanContainAnyBlocks, OverrideCanContainAnyBlocksOptions } from './overrideCanContainAnyBlocks'
 import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference'
 import { overrideGetReferencedEntity, OverrideGetReferencedEntityOptions } from './overrideGetReferencedEntity'
 import { overrideInsertBreak } from './overrideInsertBreak'
@@ -28,6 +29,7 @@ export interface CreateEditorOptions
 		OverrideCreateElementReferenceOptions,
 		OverrideGetReferencedEntityOptions,
 		OverrideApplyOptions,
+		OverrideCanContainAnyBlocksOptions,
 		OverrideRenderElementOptions,
 		OverrideNormalizeNodeOptions,
 		OverrideInsertDataOptions,
@@ -91,6 +93,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			e.slate = Slate
 
 			overrideApply(e, options)
+			overrideCanContainAnyBlocks(e, options)
 			overrideCreateElementReference(e, options)
 			overrideGetReferencedEntity(e, options)
 			overrideInsertBreak(e, options)
@@ -100,7 +103,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			overrideIsVoid(e, options)
 			overrideNormalizeNode(e, options)
 			overrideOnKeyDown(e, options)
-			overridePrepareElementForInsertion(e)
+			overridePrepareElementForInsertion(e, options)
 			overrideRenderElement(e, options)
 			overrideSlateOnChange(e, options)
 

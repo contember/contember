@@ -1,4 +1,3 @@
-import { DevErrorBoundary } from '@contember/ui'
 import {
 	ComponentType,
 	createContext,
@@ -11,6 +10,7 @@ import {
 } from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
+import { DevErrorBoundary } from './DevErrorBoundary'
 import { Page, PageProps } from './Page'
 import { PageProvider } from './PageProvider'
 

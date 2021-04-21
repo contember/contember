@@ -1,21 +1,24 @@
-import { BindingError, FieldValue, RelativeSingleField } from '@contember/binding'
-import { EditorPlaceholder } from '@contember/ui'
-import { ReactElement } from 'react'
+import { BindingError, EntityAccessor, FieldValue, RelativeEntityList, RelativeSingleField } from '@contember/binding'
+import { MutableRefObject, ReactElement } from 'react'
 import { RenderElementProps } from 'slate-react'
 import { NormalizedBlocks } from '../../../blocks'
-import { BlockElement, ElementNode } from '../../baseEditor'
+import { ElementNode } from '../../baseEditor'
 import { isContemberContentPlaceholderElement, isContemberFieldElement, isReferenceElement } from '../elements'
 import { NormalizedEmbedHandlers } from '../embed'
 import { FieldBackedElement } from '../FieldBackedElement'
 import { EditorReferenceBlocks } from '../templating'
 import { ContemberFieldElementRenderer } from './ContemberFieldElementRenderer'
+import { ContentPlaceholderElementRenderer } from './ContentPlaceholderElementRenderer'
 import { ReferenceElementRenderer } from './ReferenceElementRenderer'
 
 export interface BlockEditorElementRendererProps extends RenderElementProps {
 	element: ElementNode
-	referenceDiscriminationField: RelativeSingleField | undefined
+
+	desugaredBlockList: RelativeEntityList
 	editorReferenceBlocks: EditorReferenceBlocks
 	fallbackRenderer: (props: RenderElementProps) => ReactElement
+	getParentEntityRef: MutableRefObject<EntityAccessor.GetEntityAccessor>
+	referenceDiscriminationField: RelativeSingleField | undefined
 
 	embedContentDiscriminationField: RelativeSingleField | undefined
 	embedSubBlocks: NormalizedBlocks | undefined
@@ -36,6 +39,8 @@ export function BlockEditorElementRenderer({
 	referenceDiscriminationField,
 	leadingFields,
 	trailingFields,
+	getParentEntityRef,
+	desugaredBlockList,
 	...renderElementProps
 }: BlockEditorElementRendererProps) {
 	const { attributes, children, element } = renderElementProps
@@ -70,10 +75,13 @@ export function BlockEditorElementRenderer({
 	}
 	if (isContemberContentPlaceholderElement(element)) {
 		return (
-			<BlockElement attributes={attributes} element={element}>
-				<EditorPlaceholder>{element.placeholder}</EditorPlaceholder>
-				{children}
-			</BlockElement>
+			<ContentPlaceholderElementRenderer
+				attributes={attributes}
+				children={children}
+				element={element}
+				getParentEntityRef={getParentEntityRef}
+				desugaredBlockList={desugaredBlockList}
+			/>
 		)
 	}
 	return fallbackRenderer(renderElementProps)

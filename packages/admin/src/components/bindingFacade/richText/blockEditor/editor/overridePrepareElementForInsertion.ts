@@ -10,13 +10,22 @@ import {
 } from 'slate'
 import { ElementNode } from '../../baseEditor'
 import { ContemberEditor } from '../../ContemberEditor'
+import { FieldBackedElement } from '../FieldBackedElement'
 import { BlockSlateEditor } from './BlockSlateEditor'
 
-export interface OverridePrepareElementForInsertionOptions {}
+export interface OverridePrepareElementForInsertionOptions {
+	leadingFields: FieldBackedElement[]
+	trailingFields: FieldBackedElement[]
+}
 
-export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(editor: E) => {
+export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
+	editor: E,
+	options: OverridePrepareElementForInsertionOptions,
+) => {
 	// No need to call the implementation underneath. By default, it just throws anyway.
 	// const { prepareElementForInsertion } = editor
+
+	const { leadingFields, trailingFields } = options
 
 	editor.prepareElementForInsertion = node => {
 		const selection = editor.selection
@@ -61,6 +70,17 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(e
 
 		if (editor.canContainAnyBlocks(closestBlockElement)) {
 			return targetPoint.path
+		}
+
+		if (editor.isContemberFieldElement(closestBlockElement)) {
+			const topLevelIndex = closestBlockPath[0]
+			if (topLevelIndex < leadingFields.length) {
+				return [leadingFields.length] // Place it after the leading fields
+			}
+			if (editor.children.length - trailingFields.length <= topLevelIndex) {
+				return [editor.children.length - trailingFields.length - 1] // Place it before the trailing fields
+			}
+			// Should probably throw from here
 		}
 
 		if (SlateNode.string(closestBlockElement) === '') {

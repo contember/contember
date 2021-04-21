@@ -52,7 +52,7 @@ function toToolbarGroups(
 
 							if (targetBlock === undefined) {
 								throw new BindingError(
-									`BlockEditor: Trying to insert a block discriminated by '${discriminateBy}' but nu such block has been found!`,
+									`BlockEditor: Trying to insert a block discriminated by '${discriminateBy}' but no such block has been found!`,
 								)
 							}
 							let insertedElement: Omit<ReferenceElement, 'referenceId'>

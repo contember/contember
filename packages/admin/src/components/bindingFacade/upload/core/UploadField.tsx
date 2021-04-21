@@ -120,7 +120,7 @@ export const UploadField: FunctionComponent<UploadFieldProps> = Component(
 								{singleFileUploadState ? (
 									<UploadingFilePreview
 										uploadState={singleFileUploadState}
-										batchUpdates={entity.batchUpdates}
+										getFileAccessor={entity.getAccessor}
 										renderFilePreview={props.renderFilePreview}
 										environment={environment}
 										populators={populators}

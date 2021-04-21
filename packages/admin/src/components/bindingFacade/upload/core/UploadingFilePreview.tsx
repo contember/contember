@@ -6,7 +6,7 @@ import { FileDataPopulator } from '../fileDataPopulators'
 import { getRelevantPopulators } from './getRelevantPopulators'
 
 export interface UploadingFilePreviewProps {
-	batchUpdates: EntityAccessor['batchUpdates']
+	getFileAccessor: EntityAccessor['getAccessor']
 	environment: Environment
 	uploadState: SingleFileUploadState
 	populators: Iterable<FileDataPopulator>
@@ -28,7 +28,7 @@ type PopulatorDataState =
 	  }
 
 export const UploadingFilePreview = memo(
-	({ uploadState, batchUpdates, environment, populators, renderFilePreview }: UploadingFilePreviewProps) => {
+	({ uploadState, getFileAccessor, environment, populators, renderFilePreview }: UploadingFilePreviewProps) => {
 		const uploadStateRef = useRef(uploadState)
 		const [preparedPopulatorData, setPreparedPopulatorData] = useState<PopulatorDataState>({
 			name: 'uninitialized',
@@ -76,15 +76,11 @@ export const UploadingFilePreview = memo(
 		}, [readyState, relevantPopulators])
 
 		useEffect(() => {
-			if (
-				uploadState.readyState !== FileUploadReadyState.Success ||
-				preparedPopulatorData.name !== 'ready' ||
-				!batchUpdates
-			) {
+			if (uploadState.readyState !== FileUploadReadyState.Success || preparedPopulatorData.name !== 'ready') {
 				return
 			}
 
-			batchUpdates(() => {
+			getFileAccessor().batchUpdates(() => {
 				for (let i = 0; i < relevantPopulators.length; i++) {
 					const populator = relevantPopulators[i]
 					const preparedData = preparedPopulatorData.data[i]
@@ -95,14 +91,14 @@ export const UploadingFilePreview = memo(
 							file: uploadState.file,
 							previewUrl: uploadState.previewUrl,
 							environment,
-							batchUpdates,
+							getFileAccessor,
 						},
 						preparedData,
 					)
 				}
 			})
 		}, [
-			batchUpdates,
+			getFileAccessor,
 			environment,
 			preparedPopulatorData.data,
 			preparedPopulatorData.name,

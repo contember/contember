@@ -32,7 +32,7 @@ export class GenericFileMetadataPopulator implements FileDataPopulator {
 	}
 
 	public populateFileData(options: FileDataPopulatorOptions) {
-		options.batchUpdates(getAccessor => {
+		options.getFileAccessor().batchUpdates(getAccessor => {
 			if (this.props.fileNameField) {
 				const fileNameField = QueryLanguage.desugarRelativeSingleField(this.props.fileNameField, options.environment)
 				getAccessor().getRelativeSingleField<string>(fileNameField).updateValue(options.file.name)

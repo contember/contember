@@ -42,7 +42,7 @@ export class VideoFileMetadataPopulator implements FileDataPopulator<HTMLVideoEl
 	}
 
 	public populateFileData(options: FileDataPopulatorOptions, videoElement: HTMLVideoElement) {
-		options.batchUpdates(getAccessor => {
+		options.getFileAccessor().batchUpdates(getAccessor => {
 			if (this.props.videoWidthField) {
 				const videoWidthField = QueryLanguage.desugarRelativeSingleField(
 					this.props.videoWidthField,

@@ -5,7 +5,7 @@ export interface FileDataPopulatorOptions<UploadResult = any> {
 	file: File
 	previewUrl: string
 	uploadResult: UploadResult
-	batchUpdates: EntityAccessor['batchUpdates']
+	getFileAccessor: EntityAccessor['getAccessor']
 	environment: Environment
 }
 

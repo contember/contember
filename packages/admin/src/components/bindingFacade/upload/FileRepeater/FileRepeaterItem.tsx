@@ -67,7 +67,7 @@ export const FileRepeaterItem = memo(
 		const preview = uploadingState ? (
 			<UploadingFilePreview
 				uploadState={uploadingState}
-				batchUpdates={entity.batchUpdates}
+				getFileAccessor={entity.getAccessor}
 				renderFilePreview={resolvedFileKind.renderFilePreview || defaultFileKind.renderFilePreview}
 				environment={environment}
 				populators={fileDataPopulators}

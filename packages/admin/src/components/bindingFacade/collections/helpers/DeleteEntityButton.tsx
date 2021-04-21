@@ -14,9 +14,6 @@ export const DeleteEntityButton = memo((props: DeleteEntityButtonProps) => {
 	const triggerPersist = usePersistWithFeedback()
 	const isMutating = useMutationState()
 	const onClick = useCallback(() => {
-		if (!parentEntity.deleteEntity) {
-			return
-		}
 		if (props.immediatePersist && !confirm('Really?')) {
 			return
 		}

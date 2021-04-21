@@ -35,7 +35,7 @@ export class AudioFileMetadataPopulator implements FileDataPopulator<HTMLAudioEl
 			this.props.audioDurationField!,
 			options.environment,
 		)
-		options.batchUpdates(getAccessor => {
+		options.getFileAccessor().batchUpdates(getAccessor => {
 			getAccessor().getRelativeSingleField<number>(desugaredAudioDurationField).updateValue(audioElement.duration)
 		})
 	}

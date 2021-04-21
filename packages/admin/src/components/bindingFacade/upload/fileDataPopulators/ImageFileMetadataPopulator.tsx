@@ -37,7 +37,7 @@ export class ImageFileMetadataPopulator implements FileDataPopulator<HTMLImageEl
 	}
 
 	public populateFileData(options: FileDataPopulatorOptions, imageElement: HTMLImageElement) {
-		options.batchUpdates(getAccessor => {
+		options.getFileAccessor().batchUpdates(getAccessor => {
 			if (this.props.imageWidthField) {
 				const imageWidthField = QueryLanguage.desugarRelativeSingleField(
 					this.props.imageWidthField,

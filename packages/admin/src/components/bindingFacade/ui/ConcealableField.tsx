@@ -1,6 +1,6 @@
-import { Button, ButtonProps, toStateClass, toViewClass } from '@contember/ui'
+import { Button, ButtonProps, isSpecialLinkClick, toStateClass, toViewClass } from '@contember/ui'
 import cn from 'classnames'
-import { memo, ReactNode, Ref, useCallback, useRef, useState } from 'react'
+import { memo, ReactNode, Ref, useCallback, useMemo, useRef, useState } from 'react'
 
 export interface ConcealableFieldRendererProps {
 	onFocus: () => void
@@ -30,6 +30,16 @@ export const ConcealableField = memo(
 		const onBlur = useCallback(() => {
 			setConcealTimeoutId((setTimeout(() => setIsEditing(false), concealTimeout) as any) as number)
 		}, [concealTimeout])
+		const concealedValue = renderConcealedValue()
+		const urlValue = useMemo(() => {
+			if (
+				typeof concealedValue === 'string' &&
+				(concealedValue.startsWith('http://') || concealedValue.startsWith('https://'))
+			) {
+				return concealedValue
+			}
+			return null
+		}, [concealedValue])
 
 		return (
 			<div className={cn('concealableField', toViewClass('extended', isExtended), toStateClass('editing', isEditing))}>
@@ -40,9 +50,14 @@ export const ConcealableField = memo(
 						inputRef,
 					})}
 				</div>
-				<div
+				<a
+					href={urlValue || '#'}
 					className="concealableField-cover"
-					onClick={() => {
+					onClick={event => {
+						if (urlValue && isSpecialLinkClick(event.nativeEvent)) {
+							return
+						}
+						event.preventDefault()
 						setIsEditing(true)
 					}}
 					key="concealableField-cover"
@@ -52,7 +67,7 @@ export const ConcealableField = memo(
 						}
 					}}
 				>
-					<div className="concealableField-value">{renderConcealedValue()}</div>
+					<div className="concealableField-value">{concealedValue}</div>
 					<Button
 						size="small"
 						distinction="seamless"
@@ -60,7 +75,7 @@ export const ConcealableField = memo(
 						{...buttonProps}
 						className="concealableField-button"
 					/>
-				</div>
+				</a>
 			</div>
 		)
 	},

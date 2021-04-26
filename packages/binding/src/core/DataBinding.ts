@@ -35,6 +35,7 @@ import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
+import { UpdateMetadata } from './UpdateMetadata'
 
 export class DataBinding {
 	private static readonly schemaLoadCache: Map<string, Schema | Promise<Schema>> = new Map()
@@ -209,7 +210,7 @@ export class DataBinding {
 		})
 	}
 
-	private resolvedOnUpdate = (isMutating: boolean) => {
+	private resolvedOnUpdate = ({ isMutating }: UpdateMetadata) => {
 		this.onUpdate(new TreeRootAccessor(this.dirtinessTracker.hasChanges(), isMutating, this.bindingOperations))
 	}
 

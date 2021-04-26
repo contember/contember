@@ -26,6 +26,7 @@ import {
 	StateType,
 } from './state'
 import { TreeStore } from './TreeStore'
+import { UpdateMetadata } from './UpdateMetadata'
 
 export class EventManager {
 	public static readonly NO_CHANGES_DIFFERENCE = 0
@@ -33,8 +34,12 @@ export class EventManager {
 	private transactionDepth = 0
 	private isFrozenWhileUpdating = false
 
+	// This should ideally not exists as it should be synonymous to `this.ongoingPersistOperation !== undefined`
+	// but it makes persist-related promise juggling significantly more straightforward.
+	private isMutating: boolean = false
 	private ongoingPersistOperation: Promise<SuccessfulPersistResult> | undefined = undefined
-	private hasEverUpdated = false
+
+	private previousMetadata: UpdateMetadata | undefined = undefined
 
 	private newlyInitializedWithListeners: Set<EntityListState | EntityRealmState | FieldState> = new Set()
 	private pendingWithBeforeUpdate: Set<StateNode> = new Set()
@@ -45,7 +50,7 @@ export class EventManager {
 		private readonly batchUpdatesOptions: BatchUpdatesOptions,
 		private readonly config: Config,
 		private readonly dirtinessTracker: DirtinessTracker,
-		private readonly onUpdate: (isMutating: boolean) => void,
+		private readonly onUpdate: (metadata: UpdateMetadata) => void,
 		private readonly treeStore: TreeStore,
 	) {}
 
@@ -58,7 +63,9 @@ export class EventManager {
 			return await ongoingOperation
 		}
 		return await (this.ongoingPersistOperation = new Promise<SuccessfulPersistResult>(async (resolve, reject) => {
-			this.updateTreeRoot() // Let the world know that we're mutating
+			this.isMutating = true
+			this.flushUpdates() // Let the world know that we're mutating
+
 			try {
 				resolve(await this.asyncOperation(operation))
 			} catch (e) {
@@ -66,6 +73,7 @@ export class EventManager {
 				reject(e)
 			} finally {
 				this.ongoingPersistOperation = undefined
+				this.isMutating = false
 				this.flushUpdates()
 			}
 		}))
@@ -107,24 +115,54 @@ export class EventManager {
 		if (this.isFrozenWhileUpdating) {
 			throw new BindingError(
 				`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
-					`by updating the accessor tree during rendering or in the 'update' event handler, which is a no-op. ` +
+					`by updating the accessor tree while rendering or from within the 'update' event handler, which is a no-op. ` +
 					`If you wish to mutate the tree in reaction to other changes, use the 'beforeUpdate' event.`,
 			)
 		}
 
-		if (this.hasEverUpdated && !this.rootsWithPendingUpdates.size) {
+		const newMetadata = this.getNewUpdateMetadata()
+
+		if (!this.shouldFlushUpdates(newMetadata)) {
 			return
 		}
-		this.hasEverUpdated = true
 
 		ReactDOM.unstable_batchedUpdates(() => {
 			this.isFrozenWhileUpdating = true
 			this.triggerBeforeFlushEvents()
-			this.updateTreeRoot()
+			this.onUpdate(newMetadata)
 			this.flushPendingAccessorUpdates(Array.from(this.rootsWithPendingUpdates))
+
 			this.rootsWithPendingUpdates.clear()
 			this.isFrozenWhileUpdating = false
+			this.previousMetadata = newMetadata
 		})
+	}
+
+	private getNewUpdateMetadata(): UpdateMetadata {
+		return {
+			isMutating: this.isMutating,
+		}
+	}
+
+	private shouldFlushUpdates(newMetadata: UpdateMetadata): boolean {
+		if (this.transactionDepth > 0) {
+			return false
+		}
+		if (this.previousMetadata === undefined) {
+			return true
+		}
+		if (this.rootsWithPendingUpdates.size) {
+			return true
+		}
+		for (const key in newMetadata) {
+			const fromPrevious = this.previousMetadata[key as keyof UpdateMetadata]
+			const fromNew = newMetadata[key as keyof UpdateMetadata]
+
+			if (!Object.is(fromPrevious, fromNew)) {
+				return true
+			}
+		}
+		return false
 	}
 
 	public registerNewlyInitialized(newlyInitialized: StateNode) {
@@ -199,10 +237,6 @@ export class EventManager {
 				break
 			}
 		}
-	}
-
-	private updateTreeRoot() {
-		this.onUpdate(this.ongoingPersistOperation !== undefined)
 	}
 
 	private flushPendingAccessorUpdates(rootStates: Array<StateINode>) {

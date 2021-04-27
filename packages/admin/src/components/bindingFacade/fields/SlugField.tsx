@@ -8,7 +8,7 @@ import {
 	useField,
 	useMutationState,
 } from '@contember/binding'
-import { FormGroup, TextInput } from '@contember/ui'
+import { FormGroup, isSpecialLinkClick, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import { FunctionComponent, useCallback, useMemo } from 'react'
 import { SimpleRelativeSingleFieldProps } from '../auxiliary'
@@ -21,6 +21,7 @@ export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concea
 		persistedHardPrefix?: string | ((environment: Environment) => string)
 		persistedSoftPrefix?: string | ((environment: Environment) => string)
 		concealTimeout?: number
+		linkToExternalUrl?: boolean
 	}
 
 export const SlugField: FunctionComponent<SlugFieldProps> = Component(
@@ -32,6 +33,7 @@ export const SlugField: FunctionComponent<SlugFieldProps> = Component(
 		persistedSoftPrefix,
 		derivedFrom,
 		field,
+		linkToExternalUrl = false,
 		...props
 	}) => {
 		const environment = useEnvironment()
@@ -66,7 +68,24 @@ export const SlugField: FunctionComponent<SlugFieldProps> = Component(
 
 		return (
 			<ConcealableField
-				renderConcealedValue={() => presentedValue}
+				renderConcealedValue={() =>
+					linkToExternalUrl ? (
+						<a
+							href={presentedValue}
+							onClick={event => {
+								if (isSpecialLinkClick(event.nativeEvent)) {
+									event.stopPropagation()
+								} else {
+									event.preventDefault()
+								}
+							}}
+						>
+							{presentedValue}
+						</a>
+					) : (
+						presentedValue
+					)
+				}
 				buttonProps={buttonProps}
 				concealTimeout={concealTimeout}
 			>

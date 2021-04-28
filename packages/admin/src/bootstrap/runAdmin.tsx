@@ -56,9 +56,6 @@ export const runAdmin = (
 		.reduce((acc, it) => [...acc, ...it], [])
 
 	const handleError = (error: Error | PromiseRejectionEvent | ErrorEvent) => {
-		if (!__DEV_MODE__) {
-			return
-		}
 		const errorElementId = '__contember__dev__error__container__element'
 		let errorContainer = document.getElementById(errorElementId)
 
@@ -70,7 +67,12 @@ export const runAdmin = (
 		errorContainer.id = errorElementId
 
 		document.body.appendChild(errorContainer)
-		ReactDOM.render(<DevError error={error} />, errorContainer)
+
+		if (__DEV_MODE__) {
+			ReactDOM.render(<DevError error={error} />, errorContainer)
+		} else {
+			ReactDOM.render(<h1>Fatal error</h1>, errorContainer)
+		}
 	}
 
 	window.addEventListener('error', handleError)

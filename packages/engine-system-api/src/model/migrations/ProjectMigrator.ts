@@ -1,7 +1,7 @@
 import { createStageTree, StageTree } from '../stages'
 import { Migration, MigrationDescriber, Modification } from '@contember/schema-migrations'
 import { Client, ConnectionError, DatabaseQueryable, wrapIdentifier } from '@contember/database'
-import { DiffQuery, StageCommonEventsMatrixQuery } from '../queries'
+import { DiffQuery, LatestEventIdByStageQuery, StageCommonEventsMatrixQuery } from '../queries'
 import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
 import {
@@ -49,10 +49,16 @@ export class ProjectMigrator {
 
 		await this.rebaseExecutor.rebaseAll(db, project)
 		const rootStage = stageTree.getRoot()
-		const commonEventsMatrix = await db.queryHandler.fetch(new StageCommonEventsMatrixQuery())
-		let stageEvents = await this.fetchStageEvents(db.queryHandler, stageTree, commonEventsMatrix, rootStage)
-
-		let previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
+		let previousId: string
+		let stageEvents: StageEventsMap
+		if (stageTree.getChildren(rootStage).length === 0) {
+			previousId = await db.queryHandler.fetch(new LatestEventIdByStageQuery(rootStage.slug))
+			stageEvents = {}
+		} else {
+			const commonEventsMatrix = await db.queryHandler.fetch(new StageCommonEventsMatrixQuery())
+			stageEvents = await this.fetchStageEvents(db.queryHandler, stageTree, commonEventsMatrix, rootStage)
+			previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
+		}
 		for (const migration of sorted) {
 			logger(`Executing migration ${migration.name}...`)
 			const formatVersion = migration.formatVersion

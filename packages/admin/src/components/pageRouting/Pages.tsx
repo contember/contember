@@ -10,7 +10,7 @@ import {
 } from 'react'
 import { connect } from 'react-redux'
 import State from '../../state'
-import { DevErrorBoundary } from './DevErrorBoundary'
+import { PageErrorBoundary } from './PageErrorBoundary'
 import { Page, PageProps } from './Page'
 import { PageProvider } from './PageProvider'
 
@@ -73,16 +73,16 @@ class Pages extends PureComponent<PagesProps & PagesStateProps> {
 		const isProvider = isPageProvider(matchedPage)
 		const Layout = this.props.layout || Fragment
 		return (
-			<DevErrorBoundary>
-				<Layout>
-					{isProvider && (
-						<ParametersContext.Provider value={this.props.parameters}>
-							<Fragment key={pageName}>{matchedPage}</Fragment>
-						</ParametersContext.Provider>
-					)}
-					{isProvider || <Fragment key={pageName}>{matchedPage.props.children(this.props.parameters)}</Fragment>}
-				</Layout>
-			</DevErrorBoundary>
+			<Layout>
+				{isProvider && (
+					<ParametersContext.Provider value={this.props.parameters}>
+						<PageErrorBoundary key={pageName}>{matchedPage}</PageErrorBoundary>
+					</ParametersContext.Provider>
+				)}
+				{isProvider || (
+					<PageErrorBoundary key={pageName}>{matchedPage.props.children(this.props.parameters)}</PageErrorBoundary>
+				)}
+			</Layout>
 		)
 	}
 }

@@ -306,21 +306,7 @@ export class TreeParameterMerger {
 			return this.cloneSingleEntityEventListeners(original)
 		}
 
-		const merged: EntityEventListenerStore = new Map()
-
-		for (const [eventName, fromFresh] of fresh) {
-			const fromOriginal = original.get(eventName)
-
-			if (fromOriginal === undefined) {
-				merged.set(eventName, new Set(fromFresh))
-			} else {
-				const newListeners = this.mergeEventListeners(fromOriginal as Set<any>, fromFresh as Set<any>)
-				if (newListeners) {
-					merged.set(eventName, newListeners as any)
-				}
-			}
-		}
-		return merged
+		return this.mergeEventListenerStores(this.cloneSingleEntityEventListeners(original), fresh)
 	}
 
 	public static mergeEntityListEventListeners(
@@ -338,21 +324,27 @@ export class TreeParameterMerger {
 			return this.cloneEntityListEventListeners(original)
 		}
 
-		const merged: EntityListEventListenerStore = new Map()
+		return this.mergeEventListenerStores(this.cloneEntityListEventListeners(original), fresh)
+	}
 
+	private static mergeEventListenerStores<Store extends Map<string, Set<Function>>>(
+		original: Store,
+		fresh: Store,
+	): Store {
 		for (const [eventName, fromFresh] of fresh) {
 			const fromOriginal = original.get(eventName)
 
 			if (fromOriginal === undefined) {
-				merged.set(eventName, new Set(fromFresh as any))
+				original.set(eventName, new Set(fromFresh))
 			} else {
-				const newListeners = this.mergeEventListeners(fromOriginal as Set<any>, fromFresh as Set<any>)
+				const newListeners = this.mergeEventListeners(fromOriginal, fromFresh)
+
 				if (newListeners) {
-					merged.set(eventName, newListeners as Set<any>)
+					original.set(eventName, newListeners)
 				}
 			}
 		}
-		return merged
+		return original
 	}
 
 	public static cloneSingleEntityEventListeners(store: EntityEventListenerStore): EntityEventListenerStore {

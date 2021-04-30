@@ -4,8 +4,6 @@ export { typeDefs, devTypeDefs, Schema } from './schema'
 
 export {
 	Identity,
-	ReleaseExecutor,
-	RebaseExecutor,
 	DatabaseContext,
 	setupSystemVariables,
 	StageBySlugQuery,
@@ -16,7 +14,6 @@ export {
 	ProjectInitializer,
 	LatestEventIdByStageQuery,
 	DatabaseContextFactory,
-	DiffQuery,
 	InitEventQuery,
 	ProjectMigrator,
 	StageCreator,

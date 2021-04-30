@@ -1,32 +1,22 @@
 import { createStageTree, StageTree } from '../stages'
-import { Migration, MigrationDescriber, Modification } from '@contember/schema-migrations'
-import { Client, ConnectionError, DatabaseQueryable, wrapIdentifier } from '@contember/database'
-import { DiffQuery, LatestEventIdByStageQuery, StageCommonEventsMatrixQuery } from '../queries'
+import { Migration, MigrationDescriber } from '@contember/schema-migrations'
+import { Client, ConnectionError, wrapIdentifier } from '@contember/database'
+import { LatestEventIdByStageQuery } from '../queries'
 import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
-import {
-	CreateEventCommand,
-	RecreateContentEvent,
-	RecreateContentEventTransactionContext,
-	SaveMigrationCommand,
-	UpdateStageEventCommand,
-} from '../commands'
+import { CreateEventCommand, SaveMigrationCommand, UpdateStageEventCommand } from '../commands'
 import { ContentEvent, EventType } from '@contember/engine-common'
-import { Stage, StageWithoutEvent } from '../dtos'
-import { QueryHandler } from '@contember/queryable'
-import { assertEveryIsContentEvent, RebaseExecutor } from '../events'
+import { StageWithoutEvent } from '../dtos'
 import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
 import { ProjectConfig } from '../../types'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-
-type StageEventsMap = Record<string, ContentEvent[]>
+import { StagingDisabledError } from '../../StagingDisabledError'
 
 export class ProjectMigrator {
 	constructor(
 		private readonly migrationDescriber: MigrationDescriber,
-		private readonly rebaseExecutor: RebaseExecutor,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 		private readonly executedMigrationsResolver: ExecutedMigrationsResolver,
 	) {}
@@ -47,28 +37,22 @@ export class ProjectMigrator {
 
 		const sorted = [...migrationsToExecute].sort((a, b) => a.version.localeCompare(b.version))
 
-		await this.rebaseExecutor.rebaseAll(db, project)
 		const rootStage = stageTree.getRoot()
 		let previousId: string
-		let stageEvents: StageEventsMap
 		if (stageTree.getChildren(rootStage).length === 0) {
 			previousId = await db.queryHandler.fetch(new LatestEventIdByStageQuery(rootStage.slug))
-			stageEvents = {}
 		} else {
-			const commonEventsMatrix = await db.queryHandler.fetch(new StageCommonEventsMatrixQuery())
-			stageEvents = await this.fetchStageEvents(db.queryHandler, stageTree, commonEventsMatrix, rootStage)
-			previousId = commonEventsMatrix[rootStage.slug][rootStage.slug].stageAEventId
+			throw new StagingDisabledError()
 		}
 		for (const migration of sorted) {
 			logger(`Executing migration ${migration.name}...`)
 			const formatVersion = migration.formatVersion
 
 			for (const modification of migration.modifications) {
-				;[schema, stageEvents] = await this.applyModification(
+				;[schema] = await this.applyModification(
 					db.client,
 					stageTree,
 					schema,
-					stageEvents,
 					modification,
 					formatVersion,
 					migration.version,
@@ -90,8 +74,6 @@ export class ProjectMigrator {
 
 		await db.commandBus.execute(new UpdateStageEventCommand(rootStage.slug, previousId))
 
-		logger(`Recreating events...`)
-		await this.reCreateEvents(db, stageTree, { ...rootStage, event_id: previousId }, stageEvents)
 		logger(`Done`)
 	}
 
@@ -130,11 +112,10 @@ export class ProjectMigrator {
 		db: Client,
 		stageTree: StageTree,
 		schema: Schema,
-		events: StageEventsMap,
 		modification: Migration.Modification,
 		formatVersion: number,
 		migrationVersion: string,
-	): Promise<[Schema, StageEventsMap]> {
+	): Promise<[Schema]> {
 		const stage = stageTree.getRoot()
 		const { sql, schema: newSchema, handler } = await this.migrationDescriber.describeModification(
 			schema,
@@ -142,37 +123,7 @@ export class ProjectMigrator {
 			formatVersion,
 		)
 		await this.executeOnStage(db, stage, sql, migrationVersion)
-
-		const newEvents = await this.applyOnChildren(db, stageTree, stage, handler, events, sql, migrationVersion)
-		return [newSchema, newEvents]
-	}
-
-	private async applyOnChildren(
-		db: Client,
-		stageTree: StageTree,
-		stage: StageWithoutEvent,
-		modificationHandler: Modification<any>,
-		events: StageEventsMap,
-		sql: string,
-		migrationVersion: string,
-	): Promise<StageEventsMap> {
-		for (const childStage of stageTree.getChildren(stage)) {
-			const stageEvents = events[childStage.slug]
-
-			try {
-				const transformedEvents = await modificationHandler.transformEvents(stageEvents)
-				if (stageEvents !== transformedEvents) {
-					events = { ...events, [childStage.slug]: transformedEvents }
-				}
-			} catch (e) {
-				// eslint-disable-next-line no-console
-				console.error(e)
-				throw new MigrationFailedError(migrationVersion, e.message)
-			}
-			await this.executeOnStage(db, childStage, sql, migrationVersion)
-			events = await this.applyOnChildren(db, stageTree, childStage, modificationHandler, events, sql, migrationVersion)
-		}
-		return events
+		return [newSchema]
 	}
 
 	private async executeOnStage(db: Client, stage: StageWithoutEvent, sql: string, migrationVersion: string) {
@@ -186,50 +137,6 @@ export class ProjectMigrator {
 				throw new MigrationFailedError(migrationVersion, e.message)
 			}
 			throw e
-		}
-	}
-
-	private async fetchStageEvents(
-		queryHandler: QueryHandler<DatabaseQueryable>,
-		stageTree: StageTree,
-		eventsMatrix: StageCommonEventsMatrixQuery.Result,
-		stage: StageWithoutEvent,
-	): Promise<StageEventsMap> {
-		let result: StageEventsMap = {}
-		for (const child of stageTree.getChildren(stage)) {
-			const info = eventsMatrix[stage.slug][child.slug]
-			if (info.distance !== 0) {
-				throw new Error('Not rebased')
-			}
-			const events =
-				eventsMatrix[child.slug][stage.slug].distance > 0
-					? await queryHandler.fetch(new DiffQuery(info.commonEventId, info.stageBEventId))
-					: []
-			assertEveryIsContentEvent(events)
-
-			result = {
-				...result,
-				[child.slug]: events,
-				...(await this.fetchStageEvents(queryHandler, stageTree, eventsMatrix, child)),
-			}
-		}
-		return result
-	}
-
-	private async reCreateEvents(
-		db: DatabaseContext,
-		stageTree: StageTree,
-		stage: Stage,
-		events: StageEventsMap,
-	): Promise<void> {
-		for (const childStage of stageTree.getChildren(stage)) {
-			let previousId = stage.event_id
-			const transactionContext = new RecreateContentEventTransactionContext()
-			for (const event of events[childStage.slug]) {
-				previousId = await db.commandBus.execute(new RecreateContentEvent(event, previousId, transactionContext))
-			}
-			await db.commandBus.execute(new UpdateStageEventCommand(childStage.slug, previousId))
-			await this.reCreateEvents(db, stageTree, { ...childStage, event_id: previousId }, events)
 		}
 	}
 }

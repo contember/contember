@@ -1,11 +1,10 @@
-import { CreateOrUpdateStageCommand, UpdateStageEventCommand } from '../commands'
+import { CreateOrUpdateStageCommand } from '../commands'
 import { EventApplier } from '../events'
-import { DiffQuery, StageBySlugQuery } from '../queries'
+import { StageBySlugQuery } from '../queries'
 import { StageConfig } from '../../types'
-import { emptySchema } from '@contember/schema-utils'
 import { DatabaseContext } from '../database'
-import { ImplementationException } from '../../utils'
 import { Logger } from '@contember/engine-common'
+import { StagingDisabledError } from '../../StagingDisabledError'
 
 class StageCreator {
 	constructor(private readonly eventApplier: EventApplier) {}
@@ -27,28 +26,7 @@ class StageCreator {
 		if (!parent) {
 			return true
 		}
-
-		const queryHandler = db.client.createQueryHandler()
-
-		const newStage = await queryHandler.fetch(new StageBySlugQuery(stage.slug))
-		const parentStage = await queryHandler.fetch(new StageBySlugQuery(parent.slug))
-		if (!newStage || !parentStage) {
-			throw new ImplementationException()
-		}
-
-		// both are new
-		if (newStage.event_id === parentStage.event_id) {
-			return true
-		}
-		logger.write(`Creating stage ${stage.slug}`)
-		const events = await queryHandler.fetch(new DiffQuery(newStage.event_id, parentStage.event_id))
-		logger.write(`Got ${events.length} to apply...`)
-		await this.eventApplier.applyEvents(db, newStage, events, emptySchema)
-		logger.write(`Done`)
-
-		await db.commandBus.execute(new UpdateStageEventCommand(newStage.slug, parentStage.event_id))
-
-		return true
+		throw new StagingDisabledError()
 	}
 }
 

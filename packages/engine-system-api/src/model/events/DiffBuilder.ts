@@ -1,17 +1,15 @@
 import { DependencyBuilder, EventsDependencies } from './DependencyBuilder'
 import { Stage } from '../dtos'
 import { ContentEvent } from '@contember/engine-common'
-import { DiffCountQuery, DiffQuery } from '../queries'
-import { assertEveryIsContentEvent } from './eventUtils'
 import { DatabaseContext } from '../database'
 import { SchemaVersionBuilder } from '../migrations'
-import { EntitiesRelationsInput, EntitiesResult, EntitiesSelector, EntitiesSelectorInput } from '../dependencies'
+import { EntitiesRelationsInput, EntitiesResult, EntitiesSelector } from '../dependencies'
 import { Acl, Input, Schema } from '@contember/schema'
 import { formatSchemaName } from '../helpers'
 import { filterSchemaByStage, getEntity } from '@contember/schema-utils'
 import { Identity } from '../authorization'
-import { EventFilterValidator, InvalidFilterError } from './EventFilterValidator'
-import { emptyImmutableSet, ImmutableSet } from '../../utils/set'
+import { ImmutableSet } from '../../utils/set'
+import { StagingDisabledError } from '../../StagingDisabledError'
 
 export type EventsPermissionsVerifierContext = {
 	variables: Acl.VariablesMap
@@ -32,52 +30,7 @@ export class DiffBuilder {
 		headStage: Stage,
 		filter: ReadonlyArray<EventFilter> | null,
 	): Promise<DiffBuilderResponse> {
-		const schema = await this.schemaVersionBuilder.buildSchema(db)
-		if (filter !== null) {
-			try {
-				filter.forEach(it => EventFilterValidator.validateFilter(schema.model, it))
-			} catch (e) {
-				if (e instanceof InvalidFilterError) {
-					return new DiffBuilderErrorResponse(DiffBuilderErrorCode.invalidFilter, e.message)
-				}
-				throw e
-			}
-		}
-
-		const count = await db.queryHandler.fetch(new DiffCountQuery(baseStage.event_id, headStage.event_id))
-
-		if (!count.ok) {
-			return new DiffBuilderErrorResponse(
-				{
-					[DiffCountQuery.ErrorCode.notRebased]: DiffBuilderErrorCode.notRebased,
-				}[count.error],
-				`Stage ${headStage.slug} is not rebased`,
-			)
-		}
-
-		if (count.diff === 0) {
-			return {
-				ok: true,
-				events: [],
-			}
-		}
-
-		const events = await db.queryHandler.fetch(new DiffQuery(baseStage.event_id, headStage.event_id))
-		assertEveryIsContentEvent(events)
-		const dependencies = await this.dependencyBuilder.build(schema, events)
-
-		const filteredEvents =
-			filter !== null
-				? await this.filterEvents(events, dependencies, permissionContext, db, schema, baseStage, headStage, filter)
-				: events
-
-		return {
-			ok: true,
-			events: filteredEvents.map(it => ({
-				...it,
-				dependencies: dependencies.get(it.id) || emptyImmutableSet,
-			})),
-		}
+		throw new StagingDisabledError()
 	}
 
 	private async filterEvents(

@@ -38,14 +38,18 @@ describe('Marker tree generator', () => {
 		const onInit8 = () => {}
 		const onInit9 = () => {}
 
+		const onBeforePersist1 = () => {}
+		const onBeforePersist2 = () => {}
+		const onBeforePersist3 = () => {}
+
 		const generator = new MarkerTreeGenerator(
 			(
 				<>
-					<EntitySubTree entity="Foo(bar = 123)">
+					<EntitySubTree entity="Foo(bar = 123)" onBeforePersist={onBeforePersist1}>
 						<ParentEntity onInitialize={onInit1} />
 						<HasMany field="hasMany[x > 50]">
 							<Field field="hasManyField" />
-							<HasOne field="hasOne">
+							<HasOne field="hasOne" onBeforePersist={onBeforePersist2}>
 								<ParentEntity onInitialize={onInit7} />
 								<HasMany field="common">
 									<Field field="same" />
@@ -65,7 +69,7 @@ describe('Marker tree generator', () => {
 							<HasMany field="hasMany[x > 50]">
 								<HasOne field="hasOne">
 									<ParentEntity onInitialize={onInit8}>
-										<HasMany field="common">
+										<HasMany field="common" onBeforePersist={onBeforePersist3}>
 											<Field field="surname" />
 											<Field field="same" />
 											<ParentEntity onInitialize={onInit6} />
@@ -103,7 +107,7 @@ describe('Marker tree generator', () => {
 				offset: undefined,
 				limit: undefined,
 				childEventListeners: new Map([['initialize', new Set([onInit5, onInit6])]]) as any,
-				eventListeners: undefined,
+				eventListeners: new Map([['beforePersist', new Set([onBeforePersist3])]]) as any,
 				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
@@ -132,7 +136,10 @@ describe('Marker tree generator', () => {
 				// forceCreation: false,
 				isNonbearing: false,
 				reducedBy: undefined,
-				eventListeners: new Map([['initialize', new Set([onInit7, onInit8])]]) as any,
+				eventListeners: new Map([
+					['initialize', new Set([onInit7, onInit8])],
+					['beforePersist', new Set([onBeforePersist2])],
+				]) as any,
 				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
@@ -191,7 +198,10 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				setOnCreate: { bar: 123 },
 				// forceCreation: false,
-				eventListeners: new Map([['initialize', new Set([onInit1, onInit2, onInit3, onInit4])]]) as any,
+				eventListeners: new Map([
+					['initialize', new Set([onInit1, onInit2, onInit3, onInit4])],
+					['beforePersist', new Set([onBeforePersist1])],
+				]) as any,
 				expectedMutation: 'anyMutation',
 				alias: undefined,
 			},

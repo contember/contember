@@ -56,37 +56,3 @@ export const createEventsFromRows = (rows: EventRow[]): AnyEvent[] => {
 		}
 	})
 }
-
-export const createEventsQueryBuilder = <R = EventRow>(
-	initSpec: SelectBuilderSpecification,
-	unionSpec?: SelectBuilderSpecification,
-): SelectBuilder<R> => {
-	const commonFields: SelectBuilderSpecification = qb =>
-		qb
-			.select(['event', 'id'])
-			.select(['event', 'type'])
-			.select(['event', 'data'])
-			.select(['event', 'previous_id'])
-			.select(['event', 'created_at'])
-			.select(['event', 'identity_id'])
-			.select(['event', 'transaction_id'])
-
-	return SelectBuilder.create<R>().withRecursive('recent_events', qb => {
-		const baseQb = qb
-			.match(commonFields)
-			.select(expr => expr.raw('0'), 'index')
-			.from('event')
-			.match(initSpec)
-
-		return baseQb.unionAll(qb => {
-			return qb
-				.match(commonFields)
-				.select(expr => expr.raw('recent_events.index + 1'), 'index')
-				.from('event')
-				.join('recent_events', 'recent_events', expr =>
-					expr.columnsEq(['event', 'id'], ['recent_events', 'previous_id']),
-				)
-				.match(unionSpec || (qb => qb))
-		})
-	})
-}

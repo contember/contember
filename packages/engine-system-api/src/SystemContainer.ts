@@ -34,7 +34,6 @@ import {
 import { UuidProvider } from './utils'
 import {
 	ExecutedMigrationsQueryResolver,
-	HistoryQueryResolver,
 	MigrateMutationResolver,
 	ResolverContextFactory,
 	ResolverFactory,
@@ -44,7 +43,6 @@ import {
 import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
-import { HistoryEventTypeResolver } from './resolvers/types'
 import { MigrationAlterMutationResolver } from './resolvers/mutation/MigrationAlterMutationResolver'
 
 export interface SystemContainer {
@@ -153,17 +151,11 @@ export class SystemContainerFactory {
 			.addService('executedMigrationsQueryResolver', () => new ExecutedMigrationsQueryResolver())
 
 			.addService('historyEventResponseBuilder', () => new HistoryEventResponseBuilder(container.identityFetcher))
-			.addService(
-				'historyQueryResolver',
-				({ historyEventResponseBuilder, schemaVersionBuilder }) =>
-					new HistoryQueryResolver(historyEventResponseBuilder, schemaVersionBuilder),
-			)
 			.addService('migrateMutationResolver', ({ projectMigrator }) => new MigrateMutationResolver(projectMigrator))
 			.addService(
 				'truncateMutationResolver',
 				({ projectTruncateExecutor }) => new TruncateMutationResolver(projectTruncateExecutor),
 			)
-			.addService('historyEventTypeResolver', () => new HistoryEventTypeResolver())
 			.addService(
 				'migrationAlterMutationResolver',
 				({ migrationAlterer }) => new MigrationAlterMutationResolver(migrationAlterer),
@@ -173,19 +165,15 @@ export class SystemContainerFactory {
 				({
 					stagesQueryResolver,
 					executedMigrationsQueryResolver,
-					historyQueryResolver,
 					migrateMutationResolver,
 					truncateMutationResolver,
-					historyEventTypeResolver,
 					migrationAlterMutationResolver,
 				}) =>
 					new ResolverFactory(
 						stagesQueryResolver,
 						executedMigrationsQueryResolver,
-						historyQueryResolver,
 						migrateMutationResolver,
 						truncateMutationResolver,
-						historyEventTypeResolver,
 						migrationAlterMutationResolver,
 					),
 			)

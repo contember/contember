@@ -28,24 +28,3 @@ npm run bootstrap
 ```
 
 Instead of `npm run bootstrap` you may also use `npm run bootstrap:hoist`. The hoist option deduplicates `node_modules` structure into one shared folder and per package differences. This makes the installation faster but the build is less reliable as it differs from CI. In case of broken symlinks you can run `lerna link` to restore them.
-
-
-### Running and debugging individual tests in PhpStorm
-
-Currently it is not possible to use a remote Node.js interpreter for Mocha tests so you need a local node interpreter.
-
-- Go to `Run / Edit configurations / Templates / Mocha`
-- Paste following ENV variables
-```
-TS_NODE_PROJECT=tsconfig.devTests.json
-TEST_DB_HOST=127.0.0.1
-TEST_DB_PASSWORD=contember
-TEST_DB_NAME=tests
-TEST_DB_PORT=4479
-TEST_CWD_SUFFIX=/packages/engine-server
-NODE_ENV=development
-TEST_DB_USER=contember
-```
-- This setup will use a database from docker-compose and also there is different tsconfig file optimized for test run.
-- set Extra mocha options to `--require ts-node/register --timeout 15000`
-- Go to test file and run or debug it

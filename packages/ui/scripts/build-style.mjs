@@ -1,5 +1,5 @@
 import sass from 'sass'
-import Fiber from 'fibers'
+//import Fiber from 'fibers'
 import path from 'path'
 import fs from 'fs'
 
@@ -20,7 +20,7 @@ sass.render(
 		},
 		outFile: path.join(process.cwd(), '/dist/style.css'),
 		sourceMap: true,
-		fiber: Fiber,
+		//fiber: Fiber, // Disabled because it segfaults for some reason.
 	},
 	(err, result) => {
 		if (err) {

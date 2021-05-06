@@ -1,9 +1,26 @@
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { EntityFieldMarkersContainer, FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
+import {
+	EntityFieldMarkersContainer,
+	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
+	FieldMarker,
+	HasManyRelationMarker,
+	HasOneRelationMarker,
+} from '../markers'
 import { assertNever } from '../utils'
 import { LocalizedBindingError } from './exceptions'
 
 export class MarkerComparator {
+	public static isSubTreeSubsetOf(
+		candidate: EntitySubTreeMarker | EntityListSubTreeMarker,
+		superset: EntitySubTreeMarker | EntityListSubTreeMarker,
+	): boolean {
+		if (candidate.placeholderName !== superset.placeholderName) {
+			return false
+		}
+		return this.isSubsetOf(candidate.fields, superset.fields)
+	}
+
 	public static assertEntityMarkersSubsetOf(
 		candidate: EntityFieldMarkersContainer,
 		superset: EntityFieldMarkersContainer,
@@ -56,6 +73,29 @@ export class MarkerComparator {
 				throw e
 			}
 		}
+	}
+
+	private static isSubsetOf(candidate: EntityFieldMarkersContainer, superset: EntityFieldMarkersContainer): boolean {
+		for (const [placeholderName, candidateMarker] of candidate.markers) {
+			const fromSuperset = superset.markers.get(placeholderName)
+
+			if (fromSuperset === undefined) {
+				if (
+					candidateMarker instanceof FieldMarker &&
+					(candidateMarker.fieldName === PRIMARY_KEY_NAME || candidateMarker.fieldName === TYPENAME_KEY_NAME)
+				) {
+					continue
+				}
+				return false
+			}
+			if (candidateMarker instanceof FieldMarker || fromSuperset instanceof FieldMarker) {
+				continue
+			}
+			if (!this.isSubsetOf(candidateMarker.fields, fromSuperset.fields)) {
+				return false
+			}
+		}
+		return true
 	}
 
 	//private static assertAreMarkersSubsetOf(): {}

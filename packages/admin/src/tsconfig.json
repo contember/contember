@@ -5,11 +5,11 @@
 	},
 	"references": [
 		{ "path": "../../../packages/binding/src" },
-		{ "path": "../../../packages/react-multipass-rendering/src" },
 		{ "path": "../../../packages/client/src" },
 		{ "path": "../../../packages/react-client/src" },
+		{ "path": "../../../packages/react-multipass-rendering/src" },
 		{ "path": "../../../packages/react-utils/src" },
-		{ "path": "../../../packages/utils/src" },
-		{ "path": "../../../packages/ui/src" }
+		{ "path": "../../../packages/ui/src" },
+		{ "path": "../../../packages/utils/src" }
 	]
 }

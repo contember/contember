@@ -23,20 +23,12 @@ export class TreeAugmenter {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public extendTree(
-		newTreeId: TreeRootId | undefined,
-		newMarkerTree: MarkerTreeRoot,
-		newPersistedData: ReceivedDataTree,
-	) {
+	public extendPersistedData(newPersistedData: ReceivedDataTree) {
 		// TODO this doesn't yet handle updates for entities whose persisted data just gets magically changed without notice.
 		this.treeStore.mergeInQueryResponse(newPersistedData)
-		this.extendTreeWithoutAdditionalPersistedData(newTreeId, newMarkerTree)
 	}
 
-	public extendTreeWithoutAdditionalPersistedData(
-		newTreeId: TreeRootId | undefined,
-		newMarkerTree: MarkerTreeRoot,
-	): void {
+	public extendTreeStates(newTreeId: TreeRootId | undefined, newMarkerTree: MarkerTreeRoot): void {
 		const subTreeStates: Map<PlaceholderName, RootStateNode> = new Map()
 
 		this.treeStore.markerTrees.set(newTreeId, newMarkerTree)

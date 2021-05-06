@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"baseUrl": ".",
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
@@ -18,6 +19,19 @@
 		"strict": true,
 		"incremental": true,
 
-		"lib": ["esnext", "dom"]
+		"lib": ["esnext", "dom"],
+
+		"paths": {
+			"@contember/admin": ["packages/admin/src"],
+			"@contember/binding": ["packages/binding/src"],
+			"@contember/client": ["packages/client/src"],
+			"@contember/admin-server": ["packages/admin-server/src"],
+			"@contember/react-client": ["packages/react-client/src"],
+			"@contember/react-multipass-rendering": ["packages/react-multipass-rendering/src"],
+			"@contember/react-utils": ["packages/react-utils/src"],
+			"@contember/ui": ["packages/ui/src"],
+			"@contember/utils": ["packages/utils/src"],
+			"@contember/vimeo-file-uploader": ["packages/vimeo-file-uploader/src"]
+		}
 	}
 }

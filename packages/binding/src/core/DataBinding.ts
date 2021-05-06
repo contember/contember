@@ -219,16 +219,27 @@ export class DataBinding {
 	// 	this.treeRootListeners,
 	// )
 
-	public async extendTree(
-		newFragment: ReactNode,
-		{ signal, environment }: ExtendTreeOptions = {},
-	): Promise<TreeRootId | undefined> {
-		return await this.eventManager.asyncOperation(async () => {
-			if (signal?.aborted) {
-				return Promise.reject()
-			}
-			const newMarkerTree = new MarkerTreeGenerator(newFragment, environment ?? this.environment).generate()
+	public async extendTree(newFragment: ReactNode, options: ExtendTreeOptions = {}): Promise<TreeRootId | undefined> {
+		if (options.signal?.aborted) {
+			return Promise.reject()
+		}
+		const newMarkerTree = new MarkerTreeGenerator(newFragment, options.environment ?? this.environment).generate()
 
+		if (this.treeStore.effectivelyHasTreeRoot(newMarkerTree)) {
+			// This isn't perfectly accurate as theoretically, we could already have all the data necessary but this
+			// could still be false.
+			//
+			// We're not checking this against the schema since if we already effectively have this tree root, then
+			// assuming everything we already have is valid, this should match the schema as well.
+			return this.eventManager.syncOperation(() => {
+				const newTreeRootId = this.getNewTreeRootId()
+				this.treeAugmenter.extendTreeWithoutAdditionalPersistedData(newTreeRootId, newMarkerTree)
+				return newTreeRootId
+			})
+		}
+
+		return await this.eventManager.asyncOperation(async () => {
+			const { signal } = options
 			const schemaOrPromise = this.getOrLoadSchema()
 
 			let newPersistedData: QueryRequestResponse | undefined
@@ -257,12 +268,7 @@ export class DataBinding {
 				return Promise.reject()
 			}
 
-			// TODO this is an awful, awful hack.
-			// TODO the particular shape of the alias is relied on in MutationAlias. If you change this, change it there too.
-			const newTreeRootId =
-				this.treeStore.markerTrees.size === 0
-					? undefined
-					: `${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
+			const newTreeRootId = this.getNewTreeRootId()
 			this.treeAugmenter.extendTree(newTreeRootId, newMarkerTree, newPersistedData?.data ?? {})
 
 			return newTreeRootId
@@ -351,4 +357,12 @@ export class DataBinding {
 		let seed = 1
 		return () => seed++
 	})()
+
+	private getNewTreeRootId() {
+		// TODO this is an awful, awful hack.
+		// TODO the particular shape of the alias is relied on in MutationAlias. If you change this, change it there too.
+		return this.treeStore.markerTrees.size === 0
+			? undefined
+			: `${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
+	}
 }

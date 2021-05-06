@@ -14,6 +14,7 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '../treeParameters'
+import { MarkerComparator } from './MarkerComparator'
 import { RequestResponseNormalizer } from './RequestResponseNormalizer'
 import { Schema } from './schema'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode, StateType } from './state'
@@ -171,5 +172,20 @@ export class TreeStore {
 			this.disposeOfRealm(realm)
 		}
 		this.entityStore.delete(entity.id.value)
+	}
+
+	public effectivelyHasTreeRoot(candidateRoot: MarkerTreeRoot): boolean {
+		candidateRoots: for (const candidateSubTree of candidateRoot.subTrees.values()) {
+			for (const root of this.markerTrees.values()) {
+				for (const alreadyPresentSubTree of root.subTrees.values()) {
+					const isSubset = MarkerComparator.isSubTreeSubsetOf(candidateSubTree, alreadyPresentSubTree)
+					if (isSubset) {
+						continue candidateRoots
+					}
+				}
+			}
+			return false
+		}
+		return true
 	}
 }

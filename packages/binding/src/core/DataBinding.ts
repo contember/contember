@@ -269,67 +269,67 @@ export class DataBinding {
 		})
 	}
 
-	private flushBatchedTreeExtensions() {
-		this.eventManager.asyncOperation(async () => {
-			// This is an async operation so we just take whatever pendingExtensions there are now and let any new ones
-			// accumulate in an empty set.
-			const pendingExtensions = Array.from(this.pendingExtensions).filter(extension => {
-				if (extension.options.signal?.aborted) {
-					extension.reject()
-					return false
-				}
-				return true
-			})
-			this.pendingExtensions.clear()
-
-			const aggregateMarkerTreeRoot = pendingExtensions.reduce<MarkerTreeRoot | undefined>(
-				(previousValue, currentValue) => {
-					if (previousValue === undefined) {
-						return currentValue.markerTreeRoot
-					}
-					return MarkerMerger.mergeMarkerTreeRoots(previousValue, currentValue.markerTreeRoot)
-				},
-				undefined,
-			)
-
-			if (aggregateMarkerTreeRoot === undefined) {
-				return
+	private async flushBatchedTreeExtensions() {
+		// This is an async operation so we just take whatever pendingExtensions there are now and let any new ones
+		// accumulate in an empty set.
+		const pendingExtensions = Array.from(this.pendingExtensions).filter(extension => {
+			if (extension.options.signal?.aborted) {
+				extension.reject()
+				return false
 			}
+			return true
+		})
+		this.pendingExtensions.clear()
 
-			const aggregateSignal = getCombinedSignal(pendingExtensions.map(extension => extension.options.signal))
-
-			const schemaOrPromise = this.getOrLoadSchema()
-
-			let aggregatePersistedData: QueryRequestResponse | undefined
-
-			if (schemaOrPromise instanceof Promise) {
-				// We don't have a schema yet. We'll still optimistically fire the request so as to prevent a waterfall
-				// in the most likely case that things will go fine and the query matches the schema.
-				const newPersistedDataPromise = this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
-
-				const schema = await schemaOrPromise
-
-				this.treeStore.setSchema(schema)
-				if (__DEV_MODE__) {
-					for (const extension of pendingExtensions) {
-						SchemaValidator.assertTreeValid(schema, extension.markerTreeRoot)
-					}
+		const aggregateMarkerTreeRoot = pendingExtensions.reduce<MarkerTreeRoot | undefined>(
+			(previousValue, currentValue) => {
+				if (previousValue === undefined) {
+					return currentValue.markerTreeRoot
 				}
-				aggregatePersistedData = await newPersistedDataPromise
-			} else {
-				this.treeStore.setSchema(schemaOrPromise)
-				if (__DEV_MODE__) {
-					for (const extension of pendingExtensions) {
-						SchemaValidator.assertTreeValid(schemaOrPromise, extension.markerTreeRoot)
-					}
+				return MarkerMerger.mergeMarkerTreeRoots(previousValue, currentValue.markerTreeRoot)
+			},
+			undefined,
+		)
+
+		if (aggregateMarkerTreeRoot === undefined) {
+			return
+		}
+
+		const aggregateSignal = getCombinedSignal(pendingExtensions.map(extension => extension.options.signal))
+
+		const schemaOrPromise = this.getOrLoadSchema()
+
+		let aggregatePersistedData: QueryRequestResponse | undefined
+
+		if (schemaOrPromise instanceof Promise) {
+			// We don't have a schema yet. We'll still optimistically fire the request so as to prevent a waterfall
+			// in the most likely case that things will go fine and the query matches the schema.
+			const newPersistedDataPromise = this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
+
+			const schema = await schemaOrPromise
+
+			this.treeStore.setSchema(schema)
+			if (__DEV_MODE__) {
+				for (const extension of pendingExtensions) {
+					SchemaValidator.assertTreeValid(schema, extension.markerTreeRoot)
 				}
-				aggregatePersistedData = await this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
 			}
-
-			if (aggregateSignal?.aborted) {
-				return
+			aggregatePersistedData = await newPersistedDataPromise
+		} else {
+			this.treeStore.setSchema(schemaOrPromise)
+			if (__DEV_MODE__) {
+				for (const extension of pendingExtensions) {
+					SchemaValidator.assertTreeValid(schemaOrPromise, extension.markerTreeRoot)
+				}
 			}
+			aggregatePersistedData = await this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
+		}
 
+		if (aggregateSignal?.aborted) {
+			return
+		}
+
+		this.eventManager.syncOperation(() => {
 			this.treeAugmenter.extendPersistedData(aggregatePersistedData?.data ?? {})
 
 			for (const extension of pendingExtensions) {

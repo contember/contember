@@ -21,7 +21,6 @@ export {
 	getJunctionTables,
 	EventApplier,
 	UpdateStageEventCommand,
-	MigrationEventsQuery,
 } from './model'
 export * from './SystemContainer'
 export * from './resolvers'

@@ -1,4 +1,3 @@
-import { BindingError } from '../BindingError'
 import { MarkerMerger, TreeParameterMerger } from '../core'
 import { Environment } from '../dao'
 import {

@@ -1,3 +1,4 @@
+export * from './DeferredSubTrees'
 export * from './EntityView'
 export * from './FieldView'
 export * from './StaticRender'

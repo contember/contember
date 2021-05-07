@@ -22,7 +22,7 @@ const createServerTerminator = (): Server[] => {
 			// eslint-disable-next-line no-console
 			console.log(`process received a ${signal} signal`)
 			for (const server of servers) {
-				await new Promise(resolve => server.close(() => resolve()))
+				await new Promise(resolve => server.close(() => resolve(null)))
 			}
 			process.exit(128 + code)
 		})

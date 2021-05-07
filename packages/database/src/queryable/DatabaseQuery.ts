@@ -3,7 +3,7 @@ import { DatabaseQueryable } from '../'
 import { ImplementationException } from '../exceptions'
 
 export abstract class DatabaseQuery<T> implements Query<DatabaseQueryable, T> {
-	abstract async fetch(queryable: DatabaseQueryable): Promise<T>
+	abstract fetch(queryable: DatabaseQueryable): Promise<T>
 
 	protected fetchOneOrNull<R>(rows: Array<R>): R | null {
 		if (rows.length === 0) {

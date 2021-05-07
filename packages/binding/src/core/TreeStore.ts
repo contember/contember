@@ -176,6 +176,10 @@ export class TreeStore {
 
 	public effectivelyHasTreeRoot(candidateRoot: MarkerTreeRoot): boolean {
 		candidateRoots: for (const candidateSubTree of candidateRoot.subTrees.values()) {
+			if (candidateSubTree.parameters.isCreating) {
+				// This, by definition, won't trigger a query.
+				continue
+			}
 			for (const root of this.markerTrees.values()) {
 				for (const alreadyPresentSubTree of root.subTrees.values()) {
 					const isSubset = MarkerComparator.isSubTreeSubsetOf(candidateSubTree, alreadyPresentSubTree)

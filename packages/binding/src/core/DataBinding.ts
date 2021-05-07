@@ -26,6 +26,7 @@ import { Config } from './Config'
 import { DirtinessTracker } from './DirtinessTracker'
 import { EventManager } from './EventManager'
 import { createBatchUpdatesOptions } from './factories'
+import { MarkerMerger } from './MarkerMerger'
 import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
@@ -36,6 +37,7 @@ import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
 import { UpdateMetadata } from './UpdateMetadata'
+import { getCombinedSignal } from './utils'
 
 export class DataBinding {
 	private static readonly schemaLoadCache: Map<string, Schema | Promise<Schema>> = new Map()
@@ -219,53 +221,121 @@ export class DataBinding {
 	// 	this.treeRootListeners,
 	// )
 
-	public async extendTree(
-		newFragment: ReactNode,
-		{ signal, environment }: ExtendTreeOptions = {},
-	): Promise<TreeRootId | undefined> {
-		return await this.eventManager.asyncOperation(async () => {
-			if (signal?.aborted) {
-				return Promise.reject()
-			}
-			const newMarkerTree = new MarkerTreeGenerator(newFragment, environment ?? this.environment).generate()
+	private pendingExtensions: Set<{
+		markerTreeRoot: MarkerTreeRoot
+		newFragment: ReactNode
+		newTreeRootId: TreeRootId | undefined
+		options: ExtendTreeOptions
+		reject: () => void
+		resolve: (newRootId: TreeRootId | undefined) => void
+	}> = new Set()
 
-			const schemaOrPromise = this.getOrLoadSchema()
+	public async extendTree(newFragment: ReactNode, options: ExtendTreeOptions = {}): Promise<TreeRootId | undefined> {
+		if (options.signal?.aborted) {
+			return Promise.reject()
+		}
+		const markerTreeRoot = new MarkerTreeGenerator(newFragment, options.environment ?? this.environment).generate()
 
-			let newPersistedData: QueryRequestResponse | undefined
+		if (this.treeStore.effectivelyHasTreeRoot(markerTreeRoot)) {
+			// This isn't perfectly accurate as theoretically, we could already have all the data necessary but this
+			// could still be false.
+			//
+			// We're not checking this against the schema since if we already effectively have this tree root, then
+			// assuming everything we already have is valid, this should match the schema as well.
+			return this.eventManager.syncOperation(() => {
+				const newTreeRootId = this.getNewTreeRootId()
+				this.treeAugmenter.extendTreeStates(newTreeRootId, markerTreeRoot)
+				return newTreeRootId
+			})
+		}
 
-			if (schemaOrPromise instanceof Promise) {
-				// We don't have a schema yet. We'll still optimistically fire the request so as to prevent a waterfall
-				// in the most likely case that things will go fine and the query matches the schema.
-				const newPersistedDataPromise = this.fetchPersistedData(newMarkerTree, signal)
+		return await new Promise((resolve, reject) => {
+			this.pendingExtensions.add({
+				markerTreeRoot,
+				newFragment,
+				newTreeRootId: this.getNewTreeRootId(),
+				options,
+				reject,
+				resolve,
+			})
+			const pendingExtensionsCount = this.pendingExtensions.size
 
-				const schema = await schemaOrPromise
-
-				this.treeStore.setSchema(schema)
-				if (__DEV_MODE__) {
-					SchemaValidator.assertTreeValid(schema, newMarkerTree)
+			Promise.resolve().then(() => {
+				if (pendingExtensionsCount < this.pendingExtensions.size) {
+					return
 				}
-				newPersistedData = await newPersistedDataPromise
-			} else {
-				this.treeStore.setSchema(schemaOrPromise)
-				if (__DEV_MODE__) {
-					SchemaValidator.assertTreeValid(schemaOrPromise, newMarkerTree)
+				this.flushBatchedTreeExtensions()
+			})
+		})
+	}
+
+	private async flushBatchedTreeExtensions() {
+		// This is an async operation so we just take whatever pendingExtensions there are now and let any new ones
+		// accumulate in an empty set.
+		const pendingExtensions = Array.from(this.pendingExtensions).filter(extension => {
+			if (extension.options.signal?.aborted) {
+				extension.reject()
+				return false
+			}
+			return true
+		})
+		this.pendingExtensions.clear()
+
+		const aggregateMarkerTreeRoot = pendingExtensions.reduce<MarkerTreeRoot | undefined>(
+			(previousValue, currentValue) => {
+				if (previousValue === undefined) {
+					return currentValue.markerTreeRoot
 				}
-				newPersistedData = await this.fetchPersistedData(newMarkerTree, signal)
+				return MarkerMerger.mergeMarkerTreeRoots(previousValue, currentValue.markerTreeRoot)
+			},
+			undefined,
+		)
+
+		if (aggregateMarkerTreeRoot === undefined) {
+			return
+		}
+
+		const aggregateSignal = getCombinedSignal(pendingExtensions.map(extension => extension.options.signal))
+
+		const schemaOrPromise = this.getOrLoadSchema()
+
+		let aggregatePersistedData: QueryRequestResponse | undefined
+
+		if (schemaOrPromise instanceof Promise) {
+			// We don't have a schema yet. We'll still optimistically fire the request so as to prevent a waterfall
+			// in the most likely case that things will go fine and the query matches the schema.
+			const newPersistedDataPromise = this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
+
+			const schema = await schemaOrPromise
+
+			this.treeStore.setSchema(schema)
+			if (__DEV_MODE__) {
+				for (const extension of pendingExtensions) {
+					SchemaValidator.assertTreeValid(schema, extension.markerTreeRoot)
+				}
 			}
-
-			if (signal?.aborted) {
-				return Promise.reject()
+			aggregatePersistedData = await newPersistedDataPromise
+		} else {
+			this.treeStore.setSchema(schemaOrPromise)
+			if (__DEV_MODE__) {
+				for (const extension of pendingExtensions) {
+					SchemaValidator.assertTreeValid(schemaOrPromise, extension.markerTreeRoot)
+				}
 			}
+			aggregatePersistedData = await this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
+		}
 
-			// TODO this is an awful, awful hack.
-			// TODO the particular shape of the alias is relied on in MutationAlias. If you change this, change it there too.
-			const newTreeRootId =
-				this.treeStore.markerTrees.size === 0
-					? undefined
-					: `${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
-			this.treeAugmenter.extendTree(newTreeRootId, newMarkerTree, newPersistedData?.data ?? {})
+		if (aggregateSignal?.aborted) {
+			return
+		}
 
-			return newTreeRootId
+		this.eventManager.syncOperation(() => {
+			this.treeAugmenter.extendPersistedData(aggregatePersistedData?.data ?? {})
+
+			for (const extension of pendingExtensions) {
+				this.treeAugmenter.extendTreeStates(extension.newTreeRootId, extension.markerTreeRoot)
+				extension.resolve(extension.newTreeRootId)
+			}
 		})
 	}
 
@@ -351,4 +421,12 @@ export class DataBinding {
 		let seed = 1
 		return () => seed++
 	})()
+
+	private getNewTreeRootId() {
+		// TODO this is an awful, awful hack.
+		// TODO the particular shape of the alias is relied on in MutationAlias. If you change this, change it there too.
+		return this.treeStore.markerTrees.size === 0
+			? undefined
+			: `${generateEnumerabilityPreventingEntropy()}-${DataBinding.getNextTreeRootIdSeed()}`
+	}
 }

@@ -1,4 +1,3 @@
-import { BindingError } from '../BindingError'
 import { MarkerMerger, TreeParameterMerger } from '../core'
 import { Environment } from '../dao'
 import {
@@ -142,6 +141,16 @@ export namespace MarkerFactory {
 			fields.subTrees,
 			TreeParameterMerger.mergeParentEntityParameters(fields.parentReference, desugared),
 		)
+	}
+
+	export const createEntityFieldsWithHoistablesMarker = (
+		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
+		environment: Environment,
+	): EntityFieldsWithHoistablesMarker => {
+		if (fields instanceof EntityFieldMarkersContainer) {
+			return new EntityFieldsWithHoistablesMarker(fields, undefined, undefined)
+		}
+		return new EntityFieldsWithHoistablesMarker(fields.fields, fields.subTrees, undefined)
 	}
 
 	export const createRelativeSingleEntityFields = (

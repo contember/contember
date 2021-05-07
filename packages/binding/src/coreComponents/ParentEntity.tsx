@@ -1,5 +1,4 @@
 import { ReactNode } from 'react'
-import { EntityFieldMarkersContainer, EntityFieldsWithHoistablesMarker } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
 import { SugaredParentEntityParameters } from '../treeParameters'
 import { Component } from './Component'

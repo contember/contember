@@ -1,7 +1,10 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src"
+		"outDir": "../dist/src",
+		"paths": {
+			"@contember/react-multipass-rendering": ["../../../packages/react-multipass-rendering/src"]
+		}
 	},
 	"references": [
 		{ "path": "../../../packages/react-multipass-rendering/src" }

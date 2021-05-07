@@ -1,7 +1,10 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src"
+		"outDir": "../dist/src",
+		"paths": {
+			"@contember/client": ["../../../packages/client/src"]
+		}
 	},
 	"references": [
 		{ "path": "../../client/src" }

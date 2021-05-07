@@ -143,6 +143,16 @@ export namespace MarkerFactory {
 		)
 	}
 
+	export const createEntityFieldsWithHoistablesMarker = (
+		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
+		environment: Environment,
+	): EntityFieldsWithHoistablesMarker => {
+		if (fields instanceof EntityFieldMarkersContainer) {
+			return new EntityFieldsWithHoistablesMarker(fields, undefined, undefined)
+		}
+		return new EntityFieldsWithHoistablesMarker(fields.fields, fields.subTrees, undefined)
+	}
+
 	export const createRelativeSingleEntityFields = (
 		field: SugaredRelativeSingleEntity,
 		environment: Environment,

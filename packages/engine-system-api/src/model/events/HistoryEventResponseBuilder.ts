@@ -4,7 +4,6 @@ import {
 	HistoryDeleteEvent,
 	HistoryEvent as ApiEvent,
 	HistoryEventType as ApiEventType,
-	HistoryRunMigrationEvent,
 	HistoryUpdateEvent,
 } from '../../schema'
 import { assertNever } from '../../utils'
@@ -20,7 +19,6 @@ export class HistoryEventResponseBuilder {
 			[EventType.create]: ApiEventType.Create,
 			[EventType.update]: ApiEventType.Update,
 			[EventType.delete]: ApiEventType.Delete,
-			[EventType.runMigration]: ApiEventType.RunMigration,
 		}
 		const identityIds = events.map(it => it.identityId).filter((it, index, ids) => ids.indexOf(it) === index)
 		const identities = await this.identityFetcher.fetchIdentities(identityIds)
@@ -43,8 +41,6 @@ export class HistoryEventResponseBuilder {
 					return ((): HistoryUpdateEvent => appendUpdateSpecificData(commonData, it))()
 				case EventType.delete:
 					return ((): HistoryDeleteEvent => appendDeleteSpecificData(commonData, it))()
-				case EventType.runMigration:
-					return ((): HistoryRunMigrationEvent => commonData)()
 			}
 			assertNever(it)
 		})
@@ -58,8 +54,6 @@ export class HistoryEventResponseBuilder {
 				return `Updating ${event.tableName}#${event.rowId}`
 			case EventType.delete:
 				return `Deleting ${event.tableName}#${event.rowId}`
-			case EventType.runMigration:
-				return 'Executing a migration'
 			default:
 				return assertNever(event)
 		}

@@ -1,7 +1,7 @@
 import { EventType } from './EventType'
 
 export type ContentEvent = UpdateEvent | CreateEvent | DeleteEvent
-export type AnyEvent = RunMigrationEvent | ContentEvent
+export type AnyEvent = ContentEvent
 
 export interface Event {
 	readonly type: EventType
@@ -9,18 +9,6 @@ export interface Event {
 	readonly createdAt: Date
 	readonly transactionId: string
 	// readonly errors?: string[]
-}
-
-export class RunMigrationEvent implements Event {
-	public readonly type = EventType.runMigration
-
-	constructor(
-		public readonly id: string,
-		public readonly createdAt: Date,
-		public readonly identityId: string,
-		public readonly transactionId: string,
-		public readonly version: string,
-	) {}
 }
 
 export class UpdateEvent implements Event {

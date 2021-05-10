@@ -1,4 +1,3 @@
-import { CreateInitEventCommand } from './commands'
 import { unnamedIdentity } from './helpers'
 import { ProjectConfig, StageConfig } from '../types'
 import { ProjectMigrationInfoResolver, ProjectMigrator, SchemaVersionBuilder } from './migrations'
@@ -57,17 +56,9 @@ export class ProjectInitializer {
 		}
 		return await retryTransaction(() =>
 			dbContext.transaction(async trx => {
-				await this.createInitEvent(trx, logger)
 				await this.initStages(trx, project, logger)
 			}),
 		)
-	}
-
-	private async createInitEvent(db: DatabaseContext<Connection.TransactionLike>, logger: Logger) {
-		const rowId = await db.commandBus.execute(new CreateInitEventCommand())
-		if (rowId) {
-			logger.write(`Created init event`)
-		}
 	}
 
 	private async initStages(db: DatabaseContext<Connection.TransactionLike>, project: ProjectConfig, logger: Logger) {

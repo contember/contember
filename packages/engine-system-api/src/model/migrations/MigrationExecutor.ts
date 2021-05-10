@@ -4,7 +4,7 @@ import { Schema } from '@contember/schema'
 import { Migration, ModificationHandlerFactory } from '@contember/schema-migrations'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { Stage } from '../dtos'
-import { CreateEventCommand, UpdateStageEventCommand } from '../commands'
+import { UpdateStageEventCommand } from '../commands'
 import { formatSchemaName } from '../helpers'
 import { DatabaseContext } from '../database'
 
@@ -13,8 +13,6 @@ export class MigrationExecutor {
 
 	public async execute(db: DatabaseContext, schema: Schema, stage: Stage, migration: Migration): Promise<Schema> {
 		await db.client.query('SET search_path TO ' + wrapIdentifier(formatSchemaName(stage)))
-
-		let previousId = stage.event_id
 
 		const builder = createMigrationBuilder()
 
@@ -32,17 +30,6 @@ export class MigrationExecutor {
 		const sql = builder.getSql()
 
 		await db.client.query(sql)
-		previousId = await db.commandBus.execute(
-			new CreateEventCommand(
-				EventType.runMigration,
-				{
-					version: migration.version,
-				},
-				previousId,
-			),
-		)
-
-		await db.commandBus.execute(new UpdateStageEventCommand(stage.slug, previousId))
 		return schema
 	}
 }

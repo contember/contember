@@ -1,11 +1,9 @@
 import { createStageTree, StageTree } from '../stages'
 import { Migration, MigrationDescriber } from '@contember/schema-migrations'
 import { Client, ConnectionError, wrapIdentifier } from '@contember/database'
-import { LatestEventIdByStageQuery } from '../queries'
 import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
-import { CreateEventCommand, SaveMigrationCommand, UpdateStageEventCommand } from '../commands'
-import { ContentEvent, EventType } from '@contember/engine-common'
+import { SaveMigrationCommand } from '../commands'
 import { StageWithoutEvent } from '../dtos'
 import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
@@ -38,10 +36,7 @@ export class ProjectMigrator {
 		const sorted = [...migrationsToExecute].sort((a, b) => a.version.localeCompare(b.version))
 
 		const rootStage = stageTree.getRoot()
-		let previousId: string
-		if (stageTree.getChildren(rootStage).length === 0) {
-			previousId = await db.queryHandler.fetch(new LatestEventIdByStageQuery(rootStage.slug))
-		} else {
+		if (stageTree.getChildren(rootStage).length !== 0) {
 			throw new StagingDisabledError()
 		}
 		for (const migration of sorted) {
@@ -58,21 +53,9 @@ export class ProjectMigrator {
 					migration.version,
 				)
 			}
-
-			previousId = await db.commandBus.execute(
-				new CreateEventCommand(
-					EventType.runMigration,
-					{
-						version: migration.version,
-					},
-					previousId,
-				),
-			)
 			await db.commandBus.execute(new SaveMigrationCommand(migration))
 			logger(`Done`)
 		}
-
-		await db.commandBus.execute(new UpdateStageEventCommand(rootStage.slug, previousId))
 
 		logger(`Done`)
 	}

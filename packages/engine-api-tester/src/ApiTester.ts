@@ -1,5 +1,4 @@
 import {
-	CreateInitEventCommand,
 	DatabaseContextFactory,
 	MigrationArgs,
 	ProjectConfig,
@@ -108,8 +107,6 @@ export class ApiTester {
 			})
 		await pgClient.end()
 
-		await db.commandBus.execute(new CreateInitEventCommand())
-
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
 			resolvers: systemContainer.get('systemResolversFactory').create(false) as any,
@@ -129,13 +126,7 @@ export class ApiTester {
 			stageManager,
 			systemContainer.schemaVersionBuilder,
 		)
-		const systemApiTester = new SystemApiTester(
-			db,
-			projectConfig,
-			systemContainer.eventApplier,
-			systemSchema,
-			systemContainer,
-		)
+		const systemApiTester = new SystemApiTester(db, projectConfig, systemSchema, systemContainer)
 		let closed = false
 
 		return new ApiTester(

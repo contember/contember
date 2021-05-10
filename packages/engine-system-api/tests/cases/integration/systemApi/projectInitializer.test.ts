@@ -1,6 +1,4 @@
-import { ApiTester, createCreateEvent, createRunMigrationEvent, GQL } from '@contember/engine-api-tester'
-import { Migration, VERSION_LATEST } from '@contember/schema-migrations'
-import { createMigrationResolver } from '@contember/engine-api-tester'
+import { ApiTester } from '@contember/engine-api-tester'
 import { ProjectConfig, StageConfig } from '../../../../src'
 import { suite } from 'uvu'
 import * as assert from '../../../src/asserts'

@@ -12,14 +12,11 @@ export {
 	formatSchemaName,
 	VersionedSchema,
 	ProjectInitializer,
-	LatestEventIdByStageQuery,
+	LatestTransactionIdByStageQuery,
 	DatabaseContextFactory,
-	InitEventQuery,
 	ProjectMigrator,
 	StageCreator,
-	CreateInitEventCommand,
 	getJunctionTables,
-	EventApplier,
 	UpdateStageEventCommand,
 } from './model'
 export * from './SystemContainer'

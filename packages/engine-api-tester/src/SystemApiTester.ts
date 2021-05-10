@@ -2,7 +2,6 @@ import { createUuidGenerator, testUuid } from './testUuid'
 import { graphql, GraphQLSchema } from 'graphql'
 import {
 	DatabaseContext,
-	EventApplier,
 	Identity,
 	ProjectConfig,
 	setupSystemVariables,
@@ -17,7 +16,6 @@ export class SystemApiTester {
 	constructor(
 		private readonly db: DatabaseContext,
 		private readonly project: ProjectConfig,
-		private readonly eventApplier: EventApplier,
 		private readonly systemSchema: GraphQLSchema,
 		private readonly systemContainer: SystemContainer,
 	) {}

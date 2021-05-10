@@ -1,7 +1,5 @@
 export * from './dependency'
 export * from './DependencyBuilder'
 export * from './DiffBuilder'
-export * from './EventApplier'
-export * from './eventUtils'
 export * from './HistoryEventResponseBuilder'
 export * from './TableReferencingResolver'

@@ -15,7 +15,6 @@ import {
 	DependencyBuilderList,
 	DiffBuilder,
 	EntitiesSelector,
-	EventApplier,
 	ExecutedMigrationsResolver,
 	HistoryEventResponseBuilder,
 	MigrationAlterer,
@@ -119,11 +118,6 @@ export class SystemContainerFactory {
 					]),
 			)
 			.addService(
-				'eventApplier',
-				({ migrationExecutor, executedMigrationsResolver }) =>
-					new EventApplier(migrationExecutor, executedMigrationsResolver),
-			)
-			.addService(
 				'projectMigrator',
 				({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>
 					new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver),
@@ -134,17 +128,14 @@ export class SystemContainerFactory {
 					? new ProjectMigrationInfoResolver(executedMigrationsResolver, container.migrationsResolverFactory)
 					: undefined,
 			)
-			.addService('stageCreator', ({ eventApplier }) => new StageCreator(eventApplier))
+			.addService('stageCreator', () => new StageCreator())
 			.addService(
 				'diffBuilder',
 				({ dependencyBuilder, schemaVersionBuilder }) =>
 					new DiffBuilder(dependencyBuilder, schemaVersionBuilder, container.entitiesSelector),
 			)
 
-			.addService(
-				'projectTruncateExecutor',
-				({ executedMigrationsResolver }) => new ProjectTruncateExecutor(executedMigrationsResolver),
-			)
+			.addService('projectTruncateExecutor', () => new ProjectTruncateExecutor())
 			.addService('migrationAlterer', () => new MigrationAlterer())
 
 			.addService('stagesQueryResolver', () => new StagesQueryResolver())

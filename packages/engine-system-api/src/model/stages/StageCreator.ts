@@ -1,5 +1,4 @@
 import { CreateOrUpdateStageCommand } from '../commands'
-import { EventApplier } from '../events'
 import { StageBySlugQuery } from '../queries'
 import { StageConfig } from '../../types'
 import { DatabaseContext } from '../database'
@@ -7,7 +6,7 @@ import { Logger } from '@contember/engine-common'
 import { StagingDisabledError } from '../../StagingDisabledError'
 
 class StageCreator {
-	constructor(private readonly eventApplier: EventApplier) {}
+	constructor() {}
 
 	public async createStage(
 		db: DatabaseContext,

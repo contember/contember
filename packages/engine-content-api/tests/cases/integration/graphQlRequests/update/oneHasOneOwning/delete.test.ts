@@ -1,5 +1,5 @@
 import { test } from 'uvu'
-import { execute, sqlTransaction } from '../../../../../src/test'
+import { execute, sqlDeferred, sqlTransaction } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 import { siteSettingSchema } from './schema'
@@ -31,22 +31,18 @@ test('delete', async () => {
 						rows: [{ setting_id: testUuid(1) }],
 					},
 				},
-				{
-					sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
-					parameters: [],
-					response: 1,
-				},
-				{
-					sql: SQL`delete from "public"."site_setting"
+				...sqlDeferred([
+					{
+						sql: SQL`delete from "public"."site_setting"
               where "id" in (select "root_"."id"
                              from "public"."site_setting" as "root_"
                              where "root_"."id" = ?)
               returning "id"`,
-					parameters: [testUuid(1)],
-					response: { rows: [{ id: testUuid(1) }] },
-				},
-				{
-					sql: SQL`
+						parameters: [testUuid(1)],
+						response: { rows: [{ id: testUuid(1) }] },
+					},
+					{
+						sql: SQL`
 								with "newdata_" as
 								(select ? :: uuid as "setting_id", "root_"."id", "root_"."name"
 									from "public"."site" as "root_"
@@ -54,16 +50,12 @@ test('delete', async () => {
 								update "public"."site"
 								set "setting_id" = "newdata_"."setting_id" from "newdata_"
 								where "site"."id" = "newdata_"."id"`,
-					parameters: [null, testUuid(1)],
-					response: {
-						rowCount: 1,
+						parameters: [null, testUuid(1)],
+						response: {
+							rowCount: 1,
+						},
 					},
-				},
-				{
-					sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
-					parameters: [],
-					response: 1,
-				},
+				]),
 			]),
 		],
 		return: {

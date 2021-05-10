@@ -1,5 +1,5 @@
 import { test } from 'uvu'
-import { execute, sqlTransaction } from '../../../../src/test'
+import { execute, sqlDeferred, sqlTransaction } from '../../../../src/test'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../src/tags'
@@ -57,30 +57,22 @@ test('delete post by id', async () => {
 						],
 					},
 				},
-				{
-					sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
-					parameters: [],
-					response: 1,
-				},
-				{
-					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
-					parameters: [testUuid(1)],
-					response: { rows: [{ id: testUuid(1) }] },
-				},
-				{
-					sql: SQL`delete from "public"."post"
+				...sqlDeferred([
+					{
+						sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
+						parameters: [testUuid(1)],
+						response: { rows: [{ id: testUuid(1) }] },
+					},
+					{
+						sql: SQL`delete from "public"."post"
             where "id" in (select "root_"."id"
                            from "public"."post" as "root_"
                            where "root_"."id" = ?)
 						returning "id"`,
-					parameters: [testUuid(1)],
-					response: { rows: [{ id: testUuid(1) }] },
-				},
-				{
-					sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
-					parameters: [],
-					response: 1,
-				},
+						parameters: [testUuid(1)],
+						response: { rows: [{ id: testUuid(1) }] },
+					},
+				]),
 			]),
 		],
 		return: {

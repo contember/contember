@@ -36,7 +36,7 @@ export class DeleteExecutor {
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
 			const db = mapper.db
-			await db.query('SET CONSTRAINTS ALL DEFERRED')
+			await mapper.constraintHelper.setFkConstraintsDeferred()
 			const primaryValue = await mapper.getPrimaryValue(entity, by)
 			if (!primaryValue) {
 				return [new MutationEntryNotFoundError([], by as Input.UniqueWhere)]
@@ -51,7 +51,7 @@ export class DeleteExecutor {
 			}
 
 			try {
-				await db.query('SET CONSTRAINTS ALL IMMEDIATE')
+				await mapper.constraintHelper.setFkConstraintsImmediate()
 				return [new MutationDeleteOk([], entity, primaryValue)]
 			} catch (e) {
 				if (e instanceof ForeignKeyViolationError) {

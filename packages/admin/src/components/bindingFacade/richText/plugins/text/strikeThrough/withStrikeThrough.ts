@@ -29,7 +29,7 @@ export const withStrikeThrough = <E extends BaseEditor>(editor: E): E => {
 
 	editor.processAttributesPaste = (element, cta) => {
 		if (element.style.textDecoration) {
-			cta = { ...cta, strikeThroughMark: element.style.textDecoration === 'line-through' }
+			cta = { ...cta, [strikeThroughMark]: element.style.textDecoration === 'line-through' }
 		}
 		return processAttributesPaste(element, cta)
 	}

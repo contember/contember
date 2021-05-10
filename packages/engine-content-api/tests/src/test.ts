@@ -6,6 +6,7 @@ import { Client } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
 import { createUuidGenerator } from '@contember/engine-api-tester'
 import { getArgumentValues } from 'graphql/execution/values'
+import { SQL } from './tags'
 
 export interface SqlQuery {
 	sql: string
@@ -44,6 +45,31 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 			sql: 'COMMIT;',
 			parameters: [],
 			response: {},
+		},
+	]
+}
+
+export const sqlDeferred = (executes: SqlQuery[]): SqlQuery[] => {
+	return [
+		{
+			sql: SQL`SELECT con.conname AS name
+			         FROM pg_catalog.pg_constraint con
+				              INNER JOIN pg_catalog.pg_namespace nsp
+			         ON nsp.oid = connamespace
+			         WHERE nsp.nspname = ? and con.condeferrable = true and contype = ?`,
+			parameters: ['public', 'f'],
+			response: { rows: [{ name: 'foo' }] },
+		},
+		{
+			sql: SQL`SET CONSTRAINTS "public"."foo" DEFERRED`,
+			parameters: [],
+			response: 1,
+		},
+		...executes,
+		{
+			sql: SQL`SET CONSTRAINTS "public"."foo" IMMEDIATE`,
+			parameters: [],
+			response: 1,
 		},
 	]
 }

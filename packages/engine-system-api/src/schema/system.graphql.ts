@@ -13,15 +13,11 @@ const schema: DocumentNode = gql`
 	type Query {
 		stages: [Stage!]!
 		executedMigrations(version: String): [ExecutedMigration!]!
-		diff(stage: String!, filter: [TreeFilter!]): DiffResponse!
 		history(stage: String!, filter: [HistoryFilter!], sinceEvent: String, sinceTime: DateTime): HistoryResponse!
 	}
 
 	type Mutation {
 		migrate(migrations: [Migration!]!): MigrateResponse!
-		release(stage: String!, events: [String!]!): ReleaseResponse!
-		releaseTree(stage: String!, tree: [TreeFilter!]!): ReleaseTreeResponse!
-		rebaseAll: RebaseAllResponse!
 	}
 
 	# === history filter ===
@@ -29,19 +25,6 @@ const schema: DocumentNode = gql`
 	input HistoryFilter {
 		entity: String!
 		id: String!
-	}
-
-	# === tree filter ==
-	input TreeFilter {
-		entity: String!
-		relations: [TreeFilterRelation!]
-		id: String
-		filter: Json
-	}
-
-	input TreeFilterRelation {
-		name: String!
-		relations: [TreeFilterRelation!]!
 	}
 
 	# === history ===
@@ -133,33 +116,6 @@ const schema: DocumentNode = gql`
 		type: HistoryEventType!
 	}
 
-	# === diff ===
-
-	enum DiffErrorCode {
-		STAGE_NOT_FOUND
-		MISSING_BASE
-		NOT_REBASED
-		INVALID_FILTER
-	}
-
-	type DiffError {
-		code: DiffErrorCode!
-		developerMessage: String!
-	}
-
-	type DiffResponse {
-		ok: Boolean!
-		errors: [DiffErrorCode!]! @deprecated
-		error: DiffError
-		result: DiffResult
-	}
-
-	type DiffResult {
-		base: Stage!
-		head: Stage!
-		events: [DiffEvent!]!
-	}
-
 	# === executedMigrations ===
 
 	type ExecutedMigration {
@@ -203,114 +159,6 @@ const schema: DocumentNode = gql`
 
 	type MigrateResult {
 		message: String!
-	}
-
-	# === release ===
-	enum ReleaseErrorCode {
-		STAGE_NOT_FOUND
-		MISSING_BASE
-		MISSING_DEPENDENCY
-		FORBIDDEN
-	}
-
-	type ReleaseError {
-		code: ReleaseErrorCode!
-		developerMessage: String!
-	}
-
-	type ReleaseResponse {
-		ok: Boolean!
-		errors: [ReleaseErrorCode!]! @deprecated
-		error: ReleaseError
-	}
-
-	# === releaseTree ===
-
-	enum ReleaseTreeErrorCode {
-		STAGE_NOT_FOUND
-		MISSING_BASE
-		FORBIDDEN
-		NOT_REBASED
-		INVALID_FILTER
-	}
-
-	type ReleaseTreeError {
-		code: ReleaseTreeErrorCode!
-		developerMessage: String!
-	}
-
-	type ReleaseTreeResponse {
-		ok: Boolean!
-		errors: [ReleaseTreeErrorCode!]! @deprecated
-		error: ReleaseTreeError
-	}
-
-	# === rebase ===
-
-	type RebaseAllResponse {
-		ok: Boolean!
-	}
-
-	# === diff ===
-
-	interface DiffEvent {
-		id: String!
-		transactionId: String!
-		identityDescription: String!
-		identityId: String!
-		dependencies: [String!]!
-		description: String!
-		createdAt: DateTime!
-		type: DiffEventType!
-	}
-
-	enum DiffEventType {
-		UPDATE
-		DELETE
-		CREATE
-	}
-
-	type DiffUpdateEvent implements DiffEvent {
-		id: String!
-		transactionId: String!
-		identityId: String!
-		identityDescription: String!
-		dependencies: [String!]!
-		type: DiffEventType!
-		description: String!
-		createdAt: DateTime!
-		tableName: String!
-		primaryKeys: [String!]!
-		oldValues: Json!
-		diffValues: Json!
-	}
-
-	type DiffDeleteEvent implements DiffEvent {
-		id: String!
-		transactionId: String!
-		identityId: String!
-		identityDescription: String!
-		dependencies: [String!]!
-		type: DiffEventType!
-		description: String!
-		createdAt: DateTime!
-		tableName: String!
-		primaryKeys: [String!]!
-		oldValues: Json!
-	}
-
-	type DiffCreateEvent implements DiffEvent {
-		id: String!
-		transactionId: String!
-		identityId: String!
-		identityDescription: String!
-		dependencies: [String!]!
-		type: DiffEventType!
-		description: String!
-		createdAt: DateTime!
-		tableName: String!
-		primaryKeys: [String!]!
-		newValues: Json!
 	}
 
 	# === stage ===

@@ -16,7 +16,7 @@ export abstract class Command<Args extends Arguments, TOptions extends Options> 
 		return this.configuration
 	}
 
-	protected abstract async execute(input: Input<Args, TOptions>): Promise<void | number>
+	protected abstract execute(input: Input<Args, TOptions>): Promise<void | number>
 
 	public async run(args: string[]): Promise<number> {
 		const parser = this.getConfiguration().createParser()

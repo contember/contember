@@ -19,7 +19,7 @@ export const waitForWorker = (timeoutMs: number) => {
 			const listener = ({}, message: any) => {
 				if ('type' in message && message.type === MSG_WORKER_STARTED) {
 					ok = true
-					resolve()
+					resolve(null)
 					cluster.removeListener('message', listener)
 				}
 			}

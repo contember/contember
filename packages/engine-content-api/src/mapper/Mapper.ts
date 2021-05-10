@@ -18,11 +18,13 @@ import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
 import { UpdateBuilder } from './update'
 import { Mutex } from '../utils'
 import { CheckedPrimary } from './CheckedPrimary'
+import { ConstraintHelper } from '@contember/database'
 
 export class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
 	public readonly deletedEntities = new DeletedEntitiesStorage()
 	public readonly mutex = new Mutex()
+	public readonly constraintHelper: ConstraintHelper
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -36,7 +38,9 @@ export class Mapper {
 		private readonly updater: Updater,
 		private readonly inserter: Inserter,
 		private readonly pathFactory: PathFactory,
-	) {}
+	) {
+		this.constraintHelper = new ConstraintHelper(db)
+	}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere, fieldName: string) {
 		const columnName = getColumnName(this.schema, entity, fieldName)

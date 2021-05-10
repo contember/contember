@@ -14,10 +14,7 @@ import {
 	DeletedRowReferenceDependencyBuilder,
 	DependencyBuilderList,
 	DiffBuilder,
-	DiffEventResponseBuilder,
 	EntitiesSelector,
-	EventApplier,
-	EventsRebaser,
 	ExecutedMigrationsResolver,
 	HistoryEventResponseBuilder,
 	MigrationAlterer,
@@ -28,30 +25,23 @@ import {
 	ProjectMigrationInfoResolver,
 	ProjectMigrator,
 	ProjectTruncateExecutor,
-	RebaseExecutor,
-	ReleaseExecutor,
 	SameRowDependencyBuilder,
 	SchemaVersionBuilder,
 	StageCreator,
 	TransactionDependencyBuilder,
 } from './model'
-import { Resolvers } from './schema'
 import { UuidProvider } from './utils'
 import {
-	DiffQueryResolver,
+	ExecutedMigrationsQueryResolver,
 	MigrateMutationResolver,
-	RebaseAllMutationResolver,
-	ReleaseMutationResolver,
 	ResolverContextFactory,
 	ResolverFactory,
 	StagesQueryResolver,
+	TruncateMutationResolver,
 } from './resolvers'
 import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
-import { ReleaseTreeMutationResolver, TruncateMutationResolver } from './resolvers/mutation'
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
-import { ExecutedMigrationsQueryResolver, HistoryQueryResolver } from './resolvers/query'
-import { DiffEventTypeResolver, HistoryEventTypeResolver } from './resolvers/types'
 import { MigrationAlterMutationResolver } from './resolvers/mutation/MigrationAlterMutationResolver'
 
 export interface SystemContainer {
@@ -128,20 +118,9 @@ export class SystemContainerFactory {
 					]),
 			)
 			.addService(
-				'eventApplier',
-				({ migrationExecutor, executedMigrationsResolver }) =>
-					new EventApplier(migrationExecutor, executedMigrationsResolver),
-			)
-			.addService('eventsRebaser', () => new EventsRebaser())
-			.addService(
-				'rebaseExecutor',
-				({ dependencyBuilder, eventApplier, eventsRebaser, schemaVersionBuilder }) =>
-					new RebaseExecutor(dependencyBuilder, eventApplier, eventsRebaser, schemaVersionBuilder),
-			)
-			.addService(
 				'projectMigrator',
-				({ migrationDescriber, rebaseExecutor, schemaVersionBuilder, executedMigrationsResolver }) =>
-					new ProjectMigrator(migrationDescriber, rebaseExecutor, schemaVersionBuilder, executedMigrationsResolver),
+				({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>
+					new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver),
 			)
 
 			.addService('projectMigrationInfoResolver', ({ executedMigrationsResolver }) =>
@@ -149,55 +128,25 @@ export class SystemContainerFactory {
 					? new ProjectMigrationInfoResolver(executedMigrationsResolver, container.migrationsResolverFactory)
 					: undefined,
 			)
-			.addService('stageCreator', ({ eventApplier }) => new StageCreator(eventApplier))
+			.addService('stageCreator', () => new StageCreator())
 			.addService(
 				'diffBuilder',
 				({ dependencyBuilder, schemaVersionBuilder }) =>
 					new DiffBuilder(dependencyBuilder, schemaVersionBuilder, container.entitiesSelector),
 			)
 
-			.addService(
-				'releaseExecutor',
-				({ dependencyBuilder, eventsRebaser, schemaVersionBuilder }) =>
-					new ReleaseExecutor(dependencyBuilder, container.eventApplier, eventsRebaser, schemaVersionBuilder),
-			)
-			.addService(
-				'projectTruncateExecutor',
-				({ executedMigrationsResolver }) => new ProjectTruncateExecutor(executedMigrationsResolver),
-			)
+			.addService('projectTruncateExecutor', () => new ProjectTruncateExecutor())
 			.addService('migrationAlterer', () => new MigrationAlterer())
 
 			.addService('stagesQueryResolver', () => new StagesQueryResolver())
 			.addService('executedMigrationsQueryResolver', () => new ExecutedMigrationsQueryResolver())
 
-			.addService('diffEventResponseBuilder', () => new DiffEventResponseBuilder(container.identityFetcher))
-			.addService(
-				'diffQueryResolver',
-				({ diffEventResponseBuilder, diffBuilder }) => new DiffQueryResolver(diffEventResponseBuilder, diffBuilder),
-			)
 			.addService('historyEventResponseBuilder', () => new HistoryEventResponseBuilder(container.identityFetcher))
-			.addService(
-				'historyQueryResolver',
-				({ historyEventResponseBuilder, schemaVersionBuilder }) =>
-					new HistoryQueryResolver(historyEventResponseBuilder, schemaVersionBuilder),
-			)
-			.addService(
-				'releaseMutationResolver',
-				({ rebaseExecutor, releaseExecutor }) => new ReleaseMutationResolver(rebaseExecutor, releaseExecutor),
-			)
-			.addService(
-				'releaseTreeMutationResolver',
-				({ rebaseExecutor, releaseExecutor, diffBuilder }) =>
-					new ReleaseTreeMutationResolver(rebaseExecutor, releaseExecutor, diffBuilder),
-			)
-			.addService('rebaseMutationResolver', ({ rebaseExecutor }) => new RebaseAllMutationResolver(rebaseExecutor))
 			.addService('migrateMutationResolver', ({ projectMigrator }) => new MigrateMutationResolver(projectMigrator))
 			.addService(
 				'truncateMutationResolver',
 				({ projectTruncateExecutor }) => new TruncateMutationResolver(projectTruncateExecutor),
 			)
-			.addService('historyEventTypeResolver', () => new HistoryEventTypeResolver())
-			.addService('diffEventTypeResolver', () => new DiffEventTypeResolver())
 			.addService(
 				'migrationAlterMutationResolver',
 				({ migrationAlterer }) => new MigrationAlterMutationResolver(migrationAlterer),
@@ -207,29 +156,15 @@ export class SystemContainerFactory {
 				({
 					stagesQueryResolver,
 					executedMigrationsQueryResolver,
-					diffQueryResolver,
-					historyQueryResolver,
-					releaseMutationResolver,
-					rebaseMutationResolver,
 					migrateMutationResolver,
-					releaseTreeMutationResolver,
 					truncateMutationResolver,
-					historyEventTypeResolver,
-					diffEventTypeResolver,
 					migrationAlterMutationResolver,
 				}) =>
 					new ResolverFactory(
 						stagesQueryResolver,
 						executedMigrationsQueryResolver,
-						diffQueryResolver,
-						historyQueryResolver,
-						releaseMutationResolver,
-						rebaseMutationResolver,
 						migrateMutationResolver,
-						releaseTreeMutationResolver,
 						truncateMutationResolver,
-						historyEventTypeResolver,
-						diffEventTypeResolver,
 						migrationAlterMutationResolver,
 					),
 			)

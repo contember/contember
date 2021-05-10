@@ -25,6 +25,7 @@ import {
 import assert from 'assert'
 import { assertNever } from '../../utils'
 import { PermissionsByIdentityFactory, PredicateFactory, VariableInjector } from '../../acl'
+import { ConstraintHelper } from '@contember/database'
 
 export interface ContentEventApplierContext {
 	db: Client
@@ -159,6 +160,7 @@ export class ContentEventApplier {
 	constructor(private readonly contentApplyDependenciesFactory: ContentApplyDependenciesFactory) {}
 
 	public async apply(context: ContentEventApplierContext, events: ContentEvent[]): Promise<ContentEventApplyResult> {
+		const constraintHelper = new ConstraintHelper(context.db)
 		const tables = buildTables(context.schema.model)
 		const deps = {
 			...this.contentApplyDependenciesFactory.create(context.schema, context.roles, context.identityVariables),
@@ -171,8 +173,8 @@ export class ContentEventApplier {
 		for (const event of events) {
 			if (event.transactionId !== trxId) {
 				deletedEntities = new Set<string>()
-				await context.db.query('SET CONSTRAINTS ALL IMMEDIATE')
-				await context.db.query('SET CONSTRAINTS ALL DEFERRED')
+				await constraintHelper.setFkConstraintsImmediate()
+				await constraintHelper.setFkConstraintsDeferred()
 				trxId = event.transactionId
 			}
 			let result
@@ -212,7 +214,7 @@ export class ContentEventApplier {
 			}
 			applied.push(event)
 		}
-		await context.db.query('SET CONSTRAINTS ALL IMMEDIATE')
+		await constraintHelper.setFkConstraintsImmediate()
 		return new ContentEventApplyOkResult(applied)
 	}
 

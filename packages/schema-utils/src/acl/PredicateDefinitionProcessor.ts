@@ -45,38 +45,35 @@ class PredicateDefinitionProcessor {
 				}
 			}
 
-			const fieldWhere = acceptFieldVisitor<WhereValue | Input.Where | [string, WhereValue | Input.Where] | undefined>(
-				this.schema,
-				entity,
-				key,
-				{
-					visitColumn: (entity, column) => {
-						return handler.handleColumn({ entity, column, value: value as Input.Condition | PredicateExtension, path })
-					},
-					visitRelation: (entity, relation, targetEntity) => {
-						const processedValue = handler.handleRelation({
-							relation,
-							entity,
-							targetEntity,
-							value: value as Acl.PredicateVariable | PredicateExtension,
-							path,
-						})
-						if (
-							typeof processedValue === 'object' &&
-							'constructor' in processedValue &&
-							processedValue.constructor.name === 'Object'
-						) {
-							return this.processInternal(
-								targetEntity,
-								processedValue as Acl.PredicateDefinition<PredicateExtension>,
-								handler,
-								[...path, key],
-							)
-						}
-						return processedValue
-					},
+			const fieldWhere = acceptFieldVisitor<
+				WhereValue | Input.Where | Input.Condition | [string, WhereValue | Input.Where | Input.Condition] | undefined
+			>(this.schema, entity, key, {
+				visitColumn: (entity, column) => {
+					return handler.handleColumn({ entity, column, value: value as Input.Condition | PredicateExtension, path })
 				},
-			)
+				visitRelation: (entity, relation, targetEntity) => {
+					const processedValue = handler.handleRelation({
+						relation,
+						entity,
+						targetEntity,
+						value: value as Acl.PredicateVariable | PredicateExtension,
+						path,
+					})
+					if (
+						typeof processedValue === 'object' &&
+						'constructor' in processedValue &&
+						processedValue.constructor.name === 'Object'
+					) {
+						return this.processInternal(
+							targetEntity,
+							processedValue as Acl.PredicateDefinition<PredicateExtension>,
+							handler,
+							[...path, key],
+						)
+					}
+					return processedValue
+				},
+			})
 			if (fieldWhere === undefined) {
 				return result
 			}
@@ -95,7 +92,7 @@ namespace PredicateDefinitionProcessor {
 			entity: Model.Entity
 			column: Model.AnyColumn
 			path: string[]
-		}): R | Input.Where | undefined | [string, R | Input.Where]
+		}): R | Input.Where | Input.Condition | undefined | [string, R | Input.Where | Input.Condition]
 
 		handleRelation(ctx: {
 			value: T | Acl.PredicateVariable

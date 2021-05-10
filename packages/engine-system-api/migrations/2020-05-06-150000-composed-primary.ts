@@ -1,6 +1,18 @@
-import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
-import { createEventTrigger, dropEventTrigger } from '@contember/schema-migrations'
+import { escapeValue, MigrationBuilder, Name } from '@contember/database-migrations'
 import { formatSchemaName, getJunctionTables, MigrationArgs } from '..'
+
+const createEventTrigger = (builder: MigrationBuilder, tableName: Name, primaryColumns: string[]) => {
+	builder.createTrigger(tableName, 'log_event', {
+		when: 'AFTER',
+		operation: ['INSERT', 'UPDATE', 'DELETE'],
+		level: 'ROW',
+		function: {
+			schema: 'system',
+			name: 'trigger_event',
+		},
+		functionParams: primaryColumns,
+	})
+}
 
 const migrateEvents = (builder: MigrationBuilder, tableName: string, primaryKeys: [string, string]) => {
 	builder.sql(`
@@ -58,14 +70,14 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs) {
 			builder.addConstraint({ name: table.tableName, schema }, null, {
 				primaryKey: [table.joiningColumn.columnName, table.inverseJoiningColumn.columnName],
 			})
-			dropEventTrigger(builder, { name: table.tableName, schema })
+			builder.dropTrigger({ name: table.tableName, schema }, 'log_event')
 			createEventTrigger(builder, { name: table.tableName, schema }, primaryColumns)
 		}
 		migrateEvents(builder, table.tableName, primaryColumns)
 	}
 	for (const entity of Object.values(schema.model.entities)) {
 		for (const schema of schemas) {
-			dropEventTrigger(builder, { name: entity.tableName, schema })
+			builder.dropTrigger({ name: entity.tableName, schema }, 'log_event')
 			createEventTrigger(builder, { name: entity.tableName, schema }, [entity.primaryColumn])
 		}
 	}

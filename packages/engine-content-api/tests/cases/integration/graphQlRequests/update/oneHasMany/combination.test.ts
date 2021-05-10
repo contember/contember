@@ -1,5 +1,5 @@
 import { test } from 'uvu'
-import { execute, sqlTransaction } from '../../../../../src/test'
+import { execute, sqlDeferred, sqlTransaction } from '../../../../../src/test'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 import { postWithLocale } from './schema'
@@ -22,30 +22,22 @@ test('delete and create', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
-				{
-					sql: SQL`SET CONSTRAINTS ALL DEFERRED`,
-					parameters: [],
-					response: 1,
-				},
-				{
-					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."locale" = ? and "root_"."post_id" = ?`,
-					parameters: ['cs', testUuid(2)],
-					response: { rows: [{ id: testUuid(9) }] },
-				},
-				{
-					sql: SQL`delete from "public"."post_locale"
+				...sqlDeferred([
+					{
+						sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."locale" = ? and "root_"."post_id" = ?`,
+						parameters: ['cs', testUuid(2)],
+						response: { rows: [{ id: testUuid(9) }] },
+					},
+					{
+						sql: SQL`delete from "public"."post_locale"
               where "id" in (select "root_"."id"
                              from "public"."post_locale" as "root_"
                              where "root_"."id" = ?)
               returning "id"`,
-					parameters: [testUuid(9)],
-					response: { rows: [{ id: testUuid(9) }] },
-				},
-				{
-					sql: SQL`SET CONSTRAINTS ALL IMMEDIATE`,
-					parameters: [],
-					response: 1,
-				},
+						parameters: [testUuid(9)],
+						response: { rows: [{ id: testUuid(9) }] },
+					},
+				]),
 				{
 					sql: SQL`with "root_" as
 							(select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id")

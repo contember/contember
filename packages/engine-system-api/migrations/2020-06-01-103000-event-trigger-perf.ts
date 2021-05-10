@@ -1,6 +1,17 @@
-import { MigrationBuilder } from '@contember/database-migrations'
-import { createEventStatementTrigger } from '@contember/schema-migrations'
+import { MigrationBuilder, Name } from '@contember/database-migrations'
 import { formatSchemaName, getJunctionTables, MigrationArgs } from '..'
+
+const createEventStatementTrigger = (builder: MigrationBuilder, tableName: Name) => {
+	builder.createTrigger(tableName, 'log_event_statement', {
+		when: 'AFTER',
+		operation: ['INSERT', 'UPDATE', 'DELETE'],
+		level: 'STATEMENT',
+		function: {
+			schema: 'system',
+			name: 'statement_trigger_event',
+		},
+	})
+}
 
 export default async function (builder: MigrationBuilder, args: MigrationArgs) {
 	const schema = await args.schemaResolver()

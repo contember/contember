@@ -1,7 +1,6 @@
 export interface Stage {
 	readonly name: string
 	readonly slug: string
-	readonly event_id: string
 }
 
 export interface StageWithId extends Stage {

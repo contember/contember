@@ -1,5 +1,4 @@
 import {
-	CreateInitEventCommand,
 	DatabaseContextFactory,
 	MigrationArgs,
 	ProjectConfig,
@@ -22,7 +21,6 @@ import { makeExecutableSchema } from 'graphql-tools'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'
-import { SequenceTester } from './SequenceTester'
 import { Client, EventManagerImpl, SingleConnection } from '@contember/database'
 import { createUuidGenerator } from './testUuid'
 import { project } from './project'
@@ -40,7 +38,6 @@ export class ApiTester {
 		public readonly content: ContentApiTester,
 		public readonly system: SystemApiTester,
 		public readonly stages: TesterStageManager,
-		public readonly sequences: SequenceTester,
 		public readonly cleanup: () => Promise<void>,
 	) {}
 
@@ -110,8 +107,6 @@ export class ApiTester {
 			})
 		await pgClient.end()
 
-		await db.commandBus.execute(new CreateInitEventCommand())
-
 		const systemSchema = makeExecutableSchema({
 			typeDefs: systemTypeDefs,
 			resolvers: systemContainer.get('systemResolversFactory').create(false) as any,
@@ -131,15 +126,7 @@ export class ApiTester {
 			stageManager,
 			systemContainer.schemaVersionBuilder,
 		)
-		const systemApiTester = new SystemApiTester(
-			db,
-			projectConfig,
-			systemContainer.eventApplier,
-			systemSchema,
-			systemContainer,
-		)
-		const sequenceTester = new SequenceTester(db.client.createQueryHandler(), contentApiTester, systemApiTester)
-
+		const systemApiTester = new SystemApiTester(db, projectConfig, systemSchema, systemContainer)
 		let closed = false
 
 		return new ApiTester(
@@ -149,7 +136,6 @@ export class ApiTester {
 			contentApiTester,
 			systemApiTester,
 			stageManager,
-			sequenceTester,
 			async () => {
 				if (!closed) {
 					await projectConnection.end()

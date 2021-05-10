@@ -18,7 +18,9 @@
     "@mangoweb/sass-base": "0.0.7",
     "@popperjs/core": "2.9.0",
     "classnames": "2.2.6",
+    "react-aria": "3.6.0",
     "react-popper": "2.2.4",
+    "react-stately": "3.5.0",
     "react-textarea-autosize": "8.3.2"
   },
   "peerDependencies": {

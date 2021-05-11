@@ -239,9 +239,17 @@ export class DataBinding {
 		if (this.treeStore.effectivelyHasTreeRoot(markerTreeRoot)) {
 			// This isn't perfectly accurate as theoretically, we could already have all the data necessary but this
 			// could still be false.
-			//
-			// We're not checking this against the schema since if we already effectively have this tree root, then
-			// assuming everything we already have is valid, this should match the schema as well.
+
+			const schema = await this.getOrLoadSchema()
+			this.treeStore.setSchema(schema)
+			if (__DEV_MODE__) {
+				// For most trees, checking this against the schema should be unnecessary since if we already effectively
+				// have this tree root, then assuming everything we already have is valid, this should match the schema as well.
+				// However, we might be dealing with an isCreating tree root which is completely new. Also, we can just lean
+				// towards the safe side since developer machines can generally handle the potentially unnecessary check anyway.
+				SchemaValidator.assertTreeValid(schema, markerTreeRoot)
+			}
+
 			return this.eventManager.syncOperation(() => {
 				const newTreeRootId = this.getNewTreeRootId()
 				this.treeAugmenter.extendTreeStates(newTreeRootId, markerTreeRoot)
@@ -297,32 +305,19 @@ export class DataBinding {
 
 		const aggregateSignal = getCombinedSignal(pendingExtensions.map(extension => extension.options.signal))
 
-		const schemaOrPromise = this.getOrLoadSchema()
+		// Even if we don't have a schema yet, we'll still optimistically fire the request so as to prevent a waterfall
+		// in the most likely case that things will go fine and the query does match the schema. If it doesn't, then we
+		// just get a "400 Bad Request" but that's not enough to make us delay the happy path.
+		const [aggregatePersistedData, schema] = await Promise.all([
+			this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal),
+			this.getOrLoadSchema(),
+		])
+		this.treeStore.setSchema(schema)
 
-		let aggregatePersistedData: QueryRequestResponse | undefined
-
-		if (schemaOrPromise instanceof Promise) {
-			// We don't have a schema yet. We'll still optimistically fire the request so as to prevent a waterfall
-			// in the most likely case that things will go fine and the query matches the schema.
-			const newPersistedDataPromise = this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
-
-			const schema = await schemaOrPromise
-
-			this.treeStore.setSchema(schema)
-			if (__DEV_MODE__) {
-				for (const extension of pendingExtensions) {
-					SchemaValidator.assertTreeValid(schema, extension.markerTreeRoot)
-				}
+		if (__DEV_MODE__) {
+			for (const extension of pendingExtensions) {
+				SchemaValidator.assertTreeValid(schema, extension.markerTreeRoot)
 			}
-			aggregatePersistedData = await newPersistedDataPromise
-		} else {
-			this.treeStore.setSchema(schemaOrPromise)
-			if (__DEV_MODE__) {
-				for (const extension of pendingExtensions) {
-					SchemaValidator.assertTreeValid(schemaOrPromise, extension.markerTreeRoot)
-				}
-			}
-			aggregatePersistedData = await this.fetchPersistedData(aggregateMarkerTreeRoot, aggregateSignal)
 		}
 
 		if (aggregateSignal?.aborted) {

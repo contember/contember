@@ -199,6 +199,14 @@ export const withPaste: <E extends EditorNode>(
 		},
 
 		insertData: data => {
+			const fragment = data.getData('application/x-slate-fragment')
+
+			if (fragment) {
+				const decoded = decodeURIComponent(window.atob(fragment))
+				editor.insertFragment(JSON.parse(decoded))
+				return
+			}
+
 			const html = data.getData('text/html')
 
 			if (html) {

@@ -5,7 +5,7 @@ import { BaseEditor } from '../../../baseEditor'
 export const underlineMark = 'isUnderlined'
 
 export const withUnderline = <E extends BaseEditor>(editor: E): E => {
-	const { onKeyDown, renderLeafChildren } = editor
+	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
 
 	const isUnderlinedHotkey = isHotkey('mod+u')
 
@@ -25,6 +25,20 @@ export const withUnderline = <E extends BaseEditor>(editor: E): E => {
 			event.preventDefault()
 		}
 		onKeyDown(event)
+	}
+
+	editor.processAttributesPaste = (element, cta) => {
+		if (element.style.textDecoration) {
+			cta = { ...cta, [underlineMark]: element.style.textDecoration === 'underline' }
+		}
+		return processAttributesPaste(element, cta)
+	}
+
+	editor.processInlinePaste = (element, next, cumulativeTextAttrs) => {
+		if (element.nodeName === 'U') {
+			return next(element.childNodes, { ...cumulativeTextAttrs, [underlineMark]: true })
+		}
+		return processInlinePaste(element, next, cumulativeTextAttrs)
 	}
 
 	return editor

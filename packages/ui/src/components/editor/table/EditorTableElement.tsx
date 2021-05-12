@@ -9,12 +9,10 @@ import { Icon } from '../../Icon'
 export interface EditorTableElementProps {
 	rowCount: number
 	columnCount: number
-	addRow: (index?: number) => void
-	addColumn: (index?: number) => void
+	extendTable: (vector: 'row' | 'column', index?: number) => void
+	shrinkTable: (vector: 'row' | 'column', index: number) => void
 	justifyColumn: (index: number, direction: 'start' | 'center' | 'end' | undefined) => void
 	deleteTable: () => void
-	deleteRow: (index: number) => void
-	deleteColumn: (index: number) => void
 	//selectTable: () => void
 	isSelected: boolean
 	isFocused: boolean
@@ -24,12 +22,10 @@ export interface EditorTableElementProps {
 export const EditorTableElement = memo(function EditorTableElement({
 	rowCount,
 	columnCount,
-	addRow,
-	addColumn,
+	extendTable,
+	shrinkTable,
 	justifyColumn,
 	deleteTable,
-	deleteRow,
-	deleteColumn,
 	//selectTable,
 	isSelected,
 	isFocused,
@@ -91,7 +87,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 							{columnNumber < columnCount ? (
 								<button
 									type="button"
-									onClick={() => deleteColumn(columnNumber)}
+									onClick={() => shrinkTable('column', columnNumber)}
 									className={cn(
 										`${prefix}editorTable-columnControls-item`,
 										columnNumber === 0 && `${prefix}editorTable-columnControls-item-first`,
@@ -105,7 +101,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 								<span className={cn(`${prefix}editorTable-stub`)} />
 							)}
 							<Button
-								onClick={() => addColumn(columnNumber)}
+								onClick={() => extendTable('column', columnNumber)}
 								className={cn(`${prefix}editorTable-columnControls-add`)}
 								flow="circular"
 								size="small"
@@ -127,7 +123,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 							{rowNumber < rowCount ? (
 								<button
 									type="button"
-									onClick={() => deleteRow(rowNumber)}
+									onClick={() => shrinkTable('row', rowNumber)}
 									className={cn(
 										`${prefix}editorTable-rowControls-item`,
 										rowNumber === 0 && `${prefix}editorTable-rowControls-item-first`,
@@ -141,7 +137,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 								<span className={cn(`${prefix}editorTable-stub`)} />
 							)}
 							<Button
-								onClick={() => addRow(rowNumber)}
+								onClick={() => extendTable('row', rowNumber)}
 								className={cn(`${prefix}editorTable-rowControls-add`)}
 								flow="circular"
 								size="small"
@@ -158,7 +154,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 			<button
 				type="button"
 				className={cn(`${prefix}editorTable-appendColumn`)}
-				onClick={() => addColumn()}
+				onClick={() => extendTable('column')}
 				contentEditable={false}
 			>
 				<Icon blueprintIcon="plus" />
@@ -166,7 +162,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 			<button
 				type="button"
 				className={cn(`${prefix}editorTable-appendRow`)}
-				onClick={() => addRow()}
+				onClick={() => extendTable('row')}
 				contentEditable={false}
 			>
 				<Icon blueprintIcon="plus" />

@@ -3,6 +3,6 @@ import { ElementNode, ElementSpecifics } from '../../baseEditor'
 export const elementToSpecifics = <Element extends ElementNode = ElementNode>(
 	element: Element,
 ): ElementSpecifics<Element> => {
-	const { type, children, ...specifics } = element
+	const { type, children, referenceId, ...specifics } = element
 	return specifics
 }

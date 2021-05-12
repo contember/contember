@@ -35,5 +35,5 @@ export type SerializableEditorNode = {
 
 export type Node = EditorNode | ElementNode | TextNode
 
-export type ElementSpecifics<Element extends ElementNode> = Omit<Element, 'type' | 'children'>
+export type ElementSpecifics<Element extends ElementNode> = Omit<Element, 'type' | 'children' | 'referenceId'>
 export type TextSpecifics<Text extends TextNode> = Omit<Text, 'text'>

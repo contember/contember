@@ -1,5 +1,6 @@
 import { createElement, ReactElement } from 'react'
-import { BuiltinElements, RichTextReferenceElement } from './BuiltinElements'
+import { BuiltinElements, RichTextReferenceElement, RichTextTableRowElement } from './BuiltinElements'
+import { renderChildren, RenderChildrenOptions } from './renderChildren'
 import { resolveRichTextElementMetadata } from './resolveRichTextElementMetadata'
 import { RichTextElement } from './RichTextElement'
 import { RichTextLeaf } from './RichTextLeaf'
@@ -12,7 +13,7 @@ export interface RenderElementFallbackProps<
 > {
 	element: BuiltinElements<CustomElements, CustomLeaves>
 	children: ReactElement
-	attributeNamePrefix: string | undefined
+	options: RenderChildrenOptions<CustomElements, CustomLeaves>
 }
 
 const getElementDataAttributes = <
@@ -39,8 +40,8 @@ const getElementDataAttributes = <
 export function RenderElementFallback<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never
->({ element, children, attributeNamePrefix }: RenderElementFallbackProps<CustomElements, CustomLeaves>) {
-	const attributes = getElementDataAttributes(element, attributeNamePrefix)
+>({ element, children, options }: RenderElementFallbackProps<CustomElements, CustomLeaves>) {
+	const attributes = getElementDataAttributes(element, options.attributeNamePrefix)
 
 	switch (element.type) {
 		case 'anchor':
@@ -68,8 +69,22 @@ export function RenderElementFallback<
 					{children}
 				</span>
 			)
-		case 'table':
-			return <table {...attributes}>{children}</table>
+		case 'table': {
+			const firstRow = element.children[0] as RichTextTableRowElement<CustomElements, CustomLeaves> | undefined
+			if (!firstRow || firstRow.headerScope !== 'table') {
+				return (
+					<table {...attributes}>
+						<tbody>{children}</tbody>
+					</table>
+				)
+			}
+			return (
+				<table {...attributes}>
+					<thead>{renderChildren<CustomElements, CustomLeaves>([firstRow], options)}</thead>
+					<tbody>{renderChildren<CustomElements, CustomLeaves>(element.children.slice(1) as any, options)}</tbody>
+				</table>
+			)
+		}
 		case 'tableRow':
 			return <tr {...attributes}>{children}</tr>
 		case 'tableCell': {

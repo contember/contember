@@ -107,4 +107,5 @@ export interface RichTextTableRowElement<
 	CustomLeaves extends RichTextLeaf = never
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'tableRow'
+	headerScope?: 'table'
 }

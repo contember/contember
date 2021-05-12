@@ -38,12 +38,7 @@ export const renderChildren = <
 				}
 				if ('children' in child) {
 					return (
-						<ElementRenderer<CustomElements, CustomLeaves>
-							key={i}
-							element={child}
-							renderElement={options.renderElement}
-							attributeNamePrefix={options.attributeNamePrefix}
-						>
+						<ElementRenderer<CustomElements, CustomLeaves> key={i} element={child} options={options}>
 							{renderChildren<CustomElements, CustomLeaves>(child.children as typeof children, options)}
 						</ElementRenderer>
 					)

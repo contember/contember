@@ -1,5 +1,6 @@
 import { ComponentType, createElement, FunctionComponent, ReactElement } from 'react'
 import { BuiltinElements } from './BuiltinElements'
+import { RenderChildrenOptions } from './renderChildren'
 import { RenderElementFallback, RenderElementFallbackProps } from './RenderElementFallback'
 import { resolveRichTextElementMetadata } from './resolveRichTextElementMetadata'
 import { RichTextElement } from './RichTextElement'
@@ -24,21 +25,20 @@ export interface ElementRendererProps<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never
 > {
-	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
 	children: ReactElement
-	attributeNamePrefix?: string
+	options: RenderChildrenOptions<CustomElements, CustomLeaves>
 }
 
 export function ElementRenderer<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never
->({ element, renderElement, children, attributeNamePrefix }: ElementRendererProps<CustomElements, CustomLeaves>) {
+>({ element, children, options }: ElementRendererProps<CustomElements, CustomLeaves>) {
 	const metadata = useRichTextRenderMetadata<CustomElements, CustomLeaves>()
 	const elementMetadata = resolveRichTextElementMetadata<CustomElements, CustomLeaves>(element, metadata)
 
-	if (renderElement) {
-		return createElement(renderElement, {
+	if (options.renderElement) {
+		return createElement(options.renderElement, {
 			...elementMetadata,
 			element,
 			fallback: RenderElementFallback,
@@ -46,7 +46,7 @@ export function ElementRenderer<
 		})
 	}
 	return (
-		<RenderElementFallback element={element as BuiltinElements} attributeNamePrefix={attributeNamePrefix}>
+		<RenderElementFallback element={element as BuiltinElements} options={options}>
 			{children}
 		</RenderElementFallback>
 	)

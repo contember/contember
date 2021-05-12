@@ -1,10 +1,12 @@
 import cn from 'classnames'
 import { HTMLAttributes, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
+import { toEnumViewClass } from '../../../utils'
 
 export interface EditorTableRowElementProps {
 	attributes: HTMLAttributes<HTMLDivElement>
 	children: ReactNode
+	headerScope: 'table' | undefined
 }
 
 /**
@@ -14,10 +16,17 @@ export interface EditorTableRowElementProps {
 export const EditorTableRowElement = memo(function EditorTableRowElement({
 	attributes,
 	children,
+	headerScope,
 }: EditorTableRowElementProps) {
 	const prefix = useClassNamePrefix()
 	return (
-		<div {...attributes} className={cn(`${prefix}editorTable-row`)}>
+		<div
+			{...attributes}
+			className={cn(
+				`${prefix}editorTable-row`,
+				toEnumViewClass(headerScope ? `headerScope-${headerScope}` : undefined),
+			)}
+		>
 			{children}
 		</div>
 	)

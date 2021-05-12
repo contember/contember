@@ -1,3 +1,4 @@
+import { EditorTableRowElement } from '@contember/ui'
 import { memo } from 'react'
 import { RenderElementProps } from 'slate-react'
 import { TableRowElement } from './TableRowElement'
@@ -8,8 +9,8 @@ export interface TableRowElementRendererProps extends Omit<RenderElementProps, '
 
 export const TableRowElementRenderer = memo(function TableRowElementRenderer(props: TableRowElementRendererProps) {
 	return (
-		<div {...props.attributes} style={{ display: 'contents' }}>
+		<EditorTableRowElement attributes={props.attributes} headerScope={props.element.headerScope}>
 			{props.children}
-		</div>
+		</EditorTableRowElement>
 	)
 })

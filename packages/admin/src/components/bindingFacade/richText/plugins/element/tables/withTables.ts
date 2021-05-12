@@ -129,6 +129,20 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				)
 			})
 		},
+		toggleTableRowHeaderScope: (element: TableElement, rowIndex: number, scope: TableRowElement['headerScope']) => {
+			const rowCount = element.children.length
+			if (rowIndex !== 0 || rowCount < 1) {
+				return
+			}
+			const tablePath = ReactEditor.findPath(e, element)
+			const firstRow = element.children[0] as TableRowElement
+
+			Transforms.setNodes(
+				editor,
+				{ headerScope: firstRow.headerScope === scope ? null : scope },
+				{ match: node => e.isTableRow(node), at: [...tablePath, 0] },
+			)
+		},
 		toggleTableColumnHeaderScope: (
 			element: TableElement,
 			columnIndex: number,

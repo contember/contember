@@ -14,6 +14,7 @@
 
 	$addColor: lighten($cui-color-blue, 10)
 	$removeColor: lighten($cui-color-danger, 10)
+	$headerColor: #F9F9F9
 
 	$rowCount: var(--#{$cui-conf-globalPrefix}editorTable-rowCount, 0)
 	$columnCount: var(--#{$cui-conf-globalPrefix}editorTable-columnCount, 0)
@@ -44,13 +45,17 @@
 			&-last
 				border-bottom-left-radius: $removeDimensionBorderRadius
 		&-item:hover + * + &-line,
-		&-item:hover + * + * + * + * + &-line // I know…
+		&-item:hover + * + * + * + * + * + &-line // I know…
 			background-color: $removeColor
 			z-index: 1
 		&-item:hover + * + &-line
 			transform: translateY(150%) scaleY(2)
-		&-item:hover + * + * + * + * + &-line
+		&-item:hover + * + * + * + * + * + &-line
 			transform: translateY(-150%) scaleY(2)
+		&-more
+			grid-row: calc(2 * #{$row} + 3) / span 1
+			grid-column: 1 / span 1
+			place-self: center start
 		&-line
 			grid-row: calc(2 * #{$row} + 2) / span 1
 			grid-column: 2 / -2
@@ -118,6 +123,7 @@
 			background-color: $addColor
 			z-index: 1
 	&-rowControls-add,
+	&-rowControls-more,
 	&-columnControls-add,
 	&-columnControls-more,
 	&-handle,
@@ -144,14 +150,16 @@
 			text-align: center
 		&.view-justify-end
 			text-align: right
-		&.view-headerScope-row
-			font-weight: $fw-bold
-			background: #F8F8F8
 
 		& > p
 			margin: 0
 		& > p + p
 			margin-top: .5em
+
+	&-cell.view-headerScope-row,
+	&-row.view-headerScope-table &-cell
+		font-weight: $fw-bold
+		background: $headerColor
 
 	&-appendRow
 		grid-row: -2 / span 1
@@ -196,6 +204,7 @@
 
 	&-rowControls-add,
 	&-rowControls-item,
+	&-rowControls-more,
 	&-columnControls-add,
 	&-columnControls-item,
 	&-columnControls-more,
@@ -212,6 +221,7 @@
 	&:hover &
 		&-rowControls-add,
 		&-rowControls-item,
+		&-rowControls-more,
 		&-columnControls-add,
 		&-columnControls-item,
 		&-columnControls-more,

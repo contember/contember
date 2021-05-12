@@ -11,7 +11,8 @@ export interface EditorTableElementProps {
 	columnCount: number
 	extendTable: (vector: 'row' | 'column', index?: number) => void
 	shrinkTable: (vector: 'row' | 'column', index: number) => void
-	toggleVectorHeaderScope: (vector: 'column', index: number, scope: 'row') => void // Only a few ops supported for now
+	toggleRowHeaderScope: (index: number, scope: 'table') => void // Only a few ops supported for now
+	toggleColumnHeaderScope: (index: number, scope: 'row') => void // Only a few ops supported for now
 	justifyColumn: (index: number, direction: 'start' | 'center' | 'end' | undefined) => void
 	deleteTable: () => void
 	//selectTable: () => void
@@ -25,7 +26,8 @@ export const EditorTableElement = memo(function EditorTableElement({
 	columnCount,
 	extendTable,
 	shrinkTable,
-	toggleVectorHeaderScope,
+	toggleRowHeaderScope,
+	toggleColumnHeaderScope,
 	justifyColumn,
 	deleteTable,
 	//selectTable,
@@ -73,11 +75,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 								>
 									<ButtonGroup>
 										{columnNumber === 0 && (
-											<Button
-												flow="circular"
-												size="small"
-												onClick={() => toggleVectorHeaderScope('column', columnNumber, 'row')}
-											>
+											<Button flow="circular" size="small" onClick={() => toggleColumnHeaderScope(columnNumber, 'row')}>
 												<Icon blueprintIcon="header" size="small" />
 											</Button>
 										)}
@@ -131,6 +129,25 @@ export const EditorTableElement = memo(function EditorTableElement({
 					const rowStyle = { [`--${prefix}editorTable-row`]: rowNumber } as CSSProperties
 					return (
 						<Fragment key={rowNumber}>
+							{rowNumber < rowCount && rowNumber === 0 ? (
+								<Dropdown
+									buttonProps={{
+										className: cn(`${prefix}editorTable-rowControls-more`),
+										flow: 'circular',
+										size: 'small',
+										distinction: 'seamless',
+										style: rowStyle,
+										children: <Icon blueprintIcon="more" />,
+									}}
+									styledContent={false}
+								>
+									<Button flow="circular" size="small" onClick={() => toggleRowHeaderScope(rowNumber, 'table')}>
+										<Icon blueprintIcon="header" size="small" />
+									</Button>
+								</Dropdown>
+							) : (
+								<span className={cn(`${prefix}editorTable-stub`)} />
+							)}
 							{rowNumber < rowCount ? (
 								<button
 									type="button"

@@ -1,4 +1,5 @@
 import { FieldValue, RelativeSingleField } from '@contember/binding'
+import { Element as SlateElement, Node as SlateNode, Text } from 'slate'
 import { ResolvedDiscriminatedDatum } from '../../../discrimination'
 import { ReferenceElement, referenceElementType } from '../elements'
 import { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
@@ -24,6 +25,34 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 	}
 
 	editor.insertData = data => {
+		const fragment = data.getData('application/x-slate-fragment')
+
+		if (fragment) {
+			const decoded = decodeURIComponent(window.atob(fragment))
+			const nodes = JSON.parse(decoded) as SlateNode[]
+
+			// This may result in invalid nodes. We're relying on normalization here.
+			const stripNodeReferences = (nodes: SlateNode[]): SlateNode[] =>
+				nodes.flatMap(node => {
+					if (Text.isText(node)) {
+						return node
+					}
+					if (SlateElement.isElement(node) && 'referenceId' in node) {
+						// Essentially unwrapping the node.
+						return stripNodeReferences(node.children)
+					}
+					return {
+						...node,
+						children: stripNodeReferences(node.children),
+					}
+				})
+
+			const nodesWithoutReferences = stripNodeReferences(nodes)
+
+			editor.insertFragment(nodesWithoutReferences)
+			return
+		}
+
 		const text = data.getData('text/plain').trim()
 
 		if (!text) {

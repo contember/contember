@@ -140,6 +140,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 										children: <Icon blueprintIcon="more" />,
 									}}
 									styledContent={false}
+									alignment="right"
 								>
 									<Button flow="circular" size="small" onClick={() => toggleRowHeaderScope(rowNumber, 'table')}>
 										<Icon blueprintIcon="header" size="small" />

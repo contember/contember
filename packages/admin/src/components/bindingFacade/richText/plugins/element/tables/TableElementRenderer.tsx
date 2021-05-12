@@ -42,6 +42,12 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 		},
 		[editor, props.element],
 	)
+	const toggleVectorHeaderScope = useCallback(
+		(vector: 'column', index: number, scope: 'row') => {
+			editor.toggleTableColumnHeaderScope(props.element, index, scope)
+		},
+		[editor, props.element],
+	)
 
 	const justifyColumn = useCallback(
 		(index: number, direction: TableCellElement['justify']) =>
@@ -90,6 +96,7 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 				columnCount={(props.element.children[0] as TableRowElement | undefined)?.children.length ?? 0}
 				extendTable={extendTable}
 				shrinkTable={shrinkTable}
+				toggleVectorHeaderScope={toggleVectorHeaderScope}
 				justifyColumn={justifyColumn}
 				//selectTable={selectTable}
 				deleteTable={deleteTable}

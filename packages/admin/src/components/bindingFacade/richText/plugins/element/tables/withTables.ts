@@ -37,6 +37,21 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 
 	const e = (editor as any) as EditorWithTables<E>
 
+	const forEachCellInColumn = (
+		element: TableElement,
+		columnIndex: number,
+		callback: (cellEntry: NodeEntry<TableCellElement>) => void,
+	) => {
+		const tablePath = ReactEditor.findPath(e, element)
+		const rowCount = e.getTableRowCount(element)
+
+		Editor.withoutNormalizing(e, () => {
+			for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				callback(Editor.node(e, [...tablePath, rowIndex, columnIndex]) as NodeEntry<TableCellElement>)
+			}
+		})
+	}
+
 	Object.assign<EditorWithTables<BaseEditor>, Partial<EditorWithTables<BaseEditor>>>(e, {
 		isTable: (element, suchThat): element is TableElement => element.type === tableElementType,
 		isTableRow: (element, suchThat): element is TableRowElement => element.type === tableRowElementType,
@@ -106,17 +121,36 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			})
 		},
 		justifyTableColumn: (element: TableElement, columnIndex: number, direction: TableCellElement['justify']) => {
-			const tablePath = ReactEditor.findPath(e, element)
-			const rowCount = e.getTableRowCount(element)
+			forEachCellInColumn(element, columnIndex, ([, cellPath]) => {
+				Transforms.setNodes(
+					editor,
+					{ justify: direction ?? null },
+					{ match: node => e.isTableCell(node), at: cellPath },
+				)
+			})
+		},
+		toggleTableColumnHeaderScope: (
+			element: TableElement,
+			columnIndex: number,
+			scope: TableCellElement['headerScope'],
+		) => {
+			let currentStatusScore = 0
+			const rowCount = element.children.length
 
-			Editor.withoutNormalizing(e, () => {
-				for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					Transforms.setNodes(
-						editor,
-						{ justify: direction ?? null },
-						{ match: node => e.isTableCell(node), at: [...tablePath, rowIndex, columnIndex] },
-					)
-				}
+			forEachCellInColumn(element, columnIndex, ([cell]) => {
+				currentStatusScore += cell.headerScope === scope ? 1 : -1
+			})
+
+			// If none have it or the majority does but not all.
+			const shouldSetScope =
+				-currentStatusScore === rowCount || (currentStatusScore > 0 && currentStatusScore !== rowCount)
+
+			forEachCellInColumn(element, columnIndex, ([, cellPath]) => {
+				Transforms.setNodes(
+					editor,
+					{ headerScope: shouldSetScope ? scope : null },
+					{ match: node => e.isTableCell(node), at: cellPath },
+				)
 			})
 		},
 		deleteTableRow: (element: TableElement, index: number) => {

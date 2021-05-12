@@ -51,6 +51,11 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			}
 		})
 	}
+	const copyTableCell = ({ children, referenceId, ...cellProps }: TableCellElement): TableCellElement => ({
+		...cellProps,
+		type: tableCellElementType,
+		children: [{ text: '' }],
+	})
 
 	Object.assign<EditorWithTables<BaseEditor>, Partial<EditorWithTables<BaseEditor>>>(e, {
 		isTable: (element, suchThat): element is TableElement => element.type === tableElementType,
@@ -102,7 +107,29 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			const columnCount = e.getTableColumnCount(element)
 			const rowIndex = index ?? element.children.length
 
-			Transforms.insertNodes(e, e.createEmptyTableRowElement(columnCount), {
+			let tableRow: TableRowElement
+			if (rowIndex === 0) {
+				tableRow = e.createEmptyTableRowElement(columnCount)
+
+				if (element.children.length) {
+					const firstRow = element.children[0] as TableRowElement
+					if (firstRow.headerScope) {
+						Transforms.setNodes(e, { headerScope: null }, { at: [...tablePath, 0] })
+					}
+				}
+			} else {
+				const blueprintRow = element.children[rowIndex - 1] as TableRowElement
+
+				tableRow = {
+					type: tableRowElementType,
+					children: Array.from(
+						{ length: columnCount },
+						(_, columnIndex): TableCellElement => copyTableCell(blueprintRow.children[columnIndex] as TableCellElement),
+					),
+				}
+			}
+
+			Transforms.insertNodes(e, tableRow, {
 				at: [...tablePath, rowIndex],
 			})
 		},
@@ -114,7 +141,23 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 
 			Editor.withoutNormalizing(e, () => {
 				for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					Transforms.insertNodes(e, e.createEmptyTableCellElement(), {
+					const tableRow = element.children[rowIndex] as TableRowElement
+
+					let tableCell: TableCellElement
+					if (columnIndex === 0) {
+						tableCell = e.createEmptyTableCellElement()
+
+						if (tableRow.children.length) {
+							const firstCell = tableRow.children[0] as TableCellElement
+							if (firstCell.headerScope) {
+								Transforms.setNodes(e, { headerScope: null }, { at: [...tablePath, rowIndex, 0] })
+							}
+						}
+					} else {
+						tableCell = copyTableCell(tableRow.children[columnIndex - 1] as TableCellElement)
+					}
+
+					Transforms.insertNodes(e, tableCell, {
 						at: [...tablePath, rowIndex, columnIndex],
 					})
 				}
@@ -550,6 +593,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				}
 				if (!ContemberEditor.hasParentOfType(e, entry, tableRowElementType)) {
 					return Transforms.unwrapNodes(e, { at: path })
+				}
+				if (path[path.length - 1] > 0 && node.headerScope) {
+					return Transforms.setNodes(e, { headerScope: null }, { at: path })
 				}
 			}
 			normalizeNode(entry)

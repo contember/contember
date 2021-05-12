@@ -11,6 +11,7 @@ export interface EditorTableElementProps {
 	columnCount: number
 	extendTable: (vector: 'row' | 'column', index?: number) => void
 	shrinkTable: (vector: 'row' | 'column', index: number) => void
+	toggleVectorHeaderScope: (vector: 'column', index: number, scope: 'row') => void // Only a few ops supported for now
 	justifyColumn: (index: number, direction: 'start' | 'center' | 'end' | undefined) => void
 	deleteTable: () => void
 	//selectTable: () => void
@@ -24,6 +25,7 @@ export const EditorTableElement = memo(function EditorTableElement({
 	columnCount,
 	extendTable,
 	shrinkTable,
+	toggleVectorHeaderScope,
 	justifyColumn,
 	deleteTable,
 	//selectTable,
@@ -70,6 +72,15 @@ export const EditorTableElement = memo(function EditorTableElement({
 									styledContent={false}
 								>
 									<ButtonGroup>
+										{columnNumber === 0 && (
+											<Button
+												flow="circular"
+												size="small"
+												onClick={() => toggleVectorHeaderScope('column', columnNumber, 'row')}
+											>
+												<Icon blueprintIcon="header" size="small" />
+											</Button>
+										)}
 										<Button flow="circular" size="small" onClick={() => justifyColumn(columnNumber, 'start')}>
 											<Icon blueprintIcon="align-left" size="small" />
 										</Button>

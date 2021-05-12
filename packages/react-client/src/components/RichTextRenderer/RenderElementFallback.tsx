@@ -24,7 +24,7 @@ const getElementDataAttributes = <
 ): {
 	[dataAttribute: string]: string | number | boolean
 } => {
-	const { children, ...extendedSpecifics } = element
+	const { children, referenceId, ...extendedSpecifics } = element
 
 	return Object.fromEntries(
 		Object.entries(extendedSpecifics)

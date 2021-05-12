@@ -27,12 +27,13 @@ export interface ElementRendererProps<
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
 	children: ReactElement
+	attributeNamePrefix?: string
 }
 
 export function ElementRenderer<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never
->({ element, renderElement, children }: ElementRendererProps<CustomElements, CustomLeaves>) {
+>({ element, renderElement, children, attributeNamePrefix }: ElementRendererProps<CustomElements, CustomLeaves>) {
 	const metadata = useRichTextRenderMetadata<CustomElements, CustomLeaves>()
 	const elementMetadata = resolveRichTextElementMetadata<CustomElements, CustomLeaves>(element, metadata)
 
@@ -44,5 +45,9 @@ export function ElementRenderer<
 			children,
 		})
 	}
-	return <RenderElementFallback element={element as BuiltinElements}>{children}</RenderElementFallback>
+	return (
+		<RenderElementFallback element={element as BuiltinElements} attributeNamePrefix={attributeNamePrefix}>
+			{children}
+		</RenderElementFallback>
+	)
 }

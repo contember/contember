@@ -12,6 +12,7 @@ export interface RenderChildrenOptions<
 > {
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	renderLeaf?: RenderLeaf<CustomLeaves>
+	attributeNamePrefix?: string
 }
 
 export const renderChildren = <
@@ -41,6 +42,7 @@ export const renderChildren = <
 							key={i}
 							element={child}
 							renderElement={options.renderElement}
+							attributeNamePrefix={options.attributeNamePrefix}
 						>
 							{renderChildren<CustomElements, CustomLeaves>(child.children as typeof children, options)}
 						</ElementRenderer>

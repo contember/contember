@@ -12,32 +12,64 @@ export interface RenderElementFallbackProps<
 > {
 	element: BuiltinElements<CustomElements, CustomLeaves>
 	children: ReactElement
+	attributeNamePrefix: string | undefined
+}
+
+const getElementDataAttributes = <
+	CustomElements extends RichTextElement = never,
+	CustomLeaves extends RichTextLeaf = never
+>(
+	element: RichTextElement<CustomElements, CustomLeaves>,
+	attributeNamePrefix: string = 'contember-',
+): {
+	[dataAttribute: string]: string | number | boolean
+} => {
+	const { children, ...extendedSpecifics } = element
+
+	return Object.fromEntries(
+		Object.entries(extendedSpecifics)
+			.filter(([, value]) => {
+				const t = typeof value
+				return t === 'string' || t === 'number' || t === 'boolean'
+			})
+			.map(([attribute, value]) => [`data-${attributeNamePrefix}${attribute.toLowerCase()}`, value]),
+	)
 }
 
 export function RenderElementFallback<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never
->({ element, children }: RenderElementFallbackProps<CustomElements, CustomLeaves>) {
+>({ element, children, attributeNamePrefix }: RenderElementFallbackProps<CustomElements, CustomLeaves>) {
+	const attributes = getElementDataAttributes(element, attributeNamePrefix)
+
 	switch (element.type) {
 		case 'anchor':
-			return <a href={element.href}>{children}</a>
+			return (
+				<a {...attributes} href={element.href}>
+					{children}
+				</a>
+			)
 		case 'heading':
-			return createElement(`h${element.level}`, null, children) // TODO numbered
+			return createElement(`h${element.level}`, attributes, children) // TODO numbered
 		case 'horizontalRule':
-			return <hr />
+			return <hr {...attributes} />
 		case 'listItem':
-			return <li>{children}</li>
+			return <li {...attributes}>{children}</li>
 		case 'orderedList':
-			return <ol>{children}</ol>
+			return <ol {...attributes}>{children}</ol>
 		case 'paragraph':
-			return <p>{children}</p>
+			return <p {...attributes}>{children}</p>
 		case 'reference': {
 			return <ReferenceElementFallback element={element} children={children} />
 		}
 		case 'scrollTarget':
-			return <span id={element.identifier}>{children}</span>
+			return (
+				<span {...attributes} id={element.identifier}>
+					{children}
+				</span>
+			)
 		case 'unorderedList':
-			return <ul>{children}</ul>
+			return <ul {...attributes}>{children}</ul>
 		default: {
 			if (__DEV_MODE__) {
 				throw new RichTextRendererError(

@@ -35,6 +35,7 @@ export type RichTextRendererProps<
 	deserialize?: (source: string) => RootEditorNode<CustomElements, CustomLeaves>
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	renderLeaf?: RenderLeaf<CustomLeaves>
+	attributeNamePrefix?: string
 } & (RichTextRendererFieldProps | RichTextRendererBlockProps<CustomElements, CustomLeaves>)
 
 export const RichTextRenderer = memo(function RichTextRenderer<
@@ -44,6 +45,7 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 	deserialize = defaultDeserialize,
 	renderElement,
 	renderLeaf,
+	attributeNamePrefix,
 	...sourceProps
 }: RichTextRendererProps<CustomElements, CustomLeaves>) {
 	const normalizedSource = useMemo<NormalizedRichTextBlock<CustomElements, CustomLeaves>[]>(() => {
@@ -146,6 +148,7 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 					{renderChildren(block.content.children, {
 						renderLeaf,
 						renderElement,
+						attributeNamePrefix,
 					})}
 				</RichTextRenderMetadataContext.Provider>
 			))}

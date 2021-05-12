@@ -8,7 +8,11 @@ export interface TableCellElementRendererProps extends Omit<RenderElementProps, 
 
 export function TableCellElementRenderer(props: TableCellElementRendererProps) {
 	return (
-		<EditorTableCellElement attributes={props.attributes} justify={props.element.justify}>
+		<EditorTableCellElement
+			attributes={props.attributes}
+			justify={props.element.justify}
+			headerScope={props.element.headerScope}
+		>
 			{props.children}
 		</EditorTableCellElement>
 	)

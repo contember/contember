@@ -12,6 +12,9 @@ export type BuiltinElements<
 	| RichTextParagraphElement<CustomElements, CustomLeaves>
 	| RichTextReferenceElement<CustomElements, CustomLeaves>
 	| RichTextScrollTargetElement<CustomElements, CustomLeaves>
+	| RichTextTableCellElement<CustomElements, CustomLeaves>
+	| RichTextTableElement<CustomElements, CustomLeaves>
+	| RichTextTableRowElement<CustomElements, CustomLeaves>
 	| RichTextUnorderedListElement<CustomElements, CustomLeaves>
 
 export interface RichTextAnchorElement<
@@ -81,4 +84,28 @@ export interface RichTextScrollTargetElement<
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'scrollTarget'
 	identifier: string
+}
+
+export interface RichTextTableElement<
+	CustomElements extends RichTextElement = never,
+	CustomLeaves extends RichTextLeaf = never
+> extends RichTextElement<CustomElements, CustomLeaves> {
+	type: 'table'
+}
+
+export interface RichTextTableCellElement<
+	CustomElements extends RichTextElement = never,
+	CustomLeaves extends RichTextLeaf = never
+> extends RichTextElement<CustomElements, CustomLeaves> {
+	type: 'tableCell'
+	headerScope?: 'row'
+	justify?: 'start' | 'center' | 'end'
+}
+
+export interface RichTextTableRowElement<
+	CustomElements extends RichTextElement = never,
+	CustomLeaves extends RichTextLeaf = never
+> extends RichTextElement<CustomElements, CustomLeaves> {
+	type: 'tableRow'
+	headerScope?: 'table'
 }

@@ -51,6 +51,8 @@ const alignmentToPlacement = (alignment: DropdownAlignment | undefined) => {
 		return 'bottom'
 	} else if (alignment === 'top') {
 		return 'top'
+	} else if (alignment === 'right') {
+		return 'right'
 	} else {
 		return assertNever(alignment)
 	}

@@ -40,6 +40,9 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 				if (editor.children.length <= i) {
 					Transforms.insertNodes(editor, createNewFieldElement(), { at: childPath })
 				}
+				if (Text.isText(editor.children[i])) {
+					Transforms.wrapNodes(editor, createNewFieldElement(), { at: childPath })
+				}
 				if (!editor.isContemberFieldElement(editor.children[i])) {
 					ContemberEditor.ejectElement(editor, childPath)
 					Transforms.setNodes(editor, { type: contemberFieldElementType }, { at: childPath })
@@ -56,6 +59,9 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 				const index = editor.children.length - 1 - i
 				const childPath = path.concat(index)
 
+				if (Text.isText(editor.children[i])) {
+					Transforms.wrapNodes(editor, createNewFieldElement(), { at: childPath })
+				}
 				if (!editor.isContemberFieldElement(editor.children[index])) {
 					ContemberEditor.ejectElement(editor, childPath)
 					Transforms.setNodes(editor, { type: contemberFieldElementType }, { at: childPath })

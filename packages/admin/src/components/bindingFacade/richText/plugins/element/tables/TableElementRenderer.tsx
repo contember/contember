@@ -2,6 +2,7 @@ import { EditorTableElement } from '@contember/ui'
 import { memo, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
+import { assertNever } from '../../../../../../utils'
 import { BaseEditor, BlockElement } from '../../../baseEditor'
 import { EditorWithTables } from './EditorWithTables'
 import { TableCellElement } from './TableCellElement'
@@ -17,21 +18,48 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 	const isSelected = useSelected()
 	const isFocused = false
 
-	const addRow = useCallback((index?: number) => editor.addTableRow(props.element, index), [editor, props.element])
-	const addColumn = useCallback((index?: number) => editor.addTableColumn(props.element, index), [
-		editor,
-		props.element,
-	])
+	const extendTable = useCallback(
+		(vector: 'row' | 'column', index?: number) => {
+			if (vector === 'row') {
+				editor.addTableRow(props.element, index)
+			} else if (vector === 'column') {
+				editor.addTableColumn(props.element, index)
+			} else {
+				assertNever(vector)
+			}
+		},
+		[editor, props.element],
+	)
+	const shrinkTable = useCallback(
+		(vector: 'row' | 'column', index: number) => {
+			if (vector === 'row') {
+				editor.deleteTableRow(props.element, index)
+			} else if (vector === 'column') {
+				editor.deleteTableColumn(props.element, index)
+			} else {
+				assertNever(vector)
+			}
+		},
+		[editor, props.element],
+	)
+	const toggleRowHeaderScope = useCallback(
+		(index: number, scope: 'table') => {
+			editor.toggleTableRowHeaderScope(props.element, index, scope)
+		},
+		[editor, props.element],
+	)
+	const toggleColumnHeaderScope = useCallback(
+		(index: number, scope: 'row') => {
+			editor.toggleTableColumnHeaderScope(props.element, index, scope)
+		},
+		[editor, props.element],
+	)
+
 	const justifyColumn = useCallback(
 		(index: number, direction: TableCellElement['justify']) =>
 			editor.justifyTableColumn(props.element, index, direction),
 		[editor, props.element],
 	)
-	const deleteRow = useCallback((index: number) => editor.deleteTableRow(props.element, index), [editor, props.element])
-	const deleteColumn = useCallback((index: number) => editor.deleteTableColumn(props.element, index), [
-		editor,
-		props.element,
-	])
 	// TODO this kind of works but ends up generating tons of operations when used to delete the whole table.
 	// 		it would require more testing to ensure that it works well so it will have to wait for now.
 	// const selectTable = useCallback(() => {
@@ -72,11 +100,11 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 			<EditorTableElement
 				rowCount={props.element.children.length}
 				columnCount={(props.element.children[0] as TableRowElement | undefined)?.children.length ?? 0}
-				addRow={addRow}
-				addColumn={addColumn}
+				extendTable={extendTable}
+				shrinkTable={shrinkTable}
+				toggleRowHeaderScope={toggleRowHeaderScope}
+				toggleColumnHeaderScope={toggleColumnHeaderScope}
 				justifyColumn={justifyColumn}
-				deleteRow={deleteRow}
-				deleteColumn={deleteColumn}
 				//selectTable={selectTable}
 				deleteTable={deleteTable}
 				isSelected={isSelected}

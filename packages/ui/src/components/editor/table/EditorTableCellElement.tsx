@@ -7,6 +7,7 @@ export interface EditorTableCellElementProps {
 	attributes: HTMLAttributes<HTMLDivElement>
 	children: ReactNode
 	justify?: 'start' | 'center' | 'end'
+	headerScope?: 'row'
 }
 
 /**
@@ -17,6 +18,7 @@ export const EditorTableCellElement = memo(function EditorTableCellElement({
 	attributes,
 	children,
 	justify,
+	headerScope,
 }: EditorTableCellElementProps) {
 	const prefix = useClassNamePrefix()
 	return (
@@ -26,6 +28,7 @@ export const EditorTableCellElement = memo(function EditorTableCellElement({
 				attributes.className,
 				`${prefix}editorTable-cell`,
 				toEnumViewClass(justify ? `justify-${justify}` : undefined),
+				toEnumViewClass(headerScope ? `headerScope-${headerScope}` : undefined),
 			)}
 		>
 			{children}

@@ -37,6 +37,26 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 
 	const e = (editor as any) as EditorWithTables<E>
 
+	const forEachCellInColumn = (
+		element: TableElement,
+		columnIndex: number,
+		callback: (cellEntry: NodeEntry<TableCellElement>) => void,
+	) => {
+		const tablePath = ReactEditor.findPath(e, element)
+		const rowCount = e.getTableRowCount(element)
+
+		Editor.withoutNormalizing(e, () => {
+			for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+				callback(Editor.node(e, [...tablePath, rowIndex, columnIndex]) as NodeEntry<TableCellElement>)
+			}
+		})
+	}
+	const copyTableCell = (tableCellElement: TableCellElement): TableCellElement => ({
+		...ContemberEditor.elementToSpecifics(tableCellElement),
+		type: tableCellElementType,
+		children: [{ text: '' }],
+	})
+
 	Object.assign<EditorWithTables<BaseEditor>, Partial<EditorWithTables<BaseEditor>>>(e, {
 		isTable: (element, suchThat): element is TableElement => element.type === tableElementType,
 		isTableRow: (element, suchThat): element is TableRowElement => element.type === tableRowElementType,
@@ -87,7 +107,30 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			const columnCount = e.getTableColumnCount(element)
 			const rowIndex = index ?? element.children.length
 
-			Transforms.insertNodes(e, e.createEmptyTableRowElement(columnCount), {
+			let tableRow: TableRowElement
+			if (element.children.length === 0) {
+				tableRow = e.createEmptyTableRowElement(columnCount)
+			} else {
+				const blueprintRow = element.children[rowIndex === 0 ? 0 : rowIndex - 1] as TableRowElement
+
+				tableRow = {
+					...ContemberEditor.elementToSpecifics(blueprintRow),
+					type: tableRowElementType,
+					children: Array.from(
+						{ length: columnCount },
+						(_, columnIndex): TableCellElement => copyTableCell(blueprintRow.children[columnIndex] as TableCellElement),
+					),
+				}
+
+				if (rowIndex === 0) {
+					const firstRow = element.children[0] as TableRowElement
+					if (firstRow.headerScope) {
+						Transforms.setNodes(e, { headerScope: null }, { at: [...tablePath, 0] })
+					}
+				}
+			}
+
+			Transforms.insertNodes(e, tableRow, {
 				at: [...tablePath, rowIndex],
 			})
 		},
@@ -99,24 +142,73 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 
 			Editor.withoutNormalizing(e, () => {
 				for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					Transforms.insertNodes(e, e.createEmptyTableCellElement(), {
+					const tableRow = element.children[rowIndex] as TableRowElement
+
+					let tableCell: TableCellElement
+					if (tableRow.children.length === 0) {
+						tableCell = e.createEmptyTableCellElement()
+					} else {
+						tableCell = copyTableCell(tableRow.children[columnIndex === 0 ? 0 : columnIndex - 1] as TableCellElement)
+
+						if (columnIndex === 0) {
+							const firstCell = tableRow.children[0] as TableCellElement
+							if (firstCell.headerScope) {
+								Transforms.setNodes(e, { headerScope: null }, { at: [...tablePath, rowIndex, 0] })
+							}
+						}
+					}
+
+					Transforms.insertNodes(e, tableCell, {
 						at: [...tablePath, rowIndex, columnIndex],
 					})
 				}
 			})
 		},
 		justifyTableColumn: (element: TableElement, columnIndex: number, direction: TableCellElement['justify']) => {
+			forEachCellInColumn(element, columnIndex, ([, cellPath]) => {
+				Transforms.setNodes(
+					editor,
+					{ justify: direction ?? null },
+					{ match: node => e.isTableCell(node), at: cellPath },
+				)
+			})
+		},
+		toggleTableRowHeaderScope: (element: TableElement, rowIndex: number, scope: TableRowElement['headerScope']) => {
+			const rowCount = element.children.length
+			if (rowIndex !== 0 || rowCount < 1) {
+				return
+			}
 			const tablePath = ReactEditor.findPath(e, element)
-			const rowCount = e.getTableRowCount(element)
+			const firstRow = element.children[0] as TableRowElement
 
-			Editor.withoutNormalizing(e, () => {
-				for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					Transforms.setNodes(
-						editor,
-						{ justify: direction ?? null },
-						{ match: node => e.isTableCell(node), at: [...tablePath, rowIndex, columnIndex] },
-					)
-				}
+			Transforms.setNodes(
+				editor,
+				{ headerScope: firstRow.headerScope === scope ? null : scope },
+				{ match: node => e.isTableRow(node), at: [...tablePath, 0] },
+			)
+		},
+		toggleTableColumnHeaderScope: (
+			element: TableElement,
+			columnIndex: number,
+			scope: TableCellElement['headerScope'],
+		) => {
+			let currentStatusScore = 0
+			const rowCount = element.children.length
+
+			forEachCellInColumn(element, columnIndex, ([cell]) => {
+				currentStatusScore += cell.headerScope === scope ? 1 : -1
+			})
+
+			// If none have it or the majority does but not all.
+			const shouldSetScope =
+				-currentStatusScore === rowCount || (currentStatusScore > 0 && currentStatusScore !== rowCount)
+
+			forEachCellInColumn(element, columnIndex, ([, cellPath]) => {
+				Transforms.setNodes(
+					editor,
+					{ headerScope: shouldSetScope ? scope : null },
+					{ match: node => e.isTableCell(node), at: cellPath },
+				)
 			})
 		},
 		deleteTableRow: (element: TableElement, index: number) => {
@@ -491,6 +583,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				if (!ContemberEditor.hasParentOfType(e, entry, tableElementType)) {
 					return Transforms.unwrapNodes(e, { at: path })
 				}
+				if (path[path.length - 1] > 0 && node.headerScope) {
+					return Transforms.setNodes(e, { headerScope: null }, { at: path })
+				}
 			} else if (e.isTableCell(node)) {
 				if (node.children.length === 1) {
 					const onlyChild = node.children[0]
@@ -502,6 +597,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 				}
 				if (!ContemberEditor.hasParentOfType(e, entry, tableRowElementType)) {
 					return Transforms.unwrapNodes(e, { at: path })
+				}
+				if (path[path.length - 1] > 0 && node.headerScope) {
+					return Transforms.setNodes(e, { headerScope: null }, { at: path })
 				}
 			}
 			normalizeNode(entry)

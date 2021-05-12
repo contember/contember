@@ -68,6 +68,20 @@ export function RenderElementFallback<
 					{children}
 				</span>
 			)
+		case 'table':
+			return <table {...attributes}>{children}</table>
+		case 'tableRow':
+			return <tr {...attributes}>{children}</tr>
+		case 'tableCell': {
+			if (element.headerScope) {
+				return (
+					<th {...attributes} scope={element.headerScope}>
+						{children}
+					</th>
+				)
+			}
+			return <td {...attributes}>{children}</td>
+		}
 		case 'unorderedList':
 			return <ul {...attributes}>{children}</ul>
 		default: {

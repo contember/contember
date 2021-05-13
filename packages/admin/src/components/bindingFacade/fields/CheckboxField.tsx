@@ -1,6 +1,6 @@
 import { Component, Field, FieldAccessor } from '@contember/binding'
+import { Checkbox } from '@contember/ui'
 import { FunctionComponent } from 'react'
-import { Checkbox } from '../../ui'
 import {
 	SimpleRelativeSingleFieldMetadata,
 	SimpleRelativeSingleFieldProps,
@@ -19,9 +19,9 @@ export const CheckboxField: FunctionComponent<CheckboxFieldProps> = Component(
 				}
 				return (
 					<Checkbox
-						checked={!!fieldMetadata.field.value}
+						value={fieldMetadata.field.value}
 						onChange={generateOnChange(fieldMetadata.field)}
-						readOnly={fieldMetadata.isMutating}
+						isDisabled={fieldMetadata.isMutating}
 						errors={fieldMetadata.field.errors}
 					>
 						{fieldMetadata.environment.applySystemMiddleware('labelMiddleware', props.label)}

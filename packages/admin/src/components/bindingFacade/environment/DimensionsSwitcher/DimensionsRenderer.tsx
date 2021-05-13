@@ -1,11 +1,10 @@
 import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@contember/binding'
 import { emptyArray } from '@contember/react-utils'
-import { Button, ButtonBasedButtonProps, ButtonGroup, Dropdown } from '@contember/ui'
+import { Button, ButtonBasedButtonProps, ButtonGroup, Checkbox, Dropdown } from '@contember/ui'
 import { Fragment, ReactNode, useEffect } from 'react'
 import { RequestChange } from '../../../../state/request'
 import { Link } from '../../../Link'
 import { useRedirect } from '../../../pageRouting'
-import { Checkbox } from '../../../ui'
 import { renderByJoining } from './renderByJoining'
 import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
 
@@ -93,8 +92,8 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 				return (
 					<Checkbox
 						key={dimension.slug}
-						checked={dimension.isSelected}
-						readOnly={dimension.isSelected && !canSelectLess}
+						value={dimension.isSelected}
+						isDisabled={dimension.isSelected && !canSelectLess}
 						onChange={() => redirect(getRequestChangeCallback(dimension))}
 					>
 						{dimension.label}

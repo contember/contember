@@ -7,7 +7,7 @@ import {
 	wrapFilterInHasOnes,
 } from '@contember/binding'
 import { ComponentType, FunctionComponent, ReactElement, ReactNode } from 'react'
-import { Checkbox } from '../../../../ui'
+import { Checkbox } from '@contember/ui'
 import { FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps } from '../base'
 
@@ -41,7 +41,7 @@ export const HasManyAbsentCell: FunctionComponent<HasManyAbsentCellProps> = Comp
 			emptyFilter={false}
 			filterRenderer={({ filter, setFilter }) => {
 				return (
-					<Checkbox checked={filter} onChange={checked => setFilter(checked)}>
+					<Checkbox value={filter} onChange={checked => setFilter(checked)}>
 						Has any
 					</Checkbox>
 				)

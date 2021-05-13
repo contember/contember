@@ -63,6 +63,6 @@
     "@types/react-table": "6.7.12",
     "@types/react-window": "1.8.2",
     "@types/redux-actions": "2.6.1",
-    "fibers": "5.0.0"
+    "csstype": "3.0.8"
   }
 }

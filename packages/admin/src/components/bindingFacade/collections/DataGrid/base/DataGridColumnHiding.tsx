@@ -27,20 +27,22 @@ export function DataGridColumnHiding({
 			}}
 		>
 			<Box heading="Columns">
-				{Array.from(desiredState.columns, ([key, column]) => {
-					if (column.canBeHidden === false) {
-						return <Fragment key={key} />
-					}
-					return (
-						<Checkbox
-							key={key}
-							value={!desiredState.hiddenColumns.has(key)}
-							onChange={isChecked => setIsColumnHidden(key, !isChecked)}
-						>
-							{column.header}
-						</Checkbox>
-					)
-				})}
+				<div style={{ display: 'flex', flexDirection: 'column', gap: '0.25em' }}>
+					{Array.from(desiredState.columns, ([key, column]) => {
+						if (column.canBeHidden === false) {
+							return <Fragment key={key} />
+						}
+						return (
+							<Checkbox
+								key={key}
+								value={!desiredState.hiddenColumns.has(key)}
+								onChange={isChecked => setIsColumnHidden(key, !isChecked)}
+							>
+								{column.header}
+							</Checkbox>
+						)
+					})}
+				</div>
 			</Box>
 		</Dropdown>
 	)

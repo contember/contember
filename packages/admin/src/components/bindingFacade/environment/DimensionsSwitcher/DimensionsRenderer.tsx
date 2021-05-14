@@ -105,7 +105,14 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		if (canSelectJustOne) {
 			return <ButtonGroup orientation="vertical">{renderedDimensions}</ButtonGroup>
 		}
-		return <Fragment key="multipleDimensions">{renderedDimensions}</Fragment>
+		return (
+			<div
+				style={{ display: 'flex', flexDirection: 'column', gap: '0.25em', padding: '0.75em' }}
+				key="multipleDimensions"
+			>
+				{renderedDimensions}
+			</div>
+		)
 	}
 
 	const getNormalizedData = (currentDimensions: string[], accessor: EntityListAccessor): StatefulDimensionDatum[] => {

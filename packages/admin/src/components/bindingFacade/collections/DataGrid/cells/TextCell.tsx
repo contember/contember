@@ -7,9 +7,8 @@ import {
 	wrapFilterInHasOnes,
 } from '@contember/binding'
 import { Input } from '@contember/client'
-import { Select, TextInput } from '@contember/ui'
+import { Checkbox, Select, TextInput } from '@contember/ui'
 import { FunctionComponent, ReactElement, ReactNode } from 'react'
-import { Checkbox } from '../../../../ui'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 
@@ -115,7 +114,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 							}}
 						/>
 						<Checkbox
-							checked={filter.nullCondition}
+							value={filter.nullCondition}
 							onChange={checked => {
 								setFilter({
 									...filter,

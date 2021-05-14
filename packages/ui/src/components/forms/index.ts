@@ -1,3 +1,4 @@
+export * from './Checkbox'
 export * from './MultiButton'
 export * from './upload'
 

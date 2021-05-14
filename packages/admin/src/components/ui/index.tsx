@@ -1,5 +1,4 @@
 export * from './Avatar'
-export * from './Checkbox'
 export * from './DragHandle'
 export * from './FileInput'
 export * from './InputGroup'

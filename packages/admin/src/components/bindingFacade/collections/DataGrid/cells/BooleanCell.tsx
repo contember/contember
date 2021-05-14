@@ -1,7 +1,7 @@
 import { Component, Field, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
 import { Input } from '@contember/client'
+import { Checkbox } from '@contember/ui'
 import { FunctionComponent, ReactNode } from 'react'
-import { Checkbox } from '../../../../ui'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 
@@ -59,7 +59,7 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 					] as const).map(([item, label]) => (
 						<Checkbox
 							key={item}
-							checked={filter.has(item)}
+							value={filter.has(item)}
 							onChange={checked => {
 								const clone: BooleanFilterArtifacts = new Set(filter)
 

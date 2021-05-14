@@ -1,11 +1,11 @@
 import cn from 'classnames'
 import { memo, ReactNode, useRef } from 'react'
-import { mergeProps, useCheckbox, useFocusRing, VisuallyHidden } from 'react-aria'
+import { mergeProps, useCheckbox, useFocusRing, useHover, VisuallyHidden } from 'react-aria'
 import { useToggleState } from 'react-stately'
-import { useClassNamePrefix } from '../../auxiliary'
-import { Size, ValidationState } from '../../types'
-import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../utils'
-import { ErrorList, ErrorListProps } from './ErrorList'
+import { useClassNamePrefix } from '../../../auxiliary'
+import { Size, ValidationState } from '../../../types'
+import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../../utils'
+import { ErrorList, ErrorListProps } from '../ErrorList'
 
 export interface CheckboxProps extends ErrorListProps {
 	value: boolean | null
@@ -41,6 +41,7 @@ export const Checkbox = memo(
 		)
 
 		const { isFocusVisible, focusProps } = useFocusRing()
+		const { isHovered, hoverProps } = useHover({ isDisabled })
 
 		const finalClassName = cn(
 			`${prefix}checkbox`,
@@ -51,10 +52,11 @@ export const Checkbox = memo(
 			toStateClass('checked', value === true),
 			toStateClass('indeterminate', value === null),
 			toStateClass('disabled', isDisabled),
+			toStateClass('hovered', isHovered),
 		)
 
 		return (
-			<label className={finalClassName}>
+			<label {...hoverProps} className={finalClassName}>
 				<VisuallyHidden>
 					<input {...mergeProps(inputProps, focusProps)} ref={checkboxRef} />
 				</VisuallyHidden>

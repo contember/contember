@@ -1,10 +1,10 @@
+export * from './Checkbox'
 export * from './MultiButton'
 export * from './upload'
 
 export * from './Button'
 export * from './ButtonGroup'
 export * from './ButtonList'
-export * from './Checkbox'
 export * from './ErrorList'
 export * from './FieldSet'
 export * from './FormGroup'

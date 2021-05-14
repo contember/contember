@@ -31,7 +31,7 @@
 		grid-area: box
 		border-radius: .3em
 		color: $cui-color-gray-2
-		border: ($cui-control-border-width * 1.5) solid map_get($cui-control-view-default, 'borderColor')
+		border: ($cui-control-border-width * 1.5) solid $cui-control-view-default-border-color
 		transition-property: background-color, border-color, box-shadow
 		transition-duration: $t-background, $t-background, .2s
 
@@ -85,6 +85,10 @@
 		margin-top: .1em
 		grid-area: errors
 
+	&.is-hovered
+		&::before
+			border-color: darken($cui-control-view-default-border-color, 5)
+
 	&.is-checked
 		&::before
 			border-color: $cui-control-view-default-distinction-color
@@ -132,11 +136,11 @@
 	&.is-disabled
 		cursor: not-allowed
 		&::before
-			border-color: rgba(map_get($cui-control-view-default, 'borderColor'), .5)
+			border-color: rgba($cui-control-view-default-border-color, .5)
 	&.is-disabled.is-checked
 		&::before
-			border-color: rgba(map_get($cui-control-view-default, 'borderColor'), .7)
-			background-color: rgba(map_get($cui-control-view-default, 'borderColor'), .7)
+			border-color: rgba($cui-control-view-default-border-color, .7)
+			background-color: rgba($cui-control-view-default-border-color, .7)
 
 
 	@each $name, $settings in $cui-control-validation

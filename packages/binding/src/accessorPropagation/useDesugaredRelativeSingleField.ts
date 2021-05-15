@@ -3,12 +3,21 @@ import { QueryLanguage } from '../queryLanguage'
 import { RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
 
+/**
+ * @deprecated
+ */
 function useDesugaredRelativeSingleField(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
 ): RelativeSingleField
+/**
+ * @deprecated
+ */
 function useDesugaredRelativeSingleField(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
 ): RelativeSingleField | undefined
+/**
+ * @deprecated
+ */
 function useDesugaredRelativeSingleField(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
 ): RelativeSingleField | undefined {

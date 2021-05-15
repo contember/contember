@@ -3,12 +3,21 @@ import { QueryLanguage } from '../queryLanguage'
 import { RelativeEntityList, SugaredRelativeEntityList } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
 
+/**
+ * @deprecated
+ */
 function useDesugaredRelativeEntityList(
 	sugaredRelativeEntityList: string | SugaredRelativeEntityList,
 ): RelativeEntityList
+/**
+ * @deprecated
+ */
 function useDesugaredRelativeEntityList(
 	sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined,
 ): RelativeEntityList | undefined
+/**
+ * @deprecated
+ */
 function useDesugaredRelativeEntityList(
 	sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined,
 ): RelativeEntityList | undefined {

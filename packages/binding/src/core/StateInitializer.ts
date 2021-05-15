@@ -1,4 +1,4 @@
-import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '../accessors'
+import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
 import { EntityFieldPersistedData, RuntimeId, ServerGeneratedUuid, UnpersistedEntityDummyId } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import {
@@ -35,7 +35,7 @@ import {
 	RootStateNode,
 	StateType,
 } from './state'
-import { BijectiveIndexedMap } from './structures'
+import { BijectiveIndexedMap } from '../structures'
 import { TreeParameterMerger } from './TreeParameterMerger'
 import { TreeStore } from './TreeStore'
 

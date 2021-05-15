@@ -18,6 +18,7 @@ import {
 	OrderBy,
 	UniqueWhere,
 } from '../treeParameters'
+import { CacheStore } from './CacheStore'
 import { QueryLanguageError } from './QueryLanguageError'
 import { tokenList, TokenRegExps, tokens } from './tokenList'
 
@@ -33,6 +34,7 @@ class Parser extends EmbeddedActionsParser {
 	private static lexer = new Lexer(tokenList)
 	private static parser = new Parser()
 	private static environment: Environment = new Environment()
+	private static cacheStore: CacheStore = new CacheStore()
 
 	private qualifiedEntityList = this.RULE<DesugaredQualifiedEntityList>('qualifiedEntityList', () => {
 		const entityName = this.SUBRULE(this.entityIdentifier)
@@ -675,6 +677,12 @@ class Parser extends EmbeddedActionsParser {
 		entry: E,
 		environment: Environment,
 	): Parser.ParserResult[E] {
+		const cached = this.cacheStore.get(environment, entry, input)
+
+		if (cached !== undefined) {
+			return cached
+		}
+
 		const lexingResult = Parser.lexer.tokenize((Parser.rawInput = input))
 
 		if (lexingResult.errors.length !== 0) {
@@ -731,6 +739,8 @@ class Parser extends EmbeddedActionsParser {
 				`Failed to parse '${input}'.\n\n${Parser.parser.errors.map(i => i.message).join('\n')}`,
 			)
 		}
+
+		this.cacheStore.set(environment, entry, input, expression as Parser.ParserResult[E])
 
 		return expression as Parser.ParserResult[E]
 	}

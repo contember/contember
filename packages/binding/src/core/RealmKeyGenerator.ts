@@ -3,7 +3,7 @@ import { EntityFieldMarkersContainer } from '../markers'
 import { EntityId, EntityRealmKey, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { EntityListState, EntityRealmBlueprint, EntityRealmState } from './state'
-import { WeakIdCache } from './structures'
+import { WeakIdCache } from '../structures'
 
 const GLUE = '--'
 const keyEndRegex = new RegExp(`${GLUE}\\d+$`)

@@ -1,4 +1,4 @@
-import { BindingError } from '../../BindingError'
+import { BindingError } from '../BindingError'
 
 // Bijective as in we need to supply the inverse and also guarantee that the values are unique.
 // Provided this invariant, this should behave more or less like a regular map except it has a somewhat special

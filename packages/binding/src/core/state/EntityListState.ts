@@ -7,7 +7,7 @@ import {
 	EntityName,
 	RemovalType,
 } from '../../treeParameters'
-import { BijectiveIndexedMap } from '../structures'
+import { BijectiveIndexedMap } from '../../structures'
 import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import { StateType } from './StateType'
 

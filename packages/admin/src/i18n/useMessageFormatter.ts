@@ -1,3 +1,4 @@
+import { IntlMessageFormat } from 'intl-messageformat'
 import { ReactNode, useCallback, useMemo } from 'react'
 import { DictionaryCache } from './DictionaryCache'
 import { I18nError } from './I18nError'
@@ -12,15 +13,30 @@ const formatMessage = (
 	key: string,
 	values: Record<string, any> | undefined,
 ): string => {
-	const message = i18n.dictionaryResolver.getMessageFormat(i18n.locale, key, fallback)
+	let message: IntlMessageFormat | undefined
+	try {
+		message = i18n.dictionaryResolver.getMessageFormat(i18n.locale, key, fallback)
+	} catch (e) {
+		const original = i18n.dictionaryResolver.getResolvedMessageForDebuggingPurposes(i18n.locale, key, fallback)
+
+		throw new I18nError(
+			`Failed to format key '${key}'.${original ? ` It resolved to\n${original}` : ''}\n\n${e.message}`,
+		)
+	}
 
 	if (message === undefined) {
 		throw new I18nError(
 			`Cannot translate the message '${key}'. It's neither in the resolved nor the fallback dictionary.`,
 		)
 	}
-	// TODO the `as string` is likely wrong?
-	return message.format(values as any) as string
+
+	try {
+		// TODO the `as string` is likely wrong?
+		return message.format(values as any) as string
+	} catch (e) {
+		const original = i18n.dictionaryResolver.getResolvedMessageForDebuggingPurposes(i18n.locale, key, fallback)
+		throw new I18nError(`Failed to format key '${key}'. It resolved to\n${original}\n\n${e.message}`)
+	}
 }
 
 export const useMessageFormatter = <Dict extends MessageDictionary>(

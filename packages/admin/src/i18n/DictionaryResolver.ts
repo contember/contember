@@ -12,22 +12,38 @@ export class DictionaryResolver {
 		}
 	}
 
+	private resolveDictionary(locale: Locale, fallbackDictionary: DictionaryCache): DictionaryCache {
+		// TODO this fallback mechanism could and should be significantly smarter.
+		return this.dictionaries.get(locale.code) || fallbackDictionary
+	}
+
 	public getMessageFormat(
 		locale: Locale,
 		key: string,
 		fallbackDictionary: DictionaryCache,
 	): IntlMessageFormat | undefined {
-		// TODO this fallback mechanism could and should be significantly smarter.
-		let targetDictionary = this.dictionaries.get(locale.code) || fallbackDictionary
+		const targetDictionary = this.resolveDictionary(locale, fallbackDictionary)
 		let messageAST = targetDictionary.getMessageAST(key)
 
 		if (messageAST === undefined) {
-			targetDictionary = fallbackDictionary
-			messageAST = targetDictionary.getMessageAST(key)
+			messageAST = fallbackDictionary.getMessageAST(key)
 		}
 		if (messageAST === undefined) {
 			return undefined
 		}
 		return new IntlMessageFormat(messageAST, locale.code)
+	}
+
+	public getResolvedMessageForDebuggingPurposes(
+		locale: Locale,
+		key: string,
+		fallbackDictionary: DictionaryCache,
+	): string | undefined {
+		const targetDictionary = this.resolveDictionary(locale, fallbackDictionary)
+
+		return (
+			targetDictionary.getOriginalMessageForDebuggingPurposes(key) ??
+			fallbackDictionary.getOriginalMessageForDebuggingPurposes(key)
+		)
 	}
 }

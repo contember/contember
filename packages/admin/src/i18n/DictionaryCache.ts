@@ -26,6 +26,10 @@ export class DictionaryCache {
 		return ast
 	}
 
+	public getOriginalMessageForDebuggingPurposes(key: string): string | undefined {
+		return this.getDictionaryMessage(this.dictionary, key)
+	}
+
 	private getDictionaryMessage(dictionary: MessageDictionary, key: string): string | undefined {
 		// This deliberately resolves the ambiguity:
 		// If the key is 'foo.bar' and the dictionary is { 'foo.bar': 'abc', foo: { bar: 'xyz' } },

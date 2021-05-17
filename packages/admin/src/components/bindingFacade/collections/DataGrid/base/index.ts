@@ -15,3 +15,5 @@ export * from './getColumnFilter'
 export * from './getColumnOrderBy'
 export * from './GetNewFilter'
 export * from './GetNewOrderBy'
+
+export type { DataGridDictionary } from './dataGridDictionary'

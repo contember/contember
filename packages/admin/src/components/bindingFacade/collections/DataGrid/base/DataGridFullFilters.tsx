@@ -1,7 +1,9 @@
 import { Environment } from '@contember/binding'
 import { Box, Button, ButtonGroup, Dropdown, Icon, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
 import { createElement, Fragment, ReactElement } from 'react'
+import { MessageFormatter } from '../../../../../i18n'
 import { EmptyMessage } from '../../helpers'
+import { DataGridDictionary } from './dataGridDictionary'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
 import { DataGridState } from './DataGridState'
 
@@ -10,6 +12,7 @@ export interface DataGridFullFiltersPublicProps {}
 export interface DataGridFullFiltersInternalProps {
 	desiredState: DataGridState
 	environment: Environment
+	formatMessage: MessageFormatter<DataGridDictionary>
 	setFilter: DataGridSetColumnFilter
 }
 
@@ -18,6 +21,7 @@ export interface DataGridFullFiltersProps extends DataGridFullFiltersInternalPro
 export function DataGridFullFilters({
 	desiredState,
 	environment,
+	formatMessage,
 	setFilter,
 }: DataGridFullFiltersProps): ReactElement | null {
 	const remainingColumns = Array.from(desiredState.columns).filter(
@@ -42,22 +46,22 @@ export function DataGridFullFilters({
 								opacity: hasAnyFilters ? '1' : '0.8',
 							}}
 						/>
-						All filters
+						{formatMessage('dataGrid.columnFiltering.showMenuButton.text')}
 					</>
 				),
 			}}
 			renderContent={({ update: updateOuterDropdown }) => (
-				<Box heading="All filters">
-					{hasAnyFilters || <EmptyMessage>There are no active filters.</EmptyMessage>}
+				<Box heading={formatMessage('dataGrid.columnFiltering.heading')}>
+					{hasAnyFilters || <EmptyMessage>{formatMessage('dataGrid.columnFiltering.emptyMessage.text')}</EmptyMessage>}
 					{hasAnyFilters && (
 						<Table
 							tableHead={
 								<TableRow>
 									<TableHeaderCell scope="col" justification="justifyStart" shrunk>
-										Column
+										{formatMessage('dataGrid.columnFiltering.columnColumn.text')}
 									</TableHeaderCell>
 									<TableHeaderCell scope="col" justification="justifyStart">
-										Filter
+										{formatMessage('dataGrid.columnFiltering.filterColumn.text')}
 									</TableHeaderCell>
 									<TableHeaderCell scope="col" shrunk>
 										&nbsp;
@@ -111,7 +115,7 @@ export function DataGridFullFilters({
 								children: (
 									<>
 										<Icon alignWithLowercase blueprintIcon="add" style={{ marginRight: '0.2em' }} />
-										Add a column filter
+										{formatMessage('dataGrid.columnFiltering.addFilterButton.text')}
 									</>
 								),
 							}}

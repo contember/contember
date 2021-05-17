@@ -1,5 +1,5 @@
 import { IntlMessageFormat } from 'intl-messageformat'
-import { ReactNode, useCallback, useMemo } from 'react'
+import { createElement, Fragment, ReactElement, ReactNode, useCallback, useMemo } from 'react'
 import { DictionaryCache } from './DictionaryCache'
 import { I18nError } from './I18nError'
 import { I18nMetadata } from './I18nMetadata'
@@ -7,12 +7,35 @@ import { MessageDictionary, MessageDictionaryKeys } from './MessageDictionary'
 import { MessageFormatter } from './MessageFormatter'
 import { useI18n } from './useI18n'
 
+const assignKeys = (chunks: ReactNode | ReactNode[]): ReactElement => {
+	if (!Array.isArray(chunks)) {
+		chunks = [chunks]
+	}
+	return createElement(Fragment, {
+		children: (chunks as ReactNode[]).map((chunk, index) =>
+			createElement(Fragment, {
+				key: index,
+				children: chunk,
+			}),
+		),
+	})
+}
+
+const hasFunctionValue = (object: Record<string, unknown>): boolean => {
+	for (const key in object) {
+		if (typeof object[key] === 'function') {
+			return true
+		}
+	}
+	return false
+}
+
 const formatMessage = (
 	i18n: I18nMetadata,
 	fallback: DictionaryCache,
 	key: string,
 	values: Record<string, any> | undefined,
-): string => {
+): ReactNode => {
 	let message: IntlMessageFormat | undefined
 	try {
 		message = i18n.dictionaryResolver.getMessageFormat(i18n.locale, key, fallback)
@@ -30,9 +53,24 @@ const formatMessage = (
 		)
 	}
 
+	if (values && hasFunctionValue(values)) {
+		values = Object.fromEntries(
+			Object.entries(values).map(([key, value]) => {
+				if (typeof value === 'function') {
+					return [key, (chunks: ReactNode) => value(assignKeys(chunks))]
+				}
+				return [key, value]
+			}),
+		)
+	}
+
 	try {
-		// TODO the `as string` is likely wrong?
-		return message.format(values as any) as string
+		let formatted = message.format(values as any)
+
+		if (typeof formatted === 'string') {
+			return formatted
+		}
+		return assignKeys(formatted as ReactNode[])
 	} catch (e) {
 		const original = i18n.dictionaryResolver.getResolvedMessageForDebuggingPurposes(i18n.locale, key, fallback)
 		throw new I18nError(`Failed to format key '${key}'. It resolved to\n${original}\n\n${e.message}`)
@@ -54,7 +92,7 @@ export const useMessageFormatter = <Dict extends MessageDictionary>(
 			if (args.length === 1 || (args.length === 2 && typeof args[1] !== 'string')) {
 				const [key, values] = args as [MessageDictionaryKeys<Dict>, Record<string, any> | undefined]
 
-				return formatMessage(i18n, fallbackDictionaryCache, key, values)
+				return formatMessage(i18n, fallbackDictionaryCache, key, values) as any
 			} else {
 				const [userSpecifiedKey, fallbackKey, values] = args as [
 					U,
@@ -81,7 +119,7 @@ export const useMessageFormatter = <Dict extends MessageDictionary>(
 					// It's probably a ReactNode that handles strings through other means.
 					return userSpecifiedKey
 				}
-				return formatMessage(i18n, fallbackDictionaryCache, fallbackKey, values)
+				return formatMessage(i18n, fallbackDictionaryCache, fallbackKey, values) as any
 			}
 		},
 		[fallbackDictionaryCache, i18n],

@@ -12,7 +12,9 @@ import {
 } from '@contember/binding'
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
 import { Axis, SortEndHandler } from 'react-sortable-hoc'
+import { useMessageFormatter } from '../../../../i18n'
 import { RepeaterContainer, RepeaterContainerProps, RepeaterContainerPublicProps } from './RepeaterContainer'
+import { repeaterDictionary } from './repeaterDictionary'
 import { RepeaterItem, RepeaterItemProps } from './RepeaterItem'
 import { shouldCancelStart } from './shouldCancelStart'
 import { SortableRepeaterContainer } from './SortableRepeaterContainer'
@@ -53,6 +55,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 			},
 			[moveEntity],
 		)
+		const formatMessage = useMessageFormatter(repeaterDictionary)
 
 		const Handle: ComponentType<{ children: ReactNode }> = props.dragHandleComponent || Fragment
 		const Item: ComponentType<RepeaterItemProps & ItemExtraProps> = props.itemComponent || RepeaterItem
@@ -82,6 +85,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					isEmpty={isEmpty}
 					createNewEntity={appendNew}
 					entities={entities}
+					formatMessage={formatMessage}
 				>
 					{entities.map(entity => (
 						<Entity accessor={entity} key={entity.key}>
@@ -120,6 +124,7 @@ export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPr
 					isEmpty={isEmpty}
 					createNewEntity={appendNew}
 					entities={entities}
+					formatMessage={formatMessage}
 				>
 					{entities.map((entity, i) => (
 						<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>

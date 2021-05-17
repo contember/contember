@@ -1,5 +1,7 @@
 import { Component } from '@contember/binding'
 import { FunctionComponent, ReactNode } from 'react'
+import { useMessageFormatter } from '../../../i18n'
+import { fieldViewDictionary } from './fieldViewDictionary'
 
 export type FieldFallbackViewStyle = 'n/a' | 'nothing' | 'unknown'
 
@@ -12,6 +14,8 @@ export type FieldFallbackViewPublicProps = Partial<FieldFallbackViewProps>
 
 export const FieldFallbackView: FunctionComponent<FieldFallbackViewProps> = Component(
 	props => {
+		const formatMessage = useMessageFormatter(fieldViewDictionary)
+
 		if (props.fallback !== undefined) {
 			return <>{props.fallback}</>
 		}
@@ -19,10 +23,10 @@ export const FieldFallbackView: FunctionComponent<FieldFallbackViewProps> = Comp
 			case 'nothing':
 				return null
 			case 'unknown':
-				return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>unknown</i>
+				return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>{formatMessage('fieldView.fallback.unknown')}</i>
 			case 'n/a':
 			default:
-				return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>N/A</i>
+				return <i style={{ opacity: 0.4, fontSize: '0.75em' }}>{formatMessage('fieldView.fallback.notAvailable')}</i>
 		}
 	},
 	props => <>{props.fallback}</>,

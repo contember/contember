@@ -6,6 +6,7 @@ import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
 import { assertValidClientConfig, ClientConfig } from '../bootstrap'
 import { Router } from '../containers/router'
+import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
 import { PROJECT_CONFIGS_REPLACE } from '../reducer/projectsConfigs'
 import { emptyState } from '../state'
 import { ProjectConfig } from '../state/projectsConfigs'
@@ -108,9 +109,14 @@ export const Admin = memo((props: AdminProps) => {
 														stage={route.stage}
 													>
 														<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
-															<Suspense fallback={<ContainerSpinner />}>
-																<Component />
-															</Suspense>
+															<I18nProvider
+																localeCode={relevantConfig.defaultLocale}
+																dictionaries={relevantConfig.dictionaries}
+															>
+																<Suspense fallback={<ContainerSpinner />}>
+																	<Component />
+																</Suspense>
+															</I18nProvider>
 														</EnvironmentContext.Provider>
 													</ContemberClient>
 												)

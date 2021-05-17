@@ -1,18 +1,17 @@
-import { Component, Field, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/binding'
+import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import { Input } from '@contember/client'
 import { Checkbox } from '@contember/ui'
-import { FunctionComponent, ReactNode } from 'react'
-import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
+import { FunctionComponent } from 'react'
+import { useMessageFormatter } from '../../../../../i18n'
+import { BooleanFieldView, BooleanFieldViewProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
+import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 export type BooleanCellProps = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
-	FieldFallbackViewPublicProps &
-	SugaredRelativeSingleField & {
+	BooleanFieldViewProps & {
 		disableOrder?: boolean
 		initialOrder?: DataGridOrderDirection
-		format?: (value: boolean | null) => ReactNode
-		booleanStyle?: 'yesNo' | 'checkCross' | 'oneZero'
 	}
 
 type SingleBooleanFilterArtifact = 'includeTrue' | 'includeFalse' | 'includeNull'
@@ -44,60 +43,44 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 					return undefined
 				}
 
-				const desugared = QueryLanguage.desugarRelativeSingleField(props, environment)
+				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {
 					[desugared.field]: conditions.length > 1 ? { or: conditions } : conditions[0],
 				})
 			}}
 			emptyFilter={new Set()}
-			filterRenderer={({ filter, setFilter }) => (
-				<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
-					{([
-						['includeTrue', 'Yes'],
-						['includeFalse', 'No'],
-						['includeNull', 'N/A'],
-					] as const).map(([item, label]) => (
-						<Checkbox
-							key={item}
-							value={filter.has(item)}
-							onChange={checked => {
-								const clone: BooleanFilterArtifacts = new Set(filter)
+			filterRenderer={({ filter, setFilter }) => {
+				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
+				return (
+					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
+						{([
+							['includeTrue', formatMessage('dataGirdCells.booleanCell.includeTrue')],
+							['includeFalse', formatMessage('dataGirdCells.booleanCell.includeFalse')],
+							['includeNull', formatMessage('dataGirdCells.booleanCell.includeNull')],
+						] as const).map(([item, label]) => (
+							<Checkbox
+								key={item}
+								value={filter.has(item)}
+								onChange={checked => {
+									const clone: BooleanFilterArtifacts = new Set(filter)
 
-								if (checked) {
-									clone.add(item)
-								} else {
-									clone.delete(item)
-								}
+									if (checked) {
+										clone.add(item)
+									} else {
+										clone.delete(item)
+									}
 
-								setFilter(clone)
-							}}
-						>
-							{label}
-						</Checkbox>
-					))}
-				</div>
-			)}
+									setFilter(clone)
+								}}
+							>
+								{label}
+							</Checkbox>
+						))}
+					</div>
+				)
+			}}
 		>
-			<Field
-				{...props}
-				format={value => {
-					if (value === null) {
-						return <FieldFallbackView fallback={props.fallback} fallbackStyle={props.fallbackStyle} />
-					}
-					if (props.format) {
-						return props.format(value as boolean)
-					}
-					switch (props.booleanStyle) {
-						case 'checkCross':
-							return value ? '✔' : '❌'
-						case 'oneZero':
-							return value ? '1' : '0'
-						case 'yesNo':
-						default:
-							return value ? 'Yes' : 'No'
-					}
-				}}
-			/>
+			<BooleanFieldView {...props} />
 		</DataGridColumn>
 	)
 }, 'BooleanCell')

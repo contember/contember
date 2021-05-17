@@ -36,7 +36,7 @@
     "@types/react-dom": "17.0.1",
     "babel-loader": "8.2.2",
     "css-loader": "5.2.4",
-    "csstype": "3.0.8",
+    "csstype": "3.0.7",
     "manrope": "2.0.0",
     "resolve-url-loader": "4.0.0",
     "sass-loader": "10.1.1",

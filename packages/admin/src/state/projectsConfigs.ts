@@ -1,5 +1,6 @@
 import { ComponentType } from 'react'
 import { RouteMap } from '../components/pageRouting/utils'
+import { MessageDictionaryByLocaleCode } from '../i18n'
 import { SelectedDimension } from './request'
 
 export interface ProjectConfig {
@@ -8,6 +9,8 @@ export interface ProjectConfig {
 	component: () => Promise<{ default: ComponentType }>
 	routes: RouteMap
 	defaultDimensions?: SelectedDimension
+	defaultLocale?: string
+	dictionaries?: MessageDictionaryByLocaleCode
 }
 
 export default interface ProjectsConfigsState {

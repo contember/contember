@@ -3,8 +3,10 @@ import { Input } from '@contember/client'
 import { FormGroup, TextInput } from '@contember/ui'
 import { forwardRef, FunctionComponent, memo } from 'react'
 import DatePicker from 'react-datepicker'
+import { useMessageFormatter } from '../../../../../i18n'
 import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
+import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 export type DateCellProps = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
@@ -50,6 +52,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				end: undefined,
 			}}
 			filterRenderer={({ filter, setFilter }) => {
+				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				const { start, end } = filter
 				return (
 					<div style={{ display: 'flex', gap: '10px' }}>
@@ -62,7 +65,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 							startDate={start}
 							endDate={end}
 							isClearable
-							customInput={<DateBoundInput label="From" />}
+							customInput={<DateBoundInput label={formatMessage('dataGirdCells.dateCell.fromLabel')} />}
 						/>
 						<DatePicker
 							selected={end}
@@ -74,7 +77,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 							endDate={end}
 							minDate={start}
 							isClearable
-							customInput={<DateBoundInput label="To" />}
+							customInput={<DateBoundInput label={formatMessage('dataGirdCells.dateCell.toLabel')} />}
 						/>
 					</div>
 				)

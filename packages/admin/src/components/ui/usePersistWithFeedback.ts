@@ -18,10 +18,13 @@ export const usePersistWithFeedback = () => {
 			})
 			.catch((result: ErrorPersistResult) => {
 				console.debug('persist error', result)
-				showToast({
-					type: 'error',
-					message: 'Error!',
-				})
+				showToast(
+					{
+						type: 'error',
+						message: 'Error!',
+					},
+					8000,
+				)
 				return Promise.reject(result)
 			})
 	}, [showToast, persistAll])

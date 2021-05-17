@@ -1,9 +1,11 @@
 import { Component, Entity, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
 import { Button, ButtonList, Justification, Table, TableCell, TableRow } from '@contember/ui'
 import { ComponentType, FunctionComponent, ReactNode } from 'react'
+import { useMessageFormatter } from '../../../../../i18n'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
 import { GridPagingAction } from '../paging'
 import { DataGridColumnHiding } from './DataGridColumnHiding'
+import { dataGridDictionary } from './dataGridDictionary'
 import { DataGridFullFilters } from './DataGridFullFilters'
 import { DataGridHeaderCell } from './DataGridHeaderCell'
 import { DataGridSetColumnFilter } from './DataGridSetFilter'
@@ -57,7 +59,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 
 		allowAggregateFilterControls,
 		allowColumnVisibilityControls,
-		emptyMessage = 'No data to display.',
+		emptyMessage,
 		emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
 		emptyMessageComponentExtraProps,
 	}) => {
@@ -67,6 +69,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 			orderDirections,
 			columns,
 		} = desiredState
+		const formatMessage = useMessageFormatter(dataGridDictionary)
 		const totalCount = useHackyTotalCount(entityName, filter)
 		const normalizedItemCount = itemsPerPage === null ? accessor.length : totalCount
 		const pagesCount =
@@ -74,9 +77,14 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 
 		const pagingSummary = (
 			<>
-				Page {pageIndex + 1}
-				{pagesCount !== undefined && ` / ${pagesCount.toFixed(0)}`}
-				{normalizedItemCount !== undefined && ` (${normalizedItemCount} items)`}
+				{pagesCount === undefined
+					? formatMessage('dataGrid.paging.status.unknownPageTotal', { pageNumber: pageIndex + 1 })
+					: formatMessage('dataGrid.paging.status.knownPageTotal', {
+							pageNumber: pageIndex + 1,
+							totalPageCount: pagesCount,
+					  })}
+				{normalizedItemCount !== undefined &&
+					` ${formatMessage('dataGrid.paging.status.itemCount', { itemCount: normalizedItemCount })}`}
 			</>
 		)
 
@@ -86,12 +94,17 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 					<div>{pagingSummary}</div>
 					<ButtonList>
 						{allowColumnVisibilityControls !== false && (
-							<DataGridColumnHiding desiredState={desiredState} setIsColumnHidden={setIsColumnHidden} />
+							<DataGridColumnHiding
+								desiredState={desiredState}
+								formatMessage={formatMessage}
+								setIsColumnHidden={setIsColumnHidden}
+							/>
 						)}
 						{allowAggregateFilterControls !== false && (
 							<DataGridFullFilters
 								desiredState={desiredState}
 								environment={accessor.environment}
+								formatMessage={formatMessage}
 								setFilter={setFilter}
 							/>
 						)}
@@ -160,7 +173,9 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 					{!accessor.length && (
 						<TableRow>
 							<TableCell colSpan={columns.size}>
-								<EmptyMessageComponent {...emptyMessageComponentExtraProps}>{emptyMessage}</EmptyMessageComponent>
+								<EmptyMessageComponent {...emptyMessageComponentExtraProps}>
+									{formatMessage(emptyMessage, 'dataGrid.emptyMessage.text')}
+								</EmptyMessageComponent>
 							</TableCell>
 						</TableRow>
 					)}
@@ -174,10 +189,10 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 								disabled={pageIndex === 0}
 								onClick={() => updatePaging({ type: 'goToFirstPage' })}
 							>
-								First
+								{formatMessage('dataGrid.paging.first')}
 							</Button>
 							<Button disabled={pageIndex === 0} onClick={() => updatePaging({ type: 'goToPreviousPage' })}>
-								Previous
+								{formatMessage('dataGrid.paging.previous')}
 							</Button>
 							{itemsPerPage !== null && (
 								<>
@@ -185,7 +200,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 										disabled={accessor.length !== itemsPerPage}
 										onClick={() => updatePaging({ type: 'goToNextPage' })}
 									>
-										Next
+										{formatMessage('dataGrid.paging.next')}
 									</Button>
 									<Button
 										distinction="seamless"
@@ -194,7 +209,7 @@ export const DataGridContainer: FunctionComponent<DataGridContainerProps> = Comp
 											pagesCount !== undefined && updatePaging({ type: 'goToPage', newPageIndex: pagesCount - 1 })
 										}
 									>
-										Last
+										{formatMessage('dataGrid.paging.last')}
 									</Button>
 								</>
 							)}

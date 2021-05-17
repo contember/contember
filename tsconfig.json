@@ -3,6 +3,7 @@
 	"include": [],
 	"references": [
 		{ "path": "./packages/admin"},
+		{ "path": "./packages/admin-i18n"},
 		{ "path": "./packages/binding" },
 		{ "path": "./packages/client"},
 		{ "path": "./packages/admin-server"},

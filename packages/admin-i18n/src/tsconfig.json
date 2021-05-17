@@ -1,0 +1,13 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/src",
+		"baseUrl": ".",
+		"paths": {
+			"@contember/admin": ["../../../packages/admin/src"]
+		}
+	},
+	"references": [
+		{ "path": "../../admin/src" }
+	]
+}

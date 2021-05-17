@@ -1,0 +1,13 @@
+{
+  "name": "@contember/admin-i18n",
+  "version": "0.6.33",
+  "type": "module",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "rollup --config"
+  },
+  "typings": "dist/src/index.d.ts",
+  "devDependencies": {
+    "@contember/admin": "0.6.33"
+  }
+}

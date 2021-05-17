@@ -15,3 +15,5 @@ export * from './actions'
 export * from './reducer'
 
 export * from './temporaryHacks'
+
+export type { AdminDictionary } from './adminDictionary'

@@ -9,8 +9,10 @@ import {
 import { Input } from '@contember/client'
 import { Checkbox, Select, TextInput } from '@contember/ui'
 import { FunctionComponent, ReactElement, ReactNode } from 'react'
+import { useMessageFormatter } from '../../../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
+import { dataGridCellsDictionary } from './dataGridCellsDictionary'
 
 export type TextCellProps<Persisted extends FieldValue = FieldValue> = DataGridHeaderCellPublicProps &
 	DataGridCellPublicProps &
@@ -77,15 +79,16 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 				nullCondition: false,
 			}}
 			filterRenderer={({ filter, setFilter }) => {
+				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				const options: Array<{
 					value: TextFilterArtifacts['mode']
 					label: string
 				}> = [
-					{ value: 'matches', label: 'Contains' },
-					{ value: 'doesNotMatch', label: "Doesn't contain" },
-					{ value: 'matchesExactly', label: 'Matches exactly' },
-					{ value: 'startsWith', label: 'Starts with' },
-					{ value: 'endsWith', label: 'Ends with' },
+					{ value: 'matches', label: formatMessage('dataGirdCells.textCell.matches') },
+					{ value: 'doesNotMatch', label: formatMessage('dataGirdCells.textCell.doesNotMatch') },
+					{ value: 'matchesExactly', label: formatMessage('dataGirdCells.textCell.matchesExactly') },
+					{ value: 'startsWith', label: formatMessage('dataGirdCells.textCell.startsWith') },
+					{ value: 'endsWith', label: formatMessage('dataGirdCells.textCell.endsWith') },
 				]
 				return (
 					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
@@ -104,7 +107,7 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 						/>
 						<TextInput
 							value={filter.query}
-							placeholder="Query"
+							placeholder={formatMessage('dataGirdCells.textCell.queryPlaceholder')}
 							onChange={e => {
 								const value = e.currentTarget.value
 								setFilter({
@@ -122,7 +125,15 @@ export const TextCell: FunctionComponent<TextCellProps> = Component(props => {
 								})
 							}}
 						>
-							<b>{filter.mode === 'doesNotMatch' ? 'Exclude' : 'Include'}</b>&nbsp;N/A
+							<span style={{ whiteSpace: 'nowrap' }}>
+								{filter.mode === 'doesNotMatch'
+									? formatMessage('dataGirdCells.textCell.excludeNull', {
+											strong: chunks => <strong>{chunks}</strong>,
+									  })
+									: formatMessage('dataGirdCells.textCell.includeNull', {
+											strong: chunks => <strong>{chunks}</strong>,
+									  })}
+							</span>
 						</Checkbox>
 					</div>
 				)

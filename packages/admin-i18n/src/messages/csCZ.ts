@@ -42,6 +42,39 @@ export const csCZ: AdminDictionary = {
 			},
 		},
 	},
+	dataGirdCells: {
+		booleanCell: {
+			includeTrue: 'Ano',
+			includeFalse: 'Ne',
+			includeNull: 'Neznámé',
+		},
+		dateCell: {
+			fromLabel: 'Od',
+			toLabel: 'Do',
+		},
+		textCell: {
+			matches: 'Obsahuje',
+			doesNotMatch: 'Neobsahuje',
+			matchesExactly: 'Přesně odpovídá',
+			startsWith: 'Začáná na',
+			endsWith: 'Končí na',
+
+			queryPlaceholder: 'Hledaný výraz',
+
+			includeNull: '<strong>Zahrnout</strong> prázdné',
+			excludeNull: '<strong>Vynechat</strong> prázdné',
+		},
+	},
+	fieldView: {
+		boolean: {
+			yes: 'Ano',
+			no: 'Ne',
+		},
+		fallback: {
+			unknown: 'Neznámé',
+			notAvailable: 'Prázdné',
+		},
+	},
 	repeater: {
 		addButton: {
 			text: 'Přidat další',

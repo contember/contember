@@ -28,7 +28,6 @@ class ErrorAccessor {
 	}
 }
 namespace ErrorAccessor {
-	export type AddError = (error: ErrorAccessor.SugaredValidationError) => () => void
 	export enum ErrorType {
 		Validation = 'validation',
 		Execution = 'execution',

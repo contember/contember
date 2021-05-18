@@ -75,6 +75,10 @@ export const csCZ: AdminDictionary = {
 			notAvailable: 'Prázdné',
 		},
 	},
+	persistFeedback: {
+		successMessage: 'Úspěšně uloženo!',
+		errorMessage: 'Při ukládání došlo k chybě. Zkuste to prosím znovu.',
+	},
 	repeater: {
 		addButton: {
 			text: 'Přidat další',

@@ -13,6 +13,7 @@ class ErrorAccessor {
 				validation.push({
 					key,
 					message: typeof boxed.error === 'string' ? boxed.error : boxed.error.message,
+					code: typeof boxed.error === 'string' ? undefined : boxed.error.code,
 				})
 			} else {
 				execution.push({
@@ -53,10 +54,18 @@ namespace ErrorAccessor {
 		type: ErrorType.Validation
 		error: SugaredValidationError
 	}
-	export type SugaredValidationError = string | Omit<ValidationError, 'key'>
+	export type SugaredValidationError =
+		| string
+		| {
+				message: string
+				code?: string
+		  }
 	export interface ValidationError {
 		key: ErrorId
 		message: string
+		code: WellKnownErrorCode | string | undefined
 	}
+
+	export type WellKnownErrorCode = 'fieldRequired'
 }
 export { ErrorAccessor }

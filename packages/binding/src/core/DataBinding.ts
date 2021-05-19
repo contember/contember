@@ -6,6 +6,7 @@ import {
 	BindingOperations,
 	ExtendTreeOptions,
 	PersistErrorOptions,
+	PersistSuccessOptions,
 	TreeRootAccessor,
 } from '../accessors'
 import {
@@ -61,6 +62,8 @@ export class DataBinding {
 
 	public constructor(
 		private readonly contentApiClient: GraphQlClient,
+		private readonly systemApiClient: GraphQlClient,
+		private readonly tenantApiClient: GraphQlClient,
 		private readonly environment: Environment,
 		private readonly onUpdate: (newData: TreeRootAccessor) => void,
 		private readonly onError: (error: RequestError) => void,
@@ -71,6 +74,8 @@ export class DataBinding {
 		this.asyncBatchUpdatesOptions = {
 			...this.batchUpdatesOptions,
 			contentClient: contentApiClient,
+			systemClient: systemApiClient,
+			tenantClient: tenantApiClient,
 		}
 		this.dirtinessTracker = new DirtinessTracker()
 		this.eventManager = new EventManager(
@@ -93,7 +98,7 @@ export class DataBinding {
 
 		// TODO move this elsewhere
 		this.bindingOperations = Object.freeze<BindingOperations>({
-			...this.batchUpdatesOptions,
+			...this.asyncBatchUpdatesOptions,
 			contentClient: this.contentApiClient,
 			getTreeFilters: (): TreeFilter[] => {
 				const generator = new TreeFilterGenerator(this.treeStore)
@@ -103,7 +108,7 @@ export class DataBinding {
 				this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
 			},
 			extendTree: async (...args) => await this.extendTree(...args),
-			persist: async ({ signal } = {}) => {
+			persist: async ({ signal, onPersistSuccess, onPersistError } = {}) => {
 				if (!this.dirtinessTracker.hasChanges()) {
 					return {
 						type: PersistResultSuccessType.NothingToPersist,
@@ -133,6 +138,8 @@ export class DataBinding {
 
 						if (this.accessorErrorManager.hasErrors()) {
 							await this.eventManager.triggerOnPersistError(persistErrorOptions)
+							await onPersistError?.(persistErrorOptions)
+
 							if (shouldTryAgain) {
 								continue // Trying again immediately
 							}
@@ -176,16 +183,19 @@ export class DataBinding {
 										]),
 									),
 								)
-								await this.eventManager.triggerOnPersistSuccess({
+								const persistSuccessOptions: PersistSuccessOptions = {
 									...this.bindingOperations,
 									successType: result.type,
 									unstable_persistedEntityIds: persistedEntityIds,
-								})
+								}
+								await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
+								await onPersistSuccess?.(persistSuccessOptions)
 							})
 							return result
 						} else {
 							this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData))
 							await this.eventManager.triggerOnPersistError(persistErrorOptions)
+							await onPersistError?.(persistErrorOptions)
 							if (shouldTryAgain) {
 								if (proposedBackOffs.length) {
 									const geometricMean = Math.round(

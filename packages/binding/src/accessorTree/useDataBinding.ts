@@ -1,4 +1,8 @@
-import { useCurrentContentGraphQlClient } from '@contember/react-client'
+import {
+	useCurrentContentGraphQlClient,
+	useCurrentSystemGraphQlClient,
+	useTenantGraphQlClient,
+} from '@contember/react-client'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import { TreeRootAccessor } from '../accessors'
@@ -17,7 +21,9 @@ export const useDataBinding = ({
 	nodeTree,
 	refreshOnEnvironmentChange = true,
 }: AccessorTreeStateOptions): AccessorTreeState => {
-	const client = useCurrentContentGraphQlClient()
+	const contentClient = useCurrentContentGraphQlClient()
+	const systemClient = useCurrentSystemGraphQlClient()
+	const tenantClient = useTenantGraphQlClient()
 	const environment = useEnvironment()
 
 	const [state, dispatch] = useReducer(accessorTreeStateReducer, initialState)
@@ -44,7 +50,9 @@ export const useDataBinding = ({
 		})
 	}, [])
 
-	const [dataBinding, setDataBinding] = useState(() => new DataBinding(client, environment, onUpdate, onError))
+	const [dataBinding, setDataBinding] = useState(
+		() => new DataBinding(contentClient, systemClient, tenantClient, environment, onUpdate, onError),
+	)
 
 	useEffect(() => {
 		if (state.name !== AccessorTreeStateName.Initializing) {
@@ -65,8 +73,8 @@ export const useDataBinding = ({
 			type: AccessorTreeStateActionType.Reset,
 		})
 		// This essentially just reacts to new environments.
-		setDataBinding(new DataBinding(client, environment, onUpdate, onError))
-	}, [client, environment, onError, onUpdate, refreshOnEnvironmentChange])
+		setDataBinding(new DataBinding(contentClient, systemClient, tenantClient, environment, onUpdate, onError))
+	}, [contentClient, environment, onError, onUpdate, refreshOnEnvironmentChange, systemClient, tenantClient])
 
 	useEffect(() => {
 		isFirstRenderRef.current = false

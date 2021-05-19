@@ -1,10 +1,10 @@
-import { ErrorPersistResult, SuccessfulPersistResult, usePersist } from '@contember/binding'
+import { ErrorPersistResult, PersistOptions, SuccessfulPersistResult, usePersist } from '@contember/binding'
 import { useCallback } from 'react'
 import { useMessageFormatter } from '../../i18n'
 import { persistFeedbackDictionary } from './persistFeedbackDictionary'
 import { useShowToastWithTimeout } from './useShowToastWithTimeout'
 
-export interface PersistWithFeedbackOptions {
+export interface PersistWithFeedbackOptions extends PersistOptions {
 	successMessage?: string
 	successDuration?: number
 
@@ -17,13 +17,14 @@ export const usePersistWithFeedback = ({
 	successDuration,
 	errorMessage,
 	errorDuration,
+	...persistOptions
 }: PersistWithFeedbackOptions = {}) => {
 	const persistAll = usePersist()
 	const showToast = useShowToastWithTimeout()
 	const formatMessage = useMessageFormatter(persistFeedbackDictionary)
 
 	return useCallback((): Promise<SuccessfulPersistResult> => {
-		return persistAll()
+		return persistAll(persistOptions)
 			.then(result => {
 				console.debug('persist success', result)
 				showToast(
@@ -46,5 +47,14 @@ export const usePersistWithFeedback = ({
 				)
 				return Promise.reject(result)
 			})
-	}, [persistAll, showToast, formatMessage, successMessage, successDuration, errorMessage, errorDuration])
+	}, [
+		persistAll,
+		persistOptions,
+		showToast,
+		formatMessage,
+		successMessage,
+		successDuration,
+		errorMessage,
+		errorDuration,
+	])
 }

@@ -1,8 +1,9 @@
 import { useField } from '@contember/binding'
-import { EditorPlaceholder, ErrorList } from '@contember/ui'
+import { EditorPlaceholder } from '@contember/ui'
 import { memo } from 'react'
 import { Node as SlateNode, Path as SlatePath } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor } from 'slate-react'
+import { AccessorErrors } from '../../../errors'
 import { BlockElement } from '../../baseEditor'
 import { ContemberFieldElement } from '../elements'
 import { FieldBackedElement } from '../FieldBackedElement'
@@ -42,7 +43,7 @@ export const ContemberFieldElementRenderer = memo((props: ContemberFieldElementR
 			})}
 			{!!accessor.errors && (
 				<div contentEditable={false} data-slate-editor={false}>
-					<ErrorList errors={accessor.errors} size="small" />
+					<AccessorErrors accessor={accessor} size="small" />
 				</div>
 			)}
 		</BlockElement>

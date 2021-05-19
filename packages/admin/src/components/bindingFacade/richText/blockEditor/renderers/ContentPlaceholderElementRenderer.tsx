@@ -2,6 +2,7 @@ import { EntityAccessor, RelativeEntityList } from '@contember/binding'
 import { EditorPlaceholder, ErrorList } from '@contember/ui'
 import { memo, MutableRefObject } from 'react'
 import { RenderElementProps } from 'slate-react'
+import { AccessorErrors } from '../../../errors'
 import { BlockElement } from '../../baseEditor'
 import { ContemberContentPlaceholderElement } from '../elements'
 
@@ -20,7 +21,6 @@ export const ContentPlaceholderElementRenderer = memo(
 		desugaredBlockList,
 	}: ContentPlaceholderElementRendererProps) => {
 		const blockList = getParentEntityRef.current().getRelativeEntityList(desugaredBlockList)
-		const blockErrors = blockList.errors
 
 		// TODO This is obviously awful in that we assume that errors are only to be displayed when the content placeholder
 		//		is displayed as well which obviously won't hold for any other kind of error than "Field is required".
@@ -30,9 +30,9 @@ export const ContentPlaceholderElementRenderer = memo(
 			<BlockElement attributes={attributes} element={element}>
 				<EditorPlaceholder>{element.placeholder}</EditorPlaceholder>
 				{children}
-				{!!blockErrors && (
+				{!!blockList.errors && (
 					<div contentEditable={false} data-slate-editor={false}>
-						<ErrorList errors={blockErrors} size="small" />
+						<AccessorErrors accessor={blockList} size="small" />
 					</div>
 				)}
 			</BlockElement>

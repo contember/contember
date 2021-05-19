@@ -10,3 +10,5 @@ export * from './renderers'
 export * from './richText'
 export * from './ui'
 export * from './upload'
+
+export type { ErrorCodeDictionary } from './errors'

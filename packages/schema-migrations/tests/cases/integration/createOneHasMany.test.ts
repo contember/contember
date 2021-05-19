@@ -102,11 +102,12 @@ testMigrations('create one has many relation (post with locales)', {
 		ON "post_locale"
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
-	CREATE TRIGGER "log_event_statement"
+	CREATE CONSTRAINT TRIGGER "log_event_trx"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "post_locale"
-		FOR EACH STATEMENT
-	EXECUTE PROCEDURE "system"."statement_trigger_event"();
+		DEFERRABLE INITIALLY DEFERRED
+		FOR EACH ROW
+	EXECUTE PROCEDURE "system"."trigger_event_commit"();
 	ALTER TABLE "post_locale"
 		ADD "title" text;
 	ALTER TABLE "post_locale"

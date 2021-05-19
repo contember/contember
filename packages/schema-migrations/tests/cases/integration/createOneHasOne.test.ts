@@ -105,11 +105,12 @@ testMigrations('create one has one relation (site with settings)', {
 		ON "site"
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
-	CREATE TRIGGER "log_event_statement"
+	CREATE CONSTRAINT TRIGGER "log_event_trx"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "site"
-		FOR EACH STATEMENT
-	EXECUTE PROCEDURE "system"."statement_trigger_event"();
+		DEFERRABLE INITIALLY DEFERRED
+		FOR EACH ROW
+	EXECUTE PROCEDURE "system"."trigger_event_commit"();
 	CREATE TABLE "site_setting" (
 		"id" uuid PRIMARY KEY NOT NULL
 	);
@@ -118,11 +119,12 @@ testMigrations('create one has one relation (site with settings)', {
 		ON "site_setting"
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
-	CREATE TRIGGER "log_event_statement"
+	CREATE CONSTRAINT TRIGGER "log_event_trx"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "site_setting"
-		FOR EACH STATEMENT
-	EXECUTE PROCEDURE "system"."statement_trigger_event"();
+		DEFERRABLE INITIALLY DEFERRED
+		FOR EACH ROW
+	EXECUTE PROCEDURE "system"."trigger_event_commit"();
 	ALTER TABLE "site"
 		ADD "name" text;
 	ALTER TABLE "site_setting"

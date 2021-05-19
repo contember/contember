@@ -73,11 +73,12 @@ testMigrations('create many has many relation (post with categories)', {
 		ON "category"
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
-	CREATE TRIGGER "log_event_statement"
+	CREATE CONSTRAINT TRIGGER "log_event_trx"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "category"
-		FOR EACH STATEMENT
-	EXECUTE PROCEDURE "system"."statement_trigger_event"();
+		DEFERRABLE INITIALLY DEFERRED
+		FOR EACH ROW
+	EXECUTE PROCEDURE "system"."trigger_event_commit"();
 	ALTER TABLE "category"
 		ADD "title" text;
 	CREATE TABLE "post_categories" (
@@ -90,9 +91,10 @@ testMigrations('create many has many relation (post with categories)', {
 		ON "post_categories"
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event"($pga$post_id$pga$, $pga$category_id$pga$);
-	CREATE TRIGGER "log_event_statement"
+		CREATE CONSTRAINT TRIGGER "log_event_trx"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "post_categories"
-		FOR EACH STATEMENT
-	EXECUTE PROCEDURE "system"."statement_trigger_event"();`,
+		DEFERRABLE INITIALLY DEFERRED
+		FOR EACH ROW
+	EXECUTE PROCEDURE "system"."trigger_event_commit"();`,
 })

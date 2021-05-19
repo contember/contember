@@ -69,11 +69,12 @@ testMigrations('create many has one relation (post with author)', {
 		ON "post"
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
-	CREATE TRIGGER "log_event_statement"
+	CREATE CONSTRAINT TRIGGER "log_event_trx"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "post"
-		FOR EACH STATEMENT
-	EXECUTE PROCEDURE "system"."statement_trigger_event"();
+		DEFERRABLE INITIALLY DEFERRED
+		FOR EACH ROW
+	EXECUTE PROCEDURE "system"."trigger_event_commit"();
 	ALTER TABLE "post"
 		ADD "title" text;
 	ALTER TABLE "post"

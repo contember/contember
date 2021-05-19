@@ -1,6 +1,7 @@
 import type {
 	DataGridCellsDictionary,
 	DataGridDictionary,
+	ErrorCodeDictionary,
 	FieldViewDictionary,
 	PersistFeedbackDictionary,
 	RepeaterDictionary,
@@ -12,6 +13,7 @@ import type {
 // That way, translation packages can implement this and have TS warn them about missing messages.
 export type AdminDictionary = DataGridCellsDictionary &
 	DataGridDictionary &
+	ErrorCodeDictionary &
 	FieldViewDictionary &
 	PersistFeedbackDictionary &
 	RepeaterDictionary

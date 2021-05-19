@@ -65,6 +65,9 @@ export const csCZ: AdminDictionary = {
 			excludeNull: '<strong>Vynechat</strong> prázdné',
 		},
 	},
+	errorCodes: {
+		fieldRequired: 'Vyplňte prosím toto pole.',
+	},
 	fieldView: {
 		boolean: {
 			yes: 'Ano',

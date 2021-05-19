@@ -1,6 +1,6 @@
 {
   "name": "@contember/template-workspace",
-  "version": "0.12.0-alpha.0",
+  "version": "0.12.0-alpha.1",
   "license": "Apache-2.0",
   "scripts": {
     "version": "node ../../../dist/src/bump-yaml-version.js contember.workspace.yaml && git add contember.workspace.yaml",
@@ -11,10 +11,10 @@
     "build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
   },
   "devDependencies": {
-    "@contember/cli": "^0.12.0-alpha.0"
+    "@contember/cli": "^0.12.0-alpha.1"
   },
   "dependencies": {
-    "@contember/schema": "^0.12.0-alpha.0",
-    "@contember/schema-definition": "^0.12.0-alpha.0"
+    "@contember/schema": "^0.12.0-alpha.1",
+    "@contember/schema-definition": "^0.12.0-alpha.1"
   }
 }

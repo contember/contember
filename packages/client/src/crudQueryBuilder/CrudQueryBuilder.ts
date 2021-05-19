@@ -148,19 +148,19 @@ export class CrudQueryBuilder {
 
 	public inTransaction(alias?: string): CrudQueryBuilder {
 		const name = 'transaction'
-		const [objectName, objectBuilder] =
+		const [objectName, objectBuilder, fragments] =
 			typeof alias === 'string'
 				? [
 						alias,
 						new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }, undefined, undefined, undefined, name),
+						this.rootObjectBuilder.fragmentDefinitions,
 				  ]
-				: [name, new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects })]
-		return new CrudQueryBuilder(
-			this.type,
-			new RootObjectBuilder({
-				[objectName]: objectBuilder,
-			}),
-		)
+				: [
+						name,
+						new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }),
+						this.rootObjectBuilder.fragmentDefinitions,
+				  ]
+		return new CrudQueryBuilder(this.type, new RootObjectBuilder({ [objectName]: objectBuilder }, fragments))
 	}
 
 	getGql(): string {

@@ -6,14 +6,31 @@ export class QueryCompiler {
 	constructor(private operation: 'query' | 'mutation', private builder: RootObjectBuilder) {}
 
 	public create(): string {
-		return `${this.operation} {\n${this.formatRootObject(this.builder)}\n}`
+		const rootObjects = this.formatRootObjects(this.builder.objects)
+		const fragmentDefinitions = this.formatFragmentDefinitions(this.builder.fragmentDefinitions)
+
+		return `${this.operation} {\n${rootObjects}\n}${fragmentDefinitions ? `\n${fragmentDefinitions}` : ''}`
 	}
 
-	private formatRootObject(builder: RootObjectBuilder): string {
+	private formatFragmentDefinitions(fragments: RootObjectBuilder['fragmentDefinitions']): string {
 		const lines: string[] = []
 
-		for (const alias in builder.objects) {
-			lines.push(...this.formatObject(alias, builder.objects[alias]).map(val => `\t${val}`))
+		for (const name in fragments) {
+			const object = fragments[name]
+
+			lines.push(`fragment ${name} on ${object.objectName!} {`)
+			lines.push(...this.formatObjectBody(object))
+			lines.push('}')
+		}
+
+		return lines.join('\n')
+	}
+
+	private formatRootObjects(objects: RootObjectBuilder['objects']): string {
+		const lines: string[] = []
+
+		for (const alias in objects) {
+			lines.push(...this.formatObject(alias, objects[alias]).map(val => `\t${val}`))
 		}
 
 		return lines.join('\n')
@@ -36,8 +53,11 @@ export class QueryCompiler {
 		for (const fieldName of builder.fields) {
 			result.push(fieldName)
 		}
-		for (const typeName in builder.fragments) {
-			const fragment = builder.fragments[typeName]
+		for (const fragmentName of builder.fragmentApplications) {
+			result.push(`... ${fragmentName}`)
+		}
+		for (const typeName in builder.inlineFragments) {
+			const fragment = builder.inlineFragments[typeName]
 			result.push(`... on ${typeName} {`, ...this.formatObjectBody(fragment), '}')
 		}
 		for (const alias in builder.objects) {

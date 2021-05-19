@@ -28,9 +28,12 @@ describe('crud query builder', () => {
 				'Category',
 				CrudQueryBuilder.ReadBuilder.instantiate<DeleteMutationArguments>().by({ id: '123' }).column('id'),
 			)
+			.fragment('authorSnippet', 'Author', builder =>
+				builder.column('nickName').hasOneRelation('favoritePet', builder => builder.column('name')),
+			)
 			.create('Author', builder =>
 				builder
-					.node(builder => builder.column('name'))
+					.node(builder => builder.column('name').applyFragment('authorSnippet'))
 					.data(builder =>
 						builder
 							.set('name', 'John')
@@ -56,7 +59,14 @@ describe('crud query builder', () => {
 	createAuthor(data: {name: "John", posts: [{connect: {id: "456"}}, {create: {title: "Abcd"}}]}) {
 		node {
 			name
+			... authorSnippet
 		}
+	}
+}
+fragment authorSnippet on Author {
+	nickName
+	favoritePet {
+		name
 	}
 }`)
 	})

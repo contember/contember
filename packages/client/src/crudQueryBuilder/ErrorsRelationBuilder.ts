@@ -9,8 +9,8 @@ export class ErrorsRelationBuilder {
 				.object('path', builder =>
 					builder
 						.field('__typename')
-						.fragment('_FieldPathFragment', builder => builder.field('field'))
-						.fragment('_IndexPathFragment', builder => builder.field('index').field('alias')),
+						.inlineFragment('_FieldPathFragment', builder => builder.field('field'))
+						.inlineFragment('_IndexPathFragment', builder => builder.field('index').field('alias')),
 				),
 		)
 	}

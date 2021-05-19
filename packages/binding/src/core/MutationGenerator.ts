@@ -131,6 +131,7 @@ export class MutationGenerator {
 					subTreeType,
 					entityId,
 				}),
+				this.getNodeFragmentName(subTreePlaceholder, subTreeType, realmState),
 				queryBuilder,
 			)
 		}
@@ -144,8 +145,20 @@ export class MutationGenerator {
 				subTreeType,
 				entityId,
 			}),
+			this.getNodeFragmentName(subTreePlaceholder, subTreeType, realmState),
 			queryBuilder,
 		)
+	}
+
+	private getNodeFragmentName(
+		subTreePlaceholder: PlaceholderName,
+		subTreeType: MutationOperationSubTreeType,
+		realmState: EntityRealmState,
+	): string | undefined {
+		if (subTreeType !== MutationOperationSubTreeType.EntityList) {
+			return undefined
+		}
+		return `${realmState.entity.entityName}_${subTreePlaceholder}`
 	}
 
 	private addDeleteMutation(
@@ -171,6 +184,7 @@ export class MutationGenerator {
 		processedEntities: ProcessedEntities,
 		entityRealm: EntityRealmState,
 		alias: string,
+		nodeFragmentName: string | undefined,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
 		if (processedEntities.has(entityRealm.entity)) {
@@ -184,18 +198,26 @@ export class MutationGenerator {
 			return queryBuilder
 		}
 
+		const readBuilder = QueryGenerator.registerQueryPart(
+			getEntityMarker(entityRealm).fields.markers,
+			CrudQueryBuilder.ReadBuilder.instantiate(),
+		)
+
+		if (nodeFragmentName) {
+			queryBuilder = queryBuilder.fragment(nodeFragmentName, entityRealm.entity.entityName, readBuilder)
+		}
+
 		return queryBuilder.update(
 			entityRealm.entity.entityName,
-			builder => {
-				return builder
+			builder =>
+				builder
+					.node(nodeFragmentName ? builder => builder.applyFragment(nodeFragmentName) : readBuilder)
 					.data(builder => this.registerUpdateMutationPart(processedEntities, entityRealm, builder))
 					.by({ [PRIMARY_KEY_NAME]: runtimeId.value })
-					.node(builder => QueryGenerator.registerQueryPart(getEntityMarker(entityRealm).fields.markers, builder))
 					.ok()
 					.validation()
 					.errors()
-					.errorMessage()
-			},
+					.errorMessage(),
 			alias,
 		)
 	}
@@ -204,6 +226,7 @@ export class MutationGenerator {
 		processedEntities: ProcessedEntities,
 		entityRealm: EntityRealmState,
 		alias: string,
+		nodeFragmentName: string | undefined,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
 		if (processedEntities.has(entityRealm.entity)) {
@@ -211,23 +234,25 @@ export class MutationGenerator {
 		}
 		// Deliberately not adding the entity to processedEntities - it will be done by registerCreateMutationPart.
 
+		const readBuilder = QueryGenerator.registerQueryPart(
+			getEntityMarker(entityRealm).fields.markers,
+			CrudQueryBuilder.ReadBuilder.instantiate(),
+		)
+		if (nodeFragmentName) {
+			queryBuilder = queryBuilder.fragment(nodeFragmentName, entityRealm.entity.entityName, readBuilder)
+		}
+
 		return queryBuilder.create(
 			entityRealm.entity.entityName,
 			builder => {
-				let writeBuilder = this.registerCreateMutationPart(
-					processedEntities,
-					entityRealm,
-					new CrudQueryBuilder.WriteDataBuilder(),
-				)
 				// if (where && writeBuilder.data !== undefined && !isEmptyObject(writeBuilder.data)) {
 				// 	// Shallow cloning the parameters like this IS too naïve but it will likely last surprisingly long before we
 				// 	// run into issues.
 				// 	writeBuilder = new CrudQueryBuilder.WriteDataBuilder({ ...writeBuilder.data, ...where })
 				// }
-
 				return builder
-					.data(writeBuilder)
-					.node(builder => QueryGenerator.registerQueryPart(getEntityMarker(entityRealm).fields.markers, builder))
+					.node(nodeFragmentName ? builder => builder.applyFragment(nodeFragmentName) : readBuilder)
+					.data(builder => this.registerCreateMutationPart(processedEntities, entityRealm, builder))
 					.ok()
 					.validation()
 					.errors()

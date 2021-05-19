@@ -29,6 +29,13 @@ export class CrudQueryBuilder {
 		private rootObjectBuilder: RootObjectBuilder = new RootObjectBuilder(),
 	) {}
 
+	public fragment(name: string, typeName: string, query: ReadBuilder.BuilderFactory<never>): CrudQueryBuilder {
+		const readBuilder = ReadBuilder.instantiateFromFactory(query)
+		const objectBuilder = readBuilder.objectBuilder.name(typeName)
+
+		return new CrudQueryBuilder(this.type, this.rootObjectBuilder.fragment(name, objectBuilder))
+	}
+
 	public list(
 		name: string,
 		query: ReadBuilder.BuilderFactory<ListQueryArguments>,
@@ -143,7 +150,10 @@ export class CrudQueryBuilder {
 		const name = 'transaction'
 		const [objectName, objectBuilder] =
 			typeof alias === 'string'
-				? [alias, new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }, undefined, undefined, name)]
+				? [
+						alias,
+						new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects }, undefined, undefined, undefined, name),
+				  ]
 				: [name, new ObjectBuilder(undefined, { ...this.rootObjectBuilder.objects })]
 		return new CrudQueryBuilder(
 			this.type,

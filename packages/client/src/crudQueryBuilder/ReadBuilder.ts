@@ -60,7 +60,11 @@ class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 
 	public inlineFragment(typeName: string, builder: ReadBuilder.BuilderFactory<never>) {
 		builder = ReadBuilder.instantiateFromFactory(builder)
-		return this.instantiate<AllowedArgs>(this.objectBuilder.fragment(typeName, builder.objectBuilder))
+		return this.instantiate<AllowedArgs>(this.objectBuilder.inlineFragment(typeName, builder.objectBuilder))
+	}
+
+	public applyFragment(fragmentName: string) {
+		return this.instantiate<AllowedArgs>(this.objectBuilder.applyFragment(fragmentName))
 	}
 
 	public reductionRelation(name: string, builder: ReadBuilder.BuilderFactory<ReductionArguments>, alias?: string) {

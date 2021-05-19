@@ -9,8 +9,8 @@ describe('GraphQlQueryBuilder', () => {
 						.argument('where', { id: '123' })
 						.field('id')
 						.field('publishedAt')
-						.fragment('Article', new GraphQlBuilder.ObjectBuilder().field('leadParagraph'))
-						.fragment(
+						.inlineFragment('Article', new GraphQlBuilder.ObjectBuilder().field('leadParagraph'))
+						.inlineFragment(
 							'BlogPost',
 							new GraphQlBuilder.ObjectBuilder().object('comments', new GraphQlBuilder.ObjectBuilder().field('id')),
 						)

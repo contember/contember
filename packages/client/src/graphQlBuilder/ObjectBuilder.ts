@@ -3,7 +3,8 @@ export class ObjectBuilder {
 		public readonly fields: string[] = [],
 		public readonly objects: { [name: string]: ObjectBuilder } = {},
 		public readonly args: { [name: string]: any } = {},
-		public readonly fragments: { [typeName: string]: ObjectBuilder } = {},
+		public readonly fragmentApplications: string[] = [],
+		public readonly inlineFragments: { [typeName: string]: ObjectBuilder } = {},
 		public readonly objectName?: string,
 	) {}
 
@@ -12,17 +13,32 @@ export class ObjectBuilder {
 			this.fields,
 			this.objects,
 			{ ...this.args, [name]: value },
-			this.fragments,
+			this.fragmentApplications,
+			this.inlineFragments,
 			this.objectName,
 		)
 	}
 
 	public name(name: string): ObjectBuilder {
-		return new ObjectBuilder(this.fields, this.objects, this.args, this.fragments, name)
+		return new ObjectBuilder(
+			this.fields,
+			this.objects,
+			this.args,
+			this.fragmentApplications,
+			this.inlineFragments,
+			name,
+		)
 	}
 
 	public field(name: string): ObjectBuilder {
-		return new ObjectBuilder([...this.fields, name], this.objects, this.args, this.fragments, this.objectName)
+		return new ObjectBuilder(
+			[...this.fields, name],
+			this.objects,
+			this.args,
+			this.fragmentApplications,
+			this.inlineFragments,
+			this.objectName,
+		)
 	}
 
 	public object(name: string, builder: ((builder: ObjectBuilder) => ObjectBuilder) | ObjectBuilder): ObjectBuilder {
@@ -34,12 +50,13 @@ export class ObjectBuilder {
 			this.fields,
 			{ ...this.objects, [name]: builder },
 			this.args,
-			this.fragments,
+			this.fragmentApplications,
+			this.inlineFragments,
 			this.objectName,
 		)
 	}
 
-	public fragment(
+	public inlineFragment(
 		typeName: string,
 		builder: ((builder: ObjectBuilder) => ObjectBuilder) | ObjectBuilder,
 	): ObjectBuilder {
@@ -51,7 +68,19 @@ export class ObjectBuilder {
 			this.fields,
 			this.objects,
 			this.args,
-			{ ...this.fragments, [typeName]: builder },
+			this.fragmentApplications,
+			{ ...this.inlineFragments, [typeName]: builder },
+			this.objectName,
+		)
+	}
+
+	public applyFragment(fragmentName: string): ObjectBuilder {
+		return new ObjectBuilder(
+			this.fields,
+			this.objects,
+			this.args,
+			[...this.fragmentApplications, fragmentName],
+			this.inlineFragments,
 			this.objectName,
 		)
 	}

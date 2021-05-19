@@ -61,6 +61,8 @@ export class DataBinding {
 
 	public constructor(
 		private readonly contentApiClient: GraphQlClient,
+		private readonly systemApiClient: GraphQlClient,
+		private readonly tenantApiClient: GraphQlClient,
 		private readonly environment: Environment,
 		private readonly onUpdate: (newData: TreeRootAccessor) => void,
 		private readonly onError: (error: RequestError) => void,
@@ -71,6 +73,8 @@ export class DataBinding {
 		this.asyncBatchUpdatesOptions = {
 			...this.batchUpdatesOptions,
 			contentClient: contentApiClient,
+			systemClient: systemApiClient,
+			tenantClient: tenantApiClient,
 		}
 		this.dirtinessTracker = new DirtinessTracker()
 		this.eventManager = new EventManager(
@@ -93,7 +97,7 @@ export class DataBinding {
 
 		// TODO move this elsewhere
 		this.bindingOperations = Object.freeze<BindingOperations>({
-			...this.batchUpdatesOptions,
+			...this.asyncBatchUpdatesOptions,
 			contentClient: this.contentApiClient,
 			getTreeFilters: (): TreeFilter[] => {
 				const generator = new TreeFilterGenerator(this.treeStore)

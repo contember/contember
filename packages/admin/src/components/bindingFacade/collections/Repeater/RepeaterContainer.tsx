@@ -1,7 +1,8 @@
 import { EntityAccessor, EntityListAccessor } from '@contember/binding'
-import { Box, BoxSection, ErrorList } from '@contember/ui'
+import { Box, BoxSection } from '@contember/ui'
 import { ComponentType, memo, ReactNode } from 'react'
 import { MessageFormatter } from '../../../../i18n'
+import { AccessorErrors } from '../../errors'
 import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
 import { RepeaterDictionary } from './repeaterDictionary'
 
@@ -48,7 +49,7 @@ export const RepeaterContainer = memo(
 	}: RepeaterContainerProps) => {
 		return (
 			<Box heading={label}>
-				<ErrorList errors={accessor.errors} />
+				<AccessorErrors accessor={accessor} />
 				{isEmpty && (
 					<EmptyMessageComponent {...emptyMessageComponentExtraProps}>
 						{formatMessage(emptyMessage, 'repeater.emptyMessage.text')}

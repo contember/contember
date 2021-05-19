@@ -1,6 +1,7 @@
 import { Component, Field, FieldBasicProps, useEnvironment, useField, useMutationState } from '@contember/binding'
 import { Checkbox, FormGroup } from '@contember/ui'
 import { FunctionComponent, ReactNode } from 'react'
+import { useAccessorErrors } from '../errors'
 
 export type CheckboxFieldProps = FieldBasicProps & {
 	label: ReactNode
@@ -22,7 +23,7 @@ export const CheckboxField: FunctionComponent<CheckboxFieldProps> = Component(
 						field.updateValue(isChecked)
 					}}
 					isDisabled={isMutating}
-					errors={field.errors}
+					errors={useAccessorErrors(field)}
 				>
 					{environment.applySystemMiddleware('labelMiddleware', props.label)}
 				</Checkbox>

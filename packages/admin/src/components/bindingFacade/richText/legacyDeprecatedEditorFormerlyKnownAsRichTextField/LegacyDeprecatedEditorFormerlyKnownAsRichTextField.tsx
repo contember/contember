@@ -11,6 +11,7 @@ import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
 import { Node as SlateNode } from 'slate'
 import { Editable, Slate } from 'slate-react'
+import { useAccessorErrors } from '../../errors'
 import { ElementNode } from '../baseEditor'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins'
@@ -82,7 +83,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 				labelPosition={props.labelPosition}
 				description={props.description}
 				useLabelElement={props.useLabelElement}
-				errors={fieldAccessor.errors}
+				errors={useAccessorErrors(fieldAccessor)}
 			>
 				<Slate editor={editor} value={valueNodes} onChange={onChange}>
 					<EditorCanvas

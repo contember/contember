@@ -65,6 +65,9 @@ export const csCZ: AdminDictionary = {
 			excludeNull: '<strong>Vynechat</strong> prázdné',
 		},
 	},
+	errorCodes: {
+		fieldRequired: 'Vyplňte prosím toto pole.',
+	},
 	fieldView: {
 		boolean: {
 			yes: 'Ano',
@@ -74,6 +77,10 @@ export const csCZ: AdminDictionary = {
 			unknown: 'Neznámé',
 			notAvailable: 'Prázdné',
 		},
+	},
+	persistFeedback: {
+		successMessage: 'Úspěšně uloženo!',
+		errorMessage: 'Při ukládání došlo k chybě. Zkuste to prosím znovu.',
 	},
 	repeater: {
 		addButton: {

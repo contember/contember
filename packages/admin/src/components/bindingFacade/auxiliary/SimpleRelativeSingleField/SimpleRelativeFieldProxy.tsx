@@ -1,6 +1,7 @@
 import { Environment, SugaredRelativeSingleField, useEnvironment, useField, useMutationState } from '@contember/binding'
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import { memo, ReactNode, useMemo } from 'react'
+import { useAccessorErrors } from '../../errors'
 import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
 const contextualizeNode = (
@@ -48,6 +49,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 			}),
 			[environment, field, isMutating],
 		)
+		const fieldErrors = useAccessorErrors(field)
 
 		const rendered = render(fieldMetadata, props)
 
@@ -60,7 +62,7 @@ export const SimpleRelativeSingleFieldProxy = memo(
 						labelDescription={normalizedLabelDescription}
 						labelPosition={labelPosition}
 						description={normalizedDescription}
-						errors={fieldMetadata.field.errors}
+						errors={fieldErrors}
 					>
 						{rendered}
 					</FormGroup>

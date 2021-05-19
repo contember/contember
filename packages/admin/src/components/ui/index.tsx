@@ -9,3 +9,5 @@ export * from './useDismissToast'
 export * from './useShowToast'
 export * from './useShowToastWithTimeout'
 export * from './usePersistWithFeedback'
+
+export type { PersistFeedbackDictionary } from './persistFeedbackDictionary'

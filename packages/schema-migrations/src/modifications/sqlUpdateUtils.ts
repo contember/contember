@@ -13,14 +13,17 @@ export const createEventTrigger = (builder: MigrationBuilder, tableName: Name, p
 	})
 }
 
-export const createEventStatementTrigger = (builder: MigrationBuilder, tableName: Name) => {
-	builder.createTrigger(tableName, 'log_event_statement', {
+export const createEventTrxTrigger = (builder: MigrationBuilder, tableName: Name) => {
+	builder.createTrigger(tableName, 'log_event_trx', {
 		when: 'AFTER',
 		operation: ['INSERT', 'UPDATE', 'DELETE'],
-		level: 'STATEMENT',
+		level: 'ROW',
+		constraint: true,
+		deferrable: true,
+		deferred: true,
 		function: {
 			schema: 'system',
-			name: 'statement_trigger_event',
+			name: 'trigger_event_commit',
 		},
 	})
 }

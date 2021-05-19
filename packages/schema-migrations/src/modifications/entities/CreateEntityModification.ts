@@ -3,7 +3,7 @@ import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
 import { Modification } from '../Modification'
-import { createEventStatementTrigger, createEventTrigger } from '../sqlUpdateUtils'
+import { createEventTrxTrigger, createEventTrigger } from '../sqlUpdateUtils'
 
 class CreateEntityModification implements Modification<CreateEntityModification.Data> {
 	constructor(private readonly data: CreateEntityModification.Data, private readonly schema: Schema) {}
@@ -19,7 +19,7 @@ class CreateEntityModification implements Modification<CreateEntityModification.
 			},
 		})
 		createEventTrigger(builder, entity.tableName, [entity.primaryColumn])
-		createEventStatementTrigger(builder, entity.tableName)
+		createEventTrxTrigger(builder, entity.tableName)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {

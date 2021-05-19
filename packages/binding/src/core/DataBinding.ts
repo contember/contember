@@ -99,7 +99,6 @@ export class DataBinding {
 		// TODO move this elsewhere
 		this.bindingOperations = Object.freeze<BindingOperations>({
 			...this.asyncBatchUpdatesOptions,
-			contentClient: this.contentApiClient,
 			getTreeFilters: (): TreeFilter[] => {
 				const generator = new TreeFilterGenerator(this.treeStore)
 				return generator.generateTreeFilter()
@@ -108,13 +107,8 @@ export class DataBinding {
 				this.eventManager.syncTransaction(() => performUpdates(this.bindingOperations))
 			},
 			extendTree: async (...args) => await this.extendTree(...args),
-			persist: async ({ signal, onPersistSuccess, onPersistError } = {}) => {
-				if (!this.dirtinessTracker.hasChanges()) {
-					return {
-						type: PersistResultSuccessType.NothingToPersist,
-					}
-				}
-				return await this.eventManager.persistOperation(async () => {
+			persist: async ({ signal, onPersistSuccess, onPersistError } = {}) =>
+				await this.eventManager.persistOperation(async () => {
 					for (let attemptNumber = 1; attemptNumber <= this.config.getValue('maxPersistAttempts'); attemptNumber++) {
 						// TODO if the tree is in an inconsistent state, wait for lock releases
 
@@ -154,6 +148,14 @@ export class DataBinding {
 
 						if (mutation === undefined) {
 							this.dirtinessTracker.reset() // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
+							const persistSuccessOptions: PersistSuccessOptions = {
+								...this.bindingOperations,
+								successType: PersistResultSuccessType.NothingToPersist,
+								unstable_persistedEntityIds: [],
+							}
+							await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
+							await onPersistSuccess?.(persistSuccessOptions)
+
 							return {
 								type: PersistResultSuccessType.NothingToPersist,
 							}
@@ -214,11 +216,11 @@ export class DataBinding {
 						}
 					}
 					// Max attempts exceeded
+					// TODO fire persist error
 					throw {
 						type: MutationErrorType.GivenUp,
 					}
-				})
-			},
+				}),
 		})
 	}
 

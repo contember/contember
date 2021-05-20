@@ -34,9 +34,10 @@ export const useToolbarState = (): ToolbarsState => {
 			domRangeRect = selectionState.selection.getRangeAt(0).getBoundingClientRect()
 		} else if (selectionState.name === EditorSelectionStateName.ExpandedPointerSelection) {
 			if (document.caretRangeFromPoint) {
-				domRangeRect = document
-					.caretRangeFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
-					.getBoundingClientRect()
+				domRangeRect =
+					document
+						.caretRangeFromPoint(selectionState.finishEvent.clientX, selectionState.finishEvent.clientY)
+						?.getBoundingClientRect() || undefined
 			} else {
 				domRangeRect =
 					document

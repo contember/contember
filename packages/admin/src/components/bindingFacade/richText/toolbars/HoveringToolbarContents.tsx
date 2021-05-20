@@ -1,10 +1,4 @@
-import {
-	AccessorProvider,
-	BindingOperationsProvider,
-	useBindingOperations,
-	useEnvironment,
-	VariableInputTransformer,
-} from '@contember/binding'
+import { Entity, useEnvironment, VariableInputTransformer } from '@contember/binding'
 import { EditorToolbar, ToolbarGroup, useDialog } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { Transforms } from 'slate'
@@ -20,7 +14,6 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 	const editor = useSlate() as BlockSlateEditor
 	const { openDialog } = useDialog()
 	const environment = useEnvironment()
-	const bindingOperations = useBindingOperations()
 
 	if (!rawButtons.length) {
 		return null
@@ -70,27 +63,17 @@ export const HoveringToolbarContents = memo(({ buttons: rawButtons }: HoveringTo
 									const Content = button.referenceContent
 									await openDialog({
 										heading: button.label,
-										content: props => {
-											return (
-												<BindingOperationsProvider
-													bindingOperations={
-														// TODO get rid of this.
-														// This is NOT public api. Don't use BindingOperationsProvider.
-														bindingOperations
-													}
-												>
-													<AccessorProvider accessor={editor.getReferencedEntity(referenceId)}>
-														<Content
-															referenceId={referenceId}
-															editor={editor}
-															selection={selection}
-															onSuccess={() => props.resolve(undefined)}
-															onCancel={() => props.reject()}
-														/>
-													</AccessorProvider>
-												</BindingOperationsProvider>
-											)
-										},
+										content: props => (
+											<Entity accessor={editor.getReferencedEntity(referenceId)}>
+												<Content
+													referenceId={referenceId}
+													editor={editor}
+													selection={selection}
+													onSuccess={() => props.resolve(undefined)}
+													onCancel={() => props.reject()}
+												/>
+											</Entity>
+										),
 									})
 								} catch {
 									editor.getReferencedEntity(referenceId).deleteEntity()

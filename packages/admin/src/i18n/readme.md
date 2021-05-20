@@ -33,7 +33,7 @@ const formatMessage = useMessageFormatter(myDictionary)
 That gives you a function that returns translations. There are two main ways of using it:
 1. You have a message that **isn't configurable** from outside the component:
 	Just use a dot-syntax to reach your message, e.g. `formatMessage('myComponent.key2.nestedKey')` or `formatMessage('myComponent.key1', { variable: 123 })`.
-1. You have a message that **is** from outside the component:
+1. You have a message that **is configurable** from outside the component:
 	Start with the user-specified data and provide a fallback, e.g. `formatMessage(userSpecified, 'myComponent.key2.nestedKey')` or `formatMessage(userSpecified, 'myComponent.key1', { variable: 123 })`.
 
 In both cases, the final parameter with variables is optional. In this case, the type of `formatMessage` is `MessageFormatter<MyDictionary>`. You can use this to pass it down as a prop.

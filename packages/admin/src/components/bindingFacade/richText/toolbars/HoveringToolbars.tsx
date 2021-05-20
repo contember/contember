@@ -1,4 +1,4 @@
-import { HoveringToolbar as UIToolbar, Portal } from '@contember/ui'
+import { DialogProvider, HoveringToolbar as UIToolbar, Portal } from '@contember/ui'
 import { memo, ReactElement } from 'react'
 import { useToolbarState } from '../editorSelection'
 import { HoveringToolbarContents, HoveringToolbarContentsProps } from './HoveringToolbarContents'
@@ -16,7 +16,7 @@ export const HoveringToolbars = memo((props: HoveringToolbarsProps) => {
 		inlineToolbarActive && (props.shouldDisplayInlineToolbar === undefined || props.shouldDisplayInlineToolbar())
 
 	return (
-		<>
+		<DialogProvider>
 			<Portal>
 				{props.inlineButtons && (
 					<UIToolbar isActive={shouldDisplayInlineToolbar} ref={inlineToolbarRef} scope="contextual">
@@ -30,6 +30,6 @@ export const HoveringToolbars = memo((props: HoveringToolbarsProps) => {
 					{Array.isArray(props.blockButtons) || props.blockButtons}
 				</UIToolbar>
 			)}
-		</>
+		</DialogProvider>
 	)
 })

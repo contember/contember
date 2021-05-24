@@ -1,10 +1,4 @@
-import {
-	EntityListSubTreeMarker,
-	EntitySubTreeMarker,
-	FieldMarker,
-	HasManyRelationMarker,
-	HasOneRelationMarker,
-} from '../../markers'
+import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../../markers'
 import { PlaceholderName } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import { TreeStore } from '../TreeStore'
@@ -88,22 +82,22 @@ export class StateIterator {
 		const visited: Set<PlaceholderName> = new Set()
 
 		for (const siblingRealm of realm.entity.realms.values()) {
-			const fields = getEntityMarker(siblingRealm).fields.markers
+			if (siblingRealm.type === StateType.EntityRealmStub) {
+				continue
+			}
 
-			for (const [placeholderName, fieldState] of realm.children) {
+			for (const [placeholderName, marker] of getEntityMarker(siblingRealm).fields.markers) {
 				if (visited.has(placeholderName)) {
 					continue
 				}
-				const marker = fields.get(placeholderName)
 
-				if (
-					marker === undefined ||
-					marker instanceof EntitySubTreeMarker ||
-					marker instanceof EntityListSubTreeMarker
-				) {
-					continue
-				}
 				visited.add(placeholderName)
+
+				const fieldState = siblingRealm.children.get(placeholderName)
+
+				if (fieldState === undefined) {
+					continue // This should never happen.
+				}
 
 				if (fieldState.type === StateType.Field && marker instanceof FieldMarker) {
 					yield {

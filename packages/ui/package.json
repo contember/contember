@@ -1,6 +1,6 @@
 {
   "name": "@contember/ui",
-  "version": "0.6.37",
+  "version": "0.6.38",
   "type": "module",
   "main": "dist/src/index.js",
   "files": [
@@ -14,7 +14,7 @@
   "typings": "dist/src/index.d.ts",
   "dependencies": {
     "@blueprintjs/icons": "3.26.0",
-    "@contember/react-multipass-rendering": "0.6.37",
+    "@contember/react-multipass-rendering": "0.6.38",
     "@mangoweb/sass-base": "0.0.7",
     "@popperjs/core": "2.9.0",
     "classnames": "2.3.1",

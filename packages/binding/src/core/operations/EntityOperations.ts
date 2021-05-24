@@ -119,10 +119,6 @@ export class EntityOperations {
 						OperationsHelpers.rejectInvalidAccessorTree()
 					}
 
-					if (previouslyConnectedState === stateToConnect) {
-						continue // Do nothing.
-					}
-
 					if (previouslyConnectedState.entity.entityName !== stateToConnect.entity.entityName) {
 						throw new BindingError(
 							`EntityAccessor.connectEntityAtField: Attempting to connect at field ${entityName}.${fieldName} ` +
@@ -147,6 +143,13 @@ export class EntityOperations {
 							)
 						}
 						throw error
+					}
+
+					if (
+						previouslyConnectedState === stateToConnect ||
+						previouslyConnectedState.entity.id.value === stateToConnect.entity.id.value
+					) {
+						continue // Do nothing.
 					}
 
 					// TODO remove from planned deletions if appropriate

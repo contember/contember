@@ -213,6 +213,15 @@ export class EventManager {
 			case StateType.EntityList: {
 				justUpdated.unpersistedChangesCount += changesDelta
 
+				if (__DEV_MODE__) {
+					if (justUpdated.unpersistedChangesCount < 0) {
+						console.error(
+							`We have *JUST* reached a completely invalid state. From now on, anything can (and likely will) ` +
+								`go wrong. This is definitely a bug. Please try to report whatever led to this situation.`,
+						)
+					}
+				}
+
 				const parent = justUpdated.blueprint.parent
 
 				if (parent === undefined) {

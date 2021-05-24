@@ -86,10 +86,6 @@ export class ListOperations {
 
 			// TODO disable this at the top-level.
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, outerState)) {
-				if (state.children.has(idToConnect.value)) {
-					return
-				}
-
 				if (state.entityName !== stateToConnect.entity.entityName) {
 					throw new BindingError(
 						`EntityListAccessor.connectEntity: Attempting to connect at an entity of type ` +
@@ -117,6 +113,11 @@ export class ListOperations {
 					}
 					throw error
 				}
+
+				if (state.children.has(idToConnect.value)) {
+					continue
+				}
+
 				this.stateInitializer.initializeEntityRealm(idToConnect, state.entityName, {
 					type: 'listEntity',
 					parent: state,

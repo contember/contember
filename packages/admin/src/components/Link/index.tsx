@@ -13,4 +13,4 @@ export const Link = connect<LinkComponent.StateProps, LinkComponent.DispatchProp
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),
 )(LinkComponent)
 
-export { InnerProps, PublicAnchorProps }
+export type { InnerProps, PublicAnchorProps }

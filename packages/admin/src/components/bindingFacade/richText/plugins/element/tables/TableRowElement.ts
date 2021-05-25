@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode } from '../../../baseEditor'
+import type { BaseEditor, ElementNode } from '../../../baseEditor'
 
 export const tableRowElementType = 'tableRow' as const
 

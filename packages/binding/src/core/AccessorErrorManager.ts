@@ -1,9 +1,9 @@
 import { ErrorAccessor } from '../accessors'
-import { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
+import type { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { EventManager } from './EventManager'
 import { EntityListState, EntityRealmState, getEntityMarker, StateNode, StateType } from './state'
-import { TreeStore } from './TreeStore'
+import type { TreeStore } from './TreeStore'
 
 export class AccessorErrorManager {
 	private errorsByState: Map<StateNode, ErrorAccessor.ErrorsById> = new Map()

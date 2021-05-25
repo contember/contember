@@ -1,6 +1,6 @@
-import { TreeRootAccessor } from '../accessors'
-import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
-import { RequestError } from './RequestError'
+import type { TreeRootAccessor } from '../accessors'
+import type { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
+import type { RequestError } from './RequestError'
 
 export type AccessorTreeStateAction =
 	| {

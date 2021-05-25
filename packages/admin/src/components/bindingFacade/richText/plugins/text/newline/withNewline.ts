@@ -1,5 +1,5 @@
 import { Transforms } from 'slate'
-import { BaseEditor } from '../../../baseEditor'
+import type { BaseEditor } from '../../../baseEditor'
 
 export const withNewline = <E extends BaseEditor>(editor: E): E => {
 	const { onKeyDown } = editor

@@ -1,10 +1,10 @@
 import { RuntimeId, ServerGeneratedUuid, SingleEntityPersistedData } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { EntityOperations } from '../core/operations'
-import { Environment } from '../dao'
+import type { EntityOperations } from '../core/operations'
+import type { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
-import {
+import type {
 	DesugaredRelativeEntityList,
 	DesugaredRelativeSingleEntity,
 	DesugaredRelativeSingleField,
@@ -20,14 +20,14 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 } from '../treeParameters'
-import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
-import { BatchUpdatesOptions } from './BatchUpdatesOptions'
-import { EntityListAccessor } from './EntityListAccessor'
-import { Errorable } from './Errorable'
-import { ErrorAccessor } from './ErrorAccessor'
-import { FieldAccessor } from './FieldAccessor'
-import { PersistErrorOptions } from './PersistErrorOptions'
-import { PersistSuccessOptions } from './PersistSuccessOptions'
+import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
+import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
+import type { EntityListAccessor } from './EntityListAccessor'
+import type { Errorable } from './Errorable'
+import type { ErrorAccessor } from './ErrorAccessor'
+import type { FieldAccessor } from './FieldAccessor'
+import type { PersistErrorOptions } from './PersistErrorOptions'
+import type { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityAccessor implements Errorable {
 	public constructor(

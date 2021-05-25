@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { createContext, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { Justification, Size } from '../../types'
+import type { Justification, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 import { Box } from '../Box'
 

@@ -16,7 +16,7 @@ import {
 	withTables,
 	withUnderline,
 } from '../plugins'
-import { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
+import type { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
 import { defaultEditorPluginPreset } from './presets'
 
 const pluginAugmenters: {

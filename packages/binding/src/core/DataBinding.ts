@@ -1,5 +1,5 @@
-import { GraphQlClient, TreeFilter } from '@contember/client'
-import { ReactNode } from 'react'
+import type { GraphQlClient, TreeFilter } from '@contember/client'
+import type { ReactNode } from 'react'
 import {
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
@@ -18,9 +18,9 @@ import {
 	RequestError,
 	SuccessfulPersistResult,
 } from '../accessorTree'
-import { Environment } from '../dao'
-import { MarkerTreeRoot } from '../markers'
-import { TreeRootId } from '../treeParameters'
+import type { Environment } from '../dao'
+import type { MarkerTreeRoot } from '../markers'
+import type { TreeRootId } from '../treeParameters'
 import { assertNever, generateEnumerabilityPreventingEntropy } from '../utils'
 import { AccessorErrorManager } from './AccessorErrorManager'
 import { Config } from './Config'
@@ -37,7 +37,7 @@ import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
 import { TreeStore } from './TreeStore'
-import { UpdateMetadata } from './UpdateMetadata'
+import type { UpdateMetadata } from './UpdateMetadata'
 import { getCombinedSignal } from './utils'
 
 export class DataBinding {

@@ -1,4 +1,4 @@
-import { DetailedHTMLProps, FunctionComponent, InputHTMLAttributes } from 'react'
+import type { DetailedHTMLProps, FunctionComponent, InputHTMLAttributes } from 'react'
 
 export interface FileInputProps {
 	onChange?: DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>['onChange']

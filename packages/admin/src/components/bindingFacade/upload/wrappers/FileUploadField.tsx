@@ -1,6 +1,6 @@
 import { Component } from '@contember/binding'
-import { FunctionComponent } from 'react'
-import { SimpleRelativeSingleFieldProps } from '../../auxiliary'
+import type { FunctionComponent } from 'react'
+import type { SimpleRelativeSingleFieldProps } from '../../auxiliary'
 import { UploadField, UploadFieldRenderingProps } from '../core'
 import {
 	FileDataPopulator,

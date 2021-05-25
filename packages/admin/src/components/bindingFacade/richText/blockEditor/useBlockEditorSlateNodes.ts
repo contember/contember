@@ -1,15 +1,15 @@
 import { BindingError, EntityAccessor, FieldAccessor, RelativeSingleField } from '@contember/binding'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Editor, Element as SlateElement, PathRef } from 'slate'
-import { ElementNode } from '../baseEditor'
-import { BlockSlateEditor } from './editor'
+import type { ElementNode } from '../baseEditor'
+import type { BlockSlateEditor } from './editor'
 import {
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
 	ContemberFieldElement,
 	contemberFieldElementType,
 } from './elements'
-import { FieldBackedElement } from './FieldBackedElement'
+import type { FieldBackedElement } from './FieldBackedElement'
 
 export interface UseBlockEditorSlateNodesOptions {
 	editor: BlockSlateEditor

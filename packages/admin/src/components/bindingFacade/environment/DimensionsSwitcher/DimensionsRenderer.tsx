@@ -2,11 +2,11 @@ import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@con
 import { emptyArray } from '@contember/react-utils'
 import { Button, ButtonBasedButtonProps, ButtonGroup, Checkbox, Dropdown } from '@contember/ui'
 import { Fragment, ReactNode, useEffect } from 'react'
-import { RequestChange } from '../../../../state/request'
+import type { RequestChange } from '../../../../state/request'
 import { Link } from '../../../Link'
 import { useRedirect } from '../../../pageRouting'
 import { renderByJoining } from './renderByJoining'
-import { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
+import type { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
 
 export interface DimensionsRendererProps {
 	accessor: EntityListAccessor

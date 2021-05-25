@@ -1,12 +1,12 @@
 import { ComponentType, createElement, FunctionComponent, ReactElement } from 'react'
-import { BuiltinElements } from './BuiltinElements'
-import { RenderChildrenOptions } from './renderChildren'
+import type { BuiltinElements } from './BuiltinElements'
+import type { RenderChildrenOptions } from './renderChildren'
 import { RenderElementFallback, RenderElementFallbackProps } from './RenderElementFallback'
 import { resolveRichTextElementMetadata } from './resolveRichTextElementMetadata'
-import { RichTextElement } from './RichTextElement'
-import { RichTextElementMetadata } from './RichTextElementMetadata'
-import { RichTextLeaf } from './RichTextLeaf'
-import { RichTextReference } from './RichTextReference'
+import type { RichTextElement } from './RichTextElement'
+import type { RichTextElementMetadata } from './RichTextElementMetadata'
+import type { RichTextLeaf } from './RichTextLeaf'
+import type { RichTextReference } from './RichTextReference'
 import { useRichTextRenderMetadata } from './RichTextRenderMetadataContext'
 
 export type RenderElement<

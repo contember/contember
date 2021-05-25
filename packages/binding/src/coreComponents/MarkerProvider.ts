@@ -1,6 +1,6 @@
-import { ReactElement } from 'react'
-import { Environment } from '../dao'
-import {
+import type { ReactElement } from 'react'
+import type { Environment } from '../dao'
+import type {
 	EntityFieldMarkersContainer,
 	EntityFieldsWithHoistablesMarker,
 	FieldMarker,

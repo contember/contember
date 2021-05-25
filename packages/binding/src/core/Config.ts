@@ -1,4 +1,4 @@
-import { BindingConfig } from '../accessors'
+import type { BindingConfig } from '../accessors'
 
 export class Config {
 	private static defaultConfig: BindingConfig = {

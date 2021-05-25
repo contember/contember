@@ -1,6 +1,6 @@
-import { ElementType } from 'react'
+import type { ElementType } from 'react'
 import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError'
-import { BranchNodeOptions } from './BranchNodeOptions'
+import type { BranchNodeOptions } from './BranchNodeOptions'
 import {
 	ChildrenRepresentationReducer,
 	RepresentationFactorySite,

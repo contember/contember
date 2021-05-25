@@ -1,4 +1,4 @@
-import { FieldAccessor } from '@contember/binding'
+import type { FieldAccessor } from '@contember/binding'
 import { SingleLineTextInputProps, TextInput } from '@contember/ui'
 import { FocusEvent as ReactFocusEvent, forwardRef, memo, Ref, useMemo } from 'react'
 import DatePicker, { ReactDatePickerProps } from 'react-datepicker'

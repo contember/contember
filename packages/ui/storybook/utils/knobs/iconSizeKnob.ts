@@ -1,5 +1,5 @@
 import { radios } from '@storybook/addon-knobs'
-import { IconSize } from '../../../src/types'
+import type { IconSize } from '../../../src/types'
 
 export const iconSizeKnob = (): IconSize | undefined =>
 	radios(

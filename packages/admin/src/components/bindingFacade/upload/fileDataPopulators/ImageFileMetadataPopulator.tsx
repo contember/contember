@@ -1,6 +1,6 @@
 import { QueryLanguage, SugaredField, SugaredFieldProps } from '@contember/binding'
 import { isImage } from '../utils'
-import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
+import type { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
 
 export interface ImageFileMetadataPopulatorProps {
 	imageWidthField?: SugaredFieldProps['field']

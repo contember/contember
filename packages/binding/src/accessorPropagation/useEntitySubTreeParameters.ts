@@ -1,6 +1,6 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { useMemo } from 'react'
-import { Alias, SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
+import type { Alias, SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '../treeParameters'
 
 export function useEntitySubTreeParameters(alias: Alias): Alias
 export function useEntitySubTreeParameters(

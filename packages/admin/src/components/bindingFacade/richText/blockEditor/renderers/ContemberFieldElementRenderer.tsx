@@ -5,8 +5,8 @@ import { Node as SlateNode, Path as SlatePath } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor } from 'slate-react'
 import { AccessorErrors } from '../../../errors'
 import { BlockElement } from '../../baseEditor'
-import { ContemberFieldElement } from '../elements'
-import { FieldBackedElement } from '../FieldBackedElement'
+import type { ContemberFieldElement } from '../elements'
+import type { FieldBackedElement } from '../FieldBackedElement'
 
 export interface ContemberFieldElementRendererProps extends RenderElementProps {
 	element: ContemberFieldElement

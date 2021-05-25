@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { ButtonHTMLAttributes, createElement, forwardRef, memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { ButtonDistinction, ButtonFlow, Intent, Justification, Size } from '../../types'
+import type { ButtonDistinction, ButtonFlow, Intent, Justification, Size } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 import { Spinner } from '../Spinner'
 

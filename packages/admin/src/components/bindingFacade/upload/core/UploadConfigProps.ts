@@ -1,4 +1,4 @@
-import { FileUploader } from '@contember/client'
+import type { FileUploader } from '@contember/client'
 
 export interface UploadConfigProps {
 	accept?: string | string[]

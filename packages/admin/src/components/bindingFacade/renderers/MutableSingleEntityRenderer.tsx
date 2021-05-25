@@ -1,5 +1,5 @@
 import { Component, Entity, EntityAccessor } from '@contember/binding'
-import { FunctionComponent } from 'react'
+import type { FunctionComponent } from 'react'
 import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
 
 export interface MutableSingleEntityRendererProps extends MutableContentLayoutRendererProps {

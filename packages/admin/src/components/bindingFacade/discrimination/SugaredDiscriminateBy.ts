@@ -1,3 +1,3 @@
-import { OptionallyVariableFieldValue } from '@contember/binding'
+import type { OptionallyVariableFieldValue } from '@contember/binding'
 
 export type SugaredDiscriminateBy = OptionallyVariableFieldValue

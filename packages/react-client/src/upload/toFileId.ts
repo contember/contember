@@ -1,5 +1,5 @@
-import { FileId } from './FileId'
-import { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
+import type { FileId } from './FileId'
+import type { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 
 export const toFileId = (state: FileUploadMultiTemporalState, fileOrId: File | FileId) => {
 	if (fileOrId instanceof File) {

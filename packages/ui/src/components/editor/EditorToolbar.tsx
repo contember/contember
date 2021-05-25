@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { useCallback, memo, forwardRef } from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { HoveringToolbarScope } from '../../types'
+import type { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 import { Dropdown, DropdownProps } from '../Dropdown'
 import { EditorToolbarButton, ToolbarButton, ToolbarButtonLayout } from './EditorToolbarButton'

@@ -1,5 +1,5 @@
 import { Node as SlateNode, NodeEntry, Path as SlatePath } from 'slate'
-import { BaseEditor, ElementNode, ElementSpecifics } from '../../baseEditor'
+import type { BaseEditor, ElementNode, ElementSpecifics } from '../../baseEditor'
 import { ContemberEditor } from '../index'
 
 export const hasParentOfType = <Editor extends BaseEditor, Element extends ElementNode>(

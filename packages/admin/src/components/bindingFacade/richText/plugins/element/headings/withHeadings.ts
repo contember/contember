@@ -9,9 +9,9 @@ import {
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
-import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { EditorWithHeadings, WithHeadings } from './EditorWithHeadings'
+import type { EditorWithHeadings, WithHeadings } from './EditorWithHeadings'
 import { HeadingElement, headingElementType } from './HeadingElement'
 import { HeadingRenderer, HeadingRendererProps } from './HeadingRenderer'
 

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { ContemberLogo } from './ContemberLogo'
 

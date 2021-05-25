@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { forwardRef, memo, ReactNode } from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { HoveringToolbarScope } from '../../types'
+import type { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass } from '../../utils'
 
 export interface HoveringToolbarProps {

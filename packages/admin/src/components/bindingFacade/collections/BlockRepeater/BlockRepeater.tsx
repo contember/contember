@@ -1,5 +1,5 @@
 import { Component, SugaredFieldProps } from '@contember/binding'
-import { FunctionComponent } from 'react'
+import type { FunctionComponent } from 'react'
 import { DiscriminatedBlocks, useNormalizedBlocks } from '../../blocks'
 import { Repeater, RepeaterProps } from '../Repeater'
 import { AddNewBlockButton } from './AddNewBlockButton'

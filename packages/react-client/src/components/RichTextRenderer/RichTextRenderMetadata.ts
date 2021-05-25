@@ -1,7 +1,7 @@
-import { ReferenceRenderer } from './ReferenceRenderer'
-import { RichTextElement } from './RichTextElement'
-import { RichTextLeaf } from './RichTextLeaf'
-import { RichTextReference } from './RichTextReference'
+import type { ReferenceRenderer } from './ReferenceRenderer'
+import type { RichTextElement } from './RichTextElement'
+import type { RichTextLeaf } from './RichTextLeaf'
+import type { RichTextReference } from './RichTextReference'
 
 export interface RichTextRenderMetadata<
 	CustomElements extends RichTextElement = never,

@@ -1,6 +1,6 @@
 import { boolean, number } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { FilePreview, UploadProgress } from '../../src'
 
 const dummyImg = <img src="http://placekitten.com/200/300" />

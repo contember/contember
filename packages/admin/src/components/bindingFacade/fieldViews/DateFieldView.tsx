@@ -1,5 +1,5 @@
 import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import { FunctionComponent, ReactNode } from 'react'
+import type { FunctionComponent, ReactNode } from 'react'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 
 export type DateFieldViewProps = {

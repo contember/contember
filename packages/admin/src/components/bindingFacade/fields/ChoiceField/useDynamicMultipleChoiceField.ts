@@ -18,7 +18,7 @@ import {
 	useOptionEntities,
 	useTopLevelOptionAccessors,
 } from './BaseDynamicChoiceField'
-import { ChoiceFieldData } from './ChoiceFieldData'
+import type { ChoiceFieldData } from './ChoiceFieldData'
 
 export type DynamicMultipleChoiceFieldProps = SugaredRelativeEntityList & BaseDynamicChoiceField
 

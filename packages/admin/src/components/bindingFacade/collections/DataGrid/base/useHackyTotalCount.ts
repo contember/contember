@@ -1,4 +1,4 @@
-import { EntityName, Filter } from '@contember/binding'
+import type { EntityName, Filter } from '@contember/binding'
 import { GraphQlBuilder } from '@contember/client'
 import { useContentApiRequest } from '@contember/react-client'
 import { useEffect, useRef } from 'react'

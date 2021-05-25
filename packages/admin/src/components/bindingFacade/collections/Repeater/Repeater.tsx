@@ -1,5 +1,5 @@
 import { BindingError, Component, HasMany, SugaredRelativeEntityList, useEntityList } from '@contember/binding'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { RepeaterInner, RepeaterInnerProps } from './RepeaterInner'
 
 export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>

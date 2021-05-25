@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
-import { DataGridColumns, DataGridOrderDirectionStore, DataGridSetColumnOrderBy } from '../base'
-import { GridPagingAction } from '../paging'
+import type { DataGridColumns, DataGridOrderDirectionStore, DataGridSetColumnOrderBy } from '../base'
+import type { GridPagingAction } from '../paging'
 import { normalizeInitialOrderBys } from './normalizeInitialOrderBys'
 
 export const useOrderBys = (

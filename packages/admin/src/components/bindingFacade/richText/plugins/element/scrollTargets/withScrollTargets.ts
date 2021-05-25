@@ -1,7 +1,7 @@
 import { createElement } from 'react'
 import { Editor, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
-import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
-import { EditorWithScrollTargets, WithScrollTargets } from './EditorWithScrollTargets'
+import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import type { EditorWithScrollTargets, WithScrollTargets } from './EditorWithScrollTargets'
 import { ScrollTargetElement, scrollTargetElementType } from './ScrollTargetElement'
 import { ScrollTargetRenderer, ScrollTargetRendererProps } from './ScrollTargetRenderer'
 

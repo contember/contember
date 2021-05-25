@@ -6,7 +6,7 @@ import {
 } from '@contember/binding'
 import { memo, ReactElement, ReactNode } from 'react'
 import { FeedbackRenderer, MultiEditRenderer, MultiEditRendererProps } from '../bindingFacade/renderers'
-import { PageProvider } from './PageProvider'
+import type { PageProvider } from './PageProvider'
 
 export interface MultiEditPageProps<ContainerExtraProps, ItemExtraProps>
 	extends SugaredQualifiedEntityList,

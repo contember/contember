@@ -1,6 +1,6 @@
 import { emptyObject } from '@contember/react-utils'
 import { TreeParameterMerger, VariableInputTransformer } from '../core'
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import {
 	Alias,
 	DesugaredHasManyRelation,

@@ -1,4 +1,4 @@
-import { RichTextLeaf } from './RichTextLeaf'
+import type { RichTextLeaf } from './RichTextLeaf'
 
 export type BuiltinLeaves = RichTextBoldLeaf &
 	RichTextCodeLeaf &

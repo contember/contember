@@ -1,10 +1,10 @@
-import { ReactElement } from 'react'
-import { BuiltinElements } from './BuiltinElements'
-import { BuiltinLeaves } from './BuiltinLeaves'
+import type { ReactElement } from 'react'
+import type { BuiltinElements } from './BuiltinElements'
+import type { BuiltinLeaves } from './BuiltinLeaves'
 import { ElementRenderer, RenderElement } from './ElementRenderer'
 import { LeafRenderer, RenderLeaf } from './LeafRenderer'
-import { RichTextElement } from './RichTextElement'
-import { RichTextLeaf } from './RichTextLeaf'
+import type { RichTextElement } from './RichTextElement'
+import type { RichTextLeaf } from './RichTextLeaf'
 
 export interface RenderChildrenOptions<
 	CustomElements extends RichTextElement = never,

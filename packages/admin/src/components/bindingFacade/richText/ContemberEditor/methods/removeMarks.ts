@@ -1,5 +1,5 @@
 import { Editor } from 'slate'
-import { BaseEditor, TextNode, TextSpecifics } from '../../baseEditor'
+import type { BaseEditor, TextNode, TextSpecifics } from '../../baseEditor'
 
 export const removeMarks = <T extends TextNode, E extends BaseEditor>(editor: E, marks: TextSpecifics<T>) => {
 	Editor.withoutNormalizing(editor, () => {

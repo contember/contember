@@ -1,4 +1,4 @@
-import { BranchNode, RawNodeRepresentation, ValidFactoryName } from './nodeSpecs'
+import type { BranchNode, RawNodeRepresentation, ValidFactoryName } from './nodeSpecs'
 
 export type BranchNodeList<LeavesRepresentationUnion, BranchNodesRepresentationUnion, StaticContext> = BranchNode<
 	any,

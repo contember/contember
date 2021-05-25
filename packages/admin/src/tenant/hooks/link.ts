@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { pushRequest } from '../../actions/request'
-import { PageChange } from '../../components/pageRouting/PageLink'
+import type { PageChange } from '../../components/pageRouting/PageLink'
 import routes from '../../routes'
-import State from '../../state'
-import { RequestChange } from '../../state/request'
+import type State from '../../state'
+import type { RequestChange } from '../../state/request'
 import { requestStateToPath, RouteMap } from '../../utils/url'
 
 interface UseLinkReturn {

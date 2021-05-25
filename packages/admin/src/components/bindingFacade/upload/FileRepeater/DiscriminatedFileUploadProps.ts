@@ -1,5 +1,5 @@
-import { SugaredDiscriminateBy } from '../../discrimination'
-import { SingleFileUploadProps } from '../core'
+import type { SugaredDiscriminateBy } from '../../discrimination'
+import type { SingleFileUploadProps } from '../core'
 
 export type DiscriminatedFileUploadProps = SingleFileUploadProps & {
 	discriminateBy?: SugaredDiscriminateBy

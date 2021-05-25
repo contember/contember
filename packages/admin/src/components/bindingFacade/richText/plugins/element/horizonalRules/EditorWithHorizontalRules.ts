@@ -1,5 +1,5 @@
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
-import { HorizontalRuleElement } from './HorizontalRuleElement'
+import type { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
+import type { HorizontalRuleElement } from './HorizontalRuleElement'
 
 export interface WithHorizontalRules<E extends WithAnotherNodeType<BaseEditor, HorizontalRuleElement>> {
 	isHorizontalRule: (element: ElementNode) => element is HorizontalRuleElement

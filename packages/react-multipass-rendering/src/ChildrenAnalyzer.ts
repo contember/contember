@@ -1,10 +1,10 @@
-import { ElementType, ReactNode } from 'react'
+import type { ElementType, ReactNode } from 'react'
 import { assertNever } from './assertNever'
-import { BranchNodeList } from './BranchNodeList'
+import type { BranchNodeList } from './BranchNodeList'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
-import { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
+import type { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
 import { getErrorMessage } from './helpers'
-import { LeafList } from './LeafList'
+import type { LeafList } from './LeafList'
 import {
 	DeclarationSiteNodeRepresentationFactory,
 	RawNodeRepresentation,

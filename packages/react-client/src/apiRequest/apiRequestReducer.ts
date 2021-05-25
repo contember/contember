@@ -1,6 +1,6 @@
-import { ApiRequestAction } from './ApiRequestAction'
+import type { ApiRequestAction } from './ApiRequestAction'
 import { ApiRequestActionType } from './ApiRequestActionType'
-import { ApiRequestState } from './ApiRequestState'
+import type { ApiRequestState } from './ApiRequestState'
 
 export type ApiRequestReducer<SuccessData> = (
 	previousState: ApiRequestState<SuccessData>,

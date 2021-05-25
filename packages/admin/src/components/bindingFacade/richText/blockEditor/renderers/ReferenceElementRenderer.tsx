@@ -6,10 +6,10 @@ import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-r
 import { BlockProps, getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
 import { getDiscriminatedDatum } from '../../../discrimination'
 import { BlockElement } from '../../baseEditor'
-import { BlockSlateEditor } from '../editor'
-import { ReferenceElement } from '../elements'
-import { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
-import { EditorReferenceBlocks } from '../templating'
+import type { BlockSlateEditor } from '../editor'
+import type { ReferenceElement } from '../elements'
+import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
+import type { EditorReferenceBlocks } from '../templating'
 
 export interface ReferenceElementRendererProps extends RenderElementProps {
 	element: ReferenceElement

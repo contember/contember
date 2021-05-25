@@ -1,7 +1,7 @@
-import { Action } from 'redux-actions'
-import { ThunkDispatch } from 'redux-thunk'
-import State from '../state'
-import { Services } from '../store'
+import type { Action } from 'redux-actions'
+import type { ThunkDispatch } from 'redux-thunk'
+import type State from '../state'
+import type { Services } from '../store'
 
 export type Dispatch<A extends Action<any> = Action<any>> = ThunkDispatch<State, Services, A>
 export type StateGetter = () => State

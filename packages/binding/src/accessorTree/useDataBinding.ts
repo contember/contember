@@ -5,13 +5,13 @@ import {
 } from '@contember/react-client'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { useEnvironment } from '../accessorPropagation'
-import { TreeRootAccessor } from '../accessors'
+import type { TreeRootAccessor } from '../accessors'
 import { DataBinding } from '../core'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
-import { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
+import type { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
-import { RequestError } from './RequestError'
+import type { RequestError } from './RequestError'
 
 const initialState: AccessorTreeState = {
 	name: AccessorTreeStateName.Initializing,

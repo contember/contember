@@ -1,4 +1,4 @@
-import { ToolbarButtonSpec } from '../../../toolbars'
+import type { ToolbarButtonSpec } from '../../../toolbars'
 import { strikeThroughMark } from './withStrikeThrough'
 
 export const strikeThroughToolbarButton: ToolbarButtonSpec = {

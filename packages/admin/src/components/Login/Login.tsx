@@ -5,7 +5,7 @@ import { ChangeEvent, FormEvent, memo, useCallback, useEffect, useMemo, useState
 import { useDispatch } from 'react-redux'
 import { createAction } from 'redux-actions'
 import { SET_IDENTITY } from '../../reducer/auth'
-import { AuthIdentity, Project } from '../../state/auth'
+import type { AuthIdentity, Project } from '../../state/auth'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { useRedirect } from '../pageRouting'
 

@@ -1,5 +1,5 @@
 import { QueryLanguage, SugaredField, SugaredFieldProps } from '@contember/binding'
-import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
+import type { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
 
 export interface GenericFileMetadataPopulatorProps {
 	fileNameField?: SugaredFieldProps['field']

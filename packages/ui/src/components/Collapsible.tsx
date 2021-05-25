@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { CSSProperties, memo, ReactNode, useEffect, useRef, useState } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
-import { CollapsibleTransition } from '../types'
+import type { CollapsibleTransition } from '../types'
 import { forceReflow, toEnumViewClass, toStateClass } from '../utils'
 
 export interface CollapsibleProps {

@@ -1,5 +1,5 @@
-import { FileUploader, FileUploadError } from '@contember/client'
-import { FileUploadReadyState } from './FileUploadReadyState'
+import type { FileUploader, FileUploadError } from '@contember/client'
+import type { FileUploadReadyState } from './FileUploadReadyState'
 
 export type SingleFileUploadState<Result = any, Error extends FileUploadError = FileUploadError> =
 	| {

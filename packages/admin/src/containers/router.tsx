@@ -1,7 +1,7 @@
 import { FunctionComponent, PureComponent } from 'react'
 import { connect } from 'react-redux'
-import State from '../state'
-import RequestState from '../state/request'
+import type State from '../state'
+import type RequestState from '../state/request'
 
 type RouteName = RequestState['name']
 type RequestByName<K extends RouteName, T = RequestState> = T extends { name: K } ? T : never

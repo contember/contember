@@ -1,9 +1,9 @@
-import { FieldValue, RelativeSingleField } from '@contember/binding'
+import type { FieldValue, RelativeSingleField } from '@contember/binding'
 import { Element as SlateElement, Node as SlateNode, Text } from 'slate'
-import { ResolvedDiscriminatedDatum } from '../../../discrimination'
+import type { ResolvedDiscriminatedDatum } from '../../../discrimination'
 import { ReferenceElement, referenceElementType } from '../elements'
-import { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertDataOptions {
 	embedHandlers: NormalizedEmbedHandlers | undefined

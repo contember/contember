@@ -1,7 +1,7 @@
 import { BindingError, QueryLanguage, SugaredField, SugaredFieldProps } from '@contember/binding'
-import { S3FileUploader } from '@contember/client'
+import type { S3FileUploader } from '@contember/client'
 import { isAudio, isImage, isVideo } from '../utils'
-import { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
+import type { FileDataPopulator, FileDataPopulatorOptions } from './FileDataPopulator'
 
 export interface FileUrlDataPopulatorProps {
 	fileUrlField?: SugaredFieldProps['field']

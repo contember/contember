@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import State from '../state'
+import type State from '../state'
 import Auth from './auth'
 import ProjectsConfigs from './projectsConfigs'
 import Request from './request'

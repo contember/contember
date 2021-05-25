@@ -1,5 +1,5 @@
 import pathToRegexp from 'path-to-regexp'
-import RequestState from '../state/request'
+import type RequestState from '../state/request'
 
 type RouteName = RequestState['name']
 type RequestByName<K extends RouteName, T = RequestState> = T extends { name: K } ? T : never

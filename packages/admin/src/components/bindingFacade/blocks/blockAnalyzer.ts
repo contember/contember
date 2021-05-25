@@ -1,4 +1,4 @@
-import { Environment } from '@contember/binding'
+import type { Environment } from '@contember/binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { Block, BlockProps } from './Block'
 

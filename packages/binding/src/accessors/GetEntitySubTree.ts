@@ -1,11 +1,11 @@
-import { Environment } from '../dao'
-import {
+import type { Environment } from '../dao'
+import type {
 	Alias,
 	SugaredQualifiedSingleEntity,
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '../treeParameters'
-import { EntityAccessor } from './EntityAccessor'
+import type { EntityAccessor } from './EntityAccessor'
 
 export type GetEntitySubTree = (
 	parametersOrAlias: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,

@@ -2,10 +2,10 @@ import { BatchUpdatesOptions, EntityAccessor, ErrorAccessor } from '../../access
 import { ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EntityFieldMarkersContainer, HasOneRelationMarker } from '../../markers'
-import { FieldName } from '../../treeParameters'
+import type { FieldName } from '../../treeParameters'
 import { assertNever } from '../../utils'
-import { AccessorErrorManager } from '../AccessorErrorManager'
-import { EventManager } from '../EventManager'
+import type { AccessorErrorManager } from '../AccessorErrorManager'
+import type { EventManager } from '../EventManager'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
 import { MarkerComparator } from '../MarkerComparator'
 import {
@@ -16,8 +16,8 @@ import {
 	StateIterator,
 	StateType,
 } from '../state'
-import { StateInitializer } from '../StateInitializer'
-import { TreeStore } from '../TreeStore'
+import type { StateInitializer } from '../StateInitializer'
+import type { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
 
 export class EntityOperations {

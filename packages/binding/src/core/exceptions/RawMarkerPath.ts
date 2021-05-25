@@ -1,3 +1,3 @@
-import { MeaningfulMarker } from '../../markers'
+import type { MeaningfulMarker } from '../../markers'
 
 export type RawMarkerPath = MeaningfulMarker[]

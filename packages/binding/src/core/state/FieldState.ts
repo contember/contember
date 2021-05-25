@@ -1,8 +1,8 @@
-import { ErrorAccessor, FieldAccessor } from '../../accessors'
-import { FieldMarker } from '../../markers'
-import { FieldEventListenerStore, FieldName, FieldValue, Scalar } from '../../treeParameters'
-import { EntityRealmState } from './EntityRealmState'
-import { StateType } from './StateType'
+import type { ErrorAccessor, FieldAccessor } from '../../accessors'
+import type { FieldMarker } from '../../markers'
+import type { FieldEventListenerStore, FieldName, FieldValue, Scalar } from '../../treeParameters'
+import type { EntityRealmState } from './EntityRealmState'
+import type { StateType } from './StateType'
 
 export interface FieldState {
 	type: StateType.Field

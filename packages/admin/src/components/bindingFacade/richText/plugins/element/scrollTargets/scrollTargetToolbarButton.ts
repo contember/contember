@@ -1,4 +1,4 @@
-import { ElementToolbarButton } from '../../../toolbars'
+import type { ElementToolbarButton } from '../../../toolbars'
 import { ScrollTargetElement, scrollTargetElementType } from './ScrollTargetElement'
 
 export const scrollTargetToolbarButton: ElementToolbarButton<ScrollTargetElement> = {

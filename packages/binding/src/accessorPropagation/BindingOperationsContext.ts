@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { BindingOperations } from '../accessors'
+import type { BindingOperations } from '../accessors'
 import { BindingError } from '../BindingError'
 
 const getRejecter = (operation: string) => () => {

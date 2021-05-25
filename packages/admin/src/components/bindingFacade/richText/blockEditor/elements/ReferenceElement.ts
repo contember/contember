@@ -1,5 +1,5 @@
 import { Element, Node } from 'slate'
-import { ElementWithReference } from './ElementWithReference'
+import type { ElementWithReference } from './ElementWithReference'
 
 type ReferenceElementType = 'reference'
 export const referenceElementType: ReferenceElementType = 'reference'

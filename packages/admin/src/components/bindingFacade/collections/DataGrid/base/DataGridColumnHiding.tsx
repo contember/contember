@@ -1,9 +1,9 @@
 import { Box, Checkbox, Dropdown, Icon } from '@contember/ui'
 import { Fragment, ReactElement } from 'react'
-import { MessageFormatter } from '../../../../../i18n'
-import { DataGridDictionary } from './dataGridDictionary'
-import { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
-import { DataGridState } from './DataGridState'
+import type { MessageFormatter } from '../../../../../i18n'
+import type { DataGridDictionary } from './dataGridDictionary'
+import type { DataGridSetIsColumnHidden } from './DataGridSetIsColumnHidden'
+import type { DataGridState } from './DataGridState'
 
 export interface DataGridColumnHidingProps {
 	desiredState: DataGridState

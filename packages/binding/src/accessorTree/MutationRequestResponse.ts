@@ -1,5 +1,5 @@
-import { Result } from '@contember/client'
-import { ReceivedEntityData } from './QueryRequestResponse'
+import type { Result } from '@contember/client'
+import type { ReceivedEntityData } from './QueryRequestResponse'
 
 export interface FieldPathErrorFragment {
 	__typename: '_FieldPathFragment'

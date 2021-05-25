@@ -1,5 +1,6 @@
-import { RichTextElement } from './RichTextElement'
-import { RichTextLeaf } from './RichTextLeaf'
+import type { RichTextElement } from './RichTextElement'
+import type { RichTextLeaf } from './RichTextLeaf'
+
 export type BuiltinElements<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never

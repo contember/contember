@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 import { ImmutableEntityListRenderer, ImmutableEntityListRendererProps } from './ImmutableEntityListRenderer'
 

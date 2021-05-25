@@ -1,5 +1,5 @@
-import { EditorNode, ElementNode, TextNode } from '../Node'
-import { WithEssentials } from '../EditorWithEssentials'
+import type { EditorNode, ElementNode, TextNode } from '../Node'
+import type { WithEssentials } from '../EditorWithEssentials'
 import { Transforms } from 'slate'
 
 type Children = (ElementNode | TextNode)[]

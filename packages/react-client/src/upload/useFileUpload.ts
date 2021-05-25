@@ -1,12 +1,12 @@
 import { S3FileUploader, UploadedFileMetadata } from '@contember/client'
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { useCurrentContentGraphQlClient } from '../content'
-import { FileId } from './FileId'
+import type { FileId } from './FileId'
 import { FileUploadActionType } from './FileUploadActionType'
-import { FileUploadCompoundState } from './FileUploadCompoundState'
-import { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
+import type { FileUploadCompoundState } from './FileUploadCompoundState'
+import type { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
-import { FileWithMetadata } from './FileWithMetadata'
+import type { FileWithMetadata } from './FileWithMetadata'
 import { toFileId } from './toFileId'
 
 export type FileUpload = [FileUploadCompoundState, FileUploadOperations]

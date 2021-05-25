@@ -18,8 +18,8 @@ import {
 	resolvePopulators,
 	useResolvedPopulators,
 } from '../fileDataPopulators'
-import { SingleFileUploadProps } from './SingleFileUploadProps'
-import { UploadConfigProps } from './UploadConfigProps'
+import type { SingleFileUploadProps } from './SingleFileUploadProps'
+import type { UploadConfigProps } from './UploadConfigProps'
 import { UploadedFilePreview } from './UploadedFilePreview'
 import { UploadingFilePreview } from './UploadingFilePreview'
 

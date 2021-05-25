@@ -1,8 +1,8 @@
-import { DiscriminatedAudioFileUploadProps } from './DiscriminatedAudioFileUploadProps'
-import { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
-import { DiscriminatedGenericFileUploadProps } from './DiscriminatedGenericFileUploadProps'
-import { DiscriminatedImageFileUploadProps } from './DiscriminatedImageFileUploadProps'
-import { DiscriminatedVideoFileUploadProps } from './DiscriminatedVideoFileUploadProps'
+import type { DiscriminatedAudioFileUploadProps } from './DiscriminatedAudioFileUploadProps'
+import type { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
+import type { DiscriminatedGenericFileUploadProps } from './DiscriminatedGenericFileUploadProps'
+import type { DiscriminatedImageFileUploadProps } from './DiscriminatedImageFileUploadProps'
+import type { DiscriminatedVideoFileUploadProps } from './DiscriminatedVideoFileUploadProps'
 
 export type StockFileKindProps = {
 	additionalFileKinds?: Iterable<DiscriminatedFileUploadProps>

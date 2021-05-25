@@ -1,11 +1,11 @@
 import { BindingError } from '../../BindingError'
-import {
+import type {
 	EntityListSubTreeMarker,
 	EntitySubTreeMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 } from '../../markers'
-import { RawMarkerPath } from './RawMarkerPath'
+import type { RawMarkerPath } from './RawMarkerPath'
 
 export class LocalizedBindingError extends BindingError {
 	public constructor(message: string, public readonly markerPath: RawMarkerPath) {

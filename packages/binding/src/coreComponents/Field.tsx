@@ -1,8 +1,8 @@
 import { GraphQlBuilder } from '@contember/client'
-import { ReactElement, ReactNode } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import { useField } from '../accessorPropagation'
 import { MarkerFactory } from '../queryLanguage'
-import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
+import type { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 import { Component } from './Component'
 
 export interface FieldBasicProps extends SugaredRelativeSingleField {}

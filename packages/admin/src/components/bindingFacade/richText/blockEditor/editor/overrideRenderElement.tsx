@@ -5,14 +5,14 @@ import {
 	RelativeEntityList,
 	RelativeSingleField,
 } from '@contember/binding'
-import { MutableRefObject } from 'react'
-import { NormalizedBlocks } from '../../../blocks'
+import type { MutableRefObject } from 'react'
+import type { NormalizedBlocks } from '../../../blocks'
 import { isElementWithReference } from '../elements'
-import { NormalizedEmbedHandlers } from '../embed'
-import { FieldBackedElement } from '../FieldBackedElement'
+import type { NormalizedEmbedHandlers } from '../embed'
+import type { FieldBackedElement } from '../FieldBackedElement'
 import { BlockEditorElementRenderer } from '../renderers'
-import { EditorReferenceBlocks } from '../templating'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorReferenceBlocks } from '../templating'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideRenderElementOptions {
 	editorReferenceBlocks: EditorReferenceBlocks

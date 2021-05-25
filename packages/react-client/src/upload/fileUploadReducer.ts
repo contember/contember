@@ -1,8 +1,8 @@
 import { assertNever } from '../utils'
-import { FileId } from './FileId'
-import { FileUploadAction } from './FileUploadAction'
+import type { FileId } from './FileId'
+import type { FileUploadAction } from './FileUploadAction'
 import { FileUploadActionType } from './FileUploadActionType'
-import { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
+import type { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 import { FileUploadReadyState } from './FileUploadReadyState'
 import { toFileId } from './toFileId'
 

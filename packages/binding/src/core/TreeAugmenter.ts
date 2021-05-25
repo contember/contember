@@ -7,14 +7,14 @@ import {
 	UnpersistedEntityDummyId,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { MarkerTreeRoot } from '../markers'
-import { EntityId, PlaceholderName, TreeRootId } from '../treeParameters'
+import type { MarkerTreeRoot } from '../markers'
+import type { EntityId, PlaceholderName, TreeRootId } from '../treeParameters'
 import { assertNever } from '../utils'
 import { EventManager } from './EventManager'
 import { OperationsHelpers } from './operations/OperationsHelpers'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode, StateType } from './state'
-import { StateInitializer } from './StateInitializer'
-import { TreeStore } from './TreeStore'
+import type { StateInitializer } from './StateInitializer'
+import type { TreeStore } from './TreeStore'
 
 export class TreeAugmenter {
 	public constructor(

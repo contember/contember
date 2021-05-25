@@ -1,8 +1,8 @@
-import { FieldValue } from '@contember/binding'
+import type { FieldValue } from '@contember/binding'
 import { ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { MenuListComponentProps } from 'react-select'
+import type { MenuListComponentProps } from 'react-select'
 import { ListChildComponentProps, VariableSizeList } from 'react-window'
-import { ChoiceFieldData } from '../ChoiceField'
+import type { ChoiceFieldData } from '../ChoiceField'
 
 export function VirtualizedMenuList(
 	props: MenuListComponentProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean>,

@@ -1,6 +1,6 @@
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import {
 	EntityFieldMarkers,
 	EntityFieldMarkersContainer,
@@ -14,7 +14,7 @@ import {
 	MeaningfulMarker,
 	SubTreeMarkers,
 } from '../markers'
-import { Alias, FieldName, PlaceholderName } from '../treeParameters'
+import type { Alias, FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { TreeParameterMerger } from './TreeParameterMerger'
 

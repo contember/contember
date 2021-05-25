@@ -1,8 +1,8 @@
 import { createElement } from 'react'
 import { Editor, Element as SlateElement, Node as SlateNode, Point, Range as SlateRange, Transforms } from 'slate'
-import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { EditorWithParagraphs, WithParagraphs } from './EditorWithParagraphs'
+import type { EditorWithParagraphs, WithParagraphs } from './EditorWithParagraphs'
 import { ParagraphElement, paragraphElementType } from './ParagraphElement'
 import { ParagraphRenderer, ParagraphRendererProps } from './ParagraphRenderer'
 

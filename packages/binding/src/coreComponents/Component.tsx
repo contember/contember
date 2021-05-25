@@ -1,7 +1,7 @@
 import { FunctionComponent, memo, NamedExoticComponent, ReactElement } from 'react'
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import { assertNever } from '../utils'
-import { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from './MarkerProvider'
+import type { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } from './MarkerProvider'
 
 function Component<Props extends {}>(
 	statelessRender: FunctionComponent<Props>,

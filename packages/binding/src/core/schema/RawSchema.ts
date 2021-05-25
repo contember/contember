@@ -1,5 +1,5 @@
-import { RawSchemaEntity } from './RawSchemaEntity'
-import { RawSchemaEnum } from './RawSchemaEnum'
+import type { RawSchemaEntity } from './RawSchemaEntity'
+import type { RawSchemaEnum } from './RawSchemaEnum'
 
 export interface RawSchema {
 	enums: RawSchemaEnum[]

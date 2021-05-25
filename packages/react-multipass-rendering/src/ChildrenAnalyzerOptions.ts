@@ -1,4 +1,4 @@
-import { ErrorMessageFactory } from './ErrorMessageFactory'
+import type { ErrorMessageFactory } from './ErrorMessageFactory'
 
 export interface ChildrenAnalyzerOptions<StaticContext = any> {
 	ignoreRenderProps: boolean

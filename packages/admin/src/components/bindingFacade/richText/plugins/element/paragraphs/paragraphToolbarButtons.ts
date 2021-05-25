@@ -1,4 +1,4 @@
-import { ElementToolbarButton } from '../../../toolbars'
+import type { ElementToolbarButton } from '../../../toolbars'
 import { ParagraphElement, paragraphElementType } from './ParagraphElement'
 
 export const paragraphToolbarButton: ElementToolbarButton<ParagraphElement> = {

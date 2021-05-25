@@ -1,5 +1,5 @@
-import { GraphQlClient } from '@contember/client'
-import { RawSchema } from './RawSchema'
+import type { GraphQlClient } from '@contember/client'
+import type { RawSchema } from './RawSchema'
 import { Schema } from './Schema'
 import { SchemaPreprocessor } from './SchemaPreprocessor'
 

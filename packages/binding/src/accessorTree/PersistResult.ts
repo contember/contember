@@ -1,4 +1,4 @@
-import { RequestError } from './RequestError'
+import type { RequestError } from './RequestError'
 
 export enum PersistResultSuccessType {
 	NothingToPersist = 'nothingToPersist',

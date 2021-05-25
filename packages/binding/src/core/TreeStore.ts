@@ -1,9 +1,9 @@
 import { NormalizedPersistedData, ReceivedDataTree } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
-import {
+import type {
 	Alias,
 	EntityId,
 	EntityRealmKey,
@@ -16,7 +16,7 @@ import {
 } from '../treeParameters'
 import { MarkerComparator } from './MarkerComparator'
 import { RequestResponseNormalizer } from './RequestResponseNormalizer'
-import { Schema } from './schema'
+import type { Schema } from './schema'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode, StateType } from './state'
 
 export class TreeStore {

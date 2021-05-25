@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { MutableContentLayoutRenderer, MutableContentLayoutRendererProps } from './MutableContentLayoutRenderer'
 import { MutableEntityListRenderer, MutableEntityListRendererProps } from './MutableEntityListRenderer'
 

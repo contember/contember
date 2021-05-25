@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { ChangeEventHandler, createElement, forwardRef, memo, Ref } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 import { useComponentClassName } from '../../auxiliary'
-import { ControlDistinction, Size, ValidationState } from '../../types'
+import type { ControlDistinction, Size, ValidationState } from '../../types'
 import { toEnumStateClass, toEnumViewClass, toViewClass } from '../../utils'
 
 type PropBlackList = 'onChange' | 'ref' | 'defaultValue' | 'size'

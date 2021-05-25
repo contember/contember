@@ -1,7 +1,7 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useEntity } from '../accessorPropagation'
-import { EntityAccessor } from '../accessors'
-import { SugaredRelativeSingleEntity } from '../treeParameters'
+import type { EntityAccessor } from '../accessors'
+import type { SugaredRelativeSingleEntity } from '../treeParameters'
 
 export interface EntityViewProps {
 	render: (entity: EntityAccessor) => ReactNode

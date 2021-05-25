@@ -1,5 +1,5 @@
-import { VariableFieldValue } from '../../dao'
-import { Scalar } from './Scalar'
+import type { VariableFieldValue } from '../../dao'
+import type { Scalar } from './Scalar'
 
 export type FieldValue = Scalar
 

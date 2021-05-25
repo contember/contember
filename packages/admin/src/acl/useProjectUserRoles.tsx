@@ -1,5 +1,5 @@
 import { shallowEqual, useSelector } from 'react-redux'
-import State from '../state'
+import type State from '../state'
 
 export type ProjectUserRoles = Set<string>
 

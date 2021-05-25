@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { FunctionComponent, ReactNode } from 'react'
+import type { FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../i18n'
 import { fieldViewDictionary } from './fieldViewDictionary'
 

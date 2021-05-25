@@ -1,5 +1,5 @@
 import { ComponentType, createElement, ReactElement, ReactNode } from 'react'
-import { EntityListAccessor } from '../accessors'
+import type { EntityListAccessor } from '../accessors'
 import { Component } from './Component'
 import { Entity, EntityBaseProps } from './Entity'
 

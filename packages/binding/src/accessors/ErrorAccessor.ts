@@ -1,4 +1,4 @@
-import { Result } from '@contember/client'
+import type { Result } from '@contember/client'
 
 class ErrorAccessor {
 	public readonly validation: ErrorAccessor.ValidationErrors | undefined

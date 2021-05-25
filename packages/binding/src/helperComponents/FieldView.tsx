@@ -1,11 +1,11 @@
 import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import { ReactElement, ReactNode, useCallback, useMemo } from 'react'
 import { useEntity } from '../accessorPropagation'
-import { FieldAccessor } from '../accessors'
+import type { FieldAccessor } from '../accessors'
 import { throwBindingError } from '../BindingError'
 import { Component } from '../coreComponents'
 import { QueryLanguage } from '../queryLanguage'
-import { FieldValue, RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
+import type { FieldValue, RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
 import { SugaredField } from './SugaredField'
 
 interface FieldViewCommonProps {

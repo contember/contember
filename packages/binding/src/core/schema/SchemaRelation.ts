@@ -1,5 +1,5 @@
-import { EntityName, FieldName } from '../../treeParameters'
-import { SchemaRelationOrderBy } from './SchemaRelationOrderBy'
+import type { EntityName, FieldName } from '../../treeParameters'
+import type { SchemaRelationOrderBy } from './SchemaRelationOrderBy'
 
 export interface BaseRelation {
 	__typename: '_Relation'

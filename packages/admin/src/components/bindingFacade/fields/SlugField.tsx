@@ -11,7 +11,7 @@ import {
 import { FormGroup, isSpecialLinkClick, TextInput } from '@contember/ui'
 import slugify from '@sindresorhus/slugify'
 import { FunctionComponent, useCallback, useMemo } from 'react'
-import { SimpleRelativeSingleFieldProps } from '../auxiliary'
+import type { SimpleRelativeSingleFieldProps } from '../auxiliary'
 import { ConcealableField, ConcealableFieldProps } from '../ui'
 
 export type SlugFieldProps = Pick<ConcealableFieldProps, 'buttonProps' | 'concealTimeout'> &

@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { FunctionComponent, ReactNode } from 'react'
+import type { FunctionComponent, ReactNode } from 'react'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps } from '../base'
 
 export type GenericCellProps = DataGridHeaderCellPublicProps &

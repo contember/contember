@@ -1,4 +1,4 @@
-import { DataGridColumnKey } from './DataGridColumnKey'
-import { DataGridFilterArtifact } from './DataGridFilterArtifact'
+import type { DataGridColumnKey } from './DataGridColumnKey'
+import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
 
 export type DataGridFilterArtifactStore = Map<DataGridColumnKey, DataGridFilterArtifact>

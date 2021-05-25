@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
-import { FileUrlDataPopulatorProps } from '../fileDataPopulators'
+import type { FileUrlDataPopulatorProps } from '../fileDataPopulators'
 import { getAudioFileDefaults, getImageFileDefaults, getVideoFileDefaults } from '../stockFileKindDefaults'
-import { CustomFileKindProps } from './CustomFileKindProps'
-import { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
-import { StockFileKindProps } from './StockFileKindProps'
+import type { CustomFileKindProps } from './CustomFileKindProps'
+import type { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
+import type { StockFileKindProps } from './StockFileKindProps'
 
 export type ResolvableFileKindProps = CustomFileKindProps | StockFileKindProps
 

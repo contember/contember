@@ -1,4 +1,4 @@
-import { DataGridColumns, DataGridOrderDirectionStore } from '../base'
+import type { DataGridColumns, DataGridOrderDirectionStore } from '../base'
 
 export const normalizeInitialOrderBys = (columns: DataGridColumns): DataGridOrderDirectionStore => {
 	const orderBys: DataGridOrderDirectionStore = new Map()

@@ -1,5 +1,5 @@
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
-import { AccessorTreeStateAction } from './AccessorTreeStateAction'
+import type { AccessorTreeStateAction } from './AccessorTreeStateAction'
 import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 
 export const accessorTreeStateReducer = (

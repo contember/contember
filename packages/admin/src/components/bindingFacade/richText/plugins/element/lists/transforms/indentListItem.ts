@@ -7,12 +7,12 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import { BaseEditor } from '../../../../baseEditor'
+import type { BaseEditor } from '../../../../baseEditor'
 import { ContemberEditor } from '../../../../ContemberEditor'
-import { EditorWithLists } from '../EditorWithLists'
-import { ListItemElement } from '../ListItemElement'
-import { OrderedListElement } from '../OrderedListElement'
-import { UnorderedListElement } from '../UnorderedListElement'
+import type { EditorWithLists } from '../EditorWithLists'
+import type { ListItemElement } from '../ListItemElement'
+import type { OrderedListElement } from '../OrderedListElement'
+import type { UnorderedListElement } from '../UnorderedListElement'
 
 export const indentListItem = (
 	editor: EditorWithLists<BaseEditor>,

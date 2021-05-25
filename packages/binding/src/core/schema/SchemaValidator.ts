@@ -9,11 +9,11 @@ import {
 	HasOneRelationMarker,
 	MarkerTreeRoot,
 } from '../../markers'
-import { Filter, UniqueWhere } from '../../treeParameters'
+import type { Filter, UniqueWhere } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
-import { Schema } from './Schema'
-import { SchemaEntity } from './SchemaEntity'
+import type { Schema } from './Schema'
+import type { SchemaEntity } from './SchemaEntity'
 
 export class SchemaValidator {
 	public static assertTreeValid(schema: Schema, tree: MarkerTreeRoot) {

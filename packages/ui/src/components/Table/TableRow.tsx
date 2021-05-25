@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { memo, ReactNode, useContext } from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { Justification } from '../../types'
+import type { Justification } from '../../types'
 import { toEnumViewClass } from '../../utils'
 import { UseTableElementContext } from './Table'
 

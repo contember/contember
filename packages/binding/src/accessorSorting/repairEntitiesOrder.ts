@@ -1,5 +1,5 @@
-import { EntityAccessor } from '../accessors'
-import { RelativeSingleField } from '../treeParameters'
+import type { EntityAccessor } from '../accessors'
+import type { RelativeSingleField } from '../treeParameters'
 
 export const repairEntitiesOrder = (sortableByField: RelativeSingleField, sortedEntities: EntityAccessor[]) => {
 	for (let i = 0, len = sortedEntities.length; i < len; i++) {

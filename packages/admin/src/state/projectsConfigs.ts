@@ -1,7 +1,7 @@
-import { ComponentType } from 'react'
-import { RouteMap } from '../components/pageRouting/utils'
-import { MessageDictionaryByLocaleCode } from '../i18n'
-import { SelectedDimension } from './request'
+import type { ComponentType } from 'react'
+import type { RouteMap } from '../components/pageRouting/utils'
+import type { MessageDictionaryByLocaleCode } from '../i18n'
+import type { SelectedDimension } from './request'
 
 export interface ProjectConfig {
 	project: string

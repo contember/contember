@@ -1,8 +1,8 @@
-import { ReferenceRenderer } from './ReferenceRenderer'
-import { RichTextElement } from './RichTextElement'
-import { RichTextLeaf } from './RichTextLeaf'
-import { RichTextReference } from './RichTextReference'
-import { RootEditorNode } from './RootEditorNode'
+import type { ReferenceRenderer } from './ReferenceRenderer'
+import type { RichTextElement } from './RichTextElement'
+import type { RichTextLeaf } from './RichTextLeaf'
+import type { RichTextReference } from './RichTextReference'
+import type { RootEditorNode } from './RootEditorNode'
 
 export interface NormalizedRichTextBlock<
 	CustomElements extends RichTextElement = never,

@@ -1,8 +1,8 @@
-import { EntityAccessor, Environment } from '@contember/binding'
+import type { EntityAccessor, Environment } from '@contember/binding'
 import { FileUploadReadyState, SingleFileUploadState } from '@contember/react-client'
 import { FilePreview, UploadProgress } from '@contember/ui'
 import { memo, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { FileDataPopulator } from '../fileDataPopulators'
+import type { FileDataPopulator } from '../fileDataPopulators'
 import { getRelevantPopulators } from './getRelevantPopulators'
 
 export interface UploadingFilePreviewProps {

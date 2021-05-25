@@ -1,5 +1,5 @@
 import * as pathToRegexp from 'path-to-regexp'
-import { ProjectConfig } from './state/projectsConfigs'
+import type { ProjectConfig } from './state/projectsConfigs'
 import { toObject as parseDimensionsString, toString as dimensionsStringify } from './utils/stringifyDimensions'
 import { matchesPath, RouteMap } from './utils/url'
 

@@ -1,9 +1,9 @@
-import { FieldOperations } from '../core/operations'
+import type { FieldOperations } from '../core/operations'
 import { TemporalFieldHelper, UuidFieldHelper } from '../fieldHelpers'
-import { FieldName, FieldValue } from '../treeParameters'
-import { BatchUpdatesOptions } from './BatchUpdatesOptions'
-import { Errorable } from './Errorable'
-import { ErrorAccessor } from './ErrorAccessor'
+import type { FieldName, FieldValue } from '../treeParameters'
+import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
+import type { Errorable } from './Errorable'
+import type { ErrorAccessor } from './ErrorAccessor'
 
 class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
 	constructor(

@@ -11,7 +11,7 @@ import {
 } from 'slate'
 import { BaseEditor, BlockElement, ElementNode, ElementSpecifics, NodesWithType } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { EditorWithLists } from './EditorWithLists'
+import type { EditorWithLists } from './EditorWithLists'
 import { ListItemElement, listItemElementType } from './ListItemElement'
 import { OrderedListElement, orderedListElementType } from './OrderedListElement'
 import { dedentListItem, indentListItem } from './transforms'

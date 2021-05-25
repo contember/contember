@@ -1,4 +1,4 @@
-import { ElementToolbarButton } from '../../../toolbars'
+import type { ElementToolbarButton } from '../../../toolbars'
 import { OrderedListElement, orderedListElementType } from './OrderedListElement'
 import { UnorderedListElement, unorderedListElementType } from './UnorderedListElement'
 

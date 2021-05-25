@@ -1,6 +1,6 @@
-import { ErrorAccessor } from '../accessors'
-import { ExecutionError, MutationDataResponse, MutationResponse, ValidationError } from '../accessorTree'
-import { PlaceholderName } from '../treeParameters'
+import type { ErrorAccessor } from '../accessors'
+import type { ExecutionError, MutationDataResponse, MutationResponse, ValidationError } from '../accessorTree'
+import type { PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { MutationAlias, MutationOperationSubTreeType } from './requestAliases'
 

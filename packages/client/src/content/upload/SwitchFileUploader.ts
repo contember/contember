@@ -1,5 +1,5 @@
-import { FileUploader, FileUploaderInitializeOptions } from './FileUploader'
-import { UploadedFileMetadata } from './UploadedFileMetadata'
+import type { FileUploader, FileUploaderInitializeOptions } from './FileUploader'
+import type { UploadedFileMetadata } from './UploadedFileMetadata'
 
 class SwitchFileUploader implements FileUploader {
 	public constructor(private readonly subUploaders: SwitchFileUploader.SubUploaders) {}

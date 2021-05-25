@@ -1,6 +1,6 @@
-import { ParentEntityParameters } from '../treeParameters'
-import { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
-import { SubTreeMarkers } from './SubTreeMarkers'
+import type { ParentEntityParameters } from '../treeParameters'
+import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
+import type { SubTreeMarkers } from './SubTreeMarkers'
 
 export class EntityFieldsWithHoistablesMarker {
 	public constructor(

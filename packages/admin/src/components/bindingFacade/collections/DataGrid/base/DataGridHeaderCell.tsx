@@ -1,11 +1,11 @@
-import { Environment } from '@contember/binding'
+import type { Environment } from '@contember/binding'
 import { ActionableBox, Box, Dropdown, Icon, Justification, TableHeaderCell } from '@contember/ui'
 import { ComponentType, createElement, ReactElement, ReactNode } from 'react'
-import { FilterRendererProps } from './DataGridColumn'
-import { DataGridFilterArtifact } from './DataGridFilterArtifact'
+import type { FilterRendererProps } from './DataGridColumn'
+import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
 import { cycleOrderDirection, DataGridOrderDirection } from './DataGridOrderDirection'
-import { DataGridSetFilter } from './DataGridSetFilter'
-import { DataGridSetOrderBy } from './DataGridSetOrderBy'
+import type { DataGridSetFilter } from './DataGridSetFilter'
+import type { DataGridSetOrderBy } from './DataGridSetOrderBy'
 
 export interface DataGridHeaderCellPublicProps {
 	header?: ReactNode

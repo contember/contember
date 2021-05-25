@@ -1,4 +1,4 @@
-import { DataGridColumns, DataGridFilterArtifactStore } from '../base'
+import type { DataGridColumns, DataGridFilterArtifactStore } from '../base'
 
 export const normalizeInitialFilters = (columns: DataGridColumns): DataGridFilterArtifactStore => {
 	const filters: DataGridFilterArtifactStore = new Map()

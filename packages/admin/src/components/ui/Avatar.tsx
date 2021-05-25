@@ -1,6 +1,6 @@
 import md5 from 'blueimp-md5'
 import cn from 'classnames'
-import { FunctionComponent } from 'react'
+import type { FunctionComponent } from 'react'
 
 export enum AvatarSize {
 	Size1 = 1,

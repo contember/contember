@@ -9,10 +9,10 @@ import {
 	ReactNodeArray,
 } from 'react'
 import { connect } from 'react-redux'
-import State from '../../state'
+import type State from '../../state'
 import { PageErrorBoundary } from './PageErrorBoundary'
 import { Page, PageProps } from './Page'
-import { PageProvider } from './PageProvider'
+import type { PageProvider } from './PageProvider'
 
 type PageProviderElement = ReactElement<any> & { type: PageProvider }
 type PageElement = ReactElement<PageProps>

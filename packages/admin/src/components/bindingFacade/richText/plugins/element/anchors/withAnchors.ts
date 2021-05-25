@@ -1,9 +1,9 @@
 import { createElement } from 'react'
 import { Editor, Element as SlateElement, Node as SlateNode, Path, Range as SlateRange, Transforms } from 'slate'
-import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import { AnchorElement, anchorElementType } from './AnchorElement'
 import { AnchorRenderer, AnchorRendererProps } from './AnchorRenderer'
-import { EditorWithAnchors, WithAnchors } from './EditorWithAnchors'
+import type { EditorWithAnchors, WithAnchors } from './EditorWithAnchors'
 import { isUrl } from './isUrl'
 
 export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<E> => {

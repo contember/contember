@@ -1,5 +1,5 @@
-import { EntityAccessor } from '../accessors'
-import { FieldName } from './primitives'
+import type { EntityAccessor } from '../accessors'
+import type { FieldName } from './primitives'
 
 export interface DesugaredSingleEntityEventListeners {}
 

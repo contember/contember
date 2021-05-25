@@ -8,10 +8,10 @@ import {
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
-import { ElementNode } from '../../baseEditor'
+import type { ElementNode } from '../../baseEditor'
 import { ContemberEditor } from '../../ContemberEditor'
-import { FieldBackedElement } from '../FieldBackedElement'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { FieldBackedElement } from '../FieldBackedElement'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverridePrepareElementForInsertionOptions {
 	leadingFields: FieldBackedElement[]

@@ -1,6 +1,6 @@
-import { Input } from '@contember/schema'
-import { Literal } from '../graphQlBuilder'
-import { WriteOperation, WriteRelationOps } from './types'
+import type { Input } from '@contember/schema'
+import type { Literal } from '../graphQlBuilder'
+import type { WriteOperation, WriteRelationOps } from './types'
 import { WriteDataBuilder } from './WriteDataBuilder'
 
 class WriteOneRelationBuilder<

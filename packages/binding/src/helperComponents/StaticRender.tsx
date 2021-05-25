@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Component } from '../coreComponents'
 
 export interface StaticRenderProps {

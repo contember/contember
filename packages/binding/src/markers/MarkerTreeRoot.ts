@@ -1,5 +1,5 @@
-import { Alias, PlaceholderName } from '../treeParameters'
-import { SubTreeMarkers } from './SubTreeMarkers'
+import type { Alias, PlaceholderName } from '../treeParameters'
+import type { SubTreeMarkers } from './SubTreeMarkers'
 
 export class MarkerTreeRoot {
 	public constructor(

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Provider, ProviderProps } from 'react-redux'
 
 export interface ReduxStoreProviderProps extends ProviderProps {

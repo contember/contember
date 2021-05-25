@@ -3,8 +3,8 @@ import { EditorToolbar, ToolbarGroup, useDialog } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent } from 'react'
 import { Transforms } from 'slate'
 import { useSlate } from 'slate-react'
-import { BlockSlateEditor } from '../blockEditor'
-import { ToolbarButtonSpec } from './ToolbarButtonSpec'
+import type { BlockSlateEditor } from '../blockEditor'
+import type { ToolbarButtonSpec } from './ToolbarButtonSpec'
 
 export interface HoveringToolbarContentsProps {
 	buttons: ToolbarButtonSpec[] | ToolbarButtonSpec[][]

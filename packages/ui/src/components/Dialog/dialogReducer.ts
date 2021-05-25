@@ -1,5 +1,5 @@
-import { Reducer } from 'react'
-import { DialogSettings } from './DialogSettings'
+import type { Reducer } from 'react'
+import type { DialogSettings } from './DialogSettings'
 
 export type DialogId = number
 

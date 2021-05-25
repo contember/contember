@@ -11,7 +11,7 @@ import {
 import cn from 'classnames'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import State from '../state'
+import type State from '../state'
 import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
 import LogoutLink from './LogoutLink'
 import { default as PageLink } from './pageRouting/PageLink'

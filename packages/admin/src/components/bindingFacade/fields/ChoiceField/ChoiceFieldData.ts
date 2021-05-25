@@ -1,5 +1,5 @@
-import { EntityAccessor, Environment, ErrorAccessor, FieldValue } from '@contember/binding'
-import { ReactElement, ReactNode } from 'react'
+import type { EntityAccessor, Environment, ErrorAccessor, FieldValue } from '@contember/binding'
+import type { ReactElement, ReactNode } from 'react'
 
 export namespace ChoiceFieldData {
 	export type ChoiceArity = 'single' | 'multiple'

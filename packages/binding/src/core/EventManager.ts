@@ -1,5 +1,5 @@
 import * as ReactDOM from 'react-dom'
-import {
+import type {
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
 	EntityAccessor,
@@ -8,12 +8,12 @@ import {
 	PersistErrorOptions,
 	PersistSuccessOptions,
 } from '../accessors'
-import { SuccessfulPersistResult } from '../accessorTree'
+import type { SuccessfulPersistResult } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { FieldName, PlaceholderName } from '../treeParameters'
+import type { FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { Config } from './Config'
-import { DirtinessTracker } from './DirtinessTracker'
+import type { Config } from './Config'
+import type { DirtinessTracker } from './DirtinessTracker'
 import {
 	EntityListState,
 	EntityRealmState,
@@ -25,8 +25,8 @@ import {
 	StateNode,
 	StateType,
 } from './state'
-import { TreeStore } from './TreeStore'
-import { UpdateMetadata } from './UpdateMetadata'
+import type { TreeStore } from './TreeStore'
+import type { UpdateMetadata } from './UpdateMetadata'
 
 export class EventManager {
 	public static readonly NO_CHANGES_DIFFERENCE = 0

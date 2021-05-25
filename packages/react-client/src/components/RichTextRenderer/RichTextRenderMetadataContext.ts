@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react'
-import { RichTextElement } from './RichTextElement'
-import { RichTextLeaf } from './RichTextLeaf'
-import { RichTextReference } from './RichTextReference'
-import { RichTextRenderMetadata } from './RichTextRenderMetadata'
+import type { RichTextElement } from './RichTextElement'
+import type { RichTextLeaf } from './RichTextLeaf'
+import type { RichTextReference } from './RichTextReference'
+import type { RichTextRenderMetadata } from './RichTextRenderMetadata'
 
 export const RichTextRenderMetadataContext = createContext<RichTextRenderMetadata<any, any, any>>({
 	formatVersion: 0,

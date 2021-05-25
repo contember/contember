@@ -1,4 +1,4 @@
-import { EditorSelectionAction } from './EditorSelectionAction'
+import type { EditorSelectionAction } from './EditorSelectionAction'
 import { EditorSelectionActionType } from './EditorSelectionActionType'
 import { EditorSelectionState, EditorSelectionStateName } from './EditorSelectionState'
 

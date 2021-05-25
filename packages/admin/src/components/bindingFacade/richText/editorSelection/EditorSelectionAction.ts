@@ -1,4 +1,4 @@
-import { EditorSelectionActionType } from './EditorSelectionActionType'
+import type { EditorSelectionActionType } from './EditorSelectionActionType'
 
 export type EditorSelectionAction =
 	| {

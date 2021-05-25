@@ -3,7 +3,7 @@ import { useLayoutEffect, useState } from 'react'
 import { useClassNamePrefix, useRawCloseOnEscapeOrClickOutside } from '../../auxiliary'
 import { toEnumViewClass } from '../../utils'
 import { Box } from '../Box'
-import { DialogSettingsWithMetadata } from './dialogReducer'
+import type { DialogSettingsWithMetadata } from './dialogReducer'
 
 export interface DialogProps {
 	dialogId: number

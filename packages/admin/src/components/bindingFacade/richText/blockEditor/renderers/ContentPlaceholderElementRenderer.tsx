@@ -1,10 +1,10 @@
-import { EntityAccessor, RelativeEntityList } from '@contember/binding'
+import type { EntityAccessor, RelativeEntityList } from '@contember/binding'
 import { EditorPlaceholder, ErrorList } from '@contember/ui'
 import { memo, MutableRefObject } from 'react'
-import { RenderElementProps } from 'slate-react'
+import type { RenderElementProps } from 'slate-react'
 import { AccessorErrors } from '../../../errors'
 import { BlockElement } from '../../baseEditor'
-import { ContemberContentPlaceholderElement } from '../elements'
+import type { ContemberContentPlaceholderElement } from '../elements'
 
 export interface ContentPlaceholderElementRendererProps extends RenderElementProps {
 	element: ContemberContentPlaceholderElement

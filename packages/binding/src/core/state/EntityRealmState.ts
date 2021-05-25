@@ -1,10 +1,10 @@
-import { EntityAccessor, ErrorAccessor } from '../../accessors'
-import { EntitySubTreeMarker, HasOneRelationMarker } from '../../markers'
-import { EntityEventListenerStore, EntityRealmKey, FieldName, PlaceholderName } from '../../treeParameters'
-import { EntityListState } from './EntityListState'
-import { EntityState } from './EntityState'
-import { StateNode } from './StateNode'
-import { StateType } from './StateType'
+import type { EntityAccessor, ErrorAccessor } from '../../accessors'
+import type { EntitySubTreeMarker, HasOneRelationMarker } from '../../markers'
+import type { EntityEventListenerStore, EntityRealmKey, FieldName, PlaceholderName } from '../../treeParameters'
+import type { EntityListState } from './EntityListState'
+import type { EntityState } from './EntityState'
+import type { StateNode } from './StateNode'
+import type { StateType } from './StateType'
 
 export interface HasOneEntityRealmBlueprint {
 	readonly type: 'hasOne'

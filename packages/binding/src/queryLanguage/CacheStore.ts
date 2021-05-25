@@ -1,4 +1,4 @@
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import { LRUCache } from '../structures'
 import { Parser } from './Parser'
 

@@ -1,4 +1,4 @@
 import { createContext } from 'react'
-import { HeadingDepth } from '../types'
+import type { HeadingDepth } from '../types'
 
 export const HeadingDepthContext = createContext<HeadingDepth>(1)

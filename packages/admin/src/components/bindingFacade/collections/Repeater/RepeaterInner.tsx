@@ -11,7 +11,7 @@ import {
 	useSortedEntities,
 } from '@contember/binding'
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
-import { Axis, SortEndHandler } from 'react-sortable-hoc'
+import type { Axis, SortEndHandler } from 'react-sortable-hoc'
 import { useMessageFormatter } from '../../../../i18n'
 import { RepeaterContainer, RepeaterContainerProps, RepeaterContainerPublicProps } from './RepeaterContainer'
 import { repeaterDictionary } from './repeaterDictionary'

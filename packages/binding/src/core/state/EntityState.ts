@@ -1,6 +1,6 @@
-import { RuntimeId, UnpersistedEntityDummyId } from '../../accessorTree'
-import { EntityName, EntityRealmKey } from '../../treeParameters'
-import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
+import type { RuntimeId, UnpersistedEntityDummyId } from '../../accessorTree'
+import type { EntityName, EntityRealmKey } from '../../treeParameters'
+import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 
 export interface EntityState {
 	entityName: EntityName

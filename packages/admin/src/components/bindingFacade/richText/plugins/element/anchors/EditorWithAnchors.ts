@@ -1,5 +1,5 @@
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
-import { AnchorElement } from './AnchorElement'
+import type { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
+import type { AnchorElement } from './AnchorElement'
 
 export interface WithAnchors<E extends WithAnotherNodeType<BaseEditor, AnchorElement>> {
 	isAnchor: (element: ElementNode) => element is AnchorElement

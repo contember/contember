@@ -2,8 +2,8 @@ import { CrudQueryBuilder, GraphQlBuilder } from '@contember/client'
 import { ClientGeneratedUuid, ServerGeneratedUuid } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../bindingTypes'
-import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
-import { EntityId, EntityName, FieldValue, PlaceholderName, TreeRootId } from '../treeParameters'
+import type { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
+import type { EntityId, EntityName, FieldValue, PlaceholderName, TreeRootId } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { QueryGenerator } from './QueryGenerator'
 import { MutationAlias, MutationOperationSubTreeType, MutationOperationType } from './requestAliases'
@@ -17,7 +17,7 @@ import {
 	StateIterator,
 	StateType,
 } from './state'
-import { TreeStore } from './TreeStore'
+import type { TreeStore } from './TreeStore'
 
 type QueryBuilder = Omit<CrudQueryBuilder.CrudQueryBuilder, CrudQueryBuilder.Queries>
 

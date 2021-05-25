@@ -1,7 +1,7 @@
-import { BuiltinElements } from './BuiltinElements'
-import { BuiltinLeaves } from './BuiltinLeaves'
-import { RichTextElement } from './RichTextElement'
-import { RichTextLeaf } from './RichTextLeaf'
+import type { BuiltinElements } from './BuiltinElements'
+import type { BuiltinLeaves } from './BuiltinLeaves'
+import type { RichTextElement } from './RichTextElement'
+import type { RichTextLeaf } from './RichTextLeaf'
 
 export interface RootEditorNode<
 	CustomElements extends RichTextElement = never,

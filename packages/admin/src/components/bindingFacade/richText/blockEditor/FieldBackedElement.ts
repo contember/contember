@@ -1,5 +1,5 @@
-import { SugaredRelativeSingleField } from '@contember/binding'
-import { ReactNode } from 'react'
+import type { SugaredRelativeSingleField } from '@contember/binding'
+import type { ReactNode } from 'react'
 
 export type FieldBackedElement = {
 	field: SugaredRelativeSingleField | string

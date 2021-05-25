@@ -1,5 +1,5 @@
 import { Editor, Location } from 'slate'
-import { BaseEditor, ElementNode } from '../../baseEditor'
+import type { BaseEditor, ElementNode } from '../../baseEditor'
 import { closest } from './closest'
 
 export const closestBlockEntry = <E extends BaseEditor>(

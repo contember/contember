@@ -1,8 +1,8 @@
-import { Input } from '@contember/schema'
+import type { Input } from '@contember/schema'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
 import { ErrorsRelationBuilder } from './ErrorsRelationBuilder'
 import { ReadBuilder } from './ReadBuilder'
-import { WriteArguments, WriteFields, WriteOperation } from './types'
+import type { WriteArguments, WriteFields, WriteOperation } from './types'
 import { ValidationRelationBuilder } from './ValidationRelationBuilder'
 import { WriteDataBuilder } from './WriteDataBuilder'
 

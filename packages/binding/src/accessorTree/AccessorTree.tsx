@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { BindingOperationsProvider } from '../accessorPropagation'
 import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
 import { DirtinessContext } from './DirtinessContext'

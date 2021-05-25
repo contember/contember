@@ -1,6 +1,6 @@
 import { memo } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { FieldErrors } from '../../types'
+import type { FieldErrors } from '../../types'
 import { Message, MessageProps } from './Message'
 
 export interface ErrorListProps {

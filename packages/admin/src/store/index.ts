@@ -2,15 +2,15 @@ import { applyMiddleware, compose, createStore, Middleware, Reducer, Store as Re
 import { createAction } from 'redux-actions'
 
 import thunk from 'redux-thunk'
-import { Dispatch } from '../actions/types'
-import { ClientConfig } from '../bootstrap'
+import type { Dispatch } from '../actions/types'
+import type { ClientConfig } from '../bootstrap'
 import ContentClientFactory from '../model/ContentClientFactory'
 import GraphqlClient from '../model/GraphqlClient'
 import LocalStorageManager from '../model/LocalStorageManager'
 import SystemClientFactory from '../model/SystemClientFactory'
 import rootReducer from '../reducer'
 import { SET_IDENTITY } from '../reducer/auth'
-import State from '../state'
+import type State from '../state'
 
 export interface Services {
 	localStorageManager: LocalStorageManager

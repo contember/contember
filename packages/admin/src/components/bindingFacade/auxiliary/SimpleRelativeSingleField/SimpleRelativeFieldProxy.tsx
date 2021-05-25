@@ -2,7 +2,7 @@ import { Environment, SugaredRelativeSingleField, useEnvironment, useField, useM
 import { FormGroup, FormGroupProps } from '@contember/ui'
 import { memo, ReactNode, useMemo } from 'react'
 import { useAccessorErrors } from '../../errors'
-import { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
+import type { SimpleRelativeSingleFieldMetadata } from './SimpleRelativeSingleField'
 
 const contextualizeNode = (
 	node: ReactNode,

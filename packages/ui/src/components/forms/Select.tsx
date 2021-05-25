@@ -10,7 +10,7 @@ import {
 	RefAttributes,
 } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { ControlDistinction, Size, ValidationState } from '../../types'
+import type { ControlDistinction, Size, ValidationState } from '../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../utils'
 
 export interface SelectOption {

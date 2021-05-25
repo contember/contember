@@ -1,7 +1,7 @@
 import { Button } from '@contember/ui'
 import { useState } from 'react'
 import { connect } from 'react-redux'
-import State from '../../state'
+import type State from '../../state'
 import { isDevMode } from './isDevMode'
 
 interface TokenExposerStateProps {

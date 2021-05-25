@@ -1,7 +1,7 @@
-import { GraphQlClient } from '../../graphQlClient'
-import { FileUploadError } from './FileUploadError'
-import { FileUploadProgress } from './FileUploadProgress'
-import { UploadedFileMetadata } from './UploadedFileMetadata'
+import type { GraphQlClient } from '../../graphQlClient'
+import type { FileUploadError } from './FileUploadError'
+import type { FileUploadProgress } from './FileUploadProgress'
+import type { UploadedFileMetadata } from './UploadedFileMetadata'
 
 export interface FileUploader<Result = any, Error extends FileUploadError = FileUploadError> {
 	upload: (files: Map<File, UploadedFileMetadata>, options: FileUploaderInitializeOptions) => Promise<void>

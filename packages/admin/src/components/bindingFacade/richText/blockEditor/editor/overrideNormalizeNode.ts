@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Node as SlateNode, Path as SlatePath, Text, Transforms } from 'slate'
-import { EditorNode } from '../../baseEditor'
+import type { EditorNode } from '../../baseEditor'
 import { ContemberEditor } from '../../ContemberEditor'
 import {
 	ContemberContentPlaceholderElement,
@@ -9,8 +9,8 @@ import {
 	contemberFieldElementType,
 	isElementWithReference,
 } from '../elements'
-import { FieldBackedElement } from '../FieldBackedElement'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { FieldBackedElement } from '../FieldBackedElement'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideNormalizeNodeOptions {
 	leadingFields: FieldBackedElement[]

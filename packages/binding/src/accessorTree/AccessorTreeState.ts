@@ -1,5 +1,5 @@
-import { TreeRootAccessor } from '../accessors'
-import { RequestError } from './RequestError'
+import type { TreeRootAccessor } from '../accessors'
+import type { RequestError } from './RequestError'
 
 export enum AccessorTreeStateName {
 	Initializing = 'initializing',

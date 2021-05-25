@@ -1,8 +1,8 @@
-import { TreeFilter } from '@contember/client'
-import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
-import { BatchUpdatesOptions } from './BatchUpdatesOptions'
-import { ExtendTree } from './ExtendTree'
-import { Persist } from './Persist'
+import type { TreeFilter } from '@contember/client'
+import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
+import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
+import type { ExtendTree } from './ExtendTree'
+import type { Persist } from './Persist'
 
 export interface BindingOperations extends AsyncBatchUpdatesOptions {
 	// addEventListener: ...

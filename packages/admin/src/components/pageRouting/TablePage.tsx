@@ -6,7 +6,7 @@ import {
 } from '@contember/binding'
 import { memo, ReactElement, ReactNode } from 'react'
 import { FeedbackRenderer, TableRenderer, TableRendererProps } from '../bindingFacade'
-import { PageProvider } from './PageProvider'
+import type { PageProvider } from './PageProvider'
 
 export interface TablePageProps<ContainerExtraProps, ItemExtraProps>
 	extends SugaredQualifiedEntityList,

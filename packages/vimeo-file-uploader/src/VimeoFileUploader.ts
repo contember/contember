@@ -1,4 +1,4 @@
-import { FileUploader, FileUploaderInitializeOptions, UploadedFileMetadata } from '@contember/client'
+import type { FileUploader, FileUploaderInitializeOptions, UploadedFileMetadata } from '@contember/client'
 import tus from 'tus-js-client'
 
 interface VimeoFileUploaderState {

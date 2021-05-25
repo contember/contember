@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { ButtonGroupFlow, ButtonGroupOrientation, Size } from '../../types'
+import type { ButtonGroupFlow, ButtonGroupOrientation, Size } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 
 export interface ButtonGroupProps {

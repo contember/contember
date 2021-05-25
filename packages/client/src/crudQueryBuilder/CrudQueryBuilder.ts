@@ -2,7 +2,7 @@ import { ObjectBuilder, QueryBuilder, RootObjectBuilder } from '../graphQlBuilde
 import { isEmptyObject } from '../utils'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
 import { ReadBuilder } from './ReadBuilder'
-import {
+import type {
 	CreateMutationArguments,
 	CreateMutationFields,
 	DeleteMutationArguments,

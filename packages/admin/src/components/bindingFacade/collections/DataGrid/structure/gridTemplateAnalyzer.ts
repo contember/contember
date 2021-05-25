@@ -1,5 +1,5 @@
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { DataGridColumn, DataGridColumnProps, DataGridColumns } from '../base'
 
 class BoxedGridColumnProps {

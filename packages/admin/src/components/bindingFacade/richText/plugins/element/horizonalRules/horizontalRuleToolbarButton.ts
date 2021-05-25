@@ -1,4 +1,4 @@
-import { ElementToolbarButton } from '../../../toolbars'
+import type { ElementToolbarButton } from '../../../toolbars'
 import { HorizontalRuleElement, horizontalRuleElementType } from './HorizontalRuleElement'
 
 export const horizontalRuleToolbarButton: ElementToolbarButton<HorizontalRuleElement> = {

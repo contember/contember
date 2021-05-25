@@ -1,10 +1,10 @@
-import { RawSchema } from './RawSchema'
-import { RawSchemaEntity, RawSchemaFields } from './RawSchemaEntity'
-import { RawSchemaEnum } from './RawSchemaEnum'
-import { SchemaEntities } from './SchemaEntities'
-import { SchemaEnums } from './SchemaEnums'
-import { SchemaFields } from './SchemaFields'
-import { SchemaStore } from './SchemaStore'
+import type { RawSchema } from './RawSchema'
+import type { RawSchemaEntity, RawSchemaFields } from './RawSchemaEntity'
+import type { RawSchemaEnum } from './RawSchemaEnum'
+import type { SchemaEntities } from './SchemaEntities'
+import type { SchemaEnums } from './SchemaEnums'
+import type { SchemaFields } from './SchemaFields'
+import type { SchemaStore } from './SchemaStore'
 
 export class SchemaPreprocessor {
 	public static processRawSchema(rawSchema: RawSchema): SchemaStore {

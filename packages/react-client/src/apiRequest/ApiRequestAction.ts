@@ -1,5 +1,5 @@
-import { GraphQlClient } from '@contember/client'
-import { ApiRequestActionType } from './ApiRequestActionType'
+import type { GraphQlClient } from '@contember/client'
+import type { ApiRequestActionType } from './ApiRequestActionType'
 
 export type ApiRequestAction<SuccessData> =
 	| {

@@ -1,6 +1,6 @@
 import { Component } from '@contember/binding'
-import { FunctionComponent } from 'react'
-import { ChoiceFieldData } from './ChoiceFieldData'
+import type { FunctionComponent } from 'react'
+import type { ChoiceFieldData } from './ChoiceFieldData'
 import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
 import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'
 

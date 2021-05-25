@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { createElement, DetailedHTMLProps, forwardRef, HTMLAttributes, memo, useContext } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { HeadingDepthContext } from '../contexts'
-import { HeadingDepth, HeadingDistinction, Size } from '../types'
+import type { HeadingDepth, HeadingDistinction, Size } from '../types'
 import { toEnumViewClass } from '../utils'
 
 export interface HeadingProps

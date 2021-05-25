@@ -1,6 +1,6 @@
 import { SYSTEM_ADD_DIFF } from '../reducer/system'
 import { StageDiffDone, StageDiffFailed, StageDiffFetching, StageDiffState } from '../state/system'
-import { ActionCreator } from './types'
+import type { ActionCreator } from './types'
 
 export const setFetching = (baseStage: string): ActionCreator<StageDiffFetching> => async (dispatch, getState) => {
 	const state = getState()

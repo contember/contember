@@ -1,5 +1,5 @@
 import { Editor, Element as SlateElement, Node as SlateNode, Range as SlateRange } from 'slate'
-import { UnderlyingEditor } from '../Node'
+import type { UnderlyingEditor } from '../Node'
 
 export const overrideDeleteBackward = <E extends UnderlyingEditor>(editor: E) => {
 	const { deleteBackward } = editor

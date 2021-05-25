@@ -1,4 +1,4 @@
-import { SugaredUniqueWhere, UniqueWhere } from './primitives'
+import type { SugaredUniqueWhere, UniqueWhere } from './primitives'
 
 export interface DesugaredQualifiedSingleEntityParameters {
 	where: UniqueWhere

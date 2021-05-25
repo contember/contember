@@ -1,4 +1,4 @@
-import { ElementToolbarButton } from '../../../toolbars'
+import type { ElementToolbarButton } from '../../../toolbars'
 import { TableElement, tableElementType } from './TableElement'
 
 export const tableToolbarButton: ElementToolbarButton<TableElement> = {

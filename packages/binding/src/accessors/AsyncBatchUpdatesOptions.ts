@@ -1,5 +1,5 @@
-import { GraphQlClient } from '@contember/client'
-import { BatchUpdatesOptions } from './BatchUpdatesOptions'
+import type { GraphQlClient } from '@contember/client'
+import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
 
 export interface AsyncBatchUpdatesOptions extends BatchUpdatesOptions {
 	contentClient: GraphQlClient

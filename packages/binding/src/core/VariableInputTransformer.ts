@@ -1,6 +1,6 @@
 import { BindingError } from '../BindingError'
 import { Environment, VariableFieldValue } from '../dao'
-import { FieldValue, OptionallyVariableFieldValue, Scalar } from '../treeParameters'
+import type { FieldValue, OptionallyVariableFieldValue, Scalar } from '../treeParameters'
 
 export class VariableInputTransformer {
 	public static transformValue(value: OptionallyVariableFieldValue, environment: Environment): FieldValue {

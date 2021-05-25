@@ -1,9 +1,9 @@
 import { useConstantLengthInvariant, useConstantValueInvariant } from '@contember/react-utils'
 import { useCallback } from 'react'
 import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
-import { EntityAccessor } from '../accessors'
+import type { EntityAccessor } from '../accessors'
 import { useOnConnectionUpdate } from '../entityEvents'
-import { SugaredRelativeSingleEntity } from '../treeParameters'
+import type { SugaredRelativeSingleEntity } from '../treeParameters'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity'
 

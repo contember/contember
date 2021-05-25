@@ -5,7 +5,7 @@ import { Component } from '../coreComponents'
 import { useEntityBeforePersist } from '../entityEvents'
 import { EntityFieldMarkersContainer, EntityFieldsWithHoistablesMarker } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
-import { TreeRootId } from '../treeParameters'
+import type { TreeRootId } from '../treeParameters'
 
 export interface DeferredSubTreesProps {
 	fallback: ReactNode

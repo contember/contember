@@ -1,5 +1,5 @@
-import { ParentEntityParameters } from '../treeParameters'
-import { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
+import type { ParentEntityParameters } from '../treeParameters'
+import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
 
 export class ParentEntityMarker {
 	public constructor(

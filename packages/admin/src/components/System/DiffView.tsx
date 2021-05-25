@@ -4,8 +4,8 @@ import cn from 'classnames'
 import { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { executeRelease, fetchDiff } from '../../actions/system'
-import { Dispatch } from '../../actions/types'
-import State from '../../state'
+import type { Dispatch } from '../../actions/types'
+import type State from '../../state'
 import { AnyStageDiff, EventType, StageDiffState } from '../../state/system'
 
 enum SelectionType {

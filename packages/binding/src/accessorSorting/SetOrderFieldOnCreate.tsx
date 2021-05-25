@@ -1,9 +1,9 @@
-import { CrudQueryBuilder, Input } from '@contember/client'
+import type { CrudQueryBuilder, Input } from '@contember/client'
 import { Component, EntityListSubTree, EntitySubTree, Field } from '../coreComponents'
 import { Literal } from '../dao'
 import { SugaredField } from '../helperComponents'
 import { QueryLanguage } from '../queryLanguage'
-import {
+import type {
 	SugaredOrderBy,
 	SugaredQualifiedEntityList,
 	SugaredRelativeSingleField,

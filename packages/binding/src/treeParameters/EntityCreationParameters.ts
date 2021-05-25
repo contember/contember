@@ -1,4 +1,4 @@
-import { SetOnCreate, SugaredSetOnCreate } from './SetOnCreate'
+import type { SetOnCreate, SugaredSetOnCreate } from './SetOnCreate'
 
 export const EntityCreationParametersDefaults = {
 	// forceCreation: false,

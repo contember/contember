@@ -1,4 +1,4 @@
-import { ToolbarButtonSpec } from '../../../toolbars'
+import type { ToolbarButtonSpec } from '../../../toolbars'
 import { codeMark } from './withCode'
 
 export const codeToolbarButton: ToolbarButtonSpec = {

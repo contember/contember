@@ -1,6 +1,6 @@
-import { Input } from '@contember/schema'
+import type { Input } from '@contember/schema'
 import { Literal, ObjectBuilder } from '../graphQlBuilder'
-import { HasManyArguments, HasOneArguments, ReductionArguments, OrderDirection, ReadArguments } from './types'
+import type { HasManyArguments, HasOneArguments, OrderDirection, ReadArguments, ReductionArguments } from './types'
 
 class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 	protected constructor(public readonly objectBuilder: ObjectBuilder = new ObjectBuilder()) {}

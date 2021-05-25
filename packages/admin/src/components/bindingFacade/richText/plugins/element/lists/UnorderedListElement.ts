@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode } from '../../../baseEditor'
+import type { BaseEditor, ElementNode } from '../../../baseEditor'
 
 export const unorderedListElementType = 'unorderedList' as const
 

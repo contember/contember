@@ -1,14 +1,14 @@
-import { EntityAccessor } from '../../accessors'
-import { RuntimeId } from '../../accessorTree'
+import type { EntityAccessor } from '../../accessors'
+import type { RuntimeId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
-import { EntityId } from '../../treeParameters'
+import type { EntityId } from '../../treeParameters'
 import { EventManager } from '../EventManager'
 import { RealmKeyGenerator } from '../RealmKeyGenerator'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, StateType } from '../state'
-import { StateInitializer } from '../StateInitializer'
+import type { StateInitializer } from '../StateInitializer'
 import { TreeParameterMerger } from '../TreeParameterMerger'
-import { TreeStore } from '../TreeStore'
+import type { TreeStore } from '../TreeStore'
 
 const emptyEntityIdSet: ReadonlySet<EntityId> = new Set()
 

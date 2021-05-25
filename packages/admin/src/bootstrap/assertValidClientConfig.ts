@@ -1,5 +1,5 @@
 import { ClientError } from '@contember/react-client'
-import { ClientConfig } from './ClientConfig'
+import type { ClientConfig } from './ClientConfig'
 
 export function assertValidClientConfig(config: any): asserts config is ClientConfig {
 	if (typeof config !== 'object' || config === null) {

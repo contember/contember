@@ -1,12 +1,12 @@
 import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../../markers'
-import { PlaceholderName } from '../../treeParameters'
+import type { PlaceholderName } from '../../treeParameters'
 import { assertNever } from '../../utils'
-import { TreeStore } from '../TreeStore'
-import { EntityListState } from './EntityListState'
-import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
-import { FieldState } from './FieldState'
+import type { TreeStore } from '../TreeStore'
+import type { EntityListState } from './EntityListState'
+import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
+import type { FieldState } from './FieldState'
 import { getEntityMarker } from './getEntityMarker'
-import { RootStateNode, StateINode, StateNode } from './StateNode'
+import type { RootStateNode, StateINode, StateNode } from './StateNode'
 import { StateType } from './StateType'
 
 export class StateIterator {

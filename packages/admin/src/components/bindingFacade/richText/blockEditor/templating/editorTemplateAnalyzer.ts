@@ -1,8 +1,8 @@
-import { Environment } from '@contember/binding'
+import type { Environment } from '@contember/binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { ContentOutlet, ContentOutletProps } from './ContentOutlet'
-import { TextFieldProps } from './TextField'
+import type { TextFieldProps } from './TextField'
 
 export class BoxedTextFieldProps {
 	public constructor(public readonly value: TextFieldProps) {}

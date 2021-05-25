@@ -1,8 +1,8 @@
-import { RuntimeId } from '../accessorTree'
-import { EntityFieldMarkersContainer } from '../markers'
-import { EntityId, EntityRealmKey, PlaceholderName } from '../treeParameters'
+import type { RuntimeId } from '../accessorTree'
+import type { EntityFieldMarkersContainer } from '../markers'
+import type { EntityId, EntityRealmKey, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { EntityListState, EntityRealmBlueprint, EntityRealmState } from './state'
+import type { EntityListState, EntityRealmBlueprint, EntityRealmState } from './state'
 import { WeakIdCache } from '../structures'
 
 const GLUE = '--'

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { QueryLanguage } from '../queryLanguage'
-import { RelativeEntityList, SugaredRelativeEntityList } from '../treeParameters'
+import type { RelativeEntityList, SugaredRelativeEntityList } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
 
 /**

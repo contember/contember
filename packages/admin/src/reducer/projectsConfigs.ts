@@ -1,4 +1,4 @@
-import { Reducer } from 'redux'
+import type { Reducer } from 'redux'
 import { Action, handleActions } from 'redux-actions'
 import ProjectConfigsState, { emptyProjectsConfigsState } from '../state/projectsConfigs'
 

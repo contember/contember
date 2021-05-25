@@ -1,4 +1,4 @@
-import { GraphQlBuilder, Input } from '@contember/client'
+import type { GraphQlBuilder, Input } from '@contember/client'
 
 export type UniqueWhere<T = GraphQlBuilder.Literal> = Input.UniqueWhere<T>
 

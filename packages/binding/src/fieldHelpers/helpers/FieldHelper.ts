@@ -1,5 +1,5 @@
 import { FieldAccessor } from '../../accessors'
-import { FieldValue } from '../../treeParameters'
+import type { FieldValue } from '../../treeParameters'
 
 export class FieldHelper<Value extends FieldValue = FieldValue> {
 	protected readonly getAccessor: FieldAccessor.GetFieldAccessor<Value>

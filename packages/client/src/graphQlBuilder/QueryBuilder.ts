@@ -1,4 +1,4 @@
-import { Literal } from './Literal'
+import type { Literal } from './Literal'
 import { QueryCompiler } from './QueryCompiler'
 import { RootObjectBuilder } from './RootObjectBuilder'
 

@@ -1,5 +1,5 @@
 import { BindingError, FieldAccessor } from '@contember/binding'
-import { BaseEditor, ElementNode } from '../baseEditor'
+import type { BaseEditor, ElementNode } from '../baseEditor'
 
 export interface UseRichTextFieldEditorNodeOptions {
 	editor: BaseEditor

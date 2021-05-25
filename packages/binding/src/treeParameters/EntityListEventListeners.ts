@@ -1,5 +1,5 @@
-import { EntityListAccessor } from '../accessors'
-import { EntityEventListenerStore } from './SingleEntityEventListeners'
+import type { EntityListAccessor } from '../accessors'
+import type { EntityEventListenerStore } from './SingleEntityEventListeners'
 
 type Events = EntityListAccessor.EntityListEventListenerMap
 

@@ -1,8 +1,8 @@
-import { GraphQlClient } from '@contember/client'
+import type { GraphQlClient } from '@contember/client'
 import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { ApiRequestActionType } from './ApiRequestActionType'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
-import { ApiRequestState } from './ApiRequestState'
+import type { ApiRequestState } from './ApiRequestState'
 
 const initialState: ApiRequestState<any> = {
 	isLoading: false,

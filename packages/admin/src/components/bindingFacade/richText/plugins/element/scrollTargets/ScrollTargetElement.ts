@@ -1,4 +1,4 @@
-import { BaseEditor } from '../../../baseEditor'
+import type { BaseEditor } from '../../../baseEditor'
 
 export const scrollTargetElementType = 'scrollTarget' as const
 

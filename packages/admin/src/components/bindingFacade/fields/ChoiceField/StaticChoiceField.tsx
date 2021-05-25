@@ -12,7 +12,7 @@ import {
 	VariableInputTransformer,
 } from '@contember/binding'
 import { FunctionComponent, ReactNode, useCallback, useMemo } from 'react'
-import { ChoiceFieldData } from './ChoiceFieldData'
+import type { ChoiceFieldData } from './ChoiceFieldData'
 
 export interface StaticOption {
 	label: ReactNode

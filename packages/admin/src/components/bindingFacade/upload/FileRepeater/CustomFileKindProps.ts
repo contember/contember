@@ -1,4 +1,4 @@
-import { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
+import type { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
 
 export interface CustomFileKindProps {
 	fileKinds: Iterable<DiscriminatedFileUploadProps>

@@ -15,7 +15,7 @@ import {
 	DataGridSetIsColumnHidden,
 	DataGridState,
 } from '../base'
-import { GridPagingAction } from '../paging'
+import type { GridPagingAction } from '../paging'
 import { collectFilters } from './collectFilters'
 import { collectOrderBy } from './collectOrderBy'
 

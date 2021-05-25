@@ -1,6 +1,6 @@
-import { SuccessfulPersistResult } from '../accessorTree'
-import { PersistErrorOptions } from './PersistErrorOptions'
-import { PersistSuccessOptions } from './PersistSuccessOptions'
+import type { SuccessfulPersistResult } from '../accessorTree'
+import type { PersistErrorOptions } from './PersistErrorOptions'
+import type { PersistSuccessOptions } from './PersistSuccessOptions'
 
 export interface PersistOptions {
 	signal?: AbortSignal

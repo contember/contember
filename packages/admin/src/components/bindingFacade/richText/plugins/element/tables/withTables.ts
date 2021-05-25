@@ -11,9 +11,9 @@ import {
 	Transforms,
 } from 'slate'
 import { ReactEditor } from 'slate-react'
-import { BaseEditor } from '../../../baseEditor'
+import type { BaseEditor } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
-import { EditorWithTables } from './EditorWithTables'
+import type { EditorWithTables } from './EditorWithTables'
 import { TableCellElement, tableCellElementType } from './TableCellElement'
 import { TableCellElementRenderer, TableCellElementRendererProps } from './TableCellElementRenderer'
 import { TableElement, tableElementType } from './TableElement'

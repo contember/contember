@@ -1,6 +1,6 @@
-import { EntityAccessor, Environment } from '@contember/binding'
-import { ReactNode } from 'react'
-import { NormalizedDiscriminatedData, SugaredDiscriminateBy } from '../../../../discrimination'
+import type { EntityAccessor, Environment } from '@contember/binding'
+import type { ReactNode } from 'react'
+import type { NormalizedDiscriminatedData, SugaredDiscriminateBy } from '../../../../discrimination'
 
 export interface PopulateEmbedDataOptions<EmbedArtifacts = any> {
 	source: string

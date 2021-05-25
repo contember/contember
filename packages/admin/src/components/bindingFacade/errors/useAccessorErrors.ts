@@ -1,4 +1,4 @@
-import { EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '@contember/binding'
+import type { EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '@contember/binding'
 import { useMessageFormatter } from '../../../i18n'
 import { errorCodeDictionary } from './errorCodeDictionary'
 

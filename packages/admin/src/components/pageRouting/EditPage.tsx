@@ -7,9 +7,9 @@ import {
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
-import RequestState from '../../state/request'
+import type RequestState from '../../state/request'
 import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
-import { PageProvider } from './PageProvider'
+import type { PageProvider } from './PageProvider'
 import { useEntityRedirectOnPersistSuccess } from './useEntityRedirectOnPersistSuccess'
 
 export interface EditPageProps extends SugaredQualifiedSingleEntity, EntitySubTreeAdditionalProps {

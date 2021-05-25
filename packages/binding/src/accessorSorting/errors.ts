@@ -1,7 +1,7 @@
 import { EntityListAccessor } from '../accessors'
 import { BindingError } from '../BindingError'
-import { FieldName } from '../treeParameters'
-import { SortedEntities } from './useSortedEntities'
+import type { FieldName } from '../treeParameters'
+import type { SortedEntities } from './useSortedEntities'
 
 export const throwNoopError = (callbackName: keyof SortedEntities) => {
 	throw new BindingError(

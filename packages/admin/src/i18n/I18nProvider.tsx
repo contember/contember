@@ -3,9 +3,9 @@ import { ReactNode, useMemo } from 'react'
 import { defaultLocale } from './defaultLocale'
 import { DictionaryResolver } from './DictionaryResolver'
 import { I18nContext } from './I18nContext'
-import { I18nMetadata } from './I18nMetadata'
-import { Locale } from './Locale'
-import { MessageDictionaryByLocaleCode } from './MessageDictionary'
+import type { I18nMetadata } from './I18nMetadata'
+import type { Locale } from './Locale'
+import type { MessageDictionaryByLocaleCode } from './MessageDictionary'
 
 export interface I18nProviderProps {
 	localeCode: string | undefined

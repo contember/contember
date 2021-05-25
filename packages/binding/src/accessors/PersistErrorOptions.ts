@@ -1,4 +1,4 @@
-import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
+import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
 
 export interface ScheduleAnotherPersistOptions {
 	proposedBackoff?: number

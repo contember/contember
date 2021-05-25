@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { EntityAccessor } from '../accessors'
+import type { ReactNode } from 'react'
+import type { EntityAccessor } from '../accessors'
 import { EntityKeyContext } from './EntityKeyContext'
 import { EnvironmentContext } from './EnvironmentContext'
 

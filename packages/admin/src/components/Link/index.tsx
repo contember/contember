@@ -1,8 +1,8 @@
 import { connect } from 'react-redux'
 import { pushRequest } from '../../actions/request'
-import { Dispatch } from '../../actions/types'
+import type { Dispatch } from '../../actions/types'
 import routes from '../../routes'
-import State from '../../state'
+import type State from '../../state'
 import { requestStateToPath } from '../../utils/url'
 import { InnerProps, LinkComponent, PublicAnchorProps } from './LinkComponent'
 

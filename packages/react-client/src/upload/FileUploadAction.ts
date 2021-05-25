@@ -1,7 +1,7 @@
-import { FileUploadProgress } from '@contember/client'
-import { FileId } from './FileId'
-import { FileUploadActionType } from './FileUploadActionType'
-import { FileWithMetadata } from './FileWithMetadata'
+import type { FileUploadProgress } from '@contember/client'
+import type { FileId } from './FileId'
+import type { FileUploadActionType } from './FileUploadActionType'
+import type { FileWithMetadata } from './FileWithMetadata'
 
 export type FileUploadAction =
 	| {

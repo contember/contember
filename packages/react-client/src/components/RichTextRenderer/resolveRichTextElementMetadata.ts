@@ -1,11 +1,11 @@
-import { BuiltinElements } from './BuiltinElements'
-import { ReferenceRenderer } from './ReferenceRenderer'
-import { RichTextElement } from './RichTextElement'
-import { RichTextElementMetadata } from './RichTextElementMetadata'
-import { RichTextLeaf } from './RichTextLeaf'
-import { RichTextReference } from './RichTextReference'
+import type { BuiltinElements } from './BuiltinElements'
+import type { ReferenceRenderer } from './ReferenceRenderer'
+import type { RichTextElement } from './RichTextElement'
+import type { RichTextElementMetadata } from './RichTextElementMetadata'
+import type { RichTextLeaf } from './RichTextLeaf'
+import type { RichTextReference } from './RichTextReference'
 import { RichTextRendererError } from './RichTextRendererError'
-import { RichTextRenderMetadata } from './RichTextRenderMetadata'
+import type { RichTextRenderMetadata } from './RichTextRenderMetadata'
 
 export const resolveRichTextElementMetadata = <
 	CustomElements extends RichTextElement = never,

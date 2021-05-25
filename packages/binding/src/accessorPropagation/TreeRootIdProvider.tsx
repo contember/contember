@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { TreeRootId } from '../treeParameters'
+import type { ReactNode } from 'react'
+import type { TreeRootId } from '../treeParameters'
 import { TreeRootIdContext } from './TreeRootIdContext'
 
 export interface TreeRootIdProviderProps {

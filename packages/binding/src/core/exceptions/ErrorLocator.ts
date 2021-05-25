@@ -1,7 +1,7 @@
 import { assertNever } from '../../utils'
 import { StateNode, StateType } from '../state'
 import { MarkerSugarer } from './MarkerSugarer'
-import { RawMarkerPath } from './RawMarkerPath'
+import type { RawMarkerPath } from './RawMarkerPath'
 import { TreeParameterSugarer } from './TreeParameterSugarer'
 
 export class ErrorLocator {

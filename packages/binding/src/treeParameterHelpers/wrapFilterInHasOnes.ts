@@ -1,5 +1,5 @@
 import { whereToFilter } from '@contember/client'
-import { Filter, HasOneRelation } from '../treeParameters'
+import type { Filter, HasOneRelation } from '../treeParameters'
 
 export const wrapFilterInHasOnes = (path: HasOneRelation[], filter: Filter): Filter => {
 	for (let i = path.length - 1; i >= 0; i--) {

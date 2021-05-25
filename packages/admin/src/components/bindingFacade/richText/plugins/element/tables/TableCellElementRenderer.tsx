@@ -1,6 +1,6 @@
 import { EditorTableCellElement } from '@contember/ui'
-import { RenderElementProps } from 'slate-react'
-import { TableCellElement } from './TableCellElement'
+import type { RenderElementProps } from 'slate-react'
+import type { TableCellElement } from './TableCellElement'
 
 export interface TableCellElementRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: TableCellElement

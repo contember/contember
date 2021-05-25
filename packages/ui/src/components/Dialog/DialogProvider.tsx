@@ -2,9 +2,9 @@ import { memo, ReactNode, useMemo, useReducer, useRef } from 'react'
 import { Portal } from '../Portal'
 import { Dialog } from './Dialog'
 import { DialogContext } from './DialogContext'
-import { DialogOptions } from './DialogOptions'
+import type { DialogOptions } from './DialogOptions'
 import { dialogReducer, initialDialogState } from './dialogReducer'
-import { DialogSettings } from './DialogSettings'
+import type { DialogSettings } from './DialogSettings'
 
 export interface DialogProviderProps {
 	children: ReactNode

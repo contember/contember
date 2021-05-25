@@ -1,4 +1,4 @@
-import { SugaredUniqueWhere, UniqueWhere } from './primitives'
+import type { SugaredUniqueWhere, UniqueWhere } from './primitives'
 
 export type SetOnCreate = UniqueWhere | undefined
 

@@ -1,5 +1,5 @@
 import { CrudQueryBuilder } from '../../../src'
-import { DeleteMutationArguments } from '../../../src/crudQueryBuilder'
+import type { DeleteMutationArguments } from '../../../src/crudQueryBuilder'
 
 describe('crud query builder', () => {
 	it('complex mutation', () => {

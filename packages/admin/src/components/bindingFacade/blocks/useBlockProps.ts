@@ -1,6 +1,6 @@
 import { useEnvironment } from '@contember/binding'
 import { ReactNode, useMemo } from 'react'
-import { BlockProps } from './Block'
+import type { BlockProps } from './Block'
 import { blockAnalyzer } from './blockAnalyzer'
 
 export const useBlockProps = (children: ReactNode): BlockProps[] => {

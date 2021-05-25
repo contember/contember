@@ -1,10 +1,10 @@
-import { IntlMessageFormat } from 'intl-messageformat'
+import type { IntlMessageFormat } from 'intl-messageformat'
 import { createElement, Fragment, ReactElement, ReactNode, useCallback, useMemo } from 'react'
 import { DictionaryCache } from './DictionaryCache'
 import { I18nError } from './I18nError'
-import { I18nMetadata } from './I18nMetadata'
-import { MessageDictionary, MessageDictionaryKeys } from './MessageDictionary'
-import { MessageFormatter } from './MessageFormatter'
+import type { I18nMetadata } from './I18nMetadata'
+import type { MessageDictionary, MessageDictionaryKeys } from './MessageDictionary'
+import type { MessageFormatter } from './MessageFormatter'
 import { useI18n } from './useI18n'
 
 const assignKeys = (chunks: ReactNode | ReactNode[]): ReactElement => {

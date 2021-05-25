@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Alias, SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
+import type { Alias, SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList } from '../treeParameters'
 import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
 import { useEntityListSubTreeParameters } from './useEntityListSubTreeParameters'
 import { useGetEntityListSubTree } from './useGetEntityListSubTree'

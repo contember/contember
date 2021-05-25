@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
-import { DataGridColumns, DataGridFilterArtifactStore, DataGridSetColumnFilter } from '../base'
-import { GridPagingAction } from '../paging'
+import type { DataGridColumns, DataGridFilterArtifactStore, DataGridSetColumnFilter } from '../base'
+import type { GridPagingAction } from '../paging'
 import { normalizeInitialFilters } from './normalizeInitialFilters'
 
 export const useFilters = (

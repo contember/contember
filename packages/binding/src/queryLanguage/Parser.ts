@@ -1,7 +1,7 @@
 import { CrudQueryBuilder, GraphQlBuilder, Input } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
-import {
+import type {
 	DesugaredHasManyRelation,
 	DesugaredHasOneRelation,
 	DesugaredQualifiedEntityList,

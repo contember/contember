@@ -1,4 +1,4 @@
-import { EntityAccessor } from '../accessors'
+import type { EntityAccessor } from '../accessors'
 import { useEntityEvent } from './useEntityEvent'
 
 export const useEntityPersistSuccess = (listener: EntityAccessor.EntityEventListenerMap['persistSuccess']) => {

@@ -1,9 +1,9 @@
-import { RuntimeId } from '../../accessorTree'
+import type { RuntimeId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
-import { PlaceholderName, TreeRootId } from '../../treeParameters'
+import type { PlaceholderName, TreeRootId } from '../../treeParameters'
 import { MutationOperationSubTreeType } from './MutationOperationSubTreeType'
-import { MutationOperationType } from './MutationOperationType'
-import { TopLevelMutationOperation } from './TopLevelMutationOperation'
+import type { MutationOperationType } from './MutationOperationType'
+import type { TopLevelMutationOperation } from './TopLevelMutationOperation'
 
 const mutationAliasRegex = /^(?:(u)|(t)([^t]+)t)(.+)__([cud])([sl])(.+)$/
 

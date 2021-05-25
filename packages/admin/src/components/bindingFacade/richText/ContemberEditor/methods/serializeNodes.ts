@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode, SerializableEditorNode, TextNode } from '../../baseEditor'
+import type { BaseEditor, ElementNode, SerializableEditorNode, TextNode } from '../../baseEditor'
 
 export const serializeNodes = <E extends BaseEditor>(
 	editor: E,

@@ -1,4 +1,4 @@
-import { BaseEditor, ElementNode, SerializableEditorNode, TextNode } from '../../baseEditor'
+import type { BaseEditor, ElementNode, SerializableEditorNode, TextNode } from '../../baseEditor'
 import { toLatestFormat } from './toLatestFormat'
 
 export const strictlyDeserializeNodes = <E extends BaseEditor>(

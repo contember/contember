@@ -1,6 +1,6 @@
-import { GraphQlClient } from '@contember/client'
+import type { GraphQlClient } from '@contember/client'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { QueryRequestObject, QueryRequestState } from './requestState'
+import type { QueryRequestObject, QueryRequestState } from './requestState'
 
 export const useJsonEqualMemo = <V>(memoFn: () => V, key: any): V => {
 	const ref = useRef<{ key: string; value: V }>()

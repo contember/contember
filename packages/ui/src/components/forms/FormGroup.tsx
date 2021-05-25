@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { FormGroupLabelPosition, Size } from '../../types'
+import type { FormGroupLabelPosition, Size } from '../../types'
 import { toEnumViewClass } from '../../utils'
 import { ErrorList, ErrorListProps } from './'
 

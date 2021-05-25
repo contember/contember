@@ -1,5 +1,5 @@
 import { Node as SlateNode, Path } from 'slate'
-import { BaseEditor, TextNode, TextSpecifics } from '../../baseEditor'
+import type { BaseEditor, TextNode, TextSpecifics } from '../../baseEditor'
 
 export const hasMarks = <T extends TextNode, E extends BaseEditor>(
 	editor: E,

@@ -6,12 +6,12 @@ import {
 	RelativeEntityList,
 	RelativeSingleField,
 } from '@contember/binding'
-import { MutableRefObject } from 'react'
+import type { MutableRefObject } from 'react'
 import { Editor, PathRef, Transforms } from 'slate'
-import { ElementNode } from '../../baseEditor'
-import { ElementWithReference } from '../elements'
-import { FieldBackedElement } from '../FieldBackedElement'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { ElementNode } from '../../baseEditor'
+import type { ElementWithReference } from '../elements'
+import type { FieldBackedElement } from '../FieldBackedElement'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertElementWithReferenceOptions {
 	bindingOperations: BindingOperations

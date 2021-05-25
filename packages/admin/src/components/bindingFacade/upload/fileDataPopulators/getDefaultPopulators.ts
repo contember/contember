@@ -1,6 +1,6 @@
-import { AggregateDataPopulatorProps } from './AggregateDataPopulatorProps'
+import type { AggregateDataPopulatorProps } from './AggregateDataPopulatorProps'
 import { AudioFileMetadataPopulator } from './AudioFileMetadataPopulator'
-import { FileDataPopulator } from './FileDataPopulator'
+import type { FileDataPopulator } from './FileDataPopulator'
 import { FileUrlDataPopulator } from './FileUrlDataPopulator'
 import { GenericFileMetadataPopulator } from './GenericFileMetadataPopulator'
 import { ImageFileMetadataPopulator } from './ImageFileMetadataPopulator'

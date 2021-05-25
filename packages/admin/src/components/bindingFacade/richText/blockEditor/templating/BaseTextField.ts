@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { BlockSlateEditor } from '../editor'
+import type { ReactNode } from 'react'
+import type { BlockSlateEditor } from '../editor'
 
 export interface BaseTextField {
 	placeholder: ReactNode

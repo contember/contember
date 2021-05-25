@@ -1,13 +1,13 @@
-import { ListOperations } from '../core/operations'
-import { Environment } from '../dao'
-import { EntityId, EntityRealmKey } from '../treeParameters'
-import { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
-import { BatchUpdatesOptions } from './BatchUpdatesOptions'
-import { EntityAccessor } from './EntityAccessor'
-import { Errorable } from './Errorable'
-import { ErrorAccessor } from './ErrorAccessor'
-import { PersistErrorOptions } from './PersistErrorOptions'
-import { PersistSuccessOptions } from './PersistSuccessOptions'
+import type { ListOperations } from '../core/operations'
+import type { Environment } from '../dao'
+import type { EntityId, EntityRealmKey } from '../treeParameters'
+import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
+import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
+import type { EntityAccessor } from './EntityAccessor'
+import type { Errorable } from './Errorable'
+import type { ErrorAccessor } from './ErrorAccessor'
+import type { PersistErrorOptions } from './PersistErrorOptions'
+import type { PersistSuccessOptions } from './PersistSuccessOptions'
 
 class EntityListAccessor implements Errorable {
 	public constructor(

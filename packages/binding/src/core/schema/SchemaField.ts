@@ -1,4 +1,4 @@
-import { SchemaColumn } from './SchemaColumn'
-import { SchemaRelation } from './SchemaRelation'
+import type { SchemaColumn } from './SchemaColumn'
+import type { SchemaRelation } from './SchemaRelation'
 
 export type SchemaField = SchemaRelation | SchemaColumn

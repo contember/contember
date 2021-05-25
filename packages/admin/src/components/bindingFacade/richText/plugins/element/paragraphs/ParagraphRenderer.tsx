@@ -1,6 +1,6 @@
 import { EditorParagraph } from '@contember/ui'
-import { RenderElementProps } from 'slate-react'
-import { ParagraphElement } from './ParagraphElement'
+import type { RenderElementProps } from 'slate-react'
+import type { ParagraphElement } from './ParagraphElement'
 
 export interface ParagraphRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: ParagraphElement

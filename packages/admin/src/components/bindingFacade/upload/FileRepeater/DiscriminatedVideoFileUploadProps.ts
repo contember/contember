@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { SugaredDiscriminateBy } from '../../discrimination'
 
-export type DiscriminatedVideoFileUploadProps = {
+export interface DiscriminatedVideoFileUploadProps {
 	acceptVideo?: string | string[]
 	renderVideoFile?: () => ReactNode
 	renderVideoFilePreview?: (file: File, previewUrl: string) => ReactNode

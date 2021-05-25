@@ -1,7 +1,7 @@
 import type { Scalar } from '@contember/binding'
 import type { ElementNode } from '../../baseEditor'
 
-export type ElementDataAttributes = {
+export interface ElementDataAttributes {
 	[dataAttribute: string]: Scalar
 }
 

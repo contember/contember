@@ -5,7 +5,7 @@ import { pageRequest } from '../../state/request'
 import { Link, PublicAnchorProps } from '../Link'
 import type { LinkComponent } from '../Link/LinkComponent'
 
-export type PageConfig = {
+export interface PageConfig {
 	name: string
 	params?: {}
 }

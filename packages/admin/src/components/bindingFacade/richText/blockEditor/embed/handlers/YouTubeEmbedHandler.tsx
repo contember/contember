@@ -55,7 +55,7 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 }
 
 namespace YouTubeEmbedHandler {
-	export type Options = {
+	export interface Options {
 		render?: () => ReactNode
 		youTubeIdField: SugaredFieldProps['field']
 		discriminateBy: SugaredDiscriminateBy

@@ -73,7 +73,7 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 }
 
 namespace GoogleFormEmbedHandler {
-	export type Options = {
+	export interface Options {
 		nonEmbedLinkWarning?: string
 		render?: () => ReactNode
 		googleFormIdField: SugaredFieldProps['field']

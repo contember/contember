@@ -56,7 +56,7 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 }
 
 namespace VimeoEmbedHandler {
-	export type Options = {
+	export interface Options {
 		render?: () => ReactNode
 		vimeoIdField: SugaredFieldProps['field']
 		discriminateBy: SugaredDiscriminateBy

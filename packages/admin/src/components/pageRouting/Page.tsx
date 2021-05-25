@@ -1,6 +1,8 @@
 import { Component as ReactComponent, ReactNode } from 'react'
 
-export type Params = { [key: string]: {} }
+export interface Params {
+	[key: string]: {}
+}
 
 export interface PageProps<P extends Params = Params, N extends keyof P = keyof Params> {
 	name: N

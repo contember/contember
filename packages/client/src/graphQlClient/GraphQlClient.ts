@@ -45,7 +45,9 @@ namespace GraphQlClient {
 		signal?: AbortSignal
 	}
 
-	export type Variables = { [name: string]: any }
+	export interface Variables {
+		[name: string]: any
+	}
 
 	export type FailedRequestMetadata = Pick<Response, 'status' | 'statusText'> & {
 		responseText: string

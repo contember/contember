@@ -33,7 +33,7 @@ namespace ErrorAccessor {
 	export type ErrorsById = Map<ErrorId, BoxedError>
 
 	export type ExecutionErrors = [ExecutionError, ...ExecutionError[]]
-	export type BoxedExecutionError = {
+	export interface BoxedExecutionError {
 		type: 'execution'
 		error: SugaredExecutionError
 	}
@@ -45,7 +45,7 @@ namespace ErrorAccessor {
 	}
 
 	export type ValidationErrors = [ValidationError, ...ValidationError[]]
-	export type BoxedValidationError = {
+	export interface BoxedValidationError {
 		type: 'validation'
 		error: SugaredValidationError
 	}

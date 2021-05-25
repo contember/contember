@@ -20,6 +20,7 @@
 		"incremental": true,
 
 		"importsNotUsedAsValues": "error",
+		"isolatedModules": true,
 
 		"lib": ["esnext", "dom"]
 	}

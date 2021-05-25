@@ -1,7 +1,6 @@
 export * from './AccessorTree'
 export * from './AccessorTreeState'
 export * from './AccessorTreeStateAction'
-export * from './AccessorTreeStateActionType'
 export * from './AccessorTreeStateMetadata'
 export * from './AccessorTreeStateOptions'
 export * from './accessorTreeStateReducer'

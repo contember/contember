@@ -1,8 +1,4 @@
-export enum StageDiffState {
-	DIFF_FETCHING = 'fetching',
-	DIFF_FAILED = 'failed',
-	DIFF_DONE = 'done',
-}
+export type StageDiffState = 'fetching' | 'failed' | 'done'
 
 export interface StageDiff {
 	project: string
@@ -12,27 +8,22 @@ export interface StageDiff {
 }
 
 export interface StageDiffFetching extends StageDiff {
-	state: StageDiffState.DIFF_FETCHING
+	state: 'fetching'
 }
 
 export interface StageDiffFailed extends StageDiff {
-	state: StageDiffState.DIFF_FAILED
+	state: 'failed'
 	errors: string[]
 }
 
 export interface StageDiffDone extends StageDiff {
-	state: StageDiffState.DIFF_DONE
+	state: 'done'
 	events: Event[]
 }
 
 export type AnyStageDiff = StageDiffFetching | StageDiffDone | StageDiffFailed
 
-export enum EventType {
-	UPDATE = 'UPDATE',
-	DELETE = 'DELETE',
-	CREATE = 'CREATE',
-	RUN_MIGRATION = 'RUN_MIGRATION',
-}
+export type EventType = 'UPDATE' | 'DELETE' | 'CREATE' | 'RUN_MIGRATION'
 
 export interface Event {
 	id: string

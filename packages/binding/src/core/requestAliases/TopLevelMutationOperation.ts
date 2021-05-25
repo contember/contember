@@ -1,11 +1,11 @@
 import type { EntityId, PlaceholderName, TreeRootId } from '../../treeParameters'
-import type { MutationOperationSubTreeType } from './MutationOperationSubTreeType'
-import type { MutationOperationType } from './MutationOperationType'
+import type { mutationOperationSubTreeType } from './mutationOperationSubTreeType'
+import type { mutationOperationType } from './mutationOperationType'
 
 export interface TopLevelMutationOperation {
 	treeRootId: TreeRootId | undefined
 	subTreePlaceholder: PlaceholderName
-	type: MutationOperationType
-	subTreeType: MutationOperationSubTreeType
+	type: typeof mutationOperationType[keyof typeof mutationOperationType]
+	subTreeType: typeof mutationOperationSubTreeType[keyof typeof mutationOperationSubTreeType]
 	entityId: EntityId
 }

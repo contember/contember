@@ -1,5 +1,4 @@
 import {
-	AccessorTreeStateName,
 	BindingError,
 	DataBindingProvider,
 	DataBindingStateComponentProps,
@@ -25,7 +24,7 @@ export interface DimensionsSwitcherBaseProps
 export interface DimensionsSwitcherProps extends DimensionsSwitcherBaseProps {}
 
 const DimensionsStateRenderer = (props: DataBindingStateComponentProps) => {
-	if (props.accessorTreeState.name === AccessorTreeStateName.Initialized) {
+	if (props.accessorTreeState.name === 'initialized') {
 		return <>{props.children}</>
 	}
 	return <Spinner />

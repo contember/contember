@@ -1,7 +1,6 @@
 import type { ElementType } from 'react'
-import {
+import type {
 	ConstrainedLeafRepresentationFactory,
-	RepresentationFactorySite,
 	UnconstrainedLeafRepresentationFactory,
 	ValidFactoryName,
 } from './types'
@@ -26,13 +25,13 @@ class Leaf<
 	) {
 		if (typeof factory === 'function') {
 			this.specification = {
-				type: RepresentationFactorySite.UseSite,
+				type: 'useSite',
 				ComponentType,
 				factory,
 			}
 		} else {
 			this.specification = {
-				type: RepresentationFactorySite.DeclarationSite,
+				type: 'declarationSite',
 				factoryMethodName: factory,
 			}
 		}
@@ -47,11 +46,11 @@ namespace Leaf {
 		StaticContext
 	> =
 		| {
-				type: RepresentationFactorySite.DeclarationSite
+				type: 'declarationSite'
 				factoryMethodName: FactoryMethodName
 		  }
 		| {
-				type: RepresentationFactorySite.UseSite
+				type: 'useSite'
 				factory: UnconstrainedLeafRepresentationFactory<Props, Representation, StaticContext>
 				ComponentType?: ElementType<Props>
 		  }

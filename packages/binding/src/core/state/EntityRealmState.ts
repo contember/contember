@@ -4,7 +4,6 @@ import type { EntityEventListenerStore, EntityRealmKey, FieldName, PlaceholderNa
 import type { EntityListState } from './EntityListState'
 import type { EntityState } from './EntityState'
 import type { StateNode } from './StateNode'
-import type { StateType } from './StateType'
 
 export interface HasOneEntityRealmBlueprint {
 	readonly type: 'hasOne'
@@ -29,7 +28,7 @@ export type EntityRealmBlueprint =
 	| SubTreeEntityRealmBlueprint
 
 export interface EntityRealmStateStub {
-	readonly type: StateType.EntityRealmStub
+	readonly type: 'entityRealmStub'
 
 	readonly blueprint: EntityRealmBlueprint
 	entity: EntityState
@@ -43,7 +42,7 @@ export interface EntityRealmStateStub {
  * completely different contexts. Even with different fields.
  */
 export interface EntityRealmState {
-	readonly type: StateType.EntityRealm
+	readonly type: 'entityRealm'
 
 	readonly blueprint: EntityRealmBlueprint
 	entity: EntityState

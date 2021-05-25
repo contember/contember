@@ -1,5 +1,4 @@
 export * from './ApiRequestAction'
-export * from './ApiRequestActionType'
 export * from './ApiRequestReadyState'
 export * from './apiRequestReducer'
 export * from './ApiRequestState'

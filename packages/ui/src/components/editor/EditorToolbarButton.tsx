@@ -4,10 +4,7 @@ import { useComponentClassName } from '../../auxiliary'
 import { toViewClass } from '../../utils'
 import { Icon, IconSourceSpecification } from '../Icon'
 
-export enum ToolbarButtonLayout {
-	GRID = 'grid',
-	LIST = 'list',
-}
+export type ToolbarButtonLayout = 'grid' | 'list'
 
 export interface ToolbarButton extends IconSourceSpecification {
 	showLabel?: boolean
@@ -22,7 +19,18 @@ export interface ToolbarButton extends IconSourceSpecification {
 export const EditorToolbarButton = memo(
 	forwardRef<any, ToolbarButton>(
 		(
-			{ label, title, contemberIcon, customIcon, blueprintIcon, showLabel, isActive, layout, onClick, onMouseDown },
+			{
+				label,
+				title,
+				contemberIcon,
+				customIcon,
+				blueprintIcon,
+				showLabel,
+				isActive,
+				layout = 'grid',
+				onClick,
+				onMouseDown,
+			},
 			ref,
 		) => {
 			return (
@@ -38,7 +46,7 @@ export const EditorToolbarButton = memo(
 						useComponentClassName('editorToolbarButton'),
 						toViewClass('showLabel', showLabel),
 						toViewClass('active', isActive),
-						toViewClass(`layout-${layout || ToolbarButtonLayout.GRID}`, true),
+						toViewClass(`layout-${layout}`, true),
 					)}
 				>
 					<span className={cn(useComponentClassName('editorToolbarButton-icon'))}>

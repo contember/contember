@@ -14,7 +14,7 @@ describe('query language parser', () => {
 		expect(
 			Parser.parseQueryLanguageExpression(
 				'a(a=$a).field(ab = $ab, literalColumn = $literal).x(x = truecolor).foo',
-				Parser.EntryPoint.RelativeSingleField,
+				'relativeSingleField',
 				environment,
 			),
 		).toEqual({

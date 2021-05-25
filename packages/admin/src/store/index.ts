@@ -6,7 +6,7 @@ import type { Dispatch } from '../actions/types'
 import type { ClientConfig } from '../bootstrap'
 import ContentClientFactory from '../model/ContentClientFactory'
 import GraphqlClient from '../model/GraphqlClient'
-import LocalStorageManager from '../model/LocalStorageManager'
+import { LocalStorageManager } from '../model/LocalStorageManager'
 import SystemClientFactory from '../model/SystemClientFactory'
 import rootReducer from '../reducer'
 import { SET_IDENTITY } from '../reducer/auth'
@@ -44,7 +44,7 @@ export function persistState(services: Services) {
 	return (next: Function) => (reducer: Reducer, initialState: State): Store => {
 		const store: Store = next(reducer, initialState)
 
-		const persistedApiIdentity = services.localStorageManager.get(LocalStorageManager.Keys.API_IDENTITY)
+		const persistedApiIdentity = services.localStorageManager.get('api_identity')
 		if (persistedApiIdentity) {
 			store.dispatch(createAction(SET_IDENTITY, () => JSON.parse(persistedApiIdentity))())
 		}
@@ -53,9 +53,9 @@ export function persistState(services: Services) {
 			const state = store.getState()
 			const identity = state.auth.identity
 			if (identity) {
-				services.localStorageManager.set(LocalStorageManager.Keys.API_IDENTITY, JSON.stringify(identity))
+				services.localStorageManager.set('api_identity', JSON.stringify(identity))
 			} else {
-				services.localStorageManager.unset(LocalStorageManager.Keys.API_IDENTITY)
+				services.localStorageManager.unset('api_identity')
 			}
 		})
 

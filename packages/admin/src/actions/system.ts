@@ -1,5 +1,5 @@
 import { SYSTEM_ADD_DIFF } from '../reducer/system'
-import { StageDiffDone, StageDiffFailed, StageDiffFetching, StageDiffState } from '../state/system'
+import type { StageDiffDone, StageDiffFailed, StageDiffFetching, StageDiffState } from '../state/system'
 import type { ActionCreator } from './types'
 
 export const setFetching = (baseStage: string): ActionCreator<StageDiffFetching> => async (dispatch, getState) => {
@@ -17,7 +17,7 @@ export const setFetching = (baseStage: string): ActionCreator<StageDiffFetching>
 			project,
 			headStage,
 			baseStage,
-			state: StageDiffState.DIFF_FETCHING as const,
+			state: 'fetching' as const,
 		},
 	})
 }
@@ -46,8 +46,7 @@ export const fetchDiff = (baseStage: string): ActionCreator<StageDiffDone | Stag
 		apiToken,
 	)
 
-	const diffState: StageDiffState.DIFF_FAILED | StageDiffState.DIFF_DONE =
-		response.diff.errors && response.diff.errors.length > 0 ? StageDiffState.DIFF_FAILED : StageDiffState.DIFF_DONE
+	const diffState: 'failed' | 'done' = response.diff.errors && response.diff.errors.length > 0 ? 'failed' : 'done'
 	return dispatch({
 		type: SYSTEM_ADD_DIFF,
 		payload: {

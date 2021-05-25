@@ -1,18 +1,16 @@
-import type { EditorSelectionActionType } from './EditorSelectionActionType'
-
 export type EditorSelectionAction =
 	| {
-			type: EditorSelectionActionType.Blur
+			type: 'blur'
 	  }
 	| {
-			type: EditorSelectionActionType.SetSelection
+			type: 'setSelection'
 			selection: Selection
 	  }
 	| {
-			type: EditorSelectionActionType.SetMousePointerSelectionStart
+			type: 'setMousePointerSelectionStart'
 			event: MouseEvent
 	  }
 	| {
-			type: EditorSelectionActionType.SetMousePointerSelectionFinish
+			type: 'setMousePointerSelectionFinish'
 			event: MouseEvent | undefined
 	  }

@@ -1,18 +1,17 @@
 import type { GraphQlClient } from '@contember/client'
-import type { ApiRequestActionType } from './ApiRequestActionType'
 
 export type ApiRequestAction<SuccessData> =
 	| {
-			type: ApiRequestActionType.Uninitialize
+			type: 'uninitialize'
 	  }
 	| {
-			type: ApiRequestActionType.Initialize
+			type: 'initialize'
 	  }
 	| {
-			type: ApiRequestActionType.ResolveSuccessfully
+			type: 'resolveSuccessfully'
 			data: SuccessData
 	  }
 	| {
-			type: ApiRequestActionType.ResolveWithError
+			type: 'resolveWithError'
 			error: GraphQlClient.FailedRequestMetadata
 	  }

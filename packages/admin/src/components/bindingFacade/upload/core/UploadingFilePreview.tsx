@@ -1,5 +1,5 @@
 import type { EntityAccessor, Environment } from '@contember/binding'
-import { FileUploadReadyState, SingleFileUploadState } from '@contember/react-client'
+import type { SingleFileUploadState } from '@contember/react-client'
 import { FilePreview, UploadProgress } from '@contember/ui'
 import { memo, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { FileDataPopulator } from '../fileDataPopulators'
@@ -49,7 +49,7 @@ export const UploadingFilePreview = memo(
 		useEffect(() => {
 			const currentUploadState = uploadStateRef.current
 			const preparePopulators = async () => {
-				if (readyState === FileUploadReadyState.Uploading && currentUploadState) {
+				if (readyState === 'uploading' && currentUploadState) {
 					const dataPromises = relevantPopulators.map(populator =>
 						populator.prepareFileData
 							? populator.prepareFileData(currentUploadState.file, currentUploadState.previewUrl)
@@ -76,7 +76,7 @@ export const UploadingFilePreview = memo(
 		}, [readyState, relevantPopulators])
 
 		useEffect(() => {
-			if (uploadState.readyState !== FileUploadReadyState.Success || preparedPopulatorData.name !== 'ready') {
+			if (uploadState.readyState !== 'success' || preparedPopulatorData.name !== 'ready') {
 				return
 			}
 
@@ -114,20 +114,20 @@ export const UploadingFilePreview = memo(
 		)
 
 		const getOverlay = (): ReactNode => {
-			if (uploadState.readyState === FileUploadReadyState.Error && uploadState.error?.endUserMessage) {
+			if (uploadState.readyState === 'error' && uploadState.error?.endUserMessage) {
 				return uploadState.error.endUserMessage
 			}
 			if (
-				uploadState.readyState === FileUploadReadyState.Error ||
+				uploadState.readyState === 'error' ||
 				preparedPopulatorData.name === 'error' ||
-				uploadState.readyState === FileUploadReadyState.Aborted
+				uploadState.readyState === 'aborted'
 			) {
 				return `Upload failed`
 			}
-			if (uploadState.readyState === FileUploadReadyState.Success && preparedPopulatorData.name === 'ready') {
+			if (uploadState.readyState === 'success' && preparedPopulatorData.name === 'ready') {
 				return undefined
 			}
-			if (uploadState.readyState === FileUploadReadyState.Uploading) {
+			if (uploadState.readyState === 'uploading') {
 				return <UploadProgress progress={uploadState.progress} />
 			}
 			return <UploadProgress />

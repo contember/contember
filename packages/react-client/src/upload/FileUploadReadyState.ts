@@ -1,6 +1,1 @@
-export enum FileUploadReadyState {
-	Uploading = 'uploading',
-	Success = 'success',
-	Error = 'error',
-	Aborted = 'aborted',
-}
+export type FileUploadReadyState = 'uploading' | 'success' | 'error' | 'aborted'

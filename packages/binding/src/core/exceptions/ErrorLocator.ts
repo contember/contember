@@ -1,5 +1,5 @@
 import { assertNever } from '../../utils'
-import { StateNode, StateType } from '../state'
+import type { StateNode } from '../state'
 import { MarkerSugarer } from './MarkerSugarer'
 import type { RawMarkerPath } from './RawMarkerPath'
 import { TreeParameterSugarer } from './TreeParameterSugarer'
@@ -17,9 +17,9 @@ export class ErrorLocator {
 				return []
 			}
 			switch (state.type) {
-				case StateType.Field:
+				case 'field':
 					return [...stateToPath(state.parent), TreeParameterSugarer.sugarField(state.fieldMarker.fieldName)]
-				case StateType.EntityRealm: {
+				case 'entityRealm': {
 					const blueprint = state.blueprint
 					if (blueprint.type === 'subTree') {
 						return [
@@ -37,7 +37,7 @@ export class ErrorLocator {
 					}
 					return assertNever(blueprint)
 				}
-				case StateType.EntityList: {
+				case 'entityList': {
 					const blueprint = state.blueprint
 
 					if (blueprint.parent === undefined) {

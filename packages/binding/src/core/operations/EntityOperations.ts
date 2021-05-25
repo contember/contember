@@ -1,4 +1,4 @@
-import { BatchUpdatesOptions, EntityAccessor, ErrorAccessor } from '../../accessors'
+import type { BatchUpdatesOptions, EntityAccessor, ErrorAccessor } from '../../accessors'
 import { ServerGeneratedUuid, UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { EntityFieldMarkersContainer, HasOneRelationMarker } from '../../markers'
@@ -8,14 +8,7 @@ import type { AccessorErrorManager } from '../AccessorErrorManager'
 import type { EventManager } from '../EventManager'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
 import { MarkerComparator } from '../MarkerComparator'
-import {
-	EntityListState,
-	EntityRealmState,
-	EntityRealmStateStub,
-	getEntityMarker,
-	StateIterator,
-	StateType,
-} from '../state'
+import { EntityListState, EntityRealmState, EntityRealmStateStub, getEntityMarker, StateIterator } from '../state'
 import type { StateInitializer } from '../StateInitializer'
 import type { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
@@ -30,7 +23,7 @@ export class EntityOperations {
 	) {}
 
 	public addError(entityRealm: EntityRealmState, error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.accessorErrorManager.addError(entityRealm, { type: ErrorAccessor.ErrorType.Validation, error })
+		return this.accessorErrorManager.addError(entityRealm, { type: 'validation', error })
 	}
 
 	public addEventListener(
@@ -113,8 +106,8 @@ export class EntityOperations {
 
 					if (
 						previouslyConnectedState === undefined ||
-						previouslyConnectedState.type === StateType.Field ||
-						previouslyConnectedState.type === StateType.EntityList
+						previouslyConnectedState.type === 'field' ||
+						previouslyConnectedState.type === 'entityList'
 					) {
 						OperationsHelpers.rejectInvalidAccessorTree()
 					}
@@ -216,7 +209,7 @@ export class EntityOperations {
 
 					if (
 						stateToDisconnect === undefined ||
-						(stateToDisconnect.type !== StateType.EntityRealm && stateToDisconnect.type !== StateType.EntityRealmStub)
+						(stateToDisconnect.type !== 'entityRealm' && stateToDisconnect.type !== 'entityRealmStub')
 					) {
 						OperationsHelpers.rejectInvalidAccessorTree()
 					}
@@ -307,13 +300,13 @@ export class EntityOperations {
 					return assertNever(realmToDelete.blueprint)
 				}
 
-				if (realmToDelete.type === StateType.EntityRealm) {
+				if (realmToDelete.type === 'entityRealm') {
 					// Undoing whatever this had caused
 					changesDelta -= realmToDelete.unpersistedChangesCount
 				}
 				this.eventManager.registerJustUpdated(parent, changesDelta)
 
-				if (realmToDelete.type === StateType.EntityRealm) {
+				if (realmToDelete.type === 'entityRealm') {
 					parent.childrenWithPendingUpdates?.delete(realmToDelete)
 				}
 

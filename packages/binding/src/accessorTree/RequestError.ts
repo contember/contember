@@ -1,22 +1,16 @@
 import type { GraphQlClient } from '@contember/client'
 
-export enum RequestErrorType {
-	Unauthorized = 'unauthorized',
-	NetworkError = 'networkError',
-	UnknownError = 'unknownError',
-}
-
 export interface UnauthorizedRequestError {
-	type: RequestErrorType.Unauthorized
+	type: 'unauthorized'
 }
 
 export interface NetworkErrorRequestError {
-	type: RequestErrorType.NetworkError
+	type: 'networkError'
 	metadata: GraphQlClient.FailedRequestMetadata
 }
 
 export interface UnknownErrorRequestError {
-	type: RequestErrorType.UnknownError
+	type: 'unknownError'
 }
 
 export type RequestError = UnauthorizedRequestError | NetworkErrorRequestError | UnknownErrorRequestError

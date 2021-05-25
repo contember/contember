@@ -1,39 +1,28 @@
-export enum EditorSelectionStateName {
-	Unfocused = 'unfocused',
-	CollapsedSelection = 'collapsedSelection',
-
-	// With an anchor, but not a focus
-	EmergingPointerSelection = 'emergingPointerSelection',
-
-	ExpandedPointerSelection = 'expandedPointerSelection',
-	ExpandedNonPointerSelection = 'expandedNonPointerSelection',
-}
-
 export type EditorSelectionState =
 	| {
-			name: EditorSelectionStateName.Unfocused
+			name: 'unfocused'
 	  }
 	| {
-			name: EditorSelectionStateName.EmergingPointerSelection
+			name: 'emergingPointerSelection'
 			selection: Selection | undefined
 			selectedString: string
 			startEvent: MouseEvent
 			finishEvent: MouseEvent | undefined
 	  }
 	| {
-			name: EditorSelectionStateName.ExpandedPointerSelection
+			name: 'expandedPointerSelection'
 			selection: Selection
 			selectedString: string
 			startEvent: MouseEvent
 			finishEvent: MouseEvent
 	  }
 	| {
-			name: EditorSelectionStateName.ExpandedNonPointerSelection
+			name: 'expandedNonPointerSelection'
 			selection: Selection
 			selectedString: string
 	  }
 	| {
-			name: EditorSelectionStateName.CollapsedSelection
+			name: 'collapsedSelection'
 			selection: Selection
 			selectedString: string
 	  }

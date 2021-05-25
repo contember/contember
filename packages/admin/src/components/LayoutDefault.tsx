@@ -16,7 +16,7 @@ import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
 import LogoutLink from './LogoutLink'
 import { default as PageLink } from './pageRouting/PageLink'
 import SwitchProjectLink from './SwitchProjectLink'
-import { Avatar, AvatarSize } from './ui'
+import { Avatar } from './ui'
 
 export interface LayoutProps {
 	header: {
@@ -89,7 +89,7 @@ export const LayoutDefault = memo((props: LayoutProps) => {
 								size: 'large',
 								distinction: 'seamless',
 								flow: 'circular',
-								children: <Avatar size={AvatarSize.Size2} email={email} />,
+								children: <Avatar size={2} email={email} />,
 							}}
 						>
 							<>

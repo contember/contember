@@ -5,9 +5,8 @@ import { PRIMARY_KEY_NAME } from '../../bindingTypes'
 import type { EntityId } from '../../treeParameters'
 import { EventManager } from '../EventManager'
 import { RealmKeyGenerator } from '../RealmKeyGenerator'
-import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, StateType } from '../state'
+import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState } from '../state'
 import type { StateInitializer } from '../StateInitializer'
-import { TreeParameterMerger } from '../TreeParameterMerger'
 import type { TreeStore } from '../TreeStore'
 
 const emptyEntityIdSet: ReadonlySet<EntityId> = new Set()
@@ -110,9 +109,9 @@ export class OperationsHelpers {
 		oldEntity.realms.delete(oldRealmKey)
 		newEntity.realms.set(newRealmKey, realm)
 
-		if (realm.type === StateType.EntityRealm) {
+		if (realm.type === 'entityRealm') {
 			const childIdState = realm.children.get(PRIMARY_KEY_NAME)
-			if (childIdState?.type === StateType.Field) {
+			if (childIdState?.type === 'field') {
 				childIdState.value = newId.value
 				eventManager.registerJustUpdated(childIdState, EventManager.NO_CHANGES_DIFFERENCE)
 			}
@@ -152,7 +151,7 @@ export class OperationsHelpers {
 		if (parent) {
 			eventManager.registerJustUpdated(parent, EventManager.NO_CHANGES_DIFFERENCE)
 		}
-		if (realm.type === StateType.EntityRealm) {
+		if (realm.type === 'entityRealm') {
 			eventManager.registerJustUpdated(realm, EventManager.NO_CHANGES_DIFFERENCE)
 		}
 	}

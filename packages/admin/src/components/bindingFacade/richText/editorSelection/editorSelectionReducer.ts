@@ -1,9 +1,8 @@
 import type { EditorSelectionAction } from './EditorSelectionAction'
-import { EditorSelectionActionType } from './EditorSelectionActionType'
-import { EditorSelectionState, EditorSelectionStateName } from './EditorSelectionState'
+import type { EditorSelectionState } from './EditorSelectionState'
 
 export const defaultEditorSelectionState: EditorSelectionState = {
-	name: EditorSelectionStateName.Unfocused,
+	name: 'unfocused',
 }
 
 // TODO this whole thing needs reworked because the selection object is actually super mutable and that leads to some
@@ -13,18 +12,18 @@ export const editorSelectionReducer = (
 	action: EditorSelectionAction,
 ): EditorSelectionState => {
 	switch (action.type) {
-		case EditorSelectionActionType.Blur: {
+		case 'blur': {
 			return defaultEditorSelectionState
 		}
-		case EditorSelectionActionType.SetSelection: {
+		case 'setSelection': {
 			if (action.selection.type === 'Caret') {
 				return {
-					name: EditorSelectionStateName.CollapsedSelection,
+					name: 'collapsedSelection',
 					selection: action.selection,
 					selectedString: action.selection.toString(),
 				}
 			} else if (action.selection.type === 'Range') {
-				if (previousState.name === EditorSelectionStateName.EmergingPointerSelection) {
+				if (previousState.name === 'emergingPointerSelection') {
 					if (!previousState.finishEvent) {
 						return {
 							...previousState,
@@ -32,7 +31,7 @@ export const editorSelectionReducer = (
 						}
 					}
 					return {
-						name: EditorSelectionStateName.ExpandedPointerSelection,
+						name: 'expandedPointerSelection',
 						startEvent: previousState.startEvent,
 						finishEvent: previousState.finishEvent,
 						selection: action.selection,
@@ -40,24 +39,24 @@ export const editorSelectionReducer = (
 					}
 				}
 				return {
-					name: EditorSelectionStateName.ExpandedNonPointerSelection,
+					name: 'expandedNonPointerSelection',
 					selection: action.selection,
 					selectedString: action.selection.toString(),
 				}
 			}
 			return previousState
 		}
-		case EditorSelectionActionType.SetMousePointerSelectionStart: {
+		case 'setMousePointerSelectionStart': {
 			return {
-				name: EditorSelectionStateName.EmergingPointerSelection,
+				name: 'emergingPointerSelection',
 				selection: undefined,
 				selectedString: '',
 				startEvent: action.event,
 				finishEvent: undefined,
 			}
 		}
-		case EditorSelectionActionType.SetMousePointerSelectionFinish: {
-			if (previousState.name === EditorSelectionStateName.EmergingPointerSelection) {
+		case 'setMousePointerSelectionFinish': {
+			if (previousState.name === 'emergingPointerSelection') {
 				const selection = previousState.selection
 
 				if (!selection) {
@@ -67,14 +66,14 @@ export const editorSelectionReducer = (
 					}
 				} else if (selection.type === 'Caret') {
 					return {
-						name: EditorSelectionStateName.CollapsedSelection,
+						name: 'collapsedSelection',
 						selection,
 						selectedString: selection.toString(),
 					}
 				} else if (selection.type === 'Range') {
 					if (action.event) {
 						return {
-							name: EditorSelectionStateName.ExpandedPointerSelection,
+							name: 'expandedPointerSelection',
 							startEvent: previousState.startEvent,
 							finishEvent: action.event,
 							selection,
@@ -82,7 +81,7 @@ export const editorSelectionReducer = (
 						}
 					}
 					return {
-						name: EditorSelectionStateName.ExpandedNonPointerSelection,
+						name: 'expandedNonPointerSelection',
 						selection,
 						selectedString: selection.toString(),
 					}

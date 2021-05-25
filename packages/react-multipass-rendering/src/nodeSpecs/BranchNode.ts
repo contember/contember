@@ -1,12 +1,7 @@
 import type { ElementType } from 'react'
 import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError'
 import type { BranchNodeOptions } from './BranchNodeOptions'
-import {
-	ChildrenRepresentationReducer,
-	RepresentationFactorySite,
-	UseSiteBranchNodeRepresentationFactory,
-	ValidFactoryName,
-} from './types'
+import type { ChildrenRepresentationReducer, UseSiteBranchNodeRepresentationFactory, ValidFactoryName } from './types'
 
 class BranchNode<
 	Props extends {} = {},
@@ -58,7 +53,7 @@ class BranchNode<
 	) {
 		if (typeof factory !== 'function') {
 			this.specification = {
-				type: RepresentationFactorySite.DeclarationSite,
+				type: 'declarationSite',
 				factoryMethodName: factory,
 				childrenRepresentationReducer: componentOrReducer as ChildrenRepresentationReducer<
 					ChildrenRepresentation,
@@ -67,7 +62,7 @@ class BranchNode<
 			}
 		} else if (typeof factory === 'function') {
 			this.specification = {
-				type: RepresentationFactorySite.UseSite,
+				type: 'useSite',
 				factory,
 				ComponentType: componentOrReducer as ElementType<Props>,
 			}
@@ -91,7 +86,7 @@ namespace BranchNode {
 		Representation = any
 	> =
 		| {
-				type: RepresentationFactorySite.DeclarationSite
+				type: 'declarationSite'
 				factoryMethodName: FactoryMethodName
 				childrenRepresentationReducer: ChildrenRepresentationReducer<
 					ChildrenRepresentation,
@@ -99,7 +94,7 @@ namespace BranchNode {
 				>
 		  }
 		| {
-				type: RepresentationFactorySite.UseSite
+				type: 'useSite'
 				factory: UseSiteBranchNodeRepresentationFactory<Props, ChildrenRepresentation, Representation, StaticContext>
 				ComponentType?: ElementType<Props>
 		  }

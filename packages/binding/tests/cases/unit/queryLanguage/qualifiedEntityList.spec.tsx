@@ -2,7 +2,7 @@ import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
 
 const parse = (input: string) => {
-	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.QualifiedEntityList, new Environment())
+	return Parser.parseQueryLanguageExpression(input, 'qualifiedEntityList', new Environment())
 }
 
 describe('qualified entity list QueryLanguage parser', () => {

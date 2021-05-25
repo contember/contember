@@ -7,7 +7,6 @@ import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 import type { FieldState } from './FieldState'
 import { getEntityMarker } from './getEntityMarker'
 import type { RootStateNode, StateINode, StateNode } from './StateNode'
-import { StateType } from './StateType'
 
 export class StateIterator {
 	public static *eachSiblingRealm(
@@ -15,7 +14,7 @@ export class StateIterator {
 		relevantPlaceholder?: PlaceholderName,
 	): IterableIterator<EntityRealmState> {
 		for (let [realmKey, realm] of state.entity.realms) {
-			if (realm.type === StateType.EntityRealmStub) {
+			if (realm.type === 'entityRealmStub') {
 				if (relevantPlaceholder === undefined || getEntityMarker(realm).fields.placeholders.has(relevantPlaceholder)) {
 					realm.getAccessor()
 					realm = state.entity.realms.get(realmKey) as EntityRealmState
@@ -33,11 +32,11 @@ export class StateIterator {
 		treeStore: TreeStore,
 		state: S & StateNode,
 	): IterableIterator<S> {
-		if (state.type === StateType.EntityList && state.blueprint.parent === undefined) {
+		if (state.type === 'entityList' && state.blueprint.parent === undefined) {
 			// Top-level entity list
 			for (const [, rootStates] of treeStore.subTreeStatesByRoot) {
 				const rootList = rootStates.get(state.blueprint.marker.placeholderName)
-				if (rootList?.type === StateType.EntityList) {
+				if (rootList?.type === 'entityList') {
 					yield rootList as S
 				}
 			}
@@ -47,10 +46,10 @@ export class StateIterator {
 		let closestEntityRealm: EntityRealmState
 		let placeholderName: PlaceholderName
 
-		if (state.type === StateType.Field) {
+		if (state.type === 'field') {
 			closestEntityRealm = state.parent
 			placeholderName = state.placeholderName
-		} else if (state.type === StateType.EntityList) {
+		} else if (state.type === 'entityList') {
 			closestEntityRealm = state.blueprint.parent! // The parent-less case is handled above. Hence the assertion.
 			placeholderName = state.blueprint.marker.placeholderName
 		} else {
@@ -71,18 +70,18 @@ export class StateIterator {
 	public static *eachDistinctEntityFieldState(
 		realm: EntityRealmState | EntityRealmStateStub,
 	): IterableIterator<
-		| { type: StateType.EntityRealmStub; marker: HasOneRelationMarker; fieldState: EntityRealmStateStub }
-		| { type: StateType.EntityRealm; marker: HasOneRelationMarker; fieldState: EntityRealmState }
-		| { type: StateType.Field; marker: FieldMarker; fieldState: FieldState }
-		| { type: StateType.EntityList; marker: HasManyRelationMarker; fieldState: EntityListState }
+		| { type: 'entityRealmStub'; marker: HasOneRelationMarker; fieldState: EntityRealmStateStub }
+		| { type: 'entityRealm'; marker: HasOneRelationMarker; fieldState: EntityRealmState }
+		| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
+		| { type: 'entityList'; marker: HasManyRelationMarker; fieldState: EntityListState }
 	> {
-		if (realm.type === StateType.EntityRealmStub) {
+		if (realm.type === 'entityRealmStub') {
 			return
 		}
 		const visited: Set<PlaceholderName> = new Set()
 
 		for (const siblingRealm of realm.entity.realms.values()) {
-			if (siblingRealm.type === StateType.EntityRealmStub) {
+			if (siblingRealm.type === 'entityRealmStub') {
 				continue
 			}
 
@@ -99,27 +98,27 @@ export class StateIterator {
 					continue // This should never happen.
 				}
 
-				if (fieldState.type === StateType.Field && marker instanceof FieldMarker) {
+				if (fieldState.type === 'field' && marker instanceof FieldMarker) {
 					yield {
-						type: StateType.Field,
+						type: 'field',
 						marker,
 						fieldState,
 					}
-				} else if (fieldState.type === StateType.EntityRealm && marker instanceof HasOneRelationMarker) {
+				} else if (fieldState.type === 'entityRealm' && marker instanceof HasOneRelationMarker) {
 					yield {
-						type: StateType.EntityRealm,
+						type: 'entityRealm',
 						marker,
 						fieldState,
 					}
-				} else if (fieldState.type === StateType.EntityRealmStub && marker instanceof HasOneRelationMarker) {
+				} else if (fieldState.type === 'entityRealmStub' && marker instanceof HasOneRelationMarker) {
 					yield {
-						type: StateType.EntityRealmStub,
+						type: 'entityRealmStub',
 						marker,
 						fieldState,
 					}
-				} else if (fieldState.type === StateType.EntityList && marker instanceof HasManyRelationMarker) {
+				} else if (fieldState.type === 'entityList' && marker instanceof HasManyRelationMarker) {
 					yield {
-						type: StateType.EntityList,
+						type: 'entityList',
 						marker,
 						fieldState,
 					}
@@ -137,23 +136,23 @@ export class StateIterator {
 
 	public static *depthFirstAllNodes(root: StateNode): IterableIterator<StateNode> {
 		switch (root.type) {
-			case StateType.EntityRealm:
-			case StateType.EntityList:
+			case 'entityRealm':
+			case 'entityList':
 				for (const childState of root.children.values()) {
 					switch (childState.type) {
-						case StateType.Field:
-						case StateType.EntityRealm:
-						case StateType.EntityList:
+						case 'field':
+						case 'entityRealm':
+						case 'entityList':
 							yield* this.depthFirstAllNodes(childState)
 							break
-						case StateType.EntityRealmStub:
+						case 'entityRealmStub':
 							break
 						default:
 							return assertNever(childState)
 					}
 				}
 				break
-			case StateType.Field:
+			case 'field':
 				break
 			default:
 				return assertNever(root)
@@ -166,10 +165,10 @@ export class StateIterator {
 		match?: (iNode: StateINode) => boolean,
 	): IterableIterator<StateINode> {
 		switch (root.type) {
-			case StateType.EntityRealm:
-			case StateType.EntityList:
+			case 'entityRealm':
+			case 'entityList':
 				for (const childState of root.children.values()) {
-					if (childState.type === StateType.EntityRealm || childState.type === StateType.EntityList) {
+					if (childState.type === 'entityRealm' || childState.type === 'entityList') {
 						yield* this.depthFirstINodes(childState, match)
 					}
 				}

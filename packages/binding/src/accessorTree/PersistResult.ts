@@ -1,30 +1,20 @@
 import type { RequestError } from './RequestError'
 
-export enum PersistResultSuccessType {
-	NothingToPersist = 'nothingToPersist',
-	JustSuccess = 'justSuccess',
-}
-
 export interface NothingToPersistPersistResult {
-	type: PersistResultSuccessType.NothingToPersist
+	type: 'nothingToPersist'
 }
 
 export interface JustSuccessPersistResult {
-	type: PersistResultSuccessType.JustSuccess
+	type: 'justSuccess'
 	persistedEntityIds: string[]
 }
 
-export enum MutationErrorType {
-	InvalidInput = 'invalidInput',
-	GivenUp = 'givenUp',
-}
-
 export interface InvalidInputPersistResult {
-	type: MutationErrorType.InvalidInput
+	type: 'invalidInput'
 }
 
 export interface GivenUpPersistResult {
-	type: MutationErrorType.GivenUp
+	type: 'givenUp'
 }
 
 export type SuccessfulPersistResult = NothingToPersistPersistResult | JustSuccessPersistResult

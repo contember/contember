@@ -20,7 +20,7 @@ export class FieldOperations {
 	) {}
 
 	public addError(fieldState: FieldState, error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.accessorErrorManager.addError(fieldState, { type: ErrorAccessor.ErrorType.Validation, error })
+		return this.accessorErrorManager.addError(fieldState, { type: 'validation', error })
 	}
 
 	public addEventListener(state: FieldState, type: FieldAccessor.FieldEventType, listener: Function): () => void {

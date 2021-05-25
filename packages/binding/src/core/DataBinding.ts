@@ -11,9 +11,7 @@ import {
 } from '../accessors'
 import {
 	metadataToRequestError,
-	MutationErrorType,
 	MutationRequestResponse,
-	PersistResultSuccessType,
 	QueryRequestResponse,
 	RequestError,
 	SuccessfulPersistResult,
@@ -32,7 +30,7 @@ import { MarkerTreeGenerator } from './MarkerTreeGenerator'
 import { MutationGenerator } from './MutationGenerator'
 import { QueryGenerator } from './QueryGenerator'
 import { Schema, SchemaLoader, SchemaValidator } from './schema'
-import { StateIterator, StateType } from './state'
+import { StateIterator } from './state'
 import { StateInitializer } from './StateInitializer'
 import { TreeAugmenter } from './TreeAugmenter'
 import { TreeFilterGenerator } from './TreeFilterGenerator'
@@ -139,7 +137,7 @@ export class DataBinding {
 							}
 
 							throw {
-								type: MutationErrorType.InvalidInput,
+								type: 'invalidInput',
 							}
 						}
 
@@ -150,14 +148,14 @@ export class DataBinding {
 							this.dirtinessTracker.reset() // TODO This ideally shouldn't be necessary but given the current limitations, this makes for better UX.
 							const persistSuccessOptions: PersistSuccessOptions = {
 								...this.bindingOperations,
-								successType: PersistResultSuccessType.NothingToPersist,
+								successType: 'nothingToPersist',
 								unstable_persistedEntityIds: [],
 							}
 							await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
 							await onPersistSuccess?.(persistSuccessOptions)
 
 							return {
-								type: PersistResultSuccessType.NothingToPersist,
+								type: 'nothingToPersist',
 							}
 						}
 
@@ -171,7 +169,7 @@ export class DataBinding {
 						if (allSubMutationsOk) {
 							const persistedEntityIds = aliases.map(alias => mutationData[alias].node.id)
 							const result: SuccessfulPersistResult = {
-								type: PersistResultSuccessType.JustSuccess,
+								type: 'justSuccess',
 								persistedEntityIds,
 							}
 
@@ -211,14 +209,14 @@ export class DataBinding {
 								continue
 							}
 							throw {
-								type: MutationErrorType.InvalidInput,
+								type: 'invalidInput',
 							}
 						}
 					}
 					// Max attempts exceeded
 					// TODO fire persist error
 					throw {
-						type: MutationErrorType.GivenUp,
+						type: 'givenUp',
 					}
 				}),
 		})
@@ -379,7 +377,7 @@ export class DataBinding {
 			for (const [, rootState] of StateIterator.eachRootState(this.treeStore)) {
 				for (const state of StateIterator.depthFirstAllNodes(rootState)) {
 					switch (state.type) {
-						case StateType.Field: {
+						case 'field': {
 							if (state.hasUnpersistedChanges || state.touchLog?.size) {
 								state.touchLog?.clear()
 								state.hasUnpersistedChanges = false
@@ -387,14 +385,14 @@ export class DataBinding {
 							}
 							break
 						}
-						case StateType.EntityList:
+						case 'entityList':
 							if (state.unpersistedChangesCount > 0 || state.plannedRemovals?.size) {
 								state.unpersistedChangesCount = 0
 								state.plannedRemovals?.clear()
 								this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
 							}
 							break
-						case StateType.EntityRealm: {
+						case 'entityRealm': {
 							if (state.unpersistedChangesCount > 0 || state.plannedHasOneDeletions?.size) {
 								state.unpersistedChangesCount = 0
 								state.plannedHasOneDeletions?.clear()

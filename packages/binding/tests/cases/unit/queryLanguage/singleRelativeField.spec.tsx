@@ -3,7 +3,7 @@ import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
 
 const parse = (input: string) => {
-	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeSingleField, new Environment())
+	return Parser.parseQueryLanguageExpression(input, 'relativeSingleField', new Environment())
 }
 
 describe('single relative fields QueryLanguage parser', () => {

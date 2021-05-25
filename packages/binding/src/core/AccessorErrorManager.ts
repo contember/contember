@@ -2,7 +2,7 @@ import { ErrorAccessor } from '../accessors'
 import type { ExecutionError, MutationDataResponse, ValidationError } from '../accessorTree'
 import { ErrorsPreprocessor } from './ErrorsPreprocessor'
 import { EventManager } from './EventManager'
-import { EntityListState, EntityRealmState, getEntityMarker, StateNode, StateType } from './state'
+import { EntityListState, EntityRealmState, getEntityMarker, StateNode } from './state'
 import type { TreeStore } from './TreeStore'
 
 export class AccessorErrorManager {
@@ -76,12 +76,12 @@ export class AccessorErrorManager {
 	private addSeveralErrors(state: StateNode, errors: ErrorsPreprocessor.BaseErrorNode) {
 		if (errors.validation) {
 			for (const error of errors.validation) {
-				this.addError(state, { type: ErrorAccessor.ErrorType.Validation, error })
+				this.addError(state, { type: 'validation', error })
 			}
 		}
 		if (errors.execution) {
 			for (const error of errors.execution) {
-				this.addError(state, { type: ErrorAccessor.ErrorType.Execution, error })
+				this.addError(state, { type: 'execution', error })
 			}
 		}
 	}
@@ -95,11 +95,11 @@ export class AccessorErrorManager {
 					continue
 				}
 				switch (rootState.type) {
-					case StateType.EntityRealm: {
+					case 'entityRealm': {
 						this.setEntityStateErrors(rootState, rootError)
 						break
 					}
-					case StateType.EntityList: {
+					case 'entityList': {
 						this.setEntityListStateErrors(rootState, rootError)
 						break
 					}
@@ -114,15 +114,15 @@ export class AccessorErrorManager {
 	) {
 		this.addSeveralErrors(state, errors)
 
-		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
+		if (errors.nodeType !== 'iNode') {
 			return
 		}
 
 		for (const [childKey, child] of errors.children) {
-			if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
+			if (child.nodeType === 'leaf') {
 				const fieldState = state.children.get(childKey)
 
-				if (fieldState?.type === StateType.Field) {
+				if (fieldState?.type === 'field') {
 					this.addSeveralErrors(fieldState, child)
 					continue
 				}
@@ -142,10 +142,10 @@ export class AccessorErrorManager {
 					continue
 				}
 				switch (fieldState.type) {
-					case StateType.EntityRealm:
+					case 'entityRealm':
 						this.setEntityStateErrors(fieldState, child)
 						break
-					case StateType.EntityList:
+					case 'entityList':
 						this.setEntityListStateErrors(fieldState, child)
 						break
 				}
@@ -159,7 +159,7 @@ export class AccessorErrorManager {
 	) {
 		this.addSeveralErrors(state, errors)
 
-		if (errors.nodeType !== ErrorsPreprocessor.ErrorNodeType.INode) {
+		if (errors.nodeType !== 'iNode') {
 			return
 		}
 
@@ -169,12 +169,12 @@ export class AccessorErrorManager {
 			if (childState === undefined) {
 				continue
 			}
-			if (childState.type === StateType.EntityRealmStub) {
+			if (childState.type === 'entityRealmStub') {
 				childState.getAccessor() // Force init
 				childState = state.children.get(childKey)!
 			}
 
-			if (childError.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
+			if (childError.nodeType === 'iNode') {
 				this.setEntityStateErrors(childState as EntityRealmState, childError)
 			}
 		}

@@ -1,16 +1,15 @@
 import type { TreeRootAccessor } from '../accessors'
-import type { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 import type { RequestError } from './RequestError'
 
 export type AccessorTreeStateAction =
 	| {
-			type: AccessorTreeStateActionType.SetData
+			type: 'setData'
 			data: TreeRootAccessor
 	  }
 	| {
-			type: AccessorTreeStateActionType.FailWithError
+			type: 'failWithError'
 			error: RequestError
 	  }
 	| {
-			type: AccessorTreeStateActionType.Reset
+			type: 'reset'
 	  }

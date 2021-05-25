@@ -1,28 +1,27 @@
-import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
+import type { AccessorTreeState } from './AccessorTreeState'
 import type { AccessorTreeStateAction } from './AccessorTreeStateAction'
-import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
 
 export const accessorTreeStateReducer = (
 	previousState: AccessorTreeState,
 	action: AccessorTreeStateAction,
 ): AccessorTreeState => {
 	switch (action.type) {
-		case AccessorTreeStateActionType.SetData:
-			if (previousState.name === AccessorTreeStateName.Error) {
+		case 'setData':
+			if (previousState.name === 'error') {
 				return previousState
 			}
 			return {
-				name: AccessorTreeStateName.Initialized,
+				name: 'initialized',
 				data: action.data,
 			}
-		case AccessorTreeStateActionType.FailWithError:
+		case 'failWithError':
 			return {
-				name: AccessorTreeStateName.Error,
+				name: 'error',
 				error: action.error,
 			}
-		case AccessorTreeStateActionType.Reset:
+		case 'reset':
 			return {
-				name: AccessorTreeStateName.Initializing,
+				name: 'initializing',
 			}
 	}
 }

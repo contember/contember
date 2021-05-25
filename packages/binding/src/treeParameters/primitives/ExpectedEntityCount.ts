@@ -1,4 +1,1 @@
-export enum ExpectedEntityCount {
-	UpToOne = 'UpToOne',
-	PossiblyMany = 'PossiblyMany',
-}
+export type ExpectedEntityCount = 'upToOne' | 'possiblyMany'

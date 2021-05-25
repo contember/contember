@@ -1,14 +1,14 @@
 import type { GraphQlClient } from '@contember/client'
-import { RequestError, RequestErrorType } from './RequestError'
+import type { RequestError } from './RequestError'
 
 export const metadataToRequestError = (metadata: GraphQlClient.FailedRequestMetadata): RequestError => {
 	if (metadata.status === 401) {
 		return {
-			type: RequestErrorType.Unauthorized,
+			type: 'unauthorized',
 		}
 	}
 	return {
-		type: RequestErrorType.NetworkError,
+		type: 'networkError',
 		metadata: metadata,
 	}
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { BindingOperationsProvider } from '../accessorPropagation'
-import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
+import type { AccessorTreeState } from './AccessorTreeState'
 import { DirtinessContext } from './DirtinessContext'
 import { MutationStateContext } from './MutationStateContext'
 
@@ -12,7 +12,7 @@ export interface AccessorTreeProps {
 export function AccessorTree({ state, children }: AccessorTreeProps) {
 	// It is *CRUCIAL* that both branches differ only in props, not structurally. Otherwise there would be far too many
 	// remounts.
-	if (state.name === AccessorTreeStateName.Initialized) {
+	if (state.name === 'initialized') {
 		return (
 			<DirtinessContext.Provider value={state.data.hasUnpersistedChanges}>
 				<MutationStateContext.Provider value={state.data.isMutating}>

@@ -1,6 +1,5 @@
 import type { GraphQlClient } from '@contember/client'
 import { useCallback, useEffect, useReducer, useRef } from 'react'
-import { ApiRequestActionType } from './ApiRequestActionType'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
 import type { ApiRequestState } from './ApiRequestState'
 
@@ -33,7 +32,7 @@ export const useApiRequest = <SuccessData>(
 				return Promise.reject()
 			}
 			dispatch({
-				type: ApiRequestActionType.Initialize,
+				type: 'initialize',
 			})
 			return client
 				.sendRequest<SuccessData>(query, {
@@ -42,14 +41,14 @@ export const useApiRequest = <SuccessData>(
 				})
 				.then(data => {
 					dispatch({
-						type: ApiRequestActionType.ResolveSuccessfully,
+						type: 'resolveSuccessfully',
 						data,
 					})
 					return Promise.resolve(data)
 				})
 				.catch((error: GraphQlClient.FailedRequestMetadata) => {
 					dispatch({
-						type: ApiRequestActionType.ResolveWithError,
+						type: 'resolveWithError',
 						error,
 					})
 					return Promise.reject(error)

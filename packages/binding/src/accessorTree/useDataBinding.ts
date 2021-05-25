@@ -7,14 +7,13 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { useEnvironment } from '../accessorPropagation'
 import type { TreeRootAccessor } from '../accessors'
 import { DataBinding } from '../core'
-import { AccessorTreeState, AccessorTreeStateName } from './AccessorTreeState'
-import { AccessorTreeStateActionType } from './AccessorTreeStateActionType'
+import type { AccessorTreeState } from './AccessorTreeState'
 import type { AccessorTreeStateOptions } from './AccessorTreeStateOptions'
 import { accessorTreeStateReducer } from './accessorTreeStateReducer'
 import type { RequestError } from './RequestError'
 
 const initialState: AccessorTreeState = {
-	name: AccessorTreeStateName.Initializing,
+	name: 'initializing',
 }
 
 export const useDataBinding = ({
@@ -36,7 +35,7 @@ export const useDataBinding = ({
 			return
 		}
 		dispatch({
-			type: AccessorTreeStateActionType.SetData,
+			type: 'setData',
 			data: accessor,
 		})
 	}, [])
@@ -45,7 +44,7 @@ export const useDataBinding = ({
 			return
 		}
 		dispatch({
-			type: AccessorTreeStateActionType.FailWithError,
+			type: 'failWithError',
 			error,
 		})
 	}, [])
@@ -55,7 +54,7 @@ export const useDataBinding = ({
 	)
 
 	useEffect(() => {
-		if (state.name !== AccessorTreeStateName.Initializing) {
+		if (state.name !== 'initializing') {
 			// Ideally, this condition shouldn't be necessary. However, people are nowhere near careful and diligent
 			// enough to maintain the contract that a change in referential identity of the children passed to
 			// DataBindingProvider will result in a new DataBinding instance (which typically involves a new query).
@@ -69,9 +68,7 @@ export const useDataBinding = ({
 		if (isFirstRenderRef.current || !refreshOnEnvironmentChange) {
 			return
 		}
-		dispatch({
-			type: AccessorTreeStateActionType.Reset,
-		})
+		dispatch({ type: 'reset' })
 		// This essentially just reacts to new environments.
 		setDataBinding(new DataBinding(contentClient, systemClient, tenantClient, environment, onUpdate, onError))
 	}, [contentClient, environment, onError, onUpdate, refreshOnEnvironmentChange, systemClient, tenantClient])

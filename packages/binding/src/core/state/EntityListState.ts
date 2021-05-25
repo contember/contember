@@ -9,7 +9,6 @@ import type {
 } from '../../treeParameters'
 import type { BijectiveIndexedMap } from '../../structures'
 import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
-import type { StateType } from './StateType'
 
 export type EntityListBlueprint =
 	| {
@@ -22,7 +21,7 @@ export type EntityListBlueprint =
 	  }
 
 export interface EntityListState {
-	type: StateType.EntityList
+	type: 'entityList'
 
 	accessor: EntityListAccessor | undefined
 	blueprint: EntityListBlueprint

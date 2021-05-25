@@ -6,12 +6,9 @@ import { connect } from 'react-redux'
 import { executeRelease, fetchDiff } from '../../actions/system'
 import type { Dispatch } from '../../actions/types'
 import type State from '../../state'
-import { AnyStageDiff, EventType, StageDiffState } from '../../state/system'
+import type { AnyStageDiff, EventType, StageDiffState } from '../../state/system'
 
-enum SelectionType {
-	explicit = 'explicit',
-	dependency = 'dependency',
-}
+type SelectionType = 'explicit' | 'dependency'
 
 class DiffViewInner extends PureComponent<DiffView.StateProps & DiffView.DispatchProps, DiffView.State> {
 	state: DiffView.State = {
@@ -20,19 +17,19 @@ class DiffViewInner extends PureComponent<DiffView.StateProps & DiffView.Dispatc
 
 	calculateSelected(): { [id: string]: SelectionType } {
 		const explicit: { [id: string]: SelectionType } = this.state.selected.reduce(
-			(acc, id) => ({ ...acc, [id]: SelectionType.explicit }),
+			(acc, id) => ({ ...acc, [id]: 'explicit' }),
 			{},
 		)
 		const dependencies: { [id: string]: SelectionType } = this.state.selected
 			.map(id => this.getDependencies(id))
 			.reduce((acc, deps) => [...acc, ...deps], [])
-			.reduce((acc, id) => ({ ...acc, [id]: SelectionType.dependency }), {})
+			.reduce((acc, id) => ({ ...acc, [id]: 'dependency' }), {})
 
 		return { ...dependencies, ...explicit }
 	}
 
 	getDependencies(id: string, visited: string[] = []): string[] {
-		if (!this.props.diff || this.props.diff.state !== StageDiffState.DIFF_DONE) {
+		if (!this.props.diff || this.props.diff.state !== 'done') {
 			return []
 		}
 		const event = this.props.diff.events.find(it => it.id === id)
@@ -62,13 +59,13 @@ class DiffViewInner extends PureComponent<DiffView.StateProps & DiffView.Dispatc
 
 	private renderIcon(type: EventType) {
 		switch (type) {
-			case EventType.RUN_MIGRATION:
+			case 'RUN_MIGRATION':
 				return <Icon blueprintIcon="code" />
-			case EventType.CREATE:
+			case 'CREATE':
 				return <Icon blueprintIcon="plus" />
-			case EventType.UPDATE:
+			case 'UPDATE':
 				return <Icon blueprintIcon="edit" />
-			case EventType.DELETE:
+			case 'DELETE':
 				return <Icon blueprintIcon="trash" />
 			default:
 				assertNever(type)
@@ -80,10 +77,10 @@ class DiffViewInner extends PureComponent<DiffView.StateProps & DiffView.Dispatc
 		if (!diff) {
 			return null
 		}
-		if (diff.state === StageDiffState.DIFF_FETCHING) {
+		if (diff.state === 'fetching') {
 			return <Spinner />
 		}
-		if (diff.state === StageDiffState.DIFF_FAILED) {
+		if (diff.state === 'failed') {
 			return `Failed loading because ${diff.errors && diff.errors.join(', ')}`
 		}
 		const selected = this.calculateSelected()
@@ -105,8 +102,8 @@ class DiffViewInner extends PureComponent<DiffView.StateProps & DiffView.Dispatc
 									}}
 									className={cn(
 										'diffView',
-										selected[it.id] === SelectionType.explicit && 'is-explicit',
-										selected[it.id] === SelectionType.dependency && 'is-dependency',
+										selected[it.id] === 'explicit' && 'is-explicit',
+										selected[it.id] === 'dependency' && 'is-dependency',
 									)}
 								>
 									Click
@@ -116,7 +113,7 @@ class DiffViewInner extends PureComponent<DiffView.StateProps & DiffView.Dispatc
 								<input
 									type="checkbox"
 									checked={selected[it.id] ? true : false}
-									disabled={selected[it.id] == SelectionType.dependency}
+									disabled={selected[it.id] == 'dependency'}
 									onChange={e => {
 										const targetState = e.target.checked
 										this.setState(prev => ({

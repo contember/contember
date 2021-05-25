@@ -6,7 +6,7 @@ import type { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '.
 import type { EntityId, EntityName, FieldValue, PlaceholderName, TreeRootId } from '../treeParameters'
 import { assertNever, isEmptyObject } from '../utils'
 import { QueryGenerator } from './QueryGenerator'
-import { MutationAlias, MutationOperationSubTreeType, MutationOperationType } from './requestAliases'
+import { MutationAlias, mutationOperationSubTreeType, mutationOperationType } from './requestAliases'
 import {
 	EntityListState,
 	EntityRealmState,
@@ -15,7 +15,6 @@ import {
 	FieldState,
 	getEntityMarker,
 	StateIterator,
-	StateType,
 } from './state'
 import type { TreeStore } from './TreeStore'
 
@@ -34,19 +33,19 @@ export class MutationGenerator {
 
 			for (const [treeRootId, rootStates] of this.treeStore.subTreeStatesByRoot) {
 				for (const [placeholderName, subTreeState] of rootStates) {
-					if (subTreeState.type === StateType.EntityRealm) {
+					if (subTreeState.type === 'entityRealm') {
 						builder = this.addSubMutation(
 							processedEntities,
 							treeRootId,
 							placeholderName,
-							MutationOperationSubTreeType.SingleEntity,
+							mutationOperationSubTreeType.singleEntity,
 							subTreeState.entity.id.value,
 							subTreeState,
 							builder,
 						)
-					} else if (subTreeState.type === StateType.EntityList) {
+					} else if (subTreeState.type === 'entityList') {
 						for (const childState of subTreeState.children.values()) {
-							if (childState.type === StateType.EntityRealmStub) {
+							if (childState.type === 'entityRealmStub') {
 								// TODO there can be a forceCreate somewhere in there that we're hereby ignoring.
 								continue
 							}
@@ -54,7 +53,7 @@ export class MutationGenerator {
 								processedEntities,
 								treeRootId,
 								placeholderName,
-								MutationOperationSubTreeType.EntityList,
+								mutationOperationSubTreeType.entityList,
 								childState.entity.id.value,
 								childState,
 								builder,
@@ -72,8 +71,8 @@ export class MutationGenerator {
 										MutationAlias.encodeTopLevel({
 											treeRootId,
 											subTreePlaceholder: placeholderName,
-											type: MutationOperationType.Delete,
-											subTreeType: MutationOperationSubTreeType.EntityList,
+											type: mutationOperationType.delete,
+											subTreeType: mutationOperationSubTreeType.entityList,
 											entityId: removedId,
 										}),
 										builder,
@@ -98,7 +97,7 @@ export class MutationGenerator {
 		processedEntities: ProcessedEntities,
 		treeRootId: TreeRootId | undefined,
 		subTreePlaceholder: PlaceholderName,
-		subTreeType: MutationOperationSubTreeType,
+		subTreeType: typeof mutationOperationSubTreeType[keyof typeof mutationOperationSubTreeType],
 		entityId: EntityId,
 		realmState: EntityRealmState,
 		queryBuilder: QueryBuilder,
@@ -114,7 +113,7 @@ export class MutationGenerator {
 				MutationAlias.encodeTopLevel({
 					treeRootId,
 					subTreePlaceholder,
-					type: MutationOperationType.Delete,
+					type: mutationOperationType.delete,
 					subTreeType,
 					entityId,
 				}),
@@ -127,7 +126,7 @@ export class MutationGenerator {
 				MutationAlias.encodeTopLevel({
 					treeRootId,
 					subTreePlaceholder,
-					type: MutationOperationType.Create,
+					type: mutationOperationType.create,
 					subTreeType,
 					entityId,
 				}),
@@ -141,7 +140,7 @@ export class MutationGenerator {
 			MutationAlias.encodeTopLevel({
 				treeRootId,
 				subTreePlaceholder,
-				type: MutationOperationType.Update,
+				type: mutationOperationType.update,
 				subTreeType,
 				entityId,
 			}),
@@ -152,10 +151,10 @@ export class MutationGenerator {
 
 	private getNodeFragmentName(
 		subTreePlaceholder: PlaceholderName,
-		subTreeType: MutationOperationSubTreeType,
+		subTreeType: typeof mutationOperationSubTreeType[keyof typeof mutationOperationSubTreeType],
 		realmState: EntityRealmState,
 	): string | undefined {
-		if (subTreeType !== MutationOperationSubTreeType.EntityList) {
+		if (subTreeType !== mutationOperationSubTreeType.entityList) {
 			return undefined
 		}
 		return `${realmState.entity.entityName}_${subTreePlaceholder}`
@@ -272,7 +271,7 @@ export class MutationGenerator {
 		}
 		processedEntities.add(currentState.entity)
 
-		if (currentState.type === StateType.EntityRealmStub) {
+		if (currentState.type === 'entityRealmStub') {
 			// TODO If there's a forceCreate, this is wrong.
 			return builder
 		}
@@ -285,7 +284,7 @@ export class MutationGenerator {
 
 		for (const fieldMeta of StateIterator.eachDistinctEntityFieldState(currentState)) {
 			switch (fieldMeta.type) {
-				case StateType.Field: {
+				case 'field': {
 					const { marker, fieldState } = fieldMeta
 					const placeholderName = marker.placeholderName
 
@@ -306,8 +305,8 @@ export class MutationGenerator {
 					builder = this.registerCreateFieldPart(fieldState, marker, builder)
 					break
 				}
-				case StateType.EntityRealmStub:
-				case StateType.EntityRealm: {
+				case 'entityRealmStub':
+				case 'entityRealm': {
 					const { marker, fieldState } = fieldMeta
 					if (marker.parameters.isNonbearing) {
 						nonbearingFields.push({
@@ -320,7 +319,7 @@ export class MutationGenerator {
 					builder = this.registerCreateEntityPart(processedEntities, fieldState, marker, builder)
 					break
 				}
-				case StateType.EntityList: {
+				case 'entityList': {
 					const { marker, fieldState } = fieldMeta
 					if (marker.parameters.isNonbearing) {
 						nonbearingFields.push({
@@ -471,7 +470,7 @@ export class MutationGenerator {
 			}
 
 			switch (fieldMeta.type) {
-				case StateType.Field: {
+				case 'field': {
 					const fieldState = fieldMeta.fieldState
 					if (fieldState.persistedValue !== undefined) {
 						const resolvedValue = fieldState.getAccessor().resolvedValue
@@ -481,8 +480,8 @@ export class MutationGenerator {
 					}
 					break
 				}
-				case StateType.EntityRealmStub:
-				case StateType.EntityRealm: {
+				case 'entityRealmStub':
+				case 'entityRealm': {
 					const { fieldState, marker } = fieldMeta
 					const runtimeId = fieldState.entity.id
 					const reducedBy = marker.parameters.reducedBy
@@ -496,7 +495,7 @@ export class MutationGenerator {
 							if (persistedValue instanceof ServerGeneratedUuid) {
 								if (persistedValue.value === runtimeId.value) {
 									// The persisted and currently referenced ids match, and so this is an update.
-									if (fieldState.type === StateType.EntityRealmStub) {
+									if (fieldState.type === 'entityRealmStub') {
 										return builder // …unless we're dealing with a stub. There cannot be any updates there.
 									}
 									return builder.update(builder =>
@@ -549,7 +548,7 @@ export class MutationGenerator {
 
 							if (persistedValue instanceof ServerGeneratedUuid) {
 								if (persistedValue.value === runtimeId.value) {
-									if (fieldState.type === StateType.EntityRealmStub) {
+									if (fieldState.type === 'entityRealmStub') {
 										return builder
 									}
 									return builder.update(
@@ -582,7 +581,7 @@ export class MutationGenerator {
 					}
 					break
 				}
-				case StateType.EntityList: {
+				case 'entityList': {
 					const { marker, fieldState } = fieldMeta
 					const persistedEntityIds = entityData?.get?.(placeholderName) ?? new Set()
 
@@ -597,7 +596,7 @@ export class MutationGenerator {
 
 							if (runtimeId.existsOnServer) {
 								if (persistedEntityIds.has(runtimeId.value)) {
-									if (childState.type !== StateType.EntityRealmStub) {
+									if (childState.type !== 'entityRealmStub') {
 										// A stub cannot have any pending changes.
 										builder = builder.update(
 											{ [PRIMARY_KEY_NAME]: runtimeId.value },

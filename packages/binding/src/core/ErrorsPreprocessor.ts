@@ -2,7 +2,7 @@ import type { ErrorAccessor } from '../accessors'
 import type { ExecutionError, MutationDataResponse, MutationResponse, ValidationError } from '../accessorTree'
 import type { PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { MutationAlias, MutationOperationSubTreeType } from './requestAliases'
+import { MutationAlias, mutationOperationSubTreeType } from './requestAliases'
 
 class ErrorsPreprocessor {
 	public constructor(private readonly requestResponse: MutationDataResponse) {}
@@ -30,22 +30,22 @@ class ErrorsPreprocessor {
 
 			const { subTreeType, subTreePlaceholder, entityId } = operation
 
-			if (subTreeType === MutationOperationSubTreeType.SingleEntity) {
+			if (subTreeType === mutationOperationSubTreeType.singleEntity) {
 				if (treeRoot.has(subTreePlaceholder)) {
 					return this.rejectCorruptData()
 				}
 				treeRoot.set(subTreePlaceholder, processedResponse)
-			} else if (subTreeType === MutationOperationSubTreeType.EntityList) {
+			} else if (subTreeType === mutationOperationSubTreeType.entityList) {
 				const child = treeRoot.get(subTreePlaceholder)
 
 				if (child === undefined) {
 					treeRoot.set(subTreePlaceholder, {
-						nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
+						nodeType: 'iNode',
 						children: new Map([[entityId, processedResponse]]),
 						validation: undefined,
 						execution: undefined,
 					})
-				} else if (child.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
+				} else if (child.nodeType === 'iNode') {
 					child.children.set(entityId, processedResponse)
 				}
 			} else {
@@ -79,13 +79,13 @@ class ErrorsPreprocessor {
 			for (let i = 0, pathLength = error.path.length; i < pathLength; i++) {
 				const pathNode = error.path[i]
 
-				if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.Leaf) {
-					;((currentNode as any) as ErrorsPreprocessor.ErrorINode).nodeType = ErrorsPreprocessor.ErrorNodeType.INode
+				if (currentNode.nodeType === 'leaf') {
+					;((currentNode as any) as ErrorsPreprocessor.ErrorINode).nodeType = 'iNode'
 					;((currentNode as any) as ErrorsPreprocessor.ErrorINode).children = new Map()
 				}
 
 				if (pathNode.__typename === '_FieldPathFragment') {
-					if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
+					if (currentNode.nodeType === 'iNode') {
 						let alias = pathNode.field
 						let nextIndex = i + 1
 						if (nextIndex in error.path) {
@@ -115,7 +115,7 @@ class ErrorsPreprocessor {
 						this.rejectCorruptData()
 					}
 				} else if (pathNode.__typename === '_IndexPathFragment') {
-					if (currentNode.nodeType === ErrorsPreprocessor.ErrorNodeType.INode) {
+					if (currentNode.nodeType === 'iNode') {
 						const alias = pathNode.alias
 
 						if (alias === null) {
@@ -161,7 +161,7 @@ class ErrorsPreprocessor {
 		let rootNode: ErrorsPreprocessor.ErrorNode = {
 			validation: this.isExecutionError(error) ? undefined : [this.createValidationError(error.message.text)],
 			execution: this.isExecutionError(error) ? [{ type: error.type, developerMessage: error.message }] : undefined,
-			nodeType: ErrorsPreprocessor.ErrorNodeType.Leaf,
+			nodeType: 'leaf',
 		}
 
 		for (let i = error.path.length - 1; i >= startIndex; i--) {
@@ -170,7 +170,7 @@ class ErrorsPreprocessor {
 				rootNode = {
 					validation: undefined,
 					execution: undefined,
-					nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
+					nodeType: 'iNode',
 					children: new Map([[pathNode.field, rootNode]]),
 				}
 			} else if (pathNode.__typename === '_IndexPathFragment') {
@@ -185,7 +185,7 @@ class ErrorsPreprocessor {
 				rootNode = {
 					validation: undefined,
 					execution: undefined,
-					nodeType: ErrorsPreprocessor.ErrorNodeType.INode,
+					nodeType: 'iNode',
 					children: new Map([[MutationAlias.decodeEntityId(alias), rootNode]]),
 				}
 			} else {
@@ -227,20 +227,15 @@ namespace ErrorsPreprocessor {
 	}
 
 	export interface LeafErrorNode extends BaseErrorNode {
-		nodeType: ErrorNodeType.Leaf
+		nodeType: 'leaf'
 	}
 
 	export interface ErrorINode extends BaseErrorNode {
-		nodeType: ErrorNodeType.INode
+		nodeType: 'iNode'
 		children: Map<string, ErrorNode>
 	}
 
 	export type ErrorNode = ErrorINode | LeafErrorNode
-
-	export enum ErrorNodeType {
-		Leaf = 'Leaf',
-		INode = 'INode',
-	}
 
 	export type ErrorTreeRoot = Map<PlaceholderName, ErrorNode>
 

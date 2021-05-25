@@ -35,6 +35,14 @@ module.exports = {
 		'prefer-const': 'off',
 		'react-hooks/rules-of-hooks': 'error',
 		'react-hooks/exhaustive-deps': 'error',
+
+		'no-restricted-syntax': [
+			'error',
+			{
+				selector: 'TSEnumDeclaration',
+				message: 'TypeScript enums are banned. Use regular union types instead.',
+			},
+		],
 	},
 	settings: {
 		react: {

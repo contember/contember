@@ -19,6 +19,8 @@
 		"strict": true,
 		"incremental": true,
 
+		"importsNotUsedAsValues": "error",
+
 		"lib": ["esnext", "dom"]
 	}
 }

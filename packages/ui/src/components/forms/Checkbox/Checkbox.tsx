@@ -3,7 +3,7 @@ import { memo, ReactNode, useRef } from 'react'
 import { mergeProps, useCheckbox, useFocusRing, useHover, VisuallyHidden } from 'react-aria'
 import { useToggleState } from 'react-stately'
 import { useClassNamePrefix } from '../../../auxiliary'
-import { Size, ValidationState } from '../../../types'
+import type { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../../utils'
 import { ErrorList, ErrorListProps } from '../ErrorList'
 

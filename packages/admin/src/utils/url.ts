@@ -1,5 +1,5 @@
 import pathToRegexp from 'path-to-regexp'
-import RequestState from '../state/request'
+import type RequestState from '../state/request'
 
 type RouteName = RequestState['name']
 type RequestByName<K extends RouteName, T = RequestState> = T extends { name: K } ? T : never
@@ -31,7 +31,9 @@ export function pathToRequestState(routes: RouteMap, path: string): RequestState
 
 type CacheValue = [pathToRegexp.Key[], RegExp]
 const compiledRoutesCache = new Map<string, CacheValue>()
-type StringObject = { [key: string]: string }
+interface StringObject {
+	[key: string]: string
+}
 
 export function matchesPath(path: string, url: string): StringObject | null {
 	let keys: pathToRegexp.Key[] = []

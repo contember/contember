@@ -41,7 +41,7 @@ export interface RequestStateUninitialized<T> extends RequestStateBase<T> {
 }
 
 export type QueryRequestState<T> = RequestStateOk<T> | RequestStateError<T> | RequestStateLoading<T>
-export type QueryRequestObject<T> = {
+export interface QueryRequestObject<T> {
 	state: QueryRequestState<T>
 	refetch: () => void
 }

@@ -1,15 +1,14 @@
-import { EntityListAccessor, ErrorAccessor } from '../../accessors'
-import { EntityListSubTreeMarker, HasManyRelationMarker } from '../../markers'
-import {
+import type { EntityListAccessor, ErrorAccessor } from '../../accessors'
+import type { EntityListSubTreeMarker, HasManyRelationMarker } from '../../markers'
+import type {
 	EntityEventListenerStore,
 	EntityId,
 	EntityListEventListenerStore,
 	EntityName,
 	RemovalType,
 } from '../../treeParameters'
-import { BijectiveIndexedMap } from '../../structures'
-import { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
-import { StateType } from './StateType'
+import type { BijectiveIndexedMap } from '../../structures'
+import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
 
 export type EntityListBlueprint =
 	| {
@@ -22,7 +21,7 @@ export type EntityListBlueprint =
 	  }
 
 export interface EntityListState {
-	type: StateType.EntityList
+	type: 'entityList'
 
 	accessor: EntityListAccessor | undefined
 	blueprint: EntityListBlueprint

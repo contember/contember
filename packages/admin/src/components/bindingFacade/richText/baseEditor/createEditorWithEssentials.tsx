@@ -3,9 +3,9 @@ import { createEditor, Editor, Element as SlateElement, Path, Range as SlateRang
 import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
-import { BaseEditor } from './BaseEditor'
+import type { BaseEditor } from './BaseEditor'
 import { DefaultElement } from './DefaultElement'
-import { ElementNode, ElementSpecifics, TextNode, TextSpecifics, UnderlyingEditor } from './Node'
+import type { ElementNode, ElementSpecifics, TextNode, TextSpecifics, UnderlyingEditor } from './Node'
 import { overrideDeleteBackward, withPaste } from './overrides'
 
 export const createEditorWithEssentials = (defaultElementType: string): BaseEditor => {

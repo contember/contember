@@ -1,5 +1,5 @@
 import { Component, FieldValue, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import { ReactElement, VideoHTMLAttributes } from 'react'
+import type { ReactElement, VideoHTMLAttributes } from 'react'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 
 export interface VideoFieldViewProps<SrcField extends FieldValue = string>

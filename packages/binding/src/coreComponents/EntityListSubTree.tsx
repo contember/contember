@@ -9,9 +9,9 @@ import {
 import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory } from '../queryLanguage'
-import { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '../treeParameters'
+import type { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '../treeParameters'
 import { Component } from './Component'
-import { EntityBaseProps } from './Entity'
+import type { EntityBaseProps } from './Entity'
 import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
 

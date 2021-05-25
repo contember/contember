@@ -1,11 +1,11 @@
-import { ElementType, ReactNode } from 'react'
+import type { ElementType, ReactNode } from 'react'
 import { assertNever } from './assertNever'
-import { BranchNodeList } from './BranchNodeList'
+import type { BranchNodeList } from './BranchNodeList'
 import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
-import { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
+import type { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
 import { getErrorMessage } from './helpers'
-import { LeafList } from './LeafList'
-import {
+import type { LeafList } from './LeafList'
+import type {
 	DeclarationSiteNodeRepresentationFactory,
 	RawNodeRepresentation,
 	RepresentationFactorySite,
@@ -86,7 +86,7 @@ export class ChildrenAnalyzer<
 		if (!node || typeof node === 'string' || typeof node === 'number' || typeof node === 'boolean') {
 			for (const leaf of this.leaves) {
 				const specification = leaf.specification
-				if (specification.type === RepresentationFactorySite.UseSite) {
+				if (specification.type === 'useSite') {
 					const { ComponentType, factory } = specification
 					if (ComponentType === undefined) {
 						return factory(node, staticContext)
@@ -176,7 +176,7 @@ export class ChildrenAnalyzer<
 		for (const leaf of this.leaves) {
 			const specification = leaf.specification
 			switch (specification.type) {
-				case RepresentationFactorySite.DeclarationSite: {
+				case 'declarationSite': {
 					const { factoryMethodName } = specification
 
 					if (typeof treeNode !== 'string' && factoryMethodName in treeNode) {
@@ -189,7 +189,7 @@ export class ChildrenAnalyzer<
 					}
 					break
 				}
-				case RepresentationFactorySite.UseSite: {
+				case 'useSite': {
 					const { ComponentType, factory } = specification
 					if (ComponentType === undefined || node.type === ComponentType) {
 						return factory(node, staticContext)
@@ -206,7 +206,7 @@ export class ChildrenAnalyzer<
 		for (const branchNode of this.branchNodes) {
 			const specification = branchNode.specification
 			switch (specification.type) {
-				case RepresentationFactorySite.DeclarationSite: {
+				case 'declarationSite': {
 					const { factoryMethodName, childrenRepresentationReducer } = specification
 
 					if (typeof treeNode !== 'string' && factoryMethodName in treeNode) {
@@ -223,7 +223,7 @@ export class ChildrenAnalyzer<
 					}
 					break
 				}
-				case RepresentationFactorySite.UseSite: {
+				case 'useSite': {
 					const { factory, ComponentType } = specification
 					if (ComponentType === undefined || node.type === ComponentType) {
 						if (processedChildren === undefined && !branchNode.options.childrenAreOptional) {

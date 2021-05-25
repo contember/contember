@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { BindingOperations } from '../accessors'
+import type { ReactNode } from 'react'
+import type { BindingOperations } from '../accessors'
 import { BindingOperationsContext, defaultBindingOperations } from './BindingOperationsContext'
 
 export interface BindingOperationsProviderProps {

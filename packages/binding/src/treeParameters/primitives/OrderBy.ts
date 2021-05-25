@@ -1,4 +1,4 @@
-import { CrudQueryBuilder, Input } from '@contember/client'
+import type { CrudQueryBuilder, Input } from '@contember/client'
 
 export type OrderBy = Input.OrderBy<CrudQueryBuilder.OrderDirection>[]
 

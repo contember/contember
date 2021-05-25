@@ -1,4 +1,4 @@
-import { SchemaEnumName } from './SchemaEnums'
+import type { SchemaEnumName } from './SchemaEnums'
 
 export interface RawSchemaEnum {
 	name: SchemaEnumName

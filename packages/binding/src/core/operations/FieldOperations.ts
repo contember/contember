@@ -3,12 +3,12 @@ import { ErrorAccessor, FieldAccessor } from '../../accessors'
 import { ClientGeneratedUuid } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
-import { FieldValue } from '../../treeParameters'
-import { AccessorErrorManager } from '../AccessorErrorManager'
+import type { FieldValue } from '../../treeParameters'
+import type { AccessorErrorManager } from '../AccessorErrorManager'
 import { EventManager } from '../EventManager'
 import { FieldState, getEntityMarker, StateIterator } from '../state'
-import { StateInitializer } from '../StateInitializer'
-import { TreeStore } from '../TreeStore'
+import type { StateInitializer } from '../StateInitializer'
+import type { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
 
 export class FieldOperations {
@@ -20,7 +20,7 @@ export class FieldOperations {
 	) {}
 
 	public addError(fieldState: FieldState, error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.accessorErrorManager.addError(fieldState, { type: ErrorAccessor.ErrorType.Validation, error })
+		return this.accessorErrorManager.addError(fieldState, { type: 'validation', error })
 	}
 
 	public addEventListener(state: FieldState, type: FieldAccessor.FieldEventType, listener: Function): () => void {

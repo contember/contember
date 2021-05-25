@@ -1,4 +1,4 @@
-import { GraphQlClient } from '@contember/client'
+import type { GraphQlClient } from '@contember/client'
 
 export type ApiRequestState<SuccessData> =
 	| {

@@ -1,5 +1,5 @@
-import { ReactElement, ReactNode } from 'react'
-import { Default } from '../../types'
+import type { ReactElement, ReactNode } from 'react'
+import type { Default } from '../../types'
 
 export interface RenderDialogContentProps<Success> {
 	resolve: (value: Success) => void

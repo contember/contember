@@ -1,6 +1,6 @@
-import { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
+import type { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
 import { useMemo } from 'react'
-import RequestState from '../../state/request'
+import type RequestState from '../../state/request'
 import { useRedirect } from './useRedirect'
 
 export const useEntityRedirectOnPersistSuccess = (

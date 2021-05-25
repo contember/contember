@@ -1,4 +1,4 @@
-import { EntityName, FieldName, Filter, UniqueWhere } from '../../treeParameters'
+import type { EntityName, FieldName, Filter, UniqueWhere } from '../../treeParameters'
 
 export class TreeParameterSugarer {
 	public static sugarField(fieldName: FieldName) {

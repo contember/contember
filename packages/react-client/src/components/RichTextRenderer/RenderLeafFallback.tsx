@@ -1,5 +1,5 @@
 import { Fragment, ReactNode } from 'react'
-import { BuiltinLeaves } from './BuiltinLeaves'
+import type { BuiltinLeaves } from './BuiltinLeaves'
 
 export interface RenderLeafFallbackProps {
 	leaf: BuiltinLeaves

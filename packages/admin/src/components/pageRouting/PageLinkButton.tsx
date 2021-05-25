@@ -1,7 +1,7 @@
 import { Button, ButtonProps } from '@contember/ui'
 import { memo } from 'react'
 import { PageLink } from './index'
-import { PageLinkProps } from './PageLink'
+import type { PageLinkProps } from './PageLink'
 
 export type PageLinkButtonProps = PageLinkProps & ButtonProps
 

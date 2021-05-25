@@ -1,4 +1,4 @@
-import { Result } from '@contember/client'
+import type { Result } from '@contember/client'
 
 class ErrorAccessor {
 	public readonly validation: ErrorAccessor.ValidationErrors | undefined
@@ -9,7 +9,7 @@ class ErrorAccessor {
 		const execution: ErrorAccessor.ExecutionError[] = []
 
 		for (const [key, boxed] of errors) {
-			if (boxed.type === ErrorAccessor.ErrorType.Validation) {
+			if (boxed.type === 'validation') {
 				validation.push({
 					key,
 					message: typeof boxed.error === 'string' ? boxed.error : boxed.error.message,
@@ -28,17 +28,13 @@ class ErrorAccessor {
 	}
 }
 namespace ErrorAccessor {
-	export enum ErrorType {
-		Validation = 'validation',
-		Execution = 'execution',
-	}
 	export type ErrorId = number
 	export type BoxedError = BoxedExecutionError | BoxedValidationError
 	export type ErrorsById = Map<ErrorId, BoxedError>
 
 	export type ExecutionErrors = [ExecutionError, ...ExecutionError[]]
-	export type BoxedExecutionError = {
-		type: ErrorType.Execution
+	export interface BoxedExecutionError {
+		type: 'execution'
 		error: SugaredExecutionError
 	}
 	export type SugaredExecutionError = Result.ExecutionErrorType | Omit<ExecutionError, 'key'>
@@ -49,8 +45,8 @@ namespace ErrorAccessor {
 	}
 
 	export type ValidationErrors = [ValidationError, ...ValidationError[]]
-	export type BoxedValidationError = {
-		type: ErrorType.Validation
+	export interface BoxedValidationError {
+		type: 'validation'
 		error: SugaredValidationError
 	}
 	export type SugaredValidationError =

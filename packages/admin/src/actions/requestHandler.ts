@@ -1,8 +1,8 @@
 import { createAction } from 'redux-actions'
 import { VIEW_REPLACE } from '../reducer/view'
-import RequestState from '../state/request'
-import ViewState from '../state/view'
-import { ActionCreator } from './types'
+import type RequestState from '../state/request'
+import type ViewState from '../state/view'
+import type { ActionCreator } from './types'
 
 const handleRequest = (request: RequestState, previous: RequestState): ActionCreator<ViewState> => (
 	dispatch,

@@ -1,15 +1,15 @@
 import { validate as uuidValidate } from 'uuid'
-import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, ErrorAccessor } from '../../accessors'
+import type { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, ErrorAccessor } from '../../accessors'
 import { UnpersistedEntityDummyId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
-import { AccessorErrorManager } from '../AccessorErrorManager'
+import type { AccessorErrorManager } from '../AccessorErrorManager'
 import { EventManager } from '../EventManager'
 import { ErrorLocator, LocalizedBindingError } from '../exceptions'
 import { MarkerComparator } from '../MarkerComparator'
 import { RealmKeyGenerator } from '../RealmKeyGenerator'
-import { EntityListState, getEntityMarker, StateIterator, StateType } from '../state'
-import { StateInitializer } from '../StateInitializer'
-import { TreeStore } from '../TreeStore'
+import { EntityListState, getEntityMarker, StateIterator } from '../state'
+import type { StateInitializer } from '../StateInitializer'
+import type { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
 
 export class ListOperations {
@@ -22,7 +22,7 @@ export class ListOperations {
 	) {}
 
 	public addError(listState: EntityListState, error: ErrorAccessor.SugaredValidationError): () => void {
-		return this.accessorErrorManager.addError(listState, { type: ErrorAccessor.ErrorType.Validation, error })
+		return this.accessorErrorManager.addError(listState, { type: 'validation', error })
 	}
 
 	public addEventListener(
@@ -133,7 +133,7 @@ export class ListOperations {
 				} else {
 					changesDelta++
 				}
-				if (stateToConnect.type === StateType.EntityRealm) {
+				if (stateToConnect.type === 'entityRealm') {
 					changesDelta += stateToConnect.unpersistedChangesCount
 				}
 
@@ -175,7 +175,7 @@ export class ListOperations {
 					changesDelta--
 				}
 
-				if (disconnectedChildRealm.type === StateType.EntityRealm) {
+				if (disconnectedChildRealm.type === 'entityRealm') {
 					// Undoing whatever changes this child had caused.
 					changesDelta -= disconnectedChildRealm.unpersistedChangesCount
 				}

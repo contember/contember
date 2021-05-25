@@ -1,7 +1,7 @@
 import { EditorHeading } from '@contember/ui'
-import { FunctionComponent } from 'react'
-import { RenderElementProps } from 'slate-react'
-import { HeadingElement } from './HeadingElement'
+import type { FunctionComponent } from 'react'
+import type { RenderElementProps } from 'slate-react'
+import type { HeadingElement } from './HeadingElement'
 
 export interface HeadingRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: HeadingElement

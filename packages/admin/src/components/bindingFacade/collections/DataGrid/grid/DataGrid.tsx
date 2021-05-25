@@ -7,7 +7,7 @@ import {
 } from '@contember/binding'
 import { noop } from '@contember/react-utils'
 import { FunctionComponent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { DataGridContainerPublicProps, DataGridState } from '../base'
+import type { DataGridContainerPublicProps, DataGridState } from '../base'
 import { useGridPagingState } from '../paging'
 import { extractDataGridColumns } from '../structure'
 import { normalizeInitialFilters } from './normalizeInitialFilters'

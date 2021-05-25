@@ -1,4 +1,4 @@
-import { FieldName, FieldValue } from '../treeParameters'
+import type { FieldName, FieldValue } from '../treeParameters'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 /**

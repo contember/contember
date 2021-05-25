@@ -1,5 +1,5 @@
-import { DictionaryResolver } from './DictionaryResolver'
-import { Locale } from './Locale'
+import type { DictionaryResolver } from './DictionaryResolver'
+import type { Locale } from './Locale'
 
 export interface I18nMetadata {
 	locale: Locale

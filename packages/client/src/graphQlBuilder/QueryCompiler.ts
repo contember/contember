@@ -1,6 +1,6 @@
 import { Literal } from './Literal'
-import { ObjectBuilder } from './ObjectBuilder'
-import { RootObjectBuilder } from './RootObjectBuilder'
+import type { ObjectBuilder } from './ObjectBuilder'
+import type { RootObjectBuilder } from './RootObjectBuilder'
 
 export class QueryCompiler {
 	constructor(private operation: 'query' | 'mutation', private builder: RootObjectBuilder) {}

@@ -1,13 +1,13 @@
 import { BindingError, Environment } from '@contember/binding'
-import { ComponentType, ReactElement, ReactNode } from 'react'
-import { DataGridColumnKey } from './DataGridColumnKey'
-import { DataGridCellPublicProps } from './DataGridContainer'
-import { DataGridFilterArtifact } from './DataGridFilterArtifact'
-import { DataGridHeaderCellPublicProps } from './DataGridHeaderCell'
-import { DataGridOrderDirection } from './DataGridOrderDirection'
-import { DataGridSetFilter } from './DataGridSetFilter'
-import { GetNewFilter } from './GetNewFilter'
-import { GetNewOrderBy } from './GetNewOrderBy'
+import type { ComponentType, ReactElement, ReactNode } from 'react'
+import type { DataGridColumnKey } from './DataGridColumnKey'
+import type { DataGridCellPublicProps } from './DataGridContainer'
+import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
+import type { DataGridHeaderCellPublicProps } from './DataGridHeaderCell'
+import type { DataGridOrderDirection } from './DataGridOrderDirection'
+import type { DataGridSetFilter } from './DataGridSetFilter'
+import type { GetNewFilter } from './GetNewFilter'
+import type { GetNewOrderBy } from './GetNewOrderBy'
 
 export interface FilterRendererProps<FA extends DataGridFilterArtifact> {
 	filter: FA

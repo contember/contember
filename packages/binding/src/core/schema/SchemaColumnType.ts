@@ -1,11 +1,3 @@
-export enum SchemaKnownColumnType {
-	Bool = 'Bool',
-	Date = 'Date',
-	DateTime = 'DateTime',
-	Double = 'Double',
-	Enum = 'Enum',
-	Int = 'Integer',
-	String = 'String',
-	Uuid = 'Uuid',
-}
+export type SchemaKnownColumnType = 'Bool' | 'Date' | 'DateTime' | 'Double' | 'Enum' | 'Integer' | 'String' | 'Uuid'
+
 export type SchemaColumnType = SchemaKnownColumnType | string

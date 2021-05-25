@@ -6,9 +6,9 @@ import {
 	SugaredRelativeSingleField,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
-import { Input } from '@contember/client'
+import type { Input } from '@contember/client'
 import { Checkbox, Select, TextInput } from '@contember/ui'
-import { FunctionComponent, ReactElement, ReactNode } from 'react'
+import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'

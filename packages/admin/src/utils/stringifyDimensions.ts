@@ -1,4 +1,4 @@
-import { SelectedDimension } from '../state/request'
+import type { SelectedDimension } from '../state/request'
 
 export function toString(dimensions: SelectedDimension): string {
 	return (

@@ -1,21 +1,15 @@
-class LocalStorageManager {
-	get(key: LocalStorageManager.Keys) {
+export type LocalStorageManagerKeys = 'api_identity'
+
+export class LocalStorageManager {
+	get(key: LocalStorageManagerKeys) {
 		return localStorage.getItem(key)
 	}
 
-	set(key: LocalStorageManager.Keys, value: string) {
+	set(key: LocalStorageManagerKeys, value: string) {
 		return localStorage.setItem(key, value)
 	}
 
-	unset(key: LocalStorageManager.Keys) {
+	unset(key: LocalStorageManagerKeys) {
 		return localStorage.removeItem(key)
 	}
 }
-
-namespace LocalStorageManager {
-	export enum Keys {
-		API_IDENTITY = 'api_identity',
-	}
-}
-
-export default LocalStorageManager

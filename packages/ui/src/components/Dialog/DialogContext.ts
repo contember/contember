@@ -1,4 +1,4 @@
 import { createContext } from 'react'
-import { DialogOptions } from './DialogOptions'
+import type { DialogOptions } from './DialogOptions'
 
 export const DialogContext = createContext<DialogOptions | undefined>(undefined)

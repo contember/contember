@@ -1,5 +1,5 @@
-import { FileId } from './FileId'
-import { FileUploadCompoundState } from './FileUploadCompoundState'
+import type { FileId } from './FileId'
+import type { FileUploadCompoundState } from './FileUploadCompoundState'
 
 export interface FileUploadMultiTemporalState {
 	lastUpdateTime: number

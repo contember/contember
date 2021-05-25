@@ -1,5 +1,5 @@
 import { Editor, Location, NodeEntry, Text } from 'slate'
-import { BaseEditor, EditorNode, ElementNode } from '../../baseEditor'
+import type { BaseEditor, EditorNode, ElementNode } from '../../baseEditor'
 
 export const closest = <E extends BaseEditor>(
 	editor: E,

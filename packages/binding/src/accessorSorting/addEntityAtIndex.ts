@@ -1,5 +1,5 @@
-import { EntityAccessor, EntityListAccessor } from '../accessors'
-import { RelativeSingleField } from '../treeParameters'
+import type { EntityAccessor, EntityListAccessor } from '../accessors'
+import type { RelativeSingleField } from '../treeParameters'
 import { repairEntitiesOrder } from './repairEntitiesOrder'
 import { sortEntities } from './sortEntities'
 

@@ -7,8 +7,8 @@ import {
 	FieldValue,
 	StaticRenderProvider,
 } from '@contember/binding'
-import { FormGroupProps } from '@contember/ui'
-import { NamedExoticComponent, ReactNode } from 'react'
+import type { FormGroupProps } from '@contember/ui'
+import type { NamedExoticComponent, ReactNode } from 'react'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
 
 export type SimpleRelativeSingleFieldProps = FieldBasicProps & Omit<FormGroupProps, 'children'>

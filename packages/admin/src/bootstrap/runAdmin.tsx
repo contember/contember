@@ -1,10 +1,10 @@
 import { DevError } from '@contember/ui'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import * as ReactDOM from 'react-dom'
 import { Admin } from '../components'
-import { ProjectConfig } from '../state/projectsConfigs'
+import type { ProjectConfig } from '../state/projectsConfigs'
 import { assertValidClientConfig } from './assertValidClientConfig'
-import { ClientConfig } from './ClientConfig'
+import type { ClientConfig } from './ClientConfig'
 
 type ReactRootFactory = (config: ClientConfig, projects: ProjectConfig[]) => ReactElement
 

@@ -1,8 +1,8 @@
-import { Input, Value } from '@contember/schema'
+import type { Input, Value } from '@contember/schema'
 import { Literal } from '../graphQlBuilder'
 import { isEmptyObject } from '../utils'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
-import { WriteOperation } from './types'
+import type { WriteOperation } from './types'
 import { WriteManyRelationBuilder } from './WriteManyRelationBuilder'
 import { WriteOneRelationBuilder } from './WriteOneRelationBuilder'
 

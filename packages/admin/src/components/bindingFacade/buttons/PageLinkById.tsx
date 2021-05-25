@@ -1,6 +1,6 @@
 import { EntityAccessor, useEntity } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
-import { InnerProps } from '../../Link'
+import type { InnerProps } from '../../Link'
 import PageLink, { PageConfig } from '../../pageRouting/PageLink'
 
 interface PageLinkByIdProps {

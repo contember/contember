@@ -1,4 +1,4 @@
-export type LoginMutationResponse = {
+export interface LoginMutationResponse {
 	data: {
 		signIn: {
 			ok: boolean

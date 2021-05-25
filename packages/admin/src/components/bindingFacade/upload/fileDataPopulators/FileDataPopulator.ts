@@ -1,5 +1,5 @@
-import { EntityAccessor, Environment } from '@contember/binding'
-import { ReactNode } from 'react'
+import type { EntityAccessor, Environment } from '@contember/binding'
+import type { ReactNode } from 'react'
 
 export interface FileDataPopulatorOptions<UploadResult = any> {
 	file: File

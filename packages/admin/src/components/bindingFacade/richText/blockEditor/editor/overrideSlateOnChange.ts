@@ -1,17 +1,17 @@
-import {
+import type {
 	EntityAccessor,
 	EntityListAccessor,
 	FieldAccessor,
 	RelativeEntityList,
 	RelativeSingleField,
 } from '@contember/binding'
-import { MutableRefObject } from 'react'
+import type { MutableRefObject } from 'react'
 import { Editor, Node as SlateNode, PathRef } from 'slate'
 import { assertNever } from '../../../../../utils'
-import { EditorNode, ElementNode } from '../../baseEditor'
-import { ContemberFieldElement } from '../elements'
-import { FieldBackedElement } from '../FieldBackedElement'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorNode, ElementNode } from '../../baseEditor'
+import type { ContemberFieldElement } from '../elements'
+import type { FieldBackedElement } from '../FieldBackedElement'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideOnChangeOptions {
 	blockContentField: RelativeSingleField

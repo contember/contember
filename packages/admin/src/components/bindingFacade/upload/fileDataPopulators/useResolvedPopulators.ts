@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { AggregateDataPopulatorProps } from './AggregateDataPopulatorProps'
-import { CustomDataPopulatorProps } from './CustomDataPopulatorProps'
-import { FileDataPopulator } from './FileDataPopulator'
+import type { AggregateDataPopulatorProps } from './AggregateDataPopulatorProps'
+import type { CustomDataPopulatorProps } from './CustomDataPopulatorProps'
+import type { FileDataPopulator } from './FileDataPopulator'
 import { getDefaultPopulators } from './getDefaultPopulators'
 
 export type ResolvablePopulatorProps = CustomDataPopulatorProps | AggregateDataPopulatorProps

@@ -1,5 +1,5 @@
-import { HistoryEditor } from 'slate-history'
-import { ReactEditor } from 'slate-react'
+import type { HistoryEditor } from 'slate-history'
+import type { ReactEditor } from 'slate-react'
 
 // This is taken from https://github.com/Microsoft/TypeScript/issues/25987#issuecomment-441224690
 type KnownKeys<T> = {
@@ -28,7 +28,7 @@ export type EditorNode = Omit<Pick<UnderlyingEditor, KnownKeys<UnderlyingEditor>
 	children: Array<TextNode | ElementNode>
 }
 
-export type SerializableEditorNode = {
+export interface SerializableEditorNode {
 	formatVersion: number
 	children: Array<ElementNode | TextNode>
 }

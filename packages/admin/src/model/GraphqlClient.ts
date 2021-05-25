@@ -1,5 +1,9 @@
-type Variables = { [name: string]: any }
-type Headers = { [name: string]: string }
+interface Variables {
+	[name: string]: any
+}
+interface Headers {
+	[name: string]: string
+}
 
 class GraphqlClient {
 	constructor(private readonly apiUrl: string) {}
@@ -40,8 +44,15 @@ class GraphqlClient {
 }
 
 namespace GraphqlClient {
-	type Request = { query: string; variables: Variables }
-	type Response = { status: number; body: string; data?: any }
+	interface Request {
+		query: string
+		variables: Variables
+	}
+	interface Response {
+		status: number
+		body: string
+		data?: any
+	}
 
 	export class GraphqlError extends Error {
 		request: Request

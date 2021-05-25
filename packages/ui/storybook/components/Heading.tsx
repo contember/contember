@@ -1,7 +1,7 @@
 import { number, radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import { Heading } from '../../src/components'
-import { HeadingDepth } from '../../src/types'
+import type { HeadingDepth } from '../../src/types'
 
 const headingSizeKnob = (): 'small' | 'default' =>
 	radios(

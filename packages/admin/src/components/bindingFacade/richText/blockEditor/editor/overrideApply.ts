@@ -1,9 +1,9 @@
-import { BindingOperations } from '@contember/binding'
-import { MutableRefObject } from 'react'
+import type { BindingOperations } from '@contember/binding'
+import type { MutableRefObject } from 'react'
 import { Element as SlateElement, Operation } from 'slate'
-import { ElementNode, TextNode } from '../../baseEditor'
+import type { ElementNode, TextNode } from '../../baseEditor'
 import { isElementWithReference } from '../elements'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideApplyOptions {
 	bindingOperations: BindingOperations

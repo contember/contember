@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { useDesugaredRelativeSingleField, useEntityKey, useGetEntityByKey } from '../accessorPropagation'
-import { FieldAccessor } from '../accessors'
-import { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
+import type { FieldAccessor } from '../accessors'
+import type { FieldValue, SugaredRelativeSingleField } from '../treeParameters'
 
 const identityFunction = <Value>(value: Value) => value
 

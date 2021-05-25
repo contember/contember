@@ -1,7 +1,7 @@
 import { BindingError, RelativeSingleField } from '@contember/binding'
 import { getDiscriminatedDatum } from '../../../discrimination'
-import { EditorReferenceBlocks } from '../templating'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { EditorReferenceBlocks } from '../templating'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideIsVoidOptions {
 	referenceDiscriminationField: RelativeSingleField | undefined

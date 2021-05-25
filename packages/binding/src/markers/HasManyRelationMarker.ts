@@ -1,7 +1,7 @@
 import { BindingError } from '../BindingError'
-import { Environment } from '../dao'
-import { HasManyRelation } from '../treeParameters'
-import { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
+import type { Environment } from '../dao'
+import type { HasManyRelation } from '../treeParameters'
+import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 // This doesn't represent reduced has many relations.

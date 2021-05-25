@@ -1,6 +1,6 @@
 import { Editor, Node as SlateNode, Path as SlatePath, Point, Range as SlateRange, Transforms } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertBreakOptions {}
 

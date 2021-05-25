@@ -1,4 +1,4 @@
-import {
+import type {
 	DesugaredSingleEntityEventListeners,
 	SingleEntityEventListeners,
 	SugarableSingleEntityEventListeners,

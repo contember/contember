@@ -1,5 +1,5 @@
-import { EntityId, PlaceholderName, Scalar } from '../treeParameters'
-import { ServerGeneratedUuid } from './RuntimeId'
+import type { EntityId, PlaceholderName, Scalar } from '../treeParameters'
+import type { ServerGeneratedUuid } from './RuntimeId'
 
 // HasMany relations are encoded as sets of entity ids.
 // HasOne relations are encoded as BoxedSingleEntityId just to make them different from actual strings.

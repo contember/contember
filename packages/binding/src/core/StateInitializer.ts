@@ -8,7 +8,7 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 } from '../markers'
-import {
+import type {
 	EntityEventListenerStore,
 	EntityListEventListenerStore,
 	EntityName,
@@ -17,9 +17,9 @@ import {
 	Scalar,
 } from '../treeParameters'
 import { assertNever } from '../utils'
-import { AccessorErrorManager } from './AccessorErrorManager'
-import { Config } from './Config'
-import { EventManager } from './EventManager'
+import type { AccessorErrorManager } from './AccessorErrorManager'
+import type { Config } from './Config'
+import type { EventManager } from './EventManager'
 import { EntityOperations, FieldOperations, ListOperations } from './operations'
 import { OperationsHelpers } from './operations/OperationsHelpers'
 import { RealmKeyGenerator } from './RealmKeyGenerator'
@@ -33,11 +33,10 @@ import {
 	FieldState,
 	getEntityMarker,
 	RootStateNode,
-	StateType,
 } from './state'
 import { BijectiveIndexedMap } from '../structures'
 import { TreeParameterMerger } from './TreeParameterMerger'
-import { TreeStore } from './TreeStore'
+import type { TreeStore } from './TreeStore'
 
 export class StateInitializer {
 	private readonly fieldOperations: FieldOperations
@@ -114,7 +113,7 @@ export class StateInitializer {
 		}
 
 		const stub: EntityRealmStateStub = {
-			type: StateType.EntityRealmStub,
+			type: 'entityRealmStub',
 
 			blueprint,
 			entity,
@@ -127,18 +126,18 @@ export class StateInitializer {
 	}
 
 	private materializeEntityRealm(state: EntityRealmState | EntityRealmStateStub): EntityRealmState {
-		if (state.type === StateType.EntityRealm) {
+		if (state.type === 'entityRealm') {
 			return state
 		}
 		const { realmKey, entity, blueprint } = state
 
 		const existing = this.treeStore.entityRealmStore.get(realmKey)
-		if (existing !== undefined && existing.type === StateType.EntityRealm) {
+		if (existing !== undefined && existing.type === 'entityRealm') {
 			return existing
 		}
 
 		const entityRealm: EntityRealmState = {
-			type: StateType.EntityRealm,
+			type: 'entityRealm',
 
 			blueprint,
 			realmKey,
@@ -308,7 +307,7 @@ export class StateInitializer {
 		initialEntityIds: Set<string>,
 	): EntityListState {
 		const entityListState: EntityListState = {
-			type: StateType.EntityList,
+			type: 'entityList',
 			accessor: undefined,
 			blueprint,
 			children: new BijectiveIndexedMap(realm => realm.entity.id.value),
@@ -366,7 +365,7 @@ export class StateInitializer {
 		const resolvedFieldValue = persistedValue ?? fieldMarker.defaultValue ?? null
 
 		const fieldState: FieldState = {
-			type: StateType.Field,
+			type: 'field',
 			accessor: undefined,
 			fieldMarker,
 			placeholderName,

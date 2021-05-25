@@ -1,6 +1,6 @@
 import { loginMutation, LoginMutationResponse } from '@contember/client'
 import { useCallback } from 'react'
-import { ApiRequestState } from '../apiRequest'
+import type { ApiRequestState } from '../apiRequest'
 import { useLoginToken } from '../config'
 import { useTenantApiRequest } from '../tenant'
 

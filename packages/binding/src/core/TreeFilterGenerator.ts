@@ -1,4 +1,4 @@
-import { RelationFilter, TreeFilter } from '@contember/client'
+import type { RelationFilter, TreeFilter } from '@contember/client'
 import { EntityListPersistedData, ServerGeneratedUuid } from '../accessorTree'
 import {
 	EntityFieldMarkersContainer,
@@ -7,10 +7,10 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 } from '../markers'
-import { EntityName } from '../treeParameters'
+import type { EntityName } from '../treeParameters'
 import { assertNever } from '../utils'
 import { StateIterator } from './state'
-import { TreeStore } from './TreeStore'
+import type { TreeStore } from './TreeStore'
 
 type RawRelationFilters = Map<string, RawRelationFilters>
 

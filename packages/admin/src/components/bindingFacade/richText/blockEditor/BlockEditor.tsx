@@ -41,8 +41,8 @@ import { Editable, Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater } from '../../collections'
 import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
-import { ElementNode } from '../baseEditor'
-import { CreateEditorPublicOptions } from '../editorFactory'
+import type { ElementNode } from '../baseEditor'
+import type { CreateEditorPublicOptions } from '../editorFactory'
 import { RichEditor } from '../RichEditor'
 import {
 	HoveringToolbars,
@@ -52,9 +52,9 @@ import {
 } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
 import { createBlockEditor } from './editor'
-import { ContemberFieldElement } from './elements'
-import { EmbedHandler } from './embed'
-import { FieldBackedElement } from './FieldBackedElement'
+import type { ContemberFieldElement } from './elements'
+import type { EmbedHandler } from './embed'
+import type { FieldBackedElement } from './FieldBackedElement'
 import { ContentOutlet, ContentOutletProps, useEditorReferenceBlocks } from './templating'
 import { useBlockEditorSlateNodes } from './useBlockEditorSlateNodes'
 

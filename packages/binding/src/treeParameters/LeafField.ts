@@ -1,10 +1,10 @@
-import {
+import type {
 	DesugaredFieldEventListeners,
 	FieldEventListeners,
 	SugarableFieldEventListeners,
 	UnsugarableFieldEventListeners,
 } from './FieldEventListeners'
-import { FieldValue, OptionallyVariableFieldValue } from './primitives'
+import type { FieldValue, OptionallyVariableFieldValue } from './primitives'
 
 // These are specific to leaf fields. Common but required parameters are in AnyField.
 

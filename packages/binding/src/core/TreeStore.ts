@@ -1,9 +1,9 @@
 import { NormalizedPersistedData, ReceivedDataTree } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
-import {
+import type {
 	Alias,
 	EntityId,
 	EntityRealmKey,
@@ -16,8 +16,8 @@ import {
 } from '../treeParameters'
 import { MarkerComparator } from './MarkerComparator'
 import { RequestResponseNormalizer } from './RequestResponseNormalizer'
-import { Schema } from './schema'
-import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode, StateType } from './state'
+import type { Schema } from './schema'
+import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
 
 export class TreeStore {
 	public readonly entityStore: Map<EntityId, EntityState> = new Map()
@@ -140,19 +140,19 @@ export class TreeStore {
 		this.entityRealmStore.delete(realmToDisposeOf.realmKey)
 		realmToDisposeOf.entity.realms.delete(realmToDisposeOf.realmKey)
 
-		if (realmToDisposeOf.type === StateType.EntityRealm) {
+		if (realmToDisposeOf.type === 'entityRealm') {
 			realmToDisposeOf.blueprint.parent?.childrenWithPendingUpdates?.delete(realmToDisposeOf)
 
 			for (const child of realmToDisposeOf.children.values()) {
 				switch (child.type) {
-					case StateType.Field:
+					case 'field':
 						continue
-					case StateType.EntityRealm:
-					case StateType.EntityRealmStub: {
+					case 'entityRealm':
+					case 'entityRealmStub': {
 						this.disposeOfRealm(child)
 						break
 					}
-					case StateType.EntityList: {
+					case 'entityList': {
 						for (const listChild of child.children.values()) {
 							this.disposeOfRealm(listChild)
 						}

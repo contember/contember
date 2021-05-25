@@ -1,5 +1,5 @@
-import { GridPagingState } from '../paging'
-import {
+import type { GridPagingState } from '../paging'
+import type {
 	DataGridColumns,
 	DataGridFilterArtifactStore,
 	DataGridHiddenColumnsStateStore,

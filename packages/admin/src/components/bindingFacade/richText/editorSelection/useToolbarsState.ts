@@ -1,5 +1,4 @@
 import { RefObject, useLayoutEffect, useRef } from 'react'
-import { EditorSelectionStateName } from './EditorSelectionState'
 import { useEditorSelection } from './useEditorSelection'
 
 export interface ToolbarsState {
@@ -14,11 +13,9 @@ export const useToolbarState = (): ToolbarsState => {
 	const selectionState = useEditorSelection()
 
 	const inlineToolbarActive =
-		selectionState.name === EditorSelectionStateName.ExpandedPointerSelection ||
-		selectionState.name === EditorSelectionStateName.ExpandedNonPointerSelection
+		selectionState.name === 'expandedPointerSelection' || selectionState.name === 'expandedNonPointerSelection'
 	const blockToolbarActive =
-		selectionState.name === EditorSelectionStateName.CollapsedSelection ||
-		selectionState.name === EditorSelectionStateName.EmergingPointerSelection
+		selectionState.name === 'collapsedSelection' || selectionState.name === 'emergingPointerSelection'
 
 	useLayoutEffect(() => {
 		const container = inlineToolbarRef.current
@@ -30,9 +27,9 @@ export const useToolbarState = (): ToolbarsState => {
 		let top, left
 		let domRangeRect: DOMRect | undefined
 
-		if (selectionState.name === EditorSelectionStateName.ExpandedNonPointerSelection) {
+		if (selectionState.name === 'expandedNonPointerSelection') {
 			domRangeRect = selectionState.selection.getRangeAt(0).getBoundingClientRect()
-		} else if (selectionState.name === EditorSelectionStateName.ExpandedPointerSelection) {
+		} else if (selectionState.name === 'expandedPointerSelection') {
 			if (document.caretRangeFromPoint) {
 				domRangeRect =
 					document

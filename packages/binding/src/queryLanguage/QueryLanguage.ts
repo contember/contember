@@ -1,6 +1,6 @@
 import { emptyObject } from '@contember/react-utils'
 import { TreeParameterMerger, VariableInputTransformer } from '../core'
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import {
 	Alias,
 	DesugaredHasManyRelation,
@@ -63,29 +63,19 @@ export class QueryLanguage {
 	}
 
 	private static desugarSugarableUnconstrainedQualifiedEntityList = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.UnconstrainedQualifiedEntityList,
+		'unconstrainedQualifiedEntityList',
 	)
 	private static desugarSugarableUnconstrainedQualifiedSingleEntity = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.UnconstrainedQualifiedEntityList,
+		'unconstrainedQualifiedEntityList',
 	)
-	private static desugarSugarableQualifiedEntityList = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.QualifiedEntityList,
-	)
-	private static desugarSugarableQualifiedFieldList = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.QualifiedFieldList,
-	)
+	private static desugarSugarableQualifiedEntityList = QueryLanguage.preparePrimitiveEntryPoint('qualifiedEntityList')
+	private static desugarSugarableQualifiedFieldList = QueryLanguage.preparePrimitiveEntryPoint('qualifiedFieldList')
 	private static desugarSugarableQualifiedSingleEntity = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.QualifiedSingleEntity,
+		'qualifiedSingleEntity',
 	)
-	private static desugarSugarableRelativeEntityList = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.RelativeEntityList,
-	)
-	private static desugarSugarableRelativeSingleEntity = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.RelativeSingleEntity,
-	)
-	private static desugarSugarableRelativeSingleField = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.RelativeSingleField,
-	)
+	private static desugarSugarableRelativeEntityList = QueryLanguage.preparePrimitiveEntryPoint('relativeEntityList')
+	private static desugarSugarableRelativeSingleEntity = QueryLanguage.preparePrimitiveEntryPoint('relativeSingleEntity')
+	private static desugarSugarableRelativeSingleField = QueryLanguage.preparePrimitiveEntryPoint('relativeSingleField')
 
 	private static desugarEntityListParameters(
 		sugarablePart: SugarableEntityListParameters,
@@ -377,14 +367,12 @@ export class QueryLanguage {
 		}
 	}
 
-	public static desugarUniqueWhere = QueryLanguage.preparePrimitiveEntryPoint(Parser.EntryPoint.UniqueWhere)
+	public static desugarUniqueWhere = QueryLanguage.preparePrimitiveEntryPoint('uniqueWhere')
 	public static desugarFilter: (
-		input: string | Parser.ParserResult[Parser.EntryPoint.Filter],
+		input: string | Parser.ParserResult['filter'],
 		environment: Environment,
-	) => Parser.ParserResult[Parser.EntryPoint.Filter] = QueryLanguage.preparePrimitiveEntryPoint(
-		Parser.EntryPoint.Filter,
-	)
-	public static desugarOrderBy = QueryLanguage.preparePrimitiveEntryPoint(Parser.EntryPoint.OrderBy)
+	) => Parser.ParserResult['filter'] = QueryLanguage.preparePrimitiveEntryPoint('filter')
+	public static desugarOrderBy = QueryLanguage.preparePrimitiveEntryPoint('orderBy')
 
 	public static desugarUnconstrainedQualifiedEntityList(
 		{ entities, ...unsugarableEntityList }: SugaredUnconstrainedQualifiedEntityList,

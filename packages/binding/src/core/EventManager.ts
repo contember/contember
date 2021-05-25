@@ -1,5 +1,5 @@
 import * as ReactDOM from 'react-dom'
-import {
+import type {
 	AsyncBatchUpdatesOptions,
 	BatchUpdatesOptions,
 	EntityAccessor,
@@ -8,12 +8,12 @@ import {
 	PersistErrorOptions,
 	PersistSuccessOptions,
 } from '../accessors'
-import { SuccessfulPersistResult } from '../accessorTree'
+import type { SuccessfulPersistResult } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { FieldName, PlaceholderName } from '../treeParameters'
+import type { FieldName, PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
-import { Config } from './Config'
-import { DirtinessTracker } from './DirtinessTracker'
+import type { Config } from './Config'
+import type { DirtinessTracker } from './DirtinessTracker'
 import {
 	EntityListState,
 	EntityRealmState,
@@ -23,10 +23,9 @@ import {
 	StateINode,
 	StateIterator,
 	StateNode,
-	StateType,
 } from './state'
-import { TreeStore } from './TreeStore'
-import { UpdateMetadata } from './UpdateMetadata'
+import type { TreeStore } from './TreeStore'
+import type { UpdateMetadata } from './UpdateMetadata'
 
 export class EventManager {
 	public static readonly NO_CHANGES_DIFFERENCE = 0
@@ -209,8 +208,8 @@ export class EventManager {
 		justUpdated.accessor = undefined
 
 		switch (justUpdated.type) {
-			case StateType.EntityRealm:
-			case StateType.EntityList: {
+			case 'entityRealm':
+			case 'entityList': {
 				justUpdated.unpersistedChangesCount += changesDelta
 
 				if (__DEV_MODE__) {
@@ -236,7 +235,7 @@ export class EventManager {
 				}
 				break
 			}
-			case StateType.Field: {
+			case 'field': {
 				const parent = justUpdated.parent
 				if (!parent.childrenWithPendingUpdates) {
 					parent.childrenWithPendingUpdates = new Set()
@@ -261,7 +260,7 @@ export class EventManager {
 					handler(state.getAccessor() as any)
 				}
 			}
-			if (state.type === StateType.EntityRealm && state.fieldsWithPendingConnectionUpdates) {
+			if (state.type === 'entityRealm' && state.fieldsWithPendingConnectionUpdates) {
 				for (const updatedField of state.fieldsWithPendingConnectionUpdates) {
 					const listeners = this.getEventListeners(state, `connectionUpdate_${updatedField}` as const)
 					if (!listeners) {
@@ -274,8 +273,8 @@ export class EventManager {
 			}
 
 			switch (state.type) {
-				case StateType.EntityRealm:
-				case StateType.EntityList: {
+				case 'entityRealm':
+				case 'entityList': {
 					if (state.childrenWithPendingUpdates !== undefined) {
 						for (const childState of state.childrenWithPendingUpdates) {
 							agenda.push(childState)
@@ -284,7 +283,7 @@ export class EventManager {
 					}
 					break
 				}
-				case StateType.Field:
+				case 'field':
 					// Do nothing
 					break
 				default:
@@ -369,7 +368,7 @@ export class EventManager {
 
 					// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
 					for (const newlyInitialized of this.newlyInitializedWithListeners) {
-						if (newlyInitialized.type === StateType.Field) {
+						if (newlyInitialized.type === 'field') {
 							continue
 						}
 						const beforePersistHandlers = this.getEventListeners(newlyInitialized, eventType)
@@ -436,13 +435,13 @@ export class EventManager {
 						continue
 					}
 					switch (state.type) {
-						case StateType.Field:
+						case 'field':
 							for (const listener of listeners) {
 								;(listener as FieldAccessor.BeforeUpdateListener)(state.getAccessor())
 							}
 							break
-						case StateType.EntityRealm:
-						case StateType.EntityList:
+						case 'entityRealm':
+						case 'entityList':
 							for (const listener of listeners) {
 								state.getAccessor().batchUpdates(listener as any)
 							}
@@ -471,7 +470,7 @@ export class EventManager {
 						listener(state.getAccessor as any, this.batchUpdatesOptions)
 					}
 				}
-				if (state.type === StateType.EntityRealm) {
+				if (state.type === 'entityRealm') {
 					state.entity.hasIdSetInStone = true
 				}
 			}
@@ -563,7 +562,7 @@ export class EventManager {
 		| Set<EntityListAccessor.EntityListEventListenerMap[EventType]>
 		| undefined
 	public getEventListeners(state: StateNode, type: string): Set<any> | undefined {
-		if (state.type === StateType.EntityRealm && state.blueprint.type === 'listEntity') {
+		if (state.type === 'entityRealm' && state.blueprint.type === 'listEntity') {
 			const ownListeners = state.eventListeners?.get(type as any) as Set<any>
 			const listenersFromList = state.blueprint.parent.childEventListeners?.get(type as any) as
 				| typeof ownListeners

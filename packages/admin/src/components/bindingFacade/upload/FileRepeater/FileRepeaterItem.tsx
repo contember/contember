@@ -6,13 +6,13 @@ import {
 	RemovalType,
 	VariableInputTransformer,
 } from '@contember/binding'
-import { SingleFileUploadState } from '@contember/react-client'
+import type { SingleFileUploadState } from '@contember/react-client'
 import { ActionableBox, Box } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { getDiscriminatedBlock, NormalizedBlocks } from '../../blocks'
 import { UploadedFilePreview, UploadingFilePreview } from '../core'
-import { FileDataPopulator } from '../fileDataPopulators'
-import { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
+import type { FileDataPopulator } from '../fileDataPopulators'
+import type { DiscriminatedFileUploadProps } from './DiscriminatedFileUploadProps'
 
 export interface FileRepeaterItemProps {
 	canBeRemoved: boolean

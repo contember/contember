@@ -5,27 +5,18 @@ import { Component } from '../coreComponents'
 import { useEntityBeforePersist } from '../entityEvents'
 import { EntityFieldMarkersContainer, EntityFieldsWithHoistablesMarker } from '../markers'
 import { MarkerFactory } from '../queryLanguage'
-import { TreeRootId } from '../treeParameters'
+import type { TreeRootId } from '../treeParameters'
 
 export interface DeferredSubTreesProps {
 	fallback: ReactNode
 	children: ReactNode
 }
 
-const enum LoadStateName {
-	Initial = 1,
-	Loading,
-	Success,
-}
 type LoadState =
+	| { name: 'initial' }
+	| { name: 'loading' }
 	| {
-			name: LoadStateName.Initial
-	  }
-	| {
-			name: LoadStateName.Loading
-	  }
-	| {
-			name: LoadStateName.Success
+			name: 'success'
 			treeRootId: TreeRootId | undefined
 	  }
 
@@ -34,7 +25,7 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 		const { extendTree } = useBindingOperations()
 		const isMutating = useMutationState()
 
-		const [loadState, setLoadState] = useState<LoadState>({ name: LoadStateName.Initial })
+		const [loadState, setLoadState] = useState<LoadState>({ name: 'initial' })
 
 		const [abortController] = useState(() => new AbortController())
 		const signal = abortController.signal
@@ -46,7 +37,7 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 				if (getAccessor().existsOnServer) {
 					return
 				}
-				setLoadState({ name: LoadStateName.Initial })
+				setLoadState({ name: 'initial' })
 			}, []),
 		)
 
@@ -57,15 +48,15 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 		}, [abortController])
 
 		useEffect(() => {
-			if (isMutating || loadState.name !== LoadStateName.Initial || signal.aborted) {
+			if (isMutating || loadState.name !== 'initial' || signal.aborted) {
 				return
 			}
-			setLoadState({ name: LoadStateName.Loading })
+			setLoadState({ name: 'loading' })
 
 			const newFragment = <OnlyKeepSubTrees>{props.children}</OnlyKeepSubTrees>
 
 			extendTree(newFragment, { signal })
-				.then(treeRootId => !signal.aborted && setLoadState({ name: LoadStateName.Success, treeRootId }))
+				.then(treeRootId => !signal.aborted && setLoadState({ name: 'success', treeRootId }))
 				.catch(error => {
 					if (signal.aborted) {
 						return
@@ -75,10 +66,10 @@ export const DeferredSubTrees = Component<DeferredSubTreesProps>(
 		}, [extendTree, isMutating, loadState.name, props.children, signal])
 
 		switch (loadState.name) {
-			case LoadStateName.Initial:
-			case LoadStateName.Loading:
+			case 'initial':
+			case 'loading':
 				return <>{props.fallback}</>
-			case LoadStateName.Success:
+			case 'success':
 				// This is tricky. The relations & fields within children will just render normally as if this
 				// component didn't exist. The sub trees, however, will read the new treeRootId and draw their data
 				// from the newly loaded batch provided by this component. That way the sub trees (and only the sub trees!)

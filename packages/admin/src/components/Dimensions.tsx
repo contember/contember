@@ -1,7 +1,7 @@
 import { Component as ReactComponent, ReactNode } from 'react'
 import { connect } from 'react-redux'
-import State from '../state'
-import { SelectedDimension } from '../state/request'
+import type State from '../state'
+import type { SelectedDimension } from '../state/request'
 
 interface DimensionsStateProps<D extends SelectedDimension> {
 	dimensions: D

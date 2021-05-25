@@ -1,11 +1,11 @@
-import { Environment } from '@contember/binding'
+import type { Environment } from '@contember/binding'
 import { Box, Button, ButtonGroup, Dropdown, Icon, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
 import { createElement, Fragment, ReactElement } from 'react'
-import { MessageFormatter } from '../../../../../i18n'
+import type { MessageFormatter } from '../../../../../i18n'
 import { EmptyMessage } from '../../helpers'
-import { DataGridDictionary } from './dataGridDictionary'
-import { DataGridSetColumnFilter } from './DataGridSetFilter'
-import { DataGridState } from './DataGridState'
+import type { DataGridDictionary } from './dataGridDictionary'
+import type { DataGridSetColumnFilter } from './DataGridSetFilter'
+import type { DataGridState } from './DataGridState'
 
 export interface DataGridFullFiltersPublicProps {}
 

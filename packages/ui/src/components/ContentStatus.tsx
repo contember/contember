@@ -1,5 +1,5 @@
 import cn from 'classnames'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { Icon } from './Icon'
 

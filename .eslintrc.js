@@ -16,6 +16,7 @@ module.exports = {
 		'@typescript-eslint/ban-ts-ignore': 'off',
 		'@typescript-eslint/ban-types': 'off',
 		'@typescript-eslint/camelcase': 'off',
+		'@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
 		'@typescript-eslint/explicit-function-return-type': 'off',
 		'@typescript-eslint/explicit-member-accessibility': 'off',
 		'@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -35,6 +36,14 @@ module.exports = {
 		'prefer-const': 'off',
 		'react-hooks/rules-of-hooks': 'error',
 		'react-hooks/exhaustive-deps': 'error',
+
+		'no-restricted-syntax': [
+			'error',
+			{
+				selector: 'TSEnumDeclaration',
+				message: 'TypeScript enums are banned. Use regular union types instead.',
+			},
+		],
 	},
 	settings: {
 		react: {

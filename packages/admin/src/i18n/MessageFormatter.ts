@@ -1,6 +1,6 @@
-import { PrimitiveType } from 'intl-messageformat'
-import { ReactNode } from 'react'
-import { MessageDictionary, MessageDictionaryKeys } from './MessageDictionary'
+import type { PrimitiveType } from 'intl-messageformat'
+import type { ReactNode } from 'react'
+import type { MessageDictionary, MessageDictionaryKeys } from './MessageDictionary'
 
 export type FormatJSXChunk = (parts: ReactNode) => ReactNode
 

@@ -1,5 +1,5 @@
 import { Box } from '@contember/ui'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 export const LayoutContent = ({ children }: { children: ReactNode }) => <div className="layout-content">{children}</div>
 

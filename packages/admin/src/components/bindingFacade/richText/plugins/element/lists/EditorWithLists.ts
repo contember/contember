@@ -1,8 +1,8 @@
-import { Node as SlateNode } from 'slate'
-import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
-import { ListItemElement } from './ListItemElement'
-import { OrderedListElement } from './OrderedListElement'
-import { UnorderedListElement } from './UnorderedListElement'
+import type { Node as SlateNode } from 'slate'
+import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import type { ListItemElement } from './ListItemElement'
+import type { OrderedListElement } from './OrderedListElement'
+import type { UnorderedListElement } from './UnorderedListElement'
 
 export interface WithLists<
 	E extends WithAnotherNodeType<BaseEditor, UnorderedListElement | OrderedListElement | ListItemElement>

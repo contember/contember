@@ -1,6 +1,6 @@
 import { memo, ReactNode } from 'react'
 import { HeadingDepthContext } from '../contexts'
-import { HeadingDepth } from '../types'
+import type { HeadingDepth } from '../types'
 
 export interface LowerHeadingLevelProps {
 	currentDepth: HeadingDepth

@@ -86,31 +86,17 @@ const groups2 = [
 storiesOf('EditorToolbar', module)
 	.add('bar', () => (
 		<div style={{ margin: '300px 0', textAlign: 'center' }}>
-			<EditorToolbar isActive groups={groups1} restGroups={groups2} scope="default" layout={EditorToolbarLayout.BAR} />
+			<EditorToolbar isActive groups={groups1} restGroups={groups2} scope="default" layout="bar" />
 		</div>
 	))
 	.add('grid', () => (
 		<div style={{ margin: '50px 0', textAlign: 'center' }}>
-			<EditorToolbar
-				isActive
-				groups={groups1}
-				restGroups={groups2}
-				scope="default"
-				layout={EditorToolbarLayout.GRID}
-				showLabels
-			/>
+			<EditorToolbar isActive groups={groups1} restGroups={groups2} scope="default" layout="grid" showLabels />
 		</div>
 	))
 	.add('list', () => (
 		<div style={{ margin: '50px 0', textAlign: 'center' }}>
-			<EditorToolbar
-				isActive
-				groups={groups1}
-				restGroups={groups2}
-				scope="default"
-				layout={EditorToolbarLayout.LIST}
-				showLabels
-			/>
+			<EditorToolbar isActive groups={groups1} restGroups={groups2} scope="default" layout="list" showLabels />
 		</div>
 	))
 	.add('bar with labels', () => (

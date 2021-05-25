@@ -1,4 +1,4 @@
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideCanContainAnyBlocksOptions {}
 

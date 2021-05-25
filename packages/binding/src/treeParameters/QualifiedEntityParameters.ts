@@ -1,4 +1,4 @@
-import { Alias, EntityName, ExpectedQualifiedEntityMutation } from './primitives'
+import type { Alias, EntityName, ExpectedQualifiedEntityMutation } from './primitives'
 
 export const QualifiedEntityParametersDefaults = {
 	expectedMutation: 'anyMutation',

@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import cn from 'classnames'
 import { useComponentClassName } from '../auxiliary'
-import { Size } from '../types'
+import type { Size } from '../types'
 import { toEnumViewClass } from '../utils'
 import { Aether } from './Aether'
 import { Spinner } from './Spinner'

@@ -1,5 +1,5 @@
 import { BindingError } from '@contember/binding'
-import { BaseEditor, ElementNode, SerializableEditorNode } from '../../baseEditor'
+import type { BaseEditor, ElementNode, SerializableEditorNode } from '../../baseEditor'
 
 export const toLatestFormat = <E extends BaseEditor>(
 	editor: E,

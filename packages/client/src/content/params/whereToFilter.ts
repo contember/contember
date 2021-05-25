@@ -1,4 +1,4 @@
-import { Input } from '@contember/schema'
+import type { Input } from '@contember/schema'
 import { Literal } from '../../graphQlBuilder'
 
 export const whereToFilter = (

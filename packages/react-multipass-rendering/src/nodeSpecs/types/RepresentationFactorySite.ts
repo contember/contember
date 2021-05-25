@@ -1,4 +1,1 @@
-export enum RepresentationFactorySite {
-	DeclarationSite = 1,
-	UseSite,
-}
+export type RepresentationFactorySite = 'declarationSite' | 'useSite'

@@ -1,5 +1,5 @@
 import { Node as SlateNode, NodeEntry, Path as SlatePath } from 'slate'
-import { BaseEditor } from '../../baseEditor'
+import type { BaseEditor } from '../../baseEditor'
 
 export const getPreviousSibling = <
 	E extends BaseEditor = BaseEditor,

@@ -1,9 +1,7 @@
 import { assertNever } from '../utils'
-import { FileId } from './FileId'
-import { FileUploadAction } from './FileUploadAction'
-import { FileUploadActionType } from './FileUploadActionType'
-import { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
-import { FileUploadReadyState } from './FileUploadReadyState'
+import type { FileId } from './FileId'
+import type { FileUploadAction } from './FileUploadAction'
+import type { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 import { toFileId } from './toFileId'
 
 export const initializeFileUploadState = (): FileUploadMultiTemporalState => ({
@@ -40,10 +38,10 @@ export const fileUploadReducer = (
 		lastUpdateTime: Date.now(),
 	})
 	switch (action.type) {
-		case FileUploadActionType.PublishNewestState: {
+		case 'publishNewestState': {
 			return publishNewState()
 		}
-		case FileUploadActionType.StartUploading: {
+		case 'startUploading': {
 			for (const [fileWithMaybeId, metadata] of action.files) {
 				let file: File
 				let fileId: FileId
@@ -58,7 +56,7 @@ export const fileUploadReducer = (
 				// Deliberately allowing starting a new upload with the same id
 
 				previousState.liveState.set(fileId, {
-					readyState: FileUploadReadyState.Uploading,
+					readyState: 'uploading',
 					abortController: metadata.abortController,
 					previewUrl: metadata.previewUrl,
 					uploader: metadata.uploader,
@@ -66,17 +64,17 @@ export const fileUploadReducer = (
 				})
 				previousState.fileIdByFile.set(file, fileId)
 			}
-			return publishNewState() // Making the feedback about started upload immediate
+			return publishNewState() /* Making the feedback about started upload immediate*/
 		}
-		case FileUploadActionType.FinishSuccessfully: {
+		case 'finishSuccessfully': {
 			for (const [fileOrId, result] of action.result) {
 				const fileId = toFileId(previousState, fileOrId)
 				const previousFileState = previousState.liveState.get(fileId)
-				if (previousFileState === undefined || previousFileState.readyState !== FileUploadReadyState.Uploading) {
+				if (previousFileState === undefined || previousFileState.readyState !== 'uploading') {
 					continue
 				}
 				previousState.liveState.set(fileId, {
-					readyState: FileUploadReadyState.Success,
+					readyState: 'success',
 					previewUrl: previousFileState.previewUrl,
 					uploader: previousFileState.uploader,
 					file: previousFileState.file,
@@ -86,7 +84,7 @@ export const fileUploadReducer = (
 			// return publishNewState() // Making the feedback about successful upload immediate.
 			return getNewDirtyState()
 		}
-		case FileUploadActionType.FinishWithError: {
+		case 'finishWithError': {
 			for (const errorSpec of action.error) {
 				let fileOrId: File | FileId
 				let error: any
@@ -100,11 +98,11 @@ export const fileUploadReducer = (
 
 				const fileId = toFileId(previousState, fileOrId)
 				const previousFileState = previousState.liveState.get(fileId)
-				if (previousFileState === undefined || previousFileState.readyState !== FileUploadReadyState.Uploading) {
+				if (previousFileState === undefined || previousFileState.readyState !== 'uploading') {
 					continue
 				}
 				previousState.liveState.set(fileId, {
-					readyState: FileUploadReadyState.Error,
+					readyState: 'error',
 					previewUrl: previousFileState.previewUrl,
 					uploader: previousFileState.uploader,
 					file: previousFileState.file,
@@ -113,7 +111,7 @@ export const fileUploadReducer = (
 			}
 			return getNewDirtyState() // Bad news can wait.
 		}
-		case FileUploadActionType.Abort: {
+		case 'abort': {
 			let atLeastOneAborted = false
 			for (const fileOrId of action.files) {
 				const fileId = toFileId(previousState, fileOrId)
@@ -123,7 +121,7 @@ export const fileUploadReducer = (
 					continue
 				}
 				atLeastOneAborted = true
-				if (fileState.readyState === FileUploadReadyState.Uploading) {
+				if (fileState.readyState === 'uploading') {
 					fileState.abortController.abort() // This is a bit naughty… We shouldn't do this from here.
 				}
 				previousState.liveState.delete(fileId)
@@ -133,19 +131,15 @@ export const fileUploadReducer = (
 			}
 			return previousState
 		}
-		case FileUploadActionType.UpdateUploadProgress: {
+		case 'updateUploadProgress': {
 			for (const [fileOrId, { progress }] of action.progress) {
 				const fileId = toFileId(previousState, fileOrId)
 				const previousFileState = previousState.liveState.get(fileId)
-				if (
-					progress === undefined ||
-					previousFileState === undefined ||
-					previousFileState.readyState !== FileUploadReadyState.Uploading
-				) {
+				if (progress === undefined || previousFileState === undefined || previousFileState.readyState !== 'uploading') {
 					continue
 				}
 				previousState.liveState.set(fileId, {
-					readyState: FileUploadReadyState.Uploading,
+					readyState: 'uploading',
 					file: previousFileState.file,
 					uploader: previousFileState.uploader,
 					abortController: previousFileState.abortController,

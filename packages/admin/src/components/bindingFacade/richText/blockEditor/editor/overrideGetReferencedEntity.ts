@@ -7,8 +7,8 @@ import {
 	RelativeEntityList,
 	SugaredRelativeEntityList,
 } from '@contember/binding'
-import { MutableRefObject } from 'react'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { MutableRefObject } from 'react'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideGetReferencedEntityOptions {
 	bindingOperations: BindingOperations

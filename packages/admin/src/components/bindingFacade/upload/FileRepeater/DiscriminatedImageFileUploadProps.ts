@@ -1,7 +1,7 @@
-import { ReactNode } from 'react'
-import { SugaredDiscriminateBy } from '../../discrimination'
+import type { ReactNode } from 'react'
+import type { SugaredDiscriminateBy } from '../../discrimination'
 
-export type DiscriminatedImageFileUploadProps = {
+export interface DiscriminatedImageFileUploadProps {
 	acceptImage?: string | string[]
 	renderImageFile?: () => ReactNode
 	renderImageFilePreview?: (file: File, previewUrl: string) => ReactNode

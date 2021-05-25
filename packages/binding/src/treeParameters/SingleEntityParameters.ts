@@ -1,4 +1,4 @@
-import { Filter, SugaredFilter } from './primitives'
+import type { Filter, SugaredFilter } from './primitives'
 
 export interface DesugaredSingleEntityParameters {
 	filter: Filter | undefined

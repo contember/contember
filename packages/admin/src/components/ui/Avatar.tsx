@@ -1,28 +1,15 @@
 import md5 from 'blueimp-md5'
 import cn from 'classnames'
-import { FunctionComponent } from 'react'
-
-export enum AvatarSize {
-	Size1 = 1,
-	Size2 = 2,
-	Size3 = 3,
-	Size4 = 4,
-	Size5 = 5,
-}
-
-export enum AvatarShape {
-	Circle = 'Circle',
-	Square = 'Square',
-}
+import type { FunctionComponent } from 'react'
 
 export interface AvatarProps {
-	size?: AvatarSize
-	shape?: AvatarShape
+	size?: 1 | 2 | 3 | 4 | 5
+	shape?: 'Circle' | 'Square'
 	email?: string
 }
 
 export const Avatar: FunctionComponent<AvatarProps> = props => {
-	const { size = AvatarSize.Size1, shape = AvatarShape.Circle } = props
+	const { size = 1, shape = 'Circle' } = props
 	const email = props.email || ''
 
 	return (

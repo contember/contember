@@ -1,4 +1,4 @@
-import { ObjectBuilder } from '../graphQlBuilder'
+import type { ObjectBuilder } from '../graphQlBuilder'
 
 export class ValidationRelationBuilder {
 	public static validationRelation(objectBuilder: ObjectBuilder): ObjectBuilder {

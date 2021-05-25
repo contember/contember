@@ -1,4 +1,6 @@
-export type RecursiveStringObject = { [key: string]: string | RecursiveStringObject | undefined }
+export interface RecursiveStringObject {
+	[key: string]: string | RecursiveStringObject | undefined
+}
 
 export interface Request {
 	name: string

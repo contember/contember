@@ -1,8 +1,8 @@
-import { UnsugarableEntityListEventListeners } from './EntityListEventListeners'
-import { UnsugarableEntityListParameters } from './EntityListParameters'
-import { DesugaredHasManyRelation, HasManyRelation, SugarableHasManyRelation } from './HasManyRelation'
-import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
-import { UnsugarableRelation } from './Relation'
+import type { UnsugarableEntityListEventListeners } from './EntityListEventListeners'
+import type { UnsugarableEntityListParameters } from './EntityListParameters'
+import type { DesugaredHasManyRelation, HasManyRelation, SugarableHasManyRelation } from './HasManyRelation'
+import type { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import type { UnsugarableRelation } from './Relation'
 
 export interface DesugaredRelativeEntityList {
 	hasOneRelationPath: DesugaredHasOneRelation[]

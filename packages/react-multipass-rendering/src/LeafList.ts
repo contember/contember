@@ -1,4 +1,4 @@
-import { Leaf, ValidFactoryName } from './nodeSpecs'
+import type { Leaf, ValidFactoryName } from './nodeSpecs'
 
 export type LeafList<RepresentationUnion, StaticContext> = Leaf<
 	any,

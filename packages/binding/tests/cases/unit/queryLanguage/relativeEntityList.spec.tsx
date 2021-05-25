@@ -1,9 +1,9 @@
 import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
-import { DesugaredRelativeEntityList } from '../../../../src/treeParameters'
+import type { DesugaredRelativeEntityList } from '../../../../src/treeParameters'
 
 const parse = (input: string): DesugaredRelativeEntityList => {
-	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.RelativeEntityList, new Environment())
+	return Parser.parseQueryLanguageExpression(input, 'relativeEntityList', new Environment())
 }
 
 describe('relative entity list QueryLanguage parser', () => {

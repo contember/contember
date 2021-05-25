@@ -1,7 +1,6 @@
-import {
+import type {
 	DesugaredHasManyRelation,
 	DesugaredHasOneRelation,
-	ExpectedEntityCount,
 	Filter,
 	HasManyRelation,
 	HasOneRelation,
@@ -17,7 +16,7 @@ import {
 export class Hashing {
 	public static hashHasOneRelation(relation: HasOneRelation | DesugaredHasOneRelation): number {
 		const where: Array<Filter | UniqueWhere | string | undefined> = [
-			ExpectedEntityCount.UpToOne,
+			'upToOne',
 			relation.field,
 			relation.filter,
 			relation.reducedBy,
@@ -28,7 +27,7 @@ export class Hashing {
 
 	public static hashHasManyRelation(relation: HasManyRelation | DesugaredHasManyRelation): number {
 		const where: Array<Filter | UniqueWhere | OrderBy | string | number | undefined> = [
-			ExpectedEntityCount.PossiblyMany,
+			'possiblyMany',
 			relation.field,
 			relation.filter,
 			'offset' in relation ? relation.offset : undefined,

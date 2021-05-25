@@ -1,4 +1,4 @@
-import RequestState from './request'
+import type RequestState from './request'
 
 export default interface ViewState {
 	loading: boolean

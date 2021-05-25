@@ -1,7 +1,7 @@
 import { readFileAsArrayBuffer } from '../../utils'
-import { FileUploader, FileUploaderInitializeOptions } from './FileUploader'
+import type { FileUploader, FileUploaderInitializeOptions } from './FileUploader'
 import { GenerateUploadUrlMutationBuilder } from './GenerateUploadUrlMutationBuilder'
-import { UploadedFileMetadata } from './UploadedFileMetadata'
+import type { UploadedFileMetadata } from './UploadedFileMetadata'
 
 interface S3UploadState {
 	request?: XMLHttpRequest

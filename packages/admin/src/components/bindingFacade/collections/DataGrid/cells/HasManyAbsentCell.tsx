@@ -6,9 +6,9 @@ import {
 	SugaredRelativeEntityList,
 	wrapFilterInHasOnes,
 } from '@contember/binding'
-import { ComponentType, FunctionComponent, ReactElement, ReactNode } from 'react'
+import type { ComponentType, FunctionComponent, ReactElement, ReactNode } from 'react'
 import { Checkbox } from '@contember/ui'
-import { FieldFallbackViewPublicProps } from '../../../fieldViews'
+import type { FieldFallbackViewPublicProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps } from '../base'
 
 export type HasManyAbsentCellProps = DataGridHeaderCellPublicProps &

@@ -1,4 +1,4 @@
-import { FileDataPopulator } from '../fileDataPopulators'
+import type { FileDataPopulator } from '../fileDataPopulators'
 
 export const getRelevantPopulators = (
 	populators: Iterable<FileDataPopulator>,

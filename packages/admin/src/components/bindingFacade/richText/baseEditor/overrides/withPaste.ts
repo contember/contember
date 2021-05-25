@@ -1,9 +1,11 @@
-import { EditorNode, ElementNode, TextNode } from '../Node'
-import { WithEssentials } from '../EditorWithEssentials'
+import type { EditorNode, ElementNode, TextNode } from '../Node'
+import type { WithEssentials } from '../EditorWithEssentials'
 import { Transforms } from 'slate'
 
 type Children = (ElementNode | TextNode)[]
-export type TextAttrs = { [key: string]: any }
+export interface TextAttrs {
+	[key: string]: any
+}
 export type NodesWithTypeFiltered =
 	| { texts: (TextNode | ElementNode)[]; elements?: undefined }
 	| { elements: ElementNode[]; texts?: undefined }

@@ -1,9 +1,9 @@
-import { FieldValue } from '@contember/binding'
+import type { FieldValue } from '@contember/binding'
 import Fuse from 'fuse.js'
 import { useMemo } from 'react'
-import { Props as SelectProps } from 'react-select'
-import { Props as AsyncProps } from 'react-select/async'
-import { ChoiceFieldData } from '../ChoiceField'
+import type { Props as SelectProps } from 'react-select'
+import type { Props as AsyncProps } from 'react-select/async'
+import type { ChoiceFieldData } from '../ChoiceField'
 import { SearchInput } from './SearchInput'
 import { VirtualizedMenuList } from './VirtualizedMenuList'
 

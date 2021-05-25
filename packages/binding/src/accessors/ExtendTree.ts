@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
-import { Environment } from '../dao'
-import { TreeRootId } from '../treeParameters'
+import type { ReactNode } from 'react'
+import type { Environment } from '../dao'
+import type { TreeRootId } from '../treeParameters'
 
 export interface ExtendTreeOptions {
 	signal?: AbortSignal

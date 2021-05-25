@@ -1,6 +1,6 @@
 import { FieldAccessor, FieldValue } from '@contember/binding'
-import { NormalizedDiscriminatedData } from './NormalizedDiscriminatedData'
-import { ResolvedDiscriminatedDatum } from './ResolvedDiscriminatedDatum'
+import type { NormalizedDiscriminatedData } from './NormalizedDiscriminatedData'
+import type { ResolvedDiscriminatedDatum } from './ResolvedDiscriminatedDatum'
 
 export const getDiscriminatedDatum = <Datum>(
 	data: NormalizedDiscriminatedData<Datum>,

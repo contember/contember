@@ -1,7 +1,7 @@
 import { IntlMessageFormat } from 'intl-messageformat'
 import { DictionaryCache } from './DictionaryCache'
-import { Locale } from './Locale'
-import { MessageDictionaryByLocaleCode } from './MessageDictionary'
+import type { Locale } from './Locale'
+import type { MessageDictionaryByLocaleCode } from './MessageDictionary'
 
 export class DictionaryResolver {
 	private dictionaries: Map<string, DictionaryCache> = new Map()

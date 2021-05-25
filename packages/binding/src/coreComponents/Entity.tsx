@@ -1,6 +1,6 @@
 import { ComponentType, createElement, ReactElement, ReactNode } from 'react'
 import { AccessorProvider } from '../accessorPropagation'
-import { EntityAccessor } from '../accessors'
+import type { EntityAccessor } from '../accessors'
 import { Component } from './Component'
 
 export interface EntityBaseProps {

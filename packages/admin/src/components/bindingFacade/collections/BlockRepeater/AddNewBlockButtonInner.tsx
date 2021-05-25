@@ -1,8 +1,8 @@
 import { EntityAccessor, SugaredRelativeSingleField, useDesugaredRelativeSingleField } from '@contember/binding'
 import { Button, ButtonGroup, DropdownRenderProps } from '@contember/ui'
 import { memo } from 'react'
-import { NormalizedBlocks } from '../../blocks'
-import { CreateNewEntityButtonProps } from '../helpers'
+import type { NormalizedBlocks } from '../../blocks'
+import type { CreateNewEntityButtonProps } from '../helpers'
 
 export interface AddNewBlockButtonInnerProps extends DropdownRenderProps, CreateNewEntityButtonProps {
 	normalizedBlocks: NormalizedBlocks

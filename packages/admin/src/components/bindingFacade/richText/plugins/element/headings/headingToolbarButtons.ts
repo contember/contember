@@ -1,4 +1,4 @@
-import { ElementToolbarButton } from '../../../toolbars'
+import type { ElementToolbarButton } from '../../../toolbars'
 import { HeadingElement, headingElementType } from './HeadingElement'
 
 export const headingOneToolbarButton: ElementToolbarButton<HeadingElement> = {

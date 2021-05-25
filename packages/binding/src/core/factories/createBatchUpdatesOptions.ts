@@ -1,7 +1,7 @@
-import { BatchUpdatesOptions, EntityAccessor, EntityListAccessor } from '../../accessors'
+import type { BatchUpdatesOptions, EntityAccessor, EntityListAccessor } from '../../accessors'
 import { BindingError } from '../../BindingError'
-import { Environment } from '../../dao'
-import {
+import type { Environment } from '../../dao'
+import type {
 	Alias,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedSingleEntity,
@@ -9,7 +9,7 @@ import {
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '../../treeParameters'
-import { TreeStore } from '../TreeStore'
+import type { TreeStore } from '../TreeStore'
 
 export const createBatchUpdatesOptions = (rootEnvironment: Environment, treeStore: TreeStore): BatchUpdatesOptions =>
 	Object.freeze({

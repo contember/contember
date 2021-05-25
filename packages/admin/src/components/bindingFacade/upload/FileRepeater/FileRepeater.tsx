@@ -9,13 +9,13 @@ import {
 	resolvePopulators,
 	useResolvedPopulators,
 } from '../fileDataPopulators'
-import { CustomFileKindProps } from './CustomFileKindProps'
+import type { CustomFileKindProps } from './CustomFileKindProps'
 import {
 	FileRepeaterContainer,
 	FileRepeaterContainerPrivateProps,
 	FileRepeaterContainerPublicProps,
 } from './FileRepeaterContainer'
-import { StockFileKindProps } from './StockFileKindProps'
+import type { StockFileKindProps } from './StockFileKindProps'
 import { resolveFileKinds, useResolvedFileKinds } from './useResolvedFileKinds'
 
 type FileRepeaterProps = Omit<

@@ -1,5 +1,5 @@
-import { Environment, SugaredFilter } from '@contember/binding'
-import { DataGridFilterArtifact } from './DataGridFilterArtifact'
+import type { Environment, SugaredFilter } from '@contember/binding'
+import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
 
 export interface GetNewFilterOptions<FA extends DataGridFilterArtifact = DataGridFilterArtifact> {
 	environment: Environment

@@ -1,9 +1,9 @@
-import { AudioFileMetadataPopulatorProps } from './AudioFileMetadataPopulator'
-import { FileDataPopulator } from './FileDataPopulator'
-import { FileUrlDataPopulatorProps } from './FileUrlDataPopulator'
-import { GenericFileMetadataPopulatorProps } from './GenericFileMetadataPopulator'
-import { ImageFileMetadataPopulatorProps } from './ImageFileMetadataPopulator'
-import { VideoFileMetadataPopulatorProps } from './VideoFileMetadataPopulator'
+import type { AudioFileMetadataPopulatorProps } from './AudioFileMetadataPopulator'
+import type { FileDataPopulator } from './FileDataPopulator'
+import type { FileUrlDataPopulatorProps } from './FileUrlDataPopulator'
+import type { GenericFileMetadataPopulatorProps } from './GenericFileMetadataPopulator'
+import type { ImageFileMetadataPopulatorProps } from './ImageFileMetadataPopulator'
+import type { VideoFileMetadataPopulatorProps } from './VideoFileMetadataPopulator'
 
 export interface AggregateDataPopulatorProps
 	extends AudioFileMetadataPopulatorProps,

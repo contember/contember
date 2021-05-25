@@ -1,4 +1,4 @@
-import { ComponentType, ReactNode } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
 import { EditorNonEditable } from './EditorNonEditable'
 

@@ -1,5 +1,5 @@
 import { MarkerMerger, TreeParameterMerger } from '../core'
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import {
 	EntityFieldMarker,
 	EntityFieldMarkersContainer,
@@ -10,7 +10,7 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 } from '../markers'
-import {
+import type {
 	EntityEventListenerStore,
 	HasManyRelation,
 	HasOneRelation,

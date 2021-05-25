@@ -1,7 +1,7 @@
 import cn from 'classnames'
-import { ReactElement, ReactNode, TextareaHTMLAttributes } from 'react'
+import type { ReactElement, ReactNode, TextareaHTMLAttributes } from 'react'
 import { IncreaseBoxDepth, useClassNamePrefix } from '../../auxiliary'
-import { EditorCanvasSize } from '../../types'
+import type { EditorCanvasSize } from '../../types'
 import { toEnumViewClass } from '../../utils'
 
 export interface EditorCanvasProps<P extends TextareaHTMLAttributes<HTMLDivElement>> {

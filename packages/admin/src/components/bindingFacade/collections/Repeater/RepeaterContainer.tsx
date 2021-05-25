@@ -1,10 +1,10 @@
-import { EntityAccessor, EntityListAccessor } from '@contember/binding'
+import type { EntityAccessor, EntityListAccessor } from '@contember/binding'
 import { Box, BoxSection } from '@contember/ui'
 import { ComponentType, memo, ReactNode } from 'react'
-import { MessageFormatter } from '../../../../i18n'
+import type { MessageFormatter } from '../../../../i18n'
 import { AccessorErrors } from '../../errors'
 import { CreateNewEntityButton, CreateNewEntityButtonProps, EmptyMessage, EmptyMessageProps } from '../helpers'
-import { RepeaterDictionary } from './repeaterDictionary'
+import type { RepeaterDictionary } from './repeaterDictionary'
 
 export interface RepeaterContainerPrivateProps {
 	accessor: EntityListAccessor

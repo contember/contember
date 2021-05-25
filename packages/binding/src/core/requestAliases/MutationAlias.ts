@@ -1,9 +1,9 @@
-import { RuntimeId } from '../../accessorTree'
+import type { RuntimeId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
-import { PlaceholderName, TreeRootId } from '../../treeParameters'
-import { MutationOperationSubTreeType } from './MutationOperationSubTreeType'
-import { MutationOperationType } from './MutationOperationType'
-import { TopLevelMutationOperation } from './TopLevelMutationOperation'
+import type { PlaceholderName, TreeRootId } from '../../treeParameters'
+import { mutationOperationSubTreeType } from './mutationOperationSubTreeType'
+import type { mutationOperationType } from './mutationOperationType'
+import type { TopLevelMutationOperation } from './TopLevelMutationOperation'
 
 const mutationAliasRegex = /^(?:(u)|(t)([^t]+)t)(.+)__([cud])([sl])(.+)$/
 
@@ -42,9 +42,9 @@ export class MutationAlias {
 		}
 		const treeRootId: TreeRootId | undefined = matches[1] === 'u' ? undefined : matches[3]
 		const subTreePlaceholder: PlaceholderName = matches[4]
-		const type = matches[5] as MutationOperationType
+		const type = matches[5] as typeof mutationOperationType[keyof typeof mutationOperationType]
 		const subTreeType =
-			matches[6] === 's' ? MutationOperationSubTreeType.SingleEntity : MutationOperationSubTreeType.EntityList
+			matches[6] === 's' ? mutationOperationSubTreeType.singleEntity : mutationOperationSubTreeType.entityList
 		const entityId = matches[7].replace(aliasToUuidRegex, aliasToUuidReplacement)
 
 		return {

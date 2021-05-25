@@ -1,5 +1,5 @@
 import { MessageFormatElement, parse } from '@formatjs/icu-messageformat-parser'
-import { MessageDictionary } from './MessageDictionary'
+import type { MessageDictionary } from './MessageDictionary'
 
 export class DictionaryCache {
 	private static astCacheByDictionary: WeakMap<MessageDictionary, Map<string, MessageFormatElement[]>> = new WeakMap()

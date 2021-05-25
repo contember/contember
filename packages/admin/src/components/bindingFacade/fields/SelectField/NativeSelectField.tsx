@@ -3,7 +3,7 @@ import { Component } from '@contember/binding/dist/src/coreComponents/Component'
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoiceFieldProps } from '../ChoiceField'
-import { SelectFieldInnerPublicProps } from './SelectField'
+import type { SelectFieldInnerPublicProps } from './SelectField'
 
 export type NativeSelectFieldProps = SelectFieldInnerPublicProps &
 	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | DynamicSingleChoiceFieldProps) & {

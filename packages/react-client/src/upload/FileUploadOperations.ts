@@ -1,5 +1,5 @@
-import { FileUploader } from '@contember/client'
-import { FileId } from './FileId'
+import type { FileUploader } from '@contember/client'
+import type { FileId } from './FileId'
 
 export interface StartUploadOptions {
 	uploader?: FileUploader

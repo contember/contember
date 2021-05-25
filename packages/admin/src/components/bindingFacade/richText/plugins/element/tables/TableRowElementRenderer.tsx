@@ -1,7 +1,7 @@
 import { EditorTableRowElement } from '@contember/ui'
 import { memo } from 'react'
-import { RenderElementProps } from 'slate-react'
-import { TableRowElement } from './TableRowElement'
+import type { RenderElementProps } from 'slate-react'
+import type { TableRowElement } from './TableRowElement'
 
 export interface TableRowElementRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: TableRowElement

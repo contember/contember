@@ -1,8 +1,8 @@
 import { Component as ReactComponent, ComponentType, FunctionComponent } from 'react'
 import { connect } from 'react-redux'
 import { logout } from '../actions/auth'
-import { Dispatch } from '../actions/types'
-import State from '../state'
+import type { Dispatch } from '../actions/types'
+import type State from '../state'
 
 interface InnerProps {
 	onClick: () => void

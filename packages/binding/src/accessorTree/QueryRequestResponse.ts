@@ -1,4 +1,4 @@
-import { Scalar } from '../treeParameters'
+import type { Scalar } from '../treeParameters'
 
 export type ReceivedFieldData<A = never> = Scalar | ReceivedEntityData<A> | Array<ReceivedEntityData<A> | A>
 export type ReceivedEntityData<A = never> =

@@ -1,4 +1,4 @@
-import { RelationFilter } from './RelationFilter'
+import type { RelationFilter } from './RelationFilter'
 
 export interface TreeFilter {
 	entity: string

@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { ReactElement, ReactNode } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import { RepeaterInner, RepeaterInnerProps } from '../collections'
 
 // TODO properly unify with repeaters

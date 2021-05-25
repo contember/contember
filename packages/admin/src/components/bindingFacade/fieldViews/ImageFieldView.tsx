@@ -1,5 +1,5 @@
 import { Component, FieldValue, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import { ImgHTMLAttributes, ReactElement } from 'react'
+import type { ImgHTMLAttributes, ReactElement } from 'react'
 import { FieldFallbackView, FieldFallbackViewPublicProps } from './FieldFallbackView'
 
 export interface ImageFieldViewProps<SrcField extends FieldValue = string>

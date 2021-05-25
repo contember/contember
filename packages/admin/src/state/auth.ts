@@ -1,7 +1,4 @@
-export enum AuthStatus {
-	LOGGED_IN,
-	NOT_LOGGED_IN,
-}
+export type AuthStatus = 'loggedIn' | 'notLoggedIn'
 
 export default interface AuthState {
 	identity: AuthIdentity | null
@@ -24,5 +21,5 @@ export interface Project {
 export const emptyAuthState: AuthState = {
 	identity: null,
 	errorMessage: null,
-	status: AuthStatus.NOT_LOGGED_IN,
+	status: 'notLoggedIn',
 }

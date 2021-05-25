@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { Element, Node } from 'slate'
 
 type ContemberContentPlaceholderType = '__contember_contentPlaceholder__'

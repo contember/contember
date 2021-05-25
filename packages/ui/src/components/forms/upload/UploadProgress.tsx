@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode } from 'react'
+import type { FunctionComponent, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../../auxiliary'
 import { ProgressBar } from '../../ProgressBar'
 import { Spinner } from '../../Spinner'

@@ -1,4 +1,4 @@
-import { FieldName } from '../../treeParameters'
-import { SchemaField } from './SchemaField'
+import type { FieldName } from '../../treeParameters'
+import type { SchemaField } from './SchemaField'
 
 export type SchemaFields = Map<FieldName, SchemaField>

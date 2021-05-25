@@ -2,9 +2,8 @@ import { debounce } from 'debounce'
 import { useReducer, useRef, useCallback, useEffect } from 'react'
 import { Editor, Range as SlateRange } from 'slate'
 import { ReactEditor, useEditor } from 'slate-react'
-import { EditorSelectionActionType } from './EditorSelectionActionType'
 import { defaultEditorSelectionState, editorSelectionReducer } from './editorSelectionReducer'
-import { EditorSelectionState, EditorSelectionStateName } from './EditorSelectionState'
+import type { EditorSelectionState } from './EditorSelectionState'
 
 export const useEditorSelection = (maxInterval: number = 100): EditorSelectionState => {
 	const editor = useEditor()
@@ -23,8 +22,8 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 
 			if (isRelevant) {
 				if (
-					(selectionStateRef.current.name === EditorSelectionStateName.ExpandedPointerSelection ||
-						selectionStateRef.current.name === EditorSelectionStateName.ExpandedNonPointerSelection) &&
+					(selectionStateRef.current.name === 'expandedPointerSelection' ||
+						selectionStateRef.current.name === 'expandedNonPointerSelection') &&
 					!domSelection!.isCollapsed &&
 					selectionStateRef.current.selection
 				) {
@@ -41,12 +40,12 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 					}
 				}
 				dispatch({
-					type: EditorSelectionActionType.SetSelection,
+					type: 'setSelection',
 					selection: domSelection!,
 				})
 			} else {
 				dispatch({
-					type: EditorSelectionActionType.Blur,
+					type: 'blur',
 				})
 			}
 		}, [editor]),
@@ -58,7 +57,7 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 				e.target instanceof Node &&
 				ReactEditor.hasDOMNode(editor, e.target) &&
 				dispatch({
-					type: EditorSelectionActionType.SetMousePointerSelectionStart,
+					type: 'setMousePointerSelectionStart',
 					event: e,
 				})
 		},
@@ -68,7 +67,7 @@ export const useEditorSelection = (maxInterval: number = 100): EditorSelectionSt
 		(e: MouseEvent) => {
 			const relevantTarget = !!e.target && e.target instanceof Node && ReactEditor.hasDOMNode(editor, e.target)
 			dispatch({
-				type: EditorSelectionActionType.SetMousePointerSelectionFinish,
+				type: 'setMousePointerSelectionFinish',
 				event: relevantTarget ? e : undefined,
 			})
 		},

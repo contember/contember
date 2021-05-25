@@ -1,8 +1,8 @@
-import { Node as SlateNode, Path as SlatePath } from 'slate'
-import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
-import { TableCellElement } from './TableCellElement'
-import { TableElement } from './TableElement'
-import { TableRowElement } from './TableRowElement'
+import type { Node as SlateNode, Path as SlatePath } from 'slate'
+import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import type { TableCellElement } from './TableCellElement'
+import type { TableElement } from './TableElement'
+import type { TableRowElement } from './TableRowElement'
 
 export interface WithTables<
 	E extends WithAnotherNodeType<BaseEditor, TableElement | TableRowElement | TableCellElement>

@@ -1,6 +1,6 @@
-import { Environment } from '../dao'
+import type { Environment } from '../dao'
 import { LRUCache } from '../structures'
-import { Parser } from './Parser'
+import type { Parser } from './Parser'
 
 type CacheByEntryPoint = {
 	[Entry in Parser.EntryPoint]: LRUCache<string, Parser.ParserResult[Entry]>
@@ -39,17 +39,17 @@ export class CacheStore {
 	private createEntryPointCache(): CacheByEntryPoint {
 		// TODO configurable limits
 		return {
-			[Parser.EntryPoint.QualifiedEntityList]: new LRUCache(50),
-			[Parser.EntryPoint.QualifiedFieldList]: new LRUCache(50),
-			[Parser.EntryPoint.QualifiedSingleEntity]: new LRUCache(50),
-			[Parser.EntryPoint.UnconstrainedQualifiedEntityList]: new LRUCache(10),
-			[Parser.EntryPoint.UnconstrainedQualifiedSingleEntity]: new LRUCache(10),
-			[Parser.EntryPoint.RelativeSingleField]: new LRUCache(1000),
-			[Parser.EntryPoint.RelativeSingleEntity]: new LRUCache(500),
-			[Parser.EntryPoint.RelativeEntityList]: new LRUCache(500),
-			[Parser.EntryPoint.UniqueWhere]: new LRUCache(100),
-			[Parser.EntryPoint.Filter]: new LRUCache(100),
-			[Parser.EntryPoint.OrderBy]: new LRUCache(50),
+			qualifiedEntityList: new LRUCache(50),
+			qualifiedFieldList: new LRUCache(50),
+			qualifiedSingleEntity: new LRUCache(50),
+			unconstrainedQualifiedEntityList: new LRUCache(10),
+			unconstrainedQualifiedSingleEntity: new LRUCache(10),
+			relativeSingleField: new LRUCache(1000),
+			relativeSingleEntity: new LRUCache(500),
+			relativeEntityList: new LRUCache(500),
+			uniqueWhere: new LRUCache(100),
+			filter: new LRUCache(100),
+			orderBy: new LRUCache(50),
 		}
 	}
 }

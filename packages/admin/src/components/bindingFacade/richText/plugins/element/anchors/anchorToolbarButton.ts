@@ -1,4 +1,4 @@
-import { ElementToolbarButton } from '../../../toolbars'
+import type { ElementToolbarButton } from '../../../toolbars'
 import { AnchorElement, anchorElementType } from './AnchorElement'
 
 export const anchorToolbarButton: ElementToolbarButton<AnchorElement> = {

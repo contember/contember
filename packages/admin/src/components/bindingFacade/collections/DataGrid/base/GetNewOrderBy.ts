@@ -1,5 +1,5 @@
-import { Environment, SugaredOrderBy } from '@contember/binding'
-import { DataGridOrderDirection } from './DataGridOrderDirection'
+import type { Environment, SugaredOrderBy } from '@contember/binding'
+import type { DataGridOrderDirection } from './DataGridOrderDirection'
 
 export interface GetNewOrderByOptions {
 	environment: Environment

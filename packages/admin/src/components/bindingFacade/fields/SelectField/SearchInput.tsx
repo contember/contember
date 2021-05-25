@@ -1,4 +1,4 @@
-import { CommonProps, InputProps } from 'react-select'
+import type { CommonProps, InputProps } from 'react-select'
 import cn from 'classnames'
 
 // This function is copied from react-select.

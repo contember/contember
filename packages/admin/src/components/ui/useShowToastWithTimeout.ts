@@ -1,4 +1,4 @@
-import { ToastDefinition } from '../../state/toasts'
+import type { ToastDefinition } from '../../state/toasts'
 import { useDismissToast } from './useDismissToast'
 import { useShowToast } from './useShowToast'
 

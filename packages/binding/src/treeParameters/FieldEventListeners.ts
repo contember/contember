@@ -1,5 +1,5 @@
-import { FieldAccessor } from '../accessors'
-import { FieldValue } from './primitives'
+import type { FieldAccessor } from '../accessors'
+import type { FieldValue } from './primitives'
 
 type Events<Value extends FieldValue = FieldValue> = FieldAccessor.FieldEventListenerMap<Value>
 

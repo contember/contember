@@ -1,7 +1,7 @@
 import { CrudQueryBuilder, GraphQlBuilder, Input } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
-import {
+import type {
 	DesugaredHasManyRelation,
 	DesugaredHasOneRelation,
 	DesugaredQualifiedEntityList,
@@ -697,37 +697,37 @@ class Parser extends EmbeddedActionsParser {
 		let expression: Parser.ParserResult[keyof Parser.ParserResult]
 
 		switch (entry) {
-			case Parser.EntryPoint.RelativeSingleField:
+			case 'relativeSingleField':
 				expression = Parser.parser.relativeSingleField()
 				break
-			case Parser.EntryPoint.RelativeSingleEntity:
+			case 'relativeSingleEntity':
 				expression = Parser.parser.relativeSingleEntity()
 				break
-			case Parser.EntryPoint.RelativeEntityList:
+			case 'relativeEntityList':
 				expression = Parser.parser.relativeEntityList()
 				break
-			case Parser.EntryPoint.QualifiedEntityList:
+			case 'qualifiedEntityList':
 				expression = Parser.parser.qualifiedEntityList()
 				break
-			case Parser.EntryPoint.QualifiedFieldList:
+			case 'qualifiedFieldList':
 				expression = Parser.parser.qualifiedFieldList()
 				break
-			case Parser.EntryPoint.QualifiedSingleEntity:
+			case 'qualifiedSingleEntity':
 				expression = Parser.parser.qualifiedSingleEntity()
 				break
-			case Parser.EntryPoint.UnconstrainedQualifiedEntityList:
+			case 'unconstrainedQualifiedEntityList':
 				expression = Parser.parser.unconstrainedQualifiedEntityList()
 				break
-			case Parser.EntryPoint.UnconstrainedQualifiedSingleEntity:
+			case 'unconstrainedQualifiedSingleEntity':
 				expression = Parser.parser.unconstrainedQualifiedSingleEntity()
 				break
-			case Parser.EntryPoint.UniqueWhere:
+			case 'uniqueWhere':
 				expression = Parser.parser.uniqueWhere()
 				break
-			case Parser.EntryPoint.Filter:
+			case 'filter':
 				expression = Parser.parser.nonUniqueWhere()
 				break
-			case Parser.EntryPoint.OrderBy:
+			case 'orderBy':
 				expression = Parser.parser.orderBy()
 				break
 			default:
@@ -757,33 +757,21 @@ namespace Parser {
 		export type ConditionOperator = keyof Pick<Condition, 'eq' | 'notEq' | 'lt' | 'lte' | 'gt' | 'gte'>
 	}
 
-	export enum EntryPoint {
-		QualifiedEntityList = 'qualifiedEntityList', // E.g. Author[age < 123].son.sisters(name = 'Jane')
-		QualifiedFieldList = 'qualifiedFieldList', // E.g. Author[age < 123].son.sister.name
-		QualifiedSingleEntity = 'qualifiedSingleEntity', // E.g. Author(id = 123).son.sister
-		UnconstrainedQualifiedEntityList = 'unconstrainedQualifiedEntityList', // E.g. Author.son.sister
-		UnconstrainedQualifiedSingleEntity = 'unconstrainedQualifiedSingleEntity', // E.g. Author.son.sister
-		RelativeSingleField = 'relativeSingleField', // E.g. authors(id = 123).person.name
-		RelativeSingleEntity = 'relativeSingleEntity', // E.g. localesByLocale(locale.slug = en)
-		RelativeEntityList = 'relativeEntityList', // E.g. genres(slug = 'sciFi').authors[age < 123]
-		UniqueWhere = 'uniqueWhere', // E.g. (author.mother.id = 123)
-		Filter = 'filter', // E.g. [author.son.age < 123]
-		OrderBy = 'orderBy', // E.g. items.order asc, items.content.name asc
+	export interface ParserResult {
+		qualifiedEntityList: DesugaredQualifiedEntityList // E.g. Author[age < 123].son.sisters(name = 'Jane')
+		qualifiedFieldList: DesugaredQualifiedFieldList // E.g. Author[age < 123].son.sister.name
+		qualifiedSingleEntity: DesugaredQualifiedSingleEntity // E.g. Author(id = 123).son.sister
+		unconstrainedQualifiedEntityList: DesugaredUnconstrainedQualifiedEntityList // E.g. Author.son.sister
+		unconstrainedQualifiedSingleEntity: DesugaredUnconstrainedQualifiedSingleEntity // E.g. Author.son.sister
+		relativeSingleField: DesugaredRelativeSingleField // E.g. authors(id = 123).person.name
+		relativeSingleEntity: DesugaredRelativeSingleEntity // E.g. localesByLocale(locale.slug = en)
+		relativeEntityList: DesugaredRelativeEntityList // E.g. genres(slug = 'sciFi').authors[age < 123]
+		uniqueWhere: UniqueWhere // E.g. (author.mother.id = 123)
+		filter: Filter // E.g. [author.son.age < 123]
+		orderBy: OrderBy // E.g. items.order asc, items.content.name asc
 	}
 
-	export interface ParserResult {
-		qualifiedEntityList: DesugaredQualifiedEntityList
-		qualifiedFieldList: DesugaredQualifiedFieldList
-		qualifiedSingleEntity: DesugaredQualifiedSingleEntity
-		unconstrainedQualifiedEntityList: DesugaredUnconstrainedQualifiedEntityList
-		unconstrainedQualifiedSingleEntity: DesugaredUnconstrainedQualifiedSingleEntity
-		relativeSingleField: DesugaredRelativeSingleField
-		relativeSingleEntity: DesugaredRelativeSingleEntity
-		relativeEntityList: DesugaredRelativeEntityList
-		uniqueWhere: UniqueWhere
-		filter: Filter
-		orderBy: OrderBy
-	}
+	export type EntryPoint = keyof ParserResult
 }
 
 export { Parser }

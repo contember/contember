@@ -1,4 +1,4 @@
-import { SortableContainerProps } from 'react-sortable-hoc'
+import type { SortableContainerProps } from 'react-sortable-hoc'
 
 const interactiveElements = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'OPTION', 'BUTTON'])
 

@@ -10,7 +10,7 @@ import {
 	useMemo,
 } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { IconSize } from '../../types'
+import type { IconSize } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import * as ContemberIcons from './contemberIcons'
 

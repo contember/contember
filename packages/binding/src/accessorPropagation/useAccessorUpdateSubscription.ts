@@ -1,7 +1,7 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { useCallback, useEffect, useState } from 'react'
-import { EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
-import { FieldValue } from '../treeParameters'
+import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '../accessors'
+import type { FieldValue } from '../treeParameters'
 
 export type ForceAccessorUpdate = () => void
 

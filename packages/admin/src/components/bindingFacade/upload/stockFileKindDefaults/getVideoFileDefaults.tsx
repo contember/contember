@@ -1,7 +1,7 @@
 import { BindingError, SugaredFieldProps } from '@contember/binding'
 import { VideoFieldView } from '../../fieldViews'
 import { noFileUrlMessage } from './noFileUrlMessage'
-import { StockFileKindDefault } from './StockFileKindDefault'
+import type { StockFileKindDefault } from './StockFileKindDefault'
 
 export const getVideoFileDefaults = (fileUrlField: SugaredFieldProps['field'] | undefined): StockFileKindDefault => ({
 	accept: 'video/*',

@@ -1,4 +1,4 @@
-import { DataGridColumns, DataGridHiddenColumnsStateStore } from '../base'
+import type { DataGridColumns, DataGridHiddenColumnsStateStore } from '../base'
 
 export const normalizeInitialHiddenColumnsState = (columns: DataGridColumns): DataGridHiddenColumnsStateStore => {
 	const hideState: DataGridHiddenColumnsStateStore = new Set()

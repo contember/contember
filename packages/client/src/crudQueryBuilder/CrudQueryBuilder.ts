@@ -2,7 +2,7 @@ import { ObjectBuilder, QueryBuilder, RootObjectBuilder } from '../graphQlBuilde
 import { isEmptyObject } from '../utils'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
 import { ReadBuilder } from './ReadBuilder'
-import {
+import type {
 	CreateMutationArguments,
 	CreateMutationFields,
 	DeleteMutationArguments,
@@ -18,7 +18,7 @@ import {
 } from './types'
 import { WriteBuilder } from './WriteBuilder'
 
-type Variables = {
+interface Variables {
 	[key: string]: any
 }
 type Client<T extends any> = (query: string | object, variables?: Variables) => PromiseLike<T>

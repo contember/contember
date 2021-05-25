@@ -1,12 +1,11 @@
 import { S3FileUploader, UploadedFileMetadata } from '@contember/client'
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { useCurrentContentGraphQlClient } from '../content'
-import { FileId } from './FileId'
-import { FileUploadActionType } from './FileUploadActionType'
-import { FileUploadCompoundState } from './FileUploadCompoundState'
-import { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
+import type { FileId } from './FileId'
+import type { FileUploadCompoundState } from './FileUploadCompoundState'
+import type { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
-import { FileWithMetadata } from './FileWithMetadata'
+import type { FileWithMetadata } from './FileWithMetadata'
 import { toFileId } from './toFileId'
 
 export type FileUpload = [FileUploadCompoundState, FileUploadOperations]
@@ -32,7 +31,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 
 	const abortUpload = useCallback<AbortUpload>(files => {
 		dispatch({
-			type: FileUploadActionType.Abort,
+			type: 'abort',
 			files,
 		})
 	}, [])
@@ -67,11 +66,11 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 
 			newFileIds.size &&
 				dispatch({
-					type: FileUploadActionType.Abort,
+					type: 'abort',
 					files: newFileIds,
 				})
 			dispatch({
-				type: FileUploadActionType.StartUploading,
+				type: 'startUploading',
 				files: fileWithMetadataByFileConfig,
 			})
 
@@ -79,19 +78,19 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 				uploader.upload(filesWithMetadata, {
 					onProgress: progress => {
 						dispatch({
-							type: FileUploadActionType.UpdateUploadProgress,
+							type: 'updateUploadProgress',
 							progress,
 						})
 					},
 					onSuccess: result => {
 						dispatch({
-							type: FileUploadActionType.FinishSuccessfully,
+							type: 'finishSuccessfully',
 							result,
 						})
 					},
 					onError: error => {
 						dispatch({
-							type: FileUploadActionType.FinishWithError,
+							type: 'finishWithError',
 							error,
 						})
 					},
@@ -99,7 +98,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 				})
 			} catch (_) {
 				dispatch({
-					type: FileUploadActionType.FinishWithError,
+					type: 'finishWithError',
 					error: Array.from(filesWithMetadata).map(([file]) => [file, undefined]), // TODO this is crap.
 				})
 			}
@@ -127,7 +126,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 					clearTimeout(updateTimeoutRef.current)
 				}
 				dispatch({
-					type: FileUploadActionType.PublishNewestState,
+					type: 'publishNewestState',
 				})
 			} else {
 				if (updateTimeoutRef.current !== undefined) {
@@ -135,7 +134,7 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 				}
 				updateTimeoutRef.current = window.setTimeout(() => {
 					dispatch({
-						type: FileUploadActionType.PublishNewestState,
+						type: 'publishNewestState',
 					})
 					updateTimeoutRef.current = undefined
 				}, maxUpdateFrequency - timeDelta)

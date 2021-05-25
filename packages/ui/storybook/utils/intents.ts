@@ -1,4 +1,4 @@
-import { Intent } from '../../src/types'
+import type { Intent } from '../../src/types'
 
 export const intents: Intent[] = ['primary', 'secondary', 'tertiary', 'success', 'warn', 'danger', 'dark']
 

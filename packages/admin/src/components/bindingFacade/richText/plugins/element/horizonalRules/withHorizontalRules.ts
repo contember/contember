@@ -8,8 +8,8 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
-import { EditorWithHorizontalRules, WithHorizontalRules } from './EditorWithHorizontalRules'
+import type { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
+import type { EditorWithHorizontalRules, WithHorizontalRules } from './EditorWithHorizontalRules'
 import { HorizontalRuleElement, horizontalRuleElementType } from './HorizontalRuleElement'
 import { HorizontalRuleRenderer, HorizontalRuleRendererProps } from './HorizontalRuleRenderer'
 

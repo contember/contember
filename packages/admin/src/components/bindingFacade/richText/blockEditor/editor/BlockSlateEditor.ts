@@ -1,7 +1,7 @@
-import { EntityAccessor, FieldValue } from '@contember/binding'
-import * as Slate from 'slate'
-import { BaseEditor, ElementNode, WithAnotherNodeType } from '../../baseEditor'
-import {
+import type { EntityAccessor, FieldValue } from '@contember/binding'
+import type * as Slate from 'slate'
+import type { BaseEditor, ElementNode, WithAnotherNodeType } from '../../baseEditor'
+import type {
 	ContemberContentPlaceholderElement,
 	ContemberFieldElement,
 	ElementWithReference,

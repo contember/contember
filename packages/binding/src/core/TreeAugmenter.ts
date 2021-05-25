@@ -7,14 +7,14 @@ import {
 	UnpersistedEntityDummyId,
 } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import { MarkerTreeRoot } from '../markers'
-import { EntityId, PlaceholderName, TreeRootId } from '../treeParameters'
+import type { MarkerTreeRoot } from '../markers'
+import type { EntityId, PlaceholderName, TreeRootId } from '../treeParameters'
 import { assertNever } from '../utils'
 import { EventManager } from './EventManager'
 import { OperationsHelpers } from './operations/OperationsHelpers'
-import { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode, StateType } from './state'
-import { StateInitializer } from './StateInitializer'
-import { TreeStore } from './TreeStore'
+import type { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode } from './state'
+import type { StateInitializer } from './StateInitializer'
+import type { TreeStore } from './TreeStore'
 
 export class TreeAugmenter {
 	public constructor(
@@ -57,12 +57,12 @@ export class TreeAugmenter {
 				for (const [rootPlaceholder, rootState] of rootStates) {
 					const rootData = this.treeStore.subTreePersistedData.get(rootPlaceholder)
 
-					if (rootState.type === StateType.EntityList) {
+					if (rootState.type === 'entityList') {
 						if (!(rootData instanceof Set)) {
 							continue // This should never happen.
 						}
 						this.updateEntityListPersistedData(rootState, rootData)
-					} else if (rootState.type === StateType.EntityRealm) {
+					} else if (rootState.type === 'entityRealm') {
 						if (rootData !== undefined && !(rootData instanceof ServerGeneratedUuid)) {
 							continue // This should never happen.
 						}
@@ -111,7 +111,7 @@ export class TreeAugmenter {
 			const childData = persistedData?.get(placeholderName)
 
 			switch (child.type) {
-				case StateType.Field: {
+				case 'field': {
 					if (childData instanceof ServerGeneratedUuid || childData instanceof Set) {
 						throw new BindingError()
 					}
@@ -127,18 +127,18 @@ export class TreeAugmenter {
 					}
 					break
 				}
-				case StateType.EntityRealm:
-				case StateType.EntityRealmStub: {
+				case 'entityRealm':
+				case 'entityRealmStub': {
 					if (!(childData instanceof ServerGeneratedUuid) && childData !== undefined && childData !== null) {
 						throw new BindingError()
 					}
 					this.updateRealmIdIfNecessary(child, childData)
-					if (child.type === StateType.EntityRealm) {
+					if (child.type === 'entityRealm') {
 						this.updateEntityRealmPersistedData(child)
 					}
 					break
 				}
-				case StateType.EntityList: {
+				case 'entityList': {
 					if (childData !== undefined && !(childData instanceof Set)) {
 						throw new BindingError()
 					}
@@ -194,7 +194,7 @@ export class TreeAugmenter {
 					new ServerGeneratedUuid(childRuntimeId.value),
 				)
 			}
-			if (child.type === StateType.EntityRealm) {
+			if (child.type === 'entityRealm') {
 				this.updateEntityRealmPersistedData(child)
 			}
 		}

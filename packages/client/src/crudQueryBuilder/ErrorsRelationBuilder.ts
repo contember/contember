@@ -1,4 +1,4 @@
-import { ObjectBuilder } from '../graphQlBuilder'
+import type { ObjectBuilder } from '../graphQlBuilder'
 
 export class ErrorsRelationBuilder {
 	public static errorsRelation(objectBuilder: ObjectBuilder): ObjectBuilder {

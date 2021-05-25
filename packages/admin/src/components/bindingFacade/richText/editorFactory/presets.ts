@@ -1,4 +1,4 @@
-import { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
+import type { BuiltinEditorPlugins } from './BuiltinEditorPlugins'
 
 export const defaultEditorPluginPreset: BuiltinEditorPlugins[] = [
 	'code',

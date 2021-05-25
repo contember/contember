@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { memo, MouseEventHandler, ReactNode, useContext } from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { Justification } from '../../types'
+import type { Justification } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 import { UseTableElementContext } from './Table'
 

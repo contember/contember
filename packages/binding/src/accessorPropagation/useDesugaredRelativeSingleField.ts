@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { QueryLanguage } from '../queryLanguage'
-import { RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
+import type { RelativeSingleField, SugaredRelativeSingleField } from '../treeParameters'
 import { useEnvironment } from './useEnvironment'
 
 /**

@@ -1,17 +1,17 @@
-import {
+import type {
 	DesugaredEntityCreationParameters,
 	EntityCreationParameters,
 	SugarableEntityCreationParameters,
 	UnsugarableEntityCreationParameters,
 } from './EntityCreationParameters'
-import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
-import {
+import type { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import type {
 	DesugaredQualifiedEntityParameters,
 	QualifiedEntityParameters,
 	SugarableQualifiedEntityParameters,
 	UnsugarableQualifiedEntityParameters,
 } from './QualifiedEntityParameters'
-import {
+import type {
 	DesugaredSingleEntityEventListeners,
 	SingleEntityEventListeners,
 	SugarableSingleEntityEventListeners,

@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from '../index'
+import type { GraphQlBuilder } from '../index'
 
 export type Mutations = 'create' | 'update' | 'delete'
 

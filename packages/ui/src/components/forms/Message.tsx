@@ -1,7 +1,7 @@
 import cn from 'classnames'
 import { memo, ReactNode } from 'react'
 import { useClassNamePrefix } from '../../auxiliary'
-import { MessageDistinction, MessageFlow, MessageType, Size } from '../../types'
+import type { MessageDistinction, MessageFlow, MessageType, Size } from '../../types'
 import { toEnumViewClass, toViewClass } from '../../utils'
 
 export interface MessageProps {

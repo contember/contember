@@ -6,7 +6,11 @@ import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accesso
 import { NIL_UUID, PRIMARY_KEY_NAME } from '../bindingTypes'
 import { Environment } from '../dao'
 import { MarkerFactory, QueryLanguage } from '../queryLanguage'
-import { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity, TreeRootId } from '../treeParameters'
+import type {
+	SugaredQualifiedSingleEntity,
+	SugaredUnconstrainedQualifiedSingleEntity,
+	TreeRootId,
+} from '../treeParameters'
 import { Component } from './Component'
 import { Entity, EntityBaseProps } from './Entity'
 import { Field } from './Field'

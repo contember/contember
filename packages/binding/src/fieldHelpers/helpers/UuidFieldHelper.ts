@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from 'uuid'
-import { FieldAccessor } from '../../accessors'
+import type { FieldAccessor } from '../../accessors'
 import { FieldHelper } from './FieldHelper'
 
 class UuidFieldHelper extends FieldHelper<string> {

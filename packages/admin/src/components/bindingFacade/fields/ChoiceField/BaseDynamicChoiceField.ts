@@ -13,7 +13,7 @@ import {
 	useGetEntityListSubTree,
 } from '@contember/binding'
 import { ReactElement, ReactNode, useCallback, useMemo } from 'react'
-import { ChoiceFieldData } from './ChoiceFieldData'
+import type { ChoiceFieldData } from './ChoiceFieldData'
 
 export type BaseDynamicChoiceField = (
 	| {

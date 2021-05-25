@@ -1,5 +1,5 @@
-import { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
-import { ParagraphElement } from './ParagraphElement'
+import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
+import type { ParagraphElement } from './ParagraphElement'
 
 export interface WithParagraphs<E extends WithAnotherNodeType<BaseEditor, ParagraphElement>> {
 	isParagraph: (

@@ -1,4 +1,4 @@
 export * from './MutationAlias'
-export * from './MutationOperationSubTreeType'
-export * from './MutationOperationType'
+export * from './mutationOperationSubTreeType'
+export * from './mutationOperationType'
 export * from './TopLevelMutationOperation'

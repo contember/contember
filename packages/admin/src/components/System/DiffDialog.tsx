@@ -2,8 +2,8 @@ import { Button, FormGroup, TextInput } from '@contember/ui'
 import { FormEvent, PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { pushRequest } from '../../actions/request'
-import { Dispatch } from '../../actions/types'
-import State from '../../state'
+import type { Dispatch } from '../../actions/types'
+import type State from '../../state'
 import { pageRequest } from '../../state/request'
 
 class ConnectedDiffDialog extends PureComponent<

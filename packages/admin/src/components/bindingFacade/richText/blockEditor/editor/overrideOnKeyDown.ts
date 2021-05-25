@@ -10,7 +10,7 @@ import {
 	Transforms,
 } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideOnKeyDownOptions {}
 

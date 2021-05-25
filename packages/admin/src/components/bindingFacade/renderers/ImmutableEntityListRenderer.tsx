@@ -1,5 +1,5 @@
 import { Component, EntityListAccessor } from '@contember/binding'
-import { ReactElement, ReactNode } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import { RepeaterInner, RepeaterInnerProps } from '../collections'
 
 export interface ImmutableEntityListRendererProps<ContainerExtraProps, ItemExtraProps>

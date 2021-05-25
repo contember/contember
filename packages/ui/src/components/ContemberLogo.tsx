@@ -1,6 +1,6 @@
 import cn from 'classnames'
 import { useClassNamePrefix } from '../auxiliary'
-import { Size } from '../types'
+import type { Size } from '../types'
 
 export interface ContemberLogoProps {
 	logotype?: boolean

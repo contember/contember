@@ -1,7 +1,7 @@
 import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { memo, ReactNode } from 'react'
-import { SugaredDiscriminateBy } from '../../../../discrimination'
-import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
+import type { SugaredDiscriminateBy } from '../../../../discrimination'
+import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
 class VimeoEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'Vimeo'
@@ -56,7 +56,7 @@ class VimeoEmbedHandler implements EmbedHandler<string> {
 }
 
 namespace VimeoEmbedHandler {
-	export type Options = {
+	export interface Options {
 		render?: () => ReactNode
 		vimeoIdField: SugaredFieldProps['field']
 		discriminateBy: SugaredDiscriminateBy

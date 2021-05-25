@@ -1,7 +1,7 @@
-import { Scalar } from '@contember/binding'
-import { ElementNode } from '../../baseEditor'
+import type { Scalar } from '@contember/binding'
+import type { ElementNode } from '../../baseEditor'
 
-export type ElementDataAttributes = {
+export interface ElementDataAttributes {
 	[dataAttribute: string]: Scalar
 }
 

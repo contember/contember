@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { Filter, UniqueWhere } from '../treeParameters'
+import type { ReactNode } from 'react'
+import type { Filter, UniqueWhere } from '../treeParameters'
 
 class Environment {
 	private readonly names: Environment.NameStore

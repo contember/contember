@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'react'
+import type { FunctionComponent } from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
-import { ScrollTargetElement } from './ScrollTargetElement'
+import type { ScrollTargetElement } from './ScrollTargetElement'
 
 export interface ScrollTargetRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: ScrollTargetElement

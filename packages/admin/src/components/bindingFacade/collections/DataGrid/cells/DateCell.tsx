@@ -1,5 +1,5 @@
 import { Component, Literal, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
-import { Input } from '@contember/client'
+import type { Input } from '@contember/client'
 import { FormGroup, TextInput } from '@contember/ui'
 import { forwardRef, FunctionComponent, memo } from 'react'
 import DatePicker from 'react-datepicker'

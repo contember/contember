@@ -15,7 +15,7 @@ import {
 } from 'react'
 import { usePopper } from 'react-popper'
 import { useClassNamePrefix, useRawCloseOnEscapeOrClickOutside } from '../auxiliary'
-import { DropdownAlignment } from '../types'
+import type { DropdownAlignment } from '../types'
 import { assertNever, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
 import { Button, ButtonBasedButtonProps } from './forms'

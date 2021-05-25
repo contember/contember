@@ -1,5 +1,5 @@
 import { Component, Field, FieldProps } from '../coreComponents'
-import { SugaredRelativeSingleField } from '../treeParameters'
+import type { SugaredRelativeSingleField } from '../treeParameters'
 
 export interface SugaredFieldProps extends Omit<FieldProps, 'field'> {
 	field: string | SugaredRelativeSingleField

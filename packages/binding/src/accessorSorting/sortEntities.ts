@@ -1,5 +1,5 @@
-import { EntityAccessor } from '../accessors'
-import { RelativeSingleField } from '../treeParameters'
+import type { EntityAccessor } from '../accessors'
+import type { RelativeSingleField } from '../treeParameters'
 
 export const sortEntities = (
 	entities: EntityAccessor[],

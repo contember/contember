@@ -1,12 +1,12 @@
-import { SugaredUniqueWhere, UniqueWhere } from './primitives'
-import { DesugaredRelation, Relation, SugarableRelation, UnsugarableRelation } from './Relation'
-import {
+import type { SugaredUniqueWhere, UniqueWhere } from './primitives'
+import type { DesugaredRelation, Relation, SugarableRelation, UnsugarableRelation } from './Relation'
+import type {
 	DesugaredSingleEntityEventListeners,
 	SingleEntityEventListeners,
 	SugarableSingleEntityEventListeners,
 	UnsugarableSingleEntityEventListeners,
 } from './SingleEntityEventListeners'
-import {
+import type {
 	DesugaredSingleEntityParameters,
 	SingleEntityParameters,
 	SugarableSingleEntityParameters,

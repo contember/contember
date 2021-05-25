@@ -1,6 +1,6 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { NormalizedDiscriminatedData, useDiscriminatedData } from '../discrimination'
-import { BlockProps } from './Block'
+import type { BlockProps } from './Block'
 import { useBlockProps } from './useBlockProps'
 
 export type NormalizedBlocks = NormalizedDiscriminatedData<BlockProps>

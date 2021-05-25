@@ -1,6 +1,6 @@
 import { diffQuery, DiffQueryResponse, TreeFilter } from '@contember/client'
 import { useCallback } from 'react'
-import { ApiRequestState } from '../apiRequest'
+import type { ApiRequestState } from '../apiRequest'
 import { useStageSlug } from '../project'
 import { useSystemApiRequest } from './useSystemApiRequest'
 

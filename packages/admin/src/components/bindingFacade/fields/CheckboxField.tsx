@@ -1,6 +1,6 @@
 import { Component, Field, FieldBasicProps, useEnvironment, useField, useMutationState } from '@contember/binding'
 import { Checkbox, FormGroup } from '@contember/ui'
-import { FunctionComponent, ReactNode } from 'react'
+import type { FunctionComponent, ReactNode } from 'react'
 import { useAccessorErrors } from '../errors'
 
 export type CheckboxFieldProps = FieldBasicProps & {

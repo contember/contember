@@ -1,6 +1,6 @@
-import { Environment } from '../dao'
-import { HasOneRelation } from '../treeParameters'
-import { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
+import type { Environment } from '../dao'
+import type { HasOneRelation } from '../treeParameters'
+import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 // This may also represent a reduced has many relation.

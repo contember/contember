@@ -1,6 +1,6 @@
 import { memo, ReactNode } from 'react'
 import { BoxDepthContext } from '../contexts'
-import { BoxDepth } from '../types'
+import type { BoxDepth } from '../types'
 
 export interface LowerBoxLevelProps {
 	currentDepth: BoxDepth

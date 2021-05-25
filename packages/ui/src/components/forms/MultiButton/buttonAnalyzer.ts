@@ -1,5 +1,5 @@
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { IllegalChildrenError } from '../../../errors'
 import { Button, ButtonProps } from '../Button'
 import { FormGroup, FormGroupProps } from '../FormGroup'

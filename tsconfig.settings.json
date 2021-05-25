@@ -1,24 +1,24 @@
 {
 	"compilerOptions": {
 		"baseUrl": ".",
+		"composite": true,
 		"declaration": true,
 		"declarationMap": true,
-		"sourceMap": true,
-		"composite": true,
-		"skipLibCheck": true,
-		"noEmitOnError": true,
-		"experimentalDecorators": true,
 		"esModuleInterop": true,
-		"jsx": "react-jsx",
-
-		"target": "es2019",
-		"moduleResolution": "node",
-		"module": "esnext",
-		"outDir": "dist",
-
-		"strict": true,
+		"experimentalDecorators": true,
+		"importsNotUsedAsValues": "error",
 		"incremental": true,
-
-		"lib": ["esnext", "dom"]
+		"isolatedModules": true,
+		"jsx": "react-jsx",
+		"lib": ["ESNext", "DOM"],
+		"module": "ESNext",
+		"moduleResolution": "Node",
+		"noEmitOnError": true,
+		"outDir": "dist",
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"target": "ES2019",
+		"useDefineForClassFields": true
 	}
 }

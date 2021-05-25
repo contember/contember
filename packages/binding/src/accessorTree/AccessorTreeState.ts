@@ -1,23 +1,17 @@
-import { TreeRootAccessor } from '../accessors'
-import { RequestError } from './RequestError'
-
-export enum AccessorTreeStateName {
-	Initializing = 'initializing',
-	Error = 'error',
-	Initialized = 'initialized',
-}
+import type { TreeRootAccessor } from '../accessors'
+import type { RequestError } from './RequestError'
 
 export interface InitializingAccessorTreeState {
-	name: AccessorTreeStateName.Initializing
+	name: 'initializing'
 }
 
 export interface InitializedAccessorTreeState {
-	name: AccessorTreeStateName.Initialized
+	name: 'initialized'
 	data: TreeRootAccessor
 }
 
 export interface ErrorAccessorTreeState {
-	name: AccessorTreeStateName.Error
+	name: 'error'
 	error: RequestError
 }
 

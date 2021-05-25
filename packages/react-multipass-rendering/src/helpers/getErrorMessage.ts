@@ -1,5 +1,5 @@
-import { ReactNode } from 'react'
-import { ErrorMessageFactory } from '../ErrorMessageFactory'
+import type { ReactNode } from 'react'
+import type { ErrorMessageFactory } from '../ErrorMessageFactory'
 
 export const getErrorMessage = <StaticContext>(
 	factory: ErrorMessageFactory<StaticContext>,

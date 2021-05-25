@@ -1,5 +1,5 @@
-import { GridPagingAction } from './GridPagingAction'
-import { GridPagingState } from './GridPagingState'
+import type { GridPagingAction } from './GridPagingAction'
+import type { GridPagingState } from './GridPagingState'
 
 export const gridPagingReducer = (previousState: GridPagingState, action: GridPagingAction): GridPagingState => {
 	switch (action.type) {

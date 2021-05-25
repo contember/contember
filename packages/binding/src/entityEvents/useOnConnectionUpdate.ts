@@ -1,5 +1,5 @@
-import { EntityAccessor } from '../accessors'
-import { FieldName } from '../treeParameters'
+import type { EntityAccessor } from '../accessors'
+import type { FieldName } from '../treeParameters'
 import { useEntityEvent } from './useEntityEvent'
 
 export const useOnConnectionUpdate = (

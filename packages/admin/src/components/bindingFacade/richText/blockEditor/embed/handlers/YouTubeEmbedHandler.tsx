@@ -1,7 +1,7 @@
 import { SugaredField, SugaredFieldProps, useField } from '@contember/binding'
 import { memo, ReactNode } from 'react'
-import { SugaredDiscriminateBy } from '../../../../discrimination'
-import { EmbedHandler, PopulateEmbedDataOptions } from '../core'
+import type { SugaredDiscriminateBy } from '../../../../discrimination'
+import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
 
 class YouTubeEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'YouTube'
@@ -55,7 +55,7 @@ class YouTubeEmbedHandler implements EmbedHandler<string> {
 }
 
 namespace YouTubeEmbedHandler {
-	export type Options = {
+	export interface Options {
 		render?: () => ReactNode
 		youTubeIdField: SugaredFieldProps['field']
 		discriminateBy: SugaredDiscriminateBy

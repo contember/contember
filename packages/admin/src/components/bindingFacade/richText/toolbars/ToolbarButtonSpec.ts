@@ -1,10 +1,10 @@
-import { EntityAccessor } from '@contember/binding'
-import { IconSourceSpecification } from '@contember/ui'
-import { FunctionComponent, ReactNode } from 'react'
-import { Range as SlateRange } from 'slate'
-import { SugaredDiscriminateBy } from '../../discrimination'
-import { ElementNode, ElementSpecifics, TextNode, TextSpecifics } from '../baseEditor'
-import { BlockSlateEditor } from '../blockEditor'
+import type { EntityAccessor } from '@contember/binding'
+import type { IconSourceSpecification } from '@contember/ui'
+import type { FunctionComponent, ReactNode } from 'react'
+import type { Range as SlateRange } from 'slate'
+import type { SugaredDiscriminateBy } from '../../discrimination'
+import type { ElementNode, ElementSpecifics, TextNode, TextSpecifics } from '../baseEditor'
+import type { BlockSlateEditor } from '../blockEditor'
 
 export interface MarkSpecificToolbarButton<T extends TextNode> {
 	marks: TextSpecifics<T>

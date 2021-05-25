@@ -2,7 +2,7 @@ import cn from 'classnames'
 import { memo, ReactNode, useContext } from 'react'
 import { IncreaseBoxDepth, IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
 import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
-import { NativeProps } from '../../types'
+import type { NativeProps } from '../../types'
 import { toStateClass } from '../../utils'
 import { Heading } from '../Heading'
 

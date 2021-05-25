@@ -6,10 +6,10 @@ import {
 	RelativeSingleField,
 	SugaredRelativeEntityList,
 } from '@contember/binding'
-import { MutableRefObject } from 'react'
+import type { MutableRefObject } from 'react'
 import { Editor } from 'slate'
-import { FieldBackedElement } from '../FieldBackedElement'
-import { BlockSlateEditor } from './BlockSlateEditor'
+import type { FieldBackedElement } from '../FieldBackedElement'
+import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideCreateElementReferenceOptions {
 	bindingOperations: BindingOperations

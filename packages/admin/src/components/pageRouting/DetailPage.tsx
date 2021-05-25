@@ -6,7 +6,7 @@ import {
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
 import { FeedbackRenderer, ImmutableContentLayoutRendererProps, ImmutableSingleEntityRenderer } from '../bindingFacade'
-import { PageProvider } from './PageProvider'
+import type { PageProvider } from './PageProvider'
 
 export interface DetailPageProps extends SugaredQualifiedSingleEntity, EntitySubTreeAdditionalProps {
 	pageName: string

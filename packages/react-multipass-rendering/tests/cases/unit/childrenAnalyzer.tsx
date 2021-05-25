@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactElement, ReactNode } from 'react'
+import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import * as React from 'react'
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '../../../src'
 
@@ -32,20 +32,17 @@ const simpleFooBarComponentTree = (
 	</>
 )
 
-enum Op {
-	Plus,
-	Minus,
-	Times,
-}
+type Op = 'plus' | 'minus' | 'times'
+
 interface CalculatorBranchNodeProps {
-	op: number
+	op: Op
 	children: ReactNode
 }
 const CalculatorBranchNode = (props: CalculatorBranchNodeProps) => null
 CalculatorBranchNode.compute = (props: CalculatorBranchNodeProps, [operand1, operand2]: [number, number]) => {
-	if (props.op === Op.Plus) {
+	if (props.op === 'plus') {
 		return operand1 + operand2
-	} else if (props.op === Op.Minus) {
+	} else if (props.op === 'minus') {
 		return operand1 - operand2
 	}
 	return operand1 * operand2
@@ -58,14 +55,14 @@ const NumberComponent = (props: NumberComponentProps) => null
 
 const calculatorFormula = ( // 10 * ((5 - 3) + (2 * 6)) === 140
 	<>
-		<CalculatorBranchNode op={Op.Times}>
+		<CalculatorBranchNode op="times">
 			<NumberComponent value={10} />
-			<CalculatorBranchNode op={Op.Plus}>
-				<CalculatorBranchNode op={Op.Minus}>
+			<CalculatorBranchNode op="plus">
+				<CalculatorBranchNode op="minus">
 					<NumberComponent value={5} />
 					<NumberComponent value={3} />
 				</CalculatorBranchNode>
-				<CalculatorBranchNode op={Op.Times}>
+				<CalculatorBranchNode op="times">
 					<NumberComponent value={2} />
 					<NumberComponent value={6} />
 				</CalculatorBranchNode>

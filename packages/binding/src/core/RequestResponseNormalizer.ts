@@ -11,7 +11,7 @@ import {
 import { BindingError } from '../BindingError'
 import { PRIMARY_KEY_NAME } from '../bindingTypes'
 import { assertNever } from '../utils'
-import { MutationAlias, MutationOperationSubTreeType, MutationOperationType } from './requestAliases'
+import { MutationAlias, mutationOperationSubTreeType, mutationOperationType } from './requestAliases'
 
 export class RequestResponseNormalizer {
 	public static mergeInQueryResponse(
@@ -53,20 +53,20 @@ export class RequestResponseNormalizer {
 			const { type, entityId, subTreeType, subTreePlaceholder } = operation
 
 			switch (type) {
-				case MutationOperationType.Update:
-				case MutationOperationType.Create: {
+				case mutationOperationType.update:
+				case mutationOperationType.create: {
 					const treeDatum = newPersistedData[operationAlias]
 					const fieldData = this.createFieldData(persistedEntityDataStore, treeDatum)
 
-					if (subTreeType === MutationOperationSubTreeType.SingleEntity) {
+					if (subTreeType === mutationOperationSubTreeType.singleEntity) {
 						if (fieldData instanceof ServerGeneratedUuid) {
 							subTreeDataStore.set(subTreePlaceholder, fieldData)
 						} else {
 							return this.rejectData()
 						}
-					} else if (subTreeType === MutationOperationSubTreeType.EntityList) {
+					} else if (subTreeType === mutationOperationSubTreeType.entityList) {
 						if (fieldData instanceof ServerGeneratedUuid) {
-							if (type === MutationOperationType.Create) {
+							if (type === mutationOperationType.create) {
 								const list = subTreeDataStore.get(subTreePlaceholder)
 								if (!(list instanceof Set)) {
 									return this.rejectData()
@@ -85,13 +85,13 @@ export class RequestResponseNormalizer {
 
 					break
 				}
-				case MutationOperationType.Delete: {
+				case mutationOperationType.delete: {
 					// TODO there are potentially some references to entityId that this whole process won't quite remove.
 					//		That's a memory leak. Probably not particularly severe in most cases but still.
 					persistedEntityDataStore.delete(entityId)
-					if (subTreeType === MutationOperationSubTreeType.SingleEntity) {
+					if (subTreeType === mutationOperationSubTreeType.singleEntity) {
 						subTreeDataStore.delete(subTreePlaceholder)
-					} else if (subTreeType === MutationOperationSubTreeType.EntityList) {
+					} else if (subTreeType === mutationOperationSubTreeType.entityList) {
 						const list = subTreeDataStore.get(subTreePlaceholder)
 
 						if (!(list instanceof Set)) {

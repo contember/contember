@@ -7,7 +7,7 @@ import {
 	PureComponent,
 	ReactNode,
 } from 'react'
-import { RequestChange } from '../../state/request'
+import type { RequestChange } from '../../state/request'
 
 class LinkComponent extends PureComponent<LinkComponent.Props> {
 	onClick = (e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {

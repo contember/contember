@@ -8,7 +8,7 @@ export interface ConcealableFieldRendererProps {
 	inputRef: Ref<HTMLInputElement | undefined>
 }
 
-export type ConcealableFieldProps = {
+export interface ConcealableFieldProps {
 	buttonProps?: ButtonProps
 	concealTimeout?: number
 	renderConcealedValue: () => ReactNode

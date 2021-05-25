@@ -1,8 +1,8 @@
-import { FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
-import { Element as SlateElement, Node as SlateNode, NodeEntry } from 'slate'
-import { RenderElementProps, RenderLeafProps } from 'slate-react'
-import { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
-import { WithPaste } from './overrides'
+import type { FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
+import type { Element as SlateElement, Node as SlateNode, NodeEntry } from 'slate'
+import type { RenderElementProps, RenderLeafProps } from 'slate-react'
+import type { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
+import type { WithPaste } from './overrides'
 
 export interface WithEssentials<E extends EditorNode> {
 	formatVersion: SerializableEditorNode['formatVersion']

@@ -1,6 +1,6 @@
 import { useReducer } from 'react'
 import { gridPagingReducer } from './gridPagingReducer'
-import { GridPagingState } from './GridPagingState'
+import type { GridPagingState } from './GridPagingState'
 
 const stateDefaults: GridPagingState = {
 	pageIndex: 0,

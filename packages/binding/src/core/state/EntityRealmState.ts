@@ -1,10 +1,9 @@
-import { EntityAccessor, ErrorAccessor } from '../../accessors'
-import { EntitySubTreeMarker, HasOneRelationMarker } from '../../markers'
-import { EntityEventListenerStore, EntityRealmKey, FieldName, PlaceholderName } from '../../treeParameters'
-import { EntityListState } from './EntityListState'
-import { EntityState } from './EntityState'
-import { StateNode } from './StateNode'
-import { StateType } from './StateType'
+import type { EntityAccessor, ErrorAccessor } from '../../accessors'
+import type { EntitySubTreeMarker, HasOneRelationMarker } from '../../markers'
+import type { EntityEventListenerStore, EntityRealmKey, FieldName, PlaceholderName } from '../../treeParameters'
+import type { EntityListState } from './EntityListState'
+import type { EntityState } from './EntityState'
+import type { StateNode } from './StateNode'
 
 export interface HasOneEntityRealmBlueprint {
 	readonly type: 'hasOne'
@@ -29,7 +28,7 @@ export type EntityRealmBlueprint =
 	| SubTreeEntityRealmBlueprint
 
 export interface EntityRealmStateStub {
-	readonly type: StateType.EntityRealmStub
+	readonly type: 'entityRealmStub'
 
 	readonly blueprint: EntityRealmBlueprint
 	entity: EntityState
@@ -43,7 +42,7 @@ export interface EntityRealmStateStub {
  * completely different contexts. Even with different fields.
  */
 export interface EntityRealmState {
-	readonly type: StateType.EntityRealm
+	readonly type: 'entityRealm'
 
 	readonly blueprint: EntityRealmBlueprint
 	entity: EntityState

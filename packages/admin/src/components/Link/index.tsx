@@ -1,8 +1,8 @@
 import { connect } from 'react-redux'
 import { pushRequest } from '../../actions/request'
-import { Dispatch } from '../../actions/types'
+import type { Dispatch } from '../../actions/types'
 import routes from '../../routes'
-import State from '../../state'
+import type State from '../../state'
 import { requestStateToPath } from '../../utils/url'
 import { InnerProps, LinkComponent, PublicAnchorProps } from './LinkComponent'
 
@@ -13,4 +13,4 @@ export const Link = connect<LinkComponent.StateProps, LinkComponent.DispatchProp
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),
 )(LinkComponent)
 
-export { InnerProps, PublicAnchorProps }
+export type { InnerProps, PublicAnchorProps }

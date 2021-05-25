@@ -3,10 +3,10 @@ import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember
 import { memo, MouseEvent as ReactMouseEvent, useMemo } from 'react'
 import { useEditor } from 'slate-react'
 import { getDiscriminatedDatum, SugaredDiscriminateBy } from '../../discrimination'
-import { ElementSpecificToolbarButton } from '../toolbars'
-import { BlockSlateEditor } from './editor'
+import type { ElementSpecificToolbarButton } from '../toolbars'
+import type { BlockSlateEditor } from './editor'
 import { ReferenceElement, referenceElementType } from './elements'
-import { EditorReferenceBlocks } from './templating'
+import type { EditorReferenceBlocks } from './templating'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	title?: string

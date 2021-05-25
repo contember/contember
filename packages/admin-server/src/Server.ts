@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import Koa from 'koa'
 import koaStatic from 'koa-static'
-import { Server as HttpServer } from 'net'
+import type { Server as HttpServer } from 'net'
 import { promisify } from 'util'
 
 const readFile = promisify(fs.readFile)

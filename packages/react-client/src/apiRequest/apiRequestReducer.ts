@@ -1,6 +1,5 @@
-import { ApiRequestAction } from './ApiRequestAction'
-import { ApiRequestActionType } from './ApiRequestActionType'
-import { ApiRequestState } from './ApiRequestState'
+import type { ApiRequestAction } from './ApiRequestAction'
+import type { ApiRequestState } from './ApiRequestState'
 
 export type ApiRequestReducer<SuccessData> = (
 	previousState: ApiRequestState<SuccessData>,
@@ -12,26 +11,26 @@ export const apiRequestReducer = <SuccessData>(
 	action: ApiRequestAction<SuccessData>,
 ): ApiRequestState<SuccessData> => {
 	switch (action.type) {
-		case ApiRequestActionType.Uninitialize:
+		case 'uninitialize':
 			return {
 				readyState: 'uninitialized',
 				isFinished: false,
 				isLoading: false,
 			}
-		case ApiRequestActionType.Initialize:
+		case 'initialize':
 			return {
 				readyState: 'pending',
 				isFinished: false,
 				isLoading: true,
 			}
-		case ApiRequestActionType.ResolveSuccessfully:
+		case 'resolveSuccessfully':
 			return {
 				readyState: 'networkSuccess',
 				data: action.data,
 				isFinished: true,
 				isLoading: false,
 			}
-		case ApiRequestActionType.ResolveWithError:
+		case 'resolveWithError':
 			return {
 				readyState: 'networkError',
 				data: action.error,

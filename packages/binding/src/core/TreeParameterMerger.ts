@@ -1,6 +1,6 @@
 import { GraphQlBuilder } from '@contember/client'
 import { BindingError } from '../BindingError'
-import {
+import type {
 	Alias,
 	EntityCreationParameters,
 	EntityEventListenerStore,

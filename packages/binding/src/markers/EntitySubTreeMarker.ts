@@ -1,6 +1,6 @@
-import { Environment } from '../dao'
-import { QualifiedSingleEntity, UnconstrainedQualifiedSingleEntity } from '../treeParameters'
-import { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
+import type { Environment } from '../dao'
+import type { QualifiedSingleEntity, UnconstrainedQualifiedSingleEntity } from '../treeParameters'
+import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
 import { PlaceholderGenerator } from './PlaceholderGenerator'
 
 export class EntitySubTreeMarker {

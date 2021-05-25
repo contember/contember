@@ -3,7 +3,7 @@ import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
 
 const parse = (input: string) => {
-	return Parser.parseQueryLanguageExpression(input, Parser.EntryPoint.OrderBy, new Environment())
+	return Parser.parseQueryLanguageExpression(input, 'orderBy', new Environment())
 }
 
 describe('orderBy QueryLanguage parser', () => {

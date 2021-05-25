@@ -1,7 +1,7 @@
-import { FunctionComponent } from 'react'
+import type { FunctionComponent } from 'react'
 import { RenderElementProps, useSelected } from 'slate-react'
 import { BlockElement } from '../../../baseEditor'
-import { HorizontalRuleElement } from './HorizontalRuleElement'
+import type { HorizontalRuleElement } from './HorizontalRuleElement'
 
 export interface HorizontalRuleRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: HorizontalRuleElement

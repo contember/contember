@@ -1,7 +1,7 @@
 import { IconSvgPaths16 } from '@blueprintjs/icons'
 import { boolean, color, number, select } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { BlueprintIconName, ContemberIconName, Icon } from '../../src'
 import * as ContemberIcons from '../../src/components/Icon/contemberIcons'
 import { iconSizeKnob } from '../utils/knobs'

@@ -1,13 +1,13 @@
-import { AnyField, DesugaredAnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
-import {
+import type { AnyField, DesugaredAnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
+import type {
 	EntityListParameters,
 	SugarableEntityListParameters,
 	UnsugarableEntityListParameters,
 } from './EntityListParameters'
-import { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
-import { DesugaredLeafField, LeafField, SugarableLeafField, UnsugarableLeafField } from './LeafField'
-import { DesugaredQualifiedEntityList } from './QualifiedEntityList'
-import {
+import type { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import type { DesugaredLeafField, LeafField, SugarableLeafField, UnsugarableLeafField } from './LeafField'
+import type { DesugaredQualifiedEntityList } from './QualifiedEntityList'
+import type {
 	QualifiedEntityParameters,
 	SugarableQualifiedEntityParameters,
 	UnsugarableQualifiedEntityParameters,

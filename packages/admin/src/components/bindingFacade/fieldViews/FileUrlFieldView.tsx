@@ -1,5 +1,5 @@
 import { Component, SugaredField, SugaredFieldProps, useField } from '@contember/binding'
-import { AnchorHTMLAttributes, FunctionComponent } from 'react'
+import type { AnchorHTMLAttributes, FunctionComponent } from 'react'
 
 export interface FileUrlFieldViewProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
 	fileUrlField: SugaredFieldProps['field']

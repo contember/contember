@@ -1,4 +1,4 @@
-import { SystemEvent } from './events'
+import type { SystemEvent } from './events'
 
 export interface DiffQueryResponse {
 	data: {

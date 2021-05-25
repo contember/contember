@@ -4,10 +4,10 @@ import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
 import { assertNever } from '../../../../../../utils'
 import { BaseEditor, BlockElement } from '../../../baseEditor'
-import { EditorWithTables } from './EditorWithTables'
-import { TableCellElement } from './TableCellElement'
-import { TableElement } from './TableElement'
-import { TableRowElement } from './TableRowElement'
+import type { EditorWithTables } from './EditorWithTables'
+import type { TableCellElement } from './TableCellElement'
+import type { TableElement } from './TableElement'
+import type { TableRowElement } from './TableRowElement'
 
 export interface TableElementRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: TableElement

@@ -1,8 +1,8 @@
 import { boolean, radios, text } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
-import { ReactElement } from 'react'
+import type { ReactElement } from 'react'
 import { Button, ButtonProps } from '../../src'
-import { Size } from '../../src/types'
+import type { Size } from '../../src/types'
 import { allIntents, sizeKnob } from '../utils'
 
 export const simpleButtonStory = (size?: Size): ReactElement => {

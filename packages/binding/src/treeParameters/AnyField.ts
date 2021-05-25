@@ -1,4 +1,4 @@
-import { FieldName } from './primitives'
+import type { FieldName } from './primitives'
 
 export interface DesugaredAnyField {
 	field: FieldName

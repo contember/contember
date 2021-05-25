@@ -1,5 +1,5 @@
 import { Fragment, ReactNode } from 'react'
-import { SelectedDimensionRenderer } from './types'
+import type { SelectedDimensionRenderer } from './types'
 
 export const renderByJoining: SelectedDimensionRenderer = dimensionData => {
 	const output: ReactNode[] = []

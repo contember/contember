@@ -1,4 +1,4 @@
-import { FieldValue } from '@contember/binding'
+import type { FieldValue } from '@contember/binding'
 
 export interface ResolvedDiscriminatedDatum<Datum> {
 	discriminateBy: FieldValue

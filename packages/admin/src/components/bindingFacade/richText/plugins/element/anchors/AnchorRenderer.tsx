@@ -1,6 +1,6 @@
-import { FunctionComponent, MouseEvent as ReactMouseEvent } from 'react'
-import { RenderElementProps } from 'slate-react'
-import { AnchorElement } from './AnchorElement'
+import type { FunctionComponent, MouseEvent as ReactMouseEvent } from 'react'
+import type { RenderElementProps } from 'slate-react'
+import type { AnchorElement } from './AnchorElement'
 
 export interface AnchorRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: AnchorElement

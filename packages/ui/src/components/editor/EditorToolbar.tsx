@@ -1,16 +1,12 @@
 import cn from 'classnames'
 import { useCallback, memo, forwardRef } from 'react'
 import { useComponentClassName } from '../../auxiliary'
-import { HoveringToolbarScope } from '../../types'
+import type { HoveringToolbarScope } from '../../types'
 import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 import { Dropdown, DropdownProps } from '../Dropdown'
-import { EditorToolbarButton, ToolbarButton, ToolbarButtonLayout } from './EditorToolbarButton'
+import { EditorToolbarButton, ToolbarButton } from './EditorToolbarButton'
 
-export enum EditorToolbarLayout {
-	BAR = 'bar',
-	LIST = 'list',
-	GRID = 'grid',
-}
+export type EditorToolbarLayout = 'bar' | 'list' | 'grid'
 
 interface ToolbarButtonOrDropdown extends ToolbarButton {
 	groups?: ToolbarGroup[]
@@ -80,12 +76,12 @@ function ButtonOrDropdown(props: ToolbarButtonOrDropdown & WithPopupProps) {
 export const EditorToolbar = memo(
 	forwardRef<HTMLDivElement, EditorToolbarProps>(
 		({ isActive, scope, groups, showLabels, restGroups, layout }: EditorToolbarProps, ref) => {
-			layout = layout ?? EditorToolbarLayout.BAR
-			const buttonLayout = layout === EditorToolbarLayout.LIST ? ToolbarButtonLayout.LIST : ToolbarButtonLayout.GRID
+			layout = layout ?? 'bar'
+			const buttonLayout = layout === 'list' ? 'list' : 'grid'
 			if (restGroups) {
 				switch (layout) {
-					case EditorToolbarLayout.GRID:
-					case EditorToolbarLayout.LIST:
+					case 'grid':
+					case 'list':
 						groups = [...groups, ...restGroups]
 						restGroups = undefined
 				}
@@ -110,7 +106,7 @@ export const EditorToolbar = memo(
 										layout={buttonLayout}
 										showLabel={showLabels}
 										popup={{
-											layout: EditorToolbarLayout.LIST,
+											layout: 'list',
 											showLabels: true,
 											scope: scope,
 										}}
@@ -127,7 +123,7 @@ export const EditorToolbar = memo(
 									groups={restGroups}
 									showLabel={showLabels}
 									popup={{
-										layout: EditorToolbarLayout.GRID,
+										layout: 'grid',
 										showLabels: true,
 										scope: scope,
 									}}

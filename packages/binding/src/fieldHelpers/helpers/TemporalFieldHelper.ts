@@ -1,4 +1,4 @@
-import { FieldAccessor } from '../../accessors'
+import type { FieldAccessor } from '../../accessors'
 import { FieldHelper } from './FieldHelper'
 
 class TemporalFieldHelper extends FieldHelper<string> {

@@ -1,5 +1,5 @@
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '@contember/react-multipass-rendering'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { BindingError } from '../BindingError'
 import { Environment } from '../dao'
 import {
@@ -12,7 +12,7 @@ import {
 	HasOneRelationMarker,
 	MarkerTreeRoot,
 } from '../markers'
-import { Alias } from '../treeParameters'
+import type { Alias } from '../treeParameters'
 import { IncrementalMarkerBuilder } from './IncrementalMarkerBuilder'
 
 type Fragment = EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker

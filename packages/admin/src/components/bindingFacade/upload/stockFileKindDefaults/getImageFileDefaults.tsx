@@ -1,7 +1,7 @@
 import { BindingError, SugaredFieldProps } from '@contember/binding'
 import { ImageFieldView } from '../../fieldViews'
 import { noFileUrlMessage } from './noFileUrlMessage'
-import { StockFileKindDefault } from './StockFileKindDefault'
+import type { StockFileKindDefault } from './StockFileKindDefault'
 
 export const getImageFileDefaults = (fileUrlField: SugaredFieldProps['field'] | undefined): StockFileKindDefault => ({
 	accept: 'image/*',

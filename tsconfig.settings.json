@@ -21,6 +21,7 @@
 
 		"importsNotUsedAsValues": "error",
 		"isolatedModules": true,
+		"useDefineForClassFields": true,
 
 		"lib": ["esnext", "dom"]
 	}

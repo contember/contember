@@ -1,4 +1,4 @@
-import { ComponentType, createElement, ReactElement, ReactNode } from 'react'
+import type { ComponentType, ReactElement, ReactNode } from 'react'
 import { AccessorProvider } from '../accessorPropagation'
 import type { EntityAccessor } from '../accessors'
 import { Component } from './Component'
@@ -18,12 +18,20 @@ export type EntityProps<EntityComponentProps> = EntityBaseProps &
 	)
 
 export const Entity = Component(<EntityComponentProps extends {}>(props: EntityProps<EntityComponentProps>) => {
+	let children = props.children
+
 	if ('entityComponent' in props && props.entityComponent) {
-		return createElement(props.entityComponent, {
-			...props.entityProps!,
-			accessor: props.accessor,
-			children: props.children,
-		})
+		const EntityComponent = props.entityComponent
+
+		children = (
+			<EntityComponent {...props.entityProps!} accessor={props.accessor}>
+				{children}
+			</EntityComponent>
+		)
 	}
-	return <AccessorProvider accessor={props.accessor}>{props.children}</AccessorProvider>
+	return (
+		<AccessorProvider accessor={props.accessor} key={props.accessor.key}>
+			{children}
+		</AccessorProvider>
+	)
 }, 'Entity') as <EntityComponentProps extends {}>(props: EntityProps<EntityComponentProps>) => ReactElement

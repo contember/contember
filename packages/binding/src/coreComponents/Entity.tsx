@@ -30,7 +30,8 @@ export const Entity = Component(<EntityComponentProps extends {}>(props: EntityP
 		)
 	}
 	return (
-		<AccessorProvider accessor={props.accessor} key={props.accessor.key}>
+		// HACK: the ?. is actually important, despite the typings.
+		<AccessorProvider accessor={props.accessor} key={props.accessor?.key}>
 			{children}
 		</AccessorProvider>
 	)

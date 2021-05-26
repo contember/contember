@@ -172,6 +172,7 @@ export class TreeStore {
 			this.disposeOfRealm(realm)
 		}
 		this.entityStore.delete(entity.id.value)
+		this.persistedEntityData.delete(entity.id.value)
 	}
 
 	public effectivelyHasTreeRoot(candidateRoot: MarkerTreeRoot): boolean {

@@ -190,6 +190,8 @@ export class DataBinding {
 								}
 								await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
 								await onPersistSuccess?.(persistSuccessOptions)
+
+								this.treeAugmenter.resetCreatingSubTrees()
 							})
 							return result
 						} else {

@@ -9,7 +9,7 @@ import {
 import { BindingError } from '../BindingError'
 import type { MarkerTreeRoot } from '../markers'
 import type { EntityId, PlaceholderName, TreeRootId } from '../treeParameters'
-import { assertNever } from '../utils'
+import { assert, assertNever } from '../utils'
 import { EventManager } from './EventManager'
 import { OperationsHelpers } from './operations/OperationsHelpers'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, RootStateNode } from './state'
@@ -74,6 +74,49 @@ export class TreeAugmenter {
 				}
 			}
 		})
+	}
+
+	public resetCreatingSubTrees() {
+		for (const rootStates of this.treeStore.subTreeStatesByRoot.values()) {
+			for (const [rootPlaceholder, rootState] of rootStates) {
+				if (rootState.type === 'entityList') {
+					assert(rootState.blueprint.parent === undefined)
+					if (!rootState.blueprint.marker.parameters.isCreating) {
+						continue
+					}
+
+					this.treeStore.subTreePersistedData.delete(rootPlaceholder)
+					const changesCount = rootState.unpersistedChangesCount
+
+					// Just emptying the list. But the list itself can stay.
+					for (const childState of rootState.children.values()) {
+						this.treeStore.disposeOfRealm(childState)
+					}
+					this.eventManager.registerJustUpdated(
+						rootState,
+						changesCount ? -1 * changesCount : EventManager.NO_CHANGES_DIFFERENCE,
+					)
+				} else if (rootState.type === 'entityRealm') {
+					assert(rootState.blueprint.parent === undefined)
+					if (!rootState.blueprint.marker.parameters.isCreating) {
+						continue
+					}
+					const presentListeners = rootState.eventListeners
+					this.treeStore.disposeOfRealm(rootState)
+
+					// It's crucial to delete the persisted data before we re-initialize so that we get a fresh, new entity.
+					this.treeStore.subTreePersistedData.delete(rootPlaceholder)
+					const newRootState = this.stateInitializer.initializeSubTree(rootState.blueprint.marker)
+
+					newRootState.eventListeners = presentListeners
+					rootStates.set(rootPlaceholder, newRootState)
+
+					this.eventManager.registerJustUpdated(newRootState, EventManager.NO_CHANGES_DIFFERENCE)
+				} else {
+					assertNever(rootState)
+				}
+			}
+		}
 	}
 
 	private updateRealmIdIfNecessary(

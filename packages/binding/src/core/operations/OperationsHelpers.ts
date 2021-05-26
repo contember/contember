@@ -123,8 +123,12 @@ export class OperationsHelpers {
 
 			// Version 2.
 			// This is version two of this terrible hack. We want to preserve e.g. persistSuccess handlers.
+
+			// Version 3.
+			// The saga continues. We add a condition to exempt top-level realms. That way they can start
+			// propagating changes from the top.
 			const listeners = realm.eventListeners
-			if (listeners) {
+			if (listeners && realm.blueprint.parent) {
 				listeners.delete('update')
 				for (const eventType of listeners.keys()) {
 					if (eventType.startsWith('connectionUpdate')) {

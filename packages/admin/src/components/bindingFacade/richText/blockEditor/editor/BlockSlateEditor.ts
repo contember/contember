@@ -31,6 +31,8 @@ export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, Blo
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => void
 	slateOnChange: () => void
+
+	unstable_diagnosticOperationLog: Slate.Operation[][]
 }
 
 export type EditorWithBlockElements<E extends BaseEditor> = WithAnotherNodeType<E, BlockEditorElements> &

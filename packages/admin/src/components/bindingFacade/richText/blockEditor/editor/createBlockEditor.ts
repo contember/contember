@@ -92,6 +92,8 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			e.slateOnChange = noop
 			e.slate = Slate
 
+			e.unstable_diagnosticOperationLog = []
+
 			overrideApply(e, options)
 			overrideCanContainAnyBlocks(e, options)
 			overrideCreateElementReference(e, options)

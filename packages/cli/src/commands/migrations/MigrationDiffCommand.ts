@@ -5,7 +5,7 @@ import { InvalidSchemaException } from '@contember/schema-migrations'
 import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper'
 import { createMigrationStatusTable, printMigrationDescription } from '../../utils/migrations'
 import { executeMigrations, resolveMigrationStatus } from './MigrationExecuteHelper'
-import { resolveLocalSystemApiClient } from './SystemApiClientResolver'
+import { resolveSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
 
 type Args = {
@@ -82,7 +82,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 					console.log(`${filename} created`)
 
 					if (shouldExecute) {
-						const client = await resolveLocalSystemApiClient(workspace, project, input)
+						const client = await resolveSystemApiClient(workspace, project, input)
 						const status = await resolveMigrationStatus(client, migrationsResolver)
 						if (status.errorMigrations.length > 0) {
 							console.error(createMigrationStatusTable(status.errorMigrations))

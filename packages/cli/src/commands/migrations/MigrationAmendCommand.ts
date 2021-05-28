@@ -10,7 +10,7 @@ import {
 	printMigrationDescription,
 } from '../../utils/migrations'
 import { resolveMigrationStatus } from './MigrationExecuteHelper'
-import { resolveLocalSystemApiClient } from './SystemApiClientResolver'
+import { resolveSystemApiClient } from './SystemApiClientResolver'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from './MigrationValidationHelper'
@@ -61,7 +61,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 				if (!amendMigration) {
 					throw 'No migration to amend'
 				}
-				const client = await resolveLocalSystemApiClient(workspace, project, input)
+				const client = await resolveSystemApiClient(workspace, project, input)
 				const status = await resolveMigrationStatus(client, migrationsResolver)
 				const force = input.getOption('force')
 				if (status.errorMigrations.length > 0) {

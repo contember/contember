@@ -2,7 +2,7 @@ import { Command, CommandConfiguration, Input } from '../../cli'
 import { MigrationVersionHelper } from '@contember/schema-migrations'
 import { executeCreateMigrationCommand } from './MigrationCreateHelper'
 import { getMigrationByName } from '../../utils/migrations'
-import { resolveLocalSystemApiClient } from './SystemApiClientResolver'
+import { resolveSystemApiClient } from './SystemApiClientResolver'
 import { emptySchema } from '@contember/schema-utils'
 import { validateMigrations } from './MigrationValidationHelper'
 
@@ -63,7 +63,7 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 				if (!valid) {
 					throw `Cannot rebase migrations`
 				}
-				const client = await resolveLocalSystemApiClient(workspace, project, input)
+				const client = await resolveSystemApiClient(workspace, project, input)
 				let i = 0
 				for (const migration of migrations) {
 					const name = migration.name.substring(MigrationVersionHelper.prefixLength + 1)

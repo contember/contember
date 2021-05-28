@@ -167,6 +167,7 @@ class CompositionRoot {
 								systemServerProvider,
 							},
 							promRegistry,
+							config.server.http,
 						),
 					)
 

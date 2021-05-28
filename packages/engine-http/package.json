@@ -28,7 +28,6 @@
     "graphql-extensions": "^0.12.6",
     "graphql-tools": "^7.0.1",
     "koa": "^2.11.0",
-    "koa-bodyparser": "^4.3.0",
     "lru-cache": "^6.0.0",
     "path-to-regexp": "^6.2.0",
     "uuid": "^8.3.1"

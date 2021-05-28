@@ -1,6 +1,5 @@
 import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
 import corsMiddleware from '@koa/cors'
-import bodyParser from 'koa-bodyparser'
 import { compose, KoaMiddleware, route } from '../koa'
 import { createAuthMiddleware, createModuleInfoMiddleware } from '../common'
 import { TenantApolloServerState } from '../services'
@@ -14,12 +13,6 @@ export const createTenantMiddleware = () => {
 	}
 	return route(
 		'/tenant$',
-		compose([
-			createModuleInfoMiddleware('tenant'),
-			corsMiddleware(),
-			bodyParser(),
-			createAuthMiddleware(),
-			graphQlMiddleware,
-		]),
+		compose([createModuleInfoMiddleware('tenant'), corsMiddleware(), createAuthMiddleware(), graphQlMiddleware]),
 	)
 }

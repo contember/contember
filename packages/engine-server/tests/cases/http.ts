@@ -46,6 +46,7 @@ const createContainer = (debug: boolean) =>
 				logging: {},
 				port: 0,
 				monitoringPort: 0,
+				http: {},
 			},
 		},
 		getExampleProjectDirectory(),

@@ -1,6 +1,6 @@
 {
   "name": "@contember/template-workspace-single-instance",
-  "version": "0.12.0-alpha.1",
+  "version": "0.12.0-alpha.2",
   "license": "Apache-2.0",
   "scripts": {
     "test": "echo 'No tests'"
@@ -10,10 +10,10 @@
     "build": "tsc --noEmit && ./scripts/all-instances.sh admin/build-webpack"
   },
   "devDependencies": {
-    "@contember/cli": "^0.12.0-alpha.1"
+    "@contember/cli": "^0.12.0-alpha.2"
   },
   "dependencies": {
-    "@contember/schema": "^0.12.0-alpha.1",
-    "@contember/schema-definition": "^0.12.0-alpha.1"
+    "@contember/schema": "^0.12.0-alpha.2",
+    "@contember/schema-definition": "^0.12.0-alpha.2"
   }
 }

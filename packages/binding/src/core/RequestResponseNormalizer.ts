@@ -68,13 +68,17 @@ export class RequestResponseNormalizer {
 						if (fieldData instanceof ServerGeneratedUuid) {
 							if (type === mutationOperationType.create) {
 								const list = subTreeDataStore.get(subTreePlaceholder)
-								if (!(list instanceof Set)) {
+
+								if (list instanceof Set) {
+									// TODO this is somewhat dubious because we're essentially just guessing the order of the entities
+									//		and just carelessly put the new one at the end.
+									list.add(fieldData.value)
+								} else if (list === undefined) {
+									// That's fine. This is probably just an isCreating sub-tree.
+									subTreeDataStore.set(subTreePlaceholder, new Set([fieldData.value]))
+								} else {
 									return this.rejectData()
 								}
-
-								// TODO this is somewhat dubious because we're essentially just guessing the order of the entities
-								//		and just carelessly put the new one at the end.
-								list.add(fieldData.value)
 							}
 						} else {
 							return this.rejectData()

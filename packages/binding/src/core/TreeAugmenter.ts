@@ -92,6 +92,12 @@ export class TreeAugmenter {
 					for (const childState of rootState.children.values()) {
 						this.treeStore.disposeOfRealm(childState)
 					}
+					rootState.accessor = undefined
+					rootState.children.clear()
+					rootState.childrenWithPendingUpdates?.clear()
+					rootState.errors = undefined
+					rootState.plannedRemovals?.clear()
+
 					this.eventManager.registerJustUpdated(
 						rootState,
 						changesCount ? -1 * changesCount : EventManager.NO_CHANGES_DIFFERENCE,

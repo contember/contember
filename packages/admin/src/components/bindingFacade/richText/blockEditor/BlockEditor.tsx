@@ -3,6 +3,7 @@ import {
 	Component,
 	EntityAccessor,
 	EntityId,
+	EntityListSubTree,
 	EntityRealmKey,
 	Environment,
 	FieldAccessor,
@@ -15,6 +16,7 @@ import {
 	useDesugaredRelativeEntityList,
 	useDesugaredRelativeSingleField,
 	useEntity,
+	useEntityBeforePersist,
 	useEntityBeforeUpdate,
 	useEntityList,
 	useEntityPersistSuccess,
@@ -51,7 +53,7 @@ import {
 	ToolbarButtonSpec,
 } from '../toolbars'
 import { BlockHoveringToolbarContents, BlockHoveringToolbarContentsProps } from './BlockHoveringToolbarContents'
-import { createBlockEditor } from './editor'
+import { createBlockEditor, Unstable_BlockEditorDiagnostics } from './editor'
 import type { ContemberFieldElement } from './elements'
 import type { EmbedHandler } from './embed'
 import type { FieldBackedElement } from './FieldBackedElement'
@@ -79,6 +81,8 @@ export interface BlockEditorProps extends SugaredRelativeEntityList, CreateEdito
 	inlineButtons?: HoveringToolbarsProps['inlineButtons']
 	blockButtons?: BlockHoveringToolbarContentsProps['blockButtons']
 	otherBlockButtons?: BlockHoveringToolbarContentsProps['otherBlockButtons']
+
+	unstable_diagnosticLog?: Unstable_BlockEditorDiagnostics
 }
 
 // TODO enforce that leadingFieldBackedElements and trailingFieldBackedElements always have the same length
@@ -114,6 +118,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			plugins,
 			augmentEditor,
 			augmentEditorBuiltins,
+
+			unstable_diagnosticLog,
 
 			...blockListProps
 		} = props
@@ -219,6 +225,8 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				referencesField,
 				sortableByField: desugaredSortableByField,
 				sortedBlocksRef,
+
+				unstable_diagnosticLog,
 			}),
 		)
 
@@ -288,6 +296,38 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 				],
 			),
 		)
+
+		if (unstable_diagnosticLog) {
+			useEntityBeforePersist(
+				useCallback(
+					(getParentAccessor, options) => {
+						if (!editor.unstable_diagnosticOperationLog.length) {
+							return
+						}
+
+						const subTree = options.getEntityListSubTree({
+							entities: unstable_diagnosticLog.entities,
+							isCreating: true,
+						})
+						subTree.createNewEntity((getNewLogEntity, options) => {
+							getNewLogEntity()
+								.getField<string>(unstable_diagnosticLog.persistedAtField)
+								.updateValue(new Date().toISOString())
+							getNewLogEntity()
+								.getField<string>(unstable_diagnosticLog.operationsField)
+								.updateValue(JSON.stringify(editor.unstable_diagnosticOperationLog))
+							unstable_diagnosticLog.identify(getParentAccessor, getNewLogEntity, options)
+						})
+					},
+					[editor.unstable_diagnosticOperationLog, unstable_diagnosticLog],
+				),
+			)
+			useEntityPersistSuccess(
+				useCallback(() => {
+					editor.unstable_diagnosticOperationLog.length = 0
+				}, [editor.unstable_diagnosticOperationLog]),
+			)
+		}
 
 		// TODO this is a bit of a hack.
 		const shouldDisplayInlineToolbar = useCallback(() => {
@@ -398,6 +438,13 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 					{!props.monolithicReferencesMode && references}
 				</Repeater>
 				{props.monolithicReferencesMode && references}
+				{props.unstable_diagnosticLog && (
+					<EntityListSubTree entities={props.unstable_diagnosticLog.entities} isCreating>
+						<SugaredField field={props.unstable_diagnosticLog.operationsField} />
+						<SugaredField field={props.unstable_diagnosticLog.persistedAtField} />
+						{props.unstable_diagnosticLog.identificationStaticRender}
+					</EntityListSubTree>
+				)}
 			</>
 		)
 	},

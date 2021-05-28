@@ -12,6 +12,7 @@ import type { EditorNode, ElementNode } from '../../baseEditor'
 import type { ContemberFieldElement } from '../elements'
 import type { FieldBackedElement } from '../FieldBackedElement'
 import type { BlockSlateEditor } from './BlockSlateEditor'
+import type { Unstable_BlockEditorDiagnostics } from './Unstable_BlockEditorDiagnostics'
 
 export interface OverrideOnChangeOptions {
 	blockContentField: RelativeSingleField
@@ -24,6 +25,8 @@ export interface OverrideOnChangeOptions {
 	trailingFields: FieldBackedElement[]
 	sortableByField: RelativeSingleField
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
+
+	unstable_diagnosticLog: Unstable_BlockEditorDiagnostics | undefined
 }
 
 export const overrideSlateOnChange = <E extends BlockSlateEditor>(
@@ -39,12 +42,17 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 		trailingFields,
 		sortableByField,
 		sortedBlocksRef,
+		unstable_diagnosticLog,
 	}: OverrideOnChangeOptions,
 ) => {
 	const { slateOnChange } = editor
 
 	editor.slateOnChange = () => {
 		const { children, operations } = editor
+
+		if (unstable_diagnosticLog) {
+			editor.unstable_diagnosticOperationLog.push(operations)
+		}
 
 		let hasSelectionOperation = false
 		let hasTextOperation = false

@@ -1,6 +1,5 @@
 import { compose, KoaMiddleware, KoaRequestState, route } from '../koa'
 import corsMiddleware from '@koa/cors'
-import bodyParser from 'koa-bodyparser'
 import { createProjectMemberMiddleware, createProjectResolveMiddleware } from '../project-common'
 import { createStageResolveMiddleware } from './StageResolveMiddlewareFactory'
 import { createNotModifiedMiddleware } from './NotModifiedMiddlewareFactory'
@@ -13,7 +12,6 @@ export const createContentMiddleware = (): KoaMiddleware<KoaRequestState> => {
 		compose([
 			createModuleInfoMiddleware('content'),
 			corsMiddleware(),
-			bodyParser(),
 			createAuthMiddleware(),
 			createProjectResolveMiddleware(),
 			createStageResolveMiddleware(),

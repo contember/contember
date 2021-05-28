@@ -33,6 +33,9 @@ export interface Config {
 		port: number
 		monitoringPort: number
 		workerCount?: number | string
+		http: {
+			requestBodySize?: string
+		}
 		logging: {
 			sentry?: {
 				dsn: string
@@ -198,7 +201,11 @@ function checkServerStructure(json: unknown): Config['server'] {
 	if (!hasNumberProperty(json, 'monitoringPort')) {
 		return typeConfigError('server.monitoringPort', json.monitoringPort, 'number')
 	}
-	return { ...json, logging: checkLoggingStructure(json.logging) }
+	return {
+		...json,
+		logging: checkLoggingStructure(json.logging),
+		http: checkHttpStructure(json.http),
+	}
 }
 
 function checkLoggingStructure(json: unknown): Config['server']['logging'] {
@@ -222,6 +229,16 @@ function checkLoggingStructure(json: unknown): Config['server']['logging'] {
 	}
 
 	return { sentry }
+}
+
+function checkHttpStructure(json: unknown): Config['server']['http'] {
+	if (!json) {
+		return {}
+	}
+	if (!isObject(json)) {
+		return typeConfigError('http', json, 'object')
+	}
+	return json
 }
 
 function checkConfigStructure(json: unknown): Config {
@@ -294,6 +311,9 @@ export async function readConfig(filenames: string[], configProcessors: ConfigPr
 			port: '%env.CONTEMBER_PORT::number%',
 			monitoringPort: '%env.CONTEMBER_MONITORING_PORT::number%',
 			workerCount: '%?env.CONTEMBER_WORKER_COUNT::string%',
+			http: {
+				requestBodySize: '%?env.CONTEMBER_HTTP_REQUEST_BODY_SIZE::string%',
+			},
 			logging: {
 				sentry: {
 					dsn: '%?env.SENTRY_DSN%',

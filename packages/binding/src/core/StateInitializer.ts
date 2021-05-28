@@ -184,7 +184,7 @@ export class StateInitializer {
 		const persistedData = this.treeStore.persistedEntityData.get(entity.id.value)
 
 		const marker = getEntityMarker(state)
-		const pathBack = this.getPathBackToParent(entityRealm)
+		const pathBack = this.treeStore.getPathBackToParent(entityRealm)
 
 		for (const [placeholderName, field] of marker.fields.markers) {
 			const fieldDatum = persistedData?.get(placeholderName)
@@ -215,56 +215,6 @@ export class StateInitializer {
 		this.eventManager.registerNewlyInitialized(entityRealm)
 
 		return entityRealm
-	}
-
-	private getPathBackToParent(
-		entityRealm: EntityRealmState,
-	):
-		| {
-				fieldBackToParent: FieldName
-				parent: EntityRealmState
-		  }
-		| undefined {
-		const blueprint = entityRealm.blueprint
-		if (blueprint.parent === undefined) {
-			return undefined
-		}
-		let parentEntityName: EntityName
-		let relationFromParent: FieldName
-		let parent: EntityRealmState
-
-		if (blueprint.type === 'hasOne') {
-			parentEntityName = blueprint.parent.entity.entityName
-			relationFromParent = blueprint.marker.parameters.field
-			parent = blueprint.parent
-		} else if (blueprint.type === 'listEntity') {
-			const grandparentBlueprint = blueprint.parent.blueprint
-
-			if (grandparentBlueprint.parent === undefined) {
-				return undefined
-			}
-			parentEntityName = grandparentBlueprint.parent.entity.entityName
-			relationFromParent = grandparentBlueprint.marker.parameters.field
-			parent = grandparentBlueprint.parent
-		} else {
-			return assertNever(blueprint)
-		}
-
-		const relationSchema = this.treeStore.schema.getEntityField(parentEntityName, relationFromParent)
-
-		if (relationSchema?.__typename !== '_Relation') {
-			throw new BindingError()
-		}
-		const fieldBack = (relationSchema.ownedBy || relationSchema.inversedBy) ?? null
-
-		// console.log(parentEntityName, relationFromParent, entityRealm.entity.entityName, fieldBack)
-		if (fieldBack === null) {
-			return undefined
-		}
-		return {
-			parent,
-			fieldBackToParent: fieldBack,
-		}
 	}
 
 	private registerEntityRealm(entityRealm: EntityRealmState | EntityRealmStateStub) {

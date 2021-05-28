@@ -16,7 +16,6 @@ import {
 	EntityState,
 	FieldState,
 	getEntityMarker,
-	StateIterator,
 } from './state'
 import type { TreeStore } from './TreeStore'
 
@@ -286,6 +285,8 @@ export class MutationGenerator {
 			return builder
 		}
 
+		const pathBack = this.treeStore.getPathBackToParent(currentState)
+
 		const nonbearingFields: Array<
 			| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
 			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
@@ -326,6 +327,9 @@ export class MutationGenerator {
 					if (!(marker instanceof HasOneRelationMarker)) {
 						throw new BindingError()
 					}
+					if (pathBack?.fieldBackToParent === marker.parameters.field) {
+						continue
+					}
 					if (marker.parameters.isNonbearing) {
 						nonbearingFields.push({
 							type: 'hasOne',
@@ -341,6 +345,9 @@ export class MutationGenerator {
 					const marker = fieldState.blueprint.marker
 					if (!(marker instanceof HasManyRelationMarker)) {
 						throw new BindingError()
+					}
+					if (pathBack?.fieldBackToParent === marker.parameters.field) {
+						continue
 					}
 					if (marker.parameters.isNonbearing) {
 						nonbearingFields.push({
@@ -493,6 +500,7 @@ export class MutationGenerator {
 			processedPlaceholdersByEntity.set(currentState.entity, (processedPlaceholders = new Set()))
 		}
 
+		const pathBack = this.treeStore.getPathBackToParent(currentState)
 		const entityData = this.treeStore.persistedEntityData.get(currentState.entity.id.value)
 
 		for (const [placeholderName, fieldState] of currentState.children) {
@@ -519,6 +527,9 @@ export class MutationGenerator {
 					const marker = getEntityMarker(fieldState)
 					if (!(marker instanceof HasOneRelationMarker)) {
 						throw new BindingError()
+					}
+					if (pathBack?.fieldBackToParent === marker.parameters.field) {
+						continue
 					}
 					const runtimeId = fieldState.entity.id
 					const reducedBy = marker.parameters.reducedBy
@@ -626,6 +637,9 @@ export class MutationGenerator {
 					const marker = fieldState.blueprint.marker
 					if (!(marker instanceof HasManyRelationMarker)) {
 						throw new BindingError()
+					}
+					if (pathBack?.fieldBackToParent === marker.parameters.field) {
+						continue
 					}
 					const persistedEntityIds = entityData?.get?.(placeholderName) ?? new Set()
 

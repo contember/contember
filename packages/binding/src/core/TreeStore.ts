@@ -3,6 +3,7 @@ import { BindingError } from '../BindingError'
 import type { Environment } from '../dao'
 import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
+import type { EntityName, FieldName } from '../treeParameters'
 import type {
 	Alias,
 	EntityId,
@@ -14,6 +15,7 @@ import type {
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '../treeParameters'
+import { assertNever } from '../utils'
 import { MarkerComparator } from './MarkerComparator'
 import { RequestResponseNormalizer } from './RequestResponseNormalizer'
 import type { Schema } from './schema'
@@ -61,6 +63,56 @@ export class TreeStore {
 			throw new BindingError(`Fatal error: failed to load api schema.`)
 		}
 		return this._schema
+	}
+
+	public getPathBackToParent(
+		entityRealm: EntityRealmState | EntityRealmStateStub,
+	):
+		| {
+				fieldBackToParent: FieldName
+				parent: EntityRealmState
+		  }
+		| undefined {
+		const blueprint = entityRealm.blueprint
+		if (blueprint.parent === undefined) {
+			return undefined
+		}
+		let parentEntityName: EntityName
+		let relationFromParent: FieldName
+		let parent: EntityRealmState
+
+		if (blueprint.type === 'hasOne') {
+			parentEntityName = blueprint.parent.entity.entityName
+			relationFromParent = blueprint.marker.parameters.field
+			parent = blueprint.parent
+		} else if (blueprint.type === 'listEntity') {
+			const grandparentBlueprint = blueprint.parent.blueprint
+
+			if (grandparentBlueprint.parent === undefined) {
+				return undefined
+			}
+			parentEntityName = grandparentBlueprint.parent.entity.entityName
+			relationFromParent = grandparentBlueprint.marker.parameters.field
+			parent = grandparentBlueprint.parent
+		} else {
+			return assertNever(blueprint)
+		}
+
+		const relationSchema = this.schema.getEntityField(parentEntityName, relationFromParent)
+
+		if (relationSchema?.__typename !== '_Relation') {
+			throw new BindingError()
+		}
+		const fieldBack = (relationSchema.ownedBy || relationSchema.inversedBy) ?? null
+
+		// console.log(parentEntityName, relationFromParent, entityRealm.entity.entityName, fieldBack)
+		if (fieldBack === null) {
+			return undefined
+		}
+		return {
+			parent,
+			fieldBackToParent: fieldBack,
+		}
 	}
 
 	public getSubTreeState(

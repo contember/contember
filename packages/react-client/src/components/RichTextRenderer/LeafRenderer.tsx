@@ -1,6 +1,6 @@
-import { ComponentType, createElement, FunctionComponent } from 'react'
+import { ComponentType, createElement, ReactElement } from 'react'
 import type { BuiltinLeaves } from './BuiltinLeaves'
-import { RenderLeafFallback, RenderLeafFallbackProps } from './RenderLeafFallback'
+import { RenderLeafFallback } from './RenderLeafFallback'
 import type { RichTextLeaf } from './RichTextLeaf'
 import type { RichTextLeafMetadata } from './RichTextLeafMetadata'
 import { useRichTextRenderMetadata } from './RichTextRenderMetadataContext'
@@ -8,7 +8,7 @@ import { useRichTextRenderMetadata } from './RichTextRenderMetadataContext'
 export type RenderLeaf<CustomLeaves extends RichTextLeaf> = ComponentType<
 	{
 		leaf: CustomLeaves | BuiltinLeaves
-		fallback: FunctionComponent<RenderLeafFallbackProps>
+		fallback: ReactElement
 	} & RichTextLeafMetadata
 >
 
@@ -22,17 +22,17 @@ export function LeafRenderer<CustomLeaves extends RichTextLeaf = never>({
 	renderLeaf,
 }: LeafRendererProps<CustomLeaves>) {
 	const formatVersion = useRichTextRenderMetadata().formatVersion
+	const fallback = <RenderLeafFallback leaf={leaf} />
 
-	if (renderLeaf) {
-		return createElement(
-			renderLeaf,
-			{
-				formatVersion,
-				leaf,
-				fallback: RenderLeafFallback,
-			},
-			leaf.text,
-		)
-	}
-	return <RenderLeafFallback leaf={leaf} />
+	return renderLeaf
+		? createElement(
+				renderLeaf,
+				{
+					formatVersion,
+					leaf,
+					fallback,
+				},
+				leaf.text,
+		  )
+		: fallback
 }

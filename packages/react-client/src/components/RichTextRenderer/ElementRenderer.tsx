@@ -1,7 +1,9 @@
-import { ComponentType, createElement, FunctionComponent, ReactElement } from 'react'
+import { ComponentType, createElement, ReactElement } from 'react'
 import type { BuiltinElements } from './BuiltinElements'
+import type { BuiltinLeaves } from './BuiltinLeaves'
+import { renderChildren } from './renderChildren'
 import type { RenderChildrenOptions } from './renderChildren'
-import { RenderElementFallback, RenderElementFallbackProps } from './RenderElementFallback'
+import { RenderElementFallback } from './RenderElementFallback'
 import { resolveRichTextElementMetadata } from './resolveRichTextElementMetadata'
 import type { RichTextElement } from './RichTextElement'
 import type { RichTextElementMetadata } from './RichTextElementMetadata'
@@ -16,8 +18,20 @@ export type RenderElement<
 > = ComponentType<
 	{
 		element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
-		fallback: FunctionComponent<RenderElementFallbackProps<CustomElements, CustomLeaves>>
 		children: ReactElement
+
+		fallback: ReactElement
+
+		renderChildren: (
+			children:
+				| CustomElements
+				| BuiltinElements<CustomElements, CustomLeaves>
+				| CustomLeaves
+				| BuiltinLeaves
+				| Array<CustomElements | BuiltinElements<CustomElements, CustomLeaves> | CustomLeaves | BuiltinLeaves>,
+			options: RenderChildrenOptions<CustomElements, CustomLeaves>,
+		) => ReactElement
+		renderChildrenOptions: RenderChildrenOptions<CustomElements, CustomLeaves>
 	} & RichTextElementMetadata<CustomElements, CustomLeaves, Reference>
 >
 
@@ -37,17 +51,20 @@ export function ElementRenderer<
 	const metadata = useRichTextRenderMetadata<CustomElements, CustomLeaves>()
 	const elementMetadata = resolveRichTextElementMetadata<CustomElements, CustomLeaves>(element, metadata)
 
-	if (options.renderElement) {
-		return createElement(options.renderElement, {
-			...elementMetadata,
-			element,
-			fallback: RenderElementFallback,
-			children,
-		})
-	}
-	return (
+	const fallback = (
 		<RenderElementFallback element={element as BuiltinElements} options={options}>
 			{children}
 		</RenderElementFallback>
 	)
+
+	return options.renderElement
+		? createElement(options.renderElement, {
+				...elementMetadata,
+				element,
+				fallback,
+				children,
+				renderChildren,
+				renderChildrenOptions: options,
+		  })
+		: fallback
 }

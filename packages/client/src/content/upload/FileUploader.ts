@@ -8,8 +8,8 @@ export interface FileUploader<Result = any, Error extends FileUploadError = File
 }
 
 export interface FileUploaderInitializeOptions<Result = any, Error extends FileUploadError = FileUploadError> {
-	contentApiClient?: GraphQlClient
+	contentApiClient: GraphQlClient
 	onSuccess: (result: Iterable<[File, Result]>) => void
-	onError?: (error: Iterable<File | [File, Error]>) => void
-	onProgress?: (progress: Iterable<[File, FileUploadProgress]>) => void
+	onError: (error: Iterable<File | [File, Error]>) => void
+	onProgress: (progress: Iterable<[File, FileUploadProgress]>) => void
 }

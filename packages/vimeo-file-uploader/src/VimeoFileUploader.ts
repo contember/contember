@@ -27,16 +27,8 @@ class VimeoFileUploader implements FileUploader {
 		if (!files.size) {
 			return
 		}
-		if (!contentApiClient) {
-			return onError?.(files.keys())
-		}
 
-		const parameters: Map<
-			string,
-			{
-				size: number
-			}
-		> = new Map()
+		const parameters: Map<string, { size: number }> = new Map()
 
 		for (const [file, metadata] of files) {
 			if (this.uploadState.has(file)) {
@@ -81,7 +73,7 @@ class VimeoFileUploader implements FileUploader {
 				const datumBody = responseData[VimeoFileUploader.formatFullAlias(fileState.alias)]
 
 				if (!datumBody.ok) {
-					onError?.([
+					onError([
 						[
 							file,
 							{
@@ -98,11 +90,11 @@ class VimeoFileUploader implements FileUploader {
 					retryDelays: [0, 3000, 5000, 10000, 20000],
 					onError: (error: Error) => {
 						// Not sending error.message because it might not necessarily be user-safe.
-						onError?.([file])
+						onError([file])
 					},
 					onProgress: (bytesUploaded, bytesTotal) => {
 						const progress = bytesUploaded / bytesTotal
-						onProgress?.([
+						onProgress([
 							[
 								file,
 								{
@@ -127,7 +119,7 @@ class VimeoFileUploader implements FileUploader {
 				upload.start()
 			}
 		} catch (error) {
-			onError?.(files.keys())
+			onError(files.keys())
 		}
 	}
 

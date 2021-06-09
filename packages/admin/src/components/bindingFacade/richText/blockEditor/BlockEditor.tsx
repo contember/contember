@@ -182,17 +182,6 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 			sortedBlocksRef.current = topLevelBlocks
 		}) // Deliberately no deps array
 
-		// TODO this isn't particularly great. We should probably react to id changes more directly.
-		useEntityPersistSuccess(
-			useCallback(() => {
-				for (const [, ref] of blockElementPathRefs) {
-					ref.unref()
-				}
-				blockElementPathRefs.clear()
-				referencedEntityCache.clear()
-			}, [blockElementPathRefs, referencedEntityCache]),
-		)
-
 		const [editor] = useState(() =>
 			createBlockEditor({
 				augmentEditor,
@@ -228,6 +217,26 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 
 				unstable_diagnosticLog,
 			}),
+		)
+
+		// TODO this isn't particularly great. We should probably react to id changes more directly.
+		useEntityPersistSuccess(
+			useCallback(
+				getEntity => {
+					referencedEntityCache.clear()
+
+					for (const ref of blockElementPathRefs.values()) {
+						ref.unref()
+					}
+					blockElementPathRefs.clear()
+					const blocks = getEntity().getEntityList(blockListProps)
+					let blockIndex = leadingFieldBackedElements.length
+					for (const topLevelBlock of blocks) {
+						blockElementPathRefs.set(topLevelBlock.id, Editor.pathRef(editor, [blockIndex++], { affinity: 'backward' }))
+					}
+				},
+				[referencedEntityCache, blockElementPathRefs, blockListProps, leadingFieldBackedElements.length, editor],
+			),
 		)
 
 		const nodes = useBlockEditorSlateNodes({

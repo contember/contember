@@ -28,8 +28,9 @@ export const withBold = <E extends BaseEditor>(editor: E): E => {
 	}
 
 	editor.processAttributesPaste = (element, cta) => {
-		if (['700', '800', '900', 'bold', 'bolder'].includes(element.style.fontWeight)) {
-			cta = { ...cta, [boldMark]: true }
+		if (element.style.fontWeight) {
+			const isBold = ['700', '800', '900', 'bold', 'bolder'].includes(element.style.fontWeight)
+			cta = { ...cta, [boldMark]: isBold }
 		}
 		return processAttributesPaste(element, cta)
 	}

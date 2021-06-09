@@ -1,6 +1,6 @@
 {
   "name": "@contember/admin-i18n",
-  "version": "0.6.42",
+  "version": "0.6.43",
   "type": "module",
   "main": "dist/src/index.js",
   "scripts": {
@@ -8,6 +8,6 @@
   },
   "typings": "dist/src/index.d.ts",
   "devDependencies": {
-    "@contember/admin": "0.6.42"
+    "@contember/admin": "0.6.43"
   }
 }

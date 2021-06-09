@@ -23,12 +23,6 @@ export function VirtualizedMenuList(
 		)
 	}, [children])
 
-	useEffect(() => {
-		if (currentIndex >= 0 && list.current !== null) {
-			list.current.scrollToItem(currentIndex)
-		}
-	}, [currentIndex, children, list])
-
 	const measuredHeightsRef = useRef<Map<number, number>>(new Map())
 	const leastPendingIndexRef = useRef<number | null>(null)
 
@@ -60,11 +54,16 @@ export function VirtualizedMenuList(
 
 	const itemCountRef = useRef(itemCount)
 	useLayoutEffect(() => {
-		if (itemCountRef.current !== itemCount && list.current) {
-			list.current.resetAfterIndex(0)
+		if (list.current) {
+			if (itemCountRef.current !== itemCount) {
+				list.current.resetAfterIndex(0)
+				list.current.scrollToItem(0)
+			} else if (currentIndex >= 0) {
+				list.current.scrollToItem(currentIndex)
+			}
 		}
 		itemCountRef.current = itemCount
-	}, [itemCount])
+	}, [currentIndex, itemCount])
 
 	if (!Array.isArray(children)) {
 		return <>{children}</>
@@ -77,9 +76,9 @@ export function VirtualizedMenuList(
 			initialScrollOffset={currentIndex * height}
 			estimatedItemSize={height}
 			itemSize={index => {
-				const x = measuredHeightsRef.current.get(index)
-				if (x !== undefined) {
-					return x
+				const measuredHeight = measuredHeightsRef.current.get(index)
+				if (measuredHeight !== undefined) {
+					return measuredHeight
 				}
 				return height
 			}}

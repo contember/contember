@@ -28,8 +28,8 @@ export const withUnderline = <E extends BaseEditor>(editor: E): E => {
 	}
 
 	editor.processAttributesPaste = (element, cta) => {
-		if (element.style.textDecoration) {
-			cta = { ...cta, [underlineMark]: element.style.textDecoration === 'underline' }
+		if (element.style.textDecoration === 'underline') {
+			cta = { ...cta, [underlineMark]: true }
 		}
 		return processAttributesPaste(element, cta)
 	}

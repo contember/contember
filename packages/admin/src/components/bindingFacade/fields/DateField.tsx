@@ -25,8 +25,31 @@ export interface DateFieldInnerProps extends Omit<DateFieldProps, 'field' | 'lab
 
 export const DateFieldInner = memo(
 	forwardRef((props: DateFieldInnerProps, suppliedRef: Ref<any>) => {
+		const deserialize = (date: string | null): Date | null => (date === null ? date : new Date(date))
+
+		const serialize = (date: Date | null): string | null => {
+			if (!date) {
+				return date
+			}
+			const [year, month, day] = [
+				date.getFullYear(),
+				(date.getMonth() + 1).toFixed(0).padStart(2, '0'),
+				date.getDate().toFixed(0).padStart(2, '0'),
+			]
+			let serialized = `${year}-${month}-${day}`
+
+			if (props.showTimeSelect) {
+				const [hours, minutes] = [
+					date.getHours().toFixed(0).padStart(2, '0'),
+					date.getMinutes().toFixed(0).padStart(2, '0'),
+				]
+				serialized += ` ${hours}:${minutes}`
+			}
+
+			return serialized
+		}
 		const generateOnChange = (data: FieldAccessor<string>) => (date: Date | null) => {
-			data.updateValue(date ? date.toISOString() : null)
+			data.updateValue(serialize(date))
 		}
 		const { onFocus: outerOnFocus, onBlur: outerOnBlur } = props
 		const UnderlyingTextInput = useMemo(
@@ -52,7 +75,7 @@ export const DateFieldInner = memo(
 		)
 		return (
 			<DatePicker
-				selected={props.fieldMetadata.field.value !== null ? new Date(props.fieldMetadata.field.value) : null}
+				selected={deserialize(props.fieldMetadata.field.value)}
 				onChange={generateOnChange(props.fieldMetadata.field)}
 				readOnly={props.fieldMetadata.isMutating}
 				isClearable={true}

@@ -14,6 +14,7 @@ import { ReactEditor } from 'slate-react'
 import type { BaseEditor } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import type { EditorWithTables } from './EditorWithTables'
+import { gaugeTableColumnCount } from './gaugeTableColumnCount'
 import { TableCellElement, tableCellElementType } from './TableCellElement'
 import { TableCellElementRenderer, TableCellElementRendererProps } from './TableCellElementRenderer'
 import { TableElement, tableElementType } from './TableElement'
@@ -557,16 +558,47 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 			if (!SlateElement.isElement(node)) {
 				return normalizeNode(entry)
 			}
-			// TODO validate consistent table dimensions
 			if (e.isTable(node)) {
+				if (node.children.length === 0) {
+					return Transforms.removeNodes(e, { at: path })
+				}
+
+				let didTransform = false
 				for (const [child, childPath] of SlateNode.children(e, path)) {
 					if (SlateElement.isElement(child)) {
 						if (!e.isTableRow(child)) {
 							ContemberEditor.ejectElement(e, childPath)
 							Transforms.setNodes(e, { type: tableRowElementType }, { at: childPath })
+							didTransform = true
 						}
 					} else {
 						return Transforms.removeNodes(e, { at: path })
+					}
+				}
+				if (didTransform) {
+					return
+				}
+				const columnCount = gaugeTableColumnCount(node)
+				for (const [row, childPath] of SlateNode.children(e, path) as Iterable<NodeEntry<TableRowElement>>) {
+					const currentColumnCount = row.children.length
+					if (currentColumnCount === columnCount) {
+						continue
+					}
+
+					// For the first row, we prepend or insert at the start which in most cases will likely preserve the
+					// already existing cells' positions.
+					if (currentColumnCount > columnCount) {
+						const shouldBiasTowardsStart = childPath[childPath.length - 1] === 0
+						for (let i = columnCount; i < currentColumnCount; i++) {
+							Transforms.removeNodes(e, { at: [...childPath, shouldBiasTowardsStart ? 0 : i] })
+						}
+					} else if (currentColumnCount < columnCount) {
+						const shouldBiasTowardsStart = childPath[childPath.length - 1] === 0
+						for (let i = currentColumnCount; i < columnCount; i++) {
+							Transforms.insertNodes(e, e.createEmptyTableCellElement(), {
+								at: [...childPath, shouldBiasTowardsStart ? 0 : i],
+							})
+						}
 					}
 				}
 			} else if (e.isTableRow(node)) {

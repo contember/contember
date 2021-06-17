@@ -1,14 +1,20 @@
 import type { FileUploader } from '@contember/client'
 import type { FileId } from './FileId'
+import type { FileWithMetadata } from './FileWithMetadata'
 
-export interface StartUploadOptions {
+export interface StartUploadFileOptions<Metadata = undefined> {
+	metadata?: Metadata
 	uploader?: FileUploader
 }
 
-export type StartUpload = (files: Iterable<[FileId, File] | File>, options?: StartUploadOptions) => void
+export type InitializeUpload = (files: Iterable<[FileId, File] | File>) => Map<FileId, FileWithMetadata>
+export type StartUpload<Metadata = undefined> = (
+	files: Iterable<FileId | File | [FileId | File, StartUploadFileOptions<Metadata>]>,
+) => void
 export type AbortUpload = (files: Iterable<FileId | File>) => void
 
-export interface FileUploadOperations {
-	startUpload: StartUpload
+export interface FileUploadOperations<Metadata = undefined> {
+	initializeUpload: InitializeUpload
+	startUpload: StartUpload<Metadata>
 	abortUpload: AbortUpload
 }

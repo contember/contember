@@ -1,29 +1,49 @@
-import { S3FileUploader, UploadedFileMetadata } from '@contember/client'
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
+import { FileUploader, S3FileUploader, UploadedFileMetadata } from '@contember/client'
+import { Reducer, useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { useCurrentContentGraphQlClient } from '../content'
 import type { FileId } from './FileId'
+import type { FileUploadAction } from './FileUploadAction'
 import type { FileUploadCompoundState } from './FileUploadCompoundState'
-import type { AbortUpload, FileUploadOperations, StartUpload } from './FileUploadOperations'
+import type { FileUploadMetadata } from './FileUploadMetadata'
+import type { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
+import type {
+	AbortUpload,
+	FileUploadOperations,
+	InitializeUpload,
+	StartUpload,
+	StartUploadFileOptions,
+} from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
 import type { FileWithMetadata } from './FileWithMetadata'
 import { toFileId } from './toFileId'
 
-export type FileUpload = [FileUploadCompoundState, FileUploadOperations]
+export type FileUpload<Result = unknown, Metadata = undefined> = [
+	FileUploadCompoundState<Result, Metadata>,
+	FileUploadOperations<Metadata>,
+]
 
 export interface FileUploadOptions {
 	maxUpdateFrequency?: number // This does NOT apply to all kinds of updates.
 }
 
-export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
+export const useFileUpload = <Result = unknown, Metadata = undefined>(
+	options?: FileUploadOptions,
+): FileUpload<Result, Metadata> => {
 	const maxUpdateFrequency = options?.maxUpdateFrequency ?? 100
 
 	const contentApiClient = useCurrentContentGraphQlClient()
 
 	const updateTimeoutRef = useRef<number | undefined>(undefined)
 	const isFirstRenderRef = useRef(true)
+	const fileIdSeedRef = useRef(1)
 
-	const [multiTemporalState, dispatch] = useReducer(fileUploadReducer, undefined, initializeFileUploadState)
+	const [multiTemporalState, dispatch] = useReducer<
+		Reducer<FileUploadMultiTemporalState<Result, Metadata>, FileUploadAction<Result, Metadata>>,
+		undefined
+	>(fileUploadReducer, undefined, initializeFileUploadState)
 	const multiTemporalStateRef = useRef(multiTemporalState)
+
+	const defaultUploader = useMemo(() => new S3FileUploader(), [])
 
 	useEffect(() => {
 		multiTemporalStateRef.current = multiTemporalState
@@ -35,83 +55,148 @@ export const useFileUpload = (options?: FileUploadOptions): FileUpload => {
 			files,
 		})
 	}, [])
-	const startUpload = useCallback<StartUpload>(
-		(files, options = {}) => {
+	const initializeUpload = useCallback<InitializeUpload>(
+		files => {
 			const newFileIds = new Set<FileId>()
-			const { uploader = new S3FileUploader() } = options
-			const fileWithMetadataByFileConfig = new Map<[FileId, File] | File, FileWithMetadata>()
-			const filesWithMetadata = new Map<File, UploadedFileMetadata>()
+			const fileWithMetadataByFileConfig = new Map<FileId, FileWithMetadata>()
 
-			for (const fileWithMaybeId of files) {
+			for (const fileMaybeWithId of files) {
 				const abortController = new AbortController()
-				const file = fileWithMaybeId instanceof File ? fileWithMaybeId : fileWithMaybeId[1]
-				fileWithMetadataByFileConfig.set(fileWithMaybeId, {
+
+				let fileId: FileId
+				let file: File
+
+				if (fileMaybeWithId instanceof File) {
+					fileId = `__contember__file-${fileIdSeedRef.current++}`
+					file = fileMaybeWithId
+				} else {
+					fileId = fileMaybeWithId[0]
+					file = fileMaybeWithId[1]
+				}
+
+				abortController.signal.addEventListener('abort', () => {
+					abortUpload([fileId])
+				})
+
+				fileWithMetadataByFileConfig.set(fileId, {
 					previewUrl: URL.createObjectURL(file),
 					abortController,
-					uploader,
 					file,
-				})
-				filesWithMetadata.set(file, {
-					abortSignal: abortController.signal,
+					fileId,
 				})
 
-				const fileId: FileId | undefined = Array.isArray(fileWithMaybeId)
-					? fileWithMaybeId[0]
-					: toFileId(multiTemporalStateRef.current, file)
-				fileId && newFileIds.add(fileId)
+				newFileIds.add(fileId)
 			}
 			if (fileWithMetadataByFileConfig.size === 0) {
-				return
+				return fileWithMetadataByFileConfig
 			}
 
-			newFileIds.size &&
+			if (newFileIds.size) {
 				dispatch({
 					type: 'abort',
 					files: newFileIds,
 				})
+			}
+
 			dispatch({
-				type: 'startUploading',
+				type: 'initialize',
 				files: fileWithMetadataByFileConfig,
 			})
 
-			try {
-				uploader.upload(filesWithMetadata, {
-					onProgress: progress => {
-						dispatch({
-							type: 'updateUploadProgress',
-							progress,
-						})
-					},
-					onSuccess: result => {
-						dispatch({
-							type: 'finishSuccessfully',
-							result,
-						})
-					},
-					onError: error => {
-						dispatch({
-							type: 'finishWithError',
-							error,
-						})
-					},
-					contentApiClient,
+			return fileWithMetadataByFileConfig
+		},
+		[abortUpload],
+	)
+	const startUpload = useCallback<StartUpload<Metadata>>(
+		files => {
+			const filesById = new Map<FileId, FileUploadMetadata<Metadata>>()
+			const groupedByUploader: Map<FileUploader, Map<File, UploadedFileMetadata>> = new Map()
+
+			const currentState = multiTemporalStateRef.current
+
+			for (const fileOrIdMaybeWithOptions of files) {
+				let fileOrId: File | FileId
+				let options: StartUploadFileOptions<Metadata>
+
+				if (Array.isArray(fileOrIdMaybeWithOptions)) {
+					fileOrId = fileOrIdMaybeWithOptions[0]
+					options = fileOrIdMaybeWithOptions[1]
+				} else {
+					fileOrId = fileOrIdMaybeWithOptions
+					options = {}
+				}
+				const { uploader = defaultUploader, metadata } = options
+
+				const fileId = toFileId(currentState, fileOrId)
+				const fileState = currentState.liveState.get(fileId)
+
+				if (fileState === undefined || fileState.readyState !== 'initializing') {
+					throw new Error(
+						`Trying to startUpload a file that hasn't been previously initialized. ` +
+							`This will be possible in future, but isn't yet.`,
+					)
+				}
+
+				filesById.set(fileId, {
+					uploader,
+					metadata,
 				})
-			} catch (_) {
-				dispatch({
-					type: 'finishWithError',
-					error: Array.from(filesWithMetadata).map(([file]) => [file, undefined]), // TODO this is crap.
+
+				let filesWithSameUploader = groupedByUploader.get(uploader)
+				if (filesWithSameUploader === undefined) {
+					groupedByUploader.set(uploader, (filesWithSameUploader = new Map()))
+				}
+				filesWithSameUploader.set(fileState.file, {
+					abortSignal: fileState.abortController.signal,
 				})
 			}
+
+			dispatch({
+				type: 'startUploading',
+				files: filesById,
+			})
+
+			for (const [uploader, filesForUpload] of groupedByUploader) {
+				try {
+					uploader.upload(filesForUpload, {
+						onProgress: progress => {
+							dispatch({
+								type: 'updateUploadProgress',
+								progress,
+							})
+						},
+						onSuccess: result => {
+							dispatch({
+								type: 'finishSuccessfully',
+								result,
+							})
+						},
+						onError: error => {
+							dispatch({
+								type: 'finishWithError',
+								error,
+							})
+						},
+						contentApiClient,
+					})
+				} catch (error) {
+					dispatch({
+						type: 'finishWithError',
+						error: Array.from(filesForUpload).map(([file]) => [file, error]),
+					})
+				}
+			}
 		},
-		[contentApiClient],
+		[contentApiClient, defaultUploader],
 	)
 
-	const operations = useMemo<FileUploadOperations>(
+	const operations = useMemo<FileUploadOperations<Metadata>>(
 		() => ({
+			initializeUpload,
 			startUpload,
 			abortUpload,
 		}),
-		[abortUpload, startUpload],
+		[initializeUpload, abortUpload, startUpload],
 	)
 
 	useEffect(() => {

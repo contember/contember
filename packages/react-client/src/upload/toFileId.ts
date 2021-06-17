@@ -1,7 +1,10 @@
 import type { FileId } from './FileId'
 import type { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 
-export const toFileId = (state: FileUploadMultiTemporalState, fileOrId: File | FileId) => {
+export const toFileId = <Result = unknown, Metadata = undefined>(
+	state: FileUploadMultiTemporalState<Result, Metadata>,
+	fileOrId: File | FileId,
+) => {
 	if (fileOrId instanceof File) {
 		return state.fileIdByFile.get(fileOrId)! // Should we throw instead of the yolo "!"?
 	}

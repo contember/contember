@@ -1,26 +1,27 @@
+import { FileUploadError } from '@contember/client'
 import { assertNever } from '../utils'
 import type { FileId } from './FileId'
 import type { FileUploadAction } from './FileUploadAction'
 import type { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 import { toFileId } from './toFileId'
 
-export const initializeFileUploadState = (): FileUploadMultiTemporalState => ({
+export const initializeFileUploadState = <Result = unknown, Metadata = undefined>(): FileUploadMultiTemporalState<
+	Result,
+	Metadata
+> => ({
 	lastUpdateTime: 0,
-	stockFileIdSeed: 0,
 	fileIdByFile: new WeakMap<File, FileId>(),
 	liveState: new Map(),
 	publicState: new Map(),
 	isLiveStateDirty: false,
 })
 
-export const fileUploadReducer = (
-	previousState: FileUploadMultiTemporalState,
-	action: FileUploadAction,
-): FileUploadMultiTemporalState => {
-	let newStockFileIdSeed = previousState.stockFileIdSeed
-	const publishNewState = (): FileUploadMultiTemporalState => ({
+export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
+	previousState: FileUploadMultiTemporalState<Result, Metadata>,
+	action: FileUploadAction<Result, Metadata>,
+): FileUploadMultiTemporalState<Result, Metadata> => {
+	const publishNewState = (): FileUploadMultiTemporalState<Result, Metadata> => ({
 		publicState: previousState.liveState,
-		stockFileIdSeed: newStockFileIdSeed,
 		fileIdByFile: previousState.fileIdByFile,
 		lastUpdateTime: previousState.lastUpdateTime,
 		isLiveStateDirty: false,
@@ -29,11 +30,10 @@ export const fileUploadReducer = (
 		// several times between two publishes.
 		liveState: new Map(previousState.liveState),
 	})
-	const getNewDirtyState = (): FileUploadMultiTemporalState => ({
+	const getNewDirtyState = (): FileUploadMultiTemporalState<Result, Metadata> => ({
 		fileIdByFile: previousState.fileIdByFile,
 		liveState: previousState.liveState,
 		publicState: previousState.publicState,
-		stockFileIdSeed: previousState.stockFileIdSeed,
 		isLiveStateDirty: true,
 		lastUpdateTime: Date.now(),
 	})
@@ -41,28 +41,38 @@ export const fileUploadReducer = (
 		case 'publishNewestState': {
 			return publishNewState()
 		}
-		case 'startUploading': {
-			for (const [fileWithMaybeId, metadata] of action.files) {
-				let file: File
-				let fileId: FileId
-
-				if (fileWithMaybeId instanceof File) {
-					file = fileWithMaybeId
-					fileId = `__contember__file-${newStockFileIdSeed++}`
-				} else {
-					;[fileId, file] = fileWithMaybeId
-				}
-
+		case 'initialize': {
+			for (const [fileId, metadata] of action.files) {
 				// Deliberately allowing starting a new upload with the same id
 
 				previousState.liveState.set(fileId, {
-					readyState: 'uploading',
+					readyState: 'initializing',
 					abortController: metadata.abortController,
 					previewUrl: metadata.previewUrl,
-					uploader: metadata.uploader,
-					file,
+					file: metadata.file,
 				})
-				previousState.fileIdByFile.set(file, fileId)
+				previousState.fileIdByFile.set(metadata.file, fileId)
+			}
+			return publishNewState() /* Making the feedback about new files immediate*/
+		}
+		case 'startUploading': {
+			for (const [fileOrId, metadata] of action.files) {
+				const fileId = toFileId(previousState, fileOrId)
+				const fileState = previousState.liveState.get(fileId)
+
+				if (fileState === undefined || fileState.readyState !== 'initializing') {
+					continue
+				}
+
+				previousState.liveState.set(fileId, {
+					readyState: 'uploading',
+					abortController: fileState.abortController,
+					file: fileState.file,
+					metadata: metadata.metadata!, // If the user didn't supply the metadata, then that's on them.
+					previewUrl: fileState.previewUrl,
+					progress: undefined,
+					uploader: metadata.uploader,
+				})
 			}
 			return publishNewState() /* Making the feedback about started upload immediate*/
 		}
@@ -75,10 +85,11 @@ export const fileUploadReducer = (
 				}
 				previousState.liveState.set(fileId, {
 					readyState: 'success',
-					previewUrl: previousFileState.previewUrl,
-					uploader: previousFileState.uploader,
 					file: previousFileState.file,
+					metadata: previousFileState.metadata,
+					previewUrl: previousFileState.previewUrl,
 					result,
+					uploader: previousFileState.uploader,
 				})
 			}
 			// return publishNewState() // Making the feedback about successful upload immediate.
@@ -96,17 +107,27 @@ export const fileUploadReducer = (
 					error = undefined
 				}
 
+				if (!(error instanceof FileUploadError)) {
+					error = undefined
+				}
+
 				const fileId = toFileId(previousState, fileOrId)
 				const previousFileState = previousState.liveState.get(fileId)
-				if (previousFileState === undefined || previousFileState.readyState !== 'uploading') {
+				if (
+					previousFileState === undefined ||
+					(previousFileState.readyState !== 'initializing' && previousFileState.readyState !== 'uploading')
+				) {
 					continue
 				}
+				const uploader = previousFileState.readyState === 'uploading' ? previousFileState.uploader : undefined
+				const metadata = previousFileState.readyState === 'uploading' ? previousFileState.metadata : undefined
 				previousState.liveState.set(fileId, {
 					readyState: 'error',
-					previewUrl: previousFileState.previewUrl,
-					uploader: previousFileState.uploader,
-					file: previousFileState.file,
 					error,
+					file: previousFileState.file,
+					metadata,
+					previewUrl: previousFileState.previewUrl,
+					uploader,
 				})
 			}
 			return getNewDirtyState() // Bad news can wait.
@@ -121,7 +142,7 @@ export const fileUploadReducer = (
 					continue
 				}
 				atLeastOneAborted = true
-				if (fileState.readyState === 'uploading') {
+				if (fileState.readyState === 'initializing' || fileState.readyState === 'uploading') {
 					fileState.abortController.abort() // This is a bit naughty… We shouldn't do this from here.
 				}
 				previousState.liveState.delete(fileId)
@@ -144,6 +165,7 @@ export const fileUploadReducer = (
 					uploader: previousFileState.uploader,
 					abortController: previousFileState.abortController,
 					previewUrl: previousFileState.previewUrl,
+					metadata: previousFileState.metadata,
 					progress,
 				})
 			}

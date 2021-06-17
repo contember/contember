@@ -4,7 +4,11 @@ import type { FileUploadProgress } from './FileUploadProgress'
 import type { UploadedFileMetadata } from './UploadedFileMetadata'
 
 export interface FileUploader<Result = any, Error extends FileUploadError = FileUploadError> {
-	upload: (files: Map<File, UploadedFileMetadata>, options: FileUploaderInitializeOptions) => Promise<void>
+	upload: (
+		files: Map<File, UploadedFileMetadata>,
+		options: FileUploaderInitializeOptions<Result, Error>,
+	) => Promise<void>
+	destroy?: (files: Result[]) => Promise<void> // TODO Note that admin uploaders don'T actually invoke this yet.
 }
 
 export interface FileUploaderInitializeOptions<Result = any, Error extends FileUploadError = FileUploadError> {

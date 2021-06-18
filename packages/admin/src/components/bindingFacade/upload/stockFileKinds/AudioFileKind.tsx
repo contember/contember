@@ -40,7 +40,7 @@ export const AudioFileKind = Component<AudioFileKindProps>(
 	({
 		discriminateBy,
 		additionalExtractors = emptyArray,
-		acceptMimeTypes = 'Audio/*',
+		acceptMimeTypes = 'audio/*',
 		acceptFile = acceptAudioFile,
 		children,
 		durationField,

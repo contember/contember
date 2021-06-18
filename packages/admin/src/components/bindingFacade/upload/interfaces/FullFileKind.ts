@@ -14,7 +14,7 @@ export interface AcceptFileOptions {
 	objectUrl: string
 }
 
-export interface FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown, FileData = unknown> {
+export interface FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown> {
 	acceptMimeTypes: string | string[] | null // null means "any mime type"
 
 	/** Optionally reject with {@link AcceptFileKindError}. */
@@ -25,5 +25,5 @@ export interface FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown,
 	renderUploadedFile: ReactNode
 
 	uploader: FileUploader<UploadResult, FileUploadError>
-	extractors: FileDataExtractor<FileData, UploadResult, AcceptArtifacts>[]
+	extractors: FileDataExtractor<unknown, UploadResult, AcceptArtifacts>[]
 }

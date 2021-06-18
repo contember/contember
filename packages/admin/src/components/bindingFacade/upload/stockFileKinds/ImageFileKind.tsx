@@ -22,18 +22,15 @@ import type {
 	RenderFilePreviewOptions,
 } from '../interfaces'
 
-export interface ImageFileKindProps<AcceptArtifacts = unknown, FileData = unknown>
+export interface ImageFileKindProps<AcceptArtifacts = unknown>
 	extends Partial<
-			Omit<
-				DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts, FileData>,
-				'discriminateBy' | 'extractors'
-			>
+			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
 		>,
 		Required<FileUrlDataExtractorProps>,
 		GenericFileMetadataExtractorProps,
 		ImageFileDataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
-	additionalExtractors?: FileDataExtractor<FileData, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
+	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
 
 export const acceptImageFile = ({ file }: AcceptFileOptions) => file.type.startsWith('image')
@@ -78,6 +75,4 @@ export const ImageFileKind = Component<ImageFileKindProps>(
 		)
 	},
 	'ImageFileKind',
-) as <AcceptArtifacts = unknown, FileData = unknown>(
-	props: ImageFileKindProps<AcceptArtifacts, FileData>,
-) => ReactElement | null
+) as <AcceptArtifacts = unknown>(props: ImageFileKindProps<AcceptArtifacts>) => ReactElement | null

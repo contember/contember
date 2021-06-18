@@ -22,18 +22,15 @@ import type {
 	RenderFilePreviewOptions,
 } from '../interfaces'
 
-export interface AudioFileKindProps<AcceptArtifacts = unknown, FileData = unknown>
+export interface AudioFileKindProps<AcceptArtifacts = unknown>
 	extends Partial<
-			Omit<
-				DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts, FileData>,
-				'discriminateBy' | 'extractors'
-			>
+			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
 		>,
 		Required<FileUrlDataExtractorProps>,
 		GenericFileMetadataExtractorProps,
 		AudioFileDataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
-	additionalExtractors?: FileDataExtractor<FileData, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
+	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
 
 export const acceptAudioFile = ({ file }: AcceptFileOptions) => file.type.startsWith('audio')
@@ -77,6 +74,4 @@ export const AudioFileKind = Component<AudioFileKindProps>(
 		)
 	},
 	'AudioFileKind',
-) as <AcceptArtifacts = unknown, FileData = unknown>(
-	props: AudioFileKindProps<AcceptArtifacts, FileData>,
-) => ReactElement | null
+) as <AcceptArtifacts = unknown>(props: AudioFileKindProps<AcceptArtifacts>) => ReactElement | null

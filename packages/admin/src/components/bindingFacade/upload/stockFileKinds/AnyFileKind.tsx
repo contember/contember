@@ -9,17 +9,14 @@ import { getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../fil
 import { FileKind } from '../FileKind'
 import type { DiscriminatedFileKind, FileDataExtractor, RenderFilePreviewOptions } from '../interfaces'
 
-export interface AnyFileKindProps<AcceptArtifacts = unknown, FileData = unknown>
+export interface AnyFileKindProps<AcceptArtifacts = unknown>
 	extends Partial<
-			Omit<
-				DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts, FileData>,
-				'discriminateBy' | 'extractors'
-			>
+			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
 		>,
 		Required<FileUrlDataExtractorProps>,
 		GenericFileMetadataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
-	additionalExtractors?: FileDataExtractor<FileData, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
+	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
 
 export const acceptAnyFile = () => true
@@ -70,6 +67,4 @@ export const AnyFileKind = Component<AnyFileKindProps>(
 		)
 	},
 	'AnyFileKind',
-) as <AcceptArtifacts = unknown, FileData = unknown>(
-	props: AnyFileKindProps<AcceptArtifacts, FileData>,
-) => ReactElement | null
+) as <AcceptArtifacts = unknown>(props: AnyFileKindProps<AcceptArtifacts>) => ReactElement | null

@@ -5,7 +5,7 @@ import { eachFileKind } from './eachFileKind'
 
 export interface ResolvedAcceptingFileKind<AcceptArtifacts = any> {
 	acceptOptions: AcceptFileOptions
-	fileKind: FullFileKind<any, AcceptArtifacts, any>
+	fileKind: FullFileKind<any, AcceptArtifacts>
 	acceptArtifacts: AcceptArtifacts
 }
 

@@ -22,18 +22,15 @@ import type {
 	RenderFilePreviewOptions,
 } from '../interfaces'
 
-export interface VideoFileKindProps<AcceptArtifacts = unknown, FileData = unknown>
+export interface VideoFileKindProps<AcceptArtifacts = unknown>
 	extends Partial<
-			Omit<
-				DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts, FileData>,
-				'discriminateBy' | 'extractors'
-			>
+			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
 		>,
 		Required<FileUrlDataExtractorProps>,
 		GenericFileMetadataExtractorProps,
 		VideoFileDataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
-	additionalExtractors?: FileDataExtractor<FileData, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
+	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
 
 export const acceptVideoFile = ({ file }: AcceptFileOptions) => file.type.startsWith('video')
@@ -79,6 +76,4 @@ export const VideoFileKind = Component<VideoFileKindProps>(
 		)
 	},
 	'VideoFileKind',
-) as <AcceptArtifacts = unknown, FileData = unknown>(
-	props: VideoFileKindProps<AcceptArtifacts, FileData>,
-) => ReactElement | null
+) as <AcceptArtifacts = unknown>(props: VideoFileKindProps<AcceptArtifacts>) => ReactElement | null

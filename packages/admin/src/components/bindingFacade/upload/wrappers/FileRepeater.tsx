@@ -21,40 +21,50 @@ export interface FileRepeaterProps
 }
 
 export const FileRepeater = Component<FileRepeaterProps>(
-	props => {
+	({
+		acceptFile,
+		acceptMimeTypes,
+		children,
+		discriminationField,
+		extractors,
+		renderFilePreview,
+		renderUploadedFile,
+		uploader,
+		...props
+	}) => {
 		const environment = useEnvironment()
 		const fileKinds = useMemo(
 			() =>
 				getResolvedFileKinds(
 					{
-						acceptFile: props.acceptFile,
-						acceptMimeTypes: props.acceptMimeTypes,
-						children: props.children,
-						discriminationField: props.discriminationField,
-						extractors: props.extractors,
-						renderFilePreview: props.renderFilePreview,
-						renderUploadedFile: props.renderUploadedFile,
-						uploader: props.uploader,
+						acceptFile,
+						acceptMimeTypes,
+						children,
+						discriminationField,
+						extractors,
+						renderFilePreview,
+						renderUploadedFile,
+						uploader,
 					},
 					environment,
+					'FileRepeater',
 				),
 			[
-				props.acceptFile,
-				props.acceptMimeTypes,
-				props.children,
-				props.discriminationField,
-				props.extractors,
-				props.renderFilePreview,
-				props.renderUploadedFile,
-				props.uploader,
+				acceptFile,
+				acceptMimeTypes,
+				children,
+				discriminationField,
+				extractors,
+				renderFilePreview,
+				renderUploadedFile,
+				uploader,
 				environment,
 			],
 		)
 		return <BareFileRepeater {...props} fileKinds={fileKinds} />
 	},
-	(props, environment) => {
-		const fileKinds = getResolvedFileKinds(props, environment)
-		return <BareFileRepeater {...props} fileKinds={fileKinds} />
-	},
+	(props, environment) => (
+		<BareFileRepeater {...props} fileKinds={getResolvedFileKinds(props, environment, 'FileRepeater')} />
+	),
 	'FileRepeater',
 )

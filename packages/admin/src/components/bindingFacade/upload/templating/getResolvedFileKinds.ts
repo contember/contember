@@ -10,7 +10,11 @@ export interface HybridFileKindProps extends Partial<FullFileKind> {
 }
 
 export const getResolvedFileKinds = (
-	{
+	props: HybridFileKindProps,
+	environment: Environment,
+	componentName: string,
+): ResolvedFileKinds => {
+	const {
 		discriminationField,
 		children,
 		acceptFile,
@@ -19,9 +23,49 @@ export const getResolvedFileKinds = (
 		renderUploadedFile,
 		extractors,
 		uploader,
-	}: HybridFileKindProps,
-	environment: Environment,
-): ResolvedFileKinds => {
+	} = props
+
+	if (
+		acceptFile !== undefined ||
+		acceptMimeTypes !== undefined ||
+		renderFilePreview !== undefined ||
+		renderUploadedFile !== undefined ||
+		extractors !== undefined ||
+		uploader !== undefined
+	) {
+		if (discriminationField !== undefined) {
+			throw new BindingError(
+				`${componentName}: with a top-level file-kind prop supplied, single file kind mode is in on. ` +
+					`Thus the 'discriminationField' prop has no effect.`,
+			)
+		}
+		const mandatoryPropNames = [
+			// 'acceptFile' // Deliberately left out
+			'acceptMimeTypes',
+			'renderFilePreview',
+			'renderUploadedFile',
+			'extractors',
+			'uploader',
+		] as const
+		for (const propName of mandatoryPropNames) {
+			if (props[propName] === undefined) {
+				throw new BindingError(`${componentName}: the single file-kind mode is on but the '${propName}' is missing.`)
+			}
+		}
+
+		return {
+			isDiscriminated: false,
+			fileKind: {
+				acceptFile,
+				acceptMimeTypes: acceptMimeTypes!,
+				children,
+				extractors: extractors!,
+				renderFilePreview: renderFilePreview!,
+				renderUploadedFile,
+				uploader: uploader!,
+			},
+		}
+	}
 	const processed = fileKindTemplateAnalyzer.processChildren(children, environment)
 	const fileKinds: DiscriminatedFileKind[] = processed.map(node => node.value)
 
@@ -38,7 +82,7 @@ export const getResolvedFileKinds = (
 
 		if (!normalizedFileKinds.size) {
 			throw new BindingError(
-				`Upload: having supplied the 'discriminationField' prop, you must specify at least one file kind!`,
+				`${componentName}: having supplied the 'discriminationField' prop, you must specify at least one file kind!`,
 			)
 		}
 
@@ -50,7 +94,7 @@ export const getResolvedFileKinds = (
 	}
 	if (fileKinds.length > 1) {
 		throw new BindingError(
-			`Upload: having supplied several FileKinds, you must also specify the 'discriminationField'!`,
+			`${componentName}: having supplied several FileKind children, you must also specify the 'discriminationField'!`,
 		)
 	}
 	return {

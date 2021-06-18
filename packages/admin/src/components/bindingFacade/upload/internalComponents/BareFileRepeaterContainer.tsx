@@ -2,32 +2,24 @@ import { Entity, useGetEntityByKey, useMutationState, VariableInputTransformer }
 import type { FileId } from '@contember/react-client'
 import { FileWithMetadata, StartUploadFileOptions, useFileUpload } from '@contember/react-client'
 import { returnTrue } from '@contember/react-utils'
-import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
+import type { FormGroupProps } from '@contember/ui'
 import type { FunctionComponent } from 'react'
 import { ReactNode, useCallback } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 import { useDropzone } from 'react-dropzone'
 import { assertNever } from '../../../../utils'
-import {
-	EmptyMessage,
-	RepeaterContainerPrivateProps,
-	RepeaterContainerPublicProps,
-	SortableRepeaterItem,
-} from '../../collections'
+import { RepeaterContainerPrivateProps, RepeaterContainerPublicProps, SortableRepeaterItem } from '../../collections'
 import type { DiscriminatedFileKind } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
-import { SingleFilePreview } from './SingleFilePreview'
 import { resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from '../utils'
+import { FileInput, FileInputPublicProps } from './FileInput'
+import { SingleFilePreview } from './SingleFilePreview'
 
 export interface BareFileRepeaterContainerPrivateProps {
 	fileKinds: ResolvedFileKinds
 }
 
-export interface BareFileRepeaterContainerPublicProps
-	extends RepeaterContainerPublicProps,
-		Pick<FormGroupProps, 'description' | 'labelDescription'> {
-	addButtonSubText?: ReactNode
-}
+export interface BareFileRepeaterContainerPublicProps extends FileInputPublicProps {}
 
 export interface BareFileRepeaterContainerProps
 	extends BareFileRepeaterContainerPublicProps,
@@ -35,27 +27,17 @@ export interface BareFileRepeaterContainerProps
 		RepeaterContainerPrivateProps {}
 
 export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContainerProps> = ({
-	accessor,
 	entities,
 	isEmpty,
 	fileKinds,
-
-	addButtonComponent: AddButton = Button,
-	addButtonComponentExtraProps,
-	addButtonProps,
-	addButtonText = 'Select files to upload',
-	addButtonSubText = 'or drag & drop',
-	emptyMessage,
-	emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
-	emptyMessageComponentExtraProps,
-
 	createNewEntity,
 
-	label,
-	description,
-	labelDescription,
+	// These are here just to remove them from the spread below
+	accessor,
+	children,
+	formatMessage,
 
-	enableAddingNew = true,
+	...fileInputProps
 }) => {
 	const [uploadState, { initializeUpload, startUpload, abortUpload }] = useFileUpload()
 	const isMutating = useMutationState()
@@ -144,7 +126,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 		},
 		[initializeUpload, createNewEntity, fileKinds, startUpload, getEntityByKey],
 	)
-	const { getRootProps, getInputProps, isDragActive } = useDropzone({
+	const dropzoneState = useDropzone({
 		onDrop,
 		disabled: isMutating,
 		accept: resolvedAccept,
@@ -183,25 +165,11 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	}
 
 	return (
-		<FormGroup label={label} useLabelElement={false} description={description} labelDescription={labelDescription}>
-			<div className="fileInput">
-				{isEmpty && (
-					<EmptyMessageComponent {...emptyMessageComponentExtraProps}>
-						{emptyMessage ?? 'No files uploaded.'}
-					</EmptyMessageComponent>
-				)}
-				{!isEmpty && previews}
-				{enableAddingNew && (
-					<FileDropZone {...getRootProps()} isActive={isDragActive} className="fileInput-dropZone">
-						<input {...getInputProps()} />
-						<div className="fileInput-cta">
-							<AddButton size="small" {...addButtonComponentExtraProps} children={addButtonText} {...addButtonProps} />
-							{addButtonSubText && <span className="fileInput-cta-label">{addButtonSubText}</span>}
-						</div>
-					</FileDropZone>
-				)}
-			</div>
-		</FormGroup>
+		<FileInput
+			{...fileInputProps}
+			dropzoneState={dropzoneState}
+			children={isEmpty && !previews.length ? undefined : previews}
+		/>
 	)
 }
 BareFileRepeaterContainer.displayName = 'BareFileRepeaterContainer'

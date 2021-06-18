@@ -2,7 +2,7 @@ import type { EntityAccessor } from '@contember/binding'
 import type { SingleFileUploadState } from '@contember/react-client'
 import { FilePreview, UploadProgress } from '@contember/ui'
 import { ReactNode, useEffect, useRef, useState } from 'react'
-import type { FullFileKind } from '../interfaces'
+import type { FullFileKind } from '../../interfaces'
 
 export interface InitializedFilePreviewProps {
 	fileKind: FullFileKind

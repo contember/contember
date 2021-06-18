@@ -1,14 +1,14 @@
 import { Component, SugaredFieldProps, SugaredRelativeEntityList } from '@contember/binding'
 import type { ComponentType, ReactNode } from 'react'
 import { Fragment } from 'react'
-import { BlockRepeater, Repeater } from '../collections'
+import { BlockRepeater, Repeater } from '../../collections'
 import {
 	BareFileRepeaterContainer,
 	BareFileRepeaterContainerPrivateProps,
 	BareFileRepeaterContainerPublicProps,
 } from './BareFileRepeaterContainer'
-import type { ResolvedFileKinds } from './ResolvedFileKinds'
-import { staticRenderFileKind } from './utils'
+import type { ResolvedFileKinds } from '../ResolvedFileKinds'
+import { staticRenderFileKind } from '../utils'
 
 export interface BareFileRepeaterProps extends SugaredRelativeEntityList, BareFileRepeaterContainerPublicProps {
 	label: ReactNode

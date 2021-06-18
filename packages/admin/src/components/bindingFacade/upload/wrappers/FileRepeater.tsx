@@ -4,7 +4,7 @@ import type { FormGroupProps } from '@contember/ui'
 import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 import type { RepeaterContainerPublicProps } from '../../collections'
-import { BareFileRepeater } from '../BareFileRepeater'
+import { BareFileRepeater } from '../internalComponents'
 import type { FullFileKind } from '../interfaces'
 import { getResolvedFileKinds } from '../templating'
 

@@ -7,17 +7,17 @@ import type { FunctionComponent } from 'react'
 import { ReactNode, useCallback } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 import { useDropzone } from 'react-dropzone'
-import { assertNever } from '../../../utils'
+import { assertNever } from '../../../../utils'
 import {
 	EmptyMessage,
 	RepeaterContainerPrivateProps,
 	RepeaterContainerPublicProps,
 	SortableRepeaterItem,
-} from '../collections'
-import type { DiscriminatedFileKind } from './interfaces'
-import type { ResolvedFileKinds } from './ResolvedFileKinds'
+} from '../../collections'
+import type { DiscriminatedFileKind } from '../interfaces'
+import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { SingleFilePreview } from './SingleFilePreview'
-import { resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from './utils'
+import { resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from '../utils'
 
 export interface BareFileRepeaterContainerPrivateProps {
 	fileKinds: ResolvedFileKinds

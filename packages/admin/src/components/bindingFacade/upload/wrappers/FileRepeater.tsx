@@ -5,12 +5,14 @@ import type { ReactNode } from 'react'
 import { useMemo } from 'react'
 import type { RepeaterContainerPublicProps } from '../../collections'
 import { BareFileRepeater } from '../BareFileRepeater'
+import type { FullFileKind } from '../interfaces'
 import { getResolvedFileKinds } from '../templating'
 
 export interface FileRepeaterProps
 	extends SugaredRelativeEntityList,
 		RepeaterContainerPublicProps,
-		Pick<FormGroupProps, 'description' | 'labelDescription'> {
+		Pick<FormGroupProps, 'description' | 'labelDescription'>,
+		Partial<FullFileKind> {
 	addButtonSubText?: ReactNode
 	label: ReactNode
 	sortableBy?: SugaredFieldProps['field']
@@ -21,21 +23,37 @@ export interface FileRepeaterProps
 export const FileRepeater = Component<FileRepeaterProps>(
 	props => {
 		const environment = useEnvironment()
-		const fileKinds = useMemo(() => getResolvedFileKinds(props.children, environment, props.discriminationField), [
-			props.children,
-			props.discriminationField,
-			environment,
-		])
-		if (!fileKinds) {
-			return null // TODO!
-		}
+		const fileKinds = useMemo(
+			() =>
+				getResolvedFileKinds(
+					{
+						acceptFile: props.acceptFile,
+						acceptMimeTypes: props.acceptMimeTypes,
+						children: props.children,
+						discriminationField: props.discriminationField,
+						extractors: props.extractors,
+						renderFilePreview: props.renderFilePreview,
+						renderUploadedFile: props.renderUploadedFile,
+						uploader: props.uploader,
+					},
+					environment,
+				),
+			[
+				props.acceptFile,
+				props.acceptMimeTypes,
+				props.children,
+				props.discriminationField,
+				props.extractors,
+				props.renderFilePreview,
+				props.renderUploadedFile,
+				props.uploader,
+				environment,
+			],
+		)
 		return <BareFileRepeater {...props} fileKinds={fileKinds} />
 	},
 	(props, environment) => {
-		const fileKinds = getResolvedFileKinds(props.children, environment, props.discriminationField)
-		if (!fileKinds) {
-			return null // TODO!
-		}
+		const fileKinds = getResolvedFileKinds(props, environment)
 		return <BareFileRepeater {...props} fileKinds={fileKinds} />
 	},
 	'FileRepeater',

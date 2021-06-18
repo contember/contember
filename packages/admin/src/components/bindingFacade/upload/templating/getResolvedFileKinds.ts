@@ -1,21 +1,40 @@
 import type { Environment, SugaredFieldProps } from '@contember/binding'
-import { BindingError } from '@contember/binding'
-import type { ReactNode } from 'react'
-import type { DiscriminatedFileKind } from '../interfaces'
+import { BindingError, VariableInputTransformer } from '@contember/binding'
+import type { NormalizedDiscriminatedData } from '../../discrimination'
+import type { DiscriminatedFileKind, FullFileKind } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
-import { normalizeFileKinds } from '../utils/normalizeFileKinds'
 import { fileKindTemplateAnalyzer } from './fileKindTemplateAnalyzer'
 
+export interface HybridFileKindProps extends Partial<FullFileKind> {
+	discriminationField?: SugaredFieldProps['field']
+}
+
 export const getResolvedFileKinds = (
-	children: ReactNode,
+	{
+		discriminationField,
+		children,
+		acceptFile,
+		acceptMimeTypes,
+		renderFilePreview,
+		renderUploadedFile,
+		extractors,
+		uploader,
+	}: HybridFileKindProps,
 	environment: Environment,
-	discriminationField: SugaredFieldProps['field'] | undefined,
 ): ResolvedFileKinds => {
 	const processed = fileKindTemplateAnalyzer.processChildren(children, environment)
 	const fileKinds: DiscriminatedFileKind[] = processed.map(node => node.value)
 
 	if (discriminationField) {
-		const normalizedFileKinds = normalizeFileKinds(fileKinds, environment)
+		const normalizedFileKinds: NormalizedDiscriminatedData<FullFileKind> = new Map()
+
+		for (const fileKind of fileKinds) {
+			const value = VariableInputTransformer.transformValue(fileKind.discriminateBy, environment)
+			normalizedFileKinds.set(value, {
+				discriminateBy: value,
+				datum: fileKind,
+			})
+		}
 
 		if (!normalizedFileKinds.size) {
 			throw new BindingError(

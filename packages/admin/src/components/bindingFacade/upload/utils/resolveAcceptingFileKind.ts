@@ -17,12 +17,17 @@ export const resolveAcceptingFileKind = async (
 
 	for (const fileKind of eachFileKind(fileKinds)) {
 		const acceptMimeTypes = fileKind.acceptMimeTypes
-		if (acceptMimeTypes !== null && acceptMimeTypes !== '*' && !attrAccept(fileOptions.file, acceptMimeTypes)) {
+		if (
+			acceptMimeTypes !== null &&
+			acceptMimeTypes !== '*' &&
+			acceptMimeTypes !== '*/*' &&
+			!attrAccept(fileOptions.file, acceptMimeTypes)
+		) {
 			continue
 		}
 
 		try {
-			const isFileAccepted = fileKind.acceptFile(fileOptions)
+			const isFileAccepted = fileKind.acceptFile === undefined ? true : fileKind.acceptFile(fileOptions)
 
 			if (isFileAccepted === true) {
 				return {

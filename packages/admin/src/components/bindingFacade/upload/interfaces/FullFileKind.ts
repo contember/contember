@@ -18,7 +18,7 @@ export interface FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown>
 	acceptMimeTypes: string | string[] | null // null means "any mime type"
 
 	/** Optionally reject with {@link AcceptFileKindError}. */
-	acceptFile: (options: AcceptFileOptions) => boolean | Promise<AcceptArtifacts>
+	acceptFile: ((options: AcceptFileOptions) => boolean | Promise<AcceptArtifacts>) | undefined
 	renderFilePreview: (options: RenderFilePreviewOptions<AcceptArtifacts>) => ReactNode
 
 	children: ReactNode

@@ -59,7 +59,6 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 }) => {
 	const [uploadState, { initializeUpload, startUpload, abortUpload }] = useFileUpload()
 	const isMutating = useMutationState()
-	const getFiles = accessor.getAccessor
 	const getEntityByKey = useGetEntityByKey()
 	const resolvedAccept = useAllAcceptedMimes(fileKinds)
 

@@ -6,10 +6,10 @@ export type ResolvedFileKinds =
 	| {
 			isDiscriminated: true
 			discriminationField: SugaredFieldProps['field']
-			fileKinds: NormalizedDiscriminatedData<FullFileKind>
+			fileKinds: NormalizedDiscriminatedData<FullFileKind<any, any>>
 	  }
 	| {
 			isDiscriminated: false
-			fileKind: FullFileKind
+			fileKind: FullFileKind<any, any>
 			hasUploadedFile: (entity: EntityAccessor) => boolean
 	  }

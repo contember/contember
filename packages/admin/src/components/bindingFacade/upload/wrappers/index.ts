@@ -1,2 +1,6 @@
+export * from './AnyUploadField'
+export * from './AudioUploadField'
 export * from './FileRepeater'
+export * from './ImageUploadField'
 export * from './UploadField'
+export * from './VideoUploadField'

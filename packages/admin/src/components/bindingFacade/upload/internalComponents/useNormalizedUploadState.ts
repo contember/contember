@@ -31,12 +31,13 @@ export const useNormalizedUploadState = ({
 	const getEntityByKey = useGetEntityByKey()
 	const resolvedAccept = useAllAcceptedMimes(fileKinds)
 
-	const [uploadState, { initializeUpload, startUpload, abortUpload }] = fileUpload
+	const [uploadState, { initializeUpload, startUpload, purgeUpload }] = fileUpload
 
 	const removeFile = useCallback(
 		(fileId: FileId) => {
 			getEntityByKey(fileId.toString()).batchUpdates(getEntity => {
-				// TODO abort
+				purgeUpload([fileId])
+
 				for (const fileKind of eachFileKind(fileKinds)) {
 					for (const extractor of fileKind.extractors) {
 						extractor.destroy?.({ entity: getEntity() })
@@ -47,7 +48,7 @@ export const useNormalizedUploadState = ({
 				}
 			})
 		},
-		[fileKinds, getEntityByKey],
+		[fileKinds, getEntityByKey, purgeUpload],
 	)
 
 	const onDrop = useCallback(

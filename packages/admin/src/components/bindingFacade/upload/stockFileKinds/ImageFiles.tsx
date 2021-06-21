@@ -2,17 +2,17 @@ import { Component } from '@contember/binding'
 import type { S3FileUploader } from '@contember/client'
 import { emptyArray } from '@contember/react-utils'
 import type { ReactElement } from 'react'
-import { FileUrlFieldView } from '../../fieldViews'
+import { ImageFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
 import type {
-	AudioFileDataExtractorProps,
 	FileUrlDataExtractorProps,
 	GenericFileMetadataExtractorProps,
+	ImageFileDataExtractorProps,
 } from '../fileDataExtractors'
 import {
-	getAudioFileDataExtractor,
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
+	getImageFileDataExtractor,
 } from '../fileDataExtractors'
 import { FileKind } from '../FileKind'
 import type {
@@ -22,56 +22,57 @@ import type {
 	RenderFilePreviewOptions,
 } from '../interfaces'
 
-export interface AudioFileKindProps<AcceptArtifacts = unknown>
+export interface ImageFilesProps<AcceptArtifacts = unknown>
 	extends Partial<
 			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
 		>,
 		Required<FileUrlDataExtractorProps>,
 		GenericFileMetadataExtractorProps,
-		AudioFileDataExtractorProps {
+		ImageFileDataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
 
-export const acceptAudioFile = ({ file }: AcceptFileOptions) => file.type.startsWith('audio')
-export const renderAudioFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <audio src={objectUrl} controls />
+export const acceptImageFile = ({ file }: AcceptFileOptions) => file.type.startsWith('image')
+export const renderImageFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <img src={objectUrl} alt="" />
 
-export const AudioFileKind = Component<AudioFileKindProps>(
+export const ImageFiles = Component<ImageFilesProps>(
 	({
 		discriminateBy,
 		additionalExtractors = emptyArray,
-		acceptMimeTypes = 'audio/*',
-		acceptFile = acceptAudioFile,
+		acceptMimeTypes = 'image/*',
+		acceptFile = acceptImageFile,
 		children,
-		durationField,
 		fileSizeField,
 		fileTypeField,
 		lastModifiedField,
 		fileNameField,
-		renderFilePreview = renderAudioFilePreview,
+		renderFilePreview = renderImageFilePreview,
 		renderUploadedFile,
+		heightField,
+		widthField,
 		uploader = defaultUploader,
 		urlField,
 	}) => {
 		const extractors: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata>[] = [
 			getFileUrlDataExtractor({ urlField }),
 			getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
-			getAudioFileDataExtractor({ durationField }),
+			getImageFileDataExtractor({ heightField, widthField }),
 			...additionalExtractors,
 		]
-		const renderUploadedAudio = renderUploadedFile ?? <FileUrlFieldView fileUrlField={urlField} /> // TODO
+		const renderUploadedImage = renderUploadedFile ?? <ImageFieldView srcField={urlField} />
 		return (
 			<FileKind
 				discriminateBy={discriminateBy}
 				acceptMimeTypes={acceptMimeTypes}
 				acceptFile={acceptFile}
 				renderFilePreview={renderFilePreview}
-				renderUploadedFile={renderUploadedAudio}
+				renderUploadedFile={renderUploadedImage}
 				uploader={uploader}
 				extractors={extractors}
 				children={children}
 			/>
 		)
 	},
-	'AudioFileKind',
-) as <AcceptArtifacts = unknown>(props: AudioFileKindProps<AcceptArtifacts>) => ReactElement | null
+	'ImageFiles',
+) as <AcceptArtifacts = unknown>(props: ImageFilesProps<AcceptArtifacts>) => ReactElement | null

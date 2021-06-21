@@ -4,45 +4,51 @@ import { emptyArray } from '@contember/react-utils'
 import type { ReactElement } from 'react'
 import { FileUrlFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
-import type { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps } from '../fileDataExtractors'
-import { getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../fileDataExtractors'
+import type {
+	AudioFileDataExtractorProps,
+	FileUrlDataExtractorProps,
+	GenericFileMetadataExtractorProps,
+} from '../fileDataExtractors'
+import {
+	getAudioFileDataExtractor,
+	getFileUrlDataExtractor,
+	getGenericFileMetadataExtractor,
+} from '../fileDataExtractors'
 import { FileKind } from '../FileKind'
-import type { DiscriminatedFileKind, FileDataExtractor, RenderFilePreviewOptions } from '../interfaces'
+import type {
+	AcceptFileOptions,
+	DiscriminatedFileKind,
+	FileDataExtractor,
+	RenderFilePreviewOptions,
+} from '../interfaces'
 
-export interface AnyFileKindProps<AcceptArtifacts = unknown>
+export interface AudioFilesProps<AcceptArtifacts = unknown>
 	extends Partial<
 			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
 		>,
 		Required<FileUrlDataExtractorProps>,
-		GenericFileMetadataExtractorProps {
+		GenericFileMetadataExtractorProps,
+		AudioFileDataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
 
-export const acceptAnyFile = () => true
-export const renderAnyFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => (
-	<a
-		style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'rtl' }}
-		href={objectUrl}
-		onClick={e => e.stopPropagation()}
-		download
-	>
-		{objectUrl.substring(Math.max(0, objectUrl.lastIndexOf('/') + 1))}
-	</a>
-)
+export const acceptAudioFile = ({ file }: AcceptFileOptions) => file.type.startsWith('audio')
+export const renderAudioFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <audio src={objectUrl} controls />
 
-export const AnyFileKind = Component<AnyFileKindProps>(
+export const AudioFiles = Component<AudioFilesProps>(
 	({
 		discriminateBy,
 		additionalExtractors = emptyArray,
-		acceptMimeTypes = null,
-		acceptFile = acceptAnyFile,
+		acceptMimeTypes = 'audio/*',
+		acceptFile = acceptAudioFile,
 		children,
+		durationField,
 		fileSizeField,
 		fileTypeField,
 		lastModifiedField,
 		fileNameField,
-		renderFilePreview = renderAnyFilePreview,
+		renderFilePreview = renderAudioFilePreview,
 		renderUploadedFile,
 		uploader = defaultUploader,
 		urlField,
@@ -50,21 +56,22 @@ export const AnyFileKind = Component<AnyFileKindProps>(
 		const extractors: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata>[] = [
 			getFileUrlDataExtractor({ urlField }),
 			getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
+			getAudioFileDataExtractor({ durationField }),
 			...additionalExtractors,
 		]
-		const renderUploadedAny = renderUploadedFile ?? <FileUrlFieldView fileUrlField={urlField} />
+		const renderUploadedAudio = renderUploadedFile ?? <FileUrlFieldView fileUrlField={urlField} /> // TODO
 		return (
 			<FileKind
 				discriminateBy={discriminateBy}
 				acceptMimeTypes={acceptMimeTypes}
 				acceptFile={acceptFile}
 				renderFilePreview={renderFilePreview}
-				renderUploadedFile={renderUploadedAny}
+				renderUploadedFile={renderUploadedAudio}
 				uploader={uploader}
 				extractors={extractors}
 				children={children}
 			/>
 		)
 	},
-	'AnyFileKind',
-) as <AcceptArtifacts = unknown>(props: AnyFileKindProps<AcceptArtifacts>) => ReactElement | null
+	'AudioFiles',
+) as <AcceptArtifacts = unknown>(props: AudioFilesProps<AcceptArtifacts>) => ReactElement | null

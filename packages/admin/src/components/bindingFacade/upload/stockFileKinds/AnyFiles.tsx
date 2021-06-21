@@ -2,78 +2,69 @@ import { Component } from '@contember/binding'
 import type { S3FileUploader } from '@contember/client'
 import { emptyArray } from '@contember/react-utils'
 import type { ReactElement } from 'react'
-import { VideoFieldView } from '../../fieldViews'
+import { FileUrlFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
-import type {
-	FileUrlDataExtractorProps,
-	GenericFileMetadataExtractorProps,
-	VideoFileDataExtractorProps,
-} from '../fileDataExtractors'
-import {
-	getFileUrlDataExtractor,
-	getGenericFileMetadataExtractor,
-	getVideoFileDataExtractor,
-} from '../fileDataExtractors'
+import type { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps } from '../fileDataExtractors'
+import { getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../fileDataExtractors'
 import { FileKind } from '../FileKind'
-import type {
-	AcceptFileOptions,
-	DiscriminatedFileKind,
-	FileDataExtractor,
-	RenderFilePreviewOptions,
-} from '../interfaces'
+import type { DiscriminatedFileKind, FileDataExtractor, RenderFilePreviewOptions } from '../interfaces'
 
-export interface VideoFileKindProps<AcceptArtifacts = unknown>
+export interface AnyFilesProps<AcceptArtifacts = unknown>
 	extends Partial<
 			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
 		>,
 		Required<FileUrlDataExtractorProps>,
-		GenericFileMetadataExtractorProps,
-		VideoFileDataExtractorProps {
+		GenericFileMetadataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
 
-export const acceptVideoFile = ({ file }: AcceptFileOptions) => file.type.startsWith('video')
-export const renderVideoFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => <video src={objectUrl} controls />
+export const acceptAnyFile = () => true
+export const renderAnyFilePreview = ({ objectUrl }: RenderFilePreviewOptions) => (
+	<a
+		style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', direction: 'rtl' }}
+		href={objectUrl}
+		onClick={e => e.stopPropagation()}
+		download
+	>
+		{objectUrl.substring(Math.max(0, objectUrl.lastIndexOf('/') + 1))}
+	</a>
+)
 
-export const VideoFileKind = Component<VideoFileKindProps>(
+export const AnyFiles = Component<AnyFilesProps>(
 	({
 		discriminateBy,
 		additionalExtractors = emptyArray,
-		acceptMimeTypes = 'video/*',
-		acceptFile = acceptVideoFile,
+		acceptMimeTypes = null,
+		acceptFile = acceptAnyFile,
 		children,
-		durationField,
 		fileSizeField,
 		fileTypeField,
 		lastModifiedField,
 		fileNameField,
-		renderFilePreview = renderVideoFilePreview,
+		renderFilePreview = renderAnyFilePreview,
 		renderUploadedFile,
-		heightField,
-		widthField,
 		uploader = defaultUploader,
 		urlField,
 	}) => {
 		const extractors: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata>[] = [
 			getFileUrlDataExtractor({ urlField }),
 			getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
-			getVideoFileDataExtractor({ heightField, widthField, durationField }),
 			...additionalExtractors,
 		]
-		const renderUploadedVideo = renderUploadedFile ?? <VideoFieldView srcField={urlField} />
+		const renderUploadedAny = renderUploadedFile ?? <FileUrlFieldView fileUrlField={urlField} />
 		return (
 			<FileKind
 				discriminateBy={discriminateBy}
 				acceptMimeTypes={acceptMimeTypes}
 				acceptFile={acceptFile}
 				renderFilePreview={renderFilePreview}
-				renderUploadedFile={renderUploadedVideo}
+				renderUploadedFile={renderUploadedAny}
 				uploader={uploader}
 				extractors={extractors}
 				children={children}
 			/>
 		)
 	},
-	'VideoFileKind',
-) as <AcceptArtifacts = unknown>(props: VideoFileKindProps<AcceptArtifacts>) => ReactElement | null
+	'AnyFiles',
+) as <AcceptArtifacts = unknown>(props: AnyFilesProps<AcceptArtifacts>) => ReactElement | null

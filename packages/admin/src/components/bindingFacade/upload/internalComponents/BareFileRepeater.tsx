@@ -11,7 +11,6 @@ import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { staticRenderFileKind } from '../utils'
 
 export interface BareFileRepeaterProps extends SugaredRelativeEntityList, BareFileRepeaterContainerPublicProps {
-	label: ReactNode
 	sortableBy?: SugaredFieldProps['field']
 	fileKinds: ResolvedFileKinds
 }

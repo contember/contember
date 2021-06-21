@@ -6,13 +6,12 @@ import type { RepeaterContainerPublicProps } from '../../collections'
 
 export interface FileInputPublicProps
 	extends RepeaterContainerPublicProps,
-		Pick<FormGroupProps, 'description' | 'labelDescription'> {
+		Pick<FormGroupProps, 'label' | 'description' | 'labelDescription'> {
 	addButtonSubText?: ReactNode
 }
 
 export interface FileInputProps extends FileInputPublicProps {
 	dropzoneState: DropzoneState
-	label: ReactNode
 	children: ReactNode
 }
 

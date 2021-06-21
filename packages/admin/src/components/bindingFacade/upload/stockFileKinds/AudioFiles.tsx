@@ -5,12 +5,14 @@ import type { ReactElement } from 'react'
 import { FileUrlFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
 import type {
-	AudioFileDataExtractorProps, DestroyDataExtractorProps,
+	AudioFileDataExtractorProps,
+	DestroyDataExtractorProps,
 	FileUrlDataExtractorProps,
 	GenericFileMetadataExtractorProps,
 } from '../fileDataExtractors'
 import {
-	getAudioFileDataExtractor, getDestroyDataExtractor,
+	getAudioFileDataExtractor,
+	getDestroyDataExtractor,
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
 } from '../fileDataExtractors'
@@ -19,14 +21,13 @@ import type {
 	AcceptFileOptions,
 	DiscriminatedFileKind,
 	FileDataExtractor,
+	FullFileKind,
 	RenderFilePreviewOptions,
 } from '../interfaces'
 
 export interface AudioFilesProps<AcceptArtifacts = unknown>
-	extends Partial<
-			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
-		>,
-		Required<FileUrlDataExtractorProps>,
+	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
+		FileUrlDataExtractorProps,
 		GenericFileMetadataExtractorProps,
 		DestroyDataExtractorProps,
 		AudioFileDataExtractorProps {

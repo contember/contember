@@ -21,14 +21,13 @@ import type {
 	AcceptFileOptions,
 	DiscriminatedFileKind,
 	FileDataExtractor,
+	FullFileKind,
 	RenderFilePreviewOptions,
 } from '../interfaces'
 
 export interface VideoFilesProps<AcceptArtifacts = unknown>
-	extends Partial<
-			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
-		>,
-		Required<FileUrlDataExtractorProps>,
+	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
+		FileUrlDataExtractorProps,
 		GenericFileMetadataExtractorProps,
 		DestroyDataExtractorProps,
 		VideoFileDataExtractorProps {

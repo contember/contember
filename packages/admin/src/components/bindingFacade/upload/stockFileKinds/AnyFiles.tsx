@@ -15,13 +15,11 @@ import {
 	getGenericFileMetadataExtractor,
 } from '../fileDataExtractors'
 import { FileKind } from '../FileKind'
-import type { DiscriminatedFileKind, FileDataExtractor, RenderFilePreviewOptions } from '../interfaces'
+import type { DiscriminatedFileKind, FileDataExtractor, FullFileKind, RenderFilePreviewOptions } from '../interfaces'
 
 export interface AnyFilesProps<AcceptArtifacts = unknown>
-	extends Partial<
-			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
-		>,
-		Required<FileUrlDataExtractorProps>,
+	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
+		FileUrlDataExtractorProps,
 		DestroyDataExtractorProps,
 		GenericFileMetadataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']

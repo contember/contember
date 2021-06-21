@@ -5,12 +5,12 @@ import type { ReactElement } from 'react'
 import { FileUrlFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
 import type {
-	AudioFileDataExtractorProps,
+	AudioFileDataExtractorProps, DestroyDataExtractorProps,
 	FileUrlDataExtractorProps,
 	GenericFileMetadataExtractorProps,
 } from '../fileDataExtractors'
 import {
-	getAudioFileDataExtractor,
+	getAudioFileDataExtractor, getDestroyDataExtractor,
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
 } from '../fileDataExtractors'
@@ -28,6 +28,7 @@ export interface AudioFilesProps<AcceptArtifacts = unknown>
 		>,
 		Required<FileUrlDataExtractorProps>,
 		GenericFileMetadataExtractorProps,
+		DestroyDataExtractorProps,
 		AudioFileDataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
@@ -43,6 +44,7 @@ export const AudioFiles = Component<AudioFilesProps>(
 		acceptMimeTypes = 'audio/*',
 		acceptFile = acceptAudioFile,
 		children,
+		deleteOnRemoveField,
 		durationField,
 		fileSizeField,
 		fileTypeField,
@@ -55,6 +57,7 @@ export const AudioFiles = Component<AudioFilesProps>(
 	}) => {
 		const extractors: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata>[] = [
 			getFileUrlDataExtractor({ urlField }),
+			getDestroyDataExtractor({ deleteOnRemoveField }),
 			getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
 			getAudioFileDataExtractor({ durationField }),
 			...additionalExtractors,

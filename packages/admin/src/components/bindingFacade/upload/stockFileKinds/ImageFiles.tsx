@@ -5,11 +5,13 @@ import type { ReactElement } from 'react'
 import { ImageFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
 import type {
+	DestroyDataExtractorProps,
 	FileUrlDataExtractorProps,
 	GenericFileMetadataExtractorProps,
 	ImageFileDataExtractorProps,
 } from '../fileDataExtractors'
 import {
+	getDestroyDataExtractor,
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
 	getImageFileDataExtractor,
@@ -28,6 +30,7 @@ export interface ImageFilesProps<AcceptArtifacts = unknown>
 		>,
 		Required<FileUrlDataExtractorProps>,
 		GenericFileMetadataExtractorProps,
+		DestroyDataExtractorProps,
 		ImageFileDataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
@@ -43,6 +46,7 @@ export const ImageFiles = Component<ImageFilesProps>(
 		acceptMimeTypes = 'image/*',
 		acceptFile = acceptImageFile,
 		children,
+		deleteOnRemoveField,
 		fileSizeField,
 		fileTypeField,
 		lastModifiedField,
@@ -56,6 +60,7 @@ export const ImageFiles = Component<ImageFilesProps>(
 	}) => {
 		const extractors: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata>[] = [
 			getFileUrlDataExtractor({ urlField }),
+			getDestroyDataExtractor({ deleteOnRemoveField }),
 			getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
 			getImageFileDataExtractor({ heightField, widthField }),
 			...additionalExtractors,

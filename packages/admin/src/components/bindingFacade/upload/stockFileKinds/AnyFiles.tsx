@@ -4,8 +4,16 @@ import { emptyArray } from '@contember/react-utils'
 import type { ReactElement } from 'react'
 import { FileUrlFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
-import type { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps } from '../fileDataExtractors'
-import { getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../fileDataExtractors'
+import type {
+	DestroyDataExtractorProps,
+	FileUrlDataExtractorProps,
+	GenericFileMetadataExtractorProps,
+} from '../fileDataExtractors'
+import {
+	getDestroyDataExtractor,
+	getFileUrlDataExtractor,
+	getGenericFileMetadataExtractor,
+} from '../fileDataExtractors'
 import { FileKind } from '../FileKind'
 import type { DiscriminatedFileKind, FileDataExtractor, RenderFilePreviewOptions } from '../interfaces'
 
@@ -14,6 +22,7 @@ export interface AnyFilesProps<AcceptArtifacts = unknown>
 			Omit<DiscriminatedFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'discriminateBy' | 'extractors'>
 		>,
 		Required<FileUrlDataExtractorProps>,
+		DestroyDataExtractorProps,
 		GenericFileMetadataExtractorProps {
 	discriminateBy: DiscriminatedFileKind['discriminateBy']
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
@@ -38,6 +47,7 @@ export const AnyFiles = Component<AnyFilesProps>(
 		acceptMimeTypes = null,
 		acceptFile = acceptAnyFile,
 		children,
+		deleteOnRemoveField,
 		fileSizeField,
 		fileTypeField,
 		lastModifiedField,
@@ -49,6 +59,7 @@ export const AnyFiles = Component<AnyFilesProps>(
 	}) => {
 		const extractors: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata>[] = [
 			getFileUrlDataExtractor({ urlField }),
+			getDestroyDataExtractor({ deleteOnRemoveField }),
 			getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
 			...additionalExtractors,
 		]

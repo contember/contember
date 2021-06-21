@@ -28,6 +28,6 @@ export type FileUploadAction<Result = unknown, Metadata = undefined> =
 			error: Iterable<(File | FileId) | [File | FileId, any]>
 	  }
 	| {
-			type: 'abort'
+			type: 'purge'
 			files: Iterable<File | FileId>
 	  }

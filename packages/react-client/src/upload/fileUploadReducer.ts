@@ -132,8 +132,8 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 			}
 			return getNewDirtyState() // Bad news can wait.
 		}
-		case 'abort': {
-			let atLeastOneAborted = false
+		case 'purge': {
+			let atLeastOnePurged = false
 			for (const fileOrId of action.files) {
 				const fileId = toFileId(previousState, fileOrId)
 				const fileState = previousState.liveState.get(fileId)
@@ -141,13 +141,13 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 				if (fileState === undefined) {
 					continue
 				}
-				atLeastOneAborted = true
+				atLeastOnePurged = true
 				if (fileState.readyState === 'initializing' || fileState.readyState === 'uploading') {
 					fileState.abortController.abort() // This is a bit naughty… We shouldn't do this from here.
 				}
 				previousState.liveState.delete(fileId)
 			}
-			if (atLeastOneAborted) {
+			if (atLeastOnePurged) {
 				return getNewDirtyState()
 			}
 			return previousState

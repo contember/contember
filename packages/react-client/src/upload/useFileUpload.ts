@@ -7,7 +7,7 @@ import type { FileUploadCompoundState } from './FileUploadCompoundState'
 import type { FileUploadMetadata } from './FileUploadMetadata'
 import type { FileUploadMultiTemporalState } from './FileUploadMultiTemporalState'
 import type {
-	AbortUpload,
+	PurgeUpload,
 	FileUploadOperations,
 	InitializeUpload,
 	StartUpload,
@@ -49,9 +49,9 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 		multiTemporalStateRef.current = multiTemporalState
 	})
 
-	const abortUpload = useCallback<AbortUpload>(files => {
+	const purgeUpload = useCallback<PurgeUpload>(files => {
 		dispatch({
-			type: 'abort',
+			type: 'purge',
 			files,
 		})
 	}, [])
@@ -75,7 +75,7 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 				}
 
 				abortController.signal.addEventListener('abort', () => {
-					abortUpload([fileId])
+					purgeUpload([fileId])
 				})
 
 				fileWithMetadataByFileConfig.set(fileId, {
@@ -93,7 +93,7 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 
 			if (newFileIds.size) {
 				dispatch({
-					type: 'abort',
+					type: 'purge',
 					files: newFileIds,
 				})
 			}
@@ -105,7 +105,7 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 
 			return fileWithMetadataByFileConfig
 		},
-		[abortUpload],
+		[purgeUpload],
 	)
 	const startUpload = useCallback<StartUpload<Metadata>>(
 		files => {
@@ -194,9 +194,9 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 		() => ({
 			initializeUpload,
 			startUpload,
-			abortUpload,
+			purgeUpload,
 		}),
-		[initializeUpload, abortUpload, startUpload],
+		[initializeUpload, purgeUpload, startUpload],
 	)
 
 	useEffect(() => {

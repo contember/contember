@@ -22,7 +22,7 @@ export function FileInput({
 	description,
 	labelDescription,
 	children,
-	enableAddingNew,
+	enableAddingNew = true,
 
 	addButtonComponent: AddButton = Button,
 	addButtonComponentExtraProps,

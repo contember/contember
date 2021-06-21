@@ -31,17 +31,19 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 			prepareEntityForNewFile,
 		})
 
-		const children = hasUploadedFile(fileKinds, parentEntity) ? (
-			<div className="fileInput-preview">
-				<SingleFilePreview
-					getContainingEntity={parentEntity.getAccessor}
-					fileId={parentEntity.key}
-					removeFile={removeFile}
-					uploadState={uploadState.get(parentEntity.key)}
-					fileKinds={fileKinds}
-				/>
-			</div>
-		) : undefined
+		const fileUploadState = uploadState.get(parentEntity.key)
+		const children =
+			hasUploadedFile(fileKinds, parentEntity) || fileUploadState !== undefined ? (
+				<div className="fileInput-preview">
+					<SingleFilePreview
+						getContainingEntity={parentEntity.getAccessor}
+						fileId={parentEntity.key}
+						removeFile={removeFile}
+						uploadState={uploadState.get(parentEntity.key)}
+						fileKinds={fileKinds}
+					/>
+				</div>
+			) : undefined
 
 		return <FileInput {...fileInputProps} dropzoneState={dropzoneState} children={children} />
 	},

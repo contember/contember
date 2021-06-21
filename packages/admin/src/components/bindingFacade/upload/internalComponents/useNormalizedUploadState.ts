@@ -1,22 +1,24 @@
 import { EntityAccessor, useGetEntityByKey, useMutationState, VariableInputTransformer } from '@contember/binding'
-import { FileId, FileUpload, FileWithMetadata, StartUploadFileOptions, useFileUpload } from '@contember/react-client'
+import type { FileId, FileUploadCompoundState, FileWithMetadata, StartUploadFileOptions } from '@contember/react-client'
+import { useFileUpload } from '@contember/react-client'
 import { useCallback } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 import { DropzoneState, useDropzone } from 'react-dropzone'
 import { assertNever } from '../../../../utils'
 import type { DiscriminatedFileKind } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
-import { resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from '../utils'
+import { eachFileKind, resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from '../utils'
 
 export interface NormalizedUploadStateOptions {
 	isMultiple: boolean
 	fileKinds: ResolvedFileKinds
-	prepareEntityForNewFile: (initialize: (getNewEntity: EntityAccessor.GetEntityAccessor) => void) => void
+	prepareEntityForNewFile: (initialize: EntityAccessor.BatchUpdatesHandler) => void
 }
 
 export interface NormalizedUploadState {
-	fileUpload: FileUpload
+	uploadState: FileUploadCompoundState
 	dropzoneState: DropzoneState
+	removeFile: (fileId: FileId) => void
 }
 
 export const useNormalizedUploadState = ({
@@ -30,6 +32,23 @@ export const useNormalizedUploadState = ({
 	const resolvedAccept = useAllAcceptedMimes(fileKinds)
 
 	const [uploadState, { initializeUpload, startUpload, abortUpload }] = fileUpload
+
+	const removeFile = useCallback(
+		(fileId: FileId) => {
+			getEntityByKey(fileId.toString()).batchUpdates(getEntity => {
+				// TODO abort
+				for (const fileKind of eachFileKind(fileKinds)) {
+					for (const extractor of fileKind.extractors) {
+						extractor.destroy?.({ entity: getEntity() })
+					}
+				}
+				if (fileKinds.isDiscriminated) {
+					getEntity().getField(fileKinds.discriminationField).updateValue(null)
+				}
+			})
+		},
+		[fileKinds, getEntityByKey],
+	)
 
 	const onDrop = useCallback(
 		(files: File[]) => {
@@ -122,7 +141,8 @@ export const useNormalizedUploadState = ({
 	})
 
 	return {
+		uploadState,
 		dropzoneState,
-		fileUpload,
+		removeFile,
 	}
 }

@@ -36,18 +36,18 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	const isMutating = useMutationState()
 	const getEntityByKey = useGetEntityByKey()
 
-	const { fileUpload, dropzoneState } = useNormalizedUploadState({
+	const { uploadState, dropzoneState, removeFile } = useNormalizedUploadState({
 		isMultiple: true,
 		fileKinds,
 		prepareEntityForNewFile: createNewEntity,
 	})
-	const [uploadState] = fileUpload
 
-	const removeFile = useCallback(
+	const normalizedRemoveFile = useCallback(
 		(entityKey: FileId) => {
+			removeFile(entityKey)
 			getEntityByKey(entityKey.toString()).deleteEntity()
 		},
-		[getEntityByKey],
+		[getEntityByKey, removeFile],
 	)
 
 	const previews: ReactNode[] = []
@@ -63,7 +63,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 							getContainingEntity={entity.getAccessor}
 							fileId={entity.key}
 							hasUploadedFile={returnTrue}
-							removeFile={removeFile}
+							removeFile={normalizedRemoveFile}
 							uploadState={entityUploadState}
 							fileKinds={fileKinds}
 						/>

@@ -4,7 +4,7 @@ import { ActionableBox, Box } from '@contember/ui'
 import { memo, ReactElement, useMemo } from 'react'
 import type { FullFileKind } from '../../interfaces'
 import type { ResolvedFileKinds } from '../../ResolvedFileKinds'
-import { getEntityFileKind } from '../../utils'
+import { getEntityFileKind, hasUploadedFile } from '../../utils'
 import { InitializedFilePreview } from './InitializedFilePreview'
 import { InitializingFilePreview } from './InitializingFilePreview'
 import { UploadedFilePreview } from './UploadedFilePreview'
@@ -12,14 +12,13 @@ import { UploadedFilePreview } from './UploadedFilePreview'
 export interface SingleFilePreviewProps {
 	getContainingEntity: EntityAccessor.GetEntityAccessor
 	fileId: FileId
-	hasUploadedFile: (fileId: FileId) => boolean
 	removeFile: ((fileId: FileId) => void) | undefined
 	uploadState: SingleFileUploadState | undefined
 	fileKinds: ResolvedFileKinds
 }
 
 export const SingleFilePreview = memo(
-	({ fileId, fileKinds, getContainingEntity, hasUploadedFile, removeFile, uploadState }: SingleFilePreviewProps) => {
+	({ fileId, fileKinds, getContainingEntity, removeFile, uploadState }: SingleFilePreviewProps) => {
 		let fileKind: FullFileKind
 		let preview: ReactElement | null = null
 
@@ -44,7 +43,7 @@ export const SingleFilePreview = memo(
 					uploadState={uploadState}
 				/>
 			)
-		} else if (hasUploadedFile(fileId)) {
+		} else if (hasUploadedFile(fileKinds, getContainingEntity())) {
 			fileKind = getEntityFileKind(fileKinds, getContainingEntity)
 			preview = <UploadedFilePreview fileKind={fileKind} />
 		} else {

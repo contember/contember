@@ -1,5 +1,6 @@
 export * from './eachFileKind'
-export * from './resolveAcceptingFileKind'
 export * from './getEntityFileKind'
+export * from './hasUploadedFile'
+export * from './resolveAcceptingFileKind'
 export * from './staticRenderFileKind'
 export * from './useAllAcceptedMimes'

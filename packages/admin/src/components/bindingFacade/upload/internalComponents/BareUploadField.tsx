@@ -1,9 +1,8 @@
 import type { EntityAccessor } from '@contember/binding'
-import { Component, SugaredField, useEntity, useGetEntityByKey } from '@contember/binding'
-import type { FileId } from '@contember/react-client'
+import { Component, SugaredField, useEntity } from '@contember/binding'
 import { Fragment, useCallback } from 'react'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
-import { staticRenderFileKind } from '../utils'
+import { hasUploadedFile, staticRenderFileKind } from '../utils'
 import type { FileInputPublicProps } from './FileInput'
 import { FileInput } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
@@ -11,17 +10,14 @@ import { useNormalizedUploadState } from './useNormalizedUploadState'
 
 export interface BareUploadFieldProps extends FileInputPublicProps {
 	fileKinds: ResolvedFileKinds
-	hasUploadedFile: (entity: EntityAccessor) => boolean
 }
 
 export const BareUploadField = Component<BareUploadFieldProps>(
 	({
 		fileKinds,
-		hasUploadedFile,
 
 		...fileInputProps
 	}) => {
-		const getEntityByKey = useGetEntityByKey()
 		const parentEntity = useEntity()
 
 		const prepareEntityForNewFile = useCallback<(initialize: EntityAccessor.BatchUpdatesHandler) => void>(
@@ -35,17 +31,11 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 			prepareEntityForNewFile,
 		})
 
-		const normalizedHasUploadedFile = useCallback(
-			(entityKey: FileId) => hasUploadedFile(getEntityByKey(entityKey.toString())),
-			[getEntityByKey, hasUploadedFile],
-		)
-
-		const children = hasUploadedFile(parentEntity) ? (
+		const children = hasUploadedFile(fileKinds, parentEntity) ? (
 			<div className="fileInput-preview">
 				<SingleFilePreview
 					getContainingEntity={parentEntity.getAccessor}
 					fileId={parentEntity.key}
-					hasUploadedFile={normalizedHasUploadedFile}
 					removeFile={removeFile}
 					uploadState={uploadState.get(parentEntity.key)}
 					fileKinds={fileKinds}

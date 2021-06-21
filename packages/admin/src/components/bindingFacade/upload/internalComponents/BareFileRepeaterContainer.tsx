@@ -1,6 +1,5 @@
 import { Entity, useGetEntityByKey, useMutationState } from '@contember/binding'
 import type { FileId } from '@contember/react-client'
-import { returnTrue } from '@contember/react-utils'
 import type { FunctionComponent } from 'react'
 import { ReactNode, useCallback } from 'react'
 import { RepeaterContainerPrivateProps, SortableRepeaterItem } from '../../collections'
@@ -62,7 +61,6 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 						<SingleFilePreview
 							getContainingEntity={entity.getAccessor}
 							fileId={entity.key}
-							hasUploadedFile={returnTrue}
 							removeFile={normalizedRemoveFile}
 							uploadState={entityUploadState}
 							fileKinds={fileKinds}

@@ -1,4 +1,4 @@
-import type { SugaredFieldProps } from '@contember/binding'
+import type { EntityAccessor, SugaredFieldProps } from '@contember/binding'
 import type { NormalizedDiscriminatedData } from '../discrimination'
 import type { FullFileKind } from './interfaces'
 
@@ -11,4 +11,5 @@ export type ResolvedFileKinds =
 	| {
 			isDiscriminated: false
 			fileKind: FullFileKind
+			hasUploadedFile: (entity: EntityAccessor) => boolean
 	  }

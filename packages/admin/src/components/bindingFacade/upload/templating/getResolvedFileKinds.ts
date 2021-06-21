@@ -1,5 +1,5 @@
 import type { Environment, SugaredFieldProps } from '@contember/binding'
-import { BindingError, VariableInputTransformer } from '@contember/binding'
+import { BindingError, EntityAccessor, VariableInputTransformer } from '@contember/binding'
 import type { NormalizedDiscriminatedData } from '../../discrimination'
 import type { DiscriminatedFileKind, FullFileKind } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
@@ -7,6 +7,7 @@ import { fileKindTemplateAnalyzer } from './fileKindTemplateAnalyzer'
 
 export interface HybridFileKindProps extends Partial<FullFileKind> {
 	discriminationField?: SugaredFieldProps['field']
+	hasUploadedFile?: (entity: EntityAccessor) => boolean
 }
 
 export const getResolvedFileKinds = (
@@ -16,6 +17,7 @@ export const getResolvedFileKinds = (
 ): ResolvedFileKinds => {
 	const {
 		discriminationField,
+		hasUploadedFile,
 		children,
 		acceptFile,
 		acceptMimeTypes,
@@ -28,6 +30,7 @@ export const getResolvedFileKinds = (
 	if (
 		acceptFile !== undefined ||
 		acceptMimeTypes !== undefined ||
+		hasUploadedFile !== undefined ||
 		renderFilePreview !== undefined ||
 		renderUploadedFile !== undefined ||
 		extractors !== undefined ||
@@ -42,6 +45,7 @@ export const getResolvedFileKinds = (
 		const mandatoryPropNames = [
 			// 'acceptFile' // Deliberately left out
 			'acceptMimeTypes',
+			'hasUploadedFile',
 			'renderFilePreview',
 			'renderUploadedFile',
 			'extractors',
@@ -64,6 +68,7 @@ export const getResolvedFileKinds = (
 				renderUploadedFile,
 				uploader: uploader!,
 			},
+			hasUploadedFile: hasUploadedFile!,
 		}
 	}
 	const processed = fileKindTemplateAnalyzer.processChildren(children, environment)
@@ -92,13 +97,8 @@ export const getResolvedFileKinds = (
 			fileKinds: normalizedFileKinds,
 		}
 	}
-	if (fileKinds.length > 1) {
-		throw new BindingError(
-			`${componentName}: having supplied several FileKind children, you must also specify the 'discriminationField'!`,
-		)
-	}
-	return {
-		isDiscriminated: false,
-		fileKind: fileKinds[0],
-	}
+	throw new BindingError(
+		`${componentName}: you must supply either the 'discriminationField' prop and at least one FileKind, ` +
+			`or specify all of the top-level file-kind props directly!`,
+	)
 }

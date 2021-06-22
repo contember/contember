@@ -1,9 +1,9 @@
 export interface AcceptFileKindErrorOptions {
-	userMessage: string
+	endUserMessage: string
 }
 
 export class AcceptFileKindError extends Error {
 	public constructor(public readonly options: AcceptFileKindErrorOptions) {
-		super(options.userMessage)
+		super(options.endUserMessage)
 	}
 }

@@ -1,5 +1,5 @@
 import { Component, EntityAccessor, HasOne, SugaredField, useEntity } from '@contember/binding'
-import { Fragment, useCallback } from 'react'
+import { Fragment, useCallback, useState } from 'react'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { hasUploadedFile, staticRenderFileKind } from '../utils'
 import type { FileInputPublicProps } from './FileInput'
@@ -12,8 +12,9 @@ export interface BareUploadFieldProps extends FileInputPublicProps {
 }
 
 export const BareUploadField = Component<BareUploadFieldProps>(
-	({ fileKinds, ...fileInputProps }) => {
+	({ fileKinds: unstableFileKinds, ...fileInputProps }) => {
 		const parentEntity = useEntity()
+		const [fileKinds] = useState(() => unstableFileKinds)
 
 		const prepareEntityForNewFile = useCallback<(initialize: EntityAccessor.BatchUpdatesHandler) => void>(
 			initialize => parentEntity.batchUpdates(initialize),

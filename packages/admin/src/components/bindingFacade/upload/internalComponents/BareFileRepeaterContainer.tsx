@@ -1,7 +1,7 @@
-import { Entity, useGetEntityByKey, useMutationState } from '@contember/binding'
+import { useGetEntityByKey, useMutationState } from '@contember/binding'
 import type { FileId } from '@contember/react-client'
 import type { FunctionComponent } from 'react'
-import { ReactNode, useCallback } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
 import { RepeaterContainerPrivateProps, SortableRepeaterItem } from '../../collections'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { FileInput, FileInputPublicProps } from './FileInput'
@@ -22,7 +22,7 @@ export interface BareFileRepeaterContainerProps
 export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContainerProps> = ({
 	entities,
 	isEmpty,
-	fileKinds,
+	fileKinds: unstableFileKinds,
 	createNewEntity,
 
 	// These are here just to remove them from the spread below
@@ -34,6 +34,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 }) => {
 	const isMutating = useMutationState()
 	const getEntityByKey = useGetEntityByKey()
+	const [fileKinds] = useState(() => unstableFileKinds)
 
 	const { uploadState, dropzoneState, removeFile } = useNormalizedUploadState({
 		isMultiple: true,

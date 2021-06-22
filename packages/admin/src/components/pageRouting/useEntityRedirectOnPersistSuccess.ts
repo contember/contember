@@ -23,7 +23,7 @@ export const useEntityRedirectOnPersistSuccess = (
 			if (options.successType === 'nothingToPersist') {
 				return
 			}
-			redirect(request => redirectOnSuccess(request, options.unstable_persistedEntityIds[0], getAccessor(), options))
+			redirect(request => redirectOnSuccess(request, getAccessor().id, getAccessor(), options))
 		}
 	}, [redirectOnSuccess, redirect])
 }

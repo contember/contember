@@ -3,7 +3,8 @@ import type { ReactElement } from 'react'
 import type { DiscriminatedFileKind } from './interfaces'
 
 export interface FileKindProps<UploadResult = unknown, AcceptArtifacts = unknown>
-	extends DiscriminatedFileKind<UploadResult, AcceptArtifacts> {}
+	extends Omit<DiscriminatedFileKind<UploadResult, AcceptArtifacts>, 'children' | 'baseEntity'>,
+		Partial<Pick<DiscriminatedFileKind<UploadResult, AcceptArtifacts>, 'children' | 'baseEntity'>> {}
 
 export function FileKind<UploadResult = unknown, AcceptArtifacts = unknown>(
 	props: FileKindProps<UploadResult, AcceptArtifacts>,

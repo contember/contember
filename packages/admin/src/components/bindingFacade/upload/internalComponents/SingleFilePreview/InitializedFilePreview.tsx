@@ -1,6 +1,6 @@
 import type { EntityAccessor } from '@contember/binding'
 import type { SingleFileUploadState } from '@contember/react-client'
-import { FilePreview, Message, UploadProgress } from '@contember/ui'
+import { ErrorList, FilePreview, Message, UploadProgress } from '@contember/ui'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import type { FullFileKind } from '../../interfaces'
 
@@ -25,7 +25,7 @@ export function InitializedFilePreview({ fileKind, getContainingEntity, uploadSt
 
 	useEffect(() => {
 		const extractData = async () => {
-			if (extractionState.name !== 'uninitialized') {
+			if (extractionState.name !== 'uninitialized' || uploadState.readyState === 'error') {
 				return
 			}
 			const dataPromises = fileKind.extractors.map(extractor =>
@@ -90,15 +90,19 @@ export function InitializedFilePreview({ fileKind, getContainingEntity, uploadSt
 	)
 
 	const getOverlay = (): ReactNode => {
-		if (uploadState.readyState === 'error' && uploadState.error?.options.endUserMessage) {
-			return <Message type="danger">{uploadState.error.options.endUserMessage}</Message>
+		if (uploadState.readyState === 'error') {
+			const endUserMessages = uploadState.errors
+				? uploadState.errors
+						.filter(error => !!error.options.endUserMessage)
+						.map(error => ({ message: error.options.endUserMessage! }))
+				: []
+
+			if (endUserMessages.length) {
+				return <ErrorList errors={endUserMessages} />
+			}
 		}
-		if (
-			uploadState.readyState === 'error' ||
-			extractionState.name === 'error' ||
-			uploadState.readyState === 'aborted'
-		) {
-			return `Upload failed`
+		if (uploadState.readyState === 'error' || extractionState.name === 'error') {
+			return <Message type="danger">Upload failed</Message>
 		}
 		if (uploadState.readyState === 'success') {
 			if (extractionState.name === 'success') {

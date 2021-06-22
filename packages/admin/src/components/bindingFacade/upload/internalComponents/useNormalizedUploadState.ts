@@ -1,10 +1,18 @@
-import { EntityAccessor, useGetEntityByKey, useMutationState, VariableInputTransformer } from '@contember/binding'
+import {
+	EntityAccessor,
+	useEntityPersistSuccess,
+	useGetEntityByKey,
+	useMutationState,
+	VariableInputTransformer,
+} from '@contember/binding'
+import { FileUploadError } from '@contember/client'
 import type { FileId, FileUploadCompoundState, FileWithMetadata, StartUploadFileOptions } from '@contember/react-client'
 import { useFileUpload } from '@contember/react-client'
 import { useCallback } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 import { DropzoneState, useDropzone } from 'react-dropzone'
 import { assertNever } from '../../../../utils'
+import { AcceptFileKindError } from '../interfaces'
 import type { DiscriminatedFileKind } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { eachFileKind, resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from '../utils'
@@ -31,7 +39,7 @@ export const useNormalizedUploadState = ({
 	const getEntityByKey = useGetEntityByKey()
 	const resolvedAccept = useAllAcceptedMimes(fileKinds)
 
-	const [uploadState, { initializeUpload, startUpload, purgeUpload }] = fileUpload
+	const [uploadState, { initializeUpload, startUpload, purgeUpload, failUpload }] = fileUpload
 
 	const removeFile = useCallback(
 		(fileId: FileId) => {
@@ -84,23 +92,18 @@ export const useNormalizedUploadState = ({
 
 			Promise.resolve().then(async () => {
 				const resolvedKindPromises: Array<Promise<ResolvedAcceptingFileKind>> = []
-				const rejected: unknown[] = []
 
 				for (const fileMetadata of metadataByFileId.values()) {
-					try {
-						resolvedKindPromises.push(
-							resolveAcceptingFileKind(
-								{
-									file: fileMetadata.file,
-									abortSignal: fileMetadata.abortController.signal,
-									objectUrl: fileMetadata.previewUrl,
-								},
-								fileKinds,
-							),
-						)
-					} catch (e) {
-						rejected.push(e)
-					}
+					resolvedKindPromises.push(
+						resolveAcceptingFileKind(
+							{
+								file: fileMetadata.file,
+								abortSignal: fileMetadata.abortController.signal,
+								objectUrl: fileMetadata.previewUrl,
+							},
+							fileKinds,
+						),
+					)
 				}
 
 				// We deliberately group all files at this stage. That way by the time we actually start uploading, all file
@@ -112,8 +115,9 @@ export const useNormalizedUploadState = ({
 
 				unstable_batchedUpdates(() => {
 					const resolved = new Map<File, StartUploadFileOptions>()
+					const rejected: Array<File | [File, FileUploadError[]]> = []
 
-					for (const result of resolvedFileKinds) {
+					for (const [i, result] of resolvedFileKinds.entries()) {
 						if (result.status === 'fulfilled') {
 							const resolvedKind = result.value
 							resolved.set(resolvedKind.acceptOptions.file, {
@@ -137,20 +141,38 @@ export const useNormalizedUploadState = ({
 									)
 							}
 						} else if (result.status === 'rejected') {
-							rejected.push(result.reason)
+							const errors: FileUploadError[] = []
+							const e = result.reason
+
+							if (e instanceof AcceptFileKindError) {
+								errors.push(new FileUploadError(e.options))
+							} else if (e instanceof AggregateError) {
+								for (const error of e.errors) {
+									if (error instanceof AcceptFileKindError) {
+										errors.push(new FileUploadError(error.options))
+									}
+								}
+							}
+
+							const file = files[i]
+							if (errors.length) {
+								rejected.push([file, errors])
+							} else {
+								rejected.push(file)
+							}
 						} else {
 							assertNever(result)
 						}
 					}
 
 					if (rejected.length) {
-						// TODO
+						failUpload(rejected)
 					}
 					startUpload(resolved)
 				})
 			})
 		},
-		[initializeUpload, prepareEntityForNewFile, fileKinds, startUpload, getEntityByKey],
+		[initializeUpload, prepareEntityForNewFile, fileKinds, startUpload, getEntityByKey, failUpload],
 	)
 	const dropzoneState = useDropzone({
 		onDrop,

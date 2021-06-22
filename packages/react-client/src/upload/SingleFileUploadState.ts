@@ -26,7 +26,8 @@ export type SingleFileUploadState<Result = unknown, Metadata = undefined> =
 	  }
 	| {
 			readyState: 'error'
-			error: FileUploadError[] | undefined
+			errors: FileUploadError[] | undefined
+			rawError: any
 			file: File
 			metadata: Metadata | undefined
 			previewUrl: string

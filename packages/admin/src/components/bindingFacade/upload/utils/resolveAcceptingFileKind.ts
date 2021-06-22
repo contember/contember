@@ -1,4 +1,6 @@
+import { BindingError } from '@contember/binding'
 import attrAccept from 'attr-accept'
+import { AcceptFileKindError } from '../interfaces'
 import type { AcceptFileOptions, FullFileKind } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { eachFileKind } from './eachFileKind'
@@ -13,7 +15,7 @@ export const resolveAcceptingFileKind = async (
 	fileOptions: AcceptFileOptions,
 	fileKinds: ResolvedFileKinds,
 ): Promise<ResolvedAcceptingFileKind> => {
-	const errors: any[] = []
+	const errors: AcceptFileKindError[] = []
 
 	for (const fileKind of eachFileKind(fileKinds)) {
 		const acceptMimeTypes = fileKind.acceptMimeTypes
@@ -45,10 +47,12 @@ export const resolveAcceptingFileKind = async (
 				}
 			}
 		} catch (e) {
-			errors.push(e)
+			if (e instanceof AcceptFileKindError) {
+				errors.push(e)
+			}
 			continue
 		}
-		throw new Error('File upload: illegal acceptFile return value. Boolean or Promise expected.')
+		throw new BindingError('File upload: illegal acceptFile return value. Boolean or Promise expected.')
 	}
 	throw new AggregateError(errors)
 }

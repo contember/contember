@@ -131,7 +131,8 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 				const metadata = previousFileState.readyState === 'uploading' ? previousFileState.metadata : undefined
 				previousState.liveState.set(fileId, {
 					readyState: 'error',
-					error: errors.length ? errors : undefined,
+					errors: errors.length ? errors : undefined,
+					rawError,
 					file: previousFileState.file,
 					metadata,
 					previewUrl: previousFileState.previewUrl,

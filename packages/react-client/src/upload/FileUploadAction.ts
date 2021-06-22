@@ -1,4 +1,4 @@
-import type { FileUploadError, FileUploadProgress } from '@contember/client'
+import type { FileUploadProgress } from '@contember/client'
 import type { FileId } from './FileId'
 import type { FileUploadMetadata } from './FileUploadMetadata'
 import type { FileWithMetadata } from './FileWithMetadata'

@@ -98,17 +98,25 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 		case 'finishWithError': {
 			for (const errorSpec of action.error) {
 				let fileOrId: File | FileId
-				let error: any
+				let rawError: unknown
 
 				if (Array.isArray(errorSpec)) {
-					;[fileOrId, error] = errorSpec
+					;[fileOrId, rawError] = errorSpec
 				} else {
 					fileOrId = errorSpec
-					error = undefined
+					rawError = undefined
 				}
 
-				if (!(error instanceof FileUploadError)) {
-					error = undefined
+				const errors: FileUploadError[] = []
+
+				if (rawError instanceof FileUploadError) {
+					errors.push(rawError)
+				} else if (Array.isArray(rawError)) {
+					for (const error of rawError) {
+						if (error instanceof FileUploadError) {
+							errors.push(error)
+						}
+					}
 				}
 
 				const fileId = toFileId(previousState, fileOrId)
@@ -123,7 +131,7 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 				const metadata = previousFileState.readyState === 'uploading' ? previousFileState.metadata : undefined
 				previousState.liveState.set(fileId, {
 					readyState: 'error',
-					error,
+					error: errors.length ? errors : undefined,
 					file: previousFileState.file,
 					metadata,
 					previewUrl: previousFileState.previewUrl,

@@ -12,6 +12,7 @@ import type {
 	InitializeUpload,
 	StartUpload,
 	StartUploadFileOptions,
+	FailUpload,
 } from './FileUploadOperations'
 import { fileUploadReducer, initializeFileUploadState } from './fileUploadReducer'
 import type { FileWithMetadata } from './FileWithMetadata'
@@ -53,6 +54,12 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 		dispatch({
 			type: 'purge',
 			files,
+		})
+	}, [])
+	const failUpload = useCallback<FailUpload>(error => {
+		dispatch({
+			type: 'finishWithError',
+			error,
 		})
 	}, [])
 	const initializeUpload = useCallback<InitializeUpload>(
@@ -192,11 +199,12 @@ export const useFileUpload = <Result = unknown, Metadata = undefined>(
 
 	const operations = useMemo<FileUploadOperations<Metadata>>(
 		() => ({
+			failUpload,
 			initializeUpload,
-			startUpload,
 			purgeUpload,
+			startUpload,
 		}),
-		[initializeUpload, purgeUpload, startUpload],
+		[failUpload, initializeUpload, purgeUpload, startUpload],
 	)
 
 	useEffect(() => {

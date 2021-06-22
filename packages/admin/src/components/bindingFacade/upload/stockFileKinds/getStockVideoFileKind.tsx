@@ -29,6 +29,7 @@ export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
 	additionalExtractors = emptyArray,
 	acceptMimeTypes = 'video/*',
 	acceptFile = acceptVideoFile,
+	baseEntity,
 	children,
 	durationField,
 	fileSizeField,
@@ -53,6 +54,7 @@ export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
 	return {
 		acceptFile,
 		acceptMimeTypes,
+		baseEntity,
 		children,
 		extractors,
 		renderFilePreview,

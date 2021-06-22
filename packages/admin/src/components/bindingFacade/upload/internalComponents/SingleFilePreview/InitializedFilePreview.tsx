@@ -61,7 +61,11 @@ export function InitializedFilePreview({ fileKind, getContainingEntity, uploadSt
 			return
 		}
 
-		getContainingEntity().batchUpdates(() => {
+		getContainingEntity().batchUpdates(getEntity => {
+			if (fileKind.baseEntity) {
+				getEntity = getEntity().getEntity(fileKind.baseEntity).getAccessor
+			}
+
 			for (let i = 0; i < fileKind.extractors.length; i++) {
 				const extractor = fileKind.extractors[i]
 				const extractedData = extractionState.data[i]
@@ -72,11 +76,11 @@ export function InitializedFilePreview({ fileKind, getContainingEntity, uploadSt
 					extractedData,
 					uploadResult: uploadState.result,
 					acceptArtifacts: uploadState.metadata,
-					entity: getContainingEntity(),
+					entity: getEntity(),
 				})
 			}
 		})
-	}, [extractionState, fileKind.extractors, getContainingEntity, uploadState])
+	}, [extractionState, fileKind.baseEntity, fileKind.extractors, getContainingEntity, uploadState])
 
 	useEffect(
 		() => () => {

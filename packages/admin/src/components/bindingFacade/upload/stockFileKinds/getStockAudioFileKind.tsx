@@ -29,6 +29,7 @@ export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
 	additionalExtractors = emptyArray,
 	acceptMimeTypes = 'audio/*',
 	acceptFile = acceptAudioFile,
+	baseEntity,
 	children,
 	durationField,
 	fileSizeField,
@@ -51,6 +52,7 @@ export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
 	return {
 		acceptFile,
 		acceptMimeTypes,
+		baseEntity,
 		children,
 		extractors,
 		renderFilePreview,

@@ -39,8 +39,15 @@ export const useNormalizedUploadState = ({
 				purgeUpload([fileId])
 
 				for (const fileKind of eachFileKind(fileKinds)) {
+					const getExtractorEntity =
+						fileKind.baseEntity === undefined ? getEntity : getEntity().getEntity(fileKind.baseEntity).getAccessor
+
 					for (const extractor of fileKind.extractors) {
-						extractor.destroy?.({ entity: getEntity() })
+						extractor.destroy?.({ entity: getExtractorEntity() })
+					}
+
+					if (fileKind.baseEntity !== undefined) {
+						getExtractorEntity().deleteEntity()
 					}
 				}
 				if (fileKinds.isDiscriminated) {

@@ -57,15 +57,13 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 		previews.push(
 			<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
 				<div className="fileInput-preview view-sortable">
-					<Entity accessor={entity}>
-						<SingleFilePreview
-							getContainingEntity={entity.getAccessor}
-							fileId={entity.key}
-							removeFile={normalizedRemoveFile}
-							uploadState={entityUploadState}
-							fileKinds={fileKinds}
-						/>
-					</Entity>
+					<SingleFilePreview
+						getContainingEntity={entity.getAccessor}
+						fileId={entity.key}
+						removeFile={normalizedRemoveFile}
+						uploadState={entityUploadState}
+						fileKinds={fileKinds}
+					/>
 				</div>
 			</SortableRepeaterItem>,
 		)

@@ -29,6 +29,7 @@ export const getStockImageFileKind = <AcceptArtifacts extends any = unknown>({
 	additionalExtractors = emptyArray,
 	acceptMimeTypes = 'image/*',
 	acceptFile = acceptImageFile,
+	baseEntity,
 	children,
 	fileSizeField,
 	fileTypeField,
@@ -52,6 +53,7 @@ export const getStockImageFileKind = <AcceptArtifacts extends any = unknown>({
 	return {
 		acceptFile,
 		acceptMimeTypes,
+		baseEntity,
 		children,
 		extractors,
 		renderFilePreview,

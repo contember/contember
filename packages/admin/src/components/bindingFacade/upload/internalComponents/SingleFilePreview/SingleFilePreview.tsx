@@ -1,4 +1,4 @@
-import type { EntityAccessor } from '@contember/binding'
+import { Entity, EntityAccessor } from '@contember/binding'
 import type { FileId, SingleFileUploadState } from '@contember/react-client'
 import { ActionableBox, Box } from '@contember/ui'
 import { memo, ReactElement, useMemo } from 'react'
@@ -50,10 +50,15 @@ export const SingleFilePreview = memo(
 			return null
 		}
 		const editContents = fileKind.children ? <Box>{fileKind.children}</Box> : undefined
+		const containingEntity =
+			fileKind.baseEntity === undefined ? getContainingEntity() : getContainingEntity().getEntity(fileKind.baseEntity)
+
 		return (
-			<ActionableBox onRemove={onRemove} editContents={editContents}>
-				{preview}
-			</ActionableBox>
+			<Entity accessor={containingEntity}>
+				<ActionableBox onRemove={onRemove} editContents={editContents}>
+					{preview}
+				</ActionableBox>
+			</Entity>
 		)
 	},
 )

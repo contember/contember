@@ -2,14 +2,38 @@ import type { Environment } from '@contember/binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import type { FileKindProps } from '../FileKind'
 import { FileKind } from '../FileKind'
+import type { DiscriminatedFileKind } from '../interfaces'
 
-export class BoxedFileKindProps {
-	public constructor(public readonly value: FileKindProps) {}
+export class BoxedFileKind {
+	public constructor(public readonly value: DiscriminatedFileKind) {}
 }
 
-const fileKindLeaf = new Leaf<FileKindProps>(node => new BoxedFileKindProps(node.props), FileKind)
+const fileKindLeaf = new Leaf<FileKindProps>(node => {
+	const {
+		acceptFile,
+		acceptMimeTypes,
+		baseEntity,
+		children,
+		discriminateBy,
+		extractors,
+		renderFilePreview,
+		renderUploadedFile,
+		uploader,
+	} = node.props
+	return new BoxedFileKind({
+		acceptFile,
+		acceptMimeTypes,
+		baseEntity,
+		children,
+		discriminateBy,
+		extractors,
+		renderFilePreview,
+		renderUploadedFile,
+		uploader,
+	})
+}, FileKind)
 
-export const fileKindTemplateAnalyzer = new ChildrenAnalyzer<BoxedFileKindProps, never, Environment>([fileKindLeaf], {
+export const fileKindTemplateAnalyzer = new ChildrenAnalyzer<BoxedFileKind, never, Environment>([fileKindLeaf], {
 	ignoreUnhandledNodes: false,
 	staticRenderFactoryName: 'staticRender',
 	unhandledNodeErrorMessage: 'Upload: only FileKind children are supported.',

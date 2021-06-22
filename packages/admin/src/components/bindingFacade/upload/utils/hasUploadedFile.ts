@@ -5,5 +5,7 @@ export const hasUploadedFile = (fileKinds: ResolvedFileKinds, entity: EntityAcce
 	if (fileKinds.isDiscriminated) {
 		return entity.getField(fileKinds.discriminationField).value !== null
 	}
-	return fileKinds.hasUploadedFile(entity)
+	return fileKinds.hasUploadedFile(
+		fileKinds.fileKind.baseEntity === undefined ? entity : entity.getEntity(fileKinds.fileKind.baseEntity),
+	)
 }

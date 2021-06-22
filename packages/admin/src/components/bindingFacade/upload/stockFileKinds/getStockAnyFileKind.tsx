@@ -33,6 +33,7 @@ export const getStockAnyFileKind = <AcceptArtifacts extends any = unknown>({
 	additionalExtractors = emptyArray,
 	acceptMimeTypes = null,
 	acceptFile = acceptAnyFile,
+	baseEntity,
 	children,
 	fileSizeField,
 	fileTypeField,
@@ -51,12 +52,13 @@ export const getStockAnyFileKind = <AcceptArtifacts extends any = unknown>({
 	const renderUploadedAny = renderUploadedFile ?? <FileUrlFieldView fileUrlField={urlField} />
 
 	return {
-		acceptFile: acceptFile,
-		acceptMimeTypes: acceptMimeTypes,
-		children: children,
-		extractors: extractors,
-		renderFilePreview: renderFilePreview,
+		acceptFile,
+		acceptMimeTypes,
+		baseEntity,
+		children,
+		extractors,
+		renderFilePreview,
 		renderUploadedFile: renderUploadedAny,
-		uploader: uploader,
+		uploader,
 	}
 }

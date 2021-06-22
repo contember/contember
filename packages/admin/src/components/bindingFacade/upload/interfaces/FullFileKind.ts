@@ -21,6 +21,8 @@ export interface FullFileKind<UploadResult = unknown, AcceptArtifacts = unknown>
 	acceptFile: ((options: AcceptFileOptions) => boolean | Promise<AcceptArtifacts>) | undefined
 	renderFilePreview: (options: RenderFilePreviewOptions<AcceptArtifacts>) => ReactNode
 
+	baseEntity: string | undefined
+
 	children: ReactNode
 	renderUploadedFile: ReactNode
 

@@ -149,7 +149,6 @@ export class DataBinding {
 							const persistSuccessOptions: PersistSuccessOptions = {
 								...this.bindingOperations,
 								successType: 'nothingToPersist',
-								unstable_persistedEntityIds: [],
 							}
 							await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
 							await onPersistSuccess?.(persistSuccessOptions)
@@ -186,7 +185,6 @@ export class DataBinding {
 								const persistSuccessOptions: PersistSuccessOptions = {
 									...this.bindingOperations,
 									successType: result.type,
-									unstable_persistedEntityIds: persistedEntityIds,
 								}
 								await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
 								await onPersistSuccess?.(persistSuccessOptions)

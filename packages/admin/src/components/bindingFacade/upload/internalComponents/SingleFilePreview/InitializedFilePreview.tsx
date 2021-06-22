@@ -1,6 +1,6 @@
 import type { EntityAccessor } from '@contember/binding'
 import type { SingleFileUploadState } from '@contember/react-client'
-import { FilePreview, UploadProgress } from '@contember/ui'
+import { FilePreview, Message, UploadProgress } from '@contember/ui'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import type { FullFileKind } from '../../interfaces'
 
@@ -91,7 +91,7 @@ export function InitializedFilePreview({ fileKind, getContainingEntity, uploadSt
 
 	const getOverlay = (): ReactNode => {
 		if (uploadState.readyState === 'error' && uploadState.error?.options.endUserMessage) {
-			return uploadState.error.options.endUserMessage
+			return <Message type="danger">{uploadState.error.options.endUserMessage}</Message>
 		}
 		if (
 			uploadState.readyState === 'error' ||

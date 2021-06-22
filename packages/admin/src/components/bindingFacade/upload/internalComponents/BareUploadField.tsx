@@ -51,7 +51,7 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 		if (props.fileKinds.isDiscriminated) {
 			const children = (
 				<>
-					<SugaredField field={props.fileKinds.discriminationField} />
+					<SugaredField field={props.fileKinds.discriminationField} isNonbearing />
 					{Array.from(props.fileKinds.fileKinds.values(), (fileKind, i) => (
 						<Fragment key={i}>{staticRenderFileKind(fileKind.datum, environment)}</Fragment>
 					))}

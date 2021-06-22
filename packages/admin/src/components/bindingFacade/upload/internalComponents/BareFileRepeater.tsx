@@ -29,7 +29,7 @@ export const BareFileRepeater: ComponentType<BareFileRepeaterProps> = Component<
 		if (props.fileKinds.isDiscriminated) {
 			const renderedFileKinds = (
 				<>
-					<SugaredField field={props.fileKinds.discriminationField} />
+					<SugaredField field={props.fileKinds.discriminationField} isNonbearing />
 					{Array.from(props.fileKinds.fileKinds.values(), (fileKind, i) => (
 						<Fragment key={i}>{staticRenderFileKind(fileKind.datum, environment)}</Fragment>
 					))}

@@ -3,16 +3,14 @@ import { emptyArray } from '@contember/react-utils'
 import { FileUrlFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
 import type {
-	DestroyDataExtractorProps,
+	AudioFileDataExtractorProps,
 	FileUrlDataExtractorProps,
 	GenericFileMetadataExtractorProps,
-	AudioFileDataExtractorProps,
 } from '../fileDataExtractors'
 import {
-	getDestroyDataExtractor,
+	getAudioFileDataExtractor,
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
-	getAudioFileDataExtractor,
 } from '../fileDataExtractors'
 import type { AcceptFileOptions, FileDataExtractor, FullFileKind, RenderFilePreviewOptions } from '../interfaces'
 
@@ -20,7 +18,6 @@ export interface StockAudioFileKindProps<AcceptArtifacts = unknown>
 	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
 		FileUrlDataExtractorProps,
 		GenericFileMetadataExtractorProps,
-		DestroyDataExtractorProps,
 		AudioFileDataExtractorProps {
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
@@ -33,7 +30,6 @@ export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
 	acceptMimeTypes = 'audio/*',
 	acceptFile = acceptAudioFile,
 	children,
-	deleteOnRemoveField,
 	durationField,
 	fileSizeField,
 	fileTypeField,
@@ -46,7 +42,6 @@ export const getStockAudioFileKind = <AcceptArtifacts extends any = unknown>({
 }: StockAudioFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
-		getDestroyDataExtractor({ deleteOnRemoveField }),
 		getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
 		getAudioFileDataExtractor({ durationField }),
 		...additionalExtractors,

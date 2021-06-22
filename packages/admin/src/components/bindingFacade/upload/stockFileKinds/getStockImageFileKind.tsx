@@ -3,13 +3,11 @@ import { emptyArray } from '@contember/react-utils'
 import { ImageFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
 import type {
-	DestroyDataExtractorProps,
 	FileUrlDataExtractorProps,
 	GenericFileMetadataExtractorProps,
 	ImageFileDataExtractorProps,
 } from '../fileDataExtractors'
 import {
-	getDestroyDataExtractor,
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
 	getImageFileDataExtractor,
@@ -20,7 +18,6 @@ export interface StockImageFileKindProps<AcceptArtifacts = unknown>
 	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
 		FileUrlDataExtractorProps,
 		GenericFileMetadataExtractorProps,
-		DestroyDataExtractorProps,
 		ImageFileDataExtractorProps {
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
@@ -33,7 +30,6 @@ export const getStockImageFileKind = <AcceptArtifacts extends any = unknown>({
 	acceptMimeTypes = 'image/*',
 	acceptFile = acceptImageFile,
 	children,
-	deleteOnRemoveField,
 	fileSizeField,
 	fileTypeField,
 	lastModifiedField,
@@ -47,7 +43,6 @@ export const getStockImageFileKind = <AcceptArtifacts extends any = unknown>({
 }: StockImageFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
-		getDestroyDataExtractor({ deleteOnRemoveField }),
 		getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
 		getImageFileDataExtractor({ heightField, widthField }),
 		...additionalExtractors,

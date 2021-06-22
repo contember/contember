@@ -3,13 +3,11 @@ import { emptyArray } from '@contember/react-utils'
 import { VideoFieldView } from '../../fieldViews'
 import { defaultUploader } from '../defaultUploader'
 import type {
-	DestroyDataExtractorProps,
 	FileUrlDataExtractorProps,
 	GenericFileMetadataExtractorProps,
 	VideoFileDataExtractorProps,
 } from '../fileDataExtractors'
 import {
-	getDestroyDataExtractor,
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
 	getVideoFileDataExtractor,
@@ -20,7 +18,6 @@ export interface StockVideoFileKindProps<AcceptArtifacts = unknown>
 	extends Partial<Omit<FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts>, 'extractors'>>,
 		FileUrlDataExtractorProps,
 		GenericFileMetadataExtractorProps,
-		DestroyDataExtractorProps,
 		VideoFileDataExtractorProps {
 	additionalExtractors?: FileDataExtractor<unknown, S3FileUploader.SuccessMetadata, AcceptArtifacts>[]
 }
@@ -33,7 +30,6 @@ export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
 	acceptMimeTypes = 'video/*',
 	acceptFile = acceptVideoFile,
 	children,
-	deleteOnRemoveField,
 	durationField,
 	fileSizeField,
 	fileTypeField,
@@ -48,7 +44,6 @@ export const getStockVideoFileKind = <AcceptArtifacts extends any = unknown>({
 }: StockVideoFileKindProps<AcceptArtifacts>): FullFileKind<S3FileUploader.SuccessMetadata, AcceptArtifacts> => {
 	const extractors: FileDataExtractor<any, S3FileUploader.SuccessMetadata, AcceptArtifacts>[] = [
 		getFileUrlDataExtractor({ urlField }),
-		getDestroyDataExtractor({ deleteOnRemoveField }),
 		getGenericFileMetadataExtractor({ fileNameField, fileSizeField, fileTypeField, lastModifiedField }),
 		getVideoFileDataExtractor({ heightField, widthField, durationField }),
 		...additionalExtractors,

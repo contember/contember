@@ -13,6 +13,7 @@ export const UploadField = Component<UploadFieldProps>(
 	({
 		acceptFile,
 		acceptMimeTypes,
+		baseEntity,
 		children,
 		discriminationField,
 		extractors,
@@ -29,6 +30,7 @@ export const UploadField = Component<UploadFieldProps>(
 					{
 						acceptFile,
 						acceptMimeTypes,
+						baseEntity,
 						children,
 						discriminationField,
 						extractors,
@@ -43,6 +45,7 @@ export const UploadField = Component<UploadFieldProps>(
 			[
 				acceptFile,
 				acceptMimeTypes,
+				baseEntity,
 				children,
 				discriminationField,
 				extractors,

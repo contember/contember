@@ -38,6 +38,10 @@ export const useNormalizedUploadState = ({
 			getEntityByKey(fileId.toString()).batchUpdates(getEntity => {
 				purgeUpload([fileId])
 
+				if (fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined) {
+					getEntity = getEntity().getEntity(fileKinds.baseEntity).getAccessor
+				}
+
 				for (const fileKind of eachFileKind(fileKinds)) {
 					const getExtractorEntity =
 						fileKind.baseEntity === undefined ? getEntity : getEntity().getEntity(fileKind.baseEntity).getAccessor
@@ -52,6 +56,10 @@ export const useNormalizedUploadState = ({
 				}
 				if (fileKinds.isDiscriminated) {
 					getEntity().getField(fileKinds.discriminationField).updateValue(null)
+
+					if (fileKinds.baseEntity !== undefined) {
+						getEntity().deleteEntity()
+					}
 				}
 			})
 		},
@@ -116,7 +124,11 @@ export const useNormalizedUploadState = ({
 							if (fileKinds.isDiscriminated) {
 								const discriminated = resolvedKind.fileKind as DiscriminatedFileKind
 								const fileId = idsByFile.get(resolvedKind.acceptOptions.file)! as string
-								const fileEntity = getEntityByKey(fileId)
+								let fileEntity = getEntityByKey(fileId)
+
+								if (fileKinds.baseEntity !== undefined) {
+									fileEntity = fileEntity.getEntity(fileKinds.baseEntity)
+								}
 
 								fileEntity
 									.getField(fileKinds.discriminationField)

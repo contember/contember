@@ -6,6 +6,7 @@ export type ResolvedFileKinds =
 	| {
 			isDiscriminated: true
 			discriminationField: SugaredFieldProps['field']
+			baseEntity: string | undefined
 			fileKinds: NormalizedDiscriminatedData<FullFileKind<any, any>>
 	  }
 	| {

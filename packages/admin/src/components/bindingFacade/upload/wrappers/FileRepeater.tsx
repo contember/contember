@@ -14,6 +14,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 	({
 		acceptFile,
 		acceptMimeTypes,
+		baseEntity,
 		children,
 		discriminationField,
 		extractors,
@@ -30,6 +31,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 					{
 						acceptFile,
 						acceptMimeTypes,
+						baseEntity,
 						children,
 						discriminationField,
 						extractors,
@@ -44,6 +46,7 @@ export const FileRepeater = Component<FileRepeaterProps>(
 			[
 				acceptFile,
 				acceptMimeTypes,
+				baseEntity,
 				children,
 				discriminationField,
 				extractors,

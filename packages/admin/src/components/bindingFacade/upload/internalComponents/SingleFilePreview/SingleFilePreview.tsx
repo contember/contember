@@ -31,6 +31,10 @@ export const SingleFilePreview = memo(
 			}
 		}, [fileId, removeFile])
 
+		if (fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined) {
+			getContainingEntity = getContainingEntity().getEntity(fileKinds.baseEntity).getAccessor
+		}
+
 		if (uploadState !== undefined) {
 			if (uploadState.readyState === 'initializing') {
 				return <InitializingFilePreview />

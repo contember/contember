@@ -31,7 +31,7 @@ export const getResolvedFileKinds = (
 	if (
 		acceptFile !== undefined ||
 		acceptMimeTypes !== undefined ||
-		baseEntity !== undefined ||
+		// baseEntity !== undefined || // Deliberately left out
 		hasUploadedFile !== undefined ||
 		renderFilePreview !== undefined ||
 		renderUploadedFile !== undefined ||
@@ -47,7 +47,7 @@ export const getResolvedFileKinds = (
 		const mandatoryPropNames = [
 			// 'acceptFile' // Deliberately left out
 			'acceptMimeTypes',
-			'baseEntity',
+			// 'baseEntity', // Deliberately left out
 			'hasUploadedFile',
 			'renderFilePreview',
 			'renderUploadedFile',
@@ -98,6 +98,7 @@ export const getResolvedFileKinds = (
 		return {
 			isDiscriminated: true,
 			discriminationField,
+			baseEntity,
 			fileKinds: normalizedFileKinds,
 		}
 	}

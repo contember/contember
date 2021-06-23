@@ -1,14 +1,19 @@
 import type { FileUploadProgress } from '@contember/client'
 import type { FileId } from './FileId'
+import type { FileUploadMetadata } from './FileUploadMetadata'
 import type { FileWithMetadata } from './FileWithMetadata'
 
-export type FileUploadAction =
+export type FileUploadAction<Result = unknown, Metadata = undefined> =
 	| {
 			type: 'publishNewestState'
 	  }
 	| {
+			type: 'initialize'
+			files: Iterable<[FileId, FileWithMetadata]>
+	  }
+	| {
 			type: 'startUploading'
-			files: Iterable<[[FileId, File] | File, FileWithMetadata]>
+			files: Iterable<[File | FileId, FileUploadMetadata<Metadata>]>
 	  }
 	| {
 			type: 'updateUploadProgress'
@@ -16,13 +21,13 @@ export type FileUploadAction =
 	  }
 	| {
 			type: 'finishSuccessfully'
-			result: Iterable<[File | FileId, any]>
+			result: Iterable<[File | FileId, Result]>
 	  }
 	| {
 			type: 'finishWithError'
 			error: Iterable<(File | FileId) | [File | FileId, any]>
 	  }
 	| {
-			type: 'abort'
+			type: 'purge'
 			files: Iterable<File | FileId>
 	  }

@@ -5,14 +5,26 @@ import { toStateClass } from '../../../utils'
 
 export interface FileDropZoneProps extends HTMLAttributes<HTMLDivElement> {
 	isActive?: boolean
+	isAccepting?: boolean
+	isRejecting?: boolean
 	children?: ReactNode
 }
 
 export const FileDropZone = memo(
-	forwardRef<HTMLDivElement, FileDropZoneProps>(({ isActive, className, ...props }, ref) => {
+	forwardRef<HTMLDivElement, FileDropZoneProps>(({ isActive, isAccepting, isRejecting, className, ...props }, ref) => {
 		const prefix = useClassNamePrefix()
 		return (
-			<div {...props} className={cn(`${prefix}fileDropZone`, toStateClass('active', isActive), className)} ref={ref} />
+			<div
+				{...props}
+				className={cn(
+					`${prefix}fileDropZone`,
+					toStateClass('active', isActive),
+					toStateClass('accepting', isAccepting),
+					toStateClass('rejecting', isRejecting),
+					className,
+				)}
+				ref={ref}
+			/>
 		)
 	}),
 )

@@ -1,51 +1,23 @@
-import { Component } from '@contember/binding'
-import type { FunctionComponent } from 'react'
-import type { SimpleRelativeSingleFieldProps } from '../../auxiliary'
-import { ImageFieldView, ImageFieldViewProps } from '../../fieldViews'
-import { UploadField } from '../core'
-import {
-	FileDataPopulator,
-	FileUrlDataPopulator,
-	GenericFileMetadataPopulator,
-	GenericFileMetadataPopulatorProps,
-	ImageFileMetadataPopulator,
-	ImageFileMetadataPopulatorProps,
-} from '../fileDataPopulators'
-import { getImageFileDefaults } from '../stockFileKindDefaults'
+import { Component, EntityAccessor } from '@contember/binding'
+import type { ReactElement } from 'react'
+import { BareUploadField, FileInputPublicProps } from '../internalComponents'
+import type { StockImageFileKindProps } from '../stockFileKinds'
+import { getStockImageFileKind } from '../stockFileKinds'
 
-export type ImageUploadFieldProps = SimpleRelativeSingleFieldProps &
-	ImageFileMetadataPopulatorProps &
-	GenericFileMetadataPopulatorProps & {
-		additionalFileDataPopulators?: Iterable<FileDataPopulator>
-		formatPreviewUrl?: ImageFieldViewProps['formatUrl']
-		previewAlt?: string
-		previewTitle?: string
-	}
+export interface ImageUploadFieldProps<AcceptArtifacts = unknown>
+	extends StockImageFileKindProps<AcceptArtifacts>,
+		FileInputPublicProps {}
 
-export const ImageUploadField: FunctionComponent<ImageUploadFieldProps> = Component(props => {
-	const defaults = getImageFileDefaults(props.field)
-	return (
-		<UploadField
+export const ImageUploadField = Component<ImageUploadFieldProps>(
+	props => (
+		<BareUploadField
 			{...props}
-			fileUrlField={props.field}
-			accept={defaults.accept}
-			fileDataPopulators={[
-				...(props.additionalFileDataPopulators || []),
-				new FileUrlDataPopulator({ fileUrlField: props.field }),
-				new GenericFileMetadataPopulator(props),
-				new ImageFileMetadataPopulator(props),
-			]}
-			renderFile={() => (
-				<ImageFieldView
-					srcField={props.field}
-					formatUrl={props.formatPreviewUrl}
-					alt={props.previewAlt}
-					title={props.previewTitle}
-				/>
-			)}
-			renderFilePreview={(file, previewUrl) => (
-				<img src={previewUrl} alt={props.previewAlt} title={props.previewTitle} />
-			)}
+			fileKinds={{
+				isDiscriminated: false,
+				fileKind: getStockImageFileKind(props),
+				hasUploadedFile: (entity: EntityAccessor) => entity.getField(props.urlField).value !== null,
+			}}
 		/>
-	)
-}, 'ImageUploadField')
+	),
+	'ImageUploadField',
+) as <AcceptArtifacts = unknown>(props: ImageUploadFieldProps<AcceptArtifacts>) => ReactElement | null

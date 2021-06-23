@@ -1,32 +1,35 @@
 import type { FileUploader, FileUploadError } from '@contember/client'
 
-export type SingleFileUploadState<Result = any, Error extends FileUploadError = FileUploadError> =
+export type SingleFileUploadState<Result = unknown, Metadata = undefined> =
+	| {
+			readyState: 'initializing'
+			abortController: AbortController
+			file: File
+			previewUrl: string
+	  }
 	| {
 			readyState: 'uploading'
-			file: File
-			uploader: FileUploader
 			abortController: AbortController
+			file: File
+			metadata: Metadata
 			previewUrl: string
-			progress?: number
+			progress: number | undefined
+			uploader: FileUploader
 	  }
 	| {
 			readyState: 'success'
 			file: File
-			uploader: FileUploader
+			metadata: Metadata
 			previewUrl: string
 			result: Result
+			uploader: FileUploader
 	  }
 	| {
 			readyState: 'error'
+			errors: FileUploadError[] | undefined
+			rawError: any
 			file: File
-			uploader: FileUploader
+			metadata: Metadata | undefined
 			previewUrl: string
-			error: Error | undefined
-	  }
-	| {
-			readyState: 'aborted'
-			file: File
-			uploader: FileUploader
-			previewUrl: string
-			progress?: number
+			uploader: FileUploader | undefined
 	  }

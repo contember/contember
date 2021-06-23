@@ -13,6 +13,10 @@ export function DevError(props: DevErrorProps) {
 	if (props.error instanceof PromiseRejectionEvent) {
 		error = props.error.reason
 	} else if (props.error instanceof ErrorEvent) {
+		if (props.error.message.startsWith('ResizeObserver')) {
+			// Apparently, this can be ignored: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+			return null
+		}
 		error = props.error.error
 	} else {
 		error = props.error

@@ -4,7 +4,7 @@ import { ProgressBar } from '../../ProgressBar'
 import { Spinner } from '../../Spinner'
 
 export interface UploadProgressProps {
-	progress?: number // 0 to 1
+	progress?: string | number // 0 to 1
 	//fileSize?: number // In bytes
 	formatProgressMessage?: (progress?: number) => ReactNode
 }
@@ -17,27 +17,34 @@ export const UploadProgress: FunctionComponent<UploadProgressProps> = ({
 	progress,
 	formatProgressMessage = defaultFormatProgressMessage,
 }: UploadProgressProps) => {
-	const clampedProgress = Math.max(0, Math.min(progress ?? 0, 1))
 	const prefix = useClassNamePrefix()
+
+	const renderNumericProgress = (progress: number) => {
+		const clampedProgress = Math.max(0, Math.min(progress ?? 0, 1))
+
+		return (
+			<>
+				<div className={`${prefix}uploadProgress-progress`}>
+					<ProgressBar progress={clampedProgress} />
+				</div>
+				<div className={`${prefix}uploadProgress-message`}>
+					<div className={`${prefix}uploadProgress-message-stabilizer`}>{formatProgressMessage(1)}</div>
+					<div className={`${prefix}uploadProgress-message-real`}>{formatProgressMessage(clampedProgress)}</div>
+				</div>
+			</>
+		)
+	}
+	const renderStringProgress = (progress: string) => <div className={`${prefix}uploadProgress-message`}>{progress}</div>
 
 	return (
 		<div className={`${prefix}uploadProgress`}>
-			{progress === undefined && (
+			{(progress === undefined || typeof progress === 'string') && (
 				<div className={`${prefix}uploadProgress-indeterminate`}>
 					<Spinner />
 				</div>
 			)}
-			{progress !== undefined && (
-				<>
-					<div className={`${prefix}uploadProgress-progress`}>
-						<ProgressBar progress={clampedProgress} />
-					</div>
-					<div className={`${prefix}uploadProgress-message`}>
-						<div className={`${prefix}uploadProgress-message-stabilizer`}>{formatProgressMessage(1)}</div>
-						<div className={`${prefix}uploadProgress-message-real`}>{formatProgressMessage(clampedProgress)}</div>
-					</div>
-				</>
-			)}
+			{typeof progress === 'number' && renderNumericProgress(progress)}
+			{typeof progress === 'string' && renderStringProgress(progress)}
 		</div>
 	)
 }

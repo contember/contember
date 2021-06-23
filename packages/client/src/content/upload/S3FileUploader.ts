@@ -28,10 +28,6 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 		files: Map<File, UploadedFileMetadata>,
 		{ contentApiClient, onSuccess, onError, onProgress }: FileUploaderInitializeOptions,
 	) {
-		if (!contentApiClient) {
-			return onError?.(files.keys())
-		}
-
 		const parameters: GenerateUploadUrlMutationBuilder.MutationParameters = {}
 
 		for (const [file, metadata] of files) {
@@ -101,7 +97,7 @@ class S3FileUploader implements FileUploader<S3FileUploader.SuccessMetadata> {
 				xhr.send(uploadRequestBody)
 			}
 		} catch (error) {
-			onError?.(Array.from(files).map(([file]) => [file, error]))
+			onError(Array.from(files).map(([file]) => [file, error]))
 		}
 	}
 }

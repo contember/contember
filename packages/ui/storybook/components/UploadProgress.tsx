@@ -18,6 +18,11 @@ storiesOf('UploadProgress', module)
 			<UploadProgress />
 		</div>
 	))
+	.add('indeterminate with message', () => (
+		<div style={borderStyle}>
+			<UploadProgress progress="Processing stuff" />
+		</div>
+	))
 	.add('progressing', () => {
 		const progress = number('Progress', 0.5, {
 			range: true,

@@ -1,4 +1,5 @@
 import type { FileUploader, FileUploaderInitializeOptions, UploadedFileMetadata } from '@contember/client'
+import { FileUploadError } from '@contember/client'
 import tus from 'tus-js-client'
 
 interface VimeoFileUploaderState {
@@ -27,16 +28,8 @@ class VimeoFileUploader implements FileUploader {
 		if (!files.size) {
 			return
 		}
-		if (!contentApiClient) {
-			return onError?.(files.keys())
-		}
 
-		const parameters: Map<
-			string,
-			{
-				size: number
-			}
-		> = new Map()
+		const parameters: Map<string, { size: number }> = new Map()
 
 		for (const [file, metadata] of files) {
 			if (this.uploadState.has(file)) {
@@ -81,14 +74,7 @@ class VimeoFileUploader implements FileUploader {
 				const datumBody = responseData[VimeoFileUploader.formatFullAlias(fileState.alias)]
 
 				if (!datumBody.ok) {
-					onError?.([
-						[
-							file,
-							{
-								endUserMessage: datumBody.errors.endUserMessage,
-							},
-						],
-					])
+					onError([[file, new FileUploadError({ endUserMessage: datumBody.errors.endUserMessage })]])
 				}
 
 				const { vimeoId, uploadUrl } = datumBody.result
@@ -97,19 +83,11 @@ class VimeoFileUploader implements FileUploader {
 					endpoint: 'none',
 					retryDelays: [0, 3000, 5000, 10000, 20000],
 					onError: (error: Error) => {
-						// Not sending error.message because it might not necessarily be user-safe.
-						onError?.([file])
+						onError([[file, new FileUploadError({ developerMessage: error.message })]])
 					},
 					onProgress: (bytesUploaded, bytesTotal) => {
 						const progress = bytesUploaded / bytesTotal
-						onProgress?.([
-							[
-								file,
-								{
-									progress,
-								},
-							],
-						])
+						onProgress([[file, { progress }]])
 					},
 					onSuccess: () => {
 						const successMetadata = this.options.mapVimeoIdToResult
@@ -127,18 +105,11 @@ class VimeoFileUploader implements FileUploader {
 				upload.start()
 			}
 		} catch (error) {
-			onError?.(files.keys())
+			onError(files.keys())
 		}
 	}
 
-	private buildAPIQuery(
-		parameters: Map<
-			string,
-			{
-				size: number
-			}
-		>,
-	): string {
+	private buildAPIQuery(parameters: Map<string, { size: number }>): string {
 		return `
 mutation {
 	${Array.from(parameters)

@@ -5,6 +5,7 @@ import type {
 	FieldViewDictionary,
 	PersistFeedbackDictionary,
 	RepeaterDictionary,
+	UploadDictionary,
 } from './components'
 
 // This isn't in i18n in order to avoid unnecessary circular imports.
@@ -16,4 +17,5 @@ export type AdminDictionary = DataGridCellsDictionary &
 	ErrorCodeDictionary &
 	FieldViewDictionary &
 	PersistFeedbackDictionary &
-	RepeaterDictionary
+	RepeaterDictionary &
+	UploadDictionary

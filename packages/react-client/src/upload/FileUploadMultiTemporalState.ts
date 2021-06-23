@@ -1,11 +1,10 @@
 import type { FileId } from './FileId'
 import type { FileUploadCompoundState } from './FileUploadCompoundState'
 
-export interface FileUploadMultiTemporalState {
+export interface FileUploadMultiTemporalState<Result = unknown, Metadata = undefined> {
 	lastUpdateTime: number
-	stockFileIdSeed: number
 	isLiveStateDirty: boolean
 	fileIdByFile: WeakMap<File, FileId>
-	publicState: FileUploadCompoundState
-	liveState: FileUploadCompoundState
+	publicState: FileUploadCompoundState<Result, Metadata>
+	liveState: FileUploadCompoundState<Result, Metadata>
 }

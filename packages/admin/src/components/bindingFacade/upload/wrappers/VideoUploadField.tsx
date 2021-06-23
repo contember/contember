@@ -1,38 +1,23 @@
-import { Component } from '@contember/binding'
-import type { FunctionComponent } from 'react'
-import type { SimpleRelativeSingleFieldProps } from '../../auxiliary'
-import { UploadField } from '../core'
-import {
-	FileDataPopulator,
-	FileUrlDataPopulator,
-	GenericFileMetadataPopulator,
-	GenericFileMetadataPopulatorProps,
-	VideoFileMetadataPopulator,
-	VideoFileMetadataPopulatorProps,
-} from '../fileDataPopulators'
-import { getVideoFileDefaults } from '../stockFileKindDefaults'
+import { Component, EntityAccessor } from '@contember/binding'
+import type { ReactElement } from 'react'
+import { BareUploadField, FileInputPublicProps } from '../internalComponents'
+import type { StockVideoFileKindProps } from '../stockFileKinds'
+import { getStockVideoFileKind } from '../stockFileKinds'
 
-export type VideoUploadFieldProps = SimpleRelativeSingleFieldProps &
-	VideoFileMetadataPopulatorProps &
-	GenericFileMetadataPopulatorProps & {
-		additionalFileDataPopulators?: Iterable<FileDataPopulator>
-	}
+export interface VideoUploadFieldProps<AcceptArtifacts = unknown>
+	extends StockVideoFileKindProps<AcceptArtifacts>,
+		FileInputPublicProps {}
 
-export const VideoUploadField: FunctionComponent<VideoUploadFieldProps> = Component(props => {
-	const defaults = getVideoFileDefaults(props.field)
-	return (
-		<UploadField
+export const VideoUploadField = Component<VideoUploadFieldProps>(
+	props => (
+		<BareUploadField
 			{...props}
-			fileUrlField={props.field}
-			accept={defaults.accept}
-			fileDataPopulators={[
-				...(props.additionalFileDataPopulators || []),
-				new FileUrlDataPopulator({ fileUrlField: props.field }),
-				new GenericFileMetadataPopulator(props),
-				new VideoFileMetadataPopulator(props),
-			]}
-			renderFile={defaults.renderFile}
-			renderFilePreview={defaults.renderFilePreview}
+			fileKinds={{
+				isDiscriminated: false,
+				fileKind: getStockVideoFileKind(props),
+				hasUploadedFile: (entity: EntityAccessor) => entity.getField(props.urlField).value !== null,
+			}}
 		/>
-	)
-}, 'VideoUploadField')
+	),
+	'VideoUploadField',
+) as <AcceptArtifacts = unknown>(props: VideoUploadFieldProps<AcceptArtifacts>) => ReactElement | null

@@ -1,8 +1,8 @@
 export const uploadDictionary = {
 	upload: {
-		emptyMessage: {
-			text: 'No files uploaded',
-		},
+		// emptyMessage: {
+		// 	text: 'No files uploaded',
+		// },
 		addButton: {
 			text: 'Select files to upload',
 			subText: 'or drag & drop',

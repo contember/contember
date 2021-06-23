@@ -3,11 +3,13 @@ import type { ReactNode } from 'react'
 import type { DropzoneState } from 'react-dropzone'
 import type { MessageFormatter } from '../../../../i18n'
 import type { RepeaterContainerPublicProps } from '../../collections'
-import { EmptyMessage } from '../../collections'
 import type { UploadDictionary } from '../uploadDictionary'
 
 export interface FileInputPublicProps
-	extends RepeaterContainerPublicProps,
+	extends Omit<
+			RepeaterContainerPublicProps,
+			'emptyMessage' | 'emptyMessageComponent' | 'emptyMessageComponentExtraProps'
+		>,
 		Pick<FormGroupProps, 'label' | 'description' | 'labelDescription'> {
 	addButtonSubText?: ReactNode
 }
@@ -28,25 +30,26 @@ export function FileInput({
 	formatMessage,
 	enableAddingNew = true,
 
+	// emptyMessage,
+	// emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
+	// emptyMessageComponentExtraProps,
+
 	addButtonComponent: AddButton = Button,
 	addButtonComponentExtraProps,
 	addButtonProps,
 	addButtonText,
 	addButtonSubText,
-	emptyMessage,
-	emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
-	emptyMessageComponentExtraProps,
 }: FileInputProps) {
 	const { getRootProps, isDragActive, getInputProps } = dropzoneState
 
 	return (
 		<FormGroup label={label} useLabelElement={false} description={description} labelDescription={labelDescription}>
 			<div className="fileInput">
-				{children === undefined && (
-					<EmptyMessageComponent {...emptyMessageComponentExtraProps}>
-						{formatMessage(emptyMessage, 'upload.emptyMessage.text')}
-					</EmptyMessageComponent>
-				)}
+				{/*{children === undefined && (*/}
+				{/*	<EmptyMessageComponent {...emptyMessageComponentExtraProps}>*/}
+				{/*		{formatMessage(emptyMessage, 'upload.emptyMessage.text')}*/}
+				{/*	</EmptyMessageComponent>*/}
+				{/*)}*/}
 				{children !== undefined && children}
 				{enableAddingNew && (
 					<FileDropZone {...getRootProps()} isActive={isDragActive} className="fileInput-dropZone">

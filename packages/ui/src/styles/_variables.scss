@@ -634,6 +634,8 @@ $cui-progressBar-foreground-color: #85FF00;
 // FileDropZone
 $cui-fileDropZone-border-color: #DFDFDF;
 $cui-fileDropZone-active-border-color: $cui-box-active-color;
+$cui-fileDropZone-accepting-border-color: $cui-box-active-color; // Deliberately active, and not success
+$cui-fileDropZone-rejecting-border-color: $cui-control-validation-invalid-border-color;
 
 // Editor
 $cui-editor-heading-counters: (

@@ -40,7 +40,7 @@ export function FileInput({
 	addButtonText,
 	addButtonSubText,
 }: FileInputProps) {
-	const { getRootProps, isDragActive, getInputProps } = dropzoneState
+	const { getRootProps, isDragActive, isDragAccept, isDragReject, getInputProps } = dropzoneState
 
 	return (
 		<FormGroup label={label} useLabelElement={false} description={description} labelDescription={labelDescription}>
@@ -52,7 +52,13 @@ export function FileInput({
 				{/*)}*/}
 				{children !== undefined && children}
 				{enableAddingNew && (
-					<FileDropZone {...getRootProps()} isActive={isDragActive} className="fileInput-dropZone">
+					<FileDropZone
+						{...getRootProps()}
+						isActive={isDragActive}
+						isAccepting={isDragAccept}
+						isRejecting={isDragReject}
+						className="fileInput-dropZone"
+					>
 						<input {...getInputProps()} />
 						<div className="fileInput-cta">
 							<AddButton

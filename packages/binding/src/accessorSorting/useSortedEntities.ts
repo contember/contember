@@ -4,7 +4,7 @@ import type { EntityAccessor, EntityListAccessor } from '../accessors'
 import type { SugaredFieldProps } from '../helperComponents'
 import type { RelativeSingleField } from '../treeParameters'
 import { addEntityAtIndex } from './addEntityAtIndex'
-import { throwNonWritableError, throwNoopError } from './errors'
+import { throwNoopError } from './errors'
 import { moveEntity } from './moveEntity'
 import { sortEntities } from './sortEntities'
 
@@ -26,7 +26,7 @@ const addNewAtIndexImplementation = (
 ) => {
 	if (!desugaredSortableByField) {
 		if (index === sortedEntitiesCount) {
-			return entityList.createNewEntity()
+			return entityList.createNewEntity(preprocess)
 		}
 		return throwNoopError(callbackName)
 	}

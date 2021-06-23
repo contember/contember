@@ -90,4 +90,16 @@ export const csCZ: AdminDictionary = {
 			text: 'Nic tu není. Zkuste přidat novou položku.',
 		},
 	},
+	upload: {
+		addButton: {
+			text: 'Vyberte soubory',
+			subText: 'or nebo je sem přetáhněte',
+		},
+		fileState: {
+			inspectingFile: 'Zkoumám soubor…',
+			invalidFile: 'Chybný soubor',
+			failedUpload: 'Nahrávání selhalo',
+			finalizing: 'Dokončuji…',
+		},
+	},
 }

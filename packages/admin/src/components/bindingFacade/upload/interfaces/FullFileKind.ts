@@ -1,3 +1,4 @@
+import type { AsyncBatchUpdatesOptions } from '@contember/binding'
 import type { FileUploader, FileUploadError } from '@contember/client'
 import type { ReactNode } from 'react'
 import type { FileDataExtractor } from './FileDataExtractor'
@@ -8,7 +9,7 @@ export interface RenderFilePreviewOptions<AcceptArtifacts = unknown> {
 	acceptArtifacts: AcceptArtifacts
 }
 
-export interface AcceptFileOptions {
+export interface AcceptFileOptions extends AsyncBatchUpdatesOptions {
 	file: File
 	abortSignal: AbortSignal
 	objectUrl: string

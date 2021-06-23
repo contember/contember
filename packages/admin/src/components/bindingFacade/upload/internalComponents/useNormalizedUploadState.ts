@@ -1,4 +1,4 @@
-import { EntityAccessor, useGetEntityByKey, useMutationState, VariableInputTransformer } from '@contember/binding'
+import { EntityAccessor, useBindingOperations, useMutationState, VariableInputTransformer } from '@contember/binding'
 import { FileUploadError } from '@contember/client'
 import type { FileId, FileUploadCompoundState, FileWithMetadata, StartUploadFileOptions } from '@contember/react-client'
 import { useFileUpload } from '@contember/react-client'
@@ -30,14 +30,14 @@ export const useNormalizedUploadState = ({
 }: NormalizedUploadStateOptions): NormalizedUploadState => {
 	const fileUpload = useFileUpload()
 	const isMutating = useMutationState()
-	const getEntityByKey = useGetEntityByKey()
+	const bindingOperations = useBindingOperations()
 	const resolvedAccept = useAllAcceptedMimes(fileKinds)
 
 	const [uploadState, { initializeUpload, startUpload, purgeUpload, failUpload }] = fileUpload
 
 	const removeFile = useCallback(
 		(fileId: FileId) => {
-			getEntityByKey(fileId.toString()).batchUpdates(getEntity => {
+			bindingOperations.getEntityByKey(fileId.toString()).batchUpdates(getEntity => {
 				purgeUpload([fileId])
 
 				if (fileKinds.isDiscriminated && fileKinds.baseEntity !== undefined) {
@@ -65,11 +65,20 @@ export const useNormalizedUploadState = ({
 				}
 			})
 		},
-		[fileKinds, getEntityByKey, purgeUpload],
+		[fileKinds, bindingOperations, purgeUpload],
 	)
 
 	const onDrop = useCallback(
 		(files: File[]) => {
+			const {
+				getEntityByKey,
+				getEntityListSubTree,
+				getEntitySubTree,
+				contentClient,
+				systemClient,
+				tenantClient,
+			} = bindingOperations
+
 			const idsByFile = new Map<File, FileId>()
 			const filesWithIds: [FileId, File][] = []
 			let metadataByFileId: Map<FileId, FileWithMetadata>
@@ -94,6 +103,13 @@ export const useNormalizedUploadState = ({
 								file: fileMetadata.file,
 								abortSignal: fileMetadata.abortController.signal,
 								objectUrl: fileMetadata.previewUrl,
+
+								getEntityByKey,
+								getEntityListSubTree,
+								getEntitySubTree,
+								contentClient,
+								systemClient,
+								tenantClient,
 							},
 							fileKinds,
 						),
@@ -166,7 +182,7 @@ export const useNormalizedUploadState = ({
 				})
 			})
 		},
-		[initializeUpload, prepareEntityForNewFile, fileKinds, startUpload, getEntityByKey, failUpload],
+		[initializeUpload, prepareEntityForNewFile, fileKinds, startUpload, bindingOperations, failUpload],
 	)
 	const dropzoneState = useDropzone({
 		onDrop,

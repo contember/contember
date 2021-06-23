@@ -1,6 +1,8 @@
 import { Component, EntityAccessor, HasOne, SugaredField, useEntity } from '@contember/binding'
 import { Fragment, useCallback, useState } from 'react'
+import { useMessageFormatter } from '../../../../i18n'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
+import { uploadDictionary } from '../uploadDictionary'
 import { hasUploadedFile, staticRenderFileKind } from '../utils'
 import type { FileInputPublicProps } from './FileInput'
 import { FileInput } from './FileInput'
@@ -15,6 +17,7 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 	({ fileKinds: unstableFileKinds, ...fileInputProps }) => {
 		const parentEntity = useEntity()
 		const [fileKinds] = useState(() => unstableFileKinds)
+		const formatMessage = useMessageFormatter(uploadDictionary)
 
 		const prepareEntityForNewFile = useCallback<(initialize: EntityAccessor.BatchUpdatesHandler) => void>(
 			initialize => parentEntity.batchUpdates(initialize),
@@ -38,6 +41,7 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 					<SingleFilePreview
 						getContainingEntity={parentEntity.getAccessor}
 						fileId={parentEntity.key}
+						formatMessage={formatMessage}
 						removeFile={removeFile}
 						uploadState={uploadState.get(parentEntity.key)}
 						fileKinds={fileKinds}
@@ -45,7 +49,9 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 				</div>
 			) : undefined
 
-		return <FileInput {...fileInputProps} dropzoneState={dropzoneState} children={children} />
+		return (
+			<FileInput {...fileInputProps} dropzoneState={dropzoneState} formatMessage={formatMessage} children={children} />
+		)
 	},
 	(props, environment) => {
 		if (props.fileKinds.isDiscriminated) {

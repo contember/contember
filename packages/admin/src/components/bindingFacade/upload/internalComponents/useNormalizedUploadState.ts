@@ -1,10 +1,4 @@
-import {
-	EntityAccessor,
-	useEntityPersistSuccess,
-	useGetEntityByKey,
-	useMutationState,
-	VariableInputTransformer,
-} from '@contember/binding'
+import { EntityAccessor, useGetEntityByKey, useMutationState, VariableInputTransformer } from '@contember/binding'
 import { FileUploadError } from '@contember/client'
 import type { FileId, FileUploadCompoundState, FileWithMetadata, StartUploadFileOptions } from '@contember/react-client'
 import { useFileUpload } from '@contember/react-client'
@@ -12,8 +6,8 @@ import { useCallback } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 import { DropzoneState, useDropzone } from 'react-dropzone'
 import { assertNever } from '../../../../utils'
-import { AcceptFileKindError } from '../interfaces'
 import type { DiscriminatedFileKind } from '../interfaces'
+import { AcceptFileKindError } from '../interfaces'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
 import { eachFileKind, resolveAcceptingFileKind, ResolvedAcceptingFileKind, useAllAcceptedMimes } from '../utils'
 

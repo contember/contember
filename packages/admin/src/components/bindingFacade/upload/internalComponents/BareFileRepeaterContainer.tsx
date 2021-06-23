@@ -2,8 +2,10 @@ import { useGetEntityByKey, useMutationState } from '@contember/binding'
 import type { FileId } from '@contember/react-client'
 import type { FunctionComponent } from 'react'
 import { ReactNode, useCallback, useState } from 'react'
+import { useMessageFormatter } from '../../../../i18n'
 import { RepeaterContainerPrivateProps, SortableRepeaterItem } from '../../collections'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
+import { uploadDictionary } from '../uploadDictionary'
 import { FileInput, FileInputPublicProps } from './FileInput'
 import { SingleFilePreview } from './SingleFilePreview'
 import { useNormalizedUploadState } from './useNormalizedUploadState'
@@ -28,13 +30,14 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	// These are here just to remove them from the spread below
 	accessor,
 	children,
-	formatMessage,
+	formatMessage: _,
 
 	...fileInputProps
 }) => {
 	const isMutating = useMutationState()
 	const getEntityByKey = useGetEntityByKey()
 	const [fileKinds] = useState(() => unstableFileKinds)
+	const formatMessage = useMessageFormatter(uploadDictionary)
 
 	const { uploadState, dropzoneState, removeFile } = useNormalizedUploadState({
 		isMultiple: true,
@@ -61,6 +64,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 					<SingleFilePreview
 						getContainingEntity={entity.getAccessor}
 						fileId={entity.key}
+						formatMessage={formatMessage}
 						removeFile={normalizedRemoveFile}
 						uploadState={entityUploadState}
 						fileKinds={fileKinds}
@@ -74,6 +78,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 		<FileInput
 			{...fileInputProps}
 			dropzoneState={dropzoneState}
+			formatMessage={formatMessage}
 			children={isEmpty && !previews.length ? undefined : previews}
 		/>
 	)

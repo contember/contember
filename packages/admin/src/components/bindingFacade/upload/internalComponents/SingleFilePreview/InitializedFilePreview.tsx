@@ -2,11 +2,14 @@ import type { EntityAccessor } from '@contember/binding'
 import type { SingleFileUploadState } from '@contember/react-client'
 import { ErrorList, FilePreview, Message, UploadProgress } from '@contember/ui'
 import { ReactNode, useEffect, useRef, useState } from 'react'
+import type { MessageFormatter } from '../../../../../i18n'
 import type { FullFileKind } from '../../interfaces'
+import type { UploadDictionary } from '../../uploadDictionary'
 
 export interface InitializedFilePreviewProps {
 	fileKind: FullFileKind
 	getContainingEntity: EntityAccessor.GetEntityAccessor
+	formatMessage: MessageFormatter<UploadDictionary>
 	uploadState: SingleFileUploadState & { readyState: 'uploading' | 'success' | 'error' | 'aborted' }
 }
 
@@ -19,7 +22,12 @@ type ExtractionState =
 			data: any[]
 	  }
 
-export function InitializedFilePreview({ fileKind, getContainingEntity, uploadState }: InitializedFilePreviewProps) {
+export function InitializedFilePreview({
+	fileKind,
+	getContainingEntity,
+	formatMessage,
+	uploadState,
+}: InitializedFilePreviewProps) {
 	const [extractionState, setExtractionState] = useState<ExtractionState>({ name: 'uninitialized' })
 	const isMountedRef = useRef(true)
 
@@ -94,7 +102,7 @@ export function InitializedFilePreview({ fileKind, getContainingEntity, uploadSt
 			const endUserMessages = uploadState.errors
 				? uploadState.errors
 						.filter(error => !!error.options.endUserMessage)
-						.map(error => ({ message: error.options.endUserMessage! }))
+						.map(error => ({ message: formatMessage(error.options.endUserMessage!, 'upload.fileState.failedUpload') }))
 				: []
 
 			if (endUserMessages.length) {
@@ -102,13 +110,13 @@ export function InitializedFilePreview({ fileKind, getContainingEntity, uploadSt
 			}
 		}
 		if (uploadState.readyState === 'error' || extractionState.name === 'error') {
-			return <Message type="danger">Upload failed</Message>
+			return <Message type="danger">{formatMessage('upload.fileState.failedUpload')}</Message>
 		}
 		if (uploadState.readyState === 'success') {
 			if (extractionState.name === 'success') {
 				return undefined
 			}
-			return <UploadProgress progress="Finalizing" />
+			return <UploadProgress progress={formatMessage('upload.fileState.finalizing')} />
 		}
 		if (uploadState.readyState === 'uploading') {
 			return <UploadProgress progress={uploadState.progress} />

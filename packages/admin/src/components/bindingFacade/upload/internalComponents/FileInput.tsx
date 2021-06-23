@@ -1,8 +1,10 @@
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import type { ReactNode } from 'react'
 import type { DropzoneState } from 'react-dropzone'
-import { EmptyMessage } from '../../collections'
+import type { MessageFormatter } from '../../../../i18n'
 import type { RepeaterContainerPublicProps } from '../../collections'
+import { EmptyMessage } from '../../collections'
+import type { UploadDictionary } from '../uploadDictionary'
 
 export interface FileInputPublicProps
 	extends RepeaterContainerPublicProps,
@@ -12,6 +14,7 @@ export interface FileInputPublicProps
 
 export interface FileInputProps extends FileInputPublicProps {
 	dropzoneState: DropzoneState
+	formatMessage: MessageFormatter<UploadDictionary>
 	children: ReactNode
 }
 
@@ -22,13 +25,14 @@ export function FileInput({
 	description,
 	labelDescription,
 	children,
+	formatMessage,
 	enableAddingNew = true,
 
 	addButtonComponent: AddButton = Button,
 	addButtonComponentExtraProps,
 	addButtonProps,
-	addButtonText = 'Select files to upload',
-	addButtonSubText = 'or drag & drop',
+	addButtonText,
+	addButtonSubText,
 	emptyMessage,
 	emptyMessageComponent: EmptyMessageComponent = EmptyMessage,
 	emptyMessageComponentExtraProps,
@@ -40,7 +44,7 @@ export function FileInput({
 			<div className="fileInput">
 				{children === undefined && (
 					<EmptyMessageComponent {...emptyMessageComponentExtraProps}>
-						{emptyMessage ?? 'No files uploaded.'}
+						{formatMessage(emptyMessage, 'upload.emptyMessage.text')}
 					</EmptyMessageComponent>
 				)}
 				{children !== undefined && children}
@@ -48,8 +52,13 @@ export function FileInput({
 					<FileDropZone {...getRootProps()} isActive={isDragActive} className="fileInput-dropZone">
 						<input {...getInputProps()} />
 						<div className="fileInput-cta">
-							<AddButton size="small" {...addButtonComponentExtraProps} children={addButtonText} {...addButtonProps} />
-							{addButtonSubText && <span className="fileInput-cta-label">{addButtonSubText}</span>}
+							<AddButton
+								size="small"
+								{...addButtonComponentExtraProps}
+								children={formatMessage(addButtonText, 'upload.addButton.text')}
+								{...addButtonProps}
+							/>
+							<span className="fileInput-cta-label">{formatMessage(addButtonSubText, 'upload.addButton.subText')}</span>
 						</div>
 					</FileDropZone>
 				)}

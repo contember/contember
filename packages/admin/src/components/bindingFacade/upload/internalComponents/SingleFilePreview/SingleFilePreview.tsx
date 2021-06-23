@@ -2,8 +2,10 @@ import { BindingError, Entity, EntityAccessor } from '@contember/binding'
 import type { FileId, SingleFileUploadState } from '@contember/react-client'
 import { ActionableBox, Box } from '@contember/ui'
 import { memo, ReactElement, useMemo } from 'react'
+import type { MessageFormatter } from '../../../../../i18n'
 import type { FullFileKind } from '../../interfaces'
 import type { ResolvedFileKinds } from '../../ResolvedFileKinds'
+import type { UploadDictionary } from '../../uploadDictionary'
 import { getEntityFileKind, hasUploadedFile } from '../../utils'
 import { ErrorFilePreview } from './ErrorFilePreview'
 import { InitializedFilePreview } from './InitializedFilePreview'
@@ -13,13 +15,14 @@ import { UploadedFilePreview } from './UploadedFilePreview'
 export interface SingleFilePreviewProps {
 	getContainingEntity: EntityAccessor.GetEntityAccessor
 	fileId: FileId
+	formatMessage: MessageFormatter<UploadDictionary>
 	removeFile: ((fileId: FileId) => void) | undefined
 	uploadState: SingleFileUploadState | undefined
 	fileKinds: ResolvedFileKinds
 }
 
 export const SingleFilePreview = memo(
-	({ fileId, fileKinds, getContainingEntity, removeFile, uploadState }: SingleFilePreviewProps) => {
+	({ fileId, fileKinds, formatMessage, getContainingEntity, removeFile, uploadState }: SingleFilePreviewProps) => {
 		let fileKind: FullFileKind | undefined
 		let preview: ReactElement | null = null
 
@@ -38,13 +41,13 @@ export const SingleFilePreview = memo(
 
 		if (uploadState !== undefined) {
 			if (uploadState.readyState === 'initializing') {
-				return <InitializingFilePreview />
+				return <InitializingFilePreview formatMessage={formatMessage} />
 			}
 			fileKind = getEntityFileKind(fileKinds, getContainingEntity)
 
 			if (uploadState.readyState === 'error' && fileKind === undefined) {
 				fileKind = undefined
-				preview = <ErrorFilePreview uploadState={uploadState} />
+				preview = <ErrorFilePreview uploadState={uploadState} formatMessage={formatMessage} />
 			} else {
 				if (fileKind === undefined) {
 					throw new BindingError()
@@ -52,6 +55,7 @@ export const SingleFilePreview = memo(
 				preview = (
 					<InitializedFilePreview
 						fileKind={fileKind}
+						formatMessage={formatMessage}
 						getContainingEntity={getContainingEntity}
 						uploadState={uploadState}
 					/>

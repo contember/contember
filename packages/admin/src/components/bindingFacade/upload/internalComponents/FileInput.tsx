@@ -1,3 +1,4 @@
+import type { ErrorAccessor } from '@contember/binding'
 import { Button, FileDropZone, FormGroup, FormGroupProps } from '@contember/ui'
 import type { ReactNode } from 'react'
 import type { DropzoneState } from 'react-dropzone'
@@ -17,11 +18,13 @@ export interface FileInputPublicProps
 export interface FileInputProps extends FileInputPublicProps {
 	dropzoneState: DropzoneState
 	formatMessage: MessageFormatter<UploadDictionary>
+	errors: ErrorAccessor | undefined
 	children: ReactNode
 }
 
 export function FileInput({
 	dropzoneState,
+	errors,
 
 	label,
 	description,
@@ -43,7 +46,13 @@ export function FileInput({
 	const { getRootProps, isDragActive, isDragAccept, isDragReject, getInputProps } = dropzoneState
 
 	return (
-		<FormGroup label={label} useLabelElement={false} description={description} labelDescription={labelDescription}>
+		<FormGroup
+			label={label}
+			useLabelElement={false}
+			description={description}
+			labelDescription={labelDescription}
+			errors={errors}
+		>
 			<div className="fileInput">
 				{/*{children === undefined && (*/}
 				{/*	<EmptyMessageComponent {...emptyMessageComponentExtraProps}>*/}

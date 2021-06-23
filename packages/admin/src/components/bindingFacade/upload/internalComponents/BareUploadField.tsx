@@ -50,7 +50,13 @@ export const BareUploadField = Component<BareUploadFieldProps>(
 			) : undefined
 
 		return (
-			<FileInput {...fileInputProps} dropzoneState={dropzoneState} formatMessage={formatMessage} children={children} />
+			<FileInput
+				{...fileInputProps}
+				dropzoneState={dropzoneState}
+				formatMessage={formatMessage}
+				errors={parentWithBase.errors}
+				children={children}
+			/>
 		)
 	},
 	(props, environment) => {

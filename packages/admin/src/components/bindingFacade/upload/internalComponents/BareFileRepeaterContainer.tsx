@@ -22,6 +22,7 @@ export interface BareFileRepeaterContainerProps
 		RepeaterContainerPrivateProps {}
 
 export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContainerProps> = ({
+	accessor,
 	entities,
 	isEmpty,
 	fileKinds: unstableFileKinds,
@@ -29,7 +30,6 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	sortableBy,
 
 	// These are here just to remove them from the spread below
-	accessor,
 	children,
 	formatMessage: _,
 
@@ -88,6 +88,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 			{...fileInputProps}
 			dropzoneState={dropzoneState}
 			formatMessage={formatMessage}
+			errors={accessor.errors}
 			children={isEmpty && !previews.length ? undefined : previews}
 		/>
 	)

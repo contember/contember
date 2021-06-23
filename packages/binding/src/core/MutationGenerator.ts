@@ -192,7 +192,7 @@ export class MutationGenerator {
 			entityRealm,
 			new CrudQueryBuilder.WriteDataBuilder(),
 		)
-		if (updateBuilder.data === undefined && isEmptyObject(updateBuilder.data)) {
+		if (updateBuilder.data === undefined || isEmptyObject(updateBuilder.data)) {
 			return queryBuilder
 		}
 
@@ -238,7 +238,7 @@ export class MutationGenerator {
 			entityRealm,
 			new CrudQueryBuilder.WriteDataBuilder(),
 		)
-		if (createBuilder.data === undefined && isEmptyObject(createBuilder.data)) {
+		if (createBuilder.data === undefined || isEmptyObject(createBuilder.data)) {
 			return queryBuilder
 		}
 		const readBuilder = QueryGenerator.registerQueryPart(

@@ -1,7 +1,6 @@
-import { useGetEntityByKey, useMutationState } from '@contember/binding'
+import { SugaredFieldProps, useGetEntityByKey, useMutationState } from '@contember/binding'
 import type { FileId } from '@contember/react-client'
-import type { FunctionComponent } from 'react'
-import { ReactNode, useCallback, useState } from 'react'
+import { FunctionComponent, ReactNode, useCallback, useState } from 'react'
 import { useMessageFormatter } from '../../../../i18n'
 import { RepeaterContainerPrivateProps, SortableRepeaterItem } from '../../collections'
 import type { ResolvedFileKinds } from '../ResolvedFileKinds'
@@ -12,6 +11,7 @@ import { useNormalizedUploadState } from './useNormalizedUploadState'
 
 export interface BareFileRepeaterContainerPrivateProps {
 	fileKinds: ResolvedFileKinds
+	sortableBy?: SugaredFieldProps['field']
 }
 
 export interface BareFileRepeaterContainerPublicProps extends FileInputPublicProps {}
@@ -26,6 +26,7 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	isEmpty,
 	fileKinds: unstableFileKinds,
 	createNewEntity,
+	sortableBy,
 
 	// These are here just to remove them from the spread below
 	accessor,
@@ -56,22 +57,30 @@ export const BareFileRepeaterContainer: FunctionComponent<BareFileRepeaterContai
 	const previews: ReactNode[] = []
 	for (const [i, entity] of entities.entries()) {
 		const entityUploadState = uploadState.get(entity.key)
-
-		// dragHandleComponent={props.useDragHandle ? sortableHandle : undefined}
-		previews.push(
-			<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
-				<div className="fileInput-preview view-sortable">
-					<SingleFilePreview
-						getContainingEntity={entity.getAccessor}
-						fileId={entity.key}
-						formatMessage={formatMessage}
-						removeFile={normalizedRemoveFile}
-						uploadState={entityUploadState}
-						fileKinds={fileKinds}
-					/>
-				</div>
-			</SortableRepeaterItem>,
+		const preview = (
+			<SingleFilePreview
+				getContainingEntity={entity.getAccessor}
+				fileId={entity.key}
+				formatMessage={formatMessage}
+				removeFile={normalizedRemoveFile}
+				uploadState={entityUploadState}
+				fileKinds={fileKinds}
+			/>
 		)
+
+		if (sortableBy === undefined) {
+			previews.push(
+				<div key={entity.key} className="fileInput-preview">
+					{preview}
+				</div>,
+			)
+		} else {
+			previews.push(
+				<SortableRepeaterItem index={i} key={entity.key} disabled={isMutating}>
+					<div className="fileInput-preview view-sortable">{preview}</div>
+				</SortableRepeaterItem>,
+			)
+		}
 	}
 
 	return (

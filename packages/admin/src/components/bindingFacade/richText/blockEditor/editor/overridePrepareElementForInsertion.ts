@@ -83,6 +83,14 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 			// Should probably throw from here
 		}
 
+		if (editor.isReferenceElement(closestBlockElement)) {
+			const newPath = SlatePath.next(closestBlockPath)
+			Promise.resolve().then(() => {
+				Transforms.select(editor, newPath)
+			})
+			return newPath
+		}
+
 		if (SlateNode.string(closestBlockElement) === '') {
 			// The current element is empty and we also cannot insert inside it, and so we remove it
 			// and insert the new one in its place.

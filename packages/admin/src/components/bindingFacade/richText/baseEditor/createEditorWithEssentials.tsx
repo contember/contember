@@ -55,7 +55,7 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		},
 		toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {}, // TODO
 
-		canContainAnyBlocks: element => !editorWithEssentials.isInline(element),
+		canContainAnyBlocks: element => !editorWithEssentials.isInline(element) && !editorWithEssentials.isVoid(element),
 
 		serializeNodes: (nodes, errorMessage) => ContemberEditor.serializeNodes(editorWithEssentials, nodes, errorMessage),
 		deserializeNodes: (serializedNodes, errorMessage) =>

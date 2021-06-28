@@ -2,6 +2,7 @@ import type { FieldAccessor } from '@contember/binding'
 import { SingleLineTextInputProps, TextInput } from '@contember/ui'
 import { FocusEvent as ReactFocusEvent, forwardRef, memo, Ref, useMemo } from 'react'
 import DatePicker, { ReactDatePickerProps } from 'react-datepicker'
+import { dateToStringWithoutTimezone } from '../../../utils'
 import {
 	SimpleRelativeSingleField,
 	SimpleRelativeSingleFieldMetadata,
@@ -31,22 +32,7 @@ export const DateFieldInner = memo(
 			if (!date) {
 				return date
 			}
-			const [year, month, day] = [
-				date.getFullYear(),
-				(date.getMonth() + 1).toFixed(0).padStart(2, '0'),
-				date.getDate().toFixed(0).padStart(2, '0'),
-			]
-			let serialized = `${year}-${month}-${day}`
-
-			if (props.showTimeSelect) {
-				const [hours, minutes] = [
-					date.getHours().toFixed(0).padStart(2, '0'),
-					date.getMinutes().toFixed(0).padStart(2, '0'),
-				]
-				serialized += ` ${hours}:${minutes}`
-			}
-
-			return serialized
+			return dateToStringWithoutTimezone(date, { includeTime: !!props.showTimeSelect })
 		}
 		const generateOnChange = (data: FieldAccessor<string>) => (date: Date | null) => {
 			data.updateValue(serialize(date))

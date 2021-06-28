@@ -4,6 +4,7 @@ import { FormGroup, TextInput } from '@contember/ui'
 import { forwardRef, FunctionComponent, memo } from 'react'
 import DatePicker from 'react-datepicker'
 import { useMessageFormatter } from '../../../../../i18n'
+import { dateToStringWithoutTimezone } from '../../../../../utils'
 import { DateFieldView, DateFieldViewProps } from '../../../fieldViews'
 import { DataGridCellPublicProps, DataGridColumn, DataGridHeaderCellPublicProps, DataGridOrderDirection } from '../base'
 import { dataGridCellsDictionary } from './dataGridCellsDictionary'
@@ -37,10 +38,10 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				const conditions: Input.Condition<Input.ColumnValue<Literal>>[] = []
 
 				if (filterArtifact.start) {
-					conditions.push({ gte: filterArtifact.start.toISOString() })
+					conditions.push({ gte: dateToStringWithoutTimezone(filterArtifact.start) })
 				}
 				if (filterArtifact.end) {
-					conditions.push({ lte: filterArtifact.end.toISOString() })
+					conditions.push({ lte: dateToStringWithoutTimezone(filterArtifact.end) })
 				}
 
 				return wrapFilterInHasOnes(desugared.hasOneRelationPath, {

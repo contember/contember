@@ -1,8 +1,0 @@
-version: '3.7'
-services:
-  ts_watch:
-    user: "1000"
-  storybook:
-    user: "1000"
-    ports:
-      - "0.0.0.0:9001:9001"

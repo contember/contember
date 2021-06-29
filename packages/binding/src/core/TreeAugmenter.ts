@@ -114,7 +114,10 @@ export class TreeAugmenter {
 					this.treeStore.subTreePersistedData.delete(rootPlaceholder)
 					const newRootState = this.stateInitializer.initializeSubTree(rootState.blueprint.marker)
 
+					// We preserve the previous listeners but purge some of them.
 					newRootState.eventListeners = presentListeners
+					OperationsHelpers.purgeStaleListenersAfterIdChange(newRootState as EntityRealmState)
+
 					rootStates.set(rootPlaceholder, newRootState)
 
 					this.eventManager.registerJustUpdated(newRootState, EventManager.NO_CHANGES_DIFFERENCE)

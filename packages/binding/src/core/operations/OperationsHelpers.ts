@@ -116,26 +116,7 @@ export class OperationsHelpers {
 				eventManager.registerJustUpdated(childIdState, EventManager.NO_CHANGES_DIFFERENCE)
 			}
 
-			// Version 1.
-			// The listeners subscribed to a particular entity key so we no longer want to call these.
-			// The only positionally associated listeners are in the blueprint so we re-initialize those.
-			//realm.eventListeners = stateInitializer.initializeEntityEventListenerStore(realmBlueprint)
-
-			// Version 2.
-			// This is version two of this terrible hack. We want to preserve e.g. persistSuccess handlers.
-
-			// Version 3.
-			// The saga continues. We add a condition to exempt top-level realms. That way they can start
-			// propagating changes from the top.
-			const listeners = realm.eventListeners
-			if (listeners && realm.blueprint.parent) {
-				listeners.delete('update')
-				for (const eventType of listeners.keys()) {
-					if (eventType.startsWith('connectionUpdate')) {
-						listeners.delete(eventType)
-					}
-				}
-			}
+			this.purgeStaleListenersAfterIdChange(realm)
 		}
 
 		if (oldEntity.realms.size === 0) {
@@ -157,6 +138,31 @@ export class OperationsHelpers {
 		}
 		if (realm.type === 'entityRealm') {
 			eventManager.registerJustUpdated(realm, EventManager.NO_CHANGES_DIFFERENCE)
+		}
+	}
+
+	public static purgeStaleListenersAfterIdChange(realm: EntityRealmState) {
+		// Version 1.
+		// The listeners subscribed to a particular entity key so we no longer want to call these.
+		// The only positionally associated listeners are in the blueprint so we re-initialize those.
+		//realm.eventListeners = stateInitializer.initializeEntityEventListenerStore(realmBlueprint)
+
+		// Version 2.
+		// This is version two of this terrible hack. We want to preserve e.g. persistSuccess handlers.
+
+		// Version 3.
+		// The saga continues. We add a condition to exempt top-level realms. That way they can start
+		// propagating changes from the top.
+		const listeners = realm.eventListeners
+		if (listeners) {
+			if (realm.blueprint.parent) {
+				listeners.delete('update')
+			}
+			for (const eventType of listeners.keys()) {
+				if (eventType.startsWith('connectionUpdate')) {
+					listeners.delete(eventType)
+				}
+			}
 		}
 	}
 }

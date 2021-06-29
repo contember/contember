@@ -54,6 +54,7 @@ function useAccessorUpdateSubscription<
 			accessor: getAccessor(),
 			getAccessor,
 		})
+		accessor = getAccessor()
 	}
 
 	let forceUpdate: ForceAccessorUpdate | undefined = undefined

@@ -24,7 +24,8 @@ export const Entity = Component(<EntityComponentProps extends {}>(props: EntityP
 		const EntityComponent = props.entityComponent
 
 		children = (
-			<EntityComponent {...props.entityProps!} accessor={props.accessor}>
+			// HACK: the ?. is actually important, despite the typings.
+			<EntityComponent {...props.entityProps!} accessor={props.accessor} key={props.accessor?.key}>
 				{children}
 			</EntityComponent>
 		)

@@ -37,6 +37,7 @@ export const graphqlRequest = async (options: {
 }) => {
 	const response = await httpRequest(createHttpOptions(options))
 	const jsonResponse = JSON.parse(response.body)
+
 	if (jsonResponse.errors) {
 		throw new Error('Graphql request failed: ' + JSON.stringify(jsonResponse.errors))
 	}

@@ -36,18 +36,12 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 
 	const variables = {}
 
-	const contentEndpoint = process.argv[2]
+	const serverPort = process.env.CONTEMBER_PORT
+	const contentEndpoint = `http://localhost:${serverPort}/content/app/prod`
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const accessToken = process.env.CONTEMBER_TOKEN!
+	const accessToken = process.env.CONTEMBER_ROOT_TOKEN!
 
 	const queryGql = await readStdin()
-
-	// const queryResponse = await graphqlRequest({
-	// 	endpoint: contentEndpoint,
-	// 	query: queryGql,
-	// 	authorizationToken: accessToken,
-	// })
-	// console.log('Query count: ' + queryResponse.extensions.dbQueries.length)
 
 	console.log('Warmup')
 	for (let i = 0; i < 100; i++) {

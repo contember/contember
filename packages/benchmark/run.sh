@@ -1,20 +1,17 @@
 #!/usr/bin/env bash
 set -e
 
-export $(cat .env | xargs)
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$(dirname "$(dirname "$DIR")" )"
 
-echo "Cleaning"
-npm run drop
-echo "Starting server"
-npm run start-server > /dev/null &
-PID=$!
+echo "DROP DATABASE IF EXISTS benchmark_tenant" | docker-compose exec -T db bash -c "psql -h localhost -U \${POSTGRES_USER} postgres"
+echo "DROP DATABASE IF EXISTS benchmark_app" | docker-compose exec -T db bash -c "psql -h localhost -U \${POSTGRES_USER} postgres"
+
+CONTAINER_NAME="$( docker-compose run -d -e APP_DB_NAME=benchmark_app -e TENANT_DB_NAME=benchmark_tenant api node packages/benchmark/dist/src/start-server.js )"
+
 sleep 5
 
-echo "Initializing server"
-ACCESS_TOKEN=`node ./dist/src/setup.js`
-export ACCESS_TOKEN
+docker exec $CONTAINER_NAME node ./packages/benchmark/dist/src/setup.js
+cat ./packages/benchmark/src/query.graphql | docker exec -i $CONTAINER_NAME node ./packages/benchmark/dist/src/benchmark.js  "$@"
 
-echo "Starting benchmark"
-node ./dist/src/benchmark.js  "$@"
-
-kill $PID
+docker stop $CONTAINER_NAME

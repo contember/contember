@@ -1,6 +1,7 @@
 import prompts from 'prompts'
 import { GraphQLClient } from 'graphql-request'
-import { InstanceApiEnvironment, readInstanceConfig } from './instance'
+import { InstanceApiEnvironment } from './instance'
+import { readDefaultDockerComposeConfig } from './dockerCompose'
 
 const validatePassword = (password: string) =>
 	password.length < 6 ? 'Password must contain at least 6 characters' : true
@@ -18,12 +19,6 @@ export const createTenantApiUrl = (url: string) => {
 export const interactiveResolveLoginToken = async (instance: InstanceApiEnvironment) => {
 	if (process.env.CONTEMBER_LOGIN_TOKEN) {
 		return process.env.CONTEMBER_LOGIN_TOKEN
-	}
-	if (instance.type === 'local') {
-		const config = await readInstanceConfig(instance)
-		if (config.loginToken) {
-			return config.loginToken
-		}
 	}
 	const { loginToken } = await prompts({
 		type: 'text',
@@ -88,17 +83,6 @@ export const interactiveAskForCredentials = async (): Promise<{ email: string; p
 	return { email, password }
 }
 
-export const setup = async (
-	apiUrl: string,
-	{ email, password }: { email: string; password: string },
-): Promise<{ loginToken: string }> => {
-	const client = TenantClient.create(apiUrl, '12345123451234512345')
-	const response = await client.setup(email, password)
-	console.log('Superadmin created.')
-	console.log('Login token: ' + response.loginToken)
-	return response
-}
-
 export const interactiveResolveApiToken = async ({
 	instance,
 }: {
@@ -108,9 +92,9 @@ export const interactiveResolveApiToken = async ({
 		return process.env.CONTEMBER_API_TOKEN
 	}
 	if (instance.type === 'local') {
-		const config = await readInstanceConfig(instance)
-		if (config.apiToken) {
-			return config.apiToken
+		const dockerCompose = await readDefaultDockerComposeConfig(instance.instanceDirectory)
+		if (dockerCompose.services?.api?.environment?.CONTEMBER_ROOT_TOKEN) {
+			return dockerCompose.services?.api?.environment?.CONTEMBER_ROOT_TOKEN
 		}
 	}
 	const { strategy } = await prompts({

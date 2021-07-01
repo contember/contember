@@ -1,14 +1,14 @@
 import { ContainerStatus, getContainersStatus } from '../docker'
 import { execDockerCompose } from '../dockerCompose'
-import { Instance } from './Instance'
+import { Workspace } from '../Workspace'
 
 export type ServiceStatus = ContainerStatus
 
-export const getInstanceStatus = async (instance: Instance): Promise<ServiceStatus[]> => {
-	const instanceName = process.env.COMPOSE_PROJECT_NAME || instance.name
+export const getServicesStatus = async (workspace: Workspace): Promise<ServiceStatus[]> => {
+	const instanceName = process.env.COMPOSE_PROJECT_NAME || workspace.name
 	const runningContainers = (
 		await execDockerCompose(['ps', '-q'], {
-			cwd: instance.directory,
+			cwd: workspace.directory,
 			stdout: false,
 		})
 	)
@@ -19,7 +19,7 @@ export const getInstanceStatus = async (instance: Instance): Promise<ServiceStat
 		return []
 	}
 
-	return (await getContainersStatus({ containers: runningContainers, cwd: instance.directory }))
+	return (await getContainersStatus({ containers: runningContainers, cwd: workspace.directory }))
 		.filter(it => it.name.startsWith(instanceName + '_'))
 		.map(it => ({ ...it, name: it.name.substring(instanceName.length + 1, it.name.lastIndexOf('_')) }))
 }

@@ -118,26 +118,3 @@ export interface DockerComposeConfig {
 	version?: string
 	services?: Record<string, DockerComposeServiceConfig>
 }
-
-export class DockerCompose {
-	get options(): DockerComposeRunOptions {
-		return {
-			cwd: this.cwd,
-			...this._options,
-		}
-	}
-
-	constructor(private readonly cwd: string, private readonly _options: Partial<DockerComposeRunOptions> = {}) {}
-
-	run(args: string[], options: Partial<DockerComposeRunOptions> = {}): RunningCommand {
-		const thisOptions = this.options
-		return runDockerCompose(args, {
-			...thisOptions,
-			...options,
-			env: {
-				...thisOptions.env,
-				...options.env,
-			},
-		})
-	}
-}

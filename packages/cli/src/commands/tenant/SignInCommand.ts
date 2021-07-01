@@ -1,7 +1,6 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
 import { interactiveResolveLoginToken, interactiveSignIn } from '../../utils/tenant'
-import prompt from 'prompts'
-import { interactiveResolveInstanceEnvironmentFromInput, updateInstanceLocalConfig } from '../../utils/instance'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { Workspace } from '../../utils/Workspace'
 
 type Args = {
@@ -29,19 +28,5 @@ export class SignInCommand extends Command<Args, Options> {
 		const { sessionToken } = await interactiveSignIn({ apiUrl: instance.baseUrl, loginToken })
 		console.log('Session token:')
 		console.log(sessionToken)
-		if (instance.type === 'local') {
-			const { save } = await prompt({
-				type: 'confirm',
-				initial: false,
-				message: 'Save to contember.instance.local.yaml as a API token?',
-				name: 'save',
-			})
-			if (save) {
-				await updateInstanceLocalConfig({
-					instanceDirectory: instance.instanceDirectory,
-					updater: json => ({ ...json, apiToken: sessionToken }),
-				})
-			}
-		}
 	}
 }

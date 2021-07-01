@@ -1,8 +1,7 @@
-import prompts from 'prompts'
 import { getInstanceFromEnv, InstanceApiEnvironment, InstanceLocalApiEnvironment } from './environment'
-import { Instance } from './Instance'
 import { Workspace } from '../Workspace'
 import { isRemoteInstance } from './common'
+import { getServicesStatus } from './status'
 
 const createRemoteInstanceEnvironment = (instanceName: string): InstanceApiEnvironment => {
 	let baseUrl = instanceName
@@ -17,14 +16,14 @@ const createRemoteInstanceEnvironment = (instanceName: string): InstanceApiEnvir
 	return { type: 'remote', baseUrl }
 }
 
-const createLocalInstanceEnvironment = async (instance: Instance): Promise<InstanceLocalApiEnvironment> => {
-	const instanceStatus = await instance.getStatus()
+const createLocalInstanceEnvironment = async (workspace: Workspace): Promise<InstanceLocalApiEnvironment> => {
+	const instanceStatus = await getServicesStatus(workspace)
 	const runningApi = instanceStatus.find(it => it.name === 'api' && it.running)
 	if (!runningApi) {
-		throw `Instance ${instance.name} is not running. Run instance:up first.`
+		throw `Instance ${workspace.name} is not running.`
 	}
 	const apiServer = `http://127.0.0.1:${runningApi.ports[0].hostPort}`
-	return { type: 'local', baseUrl: apiServer, instanceName: instance.name, instanceDirectory: instance.directory }
+	return { type: 'local', baseUrl: apiServer, instanceName: workspace.name, instanceDirectory: workspace.directory }
 }
 
 export const interactiveResolveInstanceEnvironmentFromInput = async (
@@ -40,30 +39,11 @@ export const interactiveResolveInstanceEnvironmentFromInput = async (
 			}
 			return createRemoteInstanceEnvironment(instanceName)
 		} else {
-			const instance = await workspace.instances.getInstance(instanceName)
-			return await createLocalInstanceEnvironment(instance)
+			if (workspace.name !== instanceName) {
+				throw `Invalid instance name`
+			}
+			return await createLocalInstanceEnvironment(workspace)
 		}
 	}
-	const instances = await workspace.instances.listInstances()
-	if (localOnly && instances.length === 1) {
-		return await createLocalInstanceEnvironment(instances[0])
-	}
-	const { instance: selectedInstance } = await prompts({
-		type: 'select',
-		message: 'Instance',
-		name: 'instance',
-		choices: [...instances.map(it => ({ value: it, title: it.name })), { value: '__remote', title: 'Remote API' }],
-	})
-	if (!selectedInstance) {
-		throw 'Please specify an instance'
-	}
-	if (selectedInstance === '__remote') {
-		const { url } = await prompts({
-			type: 'text',
-			message: 'Remote API URL',
-			name: 'url',
-		})
-		return createRemoteInstanceEnvironment(url)
-	}
-	return await createLocalInstanceEnvironment(selectedInstance)
+	return await createLocalInstanceEnvironment(workspace)
 }

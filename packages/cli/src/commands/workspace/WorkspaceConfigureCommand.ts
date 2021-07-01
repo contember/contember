@@ -1,21 +1,18 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { interactiveInstanceConfigure, resolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { interactiveInstanceConfigure } from '../../utils/instance'
 import { readDefaultDockerComposeConfig } from '../../utils/dockerCompose'
 import { Workspace } from '../../utils/Workspace'
 
-type Args = {
-	instanceName: string
-}
+type Args = {}
 
 type Options = {
 	['ports']?: string
 	host?: string[]
 }
 
-export class InstanceConfigureCommand extends Command<Args, Options> {
+export class WorkspaceConfigureCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
-		configuration.description('Configures Contember instance by creating and/or updating local configs.')
-		configuration.argument('instanceName').optional()
+		configuration.description('Configures Contember workspace ports.')
 		configuration.option('host').valueArray()
 		configuration.option('ports').valueRequired()
 	}
@@ -25,17 +22,16 @@ export class InstanceConfigureCommand extends Command<Args, Options> {
 			throw 'TTY is required'
 		}
 		const workspace = await Workspace.get(process.cwd())
-		const instance = await resolveInstanceEnvironmentFromInput({ input, workspace })
-		const composeConfig = await readDefaultDockerComposeConfig(instance.directory)
+		const composeConfig = await readDefaultDockerComposeConfig(workspace.directory)
 		if (!composeConfig.services) {
 			throw 'docker-compose is not configured'
 		}
 		await interactiveInstanceConfigure({
 			composeConfig,
-			instance,
+			workspace,
 			host: input.getOption('host'),
 			ports: input.getOption('ports') ? Number(input.getOption('ports')) : undefined,
 		})
-		console.log('Instance configured. Check corresponding docker-compose.override.yaml for details.')
+		console.log('Workspace configured. Check corresponding docker-compose.override.yaml for details.')
 	}
 }

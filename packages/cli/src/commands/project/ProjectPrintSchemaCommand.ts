@@ -12,7 +12,7 @@ import {
 	StaticAuthorizator,
 } from '@contember/engine-content-api'
 import { DocumentNode, printSchema } from 'graphql'
-import { mergeSchemas } from 'graphql-tools'
+import { mergeSchemas } from '@graphql-tools/merge'
 
 type Args = {
 	project: string

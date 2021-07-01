@@ -77,7 +77,7 @@ class ContentApolloServerFactory {
 			timer: ctx.state.timer,
 			errorContextProvider: () => ({
 				user: ctx.state.authResult.identityId,
-				body: ctx.request.body,
+				body: ctx.request.body as string,
 				url: ctx.request.originalUrl,
 			}),
 			koaContext: ctx,

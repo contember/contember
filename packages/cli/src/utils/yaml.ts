@@ -37,7 +37,7 @@ export const updateYaml = async <Value = JSONObject>(
 
 export const readYaml = async <T = JSONObject>(path: string): Promise<T> => {
 	const content = await fs.readFile(path, { encoding: 'utf8' })
-	return jsyaml.load(content)
+	return jsyaml.load(content) as unknown as T
 }
 
 export const readMultipleYaml = async <T extends JSONObject = JSONObject>(paths: string[]): Promise<T> => {
@@ -54,5 +54,5 @@ export const readMultipleYaml = async <T extends JSONObject = JSONObject>(paths:
 		const config = await readYaml<T>(path)
 		configs.push(config)
 	}
-	return (Merger.merge(...configs) as unknown) as T
+	return Merger.merge(...configs) as unknown as T
 }

@@ -1,5 +1,5 @@
 import * as Schema from '../schema'
-import { IResolvers } from 'graphql-tools'
+import { IResolvers } from '@graphql-tools/utils'
 
 export interface IgnoreIndex {
 	[key: string]: any

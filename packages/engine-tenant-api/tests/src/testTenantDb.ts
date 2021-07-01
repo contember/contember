@@ -11,7 +11,7 @@ import {
 	typeDefs,
 } from '../../src'
 import { Buffer } from 'buffer'
-import { makeExecutableSchema } from 'graphql-tools'
+import { makeExecutableSchema } from '@graphql-tools/schema'
 import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, MockedMailer } from './mailer'
 import { dbCredentials, recreateDatabase } from './dbUtils'

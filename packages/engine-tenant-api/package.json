@@ -17,9 +17,9 @@
     "@contember/graphql-utils": "^0.12.0-alpha.2",
     "@contember/queryable": "^0.12.0-alpha.2",
     "@contember/schema": "^0.12.0-alpha.2",
+    "@graphql-tools/utils": "^7.10.0",
     "apollo-server-core": "^2.16.1",
     "apollo-server-errors": "^2.4.0",
-    "graphql-tools": "^7.0.1",
     "mustache": "^4.0.0",
     "nodemailer": "^6.4.2",
     "openid-client": "^4.2.1",
@@ -31,11 +31,12 @@
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",
     "@graphql-codegen/typescript-resolvers": "^1.15.2",
+    "@graphql-tools/schema": "^7.1.5",
     "@types/mustache": "^4.0.0",
-    "@types/node": "^14.6.4",
+    "@types/node": "^15.12.5",
     "@types/nodemailer": "^6.4.0",
     "graphql": "^15.4.0",
-    "uvu": "^0.4.1"
+    "uvu": "^0.5.1"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0",

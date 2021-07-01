@@ -17,7 +17,7 @@ import {
 	GraphQlSchemaBuilderFactory,
 	PermissionsByIdentityFactory,
 } from '@contember/engine-content-api'
-import { makeExecutableSchema } from 'graphql-tools'
+import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ContentApiTester } from './ContentApiTester'
 import { SystemApiTester } from './SystemApiTester'
 import { TesterStageManager } from './TesterStageManager'

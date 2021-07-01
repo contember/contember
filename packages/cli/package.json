@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.3",
-    "@types/js-yaml": "^3.12.1",
+    "@types/js-yaml": "^4.0.1",
     "@types/npm-package-arg": "^6.1.0",
     "@types/prompts": "^2.0.1"
   },
@@ -23,20 +23,21 @@
     "@contember/schema-definition": "^0.12.0-alpha.2",
     "@contember/schema-migrations": "^0.12.0-alpha.2",
     "@contember/schema-utils": "^0.12.0-alpha.2",
+    "@graphql-tools/merge": "^6.2.14",
     "chalk": "^4.1.0",
     "chalk-table": "^1.0.2",
     "download-tarball": "^2.0.0",
-    "fs-extra": "^9.0.1",
+    "fs-extra": "^10.0.0",
     "get-package-json-from-registry": "^2.2.2",
     "get-port": "^5.0.0",
     "graphql": "^15.4.0",
     "graphql-request": "^3.3.0",
-    "js-yaml": "^3.13.1",
+    "js-yaml": "^4.1.0",
     "npm-package-arg": "^8.0.0",
     "pg": "^8.5.0",
     "prompts": "^2.2.1",
     "registry-info": "^1.0.0",
-    "ts-node": "^9.0.0",
+    "ts-node": "^10.0.0",
     "typescript": "^4.0.2",
     "yawn-yaml": "^1.5.0"
   }

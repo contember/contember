@@ -9,7 +9,8 @@ import {
 	StaticAuthorizator,
 	IntrospectionSchemaFactory,
 } from '@contember/engine-content-api'
-import { makeExecutableSchema, mergeSchemas } from 'graphql-tools'
+import { mergeSchemas } from '@graphql-tools/merge'
+import { makeExecutableSchema } from '@graphql-tools/schema'
 import { GraphQLSchemaContributor } from '@contember/engine-plugins'
 import { JSONType } from '@contember/graphql-utils'
 

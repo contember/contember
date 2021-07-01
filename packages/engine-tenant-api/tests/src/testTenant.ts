@@ -12,7 +12,7 @@ import {
 import { Buffer } from 'buffer'
 import { ProjectScopeFactory } from '../../src/model/authorization/ProjectScopeFactory'
 import { AclSchemaEvaluatorFactory } from '../../src/model/authorization/AclSchemaEvaluatorFactory'
-import { makeExecutableSchema } from 'graphql-tools'
+import { makeExecutableSchema } from '@graphql-tools/schema'
 import { executeGraphQlTest } from './testGraphql'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import { Acl, Schema } from '@contember/schema'

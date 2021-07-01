@@ -80,7 +80,7 @@ class SystemServerProvider {
 		return {
 			...systemContext,
 			errorContextProvider: () => ({
-				body: ctx.request.body,
+				body: ctx.request.body as string,
 				project: ctx.state.project.slug,
 				url: ctx.request.originalUrl,
 				user: ctx.state.authResult.identityId,

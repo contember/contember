@@ -35,7 +35,7 @@ class TenantApolloServerFactory {
 				return {
 					...this.resolverContextFactory.create(ctx.state.authResult),
 					errorContextProvider: () => ({
-						body: ctx.request.body,
+						body: ctx.request.body as string,
 						url: ctx.request.originalUrl,
 						user: ctx.state.authResult.identityId,
 					}),

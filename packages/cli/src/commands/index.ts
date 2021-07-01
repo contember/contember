@@ -1,4 +1,3 @@
-export * from './instance'
 export * from './migrations'
 export * from './migrations'
 export * from './project'

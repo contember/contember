@@ -12,7 +12,6 @@ type Args = {
 }
 
 type Options = {
-	instance?: string
 	yes?: true
 }
 
@@ -21,10 +20,6 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 		configuration.description('Rebase migrations on filesystem and in local instance')
 		configuration.argument('project')
 		configuration.argument('migration').variadic()
-		configuration //
-			.option('instance')
-			.valueRequired()
-			.description('Local instance name')
 		configuration //
 			.option('yes')
 			.valueNone()
@@ -63,7 +58,7 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 				if (!valid) {
 					throw `Cannot rebase migrations`
 				}
-				const client = await resolveSystemApiClient(workspace, project, input)
+				const client = await resolveSystemApiClient(workspace, project)
 				let i = 0
 				for (const migration of migrations) {
 					const name = migration.name.substring(MigrationVersionHelper.prefixLength + 1)

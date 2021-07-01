@@ -15,7 +15,6 @@ type Args = {
 
 type Options = {
 	execute?: true
-	instance?: string
 	yes?: true
 }
 
@@ -24,10 +23,6 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		configuration.description('Creates schema migration diff for given project')
 		configureCreateMigrationCommand(configuration)
 		configuration.option('execute').valueNone()
-		configuration //
-			.option('instance')
-			.valueRequired()
-			.description('Local instance name')
 		configuration //
 			.option('yes')
 			.valueNone()
@@ -82,7 +77,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 					console.log(`${filename} created`)
 
 					if (shouldExecute) {
-						const client = await resolveSystemApiClient(workspace, project, input)
+						const client = await resolveSystemApiClient(workspace, project)
 						const status = await resolveMigrationStatus(client, migrationsResolver)
 						if (status.errorMigrations.length > 0) {
 							console.error(createMigrationStatusTable(status.errorMigrations))

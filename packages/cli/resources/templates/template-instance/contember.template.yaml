@@ -1,6 +1,0 @@
-type: instance
-remove:
-  - package.json
-  - package-lock.json
-replaceVariables:
-  - docker-compose.yaml

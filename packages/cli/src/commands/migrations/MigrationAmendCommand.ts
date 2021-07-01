@@ -21,7 +21,6 @@ type Args = {
 }
 
 type Options = {
-	instance?: string
 	yes?: true
 	force: boolean
 }
@@ -32,10 +31,6 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 		configuration.argument('project')
 		configuration.argument('migration').optional()
 		configuration.option('force').description('Ignore migrations order and missing migrations (dev only)')
-		configuration //
-			.option('instance')
-			.valueRequired()
-			.description('Local instance name')
 		configuration //
 			.option('yes')
 			.valueNone()
@@ -61,7 +56,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 				if (!amendMigration) {
 					throw 'No migration to amend'
 				}
-				const client = await resolveSystemApiClient(workspace, project, input)
+				const client = await resolveSystemApiClient(workspace, project)
 				const status = await resolveMigrationStatus(client, migrationsResolver)
 				const force = input.getOption('force')
 				if (status.errorMigrations.length > 0) {

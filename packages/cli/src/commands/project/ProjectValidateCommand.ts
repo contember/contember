@@ -4,7 +4,6 @@ import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { Schema } from '@contember/schema'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { SchemaUpdateError } from '@contember/schema-migrations'
 import { Workspace } from '../../utils/Workspace'
 import { validateMigrations } from '../migrations/MigrationValidationHelper'
 

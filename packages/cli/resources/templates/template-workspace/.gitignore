@@ -1,4 +1,0 @@
-/dist
-/node_modules
-/instances/*/docker-compose.override.yaml
-/instances/*/contember.instance.local.yaml

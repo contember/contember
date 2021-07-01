@@ -1,9 +1,6 @@
 import { Command, CommandConfiguration, Input } from '../../cli'
-import { join } from 'path'
 import { Workspace } from '../../utils/Workspace'
-import { runCommand } from '../../utils/commands'
 import { updateMainDockerComposeConfig } from '../../utils/dockerCompose'
-import { pathExists } from 'fs-extra'
 import { updateNpmPackages } from '../../utils/npm'
 
 type Args = {
@@ -33,34 +30,31 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 		} else {
 			console.log('contember.workspace.yaml not found, skipping')
 		}
-		const instances = await workspace.instances.listInstances()
-		console.log('Updating instance docker-compose')
-		for (const instance of instances) {
-			await updateMainDockerComposeConfig(instance.directory, (data: any) => {
-				if (!data.services?.api) {
-					console.log(`docker-compose.yaml file in instance ${instance} not found, skipping`)
-					return
-				}
-				const expectedImage = `contember/contember:${prevVersion}`
-				if (data.services.api.image !== expectedImage) {
-					console.log(
-						`API image in docker-compose.yaml file in instance ${instance} is ${data.services.api.image}, but ${expectedImage} is expected. Skipping`,
-					)
-					return data
-				}
+		console.log('Updating docker-compose')
+		await updateMainDockerComposeConfig(workspace.directory, (data: any) => {
+			if (!data.services?.api) {
+				console.log(`docker-compose.yaml file not found, skipping`)
+				return
+			}
+			const expectedImage = `contember/contember:${prevVersion}`
+			if (data.services.api.image !== expectedImage) {
+				console.log(
+					`API image in docker-compose.yaml file is ${data.services.api.image}, but ${expectedImage} is expected. Skipping`,
+				)
+				return data
+			}
 
-				return {
-					...data,
-					services: {
-						...data.services,
-						api: {
-							...data.services.api,
-							image: `contember/contember:${version}`,
-						},
+			return {
+				...data,
+				services: {
+					...data.services,
+					api: {
+						...data.services.api,
+						image: `contember/contember:${version}`,
 					},
-				}
-			})
-		}
+				},
+			}
+		})
 		console.log('API update successful')
 	}
 }

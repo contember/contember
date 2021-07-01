@@ -38,7 +38,7 @@ export class EntitiesSelector {
 		const node = this.createObjectNode(context.schema, entity, input.relations).withArg('filter', input.filter)
 
 		const result = await mapper.select(entity, node)
-		return (result as unknown) as EntitiesResult[]
+		return result as unknown as EntitiesResult[]
 	}
 
 	private createObjectNode(schema: Schema, entity: Model.Entity, relations: EntitiesRelationsInput): ObjectNode {

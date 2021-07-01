@@ -5,7 +5,8 @@ import { ObjectNode } from '../../inputProcessing'
 export class PaginatedHasManyNodesVisitor
 	implements
 		Model.ColumnVisitor<Promise<SelectGroupedObjects>>,
-		Model.RelationByTypeVisitor<Promise<SelectGroupedObjects>> {
+		Model.RelationByTypeVisitor<Promise<SelectGroupedObjects>>
+{
 	constructor(
 		private readonly ids: Input.PrimaryValue[],
 		private readonly objectNode: ObjectNode<Input.PaginationQueryInput>,

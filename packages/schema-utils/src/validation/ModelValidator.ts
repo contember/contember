@@ -203,7 +203,7 @@ export class ModelValidator {
 		if (isRelation(field as any)) {
 			return this.validateRelation(entityName, field, errors)
 		}
-		return (field as unknown) as Model.AnyColumn
+		return field as unknown as Model.AnyColumn
 	}
 
 	private validateRelation(
@@ -239,7 +239,7 @@ export class ModelValidator {
 				}
 			})
 		}
-		if (isInverseRelation((field as any) as Model.Relation)) {
+		if (isInverseRelation(field as any as Model.Relation)) {
 			// todo
 			const ownedBy = field.ownedBy
 			if (typeof ownedBy !== 'string') {
@@ -335,7 +335,7 @@ export class ModelValidator {
 				}
 			}
 		}
-		return (field as any) as Model.AnyRelation // todo
+		return field as any as Model.AnyRelation // todo
 	}
 
 	private validateIdentifier(value: string, errorBuilder: ErrorBuilder) {

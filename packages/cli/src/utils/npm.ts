@@ -70,16 +70,14 @@ export const updateNpmPackages = async (packages: NpmPackageUpdate[], workspaceD
 		await upgradeDeps('dependencies')
 		await upgradeDeps('devDependencies')
 		if (hasYarn && isRoot && packageJson.workspaces) {
-			const dirsPromise = (packageJson.workspaces as string[]).map(
-				async (it): Promise<string[]> => {
-					if (it.substr(-1) === '*') {
-						const baseDir = it.substring(0, it.length - 1)
-						return await listDirectories(baseDir)
-					} else {
-						return [join(dir, it)]
-					}
-				},
-			)
+			const dirsPromise = (packageJson.workspaces as string[]).map(async (it): Promise<string[]> => {
+				if (it.substr(-1) === '*') {
+					const baseDir = it.substring(0, it.length - 1)
+					return await listDirectories(baseDir)
+				} else {
+					return [join(dir, it)]
+				}
+			})
 			const workspaceDirs = (await Promise.all(dirsPromise)).flatMap(it => it)
 			for (const dir of workspaceDirs) {
 				await processPackageFile(dir)

@@ -8,7 +8,8 @@ import { Literal } from '../Literal'
 import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult>
-	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
+	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder
+{
 	private constructor(private readonly options: DeleteBuilder.Options) {}
 
 	public static create(): DeleteBuilder<DeleteBuilder.AffectedRows> {

@@ -9,7 +9,8 @@ import { ImplementationException } from '../exception'
 export class CreateInputVisitor<Result>
 	implements
 		Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,
-		Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>> {
+		Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>>
+{
 	constructor(
 		private readonly createInputProcessor: CreateInputProcessor<Result>,
 		private readonly schema: Model.Schema,

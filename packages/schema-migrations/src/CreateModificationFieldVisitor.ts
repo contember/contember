@@ -6,9 +6,8 @@ import { Migration } from './Migration'
 import deepCopy from './utils/deepCopy'
 
 export default class CreateFieldVisitor
-	implements
-		Model.ColumnVisitor<Migration.Modification<any>>,
-		Model.RelationByTypeVisitor<Migration.Modification<any>> {
+	implements Model.ColumnVisitor<Migration.Modification<any>>, Model.RelationByTypeVisitor<Migration.Modification<any>>
+{
 	public visitColumn(
 		entity: Model.Entity,
 		updatedColumn: Model.AnyColumn,

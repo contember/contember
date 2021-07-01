@@ -3,7 +3,8 @@ import { GroupedCounts, JoiningColumns, Mapper, RelationFetcher } from '../../ma
 import { ObjectNode } from '../../inputProcessing'
 
 export class PaginatedHasManyCountVisitor
-	implements Model.ColumnVisitor<Promise<GroupedCounts>>, Model.RelationByTypeVisitor<Promise<GroupedCounts>> {
+	implements Model.ColumnVisitor<Promise<GroupedCounts>>, Model.RelationByTypeVisitor<Promise<GroupedCounts>>
+{
 	constructor(
 		private readonly ids: Input.PrimaryValue[],
 		private readonly objectNode: ObjectNode<Input.PaginationQueryInput>,

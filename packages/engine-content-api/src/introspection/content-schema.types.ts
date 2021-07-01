@@ -274,14 +274,14 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type QueryResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
+	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
 > = {
 	schema?: Resolver<Maybe<ResolversTypes['_Schema']>, ParentType, ContextType>
 }
 
 export type _SchemaResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Schema'] = ResolversParentTypes['_Schema']
+	ParentType extends ResolversParentTypes['_Schema'] = ResolversParentTypes['_Schema'],
 > = {
 	enums?: Resolver<ReadonlyArray<ResolversTypes['_Enum']>, ParentType, ContextType>
 	entities?: Resolver<ReadonlyArray<ResolversTypes['_Entity']>, ParentType, ContextType>
@@ -290,7 +290,7 @@ export type _SchemaResolvers<
 
 export type _EntityResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Entity'] = ResolversParentTypes['_Entity']
+	ParentType extends ResolversParentTypes['_Entity'] = ResolversParentTypes['_Entity'],
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	customPrimaryAllowed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
@@ -301,7 +301,7 @@ export type _EntityResolvers<
 
 export type _UniqueConstraintResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_UniqueConstraint'] = ResolversParentTypes['_UniqueConstraint']
+	ParentType extends ResolversParentTypes['_UniqueConstraint'] = ResolversParentTypes['_UniqueConstraint'],
 > = {
 	fields?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -309,7 +309,7 @@ export type _UniqueConstraintResolvers<
 
 export type _FieldResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Field'] = ResolversParentTypes['_Field']
+	ParentType extends ResolversParentTypes['_Field'] = ResolversParentTypes['_Field'],
 > = {
 	__resolveType: TypeResolveFn<'_Column' | '_Relation', ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -321,7 +321,7 @@ export type _FieldResolvers<
 
 export type _ColumnResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Column'] = ResolversParentTypes['_Column']
+	ParentType extends ResolversParentTypes['_Column'] = ResolversParentTypes['_Column'],
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -335,7 +335,7 @@ export type _ColumnResolvers<
 
 export type _OrderByResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_OrderBy'] = ResolversParentTypes['_OrderBy']
+	ParentType extends ResolversParentTypes['_OrderBy'] = ResolversParentTypes['_OrderBy'],
 > = {
 	path?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	direction?: Resolver<ResolversTypes['_OrderByDirection'], ParentType, ContextType>
@@ -344,7 +344,7 @@ export type _OrderByResolvers<
 
 export type _RelationResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Relation'] = ResolversParentTypes['_Relation']
+	ParentType extends ResolversParentTypes['_Relation'] = ResolversParentTypes['_Relation'],
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -363,7 +363,7 @@ export type _RelationResolvers<
 
 export type _RuleResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Rule'] = ResolversParentTypes['_Rule']
+	ParentType extends ResolversParentTypes['_Rule'] = ResolversParentTypes['_Rule'],
 > = {
 	message?: Resolver<Maybe<ResolversTypes['_RuleMessage']>, ParentType, ContextType>
 	validator?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
@@ -372,7 +372,7 @@ export type _RuleResolvers<
 
 export type _ValidatorResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Validator'] = ResolversParentTypes['_Validator']
+	ParentType extends ResolversParentTypes['_Validator'] = ResolversParentTypes['_Validator'],
 > = {
 	operation?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	arguments?: Resolver<ReadonlyArray<ResolversTypes['_Argument']>, ParentType, ContextType>
@@ -381,14 +381,14 @@ export type _ValidatorResolvers<
 
 export type _ArgumentResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Argument'] = ResolversParentTypes['_Argument']
+	ParentType extends ResolversParentTypes['_Argument'] = ResolversParentTypes['_Argument'],
 > = {
 	__resolveType: TypeResolveFn<'_ValidatorArgument' | '_PathArgument' | '_LiteralArgument', ParentType, ContextType>
 }
 
 export type _ValidatorArgumentResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_ValidatorArgument'] = ResolversParentTypes['_ValidatorArgument']
+	ParentType extends ResolversParentTypes['_ValidatorArgument'] = ResolversParentTypes['_ValidatorArgument'],
 > = {
 	validator?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -396,7 +396,7 @@ export type _ValidatorArgumentResolvers<
 
 export type _PathArgumentResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_PathArgument'] = ResolversParentTypes['_PathArgument']
+	ParentType extends ResolversParentTypes['_PathArgument'] = ResolversParentTypes['_PathArgument'],
 > = {
 	path?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -404,7 +404,7 @@ export type _PathArgumentResolvers<
 
 export type _LiteralArgumentResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_LiteralArgument'] = ResolversParentTypes['_LiteralArgument']
+	ParentType extends ResolversParentTypes['_LiteralArgument'] = ResolversParentTypes['_LiteralArgument'],
 > = {
 	value?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -412,7 +412,7 @@ export type _LiteralArgumentResolvers<
 
 export type _RuleMessageResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_RuleMessage'] = ResolversParentTypes['_RuleMessage']
+	ParentType extends ResolversParentTypes['_RuleMessage'] = ResolversParentTypes['_RuleMessage'],
 > = {
 	text?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -420,7 +420,7 @@ export type _RuleMessageResolvers<
 
 export type _EnumResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['_Enum'] = ResolversParentTypes['_Enum']
+	ParentType extends ResolversParentTypes['_Enum'] = ResolversParentTypes['_Enum'],
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	values?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>

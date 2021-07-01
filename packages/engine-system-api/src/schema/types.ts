@@ -414,7 +414,7 @@ export type ResolversParentTypes = {
 
 export type MutationResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']
+	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation'],
 > = {
 	forceMigrate?: Resolver<
 		ResolversTypes['MigrateResponse'],
@@ -445,7 +445,7 @@ export type MutationResolvers<
 
 export type TruncateResponseResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['TruncateResponse'] = ResolversParentTypes['TruncateResponse']
+	ParentType extends ResolversParentTypes['TruncateResponse'] = ResolversParentTypes['TruncateResponse'],
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -453,7 +453,7 @@ export type TruncateResponseResolvers<
 
 export type MigrationModifyErrorResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrationModifyError'] = ResolversParentTypes['MigrationModifyError']
+	ParentType extends ResolversParentTypes['MigrationModifyError'] = ResolversParentTypes['MigrationModifyError'],
 > = {
 	code?: Resolver<ResolversTypes['MigrationModifyErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -462,7 +462,7 @@ export type MigrationModifyErrorResolvers<
 
 export type MigrationModifyResponseResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrationModifyResponse'] = ResolversParentTypes['MigrationModifyResponse']
+	ParentType extends ResolversParentTypes['MigrationModifyResponse'] = ResolversParentTypes['MigrationModifyResponse'],
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['MigrationModifyError']>, ParentType, ContextType>
@@ -471,7 +471,7 @@ export type MigrationModifyResponseResolvers<
 
 export type MigrationDeleteErrorResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrationDeleteError'] = ResolversParentTypes['MigrationDeleteError']
+	ParentType extends ResolversParentTypes['MigrationDeleteError'] = ResolversParentTypes['MigrationDeleteError'],
 > = {
 	code?: Resolver<ResolversTypes['MigrationDeleteErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -480,7 +480,7 @@ export type MigrationDeleteErrorResolvers<
 
 export type MigrationDeleteResponseResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrationDeleteResponse'] = ResolversParentTypes['MigrationDeleteResponse']
+	ParentType extends ResolversParentTypes['MigrationDeleteResponse'] = ResolversParentTypes['MigrationDeleteResponse'],
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['MigrationDeleteError']>, ParentType, ContextType>
@@ -497,7 +497,7 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type QueryResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']
+	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
 > = {
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
 	executedMigrations?: Resolver<
@@ -516,7 +516,7 @@ export type QueryResolvers<
 
 export type HistoryErrorResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryError'] = ResolversParentTypes['HistoryError']
+	ParentType extends ResolversParentTypes['HistoryError'] = ResolversParentTypes['HistoryError'],
 > = {
 	code?: Resolver<ResolversTypes['HistoryErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -525,7 +525,7 @@ export type HistoryErrorResolvers<
 
 export type HistoryResponseResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryResponse'] = ResolversParentTypes['HistoryResponse']
+	ParentType extends ResolversParentTypes['HistoryResponse'] = ResolversParentTypes['HistoryResponse'],
 > = {
 	ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['HistoryErrorCode']>, ParentType, ContextType>
@@ -536,7 +536,7 @@ export type HistoryResponseResolvers<
 
 export type HistoryResultResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryResult'] = ResolversParentTypes['HistoryResult']
+	ParentType extends ResolversParentTypes['HistoryResult'] = ResolversParentTypes['HistoryResult'],
 > = {
 	events?: Resolver<ReadonlyArray<ResolversTypes['HistoryEvent']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -544,7 +544,7 @@ export type HistoryResultResolvers<
 
 export type HistoryEventResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryEvent'] = ResolversParentTypes['HistoryEvent']
+	ParentType extends ResolversParentTypes['HistoryEvent'] = ResolversParentTypes['HistoryEvent'],
 > = {
 	__resolveType: TypeResolveFn<
 		'HistoryUpdateEvent' | 'HistoryDeleteEvent' | 'HistoryCreateEvent' | 'HistoryRunMigrationEvent',
@@ -562,7 +562,7 @@ export type HistoryEventResolvers<
 
 export type HistoryUpdateEventResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryUpdateEvent'] = ResolversParentTypes['HistoryUpdateEvent']
+	ParentType extends ResolversParentTypes['HistoryUpdateEvent'] = ResolversParentTypes['HistoryUpdateEvent'],
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -580,7 +580,7 @@ export type HistoryUpdateEventResolvers<
 
 export type HistoryDeleteEventResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryDeleteEvent'] = ResolversParentTypes['HistoryDeleteEvent']
+	ParentType extends ResolversParentTypes['HistoryDeleteEvent'] = ResolversParentTypes['HistoryDeleteEvent'],
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -597,7 +597,7 @@ export type HistoryDeleteEventResolvers<
 
 export type HistoryCreateEventResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryCreateEvent'] = ResolversParentTypes['HistoryCreateEvent']
+	ParentType extends ResolversParentTypes['HistoryCreateEvent'] = ResolversParentTypes['HistoryCreateEvent'],
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -614,7 +614,7 @@ export type HistoryCreateEventResolvers<
 
 export type HistoryRunMigrationEventResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryRunMigrationEvent'] = ResolversParentTypes['HistoryRunMigrationEvent']
+	ParentType extends ResolversParentTypes['HistoryRunMigrationEvent'] = ResolversParentTypes['HistoryRunMigrationEvent'],
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -628,7 +628,7 @@ export type HistoryRunMigrationEventResolvers<
 
 export type ExecutedMigrationResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['ExecutedMigration'] = ResolversParentTypes['ExecutedMigration']
+	ParentType extends ResolversParentTypes['ExecutedMigration'] = ResolversParentTypes['ExecutedMigration'],
 > = {
 	version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -641,7 +641,7 @@ export type ExecutedMigrationResolvers<
 
 export type MigrateErrorResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrateError'] = ResolversParentTypes['MigrateError']
+	ParentType extends ResolversParentTypes['MigrateError'] = ResolversParentTypes['MigrateError'],
 > = {
 	code?: Resolver<ResolversTypes['MigrateErrorCode'], ParentType, ContextType>
 	migration?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -651,7 +651,7 @@ export type MigrateErrorResolvers<
 
 export type MigrateResponseResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrateResponse'] = ResolversParentTypes['MigrateResponse']
+	ParentType extends ResolversParentTypes['MigrateResponse'] = ResolversParentTypes['MigrateResponse'],
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['MigrateError']>, ParentType, ContextType>
@@ -662,7 +662,7 @@ export type MigrateResponseResolvers<
 
 export type MigrateResultResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrateResult'] = ResolversParentTypes['MigrateResult']
+	ParentType extends ResolversParentTypes['MigrateResult'] = ResolversParentTypes['MigrateResult'],
 > = {
 	message?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -670,7 +670,7 @@ export type MigrateResultResolvers<
 
 export type StageResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['Stage'] = ResolversParentTypes['Stage']
+	ParentType extends ResolversParentTypes['Stage'] = ResolversParentTypes['Stage'],
 > = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>

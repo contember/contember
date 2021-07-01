@@ -13,7 +13,8 @@ import { createSubQueryLiteralFactory, SubQueryExpression, SubQueryLiteralFactor
 export type SelectBuilderSpecification = <Result>(qb: SelectBuilder<Result>) => SelectBuilder<Result>
 
 class SelectBuilder<Result = SelectBuilder.Result>
-	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result>>, QueryBuilder {
+	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result>>, QueryBuilder
+{
 	constructor(public readonly options: SelectBuilder.Options) {}
 
 	public static create<Result = SelectBuilder.Result>() {
@@ -153,7 +154,7 @@ class SelectBuilder<Result = SelectBuilder.Result>
 		const query = this.createQuery(namespaceContext)
 		const result: Connection.Result = await db.query(query.sql, query.parameters, query.meta)
 
-		return (result.rows as any) as Result[]
+		return result.rows as any as Result[]
 	}
 
 	public createQuery(context: Compiler.Context): Literal {

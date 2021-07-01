@@ -11,7 +11,8 @@ import { Authorizator } from '../../acl'
 import { ImplementationException } from '../../exception'
 
 export class UpdateEntityRelationInputFieldVisitor
-	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
+	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined>
+{
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,

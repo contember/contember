@@ -79,8 +79,10 @@ export class SystemContainerFactory {
 	}
 	public createBuilder(container: Args) {
 		return new Builder({})
-			.addService('systemDbMigrationsRunnerFactory', () => (db: DatabaseCredentials, dbClient: ClientBase) =>
-				new MigrationsRunner(db, 'system', systemMigrationsDirectory, dbClient),
+			.addService(
+				'systemDbMigrationsRunnerFactory',
+				() => (db: DatabaseCredentials, dbClient: ClientBase) =>
+					new MigrationsRunner(db, 'system', systemMigrationsDirectory, dbClient),
 			)
 
 			.addService('modificationHandlerFactory', () => container.modificationHandlerFactory)

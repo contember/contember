@@ -13,7 +13,7 @@ export class ObjectNode<Args = any, Extensions extends Record<string, any> = Rec
 	public withArg<
 		NewArgs = Args,
 		Name extends keyof NewArgs = keyof NewArgs,
-		Value extends NewArgs[Name] = NewArgs[Name]
+		Value extends NewArgs[Name] = NewArgs[Name],
 	>(name: Name, value: Value): ObjectNode<NewArgs> {
 		return new ObjectNode(
 			this.name,

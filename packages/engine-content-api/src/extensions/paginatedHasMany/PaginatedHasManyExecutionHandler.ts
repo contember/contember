@@ -7,7 +7,8 @@ import { PaginatedHasManyCountVisitor } from './PaginatedHasManyCountVisitor'
 import { PaginatedHasManyNodesVisitor } from './PaginatedHasManyNodesVisitor'
 
 export class PaginatedHasManyExecutionHandler
-	implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension> {
+	implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension>
+{
 	constructor(private readonly schema: Model.Schema, private readonly relationFetcher: RelationFetcher) {}
 
 	process(

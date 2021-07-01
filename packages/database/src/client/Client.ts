@@ -5,7 +5,8 @@ import { EventManager } from './EventManager'
 import { QueryHandler } from '@contember/queryable'
 
 class Client<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike>
-	implements Connection.Queryable {
+	implements Connection.Queryable
+{
 	constructor(
 		public readonly connection: ConnectionType,
 		public readonly schema: string,

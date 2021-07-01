@@ -4,13 +4,15 @@ export type ParametersResolver = (parameterParts: string[], path: Path, dataReso
 
 export class UndefinedParameterError extends Error {}
 
-export const createObjectParametersResolver = (parameters: any): ParametersResolver => parts =>
-	parts.reduce((current, part) => {
-		if (current === null || typeof current !== 'object' || typeof current[part] === 'undefined') {
-			throw new UndefinedParameterError(`Parameter "${parts.join('.')}" not found.`)
-		}
-		return current[part]
-	}, parameters)
+export const createObjectParametersResolver =
+	(parameters: any): ParametersResolver =>
+	parts =>
+		parts.reduce((current, part) => {
+			if (current === null || typeof current !== 'object' || typeof current[part] === 'undefined') {
+				throw new UndefinedParameterError(`Parameter "${parts.join('.')}" not found.`)
+			}
+			return current[part]
+		}, parameters)
 
 export const resolveParameters = (data: any, parametersResolver: ParametersResolver): any => {
 	let recursionLevel = 0

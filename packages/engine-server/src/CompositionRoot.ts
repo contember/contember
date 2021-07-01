@@ -56,10 +56,12 @@ class CompositionRoot {
 
 		const systemContainerDependencies = new Builder({})
 			.addService('providers', () => providers)
-			.addService('migrationsResolverFactory', () => (project: Pick<Project, 'slug' | 'directory'>) =>
-				new MigrationsResolver(
-					MigrationFilesManager.createForProject(projectsDirectory, project.directory || project.slug),
-				),
+			.addService(
+				'migrationsResolverFactory',
+				() => (project: Pick<Project, 'slug' | 'directory'>) =>
+					new MigrationsResolver(
+						MigrationFilesManager.createForProject(projectsDirectory, project.directory || project.slug),
+					),
 			)
 			.addService(
 				'modificationHandlerFactory',

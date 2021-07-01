@@ -13,7 +13,7 @@ export const indexListBy = <Item, Key extends KeysOfType<Item, string>, Index ex
 	return items.reduce(
 		(acc, item) => ({
 			...acc,
-			[(item[key] as unknown) as Index]: [...(acc[(item[key] as unknown) as Index] || []), item],
+			[item[key] as unknown as Index]: [...(acc[item[key] as unknown as Index] || []), item],
 		}),
 		{} as Record<Index, Item[]>,
 	)

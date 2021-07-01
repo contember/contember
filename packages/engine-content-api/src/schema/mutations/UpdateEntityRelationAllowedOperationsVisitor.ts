@@ -2,7 +2,8 @@ import { Acl, Input, Model } from '@contember/schema'
 import { Authorizator } from '../../acl'
 
 export class UpdateEntityRelationAllowedOperationsVisitor
-	implements Model.ColumnVisitor<never>, Model.RelationByTypeVisitor<Input.UpdateRelationOperation[]> {
+	implements Model.ColumnVisitor<never>, Model.RelationByTypeVisitor<Input.UpdateRelationOperation[]>
+{
 	constructor(private readonly authorizator: Authorizator) {}
 
 	visitColumn(): never {

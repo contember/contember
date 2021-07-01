@@ -70,7 +70,7 @@ const executeGraphql = (
 const signIn = async (email: string, password: string): Promise<string> => {
 	const response2 = await executeGraphql(
 		gql`
-			mutation($email: String!, $password: String!) {
+			mutation ($email: String!, $password: String!) {
 				signIn(email: $email, password: $password) {
 					ok
 					result {
@@ -302,7 +302,7 @@ test('Tenant API: sign up, add to a project and check project access', async () 
 
 	await executeGraphql(
 		gql`
-			mutation($identity: String!) {
+			mutation ($identity: String!) {
 				addProjectMember(identityId: $identity, projectSlug: "test", memberships: [{ role: "admin", variables: [] }]) {
 					ok
 				}

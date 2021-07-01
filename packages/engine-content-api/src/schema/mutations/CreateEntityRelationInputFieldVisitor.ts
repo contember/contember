@@ -10,7 +10,8 @@ import { acceptFieldVisitor } from '@contember/schema-utils'
 import { ImplementationException } from '../../exception'
 
 export class CreateEntityRelationInputFieldVisitor
-	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
+	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined>
+{
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly whereTypeBuilder: WhereTypeProvider,

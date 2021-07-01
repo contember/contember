@@ -16,7 +16,8 @@ import { FieldMap } from '../EntityFieldsProvider'
 export class HasManyToHasOneRelationReducerFieldVisitor
 	implements
 		Model.ColumnVisitor<FieldMap<HasManyToHasOneReducerExtension>>,
-		Model.RelationByTypeVisitor<FieldMap<HasManyToHasOneReducerExtension>> {
+		Model.RelationByTypeVisitor<FieldMap<HasManyToHasOneReducerExtension>>
+{
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,

@@ -4,9 +4,7 @@ import fetch from 'node-fetch'
 export class VimeoService {
 	constructor(public readonly config: VimeoConfig) {}
 
-	public async getUploadUrl(
-		filesize: number,
-	): Promise<{
+	public async getUploadUrl(filesize: number): Promise<{
 		ok: boolean
 		errors: { code: number; endUserMessage: string; developerMessage: string }[]
 		result?: { uploadUrl: string; vimeoId: string }

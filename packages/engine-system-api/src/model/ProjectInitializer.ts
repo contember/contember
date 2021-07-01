@@ -94,12 +94,8 @@ export class ProjectInitializer {
 		if (!this.projectMigrationInfoResolver) {
 			return
 		}
-		const {
-			migrationsToExecute,
-			migrationsDirectory,
-			allMigrations,
-			badMigrations,
-		} = await this.projectMigrationInfoResolver.getMigrationsInfo(db, project)
+		const { migrationsToExecute, migrationsDirectory, allMigrations, badMigrations } =
+			await this.projectMigrationInfoResolver.getMigrationsInfo(db, project)
 
 		try {
 			logger.group(`Reading migrations from directory "${migrationsDirectory}"`)

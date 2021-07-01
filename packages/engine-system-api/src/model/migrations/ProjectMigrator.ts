@@ -100,11 +100,11 @@ export class ProjectMigrator {
 		migrationVersion: string,
 	): Promise<[Schema]> {
 		const stage = stageTree.getRoot()
-		const { sql, schema: newSchema, handler } = await this.migrationDescriber.describeModification(
-			schema,
-			modification,
-			formatVersion,
-		)
+		const {
+			sql,
+			schema: newSchema,
+			handler,
+		} = await this.migrationDescriber.describeModification(schema, modification, formatVersion)
 		await this.executeOnStage(db, stage, sql, migrationVersion)
 		return [newSchema]
 	}

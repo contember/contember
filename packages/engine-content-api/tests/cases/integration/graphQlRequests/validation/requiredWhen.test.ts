@@ -50,8 +50,7 @@ requiredWhenTest('update fails when setting condition to true and current value 
 		by: { id: testUuid(1) },
 		executes: [
 			{
-				sql:
-					'select "root_"."email" as "root_email", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" = ?',
+				sql: 'select "root_"."email" as "root_email", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" = ?',
 				parameters: [testUuid(1)],
 				response: {
 					rows: [{ root_email: null, root_id: testUuid(1) }],
@@ -70,8 +69,7 @@ requiredWhenTest('update succeeds when setting condition to true and current val
 		by: { id: testUuid(1) },
 		executes: [
 			{
-				sql:
-					'select "root_"."email" as "root_email", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" = ?',
+				sql: 'select "root_"."email" as "root_email", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" = ?',
 				parameters: [testUuid(1)],
 				response: {
 					rows: [{ root_email: 'foo@bar.com', root_id: testUuid(1) }],

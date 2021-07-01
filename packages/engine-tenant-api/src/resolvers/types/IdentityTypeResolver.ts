@@ -48,25 +48,23 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		const projects = await this.projectManager.getProjectsByIdentity(parent.id, context.permissionContext)
 		return (
 			await Promise.all(
-				projects.map(
-					async (it): Promise<IdentityProjectRelation | null> => {
-						const verifier = isSelf
-							? undefined
-							: context.permissionContext.createAccessVerifier(await context.permissionContext.createProjectScope(it))
-						const memberships = await this.projectMemberManager.getProjectMemberships(
-							{ id: it.id },
-							{ id: parent.id, roles },
-							verifier,
-						)
-						if (memberships.length === 0) {
-							return null
-						}
-						return {
-							project: { ...it, members: [], roles: [] },
-							memberships: memberships,
-						}
-					},
-				),
+				projects.map(async (it): Promise<IdentityProjectRelation | null> => {
+					const verifier = isSelf
+						? undefined
+						: context.permissionContext.createAccessVerifier(await context.permissionContext.createProjectScope(it))
+					const memberships = await this.projectMemberManager.getProjectMemberships(
+						{ id: it.id },
+						{ id: parent.id, roles },
+						verifier,
+					)
+					if (memberships.length === 0) {
+						return null
+					}
+					return {
+						project: { ...it, members: [], roles: [] },
+						memberships: memberships,
+					}
+				}),
 			)
 		).filter(notEmpty)
 	}

@@ -7,7 +7,8 @@ import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFa
 export class PaginatedHasManyFieldProviderVisitor
 	implements
 		Model.ColumnVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>>,
-		Model.RelationByTypeVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>> {
+		Model.RelationByTypeVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>>
+{
 	constructor(private readonly paginatedFieldFactory: PaginatedFieldConfigFactory) {}
 
 	visitOneHasMany(

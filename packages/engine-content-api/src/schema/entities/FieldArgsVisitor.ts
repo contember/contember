@@ -7,7 +7,8 @@ import { GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
 export class FieldArgsVisitor
 	implements
 		Model.ColumnVisitor<GraphQLFieldConfigArgumentMap | undefined>,
-		Model.RelationByGenericTypeVisitor<GraphQLFieldConfigArgumentMap | undefined> {
+		Model.RelationByGenericTypeVisitor<GraphQLFieldConfigArgumentMap | undefined>
+{
 	constructor(
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,

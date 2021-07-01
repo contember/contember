@@ -136,24 +136,22 @@ export class ProjectMemberManager {
 		verifier: AccessVerifier,
 	): Promise<MembershipVariable['values']> {
 		const values = await Promise.all(
-			variable.values.map(
-				async (value): Promise<string | null> => {
-					const subMembership = {
-						role: membership.role,
-						variables: [
-							{
-								name: variable.name,
-								values: [value],
-							},
-						],
-					}
+			variable.values.map(async (value): Promise<string | null> => {
+				const subMembership = {
+					role: membership.role,
+					variables: [
+						{
+							name: variable.name,
+							values: [value],
+						},
+					],
+				}
 
-					if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([subMembership])))) {
-						return null
-					}
-					return value
-				},
-			),
+				if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([subMembership])))) {
+					return null
+				}
+				return value
+			}),
 		)
 		return values.filter(notEmpty)
 	}

@@ -7,7 +7,7 @@ import { FieldNode, ObjectNode } from '../../inputProcessing'
 
 export interface SelectExecutionHandler<
 	FieldArgs = unknown,
-	FieldExtensions extends Record<string, any> = Record<string, any>
+	FieldExtensions extends Record<string, any> = Record<string, any>,
 > {
 	process(context: SelectExecutionHandlerContext<FieldArgs, FieldExtensions>): void
 }
@@ -16,7 +16,7 @@ export type DataCallback = (ids: Input.PrimaryValue[]) => Promise<SelectNestedDa
 
 export type SelectExecutionHandlerContext<
 	FieldArgs = any,
-	FieldExtensions extends Record<string, any> = Record<string, any>
+	FieldExtensions extends Record<string, any> = Record<string, any>,
 > = {
 	mapper: Mapper
 	path: Path

@@ -27,40 +27,38 @@ class SchemaBuilder {
 	}
 
 	public createSchema(): Model.Schema {
-		const entities = Object.entries(this.entityRegistry.entities).map(
-			([entityName, definition]): Model.Entity => {
-				const definitionInstance: Record<string, Interface<FieldDefinition<any>>> = new definition()
+		const entities = Object.entries(this.entityRegistry.entities).map(([entityName, definition]): Model.Entity => {
+			const definitionInstance: Record<string, Interface<FieldDefinition<any>>> = new definition()
 
-				const unique = Reflect.getMetadata('uniqueKeys', definition) || []
+			const unique = Reflect.getMetadata('uniqueKeys', definition) || []
 
-				const primaryName = this.conventions.getPrimaryField()
-				const primaryField = this.createPrimaryColumn()
+			const primaryName = this.conventions.getPrimaryField()
+			const primaryField = this.createPrimaryColumn()
 
-				return {
-					name: entityName,
-					primary: primaryName,
-					primaryColumn: this.conventions.getColumnName(primaryName),
-					unique: this.createUnique(entityName, unique, definitionInstance),
-					fields: [tuple(primaryName, primaryField), ...Object.entries(definitionInstance)]
-						.map(([name, definition]) => {
-							return definition.createField({
-								name,
-								entityName,
-								conventions: this.conventions,
-								enumRegistry: this.enumRegistry,
-								entityRegistry: this.entityRegistry,
-							})
+			return {
+				name: entityName,
+				primary: primaryName,
+				primaryColumn: this.conventions.getColumnName(primaryName),
+				unique: this.createUnique(entityName, unique, definitionInstance),
+				fields: [tuple(primaryName, primaryField), ...Object.entries(definitionInstance)]
+					.map(([name, definition]) => {
+						return definition.createField({
+							name,
+							entityName,
+							conventions: this.conventions,
+							enumRegistry: this.enumRegistry,
+							entityRegistry: this.entityRegistry,
 						})
-						.reduce<Model.Entity['fields']>((acc, field) => {
-							if (acc[field.name]) {
-								throw new Error(`Entity ${entityName}: field ${field.name} is already registered`)
-							}
-							return { ...acc, [field.name]: field }
-						}, {}),
-					tableName: this.conventions.getTableName(entityName),
-				}
-			},
-		)
+					})
+					.reduce<Model.Entity['fields']>((acc, field) => {
+						if (acc[field.name]) {
+							throw new Error(`Entity ${entityName}: field ${field.name} is already registered`)
+						}
+						return { ...acc, [field.name]: field }
+					}, {}),
+				tableName: this.conventions.getTableName(entityName),
+			}
+		})
 
 		return {
 			enums: Object.entries(this.enumRegistry.enums).reduce((acc, [name, def]) => ({ ...acc, [name]: def.values }), {}),

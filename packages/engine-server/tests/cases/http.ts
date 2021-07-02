@@ -4,6 +4,7 @@ import { getExampleProjectDirectory, recreateDatabase } from '@contember/engine-
 import * as nodeAssert from 'assert'
 import * as assert from 'uvu/assert'
 import { test } from 'uvu'
+import prom from 'prom-client'
 
 const dbCredentials = (dbName: string) => {
 	return {
@@ -15,8 +16,8 @@ const dbCredentials = (dbName: string) => {
 	}
 }
 
-let authKey = ''
-let loginToken = ''
+const rootToken = String(process.env.CONTEMBER_ROOT_TOKEN)
+const loginToken = String(process.env.CONTEMBER_LOGIN_TOKEN)
 
 // Used to allow prettier formatting of GraphQL queries
 const gql = (strings: TemplateStringsArray) => {
@@ -24,14 +25,18 @@ const gql = (strings: TemplateStringsArray) => {
 	return strings[0]
 }
 
-const createContainer = (debug: boolean) =>
-	new CompositionRoot().createMasterContainer(
+const createContainer = (debug: boolean) => {
+	prom.register.clear()
+	return new CompositionRoot().createMasterContainer(
 		debug,
 		{
 			tenant: {
 				db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
 				mailer: {},
-				credentials: {},
+				credentials: {
+					rootToken,
+					loginToken,
+				},
 			},
 			projects: {
 				test: {
@@ -52,6 +57,7 @@ const createContainer = (debug: boolean) =>
 		getExampleProjectDirectory(),
 		[],
 	)
+}
 
 const executeGraphql = (
 	query: string,
@@ -60,7 +66,7 @@ const executeGraphql = (
 	const container = createContainer(options.debug || false)
 	return supertest(container.koa.callback())
 		.post(options.path || '/content/test/prod')
-		.set('Authorization', 'Bearer ' + (options.authorizationToken || authKey))
+		.set('Authorization', 'Bearer ' + (options.authorizationToken || rootToken))
 		.send({
 			query,
 			variables: options.variables || {},
@@ -90,39 +96,17 @@ const signIn = async (email: string, password: string): Promise<string> => {
 }
 
 test.before(async () => {
-	const connection = await recreateDatabase(String(process.env.TEST_DB_NAME))
-	await connection.end()
-	const connection2 = await recreateDatabase(String(process.env.TEST_DB_NAME_TENANT))
-	await connection2.end()
-	await createContainer(false).initializer.initialize()
-
-	const response = await executeGraphql(
-		gql`
-			mutation {
-				setup(superadmin: { email: "admin@example.com", password: "123456" }) {
-					ok
-					result {
-						superadmin {
-							id
-						}
-						loginKey {
-							id
-							token
-							identity {
-								id
-							}
-						}
-					}
-				}
-			}
-		`,
-		{
-			path: '/tenant',
-			authorizationToken: '12345123451234512345',
-		},
-	)
-	loginToken = response.body.data.setup.result.loginKey.token
-	authKey = await signIn('admin@example.com', '123456')
+	try {
+		const connection = await recreateDatabase(String(process.env.TEST_DB_NAME))
+		await connection.end()
+		const connection2 = await recreateDatabase(String(process.env.TEST_DB_NAME_TENANT))
+		await connection2.end()
+		await createContainer(false).initializer.initialize()
+	} catch (e) {
+		// eslint-disable-next-line no-console
+		console.error(e)
+		process.exit(1)
+	}
 })
 
 test('show homepage', async () => {

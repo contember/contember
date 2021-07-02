@@ -27,11 +27,11 @@ import {
 	ProjectContainer,
 	ProjectContainerResolver,
 	providers,
-	SystemServerProvider,
-	TenantApolloServerFactory,
+	TenantGraphQLMiddlewareFactory,
 } from '@contember/engine-http'
 import prom from 'prom-client'
 import { registerDbMetrics } from './utils'
+import { SystemGraphQLMiddlewareFactory } from '@contember/engine-http'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -117,17 +117,19 @@ class CompositionRoot {
 			.addService('tenantContainer', () => tenantContainer)
 			.addService('projectContainerResolver', () => projectContainerResolver)
 
-			.addService('tenantApolloServer', ({ tenantContainer }) =>
-				new TenantApolloServerFactory(
-					tenantContainer.resolvers,
-					tenantContainer.resolverContextFactory,
-					logSentryError,
-				).create(),
+			.addService(
+				'tenantGraphQlMiddlewareFactory',
+				({ tenantContainer }) =>
+					new TenantGraphQLMiddlewareFactory(
+						tenantContainer.resolvers,
+						tenantContainer.resolverContextFactory,
+						logSentryError,
+					),
 			)
 			.addService(
-				'systemServerProvider',
+				'systemGraphQLMiddlewareFactory',
 				() =>
-					new SystemServerProvider(
+					new SystemGraphQLMiddlewareFactory(
 						systemContainer.systemResolversFactory,
 						systemContainer.resolverContextFactory,
 						logSentryError,
@@ -149,11 +151,11 @@ class CompositionRoot {
 			.addService(
 				'koa',
 				({
-					tenantApolloServer,
+					tenantGraphQlMiddlewareFactory,
 					projectContainerResolver,
 					tenantContainer,
 					providers,
-					systemServerProvider,
+					systemGraphQLMiddlewareFactory,
 					promRegistry,
 				}) => {
 					const app = new Koa()
@@ -161,12 +163,12 @@ class CompositionRoot {
 						createRootMiddleware(
 							debugMode,
 							{
-								tenantApolloServer,
+								tenantGraphQlMiddlewareFactory,
 								projectContainerResolver,
 								apiKeyManager: tenantContainer.apiKeyManager,
 								projectMemberManager: tenantContainer.projectMemberManager,
 								providers,
-								systemServerProvider,
+								systemGraphQLMiddlewareFactory,
 							},
 							promRegistry,
 							config.server.http,

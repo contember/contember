@@ -18,10 +18,14 @@ import koaCompress from 'koa-compress'
 import bodyParser from 'koa-bodyparser'
 import { createColllectHttpMetricsMiddleware } from './CollectHttpMetricsMiddelware'
 import { Config } from '../config/config'
+import { SystemGraphQLMiddlewareFactory, TenantGraphQLMiddlewareFactory } from '@contember/engine-http'
 
 export const createRootMiddleware = (
 	debug: boolean,
-	services: ServicesState,
+	services: ServicesState & {
+		tenantGraphQlMiddlewareFactory: TenantGraphQLMiddlewareFactory
+		systemGraphQLMiddlewareFactory: SystemGraphQLMiddlewareFactory
+	},
 	prometheusRegistry: prom.Registry,
 	httpConfig: Config['server']['http'],
 ): KoaMiddleware<any> => {
@@ -40,7 +44,7 @@ export const createRootMiddleware = (
 		route('/playground$', createPlaygroundMiddleware()),
 		createHomepageMiddleware(),
 		createContentMiddleware(),
-		createTenantMiddleware(),
-		createSystemMiddleware(),
+		createTenantMiddleware(services.tenantGraphQlMiddlewareFactory),
+		createSystemMiddleware(services.systemGraphQLMiddlewareFactory),
 	])
 }

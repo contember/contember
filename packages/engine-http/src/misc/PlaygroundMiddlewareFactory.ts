@@ -2,7 +2,6 @@ import {
 	RenderPageOptions as PlaygroundRenderPageOptions,
 	renderPlaygroundPage,
 } from '@apollographql/graphql-playground-html'
-import { createPlaygroundOptions } from 'apollo-server-core'
 import accepts from 'accepts'
 import { get, KoaContext, KoaMiddleware, KoaRequestState } from '../koa'
 
@@ -15,9 +14,9 @@ export const createPlaygroundMiddleware = (): KoaMiddleware<KoaRequestState> => 
 			return next()
 		}
 
-		const playgroundRenderPageOptions: PlaygroundRenderPageOptions | undefined = createPlaygroundOptions({
+		const playgroundRenderPageOptions: PlaygroundRenderPageOptions | undefined = {
 			endpoint: ctx.originalUrl,
-		})
+		}
 		if (!playgroundRenderPageOptions) {
 			return ctx.throw(404)
 		}

@@ -7,7 +7,7 @@ cd "$(dirname "$(dirname "$DIR")" )"
 echo "DROP DATABASE IF EXISTS benchmark_tenant" | docker-compose exec -T db bash -c "psql -h localhost -U \${POSTGRES_USER} postgres"
 echo "DROP DATABASE IF EXISTS benchmark_app" | docker-compose exec -T db bash -c "psql -h localhost -U \${POSTGRES_USER} postgres"
 
-CONTAINER_NAME="$( docker-compose run -d -e APP_DB_NAME=benchmark_app -e TENANT_DB_NAME=benchmark_tenant api node packages/benchmark/dist/src/start-server.js )"
+CONTAINER_NAME="$( docker-compose run -d -e APP_DB_NAME=benchmark_app -e TENANT_DB_NAME=benchmark_tenant api node --expose-gc packages/benchmark/dist/src/start-server.js )"
 
 sleep 5
 

@@ -1,14 +1,11 @@
 import { Client, EventManager } from '@contember/database'
-import { ApolloServerPlugin, GraphQLRequestListener } from 'apollo-server-plugin-base'
-import { GraphQLRequestContext } from 'apollo-server-core'
+import { GraphQLListener } from './execution'
 
 type Query = { sql: string; bindings: any; elapsed?: number; error?: string; meta?: any; rowCount?: number }
 
-export default class DbQueriesPlugin<Ctx extends Record<string, any>> implements ApolloServerPlugin<Ctx> {
-	constructor(private readonly dbResolver: (context: Ctx) => Client) {}
-
-	requestDidStart({ context }: GraphQLRequestContext<Ctx>): GraphQLRequestListener<Ctx> {
-		const db = this.dbResolver(context)
+export const createDbQueriesListener = <Context>(dbResolver: (state: Context) => Client): GraphQLListener<Context> => ({
+	onExecute: ({ context }) => {
+		const db = dbResolver(context)
 		if (!db) {
 			return {}
 		}
@@ -24,12 +21,9 @@ export default class DbQueriesPlugin<Ctx extends Record<string, any>> implements
 			})
 		db.eventManager.on(EventManager.Event.queryEnd, listener)
 		db.eventManager.on(EventManager.Event.queryError, errorListener)
+
 		return {
-			willSendResponse: ({ response, context }) => {
-				const db = this.dbResolver(context)
-				if (!db) {
-					return
-				}
+			onResponse: ({ response }) => {
 				db.eventManager.removeListener(EventManager.Event.queryEnd, listener)
 				db.eventManager.removeListener(EventManager.Event.queryError, errorListener)
 				const extensions = response.extensions || (response.extensions = {})
@@ -39,5 +33,5 @@ export default class DbQueriesPlugin<Ctx extends Record<string, any>> implements
 				}))
 			},
 		}
-	}
-}
+	},
+})

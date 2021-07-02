@@ -1,14 +1,10 @@
-import {
-	GraphQLInfoState,
-	KoaMiddleware,
-	ModuleInfoMiddlewareState,
-	ProjectResolveMiddlewareState,
-} from '@contember/engine-http'
+import { KoaMiddleware, ModuleInfoMiddlewareState, ProjectResolveMiddlewareState } from '@contember/engine-http'
 import prom from 'prom-client'
+import { GraphQLKoaState } from '@contember/engine-http'
 
 export const createColllectHttpMetricsMiddleware = (
 	registry: prom.Registry,
-): KoaMiddleware<Partial<ProjectResolveMiddlewareState & ModuleInfoMiddlewareState & GraphQLInfoState>> => {
+): KoaMiddleware<Partial<ProjectResolveMiddlewareState & ModuleInfoMiddlewareState & GraphQLKoaState>> => {
 	const requestSummary = new prom.Histogram({
 		name: 'contember_http_duration_seconds',
 		help: 'Incoming HTTP requests statistics by http_method (OPTIONS requests are ignored), http_code, contember_project (or "unknown" for undefined project), contember_module (system, tenant, content, unknown) and graphql_operation (query, mutation, unknown)',

@@ -1,18 +1,16 @@
-import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
 import corsMiddleware from '@koa/cors'
-import { compose, KoaMiddleware, route } from '../koa'
+import { compose, route } from '../koa'
 import { createAuthMiddleware, createModuleInfoMiddleware } from '../common'
-import { TenantApolloServerState } from '../services'
+import { TenantGraphQLMiddlewareFactory } from './TenantGraphQLMiddlewareFactory'
 
-type KoaState = TenantApolloServerState
-
-export const createTenantMiddleware = () => {
-	const graphQlMiddleware: KoaMiddleware<KoaState> = async (ctx, next) => {
-		const apolloServer = ctx.state.tenantApolloServer
-		await graphqlKoa(apolloServer.createGraphQLServerOptions.bind(apolloServer))(ctx, next)
-	}
+export const createTenantMiddleware = (tenantGraphqlMiddlewareFactory: TenantGraphQLMiddlewareFactory) => {
 	return route(
 		'/tenant$',
-		compose([createModuleInfoMiddleware('tenant'), corsMiddleware(), createAuthMiddleware(), graphQlMiddleware]),
+		compose([
+			createModuleInfoMiddleware('tenant'),
+			corsMiddleware(),
+			createAuthMiddleware(),
+			tenantGraphqlMiddlewareFactory.create(),
+		]),
 	)
 }

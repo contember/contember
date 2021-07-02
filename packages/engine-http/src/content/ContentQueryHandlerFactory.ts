@@ -1,50 +1,55 @@
-import { ApolloServer } from 'apollo-server-koa'
 import { GraphQLSchema } from 'graphql'
 import { Context, ExecutionContainerFactory, flattenVariables } from '@contember/engine-content-api'
-import DbQueriesPlugin from '../graphql/DbQueriesPlugin'
-import { KoaContext } from '../koa'
+import { createDbQueriesListener } from '../graphql/dbQueriesListener'
+import { KoaContext, KoaMiddleware } from '../koa'
 import { ProjectMemberMiddlewareState } from '../project-common'
 import { getArgumentValues } from 'graphql/execution/values'
 import { setupSystemVariables } from '@contember/engine-system-api'
 import { v4 as uuidv4 } from 'uuid'
 import { Acl, Schema } from '@contember/schema'
-import { ErrorContextProvider, ErrorHandlerPlugin, ErrorLogger } from '../graphql/ErrorHandlerPlugin'
 import { ContentServerMiddlewareState } from './ContentServerMiddleware'
-import { AuthMiddlewareState, GraphqlInfoProviderPlugin, GraphQLInfoState, TimerMiddlewareState } from '../common'
-import { ApolloServerPlugin } from 'apollo-server-plugin-base'
+import { AuthMiddlewareState, TimerMiddlewareState } from '../common'
+import { createGraphQLQueryHandler, GraphQLListener } from '../graphql/execution'
+import { createErrorListener, ErrorLogger } from '../graphql/errors'
+import { createGraphqlRequestInfoProviderListener, GraphQLKoaState } from '../graphql/state'
 
-type InputKoaContext = KoaContext<
-	ProjectMemberMiddlewareState &
-		ContentServerMiddlewareState &
-		TimerMiddlewareState &
-		AuthMiddlewareState &
-		GraphQLInfoState
->
+export type KoaState = ProjectMemberMiddlewareState &
+	ContentServerMiddlewareState &
+	TimerMiddlewareState &
+	AuthMiddlewareState &
+	GraphQLKoaState
+type InputKoaContext = KoaContext<KoaState>
 
-type ExtendedGraphqlContext = Context & { errorContextProvider: ErrorContextProvider; koaContext: InputKoaContext }
+type ExtendedGraphqlContext = Context & { koaContext: KoaContext<KoaState> }
 
-class ContentApolloServerFactory {
+class ContentQueryHandlerFactory {
 	constructor(
 		private readonly projectName: string,
 		private readonly debug: boolean,
 		private readonly errorLogger: ErrorLogger,
 	) {}
 
-	public create(permissions: Acl.Permissions, schema: Schema, dataSchema: GraphQLSchema): ApolloServer {
-		const plugins: ApolloServerPlugin[] = [
-			new GraphqlInfoProviderPlugin(),
-			new ErrorHandlerPlugin(this.projectName, 'content', this.errorLogger),
+	public create(permissions: Acl.Permissions, schema: Schema, dataSchema: GraphQLSchema): KoaMiddleware<KoaState> {
+		const listeners: GraphQLListener<ExtendedGraphqlContext>[] = [
+			createErrorListener((err, ctx) => {
+				this.errorLogger(err, {
+					body: ctx.koaContext.request.body as string,
+					url: ctx.koaContext.request.originalUrl,
+					user: ctx.koaContext.state.authResult.identityId,
+					module: 'content',
+					project: this.projectName,
+				})
+			}),
+			createGraphqlRequestInfoProviderListener(),
 		]
 		if (this.debug) {
-			plugins.push(new DbQueriesPlugin<ExtendedGraphqlContext>(context => context.db))
+			listeners.push(createDbQueriesListener(context => context.db))
 		}
-		return new ApolloServer({
-			uploads: false,
-			playground: false,
-			introspection: true,
+
+		return createGraphQLQueryHandler<ExtendedGraphqlContext, KoaState>({
 			schema: dataSchema,
-			plugins,
-			context: ({ ctx }: { ctx: InputKoaContext }) => this.createGraphqlContext(permissions, schema, ctx),
+			contextFactory: ctx => this.createGraphqlContext(permissions, schema, ctx),
+			listeners,
 		})
 	}
 
@@ -75,14 +80,9 @@ class ContentApolloServerFactory {
 			...partialContext,
 			executionContainer,
 			timer: ctx.state.timer,
-			errorContextProvider: () => ({
-				user: ctx.state.authResult.identityId,
-				body: ctx.request.body as string,
-				url: ctx.request.originalUrl,
-			}),
 			koaContext: ctx,
 		}
 	}
 }
 
-export { ContentApolloServerFactory }
+export { ContentQueryHandlerFactory }

@@ -3,9 +3,9 @@ import corsMiddleware from '@koa/cors'
 import { compose, route } from '../koa'
 import { createProjectMemberMiddleware, createProjectResolveMiddleware } from '../project-common'
 import { createAuthMiddleware, createModuleInfoMiddleware } from '../common'
-import { createSystemServerMiddleware } from './SystemServerMiddleware'
+import { SystemGraphQLMiddlewareFactory } from './SystemGraphQLMiddlewareFactory'
 
-export const createSystemMiddleware = () => {
+export const createSystemMiddleware = (systemGraphQLMiddlewareFactory: SystemGraphQLMiddlewareFactory) => {
 	return route(
 		'/system/:projectSlug$',
 		compose([
@@ -14,7 +14,7 @@ export const createSystemMiddleware = () => {
 			createAuthMiddleware(),
 			createProjectResolveMiddleware(),
 			createProjectMemberMiddleware(),
-			createSystemServerMiddleware(),
+			systemGraphQLMiddlewareFactory.create(),
 		]),
 	)
 }

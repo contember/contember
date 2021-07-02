@@ -1,4 +1,4 @@
-import { Builder, Container } from '@contember/dic'
+import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
 import Project from './config/Project'
 import { DatabaseContextFactory, SchemaVersionBuilder } from '@contember/engine-system-api'
@@ -7,12 +7,12 @@ import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
 import {
-	ContentApolloServerFactory,
+	ContentQueryHandlerProvider,
 	ContentSchemaResolver,
 	GraphQlSchemaFactory,
-	ContentServerProvider,
 	providers,
 } from '@contember/engine-http'
+import { ContentQueryHandlerFactory } from '@contember/engine-http'
 
 export const createProjectContainer = (
 	debug: boolean,
@@ -39,12 +39,12 @@ export const createProjectContainer = (
 				.filter((it): it is GraphQLSchemaContributor => !!it)
 			return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
 		})
-		.addService('apolloServerFactory', () => new ContentApolloServerFactory(project.slug, debug, logSentryError))
+		.addService('contentQueryHandlerFactory', () => new ContentQueryHandlerFactory(project.slug, debug, logSentryError))
 		.addService('contentSchemaResolver', () => new ContentSchemaResolver(schemaVersionBuilder))
 		.addService(
-			'contentServerProvider',
-			({ contentSchemaResolver, graphQlSchemaFactory, apolloServerFactory }) =>
-				new ContentServerProvider(contentSchemaResolver, graphQlSchemaFactory, apolloServerFactory),
+			'contentQueryHandlerProvider',
+			({ contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory }) =>
+				new ContentQueryHandlerProvider(contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory),
 		)
 		.addService(
 			'systemDatabaseContextFactory',
@@ -55,7 +55,7 @@ export const createProjectContainer = (
 	return projectContainer.pick(
 		'project',
 		'connection',
-		'contentServerProvider',
+		'contentQueryHandlerProvider',
 		'systemDatabaseContextFactory',
 		'contentSchemaResolver',
 	)

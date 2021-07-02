@@ -1,2 +1,2 @@
-export * from './TenantApolloServerFactory'
+export * from './TenantGraphQLMiddlewareFactory'
 export * from './TenantMiddleware'

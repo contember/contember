@@ -1,7 +1,6 @@
 import { KoaMiddleware } from '../koa'
-import { graphqlKoa } from 'apollo-server-koa/dist/koaApollo'
 import { ProjectMemberMiddlewareState, ProjectResolveMiddlewareState } from '../project-common'
-import { TimerMiddlewareState } from '../common'
+import { AuthMiddlewareState, TimerMiddlewareState } from '../common'
 import { Client } from '@contember/database'
 import { formatSchemaName, unnamedIdentity } from '@contember/engine-system-api'
 import { StageResolveMiddlewareState } from './StageResolveMiddlewareFactory'
@@ -12,7 +11,8 @@ type KoaState = ProjectMemberMiddlewareState &
 	ProjectResolveMiddlewareState &
 	StageResolveMiddlewareState &
 	ContentServerMiddlewareState &
-	ProvidersState
+	ProvidersState &
+	AuthMiddlewareState
 
 export const createContentServerMiddleware = (): KoaMiddleware<KoaState> => {
 	const contentServer: KoaMiddleware<KoaState> = async (ctx, next) => {
@@ -22,11 +22,11 @@ export const createContentServerMiddleware = (): KoaMiddleware<KoaState> => {
 		const dbContextFactory = ctx.state.projectContainer.systemDatabaseContextFactory
 		const dbClient = projectContainer.connection.createClient(formatSchemaName(stage), { module: 'content' })
 		ctx.state.db = dbClient
-		const server = await ctx.state.timer('GraphQLServerCreate', () =>
-			projectContainer.contentServerProvider.get(dbContextFactory.create(unnamedIdentity), stage, projectRoles),
+		const handler = await ctx.state.timer('GraphQLServerCreate', () =>
+			projectContainer.contentQueryHandlerProvider.get(dbContextFactory.create(unnamedIdentity), stage, projectRoles),
 		)
 
-		await ctx.state.timer('GraphQL', () => graphqlKoa(server.createGraphQLServerOptions.bind(server))(ctx, next))
+		await ctx.state.timer('GraphQL', () => handler(ctx, next))
 	}
 	return contentServer
 }

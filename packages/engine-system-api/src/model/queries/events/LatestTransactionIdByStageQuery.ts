@@ -18,7 +18,7 @@ export class LatestTransactionIdByStageQuery extends DatabaseQuery<string> {
 			)
 		).rows[0].id
 		const rows = (
-			await queryable.db.query<{ event_id: string }>(
+			await queryable.db.query<{ transaction_id: string }>(
 				`
 				SELECT transaction_id
 				FROM system.stage_transaction
@@ -32,6 +32,6 @@ export class LatestTransactionIdByStageQuery extends DatabaseQuery<string> {
 		if (rows.length !== 1) {
 			throw new ImplementationException()
 		}
-		return rows[0].event_id
+		return rows[0].transaction_id
 	}
 }

@@ -1,24 +1,12 @@
-import request from 'request'
-
-export const httpRequest = (options: request.OptionsWithUrl) => {
-	return new Promise<request.Response>((resolve, reject) => {
-		request(options, (err, response) => {
-			if (err) {
-				return reject(err)
-			}
-			resolve(response)
-		})
-	})
-}
+import fetch, { RequestInit } from 'node-fetch'
 
 export const createHttpOptions = (options: {
 	endpoint: string
 	query: string
 	variables?: Record<string, any>
 	authorizationToken: string
-}): request.OptionsWithUrl => {
+}): RequestInit => {
 	return {
-		url: options.endpoint,
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -35,8 +23,8 @@ export const graphqlRequest = async (options: {
 	authorizationToken: string
 	noTrx?: boolean
 }) => {
-	const response = await httpRequest(createHttpOptions(options))
-	const jsonResponse = JSON.parse(response.body)
+	const response = await fetch(options.endpoint, createHttpOptions(options))
+	const jsonResponse = await response.json()
 
 	if (jsonResponse.errors) {
 		throw new Error('Graphql request failed: ' + JSON.stringify(jsonResponse.errors))

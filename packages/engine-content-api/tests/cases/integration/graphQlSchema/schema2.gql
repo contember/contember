@@ -151,6 +151,7 @@ type Info {
 type Mutation {
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
+  query: Query!
   transaction: MutationTransaction!
 }
 
@@ -200,4 +201,5 @@ type MutationTransaction {
   validation: _ValidationResult!
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
+  query: Query!
 }

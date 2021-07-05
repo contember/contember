@@ -70,4 +70,5 @@ from "public"."post" as "root_"`,
 		},
 	})
 })
+
 test.run()

@@ -399,6 +399,7 @@ type Mutation {
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
   deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
+  query: Query!
   transaction: MutationTransaction!
 }
 
@@ -482,4 +483,5 @@ type MutationTransaction {
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
   deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
+  query: Query!
 }

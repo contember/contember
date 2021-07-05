@@ -326,6 +326,7 @@ type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
+  query: Query!
   transaction: MutationTransaction!
 }
 
@@ -409,4 +410,5 @@ type MutationTransaction {
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
+  query: Query!
 }

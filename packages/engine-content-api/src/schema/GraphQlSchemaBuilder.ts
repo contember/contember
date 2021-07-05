@@ -53,6 +53,10 @@ export class GraphQlSchemaBuilder {
 				},
 			})
 		}
+		const queryObjectType = new GraphQLObjectType({
+			name: 'Query',
+			fields: () => Object.fromEntries(queries),
+		})
 		if (mutations.size > 0) {
 			mutations.set('transaction', {
 				type: new GraphQLNonNull(
@@ -66,6 +70,9 @@ export class GraphQlSchemaBuilder {
 								type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
 							},
 							...Object.fromEntries(mutations),
+							query: {
+								type: queryObjectType,
+							},
 						},
 					}),
 				),
@@ -74,6 +81,10 @@ export class GraphQlSchemaBuilder {
 						context.executionContainer.mutationResolver.resolveTransaction(info),
 					)
 				},
+			})
+			mutations.set('query', {
+				type: new GraphQLNonNull(queryObjectType),
+				resolve: (parent, args, context: Context, info) => context.executionContainer.readResolver.resolveQuery(info),
 			})
 		}
 		queries.set('_info', {
@@ -89,10 +100,7 @@ export class GraphQlSchemaBuilder {
 		})
 
 		return new GraphQLSchema({
-			query: new GraphQLObjectType({
-				name: 'Query',
-				fields: () => Object.fromEntries(queries),
-			}),
+			query: queryObjectType,
 			...(mutations.size > 0
 				? {
 						mutation: new GraphQLObjectType({

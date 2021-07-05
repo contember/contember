@@ -157,6 +157,7 @@ type Mutation {
   createPost(data: PostCreateInput!): PostCreateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  query: Query!
   transaction: MutationTransaction!
 }
 
@@ -220,4 +221,5 @@ type MutationTransaction {
   createPost(data: PostCreateInput!): PostCreateResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  query: Query!
 }

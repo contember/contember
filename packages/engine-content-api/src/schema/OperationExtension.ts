@@ -9,6 +9,7 @@ export const ExtensionKey = 'OperationMeta'
 
 export const readOperationMeta = (data: Record<string, unknown> | undefined | null): OperationMeta => {
 	if (!data) {
+		debugger
 		throw new ImplementationException()
 	}
 	const meta = data[ExtensionKey]

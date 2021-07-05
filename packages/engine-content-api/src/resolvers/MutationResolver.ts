@@ -1,13 +1,13 @@
 import { Input, Model, Result, Value } from '@contember/schema'
 import {
-	Mapper,
 	ConstraintType,
 	getInsertPrimary,
 	InputErrorKind,
+	Mapper,
+	MapperFactory,
 	MutationResultHint,
 	MutationResultList,
 	MutationResultType,
-	MapperFactory,
 } from '../mapper'
 import { ValidationResolver } from './ValidationResolver'
 import { GraphQLResolveInfo } from 'graphql'
@@ -18,6 +18,7 @@ import { Operation, readOperationMeta } from '../schema'
 import { assertNever } from '../utils'
 import { InputPreValidator } from '../input-validation'
 import { ObjectNode } from '../inputProcessing'
+import { executeReadOperations } from './ReadHelpers'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -36,7 +37,8 @@ export class MutationResolver {
 				(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors'].includes(node.name.value)) ||
 				(path.length === 2 && node.name.value === 'node') ||
 				path.length > 2 ||
-				path.length === 0
+				path.length === 0 ||
+				(path.length > 1 && path[1] === 'query')
 			)
 		})
 		const fields = GraphQlQueryAstFactory.resolveObjectType(info.returnType).getFields()
@@ -59,6 +61,9 @@ export class MutationResolver {
 			for (const field of queryAst.fields) {
 				if (!(field instanceof ObjectNode)) {
 					throw new ImplementationException()
+				}
+				if (field.name === 'query') {
+					continue
 				}
 				const fieldConfig = fields[field.name]
 				if (!fieldConfig) {
@@ -107,7 +112,7 @@ export class MutationResolver {
 				}
 			}
 
-			const trxResult: Record<string, { ok: boolean; validation?: Result.ValidationResult }> = {}
+			const trxResult: Record<string, any> = {}
 			for (const field of queryAst.fields) {
 				if (!(field instanceof ObjectNode)) {
 					throw new ImplementationException()
@@ -116,6 +121,15 @@ export class MutationResolver {
 				if (!fieldConfig) {
 					throw new ImplementationException()
 				}
+				if (field.name === 'query') {
+					trxResult[field.alias] = await executeReadOperations(
+						field,
+						GraphQlQueryAstFactory.resolveObjectType(fieldConfig.type).getFields(),
+						mapper,
+					)
+					continue
+				}
+
 				const meta = readOperationMeta(fieldConfig.extensions)
 
 				const result: {

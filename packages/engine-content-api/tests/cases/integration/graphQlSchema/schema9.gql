@@ -688,6 +688,7 @@ type Mutation {
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
   updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
+  query: Query!
   transaction: MutationTransaction!
 }
 
@@ -823,4 +824,5 @@ type MutationTransaction {
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
   updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
+  query: Query!
 }

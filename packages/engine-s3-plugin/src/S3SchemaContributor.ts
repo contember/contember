@@ -12,6 +12,7 @@ import { S3Acl, S3Service, S3ServiceFactory } from './S3Service'
 import { resolveS3Config, S3Config } from './Config'
 import { createObjectKeyVerifier, ObjectKeyVerifier } from './ObjectKeyVerifier'
 import { GraphQLSchemaContributor, SchemaContext } from '@contember/engine-plugins'
+import { Providers } from '@contember/engine-plugins'
 
 interface Identity {
 	projectRoles: string[]
@@ -42,7 +43,11 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		),
 	}
 
-	constructor(private readonly s3Config: S3Config | undefined, private readonly s3Factory: S3ServiceFactory) {}
+	constructor(
+		private readonly s3Config: S3Config | undefined,
+		private readonly s3Factory: S3ServiceFactory,
+		private readonly providers: Providers,
+	) {}
 
 	getCacheKey(context: SchemaContext): string {
 		const roles = context.identity.projectRoles
@@ -66,7 +71,7 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		}
 
 		const s3Config = resolveS3Config(this.s3Config)
-		const s3 = this.s3Factory.create(s3Config)
+		const s3 = this.s3Factory.create(s3Config, this.providers)
 		const uploadMutation = this.createUploadMutation(s3Config, s3, allowedUploads)
 		const readMutation = this.createReadMutation(s3, allowedReads)
 		const mutation = {

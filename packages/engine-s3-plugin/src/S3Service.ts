@@ -1,9 +1,9 @@
-import { S3 as AwsS3 } from 'aws-sdk'
-import { v4 as uuidv4 } from 'uuid'
 import { extension } from 'mime-types'
-import { S3Config } from './Config'
+import { resolveS3Endpoint, S3Config } from './Config'
 import { ObjectKeyVerifier } from './ObjectKeyVerifier'
 import { ForbiddenError } from 'apollo-server-errors'
+import { Providers } from '@contember/engine-plugins'
+import { S3Signer } from './S3Signer'
 
 export enum S3Acl {
 	None = 'none',
@@ -29,22 +29,13 @@ type SignedUploadUrl = {
 }
 
 export class S3Service {
-	private readonly s3: AwsS3
+	private readonly baseUrl: string
 
-	private readonly endpoint: string
+	private readonly signer: S3Signer
 
-	constructor(public readonly config: S3Config) {
-		this.s3 = new AwsS3({
-			accessKeyId: config.credentials.key,
-			secretAccessKey: config.credentials.secret,
-			region: config.region,
-			signatureVersion: 'v4',
-			endpoint: config.endpoint || 's3.{region}.amazonaws.com',
-			s3ForcePathStyle: !!config.endpoint,
-		})
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-		const endpoint = this.s3.config.endpoint!
-		this.endpoint = typeof endpoint === 'string' ? endpoint : endpoint.href
+	constructor(public readonly config: S3Config, private readonly providers: Providers) {
+		this.baseUrl = resolveS3Endpoint(config).baseUrl
+		this.signer = new S3Signer(config, providers)
 	}
 
 	public getSignedUploadUrl(
@@ -55,7 +46,8 @@ export class S3Service {
 		prefix?: string,
 	): SignedUploadUrl {
 		const ext = extension(contentType) || 'bin'
-		const localObjectKey = (prefix ? prefix + '/' : '') + `${uuidv4()}.${ext}`
+		const id = this.providers.uuid()
+		const localObjectKey = (prefix ? prefix + '/' : '') + `${id}.${ext}`
 		verifyKey(localObjectKey)
 		const objectKey = (this.config.prefix ? this.config.prefix + '/' : '') + localObjectKey
 
@@ -65,13 +57,15 @@ export class S3Service {
 		}
 
 		const aclValue = this.config.noAcl || acl === S3Acl.None ? undefined : acl || S3Acl.PublicRead
-		const url = this.s3.getSignedUrl('putObject', {
-			Bucket: bucket,
-			Key: objectKey,
-			ContentType: contentType,
-			CacheControl: 'immutable',
-			Expires: expiration || 3600,
-			...(aclValue ? { ACL: aclValue } : {}),
+		const url = this.signer.sign({
+			action: 'upload',
+			expiration: expiration || 3600,
+			key: objectKey,
+			headers: {
+				'Content-Type': contentType,
+				'Cache-Control': 'immutable',
+				...(aclValue ? { 'x-amz-acl': aclValue } : {}),
+			},
 		})
 		const publicUrl = this.formatPublicUrl(objectKey)
 		return {
@@ -109,10 +103,11 @@ export class S3Service {
 		objectKey = objectKey.substr(this.config.prefix.length + 1)
 		verifyKey(objectKey)
 
-		const url = this.s3.getSignedUrl('getObject', {
-			Bucket: bucket,
-			Key: objectKey,
-			Expires: expiration || 3600,
+		const url = this.signer.sign({
+			action: 'read',
+			expiration: expiration || 3600,
+			key: objectKey,
+			headers: {},
 		})
 		return {
 			bucket,
@@ -124,13 +119,12 @@ export class S3Service {
 	}
 
 	public formatPublicUrl(key: string): string {
-		const hostUrl = this.endpoint.includes('://') ? this.endpoint : 'https://' + this.endpoint
-		return `${hostUrl}/${this.config.bucket}/${key}`
+		return `${this.baseUrl}/${key}`
 	}
 }
 
 export class S3ServiceFactory {
-	public create(config: S3Config) {
-		return new S3Service(config)
+	public create(config: S3Config, providers: Providers) {
+		return new S3Service(config, providers)
 	}
 }

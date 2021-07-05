@@ -33,12 +33,15 @@ export const createProjectContainer = (
 
 		.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
 		.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
-		.addService('graphQlSchemaFactory', ({ project, permissionsByIdentityFactory, graphQlSchemaBuilderFactory }) => {
-			const contributors = plugins
-				.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ project }) : null))
-				.filter((it): it is GraphQLSchemaContributor => !!it)
-			return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
-		})
+		.addService(
+			'graphQlSchemaFactory',
+			({ project, permissionsByIdentityFactory, graphQlSchemaBuilderFactory, providers }) => {
+				const contributors = plugins
+					.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ project, providers }) : null))
+					.filter((it): it is GraphQLSchemaContributor => !!it)
+				return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
+			},
+		)
 		.addService('contentQueryHandlerFactory', () => new ContentQueryHandlerFactory(project.slug, debug, logSentryError))
 		.addService('contentSchemaResolver', () => new ContentSchemaResolver(schemaVersionBuilder))
 		.addService(

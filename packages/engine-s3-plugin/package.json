@@ -5,7 +5,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "scripts": {
-    "test": "echo 'No tests'"
+    "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
     "@contember/engine-common": "^0.12.0-alpha.2",
@@ -13,15 +13,17 @@
     "@contember/graphql-utils": "^0.12.0-alpha.2",
     "@contember/schema": "^0.12.0-alpha.2",
     "apollo-server-errors": "^2.3.4",
-    "aws-sdk": "^2.747.0",
     "mime-types": "^2.1.24",
     "picomatch": "^2.2.1",
+    "qs": "^6.10.1",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.0",
+    "@types/qs": "^6.9.6",
     "@types/uuid": "^8.3.0",
-    "graphql": "^15.4.0"
+    "graphql": "^15.4.0",
+    "uvu": "^0.5.1"
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"

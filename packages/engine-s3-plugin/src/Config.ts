@@ -28,3 +28,19 @@ export const resolveS3Config = (config: S3Config): S3Config => {
 		...config,
 	}
 }
+
+const defaultRegion = 'eu-west-1'
+
+export const resolveS3Endpoint = (
+	config: S3Config,
+): {
+	endpoint: string
+	basePath: string
+	baseUrl: string
+} => {
+	const endpoint = config.endpoint || `https://${config.bucket}.s3.${config.region || defaultRegion}.amazonaws.com`
+	const hasCustomEndpoint = !!config.endpoint
+	const basePath = hasCustomEndpoint ? `/${config.bucket}` : ''
+	const baseUrl = endpoint + basePath
+	return { endpoint, basePath, baseUrl }
+}

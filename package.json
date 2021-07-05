@@ -43,5 +43,6 @@
   "workspaces": [
     "packages/*",
     "packages/cli/resources/templates/*"
-  ]
+  ],
+  "dependencies": {}
 }

@@ -630,12 +630,18 @@ type Mutation {
   transaction: MutationTransaction!
 }
 
-type AuthorCreateResult {
+type AuthorCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Author
   validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
 }
 
 type _MutationError {
@@ -655,14 +661,14 @@ enum _MutationErrorType {
   SqlError
 }
 
-type AuthorDeleteResult {
+type AuthorDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Author
 }
 
-type AuthorUpdateResult {
+type AuthorUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -670,7 +676,7 @@ type AuthorUpdateResult {
   validation: _ValidationResult!
 }
 
-type CategoryCreateResult {
+type CategoryCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -678,14 +684,14 @@ type CategoryCreateResult {
   validation: _ValidationResult!
 }
 
-type CategoryDeleteResult {
+type CategoryDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Category
 }
 
-type CategoryUpdateResult {
+type CategoryUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -693,7 +699,7 @@ type CategoryUpdateResult {
   validation: _ValidationResult!
 }
 
-type PostLocaleCreateResult {
+type PostLocaleCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -701,14 +707,14 @@ type PostLocaleCreateResult {
   validation: _ValidationResult!
 }
 
-type PostLocaleDeleteResult {
+type PostLocaleDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: PostLocale
 }
 
-type PostLocaleUpdateResult {
+type PostLocaleUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -716,7 +722,7 @@ type PostLocaleUpdateResult {
   validation: _ValidationResult!
 }
 
-type PostCreateResult {
+type PostCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -724,14 +730,14 @@ type PostCreateResult {
   validation: _ValidationResult!
 }
 
-type PostDeleteResult {
+type PostDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Post
 }
 
-type PostUpdateResult {
+type PostUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!

@@ -329,12 +329,18 @@ type Mutation {
   transaction: MutationTransaction!
 }
 
-type PostLocaleCreateResult {
+type PostLocaleCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: PostLocale
   validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
 }
 
 type _MutationError {
@@ -354,14 +360,14 @@ enum _MutationErrorType {
   SqlError
 }
 
-type PostLocaleDeleteResult {
+type PostLocaleDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: PostLocale
 }
 
-type PostLocaleUpdateResult {
+type PostLocaleUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -369,7 +375,7 @@ type PostLocaleUpdateResult {
   validation: _ValidationResult!
 }
 
-type PostCreateResult {
+type PostCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -377,14 +383,14 @@ type PostCreateResult {
   validation: _ValidationResult!
 }
 
-type PostDeleteResult {
+type PostDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Post
 }
 
-type PostUpdateResult {
+type PostUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!

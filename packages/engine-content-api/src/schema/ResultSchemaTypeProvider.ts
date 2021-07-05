@@ -3,6 +3,7 @@ import {
 	GraphQLBoolean,
 	GraphQLEnumType,
 	GraphQLInt,
+	GraphQLInterfaceType,
 	GraphQLList,
 	GraphQLNonNull,
 	GraphQLObjectType,
@@ -82,4 +83,13 @@ export class ResultSchemaTypeProvider {
 	})
 
 	public errorListResultType = new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.errorResultType)))
+
+	public mutationResultType = new GraphQLInterfaceType({
+		name: 'MutationResult',
+		fields: {
+			ok: { type: new GraphQLNonNull(GraphQLBoolean) },
+			errorMessage: { type: GraphQLString },
+			errors: { type: this.errorListResultType },
+		},
+	})
 }

@@ -402,12 +402,18 @@ type Mutation {
   transaction: MutationTransaction!
 }
 
-type VideoCreateResult {
+type VideoCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Video
   validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
 }
 
 type _MutationError {
@@ -427,14 +433,14 @@ enum _MutationErrorType {
   SqlError
 }
 
-type VideoDeleteResult {
+type VideoDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Video
 }
 
-type VideoUpdateResult {
+type VideoUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -442,7 +448,7 @@ type VideoUpdateResult {
   validation: _ValidationResult!
 }
 
-type FrontPageCreateResult {
+type FrontPageCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -450,14 +456,14 @@ type FrontPageCreateResult {
   validation: _ValidationResult!
 }
 
-type FrontPageDeleteResult {
+type FrontPageDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: FrontPage
 }
 
-type FrontPageUpdateResult {
+type FrontPageUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!

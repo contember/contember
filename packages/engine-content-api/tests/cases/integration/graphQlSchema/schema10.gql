@@ -160,11 +160,17 @@ type Mutation {
   transaction: MutationTransaction!
 }
 
-type AuthorCreateResult {
+type AuthorCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
 }
 
 type _MutationError {
@@ -184,21 +190,21 @@ enum _MutationErrorType {
   SqlError
 }
 
-type PostCreateResult {
+type PostCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
-type PostLocaleCreateResult {
+type PostLocaleCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
 }
 
-type CategoryCreateResult {
+type CategoryCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!

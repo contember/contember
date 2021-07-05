@@ -146,6 +146,7 @@ export class MutationProvider {
 		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}${operation}Result`,
 			fields: fields,
+			interfaces: [this.resultSchemaTypeProvider.mutationResultType],
 		})
 	}
 }

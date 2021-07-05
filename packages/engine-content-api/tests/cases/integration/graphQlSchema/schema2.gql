@@ -154,12 +154,18 @@ type Mutation {
   transaction: MutationTransaction!
 }
 
-type TestCreateResult {
+type TestCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Test
   validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
 }
 
 type _MutationError {
@@ -179,7 +185,7 @@ enum _MutationErrorType {
   SqlError
 }
 
-type TestUpdateResult {
+type TestUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!

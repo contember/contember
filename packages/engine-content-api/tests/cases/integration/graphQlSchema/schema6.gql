@@ -236,11 +236,17 @@ type Mutation {
   transaction: MutationTransaction!
 }
 
-type OneHasManyEntityDeleteResult {
+type OneHasManyEntityDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: OneHasManyEntity
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
 }
 
 type _MutationError {
@@ -260,7 +266,7 @@ enum _MutationErrorType {
   SqlError
 }
 
-type OneHasManyEntityUpdateResult {
+type OneHasManyEntityUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -268,14 +274,14 @@ type OneHasManyEntityUpdateResult {
   validation: _ValidationResult!
 }
 
-type RootDeleteResult {
+type RootDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Root
 }
 
-type RootUpdateResult {
+type RootUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!

@@ -132,8 +132,7 @@ export const createMapperContainer = ({ permissions, schema, identityVariables, 
 		)
 		.addService(
 			'updater',
-			({ predicateFactory, updateBuilderFactory, uniqueWhereExpander }) =>
-				new Updater(schema.model, predicateFactory, updateBuilderFactory, uniqueWhereExpander),
+			({ predicateFactory, updateBuilderFactory }) => new Updater(schema.model, predicateFactory, updateBuilderFactory),
 		)
 		.addService(
 			'inserter',

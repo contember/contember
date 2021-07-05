@@ -679,16 +679,20 @@ type Mutation {
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
   deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
+  upsertAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, update: AuthorUpdateInput!, create: AuthorCreateInput!): AuthorUpsertResult!
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
+  upsertPost(by: PostUniqueWhere!, filter: PostWhere, update: PostUpdateInput!, create: PostCreateInput!): PostUpsertResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  upsertPostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, update: PostLocaleUpdateInput!, create: PostLocaleCreateInput!): PostLocaleUpsertResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
   updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
-  query: Query!
+  upsertCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, update: CategoryUpdateInput!, create: CategoryCreateInput!): CategoryUpsertResult!
+  query: Query
   transaction: MutationTransaction!
 }
 
@@ -738,6 +742,14 @@ type AuthorUpdateResult implements MutationResult {
   validation: _ValidationResult!
 }
 
+type AuthorUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Author
+  validation: _ValidationResult!
+}
+
 type PostCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
@@ -754,6 +766,14 @@ type PostDeleteResult implements MutationResult {
 }
 
 type PostUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Post
+  validation: _ValidationResult!
+}
+
+type PostUpsertResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
@@ -784,6 +804,14 @@ type PostLocaleUpdateResult implements MutationResult {
   validation: _ValidationResult!
 }
 
+type PostLocaleUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: PostLocale
+  validation: _ValidationResult!
+}
+
 type CategoryCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
@@ -807,6 +835,14 @@ type CategoryUpdateResult implements MutationResult {
   validation: _ValidationResult!
 }
 
+type CategoryUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
@@ -815,14 +851,18 @@ type MutationTransaction {
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
   deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
+  upsertAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, update: AuthorUpdateInput!, create: AuthorCreateInput!): AuthorUpsertResult!
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
+  upsertPost(by: PostUniqueWhere!, filter: PostWhere, update: PostUpdateInput!, create: PostCreateInput!): PostUpsertResult!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  upsertPostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, update: PostLocaleUpdateInput!, create: PostLocaleCreateInput!): PostLocaleUpsertResult!
   createCategory(data: CategoryCreateInput!): CategoryCreateResult!
   deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
   updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
-  query: Query!
+  upsertCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, update: CategoryUpdateInput!, create: CategoryCreateInput!): CategoryUpsertResult!
+  query: Query
 }

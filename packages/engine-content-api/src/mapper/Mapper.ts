@@ -9,7 +9,7 @@ import { PredicatesInjector } from '../acl'
 import { WhereBuilder } from './select'
 import { JunctionTableManager } from './JunctionTableManager'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete'
-import { MutationResultList } from './Result'
+import { MutationEntryNotFoundError, MutationResultList } from './Result'
 import { Updater } from './update'
 import { Inserter } from './insert'
 import { tryMutation } from './ErrorUtils'
@@ -173,7 +173,13 @@ export class Mapper {
 		data: Input.UpdateDataInput,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		return tryMutation(() => this.updater.update(this, entity, by, data, filter))
+		return tryMutation(async () => {
+			const primaryValue = await this.getPrimaryValue(entity, by)
+			if (primaryValue === undefined) {
+				return [new MutationEntryNotFoundError([], by)]
+			}
+			return await this.updater.update(this, entity, primaryValue, data, filter)
+		})
 	}
 
 	public async updateInternal(
@@ -182,7 +188,32 @@ export class Mapper {
 		predicateFields: string[],
 		builderCb: (builder: UpdateBuilder) => void,
 	): Promise<MutationResultList> {
-		return tryMutation(() => this.updater.updateCb(this, entity, by, predicateFields, builderCb))
+		return tryMutation(async () => {
+			const primaryValue = await this.getPrimaryValue(entity, by)
+			if (primaryValue === undefined) {
+				return [new MutationEntryNotFoundError([], by)]
+			}
+			return await this.updater.updateCb(this, entity, primaryValue, predicateFields, builderCb)
+		})
+	}
+
+	public async upsert(
+		entity: Model.Entity,
+		by: Input.UniqueWhere,
+		update: Input.UpdateDataInput,
+		create: Input.CreateDataInput,
+		filter?: Input.OptionalWhere,
+	): Promise<MutationResultList> {
+		return tryMutation(async () => {
+			const primaryValue = await this.getPrimaryValue(entity, by)
+			if (primaryValue === undefined) {
+				return await this.inserter.insert(this, entity, create, id => {
+					const where = { [entity.primary]: id }
+					this.primaryKeyCache[this.hashWhere(entity.name, where)] = id
+				})
+			}
+			return await this.updater.update(this, entity, primaryValue, update, filter)
+		})
 	}
 
 	public async delete(

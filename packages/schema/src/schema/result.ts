@@ -1,9 +1,17 @@
 import Value from './value'
 
 namespace Result {
-	export type MutationFieldResult = CreateResult | UpdateResult | DeleteResult
+	export type MutationFieldResult = CreateResult | UpdateResult | DeleteResult | UpsertResult
 
 	export interface CreateResult {
+		ok: boolean
+		errorMessage?: string
+		errors: ExecutionError[]
+		validation: ValidationResult
+		node: Value.Object | null
+	}
+
+	export interface UpsertResult {
 		ok: boolean
 		errorMessage?: string
 		errors: ExecutionError[]

@@ -79,6 +79,13 @@ namespace Input {
 		data: UpdateDataInput<E>
 	}
 
+	export interface UpsertInput<E = never> {
+		by: UniqueWhere<E>
+		filter?: OptionalWhere<E>
+		update: UpdateDataInput<E>
+		create: CreateDataInput<E>
+	}
+
 	export interface CreateInput<E = never> {
 		data: CreateDataInput<E>
 	}

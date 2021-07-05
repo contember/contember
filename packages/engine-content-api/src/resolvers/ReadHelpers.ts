@@ -45,6 +45,7 @@ export const executeReadOperations = async (
 				case Operation.create:
 				case Operation.update:
 				case Operation.delete:
+				case Operation.upsert:
 					throw new ImplementationException()
 			}
 			return assertNever(meta.operation)

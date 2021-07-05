@@ -46,16 +46,13 @@ test('create', async () => {
 					},
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "setting_id",
-                 "root_"."id",
-                 "root_"."name"
-               from "public"."site" as "root_"
-               where "root_"."setting_id" = ?) update "public"."site"
-              set "setting_id" = "newData_"."setting_id" from "newData_"
-              where "site"."id" = "newData_"."id"`,
-					parameters: [null, testUuid(2)],
+					sql: SQL`
+						with "newData_" as
+						(select ? :: uuid as "setting_id", "root_"."id", "root_"."name"  from "public"."site" as "root_"  where "root_"."id" = ?)
+						update  "public"."site" set  "setting_id" =  "newData_"."setting_id"
+						from "newData_"  where "site"."id" = "newData_"."id"
+					`,
+					parameters: [null, testUuid(3)],
 					response: { rowCount: 1 },
 				},
 				{

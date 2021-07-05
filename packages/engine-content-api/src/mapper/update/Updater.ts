@@ -25,23 +25,18 @@ export class Updater {
 		private readonly schema: Model.Schema,
 		private readonly predicateFactory: PredicateFactory,
 		private readonly updateBuilderFactory: UpdateBuilderFactory,
-		private readonly uniqueWhereExpander: UniqueWhereExpander,
 	) {}
 
 	public async update(
 		mapper: Mapper,
 		entity: Model.Entity,
-		by: Input.UniqueWhere,
+		primaryValue: Input.PrimaryValue,
 		data: Input.UpdateDataInput,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		const primaryValue = await mapper.getPrimaryValue(entity, by)
-
-		if (primaryValue === undefined) {
-			return [new MutationEntryNotFoundError([], by)]
-		}
-
-		const updateBuilder = this.createBuilder(entity, by)
+		const updateBuilder = this.updateBuilderFactory.create(entity, {
+			[entity.primary]: { eq: primaryValue },
+		})
 
 		const predicateFields = Object.keys(data)
 		this.applyPredicates(entity, predicateFields, updateBuilder)
@@ -63,17 +58,13 @@ export class Updater {
 	public async updateCb(
 		mapper: Mapper,
 		entity: Model.Entity,
-		by: Input.UniqueWhere,
+		primaryValue: Input.PrimaryValue,
 		predicateFields: string[],
 		builderCb: (builder: UpdateBuilder) => void,
 	): Promise<MutationResultList> {
-		const primaryValue = await mapper.getPrimaryValue(entity, by)
-
-		if (primaryValue === undefined) {
-			return [new MutationEntryNotFoundError([], by)]
-		}
-		const updateBuilder = this.createBuilder(entity, by)
-
+		const updateBuilder = this.updateBuilderFactory.create(entity, {
+			[entity.primary]: { eq: primaryValue },
+		})
 		this.applyPredicates(entity, predicateFields, updateBuilder)
 
 		const okResultFactory = (values: RowValues) => new MutationUpdateOk([], entity, primaryValue, {}, values)
@@ -86,11 +77,6 @@ export class Updater {
 		const predicateWhere = this.predicateFactory.create(entity, Acl.Operation.update, predicateFields)
 		updateBuilder.addOldWhere(predicateWhere)
 		updateBuilder.addNewWhere(predicateWhere)
-	}
-
-	private createBuilder(entity: Model.Entity, by: Input.UniqueWhere): UpdateBuilder {
-		const uniqueWhere = this.uniqueWhereExpander.expand(entity, by)
-		return this.updateBuilderFactory.create(entity, uniqueWhere)
 	}
 
 	private static async executeUpdate(

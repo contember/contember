@@ -28,17 +28,14 @@ test('disconnect', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: uuid as "post_id",
-                 "root_"."id",
-                 "root_"."title",
-                 "root_"."locale"
-               from "public"."post_locale" as "root_"
-               where "root_"."id" = ? and "root_"."post_id" = ?) update "public"."post_locale"
-              set "post_id" = "newData_"."post_id" from "newData_"
-              where "post_locale"."id" = "newData_"."id"`,
-					parameters: [null, testUuid(1), testUuid(2)],
+					sql: SQL`
+						with "newData_" as
+    					(select ? :: uuid as "post_id", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
+						update  "public"."post_locale"
+						set "post_id" =  "newData_"."post_id"
+						from "newData_"  where "post_locale"."id" = "newData_"."id"
+					`,
+					parameters: [null, testUuid(1)],
 					response: { rowCount: 1 },
 				},
 			]),

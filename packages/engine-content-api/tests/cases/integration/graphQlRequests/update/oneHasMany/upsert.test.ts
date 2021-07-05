@@ -32,18 +32,12 @@ test('upsert - exists (composed unique)', async () => {
 					},
 				},
 				{
-					sql: SQL`with "newData_" as
-              (select
-                 ? :: text as "title",
-                 "root_"."id",
-                 "root_"."locale",
-                 "root_"."post_id"
-               from "public"."post_locale" as "root_"
-               where "root_"."locale" = ? and "root_"."post_id" = ?)
-							update "public"."post_locale"
-              set "title" = "newData_"."title" from "newData_"
-              where "post_locale"."id" = "newData_"."id"`,
-					parameters: ['Hello', 'cs', testUuid(2)],
+					sql: SQL`
+						with "newData_" as
+						(select ? :: text as "title", "root_"."id", "root_"."locale", "root_"."post_id"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
+						update  "public"."post_locale" set "title" =  "newData_"."title"
+						from "newData_"  where "post_locale"."id" = "newData_"."id"`,
+					parameters: ['Hello', testUuid(1)],
 					response: { rowCount: 1 },
 				},
 			]),

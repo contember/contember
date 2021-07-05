@@ -231,7 +231,8 @@ type Mutation {
   createRoot(data: RootCreateInput!): RootCreateResult!
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
-  query: Query!
+  upsertRoot(by: RootUniqueWhere!, filter: RootWhere, update: RootUpdateInput!, create: RootCreateInput!): RootUpsertResult!
+  query: Query
   transaction: MutationTransaction!
 }
 
@@ -296,6 +297,14 @@ type RootUpdateResult implements MutationResult {
   validation: _ValidationResult!
 }
 
+type RootUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Root
+  validation: _ValidationResult!
+}
+
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
@@ -306,5 +315,6 @@ type MutationTransaction {
   createRoot(data: RootCreateInput!): RootCreateResult!
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
-  query: Query!
+  upsertRoot(by: RootUniqueWhere!, filter: RootWhere, update: RootUpdateInput!, create: RootCreateInput!): RootUpsertResult!
+  query: Query
 }

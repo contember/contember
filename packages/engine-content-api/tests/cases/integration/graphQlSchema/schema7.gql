@@ -323,10 +323,12 @@ type Mutation {
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  upsertPostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, update: PostLocaleUpdateInput!, create: PostLocaleCreateInput!): PostLocaleUpsertResult!
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
-  query: Query!
+  upsertPost(by: PostUniqueWhere!, filter: PostWhere, update: PostUpdateInput!, create: PostCreateInput!): PostUpsertResult!
+  query: Query
   transaction: MutationTransaction!
 }
 
@@ -376,6 +378,14 @@ type PostLocaleUpdateResult implements MutationResult {
   validation: _ValidationResult!
 }
 
+type PostLocaleUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: PostLocale
+  validation: _ValidationResult!
+}
+
 type PostCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
@@ -399,6 +409,14 @@ type PostUpdateResult implements MutationResult {
   validation: _ValidationResult!
 }
 
+type PostUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Post
+  validation: _ValidationResult!
+}
+
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
@@ -407,8 +425,10 @@ type MutationTransaction {
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!
+  upsertPostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, update: PostLocaleUpdateInput!, create: PostLocaleCreateInput!): PostLocaleUpsertResult!
   createPost(data: PostCreateInput!): PostCreateResult!
   deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
-  query: Query!
+  upsertPost(by: PostUniqueWhere!, filter: PostWhere, update: PostUpdateInput!, create: PostCreateInput!): PostUpsertResult!
+  query: Query
 }

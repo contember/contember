@@ -31,14 +31,12 @@ test('Update by nested unique where', async () => {
 					parameters: ['en'],
 				},
 				{
-					sql: SQL`with "newData_" as
-    (select ? :: text as "title", "root_"."id", "root_"."site_id"
-    from "public"."front_page" as "root_"
-        left join "public"."site" as "root_site" on "root_"."site_id" = "root_site"."id"
-    where "root_site"."slug" = ?)
-		update "public"."front_page" set "title" = "newData_"."title" from "newData_" where "front_page"."id" = "newData_"."id"`,
+					sql: SQL`
+							with "newData_" as
+							(select ? :: text as "title", "root_"."id", "root_"."site_id"  from "public"."front_page" as "root_"  where "root_"."id" = ?)
+							update  "public"."front_page" set  "title" =  "newData_"."title"   from "newData_"  where "front_page"."id" = "newData_"."id"`,
 					response: { rowCount: 1 },
-					parameters: ['Hello', 'en'],
+					parameters: ['Hello', testUuid(1)],
 				},
 			]),
 		],

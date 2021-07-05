@@ -35,6 +35,7 @@ export class MutationProvider {
 		mutations[`create${entityName}`] = this.getCreateMutation(entity)
 		mutations[`delete${entityName}`] = this.getDeleteMutation(entity)
 		mutations[`update${entityName}`] = this.getUpdateMutation(entity)
+		mutations[`upsert${entityName}`] = this.getUpsertMutation(entity)
 
 		return filterObject(mutations, (key, value): value is FieldConfig<any> => value !== undefined)
 	}
@@ -128,7 +129,49 @@ export class MutationProvider {
 		}
 	}
 
-	private createResultType(entityName: string, operation: 'create' | 'update' | 'delete'): GraphQLObjectType {
+	private getUpsertMutation(entity: Model.Entity): FieldConfig<Input.UpsertInput> | undefined {
+		const entityName = entity.name
+		const createInput = this.createEntityInputProvider.getInput(entityName)
+		if (createInput === undefined) {
+			return undefined
+		}
+		const updateInput = this.updateEntityInputProvider.getInput(entityName)
+		if (updateInput === undefined) {
+			return undefined
+		}
+		const resultType = this.createResultType(entityName, 'upsert')
+		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
+		if (!uniqueWhere) {
+			return undefined
+		}
+		return {
+			type: new GraphQLNonNull(resultType),
+			args: {
+				by: {
+					type: new GraphQLNonNull(uniqueWhere),
+				},
+				filter: {
+					type: this.whereTypeProvider.getEntityWhereType(entityName),
+				},
+				update: { type: new GraphQLNonNull(updateInput) },
+				create: { type: new GraphQLNonNull(createInput) },
+			},
+			extensions: { [ExtensionKey]: new OperationMeta(Operation.upsert, entity) },
+			resolve: (parent, args, context: Context, info) => {
+				return context.timer(`GraphQL.${info.fieldName}`, () => {
+					if (parent && info.path) {
+						return parent[info.path.key]
+					}
+					return context.executionContainer.get('mutationResolver').resolveUpsert(entity, info)
+				})
+			},
+		}
+	}
+
+	private createResultType(
+		entityName: string,
+		operation: 'create' | 'update' | 'delete' | 'upsert',
+	): GraphQLObjectType {
 		const fields: GraphQLObjectTypeConfig<any, any>['fields'] = {
 			ok: { type: new GraphQLNonNull(GraphQLBoolean) },
 			errorMessage: { type: GraphQLString },

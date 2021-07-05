@@ -396,10 +396,12 @@ type Mutation {
   createVideo(data: VideoCreateInput!): VideoCreateResult!
   deleteVideo(by: VideoUniqueWhere!, filter: VideoWhere): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, filter: VideoWhere, data: VideoUpdateInput!): VideoUpdateResult!
+  upsertVideo(by: VideoUniqueWhere!, filter: VideoWhere, update: VideoUpdateInput!, create: VideoCreateInput!): VideoUpsertResult!
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
   deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
-  query: Query!
+  upsertFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, update: FrontPageUpdateInput!, create: FrontPageCreateInput!): FrontPageUpsertResult!
+  query: Query
   transaction: MutationTransaction!
 }
 
@@ -449,6 +451,14 @@ type VideoUpdateResult implements MutationResult {
   validation: _ValidationResult!
 }
 
+type VideoUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Video
+  validation: _ValidationResult!
+}
+
 type FrontPageCreateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
@@ -472,6 +482,14 @@ type FrontPageUpdateResult implements MutationResult {
   validation: _ValidationResult!
 }
 
+type FrontPageUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: FrontPage
+  validation: _ValidationResult!
+}
+
 type MutationTransaction {
   ok: Boolean!
   errorMessage: String
@@ -480,8 +498,10 @@ type MutationTransaction {
   createVideo(data: VideoCreateInput!): VideoCreateResult!
   deleteVideo(by: VideoUniqueWhere!, filter: VideoWhere): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, filter: VideoWhere, data: VideoUpdateInput!): VideoUpdateResult!
+  upsertVideo(by: VideoUniqueWhere!, filter: VideoWhere, update: VideoUpdateInput!, create: VideoCreateInput!): VideoUpsertResult!
   createFrontPage(data: FrontPageCreateInput!): FrontPageCreateResult!
   deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
-  query: Query!
+  upsertFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, update: FrontPageUpdateInput!, create: FrontPageCreateInput!): FrontPageUpsertResult!
+  query: Query
 }

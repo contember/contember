@@ -22,6 +22,7 @@ export const readOperationMeta = (data: Record<string, unknown> | undefined | nu
 export const enum Operation {
 	create = 'create',
 	update = 'update',
+	upsert = 'upsert',
 	delete = 'delete',
 	list = 'list',
 	get = 'get',

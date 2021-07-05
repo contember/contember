@@ -2,6 +2,7 @@ import { Input, Model, Result, Value } from '@contember/schema'
 import {
 	ConstraintType,
 	getInsertPrimary,
+	getUpdatePrimary,
 	InputErrorKind,
 	Mapper,
 	MapperFactory,
@@ -77,6 +78,8 @@ export class MutationResolver {
 							return this.validateCreate(mapper, meta.entity, field)
 						case Operation.update:
 							return this.validateUpdate(mapper, meta.entity, field)
+						case Operation.upsert:
+							return this.validateUpsert(mapper, meta.entity, field)
 						case Operation.delete:
 							return null
 						case Operation.get:
@@ -144,6 +147,8 @@ export class MutationResolver {
 							return this.resolveUpdateInternal(mapper, meta.entity, field)
 						case Operation.delete:
 							return this.resolveDeleteInternal(mapper, meta.entity, field)
+						case Operation.upsert:
+							return this.resolveUpsertInternal(mapper, meta.entity, field)
 						case Operation.get:
 						case Operation.paginate:
 						case Operation.list:
@@ -221,14 +226,9 @@ export class MutationResolver {
 	): Promise<WithoutNode<Result.UpdateResult>> {
 		const input = queryAst.args
 		const result = await mapper.update(entity, input.by, input.data, input.filter)
-		const errors = this.convertResultToErrors(result)
-		if (errors.length > 0) {
-			return {
-				ok: false,
-				validation: { valid: true, errors: [] },
-				errors,
-				errorMessage: this.stringifyExecutionErrors(errors),
-			}
+		const errorResponse = this.createErrorResponse(result)
+		if (errorResponse) {
+			return errorResponse
 		}
 
 		const nodes = await this.resolveResultNodes(mapper, entity, input.by, queryAst)
@@ -283,18 +283,88 @@ export class MutationResolver {
 	): Promise<WithoutNode<Result.CreateResult>> {
 		const input = queryAst.args
 		const result = await mapper.insert(entity, input.data)
-		const errors = this.convertResultToErrors(result)
-		if (errors.length > 0) {
-			return {
-				ok: false,
-				validation: { valid: true, errors: [] },
-				errors,
-				errorMessage: this.stringifyExecutionErrors(errors),
-			}
+		const errorResponse = this.createErrorResponse(result)
+		if (errorResponse) {
+			return errorResponse
 		}
 		const primary = getInsertPrimary(result)
 		if (!primary) {
 			throw new ImplementationException('MutationResolver::resolveCreateInternal does not handle result properly')
+		}
+
+		const nodes = await this.resolveResultNodes(mapper, entity, { [entity.primary]: primary }, queryAst)
+		return {
+			ok: true,
+			validation: {
+				valid: true,
+				errors: [],
+			},
+			errors: [],
+			...nodes,
+		}
+	}
+
+	public async resolveUpsert(
+		entity: Model.Entity,
+		info: GraphQLResolveInfo,
+	): Promise<WithoutNode<Result.UpsertResult>> {
+		const queryAst = this.createQueryAst(info)
+		return this.transaction(async mapper => {
+			const validation = await this.validateUpsert(mapper, entity, queryAst)
+			if (validation !== null) {
+				return {
+					ok: false,
+					validation,
+					errors: [],
+					errorMessage: this.stringifyValidationErrors(validation.errors),
+				}
+			}
+			return await this.resolveUpsertInternal(mapper, entity, queryAst)
+		})
+	}
+
+	private async validateUpsert(
+		mapper: Mapper,
+		entity: Model.Entity,
+		queryAst: ObjectNode<Input.UpsertInput>,
+	): Promise<Result.ValidationResult | null> {
+		const input = queryAst.args
+		const validationResult = [
+			...(await this.inputValidator.validateCreate({
+				mapper,
+				entity,
+				data: input.create,
+				path: [],
+				overRelation: null,
+			})),
+			...(await this.inputValidator.validateUpdate({
+				mapper,
+				entity,
+				data: input.update,
+				where: input.by,
+				path: [],
+			})),
+		]
+		if (validationResult.length > 0) {
+			return ValidationResolver.createValidationResponse(validationResult)
+		}
+		return null
+	}
+
+	private async resolveUpsertInternal(
+		mapper: Mapper,
+		entity: Model.Entity,
+		queryAst: ObjectNode<Input.UpsertInput>,
+	): Promise<WithoutNode<Result.UpsertResult>> {
+		const input = queryAst.args
+		const result = await mapper.upsert(entity, input.by, input.update, input.create, input.filter)
+		const errorResponse = this.createErrorResponse(result)
+		if (errorResponse) {
+			return errorResponse
+		}
+		const primary = getInsertPrimary(result) || getUpdatePrimary(result)
+		if (!primary) {
+			throw new ImplementationException('MutationResolver::resolveUpsertInternal does not handle result properly')
 		}
 
 		const nodes = await this.resolveResultNodes(mapper, entity, { [entity.primary]: primary }, queryAst)
@@ -388,6 +458,19 @@ export class MutationResolver {
 				maxTimeout: 1000,
 			},
 		)
+	}
+
+	private createErrorResponse(result: MutationResultList) {
+		const errors = this.convertResultToErrors(result)
+		if (errors.length > 0) {
+			return {
+				ok: false,
+				validation: { valid: true, errors: [] },
+				errors,
+				errorMessage: this.stringifyExecutionErrors(errors),
+			}
+		}
+		return null
 	}
 
 	private convertResultToErrors(result: MutationResultList): Result.ExecutionError[] {

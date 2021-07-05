@@ -1,4 +1,4 @@
-FROM node:12 as builder
+FROM node:14 as builder
 
 WORKDIR /src
 ENV NODE_ENV "production"
@@ -6,7 +6,7 @@ COPY ./packages/engine-server ./
 COPY ./yarn.lock ./
 RUN yarn install
 
-FROM node:12
+FROM node:14
 
 WORKDIR /src
 

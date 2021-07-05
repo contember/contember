@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   ts_watch:
-    image: node:12
+    image: node:14
     volumes:
       - ./:/src:cached
     working_dir: /src
@@ -17,7 +17,7 @@ services:
     volumes:
     - pgsql-data:/var/lib/postgresql/data
   api:
-    image: node:12
+    image: node:14
     working_dir: /src
     volumes:
       - .:/src

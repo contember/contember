@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { MigrationVersionHelper } from '@contember/schema-migrations'
 import { executeCreateMigrationCommand } from './MigrationCreateHelper'
 import { getMigrationByName } from '../../utils/migrations'

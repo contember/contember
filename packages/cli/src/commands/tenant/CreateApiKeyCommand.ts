@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { interactiveCreateApiKey, interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { Workspace } from '../../utils/Workspace'

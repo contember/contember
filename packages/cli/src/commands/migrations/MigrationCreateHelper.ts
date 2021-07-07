@@ -1,4 +1,4 @@
-import { CommandConfiguration, Input } from '../../cli'
+import { CommandConfiguration, Input } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import {
 	MigrationCreator,

@@ -1,5 +1,5 @@
 export * from './migrations'
-export * from './migrations'
+export * from './misc'
 export * from './project'
 export * from './tenant'
 export * from './workspace'

@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { Schema } from '@contember/schema'
 import { printValidationErrors } from '../../utils/schema'
 import { InvalidSchemaException } from '@contember/schema-migrations'

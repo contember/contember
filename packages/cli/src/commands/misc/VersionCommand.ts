@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration } from '../../cli'
+import { Command, CommandConfiguration } from '@contember/cli-common'
 import { getCliVersion } from '../../utils/contember'
 
 export class VersionCommand extends Command<{}, {}> {

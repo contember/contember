@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { join } from 'path'
 import { createWorkspace } from '../../utils/Workspace'
 

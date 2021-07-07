@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { configureCreateMigrationCommand, executeCreateMigrationCommand } from './MigrationCreateHelper'
 
 type Args = {

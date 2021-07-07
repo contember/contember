@@ -1,4 +1,4 @@
-import { assertNever, Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { Workspace } from '../../utils/Workspace'
 import {
@@ -9,6 +9,7 @@ import {
 } from './MigrationExecuteHelper'
 import { resolveSystemApiClient } from './SystemApiClientResolver'
 import { createMigrationStatusTable, findMigration, MigrationState } from '../../utils/migrations'
+import { assertNever } from '../../utils/assertNever'
 
 type Args = {
 	project: string

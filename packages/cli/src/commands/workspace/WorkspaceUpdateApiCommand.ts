@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { Workspace } from '../../utils/Workspace'
 import { updateMainDockerComposeConfig } from '../../utils/dockerCompose'
 import { updateNpmPackages } from '../../utils/npm'

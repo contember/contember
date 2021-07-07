@@ -5,6 +5,9 @@
 	},
 	"references": [
 		{
+			"path": "../../cli-common/src"
+		},
+		{
 			"path": "../../config-loader/src"
 		},
 		{

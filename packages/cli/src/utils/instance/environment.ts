@@ -1,4 +1,3 @@
-import { Input } from '../../cli'
 import { isRemoteInstance } from './common'
 
 export interface InstanceLocalEnvironment {

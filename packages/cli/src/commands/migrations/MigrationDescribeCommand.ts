@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { getLatestMigration, getMigrationByName } from '../../utils/migrations'
 import chalk from 'chalk'

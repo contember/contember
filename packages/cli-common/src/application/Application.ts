@@ -1,26 +1,16 @@
 import { InvalidInputError } from './InputParser'
 import { CommandManager } from './CommandManager'
 import chalk from 'chalk'
-import { getCliVersion, getRequestedCliVersion } from '../utils/contember'
 
 export class Application {
-	constructor(private readonly commandManager: CommandManager) {}
+	constructor(private readonly commandManager: CommandManager, private readonly applicationDescription: string) {}
 
 	async run(args: string[]): Promise<void> {
 		const [{}, {}, ...commandArgs] = args
 
 		const [name, ...rest] = commandArgs
-		const version = getCliVersion()
-		const requestedVersion = await getRequestedCliVersion()
-		if (requestedVersion && requestedVersion !== version) {
-			console.error(
-				chalk.bgRed.black(
-					`Lockfile CLI version ${requestedVersion} does not match installed version ${version}. Did you run npm ci?`,
-				),
-			)
-		}
 		if (!name || name === '--help') {
-			console.error(`Contember CLI version ${version}`)
+			console.error(this.applicationDescription)
 			console.error(`Usage: <command> <command args>`)
 			const commands = Object.entries(this.commandManager.commands)
 				.filter(([name, factory], index, commands) => commands.findIndex(it => it[1] === factory) === index)

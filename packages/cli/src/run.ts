@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { register } from 'ts-node'
-import { CommandManager } from './cli/CommandManager'
+import { CommandManager, Application } from '@contember/cli-common'
 import {
 	CreateApiKeyCommand,
 	InviteCommand,
@@ -20,8 +20,8 @@ import {
 	WorkspaceCreateCommand,
 	WorkspaceUpdateApiCommand,
 } from './commands'
-import { Application } from './cli'
 import { VersionCommand } from './commands/misc'
+import { getCliVersion } from './utils/contember'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -56,11 +56,12 @@ import { VersionCommand } from './commands/misc'
 		['diff']: diffCommandFactory,
 	})
 
-	const version = process.version.match(/^v?(\d+)\..+$/)
-	if (version && Number(version[1]) < 12) {
+	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)
+	if (nodeVersion && Number(nodeVersion[1]) < 12) {
 		throw `Node >= 12 is required`
 	}
-	const app = new Application(commandManager)
+	const cliVersion = getCliVersion()
+	const app = new Application(commandManager, `Contember CLI version ${cliVersion}`)
 	await app.run(process.argv)
 })().catch(e => {
 	console.log(e)

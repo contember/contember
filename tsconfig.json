@@ -5,6 +5,7 @@
 		{ "path": "./packages/authorization" },
 		{ "path": "./packages/benchmark" },
 		{ "path": "./packages/cli" },
+		{ "path": "./packages/cli-common" },
 		{ "path": "./packages/cli/resources/templates/template-project" },
 		{ "path": "./packages/config-loader" },
 		{ "path": "./packages/database" },

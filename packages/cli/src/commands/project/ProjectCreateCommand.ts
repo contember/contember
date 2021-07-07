@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '../../cli'
+import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { validateProjectName } from '../../utils/Project'
 import { Workspace } from '../../utils/Workspace'
 

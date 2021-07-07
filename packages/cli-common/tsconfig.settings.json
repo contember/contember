@@ -1,0 +1,6 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true
+	},
+	"extends": "../../tsconfig.settings.json"
+}

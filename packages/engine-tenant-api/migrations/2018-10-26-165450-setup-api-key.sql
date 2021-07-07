@@ -16,23 +16,3 @@ $BLOCK$
             END IF;
     END
 $BLOCK$;
-
-WITH identity AS (
-  INSERT INTO "tenant"."identity" (id, parent_id, roles)
-  VALUES (
-    tenant.uuid_generate_v4(),
-    null,
-    '["setup"]'
-  )
-  returning id
-)
-INSERT INTO "tenant"."api_key" (id, token_hash, type, identity_id, enabled, expires_at, created_at)
-  select
-    tenant.uuid_generate_v4(),
-    '081115df5d291465362f17c4b7b182da6aaa6d8147a0fec1aca8435eec404612',
-    'one_off',
-    identity.id,
-    true,
-    null,
-    now()
-  from identity

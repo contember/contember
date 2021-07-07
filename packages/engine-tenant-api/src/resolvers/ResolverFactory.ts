@@ -7,7 +7,6 @@ import {
 	MailTemplateMutationResolver,
 	OtpMutationResolver,
 	RemoveProjectMemberMutationResolver,
-	SetupMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
@@ -27,8 +26,6 @@ class ResolverFactory {
 			meQueryResolver: MeQueryResolver
 			projectQueryResolver: ProjectQueryResolver
 			projectMembersQueryResolver: ProjectMembersQueryResolver
-
-			setupMutationResolver: SetupMutationResolver
 
 			signUpMutationResolver: SignUpMutationResolver
 			signInMutationResolver: SignInMutationResolver
@@ -74,8 +71,6 @@ class ResolverFactory {
 				),
 			},
 			Mutation: {
-				setup: this.resolvers.setupMutationResolver.setup.bind(this.resolvers.setupMutationResolver),
-
 				signUp: this.resolvers.signUpMutationResolver.signUp.bind(this.resolvers.signUpMutationResolver),
 				signIn: this.resolvers.signInMutationResolver.signIn.bind(this.resolvers.signInMutationResolver),
 				signOut: this.resolvers.signOutMutationResolver.signOut.bind(this.resolvers.signOutMutationResolver),

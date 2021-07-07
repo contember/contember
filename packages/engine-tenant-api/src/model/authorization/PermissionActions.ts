@@ -10,8 +10,6 @@ namespace PermissionActions {
 		mailTemplate = 'mailTemplate',
 	}
 
-	export const SYSTEM_SETUP = Authorizator.createAction(Resources.system, 'setup')
-
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
 	export const PERSON_SIGN_UP = Authorizator.createAction(Resources.person, 'signUp')
 	export const PERSON_SIGN_OUT = Authorizator.createAction(Resources.person, 'signOut')

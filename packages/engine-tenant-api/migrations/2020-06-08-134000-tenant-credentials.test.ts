@@ -4,7 +4,8 @@ import { suite } from 'uvu'
 import * as assert from 'uvu/assert'
 
 const credentialsMigrationTest = suite('credentials migration ')
-credentialsMigrationTest('generate sql with login token', async () => {
+
+credentialsMigrationTest('generate sql with root token and login token', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
 		providers: {
@@ -12,6 +13,7 @@ credentialsMigrationTest('generate sql with login token', async () => {
 		},
 		credentials: {
 			loginToken: 'helloworld',
+			rootToken: 'foobar',
 		},
 	})
 	assert.equal(
@@ -25,23 +27,7 @@ credentialsMigrationTest('generate sql with login token', async () => {
 			SELECT "tenant"."uuid_generate_v4"(), $pga$936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af$pga$, 'permanent', identity.id, NULL, NULL, NULL, now()
 			FROM identity
 			;
-`,
-	)
-})
 
-credentialsMigrationTest('generate sql with root token', async () => {
-	const builder = createMigrationBuilder()
-	await migration(builder, {
-		providers: {
-			bcrypt: val => Promise.resolve(`${val}-bcrypted`),
-		},
-		credentials: {
-			rootToken: 'foobar',
-		},
-	})
-	assert.equal(
-		builder.getSql(),
-		`
 			WITH identity AS (
 				INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
 				VALUES (
@@ -64,53 +50,6 @@ credentialsMigrationTest('generate sql with root token', async () => {
 				INSERT INTO tenant.api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
 				SELECT "tenant"."uuid_generate_v4"(), $pga$c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2$pga$, 'permanent', identity.id, NULL, NULL, NULL, now()
 				FROM identity WHERE $pga$c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2$pga$ IS NOT NULL
-			    RETURNING id
-			)
-			SELECT * FROM person, api_key
-		;
-UPDATE "tenant"."api_key"
-	         SET "disabled_at" = now()
-	         WHERE "token_hash" = '081115df5d291465362f17c4b7b182da6aaa6d8147a0fec1aca8435eec404612'
-	               AND "disabled_at" IS NULL;
-`,
-	)
-})
-
-credentialsMigrationTest('generate sql with root user', async () => {
-	const builder = createMigrationBuilder()
-	await migration(builder, {
-		providers: {
-			bcrypt: val => Promise.resolve(`${val}-bcrypted`),
-		},
-		credentials: {
-			rootPassword: 'foobar',
-		},
-	})
-	assert.equal(
-		builder.getSql(),
-		`
-			WITH identity AS (
-				INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
-				VALUES (
-						"tenant"."uuid_generate_v4"(),
-						NULL,
-						'["super_admin"]'::JSONB
-							|| (CASE WHEN $pga$root@localhost$pga$ IS NOT NULL THEN '["person"]'::JSONB ELSE '[]'::JSONB END),
-						'Superadmin',
-						now()
-					) RETURNING id
-			),
-			person AS (
-				INSERT INTO tenant.person(id, email, password_hash, identity_id)
-				SELECT "tenant"."uuid_generate_v4"(), $pga$root@localhost$pga$, $pga$foobar-bcrypted$pga$, identity.id
-				FROM identity
-				WHERE $pga$root@localhost$pga$ IS NOT NULL
-			    RETURNING id
-			),
-			api_key AS (
-				INSERT INTO tenant.api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
-				SELECT "tenant"."uuid_generate_v4"(), NULL, 'permanent', identity.id, NULL, NULL, NULL, now()
-				FROM identity WHERE NULL IS NOT NULL
 			    RETURNING id
 			)
 			SELECT * FROM person, api_key

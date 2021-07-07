@@ -15,17 +15,20 @@ export default async function (builder: MigrationBuilder, args: TenantMigrationA
 			`)
 	}
 
-	if (args.credentials.rootToken || args.credentials.rootPassword) {
-		if (args.credentials.rootEmail && !args.credentials.rootPassword) {
-			throw 'Please specify a root password using CONTEMBER_ROOT_PASSWORD env variable.'
-		}
-		const rootEmail = args.credentials.rootPassword ? args.credentials.rootEmail || 'root@localhost' : null
-		const rootPassword = args.credentials.rootPassword || null
-		const rootPasswordHash = rootPassword ? await args.providers.bcrypt(rootPassword) : null
+	if (!args.credentials.rootToken) {
+		throw 'Please specify a root token using CONTEMBER_ROOT_TOKEN env variable.'
+	}
 
-		const rootTokenHash = args.credentials.rootToken ? computeTokenHash(args.credentials.rootToken) : null
+	if (args.credentials.rootEmail && !args.credentials.rootPassword) {
+		throw 'Please specify a root password using CONTEMBER_ROOT_PASSWORD env variable.'
+	}
+	const rootEmail = args.credentials.rootPassword ? args.credentials.rootEmail || 'root@localhost' : null
+	const rootPassword = args.credentials.rootPassword || null
+	const rootPasswordHash = rootPassword ? await args.providers.bcrypt(rootPassword) : null
 
-		builder.sql(`
+	const rootTokenHash = args.credentials.rootToken ? computeTokenHash(args.credentials.rootToken) : null
+
+	builder.sql(`
 			WITH identity AS (
 				INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
 				VALUES (
@@ -52,9 +55,4 @@ export default async function (builder: MigrationBuilder, args: TenantMigrationA
 			)
 			SELECT * FROM person, api_key
 		`)
-		builder.sql(`UPDATE "tenant"."api_key"
-	         SET "disabled_at" = now()
-	         WHERE "token_hash" = '081115df5d291465362f17c4b7b182da6aaa6d8147a0fec1aca8435eec404612'
-	               AND "disabled_at" IS NULL`)
-	}
 }

@@ -18,8 +18,6 @@ const schema: DocumentNode = gql`
 	}
 
 	type Mutation {
-		setup(superadmin: AdminCredentials!): SetupResponse
-
 		signUp(email: String!, password: String!): SignUpResponse
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		signOut(all: Boolean): SignOutResponse
@@ -75,23 +73,6 @@ const schema: DocumentNode = gql`
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
-	}
-
-	# === setUp ===
-
-	input AdminCredentials {
-		email: String!
-		password: String!
-	}
-
-	type SetupResponse {
-		ok: Boolean!
-		result: SetupResult
-	}
-
-	type SetupResult {
-		superadmin: Person!
-		loginKey: ApiKeyWithToken!
 	}
 
 	# === signUp ===

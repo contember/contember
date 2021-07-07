@@ -1,6 +1,5 @@
 export enum TenantRole {
 	LOGIN = 'login',
-	SETUP = 'setup',
 	SELF = 'self',
 	PERSON = 'person',
 	SUPER_ADMIN = 'super_admin',

@@ -62,11 +62,6 @@ export type AddProjectMemberResponse = {
 	readonly error?: Maybe<AddProjectMemberError>
 }
 
-export type AdminCredentials = {
-	readonly email: Scalars['String']
-	readonly password: Scalars['String']
-}
-
 export type ApiKey = {
 	readonly __typename?: 'ApiKey'
 	readonly id: Scalars['String']
@@ -365,7 +360,6 @@ export enum MembershipValidationErrorCode {
 
 export type Mutation = {
 	readonly __typename?: 'Mutation'
-	readonly setup?: Maybe<SetupResponse>
 	readonly signUp?: Maybe<SignUpResponse>
 	readonly signIn?: Maybe<SignInResponse>
 	readonly signOut?: Maybe<SignOutResponse>
@@ -386,10 +380,6 @@ export type Mutation = {
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
 	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
-}
-
-export type MutationSetupArgs = {
-	superadmin: AdminCredentials
 }
 
 export type MutationSignUpArgs = {
@@ -633,18 +623,6 @@ export type RoleVariableDefinition = {
 	readonly name: Scalars['String']
 }
 
-export type SetupResponse = {
-	readonly __typename?: 'SetupResponse'
-	readonly ok: Scalars['Boolean']
-	readonly result?: Maybe<SetupResult>
-}
-
-export type SetupResult = {
-	readonly __typename?: 'SetupResult'
-	readonly superadmin: Person
-	readonly loginKey: ApiKeyWithToken
-}
-
 export type SignInError = {
 	readonly __typename?: 'SignInError'
 	readonly code: SignInErrorCode
@@ -877,7 +855,6 @@ export type ResolversTypes = {
 	AddProjectMemberError: ResolverTypeWrapper<AddProjectMemberError>
 	AddProjectMemberErrorCode: AddProjectMemberErrorCode
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
-	AdminCredentials: AdminCredentials
 	ApiKey: ResolverTypeWrapper<ApiKey>
 	ApiKeyWithToken: ResolverTypeWrapper<ApiKeyWithToken>
 	ChangePasswordError: ResolverTypeWrapper<ChangePasswordError>
@@ -943,8 +920,6 @@ export type ResolversTypes = {
 	RoleDefinition: ResolverTypeWrapper<RoleDefinition>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 	RoleVariableDefinition: ResolversTypes['RoleEntityVariableDefinition']
-	SetupResponse: ResolverTypeWrapper<SetupResponse>
-	SetupResult: ResolverTypeWrapper<SetupResult>
 	SignInError: ResolverTypeWrapper<SignInError>
 	SignInErrorCode: SignInErrorCode
 	SignInIDPError: ResolverTypeWrapper<SignInIdpError>
@@ -975,7 +950,6 @@ export type ResolversParentTypes = {
 	Boolean: Scalars['Boolean']
 	AddProjectMemberError: AddProjectMemberError
 	AddProjectMemberResponse: AddProjectMemberResponse
-	AdminCredentials: AdminCredentials
 	ApiKey: ApiKey
 	ApiKeyWithToken: ApiKeyWithToken
 	ChangePasswordError: ChangePasswordError
@@ -1026,8 +1000,6 @@ export type ResolversParentTypes = {
 	RoleDefinition: RoleDefinition
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 	RoleVariableDefinition: ResolversParentTypes['RoleEntityVariableDefinition']
-	SetupResponse: SetupResponse
-	SetupResult: SetupResult
 	SignInError: SignInError
 	SignInIDPError: SignInIdpError
 	SignInIDPResponse: SignInIdpResponse
@@ -1363,12 +1335,6 @@ export type MutationResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation'],
 > = {
-	setup?: Resolver<
-		Maybe<ResolversTypes['SetupResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationSetupArgs, 'superadmin'>
-	>
 	signUp?: Resolver<
 		Maybe<ResolversTypes['SignUpResponse']>,
 		ParentType,
@@ -1652,24 +1618,6 @@ export type RoleVariableDefinitionResolvers<
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
-export type SetupResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SetupResponse'] = ResolversParentTypes['SetupResponse'],
-> = {
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	result?: Resolver<Maybe<ResolversTypes['SetupResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type SetupResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SetupResult'] = ResolversParentTypes['SetupResult'],
-> = {
-	superadmin?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
-	loginKey?: Resolver<ResolversTypes['ApiKeyWithToken'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
 export type SignInErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['SignInError'] = ResolversParentTypes['SignInError'],
@@ -1861,8 +1809,6 @@ export type Resolvers<ContextType = any> = {
 	RoleDefinition?: RoleDefinitionResolvers<ContextType>
 	RoleEntityVariableDefinition?: RoleEntityVariableDefinitionResolvers<ContextType>
 	RoleVariableDefinition?: RoleVariableDefinitionResolvers<ContextType>
-	SetupResponse?: SetupResponseResolvers<ContextType>
-	SetupResult?: SetupResultResolvers<ContextType>
 	SignInError?: SignInErrorResolvers<ContextType>
 	SignInIDPError?: SignInIdpErrorResolvers<ContextType>
 	SignInIDPResponse?: SignInIdpResponseResolvers<ContextType>

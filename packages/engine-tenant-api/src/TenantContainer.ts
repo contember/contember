@@ -41,7 +41,6 @@ import {
 	RemoveProjectMemberMutationResolver,
 	ResolverContextFactory,
 	ResolverFactory,
-	SetupMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
@@ -222,10 +221,6 @@ namespace TenantContainer {
 					'addProjectMemberMutationResolver',
 					({ projectMemberManager, projectManager, membershipValidator }) =>
 						new AddProjectMemberMutationResolver(projectMemberManager, projectManager, membershipValidator),
-				)
-				.addService(
-					'setupMutationResolver',
-					({ signUpManager, apiKeyManager }) => new SetupMutationResolver(signUpManager, apiKeyManager),
 				)
 				.addService(
 					'updateProjectMemberMutationResolver',

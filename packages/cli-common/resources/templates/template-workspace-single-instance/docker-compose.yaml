@@ -30,7 +30,8 @@ services:
       TENANT_MAILER_FROM: 'contember@localhost'
 
     depends_on:
-      - postgresql
+      postgresql:
+        condition: service_healthy
 
   contember-cli:
     image: contember/cli:{version}

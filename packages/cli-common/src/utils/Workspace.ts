@@ -2,10 +2,11 @@ import { pathExists } from 'fs-extra'
 import * as path from 'path'
 import { basename, join } from 'path'
 import { readYaml, updateYaml } from './yaml'
-import { installTemplate } from './template'
 import { ProjectManager } from './ProjectManager'
 import { PathMapping } from './PathMapping'
-import { getCliVersion } from './contember'
+import { installTemplate } from './template'
+import { getPackageVersion } from './version'
+import { resourcesDir } from '../pathUtils'
 
 interface WorkspaceDirectoryArgument {
 	workspaceDirectory: string
@@ -17,11 +18,9 @@ export const createWorkspace = async ({
 }: {
 	template?: string
 } & WorkspaceDirectoryArgument) => {
-	template ??= 'templates/template-workspace-single-instance'
-	const instanceName = path.basename(workspaceDirectory)
+	template ??= join(resourcesDir, 'templates/template-workspace-single-instance')
 	await installTemplate(template, workspaceDirectory, 'workspace', {
-		instanceName: instanceName,
-		version: getCliVersion(),
+		version: getPackageVersion(),
 	})
 	const workspace = await Workspace.get(workspaceDirectory)
 	const project = await workspace.projects.createProject('sandbox', {})
@@ -37,7 +36,6 @@ export interface WorkspaceConfig {
 		enabled?: boolean
 		projectsFile?: string
 	}
-	instances?: PathMapping
 	projects?: PathMapping
 }
 

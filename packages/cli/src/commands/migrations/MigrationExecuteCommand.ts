@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { Workspace } from '../../utils/Workspace'
+import { Workspace } from '@contember/cli-common'
 import {
 	configureExecuteMigrationCommand,
 	ExecuteMigrationOptions,

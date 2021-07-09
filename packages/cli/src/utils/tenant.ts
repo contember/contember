@@ -1,7 +1,7 @@
 import prompts from 'prompts'
 import { GraphQLClient } from 'graphql-request'
 import { InstanceApiEnvironment } from './instance'
-import { readDefaultDockerComposeConfig } from './dockerCompose'
+import { readDefaultDockerComposeConfig } from '@contember/cli-common'
 
 const validatePassword = (password: string) =>
 	password.length < 6 ? 'Password must contain at least 6 characters' : true
@@ -93,8 +93,10 @@ export const interactiveResolveApiToken = async ({
 	}
 	if (instance.type === 'local') {
 		const dockerCompose = await readDefaultDockerComposeConfig(instance.instanceDirectory)
-		if (dockerCompose.services?.api?.environment?.CONTEMBER_ROOT_TOKEN) {
-			return dockerCompose.services?.api?.environment?.CONTEMBER_ROOT_TOKEN
+		const apiServiceName = dockerCompose.services?.['contember'] ? 'contember' : 'api'
+		const rootToken = dockerCompose.services?.[apiServiceName]?.environment?.CONTEMBER_ROOT_TOKEN
+		if (rootToken) {
+			return rootToken
 		}
 	}
 	const { strategy } = await prompts({

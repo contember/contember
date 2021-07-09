@@ -1,10 +1,9 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { validateProjectName } from '../../utils/Project'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import { Schema } from '@contember/schema'
 import { validateSchemaAndPrintErrors } from '../../utils/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { Workspace } from '../../utils/Workspace'
+import { Workspace, validateProjectName } from '@contember/cli-common'
 import { validateMigrations } from '../migrations/MigrationValidationHelper'
 
 type Args = {

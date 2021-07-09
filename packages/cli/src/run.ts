@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { register } from 'ts-node'
-import { CommandManager, Application } from '@contember/cli-common'
+import { Application, CommandManager, getPackageVersion } from '@contember/cli-common'
 import {
 	CreateApiKeyCommand,
 	InviteCommand,
@@ -16,12 +16,10 @@ import {
 	ProjectValidateCommand,
 	ResetPasswordCommand,
 	SignInCommand,
+	VersionCommand,
 	WorkspaceConfigureCommand,
-	WorkspaceCreateCommand,
 	WorkspaceUpdateApiCommand,
 } from './commands'
-import { VersionCommand } from './commands/misc'
-import { getCliVersion } from './utils/contember'
 ;(async () => {
 	register({
 		compilerOptions: {
@@ -40,7 +38,6 @@ import { getCliVersion } from './utils/contember'
 		['migrations:execute']: () => new MigrationExecuteCommand(),
 		['migrations:rebase']: () => new MigrationRebaseCommand(),
 		['migrations:status']: () => new MigrationStatusCommand(),
-		['workspace:create']: () => new WorkspaceCreateCommand(),
 		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(),
 		['workspace:configure']: () => new WorkspaceConfigureCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
@@ -60,7 +57,7 @@ import { getCliVersion } from './utils/contember'
 	if (nodeVersion && Number(nodeVersion[1]) < 12) {
 		throw `Node >= 12 is required`
 	}
-	const cliVersion = getCliVersion()
+	const cliVersion = getPackageVersion()
 	const app = new Application(commandManager, `Contember CLI version ${cliVersion}`)
 	await app.run(process.argv)
 })().catch(e => {

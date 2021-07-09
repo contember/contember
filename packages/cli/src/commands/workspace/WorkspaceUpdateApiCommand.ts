@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { Workspace } from '../../utils/Workspace'
-import { updateMainDockerComposeConfig } from '../../utils/dockerCompose'
+import { Workspace } from '@contember/cli-common'
+import { updateMainDockerComposeConfig } from '@contember/cli-common'
 import { updateNpmPackages } from '../../utils/npm'
 
 type Args = {
@@ -32,14 +32,15 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 		}
 		console.log('Updating docker-compose')
 		await updateMainDockerComposeConfig(workspace.directory, (data: any) => {
-			if (!data.services?.api) {
+			const apiServiceName = data.services?.['contember'] ? 'contember' : 'api'
+			if (!data.services?.[apiServiceName]) {
 				console.log(`docker-compose.yaml file not found, skipping`)
 				return
 			}
 			const expectedImage = `contember/contember:${prevVersion}`
-			if (data.services.api.image !== expectedImage) {
+			if (data.services[apiServiceName].image !== expectedImage) {
 				console.log(
-					`API image in docker-compose.yaml file is ${data.services.api.image}, but ${expectedImage} is expected. Skipping`,
+					`API image in docker-compose.yaml file is ${data.services[apiServiceName].image}, but ${expectedImage} is expected. Skipping`,
 				)
 				return data
 			}
@@ -48,8 +49,8 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 				...data,
 				services: {
 					...data.services,
-					api: {
-						...data.services.api,
+					[apiServiceName]: {
+						...data.services?.[apiServiceName],
 						image: `contember/contember:${version}`,
 					},
 				},

@@ -17,6 +17,9 @@
 			"path": "../../engine-content-api/src"
 		},
 		{
+			"path": "../../install/src"
+		},
+		{
 			"path": "../../schema/src"
 		},
 		{

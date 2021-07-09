@@ -1,6 +1,5 @@
-import { DockerComposeConfig, updateOverrideConfig } from '../dockerCompose'
+import { DockerComposeConfig, updateOverrideConfig, Workspace } from '@contember/cli-common'
 import { patchInstanceOverrideConfig, resolvePortsMapping } from './dockerComposeConfig'
-import { Workspace } from '../Workspace'
 
 export const interactiveInstanceConfigure = async ({
 	composeConfig,
@@ -15,8 +14,8 @@ export const interactiveInstanceConfigure = async ({
 }): Promise<{ adminEnv: Record<string, string> }> => {
 	const withAdmin = !!composeConfig.services?.admin
 	const adminEnv = !withAdmin ? {} : { ...composeConfig.services?.admin.environment }
-
-	if (!composeConfig.services?.api?.ports) {
+	const apiServiceName = composeConfig.services?.['contember'] ? 'contember' : 'api'
+	if (!composeConfig.services?.[apiServiceName]?.ports) {
 		const portsMapping = await resolvePortsMapping({
 			instanceDirectory: workspace.directory,
 			config: composeConfig,
@@ -24,7 +23,7 @@ export const interactiveInstanceConfigure = async ({
 			startPort: ports,
 		})
 		await updateOverrideConfig(workspace.directory, config =>
-			patchInstanceOverrideConfig(config, portsMapping, composeConfig.version),
+			patchInstanceOverrideConfig(config, portsMapping, composeConfig),
 		)
 	}
 

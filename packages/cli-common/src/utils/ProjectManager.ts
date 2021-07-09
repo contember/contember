@@ -5,7 +5,6 @@ import { resourcesDir } from '../pathUtils'
 import { installTemplate } from './template'
 import { pathExists } from 'fs-extra'
 import { getPathFromMapping, listEntriesInMapping, resolvePathMappingConfig } from './PathMapping'
-import path from 'path'
 
 export class ProjectManager {
 	constructor(private readonly workspace: Workspace) {}

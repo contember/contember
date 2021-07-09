@@ -42,7 +42,7 @@
   },
   "workspaces": [
     "packages/*",
-    "packages/cli/resources/templates/*"
+    "packages/cli-common/resources/templates/*"
   ],
   "dependencies": {}
 }

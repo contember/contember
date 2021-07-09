@@ -1,7 +1,7 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { interactiveInvite, interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
-import { Workspace } from '../../utils/Workspace'
+import { Workspace } from '@contember/cli-common'
 
 type Args = {
 	instance?: string

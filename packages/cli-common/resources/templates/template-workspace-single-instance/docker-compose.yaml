@@ -1,6 +1,6 @@
-version: '3.7'
+version: '2.4'
 services:
-  api:
+  contember:
     image: contember/contember:{version}
     volumes:
       - ./api/config.yaml:/src/config.yaml:cached
@@ -14,7 +14,7 @@ services:
       CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
 
-      DEFAULT_DB_HOST: 'db'
+      DEFAULT_DB_HOST: 'postgresql'
       DEFAULT_DB_PORT: '5432'
       DEFAULT_DB_USER: 'contember'
       DEFAULT_DB_PASSWORD: 'contember'
@@ -30,9 +30,19 @@ services:
       TENANT_MAILER_FROM: 'contember@localhost'
 
     depends_on:
-      - db
+      - postgresql
 
-  db:
+  contember-cli:
+    image: contember/cli:{version}
+    volumes:
+      - ./:/src:cached
+    working_dir: /src
+    environment:
+      CONTEMBER_INSTANCE: "http://contember:4000/"
+      CONTEMBER_API_TOKEN: "0000000000000000000000000000000000000000"
+
+
+  postgresql:
     image: postgres:10-alpine
     restart: unless-stopped
     environment:
@@ -41,19 +51,12 @@ services:
       POSTGRES_DB: contember
     volumes:
       - pgsql-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U contember" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  adminer:
-    image: michalhosna/adminer:4.7.0-517ba68
-    depends_on:
-      - db
-    environment:
-      ADMINER_DRIVER: pgsql
-      ADMINER_SERVER: db
-      ADMINER_DB: contember
-      ADMINER_USERNAME: contember
-      ADMINER_PASSWORD: contember
-      ADMINER_AUTOLOGIN: 1
-      ADMINER_NAME: Contember
   s3:
     image: minio/minio
     command: 'server /data'
@@ -67,6 +70,20 @@ services:
       MINIO_SECRET_KEY: contember
   mailhog:
     image: mailhog/mailhog
+
+#  # optional: database management tool
+#  adminer:
+#    image: michalhosna/adminer:4.8.0-en_v1
+#    depends_on:
+#      - postgresql
+#    environment:
+#      ADMINER_DRIVER: pgsql
+#      ADMINER_SERVER: postgresql
+#      ADMINER_DB: contember
+#      ADMINER_USERNAME: contember
+#      ADMINER_PASSWORD: contember
+#      ADMINER_AUTOLOGIN: 1
+#      ADMINER_NAME: Contember
 volumes:
   pgsql-data: ~
   s3-data: ~

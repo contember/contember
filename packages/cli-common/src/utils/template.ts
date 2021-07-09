@@ -66,7 +66,10 @@ export const installTemplate = async (
 			continue
 		}
 		await replaceFileContent(path, content =>
-			Object.entries(variables).reduce((content, [key, value]) => content.replace(`{${key}}`, value), content),
+			Object.entries(variables).reduce(
+				(content, [key, value]) => content.replace(new RegExp(`\{${key}\}`, 'g'), value),
+				content,
+			),
 		)
 	}
 }

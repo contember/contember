@@ -1,9 +1,8 @@
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { interactiveResolveApiToken } from '../../utils/tenant'
 import { SystemClient } from '../../utils/system'
-import { Workspace } from '../../utils/Workspace'
+import { Workspace, Project } from '@contember/cli-common'
 import { Input } from '@contember/cli-common'
-import { Project } from '../../utils/Project'
 
 export const resolveSystemApiClient = async (
 	workspace: Workspace,

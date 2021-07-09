@@ -1,0 +1,14 @@
+{
+  "name": "@contember/install",
+  "version": "0.12.0-alpha.2",
+  "license": "Apache-2.0",
+  "bin": "dist/src/run.js",
+  "scripts": {
+    "test": "echo 'No tests'"
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+    "@contember/cli-common": "^0.12.0-alpha.2"
+  }
+}

@@ -4,7 +4,7 @@ import { getLatestMigration, getMigrationByName } from '../../utils/migrations'
 import chalk from 'chalk'
 import { Migration, MigrationDescriber } from '@contember/schema-migrations'
 import { Schema } from '@contember/schema'
-import { Workspace } from '../../utils/Workspace'
+import { Workspace } from '@contember/cli-common'
 
 type Args = {
 	project: string

@@ -5,7 +5,46 @@ import {
 import accepts from 'accepts'
 import { get, KoaContext, KoaMiddleware, KoaRequestState } from '../koa'
 
-export const createPlaygroundMiddleware = (): KoaMiddleware<KoaRequestState> => {
+const sandboxTabs: PlaygroundRenderPageOptions['tabs'] = [
+	{
+		endpoint: '/content/sandbox/live',
+		name: 'Create a post',
+		variables: JSON.stringify({
+			post: {
+				title: 'Hello Contember',
+				content:
+					'Contember is a headless, GraphQL-first platform for building custom web applications. Prototype yours in a day, launch it in a week and run it for years.',
+			},
+		}),
+		query: `mutation($post: PostCreateInput!) {
+	createPost(data: $post) {
+		ok
+		errorMessage
+		node {
+			id
+			title
+		}
+	}
+}`,
+		headers: {
+			Authorization: 'Bearer 0000000000000000000000000000000000000000',
+		},
+	},
+	{
+		endpoint: '/content/sandbox/live',
+		name: 'List posts',
+		query: `query {
+	listPost {
+		title
+	}
+}`,
+		headers: {
+			Authorization: 'Bearer 0000000000000000000000000000000000000000',
+		},
+	},
+]
+
+export const createPlaygroundMiddleware = (sandbox = false): KoaMiddleware<KoaRequestState> => {
 	return get('/', (ctx: KoaContext<KoaRequestState>, next) => {
 		const accept = accepts(ctx.req)
 		const types = accept.types() as string[]
@@ -13,12 +52,11 @@ export const createPlaygroundMiddleware = (): KoaMiddleware<KoaRequestState> => 
 		if (!prefersHTML) {
 			return next()
 		}
-
-		const playgroundRenderPageOptions: PlaygroundRenderPageOptions | undefined = {
+		const playgroundRenderPageOptions: PlaygroundRenderPageOptions = {
 			endpoint: ctx.originalUrl,
 		}
-		if (!playgroundRenderPageOptions) {
-			return ctx.throw(404)
+		if (sandbox) {
+			playgroundRenderPageOptions.tabs = sandboxTabs
 		}
 
 		ctx.set('Content-Type', 'text/html')

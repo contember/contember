@@ -1,5 +1,5 @@
 import { getInstanceFromEnv, InstanceApiEnvironment, InstanceLocalApiEnvironment } from './environment'
-import { Workspace } from '../Workspace'
+import { Workspace } from '@contember/cli-common'
 import { isRemoteInstance } from './common'
 import { getServicesStatus } from './status'
 
@@ -18,8 +18,8 @@ const createRemoteInstanceEnvironment = (instanceName: string): InstanceApiEnvir
 
 const createLocalInstanceEnvironment = async (workspace: Workspace): Promise<InstanceLocalApiEnvironment> => {
 	const instanceStatus = await getServicesStatus(workspace)
-	const runningApi = instanceStatus.find(it => it.name === 'api' && it.running)
-	if (!runningApi) {
+	const runningApi = instanceStatus.find(it => it.name === 'contember') || instanceStatus.find(it => it.name === 'api')
+	if (!runningApi || !runningApi.running) {
 		throw `Instance ${workspace.name} is not running.`
 	}
 	const apiServer = `http://127.0.0.1:${runningApi.ports[0].hostPort}`

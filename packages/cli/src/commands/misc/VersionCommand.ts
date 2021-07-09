@@ -1,5 +1,4 @@
-import { Command, CommandConfiguration } from '@contember/cli-common'
-import { getCliVersion } from '../../utils/contember'
+import { Command, CommandConfiguration, getPackageVersion } from '@contember/cli-common'
 
 export class VersionCommand extends Command<{}, {}> {
 	protected configure(configuration: CommandConfiguration<{}, {}>): void {
@@ -7,7 +6,7 @@ export class VersionCommand extends Command<{}, {}> {
 	}
 
 	protected async execute(): Promise<void | number> {
-		console.log(getCliVersion())
+		console.log(getPackageVersion())
 		return 0
 	}
 }

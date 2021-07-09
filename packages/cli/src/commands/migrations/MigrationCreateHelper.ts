@@ -8,8 +8,7 @@ import {
 	SchemaMigrator,
 	SchemaVersionBuilder,
 } from '@contember/schema-migrations'
-import { Workspace } from '../../utils/Workspace'
-import { Project } from '../../utils/Project'
+import { Workspace, Project } from '@contember/cli-common'
 
 type Args = {
 	project: string

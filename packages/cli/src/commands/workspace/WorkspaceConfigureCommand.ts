@@ -1,7 +1,6 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { interactiveInstanceConfigure } from '../../utils/instance'
-import { readDefaultDockerComposeConfig } from '../../utils/dockerCompose'
-import { Workspace } from '../../utils/Workspace'
+import { readDefaultDockerComposeConfig, Workspace } from '@contember/cli-common'
 
 type Args = {}
 

@@ -6,7 +6,7 @@
 		{ "path": "./packages/benchmark" },
 		{ "path": "./packages/cli" },
 		{ "path": "./packages/cli-common" },
-		{ "path": "./packages/cli/resources/templates/template-project" },
+		{ "path": "./packages/cli-common/resources/templates/template-project" },
 		{ "path": "./packages/config-loader" },
 		{ "path": "./packages/database" },
 		{ "path": "./packages/database-migrations" },

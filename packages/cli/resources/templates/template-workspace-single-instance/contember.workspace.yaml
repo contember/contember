@@ -1,4 +1,0 @@
-api:
-  version: {version}
-instances:
-  {instanceName}: .

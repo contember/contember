@@ -1,6 +1,6 @@
 import { ContainerStatus, getContainersStatus } from '../docker'
 import { execDockerCompose } from '../dockerCompose'
-import { Workspace } from '../Workspace'
+import { Workspace } from '@contember/cli-common'
 
 export type ServiceStatus = ContainerStatus
 

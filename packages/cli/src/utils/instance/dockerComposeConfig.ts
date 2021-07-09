@@ -1,5 +1,6 @@
 import { PortMapping } from '../docker'
-import { DockerComposeConfig, getConfiguredPortsMap } from '../dockerCompose'
+import { getConfiguredPortsMap } from '../dockerCompose'
+import { DockerComposeConfig } from '@contember/cli-common'
 import getPort from 'get-port'
 
 type ServicePortsMapping = Record<string, PortMapping[]>
@@ -11,12 +12,16 @@ export const resolvePortsMapping = async (args: {
 	host?: string[]
 }): Promise<ServicePortsMapping> => {
 	const exposedServices = [
-		{ service: 'admin', port: null },
-		{ service: 'api', port: 4000 },
-		{ service: 'db', port: 5432 },
+		{ service: 'contember-admin', port: null },
+		{ service: 'contember', port: 4000 },
+		{ service: 'postgresql', port: 5432 },
 		{ service: 's3', port: null },
 		{ service: 'adminer', port: 8080 },
 		{ service: 'mailhog', port: 8025 },
+		// deprecated
+		{ service: 'admin', port: null },
+		{ service: 'api', port: 4000 },
+		{ service: 'db', port: 5432 },
 	]
 
 	const configuredPorts = getConfiguredPortsMap(args.config)
@@ -71,72 +76,34 @@ const updateConfigWithPorts = (config: any, portsMapping: ServicePortsMapping): 
 	)
 }
 
-const filterUndefinedEntries = (input: Record<string, string | undefined>): Record<string, string> =>
-	Object.fromEntries(Object.entries(input).filter((item): item is [string, string] => item[1] !== undefined))
-
-export const patchInstanceOverrideCredentials = (
-	config: DockerComposeConfig,
-	tenantCredentials: TenantCredentials,
-): DockerComposeConfig => {
-	if (config.services?.admin) {
-		config = {
-			...config,
-			services: {
-				...config.services,
-				admin: {
-					...config.services.admin,
-					environment: filterUndefinedEntries({
-						...config.services.admin.environment,
-						CONTEMBER_LOGIN_TOKEN: tenantCredentials.loginToken,
-					}),
-				},
-			},
-		}
-	}
-	return {
-		...config,
-		services: {
-			...config.services,
-			api: {
-				...config.services?.api,
-				environment: {
-					...config.services?.api?.environment,
-					...filterUndefinedEntries({
-						CONTEMBER_LOGIN_TOKEN: tenantCredentials.loginToken,
-						CONTEMBER_ROOT_TOKEN: tenantCredentials.rootToken,
-						CONTEMBER_ROOT_EMAIL: tenantCredentials.rootEmail,
-						CONTEMBER_ROOT_PASSWORD: tenantCredentials.rootPassword,
-					}),
-				},
-			},
-		},
-	}
-}
-
 export const patchInstanceOverrideConfig = (
 	config: DockerComposeConfig,
 	portsMapping: ServicePortsMapping,
-	version?: string,
+	mainConfig: DockerComposeConfig,
 ) => {
+	const apiServiceName = mainConfig.services?.['contember'] ? 'contember' : 'api'
+	const adminServiceName = mainConfig.services?.['contember-admin'] ? 'contember-admin' : 'admin'
 	config = updateConfigWithPorts(config, portsMapping)
-	if (config.services?.admin) {
+	if (config.services?.[adminServiceName]) {
 		config = {
 			...config,
 			services: {
 				...config.services,
-				admin: {
-					...config.services.admin,
-					...(!config.services.admin.user && process.getuid
+				[adminServiceName]: {
+					...config.services[adminServiceName],
+					...(!config.services[adminServiceName].user && process.getuid
 						? {
 								user: String(process.getuid()),
 						  }
 						: {}),
 					environment: {
-						...config.services.admin.environment,
+						...config.services[adminServiceName].environment,
 						CONTEMBER_PORT: String(
-							portsMapping.admin[0]?.containerPort || config.services.admin.environment?.CONTEMBER_PORT || '',
+							portsMapping[adminServiceName][0]?.containerPort ||
+								config.services[adminServiceName].environment?.CONTEMBER_PORT ||
+								'',
 						),
-						CONTEMBER_API_SERVER: `http://127.0.0.1:${portsMapping.api[0].hostPort}`,
+						CONTEMBER_API_SERVER: `http://127.0.0.1:${portsMapping[apiServiceName][0].hostPort}`,
 					},
 				},
 			},
@@ -145,18 +112,18 @@ export const patchInstanceOverrideConfig = (
 
 	return {
 		...config,
-		version: config.version || version || '3.7',
+		version: config.version || mainConfig.version || '3.7',
 		services: {
 			...config.services,
-			api: {
-				...config.services?.api,
-				...(!config.services?.api.user && process.getuid
+			[apiServiceName]: {
+				...config.services?.[apiServiceName],
+				...(!config.services?.[apiServiceName]?.user && process.getuid
 					? {
 							user: String(process.getuid()),
 					  }
 					: {}),
 				environment: {
-					...config.services?.api?.environment,
+					...config.services?.[apiServiceName]?.environment,
 					DEFAULT_S3_ENDPOINT: 'http://localhost:' + portsMapping.s3[0].hostPort,
 				},
 			},
@@ -166,11 +133,4 @@ export const patchInstanceOverrideConfig = (
 			},
 		},
 	}
-}
-
-type TenantCredentials = {
-	rootEmail?: string
-	rootPassword?: string
-	rootToken?: string
-	loginToken?: string
 }

@@ -42,19 +42,22 @@ export class Project {
 				},
 			}),
 		)
-		await updateMainDockerComposeConfig(this.workspace.directory, config => ({
-			...config,
-			services: {
-				...config.services,
-				api: {
-					...config.services?.api,
-					environment: {
-						...config.services?.api.environment,
-						[projectNameToEnvName(this.name) + '_DB_NAME']: this.name,
+		await updateMainDockerComposeConfig(this.workspace.directory, config => {
+			const serviceName = config.services?.['contember'] ? 'contember' : 'api'
+			return {
+				...config,
+				services: {
+					...config.services,
+					[serviceName]: {
+						...config.services?.[serviceName],
+						environment: {
+							...config.services?.[serviceName]?.environment,
+							[projectNameToEnvName(this.name) + '_DB_NAME']: this.name,
+						},
 					},
 				},
-			},
-		}))
+			}
+		})
 	}
 }
 

@@ -1,11 +1,13 @@
+import { ImplementationException } from '../exception'
+
 export const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, args: Args) => T) => {
-	const created: { [name: string]: T } = {}
-	const createdIds = new Set<string>()
+	const created = new Map<string, T>()
 	const recursionGuard: string[] = []
 	return (name: Id, args?: Args): T => {
 		const idString = typeof name === 'string' ? name : JSON.stringify(name)
-		if (createdIds.has(idString)) {
-			return created[idString]
+		const createdVal = created.get(idString)
+		if (createdVal) {
+			return createdVal
 		}
 		if (recursionGuard.includes(idString)) {
 			throw new Error(`Recursion for ${idString} detected`)
@@ -13,10 +15,9 @@ export const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, 
 		recursionGuard.push(idString)
 		const val = cb(name, args as Args)
 		if (recursionGuard.pop() !== idString) {
-			throw new Error('impl error')
+			throw new ImplementationException()
 		}
-		created[idString] = val
-		createdIds.add(idString)
+		created.set(idString, val)
 
 		return val
 	}

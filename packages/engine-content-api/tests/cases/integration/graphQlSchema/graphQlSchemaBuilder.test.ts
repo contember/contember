@@ -285,4 +285,12 @@ graphqlSchemaBuilderTest('custom primary allowed', async () => {
 	})
 })
 
+graphqlSchemaBuilderTest('aliased type', async () => {
+	await testSchema({
+		schema: builder =>
+			builder.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).typeAlias('AuthorName'))),
+		permissions: schema => new AllowAllPermissionFactory().create(schema),
+		graphQlSchemaFile: 'schema-aliased-type.gql',
+	})
+})
 graphqlSchemaBuilderTest.run()

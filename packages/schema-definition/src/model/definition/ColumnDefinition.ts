@@ -41,8 +41,12 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 		return this.withOption('default', value)
 	}
 
+	public typeAlias(alias: string): Interface<ColumnDefinition<Type>> {
+		return this.withOption('typeAlias', alias)
+	}
+
 	createField({ name, conventions, enumRegistry, entityName }: FieldDefinition.CreateFieldContext): Model.AnyField {
-		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType } = this.options
+		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias } = this.options
 		const common = {
 			name: name,
 			columnName: columnName || conventions.getColumnName(name),
@@ -50,6 +54,9 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
+			if (typeAlias) {
+				throw new Error('GraphQL type alias cannot be specified for enum type')
+			}
 			let enumName: string
 			if (!enumDefinition) {
 				throw new Error()
@@ -63,7 +70,12 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 
 			return { ...common, type: type, columnType: enumName }
 		}
-		return { ...common, type: type, columnType: columnType || getColumnType(type) }
+		return {
+			...common,
+			type: type,
+			columnType: columnType || getColumnType(type),
+			...(typeAlias !== undefined ? { typeAlias } : {}),
+		}
 	}
 }
 
@@ -75,6 +87,7 @@ namespace ColumnDefinition {
 	export type Options<Type extends Model.ColumnType> = {
 		type: Model.ColumnType
 		columnType?: string
+		typeAlias?: string
 		columnName?: string
 		unique?: boolean
 		nullable?: boolean

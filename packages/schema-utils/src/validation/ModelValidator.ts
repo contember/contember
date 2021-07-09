@@ -352,6 +352,7 @@ export class ModelValidator {
 
 	private validateCollisions(entities: Model.Entity[], errorBuilder: ErrorBuilder) {
 		const tableNames: Record<string, string> = {}
+		const aliasedTypes = new Map<string, Model.ColumnType>()
 		for (const entity of entities) {
 			const description = `entity ${entity.name}`
 			if (tableNames[entity.tableName]) {
@@ -384,7 +385,17 @@ export class ModelValidator {
 						tableNames[joiningTable.tableName] = description
 					}
 				},
-				visitColumn: () => {},
+				visitColumn: (entity, column) => {
+					if (!column.typeAlias) {
+						return
+					}
+					if (aliasedTypes.has(column.typeAlias) && aliasedTypes.get(column.typeAlias) !== column.type) {
+						errorBuilder
+							.for(column.name)
+							.add(`Type alias ${column.typeAlias} already exists for base type ${column.type}`)
+					}
+					aliasedTypes.set(column.typeAlias, column.type)
+				},
 				visitManyHasManyInverse: () => {},
 				visitOneHasMany: () => {},
 				visitOneHasOneInverse: () => {},

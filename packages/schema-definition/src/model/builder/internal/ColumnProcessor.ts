@@ -31,6 +31,11 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			return { ...common, type: type, columnType: options.enumName! }
 		}
-		return { ...common, type, columnType: getColumnType(type) }
+		return {
+			...common,
+			type,
+			columnType: getColumnType(type),
+			...(options.typeAlias !== undefined ? { typeAlias: options.typeAlias } : {}),
+		}
 	}
 }

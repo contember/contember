@@ -16,7 +16,7 @@ namespace Model {
 	}
 
 	export type AnyField = AnyColumn | AnyRelation
-	export type AnyColumn = Column<ColumnType>
+	export type AnyColumn<T extends ColumnType = ColumnType> = Column<T>
 
 	export enum ColumnType {
 		Uuid = 'Uuid',
@@ -30,13 +30,14 @@ namespace Model {
 		Json = 'Json',
 	}
 
-	export type Column<T extends ColumnType> = ColumnTypeDefinition & {
+	export type Column<T extends ColumnType> = ColumnTypeDefinition<T> & {
 		name: string
 		columnName: string
 	}
 
-	export interface ColumnTypeDefinition extends Field<ColumnType> {
+	export interface ColumnTypeDefinition<T extends ColumnType = ColumnType> extends Field<T> {
 		columnType: string
+		typeAlias?: string
 		nullable: boolean
 		default?: string | number | boolean | null
 	}

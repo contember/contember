@@ -35,6 +35,10 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 		return new ColumnBuilder<O>({ ...(this.options as object), primary: true } as O)
 	}
 
+	public typeAlias(typeAlias: string): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...(this.options as object), typeAlias } as O)
+	}
+
 	getOption(): O {
 		return this.options
 	}
@@ -52,6 +56,7 @@ namespace ColumnBuilder {
 		unique?: boolean
 		nullable?: boolean
 		primary?: boolean
+		typeAlias?: string
 	}
 }
 

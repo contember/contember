@@ -3,6 +3,7 @@ type Query {
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
   paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
   validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
+  validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
   getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
   listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
   paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
@@ -180,6 +181,30 @@ input RootWithoutRCreateInput {
   _dummy_field_: Boolean
 }
 
+input OneHasManyEntityUpdateInput {
+  a: String
+  r2: OneHasManyEntityUpdateR2EntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input OneHasManyEntityUpdateR2EntityRelationInput {
+  create: RootWithoutRCreateInput
+  update: RootWithoutRUpdateInput
+  upsert: OneHasManyEntityUpsertR2RelationInput
+  connect: RootUniqueWhere
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input RootWithoutRUpdateInput {
+  _dummy_field_: Boolean
+}
+
+input OneHasManyEntityUpsertR2RelationInput {
+  update: RootWithoutRUpdateInput
+  create: RootWithoutRCreateInput
+}
+
 type RootConnection {
   pageInfo: PageInfo!
   edges: [RootEdge!]!
@@ -206,7 +231,33 @@ input OneHasManyEntityWithoutR2CreateInput {
 }
 
 input RootUpdateInput {
+  r: [RootUpdateREntityRelationInput!]
   _dummy_field_: Boolean
+}
+
+input RootUpdateREntityRelationInput {
+  create: OneHasManyEntityWithoutR2CreateInput
+  update: RootUpdateRRelationInput
+  upsert: RootUpsertRRelationInput
+  connect: OneHasManyEntityUniqueWhere
+  disconnect: OneHasManyEntityUniqueWhere
+  alias: String
+}
+
+input RootUpdateRRelationInput {
+  by: OneHasManyEntityUniqueWhere
+  data: OneHasManyEntityWithoutR2UpdateInput
+}
+
+input OneHasManyEntityWithoutR2UpdateInput {
+  a: String
+  _dummy_field_: Boolean
+}
+
+input RootUpsertRRelationInput {
+  by: OneHasManyEntityUniqueWhere
+  update: OneHasManyEntityWithoutR2UpdateInput
+  create: OneHasManyEntityWithoutR2CreateInput
 }
 
 type QueryTransaction {
@@ -214,6 +265,7 @@ type QueryTransaction {
   listOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], offset: Int, limit: Int): [OneHasManyEntity!]!
   paginateOneHasManyEntity(filter: OneHasManyEntityWhere, orderBy: [OneHasManyEntityOrderBy!], skip: Int, first: Int): OneHasManyEntityConnection!
   validateCreateOneHasManyEntity(data: OneHasManyEntityCreateInput!): _ValidationResult!
+  validateUpdateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, data: OneHasManyEntityUpdateInput!): _ValidationResult!
   getRoot(by: RootUniqueWhere!, filter: RootWhere): Root
   listRoot(filter: RootWhere, orderBy: [RootOrderBy!], offset: Int, limit: Int): [Root!]!
   paginateRoot(filter: RootWhere, orderBy: [RootOrderBy!], skip: Int, first: Int): RootConnection!
@@ -227,13 +279,14 @@ type Info {
 
 type Mutation {
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
-  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntityDeleteResult!
+  updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
+  upsertOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, update: OneHasManyEntityUpdateInput!, create: OneHasManyEntityCreateInput!): OneHasManyEntityUpsertResult!
   createRoot(data: RootCreateInput!): RootCreateResult!
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!
   upsertRoot(by: RootUniqueWhere!, filter: RootWhere, update: RootUpdateInput!, create: RootCreateInput!): RootUpsertResult!
-  query: Query
   transaction: MutationTransaction!
+  query: Query!
 }
 
 type OneHasManyEntityCreateResult implements MutationResult {
@@ -267,11 +320,20 @@ enum _MutationErrorType {
   SqlError
 }
 
-type OneHasManyEntityDeleteResult implements MutationResult {
+type OneHasManyEntityUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: OneHasManyEntity
+  validation: _ValidationResult!
+}
+
+type OneHasManyEntityUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: OneHasManyEntity
+  validation: _ValidationResult!
 }
 
 type RootCreateResult implements MutationResult {
@@ -311,7 +373,8 @@ type MutationTransaction {
   errors: [_MutationError!]!
   validation: _ValidationResult!
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
-  deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntityDeleteResult!
+  updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
+  upsertOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, update: OneHasManyEntityUpdateInput!, create: OneHasManyEntityCreateInput!): OneHasManyEntityUpsertResult!
   createRoot(data: RootCreateInput!): RootCreateResult!
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!
   updateRoot(by: RootUniqueWhere!, filter: RootWhere, data: RootUpdateInput!): RootUpdateResult!

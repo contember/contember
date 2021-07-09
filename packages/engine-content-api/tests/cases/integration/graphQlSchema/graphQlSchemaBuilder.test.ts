@@ -74,7 +74,7 @@ graphqlSchemaBuilderTest('basic schema', async () => {
 						.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
 				),
 		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema1.gql',
+		graphQlSchemaFile: 'schema-basic.gql',
 	})
 })
 
@@ -106,7 +106,7 @@ graphqlSchemaBuilderTest('restricted access to fields by permissions', async () 
 				},
 			},
 		}),
-		graphQlSchemaFile: 'schema2.gql',
+		graphQlSchemaFile: 'schema-acl.gql',
 	})
 })
 const oneHasManySchema = (builder: SchemaBuilder) =>
@@ -122,7 +122,7 @@ graphqlSchemaBuilderTest('ACL with relations - everything allowed', async () => 
 	await testSchema({
 		schema: oneHasManySchema,
 		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema3.gql',
+		graphQlSchemaFile: 'schema-acl-allowed.gql',
 	})
 })
 
@@ -148,7 +148,7 @@ graphqlSchemaBuilderTest('ACL with relations - restricted delete', async () => {
 				},
 			},
 		}),
-		graphQlSchemaFile: 'schema4.gql',
+		graphQlSchemaFile: 'schema-acl-restricted-delete.gql',
 	})
 })
 
@@ -174,7 +174,7 @@ graphqlSchemaBuilderTest('ACL with relations - restricted update', async () => {
 				},
 			},
 		}),
-		graphQlSchemaFile: 'schema5.gql',
+		graphQlSchemaFile: 'schema-acl-restricted-update.gql',
 	})
 })
 
@@ -199,7 +199,7 @@ graphqlSchemaBuilderTest('ACL with relations - restricted create', async () => {
 				},
 			},
 		}),
-		graphQlSchemaFile: 'schema6.gql',
+		graphQlSchemaFile: 'schema-acl-restricted-create.gql',
 	})
 })
 
@@ -219,7 +219,7 @@ graphqlSchemaBuilderTest('has many relation reduction', async () => {
 					),
 			),
 		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema7.gql',
+		graphQlSchemaFile: 'schema-has-many-reduction.gql',
 	})
 })
 
@@ -236,7 +236,7 @@ graphqlSchemaBuilderTest('bug with multiple relations 66', async () => {
 						.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage')),
 				),
 		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema8.gql',
+		graphQlSchemaFile: 'schema-bug-66.gql',
 	})
 })
 
@@ -249,7 +249,7 @@ graphqlSchemaBuilderTest('basic schema with new builder', async () => {
 	await testSchema({
 		schema: () => schema1,
 		permissions: schema => new AllowAllPermissionFactory().create(schema),
-		graphQlSchemaFile: 'schema9.gql',
+		graphQlSchemaFile: 'schema-new-builder.gql',
 	})
 })
 
@@ -258,7 +258,7 @@ graphqlSchemaBuilderTest('allow only create', async () => {
 	await testSchema({
 		schema: () => schema,
 		permissions: schema => new AllowAllPermissionFactory([Acl.Operation.create]).create(schema),
-		graphQlSchemaFile: 'schema10.gql',
+		graphQlSchemaFile: 'schema-acl-create-only.gql',
 	})
 })
 
@@ -281,7 +281,7 @@ graphqlSchemaBuilderTest('custom primary allowed', async () => {
 						.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
 				),
 		permissions: schema => new AllowAllPermissionFactory().create(schema, true),
-		graphQlSchemaFile: 'schema11.gql',
+		graphQlSchemaFile: 'schema-custom-primary.gql',
 	})
 })
 

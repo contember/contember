@@ -401,8 +401,8 @@ type Mutation {
   deleteFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere): FrontPageDeleteResult!
   updateFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, data: FrontPageUpdateInput!): FrontPageUpdateResult!
   upsertFrontPage(by: FrontPageUniqueWhere!, filter: FrontPageWhere, update: FrontPageUpdateInput!, create: FrontPageCreateInput!): FrontPageUpsertResult!
-  query: Query
   transaction: MutationTransaction!
+  query: Query!
 }
 
 type VideoCreateResult implements MutationResult {

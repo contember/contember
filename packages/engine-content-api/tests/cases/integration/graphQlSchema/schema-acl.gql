@@ -152,8 +152,8 @@ type Mutation {
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
   upsertTest(by: TestUniqueWhere!, filter: TestWhere, update: TestUpdateInput!, create: TestCreateInput!): TestUpsertResult!
-  query: Query
   transaction: MutationTransaction!
+  query: Query!
 }
 
 type TestCreateResult implements MutationResult {

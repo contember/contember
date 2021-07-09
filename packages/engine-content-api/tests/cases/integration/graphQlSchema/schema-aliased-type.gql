@@ -149,8 +149,8 @@ type Mutation {
   deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!
   upsertAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, update: AuthorUpdateInput!, create: AuthorCreateInput!): AuthorUpsertResult!
-  query: Query
   transaction: MutationTransaction!
+  query: Query!
 }
 
 type AuthorCreateResult implements MutationResult {

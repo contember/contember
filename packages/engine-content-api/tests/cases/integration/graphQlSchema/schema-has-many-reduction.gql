@@ -328,8 +328,8 @@ type Mutation {
   deletePost(by: PostUniqueWhere!, filter: PostWhere): PostDeleteResult!
   updatePost(by: PostUniqueWhere!, filter: PostWhere, data: PostUpdateInput!): PostUpdateResult!
   upsertPost(by: PostUniqueWhere!, filter: PostWhere, update: PostUpdateInput!, create: PostCreateInput!): PostUpsertResult!
-  query: Query
   transaction: MutationTransaction!
+  query: Query!
 }
 
 type PostLocaleCreateResult implements MutationResult {

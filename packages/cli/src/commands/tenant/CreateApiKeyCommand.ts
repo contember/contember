@@ -15,7 +15,7 @@ export class CreateApiKeyCommand extends Command<Args, Options> {
 		configuration //
 			.argument('instance')
 			.optional()
-			.description('Local instance name or remote Contember API URL')
+			.description('Contember API URL')
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {

@@ -39,20 +39,3 @@ export const readYaml = async <T = JSONObject>(path: string): Promise<T> => {
 	const content = await fs.readFile(path, { encoding: 'utf8' })
 	return jsyaml.load(content) as unknown as T
 }
-
-export const readMultipleYaml = async <T extends JSONObject = JSONObject>(paths: string[]): Promise<T> => {
-	const configs: T[] = []
-	for (const path of paths) {
-		const exists = await pathExists(path)
-		if (!exists) {
-			continue
-		}
-		const stats = await fs.lstat(path)
-		if (!stats.isFile()) {
-			continue
-		}
-		const config = await readYaml<T>(path)
-		configs.push(config)
-	}
-	return Merger.merge(...configs) as unknown as T
-}

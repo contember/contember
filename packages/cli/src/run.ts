@@ -17,7 +17,6 @@ import {
 	ResetPasswordCommand,
 	SignInCommand,
 	VersionCommand,
-	WorkspaceConfigureCommand,
 	WorkspaceUpdateApiCommand,
 } from './commands'
 ;(async () => {
@@ -39,7 +38,6 @@ import {
 		['migrations:rebase']: () => new MigrationRebaseCommand(),
 		['migrations:status']: () => new MigrationStatusCommand(),
 		['workspace:update:api']: () => new WorkspaceUpdateApiCommand(),
-		['workspace:configure']: () => new WorkspaceConfigureCommand(),
 		['project:create']: () => new ProjectCreateCommand(),
 		['project:validate']: () => new ProjectValidateCommand(),
 		['project:print-schema']: () => new ProjectPrintSchemaCommand(),

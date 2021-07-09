@@ -1,6 +1,2 @@
 export * from './environment'
-export * from './configure'
-export { validateInstanceName } from './common'
-export * from './status'
-export * from './dockerComposeConfig'
 export { interactiveResolveInstanceEnvironmentFromInput } from './interactiveUtils'

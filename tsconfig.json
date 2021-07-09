@@ -22,6 +22,7 @@
 		{ "path": "./packages/engine-server" },
 		{ "path": "./packages/engine-system-api" },
 		{ "path": "./packages/engine-tenant-api" },
+		{ "path": "./packages/install" },
 		{ "path": "./packages/queryable" },
 		{ "path": "./packages/schema" },
 		{ "path": "./packages/schema-definition" },

@@ -264,9 +264,16 @@ const projectNameToEnvName = (projectName: string): string => {
 	return projectName.toUpperCase().replace(/-/g, '_')
 }
 
-export async function readConfig(filenames: string[], configProcessors: ConfigProcessor[] = []): Promise<Config> {
+export type ConfigSource = { data: string; type: 'file' | 'json' | 'yaml' }
+
+export async function readConfig(
+	configSources: ConfigSource[],
+	configProcessors: ConfigProcessor[] = [],
+): Promise<Config> {
 	const loader = new ConfigLoader()
-	const configs = await Promise.all(filenames.map(it => loader.load(it)))
+	const configs = await Promise.all(
+		configSources.map(it => (it.type === 'file' ? loader.load(it.data) : loader.loadString(it.data, it.type))),
+	)
 	const env: Record<string, string> = {
 		...configProcessors.reduce((acc, curr) => ({ ...acc, ...curr.getDefaultEnv() }), {}),
 		...Object.fromEntries(Object.entries(process.env).filter((it): it is [string, string] => it[1] !== undefined)),

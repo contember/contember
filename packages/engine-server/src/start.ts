@@ -8,6 +8,7 @@ import { join } from 'path'
 import os from 'os'
 import cluster from 'cluster'
 import { getClusterProcessType, initSentry, notifyWorkerStarted, timeout, waitForWorker } from './utils'
+import { ConfigSource } from './config/config'
 
 const createServerTerminator = (): Server[] => {
 	const signals = [
@@ -49,14 +50,22 @@ const createServerTerminator = (): Server[] => {
 		}
 	}
 
-	const configFile = process.env['CONTEMBER_CONFIG_FILE']
 	const projectsDir = process.env['CONTEMBER_PROJECTS_DIRECTORY']
 
 	const plugins = await loadPlugins()
 	const configProcessors = plugins
 		.map(it => (it.getConfigProcessor ? it.getConfigProcessor() : null))
 		.filter((it): it is ConfigProcessor => it !== null)
-	const config = await readConfig(configFile ? [configFile] : [], configProcessors)
+
+	const configSources: ConfigSource[] = []
+	for (const configType of ['file', 'yaml', 'json'] as const) {
+		const envValue = process.env['CONTEMBER_CONFIG_' + configType.toUpperCase()]
+		if (envValue) {
+			configSources.push({ type: configType, data: envValue })
+		}
+	}
+
+	const config = await readConfig(configSources, configProcessors)
 
 	if (process.argv[2] === 'validate') {
 		process.exit(0)

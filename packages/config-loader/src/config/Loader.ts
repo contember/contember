@@ -27,6 +27,13 @@ class Loader {
 		return await this.includeConfigs(config, dirname(filename))
 	}
 
+	public async loadString(content: string, adapter: string): Promise<any> {
+		if (!this.adapters[adapter]) {
+			throw new Loader.UnresolvedAdapterError(`Adapter for ${adapter} not found.`)
+		}
+		return this.adapters[adapter].parse(content)
+	}
+
 	private async includeConfigs(data: any, baseDir: string): Promise<any> {
 		if (Array.isArray(data)) {
 			return await Promise.all(data.map(async it => await this.includeConfigs(it, baseDir)))

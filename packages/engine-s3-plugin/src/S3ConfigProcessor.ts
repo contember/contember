@@ -5,7 +5,6 @@ import { S3Config } from './Config'
 export class S3ConfigProcessor implements ConfigProcessor {
 	getDefaultEnv(): Record<string, string> {
 		return {
-			DEFAULT_DB_PORT: '5432',
 			DEFAULT_S3_PREFIX: '',
 			DEFAULT_S3_ENDPOINT: '',
 			DEFAULT_S3_REGION: 'us-east-1',

@@ -275,7 +275,9 @@ export async function readConfig(
 		configSources.map(it => (it.type === 'file' ? loader.load(it.data) : loader.loadString(it.data, it.type))),
 	)
 	const env: Record<string, string> = {
-		...configProcessors.reduce((acc, curr) => ({ ...acc, ...curr.getDefaultEnv() }), {}),
+		...configProcessors.reduce((acc, curr) => ({ ...acc, ...curr.getDefaultEnv() }), {
+			DEFAULT_DB_PORT: '5432',
+		}),
 		...Object.fromEntries(Object.entries(process.env).filter((it): it is [string, string] => it[1] !== undefined)),
 	}
 

@@ -45,7 +45,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const schema: Schema = require(project.apiDir).default
-			projectValid = validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')
+			projectValid = validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:') && projectValid
 
 			const builtSchema = await container.schemaVersionBuilder.buildSchema()
 			projectValid =

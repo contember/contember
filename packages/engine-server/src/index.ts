@@ -9,7 +9,7 @@ export { CompositionRoot, Project, readConfig }
 export const createContainer = (
 	debug: boolean,
 	config: Config,
-	projectsDirectory: string,
+	projectsDirectory: string | null,
 	plugins: Plugin[],
 	processType: ProcessType = ProcessType.singleNode,
 ) => {

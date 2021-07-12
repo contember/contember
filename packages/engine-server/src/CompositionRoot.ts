@@ -43,7 +43,7 @@ class CompositionRoot {
 	createMasterContainer(
 		debugMode: boolean,
 		config: Config,
-		projectsDirectory: string,
+		projectsDirectory: string | null,
 		plugins: Plugin[],
 		processType: ProcessType = ProcessType.singleNode,
 	): MasterContainer {
@@ -56,12 +56,13 @@ class CompositionRoot {
 
 		const systemContainerDependencies = new Builder({})
 			.addService('providers', () => providers)
-			.addService(
-				'migrationsResolverFactory',
-				() => (project: Pick<Project, 'slug' | 'directory'>) =>
-					new MigrationsResolver(
-						MigrationFilesManager.createForProject(projectsDirectory, project.directory || project.slug),
-					),
+			.addService('migrationsResolverFactory', () =>
+				projectsDirectory
+					? (project: Pick<Project, 'slug' | 'directory'>) =>
+							new MigrationsResolver(
+								MigrationFilesManager.createForProject(projectsDirectory, project.directory || project.slug),
+							)
+					: undefined,
 			)
 			.addService(
 				'modificationHandlerFactory',

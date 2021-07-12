@@ -50,19 +50,13 @@ const createServerTerminator = (): Server[] => {
 	}
 
 	const configFile = process.env['CONTEMBER_CONFIG_FILE']
-	if (!configFile) {
-		throw new Error('env variable CONTEMBER_CONFIG_FILE is not set')
-	}
 	const projectsDir = process.env['CONTEMBER_PROJECTS_DIRECTORY']
-	if (!projectsDir) {
-		throw new Error('env variable CONTEMBER_PROJECTS_DIRECTORY is not set')
-	}
 
 	const plugins = await loadPlugins()
 	const configProcessors = plugins
 		.map(it => (it.getConfigProcessor ? it.getConfigProcessor() : null))
 		.filter((it): it is ConfigProcessor => it !== null)
-	const config = await readConfig([configFile], configProcessors)
+	const config = await readConfig(configFile ? [configFile] : [], configProcessors)
 
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
@@ -75,7 +69,7 @@ const createServerTerminator = (): Server[] => {
 
 	const clusterMode = getClusterProcessType(isClusterMode)
 
-	const container = createContainer(isDebug, config, projectsDir, plugins, clusterMode)
+	const container = createContainer(isDebug, config, projectsDir || null, plugins, clusterMode)
 
 	if (cluster.isMaster) {
 		const monitoringPort = config.server.monitoringPort

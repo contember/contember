@@ -36,7 +36,7 @@ export class AclValidator {
 			// 	errorBuilder.add('Role "admin" is reserved.')
 			// 	continue
 			// }
-			const rolePermissions = this.validateRolePermissions(roles[role], validRoles, errorBuilder.for(role))
+			const rolePermissions = this.validateRolePermissions(roles[role], Object.keys(roles), errorBuilder.for(role))
 			if (rolePermissions !== undefined) {
 				validRoles[role] = rolePermissions
 			}
@@ -46,7 +46,7 @@ export class AclValidator {
 
 	private validateRolePermissions(
 		permissions: unknown,
-		roles: Acl.Schema['roles'],
+		roles: string[],
 		errorBuilder: ErrorBuilder,
 	): Acl.RolePermissions | undefined {
 		if (!isObject(permissions)) {
@@ -80,11 +80,7 @@ export class AclValidator {
 		return { ...plugins, ...result }
 	}
 
-	private validateInherits(
-		inherits: unknown,
-		roles: Acl.Schema['roles'],
-		errorBuilder: ErrorBuilder,
-	): string[] | undefined {
+	private validateInherits(inherits: unknown, roles: string[], errorBuilder: ErrorBuilder): string[] | undefined {
 		if (inherits === undefined) {
 			return undefined
 		}
@@ -94,10 +90,9 @@ export class AclValidator {
 		} else {
 			const validRoles: string[] = []
 			for (const inheritsFrom of inherits) {
-				if (!roles[inheritsFrom]) {
-					errorBuilder
-						.for(inheritsFrom)
-						.add('Referenced role not exists. Make sure you are defining roles in a right order')
+				if (!roles.includes(inheritsFrom)) {
+					// todo: check recursion
+					errorBuilder.for(inheritsFrom).add('Referenced role not exists.')
 				} else {
 					validRoles.push(inheritsFrom)
 				}

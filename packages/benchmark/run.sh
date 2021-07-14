@@ -11,7 +11,7 @@ CONTAINER_NAME="$( docker-compose run -d -e APP_DB_NAME=benchmark_app -e TENANT_
 
 sleep 5
 
-docker exec $CONTAINER_NAME node ./packages/benchmark/dist/src/setup.js
-cat ./packages/benchmark/src/query.graphql | docker exec -i $CONTAINER_NAME node ./packages/benchmark/dist/src/benchmark.js  "$@"
+docker exec -e CONTEMBER_API_URL="http://localhost:${CONTEMBER_API_PORT}/content/app/prod" $CONTAINER_NAME node ./packages/benchmark/dist/src/setup.js
+cat ./packages/benchmark/src/query.graphql | docker exec -e CONTEMBER_API_URL="http://localhost:${CONTEMBER_API_PORT}/content/app/prod" -i $CONTAINER_NAME node ./packages/benchmark/dist/src/benchmark.js  "$@"
 
 docker stop $CONTAINER_NAME

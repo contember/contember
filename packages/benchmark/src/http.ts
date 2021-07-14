@@ -1,7 +1,6 @@
 import fetch, { RequestInit } from 'node-fetch'
 
 export const createHttpOptions = (options: {
-	endpoint: string
 	query: string
 	variables?: Record<string, any>
 	authorizationToken: string

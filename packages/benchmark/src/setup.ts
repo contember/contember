@@ -17,8 +17,8 @@ const dataInit = async (contentEndpoint: string, accessToken: string) => {
 	})
 }
 ;(async () => {
-	const serverPort = process.env.CONTEMBER_PORT
-	const contentEndpoint = `http://localhost:${serverPort}/content/app/prod`
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const contentEndpoint = process.env.CONTEMBER_API_URL!
 	await dataInit(contentEndpoint, process.env.CONTEMBER_ROOT_TOKEN as string)
 })().catch(e => {
 	console.error(e)

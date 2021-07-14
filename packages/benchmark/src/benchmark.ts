@@ -36,8 +36,8 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 
 	const variables = {}
 
-	const serverPort = process.env.CONTEMBER_PORT
-	const contentEndpoint = `http://localhost:${serverPort}/content/app/prod`
+	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+	const contentEndpoint = process.env.CONTEMBER_API_URL!
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const accessToken = process.env.CONTEMBER_ROOT_TOKEN!
 
@@ -64,8 +64,8 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 		const instance = autocannon({
 			connections,
 			duration: 10,
+			url: contentEndpoint,
 			...createHttpOptions({
-				endpoint: contentEndpoint,
 				query: queryGql,
 				authorizationToken: accessToken,
 				variables,

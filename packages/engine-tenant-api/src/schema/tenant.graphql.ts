@@ -73,6 +73,8 @@ const schema: DocumentNode = gql`
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
+
+		createProject(slug: String!, name: String): CreateProjectResponse
 	}
 
 	# === signUp ===
@@ -627,6 +629,22 @@ const schema: DocumentNode = gql`
 	input CreateResetPasswordRequestOptions {
 		mailProject: String
 		mailVariant: String
+	}
+
+	# === project ===
+
+	type CreateProjectResponse {
+		ok: Boolean!
+		error: CreateProjectResponseError
+	}
+
+	type CreateProjectResponseError {
+		code: CreateProjectResponseErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreateProjectResponseErrorCode {
+		ALREADY_EXISTS
 	}
 `
 

@@ -1,13 +1,13 @@
 import migration from './2020-05-06-150000-composed-primary'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { exampleProject } from '@contember/engine-api-tester'
+import { sampleProject } from '@contember/engine-api-tester'
 import { test } from 'uvu'
 import * as assert from 'uvu/assert'
 
 test('many-has-many-primary migration sql', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
-		schemaResolver: () => Promise.resolve(exampleProject),
+		schemaResolver: () => Promise.resolve(sampleProject),
 		project: {
 			slug: 'test',
 			stages: [

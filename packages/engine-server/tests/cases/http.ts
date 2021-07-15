@@ -1,10 +1,12 @@
 import supertest from 'supertest'
 import CompositionRoot from '../../src/CompositionRoot'
-import { getExampleProjectDirectory, recreateDatabase } from '@contember/engine-api-tester'
+import { recreateDatabase } from '@contember/engine-api-tester'
 import * as nodeAssert from 'assert'
 import * as assert from 'uvu/assert'
 import { test } from 'uvu'
 import prom from 'prom-client'
+import { MigrationsResolver, MigrationFilesManager } from '@contember/schema-migrations'
+import { getExampleProjectDirectory } from '@contember/engine-api-tester'
 
 const dbCredentials = (dbName: string) => {
 	return {
@@ -25,6 +27,12 @@ const gql = (strings: TemplateStringsArray) => {
 	return strings[0]
 }
 
+const projectConfig = {
+	db: dbCredentials(String(process.env.TEST_DB_NAME)),
+	name: 'test',
+	slug: 'test',
+	stages: [{ name: 'prod', slug: 'prod' }],
+}
 const createContainer = (debug: boolean) => {
 	prom.register.clear()
 	return new CompositionRoot().createMasterContainer(
@@ -38,15 +46,6 @@ const createContainer = (debug: boolean) => {
 					loginToken,
 				},
 			},
-			projects: {
-				test: {
-					directory: './',
-					db: dbCredentials(String(process.env.TEST_DB_NAME)),
-					name: 'test',
-					slug: 'test',
-					stages: [{ name: 'prod', slug: 'prod' }],
-				},
-			},
 			server: {
 				logging: {},
 				port: 0,
@@ -54,7 +53,7 @@ const createContainer = (debug: boolean) => {
 				http: {},
 			},
 		},
-		getExampleProjectDirectory(),
+		() => projectConfig,
 		[],
 	)
 }
@@ -101,7 +100,12 @@ test.before(async () => {
 		await connection.end()
 		const connection2 = await recreateDatabase(String(process.env.TEST_DB_NAME_TENANT))
 		await connection2.end()
-		await createContainer(false).initializer.initialize()
+		const migrationsResolver = new MigrationsResolver(
+			MigrationFilesManager.createForProject(getExampleProjectDirectory(), 'sample'),
+		)
+		const container = createContainer(false)
+		await container.initializer.initialize()
+		await container.initializer.createProject(projectConfig, await migrationsResolver.getMigrations())
 	} catch (e) {
 		// eslint-disable-next-line no-console
 		console.error(e)

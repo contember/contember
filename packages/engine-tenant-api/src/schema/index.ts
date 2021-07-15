@@ -180,6 +180,22 @@ export type CreatePasswordResetRequestResponse = {
 	readonly error?: Maybe<CreatePasswordResetRequestError>
 }
 
+export type CreateProjectResponse = {
+	readonly __typename?: 'CreateProjectResponse'
+	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<CreateProjectResponseError>
+}
+
+export type CreateProjectResponseError = {
+	readonly __typename?: 'CreateProjectResponseError'
+	readonly code: CreateProjectResponseErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export enum CreateProjectResponseErrorCode {
+	AlreadyExists = 'ALREADY_EXISTS',
+}
+
 export type CreateResetPasswordRequestOptions = {
 	readonly mailProject?: Maybe<Scalars['String']>
 	readonly mailVariant?: Maybe<Scalars['String']>
@@ -380,6 +396,7 @@ export type Mutation = {
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
 	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
+	readonly createProject?: Maybe<CreateProjectResponse>
 }
 
 export type MutationSignUpArgs = {
@@ -481,6 +498,11 @@ export type MutationAddProjectMailTemplateArgs = {
 
 export type MutationRemoveProjectMailTemplateArgs = {
 	templateIdentifier: MailTemplateIdentifier
+}
+
+export type MutationCreateProjectArgs = {
+	slug: Scalars['String']
+	name?: Maybe<Scalars['String']>
 }
 
 export type Person = {
@@ -872,6 +894,9 @@ export type ResolversTypes = {
 	CreatePasswordResetRequestError: ResolverTypeWrapper<CreatePasswordResetRequestError>
 	CreatePasswordResetRequestErrorCode: CreatePasswordResetRequestErrorCode
 	CreatePasswordResetRequestResponse: ResolverTypeWrapper<CreatePasswordResetRequestResponse>
+	CreateProjectResponse: ResolverTypeWrapper<CreateProjectResponse>
+	CreateProjectResponseError: ResolverTypeWrapper<CreateProjectResponseError>
+	CreateProjectResponseErrorCode: CreateProjectResponseErrorCode
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
@@ -962,6 +987,8 @@ export type ResolversParentTypes = {
 	CreateApiKeyResult: CreateApiKeyResult
 	CreatePasswordResetRequestError: CreatePasswordResetRequestError
 	CreatePasswordResetRequestResponse: CreatePasswordResetRequestResponse
+	CreateProjectResponse: CreateProjectResponse
+	CreateProjectResponseError: CreateProjectResponseError
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyResponse: DisableApiKeyResponse
@@ -1180,6 +1207,24 @@ export type CreatePasswordResetRequestResponseResolvers<
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['CreatePasswordResetRequestError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['CreatePasswordResetRequestError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateProjectResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateProjectResponse'] = ResolversParentTypes['CreateProjectResponse'],
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['CreateProjectResponseError']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateProjectResponseErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateProjectResponseError'] = ResolversParentTypes['CreateProjectResponseError'],
+> = {
+	code?: Resolver<ResolversTypes['CreateProjectResponseErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1449,6 +1494,12 @@ export type MutationResolvers<
 		ParentType,
 		ContextType,
 		RequireFields<MutationRemoveProjectMailTemplateArgs, 'templateIdentifier'>
+	>
+	createProject?: Resolver<
+		Maybe<ResolversTypes['CreateProjectResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationCreateProjectArgs, 'slug'>
 	>
 }
 
@@ -1778,6 +1829,8 @@ export type Resolvers<ContextType = any> = {
 	CreateApiKeyResult?: CreateApiKeyResultResolvers<ContextType>
 	CreatePasswordResetRequestError?: CreatePasswordResetRequestErrorResolvers<ContextType>
 	CreatePasswordResetRequestResponse?: CreatePasswordResetRequestResponseResolvers<ContextType>
+	CreateProjectResponse?: CreateProjectResponseResolvers<ContextType>
+	CreateProjectResponseError?: CreateProjectResponseErrorResolvers<ContextType>
 	DisableApiKeyError?: DisableApiKeyErrorResolvers<ContextType>
 	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
 	DisableOtpError?: DisableOtpErrorResolvers<ContextType>

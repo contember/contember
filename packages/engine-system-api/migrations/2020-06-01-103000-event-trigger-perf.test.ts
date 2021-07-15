@@ -1,13 +1,13 @@
 import migration from './2020-06-01-103000-event-trigger-perf'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { exampleProject } from '@contember/engine-api-tester'
+import { sampleProject } from '@contember/engine-api-tester'
 import { test } from 'uvu'
 import * as assert from 'uvu/assert'
 
 test('event-trigger-performance sql', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
-		schemaResolver: () => Promise.resolve(exampleProject),
+		schemaResolver: () => Promise.resolve(sampleProject),
 		project: {
 			slug: 'test',
 			stages: [

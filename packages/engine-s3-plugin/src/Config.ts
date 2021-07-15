@@ -1,3 +1,5 @@
+import { ProjectConfig } from '@contember/engine-plugins'
+
 export enum S3Providers {
 	aws = 'aws',
 	minio = 'minio',
@@ -18,6 +20,8 @@ export interface S3Config {
 		readonly secret: string
 	}
 }
+
+export type ProjectWithS3Config = ProjectConfig<{ s3?: S3Config }>
 
 // todo
 const serversWithoutAclSupport = [S3Providers.minio]

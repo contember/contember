@@ -2,22 +2,22 @@ import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
 import { ProjectSchemaResolver } from '../../src/model/type'
 import {
+	AclSchemaEvaluatorFactory,
 	createResolverContext,
 	PermissionContext,
+	ProjectScopeFactory,
 	ResolverContext,
 	StaticIdentity,
 	TenantContainer,
+	TenantContainerFactory,
 	typeDefs,
 } from '../../src'
 import { Buffer } from 'buffer'
-import { ProjectScopeFactory } from '../../src/model/authorization/ProjectScopeFactory'
-import { AclSchemaEvaluatorFactory } from '../../src/model/authorization/AclSchemaEvaluatorFactory'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { executeGraphQlTest } from './testGraphql'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import { Acl, Schema } from '@contember/schema'
 import { createMockedMailer, ExpectedMessage } from './mailer'
-import * as assert from 'uvu/assert'
 
 export interface Test {
 	query: GraphQLTestQuery
@@ -58,25 +58,28 @@ export const authenticatedApiKeyId = testUuid(998)
 
 export const executeTenantTest = async (test: Test) => {
 	const mailer = createMockedMailer()
-	const tenantContainer = new TenantContainer.Factory()
-		.createBuilder(
-			{
+	const tenantContainer = new TenantContainerFactory()
+		.createBuilder({
+			tenantDbCredentials: {
 				database: 'foo',
 				host: 'localhost',
 				port: 5432,
 				password: '123',
 				user: 'foo',
 			},
-			{},
-			{
+			providers: {
 				bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
 				bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
 				now: () => now,
 				randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length)),
 				uuid: createUuidGenerator(),
 			},
+			mailOptions: {},
 			projectSchemaResolver,
-		)
+			projectInitializer: () => {
+				throw new Error()
+			},
+		})
 		.replaceService('connection', () => createConnectionMock(test.executes))
 		.replaceService('mailer', () => mailer)
 		.build()

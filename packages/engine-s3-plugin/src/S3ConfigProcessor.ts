@@ -1,8 +1,8 @@
-import { Config, ConfigProcessor, ConfigTemplate, ConfigTemplateContext } from '@contember/engine-plugins'
+import { ProjectConfig, ConfigProcessor, ConfigTemplate, ConfigTemplateContext } from '@contember/engine-plugins'
 import { isObject, typeConfigError, hasStringProperty } from '@contember/engine-common'
-import { S3Config } from './Config'
+import { ProjectWithS3Config, S3Config } from './Config'
 
-export class S3ConfigProcessor implements ConfigProcessor {
+export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 	getDefaultEnv(): Record<string, string> {
 		return {
 			DEFAULT_S3_PREFIX: '',
@@ -36,18 +36,10 @@ export class S3ConfigProcessor implements ConfigProcessor {
 		return template
 	}
 
-	processConfig<C extends Config>(config: C): C {
+	processProjectConfig(slug: string, config: ProjectWithS3Config): ProjectWithS3Config {
 		return {
 			...config,
-			projects: Object.fromEntries(
-				Object.entries(config.projects).map(([slug, project]) => [
-					slug,
-					{
-						...project,
-						s3: project.s3 ? checkS3Config(project.s3, `projects.${slug}.s3`) : undefined,
-					},
-				]),
-			),
+			s3: config.s3 ? checkS3Config(config.s3, `projects.${slug}.s3`) : undefined,
 		}
 	}
 }

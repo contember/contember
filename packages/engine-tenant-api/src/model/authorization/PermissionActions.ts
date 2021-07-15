@@ -27,6 +27,8 @@ namespace PermissionActions {
 
 	export const PROJECT_VIEW = Authorizator.createAction(Resources.project, 'view')
 
+	export const PROJECT_CREATE = Authorizator.createAction(Resources.project, 'create')
+
 	export const PROJECT_VIEW_MEMBER = (memberships: readonly Membership[]) =>
 		Authorizator.createAction(Resources.project, 'viewMembers', { memberships })
 	export const PROJECT_ADD_MEMBER = (memberships: readonly Membership[]) =>

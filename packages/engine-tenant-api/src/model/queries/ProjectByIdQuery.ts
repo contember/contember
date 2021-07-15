@@ -1,15 +1,17 @@
 import { DatabaseQuery, SelectBuilder } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
+import { Project } from '../type'
 
-class ProjectByIdQuery extends DatabaseQuery<ProjectByIdQuery.Result> {
+export class ProjectByIdQuery extends DatabaseQuery<Project | null> {
 	constructor(private readonly projectId: string) {
 		super()
 	}
 
-	async fetch({ db }: DatabaseQueryable): Promise<ProjectByIdQuery.Result> {
-		const rows = await SelectBuilder.create<ProjectByIdQuery.Row>()
+	async fetch({ db }: DatabaseQueryable): Promise<Project | null> {
+		const rows = await SelectBuilder.create<Project>()
 			.select('id')
 			.select('name')
+			.select('slug')
 			.from('project')
 			.where({
 				id: this.projectId,
@@ -19,13 +21,3 @@ class ProjectByIdQuery extends DatabaseQuery<ProjectByIdQuery.Result> {
 		return this.fetchOneOrNull(rows)
 	}
 }
-
-namespace ProjectByIdQuery {
-	export type Row = {
-		readonly id: string
-		readonly name: string
-	}
-	export type Result = null | Row
-}
-
-export { ProjectByIdQuery }

@@ -6,44 +6,40 @@ import {
 	EntitiesSelectorMapperFactory,
 	PermissionsByIdentityFactory,
 } from '@contember/engine-content-api'
-import { SchemaVersionBuilder, SystemContainerFactory } from '@contember/engine-system-api'
-import {
-	getTenantMigrationsDirectory,
-	ProjectSchemaResolver,
-	Providers as TenantProviders,
-	TenantContainer,
-} from '@contember/engine-tenant-api'
+import { SystemContainerFactory } from '@contember/engine-system-api'
+import { getTenantMigrationsDirectory, ProjectInitializer, ProjectSchemaResolver } from '@contember/engine-tenant-api'
 import { Builder } from '@contember/dic'
-import { Config, Project, TenantConfig } from './config/config'
-import { ProcessType, logSentryError, tuple } from './utils'
-import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
+import { Config } from './config/config'
+import { createDbMetricsRegistrar, logSentryError, ProcessType } from './utils'
+import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap'
-import { createProjectContainer } from './ProjectContainer'
 import { Plugin } from '@contember/engine-plugins'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { createRootMiddleware, createShowMetricsMiddleware } from './http'
 import {
 	Koa,
-	ProjectContainer,
-	ProjectContainerResolver,
+	ProjectConfigResolver,
 	providers,
+	SystemGraphQLMiddlewareFactory,
 	TenantGraphQLMiddlewareFactory,
 } from '@contember/engine-http'
 import prom from 'prom-client'
-import { registerDbMetrics } from './utils'
-import { SystemGraphQLMiddlewareFactory } from '@contember/engine-http'
+import { ProjectContainerResolver } from './ProjectContainerResolver'
+import { TenantContainerFactory } from '@contember/engine-tenant-api'
+import { Logger } from '@contember/engine-common'
 
 export interface MasterContainer {
 	initializer: Initializer
 	koa: Koa
 	monitoringKoa: Koa
+	projectContainerResolver: ProjectContainerResolver
 }
 
 class CompositionRoot {
 	createMasterContainer(
 		debugMode: boolean,
 		config: Config,
-		projectsDirectory: string | null,
+		projectConfigResolver: ProjectConfigResolver,
 		plugins: Plugin[],
 		processType: ProcessType = ProcessType.singleNode,
 	): MasterContainer {
@@ -52,18 +48,22 @@ class CompositionRoot {
 		}
 		const projectSchemaResolver: ProjectSchemaResolver = slug => projectSchemaResolverInner(slug)
 
-		const tenantContainer = this.createTenantContainer(config.tenant, providers, projectSchemaResolver)
+		let projectInitializerInner: ProjectInitializer = () => {
+			throw new Error('called too soon')
+		}
+
+		const tenantContainer = new TenantContainerFactory().create({
+			tenantDbCredentials: config.tenant.db,
+			mailOptions: config.tenant.mailer,
+			projectSchemaResolver: projectSchemaResolver,
+			providers,
+			projectInitializer: async slug => {
+				return await projectInitializerInner(slug)
+			},
+		})
 
 		const systemContainerDependencies = new Builder({})
 			.addService('providers', () => providers)
-			.addService('migrationsResolverFactory', () =>
-				projectsDirectory
-					? (project: Pick<Project, 'slug' | 'directory'>) =>
-							new MigrationsResolver(
-								MigrationFilesManager.createForProject(projectsDirectory, project.directory || project.slug),
-							)
-					: undefined,
-			)
 			.addService(
 				'modificationHandlerFactory',
 				() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
@@ -86,31 +86,35 @@ class CompositionRoot {
 			.build()
 		const systemContainer = new SystemContainerFactory().create(systemContainerDependencies)
 
-		const projectContainers = this.createProjectContainers(
+		const projectContainerResolver = new ProjectContainerResolver(
 			debugMode,
-			Object.values(config.projects),
+			projectConfigResolver,
+			tenantContainer.projectManager,
 			plugins,
 			systemContainer.schemaVersionBuilder,
 		)
 
-		const containerList = Object.values(projectContainers)
-		const projectContainerResolver: ProjectContainerResolver = (slug, aliasFallback = false) =>
-			Promise.resolve(
-				projectContainers[slug] ||
-					(aliasFallback
-						? containerList.find(function (it) {
-								return it.project.alias && it.project.alias.includes(slug)
-						  })
-						: undefined),
-			)
-
 		projectSchemaResolverInner = async slug => {
-			const container = await projectContainerResolver(slug)
+			const container = await projectContainerResolver.getProjectContainer(slug)
 			if (!container) {
 				return undefined
 			}
 			const db = container.systemDatabaseContextFactory.create(undefined)
 			return await systemContainer.schemaVersionBuilder.buildSchema(db)
+		}
+
+		projectInitializerInner = async slug => {
+			const container = await projectContainerResolver.getProjectContainer(slug)
+			if (!container) {
+				throw new Error('Should not happen')
+			}
+			const log: string[] = []
+			await systemContainer.projectInitializer.initialize(
+				container.systemDatabaseContextFactory,
+				container.project,
+				new Logger(log.push),
+			)
+			return { log }
 		}
 
 		const masterContainer = new Builder({})
@@ -138,7 +142,7 @@ class CompositionRoot {
 					),
 			)
 
-			.addService('promRegistry', () => {
+			.addService('promRegistry', ({ projectContainerResolver }) => {
 				if (processType === ProcessType.clusterMaster) {
 					const register = new prom.AggregatorRegistry()
 					prom.collectDefaultMetrics({ register })
@@ -146,7 +150,15 @@ class CompositionRoot {
 				}
 				const register = prom.register
 				prom.collectDefaultMetrics({ register })
-				registerDbMetrics(register, tenantContainer.connection, containerList)
+				const registrar = createDbMetricsRegistrar(register)
+				registrar({ connection: tenantContainer.connection, module: 'tenant', project: 'unknown' })
+				projectContainerResolver.onCreate.push(container => {
+					registrar({
+						connection: container.connection,
+						module: 'project',
+						project: container.project.slug,
+					})
+				})
 				return register
 			})
 			.addService(
@@ -165,7 +177,7 @@ class CompositionRoot {
 							debugMode,
 							{
 								tenantGraphQlMiddlewareFactory,
-								projectContainerResolver,
+								projectContainerResolver: projectContainerResolver.getProjectContainer.bind(projectContainerResolver),
 								apiKeyManager: tenantContainer.apiKeyManager,
 								projectMemberManager: tenantContainer.projectMemberManager,
 								providers,
@@ -196,35 +208,14 @@ class CompositionRoot {
 						tenantMigrationsRunner,
 						tenantContainer.projectManager,
 						systemContainer.projectInitializer,
-						containerList,
+						projectContainerResolver,
 						config.tenant.credentials,
 						providers,
 					),
 			)
 			.build()
 
-		return masterContainer.pick('initializer', 'koa', 'monitoringKoa')
-	}
-
-	createProjectContainers(
-		debug: boolean,
-		projects: Array<Project>,
-		plugins: Plugin[],
-		schemaVersionBuilder: SchemaVersionBuilder,
-	): Record<string, ProjectContainer> {
-		const containers = Object.values(projects).map((project: Project): [string, ProjectContainer] => {
-			const projectContainer = createProjectContainer(debug, project, plugins, schemaVersionBuilder)
-			return tuple(project.slug, projectContainer)
-		})
-		return Object.fromEntries(containers)
-	}
-
-	createTenantContainer(
-		tenantConfig: TenantConfig,
-		providers: TenantProviders,
-		projectSchemaResolver: ProjectSchemaResolver,
-	) {
-		return new TenantContainer.Factory().create(tenantConfig.db, tenantConfig.mailer, providers, projectSchemaResolver)
+		return masterContainer.pick('initializer', 'koa', 'monitoringKoa', 'projectContainerResolver')
 	}
 }
 

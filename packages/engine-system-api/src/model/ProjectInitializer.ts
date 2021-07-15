@@ -1,6 +1,6 @@
 import { unnamedIdentity } from './helpers'
 import { ProjectConfig, StageConfig } from '../types'
-import { ProjectMigrationInfoResolver, ProjectMigrator, SchemaVersionBuilder } from './migrations'
+import { ProjectMigrator, SchemaVersionBuilder } from './migrations'
 import { createStageTree, StageCreator } from './stages'
 import { DatabaseContext, DatabaseContextFactory } from './database'
 import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
@@ -14,11 +14,11 @@ import {
 import { MigrationArgs } from '../migrations'
 import { createDatabaseIfNotExists, createPgClient } from '@contember/database-migrations'
 import { Logger } from '@contember/engine-common'
+import { Migration } from '@contember/schema-migrations'
 
 export class ProjectInitializer {
 	constructor(
 		private readonly projectMigrator: ProjectMigrator,
-		private readonly projectMigrationInfoResolver: ProjectMigrationInfoResolver | undefined,
 		private readonly stageCreator: StageCreator,
 		private readonly systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
@@ -28,6 +28,7 @@ export class ProjectInitializer {
 		databaseContextFactory: DatabaseContextFactory,
 		project: ProjectConfig & { db?: DatabaseCredentials },
 		logger: Logger,
+		migrations?: Migration[],
 	) {
 		const dbContext = databaseContextFactory.create(unnamedIdentity)
 		if (project.db) {
@@ -48,7 +49,6 @@ export class ProjectInitializer {
 					schemaResolver,
 					project,
 					queryHandler: dbContextMigrations.queryHandler,
-					migrationsResolverFactory: this.projectMigrationInfoResolver?.migrationsResolverFactory,
 				},
 			)
 			await pgClient.end()
@@ -56,12 +56,17 @@ export class ProjectInitializer {
 		}
 		return await retryTransaction(() =>
 			dbContext.transaction(async trx => {
-				await this.initStages(trx, project, logger)
+				await this.initStages(trx, project, logger, migrations)
 			}),
 		)
 	}
 
-	private async initStages(db: DatabaseContext<Connection.TransactionLike>, project: ProjectConfig, logger: Logger) {
+	private async initStages(
+		db: DatabaseContext<Connection.TransactionLike>,
+		project: ProjectConfig,
+		logger: Logger,
+		migrations?: Migration[],
+	) {
 		const stageTree = createStageTree(project)
 		const root = stageTree.getRoot()
 
@@ -84,37 +89,9 @@ export class ProjectInitializer {
 		logger.group(`Creating stages`)
 		await createRecursive(null, root)
 		logger.groupEnd()
-
-		logger.group(`Executing project migrations`)
-		await this.runMigrations(db, project, logger)
-		logger.groupEnd()
-	}
-
-	private async runMigrations(db: DatabaseContext, project: ProjectConfig, logger: Logger) {
-		if (!this.projectMigrationInfoResolver) {
-			return
-		}
-		const { migrationsToExecute, migrationsDirectory, allMigrations, badMigrations } =
-			await this.projectMigrationInfoResolver.getMigrationsInfo(db, project)
-
-		try {
-			logger.group(`Reading migrations from directory "${migrationsDirectory}"`)
-			for (const bad of badMigrations) {
-				logger.write(bad.error)
-			}
-
-			if (allMigrations.length === 0) {
-				logger.write(`No migrations for project found.`)
-				return
-			}
-
-			if (migrationsToExecute.length === 0) {
-				logger.breadcrumb(`No migrations to execute for project`)
-				return
-			}
-
-			await this.projectMigrator.migrate(db, project, migrationsToExecute, logger.write.bind(logger))
-		} finally {
+		if (migrations) {
+			logger.group(`Executing project migrations`)
+			await this.projectMigrator.migrate(db, project, migrations, logger.write.bind(logger))
 			logger.groupEnd()
 		}
 	}

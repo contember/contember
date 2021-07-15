@@ -1,13 +1,14 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { ProjectsQuery } from './ProjectsQuery'
 import { PermissionActions, PermissionContext } from '../authorization'
+import { Project } from '../type'
 
-class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Result> {
+export class ProjectsByIdentityQuery extends DatabaseQuery<Project[]> {
 	constructor(private readonly identityId: string, private readonly permissionContext: PermissionContext) {
 		super()
 	}
 
-	async fetch(queryable: DatabaseQueryable): Promise<ProjectsByIdentityQuery.Result> {
+	async fetch(queryable: DatabaseQueryable): Promise<Project[]> {
 		const canAuthorizedEntityViewAll = await this.permissionContext.isAllowed({
 			action: PermissionActions.PROJECT_VIEW,
 		})
@@ -16,7 +17,7 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 			return await new ProjectsQuery().fetch(queryable)
 		}
 
-		const qb = SelectBuilder.create<ProjectsByIdentityQuery.Row>()
+		const qb = SelectBuilder.create<Project>()
 			.select(['project', 'id'])
 			.select(['project', 'name'])
 			.select(['project', 'slug'])
@@ -47,14 +48,3 @@ class ProjectsByIdentityQuery extends DatabaseQuery<ProjectsByIdentityQuery.Resu
 		return await qbWithIdentityPermissions.getResult(queryable.db)
 	}
 }
-
-namespace ProjectsByIdentityQuery {
-	export type Row = {
-		readonly id: string
-		readonly name: string
-		readonly slug: string
-	}
-	export type Result = Array<Row>
-}
-
-export { ProjectsByIdentityQuery }

@@ -67,7 +67,6 @@ export class ApiTester {
 		const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
 			createMapperContainer({ schema, identityVariables, permissions, providers }).mapperFactory(db)
 		let systemContainerBuilder = systemContainerFactory.createBuilder({
-			migrationsResolverFactory: project => migrationsResolver,
 			entitiesSelector: new EntitiesSelector(mapperFactory, permissionsByIdentityFactory),
 			modificationHandlerFactory,
 			providers: providers,

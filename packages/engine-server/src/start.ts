@@ -50,8 +50,6 @@ const createServerTerminator = (): Server[] => {
 		}
 	}
 
-	const projectsDir = process.env['CONTEMBER_PROJECTS_DIRECTORY']
-
 	const plugins = await loadPlugins()
 	const configProcessors = plugins
 		.map(it => (it.getConfigProcessor ? it.getConfigProcessor() : null))
@@ -65,7 +63,7 @@ const createServerTerminator = (): Server[] => {
 		}
 	}
 
-	const config = await readConfig(configSources, configProcessors)
+	const { config, projectConfigResolver } = await readConfig(configSources, configProcessors)
 
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
@@ -78,8 +76,9 @@ const createServerTerminator = (): Server[] => {
 
 	const clusterMode = getClusterProcessType(isClusterMode)
 
-	const container = createContainer(isDebug, config, projectsDir || null, plugins, clusterMode)
+	const container = createContainer(isDebug, config, projectConfigResolver, plugins, clusterMode)
 
+	let initializedProjects: string[] = []
 	if (cluster.isMaster) {
 		const monitoringPort = config.server.monitoringPort
 		const terminator = createServerTerminator()
@@ -89,16 +88,15 @@ const createServerTerminator = (): Server[] => {
 				console.log(`Monitoring running on http://localhost:${monitoringPort}`)
 			}),
 		)
-		await container.initializer.initialize()
+		initializedProjects = await container.initializer.initialize()
 	}
 
 	const port = config.server.port
 	const printStarted = () => {
 		// eslint-disable-next-line no-console
 		console.log(`Contember API running on http://localhost:${port}`)
-		const projectSlugs = Object.values(config.projects).map(it => it.slug)
 		// eslint-disable-next-line no-console
-		console.log(`Initialized projects: ${projectSlugs.join(', ')}`)
+		console.log(`Initialized projects: ${initializedProjects.join(', ')}`)
 	}
 
 	if (isClusterMode && cluster.isMaster) {

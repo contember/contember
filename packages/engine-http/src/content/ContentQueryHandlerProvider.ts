@@ -1,11 +1,11 @@
 import { ContentSchemaResolver } from './ContentSchemaResolver'
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
 import { ContentQueryHandlerFactory, KoaState } from './ContentQueryHandlerFactory'
-import Project from '../Project'
 import LRUCache from 'lru-cache'
 import { GraphQLSchema } from 'graphql'
 import { DatabaseContext } from '@contember/engine-system-api'
 import { KoaMiddleware } from '../koa'
+import { StageConfig } from '../ProjectConfig'
 
 export class ContentQueryHandlerProvider {
 	private cache = new LRUCache<GraphQLSchema, KoaMiddleware<KoaState>>({
@@ -18,7 +18,7 @@ export class ContentQueryHandlerProvider {
 		private readonly handlerFactory: ContentQueryHandlerFactory,
 	) {}
 
-	async get(db: DatabaseContext, stage: Project.Stage, projectRoles: string[]): Promise<KoaMiddleware<KoaState>> {
+	async get(db: DatabaseContext, stage: StageConfig, projectRoles: string[]): Promise<KoaMiddleware<KoaState>> {
 		const schema = await this.contentSchemaFactory.getSchema(db, stage.slug)
 
 		const [dataSchema, permissions] = await this.graphqlSchemaFactory.create(schema, {

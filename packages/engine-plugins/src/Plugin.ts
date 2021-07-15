@@ -1,9 +1,9 @@
 import { ConfigProcessor } from './ConfigProcessor'
 import { GraphQLSchemaContributor } from './GraphQLSchemaContributor'
-import { ProjectContainer } from './ProjectContainer'
+import { ProjectConfig, ProjectContainer } from './ProjectContainer'
 
-export interface Plugin {
-	getConfigProcessor?(): ConfigProcessor
+export interface Plugin<ProjectConf extends ProjectConfig = ProjectConfig> {
+	getConfigProcessor?(): ConfigProcessor<ProjectConf>
 
-	getSchemaContributor?(container: ProjectContainer): GraphQLSchemaContributor | undefined
+	getSchemaContributor?(container: ProjectContainer<ProjectConf>): GraphQLSchemaContributor | undefined
 }

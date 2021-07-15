@@ -1,29 +1,27 @@
 import prom from 'prom-client'
 import { Connection, EventManager } from '@contember/database'
-import { ProjectContainer } from '@contember/engine-http'
 
-export const registerDbMetrics = (
-	registry: prom.Registry,
-	tenantDb: Connection.PoolStatusProvider & Connection.Queryable,
-	projectContainers: ProjectContainer[],
-) => {
-	registerDbPoolCollector(registry, tenantDb, projectContainers)
-	createSqlMetrics(registry, tenantDb, projectContainers)
+type DatabaseMetricsEntry = {
+	connection: Connection.PoolStatusProvider & Connection.Queryable
+	module: string
+	project: string
 }
+type DatabaseMetricsRegistrar = (entry: DatabaseMetricsEntry) => void
 
-export const registerDbPoolCollector = (
-	registry: prom.Registry,
-	tenantDb: Connection.PoolStatusProvider & Connection.Queryable,
-	projectContainers: ProjectContainer[],
-) => {
+export const createDbMetricsRegistrar = (registry: prom.Registry): DatabaseMetricsRegistrar => {
 	const dbPoolCollectorInner = createSingleDbPoolMetricsCollector(registry)
+	const entries: DatabaseMetricsEntry[] = []
 	const collector = () => {
-		dbPoolCollectorInner(tenantDb, { contember_module: 'tenant', contember_project: 'unknown' })
-		for (const container of projectContainers) {
-			dbPoolCollectorInner(tenantDb, { contember_module: 'content', contember_project: container.project.slug })
+		for (const entry of entries) {
+			dbPoolCollectorInner(entry.connection, { contember_module: entry.module, contember_project: entry.project })
 		}
 	}
 	registry.registerCollector(collector)
+	const sqlMetricsRegistrar = createSqlMetricsRegistrar(registry)
+	return entry => {
+		entries.push(entry)
+		sqlMetricsRegistrar(entry.connection, { contember_module: entry.module, contember_project: entry.project })
+	}
 }
 
 const createSingleDbPoolMetricsCollector = (registry: prom.Registry) => {
@@ -62,11 +60,7 @@ const createSingleDbPoolMetricsCollector = (registry: prom.Registry) => {
 	}
 }
 
-const createSqlMetrics = (
-	registry: prom.Registry,
-	tenantDb: Connection.Queryable,
-	projectContainers: ProjectContainer[],
-) => {
+const createSqlMetricsRegistrar = (registry: prom.Registry) => {
 	const sqlDuration = new prom.Histogram({
 		name: 'contember_sql_duration_ms',
 		help: 'Executed SQL queries by contember_module (system, tenant, content or unknown) and contember_project (or "unknown" for unknown project)',
@@ -81,10 +75,7 @@ const createSqlMetrics = (
 		registers: [registry],
 	})
 
-	const registerListeners = (
-		connection: Connection.Queryable,
-		labels: { contember_module?: string; contember_project?: string },
-	) => {
+	return (connection: Connection.Queryable, labels: { contember_module?: string; contember_project?: string }) => {
 		connection.eventManager.on(EventManager.Event.queryEnd, ({ meta }, { timing }) => {
 			sqlDuration.observe(
 				{
@@ -100,10 +91,5 @@ const createSqlMetrics = (
 				contember_project: labels.contember_project || 'unknown',
 			})
 		})
-	}
-
-	registerListeners(tenantDb, { contember_module: 'tenant' })
-	for (const container of projectContainers) {
-		registerListeners(container.connection, { contember_project: container.project.slug })
 	}
 }

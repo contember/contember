@@ -1,21 +1,27 @@
-import { ProjectManager, Providers as TenantProviders } from '@contember/engine-tenant-api'
+import {
+	ProjectManager,
+	Providers as TenantProviders,
+	TenantCredentials,
+	TenantMigrationArgs,
+} from '@contember/engine-tenant-api'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { ProjectInitializer } from '@contember/engine-system-api'
-import { ProjectContainer } from '@contember/engine-http'
-import { TenantCredentials, TenantMigrationArgs } from '@contember/engine-tenant-api'
 import { Logger } from '@contember/engine-common'
+import { ProjectContainerResolver } from '../ProjectContainerResolver'
+import { ProjectConfig } from '@contember/engine-http'
+import { Migration } from '@contember/schema-migrations'
 
 export class Initializer {
 	constructor(
 		private readonly tenantDbMigrationsRunner: MigrationsRunner,
 		private readonly projectManager: ProjectManager,
 		private readonly projectInitializer: ProjectInitializer,
-		private readonly projectContainers: ProjectContainer[],
+		private readonly projectContainerResolver: ProjectContainerResolver,
 		private readonly tenantCredentials: TenantCredentials,
 		private readonly providers: TenantProviders,
 	) {}
 
-	public async initialize(): Promise<void> {
+	public async initialize(): Promise<string[]> {
 		// eslint-disable-next-line no-console
 		const logger = new Logger(console.log)
 		logger.group('\nInitializing tenant database')
@@ -25,18 +31,33 @@ export class Initializer {
 		})
 		logger.groupEnd()
 
-		for (const container of this.projectContainers) {
+		const projects: string[] = []
+		for (const container of await this.projectContainerResolver.getAllProjectContainers()) {
 			const project = container.project
+			projects.push(project.slug)
 			logger.group(`\nUpdating project ${project.slug}`)
-			const tenantUpdated = await this.projectManager.createOrUpdateProject(project)
-			if (tenantUpdated) {
-				logger.write(`Tenant metadata updated`)
-			}
-
 			await this.projectInitializer.initialize(container.systemDatabaseContextFactory, project, logger)
 			logger.groupEnd()
 		}
 		// eslint-disable-next-line no-console
 		console.log('')
+		return projects
+	}
+
+	public async createProject(project: ProjectConfig, migrations: Migration[]): Promise<void> {
+		const result = await this.projectManager.createProject(project)
+		if (!result) {
+			throw new Error('Project already exists')
+		}
+		const container = await this.projectContainerResolver.getProjectContainer(project.slug)
+		if (!container) {
+			throw new Error('Should not happen')
+		}
+		await this.projectInitializer.initialize(
+			container.systemDatabaseContextFactory,
+			project,
+			new Logger(() => null),
+			migrations,
+		)
 	}
 }

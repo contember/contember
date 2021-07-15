@@ -7,6 +7,7 @@ import {
 	ResolverContext,
 	StaticIdentity,
 	TenantContainer,
+	TenantContainerFactory,
 	TenantMigrationArgs,
 	typeDefs,
 } from '../../src'
@@ -123,12 +124,20 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		providers,
 	})
 	const mailer = createMockedMailer()
-	const tenantContainer = new TenantContainer.Factory()
-		.createBuilder(credentials, {}, providers, projectSchemaResolver)
+	const tenantContainer = new TenantContainerFactory()
+		.createBuilder({
+			tenantDbCredentials: credentials,
+			mailOptions: {},
+			providers,
+			projectSchemaResolver,
+			projectInitializer: () => {
+				throw new Error()
+			},
+		})
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	await tenantContainer.projectManager.createOrUpdateProject({ slug: 'blog', name: 'blog' })
+	await tenantContainer.projectManager.createProject({ slug: 'blog', name: 'blog' })
 
 	const schema = makeExecutableSchema({
 		typeDefs: typeDefs,

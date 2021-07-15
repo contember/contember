@@ -1,5 +1,5 @@
-import { ProjectContainerResolver } from '../ProjectContainer'
+import { ProjectContainerResolverCallback } from '../ProjectContainer'
 
 export interface ProjectContainerResolverState {
-	projectContainerResolver: ProjectContainerResolver
+	projectContainerResolver: ProjectContainerResolverCallback
 }

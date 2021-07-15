@@ -1,12 +1,12 @@
 import { Builder } from '@contember/dic'
 import { Connection } from '@contember/database'
-import Project from './config/Project'
 import { DatabaseContextFactory, SchemaVersionBuilder } from '@contember/engine-system-api'
 import { logSentryError } from './utils'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { GraphQlSchemaBuilderFactory, PermissionsByIdentityFactory } from '@contember/engine-content-api'
 import { GraphQLSchemaContributor, Plugin } from '@contember/engine-plugins'
 import {
+	ProjectConfig,
 	ContentQueryHandlerProvider,
 	ContentSchemaResolver,
 	GraphQlSchemaFactory,
@@ -16,7 +16,7 @@ import { ContentQueryHandlerFactory } from '@contember/engine-http'
 
 export const createProjectContainer = (
 	debug: boolean,
-	project: Project,
+	project: ProjectConfig,
 	plugins: Plugin[],
 	schemaVersionBuilder: SchemaVersionBuilder,
 ) => {

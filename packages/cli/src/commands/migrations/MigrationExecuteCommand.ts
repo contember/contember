@@ -1,15 +1,16 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import { Workspace } from '@contember/cli-common'
 import {
 	configureExecuteMigrationCommand,
 	ExecuteMigrationOptions,
 	executeMigrations,
 	resolveMigrationStatus,
 } from './MigrationExecuteHelper'
-import { resolveSystemApiClient } from './SystemApiClientResolver'
 import { createMigrationStatusTable, findMigration, MigrationState } from '../../utils/migrations'
 import { assertNever } from '../../utils/assertNever'
+import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
+import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
+import { SystemClient } from '../../utils/system'
 
 type Args = {
 	project: string
@@ -37,9 +38,16 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		const migrationsDir = await project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 		const migrationArg = input.getArgument('migration')
-		const client = await resolveSystemApiClient(workspace, project, input)
+
+		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
+		const apiToken = await interactiveResolveApiToken({ instance })
+		const remoteProject = input?.getOption('remote-project') || project.name
+		const tenantClient = await TenantClient.create(instance.baseUrl, apiToken)
+		await tenantClient.createProject(remoteProject, true)
+		const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
+
 		const force = input.getOption('force')
-		const status = await resolveMigrationStatus(client, container.migrationsResolver, force)
+		const status = await resolveMigrationStatus(systemClient, container.migrationsResolver, force)
 		if (status.errorMigrations.length > 0) {
 			console.error(createMigrationStatusTable(status.errorMigrations))
 			if (!force) {
@@ -77,7 +85,7 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		return await executeMigrations({
 			migrationDescriber: container.migrationDescriber,
 			schemaVersionBuilder: container.schemaVersionBuilder,
-			client,
+			client: systemClient,
 			migrations,
 			requireConfirmation: !input.getOption('yes'),
 			force: force,

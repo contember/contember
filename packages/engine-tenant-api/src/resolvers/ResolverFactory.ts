@@ -2,6 +2,7 @@ import {
 	AddProjectMemberMutationResolver,
 	ChangePasswordMutationResolver,
 	CreateApiKeyMutationResolver,
+	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
 	InviteMutationResolver,
 	MailTemplateMutationResolver,
@@ -45,6 +46,8 @@ class ResolverFactory {
 			otpMutationResolver: OtpMutationResolver
 
 			mailTemplateMutationResolver: MailTemplateMutationResolver
+
+			createProjectMutationResolver: CreateProjectMutationResolver
 
 			identityTypeResolver: IdentityTypeResolver
 			projectTypeResolver: ProjectTypeResolver
@@ -113,6 +116,9 @@ class ResolverFactory {
 				),
 				removeProjectMailTemplate: this.resolvers.mailTemplateMutationResolver.removeProjectMailTemplate.bind(
 					this.resolvers.mailTemplateMutationResolver,
+				),
+				createProject: this.resolvers.createProjectMutationResolver.createProject.bind(
+					this.resolvers.createProjectMutationResolver,
 				),
 			},
 		}

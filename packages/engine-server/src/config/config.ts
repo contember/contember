@@ -1,4 +1,3 @@
-import Project from './Project'
 import {
 	ConfigLoader,
 	createObjectParametersResolver,
@@ -17,8 +16,7 @@ import {
 	hasNumberProperty,
 	hasBooleanProperty,
 } from '@contember/engine-common'
-
-export { Project }
+import { ProjectConfig, StageConfig } from '@contember/engine-http'
 
 export interface TenantConfig {
 	db: DatabaseCredentials
@@ -28,7 +26,6 @@ export interface TenantConfig {
 
 export interface Config {
 	tenant: TenantConfig
-	projects: Record<string, Project>
 	server: {
 		port: number
 		monitoringPort: number
@@ -139,7 +136,7 @@ function checkTenantStructure(json: unknown): Config['tenant'] {
 	}
 }
 
-function checkStageStructure(json: unknown, slug: string, path: string): Project.Stage {
+function checkStageStructure(json: unknown, slug: string, path: string): StageConfig {
 	json = json || {}
 	if (!isObject(json)) {
 		return typeConfigError(path, json, 'object')
@@ -151,7 +148,7 @@ function checkStageStructure(json: unknown, slug: string, path: string): Project
 	return { name: upperCaseFirst(slug), ...json, slug }
 }
 
-function checkProjectStructure(json: unknown, slug: string, path: string): Project {
+function checkProjectStructure(json: unknown, slug: string, path: string): ProjectConfig {
 	if (!isObject(json)) {
 		return typeConfigError(path, json, 'object')
 	}
@@ -245,16 +242,8 @@ function checkConfigStructure(json: unknown): Config {
 	if (!isObject(json)) {
 		return typeConfigError('', json, 'object')
 	}
-	if (!isObject(json.projects)) {
-		return typeConfigError('project', json.projects, 'object')
-	}
-
-	const projects = Object.entries(json.projects).map(([slug, value]) =>
-		tuple(slug, checkProjectStructure(value, slug, `projects.${slug}`)),
-	)
 	return {
 		...json,
-		projects: Object.fromEntries(projects),
 		tenant: checkTenantStructure(json.tenant),
 		server: checkServerStructure(json.server),
 	}
@@ -269,13 +258,13 @@ export type ConfigSource = { data: string; type: 'file' | 'json' | 'yaml' }
 export async function readConfig(
 	configSources: ConfigSource[],
 	configProcessors: ConfigProcessor[] = [],
-): Promise<Config> {
+): Promise<{ config: Config; projectConfigResolver: (slug: string) => ProjectConfig }> {
 	const loader = new ConfigLoader()
 	const configs = await Promise.all(
 		configSources.map(it => (it.type === 'file' ? loader.load(it.data) : loader.loadString(it.data, it.type))),
 	)
 	const env: Record<string, string> = {
-		...configProcessors.reduce((acc, curr) => ({ ...acc, ...curr.getDefaultEnv() }), {
+		...configProcessors.reduce((acc, curr) => ({ ...acc, ...(curr.getDefaultEnv?.() || {}) }), {
 			DEFAULT_DB_PORT: '5432',
 		}),
 		...Object.fromEntries(Object.entries(process.env).filter((it): it is [string, string] => it[1] !== undefined)),
@@ -312,8 +301,8 @@ export async function readConfig(
 				port: `%project.env.DB_PORT::number%`,
 				user: `%project.env.DB_USER%`,
 				password: `%project.env.DB_PASSWORD%`,
-				database: `%project.env.DB_NAME%`,
 				ssl: `%?project.env.DB_SSL::bool%`,
+				database: `%project.slug%`,
 			},
 		},
 		server: {
@@ -332,41 +321,14 @@ export async function readConfig(
 	}
 
 	const template = configProcessors.reduce(
-		(tpl, processor) => processor.prepareConfigTemplate(tpl, { env }),
+		(tpl, processor) => processor.prepareConfigTemplate?.(tpl, { env }) || tpl,
 		defaultTemplate,
 	)
 
 	let { projectDefaults, ...config } = Merger.merge(template, ...configs)
-	if (
-		typeof projectDefaults === 'object' &&
-		projectDefaults !== null &&
-		typeof config.projects === 'object' &&
-		config.projects !== null
-	) {
-		const projectsWithDefaults = Object.entries(config.projects).map(([slug, project]) =>
-			tuple(slug, Merger.merge(projectDefaults as any, project as any)),
-		)
-		config.projects = Object.fromEntries(projectsWithDefaults)
-	}
+
 	const parametersResolver = createObjectParametersResolver({ env })
 	config = resolveParameters(config, (parts, path, dataResolver) => {
-		if (parts[0] === 'project') {
-			if (path[0] !== 'projects' || typeof path[1] !== 'string') {
-				throw new Error(`Invalid use of ${parts.join('.')} variable in path ${path.join('.')}.`)
-			}
-			const projectSlug = path[1]
-			if (parts[1] === 'env') {
-				const envName = parts[2]
-				const projectEnvName = projectNameToEnvName(projectSlug)
-				const envValue = env[projectEnvName + '_' + envName] || env['DEFAULT_' + envName]
-				if (envValue === undefined) {
-					throw new UndefinedParameterError(`ENV variable "${projectEnvName + '_' + envName}" not found.`)
-				}
-				return envValue
-			} else if (parts[1] === 'slug') {
-				return projectSlug
-			}
-		}
 		if (parts[0] === 'tenant') {
 			if (path[0] !== 'tenant') {
 				throw new Error(`Invalid use of ${parts.join('.')} variable in path ${path.join('.')}.`)
@@ -385,8 +347,34 @@ export async function readConfig(
 		return parametersResolver(parts, path, dataResolver)
 	})
 
-	return configProcessors.reduce<Config>(
-		(config, processor) => processor.processConfig(config, { env }),
+	const baseConfig = configProcessors.reduce<Config>(
+		(config, processor) => processor.processConfig?.<any>(config, { env }) || config,
 		checkConfigStructure(config),
 	)
+	return {
+		config: baseConfig,
+		projectConfigResolver: slug => {
+			const mergedConfig = Merger.merge(projectDefaults as any, (config?.projects as any)?.[slug] as any)
+			if (!mergedConfig.stages) {
+				mergedConfig.stages = { live: { base: null } }
+			}
+			const resolvedConfig = resolveParameters(mergedConfig, (parts, path, dataResolver) => {
+				if (parts[0] === 'project') {
+					if (parts[1] === 'env') {
+						const envName = parts[2]
+						const projectEnvName = projectNameToEnvName(slug)
+						const envValue = env[projectEnvName + '_' + envName] || env['DEFAULT_' + envName]
+						if (envValue === undefined) {
+							throw new UndefinedParameterError(`ENV variable "${projectEnvName + '_' + envName}" not found.`)
+						}
+						return envValue
+					} else if (parts[1] === 'slug') {
+						return slug
+					}
+				}
+				return parametersResolver(parts, path, dataResolver)
+			})
+			return checkProjectStructure(resolvedConfig, slug, 'project')
+		},
+	}
 }

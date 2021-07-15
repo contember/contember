@@ -1,10 +1,10 @@
 import { ProjectSchemaResolver } from '@contember/engine-tenant-api'
 import { SchemaVersionBuilder } from '@contember/engine-system-api'
-import { ProjectContainerResolver } from '@contember/engine-http'
+import { ProjectContainerResolverCallback } from '@contember/engine-http'
 
 export const projectSchemaResolver =
 	(
-		projectContainerResolver: ProjectContainerResolver,
+		projectContainerResolver: ProjectContainerResolverCallback,
 		schemaVersionBuilder: SchemaVersionBuilder,
 	): ProjectSchemaResolver =>
 	async slug => {

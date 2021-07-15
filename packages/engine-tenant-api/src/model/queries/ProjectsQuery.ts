@@ -1,8 +1,9 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
+import { Project } from '../type'
 
-class ProjectsQuery extends DatabaseQuery<ProjectsQuery.Result> {
-	async fetch({ db }: DatabaseQueryable): Promise<ProjectsQuery.Result> {
-		return await SelectBuilder.create<ProjectsQuery.Row>()
+export class ProjectsQuery extends DatabaseQuery<Project[]> {
+	async fetch({ db }: DatabaseQueryable): Promise<Project[]> {
+		return await SelectBuilder.create<Project>()
 			.select('id')
 			.select('name')
 			.select('slug')
@@ -10,14 +11,3 @@ class ProjectsQuery extends DatabaseQuery<ProjectsQuery.Result> {
 			.getResult(db)
 	}
 }
-
-namespace ProjectsQuery {
-	export type Row = {
-		readonly id: string
-		readonly name: string
-		readonly slug: string
-	}
-	export type Result = Array<Row>
-}
-
-export { ProjectsQuery }

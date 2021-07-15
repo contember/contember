@@ -1,28 +1,12 @@
-import { Config, ConfigProcessor, ConfigTemplate } from '@contember/engine-plugins'
+import { ConfigProcessor } from '@contember/engine-plugins'
 import { isObject, typeConfigError, hasStringProperty } from '@contember/engine-common'
-import { VimeoConfig } from './Config'
+import { ProjectWithVimeoConfig, VimeoConfig } from './Config'
 
-export class VimeoConfigProcessor implements ConfigProcessor {
-	getDefaultEnv(): Record<string, string> {
-		return {}
-	}
-
-	prepareConfigTemplate(template: ConfigTemplate) {
-		return template
-	}
-
-	processConfig<C extends Config>(config: C): C {
+export class VimeoConfigProcessor implements ConfigProcessor<ProjectWithVimeoConfig> {
+	processProjectConfig(slug: string, config: ProjectWithVimeoConfig): ProjectWithVimeoConfig {
 		return {
 			...config,
-			projects: Object.fromEntries(
-				Object.entries(config.projects).map(([slug, project]) => [
-					slug,
-					{
-						...project,
-						vimeo: checkVimeoConfig(project.vimeo, `projects.${slug}.vimeo`),
-					},
-				]),
-			),
+			vimeo: checkVimeoConfig(config.vimeo, `projects.${slug}.vimeo`),
 		}
 	}
 }

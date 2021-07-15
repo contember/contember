@@ -4,9 +4,8 @@ import { createContainer, readConfig } from '@contember/engine-server'
 import * as path from 'path'
 ;(async () => {
 	const configFile = path.join(__dirname, '../../src/config/config.yaml')
-	const projectsDirectory = path.join(__dirname, '../../src/projects/')
-	const config = await readConfig([{ data: configFile, type: 'file' }])
-	const container = await createContainer(false, config, projectsDirectory, [])
+	const { config, projectConfigResolver } = await readConfig([{ data: configFile, type: 'file' }])
+	const container = await createContainer(false, config, projectConfigResolver, [])
 	await container.initializer.initialize()
 	const server = await container.koa.listen(config.server.port)
 

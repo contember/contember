@@ -1,6 +1,6 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectContainer } from '../ProjectContainer'
-import Project from '../Project'
+import { ProjectConfig } from '../ProjectConfig'
 import { ErrorResponseMiddlewareState } from '../common'
 import { ProjectContainerResolverState } from '../services'
 import { ProvidersState } from '../services/ProvidersState'
@@ -27,6 +27,6 @@ export const createProjectResolveMiddleware = () => {
 }
 
 export interface ProjectResolveMiddlewareState {
-	project: Project
+	project: ProjectConfig
 	projectContainer: ProjectContainer
 }

@@ -1,8 +1,9 @@
-import { ConflictActionType, InsertBuilder, Operator } from '@contember/database'
+import { InsertBuilder } from '@contember/database'
 import { Command } from './Command'
 import { Project } from '../type'
+import { ConflictActionType } from '@contember/database'
 
-export class CreateOrUpdateProjectCommand implements Command<boolean> {
+export class CreateProjectCommand implements Command<boolean> {
 	constructor(private readonly project: Pick<Project, 'name' | 'slug'>) {}
 
 	public async execute({ db, providers }: Command.Args): Promise<boolean> {
@@ -13,14 +14,7 @@ export class CreateOrUpdateProjectCommand implements Command<boolean> {
 				name: this.project.name,
 				slug: this.project.slug,
 			})
-			.onConflict(
-				ConflictActionType.update,
-				['slug'],
-				{
-					name: this.project.name,
-				},
-				expr => expr.compareColumns(['excluded', 'name'], Operator.notEq, ['project', 'name']),
-			)
+			.onConflict(ConflictActionType.doNothing)
 			.execute(db)
 		return result > 0
 	}

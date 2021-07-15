@@ -19,10 +19,8 @@ import {
 	HistoryEventResponseBuilder,
 	MigrationAlterer,
 	MigrationExecutor,
-	MigrationsResolverFactory,
 	PermissionsFactory,
 	ProjectInitializer,
-	ProjectMigrationInfoResolver,
 	ProjectMigrator,
 	ProjectTruncateExecutor,
 	SameRowDependencyBuilder,
@@ -58,7 +56,6 @@ export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient
 type Args = {
 	providers: UuidProvider
 	modificationHandlerFactory: ModificationHandlerFactory
-	migrationsResolverFactory: MigrationsResolverFactory | undefined
 	entitiesSelector: EntitiesSelector
 	eventApplier: ContentEventsApplier
 	identityFetcher: IdentityFetcher
@@ -124,12 +121,6 @@ export class SystemContainerFactory {
 				({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>
 					new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver),
 			)
-
-			.addService('projectMigrationInfoResolver', ({ executedMigrationsResolver }) =>
-				container.migrationsResolverFactory
-					? new ProjectMigrationInfoResolver(executedMigrationsResolver, container.migrationsResolverFactory)
-					: undefined,
-			)
 			.addService('stageCreator', () => new StageCreator())
 			.addService(
 				'diffBuilder',
@@ -176,20 +167,8 @@ export class SystemContainerFactory {
 			)
 			.addService(
 				'projectInitializer',
-				({
-					projectMigrator,
-					projectMigrationInfoResolver,
-					stageCreator,
-					systemDbMigrationsRunnerFactory,
-					schemaVersionBuilder,
-				}) =>
-					new ProjectInitializer(
-						projectMigrator,
-						projectMigrationInfoResolver,
-						stageCreator,
-						systemDbMigrationsRunnerFactory,
-						schemaVersionBuilder,
-					),
+				({ projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder }) =>
+					new ProjectInitializer(projectMigrator, stageCreator, systemDbMigrationsRunnerFactory, schemaVersionBuilder),
 			)
 	}
 }

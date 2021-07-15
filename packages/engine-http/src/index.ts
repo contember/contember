@@ -9,6 +9,7 @@ export * from './koa'
 export * from './providers'
 export * from './ProjectContainer'
 export * from './graphql'
+export * from './ProjectConfig'
 import Koa from 'koa'
 
 export { Koa }

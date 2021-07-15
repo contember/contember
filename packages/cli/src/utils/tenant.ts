@@ -443,4 +443,24 @@ export class TenantClient {
 			throw result.resetPassword.errors.map((it: any) => it.code)
 		}
 	}
+
+	public async createProject(slug: string, ignoreExisting = false): Promise<void> {
+		const query = `mutation($slug: String!) {
+  createProject(slug: $slug) {
+    ok
+    error {
+      code
+    }
+  }
+}`
+		const result = await this.apiClient.request<{
+			createProject: { ok: boolean; error: { code: string } }
+		}>(query, { slug })
+		if (!result.createProject.ok) {
+			if (ignoreExisting && result.createProject.error.code === 'ALREADY_EXISTS') {
+				return
+			}
+			throw result.createProject.error.code
+		}
+	}
 }

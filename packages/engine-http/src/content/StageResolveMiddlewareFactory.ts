@@ -1,6 +1,6 @@
 import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectResolveMiddlewareState } from '../project-common'
-import Project from '../Project'
+import { StageConfig } from '../ProjectConfig'
 
 type KoaState = StageResolveMiddlewareState & ProjectResolveMiddlewareState & KoaRequestState
 
@@ -20,5 +20,5 @@ export const createStageResolveMiddleware = (): KoaMiddleware<KoaState> => {
 }
 
 export interface StageResolveMiddlewareState {
-	stage: Project.Stage
+	stage: StageConfig
 }

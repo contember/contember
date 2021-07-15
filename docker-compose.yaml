@@ -25,8 +25,6 @@ services:
       NODE_ENV: development
       CONTEMBER_PORT: 4000
       CONTEMBER_MONITORING_PORT: 4001
-      CONTEMBER_PROJECTS_DIRECTORY: /src/projects
-      CONTEMBER_CONFIG_FILE: /src/projects/config.yaml
       CONTEMBER_ROOT_EMAIL: 'admin@localhost'
       CONTEMBER_ROOT_PASSWORD: 'admin@localhost'
       CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'

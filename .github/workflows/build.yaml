@@ -1,0 +1,45 @@
+name: Build
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+  pull_request:
+    branches-ignore:
+      - '**'
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16]
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@main
+        with:
+          node-version: 16
+      #- name: Set legacy peer deps
+      #  run: npm config set legacy-peer-deps=true
+      #- name: Install root dependencies
+      #  run: npm ci
+      #- name: Install package dependencies
+      #  run: npm run bootstrap
+      - name: Cache .pnpm-store
+        uses: actions/cache@v1
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-node${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install pnpm
+        run: curl -f https://get.pnpm.io/v6.7.js | node - add --global pnpm@6
+      - name: Install dependencies
+        run: pnpm install
+      - name: Lint
+        run: pnpm run eslint:lint
+      - name: Build
+        run: pnpm run build
+      - name: Test
+        run: pnpm run test

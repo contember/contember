@@ -22,12 +22,6 @@ jobs:
         uses: actions/setup-node@main
         with:
           node-version: 16
-      #- name: Set legacy peer deps
-      #  run: npm config set legacy-peer-deps=true
-      #- name: Install root dependencies
-      #  run: npm ci
-      #- name: Install package dependencies
-      #  run: npm run bootstrap
       - name: Cache .pnpm-store
         uses: actions/cache@v1
         with:

@@ -38,9 +38,10 @@ services:
       TEST_DB_USER: 'contember'
       TEST_DB_PASSWORD: 'contember'
       TENANT_DB_NAME: 'tenant'
+      CONTEMBER_TENANT_MIGRATIONS_DIR: /src/packages/engine-tenant-api/migrations
+      CONTEMBER_SYSTEM_MIGRATIONS_DIR: /src/packages/engine-system-api/migrations
     command:
       - node
       - ./packages/engine-server/dist/src/start.js
-
 volumes:
   pgsql-data: ~

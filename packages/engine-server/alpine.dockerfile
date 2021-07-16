@@ -1,21 +1,28 @@
 FROM node:14-alpine as builder
 
 WORKDIR /src
-ENV NODE_ENV "production"
-COPY ./packages/engine-server ./
-COPY ./yarn.lock ./
-RUN apk --no-cache add --virtual builds-deps build-base python
-RUN yarn install
+RUN apk --no-cache add bash
+RUN apk --no-cache add --virtual builds-deps build-base
+COPY ./ ./
+RUN /src/packages/engine-server/build.sh
 
 FROM node:14-alpine
 
 WORKDIR /src
 RUN apk --no-cache add curl
 
-COPY --from=builder /src/ /src
+COPY --from=builder /src/server/server.js /src/
+COPY --from=builder /src/server/node_modules /src/node_modules
+COPY --from=builder /src/packages/engine-system-api/migrations /src/system-migrations
+COPY --from=builder /src/packages/engine-tenant-api/migrations /src/tenant-migrations
+COPY --from=builder /src/packages/engine-server/package.json /src/package.json
+COPY --from=builder /src/license.md /src/
 
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT 4000
 ENV CONTEMBER_MONITORING_PORT 4001
+ENV CONTEMBER_TENANT_MIGRATIONS_DIR /src/tenant-migrations
+ENV CONTEMBER_SYSTEM_MIGRATIONS_DIR /src/system-migrations
+ENV CONTEMBER_PACKAGE_JSON /src/package.json
 
-CMD ["node", "./dist/src/start.js"]
+CMD ["node", "./server.js"]

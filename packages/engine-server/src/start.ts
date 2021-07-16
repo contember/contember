@@ -35,7 +35,7 @@ const createServerTerminator = (): Server[] => {
 	const isDebug = process.env.NODE_ENV === 'development'
 
 	if (cluster.isMaster) {
-		const packageJsonFile = join(__dirname, '../../package.json')
+		const packageJsonFile = process.env.CONTEMBER_PACKAGE_JSON || join(__dirname, '../../package.json')
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const version = require(packageJsonFile).version
 		// eslint-disable-next-line no-console

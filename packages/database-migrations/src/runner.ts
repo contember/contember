@@ -26,22 +26,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-import path from 'path'
+import path, { join } from 'path'
 import Db, { DBConnection } from 'node-pg-migrate/dist/db'
-import { loadMigrationFiles } from 'node-pg-migrate/dist/migration'
 import { LogFn, Logger, RunnerOptionClient, RunnerOptionUrl } from 'node-pg-migrate/dist/types'
 import { createSchemalize, getSchemas } from 'node-pg-migrate/dist/utils'
 import migrateSqlFile from 'node-pg-migrate/dist/sqlMigration'
 import { MigrationBuilder } from 'node-pg-migrate'
 import { createMigrationBuilder } from './helpers'
+import { readdir } from 'fs/promises'
 
 export interface RunnerOptionConfig {
 	migrationsTable: string
 	migrationsSchema?: string
 	schema?: string
-	dir: string
-	ignorePattern?: string
-	file?: string
 	createSchema?: boolean
 	createMigrationsSchema?: boolean
 	log?: LogFn
@@ -60,32 +57,30 @@ const nameColumn = 'name'
 const runOnColumn = 'run_on'
 
 export class Migration {
-	public name: string
 	constructor(
-		public readonly filePath: string,
-		public readonly migration: (builder: MigrationBuilder, args: any) => Promise<void>,
-	) {
-		this.name = path.basename(filePath, path.extname(filePath))
-	}
+		public readonly name: string,
+		public readonly migration: (builder: MigrationBuilder, args: any) => Promise<void> | void,
+	) {}
 }
 
-const loadMigrations = async (db: DBConnection, options: RunnerOption) => {
-	try {
-		const files = await loadMigrationFiles(options.dir, options.ignorePattern)
-		return Promise.all(
-			files.map(async file => {
-				const filePath = `${options.dir}/${file}`
-				const actions =
-					path.extname(filePath) === '.sql'
-						? (await migrateSqlFile(filePath)).up
-						: // eslint-disable-next-line @typescript-eslint/no-var-requires
-						  require(path.relative(__dirname, filePath)).default
-				return new Migration(filePath, actions)
-			}),
+export const loadMigrations = async (sqlDir: string, additional: Migration[]): Promise<Migration[]> => {
+	return (
+		await Promise.all(
+			(
+				await readdir(sqlDir)
+			)
+				.filter(it => path.extname(it) === '.sql')
+				.map(async it => {
+					const migration = (await migrateSqlFile(join(sqlDir, it))).up
+					if (!migration) {
+						throw new Error()
+					}
+					return new Migration(path.basename(it, path.extname(it)), migration)
+				}),
 		)
-	} catch (err) {
-		throw new Error(`Can't get migration files: ${err.stack}`)
-	}
+	)
+		.concat(additional)
+		.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 const lock = async (db: DBConnection): Promise<void> => {
@@ -128,7 +123,7 @@ const getRunMigrations = async (db: DBConnection, options: RunnerOption) => {
 }
 
 const getMigrationsToRun = (options: RunnerOption, runNames: string[], migrations: Migration[]): Migration[] => {
-	return migrations.filter(({ name }) => runNames.indexOf(name) < 0 && (!options.file || options.file === name))
+	return migrations.filter(({ name }) => runNames.indexOf(name) < 0)
 }
 
 const checkOrder = (runNames: string[], migrations: Migration[]) => {
@@ -155,7 +150,10 @@ const getLogger = ({ log, logger, verbose }: RunnerOption): Logger => {
 	return verbose ? loggerObject : { ...loggerObject, debug: undefined }
 }
 
-export default async (options: RunnerOption): Promise<{ name: string }[]> => {
+export default async (
+	getMigrations: () => Promise<Migration[]>,
+	options: RunnerOption,
+): Promise<{ name: string }[]> => {
 	const logger = getLogger(options)
 	const db = Db((options as RunnerOptionClient).dbClient || (options as RunnerOptionUrl).databaseUrl, logger)
 	try {
@@ -175,8 +173,8 @@ export default async (options: RunnerOption): Promise<{ name: string }[]> => {
 
 		await ensureMigrationsTable(db, options)
 
-		const [migrations, runNames] = await Promise.all([loadMigrations(db, options), getRunMigrations(db, options)])
-
+		const runNames = await getRunMigrations(db, options)
+		const migrations = await getMigrations()
 		checkOrder(runNames, migrations)
 
 		const toRun: Migration[] = getMigrationsToRun(options, runNames, migrations)

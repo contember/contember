@@ -7,14 +7,16 @@ import {
 	PermissionsByIdentityFactory,
 } from '@contember/engine-content-api'
 import { SystemContainerFactory } from '@contember/engine-system-api'
-import { getTenantMigrationsDirectory, ProjectInitializer, ProjectSchemaResolver } from '@contember/engine-tenant-api'
+import { ProjectInitializer, ProjectSchemaResolver } from '@contember/engine-tenant-api'
+import getTenantMigrations from '@contember/engine-tenant-api/migrations'
+import getSystemMigrations from '@contember/engine-system-api/migrations'
 import { Builder } from '@contember/dic'
 import { Config } from './config/config'
 import { createDbMetricsRegistrar, logSentryError, ProcessType } from './utils'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap'
 import { Plugin } from '@contember/engine-plugins'
-import { MigrationsRunner } from '@contember/database-migrations'
+import { DatabaseCredentials, MigrationsRunner } from '@contember/database-migrations'
 import { createRootMiddleware, createShowMetricsMiddleware } from './http'
 import {
 	Koa,
@@ -27,6 +29,7 @@ import prom from 'prom-client'
 import { ProjectContainerResolver } from './ProjectContainerResolver'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Logger } from '@contember/engine-common'
+import { ClientBase } from 'pg'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -83,6 +86,11 @@ class CompositionRoot {
 			.addService('eventApplier', () => {
 				return new ContentEventApplier(new ContentApplyDependenciesFactoryImpl())
 			})
+			.addService(
+				'systemDbMigrationsRunnerFactory',
+				() => (db: DatabaseCredentials, dbClient: ClientBase) =>
+					new MigrationsRunner(db, 'system', getSystemMigrations, dbClient),
+			)
 			.build()
 		const systemContainer = new SystemContainerFactory().create(systemContainerDependencies)
 
@@ -197,10 +205,7 @@ class CompositionRoot {
 
 				return app
 			})
-			.addService(
-				'tenantMigrationsRunner',
-				() => new MigrationsRunner(config.tenant.db, 'tenant', getTenantMigrationsDirectory()),
-			)
+			.addService('tenantMigrationsRunner', () => new MigrationsRunner(config.tenant.db, 'tenant', getTenantMigrations))
 			.addService(
 				'initializer',
 				({ tenantMigrationsRunner }) =>

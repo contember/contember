@@ -37,7 +37,6 @@ import {
 	StagesQueryResolver,
 	TruncateMutationResolver,
 } from './resolvers'
-import { systemMigrationsDirectory } from './migrations'
 import { ClientBase } from 'pg'
 import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
 import { MigrationAlterMutationResolver } from './resolvers/mutation/MigrationAlterMutationResolver'
@@ -59,6 +58,7 @@ type Args = {
 	entitiesSelector: EntitiesSelector
 	eventApplier: ContentEventsApplier
 	identityFetcher: IdentityFetcher
+	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner
 }
 
 export class SystemContainerFactory {
@@ -76,12 +76,7 @@ export class SystemContainerFactory {
 	}
 	public createBuilder(container: Args) {
 		return new Builder({})
-			.addService(
-				'systemDbMigrationsRunnerFactory',
-				() => (db: DatabaseCredentials, dbClient: ClientBase) =>
-					new MigrationsRunner(db, 'system', systemMigrationsDirectory, dbClient),
-			)
-
+			.addService('systemDbMigrationsRunnerFactory', () => container.systemDbMigrationsRunnerFactory)
 			.addService('modificationHandlerFactory', () => container.modificationHandlerFactory)
 
 			.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))

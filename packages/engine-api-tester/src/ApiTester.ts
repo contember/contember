@@ -26,7 +26,10 @@ import { createUuidGenerator } from './testUuid'
 import { project } from './project'
 import { createConnection, dbCredentials, recreateDatabase } from './dbUtils'
 import { join } from 'path'
-import { createPgClient } from '@contember/database-migrations'
+import { createPgClient, MigrationsRunner } from '@contember/database-migrations'
+import { ClientBase } from 'pg'
+import { DatabaseCredentials } from '@contember/database'
+import getSystemMigrations from '@contember/engine-system-api/migrations'
 
 export class ApiTester {
 	public static project = project
@@ -76,6 +79,8 @@ export class ApiTester {
 					return Promise.resolve([])
 				},
 			},
+			systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) =>
+				new MigrationsRunner(db, 'system', getSystemMigrations, dbClient),
 		})
 		if (options.systemContainerHook) {
 			systemContainerBuilder = options.systemContainerHook(systemContainerBuilder)

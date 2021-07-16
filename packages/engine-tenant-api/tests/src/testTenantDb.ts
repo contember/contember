@@ -6,7 +6,6 @@ import {
 	PermissionContext,
 	ResolverContext,
 	StaticIdentity,
-	TenantContainer,
 	TenantContainerFactory,
 	TenantMigrationArgs,
 	typeDefs,
@@ -18,11 +17,10 @@ import { createMockedMailer, MockedMailer } from './mailer'
 import { dbCredentials, recreateDatabase } from './dbUtils'
 import { MigrationsRunner } from '@contember/database-migrations'
 import { graphql } from 'graphql'
-import { promises } from 'fs'
-import { join } from 'path'
 import { Membership } from '../../src/model/type/Membership'
 import { Connection } from '@contember/database'
 import * as uvu from 'uvu'
+import getMigrations from '../../migrations'
 
 export interface TenantTest {
 	query: GraphQLTestQuery
@@ -91,26 +89,12 @@ export interface TenantTester {
 	end: () => Promise<void>
 }
 
-const getMigrationsDir = async () => {
-	const distPath = join(__dirname, '/../../../migrations')
-	const srcPath = join(__dirname, '/../../migrations')
-	try {
-		await promises.stat(distPath)
-		return distPath
-	} catch (e) {
-		if (e.code === 'ENOENT') {
-			return srcPath
-		}
-		throw e
-	}
-}
-
 export const createTenantTester = async (): Promise<TenantTester> => {
 	const dbName = String(process.env.TEST_DB_NAME)
 	const credentials = dbCredentials(dbName)
 	const conn = await recreateDatabase(dbName)
 	await conn.end()
-	const migrationsRunner = new MigrationsRunner(credentials, 'tenant', await getMigrationsDir())
+	const migrationsRunner = new MigrationsRunner(credentials, 'tenant', getMigrations)
 	const providers = {
 		bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
 		bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),

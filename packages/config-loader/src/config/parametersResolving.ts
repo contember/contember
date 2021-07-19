@@ -50,9 +50,18 @@ const resolveParametersInternal = (
 		return data.map((it, index) => resolveParametersInternal(it, [...path, index], parametersResolver))
 	}
 	if (typeof data === 'string') {
-		const match = /^%(\?)?(\w+(?:\.\w+)*)(?:::(\w+))?%$/.exec(data)
-		if (match) {
-			const [, optional, parameter, cast] = match
+		const expression = /^%([?])?([\w|:.]+)%$/.exec(data)
+		if (!expression) {
+			return data
+		}
+		const isOptional = expression[1]
+		const expressions: string[] = expression[2].split(/\|\|/g)
+		for (const [i, expr] of expressions.entries()) {
+			const singleExpression = /^(\w+(?:\.\w+)*)(?:::(\w+))?$/.exec(expr)
+			if (!singleExpression) {
+				throw new Error(`Invalid config expression ${expr}`)
+			}
+			const [, parameter, cast] = singleExpression
 			const parts = parameter.split('.')
 			try {
 				const value = parametersResolver(parts, path)
@@ -70,13 +79,15 @@ const resolveParametersInternal = (
 				}
 				return value
 			} catch (e) {
-				if (optional && e instanceof UndefinedParameterError) {
-					return undefined
+				if (e instanceof UndefinedParameterError) {
+					if (expressions[i + 1] !== undefined) {
+						continue
+					} else if (isOptional) {
+						return undefined
+					}
 				}
 				throw e
 			}
-		} else {
-			return data
 		}
 	}
 	if (data === null) {

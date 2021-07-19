@@ -302,7 +302,7 @@ export async function readConfig(
 				user: `%project.env.DB_USER%`,
 				password: `%project.env.DB_PASSWORD%`,
 				ssl: `%?project.env.DB_SSL::bool%`,
-				database: `%project.slug%`,
+				database: `%project.env.DB_NAME||project.slug%`,
 			},
 		},
 		server: {

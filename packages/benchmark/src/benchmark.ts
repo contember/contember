@@ -65,7 +65,6 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 			duration: 10,
 			url: contentEndpoint,
 			...createHttpOptions({
-				endpoint: contentEndpoint,
 				query: queryGql,
 				authorizationToken: accessToken,
 				variables,

@@ -9,7 +9,6 @@ import { Input, Model, Validation, Value } from '@contember/schema'
 import { EntityRulesResolver } from '../../../src'
 import { getEntity } from '@contember/schema-utils'
 import { Mapper } from '../../../src/mapper'
-import { DependencyCollector } from '../../../src/input-validation'
 import { createMock } from '../../src/utils'
 import { testUuid } from '../../src/testUuid'
 import * as assert from 'uvu/assert'
@@ -368,6 +367,55 @@ inputPreValidatorTest('validate update w dependent rules - valid', async () => {
 		mapper,
 	})
 	assert.equal(result, [])
+})
+
+inputPreValidatorTest('validate update with dependent rules on relation - invalid', async () => {
+	const model = new SchemaBuilder()
+		.entity('Article', e =>
+			e
+				.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
+				.manyHasOne('image', image => image.target('Image', e => e.column('url'))),
+		)
+		.buildSchema()
+
+	const rule = v.rules.conditional(v.rules.on('publishedAt', v.rules.notNull()), v.rules.defined())
+	const validator = createValidator({
+		model,
+		validation: {
+			Article: {
+				image: [{ message: { text: 'Published article must have an image' }, validator: rule }],
+			},
+		},
+		selects: [
+			{
+				entity: 'Article',
+				where: { id: testUuid(1) },
+				dependencies: { image: {} },
+				result: { id: testUuid(1), image: null },
+			},
+		],
+	})
+	const result = await validator.validateUpdate({
+		entity: getEntity(model, 'Article'),
+		data: {
+			publishedAt: 'now',
+		},
+		where: { id: testUuid(1) },
+		path: [],
+		mapper,
+	})
+	assert.equal(result, [
+		{
+			path: [
+				{
+					field: 'image',
+				},
+			],
+			message: {
+				text: 'Published article must have an image',
+			},
+		},
+	])
 })
 
 inputPreValidatorTest.run()

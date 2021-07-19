@@ -1,10 +1,9 @@
-name: Publish
+name: Publish Canary build
 on:
-  push:
-    tags:
-      - '**'
+  workflow_dispatch:
+
 jobs:
-  publish:
+  publish-canary:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -13,17 +12,11 @@ jobs:
         with:
           node-version: 14
       - name: Get the version
-        run: echo "VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+        run: echo "VERSION=${GITHUB_SHA:10}" >> $GITHUB_ENV
       - name: "Install yarn deps"
         run: yarn install
-      - name: "Build app"
-        run: yarn run build
-      - name: "Publish NPM"
-        run: bash ./scripts/npm/publish.sh
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: "Publish Docker"
-        run: bash ./scripts/docker/publish.sh
+        run: bash ./scripts/docker/publish-canary.sh
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

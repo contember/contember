@@ -29,15 +29,14 @@ const readStdin = (): Promise<string> => {
 
 const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, delay))
 ;(async () => {
-	const testName = process.argv[3]
+	const testName = process.argv[2]
 	if (testName) {
 		await dirCreate(join(__dirname, '/../../results/', testName))
 	}
 
 	const variables = {}
 
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const contentEndpoint = process.env.CONTEMBER_API_URL!
+	const contentEndpoint = `${process.env.CONTEMBER_API_URL}/content/benchmark/live`
 	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const accessToken = process.env.CONTEMBER_ROOT_TOKEN!
 
@@ -66,6 +65,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 			duration: 10,
 			url: contentEndpoint,
 			...createHttpOptions({
+				endpoint: contentEndpoint,
 				query: queryGql,
 				authorizationToken: accessToken,
 				variables,

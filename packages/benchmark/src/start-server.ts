@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
 import { createContainer, readConfig } from '@contember/engine-server'
-import * as path from 'path'
 ;(async () => {
-	const configFile = path.join(__dirname, '../../src/config/config.yaml')
-	const { config, projectConfigResolver } = await readConfig([{ data: configFile, type: 'file' }])
+	const { config, projectConfigResolver } = await readConfig([])
 	const container = await createContainer(false, config, projectConfigResolver, [])
 	await container.initializer.initialize()
 	const server = await container.koa.listen(config.server.port)

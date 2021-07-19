@@ -1,6 +1,0 @@
-projects:
-  app:
-    name: App
-    directory: app
-    stages:
-      prod: ~

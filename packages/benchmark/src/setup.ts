@@ -17,8 +17,7 @@ const dataInit = async (contentEndpoint: string, accessToken: string) => {
 	})
 }
 ;(async () => {
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-	const contentEndpoint = process.env.CONTEMBER_API_URL!
+	const contentEndpoint = `${process.env.CONTEMBER_API_URL}/content/benchmark/live`
 	await dataInit(contentEndpoint, process.env.CONTEMBER_ROOT_TOKEN as string)
 })().catch(e => {
 	console.error(e)

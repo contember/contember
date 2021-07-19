@@ -35,6 +35,7 @@ services:
     volumes:
       - ./:/src:cached
     working_dir: /src
+    command: version
     environment:
       CONTEMBER_API_URL: "http://contember:4000/"
       CONTEMBER_API_TOKEN: "0000000000000000000000000000000000000000"

@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 @import '../common'
 
 $saveControl-color: #0094FF
@@ -42,7 +44,7 @@ $saveControl-color-alt: #FFFFFF
 				background-color: darken($saveControl-color, 2%)
 
 		&-label
-			font-size: (18em / 16)
+			font-size: math.div(18em, 16)
 
 		&-toggle
 			border-left: solid 1px rgba($saveControl-color-alt, .2)

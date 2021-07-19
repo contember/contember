@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 @import '../common'
 
 .#{$cui-conf-globalPrefix}contemberLogo
@@ -6,12 +8,12 @@
 	vertical-align: middle
 
 	&-image
-		$ratio: 439 / 414
+		$ratio: math.div(439, 414)
 		display: block
 		width: 1em * $ratio
 		height: 1em
 
 	&.view-logotype &-image
-		$ratio: 1871 / 414
+		$ratio: math.div(1871, 414)
 		width: 1em * $ratio
 		height: 1em

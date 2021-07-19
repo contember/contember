@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 @import '../common'
 
 .sideDimensions
@@ -6,8 +8,8 @@
 	&-dimensions
 		&-in
 			display: flex
-			margin: 0 ($dimension-separation / -2)
+			margin: 0 math.div($dimension-separation, -2)
 
 		&-dimension
 			width: 100%
-			padding: 0 ($dimension-separation / 2)
+			padding: 0 ($dimension-separation * 0.5)

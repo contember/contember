@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 @import '../common'
 
 .#{$cui-conf-globalPrefix}select
@@ -42,11 +44,11 @@
 		$fontSize: map_get($settings, fontSize)
 
 		$view: toView($name)
-		$c: $fontSize / 1em
-		$normalizedHeight: $height / $c
-		$visualLineHeight: $normalizedHeight - 2 * ($cui-control-border-width / $c)
+		$c: math.div($fontSize, 1em)
+		$normalizedHeight: math.div($height, $c)
+		$visualLineHeight: $normalizedHeight - 2 * math.div($cui-control-border-width, $c)
 		$actualLineHeight: $cui-base-lineHeight
-		$edgeOffset: ($visualLineHeight - $actualLineHeight) / 2
+		$edgeOffset: ($visualLineHeight - $actualLineHeight) * 0.5
 
 		$paddingRight: $normalizedHeight
 		$chevronLineLength: $cui-select-chevron-height * $sqrt2
@@ -57,8 +59,8 @@
 			&::before,
 			&::after
 				+size($chevronLineLength $chevronLineThickness)
-				right: (($paddingRight - $chevronLineLength) / 2)
-				border-radius: ($chevronLineThickness / 2)
+				right: (($paddingRight - $chevronLineLength) * 0.5)
+				border-radius: ($chevronLineThickness * 0.5)
 			&::before
 				transform: translate(-50%, -.5 * $chevronLineThickness + .5 * $cui-select-chevron-height) rotate(45deg)
 			&::after

@@ -1,3 +1,5 @@
+@use "sass:list"
+
 @import '../common'
 
 .#{$cui-conf-globalPrefix}editorTable
@@ -35,7 +37,7 @@
 	$column: var(--#{$cui-conf-globalPrefix}editorTable-column, 0)
 	&-rowControls
 		&-item
-			grid-row: calc(2 * #{$row} + 3) / span 1
+			grid-row: list.slash(calc(2 * #{$row} + 3), span) 1
 			grid-column: 1 / span 1
 			place-self: center end
 			width: $frontRemoveDimensionThickness
@@ -53,22 +55,22 @@
 		&-item:hover + * + * + * + * + * + &-line
 			transform: translateY(-150%) scaleY(2)
 		&-more
-			grid-row: calc(2 * #{$row} + 3) / span 1
+			grid-row: list.slash(calc(2 * #{$row} + 3), span) 1
 			grid-column: 1 / span 1
 			place-self: center start
 		&-line
-			grid-row: calc(2 * #{$row} + 2) / span 1
+			grid-row: list.slash(calc(2 * #{$row} + 2), span) 1
 			grid-column: 2 / -2
 			background: $cui-color-gray-2
 		&-add
-			grid-row: calc(2 * #{$row} + 2) / span 1
+			grid-row: list.slash(calc(2 * #{$row} + 2), span) 1
 			grid-column: 1 / span 1
 		&-add:hover + &-line
 			transform: scaleY(4)
 	&-columnControls
 		&-item
 			grid-row: 1 / span 1
-			grid-column: calc(2 * #{$column} + 3) / span 1
+			grid-column: list.slash(calc(2 * #{$column} + 3), span) 1
 			justify-self: center
 			place-self: end center
 			height: $topRemoveDimensionThickness
@@ -87,16 +89,16 @@
 			transform: translateX(-150%) scaleX(2)
 		&-more
 			grid-row: 1 / span 1
-			grid-column: calc(2 * #{$column} + 3) / span 1
+			grid-column: list.slash(calc(2 * #{$column} + 3), span) 1
 			justify-self: center
 			place-self: center
 		&-line
 			grid-row: 2 / -2
-			grid-column: calc(2 * #{$column} + 2) / span 1
+			grid-column: list.slash(calc(2 * #{$column} + 2), span) 1
 			background: $cui-color-gray-2
 		&-add
 			grid-row: 1 / span 1
-			grid-column: calc(2 * #{$column} + 2) / span 1
+			grid-column: list.slash(calc(2 * #{$column} + 2), span) 1
 		&-add:hover + &-line
 			transform: scaleX(4)
 
@@ -164,13 +166,13 @@
 	&-appendRow
 		grid-row: -2 / span 1
 		grid-column: 2 / -2
-		border-bottom-left-radius: ($addDimensionThickness / 2)
-		border-bottom-right-radius: ($addDimensionThickness / 2)
+		border-bottom-left-radius: ($addDimensionThickness * 0.5)
+		border-bottom-right-radius: ($addDimensionThickness * 0.5)
 	&-appendColumn
 		grid-row: 2 / -2
 		grid-column: -2 / span 1
-		border-top-right-radius: ($addDimensionThickness / 2)
-		border-bottom-right-radius: ($addDimensionThickness / 2)
+		border-top-right-radius: ($addDimensionThickness * 0.5)
+		border-bottom-right-radius: ($addDimensionThickness * 0.5)
 	&-appendRow,
 	&-appendColumn,
 	&-rowControls-item,

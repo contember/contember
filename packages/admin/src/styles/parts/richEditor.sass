@@ -31,13 +31,13 @@ $buttonSize: 2em
 			background: rebeccapurple
 
 	&-top
-		+absolute(calc(#{-1*$betweenBlocks} - #{$hoverHeight / 2}) 0 null -1*$leftOver)
+		+absolute(calc(#{-1*$betweenBlocks} - #{$hoverHeight * 0.5}) 0 null -1*$leftOver)
 
 	&-bottom
-		+absolute(null 0 calc(#{-1*$betweenBlocks} - #{$hoverHeight / 2}) -1*$leftOver)
+		+absolute(null 0 calc(#{-1*$betweenBlocks} - #{$hoverHeight * 0.5}) -1*$leftOver)
 
 	&-addBtn
-		$overflow: ($hoverHeight - $buttonSize) / 2
+		$overflow: ($hoverHeight - $buttonSize) * 0.5
 		+absolute($overflow null $overflow 0)
 		+size($buttonSize)
 		background: none

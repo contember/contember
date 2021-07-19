@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 %controlSizes
 	@each $name, $settings in $cui-control-sizes
 		$height: map_get($settings, height)
@@ -5,11 +7,11 @@
 
 		$view: toView($name)
 		&#{$view}
-			$c: $fontSize / 1em
-			$normalizedHeight: $height / $c
-			$visualLineHeight: $normalizedHeight - 2 * ($cui-control-border-width / $c)
+			$c: math.div($fontSize, 1em)
+			$normalizedHeight: math.div($height, $c)
+			$visualLineHeight: $normalizedHeight - 2 * math.div($cui-control-border-width, $c)
 			$actualLineHeight: $cui-base-lineHeight
-			$edgeOffset: ($visualLineHeight - $actualLineHeight) / 2
+			$edgeOffset: ($visualLineHeight - $actualLineHeight) * 0.5
 			height: $normalizedHeight
 			min-height: $normalizedHeight
 			line-height: $actualLineHeight

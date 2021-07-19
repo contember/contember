@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 @import '../common'
 
 .#{$cui-conf-globalPrefix}collapsible
@@ -16,7 +18,7 @@
 
 	@media (prefers-reduced-motion: reduce)
 		// 1 frame at 60 fps
-		--cui-collapsible-private-transition-duration: #{(1s / 60)}
+		--cui-collapsible-private-transition-duration: #{math.div(1s, 60)}
 		--cui-collapsible-transition-timing-function: step-end
 
 	&.is-expanded

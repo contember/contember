@@ -73,8 +73,8 @@ export class SelectHydrator {
 			const last = pathTmp.pop() as string
 			const currentObject = pathTmp.reduce<any>((obj, part) => (obj && obj[part]) || undefined, result)
 			const parentValue = row[parentKeyPath.getAlias()] as Value.PrimaryValue
-			if (currentObject && parentValue) {
-				currentObject[last] = awaitedData[parentValue] || defaultValue
+			if (currentObject) {
+				currentObject[last] = (parentValue ? awaitedData[parentValue] : undefined) || defaultValue
 			}
 		}
 

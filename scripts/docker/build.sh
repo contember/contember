@@ -26,14 +26,12 @@ for VERSION in "${ALL_VERSIONS[@]:1}"
 do
   docker tag "$REPO:$MAIN_VERSION" "$REPO:$VERSION"
 done
-docker push --all-tags "$REPO"
 
 docker build -t "$REPO:$MAIN_VERSION-debian" -f ./packages/engine-server/debian.dockerfile .
 for VERSION in "${ALL_VERSIONS[@]:1}"
 do
   docker tag "$REPO:$MAIN_VERSION-debian" "$REPO:$VERSION-debian"
 done
-docker push --all-tags "$REPO"
 
 REPO="contember/cli"
 docker build -t "$REPO:$MAIN_VERSION" -f ./packages/cli/Dockerfile .
@@ -42,4 +40,4 @@ do
   docker tag "$REPO:$MAIN_VERSION" "$REPO:$VERSION"
 done
 docker tag "$REPO:$MAIN_VERSION" "$REPO:latest"
-docker push --all-tags "$REPO"
+

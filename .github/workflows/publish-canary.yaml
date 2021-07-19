@@ -13,10 +13,12 @@ jobs:
           node-version: 14
       - name: Get the version
         run: echo "VERSION=${GITHUB_SHA:10}" >> $GITHUB_ENV
+      - name: "Install yarn deps"
+        run: yarn install
       - name: "Build app"
         run: yarn run build
       - name: "Publish Docker"
-        run: bash ./scripts/docker/build-canary.sh
+        run: bash ./scripts/docker/publish-canary.sh
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

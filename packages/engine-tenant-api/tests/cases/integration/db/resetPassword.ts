@@ -28,7 +28,7 @@ resetPassword('execute password reset', async ({ tester }) => {
 	const mail = tester.mailer.expectMessage({ subject: 'Password reset' })
 	const matches = mail.html?.toString().match(/<code>(.+)<\/code>/)
 	const token = matches?.[1] as string
-	assert.is(token, '0000000000000000000000000000000000000000')
+	assert.is(token, '3030303030303030303030303030303030303030')
 
 	const resetResult = await tester.execute(resetPasswordMutation({ token, password }), {
 		roles: [TenantRole.LOGIN],

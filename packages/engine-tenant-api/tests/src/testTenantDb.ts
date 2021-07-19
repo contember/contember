@@ -20,7 +20,6 @@ import { graphql } from 'graphql'
 import { Membership } from '../../src/model/type/Membership'
 import { Connection } from '@contember/database'
 import * as uvu from 'uvu'
-import getMigrations from '../../migrations'
 
 export interface TenantTest {
 	query: GraphQLTestQuery
@@ -94,17 +93,22 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 	const credentials = dbCredentials(dbName)
 	const conn = await recreateDatabase(dbName)
 	await conn.end()
+	const getMigrations = (await import(process.env.CONTEMBER_TENANT_MIGRATIONS_DIR || '../../migrations')).default
 	const migrationsRunner = new MigrationsRunner(credentials, 'tenant', getMigrations)
+
+	let counter = 0
 	const providers = {
 		bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
 		bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
 		now: () => now,
-		randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length)),
+		randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length, (counter++).toString())),
 		uuid: createUuidGenerator(),
 	}
 
 	await migrationsRunner.migrate<TenantMigrationArgs>(() => {}, {
-		credentials: {},
+		credentials: {
+			rootToken: process.env.CONTEMBER_ROOT_TOKEN,
+		},
 		providers,
 	})
 	const mailer = createMockedMailer()
@@ -166,7 +170,12 @@ interface TenantContext {
 export const dbSuite = (title: string) => {
 	const dbSuite = uvu.suite<TenantContext>(title)
 	dbSuite.before.each(async ctx => {
-		ctx.tester = await createTenantTester()
+		try {
+			ctx.tester = await createTenantTester()
+		} catch (e) {
+			console.error(e)
+			process.exit(1)
+		}
 	})
 	dbSuite.after.each(async ctx => {
 		await ctx.tester.end()

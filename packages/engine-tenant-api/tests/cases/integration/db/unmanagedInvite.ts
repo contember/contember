@@ -44,7 +44,7 @@ inviteSuite('does not send an email and sets given password', async ({ tester })
 		ok: true,
 		errors: [],
 		result: {
-			token: '0000000000000000000000000000000000000000',
+			token: '3030303030303030303030303030303030303030',
 			person: {
 				id: result.data.unmanagedInvite.result.person.id,
 				identity: {

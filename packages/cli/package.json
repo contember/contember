@@ -17,7 +17,6 @@
     "@contember/database-migrations": "^0.12.0-alpha.2",
     "@contember/dic": "^0.12.0-alpha.2",
     "@contember/engine-content-api": "^0.12.0-alpha.2",
-    "@contember/install": "^0.12.0-alpha.2",
     "@contember/schema": "^0.12.0-alpha.2",
     "@contember/schema-definition": "^0.12.0-alpha.2",
     "@contember/schema-migrations": "^0.12.0-alpha.2",

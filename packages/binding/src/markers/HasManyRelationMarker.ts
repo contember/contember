@@ -13,7 +13,7 @@ export class HasManyRelationMarker {
 		public readonly fields: EntityFieldMarkersContainer,
 		public readonly environment: Environment,
 	) {
-		if (__DEV_MODE__) {
+		if (import.meta.env.DEV) {
 			if (parameters.initialEntityCount < 0 || !Number.isInteger(parameters.initialEntityCount)) {
 				throw new BindingError(`The preferred 'initialEntityCount' for a relation must be a non-negative integer!`)
 			}

@@ -100,7 +100,7 @@ export function RenderElementFallback<
 		case 'unorderedList':
 			return <ul {...attributes}>{children}</ul>
 		default: {
-			if (__DEV_MODE__) {
+			if (import.meta.env.DEV) {
 				throw new RichTextRendererError(
 					`RichTextRenderer: unknown element of type '${(element as { type: string }).type}'.`,
 				)
@@ -123,7 +123,7 @@ function ReferenceElementFallback<
 		elementMetadata.referenceType === undefined ||
 		elementMetadata.reference === undefined
 	) {
-		if (__DEV_MODE__) {
+		if (import.meta.env.DEV) {
 			throw new RichTextRendererError(
 				`RichTextRenderer: cannot render reference of type '${elementMetadata.referenceType}'.`,
 			)

@@ -2,7 +2,7 @@ import { usePreviousValue } from './usePreviousValue'
 
 // This entire hook should get optimized away for prod
 export const useConstantLengthInvariant = <Item extends unknown>(items: Item[], message?: string) => {
-	if (__DEV_MODE__) {
+	if (import.meta.env.DEV) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const previous = usePreviousValue(items)
 		if (previous.length !== items.length) {

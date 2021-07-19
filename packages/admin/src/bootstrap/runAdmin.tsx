@@ -68,7 +68,7 @@ export const runAdmin = (
 
 		document.body.appendChild(errorContainer)
 
-		if (__DEV_MODE__) {
+		if (import.meta.env.DEV) {
 			ReactDOM.render(<DevError error={error} />, errorContainer)
 		} else {
 			ReactDOM.render(<h1>Fatal error</h1>, errorContainer)

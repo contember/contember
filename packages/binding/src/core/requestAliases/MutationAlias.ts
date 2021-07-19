@@ -23,7 +23,7 @@ export class MutationAlias {
 
 		const alias = `${treeRootId}${operation.subTreePlaceholder}__${operation.type}${operation.subTreeType}${entityId}`
 
-		if (__DEV_MODE__) {
+		if (import.meta.env.DEV) {
 			const matches = alias.match(mutationAliasRegex)
 
 			if (!matches) {

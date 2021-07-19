@@ -485,7 +485,7 @@ const useFieldBackedElements = (entity: EntityAccessor, original: FieldBackedEle
 }
 
 const assertStaticBlockEditorInvariants = (props: BlockEditorProps, environment: Environment) => {
-	if (__DEV_MODE__) {
+	if (import.meta.env.DEV) {
 		//referencesField?: SugaredRelativeEntityList | string
 		//referenceDiscriminationField?: SugaredFieldProps['field']
 		//

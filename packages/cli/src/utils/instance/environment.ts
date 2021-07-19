@@ -3,5 +3,5 @@ export type InstanceApiEnvironment = {
 }
 
 export const getInstanceFromEnv = (): string | undefined => {
-	return process.env.CONTEMBER_INSTANCE
+	return process.env.CONTEMBER_API_URL || process.env.CONTEMBER_INSTANCE
 }

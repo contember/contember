@@ -16,7 +16,7 @@ namespace ValidationContext {
 		value = 'value',
 		node = 'node',
 		nodeList = 'nodeList',
-		undefined = 'undefinde',
+		undefined = 'undefined',
 	}
 
 	export interface ContextWithNode {

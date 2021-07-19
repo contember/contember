@@ -1,6 +1,7 @@
 import { Validation } from '@contember/schema'
 import { ValidationContext } from './ValidationContext'
 import acceptContextVisitor = ValidationContext.acceptContextVisitor
+import NodeContextType = ValidationContext.NodeContextType
 
 const getValueOrLiteral = (
 	context: ValidationContext.AnyContext,
@@ -13,10 +14,10 @@ const getValueOrLiteral = (
 }
 
 const getValueFromContext = (context: ValidationContext.AnyContext): ValidationContext.ValueType | undefined => {
-	if (ValidationContext.isUndefinedNodeContext(context)) {
+	if (context.type === NodeContextType.undefined) {
 		return undefined
 	}
-	if (!ValidationContext.isValueContext(context)) {
+	if (context.type !== NodeContextType.value) {
 		throw new Error('ValueContext is required')
 	}
 	return context.value
@@ -227,7 +228,7 @@ const validatorEvaluators: {
 		{ validator: filter }: Validation.ValidatorArgument,
 		{ validator }: Validation.ValidatorArgument,
 	) => {
-		if (!ValidationContext.isNodeListContext(context)) {
+		if (context.type !== NodeContextType.nodeList) {
 			throw new Error('NodeListContext expected for "filter" operation')
 		}
 		const filteredContext = ValidationContext.createNodeListContext(

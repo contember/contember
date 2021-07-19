@@ -36,18 +36,10 @@ namespace ValidationContext {
 	}
 
 	export const ensureNodeListContext = (context: AnyContext): NodeListContext => {
-		return isNodeListContext(context)
+		return context.type === NodeContextType.nodeList
 			? context
-			: createNodeListContext(context.root, isUndefinedNodeContext(context) ? [] : [context])
+			: createNodeListContext(context.root, context.type === NodeContextType.undefined ? [] : [context])
 	}
-
-	export const isNodeContext = (context: AnyContext): context is NodeContext =>
-		'node' in context && context.node !== undefined
-	export const isUndefinedNodeContext = (context: AnyContext): context is UndefinedNodeContext =>
-		'node' in context && context.node === undefined
-	export const isValueContext = (context: AnyContext): context is ValueContext =>
-		isNodeContext(context) && 'value' in context
-	export const isNodeListContext = (context: AnyContext): context is NodeListContext => 'nodes' in context
 
 	export const createNodeContext = (root: NodeContext, node: NodeType): NodeContext => ({
 		root,
@@ -89,7 +81,7 @@ namespace ValidationContext {
 	}
 
 	export const createContext = (context: AnyContext, part: string): AnyContext => {
-		if (isNodeListContext(context)) {
+		if (context.type === NodeContextType.nodeList) {
 			const emptyContext: NodeListContext = {
 				root: context.root,
 				nodes: [],
@@ -103,7 +95,7 @@ namespace ValidationContext {
 					emptyContext,
 				)
 		}
-		if (isUndefinedNodeContext(context)) {
+		if (context.type === NodeContextType.undefined) {
 			return context
 		}
 		if (typeof context.node[part] === 'undefined') {

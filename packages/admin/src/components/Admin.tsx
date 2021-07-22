@@ -1,7 +1,7 @@
 import { Environment, EnvironmentContext } from '@contember/binding'
 import { ContemberClient } from '@contember/react-client'
 import { ContainerSpinner, DialogProvider } from '@contember/ui'
-import { ComponentType, lazy, LazyExoticComponent, memo, Suspense, useEffect, useState } from 'react'
+import { ComponentType, lazy, LazyExoticComponent, memo, ReactElement, Suspense, useEffect, useState } from 'react'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
 import { assertValidClientConfig, ClientConfig } from '../bootstrap'
@@ -63,7 +63,7 @@ export const Admin = memo((props: AdminProps) => {
 										const normalizedConfigs: {
 											[project: string]: {
 												[stage: string]: ProjectConfig & {
-													lazyComponent: LazyExoticComponent<ComponentType<any>>
+													lazyComponent: LazyExoticComponent<ComponentType<any>> | ComponentType
 													rootEnvironment: Environment
 												}
 											}
@@ -80,7 +80,10 @@ export const Admin = memo((props: AdminProps) => {
 											}
 											normalizedConfigs[config.project][config.stage] = {
 												...config,
-												lazyComponent: lazy(config.component),
+												lazyComponent:
+													typeof config.component === 'function'
+														? lazy(config.component)
+														: () => <>{config.component}</>,
 												rootEnvironment: adminWideEnvironment.putDelta({
 													dimensions: config.defaultDimensions || {},
 												}),

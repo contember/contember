@@ -1,24 +1,25 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
+		"baseUrl": ".",
 		"outDir": "../dist/src",
 		"paths": {
-			"@contember/binding": ["../../../packages/binding/src"],
-			"@contember/client": ["../../../packages/client/src"],
-			"@contember/react-client": ["../../../packages/react-client/src"],
-			"@contember/react-multipass-rendering": ["../../../packages/react-multipass-rendering/src"],
-			"@contember/react-utils": ["../../../packages/react-utils/src"],
-			"@contember/ui": ["../../../packages/ui/src"],
-			"@contember/utils": ["../../../packages/utils/src"]
+			"@contember/binding": ["../../binding/src"],
+			"@contember/client": ["../../client/src"],
+			"@contember/react-client": ["../../react-client/src"],
+			"@contember/react-multipass-rendering": ["../../react-multipass-rendering/src"],
+			"@contember/react-utils": ["../../react-utils/src"],
+			"@contember/ui": ["../../ui/src"],
+			"@contember/utils": ["../../utils/src"]
 		}
 	},
 	"references": [
-		{ "path": "../../../packages/binding/src" },
-		{ "path": "../../../packages/client/src" },
-		{ "path": "../../../packages/react-client/src" },
-		{ "path": "../../../packages/react-multipass-rendering/src" },
-		{ "path": "../../../packages/react-utils/src" },
-		{ "path": "../../../packages/ui/src" },
-		{ "path": "../../../packages/utils/src" }
+		{ "path": "../../binding/src" },
+		{ "path": "../../client/src" },
+		{ "path": "../../react-client/src" },
+		{ "path": "../../react-multipass-rendering/src" },
+		{ "path": "../../react-utils/src" },
+		{ "path": "../../ui/src" },
+		{ "path": "../../utils/src" }
 	]
 }

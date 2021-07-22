@@ -2,17 +2,16 @@
   "name": "@contember/binding",
   "version": "0.6.52",
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "build": "rollup --config",
     "test": "jest dist/tests/bundle.spec.js"
   },
-  "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/client": "0.6.52",
-    "@contember/react-client": "0.6.52",
-    "@contember/react-multipass-rendering": "0.6.52",
-    "@contember/react-utils": "0.6.52",
+    "@contember/client": "workspace:*",
+    "@contember/react-client": "workspace:*",
+    "@contember/react-multipass-rendering": "workspace:*",
+    "@contember/react-utils": "workspace:*",
     "chevrotain": "6.5.0",
     "js-levenshtein": "1.1.6",
     "uuid": "8.3.1"

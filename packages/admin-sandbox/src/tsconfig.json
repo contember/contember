@@ -4,7 +4,7 @@
 		"outDir": "../dist/src",
 		"baseUrl": ".",
 		"paths": {
-			"@contember/admin": ["../../../packages/admin/src"]
+			"@contember/admin": ["../../admin/src"]
 		}
 	},
 	"references": [

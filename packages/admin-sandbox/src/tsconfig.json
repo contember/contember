@@ -1,7 +1,7 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src",
+		"outDir": "../tempDist/src",
 		"baseUrl": ".",
 		"paths": {
 			"@contember/admin": ["../../admin/src"]

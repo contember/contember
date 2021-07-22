@@ -1,7 +1,11 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/tests"
+		"baseUrl": ".",
+		"outDir": "../tempDist/tests",
+		"paths": {
+			"@contember/client": ["../../client/src"]
+		}
 	},
 	"references": [
 		{ "path": "../src" }

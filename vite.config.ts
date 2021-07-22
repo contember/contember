@@ -32,5 +32,6 @@ export default defineConfig({
 				replacement: resolve(__dirname, `packages/${packageName}/src/index.ts`),
 			})),
 		],
+		dedupe: packageList.map(packageName => `@contember/${packageName}`),
 	},
 })

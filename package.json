@@ -11,7 +11,7 @@
 		}
 	},
 	"scripts": {
-		"vite:dev": "vite sandbox --config vite.config.ts",
+		"vite:dev": "vite packages/admin-sandbox/src --config vite.config.ts --debug",
 		"dev": "concurrently \"npm run ts:watch\" \"npm run styles:watch\"  \"npm run storybook\"",
 		"styles:watch": "npm-watch styles:build",
 		"styles:build": "cd packages/admin && npm run styles:build",

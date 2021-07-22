@@ -58,20 +58,19 @@ importers:
 
   packages/admin:
     specifiers:
-      '@contember/binding': 0.6.52
-      '@contember/client': 0.6.52
-      '@contember/react-client': 0.6.52
-      '@contember/react-multipass-rendering': 0.6.52
-      '@contember/react-utils': 0.6.52
-      '@contember/ui': 0.6.52
-      '@contember/utils': 0.6.52
+      '@contember/binding': workspace:*
+      '@contember/client': workspace:*
+      '@contember/react-client': workspace:*
+      '@contember/react-multipass-rendering': workspace:*
+      '@contember/react-utils': workspace:*
+      '@contember/ui': workspace:*
+      '@contember/utils': workspace:*
       '@formatjs/icu-messageformat-parser': 2.0.1
       '@mangoweb/sass-base': 0.0.8
       '@sindresorhus/slugify': 0.9.1
       '@types/blueimp-md5': 2.7.0
       '@types/debounce': 1.2.0
       '@types/is-hotkey': 0.1.1
-      '@types/jasmine': 3.4.6
       '@types/leaflet': 1.5.17
       '@types/react': 17.0.5
       '@types/react-datepicker': 3.1.2
@@ -148,7 +147,6 @@ importers:
       '@types/blueimp-md5': 2.7.0
       '@types/debounce': 1.2.0
       '@types/is-hotkey': 0.1.1
-      '@types/jasmine': 3.4.6
       '@types/leaflet': 1.5.17
       '@types/react': 17.0.5
       '@types/react-datepicker': 3.1.2
@@ -163,7 +161,13 @@ importers:
 
   packages/admin-i18n:
     specifiers:
-      '@contember/admin': 0.6.52
+      '@contember/admin': workspace:*
+    devDependencies:
+      '@contember/admin': link:../admin
+
+  packages/admin-sandbox:
+    specifiers:
+      '@contember/admin': workspace:*
     devDependencies:
       '@contember/admin': link:../admin
 
@@ -184,10 +188,10 @@ importers:
 
   packages/binding:
     specifiers:
-      '@contember/client': 0.6.52
-      '@contember/react-client': 0.6.52
-      '@contember/react-multipass-rendering': 0.6.52
-      '@contember/react-utils': 0.6.52
+      '@contember/client': workspace:*
+      '@contember/react-client': workspace:*
+      '@contember/react-multipass-rendering': workspace:*
+      '@contember/react-utils': workspace:*
       '@types/jest': 26.0.13
       '@types/js-levenshtein': 1.1.0
       '@types/uuid': 8.3.0
@@ -215,7 +219,7 @@ importers:
 
   packages/react-client:
     specifiers:
-      '@contember/client': 0.6.52
+      '@contember/client': workspace:*
     dependencies:
       '@contember/client': link:../client
 
@@ -231,7 +235,7 @@ importers:
   packages/ui:
     specifiers:
       '@blueprintjs/icons': 3.26.0
-      '@contember/react-multipass-rendering': 0.6.52
+      '@contember/react-multipass-rendering': workspace:*
       '@mangoweb/sass-base': 0.0.8
       '@popperjs/core': 2.9.0
       '@storybook/addon-info': 6.0.0-alpha.2
@@ -284,7 +288,7 @@ importers:
 
   packages/vimeo-file-uploader:
     specifiers:
-      '@contember/client': 0.6.52
+      '@contember/client': workspace:*
       '@types/tus-js-client': 1.8.0
       tus-js-client: 1.8.0
     dependencies:
@@ -5097,10 +5101,6 @@ packages:
     resolution: {integrity: sha512-c3mAZEuK0lvBp8tmuL74XRKn1+y2dcwOUpH7x4WrF6gk1GIgiluDRgMYQtw2OFcBvAJWlt6ASU3tSqxp0Uu0Aw==}
     dependencies:
       '@types/istanbul-lib-report': 3.0.0
-    dev: true
-
-  /@types/jasmine/3.4.6:
-    resolution: {integrity: sha512-hpQHs+lmZ0uuCrGyqypdI1Ho7jRFolOBT6OkNdZPFziLSSEKvWu+VxWU6bGdNEA/hoV4jV8pdDeNx8EWlmfNAw==}
     dev: true
 
   /@types/jest/26.0.13:

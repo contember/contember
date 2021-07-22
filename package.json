@@ -10,6 +10,7 @@
 			"extensions": "sass,scss"
 		}
 	},
+	"type": "module",
 	"scripts": {
 		"vite:dev": "vite packages/admin-sandbox/src --config vite.config.ts --debug",
 		"dev": "concurrently \"npm run ts:watch\" \"npm run styles:watch\"  \"npm run storybook\"",

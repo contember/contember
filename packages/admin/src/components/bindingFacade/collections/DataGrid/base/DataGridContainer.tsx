@@ -1,5 +1,5 @@
 import { Component, Entity, EntityListBaseProps, EntityName, Filter } from '@contember/binding'
-import { Button, ButtonList, Justification, Table, TableCell, TableRow } from '@contember/ui'
+import { Button, ButtonList, Table, TableCell, TableRow } from '@contember/ui'
 import type { ComponentType, FunctionComponent, ReactNode } from 'react'
 import { useMessageFormatter } from '../../../../../i18n'
 import { EmptyMessage, EmptyMessageProps } from '../../helpers'
@@ -14,13 +14,6 @@ import type { DataGridSetColumnOrderBy } from './DataGridSetOrderBy'
 import type { DataGridState } from './DataGridState'
 import { getColumnFilter } from './getColumnFilter'
 import { useHackyTotalCount } from './useHackyTotalCount'
-
-export interface DataGridCellPublicProps {
-	justification?: Justification
-	shrunk?: boolean
-	hidden?: boolean
-	canBeHidden?: boolean
-}
 
 export interface DataGridContainerPublicProps {
 	allowColumnVisibilityControls?: boolean

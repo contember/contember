@@ -1,5 +1,7 @@
 import { Environment, OrderBy, QueryLanguage } from '@contember/binding'
-import type { DataGridColumnKey, DataGridColumns, DataGridOrderDirection } from './index'
+import type { DataGridColumns } from './DataGridColumn'
+import type { DataGridColumnKey } from './DataGridColumnKey'
+import type { DataGridOrderDirection } from './DataGridOrderDirection'
 
 export const getColumnOrderBy = (
 	columns: DataGridColumns,

@@ -1,16 +1,16 @@
 {
-  "name": "@contember/react-multipass-rendering",
-  "version": "0.6.52",
-  "type": "module",
-  "main": "src/index.ts",
-  "scripts": {
-    "build": "rollup --config",
-    "test": "jest dist/tests/bundle.spec.js"
-  },
-  "peerDependencies": {
-    "react": "17.0.1"
-  },
-  "devDependencies": {
-    "tslib": "1.10.0"
-  }
+	"name": "@contember/react-multipass-rendering",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "src/index.ts",
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production",
+		"test": "jest dist/tests/bundle.spec.js"
+	},
+	"peerDependencies": {
+		"react": "17.0.1"
+	},
+	"devDependencies": {
+		"tslib": "1.10.0"
+	}
 }

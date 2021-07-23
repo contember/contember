@@ -4,7 +4,9 @@
 	"main": "src/index.ts",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
-	"scripts": {},
+	"scripts": {
+		"build": "exit 0"
+	},
 	"bin": {
 		"run-admin": "dist/src/run-admin.js"
 	},

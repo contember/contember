@@ -1,9 +1,12 @@
 {
-  "name": "@contember/admin-sandbox",
-  "version": "0.6.52",
-  "type": "module",
-  "main": "src/index.html",
-  "devDependencies": {
-    "@contember/admin": "workspace:*"
-  }
+	"name": "@contember/admin-sandbox",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "src/index.html",
+	"scripts": {
+		"build": "exit 0"
+	},
+	"devDependencies": {
+		"@contember/admin": "workspace:*"
+	}
 }

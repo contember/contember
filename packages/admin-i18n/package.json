@@ -1,12 +1,12 @@
 {
-  "name": "@contember/admin-i18n",
-  "version": "0.6.52",
-  "type": "module",
-  "main": "src/index.ts",
-  "scripts": {
-    "build": "rollup --config"
-  },
-  "devDependencies": {
-    "@contember/admin": "workspace:*"
-  }
+	"name": "@contember/admin-i18n",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "src/index.ts",
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production"
+	},
+	"devDependencies": {
+		"@contember/admin": "workspace:*"
+	}
 }

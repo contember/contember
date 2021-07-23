@@ -1,12 +1,12 @@
 {
-  "name": "@contember/react-utils",
-  "version": "0.6.52",
-  "type": "module",
-  "main": "src/index.ts",
-  "scripts": {
-    "build": "rollup --config"
-  },
-  "peerDependencies": {
-    "react": "17.0.1"
-  }
+	"name": "@contember/react-utils",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "src/index.ts",
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production"
+	},
+	"peerDependencies": {
+		"react": "17.0.1"
+	}
 }

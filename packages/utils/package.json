@@ -4,5 +4,7 @@
 	"main": "src/index.ts",
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
-	"scripts": {}
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production"
+	}
 }

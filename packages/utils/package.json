@@ -1,7 +1,15 @@
 {
 	"name": "@contember/utils",
 	"version": "0.6.52",
-	"main": "src/index.ts",
+	"main": "./dist/utils.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/utils.development.js",
+				"production": "./dist/utils.production.js"
+			}
+		}
+	},
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
 	"scripts": {

@@ -2,7 +2,15 @@
 	"name": "@contember/react-utils",
 	"version": "0.6.52",
 	"type": "module",
-	"main": "src/index.ts",
+	"main": "./dist/react-utils.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/react-utils.development.js",
+				"production": "./dist/react-utils.production.js"
+			}
+		}
+	},
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production"
 	},

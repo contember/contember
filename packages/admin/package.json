@@ -2,7 +2,15 @@
 	"name": "@contember/admin",
 	"version": "0.6.52",
 	"type": "module",
-	"main": "src/index.ts",
+	"main": "./dist/admin.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/admin.development.js",
+				"production": "./dist/admin.production.js"
+			}
+		}
+	},
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
 		"styles:build": "node --experimental-modules ./scripts/build-style.mjs",

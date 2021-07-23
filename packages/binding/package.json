@@ -2,7 +2,15 @@
 	"name": "@contember/binding",
 	"version": "0.6.52",
 	"type": "module",
-	"main": "src/index.ts",
+	"main": "./dist/binding.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/binding.development.js",
+				"production": "./dist/binding.production.js"
+			}
+		}
+	},
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
 		"test": "jest dist/tests/bundle.spec.js"

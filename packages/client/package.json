@@ -1,7 +1,15 @@
 {
 	"name": "@contember/client",
 	"version": "0.6.52",
-	"main": "src/index.ts",
+	"main": "./dist/client.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/client.development.js",
+				"production": "./dist/client.production.js"
+			}
+		}
+	},
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
 	"scripts": {

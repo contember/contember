@@ -2,7 +2,15 @@
 	"name": "@contember/react-multipass-rendering",
 	"version": "0.6.52",
 	"type": "module",
-	"main": "src/index.ts",
+	"main": "./dist/react-multipass-rendering.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/react-multipass-rendering.development.js",
+				"production": "./dist/react-multipass-rendering.production.js"
+			}
+		}
+	},
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
 		"test": "jest dist/tests/bundle.spec.js"

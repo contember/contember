@@ -16,7 +16,7 @@
 		"@contember/vimeo-file-uploader"
 	],
 	"apiReport": {
-		"enabled": true,
+		"enabled": false,
 		"reportFileName": "<unscopedPackageName>.api.md",
 		"reportFolder": "<projectFolder>/doc-report/",
 		"reportTempFolder": "<projectFolder>/temp/api-extractor/"

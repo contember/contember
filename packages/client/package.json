@@ -14,6 +14,8 @@
 	"type": "module",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
+		"build:docs:dev": "api-extractor run --local",
+		"build:docs:prod": "api-extractor run",
 		"test": "jest dist/tests/bundle.spec.js"
 	},
 	"dependencies": {

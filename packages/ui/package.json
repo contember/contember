@@ -17,6 +17,8 @@
 	],
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
+		"build:docs:dev": "api-extractor run --local",
+		"build:docs:prod": "api-extractor run",
 		"storybook": "start-storybook --ci -p 9001 -c storybookConfig"
 	},
 	"dependencies": {

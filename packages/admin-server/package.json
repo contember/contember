@@ -5,7 +5,9 @@
 	"typings": "dist/src/index.d.ts",
 	"type": "module",
 	"scripts": {
-		"build": "exit 0"
+		"build": "exit 0",
+		"build:docs:dev": "exit 0",
+		"build:docs:prod": "exit 0"
 	},
 	"bin": {
 		"run-admin": "dist/src/run-admin.js"

@@ -12,7 +12,9 @@
 		}
 	},
 	"scripts": {
-		"build": "vite build --mode development && vite build --mode production"
+		"build": "vite build --mode development && vite build --mode production",
+		"build:docs:dev": "api-extractor run --local",
+		"build:docs:prod": "api-extractor run"
 	},
 	"peerDependencies": {
 		"react": "17.0.1"

@@ -1,7 +1,7 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../tempDist/tests"
+		"outDir": "../temp/tests"
 	},
 	"references": [
 		{ "path": "../src" }

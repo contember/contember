@@ -2,7 +2,7 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"baseUrl": ".",
-		"outDir": "../tempDist/src",
+		"outDir": "../temp/src",
 		"paths": {
 			"@contember/react-multipass-rendering": ["../../react-multipass-rendering/src"]
 		}

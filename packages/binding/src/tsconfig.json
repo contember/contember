@@ -2,7 +2,7 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"baseUrl": ".",
-		"outDir": "../tempDist/src",
+		"outDir": "../temp/src",
 		"paths": {
 			"@contember/client": ["../../client/src"],
 			"@contember/react-client": ["../../react-client/src"],

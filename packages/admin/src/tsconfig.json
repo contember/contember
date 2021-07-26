@@ -2,7 +2,7 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"baseUrl": ".",
-		"outDir": "../tempDist/src",
+		"outDir": "../temp/src",
 		"paths": {
 			"@contember/binding": ["../../binding/src"],
 			"@contember/client": ["../../client/src"],

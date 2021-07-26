@@ -1,5 +1,5 @@
 /packages/*/dist
-/packages/*/tempDist
+/packages/*/temp
 /packages/*/node_modules
 /lerna-debug.log
 /node_modules

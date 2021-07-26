@@ -1,7 +1,7 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../tempDist/storybook"
+		"outDir": "../temp/storybook"
 	},
 	"references": [
 		{ "path": "../src" }

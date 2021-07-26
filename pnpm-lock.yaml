@@ -4,6 +4,7 @@ importers:
 
   .:
     specifiers:
+      '@microsoft/api-documenter': 7.13.33
       '@microsoft/api-extractor': 7.18.4
       '@types/classnames': 2.2.10
       '@types/jest': 26.0.20
@@ -31,6 +32,7 @@ importers:
       typescript: 4.2.2
       vite: 2.4.2
     devDependencies:
+      '@microsoft/api-documenter': 7.13.33
       '@microsoft/api-extractor': 7.18.4
       '@types/classnames': 2.2.10
       '@types/jest': 26.0.20
@@ -164,7 +166,7 @@ importers:
   packages/admin-i18n:
     specifiers:
       '@contember/admin': workspace:*
-    devDependencies:
+    dependencies:
       '@contember/admin': link:../admin
 
   packages/admin-sandbox:
@@ -3029,6 +3031,19 @@ packages:
   /@mangoweb/sass-base/0.0.8:
     resolution: {integrity: sha512-RpSnpiTpkmNWA7dIzk3t4TnB8o/a0wVsA4w31QG5tfJ1KFHfPDvD69wtPpbTUARPAg89XnFtuOB3tR8BmgEfrg==}
     dev: false
+
+  /@microsoft/api-documenter/7.13.33:
+    resolution: {integrity: sha512-m+Yv/NTP2nvKaey20AszOv9QnQ0O3SxEGWeQF1mci920bQskcz9/5uaVMCtfq7PKPelc8k9NG4gqmzw1dRgKBA==}
+    hasBin: true
+    dependencies:
+      '@microsoft/api-extractor-model': 7.13.4
+      '@microsoft/tsdoc': 0.13.2
+      '@rushstack/node-core-library': 3.39.1
+      '@rushstack/ts-command-line': 4.8.1
+      colors: 1.2.5
+      js-yaml: 3.13.1
+      resolve: 1.17.0
+    dev: true
 
   /@microsoft/api-extractor-model/7.13.4:
     resolution: {integrity: sha512-NYaR3hJinh089/Gkee8fvmEFf9zKkoUvNxgkqUlKBCDXH2+Ou4tNDuL8G6zjhKBPicHkp2VcL8l7q9H6txUkjQ==}
@@ -11244,6 +11259,14 @@ packages:
 
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+
+  /js-yaml/3.13.1:
+    resolution: {integrity: sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw==}
+    hasBin: true
+    dependencies:
+      argparse: 1.0.10
+      esprima: 4.0.1
+    dev: true
 
   /js-yaml/3.14.1:
     resolution: {integrity: sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==}

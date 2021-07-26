@@ -32,6 +32,7 @@
 		"tag-version": "lerna version --exact --force-publish"
 	},
 	"devDependencies": {
+		"@microsoft/api-documenter": "7.13.33",
 		"@microsoft/api-extractor": "7.18.4",
 		"@types/classnames": "2.2.10",
 		"@types/jest": "26.0.20",

@@ -1,20 +1,36 @@
-import { DatabaseQueryable } from '@contember/database'
+import { Client, DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
-import { CommandBus, CreateProjectCommand } from '../commands'
+import { CommandBus, CreateProjectCommand, SetProjectSecretCommand } from '../commands'
 import { PermissionContext } from '../authorization'
-import { Project } from '../type'
+import { Project, ProjectWithSecrets } from '../type'
 import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery } from '../queries'
 import { SecretsManager } from './SecretsManager'
+import { Providers } from '../providers'
 
 export class ProjectManager {
 	constructor(
+		private readonly client: Client,
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
-		private readonly commandBus: CommandBus,
 		private readonly secretManager: SecretsManager,
+		private readonly providers: Providers,
 	) {}
 
-	public async createProject(project: Pick<Project, 'name' | 'slug' | 'config'>): Promise<boolean> {
-		return await this.commandBus.execute(new CreateProjectCommand(project))
+	public async createProject(
+		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
+	): Promise<boolean> {
+		return await this.client.transaction(async trx => {
+			const bus = new CommandBus(trx, this.providers)
+
+			const id = await bus.execute(new CreateProjectCommand(project))
+			if (!id) {
+				return false
+			}
+			for (const [key, value] of Object.entries(project.secrets)) {
+				await bus.execute(new SetProjectSecretCommand(id, key, value))
+			}
+
+			return true
+		})
 	}
 
 	public async getProjectBySlug(slug: string): Promise<Project | null> {

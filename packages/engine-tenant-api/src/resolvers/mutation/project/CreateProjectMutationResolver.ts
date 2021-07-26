@@ -26,6 +26,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			slug: args.slug,
 			name: args.name || args.slug,
 			config: args.config || {},
+			secrets: Object.fromEntries((args.secrets || []).map(it => [it.key, it.value])),
 		})
 		await this.projectIntializer(args.slug)
 		if (response) {

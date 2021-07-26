@@ -74,7 +74,7 @@ const schema: DocumentNode = gql`
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 
-		createProject(slug: String!, name: String, config: Json): CreateProjectResponse
+		createProject(slug: String!, name: String, config: Json, secrets: [ProjectSecret!]): CreateProjectResponse
 
 		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
 	}
@@ -635,6 +635,11 @@ const schema: DocumentNode = gql`
 	}
 
 	# === project ===
+
+	input ProjectSecret {
+		key: String!
+		value: String!
+	}
 
 	type CreateProjectResponse {
 		ok: Boolean!

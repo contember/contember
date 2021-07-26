@@ -505,6 +505,7 @@ export type MutationCreateProjectArgs = {
 	slug: Scalars['String']
 	name?: Maybe<Scalars['String']>
 	config?: Maybe<Scalars['Json']>
+	secrets?: Maybe<ReadonlyArray<ProjectSecret>>
 }
 
 export type MutationSetProjectSecretArgs = {
@@ -550,6 +551,11 @@ export type ProjectIdentityRelation = {
 	readonly __typename?: 'ProjectIdentityRelation'
 	readonly identity: Identity
 	readonly memberships: ReadonlyArray<Membership>
+}
+
+export type ProjectSecret = {
+	readonly key: Scalars['String']
+	readonly value: Scalars['String']
 }
 
 export type Query = {
@@ -946,6 +952,7 @@ export type ResolversTypes = {
 	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
 	Project: ResolverTypeWrapper<Project>
 	ProjectIdentityRelation: ResolverTypeWrapper<ProjectIdentityRelation>
+	ProjectSecret: ProjectSecret
 	Query: ResolverTypeWrapper<{}>
 	RemoveMailTemplateError: ResolverTypeWrapper<RemoveMailTemplateError>
 	RemoveMailTemplateErrorCode: RemoveMailTemplateErrorCode
@@ -1032,6 +1039,7 @@ export type ResolversParentTypes = {
 	PrepareOtpResult: PrepareOtpResult
 	Project: Project
 	ProjectIdentityRelation: ProjectIdentityRelation
+	ProjectSecret: ProjectSecret
 	Query: {}
 	RemoveMailTemplateError: RemoveMailTemplateError
 	RemoveMailTemplateResponse: RemoveMailTemplateResponse

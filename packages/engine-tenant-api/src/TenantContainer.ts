@@ -151,7 +151,8 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'projectManager',
-				({ queryHandler, commandBus, secretManager }) => new ProjectManager(queryHandler, commandBus, secretManager),
+				({ db, queryHandler, secretManager, providers }) =>
+					new ProjectManager(db, queryHandler, secretManager, providers),
 			)
 			.addService(
 				'passwordResetManager',

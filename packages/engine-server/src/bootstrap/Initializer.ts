@@ -45,7 +45,8 @@ export class Initializer {
 	}
 
 	public async createProject(project: ProjectConfig, migrations: Migration[]): Promise<void> {
-		const result = await this.projectManager.createProject(project)
+		const { slug, name, ...config } = project
+		const result = await this.projectManager.createProject({ slug, name, config })
 		if (!result) {
 			throw new Error('Project already exists')
 		}

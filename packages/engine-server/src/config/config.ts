@@ -258,7 +258,7 @@ export type ConfigSource = { data: string; type: 'file' | 'json' | 'yaml' }
 export async function readConfig(
 	configSources: ConfigSource[],
 	configProcessors: ConfigProcessor[] = [],
-): Promise<{ config: Config; projectConfigResolver: (slug: string) => ProjectConfig }> {
+): Promise<{ config: Config; projectConfigResolver: (slug: string, additionalConfig: any) => ProjectConfig }> {
 	const loader = new ConfigLoader()
 	const configs = await Promise.all(
 		configSources.map(it => (it.type === 'file' ? loader.load(it.data) : loader.loadString(it.data, it.type))),
@@ -353,8 +353,12 @@ export async function readConfig(
 	)
 	return {
 		config: baseConfig,
-		projectConfigResolver: slug => {
-			const mergedConfig = Merger.merge(projectDefaults as any, (config?.projects as any)?.[slug] as any)
+		projectConfigResolver: (slug, additionalConfig) => {
+			const mergedConfig = Merger.merge(
+				projectDefaults as any,
+				(config?.projects as any)?.[slug] as any,
+				additionalConfig,
+			)
 			if (!mergedConfig.stages) {
 				mergedConfig.stages = { live: { base: null } }
 			}

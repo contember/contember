@@ -21,6 +21,7 @@ export class ProjectsByIdentityQuery extends DatabaseQuery<Project[]> {
 			.select(['project', 'id'])
 			.select(['project', 'name'])
 			.select(['project', 'slug'])
+			.select(['project', 'config'])
 			.from('project')
 			.where(where =>
 				where.in(

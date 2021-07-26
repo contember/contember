@@ -7,6 +7,7 @@ export class ProjectsQuery extends DatabaseQuery<Project[]> {
 			.select('id')
 			.select('name')
 			.select('slug')
+			.select('config')
 			.from('project')
 			.getResult(db)
 	}

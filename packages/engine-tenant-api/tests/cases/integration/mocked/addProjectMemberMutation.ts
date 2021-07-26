@@ -25,7 +25,7 @@ test('add project member', async () => {
 			memberships: [{ role, variables: [{ name: variableName, values }] }],
 		}),
 		executes: [
-			getProjectBySlugSql({ projectSlug, response: { id: projectId, name: 'Blog', slug: projectSlug } }),
+			getProjectBySlugSql({ projectSlug, response: { id: projectId, name: 'Blog', slug: projectSlug, config: {} } }),
 			...sqlTransaction(
 				getProjectMembershipSql({ identityId, projectId }),
 				createMembershipSql({ membershipId, projectId, identityId, role }),

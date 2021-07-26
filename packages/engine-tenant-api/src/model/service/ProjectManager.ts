@@ -11,7 +11,7 @@ export class ProjectManager {
 		private readonly commandBus: CommandBus,
 	) {}
 
-	public async createProject(project: Pick<Project, 'name' | 'slug'>): Promise<boolean> {
+	public async createProject(project: Pick<Project, 'name' | 'slug' | 'config'>): Promise<boolean> {
 		return await this.commandBus.execute(new CreateProjectCommand(project))
 	}
 
@@ -23,7 +23,7 @@ export class ProjectManager {
 		return await this.queryHandler.fetch(new ProjectsQuery())
 	}
 
-	public async getProjectsByIdentity(identityId: string, permissionContext: PermissionContext) {
+	public async getProjectsByIdentity(identityId: string, permissionContext: PermissionContext): Promise<Project[]> {
 		return await this.queryHandler.fetch(new ProjectsByIdentityQuery(identityId, permissionContext))
 	}
 }

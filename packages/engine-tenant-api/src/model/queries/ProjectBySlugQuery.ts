@@ -12,6 +12,7 @@ export class ProjectBySlugQuery extends DatabaseQuery<Project | null> {
 			.select('id')
 			.select('name')
 			.select('slug')
+			.select('config')
 			.from('project')
 			.where({
 				slug: this.projectSlug,

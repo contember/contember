@@ -25,6 +25,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		const response = await this.projectManager.createProject({
 			slug: args.slug,
 			name: args.name || args.slug,
+			config: args.config || {},
 		})
 		await this.projectIntializer(args.slug)
 		if (response) {

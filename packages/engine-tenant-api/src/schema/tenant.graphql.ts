@@ -74,7 +74,7 @@ const schema: DocumentNode = gql`
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 
-		createProject(slug: String!, name: String): CreateProjectResponse
+		createProject(slug: String!, name: String, config: Json): CreateProjectResponse
 	}
 
 	# === signUp ===
@@ -447,6 +447,7 @@ const schema: DocumentNode = gql`
 		id: String!
 		name: String!
 		slug: String!
+		config: Json!
 		roles: [RoleDefinition!]!
 		members(memberType: MEMBER_TYPE): [ProjectIdentityRelation!]!
 	}

@@ -38,7 +38,7 @@ export class ProjectContainerResolver {
 	}
 
 	private createProjectContainer(project: Project): ProjectContainer {
-		const projectConfig = this.projectConfigResolver(project.slug)
+		const projectConfig = this.projectConfigResolver(project.slug, project.config)
 		const existing = this.containers.get(project.slug)
 		if (existing) {
 			return existing

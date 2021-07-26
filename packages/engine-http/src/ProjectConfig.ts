@@ -14,4 +14,4 @@ export interface StageConfig {
 	readonly base?: string
 }
 
-export type ProjectConfigResolver = (slug: string) => ProjectConfig
+export type ProjectConfigResolver = (slug: string, additionalConfig: any) => ProjectConfig

@@ -19,7 +19,7 @@ test('removes a project member', async () => {
           }
         }`,
 		executes: [
-			getProjectBySlugSql({ projectSlug: 'blog', response: { id: projectId, name: 'Blog', slug: 'blog' } }),
+			getProjectBySlugSql({ projectSlug: 'blog', response: { id: projectId, name: 'Blog', slug: 'blog', config: {} } }),
 			selectMembershipsSql({
 				identityId,
 				projectId,

@@ -26,7 +26,10 @@ test('update project member', async () => {
 			memberships: [{ role, variables: [{ name: variableName, values: [languageId1] }] }],
 		}),
 		executes: [
-			getProjectBySlugSql({ projectSlug: projectSlug, response: { id: projectId, name: 'Blog', slug: projectSlug } }),
+			getProjectBySlugSql({
+				projectSlug: projectSlug,
+				response: { id: projectId, name: 'Blog', slug: projectSlug, config: {} },
+			}),
 			selectMembershipsSql({
 				identityId: identityId,
 				projectId: projectId,

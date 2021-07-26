@@ -34,7 +34,10 @@ test('invite a new person', async () => {
 			],
 		}),
 		executes: [
-			getProjectBySlugSql({ projectSlug, response: { id: projectId, name: projectSlug, slug: projectSlug } }),
+			getProjectBySlugSql({
+				projectSlug,
+				response: { id: projectId, name: projectSlug, slug: projectSlug, config: {} },
+			}),
 			...sqlTransaction(
 				getPersonByEmailSql({ email, response: null }),
 				createIdentitySql({ roles: ['person'], identityId }),

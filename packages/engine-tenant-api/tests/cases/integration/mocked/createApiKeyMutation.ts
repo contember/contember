@@ -33,7 +33,7 @@ test('create api key', async () => {
 			description: 'test key',
 		}),
 		executes: [
-			getProjectBySlugSql({ projectSlug, response: { id: projectId, name: 'Blog', slug: projectSlug } }),
+			getProjectBySlugSql({ projectSlug, response: { id: projectId, name: 'Blog', slug: projectSlug, config: {} } }),
 			...sqlTransaction(
 				createIdentitySql({ identityId, description: 'test key' }),
 				createApiKeySql({ identityId, apiKeyId }),

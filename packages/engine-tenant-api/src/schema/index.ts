@@ -503,6 +503,7 @@ export type MutationRemoveProjectMailTemplateArgs = {
 export type MutationCreateProjectArgs = {
 	slug: Scalars['String']
 	name?: Maybe<Scalars['String']>
+	config?: Maybe<Scalars['Json']>
 }
 
 export type Person = {
@@ -529,6 +530,7 @@ export type Project = {
 	readonly id: Scalars['String']
 	readonly name: Scalars['String']
 	readonly slug: Scalars['String']
+	readonly config: Scalars['Json']
 	readonly roles: ReadonlyArray<RoleDefinition>
 	readonly members: ReadonlyArray<ProjectIdentityRelation>
 }
@@ -1538,6 +1540,7 @@ export type ProjectResolvers<
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	config?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	roles?: Resolver<ReadonlyArray<ResolversTypes['RoleDefinition']>, ParentType, ContextType>
 	members?: Resolver<
 		ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>,

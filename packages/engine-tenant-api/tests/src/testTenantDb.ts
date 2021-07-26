@@ -125,7 +125,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	await tenantContainer.projectManager.createProject({ slug: 'blog', name: 'blog' })
+	await tenantContainer.projectManager.createProject({ slug: 'blog', name: 'blog', config: {} })
 
 	const schema = makeExecutableSchema({
 		typeDefs: typeDefs,

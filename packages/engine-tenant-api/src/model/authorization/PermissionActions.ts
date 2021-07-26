@@ -26,6 +26,7 @@ namespace PermissionActions {
 		Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships })
 
 	export const PROJECT_VIEW = Authorizator.createAction(Resources.project, 'view')
+	export const PROJECT_SET_SECRET = Authorizator.createAction(Resources.project, 'setSecret')
 
 	export const PROJECT_CREATE = Authorizator.createAction(Resources.project, 'create')
 

@@ -25,6 +25,7 @@ import {
 	ProjectSchemaResolver,
 	ProjectScopeFactory,
 	Providers,
+	SecretsManager,
 	SignInManager,
 	SignUpManager,
 	UserMailer,
@@ -56,6 +57,7 @@ import {
 import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
+import { SetProjectSecretMutationResolver } from './resolvers/mutation/project/SetProjectSecretMutationResolver'
 
 export interface TenantContainer {
 	connection: Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
@@ -143,7 +145,14 @@ export class TenantContainerFactory {
 				({ authorizator, identityFactory, projectScopeFactory }) =>
 					new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory),
 			)
-			.addService('projectManager', ({ queryHandler, commandBus }) => new ProjectManager(queryHandler, commandBus))
+			.addService(
+				'secretManager',
+				({ commandBus, queryHandler, providers }) => new SecretsManager(commandBus, queryHandler, providers),
+			)
+			.addService(
+				'projectManager',
+				({ queryHandler, commandBus, secretManager }) => new ProjectManager(queryHandler, commandBus, secretManager),
+			)
 			.addService(
 				'passwordResetManager',
 				({ commandBus, userMailer, permissionContextFactory, projectManager }) =>
@@ -255,7 +264,10 @@ export class TenantContainerFactory {
 				'createProjectMutationResolver',
 				({ projectManager }) => new CreateProjectMutationResolver(projectManager, args.projectInitializer),
 			)
-
+			.addService(
+				'setProjectSecretMutationResolver',
+				({ projectManager, secretManager }) => new SetProjectSecretMutationResolver(projectManager, secretManager),
+			)
 			.addService(
 				'resolverContextFactory',
 				({ permissionContextFactory }) => new ResolverContextFactory(permissionContextFactory),

@@ -75,6 +75,8 @@ const schema: DocumentNode = gql`
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 
 		createProject(slug: String!, name: String, config: Json): CreateProjectResponse
+
+		setProjectSecret(projectSlug: String!, key: String!, value: String!): SetProjectSecretResponse
 	}
 
 	# === signUp ===
@@ -647,6 +649,19 @@ const schema: DocumentNode = gql`
 	enum CreateProjectResponseErrorCode {
 		ALREADY_EXISTS
 	}
+
+	type SetProjectSecretResponse {
+		ok: Boolean!
+		#error: SetProjectSecretResponseError
+	}
+
+	#	type SetProjectSecretResponseError {
+	#		code: SetProjectSecretResponseErrorCode!
+	#		developerMessage: String!
+	#	}
+	#
+	#	enum SetProjectSecretResponseErrorCode {
+	#	}
 `
 
 export default schema

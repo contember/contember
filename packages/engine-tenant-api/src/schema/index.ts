@@ -397,6 +397,7 @@ export type Mutation = {
 	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	readonly createProject?: Maybe<CreateProjectResponse>
+	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
 }
 
 export type MutationSignUpArgs = {
@@ -504,6 +505,12 @@ export type MutationCreateProjectArgs = {
 	slug: Scalars['String']
 	name?: Maybe<Scalars['String']>
 	config?: Maybe<Scalars['Json']>
+}
+
+export type MutationSetProjectSecretArgs = {
+	projectSlug: Scalars['String']
+	key: Scalars['String']
+	value: Scalars['String']
 }
 
 export type Person = {
@@ -645,6 +652,11 @@ export type RoleEntityVariableDefinition = RoleVariableDefinition & {
 
 export type RoleVariableDefinition = {
 	readonly name: Scalars['String']
+}
+
+export type SetProjectSecretResponse = {
+	readonly __typename?: 'SetProjectSecretResponse'
+	readonly ok: Scalars['Boolean']
 }
 
 export type SignInError = {
@@ -947,6 +959,7 @@ export type ResolversTypes = {
 	RoleDefinition: ResolverTypeWrapper<RoleDefinition>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 	RoleVariableDefinition: ResolversTypes['RoleEntityVariableDefinition']
+	SetProjectSecretResponse: ResolverTypeWrapper<SetProjectSecretResponse>
 	SignInError: ResolverTypeWrapper<SignInError>
 	SignInErrorCode: SignInErrorCode
 	SignInIDPError: ResolverTypeWrapper<SignInIdpError>
@@ -1029,6 +1042,7 @@ export type ResolversParentTypes = {
 	RoleDefinition: RoleDefinition
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 	RoleVariableDefinition: ResolversParentTypes['RoleEntityVariableDefinition']
+	SetProjectSecretResponse: SetProjectSecretResponse
 	SignInError: SignInError
 	SignInIDPError: SignInIdpError
 	SignInIDPResponse: SignInIdpResponse
@@ -1503,6 +1517,12 @@ export type MutationResolvers<
 		ContextType,
 		RequireFields<MutationCreateProjectArgs, 'slug'>
 	>
+	setProjectSecret?: Resolver<
+		Maybe<ResolversTypes['SetProjectSecretResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationSetProjectSecretArgs, 'projectSlug' | 'key' | 'value'>
+	>
 }
 
 export type PersonResolvers<
@@ -1670,6 +1690,14 @@ export type RoleVariableDefinitionResolvers<
 > = {
 	__resolveType: TypeResolveFn<'RoleEntityVariableDefinition', ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type SetProjectSecretResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['SetProjectSecretResponse'] = ResolversParentTypes['SetProjectSecretResponse'],
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInErrorResolvers<
@@ -1865,6 +1893,7 @@ export type Resolvers<ContextType = any> = {
 	RoleDefinition?: RoleDefinitionResolvers<ContextType>
 	RoleEntityVariableDefinition?: RoleEntityVariableDefinitionResolvers<ContextType>
 	RoleVariableDefinition?: RoleVariableDefinitionResolvers<ContextType>
+	SetProjectSecretResponse?: SetProjectSecretResponseResolvers<ContextType>
 	SignInError?: SignInErrorResolvers<ContextType>
 	SignInIDPError?: SignInIdpErrorResolvers<ContextType>
 	SignInIDPResponse?: SignInIdpResponseResolvers<ContextType>

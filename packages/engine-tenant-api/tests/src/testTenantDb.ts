@@ -103,6 +103,12 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		now: () => now,
 		randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length, (counter++).toString())),
 		uuid: createUuidGenerator(),
+		decrypt: () => {
+			throw new Error('not supported')
+		},
+		encrypt: () => {
+			throw new Error('not supported')
+		},
 	}
 
 	await migrationsRunner.migrate<TenantMigrationArgs>(() => {}, {

@@ -1,3 +1,3 @@
-import { providers } from '../providers'
+import { Providers } from '../providers'
 
-export type ProvidersState = { providers: typeof providers }
+export type ProvidersState = { providers: Providers }

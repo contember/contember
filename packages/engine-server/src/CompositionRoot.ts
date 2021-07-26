@@ -19,9 +19,9 @@ import { Plugin } from '@contember/engine-plugins'
 import { DatabaseCredentials, MigrationsRunner } from '@contember/database-migrations'
 import { createRootMiddleware, createShowMetricsMiddleware } from './http'
 import {
+	createProviders,
 	Koa,
 	ProjectConfigResolver,
-	providers,
 	SystemGraphQLMiddlewareFactory,
 	TenantGraphQLMiddlewareFactory,
 } from '@contember/engine-http'
@@ -30,6 +30,7 @@ import { ProjectContainerResolver } from './ProjectContainerResolver'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { Logger } from '@contember/engine-common'
 import { ClientBase } from 'pg'
+import { createSecretKey } from 'crypto'
 
 export interface MasterContainer {
 	initializer: Initializer
@@ -54,7 +55,11 @@ class CompositionRoot {
 		let projectInitializerInner: ProjectInitializer = () => {
 			throw new Error('called too soon')
 		}
-
+		const providers = createProviders({
+			encryptionKey: config.tenant.secrets
+				? createSecretKey(Buffer.from(config.tenant.secrets.encryptionKey, 'hex'))
+				: undefined,
+		})
 		const tenantContainer = new TenantContainerFactory().create({
 			tenantDbCredentials: config.tenant.db,
 			mailOptions: config.tenant.mailer,
@@ -100,6 +105,7 @@ class CompositionRoot {
 			tenantContainer.projectManager,
 			plugins,
 			systemContainer.schemaVersionBuilder,
+			providers,
 		)
 
 		projectSchemaResolverInner = async slug => {

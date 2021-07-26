@@ -20,6 +20,7 @@ import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { ResetPasswordMutationResolver } from './mutation/person/ResetPasswordMutationResolver'
 import { IDPMutationResolver } from './mutation/person/IDPMutationResolver'
 import { JSONType } from '@contember/graphql-utils'
+import { SetProjectSecretMutationResolver } from './mutation/project/SetProjectSecretMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -48,13 +49,14 @@ class ResolverFactory {
 			mailTemplateMutationResolver: MailTemplateMutationResolver
 
 			createProjectMutationResolver: CreateProjectMutationResolver
+			setProjectSecretMutationResolver: SetProjectSecretMutationResolver
 
 			identityTypeResolver: IdentityTypeResolver
 			projectTypeResolver: ProjectTypeResolver
 		},
 	) {}
 
-	create(): Resolvers {
+	create(): Resolvers & { Mutation: Required<Resolvers['Mutation']> } {
 		return {
 			Json: JSONType,
 			Identity: {
@@ -119,6 +121,9 @@ class ResolverFactory {
 				),
 				createProject: this.resolvers.createProjectMutationResolver.createProject.bind(
 					this.resolvers.createProjectMutationResolver,
+				),
+				setProjectSecret: this.resolvers.setProjectSecretMutationResolver.setProjectSecret.bind(
+					this.resolvers.setProjectSecretMutationResolver,
 				),
 			},
 		}

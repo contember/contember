@@ -16,12 +16,15 @@ import {
 	hasNumberProperty,
 	hasBooleanProperty,
 } from '@contember/engine-common'
-import { ProjectConfig, StageConfig } from '@contember/engine-http'
+import { ProjectConfig, ProjectConfigResolver, StageConfig } from '@contember/engine-http'
 
 export interface TenantConfig {
 	db: DatabaseCredentials
 	mailer: MailerOptions
 	credentials: TenantCredentials
+	secrets?: {
+		encryptionKey: string
+	}
 }
 
 export interface Config {
@@ -125,6 +128,21 @@ function checkTenantCredentials(json: unknown, path: string): TenantCredentials 
 
 	return values
 }
+
+function checkTenantSecrets(json: unknown, path: string): TenantConfig['secrets'] {
+	if (!isObject(json)) {
+		return typeConfigError(path, json, 'object')
+	}
+	if (!('encryptionKey' in json)) {
+		return undefined
+	}
+	if (!hasStringProperty(json, 'encryptionKey')) {
+		return typeConfigError(path + '.encryptionKey', json.encryptionKey, 'string')
+	}
+	return {
+		encryptionKey: json.encryptionKey,
+	}
+}
 function checkTenantStructure(json: unknown): Config['tenant'] {
 	if (!isObject(json)) {
 		return typeConfigError('tenant', json, 'object')
@@ -133,6 +151,7 @@ function checkTenantStructure(json: unknown): Config['tenant'] {
 		db: checkDatabaseCredentials(json.db, 'tenant.db'),
 		mailer: checkMailerParameters(json.mailer, 'tenant.mailer'),
 		credentials: checkTenantCredentials(json.credentials, 'tenant.credentials'),
+		secrets: checkTenantSecrets(json.secrets, 'tenant.secrets'),
 	}
 }
 
@@ -258,7 +277,10 @@ export type ConfigSource = { data: string; type: 'file' | 'json' | 'yaml' }
 export async function readConfig(
 	configSources: ConfigSource[],
 	configProcessors: ConfigProcessor[] = [],
-): Promise<{ config: Config; projectConfigResolver: (slug: string, additionalConfig: any) => ProjectConfig }> {
+): Promise<{
+	config: Config
+	projectConfigResolver: ProjectConfigResolver
+}> {
 	const loader = new ConfigLoader()
 	const configs = await Promise.all(
 		configSources.map(it => (it.type === 'file' ? loader.load(it.data) : loader.loadString(it.data, it.type))),
@@ -294,13 +316,16 @@ export async function readConfig(
 				rootPassword: '%?env.CONTEMBER_ROOT_PASSWORD%',
 				loginToken: '%?env.CONTEMBER_LOGIN_TOKEN%',
 			},
+			secrets: {
+				encryptionKey: '%?env.CONTEMBER_ENCRYPTION_KEY%',
+			},
 		},
 		projectDefaults: {
 			db: {
 				host: `%project.env.DB_HOST%`,
 				port: `%project.env.DB_PORT::number%`,
 				user: `%project.env.DB_USER%`,
-				password: `%project.env.DB_PASSWORD%`,
+				password: `%project.secret.db.password||project.env.DB_PASSWORD%`,
 				ssl: `%?project.env.DB_SSL::bool%`,
 				database: `%project.env.DB_NAME||project.slug%`,
 			},
@@ -353,7 +378,7 @@ export async function readConfig(
 	)
 	return {
 		config: baseConfig,
-		projectConfigResolver: (slug, additionalConfig) => {
+		projectConfigResolver: (slug, additionalConfig, secrets) => {
 			const mergedConfig = Merger.merge(
 				projectDefaults as any,
 				(config?.projects as any)?.[slug] as any,
@@ -374,6 +399,13 @@ export async function readConfig(
 						return envValue
 					} else if (parts[1] === 'slug') {
 						return slug
+					} else if (parts[1] === 'secret') {
+						const key = parts.slice(2).join('.')
+						const value = secrets[key]
+						if (value === undefined) {
+							throw new UndefinedParameterError(`Project secret ${parts[2]} not found`)
+						}
+						return value
 					}
 				}
 				return parametersResolver(parts, path, dataResolver)

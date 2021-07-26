@@ -73,6 +73,12 @@ export const executeTenantTest = async (test: Test) => {
 				now: () => now,
 				randomBytes: (length: number) => Promise.resolve(Buffer.alloc(length)),
 				uuid: createUuidGenerator(),
+				decrypt: () => {
+					throw new Error('not supported')
+				},
+				encrypt: () => {
+					throw new Error('not supported')
+				},
 			},
 			mailOptions: {},
 			projectSchemaResolver,

@@ -1,8 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 import bcrypt from 'bcrypt'
-import crypto from 'crypto'
+import crypto, { KeyObject } from 'crypto'
 
-export const providers = {
+const cryptoAlgo = 'aes-256-gcm'
+
+export const createProviders = (args: { encryptionKey?: KeyObject }) => ({
 	uuid: () => uuidv4(),
 	now: () => new Date(),
 	bcrypt: async (value: string) => await bcrypt.hash(value, 10),
@@ -17,6 +19,22 @@ export const providers = {
 				}
 			})
 		}),
-}
+	encrypt: async (value: Buffer): Promise<{ encrypted: Buffer; iv: Buffer }> => {
+		if (!args.encryptionKey) {
+			throw new Error('encryption key not provided')
+		}
 
-type Providers = typeof providers
+		const iv = crypto.randomBytes(16)
+		const cypher = crypto.createCipheriv(cryptoAlgo, args.encryptionKey, iv)
+		return { encrypted: cypher.update(value), iv }
+	},
+	decrypt: async (valueEncrypted: Buffer, iv: Buffer): Promise<Buffer> => {
+		if (!args.encryptionKey) {
+			throw new Error('encryption key not provided')
+		}
+		const decypher = crypto.createDecipheriv(cryptoAlgo, args.encryptionKey, iv)
+		return decypher.update(valueEncrypted)
+	},
+})
+
+export type Providers = ReturnType<typeof createProviders>

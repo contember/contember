@@ -10,7 +10,7 @@ import {
 	ContentQueryHandlerProvider,
 	ContentSchemaResolver,
 	GraphQlSchemaFactory,
-	providers,
+	Providers,
 } from '@contember/engine-http'
 import { ContentQueryHandlerFactory } from '@contember/engine-http'
 
@@ -19,6 +19,7 @@ export const createProjectContainer = (
 	project: ProjectConfig,
 	plugins: Plugin[],
 	schemaVersionBuilder: SchemaVersionBuilder,
+	providers: Providers,
 ) => {
 	const projectContainer = new Builder({})
 		.addService('providers', () => providers)

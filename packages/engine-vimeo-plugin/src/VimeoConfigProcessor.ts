@@ -1,4 +1,4 @@
-import { ConfigProcessor } from '@contember/engine-plugins'
+import { ConfigProcessor, ConfigTemplate, ConfigTemplateContext } from '@contember/engine-plugins'
 import { isObject, typeConfigError, hasStringProperty } from '@contember/engine-common'
 import { ProjectWithVimeoConfig, VimeoConfig } from './Config'
 
@@ -7,6 +7,15 @@ export class VimeoConfigProcessor implements ConfigProcessor<ProjectWithVimeoCon
 		return {
 			...config,
 			vimeo: checkVimeoConfig(config.vimeo, `projects.${slug}.vimeo`),
+		}
+	}
+
+	prepareConfigTemplate(template: ConfigTemplate, { env }: ConfigTemplateContext) {
+		return {
+			...template,
+			vimeo: {
+				token: `%?project.secret.vimeo.token||project.env.VIMEO_TOKEN%`,
+			},
 		}
 	}
 }

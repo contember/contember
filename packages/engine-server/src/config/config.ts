@@ -408,7 +408,7 @@ export async function readConfig(
 						return value
 					}
 				}
-				return parametersResolver(parts, path, dataResolver)
+				throw new UndefinedParameterError(`Parameter "${parts.join('.')}" not found.`)
 			})
 			return checkProjectStructure(resolvedConfig, slug, 'project')
 		},

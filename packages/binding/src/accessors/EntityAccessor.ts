@@ -232,14 +232,6 @@ class EntityAccessor implements Errorable {
 				`has-one relation. This method is meant exclusively for has-one relations.`,
 		)
 	}
-
-	/**
-	 * @deprecated
-	 * @see EntityAccessor.name
-	 */
-	public get typeName() {
-		return this.name
-	}
 }
 
 namespace EntityAccessor {

@@ -1,9 +1,6 @@
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
 import {
 	AddProjectMemberCommand,
 	AddProjectMemberCommandError,
-	CommandBus,
 	MembershipUpdateInput,
 	RemoveProjectMemberCommand,
 	RemoveProjectMemberResponse,
@@ -20,20 +17,20 @@ import { indexListBy, notEmpty } from '../../utils/array'
 import { createSetMembershipVariables } from './membershipUtils'
 import { ProjectRole } from '@contember/schema'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { DatabaseContext } from '../utils'
 
 export class ProjectMemberManager {
-	constructor(
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
-		private readonly commandBus: CommandBus,
-	) {}
+	constructor(private readonly dbContext: DatabaseContext) {}
 
 	async getProjectRoles(projectId: string, identityId: string): Promise<GetProjectRolesResponse> {
-		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery({ id: projectId }, identityId))
+		const row = await this.dbContext.queryHandler.fetch(new ProjectRolesByIdentityQuery({ id: projectId }, identityId))
 		return new GetProjectRolesResponse(row.roles)
 	}
 
 	async getProjectBySlugRoles(projectSlug: string, identityId: string): Promise<GetProjectRolesResponse> {
-		const row = await this.queryHandler.fetch(new ProjectRolesByIdentityQuery({ slug: projectSlug }, identityId))
+		const row = await this.dbContext.queryHandler.fetch(
+			new ProjectRolesByIdentityQuery({ slug: projectSlug }, identityId),
+		)
 		return new GetProjectRolesResponse(row.roles)
 	}
 
@@ -42,8 +39,8 @@ export class ProjectMemberManager {
 		identityId: string,
 		memberships: readonly Membership[],
 	): Promise<AddProjectMemberResponse> {
-		return await this.commandBus.transaction(async bus => {
-			const result = await bus.execute(
+		return await this.dbContext.transaction(async db => {
+			const result = await db.commandBus.execute(
 				new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
 			)
 			if (result.ok) {
@@ -65,14 +62,14 @@ export class ProjectMemberManager {
 		identityId: string,
 		memberships: readonly MembershipUpdateInput[],
 	): Promise<UpdateProjectMemberResponse> {
-		return await this.commandBus.transaction(
-			async bus => await bus.execute(new UpdateProjectMemberCommand(projectId, identityId, memberships)),
+		return await this.dbContext.transaction(
+			async db => await db.commandBus.execute(new UpdateProjectMemberCommand(projectId, identityId, memberships)),
 		)
 	}
 
 	async removeProjectMember(projectId: string, identityId: string): Promise<RemoveProjectMemberResponse> {
-		return await this.commandBus.transaction(
-			async bus => await bus.execute(new RemoveProjectMemberCommand(projectId, identityId)),
+		return await this.dbContext.transaction(
+			async db => await db.commandBus.execute(new RemoveProjectMemberCommand(projectId, identityId)),
 		)
 	}
 
@@ -84,7 +81,9 @@ export class ProjectMemberManager {
 		if (identity.roles?.includes(TenantRole.SUPER_ADMIN)) {
 			return [{ role: ProjectRole.ADMIN, variables: [] }]
 		}
-		const memberships = await this.queryHandler.fetch(new ProjectMembershipByIdentityQuery(project, [identity.id]))
+		const memberships = await this.dbContext.queryHandler.fetch(
+			new ProjectMembershipByIdentityQuery(project, [identity.id]),
+		)
 		if (verifier === undefined) {
 			return memberships
 		}
@@ -92,18 +91,20 @@ export class ProjectMemberManager {
 	}
 
 	async getProjectMembers(projectId: string, accessVerifier: AccessVerifier): Promise<GetProjectMembersResponse> {
-		const members = await this.queryHandler.fetch(new ProjectMembersQuery(projectId))
-		const memberships = await this.queryHandler.fetch(
-			new ProjectMembershipByIdentityQuery(
-				{ id: projectId },
-				members.map(it => it.id),
-			),
-		)
-		const filteredMemberships = await this.filterMemberships(memberships, accessVerifier)
-		const byIdentity = indexListBy(filteredMemberships, 'identityId')
-		return members
-			.map(it => (byIdentity[it.id] ? { identity: it, memberships: byIdentity[it.id] } : null))
-			.filter(notEmpty)
+		return this.dbContext.transaction(async db => {
+			const members = await db.queryHandler.fetch(new ProjectMembersQuery(projectId))
+			const memberships = await db.queryHandler.fetch(
+				new ProjectMembershipByIdentityQuery(
+					{ id: projectId },
+					members.map(it => it.id),
+				),
+			)
+			const filteredMemberships = await this.filterMemberships(memberships, accessVerifier)
+			const byIdentity = indexListBy(filteredMemberships, 'identityId')
+			return members
+				.map(it => (byIdentity[it.id] ? { identity: it, memberships: byIdentity[it.id] } : null))
+				.filter(notEmpty)
+		})
 	}
 
 	private async filterMemberships<T extends Membership>(

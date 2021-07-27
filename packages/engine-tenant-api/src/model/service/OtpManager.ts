@@ -1,22 +1,23 @@
 import { PersonRow } from '../queries'
 import { CommandBus, ConfirmOtpCommand, DisableOtpCommand, PrepareOtpCommand } from '../commands'
 import { createOtp, OtpData, verifyOtp } from '../utils/otp'
+import { DatabaseContext } from '../utils'
 
 export class OtpManager {
-	constructor(private readonly commandBus: CommandBus) {}
+	constructor(private readonly dbContext: DatabaseContext) {}
 
 	async prepareOtp(person: PersonRow, label: string): Promise<OtpData> {
 		const otp = createOtp(person.email, label)
-		await this.commandBus.execute(new PrepareOtpCommand(person.id, otp.uri))
+		await this.dbContext.commandBus.execute(new PrepareOtpCommand(person.id, otp.uri))
 		return otp
 	}
 
 	async confirmOtp(person: PersonRow): Promise<void> {
-		await this.commandBus.execute(new ConfirmOtpCommand(person.id))
+		await this.dbContext.commandBus.execute(new ConfirmOtpCommand(person.id))
 	}
 
 	async disableOtp(person: PersonRow): Promise<void> {
-		await this.commandBus.execute(new DisableOtpCommand(person.id))
+		await this.dbContext.commandBus.execute(new DisableOtpCommand(person.id))
 	}
 
 	verifyOtp(person: PersonRow, token: string): boolean {

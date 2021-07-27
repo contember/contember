@@ -7,6 +7,7 @@ import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
 import { MailTemplateQuery } from '../queries/MailTemplateQuery'
 import Layout from './templates/Layout.mustache'
+import { DatabaseContext } from '../utils'
 
 type SomeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
@@ -14,7 +15,7 @@ export class UserMailer {
 	constructor(
 		private readonly mailer: Mailer,
 		private readonly templateRenderer: TemplateRenderer,
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
+		private readonly dbContext: DatabaseContext,
 	) {}
 
 	async sendNewUserInvitedMail(
@@ -68,7 +69,7 @@ export class UserMailer {
 		if (!identifier.projectId) {
 			return null
 		}
-		const customTemplate = await this.queryHandler.fetch(
+		const customTemplate = await this.dbContext.queryHandler.fetch(
 			new MailTemplateQuery(identifier.projectId, identifier.type, identifier.variant),
 		)
 		if (!customTemplate) {

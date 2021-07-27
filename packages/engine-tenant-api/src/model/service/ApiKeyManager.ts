@@ -1,8 +1,5 @@
-import { DatabaseQueryable } from '@contember/database'
-import { QueryHandler } from '@contember/queryable'
 import {
 	AddProjectMemberCommand,
-	CommandBus,
 	CreateApiKeyCommand,
 	CreateIdentityCommand,
 	DisableApiKeyCommand,
@@ -17,15 +14,13 @@ import { TenantRole } from '../authorization'
 import { ApiKeyByTokenQuery } from '../queries'
 import { createSetMembershipVariables } from './membershipUtils'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { DatabaseContext } from '../utils'
 
 export class ApiKeyManager {
-	constructor(
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
-		private readonly commandBus: CommandBus,
-	) {}
+	constructor(private readonly dbContext: DatabaseContext) {}
 
 	async verifyAndProlong(token: string): Promise<VerifyResponse> {
-		const apiKeyRow = await this.queryHandler.fetch(new ApiKeyByTokenQuery(token))
+		const apiKeyRow = await this.dbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
 		if (apiKeyRow === null) {
 			return new ResponseError(VerifyErrorCode.NOT_FOUND, 'API key was not found')
 		}
@@ -43,7 +38,7 @@ export class ApiKeyManager {
 		}
 
 		setImmediate(async () => {
-			await this.commandBus.execute(
+			await this.dbContext.commandBus.execute(
 				new ProlongApiKeyCommand(apiKeyRow.id, apiKeyRow.type, apiKeyRow.expiration || undefined),
 			)
 		})
@@ -52,7 +47,9 @@ export class ApiKeyManager {
 	}
 
 	async createSessionApiKey(identityId: string, expiration?: number): Promise<string> {
-		return (await this.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.SESSION, identityId, expiration))).token
+		return (
+			await this.dbContext.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.SESSION, identityId, expiration))
+		).token
 	}
 
 	async createLoginApiKey(): Promise<CreateApiKeyResult> {
@@ -64,15 +61,15 @@ export class ApiKeyManager {
 	}
 
 	async disableOneOffApiKey(apiKeyId: string): Promise<void> {
-		await this.commandBus.execute(new DisableOneOffApiKeyCommand(apiKeyId))
+		await this.dbContext.commandBus.execute(new DisableOneOffApiKeyCommand(apiKeyId))
 	}
 
 	async disableApiKey(apiKeyId: string): Promise<boolean> {
-		return await this.commandBus.execute(new DisableApiKeyCommand(apiKeyId))
+		return await this.dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyId))
 	}
 
 	async disableIdentityApiKeys(identityId: string): Promise<void> {
-		await this.commandBus.execute(new DisableIdentityApiKeysCommand(identityId))
+		await this.dbContext.commandBus.execute(new DisableIdentityApiKeysCommand(identityId))
 	}
 
 	async createProjectPermanentApiKey(
@@ -80,11 +77,11 @@ export class ApiKeyManager {
 		memberships: readonly Membership[],
 		description: string,
 	): Promise<CreateApiKeyResponse> {
-		return await this.commandBus.transaction(async bus => {
-			const identityId = await bus.execute(new CreateIdentityCommand([], description))
-			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
+		return await this.dbContext.transaction(async db => {
+			const identityId = await db.commandBus.execute(new CreateIdentityCommand([], description))
+			const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
 
-			const addMemberResult = await bus.execute(
+			const addMemberResult = await db.commandBus.execute(
 				new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
 			)
 			if (!addMemberResult.ok) {
@@ -96,9 +93,9 @@ export class ApiKeyManager {
 	}
 
 	async createGlobalApiKey(roles: TenantRole[]): Promise<CreateApiKeyResponse> {
-		return await this.commandBus.transaction(async bus => {
-			const identityId = await bus.execute(new CreateIdentityCommand(roles))
-			const apiKeyResult = await bus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
+		return await this.dbContext.transaction(async db => {
+			const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
+			const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
 
 			return new ResponseOk(new CreateApiKeyResult(identityId, apiKeyResult))
 		})

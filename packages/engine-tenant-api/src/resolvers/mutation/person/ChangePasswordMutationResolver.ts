@@ -8,13 +8,13 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
 import { QueryHandler } from '@contember/queryable'
 import { DatabaseQueryable } from '@contember/database'
-import { PermissionActions, IdentityScope, PasswordChangeManager, PersonQuery } from '../../../model'
+import { PermissionActions, IdentityScope, PasswordChangeManager, PersonQuery, DatabaseContext } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class ChangePasswordMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly passwordChangeManager: PasswordChangeManager,
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
+		private readonly dbContext: DatabaseContext,
 	) {}
 
 	async changePassword(
@@ -23,7 +23,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ChangePasswordResponse> {
-		const person = await this.queryHandler.fetch(PersonQuery.byId(args.personId))
+		const person = await this.dbContext.queryHandler.fetch(PersonQuery.byId(args.personId))
 		if (!person) {
 			return createErrorResponse(ChangePasswordErrorCode.PersonNotFound, 'Person not found')
 		}

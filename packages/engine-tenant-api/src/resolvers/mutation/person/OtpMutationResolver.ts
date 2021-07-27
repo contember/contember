@@ -9,18 +9,12 @@ import {
 	PrepareOtpResponse,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
-import { PermissionActions, PersonQuery, PersonRow } from '../../../model'
-import { OtpManager } from '../../../model/service'
+import { DatabaseContext, OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
 
 export class OtpMutationResolver implements MutationResolvers {
-	constructor(
-		private readonly otpManager: OtpManager,
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
-	) {}
+	constructor(private readonly otpManager: OtpManager, private readonly dbContext: DatabaseContext) {}
 
 	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: ResolverContext): Promise<PrepareOtpResponse> {
 		const person = await this.getPersonFromContext(context)
@@ -69,7 +63,7 @@ export class OtpMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_SETUP_OTP,
 			message: 'You are not allowed to setup a OTP',
 		})
-		const person = await this.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
+		const person = await this.dbContext.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
 			throw new ImplementationException('Person should exists')
 		}

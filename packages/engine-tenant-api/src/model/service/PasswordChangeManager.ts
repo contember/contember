@@ -1,10 +1,11 @@
 import { ChangePasswordErrorCode } from '../../schema'
-import { ChangePasswordCommand, CommandBus } from '../commands'
+import { ChangePasswordCommand } from '../commands'
 import { isWeakPassword, MIN_PASSWORD_LENGTH } from '../utils/password'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { DatabaseContext } from '../utils'
 
 class PasswordChangeManager {
-	constructor(private readonly commandBus: CommandBus) {}
+	constructor(private readonly dbContext: DatabaseContext) {}
 
 	async changePassword(personId: string, password: string): Promise<PasswordChangeManager.PasswordChangeResponse> {
 		if (isWeakPassword(password)) {
@@ -13,7 +14,7 @@ class PasswordChangeManager {
 				`Password is too weak. Minimum length is ${MIN_PASSWORD_LENGTH}`,
 			)
 		}
-		await this.commandBus.execute(new ChangePasswordCommand(personId, password))
+		await this.dbContext.commandBus.execute(new ChangePasswordCommand(personId, password))
 		return new ResponseOk(null)
 	}
 }

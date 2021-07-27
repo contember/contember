@@ -17,13 +17,14 @@ import {
 	PersonQuery,
 	ResetPasswordErrorCode,
 	ResetPasswordCommandErrorCode,
+	DatabaseContext,
 } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class ResetPasswordMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly passwordResetManager: PasswordResetManager,
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
+		private readonly dbContext: DatabaseContext,
 	) {}
 
 	async createResetPasswordRequest(
@@ -36,7 +37,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_RESET_PASSWORD,
 			message: 'You are not allowed to initialize reset password request',
 		})
-		const person = await this.queryHandler.fetch(PersonQuery.byEmail(args.email))
+		const person = await this.dbContext.queryHandler.fetch(PersonQuery.byEmail(args.email))
 		if (!person) {
 			return createErrorResponse(CreatePasswordResetRequestErrorCode.PersonNotFound, 'Person was not found.')
 		}

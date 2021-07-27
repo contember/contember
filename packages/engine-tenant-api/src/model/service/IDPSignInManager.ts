@@ -6,10 +6,11 @@ import { IDPManager } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
 import { IDPResponse, IDPResponseError, IDPValidationError } from './idp'
+import { DatabaseContext } from '../utils'
 
 class IDPSignInManager {
 	constructor(
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
+		private readonly dbContext: DatabaseContext,
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly idpManager: IDPManager,
 	) {}
@@ -21,7 +22,7 @@ class IDPSignInManager {
 		sessionData: any,
 		expiration?: number,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
-		const provider = await this.queryHandler.fetch(new IdentityProviderQuery(idpSlug))
+		const provider = await this.dbContext.queryHandler.fetch(new IdentityProviderQuery(idpSlug))
 		if (!provider) {
 			throw new Error('provider not found')
 		}
@@ -33,7 +34,7 @@ class IDPSignInManager {
 				idpResponse,
 				sessionData,
 			)
-			const personRow = await this.queryHandler.fetch(PersonQuery.byEmail(claim.email))
+			const personRow = await this.dbContext.queryHandler.fetch(PersonQuery.byEmail(claim.email))
 			if (!personRow) {
 				return new ResponseError(SignInIdpErrorCode.PersonNotFound, `Person ${claim.email} not found`)
 			}
@@ -52,7 +53,7 @@ class IDPSignInManager {
 	}
 
 	async initSignInIDP(idpSlug: string, redirectUrl: string): Promise<IDPSignInManager.InitSignInIDPResponse> {
-		const provider = await this.queryHandler.fetch(new IdentityProviderQuery(idpSlug))
+		const provider = await this.dbContext.queryHandler.fetch(new IdentityProviderQuery(idpSlug))
 		if (!provider) {
 			return new ResponseError(InitSignInIdpErrorCode.ProviderNotFound, `IDP provider ${idpSlug} was not found`)
 		}

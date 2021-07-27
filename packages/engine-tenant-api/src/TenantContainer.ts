@@ -1,11 +1,10 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
-import { Connection, DatabaseCredentials, DatabaseQueryable } from '@contember/database'
-import { QueryHandler } from '@contember/queryable'
+import { Connection, DatabaseCredentials } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
 	AclSchemaEvaluatorFactory,
 	ApiKeyManager,
-	CommandBus,
+	DatabaseContext,
 	Identity,
 	IdentityFactory,
 	IDPManager,
@@ -49,6 +48,7 @@ import {
 	ResetPasswordMutationResolver,
 	ResolverContextFactory,
 	ResolverFactory,
+	SetProjectSecretMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
@@ -57,7 +57,6 @@ import {
 import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
 import { IdentityFetcher } from './bridges/system/IdentityFetcher'
-import { SetProjectSecretMutationResolver } from './resolvers/mutation/project/SetProjectSecretMutationResolver'
 
 export interface TenantContainer {
 	connection: Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
@@ -103,38 +102,24 @@ export class TenantContainerFactory {
 				(): Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider =>
 					new Connection(args.tenantDbCredentials, {}),
 			)
+			.addService('providers', () => args.providers)
 			.addService('db', ({ connection }) => connection.createClient('tenant', { module: 'tenant' }))
+			.addService('dbContext', ({ db, providers }) => new DatabaseContext(db, providers))
 			.addService('mailer', () => createMailer(args.mailOptions))
 			.addService('projectSchemaResolver', () => args.projectSchemaResolver)
 			.addService('templateRenderer', () => new TemplateRenderer())
-			.addService('providers', () => args.providers)
-			.addService('commandBus', ({ db, providers }) => new CommandBus(db, providers))
-			.addService('queryHandler', ({ db }) => {
-				const handler = new QueryHandler(
-					new DatabaseQueryable(db, {
-						get(): QueryHandler<DatabaseQueryable> {
-							return handler
-						},
-					}),
-				)
-
-				return handler
-			})
 			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
 			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 
 			.addService(
 				'userMailer',
-				({ mailer, templateRenderer, queryHandler }) => new UserMailer(mailer, templateRenderer, queryHandler),
+				({ mailer, templateRenderer, dbContext }) => new UserMailer(mailer, templateRenderer, dbContext),
 			)
 
-			.addService('apiKeyManager', ({ queryHandler, commandBus }) => new ApiKeyManager(queryHandler, commandBus))
-			.addService('signUpManager', ({ queryHandler, commandBus }) => new SignUpManager(queryHandler, commandBus))
-			.addService('passwordChangeManager', ({ commandBus }) => new PasswordChangeManager(commandBus))
-			.addService(
-				'projectMemberManager',
-				({ queryHandler, commandBus }) => new ProjectMemberManager(queryHandler, commandBus),
-			)
+			.addService('apiKeyManager', ({ dbContext }) => new ApiKeyManager(dbContext))
+			.addService('signUpManager', ({ dbContext }) => new SignUpManager(dbContext))
+			.addService('passwordChangeManager', ({ dbContext }) => new PasswordChangeManager(dbContext))
+			.addService('projectMemberManager', ({ dbContext }) => new ProjectMemberManager(dbContext))
 			.addService('identityFactory', ({ projectMemberManager }) => new IdentityFactory(projectMemberManager))
 			.addService(
 				'projectScopeFactory',
@@ -145,19 +130,15 @@ export class TenantContainerFactory {
 				({ authorizator, identityFactory, projectScopeFactory }) =>
 					new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory),
 			)
-			.addService(
-				'secretManager',
-				({ commandBus, queryHandler, providers }) => new SecretsManager(commandBus, queryHandler, providers),
-			)
+			.addService('secretManager', ({ dbContext, providers }) => new SecretsManager(dbContext, providers))
 			.addService(
 				'projectManager',
-				({ db, queryHandler, secretManager, providers }) =>
-					new ProjectManager(db, queryHandler, secretManager, providers, args.projectInitializer),
+				({ dbContext, secretManager }) => new ProjectManager(dbContext, secretManager, args.projectInitializer),
 			)
 			.addService(
 				'passwordResetManager',
-				({ commandBus, userMailer, permissionContextFactory, projectManager }) =>
-					new PasswordResetManager(commandBus, userMailer, permissionContextFactory, projectManager),
+				({ dbContext, userMailer, permissionContextFactory, projectManager }) =>
+					new PasswordResetManager(dbContext, userMailer, permissionContextFactory, projectManager),
 			)
 			.addService('idpManager', () => {
 				const idpManager = new IDPManager()
@@ -166,22 +147,22 @@ export class TenantContainerFactory {
 			})
 			.addService(
 				'idpSignInManager',
-				({ queryHandler, apiKeyManager, idpManager }) => new IDPSignInManager(queryHandler, apiKeyManager, idpManager),
+				({ dbContext, apiKeyManager, idpManager }) => new IDPSignInManager(dbContext, apiKeyManager, idpManager),
 			)
 			.addService(
 				'signInManager',
-				({ queryHandler, apiKeyManager, providers }) => new SignInManager(queryHandler, apiKeyManager, providers),
+				({ apiKeyManager, providers, dbContext }) => new SignInManager(dbContext, apiKeyManager, providers),
 			)
 			.addService('membershipValidator', ({ projectSchemaResolver }) => new MembershipValidator(projectSchemaResolver))
 			.addService('inviteManager', ({ db, providers, userMailer }) => new InviteManager(db, providers, userMailer))
-			.addService('otpManager', ({ commandBus }) => new OtpManager(commandBus))
-			.addService('mailTemplateManager', ({ commandBus }) => new MailTemplateManager(commandBus))
+			.addService('otpManager', ({ dbContext }) => new OtpManager(dbContext))
+			.addService('mailTemplateManager', ({ dbContext }) => new MailTemplateManager(dbContext))
 			.addService('identityFetcher', ({ db }) => new IdentityFetcher(db))
 
 			.addService(
 				'identityTypeResolver',
-				({ queryHandler, projectMemberManager, projectManager }) =>
-					new IdentityTypeResolver(queryHandler, projectMemberManager, projectManager),
+				({ dbContext, projectMemberManager, projectManager }) =>
+					new IdentityTypeResolver(dbContext, projectMemberManager, projectManager),
 			)
 			.addService(
 				'projectTypeResolver',
@@ -206,17 +187,15 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'signOutMutationResolver',
-				({ apiKeyManager, queryHandler }) => new SignOutMutationResolver(apiKeyManager, queryHandler),
+				({ apiKeyManager, dbContext }) => new SignOutMutationResolver(apiKeyManager, dbContext),
 			)
 			.addService(
 				'changePasswordMutationResolver',
-				({ passwordChangeManager, queryHandler }) =>
-					new ChangePasswordMutationResolver(passwordChangeManager, queryHandler),
+				({ passwordChangeManager, dbContext }) => new ChangePasswordMutationResolver(passwordChangeManager, dbContext),
 			)
 			.addService(
 				'resetPasswordMutationResolver',
-				({ passwordResetManager, queryHandler }) =>
-					new ResetPasswordMutationResolver(passwordResetManager, queryHandler),
+				({ passwordResetManager, dbContext }) => new ResetPasswordMutationResolver(passwordResetManager, dbContext),
 			)
 			.addService(
 				'inviteMutationResolver',
@@ -247,10 +226,7 @@ export class TenantContainerFactory {
 				'disableApiKeyMutationResolver',
 				({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager),
 			)
-			.addService(
-				'otpMutationResolver',
-				({ otpManager, queryHandler }) => new OtpMutationResolver(otpManager, queryHandler),
-			)
+			.addService('otpMutationResolver', ({ otpManager, dbContext }) => new OtpMutationResolver(otpManager, dbContext))
 			.addService(
 				'mailTemplateMutationResolver',
 				({ projectManager, mailTemplateManager }) =>

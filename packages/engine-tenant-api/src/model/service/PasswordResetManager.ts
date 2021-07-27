@@ -1,16 +1,11 @@
-import {
-	CommandBus,
-	CreatePasswordResetRequestCommand,
-	ResetPasswordCommand,
-	ResetPasswordCommandErrorCode,
-} from '../commands'
+import { CreatePasswordResetRequestCommand, ResetPasswordCommand, ResetPasswordCommandErrorCode } from '../commands'
 import { Response, ResponseError } from '../utils/Response'
 import { isWeakPassword, MIN_PASSWORD_LENGTH } from '../utils/password'
 import { UserMailer } from '../mailing'
 import { PersonRow } from '../queries'
 import { PermissionContextFactory } from '../authorization'
 import { ProjectManager } from './ProjectManager'
-import { ChangePasswordErrorCode } from '../../schema'
+import { DatabaseContext } from '../utils'
 
 interface MailOptions {
 	project?: string
@@ -19,14 +14,14 @@ interface MailOptions {
 
 export class PasswordResetManager {
 	constructor(
-		private readonly commandBus: CommandBus,
+		private readonly dbContext: DatabaseContext,
 		private readonly mailer: UserMailer,
 		private readonly permissionContextFactory: PermissionContextFactory,
 		private readonly projectManager: ProjectManager,
 	) {}
 
 	public async createPasswordResetRequest(person: PersonRow, mailOptions: MailOptions = {}) {
-		const result = await this.commandBus.execute(new CreatePasswordResetRequestCommand(person.id))
+		const result = await this.dbContext.commandBus.execute(new CreatePasswordResetRequestCommand(person.id))
 		const permissionContext = await this.permissionContextFactory.create({
 			id: person.identity_id,
 			roles: person.roles,
@@ -61,7 +56,7 @@ export class PasswordResetManager {
 				`Password is too weak. Minimum length is ${MIN_PASSWORD_LENGTH}`,
 			)
 		}
-		return await this.commandBus.execute(new ResetPasswordCommand(token, password))
+		return await this.dbContext.commandBus.execute(new ResetPasswordCommand(token, password))
 	}
 }
 

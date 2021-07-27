@@ -1,7 +1,5 @@
 import { Identity, IdentityProjectRelation, IdentityResolvers, Maybe, Person } from '../../schema'
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
-import { PersonRow, ProjectManager } from '../../model'
+import { DatabaseContext, PersonRow, ProjectManager } from '../../model'
 import { ResolverContext } from '../ResolverContext'
 import { ProjectMemberManager } from '../../model/service'
 import { notEmpty } from '../../utils/array'
@@ -11,14 +9,14 @@ import { PersonByIdentityBatchQuery } from '../../model/queries/person/PersonByI
 export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = createBatchLoader<string, Record<string, PersonRow>, PersonRow>(
 		async ids => {
-			const persons = await this.queryHandler.fetch(new PersonByIdentityBatchQuery(ids))
+			const persons = await this.dbContext.queryHandler.fetch(new PersonByIdentityBatchQuery(ids))
 			return Object.fromEntries(persons.map(it => [it.identity_id, it]))
 		},
 		(id, result) => result[id],
 	)
 
 	constructor(
-		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
+		private readonly dbContext: DatabaseContext,
 		private readonly projectMemberManager: ProjectMemberManager,
 		private readonly projectManager: ProjectManager,
 	) {}

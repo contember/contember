@@ -2,19 +2,7 @@
 	"$schema": "https://developer.microsoft.com/json-schemas/api-extractor/v7/api-extractor.schema.json",
 
 	"mainEntryPointFilePath": "<projectFolder>/temp/index.d.ts",
-	"bundledPackages": [
-		"@contember/admin",
-		"@contember/admin-i18n",
-		"@contember/admin-server",
-		"@contember/binding",
-		"@contember/client",
-		"@contember/react-client",
-		"@contember/react-multipass-rendering",
-		"@contember/react-utils",
-		"@contember/ui",
-		"@contember/utils",
-		"@contember/vimeo-file-uploader"
-	],
+	"bundledPackages": ["@contember/schema"],
 	"apiReport": {
 		"enabled": false,
 		"reportFileName": "<unscopedPackageName>.api.md",
@@ -27,31 +15,31 @@
 			"compilerOptions": {
 				"baseUrl": ".",
 				"paths": {
-					"@contember/admin":  ["../admin/temp"],
-					"@contember/admin-i18n":  ["../admin-i18n/temp"],
-					"@contember/admin-server":  ["../admin-server/temp"],
-					"@contember/binding":  ["../binding/temp"],
-					"@contember/client":  ["../client/temp"],
-					"@contember/react-client":  ["../react-client/temp"],
-					"@contember/react-multipass-rendering":  ["../react-multipass-rendering/temp"],
-					"@contember/react-utils":  ["../react-utils/temp"],
-					"@contember/ui":  ["../ui/temp"],
-					"@contember/utils":  ["../utils/temp"],
-					"@contember/vimeo-file-uploader":  ["../vimeo-file-uploader/temp"]
+					"@contember/admin": ["../admin/dist/admin.d.ts"],
+					"@contember/admin-i18n": ["../admin-i18n/dist/admin-i18n.d.ts"],
+					"@contember/admin-server": ["../admin-server/dist/admin-server.d.ts"],
+					"@contember/binding": ["../binding/dist/binding.d.ts"],
+					"@contember/client": ["../client/dist/client.d.ts"],
+					"@contember/react-client": ["../react-client/dist/react-client.d.ts"],
+					"@contember/react-multipass-rendering": ["../react-multipass-rendering/dist/react-multipass-rendering.d.ts"],
+					"@contember/react-utils": ["../react-utils/dist/react-utils.d.ts"],
+					"@contember/ui": ["../ui/dist/ui.d.ts"],
+					"@contember/utils": ["../utils/dist/utils.d.ts"],
+					"@contember/vimeo-file-uploader": ["../vimeo-file-uploader/dist/vimeo-file-uploader.d.ts"]
 				}
 			}
 		}
 	},
 	"docModel": {
 		"enabled": true,
-		"apiJsonFilePath": "<projectFolder>/temp/api-extractor/<unscopedPackageName>.api.json"
+		"apiJsonFilePath": "<projectFolder>/../../temp/<unscopedPackageName>.api.json"
 	},
 	"dtsRollup": {
 		"enabled": true,
 		"untrimmedFilePath": "<projectFolder>/dist/<unscopedPackageName>.d.ts"
 	},
 	"tsdocMetadata": {
-		"enabled": true,
+		"enabled": false,
 		"tsdocMetadataFilePath": "<projectFolder>/dist/tsdoc-metadata.json"
 	},
 	"newlineKind": "lf",

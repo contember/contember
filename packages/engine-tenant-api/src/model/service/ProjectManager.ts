@@ -3,7 +3,7 @@ import { QueryHandler } from '@contember/queryable'
 import { CommandBus, CreateProjectCommand, SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
 import { PermissionContext } from '../authorization'
 import { Project, ProjectInitializer, ProjectWithSecrets } from '../type'
-import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery } from '../queries'
+import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery, ProjectUpdateTimestampQuery } from '../queries'
 import { SecretsManager } from './SecretsManager'
 import { Providers } from '../providers'
 import { DatabaseContext } from '../utils'
@@ -21,7 +21,8 @@ export class ProjectManager {
 		return await this.dbContext.transaction(async db => {
 			const bus = db.commandBus
 
-			const id = await bus.execute(new CreateProjectCommand(project))
+			const now = db.providers.now()
+			const id = await bus.execute(new CreateProjectCommand(project, now))
 			if (!id) {
 				return false
 			}
@@ -32,6 +33,7 @@ export class ProjectManager {
 				await this.projectIntializer({
 					id,
 					...project,
+					updatedAt: now,
 				})
 			} catch (e) {
 				// eslint-disable-next-line no-console
@@ -51,9 +53,15 @@ export class ProjectManager {
 		return await this.dbContext.queryHandler.fetch(new ProjectBySlugQuery(slug))
 	}
 
-	public async getProjectWithSecretsBySlug(
-		slug: string,
-	): Promise<(Project & { secrets: Record<string, string> }) | null> {
+	public async getProjectState(slug: string, updatedAt: Date): Promise<'valid' | 'updated' | 'not_found'> {
+		const updatedNew = await this.dbContext.queryHandler.fetch(new ProjectUpdateTimestampQuery(slug))
+		if (!updatedNew) {
+			return 'not_found'
+		}
+		return updatedNew > updatedAt ? 'updated' : 'valid'
+	}
+
+	public async getProjectWithSecretsBySlug(slug: string): Promise<ProjectWithSecrets | null> {
 		const project = await this.dbContext.queryHandler.fetch(new ProjectBySlugQuery(slug))
 		if (!project) {
 			return null

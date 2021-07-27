@@ -9,6 +9,7 @@ export interface Project {
 
 export interface ProjectWithSecrets extends Project {
 	readonly secrets: Record<string, string>
+	readonly updatedAt: Date
 }
 
 export type ProjectSchemaResolver = (projectSlug: string) => Promise<Schema | undefined>

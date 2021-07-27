@@ -5,7 +5,7 @@ import { ProjectConfigResolver, ProjectContainer, Providers } from '@contember/e
 import { ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
 
 export class ProjectContainerResolver {
-	private containers = new Map<string, { container: ProjectContainer; cleanups: (() => void)[] }>()
+	private containers = new Map<string, { container: ProjectContainer; cleanups: (() => void)[]; timestamp: Date }>()
 
 	public readonly onCreate: ((container: ProjectContainer) => void | (() => void))[] = []
 	constructor(
@@ -34,7 +34,14 @@ export class ProjectContainerResolver {
 		// todo: process alias
 		const existing = this.containers.get(slug)
 		if (existing) {
-			return existing.container
+			const state = await this.projectManager.getProjectState(slug, existing.timestamp)
+			if (state === 'valid') {
+				return existing.container
+			}
+			this.destroyContainer(slug)
+			if (state === 'not_found') {
+				return undefined
+			}
 		}
 		const project = await this.projectManager.getProjectWithSecretsBySlug(slug)
 		if (!project) {
@@ -60,6 +67,7 @@ export class ProjectContainerResolver {
 		this.containers.set(project.slug, {
 			container: projectContainer,
 			cleanups,
+			timestamp: project.updatedAt,
 		})
 		return projectContainer
 	}

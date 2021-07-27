@@ -4,19 +4,19 @@ import type { RelativeEntityList, SugaredRelativeEntityList } from '../treeParam
 import { useEnvironment } from './useEnvironment'
 
 /**
- * @deprecated
+ * @deprecated Use useEntityList instead.
  */
 function useDesugaredRelativeEntityList(
 	sugaredRelativeEntityList: string | SugaredRelativeEntityList,
 ): RelativeEntityList
 /**
- * @deprecated
+ * @deprecated Use useEntityList instead.
  */
 function useDesugaredRelativeEntityList(
 	sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined,
 ): RelativeEntityList | undefined
 /**
- * @deprecated
+ * @deprecated Use useEntityList instead.
  */
 function useDesugaredRelativeEntityList(
 	sugaredRelativeEntityList: string | SugaredRelativeEntityList | undefined,

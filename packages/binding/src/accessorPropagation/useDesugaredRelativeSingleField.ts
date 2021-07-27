@@ -4,19 +4,19 @@ import type { RelativeSingleField, SugaredRelativeSingleField } from '../treePar
 import { useEnvironment } from './useEnvironment'
 
 /**
- * @deprecated
+ * @deprecated Use useField instead.
  */
 function useDesugaredRelativeSingleField(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField,
 ): RelativeSingleField
 /**
- * @deprecated
+ * @deprecated Use useField instead.
  */
 function useDesugaredRelativeSingleField(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,
 ): RelativeSingleField | undefined
 /**
- * @deprecated
+ * @deprecated Use useField instead.
  */
 function useDesugaredRelativeSingleField(
 	sugaredRelativeSingleField: string | SugaredRelativeSingleField | undefined,

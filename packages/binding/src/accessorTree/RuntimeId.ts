@@ -1,6 +1,6 @@
 import { generateEnumerabilityPreventingEntropy } from '../utils'
 
-interface RuntimeIdSpec {
+export interface RuntimeIdSpec {
 	existsOnServer: boolean
 	value: string
 }

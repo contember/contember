@@ -5,3 +5,5 @@ export * from './repairEntitiesOrder'
 export * from './SetOrderFieldOnCreate'
 export * from './sortEntities'
 export * from './useSortedEntities'
+
+export type { SortedEntities } from './SortedEntities'

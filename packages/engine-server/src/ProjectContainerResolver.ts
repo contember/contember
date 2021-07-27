@@ -5,8 +5,9 @@ import { ProjectConfigResolver, ProjectContainer, Providers } from '@contember/e
 import { ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
 
 export class ProjectContainerResolver {
-	private containers = new Map<string, ProjectContainer>()
-	public readonly onCreate: ((container: ProjectContainer) => void)[] = []
+	private containers = new Map<string, { container: ProjectContainer; cleanups: (() => void)[] }>()
+
+	public readonly onCreate: ((container: ProjectContainer) => void | (() => void))[] = []
 	constructor(
 		private debug: boolean,
 		private projectConfigResolver: ProjectConfigResolver,
@@ -29,15 +30,11 @@ export class ProjectContainerResolver {
 		)
 	}
 
-	public getExistingProjectContainer(): ProjectContainer[] {
-		return Array.from(this.containers.values())
-	}
-
 	public async getProjectContainer(slug: string, alias: boolean = false): Promise<ProjectContainer | undefined> {
 		// todo: process alias
 		const existing = this.containers.get(slug)
 		if (existing) {
-			return existing
+			return existing.container
 		}
 		const project = await this.projectManager.getProjectWithSecretsBySlug(slug)
 		if (!project) {
@@ -46,11 +43,11 @@ export class ProjectContainerResolver {
 		return this.createProjectContainer(project)
 	}
 
-	private createProjectContainer(project: ProjectWithSecrets): ProjectContainer {
+	public createProjectContainer(project: ProjectWithSecrets): ProjectContainer {
 		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets)
 		const existing = this.containers.get(project.slug)
 		if (existing) {
-			return existing
+			return existing.container
 		}
 		const projectContainer = createProjectContainer(
 			this.debug,
@@ -59,8 +56,24 @@ export class ProjectContainerResolver {
 			this.schemaVersionBuilder,
 			this.providers,
 		)
-		this.onCreate.forEach(it => it(projectContainer))
-		this.containers.set(project.slug, projectContainer)
+		const cleanups = this.onCreate.map(it => it(projectContainer) || (() => null))
+		this.containers.set(project.slug, {
+			container: projectContainer,
+			cleanups,
+		})
 		return projectContainer
+	}
+
+	public destroyContainer(slug: string): void {
+		const existing = this.containers.get(slug)
+		if (existing) {
+			existing.cleanups.forEach(it => it())
+			this.containers.delete(slug)
+		}
+		process.nextTick(() => {
+			if (global.gc) {
+				global.gc()
+			}
+		})
 	}
 }

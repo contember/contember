@@ -166,13 +166,13 @@ class CompositionRoot {
 				prom.collectDefaultMetrics({ register })
 				const registrar = createDbMetricsRegistrar(register)
 				registrar({ connection: tenantContainer.connection, module: 'tenant', project: 'unknown' })
-				projectContainerResolver.onCreate.push(container => {
+				projectContainerResolver.onCreate.push(container =>
 					registrar({
 						connection: container.connection,
 						module: 'project',
 						project: container.project.slug,
-					})
-				})
+					}),
+				)
 				return register
 			})
 			.addService(

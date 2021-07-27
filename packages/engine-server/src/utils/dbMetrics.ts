@@ -6,11 +6,12 @@ type DatabaseMetricsEntry = {
 	module: string
 	project: string
 }
-type DatabaseMetricsRegistrar = (entry: DatabaseMetricsEntry) => void
+type Unregistrar = () => void
+type DatabaseMetricsRegistrar = (entry: DatabaseMetricsEntry) => Unregistrar
 
 export const createDbMetricsRegistrar = (registry: prom.Registry): DatabaseMetricsRegistrar => {
 	const dbPoolCollectorInner = createSingleDbPoolMetricsCollector(registry)
-	const entries: DatabaseMetricsEntry[] = []
+	const entries = new Set<DatabaseMetricsEntry>()
 	const collector = () => {
 		for (const entry of entries) {
 			dbPoolCollectorInner(entry.connection, { contember_module: entry.module, contember_project: entry.project })
@@ -19,8 +20,15 @@ export const createDbMetricsRegistrar = (registry: prom.Registry): DatabaseMetri
 	registry.registerCollector(collector)
 	const sqlMetricsRegistrar = createSqlMetricsRegistrar(registry)
 	return entry => {
-		entries.push(entry)
-		sqlMetricsRegistrar(entry.connection, { contember_module: entry.module, contember_project: entry.project })
+		entries.add(entry)
+		const sqlMetricsUnregistrar = sqlMetricsRegistrar(entry.connection, {
+			contember_module: entry.module,
+			contember_project: entry.project,
+		})
+		return () => {
+			entries.delete(entry)
+			sqlMetricsUnregistrar()
+		}
 	}
 }
 
@@ -59,8 +67,11 @@ const createSingleDbPoolMetricsCollector = (registry: prom.Registry) => {
 		maxCount.set(labels, poolInfo.maxCount)
 	}
 }
-
-const createSqlMetricsRegistrar = (registry: prom.Registry) => {
+type SqlMetricsRegistrar = (
+	connection: Connection.Queryable,
+	labels: { contember_module?: string; contember_project?: string },
+) => Unregistrar
+const createSqlMetricsRegistrar = (registry: prom.Registry): SqlMetricsRegistrar => {
 	const sqlDuration = new prom.Histogram({
 		name: 'contember_sql_duration_ms',
 		help: 'Executed SQL queries by contember_module (system, tenant, content or unknown) and contember_project (or "unknown" for unknown project)',
@@ -75,8 +86,8 @@ const createSqlMetricsRegistrar = (registry: prom.Registry) => {
 		registers: [registry],
 	})
 
-	return (connection: Connection.Queryable, labels: { contember_module?: string; contember_project?: string }) => {
-		connection.eventManager.on(EventManager.Event.queryEnd, ({ meta }, { timing }) => {
+	return (connection, labels) => {
+		const queryEndCallback: EventManager.ListenerTypes[EventManager.Event.queryEnd] = ({ meta }, { timing }) => {
 			sqlDuration.observe(
 				{
 					contember_module: labels.contember_module || meta.module || 'unknown',
@@ -84,12 +95,18 @@ const createSqlMetricsRegistrar = (registry: prom.Registry) => {
 				},
 				timing ? timing.selfDuration / 1000 : 0,
 			)
-		})
-		connection.eventManager.on(EventManager.Event.queryError, ({ meta }) => {
+		}
+		const queryErrorCallback: EventManager.ListenerTypes[EventManager.Event.queryError] = ({ meta }) => {
 			sqlErrorRate.inc({
 				contember_module: labels.contember_module || meta.module || 'unknown',
 				contember_project: labels.contember_project || 'unknown',
 			})
-		})
+		}
+		connection.eventManager.on(EventManager.Event.queryEnd, queryEndCallback)
+		connection.eventManager.on(EventManager.Event.queryError, queryErrorCallback)
+		return () => {
+			connection.eventManager.removeListener(EventManager.Event.queryEnd, queryEndCallback)
+			connection.eventManager.removeListener(EventManager.Event.queryError, queryErrorCallback)
+		}
 	}
 }

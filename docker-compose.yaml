@@ -45,6 +45,7 @@ services:
       CONTEMBER_SYSTEM_MIGRATIONS_DIR: /src/packages/engine-system-api/migrations
     command:
       - node
+      - --expose-gc
       - ./packages/engine-server/dist/src/start.js
 volumes:
   pgsql-data: ~

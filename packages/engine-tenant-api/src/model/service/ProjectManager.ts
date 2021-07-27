@@ -2,7 +2,7 @@ import { Client, DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
 import { CommandBus, CreateProjectCommand, SetProjectSecretCommand } from '../commands'
 import { PermissionContext } from '../authorization'
-import { Project, ProjectWithSecrets } from '../type'
+import { Project, ProjectInitializer, ProjectWithSecrets } from '../type'
 import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery } from '../queries'
 import { SecretsManager } from './SecretsManager'
 import { Providers } from '../providers'
@@ -13,6 +13,7 @@ export class ProjectManager {
 		private readonly queryHandler: QueryHandler<DatabaseQueryable>,
 		private readonly secretManager: SecretsManager,
 		private readonly providers: Providers,
+		private readonly projectIntializer: ProjectInitializer,
 	) {}
 
 	public async createProject(
@@ -27,6 +28,16 @@ export class ProjectManager {
 			}
 			for (const [key, value] of Object.entries(project.secrets)) {
 				await bus.execute(new SetProjectSecretCommand(id, key, value))
+			}
+			try {
+				await this.projectIntializer({
+					id,
+					...project,
+				})
+			} catch (e) {
+				// eslint-disable-next-line no-console
+				console.error(e)
+				throw new ProjectInitError(`Project initialization error: ${'message' in e ? e.message : 'unknown'}`)
 			}
 
 			return true
@@ -56,3 +67,5 @@ export class ProjectManager {
 		return await this.queryHandler.fetch(new ProjectsByIdentityQuery(identityId, permissionContext))
 	}
 }
+
+export class ProjectInitError extends Error {}

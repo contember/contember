@@ -653,6 +653,7 @@ const schema: DocumentNode = gql`
 
 	enum CreateProjectResponseErrorCode {
 		ALREADY_EXISTS
+		INIT_ERROR
 	}
 
 	type SetProjectSecretResponse {

@@ -152,7 +152,7 @@ export class TenantContainerFactory {
 			.addService(
 				'projectManager',
 				({ db, queryHandler, secretManager, providers }) =>
-					new ProjectManager(db, queryHandler, secretManager, providers),
+					new ProjectManager(db, queryHandler, secretManager, providers, args.projectInitializer),
 			)
 			.addService(
 				'passwordResetManager',
@@ -263,7 +263,7 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'createProjectMutationResolver',
-				({ projectManager }) => new CreateProjectMutationResolver(projectManager, args.projectInitializer),
+				({ projectManager }) => new CreateProjectMutationResolver(projectManager),
 			)
 			.addService(
 				'setProjectSecretMutationResolver',

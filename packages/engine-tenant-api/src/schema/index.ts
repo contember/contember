@@ -194,6 +194,7 @@ export type CreateProjectResponseError = {
 
 export enum CreateProjectResponseErrorCode {
 	AlreadyExists = 'ALREADY_EXISTS',
+	InitError = 'INIT_ERROR',
 }
 
 export type CreateResetPasswordRequestOptions = {

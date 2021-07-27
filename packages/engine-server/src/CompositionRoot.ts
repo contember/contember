@@ -108,8 +108,8 @@ class CompositionRoot {
 			providers,
 		)
 
-		projectSchemaResolverInner = async slug => {
-			const container = await projectContainerResolver.getProjectContainer(slug)
+		projectSchemaResolverInner = async project => {
+			const container = await projectContainerResolver.getProjectContainer(project)
 			if (!container) {
 				return undefined
 			}
@@ -117,17 +117,22 @@ class CompositionRoot {
 			return await systemContainer.schemaVersionBuilder.buildSchema(db)
 		}
 
-		projectInitializerInner = async slug => {
-			const container = await projectContainerResolver.getProjectContainer(slug)
+		projectInitializerInner = async project => {
+			const container = await projectContainerResolver.createProjectContainer(project)
 			if (!container) {
 				throw new Error('Should not happen')
 			}
 			const log: string[] = []
-			await systemContainer.projectInitializer.initialize(
-				container.systemDatabaseContextFactory,
-				container.project,
-				new Logger(log.push),
-			)
+			try {
+				await systemContainer.projectInitializer.initialize(
+					container.systemDatabaseContextFactory,
+					container.project,
+					new Logger(log.push),
+				)
+			} catch (e) {
+				await projectContainerResolver.destroyContainer(project.slug)
+				throw e
+			}
 			return { log }
 		}
 

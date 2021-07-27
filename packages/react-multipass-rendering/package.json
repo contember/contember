@@ -11,6 +11,7 @@
 			}
 		}
 	},
+	"typings": "./dist/react-multipass-rendering.d.ts",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
 		"build:docs:dev": "api-extractor run --local",

@@ -10,7 +10,7 @@
 			}
 		}
 	},
-	"typings": "dist/src/index.d.ts",
+	"typings": "./dist/client.d.ts",
 	"type": "module",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",

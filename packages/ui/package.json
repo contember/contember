@@ -11,6 +11,7 @@
 			}
 		}
 	},
+	"typings": "./dist/ui.d.ts",
 	"files": [
 		"dist",
 		"src"

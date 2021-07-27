@@ -61,8 +61,8 @@ export class ProjectManager {
 		return updatedNew > updatedAt ? 'updated' : 'valid'
 	}
 
-	public async getProjectWithSecretsBySlug(slug: string): Promise<ProjectWithSecrets | null> {
-		const project = await this.dbContext.queryHandler.fetch(new ProjectBySlugQuery(slug))
+	public async getProjectWithSecretsBySlug(slug: string, alias: boolean): Promise<ProjectWithSecrets | null> {
+		const project = await this.dbContext.queryHandler.fetch(new ProjectBySlugQuery(slug, alias))
 		if (!project) {
 			return null
 		}

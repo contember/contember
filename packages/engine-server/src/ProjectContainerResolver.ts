@@ -6,6 +6,7 @@ import { ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api
 
 export class ProjectContainerResolver {
 	private containers = new Map<string, { container: ProjectContainer; cleanups: (() => void)[]; timestamp: Date }>()
+	private aliasMapping = new Map<string, string>()
 
 	public readonly onCreate: ((container: ProjectContainer) => void | (() => void))[] = []
 	constructor(
@@ -31,7 +32,10 @@ export class ProjectContainerResolver {
 	}
 
 	public async getProjectContainer(slug: string, alias: boolean = false): Promise<ProjectContainer | undefined> {
-		// todo: process alias
+		const realSlug = this.aliasMapping.get(slug)
+		if (realSlug) {
+			slug = realSlug
+		}
 		const existing = this.containers.get(slug)
 		if (existing) {
 			const state = await this.projectManager.getProjectState(slug, existing.timestamp)
@@ -43,11 +47,15 @@ export class ProjectContainerResolver {
 				return undefined
 			}
 		}
-		const project = await this.projectManager.getProjectWithSecretsBySlug(slug)
+		const project = await this.projectManager.getProjectWithSecretsBySlug(slug, alias)
 		if (!project) {
 			return undefined
 		}
-		return this.createProjectContainer(project)
+		const container = this.createProjectContainer(project)
+		if (slug !== project.slug) {
+			this.aliasMapping.set(slug, project.slug)
+		}
+		return container
 	}
 
 	public createProjectContainer(project: ProjectWithSecrets): ProjectContainer {
@@ -76,6 +84,7 @@ export class ProjectContainerResolver {
 		const existing = this.containers.get(slug)
 		if (existing) {
 			existing.cleanups.forEach(it => it())
+			existing.container.project.alias?.forEach(it => this.aliasMapping.delete(it))
 			this.containers.delete(slug)
 		}
 		process.nextTick(() => {

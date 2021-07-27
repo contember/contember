@@ -1,5 +1,5 @@
 import type { Input, Value } from '@contember/schema'
-import { Literal } from '../graphQlBuilder'
+import { GraphQlLiteral } from '../graphQlBuilder'
 import { isEmptyObject } from '../utils'
 import { CrudQueryBuilderError } from './CrudQueryBuilderError'
 import type { WriteOperation } from './types'
@@ -32,7 +32,7 @@ class WriteDataBuilder<Op extends WriteOperation.ContentfulOperation> {
 		return resolvedData
 	}
 
-	public set(fieldName: string, value: Input.ColumnValue<Literal>) {
+	public set(fieldName: string, value: Input.ColumnValue<GraphQlLiteral>) {
 		return new WriteDataBuilder<Op>({ ...this.data, [fieldName]: value })
 	}
 
@@ -72,19 +72,19 @@ class WriteDataBuilder<Op extends WriteOperation.ContentfulOperation> {
 	}
 
 	private mergeUpdateOne(
-		original: Value.FieldValue<Literal> | Input.CreateOneRelationInput<Literal> | Input.UpdateOneRelationInput<Literal>,
-		fresh: Value.FieldValue<Literal> | Input.CreateOneRelationInput<Literal> | Input.UpdateOneRelationInput<Literal>,
-	): Value.FieldValue<Literal> | Input.CreateOneRelationInput<Literal> | Input.UpdateOneRelationInput<Literal> {
+		original: Value.FieldValue<GraphQlLiteral> | Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateOneRelationInput<GraphQlLiteral>,
+		fresh: Value.FieldValue<GraphQlLiteral> | Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateOneRelationInput<GraphQlLiteral>,
+	): Value.FieldValue<GraphQlLiteral> | Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateOneRelationInput<GraphQlLiteral> {
 		// TODO This implementation pretty bad but it will have to do for now.
-		if (original instanceof Literal) {
-			if (fresh instanceof Literal) {
+		if (original instanceof GraphQlLiteral) {
+			if (fresh instanceof GraphQlLiteral) {
 				if (original.value === fresh.value) {
 					return original
 				}
 			}
 			throw new CrudQueryBuilderError(`Inconsistent data.`)
 		}
-		if (fresh instanceof Literal) {
+		if (fresh instanceof GraphQlLiteral) {
 			throw new CrudQueryBuilderError(`Inconsistent data.`)
 		}
 
@@ -131,8 +131,8 @@ class WriteDataBuilder<Op extends WriteOperation.ContentfulOperation> {
 
 namespace WriteDataBuilder {
 	export interface DataFormat {
-		create: Input.CreateDataInput<Literal>
-		update: Input.UpdateDataInput<Literal>
+		create: Input.CreateDataInput<GraphQlLiteral>
+		update: Input.UpdateDataInput<GraphQlLiteral>
 	}
 
 	export type DataLike<Op extends WriteOperation.ContentfulOperation> =

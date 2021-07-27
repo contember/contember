@@ -8,8 +8,8 @@ describe('query language parser', () => {
 			ab: 456,
 			a: 123,
 			x: 'x',
-			lit: new GraphQlBuilder.Literal('lit'),
-			literal: new GraphQlBuilder.Literal('literal'),
+			lit: new GraphQlBuilder.GraphQlLiteral('lit'),
+			literal: new GraphQlBuilder.GraphQlLiteral('literal'),
 		})
 		expect(
 			Parser.parseQueryLanguageExpression(
@@ -28,12 +28,12 @@ describe('query language parser', () => {
 				{
 					field: 'field',
 					filter: undefined,
-					reducedBy: { ab: 456, literalColumn: new GraphQlBuilder.Literal('literal') },
+					reducedBy: { ab: 456, literalColumn: new GraphQlBuilder.GraphQlLiteral('literal') },
 				},
 				{
 					field: 'x',
 					filter: undefined,
-					reducedBy: { x: new GraphQlBuilder.Literal('truecolor') },
+					reducedBy: { x: new GraphQlBuilder.GraphQlLiteral('truecolor') },
 				},
 			],
 		})

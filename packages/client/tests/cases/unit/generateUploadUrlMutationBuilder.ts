@@ -1,5 +1,5 @@
 import { GenerateUploadUrlMutationBuilder } from '../../../src/content'
-import { Literal } from '../../../src/graphQlBuilder'
+import { GraphQlLiteral } from '../../../src/graphQlBuilder'
 
 const mutationBody = `{
 		url
@@ -32,7 +32,7 @@ describe('generate upload url mutation builder', () => {
 				},
 				myMp3: {
 					contentType: 'audio/mpeg',
-					acl: new Literal('PUBLIC_READ'),
+					acl: new GraphQlLiteral('PUBLIC_READ'),
 					expiration: 123456,
 					prefix: 'foo',
 				},

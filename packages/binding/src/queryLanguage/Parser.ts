@@ -302,7 +302,7 @@ class Parser extends EmbeddedActionsParser {
 				ALT: () => {
 					const variable = this.SUBRULE(this.variable)
 					return this.ACTION(() => {
-						if (typeof variable !== 'object' || variable instanceof GraphQlBuilder.Literal) {
+						if (typeof variable !== 'object' || variable instanceof GraphQlBuilder.GraphQlLiteral) {
 							throw new QueryLanguageError(`Invalid filter value '${JSON.stringify(variable)}'`)
 						}
 						return variable
@@ -448,7 +448,7 @@ class Parser extends EmbeddedActionsParser {
 					},
 				})
 				this.CONSUME(tokens.Equals)
-				const primaryValue = this.SUBRULE<Input.PrimaryValue<GraphQlBuilder.Literal>>(this.primaryValue)
+				const primaryValue = this.SUBRULE<Input.PrimaryValue<GraphQlBuilder.GraphQlLiteral>>(this.primaryValue)
 
 				this.ACTION(() => {
 					let nestedWhere = where
@@ -467,7 +467,7 @@ class Parser extends EmbeddedActionsParser {
 							if (nestedField in nestedWhere) {
 								const existingWhere = nestedWhere[nestedField]
 
-								if (typeof existingWhere === 'object' && !(existingWhere instanceof GraphQlBuilder.Literal)) {
+								if (typeof existingWhere === 'object' && !(existingWhere instanceof GraphQlBuilder.GraphQlLiteral)) {
 									nestedWhere = existingWhere
 								} else {
 									throw new QueryLanguageError(
@@ -516,7 +516,7 @@ class Parser extends EmbeddedActionsParser {
 							throw new QueryLanguageError(`The only valid order directions are \`asc\` and \`desc\`.`)
 						}
 					} else {
-						literal = new GraphQlBuilder.Literal('asc')
+						literal = new GraphQlBuilder.GraphQlLiteral('asc')
 					}
 					let orderBy: Input.FieldOrderBy<CrudQueryBuilder.OrderDirection> = literal
 
@@ -539,7 +539,7 @@ class Parser extends EmbeddedActionsParser {
 		])
 	})
 
-	private primaryValue = this.RULE<Input.PrimaryValue<GraphQlBuilder.Literal>>('primaryValue', () => {
+	private primaryValue = this.RULE<Input.PrimaryValue<GraphQlBuilder.GraphQlLiteral>>('primaryValue', () => {
 		return this.OR([
 			{
 				ALT: () => this.SUBRULE(this.string),
@@ -557,7 +557,7 @@ class Parser extends EmbeddedActionsParser {
 						if (
 							typeof variableValue === 'string' ||
 							typeof variableValue === 'number' ||
-							variableValue instanceof GraphQlBuilder.Literal
+							variableValue instanceof GraphQlBuilder.GraphQlLiteral
 						) {
 							return variableValue
 						}
@@ -638,13 +638,13 @@ class Parser extends EmbeddedActionsParser {
 		return parseFloat(this.CONSUME(tokens.NumberLiteral).image)
 	})
 
-	private graphQlLiteral: () => GraphQlBuilder.Literal = this.RULE('graphQlLiteral', () => {
+	private graphQlLiteral: () => GraphQlBuilder.GraphQlLiteral = this.RULE('graphQlLiteral', () => {
 		const image = this.SUBRULE(this.identifier)
 
-		return new GraphQlBuilder.Literal(image)
+		return new GraphQlBuilder.GraphQlLiteral(image)
 	})
 
-	private variable = this.RULE<string | number | GraphQlBuilder.Literal | Filter | UniqueWhere>('variable', () => {
+	private variable = this.RULE<string | number | GraphQlBuilder.GraphQlLiteral | Filter | UniqueWhere>('variable', () => {
 		this.CONSUME(tokens.DollarSign)
 		const variableName = this.CONSUME(tokens.Identifier).image
 
@@ -750,7 +750,7 @@ namespace Parser {
 	export namespace AST {
 		export type FieldWhere = Input.FieldWhere<Condition>
 
-		export type ColumnValue = Input.ColumnValue<GraphQlBuilder.Literal>
+		export type ColumnValue = Input.ColumnValue<GraphQlBuilder.GraphQlLiteral>
 
 		export type Condition = Input.Condition<ColumnValue>
 

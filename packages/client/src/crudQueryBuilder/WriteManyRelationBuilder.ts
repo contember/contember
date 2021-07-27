@@ -1,5 +1,5 @@
 import type { Input } from '@contember/schema'
-import type { Literal } from '../graphQlBuilder'
+import type { GraphQlLiteral } from '../graphQlBuilder'
 import type { WriteOperation, WriteRelationOps } from './types'
 import { WriteDataBuilder } from './WriteDataBuilder'
 
@@ -42,21 +42,21 @@ class WriteManyRelationBuilder<
 			  ] as WriteManyRelationBuilder.DataFormat[WriteOperation.Create['op']])) as WriteManyRelationBuilder.Builder<Op>
 	}
 
-	public connect(where: Input.UniqueWhere<Literal>, alias?: string) {
+	public connect(where: Input.UniqueWhere<GraphQlLiteral>, alias?: string) {
 		return WriteManyRelationBuilder.instantiate<Op>([
 			...this.data,
 			this.withAlias({ connect: where }, alias),
 		] as WriteManyRelationBuilder.DataFormat[Op['op']])
 	}
 
-	public delete(where: Input.UniqueWhere<Literal>, alias?: string) {
+	public delete(where: Input.UniqueWhere<GraphQlLiteral>, alias?: string) {
 		return WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
 			...this.data,
 			this.withAlias({ delete: where }, alias),
 		])
 	}
 
-	public disconnect(where: Input.UniqueWhere<Literal>, alias?: string) {
+	public disconnect(where: Input.UniqueWhere<GraphQlLiteral>, alias?: string) {
 		return WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
 			...this.data,
 			this.withAlias({ disconnect: where }, alias),
@@ -64,7 +64,7 @@ class WriteManyRelationBuilder<
 	}
 
 	public update(
-		where: Input.UniqueWhere<Literal>,
+		where: Input.UniqueWhere<GraphQlLiteral>,
 		data: WriteDataBuilder.DataLike<WriteOperation.Update>,
 		alias?: string,
 	): WriteManyRelationBuilder.Builder<WriteOperation.Update> {
@@ -78,7 +78,7 @@ class WriteManyRelationBuilder<
 	}
 
 	public upsert(
-		where: Input.UniqueWhere<Literal>,
+		where: Input.UniqueWhere<GraphQlLiteral>,
 		update: WriteDataBuilder.DataLike<WriteOperation.Update>,
 		create: WriteDataBuilder.DataLike<WriteOperation.Create>,
 		alias?: string,
@@ -102,7 +102,7 @@ class WriteManyRelationBuilder<
 			  ])) as WriteManyRelationBuilder.Builder<WriteOperation.Update>
 	}
 
-	private withAlias<D extends Input.CreateOneRelationInput<Literal> | Input.UpdateManyRelationInputItem<Literal>>(
+	private withAlias<D extends Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateManyRelationInputItem<GraphQlLiteral>>(
 		data: D,
 		alias?: string,
 	): D {
@@ -115,8 +115,8 @@ class WriteManyRelationBuilder<
 
 namespace WriteManyRelationBuilder {
 	export interface DataFormat {
-		create: Input.CreateManyRelationInput<Literal>
-		update: Input.UpdateManyRelationInput<Literal>
+		create: Input.CreateManyRelationInput<GraphQlLiteral>
+		update: Input.UpdateManyRelationInput<GraphQlLiteral>
 	}
 
 	export type Builder<

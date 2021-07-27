@@ -1,9 +1,23 @@
-class GraphQlClient {
+export interface GraphQlClientRequestOptions {
+	variables?: GraphQlClientVariables
+	apiTokenOverride?: string
+	signal?: AbortSignal
+}
+
+export interface GraphQlClientVariables {
+	[name: string]: any
+}
+
+export type GraphQlClientFailedRequestMetadata = Pick<Response, 'status' | 'statusText'> & {
+	responseText: string
+}
+
+export class GraphQlClient {
 	constructor(public readonly apiUrl: string, private readonly apiToken?: string) {}
 
 	async sendRequest<T = any>(
 		query: string,
-		{ apiTokenOverride, signal, variables }: GraphQlClient.RequestOptions = {},
+		{ apiTokenOverride, signal, variables }: GraphQlClientRequestOptions = {},
 	): Promise<T> {
 		const headers: {
 			[header: string]: string
@@ -28,7 +42,7 @@ class GraphQlClient {
 			// It may still have errors (e.g. unfilled fields) but as far as the request goes, it is ok.
 			return await response.json()
 		}
-		const failedRequest: GraphQlClient.FailedRequestMetadata = {
+		const failedRequest: GraphQlClientFailedRequestMetadata = {
 			status: response.status,
 			statusText: response.statusText,
 			responseText: await response.text(),
@@ -37,21 +51,3 @@ class GraphQlClient {
 		return Promise.reject(failedRequest)
 	}
 }
-
-namespace GraphQlClient {
-	export interface RequestOptions {
-		variables?: GraphQlClient.Variables
-		apiTokenOverride?: string
-		signal?: AbortSignal
-	}
-
-	export interface Variables {
-		[name: string]: any
-	}
-
-	export type FailedRequestMetadata = Pick<Response, 'status' | 'statusText'> & {
-		responseText: string
-	}
-}
-
-export { GraphQlClient }

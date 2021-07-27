@@ -1,4 +1,4 @@
-export class Literal<Value extends string = string> {
+export class GraphQlLiteral<Value extends string = string> {
 	constructor(public readonly value: Value) {}
 
 	public toString() {

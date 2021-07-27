@@ -1,4 +1,4 @@
-export * from './Literal'
+export * from './GraphQlLiteral'
 export * from './ObjectBuilder'
 export * from './QueryBuilder'
 export * from './QueryCompiler'

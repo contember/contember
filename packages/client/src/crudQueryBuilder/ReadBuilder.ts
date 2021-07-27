@@ -1,5 +1,5 @@
 import type { Input } from '@contember/schema'
-import { Literal, ObjectBuilder } from '../graphQlBuilder'
+import { GraphQlLiteral, ObjectBuilder } from '../graphQlBuilder'
 import type { HasManyArguments, HasOneArguments, OrderDirection, ReadArguments, ReductionArguments } from './types'
 
 class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
@@ -26,11 +26,11 @@ class ReadBuilder<AllowedArgs extends ReadArguments = ReadArguments> {
 		return ReadBuilder.instantiate<AA>(objectBuilder)
 	}
 
-	public by(by: Input.UniqueWhere<Literal>) {
+	public by(by: Input.UniqueWhere<GraphQlLiteral>) {
 		return this.instantiate<Exclude<AllowedArgs, 'by'>>(this.objectBuilder.argument('by', by))
 	}
 
-	public filter(where: Input.Where<Input.Condition<Input.ColumnValue<Literal>>>) {
+	public filter(where: Input.Where<Input.Condition<Input.ColumnValue<GraphQlLiteral>>>) {
 		return this.instantiate<Exclude<AllowedArgs, 'filter'>>(this.objectBuilder.argument('filter', where))
 	}
 

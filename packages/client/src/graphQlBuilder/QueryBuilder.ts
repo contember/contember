@@ -1,4 +1,4 @@
-import type { Literal } from './Literal'
+import type { GraphQlLiteral } from './GraphQlLiteral'
 import { QueryCompiler } from './QueryCompiler'
 import { RootObjectBuilder } from './RootObjectBuilder'
 
@@ -27,7 +27,7 @@ namespace QueryBuilder {
 
 	export interface List extends Array<Value> {}
 
-	export type AtomicValue = string | null | number | boolean | Literal
+	export type AtomicValue = string | null | number | boolean | GraphQlLiteral
 	export type Value = AtomicValue | QueryBuilder.Object | List
 }
 

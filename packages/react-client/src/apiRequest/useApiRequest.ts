@@ -1,4 +1,9 @@
-import type { GraphQlClient } from '@contember/client'
+import type {
+	GraphQlClient,
+	GraphQlClientFailedRequestMetadata,
+	GraphQlClientRequestOptions,
+	GraphQlClientVariables,
+} from '@contember/client'
 import { useCallback, useEffect, useReducer, useRef } from 'react'
 import { ApiRequestReducer, apiRequestReducer } from './apiRequestReducer'
 import type { ApiRequestState } from './ApiRequestState'
@@ -9,24 +14,24 @@ const initialState: ApiRequestState<any> = {
 	readyState: 'uninitialized',
 }
 
-export const useApiRequest = <SuccessData>(
-	client: GraphQlClient,
-): [
+export type UseApiRequestResult<SuccessData> = [
 	ApiRequestState<SuccessData>,
 	(
 		query: string,
-		variables?: GraphQlClient.Variables,
-		options?: Omit<GraphQlClient.RequestOptions, 'variables'>,
+		variables?: GraphQlClientVariables,
+		options?: Omit<GraphQlClientRequestOptions, 'variables'>,
 	) => Promise<SuccessData>,
-] => {
+]
+
+export const useApiRequest = <SuccessData>(client: GraphQlClient): UseApiRequestResult<SuccessData> => {
 	const [state, dispatch] = useReducer(apiRequestReducer as ApiRequestReducer<SuccessData>, initialState)
 
 	const isUnmountedRef = useRef(false)
 	const sendRequest = useCallback(
 		async (
 			query: string,
-			variables: GraphQlClient.Variables = {},
-			options?: Omit<GraphQlClient.RequestOptions, 'variables'>,
+			variables: GraphQlClientVariables = {},
+			options?: Omit<GraphQlClientRequestOptions, 'variables'>,
 		): Promise<SuccessData> => {
 			if (isUnmountedRef.current) {
 				return Promise.reject()
@@ -46,7 +51,7 @@ export const useApiRequest = <SuccessData>(
 					})
 					return Promise.resolve(data)
 				})
-				.catch((error: GraphQlClient.FailedRequestMetadata) => {
+				.catch((error: GraphQlClientFailedRequestMetadata) => {
 					dispatch({
 						type: 'resolveWithError',
 						error,

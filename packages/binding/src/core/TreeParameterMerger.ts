@@ -193,8 +193,8 @@ export class TreeParameterMerger {
 				const fromOriginal = originalCopy[field]
 				const fromFresh = fresh[field]
 
-				if (fromOriginal instanceof GraphQlBuilder.Literal) {
-					if (fromFresh instanceof GraphQlBuilder.Literal) {
+				if (fromOriginal instanceof GraphQlBuilder.GraphQlLiteral) {
+					if (fromFresh instanceof GraphQlBuilder.GraphQlLiteral) {
 						if (fromOriginal.value === fromFresh.value) {
 							// Good, do nothing.
 							continue
@@ -206,7 +206,7 @@ export class TreeParameterMerger {
 					}
 				}
 				if (typeof fromOriginal === 'object') {
-					if (fromFresh instanceof GraphQlBuilder.Literal) {
+					if (fromFresh instanceof GraphQlBuilder.GraphQlLiteral) {
 						throw new BindingError() // TODO msg
 					} else if (typeof fromFresh === 'object') {
 						const merged = this.mergeSetOnCreate(fromOriginal, fromFresh)

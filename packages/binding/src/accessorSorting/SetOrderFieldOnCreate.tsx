@@ -1,6 +1,6 @@
 import type { CrudQueryBuilder, Input } from '@contember/client'
+import { GraphQlLiteral } from '@contember/client'
 import { Component, EntityListSubTree, EntitySubTree, Field } from '../coreComponents'
-import { Literal } from '../dao'
 import { SugaredField } from '../helperComponents'
 import { QueryLanguage } from '../queryLanguage'
 import type {
@@ -32,7 +32,7 @@ export const SetOrderFieldOnCreate = Component<SetOrderFieldOnCreateProps>(
 						[currentValue]: accumulator,
 					}),
 					{
-						[desugaredOrderField.field]: new Literal(order),
+						[desugaredOrderField.field]: new GraphQlLiteral(order),
 					} as Input.OrderBy<CrudQueryBuilder.OrderDirection>,
 				),
 		]

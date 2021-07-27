@@ -9,7 +9,7 @@ describe('whereToFilter', () => {
 						baz: '123',
 						xyz: 456,
 					},
-					abc: new GraphQlBuilder.Literal('myLiteral'),
+					abc: new GraphQlBuilder.GraphQlLiteral('myLiteral'),
 				},
 			}),
 		).toEqual({
@@ -18,7 +18,7 @@ describe('whereToFilter', () => {
 					baz: { eq: '123' },
 					xyz: { eq: 456 },
 				},
-				abc: { eq: new GraphQlBuilder.Literal('myLiteral') },
+				abc: { eq: new GraphQlBuilder.GraphQlLiteral('myLiteral') },
 			},
 		})
 	})

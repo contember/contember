@@ -17,7 +17,7 @@ describe('GraphQlQueryBuilder', () => {
 						.object(
 							'locales',
 							new GraphQlBuilder.ObjectBuilder()
-								.argument('where', { locale: { eq: new GraphQlBuilder.Literal('cs') } })
+								.argument('where', { locale: { eq: new GraphQlBuilder.GraphQlLiteral('cs') } })
 								.field('id')
 								.field('title'),
 						),

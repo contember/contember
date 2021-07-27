@@ -1,4 +1,4 @@
-import type { GraphQlClient } from '@contember/client'
+import type { GraphQlClient, GraphQlClientRequestOptions } from '@contember/client'
 import type { RawSchema } from './RawSchema'
 import { Schema } from './Schema'
 import { SchemaPreprocessor } from './SchemaPreprocessor'
@@ -46,7 +46,7 @@ export class SchemaLoader {
 	public static async loadSchema(
 		client: GraphQlClient,
 		maxAttempts: number,
-		options?: GraphQlClient.RequestOptions,
+		options?: GraphQlClientRequestOptions,
 	): Promise<Schema> {
 		return new Promise<Schema>(async (resolve, reject) => {
 			for (let attemptNumber = 0; attemptNumber < Math.max(1, maxAttempts); attemptNumber++) {

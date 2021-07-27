@@ -1,4 +1,4 @@
-import type { GraphQlClient, TreeFilter } from '@contember/client'
+import type { GraphQlClient, GraphQlClientFailedRequestMetadata, TreeFilter } from '@contember/client'
 import type { ReactNode } from 'react'
 import {
 	AsyncBatchUpdatesOptions,
@@ -364,7 +364,7 @@ export class DataBinding {
 			if (metadata.name === 'AbortError') {
 				return
 			}
-			this.onError(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
+			this.onError(metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata))
 		}
 		return queryResponse
 	}

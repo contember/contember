@@ -1,4 +1,4 @@
-import { CrudQueryBuilder, GraphQlBuilder, Input } from '@contember/client'
+import { CrudQueryBuilder, GraphQlBuilder, GraphQlLiteral, Input } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
 import { Environment } from '../dao'
 import type {
@@ -644,7 +644,7 @@ class Parser extends EmbeddedActionsParser {
 		return new GraphQlBuilder.GraphQlLiteral(image)
 	})
 
-	private variable = this.RULE<string | number | GraphQlBuilder.GraphQlLiteral | Filter | UniqueWhere>('variable', () => {
+	private variable = this.RULE<string | number | GraphQlLiteral | Filter | UniqueWhere>('variable', () => {
 		this.CONSUME(tokens.DollarSign)
 		const variableName = this.CONSUME(tokens.Identifier).image
 

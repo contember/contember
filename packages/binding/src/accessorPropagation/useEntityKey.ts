@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import { BindingError } from '../BindingError'
 import { EntityKeyContext } from './EntityKeyContext'
 
-export const useEntityKey = () => {
+export const useEntityKey = (): string => {
 	const entityKey = useContext(EntityKeyContext)
 
 	if (entityKey === undefined) {

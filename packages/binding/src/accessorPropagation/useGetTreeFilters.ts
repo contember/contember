@@ -1,3 +1,4 @@
+import type { TreeFilter } from '@contember/client'
 import { useBindingOperations } from './useBindingOperations'
 
-export const useGetTreeFilters = () => useBindingOperations().getTreeFilters
+export const useGetTreeFilters = (): (() => TreeFilter[]) => useBindingOperations().getTreeFilters

@@ -367,12 +367,18 @@ export class QueryLanguage {
 		}
 	}
 
-	public static desugarUniqueWhere = QueryLanguage.preparePrimitiveEntryPoint('uniqueWhere')
+	public static desugarUniqueWhere: (
+		input: string | Parser.ParserResult['uniqueWhere'],
+		environment: Environment,
+	) => Parser.ParserResult['uniqueWhere'] = QueryLanguage.preparePrimitiveEntryPoint('uniqueWhere')
 	public static desugarFilter: (
 		input: string | Parser.ParserResult['filter'],
 		environment: Environment,
 	) => Parser.ParserResult['filter'] = QueryLanguage.preparePrimitiveEntryPoint('filter')
-	public static desugarOrderBy = QueryLanguage.preparePrimitiveEntryPoint('orderBy')
+	public static desugarOrderBy: (
+		input: string | Parser.ParserResult['orderBy'],
+		environment: Environment,
+	) => Parser.ParserResult['orderBy'] = QueryLanguage.preparePrimitiveEntryPoint('orderBy')
 
 	public static desugarUnconstrainedQualifiedEntityList(
 		{ entities, ...unsugarableEntityList }: SugaredUnconstrainedQualifiedEntityList,

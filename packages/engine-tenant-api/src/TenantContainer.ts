@@ -53,6 +53,7 @@ import {
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
+	UpdateProjectMutationResolver,
 } from './resolvers'
 import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
@@ -240,6 +241,10 @@ export class TenantContainerFactory {
 			.addService(
 				'createProjectMutationResolver',
 				({ projectManager }) => new CreateProjectMutationResolver(projectManager),
+			)
+			.addService(
+				'updateProjectMutationResolver',
+				({ projectManager }) => new UpdateProjectMutationResolver(projectManager),
 			)
 			.addService(
 				'setProjectSecretMutationResolver',

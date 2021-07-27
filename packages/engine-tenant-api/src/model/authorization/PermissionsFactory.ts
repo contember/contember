@@ -15,6 +15,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SETUP_OTP)
 		permissions.allow(TenantRole.PROJECT_MEMBER, PermissionActions.PROJECT_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_SET_SECRET)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_UPDATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)

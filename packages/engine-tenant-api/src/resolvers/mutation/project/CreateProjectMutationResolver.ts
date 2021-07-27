@@ -21,8 +21,8 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		})
 		try {
 			const response = await this.projectManager.createProject({
-				slug: args.slug,
-				name: args.name || args.slug,
+				slug: args.projectSlug,
+				name: args.name || args.projectSlug,
 				config: args.config || {},
 				secrets: Object.fromEntries((args.secrets || []).map(it => [it.key, it.value])),
 			})
@@ -33,7 +33,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 				ok: false,
 				error: {
 					code: CreateProjectResponseErrorCode.AlreadyExists,
-					developerMessage: `Project ${args.slug} already exists`,
+					developerMessage: `Project ${args.projectSlug} already exists`,
 				},
 			}
 		} catch (e) {

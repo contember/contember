@@ -399,6 +399,7 @@ export type Mutation = {
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	readonly createProject?: Maybe<CreateProjectResponse>
 	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
+	readonly updateProject?: Maybe<UpdateProjectResponse>
 }
 
 export type MutationSignUpArgs = {
@@ -503,7 +504,7 @@ export type MutationRemoveProjectMailTemplateArgs = {
 }
 
 export type MutationCreateProjectArgs = {
-	slug: Scalars['String']
+	projectSlug: Scalars['String']
 	name?: Maybe<Scalars['String']>
 	config?: Maybe<Scalars['Json']>
 	secrets?: Maybe<ReadonlyArray<ProjectSecret>>
@@ -513,6 +514,13 @@ export type MutationSetProjectSecretArgs = {
 	projectSlug: Scalars['String']
 	key: Scalars['String']
 	value: Scalars['String']
+}
+
+export type MutationUpdateProjectArgs = {
+	projectSlug: Scalars['String']
+	name?: Maybe<Scalars['String']>
+	config?: Maybe<Scalars['Json']>
+	mergeConfig?: Maybe<Scalars['Boolean']>
 }
 
 export type Person = {
@@ -798,6 +806,11 @@ export type UpdateProjectMemberResponse = {
 	readonly error?: Maybe<UpdateProjectMemberError>
 }
 
+export type UpdateProjectResponse = {
+	readonly __typename?: 'UpdateProjectResponse'
+	readonly ok: Scalars['Boolean']
+}
+
 export type VariableEntry = {
 	readonly __typename?: 'VariableEntry'
 	readonly name: Scalars['String']
@@ -986,6 +999,7 @@ export type ResolversTypes = {
 	UpdateProjectMemberError: ResolverTypeWrapper<UpdateProjectMemberError>
 	UpdateProjectMemberErrorCode: UpdateProjectMemberErrorCode
 	UpdateProjectMemberResponse: ResolverTypeWrapper<UpdateProjectMemberResponse>
+	UpdateProjectResponse: ResolverTypeWrapper<UpdateProjectResponse>
 	VariableEntry: ResolverTypeWrapper<VariableEntry>
 	VariableEntryInput: VariableEntryInput
 }
@@ -1065,6 +1079,7 @@ export type ResolversParentTypes = {
 	SignUpResult: SignUpResult
 	UpdateProjectMemberError: UpdateProjectMemberError
 	UpdateProjectMemberResponse: UpdateProjectMemberResponse
+	UpdateProjectResponse: UpdateProjectResponse
 	VariableEntry: VariableEntry
 	VariableEntryInput: VariableEntryInput
 }
@@ -1524,13 +1539,19 @@ export type MutationResolvers<
 		Maybe<ResolversTypes['CreateProjectResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationCreateProjectArgs, 'slug'>
+		RequireFields<MutationCreateProjectArgs, 'projectSlug'>
 	>
 	setProjectSecret?: Resolver<
 		Maybe<ResolversTypes['SetProjectSecretResponse']>,
 		ParentType,
 		ContextType,
 		RequireFields<MutationSetProjectSecretArgs, 'projectSlug' | 'key' | 'value'>
+	>
+	updateProject?: Resolver<
+		Maybe<ResolversTypes['UpdateProjectResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationUpdateProjectArgs, 'projectSlug'>
 	>
 }
 
@@ -1843,6 +1864,14 @@ export type UpdateProjectMemberResponseResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type UpdateProjectResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['UpdateProjectResponse'] = ResolversParentTypes['UpdateProjectResponse'],
+> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type VariableEntryResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['VariableEntry'] = ResolversParentTypes['VariableEntry'],
@@ -1916,6 +1945,7 @@ export type Resolvers<ContextType = any> = {
 	SignUpResult?: SignUpResultResolvers<ContextType>
 	UpdateProjectMemberError?: UpdateProjectMemberErrorResolvers<ContextType>
 	UpdateProjectMemberResponse?: UpdateProjectMemberResponseResolvers<ContextType>
+	UpdateProjectResponse?: UpdateProjectResponseResolvers<ContextType>
 	VariableEntry?: VariableEntryResolvers<ContextType>
 }
 

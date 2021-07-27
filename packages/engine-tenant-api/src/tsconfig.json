@@ -6,6 +6,9 @@
 	},
 	"references": [
 		{
+			"path": "../../config-loader/src"
+		},
+		{
 			"path": "../../queryable/src"
 		},
 		{

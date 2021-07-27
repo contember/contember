@@ -4,23 +4,24 @@ import {
 	CreateApiKeyMutationResolver,
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
+	IDPMutationResolver,
 	InviteMutationResolver,
 	MailTemplateMutationResolver,
 	OtpMutationResolver,
 	RemoveProjectMemberMutationResolver,
+	ResetPasswordMutationResolver,
+	SetProjectSecretMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
+	UpdateProjectMutationResolver,
 } from './mutation'
 
 import { Resolvers } from '../schema'
 import { MeQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
-import { ResetPasswordMutationResolver } from './mutation/person/ResetPasswordMutationResolver'
-import { IDPMutationResolver } from './mutation/person/IDPMutationResolver'
 import { JSONType } from '@contember/graphql-utils'
-import { SetProjectSecretMutationResolver } from './mutation/project/SetProjectSecretMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -50,6 +51,7 @@ class ResolverFactory {
 
 			createProjectMutationResolver: CreateProjectMutationResolver
 			setProjectSecretMutationResolver: SetProjectSecretMutationResolver
+			updateProjectMutationResolver: UpdateProjectMutationResolver
 
 			identityTypeResolver: IdentityTypeResolver
 			projectTypeResolver: ProjectTypeResolver
@@ -121,6 +123,9 @@ class ResolverFactory {
 				),
 				createProject: this.resolvers.createProjectMutationResolver.createProject.bind(
 					this.resolvers.createProjectMutationResolver,
+				),
+				updateProject: this.resolvers.updateProjectMutationResolver.updateProject.bind(
+					this.resolvers.updateProjectMutationResolver,
 				),
 				setProjectSecret: this.resolvers.setProjectSecretMutationResolver.setProjectSecret.bind(
 					this.resolvers.setProjectSecretMutationResolver,

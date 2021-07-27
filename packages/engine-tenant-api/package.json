@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@contember/authorization": "^0.12.0-alpha.2",
+    "@contember/config-loader": "^0.12.0-alpha.2",
     "@contember/database": "^0.12.0-alpha.2",
     "@contember/database-migrations": "^0.12.0-alpha.2",
     "@contember/dic": "^0.12.0-alpha.2",

@@ -1,6 +1,6 @@
 import { Client, DatabaseQueryable } from '@contember/database'
 import { QueryHandler } from '@contember/queryable'
-import { CommandBus, CreateProjectCommand, SetProjectSecretCommand } from '../commands'
+import { CommandBus, CreateProjectCommand, SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
 import { PermissionContext } from '../authorization'
 import { Project, ProjectInitializer, ProjectWithSecrets } from '../type'
 import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery } from '../queries'
@@ -41,6 +41,10 @@ export class ProjectManager {
 
 			return true
 		})
+	}
+
+	public async updateProject(id: string, data: Partial<Pick<Project, 'name' | 'config'>>): Promise<void> {
+		await this.dbContext.commandBus.execute(new UpdateProjectCommand(id, data))
 	}
 
 	public async getProjectBySlug(slug: string): Promise<Project | null> {

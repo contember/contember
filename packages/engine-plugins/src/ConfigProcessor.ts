@@ -15,9 +15,5 @@ export interface ConfigProcessor<ProjectConf extends ProjectConfig = ProjectConf
 
 	processConfig?<C extends Config>(config: C, context: ConfigContext): C
 
-	processProjectConfig?(
-		slug: string,
-		config: ProjectConfig<ProjectConf>,
-		context: ConfigContext,
-	): ProjectConfig<ProjectConf>
+	processProjectConfig?<C>(slug: string, config: C & ProjectConfig<ProjectConf>): C & ProjectConfig<ProjectConf>
 }

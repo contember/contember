@@ -3,7 +3,7 @@ import { isObject, typeConfigError, hasStringProperty } from '@contember/engine-
 import { ProjectWithVimeoConfig, VimeoConfig } from './Config'
 
 export class VimeoConfigProcessor implements ConfigProcessor<ProjectWithVimeoConfig> {
-	processProjectConfig(slug: string, config: ProjectWithVimeoConfig): ProjectWithVimeoConfig {
+	processProjectConfig<C>(slug: string, config: C & ProjectWithVimeoConfig): C & ProjectWithVimeoConfig {
 		return {
 			...config,
 			vimeo: checkVimeoConfig(config.vimeo, `projects.${slug}.vimeo`),

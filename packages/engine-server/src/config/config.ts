@@ -410,7 +410,12 @@ export async function readConfig(
 				}
 				throw new UndefinedParameterError(`Parameter "${parts.join('.')}" not found.`)
 			})
-			return checkProjectStructure(resolvedConfig, slug, 'project')
+			const projectConfig = checkProjectStructure(resolvedConfig, slug, 'project')
+
+			return configProcessors.reduce(
+				(config, processor) => processor.processProjectConfig?.(slug, config) ?? config,
+				projectConfig,
+			)
 		},
 	}
 }

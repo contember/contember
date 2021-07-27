@@ -18,7 +18,7 @@ export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 			projectDefaults: {
 				...template.projectDefaults,
 				s3: {
-					bucket: `%?project.env.S3_BUCKET%`,
+					bucket: `%?project.env.S3_BUCKET||project.slug%`,
 					prefix: `%project.env.S3_PREFIX%`,
 					region: `%project.env.S3_REGION%`,
 					endpoint: `%project.env.S3_ENDPOINT%`,
@@ -32,7 +32,7 @@ export class S3ConfigProcessor implements ConfigProcessor<ProjectWithS3Config> {
 		}
 	}
 
-	processProjectConfig(slug: string, config: ProjectWithS3Config): ProjectWithS3Config {
+	processProjectConfig<C>(slug: string, config: C & ProjectWithS3Config): C & ProjectWithS3Config {
 		return {
 			...config,
 			s3: checkS3Config(config.s3, `projects.${slug}.s3`),
@@ -47,6 +47,10 @@ function checkS3Config(json: unknown, path: string): S3Config | undefined {
 	if (!isObject(json)) {
 		return typeConfigError(path, json, 'object')
 	}
+	const credentials = checkS3Credentials(json.credentials, `${path}.credentials`)
+	if (credentials === undefined) {
+		return undefined
+	}
 	if (!hasStringProperty(json, 'bucket')) {
 		return typeConfigError(path + '.bucket', json.bucket, 'string')
 	}
@@ -57,10 +61,6 @@ function checkS3Config(json: unknown, path: string): S3Config | undefined {
 		return typeConfigError(path + '.region', json.region, 'string')
 	}
 
-	const credentials = checkS3Credentials(json.credentials, `${path}.credentials`)
-	if (credentials === undefined) {
-		return undefined
-	}
 	return { ...json, credentials: credentials }
 }
 
@@ -71,7 +71,7 @@ function checkS3Credentials(json: unknown, path: string): S3Config['credentials'
 	if (!isObject(json)) {
 		return typeConfigError(path, json, 'object')
 	}
-	if (json.key === undefined) {
+	if (json.key === undefined || json.secret === undefined) {
 		return undefined
 	}
 	if (!hasStringProperty(json, 'key')) {

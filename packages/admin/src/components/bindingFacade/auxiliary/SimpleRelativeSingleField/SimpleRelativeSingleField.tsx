@@ -1,12 +1,4 @@
-import {
-	Component,
-	Environment,
-	Field,
-	FieldAccessor,
-	FieldBasicProps,
-	FieldValue,
-	StaticRenderProvider,
-} from '@contember/binding'
+import { Component, Environment, Field, FieldAccessor, FieldBasicProps, FieldValue } from '@contember/binding'
 import type { FormGroupProps } from '@contember/ui'
 import type { NamedExoticComponent, ReactNode } from 'react'
 import { SimpleRelativeSingleFieldProxy } from './SimpleRelativeFieldProxy'
@@ -26,7 +18,7 @@ export const SimpleRelativeSingleField = function <
 	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: P) => ReactNode,
 	displayName: string,
 	defaultProps?: Partial<P>,
-): NamedExoticComponent<P> & StaticRenderProvider<P> {
+): NamedExoticComponent<P> {
 	return Component<P>(
 		props => <SimpleRelativeSingleFieldProxy {...defaultProps} {...props} render={render} />,
 		(props: P) => {

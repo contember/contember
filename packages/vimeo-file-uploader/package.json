@@ -20,8 +20,5 @@
 	"dependencies": {
 		"@contember/client": "workspace:*",
 		"tus-js-client": "2.3.0"
-	},
-	"devDependencies": {
-		"@types/tus-js-client": "2.1.0"
 	}
 }

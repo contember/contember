@@ -63,7 +63,8 @@ test('invite a new person', async () => {
 			{
 				sql: SQL`SELECT "project"."id",
 						         "project"."name",
-						         "project"."slug"
+						         "project"."slug",
+						         "project"."config"
 					         FROM "tenant"."project"
 						              INNER JOIN "tenant"."project_member" AS "project_member" ON "project_member"."project_id" = "project"."id"
 					         WHERE "project_member"."identity_id" = ?`,

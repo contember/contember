@@ -155,7 +155,10 @@ export class TenantContainerFactory {
 				({ apiKeyManager, providers, dbContext }) => new SignInManager(dbContext, apiKeyManager, providers),
 			)
 			.addService('membershipValidator', ({ projectSchemaResolver }) => new MembershipValidator(projectSchemaResolver))
-			.addService('inviteManager', ({ db, providers, userMailer }) => new InviteManager(db, providers, userMailer))
+			.addService(
+				'inviteManager',
+				({ dbContext, providers, userMailer }) => new InviteManager(dbContext, providers, userMailer),
+			)
 			.addService('otpManager', ({ dbContext }) => new OtpManager(dbContext))
 			.addService('mailTemplateManager', ({ dbContext }) => new MailTemplateManager(dbContext))
 			.addService('identityFetcher', ({ db }) => new IdentityFetcher(db))

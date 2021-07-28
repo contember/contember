@@ -125,7 +125,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 			providers,
 			projectSchemaResolver,
 			projectInitializer: () => {
-				throw new Error()
+				return Promise.resolve({ log: [] })
 			},
 		})
 		.replaceService('mailer', () => mailer)

@@ -3,7 +3,7 @@ import { SQL } from '../../../../src/tags'
 import { Project } from '../../../../../src'
 
 export const getProjectBySlugSql = (args: { projectSlug: string; response: Project }): ExpectedQuery => ({
-	sql: SQL`SELECT "id", "name", "slug"
+	sql: SQL`select "id", "name", "slug", "config", "updated_at" as "updatedAt"
 	         FROM "tenant"."project"
 	         WHERE "slug" = ?`,
 	parameters: [args.projectSlug],

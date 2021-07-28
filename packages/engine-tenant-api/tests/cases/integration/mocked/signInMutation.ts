@@ -27,7 +27,7 @@ const createApiKeySql = function ({ apiKeyId, identityId }: { apiKeyId: string; 
 }
 const getIdentityProjectsSql = function ({ identityId, projectId }: { identityId: string; projectId: string }) {
 	return {
-		sql: SQL`SELECT "project"."id", "project"."name", "project"."slug"
+		sql: SQL`SELECT "project"."id", "project"."name", "project"."slug", "project"."config"
 			         FROM "tenant"."project"
 			         WHERE "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?) AND
 					         "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?)`,
@@ -65,7 +65,8 @@ test('signs in', async () => {
 			{
 				sql: SQL`SELECT "project"."id",
 						         "project"."name",
-						         "project"."slug"
+						         "project"."slug",
+						         "project"."config"
 					         FROM "tenant"."project"
 						              INNER JOIN "tenant"."project_member" AS "project_member" ON "project_member"."project_id" = "project"."id"
 					         WHERE "project_member"."identity_id" = ?`,

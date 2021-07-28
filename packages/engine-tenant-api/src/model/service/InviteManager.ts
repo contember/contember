@@ -1,5 +1,9 @@
-import { CommandBus, CreateIdentityCommand, CreatePersonCommand } from '../commands'
-import { Client } from '@contember/database'
+import {
+	CommandBus,
+	CreateIdentityCommand,
+	CreateOrUpdateProjectMembershipCommand,
+	CreatePersonCommand,
+} from '../commands'
 import { Providers } from '../providers'
 import { PersonQuery, PersonRow } from '../queries'
 import { Membership } from '../type/Membership'
@@ -8,8 +12,8 @@ import { TenantRole } from '../authorization'
 import { UserMailer } from '../mailing'
 import { Project } from '../type'
 import { createAppendMembershipVariables } from './membershipUtils'
-import { CreateOrUpdateProjectMembershipCommand } from '../commands/membership/CreateOrUpdateProjectMembershipCommand'
 import { Response, ResponseOk } from '../utils/Response'
+import { DatabaseContext } from '../utils'
 
 export interface InviteOptions {
 	noEmail?: boolean
@@ -19,7 +23,7 @@ export interface InviteOptions {
 
 export class InviteManager {
 	constructor(
-		private readonly client: Client,
+		private readonly databaseContext: DatabaseContext,
 		private readonly providers: Providers,
 		private readonly mailer: UserMailer,
 	) {}
@@ -30,18 +34,19 @@ export class InviteManager {
 		memberships: readonly Membership[],
 		options: InviteOptions = {},
 	): Promise<InviteResponse> {
-		return await this.client.transaction(async trx => {
-			const bus = new CommandBus(trx, this.providers)
-			let person: Omit<PersonRow, 'roles'> | null = await trx.createQueryHandler().fetch(PersonQuery.byEmail(email))
+		return await this.databaseContext.transaction(async trx => {
+			let person: Omit<PersonRow, 'roles'> | null = await trx.queryHandler.fetch(PersonQuery.byEmail(email))
 			const isNew = !person
 			let generatedPassword: string = ''
 			if (!person) {
-				const identityId = await bus.execute(new CreateIdentityCommand([TenantRole.PERSON]))
+				const identityId = await trx.commandBus.execute(new CreateIdentityCommand([TenantRole.PERSON]))
 				generatedPassword = options.password || (await this.providers.randomBytes(9)).toString('base64')
-				person = await bus.execute(new CreatePersonCommand(identityId, email, generatedPassword))
+				person = await trx.commandBus.execute(new CreatePersonCommand(identityId, email, generatedPassword))
 			}
 			for (const membershipUpdate of createAppendMembershipVariables(memberships)) {
-				await bus.execute(new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate))
+				await trx.commandBus.execute(
+					new CreateOrUpdateProjectMembershipCommand(project.id, person.identity_id, membershipUpdate),
+				)
 			}
 			if (!options.noEmail) {
 				const customMailOptions = {

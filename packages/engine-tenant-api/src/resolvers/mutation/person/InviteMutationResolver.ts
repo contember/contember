@@ -7,10 +7,15 @@ import {
 	MutationUnmanagedInviteArgs,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectManager, Project, InviteOptions } from '../../../model'
-import { InviteManager } from '../../../model/service'
+import {
+	InviteManager,
+	InviteOptions,
+	MembershipValidator,
+	PermissionActions,
+	Project,
+	ProjectManager,
+} from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
-import { MembershipValidator } from '../../../model/service'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 
 export class InviteMutationResolver implements MutationResolvers {

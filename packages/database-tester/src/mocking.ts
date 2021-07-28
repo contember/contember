@@ -28,7 +28,10 @@ export const createConnectionMock = (
 			const expectedMsg = `Expected query does not match SQL:
 ${sql}
 with following parameters
-${JSON.stringify(parameters, undefined, '  ')}`
+${JSON.stringify(parameters, undefined, '  ')}
+
+Expected:
+${expected.sql}`
 			assert.is(actualSql, expectedSql, expectedMsg)
 
 			if (expected.parameters) {

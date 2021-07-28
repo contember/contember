@@ -42,7 +42,7 @@ test('create api key', async () => {
 				createMembershipVariableSql({ variableId, membershipId, values: [languageId], variableName: 'language' }),
 			),
 			{
-				sql: SQL`SELECT "project"."id", "project"."name", "project"."slug"
+				sql: SQL`SELECT "project"."id", "project"."name", "project"."slug", "project"."config"
 					         FROM "tenant"."project"
 					         WHERE "project"."id" IN (SELECT "project_id" FROM "tenant"."project_membership" WHERE "identity_id" = ?)`,
 				parameters: [identityId],

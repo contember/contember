@@ -5,6 +5,7 @@ import {
 	createErrorResponseMiddleware,
 	createHomepageMiddleware,
 	createPlaygroundMiddleware,
+	createPoweredByHeaderMiddleware,
 	createServicesProviderMiddleware,
 	createSystemMiddleware,
 	createTenantMiddleware,
@@ -22,6 +23,7 @@ import { SystemGraphQLMiddlewareFactory, TenantGraphQLMiddlewareFactory } from '
 
 export const createRootMiddleware = (
 	debug: boolean,
+	version: string,
 	services: ServicesState & {
 		tenantGraphQlMiddlewareFactory: TenantGraphQLMiddlewareFactory
 		systemGraphQLMiddlewareFactory: SystemGraphQLMiddlewareFactory
@@ -36,6 +38,7 @@ export const createRootMiddleware = (
 		bodyParser({
 			jsonLimit: httpConfig.requestBodySize || '1mb',
 		}),
+		createPoweredByHeaderMiddleware(debug, version),
 		createColllectHttpMetricsMiddleware(prometheusRegistry),
 		createDebugInfoMiddleware(debug),
 		createServicesProviderMiddleware(services),

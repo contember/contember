@@ -45,10 +45,18 @@ export interface MasterContainerArgs {
 	projectConfigResolver: ProjectConfigResolver
 	plugins: Plugin[]
 	processType: ProcessType
+	version?: string
 }
 
 export class MasterContainerFactory {
-	create({ debugMode, config, projectConfigResolver, plugins, processType }: MasterContainerArgs): MasterContainer {
+	create({
+		debugMode,
+		config,
+		projectConfigResolver,
+		plugins,
+		processType,
+		version,
+	}: MasterContainerArgs): MasterContainer {
 		let projectSchemaResolverInner: ProjectSchemaResolver = () => {
 			throw new Error('called too soon')
 		}
@@ -196,6 +204,7 @@ export class MasterContainerFactory {
 					app.use(
 						createRootMiddleware(
 							debugMode,
+							version ?? 'unknown',
 							{
 								tenantGraphQlMiddlewareFactory,
 								projectContainerResolver: projectContainerResolver.getProjectContainer.bind(projectContainerResolver),

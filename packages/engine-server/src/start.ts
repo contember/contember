@@ -33,11 +33,11 @@ const createServerTerminator = (): Server[] => {
 
 ;(async () => {
 	const isDebug = process.env.NODE_ENV === 'development'
+	const packageJsonFile = process.env.CONTEMBER_PACKAGE_JSON || join(__dirname, '../../package.json')
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	const version = require(packageJsonFile).version
 
 	if (cluster.isMaster) {
-		const packageJsonFile = process.env.CONTEMBER_PACKAGE_JSON || join(__dirname, '../../package.json')
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const version = require(packageJsonFile).version
 		// eslint-disable-next-line no-console
 		console.log(`Starting Contember ${version}`)
 		// eslint-disable-next-line no-console
@@ -76,7 +76,14 @@ const createServerTerminator = (): Server[] => {
 
 	const processType = getClusterProcessType(isClusterMode)
 
-	const container = createContainer({ debugMode: isDebug, config, projectConfigResolver, plugins, processType })
+	const container = createContainer({
+		debugMode: isDebug,
+		config,
+		projectConfigResolver,
+		plugins,
+		processType,
+		version,
+	})
 
 	let initializedProjects: string[] = []
 	if (cluster.isMaster) {

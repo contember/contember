@@ -268,4 +268,152 @@ test('Posts with paginated comments (one has many)', async () => {
 	})
 })
 
+test('Posts with comment count (one has many)', async () => {
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Post', entity => entity.oneHasMany('comments', relation => relation.target('Comment').ownedBy('post')))
+			.entity('Comment', entity => entity.column('content').column('deletedAt', c => c.type(Model.ColumnType.DateTime)))
+			.buildSchema(),
+		query: GQL`
+        query {
+          listPost {
+            id
+            paginateComments(filter: {deletedAt: {isNull: true}}, first: 1) {
+				pageInfo {
+					totalCount
+				}
+            }
+          }
+        }
+			`,
+		executes: [
+			{
+				sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id"
+                     from "public"."post" as "root_"`,
+				response: {
+					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+				},
+			},
+			{
+				sql: SQL`select
+       				count(*) as "row_count", "root_"."post_id"
+					from "public"."comment" as "root_"
+					where "root_"."deleted_at" is null and "root_"."post_id" in (?, ?)
+					group by "root_"."post_id"`,
+				parameters: [testUuid(1), testUuid(2)],
+				response: {
+					rows: [
+						{ post_id: testUuid(1), row_count: 5 },
+						{ post_id: testUuid(2), row_count: 3 },
+					],
+				},
+			},
+		],
+		return: {
+			data: {
+				listPost: [
+					{
+						id: testUuid(1),
+						paginateComments: {
+							pageInfo: {
+								totalCount: 5,
+							},
+						},
+					},
+					{
+						id: testUuid(2),
+						paginateComments: {
+							pageInfo: {
+								totalCount: 3,
+							},
+						},
+					},
+				],
+			},
+		},
+	})
+})
+
+test('Posts with paginated comments without count (one has many)', async () => {
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Post', entity => entity.oneHasMany('comments', relation => relation.target('Comment').ownedBy('post')))
+			.entity('Comment', entity => entity.column('content').column('deletedAt', c => c.type(Model.ColumnType.DateTime)))
+			.buildSchema(),
+		query: GQL`
+        query {
+          listPost {
+            id
+            paginateComments(filter: {deletedAt: {isNull: true}}, first: 1) {
+				edges {
+					node {
+						content
+					}
+				}
+            }
+          }
+        }
+			`,
+		executes: [
+			{
+				sql: SQL`select
+                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_id"
+                     from "public"."post" as "root_"`,
+				response: {
+					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+				},
+			},
+			{
+				sql: SQL`with "data" as
+    				(select
+    				    "root_"."post_id" as "__grouping_key",
+    				    "root_"."content" as "root_content",
+    					"root_"."id" as "root_id",
+    				    row_number() over(partition by  "root_"."post_id" order by "root_"."id" asc) as "rowNumber_"
+    					from "public"."comment" as "root_"
+    					where "root_"."deleted_at" is null
+    					      and "root_"."post_id" in (?, ?)
+    					order by "root_"."id" asc)
+					select "data".*  from "data"   where "data"."rowNumber_" <= ?`,
+				parameters: [testUuid(1), testUuid(2), 1],
+				response: {
+					rows: [
+						{ __grouping_key: testUuid(1), root_id: testUuid(3), root_content: 'Lorem ipsum' },
+						{ __grouping_key: testUuid(2), root_id: testUuid(4), root_content: 'Dolor sit' },
+					],
+				},
+			},
+		],
+		return: {
+			data: {
+				listPost: [
+					{
+						id: testUuid(1),
+						paginateComments: {
+							edges: [
+								{
+									node: { content: 'Lorem ipsum' },
+								},
+							],
+						},
+					},
+					{
+						id: testUuid(2),
+						paginateComments: {
+							edges: [
+								{
+									node: { content: 'Dolor sit' },
+								},
+							],
+						},
+					},
+				],
+			},
+		},
+	})
+})
+
 test.run()

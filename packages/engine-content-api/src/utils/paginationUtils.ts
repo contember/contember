@@ -17,11 +17,11 @@ export class PaginationHelper {
 
 	public createResponse(totalCount?: number, nodes?: Record<string, any>[]): any {
 		const hasTotalCount = totalCount !== undefined
-		if (this.requiresTotalCount !== hasTotalCount) {
+		if (this.requiresTotalCount && !hasTotalCount) {
 			throw new Error('totalCount is required')
 		}
 		const hasNodes = nodes !== undefined
-		if (this.requiresNodes !== hasNodes) {
+		if (this.requiresNodes && !hasNodes) {
 			throw new Error('nodes are required')
 		}
 		return {

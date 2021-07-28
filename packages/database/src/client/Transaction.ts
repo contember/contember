@@ -25,7 +25,7 @@ export class Transaction implements Connection.TransactionLike {
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 	): Promise<Result> {
 		const savepointName = `savepoint_${this.savepointCounter++}`
-		await this.pgClient.query(`SAVEPOINT ${wrapIdentifier(savepointName)}`)
+		await this.query(`SAVEPOINT ${wrapIdentifier(savepointName)}`)
 		const savepoint = new SavePoint(savepointName, this, this.pgClient)
 		try {
 			const result = await callback(savepoint)
@@ -81,7 +81,7 @@ export class Transaction implements Connection.TransactionLike {
 	}
 
 	private async close(command: string) {
-		await this.pgClient.query(command)
+		await this.query(command)
 		this._isClosed = true
 	}
 }
@@ -111,7 +111,7 @@ class SavePoint implements Connection.TransactionLike {
 
 	async query<Row extends Record<string, any>>(
 		sql: string,
-		parameters: any[],
+		parameters: any[] = [],
 		meta: Record<string, any> = {},
 	): Promise<Connection.Result<Row>> {
 		if (this.isClosed) {
@@ -129,7 +129,7 @@ class SavePoint implements Connection.TransactionLike {
 	}
 
 	private async close(sql: string) {
-		await this.pgClient.query(sql)
+		await this.query(sql)
 		this._isClosed = true
 	}
 }

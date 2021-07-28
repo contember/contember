@@ -84,7 +84,7 @@ export const convertError = (e: any): MutationResult => {
 	if (e instanceof Database.TransactionAbortedError) {
 		return new MutationSqlError([], e.originalMessage, [MutationResultHint.subSequentSqlError])
 	}
-	if (e instanceof Database.ConnectionError) {
+	if (e instanceof Database.QueryError) {
 		// eslint-disable-next-line no-console
 		console.error(e)
 		return new MutationSqlError([], e.originalMessage, [MutationResultHint.sqlError])

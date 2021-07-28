@@ -1,6 +1,6 @@
 import { createStageTree, StageTree } from '../stages'
 import { Migration, MigrationDescriber } from '@contember/schema-migrations'
-import { Client, ConnectionError, wrapIdentifier } from '@contember/database'
+import { Client, QueryError, wrapIdentifier } from '@contember/database'
 import { formatSchemaName } from '../helpers'
 import { Schema } from '@contember/schema'
 import { SaveMigrationCommand } from '../commands'
@@ -114,7 +114,7 @@ export class ProjectMigrator {
 		try {
 			await db.query(sql)
 		} catch (e) {
-			if (e instanceof ConnectionError) {
+			if (e instanceof QueryError) {
 				// eslint-disable-next-line no-console
 				console.error(e)
 				throw new MigrationFailedError(migrationVersion, e.message)

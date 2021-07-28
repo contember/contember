@@ -2,7 +2,7 @@ import { Pool, PoolConfig } from 'pg'
 import { EventManager, EventManagerImpl } from './EventManager'
 import { Client } from './Client'
 import { Transaction } from './Transaction'
-import { executeQuery } from './execution'
+import { executeClientOperation, executeQuery } from './execution'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	private readonly pool: Pool
@@ -22,9 +22,13 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 	async transaction<Result>(
 		callback: (connection: Connection.TransactionLike) => Promise<Result> | Result,
 	): Promise<Result> {
-		const client = await this.pool.connect()
-		await client.query('BEGIN')
-		const transaction = new Transaction(client, new EventManagerImpl(this.eventManager), this.queryConfig)
+		const client = await executeClientOperation(() => this.pool.connect())
+		const eventManager = new EventManagerImpl(this.eventManager)
+		await executeQuery(client, eventManager, {
+			sql: 'BEGIN',
+			...this.queryConfig,
+		})
+		const transaction = new Transaction(client, eventManager, this.queryConfig)
 		try {
 			const result = await callback(transaction)
 
@@ -40,7 +44,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 	}
 
 	async end(): Promise<void> {
-		await this.pool.end()
+		await executeClientOperation(() => this.pool.end())
 	}
 
 	async query<Row extends Record<string, any>>(
@@ -49,7 +53,7 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		meta: Record<string, any> = {},
 		config: Connection.QueryConfig = {},
 	): Promise<Connection.Result<Row>> {
-		const client = await this.pool.connect()
+		const client = await executeClientOperation(() => this.pool.connect())
 		const query: Connection.Query = { sql, parameters, meta, ...this.queryConfig, ...config }
 		try {
 			const result = await executeQuery<Row>(client, this.eventManager, query, {})

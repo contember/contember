@@ -2,26 +2,30 @@ import { ClientBase } from 'pg'
 import { EventManager } from './EventManager'
 import { Connection } from './Connection'
 import {
-	ConnectionError,
+	QueryError,
 	ForeignKeyViolationError,
 	InvalidDataError,
 	NotNullViolationError,
 	SerializationFailureError,
 	TransactionAbortedError,
 	UniqueViolationError,
+	ClientError,
 } from './errors'
 
 function prepareSql(sql: string) {
 	let parameterIndex = 0
 	return sql.replace(/(\\*)\?/g, ({}, numOfEscapes) => (numOfEscapes.length % 2 ? '?' : `$${++parameterIndex}`))
 }
+type SomeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
 
 export async function executeQuery<Row extends Record<string, any>>(
 	pgClient: ClientBase,
 	eventManager: EventManager,
-	{ sql, parameters, meta, timing }: Connection.Query & Connection.QueryConfig,
-	context: Connection.QueryContext,
+	{ sql, parameters, meta, timing }: SomeOptional<Connection.Query, 'parameters' | 'meta'> & Connection.QueryConfig,
+	context: Connection.QueryContext = {},
 ): Promise<Connection.Result<Row>> {
+	parameters ??= []
+	meta ??= {}
 	try {
 		eventManager.fire(EventManager.Event.queryStart, { sql, parameters, meta })
 
@@ -71,7 +75,15 @@ export async function executeQuery<Row extends Record<string, any>>(
 			case '25P02':
 				throw new TransactionAbortedError(sql, parameters, error)
 			default:
-				throw new ConnectionError(sql, parameters, error)
+				throw new QueryError(sql, parameters, error)
 		}
+	}
+}
+
+export const executeClientOperation = async <T>(cb: () => Promise<T>): Promise<T> => {
+	try {
+		return await cb()
+	} catch (e) {
+		throw new ClientError(e)
 	}
 }

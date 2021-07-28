@@ -24,8 +24,12 @@ class SingleConnection implements Connection.ConnectionLike, Connection.ClientFa
 			await this.pgClient.connect()
 			this.isConnected = true
 		}
-		await this.pgClient.query('BEGIN')
-		const transaction = new Transaction(this.pgClient, new EventManagerImpl(this.eventManager), this.queryConfig)
+		const eventManager = new EventManagerImpl(this.eventManager)
+		await executeQuery(this.pgClient, eventManager, {
+			sql: 'BEGIN',
+			...this.queryConfig,
+		})
+		const transaction = new Transaction(this.pgClient, eventManager, this.queryConfig)
 		try {
 			const result = await callback(transaction)
 

@@ -1,12 +1,11 @@
 import supertest from 'supertest'
-import CompositionRoot from '../../src/CompositionRoot'
-import { recreateDatabase } from '@contember/engine-api-tester'
+import { MasterContainerFactory, ProcessType } from '../../src'
+import { getExampleProjectDirectory, recreateDatabase } from '@contember/engine-api-tester'
 import * as nodeAssert from 'assert'
 import * as assert from 'uvu/assert'
 import { test } from 'uvu'
 import prom from 'prom-client'
-import { MigrationsResolver, MigrationFilesManager } from '@contember/schema-migrations'
-import { getExampleProjectDirectory } from '@contember/engine-api-tester'
+import { MigrationFilesManager, MigrationsResolver } from '@contember/schema-migrations'
 
 const dbCredentials = (dbName: string) => {
 	return {
@@ -35,9 +34,9 @@ const projectConfig = {
 }
 const createContainer = (debug: boolean) => {
 	prom.register.clear()
-	return new CompositionRoot().createMasterContainer(
-		debug,
-		{
+	return new MasterContainerFactory().create({
+		debugMode: debug,
+		config: {
 			tenant: {
 				db: dbCredentials(String(process.env.TEST_DB_NAME_TENANT)),
 				mailer: {},
@@ -53,9 +52,10 @@ const createContainer = (debug: boolean) => {
 				http: {},
 			},
 		},
-		() => projectConfig,
-		[],
-	)
+		projectConfigResolver: () => projectConfig,
+		plugins: [],
+		processType: ProcessType.singleNode,
+	})
 }
 
 const executeGraphql = (

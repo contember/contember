@@ -1,17 +1,10 @@
-import CompositionRoot from './CompositionRoot'
-import { ProjectConfig, ProjectConfigResolver } from '@contember/engine-http'
-import { Config, readConfig } from './config/config'
-import { Plugin } from '@contember/engine-plugins'
+import { MasterContainerFactory, MasterContainerArgs } from './MasterContainer'
+import { ProjectConfig } from '@contember/engine-http'
+import { readConfig } from './config/config'
 import { ProcessType } from './utils'
 
-export { CompositionRoot, ProjectConfig, readConfig }
+export { MasterContainerFactory, ProjectConfig, readConfig, ProcessType }
 
-export const createContainer = (
-	debug: boolean,
-	config: Config,
-	projectConfigResolver: ProjectConfigResolver,
-	plugins: Plugin[],
-	processType: ProcessType = ProcessType.singleNode,
-) => {
-	return new CompositionRoot().createMasterContainer(debug, config, projectConfigResolver, plugins, processType)
+export const createContainer = (args: MasterContainerArgs) => {
+	return new MasterContainerFactory().create(args)
 }

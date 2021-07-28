@@ -39,14 +39,16 @@ export interface MasterContainer {
 	projectContainerResolver: ProjectContainerResolver
 }
 
-class CompositionRoot {
-	createMasterContainer(
-		debugMode: boolean,
-		config: Config,
-		projectConfigResolver: ProjectConfigResolver,
-		plugins: Plugin[],
-		processType: ProcessType = ProcessType.singleNode,
-	): MasterContainer {
+export interface MasterContainerArgs {
+	debugMode: boolean
+	config: Config
+	projectConfigResolver: ProjectConfigResolver
+	plugins: Plugin[]
+	processType: ProcessType
+}
+
+export class MasterContainerFactory {
+	create({ debugMode, config, projectConfigResolver, plugins, processType }: MasterContainerArgs): MasterContainer {
 		let projectSchemaResolverInner: ProjectSchemaResolver = () => {
 			throw new Error('called too soon')
 		}
@@ -234,5 +236,3 @@ class CompositionRoot {
 		return masterContainer.pick('initializer', 'koa', 'monitoringKoa', 'projectContainerResolver')
 	}
 }
-
-export default CompositionRoot

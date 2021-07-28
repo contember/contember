@@ -74,9 +74,9 @@ const createServerTerminator = (): Server[] => {
 	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)
 	const isClusterMode = workerCount > 1
 
-	const clusterMode = getClusterProcessType(isClusterMode)
+	const processType = getClusterProcessType(isClusterMode)
 
-	const container = createContainer(isDebug, config, projectConfigResolver, plugins, clusterMode)
+	const container = createContainer({ debugMode: isDebug, config, projectConfigResolver, plugins, processType })
 
 	let initializedProjects: string[] = []
 	if (cluster.isMaster) {

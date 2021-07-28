@@ -188,7 +188,7 @@ class EntityAccessor implements Errorable {
 		const record = this.fieldData.get(placeholderName)
 		if (record === undefined) {
 			throw new BindingError(
-				`EntityAccessor: unknown field placeholder '${placeholderName}'. Unless this is just a typo, this is ` +
+				`EntityAccessor: unknown field placeholder '${placeholderName} on ${this.name}'. Unless this is just a typo, this is ` +
 					`typically caused by one of the following:\n` +
 					`\t• Trying to access a field that has not been registered during static render, and thus lacks a marker and an accessor.\n` +
 					`\t• Misusing an EntityAccessor getter. If you used one of the getRelative[…] family, please make sure all ` +

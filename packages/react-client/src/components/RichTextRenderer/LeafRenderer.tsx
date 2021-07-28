@@ -1,4 +1,5 @@
-import { ComponentType, createElement, ReactElement } from 'react'
+import type { ComponentType, ReactElement } from 'react'
+import { createElement } from 'react'
 import type { BuiltinLeaves } from './BuiltinLeaves'
 import { RenderLeafFallback } from './RenderLeafFallback'
 import type { RichTextLeaf } from './RichTextLeaf'

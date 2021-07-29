@@ -32,6 +32,6 @@ export class ConstraintHelper {
 				)
 			).rows.map(it => it.name)
 		}
-		return this.constraintNames!.map(it => `${wrapIdentifier(this.client.schema)}.${wrapIdentifier(it)}`).join(', ')
+		return this.constraintNames.map(it => `${wrapIdentifier(this.client.schema)}.${wrapIdentifier(it)}`).join(', ')
 	}
 }

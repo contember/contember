@@ -1,8 +1,6 @@
 import { Model } from '@contember/schema'
 import FieldBuilder from './FieldBuilder'
 import { AddEntityCallback, EntityConfigurator } from './types'
-import { Interface } from '../definition/types'
-import OneHasOneDefinition from '../definition/OneHasOneDefinition'
 
 type PartialOptions<K extends keyof OneHasOneBuilder.Options> = Partial<OneHasOneBuilder.Options> &
 	Pick<OneHasOneBuilder.Options, K>

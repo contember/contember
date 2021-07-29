@@ -1,9 +1,8 @@
 import { Model } from '@contember/schema'
-import { Interface } from './types'
-import FieldDefinition from './FieldDefinition'
-import { RelationTarget } from './types'
+import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 
-class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinition.Options> {
+export class OneHasOneDefinitionImpl extends FieldDefinition<OneHasOneDefinitionOptions> {
 	type = 'OneHasOneDefinition' as const
 
 	inversedBy(inversedBy: string): Interface<OneHasOneDefinition> {
@@ -34,7 +33,7 @@ class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinition.Options> {
 		return this.withOption('orphanRemoval', true)
 	}
 
-	createField({ name, conventions, entityRegistry }: FieldDefinition.CreateFieldContext): Model.AnyField {
+	createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn: Partial<Model.JoiningColumn> = options.joiningColumn || {}
 
@@ -53,14 +52,16 @@ class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinition.Options> {
 	}
 }
 
-namespace OneHasOneDefinition {
-	export type Options = {
-		target: RelationTarget
-		inversedBy?: string
-		joiningColumn?: Partial<Model.JoiningColumn>
-		nullable?: boolean
-		orphanRemoval?: true
-	}
+export type OneHasOneDefinition = Interface<OneHasOneDefinitionImpl>
+
+export function oneHasOne(target: EntityConstructor, inversedBy?: string): OneHasOneDefinition {
+	return new OneHasOneDefinitionImpl({ target, inversedBy })
 }
 
-export default OneHasOneDefinition
+export type OneHasOneDefinitionOptions = {
+	target: RelationTarget
+	inversedBy?: string
+	joiningColumn?: Partial<Model.JoiningColumn>
+	nullable?: boolean
+	orphanRemoval?: true
+}

@@ -1,4 +1,4 @@
-import EnumDefinition from './EnumDefinition'
+import { EnumDefinition } from '../EnumDefinition'
 
 export class EnumRegistry {
 	public readonly enums: Record<string, EnumDefinition> = {}

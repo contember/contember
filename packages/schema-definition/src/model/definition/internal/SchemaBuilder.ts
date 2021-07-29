@@ -1,17 +1,16 @@
 import { Model } from '@contember/schema'
 import { NamingHelper } from '@contember/schema-utils'
-import { tuple } from '../../utils'
-import { EntityConstructor, Interface } from './types'
-import NamingConventions from './NamingConventions'
-import FieldDefinition from './FieldDefinition'
-import UniqueDefinition from './UniqueDefinition'
-import ColumnDefinition from './ColumnDefinition'
-import EnumDefinition from './EnumDefinition'
 import 'reflect-metadata'
+import { tuple } from '../../../utils'
+import { EntityConstructor, Interface } from '../types'
+import { NamingConventions } from '../NamingConventions'
+import { EnumDefinition } from '../EnumDefinition'
 import { EntityRegistry } from './EntityRegistry'
 import { EnumRegistry } from './EnumRegistry'
+import { ColumnDefinition, FieldDefinition } from '../fieldDefinitions'
+import { UniqueOptions } from '../UniqueDefinition'
 
-class SchemaBuilder {
+export class SchemaBuilder {
 	private entityRegistry = new EntityRegistry()
 
 	private enumRegistry = new EnumRegistry()
@@ -75,7 +74,7 @@ class SchemaBuilder {
 
 	private createUnique(
 		entityName: string,
-		uniqueDefinition: UniqueDefinition.Options[],
+		uniqueDefinition: UniqueOptions<Record<string, unknown>>[],
 		fieldDefinitions: Record<string, Interface<FieldDefinition<any>>>,
 	): Model.UniqueConstraints {
 		const unique: Model.UniqueConstraints = {}
@@ -92,5 +91,3 @@ class SchemaBuilder {
 		return unique
 	}
 }
-
-export default SchemaBuilder

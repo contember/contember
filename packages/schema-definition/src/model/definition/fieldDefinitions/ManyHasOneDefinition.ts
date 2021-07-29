@@ -1,9 +1,9 @@
-import { Interface } from './types'
+import { EntityConstructor, Interface } from '../types'
 import { Model } from '@contember/schema'
-import FieldDefinition from './FieldDefinition'
-import { RelationTarget } from './types'
+import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
+import { RelationTarget } from '../types'
 
-class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinition.Options> {
+export class ManyHasOneDefinitionImpl extends FieldDefinition<ManyHasOneDefinitionOptions> {
 	type = 'ManyHasOneDefinition' as const
 
 	inversedBy(inversedBy: string): Interface<ManyHasOneDefinition> {
@@ -30,7 +30,7 @@ class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinition.Options>
 		return this.withOption('nullable', false)
 	}
 
-	createField({ name, conventions, entityName, entityRegistry }: FieldDefinition.CreateFieldContext): Model.AnyField {
+	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		const joiningColumn = options.joiningColumn || {}
 		return {
@@ -47,13 +47,15 @@ class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinition.Options>
 	}
 }
 
-namespace ManyHasOneDefinition {
-	export type Options = {
-		target: RelationTarget
-		inversedBy?: string
-		joiningColumn?: Partial<Model.JoiningColumn>
-		nullable?: boolean
-	}
+export type ManyHasOneDefinition = Interface<ManyHasOneDefinitionImpl>
+
+export function manyHasOne(target: EntityConstructor, inversedBy?: string): ManyHasOneDefinition {
+	return new ManyHasOneDefinitionImpl({ target, inversedBy })
 }
 
-export default ManyHasOneDefinition
+export type ManyHasOneDefinitionOptions = {
+	target: RelationTarget
+	inversedBy?: string
+	joiningColumn?: Partial<Model.JoiningColumn>
+	nullable?: boolean
+}

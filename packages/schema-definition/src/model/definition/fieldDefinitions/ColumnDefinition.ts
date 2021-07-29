@@ -1,15 +1,15 @@
 import { Model } from '@contember/schema'
-import { Interface } from './types'
-import FieldDefinition from './FieldDefinition'
-import EnumDefinition from './EnumDefinition'
-import { getColumnType } from '../utils/getColumnType'
+import { Interface } from '../types'
+import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
+import { EnumDefinition } from '../EnumDefinition'
+import { getColumnType } from '../../utils'
 
-class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<ColumnDefinition.Options<Type>> {
+export class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<ColumnDefinitionOptions<Type>> {
 	type = 'ColumnDefinition' as const
 
 	public static create<Type extends Model.ColumnType>(
 		type: Type,
-		typeOptions: ColumnDefinition.TypeOptions = {},
+		typeOptions: ColumnTypeOptions = {},
 	): ColumnDefinition<Type> {
 		return new ColumnDefinition({
 			type: type,
@@ -45,7 +45,7 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 		return this.withOption('typeAlias', alias)
 	}
 
-	createField({ name, conventions, enumRegistry, entityName }: FieldDefinition.CreateFieldContext): Model.AnyField {
+	createField({ name, conventions, enumRegistry, entityName }: CreateFieldContext): Model.AnyField {
 		const { type, nullable, columnName, enumDefinition, default: defaultValue, columnType, typeAlias } = this.options
 		const common = {
 			name: name,
@@ -79,20 +79,51 @@ class ColumnDefinition<Type extends Model.ColumnType> extends FieldDefinition<Co
 	}
 }
 
-namespace ColumnDefinition {
-	export type TypeOptions = {
-		enumDefinition?: EnumDefinition
-	}
-
-	export type Options<Type extends Model.ColumnType> = {
-		type: Model.ColumnType
-		columnType?: string
-		typeAlias?: string
-		columnName?: string
-		unique?: boolean
-		nullable?: boolean
-		default?: Model.ColumnTypeDefinition['default']
-	} & TypeOptions
+export function column(type: Model.ColumnType, typeOptions: ColumnTypeOptions = {}) {
+	return ColumnDefinition.create(type, typeOptions)
 }
 
-export default ColumnDefinition
+export function stringColumn() {
+	return column(Model.ColumnType.String)
+}
+
+export function intColumn() {
+	return column(Model.ColumnType.Int)
+}
+
+export function boolColumn() {
+	return column(Model.ColumnType.Bool)
+}
+
+export function doubleColumn() {
+	return column(Model.ColumnType.Double)
+}
+
+export function dateColumn() {
+	return column(Model.ColumnType.Date)
+}
+
+export function dateTimeColumn() {
+	return column(Model.ColumnType.DateTime)
+}
+
+export function jsonColumn() {
+	return column(Model.ColumnType.Json)
+}
+
+export function enumColumn(enumDefinition: EnumDefinition) {
+	return column(Model.ColumnType.Enum, { enumDefinition })
+}
+
+export type ColumnTypeOptions = {
+	enumDefinition?: EnumDefinition
+}
+export type ColumnDefinitionOptions<Type extends Model.ColumnType> = {
+	type: Model.ColumnType
+	columnType?: string
+	typeAlias?: string
+	columnName?: string
+	unique?: boolean
+	nullable?: boolean
+	default?: Model.ColumnTypeDefinition['default']
+} & ColumnTypeOptions

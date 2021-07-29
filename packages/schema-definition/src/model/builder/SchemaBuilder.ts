@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import EntityBuilder from './EntityBuilder'
-import NamingConventions from './../definition/NamingConventions'
+import { DefaultNamingConventions, NamingConventions } from '../definition/NamingConventions'
 import SchemaBuilderInternal from './SchemaBuilderInternal'
 import { EntityConfigurator } from './types'
 
@@ -8,7 +8,7 @@ export default class SchemaBuilder {
 	private entities: { [name: string]: EntityConfigurator } = {}
 	private enums: { [name: string]: string[] } = {}
 
-	constructor(private readonly conventions: NamingConventions = new NamingConventions.Default()) {}
+	constructor(private readonly conventions: NamingConventions = new DefaultNamingConventions()) {}
 
 	public enum(name: string, values: string[]): SchemaBuilder {
 		this.enums[name] = values

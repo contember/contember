@@ -1,6 +1,6 @@
 import FieldProcessor from './FieldProcessor'
 import ColumnBuilder from '../ColumnBuilder'
-import NamingConventions from '../../definition/NamingConventions'
+import { NamingConventions } from '../../definition/NamingConventions'
 import { Model } from '@contember/schema'
 import { getColumnType } from '../../utils/getColumnType'
 

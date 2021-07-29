@@ -1,8 +1,8 @@
 import { Model } from '@contember/schema'
-import { Interface, RelationTarget } from './types'
-import FieldDefinition from './FieldDefinition'
+import { EntityConstructor, Interface, RelationTarget } from '../types'
+import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 
-class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition.Options> {
+export class ManyHasManyDefinitionImpl extends FieldDefinition<ManyHasManyDefinitionOptions> {
 	type = 'ManyHasManyDefinition' as const
 
 	inversedBy(inversedBy: string): Interface<ManyHasManyDefinition> {
@@ -21,7 +21,7 @@ class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition.Option
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
 
-	createField({ name, conventions, entityName, entityRegistry }: FieldDefinition.CreateFieldContext): Model.AnyField {
+	createField({ name, conventions, entityName, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		let joiningTable: Model.JoiningTable | undefined = options.joiningTable
 		if (!joiningTable) {
@@ -49,13 +49,15 @@ class ManyHasManyDefinition extends FieldDefinition<ManyHasManyDefinition.Option
 	}
 }
 
-namespace ManyHasManyDefinition {
-	export type Options = {
-		target: RelationTarget
-		inversedBy?: string
-		joiningTable?: Model.JoiningTable
-		orderBy?: Model.OrderBy[]
-	}
+export type ManyHasManyDefinition = Interface<ManyHasManyDefinitionImpl>
+
+export function manyHasMany(target: EntityConstructor, inversedBy?: string): ManyHasManyDefinition {
+	return new ManyHasManyDefinitionImpl({ target, inversedBy })
 }
 
-export default ManyHasManyDefinition
+export type ManyHasManyDefinitionOptions = {
+	target: RelationTarget
+	inversedBy?: string
+	joiningTable?: Model.JoiningTable
+	orderBy?: Model.OrderBy[]
+}

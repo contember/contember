@@ -6,6 +6,9 @@
 	},
 	"references": [
 		{
+			"path": "../../engine-api-tester/src"
+		},
+		{
 			"path": "../src"
 		}
 	]

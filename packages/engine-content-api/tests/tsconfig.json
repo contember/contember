@@ -10,6 +10,9 @@
 		},
 		{
 			"path": "../../engine-api-tester/src"
+		},
+		{
+			"path": "../../schema-definition/src"
 		}
 	]
 }

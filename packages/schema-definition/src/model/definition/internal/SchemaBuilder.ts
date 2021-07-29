@@ -2,13 +2,13 @@ import { Model } from '@contember/schema'
 import { NamingHelper } from '@contember/schema-utils'
 import 'reflect-metadata'
 import { tuple } from '../../../utils'
-import { EntityConstructor, Interface } from '../types'
+import { EntityConstructor, FieldsDefinition } from '../types'
 import { NamingConventions } from '../NamingConventions'
 import { EnumDefinition } from '../EnumDefinition'
 import { EntityRegistry } from './EntityRegistry'
 import { EnumRegistry } from './EnumRegistry'
-import { ColumnDefinition, FieldDefinition } from '../fieldDefinitions'
-import { UniqueOptions } from '../UniqueDefinition'
+import { ColumnDefinition } from '../fieldDefinitions'
+import { applyEntityExtensions } from '../extensions'
 
 export class SchemaBuilder {
 	private entityRegistry = new EntityRegistry()
@@ -27,18 +27,16 @@ export class SchemaBuilder {
 
 	public createSchema(): Model.Schema {
 		const entities = Object.entries(this.entityRegistry.entities).map(([entityName, definition]): Model.Entity => {
-			const definitionInstance: Record<string, Interface<FieldDefinition<any>>> = new definition()
-
-			const unique = Reflect.getMetadata('uniqueKeys', definition) || []
+			const definitionInstance: FieldsDefinition = new definition()
 
 			const primaryName = this.conventions.getPrimaryField()
 			const primaryField = this.createPrimaryColumn()
 
-			return {
+			const entity: Model.Entity = {
 				name: entityName,
 				primary: primaryName,
 				primaryColumn: this.conventions.getColumnName(primaryName),
-				unique: this.createUnique(entityName, unique, definitionInstance),
+				unique: this.createUnique(entityName, definitionInstance),
 				fields: [tuple(primaryName, primaryField), ...Object.entries(definitionInstance)]
 					.map(([name, definition]) => {
 						return definition.createField({
@@ -57,6 +55,7 @@ export class SchemaBuilder {
 					}, {}),
 				tableName: this.conventions.getTableName(entityName),
 			}
+			return applyEntityExtensions(definition, entity, definitionInstance)
 		})
 
 		return {
@@ -72,16 +71,8 @@ export class SchemaBuilder {
 		})
 	}
 
-	private createUnique(
-		entityName: string,
-		uniqueDefinition: UniqueOptions<Record<string, unknown>>[],
-		fieldDefinitions: Record<string, Interface<FieldDefinition<any>>>,
-	): Model.UniqueConstraints {
+	private createUnique(entityName: string, fieldDefinitions: FieldsDefinition): Model.UniqueConstraints {
 		const unique: Model.UniqueConstraints = {}
-		for (let { name, fields } of uniqueDefinition) {
-			name = name || NamingHelper.createUniqueConstraintName(entityName, fields)
-			unique[name] = { fields, name }
-		}
 		for (const [fieldName, definition] of Object.entries(fieldDefinitions)) {
 			if (definition.options.unique) {
 				const uniqueName = NamingHelper.createUniqueConstraintName(entityName, [fieldName])

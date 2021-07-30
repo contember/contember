@@ -1,4 +1,5 @@
 /lerna-debug.log
 /node_modules
 /packages/*/dist
+/packages/*/temp
 /packages/*/node_modules

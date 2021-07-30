@@ -1,7 +1,7 @@
 /*
-* For a detailed explanation regarding each configuration property, visit:
-* https://jestjs.io/docs/en/configuration.html
-*/
+ * For a detailed explanation regarding each configuration property, visit:
+ * https://jestjs.io/docs/en/configuration.html
+ */
 export const getJestConfig = () => ({
 	// All imported modules in your tests should be mocked automatically
 	// automock: false,
@@ -10,7 +10,7 @@ export const getJestConfig = () => ({
 	// bail: 0,
 
 	// The directory where Jest should store its cached dependency information
-	// cacheDirectory: "/tmp/jest_rs",
+	cacheDirectory: 'temp/_jest/cache',
 
 	// Automatically clear mock calls and instances between every test
 	// clearMocks: false,
@@ -22,7 +22,7 @@ export const getJestConfig = () => ({
 	collectCoverageFrom: ['src/**/*.ts'],
 
 	// The directory where Jest should output its coverage files
-	coverageDirectory: 'temp/coverage',
+	coverageDirectory: 'temp/_jest/coverage',
 
 	// An array of regexp pattern strings used to skip coverage collection
 	// coveragePathIgnorePatterns: [
@@ -80,7 +80,9 @@ export const getJestConfig = () => ({
 	// ],
 
 	// A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-	// moduleNameMapper: {},
+	moduleNameMapper: {
+		'^@contember/(.+)': '<rootDir>/../$1/src/index.ts',
+	},
 
 	// An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
 	// modulePathIgnorePatterns: [],

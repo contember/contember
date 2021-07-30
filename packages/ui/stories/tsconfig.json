@@ -1,0 +1,10 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../temp/stories",
+		"allowJs": true
+	},
+	"references": [
+		{ "path": "../src" }
+	]
+}

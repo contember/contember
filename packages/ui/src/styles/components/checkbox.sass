@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 @import '../common'
 
 .#{$cui-conf-globalPrefix}checkbox
@@ -50,11 +52,11 @@
 			top: 50%
 			left: 50%
 			background-color: currentColor
-			border-radius: ($tick-thickness / 2)
-			transform-origin: ($tick-thickness / 2) center // Essentially "left center"
+			border-radius: ($tick-thickness * 0.5)
+			transform-origin: ($tick-thickness * 0.5) center // Essentially "left center"
 
-		$tick-x-offset: -($tick-thickness / 2) - ($tick-long-length - $tick-short-length) * $tick-angle-half-sine / 2
-		$tick-y-offset: -($tick-thickness / 4) + ($tick-long-length - $tick-thickness) * $tick-angle-half-sine / 2
+		$tick-x-offset: -($tick-thickness * 0.5) - ($tick-long-length - $tick-short-length) * $tick-angle-half-sine * 0.5
+		$tick-y-offset: -($tick-thickness * 0.25) + ($tick-long-length - $tick-thickness) * $tick-angle-half-sine * 0.5
 
 		&::before
 			+size($tick-short-length $tick-thickness)
@@ -68,7 +70,7 @@
 		display: flex
 		flex-direction: column
 		line-height: $cui-base-lineHeight
-		padding-top: (($box-side - $cui-base-lineHeight * .8) / 2)
+		padding-top: (($box-side - $cui-base-lineHeight * .8) * 0.5)
 
 		&-main
 			color: $cui-formGroup-label-color
@@ -114,7 +116,7 @@
 					color: $c-tick
 					width: $tick-long-length
 
-			$t-short-factor: $tick-short-length / ($tick-long-length + $tick-short-length)
+			$t-short-factor: math.div($tick-short-length, $tick-long-length + $tick-short-length)
 			$t-short: $t-tick * $t-short-factor
 			&::before
 				animation: $t-short checkbox-tick-short $t-background ease-in forwards

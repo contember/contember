@@ -1,0 +1,14 @@
+{
+	"name": "@contember/admin-sandbox",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "src/index.html",
+	"scripts": {
+		"build": "exit 0",
+		"build:api:dev": "exit 0",
+		"build:api:prod": "exit 0"
+	},
+	"devDependencies": {
+		"@contember/admin": "workspace:*"
+	}
+}

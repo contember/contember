@@ -1,13 +1,14 @@
-import { NormalizedPersistedData, ReceivedDataTree } from '../accessorTree'
+import { NormalizedPersistedData, PersistedEntityDataStore, ReceivedDataTree, SubTreeDataStore } from '../accessorTree'
 import { BindingError } from '../BindingError'
 import type { Environment } from '../dao'
 import { MarkerTreeRoot, PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
-import type { EntityName, FieldName } from '../treeParameters'
 import type {
 	Alias,
 	EntityId,
+	EntityName,
 	EntityRealmKey,
+	FieldName,
 	PlaceholderName,
 	SugaredQualifiedEntityList,
 	SugaredQualifiedSingleEntity,
@@ -20,6 +21,8 @@ import { MarkerComparator } from './MarkerComparator'
 import { RequestResponseNormalizer } from './RequestResponseNormalizer'
 import type { Schema } from './schema'
 import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
+
+const emptyEntityIdSet: ReadonlySet<EntityId> = new Set()
 
 export class TreeStore {
 	public readonly entityStore: Map<EntityId, EntityState> = new Map()
@@ -35,26 +38,26 @@ export class TreeStore {
 
 	public constructor() {}
 
-	public mergeInQueryResponse(response: ReceivedDataTree) {
+	public mergeInQueryResponse(response: ReceivedDataTree): void {
 		RequestResponseNormalizer.mergeInQueryResponse(this.persistedData, response)
 	}
 
-	public mergeInMutationResponse(response: ReceivedDataTree) {
+	public mergeInMutationResponse(response: ReceivedDataTree): void {
 		RequestResponseNormalizer.mergeInMutationResponse(this.persistedData, response)
 	}
 
-	public setSchema(newSchema: Schema) {
+	public setSchema(newSchema: Schema): void {
 		// TODO
 		if (this._schema === undefined) {
 			this._schema = newSchema
 		}
 	}
 
-	public get persistedEntityData() {
+	public get persistedEntityData(): PersistedEntityDataStore {
 		return this.persistedData.persistedEntityDataStore
 	}
 
-	public get subTreePersistedData() {
+	public get subTreePersistedData(): SubTreeDataStore {
 		return this.persistedData.subTreeDataStore
 	}
 
@@ -186,6 +189,17 @@ export class TreeStore {
 			throw new BindingError(`Trying to retrieve a non-existent sub-tree '${placeholderName}'.`)
 		}
 		return subTreeState
+	}
+
+	public getEntityListPersistedIds(state: EntityListState): ReadonlySet<string> {
+		const blueprint = state.blueprint
+
+		if (blueprint.parent) {
+			const entityData = this.persistedEntityData.get(blueprint.parent.entity.id.value)
+			return (entityData?.get(blueprint.marker.placeholderName) as Set<string> | undefined) ?? emptyEntityIdSet
+		} else {
+			return (this.subTreePersistedData.get(blueprint.marker.placeholderName) as Set<string>) ?? emptyEntityIdSet
+		}
 	}
 
 	public disposeOfRealm(realmToDisposeOf: EntityRealmState | EntityRealmStateStub) {

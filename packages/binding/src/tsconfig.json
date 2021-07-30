@@ -1,18 +1,19 @@
 {
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
-		"outDir": "../dist/src",
+		"baseUrl": ".",
+		"outDir": "../temp",
 		"paths": {
-			"@contember/client": ["../../../packages/client/src"],
-			"@contember/react-client": ["../../../packages/react-client/src"],
-			"@contember/react-multipass-rendering": ["../../../packages/react-multipass-rendering/src"],
-			"@contember/react-utils": ["../../../packages/react-utils/src"]
+			"@contember/client": ["../../client/src"],
+			"@contember/react-client": ["../../react-client/src"],
+			"@contember/react-multipass-rendering": ["../../react-multipass-rendering/src"],
+			"@contember/react-utils": ["../../react-utils/src"]
 		}
 	},
 	"references": [
-		{ "path": "../../../packages/client/src" },
-		{ "path": "../../../packages/react-client/src" },
-		{ "path": "../../../packages/react-multipass-rendering/src" },
-		{ "path": "../../../packages/react-utils/src" }
+		{ "path": "../../client/src" },
+		{ "path": "../../react-client/src" },
+		{ "path": "../../react-multipass-rendering/src" },
+		{ "path": "../../react-utils/src" }
 	]
 }

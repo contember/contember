@@ -1,4 +1,4 @@
-import type { GraphQlClient } from '@contember/client'
+import type { GraphQlClientFailedRequestMetadata } from '@contember/client'
 
 export interface UnauthorizedRequestError {
 	type: 'unauthorized'
@@ -6,7 +6,7 @@ export interface UnauthorizedRequestError {
 
 export interface NetworkErrorRequestError {
 	type: 'networkError'
-	metadata: GraphQlClient.FailedRequestMetadata
+	metadata: GraphQlClientFailedRequestMetadata
 }
 
 export interface UnknownErrorRequestError {

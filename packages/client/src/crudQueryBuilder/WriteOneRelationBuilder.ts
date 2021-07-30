@@ -1,5 +1,5 @@
 import type { Input } from '@contember/schema'
-import type { Literal } from '../graphQlBuilder'
+import type { GraphQlLiteral } from '../graphQlBuilder'
 import type { WriteOperation, WriteRelationOps } from './types'
 import { WriteDataBuilder } from './WriteDataBuilder'
 
@@ -41,7 +41,7 @@ class WriteOneRelationBuilder<
 			  })
 	}
 
-	public connect(where: Input.UniqueWhere<Literal>) {
+	public connect(where: Input.UniqueWhere<GraphQlLiteral>) {
 		return WriteOneRelationBuilder.instantiate<Op, never>({ connect: where })
 	}
 
@@ -78,8 +78,8 @@ class WriteOneRelationBuilder<
 
 namespace WriteOneRelationBuilder {
 	export interface DataFormat {
-		create: Input.CreateOneRelationInput<Literal>
-		update: Input.UpdateOneRelationInput<Literal>
+		create: Input.CreateOneRelationInput<GraphQlLiteral>
+		update: Input.UpdateOneRelationInput<GraphQlLiteral>
 	}
 
 	export type Builder<

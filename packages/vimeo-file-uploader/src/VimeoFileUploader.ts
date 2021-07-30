@@ -1,9 +1,9 @@
 import type { FileUploader, FileUploaderInitializeOptions, UploadedFileMetadata } from '@contember/client'
 import { FileUploadError } from '@contember/client'
-import tus from 'tus-js-client'
+import { Upload } from 'tus-js-client'
 
 interface VimeoFileUploaderState {
-	upload?: tus.Upload
+	upload?: Upload
 	alias: number
 }
 
@@ -79,7 +79,7 @@ class VimeoFileUploader implements FileUploader {
 
 				const { vimeoId, uploadUrl } = datumBody.result
 
-				const upload = new tus.Upload(file, {
+				const upload = new Upload(file, {
 					endpoint: 'none',
 					retryDelays: [0, 3000, 5000, 10000, 20000],
 					onError: (error: Error) => {

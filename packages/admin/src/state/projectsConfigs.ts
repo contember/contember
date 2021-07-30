@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactElement } from 'react'
 import type { RouteMap } from '../components/pageRouting/utils'
 import type { MessageDictionaryByLocaleCode } from '../i18n'
 import type { SelectedDimension } from './request'
@@ -6,7 +6,7 @@ import type { SelectedDimension } from './request'
 export interface ProjectConfig {
 	project: string
 	stage: string
-	component: () => Promise<{ default: ComponentType }>
+	component: (() => Promise<{ default: ComponentType }>) | ReactElement
 	routes: RouteMap
 	defaultDimensions?: SelectedDimension
 	defaultLocale?: string

@@ -1,17 +1,28 @@
 {
-  "name": "@contember/react-multipass-rendering",
-  "version": "0.6.52",
-  "type": "module",
-  "main": "dist/src/index.js",
-  "scripts": {
-    "build": "rollup --config",
-    "test": "jest dist/tests/bundle.spec.js"
-  },
-  "typings": "dist/src/index.d.ts",
-  "peerDependencies": {
-    "react": "17.0.1"
-  },
-  "devDependencies": {
-    "tslib": "1.10.0"
-  }
+	"name": "@contember/react-multipass-rendering",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "./dist/react-multipass-rendering.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/react-multipass-rendering.development.js",
+				"production": "./dist/react-multipass-rendering.production.js"
+			}
+		}
+	},
+	"typings": "./dist/react-multipass-rendering.d.ts",
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production",
+		"build:api:dev": "api-extractor run --local",
+		"build:api:prod": "api-extractor run",
+		"test": "jest",
+		"test:with-coverage": "jest --coverage=true"
+	},
+	"peerDependencies": {
+		"react": "17.0.1"
+	},
+	"devDependencies": {
+		"tslib": "1.10.0"
+	}
 }

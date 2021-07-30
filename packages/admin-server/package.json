@@ -1,10 +1,13 @@
 {
 	"name": "@contember/admin-server",
 	"version": "0.6.52",
-	"main": "dist/src/index.js",
-	"typings": "dist/src/index.d.ts",
+	"main": "src/index.ts",
 	"type": "module",
-	"scripts": {},
+	"scripts": {
+		"build": "exit 0",
+		"build:api:dev": "exit 0",
+		"build:api:prod": "exit 0"
+	},
 	"bin": {
 		"run-admin": "dist/src/run-admin.js"
 	},

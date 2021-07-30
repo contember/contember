@@ -1,16 +1,26 @@
 {
-  "name": "@contember/react-client",
-  "version": "0.6.52",
-  "type": "module",
-  "main": "dist/src/index.js",
-  "scripts": {
-    "build": "rollup --config"
-  },
-  "typings": "dist/src/index.d.ts",
-  "dependencies": {
-    "@contember/client": "0.6.52"
-  },
-  "peerDependencies": {
-    "react": "17.0.1"
-  }
+	"name": "@contember/react-client",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "./dist/react-client.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/react-client.development.js",
+				"production": "./dist/react-client.production.js"
+			}
+		}
+	},
+	"typings": "./dist/react-client.d.ts",
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production",
+		"build:api:dev": "api-extractor run --local",
+		"build:api:prod": "api-extractor run"
+	},
+	"dependencies": {
+		"@contember/client": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "17.0.1"
+	}
 }

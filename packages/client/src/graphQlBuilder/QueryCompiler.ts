@@ -1,4 +1,4 @@
-import { Literal } from './Literal'
+import { GraphQlLiteral } from './GraphQlLiteral'
 import type { ObjectBuilder } from './ObjectBuilder'
 import type { RootObjectBuilder } from './RootObjectBuilder'
 
@@ -86,7 +86,7 @@ export class QueryCompiler {
 			const vals = args.map(val => this.formatArgs(val, level + 1))
 			return `[${vals.join(', ')}]`
 		}
-		if (args instanceof Literal) {
+		if (args instanceof GraphQlLiteral) {
 			return args.value
 		}
 

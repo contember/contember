@@ -212,7 +212,7 @@ export class EventManager {
 			case 'entityList': {
 				justUpdated.unpersistedChangesCount += changesDelta
 
-				if (__DEV_MODE__) {
+				if (import.meta.env.DEV) {
 					if (justUpdated.unpersistedChangesCount < 0) {
 						console.error(
 							`We have *JUST* reached a completely invalid state. From now on, anything can (and likely will) ` +
@@ -346,7 +346,7 @@ export class EventManager {
 						const changesCountAfter = this.dirtinessTracker.getChangesCount()
 
 						if (result instanceof Promise) {
-							if (__DEV_MODE__) {
+							if (import.meta.env.DEV) {
 								if (changesCountBefore !== changesCountAfter) {
 									// This isn't bulletproof. They could e.g. undo a change and make another one which would
 									// slip through this detection. But for most cases, it should be good enough and not too expensive.
@@ -394,7 +394,7 @@ export class EventManager {
 						} else {
 							// We just silently stop.
 							// That's NOT ideal but what else exactly do we do so that it's even remotely recoverable?
-							if (__DEV_MODE__) {
+							if (import.meta.env.DEV) {
 								throw new BindingError(
 									`A ${eventType} handler returned a promise that rejected. ` +
 										`This is a no-op that will fail silently in production.`,
@@ -403,7 +403,7 @@ export class EventManager {
 						}
 					}
 				}
-				if (__DEV_MODE__) {
+				if (import.meta.env.DEV) {
 					if (callbackQueue.length) {
 						throw new BindingError(
 							`Exceeded the ${eventType} settle limit. Your code likely contains a deadlock. ` +
@@ -501,7 +501,7 @@ export class EventManager {
 				// TODO timeout
 				const handlerResults = await Promise.allSettled(handlerPromises)
 
-				if (__DEV_MODE__) {
+				if (import.meta.env.DEV) {
 					for (const result of handlerResults) {
 						if (result.status === 'rejected') {
 							throw new BindingError(

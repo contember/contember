@@ -1,10 +1,8 @@
 import type { GridPagingState } from '../paging'
-import type {
-	DataGridColumns,
-	DataGridFilterArtifactStore,
-	DataGridHiddenColumnsStateStore,
-	DataGridOrderDirectionStore,
-} from './index'
+import type { DataGridColumns } from './DataGridColumn'
+import type { DataGridFilterArtifactStore } from './DataGridFilterArtifactStore'
+import type { DataGridHiddenColumnsStateStore } from './DataGridHiddenColumnsStateStore'
+import type { DataGridOrderDirectionStore } from './DataGridOrderDirectionStore'
 
 export interface DataGridState {
 	paging: GridPagingState

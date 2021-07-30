@@ -1,1 +1,1 @@
-declare const __DEV_MODE__: boolean
+/// <reference types="vite/client" />

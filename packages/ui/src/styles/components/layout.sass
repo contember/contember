@@ -1,3 +1,5 @@
+@use 'sass:math'
+
 @import '../common'
 
 .#{$cui-conf-globalPrefix}layout
@@ -111,11 +113,11 @@
 				width: $cui-layout-sidebar-width
 
 		&-collapseButton
-			$size: (24em / 16)
+			$size: math.div(24em, 16)
 			font-size: inherit
 			position: absolute
 			z-index: 2
-			top: (48em / 16)
+			top: math.div(48em, 16)
 			right: -0.5 * $size
 			display: inline-flex
 			width: $size

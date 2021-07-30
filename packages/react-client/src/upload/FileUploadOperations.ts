@@ -1,4 +1,4 @@
-import type { FileUploader, FileUploadError } from '@contember/client'
+import type { FileUploader } from '@contember/client'
 import type { FileId } from './FileId'
 import type { FileWithMetadata } from './FileWithMetadata'
 

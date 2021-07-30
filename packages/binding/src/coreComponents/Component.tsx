@@ -6,7 +6,7 @@ import type { MarkerProvider, StaticRenderProvider, StaticRenderProviderProps } 
 function Component<Props extends {}>(
 	statelessRender: FunctionComponent<Props>,
 	displayName?: string,
-): NamedExoticComponent<Props> & StaticRenderProvider<Props>
+): NamedExoticComponent<Props>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	statefulRender: FunctionComponent<Props>,
 	staticRender: (
@@ -14,12 +14,12 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 		environment: Environment,
 	) => ReactElement | null,
 	displayName?: string,
-): NamedExoticComponent<Props> & StaticRenderProvider<Props, NonStaticPropNames>
+): NamedExoticComponent<Props>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	statefulRender: FunctionComponent<Props>,
 	markerProvisions: MarkerProvider<Props, NonStaticPropNames>,
 	displayName?: string,
-): NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames>
+): NamedExoticComponent<Props>
 function Component<Props extends {}, NonStaticPropNames extends keyof Props = never>(
 	render: FunctionComponent<Props>,
 	decider?:

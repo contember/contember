@@ -8,7 +8,7 @@ export interface RepeaterProps<ContainerExtraProps, ItemExtraProps>
 
 export const Repeater = Component(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterProps<ContainerExtraProps, ItemExtraProps>) => {
-		if (__DEV_MODE__) {
+		if (import.meta.env.DEV) {
 			if (
 				'sortableBy' in props &&
 				props.sortableBy !== undefined &&

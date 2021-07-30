@@ -1,13 +1,23 @@
 {
-  "name": "@contember/react-utils",
-  "version": "0.6.52",
-  "type": "module",
-  "main": "dist/src/index.js",
-  "scripts": {
-    "build": "rollup --config"
-  },
-  "typings": "dist/src/index.d.ts",
-  "peerDependencies": {
-    "react": "17.0.1"
-  }
+	"name": "@contember/react-utils",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "./dist/react-utils.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/react-utils.development.js",
+				"production": "./dist/react-utils.production.js"
+			}
+		}
+	},
+	"typings": "./dist/react-utils.d.ts",
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production",
+		"build:api:dev": "api-extractor run --local",
+		"build:api:prod": "api-extractor run"
+	},
+	"peerDependencies": {
+		"react": "17.0.1"
+	}
 }

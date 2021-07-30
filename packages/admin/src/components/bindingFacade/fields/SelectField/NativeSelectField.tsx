@@ -1,5 +1,4 @@
-import { BindingError, ErrorAccessor } from '@contember/binding'
-import { Component } from '@contember/binding/dist/src/coreComponents/Component'
+import { BindingError, Component, ErrorAccessor } from '@contember/binding'
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoiceFieldProps } from '../ChoiceField'

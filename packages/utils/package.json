@@ -1,8 +1,20 @@
 {
 	"name": "@contember/utils",
 	"version": "0.6.52",
-	"main": "dist/src/index.js",
-	"typings": "dist/src/index.d.ts",
+	"main": "./dist/utils.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/utils.development.js",
+				"production": "./dist/utils.production.js"
+			}
+		}
+	},
+	"typings": "./dist/utils.d.ts",
 	"type": "module",
-	"scripts": {}
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production",
+		"build:api:dev": "api-extractor run --local",
+		"build:api:prod": "api-extractor run"
+	}
 }

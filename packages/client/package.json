@@ -1,12 +1,23 @@
 {
 	"name": "@contember/client",
 	"version": "0.6.52",
-	"main": "dist/src/index.js",
-	"typings": "dist/src/index.d.ts",
+	"main": "./temp/client.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/client.development.js",
+				"production": "./dist/client.production.js"
+			}
+		}
+	},
+	"typings": "./dist/client.d.ts",
 	"type": "module",
 	"scripts": {
-		"build": "rollup --config",
-		"test": "jest dist/tests/bundle.spec.js"
+		"build": "vite build --mode development && vite build --mode production",
+		"build:api:dev": "api-extractor run --local",
+		"build:api:prod": "api-extractor run",
+		"test": "jest",
+		"test:with-coverage": "jest --coverage=true"
 	},
 	"dependencies": {
 		"@contember/schema": "0.9.2"

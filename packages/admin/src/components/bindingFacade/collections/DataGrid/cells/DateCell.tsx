@@ -1,4 +1,4 @@
-import { Component, Literal, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
+import { Component, QueryLanguage, wrapFilterInHasOnes } from '@contember/binding'
 import type { Input } from '@contember/client'
 import { FormGroup, TextInput } from '@contember/ui'
 import { forwardRef, FunctionComponent, memo } from 'react'
@@ -35,7 +35,7 @@ export const DateCell: FunctionComponent<DateCellProps> = Component(props => {
 				}
 				const desugared = QueryLanguage.desugarRelativeSingleField(props.field, environment)
 
-				const conditions: Input.Condition<Input.ColumnValue<Literal>>[] = []
+				const conditions: Input.Condition<Input.ColumnValue>[] = []
 
 				if (filterArtifact.start) {
 					conditions.push({ gte: dateToStringWithoutTimezone(filterArtifact.start) })

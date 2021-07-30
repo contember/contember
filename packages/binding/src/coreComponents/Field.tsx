@@ -23,7 +23,11 @@ export const Field = Component(
 			return <>{props.format(field.value)}</>
 		}
 
-		if (field.value instanceof GraphQlBuilder.Literal || field.value === null || typeof field.value === 'boolean') {
+		if (
+			field.value instanceof GraphQlBuilder.GraphQlLiteral ||
+			field.value === null ||
+			typeof field.value === 'boolean'
+		) {
 			return null
 		}
 		return <>{field.value}</>

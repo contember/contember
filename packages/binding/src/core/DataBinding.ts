@@ -1,4 +1,4 @@
-import type { GraphQlClient, TreeFilter } from '@contember/client'
+import type { GraphQlClient, GraphQlClientFailedRequestMetadata, TreeFilter } from '@contember/client'
 import type { ReactNode } from 'react'
 import {
 	AsyncBatchUpdatesOptions,
@@ -252,7 +252,7 @@ export class DataBinding {
 
 			const schema = await this.getOrLoadSchema()
 			this.treeStore.setSchema(schema)
-			if (__DEV_MODE__) {
+			if (import.meta.env.DEV) {
 				// For most trees, checking this against the schema should be unnecessary since if we already effectively
 				// have this tree root, then assuming everything we already have is valid, this should match the schema as well.
 				// However, we might be dealing with an isCreating tree root which is completely new. Also, we can just lean
@@ -324,7 +324,7 @@ export class DataBinding {
 		])
 		this.treeStore.setSchema(schema)
 
-		if (__DEV_MODE__) {
+		if (import.meta.env.DEV) {
 			for (const extension of pendingExtensions) {
 				SchemaValidator.assertTreeValid(schema, extension.markerTreeRoot)
 			}
@@ -364,7 +364,7 @@ export class DataBinding {
 			if (metadata.name === 'AbortError') {
 				return
 			}
-			this.onError(metadataToRequestError(metadata as GraphQlClient.FailedRequestMetadata))
+			this.onError(metadataToRequestError(metadata as GraphQlClientFailedRequestMetadata))
 		}
 		return queryResponse
 	}

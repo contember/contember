@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import type { EntityListAccessor } from '../accessors'
 import type {
 	Alias,
 	SugaredQualifiedEntityList,
@@ -9,7 +10,10 @@ import { useBindingOperations } from './useBindingOperations'
 import { useEnvironment } from './useEnvironment'
 import { useTreeRootId } from './useTreeRootId'
 
-export const useGetEntityListSubTree = () => {
+export const useGetEntityListSubTree = (): ((
+	parametersOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList,
+	...treeId: [TreeRootId | undefined] | []
+) => EntityListAccessor) => {
 	const environment = useEnvironment()
 	const getEntityListSubTree = useBindingOperations().getEntityListSubTree
 	const treeRootId = useTreeRootId()

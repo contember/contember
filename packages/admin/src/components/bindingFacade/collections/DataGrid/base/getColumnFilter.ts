@@ -1,5 +1,6 @@
 import { Environment, Filter, QueryLanguage } from '@contember/binding'
-import type { DataGridColumnProps, DataGridFilterArtifact } from './index'
+import type { DataGridColumnProps } from './DataGridColumn'
+import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
 
 export const getColumnFilter = (
 	column: DataGridColumnProps,

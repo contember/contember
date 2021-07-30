@@ -8,6 +8,7 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 } from '../markers'
+import { BijectiveIndexedMap } from '../structures'
 import type {
 	EntityEventListenerStore,
 	EntityListEventListenerStore,
@@ -21,7 +22,6 @@ import type { AccessorErrorManager } from './AccessorErrorManager'
 import type { Config } from './Config'
 import type { EventManager } from './EventManager'
 import { EntityOperations, FieldOperations, ListOperations } from './operations'
-import { OperationsHelpers } from './operations/OperationsHelpers'
 import { RealmKeyGenerator } from './RealmKeyGenerator'
 import {
 	EntityListBlueprint,
@@ -34,7 +34,6 @@ import {
 	getEntityMarker,
 	RootStateNode,
 } from './state'
-import { BijectiveIndexedMap } from '../structures'
 import { TreeParameterMerger } from './TreeParameterMerger'
 import type { TreeStore } from './TreeStore'
 
@@ -270,7 +269,7 @@ export class StateInitializer {
 			unpersistedChangesCount: 0, // TODO force creation?
 			getAccessor: () => {
 				if (entityListState.accessor === undefined) {
-					const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, entityListState)
+					const persistedEntityIds = this.treeStore.getEntityListPersistedIds(entityListState)
 					entityListState.accessor = new EntityListAccessor(
 						entityListState,
 						this.listOperations,

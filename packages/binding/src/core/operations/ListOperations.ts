@@ -80,7 +80,7 @@ export class ListOperations {
 
 	public connectEntity(outerState: EntityListState, entityToConnect: EntityAccessor) {
 		this.eventManager.syncOperation(() => {
-			const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, outerState)
+			const persistedEntityIds = this.treeStore.getEntityListPersistedIds(outerState)
 			const stateToConnect = OperationsHelpers.resolveAndPrepareEntityToConnect(this.treeStore, entityToConnect)
 			const idToConnect = stateToConnect.entity.id
 
@@ -145,7 +145,7 @@ export class ListOperations {
 	public disconnectEntity(listState: EntityListState, childEntity: EntityAccessor) {
 		this.eventManager.syncOperation(() => {
 			// TODO disable this at the top-level.
-			const persistedEntityIds = OperationsHelpers.getEntityListPersistedIds(this.treeStore, listState)
+			const persistedEntityIds = this.treeStore.getEntityListPersistedIds(listState)
 			for (const state of StateIterator.eachSiblingRealmChild(this.treeStore, listState)) {
 				const disconnectedChildIdValue = childEntity.id
 				const disconnectedChildRealm = state.children.get(disconnectedChildIdValue)

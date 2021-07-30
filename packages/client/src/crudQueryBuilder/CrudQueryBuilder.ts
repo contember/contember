@@ -18,11 +18,6 @@ import type {
 } from './types'
 import { WriteBuilder } from './WriteBuilder'
 
-interface Variables {
-	[key: string]: any
-}
-type Client<T extends any> = (query: string | object, variables?: Variables) => PromiseLike<T>
-
 export class CrudQueryBuilder {
 	constructor(
 		private type: undefined | 'query' | 'mutation' = undefined,
@@ -173,9 +168,5 @@ export class CrudQueryBuilder {
 			default:
 				throw new CrudQueryBuilderError(`Invalid type ${this.type}`)
 		}
-	}
-
-	async execute<T>(client: Client<T>, variables?: Variables): Promise<T> {
-		return client(this.getGql(), variables)
 	}
 }

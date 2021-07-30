@@ -1,4 +1,4 @@
-import { GraphQlBuilder } from '@contember/client'
+import { GraphQlLiteral } from '@contember/client'
 import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
 
@@ -79,7 +79,7 @@ describe('single relative fields QueryLanguage parser', () => {
 					filter: undefined,
 					reducedBy: {
 						a: 'b',
-						bar: new GraphQlBuilder.Literal('Literal'),
+						bar: new GraphQlLiteral('Literal'),
 					},
 				},
 			],
@@ -110,7 +110,7 @@ describe('single relative fields QueryLanguage parser', () => {
 								be: {
 									indeed: {
 										not: {
-											shallow: new GraphQlBuilder.Literal('baz'),
+											shallow: new GraphQlLiteral('baz'),
 										},
 									},
 								},

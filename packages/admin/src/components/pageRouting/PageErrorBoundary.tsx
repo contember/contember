@@ -7,7 +7,7 @@ export interface PageErrorBoundaryProps {
 }
 
 export const PageErrorBoundary = memo((props: PageErrorBoundaryProps) => (
-	<ErrorBoundary FallbackComponent={__DEV_MODE__ ? DevErrorFallback : ProdErrorFallback}>
+	<ErrorBoundary FallbackComponent={import.meta.env.DEV ? DevErrorFallback : ProdErrorFallback}>
 		{props.children}
 	</ErrorBoundary>
 ))

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import { memo, ReactNode } from 'react'
 import { SessionTokenContext } from './auth'
 import { ApiBaseUrlContext, LoginTokenContext } from './config'

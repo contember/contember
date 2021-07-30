@@ -1,29 +1,40 @@
 {
-  "name": "@contember/binding",
-  "version": "0.6.52",
-  "type": "module",
-  "main": "dist/src/index.js",
-  "scripts": {
-    "build": "rollup --config",
-    "test": "jest dist/tests/bundle.spec.js"
-  },
-  "typings": "dist/src/index.d.ts",
-  "dependencies": {
-    "@contember/client": "0.6.52",
-    "@contember/react-client": "0.6.52",
-    "@contember/react-multipass-rendering": "0.6.52",
-    "@contember/react-utils": "0.6.52",
-    "chevrotain": "6.5.0",
-    "js-levenshtein": "1.1.6",
-    "uuid": "8.3.1"
-  },
-  "peerDependencies": {
-    "react": "17.0.1",
-    "react-dom": "17.0.1"
-  },
-  "devDependencies": {
-    "@types/jest": "26.0.13",
-    "@types/js-levenshtein": "1.1.0",
-    "@types/uuid": "8.3.0"
-  }
+	"name": "@contember/binding",
+	"version": "0.6.52",
+	"type": "module",
+	"main": "./dist/binding.production.js",
+	"exports": {
+		".": {
+			"import": {
+				"development": "./dist/binding.development.js",
+				"production": "./dist/binding.production.js"
+			}
+		}
+	},
+	"typings": "./dist/binding.d.ts",
+	"scripts": {
+		"build": "vite build --mode development && vite build --mode production",
+		"build:api:dev": "api-extractor run --local",
+		"build:api:prod": "api-extractor run",
+		"test": "jest",
+		"test:with-coverage": "jest --coverage=true"
+	},
+	"dependencies": {
+		"@contember/client": "workspace:*",
+		"@contember/react-client": "workspace:*",
+		"@contember/react-multipass-rendering": "workspace:*",
+		"@contember/react-utils": "workspace:*",
+		"chevrotain": "6.5.0",
+		"js-levenshtein": "1.1.6",
+		"uuid": "8.3.1"
+	},
+	"peerDependencies": {
+		"react": "17.0.1",
+		"react-dom": "17.0.1"
+	},
+	"devDependencies": {
+		"@types/jest": "26.0.13",
+		"@types/js-levenshtein": "1.1.0",
+		"@types/uuid": "8.3.0"
+	}
 }

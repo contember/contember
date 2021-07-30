@@ -6,15 +6,8 @@ import type { RelativeSingleField } from '../treeParameters'
 import { addEntityAtIndex } from './addEntityAtIndex'
 import { throwNoopError } from './errors'
 import { moveEntity } from './moveEntity'
+import type { SortedEntities } from './SortedEntities'
 import { sortEntities } from './sortEntities'
-
-export interface SortedEntities {
-	entities: EntityAccessor[]
-	prependNew: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
-	appendNew: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
-	addNewAtIndex: (index: number, preprocess?: EntityAccessor.BatchUpdatesHandler) => void
-	moveEntity: (oldIndex: number, newIndex: number) => void
-}
 
 const addNewAtIndexImplementation = (
 	callbackName: keyof SortedEntities,

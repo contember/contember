@@ -2,14 +2,11 @@ import type { EntityAccessor } from '../../accessors'
 import type { RuntimeId } from '../../accessorTree'
 import { BindingError } from '../../BindingError'
 import { PRIMARY_KEY_NAME } from '../../bindingTypes'
-import type { EntityId } from '../../treeParameters'
 import { EventManager } from '../EventManager'
 import { RealmKeyGenerator } from '../RealmKeyGenerator'
-import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState } from '../state'
+import type { EntityRealmState, EntityRealmStateStub, EntityState } from '../state'
 import type { StateInitializer } from '../StateInitializer'
 import type { TreeStore } from '../TreeStore'
-
-const emptyEntityIdSet: ReadonlySet<EntityId> = new Set()
 
 export class OperationsHelpers {
 	public static rejectInvalidAccessorTree(): never {
@@ -46,17 +43,6 @@ export class OperationsHelpers {
 		// }
 
 		return stateToConnect
-	}
-
-	public static getEntityListPersistedIds(treeStore: TreeStore, state: EntityListState): ReadonlySet<string> {
-		const blueprint = state.blueprint
-
-		if (blueprint.parent) {
-			const entityData = treeStore.persistedEntityData.get(blueprint.parent.entity.id.value)
-			return (entityData?.get(blueprint.marker.placeholderName) as Set<string> | undefined) ?? emptyEntityIdSet
-		} else {
-			return (treeStore.subTreePersistedData.get(blueprint.marker.placeholderName) as Set<string>) ?? emptyEntityIdSet
-		}
 	}
 
 	public static changeEntityId(

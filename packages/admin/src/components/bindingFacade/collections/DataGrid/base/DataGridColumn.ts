@@ -1,7 +1,7 @@
 import { BindingError, Environment } from '@contember/binding'
 import type { ComponentType, ReactElement, ReactNode } from 'react'
+import type { DataGridCellPublicProps } from './DataGridCellPublicProps'
 import type { DataGridColumnKey } from './DataGridColumnKey'
-import type { DataGridCellPublicProps } from './DataGridContainer'
 import type { DataGridFilterArtifact } from './DataGridFilterArtifact'
 import type { DataGridHeaderCellPublicProps } from './DataGridHeaderCell'
 import type { DataGridOrderDirection } from './DataGridOrderDirection'

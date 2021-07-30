@@ -1,10 +1,11 @@
 {
 	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
 		"baseUrl": ".",
 		"composite": true,
 		"declaration": true,
+		"emitDeclarationOnly": true,
 		"declarationMap": true,
-		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"importsNotUsedAsValues": "error",
 		"incremental": true,

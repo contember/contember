@@ -9,6 +9,7 @@ export type {
 	FileUploadOperations,
 	InitializeUpload,
 	PurgeUpload,
+	FailUpload,
 } from './FileUploadOperations'
 export type { FileWithMetadata } from './FileWithMetadata'
 export type { SingleFileUploadState } from './SingleFileUploadState'

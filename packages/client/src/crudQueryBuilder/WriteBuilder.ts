@@ -1,5 +1,5 @@
 import type { Input } from '@contember/schema'
-import { Literal, ObjectBuilder } from '../graphQlBuilder'
+import { GraphQlLiteral, ObjectBuilder } from '../graphQlBuilder'
 import { ErrorsRelationBuilder } from './ErrorsRelationBuilder'
 import { ReadBuilder } from './ReadBuilder'
 import type { WriteArguments, WriteFields, WriteOperation } from './types'
@@ -33,7 +33,7 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 		)
 	}
 
-	public by(by: Input.UniqueWhere<Literal>) {
+	public by(by: Input.UniqueWhere<GraphQlLiteral>) {
 		return WriteBuilder.instantiate<Exclude<AA, 'by'>, AF, Op>(this.objectBuilder.argument('by', by))
 	}
 

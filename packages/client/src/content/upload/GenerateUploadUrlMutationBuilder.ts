@@ -1,4 +1,4 @@
-import { Literal, ObjectBuilder, QueryBuilder } from '../../graphQlBuilder'
+import { GraphQlLiteral, ObjectBuilder, QueryBuilder } from '../../graphQlBuilder'
 
 class GenerateUploadUrlMutationBuilder {
 	private static generateUploadUrlFields = new ObjectBuilder()
@@ -33,7 +33,7 @@ namespace GenerateUploadUrlMutationBuilder {
 		contentType: string
 		expiration?: number
 		prefix?: string
-		acl?: Literal<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>
+		acl?: GraphQlLiteral<'PUBLIC_READ' | 'PRIVATE' | 'NONE'>
 	}
 
 	export interface MutationParameters {

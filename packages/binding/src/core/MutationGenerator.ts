@@ -416,7 +416,7 @@ export class MutationGenerator {
 					typeof field === 'string' ||
 					typeof field === 'number' ||
 					field === null ||
-					field instanceof GraphQlBuilder.Literal
+					field instanceof GraphQlBuilder.GraphQlLiteral
 				) {
 					builder = builder.set(key, field)
 				} else {
@@ -698,7 +698,7 @@ export class MutationGenerator {
 		return builder
 	}
 
-	private transformFieldValue(fieldState: FieldState, value: FieldValue): FieldValue | GraphQlBuilder.Literal {
+	private transformFieldValue(fieldState: FieldState, value: FieldValue): FieldValue | GraphQlBuilder.GraphQlLiteral {
 		if (typeof value !== 'string') {
 			return value
 		}
@@ -709,6 +709,6 @@ export class MutationGenerator {
 		if (fieldSchema === undefined || fieldSchema.__typename !== '_Column') {
 			throw new BindingError()
 		}
-		return fieldSchema.enumName === null ? value : new GraphQlBuilder.Literal(value)
+		return fieldSchema.enumName === null ? value : new GraphQlBuilder.GraphQlLiteral(value)
 	}
 }

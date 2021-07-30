@@ -4,19 +4,19 @@ import type { RelativeSingleEntity, SugaredRelativeSingleEntity } from '../treeP
 import { useEnvironment } from './useEnvironment'
 
 /**
- * @deprecated
+ * @deprecated Use useEntity instead.
  */
 function useDesugaredRelativeSingleEntity(
 	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity,
 ): RelativeSingleEntity
 /**
- * @deprecated
+ * @deprecated Use useEntity instead.
  */
 function useDesugaredRelativeSingleEntity(
 	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined,
 ): RelativeSingleEntity | undefined
 /**
- * @deprecated
+ * @deprecated Use useEntity instead.
  */
 function useDesugaredRelativeSingleEntity(
 	sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined,

@@ -47,7 +47,7 @@ export class FieldOperations {
 			if (placeholderName === PRIMARY_KEY_NAME) {
 				const entity = fieldState.parent.entity
 
-				if (__DEV_MODE__) {
+				if (import.meta.env.DEV) {
 					if (newValue !== fieldState.value && (fieldState.touchLog !== undefined || entity.hasIdSetInStone)) {
 						throw new BindingError(
 							`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n` +

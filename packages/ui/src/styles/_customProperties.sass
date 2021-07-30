@@ -1,3 +1,4 @@
+@use 'sass:math'
 @import 'common'
 
 =customProperties()
@@ -12,6 +13,6 @@
 	@media (prefers-reduced-motion: reduce)
 		--cui-button-effect-transition-duration: 0s
 
-		--cui-spinner-period: #{1/3 * $cui-spinner-period}
+		--cui-spinner-period: #{math.div($cui-spinner-period, 3)}
 
 		--cui-menu-caret-transition-duration: 0s

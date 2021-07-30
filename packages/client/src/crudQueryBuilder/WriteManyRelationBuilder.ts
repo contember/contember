@@ -102,10 +102,9 @@ class WriteManyRelationBuilder<
 			  ])) as WriteManyRelationBuilder.Builder<WriteOperation.Update>
 	}
 
-	private withAlias<D extends Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateManyRelationInputItem<GraphQlLiteral>>(
-		data: D,
-		alias?: string,
-	): D {
+	private withAlias<
+		D extends Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateManyRelationInputItem<GraphQlLiteral>
+	>(data: D, alias?: string): D {
 		if (alias !== undefined) {
 			data.alias = alias
 		}

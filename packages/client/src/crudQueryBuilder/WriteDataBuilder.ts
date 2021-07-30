@@ -72,9 +72,18 @@ class WriteDataBuilder<Op extends WriteOperation.ContentfulOperation> {
 	}
 
 	private mergeUpdateOne(
-		original: Value.FieldValue<GraphQlLiteral> | Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateOneRelationInput<GraphQlLiteral>,
-		fresh: Value.FieldValue<GraphQlLiteral> | Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateOneRelationInput<GraphQlLiteral>,
-	): Value.FieldValue<GraphQlLiteral> | Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateOneRelationInput<GraphQlLiteral> {
+		original:
+			| Value.FieldValue<GraphQlLiteral>
+			| Input.CreateOneRelationInput<GraphQlLiteral>
+			| Input.UpdateOneRelationInput<GraphQlLiteral>,
+		fresh:
+			| Value.FieldValue<GraphQlLiteral>
+			| Input.CreateOneRelationInput<GraphQlLiteral>
+			| Input.UpdateOneRelationInput<GraphQlLiteral>,
+	):
+		| Value.FieldValue<GraphQlLiteral>
+		| Input.CreateOneRelationInput<GraphQlLiteral>
+		| Input.UpdateOneRelationInput<GraphQlLiteral> {
 		// TODO This implementation pretty bad but it will have to do for now.
 		if (original instanceof GraphQlLiteral) {
 			if (fresh instanceof GraphQlLiteral) {

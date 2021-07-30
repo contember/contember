@@ -16,8 +16,7 @@
 		"build": "vite build --mode development && vite build --mode production",
 		"build:api:dev": "api-extractor run --local",
 		"build:api:prod": "api-extractor run",
-		"styles:build": "node --experimental-modules ./scripts/build-style.mjs",
-		"test": "echo \"There is nothing to do\" || jest dist/tests/bundle.spec.js"
+		"styles:build": "node --experimental-modules ./scripts/build-style.mjs"
 	},
 	"dependencies": {
 		"@contember/binding": "workspace:*",

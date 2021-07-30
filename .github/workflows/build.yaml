@@ -35,5 +35,7 @@ jobs:
         run: pnpm run eslint:lint
       - name: Build
         run: pnpm run build
+      - name: Build API
+        run: pnpm run build:api:prod
       - name: Test
         run: pnpm run test

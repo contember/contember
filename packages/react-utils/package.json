@@ -14,8 +14,8 @@
 	"typings": "./dist/react-utils.d.ts",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
-		"build:docs:dev": "api-extractor run --local",
-		"build:docs:prod": "api-extractor run"
+		"build:api:dev": "api-extractor run --local",
+		"build:api:prod": "api-extractor run"
 	},
 	"peerDependencies": {
 		"react": "17.0.1"

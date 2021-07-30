@@ -16,7 +16,8 @@
 		"build": "vite build --mode development && vite build --mode production",
 		"build:api:dev": "api-extractor run --local",
 		"build:api:prod": "api-extractor run",
-		"test": "jest dist/tests/bundle.spec.js"
+		"test": "jest",
+		"test:with-coverage": "jest --coverage=true"
 	},
 	"peerDependencies": {
 		"react": "17.0.1"

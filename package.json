@@ -12,7 +12,7 @@
 	},
 	"type": "module",
 	"scripts": {
-		"build": "pnpm run ts:build build && pnpm run -r --parallel build",
+		"build": "pnpm run ts:build && pnpm run -r --parallel build && pnpm run -r --parallel styles:build",
 		"build:api:dev": "pnpm run -r build:api:dev # && pnpm run build:docs",
 		"build:ap:prod": "pnpm run -r build:api:prod # && pnpm run build:docs",
 		"build:docs": "echo \"Generated API docs are currently broken and disabled.\" # api-documenter markdown --input-folder ./temp --output-folder ./docs",

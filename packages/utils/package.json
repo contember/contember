@@ -10,6 +10,7 @@
 			}
 		}
 	},
+	"files": ["dist/"],
 	"typings": "./dist/utils.d.ts",
 	"type": "module",
 	"scripts": {

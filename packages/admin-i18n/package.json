@@ -11,6 +11,7 @@
 			}
 		}
 	},
+	"files": ["dist/"],
 	"typings": "./dist/admin-i18n.d.ts",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",

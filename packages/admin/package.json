@@ -46,7 +46,6 @@
 		"react-redux": "7.1.0",
 		"react-select": "4.3.0",
 		"react-sortable-hoc": "1.10.1",
-		"react-table": "6.8.6",
 		"react-window": "1.8.5",
 		"redux": "4.0.4",
 		"redux-actions": "2.6.5",
@@ -70,7 +69,6 @@
 		"@types/react-leaflet": "2.5.2",
 		"@types/react-redux": "7.1.5",
 		"@types/react-select": "4.0.14",
-		"@types/react-table": "6.7.12",
 		"@types/react-window": "1.8.2",
 		"@types/redux-actions": "2.6.1",
 		"csstype": "3.0.7"

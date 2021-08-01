@@ -3,10 +3,9 @@
 	"version": "0.6.52",
 	"type": "module",
 	"main": "src/index.html",
+	"private": true,
 	"scripts": {
-		"build": "exit 0",
-		"build:api:dev": "exit 0",
-		"build:api:prod": "exit 0"
+		"vite": "vite src --config vite.config.js --debug"
 	},
 	"devDependencies": {
 		"@contember/admin": "workspace:*"

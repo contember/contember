@@ -30,7 +30,7 @@ export function createViteConfig(packageName) {
 					},
 				},
 				sourcemap: isDevMode ? 'inline' : false,
-				target: isDevMode ? 'esnext' : 'es2019',
+				target: isDevMode ? 'esnext' : 'es2020',
 			},
 			esbuild: {
 				jsxInject: `import * as React from 'react'`,
@@ -43,6 +43,10 @@ export function createViteConfig(packageName) {
 						find: `@contember/${packageName}`,
 						replacement: resolve(rootDirectory, `packages/${packageName}/src/index.ts`),
 					})),
+					{
+						find: 'attr-accept',
+						replacement: resolve(rootDirectory, `packages/admin/node_modules/attr-accept/src/index.js`),
+					},
 				],
 				dedupe: packageList.map(packageName => `@contember/${packageName}`),
 			},

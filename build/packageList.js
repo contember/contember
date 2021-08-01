@@ -1,7 +1,7 @@
 export const packageList = [
 	'admin',
 	'admin-i18n',
-	// 'admin-sandbox', // Deliberately left out.
+	'admin-sandbox',
 	'admin-server',
 	'binding',
 	'client',

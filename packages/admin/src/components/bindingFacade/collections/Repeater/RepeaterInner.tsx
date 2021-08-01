@@ -11,7 +11,7 @@ import {
 	useSortedEntities,
 } from '@contember/binding'
 import { ComponentType, Fragment, ReactElement, ReactNode, useCallback } from 'react'
-import type { Axis, SortEndHandler } from 'react-sortable-hoc'
+import type { SortEndHandler } from 'react-sortable-hoc'
 import { useMessageFormatter } from '../../../../i18n'
 import { RepeaterContainer, RepeaterContainerProps, RepeaterContainerPublicProps } from './RepeaterContainer'
 import { repeaterDictionary } from './repeaterDictionary'
@@ -39,7 +39,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 	itemComponent?: ComponentType<RepeaterItemProps & ItemExtraProps>
 	itemComponentExtraProps?: ItemExtraProps
 
-	unstable__sortAxis?: Axis
+	unstable__sortAxis?: 'x' | 'y' | 'xy'
 	useDragHandle?: boolean
 }
 

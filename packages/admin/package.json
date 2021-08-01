@@ -11,6 +11,7 @@
 			}
 		}
 	},
+	"files": ["dist/"],
 	"typings": "./dist/admin.d.ts",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
@@ -29,7 +30,7 @@
 		"@formatjs/icu-messageformat-parser": "2.0.1",
 		"@mangoweb/sass-base": "0.0.8",
 		"@sindresorhus/slugify": "0.9.1",
-		"attr-accept": "2.1.0",
+		"attr-accept": "2.2.2",
 		"blueimp-md5": "2.12.0",
 		"classnames": "2.2.6",
 		"debounce": "1.2.0",
@@ -46,7 +47,6 @@
 		"react-redux": "7.1.0",
 		"react-select": "4.3.0",
 		"react-sortable-hoc": "1.10.1",
-		"react-table": "6.8.6",
 		"react-window": "1.8.5",
 		"redux": "4.0.4",
 		"redux-actions": "2.6.5",
@@ -70,7 +70,6 @@
 		"@types/react-leaflet": "2.5.2",
 		"@types/react-redux": "7.1.5",
 		"@types/react-select": "4.0.14",
-		"@types/react-table": "6.7.12",
 		"@types/react-window": "1.8.2",
 		"@types/redux-actions": "2.6.1",
 		"csstype": "3.0.7"

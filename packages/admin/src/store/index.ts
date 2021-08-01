@@ -7,7 +7,6 @@ import type { ClientConfig } from '../bootstrap'
 import ContentClientFactory from '../model/ContentClientFactory'
 import GraphqlClient from '../model/GraphqlClient'
 import { LocalStorageManager } from '../model/LocalStorageManager'
-import SystemClientFactory from '../model/SystemClientFactory'
 import rootReducer from '../reducer'
 import { SET_IDENTITY } from '../reducer/auth'
 import type State from '../state'
@@ -16,7 +15,6 @@ export interface Services {
 	localStorageManager: LocalStorageManager
 	tenantClient: GraphqlClient
 	contentClientFactory: ContentClientFactory
-	systemClientFactory: SystemClientFactory
 	config: ClientConfig
 }
 
@@ -24,12 +22,10 @@ export function createServices(config: ClientConfig): Services {
 	const localStorageManager = new LocalStorageManager()
 	const tenantClient = new GraphqlClient(config.apiBaseUrl + '/tenant')
 	const contentClientFactory = new ContentClientFactory(config.apiBaseUrl)
-	const systemClientFactory = new SystemClientFactory(config.apiBaseUrl)
 	return {
 		localStorageManager,
 		tenantClient,
 		contentClientFactory,
-		systemClientFactory,
 		config,
 	}
 }

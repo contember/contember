@@ -4,8 +4,6 @@ import { createAction } from 'redux-actions'
 import thunk from 'redux-thunk'
 import type { Dispatch } from '../actions/types'
 import type { ClientConfig } from '../bootstrap'
-import ContentClientFactory from '../model/ContentClientFactory'
-import GraphqlClient from '../model/GraphqlClient'
 import { LocalStorageManager } from '../model/LocalStorageManager'
 import rootReducer from '../reducer'
 import { SET_IDENTITY } from '../reducer/auth'
@@ -13,19 +11,13 @@ import type State from '../state'
 
 export interface Services {
 	localStorageManager: LocalStorageManager
-	tenantClient: GraphqlClient
-	contentClientFactory: ContentClientFactory
 	config: ClientConfig
 }
 
 export function createServices(config: ClientConfig): Services {
 	const localStorageManager = new LocalStorageManager()
-	const tenantClient = new GraphqlClient(config.apiBaseUrl + '/tenant')
-	const contentClientFactory = new ContentClientFactory(config.apiBaseUrl)
 	return {
 		localStorageManager,
-		tenantClient,
-		contentClientFactory,
 		config,
 	}
 }

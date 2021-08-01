@@ -16,6 +16,7 @@
 		"build:api:dev": "pnpm run -r build:api:dev # && pnpm run build:docs",
 		"build:ap:prod": "pnpm run -r build:api:prod # && pnpm run build:docs",
 		"build:docs": "echo \"Generated API docs are currently broken and disabled.\" # api-documenter markdown --input-folder ./temp --output-folder ./docs",
+		"changeset": "changeset",
 		"check": "./scripts/runChecks.sh",
 		"clean": "pnpm run clean:dependencies && pnpm run clean:generated",
 		"clean:dependencies": "rm -rf node_modules/ packages/*/node_modules",

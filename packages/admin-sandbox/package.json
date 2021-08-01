@@ -1,6 +1,6 @@
 {
 	"name": "@contember/admin-sandbox",
-	"version": "0.6.52",
+	"version": "0.6.53",
 	"type": "module",
 	"main": "src/index.html",
 	"private": true,

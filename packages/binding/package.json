@@ -1,6 +1,6 @@
 {
 	"name": "@contember/binding",
-	"version": "0.6.52",
+	"version": "0.6.53",
 	"type": "module",
 	"main": "./dist/binding.production.js",
 	"exports": {
@@ -11,7 +11,9 @@
 			}
 		}
 	},
-	"files": ["dist/"],
+	"files": [
+		"dist/"
+	],
 	"typings": "./dist/binding.d.ts",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",

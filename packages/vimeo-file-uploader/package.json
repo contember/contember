@@ -1,6 +1,6 @@
 {
 	"name": "@contember/vimeo-file-uploader",
-	"version": "0.6.52",
+	"version": "0.6.53",
 	"main": "./dist/vimeo-file-uploader.production.js",
 	"exports": {
 		".": {
@@ -10,7 +10,9 @@
 			}
 		}
 	},
-	"files": ["dist/"],
+	"files": [
+		"dist/"
+	],
 	"typings": "./dist/vimeo-file-uploader.d.ts",
 	"type": "module",
 	"scripts": {

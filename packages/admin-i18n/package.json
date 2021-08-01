@@ -1,6 +1,6 @@
 {
 	"name": "@contember/admin-i18n",
-	"version": "0.6.52",
+	"version": "0.6.53",
 	"type": "module",
 	"main": "./dist/admin-i18n.production.js",
 	"exports": {
@@ -11,7 +11,9 @@
 			}
 		}
 	},
-	"files": ["dist/"],
+	"files": [
+		"dist/"
+	],
 	"typings": "./dist/admin-i18n.d.ts",
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",

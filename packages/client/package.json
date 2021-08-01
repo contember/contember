@@ -1,6 +1,6 @@
 {
 	"name": "@contember/client",
-	"version": "0.6.52",
+	"version": "0.6.53",
 	"main": "./dist/client.production.js",
 	"exports": {
 		".": {
@@ -10,7 +10,9 @@
 			}
 		}
 	},
-	"files": ["dist/"],
+	"files": [
+		"dist/"
+	],
 	"typings": "./dist/client.d.ts",
 	"type": "module",
 	"scripts": {

@@ -16,7 +16,7 @@ class SoundCloudEmbedHandler implements EmbedHandler<string> {
 	}
 
 	public canHandleSource(source: string, url: URL | undefined): boolean | string {
-		// This method deliberately biases towards the liberal and permissive.
+		// Regular url from url bar is ignored intentionally since it doesn't contain track id required for embed/iframe src attribute
 		if (url) {
 			return false
 		}

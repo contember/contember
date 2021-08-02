@@ -65,16 +65,19 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		if (!field) {
 			throw new Error()
 		}
-		this.executionContext.addData(entity.primary, async ids =>
-			this.relationFetcher.fetchManyHasManyGroups(
-				this.mapper,
-				field,
-				targetEntity,
-				relation,
-				targetRelation,
-				columns,
-				ids,
-			),
+		this.executionContext.addData(
+			entity.primary,
+			async ids =>
+				this.relationFetcher.fetchManyHasManyGroups(
+					this.mapper,
+					field,
+					targetEntity,
+					relation,
+					targetRelation,
+					columns,
+					ids,
+				),
+			[],
 		)
 	}
 

@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-tenant-api",
-  "version": "0.11.2",
+  "version": "0.11.3",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -9,14 +9,14 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/authorization": "^0.11.2",
-    "@contember/database": "^0.11.2",
-    "@contember/database-migrations": "^0.11.2",
-    "@contember/dic": "^0.11.2",
-    "@contember/engine-common": "^0.11.2",
-    "@contember/graphql-utils": "^0.11.2",
-    "@contember/queryable": "^0.11.2",
-    "@contember/schema": "^0.11.2",
+    "@contember/authorization": "^0.11.3",
+    "@contember/database": "^0.11.3",
+    "@contember/database-migrations": "^0.11.3",
+    "@contember/dic": "^0.11.3",
+    "@contember/engine-common": "^0.11.3",
+    "@contember/graphql-utils": "^0.11.3",
+    "@contember/queryable": "^0.11.3",
+    "@contember/schema": "^0.11.3",
     "apollo-server-core": "^2.16.1",
     "apollo-server-errors": "^2.4.0",
     "graphql-tools": "^7.0.1",
@@ -26,7 +26,7 @@
     "otplib": "^12.0.1"
   },
   "devDependencies": {
-    "@contember/database-tester": "^0.11.2",
+    "@contember/database-tester": "^0.11.3",
     "@graphql-codegen/cli": "^1.15.2",
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",

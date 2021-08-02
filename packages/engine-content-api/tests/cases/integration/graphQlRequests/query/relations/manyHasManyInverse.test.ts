@@ -118,4 +118,56 @@ test('Tags with paginated posts (many has many inverse)', async () => {
 	})
 })
 
+test('empty many-has-many inverse relation', async () => {
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Post', entity =>
+				entity.manyHasMany('tags', relation => relation.target('Tag').inversedBy('posts')).column('name'),
+			)
+			.entity('Tag', entity => entity.column('name'))
+			.buildSchema(),
+		query: GQL`
+        query {
+          listTag {
+            id
+            posts {
+				id
+            }
+          }
+        }
+			`,
+		executes: [
+			{
+				sql: SQL`select "root_"."id" as "root_id",
+					         "root_"."id" as "root_id"
+				         from "public"."tag" as "root_"`,
+				response: {
+					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+				},
+			},
+			{
+				sql: SQL`select "junction_"."tag_id", "junction_"."post_id"  from "public"."post_tags" as "junction_"  where "junction_"."tag_id" in (?, ?)`,
+				parameters: [testUuid(1), testUuid(2)],
+				response: {
+					rows: [],
+				},
+			},
+		],
+		return: {
+			data: {
+				listTag: [
+					{
+						id: testUuid(1),
+						posts: [],
+					},
+					{
+						id: testUuid(2),
+						posts: [],
+					},
+				],
+			},
+		},
+	})
+})
+
 test.run()

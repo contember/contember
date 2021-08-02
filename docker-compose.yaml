@@ -1,0 +1,130 @@
+version: '3'
+
+services:
+  admin_server:
+    image: node:14-alpine
+    command: 'npx nodemon dist/run-admin.js'
+    user: '1000:1000'
+
+    working_dir: /src/packages/admin-server
+    volumes:
+      - .:/src:cached
+
+    environment:
+      NODE_ENV: 'development'
+      CONTEMBER_PORT: '4000'
+
+      CONTEMBER_API_ENDPOINT: 'http://api:4000'
+      CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+      CONTEMBER_PUBLIC_DIR: '/src/packages/admin-server/dist'
+
+      CONTEMBER_S3_ENDPOINT: 'http://s3:9000'
+      CONTEMBER_S3_REGION: '_'
+      CONTEMBER_S3_BUCKET: 'contember'
+      CONTEMBER_S3_PREFIX: 'admin/'
+      CONTEMBER_S3_KEY: 'contember'
+      CONTEMBER_S3_SECRET: 'contember'
+
+    ports:
+      - '4000:4000'
+
+    depends_on:
+      - admin_server_esbuild
+      - admin_server_vite
+
+
+  admin_server_esbuild:
+    image: node:14-alpine
+    command: 'npx esbuild src/run-admin.ts --bundle --watch --sourcemap --platform=node --outdir=dist'
+    user: '1000:1000'
+
+    working_dir: /src/packages/admin-server
+    volumes:
+      - .:/src:cached
+
+
+  admin_server_vite:
+    image: node:14-alpine
+    command: 'npx vite build public --config vite.config.js --watch'
+    user: '1000:1000'
+
+    working_dir: /src/packages/admin-server
+    volumes:
+      - .:/src:cached
+
+
+  api:
+    image: contember/contember:canary-22b4fb522631340e5b3c9b03982d23
+
+    environment:
+      NODE_ENV: 'development'
+
+      CONTEMBER_PORT: '4000'
+      CONTEMBER_ROOT_EMAIL: 'superadmin@localhost'
+      CONTEMBER_ROOT_PASSWORD: 'superadmin@localhost'
+      CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+      CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+
+      DEFAULT_DB_HOST: 'postgres'
+      DEFAULT_DB_PORT: '5432'
+      DEFAULT_DB_USER: 'contember'
+      DEFAULT_DB_PASSWORD: 'contember'
+
+      DEFAULT_S3_PROVIDER: 'minio'
+      DEFAULT_S3_REGION: ''
+      DEFAULT_S3_BUCKET: 'contember'
+      DEFAULT_S3_PREFIX: 'data/'
+      DEFAULT_S3_KEY: 'contember'
+      DEFAULT_S3_SECRET: 'contember'
+
+      TENANT_DB_NAME: 'tenant'
+
+    depends_on:
+      - postgres
+
+
+  s3:
+    image: minio/minio
+    command: 'server /data'
+
+    environment:
+      MINIO_ROOT_USER: contember
+      MINIO_ROOT_PASSWORD: contember
+
+    ports:
+      - '9000:9000'
+
+    volumes:
+      - s3-data:/data:cached
+
+  adminer:
+    image: michalhosna/adminer:latest
+
+    environment:
+      ADMINER_DRIVER: pgsql
+      ADMINER_SERVER: postgres
+      ADMINER_DB: contember
+      ADMINER_USERNAME: contember
+      ADMINER_PASSWORD: contember
+      ADMINER_AUTOLOGIN: 1
+      ADMINER_NAME: Contember
+
+    depends_on:
+      - postgres
+
+
+  postgres:
+    image: postgres:12-alpine
+
+    environment:
+      POSTGRES_PASSWORD: contember
+      POSTGRES_USER: contember
+      POSTGRES_DB: contember
+
+    volumes:
+      - pgsql-data:/var/lib/postgresql/data
+
+
+volumes:
+  pgsql-data: ~
+  s3-data: ~

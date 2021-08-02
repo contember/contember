@@ -2,7 +2,7 @@
 	"name": "@contember/admin-server",
 	"version": "0.6.52",
 	"scripts": {
-		"build": "tsc && vite build public --config vite.config.js && esbuild src/run-admin.ts --bundle --sourcemap --platform=node --outdir=dist",
+		"build": "vite build public --config vite.config.js && esbuild src/run-admin.ts --bundle --sourcemap --platform=node --outdir=dist",
 		"build:api:dev": "exit 0",
 		"build:api:prod": "exit 0"
 	},
@@ -22,9 +22,6 @@
 		"@types/mime": "^2.0.3",
 		"@types/node": "^16.3.3",
 		"@types/node-fetch": "^2.5.11",
-		"esbuild": "^0.12.15",
-		"nodemon": "^2.0.12",
-		"typescript": "^4.3.5",
-		"vite": "2.4.2"
+		"esbuild": "^0.12.15"
 	}
 }

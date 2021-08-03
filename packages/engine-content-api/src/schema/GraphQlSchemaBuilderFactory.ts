@@ -27,133 +27,209 @@ import { Authorizator } from '../acl'
 import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory'
 import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
 import { PaginatedHasManyFieldProviderVisitor } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProviderVisitor'
+import { Builder } from '@contember/dic'
 
 export class GraphQlSchemaBuilderFactory {
 	constructor() {}
 
 	public create(schema: Model.Schema, authorizator: Authorizator): GraphQlSchemaBuilder {
-		const customTypesProvider = new CustomTypesProvider()
-		const enumsProvider = new EnumsProvider(schema)
-		const columnTypeResolver = new ColumnTypeResolver(schema, enumsProvider, customTypesProvider)
-		const conditionTypeProvider = new ConditionTypeProvider(columnTypeResolver)
-		const whereTypeProvider = new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider)
-		const orderByTypeProvider = new OrderByTypeProvider(schema, authorizator)
+		return this.createContainerBuilder(schema, authorizator).build().graphQlSchemaBuilder
+	}
 
-		const entityTypeProvider = new EntityTypeProvider(
-			schema,
-			authorizator,
-			columnTypeResolver,
-			whereTypeProvider,
-			orderByTypeProvider,
-		)
-
-		const paginatedFieldConfigFactory = new PaginatedFieldConfigFactory(
-			whereTypeProvider,
-			orderByTypeProvider,
-			entityTypeProvider,
-		)
-		const hasManyToOneReducerVisitor = new HasManyToHasOneRelationReducerFieldVisitor(
-			schema,
-			authorizator,
-			entityTypeProvider,
-			whereTypeProvider,
-		)
-		const hasManyToOneReducer = new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor)
-		entityTypeProvider.registerEntityFieldProvider(HasManyToHasOneReducer.extensionName, hasManyToOneReducer)
-
-		const paginatedHasManyFieldProviderVisitor = new PaginatedHasManyFieldProviderVisitor(paginatedFieldConfigFactory)
-		const paginatedHasManyFieldProvider = new PaginatedHasManyFieldProvider(
-			schema,
-			paginatedHasManyFieldProviderVisitor,
-		)
-		entityTypeProvider.registerEntityFieldProvider(
-			PaginatedHasManyFieldProvider.extensionName,
-			paginatedHasManyFieldProvider,
-		)
-
-		const queryProvider = new QueryProvider(
-			authorizator,
-			whereTypeProvider,
-			orderByTypeProvider,
-			entityTypeProvider,
-			paginatedFieldConfigFactory,
-		)
-
-		const createEntityInputProviderAccessor = new Accessor<EntityInputProvider<EntityInputType.create>>()
-		const createEntityRelationAllowedOperationsVisitor = new CreateEntityRelationAllowedOperationsVisitor(authorizator)
-		const createEntityRelationInputFieldVisitor = new CreateEntityRelationInputFieldVisitor(
-			schema,
-			whereTypeProvider,
-			createEntityInputProviderAccessor,
-			createEntityRelationAllowedOperationsVisitor,
-		)
-		const createEntityRelationInputProvider = new CreateEntityRelationInputProvider(
-			schema,
-			createEntityRelationInputFieldVisitor,
-		)
-		const createEntityInputFieldVisitor = new CreateEntityInputFieldVisitor(
-			schema,
-			authorizator,
-			columnTypeResolver,
-			createEntityRelationInputProvider,
-		)
-		const createEntityInputProvider = new EntityInputProvider(
-			EntityInputType.create,
-			schema,
-			authorizator,
-			createEntityInputFieldVisitor,
-		)
-		createEntityInputProviderAccessor.set(createEntityInputProvider)
-
-		const updateEntityInputProviderAccessor = new Accessor<EntityInputProvider<EntityInputType.update>>()
-		const updateEntityRelationAllowedOperationsVisitor = new UpdateEntityRelationAllowedOperationsVisitor(authorizator)
-		const updateEntityRelationInputFieldVisitor = new UpdateEntityRelationInputFieldVisitor(
-			schema,
-			authorizator,
-			whereTypeProvider,
-			updateEntityInputProviderAccessor,
-			createEntityInputProvider,
-			updateEntityRelationAllowedOperationsVisitor,
-		)
-		const updateEntityRelationInputProvider = new UpdateEntityRelationInputProvider(
-			schema,
-			updateEntityRelationInputFieldVisitor,
-		)
-		const updateEntityInputFieldVisitor = new UpdateEntityInputFieldVisitor(
-			authorizator,
-			columnTypeResolver,
-			updateEntityRelationInputProvider,
-		)
-		const updateEntityInputProvider = new EntityInputProvider(
-			EntityInputType.update,
-			schema,
-			authorizator,
-			updateEntityInputFieldVisitor,
-		)
-		updateEntityInputProviderAccessor.set(updateEntityInputProvider)
-
-		const resultSchemaTypeProvider = new ResultSchemaTypeProvider()
-		const mutationProvider = new MutationProvider(
-			authorizator,
-			whereTypeProvider,
-			entityTypeProvider,
-			createEntityInputProvider,
-			updateEntityInputProvider,
-			resultSchemaTypeProvider,
-		)
-		const validationQueriesProvider = new ValidationQueriesProvider(
-			whereTypeProvider,
-			createEntityInputProvider,
-			updateEntityInputProvider,
-			resultSchemaTypeProvider,
-		)
-
-		return new GraphQlSchemaBuilder(
-			schema,
-			queryProvider,
-			validationQueriesProvider,
-			mutationProvider,
-			resultSchemaTypeProvider,
-		)
+	public createContainerBuilder(schema: Model.Schema, authorizator: Authorizator) {
+		return new Builder({})
+			.addService('schema', () => schema)
+			.addService('authorizator', () => authorizator)
+			.addService('customTypesProvider', ({}) => new CustomTypesProvider())
+			.addService('enumsProvider', ({ schema }) => new EnumsProvider(schema))
+			.addService(
+				'columnTypeResolver',
+				({ schema, enumsProvider, customTypesProvider }) =>
+					new ColumnTypeResolver(schema, enumsProvider, customTypesProvider),
+			)
+			.addService('conditionTypeProvider', ({ columnTypeResolver }) => new ConditionTypeProvider(columnTypeResolver))
+			.addService(
+				'whereTypeProvider',
+				({ schema, authorizator, columnTypeResolver, conditionTypeProvider }) =>
+					new WhereTypeProvider(schema, authorizator, columnTypeResolver, conditionTypeProvider),
+			)
+			.addService('orderByTypeProvider', ({ schema, authorizator }) => new OrderByTypeProvider(schema, authorizator))
+			.addService(
+				'entityTypeProvider',
+				({ schema, authorizator, columnTypeResolver, whereTypeProvider, orderByTypeProvider }) =>
+					new EntityTypeProvider(schema, authorizator, columnTypeResolver, whereTypeProvider, orderByTypeProvider),
+			)
+			.addService(
+				'paginatedFieldConfigFactory',
+				({ whereTypeProvider, orderByTypeProvider, entityTypeProvider }) =>
+					new PaginatedFieldConfigFactory(whereTypeProvider, orderByTypeProvider, entityTypeProvider),
+			)
+			.addService(
+				'hasManyToOneReducerVisitor',
+				({ schema, authorizator, entityTypeProvider, whereTypeProvider }) =>
+					new HasManyToHasOneRelationReducerFieldVisitor(schema, authorizator, entityTypeProvider, whereTypeProvider),
+			)
+			.addService(
+				'hasManyToOneReducer',
+				({ schema, hasManyToOneReducerVisitor }) => new HasManyToHasOneReducer(schema, hasManyToOneReducerVisitor),
+			)
+			.addService(
+				'paginatedHasManyFieldProviderVisitor',
+				({ paginatedFieldConfigFactory }) => new PaginatedHasManyFieldProviderVisitor(paginatedFieldConfigFactory),
+			)
+			.addService(
+				'paginatedHasManyFieldProvider',
+				({ schema, paginatedHasManyFieldProviderVisitor }) =>
+					new PaginatedHasManyFieldProvider(schema, paginatedHasManyFieldProviderVisitor),
+			)
+			.addService(
+				'queryProvider',
+				({ authorizator, whereTypeProvider, orderByTypeProvider, entityTypeProvider, paginatedFieldConfigFactory }) =>
+					new QueryProvider(
+						authorizator,
+						whereTypeProvider,
+						orderByTypeProvider,
+						entityTypeProvider,
+						paginatedFieldConfigFactory,
+					),
+			)
+			.addService(
+				'createEntityInputProviderAccessor',
+				({}) => new Accessor<EntityInputProvider<EntityInputType.create>>(),
+			)
+			.addService(
+				'createEntityRelationAllowedOperationsVisitor',
+				({ authorizator }) => new CreateEntityRelationAllowedOperationsVisitor(authorizator),
+			)
+			.addService(
+				'createEntityRelationInputFieldVisitor',
+				({
+					schema,
+					whereTypeProvider,
+					createEntityInputProviderAccessor,
+					createEntityRelationAllowedOperationsVisitor,
+				}) =>
+					new CreateEntityRelationInputFieldVisitor(
+						schema,
+						whereTypeProvider,
+						createEntityInputProviderAccessor,
+						createEntityRelationAllowedOperationsVisitor,
+					),
+			)
+			.addService(
+				'createEntityRelationInputProvider',
+				({ schema, createEntityRelationInputFieldVisitor }) =>
+					new CreateEntityRelationInputProvider(schema, createEntityRelationInputFieldVisitor),
+			)
+			.addService(
+				'createEntityInputFieldVisitor',
+				({ schema, authorizator, columnTypeResolver, createEntityRelationInputProvider }) =>
+					new CreateEntityInputFieldVisitor(
+						schema,
+						authorizator,
+						columnTypeResolver,
+						createEntityRelationInputProvider,
+					),
+			)
+			.addService(
+				'createEntityInputProvider',
+				({ schema, authorizator, createEntityInputFieldVisitor }) =>
+					new EntityInputProvider(EntityInputType.create, schema, authorizator, createEntityInputFieldVisitor),
+			)
+			.addService(
+				'updateEntityInputProviderAccessor',
+				({}) => new Accessor<EntityInputProvider<EntityInputType.update>>(),
+			)
+			.addService(
+				'updateEntityRelationAllowedOperationsVisitor',
+				({ authorizator }) => new UpdateEntityRelationAllowedOperationsVisitor(authorizator),
+			)
+			.addService(
+				'updateEntityRelationInputFieldVisitor',
+				({
+					schema,
+					authorizator,
+					whereTypeProvider,
+					updateEntityInputProviderAccessor,
+					createEntityInputProvider,
+					updateEntityRelationAllowedOperationsVisitor,
+				}) =>
+					new UpdateEntityRelationInputFieldVisitor(
+						schema,
+						authorizator,
+						whereTypeProvider,
+						updateEntityInputProviderAccessor,
+						createEntityInputProvider,
+						updateEntityRelationAllowedOperationsVisitor,
+					),
+			)
+			.addService(
+				'updateEntityRelationInputProvider',
+				({ schema, updateEntityRelationInputFieldVisitor }) =>
+					new UpdateEntityRelationInputProvider(schema, updateEntityRelationInputFieldVisitor),
+			)
+			.addService(
+				'updateEntityInputFieldVisitor',
+				({ authorizator, columnTypeResolver, updateEntityRelationInputProvider }) =>
+					new UpdateEntityInputFieldVisitor(authorizator, columnTypeResolver, updateEntityRelationInputProvider),
+			)
+			.addService(
+				'updateEntityInputProvider',
+				({ schema, authorizator, updateEntityInputFieldVisitor }) =>
+					new EntityInputProvider(EntityInputType.update, schema, authorizator, updateEntityInputFieldVisitor),
+			)
+			.addService('resultSchemaTypeProvider', ({}) => new ResultSchemaTypeProvider())
+			.addService(
+				'mutationProvider',
+				({
+					authorizator,
+					whereTypeProvider,
+					entityTypeProvider,
+					createEntityInputProvider,
+					updateEntityInputProvider,
+					resultSchemaTypeProvider,
+				}) =>
+					new MutationProvider(
+						authorizator,
+						whereTypeProvider,
+						entityTypeProvider,
+						createEntityInputProvider,
+						updateEntityInputProvider,
+						resultSchemaTypeProvider,
+					),
+			)
+			.addService(
+				'validationQueriesProvider',
+				({ whereTypeProvider, createEntityInputProvider, updateEntityInputProvider, resultSchemaTypeProvider }) =>
+					new ValidationQueriesProvider(
+						whereTypeProvider,
+						createEntityInputProvider,
+						updateEntityInputProvider,
+						resultSchemaTypeProvider,
+					),
+			)
+			.addService(
+				'graphQlSchemaBuilder',
+				({ schema, queryProvider, validationQueriesProvider, mutationProvider, resultSchemaTypeProvider }) =>
+					new GraphQlSchemaBuilder(
+						schema,
+						queryProvider,
+						validationQueriesProvider,
+						mutationProvider,
+						resultSchemaTypeProvider,
+					),
+			)
+			.setupService('createEntityInputProvider', (it, { createEntityInputProviderAccessor }) => {
+				createEntityInputProviderAccessor.set(it)
+			})
+			.setupService('updateEntityInputProvider', (it, { updateEntityInputProviderAccessor }) => {
+				updateEntityInputProviderAccessor.set(it)
+			})
+			.setupService('entityTypeProvider', (it, { hasManyToOneReducer }) => {
+				it.registerEntityFieldProvider(HasManyToHasOneReducer.extensionName, hasManyToOneReducer)
+			})
+			.setupService('entityTypeProvider', (it, { paginatedHasManyFieldProvider }) => {
+				it.registerEntityFieldProvider(PaginatedHasManyFieldProvider.extensionName, paginatedHasManyFieldProvider)
+			})
 	}
 }

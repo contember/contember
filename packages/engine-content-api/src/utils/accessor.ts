@@ -1,9 +1,10 @@
 import { ImplementationException } from '../exception'
+import { Interface } from './Interface'
 
 export class Accessor<T> {
 	private val: T | undefined
 
-	get(): T {
+	get(): Interface<T> {
 		if (!this.val) {
 			throw new ImplementationException('Accessor value is not set')
 		}
@@ -11,7 +12,7 @@ export class Accessor<T> {
 		return this.val
 	}
 
-	set(val: T): void {
+	set(val: Interface<T>): void {
 		this.val = val
 	}
 }

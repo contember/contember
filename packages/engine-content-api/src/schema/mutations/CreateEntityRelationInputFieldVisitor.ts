@@ -2,7 +2,7 @@ import { GraphQLInputObjectType, GraphQLString } from 'graphql'
 import { Input, Model } from '@contember/schema'
 import { GqlTypeName } from '../utils'
 import { WhereTypeProvider } from '../WhereTypeProvider'
-import { Accessor } from '../../utils'
+import { Accessor, Interface } from '../../utils'
 import { EntityInputProvider, EntityInputType } from './EntityInputProvider'
 import { GraphQLInputFieldConfigMap } from 'graphql/type/definition'
 import { CreateEntityRelationAllowedOperationsVisitor } from './CreateEntityRelationAllowedOperationsVisitor'
@@ -15,7 +15,9 @@ export class CreateEntityRelationInputFieldVisitor
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly whereTypeBuilder: WhereTypeProvider,
-		private readonly createEntityInputProviderAccessor: Accessor<EntityInputProvider<EntityInputType.create>>,
+		private readonly createEntityInputProviderAccessor: Accessor<
+			Interface<EntityInputProvider<EntityInputType.create>>
+		>,
 		private readonly createEntityRelationAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor,
 	) {}
 

@@ -1,6 +1,7 @@
 export * from './accessor'
 export * from './arrays'
 export * from './assertNever'
+export * from './Interface'
 export * from './isIt'
 export * from './Mutex'
 export * from './object'

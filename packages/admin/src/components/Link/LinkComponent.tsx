@@ -30,7 +30,7 @@ class LinkComponent extends PureComponent<LinkComponent.Props> {
 		</a>
 	)
 
-	render() {
+	override render() {
 		const { Component = this.defaultComponent, requestChange, goTo, dispatch, ...innerProps } = this.props
 		return <Component isActive={location.pathname === this.props.href} {...innerProps} onClick={this.onClick} />
 	}

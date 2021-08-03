@@ -14,7 +14,7 @@ interface SwitchProjectStateProps {
 type Props = SwitchProjectStateProps & SwitchProjectLinkProps
 
 class SwitchProjectLink extends ReactComponent<Props, {}> {
-	render() {
+	override render() {
 		if (!this.props.hasMoreProjects) {
 			return null
 		}

@@ -21,7 +21,7 @@ const toastTypeToIntent: { [K in ToastType]: Intent } = {
 }
 
 class ToasterConnected extends PureComponent<Toaster.ToasterStateProps & Toaster.ToasterDispatcherProps> {
-	render() {
+	override render() {
 		return (
 			<div className="toaster">
 				{this.props.toasts.map(toast => (

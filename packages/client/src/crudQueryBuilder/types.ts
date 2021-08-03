@@ -60,14 +60,14 @@ export namespace WriteOperation {
 	export abstract class ContentfulOperation extends Operation implements ContentfulOperation {}
 
 	export class Update extends ContentfulOperation {
-		readonly op = 'update' as const
+		override readonly op = 'update' as const
 	}
 
 	export class Create extends ContentfulOperation {
-		readonly op = 'create' as const
+		override readonly op = 'create' as const
 	}
 
 	export class Delete extends Operation {
-		readonly op = 'delete' as const
+		override readonly op = 'delete' as const
 	}
 }

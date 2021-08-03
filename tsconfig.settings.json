@@ -15,6 +15,7 @@
 		"module": "ESNext",
 		"moduleResolution": "Node",
 		"noEmitOnError": true,
+		"noImplicitOverride": true,
 		"outDir": "dist",
 		"skipLibCheck": true,
 		"sourceMap": true,

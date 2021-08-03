@@ -21,7 +21,7 @@ export interface SideDimensionsProps extends SideDimensions.CommonDimensionProps
 class SideDimensions extends PureComponent<SideDimensionsProps> {
 	static displayName = 'SideDimensions'
 
-	public render() {
+	public override render() {
 		return (
 			<div className="sideDimensions">
 				<EnvironmentContext.Consumer>
@@ -97,7 +97,7 @@ namespace SideDimensions {
 	export class SingleDimension extends PureComponent<SingleDimensionProps> {
 		static displayName = 'SideDimension'
 
-		public render() {
+		public override render() {
 			const children = SingleDimension.staticRender(this.props, this.props.environment)
 			return (
 				<EnvironmentContext.Provider value={SingleDimension.generateEnvironment(this.props, this.props.environment)}>

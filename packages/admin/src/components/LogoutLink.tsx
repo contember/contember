@@ -33,7 +33,7 @@ class LogoutLink extends ReactComponent<Props, {}> {
 		</a>
 	)
 
-	render() {
+	override render() {
 		const Component = this.props.Component || this.defaultComponent
 		return <Component onClick={this.onClick} />
 	}

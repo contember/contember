@@ -6,7 +6,7 @@ export interface InputGroupProps {
 }
 
 export class InputGroup extends PureComponent<InputGroupProps & InputHTMLAttributes<HTMLInputElement>> {
-	public render() {
+	public override render() {
 		const { large, children, ...rest } = this.props
 
 		return (

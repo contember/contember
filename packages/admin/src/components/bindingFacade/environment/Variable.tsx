@@ -6,14 +6,12 @@ interface VariableProps {
 	format?: (value: ReactNode) => ReactNode
 }
 
-export const Variable = memo(
-	({ name, format }: VariableProps): ReactElement => {
-		const environment = useEnvironment()
-		const value = environment.getValueOrElse(name, null)
+export const Variable = memo(({ name, format }: VariableProps): ReactElement => {
+	const environment = useEnvironment()
+	const value = environment.getValueOrElse(name, null)
 
-		const formatted = useMemo(() => (format ? format(value) : value), [format, value])
+	const formatted = useMemo(() => (format ? format(value) : value), [format, value])
 
-		return <>{formatted}</>
-	},
-)
+	return <>{formatted}</>
+})
 Variable.displayName = 'Variable'

@@ -2,7 +2,7 @@ export type DeclarationSiteNodeRepresentationFactory<
 	Props extends {},
 	ReducedChildrenRepresentation,
 	Representation,
-	StaticContext
+	StaticContext,
 > = (
 	props: Props,
 	reducedChildrenRepresentation: ReducedChildrenRepresentation,

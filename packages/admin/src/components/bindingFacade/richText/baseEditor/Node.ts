@@ -1,15 +1,6 @@
 import type { HistoryEditor } from 'slate-history'
 import type { ReactEditor } from 'slate-react'
 
-// This is taken from https://github.com/Microsoft/TypeScript/issues/25987#issuecomment-441224690
-type KnownKeys<T> = {
-	[K in keyof T]: string extends K ? never : number extends K ? never : K
-} extends { [_ in keyof T]: infer U }
-	? {} extends U
-		? never
-		: U
-	: never
-
 export interface TextNode {
 	text: string
 }
@@ -21,9 +12,30 @@ export interface ElementNode {
 }
 
 export type UnderlyingEditor = ReactEditor & HistoryEditor
-
+export type KnownEditorKeys =
+	| 'addMark'
+	| 'apply'
+	| 'deleteBackward'
+	| 'deleteForward'
+	| 'deleteFragment'
+	| 'history'
+	| 'insertBreak'
+	| 'insertData'
+	| 'insertFragment'
+	| 'insertNode'
+	| 'insertText'
+	| 'isInline'
+	| 'isVoid'
+	| 'marks'
+	| 'normalizeNode'
+	| 'onChange'
+	| 'operations'
+	| 'redo'
+	| 'removeMark'
+	| 'selection'
+	| 'undo'
 // We're effectively simply removing the index signature from Slate's original Editor type.
-export type EditorNode = Omit<Pick<UnderlyingEditor, KnownKeys<UnderlyingEditor>>, 'children'> & {
+export type EditorNode = Pick<UnderlyingEditor, KnownEditorKeys> & {
 	type?: never
 	children: Array<TextNode | ElementNode>
 }

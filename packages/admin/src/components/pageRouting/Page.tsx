@@ -16,7 +16,7 @@ export class Page<P extends Params, N extends keyof P = keyof P, K = P[N]> exten
 	name: N
 	children: (params: K) => ReactNode
 }> {
-	render(): ReactNode {
+	override render(): ReactNode {
 		throw new Error(
 			`The <Page /> component doesn't work if it is not placed as a direct child of the <Pages /> component`,
 		)

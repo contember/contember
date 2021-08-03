@@ -8,7 +8,7 @@ import type { RichTextLeaf } from './RichTextLeaf'
 
 export interface RenderChildrenOptions<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > {
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	renderLeaf?: RenderLeaf<CustomLeaves>
@@ -17,7 +17,7 @@ export interface RenderChildrenOptions<
 
 export const renderChildren = <
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 >(
 	children:
 		| CustomElements

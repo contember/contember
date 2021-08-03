@@ -50,9 +50,10 @@ export const FieldView = Component<FieldViewProps>(
 		const entityAccessor = useEntity()
 		const environment = entityAccessor.environment
 
-		const desugarField = useCallback((rsf: SRSF) => QueryLanguage.desugarRelativeSingleField(rsf, environment), [
-			environment,
-		])
+		const desugarField = useCallback(
+			(rsf: SRSF) => QueryLanguage.desugarRelativeSingleField(rsf, environment),
+			[environment],
+		)
 		const desugaredFields = useArrayMapMemo(fields, desugarField)
 
 		const retrieveField = useCallback(

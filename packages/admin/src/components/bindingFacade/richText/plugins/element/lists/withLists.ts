@@ -31,7 +31,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		processNodeListPaste,
 	} = editor
 
-	const e = (editor as any) as EditorWithLists<E>
+	const e = editor as any as EditorWithLists<E>
 
 	Object.assign<EditorWithLists<BaseEditor>, Partial<EditorWithLists<BaseEditor>>>(e, {
 		isListItem: (element, suchThat): element is ListItemElement =>
@@ -534,5 +534,5 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 		}
 	}
 
-	return (editor as unknown) as EditorWithLists<E>
+	return editor as unknown as EditorWithLists<E>
 }

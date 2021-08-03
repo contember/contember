@@ -403,9 +403,9 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		const embedHandlers = Array.from(props.embedHandlers || [])
 
 		const inlineButtons: ToolbarButtonSpec[] = props.inlineButtons
-			? ((Array.isArray(props.inlineButtons[0])
-					? props.inlineButtons
-					: [props.inlineButtons]) as ToolbarButtonSpec[][]).flat()
+			? (
+					(Array.isArray(props.inlineButtons[0]) ? props.inlineButtons : [props.inlineButtons]) as ToolbarButtonSpec[][]
+			  ).flat()
 			: emptyArray
 
 		const references = !!(props.referencesField && props.referenceDiscriminationField) && (

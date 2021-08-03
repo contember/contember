@@ -37,14 +37,13 @@ export type DataGridColumnOrdering =
 			getNewOrderBy: GetNewOrderBy
 	  }
 
-export type DataGridColumnProps<
-	FA extends DataGridFilterArtifact = DataGridFilterArtifact
-> = DataGridHeaderCellPublicProps &
-	DataGridCellPublicProps &
-	DataGridColumnFiltering<FA> &
-	DataGridColumnOrdering & {
-		children: ReactNode
-	}
+export type DataGridColumnProps<FA extends DataGridFilterArtifact = DataGridFilterArtifact> =
+	DataGridHeaderCellPublicProps &
+		DataGridCellPublicProps &
+		DataGridColumnFiltering<FA> &
+		DataGridColumnOrdering & {
+			children: ReactNode
+		}
 
 export type DataGridColumns = Map<DataGridColumnKey, DataGridColumnProps>
 

@@ -48,7 +48,7 @@ export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames
 
 export type CompleteMarkerProvider<
 	Props extends {} = any,
-	NonStaticPropNames extends keyof Props = never
+	NonStaticPropNames extends keyof Props = never,
 > = EnvironmentDeltaProvider<Props> &
 	LeafMarkerProvider<Props> &
 	BranchMarkerProvider<Props> &

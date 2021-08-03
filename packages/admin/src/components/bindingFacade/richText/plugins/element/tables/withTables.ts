@@ -36,7 +36,7 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		onKeyDown,
 	} = editor
 
-	const e = (editor as any) as EditorWithTables<E>
+	const e = editor as any as EditorWithTables<E>
 
 	const forEachCellInColumn = (
 		element: TableElement,
@@ -649,5 +649,5 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 		},
 	})
 
-	return (editor as unknown) as EditorWithTables<E>
+	return editor as unknown as EditorWithTables<E>
 }

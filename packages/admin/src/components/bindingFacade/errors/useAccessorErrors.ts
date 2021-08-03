@@ -10,14 +10,12 @@ export const useAccessorErrors = (
 	if (!accessor.errors || !accessor.errors.validation) {
 		return undefined
 	}
-	return accessor.errors.validation.map(
-		(error): ErrorAccessor.ValidationError => {
-			switch (error.code) {
-				case 'fieldRequired':
-					return { ...error, message: formatMessage('errorCodes.fieldRequired') }
-				default:
-					return error
-			}
-		},
-	) as ErrorAccessor.ValidationErrors
+	return accessor.errors.validation.map((error): ErrorAccessor.ValidationError => {
+		switch (error.code) {
+			case 'fieldRequired':
+				return { ...error, message: formatMessage('errorCodes.fieldRequired') }
+			default:
+				return error
+		}
+	}) as ErrorAccessor.ValidationErrors
 }

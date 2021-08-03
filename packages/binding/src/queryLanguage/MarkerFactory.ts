@@ -31,7 +31,7 @@ import { QueryLanguage } from './QueryLanguage'
 export class MarkerFactory {
 	private static createSubTreeMarker<
 		Params extends Record<'hasOneRelationPath', HasOneRelation[]> & Record<Key, EntityEventListenerStore | undefined>,
-		Key extends keyof Params
+		Key extends keyof Params,
 	>(
 		qualifiedParams: Params,
 		key: Key,
@@ -166,13 +166,12 @@ export class MarkerFactory {
 		if (fields instanceof EntityFieldMarkersContainer) {
 			return this.wrapRelativeEntityFieldMarkers(relativeSingleEntity.hasOneRelationPath, environment, fields)
 		}
-		relativeSingleEntity.hasOneRelationPath[
-			relativeSingleEntity.hasOneRelationPath.length - 1
-		] = TreeParameterMerger.mergeInParentEntity(
-			relativeSingleEntity.hasOneRelationPath[relativeSingleEntity.hasOneRelationPath.length - 1],
-			'eventListeners',
-			fields.parentReference,
-		)
+		relativeSingleEntity.hasOneRelationPath[relativeSingleEntity.hasOneRelationPath.length - 1] =
+			TreeParameterMerger.mergeInParentEntity(
+				relativeSingleEntity.hasOneRelationPath[relativeSingleEntity.hasOneRelationPath.length - 1],
+				'eventListeners',
+				fields.parentReference,
+			)
 		return new EntityFieldsWithHoistablesMarker(
 			this.wrapRelativeEntityFieldMarkers(relativeSingleEntity.hasOneRelationPath, environment, fields.fields),
 			fields.subTrees,

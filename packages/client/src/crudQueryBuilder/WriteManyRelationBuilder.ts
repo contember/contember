@@ -5,20 +5,20 @@ import { WriteDataBuilder } from './WriteDataBuilder'
 
 class WriteManyRelationBuilder<
 	Op extends WriteOperation.ContentfulOperation,
-	Allowed extends WriteRelationOps[Op['op']]
+	Allowed extends WriteRelationOps[Op['op']],
 > {
 	private constructor(public readonly data: WriteManyRelationBuilder.DataFormat[Op['op']] = []) {}
 
 	public static instantiate<
 		Op extends WriteOperation.ContentfulOperation,
-		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
 	>(data: WriteManyRelationBuilder.DataFormat[Op['op']] = []): WriteManyRelationBuilder.Builder<Op, Allowed> {
 		return new WriteManyRelationBuilder<Op, Allowed>(data)
 	}
 
 	public static instantiateFromFactory<
 		Op extends WriteOperation.ContentfulOperation,
-		Allowed extends WriteRelationOps[Op['op']]
+		Allowed extends WriteRelationOps[Op['op']],
 	>(builder: WriteManyRelationBuilder.BuilderFactory<Op, Allowed>): WriteManyRelationBuilder.Builder<Op, never> {
 		if (typeof builder === 'function') {
 			return builder(WriteManyRelationBuilder.instantiate())
@@ -34,12 +34,14 @@ class WriteManyRelationBuilder<
 		alias?: string,
 	): WriteManyRelationBuilder.Builder<Op> {
 		const resolvedData = WriteDataBuilder.resolveData(data)
-		return (resolvedData === undefined
-			? this
-			: WriteManyRelationBuilder.instantiate<Op>([
-					...this.data,
-					this.withAlias({ create: resolvedData }, alias),
-			  ] as WriteManyRelationBuilder.DataFormat[WriteOperation.Create['op']])) as WriteManyRelationBuilder.Builder<Op>
+		return (
+			resolvedData === undefined
+				? this
+				: WriteManyRelationBuilder.instantiate<Op>([
+						...this.data,
+						this.withAlias({ create: resolvedData }, alias),
+				  ] as WriteManyRelationBuilder.DataFormat[WriteOperation.Create['op']])
+		) as WriteManyRelationBuilder.Builder<Op>
 	}
 
 	public connect(where: Input.UniqueWhere<GraphQlLiteral>, alias?: string) {
@@ -69,12 +71,14 @@ class WriteManyRelationBuilder<
 		alias?: string,
 	): WriteManyRelationBuilder.Builder<WriteOperation.Update> {
 		const resolvedData = WriteDataBuilder.resolveData(data)
-		return (resolvedData === undefined
-			? this
-			: WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
-					...this.data,
-					this.withAlias({ update: { by: where, data: resolvedData } }, alias),
-			  ])) as WriteManyRelationBuilder.Builder<WriteOperation.Update>
+		return (
+			resolvedData === undefined
+				? this
+				: WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
+						...this.data,
+						this.withAlias({ update: { by: where, data: resolvedData } }, alias),
+				  ])
+		) as WriteManyRelationBuilder.Builder<WriteOperation.Update>
 	}
 
 	public upsert(
@@ -85,25 +89,27 @@ class WriteManyRelationBuilder<
 	): WriteManyRelationBuilder.Builder<WriteOperation.Update> {
 		const resolvedUpdate = WriteDataBuilder.resolveData(update)
 		const resolvedCreate = WriteDataBuilder.resolveData(create)
-		return (resolvedUpdate === undefined && resolvedCreate === undefined
-			? this
-			: WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
-					...this.data,
-					this.withAlias(
-						{
-							upsert: {
-								by: where,
-								update: resolvedUpdate || {},
-								create: resolvedCreate || {},
+		return (
+			resolvedUpdate === undefined && resolvedCreate === undefined
+				? this
+				: WriteManyRelationBuilder.instantiate<WriteOperation.Update>([
+						...this.data,
+						this.withAlias(
+							{
+								upsert: {
+									by: where,
+									update: resolvedUpdate || {},
+									create: resolvedCreate || {},
+								},
 							},
-						},
-						alias,
-					),
-			  ])) as WriteManyRelationBuilder.Builder<WriteOperation.Update>
+							alias,
+						),
+				  ])
+		) as WriteManyRelationBuilder.Builder<WriteOperation.Update>
 	}
 
 	private withAlias<
-		D extends Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateManyRelationInputItem<GraphQlLiteral>
+		D extends Input.CreateOneRelationInput<GraphQlLiteral> | Input.UpdateManyRelationInputItem<GraphQlLiteral>,
 	>(data: D, alias?: string): D {
 		if (alias !== undefined) {
 			data.alias = alias
@@ -120,7 +126,7 @@ namespace WriteManyRelationBuilder {
 
 	export type Builder<
 		Op extends WriteOperation.ContentfulOperation,
-		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
 	> = Omit<
 		WriteManyRelationBuilder<Op, Allowed>,
 		Exclude<WriteRelationOps[WriteOperation.ContentfulOperation['op']], Allowed>
@@ -128,7 +134,7 @@ namespace WriteManyRelationBuilder {
 
 	export type BuilderFactory<
 		Op extends WriteOperation.ContentfulOperation,
-		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']]
+		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
 	> = DataFormat[Op['op']] | Builder<Op, never> | ((builder: Builder<Op, Allowed>) => Builder<Op, never>)
 }
 

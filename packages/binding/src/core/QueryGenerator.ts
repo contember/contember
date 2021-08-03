@@ -75,11 +75,10 @@ export class QueryGenerator {
 
 		if (subTree.parameters) {
 			const parameters = subTree.parameters
-			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<
-				Exclude<CrudQueryBuilder.ReadArguments, 'filter'>
-			> = parameters.filter
-				? CrudQueryBuilder.ReadBuilder.instantiate().filter(parameters.filter)
-				: CrudQueryBuilder.ReadBuilder.instantiate()
+			const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
+				parameters.filter
+					? CrudQueryBuilder.ReadBuilder.instantiate().filter(parameters.filter)
+					: CrudQueryBuilder.ReadBuilder.instantiate()
 
 			const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<
 				Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy'>
@@ -121,9 +120,8 @@ export class QueryGenerator {
 					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
 				)
 
-				const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<
-					Exclude<CrudQueryBuilder.ReadArguments, 'filter'>
-				> = relation.filter ? builderWithBody.filter(relation.filter) : builderWithBody
+				const filteredBuilder: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
+					relation.filter ? builderWithBody.filter(relation.filter) : builderWithBody
 
 				if (relation.reducedBy) {
 					// Assuming there's exactly one reducer field as enforced by MarkerTreeGenerator
@@ -147,9 +145,8 @@ export class QueryGenerator {
 					this.registerQueryPart(fieldValue.fields.markers, CrudQueryBuilder.ReadBuilder.instantiate()).objectBuilder,
 				)
 
-				const withFilter: CrudQueryBuilder.ReadBuilder.Builder<
-					Exclude<CrudQueryBuilder.ReadArguments, 'filter'>
-				> = relation.filter ? builderWithBody.filter(relation.filter) : builderWithBody
+				const withFilter: CrudQueryBuilder.ReadBuilder.Builder<Exclude<CrudQueryBuilder.ReadArguments, 'filter'>> =
+					relation.filter ? builderWithBody.filter(relation.filter) : builderWithBody
 
 				const withOrderBy: CrudQueryBuilder.ReadBuilder.Builder<
 					Exclude<CrudQueryBuilder.ReadArguments, 'filter' | 'orderBy'>

@@ -57,8 +57,8 @@ export const useDerivedField = <SourceValue extends FieldValue = FieldValue>(
 		[stableGetEntityReference, desugaredDerived, transform, agent],
 	)
 
-	useEffect(() => stableGetSourceReference().addEventListener('beforeUpdate', onBeforeUpdate), [
-		onBeforeUpdate,
-		stableGetSourceReference,
-	])
+	useEffect(
+		() => stableGetSourceReference().addEventListener('beforeUpdate', onBeforeUpdate),
+		[onBeforeUpdate, stableGetSourceReference],
+	)
 }

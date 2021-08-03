@@ -4,7 +4,7 @@ export type UseSiteBranchNodeRepresentationFactory<
 	Props extends {},
 	ChildrenRepresentation,
 	Representation,
-	StaticContext
+	StaticContext,
 > = (
 	node: ReactElement<Props, any>,
 	childrenRepresentation: ChildrenRepresentation,

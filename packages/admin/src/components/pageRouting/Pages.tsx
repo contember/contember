@@ -51,7 +51,7 @@ export const ParametersContext = createContext<Parameters>({})
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
 class Pages extends PureComponent<PagesProps & PagesStateProps> {
-	render() {
+	override render() {
 		if (!this.props.children) return null
 		const children: ReactNodeArray = Array.isArray(this.props.children) ? this.props.children : [this.props.children]
 

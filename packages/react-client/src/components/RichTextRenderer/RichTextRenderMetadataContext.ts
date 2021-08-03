@@ -16,5 +16,5 @@ RichTextRenderMetadataContext.displayName = 'RichTextRenderMetadataContext'
 export const useRichTextRenderMetadata = <
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never,
-	Reference extends RichTextReference = RichTextReference
+	Reference extends RichTextReference = RichTextReference,
 >() => useContext(RichTextRenderMetadataContext) as RichTextRenderMetadata<CustomElements, CustomLeaves, Reference>

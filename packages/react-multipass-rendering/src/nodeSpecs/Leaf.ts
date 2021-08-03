@@ -9,7 +9,7 @@ class Leaf<
 	Props extends {} = {},
 	StaticContext = any,
 	FactoryMethodName extends ValidFactoryName = string,
-	Representation = any
+	Representation = any,
 > {
 	public readonly specification: Leaf.Specification<FactoryMethodName, Representation, Props, StaticContext>
 
@@ -43,7 +43,7 @@ namespace Leaf {
 		FactoryMethodName extends ValidFactoryName,
 		Representation,
 		Props extends {},
-		StaticContext
+		StaticContext,
 	> =
 		| {
 				type: 'declarationSite'

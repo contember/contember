@@ -70,9 +70,8 @@ export class QueryLanguage {
 	)
 	private static desugarSugarableQualifiedEntityList = QueryLanguage.preparePrimitiveEntryPoint('qualifiedEntityList')
 	private static desugarSugarableQualifiedFieldList = QueryLanguage.preparePrimitiveEntryPoint('qualifiedFieldList')
-	private static desugarSugarableQualifiedSingleEntity = QueryLanguage.preparePrimitiveEntryPoint(
-		'qualifiedSingleEntity',
-	)
+	private static desugarSugarableQualifiedSingleEntity =
+		QueryLanguage.preparePrimitiveEntryPoint('qualifiedSingleEntity')
 	private static desugarSugarableRelativeEntityList = QueryLanguage.preparePrimitiveEntryPoint('relativeEntityList')
 	private static desugarSugarableRelativeSingleEntity = QueryLanguage.preparePrimitiveEntryPoint('relativeSingleEntity')
 	private static desugarSugarableRelativeSingleField = QueryLanguage.preparePrimitiveEntryPoint('relativeSingleField')
@@ -165,9 +164,7 @@ export class QueryLanguage {
 		return store
 	}
 
-	private static desugarEntityListEventListeners(
-		unsugarable: UnsugarableEntityListEventListeners,
-	):
+	private static desugarEntityListEventListeners(unsugarable: UnsugarableEntityListEventListeners):
 		| {
 				eventListeners: EntityListEventListenerStore | undefined
 				childEventListeners: EntityEventListenerStore | undefined

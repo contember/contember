@@ -8,7 +8,7 @@ import type { RichTextReference } from './RichTextReference'
 export type ReferenceRendererProps<
 	Reference extends RichTextReference = RichTextReference,
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > = {
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
 	children: ReactElement
@@ -22,5 +22,5 @@ export type ReferenceRendererProps<
 export type ReferenceRenderer<
 	Reference extends RichTextReference = RichTextReference,
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > = (props: ReferenceRendererProps<Reference, CustomElements, CustomLeaves>) => ReactNode

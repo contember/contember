@@ -23,7 +23,7 @@ export interface SugarableFieldEventListeners {}
 
 export type UnsugarableFieldEventListeners<
 	Persisted extends FieldValue = FieldValue,
-	Produced extends Persisted = Persisted
+	Produced extends Persisted = Persisted,
 > = {
 	[EventName in keyof Events & string as `on${Capitalize<EventName>}`]?: Events[EventName] | Set<Events[EventName]>
 }

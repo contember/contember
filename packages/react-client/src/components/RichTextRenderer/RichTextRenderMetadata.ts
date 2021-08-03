@@ -6,7 +6,7 @@ import type { RichTextReference } from './RichTextReference'
 export interface RichTextRenderMetadata<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never,
-	Reference extends RichTextReference = RichTextReference
+	Reference extends RichTextReference = RichTextReference,
 > {
 	formatVersion: number
 	referenceRenderers: Record<string, ReferenceRenderer<Reference, CustomElements, CustomLeaves>>

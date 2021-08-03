@@ -13,7 +13,7 @@ export interface SimpleRelativeSingleFieldMetadata<Value extends FieldValue = Fi
 
 export const SimpleRelativeSingleField = function <
 	P extends FieldBasicProps & Omit<FormGroupProps, 'children'>,
-	Value extends FieldValue = FieldValue
+	Value extends FieldValue = FieldValue,
 >(
 	render: (fieldMetadata: SimpleRelativeSingleFieldMetadata<Value>, props: P) => ReactNode,
 	displayName: string,

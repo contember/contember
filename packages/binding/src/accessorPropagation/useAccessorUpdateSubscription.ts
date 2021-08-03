@@ -34,7 +34,7 @@ function useAccessorUpdateSubscription(
 ): [EntityListAccessor | EntityAccessor, ForceAccessorUpdate]
 function useAccessorUpdateSubscription<
 	A extends FieldAccessor<Value> | EntityListAccessor | EntityAccessor,
-	Value extends FieldValue = FieldValue
+	Value extends FieldValue = FieldValue,
 >(getAccessor: () => A, withForceUpdate?: true): A | [A, ForceAccessorUpdate] {
 	// This is *HEAVILY* adopted from https://github.com/facebook/react/blob/master/packages/use-subscription/src/useSubscription.js
 	const [state, setState] = useState<{
@@ -71,10 +71,12 @@ function useAccessorUpdateSubscription<
 	useEffect(() => {
 		let isStillSubscribed = true
 
-		const unsubscribe = (getAccessor().addEventListener as (
-			eventType: 'update',
-			handler: (newAccessor: FieldAccessor<Value> | EntityListAccessor | EntityAccessor) => void,
-		) => () => void)('update', newAccessor => {
+		const unsubscribe = (
+			getAccessor().addEventListener as (
+				eventType: 'update',
+				handler: (newAccessor: FieldAccessor<Value> | EntityListAccessor | EntityAccessor) => void,
+			) => () => void
+		)('update', newAccessor => {
 			if (!isStillSubscribed) {
 				return
 			}

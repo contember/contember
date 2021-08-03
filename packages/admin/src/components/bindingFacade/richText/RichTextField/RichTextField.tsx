@@ -31,10 +31,10 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 		const environment = entity.environment
 		const getParent = entity.getAccessor
 
-		const desugaredField = useMemo(() => QueryLanguage.desugarRelativeSingleField(props, environment), [
-			environment,
-			props,
-		])
+		const desugaredField = useMemo(
+			() => QueryLanguage.desugarRelativeSingleField(props, environment),
+			[environment, props],
+		)
 		const fieldAccessor = useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [entity, desugaredField])
 
 		// The cache is questionable, really.

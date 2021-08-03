@@ -14,23 +14,25 @@ interface ProjectsListProps {
 	onSelectProject: (project: ProjectConfig) => void
 }
 
-const selectProjectRequest = (project: ProjectConfig): RequestChange => () => ({
-	name: 'project_page',
-	project: project.project,
-	stage: project.stage,
-	pageName: 'dashboard',
-	parameters: {},
-	dimensions: {},
-})
+const selectProjectRequest =
+	(project: ProjectConfig): RequestChange =>
+	() => ({
+		name: 'project_page',
+		project: project.project,
+		stage: project.stage,
+		pageName: 'dashboard',
+		parameters: {},
+		dimensions: {},
+	})
 
 class ProjectsList extends ReactComponent<ProjectsListProps, {}> {
-	componentDidMount(): void {
+	override componentDidMount(): void {
 		if (this.props.configs.length === 1) {
 			this.props.onSelectProject(this.props.configs[0])
 		}
 	}
 
-	render() {
+	override render() {
 		return (
 			<MiscPageLayout heading="Projects">
 				<ButtonList flow="block">

@@ -19,7 +19,7 @@ export interface RichTextRendererFieldProps {
 
 export interface RichTextRendererBlockProps<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > {
 	blocks: RichTextBlock[]
 	referenceRenderers?: Record<string, ReferenceRenderer<any, CustomElements, CustomLeaves>>
@@ -30,7 +30,7 @@ export interface RichTextRendererBlockProps<
 
 export type RichTextRendererProps<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > = {
 	deserialize?: (source: string) => RootEditorNode<CustomElements, CustomLeaves>
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
@@ -40,7 +40,7 @@ export type RichTextRendererProps<
 
 export const RichTextRenderer = memo(function RichTextRenderer<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 >({
 	deserialize = defaultDeserialize,
 	renderElement,

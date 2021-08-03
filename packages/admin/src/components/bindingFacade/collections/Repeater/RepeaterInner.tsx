@@ -45,7 +45,7 @@ export interface RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>
 
 type NonStaticPropNames = 'accessor'
 
-export const RepeaterInner = (Component<RepeaterInnerProps<any, any>, NonStaticPropNames>(
+export const RepeaterInner = Component<RepeaterInnerProps<any, any>, NonStaticPropNames>(
 	<ContainerExtraProps, ItemExtraProps>(props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>) => {
 		const isMutating = useMutationState()
 		const { entities, moveEntity, appendNew } = useSortedEntities(props.accessor, props.sortableBy)
@@ -153,7 +153,7 @@ export const RepeaterInner = (Component<RepeaterInnerProps<any, any>, NonStaticP
 		</>
 	),
 	'RepeaterInner',
-) as any) as (<ContainerExtraProps, ItemExtraProps>(
+) as any as (<ContainerExtraProps, ItemExtraProps>(
 	props: RepeaterInnerProps<ContainerExtraProps, ItemExtraProps>,
 ) => ReactElement) &
 	StaticRenderProvider<RepeaterInnerProps<unknown, unknown>, NonStaticPropNames>

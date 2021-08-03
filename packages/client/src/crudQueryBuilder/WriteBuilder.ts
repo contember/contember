@@ -18,7 +18,7 @@ class WriteBuilder<AA extends WriteArguments, AF extends WriteFields, Op extends
 	public static instantiateFromFactory<
 		AA extends WriteArguments,
 		AF extends WriteFields,
-		Op extends WriteOperation.Operation
+		Op extends WriteOperation.Operation,
 	>(builder: WriteBuilder.BuilderFactory<AA, AF, Op>): WriteBuilder.Builder<never, never, Op> {
 		if (typeof builder === 'function') {
 			return builder(WriteBuilder.instantiate())

@@ -70,14 +70,8 @@ export const useNormalizedUploadState = ({
 
 	const onDrop = useCallback(
 		(files: File[]) => {
-			const {
-				getEntityByKey,
-				getEntityListSubTree,
-				getEntitySubTree,
-				contentClient,
-				systemClient,
-				tenantClient,
-			} = bindingOperations
+			const { getEntityByKey, getEntityListSubTree, getEntitySubTree, contentClient, systemClient, tenantClient } =
+				bindingOperations
 
 			const idsByFile = new Map<File, FileId>()
 			const filesWithIds: [FileId, File][] = []

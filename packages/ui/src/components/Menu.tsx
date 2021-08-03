@@ -11,7 +11,7 @@ const DepthContext = createContext(0)
 class Menu extends PureComponent<Menu.Props> {
 	public static displayName = 'Menu'
 
-	public render() {
+	public override render() {
 		return (
 			<DepthContext.Provider value={0}>
 				<GlobalClassNamePrefixContext.Consumer>

@@ -279,7 +279,7 @@ export class TreeParameterMerger {
 
 	public static mergeInParentEntity<
 		Original extends Record<Key, EntityEventListenerStore | undefined>,
-		Key extends keyof Original
+		Key extends keyof Original,
 	>(original: Original, key: Key, parentEntity: ParentEntityParameters | undefined): Original {
 		if (!parentEntity) {
 			return original

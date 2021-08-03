@@ -9,7 +9,7 @@ import { useRichTextRenderMetadata } from './RichTextRenderMetadataContext'
 
 export interface RenderElementFallbackProps<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > {
 	element: BuiltinElements<CustomElements, CustomLeaves>
 	children: ReactElement
@@ -18,7 +18,7 @@ export interface RenderElementFallbackProps<
 
 const getElementDataAttributes = <
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 >(
 	element: RichTextElement<CustomElements, CustomLeaves>,
 	attributeNamePrefix: string = 'contember-',
@@ -39,7 +39,7 @@ const getElementDataAttributes = <
 
 export function RenderElementFallback<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 >({ element, children, options }: RenderElementFallbackProps<CustomElements, CustomLeaves>) {
 	const attributes = getElementDataAttributes(element, options.attributeNamePrefix)
 
@@ -113,7 +113,7 @@ export function RenderElementFallback<
 
 function ReferenceElementFallback<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 >({ element, children }: { element: RichTextReferenceElement<CustomElements, CustomLeaves>; children: ReactElement }) {
 	const metadata = useRichTextRenderMetadata<CustomElements, CustomLeaves>()
 	const elementMetadata = resolveRichTextElementMetadata<CustomElements, CustomLeaves>(element, metadata)

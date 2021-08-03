@@ -47,9 +47,8 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 	if (typeof decider === 'object') {
 		for (const provisionName in decider) {
 			const methodName = provisionName as keyof MarkerProvider<Props, NonStaticPropNames>
-			;(augmentedRender[methodName] as MarkerProvider<Props, NonStaticPropNames>[typeof methodName]) = decider[
-				methodName
-			]
+			;(augmentedRender[methodName] as MarkerProvider<Props, NonStaticPropNames>[typeof methodName]) =
+				decider[methodName]
 		}
 
 		return augmentedRender

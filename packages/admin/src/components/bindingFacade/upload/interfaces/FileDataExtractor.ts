@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 export interface FileDataExtractorPopulateFieldsOptions<
 	ExtractedData = unknown,
 	UploadResult = unknown,
-	AcceptArtifacts = unknown
+	AcceptArtifacts = unknown,
 > {
 	file: File
 	objectUrl: string

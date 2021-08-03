@@ -2,12 +2,8 @@ export interface MessageDictionaryByLocaleCode {
 	[localeCode: string]: MessageDictionary
 }
 
-export type MessageDictionary = {
-	[Key in string]: MessageDictionary | string
-}
-
-export type PartialDictionary<Dict extends MessageDictionary> = {
-	[Key in keyof Dict]?: Dict[Key] extends MessageDictionary ? PartialDictionary<Dict[Key]> : Dict[Key]
+export interface MessageDictionary {
+	[Key: string]: MessageDictionary | string
 }
 
 export type MessageDictionaryKeys<Dict extends MessageDictionary> = {

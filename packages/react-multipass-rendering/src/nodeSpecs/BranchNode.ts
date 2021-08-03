@@ -9,7 +9,7 @@ class BranchNode<
 	FactoryMethodName extends ValidFactoryName = string,
 	ChildrenRepresentation = any,
 	ReducedChildrenRepresentation = any,
-	Representation = any
+	Representation = any,
 > {
 	private static defaultOptions: BranchNodeOptions = {
 		childrenAreOptional: false,
@@ -83,7 +83,7 @@ namespace BranchNode {
 		FactoryMethodName extends ValidFactoryName = string,
 		ChildrenRepresentation = any,
 		ReducedChildrenRepresentation = any,
-		Representation = any
+		Representation = any,
 	> =
 		| {
 				type: 'declarationSite'

@@ -20,7 +20,7 @@ interface RoutesRendererOwnProps {
 type RoutesRendererProps = RoutesRendererStateProps & RoutesRendererOwnProps
 
 class RoutesRenderer extends PureComponent<RoutesRendererProps> {
-	public render() {
+	public override render() {
 		const route = this.props.route
 		if (!route) {
 			return null

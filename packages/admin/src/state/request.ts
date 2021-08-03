@@ -47,16 +47,13 @@ export type RequestChange = (currentState: RequestState) => RequestState
 
 export const loginRequest = (): RequestChange => (): LoginRequest => ({ name: 'login' })
 
-export const pageRequest = <P extends PageParameters>(
-	project: string,
-	stage: string,
-	pageName: string,
-	parameters: P,
-): RequestChange => (currentState): PageRequest<P> => ({
-	name: 'project_page',
-	project,
-	stage,
-	pageName,
-	parameters,
-	dimensions: (currentState as StageRequest).dimensions || {},
-})
+export const pageRequest =
+	<P extends PageParameters>(project: string, stage: string, pageName: string, parameters: P): RequestChange =>
+	(currentState): PageRequest<P> => ({
+		name: 'project_page',
+		project,
+		stage,
+		pageName,
+		parameters,
+		dimensions: (currentState as StageRequest).dimensions || {},
+	})

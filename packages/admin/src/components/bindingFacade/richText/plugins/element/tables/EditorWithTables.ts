@@ -5,7 +5,7 @@ import type { TableElement } from './TableElement'
 import type { TableRowElement } from './TableRowElement'
 
 export interface WithTables<
-	E extends WithAnotherNodeType<BaseEditor, TableElement | TableRowElement | TableCellElement>
+	E extends WithAnotherNodeType<BaseEditor, TableElement | TableRowElement | TableCellElement>,
 > {
 	isTable: (element: ElementNode | SlateNode, suchThat?: ElementSpecifics<TableElement>) => element is TableElement
 	isTableRow: (

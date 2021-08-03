@@ -30,14 +30,14 @@ export const SimpleRelativeSingleFieldProxy = memo(
 		const environment = useEnvironment()
 		const field = useField(props)
 
-		const normalizedLabel = useMemo(() => contextualizeNode(label, environment, 'labelMiddleware'), [
-			environment,
-			label,
-		])
-		const normalizedLabelDescription = useMemo(() => contextualizeNode(labelDescription, environment), [
-			environment,
-			labelDescription,
-		])
+		const normalizedLabel = useMemo(
+			() => contextualizeNode(label, environment, 'labelMiddleware'),
+			[environment, label],
+		)
+		const normalizedLabelDescription = useMemo(
+			() => contextualizeNode(labelDescription, environment),
+			[environment, labelDescription],
+		)
 		const normalizedDescription = useMemo(() => contextualizeNode(description, environment), [environment, description])
 		const isMutating = useMutationState()
 

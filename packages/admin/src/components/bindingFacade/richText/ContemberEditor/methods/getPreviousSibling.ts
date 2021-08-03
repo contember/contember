@@ -4,7 +4,7 @@ import type { BaseEditor } from '../../baseEditor'
 export const getPreviousSibling = <
 	E extends BaseEditor = BaseEditor,
 	CurrentNode extends SlateNode = SlateNode,
-	PreviousNode extends SlateNode = CurrentNode
+	PreviousNode extends SlateNode = CurrentNode,
 >(
 	editor: E,
 	node: CurrentNode,

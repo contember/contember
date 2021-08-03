@@ -7,8 +7,9 @@ interface GenericPageProps {
 	children: ReactNode
 }
 
-const GenericPage: Partial<PageProvider<GenericPageProps>> &
-	ComponentType<GenericPageProps> = memo((props: GenericPageProps) => <LayoutInner>{props.children}</LayoutInner>)
+const GenericPage: Partial<PageProvider<GenericPageProps>> & ComponentType<GenericPageProps> = memo(
+	(props: GenericPageProps) => <LayoutInner>{props.children}</LayoutInner>,
+)
 
 GenericPage.displayName = 'GenericPage'
 GenericPage.getPageName = (props: GenericPageProps) => props.pageName

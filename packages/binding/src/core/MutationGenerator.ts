@@ -187,11 +187,12 @@ export class MutationGenerator {
 		nodeFragmentName: string | undefined,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		const updateBuilder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> = this.registerUpdateMutationPart(
-			processedPlaceholdersByEntity,
-			entityRealm,
-			new CrudQueryBuilder.WriteDataBuilder(),
-		)
+		const updateBuilder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Update> =
+			this.registerUpdateMutationPart(
+				processedPlaceholdersByEntity,
+				entityRealm,
+				new CrudQueryBuilder.WriteDataBuilder(),
+			)
 		if (updateBuilder.data === undefined || isEmptyObject(updateBuilder.data)) {
 			return queryBuilder
 		}
@@ -233,11 +234,12 @@ export class MutationGenerator {
 		nodeFragmentName: string | undefined,
 		queryBuilder: QueryBuilder = new CrudQueryBuilder.CrudQueryBuilder(),
 	): QueryBuilder {
-		const createBuilder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> = this.registerCreateMutationPart(
-			processedPlaceholdersByEntity,
-			entityRealm,
-			new CrudQueryBuilder.WriteDataBuilder(),
-		)
+		const createBuilder: CrudQueryBuilder.WriteDataBuilder<CrudQueryBuilder.WriteOperation.Create> =
+			this.registerCreateMutationPart(
+				processedPlaceholdersByEntity,
+				entityRealm,
+				new CrudQueryBuilder.WriteDataBuilder(),
+			)
 		if (createBuilder.data === undefined || isEmptyObject(createBuilder.data)) {
 			return queryBuilder
 		}

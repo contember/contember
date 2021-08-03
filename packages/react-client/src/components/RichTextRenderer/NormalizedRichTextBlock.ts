@@ -6,7 +6,7 @@ import type { RootEditorNode } from './RootEditorNode'
 
 export interface NormalizedRichTextBlock<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > {
 	content: RootEditorNode<CustomElements, CustomLeaves>
 	referenceRenderers: Record<string, ReferenceRenderer<RichTextReference, CustomElements, CustomLeaves>>

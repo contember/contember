@@ -25,98 +25,102 @@ export interface LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps
 		CreateEditorPublicOptions,
 		HoveringToolbarsProps {}
 
-export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionComponent<LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps> = Component(
-	props => {
-		const entity = useEntity()
-		const environment = entity.environment
-		const getParent = entity.getAccessor
+export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionComponent<LegacyDeprecatedEditorFormerlyKnownAsRichTextFieldProps> =
+	Component(
+		props => {
+			const entity = useEntity()
+			const environment = entity.environment
+			const getParent = entity.getAccessor
 
-		const desugaredField = useMemo(() => QueryLanguage.desugarRelativeSingleField(props, environment), [
-			environment,
-			props,
-		])
-		const fieldAccessor = useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [entity, desugaredField])
+			const desugaredField = useMemo(
+				() => QueryLanguage.desugarRelativeSingleField(props, environment),
+				[environment, props],
+			)
+			const fieldAccessor = useMemo(
+				() => entity.getRelativeSingleField<string>(desugaredField),
+				[entity, desugaredField],
+			)
 
-		// The cache is questionable, really.
-		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
-		const isMutating = useMutationState()
+			// The cache is questionable, really.
+			const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
+			const isMutating = useMutationState()
 
-		const [editor] = useState(() => {
-			return createEditor({
-				plugins: props.plugins,
-				augmentEditor: props.augmentEditor,
-				augmentEditorBuiltins: props.augmentEditorBuiltins,
-				defaultElementType: paragraphElementType,
-				addEditorBuiltins: editor => editor,
-			})
-		})
-
-		const valueNodes = useRichTextFieldNodes({
-			editor,
-			fieldAccessor,
-			contemberFieldElementCache,
-		})
-
-		const serialize = editor.serializeNodes
-		const onChange = useCallback(
-			(value: SlateNode[]) => {
-				getParent().batchUpdates(getAccessor => {
-					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
-
-					if (SlateNode.string({ children: value }) === '') {
-						fieldAccessor.updateValue(fieldAccessor.valueOnServer === null ? null : '')
-						return
-					}
-
-					fieldAccessor.updateValue(serialize(value as ElementNode[]))
-					contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as ElementNode[])
+			const [editor] = useState(() => {
+				return createEditor({
+					plugins: props.plugins,
+					augmentEditor: props.augmentEditor,
+					augmentEditorBuiltins: props.augmentEditorBuiltins,
+					defaultElementType: paragraphElementType,
+					addEditorBuiltins: editor => editor,
 				})
-			},
-			[getParent, contemberFieldElementCache, desugaredField, serialize],
-		)
+			})
 
-		return (
-			<FormGroup
-				label={props.label}
-				size={props.size}
-				labelDescription={props.labelDescription}
-				labelPosition={props.labelPosition}
-				description={props.description}
-				useLabelElement={props.useLabelElement}
-				errors={useAccessorErrors(fieldAccessor)}
-			>
-				<Slate editor={editor} value={valueNodes} onChange={onChange}>
-					<EditorCanvas
-						underlyingComponent={Editable}
-						componentProps={{
-							readOnly: isMutating,
-							renderElement: editor.renderElement,
-							renderLeaf: editor.renderLeaf,
-							onKeyDown: editor.onKeyDown,
-							onFocusCapture: editor.onFocus,
-							onBlurCapture: editor.onBlur,
-							onDOMBeforeInput: editor.onDOMBeforeInput,
-						}}
-					>
-						<HoveringToolbars
-							blockButtons={props.blockButtons}
-							inlineButtons={props.inlineButtons ?? defaultInlineButtons}
-						/>
-					</EditorCanvas>
-				</Slate>
-			</FormGroup>
-		)
-	},
-	props => (
-		<>
-			<Field defaultValue={props.defaultValue} field={props.field} isNonbearing={props.isNonbearing} />
-			{props.label}
-			{props.labelDescription}
-			{props.description}
-		</>
-	),
-	'LegacyDeprecatedEditorFormerlyKnownAsRichTextField',
-)
+			const valueNodes = useRichTextFieldNodes({
+				editor,
+				fieldAccessor,
+				contemberFieldElementCache,
+			})
+
+			const serialize = editor.serializeNodes
+			const onChange = useCallback(
+				(value: SlateNode[]) => {
+					getParent().batchUpdates(getAccessor => {
+						const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
+
+						if (SlateNode.string({ children: value }) === '') {
+							fieldAccessor.updateValue(fieldAccessor.valueOnServer === null ? null : '')
+							return
+						}
+
+						fieldAccessor.updateValue(serialize(value as ElementNode[]))
+						contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as ElementNode[])
+					})
+				},
+				[getParent, contemberFieldElementCache, desugaredField, serialize],
+			)
+
+			return (
+				<FormGroup
+					label={props.label}
+					size={props.size}
+					labelDescription={props.labelDescription}
+					labelPosition={props.labelPosition}
+					description={props.description}
+					useLabelElement={props.useLabelElement}
+					errors={useAccessorErrors(fieldAccessor)}
+				>
+					<Slate editor={editor} value={valueNodes} onChange={onChange}>
+						<EditorCanvas
+							underlyingComponent={Editable}
+							componentProps={{
+								readOnly: isMutating,
+								renderElement: editor.renderElement,
+								renderLeaf: editor.renderLeaf,
+								onKeyDown: editor.onKeyDown,
+								onFocusCapture: editor.onFocus,
+								onBlurCapture: editor.onBlur,
+								onDOMBeforeInput: editor.onDOMBeforeInput,
+							}}
+						>
+							<HoveringToolbars
+								blockButtons={props.blockButtons}
+								inlineButtons={props.inlineButtons ?? defaultInlineButtons}
+							/>
+						</EditorCanvas>
+					</Slate>
+				</FormGroup>
+			)
+		},
+		props => (
+			<>
+				<Field defaultValue={props.defaultValue} field={props.field} isNonbearing={props.isNonbearing} />
+				{props.label}
+				{props.labelDescription}
+				{props.description}
+			</>
+		),
+		'LegacyDeprecatedEditorFormerlyKnownAsRichTextField',
+	)
 
 const RB = RichEditor.buttons
 const defaultInlineButtons: HoveringToolbarsProps['inlineButtons'] = [

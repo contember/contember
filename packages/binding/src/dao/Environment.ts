@@ -133,7 +133,7 @@ class Environment {
 
 	public applySystemMiddleware<
 		N extends Environment.SystemMiddlewareName,
-		A extends Parameters<Exclude<Environment.SystemMiddleware[N], undefined>>
+		A extends Parameters<Exclude<Environment.SystemMiddleware[N], undefined>>,
 	>(name: N, ...args: A): ReturnType<Exclude<Environment.SystemMiddleware[N], undefined>> | A {
 		const middleware: Environment.SystemMiddleware[N] = this.names[name]
 		if (typeof middleware === 'function') {

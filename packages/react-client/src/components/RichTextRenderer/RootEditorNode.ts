@@ -5,7 +5,7 @@ import type { RichTextLeaf } from './RichTextLeaf'
 
 export interface RootEditorNode<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > {
 	formatVersion: number
 	children: Array<BuiltinElements<CustomElements, CustomLeaves> | CustomElements | BuiltinLeaves | CustomLeaves>

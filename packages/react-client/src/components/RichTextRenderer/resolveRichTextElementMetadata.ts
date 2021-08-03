@@ -10,7 +10,7 @@ import type { RichTextRenderMetadata } from './RichTextRenderMetadata'
 export const resolveRichTextElementMetadata = <
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never,
-	Reference extends RichTextReference = RichTextReference
+	Reference extends RichTextReference = RichTextReference,
 >(
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>,
 	metadata: RichTextRenderMetadata<CustomElements, CustomLeaves, Reference>,

@@ -15,7 +15,7 @@ import { useRichTextRenderMetadata } from './RichTextRenderMetadataContext'
 export type RenderElement<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = never,
-	Reference extends RichTextReference = RichTextReference
+	Reference extends RichTextReference = RichTextReference,
 > = ComponentType<
 	{
 		element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
@@ -38,7 +38,7 @@ export type RenderElement<
 
 export interface ElementRendererProps<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > {
 	element: CustomElements | BuiltinElements<CustomElements, CustomLeaves>
 	children: ReactElement
@@ -47,7 +47,7 @@ export interface ElementRendererProps<
 
 export function ElementRenderer<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 >({ element, children, options }: ElementRendererProps<CustomElements, CustomLeaves>) {
 	const metadata = useRichTextRenderMetadata<CustomElements, CustomLeaves>()
 	const elementMetadata = resolveRichTextElementMetadata<CustomElements, CustomLeaves>(element, metadata)

@@ -3,7 +3,7 @@ import type { RichTextLeaf } from './RichTextLeaf'
 
 export type BuiltinElements<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > =
 	| RichTextAnchorElement<CustomElements, CustomLeaves>
 	| RichTextHeadingElement<CustomElements, CustomLeaves>
@@ -20,7 +20,7 @@ export type BuiltinElements<
 
 export interface RichTextAnchorElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'anchor'
 	href: string
@@ -28,7 +28,7 @@ export interface RichTextAnchorElement<
 
 export interface RichTextHeadingElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'heading'
 	level: 1 | 2 | 3 | 4 | 5 | 6
@@ -37,35 +37,35 @@ export interface RichTextHeadingElement<
 
 export interface RichTextOrderedListElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'orderedList'
 }
 
 export interface RichTextUnorderedListElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'unorderedList'
 }
 
 export interface RichTextListItemElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'listItem'
 }
 
 export interface RichTextHorizontalRuleElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'horizontalRule'
 }
 
 export interface RichTextParagraphElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'paragraph'
 	isNumbered?: boolean
@@ -73,7 +73,7 @@ export interface RichTextParagraphElement<
 
 export interface RichTextReferenceElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'reference'
 	referenceId: string
@@ -81,7 +81,7 @@ export interface RichTextReferenceElement<
 
 export interface RichTextScrollTargetElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'scrollTarget'
 	identifier: string
@@ -89,14 +89,14 @@ export interface RichTextScrollTargetElement<
 
 export interface RichTextTableElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'table'
 }
 
 export interface RichTextTableCellElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'tableCell'
 	headerScope?: 'row'
@@ -105,7 +105,7 @@ export interface RichTextTableCellElement<
 
 export interface RichTextTableRowElement<
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 > extends RichTextElement<CustomElements, CustomLeaves> {
 	type: 'tableRow'
 	headerScope?: 'table'

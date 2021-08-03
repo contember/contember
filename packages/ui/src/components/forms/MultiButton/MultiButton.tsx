@@ -14,9 +14,10 @@ export const MultiButton = memo(({ triggerFromDropdown = false, ...props }: Mult
 	const [currentButtonIndex, setCurrentButtonIndex] = useState(0)
 
 	const augmentedButtons = useMemo(() => buttonAnalyzer.processChildren(props.children, undefined), [props.children])
-	const formGroupsPresent = useMemo(() => augmentedButtons.some(props => props instanceof ButtonFormGroupProps), [
-		augmentedButtons,
-	])
+	const formGroupsPresent = useMemo(
+		() => augmentedButtons.some(props => props instanceof ButtonFormGroupProps),
+		[augmentedButtons],
+	)
 	const buttonFormGroupProps = useMemo(
 		() =>
 			augmentedButtons.map(item => {

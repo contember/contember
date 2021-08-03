@@ -188,17 +188,15 @@ const EditUserMembership: FC<EditUserMembershipProps> = ({
 										}}
 										options={[
 											{ value: -1, label: 'Select role', disabled: true },
-											...rolesToShow.map(
-												({ name: roleName }): SelectOption => {
-													const otherIndex = memberships.findIndex(mem => mem && mem.role === roleName)
-													const enabled = otherIndex === -1 || otherIndex === membershipIndex
-													return {
-														value: roleName,
-														label: rolesConfig[roleName]!.name,
-														disabled: !enabled,
-													}
-												},
-											),
+											...rolesToShow.map(({ name: roleName }): SelectOption => {
+												const otherIndex = memberships.findIndex(mem => mem && mem.role === roleName)
+												const enabled = otherIndex === -1 || otherIndex === membershipIndex
+												return {
+													value: roleName,
+													label: rolesConfig[roleName]!.name,
+													disabled: !enabled,
+												}
+											}),
 										]}
 										value={membership === undefined ? -1 : membership.role}
 									/>

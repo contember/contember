@@ -89,14 +89,13 @@ export const useStaticChoiceField = <StaticArity extends ChoiceFieldData.ChoiceA
 	return metadata as any // TS… 🙁
 }
 
-export const StaticChoiceField: FunctionComponent<
-	StaticChoiceFieldProps<any> & ChoiceFieldData.MetadataPropsByArity
-> = Component(
-	props => {
-		const metadata = useStaticChoiceField(props)
+export const StaticChoiceField: FunctionComponent<StaticChoiceFieldProps<any> & ChoiceFieldData.MetadataPropsByArity> =
+	Component(
+		props => {
+			const metadata = useStaticChoiceField(props)
 
-		return props.children(metadata)
-	},
-	props => <Field {...props} />,
-	'StaticChoiceField',
-)
+			return props.children(metadata)
+		},
+		props => <Field {...props} />,
+		'StaticChoiceField',
+	)

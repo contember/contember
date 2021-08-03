@@ -29,26 +29,27 @@ export interface Store extends ReduxStore<State> {
 export class ReducerError extends Error {}
 
 export function persistState(services: Services) {
-	return (next: Function) => (reducer: Reducer, initialState: State): Store => {
-		const store: Store = next(reducer, initialState)
+	return (next: Function) =>
+		(reducer: Reducer, initialState: State): Store => {
+			const store: Store = next(reducer, initialState)
 
-		const persistedApiIdentity = services.localStorageManager.get('api_identity')
-		if (persistedApiIdentity) {
-			store.dispatch(createAction(SET_IDENTITY, () => JSON.parse(persistedApiIdentity))())
-		}
-
-		store.subscribe(() => {
-			const state = store.getState()
-			const identity = state.auth.identity
-			if (identity) {
-				services.localStorageManager.set('api_identity', JSON.stringify(identity))
-			} else {
-				services.localStorageManager.unset('api_identity')
+			const persistedApiIdentity = services.localStorageManager.get('api_identity')
+			if (persistedApiIdentity) {
+				store.dispatch(createAction(SET_IDENTITY, () => JSON.parse(persistedApiIdentity))())
 			}
-		})
 
-		return store
-	}
+			store.subscribe(() => {
+				const state = store.getState()
+				const identity = state.auth.identity
+				if (identity) {
+					services.localStorageManager.set('api_identity', JSON.stringify(identity))
+				} else {
+					services.localStorageManager.unset('api_identity')
+				}
+			})
+
+			return store
+		}
 }
 
 export function configureStore(initialState: State, config: ClientConfig): Store {

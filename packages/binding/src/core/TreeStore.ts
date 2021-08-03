@@ -68,9 +68,7 @@ export class TreeStore {
 		return this._schema
 	}
 
-	public getPathBackToParent(
-		entityRealm: EntityRealmState | EntityRealmStateStub,
-	):
+	public getPathBackToParent(entityRealm: EntityRealmState | EntityRealmStateStub):
 		| {
 				fieldBackToParent: FieldName
 				parent: EntityRealmState

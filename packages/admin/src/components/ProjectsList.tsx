@@ -14,14 +14,16 @@ interface ProjectsListProps {
 	onSelectProject: (project: ProjectConfig) => void
 }
 
-const selectProjectRequest = (project: ProjectConfig): RequestChange => () => ({
-	name: 'project_page',
-	project: project.project,
-	stage: project.stage,
-	pageName: 'dashboard',
-	parameters: {},
-	dimensions: {},
-})
+const selectProjectRequest =
+	(project: ProjectConfig): RequestChange =>
+	() => ({
+		name: 'project_page',
+		project: project.project,
+		stage: project.stage,
+		pageName: 'dashboard',
+		parameters: {},
+		dimensions: {},
+	})
 
 class ProjectsList extends ReactComponent<ProjectsListProps, {}> {
 	componentDidMount(): void {

@@ -54,9 +54,10 @@ export const useDesugaredOptionPath = (props: BaseDynamicChoiceField) => {
 
 export const useTopLevelOptionAccessors = (desugaredOptionPath: QualifiedFieldList | QualifiedEntityList) => {
 	const getSubTree = useGetEntityListSubTree()
-	const entityList = useMemo<SugaredQualifiedEntityList>(() => ({ entities: desugaredOptionPath }), [
-		desugaredOptionPath,
-	])
+	const entityList = useMemo<SugaredQualifiedEntityList>(
+		() => ({ entities: desugaredOptionPath }),
+		[desugaredOptionPath],
+	)
 	const getSubTreeData = useCallback(() => getSubTree(entityList), [entityList, getSubTree])
 	const subTreeData = useAccessorUpdateSubscription(getSubTreeData)
 	return useMemo(() => Array.from(subTreeData), [subTreeData]) // Preserve ref equality if possible.
@@ -113,35 +114,33 @@ export const useNormalizedOptions = (
 	)
 	return useMemo(
 		() =>
-			optionEntities.map(
-				(item, i): ChoiceFieldData.SingleDatum => {
-					const label = renderOption
-						? renderOption(item)
-						: 'field' in desugaredOptionPath
-						? `${item.getField(desugaredOptionPath.field).value ?? ''}`
-						: ''
+			optionEntities.map((item, i): ChoiceFieldData.SingleDatum => {
+				const label = renderOption
+					? renderOption(item)
+					: 'field' in desugaredOptionPath
+					? `${item.getField(desugaredOptionPath.field).value ?? ''}`
+					: ''
 
-					let searchKeywords: string
+				let searchKeywords: string
 
-					if (desugaredFields.length) {
-						searchKeywords = desugaredFields
-							.map(desugared => item.getRelativeSingleField<string>(desugared).value ?? '')
-							.join(' ')
-					} else if (typeof label === 'string') {
-						searchKeywords = label
-					} else {
-						// TODO we're failing silently which is not ideal but at the same time it's not correct to throw.
-						searchKeywords = ''
-					}
+				if (desugaredFields.length) {
+					searchKeywords = desugaredFields
+						.map(desugared => item.getRelativeSingleField<string>(desugared).value ?? '')
+						.join(' ')
+				} else if (typeof label === 'string') {
+					searchKeywords = label
+				} else {
+					// TODO we're failing silently which is not ideal but at the same time it's not correct to throw.
+					searchKeywords = ''
+				}
 
-					return {
-						key: i,
-						label,
-						searchKeywords,
-						actualValue: item.id,
-					}
-				},
-			),
+				return {
+					key: i,
+					label,
+					searchKeywords,
+					actualValue: item.id,
+				}
+			}),
 		[desugaredOptionPath, optionEntities, renderOption, desugaredFields],
 	)
 }

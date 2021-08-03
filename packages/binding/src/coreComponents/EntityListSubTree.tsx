@@ -42,11 +42,10 @@ export const EntityListSubTree = Component(
 
 		const getSubTree = useGetEntityListSubTree()
 		const parameters = useEntityListSubTreeParameters(props)
-		const getAccessor = useCallback(() => getSubTree(parameters, props.treeRootId), [
-			getSubTree,
-			parameters,
-			props.treeRootId,
-		])
+		const getAccessor = useCallback(
+			() => getSubTree(parameters, props.treeRootId),
+			[getSubTree, parameters, props.treeRootId],
+		)
 		const accessor = useAccessorUpdateSubscription(getAccessor)
 
 		//  TODO revive top level hasOneRelationPath

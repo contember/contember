@@ -68,7 +68,7 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 				unwrapAnchor(e)
 			} else {
 				const href =
-					((suchThat as unknown) as ElementSpecifics<AnchorElement> | undefined)?.href ?? prompt('Insert the URL:')
+					(suchThat as unknown as ElementSpecifics<AnchorElement> | undefined)?.href ?? prompt('Insert the URL:')
 
 				if (!href) {
 					return
@@ -94,7 +94,7 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 	}
 	e.insertText = text => {
 		if (text && isUrl(text)) {
-			wrapAnchor((e as unknown) as BaseAnchorEditor, text)
+			wrapAnchor(e as unknown as BaseAnchorEditor, text)
 		} else {
 			insertText(text)
 		}
@@ -103,7 +103,7 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 		const text = data.getData('text/plain')
 
 		if (text && isUrl(text)) {
-			wrapAnchor((e as unknown) as BaseAnchorEditor, text)
+			wrapAnchor(e as unknown as BaseAnchorEditor, text)
 		} else {
 			insertData(data)
 		}
@@ -142,5 +142,5 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 		return processInlinePaste(element, next, cumulativeTextAttrs)
 	}
 
-	return (e as unknown) as EditorWithAnchors<E>
+	return e as unknown as EditorWithAnchors<E>
 }

@@ -4,7 +4,7 @@ import type { RootEditorNode } from './RootEditorNode'
 
 export const defaultDeserialize = <
 	CustomElements extends RichTextElement = never,
-	CustomLeaves extends RichTextLeaf = never
+	CustomLeaves extends RichTextLeaf = never,
 >(
 	source: string,
 ): RootEditorNode<CustomElements, CustomLeaves> => {

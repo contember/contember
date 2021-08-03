@@ -101,15 +101,15 @@ describe('children analyzer', () => {
 	})
 	it('should correctly process leaves & branch nodes', () => {
 		const numberLeaf = new Leaf(node => node.props.value, NumberComponent)
-		const calculatorBranchNode = new BranchNode('compute', (children: RawNodeRepresentation<number, number>): [
-			number,
-			number,
-		] => {
-			if (!children || typeof children === 'number' || children.length !== 2) {
-				throw new Error('We only support binary ops')
-			}
-			return [children[0], children[1]]
-		})
+		const calculatorBranchNode = new BranchNode(
+			'compute',
+			(children: RawNodeRepresentation<number, number>): [number, number] => {
+				if (!children || typeof children === 'number' || children.length !== 2) {
+					throw new Error('We only support binary ops')
+				}
+				return [children[0], children[1]]
+			},
+		)
 		const analyser = new ChildrenAnalyzer<number, number>([numberLeaf], [calculatorBranchNode])
 		expect(analyser.processChildren(calculatorFormula, undefined)).toEqual([140])
 	})

@@ -184,5 +184,5 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		return processBlockPaste(element, next, cumulativeTextAttrs)
 	}
 
-	return (e as unknown) as EditorWithHeadings<E>
+	return e as unknown as EditorWithHeadings<E>
 }

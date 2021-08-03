@@ -541,7 +541,7 @@ export class EventManager {
 		type: EventType,
 	): Set<EntityListAccessor.EntityListEventListenerMap[EventType]> | undefined
 	public getEventListeners<
-		EventType extends keyof EntityAccessor.EntityEventListenerMap & keyof EntityListAccessor.EntityListEventListenerMap
+		EventType extends keyof EntityAccessor.EntityEventListenerMap & keyof EntityListAccessor.EntityListEventListenerMap,
 	>(
 		state: StateINode,
 		type: EventType,
@@ -552,7 +552,7 @@ export class EventManager {
 	public getEventListeners<
 		EventType extends keyof FieldAccessor.FieldEventListenerMap &
 			keyof EntityAccessor.EntityEventListenerMap &
-			keyof EntityListAccessor.EntityListEventListenerMap
+			keyof EntityListAccessor.EntityListEventListenerMap,
 	>(
 		state: StateNode,
 		type: EventType,

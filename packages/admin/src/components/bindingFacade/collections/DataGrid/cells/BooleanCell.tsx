@@ -53,11 +53,13 @@ export const BooleanCell: FunctionComponent<BooleanCellProps> = Component(props 
 				const formatMessage = useMessageFormatter(dataGridCellsDictionary)
 				return (
 					<div style={{ display: 'flex', gap: '0.5em', alignItems: 'center' }}>
-						{([
-							['includeTrue', formatMessage('dataGirdCells.booleanCell.includeTrue')],
-							['includeFalse', formatMessage('dataGirdCells.booleanCell.includeFalse')],
-							['includeNull', formatMessage('dataGirdCells.booleanCell.includeNull')],
-						] as const).map(([item, label]) => (
+						{(
+							[
+								['includeTrue', formatMessage('dataGirdCells.booleanCell.includeTrue')],
+								['includeFalse', formatMessage('dataGirdCells.booleanCell.includeFalse')],
+								['includeNull', formatMessage('dataGirdCells.booleanCell.includeNull')],
+							] as const
+						).map(([item, label]) => (
 							<Checkbox
 								key={item}
 								value={filter.has(item)}

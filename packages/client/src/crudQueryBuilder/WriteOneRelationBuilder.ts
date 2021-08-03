@@ -6,14 +6,14 @@ import { WriteDataBuilder } from './WriteDataBuilder'
 class WriteOneRelationBuilder<
 	Op extends WriteOperation.ContentfulOperation,
 	Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
-	D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
+	D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']],
 > {
 	protected constructor(public readonly data: D = undefined as D) {}
 
 	public static instantiate<
 		Op extends WriteOperation.ContentfulOperation,
 		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
-		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
+		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']],
 	>(data: D = undefined as D): WriteOneRelationBuilder.Builder<Op, Allowed, D> {
 		return new WriteOneRelationBuilder<Op, Allowed, D>(data)
 	}
@@ -21,7 +21,7 @@ class WriteOneRelationBuilder<
 	public static instantiateFromFactory<
 		Op extends WriteOperation.ContentfulOperation,
 		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
-		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
+		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']],
 	>(builder: WriteOneRelationBuilder.BuilderFactory<Op, Allowed, D>): WriteOneRelationBuilder.Builder<Op, never, D> {
 		if (typeof builder === 'function') {
 			return builder(WriteOneRelationBuilder.instantiate())
@@ -85,7 +85,7 @@ namespace WriteOneRelationBuilder {
 	export type Builder<
 		Op extends WriteOperation.ContentfulOperation,
 		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
-		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
+		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']],
 	> = Omit<
 		WriteOneRelationBuilder<Op, Allowed, D>,
 		Exclude<WriteRelationOps[WriteOperation.ContentfulOperation['op']], Allowed>
@@ -94,7 +94,7 @@ namespace WriteOneRelationBuilder {
 	export type BuilderFactory<
 		Op extends WriteOperation.ContentfulOperation,
 		Allowed extends WriteRelationOps[Op['op']] = WriteRelationOps[Op['op']],
-		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']]
+		D extends WriteOneRelationBuilder.DataFormat[Op['op']] | undefined = WriteOneRelationBuilder.DataFormat[Op['op']],
 	> = D | Builder<Op, never, D> | ((builder: Builder<Op, Allowed, D>) => Builder<Op, never, D>)
 }
 

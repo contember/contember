@@ -35,19 +35,8 @@ export type ButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps)
 
 export const Button = memo(
 	forwardRef<any, ButtonProps>((props, ref) => {
-		const {
-			Component,
-			intent,
-			size,
-			flow,
-			distinction,
-			justification,
-			isLoading,
-			isActive,
-			bland,
-			children,
-			...rest
-		} = props
+		const { Component, intent, size, flow, distinction, justification, isLoading, isActive, bland, children, ...rest } =
+			props
 
 		if (props.disabled === true) {
 			rest['aria-disabled'] = true

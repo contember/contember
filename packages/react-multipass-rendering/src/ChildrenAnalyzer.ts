@@ -18,7 +18,7 @@ import type {
 export class ChildrenAnalyzer<
 	AllLeavesRepresentation = any,
 	AllBranchNodesRepresentation = never,
-	StaticContext = undefined
+	StaticContext = undefined,
 > {
 	private static defaultOptions: ChildrenAnalyzerOptions = {
 		ignoreRenderProps: true,

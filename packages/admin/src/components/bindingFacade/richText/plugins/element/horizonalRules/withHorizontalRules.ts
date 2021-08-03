@@ -141,5 +141,5 @@ export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWith
 		})
 	}
 
-	return (e as unknown) as EditorWithHorizontalRules<E>
+	return e as unknown as EditorWithHorizontalRules<E>
 }

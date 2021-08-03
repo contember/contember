@@ -160,9 +160,9 @@ class EntityAccessor implements Errorable {
 	public getRelativeSingleField<Value extends FieldValue = FieldValue>(
 		field: RelativeSingleField | DesugaredRelativeSingleField,
 	): FieldAccessor<Value> {
-		return (this.getRelativeSingleEntity(field).getAccessorByPlaceholder(
+		return this.getRelativeSingleEntity(field).getAccessorByPlaceholder(
 			PlaceholderGenerator.getFieldPlaceholder(field.field),
-		) as unknown) as FieldAccessor<Value>
+		) as unknown as FieldAccessor<Value>
 	}
 
 	public getRelativeSingleEntity(

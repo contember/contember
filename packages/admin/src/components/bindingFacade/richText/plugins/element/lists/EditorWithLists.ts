@@ -5,7 +5,7 @@ import type { OrderedListElement } from './OrderedListElement'
 import type { UnorderedListElement } from './UnorderedListElement'
 
 export interface WithLists<
-	E extends WithAnotherNodeType<BaseEditor, UnorderedListElement | OrderedListElement | ListItemElement>
+	E extends WithAnotherNodeType<BaseEditor, UnorderedListElement | OrderedListElement | ListItemElement>,
 > {
 	isUnorderedList: (
 		element: ElementNode | SlateNode,

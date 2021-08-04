@@ -1,0 +1,92 @@
+@use 'sass:math'
+
+@import '../common'
+
+.#{$cui-conf-globalPrefix}radio
+	$size: 1.2em
+	$gap: .35em
+	$radio-knob-percent: 60%
+	$t-background: .08s
+	$gap-between: .75em
+
+	&-group
+		--radio-color: #{$cui-control-view-default-border-color}
+		display: flex
+		flex-direction: column
+		gap: $gap-between
+		&.view-horizontal
+			flex-direction: row
+			flex-wrap: wrap
+			gap: $gap-between
+
+	&-option
+		align-items: flex-start
+		display: flex
+		flex-direction: row
+		&.is-checked
+			--radio-color: #{$cui-control-view-default-distinction-color}
+		&.is-checked.is-readonly
+			--radio-color: #{$cui-control-view-default-border-color}
+		&.is-invalid
+			--radio-color: #{$cui-control-validation-invalid-color}
+		&.is-disabled
+			cursor: not-allowed
+			opacity: 0.5
+
+	&-control
+		width: $size
+		min-width: $size
+		height: $size
+		border-radius: 50%
+		border: $cui-control-border-width solid var(--radio-color) // TODO: A11Y issue: Too light grey colour
+		margin-inline-end: $gap
+		position: relative
+		transition-property: background-color, border-color, box-shadow
+		transition-duration: $t-background, $t-background, .2s
+		&::before
+			border-radius: 50%
+			content: ''
+			position: absolute
+			width: 100%
+			height: 100%
+			transition-property: box-shadow
+			transition-duration: .2s
+		&::after
+			border-radius: 50%
+			content: ''
+			position: absolute
+			top: math.div((100% - $radio-knob-percent), 2)
+			left: math.div((100% - $radio-knob-percent), 2)
+			width: $radio-knob-percent
+			height: $radio-knob-percent
+			transition-property: background-color, transform
+			transition-duration: $t-background, .2s
+			transform: scale(0)
+
+	&-label
+		grid-area: label
+		display: flex
+		flex-direction: column
+		line-height: $cui-base-lineHeight
+		padding-bottom: (($size - $cui-base-lineHeight * .8) * 0.5)
+		padding-top: (($size - $cui-base-lineHeight * .8) * 0.5)
+		&-main
+			color: $cui-formGroup-label-color
+			font-weight: $fw-medium
+			font-size: .8em
+			line-height: $cui-base-lineHeight
+		&-description
+			font-weight: $fw-normal
+			font-size: .76em
+			color: $cui-formGroup-labelDescription-color
+			display: inline-block
+			line-height: $cui-base-lineHeight
+
+	&-option.is-checked &-control::after
+		background-color: var(--radio-color)
+	&-option.is-focused &-control::before
+		box-shadow: 0 0 0 .2em rgba($cui-control-view-default-distinction-color, .3)
+	&-option.is-focused:not(.is-checked) &-control::before
+		border-color: lighten($cui-control-view-default-distinction-color, 10)
+	&-option.is-checked &-control::after
+		transform: scale(1)

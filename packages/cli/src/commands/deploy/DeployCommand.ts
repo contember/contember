@@ -6,12 +6,11 @@ import {
 	resolveMigrationStatus,
 } from '../migrations/MigrationExecuteHelper'
 import { pathExists } from 'fs-extra'
-import { readdir, readFile } from 'fs/promises'
 import { interactiveResolveApiToken, TenantClient } from '../../utils/tenant'
 import { interactiveResolveInstanceEnvironmentFromInput } from '../../utils/instance'
 import { SystemClient } from '../../utils/system'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
-import fetch from 'node-fetch'
+import { AdminClient, readAdminFiles } from '../../utils/admin'
 
 type Args = {
 	project: string
@@ -40,7 +39,7 @@ export class DeployCommand extends Command<Args, Options> {
 
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
 		const apiToken = await interactiveResolveApiToken({ instance })
-		const remoteProject = input?.getOption('remote-project') || project.name
+		const remoteProject = input.getOption('remote-project') || project.name
 		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 		await tenantClient.createProject(remoteProject, true)
 		const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
@@ -65,39 +64,10 @@ export class DeployCommand extends Command<Args, Options> {
 		}
 
 		if (adminEndpoint) {
-			const response = await fetch(`${adminEndpoint}/_deploy`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiToken}` },
-				body: JSON.stringify({
-					project: input.getOption('remote-project') ?? project.name,
-					files: await this.readFiles(projectAdminDistDir),
-				}),
-			})
-
-			if (!response.ok) {
-				throw 'Failed to deploy admin'
-			}
+			const client = AdminClient.create(adminEndpoint, apiToken)
+			await client.deploy(remoteProject, await readAdminFiles(projectAdminDistDir))
 		}
 
 		return 0
-	}
-
-	private async readFiles(dir: string, prefix: string = ''): Promise<Array<{ path: string; data: string }>> {
-		const files = []
-
-		for (const fileName of await readdir(dir, { withFileTypes: true })) {
-			if (fileName.isDirectory()) {
-				for (const innerFile of await this.readFiles(`${dir}/${fileName}`, prefix + fileName + '/')) {
-					files.push(innerFile)
-				}
-			} else if (fileName.isFile()) {
-				files.push({
-					path: prefix + fileName,
-					data: (await readFile(`${dir}/${fileName}`)).toString('base64'),
-				})
-			}
-		}
-
-		return files
 	}
 }

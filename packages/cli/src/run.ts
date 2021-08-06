@@ -3,6 +3,7 @@ import { register } from 'ts-node'
 import { Application, CommandManager, getPackageVersion } from '@contember/cli-common'
 import {
 	CreateApiKeyCommand,
+	DeployCommand,
 	InviteCommand,
 	MigrationAmendCommand,
 	MigrationCreateCommand,
@@ -29,6 +30,7 @@ import {
 	const diffCommandFactory = () => new MigrationDiffCommand()
 	const migrationsDescribeFactory = () => new MigrationDescribeCommand()
 	const commandManager = new CommandManager({
+		['deploy']: () => new DeployCommand(),
 		['version']: () => new VersionCommand(),
 		['migrations:diff']: diffCommandFactory,
 		['migrations:amend']: () => new MigrationAmendCommand(),

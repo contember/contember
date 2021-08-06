@@ -1,3 +1,4 @@
+export * from './deploy'
 export * from './migrations'
 export * from './misc'
 export * from './project'

@@ -1,7 +1,5 @@
-import { SchemaVersionBuilder } from '@contember/engine-system-api'
-import { createProjectContainer } from './ProjectContainer'
-import { Plugin } from '@contember/engine-plugins'
-import { ProjectConfigResolver, ProjectContainer, Providers } from '@contember/engine-http'
+import { ProjectContainerFactory } from './ProjectContainer'
+import { ProjectConfigResolver, ProjectContainer } from '@contember/engine-http'
 import { ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
 
 export class ProjectContainerResolver {
@@ -10,12 +8,9 @@ export class ProjectContainerResolver {
 
 	public readonly onCreate: ((container: ProjectContainer) => void | (() => void))[] = []
 	constructor(
-		private debug: boolean,
+		private projectContainerFactory: ProjectContainerFactory,
 		private projectConfigResolver: ProjectConfigResolver,
 		private projectManager: ProjectManager,
-		private plugins: Plugin[],
-		private schemaVersionBuilder: SchemaVersionBuilder,
-		private providers: Providers,
 	) {}
 
 	public async getAllProjectContainers(): Promise<ProjectContainer[]> {
@@ -64,13 +59,7 @@ export class ProjectContainerResolver {
 		if (existing) {
 			return existing.container
 		}
-		const projectContainer = createProjectContainer(
-			this.debug,
-			projectConfig,
-			this.plugins,
-			this.schemaVersionBuilder,
-			this.providers,
-		)
+		const projectContainer = this.projectContainerFactory.createContainer(projectConfig)
 		const cleanups = this.onCreate.map(it => it(projectContainer) || (() => null))
 		this.containers.set(project.slug, {
 			container: projectContainer,

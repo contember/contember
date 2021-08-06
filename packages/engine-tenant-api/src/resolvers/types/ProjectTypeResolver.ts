@@ -30,7 +30,7 @@ export class ProjectTypeResolver implements ProjectResolvers {
 	}
 
 	async roles(parent: Project) {
-		const schema = await this.projectSchemaResolver(parent.slug)
+		const schema = await this.projectSchemaResolver.getSchema(parent.slug)
 		if (!schema) {
 			return []
 		}

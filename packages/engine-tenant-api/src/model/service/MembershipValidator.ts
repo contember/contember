@@ -6,7 +6,7 @@ export class MembershipValidator {
 	constructor(private readonly schemaResolver: ProjectSchemaResolver) {}
 
 	async validate(project: string, memberships: readonly Membership[]): Promise<MembershipValidationError[]> {
-		const schema = await this.schemaResolver(project)
+		const schema = await this.schemaResolver.getSchema(project)
 		if (!schema) {
 			throw new Error()
 		}

@@ -30,7 +30,7 @@ export class ProjectManager {
 				await bus.execute(new SetProjectSecretCommand(id, key, value))
 			}
 			try {
-				await this.projectIntializer({
+				await this.projectIntializer.initializeProject({
 					id,
 					...project,
 					updatedAt: now,

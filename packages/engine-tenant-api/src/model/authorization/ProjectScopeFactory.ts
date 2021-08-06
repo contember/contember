@@ -11,7 +11,7 @@ export class ProjectScopeFactory {
 	) {}
 
 	async create(project: Pick<Project, 'slug'>): Promise<AuthorizationScope<Identity> | null> {
-		const schema = await this.schemaResolver(project.slug)
+		const schema = await this.schemaResolver.getSchema(project.slug)
 		if (!schema) {
 			return null
 		}

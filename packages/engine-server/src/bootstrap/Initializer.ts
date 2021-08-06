@@ -7,7 +7,7 @@ import {
 import { MigrationsRunner } from '@contember/database-migrations'
 import { ProjectInitializer } from '@contember/engine-system-api'
 import { Logger } from '@contember/engine-common'
-import { ProjectContainerResolver } from '../ProjectContainerResolver'
+import { ProjectContainerResolver } from '../project'
 import { ProjectConfig } from '@contember/engine-http'
 import { Migration } from '@contember/schema-migrations'
 

@@ -71,16 +71,16 @@ export interface TenantContainer {
 	identityFetcher: IdentityFetcher
 }
 
-export interface TenantArgs {
-	tenantDbCredentials: DatabaseCredentials
-	mailOptions: MailerOptions
+export interface TenantContainerArgs {
 	providers: Providers
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
 }
 
 export class TenantContainerFactory {
-	create(args: TenantArgs): TenantContainer {
+	constructor(private readonly tenantDbCredentials: DatabaseCredentials, private readonly mailOptions: MailerOptions) {}
+
+	create(args: TenantContainerArgs): TenantContainer {
 		return this.createBuilder(args)
 			.build()
 			.pick(
@@ -96,17 +96,17 @@ export class TenantContainerFactory {
 			)
 	}
 
-	createBuilder(args: TenantArgs) {
+	createBuilder(args: TenantContainerArgs) {
 		return new Builder({})
 			.addService(
 				'connection',
 				(): Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider =>
-					new Connection(args.tenantDbCredentials, {}),
+					new Connection(this.tenantDbCredentials, {}),
 			)
 			.addService('providers', () => args.providers)
 			.addService('db', ({ connection }) => connection.createClient('tenant', { module: 'tenant' }))
 			.addService('dbContext', ({ db, providers }) => new DatabaseContext(db, providers))
-			.addService('mailer', () => createMailer(args.mailOptions))
+			.addService('mailer', () => createMailer(this.mailOptions))
 			.addService('projectSchemaResolver', () => args.projectSchemaResolver)
 			.addService('templateRenderer', () => new TemplateRenderer())
 			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))

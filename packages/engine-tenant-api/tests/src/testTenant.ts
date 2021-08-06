@@ -1,6 +1,6 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
-import { ProjectSchemaResolver } from '../../src/model/type'
+import { ProjectSchemaResolver } from '../../src'
 import {
 	AclSchemaEvaluatorFactory,
 	createResolverContext,
@@ -51,22 +51,26 @@ const schema: Schema = {
 	},
 }
 
-const projectSchemaResolver: ProjectSchemaResolver = project => Promise.resolve(schema)
+const projectSchemaResolver: ProjectSchemaResolver = {
+	getSchema: project => Promise.resolve(schema),
+}
 
 export const authenticatedIdentityId = testUuid(999)
 export const authenticatedApiKeyId = testUuid(998)
 
 export const executeTenantTest = async (test: Test) => {
 	const mailer = createMockedMailer()
-	const tenantContainer = new TenantContainerFactory()
+	const tenantContainer = new TenantContainerFactory(
+		{
+			database: 'foo',
+			host: 'localhost',
+			port: 5432,
+			password: '123',
+			user: 'foo',
+		},
+		{},
+	)
 		.createBuilder({
-			tenantDbCredentials: {
-				database: 'foo',
-				host: 'localhost',
-				port: 5432,
-				password: '123',
-				user: 'foo',
-			},
 			providers: {
 				bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
 				bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
@@ -80,10 +84,11 @@ export const executeTenantTest = async (test: Test) => {
 					throw new Error('not supported')
 				},
 			},
-			mailOptions: {},
 			projectSchemaResolver,
-			projectInitializer: () => {
-				throw new Error()
+			projectInitializer: {
+				initializeProject: () => {
+					throw new Error()
+				},
 			},
 		})
 		.replaceService('connection', () => createConnectionMock(test.executes))

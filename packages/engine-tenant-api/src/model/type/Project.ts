@@ -12,5 +12,9 @@ export interface ProjectWithSecrets extends Project {
 	readonly updatedAt: Date
 }
 
-export type ProjectSchemaResolver = (projectSlug: string) => Promise<Schema | undefined>
-export type ProjectInitializer = (project: ProjectWithSecrets) => Promise<{ log: string[] }>
+export interface ProjectSchemaResolver {
+	getSchema(projectSlug: string): Promise<Schema | undefined>
+}
+export interface ProjectInitializer {
+	initializeProject(project: ProjectWithSecrets): Promise<{ log: string[] }>
+}

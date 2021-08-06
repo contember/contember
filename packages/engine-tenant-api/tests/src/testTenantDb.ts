@@ -1,9 +1,9 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
-import { ProjectSchemaResolver } from '../../src/model/type'
 import {
 	createResolverContext,
 	PermissionContext,
+	ProjectSchemaResolver,
 	ResolverContext,
 	StaticIdentity,
 	TenantContainerFactory,
@@ -72,7 +72,9 @@ const schema: Schema = {
 	},
 }
 
-const projectSchemaResolver: ProjectSchemaResolver = project => Promise.resolve(schema)
+const projectSchemaResolver: ProjectSchemaResolver = {
+	getSchema: project => Promise.resolve(schema),
+}
 
 export const authenticatedIdentityId = testUuid(999)
 export const authenticatedApiKeyId = testUuid(998)
@@ -118,14 +120,12 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		providers,
 	})
 	const mailer = createMockedMailer()
-	const tenantContainer = new TenantContainerFactory()
+	const tenantContainer = new TenantContainerFactory(credentials, {})
 		.createBuilder({
-			tenantDbCredentials: credentials,
-			mailOptions: {},
 			providers,
 			projectSchemaResolver,
-			projectInitializer: () => {
-				return Promise.resolve({ log: [] })
+			projectInitializer: {
+				initializeProject: () => Promise.resolve({ log: [] }),
 			},
 		})
 		.replaceService('mailer', () => mailer)

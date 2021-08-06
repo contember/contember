@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class CreateRelationInverseSideModification implements Modification<CreateRelationInverseSideModification.Data> {
-	constructor(private readonly data: CreateRelationInverseSideModification.Data, private readonly schema: Schema) {}
+export const CreateRelationInverseSideModification: ModificationHandlerStatic<CreateRelationInverseSideModificationData> = class {
+	static id = 'createRelationInverseSide'
+	constructor(private readonly data: CreateRelationInverseSideModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {}
 
@@ -29,15 +30,13 @@ class CreateRelationInverseSideModification implements Modification<CreateRelati
 	describe() {
 		return { message: `Add relation ${this.data.entityName}.${this.data.relation.name}` }
 	}
-}
 
-namespace CreateRelationInverseSideModification {
-	export const id = 'createRelationInverseSide'
-
-	export interface Data {
-		entityName: string
-		relation: Model.AnyRelation & Model.InverseRelation
+	static createModification(data: CreateRelationInverseSideModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default CreateRelationInverseSideModification
+export interface CreateRelationInverseSideModificationData {
+	entityName: string
+	relation: Model.AnyRelation & Model.InverseRelation
+}

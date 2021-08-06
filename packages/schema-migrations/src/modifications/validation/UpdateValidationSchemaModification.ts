@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Validation } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class UpdateValidationSchemaModification implements Modification<UpdateValidationSchemaModification.Data> {
-	constructor(private readonly data: UpdateValidationSchemaModification.Data) {}
+export const UpdateValidationSchemaModification: ModificationHandlerStatic<UpdateValidationSchemaModificationData> = class {
+	static id = 'updateValidationSchema'
+	constructor(private readonly data: UpdateValidationSchemaModificationData) {}
 
 	public createSql(builder: MigrationBuilder): void {}
 
@@ -23,14 +24,12 @@ class UpdateValidationSchemaModification implements Modification<UpdateValidatio
 	describe() {
 		return { message: 'Update validation schema' }
 	}
-}
 
-namespace UpdateValidationSchemaModification {
-	export const id = 'updateValidationSchema'
-
-	export interface Data {
-		schema: Validation.Schema
+	static createModification(data: UpdateValidationSchemaModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default UpdateValidationSchemaModification
+export interface UpdateValidationSchemaModificationData {
+	schema: Validation.Schema
+}

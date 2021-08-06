@@ -2,10 +2,12 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Acl } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class UpdateAclSchemaModification implements Modification<UpdateAclSchemaModification.Data> {
-	constructor(private readonly data: UpdateAclSchemaModification.Data) {}
+export const UpdateAclSchemaModification: ModificationHandlerStatic<UpdateAclSchemaModificationData> = class {
+	public static id = 'updateAclSchema'
+
+	constructor(private readonly data: UpdateAclSchemaModificationData) {}
 
 	public createSql(builder: MigrationBuilder): void {}
 
@@ -23,14 +25,12 @@ class UpdateAclSchemaModification implements Modification<UpdateAclSchemaModific
 	describe() {
 		return { message: 'Update ACL schema' }
 	}
-}
 
-namespace UpdateAclSchemaModification {
-	export const id = 'updateAclSchema'
-
-	export interface Data {
-		schema: Acl.Schema
+	static createModification(data: UpdateAclSchemaModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default UpdateAclSchemaModification
+export interface UpdateAclSchemaModificationData {
+	schema: Acl.Schema
+}

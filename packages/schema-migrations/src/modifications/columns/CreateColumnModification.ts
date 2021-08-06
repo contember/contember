@@ -2,13 +2,15 @@ import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent, EventType } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnName, resolveDefaultValue } from '@contember/schema-utils'
 import { ImplementationException } from '../../exceptions'
 
-class CreateColumnModification implements Modification<CreateColumnModification.Data> {
-	constructor(private readonly data: CreateColumnModification.Data, private readonly schema: Schema) {}
+export const CreateColumnModification: ModificationHandlerStatic<CreateColumnModificationData> = class {
+	static id = 'createColumn'
+
+	constructor(private readonly data: CreateColumnModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -91,17 +93,15 @@ class CreateColumnModification implements Modification<CreateColumnModification.
 				: undefined
 		return { message: `Add field ${this.data.entityName}.${this.data.field.name}`, failureWarning }
 	}
-}
 
-namespace CreateColumnModification {
-	export const id = 'createColumn'
-
-	export interface Data {
-		entityName: string
-		field: Model.AnyColumn
-		fillValue?: any
-		copyValue?: string
+	static createModification(data: CreateColumnModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default CreateColumnModification
+export interface CreateColumnModificationData {
+	entityName: string
+	field: Model.AnyColumn
+	fillValue?: any
+	copyValue?: string
+}

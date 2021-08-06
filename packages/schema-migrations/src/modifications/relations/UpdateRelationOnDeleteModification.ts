@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class UpdateRelationOnDeleteModification implements Modification<UpdateRelationOnDeleteModification.Data> {
-	constructor(private readonly data: UpdateRelationOnDeleteModification.Data, private readonly schema: Schema) {}
+export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<UpdateRelationOnDeleteModificationData> = class {
+	static id = 'updateRelationOnDelete'
+	constructor(private readonly data: UpdateRelationOnDeleteModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {}
 
@@ -29,16 +30,14 @@ class UpdateRelationOnDeleteModification implements Modification<UpdateRelationO
 	describe() {
 		return { message: `Change on-delete policy of relation ${this.data.entityName}.${this.data.fieldName}` }
 	}
-}
 
-namespace UpdateRelationOnDeleteModification {
-	export const id = 'updateRelationOnDelete'
-
-	export interface Data {
-		entityName: string
-		fieldName: string
-		onDelete: Model.OnDelete
+	static createModification(data: UpdateRelationOnDeleteModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default UpdateRelationOnDeleteModification
+export interface UpdateRelationOnDeleteModificationData {
+	entityName: string
+	fieldName: string
+	onDelete: Model.OnDelete
+}

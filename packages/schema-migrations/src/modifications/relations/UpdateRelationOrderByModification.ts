@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class UpdateRelationOrderByModification implements Modification<UpdateRelationOrderByModification.Data> {
-	constructor(private readonly data: UpdateRelationOrderByModification.Data, private readonly schema: Schema) {}
+export const UpdateRelationOrderByModification: ModificationHandlerStatic<UpdateRelationOrderByModificationData> = class {
+	static id = 'updateRelationOrderBy'
+	constructor(private readonly data: UpdateRelationOrderByModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {}
 
@@ -29,16 +30,14 @@ class UpdateRelationOrderByModification implements Modification<UpdateRelationOr
 	describe() {
 		return { message: `Update order-by of relation ${this.data.entityName}.${this.data.fieldName}` }
 	}
-}
 
-namespace UpdateRelationOrderByModification {
-	export const id = 'updateRelationOrderBy'
-
-	export interface Data {
-		entityName: string
-		fieldName: string
-		orderBy: Model.OrderBy[]
+	static createModification(data: UpdateRelationOrderByModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default UpdateRelationOrderByModification
+export interface UpdateRelationOrderByModificationData {
+	entityName: string
+	fieldName: string
+	orderBy: Model.OrderBy[]
+}

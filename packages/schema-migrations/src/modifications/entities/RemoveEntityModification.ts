@@ -11,13 +11,14 @@ import {
 	updateModel,
 	updateSchema,
 } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 import { VERSION_ACL_PATCH } from '../ModificationVersions'
 import { PredicateDefinitionProcessor } from '@contember/schema-utils'
 
-class RemoveEntityModification implements Modification<RemoveEntityModification.Data> {
+export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityModificationData> = class {
+	static id = 'removeEntity'
 	constructor(
-		private readonly data: RemoveEntityModification.Data,
+		private readonly data: RemoveEntityModificationData,
 		private readonly schema: Schema,
 		private readonly formatVersion: number,
 	) {}
@@ -78,14 +79,12 @@ class RemoveEntityModification implements Modification<RemoveEntityModification.
 	describe() {
 		return { message: `Remove entity ${this.data.entityName}`, isDestructive: true }
 	}
-}
 
-namespace RemoveEntityModification {
-	export const id = 'removeEntity'
-
-	export interface Data {
-		entityName: string
+	static createModification(data: RemoveEntityModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default RemoveEntityModification
+export interface RemoveEntityModificationData {
+	entityName: string
+}

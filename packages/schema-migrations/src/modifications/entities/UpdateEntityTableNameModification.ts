@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class UpdateEntityTableNameModification implements Modification<UpdateEntityTableNameModification.Data> {
-	constructor(private readonly data: UpdateEntityTableNameModification.Data, private readonly schema: Schema) {}
+export const UpdateEntityTableNameModification: ModificationHandlerStatic<UpdateEntityTableNameModificationData> = class {
+	static id = 'updateEntityTableName'
+	constructor(private readonly data: UpdateEntityTableNameModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -34,15 +35,13 @@ class UpdateEntityTableNameModification implements Modification<UpdateEntityTabl
 	describe() {
 		return { message: `Change table name of entity ${this.data.entityName}` }
 	}
-}
 
-namespace UpdateEntityTableNameModification {
-	export const id = 'updateEntityTableName'
-
-	export interface Data {
-		entityName: string
-		tableName: string
+	static createModification(data: UpdateEntityTableNameModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default UpdateEntityTableNameModification
+export interface UpdateEntityTableNameModificationData {
+	entityName: string
+	tableName: string
+}

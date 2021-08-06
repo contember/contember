@@ -4,11 +4,11 @@ import { Migration } from './Migration'
 import { Schema } from '@contember/schema'
 import {
 	emptyModificationDescriptionContext,
-	Modification,
 	ModificationDescription,
 	ModificationDescriptionContext,
-} from './modifications/Modification'
-import CreateEntityModification from './modifications/entities/CreateEntityModification'
+	ModificationHandler,
+} from './modifications/ModificationHandler'
+import { CreateEntityModification } from './modifications/entities'
 import { SchemaValidator, ValidationError } from '@contember/schema-utils'
 import { SchemaUpdateError } from './modifications/exceptions'
 
@@ -17,7 +17,7 @@ export interface ModificationDescriptionResult {
 	sql: string
 	schema: Schema
 	description: ModificationDescription
-	handler: Modification<any>
+	handler: ModificationHandler<any>
 	errors: ValidationError[]
 }
 

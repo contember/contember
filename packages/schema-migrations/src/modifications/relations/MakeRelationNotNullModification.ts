@@ -2,11 +2,12 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 import { getEntity, tryGetColumnName } from '@contember/schema-utils'
 
-class MakeRelationNotNullModification implements Modification<MakeRelationNotNullModification.Data> {
-	constructor(private readonly data: MakeRelationNotNullModification.Data, private readonly schema: Schema) {}
+export const MakeRelationNotNullModification: ModificationHandlerStatic<MakeRelationNotNullModificationData> = class {
+	static id = 'makeRelationNotNull'
+	constructor(private readonly data: MakeRelationNotNullModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = getEntity(this.schema.model, this.data.entityName)
@@ -42,16 +43,14 @@ class MakeRelationNotNullModification implements Modification<MakeRelationNotNul
 			failureWarning: 'Changing to not-null may fail in runtime',
 		}
 	}
-}
 
-namespace MakeRelationNotNullModification {
-	export const id = 'makeRelationNotNull'
-
-	export interface Data {
-		entityName: string
-		fieldName: string
-		// todo fillValue
+	static createModification(data: MakeRelationNotNullModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default MakeRelationNotNullModification
+export interface MakeRelationNotNullModificationData {
+	entityName: string
+	fieldName: string
+	// todo fillValue
+}

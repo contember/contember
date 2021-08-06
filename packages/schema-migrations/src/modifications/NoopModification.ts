@@ -1,9 +1,9 @@
-import { Modification } from './Modification'
+import { ModificationHandler } from './ModificationHandler'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 
-export class NoopModification implements Modification<{}> {
+export class NoopModification implements ModificationHandler<{}> {
 	createSql(builder: MigrationBuilder): void | Promise<void> {}
 
 	getSchemaUpdater(): (value: Schema) => Schema {

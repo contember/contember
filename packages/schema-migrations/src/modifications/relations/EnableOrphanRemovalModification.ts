@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class EnableOrphanRemovalModification implements Modification<EnableOrphanRemovalModification.Data> {
-	constructor(private readonly data: EnableOrphanRemovalModification.Data, private readonly schema: Schema) {}
+export const EnableOrphanRemovalModification: ModificationHandlerStatic<EnableOrphanRemovalModificationData> = class {
+	static id = 'enableOrphanRemoval'
+	constructor(private readonly data: EnableOrphanRemovalModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {}
 
@@ -31,15 +32,13 @@ class EnableOrphanRemovalModification implements Modification<EnableOrphanRemova
 			message: `Enable orphan removal on ${this.data.entityName}.${this.data.fieldName}`,
 		}
 	}
-}
 
-namespace EnableOrphanRemovalModification {
-	export const id = 'enableOrphanRemoval'
-
-	export interface Data {
-		entityName: string
-		fieldName: string
+	static createModification(data: EnableOrphanRemovalModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default EnableOrphanRemovalModification
+export interface EnableOrphanRemovalModificationData {
+	entityName: string
+	fieldName: string
+}

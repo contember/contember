@@ -3,8 +3,8 @@ import { acceptRelationTypeVisitor, NamingHelper } from '@contember/schema-utils
 import { MigrationBuilder } from '@contember/database-migrations'
 import { ContentEvent } from '@contember/engine-common'
 import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
-import { createEventTrxTrigger, createEventTrigger } from '../sqlUpdateUtils'
+import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createEventTrigger, createEventTrxTrigger } from '../sqlUpdateUtils'
 import { isIt } from '../../utils/isIt'
 
 const getPrimaryType = (entity: Model.Entity): string => {
@@ -12,8 +12,10 @@ const getPrimaryType = (entity: Model.Entity): string => {
 	return column.columnType
 }
 
-class CreateRelationModification implements Modification<CreateRelationModification.Data> {
-	constructor(private readonly data: CreateRelationModification.Data, private readonly schema: Schema) {}
+export const CreateRelationModification: ModificationHandlerStatic<CreateRelationModificationData> = class {
+	static id = 'createRelation'
+
+	constructor(private readonly data: CreateRelationModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -127,16 +129,14 @@ class CreateRelationModification implements Modification<CreateRelationModificat
 				: undefined
 		return { message: `Add relation ${this.data.entityName}.${this.data.owningSide.name}`, failureWarning }
 	}
-}
 
-namespace CreateRelationModification {
-	export const id = 'createRelation'
-
-	export interface Data {
-		entityName: string
-		owningSide: Model.AnyRelation & Model.OwningRelation
-		inverseSide?: Model.AnyRelation & Model.InverseRelation
+	static createModification(data: CreateRelationModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default CreateRelationModification
+export interface CreateRelationModificationData {
+	entityName: string
+	owningSide: Model.AnyRelation & Model.OwningRelation
+	inverseSide?: Model.AnyRelation & Model.InverseRelation
+}

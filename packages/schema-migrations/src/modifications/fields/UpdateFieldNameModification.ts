@@ -1,5 +1,5 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Acl, Input, Model, Schema, Value } from '@contember/schema'
+import { Input, Model, Schema, Value } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import {
 	SchemaUpdater,
@@ -14,15 +14,16 @@ import {
 	updateModel,
 	updateSchema,
 } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
 import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
 
-class UpdateFieldNameModification implements Modification<UpdateFieldNameModification.Data> {
+export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldNameModificationData> = class {
+	static id = 'updateFieldName'
 	constructor(
-		private readonly data: UpdateFieldNameModification.Data,
+		private readonly data: UpdateFieldNameModificationData,
 		private readonly schema: Schema,
 		private readonly formatVersion: number,
 	) {}
@@ -172,16 +173,14 @@ class UpdateFieldNameModification implements Modification<UpdateFieldNameModific
 	describe() {
 		return { message: `Change field name ${this.data.entityName}.${this.data.fieldName} to ${this.data.newFieldName}` }
 	}
-}
 
-namespace UpdateFieldNameModification {
-	export const id = 'updateFieldName'
-
-	export interface Data {
-		entityName: string
-		fieldName: string
-		newFieldName: string
+	static createModification(data: UpdateFieldNameModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default UpdateFieldNameModification
+export interface UpdateFieldNameModificationData {
+	entityName: string
+	fieldName: string
+	newFieldName: string
+}

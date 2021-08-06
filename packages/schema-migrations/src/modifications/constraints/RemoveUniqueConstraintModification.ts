@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class RemoveUniqueConstraintModification implements Modification<RemoveUniqueConstraintModification.Data> {
-	constructor(private readonly data: RemoveUniqueConstraintModification.Data, private readonly schema: Schema) {}
+export const RemoveUniqueConstraintModification: ModificationHandlerStatic<RemoveUniqueConstraintModificationData> = class {
+	static id = 'removeUniqueConstraint'
+	constructor(private readonly data: RemoveUniqueConstraintModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -32,15 +33,13 @@ class RemoveUniqueConstraintModification implements Modification<RemoveUniqueCon
 		const fields = this.schema.model.entities[this.data.entityName].unique[this.data.constraintName].fields
 		return { message: `Remove unique constraint (${fields.join(', ')}) on entity ${this.data.entityName}` }
 	}
-}
 
-namespace RemoveUniqueConstraintModification {
-	export const id = 'removeUniqueConstraint'
-
-	export interface Data {
-		entityName: string
-		constraintName: string
+	static createModification(data: RemoveUniqueConstraintModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default RemoveUniqueConstraintModification
+export interface RemoveUniqueConstraintModificationData {
+	entityName: string
+	constraintName: string
+}

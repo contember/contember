@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class RemoveEnumModification implements Modification<RemoveEnumModification.Data> {
-	constructor(private readonly data: RemoveEnumModification.Data, private readonly schema: Schema) {}
+export const RemoveEnumModification: ModificationHandlerStatic<RemoveEnumModificationData> = class {
+	static id = 'removeEnum'
+	constructor(private readonly data: RemoveEnumModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		builder.dropDomain(this.data.enumName)
@@ -28,14 +29,12 @@ class RemoveEnumModification implements Modification<RemoveEnumModification.Data
 	describe() {
 		return { message: `Remove ${this.data.enumName}` }
 	}
-}
 
-namespace RemoveEnumModification {
-	export const id = 'removeEnum'
-
-	export interface Data {
-		enumName: string
+	static createModification(data: RemoveEnumModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default RemoveEnumModification
+export interface RemoveEnumModificationData {
+	enumName: string
+}

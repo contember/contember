@@ -20,12 +20,13 @@ import {
 	updateModel,
 	updateSchema,
 } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandler, ModificationHandlerStatic } from '../ModificationHandler'
 import { VERSION_ACL_PATCH } from '../ModificationVersions'
 
-class RemoveFieldModification implements Modification<RemoveFieldModification.Data> {
+export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModificationData> = class {
+	static id = 'removeField'
 	constructor(
-		private readonly data: RemoveFieldModification.Data,
+		private readonly data: RemoveFieldModificationData,
 		private readonly schema: Schema,
 		private readonly version: number,
 	) {}
@@ -121,15 +122,13 @@ class RemoveFieldModification implements Modification<RemoveFieldModification.Da
 	describe() {
 		return { message: `Remove field ${this.data.entityName}.${this.data.fieldName}`, isDestructive: true }
 	}
-}
 
-namespace RemoveFieldModification {
-	export const id = 'removeField'
-
-	export interface Data {
-		entityName: string
-		fieldName: string
+	static createModification(data: RemoveFieldModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default RemoveFieldModification
+export interface RemoveFieldModificationData {
+	entityName: string
+	fieldName: string
+}

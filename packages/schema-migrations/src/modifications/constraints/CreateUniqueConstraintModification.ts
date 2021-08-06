@@ -2,11 +2,13 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
-class CreateUniqueConstraintModification implements Modification<CreateUniqueConstraintModification.Data> {
-	constructor(private readonly data: CreateUniqueConstraintModification.Data, private readonly schema: Schema) {}
+export const CreateUniqueConstraintModification: ModificationHandlerStatic<CreateUniqueConstraintModificationData> = class {
+	static id = 'createUniqueConstraint'
+
+	constructor(private readonly data: CreateUniqueConstraintModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -66,15 +68,13 @@ class CreateUniqueConstraintModification implements Modification<CreateUniqueCon
 				: undefined,
 		}
 	}
-}
 
-namespace CreateUniqueConstraintModification {
-	export const id = 'createUniqueConstraint'
-
-	export interface Data {
-		entityName: string
-		unique: Model.UniqueConstraint
+	static createModification(data: CreateUniqueConstraintModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default CreateUniqueConstraintModification
+export interface CreateUniqueConstraintModificationData {
+	entityName: string
+	unique: Model.UniqueConstraint
+}

@@ -2,10 +2,11 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 
-class UpdateColumnDefinitionModification implements Modification<UpdateColumnDefinitionModification.Data> {
-	constructor(private readonly data: UpdateColumnDefinitionModification.Data, private readonly schema: Schema) {}
+export const UpdateColumnDefinitionModification: ModificationHandlerStatic<UpdateColumnDefinitionModificationData> = class {
+	static id = 'updateColumnDefinition'
+	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -51,16 +52,14 @@ class UpdateColumnDefinitionModification implements Modification<UpdateColumnDef
 			failureWarning,
 		}
 	}
-}
 
-namespace UpdateColumnDefinitionModification {
-	export const id = 'updateColumnDefinition'
-
-	export interface Data {
-		entityName: string
-		fieldName: string
-		definition: Model.AnyColumn
+	static createModification(data: UpdateColumnDefinitionModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default UpdateColumnDefinitionModification
+export interface UpdateColumnDefinitionModificationData {
+	entityName: string
+	fieldName: string
+	definition: Model.AnyColumn
+}

@@ -12,25 +12,30 @@ import {
 	updateModel,
 	updateSchema,
 } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandler, ModificationHandlerStatic } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
 import { NamingHelper } from '@contember/schema-utils'
-import UpdateEntityTableNameModification from './UpdateEntityTableNameModification'
+import { UpdateEntityTableNameModification } from './UpdateEntityTableNameModification'
 import { NoopModification } from '../NoopModification'
 import { renameConstraintSchemaUpdater, renameConstraintsSqlBuilder } from '../utils/renameConstraintsHelper'
 import { changeValue } from '../utils/valueUtils'
 
-class UpdateEntityNameModification implements Modification<UpdateEntityNameModification.Data> {
-	private subModification: Modification<any>
+export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntityNameModificationData> = class {
+	static id = 'updateEntityName'
+	private subModification: ModificationHandler<any>
 
 	constructor(
-		private readonly data: UpdateEntityNameModification.Data,
+		private readonly data: UpdateEntityNameModificationData,
 		private readonly schema: Schema,
 		private readonly formatVersion: number,
 	) {
 		this.subModification = data.tableName
-			? new UpdateEntityTableNameModification({ entityName: data.entityName, tableName: data.tableName }, schema)
+			? new UpdateEntityTableNameModification(
+					{ entityName: data.entityName, tableName: data.tableName },
+					schema,
+					this.formatVersion,
+			  )
 			: new NoopModification()
 	}
 
@@ -120,16 +125,14 @@ class UpdateEntityNameModification implements Modification<UpdateEntityNameModif
 	describe() {
 		return { message: `Change entity name from ${this.data.entityName} to ${this.data.newEntityName}` }
 	}
-}
 
-namespace UpdateEntityNameModification {
-	export const id = 'updateEntityName'
-
-	export interface Data {
-		entityName: string
-		newEntityName: string
-		tableName?: string
+	static createModification(data: UpdateEntityNameModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default UpdateEntityNameModification
+export interface UpdateEntityNameModificationData {
+	entityName: string
+	newEntityName: string
+	tableName?: string
+}

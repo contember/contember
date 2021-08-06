@@ -2,11 +2,12 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 import { escapeSqlString } from '../../utils/escapeSqlString'
 
-class CreateEnumModification implements Modification<CreateEnumModification.Data> {
-	constructor(private readonly data: CreateEnumModification.Data, private readonly schema: Schema) {}
+export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModificationData> = class {
+	static id = 'createEnum'
+	constructor(private readonly data: CreateEnumModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const joinedValues = this.data.values.map(it => `'${escapeSqlString(it)}'`).join(',')
@@ -33,15 +34,13 @@ class CreateEnumModification implements Modification<CreateEnumModification.Data
 	describe() {
 		return { message: `Add enum ${this.data.enumName}` }
 	}
-}
 
-namespace CreateEnumModification {
-	export const id = 'createEnum'
-
-	export interface Data {
-		enumName: string
-		values: string[]
+	static createModification(data: CreateEnumModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default CreateEnumModification
+export interface CreateEnumModificationData {
+	enumName: string
+	values: string[]
+}

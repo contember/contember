@@ -2,11 +2,12 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
-import { createEventTrxTrigger, createEventTrigger } from '../sqlUpdateUtils'
+import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createEventTrigger, createEventTrxTrigger } from '../sqlUpdateUtils'
 
-class CreateEntityModification implements Modification<CreateEntityModification.Data> {
-	constructor(private readonly data: CreateEntityModification.Data, private readonly schema: Schema) {}
+export const CreateEntityModification: ModificationHandlerStatic<CreateEntityModificationData> = class {
+	static id = 'createEntity'
+	constructor(private readonly data: CreateEntityModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.data.entity
@@ -39,14 +40,12 @@ class CreateEntityModification implements Modification<CreateEntityModification.
 	describe() {
 		return { message: `Add entity ${this.data.entity.name}` }
 	}
-}
 
-namespace CreateEntityModification {
-	export const id = 'createEntity'
-
-	export interface Data {
-		entity: Model.Entity
+	static createModification(data: CreateEntityModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default CreateEntityModification
+export interface CreateEntityModificationData {
+	entity: Model.Entity
+}

@@ -2,11 +2,12 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
-import { Modification } from '../Modification'
+import { ModificationHandlerStatic } from '../ModificationHandler'
 import { getEntity, tryGetColumnName } from '@contember/schema-utils'
 
-class MakeRelationNullableModification implements Modification<MakeRelationNullableModification.Data> {
-	constructor(private readonly data: MakeRelationNullableModification.Data, private readonly schema: Schema) {}
+export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRelationNullableModificationData> = class {
+	static id = 'makeRelationNullable'
+	constructor(private readonly data: MakeRelationNullableModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = getEntity(this.schema.model, this.data.entityName)
@@ -41,15 +42,13 @@ class MakeRelationNullableModification implements Modification<MakeRelationNulla
 			message: `Make relation ${this.data.entityName}.${this.data.fieldName} nullable`,
 		}
 	}
-}
 
-namespace MakeRelationNullableModification {
-	export const id = 'makeRelationNullable'
-
-	export interface Data {
-		entityName: string
-		fieldName: string
+	static createModification(data: MakeRelationNullableModificationData) {
+		return { modification: this.id, ...data }
 	}
 }
 
-export default MakeRelationNullableModification
+export interface MakeRelationNullableModificationData {
+	entityName: string
+	fieldName: string
+}

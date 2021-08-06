@@ -182,7 +182,7 @@ export class MasterContainerFactory {
 				projectContainerResolver.onCreate.push(container =>
 					registrar({
 						connection: container.connection,
-						module: 'project',
+						module: 'content',
 						project: container.project.slug,
 					}),
 				)

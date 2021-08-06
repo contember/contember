@@ -52,18 +52,7 @@ function checkDatabaseCredentials(json: unknown, path: string): DatabaseCredenti
 		return typeConfigError(path + '.host', json.host, 'string')
 	}
 	if (!hasNumberProperty(json, 'port')) {
-		if (hasStringProperty({ ...json }, 'port')) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`DEPRECATED: Property ${path}.port must be a number, but string was found. Use ::number typecast in config.`,
-			)
-			json.port = Number(json.port)
-		} else {
-			return typeConfigError(path + '.port', json.port, 'number')
-		}
-	}
-	if (!hasNumberProperty(json, 'port')) {
-		throw new Error('impl error')
+		return typeConfigError(path + '.port', json.port, 'number')
 	}
 	if (!hasStringProperty(json, 'user')) {
 		return typeConfigError(path + '.user', json.user, 'string')
@@ -178,11 +167,6 @@ function checkProjectStructure(json: unknown, slug: string, path: string): Proje
 	if (!isObject(json.stages)) {
 		return typeConfigError(`${path}.stages`, json.stages, 'object')
 	}
-	if (json.dbCredentials) {
-		// eslint-disable-next-line no-console
-		console.warn(`${path}.dbCredentials is deprecated, use ${path}.db instead`)
-		json.db = json.dbCredentials
-	}
 	const stages = Object.entries(json.stages).map(([slug, value]) =>
 		checkStageStructure(value, slug, `${path}.stages.${slug}`),
 	)
@@ -201,18 +185,7 @@ function checkServerStructure(json: unknown): Config['server'] {
 		return typeConfigError('server', json, 'object')
 	}
 	if (!hasNumberProperty(json, 'port')) {
-		if (hasStringProperty({ ...json }, 'port')) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`DEPRECATED: Property server.port must be a number, but string was found. Use ::number typecast in config.`,
-			)
-			json.port = Number(json.port)
-		} else {
-			return typeConfigError('server.port', json.port, 'number')
-		}
-	}
-	if (!hasNumberProperty(json, 'port')) {
-		throw new Error('impl error')
+		return typeConfigError('server.port', json.port, 'number')
 	}
 	if (!hasNumberProperty(json, 'monitoringPort')) {
 		return typeConfigError('server.monitoringPort', json.monitoringPort, 'number')

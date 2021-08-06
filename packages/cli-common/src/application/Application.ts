@@ -16,14 +16,29 @@ export class Application {
 				.filter(([name, factory], index, commands) => commands.findIndex(it => it[1] === factory) === index)
 				.map(([name]) => name)
 				.sort((a, b) => a.localeCompare(b))
+
+			const maxCommandNameLength = Math.max(...commands.map(it => it.length))
+
 			for (let commandName of commands) {
 				const [, command] = this.commandManager.createCommand(commandName)
 				const configuration = command.getConfiguration()
-				const usage = configuration.getUsage()
-				const commandUsage = usage ? ' ' + usage : ''
-				const description = configuration.getDescription() ? ` - ${configuration.getDescription()}` : ''
-				console.error(`\t${chalk.greenBright(commandName)}${chalk.green(commandUsage)}${description}`)
+				const indent = '    '
+				console.error(
+					`${indent}${chalk.greenBright(
+						commandName.padEnd(maxCommandNameLength),
+					)}${indent}${configuration.getDescription()}`,
+				)
+				if (name === '--help') {
+					const helpIndent = `${indent}${' '.repeat(maxCommandNameLength)}${indent}`
+					const usage = configuration.getUsage({ format: 'multiline', indent: helpIndent })
+					if (usage) {
+						console.error(chalk.green(usage))
+					} else {
+						console.error(`${helpIndent}${chalk.gray('No options')}`)
+					}
+				}
 			}
+
 			return process.exit(0)
 		}
 
@@ -37,9 +52,9 @@ export class Application {
 				console.error(commandDescription)
 			}
 			console.error('\nUsage:')
-			console.error(chalk.green(configuration.getUsage('short')))
+			console.error(chalk.green(configuration.getUsage({ format: 'short' })))
 			console.error('\nArguments and options:')
-			console.error(configuration.getUsage('multiline'))
+			console.error(configuration.getUsage({ format: 'multiline' }))
 
 			return process.exit(0)
 		}
@@ -51,7 +66,7 @@ export class Application {
 			if (e instanceof InvalidInputError) {
 				console.error(chalk.bgRedBright.white(e.message))
 				const configuration = command.getConfiguration()
-				console.error(`${chalk.greenBright(fullName)} ${chalk.green(configuration.getUsage('line'))}`)
+				console.error(`${chalk.greenBright(fullName)} ${chalk.green(configuration.getUsage({ format: 'line' }))}`)
 
 				return process.exit(1)
 			} else {

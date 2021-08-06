@@ -47,8 +47,8 @@ export class CommandConfiguration<Args extends Arguments, TOptions extends Optio
 		return new InputParser(this.arguments, this.options)
 	}
 
-	public getUsage(format: UsageFormat = 'line'): string {
-		return UsageFormatter.format(this.arguments, this.options, format)
+	public getUsage(args: { format?: UsageFormat; indent?: string } = {}): string {
+		return UsageFormatter.format(this.arguments, this.options, args)
 	}
 }
 

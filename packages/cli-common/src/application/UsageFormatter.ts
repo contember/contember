@@ -3,9 +3,13 @@ import { Option, OptionMode } from './Option'
 import { assertNever } from './assertNever'
 
 export type UsageFormat = 'line' | 'short' | 'multiline'
+export type UsageFormatOptions = { format?: UsageFormat; indent?: string }
+
 export class UsageFormatter {
-	public static format(args: Argument[], options: Option[], format: UsageFormat): string {
+	public static format(args: Argument[], options: Option[], { format, indent }: UsageFormatOptions): string {
 		let parts = []
+		format ??= 'short'
+		indent ??= '    '
 		const isShort = format === 'short'
 		for (let arg of args) {
 			const name = arg.name
@@ -51,7 +55,7 @@ export class UsageFormatter {
 			parts.push(optionDescription)
 		}
 		if (format === 'multiline') {
-			return parts.map(it => `\t${it}`).join('\n')
+			return parts.map(it => `${indent}${it}`).join('\n')
 		}
 		return parts.join(' ')
 	}

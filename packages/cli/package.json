@@ -27,6 +27,7 @@
     "get-port": "^5.0.0",
     "graphql": "^15.4.0",
     "graphql-request": "^3.3.0",
+    "node-fetch": "^2.6.1",
     "pg": "^8.5.0",
     "prompts": "^2.2.1",
     "ts-node": "^10.0.0",

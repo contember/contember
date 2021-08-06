@@ -35,14 +35,14 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 
 		const workspace = await Workspace.get(process.cwd())
 		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
-		const migrationsDir = await project.migrationsDir
+		const migrationsDir = project.migrationsDir
 		const container = new MigrationsContainerFactory(migrationsDir).create()
 		const migrationArg = input.getArgument('migration')
 
 		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
 		const apiToken = await interactiveResolveApiToken({ instance })
 		const remoteProject = input?.getOption('remote-project') || project.name
-		const tenantClient = await TenantClient.create(instance.baseUrl, apiToken)
+		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
 		await tenantClient.createProject(remoteProject, true)
 		const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
 

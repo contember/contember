@@ -26,6 +26,9 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			return
+		}
 		const targetEntity = this.schema.model.entities[this.data.owningSide.target]
 		acceptRelationTypeVisitor(this.schema.model, entity, this.data.owningSide, {
 			visitManyHasOne: ({}, relation, {}, _) => {

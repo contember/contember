@@ -40,7 +40,7 @@ export class MutationProvider {
 		return filterObject(mutations, (key, value): value is FieldConfig<any> => value !== undefined)
 	}
 
-	private getCreateMutation(entity: Model.Entity): FieldConfig<Input.CreateInput> | undefined {
+	protected getCreateMutation(entity: Model.Entity): FieldConfig<Input.CreateInput> | undefined {
 		const entityName = entity.name
 		const dataType = this.createEntityInputProvider.getInput(entityName)
 		if (dataType === undefined) {
@@ -64,8 +64,11 @@ export class MutationProvider {
 		}
 	}
 
-	private getDeleteMutation(entity: Model.Entity): FieldConfig<Input.DeleteInput> | undefined {
+	protected getDeleteMutation(entity: Model.Entity): FieldConfig<Input.DeleteInput> | undefined {
 		const entityName = entity.name
+		if (entity.view) {
+			return undefined
+		}
 		if (!this.authorizator.isAllowed(Acl.Operation.delete, entityName)) {
 			return undefined
 		}
@@ -95,7 +98,7 @@ export class MutationProvider {
 		}
 	}
 
-	public getUpdateMutation(entity: Model.Entity): FieldConfig<Input.UpdateInput> | undefined {
+	protected getUpdateMutation(entity: Model.Entity): FieldConfig<Input.UpdateInput> | undefined {
 		const entityName = entity.name
 		const dataType = this.updateEntityInputProvider.getInput(entityName)
 		if (dataType === undefined) {

@@ -19,7 +19,7 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 			entityName: string
 			withoutRelation?: string
 		}
-	>(id => this.createInput(id.entityName, id.withoutRelation))
+	>(id => this.createInput(getEntity(this.schema, id.entityName), id.withoutRelation))
 
 	constructor(
 		private readonly operation: Operation,
@@ -32,10 +32,15 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 		return this.entityInputs({ entityName, withoutRelation })
 	}
 
-	protected createInput(entityName: string, withoutRelation?: string) {
+	protected createInput(entity: Model.Entity, withoutRelation?: string): GraphQLInputObjectType | undefined {
+		if (entity.view) {
+			return undefined
+		}
+		const entityName = entity.name
 		const withoutSuffix = withoutRelation ? GqlTypeName`Without${withoutRelation}` : ''
-
-		const entity = getEntity(this.schema, entityName)
+		if (entity.view) {
+			return undefined
+		}
 		const operation: Acl.Operation = (() => {
 			switch (this.operation) {
 				case EntityInputType.create:

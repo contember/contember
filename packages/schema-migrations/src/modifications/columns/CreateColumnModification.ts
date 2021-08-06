@@ -15,6 +15,9 @@ export const CreateColumnModification: ModificationHandlerStatic<CreateColumnMod
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			return
+		}
 		const column = this.data.field
 		const hasSeed = this.data.fillValue !== undefined || this.data.copyValue !== undefined
 		builder.addColumn(entity.tableName, {

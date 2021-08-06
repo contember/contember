@@ -12,8 +12,10 @@ export const CreateUniqueConstraintModification: ModificationHandlerStatic<Creat
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			return
+		}
 		const fields = this.data.unique.fields
-
 		const columns = fields.map(fieldName => {
 			return acceptFieldVisitor(this.schema.model, entity, fieldName, {
 				visitColumn: ({}, column) => {

@@ -40,8 +40,8 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 	}
 
 	public createSql(builder: MigrationBuilder): void {
-		if (this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
-			const entity = this.schema.model.entities[this.data.entityName]
+		const entity = this.schema.model.entities[this.data.entityName]
+		if (!entity.view && this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
 			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
 		}
 		this.subModification.createSql(builder)

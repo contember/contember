@@ -11,6 +11,9 @@ export const RemoveUniqueConstraintModification: ModificationHandlerStatic<Remov
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			return
+		}
 		builder.dropConstraint(entity.tableName, this.data.constraintName)
 	}
 

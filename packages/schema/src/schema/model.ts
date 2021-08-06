@@ -8,6 +8,11 @@ namespace Model {
 		tableName: string
 		fields: { [name: string]: AnyField }
 		unique: UniqueConstraints
+		view?: View
+	}
+
+	export interface View {
+		sql: string
 	}
 
 	export type FieldType = RelationType | ColumnType

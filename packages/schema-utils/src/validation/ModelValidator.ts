@@ -98,7 +98,7 @@ export class ModelValidator {
 			return undefined
 		}
 		if (typeof entity.tableName !== 'string') {
-			errors.for('tableName').add('Entity name must be a string')
+			errors.for('tableName').add('Table name must be a string')
 			return undefined
 		}
 		const fields = entity.fields
@@ -106,11 +106,32 @@ export class ModelValidator {
 			errors.add('Fields must be an object')
 			return undefined
 		}
+		const partialEntity: Model.Entity = {
+			name: entity.name,
+			primary: entity.primary,
+			primaryColumn: entity.primaryColumn,
+			tableName: entity.tableName,
+			fields: {},
+			unique: {},
+		}
+
+		if (entity.view) {
+			const viewTmp = entity.view
+			if (!isObject(viewTmp)) {
+				errors.for('view').add('View must be an object')
+				return undefined
+			}
+			if (typeof viewTmp.sql !== 'string') {
+				errors.for('view', 'sql').add('View SQL must be a string')
+				return undefined
+			}
+			partialEntity.view = entity.view as Model.View
+		}
 
 		const validFields: Model.Entity['fields'] = {}
 		for (const [fieldName, field] of Object.entries(fields)) {
 			const fieldErrors = errors.for(fieldName)
-			const validField = this.validateField(entity.name, field, fieldErrors)
+			const validField = this.validateField(partialEntity, field, fieldErrors)
 			if (!validField) {
 				continue
 			}
@@ -133,10 +154,7 @@ export class ModelValidator {
 		)
 
 		return {
-			name: entity.name,
-			primary: entity.primary,
-			primaryColumn: entity.primaryColumn,
-			tableName: entity.tableName,
+			...partialEntity,
 			fields: validFields,
 			unique: validUniqueConstraints,
 		}
@@ -184,7 +202,7 @@ export class ModelValidator {
 		return validUniqueConstraints
 	}
 
-	private validateField(entityName: string, field: unknown, errors: ErrorBuilder): Model.AnyField | undefined {
+	private validateField(partialEntity: Model.Entity, field: unknown, errors: ErrorBuilder): Model.AnyField | undefined {
 		if (!isObject(field)) {
 			errors.add('Field must be an object')
 			return undefined
@@ -201,16 +219,17 @@ export class ModelValidator {
 			return undefined
 		}
 		if (isRelation(field as any)) {
-			return this.validateRelation(entityName, field, errors)
+			return this.validateRelation(partialEntity, field, errors)
 		}
 		return field as unknown as Model.AnyColumn
 	}
 
 	private validateRelation(
-		entityName: string,
+		partialEntity: Model.Entity,
 		field: UnknownObject,
 		errors: ErrorBuilder,
 	): Model.AnyRelation | undefined {
+		const entityName = partialEntity.name
 		const targetEntityName = field.target as string // todo
 		const targetEntity = this.model.entities[targetEntityName] || undefined
 		if (!targetEntity) {
@@ -238,6 +257,18 @@ export class ModelValidator {
 					}
 				}
 			})
+		}
+		if (partialEntity.view) {
+			const type = (field as any as Model.Relation).type
+			if (
+				type === Model.RelationType.ManyHasMany ||
+				type === Model.RelationType.OneHasMany ||
+				(type === Model.RelationType.OneHasOne && !('joiningColumn' in field))
+			) {
+				errors.add(
+					'This relation type is not allowed on a view entity. Only one-has-one owning and many-has one are allowed.',
+				)
+			}
 		}
 		if (isInverseRelation(field as any as Model.Relation)) {
 			// todo
@@ -290,6 +321,13 @@ export class ModelValidator {
 			}
 		} else {
 			const inversedBy = field.inversedBy as string // todo
+			if (targetEntity.view) {
+				if ('joiningColumn' in field) {
+					errors.add(
+						`View entity ${targetEntity.name} cannot be referenced from an owning relation. Try switching the owning side.`,
+					)
+				}
+			}
 			if (inversedBy) {
 				const targetField = targetEntity.fields[inversedBy]
 				const relationDescription = `Target relation ${targetEntityName}::${inversedBy}:`

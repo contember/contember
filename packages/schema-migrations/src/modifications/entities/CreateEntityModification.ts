@@ -11,6 +11,10 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.data.entity
+		if (entity.view) {
+			builder.createView(entity.tableName, {}, entity.view.sql)
+			return
+		}
 		const primaryColumn = entity.fields[entity.primary] as Model.AnyColumn
 		builder.createTable(entity.tableName, {
 			[primaryColumn.name]: {

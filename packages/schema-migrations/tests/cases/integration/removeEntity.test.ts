@@ -2,6 +2,7 @@ import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
+import { SchemaDefinition as def } from '@contember/schema-definition'
 
 testMigrations('remove an entity', {
 	originalSchema: new SchemaBuilder()
@@ -90,4 +91,23 @@ testMigrations('remove entity with acl', {
 		},
 	],
 	sql: SQL`DROP TABLE "site" CASCADE;`,
+})
+
+namespace ViewEntityOriginalSchema {
+	@def.View("SELECT null as id, 'John' AS name")
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+testMigrations('remove a view', {
+	originalSchema: def.createModel(ViewEntityOriginalSchema),
+	updatedSchema: new SchemaBuilder().buildSchema(),
+	diff: [
+		{
+			modification: 'removeEntity',
+			entityName: 'Author',
+		},
+	],
+	sql: SQL`
+	DROP VIEW "author";`,
 })

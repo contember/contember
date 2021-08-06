@@ -20,6 +20,7 @@ import {
 	MutationResultList,
 	NothingToDoReason,
 } from './Result'
+import { ImplementationException } from '../exception'
 
 type OkResultFactory = () => MutationJunctionUpdateOk
 
@@ -81,6 +82,9 @@ export class JunctionTableManager {
 	): Promise<MutationResult> {
 		const joiningTable = relation.joiningTable
 		const inverseEntity = getEntity(this.schema, relation.target)
+		if (inverseEntity.view || owningEntity.view) {
+			throw new ImplementationException()
+		}
 
 		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
 		let inversePredicate: Input.Where = {}

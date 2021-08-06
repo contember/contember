@@ -1,8 +1,8 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor, FieldsDefinition } from './types'
+import { DecoratorFunction, EntityConstructor, FieldsDefinition } from './types'
 
 export type EntityExtension = (entity: Model.Entity, definition: FieldsDefinition) => Model.Entity
-export const extendEntity = (extension: EntityExtension) => {
+export const extendEntity = <T>(extension: EntityExtension): DecoratorFunction<T> => {
 	return function (cls: EntityConstructor) {
 		const extensions = Reflect.getMetadata('extensions', cls) || []
 		Reflect.defineMetadata('extensions', [...extensions, extension], cls)

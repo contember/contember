@@ -11,6 +11,7 @@ import {
 	CreateEntityModification,
 	RemoveEntityModification,
 	UpdateEntityTableNameModification,
+	UpdateViewModification,
 } from './modifications/entities'
 import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './modifications/enums'
 import {
@@ -32,7 +33,7 @@ import { PatchAclSchemaModification, UpdateAclSchemaModification } from './modif
 import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './modifications/validation'
 import { CreateDiff } from './modifications/ModificationHandler'
 import { isDefined } from './utils/isDefined'
-import { RemoveChangedFieldDiffer } from './modifications/differs/RemoveChangedFieldDiffer'
+import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer } from './modifications/differs'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -53,6 +54,7 @@ export class SchemaDiffer {
 			RemoveFieldModification.createDiff,
 			CreateEnumModification.createDiff,
 
+			UpdateViewModification.createDiff,
 			UpdateEntityTableNameModification.createDiff,
 			UpdateColumnDefinitionModification.createDiff,
 			UpdateColumnNameModification.createDiff,
@@ -65,6 +67,7 @@ export class SchemaDiffer {
 			UpdateEnumModification.createDiff,
 
 			new RemoveChangedFieldDiffer().createDiff,
+			new ChangeViewNonViewDiffer().createDiff,
 			CreateEntityModification.createDiff,
 			CreateColumnModification.createDiff,
 			CreateRelationModification.createDiff,

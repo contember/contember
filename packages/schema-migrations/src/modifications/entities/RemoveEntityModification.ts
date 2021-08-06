@@ -25,7 +25,12 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
-		builder.dropTable(this.schema.model.entities[this.data.entityName].tableName, { cascade: true })
+		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			builder.dropView(entity.tableName)
+			return
+		}
+		builder.dropTable(entity.tableName, { cascade: true })
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {

@@ -12,6 +12,9 @@ export const UpdateColumnDefinitionModification: ModificationHandlerStatic<Updat
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			return
+		}
 		const field = entity.fields[this.data.fieldName] as Model.AnyColumn
 		const definition = this.data.definition
 		builder.alterColumn(entity.tableName, field.columnName, {

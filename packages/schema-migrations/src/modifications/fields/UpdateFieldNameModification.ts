@@ -29,8 +29,11 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
+		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			return
+		}
 		if (this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME) {
-			const entity = this.schema.model.entities[this.data.entityName]
 			renameConstraintsSqlBuilder(builder, entity, this.getNewConstraintName.bind(this))
 		}
 	}

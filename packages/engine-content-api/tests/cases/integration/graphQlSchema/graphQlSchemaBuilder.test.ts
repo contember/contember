@@ -8,6 +8,7 @@ import * as model from './model'
 import { promises as fs } from 'fs'
 import * as assert from 'uvu/assert'
 import { suite } from 'uvu'
+import { SchemaDefinition as def } from '@contember/schema-definition'
 
 interface Test {
 	schema: (builder: SchemaBuilder) => SchemaBuilder | Model.Schema
@@ -291,6 +292,20 @@ graphqlSchemaBuilderTest('aliased type', async () => {
 			builder.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).typeAlias('AuthorName'))),
 		permissions: schema => new AllowAllPermissionFactory().create(schema),
 		graphQlSchemaFile: 'schema-aliased-type.gql',
+	})
+})
+
+namespace ViewEntity {
+	@def.View("SELECT null as id, 'John' AS name")
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+graphqlSchemaBuilderTest('view entity', async () => {
+	await testSchema({
+		schema: () => SchemaDefinition.createModel(ViewEntity),
+		permissions: schema => new AllowAllPermissionFactory().create(schema),
+		graphQlSchemaFile: 'schema-view-entity.gql',
 	})
 })
 graphqlSchemaBuilderTest.run()

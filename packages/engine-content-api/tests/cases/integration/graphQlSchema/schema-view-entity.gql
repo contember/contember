@@ -1,0 +1,110 @@
+type Query {
+  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Author {
+  _meta: AuthorMeta
+  id: UUID!
+  name: String
+}
+
+type AuthorMeta {
+  id: FieldMeta
+  name: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+input AuthorUniqueWhere {
+  id: UUID
+}
+
+input AuthorWhere {
+  id: UUIDCondition
+  name: StringCondition
+  and: [AuthorWhere]
+  or: [AuthorWhere]
+  not: AuthorWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+}
+
+input AuthorOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  name: OrderDirection
+}
+
+enum OrderDirection {
+  asc
+  desc
+}
+
+type AuthorConnection {
+  pageInfo: PageInfo!
+  edges: [AuthorEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type AuthorEdge {
+  node: Author!
+}
+
+type QueryTransaction {
+  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
+}
+
+type Info {
+  description: String
+}

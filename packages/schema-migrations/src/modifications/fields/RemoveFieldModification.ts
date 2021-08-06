@@ -36,6 +36,10 @@ export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModif
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
+		const entity = this.schema.model.entities[this.data.entityName]
+		if (entity.view) {
+			return
+		}
 		acceptFieldVisitor(this.schema.model, this.data.entityName, this.data.fieldName, {
 			visitColumn: (entity, column) => {
 				builder.dropColumn(entity.tableName, column.columnName)

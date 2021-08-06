@@ -13,6 +13,9 @@ export const MakeRelationNotNullModification: ModificationHandlerStatic<MakeRela
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = getEntity(this.schema.model, this.data.entityName)
+		if (entity.view) {
+			return
+		}
 		const columnName = tryGetColumnName(this.schema.model, entity, this.data.fieldName)
 		if (!columnName) {
 			return

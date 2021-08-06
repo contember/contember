@@ -19,6 +19,7 @@ import { UpdateBuilder } from './update'
 import { Mutex } from '../utils'
 import { CheckedPrimary } from './CheckedPrimary'
 import { ConstraintHelper } from '@contember/database'
+import { ImplementationException } from '../exception'
 
 export class Mapper {
 	private primaryKeyCache: Record<string, Promise<string> | string> = {}
@@ -159,6 +160,9 @@ export class Mapper {
 	}
 
 	public async insert(entity: Model.Entity, data: Input.CreateDataInput): Promise<MutationResultList> {
+		if (entity.view) {
+			throw new ImplementationException()
+		}
 		return tryMutation(() =>
 			this.inserter.insert(this, entity, data, id => {
 				const where = { [entity.primary]: id }
@@ -173,6 +177,9 @@ export class Mapper {
 		data: Input.UpdateDataInput,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
+		if (entity.view) {
+			throw new ImplementationException()
+		}
 		return tryMutation(async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
@@ -204,6 +211,9 @@ export class Mapper {
 		create: Input.CreateDataInput,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
+		if (entity.view) {
+			throw new ImplementationException()
+		}
 		return tryMutation(async () => {
 			const primaryValue = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
@@ -221,6 +231,9 @@ export class Mapper {
 		by: Input.UniqueWhere | CheckedPrimary,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
+		if (entity.view) {
+			throw new ImplementationException()
+		}
 		return tryMutation(() => this.deleteExecutor.execute(this, entity, by, filter))
 	}
 

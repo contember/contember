@@ -9,6 +9,7 @@ import {
 	RemoveEntityModification,
 	UpdateEntityNameModification,
 	UpdateEntityTableNameModification,
+	UpdateViewModification,
 } from './entities'
 import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './enums'
 import { RemoveFieldModification, UpdateFieldNameModification } from './fields'
@@ -48,6 +49,7 @@ namespace ModificationHandlerFactory {
 		RemoveEntityModification,
 		UpdateEntityNameModification,
 		UpdateEntityTableNameModification,
+		UpdateViewModification,
 		CreateEnumModification,
 		RemoveEnumModification,
 		UpdateEnumModification,

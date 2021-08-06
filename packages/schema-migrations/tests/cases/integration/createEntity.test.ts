@@ -2,6 +2,7 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
 import { testMigrations } from '../../src/tests'
+import { SchemaDefinition as def } from '@contember/schema-definition'
 
 testMigrations('create a table (no relations, unique on column)', {
 	originalSchema: new SchemaBuilder().buildSchema(),
@@ -97,4 +98,49 @@ testMigrations('create a table (no relations, unique on column)', {
 		ADD "registered_at" date;
 	ALTER TABLE "author"
 		ADD CONSTRAINT "unique_Author_email_a3e587" UNIQUE ("email");`,
+})
+
+namespace ViewEntityUpdatedSchema {
+	@def.View("SELECT null as id, 'John' AS name")
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+testMigrations('create a view', {
+	originalSchema: new SchemaBuilder().buildSchema(),
+	updatedSchema: def.createModel(ViewEntityUpdatedSchema),
+	diff: [
+		{
+			modification: 'createEntity',
+			entity: {
+				fields: {
+					id: {
+						columnName: 'id',
+						name: 'id',
+						nullable: false,
+						type: Model.ColumnType.Uuid,
+						columnType: 'uuid',
+					},
+				},
+				name: 'Author',
+				primary: 'id',
+				primaryColumn: 'id',
+				tableName: 'author',
+				unique: {},
+				view: { sql: "SELECT null as id, 'John' AS name" },
+			},
+		},
+		{
+			modification: 'createColumn',
+			entityName: 'Author',
+			field: {
+				columnName: 'name',
+				name: 'name',
+				nullable: true,
+				type: Model.ColumnType.String,
+				columnType: 'text',
+			},
+		},
+	],
+	sql: SQL`CREATE VIEW "author" AS SELECT null as id, 'John' AS name;`,
 })

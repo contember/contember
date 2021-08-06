@@ -9,6 +9,7 @@ import { FieldDefinition } from './fieldDefinitions'
 export * from './fieldDefinitions'
 export * from './EnumDefinition'
 export * from './UniqueDefinition'
+export * from './ViewDefinition'
 export { extendEntity, EntityExtension } from './extensions'
 
 export abstract class Entity {

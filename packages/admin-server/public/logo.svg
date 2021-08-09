@@ -1,0 +1,21 @@
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	viewBox="0 0 439 414"
+>
+	<defs>
+		<path stroke-width="20" stroke-linecap="round" id="d" d="M10 147v191" />
+		<path stroke-width="20" stroke-linecap="round" id="a" d="M10 147L429 12" />
+		<path stroke-width="20" stroke-linecap="round" id="b" d="M429 12L263 212" />
+		<path stroke-width="20" stroke-linecap="round" id="c" d="M10 147c105 46 252 65 253 65" />
+	</defs>
+	<use xlink:href="#a" stroke="#7ed321" transform="translate(0 191)" />
+	<use xlink:href="#b" stroke="#0094ff" transform="translate(0 191)" />
+	<use xlink:href="#c" stroke="red" transform="translate(0 191)" />
+	<use xlink:href="#d" stroke="#7ed321" transform="translate(419 -135)" />
+	<use xlink:href="#d" stroke="#ff00b8" />
+	<use xlink:href="#d" stroke="#9013fe" transform="translate(253 65)" />
+	<use xlink:href="#a" stroke="#0094ff" />
+	<use xlink:href="#b" stroke="#ff00b8" />
+	<use xlink:href="#c" stroke="red" />
+</svg>

@@ -1,23 +1,27 @@
 {
 	"name": "@contember/admin-server",
 	"version": "0.6.52",
-	"main": "src/index.ts",
-	"type": "module",
 	"scripts": {
-		"build": "exit 0",
+		"build": "vite build public --config vite.config.js && esbuild src/run-admin.ts --bundle --sourcemap --platform=node --outdir=dist",
 		"build:api:dev": "exit 0",
 		"build:api:prod": "exit 0"
 	},
 	"bin": {
-		"run-admin": "dist/src/run-admin.js"
+		"run-admin": "dist/run-admin.js"
 	},
 	"dependencies": {
-		"koa": "2.8.1",
-		"koa-static": "5.0.0"
+		"@aws-sdk/client-s3": "^3.22.0",
+		"@contember/dic": "^0.11.2",
+		"cookie": "^0.4.1",
+		"mime": "^2.5.2",
+		"node-fetch": "^2.6.1"
 	},
 	"devDependencies": {
-		"@types/koa": "2.11.2",
-		"@types/koa-static": "4.0.0",
-		"@types/node": "14.14.31"
+		"@contember/admin": "workspace:*",
+		"@types/cookie": "^0.4.1",
+		"@types/mime": "^2.0.3",
+		"@types/node": "^16.3.3",
+		"@types/node-fetch": "^2.5.11",
+		"esbuild": "^0.12.15"
 	}
 }

@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  sandbox_vite:
+    user: '1000:1000'
+    environment:
+      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:4001'
+    ports:
+      - 4002:4002
+  admin_server:
+    user: '1000:1000'
+    environment:
+       CONTEMBER_S3_ENDPOINT: 'http://s3:9000'
+    ports:
+      - '4000:4000'
+
+  admin_server_esbuild:
+    user: '1000:1000'
+
+  admin_server_vite:
+    user: '1000:1000'
+
+  api:
+    environment:
+      CONTEMBER_PORT: '4000'
+      DEFAULT_S3_ENDPOINT: 'http://host.docker.internal:9000'
+    ports:
+      - '4001:4000'
+
+  s3:
+    command: 'server --address :9000 /data'
+    ports:
+      - '9000:9000'
+
+  postgres:
+    ports:
+      - 4003:5432

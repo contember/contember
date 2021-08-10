@@ -4,13 +4,9 @@ services:
   sandbox_vite:
     image: node:14-alpine
     command: 'npx vite src --config vite.config.js --debug --port 4002 --host 0.0.0.0'
-    user: '1000:1000'
-
-    network_mode: 'host'
 
     environment:
       NODE_ENV: 'development'
-      VITE_CONTEMBER_ADMIN_API_BASE_URL: 'http://localhost:4001'
       VITE_CONTEMBER_ADMIN_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
 
     working_dir: /src/packages/admin-sandbox
@@ -21,7 +17,6 @@ services:
   admin_server:
     image: node:14-alpine
     command: 'npx nodemon dist/run-admin.js'
-    user: '1000:1000'
 
     working_dir: /src/packages/admin-server
     volumes:
@@ -42,9 +37,6 @@ services:
       CONTEMBER_S3_KEY: 'contember'
       CONTEMBER_S3_SECRET: 'contember'
 
-    ports:
-      - '4000:4000'
-
     depends_on:
       - admin_server_esbuild
       - admin_server_vite
@@ -53,7 +45,6 @@ services:
   admin_server_esbuild:
     image: node:14-alpine
     command: 'npx esbuild src/run-admin.ts --bundle --watch --sourcemap --platform=node --outdir=dist'
-    user: '1000:1000'
 
     working_dir: /src/packages/admin-server
     volumes:
@@ -63,7 +54,6 @@ services:
   admin_server_vite:
     image: node:14-alpine
     command: 'npx vite build public --config vite.config.js --watch'
-    user: '1000:1000'
 
     working_dir: /src/packages/admin-server
     volumes:
@@ -76,7 +66,6 @@ services:
     environment:
       NODE_ENV: 'development'
 
-      CONTEMBER_PORT: '4000'
       CONTEMBER_ROOT_EMAIL: 'superadmin@localhost'
       CONTEMBER_ROOT_PASSWORD: 'superadmin@localhost'
       CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
@@ -90,14 +79,11 @@ services:
       DEFAULT_S3_PROVIDER: 'minio'
       DEFAULT_S3_REGION: ''
       DEFAULT_S3_BUCKET: 'contember'
-      DEFAULT_S3_PREFIX: 'data/'
+      DEFAULT_S3_PREFIX: 'data'
       DEFAULT_S3_KEY: 'contember'
       DEFAULT_S3_SECRET: 'contember'
 
       TENANT_DB_NAME: 'tenant'
-
-    ports:
-      - '4001:4000'
 
     depends_on:
       - postgres
@@ -105,17 +91,18 @@ services:
 
   s3:
     image: minio/minio
+    entrypoint: /minio-entrypoint.sh
     command: 'server /data'
 
     environment:
       MINIO_ROOT_USER: contember
       MINIO_ROOT_PASSWORD: contember
 
-    ports:
-      - '9000:9000'
 
     volumes:
       - s3-data:/data:cached
+      - ./scripts/docker-compose/s3-policy.json:/bucket-policy.json
+      - ./scripts/docker-compose/s3-entrypoint.sh:/minio-entrypoint.sh
 
   adminer:
     image: michalhosna/adminer:latest

@@ -21,10 +21,17 @@ export function createViteConfig(packageName) {
 					entry: resolve(rootDirectory, `${packageDir}/src/index.ts`),
 					formats: ['es'],
 				},
-				minify: isDevMode ? false : 'terser',
+				minify: false,
 				outDir: resolve(rootDirectory, `${packageDir}/dist`),
 				rollupOptions: {
-					external: ['react', 'react-dom'],
+					external: (source, importer, isResolved) => {
+						if (!isResolved) {
+							return !source.startsWith('./') && !source.startsWith('../')
+
+						} else {
+							return source.includes('/node_modules/')
+						}
+					},
 					output: {
 						entryFileNames: `${packageName}.${mode}.js`,
 					},

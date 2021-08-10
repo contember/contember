@@ -1,8 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
+import deepEqual from 'fast-deep-equal'
 
 export const RemoveUniqueConstraintModification: ModificationHandlerStatic<RemoveUniqueConstraintModificationData> = class {
 	static id = 'removeUniqueConstraint'
@@ -15,7 +16,7 @@ export const RemoveUniqueConstraintModification: ModificationHandlerStatic<Remov
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
-			updateEntity(this.data.entityName, entity => {
+			updateEntity(this.data.entityName, ({ entity }) => {
 				const { [this.data.constraintName]: removed, ...unique } = entity.unique
 				return {
 					...entity,
@@ -36,6 +37,24 @@ export const RemoveUniqueConstraintModification: ModificationHandlerStatic<Remov
 
 	static createModification(data: RemoveUniqueConstraintModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.values(originalSchema.model.entities).flatMap(entity =>
+			Object.values(entity.unique)
+				.filter(
+					it =>
+						updatedSchema.model.entities[entity.name] &&
+						(!updatedSchema.model.entities[entity.name].unique[it.name] ||
+							!deepEqual(it.fields, updatedSchema.model.entities[entity.name].unique[it.name].fields)),
+				)
+				.map(unique =>
+					RemoveUniqueConstraintModification.createModification({
+						entityName: entity.name,
+						constraintName: unique.name,
+					}),
+				),
+		)
 	}
 }
 

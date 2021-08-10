@@ -71,7 +71,7 @@ export function testGenerateSql(originalSchema: Model.Schema, diff: Migration.Mo
 	for (let { modification, ...data } of diff) {
 		const modificationHandler = modificationFactory.create(modification, data, schema, VERSION_LATEST)
 		modificationHandler.createSql(builder)
-		schema = modificationHandler.getSchemaUpdater()(schema)
+		schema = modificationHandler.getSchemaUpdater()({ schema })
 	}
 	const actual = builder.getSql().replace(/\s+/g, ' ').trim()
 	assert.equal(actual, expectedSql)

@@ -1,8 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent, EventType } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
+import { updateColumns } from '../utils/diffUtils'
 
 export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColumnNameModificationData> = class {
 	static id = 'updateColumnName'
@@ -18,7 +19,7 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 		return updateModel(
 			updateEntity(
 				this.data.entityName,
-				updateField(this.data.fieldName, field => ({ ...field, columnName: this.data.columnName })),
+				updateField(this.data.fieldName, ({ field }) => ({ ...field, columnName: this.data.columnName })),
 			),
 		)
 	}
@@ -48,6 +49,19 @@ export const UpdateColumnNameModification: ModificationHandlerStatic<UpdateColum
 
 	static createModification(data: UpdateColumnNameModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return updateColumns(originalSchema, updatedSchema, ({ originalColumn, updatedColumn, updatedEntity }) => {
+			if (originalColumn.columnName === updatedColumn.columnName) {
+				return undefined
+			}
+			return UpdateColumnNameModification.createModification({
+				entityName: updatedEntity.name,
+				fieldName: updatedColumn.name,
+				columnName: updatedColumn.columnName,
+			})
+		})
 	}
 }
 export interface UpdateColumnNameModificationData {

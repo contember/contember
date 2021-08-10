@@ -1,8 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Acl } from '@contember/schema'
+import { Acl, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater } from '../schemaUpdateUtils'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
+import deepEqual from 'fast-deep-equal'
+import { createPatch } from 'rfc6902'
+import { PatchAclSchemaModification } from './PatchAclSchemaModification'
 
 export const UpdateAclSchemaModification: ModificationHandlerStatic<UpdateAclSchemaModificationData> = class {
 	public static id = 'updateAclSchema'
@@ -12,7 +15,7 @@ export const UpdateAclSchemaModification: ModificationHandlerStatic<UpdateAclSch
 	public createSql(builder: MigrationBuilder): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return schema => ({
+		return ({ schema }) => ({
 			...schema,
 			acl: this.data.schema,
 		})
@@ -28,6 +31,17 @@ export const UpdateAclSchemaModification: ModificationHandlerStatic<UpdateAclSch
 
 	static createModification(data: UpdateAclSchemaModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		if (deepEqual(originalSchema.acl, updatedSchema.acl)) {
+			return []
+		}
+		const patch = createPatch(originalSchema.acl, updatedSchema.acl)
+		if (patch.length <= 100) {
+			return [PatchAclSchemaModification.createModification({ patch })]
+		}
+		return [UpdateAclSchemaModification.createModification({ schema: updatedSchema.acl })]
 	}
 }
 

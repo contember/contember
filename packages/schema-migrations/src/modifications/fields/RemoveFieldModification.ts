@@ -1,14 +1,17 @@
 import {
 	acceptFieldVisitor,
+	isInverseRelation,
+	isOwningRelation,
+	isRelation,
 	NamingHelper,
 	PredicateDefinitionProcessor,
 	tryGetColumnName,
 } from '@contember/schema-utils'
-import { isIt } from '../../utils/isIt'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent, EventType } from '@contember/engine-common'
 import {
+	removeField,
 	SchemaUpdater,
 	updateAcl,
 	updateAclEveryEntity,
@@ -19,16 +22,17 @@ import {
 	updateField,
 	updateModel,
 	updateSchema,
-} from '../schemaUpdateUtils'
-import { ModificationHandler, ModificationHandlerStatic } from '../ModificationHandler'
-import { VERSION_ACL_PATCH } from '../ModificationVersions'
+} from '../utils/schemaUpdateUtils'
+import { ModificationHandlerStatic } from '../ModificationHandler'
+import { VERSION_ACL_PATCH, VERSION_REMOVE_RELATION_INVERSE_SIDE } from '../ModificationVersions'
+import { isDefined } from '../../utils/isDefined'
 
 export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModificationData> = class {
 	static id = 'removeField'
 	constructor(
 		private readonly data: RemoveFieldModificationData,
 		private readonly schema: Schema,
-		private readonly version: number,
+		private readonly formatVersion: number,
 	) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -53,49 +57,7 @@ export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModif
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		const entity = this.schema.model.entities[this.data.entityName]
-		const field = entity.fields[this.data.fieldName]
-
-		return updateSchema(
-			updateModel(
-				updateEntity(this.data.entityName, entity => {
-					const { [this.data.fieldName]: removed, ...fields } = entity.fields
-					return { ...entity, fields }
-				}),
-				isIt<Model.InverseRelation>(field, 'ownedBy')
-					? updateEntity(
-							field.target,
-							updateField<Model.AnyOwningRelation>(field.ownedBy, ({ inversedBy, ...field }) => field),
-					  )
-					: undefined,
-			),
-			this.version >= VERSION_ACL_PATCH
-				? updateAcl(
-						updateAclEveryRole(
-							updateAclEveryEntity(
-								updateAclFieldPermissions((permissions, entityName) => {
-									if (entityName !== this.data.entityName) {
-										return permissions
-									}
-									const { [this.data.fieldName]: field, ...other } = permissions
-									return {
-										...other,
-									}
-								}),
-								updateAclEveryPredicate((predicate, entityName) => {
-									const processor = new PredicateDefinitionProcessor(this.schema.model)
-									return processor.process(this.schema.model.entities[entityName], predicate, {
-										handleColumn: ctx =>
-											ctx.entity.name === entity.name && ctx.column.name === field.name ? undefined : ctx.value,
-										handleRelation: ctx =>
-											ctx.entity.name === entity.name && ctx.relation.name === field.name ? undefined : ctx.value,
-									})
-								}),
-							),
-						),
-				  )
-				: undefined,
-		)
+		return removeField(this.data.entityName, this.data.fieldName, this.formatVersion)
 	}
 
 	public transformEvents(events: ContentEvent[]): ContentEvent[] {
@@ -125,6 +87,30 @@ export const RemoveFieldModification: ModificationHandlerStatic<RemoveFieldModif
 
 	static createModification(data: RemoveFieldModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.values(updatedSchema.model.entities)
+			.filter(({ name }) => originalSchema.model.entities[name])
+			.flatMap(entity => {
+				const originalEntity = originalSchema.model.entities[entity.name]
+
+				return Object.values(originalEntity.fields)
+					.filter(field => !entity.fields[field.name])
+					.map(field => {
+						if (isRelation(field) && isInverseRelation(field)) {
+							const target = updatedSchema.model.entities[field.target]
+							if (!target || !target.fields[field.ownedBy]) {
+								return undefined
+							}
+						}
+						return RemoveFieldModification.createModification({
+							entityName: entity.name,
+							fieldName: field.name,
+						})
+					})
+					.filter(isDefined)
+			})
 	}
 }
 

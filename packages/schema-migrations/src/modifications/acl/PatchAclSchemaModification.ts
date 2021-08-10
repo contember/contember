@@ -1,6 +1,6 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater } from '../schemaUpdateUtils'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { applyPatch, Operation } from 'rfc6902'
 import deepCopy from '../../utils/deepCopy'
@@ -13,7 +13,7 @@ export const PatchAclSchemaModification: ModificationHandlerStatic<PatchAclSchem
 	public createSql(builder: MigrationBuilder): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return schema => {
+		return ({ schema }) => {
 			const acl = deepCopy(schema.acl)
 			const result = applyPatch(acl, this.data.patch).filter(it => it !== null)
 			if (result.length > 0) {

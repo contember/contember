@@ -1,11 +1,18 @@
 import { Model, Schema } from '@contember/schema'
-import { acceptRelationTypeVisitor, NamingHelper } from '@contember/schema-utils'
+import {
+	acceptRelationTypeVisitor,
+	isInverseRelation,
+	isOwningRelation,
+	isRelation,
+	NamingHelper,
+} from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { ContentEvent } from '@contember/engine-common'
-import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
+import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
-import { createEventTrigger, createEventTrxTrigger } from '../sqlUpdateUtils'
+import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
 import { isIt } from '../../utils/isIt'
+import { createFields } from '../utils/diffUtils'
 
 const getPrimaryType = (entity: Model.Entity): string => {
 	const column = entity.fields[entity.primary] as Model.AnyColumn
@@ -132,6 +139,25 @@ export const CreateRelationModification: ModificationHandlerStatic<CreateRelatio
 
 	static createModification(data: CreateRelationModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return createFields(originalSchema, updatedSchema, ({ newField, updatedEntity }) => {
+			if (!isRelation(newField) || !isOwningRelation(newField)) {
+				return undefined
+			}
+			const inverseSide = newField.inversedBy
+				? updatedSchema.model.entities[newField.target].fields[newField.inversedBy]
+				: undefined
+			if (inverseSide && !(isRelation(inverseSide) && isInverseRelation(inverseSide))) {
+				throw new Error()
+			}
+			return CreateRelationModification.createModification({
+				entityName: updatedEntity.name,
+				owningSide: newField,
+				...(inverseSide ? { inverseSide } : {}),
+			})
+		})
 	}
 }
 

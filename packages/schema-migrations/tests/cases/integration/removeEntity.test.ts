@@ -17,18 +17,11 @@ testMigrations('remove an entity', {
 		.buildSchema(),
 	diff: [
 		{
-			modification: 'removeField',
-			entityName: 'Post',
-			fieldName: 'author',
-		},
-		{
 			modification: 'removeEntity',
 			entityName: 'Author',
 		},
 	],
-	sql: SQL`ALTER TABLE "post"
-		DROP "author_id";
-	DROP TABLE "author";`,
+	sql: SQL`DROP TABLE "author" CASCADE;`,
 })
 
 testMigrations('remove entity with acl', {
@@ -92,16 +85,9 @@ testMigrations('remove entity with acl', {
 	},
 	diff: [
 		{
-			modification: 'removeField',
-			entityName: 'Post',
-			fieldName: 'site',
-		},
-		{
 			modification: 'removeEntity',
 			entityName: 'Site',
 		},
 	],
-	sql: SQL`ALTER TABLE "post"
-			DROP "site_id";
-		DROP TABLE "site";`,
+	sql: SQL`DROP TABLE "site" CASCADE;`,
 })

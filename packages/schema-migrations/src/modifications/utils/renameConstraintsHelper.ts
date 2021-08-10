@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import { MigrationBuilder } from '@contember/database-migrations'
-import { EntityUpdater } from '../schemaUpdateUtils'
+import { EntityUpdater } from './schemaUpdateUtils'
 
 type NameGenerator = (constraint: Model.UniqueConstraint) => string | null
 export const renameConstraintsSqlBuilder = (
@@ -19,7 +19,7 @@ export const renameConstraintsSqlBuilder = (
 }
 
 export const renameConstraintSchemaUpdater = (nameGenerator: NameGenerator): EntityUpdater => {
-	return entity => {
+	return ({ entity }) => {
 		const newConstraints: Model.UniqueConstraints = {}
 		for (const constraint of Object.values(entity.unique)) {
 			const newName = nameGenerator(constraint)

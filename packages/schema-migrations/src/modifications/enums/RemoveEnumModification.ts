@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 
 export const RemoveEnumModification: ModificationHandlerStatic<RemoveEnumModificationData> = class {
@@ -13,7 +13,7 @@ export const RemoveEnumModification: ModificationHandlerStatic<RemoveEnumModific
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(model => {
+		return updateModel(({ model }) => {
 			const { [this.data.enumName]: removedEnum, ...enums } = model.enums
 			return {
 				...model,
@@ -32,6 +32,12 @@ export const RemoveEnumModification: ModificationHandlerStatic<RemoveEnumModific
 
 	static createModification(data: RemoveEnumModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.entries(originalSchema.model.enums)
+			.filter(([name]) => !updatedSchema.model.enums[name])
+			.map(([enumName, values]) => RemoveEnumModification.createModification({ enumName }))
 	}
 }
 

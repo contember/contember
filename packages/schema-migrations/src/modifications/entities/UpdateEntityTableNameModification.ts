@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 
 export const UpdateEntityTableNameModification: ModificationHandlerStatic<UpdateEntityTableNameModificationData> = class {
@@ -15,7 +15,7 @@ export const UpdateEntityTableNameModification: ModificationHandlerStatic<Update
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return updateModel(
-			updateEntity(this.data.entityName, entity => ({
+			updateEntity(this.data.entityName, ({ entity }) => ({
 				...entity,
 				tableName: this.data.tableName,
 			})),
@@ -38,6 +38,14 @@ export const UpdateEntityTableNameModification: ModificationHandlerStatic<Update
 
 	static createModification(data: UpdateEntityTableNameModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.values(updatedSchema.model.entities)
+			.filter(
+				it => updatedSchema.model.entities[it.name] && updatedSchema.model.entities[it.name].tableName !== it.tableName,
+			)
+			.map(it => UpdateEntityTableNameModification.createModification({ entityName: it.name, tableName: it.tableName }))
 	}
 }
 

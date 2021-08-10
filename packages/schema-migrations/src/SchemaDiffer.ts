@@ -1,15 +1,38 @@
-import { Model, Schema } from '@contember/schema'
-import { acceptFieldVisitor, isOwningRelation, SchemaValidator, ValidationError } from '@contember/schema-utils'
-import { isIt } from './utils/isIt'
+import { Schema } from '@contember/schema'
+import { deepCompare, SchemaValidator, ValidationError } from '@contember/schema-utils'
 import { SchemaMigrator } from './SchemaMigrator'
-import ModificationBuilder from './modifications/ModificationBuilder'
 import { Migration } from './Migration'
-import { createPatch } from 'rfc6902'
 import deepEqual from 'fast-deep-equal'
-import deepCopy from './utils/deepCopy'
 import { ImplementationException } from './exceptions'
 import { VERSION_LATEST } from './modifications/ModificationVersions'
-import { deepCompare } from '@contember/schema-utils'
+import { CreateUniqueConstraintModification, RemoveUniqueConstraintModification } from './modifications/constraints'
+import { RemoveFieldModification } from './modifications/fields'
+import {
+	CreateEntityModification,
+	RemoveEntityModification,
+	UpdateEntityTableNameModification,
+} from './modifications/entities'
+import { CreateEnumModification, RemoveEnumModification, UpdateEnumModification } from './modifications/enums'
+import {
+	CreateColumnModification,
+	UpdateColumnDefinitionModification,
+	UpdateColumnNameModification,
+} from './modifications/columns'
+import {
+	CreateRelationInverseSideModification,
+	CreateRelationModification,
+	DisableOrphanRemovalModification,
+	EnableOrphanRemovalModification,
+	MakeRelationNotNullModification,
+	MakeRelationNullableModification,
+	UpdateRelationOnDeleteModification,
+	UpdateRelationOrderByModification,
+} from './modifications/relations'
+import { PatchAclSchemaModification, UpdateAclSchemaModification } from './modifications/acl'
+import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './modifications/validation'
+import { CreateDiff } from './modifications/ModificationHandler'
+import { isDefined } from './utils/isDefined'
+import { RemoveChangedFieldDiffer } from './modifications/differs/RemoveChangedFieldDiffer'
 
 export class SchemaDiffer {
 	constructor(private readonly schemaMigrator: SchemaMigrator) {}
@@ -24,244 +47,50 @@ export class SchemaDiffer {
 			throw new InvalidSchemaException('updated schema is not valid', updatedErrors)
 		}
 
-		const builder = new ModificationBuilder(originalSchema, updatedSchema)
+		const differs: CreateDiff[] = [
+			RemoveUniqueConstraintModification.createDiff,
+			RemoveEntityModification.createDiff,
+			RemoveFieldModification.createDiff,
+			CreateEnumModification.createDiff,
 
-		const originalModel = originalSchema.model
-		const updatedModel = updatedSchema.model
+			UpdateEntityTableNameModification.createDiff,
+			UpdateColumnDefinitionModification.createDiff,
+			UpdateColumnNameModification.createDiff,
+			UpdateRelationOnDeleteModification.createDiff,
+			MakeRelationNotNullModification.createDiff,
+			MakeRelationNullableModification.createDiff,
+			EnableOrphanRemovalModification.createDiff,
+			DisableOrphanRemovalModification.createDiff,
+			UpdateRelationOrderByModification.createDiff,
+			UpdateEnumModification.createDiff,
 
-		const originalEnums = new Set(Object.keys(originalModel.enums))
+			new RemoveChangedFieldDiffer().createDiff,
+			CreateEntityModification.createDiff,
+			CreateColumnModification.createDiff,
+			CreateRelationModification.createDiff,
+			CreateRelationInverseSideModification.createDiff,
 
-		for (const enumName in updatedModel.enums) {
-			if (!originalEnums.has(enumName)) {
-				builder.createEnum(enumName)
-				continue
-			}
-			if (!deepEqual(updatedModel.enums[enumName], originalModel.enums[enumName])) {
-				builder.updateEnum(enumName)
-			}
-			originalEnums.delete(enumName)
+			CreateUniqueConstraintModification.createDiff,
+
+			RemoveEnumModification.createDiff,
+
+			UpdateAclSchemaModification.createDiff,
+			PatchAclSchemaModification.createDiff,
+
+			UpdateValidationSchemaModification.createDiff,
+			PatchValidationSchemaModification.createDiff,
+		].filter(isDefined)
+
+		const diffs: Migration.Modification[] = []
+		let appliedDiffsSchema = originalSchema
+		for (const differ of differs) {
+			const differDiffs = differ(appliedDiffsSchema, updatedSchema)
+			appliedDiffsSchema = this.schemaMigrator.applyModifications(appliedDiffsSchema, differDiffs, VERSION_LATEST)
+			diffs.push(...differDiffs)
 		}
 
-		for (const entityName in updatedModel.entities) {
-			const updatedEntity: Model.Entity = updatedModel.entities[entityName]
-			const originalEntity: Model.Entity | undefined = originalModel.entities[entityName]
-
-			if (!originalEntity) {
-				builder.createEntity(updatedEntity)
-				for (const fieldName in updatedEntity.fields) {
-					if (fieldName === updatedEntity.primary) {
-						continue
-					}
-					builder.createField(updatedEntity, fieldName)
-				}
-				for (const uniqueName in updatedEntity.unique) {
-					builder.createUnique(updatedEntity, uniqueName)
-				}
-				continue
-			}
-
-			this.trackUniqueConstraintDiff(builder, originalEntity, updatedEntity)
-
-			if (updatedEntity.tableName !== originalEntity.tableName) {
-				builder.updateEntityTableName(entityName, updatedEntity.tableName)
-			}
-
-			const tryPartialUpdate = (updatedRelation: Model.AnyRelation, originalRelation: Model.AnyRelation): boolean => {
-				if (updatedRelation.type !== originalRelation.type) {
-					return false
-				}
-				const marker = builder.createMarker()
-				const tmpRelation = deepCopy(originalRelation)
-				if (
-					isIt<Model.JoiningColumnRelation>(updatedRelation, 'joiningColumn') &&
-					isIt<Model.JoiningColumnRelation>(originalRelation, 'joiningColumn') &&
-					updatedRelation.joiningColumn.onDelete !== originalRelation.joiningColumn.onDelete
-				) {
-					;(tmpRelation as Model.AnyRelation & Model.JoiningColumnRelation).joiningColumn.onDelete =
-						updatedRelation.joiningColumn.onDelete
-					builder.updateRelationOnDelete(entityName, updatedRelation.name, updatedRelation.joiningColumn.onDelete)
-				}
-
-				if (
-					isIt<Model.NullableRelation>(updatedRelation, 'nullable') &&
-					isIt<Model.NullableRelation>(originalRelation, 'nullable') &&
-					!updatedRelation.nullable &&
-					originalRelation.nullable
-				) {
-					;(tmpRelation as Model.AnyRelation & Model.NullableRelation).nullable = false
-					builder.makeRelationNotNull(entityName, updatedRelation.name)
-				}
-				if (
-					isIt<Model.NullableRelation>(updatedRelation, 'nullable') &&
-					isIt<Model.NullableRelation>(originalRelation, 'nullable') &&
-					updatedRelation.nullable &&
-					!originalRelation.nullable
-				) {
-					;(tmpRelation as Model.AnyRelation & Model.NullableRelation).nullable = true
-					builder.makeRelationNullable(entityName, updatedRelation.name)
-				}
-
-				const isItOrderable = (relation: Model.AnyRelation): relation is Model.OrderableRelation & Model.AnyRelation =>
-					relation.type === Model.RelationType.ManyHasMany || relation.type === Model.RelationType.OneHasMany
-				if (
-					isItOrderable(updatedRelation) &&
-					isItOrderable(originalRelation) &&
-					!deepEqual(updatedRelation.orderBy || [], originalRelation.orderBy || [])
-				) {
-					;(tmpRelation as Model.AnyRelation & Model.OrderableRelation).orderBy = updatedRelation.orderBy || []
-					builder.updateRelationOrderBy(entityName, updatedRelation.name, updatedRelation.orderBy || [])
-				}
-				if (
-					isOwningRelation(originalRelation) &&
-					originalRelation.type === Model.RelationType.OneHasOne &&
-					isOwningRelation(updatedRelation) &&
-					updatedRelation.type === Model.RelationType.OneHasOne &&
-					updatedRelation.orphanRemoval !== originalRelation.orphanRemoval
-				) {
-					if (updatedRelation.orphanRemoval) {
-						;(tmpRelation as Model.OneHasOneOwningRelation).orphanRemoval = updatedRelation.orphanRemoval
-						builder.enableOrphanRemoval(entityName, updatedRelation.name)
-					} else {
-						delete (tmpRelation as Model.OneHasOneOwningRelation).orphanRemoval
-						builder.disableOrphanRemoval(entityName, updatedRelation.name)
-					}
-				}
-
-				if (!deepEqual(tmpRelation, updatedRelation)) {
-					marker.rewind()
-					return false
-				}
-
-				return true
-			}
-
-			const originalFields = new Set(Object.keys(originalEntity.fields))
-			for (const fieldName in updatedEntity.fields) {
-				if (!originalFields.has(fieldName)) {
-					builder.createField(updatedEntity, fieldName)
-					continue
-				}
-				originalFields.delete(fieldName)
-
-				acceptFieldVisitor(updatedModel, updatedEntity, fieldName, {
-					visitColumn: ({}, updatedColumn: Model.AnyColumn) => {
-						acceptFieldVisitor(originalModel, originalEntity, fieldName, {
-							visitColumn: ({}, originalColumn: Model.AnyColumn) => {
-								if (updatedColumn.columnName != originalColumn.columnName) {
-									builder.updateColumnName(entityName, fieldName, updatedColumn.columnName)
-								}
-								const {
-									name: {},
-									columnName: {},
-									...updatedDefinition
-								} = updatedColumn as any
-								const {
-									name: {},
-									columnName: {},
-									...originalDefinition
-								} = originalColumn as any
-
-								if (!deepEqual(updatedDefinition, originalDefinition)) {
-									builder.updateColumnDefinition(entityName, fieldName, updatedDefinition)
-								}
-							},
-							visitRelation: () => {
-								builder.removeField(entityName, fieldName)
-								builder.createField(updatedEntity, fieldName)
-							},
-						})
-					},
-					visitRelation: ({}, updatedRelation: Model.AnyRelation, {}, _) => {
-						acceptFieldVisitor(originalModel, originalEntity, fieldName, {
-							visitColumn: () => {
-								builder.removeField(entityName, fieldName)
-								builder.createField(updatedEntity, fieldName)
-							},
-							visitRelation: ({}, originalRelation: Model.AnyRelation, {}, _) => {
-								const updatedWithoutInverse = { ...updatedRelation, inversedBy: undefined }
-								const originalWithoutInverse = { ...originalRelation, inversedBy: undefined }
-								if (deepEqual(updatedWithoutInverse, originalWithoutInverse)) {
-									return
-								}
-								const partialUpdateResult = tryPartialUpdate(updatedWithoutInverse, originalWithoutInverse)
-
-								if (!partialUpdateResult) {
-									builder.removeField(entityName, fieldName)
-									builder.createField(updatedEntity, fieldName)
-								}
-							},
-						})
-					},
-				})
-			}
-
-			for (const fieldName of originalFields) {
-				acceptFieldVisitor(originalSchema.model, entityName, fieldName, {
-					visitColumn: () => {
-						builder.removeField(entityName, fieldName)
-					},
-					visitManyHasOne: () => {
-						builder.removeField(entityName, fieldName)
-					},
-					visitOneHasMany: () => {
-						builder.removeField(entityName, fieldName)
-					},
-					visitOneHasOneOwning: () => {
-						builder.removeField(entityName, fieldName)
-					},
-					visitOneHasOneInverse: () => {
-						builder.removeField(entityName, fieldName)
-					},
-					visitManyHasManyOwning: () => {
-						builder.removeField(entityName, fieldName)
-					},
-					visitManyHasManyInverse: () => {
-						builder.removeField(entityName, fieldName)
-					},
-				})
-			}
-		}
-
-		const entitiesToDelete = Object.keys(originalModel.entities).filter(name => !updatedModel.entities[name])
-		for (const entityName of entitiesToDelete) {
-			builder.removeEntity(entityName)
-		}
-
-		const enumsToDelete = Object.keys(originalModel.enums).filter(name => !updatedModel.enums[name])
-		for (const enumName of enumsToDelete) {
-			builder.removeEnum(enumName)
-		}
-
-		const partiallyMigratedSchema = this.schemaMigrator.applyModifications(
-			originalSchema,
-			builder.getDiff(),
-			VERSION_LATEST,
-		)
-
-		if (!deepEqual(partiallyMigratedSchema.acl, updatedSchema.acl)) {
-			const patch = createPatch(partiallyMigratedSchema.acl, updatedSchema.acl)
-			if (patch.length <= 100) {
-				builder.patchAclSchema(patch)
-			} else {
-				builder.updateAclSchema(updatedSchema.acl)
-			}
-		}
-
-		if (!deepEqual(partiallyMigratedSchema.validation, updatedSchema.validation)) {
-			const patch = createPatch(partiallyMigratedSchema.validation, updatedSchema.validation)
-			if (patch.length <= 20) {
-				builder.patchValidationSchema(patch)
-			} else {
-				builder.updateValidationSchema(updatedSchema.validation)
-			}
-		}
-
-		const diff = builder.getDiff()
-
-		const schemaWithAppliedModifications = this.schemaMigrator.applyModifications(originalSchema, diff, VERSION_LATEST)
-
-		if (checkRecreate && !deepEqual(updatedSchema, schemaWithAppliedModifications)) {
-			const errors = deepCompare(updatedSchema, schemaWithAppliedModifications, [])
+		if (checkRecreate && !deepEqual(updatedSchema, appliedDiffsSchema)) {
+			const errors = deepCompare(updatedSchema, appliedDiffsSchema, [])
 			let message = 'Updated schema cannot be recreated by the generated diff:'
 			for (const err of errors) {
 				message += '\n\t' + err.path.join('.') + ': ' + err.message
@@ -270,34 +99,7 @@ export class SchemaDiffer {
 			throw new ImplementationException(message)
 		}
 
-		return diff
-	}
-
-	private trackUniqueConstraintDiff(
-		builder: ModificationBuilder,
-		originalEntity: Model.Entity,
-		updatedEntity: Model.Entity,
-	) {
-		const originalUnique = originalEntity.unique
-		const originalUniqueNames = new Set(Object.keys(originalUnique))
-
-		for (const uniqueName in updatedEntity.unique) {
-			if (
-				originalUniqueNames.has(uniqueName) &&
-				!deepEqual(updatedEntity.unique[uniqueName], originalUnique[uniqueName])
-			) {
-				builder.removeUnique(updatedEntity.name, uniqueName)
-				originalUniqueNames.delete(uniqueName)
-			}
-			if (!originalUniqueNames.has(uniqueName)) {
-				builder.createUnique(updatedEntity, uniqueName)
-			}
-			originalUniqueNames.delete(uniqueName)
-		}
-
-		for (const uniqueName of originalUniqueNames) {
-			builder.removeUnique(updatedEntity.name, uniqueName)
-		}
+		return diffs
 	}
 }
 

@@ -1,8 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { addField, SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
+import { addField, SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
+import { createFields } from '../utils/diffUtils'
+import { isInverseRelation, isRelation } from '@contember/schema-utils'
 
 export const CreateRelationInverseSideModification: ModificationHandlerStatic<CreateRelationInverseSideModificationData> = class {
 	static id = 'createRelationInverseSide'
@@ -15,7 +17,7 @@ export const CreateRelationInverseSideModification: ModificationHandlerStatic<Cr
 			updateEntity(this.data.entityName, addField(this.data.relation)),
 			updateEntity(
 				this.data.relation.target,
-				updateField<Model.AnyRelation & Model.OwningRelation>(this.data.relation.ownedBy, field => ({
+				updateField<Model.AnyRelation & Model.OwningRelation>(this.data.relation.ownedBy, ({ field }) => ({
 					...field,
 					inversedBy: this.data.relation.name,
 				})),
@@ -33,6 +35,18 @@ export const CreateRelationInverseSideModification: ModificationHandlerStatic<Cr
 
 	static createModification(data: CreateRelationInverseSideModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return createFields(originalSchema, updatedSchema, ({ newField, updatedEntity }) => {
+			if (!isRelation(newField) || !isInverseRelation(newField)) {
+				return undefined
+			}
+			return CreateRelationInverseSideModification.createModification({
+				entityName: updatedEntity.name,
+				relation: newField,
+			})
+		})
 	}
 }
 

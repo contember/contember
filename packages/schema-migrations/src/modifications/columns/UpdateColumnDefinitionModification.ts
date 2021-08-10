@@ -1,8 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
+import deepEqual from 'fast-deep-equal'
+import { updateColumns } from '../utils/diffUtils'
 
 export const UpdateColumnDefinitionModification: ModificationHandlerStatic<UpdateColumnDefinitionModificationData> = class {
 	static id = 'updateColumnDefinition'
@@ -27,7 +29,7 @@ export const UpdateColumnDefinitionModification: ModificationHandlerStatic<Updat
 		return updateModel(
 			updateEntity(
 				this.data.entityName,
-				updateField<Model.AnyColumn>(this.data.fieldName, field => {
+				updateField<Model.AnyColumn>(this.data.fieldName, ({ field }) => {
 					return {
 						...this.data.definition,
 						name: field.name,
@@ -55,6 +57,29 @@ export const UpdateColumnDefinitionModification: ModificationHandlerStatic<Updat
 
 	static createModification(data: UpdateColumnDefinitionModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return updateColumns(originalSchema, updatedSchema, ({ originalColumn, updatedColumn, updatedEntity }) => {
+			const {
+				name: {},
+				columnName: {},
+				...updatedDefinition
+			} = updatedColumn as any
+			const {
+				name: {},
+				columnName: {},
+				...originalDefinition
+			} = originalColumn as any
+			if (deepEqual(updatedDefinition, originalDefinition)) {
+				return undefined
+			}
+			return UpdateColumnDefinitionModification.createModification({
+				entityName: updatedEntity.name,
+				fieldName: updatedColumn.name,
+				definition: updatedDefinition,
+			})
+		})
 	}
 }
 

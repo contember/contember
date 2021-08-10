@@ -1,9 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
-import { createEventTrigger, createEventTrxTrigger } from '../sqlUpdateUtils'
+import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
 
 export const CreateEntityModification: ModificationHandlerStatic<CreateEntityModificationData> = class {
 	static id = 'createEntity'
@@ -24,7 +24,7 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(model => ({
+		return updateModel(({ model }) => ({
 			...model,
 			entities: {
 				...model.entities,
@@ -43,6 +43,22 @@ export const CreateEntityModification: ModificationHandlerStatic<CreateEntityMod
 
 	static createModification(data: CreateEntityModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.values(updatedSchema.model.entities)
+			.filter(it => !originalSchema.model.entities[it.name])
+			.map(entity =>
+				CreateEntityModification.createModification({
+					entity: {
+						...entity,
+						fields: {
+							[entity.primary]: entity.fields[entity.primary],
+						},
+						unique: {},
+					},
+				}),
+			)
 	}
 }
 

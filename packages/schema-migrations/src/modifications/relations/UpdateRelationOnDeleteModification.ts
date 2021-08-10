@@ -1,8 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
+import { isIt } from '../../utils/isIt'
+import { updateRelations } from '../utils/diffUtils'
 
 export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<UpdateRelationOnDeleteModificationData> = class {
 	static id = 'updateRelationOnDelete'
@@ -15,7 +17,7 @@ export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<Updat
 		return updateModel(
 			updateEntity(
 				entityName,
-				updateField<Model.AnyRelation & Model.JoiningColumnRelation>(fieldName, field => ({
+				updateField<Model.AnyRelation & Model.JoiningColumnRelation>(fieldName, ({ field }) => ({
 					...field,
 					joiningColumn: { ...field.joiningColumn, onDelete },
 				})),
@@ -33,6 +35,24 @@ export const UpdateRelationOnDeleteModification: ModificationHandlerStatic<Updat
 
 	static createModification(data: UpdateRelationOnDeleteModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
+			if (
+				originalRelation.type === updatedRelation.type &&
+				isIt<Model.JoiningColumnRelation>(updatedRelation, 'joiningColumn') &&
+				isIt<Model.JoiningColumnRelation>(originalRelation, 'joiningColumn') &&
+				updatedRelation.joiningColumn.onDelete !== originalRelation.joiningColumn.onDelete
+			) {
+				return UpdateRelationOnDeleteModification.createModification({
+					entityName: updatedEntity.name,
+					fieldName: updatedRelation.name,
+					onDelete: updatedRelation.joiningColumn.onDelete,
+				})
+			}
+			return undefined
+		})
 	}
 }
 

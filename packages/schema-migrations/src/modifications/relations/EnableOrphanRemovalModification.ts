@@ -1,8 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
+import { isOwningRelation } from '@contember/schema-utils'
+import { updateRelations } from '../utils/diffUtils'
 
 export const EnableOrphanRemovalModification: ModificationHandlerStatic<EnableOrphanRemovalModificationData> = class {
 	static id = 'enableOrphanRemoval'
@@ -15,7 +17,7 @@ export const EnableOrphanRemovalModification: ModificationHandlerStatic<EnableOr
 		return updateModel(
 			updateEntity(
 				entityName,
-				updateField<Model.OneHasOneOwningRelation>(fieldName, field => ({
+				updateField<Model.OneHasOneOwningRelation>(fieldName, ({ field }) => ({
 					...field,
 					orphanRemoval: true,
 				})),
@@ -35,6 +37,25 @@ export const EnableOrphanRemovalModification: ModificationHandlerStatic<EnableOr
 
 	static createModification(data: EnableOrphanRemovalModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
+			if (
+				isOwningRelation(originalRelation) &&
+				isOwningRelation(updatedRelation) &&
+				originalRelation.type === Model.RelationType.OneHasOne &&
+				updatedRelation.type === Model.RelationType.OneHasOne &&
+				!originalRelation.orphanRemoval &&
+				updatedRelation.orphanRemoval
+			) {
+				return EnableOrphanRemovalModification.createModification({
+					entityName: updatedEntity.name,
+					fieldName: updatedRelation.name,
+				})
+			}
+			return undefined
+		})
 	}
 }
 

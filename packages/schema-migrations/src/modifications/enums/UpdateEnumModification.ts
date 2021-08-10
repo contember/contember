@@ -1,9 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { escapeSqlString } from '../../utils/escapeSqlString'
+import deepEqual from 'fast-deep-equal'
 
 export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModificationData> = class {
 	static id = 'updateEnum'
@@ -18,7 +19,7 @@ export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModific
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(model => ({
+		return updateModel(({ model }) => ({
 			...model,
 			enums: {
 				...model.enums,
@@ -43,6 +44,16 @@ export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModific
 
 	static createModification(data: UpdateEnumModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.entries(updatedSchema.model.enums)
+			.filter(
+				([name]) =>
+					originalSchema.model.enums[name] &&
+					!deepEqual(updatedSchema.model.enums[name], originalSchema.model.enums[name]),
+			)
+			.map(([enumName, values]) => UpdateEnumModification.createModification({ enumName, values }))
 	}
 }
 

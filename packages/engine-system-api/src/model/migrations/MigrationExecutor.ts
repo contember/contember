@@ -24,7 +24,7 @@ export class MigrationExecutor {
 				migration.formatVersion,
 			)
 			await modificationHandler.createSql(builder)
-			schema = modificationHandler.getSchemaUpdater()(schema)
+			schema = modificationHandler.getSchemaUpdater()({ schema })
 		}
 
 		const sql = builder.getSql()

@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { escapeSqlString } from '../../utils/escapeSqlString'
 
@@ -18,7 +18,7 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		return updateModel(model => ({
+		return updateModel(({ model }) => ({
 			...model,
 			enums: {
 				...model.enums,
@@ -37,6 +37,12 @@ export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModific
 
 	static createModification(data: CreateEnumModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.entries(updatedSchema.model.enums)
+			.filter(([name]) => !originalSchema.model.enums[name])
+			.map(([enumName, values]) => CreateEnumModification.createModification({ enumName, values }))
 	}
 }
 

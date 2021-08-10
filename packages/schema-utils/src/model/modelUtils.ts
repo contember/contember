@@ -248,4 +248,6 @@ export const isOwningRelation = (relation: Model.Relation): relation is Model.Ow
 	return !isInverseRelation(relation)
 }
 
+export const isColumn = (field: Model.AnyField): field is Model.AnyColumn => isIt<Model.AnyColumn>(field, 'columnType')
+
 export const emptyModelSchema: Model.Schema = { entities: {}, enums: {} }

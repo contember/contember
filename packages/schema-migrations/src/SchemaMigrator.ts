@@ -9,7 +9,7 @@ export class SchemaMigrator {
 		for (const modification of diff) {
 			const { modification: name, ...data } = modification
 			const modificationHandler = this.modificationHandlerFactory.create(name, data, schema, formatVersion)
-			schema = modificationHandler.getSchemaUpdater()(schema)
+			schema = modificationHandler.getSchemaUpdater()({ schema })
 		}
 		return schema
 	}

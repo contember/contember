@@ -1,11 +1,12 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent, EventType } from '@contember/engine-common'
-import { addField, SchemaUpdater, updateEntity, updateModel } from '../schemaUpdateUtils'
+import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { wrapIdentifier } from '../../utils/dbHelpers'
-import { getColumnName, resolveDefaultValue } from '@contember/schema-utils'
+import { getColumnName, isColumn, isInverseRelation, isRelation, resolveDefaultValue } from '@contember/schema-utils'
 import { ImplementationException } from '../../exceptions'
+import { createFields } from '../utils/diffUtils'
 
 export const CreateColumnModification: ModificationHandlerStatic<CreateColumnModificationData> = class {
 	static id = 'createColumn'
@@ -96,6 +97,19 @@ export const CreateColumnModification: ModificationHandlerStatic<CreateColumnMod
 
 	static createModification(data: CreateColumnModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return createFields(originalSchema, updatedSchema, ({ newField, updatedEntity }) => {
+			if (!isColumn(newField)) {
+				return undefined
+			}
+			return CreateColumnModification.createModification({
+				entityName: updatedEntity.name,
+				field: newField,
+				...(newField.default ? { fillValue: newField.default } : {}),
+			})
+		})
 	}
 }
 

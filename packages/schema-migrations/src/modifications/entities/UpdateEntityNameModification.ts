@@ -11,7 +11,7 @@ import {
 	updateEveryField,
 	updateModel,
 	updateSchema,
-} from '../schemaUpdateUtils'
+} from '../utils/schemaUpdateUtils'
 import { ModificationHandler, ModificationHandlerStatic } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
@@ -52,7 +52,7 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 			this.subModification.getSchemaUpdater(),
 			updateModel(
 				updateEveryEntity(
-					updateEveryField(field => {
+					updateEveryField(({ field }) => {
 						if (isIt<Model.AnyRelation>(field, 'target') && field.target === this.data.entityName) {
 							return { ...field, target: this.data.newEntityName }
 						}
@@ -62,7 +62,7 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 				this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
 					? updateEntity(this.data.entityName, renameConstraintSchemaUpdater(this.getNewConstraintName.bind(this)))
 					: undefined,
-				model => {
+				({ model }) => {
 					const { [this.data.entityName]: renamed, ...entities } = model.entities
 					const newEntities = {
 						...entities,
@@ -80,7 +80,7 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 			this.formatVersion >= VERSION_ACL_PATCH
 				? updateAcl(
 						updateAclEveryRole(
-							role => ({
+							({ role }) => ({
 								...role,
 								variables: Object.fromEntries(
 									Object.entries(role.variables).map(([key, variable]) => [
@@ -92,7 +92,7 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 									]),
 								),
 							}),
-							updateAclEntities(entities => {
+							updateAclEntities(({ entities }) => {
 								if (!entities[this.data.entityName]) {
 									return entities
 								}

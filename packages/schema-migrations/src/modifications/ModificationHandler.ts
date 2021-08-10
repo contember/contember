@@ -1,6 +1,6 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater } from './schemaUpdateUtils'
+import { SchemaUpdater } from './utils/schemaUpdateUtils'
 import { Model, Schema } from '@contember/schema'
 import { Migration } from '../Migration'
 
@@ -23,8 +23,15 @@ export interface ModificationHandler<Data> {
 	describe(context: ModificationDescriptionContext): ModificationDescription
 }
 
+export type CreateDiff = (originalSchema: Schema, updatedSchema: Schema) => Migration.Modification[]
+
 export interface ModificationHandlerStatic<Data> {
 	id: string
 	createModification: (data: Data) => Migration.Modification<Data>
+	createDiff?: CreateDiff
 	new (data: Data, schema: Schema, formatVersion: number): ModificationHandler<Data>
+}
+
+export interface Differ {
+	createDiff: CreateDiff
 }

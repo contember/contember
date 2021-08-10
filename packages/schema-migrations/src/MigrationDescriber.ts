@@ -38,7 +38,7 @@ export class MigrationDescriber {
 			formatVersion,
 		)
 		try {
-			schema = modificationHandler.getSchemaUpdater()(schema)
+			schema = modificationHandler.getSchemaUpdater()({ schema })
 		} catch (e) {
 			if (!(e instanceof SchemaUpdateError)) {
 				throw e

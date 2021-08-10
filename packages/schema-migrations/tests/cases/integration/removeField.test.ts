@@ -2,7 +2,6 @@ import { testMigrations } from '../../src/tests'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { SQL } from '../../src/tags'
-import { Migration } from '../../../src'
 
 testMigrations('remove relation (many has one)', {
 	originalSchema: new SchemaBuilder()
@@ -52,11 +51,6 @@ testMigrations('remove relation (one has many)', {
 		},
 		{
 			modification: 'removeField',
-			entityName: 'Post',
-			fieldName: 'locales',
-		},
-		{
-			modification: 'removeField',
 			entityName: 'PostLocale',
 			fieldName: 'post',
 		},
@@ -100,11 +94,6 @@ testMigrations('remove relation (one has one)', {
 		.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 		.buildSchema(),
 	diff: [
-		{
-			modification: 'removeField',
-			entityName: 'SiteSetting',
-			fieldName: 'site',
-		},
 		{
 			modification: 'removeField',
 			entityName: 'Site',

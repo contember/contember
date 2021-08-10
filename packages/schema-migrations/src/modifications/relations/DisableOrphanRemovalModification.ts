@@ -1,8 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
+import { isOwningRelation } from '@contember/schema-utils'
+import { updateRelations } from '../utils/diffUtils'
 
 export const DisableOrphanRemovalModification: ModificationHandlerStatic<DisableOrphanRemovalModificationData> = class {
 	static id = 'disableOrphanRemoval'
@@ -16,7 +18,7 @@ export const DisableOrphanRemovalModification: ModificationHandlerStatic<Disable
 		return updateModel(
 			updateEntity(
 				entityName,
-				updateField<Model.OneHasOneOwningRelation>(fieldName, ({ orphanRemoval, ...field }) => field),
+				updateField<Model.OneHasOneOwningRelation>(fieldName, ({ field: { orphanRemoval, ...field } }) => field),
 			),
 		)
 	}
@@ -33,6 +35,25 @@ export const DisableOrphanRemovalModification: ModificationHandlerStatic<Disable
 
 	static createModification(data: DisableOrphanRemovalModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
+			if (
+				isOwningRelation(originalRelation) &&
+				isOwningRelation(updatedRelation) &&
+				originalRelation.type === Model.RelationType.OneHasOne &&
+				updatedRelation.type === Model.RelationType.OneHasOne &&
+				originalRelation.orphanRemoval &&
+				!updatedRelation.orphanRemoval
+			) {
+				return DisableOrphanRemovalModification.createModification({
+					entityName: updatedEntity.name,
+					fieldName: updatedRelation.name,
+				})
+			}
+			return undefined
+		})
 	}
 }
 export interface DisableOrphanRemovalModificationData {

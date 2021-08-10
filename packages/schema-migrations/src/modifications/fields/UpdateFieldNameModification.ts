@@ -13,7 +13,7 @@ import {
 	updateEveryField,
 	updateModel,
 	updateSchema,
-} from '../schemaUpdateUtils'
+} from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { acceptFieldVisitor, NamingHelper, PredicateDefinitionProcessor } from '@contember/schema-utils'
 import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_NAME } from '../ModificationVersions'
@@ -42,7 +42,7 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 				: undefined
 		const updateConstraintFields =
 			this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
-				? updateEntity(this.data.entityName, entity => {
+				? updateEntity(this.data.entityName, ({ entity }) => {
 						return {
 							...entity,
 							unique: Object.fromEntries(
@@ -59,7 +59,7 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 				: undefined
 
 		const updateRelationReferences = updateEveryEntity(
-			updateEveryField((field, entity) => {
+			updateEveryField(({ field, entity }) => {
 				const isUpdatedRelation = (entity: Model.Entity, relation: Model.AnyRelation | null) => {
 					return entity.name === this.data.entityName && relation && relation.name === this.data.fieldName
 				}
@@ -99,7 +99,7 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 				})
 			}),
 		)
-		const updateEntityName = updateEntity(this.data.entityName, entity => {
+		const updateEntityName = updateEntity(this.data.entityName, ({ entity }) => {
 			const { [this.data.fieldName]: updated, ...fields } = entity.fields
 			return {
 				...entity,
@@ -127,9 +127,9 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 										...other,
 									}
 								}),
-								updateAclEveryPredicate((predicate, entityName) => {
-									const processor = new PredicateDefinitionProcessor(this.schema.model)
-									const currentEntity = this.schema.model.entities[entityName]
+								updateAclEveryPredicate(({ predicate, entityName, schema }) => {
+									const processor = new PredicateDefinitionProcessor(schema.model)
+									const currentEntity = schema.model.entities[entityName]
 									return processor.process<Input.Condition<Value.FieldValue<never>> | string, never>(
 										currentEntity,
 										predicate,
@@ -150,8 +150,8 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 				  )
 				: undefined
 		return updateSchema(
-			updateModel(updateConstraintName, updateConstraintFields, updateRelationReferences, updateEntityName),
 			updateAclOp,
+			updateModel(updateConstraintName, updateConstraintFields, updateRelationReferences, updateEntityName),
 		)
 	}
 

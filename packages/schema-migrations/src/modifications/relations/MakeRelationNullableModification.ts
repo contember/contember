@@ -1,9 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { getEntity, tryGetColumnName } from '@contember/schema-utils'
+import { isIt } from '../../utils/isIt'
+import { updateRelations } from '../utils/diffUtils'
 
 export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRelationNullableModificationData> = class {
 	static id = 'makeRelationNullable'
@@ -25,7 +27,7 @@ export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRel
 		return updateModel(
 			updateEntity(
 				entityName,
-				updateField<Model.AnyRelation & Model.NullableRelation>(fieldName, field => ({
+				updateField<Model.AnyRelation & Model.NullableRelation>(fieldName, ({ field }) => ({
 					...field,
 					nullable: true,
 				})),
@@ -45,6 +47,24 @@ export const MakeRelationNullableModification: ModificationHandlerStatic<MakeRel
 
 	static createModification(data: MakeRelationNullableModificationData) {
 		return { modification: this.id, ...data }
+	}
+
+	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
+			if (
+				originalRelation.type === updatedRelation.type &&
+				isIt<Model.NullableRelation>(updatedRelation, 'nullable') &&
+				isIt<Model.NullableRelation>(originalRelation, 'nullable') &&
+				updatedRelation.nullable &&
+				!originalRelation.nullable
+			) {
+				return MakeRelationNullableModification.createModification({
+					entityName: updatedEntity.name,
+					fieldName: updatedRelation.name,
+				})
+			}
+			return undefined
+		})
 	}
 }
 

@@ -33,8 +33,8 @@ export default new Builder({})
 		return new S3Manager(s3Client, env.CONTEMBER_S3_BUCKET, env.CONTEMBER_S3_PREFIX)
 	})
 
-	.addService('loginController', ({ env }) => {
-		return new LoginController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_LOGIN_TOKEN, env.CONTEMBER_PUBLIC_DIR)
+	.addService('loginController', ({ env, tenant, s3 }) => {
+		return new LoginController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_LOGIN_TOKEN, env.CONTEMBER_PUBLIC_DIR, tenant, s3)
 	})
 
 	.addService('deployController', ({ tenant, s3 }) => {

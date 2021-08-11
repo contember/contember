@@ -4,7 +4,7 @@ import type { MutationRequestState } from './requestState'
 
 export type UseMutationReturn<R, V> = [(variables: V) => Promise<R>, MutationRequestState<R>]
 
-export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken?: string): UseMutationReturn<R, V> => {
+export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken?: string, headers?: Record<string, string>): UseMutationReturn<R, V> => {
 	const [state, setState] = useState<MutationRequestState<R>>({
 		error: false,
 		loading: false,
@@ -21,6 +21,7 @@ export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken
 				const response = client.sendRequest<{ data: R }>(query, {
 					variables,
 					apiTokenOverride: apiToken,
+					headers,
 				})
 				return response.then(
 					data => {

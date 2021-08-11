@@ -1,0 +1,44 @@
+{
+	"formatVersion": 2,
+	"modifications": [
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "fileList"
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "fileList",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "ComplexFileList",
+				"joiningColumn": {
+					"columnName": "file_list_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/fileList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/fileList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/fileList",
+					"value": true
+				}
+			]
+		}
+	]
+}

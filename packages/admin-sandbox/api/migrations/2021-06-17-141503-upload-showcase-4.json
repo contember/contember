@@ -1,0 +1,20 @@
+{
+	"formatVersion": 2,
+	"modifications": [
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/s3",
+					"value": {
+						"**": {
+							"upload": true,
+							"read": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

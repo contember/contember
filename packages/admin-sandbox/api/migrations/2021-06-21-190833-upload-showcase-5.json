@@ -1,0 +1,235 @@
+{
+	"formatVersion": 2,
+	"modifications": [
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "single1"
+		},
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "single2"
+		},
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "single3"
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "DiscriminatedAttachmentType",
+			"values": [
+				"image",
+				"video"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "DiscriminatedAttachment",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "discriminated_attachment",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "DiscriminatedAttachment",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": true,
+				"type": "Enum",
+				"columnType": "DiscriminatedAttachmentType"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "DiscriminatedAttachment",
+			"owningSide": {
+				"name": "image",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "ComplexImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "DiscriminatedAttachment",
+			"owningSide": {
+				"name": "video",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "BasicVideo",
+				"joiningColumn": {
+					"columnName": "video_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "singleTrivialImage",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "TrivialImage",
+				"joiningColumn": {
+					"columnName": "single_trivial_image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "singleBasicImage",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "BasicImage",
+				"joiningColumn": {
+					"columnName": "single_basic_image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "singleComplexImage",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "ComplexImage",
+				"joiningColumn": {
+					"columnName": "single_complex_image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "discriminatedAttachment",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "DiscriminatedAttachment",
+				"joiningColumn": {
+					"columnName": "discriminated_attachment_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/DiscriminatedAttachment",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"type": true,
+								"image": true,
+								"video": true
+							},
+							"update": {
+								"id": true,
+								"type": true,
+								"image": true,
+								"video": true
+							},
+							"create": {
+								"id": true,
+								"type": true,
+								"image": true,
+								"video": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/singleTrivialImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/singleBasicImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/singleComplexImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/discriminatedAttachment",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/singleTrivialImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/singleBasicImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/singleComplexImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/discriminatedAttachment",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/singleTrivialImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/singleBasicImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/singleComplexImage",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/discriminatedAttachment",
+					"value": true
+				}
+			]
+		}
+	]
+}

@@ -3,5 +3,10 @@
 	"include": [],
 	"references": [
 		{ "path": "./src" }
-	]
+	],
+	"ts-node": {
+		"moduleTypes": {
+			"api/**/*": "cjs"
+		}
+	}
 }

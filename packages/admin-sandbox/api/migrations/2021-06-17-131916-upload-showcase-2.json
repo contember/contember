@@ -1,0 +1,943 @@
+{
+	"formatVersion": 2,
+	"modifications": [
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "single1"
+		},
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "single2"
+		},
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "single3"
+		},
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "multiple1"
+		},
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "multiple2"
+		},
+		{
+			"modification": "removeField",
+			"entityName": "UploadShowcase",
+			"fieldName": "multiple3"
+		},
+		{
+			"modification": "removeEntity",
+			"entityName": "Image1"
+		},
+		{
+			"modification": "removeEntity",
+			"entityName": "Image2"
+		},
+		{
+			"modification": "removeEntity",
+			"entityName": "Image3"
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "ComplexFileListItemType",
+			"values": [
+				"image",
+				"video"
+			]
+		},
+		{
+			"modification": "createEnum",
+			"enumName": "One",
+			"values": [
+				"One"
+			]
+		},
+		{
+			"modification": "updateColumnDefinition",
+			"entityName": "UploadShowcase",
+			"fieldName": "unique",
+			"definition": {
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "One"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "TrivialImage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "trivial_image",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "BasicImage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "basic_image",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ComplexImage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "complex_image",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "BasicVideo",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "basic_video",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ComplexImageList",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "complex_image_list",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ComplexImageListItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "complex_image_list_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ComplexFileList",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "complex_file_list",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ComplexFileListItem",
+				"primary": "id",
+				"primaryColumn": "id",
+				"tableName": "complex_file_list_item",
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"unique": {}
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "TrivialImage",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "width",
+				"columnName": "width",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "height",
+				"columnName": "height",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "size",
+				"columnName": "size",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicImage",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImage",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImage",
+			"field": {
+				"name": "width",
+				"columnName": "width",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImage",
+			"field": {
+				"name": "height",
+				"columnName": "height",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImage",
+			"field": {
+				"name": "size",
+				"columnName": "size",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImage",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImage",
+			"field": {
+				"name": "fileName",
+				"columnName": "file_name",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImage",
+			"field": {
+				"name": "base64",
+				"columnName": "base64",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImage",
+			"field": {
+				"name": "alt",
+				"columnName": "alt",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicVideo",
+			"field": {
+				"name": "url",
+				"columnName": "url",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicVideo",
+			"field": {
+				"name": "width",
+				"columnName": "width",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicVideo",
+			"field": {
+				"name": "height",
+				"columnName": "height",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicVideo",
+			"field": {
+				"name": "size",
+				"columnName": "size",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "BasicVideo",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexImageListItem",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": false,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexFileListItem",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": false,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ComplexFileListItem",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "ComplexFileListItemType"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ComplexImageListItem",
+			"owningSide": {
+				"name": "list",
+				"inversedBy": "items",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "ComplexImageList",
+				"joiningColumn": {
+					"columnName": "list_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "items",
+				"ownedBy": "list",
+				"type": "OneHasMany",
+				"target": "ComplexImageListItem"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ComplexImageListItem",
+			"owningSide": {
+				"name": "image",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "ComplexImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ComplexFileListItem",
+			"owningSide": {
+				"name": "list",
+				"inversedBy": "items",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "ComplexFileList",
+				"joiningColumn": {
+					"columnName": "list_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "items",
+				"ownedBy": "list",
+				"type": "OneHasMany",
+				"target": "ComplexFileListItem"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ComplexFileListItem",
+			"owningSide": {
+				"name": "image",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "ComplexImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ComplexFileListItem",
+			"owningSide": {
+				"name": "video",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "BasicVideo",
+				"joiningColumn": {
+					"columnName": "video_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "single1",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "TrivialImage",
+				"joiningColumn": {
+					"columnName": "single1_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "single2",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "BasicImage",
+				"joiningColumn": {
+					"columnName": "single2_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "single3",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "ComplexImage",
+				"joiningColumn": {
+					"columnName": "single3_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "imageList",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "ComplexImageList",
+				"joiningColumn": {
+					"columnName": "image_list_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "UploadShowcase",
+			"owningSide": {
+				"name": "fileList",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "ComplexImageList",
+				"joiningColumn": {
+					"columnName": "file_list_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "removeEnum",
+			"enumName": "UploadShowcaseUnique"
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/TrivialImage",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"url": true
+							},
+							"update": {
+								"id": true,
+								"url": true
+							},
+							"create": {
+								"id": true,
+								"url": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true
+							},
+							"update": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true
+							},
+							"create": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexImage",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true,
+								"fileName": true,
+								"base64": true,
+								"alt": true
+							},
+							"update": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true,
+								"fileName": true,
+								"base64": true,
+								"alt": true
+							},
+							"create": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true,
+								"fileName": true,
+								"base64": true,
+								"alt": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicVideo",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true
+							},
+							"update": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true
+							},
+							"create": {
+								"id": true,
+								"url": true,
+								"width": true,
+								"height": true,
+								"size": true,
+								"type": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexImageList",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"items": true
+							},
+							"update": {
+								"id": true,
+								"items": true
+							},
+							"create": {
+								"id": true,
+								"items": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexImageListItem",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"image": true
+							},
+							"update": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"image": true
+							},
+							"create": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"image": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexFileList",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"items": true
+							},
+							"update": {
+								"id": true,
+								"items": true
+							},
+							"create": {
+								"id": true,
+								"items": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexFileListItem",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"read": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"type": true,
+								"image": true,
+								"video": true
+							},
+							"update": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"type": true,
+								"image": true,
+								"video": true
+							},
+							"create": {
+								"id": true,
+								"list": true,
+								"order": true,
+								"type": true,
+								"image": true,
+								"video": true
+							},
+							"delete": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/single1",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/single2",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/single3",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/imageList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/create/fileList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/single1",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/single2",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/single3",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/imageList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/update/fileList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/single1",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/single2",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/single3",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/imageList",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/read/fileList",
+					"value": true
+				}
+			]
+		}
+	]
+}

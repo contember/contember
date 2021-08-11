@@ -1,0 +1,60 @@
+{
+	"formatVersion": 2,
+	"modifications": [
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/UploadShowcase/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/TrivialImage/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicImage/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexImage/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/BasicVideo/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexImageList/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexImageListItem/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexFileList/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ComplexFileListItem/operations/customPrimary",
+					"value": true
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/DiscriminatedAttachment/operations/customPrimary",
+					"value": true
+				}
+			]
+		}
+	]
+}

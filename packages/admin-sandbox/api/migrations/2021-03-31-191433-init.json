@@ -1,0 +1,19 @@
+{
+	"formatVersion": 2,
+	"modifications": [
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin",
+					"value": {
+						"variables": {},
+						"stages": "*",
+						"entities": {}
+					}
+				}
+			]
+		}
+	]
+}

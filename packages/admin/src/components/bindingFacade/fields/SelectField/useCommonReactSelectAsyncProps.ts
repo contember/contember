@@ -11,12 +11,14 @@ export interface UseCommonReactSelectAsyncPropsProps {
 	reactSelectProps: Partial<SelectProps<any, any, any>> | undefined
 	placeholder: string | undefined
 	data: ChoiceFieldData.Data<FieldValue | undefined>
+	isInvalid: boolean
 }
 
 export const useCommonReactSelectAsyncProps = ({
 	reactSelectProps,
 	placeholder,
 	data,
+	isInvalid,
 }: UseCommonReactSelectAsyncPropsProps): AsyncProps<ChoiceFieldData.SingleDatum<FieldValue | undefined>, boolean> => {
 	const fuse = useMemo(
 		() =>
@@ -33,6 +35,16 @@ export const useCommonReactSelectAsyncProps = ({
 				...base,
 				zIndex: 99,
 			}),
+			control: base =>
+				isInvalid
+					? {
+							...base,
+							'borderColor': '#FF312E',
+							'&:hover': {
+								borderColor: '#FF312E',
+							},
+					  }
+					: base,
 		},
 		loadOptions: (inputValue, callback) => {
 			const result = fuse.search(inputValue)

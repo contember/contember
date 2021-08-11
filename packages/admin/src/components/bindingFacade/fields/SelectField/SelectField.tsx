@@ -63,10 +63,15 @@ const SelectFieldInner = memo(
 			reactSelectProps,
 			placeholder,
 			data,
+			isInvalid: (errors?.validation?.length ?? 0) > 0,
 		})
 
 		return (
-			<FormGroup {...formGroupProps} label={environment.applySystemMiddleware('labelMiddleware', formGroupProps.label)}>
+			<FormGroup
+				{...formGroupProps}
+				errors={errors}
+				label={environment.applySystemMiddleware('labelMiddleware', formGroupProps.label)}
+			>
 				<AsyncSelect
 					{...asyncProps}
 					isClearable={allowNull === true}

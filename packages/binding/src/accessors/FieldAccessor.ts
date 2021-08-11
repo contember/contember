@@ -23,6 +23,10 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 		return this.operations.addError(this.stateKey, error)
 	}
 
+	public clearErrors(): void {
+		this.operations.clearErrors(this.stateKey)
+	}
+
 	public addEventListener(
 		type: 'beforeUpdate',
 		listener: FieldAccessor.FieldEventListenerMap<Value>['beforeUpdate'],

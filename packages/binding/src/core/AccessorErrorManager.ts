@@ -30,6 +30,17 @@ export class AccessorErrorManager {
 		})
 	}
 
+	public clearErrorsByState(state: StateNode): void {
+		return this.eventManager.syncOperation(() => {
+			if (!this.errorsByState.has(state)) {
+				return
+			}
+			this.errorsByState.delete(state)
+			state.errors = undefined
+			this.eventManager.registerJustUpdated(state, EventManager.NO_CHANGES_DIFFERENCE)
+		})
+	}
+
 	public replaceErrors(data: MutationDataResponse) {
 		this.eventManager.syncOperation(() => {
 			this.clearErrors()

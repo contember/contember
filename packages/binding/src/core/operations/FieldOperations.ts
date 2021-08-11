@@ -23,6 +23,10 @@ export class FieldOperations {
 		return this.accessorErrorManager.addError(fieldState, { type: 'validation', error })
 	}
 
+	public clearErrors(fieldState: FieldState): void {
+		return this.accessorErrorManager.clearErrorsByState(fieldState)
+	}
+
 	public addEventListener(state: FieldState, type: FieldAccessor.FieldEventType, listener: Function): () => void {
 		let listeners = state.eventListeners
 		if (!listeners) {

@@ -5,9 +5,10 @@ import {
 	EntitySubTreeAdditionalCreationProps,
 	EntitySubTreeAdditionalProps,
 	PersistSuccessOptions,
+	QueryLanguage,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
-import { ComponentType, memo, ReactNode } from 'react'
+import { ComponentType, memo, ReactNode, useMemo } from 'react'
 import type RequestState from '../../state/request'
 import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
 import type { PageProvider } from './PageProvider'
@@ -28,19 +29,29 @@ export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'i
 	}
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreatePageProps> = memo(
-	({ pageName, children, rendererProps, redirectOnSuccess, ...entityProps }: CreatePageProps) => (
-		<DataBindingProvider stateComponent={FeedbackRenderer}>
-			<EntitySubTree
-				{...entityProps}
-				entityComponent={MutableSingleEntityRenderer}
-				entityProps={rendererProps}
-				onPersistSuccess={useEntityRedirectOnPersistSuccess(redirectOnSuccess)}
-				isCreating
-			>
-				{children}
-			</EntitySubTree>
-		</DataBindingProvider>
-	),
+	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreatePageProps) => {
+		const redirectOnSuccessCb = useEntityRedirectOnPersistSuccess(redirectOnSuccess)
+		return (
+			<DataBindingProvider stateComponent={FeedbackRenderer}>
+				<EntitySubTree
+					{...entityProps}
+					entityComponent={MutableSingleEntityRenderer}
+					entityProps={rendererProps}
+					onPersistSuccess={useMemo(() => {
+						if (!redirectOnSuccessCb || !onPersistSuccess) {
+							return redirectOnSuccessCb ?? onPersistSuccess
+						}
+						const listeners = QueryLanguage.desugarEventListener(onPersistSuccess)
+						listeners.add(redirectOnSuccessCb)
+						return listeners
+					}, [onPersistSuccess, redirectOnSuccessCb])}
+					isCreating
+				>
+					{children}
+				</EntitySubTree>
+			</DataBindingProvider>
+		)
+	},
 )
 
 CreatePage.displayName = 'CreatePage'

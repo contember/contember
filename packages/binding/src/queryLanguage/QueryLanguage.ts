@@ -103,9 +103,9 @@ export class QueryLanguage {
 		return setOnCreate
 	}
 
-	private static desugarEventListener<F extends Function>(listener: F | Set<F>): Set<F>
-	private static desugarEventListener<F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined
-	private static desugarEventListener<F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined {
+	public static desugarEventListener<F extends Function>(listener: F | Set<F>): Set<F>
+	public static desugarEventListener<F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined
+	public static desugarEventListener<F extends Function>(listener: F | Set<F> | undefined): Set<F> | undefined {
 		if (typeof listener === 'function') {
 			return new Set([listener])
 		}

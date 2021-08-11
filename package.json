@@ -38,7 +38,7 @@
     "lint-staged": "^11.0.0",
     "oao": "^2.0.2",
     "prettier": "^2.3.2",
-    "ts-node": "^10.0.0",
+    "ts-node": "^10.2.0",
     "typescript": "^4.3.5"
   },
   "workspaces": [

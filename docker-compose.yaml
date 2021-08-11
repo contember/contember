@@ -88,6 +88,15 @@ services:
     depends_on:
       - postgres
 
+  contember-cli:
+    image: contember/cli:canary-22b4fb522631340e5b3c9b03982d23
+    volumes:
+      - ./:/src:cached
+    working_dir: /src/packages/admin-sandbox
+    command: 'version'
+    environment:
+      CONTEMBER_API_URL: "http://api:4000/"
+      CONTEMBER_API_TOKEN: "0000000000000000000000000000000000000000"
 
   s3:
     image: minio/minio

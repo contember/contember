@@ -11,6 +11,10 @@ const LOGIN_MUTATION = `
 			}
 			result {
 				token
+				person {
+					id
+					email
+				}
 			}
 		}
 	}
@@ -23,6 +27,10 @@ interface LoginResponseOk {
 		ok: true
 		result: {
 			token: string
+			person: {
+				id: string
+				email: string
+			}
 		}
 	}
 }

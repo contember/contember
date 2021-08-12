@@ -3,7 +3,7 @@ version: '3'
 services:
   sandbox_vite:
     image: node:14-alpine
-    command: 'npx vite src --config vite.config.js --debug --port 4002 --host 0.0.0.0'
+    command: '/src/node_modules/.bin/vite src --config vite.config.js --debug --port 4002 --host 0.0.0.0'
 
     environment:
       NODE_ENV: 'development'
@@ -16,7 +16,7 @@ services:
 
   admin_server:
     image: node:14-alpine
-    command: 'npx nodemon dist/run-admin.js'
+    command: '/src/node_modules/.bin/nodemon dist/run-admin.js'
 
     working_dir: /src/packages/admin-server
     volumes:
@@ -44,7 +44,7 @@ services:
 
   admin_server_esbuild:
     image: node:14-alpine
-    command: 'npx esbuild src/run-admin.ts --bundle --watch --sourcemap --platform=node --outdir=dist'
+    command: '/src/node_modules/.bin/esbuild src/run-admin.ts --bundle --watch --sourcemap --platform=node --outdir=dist'
 
     working_dir: /src/packages/admin-server
     volumes:
@@ -53,7 +53,7 @@ services:
 
   admin_server_vite:
     image: node:14-alpine
-    command: 'npx vite build public --config vite.config.js --watch'
+    command: '/src/node_modules/.bin/vite build public --config vite.config.js --watch'
 
     working_dir: /src/packages/admin-server
     volumes:

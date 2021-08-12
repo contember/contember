@@ -43,7 +43,7 @@ export const Button = memo(
 		}
 
 		if (props.Component === 'button' || !props.Component) {
-			;(rest as ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
+			(rest as ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
 		}
 		const prefix = useClassNamePrefix()
 

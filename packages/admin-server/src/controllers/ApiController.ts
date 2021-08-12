@@ -47,7 +47,7 @@ export class ApiController extends BaseController<ApiParams> {
 				let token: string | undefined
 
 				try {
-					;[jsonBody, token] = this.extractToken(JSON.parse(textBody), tokenPath.split('.'))
+					[jsonBody, token] = this.extractToken(JSON.parse(textBody), tokenPath.split('.'))
 				} catch (e) {
 					this.proxyHead(res, innerRes)
 					res.end(rawBody)

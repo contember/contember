@@ -437,7 +437,7 @@ export class EventManager {
 					switch (state.type) {
 						case 'field':
 							for (const listener of listeners) {
-								;(listener as FieldAccessor.BeforeUpdateListener)(state.getAccessor())
+								(listener as FieldAccessor.BeforeUpdateListener)(state.getAccessor())
 							}
 							break
 						case 'entityRealm':

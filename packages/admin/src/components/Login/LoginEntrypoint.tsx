@@ -29,7 +29,7 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 
 	} else if (projects.length === 1) {
 		window.location.href = props.formatProjectUrl(projects[0])
-		return <></>
+		return null
 
 	} else {
 		return <ProjectList projects={projects} formatProjectUrl={props.formatProjectUrl}/>

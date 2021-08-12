@@ -19,7 +19,9 @@ export const ProjectList = (props: ProjectListProps) => {
 						distinction="seamless"
 						flow="block"
 						justification="justifyStart"
-					>{project.name}</Button>
+					>
+						{project.name}
+					</Button>
 				))}
 			</ButtonList>
 		</MiscPageLayout>

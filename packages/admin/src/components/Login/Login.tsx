@@ -41,7 +41,7 @@ export const Login = ({ onLogin }: LoginProps) => {
 					setErrors([])
 					onLogin(
 						loginState.extensions.contemberAdminServer.projects,
-						loginState.data.signIn.result.person
+						loginState.data.signIn.result.person,
 					)
 				}
 			}

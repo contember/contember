@@ -22,4 +22,4 @@ export const editorTemplateAnalyzer = new ChildrenAnalyzer<
 	/*BoxedTextFieldProps |*/ BoxedContentOutletProps | BoxedCatchAllJSX,
 	never,
 	Environment
->([/*textFieldLeaf,*/ outletLeaf, catchAllJSXLeaf])
+>([/*textFieldLeaf, */outletLeaf, catchAllJSXLeaf])

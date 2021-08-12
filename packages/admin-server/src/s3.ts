@@ -13,12 +13,22 @@ export class S3Manager {
 	constructor(private s3: S3Client, private s3Bucket: string, private s3Prefix: string) {}
 
 	async getObject(projectSlug: string, path: string): Promise<GetObjectCommandOutput> {
-		return this.s3.send(
-			new GetObjectCommand({
-				Bucket: this.s3Bucket,
-				Key: this.formatKey(projectSlug, path),
-			}),
-		)
+		try {
+			return this.s3.send(
+				new GetObjectCommand({
+					Bucket: this.s3Bucket,
+					Key: this.formatKey(projectSlug, path),
+				}),
+			)
+
+		} catch (e) {
+			return this.s3.send(
+				new GetObjectCommand({
+					Bucket: this.s3Bucket,
+					Key: this.formatKey(projectSlug, ''),
+				}),
+			)
+		}
 	}
 
 	async putObject(projectSlug: string, path: string, body: Buffer): Promise<PutObjectCommandOutput> {

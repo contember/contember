@@ -14,7 +14,7 @@ export class LoginController extends BaseController {
 		private loginToken: string,
 		private publicDir: string,
 		private tenant: TenantApi,
-		private s3: S3Manager
+		private s3: S3Manager,
 	) {
 		super()
 	}

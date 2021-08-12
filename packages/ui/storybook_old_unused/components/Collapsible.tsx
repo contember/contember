@@ -7,12 +7,12 @@ storiesOf('Collapsible', module).add('simple', () => {
 	const transition: CollapsibleProps['transition'] = radios(
 		'Transition',
 		{
-			Default: 'default',
+			'Default': 'default',
 			'Top insert': 'topInsert',
 			'Bottom insert': 'bottomInsert',
 			'Left insert': 'leftInsert',
 			'Right insert': 'rightInsert',
-			Fade: 'fade',
+			'Fade': 'fade',
 		},
 		'default',
 	)

@@ -26,7 +26,7 @@ export class ApiController extends BaseController<ApiParams> {
 			path: apiEndpointUrl.pathname + params.path,
 			method: req.method,
 			headers: {
-				Authorization: token && tokenPath === null ? `Bearer ${token}` : req.headers['authorization'],
+				'Authorization': token && tokenPath === null ? `Bearer ${token}` : req.headers['authorization'],
 				'Content-Type': req.headers['content-type'] ?? '',
 			},
 		}

@@ -9,6 +9,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	ReactDOM.render(
 		<LoginEntrypoint {...config} formatProjectUrl={formatProjectUrl} />,
-		document.getElementById('root')
+		document.getElementById('root'),
 	)
 })

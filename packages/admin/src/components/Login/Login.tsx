@@ -9,7 +9,7 @@ export interface LoginProps {
 	onLogin: (projects: Project[], person: { id: string, email: string }) => void
 }
 
-export const Login = (props: LoginProps) => {
+export const Login = ({ onLogin }: LoginProps) => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [errors, setErrors] = useState<FieldError[]>([])
@@ -39,14 +39,14 @@ export const Login = (props: LoginProps) => {
 
 				} else {
 					setErrors([])
-					props.onLogin(
+					onLogin(
 						loginState.extensions.contemberAdminServer.projects,
 						loginState.data.signIn.result.person
 					)
 				}
 			}
 		},
-		[loginState],
+		[loginState, onLogin],
 	)
 
 	return (

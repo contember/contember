@@ -45,7 +45,7 @@ export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken
 			}
 			return Promise.reject()
 		},
-		[client, query, apiToken],
+		[client, query, apiToken, headers],
 	)
 	return [cb, state]
 }

@@ -31,17 +31,16 @@
 		&-title
 			display: flex
 			align-items: center
+			line-height: inherit // TODO: Requied for button to inherit line-height
 			width: 100%
 			transition: background-color ease-in-out .5s
-
-	&-titleContent
-		flex-grow: 1
 
 	&-group
 		&-title
 			color: $cui-menu-group-color
 			font-size: $cui-menu-group-title-font-size
-			margin: (2 * $cui-menu-vertical-padding) 0 $cui-menu-vertical-padding
+			letter-spacing: 0.125em
+			margin: (4 * $cui-menu-vertical-padding) 0 $cui-menu-vertical-padding
 			padding: 0 $cui-menu-horizontal-padding
 			font-weight: $fw-extraBold
 			text-transform: uppercase
@@ -63,12 +62,7 @@
 			font-family: inherit
 
 		&-list
-			padding: ($cui-menu-vertical-padding * 0.5) 0 $cui-menu-vertical-padding * 2
-
-		&.is-collapsed &,
-		&.is-expanded &
-			&-title
-				font-weight: $fw-bold
+			padding-bottom: ($cui-menu-vertical-padding * 0.5)
 
 	&.view-showCaret &-subgroup
 
@@ -80,17 +74,17 @@
 				margin-top: -0.2em
 				width: .5em
 				height: .5em
-				margin-left: 1em
+				margin-left: .5em
 				border-bottom: rem(2px) solid
 				border-right: rem(2px) solid
 				opacity: .5
 				transition: transform var(--cui-menu-caret-transition-duration)
 				transform-origin: 70% 70%
-				transform: rotate(#{45deg + 180deg})
+				transform: rotate(45deg)
 
 		&.is-collapsed .#{$cui-conf-globalPrefix}menu-subgroup
 			&-title::after
-				transform: rotate(45deg)
+				transform: rotate(-45deg)
 
 	&-action
 		font-size: $cui-menu-action-title-font-size
@@ -125,34 +119,37 @@
 	button#{&}
 		&-subgroup-title
 			cursor: pointer
-
 			&:hover
-				color: $cui-menu-subgroup-active-color
+				color: $cui-menu-subgroup-hover-color
 
 		&-subgroup,
 		&-action,
 		&-tooDeep
-			&-title:focus
-				@extend %implementsCustomFocusEffects
-				background: $cui-menu-action-focus-color
+			&-title
+				&:focus
+					@extend %implementsCustomFocusEffects
+					background: $cui-menu-action-focus-color
+				&:hover
+					color: $cui-menu-action-active-color
 
 	&-subgroup,
 	&-action,
 	&-tooDeep
 		&.is-active > &-title
-			&,
+			color: $cui-menu-action-active-color
+			font-weight: $fw-medium
 			&:hover
-				color: $cui-menu-action-active-color
+				color: $cui-menu-action-hover-color
 
 	&-subgroup
 		&.is-active > &-title
-			&,
+			color: $cui-menu-action-active-color
 			&:hover
-				color: $cui-menu-action-active-color
+				color: $cui-menu-action-hover-color
 
 	&-action,
 	&-tooDeep
 		&.is-active > &-title
-			&,
+			color: $cui-menu-action-active-color
 			&:hover
-				color: $cui-menu-action-active-color
+				color: $cui-menu-action-hover-color

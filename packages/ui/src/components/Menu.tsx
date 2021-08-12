@@ -16,7 +16,7 @@ class Menu extends PureComponent<Menu.Props> {
 			<DepthContext.Provider value={0}>
 				<GlobalClassNamePrefixContext.Consumer>
 					{prefix => (
-						<section className={cn(`${prefix}menu`, toViewClass('showCaret', this.props.showCaret))}>
+						<section className={cn(`${prefix}menu`, toViewClass('showCaret', this.props.showCaret ?? true))}>
 							<ul className={`${prefix}menu-list`}>{this.props.children}</ul>
 						</section>
 					)}

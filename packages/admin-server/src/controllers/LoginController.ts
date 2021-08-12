@@ -30,7 +30,7 @@ export class LoginController extends BaseController {
 
 			if (path === 'index.html') {
 				const projects = await this.getProjects(this.readAuthCookie(req))
-				const configJson = JSON.stringify({ apiBaseUrl: this.apiEndpoint, loginToken: this.loginToken, projects })
+				const configJson = JSON.stringify({ apiBaseUrl: '/_api', loginToken: this.loginToken, projects })
 				res.end(content.toString('utf8').replace(CONTEMBER_CONFIG_PLACEHOLDER, configJson))
 
 			} else {

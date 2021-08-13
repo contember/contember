@@ -6,7 +6,7 @@ import {
 	PutObjectCommandOutput,
 	S3Client,
 } from '@aws-sdk/client-s3'
-import * as Buffer from 'buffer'
+import type * as Buffer from 'buffer'
 import * as mime from 'mime'
 
 export class S3Manager {
@@ -46,6 +46,6 @@ export class S3Manager {
 	}
 
 	private formatKey(projectSlug: string, path: string) {
-		return this.s3Prefix + projectSlug + '/' + (path === '' ? 'index.html' : path)
+		return this.s3Prefix + projectSlug + '/' + path
 	}
 }

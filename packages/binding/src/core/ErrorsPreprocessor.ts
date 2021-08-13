@@ -80,7 +80,7 @@ class ErrorsPreprocessor {
 				const pathNode = error.path[i]
 
 				if (currentNode.nodeType === 'leaf') {
-					;(currentNode as any as ErrorsPreprocessor.ErrorINode).nodeType = 'iNode'
+					(currentNode as any as ErrorsPreprocessor.ErrorINode).nodeType = 'iNode'
 					;(currentNode as any as ErrorsPreprocessor.ErrorINode).children = new Map()
 				}
 

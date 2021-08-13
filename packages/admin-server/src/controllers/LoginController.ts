@@ -3,11 +3,17 @@ import { readFile } from 'fs/promises'
 import { getType } from 'mime'
 import { BaseController } from './BaseController'
 import { URL } from 'url'
+import type { ProjectListProvider } from '../project'
 
 const CONTEMBER_CONFIG_PLACEHOLDER = '{configuration}'
 
 export class LoginController extends BaseController {
-	constructor(private apiEndpoint: string, private loginToken: string, private publicDir: string) {
+	constructor(
+		private apiEndpoint: string,
+		private loginToken: string,
+		private publicDir: string,
+		private projectListProvider: ProjectListProvider,
+	) {
 		super()
 	}
 
@@ -21,11 +27,14 @@ export class LoginController extends BaseController {
 			res.setHeader('Content-Type', contentType)
 
 			if (path === 'index.html') {
-				const configJson = JSON.stringify({ apiBaseUrl: this.apiEndpoint, loginToken: this.loginToken })
+				const projects = await this.projectListProvider.get(this.readAuthCookie(req))
+				const configJson = JSON.stringify({ apiBaseUrl: '/_api', loginToken: this.loginToken, projects })
 				res.end(content.toString('utf8').replace(CONTEMBER_CONFIG_PLACEHOLDER, configJson))
+
 			} else {
 				res.end(content)
 			}
+
 		} catch (e) {
 			res.writeHead(404)
 			res.end()

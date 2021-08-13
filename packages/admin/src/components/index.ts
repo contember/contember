@@ -1,5 +1,6 @@
 export * from './bindingFacade'
 export * from './Admin'
+export * from './Login'
 export { default as Dimensions } from './Dimensions'
 export * from './Link'
 export { default as LogoutLink } from './LogoutLink'

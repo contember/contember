@@ -7,16 +7,10 @@ interface RequestStateBase<T> {
 
 export interface RequestStateOk<T> extends RequestStateBase<T> {
 	data: T
+	extensions?: any
 	loading: false
 	finished: true
 	error: false
-}
-
-export interface RequestStateError<T> extends RequestStateBase<T> {
-	data?: undefined
-	loading: false
-	finished: true
-	error: true
 }
 
 export interface RequestStateError<T> extends RequestStateBase<T> {

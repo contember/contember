@@ -2,15 +2,17 @@ import { request as httpRequest, IncomingMessage, OutgoingHttpHeaders, ServerRes
 import { request as httpsRequest, RequestOptions } from 'https'
 import { URL } from 'url'
 import { BaseController } from './BaseController'
-import type { S3Manager } from '../s3'
-import type { TenantApi } from '../tenant'
+import type { ProjectListProvider } from '../project'
 
 interface ApiParams {
 	path: string
 }
 
 export class ApiController extends BaseController<ApiParams> {
-	constructor(private apiEndpoint: string, private tenant: TenantApi, private s3: S3Manager) {
+	constructor(
+		private apiEndpoint: string,
+		private projectListProvider: ProjectListProvider,
+	) {
 		super()
 	}
 
@@ -26,7 +28,7 @@ export class ApiController extends BaseController<ApiParams> {
 			path: apiEndpointUrl.pathname + params.path,
 			method: req.method,
 			headers: {
-				Authorization: token && tokenPath === null ? `Bearer ${token}` : req.headers['authorization'],
+				'Authorization': token && tokenPath === null ? `Bearer ${token}` : req.headers['authorization'],
 				'Content-Type': req.headers['content-type'] ?? '',
 			},
 		}
@@ -47,7 +49,7 @@ export class ApiController extends BaseController<ApiParams> {
 				let token: string | undefined
 
 				try {
-					;[jsonBody, token] = this.extractToken(JSON.parse(textBody), tokenPath.split('.'))
+					[jsonBody, token] = this.extractToken(JSON.parse(textBody), tokenPath.split('.'))
 				} catch (e) {
 					this.proxyHead(res, innerRes)
 					res.end(rawBody)
@@ -60,12 +62,8 @@ export class ApiController extends BaseController<ApiParams> {
 					return
 				}
 
-				const accessibleProjects = await this.tenant.listAccessibleProjects(token)
-				const projectsWithAdmin = new Set(await this.s3.listProjectSlugs())
-				const projects = accessibleProjects.filter(it => projectsWithAdmin.has(it.slug))
-
 				jsonBody['extensions'] ??= {}
-				jsonBody['extensions']['contemberAdminServer'] = { projects }
+				jsonBody['extensions']['contemberAdminServer'] = { projects: this.projectListProvider.get(token) }
 
 				this.writeAuthCookie(res, token)
 				this.proxyHead(res, innerRes)

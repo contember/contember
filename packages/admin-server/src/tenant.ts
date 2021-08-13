@@ -68,7 +68,7 @@ export class TenantApi {
 		})
 
 		if (!response.ok) {
-			return []
+			return null
 		}
 
 		const payload = ProjectListResponseType(await response.json())
@@ -80,7 +80,7 @@ export class TenantApi {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
+				'Authorization': `Bearer ${token}`,
 			},
 			body: JSON.stringify({ query, variables }),
 		})

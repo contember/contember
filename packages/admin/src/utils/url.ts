@@ -39,7 +39,7 @@ export function matchesPath(path: string, url: string): StringObject | null {
 	let keys: pathToRegexp.Key[] = []
 	let regexp: RegExp
 	if (compiledRoutesCache.has(path)) {
-		;[keys, regexp] = compiledRoutesCache.get(path) as CacheValue
+		[keys, regexp] = compiledRoutesCache.get(path) as CacheValue
 	} else {
 		regexp = pathToRegexp(path, keys)
 		compiledRoutesCache.set(path, [keys, regexp])

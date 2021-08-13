@@ -410,7 +410,7 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 					return onKeyDown(event)
 				}
 			} else {
-				;[cellElement, cellPath] = closestBlockEntry
+				[cellElement, cellPath] = closestBlockEntry
 			}
 			if (cellPath.length < 3) {
 				return onKeyDown(event)

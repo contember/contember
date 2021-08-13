@@ -101,7 +101,7 @@ export const fileUploadReducer = <Result = unknown, Metadata = undefined>(
 				let rawError: unknown
 
 				if (Array.isArray(errorSpec)) {
-					;[fileOrId, rawError] = errorSpec
+					[fileOrId, rawError] = errorSpec
 				} else {
 					fileOrId = errorSpec
 					rawError = undefined

@@ -1,12 +1,12 @@
 import { Environment, EnvironmentContext } from '@contember/binding'
 import { ContemberClient } from '@contember/react-client'
 import { ContainerSpinner, DialogProvider } from '@contember/ui'
-import { ComponentType, lazy, LazyExoticComponent, memo, ReactElement, Suspense, useEffect, useState } from 'react'
+import { ComponentType, lazy, LazyExoticComponent, memo, Suspense, useEffect, useState } from 'react'
 import { createAction } from 'redux-actions'
 import { populateRequest } from '../actions/request'
 import { assertValidClientConfig, ClientConfig } from '../bootstrap'
 import { Router } from '../containers/router'
-import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
+import { I18nProvider } from '../i18n'
 import { PROJECT_CONFIGS_REPLACE } from '../reducer/projectsConfigs'
 import { emptyState } from '../state'
 import type { ProjectConfig } from '../state/projectsConfigs'
@@ -14,10 +14,13 @@ import type { PageRequest } from '../state/request'
 
 import { configureStore, Store } from '../store'
 import { ReduxStoreProvider } from '../temporaryHacks'
-import { Login } from './Login'
+import { Login, Project } from './Login'
 import { NavigationIsActiveProvider, NavigationProvider } from './NavigationProvider'
 import ProjectsList from './ProjectsList'
 import { Toaster } from './ui'
+import type { AuthIdentity } from '../state/auth'
+import { SET_IDENTITY } from '../reducer/auth'
+import { useRedirect } from './pageRouting'
 
 export interface AdminProps {
 	configs: ProjectConfig[]
@@ -35,7 +38,9 @@ export const Admin = memo((props: AdminProps) => {
 
 		return store
 	})
+
 	const [adminWideEnvironment] = useState(() => Environment.create(props.clientConfig.envVariables))
+	const redirect = useRedirect()
 
 	useEffect(() => {
 		const onPopState = (e: PopStateEvent) => {
@@ -57,7 +62,22 @@ export const Admin = memo((props: AdminProps) => {
 						<DialogProvider>
 							<Router
 								routes={{
-									login: () => <Login />,
+									login: () => <Login onLogin={((projects, person) => {
+										store.dispatch(
+											createAction<AuthIdentity>(SET_IDENTITY, () => ({
+												token: '__DUMMY__', // TODO: ???
+												email: person.email,
+												personId: person.id,
+												projects: projects.map(
+													(project: Project): any => ({
+														slug: project.slug,
+														roles: [], // TODO: ???
+													}),
+												),
+											}))(),
+										)
+										redirect(() => ({ name: 'projects_list' }))
+									})} />,
 									projects_list: () => <ProjectsList configs={props.configs} />,
 									project_page: (() => {
 										const normalizedConfigs: {

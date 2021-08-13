@@ -1,9 +1,14 @@
-import { runAdmin } from '@contember/admin'
+import * as ReactDOM from 'react-dom'
+import { LoginEntrypoint, Project } from '@contember/admin'
 import './index.sass'
 
 window.addEventListener('DOMContentLoaded', () => {
-	const el = document.querySelector('#contember-config')
+	const el = document.getElementById('contember-config')
 	const config = JSON.parse(el?.innerHTML ?? '{}')
+	const formatProjectUrl = (project: Project) => `/${project.slug}/`
 
-	runAdmin({}, { config })
+	ReactDOM.render(
+		<LoginEntrypoint {...config} formatProjectUrl={formatProjectUrl} />,
+		document.getElementById('root'),
+	)
 })

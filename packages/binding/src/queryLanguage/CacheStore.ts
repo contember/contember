@@ -33,7 +33,7 @@ export class CacheStore {
 		if (caches === undefined) {
 			this.cacheStore.set(environment, (caches = this.createEntryPointCache()))
 		}
-		;(caches[entry] as LRUCache<string, Parser.ParserResult[Entry]>).set(expression, value)
+		(caches[entry] as LRUCache<string, Parser.ParserResult[Entry]>).set(expression, value)
 	}
 
 	private createEntryPointCache(): CacheByEntryPoint {

@@ -12,6 +12,10 @@ export default defineConfig(async ({ command, mode }) => ({
 		sourcemap: true,
 		target: 'es2020',
 	},
+	esbuild: {
+		jsxInject: `import * as React from 'react'`,
+		target: 'esnext',
+	},
 	plugins: [reactRefresh()],
 	resolve: {
 		alias: [

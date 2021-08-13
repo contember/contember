@@ -9,6 +9,7 @@ import { ApiController } from './controllers/ApiController'
 import * as http from 'http'
 import { URL } from 'url'
 import { S3Manager } from './s3'
+import { ProjectListProvider } from './project'
 
 export default new Builder({})
 	.addService('env', env)
@@ -33,8 +34,12 @@ export default new Builder({})
 		return new S3Manager(s3Client, env.CONTEMBER_S3_BUCKET, env.CONTEMBER_S3_PREFIX)
 	})
 
-	.addService('loginController', ({ env }) => {
-		return new LoginController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_LOGIN_TOKEN, env.CONTEMBER_PUBLIC_DIR)
+	.addService('projectListProvider', ({ tenant, s3 }) => {
+		return new ProjectListProvider(tenant, s3)
+	})
+
+	.addService('loginController', ({ env, projectListProvider }) => {
+		return new LoginController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_LOGIN_TOKEN, env.CONTEMBER_PUBLIC_DIR, projectListProvider)
 	})
 
 	.addService('deployController', ({ tenant, s3 }) => {
@@ -45,8 +50,8 @@ export default new Builder({})
 		return new ProjectController(tenant, s3)
 	})
 
-	.addService('apiController', ({ env, tenant, s3 }) => {
-		return new ApiController(env.CONTEMBER_API_ENDPOINT, tenant, s3)
+	.addService('apiController', ({ env, projectListProvider }) => {
+		return new ApiController(env.CONTEMBER_API_ENDPOINT, projectListProvider)
 	})
 
 	.addService('httpServer', ({ loginController, deployController, projectController, apiController }) => {

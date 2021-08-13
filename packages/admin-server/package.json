@@ -21,7 +21,6 @@
 		"@types/cookie": "^0.4.1",
 		"@types/mime": "^2.0.3",
 		"@types/node": "^16.3.3",
-		"@types/node-fetch": "^2.5.11",
-		"esbuild": "^0.12.15"
+		"@types/node-fetch": "^2.5.11"
 	}
 }

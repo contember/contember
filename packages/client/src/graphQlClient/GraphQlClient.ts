@@ -2,6 +2,7 @@ export interface GraphQlClientRequestOptions {
 	variables?: GraphQlClientVariables
 	apiTokenOverride?: string
 	signal?: AbortSignal
+	headers?: Record<string, string>
 }
 
 export interface GraphQlClientVariables {
@@ -17,31 +18,29 @@ export class GraphQlClient {
 
 	async sendRequest<T = any>(
 		query: string,
-		{ apiTokenOverride, signal, variables }: GraphQlClientRequestOptions = {},
+		{ apiTokenOverride, signal, variables, headers }: GraphQlClientRequestOptions = {},
 	): Promise<T> {
-		const headers: {
-			[header: string]: string
-		} = {
-			'Content-Type': 'application/json',
-		}
-
+		const resolvedHeaders: Record<string, string> = { 'Content-Type': 'application/json', ...headers }
 		const resolvedToken = apiTokenOverride ?? this.apiToken
+
 		if (resolvedToken !== undefined) {
-			headers['Authorization'] = `Bearer ${resolvedToken}`
+			resolvedHeaders['Authorization'] = `Bearer ${resolvedToken}`
 		}
 
 		console.debug(query)
 
 		const response = await fetch(this.apiUrl, {
 			method: 'POST',
-			headers,
+			headers: resolvedHeaders,
 			signal,
 			body: JSON.stringify({ query, variables }),
 		})
+
 		if (response.ok) {
 			// It may still have errors (e.g. unfilled fields) but as far as the request goes, it is ok.
 			return await response.json()
 		}
+
 		const failedRequest: GraphQlClientFailedRequestMetadata = {
 			status: response.status,
 			statusText: response.statusText,

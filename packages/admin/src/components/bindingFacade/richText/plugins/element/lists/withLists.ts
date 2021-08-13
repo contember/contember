@@ -375,7 +375,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 
 			if (event.key === 'Tab') {
 				if (e.isDefaultElement(closestBlockElement)) {
-					;[closestBlockElement, closestBlockPath] = Editor.parent(e, closestBlockPath)
+					[closestBlockElement, closestBlockPath] = Editor.parent(e, closestBlockPath)
 				}
 				if (!e.isListItem(closestBlockElement)) {
 					return onKeyDown(event)

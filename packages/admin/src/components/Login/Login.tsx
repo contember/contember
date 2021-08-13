@@ -1,85 +1,65 @@
 import { getTenantErrorMessage } from '@contember/client'
-import { useLoginRequest } from '@contember/react-client'
-import { Button, ErrorList, FormGroup, TextInput } from '@contember/ui'
-import { ChangeEvent, FormEvent, memo, useCallback, useEffect, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { createAction } from 'redux-actions'
-import { SET_IDENTITY } from '../../reducer/auth'
-import type { AuthIdentity, Project } from '../../state/auth'
+import { Button, ErrorList, FieldError, FormGroup, TextInput } from '@contember/ui'
+import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react'
 import { MiscPageLayout } from '../MiscPageLayout'
-import { useRedirect } from '../pageRouting'
+import type { Project } from './LoginEntrypoint'
+import { useLogin } from '../../tenant'
 
-export const Login = memo(() => {
-	const [requestState, login] = useLoginRequest()
+export interface LoginProps {
+	onLogin: (projects: Project[], person: { id: string, email: string }) => void
+}
+
+export const Login = ({ onLogin }: LoginProps) => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const isLoading = requestState.isLoading
+	const [errors, setErrors] = useState<FieldError[]>([])
+	const [triggerLogin, loginState] = useLogin()
+
+	const onEmailChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value), [setEmail])
+	const onPasswordChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value), [setPassword])
 
 	const onSubmit = useCallback(
 		(e: FormEvent<HTMLFormElement>) => {
 			e.preventDefault()
-			login(email, password)
+			triggerLogin({ email, password, expiration: 14 * 24 * 3600 })
 		},
-		[email, login, password],
+		[triggerLogin, email, password],
 	)
-	const onEmailChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value), [])
-	const onPasswordChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value), [])
 
-	const errorMessages = useMemo(() => {
-		let errors: string[] = []
+	useEffect(
+		() => {
+			if (loginState.finished) {
+				if (loginState.error) {
+					setErrors([{ message: 'Something went wrong. Please try again.' }])
 
-		if (requestState.readyState === 'networkError') {
-			errors.push('Something went wrong. Please try again.')
-		} else if (requestState.readyState === 'networkSuccess') {
-			errors = errors.concat(
-				requestState.data.data.signIn.errors.map(
-					(error: { endUserMessage: string | null; code: string }) =>
-						error.endUserMessage || getTenantErrorMessage(error.code),
-				),
-			)
-		}
-		return errors.map(message => ({ message }))
-	}, [requestState])
+				} else if (!loginState.data.signIn.ok) {
+					setErrors(loginState.data.signIn.errors.map(error => ({
+						message: error.endUserMessage ?? getTenantErrorMessage(error.code),
+					})))
 
-	const dispatch = useDispatch()
-	const redirect = useRedirect()
-	useEffect(() => {
-		if (requestState.readyState === 'networkSuccess') {
-			const signIn = requestState.data.data.signIn
-			const { ok, result } = signIn
-
-			if (!ok || !result) {
-				return
+				} else {
+					setErrors([])
+					onLogin(
+						loginState.extensions.contemberAdminServer.projects,
+						loginState.data.signIn.result.person,
+					)
+				}
 			}
-
-			dispatch(
-				createAction<AuthIdentity>(SET_IDENTITY, () => ({
-					token: result.token,
-					email: result.person.email,
-					personId: result.person.id,
-					projects: result.person.identity.projects.map(
-						(it: any): Project => ({
-							slug: it.project.slug,
-							roles: it.memberships.map((membership: { role: string }) => membership.role),
-						}),
-					),
-				}))(),
-			)
-			redirect(() => ({ name: 'projects_list' }))
-		}
-	}, [dispatch, redirect, requestState])
+		},
+		[loginState, onLogin],
+	)
 
 	return (
 		<MiscPageLayout heading="Contember Admin">
 			<form onSubmit={onSubmit}>
-				<ErrorList size="large" errors={errorMessages} />
+				<ErrorList size="large" errors={errors}/>
 				<FormGroup label="Email">
 					<TextInput
 						value={email}
 						autoComplete="username"
 						type="email"
 						autoFocus
-						disabled={isLoading}
+						disabled={loginState.loading}
 						onChange={onEmailChange}
 					/>
 				</FormGroup>
@@ -88,17 +68,16 @@ export const Login = memo(() => {
 						type="password"
 						autoComplete="current-password"
 						value={password}
-						disabled={isLoading}
+						disabled={loginState.loading}
 						onChange={onPasswordChange}
 					/>
 				</FormGroup>
 				<FormGroup label={undefined}>
-					<Button type="submit" intent="primary" disabled={isLoading}>
+					<Button type="submit" intent="primary" disabled={loginState.loading}>
 						Submit
 					</Button>
 				</FormGroup>
 			</form>
 		</MiscPageLayout>
 	)
-})
-Login.displayName = 'Login'
+}

@@ -235,19 +235,6 @@ export class TreeParameterMerger {
 		return originalCopy
 	}
 
-	private static mergeEventListeners<F extends Function>(
-		original: Set<F> | undefined,
-		fresh: Set<F> | undefined,
-	): Set<F> | undefined {
-		if (original === undefined) {
-			return new Set(fresh)
-		}
-		if (fresh === undefined) {
-			return new Set(original)
-		}
-		return this.mergeSets(original, fresh)
-	}
-
 	private static mergeSets<T>(original: Set<T>, fresh: Set<T>): Set<T> {
 		const combinedSet = new Set(original)
 		for (const item of fresh) {
@@ -306,7 +293,9 @@ export class TreeParameterMerger {
 			return this.cloneSingleEntityEventListeners(original)
 		}
 
-		return this.mergeEventListenerStores(this.cloneSingleEntityEventListeners(original), fresh)
+		const store = this.cloneSingleEntityEventListeners(original)
+		store.append(fresh)
+		return store
 	}
 
 	public static mergeEntityListEventListeners(
@@ -324,41 +313,18 @@ export class TreeParameterMerger {
 			return this.cloneEntityListEventListeners(original)
 		}
 
-		return this.mergeEventListenerStores(this.cloneEntityListEventListeners(original), fresh)
-	}
-
-	private static mergeEventListenerStores<Store extends Map<string, Set<Function>>>(
-		original: Store,
-		fresh: Store,
-	): Store {
-		for (const [eventName, fromFresh] of fresh) {
-			const fromOriginal = original.get(eventName)
-
-			if (fromOriginal === undefined) {
-				original.set(eventName, new Set(fromFresh))
-			} else {
-				const newListeners = this.mergeEventListeners(fromOriginal, fromFresh)
-
-				if (newListeners) {
-					original.set(eventName, newListeners)
-				}
-			}
-		}
-		return original
+		const store = this.cloneEntityListEventListeners(original)
+		store.append(fresh)
+		return store
 	}
 
 	public static cloneSingleEntityEventListeners(store: EntityEventListenerStore): EntityEventListenerStore {
-		return new Map(store) as EntityEventListenerStore
+		// TODO is intentional, that second clone is deep?
+		return store.clone()
 	}
 
 	public static cloneEntityListEventListeners(store: EntityListEventListenerStore): EntityListEventListenerStore {
-		const cloned: EntityListEventListenerStore = new Map()
-
-		for (const [eventName, listeners] of store) {
-			cloned.set(eventName, new Set(listeners as Set<any>))
-		}
-
-		return cloned
+		return store.cloneDeep()
 	}
 
 	private static mergeExpectedRelationMutation(

@@ -36,6 +36,7 @@ import {
 } from './state'
 import { TreeParameterMerger } from './TreeParameterMerger'
 import type { TreeStore } from './TreeStore'
+import { EventListenersStore } from '../treeParameters'
 
 export class StateInitializer {
 	private readonly fieldOperations: FieldOperations
@@ -456,7 +457,7 @@ export class StateInitializer {
 
 		realm.getAccessor().batchUpdates(initialize)
 
-		const initializeListeners = this.eventManager.getEventListeners(entityRealm, 'initialize')
+		const initializeListeners = this.eventManager.getEventListeners(entityRealm, { type: 'initialize' })
 		if (initializeListeners === undefined || initializeListeners.size === 0) {
 			realm.entity.hasIdSetInStone = true
 		}
@@ -464,13 +465,14 @@ export class StateInitializer {
 
 	public initializeEntityEventListenerStore(blueprint: EntityRealmBlueprint): EntityEventListenerStore | undefined {
 		if (blueprint.type === 'listEntity') {
-			const blueprintListeners = blueprint.parent.blueprint.marker.parameters.eventListeners
-			const childInitialize = blueprintListeners?.get('childInitialize')
+			const blueprintListeners = blueprint.parent.blueprint.marker.parameters.childEventListeners
+			const childInitialize = blueprintListeners?.get({ type: 'initialize' })
+			const store: EntityEventListenerStore = new EventListenersStore(() => blueprint.parent.childEventListeners)
 
-			if (childInitialize === undefined) {
-				return undefined
+			if (childInitialize !== undefined) {
+				store.set({ type: 'initialize' }, childInitialize)
 			}
-			return new Map([['initialize', new Set(childInitialize)]]) as EntityEventListenerStore
+			return store
 		}
 
 		const blueprintListeners = blueprint.marker.parameters.eventListeners

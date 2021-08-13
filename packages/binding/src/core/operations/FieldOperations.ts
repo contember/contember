@@ -10,6 +10,7 @@ import { FieldState, getEntityMarker, StateIterator } from '../state'
 import type { StateInitializer } from '../StateInitializer'
 import type { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
+import { EventListenersStore } from '../../treeParameters'
 
 export class FieldOperations {
 	public constructor(
@@ -19,31 +20,31 @@ export class FieldOperations {
 		private readonly treeStore: TreeStore,
 	) {}
 
-	public addError(fieldState: FieldState, error: ErrorAccessor.SugaredValidationError): () => void {
+	public addError(fieldState: FieldState<any>, error: ErrorAccessor.SugaredValidationError): () => void {
 		return this.accessorErrorManager.addError(fieldState, { type: 'validation', error })
 	}
 
-	public clearErrors(fieldState: FieldState): void {
+	public clearErrors(fieldState: FieldState<any>): void {
 		return this.accessorErrorManager.clearErrorsByState(fieldState)
 	}
 
-	public addEventListener(state: FieldState, type: FieldAccessor.FieldEventType, listener: Function): () => void {
-		let listeners = state.eventListeners
-		if (!listeners) {
-			state.eventListeners = listeners = new Map()
+	public addEventListener<
+		Type extends keyof FieldAccessor.FieldEventListenerMap,
+		Value extends FieldValue = FieldValue,
+	>(
+		state: FieldState<Value>,
+		event: { type: Type; key?: string },
+		listener: FieldAccessor.FieldEventListenerMap<Value>[Type],
+	): () => void {
+		if (!state.eventListeners) {
+			state.eventListeners = new EventListenersStore()
 		}
-		let forThisEvent = listeners.get(type)
-		if (forThisEvent === undefined) {
-			listeners.set(type, (forThisEvent = new Set<never>()))
-		}
-		forThisEvent.add(listener as any)
-
-		return () => state.eventListeners?.get?.(type)?.delete(listener as any)
+		return state.eventListeners.add(event, listener)
 	}
 
-	public updateValue(
-		fieldState: FieldState,
-		newValue: FieldValue,
+	public updateValue<Value extends FieldValue = FieldValue>(
+		fieldState: FieldState<Value>,
+		newValue: Value | null,
 		{ agent = FieldAccessor.userAgent }: FieldAccessor.UpdateOptions = {},
 	) {
 		this.eventManager.syncOperation(() => {

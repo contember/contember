@@ -58,7 +58,7 @@ export const useDerivedField = <SourceValue extends FieldValue = FieldValue>(
 	)
 
 	useEffect(
-		() => stableGetSourceReference().addEventListener('beforeUpdate', onBeforeUpdate),
+		() => stableGetSourceReference().addEventListener({ type: 'beforeUpdate' }, onBeforeUpdate),
 		[onBeforeUpdate, stableGetSourceReference],
 	)
 }

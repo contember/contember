@@ -1,19 +1,15 @@
 import type { FieldAccessor } from '../accessors'
 import type { FieldValue } from './primitives'
+import type { EventListenersStore } from './EventListenersStore'
 
 type Events<Value extends FieldValue = FieldValue> = FieldAccessor.FieldEventListenerMap<Value>
 
 export interface DesugaredFieldEventListeners {}
 
-export interface FieldEventListenerStore extends Map<keyof Events, Set<Events[keyof Events]>> {
-	// Unfortunately, we have to enumerate these because otherwise, TS just can't handle the polymorphism.
-	get(key: 'beforeUpdate'): Set<Events['beforeUpdate']> | undefined
-	get(key: 'initialize'): Set<Events['initialize']> | undefined
-	get(key: 'update'): Set<Events['update']> | undefined
-	get(key: keyof Events): Set<Events[keyof Events]> | undefined
-
-	set(key: keyof Events, value: Set<Events[keyof Events]>): this
-}
+export type FieldEventListenerStore<Value extends FieldValue = FieldValue> = EventListenersStore<
+	keyof Events<Value>,
+	Partial<Events<Value>>
+>
 
 export interface FieldEventListeners {
 	eventListeners: FieldEventListenerStore | undefined

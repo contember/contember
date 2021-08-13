@@ -35,7 +35,23 @@ export function useEntityEvent(type: keyof EntityAccessor.RuntimeEntityEventList
 
 	useEffect(() => {
 		// addEventListener returns an unsubscribe function, which we're deliberately re-returning from here.
-		return (stableGetEntityReference().addEventListener as any)(type, ...args)
+		const entityAccessor = stableGetEntityReference()
+		if (type === 'connectionUpdate') {
+			return entityAccessor.addEventListener(
+				{
+					type,
+					key: args[0] as string,
+				},
+				args[1] as any,
+			)
+		} else {
+			return entityAccessor.addEventListener(
+				{
+					type,
+				},
+				args[0] as any,
+			)
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [...args, stableGetEntityReference])
 }

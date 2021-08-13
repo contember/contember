@@ -5,7 +5,7 @@ import {
 	EntityListSubTreeMarker,
 	EntitySubTree,
 	EntitySubTreeMarker,
-	Environment,
+	Environment, EventListenersStore,
 	Field,
 	FieldMarker,
 	HasMany,
@@ -106,8 +106,8 @@ describe('Marker tree generator', () => {
 				orderBy: undefined,
 				offset: undefined,
 				limit: undefined,
-				childEventListeners: new Map([['initialize', new Set([onInit5, onInit6])]]) as any,
-				eventListeners: new Map([['beforePersist', new Set([onBeforePersist3])]]) as any,
+				childEventListeners: new EventListenersStore(undefined, new Map([['initialize', new Set([onInit5, onInit6])]])),
+				eventListeners: new EventListenersStore(undefined, new Map([['beforePersist', new Set([onBeforePersist3])]])),
 				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
@@ -136,10 +136,10 @@ describe('Marker tree generator', () => {
 				// forceCreation: false,
 				isNonbearing: false,
 				reducedBy: undefined,
-				eventListeners: new Map([
+				eventListeners: new EventListenersStore(undefined, new Map([
 					['initialize', new Set([onInit7, onInit8])],
 					['beforePersist', new Set([onBeforePersist2])],
-				]) as any,
+				])),
 				expectedMutation: 'anyMutation',
 			},
 			new EntityFieldMarkersContainer(
@@ -198,10 +198,10 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				setOnCreate: { bar: 123 },
 				// forceCreation: false,
-				eventListeners: new Map([
+				eventListeners: new EventListenersStore(undefined, new Map([
 					['initialize', new Set([onInit1, onInit2, onInit3, onInit4])],
 					['beforePersist', new Set([onBeforePersist1])],
-				]) as any,
+				])),
 				expectedMutation: 'anyMutation',
 				alias: undefined,
 			},
@@ -229,7 +229,7 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				setOnCreate: undefined,
 				// forceCreation: false,
-				childEventListeners: new Map([['initialize', new Set([onInit9])]]) as any,
+				childEventListeners: new EventListenersStore(undefined, new Map([['initialize', new Set([onInit9])]])),
 				eventListeners: undefined,
 				expectedMutation: 'anyMutation',
 				alias: undefined,

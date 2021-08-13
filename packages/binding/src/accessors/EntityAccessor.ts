@@ -28,10 +28,11 @@ import type { ErrorAccessor } from './ErrorAccessor'
 import type { FieldAccessor } from './FieldAccessor'
 import type { PersistErrorOptions } from './PersistErrorOptions'
 import type { PersistSuccessOptions } from './PersistSuccessOptions'
+import type { EntityRealmState } from '../core/state'
 
 class EntityAccessor implements Errorable {
 	public constructor(
-		private readonly stateKey: any,
+		private readonly stateKey: EntityRealmState,
 		private readonly operations: EntityOperations,
 		private readonly runtimeId: RuntimeId,
 		public readonly key: EntityRealmKey, // ⚠️ This is *NOT* the id! ⚠️
@@ -65,30 +66,11 @@ class EntityAccessor implements Errorable {
 		return this.operations.addError(this.stateKey, error)
 	}
 
-	public addEventListener(
-		type: 'beforePersist',
-		listener: EntityAccessor.EntityEventListenerMap['beforePersist'],
-	): () => void
-	public addEventListener(
-		type: 'beforeUpdate',
-		listener: EntityAccessor.EntityEventListenerMap['beforeUpdate'],
-	): () => void
-	public addEventListener(
-		type: 'connectionUpdate',
-		hasOneField: FieldName,
-		listener: EntityAccessor.EntityEventListenerMap['connectionUpdate'],
-	): () => void
-	public addEventListener(
-		type: 'persistError',
-		listener: EntityAccessor.EntityEventListenerMap['persistError'],
-	): () => void
-	public addEventListener(
-		type: 'persistSuccess',
-		listener: EntityAccessor.EntityEventListenerMap['persistSuccess'],
-	): () => void
-	public addEventListener(type: 'update', listener: EntityAccessor.EntityEventListenerMap['update']): () => void
-	public addEventListener(type: keyof EntityAccessor.RuntimeEntityEventListenerMap, ...args: unknown[]): () => void {
-		return this.operations.addEventListener(this.stateKey, type, ...args)
+	public addEventListener<Type extends keyof EntityAccessor.RuntimeEntityEventListenerMap>(
+		event: { type: Type; key?: string },
+		listener: EntityAccessor.EntityEventListenerMap[Type],
+	): () => void {
+		return this.operations.addEventListener(this.stateKey, event, listener)
 	}
 
 	public batchUpdates(performUpdates: EntityAccessor.BatchUpdatesHandler): void {

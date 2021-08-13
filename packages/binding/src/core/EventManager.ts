@@ -10,7 +10,7 @@ import type {
 } from '../accessors'
 import type { SuccessfulPersistResult } from '../accessorTree'
 import { BindingError } from '../BindingError'
-import type { FieldName, PlaceholderName } from '../treeParameters'
+import type { PlaceholderName } from '../treeParameters'
 import { assertNever } from '../utils'
 import type { Config } from './Config'
 import type { DirtinessTracker } from './DirtinessTracker'
@@ -26,6 +26,7 @@ import {
 } from './state'
 import type { TreeStore } from './TreeStore'
 import type { UpdateMetadata } from './UpdateMetadata'
+import type { EventListenersStore } from '../treeParameters'
 
 export class EventManager {
 	public static readonly NO_CHANGES_DIFFERENCE = 0
@@ -165,7 +166,7 @@ export class EventManager {
 	}
 
 	public registerNewlyInitialized(newlyInitialized: StateNode) {
-		const initializeListeners = this.getEventListeners(newlyInitialized, 'initialize')
+		const initializeListeners = this.getEventListeners(newlyInitialized, { type: 'initialize' })
 
 		if (initializeListeners === undefined) {
 			return
@@ -201,7 +202,7 @@ export class EventManager {
 	}
 
 	public registerJustUpdated(justUpdated: StateNode, changesDelta: number) {
-		const beforeUpdateListeners = this.getEventListeners(justUpdated, 'beforeUpdate')
+		const beforeUpdateListeners = this.getEventListeners(justUpdated, { type: 'beforeUpdate' })
 		if (beforeUpdateListeners !== undefined) {
 			this.pendingWithBeforeUpdate.add(justUpdated)
 		}
@@ -252,17 +253,23 @@ export class EventManager {
 		const agenda: StateNode[] = rootStates
 
 		for (const state of agenda) {
-			const updateListeners = this.getEventListeners(state, 'update')
+			// yes, the calls are same, but this way we can avoid type casting
+			const updateListeners =
+				state.type === 'field'
+					? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
+					: state.type === 'entityRealm'
+					? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
+					: this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
 
 			if (updateListeners !== undefined) {
 				for (const handler of updateListeners) {
 					// TS can't quite handle the polymorphism here but this is fine.
-					handler(state.getAccessor() as any)
+					handler()
 				}
 			}
 			if (state.type === 'entityRealm' && state.fieldsWithPendingConnectionUpdates) {
 				for (const updatedField of state.fieldsWithPendingConnectionUpdates) {
-					const listeners = this.getEventListeners(state, `connectionUpdate_${updatedField}` as const)
+					const listeners = this.getEventListeners(state, { type: 'connectionUpdate', key: updatedField })
 					if (!listeners) {
 						continue
 					}
@@ -298,121 +305,101 @@ export class EventManager {
 		eventType: 'beforePersist' | 'persistSuccess',
 		options: AsyncBatchUpdatesOptions | PersistSuccessOptions,
 	): Promise<void> {
-		return new Promise<void>(async resolve => {
-			await this.asyncTransaction(async () => {
-				const iNodeHasRelevantListener = (iNode: StateINode) => this.getEventListeners(iNode, eventType) !== undefined
+		await this.asyncTransaction(async () => {
+			// TODO if an entity from here (or its parent) gets deleted, we need to remove stale handlers from here.
+			const callbackQueue: Array<
+				[
+					// The typings could be nicer but TS…
+					StateINode,
+					(
+						| EntityAccessor.EntityEventListenerMap[typeof eventType]
+						| EntityListAccessor.EntityListEventListenerMap[typeof eventType]
+					),
+				]
+			> = []
 
-				// TODO if an entity from here (or its parent) gets deleted, we need to remove stale handlers from here.
-				const callbackQueue: Array<
-					[
-						// The typings could be nicer but TS…
-						StateINode,
-						(
-							| EntityAccessor.EntityEventListenerMap[typeof eventType]
-							| EntityListAccessor.EntityListEventListenerMap[typeof eventType]
-						),
-					]
+			for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
+				for (const iNode of StateIterator.depthFirstINodes(subTreeState)) {
+					const listeners = this.getEventListeners(iNode, { type: eventType }) ?? []
+					for (const listener of listeners) {
+						callbackQueue.push([iNode, listener])
+					}
+				}
+			}
+			for (
+				let waterfallDepth = 0;
+				waterfallDepth < this.config.getValue(`${eventType}SettleLimit` as const);
+				waterfallDepth++
+			) {
+				const promiseReturns: Array<
+					Promise<
+						| void
+						| EntityAccessor.EntityEventListenerMap[typeof eventType]
+						| EntityListAccessor.EntityListEventListenerMap[typeof eventType]
+					>
 				> = []
+				const correspondingStates: Array<StateINode> = []
 
-				for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
-					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasRelevantListener)) {
-						const listeners = this.getEventListeners(iNode, eventType)
-						for (const listener of listeners!) {
-							callbackQueue.push([iNode, listener])
-						}
-					}
+				if (callbackQueue.length === 0) {
+					break
 				}
-				for (
-					let waterfallDepth = 0;
-					waterfallDepth < this.config.getValue(`${eventType}SettleLimit` as const);
-					waterfallDepth++
-				) {
-					const promiseReturns: Array<
-						Promise<
-							| void
-							| EntityAccessor.EntityEventListenerMap[typeof eventType]
-							| EntityListAccessor.EntityListEventListenerMap[typeof eventType]
-						>
-					> = []
-					const correspondingStates: Array<StateINode> = []
 
-					if (callbackQueue.length === 0) {
-						break
-					}
-
-					for (const [state, callback] of callbackQueue) {
-						const changesCountBefore = this.dirtinessTracker.getChangesCount()
+				for (const [state, callback] of callbackQueue) {
+					correspondingStates.push(state)
+					try {
 						const result = callback(state.getAccessor as any, options as any) // TS can't quite handle this but this is sound.
-						const changesCountAfter = this.dirtinessTracker.getChangesCount()
-
 						if (result instanceof Promise) {
-							if (import.meta.env.DEV) {
-								if (changesCountBefore !== changesCountAfter) {
-									// This isn't bulletproof. They could e.g. undo a change and make another one which would
-									// slip through this detection. But for most cases, it should be good enough and not too expensive.
-									throw new BindingError(
-										`A ${eventType} event handler cannot be asynchronous and alter the accessor tree at the same time. ` +
-											`To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.`,
-									)
-								}
-							}
-
 							promiseReturns.push(result)
-							correspondingStates.push(state)
-						}
-					}
-					// TODO timeout
-					const newCallbacks = await Promise.allSettled(promiseReturns)
-
-					callbackQueue.length = 0 // Empties the queue
-
-					// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
-					for (const newlyInitialized of this.newlyInitializedWithListeners) {
-						if (newlyInitialized.type === 'field') {
-							continue
-						}
-						const beforePersistHandlers = this.getEventListeners(newlyInitialized, eventType)
-						if (beforePersistHandlers) {
-							for (const listener of beforePersistHandlers) {
-								callbackQueue.push([newlyInitialized, listener])
-							}
-						}
-					}
-
-					this.triggerBeforeFlushEvents()
-
-					for (let i = 0; i < newCallbacks.length; i++) {
-						const result = newCallbacks[i]
-						const correspondingState = correspondingStates[i]
-
-						if (result.status === 'fulfilled') {
-							if (typeof result.value === 'function') {
-								callbackQueue.push([correspondingState, result.value])
-							}
-							// Otherwise do nothing. This is just a handler that albeit async, doesn't appear to
-							// interact with data binding.
 						} else {
-							// We just silently stop.
-							// That's NOT ideal but what else exactly do we do so that it's even remotely recoverable?
-							if (import.meta.env.DEV) {
-								throw new BindingError(
-									`A ${eventType} handler returned a promise that rejected. ` +
-										`This is a no-op that will fail silently in production.`,
-								)
-							}
+							promiseReturns.push(Promise.resolve(result))
+						}
+					} catch (e) {
+						promiseReturns.push(Promise.reject(e))
+					}
+				}
+				// TODO timeout
+
+				const newCallbacks = await this.executeWithoutChanges(eventType, () => Promise.allSettled(promiseReturns))
+
+				callbackQueue.length = 0 // Empties the queue
+
+				// TODO we're drifting away from the original depth-first order. Let's see if that's ever even an issue.
+				for (const newlyInitialized of this.newlyInitializedWithListeners) {
+					if (newlyInitialized.type === 'field') {
+						continue
+					}
+					const beforePersistHandlers = this.getEventListeners(newlyInitialized, { type: eventType })
+					if (beforePersistHandlers) {
+						for (const listener of beforePersistHandlers) {
+							callbackQueue.push([newlyInitialized, listener])
 						}
 					}
 				}
-				if (import.meta.env.DEV) {
-					if (callbackQueue.length) {
-						throw new BindingError(
-							`Exceeded the ${eventType} settle limit. Your code likely contains a deadlock. ` +
-								`If that's not the case, raise the settle limit from DataBindingProvider.`,
-						)
+
+				this.triggerBeforeFlushEvents()
+				this.handleRejections(eventType, newCallbacks)
+
+				for (let i = 0; i < newCallbacks.length; i++) {
+					const result = newCallbacks[i]
+					const correspondingState = correspondingStates[i]
+
+					if (result.status === 'fulfilled') {
+						if (typeof result.value === 'function') {
+							callbackQueue.push([correspondingState, result.value])
+						}
+						// Otherwise do nothing. This is just a handler that albeit async, doesn't appear to
+						// interact with data binding.
 					}
 				}
-			})
-			resolve()
+			}
+			if (import.meta.env.DEV) {
+				if (callbackQueue.length) {
+					throw new BindingError(
+						`Exceeded the ${eventType} settle limit. Your code likely contains a deadlock. ` +
+							`If that's not the case, raise the settle limit from DataBindingProvider.`,
+					)
+				}
+			}
 		})
 	}
 
@@ -429,7 +416,7 @@ export class EventManager {
 				this.pendingWithBeforeUpdate = new Set()
 
 				for (const state of withBeforeUpdate) {
-					const listeners = this.getEventListeners(state, 'beforeUpdate')
+					const listeners = this.getEventListeners(state, { type: 'beforeUpdate' })
 					if (listeners === undefined) {
 						// This can happen if the listener has unsubscribed since we added it to the set.
 						continue
@@ -463,11 +450,17 @@ export class EventManager {
 	private triggerOnInitialize() {
 		this.syncTransaction(() => {
 			for (const state of this.newlyInitializedWithListeners) {
-				const listeners = this.getEventListeners(state, 'initialize')
+				// yes, the calls are same, but this way we can avoid type casting
+				const listeners =
+					state.type === 'field'
+						? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
+						: state.type === 'entityRealm'
+						? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
+						: this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
 
 				if (listeners) {
 					for (const listener of listeners) {
-						listener(state.getAccessor as any, this.batchUpdatesOptions)
+						listener()
 					}
 				}
 				if (state.type === 'entityRealm') {
@@ -479,40 +472,37 @@ export class EventManager {
 	}
 
 	public async triggerOnPersistError(options: PersistErrorOptions) {
-		return new Promise<void>(async resolve => {
-			await this.asyncTransaction(async () => {
-				const iNodeHasPersistErrorHandler = (iNode: StateINode) =>
-					this.getEventListeners(iNode, 'persistError') !== undefined
+		await this.asyncTransaction(async () => {
+			const handlerPromises: Array<Promise<void>> = []
 
-				const handlerPromises: Array<Promise<void>> = []
-
-				for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
-					for (const iNode of StateIterator.depthFirstINodes(subTreeState, iNodeHasPersistErrorHandler)) {
-						for (const listener of this.getEventListeners(iNode, 'persistError')!) {
-							const result = listener(iNode.getAccessor as any, options)
-
+			for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
+				for (const iNode of StateIterator.depthFirstINodes(subTreeState)) {
+					// yes, the calls are same, but this way we can avoid type casting
+					const dispatchers =
+						iNode.type === 'entityRealm'
+							? this.getEventDispatchers(iNode, { type: 'persistError' }, [iNode.getAccessor, options])
+							: this.getEventDispatchers(iNode, { type: 'persistError' }, [iNode.getAccessor, options])
+					if (dispatchers === undefined) {
+						continue
+					}
+					for (const listener of dispatchers ?? []) {
+						try {
+							const result = listener()
 							if (result instanceof Promise) {
 								handlerPromises.push(result)
+							} else {
+								handlerPromises.push(Promise.resolve(result))
 							}
+						} catch (e) {
+							handlerPromises.push(Promise.reject(e))
 						}
 					}
 				}
+			}
 
-				// TODO timeout
-				const handlerResults = await Promise.allSettled(handlerPromises)
-
-				if (import.meta.env.DEV) {
-					for (const result of handlerResults) {
-						if (result.status === 'rejected') {
-							throw new BindingError(
-								`A persistError handler returned a promise that rejected. ` +
-									`This is a no-op that will fail silently in production.`,
-							)
-						}
-					}
-				}
-				return resolve()
-			})
+			// TODO timeout
+			const handlerResults = await Promise.allSettled(handlerPromises)
+			this.handleRejections('persistError', handlerResults)
 		})
 	}
 
@@ -524,67 +514,67 @@ export class EventManager {
 		return this.triggerAsyncMutatingEvent('persistSuccess', options)
 	}
 
-	public getEventListeners<EventType extends keyof FieldAccessor.FieldEventListenerMap>(
-		state: FieldState,
-		type: EventType,
-	): Set<FieldAccessor.FieldEventListenerMap[EventType]> | undefined
-	public getEventListeners(
-		state: EntityRealmState,
-		type: `connectionUpdate_${FieldName}`,
-	): Set<EntityAccessor.EntityEventListenerMap['connectionUpdate']> | undefined
-	public getEventListeners<EventType extends keyof EntityAccessor.EntityEventListenerMap>(
-		state: EntityRealmState,
-		type: EventType,
-	): Set<EntityAccessor.EntityEventListenerMap[EventType]> | undefined
-	public getEventListeners<EventType extends keyof EntityListAccessor.EntityListEventListenerMap>(
-		state: EntityListState,
-		type: EventType,
-	): Set<EntityListAccessor.EntityListEventListenerMap[EventType]> | undefined
 	public getEventListeners<
-		EventType extends keyof EntityAccessor.EntityEventListenerMap & keyof EntityListAccessor.EntityListEventListenerMap,
-	>(
-		state: StateINode,
-		type: EventType,
-	):
-		| Set<EntityAccessor.EntityEventListenerMap[EventType]>
-		| Set<EntityListAccessor.EntityListEventListenerMap[EventType]>
-		| undefined
-	public getEventListeners<
-		EventType extends keyof FieldAccessor.FieldEventListenerMap &
-			keyof EntityAccessor.EntityEventListenerMap &
-			keyof EntityListAccessor.EntityListEventListenerMap,
-	>(
-		state: StateNode,
-		type: EventType,
-	):
-		| Set<FieldAccessor.FieldEventListenerMap[EventType]>
-		| Set<EntityAccessor.EntityEventListenerMap[EventType]>
-		| Set<EntityListAccessor.EntityListEventListenerMap[EventType]>
-		| undefined
-	public getEventListeners(state: StateNode, type: string): Set<any> | undefined {
-		if (state.type === 'entityRealm' && state.blueprint.type === 'listEntity') {
-			const ownListeners = state.eventListeners?.get(type as any) as Set<any>
-			const listenersFromList = state.blueprint.parent.childEventListeners?.get(type as any) as
-				| typeof ownListeners
-				| undefined
-
-			if (ownListeners === undefined) {
-				if (listenersFromList === undefined || listenersFromList.size === 0) {
-					return undefined
-				}
-				return listenersFromList
-			}
-			if (listenersFromList === undefined || listenersFromList.size === 0) {
-				return ownListeners
-			}
-			return new Set([...ownListeners, ...listenersFromList])
-		}
-
-		const listeners = state.eventListeners?.get(type as any) as Set<any> | undefined
-
-		if (listeners === undefined || listeners.size === 0) {
+		State extends StateNode,
+		EventListenerTypes extends
+			Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never,
+		EventType extends EventListenerTypes[0],
+	>(state: State, event: { type: EventType; key?: string }): Set<Exclude<EventListenerTypes[1][EventType], undefined>> | undefined {
+		if (!state.eventListeners) {
 			return undefined
 		}
-		return listeners
+		return (state.eventListeners as EventListenersStore<EventType, EventListenerTypes[1]>).get(event) as Set<
+			Exclude<EventListenerTypes[1][EventType], undefined>
+		>
+	}
+
+	public getEventDispatchers<
+		State extends StateNode,
+		EventListenerTypes extends
+			Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Keys, infer Map> ? [Keys, Map] : never,
+		EventType extends EventListenerTypes[0],
+	>(
+		state: State,
+		event: { type: EventType; key?: string },
+		listenerArgs: Parameters<Exclude<EventListenerTypes[1][EventType], undefined>>,
+	): Array<() => ReturnType<Exclude<EventListenerTypes[1][EventType], undefined>>> | undefined {
+		const eventListeners = this.getEventListeners(state, event)
+		if (eventListeners === undefined) {
+			return undefined
+		}
+		return Array.from(eventListeners.values(), listener => {
+			return () => listener(...listenerArgs)
+		}) as Array<() => ReturnType<Exclude<EventListenerTypes[1][EventType], undefined>>>
+	}
+
+	private handleRejections(handler: string, promises: PromiseSettledResult<any>[]) {
+		const rejections = promises.filter((it): it is PromiseRejectedResult => it.status === 'rejected')
+		if (rejections.length === 0) {
+			return
+		}
+		rejections.forEach(console.error)
+		if (import.meta.env.DEV) {
+			throw new BindingError(
+				`A ${handler} handler returned a promise that rejected. ` +
+					`This is a no-op that will fail silently in production.`,
+			)
+		}
+	}
+
+	private async executeWithoutChanges<T>(eventType: string, cb: () => Promise<T>): Promise<T> {
+		const changesCountBefore = this.dirtinessTracker.getTotalChangesCount()
+		const result = await cb()
+		const changesCountAfter = this.dirtinessTracker.getTotalChangesCount()
+		if (import.meta.env.DEV) {
+			if (changesCountBefore !== changesCountAfter) {
+				// This isn't bulletproof. They could e.g. undo a change and make another one which would
+				// slip through this detection. But for most cases, it should be good enough and not too expensive.
+				throw new BindingError(
+					`A ${eventType} event handler cannot be asynchronous and alter the accessor tree at the same time. ` +
+						`To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.`,
+				)
+			}
+		}
+		return result
 	}
 }

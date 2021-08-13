@@ -8,10 +8,11 @@ import type { Errorable } from './Errorable'
 import type { ErrorAccessor } from './ErrorAccessor'
 import type { PersistErrorOptions } from './PersistErrorOptions'
 import type { PersistSuccessOptions } from './PersistSuccessOptions'
+import type { EntityListState } from '../core/state'
 
 class EntityListAccessor implements Errorable {
 	public constructor(
-		private readonly stateKey: any,
+		private readonly stateKey: EntityListState,
 		private readonly operations: ListOperations,
 		private readonly _children: ReadonlyMap<EntityId, { getAccessor: EntityAccessor.GetEntityAccessor }>,
 		private readonly _idsPersistedOnServer: ReadonlySet<string>,
@@ -95,39 +96,19 @@ class EntityListAccessor implements Errorable {
 		return this.operations.addError(this.stateKey, error)
 	}
 
-	public addEventListener(
-		type: 'beforePersist',
-		listener: EntityListAccessor.EntityListEventListenerMap['beforePersist'],
-	): () => void
-	public addEventListener(
-		type: 'beforeUpdate',
-		listener: EntityListAccessor.EntityListEventListenerMap['beforeUpdate'],
-	): () => void
-	public addEventListener(
-		type: 'persistSuccess',
-		listener: EntityListAccessor.EntityListEventListenerMap['persistSuccess'],
-	): () => void
-	public addEventListener(
-		type: 'persistError',
-		listener: EntityListAccessor.EntityListEventListenerMap['persistError'],
-	): () => void
-	public addEventListener(type: 'update', listener: EntityListAccessor.EntityListEventListenerMap['update']): () => void
-	public addEventListener(
-		type: 'childBeforeUpdate',
-		listener: EntityAccessor.EntityEventListenerMap['beforeUpdate'],
-	): () => void
-	public addEventListener(
-		type: 'childInitialize',
-		listener: EntityAccessor.EntityEventListenerMap['initialize'],
-	): () => void
-	public addEventListener(type: 'childUpdate', listener: EntityAccessor.EntityEventListenerMap['update']): () => void
-	public addEventListener(
-		type:
-			| keyof EntityListAccessor.RuntimeEntityListEventListenerMap
-			| `child${Capitalize<EntityAccessor.EntityEventType>}`,
-		...args: unknown[]
-	): () => void {
-		return this.operations.addEventListener(this.stateKey, type, ...args)
+	public addEventListener<Type extends keyof EntityListAccessor.RuntimeEntityListEventListenerMap>(
+		event: { type: Type; key?: string },
+		listener: EntityListAccessor.RuntimeEntityListEventListenerMap[Type],
+	) {
+		return this.operations.addEventListener(this.stateKey, event, listener)
+	}
+
+	public addChildEventListener<Type extends keyof EntityAccessor.EntityEventListenerMap>(
+		state: EntityListState,
+		event: { type: Type; key?: string },
+		listener: EntityAccessor.EntityEventListenerMap[Type],
+	) {
+		return this.operations.addChildEventListener(this.stateKey, event, listener)
 	}
 
 	public batchUpdates(performUpdates: EntityListAccessor.BatchUpdatesHandler): void {
@@ -175,7 +156,7 @@ namespace EntityListAccessor {
 			string as `child${Capitalize<EventType>}`]: EntityAccessor.EntityEventListenerMap[EventType]
 	}
 
-	export interface RuntimeEntityListEventListenerMap extends ChildEventListenerMap {
+	export interface RuntimeEntityListEventListenerMap {
 		beforePersist: BeforePersistHandler
 		beforeUpdate: BatchUpdatesHandler
 		persistError: PersistErrorHandler

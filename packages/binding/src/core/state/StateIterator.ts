@@ -1,5 +1,5 @@
 import { FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '../../markers'
-import type { PlaceholderName } from '../../treeParameters'
+import type { FieldValue, PlaceholderName } from '../../treeParameters'
 import { assertNever } from '../../utils'
 import type { TreeStore } from '../TreeStore'
 import type { EntityListState } from './EntityListState'
@@ -28,9 +28,9 @@ export class StateIterator {
 	}
 
 	// Note that this only yields siblings with the same placeholderName!
-	public static *eachSiblingRealmChild<S extends EntityListState | FieldState>(
+	public static *eachSiblingRealmChild<Value extends FieldValue, S extends EntityListState | FieldState<Value>>(
 		treeStore: TreeStore,
-		state: S & StateNode,
+		state: S & StateNode<Value>,
 	): IterableIterator<S> {
 		if (state.type === 'entityList' && state.blueprint.parent === undefined) {
 			// Top-level entity list

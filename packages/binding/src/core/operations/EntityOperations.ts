@@ -12,6 +12,7 @@ import { EntityListState, EntityRealmState, EntityRealmStateStub, getEntityMarke
 import type { StateInitializer } from '../StateInitializer'
 import type { TreeStore } from '../TreeStore'
 import { OperationsHelpers } from './OperationsHelpers'
+import { EventListenersStore } from '../../treeParameters'
 
 export class EntityOperations {
 	public constructor(
@@ -26,45 +27,15 @@ export class EntityOperations {
 		return this.accessorErrorManager.addError(entityRealm, { type: 'validation', error })
 	}
 
-	public addEventListener(
+	public addEventListener<Type extends keyof EntityAccessor.RuntimeEntityEventListenerMap>(
 		state: EntityRealmState,
-		type: keyof EntityAccessor.RuntimeEntityEventListenerMap,
-		...args: unknown[]
+		event: { type: Type; key?: string },
+		listener: EntityAccessor.EntityEventListenerMap[Type],
 	) {
 		if (state.eventListeners === undefined) {
-			state.eventListeners = new Map()
+			state.eventListeners = new EventListenersStore()
 		}
-
-		if (type === 'connectionUpdate') {
-			const fieldName = args[0] as FieldName
-			const listenerToAdd = args[1] as EntityAccessor.UpdateListener
-			const eventType = `connectionUpdate_${fieldName}` as const
-
-			let existingListeners = state.eventListeners.get(eventType)
-
-			if (existingListeners === undefined) {
-				state.eventListeners.set(eventType, new Set([listenerToAdd]))
-			} else {
-				existingListeners.add(listenerToAdd)
-			}
-
-			return () => {
-				state.eventListeners?.get(eventType)?.delete(listenerToAdd)
-			}
-		} else {
-			const listenerToAdd = args[0] as EntityAccessor.RuntimeEntityEventListenerMap[typeof type]
-			let existingListeners = state.eventListeners.get(type)
-
-			if (existingListeners === undefined) {
-				state.eventListeners.set(type, new Set([listenerToAdd]))
-			} else {
-				existingListeners.add(listenerToAdd)
-			}
-
-			return () => {
-				state.eventListeners?.get(type)?.delete(listenerToAdd)
-			}
-		}
+		return state.eventListeners.add(event, listener)
 	}
 
 	public batchUpdates(state: EntityRealmState, performUpdates: EntityAccessor.BatchUpdatesHandler) {

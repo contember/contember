@@ -11,6 +11,7 @@ import {
 	EntityListParameters,
 	EntityListPreferencesDefaults,
 	EntityName,
+	EventListenersStore,
 	FieldEventListenerStore,
 	FieldName,
 	Filter,
@@ -126,12 +127,12 @@ export class QueryLanguage {
 			return undefined
 		}
 
-		const store: EntityEventListenerStore = new Map()
+		const store: EntityEventListenerStore = new EventListenersStore()
 
 		if (unsugarable.onConnectionUpdate) {
 			for (const fieldName in unsugarable.onConnectionUpdate) {
 				const listener = this.desugarEventListener(unsugarable.onConnectionUpdate[fieldName])
-				store.set(`connectionUpdate_${fieldName}` as const, listener)
+				store.set({ type: 'connectionUpdate', key: fieldName }, listener)
 			}
 		}
 
@@ -143,22 +144,22 @@ export class QueryLanguage {
 		const update = this.desugarEventListener(unsugarable.onUpdate)
 
 		if (beforePersist) {
-			store.set('beforePersist', beforePersist)
+			store.set({ type: 'beforePersist' }, beforePersist)
 		}
 		if (beforeUpdate) {
-			store.set('beforeUpdate', beforeUpdate)
+			store.set({ type: 'beforeUpdate' }, beforeUpdate)
 		}
 		if (initialize) {
-			store.set('initialize', initialize)
+			store.set({ type: 'initialize' }, initialize)
 		}
 		if (persistError) {
-			store.set('persistError', persistError)
+			store.set({ type: 'persistError' }, persistError)
 		}
 		if (persistSuccess) {
-			store.set('persistSuccess', persistSuccess)
+			store.set({ type: 'persistSuccess' }, persistSuccess)
 		}
 		if (update) {
-			store.set('update', update)
+			store.set({ type: 'update' }, update)
 		}
 
 		return store
@@ -184,7 +185,7 @@ export class QueryLanguage {
 			return undefined
 		}
 
-		const eventListeners: EntityListEventListenerStore = new Map()
+		const eventListeners: EntityListEventListenerStore = new EventListenersStore()
 
 		const beforePersist = this.desugarEventListener(unsugarable.onBeforePersist)
 		const beforeUpdate = this.desugarEventListener(unsugarable.onBeforeUpdate)
@@ -194,38 +195,38 @@ export class QueryLanguage {
 		const update = this.desugarEventListener(unsugarable.onUpdate)
 
 		if (beforePersist) {
-			eventListeners.set('beforePersist', beforePersist)
+			eventListeners.set({ type: 'beforePersist' }, beforePersist)
 		}
 		if (beforeUpdate) {
-			eventListeners.set('beforeUpdate', beforeUpdate)
+			eventListeners.set({ type: 'beforeUpdate' }, beforeUpdate)
 		}
 		if (initialize) {
-			eventListeners.set('initialize', initialize)
+			eventListeners.set({ type: 'initialize' }, initialize)
 		}
 		if (persistError) {
-			eventListeners.set('persistError', persistError)
+			eventListeners.set({ type: 'persistError' }, persistError)
 		}
 		if (persistSuccess) {
-			eventListeners.set('persistSuccess', persistSuccess)
+			eventListeners.set({ type: 'persistSuccess' }, persistSuccess)
 		}
 		if (update) {
-			eventListeners.set('update', update)
+			eventListeners.set({ type: 'update' }, update)
 		}
 
-		const childEventListeners: EntityEventListenerStore = new Map()
+		const childEventListeners: EntityEventListenerStore = new EventListenersStore()
 
 		const childBeforeUpdate = this.desugarEventListener(unsugarable.onChildBeforeUpdate)
 		const childInitialize = this.desugarEventListener(unsugarable.onChildInitialize)
 		const childUpdate = this.desugarEventListener(unsugarable.onChildUpdate)
 
 		if (childBeforeUpdate) {
-			childEventListeners.set('beforeUpdate', childBeforeUpdate)
+			childEventListeners.set({ type: 'beforeUpdate' }, childBeforeUpdate)
 		}
 		if (childInitialize) {
-			childEventListeners.set('initialize', childInitialize)
+			childEventListeners.set({ type: 'initialize' }, childInitialize)
 		}
 		if (childUpdate) {
-			childEventListeners.set('update', childUpdate)
+			childEventListeners.set({ type: 'update' }, childUpdate)
 		}
 
 		return {
@@ -241,16 +242,16 @@ export class QueryLanguage {
 			return undefined
 		}
 
-		const store: FieldEventListenerStore = new Map()
+		const store: FieldEventListenerStore = new EventListenersStore()
 
 		const beforeUpdate = this.desugarEventListener(unsugarable.onBeforeUpdate)
 		const update = this.desugarEventListener(unsugarable.onUpdate)
 
 		if (beforeUpdate) {
-			store.set('beforeUpdate', beforeUpdate)
+			store.set({ type: 'beforeUpdate' }, beforeUpdate)
 		}
 		if (update) {
-			store.set('update', update)
+			store.set({ type: 'update' }, update)
 		}
 
 		return store

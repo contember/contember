@@ -142,13 +142,9 @@ export class OperationsHelpers {
 		const listeners = realm.eventListeners
 		if (listeners) {
 			if (realm.blueprint.parent) {
-				listeners.delete('update')
+				listeners.delete({ type: 'update' })
 			}
-			for (const eventType of listeners.keys()) {
-				if (eventType.startsWith('connectionUpdate')) {
-					listeners.delete(eventType)
-				}
-			}
+			listeners.deleteByType('connectionUpdate')
 		}
 	}
 }

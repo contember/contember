@@ -1,24 +1,11 @@
 import type { EntityAccessor } from '../accessors'
-import type { FieldName } from './primitives'
+import type { EventListenersStore } from './EventListenersStore'
+
+type Events = EntityAccessor.EntityEventListenerMap
 
 export interface DesugaredSingleEntityEventListeners {}
 
-type AllEvents = EntityAccessor.EntityEventListenerMap
-type StdEvents = Omit<AllEvents, 'connectionUpdate'>
-export interface EntityEventListenerStore
-	extends Map<keyof StdEvents | `connectionUpdate_${FieldName}`, Set<AllEvents[keyof AllEvents]>> {
-	// Unfortunately, we have to enumerate these because otherwise, TS just can't handle the polymorphism.
-	get(key: 'beforePersist'): Set<StdEvents['beforePersist']> | undefined
-	get(key: 'beforeUpdate'): Set<StdEvents['beforeUpdate']> | undefined
-	get(key: `connectionUpdate_${FieldName}`): Set<AllEvents['connectionUpdate']> | undefined
-	get(key: 'persistError'): Set<StdEvents['persistError']> | undefined
-	get(key: 'persistSuccess'): Set<StdEvents['persistSuccess']> | undefined
-	get(key: 'update'): Set<StdEvents['update']> | undefined
-	get(key: 'initialize'): Set<StdEvents['initialize']> | undefined
-	get(key: `connectionUpdate_${FieldName}` | keyof StdEvents): Set<AllEvents[keyof AllEvents]> | undefined
-
-	set(key: `connectionUpdate_${FieldName}` | keyof StdEvents, value: Set<AllEvents[keyof AllEvents]>): this
-}
+export type EntityEventListenerStore = EventListenersStore<keyof Events, Events>
 
 export interface SingleEntityEventListeners {
 	eventListeners: EntityEventListenerStore | undefined

@@ -1,8 +1,13 @@
 export class DirtinessTracker {
 	private changesCount = 0
+	private totalChangesCount = 0
 
 	public getChangesCount() {
 		return this.changesCount
+	}
+
+	public getTotalChangesCount() {
+		return this.totalChangesCount
 	}
 
 	public hasChanges() {
@@ -14,6 +19,7 @@ export class DirtinessTracker {
 	}
 
 	public increment() {
+		this.totalChangesCount++
 		this.changesCount++
 	}
 

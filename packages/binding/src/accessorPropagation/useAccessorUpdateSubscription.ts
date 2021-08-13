@@ -73,10 +73,10 @@ function useAccessorUpdateSubscription<
 
 		const unsubscribe = (
 			getAccessor().addEventListener as (
-				eventType: 'update',
+				eventType: { type: 'update' },
 				handler: (newAccessor: FieldAccessor<Value> | EntityListAccessor | EntityAccessor) => void,
 			) => () => void
-		)('update', newAccessor => {
+		)({ type: 'update' }, newAccessor => {
 			if (!isStillSubscribed) {
 				return
 			}

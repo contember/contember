@@ -4,10 +4,11 @@ import type { FieldName, FieldValue } from '../treeParameters'
 import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
 import type { Errorable } from './Errorable'
 import type { ErrorAccessor } from './ErrorAccessor'
+import type { FieldState } from '../core/state'
 
 class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable {
 	constructor(
-		private readonly stateKey: any,
+		private readonly stateKey: FieldState<Value>,
 		private readonly operations: FieldOperations,
 		public readonly fieldName: FieldName,
 		public readonly value: Value | null,
@@ -27,13 +28,11 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 		this.operations.clearErrors(this.stateKey)
 	}
 
-	public addEventListener(
-		type: 'beforeUpdate',
-		listener: FieldAccessor.FieldEventListenerMap<Value>['beforeUpdate'],
-	): () => void
-	public addEventListener(type: 'update', listener: FieldAccessor.FieldEventListenerMap<Value>['update']): () => void
-	public addEventListener(type: FieldAccessor.FieldEventType, listener: Function): () => void {
-		return this.operations.addEventListener(this.stateKey, type, listener)
+	public addEventListener<Type extends keyof FieldAccessor.FieldEventListenerMap<Value>>(
+		event: { type: Type; key?: string },
+		listener: FieldAccessor.FieldEventListenerMap<Value>[Type],
+	): () => void {
+		return this.operations.addEventListener(this.stateKey, event, listener)
 	}
 
 	public updateValue(newValue: Value | null, options?: FieldAccessor.UpdateOptions): void {
@@ -62,11 +61,11 @@ class FieldAccessor<Value extends FieldValue = FieldValue> implements Errorable 
 	// helpers
 
 	public get asTemporal(): TemporalFieldHelper {
-		return new TemporalFieldHelper(this.getAccessor as FieldAccessor.GetFieldAccessor<string>)
+		return new TemporalFieldHelper(this.getAccessor as FieldAccessor.GetFieldAccessor<any>)
 	}
 
 	public get asUuid(): UuidFieldHelper {
-		return new UuidFieldHelper(this.getAccessor as FieldAccessor.GetFieldAccessor<string>)
+		return new UuidFieldHelper(this.getAccessor as FieldAccessor.GetFieldAccessor<any>)
 	}
 }
 namespace FieldAccessor {

@@ -3,6 +3,7 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import type { TenantApi } from '../tenant'
 import type { S3Manager } from '../s3'
 import { Readable } from 'stream'
+import type { GetObjectCommandOutput } from '@aws-sdk/client-s3'
 
 interface ProjectParams {
 	projectSlug: string
@@ -25,18 +26,29 @@ export class ProjectController extends BaseController<ProjectParams> {
 		}
 
 		try {
-			const innerRes = await this.s3.getObject(params.projectSlug, params.path)
+			const innerRes = await this.tryFiles(params.projectSlug, params.path)
 
 			if (innerRes.Body instanceof Readable) {
 				res.setHeader('Content-Type', innerRes.ContentType ?? 'application/octet-stream')
 				innerRes.Body.pipe(res)
+
 			} else {
 				res.writeHead(500)
 				res.end()
 			}
+
 		} catch (e) {
 			res.writeHead(404)
 			res.end()
+		}
+	}
+
+	private async tryFiles(projectSlug: string, path: string): Promise<GetObjectCommandOutput> {
+		try {
+			return this.s3.getObject(projectSlug, path === '' ? 'index.html' : path)
+
+		} catch (e) {
+			return this.s3.getObject(projectSlug, 'index.html')
 		}
 	}
 }

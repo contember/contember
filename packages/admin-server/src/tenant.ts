@@ -68,7 +68,7 @@ export class TenantApi {
 		})
 
 		if (!response.ok) {
-			return []
+			return null
 		}
 
 		const payload = ProjectListResponseType(await response.json())

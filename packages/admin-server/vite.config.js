@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite'
-import { resolve } from 'path';
+import { resolve } from 'path'
 import { rootDirectory } from '../../build/rootDirectory'
 import reactRefresh from '@vitejs/plugin-react-refresh'
-import { packageList } from "../../build/packageList";
+import { packageList } from '../../build/packageList'
 
 export default defineConfig(async ({ command, mode }) => ({
 	build: {
@@ -11,6 +11,13 @@ export default defineConfig(async ({ command, mode }) => ({
 		assetsDir: '_static',
 		sourcemap: true,
 		target: 'es2020',
+		rollupOptions: {
+			treeshake: {
+				moduleSideEffects: (id, external) => {
+					return id.endsWith('packages/admin-server/public/main.tsx')
+				},
+			},
+		},
 	},
 	esbuild: {
 		jsxInject: `import * as React from 'react'`,

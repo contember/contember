@@ -5,6 +5,7 @@ import ToastsState, { emptyToastsState } from './toasts'
 import ViewState, { emptyViewState } from './view'
 
 export default interface State {
+	basePath: string
 	request: RequestState
 	view: ViewState
 	auth: AuthState
@@ -13,6 +14,7 @@ export default interface State {
 }
 
 export const emptyState: State = {
+	basePath: '', // or '/projectName
 	request: emptyRequestState,
 	view: emptyViewState,
 	auth: emptyAuthState,

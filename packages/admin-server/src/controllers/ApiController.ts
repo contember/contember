@@ -63,7 +63,7 @@ export class ApiController extends BaseController<ApiParams> {
 				}
 
 				jsonBody['extensions'] ??= {}
-				jsonBody['extensions']['contemberAdminServer'] = { projects: this.projectListProvider.get(token) }
+				jsonBody['extensions']['contemberAdminServer'] = { projects: await this.projectListProvider.get(token) }
 
 				this.writeAuthCookie(res, token)
 				this.proxyHead(res, innerRes)

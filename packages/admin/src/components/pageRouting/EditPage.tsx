@@ -1,37 +1,30 @@
 import {
 	DataBindingProvider,
-	EntityAccessor,
 	EntitySubTree,
 	EntitySubTreeAdditionalProps,
-	PersistSuccessOptions,
 	SugaredQualifiedSingleEntity,
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
-import type RequestState from '../../state/request'
 import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
 import type { PageProvider } from './PageProvider'
-import { useEntityRedirectOnPersistSuccess } from './useEntityRedirectOnPersistSuccess'
+import { RedirectOnSuccessHandler } from './useEntityRedirectOnPersistSuccess'
+import { useOnPersistSuccess } from './useOnPersistSuccess'
 
 export interface EditPageProps extends SugaredQualifiedSingleEntity, EntitySubTreeAdditionalProps {
 	pageName: string
 	children: ReactNode
-	redirectOnSuccess?: (
-		currentState: RequestState,
-		persistedId: string,
-		entity: EntityAccessor,
-		options: PersistSuccessOptions,
-	) => RequestState
+	redirectOnSuccess?: RedirectOnSuccessHandler
 	rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
 }
 
 const EditPage: Partial<PageProvider<EditPageProps>> & ComponentType<EditPageProps> = memo(
-	({ pageName, children, rendererProps, redirectOnSuccess, ...entityProps }: EditPageProps) => (
+	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: EditPageProps) => (
 		<DataBindingProvider stateComponent={FeedbackRenderer}>
 			<EntitySubTree
 				{...entityProps}
 				entityComponent={MutableSingleEntityRenderer}
 				entityProps={rendererProps}
-				onPersistSuccess={useEntityRedirectOnPersistSuccess(redirectOnSuccess)}
+				onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })}
 			>
 				{children}
 			</EntitySubTree>

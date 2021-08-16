@@ -3,14 +3,16 @@ import { useMemo } from 'react'
 import type RequestState from '../../state/request'
 import { useRedirect } from './useRedirect'
 
+export type RedirectOnSuccessHandler = (
+	currentState: RequestState,
+	persistedId: string,
+	entity: EntityAccessor,
+	options: PersistSuccessOptions,
+) => RequestState
+
 export const useEntityRedirectOnPersistSuccess = (
 	redirectOnSuccess:
-		| ((
-				currentState: RequestState,
-				persistedId: string,
-				entity: EntityAccessor,
-				options: PersistSuccessOptions,
-		  ) => RequestState)
+		| RedirectOnSuccessHandler
 		| undefined,
 ) => {
 	const redirect = useRedirect()

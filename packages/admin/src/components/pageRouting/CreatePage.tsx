@@ -1,50 +1,34 @@
 import {
 	DataBindingProvider,
-	EntityAccessor,
 	EntitySubTree,
 	EntitySubTreeAdditionalCreationProps,
 	EntitySubTreeAdditionalProps,
-	PersistSuccessOptions,
-	QueryLanguage,
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
-import { ComponentType, memo, ReactNode, useMemo } from 'react'
-import type RequestState from '../../state/request'
+import { ComponentType, memo, ReactNode } from 'react'
 import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
 import type { PageProvider } from './PageProvider'
-import { useEntityRedirectOnPersistSuccess } from './useEntityRedirectOnPersistSuccess'
+import { RedirectOnSuccessHandler } from './useEntityRedirectOnPersistSuccess'
+import { useOnPersistSuccess } from './useOnPersistSuccess'
 
 export type CreatePageProps = Omit<SugaredUnconstrainedQualifiedSingleEntity, 'isCreating'> &
 	EntitySubTreeAdditionalProps &
 	EntitySubTreeAdditionalCreationProps & {
 		pageName: string
 		children: ReactNode
-		redirectOnSuccess?: (
-			currentState: RequestState,
-			persistedId: string,
-			entity: EntityAccessor,
-			options: PersistSuccessOptions,
-		) => RequestState
+		redirectOnSuccess?: RedirectOnSuccessHandler
 		rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
 	}
 
 const CreatePage: Partial<PageProvider<CreatePageProps>> & ComponentType<CreatePageProps> = memo(
 	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: CreatePageProps) => {
-		const redirectOnSuccessCb = useEntityRedirectOnPersistSuccess(redirectOnSuccess)
 		return (
 			<DataBindingProvider stateComponent={FeedbackRenderer}>
 				<EntitySubTree
 					{...entityProps}
 					entityComponent={MutableSingleEntityRenderer}
 					entityProps={rendererProps}
-					onPersistSuccess={useMemo(() => {
-						if (!redirectOnSuccessCb || !onPersistSuccess) {
-							return redirectOnSuccessCb ?? onPersistSuccess
-						}
-						const listeners = QueryLanguage.desugarEventListener(onPersistSuccess)
-						listeners.add(redirectOnSuccessCb)
-						return listeners
-					}, [onPersistSuccess, redirectOnSuccessCb])}
+					onPersistSuccess={useOnPersistSuccess({ redirectOnSuccess, onPersistSuccess })}
 					isCreating
 				>
 					{children}

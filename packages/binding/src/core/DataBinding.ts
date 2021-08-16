@@ -172,25 +172,33 @@ export class DataBinding {
 								persistedEntityIds,
 							}
 
-							await this.eventManager.asyncTransaction(async () => {
-								this.resetTreeAfterSuccessfulPersist()
-								this.treeAugmenter.updatePersistedData(
-									Object.fromEntries(
-										Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
-											placeholderName,
-											subTreeResponse.node,
-										]),
-									),
-								)
-								const persistSuccessOptions: PersistSuccessOptions = {
-									...this.bindingOperations,
-									successType: result.type,
-								}
-								await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
-								await onPersistSuccess?.(persistSuccessOptions)
+							try {
+								await this.eventManager.asyncTransaction(async () => {
+									this.resetTreeAfterSuccessfulPersist()
+									this.treeAugmenter.updatePersistedData(
+										Object.fromEntries(
+											Object.entries(mutationData).map(([placeholderName, subTreeResponse]) => [
+												placeholderName,
+												subTreeResponse.node,
+											]),
+										),
+									)
+									const persistSuccessOptions: PersistSuccessOptions = {
+										...this.bindingOperations,
+										successType: result.type,
+									}
+									await this.eventManager.triggerOnPersistSuccess(persistSuccessOptions)
+									await onPersistSuccess?.(persistSuccessOptions)
 
-								this.treeAugmenter.resetCreatingSubTrees()
-							})
+									this.treeAugmenter.resetCreatingSubTrees()
+								})
+							} catch (e) {
+								console.error(e)
+								return {
+									...result,
+									afterPersistError: e,
+								}
+							}
 							return result
 						} else {
 							this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData))

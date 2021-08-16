@@ -7,6 +7,7 @@ export interface NothingToPersistPersistResult {
 export interface JustSuccessPersistResult {
 	type: 'justSuccess'
 	persistedEntityIds: string[]
+	afterPersistError?: any
 }
 
 export interface InvalidInputPersistResult {

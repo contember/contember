@@ -81,6 +81,7 @@ export const csCZ: AdminDictionary = {
 	persistFeedback: {
 		successMessage: 'Úspěšně uloženo!',
 		errorMessage: 'Při ukládání došlo k chybě. Zkuste to prosím znovu.',
+		afterPersistErrorMessage: 'Po úspěšném uložení dat došlo k chybě. Obnovte, prosím, stránku.',
 	},
 	repeater: {
 		addButton: {

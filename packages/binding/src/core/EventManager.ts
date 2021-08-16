@@ -552,7 +552,7 @@ export class EventManager {
 		if (rejections.length === 0) {
 			return
 		}
-		rejections.forEach(console.error)
+		rejections.forEach(it => console.error(it.reason))
 		if (import.meta.env.DEV) {
 			throw new BindingError(
 				`A ${handler} handler returned a promise that rejected. ` +

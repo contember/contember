@@ -10,6 +10,9 @@ export interface PersistWithFeedbackOptions extends PersistOptions {
 
 	errorMessage?: string
 	errorDuration?: number
+
+	afterPersistErrorMessage?: string
+	afterPersistErrorDuration?: number
 }
 
 export const usePersistWithFeedback = ({
@@ -17,6 +20,8 @@ export const usePersistWithFeedback = ({
 	successDuration,
 	errorMessage,
 	errorDuration,
+	afterPersistErrorMessage,
+	afterPersistErrorDuration,
 	...persistOptions
 }: PersistWithFeedbackOptions = {}) => {
 	const persistAll = usePersist()
@@ -34,6 +39,15 @@ export const usePersistWithFeedback = ({
 					},
 					successDuration ?? 4000,
 				)
+				if (result.type === 'justSuccess' && result.afterPersistError) {
+					showToast(
+						{
+							type: 'error',
+							message: formatMessage(afterPersistErrorMessage, 'persistFeedback.afterPersistErrorMessage'),
+						},
+						afterPersistErrorDuration ?? 8000,
+					)
+				}
 				return result
 			})
 			.catch((result: ErrorPersistResult) => {
@@ -56,5 +70,7 @@ export const usePersistWithFeedback = ({
 		successDuration,
 		errorMessage,
 		errorDuration,
+		afterPersistErrorDuration,
+		afterPersistErrorMessage,
 	])
 }

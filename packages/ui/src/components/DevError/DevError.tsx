@@ -1,43 +1,19 @@
 import { useClassNamePrefix } from '../../auxiliary'
+import { DevErrorInner, DevErrorInnerProps } from './DevErrorInner'
 
-export interface DevErrorProps {
-	error: Error | PromiseRejectionEvent | ErrorEvent
-	stack?: string
+export interface DevErrorProps extends DevErrorInnerProps
+{
 }
 
 export function DevError(props: DevErrorProps) {
 	const prefix = useClassNamePrefix()
-
-	let error: Error | undefined
-
-	if (props.error instanceof PromiseRejectionEvent) {
-		error = props.error.reason
-	} else if (props.error instanceof ErrorEvent) {
-		if (props.error.message.startsWith('ResizeObserver')) {
-			// Apparently, this can be ignored: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
-			return null
-		}
-		error = props.error.error
-	} else {
-		error = props.error
-	}
-
-	if (!(error instanceof Error)) {
-		error = undefined
-	}
-
 	return (
 		<div className={`${prefix}devError`}>
 			<div className={`${prefix}devError-in`}>
-				<h1 className={`${prefix}devError-message`}>
-					{!!error && `${error.name}: ${error.message}`}
-					{!error && 'Error!'}
-				</h1>
-				{!!props.stack && (
-					<div className={`${prefix}devError-stack`}>
-						<div className={`${prefix}devError-stack-dump`}>{props.stack}</div>
-					</div>
-				)}
+				<div className={`${prefix}devError-bar`}>
+					<div className={`${prefix}devError-errorSource`}>{props.source}</div>
+				</div>
+				<DevErrorInner {...props} />
 			</div>
 		</div>
 	)

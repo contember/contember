@@ -1,10 +1,12 @@
-import { DevError } from '@contember/ui'
 import type { ReactElement } from 'react'
 import * as ReactDOM from 'react-dom'
 import { Admin } from '../components'
 import type { ProjectConfig } from '../state/projectsConfigs'
 import { assertValidClientConfig } from './assertValidClientConfig'
 import type { ClientConfig } from './ClientConfig'
+import StackTracey from 'stacktracey'
+import { Buffer } from 'buffer'
+import { DevErrorManager, ErrorBus } from '../components/Dev'
 
 type ReactRootFactory = (config: ClientConfig, projects: ProjectConfig[]) => ReactElement
 
@@ -55,31 +57,59 @@ export const runAdmin = (
 		.map(it => (Array.isArray(it) ? it : [it]))
 		.reduce((acc, it) => [...acc, ...it], [])
 
-	const handleError = (error: Error | PromiseRejectionEvent | ErrorEvent) => {
+	const getErrorContainer = () => {
 		const errorElementId = '__contember__dev__error__container__element'
 		let errorContainer = document.getElementById(errorElementId)
 
 		if (errorContainer) {
-			return
-		}
-
-		errorContainer = document.createElement('div')
-		errorContainer.id = errorElementId
-
-		document.body.appendChild(errorContainer)
-
-		if (import.meta.env.DEV) {
-			ReactDOM.render(<DevError error={error} />, errorContainer)
+			ReactDOM.unmountComponentAtNode(errorContainer)
 		} else {
-			ReactDOM.render(<h1>Fatal error</h1>, errorContainer)
+			errorContainer = document.createElement('div')
+			errorContainer.id = errorElementId
+			document.body.appendChild(errorContainer)
 		}
+		return errorContainer
 	}
+	const reactElement = reactRoot(config, projectConfigs)
+	if (import.meta.env.DEV) {
+		const errorBus = new ErrorBus()
+		window.Buffer = Buffer
+		window.addEventListener('error', e => {
+			if (e.message.startsWith('ResizeObserver')) {
+				// Apparently, this can be ignored: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+				return
+			}
+			errorBus.handleError('Unhandled error', e.error)
+		})
+		window.addEventListener('unhandledrejection', e => errorBus.handleError('Unhandled promise rejection', e.reason))
+		const origOnError = console.error
+		console.error = (...args) => {
+			origOnError(...args)
+			for (const arg of args) {
+				if (!(arg instanceof Error)) {
+					continue
+				}
+				errorBus.handleError('Logged error', arg)
+			}
+		}
+		ReactDOM.render(<DevErrorManager bus={errorBus} />, getErrorContainer())
+		try {
+			ReactDOM.render(reactElement, rootEl)
+		} catch (error) {
+			errorBus.handleError('React crash', error)
+		}
+	} else {
+		const renderError = () => {
+			ReactDOM.render(<h1>Fatal error</h1>, getErrorContainer())
+		}
 
-	window.addEventListener('error', handleError)
-	window.addEventListener('unhandledrejection', handleError)
-	try {
-		ReactDOM.render(reactRoot(config, projectConfigs), rootEl)
-	} catch (e) {
-		handleError(e)
+		window.addEventListener('error', renderError)
+		window.addEventListener('unhandledrejection', renderError)
+		try {
+			ReactDOM.render(reactElement, rootEl)
+		} catch (e) {
+			console.error(e)
+			renderError()
+		}
 	}
 }

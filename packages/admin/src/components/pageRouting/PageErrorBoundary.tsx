@@ -1,6 +1,7 @@
-import { DevError, Message, Portal } from '@contember/ui'
+import { Message } from '@contember/ui'
 import { memo, ReactNode } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
+import { DevErrorFallback } from '../Dev'
 
 export interface PageErrorBoundaryProps {
 	children: ReactNode
@@ -11,14 +12,6 @@ export const PageErrorBoundary = memo((props: PageErrorBoundaryProps) => (
 		{props.children}
 	</ErrorBoundary>
 ))
-
-function DevErrorFallback({ error }: FallbackProps) {
-	return (
-		<Portal>
-			<DevError error={error} />
-		</Portal>
-	)
-}
 
 function ProdErrorFallback({}: FallbackProps) {
 	return (

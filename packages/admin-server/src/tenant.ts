@@ -22,6 +22,36 @@ const ProjectListResponseType = object({
 	}),
 })
 
+const MeResponseType = object({
+	data: object({
+		me: object({
+			person: object({
+				id: string,
+				email: string,
+			}),
+			projects: array(
+				object({
+					project: object({
+						slug: string,
+						name: string,
+					}),
+					memberships: array(
+						object({
+							role: string,
+							variables: array(
+								object({
+									name: string,
+									values: array(string),
+								}),
+							),
+						}),
+					),
+				}),
+			),
+		}),
+	}),
+})
+
 interface TenantApiRequest {
 	token: string
 	query: string
@@ -73,6 +103,44 @@ export class TenantApi {
 
 		const payload = ProjectListResponseType(await response.json())
 		return payload.data.projects
+	}
+
+	async getMe(token: string) {
+		const response = await this.request({
+			token,
+			query: `
+				query {
+					me {
+						person {
+							id
+							email
+						}
+
+						projects {
+							project {
+								slug
+								name
+							}
+
+							memberships {
+								role
+								variables {
+									name
+									values
+								}
+							}
+						}
+					}
+				}
+			`,
+		})
+
+		if (!response.ok) {
+			return null
+		}
+
+		const payload = MeResponseType(await response.json())
+		return payload.data.me
 	}
 
 	private async request({ token, query, variables }: TenantApiRequest): Promise<Response> {

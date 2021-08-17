@@ -10,6 +10,7 @@ import * as http from 'http'
 import { URL } from 'url'
 import { S3Manager } from './s3'
 import { ProjectListProvider } from './project'
+import { MeController } from './controllers/MeController'
 
 export default new Builder({})
 	.addService('env', env)
@@ -54,7 +55,11 @@ export default new Builder({})
 		return new ApiController(env.CONTEMBER_API_ENDPOINT, projectListProvider)
 	})
 
-	.addService('httpServer', ({ loginController, deployController, projectController, apiController }) => {
+	.addService('meController', ({ tenant, s3 }) => {
+		return new MeController(tenant, s3)
+	})
+
+	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController }) => {
 		return http.createServer(async (req, res) => {
 			const startTime = process.hrtime()
 			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
@@ -64,6 +69,10 @@ export default new Builder({})
 				switch (prefix) {
 					case '_deploy':
 						await deployController.handle(req, res)
+						break
+
+					case '_me':
+						await meController.handle(req, res)
 						break
 
 					case '_api':

@@ -4,13 +4,13 @@ import { getType } from 'mime'
 import { BaseController } from './BaseController'
 import { URL } from 'url'
 import type { ProjectListProvider } from '../project'
+import { LOGIN_TOKEN_PLACEHOLDER } from './ApiController'
 
 const CONTEMBER_CONFIG_PLACEHOLDER = '{configuration}'
 
 export class LoginController extends BaseController {
 	constructor(
 		private apiEndpoint: string,
-		private loginToken: string,
 		private publicDir: string,
 		private projectListProvider: ProjectListProvider,
 	) {
@@ -28,7 +28,7 @@ export class LoginController extends BaseController {
 
 			if (path === 'index.html') {
 				const projects = await this.projectListProvider.get(this.readAuthCookie(req))
-				const configJson = JSON.stringify({ apiBaseUrl: '/_api', loginToken: this.loginToken, projects })
+				const configJson = JSON.stringify({ apiBaseUrl: '/_api', loginToken: LOGIN_TOKEN_PLACEHOLDER, projects })
 				res.end(content.toString('utf8').replace(CONTEMBER_CONFIG_PLACEHOLDER, configJson))
 
 			} else {

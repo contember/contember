@@ -40,7 +40,7 @@ export default new Builder({})
 	})
 
 	.addService('loginController', ({ env, projectListProvider }) => {
-		return new LoginController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_LOGIN_TOKEN, env.CONTEMBER_PUBLIC_DIR, projectListProvider)
+		return new LoginController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_PUBLIC_DIR, projectListProvider)
 	})
 
 	.addService('deployController', ({ tenant, s3 }) => {
@@ -52,7 +52,7 @@ export default new Builder({})
 	})
 
 	.addService('apiController', ({ env, projectListProvider }) => {
-		return new ApiController(env.CONTEMBER_API_ENDPOINT, projectListProvider)
+		return new ApiController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_LOGIN_TOKEN, projectListProvider)
 	})
 
 	.addService('meController', ({ tenant, s3 }) => {

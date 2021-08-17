@@ -118,7 +118,7 @@ export const Admin = memo((props: AdminProps) => {
 											const Component = relevantConfig.lazyComponent
 
 											if (config) {
-												relevantConfig.rootEnvironment = relevantConfig.rootEnvironment
+												const environment = relevantConfig.rootEnvironment
 													.updateDimensionsIfNecessary(route.dimensions, config.defaultDimensions || {})
 													.putDelta({
 														...route.parameters,
@@ -131,7 +131,7 @@ export const Admin = memo((props: AdminProps) => {
 														sessionToken={store.getState().auth.identity?.token}
 														stage={route.stage}
 													>
-														<EnvironmentContext.Provider value={relevantConfig.rootEnvironment}>
+														<EnvironmentContext.Provider value={environment}>
 															<I18nProvider
 																localeCode={relevantConfig.defaultLocale}
 																dictionaries={relevantConfig.dictionaries}

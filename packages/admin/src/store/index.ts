@@ -60,5 +60,5 @@ export function configureStore(initialState: State, config: ClientConfig): Store
 	const middlewareEnhancer = applyMiddleware(...middlewares)
 
 	// "as any" is a workaround for typescript exceeding max call stack size (tsc's bug)
-	return (createStore as any)(rootReducer, initialState, composeEnhancers(middlewareEnhancer, persistState(services)))
+	return (createStore as any)(rootReducer, initialState, composeEnhancers(middlewareEnhancer/*, persistState(services)*/))
 }

@@ -7,6 +7,7 @@ import Toasts from './toasts'
 import View from './view'
 
 export default combineReducers<State>({
+	basePath: (state, action) => state ?? '',
 	request: Request,
 	view: View,
 	auth: Auth,

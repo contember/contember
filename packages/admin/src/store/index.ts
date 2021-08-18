@@ -28,6 +28,7 @@ export interface Store extends ReduxStore<State> {
 
 export class ReducerError extends Error {}
 
+/** @deprecated */
 export function persistState(services: Services) {
 	return (next: Function) =>
 		(reducer: Reducer, initialState: State): Store => {

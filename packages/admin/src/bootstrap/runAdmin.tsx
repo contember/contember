@@ -1,12 +1,12 @@
 import type { ReactElement } from 'react'
 import * as ReactDOM from 'react-dom'
-import { Admin } from '../components'
 import type { ProjectConfig } from '../state/projectsConfigs'
 import { assertValidClientConfig } from './assertValidClientConfig'
 import type { ClientConfig } from './ClientConfig'
 import StackTracey from 'stacktracey'
 import { Buffer } from 'buffer'
 import { DevErrorManager, ErrorBus } from '../components/Dev'
+import { ProjectEntrypoint } from '../components'
 
 type ReactRootFactory = (config: ClientConfig, projects: ProjectConfig[]) => ReactElement
 
@@ -51,7 +51,7 @@ export const runAdmin = (
 	})()
 
 	const reactRoot: ReactRootFactory =
-		options.reactRoot || ((config, projectConfigs) => <Admin clientConfig={config} configs={projectConfigs} />)
+		options.reactRoot || ((config, projectConfigs) => <ProjectEntrypoint basePath="" clientConfig={config} projectConfig={projectConfigs[0]} />)
 
 	const projectConfigs = Object.values(projects)
 		.map(it => (Array.isArray(it) ? it : [it]))

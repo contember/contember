@@ -17,10 +17,10 @@ export const NavigationIsActiveProvider = memo(function NavigationIsActiveProvid
 	props: NavigationIsActiveProviderProps,
 ) {
 	const viewRoute = useSelector((state: State): PageRequest<any> | undefined => {
-		if (!state.view.route || state.view.route.name !== 'project_page') {
+		if (state.request.name !== 'project_page') {
 			return undefined
 		}
-		return state.view.route
+		return state.request
 	}, shallowEqual)
 	const configs = useSelector((state: State) => [state.projectConfig], shallowEqual)
 	const request = useSelector((state: State) => state.request, shallowEqual)

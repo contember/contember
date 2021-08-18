@@ -7,7 +7,7 @@ import { requestStateToPath } from '../../utils/url'
 import { InnerProps, LinkComponent, PublicAnchorProps } from './LinkComponent'
 
 export const Link = connect<LinkComponent.StateProps, LinkComponent.DispatchProps, LinkComponent.OwnProps, State>(
-	({ view, projectConfig, request }, { requestChange }) => ({
+	({ projectConfig, request }, { requestChange }) => ({
 		href: requestStateToPath(routes([projectConfig]), requestChange(request)),
 	}),
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),

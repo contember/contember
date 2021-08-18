@@ -9,7 +9,6 @@ import { Toaster } from '../ui'
 import type { ProjectConfig } from 'index'
 import { ProjectEntrypointInner } from './ProjectEntrypointInner'
 import { emptyRequestState } from '../../state/request'
-import { emptyViewState } from '../../state/view'
 import { emptyAuthState } from '../../state/auth'
 import { emptyToastsState } from '../../state/toasts'
 
@@ -25,7 +24,6 @@ export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 			{
 				basePath: props.basePath,
 				request: emptyRequestState,
-				view: emptyViewState,
 				auth: emptyAuthState,
 				projectConfig: props.projectConfig,
 				toasts: emptyToastsState,

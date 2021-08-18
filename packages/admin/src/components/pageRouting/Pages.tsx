@@ -87,9 +87,9 @@ class Pages extends PureComponent<PagesProps & PagesStateProps> {
 	}
 }
 
-export default connect<PagesStateProps, {}, PagesProps, State>(({ view }) => {
-	if (view.route && view.route.name === 'project_page') {
-		return { name: view.route.pageName, parameters: view.route.parameters }
+export default connect<PagesStateProps, {}, PagesProps, State>(({ request }) => {
+	if (request.name === 'project_page') {
+		return { name: request.pageName, parameters: request.parameters }
 	}
 	throw new Error('Pages can be render in "project_page" route')
 })(Pages)

@@ -9,8 +9,7 @@ type RouteHandler<K extends RouteName> = FunctionComponent<{ route: RequestByNam
 type RouteMap<N extends RouteName = RouteName> = { [K in N]: RouteHandler<K> }
 
 interface RoutesRendererStateProps {
-	loading: boolean
-	route: RequestState | null
+	request: RequestState
 }
 
 interface RoutesRendererOwnProps {
@@ -21,18 +20,12 @@ type RoutesRendererProps = RoutesRendererStateProps & RoutesRendererOwnProps
 
 class RoutesRenderer extends PureComponent<RoutesRendererProps> {
 	public override render() {
-		const route = this.props.route
-		if (!route) {
-			return null
-		}
+		const route = this.props.request
 		const Handler = this.props.routes[route.name] as RouteHandler<RouteName>
 		return Handler ? <Handler route={route} /> : '404'
 	}
 }
 
 export const Router = connect<RoutesRendererStateProps, {}, RoutesRendererOwnProps, State>(
-	({ view: { loading, route } }) => ({
-		loading,
-		route,
-	}),
+	({ request }) => ({ request }),
 )(RoutesRenderer)

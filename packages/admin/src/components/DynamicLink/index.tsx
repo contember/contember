@@ -42,7 +42,7 @@ const DynamicLinkComponent = (props: DynamicLinkProps) => {
 DynamicLinkComponent.displayName = 'DynamicLink'
 
 export const DynamicLink = connect<DynamicLinkStateProps, DynamicLinkDispatchProps, DynamicLinkOwnProps, State>(
-	({ view, projectConfig, request }, { requestChange }) => ({
+	({ projectConfig, request }, { requestChange }) => ({
 		url: requestStateToPath(routes([projectConfig]), requestChange(request)),
 	}),
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),

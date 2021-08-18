@@ -2,8 +2,6 @@ import { createAction } from 'redux-actions'
 import { REQUEST_REPLACE } from '../reducer/request'
 import { PageNotFound } from '../routes'
 import type { default as RequestState, PageRequest, RequestChange } from '../state/request'
-import type ViewState from '../state/view'
-import handleRequest from './requestHandler'
 import type { ActionCreator } from './types'
 import { matchesPath } from '../utils'
 import type { ProjectConfig } from '../state/projectsConfigs'
@@ -40,13 +38,11 @@ const requestStateToPathX = (projectConfig: ProjectConfig, request: PageRequest<
 }
 
 export const pushRequest =
-	(requestChange: RequestChange): ActionCreator<ViewState> =>
+	(requestChange: RequestChange): ActionCreator<RequestState> =>
 	(dispatch, getState) => {
 		const basePath = getState().basePath
 		const previousRequest = getState().request
 		const request: RequestState = { ...requestChange(previousRequest) }
-		dispatch(createAction(REQUEST_REPLACE, () => request)())
-
 		const projectConfig = getState().projectConfig
 
 		window.history.pushState(
@@ -54,11 +50,12 @@ export const pushRequest =
 			document.title,
 			basePath + requestStateToPathX(projectConfig, request as any), // TODO
 		)
-		return dispatch(handleRequest(request, previousRequest))
+
+		return dispatch(createAction(REQUEST_REPLACE, () => request)())
 	}
 
 export const populateRequest =
-	(location: Location): ActionCreator<ViewState> =>
+	(location: Location): ActionCreator<RequestState> =>
 	(dispatch, getState) => {
 		const basePath = getState().basePath
 
@@ -81,7 +78,5 @@ export const populateRequest =
 			window.history.replaceState({}, document.title, canonicalPath)
 		}
 
-		const previousRequest = getState().request
-		dispatch(createAction(REQUEST_REPLACE, () => request)())
-		return dispatch(handleRequest(request, previousRequest))
+		return dispatch(createAction(REQUEST_REPLACE, () => request)())
 	}

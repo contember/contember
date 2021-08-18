@@ -22,7 +22,7 @@ export const NavigationIsActiveProvider = memo(function NavigationIsActiveProvid
 		}
 		return state.view.route
 	}, shallowEqual)
-	const configs = useSelector((state: State) => state.projectsConfigs.configs, shallowEqual)
+	const configs = useSelector((state: State) => [state.projectConfig], shallowEqual)
 	const request = useSelector((state: State) => state.request, shallowEqual)
 	const isActive = useCallback(
 		(to: string | Navigation.CustomTo) => {

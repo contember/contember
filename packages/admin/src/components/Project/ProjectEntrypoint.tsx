@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react'
 import { ContemberClient } from '@contember/react-client'
 import { ClientConfig } from '../../bootstrap'
 import { configureStore, Store } from '../../store'
-import { emptyState } from '../../state'
 import { populateRequest } from '../../actions'
 import { ReduxStoreProvider } from '../../temporaryHacks'
 import { DialogProvider } from '@contember/ui'
 import { Toaster } from '../ui'
 import type { ProjectConfig } from 'index'
 import { ProjectEntrypointInner } from './ProjectEntrypointInner'
+import { emptyRequestState } from '../../state/request'
+import { emptyViewState } from '../../state/view'
+import { emptyAuthState } from '../../state/auth'
+import { emptyToastsState } from '../../state/toasts'
 
 export interface ProjectEntrypointProps { // TODO: better props names
 	basePath: string
@@ -20,9 +23,12 @@ export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 	const [store] = useState(() => { // TODO: move out to new "runAdmin"
 		const store: Store = configureStore(
 			{
-				...emptyState,
 				basePath: props.basePath,
-				projectsConfigs: { configs: [props.projectConfig] },
+				request: emptyRequestState,
+				view: emptyViewState,
+				auth: emptyAuthState,
+				projectConfig: props.projectConfig,
+				toasts: emptyToastsState,
 			},
 			props.clientConfig,
 		)

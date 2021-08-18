@@ -12,11 +12,3 @@ export interface ProjectConfig {
 	defaultLocale?: string
 	dictionaries?: MessageDictionaryByLocaleCode
 }
-
-export default interface ProjectsConfigsState {
-	configs: ProjectConfig[]
-}
-
-export const emptyProjectsConfigsState: ProjectsConfigsState = {
-	configs: [],
-}

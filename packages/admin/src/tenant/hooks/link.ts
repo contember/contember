@@ -13,8 +13,8 @@ interface UseLinkReturn {
 }
 
 export const useLink = (requestChange: RequestChange): UseLinkReturn => {
-	const routeMap = useSelector<State, RouteMap>(({ projectsConfigs }) => {
-		return routes(projectsConfigs.configs)
+	const routeMap = useSelector<State, RouteMap>(({ projectConfig }) => {
+		return routes([projectConfig])
 	})
 	const request = useSelector<State, State['request']>(({ request }) => {
 		return request

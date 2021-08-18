@@ -47,7 +47,7 @@ export const pushRequest =
 		const request: RequestState = { ...requestChange(previousRequest) }
 		dispatch(createAction(REQUEST_REPLACE, () => request)())
 
-		const projectConfig = getState().projectsConfigs.configs[0] // TODO!
+		const projectConfig = getState().projectConfig
 
 		window.history.pushState(
 			{},
@@ -66,7 +66,7 @@ export const populateRequest =
 			throw new PageNotFound('No matching route found (wrong basePath)')
 		}
 
-		const projectConfig = getState().projectsConfigs.configs[0] // TODO!
+		const projectConfig = getState().projectConfig
 		const path = location.pathname.substring(basePath.length)
 
 		const request = pathToRequestStateX(projectConfig, path)

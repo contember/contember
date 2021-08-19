@@ -2,10 +2,17 @@
 
 @import '../common'
 
-$saveControl-color: #0094FF
-$saveControl-color-alt: #FFFFFF
+$saveControl-color: $cui-button-view-primary-background
+$saveControl-color-alt: $cui-button-view-primary-color
 
 .#{$cui-conf-globalPrefix}saveControl
+	$vertical-padding: .8em
+	$horizontal-padding: 1.5em
+	$line-height: 1
+
+	$button-height: $line-height + 2 * $vertical-padding
+
+	display: inline-flex
 	position: relative
 
 	&-window-in
@@ -13,7 +20,7 @@ $saveControl-color-alt: #FFFFFF
 
 	&-button-primary,
 	&-button-toggle
-		padding: .8em 1.5em
+		padding: $vertical-padding $horizontal-padding
 
 	&-button,
 	&-window
@@ -22,13 +29,19 @@ $saveControl-color-alt: #FFFFFF
 	&-button
 		background: $saveControl-color
 		color: $saveControl-color-alt
-		display: inline-flex
-		line-height: 1
+		display: inherit
+		flex-grow: 1
+		line-height: $line-height
 		overflow: hidden
+		margin-left: -$button-height * math.div($extra-optical-size-rounded-rectangle, 2)
+		margin-right: -$button-height * math.div($extra-optical-size-rounded-rectangle, 2)
 
 		&.view-disabled
-			background: #aaaaaa
+			background: rgba(182, 182, 182, 0.5)
 			pointer-events: none
+
+		&-primary
+			flex-grow: inherit
 
 		&-primary,
 		&-toggle

@@ -27,6 +27,7 @@ export class ErrorBus {
 		}
 	}
 }
+
 export interface DevErrorManagerProps {
 	bus: ErrorBus
 }

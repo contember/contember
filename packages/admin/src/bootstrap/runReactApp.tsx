@@ -6,17 +6,13 @@ export const runReactApp = (
 	reactElement: ReactElement,
 	domRoot?: HTMLElement | string | null,
 ) => {
-	const rootEl = (() => {
-		if (domRoot && domRoot instanceof HTMLElement) {
-			return domRoot
-		}
-		const selector = domRoot || '#root'
-		return document.querySelector<HTMLElement>(selector)
-	})()
+	const rootEl = domRoot instanceof HTMLElement
+		? domRoot
+		: document.querySelector<HTMLElement>(domRoot ?? '#root')
+
 	if (!rootEl) {
 		throw new Error('Contember root element not found')
 	}
-
 
 	const handler = createErrorHandler()
 	handler(() => ReactDOM.render(reactElement, rootEl))

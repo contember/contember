@@ -13,15 +13,18 @@ window.addEventListener('DOMContentLoaded', () => {
 	if (typeof sessionToken !== 'string') {
 		throw new Error(`The ENV variables haven't been set. Check your \`.env.development.local\` file.`) // TODO: better message
 	}
-	runReactApp(<ProjectEntrypoint
-		basePath=""
-		clientConfig={{ apiBaseUrl, sessionToken }}
-		projectConfig={{
-			project: 'sandbox',
-			stage: 'live',
-			component: <Sandbox/>,
-			routes: {
-				dashboard: { path: '/' },
-			},
-		}}/>)
+
+	runReactApp(
+		<ProjectEntrypoint
+			clientConfig={{ apiBaseUrl, sessionToken }}
+			projectConfig={{
+				project: 'sandbox',
+				stage: 'live',
+				component: <Sandbox />,
+				routes: {
+					dashboard: { path: '/' },
+				},
+			}}
+		/>,
+	)
 })

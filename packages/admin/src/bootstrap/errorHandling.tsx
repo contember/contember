@@ -8,16 +8,19 @@ const getErrorContainer = () => {
 
 	if (errorContainer) {
 		ReactDOM.unmountComponentAtNode(errorContainer)
+
 	} else {
 		errorContainer = document.createElement('div')
 		errorContainer.id = errorElementId
 		document.body.appendChild(errorContainer)
 	}
+
 	return errorContainer
 }
 
 const devErrorHandler = (): TryRun => {
 	const errorBus = new ErrorBus()
+
 	window.Buffer = Buffer
 	window.addEventListener('error', e => {
 		if (e.message.startsWith('ResizeObserver')) {
@@ -26,18 +29,20 @@ const devErrorHandler = (): TryRun => {
 		}
 		errorBus.handleError('Unhandled error', e.error)
 	})
+
 	window.addEventListener('unhandledrejection', e => errorBus.handleError('Unhandled promise rejection', e.reason))
+
 	const origOnError = console.error
 	console.error = (...args) => {
 		origOnError(...args)
 		for (const arg of args) {
-			if (!(arg instanceof Error)) {
-				continue
+			if (arg instanceof Error) {
+				errorBus.handleError('Logged error', arg)
 			}
-			errorBus.handleError('Logged error', arg)
 		}
 	}
-	ReactDOM.render(<DevErrorManager bus={errorBus}/>, getErrorContainer())
+
+	ReactDOM.render(<DevErrorManager bus={errorBus} />, getErrorContainer())
 
 	return async cb => {
 		try {

@@ -6,7 +6,7 @@ import type { SelectedDimension } from './request'
 export interface ProjectConfig {
 	project: string
 	stage: string
-	component: (() => Promise<{ default: ComponentType }>) | ReactElement
+	component: (() => Promise<{ default: ComponentType }>) | ReactElement // TODO: drop support for lazy loaded component?
 	routes: RouteMap
 	defaultDimensions?: SelectedDimension
 	defaultLocale?: string

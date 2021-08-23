@@ -1,8 +1,12 @@
 import { Button, ButtonList } from '@contember/ui'
 import { MiscPageLayout } from '../MiscPageLayout'
-import type { Project } from './LoginEntrypoint'
 
-interface ProjectListProps {
+export interface Project {
+	slug: string
+	name: string
+}
+
+export interface ProjectListProps {
 	projects: Project[],
 	formatProjectUrl: (project: Project) => string
 }

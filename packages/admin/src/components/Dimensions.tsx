@@ -20,7 +20,7 @@ class Dimensions<D extends SelectedDimension> extends ReactComponent<DimensionsS
 export default connect<DimensionsStateProps<SelectedDimension>, {}, DimensionsOwnProps<SelectedDimension>, State>(
 	(state: State): DimensionsStateProps<SelectedDimension> => {
 		return {
-			dimensions: state.request.name === 'project_page' ? state.request.dimensions : {},
+			dimensions: state.request?.dimensions ?? {},
 		}
 	},
 )(Dimensions)

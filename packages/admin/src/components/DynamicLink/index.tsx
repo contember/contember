@@ -2,11 +2,10 @@ import type { ComponentType, ReactElement } from 'react'
 import { connect } from 'react-redux'
 import { pushRequest } from '../../actions/request'
 import type { Dispatch } from '../../actions/types'
-import routes from '../../routes'
 import type State from '../../state'
 import type { RequestChange } from '../../state/request'
 import { isUrlActive } from '../../utils/isUrlActive'
-import { requestStateToPath } from '../../utils/url'
+import { requestStateToPath } from '../../routing'
 
 export interface DynamicLinkInnerProps {
 	onClick: () => void
@@ -42,8 +41,8 @@ const DynamicLinkComponent = (props: DynamicLinkProps) => {
 DynamicLinkComponent.displayName = 'DynamicLink'
 
 export const DynamicLink = connect<DynamicLinkStateProps, DynamicLinkDispatchProps, DynamicLinkOwnProps, State>(
-	({ projectConfig, request }, { requestChange }) => ({
-		url: requestStateToPath(routes([projectConfig]), requestChange(request)),
+	({ basePath, projectConfig, request }, { requestChange }) => ({
+		url: requestStateToPath(basePath, projectConfig, requestChange(request)),
 	}),
 	(dispatch: Dispatch, { requestChange }) => ({ goTo: () => dispatch(pushRequest(requestChange)) }),
 )(DynamicLinkComponent)

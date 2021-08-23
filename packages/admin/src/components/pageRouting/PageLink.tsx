@@ -35,9 +35,9 @@ export interface PageLinkProps extends Omit<LinkComponent.Props, 'goTo' | 'href'
 type Props = PageLinkProps & StateProps & PublicAnchorProps
 
 export default connect<StateProps, {}, PageLinkProps, State>(({ request }) => {
-	if (request.name === 'project_page') {
+	if (request !== null) {
 		return { project: request.project, stage: request.stage }
 	} else {
-		throw 'Cannot render PageLink outside project pages.'
+		throw 'Cannot render PageLink without resolved request'
 	}
 })(PageLink)

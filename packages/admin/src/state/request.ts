@@ -2,19 +2,7 @@ export interface RecursiveStringObject {
 	[key: string]: string | RecursiveStringObject | undefined
 }
 
-export interface Request {
-	name: string
-}
-
-export interface LoginRequest extends Request {
-	name: 'login'
-}
-
-export interface ProjectsListRequest extends Request {
-	name: 'projects_list'
-}
-
-export interface ProjectRequest extends Request {
+export interface ProjectRequest {
 	project: string
 }
 
@@ -30,30 +18,24 @@ export interface StageRequest extends ProjectRequest {
 type PageParameters = RecursiveStringObject
 
 export interface PageRequest<P extends PageParameters> extends StageRequest {
-	name: 'project_page'
 	pageName: string
 	parameters: P
 }
 
-type RequestState = LoginRequest | ProjectsListRequest | PageRequest<any>
+type RequestState = PageRequest<any> | null
 
 export default RequestState
 
-export const emptyRequestState: RequestState = {
-	name: 'login',
-}
+export const emptyRequestState: RequestState = null
 
 export type RequestChange = (currentState: RequestState) => RequestState
 
-export const loginRequest = (): RequestChange => (): LoginRequest => ({ name: 'login' })
-
 export const pageRequest =
 	<P extends PageParameters>(project: string, stage: string, pageName: string, parameters: P): RequestChange =>
-	(currentState): PageRequest<P> => ({
-		name: 'project_page',
+	(currentState: RequestState): PageRequest<P> => ({
 		project,
 		stage,
 		pageName,
 		parameters,
-		dimensions: (currentState as StageRequest).dimensions || {},
+		dimensions: currentState?.dimensions || {},
 	})

@@ -40,8 +40,8 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		const getRequestChangeCallback =
 			(dimension: StatefulDimensionDatum): RequestChange =>
 			reqState => {
-				if (reqState.name !== 'project_page') {
-					return reqState
+				if (reqState === null) {
+					throw 'Cannot switch dimension of unmatched request'
 				}
 
 				let updatedDimensions: StatefulDimensionDatum[]
@@ -158,13 +158,10 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 
 		if (normalizedData !== undefined && selectedDimensions.length === 0 && redirectTarget.length > 0) {
 			redirect(requestState => {
-				if (requestState.name !== 'project_page') {
-					return requestState
-				}
 				return {
-					...requestState,
+					...requestState!,
 					dimensions: {
-						...(requestState.dimensions || {}),
+						...(requestState?.dimensions ?? {}),
 						[props.dimension]: getUniqueDimensions(redirectTarget.map(item => item.slug).slice(0, props.maxItems)),
 					},
 				}

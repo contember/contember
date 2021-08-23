@@ -1,12 +1,7 @@
 import { ApiBaseUrlContext, LoginTokenContext } from '@contember/react-client'
 import { useState } from 'react'
 import { Login } from './Login'
-import { ProjectList } from './ProjectList'
-
-export interface Project {
-	slug: string
-	name: string
-}
+import { Project, ProjectList } from '../Project'
 
 export interface LoginEntrypointProps {
 	apiBaseUrl: string

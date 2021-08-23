@@ -1,15 +1,13 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { useSessionToken } from '@contember/react-client'
-import { Environment, EnvironmentContext } from '@contember/binding'
 import { ContainerSpinner } from '@contember/ui'
-import { I18nProvider } from '../../i18n'
-import type { ClientConfig, ProjectConfig } from 'index'
 import type { AuthIdentity } from '../../state/auth'
 import { useTenantMe } from '../../tenant/hooks/me'
 import { createAction } from 'redux-actions'
 import { SET_IDENTITY } from '../../reducer/auth'
 import { useDispatch } from 'react-redux'
-import { Router } from '../../containers/router'
+import { ProjectConfig } from '../../state/projectsConfigs'
+import { ClientConfig } from '../../bootstrap'
 
 export interface ProjectEntrypointInnerProps {
 	clientConfig: ClientConfig
@@ -50,36 +48,15 @@ export const ProjectEntrypointInner = (props: ProjectEntrypointInnerProps) => {
 		return null // TODO: handle error better (redirect to login?)
 	}
 
-	const rootEnv = Environment.create({ // TODO: move back to useState?
-		...props.clientConfig.envVariables,
-		dimensions: props.projectConfig.defaultDimensions ?? {},
-	})
+	if (typeof props.projectConfig.component === 'function') {
+		const Component = lazy(props.projectConfig.component)
 
-	const Component = typeof props.projectConfig.component === 'function'
-		? lazy(props.projectConfig.component)
-		: () => <>{props.projectConfig.component}</>
+		return (
+			<Suspense fallback={<ContainerSpinner />}>
+				<Component />
+			</Suspense>
+		)
+	}
 
-	return (
-		<Router
-			routes={{
-				login: () => null, // TODO: drop
-				projects_list: () => null, // TODO: drop
-				project_page: ({ route }) => {
-					const requestEnv = rootEnv
-						.updateDimensionsIfNecessary(route.dimensions, props.projectConfig.defaultDimensions ?? {})
-						.putDelta(route.parameters)
-
-					return (
-						<EnvironmentContext.Provider value={requestEnv}>
-							<I18nProvider localeCode={props.projectConfig.defaultLocale} dictionaries={props.projectConfig.dictionaries}>
-								<Suspense fallback={<ContainerSpinner />}>
-									<Component />
-								</Suspense>
-							</I18nProvider>
-						</EnvironmentContext.Provider>
-					)
-				},
-			}}
-		/>
-	)
+	return props.projectConfig.component
 }

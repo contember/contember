@@ -1,27 +1,19 @@
-import { Component as ReactComponent, ComponentType } from 'react'
-import { connect } from 'react-redux'
+import { ComponentType } from 'react'
+import { useSelector } from 'react-redux'
 import type State from '../state'
-import { InnerProps, Link } from './Link'
+import { InnerProps } from './Link'
 
 interface SwitchProjectLinkProps {
-	Component?: ComponentType<InnerProps>
+	Component: ComponentType<InnerProps>
 }
 
-interface SwitchProjectStateProps {
-	hasMoreProjects: boolean
-}
+export const SwitchProjectLink = (props: SwitchProjectLinkProps) => {
+	const hasMoreProjects = useSelector<State, boolean>(state => !!(state.auth.identity && state.auth.identity.projects.length > 1))
 
-type Props = SwitchProjectStateProps & SwitchProjectLinkProps
-
-class SwitchProjectLink extends ReactComponent<Props, {}> {
-	override render() {
-		if (!this.props.hasMoreProjects) {
-			return null
-		}
-		return <Link requestChange={() => ({ name: 'projects_list' })} Component={this.props.Component} />
+	if (!hasMoreProjects) {
+		return null
 	}
-}
 
-export default connect<SwitchProjectStateProps, {}, SwitchProjectLinkProps, State>(state => ({
-	hasMoreProjects: !!(state.auth.identity && state.auth.identity.projects.length > 1),
-}))(SwitchProjectLink)
+	// TODO: better routing to loginPage?
+	return <props.Component href="/" isActive={false} />
+}

@@ -1,79 +1,36 @@
 import { createAction } from 'redux-actions'
 import { REQUEST_REPLACE } from '../reducer/request'
-import { PageNotFound } from '../routes'
-import type { default as RequestState, PageRequest, RequestChange } from '../state/request'
+import type { default as RequestState, RequestChange } from '../state/request'
 import type { ActionCreator } from './types'
-import { matchesPath } from '../utils'
-import type { ProjectConfig } from '../state/projectsConfigs'
-import * as pathToRegexp from 'path-to-regexp'
-
-const pathToRequestStateX = (projectConfig: ProjectConfig, path: string): PageRequest<any> | null => {
-	for (const [name, config] of Object.entries(projectConfig.routes)) {
-		const params = matchesPath(config.path, path)
-
-		if (params !== null) {
-			return {
-				name: 'project_page',
-				pageName: name,
-				parameters: config.paramsToObject ? config.paramsToObject({ ...params }) : params,
-				project: projectConfig.project,
-				stage: projectConfig.stage,
-				dimensions: projectConfig.defaultDimensions ?? {}, // TODO: parse dimensions from request
-			}
-		}
-	}
-
-	return null
-}
-
-const requestStateToPathX = (projectConfig: ProjectConfig, request: PageRequest<any>): string => {
-	if (!projectConfig.routes[request.pageName]) {
-		throw new PageNotFound(`No such project or page as ${request.pageName} in ${projectConfig.project}/${projectConfig.stage}`)
-	}
-
-	const route = projectConfig.routes[request.pageName]
-	const pathParameters = route.objectToParams ? route.objectToParams(request.parameters) : request.parameters
-
-	return pathToRegexp.compile(route.path)(pathParameters)
-}
+import { PageNotFound, pathToRequestState, requestStateToPath } from '../routing'
 
 export const pushRequest =
 	(requestChange: RequestChange): ActionCreator<RequestState> =>
 	(dispatch, getState) => {
-		const basePath = getState().basePath
-		const previousRequest = getState().request
-		const request: RequestState = { ...requestChange(previousRequest) }
-		const projectConfig = getState().projectConfig
+		const { basePath, request, projectConfig } = getState()
+		const newRequest = requestChange(request)
 
-		window.history.pushState(
-			{},
-			document.title,
-			basePath + requestStateToPathX(projectConfig, request as any), // TODO
-		)
+		if (newRequest !== null) {
+			const newPath = requestStateToPath(basePath, projectConfig, newRequest)
+			window.history.pushState({}, document.title, newPath)
+		}
 
-		return dispatch(createAction(REQUEST_REPLACE, () => request)())
+		return dispatch(createAction(REQUEST_REPLACE, () => newRequest ? { ...newRequest } : null)())
 	}
 
 export const populateRequest =
 	(location: Location): ActionCreator<RequestState> =>
 	(dispatch, getState) => {
-		const basePath = getState().basePath
-
-		if (!location.pathname.startsWith(basePath)) {
-			throw new PageNotFound('No matching route found (wrong basePath)')
-		}
-
-		const projectConfig = getState().projectConfig
-		const path = location.pathname.substring(basePath.length)
-
-		const request = pathToRequestStateX(projectConfig, path)
+		const { basePath, projectConfig } = getState()
+		const request = pathToRequestState(basePath, projectConfig, location.pathname)
 
 		if (!request) {
 			throw new PageNotFound('No matching route found')
 		}
 
 		// Replace with canonical version of the url
-		const canonicalPath = basePath + requestStateToPathX(projectConfig, request)
+		const canonicalPath = requestStateToPath(basePath, projectConfig, request)
+
 		if (canonicalPath !== location.pathname) {
 			window.history.replaceState({}, document.title, canonicalPath)
 		}

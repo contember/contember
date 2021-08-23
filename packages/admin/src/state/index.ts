@@ -4,9 +4,9 @@ import RequestState from './request'
 import ToastsState from './toasts'
 
 export default interface State {
-	basePath: string
+	basePath: string // TODO: remove from state
 	request: RequestState
 	auth: AuthState
-	projectConfig: ProjectConfig
+	projectConfig: ProjectConfig // TODO: remove from state
 	toasts: ToastsState
 }

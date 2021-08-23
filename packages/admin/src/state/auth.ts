@@ -10,7 +10,7 @@ export interface AuthIdentity {
 	token: string
 	email: string
 	personId: string
-	projects: Project[]
+	projects: Project[] // TODO: drop other projects
 }
 
 export interface Project {

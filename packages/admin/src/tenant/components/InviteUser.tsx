@@ -12,13 +12,12 @@ import {
 	TitleBar,
 } from '@contember/ui'
 import { ComponentType, Dispatch, FC, memo, SetStateAction, useCallback, useEffect, useState } from 'react'
-import { NavigateBackButton } from '../../components/pageRouting'
+import { NavigateBackButton, useRedirect } from '../../components/pageRouting'
 import {
 	RoleVariableDefinition,
 	useAddToast,
 	useInvite,
 	useListRolesQuery,
-	usePageLink,
 	useUpdateProjectMembership,
 } from '../hooks'
 import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
@@ -234,7 +233,7 @@ const EditUserMembership: FC<EditUserMembershipProps> = ({
 
 export const InviteUser: FC<{ project: string; rolesConfig: RolesConfig }> = ({ project, rolesConfig }) => {
 	const [email, setEmailInner] = useState('')
-	const { goTo: goToUsersList } = usePageLink('tenantUsers')
+	const redirect = useRedirect()
 	const addToast = useAddToast()
 	const [emailNotValidError, setEmailNotValidError] = useState(false)
 	const setEmail = useCallback((email: string) => {
@@ -268,13 +267,13 @@ export const InviteUser: FC<{ project: string; rolesConfig: RolesConfig }> = ({ 
 		}
 		const inviteResult = await invite(email, membershipsToSave)
 		if (inviteResult.invite.ok) {
-			goToUsersList()
+			redirect(req => ({ ...req!, pageName: 'tenantUsers', parameters: {} }))
 			addToast({
 				type: 'success',
 				message: `User has been invited to this project and credentials have been sent to the given email.`,
 			})
 		}
-	}, [addToast, email, goToUsersList, invite, memberships])
+	}, [addToast, email, redirect, invite, memberships])
 
 	const props: EditUserMembershipProps = {
 		project: project,
@@ -326,7 +325,7 @@ export const EditUser: FC<{ project: string; rolesConfig: RolesConfig; identityI
 		})
 	}, [previousMembershipsState.data, previousMembershipsState.error, previousMembershipsState.finished])
 
-	const { goTo: goToUsersList } = usePageLink('tenantUsers')
+	const redirect = useRedirect()
 	const addToast = useAddToast()
 
 	const submit = useCallback(async () => {
@@ -336,13 +335,13 @@ export const EditUser: FC<{ project: string; rolesConfig: RolesConfig; identityI
 		}
 		const result = await updateMembership(project, identityId, membershipsToSave)
 		if (result.updateProjectMember.ok) {
-			goToUsersList()
+			redirect(req => ({ ...req!, pageName: 'tenantUsers', parameters: {} }))
 			addToast({
 				type: 'success',
 				message: `Updated user's roles successfully.`,
 			})
 		}
-	}, [addToast, goToUsersList, identityId, memberships, project, updateMembership])
+	}, [addToast, redirect, identityId, memberships, project, updateMembership])
 
 	const props: EditUserMembershipProps = {
 		project: project,

@@ -1,7 +1,6 @@
 export * from './lib'
 export * from './changePasswords'
 export * from './invite'
-export * from './link'
 export * from './listUsers'
 export * from './login'
 export * from './removeMember'

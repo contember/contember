@@ -5,7 +5,7 @@ export type ProjectUserRoles = Set<string>
 
 export const useProjectUserRoles = () => {
 	return useSelector<State, ProjectUserRoles>(state => {
-		if (state.request.name !== 'project_page' || !state.auth.identity) {
+		if (state.request === null || !state.auth.identity) {
 			return new Set()
 		}
 		const projectSlug = state.request.project

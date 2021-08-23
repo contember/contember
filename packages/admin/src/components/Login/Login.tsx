@@ -2,8 +2,8 @@ import { getTenantErrorMessage } from '@contember/client'
 import { Button, ErrorList, FieldError, FormGroup, TextInput } from '@contember/ui'
 import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react'
 import { MiscPageLayout } from '../MiscPageLayout'
-import type { Project } from './LoginEntrypoint'
 import { useLogin } from '../../tenant'
+import { Project } from '../Project'
 
 export interface LoginProps {
 	onLogin: (projects: Project[], person: { id: string, email: string }) => void

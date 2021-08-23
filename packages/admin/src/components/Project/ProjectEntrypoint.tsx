@@ -11,9 +11,9 @@ import { emptyRequestState } from '../../state/request'
 import { emptyAuthState } from '../../state/auth'
 import { emptyToastsState } from '../../state/toasts'
 import { Environment, EnvironmentContext } from '@contember/binding'
-import { ProjectConfig } from 'state/projectsConfigs'
 import { I18nProvider } from '../../i18n'
 import { NavigationProvider } from '../NavigationProvider'
+import { ProjectConfig } from '../../state/projectsConfigs'
 
 export interface ProjectEntrypointProps { // TODO: better props names
 	basePath?: string

@@ -1,10 +1,10 @@
 import { ComponentType } from 'react'
 import { useSelector } from 'react-redux'
 import type State from '../state'
-import { InnerProps } from './Link'
+import { InnerLinkProps } from './Link'
 
 interface SwitchProjectLinkProps {
-	Component: ComponentType<InnerProps>
+	Component: ComponentType<InnerLinkProps>
 }
 
 export const SwitchProjectLink = (props: SwitchProjectLinkProps) => {

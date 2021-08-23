@@ -1,9 +1,8 @@
 import { memo } from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import type State from '../../state'
 import { pageRequest } from '../../state/request'
-import { Link, PublicAnchorProps } from '../Link'
-import type { LinkComponent } from '../Link/LinkComponent'
+import { Link, LinkProps, PublicAnchorProps } from '../Link'
 
 export interface PageConfig {
 	name: string
@@ -12,7 +11,11 @@ export interface PageConfig {
 
 export type PageChange = () => PageConfig
 
-const PageLink = memo(({ project, to, stage, ...props }: Props) => {
+export const PageLink = memo(({  to,  ...props }: PageLinkProps) => {
+	const request = useSelector<State, {project: string, stage: string} | null>(selector => selector.request)
+	if (!request) {
+		throw 'Cannot render PageLink without resolved request'
+	}
 	const changed =
 		typeof to === 'string'
 			? {
@@ -20,24 +23,10 @@ const PageLink = memo(({ project, to, stage, ...props }: Props) => {
 					params: {},
 			  }
 			: to()
-	return <Link requestChange={pageRequest(project, stage, changed.name, changed.params || {})} {...props} />
+	return <Link requestChange={pageRequest(request.project, request.stage, changed.name, changed.params || {})} {...props} />
 })
+PageLink.displayName = 'PageLink'
 
-interface StateProps {
-	project: string
-	stage: string
-}
-
-export interface PageLinkProps extends Omit<LinkComponent.Props, 'goTo' | 'href' | 'requestChange'> {
+export interface PageLinkProps extends Omit<LinkProps & PublicAnchorProps, 'goTo' | 'href' | 'requestChange'> {
 	to: PageChange | string
 }
-
-type Props = PageLinkProps & StateProps & PublicAnchorProps
-
-export default connect<StateProps, {}, PageLinkProps, State>(({ request }) => {
-	if (request !== null) {
-		return { project: request.project, stage: request.stage }
-	} else {
-		throw 'Cannot render PageLink without resolved request'
-	}
-})(PageLink)

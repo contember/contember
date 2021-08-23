@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux'
 import type State from '../state'
 import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
 import { LogoutLink } from './LogoutLink'
-import { default as PageLink } from './pageRouting/PageLink'
+import { PageLink } from './pageRouting/PageLink'
 import { SwitchProjectLink } from './SwitchProjectLink'
 import { Avatar } from './ui'
 

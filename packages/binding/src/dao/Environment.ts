@@ -152,6 +152,7 @@ namespace Environment {
 		labelMiddleware?: (label: ReactNode) => ReactNode
 		rootWhere?: UniqueWhere
 		rootWhereAsFilter?: Filter
+		rootShouldExists?: 'no' | 'maybe' | 'yes'
 	}
 
 	export const systemVariableNames: Set<SystemVariableName> = new Set([

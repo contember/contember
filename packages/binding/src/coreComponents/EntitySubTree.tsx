@@ -91,12 +91,14 @@ export const EntitySubTree = Component(
 				return newEnvironment.putDelta({
 					rootWhere,
 					rootWhereAsFilter: whereToFilter(rootWhere),
+					rootShouldExists: 'no',
 				})
 			}
 			const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(props, newEnvironment)
 			return newEnvironment.putDelta({
 				rootWhere: qualifiedSingleEntity.where,
 				rootWhereAsFilter: whereToFilter(qualifiedSingleEntity.where),
+				rootShouldExists: qualifiedSingleEntity.setOnCreate ? 'maybe' : 'yes',
 			})
 		},
 	},

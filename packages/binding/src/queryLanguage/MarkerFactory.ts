@@ -27,6 +27,7 @@ import type {
 } from '../treeParameters'
 import { assertNever } from '../utils'
 import { QueryLanguage } from './QueryLanguage'
+import { GraphQlLiteral } from '@contember/client'
 
 export class MarkerFactory {
 	private static createSubTreeMarker<
@@ -79,11 +80,7 @@ export class MarkerFactory {
 		fields: EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker,
 		environment: Environment,
 	): EntityFieldsWithHoistablesMarker {
-		const desugared = QueryLanguage.desugarQualifiedSingleEntity(entity, environment)
-		const qualifiedSingleEntity: QualifiedSingleEntity = {
-			...desugared,
-			setOnCreate: TreeParameterMerger.mergeSetOnCreate(desugared.setOnCreate || {}, desugared.where),
-		}
+		const qualifiedSingleEntity: QualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(entity, environment)
 
 		return this.createSubTreeMarker(qualifiedSingleEntity, 'eventListeners', EntitySubTreeMarker, fields, environment)
 	}

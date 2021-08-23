@@ -7,12 +7,12 @@ import { ReduxStoreProvider } from '../../temporaryHacks'
 import { DialogProvider } from '@contember/ui'
 import { ProjectEntrypointInner } from './ProjectEntrypointInner'
 import { emptyRequestState } from '../../state/request'
-import { emptyAuthState } from '../../state/auth'
 import { Environment, EnvironmentContext } from '@contember/binding'
 import { I18nProvider } from '../../i18n'
 import { NavigationProvider } from '../NavigationProvider'
 import { ProjectConfig } from '../../state/projectsConfigs'
 import { Toaster, ToasterProvider } from '../Toaster'
+import { IdentityProvider } from '../Identity'
 
 export interface ProjectEntrypointProps { // TODO: better props names
 	basePath?: string
@@ -26,7 +26,6 @@ export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 			{
 				basePath: props.basePath ?? '',
 				request: emptyRequestState,
-				auth: emptyAuthState,
 				projectConfig: props.projectConfig,
 			},
 		)
@@ -73,7 +72,9 @@ export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 								stage={props.projectConfig.stage}
 							>
 								<NavigationProvider>
-									<ProjectEntrypointInner clientConfig={props.clientConfig} projectConfig={props.projectConfig} />
+									<IdentityProvider>
+										<ProjectEntrypointInner clientConfig={props.clientConfig} projectConfig={props.projectConfig} />
+									</IdentityProvider>
 								</NavigationProvider>
 							</ContemberClient>
 							<Toaster />

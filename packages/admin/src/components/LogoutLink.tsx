@@ -1,5 +1,5 @@
 import { ComponentType, FunctionComponent, memo, useCallback } from 'react'
-import { useLogout } from '../actions'
+import { useLogout } from './Identity'
 
 interface InnerProps {
 	onClick: () => void

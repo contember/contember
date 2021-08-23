@@ -1,20 +1,22 @@
-import { shallowEqual, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import type State from '../state'
+import { useIdentity } from '../components'
+import { useMemo } from 'react'
 
 export type ProjectUserRoles = Set<string>
 
-export const useProjectUserRoles = () => {
-	return useSelector<State, ProjectUserRoles>(state => {
-		if (state.request === null || !state.auth.identity) {
+export const useProjectUserRoles = (): ProjectUserRoles => {
+	const identity = useIdentity()
+	const projectSlug = useSelector<State, string | undefined>(state => state.request?.project)
+	return useMemo(() => {
+		if (!projectSlug) {
 			return new Set()
 		}
-		const projectSlug = state.request.project
-		const targetProject = state.auth.identity.projects.find(project => project.slug === projectSlug)
-
+		const targetProject = identity.projects.find(project => project.slug === projectSlug)
 		if (targetProject === undefined) {
 			return new Set()
 		}
 
 		return new Set(targetProject.roles)
-	}, shallowEqual)
+	}, [identity.projects, projectSlug])
 }

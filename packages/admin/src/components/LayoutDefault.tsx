@@ -17,6 +17,7 @@ import { LogoutLink } from './LogoutLink'
 import { PageLink } from './pageRouting/PageLink'
 import { SwitchProjectLink } from './SwitchProjectLink'
 import { Avatar } from './ui'
+import { useIdentity } from './Identity'
 
 export interface LayoutProps {
 	header: {
@@ -32,9 +33,7 @@ export interface LayoutProps {
 
 export const LayoutDefault = memo((props: LayoutProps) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
-	const email = useSelector<State, string | undefined>(state =>
-		state.auth.identity ? state.auth.identity.email : undefined,
-	)
+	const email = useIdentity().email
 	const sideRef = useRef<HTMLElement>(null)
 
 	const toggleMenu = useCallback(

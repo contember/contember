@@ -26,7 +26,7 @@ export function createViteConfig(packageName) {
 				rollupOptions: {
 					external: (source, importer, isResolved) => {
 						if (!isResolved) {
-							return !source.startsWith('./') && !source.startsWith('../')
+							return !source.startsWith('./') && !source.startsWith('../') && source !== '.'
 
 						} else {
 							return source.includes('/node_modules/')

@@ -5,12 +5,12 @@ import { ComponentType, FC, Fragment, memo, useCallback } from 'react'
 import { PageLinkButton } from '../../components/pageRouting'
 import {
 	Membership,
-	useAddToast,
 	useAuthedContentQuery,
 	useListUsersQuery,
 	useRemoveProjectMembership,
 	useUpdateCurrentProjectMembership,
 } from '../hooks'
+import { useShowToast } from '../../components'
 
 export interface UsersListProps<T> {
 	project: string
@@ -28,7 +28,7 @@ interface RoleRenderers<T> {
 }
 
 export const UsersList = memo<UsersListProps<any>>(({ project, roleRenderers, rolesDataQuery }) => {
-	const addToast = useAddToast()
+	const addToast = useShowToast()
 	const { state: query, refetch: refetchUserList } = useListUsersQuery(project)
 	const { state: rolesData } = useAuthedContentQuery<any, {}>(rolesDataQuery, {})
 	const [updateMembership, updateMembershipState] = useUpdateCurrentProjectMembership()

@@ -15,12 +15,12 @@ import { ComponentType, Dispatch, FC, memo, SetStateAction, useCallback, useEffe
 import { NavigateBackButton, useRedirect } from '../../components/pageRouting'
 import {
 	RoleVariableDefinition,
-	useAddToast,
 	useInvite,
 	useListRolesQuery,
 	useUpdateProjectMembership,
 } from '../hooks'
 import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
+import { useShowToast } from '../../components'
 
 interface VariableConfig {
 	render: ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
@@ -234,7 +234,7 @@ const EditUserMembership: FC<EditUserMembershipProps> = ({
 export const InviteUser: FC<{ project: string; rolesConfig: RolesConfig }> = ({ project, rolesConfig }) => {
 	const [email, setEmailInner] = useState('')
 	const redirect = useRedirect()
-	const addToast = useAddToast()
+	const addToast = useShowToast()
 	const [emailNotValidError, setEmailNotValidError] = useState(false)
 	const setEmail = useCallback((email: string) => {
 		setEmailNotValidError(false)
@@ -326,7 +326,7 @@ export const EditUser: FC<{ project: string; rolesConfig: RolesConfig; identityI
 	}, [previousMembershipsState.data, previousMembershipsState.error, previousMembershipsState.finished])
 
 	const redirect = useRedirect()
-	const addToast = useAddToast()
+	const addToast = useShowToast()
 
 	const submit = useCallback(async () => {
 		const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)

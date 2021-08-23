@@ -5,15 +5,14 @@ import { configureStore, Store } from '../../store'
 import { populateRequest } from '../../actions'
 import { ReduxStoreProvider } from '../../temporaryHacks'
 import { DialogProvider } from '@contember/ui'
-import { Toaster } from '../ui'
 import { ProjectEntrypointInner } from './ProjectEntrypointInner'
 import { emptyRequestState } from '../../state/request'
 import { emptyAuthState } from '../../state/auth'
-import { emptyToastsState } from '../../state/toasts'
 import { Environment, EnvironmentContext } from '@contember/binding'
 import { I18nProvider } from '../../i18n'
 import { NavigationProvider } from '../NavigationProvider'
 import { ProjectConfig } from '../../state/projectsConfigs'
+import { Toaster, ToasterProvider } from '../Toaster'
 
 export interface ProjectEntrypointProps { // TODO: better props names
 	basePath?: string
@@ -29,7 +28,6 @@ export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 				request: emptyRequestState,
 				auth: emptyAuthState,
 				projectConfig: props.projectConfig,
-				toasts: emptyToastsState,
 			},
 		)
 
@@ -66,19 +64,21 @@ export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 				dictionaries={props.projectConfig.dictionaries}
 			>
 				<ReduxStoreProvider store={store}>
-					<DialogProvider>
-						<ContemberClient
-							apiBaseUrl={props.clientConfig.apiBaseUrl}
-							sessionToken={props.clientConfig.sessionToken}
-							project={props.projectConfig.project}
-							stage={props.projectConfig.stage}
-						>
-							<NavigationProvider>
-								<ProjectEntrypointInner clientConfig={props.clientConfig} projectConfig={props.projectConfig} />
-							</NavigationProvider>
-						</ContemberClient>
-						<Toaster />
-					</DialogProvider>
+					<ToasterProvider>
+						<DialogProvider>
+							<ContemberClient
+								apiBaseUrl={props.clientConfig.apiBaseUrl}
+								sessionToken={props.clientConfig.sessionToken}
+								project={props.projectConfig.project}
+								stage={props.projectConfig.stage}
+							>
+								<NavigationProvider>
+									<ProjectEntrypointInner clientConfig={props.clientConfig} projectConfig={props.projectConfig} />
+								</NavigationProvider>
+							</ContemberClient>
+							<Toaster />
+						</DialogProvider>
+					</ToasterProvider>
 				</ReduxStoreProvider>
 			</I18nProvider>
 		</EnvironmentContext.Provider>

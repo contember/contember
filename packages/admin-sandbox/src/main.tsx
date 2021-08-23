@@ -1,5 +1,4 @@
-import { ProjectEntrypoint } from '@contember/admin'
-import * as ReactDOM from 'react-dom'
+import { ProjectEntrypoint, runReactApp } from '@contember/admin'
 import Sandbox from './Sandbox'
 import './index.sass'
 
@@ -14,19 +13,15 @@ window.addEventListener('DOMContentLoaded', () => {
 	if (typeof sessionToken !== 'string') {
 		throw new Error(`The ENV variables haven't been set. Check your \`.env.development.local\` file.`) // TODO: better message
 	}
-
-	ReactDOM.render(
-		<ProjectEntrypoint
-			basePath=""
-			clientConfig={{ apiBaseUrl, sessionToken }}
-			projectConfig={{
-				project: 'sandbox',
-				stage: 'live',
-				component: <Sandbox />,
-				routes: {
-					dashboard: { path: '/' },
-				},
-			}} />,
-		document.getElementById('root'),
-	)
+	runReactApp(<ProjectEntrypoint
+		basePath=""
+		clientConfig={{ apiBaseUrl, sessionToken }}
+		projectConfig={{
+			project: 'sandbox',
+			stage: 'live',
+			component: <Sandbox/>,
+			routes: {
+				dashboard: { path: '/' },
+			},
+		}}/>)
 })

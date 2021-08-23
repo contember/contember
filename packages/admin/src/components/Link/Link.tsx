@@ -2,9 +2,11 @@ import { isSpecialLinkClick } from '@contember/ui'
 import {
 	AnchorHTMLAttributes,
 	ComponentType,
-	FunctionComponent, memo,
+	FunctionComponent,
+	memo,
 	MouseEvent as ReactMouseEvent,
-	ReactNode, useCallback,
+	ReactNode,
+	useCallback,
 } from 'react'
 import type { RequestChange } from '../../state/request'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,7 +24,7 @@ export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, requestChang
 	const goTo = useCallback(() => {
 		dispatch(pushRequest(requestChange))
 	}, [dispatch, requestChange])
-	const innerOnClick = useCallback((e: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
+	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		if (e) {
 			if (onClick) {
 				onClick(e)
@@ -45,9 +47,10 @@ Link.displayName = 'Link'
 
 export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
 
-export interface InnerLinkProps extends PublicAnchorProps {
+export interface InnerLinkProps extends Omit<PublicAnchorProps, 'onClick'> {
 	href: string
 	isActive: boolean
+	onClick: (e?: ReactMouseEvent<HTMLAnchorElement>) => void
 }
 
 export interface LinkProps {

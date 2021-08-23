@@ -4,8 +4,8 @@ import { shallowEqual, useSelector } from 'react-redux'
 import type State from '../../state'
 import { PageRequest, pageRequest } from '../../state/request'
 import { isUrlActive } from '../../utils/isUrlActive'
-import { DynamicLink } from '../DynamicLink'
 import { PageLink, useUrlGenerator } from '../pageRouting'
+import { Link } from '../Link'
 
 export interface NavigationIsActiveProviderProps {
 	children?: ReactNode
@@ -54,7 +54,7 @@ export const NavigationProvider = memo(function NavigationProvider(props: Naviga
 					if ('Component' in props) {
 						const Component = props.Component
 						return (
-							<DynamicLink
+							<Link
 								requestChange={requestState => {
 									if (typeof to === 'string') {
 										return { ...requestState!, pageName: to }
@@ -68,7 +68,7 @@ export const NavigationProvider = memo(function NavigationProvider(props: Naviga
 								)}
 							>
 								<>{children}</>
-							</DynamicLink>
+							</Link>
 						)
 					}
 					return (

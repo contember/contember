@@ -1,44 +1,31 @@
-import { Component as ReactComponent, ComponentType, FunctionComponent } from 'react'
-import { connect } from 'react-redux'
-import { logout } from '../actions/auth'
-import type { Dispatch } from '../actions/types'
-import type State from '../state'
+import { ComponentType, FunctionComponent, memo, useCallback } from 'react'
+import { useLogout } from '../actions'
 
 interface InnerProps {
 	onClick: () => void
 }
 
-interface LogoutLinkProps {
+export interface LogoutLinkProps {
 	Component?: ComponentType<InnerProps>
 }
 
-interface LogoutDispatchProps {
-	logout: () => void
-}
 
-type Props = LogoutDispatchProps & LogoutLinkProps
+const defaultComponent: FunctionComponent<InnerProps> = ({ onClick, children }) => (
+	<a href="#" onClick={onClick}>
+		{children}
+	</a>
+)
 
-class LogoutLink extends ReactComponent<Props, {}> {
-	onClick = async () => {
+export const LogoutLink = memo<LogoutLinkProps>(props => {
+	const onLogout = useLogout()
+	const onClick = useCallback(async () => {
 		if (navigator.credentials && navigator.credentials.preventSilentAccess) {
 			await navigator.credentials.preventSilentAccess()
 		}
+		onLogout()
+	}, [onLogout])
+	const Component = props.Component || defaultComponent
+	return <Component onClick={onClick} children={props.children} />
+})
 
-		this.props.logout()
-	}
-
-	defaultComponent: FunctionComponent<InnerProps> = () => (
-		<a href="#" onClick={this.props.logout}>
-			{this.props.children}
-		</a>
-	)
-
-	override render() {
-		const Component = this.props.Component || this.defaultComponent
-		return <Component onClick={this.onClick} />
-	}
-}
-
-export default connect<{}, LogoutDispatchProps, LogoutLinkProps, State>(null, (dispatch: Dispatch, ownProps) => ({
-	logout: () => dispatch(logout()),
-}))(LogoutLink)
+LogoutLink.displayName = 'LogoutLink'

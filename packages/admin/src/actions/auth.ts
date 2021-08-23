@@ -1,10 +1,12 @@
 import { createAction } from 'redux-actions'
 import { SET_LOGOUT } from '../reducer/auth'
-import { pushRequest } from './request'
-import type { Dispatch } from './types'
+import { useDispatch } from 'react-redux'
+import { useCallback } from 'react'
 
-export const logout = () => (dispatch: Dispatch) => {
-	dispatch(createAction(SET_LOGOUT)())
-	window.location.href = '/' // TODO: better
-	// return dispatch(pushRequest(() => ({ name: 'login' })))
+export const useLogout = () => {
+	const dispatch = useDispatch()
+	return useCallback((() => {
+		dispatch(createAction(SET_LOGOUT)())
+		window.location.href = '/'
+	}), [dispatch])
 }

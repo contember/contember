@@ -3,19 +3,18 @@ import RequestState, { PageRequest, RecursiveStringObject } from '../state/reque
 import * as pathToRegexp from 'path-to-regexp'
 import { MatchFunction, PathFunction } from 'path-to-regexp'
 import { Environment } from '@contember/binding'
-import SelectedDimensions = Environment.SelectedDimensions
 
 const matchFunctionsCache: Record<string, MatchFunction> = {}
 const pathFunctionsCache: Record<string, PathFunction> = {}
 
-export const parseDimensions = (dimensions: string): SelectedDimensions => {
+export const parseDimensions = (dimensions: string): Environment.SelectedDimensions => {
 	return dimensions
 		.split('+')
 		.map((pair: string) => pair.split('='))
 		.reduce((acc, [key, value]) => ({ ...acc, [key]: value.split(',') }), {})
 }
 
-export const stringifyDimensions = (dimensions: SelectedDimensions): string => {
+export const stringifyDimensions = (dimensions: Environment.SelectedDimensions): string => {
 	return Object.entries(dimensions)
 		.map(([key, value]) => `${key}=${value.join(',')}`)
 		.join('+')

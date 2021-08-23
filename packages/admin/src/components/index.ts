@@ -1,6 +1,5 @@
 export * from './bindingFacade'
 export * from './Login'
-export { default as Dimensions } from './Dimensions'
 export * from './Link'
 export * from './LogoutLink'
 export * from './pageRouting'

@@ -26,7 +26,7 @@ export const pathToRequestState = (basePath: string, projectConfig: ProjectConfi
 		return null
 	}
 
-	const dimensionSegment = path.split('/')[2]
+	const dimensionSegment = path.split('/')[2] ?? ''
 	const hasDimensions = dimensionSegment.includes('=')
 
 	const dimensions = hasDimensions ? parseDimensions(dimensionSegment) : projectConfig.defaultDimensions

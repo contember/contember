@@ -31,7 +31,6 @@ export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 				projectConfig: props.projectConfig,
 				toasts: emptyToastsState,
 			},
-			props.clientConfig,
 		)
 
 		store.dispatch(populateRequest(window.location))

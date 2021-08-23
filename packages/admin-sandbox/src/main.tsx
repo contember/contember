@@ -23,6 +23,7 @@ window.addEventListener('DOMContentLoaded', () => {
 				component: <Sandbox />,
 				routes: {
 					dashboard: { path: '/' },
+					second: { path: '/2nd' },
 				},
 			}}
 		/>,

@@ -1,11 +1,10 @@
 import {
 	EditPage,
 	FileRepeater,
-	GenericPage,
 	ImageFiles,
 	ImageUploadField,
+	PageLink,
 	TextField,
-	TitleBar,
 	UploadField,
 	VideoFiles,
 } from '@contember/admin'
@@ -18,6 +17,7 @@ import {
 
 export const DashboardPage = (
 	<EditPage pageName="dashboard" entity="UploadShowcase(unique = One)">
+		<PageLink to="second">SECOND</PageLink>
 		<ImageUploadField urlField="singleTrivialImage.url" label="Trivial imageddd" />
 		<ImageUploadField
 			label="Single basic image"

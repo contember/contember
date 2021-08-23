@@ -12,7 +12,7 @@ import cn from 'classnames'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import type State from '../state'
-import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
+import { ProjectUserRolesRevealer } from './Dev'
 import { LogoutLink } from './LogoutLink'
 import { PageLink } from './pageRouting/PageLink'
 import { SwitchProjectLink } from './SwitchProjectLink'
@@ -76,7 +76,6 @@ export const LayoutDefault = memo((props: LayoutProps) => {
 						</PageLink>
 					)}
 					<DropdownContentContainerProvider>{props.header.left}</DropdownContentContainerProvider>
-					{<TokenExposer />}
 					{<ProjectUserRolesRevealer />}
 				</div>
 				<div className="navbar-center">{props.header.center}</div>

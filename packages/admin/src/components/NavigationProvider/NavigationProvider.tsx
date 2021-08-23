@@ -27,8 +27,6 @@ export const NavigationIsActiveProvider = memo(function NavigationIsActiveProvid
 			}
 
 			const url = urlGenerator(pageRequest(
-				viewRoute.project,
-				viewRoute.stage,
 				typeof to === 'string' ? to : to.pageName,
 				typeof to === 'string' ? {} : to.parameters,
 			)(request))

@@ -39,8 +39,6 @@ export const pathToRequestState = (basePath: string, projectConfig: ProjectConfi
 			return {
 				pageName: pageName,
 				parameters: config.paramsToObject ? config.paramsToObject(matchResult.params) : matchResult.params,
-				project: projectConfig.project,
-				stage: projectConfig.stage,
 				dimensions: dimensions ?? {},
 			}
 		}

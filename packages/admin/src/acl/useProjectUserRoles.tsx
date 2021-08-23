@@ -7,7 +7,7 @@ export type ProjectUserRoles = Set<string>
 
 export const useProjectUserRoles = (): ProjectUserRoles => {
 	const identity = useIdentity()
-	const projectSlug = useSelector<State, string | undefined>(state => state.request?.project)
+	const projectSlug = useSelector<State, string | undefined>(state => state.projectConfig.project)
 	return useMemo(() => {
 		if (!projectSlug) {
 			return new Set()

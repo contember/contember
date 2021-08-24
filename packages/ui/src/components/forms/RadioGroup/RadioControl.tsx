@@ -1,11 +1,11 @@
 import classnames from 'classnames'
 import { memo, ReactNode, useContext, useRef } from 'react'
 import { useFocusRing, useHover, useRadio, VisuallyHidden } from 'react-aria'
-import type { Size, ValidationState } from 'types'
 import { useClassNamePrefix } from '../../../auxiliary'
 import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../../utils'
 import { RadioContext } from './RadioContext'
 import type { RadioOption } from './types'
+import { Size, ValidationState } from '../../../types'
 
 interface RadioProps {
 	children: ReactNode

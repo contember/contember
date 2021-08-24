@@ -27,9 +27,8 @@ export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, to, Componen
 			if (e.isDefaultPrevented() || isSpecialLinkClick(e.nativeEvent)) {
 				return
 			}
-			e.preventDefault()
 		}
-		navigate()
+		navigate(e)
 	}, [navigate, onClick])
 
 	const InnerComponent = Component ?? defaultComponent

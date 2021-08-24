@@ -1,5 +1,5 @@
 export * from './auxiliary'
 export * from './components'
-export * from './Navigation'
+export { NavigationContext } from './Navigation'
 export * from './utils'
 export * from './types'

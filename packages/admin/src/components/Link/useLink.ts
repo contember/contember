@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { BaseSyntheticEvent, useCallback, useMemo } from 'react'
 import {
 	pageRequest,
 	RequestChange,
@@ -12,11 +12,17 @@ import {
 export interface LinkProps
 {
 	href: string
-	navigate: () => void
+	navigate: (e?: BaseSyntheticEvent) => void
 	isActive: boolean
 }
 
 export type LinkTarget = string | RequestChange | (Partial<RequestState> & {pageName: string})
+
+export const isLinkTarget = (value: unknown): value is LinkTarget => {
+	return typeof value === 'string'
+		|| typeof value === 'function'
+		|| (typeof value === 'object' && value !== null &&  'pageName' in value)
+}
 
 const targetToRequest = (target: LinkTarget, currentRequest: RequestState): RequestState => {
 	if (typeof target === 'string') {
@@ -54,9 +60,10 @@ export const useLinkFactory = () => {
 		return {
 			href: href,
 			isActive: window.location.pathname === href, // todo better active detection
-			navigate: () => {
+			navigate: e => {
 				if (request !== null) {
 					window.history.pushState({}, document.title, href)
+					e?.preventDefault()
 				}
 				pushRequest(request)
 			},

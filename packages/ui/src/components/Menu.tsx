@@ -1,8 +1,16 @@
 import cn from 'classnames'
-import { createContext, PureComponent, ReactNode, useCallback, useContext, useState } from 'react'
+import {
+	createContext,
+	MouseEvent as ReactMouseEvent,
+	PureComponent,
+	ReactNode,
+	useCallback,
+	useContext,
+	useState,
+} from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { GlobalClassNamePrefixContext } from '../contexts'
-import { Navigation } from '../Navigation'
+import { useNavigationLink } from '../Navigation'
 import { isSpecialLinkClick, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
 
@@ -32,32 +40,32 @@ namespace Menu {
 		showCaret?: boolean
 	}
 
-	export interface ItemProps {
+	export interface ItemProps<T extends any = any> {
 		children?: ReactNode
 		title?: string | ReactNode
-		to?: Navigation.MiddlewareProps['to']
+		to?: T
 		external?: boolean
 		expandedByDefault?: boolean
 	}
 
-	interface TitleProps {
+	type TitleProps = {
 		children?: ReactNode
 		className?: string
-	}
-
-	type TitleOptions =
-		| {
+	} & (
+		  {
 				onClick?: never
-				to?: never
+				href?: never
 				external?: never
 				suppressTo?: never
 		  }
 		| {
-				onClick?: () => void
-				to?: Navigation.MiddlewareProps['to']
-				external?: ItemProps['external']
+				onClick?: (e: ReactMouseEvent<HTMLElement>) => void
+				href?: string
+				external?: boolean
 				suppressTo?: boolean
 		  }
+
+	)
 
 	function DepthSpecificItem(props: ItemProps) {
 		const depth = useContext(DepthContext)
@@ -73,32 +81,24 @@ namespace Menu {
 		}
 	}
 
-	function useTitle(options: TitleOptions) {
-		const Link = useContext(Navigation.MiddlewareContext)
-		const { to, external, suppressTo, onClick } = options
+	function Title(props: TitleProps) {
 		const prefix = useClassNamePrefix()
-
-		return (props: TitleProps) => {
-			const { children, ...otherProps } = props
+			const { children, external, suppressTo, onClick, ...otherProps } = props
 			const content = <div className={`${prefix}menu-titleContent`}>{children}</div>
-			if (to) {
-				return (
-					<Link
-						to={to}
-						{...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-						onClick={event => {
-							if (onClick && !isSpecialLinkClick(event.nativeEvent)) {
-								onClick()
-								if (suppressTo) {
-									event.preventDefault()
-								}
+			if (otherProps.href) {
+				return <a
+					href={otherProps.href}
+					{...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+					onClick={event => {
+						if (onClick && !isSpecialLinkClick(event.nativeEvent)) {
+							onClick(event)
+							if (suppressTo) {
+								event.preventDefault()
 							}
-						}}
-						{...otherProps}
-					>
-						{content}
-					</Link>
-				)
+						}
+					}}
+					{...otherProps}
+				>{content}</a>
 			} else if (onClick) {
 				return (
 					<button type="button" onClick={onClick} {...otherProps}>
@@ -108,25 +108,22 @@ namespace Menu {
 			} else {
 				return <div {...otherProps}>{content}</div>
 			}
-		}
 	}
 
 	function ItemWrapper(props: {
 		children?: ReactNode
 		className: string
-		to: ItemProps['to']
-		suppressIsActive?: boolean
+		isActive?: boolean
 	}) {
-		const isActive = Navigation.useIsActive(props.to)
-		return <li className={cn(props.className, isActive && !props.suppressIsActive && 'is-active')}>{props.children}</li>
+		return <li className={cn(props.className, props.isActive && 'is-active')}>{props.children}</li>
 	}
 
 	function GroupItem(props: ItemProps) {
-		const Title = useTitle({ to: props.to, external: props.external })
+		const { isActive, href, navigate } = useNavigationLink(props.to)
 		const prefix = useClassNamePrefix()
 		return (
-			<ItemWrapper className={`${prefix}menu-group`} to={props.to}>
-				{props.title && <Title className={`${prefix}menu-group-title`}>{props.title}</Title>}
+			<ItemWrapper className={`${prefix}menu-group`} isActive={isActive}>
+				{props.title && <Title href={href} onClick={navigate} className={`${prefix}menu-group-title`}>{props.title}</Title>}
 				{props.children && <ul className={`${prefix}menu-group-list`}>{props.children}</ul>}
 			</ItemWrapper>
 		)
@@ -134,25 +131,25 @@ namespace Menu {
 
 	function SubGroupItem(props: ItemProps) {
 		const [expanded, setExpanded] = useState(!!props.expandedByDefault)
-		const onClick = useCallback(() => {
+		const { isActive, href, navigate } = useNavigationLink(props.to)
+		const onClick = useCallback((e: ReactMouseEvent) => {
 			setExpanded(!expanded)
-		}, [setExpanded, expanded])
-		const options: TitleOptions = {
-			onClick: props.children ? onClick : undefined,
-			to: props.to,
+			navigate?.(e)
+		}, [setExpanded, expanded, navigate])
+		const options: TitleProps = {
+			onClick: onClick,
 			external: props.external,
 			suppressTo: expanded,
+			href,
 		}
-		const Title = useTitle(options)
 		const prefix = useClassNamePrefix()
 
 		return (
 			<ItemWrapper
 				className={cn(`${prefix}menu-subgroup`, props.children && (expanded ? 'is-expanded' : 'is-collapsed'))}
-				to={props.to}
-				suppressIsActive={!!props.children}
+				isActive={isActive && !props.children}
 			>
-				{props.title && <Title className={`${prefix}menu-subgroup-title`}>{props.title}</Title>}
+				{props.title && <Title {...options} className={`${prefix}menu-subgroup-title`}>{props.title}</Title>}
 				{props.children && (
 					<Collapsible expanded={expanded}>
 						<ul className={`${prefix}menu-subgroup-list`}>{props.children}</ul>
@@ -163,22 +160,22 @@ namespace Menu {
 	}
 
 	function ActionItem(props: ItemProps) {
-		const Title = useTitle({ to: props.to, external: props.external })
+		const { isActive, href, navigate } = useNavigationLink(props.to)
 		const prefix = useClassNamePrefix()
 		return (
-			<ItemWrapper className={`${prefix}menu-action`} to={props.to}>
-				{props.title && <Title className={`${prefix}menu-action-title`}>{props.title}</Title>}
+			<ItemWrapper className={`${prefix}menu-action`} isActive={isActive}>
+				{props.title && <Title href={href} onClick={navigate} external={props.external} className={`${prefix}menu-action-title`}>{props.title}</Title>}
 				{props.children && <ul className={`${prefix}menu-action-list`}>{props.children}</ul>}
 			</ItemWrapper>
 		)
 	}
 
 	function TooDeepItem(props: ItemProps) {
-		const Title = useTitle({ to: props.to, external: props.external })
+		const { isActive, href, navigate } = useNavigationLink(props.to)
 		const prefix = useClassNamePrefix()
 		return (
-			<ItemWrapper className={`${prefix}menu-tooDeep`} to={props.to}>
-				{props.title && <Title className={`${prefix}menu-tooDeep-title`}>{props.title}</Title>}
+			<ItemWrapper className={`${prefix}menu-tooDeep`} isActive={isActive}>
+				{props.title && <Title href={href} onClick={navigate} external={props.external}  className={`${prefix}menu-tooDeep-title`}>{props.title}</Title>}
 				{props.children && <ul className={`${prefix}menu-tooDeep-list`}>{props.children}</ul>}
 			</ItemWrapper>
 		)

@@ -1,13 +1,12 @@
-import { useSelector } from 'react-redux'
-import type State from '../state'
 import { useIdentity } from '../components'
 import { useMemo } from 'react'
+import { useProjectSlug } from '@contember/react-client'
 
 export type ProjectUserRoles = Set<string>
 
 export const useProjectUserRoles = (): ProjectUserRoles => {
 	const identity = useIdentity()
-	const projectSlug = useSelector<State, string | undefined>(state => state.projectConfig.project)
+	const projectSlug = useProjectSlug()
 	return useMemo(() => {
 		if (!projectSlug) {
 			return new Set()

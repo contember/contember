@@ -1,6 +1,6 @@
 import { lazy, memo, Suspense } from 'react'
 import { ContainerSpinner } from '@contember/ui'
-import { ProjectConfig } from '../../state/projectsConfigs'
+import { ProjectConfig } from './ProjectConfig'
 
 export interface ProjectEntrypointInnerProps {
 	Component: ProjectConfig['component']

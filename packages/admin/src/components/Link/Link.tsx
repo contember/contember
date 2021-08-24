@@ -7,12 +7,13 @@ import {
 	MouseEvent as ReactMouseEvent,
 	ReactNode,
 	useCallback,
+	useMemo,
 } from 'react'
 import type { RequestChange } from '../../state/request'
 import { useDispatch, useSelector } from 'react-redux'
 import { pushRequest } from '../../actions'
 import State from '../../state'
-import { requestStateToPath } from '../../routing'
+import { requestStateToPath, useRouting } from '../../routing'
 
 const defaultComponent: FunctionComponent <InnerLinkProps> = props => (
 	// TODO do something with isActive?
@@ -21,9 +22,10 @@ const defaultComponent: FunctionComponent <InnerLinkProps> = props => (
 
 export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, requestChange, ...props }) => {
 	const dispatch = useDispatch()
+	const routing = useRouting()
 	const goTo = useCallback(() => {
-		dispatch(pushRequest(requestChange))
-	}, [dispatch, requestChange])
+		dispatch(pushRequest(routing, requestChange))
+	}, [dispatch, requestChange, routing])
 	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		if (e) {
 			if (onClick) {
@@ -36,9 +38,8 @@ export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, requestChang
 		}
 		goTo()
 	}, [goTo, onClick])
-	const href = useSelector<State, string>(({ basePath, projectConfig, request }) =>
-			requestStateToPath(basePath, projectConfig, requestChange(request)),
-	)
+	const request = useSelector<State, State['request']>(({ request }) => request)
+	const href = useMemo(() => requestStateToPath(routing, requestChange(request)), [request, requestChange, routing])
 
 	const { Component = defaultComponent, ...innerProps } = props
 	return <Component isActive={location.pathname === href} href={href} {...innerProps} onClick={innerOnClick}/>

@@ -1,13 +1,11 @@
-import { useSelector } from 'react-redux'
 import RequestState from '../../state/request'
-import State from '../../state'
-import { requestStateToPath } from '../../routing'
+import { requestStateToPath, useRouting } from '../../routing'
+import { useCallback } from 'react'
 
 export const useUrlGenerator = () => {
-	const basePath = useSelector<State, State['basePath']>(({ basePath }) => basePath)
-	const projectConfig = useSelector<State, State['projectConfig']>(({ projectConfig }) => projectConfig)
+	const routing = useRouting()
 
-	return (request: RequestState): string => {
-		return requestStateToPath(basePath, projectConfig, request)
-	}
+	return useCallback((request: RequestState): string => {
+		return requestStateToPath(routing, request)
+	}, [routing])
 }

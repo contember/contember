@@ -1,7 +1,7 @@
 import { ClientConfig } from '../../bootstrap'
 import { ProjectList } from './ProjectList'
 import { ProjectEntrypoint } from './ProjectEntrypoint'
-import { ProjectConfig } from '../../state/projectsConfigs'
+import { ProjectConfig } from './ProjectConfig'
 
 export interface ProjectListEntrypointProps {
 	clientConfig: ClientConfig

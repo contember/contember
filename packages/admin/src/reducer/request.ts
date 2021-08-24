@@ -1,6 +1,6 @@
 import type { Reducer } from 'redux'
 import { Action, handleActions } from 'redux-actions'
-import RequestState, { emptyRequestState } from '../state/request'
+import { RequestState, emptyRequestState } from '../state/request'
 
 export const REQUEST_REPLACE = 'request_replace'
 

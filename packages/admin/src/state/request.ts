@@ -15,7 +15,7 @@ export interface PageRequest<P extends PageParameters> {
 	dimensions: SelectedDimension
 }
 
-type RequestState = PageRequest<any> | null
+export type RequestState = PageRequest<any> | null
 
 export default RequestState
 
@@ -24,9 +24,9 @@ export const emptyRequestState: RequestState = null
 export type RequestChange = (currentState: RequestState) => RequestState
 
 export const pageRequest =
-	<P extends PageParameters>(pageName: string, parameters: P): RequestChange =>
+	<P extends PageParameters>(pageName: string, parameters?: P): RequestChange =>
 	(currentState: RequestState): PageRequest<P> => ({
 		pageName,
-		parameters,
+		parameters: parameters ?? {} as P,
 		dimensions: currentState?.dimensions || {},
 	})

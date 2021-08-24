@@ -7,25 +7,18 @@ import {
 	MouseEvent as ReactMouseEvent,
 	ReactNode,
 	useCallback,
-	useMemo,
 } from 'react'
-import type { RequestChange } from '../../state/request'
-import { useDispatch, useSelector } from 'react-redux'
-import { pushRequest } from '../../actions'
-import State from '../../state'
-import { requestStateToPath, useRouting } from '../../routing'
+import { LinkTarget, useLink } from './useLink'
 
-const defaultComponent: FunctionComponent <InnerLinkProps> = props => (
+
+const defaultComponent: FunctionComponent<InnerLinkProps> = ({ isActive, ...props }) => (
 	// TODO do something with isActive?
 	<a {...props}/>
 )
 
-export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, requestChange, ...props }) => {
-	const dispatch = useDispatch()
-	const routing = useRouting()
-	const goTo = useCallback(() => {
-		dispatch(pushRequest(routing, requestChange))
-	}, [dispatch, requestChange, routing])
+export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, to, Component, ...props }) => {
+	const { navigate, isActive, href } = useLink(to)
+
 	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		if (e) {
 			if (onClick) {
@@ -36,13 +29,11 @@ export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, requestChang
 			}
 			e.preventDefault()
 		}
-		goTo()
-	}, [goTo, onClick])
-	const request = useSelector<State, State['request']>(({ request }) => request)
-	const href = useMemo(() => requestStateToPath(routing, requestChange(request)), [request, requestChange, routing])
+		navigate()
+	}, [navigate, onClick])
 
-	const { Component = defaultComponent, ...innerProps } = props
-	return <Component isActive={location.pathname === href} href={href} {...innerProps} onClick={innerOnClick}/>
+	const InnerComponent = Component ?? defaultComponent
+	return <InnerComponent isActive={isActive} href={href} {...props} onClick={innerOnClick}/>
 })
 Link.displayName = 'Link'
 
@@ -54,8 +45,9 @@ export interface InnerLinkProps extends Omit<PublicAnchorProps, 'onClick'> {
 	onClick: (e?: ReactMouseEvent<HTMLAnchorElement>) => void
 }
 
+
 export interface LinkProps {
-	requestChange: RequestChange
 	Component?: ComponentType<InnerLinkProps>
 	children?: ReactNode
+	to: LinkTarget
 }

@@ -1,17 +1,13 @@
 import { useCallback } from 'react'
-import { useDispatch } from 'react-redux'
-import { pushRequest } from '../../actions'
 import type { RequestChange } from '../../state/request'
-import { useRouting } from '../../routing'
+import { useLinkFactory } from '../Link/useLink'
 
 export const useRedirect = () => {
-	const dispatch = useDispatch()
-	const routing = useRouting()
-
+	const linkFactory = useLinkFactory()
 	return useCallback(
 		(requestChange: RequestChange) => {
-			dispatch(pushRequest(routing, requestChange))
+			linkFactory(requestChange).navigate()
 		},
-		[dispatch, routing],
+		[linkFactory],
 	)
 }

@@ -1,11 +1,8 @@
 import { Navigation } from '@contember/ui'
 import { memo, ReactNode, useCallback } from 'react'
-import { shallowEqual, useSelector } from 'react-redux'
-import type State from '../../state'
-import { PageRequest, pageRequest } from '../../state/request'
-import { isUrlActive } from '../../utils/isUrlActive'
-import { PageLink, useUrlGenerator } from '../pageRouting'
+import { PageLink } from '../pageRouting'
 import { Link } from '../Link'
+import { useLinkFactory } from '../Link/useLink'
 
 export interface NavigationIsActiveProviderProps {
 	children?: ReactNode
@@ -14,26 +11,12 @@ export interface NavigationIsActiveProviderProps {
 export const NavigationIsActiveProvider = memo(function NavigationIsActiveProvider(
 	props: NavigationIsActiveProviderProps,
 ) {
-	const viewRoute = useSelector((state: State): PageRequest<any> | null => {
-		return state.request
-	}, shallowEqual)
-	const request = useSelector((state: State) => state.request, shallowEqual)
-	const urlGenerator = useUrlGenerator()
-
+	const linkFactory = useLinkFactory()
 	const isActive = useCallback(
 		(to: string | Navigation.CustomTo) => {
-			if (viewRoute === null) {
-				return false
-			}
-
-			const url = urlGenerator(pageRequest(
-				typeof to === 'string' ? to : to.pageName,
-				typeof to === 'string' ? {} : to.parameters,
-			)(request))
-
-			return isUrlActive(url)
+			return linkFactory(to).isActive
 		},
-		[request, urlGenerator, viewRoute],
+		[linkFactory],
 	)
 
 	return <Navigation.IsActiveContext.Provider value={isActive}>{props.children}</Navigation.IsActiveContext.Provider>
@@ -53,7 +36,7 @@ export const NavigationProvider = memo(function NavigationProvider(props: Naviga
 						const Component = props.Component
 						return (
 							<Link
-								requestChange={requestState => {
+								to={requestState => {
 									if (typeof to === 'string') {
 										return { ...requestState!, pageName: to }
 									}

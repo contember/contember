@@ -75,7 +75,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 				return (
 					<Link
 						key={dimension.slug}
-						requestChange={getRequestChangeCallback(dimension)}
+						to={getRequestChangeCallback(dimension)}
 						Component={({ href, onClick }) => (
 							<Button
 								Component="a"

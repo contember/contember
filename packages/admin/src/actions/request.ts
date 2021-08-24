@@ -1,23 +1,9 @@
 import { createAction } from 'redux-actions'
 import { REQUEST_REPLACE } from '../reducer/request'
-import type { default as RequestState, RequestChange } from '../state/request'
+import type { RequestState } from '../state/request'
 import type { ActionCreator } from './types'
 import { PageNotFound, pathToRequestState, requestStateToPath } from '../routing/urlMapper'
 import { RoutingContextValue } from '../routing'
-
-export const pushRequest =
-	(routing: RoutingContextValue, requestChange: RequestChange): ActionCreator<RequestState> =>
-	(dispatch, getState) => {
-		const {  request } = getState()
-		const newRequest = requestChange(request)
-
-		if (newRequest !== null) {
-			const newPath = requestStateToPath(routing, newRequest)
-			window.history.pushState({}, document.title, newPath)
-		}
-
-		return dispatch(createAction(REQUEST_REPLACE, () => newRequest ? { ...newRequest } : null)())
-	}
 
 export const populateRequest =
 	(routing: RoutingContextValue, location: Location): ActionCreator<RequestState> =>

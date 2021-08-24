@@ -1,4 +1,4 @@
-import RequestState from '../state/request'
+import { RequestState } from '../state/request'
 import * as pathToRegexp from 'path-to-regexp'
 import { MatchFunction, PathFunction } from 'path-to-regexp'
 import { Environment } from '@contember/binding'

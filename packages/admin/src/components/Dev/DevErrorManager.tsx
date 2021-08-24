@@ -7,12 +7,11 @@ export class ErrorBus {
 	private listener: null | ((error: { error: ErrorType, source: string }) => void) = null
 
 	async handleError(source: string, error: ErrorType) {
-		const boxedError = {
-			error,
-			source,
-		}
+		const boxedError = { error, source }
+
 		if (!this.listener) {
 			this.queue.push(boxedError)
+
 		} else {
 			this.listener(boxedError)
 		}
@@ -36,12 +35,22 @@ export function DevErrorManager(props: DevErrorManagerProps) {
 	const [errors, setErrors] = useState<{ error: ErrorType, source: string }[]>([])
 	const [errIndex, setErrorIndex] = useState(0)
 	const [open, setOpen] = useState(false)
-	useEffect(() => {
-		return props.bus.register(err => {
-			setErrors(errors => [err, ...errors])
-			setOpen(true)
-		})
-	}, [props.bus])
+
+	useEffect(
+		() => {
+			return props.bus.register(err => {
+				setTimeout(
+					() => {
+						setErrors(errors => [err, ...errors])
+						setOpen(true)
+					},
+					0,
+				)
+			})
+		},
+		[props.bus],
+	)
+
 	const currentError = errors[errIndex]
 	const stackTrace = useParsedStacktrace(currentError?.error)
 	if (!currentError) {

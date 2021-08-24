@@ -8,11 +8,9 @@ export const runReactApp = (
 ) => {
 	const rootEl = domRoot instanceof HTMLElement
 		? domRoot
-		: document.querySelector<HTMLElement>(domRoot ?? '#root')
-
-	if (!rootEl) {
-		throw new Error('Contember root element not found')
-	}
+		: typeof domRoot === 'string'
+		? document.querySelector<HTMLElement>(domRoot)
+		: document.body.appendChild(document.createElement('div'))
 
 	const handler = createErrorHandler()
 	handler(() => ReactDOM.render(reactElement, rootEl))

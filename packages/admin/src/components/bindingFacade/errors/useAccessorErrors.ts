@@ -1,9 +1,9 @@
-import type { EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor } from '@contember/binding'
+import type { EntityAccessor, EntityListAccessor, ErrorAccessor, FieldAccessor, FieldValue } from '@contember/binding'
 import { useMessageFormatter } from '../../../i18n'
 import { errorCodeDictionary } from './errorCodeDictionary'
 
-export const useAccessorErrors = (
-	accessor: FieldAccessor | EntityAccessor | EntityListAccessor,
+export const useAccessorErrors = <Value extends FieldValue>(
+	accessor: FieldAccessor<Value> | EntityAccessor | EntityListAccessor,
 ): ErrorAccessor.ValidationErrors | undefined => {
 	const formatMessage = useMessageFormatter(errorCodeDictionary)
 

@@ -250,16 +250,6 @@ importers:
     dependencies:
       '@contember/schema': 0.11.3
 
-  packages/projects:
-    specifiers:
-      '@contember/admin': workspace:*
-      '@contember/schema': ^0.11.3
-      '@contember/schema-definition': '0.11'
-    devDependencies:
-      '@contember/admin': link:../admin
-      '@contember/schema': 0.11.3
-      '@contember/schema-definition': 0.11.3
-
   packages/react-client:
     specifiers:
       '@contember/client': workspace:*
@@ -3043,14 +3033,17 @@ packages:
       '@contember/schema': 0.11.3
       '@contember/schema-utils': 0.11.3
       reflect-metadata: 0.1.13
+    dev: false
 
   /@contember/schema-utils/0.11.3:
     resolution: {integrity: sha512-bkcR+pEFqDI4nA+ERZgJlqsmBP6qqUp31r/gCAF9WPYWe6TGL2QbMRsL0gYwV52/Malxz8AbxhiCo4/kH1chyQ==}
     dependencies:
       '@contember/schema': 0.11.3
+    dev: false
 
   /@contember/schema/0.11.3:
     resolution: {integrity: sha512-4h/+Pn7UVUITQ/GzAhgJzKcqeFgh0Lwovn1uoUyJI3rw/sFwalx05E59TZRzTalD6NT+cZxiKNmZ71HgXNPPbg==}
+    dev: false
 
   /@emotion/cache/10.0.29:
     resolution: {integrity: sha512-fU2VtSVlHiF27empSbxi1O2JFdNWZO+2NFHfwO0pxgTep6Xa3uGb+3pVKfLww2l/IBGLNEZl5Xf/++A4wAYDYQ==}
@@ -16622,6 +16615,7 @@ packages:
 
   /reflect-metadata/0.1.13:
     resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
+    dev: false
 
   /refractor/3.4.0:
     resolution: {integrity: sha512-dBeD02lC5eytm9Gld2Mx0cMcnR+zhSnsTfPpWqFaMgUMJfC9A6bcN3Br/NaXrnBJcuxnLFR90k1jrkaSyV8umg==}

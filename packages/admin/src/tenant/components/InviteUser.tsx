@@ -12,15 +12,9 @@ import {
 	TitleBar,
 } from '@contember/ui'
 import { ComponentType, Dispatch, FC, memo, SetStateAction, useCallback, useEffect, useState } from 'react'
-import { NavigateBackButton, useRedirect } from '../../components/pageRouting'
-import {
-	RoleVariableDefinition,
-	useInvite,
-	useListRolesQuery,
-	useUpdateProjectMembership,
-} from '../hooks'
+import { NavigateBackButton, useRedirect, useShowToast } from '../../components'
+import { RoleVariableDefinition, useInvite, useListRolesQuery, useUpdateProjectMembership } from '../hooks'
 import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
-import { useShowToast } from '../../components'
 
 interface VariableConfig {
 	render: ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>

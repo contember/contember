@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import type { RequestChange } from '../../state/request'
+import type { RequestChange } from '../../routing'
 import { useLinkFactory } from '../Link/useLink'
 
 export const useRedirect = () => {

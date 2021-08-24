@@ -1,10 +1,9 @@
 import { ComponentType, createContext, Fragment, isValidElement, ReactElement, ReactNode, ReactNodeArray } from 'react'
-import { useSelector } from 'react-redux'
-import type State from '../../state'
 import { PageErrorBoundary } from './PageErrorBoundary'
 import { Page, PageProps } from './Page'
 import type { PageProvider } from './PageProvider'
 import { EnvironmentContext, useEnvironment } from '@contember/binding'
+import { useCurrentRequest } from '../../routing'
 
 type PageProviderElement = ReactElement<any> & { type: PageProvider }
 type PageElement = ReactElement<PageProps>
@@ -39,7 +38,7 @@ export const ParametersContext = createContext<Parameters>({}) // TODO: drop? wh
  */
 export const Pages = (props: PagesProps) => {
 	const rootEnv = useEnvironment()
-	const request = useSelector<State, State['request']>(({ request }) => request) // TODO: extract to useRequest
+	const request = useCurrentRequest()
 
 	if (request === null || !props.children) {
 		return null

@@ -1,10 +1,13 @@
 import { useCallback, useMemo } from 'react'
-import { RequestState, RequestChange, pageRequest } from '../../state/request'
-import { useDispatch, useSelector } from 'react-redux'
-import State from '../../state'
-import { requestStateToPath, useRouting } from '../../routing'
-import { createAction } from 'redux-actions'
-import { REQUEST_REPLACE } from '../../reducer/request'
+import {
+	pageRequest,
+	RequestChange,
+	RequestState,
+	requestStateToPath,
+	useCurrentRequest,
+	usePushRequest,
+	useRouting,
+} from '../../routing'
 
 export interface LinkProps
 {
@@ -33,9 +36,9 @@ const targetToRequest = (target: LinkTarget, currentRequest: RequestState): Requ
 }
 
 export const useLinkFactory = () => {
-	const currentRequest = useSelector<State, State['request']>(({ request }) => request)
+	const currentRequest = useCurrentRequest()
 	const routing = useRouting()
-	const dispatch = useDispatch()
+	const pushRequest = usePushRequest()
 
 	return useCallback((target: LinkTarget): LinkProps => {
 		const request = targetToRequest(target, currentRequest)
@@ -55,10 +58,10 @@ export const useLinkFactory = () => {
 				if (request !== null) {
 					window.history.pushState({}, document.title, href)
 				}
-				dispatch(createAction(REQUEST_REPLACE, () => request ? { ...request } : null)())
+				pushRequest(request)
 			},
 		}
-	}, [currentRequest, dispatch, routing])
+	}, [currentRequest, pushRequest, routing])
 }
 
 export const useLink = (target: LinkTarget) => {

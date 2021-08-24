@@ -7,7 +7,7 @@ export interface SelectedDimension {
 }
 
 
-type PageParameters = RecursiveStringObject
+export type PageParameters = RecursiveStringObject
 
 export interface PageRequest<P extends PageParameters> {
 	pageName: string
@@ -17,16 +17,4 @@ export interface PageRequest<P extends PageParameters> {
 
 export type RequestState = PageRequest<any> | null
 
-export default RequestState
-
-export const emptyRequestState: RequestState = null
-
 export type RequestChange = (currentState: RequestState) => RequestState
-
-export const pageRequest =
-	<P extends PageParameters>(pageName: string, parameters?: P): RequestChange =>
-	(currentState: RequestState): PageRequest<P> => ({
-		pageName,
-		parameters: parameters ?? {} as P,
-		dimensions: currentState?.dimensions || {},
-	})

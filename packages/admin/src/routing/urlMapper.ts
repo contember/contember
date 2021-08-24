@@ -1,8 +1,8 @@
-import { RequestState } from '../state/request'
 import * as pathToRegexp from 'path-to-regexp'
 import { MatchFunction, PathFunction } from 'path-to-regexp'
 import { Environment } from '@contember/binding'
 import { RoutingContextValue } from './RoutingContext'
+import { RequestState } from './types'
 
 const matchFunctionsCache: Record<string, MatchFunction> = {}
 const pathFunctionsCache: Record<string, PathFunction> = {}

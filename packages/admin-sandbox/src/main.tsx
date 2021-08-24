@@ -24,6 +24,9 @@ window.addEventListener('DOMContentLoaded', () => {
 				routes: {
 					dashboard: { path: '/' },
 					second: { path: '/2nd' },
+					fooPage: {path: '/foo'},
+					barPage: {path: '/bar'},
+					loremPage: {path: '/lorem'},
 				},
 			}}
 		/>,

@@ -1,16 +1,14 @@
-import { lazy, Suspense } from 'react'
+import { lazy, memo, Suspense } from 'react'
 import { ContainerSpinner } from '@contember/ui'
 import { ProjectConfig } from '../../state/projectsConfigs'
-import { ClientConfig } from '../../bootstrap'
 
 export interface ProjectEntrypointInnerProps {
-	clientConfig: ClientConfig
-	projectConfig: ProjectConfig
+	Component: ProjectConfig['component']
 }
 
-export const ProjectEntrypointInner = (props: ProjectEntrypointInnerProps) => {
-	if (typeof props.projectConfig.component === 'function') {
-		const Component = lazy(props.projectConfig.component)
+export const ProjectEntrypointInner = memo((props: ProjectEntrypointInnerProps) => {
+	if (typeof props.Component === 'function') {
+		const Component = lazy(props.Component)
 
 		return (
 			<Suspense fallback={<ContainerSpinner />}>
@@ -19,5 +17,5 @@ export const ProjectEntrypointInner = (props: ProjectEntrypointInnerProps) => {
 		)
 	}
 
-	return props.projectConfig.component
-}
+	return props.Component
+})

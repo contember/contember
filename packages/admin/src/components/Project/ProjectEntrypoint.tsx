@@ -73,7 +73,7 @@ export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 							>
 								<NavigationProvider>
 									<IdentityProvider>
-										<ProjectEntrypointInner clientConfig={props.clientConfig} projectConfig={props.projectConfig} />
+										<ProjectEntrypointInner Component={props.projectConfig.component} />
 									</IdentityProvider>
 								</NavigationProvider>
 							</ContemberClient>

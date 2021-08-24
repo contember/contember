@@ -21,19 +21,20 @@ export const stringifyDimensions = (dimensions: Environment.SelectedDimensions):
 }
 
 export const pathToRequestState = (routing: RoutingContextValue, path: string): RequestState => {
-	if (!path.startsWith(routing.basePath)) {
+	if (!path.startsWith(routing.basePath.slice(0, -1))) {
 		return null
 	}
 
-	const dimensionSegment = path.split('/')[2] ?? ''
-	const hasDimensions = dimensionSegment.includes('=')
+	const dimensionsSegment = path.slice(routing.basePath.length, path.indexOf('/', routing.basePath.length))
+	const hasDimensions = dimensionsSegment.includes('=')
 
-	const dimensions = hasDimensions ? parseDimensions(dimensionSegment) : routing.defaultDimensions
-	const pagePath = hasDimensions ? path.substring(routing.basePath.length + dimensionSegment.length + 1) : path.substring(routing.basePath.length)
+	const dimensions = hasDimensions ? parseDimensions(dimensionsSegment) : routing.defaultDimensions
+	const pagePath = hasDimensions ? path.slice(routing.basePath.length + dimensionsSegment.length) : path.slice(routing.basePath.length - 1)
+	const pagePathNormalized = pagePath.endsWith('/') ? pagePath : `${pagePath}/`
 
 	for (const [pageName, config] of Object.entries(routing.routes)) {
 		matchFunctionsCache[config.path] ??= pathToRegexp.match(config.path, { decode: decodeURIComponent })
-		const matchResult = matchFunctionsCache[config.path](pagePath)
+		const matchResult = matchFunctionsCache[config.path](pagePathNormalized)
 
 		if (matchResult !== false) {
 			return {
@@ -56,9 +57,8 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 		throw new PageNotFound(`No such route for page ${request.pageName}`)
 	}
 
-	const dimensionSegment = Object.entries(request.dimensions).length === 0
-		? ''
-		: `/${stringifyDimensions(request.dimensions)}`
+	const dimensionsString = stringifyDimensions(request.dimensions)
+	const dimensionsSegment = dimensionsString ? `/${dimensionsString}` : ''
 
 	const route = routing.routes[request.pageName]
 	const pathParameters = route.objectToParams ? route.objectToParams(request.parameters) : request.parameters
@@ -66,7 +66,7 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 	pathFunctionsCache[route.path] ??= pathToRegexp.compile(route.path, { encode: encodeURIComponent })
 	const pageSegment = pathFunctionsCache[route.path](pathParameters)
 
-	return routing.basePath + dimensionSegment + pageSegment
+	return routing.basePath.slice(0, -1) + dimensionsSegment + pageSegment
 }
 
 export class PageNotFound extends Error {

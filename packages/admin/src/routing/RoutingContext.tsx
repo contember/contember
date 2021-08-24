@@ -9,7 +9,7 @@ export interface RoutingContextValue {
 }
 
 export const RoutingContext = createContext<RoutingContextValue>({
-	basePath: '',
+	basePath: '/',
 	routes: {},
 })
 

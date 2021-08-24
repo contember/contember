@@ -21,7 +21,7 @@ export interface ProjectEntrypointProps { // TODO: better props names
 export const ProjectEntrypoint = (props: ProjectEntrypointProps) => {
 
 	const routing: RoutingContextValue = useMemo(() => ({
-		basePath: props.basePath ?? '',
+		basePath: props.basePath ?? '/',
 		routes: props.projectConfig.routes,
 		defaultDimensions: props.projectConfig.defaultDimensions,
 	}), [props.basePath, props.projectConfig.defaultDimensions, props.projectConfig.routes])

@@ -16,7 +16,7 @@ export const ProjectListEntrypoint = (props: ProjectListEntrypointProps) => {
 		return (
 			<ProjectEntrypoint
 				key={projectConfig.project}
-				basePath={`/${projectConfig.project}`}
+				basePath={`/${projectConfig.project}/`}
 				clientConfig={props.clientConfig}
 				projectConfig={projectConfig}
 			/>
@@ -24,6 +24,6 @@ export const ProjectListEntrypoint = (props: ProjectListEntrypointProps) => {
 
 	} else {
 		const projects = props.projectConfigs.map(it => ({ slug: it.project, name: it.project }))
-		return <ProjectList projects={projects} formatProjectUrl={it => `/${it.slug}/`} /> // TODO: it should also work without the trailing slash
+		return <ProjectList projects={projects} formatProjectUrl={it => `/${it.slug}/`} />
 	}
 }

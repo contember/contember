@@ -16,7 +16,7 @@ jobs:
         run: yarn install
       - name: Extract version
         id: versions
-        uses: ./.github.actions/extract-version
+        uses: ./.github/actions/extract-version
         with:
           version: ${{ github.ref }}
       - name: "Build app"

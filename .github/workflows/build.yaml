@@ -23,14 +23,14 @@ jobs:
       - name: Setup repo
         uses: actions/checkout@v2
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Setup node
         uses: actions/setup-node@main
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
-
-      - name: Install pnpm
-        run: npm install -g pnpm
 
       - name: Install dependencies
         run: pnpm install

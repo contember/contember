@@ -14,6 +14,9 @@ jobs:
       - name: Setup repo
         uses: actions/checkout@v2
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Setup node
         uses: actions/setup-node@main
         with:
@@ -21,12 +24,6 @@ jobs:
           cache: pnpm
           registry-url: https://verdaccio.mgw.cz/
           scope: @contember
-
-      - name: Get the version
-        run: echo "VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
-
-      - name: Install pnpm
-        run: npm install -g pnpm
 
       - name: Install dependencies
         run: pnpm install
@@ -46,7 +43,7 @@ jobs:
       - name: Publish NPM
         run: |
           pnpm config set git-tag-version false
-          pnpm recursive exec npm version "$VERSION"
+          pnpm recursive exec npm version "${GITHUB_REF:11}"
           pnpm recursive publish --access restricted --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.VERDACCIO_NPM_TOKEN }}

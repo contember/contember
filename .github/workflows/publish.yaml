@@ -22,8 +22,6 @@ jobs:
         with:
           node-version: 16
           cache: pnpm
-          registry-url: https://verdaccio.mgw.cz/
-          scope: '@contember'
 
       - name: Install dependencies
         run: pnpm install
@@ -39,6 +37,14 @@ jobs:
 
       - name: Test
         run: pnpm run test
+
+      - name: Setup node
+        uses: actions/setup-node@main
+        with:
+          node-version: 16
+          cache: pnpm
+          registry-url: https://verdaccio.mgw.cz/
+          scope: '@contember'
 
       - name: Publish NPM
         run: |

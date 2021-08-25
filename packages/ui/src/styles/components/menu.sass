@@ -128,7 +128,7 @@
 			&-title
 				&:focus
 					@extend %implementsCustomFocusEffects
-					background: $cui-menu-action-focus-color
+					background: $cui-menu-action-focus-background-color
 				&:hover
 					color: $cui-menu-action-active-color
 
@@ -137,7 +137,7 @@
 	&-tooDeep
 		&.is-active > &-title
 			color: $cui-menu-action-active-color
-			font-weight: $fw-medium
+			font-weight: $cui-menu-action-active-font-weight
 			&:hover
 				color: $cui-menu-action-hover-color
 

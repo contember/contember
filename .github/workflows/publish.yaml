@@ -23,7 +23,7 @@ jobs:
           node-version: 16
           cache: pnpm
           registry-url: https://verdaccio.mgw.cz/
-          scope: @contember
+          scope: '@contember'
 
       - name: Install dependencies
         run: pnpm install

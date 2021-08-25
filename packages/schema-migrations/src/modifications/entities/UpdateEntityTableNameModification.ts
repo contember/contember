@@ -47,7 +47,8 @@ export const UpdateEntityTableNameModification: ModificationHandlerStatic<Update
 	static createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(updatedSchema.model.entities)
 			.filter(
-				it => updatedSchema.model.entities[it.name] && updatedSchema.model.entities[it.name].tableName !== it.tableName,
+				it =>
+					originalSchema.model.entities[it.name] && originalSchema.model.entities[it.name].tableName !== it.tableName,
 			)
 			.map(it => UpdateEntityTableNameModification.createModification({ entityName: it.name, tableName: it.tableName }))
 	}

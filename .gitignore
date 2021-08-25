@@ -1,3 +1,4 @@
+/.npmrc
 /packages/*/dist
 /packages/*/temp
 /packages/*/node_modules

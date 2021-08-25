@@ -1,14 +1,13 @@
 {
   "name": "@contember/install",
-  "version": "0.12.0-alpha.2",
+  "version": "0.12.0-alpha.3",
   "license": "Apache-2.0",
   "bin": "dist/src/run.js",
   "scripts": {
     "test": "echo 'No tests'"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "dependencies": {
-    "@contember/cli-common": "^0.12.0-alpha.2"
+    "@contember/cli-common": "^0.12.0-alpha.3"
   }
 }

@@ -11,7 +11,7 @@ export function createViteConfig(packageName) {
 
 	const packageDir = `packages/${packageName}`
 
-	return defineConfig(async ({ command, mode }) => {
+	return defineConfig(({ command, mode }) => {
 		const isDevMode = mode === 'development'
 		return {
 			build: {
@@ -24,13 +24,8 @@ export function createViteConfig(packageName) {
 				minify: false,
 				outDir: resolve(rootDirectory, `${packageDir}/dist`),
 				rollupOptions: {
-					external: (source, importer, isResolved) => {
-						if (!isResolved) {
-							return !source.startsWith('./') && !source.startsWith('../') && source !== '.'
-
-						} else {
-							return source.includes('/node_modules/')
-						}
+					external: (id, importer, resolved) => {
+						return !resolved && !id.startsWith('./') && !id.startsWith('../') && id !== '.'
 					},
 					output: {
 						entryFileNames: `${packageName}.${mode}.js`,
@@ -41,7 +36,6 @@ export function createViteConfig(packageName) {
 			},
 			esbuild: {
 				jsxInject: `import * as React from 'react'`,
-				target: 'esnext',
 			},
 			plugins: [reactRefresh()],
 			resolve: {

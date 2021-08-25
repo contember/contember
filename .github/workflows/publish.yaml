@@ -1,38 +1,46 @@
 name: Publish
+
 on:
   push:
     tags:
       - '**'
+
 jobs:
-  build:
+  publish:
     name: Publish
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16]
+
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
+
       - name: Setup node
         uses: actions/setup-node@main
         with:
           node-version: 16
+
       - name: Get the version
         run: echo "VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
-      - name: Cache .pnpm-store
-        uses: actions/cache@v1
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-node${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+
       - name: Install pnpm
-        run: curl -f https://get.pnpm.io/v6.7.js | node - add --global pnpm@6
+        run: npm install -g pnpm
+
       - name: Install dependencies
         run: pnpm install
+
+      - name: Lint
+        run: pnpm run eslint:lint
+
       - name: Build
         run: pnpm run build
+
+      - name: Build API
+        run: pnpm run build:api:dev
+
       - name: Test
         run: pnpm run test
+
       - name: Publish NPM
-        run: pnpm publish -r --access restricted
+        run: cp .npmrc.dist .npmrc && pnpm publish -r --access restricted
         env:
           VERDACCIO_NPM_TOKEN: ${{ secrets.VERDACCIO_NPM_TOKEN }}

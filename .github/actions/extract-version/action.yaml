@@ -1,0 +1,14 @@
+name: 'Extract info about the version'
+description: ''
+inputs:
+  version: # id of input
+    description: 'Semver'
+    required: true
+outputs:
+  npmTag:
+    description: 'Resolved tag for NPM'
+  versions:
+    description: 'String of possible tags separated by space'
+runs:
+  using: 'node12'
+  main: 'index.js'

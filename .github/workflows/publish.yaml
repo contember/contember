@@ -12,18 +12,23 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 14
-      - name: Get the version
-        run: echo "VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
       - name: "Install yarn deps"
         run: yarn install
+      - name: Extract version
+        id: versions
+        uses: ./.github.actions/extract-version
+        with:
+          version: ${{ github.ref }}
       - name: "Build app"
         run: yarn run build
       - name: "Publish NPM"
         run: bash ./scripts/npm/publish.sh
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          NPM_TAG: ${{ steps.versions.outputs.npmTag }}
       - name: "Publish Docker"
         run: bash ./scripts/docker/publish.sh
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_TAGS: ${{ steps.versions.outputs.versions }}

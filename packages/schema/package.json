@@ -1,6 +1,6 @@
 {
   "name": "@contember/schema",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",

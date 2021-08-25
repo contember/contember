@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParsedStacktrace } from './useParsedStacktrace'
 
 export class ErrorBus {
-	private queue: {error: ErrorType, source: string}[] = []
+	private queue: { error: ErrorType, source: string }[] = []
 	private listener: null | ((error: { error: ErrorType, source: string }) => void) = null
 
 	async handleError(source: string, error: ErrorType) {

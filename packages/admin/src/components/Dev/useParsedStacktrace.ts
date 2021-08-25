@@ -1,6 +1,5 @@
-import { ErrorType } from '@contember/ui'
+import { ErrorType, ParsedStackTrace } from '@contember/ui'
 import { useEffect, useState } from 'react'
-import { ParsedStackTrace } from '@contember/ui'
 
 export const parseStacktrace = async (e: Error) => {
 	const StackTracey = (await import('stacktracey')).default

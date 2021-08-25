@@ -7,6 +7,7 @@ export interface ErrorFilePreviewProps {
 	uploadState: SingleFileUploadState & { readyState: 'error' }
 	formatMessage: MessageFormatter<UploadDictionary>
 }
+
 export function ErrorFilePreview({ uploadState, formatMessage }: ErrorFilePreviewProps) {
 	const endUserMessages = uploadState.errors
 		? uploadState.errors

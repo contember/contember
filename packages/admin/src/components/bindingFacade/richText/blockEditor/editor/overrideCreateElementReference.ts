@@ -2,7 +2,6 @@ import {
 	BindingError,
 	BindingOperations,
 	EntityAccessor,
-	EntityListAccessor,
 	RelativeSingleField,
 	SugaredRelativeEntityList,
 } from '@contember/binding'

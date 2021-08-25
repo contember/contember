@@ -28,17 +28,19 @@ export const ToasterProvider: React.FC = props => {
 	const dismissToast = useCallback((toastId: ToastId) => {
 		dispatch({ type: 'dismissToast', toastId })
 	}, [])
+
 	const showToast = useCallback((toast: ToastDefinition) => {
 		const id = String(counter)
 		dispatch({ type: 'showToast', toast: { ...toast, id: id } })
 		setCounter(it => it + 1)
 		return id
 	}, [counter])
-	return <ToasterContext.Provider value={useMemo(() => ({
+
+	const toasterContextValue = useMemo(() => ({
 		toasts,
 		dismissToast,
 		showToast,
-	}), [dismissToast, showToast, toasts])}>
-		{props.children}
-	</ToasterContext.Provider>
+	}), [dismissToast, showToast, toasts])
+
+	return <ToasterContext.Provider value={toasterContextValue}>{props.children}</ToasterContext.Provider>
 }

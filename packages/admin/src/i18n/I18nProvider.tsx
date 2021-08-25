@@ -13,6 +13,7 @@ export interface I18nProviderProps {
 
 	children: ReactNode
 }
+
 export function I18nProvider({ localeCode, dictionaries = emptyObject, children }: I18nProviderProps) {
 	const locale = useMemo<Locale>(() => ({ code: localeCode || defaultLocale.code }), [localeCode])
 	const metadata = useMemo<I18nMetadata>(

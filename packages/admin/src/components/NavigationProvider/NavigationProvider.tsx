@@ -10,16 +10,16 @@ export interface NavigationProviderProps {
 export const NavigationProvider = memo(function NavigationProvider(props: NavigationProviderProps) {
 	const linkFactory = useLinkFactory()
 	return (
-			<NavigationContext.Provider
-				value={val => {
-					if (!isLinkTarget(val)) {
-						throw new PageNotFound('Invalid request')
-					}
-					return linkFactory(val as any)
-				}}
-			>
-				{props.children}
-			</NavigationContext.Provider>
+		<NavigationContext.Provider
+			value={val => {
+				if (!isLinkTarget(val)) {
+					throw new PageNotFound('Invalid request')
+				}
+				return linkFactory(val as any)
+			}}
+		>
+			{props.children}
+		</NavigationContext.Provider>
 	)
 })
 NavigationProvider.displayName = 'NavigationProvider'

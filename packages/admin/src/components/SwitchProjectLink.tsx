@@ -14,5 +14,5 @@ export const SwitchProjectLink = ({ Component, ...props }: SwitchProjectLinkProp
 		return null
 	}
 
-	return <Component href="/" {...props}/>
+	return <Component href="/" {...props} />
 }

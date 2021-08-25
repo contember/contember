@@ -52,7 +52,7 @@ export const Login = ({ onLogin }: LoginProps) => {
 	return (
 		<MiscPageLayout heading="Contember Admin">
 			<form onSubmit={onSubmit}>
-				<ErrorList size="large" errors={errors}/>
+				<ErrorList size="large" errors={errors} />
 				<FormGroup label="Email">
 					<TextInput
 						value={email}

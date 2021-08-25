@@ -3,9 +3,11 @@ import type { WithEssentials } from '../EditorWithEssentials'
 import { Transforms } from 'slate'
 
 type Children = (ElementNode | TextNode)[]
+
 export interface TextAttrs {
 	[key: string]: any
 }
+
 export type NodesWithTypeFiltered =
 	| { texts: (TextNode | ElementNode)[]; elements?: undefined }
 	| { elements: ElementNode[]; texts?: undefined }

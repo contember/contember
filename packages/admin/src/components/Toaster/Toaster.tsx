@@ -4,6 +4,7 @@ import { ToasterContext } from './ToasterContext'
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info'
 export type ToastId = string
+
 export interface ToastDefinition {
 	type: ToastType
 	message: string
@@ -50,7 +51,7 @@ export const Toaster: React.FC = () => {
 									toasterContext.dismissToast(toast.id)
 								}}
 							>
-								<Icon blueprintIcon="cross" style={{ color: 'white' }}/>
+								<Icon blueprintIcon="cross" style={{ color: 'white' }} />
 							</Button>
 						}
 					>

@@ -83,6 +83,7 @@ namespace SpotifyEmbedHandler {
 		type: string
 		id: string
 	}
+
 	export interface Options {
 		render?: () => ReactNode
 		spotifyTypeField: SugaredFieldProps['field']

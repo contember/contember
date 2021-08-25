@@ -22,6 +22,7 @@ export interface InitializeReferenceContentProps {
 	onSuccess: () => void
 	onCancel: () => void
 }
+
 export interface InitializeReferenceSpecificToolbarButton {
 	discriminateBy: SugaredDiscriminateBy
 	initializeReference?: EntityAccessor.BatchUpdatesHandler

@@ -9,19 +9,18 @@ import {
 	useRouting,
 } from '../../routing'
 
-export interface LinkProps
-{
+export interface LinkProps {
 	href: string
 	navigate: (e?: BaseSyntheticEvent) => void
 	isActive: boolean
 }
 
-export type LinkTarget = string | RequestChange | (Partial<RequestState> & {pageName: string})
+export type LinkTarget = string | RequestChange | (Partial<RequestState> & { pageName: string })
 
 export const isLinkTarget = (value: unknown): value is LinkTarget => {
 	return typeof value === 'string'
 		|| typeof value === 'function'
-		|| (typeof value === 'object' && value !== null &&  'pageName' in value)
+		|| (typeof value === 'object' && value !== null && 'pageName' in value)
 }
 
 const targetToRequest = (target: LinkTarget, currentRequest: RequestState): RequestState => {

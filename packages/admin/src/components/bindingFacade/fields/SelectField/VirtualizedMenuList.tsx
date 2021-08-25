@@ -1,5 +1,5 @@
 import type { FieldValue } from '@contember/binding'
-import { ReactElement, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { ReactElement, useCallback, useLayoutEffect, useMemo, useRef } from 'react'
 import type { MenuListComponentProps } from 'react-select'
 import { ListChildComponentProps, VariableSizeList } from 'react-window'
 import type { ChoiceFieldData } from '../ChoiceField'

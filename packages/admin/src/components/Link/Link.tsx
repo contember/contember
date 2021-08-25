@@ -13,7 +13,7 @@ import { LinkTarget, useLink } from './useLink'
 
 const defaultComponent: FunctionComponent<InnerLinkProps> = ({ isActive, ...props }) => (
 	// TODO do something with isActive?
-	<a {...props}/>
+	<a {...props} />
 )
 
 export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, to, Component, ...props }) => {
@@ -32,7 +32,7 @@ export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, to, Componen
 	}, [navigate, onClick])
 
 	const InnerComponent = Component ?? defaultComponent
-	return <InnerComponent isActive={isActive} href={href} {...props} onClick={innerOnClick}/>
+	return <InnerComponent isActive={isActive} href={href} {...props} onClick={innerOnClick} />
 })
 Link.displayName = 'Link'
 

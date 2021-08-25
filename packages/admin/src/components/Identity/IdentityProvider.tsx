@@ -6,14 +6,13 @@ import { ContainerSpinner, Message } from '@contember/ui'
 export interface Identity {
 	email: string
 	personId: string
-	projects: IdentityProject[] // TODO: drop other projects
+	projects: IdentityProject[]
 }
 
 export interface IdentityProject {
 	slug: string
 	roles: string[]
 }
-
 
 interface IdentityContext {
 	clearIdentity: () => void
@@ -48,25 +47,30 @@ export const IdentityProvider: React.FC = ({ children }) => {
 		},
 		[identity, sessionToken, me],
 	)
-	const clearIdentity = useCallback(() => {
-		setIdentity(undefined)
-		setIdentityCleared(true)
-	}, [])
 
-	const identityContextValue = useMemo(() => identity ? {
-		clearIdentity,
-		identity,
-	} : undefined, [identity, clearIdentity])
+	const clearIdentity = useCallback(
+		() => {
+			setIdentity(undefined)
+			setIdentityCleared(true)
+		},
+		[],
+	)
+
+	const identityContextValue = useMemo(
+		() => identity ? { clearIdentity, identity } : undefined,
+		[identity, clearIdentity],
+	)
 
 	if (identityCleared) {
 		return <Message type="default">Logging out...</Message>
 	}
+
 	if (me.error) {
 		return <Message type="danger">Failed to fetch an identity</Message>
 	}
 
 	if (!identity) {
-		return <ContainerSpinner/>
+		return <ContainerSpinner />
 	}
 
 	return <IdentityContext.Provider value={identityContextValue}>{children}</IdentityContext.Provider>

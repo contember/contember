@@ -27,6 +27,6 @@ export const LoginEntrypoint = (props: LoginEntrypointProps) => {
 		return null
 
 	} else {
-		return <ProjectList projects={projects} formatProjectUrl={props.formatProjectUrl}/>
+		return <ProjectList projects={projects} formatProjectUrl={props.formatProjectUrl} />
 	}
 }

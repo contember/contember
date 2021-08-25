@@ -1,15 +1,4 @@
 {
-	"watch": {
-		"styles:build": {
-			"patterns": [
-				"packages"
-			],
-			"ignore": [
-				"node_modules"
-			],
-			"extensions": "sass,scss"
-		}
-	},
 	"type": "module",
 	"scripts": {
 		"build": "pnpm run ts:build && pnpm run -r --parallel build && pnpm run -r --parallel styles:build",

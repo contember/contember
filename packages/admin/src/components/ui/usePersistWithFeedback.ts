@@ -2,7 +2,7 @@ import { ErrorPersistResult, PersistOptions, SuccessfulPersistResult, usePersist
 import { useCallback } from 'react'
 import { useMessageFormatter } from '../../i18n'
 import { persistFeedbackDictionary } from './persistFeedbackDictionary'
-import { useShowToastWithTimeout } from './useShowToastWithTimeout'
+import { useShowToastWithTimeout } from '../Toaster'
 
 export interface PersistWithFeedbackOptions extends PersistOptions {
 	successMessage?: string

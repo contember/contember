@@ -4,6 +4,9 @@ import { URL } from 'url'
 import { BaseController } from './BaseController'
 import type { ProjectListProvider } from '../project'
 
+export const LOGIN_TOKEN_PLACEHOLDER = '__LOGIN_TOKEN__'
+export const SESSION_TOKEN_PLACEHOLDER = '__SESSION_TOKEN__'
+
 interface ApiParams {
 	path: string
 }
@@ -11,13 +14,13 @@ interface ApiParams {
 export class ApiController extends BaseController<ApiParams> {
 	constructor(
 		private apiEndpoint: string,
+		private loginToken: string,
 		private projectListProvider: ProjectListProvider,
 	) {
 		super()
 	}
 
 	async handle(req: IncomingMessage, res: ServerResponse, params: ApiParams): Promise<void> {
-		const token = this.readAuthCookie(req)
 		const tokenPath = req.headers['x-contember-token-path']
 		const apiEndpointUrl = new URL(this.apiEndpoint)
 
@@ -27,17 +30,14 @@ export class ApiController extends BaseController<ApiParams> {
 			port: apiEndpointUrl.port,
 			path: apiEndpointUrl.pathname + params.path,
 			method: req.method,
-			headers: {
-				'Authorization': token && tokenPath === null ? `Bearer ${token}` : req.headers['authorization'],
-				'Content-Type': req.headers['content-type'] ?? '',
-			},
+			headers: this.transformIncomingHeaders(req),
 		}
 
 		const driver = apiEndpointUrl.protocol === 'http:' ? httpRequest : httpsRequest
 		req.pipe(
 			driver(innerRequestOptions, async innerRes => {
 				if (typeof tokenPath !== 'string') {
-					this.proxyHead(res, innerRes)
+					this.proxyOugoingHead(res, innerRes)
 					innerRes.pipe(res)
 					return
 				}
@@ -50,14 +50,15 @@ export class ApiController extends BaseController<ApiParams> {
 
 				try {
 					[jsonBody, token] = this.extractToken(JSON.parse(textBody), tokenPath.split('.'))
+
 				} catch (e) {
-					this.proxyHead(res, innerRes)
+					this.proxyOugoingHead(res, innerRes)
 					res.end(rawBody)
 					return
 				}
 
 				if (token === undefined || typeof jsonBody !== 'object' || jsonBody === null) {
-					this.proxyHead(res, innerRes)
+					this.proxyOugoingHead(res, innerRes)
 					res.end(rawBody)
 					return
 				}
@@ -66,7 +67,7 @@ export class ApiController extends BaseController<ApiParams> {
 				jsonBody['extensions']['contemberAdminServer'] = { projects: await this.projectListProvider.get(token) }
 
 				this.writeAuthCookie(res, token)
-				this.proxyHead(res, innerRes)
+				this.proxyOugoingHead(res, innerRes)
 				res.end(JSON.stringify(jsonBody))
 			}),
 		)
@@ -77,12 +78,36 @@ export class ApiController extends BaseController<ApiParams> {
 		})
 	}
 
+	private transformIncomingHeaders(req: IncomingMessage): OutgoingHttpHeaders {
+		const outHeaders: OutgoingHttpHeaders = {}
+		const bearerToken = this.readBearerToken(req)
+		const cookieToken = this.readAuthCookie(req)
+
+		if (bearerToken === LOGIN_TOKEN_PLACEHOLDER) {
+			outHeaders['Authorization'] = `Bearer ${this.loginToken}`
+
+		} else if (bearerToken === SESSION_TOKEN_PLACEHOLDER || req.headers['authorization'] === undefined) {
+			if (cookieToken !== null) {
+				outHeaders['Authorization'] = `Bearer ${cookieToken}`
+			}
+
+		} else {
+			outHeaders['Authorization'] = req.headers['authorization']
+		}
+
+		if (req.headers['content-type'] !== undefined) {
+			outHeaders['Content-Type'] = req.headers['content-type']
+		}
+
+		return outHeaders
+	}
+
 	private extractToken(json: unknown, path: string[]): [any, string | undefined] {
 		const [head, ...tail] = path
 
 		if (head === undefined) {
 			if (typeof json === 'string') {
-				return ['__TOKEN_MOVED_TO_COOKIE__', json]
+				return [SESSION_TOKEN_PLACEHOLDER, json]
 			} else {
 				return [json, undefined]
 			}
@@ -96,7 +121,7 @@ export class ApiController extends BaseController<ApiParams> {
 		return [json, undefined]
 	}
 
-	private proxyHead(outerRes: ServerResponse, innerRes: IncomingMessage) {
+	private proxyOugoingHead(outerRes: ServerResponse, innerRes: IncomingMessage) {
 		const headerWhitelist = new Set(['content-type', 'x-contember-ref'])
 		const outHeaders: OutgoingHttpHeaders = {}
 

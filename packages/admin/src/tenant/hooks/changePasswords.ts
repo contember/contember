@@ -1,6 +1,7 @@
 import { getTenantErrorMessage } from '@contember/client'
 import { useCallback, useMemo } from 'react'
-import { useAuthedTenantMutation, useAuthIdentity } from './lib'
+import { useAuthedTenantMutation } from './lib'
+import { useIdentity } from '../../components'
 
 const CHANGE_PASSWORD_MUTATION = `
 	mutation(
@@ -43,7 +44,7 @@ interface ReturnedState {
 }
 
 export const useChangePassword = (): [(password: string) => void, ReturnedState] => {
-	const auth = useAuthIdentity()
+	const auth = useIdentity()
 	const personId = auth ? auth.personId : undefined
 	const [triggerChangePassword, state] = useAuthedTenantMutation<ChangePasswordResponse, ChangePasswordVariables>(
 		CHANGE_PASSWORD_MUTATION,

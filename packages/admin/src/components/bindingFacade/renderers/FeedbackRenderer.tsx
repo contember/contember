@@ -13,7 +13,7 @@ export function FeedbackRenderer({ accessorTreeState, children }: FeedbackRender
 
 	useEffect(() => {
 		if (accessorTreeState.name === 'error' && accessorTreeState.error.type === 'unauthorized') {
-			redirect(() => ({ name: 'login' }))
+			window.location.href = '/' // redirect to login
 		}
 	}, [accessorTreeState, redirect])
 

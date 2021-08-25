@@ -4,6 +4,7 @@ export interface DimensionDatum {
 	slug: string
 	label: ReactNode
 }
+
 export interface StatefulDimensionDatum<IsSelected extends boolean = boolean> extends DimensionDatum {
 	isSelected: IsSelected
 }

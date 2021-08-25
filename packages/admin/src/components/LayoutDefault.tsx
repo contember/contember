@@ -10,13 +10,12 @@ import {
 } from '@contember/ui'
 import cn from 'classnames'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
-import type State from '../state'
-import { ProjectUserRolesRevealer, TokenExposer } from './Dev'
-import LogoutLink from './LogoutLink'
-import { default as PageLink } from './pageRouting/PageLink'
-import SwitchProjectLink from './SwitchProjectLink'
+import { ProjectUserRolesRevealer } from './Dev'
+import { LogoutLink } from './LogoutLink'
+import { PageLink } from './pageRouting'
+import { SwitchProjectLink } from './SwitchProjectLink'
 import { Avatar } from './ui'
+import { useIdentity } from './Identity'
 
 export interface LayoutProps {
 	header: {
@@ -32,9 +31,7 @@ export interface LayoutProps {
 
 export const LayoutDefault = memo((props: LayoutProps) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
-	const email = useSelector<State, string | undefined>(state =>
-		state.auth.identity ? state.auth.identity.email : undefined,
-	)
+	const email = useIdentity().email
 	const sideRef = useRef<HTMLElement>(null)
 
 	const toggleMenu = useCallback(
@@ -76,7 +73,6 @@ export const LayoutDefault = memo((props: LayoutProps) => {
 						</PageLink>
 					)}
 					<DropdownContentContainerProvider>{props.header.left}</DropdownContentContainerProvider>
-					{<TokenExposer />}
 					{<ProjectUserRolesRevealer />}
 				</div>
 				<div className="navbar-center">{props.header.center}</div>

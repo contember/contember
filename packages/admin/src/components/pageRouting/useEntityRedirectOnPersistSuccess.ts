@@ -1,10 +1,10 @@
 import type { EntityAccessor, PersistSuccessOptions } from '@contember/binding'
 import { useMemo } from 'react'
-import type RequestState from '../../state/request'
 import { useRedirect } from './useRedirect'
+import { RequestState, PageRequest } from '../../routing'
 
 export type RedirectOnSuccessHandler = (
-	currentState: RequestState,
+	currentState: PageRequest<any>,
 	persistedId: string,
 	entity: EntityAccessor,
 	options: PersistSuccessOptions,
@@ -25,7 +25,7 @@ export const useEntityRedirectOnPersistSuccess = (
 			if (options.successType === 'nothingToPersist') {
 				return
 			}
-			redirect(request => redirectOnSuccess(request, getAccessor().id, getAccessor(), options))
+			redirect(request => redirectOnSuccess(request!, getAccessor().id, getAccessor(), options))
 		}
 	}, [redirectOnSuccess, redirect])
 }

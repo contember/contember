@@ -1,6 +1,6 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { Aether, Menu, Navigation } from '../../src'
+import { Aether, Menu, NavigationContext } from '../../src'
 
 export default {
 	title: 'Menu',
@@ -15,9 +15,15 @@ export default {
 } as ComponentMeta<typeof Menu>
 
 const Template: ComponentStory<typeof Menu> = args => (
-	<Navigation.IsActiveContext.Provider value={(s: any) => s === '#active-page'}>
+	<NavigationContext.Provider value={(to: any) => ({
+		isActive: to === '#active-page',
+		href: to,
+		navigate: () => {
+			location.href = to
+		},
+	})}>
 		<Menu {...args} />
-	</Navigation.IsActiveContext.Provider>
+	</NavigationContext.Provider>
 )
 
 export const Simple = Template.bind({})

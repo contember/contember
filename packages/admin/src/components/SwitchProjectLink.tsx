@@ -1,27 +1,18 @@
-import { Component as ReactComponent, ComponentType } from 'react'
-import { connect } from 'react-redux'
-import type State from '../state'
-import { InnerProps, Link } from './Link'
+import { AnchorHTMLAttributes, ComponentType } from 'react'
+import { useIdentity } from './Identity'
+
+export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
 
 interface SwitchProjectLinkProps {
-	Component?: ComponentType<InnerProps>
+	Component: ComponentType<AnchorHTMLAttributes<HTMLAnchorElement>>
 }
 
-interface SwitchProjectStateProps {
-	hasMoreProjects: boolean
-}
+export const SwitchProjectLink = ({ Component, ...props }: SwitchProjectLinkProps & PublicAnchorProps) => {
+	const hasMoreProjects = useIdentity().projects.length > 1
 
-type Props = SwitchProjectStateProps & SwitchProjectLinkProps
-
-class SwitchProjectLink extends ReactComponent<Props, {}> {
-	override render() {
-		if (!this.props.hasMoreProjects) {
-			return null
-		}
-		return <Link requestChange={() => ({ name: 'projects_list' })} Component={this.props.Component} />
+	if (!hasMoreProjects) {
+		return null
 	}
-}
 
-export default connect<SwitchProjectStateProps, {}, SwitchProjectLinkProps, State>(state => ({
-	hasMoreProjects: !!(state.auth.identity && state.auth.identity.projects.length > 1),
-}))(SwitchProjectLink)
+	return <Component href="/" {...props} />
+}

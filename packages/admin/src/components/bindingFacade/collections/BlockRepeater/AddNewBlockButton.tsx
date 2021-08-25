@@ -1,7 +1,6 @@
-import { Dropdown, DropdownProps, FormGroup } from '@contember/ui'
+import { Dropdown, DropdownProps, FormGroup, Icon } from '@contember/ui'
 import { memo, useMemo } from 'react'
 import { AddNewBlockButtonInner, AddNewBlockButtonInnerProps } from './AddNewBlockButtonInner'
-import { Icon } from '@contember/ui'
 
 export interface AddNewBlockButtonProps extends Omit<AddNewBlockButtonInnerProps, 'requestClose'> {}
 

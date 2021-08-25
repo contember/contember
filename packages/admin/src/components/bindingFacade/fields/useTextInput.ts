@@ -22,7 +22,7 @@ interface UseTextInputEventsProps<Value extends FieldValue> {
 export const stringFieldParser: TextInputValueParser<string> = (value, field) =>
 	!value && field.valueOnServer === null ? null : value
 
-const defaultFormatter: TextInputValueFormatter<FieldValue> = value => String(value ?? '')
+const defaultFormatter = <Value extends FieldValue>(value: Value | null) => String(value ?? '')
 
 export const useTextInput = <Value extends FieldValue>({
 	fieldMetadata,

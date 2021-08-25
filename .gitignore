@@ -2,7 +2,6 @@
 /packages/*/temp
 /packages/*/node_modules
 /packages/admin-sandbox/.env.development.local
-/lerna-debug.log
 /node_modules
 /temp
 /docker-compose.override.yaml

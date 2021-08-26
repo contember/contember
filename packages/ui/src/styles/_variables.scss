@@ -1,6 +1,10 @@
 @import './../../node_modules/@mangoweb/sass-base/_variables';
 @import './functions/index';
 
+// Diameter of rounded objects is larger
+$extra-optical-size-rounded-rectangle: 0.2146;
+$extra-optical-size-circle: 0.1284;
+
 // "CUI" stands for Contember UI
 
 // Core configurations

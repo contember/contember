@@ -16,7 +16,6 @@
 
 		transition-property: opacity, visibility, pointer-events, transform
 		transition-duration: .1s
-		visibility: hidden
 		opacity: 0
 		pointer-events: none
 		transform: translateY(em(-10px))
@@ -26,9 +25,8 @@
 		& + &
 			margin-top: em(5px)
 
-	&:hover > &
-		&-actions
-			visibility: visible
-			opacity: 1
-			pointer-events: all
-			transform: translateY(0)
+	&:hover > &-actions,
+	&:focus-within > &-actions
+		opacity: 1
+		pointer-events: all
+		transform: translateY(0)

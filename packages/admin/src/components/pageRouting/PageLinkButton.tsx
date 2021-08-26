@@ -1,9 +1,9 @@
-import { Button, ButtonProps } from '@contember/ui'
+import { AnchorButton, AnchorButtonProps } from '@contember/ui'
 import { memo } from 'react'
 import { PageLink } from './index'
 import type { PageLinkProps } from './PageLink'
 
-export type PageLinkButtonProps = PageLinkProps & ButtonProps
+export type PageLinkButtonProps = PageLinkProps & AnchorButtonProps
 
 // TODO forward ref
 export const PageLinkButton = memo<PageLinkButtonProps>(({ to, children, ...buttonProps }) => {
@@ -11,11 +11,7 @@ export const PageLinkButton = memo<PageLinkButtonProps>(({ to, children, ...butt
 		<PageLink
 			{...buttonProps}
 			to={to}
-			Component={({ isActive, ...buttonProps }) => (
-				<Button {...buttonProps} Component="a">
-					{children}
-				</Button>
-			)}
+			Component={AnchorButton}
 		/>
 	)
 })

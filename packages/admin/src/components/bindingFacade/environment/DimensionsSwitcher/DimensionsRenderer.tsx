@@ -1,6 +1,6 @@
 import { Entity, EntityAccessor, EntityListAccessor, useEnvironment } from '@contember/binding'
 import { emptyArray } from '@contember/react-utils'
-import { Button, ButtonBasedButtonProps, ButtonGroup, Checkbox, Dropdown } from '@contember/ui'
+import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown } from '@contember/ui'
 import { ReactNode, useEffect } from 'react'
 import type { RequestChange } from '../../../../routing'
 import { Link } from '../../../Link'
@@ -10,7 +10,7 @@ import type { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
 
 export interface DimensionsRendererProps {
 	accessor: EntityListAccessor
-	buttonProps?: ButtonBasedButtonProps
+	buttonProps?: ButtonProps
 	dimension: string
 	labelFactory: ReactNode
 	maxItems: number
@@ -77,8 +77,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 						key={dimension.slug}
 						to={getRequestChangeCallback(dimension)}
 						Component={({ href, onClick }) => (
-							<Button
-								Component="a"
+							<AnchorButton
 								href={href}
 								flow="block"
 								distinction="seamless"
@@ -86,7 +85,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 								onClick={onClick}
 							>
 								{dimension.label}
-							</Button>
+							</AnchorButton>
 						)}
 					/>
 				)

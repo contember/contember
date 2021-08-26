@@ -1,5 +1,6 @@
 import {
 	Aether,
+	AnchorButton,
 	Button,
 	ButtonGroup,
 	Dropdown,
@@ -96,9 +97,9 @@ export const LayoutDefault = memo((props: LayoutProps) => {
 									{props.userMenu}
 									<SwitchProjectLink
 										Component={({ onClick, href }) => (
-											<Button distinction="seamless" flow="generousBlock" onClick={onClick} href={href} Component="a">
+											<AnchorButton distinction="seamless" flow="generousBlock" onClick={onClick} href={href}>
 												Switch project
-											</Button>
+											</AnchorButton>
 										)}
 									/>
 									<LogoutLink

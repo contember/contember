@@ -1,8 +1,8 @@
 import { EntityAccessor, useMutationState } from '@contember/binding'
-import { Button, ButtonBasedButtonProps, FormGroup, Icon, IconProps } from '@contember/ui'
+import { Button, ButtonProps, FormGroup, Icon, IconProps } from '@contember/ui'
 import { memo } from 'react'
 
-export type CreateNewEntityButtonProps = ButtonBasedButtonProps & {
+export type CreateNewEntityButtonProps = ButtonProps & {
 	createNewEntity: (initialize?: EntityAccessor.BatchUpdatesHandler) => void
 	iconProps?: IconProps
 }

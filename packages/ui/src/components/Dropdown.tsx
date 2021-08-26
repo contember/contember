@@ -18,7 +18,7 @@ import { useClassNamePrefix, useRawCloseOnEscapeOrClickOutside } from '../auxili
 import type { DropdownAlignment } from '../types'
 import { assertNever, toViewClass } from '../utils'
 import { Collapsible } from './Collapsible'
-import { Button, ButtonBasedButtonProps } from './forms'
+import { Button, ButtonProps } from './forms'
 import { Portal } from './Portal'
 
 export interface DropdownRenderProps {
@@ -33,7 +33,7 @@ export interface DropdownProps {
 		onClick: (event: ReactMouseEvent<HTMLElement, MouseEvent>) => void
 	}) => ReactNode
 	renderContent?: (props: DropdownRenderProps) => ReactNode
-	buttonProps?: ButtonBasedButtonProps
+	buttonProps?: ButtonProps
 	alignment?: DropdownAlignment
 	strategy?: 'absolute' | 'fixed'
 	contentContainer?: HTMLElement

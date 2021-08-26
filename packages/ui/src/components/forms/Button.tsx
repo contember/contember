@@ -7,11 +7,11 @@ import { Spinner } from '../Spinner'
 
 type PropBlackList = 'ref' | 'size'
 
-interface ButtonBasedProps extends Omit<JSX.IntrinsicElements['button'], PropBlackList> {
-	Component?: 'button' | undefined
+export interface ButtonBasedProps extends Omit<JSX.IntrinsicElements['button'], PropBlackList> {
+	Component: 'button'
 }
 
-interface AnchorBasedProps extends Omit<JSX.IntrinsicElements['a'], PropBlackList> {
+export interface AnchorBasedProps extends Omit<JSX.IntrinsicElements['a'], PropBlackList> {
 	Component: 'a'
 }
 
@@ -28,13 +28,27 @@ export interface ButtonOwnProps {
 	children?: ReactNode
 }
 
-export type ButtonBasedButtonProps = ButtonOwnProps & ButtonBasedProps
-export type AnchorBasedButtonProps = ButtonOwnProps & AnchorBasedProps
+export type ButtonProps = ButtonOwnProps & Omit<ButtonBasedProps, 'Component'>
+export type AnchorButtonProps = ButtonOwnProps & Omit<AnchorBasedProps, 'Component'>
 
-export type ButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps)
+type BaseButtonProps = ButtonOwnProps & (ButtonBasedProps | AnchorBasedProps)
+
+export const AnchorButton = memo(
+	forwardRef<HTMLAnchorElement, AnchorButtonProps>((props, ref) => {
+		return <BaseButton {...props} ref={ref} Component={'a'}/>
+	}),
+)
+AnchorButton.displayName = 'AnchorButton'
 
 export const Button = memo(
-	forwardRef<any, ButtonProps>((props, ref) => {
+	forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+		return <BaseButton {...props} ref={ref} Component={'button'}/>
+	}),
+)
+Button.displayName = 'Button'
+
+export const BaseButton = memo(
+	forwardRef<any, BaseButtonProps>((props, ref) => {
 		const { Component, intent, size, flow, distinction, justification, isLoading, isActive, bland, children, ...rest } =
 			props
 
@@ -42,7 +56,7 @@ export const Button = memo(
 			rest['aria-disabled'] = true
 		}
 
-		if (props.Component === 'button' || !props.Component) {
+		if (props.Component === 'button') {
 			(rest as ButtonHTMLAttributes<HTMLButtonElement>).type = props.type !== undefined ? props.type : 'button'
 		}
 		const prefix = useClassNamePrefix()
@@ -73,7 +87,8 @@ export const Button = memo(
 			</>
 		)
 
-		return createElement(Component || 'button', { ...rest, ...attrs }, content)
+		return createElement(Component, { ...rest, ...attrs }, content)
 	}),
 )
-Button.displayName = 'Button'
+BaseButton.displayName = 'BaseButton'
+

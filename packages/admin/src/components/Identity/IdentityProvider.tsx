@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useSessionToken } from '@contember/react-client'
 import { useTenantMe } from '../../tenant/hooks/me'
-import { Button, ContainerSpinner, Message } from '@contember/ui'
+import { AnchorButton, ContainerSpinner, Message } from '@contember/ui'
 import { MiscPageLayout } from '../MiscPageLayout'
 
 export interface Identity {
@@ -74,7 +74,7 @@ export const IdentityProvider: React.FC = ({ children }) => {
 		return (
 			<MiscPageLayout>
 				<Message type="danger" size="large" flow="generousBlock">Failed to fetch an identity</Message>
-				<Button style={{ margin: '0 auto', display: 'block', textAlign: 'center', maxWidth: '100px' }} href={window.location.href} Component="a">Reload</Button>
+				<AnchorButton style={{ margin: '0 auto', display: 'block', textAlign: 'center', maxWidth: '100px' }} href={window.location.href}>Reload</AnchorButton>
 			</MiscPageLayout>
 		)
 	}

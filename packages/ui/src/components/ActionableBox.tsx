@@ -1,7 +1,7 @@
 import { memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
 import { Dropdown } from './Dropdown'
-import { Button, ButtonProps } from './forms'
+import { Button, ButtonOwnProps } from './forms'
 import { Icon, IconProps } from './Icon'
 
 export interface ActionableBoxProps {
@@ -10,7 +10,7 @@ export interface ActionableBoxProps {
 	children: ReactNode
 }
 
-const commonButtonProps: ButtonProps = {
+const commonButtonProps: ButtonOwnProps = {
 	size: 'small',
 	flow: 'circular',
 }

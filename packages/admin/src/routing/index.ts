@@ -2,3 +2,6 @@ export { requestStateToPath, pathToRequestState, PageNotFound } from './urlMappe
 export * from './RoutingContext'
 export * from './RequestContext'
 export * from './types'
+export type { InnerRoutingLinkProps, RoutingLinkProps, PublicAnchorProps } from './RoutingLink'
+export { RoutingLink } from './RoutingLink'
+export * from './useRoutingLink'

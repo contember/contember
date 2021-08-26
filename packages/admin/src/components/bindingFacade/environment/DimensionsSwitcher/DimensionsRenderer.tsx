@@ -3,7 +3,7 @@ import { emptyArray } from '@contember/react-utils'
 import { AnchorButton, ButtonGroup, ButtonProps, Checkbox, Dropdown } from '@contember/ui'
 import { ReactNode, useEffect } from 'react'
 import type { RequestChange } from '../../../../routing'
-import { Link } from '../../../Link'
+import { RoutingLink } from '../../../../routing'
 import { useRedirect } from '../../../pageRouting'
 import { renderByJoining } from './renderByJoining'
 import type { SelectedDimensionRenderer, StatefulDimensionDatum } from './types'
@@ -73,7 +73,7 @@ export function DimensionsRenderer(props: DimensionsRendererProps) {
 		const renderedDimensions = dimensionData.map(dimension => {
 			if (canSelectJustOne) {
 				return (
-					<Link
+					<RoutingLink
 						key={dimension.slug}
 						to={getRequestChangeCallback(dimension)}
 						Component={({ href, onClick }) => (

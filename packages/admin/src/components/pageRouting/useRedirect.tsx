@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 import type { RequestChange } from '../../routing'
-import { useLinkFactory } from '../Link/useLink'
+import { useRoutingLinkFactory } from '../../routing'
 
 export const useRedirect = () => {
-	const linkFactory = useLinkFactory()
+	const linkFactory = useRoutingLinkFactory()
 	return useCallback(
 		(requestChange: RequestChange) => {
 			linkFactory(requestChange).navigate()

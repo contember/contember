@@ -4,7 +4,7 @@ import { RoutingContextValue, useRouting } from './RoutingContext'
 import { PageNotFound, pathToRequestState, requestStateToPath } from './urlMapper'
 
 
-export const pageRequest =
+export const requestChangeFactory =
 	<P extends PageParameters>(pageName: string, parameters?: P): RequestChange =>
 	(currentState: RequestState): PageRequest<P> => ({
 		pageName,

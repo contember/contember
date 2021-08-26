@@ -85,7 +85,7 @@
 	&-option.is-checked &-control::after
 		background-color: var(--radio-color)
 	&-option.is-focused &-control::before
-		box-shadow: 0 0 0 .2em rgba($cui-control-view-default-distinction-color, .3)
+		box-shadow: 0 0 0 .2em rgba($cui-control-view-default-distinction-color, $cui-control-focus-opacity)
 	&-option.is-focused:not(.is-checked) &-control::before
 		border-color: lighten($cui-control-view-default-distinction-color, 10)
 	&-option.is-checked &-control::after

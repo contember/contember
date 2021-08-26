@@ -18,6 +18,7 @@ $cui-color-pink: #FF25C3 !default;
 $cui-color-purple: #9013FE !default;
 $cui-color-green: #7ED321 !default;
 $cui-color-yellow: #FFC416 !default;
+$cui-color-orange: #FF7316 !default;
 $cui-color-red: #FF312E !default;
 
 $cui-color-white: #FFFFFF !default;
@@ -39,7 +40,7 @@ $cui-color-primary: $cui-color-blue !default;
 $cui-color-secondary: $cui-color-pink !default;
 $cui-color-tertiary: $cui-color-purple !default;
 $cui-color-success: $cui-color-green !default;
-$cui-color-warn: $cui-color-yellow !default;
+$cui-color-warn: $cui-color-orange !default;
 $cui-color-danger: $cui-color-red !default;
 $cui-color-info: $cui-color-blue !default;
 $cui-color-dark: $cui-color-gray-8 !default;
@@ -53,7 +54,9 @@ $cui-base-lineHeight: 1.2 !default; // In order for computations to work, keep t
 $cui-effect-transition-duration: .3s !default;
 
 $cui-control-border-width: em(1px) !default;
-$cui-control-border-radius: em(3px) !default;
+$cui-control-border-radius: em(5px) !default;
+
+$cui-control-focus-opacity: 0.3 !default;
 
 $cui-control-view-default-color: $cui-color-gray-7 !default;
 $cui-control-view-default-background: $cui-color-white !default;
@@ -138,92 +141,111 @@ $cui-select-chevron-height: .5em !default;
 $cui-button-effect-transition-duration: .15s !default;
 
 $cui-button-bland-opacity: .75 !default;
+$cui-button-disabled-background-color: $cui-color-gray-2 !default;
+$cui-button-disabled-border-color: $cui-color-gray-2 !default;
+$cui-button-disabled-color: $cui-color-gray-5 !default;
 
 $cui-button-view-default-color: $cui-color-gray-7 !default;
 $cui-button-view-default-background: $cui-color-gray-1 !default;
-$cui-button-view-default-border-color: $cui-color-gray-3 !default;
+$cui-button-view-default-border-color: $cui-color-gray-2 !default;
+$cui-button-view-default-focus-color: $cui-control-view-default-distinction-color !default;
 $cui-button-view-default-distinction-color: $cui-color-gray-7 !default;
 $cui-button-view-default: (
 	'color': $cui-button-view-default-color,
 	'background': $cui-button-view-default-background,
 	'borderColor': $cui-button-view-default-border-color,
+	'focusColor': $cui-button-view-default-focus-color,
 	'distinctionColor': $cui-button-view-default-distinction-color,
 ) !default;
 
 $cui-button-view-primary-color: $cui-color-white !default;
 $cui-button-view-primary-background: $cui-color-primary !default;
-$cui-button-view-primary-border-color: darken($cui-color-primary, 5) !default;
+$cui-button-view-primary-border-color: darken($cui-color-primary, 10) !default;
+$cui-button-view-primary-focus-color: $cui-color-primary !default;
 $cui-button-view-primary-distinction-color: $cui-color-primary !default;
 $cui-button-view-primary: (
 	'color': $cui-button-view-primary-color,
 	'background': $cui-button-view-primary-background,
 	'borderColor': $cui-button-view-primary-border-color,
+	'focusColor': $cui-button-view-primary-focus-color,
 	'distinctionColor': $cui-button-view-primary-distinction-color,
 ) !default;
 
 $cui-button-view-secondary-color: $cui-color-white !default;
 $cui-button-view-secondary-background: $cui-color-secondary !default;
-$cui-button-view-secondary-border-color: darken($cui-color-secondary, 5) !default;
+$cui-button-view-secondary-border-color: darken($cui-color-secondary, 15) !default;
+$cui-button-view-secondary-focus-color: $cui-color-secondary !default;
 $cui-button-view-secondary-distinction-color: $cui-color-secondary !default;
 $cui-button-view-secondary: (
 	'color': $cui-button-view-secondary-color,
 	'background': $cui-button-view-secondary-background,
 	'borderColor': $cui-button-view-secondary-border-color,
+	'focusColor': $cui-button-view-secondary-focus-color,
 	'distinctionColor': $cui-button-view-secondary-distinction-color,
 ) !default;
 
 $cui-button-view-tertiary-color: $cui-color-white !default;
 $cui-button-view-tertiary-background: $cui-color-tertiary !default;
-$cui-button-view-tertiary-border-color: darken($cui-color-tertiary, 5) !default;
+$cui-button-view-tertiary-border-color: darken($cui-color-tertiary, 15) !default;
+$cui-button-view-tertiary-focus-color: $cui-color-tertiary !default;
 $cui-button-view-tertiary-distinction-color: $cui-color-tertiary !default;
 $cui-button-view-tertiary: (
 	'color': $cui-button-view-tertiary-color,
 	'background': $cui-button-view-tertiary-background,
 	'borderColor': $cui-button-view-tertiary-border-color,
+	'focusColor': $cui-button-view-tertiary-focus-color,
 	'distinctionColor': $cui-button-view-tertiary-distinction-color,
 ) !default;
 
 $cui-button-view-success-color: $cui-color-white !default;
-$cui-button-view-success-background: $cui-color-success !default;
-$cui-button-view-success-border-color: darken($cui-color-success, 5) !default;
-$cui-button-view-success-distinction-color: $cui-color-success !default;
+$cui-button-view-success-background: darken($cui-color-success, 10) !default;
+$cui-button-view-success-border-color: darken($cui-color-success, 15) !default;
+$cui-button-view-success-focus-color: darken($cui-color-success, 10) !default;
+$cui-button-view-success-distinction-color: darken($cui-color-success, 10) !default;
 $cui-button-view-success: (
 	'color': $cui-button-view-success-color,
 	'background': $cui-button-view-success-background,
 	'borderColor': $cui-button-view-success-border-color,
+	'focusColor': $cui-button-view-success-focus-color,
 	'distinctionColor': $cui-button-view-success-distinction-color,
 ) !default;
 
 $cui-button-view-warn-color: $cui-color-white !default;
 $cui-button-view-warn-background: $cui-color-warn !default;
-$cui-button-view-warn-border-color: darken($cui-color-warn, 5) !default;
+$cui-button-view-warn-border-color: darken($cui-color-warn, 10) !default;
+$cui-button-view-warn-focus-color: $cui-color-warn !default;
 $cui-button-view-warn-distinction-color: $cui-color-warn !default;
 $cui-button-view-warn: (
 	'color': $cui-button-view-warn-color,
 	'background': $cui-button-view-warn-background,
 	'borderColor': $cui-button-view-warn-border-color,
+	'focusColor': $cui-button-view-warn-focus-color,
 	'distinctionColor': $cui-button-view-warn-distinction-color,
 ) !default;
 
 $cui-button-view-danger-color: $cui-color-white !default;
 $cui-button-view-danger-background: $cui-color-danger !default;
-$cui-button-view-danger-border-color: darken($cui-color-danger, 5) !default;
+$cui-button-view-danger-border-color: darken($cui-color-danger, 15) !default;
+$cui-button-view-danger-focus-color: $cui-color-danger !default;
 $cui-button-view-danger-distinction-color: $cui-color-danger !default;
 $cui-button-view-danger: (
 	'color': $cui-button-view-danger-color,
 	'background': $cui-button-view-danger-background,
 	'borderColor': $cui-button-view-danger-border-color,
+	'focusColor': $cui-button-view-danger-focus-color,
 	'distinctionColor': $cui-button-view-danger-distinction-color,
 ) !default;
 
 $cui-button-view-dark-color: $cui-color-gray-2 !default;
 $cui-button-view-dark-background: $cui-color-dark !default;
-$cui-button-view-dark-border-color: darken($cui-color-dark, 5) !default;
+$cui-button-view-dark-border-color: darken($cui-color-dark, 15) !default;
+$cui-button-view-dark-focus-color: $cui-color-dark !default;
 $cui-button-view-dark-distinction-color: $cui-color-dark !default;
 $cui-button-view-dark: (
 	'color': $cui-button-view-dark-color,
 	'background': $cui-button-view-dark-background,
 	'borderColor': $cui-button-view-dark-border-color,
+	'focusColor': $cui-button-view-dark-focus-color,
 	'distinctionColor': $cui-button-view-dark-distinction-color,
 ) !default;
 

@@ -1,32 +1,15 @@
 @use 'sass:math'
 
+@import './buttonSizeMixin'
+
 %buttonSizes
 	@each $name, $settings in $cui-button-sizes
 		$height: map_get($settings, height)
 		$fontSize: map_get($settings, fontSize)
-
 		$view: toView($name)
-		&#{$view},
-		&-group#{$view}
-			$c: math.div($fontSize, 1em)
-			$normalizedHeight: math.div($height, $c)
-			$visualLineHeight: $normalizedHeight - 2 * math.div($cui-control-border-width, $c)
-			$actualLineHeight: 1.25em
-			$edgeOffset: ($visualLineHeight - $actualLineHeight) * 0.5
-			min-height: $normalizedHeight
-			line-height: $actualLineHeight
-			padding: $edgeOffset .5em
-			font-size: $fontSize
 
-
-			&.view-squarish,
-			&.view-circular
-				+size($normalizedHeight)
-			&.view-generous,
-			&.view-generousBlock
-				padding-left: 1.5 * $normalizedHeight
-				padding-right: 1.5 * $normalizedHeight
-
+		&#{$view}
+			@include buttonSizeMixin($fontSize, $height)
 
 	&.view-block,
 	&.view-generousBlock

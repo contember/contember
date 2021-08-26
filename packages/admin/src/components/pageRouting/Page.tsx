@@ -1,24 +1,23 @@
-import { Component as ReactComponent, ReactNode } from 'react'
+import { ComponentType } from 'react'
+import { useCurrentRequest } from '../../routing'
 
-export interface Params {
-	[key: string]: {}
-}
-
-export interface PageProps<P extends Params = Params, N extends keyof P = keyof Params> {
-	name: N
-	children: (params: P[N]) => ReactNode
+export interface PageProps {
+	name: string
+	children: ComponentType
 }
 
 /**
  * Page specifies one page. It must have a `name` prop and it's child must be a function which takes page's params and returns React node to render.
  */
-export class Page<P extends Params, N extends keyof P = keyof P, K = P[N]> extends ReactComponent<{
-	name: N
-	children: (params: K) => ReactNode
-}> {
-	override render(): ReactNode {
-		throw new Error(
-			`The <Page /> component doesn't work if it is not placed as a direct child of the <Pages /> component`,
-		)
+export const Page = (props: PageProps) => {
+	const request = useCurrentRequest()
+
+	if (request === null) {
+		return null
 	}
+
+	return <props.children {...request.parameters} />
 }
+
+Page.displayName = 'Page'
+Page.getPageName = (props: PageProps): string => props.name

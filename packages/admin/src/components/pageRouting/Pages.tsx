@@ -1,37 +1,27 @@
-import { ComponentType, createContext, Fragment, isValidElement, ReactElement, ReactNode, ReactNodeArray } from 'react'
-import { PageErrorBoundary } from './PageErrorBoundary'
-import { Page, PageProps } from './Page'
-import type { PageProvider } from './PageProvider'
 import { EnvironmentContext, useEnvironment } from '@contember/binding'
+import { ComponentType, Fragment, isValidElement, ReactElement, ReactNode, ReactNodeArray, useMemo } from 'react'
+import { PageErrorBoundary } from './PageErrorBoundary'
 import { useCurrentRequest } from '../../routing'
+import { Message } from '@contember/ui'
 
-type PageProviderElement = ReactElement<any> & { type: PageProvider }
-type PageElement = ReactElement<PageProps>
-type PageChild = PageElement | PageProviderElement
+export type PageProvider<P> = ComponentType & {
+	getPageName(props: P): string
+}
+
+export type PageProviderElement = ReactElement<any, PageProvider<any>>
 
 export interface PagesProps {
-	children: PageChild[] | PageChild
+	children: PageProviderElement[] | PageProviderElement
 	layout?: ComponentType<{ children?: ReactNode }>
 }
 
-function isPageProvider(el: any): el is PageProviderElement {
-	return isValidElement(el) && typeof (el.type as any).getPageName === 'function'
+function isPageProviderElement(el: ReactNode): el is PageProviderElement {
+	return isValidElement(el) && typeof el.type !== 'string' && typeof (el.type as any).getPageName === 'function'
 }
 
-function isPageElement(el: any): el is PageElement {
-	if (isValidElement<PageProps>(el)) {
-		return el.type === Page
-	} else {
-		return false
-	}
+function isPageList(children: ReactNodeArray): children is PageProviderElement[] {
+	return children.every(child => isPageProviderElement(child))
 }
-
-function isPageList(children: ReactNodeArray): children is PageChild[] {
-	return children.every(child => isPageElement(child) || isPageProvider(child))
-}
-
-export type Parameters = any
-export const ParametersContext = createContext<Parameters>({}) // TODO: drop? who needs this?
 
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
@@ -39,45 +29,45 @@ export const ParametersContext = createContext<Parameters>({}) // TODO: drop? wh
 export const Pages = (props: PagesProps) => {
 	const rootEnv = useEnvironment()
 	const request = useCurrentRequest()
+	const Layout = props.layout ?? Fragment
 
-	if (request === null || !props.children) {
-		return null
+	const pageMap = useMemo(
+		() => {
+			const pageList = Array.isArray(props.children) ? props.children : [props.children]
+
+			if (!isPageList(pageList)) {
+				throw new Error('Pages has a child which is not a Page')
+			}
+
+			return new Map(pageList.map(child => [child.type.getPageName(child.props), child]))
+		},
+		[props.children],
+	)
+
+	if (request === null) {
+		return (
+			<EnvironmentContext.Provider value={rootEnv}>
+				<Layout>
+					<Message type="danger">Page not found</Message>
+				</Layout>
+			</EnvironmentContext.Provider>
+		)
 	}
 
-	const children: ReactNodeArray = Array.isArray(props.children) ? props.children : [props.children]
+	const page = pageMap.get(request.pageName)
 
-	if (!isPageList(children)) {
-		throw new Error('Pages has a child which is not a Page')
-	}
-
-	const pageNames = children.map(child => isPageProvider(child) ? child.type.getPageName(child.props) : child.props.name)
-	const matchedPageIndex = pageNames.findIndex(name => name === request.pageName)
-
-	if (matchedPageIndex === -1) {
+	if (page === undefined) {
 		throw new Error(`No such page as ${request.pageName}.`)
 	}
 
-	const matchedPage = children[matchedPageIndex]
-	const pageName = pageNames[matchedPageIndex]
-
-	const isProvider = isPageProvider(matchedPage)
-	const Layout = props.layout || Fragment
-
 	const requestEnv = rootEnv
-		.updateDimensionsIfNecessary(request.dimensions, rootEnv.getAllDimensions()) // TODO: why updateDimensionsIfNecessary?
+		.updateDimensionsIfNecessary(request.dimensions, rootEnv.getAllDimensions())
 		.putDelta(request.parameters)
 
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
-				{isProvider && (
-					<ParametersContext.Provider value={request.parameters}>
-						<PageErrorBoundary key={pageName}>{matchedPage}</PageErrorBoundary>
-					</ParametersContext.Provider>
-				)}
-				{isProvider || (
-					<PageErrorBoundary key={pageName}>{matchedPage.props.children(request.parameters)}</PageErrorBoundary>
-				)}
+				<PageErrorBoundary key={request.pageName}>{page}</PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>
 	)

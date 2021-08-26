@@ -6,7 +6,7 @@ import {
 } from '@contember/binding'
 import { ComponentType, memo, ReactNode } from 'react'
 import { FeedbackRenderer, MutableContentLayoutRendererProps, MutableSingleEntityRenderer } from '../bindingFacade'
-import type { PageProvider } from './PageProvider'
+import type { PageProvider } from './Pages'
 import { RedirectOnSuccessHandler } from './useEntityRedirectOnPersistSuccess'
 import { useOnPersistSuccess } from './useOnPersistSuccess'
 

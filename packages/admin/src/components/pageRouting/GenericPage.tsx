@@ -1,6 +1,6 @@
 import { ComponentType, memo, ReactNode } from 'react'
 import { LayoutInner } from '../LayoutInner'
-import type { PageProvider } from './PageProvider'
+import type { PageProvider } from './Pages'
 
 interface GenericPageProps {
 	pageName: string

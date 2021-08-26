@@ -4,6 +4,9 @@
 	&-items
 		display: flex
 		flex-wrap: wrap
+		font-size: $cui-breadcrumbs-font-size
+		letter-spacing: 0.025em
+		user-select: none
 
 	&-item
 		color: $cui-breadcrumbs-text-color
@@ -18,5 +21,16 @@
 			display: none
 
 		a
-			text-decoration: underline
+			border-radius: .25em
 			color: $cui-breadcrumbs-link-color
+			font-weight: $cui-breadcrumbs-link-font-weight
+			margin: -.25em
+			padding: .25em
+			text-decoration: none
+
+			&:hover
+				color: $cui-breadcrumbs-link-hover-color
+
+			&:focus
+				background-color: $cui-breadcrumbs-link-focus-background-color
+				outline: none

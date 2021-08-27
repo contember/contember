@@ -10,6 +10,7 @@
 		$background: map_get($settings, background)
 		$borderColor: map_get($settings, borderColor)
 		$distinctionColor: map_get($settings, distinctionColor)
+		$focusColor: map_get($settings, focusColor)
 
 		$view: toView($name)
 
@@ -26,19 +27,19 @@
 				transform: translateZ(-.02em)
 		&#{$view}#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector},
 		&#{$view}#{$primary-selector}.is-active#{$secondary-selector}
-			background: linear-gradient(to bottom, darken($background, 3), darken($background, 9))
+			background: linear-gradient(to bottom, $borderColor, $borderColor)
 
-		&#{$view}#{$primary-selector}:focus#{$secondary-selector}
+		&#{$view}#{$primary-selector}:focus-visible:focus#{$secondary-selector}
 			@extend %implementsCustomFocusEffects
-			box-shadow: 0 0 0 .2em rgba($borderColor, .4)
+			box-shadow: 0 0 0 .2em rgba($focusColor, $cui-control-focus-opacity)
 
 		&#{$view}#{$primary-selector}[disabled]#{$secondary-selector},
 		&#{$view}#{$primary-selector}[readonly]#{$secondary-selector}
 			cursor: not-allowed
-			color: lighten($color, 5)
+			color: $cui-button-disabled-color
 			// This gradient is silly but it means we can transition to it from other gradients
-			background: linear-gradient(to bottom, lighten($background, 10), lighten($background, 10))
-			border-color: lighten($borderColor, 10)
+			background: linear-gradient(to bottom, $cui-button-disabled-background-color, $cui-button-disabled-background-color)
+			border-color: $cui-button-disabled-border-color
 			opacity: $cui-control-inactive-opacity
 
 		&#{$view}.view-seamless#{$primary-selector}#{$secondary-selector},
@@ -52,10 +53,11 @@
 		&#{$view}.view-outlined#{$primary-selector}:hover#{$secondary-selector},
 		&#{$view}.view-seamless#{$primary-selector}:focus#{$secondary-selector},
 		&#{$view}.view-outlined#{$primary-selector}:focus#{$secondary-selector}
-			color: darken($distinctionColor, 5)
+			color: darken($distinctionColor, 20)
 			background: rgba(lighten($distinctionColor, 20), .3)
 		&#{$view}.view-seamless#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector},
 		&#{$view}.view-outlined#{$primary-selector}:not([disabled]):not([readonly]):active#{$secondary-selector},
 		&#{$view}.view-seamless#{$primary-selector}:not([disabled]):not([readonly]).is-active#{$secondary-selector},
 		&#{$view}.view-outlined#{$primary-selector}:not([disabled]):not([readonly]).is-active#{$secondary-selector}
 			background: rgba(lighten($distinctionColor, 5), .3)
+			color: darken($distinctionColor, 20)

@@ -1,5 +1,14 @@
 import { EnvironmentContext, useEnvironment } from '@contember/binding'
-import { ComponentType, Fragment, isValidElement, ReactElement, ReactNode, ReactNodeArray, useMemo } from 'react'
+import {
+	ComponentType,
+	Fragment,
+	isValidElement,
+	ReactElement,
+	ReactNode,
+	ReactNodeArray,
+	useMemo,
+	useRef,
+} from 'react'
 import { PageErrorBoundary } from './PageErrorBoundary'
 import { useCurrentRequest } from '../../routing'
 import { Message } from '@contember/ui'
@@ -29,6 +38,7 @@ function isPageList(children: ReactNodeArray): children is PageProviderElement[]
 export const Pages = (props: PagesProps) => {
 	const rootEnv = useEnvironment()
 	const request = useCurrentRequest()
+	const requestId = useRef<number>(0)
 	const Layout = props.layout ?? Fragment
 
 	const pageMap = useMemo(
@@ -48,7 +58,7 @@ export const Pages = (props: PagesProps) => {
 		return (
 			<EnvironmentContext.Provider value={rootEnv}>
 				<Layout>
-					<Message type="danger">Page not found</Message>
+					<Message type="danger" size="large">Page not found</Message>
 				</Layout>
 			</EnvironmentContext.Provider>
 		)
@@ -67,7 +77,7 @@ export const Pages = (props: PagesProps) => {
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
-				<PageErrorBoundary key={request.pageName}>{page}</PageErrorBoundary>
+				<PageErrorBoundary key={requestId.current++}>{page}</PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>
 	)

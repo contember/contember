@@ -3,7 +3,7 @@ import { useCurrentRequest } from '../../routing'
 
 export interface PageProps {
 	name: string
-	children: ComponentType
+	children: ComponentType<any>
 }
 
 /**

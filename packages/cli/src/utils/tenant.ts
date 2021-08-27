@@ -446,7 +446,7 @@ export class TenantClient {
 
 	public async createProject(slug: string, ignoreExisting = false): Promise<void> {
 		const query = `mutation($slug: String!) {
-  createProject(slug: $slug) {
+  createProject(projectSlug: $slug) {
     ok
     error {
       code

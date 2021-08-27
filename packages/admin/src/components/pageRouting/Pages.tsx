@@ -12,6 +12,7 @@ import {
 import { PageErrorBoundary } from './PageErrorBoundary'
 import { useCurrentRequest } from '../../routing'
 import { Message } from '@contember/ui'
+import { MiscPageLayout } from '../MiscPageLayout'
 
 export type PageProvider<P> = ComponentType & {
 	getPageName(props: P): string
@@ -56,11 +57,9 @@ export const Pages = (props: PagesProps) => {
 
 	if (request === null) {
 		return (
-			<EnvironmentContext.Provider value={rootEnv}>
-				<Layout>
-					<Message type="danger" size="large">Page not found</Message>
-				</Layout>
-			</EnvironmentContext.Provider>
+			<MiscPageLayout>
+				<Message type="danger" size="large">Page not found</Message>
+			</MiscPageLayout>
 		)
 	}
 

@@ -122,7 +122,7 @@ function checkTenantSecrets(json: unknown, path: string): TenantConfig['secrets'
 	if (!isObject(json)) {
 		return typeConfigError(path, json, 'object')
 	}
-	if (!('encryptionKey' in json)) {
+	if (json.encryptionKey === undefined) {
 		return undefined
 	}
 	if (!hasStringProperty(json, 'encryptionKey')) {

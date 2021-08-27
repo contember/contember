@@ -51,15 +51,13 @@ export const RequestProvider: FC = ({ children }) => {
 export const populateRequest = (routing: RoutingContextValue, location: Location): RequestState => {
 	const request = pathToRequestState(routing, location.pathname)
 
-	if (!request) {
-		throw new PageNotFound('No matching route found')
-	}
-
 	// Replace with canonical version of the url
-	const canonicalPath = requestStateToPath(routing, request)
+	if (request !== null) {
+		const canonicalPath = requestStateToPath(routing, request)
 
-	if (canonicalPath !== location.pathname) {
-		window.history.replaceState({}, document.title, canonicalPath)
+		if (canonicalPath !== location.pathname) {
+			window.history.replaceState({}, document.title, canonicalPath)
+		}
 	}
 
 	return request

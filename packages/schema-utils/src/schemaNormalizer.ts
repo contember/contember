@@ -20,6 +20,24 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 					},
 					...((schema.acl.roles?.[ProjectRole.ADMIN] as Acl.RolePermissions | undefined) || {}),
 				},
+				[ProjectRole.CONTENT_ADMIN]: {
+					stages: '*',
+					variables: {},
+					entities: new AllowAllPermissionFactory().create(schema.model),
+					s3: {
+						'**': {
+							upload: true,
+							read: true,
+						},
+					},
+					system: {
+						diff: Acl.SystemPermissionsLevel.any,
+						history: Acl.SystemPermissionsLevel.any,
+						release: Acl.SystemPermissionsLevel.any,
+						rebase: Acl.SystemPermissionsLevel.any,
+					},
+					...((schema.acl.roles?.[ProjectRole.CONTENT_ADMIN] as Acl.RolePermissions | undefined) || {}),
+				},
 				[ProjectRole.MAINTAINER]: {
 					stages: '*',
 					entities: {},

@@ -46,18 +46,18 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 		const updateConstraintFields =
 			this.formatVersion >= VERSION_UPDATE_CONSTRAINT_NAME
 				? updateEntity(this.data.entityName, ({ entity }) => {
-						return {
-							...entity,
-							unique: Object.fromEntries(
-								Object.entries(entity.unique).map(([name, unique]) => [
-									name,
-									{
-										...unique,
-										fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
-									},
-								]),
-							),
-						}
+					return {
+						...entity,
+						unique: Object.fromEntries(
+							Object.entries(entity.unique).map(([name, unique]) => [
+								name,
+								{
+									...unique,
+									fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
+								},
+							]),
+						),
+					}
 				  })
 				: undefined
 
@@ -115,41 +115,41 @@ export const UpdateFieldNameModification: ModificationHandlerStatic<UpdateFieldN
 		const updateAclOp =
 			this.formatVersion >= VERSION_ACL_PATCH
 				? updateAcl(
-						updateAclEveryRole(
-							updateAclEveryEntity(
-								updateAclFieldPermissions((permissions, entityName) => {
-									if (entityName !== this.data.entityName) {
-										return permissions
-									}
-									if (!permissions[this.data.fieldName]) {
-										return permissions
-									}
-									const { [this.data.fieldName]: field, ...other } = permissions
-									return {
-										[this.data.newFieldName]: field,
-										...other,
-									}
-								}),
-								updateAclEveryPredicate(({ predicate, entityName, schema }) => {
-									const processor = new PredicateDefinitionProcessor(schema.model)
-									const currentEntity = schema.model.entities[entityName]
-									return processor.process<Input.Condition<Value.FieldValue<never>> | string, never>(
-										currentEntity,
-										predicate,
-										{
-											handleColumn: ctx =>
-												ctx.entity.name === this.data.entityName && ctx.column.name === this.data.fieldName
-													? [this.data.newFieldName, ctx.value]
-													: ctx.value,
-											handleRelation: ctx =>
-												ctx.entity.name === this.data.entityName && ctx.relation.name === this.data.fieldName
-													? [this.data.newFieldName, ctx.value]
-													: ctx.value,
-										},
-									)
-								}),
-							),
+					updateAclEveryRole(
+						updateAclEveryEntity(
+							updateAclFieldPermissions((permissions, entityName) => {
+								if (entityName !== this.data.entityName) {
+									return permissions
+								}
+								if (!permissions[this.data.fieldName]) {
+									return permissions
+								}
+								const { [this.data.fieldName]: field, ...other } = permissions
+								return {
+									[this.data.newFieldName]: field,
+									...other,
+								}
+							}),
+							updateAclEveryPredicate(({ predicate, entityName, schema }) => {
+								const processor = new PredicateDefinitionProcessor(schema.model)
+								const currentEntity = schema.model.entities[entityName]
+								return processor.process<Input.Condition<Value.FieldValue<never>> | string, never>(
+									currentEntity,
+									predicate,
+									{
+										handleColumn: ctx =>
+											ctx.entity.name === this.data.entityName && ctx.column.name === this.data.fieldName
+												? [this.data.newFieldName, ctx.value]
+												: ctx.value,
+										handleRelation: ctx =>
+											ctx.entity.name === this.data.entityName && ctx.relation.name === this.data.fieldName
+												? [this.data.newFieldName, ctx.value]
+												: ctx.value,
+									},
+								)
+							}),
 						),
+					),
 				  )
 				: undefined
 		return updateSchema(

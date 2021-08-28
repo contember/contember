@@ -11,7 +11,7 @@ export const filterSchemaByStage = <S extends Schema>(schema: S, stageSlug: stri
 				...definition,
 				...(definition.inherits
 					? {
-							inherits: definition.inherits.filter(it => roles.map(([role]) => role).includes(it)),
+						inherits: definition.inherits.filter(it => roles.map(([role]) => role).includes(it)),
 					  }
 					: {}),
 			},

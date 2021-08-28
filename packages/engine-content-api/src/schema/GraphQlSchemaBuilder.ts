@@ -103,10 +103,10 @@ export class GraphQlSchemaBuilder {
 			query: queryObjectType,
 			...(mutations.size > 0
 				? {
-						mutation: new GraphQLObjectType({
-							name: 'Mutation',
-							fields: () => Object.fromEntries(mutations),
-						}),
+					mutation: new GraphQLObjectType({
+						name: 'Mutation',
+						fields: () => Object.fromEntries(mutations),
+					}),
 				  }
 				: {}),
 		})

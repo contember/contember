@@ -26,12 +26,12 @@ export default class PermissionOverrider {
 				...(original.operations.delete === undefined && overrides.operations.delete === undefined
 					? {}
 					: {
-							delete: overrides.operations.delete ?? original.operations.delete,
+						delete: overrides.operations.delete ?? original.operations.delete,
 					  }),
 				...(original.operations.customPrimary === undefined && overrides.operations.customPrimary === undefined
 					? {}
 					: {
-							customPrimary: overrides.operations.customPrimary ?? original.operations.customPrimary,
+						customPrimary: overrides.operations.customPrimary ?? original.operations.customPrimary,
 					  }),
 			},
 		}

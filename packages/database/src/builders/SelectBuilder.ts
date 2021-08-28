@@ -12,9 +12,7 @@ import { createSubQueryLiteralFactory, SubQueryExpression, SubQueryLiteralFactor
 
 export type SelectBuilderSpecification = <Result>(qb: SelectBuilder<Result>) => SelectBuilder<Result>
 
-class SelectBuilder<Result = SelectBuilder.Result>
-	implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result>>, QueryBuilder
-{
+class SelectBuilder<Result = SelectBuilder.Result> implements With.Aware, Where.Aware, QueryBuilder.Orderable<SelectBuilder<Result>>, QueryBuilder {
 	constructor(public readonly options: SelectBuilder.Options) {}
 
 	public static create<Result = SelectBuilder.Result>() {
@@ -180,28 +178,28 @@ namespace SelectBuilder {
 
 	export type Options = Readonly<
 		With.Options &
-			Where.Options & {
-				distinct?: Literal[]
-				select: Literal[]
-				limit: [number | undefined, number | undefined]
-				from: undefined | [Literal | string, string | undefined][]
-				orderBy: [Literal, 'asc' | 'desc'][]
-				join: {
-					type: 'inner' | 'left'
-					table: string | Literal
-					alias: string | undefined
-					condition: Literal | undefined
-				}[]
-				grouping: {
-					groupingElement: Literal[]
-				}
-				lock?: LockType
-				meta: Record<string, any>
-				union?: {
-					type: 'all' | 'distinct'
-					literal: SubQueryLiteralFactory
-				}
+		Where.Options & {
+			distinct?: Literal[]
+			select: Literal[]
+			limit: [number | undefined, number | undefined]
+			from: undefined | [Literal | string, string | undefined][]
+			orderBy: [Literal, 'asc' | 'desc'][]
+			join: {
+				type: 'inner' | 'left'
+				table: string | Literal
+				alias: string | undefined
+				condition: Literal | undefined
+			}[]
+			grouping: {
+				groupingElement: Literal[]
 			}
+			lock?: LockType
+			meta: Record<string, any>
+			union?: {
+				type: 'all' | 'distinct'
+				literal: SubQueryLiteralFactory
+			}
+		}
 	>
 
 	export type JoinCondition = ConditionCallback

@@ -165,16 +165,16 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 				...(s3Config.noAcl
 					? {}
 					: {
-							acl: {
-								type: new GraphQLEnumType({
-									name: 'S3Acl',
-									values: {
-										PUBLIC_READ: {},
-										PRIVATE: {},
-										NONE: {},
-									},
-								}),
-							},
+						acl: {
+							type: new GraphQLEnumType({
+								name: 'S3Acl',
+								values: {
+									PUBLIC_READ: {},
+									PRIVATE: {},
+									NONE: {},
+								},
+							}),
+						},
 					  }),
 			},
 			resolve: async (

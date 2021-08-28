@@ -10,9 +10,7 @@ test('upsert - exists', async () => {
 		query: GQL`mutation {
         updatePost(
             by: {id: "${testUuid(2)}"},
-            data: {categories: [{upsert: {by: {id: "${testUuid(
-							1,
-						)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
+            data: {categories: [{upsert: {by: {id: "${testUuid(1)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           ok
         }
@@ -66,8 +64,8 @@ test('upsert - not exists', async () => {
         updatePost(
             by: {id: "${testUuid(2)}"},
             data: {categories: [{upsert: {by: {id: "${testUuid(
-							1,
-						)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
+		1,
+	)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           ok
         }

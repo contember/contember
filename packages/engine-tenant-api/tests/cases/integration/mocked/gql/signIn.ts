@@ -15,9 +15,7 @@ export const signInMutation = (
 			errors {code}
 			result {
 				token
-				${
-					options.withData
-						? `person {
+				${options.withData ? `person {
 					id
 					identity {
 						projects {
@@ -31,9 +29,7 @@ export const signInMutation = (
 					}
 				}
 				`
-						: ''
-				}
-
+		: ''}
 			}
 		}
 	}`,

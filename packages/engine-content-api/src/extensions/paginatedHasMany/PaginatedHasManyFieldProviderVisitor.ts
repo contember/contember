@@ -4,11 +4,10 @@ import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldP
 import { capitalizeFirstLetter } from '../../utils'
 import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFactory'
 
-export class PaginatedHasManyFieldProviderVisitor
-	implements
-		Model.ColumnVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>>,
-		Model.RelationByTypeVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>>
-{
+export class PaginatedHasManyFieldProviderVisitor implements
+	Model.ColumnVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>>,
+	Model.RelationByTypeVisitor<FieldMap<PaginatedHasManyFieldProviderExtension>> {
+
 	constructor(private readonly paginatedFieldFactory: PaginatedFieldConfigFactory) {}
 
 	visitOneHasMany(

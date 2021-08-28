@@ -10,9 +10,10 @@ import { UpdateEntityRelationAllowedOperationsVisitor } from './UpdateEntityRela
 import { Authorizator } from '../../acl'
 import { ImplementationException } from '../../exception'
 
-export class UpdateEntityRelationInputFieldVisitor
-	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined>
-{
+export class UpdateEntityRelationInputFieldVisitor implements
+	Model.ColumnVisitor<never>,
+	Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
+
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
@@ -38,25 +39,25 @@ export class UpdateEntityRelationInputFieldVisitor
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType
 			? {
-					type: createInputType,
+				type: createInputType,
 			  }
 			: undefined
 		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
 		const updateInput = updateInputType
 			? {
-					type: updateInputType,
+				type: updateInputType,
 			  }
 			: undefined
 		const upsertInput =
 			updateInput && createInput
 				? {
-						type: new GraphQLInputObjectType({
-							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
-							fields: () => ({
-								update: updateInput,
-								create: createInput,
-							}),
+					type: new GraphQLInputObjectType({
+						name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
+						fields: () => ({
+							update: updateInput,
+							create: createInput,
 						}),
+					}),
 				  }
 				: undefined
 		const booleanInput = {
@@ -95,40 +96,40 @@ export class UpdateEntityRelationInputFieldVisitor
 		const createInputType = this.createEntityInputProvider.getInput(targetEntity.name, withoutRelation)
 		const createInput = createInputType
 			? {
-					type: createInputType,
+				type: createInputType,
 			  }
 			: undefined
 		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
 		const updateInput = updateInputType
 			? {
-					type: updateInputType,
+				type: updateInputType,
 			  }
 			: undefined
 
 		const updateSpecifiedInput =
 			updateInput && whereInput
 				? {
-						type: new GraphQLInputObjectType({
-							name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
-							fields: () => ({
-								by: whereInput,
-								data: updateInput,
-							}),
+					type: new GraphQLInputObjectType({
+						name: GqlTypeName`${entity.name}Update${relation.name}RelationInput`,
+						fields: () => ({
+							by: whereInput,
+							data: updateInput,
 						}),
+					}),
 				  }
 				: undefined
 
 		const upsertInput =
 			updateInput && createInput && whereInput
 				? {
-						type: new GraphQLInputObjectType({
-							name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
-							fields: () => ({
-								by: whereInput,
-								update: updateInput,
-								create: createInput,
-							}),
+					type: new GraphQLInputObjectType({
+						name: GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`,
+						fields: () => ({
+							by: whereInput,
+							update: updateInput,
+							create: createInput,
 						}),
+					}),
 				  }
 				: undefined
 

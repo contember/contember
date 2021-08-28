@@ -7,9 +7,8 @@ import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
 import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
-class DeleteBuilder<Result extends DeleteBuilder.DeleteResult>
-	implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder
-{
+class DeleteBuilder<Result extends DeleteBuilder.DeleteResult> implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
+
 	private constructor(private readonly options: DeleteBuilder.Options) {}
 
 	public static create(): DeleteBuilder<DeleteBuilder.AffectedRows> {
@@ -74,7 +73,7 @@ namespace DeleteBuilder {
 		returning: Returning
 		using: { [alias: string]: string }
 	} & With.Options &
-		Where.Options
+	Where.Options
 }
 
 export { DeleteBuilder }

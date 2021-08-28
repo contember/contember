@@ -20,7 +20,7 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 					.match(qb =>
 						'id' in this.project
 							? qb.where({
-									project_id: this.project.id,
+								project_id: this.project.id,
 							  })
 							: qb.match(byProjectSlug(this.project.slug)),
 					),

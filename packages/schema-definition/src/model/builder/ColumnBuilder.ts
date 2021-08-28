@@ -1,6 +1,10 @@
 import FieldBuilder from './FieldBuilder'
 import { Model } from '@contember/schema'
 
+type PartialColumnOptions<K extends keyof ColumnBuilder.Options> =
+	& Partial<ColumnBuilder.Options>
+	& Pick<ColumnBuilder.Options, K>
+
 class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions<never>> implements FieldBuilder<O> {
 	constructor(private readonly options: O) {}
 
@@ -59,8 +63,5 @@ namespace ColumnBuilder {
 		typeAlias?: string
 	}
 }
-
-type PartialColumnOptions<K extends keyof ColumnBuilder.Options> = Partial<ColumnBuilder.Options> &
-	Pick<ColumnBuilder.Options, K>
 
 export default ColumnBuilder

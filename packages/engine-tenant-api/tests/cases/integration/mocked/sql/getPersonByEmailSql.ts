@@ -13,15 +13,15 @@ export const getPersonByEmailSql = (args: {
 	response: {
 		rows: args.response
 			? [
-					{
-						id: args.response.personId,
-						password_hash: `BCRYPTED-${args.response.password}`,
-						identity_id: args.response.identityId,
-						roles: args.response.roles,
-						email: args.email,
-						otp_uri: args.response.otpUri,
-						otp_activated_at: args.response.otpUri ? new Date() : null,
-					},
+				{
+					id: args.response.personId,
+					password_hash: `BCRYPTED-${args.response.password}`,
+					identity_id: args.response.identityId,
+					roles: args.response.roles,
+					email: args.email,
+					otp_uri: args.response.otpUri,
+					otp_activated_at: args.response.otpUri ? new Date() : null,
+				},
 			  ]
 			: [],
 	},

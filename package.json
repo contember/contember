@@ -32,13 +32,10 @@
     "@typescript-eslint/parser": "^4.28.1",
     "esbuild": "^0.12.15",
     "eslint": "^7.29.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
     "husky": "^4",
     "lint-staged": "^11.0.0",
     "oao": "^2.0.2",
-    "prettier": "^2.3.2",
     "ts-node": "^10.2.0",
     "typescript": "^4.3.5"
   },

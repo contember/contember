@@ -6,13 +6,14 @@ import { formatSchemaName, unnamedIdentity } from '@contember/engine-system-api'
 import { StageResolveMiddlewareState } from './StageResolveMiddlewareFactory'
 import { ProvidersState } from '../services'
 
-type KoaState = ProjectMemberMiddlewareState &
-	TimerMiddlewareState &
-	ProjectResolveMiddlewareState &
-	StageResolveMiddlewareState &
-	ContentServerMiddlewareState &
-	ProvidersState &
-	AuthMiddlewareState
+type KoaState =
+	& ProjectMemberMiddlewareState
+	& TimerMiddlewareState
+	& ProjectResolveMiddlewareState
+	& StageResolveMiddlewareState
+	& ContentServerMiddlewareState
+	& ProvidersState
+	& AuthMiddlewareState
 
 export const createContentServerMiddleware = (): KoaMiddleware<KoaState> => {
 	const contentServer: KoaMiddleware<KoaState> = async (ctx, next) => {

@@ -3,8 +3,7 @@ export type Maybe<T> = T | null
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
-export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } &
-	{ [P in K]-?: NonNullable<T[P]> }
+export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
 	ID: string
@@ -15,6 +14,7 @@ export type Scalars = {
 	DateTime: Date
 	Json: unknown
 }
+
 
 export type ExecutedMigration = {
 	readonly __typename?: 'ExecutedMigration'
@@ -61,7 +61,7 @@ export type HistoryError = {
 }
 
 export enum HistoryErrorCode {
-	StageNotFound = 'STAGE_NOT_FOUND',
+	StageNotFound = 'STAGE_NOT_FOUND'
 }
 
 export type HistoryEvent = {
@@ -78,7 +78,7 @@ export enum HistoryEventType {
 	Update = 'UPDATE',
 	Delete = 'DELETE',
 	Create = 'CREATE',
-	RunMigration = 'RUN_MIGRATION',
+	RunMigration = 'RUN_MIGRATION'
 }
 
 export type HistoryFilter = {
@@ -126,6 +126,7 @@ export type HistoryUpdateEvent = HistoryEvent & {
 	readonly diffValues: Scalars['Json']
 }
 
+
 export type MigrateError = {
 	readonly __typename?: 'MigrateError'
 	readonly code: MigrateErrorCode
@@ -138,7 +139,7 @@ export enum MigrateErrorCode {
 	AlreadyExecuted = 'ALREADY_EXECUTED',
 	InvalidFormat = 'INVALID_FORMAT',
 	InvalidSchema = 'INVALID_SCHEMA',
-	MigrationFailed = 'MIGRATION_FAILED',
+	MigrationFailed = 'MIGRATION_FAILED'
 }
 
 export type MigrateResponse = {
@@ -170,7 +171,7 @@ export type MigrationDeleteError = {
 
 export enum MigrationDeleteErrorCode {
 	NotFound = 'NOT_FOUND',
-	InvalidFormat = 'INVALID_FORMAT',
+	InvalidFormat = 'INVALID_FORMAT'
 }
 
 export type MigrationDeleteResponse = {
@@ -193,7 +194,7 @@ export type MigrationModifyError = {
 }
 
 export enum MigrationModifyErrorCode {
-	NotFound = 'NOT_FOUND',
+	NotFound = 'NOT_FOUND'
 }
 
 export type MigrationModifyResponse = {
@@ -211,17 +212,21 @@ export type Mutation = {
 	readonly truncate: TruncateResponse
 }
 
+
 export type MutationForceMigrateArgs = {
 	migrations: ReadonlyArray<Migration>
 }
+
 
 export type MutationMigrateArgs = {
 	migrations: ReadonlyArray<Migration>
 }
 
+
 export type MutationMigrationDeleteArgs = {
 	migration: Scalars['String']
 }
+
 
 export type MutationMigrationModifyArgs = {
 	migration: Scalars['String']
@@ -235,9 +240,11 @@ export type Query = {
 	readonly history: HistoryResponse
 }
 
+
 export type QueryExecutedMigrationsArgs = {
 	version?: Maybe<Scalars['String']>
 }
+
 
 export type QueryHistoryArgs = {
 	stage: Scalars['String']
@@ -258,7 +265,10 @@ export type TruncateResponse = {
 	readonly ok: Scalars['Boolean']
 }
 
+
+
 export type ResolverTypeWrapper<T> = Promise<T> | T
+
 
 export type LegacyStitchingResolver<TResult, TParent, TContext, TArgs> = {
 	fragment: string
@@ -269,32 +279,30 @@ export type NewStitchingResolver<TResult, TParent, TContext, TArgs> = {
 	selectionSet: string
 	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
 }
-export type StitchingResolver<TResult, TParent, TContext, TArgs> =
-	| LegacyStitchingResolver<TResult, TParent, TContext, TArgs>
-	| NewStitchingResolver<TResult, TParent, TContext, TArgs>
+export type StitchingResolver<TResult, TParent, TContext, TArgs> = LegacyStitchingResolver<TResult, TParent, TContext, TArgs> | NewStitchingResolver<TResult, TParent, TContext, TArgs>
 export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
-	| ResolverFn<TResult, TParent, TContext, TArgs>
-	| StitchingResolver<TResult, TParent, TContext, TArgs>
+  | ResolverFn<TResult, TParent, TContext, TArgs>
+  | StitchingResolver<TResult, TParent, TContext, TArgs>
 
 export type ResolverFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo,
+	info: GraphQLResolveInfo
 ) => Promise<TResult> | TResult
 
 export type SubscriptionSubscribeFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo,
+	info: GraphQLResolveInfo
 ) => AsyncIterator<TResult> | Promise<AsyncIterator<TResult>>
 
 export type SubscriptionResolveFn<TResult, TParent, TContext, TArgs> = (
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo,
+	info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>
 
 export interface SubscriptionSubscriberObject<TResult, TKey extends string, TParent, TContext, TArgs> {
@@ -308,24 +316,20 @@ export interface SubscriptionResolverObject<TResult, TParent, TContext, TArgs> {
 }
 
 export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, TArgs> =
-	| SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
-	| SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
+  | SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
+  | SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
 
 export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
-	| ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
-	| SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>
+  | ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
+  | SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>
 
 export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
 	parent: TParent,
 	context: TContext,
-	info: GraphQLResolveInfo,
+	info: GraphQLResolveInfo
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>
 
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (
-	obj: T,
-	context: TContext,
-	info: GraphQLResolveInfo,
-) => boolean | Promise<boolean>
+export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>
 
 export type NextResolverFn<T> = () => Promise<T>
 
@@ -334,7 +338,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 	parent: TParent,
 	args: TArgs,
 	context: TContext,
-	info: GraphQLResolveInfo,
+	info: GraphQLResolveInfo
 ) => TResult | Promise<TResult>
 
 /** Mapping between all available schema types and the resolvers types */
@@ -347,11 +351,7 @@ export type ResolversTypes = {
 	HistoryDeleteEvent: ResolverTypeWrapper<HistoryDeleteEvent>
 	HistoryError: ResolverTypeWrapper<HistoryError>
 	HistoryErrorCode: HistoryErrorCode
-	HistoryEvent:
-		| ResolversTypes['HistoryCreateEvent']
-		| ResolversTypes['HistoryDeleteEvent']
-		| ResolversTypes['HistoryRunMigrationEvent']
-		| ResolversTypes['HistoryUpdateEvent']
+	HistoryEvent: ResolversTypes['HistoryCreateEvent'] | ResolversTypes['HistoryDeleteEvent'] | ResolversTypes['HistoryRunMigrationEvent'] | ResolversTypes['HistoryUpdateEvent']
 	HistoryEventType: HistoryEventType
 	HistoryFilter: HistoryFilter
 	HistoryResponse: ResolverTypeWrapper<HistoryResponse>
@@ -387,11 +387,7 @@ export type ResolversParentTypes = {
 	HistoryCreateEvent: HistoryCreateEvent
 	HistoryDeleteEvent: HistoryDeleteEvent
 	HistoryError: HistoryError
-	HistoryEvent:
-		| ResolversParentTypes['HistoryCreateEvent']
-		| ResolversParentTypes['HistoryDeleteEvent']
-		| ResolversParentTypes['HistoryRunMigrationEvent']
-		| ResolversParentTypes['HistoryUpdateEvent']
+	HistoryEvent: ResolversParentTypes['HistoryCreateEvent'] | ResolversParentTypes['HistoryDeleteEvent'] | ResolversParentTypes['HistoryRunMigrationEvent'] | ResolversParentTypes['HistoryUpdateEvent']
 	HistoryFilter: HistoryFilter
 	HistoryResponse: HistoryResponse
 	Boolean: Scalars['Boolean']
@@ -418,10 +414,7 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 	name: 'DateTime'
 }
 
-export type ExecutedMigrationResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ExecutedMigration'] = ResolversParentTypes['ExecutedMigration'],
-> = {
+export type ExecutedMigrationResolvers<ContextType = any, ParentType extends ResolversParentTypes['ExecutedMigration'] = ResolversParentTypes['ExecutedMigration']> = {
 	version?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	executedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
@@ -431,10 +424,7 @@ export type ExecutedMigrationResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type HistoryCreateEventResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryCreateEvent'] = ResolversParentTypes['HistoryCreateEvent'],
-> = {
+export type HistoryCreateEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryCreateEvent'] = ResolversParentTypes['HistoryCreateEvent']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -448,10 +438,7 @@ export type HistoryCreateEventResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type HistoryDeleteEventResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryDeleteEvent'] = ResolversParentTypes['HistoryDeleteEvent'],
-> = {
+export type HistoryDeleteEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryDeleteEvent'] = ResolversParentTypes['HistoryDeleteEvent']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -465,24 +452,14 @@ export type HistoryDeleteEventResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type HistoryErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryError'] = ResolversParentTypes['HistoryError'],
-> = {
+export type HistoryErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryError'] = ResolversParentTypes['HistoryError']> = {
 	code?: Resolver<ResolversTypes['HistoryErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type HistoryEventResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryEvent'] = ResolversParentTypes['HistoryEvent'],
-> = {
-	__resolveType: TypeResolveFn<
-		'HistoryCreateEvent' | 'HistoryDeleteEvent' | 'HistoryRunMigrationEvent' | 'HistoryUpdateEvent',
-		ParentType,
-		ContextType
-	>
+export type HistoryEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryEvent'] = ResolversParentTypes['HistoryEvent']> = {
+	__resolveType: TypeResolveFn<'HistoryCreateEvent' | 'HistoryDeleteEvent' | 'HistoryRunMigrationEvent' | 'HistoryUpdateEvent', ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -492,10 +469,7 @@ export type HistoryEventResolvers<
 	type?: Resolver<ResolversTypes['HistoryEventType'], ParentType, ContextType>
 }
 
-export type HistoryResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryResponse'] = ResolversParentTypes['HistoryResponse'],
-> = {
+export type HistoryResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryResponse'] = ResolversParentTypes['HistoryResponse']> = {
 	ok?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['HistoryErrorCode']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['HistoryError']>, ParentType, ContextType>
@@ -503,18 +477,12 @@ export type HistoryResponseResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type HistoryResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryResult'] = ResolversParentTypes['HistoryResult'],
-> = {
+export type HistoryResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryResult'] = ResolversParentTypes['HistoryResult']> = {
 	events?: Resolver<ReadonlyArray<ResolversTypes['HistoryEvent']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type HistoryRunMigrationEventResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryRunMigrationEvent'] = ResolversParentTypes['HistoryRunMigrationEvent'],
-> = {
+export type HistoryRunMigrationEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryRunMigrationEvent'] = ResolversParentTypes['HistoryRunMigrationEvent']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -525,10 +493,7 @@ export type HistoryRunMigrationEventResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type HistoryUpdateEventResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['HistoryUpdateEvent'] = ResolversParentTypes['HistoryUpdateEvent'],
-> = {
+export type HistoryUpdateEventResolvers<ContextType = any, ParentType extends ResolversParentTypes['HistoryUpdateEvent'] = ResolversParentTypes['HistoryUpdateEvent']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -547,20 +512,14 @@ export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 	name: 'Json'
 }
 
-export type MigrateErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrateError'] = ResolversParentTypes['MigrateError'],
-> = {
+export type MigrateErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrateError'] = ResolversParentTypes['MigrateError']> = {
 	code?: Resolver<ResolversTypes['MigrateErrorCode'], ParentType, ContextType>
 	migration?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type MigrateResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrateResponse'] = ResolversParentTypes['MigrateResponse'],
-> = {
+export type MigrateResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrateResponse'] = ResolversParentTypes['MigrateResponse']> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['MigrateError']>, ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['MigrateError']>, ParentType, ContextType>
@@ -568,114 +527,57 @@ export type MigrateResponseResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type MigrateResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrateResult'] = ResolversParentTypes['MigrateResult'],
-> = {
+export type MigrateResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrateResult'] = ResolversParentTypes['MigrateResult']> = {
 	message?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type MigrationDeleteErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrationDeleteError'] = ResolversParentTypes['MigrationDeleteError'],
-> = {
+export type MigrationDeleteErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationDeleteError'] = ResolversParentTypes['MigrationDeleteError']> = {
 	code?: Resolver<ResolversTypes['MigrationDeleteErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type MigrationDeleteResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrationDeleteResponse'] = ResolversParentTypes['MigrationDeleteResponse'],
-> = {
+export type MigrationDeleteResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationDeleteResponse'] = ResolversParentTypes['MigrationDeleteResponse']> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['MigrationDeleteError']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type MigrationModifyErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrationModifyError'] = ResolversParentTypes['MigrationModifyError'],
-> = {
+export type MigrationModifyErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationModifyError'] = ResolversParentTypes['MigrationModifyError']> = {
 	code?: Resolver<ResolversTypes['MigrationModifyErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type MigrationModifyResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['MigrationModifyResponse'] = ResolversParentTypes['MigrationModifyResponse'],
-> = {
+export type MigrationModifyResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['MigrationModifyResponse'] = ResolversParentTypes['MigrationModifyResponse']> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['MigrationModifyError']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type MutationResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation'],
-> = {
-	forceMigrate?: Resolver<
-		ResolversTypes['MigrateResponse'],
-		ParentType,
-		ContextType,
-		RequireFields<MutationForceMigrateArgs, 'migrations'>
-	>
-	migrate?: Resolver<
-		ResolversTypes['MigrateResponse'],
-		ParentType,
-		ContextType,
-		RequireFields<MutationMigrateArgs, 'migrations'>
-	>
-	migrationDelete?: Resolver<
-		ResolversTypes['MigrationDeleteResponse'],
-		ParentType,
-		ContextType,
-		RequireFields<MutationMigrationDeleteArgs, 'migration'>
-	>
-	migrationModify?: Resolver<
-		ResolversTypes['MigrationModifyResponse'],
-		ParentType,
-		ContextType,
-		RequireFields<MutationMigrationModifyArgs, 'migration' | 'modification'>
-	>
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+	forceMigrate?: Resolver<ResolversTypes['MigrateResponse'], ParentType, ContextType, RequireFields<MutationForceMigrateArgs, 'migrations'>>
+	migrate?: Resolver<ResolversTypes['MigrateResponse'], ParentType, ContextType, RequireFields<MutationMigrateArgs, 'migrations'>>
+	migrationDelete?: Resolver<ResolversTypes['MigrationDeleteResponse'], ParentType, ContextType, RequireFields<MutationMigrationDeleteArgs, 'migration'>>
+	migrationModify?: Resolver<ResolversTypes['MigrationModifyResponse'], ParentType, ContextType, RequireFields<MutationMigrationModifyArgs, 'migration' | 'modification'>>
 	truncate?: Resolver<ResolversTypes['TruncateResponse'], ParentType, ContextType>
 }
 
-export type QueryResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query'],
-> = {
+export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
 	stages?: Resolver<ReadonlyArray<ResolversTypes['Stage']>, ParentType, ContextType>
-	executedMigrations?: Resolver<
-		ReadonlyArray<ResolversTypes['ExecutedMigration']>,
-		ParentType,
-		ContextType,
-		RequireFields<QueryExecutedMigrationsArgs, never>
-	>
-	history?: Resolver<
-		ResolversTypes['HistoryResponse'],
-		ParentType,
-		ContextType,
-		RequireFields<QueryHistoryArgs, 'stage'>
-	>
+	executedMigrations?: Resolver<ReadonlyArray<ResolversTypes['ExecutedMigration']>, ParentType, ContextType, RequireFields<QueryExecutedMigrationsArgs, never>>
+	history?: Resolver<ResolversTypes['HistoryResponse'], ParentType, ContextType, RequireFields<QueryHistoryArgs, 'stage'>>
 }
 
-export type StageResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['Stage'] = ResolversParentTypes['Stage'],
-> = {
+export type StageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Stage'] = ResolversParentTypes['Stage']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type TruncateResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['TruncateResponse'] = ResolversParentTypes['TruncateResponse'],
-> = {
+export type TruncateResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['TruncateResponse'] = ResolversParentTypes['TruncateResponse']> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -704,6 +606,7 @@ export type Resolvers<ContextType = any> = {
 	Stage?: StageResolvers<ContextType>
 	TruncateResponse?: TruncateResponseResolvers<ContextType>
 }
+
 
 /**
  * @deprecated

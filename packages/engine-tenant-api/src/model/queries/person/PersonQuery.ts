@@ -35,7 +35,7 @@ class PersonQuery extends DatabaseQuery<MaybePersonRow> {
 		} else if ('identity_id' in this.condition) {
 			return conditionBuilder.compare(['person', 'identity_id'], Operator.eq, this.condition.identity_id)
 		} else {
-			;((_: never): never => {
+			((_: never): never => {
 				throw new Error()
 			})(this.condition)
 		}

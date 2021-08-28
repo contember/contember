@@ -32,9 +32,9 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 	) {
 		this.subModification = data.tableName
 			? new UpdateEntityTableNameModification(
-					{ entityName: data.entityName, tableName: data.tableName },
-					schema,
-					this.formatVersion,
+				{ entityName: data.entityName, tableName: data.tableName },
+				schema,
+				this.formatVersion,
 			  )
 			: new NoopModification()
 	}
@@ -79,30 +79,30 @@ export const UpdateEntityNameModification: ModificationHandlerStatic<UpdateEntit
 			),
 			this.formatVersion >= VERSION_ACL_PATCH
 				? updateAcl(
-						updateAclEveryRole(
-							({ role }) => ({
-								...role,
-								variables: Object.fromEntries(
-									Object.entries(role.variables).map(([key, variable]) => [
-										key,
-										{
-											...variable,
-											entityName: changeValue(this.data.entityName, this.data.newEntityName)(variable.entityName),
-										},
-									]),
-								),
-							}),
-							updateAclEntities(({ entities }) => {
-								if (!entities[this.data.entityName]) {
-									return entities
-								}
-								const { [this.data.entityName]: renamed, ...other } = entities
-								return {
-									[this.data.newEntityName]: renamed,
-									...other,
-								}
-							}),
-						),
+					updateAclEveryRole(
+						({ role }) => ({
+							...role,
+							variables: Object.fromEntries(
+								Object.entries(role.variables).map(([key, variable]) => [
+									key,
+									{
+										...variable,
+										entityName: changeValue(this.data.entityName, this.data.newEntityName)(variable.entityName),
+									},
+								]),
+							),
+						}),
+						updateAclEntities(({ entities }) => {
+							if (!entities[this.data.entityName]) {
+								return entities
+							}
+							const { [this.data.entityName]: renamed, ...other } = entities
+							return {
+								[this.data.newEntityName]: renamed,
+								...other,
+							}
+						}),
+					),
 				  )
 				: undefined,
 		)

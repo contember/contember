@@ -47,55 +47,55 @@ export type EntityAclEveryPredicatesUpdater = (args: {
 
 export const updateSchema =
 	(...schemaUpdater: (SchemaUpdater | undefined)[]): SchemaUpdater =>
-	args =>
-		schemaUpdater.filter(isDefined).reduce((schema, updater) => updater({ ...args, schema }), args.schema)
+		args =>
+			schemaUpdater.filter(isDefined).reduce((schema, updater) => updater({ ...args, schema }), args.schema)
 
 export const updateAcl =
 	(updater: AclUpdater): SchemaUpdater =>
-	args => ({
-		...args.schema,
-		acl: updater({ schema: args.schema, acl: args.schema.acl }),
-	})
+		args => ({
+			...args.schema,
+			acl: updater({ schema: args.schema, acl: args.schema.acl }),
+		})
 
 export const updateAclEveryRole =
 	(...updater: AclRoleUpdater[]): AclUpdater =>
-	args => ({
-		...args.acl,
-		roles: Object.fromEntries(
-			updater.reduce(
-				(acc, updater) => acc.map(([name, role]) => [name, updater({ ...args, role })]),
-				Object.entries(args.acl.roles),
+		args => ({
+			...args.acl,
+			roles: Object.fromEntries(
+				updater.reduce(
+					(acc, updater) => acc.map(([name, role]) => [name, updater({ ...args, role })]),
+					Object.entries(args.acl.roles),
+				),
 			),
-		),
-	})
+		})
 
 export const updateAclEntities =
 	(updater: AclPermissionsUpdater): AclRoleUpdater =>
-	args => ({
-		...args.role,
-		entities: updater({ ...args, entities: args.role.entities }),
-	})
+		args => ({
+			...args.role,
+			entities: updater({ ...args, entities: args.role.entities }),
+		})
 
 export const updateAclEveryEntity =
 	(...updater: AclEntityPermissionsUpdater[]): AclRoleUpdater =>
-	args => ({
-		...args.role,
-		entities: Object.fromEntries(
-			updater.reduce(
-				(acc, updater) =>
-					acc.map(([entity, entityPermissions]) => [
-						entity,
-						updater({
-							...args,
-							entities: args.role.entities,
-							entityName: entity,
-							entityPermissions,
-						}),
-					]),
-				Object.entries(args.role.entities),
+		args => ({
+			...args.role,
+			entities: Object.fromEntries(
+				updater.reduce(
+					(acc, updater) =>
+						acc.map(([entity, entityPermissions]) => [
+							entity,
+							updater({
+								...args,
+								entities: args.role.entities,
+								entityName: entity,
+								entityPermissions,
+							}),
+						]),
+					Object.entries(args.role.entities),
+				),
 			),
-		),
-	})
+		})
 
 type EntityAclFieldPermissionsUpdater = (
 	fieldPermissions: Acl.FieldPermissions,
@@ -110,124 +110,124 @@ type EntityOperationHandler = {
 
 export const updateAclFieldPermissions =
 	(updater: EntityAclFieldPermissionsUpdater): AclEntityPermissionsUpdater =>
-	({ entityPermissions, entityName }) => {
-		const operations: Acl.EntityOperations = {}
-		const handlers: EntityOperationHandler = {
-			create: value => updater(value, entityName, Acl.Operation.create),
-			update: value => updater(value, entityName, Acl.Operation.update),
-			read: value => updater(value, entityName, Acl.Operation.read),
-			delete: value => value,
-			customPrimary: value => value,
-		}
-		const types: (keyof Acl.EntityOperations)[] = ['create', 'update', 'read', 'delete', 'customPrimary']
-		for (const key of types) {
-			if (key in entityPermissions.operations) {
-				operations[key] = handlers[key](entityPermissions.operations[key] as any) as any
+		({ entityPermissions, entityName }) => {
+			const operations: Acl.EntityOperations = {}
+			const handlers: EntityOperationHandler = {
+				create: value => updater(value, entityName, Acl.Operation.create),
+				update: value => updater(value, entityName, Acl.Operation.update),
+				read: value => updater(value, entityName, Acl.Operation.read),
+				delete: value => value,
+				customPrimary: value => value,
+			}
+			const types: (keyof Acl.EntityOperations)[] = ['create', 'update', 'read', 'delete', 'customPrimary']
+			for (const key of types) {
+				if (key in entityPermissions.operations) {
+					operations[key] = handlers[key](entityPermissions.operations[key] as any) as any
+				}
+			}
+
+			return {
+				...entityPermissions,
+				operations,
 			}
 		}
 
-		return {
-			...entityPermissions,
-			operations,
-		}
-	}
-
 export const updateAclEveryPredicate =
 	(updater: EntityAclEveryPredicatesUpdater): AclEntityPermissionsUpdater =>
-	args => {
-		return {
-			...args.entityPermissions,
-			predicates: Object.fromEntries(
-				Object.entries(args.entityPermissions.predicates).map(([name, predicate]) => [
-					name,
-					updater({
-						...args,
-						predicate,
-					}),
-				]),
-			),
+		args => {
+			return {
+				...args.entityPermissions,
+				predicates: Object.fromEntries(
+					Object.entries(args.entityPermissions.predicates).map(([name, predicate]) => [
+						name,
+						updater({
+							...args,
+							predicate,
+						}),
+					]),
+				),
+			}
 		}
-	}
 
 export const updateModel =
 	(...modelUpdate: (ModelUpdater | undefined)[]): SchemaUpdater =>
-	args => ({
-		...args.schema,
-		model: modelUpdate
-			.filter((it): it is ModelUpdater => it !== undefined)
-			.reduce((model, updater) => updater({ ...args, model }), args.schema.model),
-	})
+		args => ({
+			...args.schema,
+			model: modelUpdate
+				.filter((it): it is ModelUpdater => it !== undefined)
+				.reduce((model, updater) => updater({ ...args, model }), args.schema.model),
+		})
 
 export const updateEntity =
 	(name: string, entityUpdate: EntityUpdater): ModelUpdater =>
-	args => {
-		if (!args.model.entities[name]) {
-			throw new SchemaUpdateError(`Entity ${name} not found`)
+		args => {
+			if (!args.model.entities[name]) {
+				throw new SchemaUpdateError(`Entity ${name} not found`)
+			}
+			return {
+				...args.model,
+				entities: {
+					...args.model.entities,
+					[name]: entityUpdate({ ...args, entity: args.model.entities[name] }),
+				},
+			}
 		}
-		return {
-			...args.model,
-			entities: {
-				...args.model.entities,
-				[name]: entityUpdate({ ...args, entity: args.model.entities[name] }),
-			},
-		}
-	}
 
 export const updateEveryEntity =
 	(entityUpdate: EntityUpdater): ModelUpdater =>
-	args => ({
-		...args.model,
-		entities: Object.fromEntries(
-			Object.entries(args.model.entities).map(([name, entity]) => [name, entityUpdate({ ...args, entity })]),
-		),
-	})
+		args => ({
+			...args.model,
+			entities: Object.fromEntries(
+				Object.entries(args.model.entities).map(([name, entity]) => [name, entityUpdate({ ...args, entity })]),
+			),
+		})
 
 export const updateField =
 	<T extends Model.AnyField = Model.AnyField>(name: string, fieldUpdater: FieldUpdater<T>): EntityUpdater =>
-	args => {
-		const { [name]: field, ...otherFields } = args.entity.fields
-		if (!args.entity.fields[name]) {
-			throw new SchemaUpdateError(`Field ${args.entity.name}::${name} not found`)
-		}
-		const updatedField = fieldUpdater({ ...args, field: args.entity.fields[name] as T })
+		args => {
+			const { [name]: field, ...otherFields } = args.entity.fields
+			if (!args.entity.fields[name]) {
+				throw new SchemaUpdateError(`Field ${args.entity.name}::${name} not found`)
+			}
+			const updatedField = fieldUpdater({ ...args, field: args.entity.fields[name] as T })
 
-		return {
-			...args.entity,
-			fields: {
-				...otherFields,
-				...(updatedField ? { [name]: updatedField } : {}),
-			},
+			return {
+				...args.entity,
+				fields: {
+					...otherFields,
+					...(updatedField ? { [name]: updatedField } : {}),
+				},
+			}
 		}
-	}
 
 export const updateEveryField =
 	(fieldUpdater: FieldUpdater<Model.AnyField>): EntityUpdater =>
-	args => ({
-		...args.entity,
-		fields: Object.fromEntries(
-			Object.entries(args.entity.fields)
-				.map(([name, field]) => {
-					const updatedField = fieldUpdater({ ...args, field })
-					if (!updatedField) {
-						return undefined
-					}
-					return [name, updatedField]
-				})
-				.filter(isDefined),
-		),
-	})
+		args => ({
+			...args.entity,
+			fields: Object.fromEntries(
+				Object.entries(args.entity.fields)
+					.map(([name, field]) => {
+						const updatedField = fieldUpdater({ ...args, field })
+						if (!updatedField) {
+							return undefined
+						}
+						return [name, updatedField]
+					})
+					.filter(isDefined),
+			),
+		})
 
 export const addField =
 	(field: Model.AnyField): EntityUpdater =>
-	args => {
-		return {
-			...args.entity,
-			fields: {
-				...args.entity.fields,
-				[field.name]: field,
-			},
+		args => {
+			return {
+				...args.entity,
+				fields: {
+					...args.entity.fields,
+					[field.name]: field,
+				},
+			}
 		}
-	}
 
 export const removeField = (entityName: string, fieldName: string, version: number): SchemaUpdater => {
 	return ({ schema }) => {
@@ -236,28 +236,28 @@ export const removeField = (entityName: string, fieldName: string, version: numb
 		return updateSchema(
 			version >= VERSION_ACL_PATCH
 				? updateAcl(
-						updateAclEveryRole(
-							updateAclEveryEntity(
-								updateAclFieldPermissions((permissions, entityName) => {
-									if (entityName !== entity.name) {
-										return permissions
-									}
-									const { [fieldName]: field, ...other } = permissions
-									return {
-										...other,
-									}
-								}),
-								updateAclEveryPredicate(({ predicate, entityName }) => {
-									const processor = new PredicateDefinitionProcessor(schema.model)
-									return processor.process(schema.model.entities[entityName], predicate, {
-										handleColumn: ctx =>
-											ctx.entity.name === entity.name && ctx.column.name === field.name ? undefined : ctx.value,
-										handleRelation: ctx =>
-											ctx.entity.name === entity.name && ctx.relation.name === field.name ? undefined : ctx.value,
-									})
-								}),
-							),
+					updateAclEveryRole(
+						updateAclEveryEntity(
+							updateAclFieldPermissions((permissions, entityName) => {
+								if (entityName !== entity.name) {
+									return permissions
+								}
+								const { [fieldName]: field, ...other } = permissions
+								return {
+									...other,
+								}
+							}),
+							updateAclEveryPredicate(({ predicate, entityName }) => {
+								const processor = new PredicateDefinitionProcessor(schema.model)
+								return processor.process(schema.model.entities[entityName], predicate, {
+									handleColumn: ctx =>
+										ctx.entity.name === entity.name && ctx.column.name === field.name ? undefined : ctx.value,
+									handleRelation: ctx =>
+										ctx.entity.name === entity.name && ctx.relation.name === field.name ? undefined : ctx.value,
+								})
+							}),
 						),
+					),
 				  )
 				: undefined,
 			isRelation(field) &&
@@ -273,8 +273,8 @@ export const removeField = (entityName: string, fieldName: string, version: numb
 				}),
 				isRelation(field) && isInverseRelation(field)
 					? updateEntity(
-							field.target,
-							updateField<Model.AnyOwningRelation>(field.ownedBy, ({ field: { inversedBy, ...field } }) => field),
+						field.target,
+						updateField<Model.AnyOwningRelation>(field.ownedBy, ({ field: { inversedBy, ...field } }) => field),
 					  )
 					: undefined,
 			),

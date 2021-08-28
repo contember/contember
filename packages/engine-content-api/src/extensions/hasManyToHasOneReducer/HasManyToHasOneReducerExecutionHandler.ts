@@ -6,9 +6,8 @@ import { ImplementationException } from '../../exception'
 import { UniqueWhereExpander } from '../../inputProcessing'
 import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
 
-export class HasManyToHasOneReducerExecutionHandler
-	implements SelectExecutionHandler<Input.UniqueQueryInput, HasManyToHasOneReducerExtension>
-{
+export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<Input.UniqueQueryInput, HasManyToHasOneReducerExtension> {
+
 	constructor(private readonly schema: Model.Schema, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
 	process(context: SelectExecutionHandlerContext<Input.UniqueQueryInput, HasManyToHasOneReducerExtension>): void {

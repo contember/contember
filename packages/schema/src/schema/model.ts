@@ -55,8 +55,13 @@ namespace Model {
 		visitRelation(entity: Entity, relation: Relation, targetEntity: Entity, targetRelation: Relation | null): T
 	}
 
-	export type FieldVisitor<T> = ColumnVisitor<T> &
-		(RelationVisitor<T> | RelationByTypeVisitor<T> | RelationByGenericTypeVisitor<T>)
+	export type FieldVisitor<T> =
+		& ColumnVisitor<T>
+		& (
+			| RelationVisitor<T>
+			| RelationByTypeVisitor<T>
+			| RelationByGenericTypeVisitor<T>
+		)
 
 	export interface RelationByTypeVisitor<T> {
 		visitManyHasOne(
@@ -120,12 +125,18 @@ namespace Model {
 		ManyHasMany = 'ManyHasMany',
 	}
 
-	export type AnyInverseRelation = OneHasManyRelation | OneHasOneInverseRelation | ManyHasManyInverseRelation
+	export type AnyInverseRelation =
+		| OneHasManyRelation
+		| OneHasOneInverseRelation
+		| ManyHasManyInverseRelation
 
 	/** @deprecated */
 	export type AnyInversedRelation = AnyInverseRelation
 
-	export type AnyOwningRelation = ManyHasOneRelation | OneHasOneOwningRelation | ManyHasManyOwningRelation
+	export type AnyOwningRelation =
+		| ManyHasOneRelation
+		| OneHasOneOwningRelation
+		| ManyHasManyOwningRelation
 
 	export type AnyRelation = AnyInverseRelation | AnyOwningRelation
 
@@ -185,30 +196,48 @@ namespace Model {
 		orderBy?: OrderBy[]
 	}
 
-	export type OneHasManyRelation = Relation<RelationType.OneHasMany> & InverseRelation & OrderableRelation
-	export type ManyHasOneRelation = Relation<RelationType.ManyHasOne> &
-		OwningRelation &
-		JoiningColumnRelation &
-		NullableRelation
-	export type OneHasOneInverseRelation = Relation<RelationType.OneHasOne> & InverseRelation & NullableRelation
+	export type OneHasManyRelation =
+		& Relation<RelationType.OneHasMany>
+		& InverseRelation
+		& OrderableRelation
+
+	export type ManyHasOneRelation =
+		& Relation<RelationType.ManyHasOne>
+		& OwningRelation
+		& JoiningColumnRelation
+		& NullableRelation
+
+	export type OneHasOneInverseRelation =
+		& Relation<RelationType.OneHasOne>
+		& InverseRelation
+		& NullableRelation
 	/** @deprecated */
 	export type OneHasOneInversedRelation = OneHasOneInverseRelation
-	export type OneHasOneOwningRelation = Relation<RelationType.OneHasOne> &
-		OwningRelation &
-		JoiningColumnRelation &
-		NullableRelation & {
+
+	export type OneHasOneOwningRelation =
+		& Relation<RelationType.OneHasOne>
+		& OwningRelation
+		& JoiningColumnRelation
+		& NullableRelation
+		& {
 			orphanRemoval?: true
 		}
 	/** @deprecated */
 	export type OneHasOneOwnerRelation = OneHasOneOwningRelation
-	export type ManyHasManyInverseRelation = Relation<RelationType.ManyHasMany> & InverseRelation & OrderableRelation
+
+	export type ManyHasManyInverseRelation =
+		& Relation<RelationType.ManyHasMany>
+		& InverseRelation
+		& OrderableRelation
 	/** @deprecated */
 	export type ManyHasManyInversedRelation = ManyHasManyInverseRelation
-	export type ManyHasManyOwningRelation = Relation<RelationType.ManyHasMany> &
-		OwningRelation &
-		JoiningTableRelation &
-		OrderableRelation
 
+	export type ManyHasManyOwningRelation =
+		& Relation<RelationType.ManyHasMany>
+		& OwningRelation
+		& JoiningTableRelation
+		& OrderableRelation
+	/** @deprecated */
 	export type ManyHasManyOwnerRelation = ManyHasManyOwningRelation
 
 	export interface Schema {

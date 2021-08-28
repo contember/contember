@@ -16,7 +16,7 @@ class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQu
 		const qbWithProjectWhere =
 			'id' in this.project
 				? qb.where({
-						project_id: this.project.id,
+					project_id: this.project.id,
 				  })
 				: qb.match(byProjectSlug(this.project.slug))
 		const result = await qbWithProjectWhere.getResult(db)

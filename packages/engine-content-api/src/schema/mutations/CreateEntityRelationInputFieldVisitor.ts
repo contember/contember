@@ -9,9 +9,10 @@ import { CreateEntityRelationAllowedOperationsVisitor } from './CreateEntityRela
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { ImplementationException } from '../../exception'
 
-export class CreateEntityRelationInputFieldVisitor
-	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined>
-{
+export class CreateEntityRelationInputFieldVisitor implements
+	Model.ColumnVisitor<never>,
+	Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
+
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly whereTypeBuilder: WhereTypeProvider,
@@ -82,8 +83,8 @@ export class CreateEntityRelationInputFieldVisitor
 			fields: () =>
 				withAliasField
 					? {
-							...fields,
-							alias: { type: GraphQLString },
+						...fields,
+						alias: { type: GraphQLString },
 					  }
 					: fields,
 		})

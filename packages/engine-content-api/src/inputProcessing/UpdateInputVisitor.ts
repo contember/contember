@@ -4,11 +4,10 @@ import { UpdateInputProcessor } from './UpdateInputProcessor'
 import * as Context from './InputContext'
 import { ImplementationException, UserError } from '../exception'
 
-export class UpdateInputVisitor<Result>
-	implements
-		Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,
-		Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>>
-{
+export class UpdateInputVisitor<Result> implements
+	Model.ColumnVisitor<Promise<Result | Result[] | undefined>>,
+	Model.RelationByTypeVisitor<Promise<Result | Result[] | undefined>> {
+
 	constructor(
 		private readonly updateInputProcessor: UpdateInputProcessor<Result>,
 		private readonly schema: Model.Schema,

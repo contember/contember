@@ -192,8 +192,8 @@ export const assertMaxLength = (min: number, message: MessageOrString) => fluent
 
 export const combine =
 	(...decorators: PropertyDecorator[]): PropertyDecorator =>
-	(target, propertyKey) =>
-		decorators.forEach(it => it(target, propertyKey))
+		(target, propertyKey) =>
+			decorators.forEach(it => it(target, propertyKey))
 
 export function parseDefinition(
 	definitions: Record<string, SchemaDefinition.EnumDefinition | { new (): any }>,

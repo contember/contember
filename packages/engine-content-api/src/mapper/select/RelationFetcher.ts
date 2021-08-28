@@ -168,7 +168,7 @@ export class RelationFetcher {
 			['junction_', column.sourceColumn.columnName],
 			(orderable, qb) => {
 				if (object.args.orderBy) {
-					;[qb, orderable] = this.orderBuilder.build(
+					[qb, orderable] = this.orderBuilder.build(
 						qb,
 						orderable,
 						targetEntity,

@@ -94,7 +94,7 @@ export class DiffBuilder {
 								relations: it.relations,
 								filter: it.id
 									? {
-											[getEntity(schema.model, it.entity).primary]: { eq: it.id },
+										[getEntity(schema.model, it.entity).primary]: { eq: it.id },
 									  }
 									: it.filter || {},
 							},

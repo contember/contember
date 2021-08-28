@@ -96,13 +96,15 @@ namespace UpdateBuilder {
 	export type AffectedRows = number
 	export type UpdateResult = AffectedRows | Returning.Result[]
 
-	export type Options = {
-		table: string | undefined
-		values: QueryBuilder.ResolvedValues | undefined
-		returning: Returning
-		from: SelectBuilder.Callback | undefined
-	} & With.Options &
-		Where.Options
+	export type Options =
+		& {
+			table: string | undefined
+			values: QueryBuilder.ResolvedValues | undefined
+			returning: Returning
+			from: SelectBuilder.Callback | undefined
+		}
+		& With.Options
+		& Where.Options
 
 	export type ResolvedOptions = Pick<Options, Exclude<keyof Options, 'from'>> & {
 		from: Literal | undefined

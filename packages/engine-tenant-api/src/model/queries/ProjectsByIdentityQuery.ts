@@ -38,12 +38,12 @@ export class ProjectsByIdentityQuery extends DatabaseQuery<Project[]> {
 		const qbWithIdentityPermissions = canAuthorizedEntityViewAll
 			? qb
 			: qb.where(where =>
-					where.in(
-						['project', 'id'],
-						SelectBuilder.create().from('project_membership').select('project_id').where({
-							identity_id: this.permissionContext.identity.id,
-						}),
-					),
+				where.in(
+					['project', 'id'],
+					SelectBuilder.create().from('project_membership').select('project_id').where({
+						identity_id: this.permissionContext.identity.id,
+					}),
+				),
 			  )
 
 		return await qbWithIdentityPermissions.getResult(queryable.db)

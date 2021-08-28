@@ -255,7 +255,7 @@ export class ValidationValidator {
 
 				return { operation: 'filter', args: [filterArgA, filterArgB] }
 			default:
-				;((_: never) => {
+				((_: never) => {
 					errorBuilder.for('operation', `Operation ${(validatorCast as any).operation} is not an valid option`)
 				})(validatorCast)
 		}

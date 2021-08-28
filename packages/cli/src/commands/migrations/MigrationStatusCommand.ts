@@ -89,8 +89,8 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 		const filtered =
 			onlyErrors || onlyToExecute
 				? sortMigrations([
-						...(onlyErrors ? status.errorMigrations : []),
-						...(onlyToExecute ? status.migrationsToExecute : []),
+					...(onlyErrors ? status.errorMigrations : []),
+					...(onlyToExecute ? status.migrationsToExecute : []),
 				  ])
 				: status.allMigrations
 		console.log(createMigrationStatusTable(filtered))

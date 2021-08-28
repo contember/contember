@@ -4,10 +4,11 @@ import { ProjectContainerResolverState } from './ProjectContainerResolverState'
 import { ProjectMemberManagerState } from './ProjectMemberManagerState'
 import { ProvidersState } from './ProvidersState'
 
-export type ServicesState = ApiKeyManagerState &
-	ProjectContainerResolverState &
-	ProjectMemberManagerState &
-	ProvidersState
+export type ServicesState =
+	& ApiKeyManagerState
+	& ProjectContainerResolverState
+	& ProjectMemberManagerState
+	& ProvidersState
 
 export const createServicesProviderMiddleware = (services: ServicesState): KoaMiddleware<ServicesState> => {
 	return (ctx, next) => {

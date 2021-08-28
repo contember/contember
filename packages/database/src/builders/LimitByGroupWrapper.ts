@@ -4,15 +4,15 @@ import { Operator } from './ConditionBuilder'
 import { Client } from '../client'
 import { WindowFunction } from './WindowFunction'
 
+type OrderByCallback = <Orderable extends QueryBuilder.Orderable<any> | null>(
+	orderable: Orderable,
+	qb: SelectBuilder<any>,
+) => [Orderable, SelectBuilder<any>]
+
 class LimitByGroupWrapper {
 	constructor(
 		private readonly groupBy: QueryBuilder.ColumnIdentifier,
-		private readonly orderByCallback:
-			| (<Orderable extends QueryBuilder.Orderable<any> | null>(
-					orderable: Orderable,
-					qb: SelectBuilder<any>,
-			  ) => [Orderable, SelectBuilder<any>])
-			| undefined,
+		private readonly orderByCallback: OrderByCallback | undefined,
 		private readonly skip: number | undefined,
 		private readonly limit: number | undefined,
 	) {}
@@ -21,7 +21,7 @@ class LimitByGroupWrapper {
 		if (this.limit !== undefined || this.skip !== undefined) {
 			let window = WindowFunction.createEmpty().rowNumber().partitionBy(this.groupBy)
 			if (this.orderByCallback !== undefined) {
-				;[window, qb] = this.orderByCallback(window, qb)
+				[window, qb] = this.orderByCallback(window, qb)
 			}
 
 			qb = qb.select(window.compile(), 'rowNumber_')

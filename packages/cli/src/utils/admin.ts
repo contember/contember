@@ -18,7 +18,7 @@ export class AdminClient {
 	private async execute(path: string, method: string, body: any): Promise<Response> {
 		return await fetch(`${this.url}/${path}`, {
 			method: method,
-			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.apiToken}` },
+			headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.apiToken}` },
 			body: JSON.stringify(body),
 		})
 	}

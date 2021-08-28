@@ -15,4 +15,4 @@ require:
   - "ts-node/register"
 hooks:
   afterAllFileWrite:
-    - prettier --write
+    - eslint --fix

@@ -3,12 +3,13 @@ import { ProjectResolveMiddlewareState } from './ProjectResolveMiddlewareFactory
 import { AuthMiddlewareState, ErrorResponseMiddlewareState, TimerMiddlewareState } from '../common'
 import { ProjectMemberManagerState } from '../services'
 
-type KoaState = ProjectMemberMiddlewareState &
-	ProjectMemberManagerState &
-	AuthMiddlewareState &
-	ProjectResolveMiddlewareState &
-	ErrorResponseMiddlewareState &
-	TimerMiddlewareState
+type KoaState =
+	& ProjectMemberMiddlewareState
+	& ProjectMemberManagerState
+	& AuthMiddlewareState
+	& ProjectResolveMiddlewareState
+	& ErrorResponseMiddlewareState
+	& TimerMiddlewareState
 
 export const createProjectMemberMiddleware = (): KoaMiddleware<KoaState> => {
 	const projectMember: KoaMiddleware<KoaState> = async (ctx, next) => {

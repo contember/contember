@@ -2,8 +2,9 @@ import { Model } from '@contember/schema'
 import FieldBuilder from './FieldBuilder'
 import { AddEntityCallback, EntityConfigurator } from './types'
 
-type PartialOptions<K extends keyof ManyHasManyBuilder.Options> = Partial<ManyHasManyBuilder.Options> &
-	Pick<ManyHasManyBuilder.Options, K>
+type PartialOptions<K extends keyof ManyHasManyBuilder.Options> =
+	& Partial<ManyHasManyBuilder.Options>
+	& Pick<ManyHasManyBuilder.Options, K>
 
 class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O> {
 	constructor(private readonly options: O, private readonly addEntity: AddEntityCallback) {}

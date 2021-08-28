@@ -37,45 +37,45 @@ export const RemoveEntityModification: ModificationHandlerStatic<RemoveEntityMod
 		return updateSchema(
 			this.formatVersion >= VERSION_ACL_PATCH
 				? updateAcl(
-						updateAclEveryRole(
-							({ role }) => ({
-								...role,
-								variables: Object.fromEntries(
-									Object.entries(role.variables).filter(([, variable]) => variable.entityName !== this.data.entityName),
-								),
-							}),
-							updateAclEntities(({ entities }) => {
-								const { [this.data.entityName]: removed, ...other } = entities
-								return other
-							}),
-							updateAclEveryEntity(
-								updateAclEveryPredicate(({ predicate, entityName, schema }) => {
-									const processor = new PredicateDefinitionProcessor(schema.model)
-									const currentEntity = schema.model.entities[entityName]
-									return processor.process(currentEntity, predicate, {
-										handleColumn: ctx => {
-											return ctx.entity.name === this.data.entityName ? undefined : ctx.value
-										},
-										handleRelation: ctx => {
-											return ctx.entity.name === this.data.entityName ? undefined : ctx.value
-										},
-									})
-								}),
+					updateAclEveryRole(
+						({ role }) => ({
+							...role,
+							variables: Object.fromEntries(
+								Object.entries(role.variables).filter(([, variable]) => variable.entityName !== this.data.entityName),
 							),
+						}),
+						updateAclEntities(({ entities }) => {
+							const { [this.data.entityName]: removed, ...other } = entities
+							return other
+						}),
+						updateAclEveryEntity(
+							updateAclEveryPredicate(({ predicate, entityName, schema }) => {
+								const processor = new PredicateDefinitionProcessor(schema.model)
+								const currentEntity = schema.model.entities[entityName]
+								return processor.process(currentEntity, predicate, {
+									handleColumn: ctx => {
+										return ctx.entity.name === this.data.entityName ? undefined : ctx.value
+									},
+									handleRelation: ctx => {
+										return ctx.entity.name === this.data.entityName ? undefined : ctx.value
+									},
+								})
+							}),
 						),
+					),
 				  )
 				: undefined,
 			this.formatVersion >= VERSION_REMOVE_REFERENCING_RELATIONS
 				? ({ schema }) => {
-						const fieldsToRemove = Object.values(schema.model.entities).flatMap(entity =>
-							Object.values(entity.fields)
-								.filter(field => isRelation(field) && field.target === this.data.entityName)
-								.map(field => [entity.name, field.name]),
-						)
-						return fieldsToRemove.reduce(
-							(schema, [entity, field]) => removeField(entity, field, this.formatVersion)({ schema }),
-							schema,
-						)
+					const fieldsToRemove = Object.values(schema.model.entities).flatMap(entity =>
+						Object.values(entity.fields)
+							.filter(field => isRelation(field) && field.target === this.data.entityName)
+							.map(field => [entity.name, field.name]),
+					)
+					return fieldsToRemove.reduce(
+						(schema, [entity, field]) => removeField(entity, field, this.formatVersion)({ schema }),
+						schema,
+					)
 				  }
 				: undefined,
 			updateModel(({ model }) => {

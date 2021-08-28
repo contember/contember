@@ -2,11 +2,10 @@ import { Input, Model } from '@contember/schema'
 import { GroupedCounts, JoiningColumns, Mapper, RelationFetcher, SelectGroupedObjects } from '../../mapper'
 import { ObjectNode } from '../../inputProcessing'
 
-export class PaginatedHasManyNodesVisitor
-	implements
-		Model.ColumnVisitor<Promise<SelectGroupedObjects>>,
-		Model.RelationByTypeVisitor<Promise<SelectGroupedObjects>>
-{
+export class PaginatedHasManyNodesVisitor implements
+	Model.ColumnVisitor<Promise<SelectGroupedObjects>>,
+	Model.RelationByTypeVisitor<Promise<SelectGroupedObjects>> {
+
 	constructor(
 		private readonly ids: Input.PrimaryValue[],
 		private readonly objectNode: ObjectNode<Input.PaginationQueryInput>,

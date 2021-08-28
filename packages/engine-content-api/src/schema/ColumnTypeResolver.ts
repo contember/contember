@@ -81,7 +81,7 @@ export class ColumnTypeResolver {
 			case Model.ColumnType.Json:
 				return this.customTypeProvider.jsonType
 			default:
-				;(({}: never): never => {
+				(({}: never): never => {
 					throw new ImplementationException('Invalid column type')
 				})(type)
 		}

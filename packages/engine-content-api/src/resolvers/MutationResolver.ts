@@ -165,8 +165,8 @@ export class MutationResolver {
 						errors: executionErrors,
 						validation: result.validation
 							? {
-									valid: result.validation.valid,
-									errors: validationErrors,
+								valid: result.validation.valid,
+								errors: validationErrors,
 							  }
 							: { valid: true, errors: [] },
 						errorMessage: [

@@ -131,9 +131,9 @@ namespace InsertBuilder {
 	export type ConflictAction =
 		| { type: ConflictActionType.doNothing; target?: ConflictTarget }
 		| (Where.Options & {
-				type: ConflictActionType.update
-				values: QueryBuilder.ResolvedValues
-				target: ConflictTarget
+			type: ConflictActionType.update
+			values: QueryBuilder.ResolvedValues
+			target: ConflictTarget
 		  })
 
 	export type IndexColumns = string[]

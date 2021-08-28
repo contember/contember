@@ -34,9 +34,7 @@ test.skip('update book with validation - failed', async () => {
 		validation: bookValidation,
 		query: GQL`
           mutation {
-              updateBook(by: {id: "${testUuid(1)}"}, data: {name: "", tags: [{connect: {id: "${testUuid(
-			2,
-		)}"}}, {disconnect: {id: "${testUuid(3)}"}}]}) {
+              updateBook(by: {id: "${testUuid(1)}"}, data: {name: "", tags: [{connect: {id: "${testUuid(2)}"}}, {disconnect: {id: "${testUuid(3)}"}}]}) {
                   ok
                   validation {
                       valid

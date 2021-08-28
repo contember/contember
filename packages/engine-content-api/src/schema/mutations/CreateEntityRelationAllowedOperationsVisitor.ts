@@ -2,9 +2,10 @@ import { Acl, Input, Model } from '@contember/schema'
 import { Authorizator } from '../../acl'
 import { ImplementationException } from '../../exception'
 
-export class CreateEntityRelationAllowedOperationsVisitor
-	implements Model.ColumnVisitor<never>, Model.RelationByTypeVisitor<Input.CreateRelationOperation[]>
-{
+export class CreateEntityRelationAllowedOperationsVisitor implements
+	Model.ColumnVisitor<never>,
+	Model.RelationByTypeVisitor<Input.CreateRelationOperation[]> {
+
 	constructor(private readonly authorizator: Authorizator) {}
 
 	visitColumn(): never {

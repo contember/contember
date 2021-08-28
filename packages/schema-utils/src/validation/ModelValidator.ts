@@ -237,7 +237,7 @@ export class ModelValidator {
 			return undefined
 		}
 		if (((it: Model.AnyRelation): it is Model.AnyRelation & Model.OrderableRelation => 'orderBy' in it)(field as any)) {
-			;(field as Model.OrderableRelation).orderBy?.forEach(it => {
+			(field as Model.OrderableRelation).orderBy?.forEach(it => {
 				let entity = targetEntity
 
 				for (let i = 0; i < it.path.length; i++) {

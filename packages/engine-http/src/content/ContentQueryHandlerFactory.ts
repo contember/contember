@@ -1,6 +1,14 @@
 import { GraphQLSchema } from 'graphql'
 import { Context, ExecutionContainerFactory, flattenVariables } from '@contember/engine-content-api'
-import { createDbQueriesListener } from '../graphql/dbQueriesListener'
+import {
+	createDbQueriesListener,
+	createErrorListener,
+	createGraphQLQueryHandler,
+	createGraphqlRequestInfoProviderListener,
+	ErrorLogger,
+	GraphQLKoaState,
+	GraphQLListener,
+} from '../graphql'
 import { KoaContext, KoaMiddleware } from '../koa'
 import { ProjectMemberMiddlewareState } from '../project-common'
 import { getArgumentValues } from 'graphql/execution/values'
@@ -9,15 +17,14 @@ import { v4 as uuidv4 } from 'uuid'
 import { Acl, Schema } from '@contember/schema'
 import { ContentServerMiddlewareState } from './ContentServerMiddleware'
 import { AuthMiddlewareState, TimerMiddlewareState } from '../common'
-import { createGraphQLQueryHandler, GraphQLListener } from '../graphql/execution'
-import { createErrorListener, ErrorLogger } from '../graphql/errors'
-import { createGraphqlRequestInfoProviderListener, GraphQLKoaState } from '../graphql/state'
 
-export type KoaState = ProjectMemberMiddlewareState &
-	ContentServerMiddlewareState &
-	TimerMiddlewareState &
-	AuthMiddlewareState &
-	GraphQLKoaState
+export type KoaState =
+	& ProjectMemberMiddlewareState
+	& ContentServerMiddlewareState
+	& TimerMiddlewareState
+	& AuthMiddlewareState
+	& GraphQLKoaState
+
 type InputKoaContext = KoaContext<KoaState>
 
 type ExtendedGraphqlContext = Context & { koaContext: KoaContext<KoaState> }

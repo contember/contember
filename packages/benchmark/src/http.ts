@@ -9,7 +9,7 @@ export const createHttpOptions = (options: {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${options.authorizationToken}`,
+			'Authorization': `Bearer ${options.authorizationToken}`,
 		},
 		body: JSON.stringify({ query: options.query, variables: options.variables }),
 	}

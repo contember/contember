@@ -24,49 +24,22 @@ const schema: DocumentNode = gql`
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 
 		initSignInIDP(identityProvider: String!, redirectUrl: String!): InitSignInIDPResponse
-		signInIDP(
-			identityProvider: String!
-			idpResponse: IDPResponseInput!
-			redirectUrl: String!
-			sessionData: Json!
-			expiration: Int
-		): SignInIDPResponse
+		signInIDP(identityProvider: String!, idpResponse: IDPResponseInput!, redirectUrl: String!, sessionData: Json!, expiration: Int): SignInIDPResponse
 
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
 		disableOtp: DisableOtpResponse
 
-		createResetPasswordRequest(
-			email: String!
-			options: CreateResetPasswordRequestOptions
-		): CreatePasswordResetRequestResponse
+		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
-		invite(
-			email: String!
-			projectSlug: String!
-			memberships: [MembershipInput!]!
-			options: InviteOptions
-		): InviteResponse
-		unmanagedInvite(
-			email: String!
-			projectSlug: String!
-			memberships: [MembershipInput!]!
-			password: String!
-		): InviteResponse
+		invite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
+		unmanagedInvite(email: String!, projectSlug: String!, memberships: [MembershipInput!]!, password: String!): InviteResponse
 
-		addProjectMember(
-			projectSlug: String!
-			identityId: String!
-			memberships: [MembershipInput!]!
-		): AddProjectMemberResponse
+		addProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): AddProjectMemberResponse
 		removeProjectMember(projectSlug: String!, identityId: String!): RemoveProjectMemberResponse
 
-		updateProjectMember(
-			projectSlug: String!
-			identityId: String!
-			memberships: [MembershipInput!]!
-		): UpdateProjectMemberResponse
+		updateProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): UpdateProjectMemberResponse
 
 		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse

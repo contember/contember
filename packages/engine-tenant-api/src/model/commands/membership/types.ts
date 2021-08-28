@@ -1,14 +1,14 @@
-export type VariableUpdateInput = {
-	name: string
-} & (
-	| {
+export type VariableUpdateInput =
+	& { name: string }
+	& (
+		| {
 			set: ReadonlyArray<string>
 	  }
-	| {
+		| {
 			remove: ReadonlyArray<string>
 			append: ReadonlyArray<string>
 	  }
-)
+	)
 
 export type MembershipInput = {
 	role: string

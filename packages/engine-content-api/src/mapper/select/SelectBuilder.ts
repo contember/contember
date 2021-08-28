@@ -63,7 +63,7 @@ export class SelectBuilder {
 				[path.getAlias(), groupByColumn],
 				(orderable, qb) => {
 					if (orderBy.length > 0) {
-						;[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
+						[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
 					}
 					return [orderable, qb]
 				},
@@ -72,7 +72,7 @@ export class SelectBuilder {
 			)
 		} else {
 			if (orderBy.length > 0) {
-				;[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy)
+				[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy)
 			}
 			this.qb = this.qb.limit(input.args.limit, input.args.offset)
 		}

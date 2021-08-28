@@ -2,14 +2,14 @@ import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectContainer } from '../ProjectContainer'
 import { ProjectConfig } from '../ProjectConfig'
 import { ErrorResponseMiddlewareState } from '../common'
-import { ProjectContainerResolverState } from '../services'
-import { ProvidersState } from '../services/ProvidersState'
+import { ProjectContainerResolverState, ProvidersState } from '../services'
 
-type KoaState = ProjectResolveMiddlewareState &
-	KoaRequestState &
-	ErrorResponseMiddlewareState &
-	ProvidersState &
-	ProjectContainerResolverState
+type KoaState =
+	& ProjectResolveMiddlewareState
+	& KoaRequestState
+	& ErrorResponseMiddlewareState
+	& ProvidersState
+	& ProjectContainerResolverState
 
 export const createProjectResolveMiddleware = () => {
 	const projectResolve: KoaMiddleware<KoaState> = async (ctx, next) => {

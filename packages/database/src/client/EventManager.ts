@@ -10,11 +10,11 @@ export class EventManagerImpl {
 	constructor(private readonly parent: EventManager | null = null) {}
 
 	on<Event extends keyof EventManager.ListenerTypes>(event: Event, cb: EventManager.ListenerTypes[Event]): void {
-		;(this.listeners[event] as EventManager.ListenerTypes[Event][]).push(cb)
+		(this.listeners[event] as EventManager.ListenerTypes[Event][]).push(cb)
 	}
 
 	fire<Event extends EventManager.Event>(event: Event, ...params: Parameters<EventManager.ListenerTypes[Event]>): void {
-		;(this.listeners[event] as EventManager.ListenerTypes[Event][]).forEach((cb: EventManager.ListenerTypes[Event]) =>
+		(this.listeners[event] as EventManager.ListenerTypes[Event][]).forEach((cb: EventManager.ListenerTypes[Event]) =>
 			cb(...(params as [any, any])),
 		)
 		if (this.parent) {

@@ -29,11 +29,11 @@ export type SelectExecutionHandlerContext<
 	addData: (parentField: string, cb: DataCallback, defaultValue?: SelectNestedDefaultValue) => void
 } & (
 	| {
-			fieldNode: FieldNode<FieldExtensions>
-			objectNode?: never
+		fieldNode: FieldNode<FieldExtensions>
+		objectNode?: never
 	  }
 	| {
-			fieldNode?: never
-			objectNode: ObjectNode<FieldArgs, FieldExtensions>
+		fieldNode?: never
+		objectNode: ObjectNode<FieldArgs, FieldExtensions>
 	  }
 )

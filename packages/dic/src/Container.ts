@@ -37,8 +37,8 @@ export class Builder<M extends ServiceTypeMap = {}> {
 				'factory' in factory
 					? factory
 					: {
-							...currentFactory,
-							factory,
+						...currentFactory,
+						factory,
 					  },
 		} as ServiceDefinitionMap<M>)
 	}

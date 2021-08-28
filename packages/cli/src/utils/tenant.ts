@@ -49,7 +49,7 @@ export const interactiveSignIn = async ({
 		},
 	])
 	if (!expiration) {
-		;({ expiration } = await prompts({
+		({ expiration } = await prompts({
 			type: 'number',
 			name: 'expiration',
 			message: 'Expiration in seconds',
@@ -214,7 +214,7 @@ const interactiveResolveMemberships = async ({
 			membership.variables.push({ name: variable.name, values })
 		}
 		if (choices.length) {
-			;({ another } = await prompts({
+			({ another } = await prompts({
 				name: 'another',
 				message: 'Do you want to add another role?',
 				type: 'confirm',

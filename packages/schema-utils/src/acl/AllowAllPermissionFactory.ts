@@ -32,7 +32,7 @@ export class AllowAllPermissionFactory {
 					create: this.operations.includes(Acl.Operation.create) ? fieldPermissions : {},
 					...(this.operations.includes(Acl.Operation.delete)
 						? {
-								delete: true,
+							delete: true,
 						  }
 						: {}),
 					...(allowCustomPrimary ? { customPrimary: true } : {}),

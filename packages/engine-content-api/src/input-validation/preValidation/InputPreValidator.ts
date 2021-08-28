@@ -46,8 +46,8 @@ export class InputPreValidator {
 
 		const dataWithRelation = overRelation
 			? {
-					...data,
-					[overRelation.name]: { create: {} },
+				...data,
+				[overRelation.name]: { create: {} },
 			  }
 			: data
 		const context = this.createContextForCreate(entity, dataWithRelation)
@@ -177,7 +177,7 @@ export class InputPreValidator {
 						changedFields.includes(field)
 							? fieldRules
 							: fieldRules.filter(rule =>
-									Object.keys(DependencyCollector.collect(rule.validator)).find(it => changedFields.includes(it)),
+								Object.keys(DependencyCollector.collect(rule.validator)).find(it => changedFields.includes(it)),
 							  ),
 					)
 				})

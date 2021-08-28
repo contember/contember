@@ -44,7 +44,7 @@ export class ProjectMigrator {
 			const formatVersion = migration.formatVersion
 
 			for (const modification of migration.modifications) {
-				;[schema] = await this.applyModification(
+				[schema] = await this.applyModification(
 					db.client,
 					stageTree,
 					schema,

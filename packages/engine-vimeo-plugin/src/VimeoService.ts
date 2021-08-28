@@ -15,7 +15,7 @@ export class VimeoService {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: authorizationHeader,
+				'Authorization': authorizationHeader,
 			},
 			body: JSON.stringify({
 				upload: {

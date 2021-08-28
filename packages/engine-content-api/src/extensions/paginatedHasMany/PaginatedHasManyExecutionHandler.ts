@@ -6,9 +6,7 @@ import { createPaginationHelper } from '../../utils'
 import { PaginatedHasManyCountVisitor } from './PaginatedHasManyCountVisitor'
 import { PaginatedHasManyNodesVisitor } from './PaginatedHasManyNodesVisitor'
 
-export class PaginatedHasManyExecutionHandler
-	implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension>
-{
+export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension> {
 	constructor(private readonly schema: Model.Schema, private readonly relationFetcher: RelationFetcher) {}
 
 	process(
@@ -24,19 +22,19 @@ export class PaginatedHasManyExecutionHandler
 			async ids => {
 				const counts = pagination.requiresTotalCount
 					? await acceptFieldVisitor(
-							this.schema,
-							entity,
-							objectNode.extensions.relationName,
-							new PaginatedHasManyCountVisitor(ids, objectNode, this.relationFetcher, mapper),
+						this.schema,
+						entity,
+						objectNode.extensions.relationName,
+						new PaginatedHasManyCountVisitor(ids, objectNode, this.relationFetcher, mapper),
 					  )
 					: {}
 
 				const nodes = pagination.nodeField
 					? await acceptFieldVisitor(
-							this.schema,
-							entity,
-							objectNode.extensions.relationName,
-							new PaginatedHasManyNodesVisitor(ids, pagination.nodeField, this.relationFetcher, mapper),
+						this.schema,
+						entity,
+						objectNode.extensions.relationName,
+						new PaginatedHasManyNodesVisitor(ids, pagination.nodeField, this.relationFetcher, mapper),
 					  )
 					: undefined
 				const result = new Map<Input.PrimaryValue, any>()

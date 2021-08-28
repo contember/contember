@@ -13,14 +13,14 @@ export const getPersonByIdentity = (args: {
 	response: {
 		rows: args.response
 			? [
-					{
-						id: args.response.personId,
-						password_hash: `BCRYPTED-${args.response.password}`,
-						identity_id: args.identityId,
-						roles: args.response.roles,
-						email: args.response.email,
-						otp_uri: args.response.otpUri,
-					},
+				{
+					id: args.response.personId,
+					password_hash: `BCRYPTED-${args.response.password}`,
+					identity_id: args.identityId,
+					roles: args.response.roles,
+					email: args.response.email,
+					otp_uri: args.response.otpUri,
+				},
 			  ]
 			: [],
 	},

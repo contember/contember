@@ -3,9 +3,7 @@ import { Model } from '@contember/schema'
 import { ColumnTypeResolver } from '../ColumnTypeResolver'
 import { EntityTypeProvider } from '../EntityTypeProvider'
 
-export class FieldTypeVisitor
-	implements Model.ColumnVisitor<GraphQLOutputType>, Model.RelationByGenericTypeVisitor<GraphQLOutputType>
-{
+export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>, Model.RelationByGenericTypeVisitor<GraphQLOutputType> {
 	private columnTypeResolver: ColumnTypeResolver
 	private entityTypeProvider: EntityTypeProvider
 

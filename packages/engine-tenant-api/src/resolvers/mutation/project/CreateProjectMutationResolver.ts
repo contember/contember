@@ -15,6 +15,16 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		args: MutationCreateProjectArgs,
 		context: ResolverContext,
 	): Promise<CreateProjectResponse> {
+		const project = await this.projectManager.getProjectBySlug(args.projectSlug)
+		if (
+			project &&
+			(await context.isAllowed({
+				scope: await context.permissionContext.createProjectScope(project),
+				action: PermissionActions.PROJECT_VIEW,
+			}))
+		) {
+			return this.createProjectExistsResponse(args.projectSlug)
+		}
 		await context.requireAccess({
 			action: PermissionActions.PROJECT_CREATE,
 			message: 'You are not allowed to create a project',
@@ -29,13 +39,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			if (response) {
 				return { ok: true }
 			}
-			return {
-				ok: false,
-				error: {
-					code: CreateProjectResponseErrorCode.AlreadyExists,
-					developerMessage: `Project ${args.projectSlug} already exists`,
-				},
-			}
+			return this.createProjectExistsResponse(args.projectSlug)
 		} catch (e) {
 			if (e instanceof ProjectInitError) {
 				return {
@@ -47,6 +51,16 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 				}
 			}
 			throw e
+		}
+	}
+
+	private createProjectExistsResponse(slug: string) {
+		return {
+			ok: false,
+			error: {
+				code: CreateProjectResponseErrorCode.AlreadyExists,
+				developerMessage: `Project ${slug} already exists`,
+			},
 		}
 	}
 }

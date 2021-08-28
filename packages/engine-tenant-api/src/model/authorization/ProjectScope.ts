@@ -21,7 +21,7 @@ export class ProjectScope implements AuthorizationScope<Identity> {
 			tenantRoles.push(TenantRole.PROJECT_MEMBER)
 		}
 		const projectRoles = projectMemberships.map(it => it.role)
-		if (projectRoles.includes(ProjectRole.ADMIN)) {
+		if (projectRoles.includes(ProjectRole.ADMIN) || projectRoles.includes(ProjectRole.MAINTAINER)) {
 			tenantRoles.push(TenantRole.PROJECT_ADMIN)
 		}
 		const evaluator = await this.aclSchemaEvaluatorFactory.create(this.aclSchema)

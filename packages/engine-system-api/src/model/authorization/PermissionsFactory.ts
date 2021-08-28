@@ -6,7 +6,7 @@ export class PermissionsFactory {
 	public create(): Permissions {
 		const permissions = new Permissions()
 		permissions.allow(ProjectRole.ADMIN, { resource: Permissions.ALL, privilege: Permissions.ALL })
-		permissions.allow(ProjectRole.MIGRATION, AuthorizationActions.PROJECT_MIGRATE)
+		permissions.allow(ProjectRole.MAINTAINER, AuthorizationActions.PROJECT_MIGRATE)
 
 		return permissions
 	}

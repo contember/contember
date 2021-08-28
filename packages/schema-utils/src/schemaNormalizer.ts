@@ -20,7 +20,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 					},
 					...((schema.acl.roles?.[ProjectRole.ADMIN] as Acl.RolePermissions | undefined) || {}),
 				},
-				[ProjectRole.MIGRATION]: {
+				[ProjectRole.MAINTAINER]: {
 					stages: '*',
 					entities: {},
 					variables: {},

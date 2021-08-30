@@ -2,8 +2,8 @@ import classNames from 'classnames'
 import { memo } from 'react'
 import { useRadioGroup } from 'react-aria'
 import { useRadioGroupState } from 'react-stately'
-import type { Size, ValidationState } from '../../../types'
 import { useClassNamePrefix } from '../../../auxiliary'
+import type { Size, ValidationState } from '../../../types'
 import { toEnumStateClass, toEnumViewClass } from '../../../utils'
 import { ErrorList, ErrorListProps } from '../ErrorList'
 import { RadioContext } from './RadioContext'
@@ -49,6 +49,7 @@ export const RadioGroup = memo((props: RadioGroupProps) => {
 
 	const classList = classNames(
 		`${prefix}radio-group`,
+		toEnumViewClass(size),
 		toEnumStateClass(validationState),
 		toEnumViewClass(orientation ?? 'vertical'),
 	)

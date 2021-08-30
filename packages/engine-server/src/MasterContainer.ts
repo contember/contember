@@ -63,41 +63,42 @@ export class MasterContainerFactory {
 		version,
 	}: MasterContainerArgs): MasterContainer {
 		const masterContainer = new Builder({})
-			.addService('config', () => config)
-			.addService('debugMode', () => debugMode)
-			.addService('processType', () => processType)
-			.addService('version', () => version)
-			.addService('projectConfigResolver', () => projectConfigResolver)
-			.addService('plugins', () => plugins)
-			.addService(
-				'tenantContainerFactory',
-				({ config }) => new TenantContainerFactory(config.tenant.db, config.tenant.mailer),
-			)
-			.addService('systemContainerFactory', () => new SystemContainerFactory())
-
-			.addService('providers', ({ config }) =>
-				createProviders({
-					encryptionKey: config.tenant.secrets
-						? createSecretKey(Buffer.from(config.tenant.secrets.encryptionKey, 'hex'))
-						: undefined,
-				}),
-			)
-			.addService('projectSchemaResolver', () => new ProjectSchemaResolverProxy())
-			.addService('projectInitializer', () => new ProjectInitializerProxy())
-			.addService(
-				'tenantContainer',
-				({ tenantContainerFactory, providers, projectSchemaResolver, projectInitializer }) =>
-					tenantContainerFactory.create({
-						providers,
-						projectSchemaResolver,
-						projectInitializer,
-					}),
-			)
-			.addService(
-				'modificationHandlerFactory',
-				() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
-			)
-			.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
+			.addService('config', () =>
+				config)
+			.addService('debugMode', () =>
+				debugMode)
+			.addService('processType', () =>
+				processType)
+			.addService('version', () =>
+				version)
+			.addService('projectConfigResolver', () =>
+				projectConfigResolver)
+			.addService('plugins', () =>
+				plugins)
+			.addService('tenantContainerFactory', ({ config }) =>
+				new TenantContainerFactory(config.tenant.db, config.tenant.mailer))
+			.addService('systemContainerFactory', () =>
+				new SystemContainerFactory())
+			.addService('providers', ({ config }) => {
+				const encryptionKey = config.tenant.secrets
+					? createSecretKey(Buffer.from(config.tenant.secrets.encryptionKey, 'hex'))
+					: undefined
+				return createProviders({ encryptionKey })
+			})
+			.addService('projectSchemaResolver', () =>
+				new ProjectSchemaResolverProxy())
+			.addService('projectInitializer', () =>
+				new ProjectInitializerProxy())
+			.addService('tenantContainer', ({ tenantContainerFactory, providers, projectSchemaResolver, projectInitializer }) =>
+				tenantContainerFactory.create({
+					providers,
+					projectSchemaResolver,
+					projectInitializer,
+				}))
+			.addService('modificationHandlerFactory', () =>
+				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
+			.addService('permissionsByIdentityFactory', ({}) =>
+				new PermissionsByIdentityFactory())
 			.addService('entitiesSelector', ({ permissionsByIdentityFactory, providers }) => {
 				const mapperFactory: EntitiesSelectorMapperFactory = (db, schema, identityVariables, permissions) =>
 					createMapperContainer({
@@ -108,67 +109,34 @@ export class MasterContainerFactory {
 					}).mapperFactory(db)
 				return new EntitiesSelector(mapperFactory, permissionsByIdentityFactory)
 			})
-			.addService('identityFetcher', ({ tenantContainer }) => tenantContainer.identityFetcher)
-			.addService('eventApplier', () => {
-				return new ContentEventApplier(new ContentApplyDependenciesFactoryImpl())
-			})
-			.addService(
-				'systemDbMigrationsRunnerFactory',
-				() => (db: DatabaseCredentials, dbClient: ClientBase) =>
-					new MigrationsRunner(db, 'system', getSystemMigrations, dbClient),
-			)
-			.addService(
-				'systemContainer',
-				({
-					systemContainerFactory,
+			.addService('identityFetcher', ({ tenantContainer }) =>
+				tenantContainer.identityFetcher)
+			.addService('eventApplier', () =>
+				new ContentEventApplier(new ContentApplyDependenciesFactoryImpl()))
+			.addService('systemDbMigrationsRunnerFactory', () =>
+				(db: DatabaseCredentials, dbClient: ClientBase) =>
+					new MigrationsRunner(db, 'system', getSystemMigrations, dbClient))
+			.addService('systemContainer', ({ systemContainerFactory, entitiesSelector, eventApplier, identityFetcher, modificationHandlerFactory, providers, systemDbMigrationsRunnerFactory }) =>
+				systemContainerFactory.create({
 					entitiesSelector,
 					eventApplier,
 					identityFetcher,
 					modificationHandlerFactory,
 					providers,
 					systemDbMigrationsRunnerFactory,
-				}) =>
-					systemContainerFactory.create({
-						entitiesSelector,
-						eventApplier,
-						identityFetcher,
-						modificationHandlerFactory,
-						providers,
-						systemDbMigrationsRunnerFactory,
-					}),
-			)
-			.addService('schemaVersionBuilder', ({ systemContainer }) => systemContainer.schemaVersionBuilder)
-			.addService(
-				'projectContainerFactory',
-				({ debugMode, plugins, schemaVersionBuilder, providers }) =>
-					new ProjectContainerFactory(debugMode, plugins, schemaVersionBuilder, providers),
-			)
-			.addService('tenantProjectManager', ({ tenantContainer }) => tenantContainer.projectManager)
-			.addService(
-				'projectContainerResolver',
-				({ tenantProjectManager, projectContainerFactory, projectConfigResolver }) =>
-					new ProjectContainerResolver(projectContainerFactory, projectConfigResolver, tenantProjectManager),
-			)
-			.addService(
-				'tenantGraphQlMiddlewareFactory',
-				({ tenantContainer }) =>
-					new TenantGraphQLMiddlewareFactory(
-						tenantContainer.resolvers,
-						tenantContainer.resolverContextFactory,
-						logSentryError,
-					),
-			)
-			.addService(
-				'systemGraphQLMiddlewareFactory',
-				({ systemContainer, debugMode }) =>
-					new SystemGraphQLMiddlewareFactory(
-						systemContainer.systemResolversFactory,
-						systemContainer.resolverContextFactory,
-						logSentryError,
-						debugMode,
-					),
-			)
-
+				}))
+			.addService('schemaVersionBuilder', ({ systemContainer }) =>
+				systemContainer.schemaVersionBuilder)
+			.addService('projectContainerFactory', ({ debugMode, plugins, schemaVersionBuilder, providers }) =>
+				new ProjectContainerFactory(debugMode, plugins, schemaVersionBuilder, providers))
+			.addService('tenantProjectManager', ({ tenantContainer }) =>
+				tenantContainer.projectManager)
+			.addService('projectContainerResolver', ({ tenantProjectManager, projectContainerFactory, projectConfigResolver }) =>
+				new ProjectContainerResolver(projectContainerFactory, projectConfigResolver, tenantProjectManager))
+			.addService('tenantGraphQlMiddlewareFactory', ({ tenantContainer }) =>
+				new TenantGraphQLMiddlewareFactory(tenantContainer.resolvers, tenantContainer.resolverContextFactory, logSentryError))
+			.addService('systemGraphQLMiddlewareFactory', ({ systemContainer, debugMode }) =>
+				new SystemGraphQLMiddlewareFactory(systemContainer.systemResolversFactory, systemContainer.resolverContextFactory, logSentryError, debugMode))
 			.addService('promRegistry', ({ projectContainerResolver, processType, tenantContainer }) => {
 				if (processType === ProcessType.clusterMaster) {
 					const register = new prom.AggregatorRegistry()
@@ -228,10 +196,8 @@ export class MasterContainerFactory {
 
 				return app
 			})
-			.addService(
-				'tenantMigrationsRunner',
-				({ config }) => new MigrationsRunner(config.tenant.db, 'tenant', getTenantMigrations),
-			)
+			.addService('tenantMigrationsRunner', ({ config }) =>
+				new MigrationsRunner(config.tenant.db, 'tenant', getTenantMigrations))
 			.addService(
 				'initializer',
 				({ tenantMigrationsRunner, tenantContainer, systemContainer, projectContainerResolver, config, providers }) =>

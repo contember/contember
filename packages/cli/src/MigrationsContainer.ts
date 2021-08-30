@@ -25,26 +25,22 @@ export class MigrationsContainerFactory {
 
 	public create(): MigrationsContainer {
 		return new Builder({})
-			.addService('migrationFilesManager', () => new MigrationFilesManager(this.directory))
-			.addService(
-				'modificationHandlerFactory',
-				() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
-			)
-			.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
-			.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-			.addService(
-				'schemaVersionBuilder',
-				({ migrationsResolver, schemaMigrator }) => new SchemaVersionBuilder(migrationsResolver, schemaMigrator),
-			)
-			.addService('schemaDiffer', ({ schemaMigrator }) => new SchemaDiffer(schemaMigrator))
-			.addService(
-				'migrationCreator',
-				({ migrationFilesManager, schemaDiffer }) => new MigrationCreator(migrationFilesManager, schemaDiffer),
-			)
-			.addService(
-				'migrationDescriber',
-				({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory),
-			)
+			.addService('migrationFilesManager', () =>
+				new MigrationFilesManager(this.directory))
+			.addService('modificationHandlerFactory', () =>
+				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
+			.addService('schemaMigrator', ({ modificationHandlerFactory }) =>
+				new SchemaMigrator(modificationHandlerFactory))
+			.addService('migrationsResolver', ({ migrationFilesManager }) =>
+				new MigrationsResolver(migrationFilesManager))
+			.addService('schemaVersionBuilder', ({ migrationsResolver, schemaMigrator }) =>
+				new SchemaVersionBuilder(migrationsResolver, schemaMigrator))
+			.addService('schemaDiffer', ({ schemaMigrator }) =>
+				new SchemaDiffer(schemaMigrator))
+			.addService('migrationCreator', ({ migrationFilesManager, schemaDiffer }) =>
+				new MigrationCreator(migrationFilesManager, schemaDiffer))
+			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
+				new MigrationDescriber(modificationHandlerFactory))
 			.build()
 			.pick(
 				'migrationCreator',

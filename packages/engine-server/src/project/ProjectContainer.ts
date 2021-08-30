@@ -37,45 +37,33 @@ export class ProjectContainerFactory {
 
 	protected createBuilder(project: ProjectConfig) {
 		return new Builder({})
-			.addService('providers', () => this.providers)
-			.addService('schemaVersionBuilder', () => this.schemaVersionBuilder)
-			.addService('project', () => project)
-			.addService('connection', ({ project }) => {
-				return new Connection(project.db, { timing: true })
+			.addService('providers', () =>
+				this.providers)
+			.addService('schemaVersionBuilder', () =>
+				this.schemaVersionBuilder)
+			.addService('project', () =>
+				project)
+			.addService('connection', ({ project }) =>
+				new Connection(project.db, { timing: true }))
+			.addService('modificationHandlerFactory', () =>
+				new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
+			.addService('graphQlSchemaBuilderFactory', () =>
+				new GraphQlSchemaBuilderFactory())
+			.addService('permissionsByIdentityFactory', ({}) =>
+				new PermissionsByIdentityFactory())
+			.addService('graphQlSchemaFactory', ({ project, permissionsByIdentityFactory, graphQlSchemaBuilderFactory, providers }) => {
+				const contributors = this.plugins
+					.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ project, providers }) : null))
+					.filter((it): it is GraphQLSchemaContributor => !!it)
+				return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
 			})
-			.addService(
-				'modificationHandlerFactory',
-				() => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap),
-			)
-
-			.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
-			.addService('permissionsByIdentityFactory', ({}) => new PermissionsByIdentityFactory())
-			.addService(
-				'graphQlSchemaFactory',
-				({ project, permissionsByIdentityFactory, graphQlSchemaBuilderFactory, providers }) => {
-					const contributors = this.plugins
-						.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ project, providers }) : null))
-						.filter((it): it is GraphQLSchemaContributor => !!it)
-					return new GraphQlSchemaFactory(graphQlSchemaBuilderFactory, permissionsByIdentityFactory, contributors)
-				},
-			)
-			.addService(
-				'contentQueryHandlerFactory',
-				() => new ContentQueryHandlerFactory(project.slug, this.debug, logSentryError),
-			)
-			.addService(
-				'contentSchemaResolver',
-				({ schemaVersionBuilder }) => new ContentSchemaResolver(schemaVersionBuilder),
-			)
-			.addService(
-				'contentQueryHandlerProvider',
-				({ contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory }) =>
-					new ContentQueryHandlerProvider(contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory),
-			)
-			.addService(
-				'systemDatabaseContextFactory',
-				({ connection, providers }) =>
-					new DatabaseContextFactory(connection.createClient('system', { module: 'system' }), providers),
-			)
+			.addService('contentQueryHandlerFactory', () =>
+				new ContentQueryHandlerFactory(project.slug, this.debug, logSentryError))
+			.addService('contentSchemaResolver', ({ schemaVersionBuilder }) =>
+				new ContentSchemaResolver(schemaVersionBuilder))
+			.addService('contentQueryHandlerProvider', ({ contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory }) =>
+				new ContentQueryHandlerProvider(contentSchemaResolver, graphQlSchemaFactory, contentQueryHandlerFactory))
+			.addService('systemDatabaseContextFactory', ({ connection, providers }) =>
+				new DatabaseContextFactory(connection.createClient('system', { module: 'system' }), providers))
 	}
 }

@@ -1,33 +1,32 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { Aether, PersistControl } from '../../src'
+import { PersistControl } from '../../src'
 
 export default {
 	title: 'PersistControl',
 	component: PersistControl,
 	decorators: [
-		Story => (<>
+		Story => <div style={{ display: 'flex', flex: 1, flexDirection: 'column' }}>
 			<p>Container set to align children flex-start:</p>
-			<Aether style={{ display: 'flex', gap: '1em', justifyContent: 'flex-start', padding: '2em' }}>
+			<div style={{ display: 'flex', gap: '1em', justifyContent: 'flex-start' }}>
 					<Story />
-			</Aether>
+			</div>
 
 			<p>Container set align children center:</p>
-			<Aether style={{ display: 'flex', gap: '1em', justifyContent: 'center', padding: '2em' }}>
+			<div style={{ display: 'flex', gap: '1em', justifyContent: 'center' }}>
 					<Story />
-			</Aether>
+			</div>
 
 			<p>Container set to align children flex-end:</p>
-			<Aether style={{ display: 'flex', gap: '1em', justifyContent: 'flex-end', padding: '2em' }}>
+			<div style={{ display: 'flex', gap: '1em', justifyContent: 'flex-end' }}>
 					<Story />
-			</Aether>
+			</div>
 
 			<p>Container set to stretch children:</p>
-			<Aether style={{ display: 'flex', flexDirection: 'column', gap: '1em', padding: '2em' }}>
+			<div style={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
 				<Story />
-			</Aether>
-			</>
-		),
+			</div>
+		</div>,
 	],
 } as ComponentMeta<typeof PersistControl>
 

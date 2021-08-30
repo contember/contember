@@ -1,17 +1,15 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { Aether, Menu, NavigationContext } from '../../src'
+import { Menu, NavigationContext } from '../../src'
 
 export default {
 	title: 'Menu',
 	component: Menu,
-	decorators: [
-		Story => (
-			<Aether style={{ padding: '2em' }}>
-				<Story />
-			</Aether>
-		),
-	],
+	argTypes: {
+		showCaret: {
+			defaultValue: true,
+		},
+	},
 } as ComponentMeta<typeof Menu>
 
 const Template: ComponentStory<typeof Menu> = args => (
@@ -22,15 +20,7 @@ const Template: ComponentStory<typeof Menu> = args => (
 			location.href = to
 		},
 	})}>
-		<Menu {...args} />
-	</NavigationContext.Provider>
-)
-
-export const Simple = Template.bind({})
-
-Simple.args = {
-	children: (
-		<>
+		<Menu {...args}>
 			<Menu.Item title="Front page" to="#active-page" />
 			<Menu.Item title="Pages">
 				<Menu.Item title="List all" to="#other-page" />
@@ -68,6 +58,9 @@ Simple.args = {
 				<Menu.Item title={<button type="button">Arbitrary JSX content</button>} />
 				<Menu.Item title="Last item" to="#active-page" />
 			</Menu.Item>
-		</>
-	),
-}
+		</Menu>
+	</NavigationContext.Provider>
+)
+
+export const Simple = Template.bind({})
+Simple.args = {}

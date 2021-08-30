@@ -1,17 +1,10 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { Aether, Button, ButtonList } from '../../src'
+import { Button, ButtonList } from '../../src'
 
 export default {
 	title: 'ButtonList',
 	component: ButtonList,
-	decorators: [
-		Story => (
-			<Aether style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '1em', padding: '2em' }}>
-				<Story />
-			</Aether>
-		),
-	],
 } as ComponentMeta<typeof ButtonList>
 
 const Template: ComponentStory<typeof ButtonList> = args => <ButtonList {...args}>

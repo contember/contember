@@ -1,17 +1,14 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { Aether, RadioGroup } from '../../src'
+import { RadioGroup } from '../../src'
 
 export default {
 	title: 'RadioGroup',
 	component: RadioGroup,
-	decorators: [
-		Story => (
-			<Aether style={{ padding: '2em' }}>
-				<Story />
-			</Aether>
-		),
-	],
+	argTypes: {
+		isDisabled: { defaultValue: false },
+		isReadOnly: { defaultValue: false },
+	},
 } as ComponentMeta<typeof RadioGroup>
 
 const Template: ComponentStory<typeof RadioGroup> = args => <RadioGroup {...args} />

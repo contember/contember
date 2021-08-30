@@ -1,19 +1,17 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { Aether, Collapsible } from '../../src'
+import { Collapsible } from '../../src'
 
 
 export default {
 	title: 'Collapsible',
 	component: Collapsible,
 	decorators: [
-		Story => (
-			<Aether style={{ padding: '2em' }}>
-				<p>Content before…</p>
-				<Story />
-				<p>Content after…</p>
-			</Aether>
-		),
+		Story => <>
+			<p>Content before…</p>
+			<Story />
+			<p>Content after…</p>
+		</>,
 	],
 } as ComponentMeta<typeof Collapsible>
 

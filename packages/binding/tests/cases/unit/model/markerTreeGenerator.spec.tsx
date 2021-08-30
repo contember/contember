@@ -90,6 +90,7 @@ describe('Marker tree generator', () => {
 		)
 
 		const environment = Environment.create({
+			rootShouldExists: 'yes',
 			rootWhere: { bar: 123 },
 			rootWhereAsFilter: { bar: { eq: 123 } },
 		})
@@ -196,7 +197,7 @@ describe('Marker tree generator', () => {
 				hasOneRelationPath: [],
 				isCreating: false,
 				isNonbearing: false,
-				setOnCreate: { bar: 123 },
+				setOnCreate: undefined,
 				// forceCreation: false,
 				eventListeners: new EventListenersStore(undefined, new Map([
 					['initialize', new Set([onInit1, onInit2, onInit3, onInit4])],

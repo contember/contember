@@ -52,6 +52,7 @@ import {
 	UnsugarableSingleEntityEventListeners,
 } from '../treeParameters'
 import { Parser } from './Parser'
+import { GraphQlLiteral } from '@contember/client'
 
 export class QueryLanguage {
 	private static preparePrimitiveEntryPoint<Entry extends Parser.EntryPoint>(entryPoint: Entry) {
@@ -585,10 +586,22 @@ export class QueryLanguage {
 		// 	unsugarableSingleEntity.forceCreation !== undefined
 		// 		? unsugarableSingleEntity.forceCreation !== undefined
 		// 		: EntityCreationParametersDefaults.forceCreation
-		const setOnCreate: UniqueWhere | undefined =
+		let setOnCreate: UniqueWhere | undefined =
 			unsugarableSingleEntity.setOnCreate !== undefined
 				? this.desugarSetOnCreate(unsugarableSingleEntity.setOnCreate, environment)
 				: undefined
+
+		// todo: remove deprecated code
+		if (!setOnCreate) {
+			const whereValues = Object.values(where)
+			if (whereValues.length === 1 && whereValues[0] instanceof GraphQlLiteral) {
+				setOnCreate = where
+				if (import.meta.env.DEV) {
+					console.warn('Automatic creation of singleton entities in EditPage is deprecated. Please use setOnCreate prop.')
+				}
+			}
+		}
+
 		const isNonbearing: boolean =
 			unsugarableSingleEntity.isNonbearing !== undefined
 				? unsugarableSingleEntity.isNonbearing

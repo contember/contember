@@ -8,6 +8,8 @@ export interface CollapsibleProps {
 	expanded: boolean
 	transition?: CollapsibleTransition
 	children?: ReactNode
+	onClose?: () => void
+	onOpen?: () => void
 	onTransitionEnd?: () => void
 }
 
@@ -18,9 +20,14 @@ export const Collapsible = memo((props: CollapsibleProps) => {
 	const [delayedExpanded, setDelayedExpanded] = useState(props.expanded)
 
 	const onTransitionEnd = () => {
+		if (!isTransitioning) {
+			return
+		}
+
 		setContentHeight('auto')
 		setIsTransitioning(false)
 		props.onTransitionEnd?.()
+		props.expanded ? props.onOpen?.() : props.onClose?.()
 	}
 
 	const updateContentHeight = () => {

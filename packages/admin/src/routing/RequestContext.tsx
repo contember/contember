@@ -1,7 +1,7 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { PageParameters, PageRequest, RequestChange, RequestState } from './types'
 import { RoutingContextValue, useRouting } from './RoutingContext'
-import { PageNotFound, pathToRequestState, requestStateToPath } from './urlMapper'
+import { pathToRequestState, requestStateToPath } from './urlMapper'
 
 
 export const requestChangeFactory =
@@ -14,7 +14,10 @@ export const requestChangeFactory =
 
 
 export const CurrentRequestContext = createContext<RequestState>(null)
+CurrentRequestContext.displayName = 'CurrentRequestContext'
+
 export const PushRequestContext = createContext<(req: RequestState) => void>(() => {})
+PushRequestContext.displayName = 'PushRequestContext'
 
 export const useCurrentRequest = () => useContext(CurrentRequestContext)
 export const usePushRequest = () => useContext(PushRequestContext)

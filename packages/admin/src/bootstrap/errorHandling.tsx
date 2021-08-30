@@ -21,7 +21,7 @@ const getErrorContainer = () => {
 const devErrorHandler = (): TryRun => {
 	const errorBus = new ErrorBus()
 
-	window.Buffer = Buffer
+	;(window as any).Buffer = Buffer
 	window.addEventListener('error', e => {
 		if (e.message.startsWith('ResizeObserver')) {
 			// Apparently, this can be ignored: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded

@@ -1,8 +1,7 @@
 import { createContext, FC, useContext, useEffect, useState } from 'react'
 import { PageParameters, PageRequest, RequestChange, RequestState } from './types'
 import { RoutingContextValue, useRouting } from './RoutingContext'
-import { PageNotFound, pathToRequestState, requestStateToPath } from './urlMapper'
-import { I18nContext } from '../i18n'
+import { pathToRequestState, requestStateToPath } from './urlMapper'
 
 
 export const requestChangeFactory =

@@ -8,16 +8,16 @@ import {
 	ReactNode,
 	useCallback,
 } from 'react'
-import { LinkTarget, useLink } from './useLink'
+import { RoutingLinkTarget, useRoutingLink } from './useRoutingLink'
 
 
-const defaultComponent: FunctionComponent<InnerLinkProps> = ({ isActive, ...props }) => (
+const defaultComponent: FunctionComponent<InnerRoutingLinkProps> = ({ isActive, ...props }) => (
 	// TODO do something with isActive?
 	<a {...props} />
 )
 
-export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, to, Component, ...props }) => {
-	const { navigate, isActive, href } = useLink(to)
+export const RoutingLink = memo<RoutingLinkProps & PublicAnchorProps>(({ onClick, to, Component, ...props }) => {
+	const { navigate, isActive, href } = useRoutingLink(to)
 
 	const innerOnClick = useCallback((e?: ReactMouseEvent<HTMLAnchorElement, MouseEvent>) => {
 		if (e) {
@@ -34,19 +34,20 @@ export const Link = memo<LinkProps & PublicAnchorProps>(({ onClick, to, Componen
 	const InnerComponent = Component ?? defaultComponent
 	return <InnerComponent isActive={isActive} href={href} {...props} onClick={innerOnClick} />
 })
-Link.displayName = 'Link'
+RoutingLink.displayName = 'RoutingLink'
 
 export type PublicAnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
 
-export interface InnerLinkProps extends Omit<PublicAnchorProps, 'onClick'> {
+
+export interface InnerRoutingLinkProps extends Omit<PublicAnchorProps, 'onClick'> {
 	href: string
 	isActive: boolean
 	onClick: (e?: ReactMouseEvent<HTMLAnchorElement>) => void
 }
 
 
-export interface LinkProps {
-	Component?: ComponentType<InnerLinkProps>
+export interface RoutingLinkProps {
+	Component?: ComponentType<InnerRoutingLinkProps>
 	children?: ReactNode
-	to: LinkTarget
+	to: RoutingLinkTarget
 }

@@ -1,4 +1,4 @@
-import { Button, ButtonList } from '@contember/ui'
+import { AnchorButton, ButtonList } from '@contember/ui'
 import { MiscPageLayout } from '../MiscPageLayout'
 
 export interface Project {
@@ -16,16 +16,15 @@ export const ProjectList = (props: ProjectListProps) => {
 		<MiscPageLayout heading="Projects">
 			<ButtonList flow="block">
 				{props.projects.map(project => (
-					<Button
+					<AnchorButton
 						key={project.slug}
 						href={props.formatProjectUrl(project)}
-						Component="a"
 						distinction="seamless"
 						flow="block"
 						justification="justifyStart"
 					>
 						{project.name}
-					</Button>
+					</AnchorButton>
 				))}
 			</ButtonList>
 		</MiscPageLayout>

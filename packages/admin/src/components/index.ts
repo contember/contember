@@ -1,7 +1,6 @@
 export * from './bindingFacade'
 export * from './Identity'
 export * from './Login'
-export * from './Link'
 export * from './LogoutLink'
 export * from './pageRouting'
 export * from './ui'

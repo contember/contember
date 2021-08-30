@@ -1,6 +1,5 @@
-import { memo, useMemo } from 'react'
-import { Link, LinkProps, PublicAnchorProps } from '../Link'
-import { LinkTarget } from '../Link/useLink'
+import { AnchorHTMLAttributes, memo, useMemo } from 'react'
+import { RoutingLink, RoutingLinkProps, RoutingLinkTarget } from '../../routing'
 
 export interface PageConfig {
 	name: string
@@ -12,7 +11,7 @@ export type PageChange = () => PageConfig
 
 /** @deprecated */
 export const PageLink = memo(({  to,  ...props }: PageLinkProps) => {
-	const passedTo: LinkTarget = useMemo(() => {
+	const passedTo: RoutingLinkTarget = useMemo(() => {
 		if (typeof to === 'function') {
 			return currentRequest => {
 				const newRequest = to(currentRequest)
@@ -28,10 +27,10 @@ export const PageLink = memo(({  to,  ...props }: PageLinkProps) => {
 		}
 		return to
 	}, [to])
-	return <Link to={passedTo} {...props} />
+	return <RoutingLink to={passedTo} {...props} />
 })
 PageLink.displayName = 'PageLink'
 
-export interface PageLinkProps extends Omit<LinkProps & PublicAnchorProps, 'href' | 'to'> {
-	to: PageChange | LinkTarget
+export interface PageLinkProps extends Omit<RoutingLinkProps & AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'to'> {
+	to: PageChange | RoutingLinkTarget
 }

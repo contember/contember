@@ -1,31 +1,26 @@
 import { BaseSyntheticEvent, useCallback, useMemo } from 'react'
-import {
-	pageRequest,
-	RequestChange,
-	RequestState,
-	requestStateToPath,
-	useCurrentRequest,
-	usePushRequest,
-	useRouting,
-} from '../../routing'
+import { RequestChange, RequestState } from './types'
+import { requestChangeFactory, useCurrentRequest, usePushRequest } from './RequestContext'
+import { useRouting } from './RoutingContext'
+import { requestStateToPath } from './urlMapper'
 
-export interface LinkProps {
+export interface RoutingLinkParams {
 	href: string
 	navigate: (e?: BaseSyntheticEvent) => void
 	isActive: boolean
 }
 
-export type LinkTarget = string | RequestChange | (Partial<RequestState> & { pageName: string })
+export type RoutingLinkTarget = string | RequestChange | (Partial<RequestState> & { pageName: string })
 
-export const isLinkTarget = (value: unknown): value is LinkTarget => {
+export const isRoutingLinkTarget = (value: unknown): value is RoutingLinkTarget => {
 	return typeof value === 'string'
 		|| typeof value === 'function'
 		|| (typeof value === 'object' && value !== null && 'pageName' in value)
 }
 
-const targetToRequest = (target: LinkTarget, currentRequest: RequestState): RequestState => {
+const targetToRequest = (target: RoutingLinkTarget, currentRequest: RequestState): RequestState => {
 	if (typeof target === 'string') {
-		return pageRequest(target, {})(currentRequest)
+		return requestChangeFactory(target, {})(currentRequest)
 	}
 	if (typeof target === 'function') {
 		return target(currentRequest)
@@ -40,12 +35,12 @@ const targetToRequest = (target: LinkTarget, currentRequest: RequestState): Requ
 	}
 }
 
-export const useLinkFactory = () => {
+export const useRoutingLinkFactory = () => {
 	const currentRequest = useCurrentRequest()
 	const routing = useRouting()
 	const pushRequest = usePushRequest()
 
-	return useCallback((target: LinkTarget): LinkProps => {
+	return useCallback((target: RoutingLinkTarget): RoutingLinkParams => {
 		const request = targetToRequest(target, currentRequest)
 		let href: string
 		try {
@@ -70,8 +65,8 @@ export const useLinkFactory = () => {
 	}, [currentRequest, pushRequest, routing])
 }
 
-export const useLink = (target: LinkTarget) => {
-	const linkFactory = useLinkFactory()
+export const useRoutingLink = (target: RoutingLinkTarget) => {
+	const linkFactory = useRoutingLinkFactory()
 	return useMemo(() => {
 		return linkFactory(target)
 	}, [target, linkFactory])

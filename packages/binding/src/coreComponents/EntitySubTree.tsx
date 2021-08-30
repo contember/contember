@@ -94,7 +94,7 @@ export const EntitySubTree = Component(
 					rootShouldExists: 'no',
 				})
 			}
-			const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(props, newEnvironment)
+			const qualifiedSingleEntity = QueryLanguage.desugarQualifiedSingleEntity(props, newEnvironment, { missingSetOnCreate: 'fill' })
 			return newEnvironment.putDelta({
 				rootWhere: qualifiedSingleEntity.where,
 				rootWhereAsFilter: whereToFilter(qualifiedSingleEntity.where),

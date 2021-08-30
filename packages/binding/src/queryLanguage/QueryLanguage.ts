@@ -554,6 +554,7 @@ export class QueryLanguage {
 	public static desugarQualifiedSingleEntity(
 		{ entity, ...unsugarableSingleEntity }: SugaredQualifiedSingleEntity,
 		environment: Environment,
+		options: { missingSetOnCreate?: 'fill' | 'fillAndWarn' } = {},
 	): QualifiedSingleEntity {
 		let entityName: EntityName
 		let where: UniqueWhere
@@ -592,11 +593,11 @@ export class QueryLanguage {
 				: undefined
 
 		// todo: remove deprecated code
-		if (!setOnCreate) {
+		if (!setOnCreate && options.missingSetOnCreate) {
 			const whereValues = Object.values(where)
 			if (whereValues.length === 1 && whereValues[0] instanceof GraphQlLiteral) {
 				setOnCreate = where
-				if (import.meta.env.DEV) {
+				if (import.meta.env.DEV && options.missingSetOnCreate === 'fillAndWarn') {
 					console.warn('Automatic creation of singleton entities in EditPage is deprecated. Please use setOnCreate prop.')
 				}
 			}

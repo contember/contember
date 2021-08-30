@@ -159,6 +159,7 @@ namespace Environment {
 		'labelMiddleware',
 		'rootWhere',
 		'rootWhereAsFilter',
+		'rootShouldExists',
 	])
 
 	export type SystemVariableName = keyof SystemVariables

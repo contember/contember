@@ -1,23 +1,22 @@
 import {
-	AddProjectMemberCommand,
 	CreateApiKeyCommand,
-	CreateIdentityCommand,
 	DisableApiKeyCommand,
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
 	ProlongApiKeyCommand,
-} from '../commands'
-import { ApiKey } from '../type'
-import { ImplementationException } from '../../exceptions'
-import { Membership } from '../type/Membership'
-import { TenantRole } from '../authorization'
-import { ApiKeyByTokenQuery } from '../queries'
-import { createSetMembershipVariables } from './membershipUtils'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { DatabaseContext } from '../utils'
+} from '../../commands'
+import { ApiKey } from '../../type'
+import { Membership } from '../../type/Membership'
+import { ApiKeyByTokenQuery } from '../../queries'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response'
+import { DatabaseContext } from '../../utils'
+import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
 
 export class ApiKeyManager {
-	constructor(private readonly dbContext: DatabaseContext) {}
+	constructor(
+		private readonly dbContext: DatabaseContext,
+		private readonly apiKeyService: ApiKeyService,
+	) {}
 
 	async verifyAndProlong(token: string): Promise<VerifyResponse> {
 		const apiKeyRow = await this.dbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
@@ -52,13 +51,6 @@ export class ApiKeyManager {
 		).token
 	}
 
-	async createLoginApiKey(): Promise<CreateApiKeyResult> {
-		const response = await this.createGlobalApiKey([TenantRole.LOGIN])
-		if (!response.ok) {
-			throw new ImplementationException()
-		}
-		return response.result
-	}
 
 	async disableOneOffApiKey(apiKeyId: string): Promise<void> {
 		await this.dbContext.commandBus.execute(new DisableOneOffApiKeyCommand(apiKeyId))
@@ -78,28 +70,10 @@ export class ApiKeyManager {
 		description: string,
 	): Promise<CreateApiKeyResponse> {
 		return await this.dbContext.transaction(async db => {
-			const identityId = await db.commandBus.execute(new CreateIdentityCommand([], description))
-			const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
-
-			const addMemberResult = await db.commandBus.execute(
-				new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
-			)
-			if (!addMemberResult.ok) {
-				throw new ImplementationException()
-			}
-
-			return new ResponseOk(new CreateApiKeyResult(identityId, apiKeyResult))
+			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description)
 		})
 	}
 
-	async createGlobalApiKey(roles: TenantRole[]): Promise<CreateApiKeyResponse> {
-		return await this.dbContext.transaction(async db => {
-			const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles))
-			const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand(ApiKey.Type.PERMANENT, identityId))
-
-			return new ResponseOk(new CreateApiKeyResult(identityId, apiKeyResult))
-		})
-	}
 }
 
 export type VerifyResponse = Response<VerifyResult, VerifyErrorCode>
@@ -116,10 +90,4 @@ export const enum VerifyErrorCode {
 	EXPIRED = 'expired',
 	NO_AUTH_HEADER = 'no_auth_header',
 	INVALID_AUTH_HEADER = 'invalid_auth_header',
-}
-
-export type CreateApiKeyResponse = Response<CreateApiKeyResult, never>
-
-export class CreateApiKeyResult {
-	constructor(public readonly identityId: string, public readonly apiKey: { id: string; token: string }) {}
 }

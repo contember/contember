@@ -3,7 +3,7 @@ import { Connection, DatabaseCredentials } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
 	AclSchemaEvaluatorFactory,
-	ApiKeyManager,
+	ApiKeyManager, ApiKeyService,
 	DatabaseContext,
 	Identity,
 	IdentityFactory,
@@ -117,7 +117,8 @@ export class TenantContainerFactory {
 				({ mailer, templateRenderer, dbContext }) => new UserMailer(mailer, templateRenderer, dbContext),
 			)
 
-			.addService('apiKeyManager', ({ dbContext }) => new ApiKeyManager(dbContext))
+			.addService('apiKeyService', () => new ApiKeyService())
+			.addService('apiKeyManager', ({ dbContext, apiKeyService }) => new ApiKeyManager(dbContext, apiKeyService))
 			.addService('signUpManager', ({ dbContext }) => new SignUpManager(dbContext))
 			.addService('passwordChangeManager', ({ dbContext }) => new PasswordChangeManager(dbContext))
 			.addService('projectMemberManager', ({ dbContext }) => new ProjectMemberManager(dbContext))

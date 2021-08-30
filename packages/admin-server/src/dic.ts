@@ -41,7 +41,7 @@ export default new Builder({})
 	})
 
 	.addService('loginController', ({ env, projectListProvider }) => {
-		return new LoginController(env.CONTEMBER_API_ENDPOINT, env.CONTEMBER_PUBLIC_DIR, projectListProvider)
+		return new LoginController(env.CONTEMBER_PUBLIC_DIR, projectListProvider)
 	})
 
 	.addService('deployController', ({ tenant, s3 }) => {

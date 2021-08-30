@@ -1,7 +1,8 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useSessionToken } from '@contember/react-client'
 import { useTenantMe } from '../../tenant/hooks/me'
-import { ContainerSpinner, Message } from '@contember/ui'
+import { Button, ContainerSpinner, Message } from '@contember/ui'
+import { MiscPageLayout } from '../MiscPageLayout'
 
 export interface Identity {
 	email: string
@@ -62,11 +63,20 @@ export const IdentityProvider: React.FC = ({ children }) => {
 	)
 
 	if (identityCleared) {
-		return <Message type="default">Logging out...</Message>
+		return (
+			<MiscPageLayout>
+				<Message type="default" size="large" flow="generousBlock">Logging out&hellip;</Message>
+			</MiscPageLayout>
+		)
 	}
 
 	if (me.error) {
-		return <Message type="danger">Failed to fetch an identity</Message>
+		return (
+			<MiscPageLayout>
+				<Message type="danger" size="large" flow="generousBlock">Failed to fetch an identity</Message>
+				<Button style={{ margin: '0 auto', display: 'block', textAlign: 'center', maxWidth: '100px' }} href={window.location.href} Component="a">Reload</Button>
+			</MiscPageLayout>
+		)
 	}
 
 	if (!identity) {

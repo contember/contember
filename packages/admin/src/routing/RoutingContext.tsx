@@ -8,9 +8,7 @@ export interface RoutingContextValue {
 	defaultDimensions?: SelectedDimension
 }
 
-export const RoutingContext = createContext<RoutingContextValue>({
-	basePath: '/',
-	routes: {},
-})
+export const RoutingContext = createContext<RoutingContextValue>({ basePath: '/', routes: {} })
+RoutingContext.displayName = 'RoutingContext'
 
 export const useRouting = () => useContext(RoutingContext)

@@ -5,14 +5,19 @@ import { TenantRole } from './Roles'
 class PermissionsFactory {
 	public create(): Permissions {
 		const permissions = new Permissions()
+
 		permissions.allow(TenantRole.SUPER_ADMIN, { resource: Permissions.ALL, privilege: Permissions.ALL })
+
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_SIGN_IN)
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_RESET_PASSWORD)
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_CREATE_IDP_URL)
 		permissions.allow(TenantRole.LOGIN, PermissionActions.PERSON_SIGN_IN_IDP)
+
 		permissions.allow(TenantRole.SELF, PermissionActions.PERSON_CHANGE_PASSWORD)
+
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SIGN_OUT)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SETUP_OTP)
+
 		permissions.allow(TenantRole.PROJECT_MEMBER, PermissionActions.PROJECT_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_SET_SECRET)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_UPDATE)
@@ -27,6 +32,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE_UNMANAGED([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_ADD)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_REMOVE)
+
+		permissions.allow(TenantRole.PROJECT_CREATOR, PermissionActions.PROJECT_CREATE)
 
 		return permissions
 	}

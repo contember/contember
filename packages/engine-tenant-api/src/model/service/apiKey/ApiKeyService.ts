@@ -5,6 +5,7 @@ import { ApiKey } from '../../type'
 import { createSetMembershipVariables } from '../membershipUtils'
 import { ImplementationException } from '../../../exceptions'
 import { Response, ResponseOk } from '../../utils/Response'
+import { ApiKeyWithToken } from '../../../schema'
 
 export class ApiKeyService {
 	async createProjectPermanentApiKey(
@@ -32,5 +33,16 @@ export type CreateApiKeyResponse = Response<CreateApiKeyResult, never>
 
 export class CreateApiKeyResult {
 	constructor(public readonly identityId: string, public readonly apiKey: { id: string; token: string }) {
+	}
+
+	toApiKeyWithToken(): ApiKeyWithToken {
+		return {
+			id: this.apiKey.id,
+			token: this.apiKey.token,
+			identity: {
+				id: this.identityId,
+				projects: [],
+			},
+		}
 	}
 }

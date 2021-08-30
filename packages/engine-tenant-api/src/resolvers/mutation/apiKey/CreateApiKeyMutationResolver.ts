@@ -6,8 +6,7 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
-import { ApiKeyManager, PermissionActions, ProjectManager, ProjectScope } from '../../../model'
-import { MembershipValidator } from '../../../model/service/MembershipValidator'
+import { ApiKeyManager, MembershipValidator, PermissionActions, ProjectManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createProjectNotFoundResponse } from '../../errorUtils'
 
@@ -50,14 +49,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			ok: true,
 			errors: [],
 			result: {
-				apiKey: {
-					id: result.result.apiKey.id,
-					token: result.result.apiKey.token,
-					identity: {
-						id: result.result.identityId,
-						projects: [],
-					},
-				},
+				apiKey: result.result.toApiKeyWithToken(),
 			},
 		}
 	}

@@ -183,6 +183,7 @@ export type CreateProjectResponse = {
 	readonly __typename?: 'CreateProjectResponse'
 	readonly ok: Scalars['Boolean']
 	readonly error?: Maybe<CreateProjectResponseError>
+	readonly result?: Maybe<CreateProjectResult>
 }
 
 export type CreateProjectResponseError = {
@@ -194,6 +195,11 @@ export type CreateProjectResponseError = {
 export enum CreateProjectResponseErrorCode {
 	AlreadyExists = 'ALREADY_EXISTS',
 	InitError = 'INIT_ERROR'
+}
+
+export type CreateProjectResult = {
+	readonly __typename?: 'CreateProjectResult'
+	readonly deployerApiKey: ApiKeyWithToken
 }
 
 export type CreateResetPasswordRequestOptions = {
@@ -954,6 +960,7 @@ export type ResolversTypes = {
 	CreateProjectResponse: ResolverTypeWrapper<CreateProjectResponse>
 	CreateProjectResponseError: ResolverTypeWrapper<CreateProjectResponseError>
 	CreateProjectResponseErrorCode: CreateProjectResponseErrorCode
+	CreateProjectResult: ResolverTypeWrapper<CreateProjectResult>
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
@@ -1049,6 +1056,7 @@ export type ResolversParentTypes = {
 	CreatePasswordResetRequestResponse: CreatePasswordResetRequestResponse
 	CreateProjectResponse: CreateProjectResponse
 	CreateProjectResponseError: CreateProjectResponseError
+	CreateProjectResult: CreateProjectResult
 	CreateResetPasswordRequestOptions: CreateResetPasswordRequestOptions
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyResponse: DisableApiKeyResponse
@@ -1220,12 +1228,18 @@ export type CreatePasswordResetRequestResponseResolvers<ContextType = any, Paren
 export type CreateProjectResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateProjectResponse'] = ResolversParentTypes['CreateProjectResponse']> = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	error?: Resolver<Maybe<ResolversTypes['CreateProjectResponseError']>, ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['CreateProjectResult']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateProjectResponseErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateProjectResponseError'] = ResolversParentTypes['CreateProjectResponseError']> = {
 	code?: Resolver<ResolversTypes['CreateProjectResponseErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateProjectResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['CreateProjectResult'] = ResolversParentTypes['CreateProjectResult']> = {
+	deployerApiKey?: Resolver<ResolversTypes['ApiKeyWithToken'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1585,6 +1599,7 @@ export type Resolvers<ContextType = any> = {
 	CreatePasswordResetRequestResponse?: CreatePasswordResetRequestResponseResolvers<ContextType>
 	CreateProjectResponse?: CreateProjectResponseResolvers<ContextType>
 	CreateProjectResponseError?: CreateProjectResponseErrorResolvers<ContextType>
+	CreateProjectResult?: CreateProjectResultResolvers<ContextType>
 	DisableApiKeyError?: DisableApiKeyErrorResolvers<ContextType>
 	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
 	DisableOtpError?: DisableOtpErrorResolvers<ContextType>

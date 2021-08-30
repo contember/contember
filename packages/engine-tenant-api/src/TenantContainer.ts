@@ -135,7 +135,7 @@ export class TenantContainerFactory {
 			.addService('secretManager', ({ dbContext, providers }) => new SecretsManager(dbContext, providers))
 			.addService(
 				'projectManager',
-				({ dbContext, secretManager }) => new ProjectManager(dbContext, secretManager, args.projectInitializer),
+				({ dbContext, secretManager, apiKeyService }) => new ProjectManager(dbContext, secretManager, args.projectInitializer, apiKeyService),
 			)
 			.addService(
 				'passwordResetManager',

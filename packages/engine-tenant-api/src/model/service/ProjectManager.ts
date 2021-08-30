@@ -1,47 +1,65 @@
-import { Client, DatabaseQueryable } from '@contember/database'
-import { QueryHandler } from '@contember/queryable'
-import { CommandBus, CreateProjectCommand, SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
+import { AddProjectMemberCommand, CreateProjectCommand, SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
 import { PermissionContext } from '../authorization'
 import { Project, ProjectInitializer, ProjectWithSecrets } from '../type'
 import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery, ProjectUpdateTimestampQuery } from '../queries'
 import { SecretsManager } from './SecretsManager'
-import { Providers } from '../providers'
 import { DatabaseContext } from '../utils'
+import { createSetMembershipVariables } from './membershipUtils'
+import { ImplementationException } from '../../exceptions'
+import { ProjectRole } from '@contember/schema'
+import { ApiKeyService, CreateApiKeyResult } from './apiKey'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { CreateProjectResponseErrorCode } from '../../schema'
 
 export class ProjectManager {
 	constructor(
 		private readonly dbContext: DatabaseContext,
 		private readonly secretManager: SecretsManager,
 		private readonly projectIntializer: ProjectInitializer,
+		private readonly apiKeyService: ApiKeyService,
 	) {}
 
 	public async createProject(
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
-	): Promise<boolean> {
+		ownerIdentityId: string | undefined,
+	): Promise<CreateProjectResponse> {
 		return await this.dbContext.transaction(async db => {
 			const bus = db.commandBus
 
 			const now = db.providers.now()
-			const id = await bus.execute(new CreateProjectCommand(project, now))
-			if (!id) {
-				return false
+			const projectId = await bus.execute(new CreateProjectCommand(project, now))
+			if (!projectId) {
+				return new ResponseError(CreateProjectResponseErrorCode.AlreadyExists, `Project ${project.slug} already exists`)
 			}
 			for (const [key, value] of Object.entries(project.secrets)) {
-				await bus.execute(new SetProjectSecretCommand(id, key, value))
+				await bus.execute(new SetProjectSecretCommand(projectId, key, value))
 			}
+			if (ownerIdentityId) {
+				const addMemberResult = await db.commandBus.execute(
+					new AddProjectMemberCommand(projectId, ownerIdentityId, createSetMembershipVariables([{ role: ProjectRole.ADMIN, variables: [] }])),
+				)
+				if (!addMemberResult.ok) {
+					throw new ImplementationException()
+				}
+
+			}
+
+			const deployMembership = [{ role: ProjectRole.DEPLOYER, variables: [] }]
+			const deployResult = await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, `Deploy key for ${project.slug}`)
+
 			try {
 				await this.projectIntializer.initializeProject({
-					id,
+					id: projectId,
 					...project,
 					updatedAt: now,
 				})
 			} catch (e) {
 				// eslint-disable-next-line no-console
 				console.error(e)
-				throw new ProjectInitError(`Project initialization error: ${'message' in e ? e.message : 'unknown'}`)
+				return new ResponseError(CreateProjectResponseErrorCode.AlreadyExists, `Project initialization error: ${'message' in e ? e.message : 'unknown'}`)
 			}
 
-			return true
+			return new ResponseOk(new CreateProjectResult(deployResult.result))
 		})
 	}
 
@@ -80,3 +98,11 @@ export class ProjectManager {
 }
 
 export class ProjectInitError extends Error {}
+
+
+export type CreateProjectResponse = Response<CreateProjectResult, CreateProjectResponseErrorCode>
+
+export class CreateProjectResult {
+	constructor(public readonly deployerApiKey: CreateApiKeyResult) {
+	}
+}

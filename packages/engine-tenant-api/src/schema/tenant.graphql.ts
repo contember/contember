@@ -617,11 +617,16 @@ const schema: DocumentNode = gql`
 	type CreateProjectResponse {
 		ok: Boolean!
 		error: CreateProjectResponseError
+		result: CreateProjectResult
 	}
 
 	type CreateProjectResponseError {
 		code: CreateProjectResponseErrorCode!
 		developerMessage: String!
+	}
+
+	type CreateProjectResult {
+		deployerApiKey: ApiKeyWithToken!
 	}
 
 	enum CreateProjectResponseErrorCode {

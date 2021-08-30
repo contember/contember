@@ -5,7 +5,8 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
-import { PermissionActions, ProjectInitError, ProjectManager } from '../../../model'
+import { PermissionActions, ProjectManager } from '../../../model'
+import { createErrorResponse } from '../../errorUtils'
 
 export class CreateProjectMutationResolver implements MutationResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}
@@ -23,43 +24,29 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 				action: PermissionActions.PROJECT_VIEW,
 			}))
 		) {
-			return this.createProjectExistsResponse(args.projectSlug)
+			return createErrorResponse(CreateProjectResponseErrorCode.AlreadyExists, `Project ${args.projectSlug} already exists`)
 		}
 		await context.requireAccess({
 			action: PermissionActions.PROJECT_CREATE,
 			message: 'You are not allowed to create a project',
 		})
-		try {
-			const response = await this.projectManager.createProject({
+		const response = await this.projectManager.createProject(
+			{
 				slug: args.projectSlug,
 				name: args.name || args.projectSlug,
 				config: args.config || {},
 				secrets: Object.fromEntries((args.secrets || []).map(it => [it.key, it.value])),
-			})
-			if (response) {
-				return { ok: true }
-			}
-			return this.createProjectExistsResponse(args.projectSlug)
-		} catch (e) {
-			if (e instanceof ProjectInitError) {
-				return {
-					ok: false,
-					error: {
-						code: CreateProjectResponseErrorCode.InitError,
-						developerMessage: e.message,
-					},
-				}
-			}
-			throw e
+			},
+			context.identity.id,
+		)
+		if (!response.ok) {
+			return createErrorResponse(response.error, response.errorMessage)
 		}
-	}
-
-	private createProjectExistsResponse(slug: string) {
 		return {
-			ok: false,
-			error: {
-				code: CreateProjectResponseErrorCode.AlreadyExists,
-				developerMessage: `Project ${slug} already exists`,
+			ok: true,
+			error: null,
+			result: {
+				deployerApiKey: response.result.deployerApiKey.toApiKeyWithToken(),
 			},
 		}
 	}

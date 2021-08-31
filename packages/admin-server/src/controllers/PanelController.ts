@@ -1,24 +1,27 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { BaseController } from './BaseController'
 import { SESSION_TOKEN_PLACEHOLDER } from './ApiController'
-import { createServe } from '../utils/serve'
+import { ProcessFile, StaticFileHandler } from '../http/StaticFileHandler'
 
 const CONTEMBER_CONFIG_PLACEHOLDER = '{configuration}'
 
 export class PanelController extends BaseController {
-	private serve = createServe(this.publicDir, '/_panel/',  async (path, content, req) => {
+	private fileProcessor: ProcessFile = async (path, content) => {
 		if (path === 'index.html') {
 			const configJson = JSON.stringify({ apiBaseUrl: '/_api', sessionToken: SESSION_TOKEN_PLACEHOLDER })
 			return content.toString('utf8').replace(CONTEMBER_CONFIG_PLACEHOLDER, configJson)
 		}
 		return content
-	})
+	}
 
-	constructor(private publicDir: string) {
+	constructor(private staticFileHandler: StaticFileHandler) {
 		super()
 	}
 
 	async handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
-		await this.serve(req, res)
+		await this.staticFileHandler.serve(req, res, {
+			basePath: '/_panel/',
+			fileProcessor: this.fileProcessor,
+		})
 	}
 }

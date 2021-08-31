@@ -13,6 +13,7 @@ import { ProjectListProvider } from './project'
 import { MeController } from './controllers/MeController'
 import { LegacyController } from './controllers/LegacyController'
 import { PanelController } from './controllers/PanelController'
+import { StaticFileHandler } from './http/StaticFileHandler'
 
 export default new Builder({})
 	.addService('env', env)
@@ -41,8 +42,12 @@ export default new Builder({})
 		return new ProjectListProvider(tenant, s3)
 	})
 
-	.addService('loginController', ({ env, projectListProvider }) => {
-		return new LoginController(env.CONTEMBER_PUBLIC_DIR, projectListProvider)
+	.addService('staticFileHandler', ({ env }) => {
+		return new StaticFileHandler(env.CONTEMBER_PUBLIC_DIR)
+	})
+
+	.addService('loginController', ({ staticFileHandler, projectListProvider }) => {
+		return new LoginController(staticFileHandler, projectListProvider)
 	})
 
 	.addService('deployController', ({ tenant, s3 }) => {
@@ -65,8 +70,8 @@ export default new Builder({})
 		return new LegacyController()
 	})
 
-	.addService('panelController', ({ env }) => {
-		return new PanelController(env.CONTEMBER_PUBLIC_DIR)
+	.addService('panelController', ({ staticFileHandler }) => {
+		return new PanelController(staticFileHandler)
 	})
 
 	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController, legacyController, panelController }) => {

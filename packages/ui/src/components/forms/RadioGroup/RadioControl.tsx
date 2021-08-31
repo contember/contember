@@ -2,22 +2,21 @@ import classnames from 'classnames'
 import { memo, ReactNode, useContext, useRef } from 'react'
 import { useFocusRing, useHover, useRadio, VisuallyHidden } from 'react-aria'
 import { useClassNamePrefix } from '../../../auxiliary'
-import { toEnumStateClass, toEnumViewClass, toStateClass } from '../../../utils'
+import { ValidationState } from '../../../types'
+import { toEnumStateClass, toStateClass } from '../../../utils'
 import { RadioContext } from './RadioContext'
 import type { RadioOption } from './types'
-import { Size, ValidationState } from '../../../types'
 
 interface RadioProps {
 	children: ReactNode
 	description: ReactNode
 	name?: string
-	size?: Size
 	validationState?: ValidationState
 	value: RadioOption['value']
 }
 
 export const RadioControl = memo((props: RadioProps) => {
-	const { children, description, size, validationState, value } = props
+	const { children, description, validationState, value } = props
 
 	const prefix = useClassNamePrefix()
 	const ref = useRef<HTMLInputElement>(null)
@@ -32,7 +31,6 @@ export const RadioControl = memo((props: RadioProps) => {
 
 	const classList = classnames(
 		`${prefix}radio-option`,
-		toEnumViewClass(size),
 		toEnumStateClass(validationState),
 		toStateClass('focused', isFocusVisible),
 		toStateClass('checked', isSelected),

@@ -7,7 +7,7 @@ import { createServe } from '../utils/serve'
 const CONTEMBER_CONFIG_PLACEHOLDER = '{configuration}'
 
 export class LoginController extends BaseController {
-	private serve = createServe(this.publicDir, async (path, content, req) => {
+	private serve = createServe(this.publicDir, '/', async (path, content, req) => {
 		if (path === 'index.html') {
 			const projects = await this.projectListProvider.get(this.readAuthCookie(req))
 			const configJson = JSON.stringify({ apiBaseUrl: '/_api', loginToken: LOGIN_TOKEN_PLACEHOLDER, projects })

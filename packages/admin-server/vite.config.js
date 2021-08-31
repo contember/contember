@@ -12,9 +12,10 @@ export default defineConfig(async ({ command, mode }) => ({
 		sourcemap: true,
 		target: 'es2020',
 		rollupOptions: {
+			input: ['public/index.html', 'public/_panel/index.html'],
 			treeshake: {
 				moduleSideEffects: (id, external) => {
-					return id.endsWith('packages/admin-server/public/main.tsx')
+					return id.endsWith('packages/admin-server/public/main.tsx') || id.endsWith('packages/admin-server/public/_panel/main.tsx')
 				},
 			},
 		},

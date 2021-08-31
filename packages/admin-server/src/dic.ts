@@ -12,6 +12,7 @@ import { S3Manager } from './s3'
 import { ProjectListProvider } from './project'
 import { MeController } from './controllers/MeController'
 import { LegacyController } from './controllers/LegacyController'
+import { PanelController } from './controllers/PanelController'
 
 export default new Builder({})
 	.addService('env', env)
@@ -64,7 +65,11 @@ export default new Builder({})
 		return new LegacyController()
 	})
 
-	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController, legacyController }) => {
+	.addService('panelController', ({ env }) => {
+		return new PanelController(env.CONTEMBER_PUBLIC_DIR)
+	})
+
+	.addService('httpServer', ({ loginController, deployController, projectController, apiController, meController, legacyController, panelController }) => {
 		return http.createServer(async (req, res) => {
 			const startTime = process.hrtime()
 			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
@@ -92,6 +97,10 @@ export default new Builder({})
 					case 'p':
 					case 'projects':
 						await legacyController.handle(req, res)
+						break
+
+					case '_panel':
+						await panelController.handle(req, res)
 						break
 
 					default:

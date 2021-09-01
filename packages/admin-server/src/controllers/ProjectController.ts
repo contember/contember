@@ -44,11 +44,6 @@ export class ProjectController extends BaseController<ProjectParams> {
 	}
 
 	private async tryFiles(projectSlug: string, path: string): Promise<GetObjectCommandOutput> {
-		try {
-			return this.s3.getObject(projectSlug, path === '' ? 'index.html' : path)
-
-		} catch (e) {
-			return this.s3.getObject(projectSlug, 'index.html')
-		}
+		return await this.s3.getObject(projectSlug, path.includes('.') ? path : 'index.html')
 	}
 }

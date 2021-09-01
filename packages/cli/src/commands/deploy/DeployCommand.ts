@@ -24,6 +24,7 @@ export class DeployCommand extends Command<Args, Options> {
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Deploy Contember project')
 		configuration.argument('project')
+		configuration.option('admin')
 		configureExecuteMigrationCommand(configuration)
 	}
 

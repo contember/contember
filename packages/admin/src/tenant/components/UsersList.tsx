@@ -14,8 +14,8 @@ export interface UsersListProps<T> {
 	project: string
 	children?: undefined
 	createRoleRenderer?: RoleRendererFactory
-	createInviteUserLink: () => RoutingLinkTarget
-	createEditUserLink: (id: string) => RoutingLinkTarget
+	userInviteLink: RoutingLinkTarget
+	createUserEditLink: (id: string) => RoutingLinkTarget
 }
 
 interface Variables {
@@ -28,7 +28,7 @@ interface RoleRenderers<T> {
 
 const DefaultRoleRenderer: RoleRenderer = ({ role }) => <>{role}</>
 
-export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRenderer, createEditUserLink, createInviteUserLink }) => {
+export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRenderer, userInviteLink, createUserEditLink }) => {
 	const addToast = useShowToast()
 	const { state: query, refetch: refetchUserList } = useListUsersQuery(project)
 	const [removeMemberInner] = useRemoveProjectMembership()
@@ -81,7 +81,7 @@ export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRendere
 
 	return (
 		<div>
-			<TitleBar actions={<PageLinkButton to={createInviteUserLink()}>Add a user</PageLinkButton>}>Users in project</TitleBar>
+			<TitleBar actions={<PageLinkButton to={userInviteLink}>Add a user</PageLinkButton>}>Users in project</TitleBar>
 			<Table>
 				{query.data.project.members.map(member => {
 					if (!member.identity.person) {
@@ -106,7 +106,7 @@ export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRendere
 							<TableCell shrunk>
 								<PageLinkButton
 									size="small"
-									to={createEditUserLink(member.identity.id)}
+									to={createUserEditLink(member.identity.id)}
 								>
 									Edit roles
 								</PageLinkButton>
@@ -146,8 +146,8 @@ export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(pro
 		return <UsersList
 			project={project}
 			createRoleRenderer={roleRendererFactory}
-			createInviteUserLink={() => 'tenantInviteUser'}
-			createEditUserLink={id => ({ pageName: 'tenantEditUser', params: { id } })}
+			userInviteLink={'tenantInviteUser'}
+			createUserEditLink={id => ({ pageName: 'tenantEditUser', params: { id } })}
 		/>
 	}
 	return null

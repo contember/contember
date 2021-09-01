@@ -29,12 +29,12 @@ export const readAdminFiles = async (dir: string, prefix: string = ''): Promise<
 	const files = []
 	for (const fileName of await readdir(dir, { withFileTypes: true })) {
 		if (fileName.isDirectory()) {
-			const subFiles = await readAdminFiles(`${dir}/${fileName}`, prefix + fileName + '/')
+			const subFiles = await readAdminFiles(`${dir}/${fileName.name}`, prefix + fileName.name + '/')
 			files.push(...subFiles)
 		} else if (fileName.isFile()) {
 			files.push({
-				path: prefix + fileName,
-				data: (await readFile(`${dir}/${fileName}`)).toString('base64'),
+				path: prefix + fileName.name,
+				data: (await readFile(`${dir}/${fileName.name}`)).toString('base64'),
 			})
 		}
 	}

@@ -19,5 +19,7 @@ COPY --from=builder /src/packages/admin-server/dist/_static      ./public/_stati
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT "4000"
 ENV CONTEMBER_PUBLIC_DIR "/src/public"
+ENV CONTEMBER_S3_ENDPOINT ""
+ENV CONTEMBER_S3_PREFIX ""
 
 CMD ["node", "./run-admin.js"]

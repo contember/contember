@@ -1,6 +1,7 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
 import {
+	CreateProjectCommand,
 	createResolverContext,
 	PermissionContext,
 	ProjectSchemaResolver,
@@ -131,7 +132,11 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	await tenantContainer.projectManager.createProject({ slug: 'blog', name: 'blog', config: {}, secrets: {} }, undefined)
+	await tenantContainer.dbContext.commandBus.execute(new CreateProjectCommand({
+		slug: 'blog',
+		name: 'blog',
+		config: {},
+	}, now))
 
 	const schema = makeExecutableSchema({
 		typeDefs: typeDefs,

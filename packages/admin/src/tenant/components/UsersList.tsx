@@ -1,22 +1,21 @@
 import { getTenantErrorMessage } from '@contember/client'
-import { useProjectSlug } from '@contember/react-client'
+import { useCurrentContentGraphQlClient, useProjectSlug } from '@contember/react-client'
 import { Button, ContainerSpinner, Table, TableCell, TableRow, Tag, TitleBar } from '@contember/ui'
-import { ComponentType, FC, Fragment, memo, useCallback } from 'react'
-import { PageLinkButton } from '../../components/pageRouting'
-import {
-	Membership,
-	useAuthedContentQuery,
-	useListUsersQuery,
-	useRemoveProjectMembership,
-	useUpdateCurrentProjectMembership,
-} from '../hooks'
-import { useShowToast } from '../../components'
+import { ComponentType, FC, Fragment, memo, useCallback, useEffect, useState } from 'react'
+import { PageLinkButton, useShowToast } from '../../components'
+import { useListUsersQuery, useRemoveProjectMembership } from '../hooks'
+import { RoutingLinkTarget } from '../../routing'
+
+type RoleDefinition = any // todo
+type RoleRenderer = React.FC<{ role: string, variables: Variables }>
+type RoleRendererFactory = (roleDefinitions: RoleDefinition[]) => Promise<RoleRenderer>;
 
 export interface UsersListProps<T> {
 	project: string
 	children?: undefined
-	rolesDataQuery: string
-	roleRenderers: RoleRenderers<T>
+	createRoleRenderer?: RoleRendererFactory
+	createInviteUserLink: () => RoutingLinkTarget
+	createEditUserLink: (id: string) => RoutingLinkTarget
 }
 
 interface Variables {
@@ -27,39 +26,12 @@ interface RoleRenderers<T> {
 	[role: string]: ComponentType<{ variables: Variables; rolesData: T }>
 }
 
-export const UsersList = memo<UsersListProps<any>>(({ project, roleRenderers, rolesDataQuery }) => {
+const DefaultRoleRenderer: RoleRenderer = ({ role }) => <>{role}</>
+
+export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRenderer, createEditUserLink, createInviteUserLink }) => {
 	const addToast = useShowToast()
 	const { state: query, refetch: refetchUserList } = useListUsersQuery(project)
-	const { state: rolesData } = useAuthedContentQuery<any, {}>(rolesDataQuery, {})
-	const [updateMembership, updateMembershipState] = useUpdateCurrentProjectMembership()
-	const removeMembership = useCallback(
-		async (identityId: string, memberships: Membership[], membershipToRemove: Membership) => {
-			const confirmed = confirm(`Do you want to remove user's role in project?`)
-			if (!confirmed) {
-				return
-			}
-			const result = await updateMembership(
-				identityId,
-				memberships.filter(membership => membership !== membershipToRemove),
-			)
-			if (result.updateProjectMember.ok) {
-				addToast({
-					message: `Membership updated`,
-					type: 'success',
-				})
-			} else {
-				addToast({
-					message: `Error updating membership: ${result.updateProjectMember.errors
-						.map(it => getTenantErrorMessage(it.code))
-						.join(', ')}`,
-					type: 'error',
-				})
-			}
-			await refetchUserList()
-		},
-		[addToast, refetchUserList, updateMembership],
-	)
-	const [removeMemberInner, removeMemberState] = useRemoveProjectMembership()
+	const [removeMemberInner] = useRemoveProjectMembership()
 	const removeMember = useCallback(
 		async (id: string) => {
 			const confirmed = confirm('Do you want to remove user from project?')
@@ -84,18 +56,32 @@ export const UsersList = memo<UsersListProps<any>>(({ project, roleRenderers, ro
 		},
 		[addToast, project, refetchUserList, removeMemberInner],
 	)
+	const [RoleRenderer, setRoleRenderer] = useState<RoleRenderer>()
+	useEffect(() => {
+		if (!createRoleRenderer) {
+			setRoleRenderer(() => DefaultRoleRenderer)
+			return
+		}
+		if (!query.finished || query.error) {
+			return
+		}
+		(async () => {
+			const renderer = await createRoleRenderer(query.data.project.roles)
+			setRoleRenderer(() => renderer)
+		})()
+	}, [createRoleRenderer, query])
 
-	if (query.error || updateMembershipState.error || removeMemberState.error) {
+	if (query.error) {
 		return <>Error loading data</>
 	}
 
-	if (query.loading || rolesData.loading || updateMembershipState.loading || removeMemberState.loading) {
+	if (query.loading || !RoleRenderer) {
 		return <ContainerSpinner />
 	}
 
 	return (
 		<div>
-			<TitleBar actions={<PageLinkButton to="tenantInviteUser">Add a user</PageLinkButton>}>Users in project</TitleBar>
+			<TitleBar actions={<PageLinkButton to={createInviteUserLink()}>Add a user</PageLinkButton>}>Users in project</TitleBar>
 			<Table>
 				{query.data.project.members.map(member => {
 					if (!member.identity.person) {
@@ -106,26 +92,13 @@ export const UsersList = memo<UsersListProps<any>>(({ project, roleRenderers, ro
 							<TableCell>{member.identity.person ? member.identity.person.email : '?'}</TableCell>
 							<TableCell>
 								{member.memberships.map((membership, i) => {
-									const Renderer =
-										membership.role in roleRenderers
-											? roleRenderers[membership.role]
-											: () => <>Unknown role "{membership.role}"</>
 									const vars: Variables = {}
 									for (let variable of membership.variables) {
 										vars[variable.name] = variable.values
 									}
 									return (
-										<Tag
-											key={membership.role}
-											//onRemove={() => {
-											//	removeMembership(member.identity.id, member.memberships, membership)
-											//}}
-										>
-											{rolesData.error ? (
-												'Error loading data'
-											) : (
-												<Renderer variables={vars} rolesData={rolesData.data} />
-											)}
+										<Tag key={membership.role}>
+											<RoleRenderer variables={vars} role={membership.role} />
 										</Tag>
 									)
 								})}
@@ -133,7 +106,7 @@ export const UsersList = memo<UsersListProps<any>>(({ project, roleRenderers, ro
 							<TableCell shrunk>
 								<PageLinkButton
 									size="small"
-									to={() => ({ name: 'tenantEditUser', params: { id: member.identity.id } })}
+									to={createEditUserLink(member.identity.id)}
 								>
 									Edit roles
 								</PageLinkButton>
@@ -151,12 +124,31 @@ export const UsersList = memo<UsersListProps<any>>(({ project, roleRenderers, ro
 	)
 })
 
-type UsersManagementProps<T> = Omit<UsersListProps<T>, 'project'>
+interface UsersManagementProps<T> {
+	rolesDataQuery: string
+	roleRenderers: RoleRenderers<T>
+}
 
 export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(props: UsersManagementProps<T>) => {
 	const project = useProjectSlug()
+	const contentClient = useCurrentContentGraphQlClient()
+	const roleRendererFactory: RoleRendererFactory = useCallback(async () => {
+		const rolesData = await contentClient.sendRequest(props.rolesDataQuery)
+		return ({ role, variables }) => {
+			const Renderer = props.roleRenderers[role]
+			if (!Renderer) {
+				return <>Unknown role {role}</>
+			}
+			return <Renderer rolesData={rolesData} variables={variables}/>
+		}
+	}, [contentClient, props.roleRenderers, props.rolesDataQuery])
 	if (project) {
-		return <UsersList project={project} {...props} />
+		return <UsersList
+			project={project}
+			createRoleRenderer={roleRendererFactory}
+			createInviteUserLink={() => 'tenantInviteUser'}
+			createEditUserLink={id => ({ pageName: 'tenantEditUser', params: { id } })}
+		/>
 	}
 	return null
 }

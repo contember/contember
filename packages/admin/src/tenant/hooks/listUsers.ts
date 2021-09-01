@@ -1,11 +1,14 @@
 import { useAuthedTenantQuery } from './lib'
+import { PROJECT_ROLES_FRAGMENT, RoleDefinition } from './roles'
 
 const LIST_USERS_QUERY = `
+	${PROJECT_ROLES_FRAGMENT}
 	query($slug: String!) {
 		project: projectBySlug(slug: $slug) {
 			id
 			name
 			slug
+			... ProjectRoles
 			members(memberType: PERSON) {
 				identity {
 					id
@@ -39,6 +42,7 @@ interface ListUserQueryResult {
 		id: string
 		name: string
 		slug: string
+		roles: RoleDefinition[]
 		members: {
 			identity: {
 				id: string

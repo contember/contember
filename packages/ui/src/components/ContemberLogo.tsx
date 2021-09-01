@@ -21,7 +21,7 @@ export const ContemberLogo = ({ logotype, size }: ContemberLogoProps) => {
 
 	switch (typeof size) {
 		case 'number':
-			fontSize = `${size}em`
+			fontSize = `${size >= 0 ? size : 1}em`
 			break
 		case 'string':
 			fontSize = `${logoSizes[size]}em`

@@ -1,18 +1,22 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
-import { Aether, Button } from '../../src'
+import { Button } from '../../src'
 
 export default {
 	title: 'Button',
 	component: Button,
 	decorators: [
-		Story => (
-			<Aether style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '1em', padding: '2em' }}>
-        <p style={{ flex: '100% 1 1' }}>This is a text with normal weight that is not clickable. And here's some <a href="#">link</a> that is clickable. Buttons should have enough clickable visual affordance event when seamless.</p>
-				<Story />
-			</Aether>
-		),
+		Story => <>
+      <p style={{ flex: '100% 1 1' }}>This is a text with normal weight that is not clickable. And here's some <a href="#">link</a> that is clickable. Buttons should have enough clickable visual affordance event when seamless.</p>
+      <Story />
+		</>,
 	],
+  argTypes: {
+    disabled: { defaultValue: false },
+    bland: { defaultValue: false },
+    isActive: { defaultValue: false },
+    isLoading: { defaultValue: false },
+  },
 } as ComponentMeta<typeof Button>
 
 const Template: ComponentStory<typeof Button> = args => <>

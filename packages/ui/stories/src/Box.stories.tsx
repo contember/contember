@@ -1,18 +1,11 @@
 import type { ComponentMeta, ComponentStory } from '@storybook/react'
 import * as React from 'react'
+import { Box } from '../../src'
 
-import { Aether, Box } from '../../src'
 
 export default {
 	title: 'Box',
 	component: Box,
-	decorators: [
-		Story => (
-			<Aether style={{ padding: '2em' }}>
-				<Story />
-			</Aether>
-		),
-	],
 } as ComponentMeta<typeof Box>
 
 const Template: ComponentStory<typeof Box> = args => <Box {...args} />

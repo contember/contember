@@ -56,7 +56,8 @@ export class ProjectManager {
 			} catch (e) {
 				// eslint-disable-next-line no-console
 				console.error(e)
-				return new ResponseError(CreateProjectResponseErrorCode.AlreadyExists, `Project initialization error: ${'message' in e ? e.message : 'unknown'}`)
+				await db.client.connection.rollback()
+				return new ResponseError(CreateProjectResponseErrorCode.InitError, `Project initialization error: ${'message' in e ? e.message : 'unknown'}`)
 			}
 
 			return new ResponseOk(new CreateProjectResult(deployResult.result))

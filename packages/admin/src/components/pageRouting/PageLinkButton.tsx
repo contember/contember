@@ -6,7 +6,7 @@ import type { PageLinkProps } from './PageLink'
 export type PageLinkButtonProps = PageLinkProps & AnchorButtonProps
 
 // TODO forward ref
-export const PageLinkButton = memo<PageLinkButtonProps>(({ to, children, ...buttonProps }) => {
+export const PageLinkButton = memo<PageLinkButtonProps>(({ to, ...buttonProps }) => {
 	return (
 		<PageLink
 			{...buttonProps}

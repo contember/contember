@@ -1,5 +1,16 @@
 import * as ReactDOM from 'react-dom'
-import { ApplicationEntrypoint, CreateProjectForm, GenericPage, Layout, Menu, Pages } from '@contember/admin'
+import {
+	ApplicationEntrypoint,
+	CreateProjectForm,
+	GenericPage,
+	Layout,
+	LayoutInner,
+	Menu,
+	Page,
+	Pages,
+	ProjectOverview,
+	ProjectsGrid,
+} from '@contember/admin'
 import './index.sass'
 import { FC } from 'react'
 
@@ -17,6 +28,11 @@ const PanelLayout: FC = props => {
 	)
 }
 
+const ProjectOverviewPage = (props: {project: string}) => {
+	return <LayoutInner>
+		<ProjectOverview project={props.project} />
+	</LayoutInner>
+}
 
 window.addEventListener('DOMContentLoaded', () => {
 	const el = document.getElementById('contember-config')
@@ -30,12 +46,18 @@ window.addEventListener('DOMContentLoaded', () => {
 			routes={{
 				dashboard: { path: '/' },
 				projectCreate: { path: '/project/create' },
+				projectOverview: { path: '/project/:project' },
 			}}
 			children={<Pages layout={PanelLayout} children={[
-				<GenericPage pageName={'dashboard'}>Dashboard</GenericPage>,
+				<GenericPage pageName={'dashboard'}>
+					<ProjectsGrid/>
+				</GenericPage>,
 				<GenericPage pageName={'projectCreate'}>
 					<CreateProjectForm />
 				</GenericPage>,
+				<Page name="projectOverview">
+					{ProjectOverviewPage}
+				</Page>,
 			]} />}
 		/>,
 		document.getElementById('root'),

@@ -1,6 +1,6 @@
 {
   "name": "@contember/database-migrations",
-  "version": "0.12.0-alpha.5",
+  "version": "0.12.0-alpha.6",
   "scripts": {
     "test": "echo 'No tests'"
   },
@@ -8,7 +8,7 @@
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
   "dependencies": {
-    "@contember/database": "^0.12.0-alpha.5",
+    "@contember/database": "^0.12.0-alpha.6",
     "node-pg-migrate": "^5.9.0"
   },
   "devDependencies": {

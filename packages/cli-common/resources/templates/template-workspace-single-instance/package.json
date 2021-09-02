@@ -1,12 +1,12 @@
 {
   "name": "@contember/template-workspace-single-instance",
-  "version": "0.12.0-alpha.7",
+  "version": "0.12.0-alpha.8",
   "license": "Apache-2.0",
   "scripts": {
     "test": "echo 'No tests'"
   },
   "dependencies": {
-    "@contember/schema": "^0.12.0-alpha.7",
-    "@contember/schema-definition": "^0.12.0-alpha.7"
+    "@contember/schema": "^0.12.0-alpha.8",
+    "@contember/schema-definition": "^0.12.0-alpha.8"
   }
 }

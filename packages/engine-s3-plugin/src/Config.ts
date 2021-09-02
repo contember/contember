@@ -42,9 +42,10 @@ export const resolveS3Endpoint = (
 	basePath: string
 	baseUrl: string
 } => {
-	const endpoint = config.endpoint || `https://${config.bucket}.s3.${config.region || defaultRegion}.amazonaws.com`
-	const hasCustomEndpoint = !!config.endpoint
-	const basePath = hasCustomEndpoint ? `/${config.bucket}` : ''
+	const hasLegacyPath = !!config.endpoint || config.bucket.includes('.')
+	const endpoint = config.endpoint || `https://${hasLegacyPath ? '' : `${config.bucket}.`}s3.${config.region || defaultRegion}.amazonaws.com`
+	const basePath = hasLegacyPath ? `/${config.bucket}` : ''
+
 	const baseUrl = endpoint + basePath
 	return { endpoint, basePath, baseUrl }
 }

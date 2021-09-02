@@ -2,6 +2,7 @@ FROM node:14-alpine as builder
 
 WORKDIR /src
 COPY ./ ./
+RUN apk add --no-cache bash
 RUN /src/packages/cli/build.sh
 
 FROM node:14-alpine

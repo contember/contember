@@ -12,15 +12,14 @@ namespace Where {
 		constructor(public readonly values: (Literal | ValueWhere)[]) {}
 
 		public withWhere(expression: Expression): Statement {
-			if (typeof expression !== 'function') {
-				return new Statement([...this.values, expression])
+			if (typeof expression === 'function') {
+				return this.withWhere(ConditionBuilder.invoke(expression))
 			}
-			const builder = ConditionBuilder.invoke(expression)
-			const sql = builder.getSql()
-			if (!sql) {
-				return this
+			if (expression instanceof ConditionBuilder) {
+				const sql = expression.getSql()
+				return sql ? this.withWhere(sql) : this
 			}
-			return new Statement([...this.values, sql])
+			return new Statement([...this.values, expression])
 		}
 
 		public compile(): Literal {
@@ -50,7 +49,7 @@ namespace Where {
 	}
 
 	export type ValueWhere = { [columnName: string]: Value }
-	export type Expression = ValueWhere | ConditionCallback | Literal
+	export type Expression = ValueWhere | ConditionCallback | ConditionBuilder | Literal
 }
 
 export { Where }

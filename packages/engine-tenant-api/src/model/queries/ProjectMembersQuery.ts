@@ -1,7 +1,11 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
+import { Member_Type } from '../../schema'
 
 class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQuery.Result> {
-	constructor(private readonly projectId: string) {
+	constructor(
+		private readonly projectId: string,
+		private readonly memberType?: Member_Type,
+	) {
 		super()
 	}
 

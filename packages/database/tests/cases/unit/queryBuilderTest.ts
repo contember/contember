@@ -48,7 +48,7 @@ test('query builder: constructs condition', async () => {
 							'm',
 							wrapper.selectBuilder().select(expr => expr.selectValue(1)),
 						)
-						.null('n')
+						.isNull('n')
 						.raw('false'),
 				)
 
@@ -82,8 +82,8 @@ test('query builder: construct "on"', async () => {
 						.and(clause =>
 							clause
 								.in(['bar', 'c'], [1, 2, 3])
-								.null(['bar', 'd'])
-								.not(clause => clause.null(['bar', 'd']))
+								.isNull(['bar', 'd'])
+								.not(clause => clause.isNull(['bar', 'd']))
 								.compareColumns(['bar', 'e'], Operator.lte, ['bar', 'f']),
 						),
 				)

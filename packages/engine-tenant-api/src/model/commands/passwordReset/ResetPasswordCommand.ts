@@ -41,7 +41,7 @@ export class ResetPasswordCommand implements Command<ResetPasswordCommandRespons
 		const count = await UpdateBuilder.create()
 			.table('person_password_reset')
 			.where({ id: result.id })
-			.where(expr => expr.null('used_at'))
+			.where(expr => expr.isNull('used_at'))
 			.values({
 				used_at: now,
 			})

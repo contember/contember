@@ -1,10 +1,10 @@
-FROM node:14 as builder
+FROM node:14-alpine as builder
 
 WORKDIR /src
 COPY ./ ./
 RUN /src/packages/cli/build.sh
 
-FROM node:14
+FROM node:14-alpine
 
 WORKDIR /src
 ENV NODE_ENV "production"

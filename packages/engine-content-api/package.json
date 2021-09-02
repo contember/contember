@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-content-api",
-  "version": "0.12.0-alpha.8",
+  "version": "0.12.0-alpha.9",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -9,19 +9,19 @@
     "test": "uvu dist/tests/cases/ \\.js$"
   },
   "dependencies": {
-    "@contember/database": "^0.12.0-alpha.8",
-    "@contember/dic": "^0.12.0-alpha.8",
-    "@contember/engine-common": "^0.12.0-alpha.8",
-    "@contember/graphql-utils": "^0.12.0-alpha.8",
-    "@contember/schema": "^0.12.0-alpha.8",
-    "@contember/schema-utils": "^0.12.0-alpha.8",
+    "@contember/database": "^0.12.0-alpha.9",
+    "@contember/dic": "^0.12.0-alpha.9",
+    "@contember/engine-common": "^0.12.0-alpha.9",
+    "@contember/graphql-utils": "^0.12.0-alpha.9",
+    "@contember/schema": "^0.12.0-alpha.9",
+    "@contember/schema-utils": "^0.12.0-alpha.9",
     "@graphql-tools/schema": "^7.1.5",
     "graphql-tag": "^2.12.5"
   },
   "devDependencies": {
-    "@contember/database-tester": "^0.12.0-alpha.8",
-    "@contember/engine-api-tester": "^0.12.0-alpha.8",
-    "@contember/schema-definition": "^0.12.0-alpha.8",
+    "@contember/database-tester": "^0.12.0-alpha.9",
+    "@contember/engine-api-tester": "^0.12.0-alpha.9",
+    "@contember/schema-definition": "^0.12.0-alpha.9",
     "@graphql-codegen/cli": "^1.15.2",
     "@graphql-codegen/typescript": "^1.15.2",
     "@graphql-codegen/typescript-operations": "^1.15.2",

@@ -4,6 +4,7 @@ import { QueryBuilder } from './QueryBuilder'
 import { SelectBuilder } from './SelectBuilder'
 import { toFqnWrap } from './formatUtils'
 import { Compiler } from './Compiler'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
 export type ConditionCallback = (builder: ConditionBuilder) => ConditionBuilder
 
@@ -94,6 +95,17 @@ export class ConditionBuilder {
 			return this.with(new Literal(`${toFqnWrap(columnName)} in (${parameters})`, values))
 		}
 		return this.raw('false')
+	}
+
+	exists(subQuery: SubQueryExpression<SelectBuilder>): ConditionBuilder {
+		const context = new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set())
+		const query = createSubQueryLiteralFactory<SelectBuilder>(subQuery)(context, subQuery => {
+			if (subQuery.options.select.length === 0) {
+				return subQuery.select(expr => expr.selectValue(1))
+			}
+			return subQuery
+		})
+		return this.with(new Literal(`exists (${query.sql})`, query.parameters))
 	}
 
 	isNull(columnName: QueryBuilder.ColumnIdentifier): ConditionBuilder {

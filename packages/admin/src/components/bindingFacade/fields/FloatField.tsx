@@ -15,7 +15,7 @@ export const FloatField = SimpleRelativeSingleField<FloatFieldProps, number>(
 			parse: val => {
 				const normalizedValue = (val || '0')
 					.replaceAll(',', '.')
-					.replace(/([^0-9.]|(?<=\.\d*)\.)/g, '')
+					.replace(/([^0-9.]|\.(?=\d*\.))/g, '')
 					.replace(/^0*(?=\d)/, '')
 				setInnerValue(normalizedValue)
 				return parseFloat(normalizedValue)

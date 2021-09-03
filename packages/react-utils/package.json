@@ -2,12 +2,12 @@
 	"name": "@contember/react-utils",
 	"version": "0.6.53",
 	"type": "module",
-	"main": "./dist/react-utils.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/react-utils.development.js",
-				"production": "./dist/react-utils.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

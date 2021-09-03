@@ -1,12 +1,12 @@
 {
 	"name": "@contember/client",
 	"version": "0.6.53",
-	"main": "./dist/client.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/client.development.js",
-				"production": "./dist/client.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

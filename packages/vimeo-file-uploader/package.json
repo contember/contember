@@ -1,12 +1,12 @@
 {
 	"name": "@contember/vimeo-file-uploader",
 	"version": "0.6.53",
-	"main": "./dist/vimeo-file-uploader.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/vimeo-file-uploader.development.js",
-				"production": "./dist/vimeo-file-uploader.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

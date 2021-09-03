@@ -2,12 +2,12 @@
 	"name": "@contember/admin",
 	"version": "0.6.53",
 	"type": "module",
-	"main": "./dist/admin.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/admin.development.js",
-				"production": "./dist/admin.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

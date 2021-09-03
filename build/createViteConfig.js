@@ -22,20 +22,26 @@ export function createViteConfig(packageName) {
 					formats: ['es'],
 				},
 				minify: false,
-				outDir: resolve(rootDirectory, `${packageDir}/dist`),
+				outDir: resolve(rootDirectory, `${packageDir}/dist/${mode}`),
 				rollupOptions: {
 					external: (id, importer, resolved) => {
 						return !resolved && !id.startsWith('./') && !id.startsWith('../') && id !== '.'
 					},
 					output: {
-						entryFileNames: `${packageName}.${mode}.js`,
+						preserveModules: true,
+						entryFileNames: '[name].js',
+					},
+					treeshake: {
+						moduleSideEffects: false,
 					},
 				},
-				sourcemap: isDevMode ? 'inline' : false,
+				sourcemap: true,
 				target: isDevMode ? 'esnext' : 'es2020',
 			},
 			esbuild: {
-				jsxInject: `import * as React from 'react'`,
+				jsxFactory: '_jsx',
+				jsxFragment: '_jsxFragment',
+				jsxInject: `import { createElement as _jsx, Fragment as _jsxFragment } from 'react'`,
 			},
 			plugins: [reactRefresh()],
 			resolve: {

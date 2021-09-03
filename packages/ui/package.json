@@ -2,12 +2,12 @@
 	"name": "@contember/ui",
 	"version": "0.6.53",
 	"type": "module",
-	"main": "./dist/ui.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/ui.development.js",
-				"production": "./dist/ui.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

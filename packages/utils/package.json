@@ -1,12 +1,12 @@
 {
 	"name": "@contember/utils",
 	"version": "0.6.53",
-	"main": "./dist/utils.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/utils.development.js",
-				"production": "./dist/utils.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

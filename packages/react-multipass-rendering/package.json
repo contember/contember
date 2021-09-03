@@ -2,12 +2,12 @@
 	"name": "@contember/react-multipass-rendering",
 	"version": "0.6.53",
 	"type": "module",
-	"main": "./dist/react-multipass-rendering.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/react-multipass-rendering.development.js",
-				"production": "./dist/react-multipass-rendering.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

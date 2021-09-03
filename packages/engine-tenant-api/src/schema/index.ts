@@ -330,11 +330,6 @@ export type InviteResult = {
 }
 
 
-export enum Member_Type {
-	ApiKey = 'API_KEY',
-	Person = 'PERSON'
-}
-
 export type MailTemplate = {
 	readonly projectSlug: Scalars['String']
 	readonly type: MailType
@@ -355,6 +350,11 @@ export enum MailType {
 	ExistingUserInvited = 'EXISTING_USER_INVITED',
 	NewUserInvited = 'NEW_USER_INVITED',
 	ResetPasswordRequest = 'RESET_PASSWORD_REQUEST'
+}
+
+export enum MemberType {
+	ApiKey = 'API_KEY',
+	Person = 'PERSON'
 }
 
 export type Membership = {
@@ -582,7 +582,7 @@ export type Project = {
 
 
 export type ProjectMembersArgs = {
-	memberType?: Maybe<Member_Type>
+	memberType?: Maybe<MemberType>
 }
 
 export type ProjectIdentityRelation = {
@@ -981,10 +981,10 @@ export type ResolversTypes = {
 	InviteResponse: ResolverTypeWrapper<InviteResponse>
 	InviteResult: ResolverTypeWrapper<InviteResult>
 	Json: ResolverTypeWrapper<Scalars['Json']>
-	MEMBER_TYPE: Member_Type
 	MailTemplate: MailTemplate
 	MailTemplateIdentifier: MailTemplateIdentifier
 	MailType: MailType
+	MemberType: MemberType
 	Membership: ResolverTypeWrapper<Membership>
 	MembershipInput: MembershipInput
 	MembershipValidationError: ResolverTypeWrapper<MembershipValidationError>

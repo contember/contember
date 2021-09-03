@@ -424,10 +424,10 @@ const schema: DocumentNode = gql`
 		slug: String!
 		config: Json!
 		roles: [RoleDefinition!]!
-		members(memberType: MEMBER_TYPE): [ProjectIdentityRelation!]!
+		members(memberType: MemberType): [ProjectIdentityRelation!]!
 	}
 
-	enum MEMBER_TYPE {
+	enum MemberType {
 		API_KEY
 		PERSON
 	}

@@ -406,6 +406,7 @@ const schema: DocumentNode = gql`
 
 	type Identity {
 		id: String!
+		description: String
 		person: Person
 		apiKey: ApiKey
 		projects: [IdentityProjectRelation!]!

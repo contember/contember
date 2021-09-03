@@ -1,7 +1,7 @@
 import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { MemberType } from '../../schema'
 
-class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQuery.Result> {
+export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult> {
 	constructor(
 		private readonly projectId: string,
 		private readonly memberType?: MemberType,
@@ -9,9 +9,10 @@ class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQuery.Result> {
 		super()
 	}
 
-	async fetch({ db }: DatabaseQueryable): Promise<ProjectMembersQuery.Result> {
-		return await SelectBuilder.create<{ id: string }>()
+	async fetch({ db }: DatabaseQueryable): Promise<ProjectMembersQueryResult> {
+		return await SelectBuilder.create<{ id: string; description: string }>()
 			.select('id')
+			.select('description')
 			.from('identity')
 			.where(it => it.exists(
 				builder => builder
@@ -36,8 +37,9 @@ class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQuery.Result> {
 	}
 }
 
-namespace ProjectMembersQuery {
-	export type Result = { id: string }[]
+export interface ProjectMembersQueryRow {
+	id: string
+	description: string
 }
 
-export { ProjectMembersQuery }
+export type ProjectMembersQueryResult = ProjectMembersQueryRow[]

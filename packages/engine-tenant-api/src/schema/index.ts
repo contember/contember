@@ -254,6 +254,7 @@ export type IdpResponseInput = {
 export type Identity = {
 	readonly __typename?: 'Identity'
 	readonly id: Scalars['String']
+	readonly description?: Maybe<Scalars['String']>
 	readonly person?: Maybe<Person>
 	readonly apiKey?: Maybe<ApiKey>
 	readonly projects: ReadonlyArray<IdentityProjectRelation>
@@ -1273,6 +1274,7 @@ export type DisableOtpResponseResolvers<ContextType = any, ParentType extends Re
 
 export type IdentityResolvers<ContextType = any, ParentType extends ResolversParentTypes['Identity'] = ResolversParentTypes['Identity']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>
 	apiKey?: Resolver<Maybe<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['IdentityProjectRelation']>, ParentType, ContextType>

@@ -24,7 +24,7 @@ export class ApiKeyService {
 			throw new ImplementationException()
 		}
 
-		return new ResponseOk(new CreateApiKeyResult(identityId, apiKeyResult))
+		return new ResponseOk(new CreateApiKeyResult({ id: identityId, description }, apiKeyResult))
 	}
 }
 
@@ -32,7 +32,7 @@ export class ApiKeyService {
 export type CreateApiKeyResponse = Response<CreateApiKeyResult, never>
 
 export class CreateApiKeyResult {
-	constructor(public readonly identityId: string, public readonly apiKey: { id: string; token: string }) {
+	constructor(public readonly identity: {id: string; description?: string}, public readonly apiKey: { id: string; token: string }) {
 	}
 
 	toApiKeyWithToken(): ApiKeyWithToken {
@@ -40,7 +40,7 @@ export class CreateApiKeyResult {
 			id: this.apiKey.id,
 			token: this.apiKey.token,
 			identity: {
-				id: this.identityId,
+				...this.identity,
 				projects: [],
 			},
 		}

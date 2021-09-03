@@ -1,7 +1,6 @@
 import { Identity, IdentityProjectRelation, IdentityResolvers, Maybe, Person } from '../../schema'
-import { DatabaseContext, PersonRow, ProjectManager } from '../../model'
+import { DatabaseContext, PersonRow, ProjectManager, ProjectMemberManager } from '../../model'
 import { ResolverContext } from '../ResolverContext'
-import { ProjectMemberManager } from '../../model/service'
 import { notEmpty } from '../../utils/array'
 import { createBatchLoader } from '../../utils/batchQuery'
 import { PersonByIdentityBatchQuery } from '../../model/queries/person/PersonByIdentityBatchQuery'

@@ -39,7 +39,9 @@ export function createViteConfig(packageName) {
 				target: isDevMode ? 'esnext' : 'es2020',
 			},
 			esbuild: {
-				jsxInject: `import * as React from 'react'`,
+				jsxFactory: '_jsx',
+				jsxFragment: '_jsxFragment',
+				jsxInject: `import { createElement as _jsx, Fragment as _jsxFragment } from 'react'`,
 			},
 			plugins: [reactRefresh()],
 			resolve: {

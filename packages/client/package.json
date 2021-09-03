@@ -15,6 +15,7 @@
 	],
 	"typings": "./dist/client.d.ts",
 	"type": "module",
+	"sideEffects": false,
 	"scripts": {
 		"build": "vite build --mode development && vite build --mode production",
 		"build:api:dev": "api-extractor run --local",

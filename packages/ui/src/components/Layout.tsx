@@ -63,7 +63,7 @@ export const Layout = ({
 	return (
 		<div className={cn(`${prefix}layout`, toViewClass('collapsed', collapsed))}>
 			<div className={`${prefix}layout-top`}>
-				<div className={`${prefix}layout-topBar`}>
+				{(topStart || topCenter || topEnd || top) && <div className={`${prefix}layout-topBar`}>
 					{top}
 					{(topStart || topCenter || topEnd) && (
 						<>
@@ -72,7 +72,7 @@ export const Layout = ({
 							<div className={`${prefix}layout-topBar-end`}>{spaced(topEnd)}</div>
 						</>
 					)}
-				</div>
+				</div>}
 				{(actions || actionsStart || actionsCenter || actionsEnd) && (
 					<div className={`${prefix}layout-actionBar`}>
 						<div className={`${prefix}layout-actionBar-sideBar`}></div>

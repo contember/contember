@@ -7,6 +7,7 @@ import { Compiler } from './Compiler'
 import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
 export type ConditionCallback = (builder: ConditionBuilder) => ConditionBuilder
+export type ConditionExpression = ConditionBuilder | ConditionCallback
 
 interface Raw {
 	sql: string
@@ -45,20 +46,24 @@ export class ConditionBuilder {
 		return new ConditionBuilder([])
 	}
 
-	public static invoke(cb: ConditionCallback): ConditionBuilder {
-		return cb(ConditionBuilder.create())
+	public static process(condition: ConditionExpression): ConditionBuilder {
+		return typeof condition === 'function' ? condition(ConditionBuilder.create()) : condition
 	}
 
-	and(callback: ConditionCallback): ConditionBuilder {
-		return this.invokeCallback(callback, ['and', false])
+	public static not(condition: ConditionExpression): ConditionBuilder {
+		return ConditionBuilder.create().not(condition)
 	}
 
-	or(callback: ConditionCallback): ConditionBuilder {
-		return this.invokeCallback(callback, ['or', false])
+	and(condition: ConditionExpression): ConditionBuilder {
+		return this.processConditionExpression(ConditionBuilder.process(condition), ['and', false])
 	}
 
-	not(callback: ConditionCallback): ConditionBuilder {
-		return this.invokeCallback(callback, ['and', true])
+	or(condition: ConditionExpression): ConditionBuilder {
+		return this.processConditionExpression(ConditionBuilder.process(condition), ['or', false])
+	}
+
+	not(condition: ConditionExpression): ConditionBuilder {
+		return this.processConditionExpression(ConditionBuilder.process(condition), ['and', true])
 	}
 
 	compare(columnName: QueryBuilder.ColumnIdentifier, operator: Operator, value: Value): ConditionBuilder {
@@ -131,8 +136,7 @@ export class ConditionBuilder {
 		return this.expressions.length === 0
 	}
 
-	private invokeCallback(callback: ConditionCallback, parameters: ['and' | 'or', boolean]): ConditionBuilder {
-		const builder = callback(ConditionBuilder.create())
+	private processConditionExpression(builder: ConditionBuilder, parameters: ['and' | 'or', boolean]): ConditionBuilder {
 		const sql = ConditionBuilder.createLiteral(builder.expressions, ...parameters)
 		if (sql) {
 			return new ConditionBuilder([...this.expressions, sql])

@@ -12,11 +12,8 @@ namespace Where {
 		constructor(public readonly values: (Literal | ValueWhere)[]) {}
 
 		public withWhere(expression: Expression): Statement {
-			if (typeof expression === 'function') {
-				return this.withWhere(ConditionBuilder.invoke(expression))
-			}
-			if (expression instanceof ConditionBuilder) {
-				const sql = expression.getSql()
+			if (typeof expression === 'function' || expression instanceof ConditionBuilder) {
+				const sql = ConditionBuilder.process(expression).getSql()
 				return sql ? this.withWhere(sql) : this
 			}
 			return new Statement([...this.values, expression])

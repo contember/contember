@@ -5,7 +5,7 @@ import { Compiler } from './Compiler'
 import { QueryBuilder } from './QueryBuilder'
 import { Client, Connection } from '../client'
 import { Literal } from '../Literal'
-import { ConditionBuilder, ConditionCallback } from './ConditionBuilder'
+import { ConditionBuilder, ConditionCallback, ConditionExpression } from './ConditionBuilder'
 import { LockType } from './LockType'
 import { columnExpressionToLiteral, toFqnWrap } from './utils'
 import { createSubQueryLiteralFactory, SubQueryExpression, SubQueryLiteralFactory } from './internal/Subqueries'
@@ -113,7 +113,7 @@ class SelectBuilder<Result = SelectBuilder.Result> implements With.Aware, Where.
 		if (joinCondition === undefined) {
 			return undefined
 		}
-		const builder = ConditionBuilder.invoke(joinCondition)
+		const builder = ConditionBuilder.process(joinCondition)
 
 		return builder.getSql() || undefined
 	}
@@ -202,7 +202,7 @@ namespace SelectBuilder {
 		}
 	>
 
-	export type JoinCondition = ConditionCallback
+	export type JoinCondition = ConditionExpression
 }
 
 export { SelectBuilder }

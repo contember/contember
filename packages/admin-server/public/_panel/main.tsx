@@ -53,7 +53,10 @@ window.addEventListener('DOMContentLoaded', () => {
 					<ProjectsGrid/>
 				</GenericPage>,
 				<GenericPage pageName={'projectCreate'}>
-					<CreateProjectForm />
+					<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
+						New project
+					</TitleBar>
+					<CreateProjectForm projectListLink={'projectList'} />
 				</GenericPage>,
 				<Page name="projectOverview">
 					{ProjectOverviewPage}

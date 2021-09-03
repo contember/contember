@@ -2,7 +2,8 @@ import { FC, SyntheticEvent, useState } from 'react'
 import { Box, Button, FormGroup, TextInput } from '@contember/ui'
 import { useForm } from './useForm'
 import { useCreateProject } from '../hooks'
-import { useShowToast } from '../../components'
+import { useRedirect, useShowToast } from '../../components'
+import { RoutingLinkTarget } from '../../routing'
 
 const emptyForm = {
 	slug: '',
@@ -15,11 +16,16 @@ const emptyForm = {
 	dbSsl: '',
 }
 
-export const CreateProjectForm: FC = () => {
+interface CreateProjectForm {
+	projectListLink: RoutingLinkTarget
+}
+
+export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) => {
 	const { register, values } = useForm(emptyForm)
 	const [isSubmitting, setSubmitting] = useState(false)
 	const createProject = useCreateProject()
 	const toaster = useShowToast()
+	const redirect = useRedirect()
 	const onSubmit = async (e: SyntheticEvent) => {
 		e.preventDefault()
 		setSubmitting(true)
@@ -43,6 +49,7 @@ export const CreateProjectForm: FC = () => {
 			secrets,
 		})
 		if (result.ok) {
+			redirect(projectListLink)
 			toaster({
 				message: `Project ${projectSlug} created. Please save following deploy token: ${result.result.deployerApiKey.token}`,
 				type: 'success',

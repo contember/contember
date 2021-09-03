@@ -1,5 +1,5 @@
 import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { MemberType } from '../../schema'
+import { MemberType } from '../../../schema'
 
 export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult> {
 	constructor(

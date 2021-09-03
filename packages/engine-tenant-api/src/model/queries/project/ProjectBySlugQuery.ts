@@ -1,6 +1,6 @@
 import { DatabaseQuery, SelectBuilder } from '@contember/database'
 import { DatabaseQueryable } from '@contember/database'
-import { Project } from '../type'
+import { Project } from '../../type'
 
 export class ProjectBySlugQuery extends DatabaseQuery<(Project & { updatedAt: Date }) | null> {
 	constructor(private readonly projectSlug: string, private readonly alias = false) {

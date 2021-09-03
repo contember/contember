@@ -1,11 +1,8 @@
-import { QueryHandler } from '@contember/queryable'
-import { DatabaseQueryable } from '@contember/database'
 import { ApiKeyManager } from '../service'
 import { IdentityProviderQuery, PersonQuery, PersonRow } from '../queries'
-import { IDPManager } from './idp'
+import { IDPManager, IDPResponse, IDPResponseError, IDPValidationError } from './idp'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, SignInIdpErrorCode } from '../../schema'
-import { IDPResponse, IDPResponseError, IDPValidationError } from './idp'
 import { DatabaseContext } from '../utils'
 
 class IDPSignInManager {

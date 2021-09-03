@@ -1,7 +1,7 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { ProjectsQuery } from './ProjectsQuery'
-import { PermissionActions, PermissionContext } from '../authorization'
-import { Project } from '../type'
+import { PermissionActions, PermissionContext } from '../../authorization'
+import { Project } from '../../type'
 
 export class ProjectsByIdentityQuery extends DatabaseQuery<Project[]> {
 	constructor(private readonly identityId: string, private readonly permissionContext: PermissionContext) {

@@ -1,5 +1,5 @@
-import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@contember/database'
-import { MaybePersonRow, PersonRow } from './types'
+import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, Operator } from '@contember/database'
+import { MaybePersonRow } from './types'
 import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
 
 class PersonQuery extends DatabaseQuery<MaybePersonRow> {

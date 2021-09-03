@@ -1,6 +1,6 @@
 import { DatabaseQueryable, DatabaseQuery, SelectBuilder, Operator } from '@contember/database'
-import { ApiKey } from '../type'
-import { computeTokenHash } from '../utils/tokenUtils'
+import { ApiKey } from '../../type'
+import { computeTokenHash } from '../../utils/tokenUtils'
 
 class ApiKeyByTokenQuery extends DatabaseQuery<ApiKeyByTokenQuery.Result> {
 	constructor(private readonly token: string) {

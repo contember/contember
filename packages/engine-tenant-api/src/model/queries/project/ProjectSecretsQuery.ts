@@ -1,7 +1,7 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { Providers } from '../providers'
+import { Providers } from '../../providers'
 
-export class ListProjectSecretsQuery extends DatabaseQuery<Record<string, string>> {
+export class ProjectSecretsQuery extends DatabaseQuery<Record<string, string>> {
 	constructor(private readonly projectId: string, private readonly providers: Providers) {
 		super()
 	}

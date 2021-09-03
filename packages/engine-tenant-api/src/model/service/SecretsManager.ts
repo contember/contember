@@ -1,6 +1,6 @@
 import { SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
 import { Providers } from '../providers'
-import { ListProjectSecretsQuery } from '../queries'
+import { ProjectSecretsQuery } from '../queries'
 import { DatabaseContext } from '../utils'
 
 export class SecretsManager {
@@ -14,6 +14,6 @@ export class SecretsManager {
 	}
 
 	public async readSecrets(projectId: string): Promise<Record<string, string>> {
-		return await this.dbContext.queryHandler.fetch(new ListProjectSecretsQuery(projectId, this.providers))
+		return await this.dbContext.queryHandler.fetch(new ProjectSecretsQuery(projectId, this.providers))
 	}
 }

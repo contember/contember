@@ -7,11 +7,9 @@ import {
 	UpdateProjectMemberCommand,
 	UpdateProjectMemberResponse,
 } from '../commands'
-import { ProjectMembershipByIdentityQuery } from '../queries/ProjectMembershipByIdentityQuery'
+import { ProjectMembershipByIdentityQuery, ProjectMembersQuery, ProjectRolesByIdentityQuery } from '../queries'
 import { Membership, MembershipVariable } from '../type/Membership'
-import { ProjectMembersQuery } from '../queries/ProjectMembersQuery'
 import { AddProjectMemberErrorCode, MemberType } from '../../schema'
-import { ProjectRolesByIdentityQuery } from '../queries'
 import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
 import { indexListBy, notEmpty } from '../../utils/array'
 import { createSetMembershipVariables } from './membershipUtils'

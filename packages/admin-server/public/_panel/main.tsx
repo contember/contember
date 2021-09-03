@@ -2,14 +2,19 @@ import * as ReactDOM from 'react-dom'
 import {
 	ApplicationEntrypoint,
 	CreateProjectForm,
+	EditUser,
 	GenericPage,
+	InviteUser,
 	Layout,
 	LayoutInner,
 	Menu,
+	NavigateBackButton,
 	Page,
+	PageLinkButton,
 	Pages,
-	ProjectOverview,
 	ProjectsGrid,
+	TitleBar,
+	UsersList,
 } from '@contember/admin'
 import './index.sass'
 import { FC } from 'react'
@@ -19,19 +24,13 @@ const PanelLayout: FC = props => {
 	return (
 		<Layout
 			children={props.children}
-			topStart={'Contember Admin Panel'}
 			sideBar={<Menu>
-				<Menu.Item title="Dashboard" to={'dashboard'}/>
-				<Menu.Item title="Create project" to={'projectCreate'}/>
+				<Menu.Item title={'Contember Admin Panel'}>
+					<Menu.Item title="Projects" to={'projectList'} />
+				</Menu.Item>
 			</Menu>}
 		/>
 	)
-}
-
-const ProjectOverviewPage = (props: {project: string}) => {
-	return <LayoutInner>
-		<ProjectOverview project={props.project} />
-	</LayoutInner>
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -44,13 +43,19 @@ window.addEventListener('DOMContentLoaded', () => {
 			apiBaseUrl={config.apiBaseUrl}
 			basePath={'/_panel/'}
 			routes={{
-				dashboard: { path: '/' },
+				projectList: { path: '/' },
 				projectCreate: { path: '/project/create' },
-				projectOverview: { path: '/project/:project' },
+				projectOverview: { path: '/project/view/:project' },
+				userInvite: { path: '/project/invite/:project' },
+				userEdit: { path: '/project/invite/:project/:user' },
 			}}
 			children={<Pages layout={PanelLayout} children={[
-				<GenericPage pageName={'dashboard'}>
-					<ProjectsGrid/>
+				<GenericPage pageName={'projectList'}>
+					<TitleBar actions={<PageLinkButton to={'projectCreate'}>New project</PageLinkButton>}>
+						Projects
+					</TitleBar>
+					<ProjectsGrid
+						createProjectDetailLink={project => ({ pageName: 'projectOverview', parameters: { project } })} />
 				</GenericPage>,
 				<GenericPage pageName={'projectCreate'}>
 					<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
@@ -59,7 +64,51 @@ window.addEventListener('DOMContentLoaded', () => {
 					<CreateProjectForm projectListLink={'projectList'} />
 				</GenericPage>,
 				<Page name="projectOverview">
-					{ProjectOverviewPage}
+					{({ project }: { project: string }) =>
+						<LayoutInner>
+							<TitleBar
+								navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}
+								actions={<PageLinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Invite
+									user</PageLinkButton>}
+							>
+								Project {project}
+							</TitleBar>
+							<UsersList
+								project={project}
+								createUserEditLink={user => ({ pageName: 'userEdit', parameters: { project, user } })}
+							/>
+						</LayoutInner>}
+				</Page>,
+				<Page name="userInvite">
+					{({ project }: { project: string }) =>
+						<LayoutInner>
+							<TitleBar
+								navigation={<NavigateBackButton
+									to={{ pageName: 'projectOverview', parameters: { project } }}>Project</NavigateBackButton>}
+							>
+								Invite user to project {project}
+							</TitleBar>
+							<InviteUser
+								project={project}
+								userListLink={{ pageName: 'projectOverview', parameters: { project } }}
+							/>
+						</LayoutInner>}
+				</Page>,
+				<Page name="userEdit">
+					{({ project, user }: { project: string, user: string }) =>
+						<LayoutInner>
+							<TitleBar
+								navigation={<NavigateBackButton
+									to={{ pageName: 'projectOverview', parameters: { project } }}>Users</NavigateBackButton>}
+							>
+								Edit user in project {project}
+							</TitleBar>
+							<EditUser
+								project={project}
+								identityId={user}
+								userListLink={{ pageName: 'projectOverview', parameters: { project } }}
+							/>
+						</LayoutInner>}
 				</Page>,
 			]} />}
 		/>,

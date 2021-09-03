@@ -32,7 +32,7 @@ export const MemberList = memo<MemberListProps<any>>(({ project, createRoleRende
 			if (query.data.project.members.length === 0) {
 				return <EmptyMessage>No members</EmptyMessage>
 			}
-			return <Table>
+			return <Table bare>
 				{query.data.project.members.map(member => {
 					return (
 						<TableRow key={member.identity.id}>

@@ -3,10 +3,11 @@ import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
 import { Membership } from './VariableSelector'
 import { useUpdateProjectMembership } from '../hooks'
 import { getTenantErrorMessage } from '@contember/client'
-import { useRedirect, useShowToast } from '../../components'
+import { NavigateBackButton, useRedirect, useShowToast } from '../../components'
 import { EditUserMembership, EditUserMembershipProps, RolesConfig, SubmitState } from './EditUserMembership'
 import { useProjectSlug } from '@contember/react-client'
 import { RoutingLinkTarget } from '../../routing'
+import { TitleBar } from '@contember/ui'
 
 interface EditUserProps {
 	project: string
@@ -74,7 +75,6 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 		setEmail: undefined,
 		submit: submit,
 		submitState,
-		userListLink,
 	}
 
 	return <EditUserMembership {...props} />
@@ -87,11 +87,16 @@ export const EditUserInProject: FC<{ rolesConfig: RolesConfig; identityId: strin
 		if (!project) {
 			return <>Not in project.</>
 		}
-		return <EditUser
-			project={project}
-			rolesConfig={rolesConfig}
-			identityId={identityId}
-			userListLink={'tenantUsers'}
-		/>
+		return <>
+			<TitleBar navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}>
+				Edit user
+			</TitleBar>
+			<EditUser
+				project={project}
+				rolesConfig={rolesConfig}
+				identityId={identityId}
+				userListLink={'tenantUsers'}
+			/>
+		</>
 	},
 )

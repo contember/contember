@@ -1,19 +1,7 @@
 import { Membership, VariableSelector } from './VariableSelector'
 import { ComponentType, Dispatch, FC, SetStateAction, useCallback } from 'react'
 import { useListRolesQuery } from '../hooks'
-import {
-	Box,
-	Button,
-	ContainerSpinner,
-	FormGroup,
-	Heading,
-	Select,
-	SelectOption,
-	TextInput,
-	TitleBar,
-} from '@contember/ui'
-import { NavigateBackButton } from '../../components'
-import { RoutingLinkTarget } from '../../routing'
+import { Box, Button, ContainerSpinner, FormGroup, Heading, Select, SelectOption, TextInput } from '@contember/ui'
 
 interface VariableConfig {
 	render: ComponentType<{ value: string[]; onChange: (newValues: string[]) => void }>
@@ -48,10 +36,9 @@ export interface EditUserMembershipProps {
 	setEmail?: (newEmail: string) => void
 	submit: () => void
 	submitState?: SubmitState
-	userListLink: RoutingLinkTarget
 }
 
-export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, memberships, email, setMemberships, rolesConfig, setEmail, submit, submitState, userListLink }) => {
+export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, memberships, email, setMemberships, rolesConfig, setEmail, submit, submitState }) => {
 	const { state: roleDefinitionState } = useListRolesQuery(project)
 
 	const addMembership = useCallback(() => {
@@ -76,9 +63,6 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 
 	return (
 		<>
-			<TitleBar navigation={<NavigateBackButton to={userListLink}>Back to list of users</NavigateBackButton>}>
-				{editing ? 'Edit user' : 'Invite user'}
-			</TitleBar>
 			<Box>
 				{submitState && submitState.error && <>Error: {submitState.error}</>}
 				{email !== undefined && (

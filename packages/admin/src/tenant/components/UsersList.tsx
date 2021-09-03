@@ -14,7 +14,6 @@ export interface UsersListProps<T> {
 	project: string
 	children?: undefined
 	createRoleRenderer?: RoleRendererFactory
-	userInviteLink: RoutingLinkTarget
 	createUserEditLink: (id: string) => RoutingLinkTarget
 }
 
@@ -28,7 +27,7 @@ interface RoleRenderers<T> {
 
 const DefaultRoleRenderer: RoleRenderer = ({ role }) => <>{role}</>
 
-export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRenderer, userInviteLink, createUserEditLink }) => {
+export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRenderer, createUserEditLink }) => {
 	const addToast = useShowToast()
 	const { state: query, refetch: refetchUserList } = useListUsersQuery(project)
 	const [removeMemberInner] = useRemoveProjectMembership()
@@ -80,8 +79,7 @@ export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRendere
 	}
 
 	return (
-		<div>
-			<TitleBar actions={<PageLinkButton to={userInviteLink}>Add a user</PageLinkButton>}>Users in project</TitleBar>
+		<>
 			<Table>
 				{query.data.project.members.map(member => {
 					if (!member.identity.person) {
@@ -120,7 +118,7 @@ export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRendere
 					)
 				})}
 			</Table>
-		</div>
+		</>
 	)
 })
 
@@ -143,12 +141,14 @@ export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(pro
 		}
 	}, [contentClient, props.roleRenderers, props.rolesDataQuery])
 	if (project) {
-		return <UsersList
-			project={project}
-			createRoleRenderer={roleRendererFactory}
-			userInviteLink={'tenantInviteUser'}
-			createUserEditLink={id => ({ pageName: 'tenantEditUser', params: { id } })}
-		/>
+		return <>
+			<TitleBar actions={<PageLinkButton to={'tenantInviteUser'}>Add a user</PageLinkButton>}>Users in project</TitleBar>
+			<UsersList
+				project={project}
+				createRoleRenderer={roleRendererFactory}
+				createUserEditLink={id => ({ pageName: 'tenantEditUser', params: { id } })}
+			/>
+		</>
 	}
 	return null
 }

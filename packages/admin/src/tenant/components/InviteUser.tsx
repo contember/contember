@@ -1,11 +1,12 @@
 import { getTenantErrorMessage } from '@contember/client'
 import { useProjectSlug } from '@contember/react-client'
 import { FC, memo, useCallback, useState } from 'react'
-import { useRedirect, useShowToast } from '../../components'
+import { NavigateBackButton, useRedirect, useShowToast } from '../../components'
 import { useInvite } from '../hooks'
 import { Membership } from './VariableSelector'
 import { EditUserMembership, EditUserMembershipProps, RolesConfig, SubmitState } from './EditUserMembership'
 import { RoutingLinkTarget } from '../../routing'
+import { TitleBar } from '@contember/ui'
 
 
 interface InviteUserProps {
@@ -66,7 +67,6 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 		setEmail: setEmail,
 		submit: submit,
 		submitState,
-		userListLink,
 	}
 
 	return <EditUserMembership {...props} />
@@ -78,5 +78,10 @@ export const InviteUserToProject: FC<{ rolesConfig: RolesConfig }> = memo(({ rol
 	if (!project) {
 		return <>Not in project.</>
 	}
-	return <InviteUser project={project} rolesConfig={rolesConfig} userListLink={'tenantUsers'} />
+	return <>
+		<TitleBar navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}>
+			Invite user
+		</TitleBar>
+		<InviteUser project={project} rolesConfig={rolesConfig} userListLink={'tenantUsers'} />
+	</>
 })

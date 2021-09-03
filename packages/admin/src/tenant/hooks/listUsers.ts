@@ -37,7 +37,7 @@ export interface Membership {
 	}[]
 }
 
-interface ListUserQueryResult {
+export interface ListUserQueryResult {
 	project: {
 		id: string
 		name: string

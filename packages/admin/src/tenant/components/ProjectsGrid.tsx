@@ -1,8 +1,9 @@
 import { FC } from 'react'
 import { useAuthedTenantQuery } from '../hooks'
-import { AnchorButton, ContainerSpinner, Table, TableCell, TableHeaderCell, TableRow } from '@contember/ui'
+import { Table, TableCell, TableRow } from '@contember/ui'
 import { RoutingLinkTarget } from '../../routing'
 import { PageLinkButton } from '../../components'
+import { QueryLoader } from './QueryLoader'
 
 interface ProjectGridProps
 {
@@ -16,19 +17,16 @@ export const ProjectsGrid: FC<ProjectGridProps> = ({ createProjectDetailLink }) 
 		name
 	}
 }`, {})
-	if (query.error) {
-		return <>Error loading data</>
-	}
-	if (query.loading) {
-		return <ContainerSpinner />
-	}
-	return <Table>
-		{query.data?.projects.map(project => <TableRow>
-			<TableCell>{project.name}</TableCell>
-			<TableCell><span style={{ fontFamily: 'monospace' }}>{project.slug}</span></TableCell>
-			<TableCell>
-				<PageLinkButton to={createProjectDetailLink(project.slug)}>Overview and users</PageLinkButton>
-			</TableCell>
-		</TableRow>)}
-	</Table>
+
+	return <QueryLoader query={query}>
+		{({ query }) => <Table>
+			{query.data?.projects.map(project => <TableRow>
+				<TableCell>{project.name}</TableCell>
+				<TableCell><span style={{ fontFamily: 'monospace' }}>{project.slug}</span></TableCell>
+				<TableCell>
+					<PageLinkButton to={createProjectDetailLink(project.slug)}>Overview and users</PageLinkButton>
+				</TableCell>
+			</TableRow>)}
+		</Table>}
+	</QueryLoader>
 }

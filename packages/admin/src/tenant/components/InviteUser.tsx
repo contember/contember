@@ -10,7 +10,7 @@ import { RoutingLinkTarget } from '../../routing'
 
 interface InviteUserProps {
 	project: string
-	rolesConfig: RolesConfig
+	rolesConfig?: RolesConfig
 	userListLink: RoutingLinkTarget
 }
 export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userListLink }) => {

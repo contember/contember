@@ -10,7 +10,7 @@ import { RoutingLinkTarget } from '../../routing'
 
 interface EditUserProps {
 	project: string
-	rolesConfig: RolesConfig
+	rolesConfig?: RolesConfig
 	identityId: string
 	userListLink: RoutingLinkTarget
 }

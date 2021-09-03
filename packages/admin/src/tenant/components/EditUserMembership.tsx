@@ -44,7 +44,7 @@ export interface EditUserMembershipProps {
 	memberships: (Membership | undefined)[]
 	email?: string
 	setMemberships: Dispatch<SetStateAction<(Membership | undefined)[]>>
-	rolesConfig: RolesConfig
+	rolesConfig?: RolesConfig
 	setEmail?: (newEmail: string) => void
 	submit: () => void
 	submitState?: SubmitState
@@ -71,7 +71,7 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 	}
 
 	const roleDefinitions = roleDefinitionState.data.project.roles
-	const rolesToShow = roleDefinitions.filter(({ name }) => name in rolesConfig)
+	const rolesToShow = rolesConfig ? roleDefinitions.filter(({ name }) => name in rolesConfig) : roleDefinitions
 	const editing = email === undefined
 
 	return (
@@ -133,7 +133,7 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 												const enabled = otherIndex === -1 || otherIndex === membershipIndex
 												return {
 													value: roleName,
-													label: rolesConfig[roleName]!.name,
+													label: rolesConfig?.[roleName]?.name ?? roleName,
 													disabled: !enabled,
 												}
 											}),

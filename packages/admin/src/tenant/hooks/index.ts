@@ -1,4 +1,5 @@
 export * from './lib'
+export * from './createApiKey'
 export * from './createProject'
 export * from './changePasswords'
 export * from './invite'

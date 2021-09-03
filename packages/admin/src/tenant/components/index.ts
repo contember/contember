@@ -1,5 +1,6 @@
 export * from './ApiKeyList'
 export * from './CreateProjectForm'
+export * from './CreateApiKeyForm'
 export * from './ChangePassword'
 export * from './InviteUser'
 export * from './EditUser'

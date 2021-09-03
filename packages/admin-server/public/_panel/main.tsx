@@ -1,7 +1,7 @@
 import * as ReactDOM from 'react-dom'
 import {
 	ApiKeyList,
-	ApplicationEntrypoint, Box,
+	ApplicationEntrypoint, Box, CreateApiKeyForm,
 	CreateProjectForm,
 	EditUser,
 	GenericPage,
@@ -49,6 +49,7 @@ window.addEventListener('DOMContentLoaded', () => {
 				projectOverview: { path: '/project/view/:project' },
 				userInvite: { path: '/project/invite/:project' },
 				identityEdit: { path: '/project/edit/:project/:identity' },
+				apiKeyCreate: { path: '/project/api-key/:project' },
 			}}
 			children={<Pages layout={PanelLayout} children={[
 				<GenericPage pageName={'projectList'}>
@@ -70,24 +71,30 @@ window.addEventListener('DOMContentLoaded', () => {
 							<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
 								Project {project}
 							</TitleBar>
-							<Box
-								heading={'Users'}
-								actions={<PageLinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Invite user</PageLinkButton>}
-							>
-								<UsersList
-									project={project}
-									createUserEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
-								/>
-							</Box>
-							<Box
-								heading={'API keys'}
-								// actions={<PageLinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Create API key</PageLinkButton>}
-							>
-								<ApiKeyList
-									project={project}
-									createApiKeyEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
-								/>
-							</Box>
+							<div className={'projectMembers'}>
+								<div className={'projectMembers-section'}>
+									<Box
+										heading={'Users'}
+										actions={<PageLinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Invite user</PageLinkButton>}
+									>
+										<UsersList
+											project={project}
+											createUserEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
+										/>
+									</Box>
+								</div>
+								<div className={'projectMembers-section'}>
+									<Box
+										heading={'API keys'}
+										actions={<PageLinkButton to={{ pageName: 'apiKeyCreate', parameters: { project } }}>Create API key</PageLinkButton>}
+									>
+										<ApiKeyList
+											project={project}
+											createApiKeyEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
+										/>
+									</Box>
+								</div>
+							</div>
 						</LayoutInner>}
 				</Page>,
 				<Page name="userInvite">
@@ -118,6 +125,21 @@ window.addEventListener('DOMContentLoaded', () => {
 								project={project}
 								identityId={identity}
 								userListLink={{ pageName: 'projectOverview', parameters: { project } }}
+							/>
+						</LayoutInner>}
+				</Page>,
+				<Page name="apiKeyCreate">
+					{({ project }: { project: string }) =>
+						<LayoutInner>
+							<TitleBar
+								navigation={<NavigateBackButton
+									to={{ pageName: 'projectOverview', parameters: { project } }}>Project</NavigateBackButton>}
+							>
+								Create API key for project {project}
+							</TitleBar>
+							<CreateApiKeyForm
+								project={project}
+								apiKeyListLink={{ pageName: 'projectOverview', parameters: { project } }}
 							/>
 						</LayoutInner>}
 				</Page>,

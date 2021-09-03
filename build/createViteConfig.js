@@ -32,7 +32,7 @@ export function createViteConfig(packageName) {
 						entryFileNames: '[name].js',
 					},
 				},
-				sourcemap: isDevMode ? 'inline' : false,
+				sourcemap: true,
 				target: isDevMode ? 'esnext' : 'es2020',
 			},
 			esbuild: {

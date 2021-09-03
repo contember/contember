@@ -31,6 +31,9 @@ export function createViteConfig(packageName) {
 						preserveModules: true,
 						entryFileNames: '[name].js',
 					},
+					treeshake: {
+						moduleSideEffects: false,
+					},
 				},
 				sourcemap: true,
 				target: isDevMode ? 'esnext' : 'es2020',

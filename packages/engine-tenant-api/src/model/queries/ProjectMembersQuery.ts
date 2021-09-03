@@ -1,20 +1,36 @@
-import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { Member_Type } from '../../schema'
+import { ConditionBuilder, DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
+import { MemberType } from '../../schema'
 
 class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQuery.Result> {
 	constructor(
 		private readonly projectId: string,
-		private readonly memberType?: Member_Type,
+		private readonly memberType?: MemberType,
 	) {
 		super()
 	}
 
 	async fetch({ db }: DatabaseQueryable): Promise<ProjectMembersQuery.Result> {
 		return await SelectBuilder.create<{ id: string }>()
-			.select(expr => expr.raw('distinct (identity_id)'), 'id')
-			.from('project_membership')
-			.where({
-				project_id: this.projectId,
+			.select('id')
+			.from('identity')
+			.where(it => it.exists(
+				builder => builder
+					.from('project_membership')
+					.where(expr => expr.columnsEq(['project_membership', 'identity_id'], ['identity', 'id'])),
+			))
+			.match(qb => {
+				if (!this.memberType) {
+					return qb
+				}
+				const expr = ConditionBuilder.create().exists(
+					builder => builder
+						.from('person')
+						.where(expr => expr.columnsEq(['person', 'identity_id'], ['identity', 'id'])),
+				)
+				if (this.memberType === MemberType.Person) {
+					return qb.where(expr)
+				}
+				return qb.where(ConditionBuilder.not(expr))
 			})
 			.getResult(db)
 	}

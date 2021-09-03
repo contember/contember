@@ -22,8 +22,8 @@ export class ProjectTypeResolver implements ProjectResolvers {
 			return []
 		}
 
-		// todo: filter by args
-		return (await this.projectMemberManager.getProjectMembers(parent.id, verifier)).map(it => ({
+		const members = await this.projectMemberManager.getProjectMembers(parent.id, verifier, args.memberType ?? undefined)
+		return members.map(it => ({
 			...it,
 			identity: { ...it.identity, projects: [] },
 		}))

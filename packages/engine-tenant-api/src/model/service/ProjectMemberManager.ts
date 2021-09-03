@@ -10,7 +10,7 @@ import {
 import { ProjectMembershipByIdentityQuery } from '../queries/ProjectMembershipByIdentityQuery'
 import { Membership, MembershipVariable } from '../type/Membership'
 import { ProjectMembersQuery } from '../queries/ProjectMembersQuery'
-import { AddProjectMemberErrorCode } from '../../schema'
+import { AddProjectMemberErrorCode, MemberType } from '../../schema'
 import { ProjectRolesByIdentityQuery } from '../queries'
 import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
 import { indexListBy, notEmpty } from '../../utils/array'
@@ -90,9 +90,9 @@ export class ProjectMemberManager {
 		return await this.filterMemberships(memberships, verifier)
 	}
 
-	async getProjectMembers(projectId: string, accessVerifier: AccessVerifier): Promise<GetProjectMembersResponse> {
+	async getProjectMembers(projectId: string, accessVerifier: AccessVerifier, memberType?: MemberType): Promise<GetProjectMembersResponse> {
 		return this.dbContext.transaction(async db => {
-			const members = await db.queryHandler.fetch(new ProjectMembersQuery(projectId))
+			const members = await db.queryHandler.fetch(new ProjectMembersQuery(projectId, memberType))
 			const memberships = await db.queryHandler.fetch(
 				new ProjectMembershipByIdentityQuery(
 					{ id: projectId },

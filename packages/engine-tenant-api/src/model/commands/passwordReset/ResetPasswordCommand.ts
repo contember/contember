@@ -2,7 +2,7 @@ import { Command } from '../Command'
 import { SelectBuilder, UpdateBuilder } from '@contember/database'
 import { computeTokenHash } from '../../utils'
 import { ImplementationException } from '../../../exceptions'
-import { ChangePasswordCommand } from '../ChangePasswordCommand'
+import { ChangePasswordCommand } from '../person/ChangePasswordCommand'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response'
 
 export class ResetPasswordCommand implements Command<ResetPasswordCommandResponse> {

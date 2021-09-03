@@ -1,6 +1,6 @@
 import { Command } from '../Command'
-import { ConflictActionType, DeleteBuilder, InsertBuilder } from '@contember/database'
-import { MailTemplate, MailTemplateIdentifier } from '../../mailing'
+import { DeleteBuilder } from '@contember/database'
+import { MailTemplateIdentifier } from '../../mailing'
 
 export class RemoveMailTemplateCommand implements Command<boolean> {
 	constructor(private mailTemplateIdentifier: MailTemplateIdentifier) {}

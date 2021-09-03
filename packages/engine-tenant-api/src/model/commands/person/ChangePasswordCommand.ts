@@ -1,4 +1,4 @@
-import { Command } from './Command'
+import { Command } from '../Command'
 import { UpdateBuilder } from '@contember/database'
 
 export class ChangePasswordCommand implements Command<void> {

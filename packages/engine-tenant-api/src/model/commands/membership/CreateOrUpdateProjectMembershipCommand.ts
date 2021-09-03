@@ -2,7 +2,7 @@ import { Command } from '../Command'
 import { ConflictActionType, DeleteBuilder, InsertBuilder } from '@contember/database'
 import { ImplementationException } from '../../../exceptions'
 import { MembershipInput } from './types'
-import { PatchProjectMembershipVariablesCommand } from './variables/PatchProjectMembershipVariablesCommand'
+import { PatchProjectMembershipVariablesCommand } from './variables'
 
 export class CreateOrUpdateProjectMembershipCommand implements Command<void> {
 	constructor(

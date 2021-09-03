@@ -1,8 +1,8 @@
-import { Command } from './Command'
-import { ApiKey } from '../type'
+import { Command } from '../Command'
+import { ApiKey } from '../../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
 import { InsertBuilder } from '@contember/database'
-import { computeTokenHash, generateToken } from '../utils'
+import { computeTokenHash, generateToken } from '../../utils'
 
 export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 	private readonly type: ApiKey.Type

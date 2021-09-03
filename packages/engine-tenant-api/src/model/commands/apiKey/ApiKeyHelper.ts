@@ -1,6 +1,6 @@
-import { ApiKey } from '../type'
-import { Providers } from '../providers'
-import { plusMinutes } from '../utils/time'
+import { ApiKey } from '../../type'
+import { Providers } from '../../providers'
+import { plusMinutes } from '../../utils/time'
 
 const DEFAULT_EXPIRATION = 30
 export class ApiKeyHelper {

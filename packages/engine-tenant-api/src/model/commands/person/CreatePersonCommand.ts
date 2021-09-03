@@ -1,5 +1,5 @@
-import { Command } from './Command'
-import { PersonRow } from '../queries'
+import { Command } from '../Command'
+import { PersonRow } from '../../queries'
 import { InsertBuilder } from '@contember/database'
 
 export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {

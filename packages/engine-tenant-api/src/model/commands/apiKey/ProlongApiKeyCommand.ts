@@ -1,5 +1,5 @@
-import { Command } from './Command'
-import { ApiKey } from '../type'
+import { Command } from '../Command'
+import { ApiKey } from '../../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
 import { UpdateBuilder } from '@contember/database'
 

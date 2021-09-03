@@ -1,16 +1,14 @@
-import { Command } from './Command'
-import { ApiKey } from '../type'
+import { Command } from '../Command'
 import { UpdateBuilder } from '@contember/database'
 
-export class DisableOneOffApiKeyCommand implements Command<void> {
-	constructor(private readonly apiKeyId: string) {}
+export class DisableIdentityApiKeysCommand implements Command<void> {
+	constructor(private readonly identityId: string) {}
 
 	async execute({ db }: Command.Args): Promise<void> {
 		const qb = UpdateBuilder.create()
 			.table('api_key')
 			.where({
-				id: this.apiKeyId,
-				type: ApiKey.Type.ONE_OFF,
+				identity_id: this.identityId,
 			})
 			.values({ disabled_at: new Date() })
 

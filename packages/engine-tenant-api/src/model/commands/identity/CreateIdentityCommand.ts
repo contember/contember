@@ -1,4 +1,4 @@
-import { Command } from './Command'
+import { Command } from '../Command'
 import { InsertBuilder } from '@contember/database'
 
 export class CreateIdentityCommand implements Command<string> {

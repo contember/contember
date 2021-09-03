@@ -2,12 +2,12 @@
 	"name": "@contember/react-client",
 	"version": "0.6.53",
 	"type": "module",
-	"main": "./dist/react-client.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/react-client.development.js",
-				"production": "./dist/react-client.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

@@ -22,13 +22,14 @@ export function createViteConfig(packageName) {
 					formats: ['es'],
 				},
 				minify: false,
-				outDir: resolve(rootDirectory, `${packageDir}/dist`),
+				outDir: resolve(rootDirectory, `${packageDir}/dist/${mode}`),
 				rollupOptions: {
 					external: (id, importer, resolved) => {
 						return !resolved && !id.startsWith('./') && !id.startsWith('../') && id !== '.'
 					},
 					output: {
-						entryFileNames: `${packageName}.${mode}.js`,
+						preserveModules: true,
+						entryFileNames: '[name].js',
 					},
 				},
 				sourcemap: isDevMode ? 'inline' : false,

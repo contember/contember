@@ -2,12 +2,12 @@
 	"name": "@contember/binding",
 	"version": "0.6.53",
 	"type": "module",
-	"main": "./dist/binding.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/binding.development.js",
-				"production": "./dist/binding.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

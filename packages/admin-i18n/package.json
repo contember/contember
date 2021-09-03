@@ -2,12 +2,12 @@
 	"name": "@contember/admin-i18n",
 	"version": "0.6.53",
 	"type": "module",
-	"main": "./dist/admin-i18n.production.js",
+	"main": "./dist/production/index.js",
 	"exports": {
 		".": {
 			"import": {
-				"development": "./dist/admin-i18n.development.js",
-				"production": "./dist/admin-i18n.production.js"
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js"
 			}
 		}
 	},

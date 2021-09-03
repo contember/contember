@@ -1,4 +1,4 @@
-import { ListUserQueryResult, QueryRequestState } from '../hooks'
+import { ListMembersQuery, QueryRequestState } from '../hooks'
 import { ComponentType, useEffect, useState } from 'react'
 
 
@@ -17,7 +17,7 @@ export interface RoleRenderers<T> {
 
 const DefaultRoleRenderer: RoleRenderer = ({ role }) => <>{role} </>
 
-export const useRoleRenderer = (roleRendererFactory: RoleRendererFactory | undefined, query: QueryRequestState<ListUserQueryResult>): RoleRenderer | undefined => {
+export const useRoleRenderer = (roleRendererFactory: RoleRendererFactory | undefined, query: QueryRequestState<ListMembersQuery>): RoleRenderer | undefined => {
 	const [roleRenderer, setRoleRenderer] = useState<RoleRenderer>()
 	useEffect(() => {
 		if (!roleRendererFactory) {

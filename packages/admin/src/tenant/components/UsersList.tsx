@@ -1,13 +1,10 @@
 import { useCurrentContentGraphQlClient, useProjectSlug } from '@contember/react-client'
-import { Button, ContainerSpinner, Table, TableCell, TableRow, Tag, TitleBar } from '@contember/ui'
-import { FC, Fragment, memo, useCallback } from 'react'
+import { TitleBar } from '@contember/ui'
+import { FC, memo, useCallback } from 'react'
 import { PageLinkButton } from '../../components'
-import { useListUsersQuery } from '../hooks'
 import { RoutingLinkTarget } from '../../routing'
-import { RoleRendererFactory, RoleRenderers, useRoleRenderer, Variables } from './RoleRenderer'
-import { useRemoveMemberIntent } from './useRemoveMemberIntent'
-import { IdentityMembership } from './IdentityMembership'
-import { QueryLoader } from './QueryLoader'
+import { RoleRendererFactory, RoleRenderers } from './RoleRenderer'
+import { MemberList } from './MemberList'
 
 
 export interface UsersListProps<T> {
@@ -18,39 +15,14 @@ export interface UsersListProps<T> {
 }
 
 
-export const UsersList = memo<UsersListProps<any>>(({ project, createRoleRenderer, createUserEditLink }) => {
-	const { state: query, refetch: refetchUserList } = useListUsersQuery(project)
-	const removeMember = useRemoveMemberIntent(project, refetchUserList)
-	const RoleRenderer = useRoleRenderer(createRoleRenderer, query)
-
-	return <QueryLoader query={query}>
-		{({ query }) => !RoleRenderer ? <ContainerSpinner /> : <Table>
-			{query.data.project.members.map(member => {
-				return (
-					<TableRow key={member.identity.id}>
-						<TableCell>{member.identity.person ? member.identity.person.email : '?'}</TableCell>
-						<TableCell>
-							<IdentityMembership RoleRenderer={RoleRenderer} memberships={member.memberships} />
-						</TableCell>
-						<TableCell shrunk>
-							<PageLinkButton
-								size="small"
-								to={createUserEditLink(member.identity.id)}
-							>
-								Edit roles
-							</PageLinkButton>
-						</TableCell>
-						<TableCell shrunk>
-							<Button size="small" intent="danger" onClick={() => removeMember(member.identity.id)}>
-								Revoke access
-							</Button>
-						</TableCell>
-					</TableRow>
-				)
-			})}
-		</Table>}
-	</QueryLoader>
-})
+export const UsersList = memo<UsersListProps<any>>(({ createUserEditLink, ...props }) =>
+	<MemberList
+		{...props}
+		createEditIdentityLink={createUserEditLink}
+		memberType={'PERSON'}
+		Identity={({ identity }) => <>{identity.person ? identity.person.email : '?'}</>}
+	/>,
+)
 
 interface UsersManagementProps<T> {
 	rolesDataQuery: string

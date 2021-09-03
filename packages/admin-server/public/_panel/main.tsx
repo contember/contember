@@ -1,6 +1,7 @@
 import * as ReactDOM from 'react-dom'
 import {
-	ApplicationEntrypoint,
+	ApiKeyList,
+	ApplicationEntrypoint, Box,
 	CreateProjectForm,
 	EditUser,
 	GenericPage,
@@ -47,7 +48,7 @@ window.addEventListener('DOMContentLoaded', () => {
 				projectCreate: { path: '/project/create' },
 				projectOverview: { path: '/project/view/:project' },
 				userInvite: { path: '/project/invite/:project' },
-				userEdit: { path: '/project/invite/:project/:user' },
+				identityEdit: { path: '/project/edit/:project/:identity' },
 			}}
 			children={<Pages layout={PanelLayout} children={[
 				<GenericPage pageName={'projectList'}>
@@ -66,17 +67,27 @@ window.addEventListener('DOMContentLoaded', () => {
 				<Page name="projectOverview">
 					{({ project }: { project: string }) =>
 						<LayoutInner>
-							<TitleBar
-								navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}
-								actions={<PageLinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Invite
-									user</PageLinkButton>}
-							>
+							<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
 								Project {project}
 							</TitleBar>
-							<UsersList
-								project={project}
-								createUserEditLink={user => ({ pageName: 'userEdit', parameters: { project, user } })}
-							/>
+							<Box
+								heading={'Users'}
+								actions={<PageLinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Invite user</PageLinkButton>}
+							>
+								<UsersList
+									project={project}
+									createUserEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
+								/>
+							</Box>
+							<Box
+								heading={'API keys'}
+								// actions={<PageLinkButton to={{ pageName: 'userInvite', parameters: { project } }}>Create API key</PageLinkButton>}
+							>
+								<ApiKeyList
+									project={project}
+									createApiKeyEditLink={identity => ({ pageName: 'identityEdit', parameters: { project, identity } })}
+								/>
+							</Box>
 						</LayoutInner>}
 				</Page>,
 				<Page name="userInvite">
@@ -94,18 +105,18 @@ window.addEventListener('DOMContentLoaded', () => {
 							/>
 						</LayoutInner>}
 				</Page>,
-				<Page name="userEdit">
-					{({ project, user }: { project: string, user: string }) =>
+				<Page name="identityEdit">
+					{({ project, identity }: { project: string, identity: string }) =>
 						<LayoutInner>
 							<TitleBar
 								navigation={<NavigateBackButton
 									to={{ pageName: 'projectOverview', parameters: { project } }}>Users</NavigateBackButton>}
 							>
-								Edit user in project {project}
+								Edit membership in project {project}
 							</TitleBar>
 							<EditUser
 								project={project}
-								identityId={user}
+								identityId={identity}
 								userListLink={{ pageName: 'projectOverview', parameters: { project } }}
 							/>
 						</LayoutInner>}

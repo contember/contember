@@ -1,7 +1,7 @@
 import { Membership, VariableSelector } from './VariableSelector'
 import { ComponentType, Dispatch, FC, SetStateAction, useCallback } from 'react'
 import { useListRolesQuery } from '../hooks'
-import { Box, Button, ContainerSpinner, FormGroup, Heading, Select, SelectOption, TextInput } from '@contember/ui'
+import { Box, Button, FormGroup, Heading, Select, SelectOption } from '@contember/ui'
 import { QueryLoader } from './QueryLoader'
 
 interface VariableConfig {
@@ -21,63 +21,26 @@ export type RolesConfig = {
 	[K in string]?: RoleConfig
 }
 
-export interface SubmitState {
-	loading: boolean
-	error: undefined | string
-	errorEmail: undefined | string
-	success: boolean
-}
-
 export interface EditUserMembershipProps {
 	project: string
 	memberships: (Membership | undefined)[]
-	email?: string
 	setMemberships: Dispatch<SetStateAction<(Membership | undefined)[]>>
 	rolesConfig?: RolesConfig
-	setEmail?: (newEmail: string) => void
-	submit: () => void
-	submitState?: SubmitState
 }
 
-export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, memberships, email, setMemberships, rolesConfig, setEmail, submit, submitState }) => {
+export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, memberships, setMemberships, rolesConfig }) => {
 	const { state: roleDefinitionState } = useListRolesQuery(project)
 
 	const addMembership = useCallback(() => {
 		setMemberships(memberships => [...memberships, undefined])
 	}, [setMemberships])
 
-	if ((submitState && submitState.loading)) {
-		return <ContainerSpinner />
-	}
-
-	if (submitState && submitState.success) {
-		return <>User's roles are changed.</>
-	}
-
 	return <QueryLoader query={roleDefinitionState}>
 		{({ query }) => {
 			const roleDefinitions = query.data.project.roles
 			const rolesToShow = rolesConfig ? roleDefinitions.filter(({ name }) => name in rolesConfig) : roleDefinitions
-			const editing = email === undefined
-
 			return (
 				<>
-					<Box>
-						{submitState && submitState.error && <>Error: {submitState.error}</>}
-						{email !== undefined && (
-							<FormGroup
-								label="E-mail"
-								errors={submitState && submitState.errorEmail ? [{ message: submitState.errorEmail }] : undefined}
-							>
-								<TextInput
-									validationState={submitState && submitState.errorEmail ? 'invalid' : 'default'}
-									readOnly={setEmail === undefined}
-									value={email}
-									onChange={e => setEmail && setEmail(e.target.value)}
-									allowNewlines={false}
-								/>
-							</FormGroup>
-						)}
 						<Heading depth={2} size="small" style={{ margin: '0.83em 0' }}>
 							Roles
 						</Heading>
@@ -147,10 +110,6 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 								Add role
 							</Button>
 						</div>
-						<Button intent="primary" size="large" onClick={submit}>
-							{editing ? 'Save' : 'Invite'}
-						</Button>
-					</Box>
 				</>)
 		}}
 	</QueryLoader>

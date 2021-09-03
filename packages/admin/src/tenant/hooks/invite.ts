@@ -1,65 +1,28 @@
-import { useCallback } from 'react'
-import { MutationRequestState, useAuthedTenantMutation } from './lib'
+import { GQLVariable, useSingleTenantMutation } from './lib/facade'
+import { MembershipInput } from './updateMembership'
 
 const INVITE_MUTATION = `
-	mutation (
-		$email: String!,
-		$projectSlug: String!,
-		$memberships: [MembershipInput!]!
+	invite(
+		email: $email,
+		projectSlug: $projectSlug,
+		memberships: $memberships
 	) {
-		invite(
-			email: $email,
-			projectSlug: $projectSlug,
-			memberships: $memberships
-		) {
-			ok
-			errors {
-				code
-			}
+		ok
+		errors {
+			code
 		}
 	}
 `
 
-interface CreateUserMutationResult {
-	invite: {
-		ok: boolean
-		errors: { code: string }[]
-	}
+const inviteVariables = {
+	projectSlug: GQLVariable.Required(GQLVariable.String),
+	email: GQLVariable.Required(GQLVariable.String),
+	memberships: GQLVariable.Required(GQLVariable.List(MembershipInput)),
 }
 
-interface InviteMembershipInput {
-	role: string
-	variables: {
-		name: string
-		values: string[]
-	}[]
-}
+type InviteErrorCodes =
+	| 'PROJECT_NOT_FOUND'
+	| 'ALREADY_MEMBER'
+	| 'INVALID_MEMBERSHIP'
 
-interface CreateUserMutationVariables {
-	email: string
-	projectSlug: string
-	memberships: InviteMembershipInput[]
-}
-
-export const useInvite = (
-	project: string,
-): [
-	(email: string, memberships: InviteMembershipInput[]) => Promise<CreateUserMutationResult>,
-	MutationRequestState<CreateUserMutationResult>,
-] => {
-	const [addUser, state] = useAuthedTenantMutation<CreateUserMutationResult, CreateUserMutationVariables>(
-		INVITE_MUTATION,
-	)
-	const cb = useCallback(
-		(email: string, memberships: InviteMembershipInput[]) => {
-			return addUser({
-				email,
-				memberships,
-				projectSlug: project,
-			})
-		},
-		[addUser, project],
-	)
-
-	return [cb, state]
-}
+export const useInvite = () => useSingleTenantMutation<never, InviteErrorCodes, typeof inviteVariables>(INVITE_MUTATION, inviteVariables)

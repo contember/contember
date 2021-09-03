@@ -1,13 +1,12 @@
-import { FC, memo, useCallback, useEffect, useState } from 'react'
+import { FC, memo, SyntheticEvent, useCallback, useEffect, useState } from 'react'
 import { useProjectMembershipsQuery } from '../hooks/projectMemberships'
 import { Membership } from './VariableSelector'
 import { useUpdateProjectMembership } from '../hooks'
-import { getTenantErrorMessage } from '@contember/client'
 import { NavigateBackButton, useRedirect, useShowToast } from '../../components'
-import { EditUserMembership, EditUserMembershipProps, RolesConfig, SubmitState } from './EditUserMembership'
+import { EditUserMembership, RolesConfig } from './EditUserMembership'
 import { useProjectSlug } from '@contember/react-client'
 import { RoutingLinkTarget } from '../../routing'
-import { TitleBar } from '@contember/ui'
+import { Box, Button, TitleBar } from '@contember/ui'
 
 interface EditUserProps {
 	project: string
@@ -20,20 +19,7 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 	const { state: previousMembershipsState } = useProjectMembershipsQuery(project, identityId)
 	const [memberships, setMemberships] = useState<(Membership | undefined)[]>([undefined])
 
-	const [updateMembership, updateMembershipElement] = useUpdateProjectMembership()
-	const submitState: SubmitState | undefined = {
-		loading: updateMembershipElement.loading,
-		success:
-			updateMembershipElement.finished &&
-			!updateMembershipElement.error &&
-			updateMembershipElement.data.updateProjectMember.ok,
-		errorEmail: undefined,
-		error: updateMembershipElement.error
-			? 'Unable to submit'
-			: updateMembershipElement.finished && !updateMembershipElement.data.updateProjectMember.ok
-				? updateMembershipElement.data.updateProjectMember.errors.map(it => getTenantErrorMessage(it.code)).join(', ')
-				: undefined,
-	}
+	const updateMembership = useUpdateProjectMembership()
 
 	useEffect(() => {
 		setMemberships(currentMemberships => {
@@ -50,34 +36,44 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 
 	const redirect = useRedirect()
 	const addToast = useShowToast()
+	const [isSubmitting, setSubmitting] = useState(false)
 
-	const submit = useCallback(async () => {
+	const submit = useCallback(async (e: SyntheticEvent) => {
+		e.preventDefault()
+		setSubmitting(true)
 		const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
 		if (membershipsToSave.length === 0) {
 			return
 		}
-		const result = await updateMembership(project, identityId, membershipsToSave)
-		if (result.updateProjectMember.ok) {
-			redirect(userListLink)
+		const result = await updateMembership({ projectSlug: project, identityId, memberships: membershipsToSave })
+		setSubmitting(false)
+		if (result.ok) {
 			addToast({
 				type: 'success',
 				message: `Updated user's roles successfully.`,
 			})
+			redirect(userListLink)
+		} else {
+			switch (result.error.code) {
+				case 'NOT_MEMBER':
+					return addToast({ message: `Project member not found`, type: 'error' })
+				case 'INVALID_MEMBERSHIP':
+					return addToast({ message: `Invalid membership definition`, type: 'error' })
+				case 'PROJECT_NOT_FOUND':
+					return addToast({ message: `Project not found`, type: 'error' })
+			}
 		}
 	}, [memberships, updateMembership, project, identityId, redirect, userListLink, addToast])
 
-	const props: EditUserMembershipProps = {
-		project: project,
-		rolesConfig: rolesConfig,
-		memberships: memberships,
-		setMemberships: setMemberships,
-		email: undefined,
-		setEmail: undefined,
-		submit: submit,
-		submitState,
-	}
-
-	return <EditUserMembership {...props} />
+	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
+	return <Box>
+		<form onSubmit={submit}>
+			<EditUserMembership {...editUserMembershipProps} />
+			<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+				Save
+			</Button>
+		</form>
+	</Box>
 }
 
 

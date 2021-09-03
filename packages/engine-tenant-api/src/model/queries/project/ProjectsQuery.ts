@@ -9,6 +9,7 @@ export class ProjectsQuery extends DatabaseQuery<Project[]> {
 			.select('slug')
 			.select('config')
 			.from('project')
+			.orderBy('slug')
 			.getResult(db)
 	}
 }

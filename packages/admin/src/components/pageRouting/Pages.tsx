@@ -3,6 +3,7 @@ import { Message } from '@contember/ui'
 import {
 	ComponentType,
 	Fragment,
+	FunctionComponent,
 	isValidElement,
 	ReactElement,
 	ReactNode,
@@ -21,7 +22,7 @@ export type PageProvider<P> = ComponentType & {
 export type PageProviderElement = ReactElement<any, PageProvider<any>>
 
 export interface PagesProps {
-	children: PageProviderElement[] | PageProviderElement
+	children: PageProviderElement[] | PageProviderElement | Record<string, FunctionComponent>
 	layout?: ComponentType<{ children?: ReactNode }>
 }
 
@@ -36,28 +37,33 @@ function isPageList(children: ReactNodeArray): children is PageProviderElement[]
 /**
  * Pages element specifies collection of pages (component Page or component with getPageName static method).
  */
-export const Pages = (props: PagesProps) => {
+export const Pages = ({ children, layout }: PagesProps) => {
 	const rootEnv = useEnvironment()
 	const request = useCurrentRequest()
 	const requestId = useRef<number>(0)
-	const Layout = props.layout ?? Fragment
+	const Layout = layout ?? Fragment
 
-	const pageMap = useMemo(
+	const pageMap = useMemo<Map<string, FunctionComponent>>(
 		() => {
-			const pageList = Array.isArray(props.children) ? props.children : [props.children]
+			if (Array.isArray(children)) {
+				if (isPageList(children)) {
+					return new Map(children.map(child => [child.type.getPageName(child.props), () => child]))
 
-			if (!isPageList(pageList)) {
-				throw new Error('Pages has a child which is not a Page')
+				} else {
+					throw new Error('Pages has a child which is not a Page')
+				}
+
+			} else if (isPageProviderElement(children)) {
+				return new Map([[children.type.getPageName(children.props), () => children]])
+
+			} else {
+				return new Map(Object.entries(children))
 			}
-
-			return new Map(pageList.map(child => [child.type.getPageName(child.props), child]))
 		},
-		[props.children],
+		[children],
 	)
 
-	const page = request ? pageMap.get(request.pageName) : undefined
-
-	if (request === null || page === undefined) {
+	if (request === null) {
 		return (
 			<MiscPageLayout>
 				<Message intent="danger" size="large">Page not found</Message>
@@ -70,6 +76,11 @@ export const Pages = (props: PagesProps) => {
 			throw new Error(`Cannot use ${reservedVariableName} as parameter name.`)
 		}
 	}
+	const Page = pageMap.get(request.pageName)
+
+	if (Page === undefined) {
+		throw new Error(`No such page as ${request.pageName}.`)
+	}
 
 	const requestEnv = rootEnv
 		.updateDimensionsIfNecessary(request.dimensions, rootEnv.getAllDimensions())
@@ -78,7 +89,7 @@ export const Pages = (props: PagesProps) => {
 	return (
 		<EnvironmentContext.Provider value={requestEnv}>
 			<Layout>
-				<PageErrorBoundary key={requestId.current++}>{page}</PageErrorBoundary>
+				<PageErrorBoundary key={requestId.current++}><Page /></PageErrorBoundary>
 			</Layout>
 		</EnvironmentContext.Provider>
 	)

@@ -1,5 +1,6 @@
-import { useAuthedTenantMutation } from './auth'
 import { JsonValue } from '../../../utils'
+import { useCallback } from 'react'
+import { useTenantGraphQlClient } from '@contember/react-client'
 
 export interface GQLVariableType<Value = any, Required extends boolean = boolean> {
 	graphQlType: string
@@ -27,14 +28,21 @@ export const useSingleTenantMutation = <
 	ErrorCode extends string,
 	Variables extends Record<string, GQLVariableType<any, any>>
 	>(mutation: string, variableDefinitions: Variables): TenantMutationExecutor<VariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>> => {
-	const formattedVariables = Object.entries(variableDefinitions).map(([name, type]) => `$${name}: ${type.graphQlType}`).join(', ')
-	const [tenantMutation] = useAuthedTenantMutation<{result: TenantMutationResponse<Result, ErrorCode>}, VariableValues<Variables>>(`
-		mutation${formattedVariables ? `(${formattedVariables})` : ''} {
-			result: ${mutation}
-		}
-	`)
 
-	return async variables => (await tenantMutation(variables)).result
+	const client = useTenantGraphQlClient()
+
+	return useCallback(async variables => {
+		const formattedVariables = Object.entries(variableDefinitions).map(([name, type]) => `$${name}: ${type.graphQlType}`).join(', ')
+		const response = await client.sendRequest< { data: { result: TenantMutationResponse<Result, ErrorCode>}, errors? : any }>(`
+			mutation${formattedVariables ? `(${formattedVariables})` : ''} {
+				result: ${mutation}
+			}
+		`, { variables })
+		if (response.errors) {
+			throw response.errors
+		}
+		return response.data.result
+	}, [client, mutation, variableDefinitions])
 }
 
 export interface TenantMutationErrorResponse<Code extends string> {

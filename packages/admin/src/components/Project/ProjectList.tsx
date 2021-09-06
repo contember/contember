@@ -14,19 +14,23 @@ export interface ProjectListProps {
 export const ProjectList = (props: ProjectListProps) => {
 	return (
 		<MiscPageLayout heading="Projects">
-			<ButtonList flow="block">
-				{props.projects.map(project => (
-					<AnchorButton
-						key={project.slug}
-						href={props.formatProjectUrl(project)}
-						distinction="seamless"
-						flow="block"
-						justification="justifyStart"
-					>
-						{project.name}
-					</AnchorButton>
-				))}
-			</ButtonList>
+			<ProjectListButtons {...props}/>
 		</MiscPageLayout>
 	)
+}
+
+export const ProjectListButtons = (props: ProjectListProps) => {
+	return <ButtonList flow="block">
+		{props.projects.map(project => (
+			<AnchorButton
+				key={project.slug}
+				href={props.formatProjectUrl(project)}
+				distinction="seamless"
+				flow="block"
+				justification="justifyStart"
+			>
+				{project.name}
+			</AnchorButton>
+		))}
+	</ButtonList>
 }

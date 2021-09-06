@@ -5,7 +5,7 @@ import { useInvite } from '../hooks'
 import { Membership } from './VariableSelector'
 import { EditUserMembership, RolesConfig } from './EditUserMembership'
 import { RoutingLinkTarget } from '../../routing'
-import { Box, Button, FormGroup, TextInput, TitleBar } from '@contember/ui'
+import { Box, BoxSection, Button, FormGroup, TextInput, TitleBar } from '@contember/ui'
 
 interface InviteUserProps {
 	project: string
@@ -61,20 +61,26 @@ export const InviteUser: FC<InviteUserProps> = ({ project, rolesConfig, userList
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 
 	return (
-		<Box>
+		<Box style={{ maxWidth: '800px' }}>
 			<form onSubmit={submit}>
-				<FormGroup label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
-					<TextInput
-						validationState={emailNotValidError ? 'invalid' : 'default'}
-						value={email}
-						onChange={e => setEmail && setEmail(e.target.value)}
-						allowNewlines={false}
-					/>
-				</FormGroup>
-				<EditUserMembership {...editUserMembershipProps} />
-				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
-					Invite
-				</Button>
+				<BoxSection heading={false}>
+					<FormGroup label="E-mail" errors={emailNotValidError ? [{ message: 'Email is not valid.' }] : undefined}>
+						<TextInput
+							validationState={emailNotValidError ? 'invalid' : 'default'}
+							value={email}
+							onChange={e => setEmail && setEmail(e.target.value)}
+							allowNewlines={false}
+						/>
+					</FormGroup>
+				</BoxSection>
+				<BoxSection heading={false}>
+					<EditUserMembership {...editUserMembershipProps} />
+				</BoxSection>
+				<BoxSection heading={false}>
+					<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+						Invite
+					</Button>
+				</BoxSection>
 			</form>
 		</Box>
 	)

@@ -3,7 +3,7 @@ import { useRedirect, useShowToast } from '../../components'
 import { Membership } from './VariableSelector'
 import { EditUserMembership, RolesConfig } from './EditUserMembership'
 import { RoutingLinkTarget } from '../../routing'
-import { Box, Button, FormGroup, TextInput } from '@contember/ui'
+import { Box, BoxSection, Button, FormGroup, TextInput } from '@contember/ui'
 import { useCreateApiKey } from '../hooks'
 import { useForm } from './useForm'
 
@@ -58,15 +58,21 @@ export const CreateApiKeyForm: FC<CreateApiKeyFormProps> = ({ project, rolesConf
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 
 	return (
-		<Box>
+		<Box style={{ maxWidth: '800px' }}>
 			<form onSubmit={submit}>
-				<FormGroup label="Description">
-					<TextInput {...register('description')} />
-				</FormGroup>
-				<EditUserMembership {...editUserMembershipProps} />
-				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
-					Create API key
-				</Button>
+				<BoxSection heading={false}>
+					<FormGroup label="Description">
+						<TextInput {...register('description')} />
+					</FormGroup>
+				</BoxSection>
+				<BoxSection heading={false}>
+					<EditUserMembership {...editUserMembershipProps} />
+				</BoxSection>
+				<BoxSection heading={false}>
+					<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+						Create API key
+					</Button>
+				</BoxSection>
 			</form>
 		</Box>
 	)

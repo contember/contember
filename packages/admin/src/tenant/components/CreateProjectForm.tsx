@@ -1,5 +1,5 @@
 import { FC, SyntheticEvent, useState } from 'react'
-import { Box, Button, FormGroup, Select, TextInput } from '@contember/ui'
+import { Box, BoxSection, Button, FormGroup, Select, TextInput } from '@contember/ui'
 import { useForm } from './useForm'
 import { useCreateProject } from '../hooks'
 import { useRedirect, useShowToast } from '../../components'
@@ -79,13 +79,15 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 	return (
 		<Box heading={'Create a new project'}>
 			<form onSubmit={onSubmit}>
-				<FormGroup label={'Project slug'}>
-					<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} required />
-				</FormGroup>
-				<FormGroup label={'Project name'}>
-					<TextInput {...register('name')} placeholder={values.slug} />
-				</FormGroup>
-				<Box heading={'Database credentials'}>
+				<BoxSection heading={false}>
+					<FormGroup label={'Project slug'}>
+						<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} required />
+					</FormGroup>
+					<FormGroup label={'Project name'}>
+						<TextInput {...register('name')} placeholder={values.slug} />
+					</FormGroup>
+				</BoxSection>
+				<BoxSection heading={'Database credentials'}>
 					<p>You can leave some of this fields empty to use default values.</p>
 					<FormGroup label={'Host'}>
 						<TextInput {...register('dbHost')} />
@@ -109,12 +111,14 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 							{ value: 'no', label: 'no' },
 						]}/>
 					</FormGroup>
-				</Box>
-				<FormGroup label={undefined}>
-					<Button type={'submit'} intent={'primary'} disabled={isSubmitting}>
-						Create a project
-					</Button>
-				</FormGroup>
+				</BoxSection>
+				<BoxSection heading={false}>
+					<FormGroup label={undefined}>
+						<Button type={'submit'} intent={'primary'} disabled={isSubmitting}>
+							Create a project
+						</Button>
+					</FormGroup>
+				</BoxSection>
 			</form>
 		</Box>
 	)

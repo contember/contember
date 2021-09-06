@@ -1,7 +1,7 @@
 import { Membership, VariableSelector } from './VariableSelector'
 import { ComponentType, Dispatch, FC, SetStateAction, useCallback } from 'react'
 import { useListRolesQuery } from '../hooks'
-import { Box, Button, FormGroup, Heading, Select, SelectOption } from '@contember/ui'
+import { Box, BoxSection, Button, FormGroup, Heading, Icon, Select, SelectOption } from '@contember/ui'
 import { QueryLoader } from './QueryLoader'
 
 interface VariableConfig {
@@ -42,10 +42,7 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 				const rolesToShow = rolesConfig ? roleDefinitions.filter(({ name }) => name in rolesConfig) : roleDefinitions
 				return (
 					<>
-						<Heading depth={2} size="small" style={{ margin: '0.83em 0' }}>
-							Roles
-						</Heading>
-						<div>
+						<Box heading={'Roles'}>
 							{memberships.map((membership, membershipIndex) => {
 								const roleDefinition = membership && roleDefinitions.find(def => def.name === membership.role)
 
@@ -64,8 +61,12 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 								}
 
 								return (
-									<Box key={membershipIndex}>
-										<FormGroup label="Role">
+									<BoxSection
+										heading={false}
+										key={membershipIndex}
+										actions={<Button distinction={'seamless'} size="small" onClick={removeMembership}><Icon blueprintIcon="trash" /></Button>}
+									>
+										<FormGroup label={undefined}>
 											<Select
 												onChange={e => {
 													const newRole = e.target.value
@@ -101,16 +102,22 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 													}}
 												/>
 											))}
-										<Button size="small" onClick={removeMembership}>
-											Remove role
-										</Button>
-									</Box>
+
+									</BoxSection>
 								)
 							})}
-							<Button distinction="seamless" onClick={addMembership}>
-								Add role
-							</Button>
-						</div>
+							<BoxSection heading={undefined}>
+								<Button
+									distinction="seamless"
+									flow="block"
+									justification="justifyStart"
+									onClick={addMembership}
+								>
+									<Icon blueprintIcon={'add'} style={{ marginRight: '0.2em' }} />
+									Add role
+								</Button>
+							</BoxSection>
+						</Box>
 					</>
 				)
 			}}

@@ -6,7 +6,7 @@ import { NavigateBackButton, useRedirect, useShowToast } from '../../components'
 import { EditUserMembership, RolesConfig } from './EditUserMembership'
 import { useProjectSlug } from '@contember/react-client'
 import { RoutingLinkTarget } from '../../routing'
-import { Box, Button, TitleBar } from '@contember/ui'
+import { Box, BoxSection, Button, TitleBar } from '@contember/ui'
 
 interface EditUserProps {
 	project: string
@@ -70,12 +70,16 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 	return (
-		<Box>
+		<Box style={{ maxWidth: '800px' }}>
 			<form onSubmit={submit}>
-				<EditUserMembership {...editUserMembershipProps} />
-				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
-					Save
-				</Button>
+				<BoxSection heading={false}>
+						<EditUserMembership {...editUserMembershipProps} />
+				</BoxSection>
+				<BoxSection heading={false}>
+					<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+						Save
+					</Button>
+				</BoxSection>
 			</form>
 		</Box>
 	)

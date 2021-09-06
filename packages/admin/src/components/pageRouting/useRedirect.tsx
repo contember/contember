@@ -4,8 +4,8 @@ import { RoutingLinkTarget, useRoutingLinkFactory } from '../../routing'
 export const useRedirect = () => {
 	const linkFactory = useRoutingLinkFactory()
 	return useCallback(
-		(requestChange: RoutingLinkTarget) => {
-			linkFactory(requestChange).navigate()
+		(target: RoutingLinkTarget) => {
+			linkFactory(target).navigate()
 		},
 		[linkFactory],
 	)

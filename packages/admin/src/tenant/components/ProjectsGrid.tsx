@@ -5,8 +5,7 @@ import { RoutingLinkTarget } from '../../routing'
 import { PageLinkButton } from '../../components'
 import { QueryLoader } from './QueryLoader'
 
-interface ProjectGridProps
-{
+interface ProjectGridProps {
 	createProjectDetailLink: (project: string) => RoutingLinkTarget
 }
 

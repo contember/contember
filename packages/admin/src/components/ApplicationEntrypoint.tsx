@@ -1,5 +1,4 @@
 import { RequestProvider, RouteMap, RoutingContext, RoutingContextValue, SelectedDimension } from '../routing'
-import { useMemo } from 'react'
 import { Environment, EnvironmentContext } from '@contember/binding'
 import { I18nProvider, MessageDictionaryByLocaleCode } from '../i18n'
 import { Toaster, ToasterProvider } from './Toaster'
@@ -7,6 +6,7 @@ import { DialogProvider } from '@contember/ui'
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { NavigationProvider } from './NavigationProvider'
 import { IdentityProvider } from './Identity'
+import { ReactNode } from 'react'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {
 	basePath?: string
@@ -16,6 +16,7 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
 	defaultLocale?: string
 	dictionaries?: MessageDictionaryByLocaleCode
 	envVariables?: Record<string, string>
+	children: ReactNode
 }
 
 const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
@@ -28,8 +29,9 @@ const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
 	}
 }
 
-export const ApplicationEntrypoint: React.FC<ApplicationEntrypointProps> = props => {
+export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 	validateProps(props)
+
 	const routing: RoutingContextValue = {
 		basePath: props.basePath ?? '/',
 		routes: props.routes,
@@ -64,7 +66,7 @@ export const ApplicationEntrypoint: React.FC<ApplicationEntrypointProps> = props
 										</IdentityProvider>
 									</NavigationProvider>
 								</ContemberClient>
-								<Toaster/>
+								<Toaster />
 							</DialogProvider>
 						</ToasterProvider>
 					</RequestProvider>

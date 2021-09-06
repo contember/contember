@@ -5,17 +5,20 @@ import { readFile } from 'fs/promises'
 
 export type ProcessFile = (path: string, content: Buffer, req: IncomingMessage) => Promise<string | Buffer>
 
+export interface StaticFileHandlerOptions {
+	basePath?: string,
+	fileProcessor?: ProcessFile,
+}
+
 export class StaticFileHandler {
 	constructor(private publicDir: string) {}
 
-	public async serve(req: IncomingMessage, res: ServerResponse, options: {
-		basePath?: string,
-		fileProcessor?: ProcessFile,
-	} = {}): Promise<void> {
+	public async serve(req: IncomingMessage, res: ServerResponse, options: StaticFileHandlerOptions = {}): Promise<void> {
 		const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
 		const basePath = options.basePath ?? '/'
 		const path = url.pathname.includes('.') ? url.pathname : basePath + 'index.html'
 		const contentType = getType(path) ?? 'application/octet-stream'
+
 		try {
 			const content = await readFile(this.publicDir + path)
 			res.setHeader('Content-Type', contentType)

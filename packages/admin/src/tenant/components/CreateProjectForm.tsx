@@ -96,11 +96,11 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 						<TextInput {...register('dbPassword')} />
 					</FormGroup>
 					<FormGroup label={'SSL'}>
-						<select {...register('dbSsl')}>
-							<option>--</option>
-							<option value={'yes'}>yes</option>
-							<option value={'no'}>no</option>
-						</select>
+						<Select {...register('dbSsl')} options={[
+							{ value: '', label: 'default' },
+							{ value: 'yes', label: 'yes' },
+							{ value: 'no', label: 'no' },
+						]}/>
 					</FormGroup>
 				</Box>
 				<FormGroup label={undefined}>

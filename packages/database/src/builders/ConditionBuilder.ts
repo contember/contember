@@ -106,7 +106,7 @@ export class ConditionBuilder {
 		const context = new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set())
 		const query = createSubQueryLiteralFactory<SelectBuilder>(subQuery)(context, subQuery => {
 			if (subQuery.options.select.length === 0) {
-				return subQuery.select(expr => expr.selectValue(1))
+				return subQuery.select(expr => expr.raw('?::int', 1))
 			}
 			return subQuery
 		})

@@ -57,7 +57,7 @@ test('query builder: constructs condition', async () => {
                where "a" = ? and "b" != ? and "c" < ? and "d" <= ? and "e" > ? and "f" >= ?
                      and "g" like '%' || ? || '%' and "h" like ? || '%' and "i" like '%' || ?
                      and "j" ilike '%' || ? || '%' and "k" ilike ? || '%' and "l" ilike '%' || ?
-                     and "z" = "foo"."x" and "o" in (?, ?, ?) and "m" in (select ?) and exists (select ?) and "n" is null and false`,
+                     and "z" = "foo"."x" and "o" in (?, ?, ?) and "m" in (select ?) and exists (select ?::int) and "n" is null and false`,
 		parameters: [1, 2, 3, 4, 5, 6, 'foo\\\\\\%bar', 'lorem\\_ipsum', 'dolor\\%sit', 'X', 'Y', 'Z', 1, 2, 3, 1, 1],
 	})
 })

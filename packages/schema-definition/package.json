@@ -1,6 +1,6 @@
 {
   "name": "@contember/schema-definition",
-  "version": "0.12.0-alpha.10",
+  "version": "0.12.0-alpha.11",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -8,8 +8,8 @@
     "test": "echo 'No tests'"
   },
   "dependencies": {
-    "@contember/schema": "^0.12.0-alpha.10",
-    "@contember/schema-utils": "^0.12.0-alpha.10",
+    "@contember/schema": "^0.12.0-alpha.11",
+    "@contember/schema-utils": "^0.12.0-alpha.11",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {}

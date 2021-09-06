@@ -1,7 +1,6 @@
 import { useAuthedTenantMutation } from './auth'
 import { JsonValue } from '../../../utils'
 
-
 export interface GQLVariableType<Value = any, Required extends boolean = boolean> {
 	graphQlType: string
 	required: Required
@@ -30,13 +29,13 @@ export const useSingleTenantMutation = <
 	>(mutation: string, variableDefinitions: Variables): TenantMutationExecutor<VariableValues<Variables>, TenantMutationResponse<Result, ErrorCode>> => {
 	const formattedVariables = Object.entries(variableDefinitions).map(([name, type]) => `$${name}: ${type.graphQlType}`).join(', ')
 	const [tenantMutation] = useAuthedTenantMutation<{result: TenantMutationResponse<Result, ErrorCode>}, VariableValues<Variables>>(`
-mutation${formattedVariables ? `(${formattedVariables})` : ''} {
-	result: ${mutation}
-}
-`)
+		mutation${formattedVariables ? `(${formattedVariables})` : ''} {
+			result: ${mutation}
+		}
+	`)
+
 	return async variables => (await tenantMutation(variables)).result
 }
-
 
 export interface TenantMutationErrorResponse<Code extends string> {
 	ok: false
@@ -54,8 +53,7 @@ export type TenantMutationResponse<Result extends JsonValue, ErrorCode extends s
 	| TenantMutationErrorResponse<ErrorCode>
 	| TenantMutationOkResponse<Result>
 
-
-type KeysMatching<T, V> = NonNullable<{ [K in keyof T]: T[K] extends V ? K : never }[keyof T]>;
+type KeysMatching<T, V> = NonNullable<{ [K in keyof T]: T[K] extends V ? K : never }[keyof T]>
 
 type VariableValues<VariableMap extends Record<string, GQLVariableType>> = {
 	[K in KeysMatching<VariableMap, GQLVariableType<any, true>>]: VariableMap[K] extends GQLVariableType<infer Value, boolean> ? Value : never

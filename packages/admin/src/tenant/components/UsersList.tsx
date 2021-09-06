@@ -6,7 +6,6 @@ import { RoutingLinkTarget } from '../../routing'
 import { RoleRendererFactory, RoleRenderers } from './RoleRenderer'
 import { MemberList } from './MemberList'
 
-
 export interface UsersListProps<T> {
 	project: string
 	children?: undefined
@@ -14,15 +13,14 @@ export interface UsersListProps<T> {
 	createUserEditLink: (id: string) => RoutingLinkTarget
 }
 
-
-export const UsersList = memo<UsersListProps<any>>(({ createUserEditLink, ...props }) =>
+export const UsersList = memo<UsersListProps<any>>(({ createUserEditLink, ...props }) => (
 	<MemberList
 		{...props}
 		createEditIdentityLink={createUserEditLink}
 		memberType={'PERSON'}
 		Identity={({ identity }) => <>{identity.person ? identity.person.email : '?'}</>}
-	/>,
-)
+	/>
+))
 
 interface UsersManagementProps<T> {
 	rolesDataQuery: string
@@ -39,18 +37,22 @@ export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(pro
 			if (!Renderer) {
 				return <>Unknown role {role}</>
 			}
-			return <Renderer rolesData={rolesData} variables={variables}/>
+			return <Renderer rolesData={rolesData} variables={variables} />
 		}
 	}, [contentClient, props.roleRenderers, props.rolesDataQuery])
 	if (project) {
-		return <>
-			<TitleBar actions={<PageLinkButton to={'tenantInviteUser'}>Add a user</PageLinkButton>}>Users in project</TitleBar>
-			<UsersList
-				project={project}
-				createRoleRenderer={roleRendererFactory}
-				createUserEditLink={id => ({ pageName: 'tenantEditUser', params: { id } })}
-			/>
-		</>
+		return (
+			<>
+				<TitleBar actions={<PageLinkButton to={'tenantInviteUser'}>Add a user</PageLinkButton>}>
+					Users in project
+				</TitleBar>
+				<UsersList
+					project={project}
+					createRoleRenderer={roleRendererFactory}
+					createUserEditLink={id => ({ pageName: 'tenantEditUser', params: { id } })}
+				/>
+			</>
+		)
 	}
 	return null
 }

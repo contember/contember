@@ -11,7 +11,7 @@ export interface ContemberClientProps {
 	stage?: string
 }
 
-export const ContemberClient = memo<ContemberClientProps & {children: React.ReactNode}>(function ContemberClient({
+export const ContemberClient = memo<ContemberClientProps & { children: React.ReactNode }>(function ContemberClient({
 	apiBaseUrl,
 	children,
 	loginToken,

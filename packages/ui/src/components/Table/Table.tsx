@@ -25,16 +25,18 @@ export const Table = memo(({ /*useTableElement = true, */ bare, ...props }: Tabl
 		toEnumViewClass(props.justification, 'justifyStart'),
 	)
 
-	const table = <div className={`${prefix}table-wrapper`}>
-		{/*{useTableElement ? (*/}
-		<table className={className}>
-			{props.tableHead && <thead>{props.tableHead}</thead>}
-			<tbody>{props.children}</tbody>
-		</table>
-		{/*) : (*/}
-		{/*	<div className={className}>{props.children}</div>*/}
-		{/*)}*/}
-	</div>
+	const table = (
+		<div className={`${prefix}table-wrapper`}>
+			{/*{useTableElement ? (*/}
+			<table className={className}>
+				{props.tableHead && <thead>{props.tableHead}</thead>}
+				<tbody>{props.children}</tbody>
+			</table>
+			{/*) : (*/}
+			{/*	<div className={className}>{props.children}</div>*/}
+			{/*)}*/}
+		</div>
+	)
 
 	return (
 		<UseTableElementContext.Provider value={/*useTableElement*/ true}>

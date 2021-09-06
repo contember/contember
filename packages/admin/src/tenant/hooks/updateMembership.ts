@@ -28,4 +28,7 @@ type UpdateMembershipErrorCodes =
 	| 'INVALID_MEMBERSHIP'
 
 export const useUpdateProjectMembership = () =>
-	useSingleTenantMutation<never, UpdateMembershipErrorCodes, typeof updateMembershipVariables>(UPDATE_MEMBERSHIP_QUERY, updateMembershipVariables)
+	useSingleTenantMutation<never, UpdateMembershipErrorCodes, typeof updateMembershipVariables>(
+		UPDATE_MEMBERSHIP_QUERY,
+		updateMembershipVariables,
+	)

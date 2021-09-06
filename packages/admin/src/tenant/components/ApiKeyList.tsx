@@ -10,12 +10,11 @@ export interface ApiKeyListProps<T> {
 	createApiKeyEditLink: (id: string) => RoutingLinkTarget
 }
 
-
-export const ApiKeyList = memo<ApiKeyListProps<any>>(({ createApiKeyEditLink, ...props }) =>
+export const ApiKeyList = memo<ApiKeyListProps<any>>(({ createApiKeyEditLink, ...props }) => (
 	<MemberList
 		{...props}
 		createEditIdentityLink={createApiKeyEditLink}
 		memberType={'API_KEY'}
 		Identity={({ identity }) => <>{identity.description ?? 'unknown key'}</>}
-	/>,
-)
+	/>
+))

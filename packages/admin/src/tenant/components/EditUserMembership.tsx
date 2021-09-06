@@ -35,12 +35,13 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 		setMemberships(memberships => [...memberships, undefined])
 	}, [setMemberships])
 
-	return <QueryLoader query={roleDefinitionState}>
-		{({ query }) => {
-			const roleDefinitions = query.data.project.roles
-			const rolesToShow = rolesConfig ? roleDefinitions.filter(({ name }) => name in rolesConfig) : roleDefinitions
-			return (
-				<>
+	return (
+		<QueryLoader query={roleDefinitionState}>
+			{({ query }) => {
+				const roleDefinitions = query.data.project.roles
+				const rolesToShow = rolesConfig ? roleDefinitions.filter(({ name }) => name in rolesConfig) : roleDefinitions
+				return (
+					<>
 						<Heading depth={2} size="small" style={{ margin: '0.83em 0' }}>
 							Roles
 						</Heading>
@@ -88,18 +89,18 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 											/>
 										</FormGroup>
 										{roleDefinition &&
-										membership &&
-										roleDefinition.variables.map(variable => (
-											<VariableSelector
-												key={variable.name}
-												rolesConfig={rolesConfig}
-												membership={membership}
-												variable={variable}
-												onChange={newMembership => {
-													updateMembership(newMembership)
-												}}
-											/>
-										))}
+											membership &&
+											roleDefinition.variables.map(variable => (
+												<VariableSelector
+													key={variable.name}
+													rolesConfig={rolesConfig}
+													membership={membership}
+													variable={variable}
+													onChange={newMembership => {
+														updateMembership(newMembership)
+													}}
+												/>
+											))}
 										<Button size="small" onClick={removeMembership}>
 											Remove role
 										</Button>
@@ -110,7 +111,9 @@ export const EditUserMembership: FC<EditUserMembershipProps> = ({ project, membe
 								Add role
 							</Button>
 						</div>
-				</>)
-		}}
-	</QueryLoader>
+					</>
+				)
+			}}
+		</QueryLoader>
+	)
 }

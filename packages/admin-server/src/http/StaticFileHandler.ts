@@ -6,8 +6,8 @@ import { readFile } from 'fs/promises'
 export type ProcessFile = (path: string, content: Buffer, req: IncomingMessage) => Promise<string | Buffer>
 
 export interface StaticFileHandlerOptions {
-	basePath?: string,
-	fileProcessor?: ProcessFile,
+	basePath?: string
+	fileProcessor?: ProcessFile
 }
 
 export class StaticFileHandler {

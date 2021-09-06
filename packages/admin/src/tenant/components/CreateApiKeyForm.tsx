@@ -7,7 +7,6 @@ import { Box, Button, FormGroup, TextInput } from '@contember/ui'
 import { useCreateApiKey } from '../hooks'
 import { useForm } from './useForm'
 
-
 interface CreateApiKeyFormProps {
 	project: string
 	rolesConfig?: RolesConfig
@@ -27,42 +26,48 @@ export const CreateApiKeyForm: FC<CreateApiKeyFormProps> = ({ project, rolesConf
 
 	const createApiKey = useCreateApiKey()
 
-	const submit = useCallback(async (e: SyntheticEvent) => {
-		e.preventDefault()
-		setSubmitting(true)
-		const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
-		const response = await createApiKey({ description: values.description, memberships: membershipsToSave, projectSlug: project })
-		setSubmitting(false)
-		if (response.ok) {
-			addToast({
-				type: 'success',
-				message: `API key has been created. Save following token: ${response.result.apiKey.token}`,
+	const submit = useCallback(
+		async (e: SyntheticEvent) => {
+			e.preventDefault()
+			setSubmitting(true)
+			const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
+			const response = await createApiKey({
+				description: values.description,
+				memberships: membershipsToSave,
+				projectSlug: project,
 			})
-			redirect(apiKeyListLink)
-		} else {
-			switch (response.error.code) {
-				case 'INVALID_MEMBERSHIP':
-					return addToast({ message: `Invalid membership definition`, type: 'error' })
-				case 'PROJECT_NOT_FOUND':
-					return addToast({ message: `Project not found`, type: 'error' })
+			setSubmitting(false)
+			if (response.ok) {
+				addToast({
+					type: 'success',
+					message: `API key has been created. Save following token: ${response.result.apiKey.token}`,
+				})
+				redirect(apiKeyListLink)
+			} else {
+				switch (response.error.code) {
+					case 'INVALID_MEMBERSHIP':
+						return addToast({ message: `Invalid membership definition`, type: 'error' })
+					case 'PROJECT_NOT_FOUND':
+						return addToast({ message: `Project not found`, type: 'error' })
+				}
 			}
-		}
-	}, [memberships, createApiKey, values.description, project, addToast, redirect, apiKeyListLink])
-
+		},
+		[memberships, createApiKey, values.description, project, addToast, redirect, apiKeyListLink],
+	)
 
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
 
-	return <Box>
-		<form onSubmit={submit}>
-			<FormGroup
-				label="Description"
-			>
-				<TextInput {...register('description')} />
-			</FormGroup>
-			<EditUserMembership {...editUserMembershipProps} />
-			<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
-				Create API key
-			</Button>
-		</form>
-	</Box>
+	return (
+		<Box>
+			<form onSubmit={submit}>
+				<FormGroup label="Description">
+					<TextInput {...register('description')} />
+				</FormGroup>
+				<EditUserMembership {...editUserMembershipProps} />
+				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+					Create API key
+				</Button>
+			</form>
+		</Box>
+	)
 }

@@ -30,7 +30,7 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 		e.preventDefault()
 		setSubmitting(true)
 		const projectSlug = values.slug
-		const secrets: { key: string, value: string }[] = []
+		const secrets: { key: string; value: string }[] = []
 		if (values.dbPassword) {
 			secrets.push({ key: 'db.password', value: values.dbPassword })
 		}
@@ -69,48 +69,46 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 		}
 		setSubmitting(false)
 	}
-	return <Box heading={'Create a new project'}>
-		<form onSubmit={onSubmit}>
-			<FormGroup label={'Project slug'}>
-				<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'}/>
-			</FormGroup>
-			<FormGroup label={'Project name'}>
-				<TextInput {...register('name')} placeholder={values.slug} />
-			</FormGroup>
-			<Box heading={'Database credentials'}>
-				<p>You can leave some of this fields empty to use default values.</p>
-				<FormGroup label={'Host'}>
-					<TextInput {...register('dbHost')} />
+	return (
+		<Box heading={'Create a new project'}>
+			<form onSubmit={onSubmit}>
+				<FormGroup label={'Project slug'}>
+					<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} />
 				</FormGroup>
-				<FormGroup label={'Port'}>
-					<TextInput {...register('dbPort')} />
+				<FormGroup label={'Project name'}>
+					<TextInput {...register('name')} placeholder={values.slug} />
 				</FormGroup>
-				<FormGroup label={'Database name'}>
-					<TextInput {...register('dbName')} />
+				<Box heading={'Database credentials'}>
+					<p>You can leave some of this fields empty to use default values.</p>
+					<FormGroup label={'Host'}>
+						<TextInput {...register('dbHost')} />
+					</FormGroup>
+					<FormGroup label={'Port'}>
+						<TextInput {...register('dbPort')} />
+					</FormGroup>
+					<FormGroup label={'Database name'}>
+						<TextInput {...register('dbName')} />
+					</FormGroup>
+					<FormGroup label={'User'}>
+						<TextInput {...register('dbUser')} />
+					</FormGroup>
+					<FormGroup label={'Password'}>
+						<TextInput {...register('dbPassword')} />
+					</FormGroup>
+					<FormGroup label={'SSL'}>
+						<select {...register('dbSsl')}>
+							<option>--</option>
+							<option value={'yes'}>yes</option>
+							<option value={'no'}>no</option>
+						</select>
+					</FormGroup>
+				</Box>
+				<FormGroup label={undefined}>
+					<Button type={'submit'} intent={'primary'} disabled={isSubmitting}>
+						Create a project
+					</Button>
 				</FormGroup>
-				<FormGroup label={'User'}>
-					<TextInput {...register('dbUser')} />
-				</FormGroup>
-				<FormGroup label={'Password'}>
-					<TextInput {...register('dbPassword')} />
-				</FormGroup>
-				<FormGroup label={'SSL'}>
-					<select {...register('dbSsl')}>
-						<option>--</option>
-						<option value={'yes'}>yes</option>
-						<option value={'no'}>no</option>
-					</select>
-				</FormGroup>
-			</Box>
-			<FormGroup label={undefined}>
-				<Button
-					type={'submit'}
-					intent={'primary'}
-					disabled={isSubmitting}
-				>
-					Create a project
-				</Button>
-			</FormGroup>
-		</form>
-	</Box>
+			</form>
+		</Box>
+	)
 }

@@ -38,44 +38,48 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 	const addToast = useShowToast()
 	const [isSubmitting, setSubmitting] = useState(false)
 
-	const submit = useCallback(async (e: SyntheticEvent) => {
-		e.preventDefault()
-		setSubmitting(true)
-		const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
-		if (membershipsToSave.length === 0) {
-			return
-		}
-		const result = await updateMembership({ projectSlug: project, identityId, memberships: membershipsToSave })
-		setSubmitting(false)
-		if (result.ok) {
-			addToast({
-				type: 'success',
-				message: `Updated user's roles successfully.`,
-			})
-			redirect(userListLink)
-		} else {
-			switch (result.error.code) {
-				case 'NOT_MEMBER':
-					return addToast({ message: `Project member not found`, type: 'error' })
-				case 'INVALID_MEMBERSHIP':
-					return addToast({ message: `Invalid membership definition`, type: 'error' })
-				case 'PROJECT_NOT_FOUND':
-					return addToast({ message: `Project not found`, type: 'error' })
+	const submit = useCallback(
+		async (e: SyntheticEvent) => {
+			e.preventDefault()
+			setSubmitting(true)
+			const membershipsToSave = memberships.filter((it: Membership | undefined): it is Membership => it !== undefined)
+			if (membershipsToSave.length === 0) {
+				return
 			}
-		}
-	}, [memberships, updateMembership, project, identityId, redirect, userListLink, addToast])
+			const result = await updateMembership({ projectSlug: project, identityId, memberships: membershipsToSave })
+			setSubmitting(false)
+			if (result.ok) {
+				addToast({
+					type: 'success',
+					message: `Updated user's roles successfully.`,
+				})
+				redirect(userListLink)
+			} else {
+				switch (result.error.code) {
+					case 'NOT_MEMBER':
+						return addToast({ message: `Project member not found`, type: 'error' })
+					case 'INVALID_MEMBERSHIP':
+						return addToast({ message: `Invalid membership definition`, type: 'error' })
+					case 'PROJECT_NOT_FOUND':
+						return addToast({ message: `Project not found`, type: 'error' })
+				}
+			}
+		},
+		[memberships, updateMembership, project, identityId, redirect, userListLink, addToast],
+	)
 
 	const editUserMembershipProps = { project, rolesConfig, memberships, setMemberships }
-	return <Box>
-		<form onSubmit={submit}>
-			<EditUserMembership {...editUserMembershipProps} />
-			<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
-				Save
-			</Button>
-		</form>
-	</Box>
+	return (
+		<Box>
+			<form onSubmit={submit}>
+				<EditUserMembership {...editUserMembershipProps} />
+				<Button intent="primary" size="large" type={'submit'} disabled={isSubmitting}>
+					Save
+				</Button>
+			</form>
+		</Box>
+	)
 }
-
 
 export const EditUserInProject: FC<{ rolesConfig: RolesConfig; identityId: string }> = memo(
 	({ rolesConfig, identityId }) => {
@@ -83,16 +87,13 @@ export const EditUserInProject: FC<{ rolesConfig: RolesConfig; identityId: strin
 		if (!project) {
 			return <>Not in project.</>
 		}
-		return <>
-			<TitleBar navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}>
-				Edit user
-			</TitleBar>
-			<EditUser
-				project={project}
-				rolesConfig={rolesConfig}
-				identityId={identityId}
-				userListLink={'tenantUsers'}
-			/>
-		</>
+		return (
+			<>
+				<TitleBar navigation={<NavigateBackButton to={'tenantUsers'}>Back to list of users</NavigateBackButton>}>
+					Edit user
+				</TitleBar>
+				<EditUser project={project} rolesConfig={rolesConfig} identityId={identityId} userListLink={'tenantUsers'} />
+			</>
+		)
 	},
 )

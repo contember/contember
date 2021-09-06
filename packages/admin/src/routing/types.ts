@@ -16,7 +16,6 @@ export type RequestState = PageRequest<any> | null
 
 export type RequestChange = (currentState: RequestState) => RequestState
 
-
 type Params = any
 type RouteName = string
 type ParamsByName<K extends RouteName, T = Params> = T extends { name: K } ? T : never

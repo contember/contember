@@ -60,7 +60,7 @@ export interface ListMembersQuery {
 	}
 }
 
-export type ListMembersMemberType = 'PERSON' | 'API_KEY';
+export type ListMembersMemberType = 'PERSON' | 'API_KEY'
 
 interface ListMembersQueryVariables {
 	slug: string
@@ -68,5 +68,8 @@ interface ListMembersQueryVariables {
 }
 
 export const useListMembersQuery = (projectSlug: string, memberType: ListMembersQueryVariables['memberType']) => {
-	return useAuthedTenantQuery<ListMembersQuery, ListMembersQueryVariables>(LIST_MEMBERS_QUERY, { slug: projectSlug, memberType })
+	return useAuthedTenantQuery<ListMembersQuery, ListMembersQueryVariables>(LIST_MEMBERS_QUERY, {
+		slug: projectSlug,
+		memberType,
+	})
 }

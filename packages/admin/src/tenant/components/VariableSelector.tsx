@@ -19,9 +19,20 @@ interface VariableSelectorProps {
 	onChange: (newMembership: Membership) => void
 }
 const GenericVariableEdit = ({ value, onChange }: { value: string[]; onChange: (newValues: string[]) => void }) => {
-	return <TextInput allowNewlines={true} value={value.join('\n')} onChange={e => {
-		onChange(e.currentTarget.value.split('\n').map(it => it.trim()).filter(it => !!it))
-	}}/>
+	return (
+		<TextInput
+			allowNewlines={true}
+			value={value.join('\n')}
+			onChange={e => {
+				onChange(
+					e.currentTarget.value
+						.split('\n')
+						.map(it => it.trim())
+						.filter(it => !!it),
+				)
+			}}
+		/>
+	)
 }
 
 export const VariableSelector: FC<VariableSelectorProps> = ({ rolesConfig, membership, variable, onChange }) => {

@@ -45,10 +45,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 
 	return (
 		<EnvironmentContext.Provider value={rootEnv}>
-			<I18nProvider
-				localeCode={props.defaultLocale}
-				dictionaries={props.dictionaries}
-			>
+			<I18nProvider localeCode={props.defaultLocale} dictionaries={props.dictionaries}>
 				<RoutingContext.Provider value={routing}>
 					<RequestProvider>
 						<ToasterProvider>

@@ -15,6 +15,6 @@ runReactApp(
 			barPage: { path: '/bar' },
 			loremPage: { path: '/lorem' },
 		}}
-		children={<Sandbox/>}
+		children={<Sandbox />}
 	/>,
 )

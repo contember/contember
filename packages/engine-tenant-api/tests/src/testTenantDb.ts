@@ -21,6 +21,7 @@ import { graphql } from 'graphql'
 import { Membership } from '../../src/model/type/Membership'
 import { Connection } from '@contember/database'
 import * as uvu from 'uvu'
+import * as assert from 'uvu/assert'
 
 export interface TenantTest {
 	query: GraphQLTestQuery
@@ -83,6 +84,7 @@ export const authenticatedApiKeyId = testUuid(998)
 interface TenantTestOptions {
 	membership?: Membership
 	roles?: string[]
+	noErrorsCheck?: boolean
 }
 
 export interface TenantTester {
@@ -165,7 +167,11 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 				context,
 				typeof query === 'string' ? undefined : query.variables,
 			)
-			return JSON.parse(JSON.stringify(result))
+			const result2 = JSON.parse(JSON.stringify(result))
+			if (options.noErrorsCheck !== true) {
+				assert.equal(result2.errors ?? [], [])
+			}
+			return result2
 		},
 		mailer,
 		end: async () => {

@@ -109,6 +109,7 @@ inviteSuite('superEditor cannot invite a user with different variables', async (
 				role: 'superEditor',
 				variables: [{ name: 'language', values: [languageId] }],
 			},
+			noErrorsCheck: true,
 		},
 	)
 	assert.is(result.errors[0].message, 'You are not allowed to invite a person')
@@ -132,6 +133,7 @@ inviteSuite('editor cannot invite a user with a membership', async ({ tester }) 
 				role: 'editor',
 				variables: [{ name: 'language', values: [languageId] }],
 			},
+			noErrorsCheck: true,
 		},
 	)
 	assert.is(result.errors[0].message, 'You are not allowed to invite a person')

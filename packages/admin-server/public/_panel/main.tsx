@@ -6,6 +6,7 @@ import {
 	CreateProjectForm,
 	EditUser,
 	GenericPage,
+	Icon,
 	InviteUser,
 	Layout,
 	LayoutInner,
@@ -28,7 +29,10 @@ const PanelLayout: FC = props => {
 			children={props.children}
 			sideBar={
 				<Menu>
-					<Menu.Item title={'Contember Admin Panel'}>
+					<Menu.Item>
+					<Menu.Item title={<><Icon blueprintIcon="chevron-left" style={{ verticalAlign: 'middle' }}/> back</>} href={'/'} />
+				</Menu.Item>
+				<Menu.Item title={'Contember Admin Panel'}>
 						<Menu.Item title="Projects" to={'projectList'} />
 					</Menu.Item>
 				</Menu>

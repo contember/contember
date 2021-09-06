@@ -1,7 +1,8 @@
-import * as ReactDOM from 'react-dom'
 import {
 	ApiKeyList,
-	ApplicationEntrypoint, Box, CreateApiKeyForm,
+	ApplicationEntrypoint,
+	Box,
+	CreateApiKeyForm,
 	CreateProjectForm,
 	EditUser,
 	GenericPage,
@@ -14,59 +15,59 @@ import {
 	PageLinkButton,
 	Pages,
 	ProjectsGrid,
+	runReactApp,
 	TitleBar,
 	UsersList,
 } from '@contember/admin'
 import './index.sass'
 import { FC } from 'react'
 
-
 const PanelLayout: FC = props => {
 	return (
 		<Layout
 			children={props.children}
-			sideBar={<Menu>
-				<Menu.Item title={'Contember Admin Panel'}>
-					<Menu.Item title="Projects" to={'projectList'} />
-				</Menu.Item>
-			</Menu>}
+			sideBar={
+				<Menu>
+					<Menu.Item title={'Contember Admin Panel'}>
+						<Menu.Item title="Projects" to={'projectList'} />
+					</Menu.Item>
+				</Menu>
+			}
 		/>
 	)
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-	const el = document.getElementById('contember-config')
-	const config = JSON.parse(el?.innerHTML ?? '{}')
-
-	ReactDOM.render(
-		<ApplicationEntrypoint
-			sessionToken={config.sessionToken}
-			apiBaseUrl={config.apiBaseUrl}
-			basePath={'/_panel/'}
-			routes={{
-				projectList: { path: '/' },
-				projectCreate: { path: '/project/create' },
-				projectOverview: { path: '/project/view/:project' },
-				userInvite: { path: '/project/invite/:project' },
-				identityEdit: { path: '/project/edit/:project/:identity' },
-				apiKeyCreate: { path: '/project/api-key/:project' },
-			}}
-			children={<Pages layout={PanelLayout} children={[
+runReactApp(
+	<ApplicationEntrypoint
+		sessionToken={'__SESSION_TOKEN__'}
+		apiBaseUrl={'/_api'}
+		basePath={'/_panel/'}
+		routes={{
+			projectList: { path: '/' },
+			projectCreate: { path: '/project/create' },
+			projectOverview: { path: '/project/view/:project' },
+			userInvite: { path: '/project/invite/:project' },
+			identityEdit: { path: '/project/edit/:project/:identity' },
+			apiKeyCreate: { path: '/project/api-key/:project' },
+		}}
+		children={
+			<Pages layout={PanelLayout}>
 				<GenericPage pageName={'projectList'}>
 					<TitleBar actions={<PageLinkButton to={'projectCreate'}>New project</PageLinkButton>}>
 						Projects
 					</TitleBar>
-					<ProjectsGrid
-						createProjectDetailLink={project => ({ pageName: 'projectOverview', parameters: { project } })} />
-				</GenericPage>,
+					<ProjectsGrid createProjectDetailLink={project => ({ pageName: 'projectOverview', parameters: { project } })} />
+				</GenericPage>
+
 				<GenericPage pageName={'projectCreate'}>
 					<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
 						New project
 					</TitleBar>
 					<CreateProjectForm projectListLink={'projectList'} />
-				</GenericPage>,
+				</GenericPage>
+
 				<Page name="projectOverview">
-					{({ project }: { project: string }) =>
+					{({ project }: { project: string }) => (
 						<LayoutInner>
 							<TitleBar navigation={<NavigateBackButton to={'projectList'}>Projects</NavigateBackButton>}>
 								Project {project}
@@ -95,10 +96,12 @@ window.addEventListener('DOMContentLoaded', () => {
 									</Box>
 								</div>
 							</div>
-						</LayoutInner>}
-				</Page>,
+						</LayoutInner>
+					)}
+				</Page>
+
 				<Page name="userInvite">
-					{({ project }: { project: string }) =>
+					{({ project }: { project: string }) => (
 						<LayoutInner>
 							<TitleBar
 								navigation={<NavigateBackButton
@@ -110,10 +113,12 @@ window.addEventListener('DOMContentLoaded', () => {
 								project={project}
 								userListLink={{ pageName: 'projectOverview', parameters: { project } }}
 							/>
-						</LayoutInner>}
-				</Page>,
+						</LayoutInner>
+					)}
+				</Page>
+
 				<Page name="identityEdit">
-					{({ project, identity }: { project: string, identity: string }) =>
+					{({ project, identity }: { project: string, identity: string }) => (
 						<LayoutInner>
 							<TitleBar
 								navigation={<NavigateBackButton
@@ -126,10 +131,12 @@ window.addEventListener('DOMContentLoaded', () => {
 								identityId={identity}
 								userListLink={{ pageName: 'projectOverview', parameters: { project } }}
 							/>
-						</LayoutInner>}
-				</Page>,
+						</LayoutInner>
+					)}
+				</Page>
+
 				<Page name="apiKeyCreate">
-					{({ project }: { project: string }) =>
+					{({ project }: { project: string }) => (
 						<LayoutInner>
 							<TitleBar
 								navigation={<NavigateBackButton
@@ -141,10 +148,10 @@ window.addEventListener('DOMContentLoaded', () => {
 								project={project}
 								apiKeyListLink={{ pageName: 'projectOverview', parameters: { project } }}
 							/>
-						</LayoutInner>}
-				</Page>,
-			]} />}
-		/>,
-		document.getElementById('root'),
-	)
-})
+						</LayoutInner>
+					)}
+				</Page>
+			</Pages>
+		}
+	/>,
+)

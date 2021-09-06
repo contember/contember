@@ -6,14 +6,14 @@ import { RoutingLinkTarget } from '../../routing'
 import { RoleRendererFactory, RoleRenderers } from './RoleRenderer'
 import { MemberList } from './MemberList'
 
-export interface UsersListProps<T> {
+export interface UsersListProps {
 	project: string
 	children?: undefined
 	createRoleRenderer?: RoleRendererFactory
 	createUserEditLink: (id: string) => RoutingLinkTarget
 }
 
-export const UsersList = memo<UsersListProps<any>>(({ createUserEditLink, ...props }) => (
+export const UsersList = memo<UsersListProps>(({ createUserEditLink, ...props }) => (
 	<MemberList
 		{...props}
 		createEditIdentityLink={createUserEditLink}

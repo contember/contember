@@ -8,7 +8,7 @@ import { useRemoveMemberIntent } from './useRemoveMemberIntent'
 import { IdentityMembership } from './IdentityMembership'
 import { QueryLoader } from './QueryLoader'
 
-export interface MemberListProps<T> {
+export interface MemberListProps {
 	project: string
 	children?: undefined
 	createRoleRenderer?: RoleRendererFactory
@@ -17,7 +17,7 @@ export interface MemberListProps<T> {
 	Identity: ComponentType<{ identity: MemberIdentity }>
 }
 
-export const MemberList = memo<MemberListProps<any>>(({ project, createRoleRenderer, createEditIdentityLink, Identity, memberType }) => {
+export const MemberList = memo<MemberListProps>(({ project, createRoleRenderer, createEditIdentityLink, Identity, memberType }) => {
 		const { state: query, refetch: refetchMembersList } = useListMembersQuery(project, memberType)
 		const removeMember = useRemoveMemberIntent(project, refetchMembersList)
 		const RoleRenderer = useRoleRenderer(createRoleRenderer, query)

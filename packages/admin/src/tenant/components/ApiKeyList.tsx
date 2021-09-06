@@ -3,14 +3,14 @@ import { RoutingLinkTarget } from '../../routing'
 import { memo } from 'react'
 import { MemberList } from './MemberList'
 
-export interface ApiKeyListProps<T> {
+export interface ApiKeyListProps {
 	project: string
 	children?: undefined
 	createRoleRenderer?: RoleRendererFactory
 	createApiKeyEditLink: (id: string) => RoutingLinkTarget
 }
 
-export const ApiKeyList = memo<ApiKeyListProps<any>>(({ createApiKeyEditLink, ...props }) => (
+export const ApiKeyList = memo<ApiKeyListProps>(({ createApiKeyEditLink, ...props }) => (
 	<MemberList
 		{...props}
 		createEditIdentityLink={createApiKeyEditLink}

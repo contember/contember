@@ -80,7 +80,7 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 		<Box heading={'Create a new project'}>
 			<form onSubmit={onSubmit}>
 				<FormGroup label={'Project slug'}>
-					<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} />
+					<TextInput {...register('slug')} pattern={'[a-z][-a-z0-9]*'} required />
 				</FormGroup>
 				<FormGroup label={'Project name'}>
 					<TextInput {...register('name')} placeholder={values.slug} />

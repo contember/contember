@@ -55,18 +55,14 @@ export const Pages = (props: PagesProps) => {
 		[props.children],
 	)
 
-	if (request === null) {
+	const page = request ? pageMap.get(request.pageName) : undefined
+
+	if (request === null || page === undefined) {
 		return (
 			<MiscPageLayout>
 				<Message type="danger" size="large">Page not found</Message>
 			</MiscPageLayout>
 		)
-	}
-
-	const page = pageMap.get(request.pageName)
-
-	if (page === undefined) {
-		throw new Error(`No such page as ${request.pageName}.`)
 	}
 
 	const requestEnv = rootEnv

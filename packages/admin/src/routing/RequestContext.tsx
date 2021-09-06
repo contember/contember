@@ -52,7 +52,7 @@ export const RequestProvider: FC = ({ children }) => {
 }
 
 export const populateRequest = (routing: RoutingContextValue, location: Location): RequestState => {
-	const request = pathToRequestState(routing, location.pathname)
+	const request = pathToRequestState(routing, location.pathname, location.search)
 
 	// Replace with canonical version of the url
 	if (request !== null) {

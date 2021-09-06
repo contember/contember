@@ -1,13 +1,10 @@
-export interface RecursiveStringObject {
-	[key: string]: string | RecursiveStringObject | undefined
-}
-
 export interface SelectedDimension {
 	[key: string]: string[]
 }
 
-
-export type PageParameters = RecursiveStringObject
+export interface PageParameters {
+	[key: string]: string | PageParameters | undefined
+}
 
 export interface PageRequest<P extends PageParameters> {
 	pageName: string

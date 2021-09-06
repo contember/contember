@@ -7,20 +7,28 @@ import { RequestState } from './types'
 const matchFunctionsCache: Record<string, MatchFunction> = {}
 const pathFunctionsCache: Record<string, PathFunction> = {}
 
-export const parseDimensions = (dimensions: string): Environment.SelectedDimensions => {
+export const dimensionsIn = (dimensions: string): Environment.SelectedDimensions => {
 	return dimensions
 		.split('+')
 		.map((pair: string) => pair.split('='))
 		.reduce((acc, [key, value]) => ({ ...acc, [key]: value.split(',') }), {})
 }
 
-export const stringifyDimensions = (dimensions: Environment.SelectedDimensions): string => {
+export const dimensionsOut = (dimensions: Environment.SelectedDimensions): string => {
 	return Object.entries(dimensions)
 		.map(([key, value]) => `${key}=${value.join(',')}`)
 		.join('+')
 }
 
-export const pathToRequestState = (routing: RoutingContextValue, path: string): RequestState => {
+export const pageNameIn = (pageName: string): string => {
+	return pageName.replace(/-([a-z])/g, m => m[1].toUpperCase())
+}
+
+export const pageNameOut = (pageName: string): string => {
+	return pageName.replace(/([A-Z])/g, '-$1').toLowerCase()
+}
+
+export const pathToRequestState = (routing: RoutingContextValue, path: string, query: string): RequestState => {
 	if (!path.startsWith(routing.basePath.slice(0, -1))) {
 		return null
 	}
@@ -28,7 +36,7 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string): 
 	const dimensionsSegment = path.slice(routing.basePath.length, path.indexOf('/', routing.basePath.length))
 	const hasDimensions = dimensionsSegment.includes('=')
 
-	const dimensions = hasDimensions ? parseDimensions(dimensionsSegment) : routing.defaultDimensions
+	const dimensions = hasDimensions ? dimensionsIn(dimensionsSegment) : routing.defaultDimensions
 	const pagePath = hasDimensions ? path.slice(routing.basePath.length + dimensionsSegment.length) : path.slice(routing.basePath.length - 1)
 	const pagePathNormalized = pagePath.endsWith('/') ? pagePath : `${pagePath}/`
 
@@ -45,7 +53,11 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string): 
 		}
 	}
 
-	return null
+	return {
+		pageName: pageNameIn(pagePathNormalized.slice(1, -1)),
+		parameters: Object.fromEntries(new URLSearchParams(query)),
+		dimensions: dimensions ?? {},
+	}
 }
 
 export const requestStateToPath = (routing: RoutingContextValue, request: RequestState): string => {
@@ -53,12 +65,18 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 		throw new PageNotFound(`Unable to generate URL for empty request`)
 	}
 
-	if (!routing.routes[request.pageName]) {
-		throw new PageNotFound(`No such route for page ${request.pageName}`)
-	}
-
-	const dimensionsString = stringifyDimensions(request.dimensions)
+	const dimensionsString = dimensionsOut(request.dimensions)
 	const dimensionsSegment = dimensionsString ? `/${dimensionsString}` : ''
+	const prefix = routing.basePath.slice(0, -1) + dimensionsSegment
+
+	if (!routing.routes[request.pageName]) {
+		const pageSegment = '/' + pageNameOut(request.pageName)
+
+		const query = new URLSearchParams(request.parameters).toString()
+		const querySegment = query ? `?${query}` : ''
+
+		return prefix + pageSegment + querySegment
+	}
 
 	const route = routing.routes[request.pageName]
 	const pathParameters = route.objectToParams ? route.objectToParams(request.parameters) : request.parameters
@@ -66,7 +84,7 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 	pathFunctionsCache[route.path] ??= pathToRegexp.compile(route.path, { encode: encodeURIComponent })
 	const pageSegment = pathFunctionsCache[route.path](pathParameters)
 
-	return routing.basePath.slice(0, -1) + dimensionsSegment + pageSegment
+	return prefix + pageSegment
 }
 
 export class PageNotFound extends Error {

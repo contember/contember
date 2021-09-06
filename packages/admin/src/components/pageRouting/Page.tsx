@@ -1,23 +1,23 @@
-import { ComponentType } from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import { useCurrentRequest } from '../../routing'
 
-export interface PageProps {
+export interface PageProps<P> {
 	name: string
-	children: ComponentType<any>
+	children: FunctionComponent<P> | ReactNode
 }
 
 /**
  * Page specifies one page. It must have a `name` prop and it's child must be a function which takes page's params and returns React node to render.
  */
-export const Page = (props: PageProps) => {
+export const Page = <P extends unknown = any>(props: PageProps<P>) => {
 	const request = useCurrentRequest()
 
 	if (request === null) {
 		return null
 	}
 
-	return <props.children {...request.parameters} />
+	return typeof props.children === 'function' ? <props.children {...request.parameters} /> : <>{props.children}</>
 }
 
 Page.displayName = 'Page'
-Page.getPageName = (props: PageProps): string => props.name
+Page.getPageName = (props: PageProps<unknown>): string => props.name

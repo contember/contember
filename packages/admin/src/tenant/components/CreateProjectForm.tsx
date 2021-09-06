@@ -1,5 +1,5 @@
 import { FC, SyntheticEvent, useState } from 'react'
-import { Box, Button, FormGroup, TextInput } from '@contember/ui'
+import { Box, Button, FormGroup, Select, TextInput } from '@contember/ui'
 import { useForm } from './useForm'
 import { useCreateProject } from '../hooks'
 import { useRedirect, useShowToast } from '../../components'
@@ -34,40 +34,47 @@ export const CreateProjectForm: FC<CreateProjectForm> = ({ projectListLink }) =>
 		if (values.dbPassword) {
 			secrets.push({ key: 'db.password', value: values.dbPassword })
 		}
-		const result = await createProject({
-			projectSlug,
-			name: values.name || undefined,
-			config: {
-				db: {
-					host: values.dbHost || undefined,
-					port: values.dbPort ? Number(values.dbPort) : undefined,
-					user: values.dbUser || undefined,
-					ssl: values.dbSsl ? values.dbSsl === 'yes' : undefined,
-					database: values.dbName || undefined,
+		try {
+			const result = await createProject({
+				projectSlug,
+				name: values.name || undefined,
+				config: {
+					db: {
+						host: values.dbHost || undefined,
+						port: values.dbPort ? Number(values.dbPort) : undefined,
+						user: values.dbUser || undefined,
+						ssl: values.dbSsl ? values.dbSsl === 'yes' : undefined,
+						database: values.dbName || undefined,
+					},
 				},
-			},
-			secrets,
-		})
-		if (result.ok) {
-			redirect(projectListLink)
-			toaster({
-				message: `Project ${projectSlug} created. Please save following deploy token: ${result.result.deployerApiKey.token}`,
-				type: 'success',
+				secrets,
 			})
-		} else {
-			switch (result.error.code) {
-				case 'ALREADY_EXISTS':
-					toaster({ message: `Project ${projectSlug} already exists`, type: 'error' })
-					break
-				case 'INIT_ERROR':
-					toaster({
-						message: `Project ${projectSlug} initialization has failed: ${result.error.developerMessage}`,
-						type: 'error',
-					})
-					break
+			if (result.ok) {
+				redirect(projectListLink)
+				toaster({
+					message: `Project ${projectSlug} created. Please save following deploy token: ${result.result.deployerApiKey.token}`,
+					type: 'success',
+				})
+			} else {
+				switch (result.error.code) {
+					case 'ALREADY_EXISTS':
+						toaster({ message: `Project ${projectSlug} already exists`, type: 'error' })
+						break
+					case 'INIT_ERROR':
+						toaster({
+							message: `Project ${projectSlug} initialization has failed: ${result.error.developerMessage}`,
+							type: 'error',
+						})
+						break
+				}
 			}
+		} catch (e) {
+			console.error(e)
+			toaster({ message: `Request has failed. Please try later.`, type: 'error' })
+
+		} finally {
+			setSubmitting(false)
 		}
-		setSubmitting(false)
 	}
 	return (
 		<Box heading={'Create a new project'}>

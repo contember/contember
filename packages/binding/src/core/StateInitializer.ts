@@ -286,9 +286,9 @@ export class StateInitializer {
 			},
 		}
 
-		const initialData: Set<string | undefined> =
+		const initialData: Iterable<string | undefined> =
 			initialEntityIds.size === 0
-				? new Set(Array.from({ length: blueprint.marker.parameters.initialEntityCount }))
+				? Array.from({ length: blueprint.marker.parameters.initialEntityCount })
 				: initialEntityIds
 		for (const entityId of initialData) {
 			this.initializeEntityRealm(

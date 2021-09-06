@@ -17,6 +17,7 @@ export interface ApplicationEntrypointProps extends ContemberClientProps {
 	dictionaries?: MessageDictionaryByLocaleCode
 	envVariables?: Record<string, string>
 	children: ReactNode
+	onInvalidIdentity?: () => void
 }
 
 const validateProps = (props: Partial<ApplicationEntrypointProps>) => {
@@ -58,7 +59,7 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 									stage={props.stage}
 								>
 									<NavigationProvider>
-										<IdentityProvider>
+										<IdentityProvider onInvalidIdentity={props.onInvalidIdentity}>
 											{props.children}
 										</IdentityProvider>
 									</NavigationProvider>

@@ -46,6 +46,9 @@ runReactApp(
 		sessionToken={'__SESSION_TOKEN__'}
 		apiBaseUrl={'/_api'}
 		basePath={'/_panel/'}
+		onInvalidIdentity={() => {
+			window.location.href = '/'
+		}}
 		routes={{
 			projectList: { path: '/' },
 			projectCreate: { path: '/project/create' },

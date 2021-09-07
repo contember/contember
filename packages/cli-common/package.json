@@ -14,6 +14,7 @@
     "@types/npm-package-arg": "^6.1.0"
   },
   "dependencies": {
+    "@contember/config-loader": "^0.12.0-alpha.11",
     "chalk": "^4.1.0",
     "download-tarball": "^2.0.0",
     "fs-extra": "^10.0.0",

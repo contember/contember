@@ -1,4 +1,4 @@
-import { EnvironmentContext, useEnvironment } from '@contember/binding'
+import { Environment, EnvironmentContext, useEnvironment } from '@contember/binding'
 import {
 	ComponentType,
 	Fragment,
@@ -63,6 +63,12 @@ export const Pages = (props: PagesProps) => {
 				<Message type="danger" size="large">Page not found</Message>
 			</MiscPageLayout>
 		)
+	}
+
+	for (const reservedVariableName of Environment.reservedVariableNames) {
+		if (reservedVariableName in request.parameters) {
+			throw new Error(`Cannot use ${reservedVariableName} as parameter name.`)
+		}
 	}
 
 	const requestEnv = rootEnv

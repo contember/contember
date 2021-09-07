@@ -55,10 +55,7 @@ export const useRoutingLinkFactory = () => {
 			href: href,
 			isActive: window.location.pathname === href, // todo better active detection
 			navigate: e => {
-				if (request !== null) {
-					window.history.pushState({}, document.title, href)
-					e?.preventDefault()
-				}
+				e?.preventDefault()
 				pushRequest(request)
 			},
 		}

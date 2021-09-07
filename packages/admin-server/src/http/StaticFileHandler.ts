@@ -19,17 +19,20 @@ export class StaticFileHandler {
 		const path = url.pathname.includes('.') ? url.pathname : basePath + 'index.html'
 		const contentType = getType(path) ?? 'application/octet-stream'
 
+		let content: Buffer
 		try {
-			const content = await readFile(this.publicDir + path)
-			res.setHeader('Content-Type', contentType)
-			if (options.fileProcessor) {
-				res.end(await options.fileProcessor(path.slice(basePath.length), content, req))
-			} else {
-				res.end(content)
-			}
+			content = await readFile(this.publicDir + path)
 		} catch (e) {
 			res.writeHead(404)
-			res.end()
+			return res.end()
+		}
+
+		res.setHeader('Content-Type', contentType)
+		if (options.fileProcessor) {
+			const processed = await options.fileProcessor(path.slice(basePath.length), content, req)
+			res.end(processed)
+		} else {
+			res.end(content)
 		}
 	}
 }

@@ -8,7 +8,7 @@ export default defineConfig({
 	root: 'public',
 	build: {
 		assetsDir: '_static',
-		outDir: resolve(rootDirectory, `packages/admin-server/dist`),
+		outDir: resolve(rootDirectory, `packages/admin-server/dist/public`),
 		rollupOptions: {
 			input: ['public/index.html', 'public/_panel/index.html'],
 			treeshake: {

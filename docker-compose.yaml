@@ -17,7 +17,7 @@ services:
 
   admin_server:
     image: node:14-alpine
-    command: '/src/node_modules/.bin/nodemon dist/run-admin.js'
+    command: 'node dist/server/run-admin.js'
 
     working_dir: /src/packages/admin-server
     volumes:
@@ -29,7 +29,7 @@ services:
 
       CONTEMBER_API_ENDPOINT: 'http://api:4000'
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
-      CONTEMBER_PUBLIC_DIR: '/src/packages/admin-server/dist'
+      CONTEMBER_PUBLIC_DIR: '/src/packages/admin-server/dist/public'
 
       CONTEMBER_S3_ENDPOINT: 'http://s3:9000'
       CONTEMBER_S3_REGION: '_'
@@ -45,7 +45,7 @@ services:
 
   admin_server_esbuild:
     image: node:14-alpine
-    command: '/src/node_modules/.bin/esbuild src/run-admin.ts --bundle --watch --sourcemap --platform=node --outdir=dist'
+    command: 'npm run watch:server'
 
     working_dir: /src/packages/admin-server
     volumes:
@@ -54,7 +54,7 @@ services:
 
   admin_server_vite:
     image: node:14-alpine
-    command: '/src/node_modules/.bin/vite build public --config vite.config.js --watch'
+    command: 'npm run watch:public'
 
     working_dir: /src/packages/admin-server
     volumes:

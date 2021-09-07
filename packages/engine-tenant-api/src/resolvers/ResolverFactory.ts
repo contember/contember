@@ -73,63 +73,41 @@ class ResolverFactory {
 				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),
 				projectBySlug: this.resolvers.projectQueryResolver.projectBySlug.bind(this.resolvers.projectQueryResolver),
 				projects: this.resolvers.projectQueryResolver.projects.bind(this.resolvers.projectQueryResolver),
-				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(
-					this.resolvers.projectMembersQueryResolver,
-				),
+				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),
 			},
 			Mutation: {
 				signUp: this.resolvers.signUpMutationResolver.signUp.bind(this.resolvers.signUpMutationResolver),
 				signIn: this.resolvers.signInMutationResolver.signIn.bind(this.resolvers.signInMutationResolver),
 				signOut: this.resolvers.signOutMutationResolver.signOut.bind(this.resolvers.signOutMutationResolver),
-				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(
-					this.resolvers.changePasswordMutationResolver,
-				),
+
+				changePassword: this.resolvers.changePasswordMutationResolver.changePassword.bind(this.resolvers.changePasswordMutationResolver),
+				changeMyPassword: this.resolvers.changePasswordMutationResolver.changeMyPassword.bind(this.resolvers.changePasswordMutationResolver),
+				createResetPasswordRequest: this.resolvers.resetPasswordMutationResolver.createResetPasswordRequest.bind(this.resolvers.resetPasswordMutationResolver),
+				resetPassword: this.resolvers.resetPasswordMutationResolver.resetPassword.bind(this.resolvers.resetPasswordMutationResolver),
+
 				initSignInIDP: this.resolvers.idpMutationResolver.initSignInIDP.bind(this.resolvers.idpMutationResolver),
 				signInIDP: this.resolvers.idpMutationResolver.signInIDP.bind(this.resolvers.idpMutationResolver),
-				createResetPasswordRequest: this.resolvers.resetPasswordMutationResolver.createResetPasswordRequest.bind(
-					this.resolvers.resetPasswordMutationResolver,
-				),
-				resetPassword: this.resolvers.resetPasswordMutationResolver.resetPassword.bind(
-					this.resolvers.resetPasswordMutationResolver,
-				),
-				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
-				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(
-					this.resolvers.inviteMutationResolver,
-				),
-				addProjectMember: this.resolvers.addProjectMemberMutationResolver.addProjectMember.bind(
-					this.resolvers.addProjectMemberMutationResolver,
-				),
-				updateProjectMember: this.resolvers.updateProjectMemberMutationResolver.updateProjectMember.bind(
-					this.resolvers.updateProjectMemberMutationResolver,
-				),
-				removeProjectMember: this.resolvers.removeProjectMemberMutationResolver.removeProjectMember.bind(
-					this.resolvers.updateProjectMemberMutationResolver,
-				),
 
-				createApiKey: this.resolvers.createApiKeyMutationResolver.createApiKey.bind(
-					this.resolvers.createApiKeyMutationResolver,
-				),
-				disableApiKey: this.resolvers.disableApiKeyMutationResolver.disableApiKey.bind(
-					this.resolvers.disableApiKeyMutationResolver,
-				),
+				invite: this.resolvers.inviteMutationResolver.invite.bind(this.resolvers.inviteMutationResolver),
+				unmanagedInvite: this.resolvers.inviteMutationResolver.unmanagedInvite.bind(this.resolvers.inviteMutationResolver),
+
+				addProjectMember: this.resolvers.addProjectMemberMutationResolver.addProjectMember.bind(this.resolvers.addProjectMemberMutationResolver),
+				updateProjectMember: this.resolvers.updateProjectMemberMutationResolver.updateProjectMember.bind(this.resolvers.updateProjectMemberMutationResolver),
+				removeProjectMember: this.resolvers.removeProjectMemberMutationResolver.removeProjectMember.bind(this.resolvers.updateProjectMemberMutationResolver),
+
+				createApiKey: this.resolvers.createApiKeyMutationResolver.createApiKey.bind(this.resolvers.createApiKeyMutationResolver),
+				disableApiKey: this.resolvers.disableApiKeyMutationResolver.disableApiKey.bind(this.resolvers.disableApiKeyMutationResolver),
+
 				prepareOtp: this.resolvers.otpMutationResolver.prepareOtp.bind(this.resolvers.otpMutationResolver),
 				confirmOtp: this.resolvers.otpMutationResolver.confirmOtp.bind(this.resolvers.otpMutationResolver),
 				disableOtp: this.resolvers.otpMutationResolver.disableOtp.bind(this.resolvers.otpMutationResolver),
-				addProjectMailTemplate: this.resolvers.mailTemplateMutationResolver.addProjectMailTemplate.bind(
-					this.resolvers.mailTemplateMutationResolver,
-				),
-				removeProjectMailTemplate: this.resolvers.mailTemplateMutationResolver.removeProjectMailTemplate.bind(
-					this.resolvers.mailTemplateMutationResolver,
-				),
-				createProject: this.resolvers.createProjectMutationResolver.createProject.bind(
-					this.resolvers.createProjectMutationResolver,
-				),
-				updateProject: this.resolvers.updateProjectMutationResolver.updateProject.bind(
-					this.resolvers.updateProjectMutationResolver,
-				),
-				setProjectSecret: this.resolvers.setProjectSecretMutationResolver.setProjectSecret.bind(
-					this.resolvers.setProjectSecretMutationResolver,
-				),
+
+				addProjectMailTemplate: this.resolvers.mailTemplateMutationResolver.addProjectMailTemplate.bind(this.resolvers.mailTemplateMutationResolver),
+				removeProjectMailTemplate: this.resolvers.mailTemplateMutationResolver.removeProjectMailTemplate.bind(this.resolvers.mailTemplateMutationResolver),
+
+				createProject: this.resolvers.createProjectMutationResolver.createProject.bind(this.resolvers.createProjectMutationResolver),
+				updateProject: this.resolvers.updateProjectMutationResolver.updateProject.bind(this.resolvers.updateProjectMutationResolver),
+				setProjectSecret: this.resolvers.setProjectSecretMutationResolver.setProjectSecret.bind(this.resolvers.setProjectSecretMutationResolver),
 			},
 		}
 	}

@@ -1,6 +1,6 @@
 import { CreatePasswordResetRequestCommand, ResetPasswordCommand, ResetPasswordCommandErrorCode } from '../commands'
 import { Response, ResponseError } from '../utils/Response'
-import { isWeakPassword, MIN_PASSWORD_LENGTH } from '../utils/password'
+import { getPasswordWeaknessMessage } from '../utils/password'
 import { UserMailer } from '../mailing'
 import { PersonRow } from '../queries'
 import { PermissionContextFactory } from '../authorization'
@@ -50,11 +50,9 @@ export class PasswordResetManager {
 	}
 
 	public async resetPassword(token: string, password: string): Promise<ResetPasswordResponse> {
-		if (isWeakPassword(password)) {
-			return new ResponseError(
-				ResetPasswordErrorCode.PASSWORD_TOO_WEAK,
-				`Password is too weak. Minimum length is ${MIN_PASSWORD_LENGTH}`,
-			)
+		const weakPassword = getPasswordWeaknessMessage(password)
+		if (weakPassword) {
+			return new ResponseError(ResetPasswordErrorCode.PASSWORD_TOO_WEAK, weakPassword)
 		}
 		return await this.dbContext.commandBus.execute(new ResetPasswordCommand(token, password))
 	}

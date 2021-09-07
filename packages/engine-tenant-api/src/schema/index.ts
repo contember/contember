@@ -74,6 +74,24 @@ export type ApiKeyWithToken = {
 	readonly identity: Identity
 }
 
+export type ChangeMyPasswordError = {
+	readonly __typename?: 'ChangeMyPasswordError'
+	readonly code: ChangeMyPasswordErrorCode
+	readonly developerMessage: Scalars['String']
+}
+
+export enum ChangeMyPasswordErrorCode {
+	TooWeak = 'TOO_WEAK',
+	NotAPerson = 'NOT_A_PERSON',
+	InvalidPassword = 'INVALID_PASSWORD'
+}
+
+export type ChangeMyPasswordResponse = {
+	readonly __typename?: 'ChangeMyPasswordResponse'
+	readonly ok: Scalars['Boolean']
+	readonly error?: Maybe<ChangeMyPasswordError>
+}
+
 export type ChangePasswordError = {
 	readonly __typename?: 'ChangePasswordError'
 	readonly code: ChangePasswordErrorCode
@@ -388,6 +406,7 @@ export type Mutation = {
 	readonly signIn?: Maybe<SignInResponse>
 	readonly signOut?: Maybe<SignOutResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
+	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
 	readonly signInIDP?: Maybe<SignInIdpResponse>
 	readonly prepareOtp?: Maybe<PrepareOtpResponse>
@@ -432,6 +451,12 @@ export type MutationSignOutArgs = {
 export type MutationChangePasswordArgs = {
 	personId: Scalars['String']
 	password: Scalars['String']
+}
+
+
+export type MutationChangeMyPasswordArgs = {
+	currentPassword: Scalars['String']
+	newPassword: Scalars['String']
 }
 
 
@@ -943,6 +968,9 @@ export type ResolversTypes = {
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
 	ApiKey: ResolverTypeWrapper<ApiKey>
 	ApiKeyWithToken: ResolverTypeWrapper<ApiKeyWithToken>
+	ChangeMyPasswordError: ResolverTypeWrapper<ChangeMyPasswordError>
+	ChangeMyPasswordErrorCode: ChangeMyPasswordErrorCode
+	ChangeMyPasswordResponse: ResolverTypeWrapper<ChangeMyPasswordResponse>
 	ChangePasswordError: ResolverTypeWrapper<ChangePasswordError>
 	ChangePasswordErrorCode: ChangePasswordErrorCode
 	ChangePasswordResponse: ResolverTypeWrapper<ChangePasswordResponse>
@@ -1045,6 +1073,8 @@ export type ResolversParentTypes = {
 	AddProjectMemberResponse: AddProjectMemberResponse
 	ApiKey: ApiKey
 	ApiKeyWithToken: ApiKeyWithToken
+	ChangeMyPasswordError: ChangeMyPasswordError
+	ChangeMyPasswordResponse: ChangeMyPasswordResponse
 	ChangePasswordError: ChangePasswordError
 	ChangePasswordResponse: ChangePasswordResponse
 	CheckResetPasswordTokenResult: CheckResetPasswordTokenResult
@@ -1155,6 +1185,18 @@ export type ApiKeyWithTokenResolvers<ContextType = any, ParentType extends Resol
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ChangeMyPasswordErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeMyPasswordError'] = ResolversParentTypes['ChangeMyPasswordError']> = {
+	code?: Resolver<ResolversTypes['ChangeMyPasswordErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ChangeMyPasswordResponseResolvers<ContextType = any, ParentType extends ResolversParentTypes['ChangeMyPasswordResponse'] = ResolversParentTypes['ChangeMyPasswordResponse']> = {
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	error?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordError']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -1352,6 +1394,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	signIn?: Resolver<Maybe<ResolversTypes['SignInResponse']>, ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>
 	signOut?: Resolver<Maybe<ResolversTypes['SignOutResponse']>, ParentType, ContextType, RequireFields<MutationSignOutArgs, never>>
 	changePassword?: Resolver<Maybe<ResolversTypes['ChangePasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangePasswordArgs, 'personId' | 'password'>>
+	changeMyPassword?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordResponse']>, ParentType, ContextType, RequireFields<MutationChangeMyPasswordArgs, 'currentPassword' | 'newPassword'>>
 	initSignInIDP?: Resolver<Maybe<ResolversTypes['InitSignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationInitSignInIdpArgs, 'identityProvider' | 'redirectUrl'>>
 	signInIDP?: Resolver<Maybe<ResolversTypes['SignInIDPResponse']>, ParentType, ContextType, RequireFields<MutationSignInIdpArgs, 'identityProvider' | 'idpResponse' | 'redirectUrl' | 'sessionData'>>
 	prepareOtp?: Resolver<Maybe<ResolversTypes['PrepareOtpResponse']>, ParentType, ContextType, RequireFields<MutationPrepareOtpArgs, never>>
@@ -1589,6 +1632,8 @@ export type Resolvers<ContextType = any> = {
 	AddProjectMemberResponse?: AddProjectMemberResponseResolvers<ContextType>
 	ApiKey?: ApiKeyResolvers<ContextType>
 	ApiKeyWithToken?: ApiKeyWithTokenResolvers<ContextType>
+	ChangeMyPasswordError?: ChangeMyPasswordErrorResolvers<ContextType>
+	ChangeMyPasswordResponse?: ChangeMyPasswordResponseResolvers<ContextType>
 	ChangePasswordError?: ChangePasswordErrorResolvers<ContextType>
 	ChangePasswordResponse?: ChangePasswordResponseResolvers<ContextType>
 	CheckResetPasswordTokenResult?: CheckResetPasswordTokenResultResolvers<ContextType>

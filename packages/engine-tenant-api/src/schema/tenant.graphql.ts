@@ -22,6 +22,7 @@ const schema: DocumentNode = gql`
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		signOut(all: Boolean): SignOutResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
+		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
 
 		initSignInIDP(identityProvider: String!, redirectUrl: String!): InitSignInIDPResponse
 		signInIDP(identityProvider: String!, idpResponse: IDPResponseInput!, redirectUrl: String!, sessionData: Json!, expiration: Int): SignInIDPResponse
@@ -136,6 +137,23 @@ const schema: DocumentNode = gql`
 	enum ChangePasswordErrorCode {
 		PERSON_NOT_FOUND
 		TOO_WEAK
+	}
+
+
+	type ChangeMyPasswordResponse {
+		ok: Boolean!
+		error: ChangeMyPasswordError
+	}
+
+	type ChangeMyPasswordError {
+		code: ChangeMyPasswordErrorCode!
+		developerMessage: String!
+	}
+
+	enum ChangeMyPasswordErrorCode {
+		TOO_WEAK
+		NOT_A_PERSON
+		INVALID_PASSWORD
 	}
 
 	# === IDP ===

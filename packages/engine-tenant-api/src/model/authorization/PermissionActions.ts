@@ -15,6 +15,7 @@ namespace PermissionActions {
 	export const PERSON_SIGN_OUT = Authorizator.createAction(Resources.person, 'signOut')
 	export const PERSON_SETUP_OTP = Authorizator.createAction(Resources.person, 'setupOtp')
 	export const PERSON_CHANGE_PASSWORD = Authorizator.createAction(Resources.person, 'changePassword')
+	export const PERSON_CHANGE_MY_PASSWORD = Authorizator.createAction(Resources.person, 'changeMyPassword')
 	export const PERSON_RESET_PASSWORD = Authorizator.createAction(Resources.person, 'resetPassword')
 	export const PERSON_CREATE_IDP_URL = Authorizator.createAction(Resources.person, 'createIdPUrl')
 	export const PERSON_SIGN_IN_IDP = Authorizator.createAction(Resources.person, 'signInIdp')

@@ -126,8 +126,8 @@ export class TenantContainerFactory {
 				new ApiKeyManager(dbContext, apiKeyService))
 			.addService('signUpManager', ({ dbContext }) =>
 				new SignUpManager(dbContext))
-			.addService('passwordChangeManager', ({ dbContext }) =>
-				new PasswordChangeManager(dbContext))
+			.addService('passwordChangeManager', ({ dbContext, providers }) =>
+				new PasswordChangeManager(dbContext, providers))
 			.addService('projectMemberManager', ({ dbContext }) =>
 				new ProjectMemberManager(dbContext))
 			.addService('identityFactory', ({ projectMemberManager }) =>

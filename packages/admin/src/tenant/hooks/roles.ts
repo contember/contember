@@ -1,18 +1,24 @@
 import { useAuthedTenantQuery } from './lib'
 
+export const PROJECT_ROLES_FRAGMENT = `
+	fragment ProjectRoles on Project {
+		roles {
+			name
+			variables {
+				... on RoleEntityVariableDefinition {
+					name
+					entityName
+				}
+			}
+		}
+	}
+`
 const LIST_ROLES_QUERY = `
+	${PROJECT_ROLES_FRAGMENT}
 	query($slug: String!) {
 		project: projectBySlug(slug: $slug) {
 			id
-			roles {
-				name
-				variables {
-					... on RoleEntityVariableDefinition {
-						name
-						entityName
-					}
-				}
-			}
+			... ProjectRoles
 		}
 	}
 `

@@ -1,20 +1,22 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
+import { packageList } from '../../build/packageList'
 import { rootDirectory } from '../../build/rootDirectory'
 import reactRefresh from '@vitejs/plugin-react-refresh'
-import { packageList } from '../../build/packageList'
 
-export default defineConfig(async ({ command, mode }) => ({
+export default defineConfig({
+	root: 'public',
 	build: {
-		minify: mode === 'development' ? false : 'terser',
-		outDir: resolve(rootDirectory, `packages/admin-server/dist`),
 		assetsDir: '_static',
-		sourcemap: true,
-		target: 'es2020',
+		outDir: resolve(rootDirectory, `packages/admin-server/dist`),
 		rollupOptions: {
+			input: ['public/index.html', 'public/_panel/index.html'],
 			treeshake: {
 				moduleSideEffects: (id, external) => {
-					return id.endsWith('packages/admin-server/public/main.tsx')
+					return (
+						id.endsWith('packages/admin-server/public/main.tsx') ||
+						id.endsWith('packages/admin-server/public/_panel/main.tsx')
+					)
 				},
 			},
 		},
@@ -32,4 +34,4 @@ export default defineConfig(async ({ command, mode }) => ({
 			})),
 		],
 	},
-}))
+})

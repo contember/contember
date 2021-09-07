@@ -11,11 +11,7 @@ export const useLogout = () => {
 
 	return useCallback(
 		async () => {
-			if (!logout) {
-				throw new Error('Identity context is not initialized')
-			}
-
-			logout()
+			logout?.()
 
 			const response = await tenantLogout({})
 			if (!response.signOut.ok) {

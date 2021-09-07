@@ -62,7 +62,7 @@ services:
 
 
   api:
-    image: contember/contember:canary-22b4fb522631340e5b3c9b03982d23
+    image: contember/contember:0.12.0-alpha.11
 
     environment:
       NODE_ENV: 'development'

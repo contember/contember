@@ -13,10 +13,11 @@ export interface TableProps {
 	tableHead?: ReactNode
 	size?: Size
 	justification?: Justification
+	bare?: boolean
 	//useTableElement?: boolean
 }
 
-export const Table = memo(({ /*useTableElement = true, */ ...props }: TableProps) => {
+export const Table = memo(({ /*useTableElement = true, */ bare, ...props }: TableProps) => {
 	const prefix = useClassNamePrefix()
 	const className = cn(
 		`${prefix}table`,
@@ -24,20 +25,22 @@ export const Table = memo(({ /*useTableElement = true, */ ...props }: TableProps
 		toEnumViewClass(props.justification, 'justifyStart'),
 	)
 
+	const table = (
+		<div className={`${prefix}table-wrapper`}>
+			{/*{useTableElement ? (*/}
+			<table className={className}>
+				{props.tableHead && <thead>{props.tableHead}</thead>}
+				<tbody>{props.children}</tbody>
+			</table>
+			{/*) : (*/}
+			{/*	<div className={className}>{props.children}</div>*/}
+			{/*)}*/}
+		</div>
+	)
+
 	return (
 		<UseTableElementContext.Provider value={/*useTableElement*/ true}>
-			<Box heading={props.heading}>
-				<div className={`${prefix}table-wrapper`}>
-					{/*{useTableElement ? (*/}
-					<table className={className}>
-						{props.tableHead && <thead>{props.tableHead}</thead>}
-						<tbody>{props.children}</tbody>
-					</table>
-					{/*) : (*/}
-					{/*	<div className={className}>{props.children}</div>*/}
-					{/*)}*/}
-				</div>
-			</Box>
+			{bare ? table : <Box heading={props.heading}>{table}</Box>}
 		</UseTableElementContext.Provider>
 	)
 })

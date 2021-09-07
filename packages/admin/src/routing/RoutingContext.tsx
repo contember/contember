@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react'
-import { RouteMap } from '../components/pageRouting/utils'
-import { SelectedDimension } from './types'
+import { RouteMap, SelectedDimension } from './types'
 
 export interface RoutingContextValue {
 	basePath: string

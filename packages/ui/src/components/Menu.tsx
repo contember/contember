@@ -44,6 +44,7 @@ namespace Menu {
 		children?: ReactNode
 		title?: string | ReactNode
 		to?: T
+		href?: string
 		external?: boolean
 		expandedByDefault?: boolean
 	}
@@ -119,7 +120,7 @@ namespace Menu {
 	}
 
 	function GroupItem(props: ItemProps) {
-		const { isActive, href, navigate } = useNavigationLink(props.to)
+		const { isActive, href, navigate } = useNavigationLink(props.to, props.href)
 		const prefix = useClassNamePrefix()
 		return (
 			<ItemWrapper className={`${prefix}menu-group`} isActive={isActive}>
@@ -131,7 +132,7 @@ namespace Menu {
 
 	function SubGroupItem(props: ItemProps) {
 		const [expanded, setExpanded] = useState(!!props.expandedByDefault)
-		const { isActive, href, navigate } = useNavigationLink(props.to)
+		const { isActive, href, navigate } = useNavigationLink(props.to, props.href)
 		const onClick = useCallback((e: ReactMouseEvent) => {
 			setExpanded(!expanded)
 			navigate?.(e)
@@ -160,7 +161,7 @@ namespace Menu {
 	}
 
 	function ActionItem(props: ItemProps) {
-		const { isActive, href, navigate } = useNavigationLink(props.to)
+		const { isActive, href, navigate } = useNavigationLink(props.to, props.href)
 		const prefix = useClassNamePrefix()
 		return (
 			<ItemWrapper className={`${prefix}menu-action`} isActive={isActive}>
@@ -171,7 +172,7 @@ namespace Menu {
 	}
 
 	function TooDeepItem(props: ItemProps) {
-		const { isActive, href, navigate } = useNavigationLink(props.to)
+		const { isActive, href, navigate } = useNavigationLink(props.to, props.href)
 		const prefix = useClassNamePrefix()
 		return (
 			<ItemWrapper className={`${prefix}menu-tooDeep`} isActive={isActive}>

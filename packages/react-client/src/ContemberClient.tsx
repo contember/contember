@@ -3,32 +3,22 @@ import { SessionTokenContext } from './auth'
 import { ApiBaseUrlContext, LoginTokenContext } from './config'
 import { ProjectSlugContext, StageSlugContext } from './project'
 
-export type ContemberClientProps = {
-	children: ReactNode
+export interface ContemberClientProps {
 	apiBaseUrl: string
-} & (
-	| {
-			sessionToken: string
-			project: string
-			stage: string
-			loginToken?: string
-	  }
-	| {
-			sessionToken?: string
-			project?: string
-			stage?: string
-			loginToken: string
-	  }
-)
+	sessionToken?: string
+	loginToken?: string
+	project?: string
+	stage?: string
+}
 
-export const ContemberClient = memo(function ContemberClient({
+export const ContemberClient = memo<ContemberClientProps & { children: React.ReactNode }>(function ContemberClient({
 	apiBaseUrl,
 	children,
 	loginToken,
 	project,
 	sessionToken,
 	stage,
-}: ContemberClientProps) {
+}) {
 	return (
 		<ApiBaseUrlContext.Provider value={apiBaseUrl}>
 			<LoginTokenContext.Provider value={loginToken}>

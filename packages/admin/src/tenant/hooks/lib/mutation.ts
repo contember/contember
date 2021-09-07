@@ -11,39 +11,34 @@ export const useMutation = <R, V>(client: GraphQlClient, query: string, apiToken
 		finished: false,
 	})
 	const cb = useCallback(
-		(variables: V) => {
-			if (client) {
-				setState({
-					loading: true,
-					finished: false,
-					error: false,
-				})
-				const response = client.sendRequest<{ data: R, extensions?: any }>(query, {
+		async (variables: V) => {
+			setState({
+				loading: true,
+				finished: false,
+				error: false,
+			})
+			try {
+				const response = await client.sendRequest<{ data: R, extensions?: any, errors?: any }>(query, {
 					variables,
 					apiTokenOverride: apiToken,
 					headers,
 				})
-				return response.then(
-					data => {
-						setState({
-							...data,
-							loading: false,
-							finished: true,
-							error: false,
-						})
-						return Promise.resolve(data.data)
-					},
-					() => {
-						setState({
-							loading: false,
-							finished: true,
-							error: true,
-						})
-						return Promise.reject()
-					},
-				)
+				setState({
+					...response,
+					loading: false,
+					finished: true,
+					error: false,
+				})
+				return response.data
+
+			} catch (e) {
+				setState({
+					loading: false,
+					finished: true,
+					error: true,
+				})
+				throw e
 			}
-			return Promise.reject()
 		},
 		[client, query, apiToken, headers],
 	)

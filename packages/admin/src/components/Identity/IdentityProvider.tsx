@@ -21,7 +21,7 @@ interface IdentityContext {
 }
 
 export const IdentityContext = createContext<IdentityContext | undefined>(undefined)
-export const IdentityProvider: React.FC = ({ children }) => {
+export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ children, onInvalidIdentity }) => {
 	const [identity, setIdentity] = useState<Identity>()
 	const [identityCleared, setIdentityCleared] = useState(false)
 	const sessionToken = useSessionToken()
@@ -29,6 +29,9 @@ export const IdentityProvider: React.FC = ({ children }) => {
 
 	useEffect(
 		() => {
+			if (me.error && onInvalidIdentity) {
+				onInvalidIdentity()
+			}
 			if (!me.finished || me.error || sessionToken === undefined || identity) {
 				return
 			}
@@ -46,7 +49,7 @@ export const IdentityProvider: React.FC = ({ children }) => {
 				})),
 			})
 		},
-		[identity, sessionToken, me],
+		[identity, sessionToken, me, onInvalidIdentity],
 	)
 
 	const clearIdentity = useCallback(

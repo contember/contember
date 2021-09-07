@@ -1,14 +1,18 @@
 import { useAuthedTenantQuery } from './lib'
+import { PROJECT_ROLES_FRAGMENT, RoleDefinition } from './roles'
 
-const LIST_USERS_QUERY = `
-	query($slug: String!) {
+const LIST_MEMBERS_QUERY = `
+	${PROJECT_ROLES_FRAGMENT}
+	query($slug: String!, $memberType: MemberType) {
 		project: projectBySlug(slug: $slug) {
 			id
 			name
 			slug
-			members(memberType: PERSON) {
+			... ProjectRoles
+			members(memberType: $memberType) {
 				identity {
 					id
+					description
 					person {
 						id
 						email
@@ -34,28 +38,38 @@ export interface Membership {
 	}[]
 }
 
-interface ListUserQueryResult {
+export interface MemberIdentity {
+	id: string
+	description?: string
+	person?: {
+		id: string
+		email: string
+	}
+}
+
+export interface ListMembersQuery {
 	project: {
 		id: string
 		name: string
 		slug: string
+		roles: RoleDefinition[]
 		members: {
-			identity: {
-				id: string
-				person?: {
-					id: string
-					email: string
-				}
-			}
+			identity: MemberIdentity
 			memberships: Membership[]
 		}[]
 	}
 }
 
-interface ListUserQueryVariables {
+export type ListMembersMemberType = 'PERSON' | 'API_KEY'
+
+interface ListMembersQueryVariables {
 	slug: string
+	memberType?: ListMembersMemberType
 }
 
-export const useListUsersQuery = (projectSlug: string) => {
-	return useAuthedTenantQuery<ListUserQueryResult, ListUserQueryVariables>(LIST_USERS_QUERY, { slug: projectSlug })
+export const useListMembersQuery = (projectSlug: string, memberType: ListMembersQueryVariables['memberType']) => {
+	return useAuthedTenantQuery<ListMembersQuery, ListMembersQueryVariables>(LIST_MEMBERS_QUERY, {
+		slug: projectSlug,
+		memberType,
+	})
 }

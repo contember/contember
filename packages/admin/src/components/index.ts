@@ -1,3 +1,4 @@
+export * from './ApplicationEntrypoint'
 export * from './bindingFacade'
 export * from './Identity'
 export * from './Login'

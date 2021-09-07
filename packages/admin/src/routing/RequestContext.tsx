@@ -58,7 +58,7 @@ export const populateRequest = (routing: RoutingContextValue, location: Location
 	if (request !== null) {
 		const canonicalPath = requestStateToPath(routing, request)
 
-		if (canonicalPath !== location.pathname) {
+		if (canonicalPath !== location.pathname + location.search) {
 			window.history.replaceState({}, document.title, canonicalPath)
 		}
 	}

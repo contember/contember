@@ -162,6 +162,11 @@ namespace Environment {
 		'rootShouldExists',
 	])
 
+	export const reservedVariableNames: Set<string> = new Set([
+		...systemVariableNames,
+		'dimensions',
+	])
+
 	export type SystemVariableName = keyof SystemVariables
 
 	export interface SelectedDimensions {

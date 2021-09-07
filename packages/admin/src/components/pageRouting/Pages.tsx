@@ -1,4 +1,4 @@
-import { EnvironmentContext, useEnvironment } from '@contember/binding'
+import { Environment, EnvironmentContext, useEnvironment } from '@contember/binding'
 import {
 	ComponentType,
 	Fragment,
@@ -55,7 +55,9 @@ export const Pages = (props: PagesProps) => {
 		[props.children],
 	)
 
-	if (request === null) {
+	const page = request ? pageMap.get(request.pageName) : undefined
+
+	if (request === null || page === undefined) {
 		return (
 			<MiscPageLayout>
 				<Message type="danger" size="large">Page not found</Message>
@@ -63,10 +65,10 @@ export const Pages = (props: PagesProps) => {
 		)
 	}
 
-	const page = pageMap.get(request.pageName)
-
-	if (page === undefined) {
-		throw new Error(`No such page as ${request.pageName}.`)
+	for (const reservedVariableName of Environment.reservedVariableNames) {
+		if (reservedVariableName in request.parameters) {
+			throw new Error(`Cannot use ${reservedVariableName} as parameter name.`)
+		}
 	}
 
 	const requestEnv = rootEnv

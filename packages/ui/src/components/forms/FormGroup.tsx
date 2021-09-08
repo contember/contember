@@ -32,6 +32,7 @@ export const FormGroup = memo(
 	}: FormGroupProps) => {
 		const LabelElement = useLabelElement ? 'label' : 'div'
 		const prefix = useClassNamePrefix()
+
 		return (
 			<div className={cn(`${prefix}formGroup`, toEnumViewClass(size), toEnumViewClass(labelPosition))}>
 				<LabelElement className={`${prefix}formGroup-label`}>

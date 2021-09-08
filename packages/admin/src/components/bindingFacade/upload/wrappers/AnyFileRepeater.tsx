@@ -1,5 +1,5 @@
 import { Component, EntityAccessor, SugaredFieldProps, SugaredRelativeEntityList } from '@contember/binding'
-import type { ReactElement } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import { BareFileRepeater, FileInputPublicProps } from '../internalComponents'
 import type { StockAnyFileKindProps } from '../stockFileKinds'
 import { getStockAnyFileKind } from '../stockFileKinds'
@@ -7,8 +7,10 @@ import { getStockAnyFileKind } from '../stockFileKinds'
 export interface AnyFileRepeaterProps<AcceptArtifacts = unknown>
 	extends SugaredRelativeEntityList,
 		StockAnyFileKindProps<AcceptArtifacts>,
-		FileInputPublicProps {
+		Omit<FileInputPublicProps, 'label'> {
 	sortableBy?: SugaredFieldProps['field']
+	label?: ReactNode
+	itemLabel: ReactNode
 }
 
 export const AnyFileRepeater = Component<AnyFileRepeaterProps>(

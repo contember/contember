@@ -66,7 +66,6 @@
 		display: flex
 		align-items: stretch
 		width: 100%
-		flex-grow: 1
 
 	&-sideBar
 		display: flex
@@ -75,11 +74,8 @@
 		flex-grow: 0
 		width: $cui-layout-sidebar-width
 		border-right: $cui-layout-border
+		position: relative
 		transition: width $easing .5s
-		position: absolute
-		top: 0
-		left: 0
-		bottom: 0
 
 		&-in
 			position: relative
@@ -139,11 +135,10 @@
 		flex-grow: 1
 		background: $cui-layout-background
 		transition: margin-left $easing .5s
-		margin-left: $cui-layout-sidebar-width
 		min-height: 100%
 
-	&-space
-		padding: .5em 1em
+	// &-space
+	// 	padding: .5em 1em
 
 	&.view-collapsed &-actionBar-sideBar
 		width: 4.45em
@@ -161,4 +156,4 @@
 		transform: rotate(180deg)
 
 	&.view-collapsed &-main
-		margin-left: 4.45em
+		margin-left: 0

@@ -1,4 +1,4 @@
-import { Box } from '@contember/ui'
+import { Stack } from '@contember/ui'
 import type { ReactNode } from 'react'
 
 export const LayoutContent = ({ children }: { children: ReactNode }) => (
@@ -6,11 +6,13 @@ export const LayoutContent = ({ children }: { children: ReactNode }) => (
 )
 
 export const LayoutInner = ({ children }: { children: ReactNode }) => (
-	<div className="layout-content-in">{children}</div>
+	<Stack direction="vertical" className="layout-content-in">{children}</Stack>
 )
 
 export const LayoutSide = ({ children }: { children: ReactNode }) => (
 	<div className="layout-content-side">
-		<Box>{children}</Box>
+		<Stack depth={2} direction="vertical">
+			{children}
+		</Stack>
 	</div>
 )

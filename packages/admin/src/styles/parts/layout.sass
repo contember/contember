@@ -67,12 +67,17 @@
 		display: flex
 		justify-content: flex-start
 		align-items: flex-start
+		gap: $cui-gap * 8
+		margin: 1em
 
 		&-in
-			padding: 0 rem(25px)
 			flex-grow: 1
 
 		&-side
+			background-color: $cui-box-depth-2-background
+			border: $cui-box-depth-2-border
+			border-radius: $cui-control-border-radius
+			padding: $cui-box-depth-2-padding-y $cui-box-depth-2-padding-x
 			width: 20rem
 			flex-shrink: 0
 			position: sticky
@@ -85,3 +90,18 @@
 		&-content
 			flex-direction: column
 			align-items: stretch
+			gap: $cui-gap * 12
+			margin: 0
+
+			&-in
+				padding: 1em
+
+			&-side
+				background-color: $cui-box-depth-2-background
+				border: unset
+				border-radius: unset
+				border-top: $cui-box-depth-2-border
+				display: flex
+				flex-direction: column
+				padding-bottom: calc(#{$cui-box-depth-2-padding-y} + env(safe-area-inset-bottom))
+				width: auto

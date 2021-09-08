@@ -6,8 +6,6 @@ export interface EntityListPreferences {
 	initialEntityCount: number
 }
 
-export interface SugarableEntityListPreferences {}
-
 export interface UnsugarableEntityListPreferences {
 	initialEntityCount?: number
 }

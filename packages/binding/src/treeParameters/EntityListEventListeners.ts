@@ -13,8 +13,6 @@ export interface EntityListEventListeners {
 	childEventListeners: EntityEventListenerStore | undefined
 }
 
-export interface SugarableEntityListEventListeners {}
-
 export type UnsugarableEntityListEventListeners = {
 	[EventType in keyof UnsugarableEvents & string as `on${Capitalize<EventType>}`]?:
 		| UnsugarableEvents[EventType]

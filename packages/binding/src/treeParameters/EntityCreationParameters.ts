@@ -27,8 +27,6 @@ export interface EntityCreationParameters {
 	setOnCreate: SetOnCreate
 }
 
-export interface SugarableEntityCreationParameters {}
-
 export interface UnsugarableEntityCreationParameters {
 	// forceCreation?: boolean
 	isNonbearing?: boolean

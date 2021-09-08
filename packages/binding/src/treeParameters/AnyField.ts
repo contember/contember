@@ -7,5 +7,3 @@ export interface AnyField {
 export interface SugarableAnyField {
 	field: FieldName
 }
-
-export interface UnsugarableAnyField {}

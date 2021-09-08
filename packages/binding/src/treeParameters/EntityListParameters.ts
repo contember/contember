@@ -1,8 +1,4 @@
-import type {
-	EntityListPreferences,
-	SugarableEntityListPreferences,
-	UnsugarableEntityListPreferences,
-} from './EntityListPreferences'
+import type { EntityListPreferences, UnsugarableEntityListPreferences } from './EntityListPreferences'
 import type { Filter, Limit, Offset, OrderBy, SugaredFilter, SugaredOrderBy } from './primitives'
 
 export interface EntityListParameters extends EntityListPreferences {
@@ -12,7 +8,7 @@ export interface EntityListParameters extends EntityListPreferences {
 	filter: Filter | undefined
 }
 
-export interface SugarableEntityListParameters extends SugarableEntityListPreferences {
+export interface SugarableEntityListParameters {
 	filter?: SugaredFilter
 }
 

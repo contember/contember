@@ -1,9 +1,5 @@
-import type { AnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
-import type {
-	EntityCreationParameters,
-	SugarableEntityCreationParameters,
-	UnsugarableEntityCreationParameters,
-} from './EntityCreationParameters'
+import type { AnyField, SugarableAnyField } from './AnyField'
+import type { EntityCreationParameters, UnsugarableEntityCreationParameters } from './EntityCreationParameters'
 import type { ExpectedRelationMutation } from './primitives'
 
 export const RelationDefaults = {
@@ -14,8 +10,8 @@ export interface Relation extends AnyField, EntityCreationParameters {
 	expectedMutation: ExpectedRelationMutation
 }
 
-export interface SugarableRelation extends SugarableAnyField, SugarableEntityCreationParameters {}
+export interface SugarableRelation extends SugarableAnyField {}
 
-export interface UnsugarableRelation extends UnsugarableAnyField, UnsugarableEntityCreationParameters {
+export interface UnsugarableRelation extends UnsugarableEntityCreationParameters {
 	expectedMutation?: ExpectedRelationMutation
 }

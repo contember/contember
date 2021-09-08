@@ -9,7 +9,6 @@ export interface SingleEntityEventListeners {
 	eventListeners: EntityEventListenerStore | undefined
 }
 
-export interface SugarableSingleEntityEventListeners {}
 
 export type UnsugarableSingleEntityEventListeners = {
 	[EventName in Exclude<keyof EntityAccessor.EntityEventListenerMap, 'connectionUpdate'> &

@@ -7,5 +7,3 @@ export interface SingleEntityParameters {
 export interface SugarableSingleEntityParameters {
 	filter?: SugaredFilter
 }
-
-export interface UnsugarableSingleEntityParameters {}

@@ -7,5 +7,3 @@ export interface QualifiedSingleEntityParameters {
 export interface SugarableQualifiedSingleEntityParameters {
 	where: SugaredUniqueWhere
 }
-
-export interface UnsugarableQualifiedSingleEntityParameters {}

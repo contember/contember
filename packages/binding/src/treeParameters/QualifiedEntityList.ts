@@ -1,13 +1,5 @@
-import type {
-	EntityCreationParameters,
-	SugarableEntityCreationParameters,
-	UnsugarableEntityCreationParameters,
-} from './EntityCreationParameters'
-import type {
-	EntityListEventListeners,
-	SugarableEntityListEventListeners,
-	UnsugarableEntityListEventListeners,
-} from './EntityListEventListeners'
+import type { EntityCreationParameters, UnsugarableEntityCreationParameters } from './EntityCreationParameters'
+import type { EntityListEventListeners, UnsugarableEntityListEventListeners } from './EntityListEventListeners'
 import type {
 	EntityListParameters,
 	SugarableEntityListParameters,
@@ -32,9 +24,7 @@ export interface QualifiedEntityList
 
 export interface SugarableQualifiedEntityList
 	extends SugarableEntityListParameters,
-		SugarableQualifiedEntityParameters,
-		SugarableEntityCreationParameters,
-		SugarableEntityListEventListeners {
+		SugarableQualifiedEntityParameters {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 

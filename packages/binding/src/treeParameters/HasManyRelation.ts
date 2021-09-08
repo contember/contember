@@ -1,8 +1,4 @@
-import type {
-	EntityListEventListeners,
-	SugarableEntityListEventListeners,
-	UnsugarableEntityListEventListeners,
-} from './EntityListEventListeners'
+import type { EntityListEventListeners, UnsugarableEntityListEventListeners } from './EntityListEventListeners'
 import type {
 	EntityListParameters,
 	SugarableEntityListParameters,
@@ -14,8 +10,7 @@ export interface HasManyRelation extends Relation, EntityListParameters, EntityL
 
 export interface SugarableHasManyRelation
 	extends SugarableRelation,
-		SugarableEntityListParameters,
-		SugarableEntityListEventListeners {}
+		SugarableEntityListParameters {}
 
 export interface UnsugarableHasManyRelation
 	extends UnsugarableRelation,

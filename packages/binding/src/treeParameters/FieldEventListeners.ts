@@ -13,7 +13,6 @@ export interface FieldEventListeners {
 	eventListeners: FieldEventListenerStore | undefined
 }
 
-export interface SugarableFieldEventListeners {}
 
 export type UnsugarableFieldEventListeners<
 	Persisted extends FieldValue = FieldValue,

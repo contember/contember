@@ -6,7 +6,7 @@ runReactApp(
 	<ApplicationEntrypoint
 		apiBaseUrl={import.meta.env.VITE_CONTEMBER_ADMIN_API_BASE_URL as string}
 		sessionToken={import.meta.env.VITE_CONTEMBER_ADMIN_SESSION_TOKEN as string}
-		project={'sandbox'}
+		project={'admin-sandbox'}
 		stage={'live'}
 		routes={{
 			dashboard: { path: '/' },

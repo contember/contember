@@ -90,7 +90,7 @@ services:
       - postgres
 
   contember-cli:
-    image: contember/cli:canary-22b4fb522631340e5b3c9b03982d23
+    image: contember/cli:0.12.0-alpha.11
     volumes:
       - ./:/src:cached
     working_dir: /src/packages/admin-sandbox

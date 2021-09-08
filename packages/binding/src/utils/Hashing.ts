@@ -1,6 +1,4 @@
 import type {
-	DesugaredHasManyRelation,
-	DesugaredHasOneRelation,
 	Filter,
 	HasManyRelation,
 	HasOneRelation,
@@ -14,7 +12,7 @@ import type {
 
 // TODO update hashing so that for offset, 0 == undefined
 export class Hashing {
-	public static hashHasOneRelation(relation: HasOneRelation | DesugaredHasOneRelation): number {
+	public static hashHasOneRelation(relation: HasOneRelation): number {
 		const where: Array<Filter | UniqueWhere | string | undefined> = [
 			'upToOne',
 			relation.field,
@@ -25,7 +23,7 @@ export class Hashing {
 		return Hashing.hashArray(where)
 	}
 
-	public static hashHasManyRelation(relation: HasManyRelation | DesugaredHasManyRelation): number {
+	public static hashHasManyRelation(relation: HasManyRelation): number {
 		const where: Array<Filter | UniqueWhere | OrderBy | string | number | undefined> = [
 			'possiblyMany',
 			relation.field,

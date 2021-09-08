@@ -1,36 +1,25 @@
 import type {
-	DesugaredEntityCreationParameters,
 	EntityCreationParameters,
 	SugarableEntityCreationParameters,
 	UnsugarableEntityCreationParameters,
 } from './EntityCreationParameters'
 import type {
-	DesugaredEntityListEventListeners,
 	EntityListEventListeners,
 	SugarableEntityListEventListeners,
 	UnsugarableEntityListEventListeners,
 } from './EntityListEventListeners'
 import type {
-	DesugaredEntityListParameters,
 	EntityListParameters,
 	SugarableEntityListParameters,
 	UnsugarableEntityListParameters,
 } from './EntityListParameters'
-import type { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import type { HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import type {
-	DesugaredQualifiedEntityParameters,
 	QualifiedEntityParameters,
 	SugarableQualifiedEntityParameters,
 	UnsugarableQualifiedEntityParameters,
 } from './QualifiedEntityParameters'
 
-export interface DesugaredQualifiedEntityList
-	extends DesugaredEntityListParameters,
-		DesugaredQualifiedEntityParameters,
-		DesugaredEntityCreationParameters,
-		DesugaredEntityListEventListeners {
-	hasOneRelationPath: DesugaredHasOneRelation[]
-}
 
 export interface QualifiedEntityList
 	extends EntityListParameters,

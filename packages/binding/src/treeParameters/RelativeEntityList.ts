@@ -1,13 +1,8 @@
 import type { UnsugarableEntityListEventListeners } from './EntityListEventListeners'
 import type { UnsugarableEntityListParameters } from './EntityListParameters'
-import type { DesugaredHasManyRelation, HasManyRelation, SugarableHasManyRelation } from './HasManyRelation'
-import type { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import type { HasManyRelation, SugarableHasManyRelation } from './HasManyRelation'
+import type { HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import type { UnsugarableRelation } from './Relation'
-
-export interface DesugaredRelativeEntityList {
-	hasOneRelationPath: DesugaredHasOneRelation[]
-	hasManyRelation: DesugaredHasManyRelation
-}
 
 export interface RelativeEntityList {
 	hasOneRelationPath: HasOneRelation[]

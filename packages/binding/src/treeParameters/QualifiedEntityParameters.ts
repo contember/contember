@@ -4,10 +4,6 @@ export const QualifiedEntityParametersDefaults = {
 	expectedMutation: 'anyMutation',
 } as const
 
-export interface DesugaredQualifiedEntityParameters {
-	entityName: EntityName
-}
-
 export interface QualifiedEntityParameters {
 	alias: Set<Alias> | undefined
 	entityName: EntityName

@@ -1,5 +1,4 @@
 import type {
-	DesugaredFieldEventListeners,
 	FieldEventListeners,
 	SugarableFieldEventListeners,
 	UnsugarableFieldEventListeners,
@@ -11,8 +10,6 @@ import type { FieldValue, OptionallyVariableFieldValue } from './primitives'
 export const LeafFieldDefaults = {
 	isNonbearing: false,
 } as const
-
-export interface DesugaredLeafField extends DesugaredFieldEventListeners {}
 
 export interface LeafField extends FieldEventListeners {
 	isNonbearing: boolean

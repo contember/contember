@@ -3,8 +3,6 @@ import { TreeParameterMerger, VariableInputTransformer } from '../core'
 import type { Environment } from '../dao'
 import {
 	Alias,
-	DesugaredHasManyRelation,
-	DesugaredHasOneRelation,
 	EntityCreationParametersDefaults,
 	EntityEventListenerStore,
 	EntityListEventListenerStore,
@@ -53,9 +51,16 @@ import {
 } from '../treeParameters'
 import { Parser } from './Parser'
 import { GraphQlLiteral } from '@contember/client'
+import { ParsedHasManyRelation, ParsedHasOneRelation } from './ParserResults'
 
 export class QueryLanguage {
+
 	private static preparePrimitiveEntryPoint<Entry extends Parser.EntryPoint>(entryPoint: Entry) {
+		return (input: string, environment: Environment): Parser.ParserResult[Entry] =>
+			Parser.parseQueryLanguageExpression(input, entryPoint, environment)
+	}
+
+	private static preparePrimitiveEntryPointWithFallback<Entry extends Parser.EntryPoint>(entryPoint: Entry) {
 		return (input: string | Parser.ParserResult[Entry], environment: Environment): Parser.ParserResult[Entry] => {
 			if (typeof input === 'string') {
 				return Parser.parseQueryLanguageExpression(input, entryPoint, environment)
@@ -64,19 +69,19 @@ export class QueryLanguage {
 		}
 	}
 
-	private static desugarSugarableUnconstrainedQualifiedEntityList = QueryLanguage.preparePrimitiveEntryPoint(
-		'unconstrainedQualifiedEntityList',
-	)
-	private static desugarSugarableUnconstrainedQualifiedSingleEntity = QueryLanguage.preparePrimitiveEntryPoint(
-		'unconstrainedQualifiedEntityList',
-	)
-	private static desugarSugarableQualifiedEntityList = QueryLanguage.preparePrimitiveEntryPoint('qualifiedEntityList')
-	private static desugarSugarableQualifiedFieldList = QueryLanguage.preparePrimitiveEntryPoint('qualifiedFieldList')
-	private static desugarSugarableQualifiedSingleEntity =
-		QueryLanguage.preparePrimitiveEntryPoint('qualifiedSingleEntity')
-	private static desugarSugarableRelativeEntityList = QueryLanguage.preparePrimitiveEntryPoint('relativeEntityList')
-	private static desugarSugarableRelativeSingleEntity = QueryLanguage.preparePrimitiveEntryPoint('relativeSingleEntity')
-	private static desugarSugarableRelativeSingleField = QueryLanguage.preparePrimitiveEntryPoint('relativeSingleField')
+	private static parseUnconstrainedQualifiedEntityList = QueryLanguage.preparePrimitiveEntryPoint('unconstrainedQualifiedEntityList')
+	private static parseUnconstrainedQualifiedSingleEntity = QueryLanguage.preparePrimitiveEntryPoint('unconstrainedQualifiedEntityList')
+	private static parseQualifiedEntityList = QueryLanguage.preparePrimitiveEntryPoint('qualifiedEntityList')
+	private static parseQualifiedFieldList = QueryLanguage.preparePrimitiveEntryPoint('qualifiedFieldList')
+	private static parseQualifiedSingleEntity = QueryLanguage.preparePrimitiveEntryPoint('qualifiedSingleEntity')
+	private static parseRelativeEntityList = QueryLanguage.preparePrimitiveEntryPoint('relativeEntityList')
+	private static parseRelativeSingleEntity = QueryLanguage.preparePrimitiveEntryPoint('relativeSingleEntity')
+	private static parseRelativeSingleField = QueryLanguage.preparePrimitiveEntryPoint('relativeSingleField')
+
+	public static desugarUniqueWhere = QueryLanguage.preparePrimitiveEntryPointWithFallback('uniqueWhere')
+	public static desugarFilter = QueryLanguage.preparePrimitiveEntryPointWithFallback('filter')
+	public static desugarOrderBy = QueryLanguage.preparePrimitiveEntryPointWithFallback('orderBy')
+
 
 	private static desugarEntityListParameters(
 		sugarablePart: SugarableEntityListParameters,
@@ -286,7 +291,7 @@ export class QueryLanguage {
 	}
 
 	private static augmentDesugaredHasOneRelationPath(
-		path: DesugaredHasOneRelation[],
+		path: ParsedHasOneRelation[],
 		unsugarable: UnsugarableHasOneRelation,
 		environment: Environment,
 	): HasOneRelation[] {
@@ -297,7 +302,7 @@ export class QueryLanguage {
 	}
 
 	private static augmentDesugaredHasManyRelation(
-		relation: DesugaredHasManyRelation,
+		relation: ParsedHasManyRelation,
 		unsugarable: UnsugarableHasManyRelation,
 		environment: Environment,
 	): HasManyRelation {
@@ -366,19 +371,6 @@ export class QueryLanguage {
 		}
 	}
 
-	public static desugarUniqueWhere: (
-		input: string | Parser.ParserResult['uniqueWhere'],
-		environment: Environment,
-	) => Parser.ParserResult['uniqueWhere'] = QueryLanguage.preparePrimitiveEntryPoint('uniqueWhere')
-	public static desugarFilter: (
-		input: string | Parser.ParserResult['filter'],
-		environment: Environment,
-	) => Parser.ParserResult['filter'] = QueryLanguage.preparePrimitiveEntryPoint('filter')
-	public static desugarOrderBy: (
-		input: string | Parser.ParserResult['orderBy'],
-		environment: Environment,
-	) => Parser.ParserResult['orderBy'] = QueryLanguage.preparePrimitiveEntryPoint('orderBy')
-
 	public static desugarUnconstrainedQualifiedEntityList(
 		{ entities, ...unsugarableEntityList }: SugaredUnconstrainedQualifiedEntityList,
 		environment: Environment,
@@ -387,10 +379,10 @@ export class QueryLanguage {
 		let entityName: EntityName
 
 		if (typeof entities === 'string') {
-			const desugared = this.desugarSugarableUnconstrainedQualifiedEntityList(entities, environment)
-			entityName = desugared.entityName
+			const parsed = this.parseUnconstrainedQualifiedEntityList(entities, environment)
+			entityName = parsed.entityName
 			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
-				desugared.hasOneRelationPath,
+				parsed.hasOneRelationPath,
 				emptyObject,
 				environment,
 			)
@@ -426,10 +418,10 @@ export class QueryLanguage {
 		let entityName: EntityName
 
 		if (typeof entity === 'string') {
-			const desugared = this.desugarSugarableUnconstrainedQualifiedSingleEntity(entity, environment)
-			entityName = desugared.entityName
+			const parsed = this.parseUnconstrainedQualifiedSingleEntity(entity, environment)
+			entityName = parsed.entityName
 			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
-				desugared.hasOneRelationPath,
+				parsed.hasOneRelationPath,
 				unsugarableSingleEntity,
 				environment,
 			)
@@ -467,12 +459,12 @@ export class QueryLanguage {
 		let filter: SugaredFilter | undefined
 
 		if (typeof entities === 'string') {
-			const desugared = this.desugarSugarableQualifiedEntityList(entities, environment)
+			const parsed = this.parseQualifiedEntityList(entities, environment)
 
-			entityName = desugared.entityName
-			filter = desugared.filter
+			entityName = parsed.entityName
+			filter = parsed.filter
 			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
-				desugared.hasOneRelationPath,
+				parsed.hasOneRelationPath,
 				emptyObject,
 				environment,
 			)
@@ -517,13 +509,13 @@ export class QueryLanguage {
 		let hasOneRelationPath: HasOneRelation[]
 
 		if (typeof fields === 'string') {
-			const desugared = this.desugarSugarableQualifiedFieldList(fields, environment)
+			const parsed = this.parseQualifiedFieldList(fields, environment)
 
-			field = desugared.field
-			entityName = desugared.entityName
-			filter = desugared.filter
+			field = parsed.field
+			entityName = parsed.entityName
+			filter = parsed.filter
 			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
-				desugared.hasOneRelationPath,
+				parsed.hasOneRelationPath,
 				emptyObject,
 				environment,
 			)
@@ -562,13 +554,13 @@ export class QueryLanguage {
 		let hasOneRelationPath: HasOneRelation[]
 
 		if (typeof entity === 'string') {
-			const desugaredEntity = this.desugarSugarableQualifiedSingleEntity(entity, environment)
+			const parsed = this.parseQualifiedSingleEntity(entity, environment)
 
-			entityName = desugaredEntity.entityName
-			where = desugaredEntity.where
-			filter = desugaredEntity.filter
+			entityName = parsed.entityName
+			where = parsed.where
+			filter = parsed.filter
 			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
-				desugaredEntity.hasOneRelationPath,
+				parsed.hasOneRelationPath,
 				unsugarableSingleEntity,
 				environment,
 			)
@@ -645,14 +637,18 @@ export class QueryLanguage {
 		}
 
 		const { field, ...unsugarableEntity } = sugaredRelativeSingleEntity
-		const hasOneRelationPath =
-			typeof field === 'string'
-				? this.augmentDesugaredHasOneRelationPath(
-						this.desugarSugarableRelativeSingleEntity(field, environment).hasOneRelationPath,
-						unsugarableEntity,
-						environment,
-				  )
-				: this.desugarHasOneRelationPath(field, unsugarableEntity, environment)
+		let hasOneRelationPath: HasOneRelation[]
+		if (typeof field === 'string') {
+			const parsed = this.parseRelativeSingleEntity(field, environment)
+			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
+				parsed.hasOneRelationPath,
+				unsugarableEntity,
+				environment,
+			)
+
+		} else {
+			hasOneRelationPath = this.desugarHasOneRelationPath(field, unsugarableEntity, environment)
+		}
 
 		return {
 			hasOneRelationPath,
@@ -672,9 +668,9 @@ export class QueryLanguage {
 		let hasOneRelationPath: HasOneRelation[]
 		let fieldName: FieldName
 		if (typeof field === 'string') {
-			const desugaredField = this.desugarSugarableRelativeSingleField(field, environment)
-			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(desugaredField.hasOneRelationPath, {}, environment)
-			fieldName = desugaredField.field
+			const parsed = this.parseRelativeSingleField(field, environment)
+			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(parsed.hasOneRelationPath, {}, environment)
+			fieldName = parsed.field
 		} else {
 			hasOneRelationPath = this.desugarHasOneRelationPath(field.hasOneRelationPath, {}, environment)
 			fieldName = field.field
@@ -709,14 +705,14 @@ export class QueryLanguage {
 		let hasOneRelationPath: HasOneRelation[]
 		let hasManyRelation: HasManyRelation
 		if (typeof field === 'string') {
-			const desugaredField = this.desugarSugarableRelativeEntityList(field, environment)
+			const parsed = this.parseRelativeEntityList(field, environment)
 			hasOneRelationPath = this.augmentDesugaredHasOneRelationPath(
-				desugaredField.hasOneRelationPath,
+				parsed.hasOneRelationPath,
 				emptyObject,
 				environment,
 			)
 			hasManyRelation = this.augmentDesugaredHasManyRelation(
-				desugaredField.hasManyRelation,
+				parsed.hasManyRelation,
 				unsugarableEntityList,
 				environment,
 			)

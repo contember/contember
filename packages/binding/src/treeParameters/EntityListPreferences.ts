@@ -2,8 +2,6 @@ export const EntityListPreferencesDefaults: EntityListPreferences = {
 	initialEntityCount: 0,
 }
 
-export interface DesugaredEntityListPreferences {}
-
 export interface EntityListPreferences {
 	initialEntityCount: number
 }

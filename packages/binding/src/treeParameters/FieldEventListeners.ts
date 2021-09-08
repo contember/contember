@@ -4,8 +4,6 @@ import type { EventListenersStore } from './EventListenersStore'
 
 type Events<Value extends FieldValue = FieldValue> = FieldAccessor.FieldEventListenerMap<Value>
 
-export interface DesugaredFieldEventListeners {}
-
 export type FieldEventListenerStore<Value extends FieldValue = FieldValue> = EventListenersStore<
 	keyof Events<Value>,
 	Partial<Events<Value>>

@@ -1,8 +1,8 @@
 import { Environment } from '../../../../src/dao'
 import { Parser } from '../../../../src/queryLanguage'
-import type { DesugaredRelativeEntityList } from '../../../../src/treeParameters'
+import type { ParsedRelativeEntityList } from '../../../../src/queryLanguage/ParserResults'
 
-const parse = (input: string): DesugaredRelativeEntityList => {
+const parse = (input: string): ParsedRelativeEntityList => {
 	return Parser.parseQueryLanguageExpression(input, 'relativeEntityList', new Environment())
 }
 

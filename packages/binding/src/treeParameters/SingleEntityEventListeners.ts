@@ -3,8 +3,6 @@ import type { EventListenersStore } from './EventListenersStore'
 
 type Events = EntityAccessor.EntityEventListenerMap
 
-export interface DesugaredSingleEntityEventListeners {}
-
 export type EntityEventListenerStore = EventListenersStore<keyof Events, Events>
 
 export interface SingleEntityEventListeners {

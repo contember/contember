@@ -5,9 +5,6 @@ import type { Environment } from '../dao'
 import { PlaceholderGenerator } from '../markers'
 import { QueryLanguage } from '../queryLanguage'
 import type {
-	DesugaredRelativeEntityList,
-	DesugaredRelativeSingleEntity,
-	DesugaredRelativeSingleField,
 	EntityId,
 	EntityName,
 	EntityRealmKey,
@@ -139,17 +136,13 @@ class EntityAccessor implements Errorable {
 	/**
 	 * @see EntityAccessor.getField
 	 */
-	public getRelativeSingleField<Value extends FieldValue = FieldValue>(
-		field: RelativeSingleField | DesugaredRelativeSingleField,
-	): FieldAccessor<Value> {
+	public getRelativeSingleField<Value extends FieldValue = FieldValue>(field: RelativeSingleField): FieldAccessor<Value> {
 		return this.getRelativeSingleEntity(field).getAccessorByPlaceholder(
 			PlaceholderGenerator.getFieldPlaceholder(field.field),
 		) as unknown as FieldAccessor<Value>
 	}
 
-	public getRelativeSingleEntity(
-		relativeSingleEntity: RelativeSingleEntity | DesugaredRelativeSingleEntity,
-	): EntityAccessor {
+	public getRelativeSingleEntity(relativeSingleEntity: RelativeSingleEntity): EntityAccessor {
 		let relativeTo: EntityAccessor = this
 
 		for (const hasOneRelation of relativeSingleEntity.hasOneRelationPath) {
@@ -160,7 +153,7 @@ class EntityAccessor implements Errorable {
 		return relativeTo
 	}
 
-	public getRelativeEntityList(entityList: RelativeEntityList | DesugaredRelativeEntityList): EntityListAccessor {
+	public getRelativeEntityList(entityList: RelativeEntityList): EntityListAccessor {
 		return this.getRelativeSingleEntity(entityList).getAccessorByPlaceholder(
 			PlaceholderGenerator.getHasManyRelationPlaceholder(entityList.hasManyRelation),
 		) as EntityListAccessor

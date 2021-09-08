@@ -1,24 +1,16 @@
-import type { AnyField, DesugaredAnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
+import type { AnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
 import type {
 	EntityListParameters,
 	SugarableEntityListParameters,
 	UnsugarableEntityListParameters,
 } from './EntityListParameters'
-import type { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
-import type { DesugaredLeafField, LeafField, SugarableLeafField, UnsugarableLeafField } from './LeafField'
-import type { DesugaredQualifiedEntityList } from './QualifiedEntityList'
+import type { HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import type { LeafField, SugarableLeafField, UnsugarableLeafField } from './LeafField'
 import type {
 	QualifiedEntityParameters,
 	SugarableQualifiedEntityParameters,
 	UnsugarableQualifiedEntityParameters,
 } from './QualifiedEntityParameters'
-
-export interface DesugaredQualifiedFieldList
-	extends DesugaredQualifiedEntityList,
-		DesugaredAnyField,
-		DesugaredLeafField {
-	hasOneRelationPath: DesugaredHasOneRelation[]
-}
 
 export interface QualifiedFieldList extends EntityListParameters, QualifiedEntityParameters, AnyField, LeafField {
 	hasOneRelationPath: HasOneRelation[]

@@ -5,7 +5,6 @@ import type { EventListenersStore } from './EventListenersStore'
 type Events = EntityListAccessor.EntityListEventListenerMap
 type UnsugarableEvents = EntityListAccessor.EntityListEventListenerMap & EntityListAccessor.ChildEventListenerMap
 
-export interface DesugaredEntityListEventListeners {}
 
 export type EntityListEventListenerStore = EventListenersStore<keyof Events, Partial<Events>>
 

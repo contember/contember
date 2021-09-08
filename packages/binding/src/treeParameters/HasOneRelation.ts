@@ -1,24 +1,15 @@
 import type { SugaredUniqueWhere, UniqueWhere } from './primitives'
-import type { DesugaredRelation, Relation, SugarableRelation, UnsugarableRelation } from './Relation'
+import type { Relation, SugarableRelation, UnsugarableRelation } from './Relation'
 import type {
-	DesugaredSingleEntityEventListeners,
 	SingleEntityEventListeners,
 	SugarableSingleEntityEventListeners,
 	UnsugarableSingleEntityEventListeners,
 } from './SingleEntityEventListeners'
 import type {
-	DesugaredSingleEntityParameters,
 	SingleEntityParameters,
 	SugarableSingleEntityParameters,
 	UnsugarableSingleEntityParameters,
 } from './SingleEntityParameters'
-
-export interface DesugaredHasOneRelation
-	extends DesugaredRelation,
-		DesugaredSingleEntityParameters,
-		DesugaredSingleEntityEventListeners {
-	reducedBy: UniqueWhere | undefined
-}
 
 export interface HasOneRelation extends Relation, SingleEntityParameters, SingleEntityEventListeners {
 	reducedBy: UniqueWhere | undefined

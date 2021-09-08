@@ -1,14 +1,9 @@
 import type {
-	DesugaredEntityListPreferences,
 	EntityListPreferences,
 	SugarableEntityListPreferences,
 	UnsugarableEntityListPreferences,
 } from './EntityListPreferences'
 import type { Filter, Limit, Offset, OrderBy, SugaredFilter, SugaredOrderBy } from './primitives'
-
-export interface DesugaredEntityListParameters extends DesugaredEntityListPreferences {
-	filter: Filter | undefined
-}
 
 export interface EntityListParameters extends EntityListPreferences {
 	orderBy: OrderBy | undefined

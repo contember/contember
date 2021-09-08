@@ -1,6 +1,4 @@
 import type {
-	DesugaredHasManyRelation,
-	DesugaredHasOneRelation,
 	FieldName,
 	HasManyRelation,
 	HasOneRelation,
@@ -16,11 +14,11 @@ export class PlaceholderGenerator {
 		return fieldName
 	}
 
-	public static getHasOneRelationPlaceholder(relation: HasOneRelation | DesugaredHasOneRelation): string {
+	public static getHasOneRelationPlaceholder(relation: HasOneRelation): string {
 		return `${relation.field}_${Hashing.hashHasOneRelation(relation)}`
 	}
 
-	public static getHasManyRelationPlaceholder(relation: HasManyRelation | DesugaredHasManyRelation): string {
+	public static getHasManyRelationPlaceholder(relation: HasManyRelation): string {
 		return `${relation.field}_${Hashing.hashHasManyRelation(relation)}`
 	}
 

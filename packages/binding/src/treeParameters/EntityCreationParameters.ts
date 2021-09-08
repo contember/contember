@@ -5,7 +5,6 @@ export const EntityCreationParametersDefaults = {
 	isNonbearing: false,
 } as const
 
-export interface DesugaredEntityCreationParameters {}
 
 /*
 It can be somewhat tricky to understand how these parameters actually work. These are all only relevant when *creating

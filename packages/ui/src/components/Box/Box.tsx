@@ -2,8 +2,8 @@ import classnames from 'classnames'
 import { forwardRef, memo, ReactNode, useContext } from 'react'
 import { IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
 import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
-import type { BoxDistinction, NativeProps } from '../../types'
-import { toStateClass, toViewClass } from '../../utils'
+import type { BoxDistinction, BoxWidth, NativeProps } from '../../types'
+import { toEnumViewClass, toStateClass, toViewClass } from '../../utils'
 import { Heading } from '../Heading'
 import { BoxContent } from './BoxContent'
 
@@ -13,13 +13,14 @@ export interface BoxOwnProps {
 	children?: ReactNode
 	distinction?: BoxDistinction
 	isActive?: boolean
+	width?: BoxWidth
 }
 
 export interface BoxProps extends BoxOwnProps, Omit<NativeProps<HTMLDivElement>, 'children'> {}
 
 export const Box = memo(
 	forwardRef<HTMLDivElement, BoxProps>(
-		({ actions, children, heading, distinction, isActive = false, className, ...divProps }: BoxProps, ref) => {
+		({ actions, children, heading, distinction, isActive = false, className, width, ...divProps }: BoxProps, ref) => {
 			const boxDepth = useContext(BoxDepthContext)
 			const headingDepth = useContext(HeadingDepthContext)
 			const prefix = useClassNamePrefix()
@@ -30,6 +31,7 @@ export const Box = memo(
 					className={classnames(
 						`${prefix}box`,
 						toViewClass(`depth-${boxDepth}`, true),
+						toEnumViewClass(width),
 						toStateClass('active', isActive),
 						className,
 					)}

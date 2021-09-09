@@ -1,10 +1,23 @@
 @import '../common'
 
 .#{$cui-conf-globalPrefix}box
+	$max-width: 40em
+	$max-width-wide: 60em
+
 	+boxNesting
 	display: flex
 	flex-direction: column
 	gap: $cui-gap * 6
+	width: 100%
+	max-width: $max-width
+	margin: 0 auto
+
+	&.view-full
+		width: unset
+		max-width: unset
+		margin: unset
+	&.view-wide
+		max-width: $max-width-wide
 
 	&-content.view-seamless,
 	&-content &.view-seamlessIfNested
@@ -18,6 +31,9 @@
 		grid-row: 1
 		display: flex
 		align-items: center
+		width: 100%
+		max-width: $max-width
+		margin: 0 auto
 
 	&-actions
 		grid-column: 2

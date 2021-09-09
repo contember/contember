@@ -10,7 +10,8 @@
 				"development": "./dist/development/index.js",
 				"production": "./dist/production/index.js"
 			}
-		}
+		},
+		"./style.css": "./dist/style.css"
 	},
 	"files": [
 		"dist/"

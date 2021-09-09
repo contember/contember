@@ -102,7 +102,6 @@ importers:
       intl-messageformat: 9.9.1
       is-hotkey: 0.1.8
       leaflet: 1.7.1
-      moment: 2.29.1
       path-to-regexp: 6.2.0
       react-datepicker: 3.8.0
       react-dropzone: 10.2.2
@@ -135,7 +134,6 @@ importers:
       intl-messageformat: 9.9.1
       is-hotkey: 0.1.8
       leaflet: 1.7.1
-      moment: 2.29.1
       path-to-regexp: 6.2.0
       react-datepicker: 3.8.0_react-dom@17.0.1+react@17.0.1
       react-dropzone: 10.2.2_react@17.0.1
@@ -13560,10 +13558,6 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
     dev: true
-
-  /moment/2.29.1:
-    resolution: {integrity: sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==}
-    dev: false
 
   /move-concurrently/1.0.1:
     resolution: {integrity: sha1-viwAX9oy4LKa8fBdfEszIUxwH5I=}

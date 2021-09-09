@@ -2,7 +2,6 @@ import type { EntityAccessor, Environment, ErrorAccessor, FieldValue } from '@co
 import type { ReactElement, ReactNode } from 'react'
 
 export namespace ChoiceFieldData {
-	export type ChoiceArity = 'single' | 'multiple'
 
 	export type StaticValue = FieldValue
 	export type DynamicValue = EntityAccessor['idOnServer']
@@ -38,18 +37,12 @@ export namespace ChoiceFieldData {
 		onChange: (optionKey: ValueRepresentation, isChosen: boolean) => void
 	}
 
-	export interface MetadataByArity {
-		single: SingleChoiceFieldMetadata
-		multiple: MultipleChoiceFieldMetadata
+	export interface SingleChoiceFieldProps {
+		children: (metadata: SingleChoiceFieldMetadata) => ReactElement | null
 	}
 
-	export type MetadataPropsByArity =
-		| {
-				arity: 'single'
-				children: (metadata: ChoiceFieldData.SingleChoiceFieldMetadata) => ReactElement | null
-		  }
-		| {
-				arity: 'multiple'
-				children: (metadata: ChoiceFieldData.MultipleChoiceFieldMetadata) => ReactElement | null
-		  }
+	export interface MultiChoiceFieldProps {
+		children: (metadata: MultipleChoiceFieldMetadata) => ReactElement | null
+	}
+
 }

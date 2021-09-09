@@ -1,17 +1,17 @@
 import { BindingError, Component, ErrorAccessor } from '@contember/binding'
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
-import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticChoiceFieldProps } from '../ChoiceField'
+import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticSingleChoiceFieldProps } from '../ChoiceField'
 import type { SelectFieldInnerPublicProps } from './SelectField'
 
 export type NativeSelectFieldProps = SelectFieldInnerPublicProps &
-	(Omit<StaticChoiceFieldProps<'single'>, 'arity'> | DynamicSingleChoiceFieldProps) & {
+	(StaticSingleChoiceFieldProps | DynamicSingleChoiceFieldProps) & {
 		searchByFields?: never
 	}
 
 export const NativeSelectField: FunctionComponent<NativeSelectFieldProps> = Component(
 	props => (
-		<ChoiceField {...props} arity="single">
+		<ChoiceField {...props}>
 			{({
 				data,
 				currentValue,

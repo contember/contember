@@ -1,19 +1,20 @@
 import { Component } from '@contember/binding'
 import type { FunctionComponent } from 'react'
 import type { ChoiceFieldData } from './ChoiceFieldData'
-import { DynamicChoiceField, DynamicChoiceFieldProps } from './DynamicChoiceField'
-import { StaticChoiceField, StaticChoiceFieldProps } from './StaticChoiceField'
+import { StaticSingleChoiceField, StaticSingleChoiceFieldProps } from './StaticSingleChoiceField'
+import { DynamicSingleChoiceField } from './DynamicSingleChoiceField'
+import { DynamicSingleChoiceFieldProps } from './useDynamicSingleChoiceField'
 
-export type ChoiceFieldProps<Arity extends ChoiceFieldData.ChoiceArity = ChoiceFieldData.ChoiceArity> = (
-	| StaticChoiceFieldProps<Arity>
-	| DynamicChoiceFieldProps
-) &
-	ChoiceFieldData.MetadataPropsByArity
+export type ChoiceFieldProps = (
+	| StaticSingleChoiceFieldProps
+	| DynamicSingleChoiceFieldProps
+) & ChoiceFieldData.SingleChoiceFieldProps
+
+const isStatic = (props: ChoiceFieldProps): props is StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps	=>
+	Array.isArray(props.options)
 
 export const ChoiceField: FunctionComponent<ChoiceFieldProps> = Component(props => {
-	if (Array.isArray(props.options)) {
-		return <StaticChoiceField {...(props as StaticChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity)} />
-	}
-
-	return <DynamicChoiceField {...(props as DynamicChoiceFieldProps & ChoiceFieldData.MetadataPropsByArity)} />
+	return isStatic(props)
+		? <StaticSingleChoiceField {...props} />
+		: <DynamicSingleChoiceField {...props} />
 }, 'ChoiceField')

@@ -3,15 +3,14 @@ import { FormGroup, FormGroupProps } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import type { Props as SelectProps } from 'react-select'
 import AsyncSelect from 'react-select/async'
-import { ChoiceField, ChoiceFieldData, DynamicMultipleChoiceFieldProps, StaticChoiceFieldProps } from '../ChoiceField'
+import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
 
-export type MultiSelectFieldProps = MultiSelectFieldInnerPublicProps &
-	(Omit<StaticChoiceFieldProps<'multiple'>, 'arity'> | DynamicMultipleChoiceFieldProps)
+export type MultiSelectFieldProps = MultiSelectFieldInnerPublicProps & DynamicMultipleChoiceFieldProps
 
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (
-		<ChoiceField {...props} arity="multiple">
+		<DynamicMultiChoiceField {...props} >
 			{({
 				data,
 				currentValues,
@@ -32,7 +31,7 @@ export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Compon
 					clear={clear}
 				/>
 			)}
-		</ChoiceField>
+		</DynamicMultiChoiceField>
 	),
 	'MultiSelectField',
 )

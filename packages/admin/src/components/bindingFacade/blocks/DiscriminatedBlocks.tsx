@@ -1,8 +1,9 @@
 import { Component, SugaredRelativeSingleField } from '@contember/binding'
 import type { FormGroupProps } from '@contember/ui'
 import { FunctionComponent, ReactNode, useMemo } from 'react'
-import { NativeSelectFieldInner, NormalizedStaticOption, StaticChoiceField, useStaticChoiceField } from '../fields'
+import { NativeSelectFieldInner, NormalizedStaticOption, StaticSingleChoiceField } from '../fields'
 import { useNormalizedBlocks } from './useNormalizedBlocks'
+import { useStaticSingleChoiceField } from '../fields/ChoiceField/useStaticSingleChoiceField'
 
 export interface DiscriminatedBlocksProps extends Omit<FormGroupProps, 'children'>, SugaredRelativeSingleField {
 	children: ReactNode
@@ -23,10 +24,9 @@ export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = 
 				})),
 			[blocksArray],
 		)
-		const metadata = useStaticChoiceField({
+		const metadata = useStaticSingleChoiceField({
 			...props,
 			options: transformedBlockList,
-			arity: 'single',
 		})
 		return (
 			<>
@@ -48,7 +48,7 @@ export const DiscriminatedBlocks: FunctionComponent<DiscriminatedBlocksProps> = 
 	},
 	props => (
 		<>
-			<StaticChoiceField {...(props as any)} options={[]} arity="single" isNonbearing={true} />
+			<StaticSingleChoiceField {...(props as any)} options={[]} arity="single" isNonbearing={true} />
 			{props.children}
 		</>
 	),

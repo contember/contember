@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from 'react'
+import { ReactElement } from 'react'
 import {
 	EntityListSubTree,
 	Environment,
@@ -21,43 +21,43 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 			<Field field={props.searchByFields} />
 		))
 
-	let renderedOptionBase: ReactNode
 
 	if ('renderOption' in props) {
-		renderedOptionBase =
+		const renderedOptionBase =
 			typeof props.optionsStaticRender === 'function'
 				? props.optionsStaticRender(environment)
 				: props.optionsStaticRender
-	} else {
-		// TODO this is wasteful
-		const sugaredFieldList: SugaredQualifiedFieldList =
-			typeof props.options === 'string' || !('fields' in props.options) ? { fields: props.options } : props.options
-		const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
-		renderedOptionBase = <Field field={fieldList} />
-	}
-
-	const renderedOption = (
-		<>
-			{searchByFields}
-			{renderedOptionBase}
-		</>
-	)
-
-	if ('renderOption' in props) {
+		const renderedOption = (
+			<>
+				{searchByFields}
+				{renderedOptionBase}
+			</>
+		)
 		const sugaredEntityList: SugaredQualifiedEntityList =
 			typeof props.options === 'string' || !('entities' in props.options)
 				? { entities: props.options }
 				: props.options
+
 		const subTree = (
 			<EntityListSubTree {...sugaredEntityList} expectedMutation="none">
 				{renderedOption}
 			</EntityListSubTree>
 		)
+
 		return { subTree, renderedOption }
+
 	} else {
 		const sugaredFieldList: SugaredQualifiedFieldList =
 			typeof props.options === 'string' || !('fields' in props.options) ? { fields: props.options } : props.options
 		const fieldList = QueryLanguage.desugarQualifiedFieldList(sugaredFieldList, environment)
+		const renderedOptionBase = <Field field={fieldList} />
+		const renderedOption = (
+			<>
+				{searchByFields}
+				{renderedOptionBase}
+			</>
+		)
+
 		const subTree = (
 			<EntityListSubTree
 				{...fieldList}
@@ -70,6 +70,7 @@ export const renderDynamicChoiceFieldStatic = (props: BaseDynamicChoiceField, en
 				{renderedOption}
 			</EntityListSubTree>
 		)
+
 		return { subTree, renderedOption }
 	}
 }

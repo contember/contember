@@ -10,6 +10,7 @@ runReactApp(
 		stage={'live'}
 		routes={{
 			dashboard: { path: '/' },
+			inputs: { path: '/inputs' },
 			second: { path: '/2nd' },
 			fooPage: { path: '/foo' },
 			barPage: { path: '/bar' },

@@ -1,0 +1,250 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "SomeEnum",
+			"values": [
+				"a",
+				"b",
+				"c"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "InputShowcase",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "input_showcase"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "One"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "textValue",
+				"columnName": "text_value",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "slugValue",
+				"columnName": "slug_value",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "multilineValue",
+				"columnName": "multiline_value",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "boolValue",
+				"columnName": "bool_value",
+				"nullable": true,
+				"type": "Bool",
+				"columnType": "boolean"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "intValue",
+				"columnName": "int_value",
+				"nullable": true,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "floatValue",
+				"columnName": "float_value",
+				"nullable": true,
+				"type": "Double",
+				"columnType": "double precision"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "dateValue",
+				"columnName": "date_value",
+				"nullable": true,
+				"type": "Date",
+				"columnType": "date"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "dateTimeValue",
+				"columnName": "date_time_value",
+				"nullable": true,
+				"type": "DateTime",
+				"columnType": "timestamptz"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "gpsLatValue",
+				"columnName": "gps_lat_value",
+				"nullable": true,
+				"type": "Double",
+				"columnType": "double precision"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "gpsLonValue",
+				"columnName": "gps_lon_value",
+				"nullable": true,
+				"type": "Double",
+				"columnType": "double precision"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "enumValue",
+				"columnName": "enum_value",
+				"nullable": true,
+				"type": "Enum",
+				"columnType": "SomeEnum"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "InputShowcase",
+			"field": {
+				"name": "selectValue",
+				"columnName": "select_value",
+				"nullable": true,
+				"type": "Enum",
+				"columnType": "SomeEnum"
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "InputShowcase",
+			"unique": {
+				"fields": [
+					"unique"
+				],
+				"name": "unique_InputShowcase_unique_e48fad"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/InputShowcase",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"unique": true,
+								"textValue": true,
+								"slugValue": true,
+								"multilineValue": true,
+								"boolValue": true,
+								"intValue": true,
+								"floatValue": true,
+								"dateValue": true,
+								"dateTimeValue": true,
+								"gpsLatValue": true,
+								"gpsLonValue": true,
+								"enumValue": true,
+								"selectValue": true
+							},
+							"read": {
+								"id": true,
+								"unique": true,
+								"textValue": true,
+								"slugValue": true,
+								"multilineValue": true,
+								"boolValue": true,
+								"intValue": true,
+								"floatValue": true,
+								"dateValue": true,
+								"dateTimeValue": true,
+								"gpsLatValue": true,
+								"gpsLonValue": true,
+								"enumValue": true,
+								"selectValue": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"textValue": true,
+								"slugValue": true,
+								"multilineValue": true,
+								"boolValue": true,
+								"intValue": true,
+								"floatValue": true,
+								"dateValue": true,
+								"dateTimeValue": true,
+								"gpsLatValue": true,
+								"gpsLonValue": true,
+								"enumValue": true,
+								"selectValue": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

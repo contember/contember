@@ -6,9 +6,12 @@ import AsyncSelect from 'react-select/async'
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticSingleChoiceFieldProps } from '../ChoiceField'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
 
-// TODO this is a bit of a mouthful. Express this more elegantly in order to avoid moving so much complexity to places like here.
-export type SelectFieldProps = SelectFieldInnerPublicProps &
-	(StaticSingleChoiceFieldProps | DynamicSingleChoiceFieldProps)
+export type SelectFieldProps =
+	& SelectFieldInnerPublicProps
+	& (
+		| StaticSingleChoiceFieldProps
+		| DynamicSingleChoiceFieldProps
+	)
 
 export const SelectField: FunctionComponent<SelectFieldProps> = Component(
 	props => (

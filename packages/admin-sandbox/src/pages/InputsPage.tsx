@@ -25,11 +25,11 @@ export const InputsPage = (
 		<DateField field={'dateValue'} label={'Date'} />
 		<DateTimeField field={'dateTimeValue'} label={'Date time'} />
 		<LocationField latitudeField={'gpsLatValue'} longitudeField={'gpsLonValue'} label={'Map'} />
-		{/*<RadioField field={'enumValue'} label={'Value'} options={[*/}
-		{/*	{ value: 'a', label: 'A option' },*/}
-		{/*	{ value: 'b', label: 'B option' },*/}
-		{/*	{ value: 'c', label: 'C option' },*/}
-		{/*]}/>*/}
+		<RadioField field={'enumValue'} label={'Value'} options={[
+			{ value: 'a', label: 'A option' },
+			{ value: 'b', label: 'B option' },
+			{ value: 'c', label: 'C option' },
+		]} orientation={'horizontal'} />
 		<SelectField field={'selectValue	'} label={'Value'} options={[
 			{ value: 'a', label: 'A option' },
 			{ value: 'b', label: 'B option' },

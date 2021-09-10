@@ -32,12 +32,14 @@ function Component<Props extends {}, NonStaticPropNames extends keyof Props = ne
 		render.displayName = decider
 		const augmentedRender: NamedExoticComponent<Props> & MarkerProvider<Props> = memo<Props>(render)
 		augmentedRender.staticRender = render as StaticRenderProvider<Props>['staticRender']
+		augmentedRender.displayName = decider
 
 		return augmentedRender
 	}
 
 	render.displayName = displayName
 	const augmentedRender: NamedExoticComponent<Props> & MarkerProvider<Props, NonStaticPropNames> = memo<Props>(render)
+	augmentedRender.displayName = displayName
 
 	if (typeof decider === 'function') {
 		augmentedRender.staticRender = decider

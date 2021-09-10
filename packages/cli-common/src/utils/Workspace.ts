@@ -1,30 +1,28 @@
-import { pathExists } from 'fs-extra'
-import * as path from 'path'
 import { basename, join } from 'path'
-import { readYaml, updateYaml } from './yaml'
 import { ProjectManager } from './ProjectManager'
 import { PathMapping } from './PathMapping'
 import { installTemplate } from './template'
 import { getPackageVersion } from './version'
-import { resourcesDir } from '../pathUtils'
+import { pathExists } from 'fs-extra'
+import { readYaml } from './yaml'
 
-interface WorkspaceDirectoryArgument {
+export interface WorkspaceDirectoryArgument {
 	workspaceDirectory: string
 }
 
-export const createWorkspace = async ({
-	workspaceDirectory,
-	template,
-}: {
+type CreateWorkspaceArgs = {
+	workspaceName: string
 	template?: string
-} & WorkspaceDirectoryArgument) => {
-	template ??= join(resourcesDir, 'templates/template-workspace-single-instance')
+} & WorkspaceDirectoryArgument
+
+export const createWorkspace = async ({ workspaceDirectory, workspaceName, template }: CreateWorkspaceArgs) => {
+	template ??= '@contember/template-workspace'
 	await installTemplate(template, workspaceDirectory, 'workspace', {
 		version: getPackageVersion(),
+		projectName: workspaceName,
 	})
 	const workspace = await Workspace.get(workspaceDirectory)
-	const project = await workspace.projects.createProject('sandbox', {})
-	await project.register()
+	await workspace.projects.createProject(workspaceName, {})
 }
 
 export interface WorkspaceConfig {
@@ -61,36 +59,12 @@ export class Workspace {
 		return this.config?.api?.version || undefined
 	}
 
-	get apiConfigFile(): string {
-		return path.resolve(this.directory, this.config.api?.configFile || 'api/config.yaml')
-	}
-
-	get adminProjectsFile(): string {
-		return path.resolve(this.directory, this.config.admin?.projectsFile || 'admin/src/projects.ts')
-	}
-
-	async updateApiVersion(newVersion: string) {
-		const configPath = formatConfigPath(this.directory)
-		if (!(await pathExists(configPath))) {
-			return false
-		}
-		await updateYaml(configPath, data => {
-			return {
-				...data,
-				api: {
-					...(typeof data.api === 'object' ? data.api : {}),
-					version: newVersion,
-				},
-			}
-		})
-		return true
-	}
 }
 
-const formatConfigPath = (workspaceDirectory: string) => join(workspaceDirectory, 'contember.workspace.yaml')
+export const formatWorkspaceConfigPath = (workspaceDirectory: string) => join(workspaceDirectory, 'contember.workspace.yaml')
 
 const readWorkspaceConfig = async ({ workspaceDirectory }: WorkspaceDirectoryArgument): Promise<WorkspaceConfig> => {
-	const configPath = formatConfigPath(workspaceDirectory)
+	const configPath = formatWorkspaceConfigPath(workspaceDirectory)
 	if (!(await pathExists(configPath))) {
 		return {}
 	}

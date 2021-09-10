@@ -1,29 +1,32 @@
-import { join, isAbsolute } from 'path'
-import { replaceFileContent, tryUnlink } from './fs'
+import { isAbsolute, join } from 'path'
+import { replaceFileContent } from './fs'
 import { copy, pathExists, remove, rename } from 'fs-extra'
-import { readYaml } from './yaml'
 import { downloadPackage } from './npm'
+import { resourcesDir } from '../pathUtils'
+import { readYaml } from './yaml'
 
+const localTemplates: Record<string, string> = {
+	['@contember/template-workspace']: join(resourcesDir, 'templates/template-workspace'),
+	['@contember/template-project']: join(resourcesDir, 'templates/template-project'),
+}
 export const installTemplate = async (
 	template: string,
 	targetDir: string,
 	requiredTemplateType: string,
 	variables: Record<string, string> = {},
 ) => {
-	if (isAbsolute(template)) {
-		const nodeModulesDir = join(template, 'node_modules')
-		await copy(template, targetDir, {
-			filter: src => {
-				// this is useful for Contember developers
-				return !src.startsWith(nodeModulesDir)
-			},
-		})
-	} else {
-		await downloadPackage(template, targetDir)
+	let removeTemplate = () => {}
+	if (localTemplates[template]) {
+		template = localTemplates[template]
 	}
-	const templateConfigFile = join(targetDir, 'contember.template.yaml')
+	if (!isAbsolute(template)) {
+		template = await downloadPackage(template)
+		removeTemplate = async () => {
+			await remove(template)
+		}
+	}
+	const templateConfigFile = join(template, 'contember.template.yaml')
 	if (!(await pathExists(templateConfigFile))) {
-		await remove(targetDir)
 		throw `${template} is not a Contember template`
 	}
 	const config = (await readYaml(templateConfigFile)) as {
@@ -31,17 +34,15 @@ export const installTemplate = async (
 		remove?: string[]
 		patchPackageJson?: boolean
 		rename?: Record<string, string>
+		copy?: Record<string, string>
 		replaceVariables?: string[]
 	}
-	if (!config.type || config.type !== requiredTemplateType) {
-		await remove(targetDir)
-		throw `${template} is not a ${requiredTemplateType} template`
-	}
-	await tryUnlink(templateConfigFile)
-
-	for (const fileToRemove of config.remove || []) {
-		await tryUnlink(join(targetDir, fileToRemove))
-	}
+	const nodeModulesDir = join(template, 'node_modules')
+	const skippedFiles = new Set([...(config.remove || []).map(it => join(template, it)), templateConfigFile])
+	await copy(template, targetDir, {
+		filter: src => !src.startsWith(nodeModulesDir) && !skippedFiles.has(src),
+	})
+	await removeTemplate()
 
 	if (config.patchPackageJson) {
 		await replaceFileContent(join(targetDir, 'package.json'), content => {
@@ -58,6 +59,9 @@ export const installTemplate = async (
 	}
 	for (const [source, target] of Object.entries(config.rename || {})) {
 		await rename(join(targetDir, source), join(targetDir, target))
+	}
+	for (const [source, target] of Object.entries(config.copy || {})) {
+		await copy(join(targetDir, source), join(targetDir, target))
 	}
 
 	for (const file of config.replaceVariables || []) {

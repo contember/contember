@@ -67,7 +67,7 @@ export class ProjectValidateCommand extends Command<Args, Options> {
 			console.groupEnd()
 			valid = valid && projectValid
 		}
-		if (invalidProjects) {
+		if (invalidProjects.length) {
 			console.log('Following projects failed the validation:')
 			invalidProjects.forEach(it => console.log(it))
 		}

@@ -8,9 +8,8 @@
     "test": "echo 'No tests'"
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.1",
-    "@types/fs-extra": "^9.0.3",
     "@types/node": "^15.12.5",
+    "@types/js-yaml": "^4.0.1",
     "@types/npm-package-arg": "^6.1.0"
   },
   "dependencies": {
@@ -21,7 +20,6 @@
     "js-yaml": "^4.1.0",
     "get-package-json-from-registry": "^2.2.2",
     "npm-package-arg": "^8.0.0",
-    "registry-info": "^1.0.0",
-    "yawn-yaml": "^1.5.0"
+    "registry-info": "^1.0.0"
   }
 }

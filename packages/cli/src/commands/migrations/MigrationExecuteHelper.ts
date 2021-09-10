@@ -49,7 +49,7 @@ export const executeMigrations = async ({
 	schemaVersionBuilder: SchemaVersionBuilder
 	migrationDescriber: MigrationDescriber
 	force?: boolean
-}) => {
+}): Promise<number> => {
 	console.log('Will execute following migrations:')
 	migrations.forEach(it => console.log(it.name))
 	if (requireConfirmation) {

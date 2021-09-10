@@ -6,9 +6,7 @@ export class Application {
 	constructor(private readonly commandManager: CommandManager, private readonly applicationDescription: string) {}
 
 	async run(args: string[]): Promise<void> {
-		const [{}, {}, ...commandArgs] = args
-
-		const [name, ...rest] = commandArgs
+		const [name, ...rest] = args
 		if (!name || name === '--help') {
 			console.error(this.applicationDescription)
 			console.error(`Usage: <command> <command args>`)
@@ -41,11 +39,20 @@ export class Application {
 
 			return process.exit(0)
 		}
+		return this.runCommandInternal(name, rest, true)
+	}
 
+	public async runCommand(name: string, args: string[]) {
+		return this.runCommandInternal(name, args, false)
+	}
+
+	public async runCommandInternal(name: string, args: string[], showCommandName: boolean) {
 		const [fullName, command] = this.commandManager.createCommand(name)
 
-		if (rest[0] === '--help' || rest[0] === '-h') {
-			console.error(chalk.greenBright(fullName))
+		if (args[0] === '--help' || args[0] === '-h') {
+			if (showCommandName) {
+				console.error(chalk.greenBright(fullName))
+			}
 			const configuration = command.getConfiguration()
 			const commandDescription = configuration.getDescription()
 			if (commandDescription) {
@@ -60,13 +67,13 @@ export class Application {
 		}
 
 		try {
-			const result = await command.run(rest)
+			const result = await command.run(args)
 			return process.exit(result)
 		} catch (e) {
 			if (e instanceof InvalidInputError) {
 				console.error(chalk.bgRedBright.white(e.message))
 				const configuration = command.getConfiguration()
-				console.error(`${chalk.greenBright(fullName)} ${chalk.green(configuration.getUsage({ format: 'line' }))}`)
+				console.error(`${showCommandName ? chalk.greenBright(fullName) + ' ' : ''}${chalk.green(configuration.getUsage({ format: 'line' }))}`)
 
 				return process.exit(1)
 			} else {

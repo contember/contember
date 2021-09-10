@@ -16,7 +16,7 @@ export const resolvePathMappingConfig = async (
 		return { ['*']: dir }
 	} else {
 		// single instance/project
-		const baseName = basename(baseDir)
+		const baseName = process.env.CONTEMBER_PROJECT_NAME ?? basename(baseDir)
 			.toLocaleLowerCase()
 			.replace(/[^-_a-z0-9]/, '')
 		return { [baseName]: baseDir }

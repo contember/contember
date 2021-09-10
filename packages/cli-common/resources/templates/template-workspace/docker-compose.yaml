@@ -2,14 +2,18 @@ version: '2.4'
 services:
   contember:
     image: contember/contember:{version}
+    restart: on-failure
     environment:
       NODE_ENV: 'development'
-      CONTEMBER_S3_SERVER: minio
 
       CONTEMBER_ROOT_EMAIL: 'contember@localhost'
       CONTEMBER_ROOT_PASSWORD: 'contember'
       CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+      CONTEMBER_CONFIG_YAML: |
+        projectDefaults:
+          s3:
+            prefix: '%project.slug%'
 
       DEFAULT_DB_HOST: 'postgresql'
       DEFAULT_DB_PORT: '5432'
@@ -30,20 +34,32 @@ services:
       postgresql:
         condition: service_healthy
 
+  admin:
+    image: node:14-alpine
+    command: npm run start-admin
+    environment:
+      VITE_CONTEMBER_ADMIN_SESSION_TOKEN: '0000000000000000000000000000000000000000'
+      VITE_CONTEMBER_ADMIN_PROJECT_NAME: '{projectName}'
+    volumes:
+      - ./:/src
+    working_dir: /src
+
   contember-cli:
     image: contember/cli:{version}
+    command: [ 'migrations:execute', '.', '--yes' ]
     volumes:
       - ./:/src:cached
     working_dir: /src
-    command: version
     environment:
-      CONTEMBER_API_URL: "http://contember:4000/"
-      CONTEMBER_API_TOKEN: "0000000000000000000000000000000000000000"
-
+      CONTEMBER_API_URL: 'http://contember:4000/'
+      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
+      CONTEMBER_PROJECT_NAME: '{projectName}'
+    depends_on:
+      contember:
+        condition: service_started
 
   postgresql:
-    image: postgres:10-alpine
-    restart: unless-stopped
+    image: postgres:13-alpine
     environment:
       POSTGRES_PASSWORD: contember
       POSTGRES_USER: contember
@@ -51,38 +67,39 @@ services:
     volumes:
       - pgsql-data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U contember" ]
+      test: [ 'CMD-SHELL', 'pg_isready -U contember' ]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
 
   s3:
     image: minio/minio
     command: 'server /data'
     volumes:
       - s3-data:/data
-      - ./api/s3-policy.json:/bucket-policy.json
-      - ./api/s3-entrypoint.sh:/minio-entrypoint.sh
+      - ./scripts/minio/s3-policy.json:/bucket-policy.json
+      - ./scripts/minio/s3-entrypoint.sh:/minio-entrypoint.sh
     entrypoint: /minio-entrypoint.sh
     environment:
       MINIO_ACCESS_KEY: contember
       MINIO_SECRET_KEY: contember
+
   mailhog:
     image: mailhog/mailhog
 
-#  # optional: database management tool
-#  adminer:
-#    image: michalhosna/adminer:4.8.0-en_v1
-#    depends_on:
-#      - postgresql
-#    environment:
-#      ADMINER_DRIVER: pgsql
-#      ADMINER_SERVER: postgresql
-#      ADMINER_DB: contember
-#      ADMINER_USERNAME: contember
-#      ADMINER_PASSWORD: contember
-#      ADMINER_AUTOLOGIN: 1
-#      ADMINER_NAME: Contember
+  adminer:
+    image: michalhosna/adminer:4.8.0-en_v1
+    depends_on:
+      - postgresql
+    environment:
+      ADMINER_DRIVER: pgsql
+      ADMINER_SERVER: postgresql
+      ADMINER_DB: contember
+      ADMINER_USERNAME: contember
+      ADMINER_PASSWORD: contember
+      ADMINER_AUTOLOGIN: 1
+      ADMINER_NAME: Contember
+
 volumes:
   pgsql-data: ~
   s3-data: ~

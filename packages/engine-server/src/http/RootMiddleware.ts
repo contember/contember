@@ -45,7 +45,6 @@ export const createRootMiddleware = (
 		createErrorResponseMiddleware(),
 		createTimerMiddleware(),
 		route('/playground$', createPlaygroundMiddleware()),
-		debug ? route('/sandbox$', createPlaygroundMiddleware(true)) : null,
 		createHomepageMiddleware(),
 		createContentMiddleware(),
 		createTenantMiddleware(services.tenantGraphQlMiddlewareFactory),

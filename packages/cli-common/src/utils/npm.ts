@@ -2,11 +2,11 @@ import getRegistryInfo from 'registry-info'
 import getPackageJson from 'get-package-json-from-registry'
 import npa from 'npm-package-arg'
 import downloadTarball from 'download-tarball'
-import { move, readdir, remove } from 'fs-extra'
+import { readdir } from 'fs-extra'
 import { join } from 'path'
 import { tmpdir } from 'os'
 
-export const downloadPackage = async (pkgName: string, dir: string): Promise<void> => {
+export const downloadPackage = async (pkgName: string): Promise<string> => {
 	const { scope } = npa(pkgName)
 	const { authorization } = getRegistryInfo(scope)
 	const headers = authorization ? { authorization } : {}
@@ -22,6 +22,5 @@ export const downloadPackage = async (pkgName: string, dir: string): Promise<voi
 	if (dirContent.length !== 1 || dirContent[0] !== 'package') {
 		throw 'Invalid NPM package'
 	}
-	await move(join(tmpDir, 'package'), dir)
-	await remove(tmpDir)
+	return join(tmpDir, 'package')
 }

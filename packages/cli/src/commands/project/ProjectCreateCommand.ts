@@ -22,8 +22,7 @@ export class ProjectCreateCommand extends Command<Args, Options> {
 		const workspace = await Workspace.get(process.cwd())
 
 		const template = input.getOption('template')
-		const project = await workspace.projects.createProject(projectName, { template })
-		await project.register()
+		await workspace.projects.createProject(projectName, { template })
 
 		console.log(`Project ${projectName} created`)
 	}

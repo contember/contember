@@ -1,5 +1,4 @@
 type: project
-remove:
-  - package.json
-  - package-lock.json
-  - tsconfig.json
+replaceVariables:
+  - admin/index.tsx
+  - admin/index.html

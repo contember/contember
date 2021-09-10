@@ -59,7 +59,7 @@ import {
 	}
 	const cliVersion = getPackageVersion()
 	const app = new Application(commandManager, `Contember CLI version ${cliVersion}`)
-	await app.run(process.argv)
+	await app.run(process.argv.slice(2))
 })().catch(e => {
 	console.log(e)
 	process.exit(1)

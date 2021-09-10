@@ -25,6 +25,6 @@
 		"@contember/client": "workspace:*"
 	},
 	"peerDependencies": {
-		"react": "17.0.1"
+		"react": "^17"
 	}
 }

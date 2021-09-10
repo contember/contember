@@ -21,7 +21,7 @@
 		"build": "vite build --mode development && vite build --mode production",
 		"build:api:dev": "api-extractor run --local",
 		"build:api:prod": "api-extractor run",
-		"styles:build": "node --experimental-modules ./scripts/build-style.mjs"
+		"styles:build": "sass src/index.sass:dist/style.css"
 	},
 	"dependencies": {
 		"@contember/binding": "workspace:*",
@@ -43,7 +43,6 @@
 		"intl-messageformat": "9.9.1",
 		"is-hotkey": "0.1.8",
 		"leaflet": "1.7.1",
-		"moment": "2.29.1",
 		"path-to-regexp": "6.2.0",
 		"react-datepicker": "3.8.0",
 		"react-dropzone": "10.2.2",

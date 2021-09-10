@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input, Workspace } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, validateProjectName, Workspace } from '@contember/cli-common'
 import { MigrationsContainerFactory } from '../../MigrationsContainer'
 import {
 	configureExecuteMigrationCommand,
@@ -34,61 +34,78 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		const projectName = input.getArgument('project')
 
 		const workspace = await Workspace.get(process.cwd())
-		const project = await workspace.projects.getProject(projectName, { fuzzy: true })
-		const migrationsDir = project.migrationsDir
-		const container = new MigrationsContainerFactory(migrationsDir).create()
-		const migrationArg = input.getArgument('migration')
 
-		const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
-		const apiToken = await interactiveResolveApiToken({ instance })
-		const remoteProject = input?.getOption('remote-project') || project.name
-		const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
-		await tenantClient.createProject(remoteProject, true)
-		const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
-
-		const force = input.getOption('force')
-		const status = await resolveMigrationStatus(systemClient, container.migrationsResolver, force)
-		if (status.errorMigrations.length > 0) {
-			console.error(createMigrationStatusTable(status.errorMigrations))
-			if (!force) {
-				throw `Cannot execute migrations`
-			}
+		const allProjects = projectName === '.'
+		if (!allProjects) {
+			validateProjectName(projectName)
 		}
-
-		const migrations = (() => {
-			if (migrationArg) {
-				const migration = findMigration(status.allMigrations, migrationArg)
-				if (!migration) {
-					throw `Undefined migration ${migrationArg}`
-				}
-				switch (migration.state) {
-					case MigrationState.EXECUTED_OK:
-						throw `Migration ${migrationArg} is already executed`
-					case MigrationState.TO_EXECUTE_ERROR:
-					case MigrationState.EXECUTED_ERROR:
-					case MigrationState.EXECUTED_MISSING:
-						throw `Cannot execute migration ${migrationArg}: ${migration.errorMessage} (${migration.state})`
-					case MigrationState.TO_EXECUTE_OK:
-						return [migration]
-					default:
-						assertNever(migration)
-				}
-			} else {
-				return status.migrationsToExecute
-			}
-		})()
-		if (migrations.length === 0) {
-			console.log('No migrations to execute')
-			return 0
+		const remoteProjectOption = input?.getOption('remote-project')
+		if (remoteProjectOption && allProjects) {
+			throw 'Option remote-project can be used only for a single project'
 		}
+		const projects = allProjects
+			? await workspace.projects.listProjects()
+			: [await workspace.projects.getProject(projectName, { fuzzy: true })]
 
-		return await executeMigrations({
-			migrationDescriber: container.migrationDescriber,
-			schemaVersionBuilder: container.schemaVersionBuilder,
-			client: systemClient,
-			migrations,
-			requireConfirmation: !input.getOption('yes'),
-			force: force,
-		})
+		let code = 0
+		for (const project of projects) {
+			const migrationsDir = project.migrationsDir
+			const container = new MigrationsContainerFactory(migrationsDir).create()
+			const migrationArg = input.getArgument('migration')
+
+			const instance = await interactiveResolveInstanceEnvironmentFromInput(workspace, input?.getOption('instance'))
+			const apiToken = await interactiveResolveApiToken({ instance })
+			const remoteProject = remoteProjectOption || project.name
+			const tenantClient = TenantClient.create(instance.baseUrl, apiToken)
+			await tenantClient.createProject(remoteProject, true)
+			const systemClient = SystemClient.create(instance.baseUrl, remoteProject, apiToken)
+
+			const force = input.getOption('force')
+			const status = await resolveMigrationStatus(systemClient, container.migrationsResolver, force)
+			if (status.errorMigrations.length > 0) {
+				console.error(createMigrationStatusTable(status.errorMigrations))
+				if (!force) {
+					throw `Cannot execute migrations`
+				}
+			}
+
+			const migrations = (() => {
+				if (migrationArg) {
+					const migration = findMigration(status.allMigrations, migrationArg)
+					if (!migration) {
+						throw `Undefined migration ${migrationArg}`
+					}
+					switch (migration.state) {
+						case MigrationState.EXECUTED_OK:
+							throw `Migration ${migrationArg} is already executed`
+						case MigrationState.TO_EXECUTE_ERROR:
+						case MigrationState.EXECUTED_ERROR:
+						case MigrationState.EXECUTED_MISSING:
+							throw `Cannot execute migration ${migrationArg}: ${migration.errorMessage} (${migration.state})`
+						case MigrationState.TO_EXECUTE_OK:
+							return [migration]
+						default:
+							assertNever(migration)
+					}
+				} else {
+					return status.migrationsToExecute
+				}
+			})()
+			if (migrations.length === 0) {
+				console.log('No migrations to execute')
+				continue
+			}
+
+			const singleCode = await executeMigrations({
+				migrationDescriber: container.migrationDescriber,
+				schemaVersionBuilder: container.schemaVersionBuilder,
+				client: systemClient,
+				migrations,
+				requireConfirmation: !input.getOption('yes'),
+				force: force,
+			})
+			code ||= singleCode
+		}
+		return code
 	}
 }

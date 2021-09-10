@@ -8,6 +8,7 @@ const SandboxLayout: FC = props => {
 			children={props.children}
 			sideBar={<Menu>
 				<Menu.Item title="Dashboard" to={'dashboard'}>
+					<Menu.Item title="Inputs" to="inputs" />
 					<Menu.Item title="Foo" to="fooPage" />
 					<Menu.Item title="Bar" to="barPage" />
 					<Menu.Item title="Lorem" to="loremPage">

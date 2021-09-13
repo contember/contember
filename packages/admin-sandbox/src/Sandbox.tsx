@@ -12,6 +12,7 @@ const SandboxLayout: FC = props => {
 					<Menu.Item title="Tags" to="tags" />
 					<Menu.Item title="Categories" to="categories" />
 					<Menu.Item title="Articles" to="articleList" />
+					<Menu.Item title="Homepage" to="homepage" />
 					<Menu.Item title="Foo" to="fooPage" />
 					<Menu.Item title="Bar" to="barPage" />
 					<Menu.Item title="Lorem" to="loremPage">

@@ -1,0 +1,364 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEnum",
+			"enumName": "ContentReferenceType",
+			"values": [
+				"image",
+				"quote"
+			]
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Content",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "content"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ContentBlock",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "content_block"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "ContentReference",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "content_reference"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Homepage",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "homepage"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ContentBlock",
+			"field": {
+				"name": "order",
+				"columnName": "order",
+				"nullable": false,
+				"type": "Integer",
+				"columnType": "integer"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ContentBlock",
+			"field": {
+				"name": "json",
+				"columnName": "json",
+				"nullable": false,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ContentReference",
+			"field": {
+				"name": "type",
+				"columnName": "type",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "ContentReferenceType"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ContentReference",
+			"field": {
+				"name": "primaryText",
+				"columnName": "primary_text",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "ContentReference",
+			"field": {
+				"name": "secondaryText",
+				"columnName": "secondary_text",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Homepage",
+			"field": {
+				"name": "unique",
+				"columnName": "unique",
+				"nullable": false,
+				"type": "Enum",
+				"columnType": "One"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ContentBlock",
+			"owningSide": {
+				"name": "content",
+				"inversedBy": "blocks",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "Content",
+				"joiningColumn": {
+					"columnName": "content_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "blocks",
+				"ownedBy": "content",
+				"type": "OneHasMany",
+				"target": "ContentBlock",
+				"orderBy": [
+					{
+						"path": [
+							"order"
+						],
+						"direction": "asc"
+					}
+				]
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ContentReference",
+			"owningSide": {
+				"name": "block",
+				"inversedBy": "references",
+				"nullable": false,
+				"type": "ManyHasOne",
+				"target": "ContentBlock",
+				"joiningColumn": {
+					"columnName": "block_id",
+					"onDelete": "cascade"
+				}
+			},
+			"inverseSide": {
+				"name": "references",
+				"ownedBy": "block",
+				"type": "OneHasMany",
+				"target": "ContentReference"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "ContentReference",
+			"owningSide": {
+				"name": "image",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "BasicImage",
+				"joiningColumn": {
+					"columnName": "image_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Homepage",
+			"owningSide": {
+				"name": "content",
+				"nullable": true,
+				"type": "OneHasOne",
+				"target": "Content",
+				"joiningColumn": {
+					"columnName": "content_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createUniqueConstraint",
+			"entityName": "Homepage",
+			"unique": {
+				"fields": [
+					"unique"
+				],
+				"name": "unique_Homepage_unique_5b4e83"
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Content",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"blocks": true
+							},
+							"read": {
+								"id": true,
+								"blocks": true
+							},
+							"update": {
+								"id": true,
+								"blocks": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentBlock",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"content": true,
+								"order": true,
+								"json": true,
+								"references": true
+							},
+							"read": {
+								"id": true,
+								"content": true,
+								"order": true,
+								"json": true,
+								"references": true
+							},
+							"update": {
+								"id": true,
+								"content": true,
+								"order": true,
+								"json": true,
+								"references": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/ContentReference",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"block": true,
+								"type": true,
+								"primaryText": true,
+								"secondaryText": true,
+								"image": true
+							},
+							"read": {
+								"id": true,
+								"block": true,
+								"type": true,
+								"primaryText": true,
+								"secondaryText": true,
+								"image": true
+							},
+							"update": {
+								"id": true,
+								"block": true,
+								"type": true,
+								"primaryText": true,
+								"secondaryText": true,
+								"image": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Homepage",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"unique": true,
+								"content": true
+							},
+							"read": {
+								"id": true,
+								"unique": true,
+								"content": true
+							},
+							"update": {
+								"id": true,
+								"unique": true,
+								"content": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

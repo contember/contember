@@ -1,6 +1,7 @@
 export * from './ArticlePages'
 export * from './CategoryPages'
 export * from './DashboardPage'
+export * from './HomepagePage'
 export * from './InputsPage'
 export * from './RandomPages'
 export * from './SecondPage'

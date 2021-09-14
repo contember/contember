@@ -373,6 +373,9 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 						onFocusCapture: editor.onFocus,
 						onBlurCapture: editor.onBlur,
 						onDOMBeforeInput: editor.onDOMBeforeInput,
+						onDrop: (e => {
+							e.preventDefault()
+						}),
 					}}
 					size="large"
 				>

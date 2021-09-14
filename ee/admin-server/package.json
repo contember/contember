@@ -1,6 +1,8 @@
 {
 	"name": "@contember/admin-server",
 	"version": "0.6.52",
+	"private": true,
+	"license": "proprietary",
 	"scripts": {
 		"build": "pnpm run build:public && pnpm run build:server",
 		"watch": "pnpm run watch:public && pnpm run watch:server",

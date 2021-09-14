@@ -1,7 +1,7 @@
 import reactRefresh from '@vitejs/plugin-react-refresh'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
-import { packageList } from './packageList.js'
+import { getPackagePath, packageList } from './packageList.js'
 import { rootDirectory } from './rootDirectory.js'
 
 export function createViteConfig(packageName) {
@@ -48,7 +48,7 @@ export function createViteConfig(packageName) {
 				alias: [
 					...packageList.map(packageName => ({
 						find: `@contember/${packageName}`,
-						replacement: resolve(rootDirectory, `packages/${packageName}/src/index.ts`),
+						replacement: resolve(rootDirectory, getPackagePath(packageName)),
 					})),
 					{
 						find: 'attr-accept',

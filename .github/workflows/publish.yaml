@@ -36,7 +36,7 @@ jobs:
         run: pnpm run build:api:dev
 
       - name: Build Docker
-        run: docker build -t "contember/admin:${GITHUB_REF:11}" -f ./packages/admin-server/Dockerfile .
+        run: docker build -t "contember/admin:${GITHUB_REF:11}" -f ./ee/admin-server/Dockerfile .
 
       - name: Test
         run: pnpm run test

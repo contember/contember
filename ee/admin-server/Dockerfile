@@ -5,14 +5,14 @@ RUN npm install -g pnpm
 
 COPY ./ ./
 
-RUN cd packages/admin-server && \
+RUN cd ee/admin-server && \
     pnpm install && \
     pnpm run build
 
 FROM node:14-alpine
 
 WORKDIR /src
-COPY --from=builder /src/packages/admin-server/dist/ ./
+COPY --from=builder /src/packages/ee/dist/ ./
 
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT "4000"

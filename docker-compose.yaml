@@ -19,7 +19,7 @@ services:
     image: node:14-alpine
     command: 'node dist/server/run-admin.js'
 
-    working_dir: /src/packages/admin-server
+    working_dir: /src/ee/admin-server
     volumes:
       - .:/src:cached
 
@@ -29,7 +29,7 @@ services:
 
       CONTEMBER_API_ENDPOINT: 'http://api:4000'
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
-      CONTEMBER_PUBLIC_DIR: '/src/packages/admin-server/dist/public'
+      CONTEMBER_PUBLIC_DIR: '/src/ee/admin-server/dist/public'
 
       CONTEMBER_S3_ENDPOINT: 'http://s3:9000'
       CONTEMBER_S3_REGION: '_'
@@ -47,7 +47,7 @@ services:
     image: node:14-alpine
     command: 'npm run watch:server'
 
-    working_dir: /src/packages/admin-server
+    working_dir: /src/ee/admin-server
     volumes:
       - .:/src:cached
 
@@ -56,7 +56,7 @@ services:
     image: node:14-alpine
     command: 'npm run watch:public'
 
-    working_dir: /src/packages/admin-server
+    working_dir: /src/ee/admin-server
     volumes:
       - .:/src:cached
 

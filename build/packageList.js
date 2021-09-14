@@ -12,3 +12,12 @@ export const packageList = [
 	'utils',
 	'vimeo-file-uploader',
 ]
+
+export const getPackagePath = name => {
+	switch (name) {
+		case 'admin-server':
+			return `ee/${name}/src/index.ts`
+		default:
+			return `packages/${name}/src/index.ts`
+	}
+}

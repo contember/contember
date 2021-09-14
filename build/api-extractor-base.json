@@ -17,7 +17,6 @@
 				"paths": {
 					"@contember/admin": ["../admin/dist/admin.d.ts"],
 					"@contember/admin-i18n": ["../admin-i18n/dist/admin-i18n.d.ts"],
-					"@contember/admin-server": ["../admin-server/dist/admin-server.d.ts"],
 					"@contember/binding": ["../binding/dist/binding.d.ts"],
 					"@contember/client": ["../client/dist/client.d.ts"],
 					"@contember/react-client": ["../react-client/dist/react-client.d.ts"],

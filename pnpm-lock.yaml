@@ -70,6 +70,31 @@ importers:
       typescript: 4.3.5
       vite: 2.5.0
 
+  ee/admin-server:
+    specifiers:
+      '@aws-sdk/client-s3': ^3.22.0
+      '@contember/admin': workspace:*
+      '@contember/dic': ^0.11.2
+      '@types/cookie': ^0.4.1
+      '@types/mime': ^2.0.3
+      '@types/node': ^16.3.3
+      '@types/node-fetch': ^2.5.11
+      cookie: ^0.4.1
+      mime: ^2.5.2
+      node-fetch: ^2.6.1
+    dependencies:
+      '@aws-sdk/client-s3': 3.24.0
+      '@contember/dic': 0.11.2
+      cookie: 0.4.1
+      mime: 2.5.2
+      node-fetch: 2.6.1
+    devDependencies:
+      '@contember/admin': link:../../packages/admin
+      '@types/cookie': 0.4.1
+      '@types/mime': 2.0.3
+      '@types/node': 16.4.10
+      '@types/node-fetch': 2.5.12
+
   packages/admin:
     specifiers:
       '@contember/binding': workspace:*
@@ -175,31 +200,6 @@ importers:
       '@contember/schema-definition': 0.11.3
     devDependencies:
       '@contember/admin': link:../admin
-
-  packages/admin-server:
-    specifiers:
-      '@aws-sdk/client-s3': ^3.22.0
-      '@contember/admin': workspace:*
-      '@contember/dic': ^0.11.2
-      '@types/cookie': ^0.4.1
-      '@types/mime': ^2.0.3
-      '@types/node': ^16.3.3
-      '@types/node-fetch': ^2.5.11
-      cookie: ^0.4.1
-      mime: ^2.5.2
-      node-fetch: ^2.6.1
-    dependencies:
-      '@aws-sdk/client-s3': 3.24.0
-      '@contember/dic': 0.11.2
-      cookie: 0.4.1
-      mime: 2.5.2
-      node-fetch: 2.6.1
-    devDependencies:
-      '@contember/admin': link:../admin
-      '@types/cookie': 0.4.1
-      '@types/mime': 2.0.3
-      '@types/node': 16.4.10
-      '@types/node-fetch': 2.5.12
 
   packages/binding:
     specifiers:

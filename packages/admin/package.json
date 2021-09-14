@@ -1,5 +1,6 @@
 {
 	"name": "@contember/admin",
+	"license": "Apache-2.0",
 	"version": "0.6.53",
 	"type": "module",
 	"sideEffects": false,

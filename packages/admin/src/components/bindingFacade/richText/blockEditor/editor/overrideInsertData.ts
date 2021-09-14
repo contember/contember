@@ -35,11 +35,11 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 			const stripNodeReferences = (nodes: SlateNode[]): SlateNode[] =>
 				nodes.flatMap(node => {
 					if (Text.isText(node)) {
-						return node
+						return node as SlateNode
 					}
 					if (SlateElement.isElement(node) && 'referenceId' in node) {
 						// Essentially unwrapping the node.
-						return stripNodeReferences(node.children)
+						return stripNodeReferences((node as SlateElement).children)
 					}
 					return {
 						...node,

@@ -6,5 +6,5 @@ export interface ElementWithReference extends Element {
 }
 
 export const isElementWithReference = (candidate: Node): candidate is ElementWithReference => {
-	return !Text.isText(candidate) && 'referenceId' in candidate && candidate.referenceId
+	return !Text.isText(candidate) && 'referenceId' in candidate && !!candidate.referenceId
 }

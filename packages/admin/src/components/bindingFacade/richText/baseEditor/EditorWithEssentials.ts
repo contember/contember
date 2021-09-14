@@ -1,28 +1,28 @@
 import type { FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
-import type { Element as SlateElement, Node as SlateNode, NodeEntry } from 'slate'
+import type { BaseEditor, Element as SlateElement, Node as SlateNode, Text as SlateText, NodeEntry } from 'slate'
 import type { RenderElementProps, RenderLeafProps } from 'slate-react'
-import type { EditorNode, ElementNode, ElementSpecifics, SerializableEditorNode, TextNode, TextSpecifics } from './Node'
+import type { ElementSpecifics, TextSpecifics } from './Node'
 import type { WithPaste } from './overrides'
 
-export interface WithEssentials<E extends EditorNode> {
-	formatVersion: SerializableEditorNode['formatVersion']
+export interface WithEssentials {
+	formatVersion: number
 	defaultElementType: string
 	isDefaultElement: (element: SlateElement) => boolean
 	createDefaultElement: (children: SlateElement['children']) => SlateElement
 	insertBetweenBlocks: (blockEntry: NodeEntry, edge: 'before' | 'after') => void
 
-	canToggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => boolean
-	hasMarks: <T extends TextNode>(marks: TextSpecifics<T>) => boolean
-	toggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => void
+	canToggleMarks: <T extends SlateText>(marks: TextSpecifics<T>) => boolean
+	hasMarks: <T extends SlateText>(marks: TextSpecifics<T>) => boolean
+	toggleMarks: <T extends SlateText>(marks: TextSpecifics<T>) => void
 
-	canToggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
-	isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
-	toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => void
+	canToggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
+	isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
+	toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => void
 
-	canContainAnyBlocks: (element: ElementNode) => boolean
+	canContainAnyBlocks: (element: SlateElement) => boolean
 
-	serializeNodes: (nodes: Array<ElementNode | TextNode>, errorMessage?: string) => string
-	deserializeNodes: (serializedNodes: string, errorMessage?: string) => Array<ElementNode | TextNode>
+	serializeNodes: (nodes: Array<SlateElement | SlateText>, errorMessage?: string) => string
+	deserializeNodes: (serializedNodes: string, errorMessage?: string) => Array<SlateElement | SlateText>
 
 	upgradeFormatBySingleVersion: (node: SlateNode, oldVersion: number) => SlateNode
 
@@ -36,4 +36,4 @@ export interface WithEssentials<E extends EditorNode> {
 	onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
 }
 
-export type EditorWithEssentials<E extends EditorNode> = WithEssentials<E> & WithPaste & EditorNode
+export type EditorWithEssentials<E extends BaseEditor> = WithEssentials & WithPaste & E

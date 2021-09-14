@@ -38,12 +38,11 @@ import {
 	useRef,
 	useState,
 } from 'react'
-import { Editor, PathRef, Range as SlateRange } from 'slate'
+import { Editor, PathRef, Range as SlateRange, Element as SlateElement } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { getDiscriminatedBlock, useNormalizedBlocks } from '../../blocks'
 import { Repeater } from '../../collections'
 import { SugaredDiscriminateBy, useDiscriminatedData } from '../../discrimination'
-import type { ElementNode } from '../baseEditor'
 import type { CreateEditorPublicOptions } from '../editorFactory'
 import { RichEditor } from '../RichEditor'
 import {
@@ -166,7 +165,7 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 		//
 
 		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ContemberFieldElement>())
-		const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, ElementNode>())
+		const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, SlateElement>())
 		const [blockElementPathRefs] = useState(() => new Map<string, PathRef>())
 		const [referencedEntityCache] = useState(() => new Map<EntityId, EntityRealmKey>())
 
@@ -288,9 +287,9 @@ const BlockEditorComponent: FunctionComponent<BlockEditorProps> = Component(
 						const currentNode = editor.deserializeNodes(
 							contentField.value!,
 							`BlockEditor: The 'contentField' of a block contains invalid data.`,
-						)[0] as ElementNode
-						if (JSON.stringify(previousNode) === JSON.stringify(currentNode)) {
-							blockElementCache.set(blockEntity, previousNode as ElementNode)
+						)[0]
+						if (SlateElement.isElement(previousNode) && JSON.stringify(previousNode) === JSON.stringify(currentNode)) {
+							blockElementCache.set(blockEntity, previousNode)
 						}
 					}
 				},

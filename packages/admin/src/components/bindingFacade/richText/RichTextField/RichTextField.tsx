@@ -9,10 +9,9 @@ import {
 } from '@contember/binding'
 import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
-import { Editor, Node as SlateNode, NodeEntry, Transforms } from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { useAccessorErrors } from '../../errors'
-import type { ElementNode } from '../baseEditor'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
 import { paragraphElementType } from '../plugins'
 import { RichEditor } from '../RichEditor'
@@ -38,7 +37,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 		const fieldAccessor = useMemo(() => entity.getRelativeSingleField<string>(desugaredField), [entity, desugaredField])
 
 		// The cache is questionable, really.
-		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, ElementNode[]>())
+		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, SlateElement[]>())
 		const isMutating = useMutationState()
 
 		const [editor] = useState(() => {
@@ -67,12 +66,11 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 				},
 				normalizeNode: (nodeEntry: NodeEntry) => {
 					const [node, path] = nodeEntry
-
-					if (path.length === 0) {
+					if (path.length === 0 && SlateElement.isElement(node)) {
 						// Enforce that there's exactly one child and that it's
 						if (node.children.length > 1) {
 							return Editor.withoutNormalizing(editor, () => {
-								const targetPath = [0, (editor.children[0] as ElementNode).children.length]
+								const targetPath = [0, (editor.children[0] as SlateElement).children.length]
 								Transforms.moveNodes(editor, {
 									at: [1],
 									to: targetPath,
@@ -80,7 +78,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 								Transforms.unwrapNodes(editor, { at: targetPath })
 							})
 						}
-						if (!editor.isDefaultElement(node.children[0])) {
+						if (SlateElement.isElement(node.children[0]) && !editor.isDefaultElement(node.children[0])) {
 							return Editor.withoutNormalizing(editor, () => {
 								Transforms.wrapNodes(editor, editor.createDefaultElement([{ text: '' }]), {
 									at: path,
@@ -116,8 +114,10 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 						return
 					}
 
-					fieldAccessor.updateValue(serialize(value[0].children))
-					contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as ElementNode[])
+					if (SlateElement.isElement(value[0])) {
+						fieldAccessor.updateValue(serialize(value[0].children))
+						contemberFieldElementCache.set(getAccessor().getRelativeSingleField(desugaredField), value as SlateElement[])
+					}
 				})
 			},
 			[getParent, contemberFieldElementCache, desugaredField, serialize],

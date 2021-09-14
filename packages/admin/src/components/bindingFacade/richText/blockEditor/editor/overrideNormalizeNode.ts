@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
-import { Node as SlateNode, Path as SlatePath, Text, Transforms } from 'slate'
-import type { EditorNode } from '../../baseEditor'
+import { Editor, Node as SlateNode, Path as SlatePath, Text, Transforms } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
 import {
 	ContemberContentPlaceholderElement,
@@ -92,7 +91,7 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 				}
 			}
 			if (editor.children.length === leadingCount + trailingCount + 1) {
-				const soleBlock = editor.children[leadingCount] as EditorNode
+				const soleBlock = editor.children[leadingCount] as Editor
 				if (editor.isDefaultElement(soleBlock) && SlateNode.string(soleBlock) === '') {
 					const targetPath = path.concat(leadingCount)
 					Transforms.removeNodes(editor, { at: targetPath })

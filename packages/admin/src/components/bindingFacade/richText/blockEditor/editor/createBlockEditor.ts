@@ -1,7 +1,7 @@
 import { BindingError } from '@contember/binding'
 import { noop } from '@contember/react-utils'
 import * as Slate from 'slate'
-import { Element as SlateElement } from 'slate'
+import { Element as SlateElement, Node as SlateNode } from 'slate'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
 import { isContemberContentPlaceholderElement, isContemberFieldElement, isReferenceElement } from '../elements'
@@ -76,7 +76,7 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			}
 
 			const { upgradeFormatBySingleVersion } = e
-			e.upgradeFormatBySingleVersion = (node, oldVersion) => {
+			e.upgradeFormatBySingleVersion = (node, oldVersion): SlateNode => {
 				if (oldVersion !== 0 || !SlateElement.isElement(node)) {
 					return upgradeFormatBySingleVersion(node, oldVersion)
 				}

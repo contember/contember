@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"outDir": "../temp",
+		"typeRoots": ["./types/"],
 		"paths": {
 			"@contember/binding": ["../../binding/src"],
 			"@contember/client": ["../../client/src"],

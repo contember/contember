@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { Editor, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
+import { Editor, Node as SlateNode, Element as SlateElement, Range as SlateRange, Transforms } from 'slate'
 import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
 import type { EditorWithScrollTargets, WithScrollTargets } from './EditorWithScrollTargets'
 import { ScrollTargetElement, scrollTargetElementType } from './ScrollTargetElement'
@@ -12,7 +12,7 @@ export const withScrollTargets = <E extends BaseEditor>(editor: E): EditorWithSc
 	const { isInline, isVoid, renderElement, toggleElement, isElementActive } = editor
 
 	const isScrollTarget = (element: SlateNode | ElementNode): element is ScrollTargetElement =>
-		element.type === scrollTargetElementType
+		SlateElement.isElement(element) && element.type === scrollTargetElementType
 	const isScrollTargetActive = (editor: BaseScrollTargetEditor) => {
 		const [link] = Editor.nodes(editor, { match: isScrollTarget })
 		return !!link

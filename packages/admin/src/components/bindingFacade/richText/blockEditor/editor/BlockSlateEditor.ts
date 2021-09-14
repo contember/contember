@@ -1,12 +1,13 @@
 import type { EntityAccessor, FieldValue } from '@contember/binding'
 import type * as Slate from 'slate'
-import type { BaseEditor, ElementNode, WithAnotherNodeType } from '../../baseEditor'
+import type { BaseEditor, WithAnotherNodeType } from '../../baseEditor'
 import type {
 	ContemberContentPlaceholderElement,
 	ContemberFieldElement,
 	ElementWithReference,
 	ReferenceElement,
 } from '../elements'
+import { Editor } from 'slate'
 
 export type BlockEditorElements = ReferenceElement | ContemberContentPlaceholderElement | ContemberFieldElement
 
@@ -19,13 +20,13 @@ export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, Blo
 
 	// Really, try to avoid passing just the referenceId at all costs
 	getReferencedEntity: (elementOrReferenceId: ElementWithReference | string) => EntityAccessor
-	prepareElementForInsertion: (element: ElementNode) => Slate.Path
+	prepareElementForInsertion: (element: Slate.Element) => Slate.Path
 	createElementReference: (
 		targetPath: Slate.Path,
 		referenceDiscriminant: FieldValue,
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => string
-	insertElementWithReference: <Element extends ElementNode>(
+	insertElementWithReference: <Element extends Slate.Element>(
 		element: Omit<Element, 'referenceId'>,
 		referenceDiscriminant: FieldValue,
 		initialize?: EntityAccessor.BatchUpdatesHandler,
@@ -38,4 +39,4 @@ export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, Blo
 export type EditorWithBlockElements<E extends BaseEditor> = WithAnotherNodeType<E, BlockEditorElements> &
 	WithBlockElements<WithAnotherNodeType<E, BlockEditorElements>>
 
-export type BlockSlateEditor = EditorWithBlockElements<BaseEditor>
+export type BlockSlateEditor = Editor & EditorWithBlockElements<BaseEditor>

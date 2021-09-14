@@ -19,8 +19,8 @@ export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWith
 	const e: E & Partial<WithHorizontalRules<BaseHorizontalRuleEditor>> = editor
 	const { isVoid, insertText, renderElement, toggleElement } = editor
 
-	const isHorizontalRule = (element: SlateNode | ElementNode): element is HorizontalRuleElement =>
-		element.type === horizontalRuleElementType
+	const isHorizontalRule = (element: SlateNode): element is HorizontalRuleElement =>
+		SlateElement.isElement(element) && element.type === horizontalRuleElementType
 	const isHorizontalRuleActive = (editor: BaseHorizontalRuleEditor) => {
 		const [hr] = Editor.nodes(editor, { match: isHorizontalRule })
 		return !!hr

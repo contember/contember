@@ -1,21 +1,21 @@
 import { createElement } from 'react'
-import { createEditor, Editor, Element as SlateElement, Path, Range as SlateRange, Transforms } from 'slate'
+import { createEditor, Editor, Element as SlateElement, Path, Range as SlateRange, Text as SlateText, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import { withReact } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
-import type { BaseEditor } from './BaseEditor'
 import { DefaultElement } from './DefaultElement'
-import type { ElementNode, ElementSpecifics, TextNode, TextSpecifics, UnderlyingEditor } from './Node'
+import type { ElementSpecifics, TextSpecifics, UnderlyingEditor } from './Node'
 import { overrideDeleteBackward, withPaste } from './overrides'
+import { ReactEditor } from 'slate-react'
 
-export const createEditorWithEssentials = (defaultElementType: string): BaseEditor => {
-	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor())) as BaseEditor
-	const editorWithEssentials = underlyingEditor as BaseEditor
+export const createEditorWithEssentials = (defaultElementType: string): Editor => {
+	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor() as ReactEditor))
+	const editorWithEssentials = underlyingEditor as unknown as Editor
 
-	Object.assign<BaseEditor, Partial<BaseEditor>>(editorWithEssentials, {
+	Object.assign<Editor, Partial<Editor>>(editorWithEssentials, {
 		formatVersion: 1,
 		defaultElementType,
-		isDefaultElement: element => element.type === defaultElementType,
+		isDefaultElement: element => 'type' in element && (element as any).type === defaultElementType,
 		createDefaultElement: children => ({
 			type: defaultElementType,
 			children,
@@ -30,18 +30,18 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 		},
 
 		canToggleMarks: () => true,
-		canToggleElement: <E extends ElementNode>() => true,
+		canToggleElement: <E extends SlateElement>() => true,
 
-		hasMarks: <T extends TextNode>(marks: TextSpecifics<T>) => ContemberEditor.hasMarks(editorWithEssentials, marks),
+		hasMarks: <T extends SlateText>(marks: TextSpecifics<T>) => ContemberEditor.hasMarks(editorWithEssentials, marks),
 
 		// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
 		// 	include empty strings at the edges of top-level elements.
-		isElementActive: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
+		isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) =>
 			Array.from(ContemberEditor.topLevelNodes(editorWithEssentials)).every(([node]) =>
 				ContemberEditor.isElementType(node, elementType, suchThat),
 			),
 
-		toggleMarks: <T extends TextNode>(marks: TextSpecifics<T>) => {
+		toggleMarks: <T extends SlateText>(marks: TextSpecifics<T>) => {
 			if (!editorWithEssentials.canToggleMarks(marks)) {
 				return
 			}
@@ -53,7 +53,7 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 			ContemberEditor.addMarks(editorWithEssentials, marks)
 			return true
 		},
-		toggleElement: <E extends ElementNode>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {}, // TODO
+		toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {}, // TODO
 
 		canContainAnyBlocks: element => !editorWithEssentials.isInline(element) && !editorWithEssentials.isVoid(element),
 
@@ -122,5 +122,5 @@ export const createEditorWithEssentials = (defaultElementType: string): BaseEdit
 
 	withPaste(editorWithEssentials)
 
-	return editorWithEssentials as BaseEditor
+	return editorWithEssentials
 }

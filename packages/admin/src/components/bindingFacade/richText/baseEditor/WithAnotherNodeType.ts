@@ -1,5 +1,5 @@
-import type { BaseEditor } from './BaseEditor'
+import { Editor } from 'slate'
 
-export type WithAnotherNodeType<E extends BaseEditor, NodeType> = Omit<E, 'children'> & {
+export type WithAnotherNodeType<E extends Editor, NodeType> = Omit<E, 'children'> & {
 	children: Array<E['children'][number] | NodeType>
 }

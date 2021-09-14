@@ -1,8 +1,6 @@
 import { BindingError, EntityAccessor, FieldAccessor, RelativeSingleField } from '@contember/binding'
 import type { ReactNode } from 'react'
 import { Editor, Element as SlateElement, PathRef } from 'slate'
-import type { ElementNode } from '../baseEditor'
-import type { BlockSlateEditor } from './editor'
 import {
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
@@ -12,8 +10,8 @@ import {
 import type { FieldBackedElement } from './FieldBackedElement'
 
 export interface UseBlockEditorSlateNodesOptions {
-	editor: BlockSlateEditor
-	blockElementCache: WeakMap<EntityAccessor, ElementNode>
+	editor: Editor
+	blockElementCache: WeakMap<EntityAccessor, SlateElement>
 	blockElementPathRefs: Map<string, PathRef>
 	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	blockContentField: RelativeSingleField
@@ -102,7 +100,7 @@ export const useBlockEditorSlateNodes = ({
 				}
 				const contentField = entity.getRelativeSingleField(blockContentField)
 
-				let blockElement: ElementNode
+				let blockElement: SlateElement
 
 				if (contentField.value === null || contentField.value === '') {
 					blockElement = editor.createDefaultElement([{ text: '' }])
@@ -112,7 +110,7 @@ export const useBlockEditorSlateNodes = ({
 					blockElement = editor.deserializeNodes(
 						contentField.value,
 						`BlockEditor: The 'contentField' of a block contains invalid data.`,
-					)[0] as ElementNode
+					)[0] as SlateElement
 				}
 				blockElementCache.set(entity, blockElement)
 				return blockElement

@@ -1,51 +1,17 @@
 import type { HistoryEditor } from 'slate-history'
 import type { ReactEditor } from 'slate-react'
-
-export interface TextNode {
-	text: string
-}
-
-export interface ElementNode {
-	type?: string
-	referenceId?: string
-	children: Array<ElementNode | TextNode>
-}
+import type { Element as SlateElement, Text as SlateText, Editor as SlateEditor } from 'slate'
 
 export type UnderlyingEditor = ReactEditor & HistoryEditor
-export type KnownEditorKeys =
-	| 'addMark'
-	| 'apply'
-	| 'deleteBackward'
-	| 'deleteForward'
-	| 'deleteFragment'
-	| 'history'
-	| 'insertBreak'
-	| 'insertData'
-	| 'insertFragment'
-	| 'insertNode'
-	| 'insertText'
-	| 'isInline'
-	| 'isVoid'
-	| 'marks'
-	| 'normalizeNode'
-	| 'onChange'
-	| 'operations'
-	| 'redo'
-	| 'removeMark'
-	| 'selection'
-	| 'undo'
-// We're effectively simply removing the index signature from Slate's original Editor type.
-export type EditorNode = Pick<UnderlyingEditor, KnownEditorKeys> & {
-	type?: never
-	children: Array<TextNode | ElementNode>
-}
+export type BaseEditor = SlateEditor
 
 export interface SerializableEditorNode {
 	formatVersion: number
 	children: Array<ElementNode | TextNode>
 }
 
-export type Node = EditorNode | ElementNode | TextNode
-
-export type ElementSpecifics<Element extends ElementNode> = Omit<Element, 'type' | 'children' | 'referenceId'>
-export type TextSpecifics<Text extends TextNode> = Omit<Text, 'text'>
+export type ElementSpecifics<Element extends SlateElement> = Omit<Element, 'type' | 'children' | 'referenceId'>
+export type TextSpecifics<Text extends SlateText> = Omit<Text, 'text'>
+export type ElementNode = SlateElement
+export type EditorNode = SlateEditor
+export type TextNode = SlateText

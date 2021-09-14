@@ -1,6 +1,6 @@
 import type { EditorNode, ElementNode, TextNode } from '../Node'
 import type { WithEssentials } from '../EditorWithEssentials'
-import { Transforms } from 'slate'
+import { Descendant, Transforms } from 'slate'
 
 type Children = (ElementNode | TextNode)[]
 
@@ -37,10 +37,10 @@ export interface WithPaste {
 	processNodeListPaste: ProcessNodeListPaste
 
 	// Base implementation
-	deserializeFromNodeListToPure: (list: Node[], cumulativeTextAttrs: TextAttrs) => (TextNode | ElementNode)[]
+	deserializeFromNodeListToPure: (list: Node[], cumulativeTextAttrs: TextAttrs) => Descendant[]
 	processWithAttributeProcessor: (element: Node, cta: TextAttrs) => TextAttrs
-	deserializeTextNode: (node: Node, cumulativeTextAttrs: TextAttrs) => (TextNode | ElementNode)[] | null
-	deserializeTextFromNodeList: (list: NodeList, cumulativeTextAttrs: TextAttrs) => (TextNode | ElementNode)[]
+	deserializeTextNode: (node: Node, cumulativeTextAttrs: TextAttrs) => Descendant[] | null
+	deserializeTextFromNodeList: (list: NodeList, cumulativeTextAttrs: TextAttrs) => Descendant[]
 
 	// Utils
 	wordPasteListItemContent: (allNodes: Iterable<Node> | ArrayLike<Node>) => Node[]
@@ -50,9 +50,9 @@ export interface WithPaste {
 const ignoredElements = ['SCRIPT', 'STYLE', 'TEMPLATE']
 
 export const withPaste: <E extends EditorNode>(
-	editor: WithEssentials<E> & EditorNode,
-) => asserts editor is WithPaste & WithEssentials<E> & EditorNode = editor => {
-	const editorWithEssentials = editor as WithPaste & WithEssentials<EditorNode> & EditorNode
+	editor: E,
+) => asserts editor is E = editor => {
+	const editorWithEssentials = editor as WithPaste & EditorNode
 	const { insertData } = editorWithEssentials
 
 	const impl: WithPaste & Partial<EditorNode> = {

@@ -1,4 +1,4 @@
-import { Editor, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
+import { Editor, Node as SlateNode, Path as SlatePath, Transforms, Element as SlateElement } from 'slate'
 import type { BaseEditor } from '../../../../baseEditor'
 import { ContemberEditor } from '../../../../ContemberEditor'
 import type { EditorWithLists } from '../EditorWithLists'
@@ -11,7 +11,7 @@ export const dedentListItem = (
 	listItemPath: SlatePath,
 ): boolean => {
 	const parentListPath = SlatePath.parent(listItemPath)
-	const parentListElement = SlateNode.get(editor, parentListPath)
+	const parentListElement = SlateNode.get(editor, parentListPath) as SlateElement
 	const parentListChildrenCount = parentListElement.children.length
 	const subsequentListItemCount = parentListChildrenCount - listItemPath[listItemPath.length - 1] - 1
 

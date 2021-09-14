@@ -47,7 +47,7 @@ export const withParagraphs = <E extends BaseEditor>(editor: E): EditorWithParag
 		}
 		const [closestBlockElement, closestBlockPath] = closestBlockEntry
 
-		return closestBlockPath.length === 1 && closestBlockElement.type === paragraphElementType
+		return closestBlockPath.length === 1 &&  SlateElement.isElement(closestBlockElement) && closestBlockElement.type === paragraphElementType
 	}
 
 	e.toggleElement = (elementType, suchThat) => {

@@ -121,7 +121,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 
 			if (e.isElementActive(elementType, suchThat)) {
 				const closestListEntry = ContemberEditor.closest(editor, {
-					match: node => node.type === elementType,
+					match: node => SlateElement.isElement(node) && node.type === elementType,
 				}) as NodeEntry<UnorderedListElement | OrderedListElement>
 				if (!closestListEntry) {
 					return

@@ -1,7 +1,7 @@
 import { useField } from '@contember/binding'
 import { EditorPlaceholder } from '@contember/ui'
 import { memo } from 'react'
-import { Node as SlateNode, Path as SlatePath } from 'slate'
+import { Node as SlateNode, Path as SlatePath, Element as SlateElement } from 'slate'
 import { ReactEditor, RenderElementProps, useEditor } from 'slate-react'
 import { AccessorErrors } from '../../../errors'
 import { BlockElement } from '../../baseEditor'
@@ -20,7 +20,7 @@ export const ContemberFieldElementRenderer = memo((props: ContemberFieldElementR
 	const editor = useEditor()
 	const path = ReactEditor.findPath(editor, props.element)
 	const parentPath = SlatePath.parent(path)
-	const parent = SlateNode.get(editor, parentPath)
+	const parent = SlateNode.get(editor, parentPath) as SlateElement
 	const lastIndex = path[path.length - 1]
 
 	const fieldBackedElement =

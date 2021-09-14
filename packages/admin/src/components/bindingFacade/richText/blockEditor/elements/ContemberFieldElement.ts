@@ -1,10 +1,9 @@
 import { Element, Node } from 'slate'
-import type { ElementNode } from '../../baseEditor'
 
 type ContemberFieldElementType = '__contember_field__'
 export const contemberFieldElementType: ContemberFieldElementType = '__contember_field__'
 
-export interface ContemberFieldElement extends ElementNode {
+export interface ContemberFieldElement extends Element {
 	type: ContemberFieldElementType
 }
 

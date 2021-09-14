@@ -59,9 +59,9 @@ export const withTables = <E extends BaseEditor>(editor: E): EditorWithTables<E>
 	})
 
 	Object.assign<EditorWithTables<BaseEditor>, Partial<EditorWithTables<BaseEditor>>>(e, {
-		isTable: (element, suchThat): element is TableElement => element.type === tableElementType,
-		isTableRow: (element, suchThat): element is TableRowElement => element.type === tableRowElementType,
-		isTableCell: (element, suchThat): element is TableCellElement => element.type === tableCellElementType,
+		isTable: (element, suchThat): element is TableElement => SlateElement.isElement(element) && element.type === tableElementType,
+		isTableRow: (element, suchThat): element is TableRowElement => SlateElement.isElement(element) && element.type === tableRowElementType,
+		isTableCell: (element, suchThat): element is TableCellElement => SlateElement.isElement(element) && element.type === tableCellElementType,
 		createEmptyTableElement: (rowCount = 3, columnCount = 2) => ({
 			type: tableElementType,
 			children: Array.from({ length: rowCount }, () => e.createEmptyTableRowElement(columnCount)),

@@ -1,5 +1,4 @@
 export * from './overrides'
-export * from './BaseEditor'
 export * from './BlockElement'
 export * from './createEditorWithEssentials'
 export * from './DefaultElement'

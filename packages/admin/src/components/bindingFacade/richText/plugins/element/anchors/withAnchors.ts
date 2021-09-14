@@ -21,7 +21,7 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 		toggleElement,
 	} = editor
 
-	const isAnchor = (element: SlateNode | ElementNode): element is AnchorElement => element.type === anchorElementType
+	const isAnchor = (element: SlateNode | ElementNode): element is AnchorElement => SlateElement.isElement(element) && element.type === anchorElementType
 	const isAnchorActive = (editor: BaseAnchorEditor) => {
 		const [link] = Editor.nodes(editor, { match: isAnchor })
 		return !!link

@@ -9,8 +9,7 @@
 			"@contember/react-client": ["../../react-client/src"],
 			"@contember/react-multipass-rendering": ["../../react-multipass-rendering/src"],
 			"@contember/react-utils": ["../../react-utils/src"],
-			"@contember/ui": ["../../ui/src"],
-			"@contember/utils": ["../../utils/src"]
+			"@contember/ui": ["../../ui/src"]
 		}
 	},
 	"references": [
@@ -19,7 +18,6 @@
 		{ "path": "../../react-client/src" },
 		{ "path": "../../react-multipass-rendering/src" },
 		{ "path": "../../react-utils/src" },
-		{ "path": "../../ui/src" },
-		{ "path": "../../utils/src" }
+		{ "path": "../../ui/src" }
 	]
 }

@@ -1,4 +1,4 @@
-import { assertNever } from '@contember/utils'
+import { assertNever } from '../../../../../utils'
 
 export type DataGridOrderDirection = 'asc' | 'desc' | undefined
 

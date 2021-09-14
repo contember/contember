@@ -103,7 +103,6 @@ importers:
       '@contember/react-multipass-rendering': workspace:*
       '@contember/react-utils': workspace:*
       '@contember/ui': workspace:*
-      '@contember/utils': workspace:*
       '@formatjs/icu-messageformat-parser': 2.0.11
       '@mangoweb/sass-base': 0.0.8
       '@sindresorhus/slugify': 0.11.0
@@ -146,7 +145,6 @@ importers:
       '@contember/react-multipass-rendering': link:../react-multipass-rendering
       '@contember/react-utils': link:../react-utils
       '@contember/ui': link:../ui
-      '@contember/utils': link:../utils
       '@formatjs/icu-messageformat-parser': 2.0.11
       '@mangoweb/sass-base': 0.0.8
       '@sindresorhus/slugify': 0.11.0
@@ -305,9 +303,6 @@ importers:
       sass-loader: 10.1.1_sass@1.36.0
       source-map-loader: 2.0.1
       style-loader: 2.0.0
-
-  packages/utils:
-    specifiers: {}
 
   packages/vimeo-file-uploader:
     specifiers:

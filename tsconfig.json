@@ -12,7 +12,6 @@
 		{ "path": "./packages/react-multipass-rendering"},
 		{ "path": "./packages/react-utils"},
 		{ "path": "./packages/ui" },
-		{ "path": "./packages/utils" },
 		{ "path": "./packages/vimeo-file-uploader" }
 	]
 }

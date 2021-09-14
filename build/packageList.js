@@ -9,7 +9,6 @@ export const packageList = [
 	'react-multipass-rendering',
 	'react-utils',
 	'ui',
-	'utils',
 	'vimeo-file-uploader',
 ]
 

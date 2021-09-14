@@ -30,7 +30,6 @@
 		"@contember/react-multipass-rendering": "workspace:*",
 		"@contember/react-utils": "workspace:*",
 		"@contember/ui": "workspace:*",
-		"@contember/utils": "workspace:*",
 		"@formatjs/icu-messageformat-parser": "2.0.11",
 		"@mangoweb/sass-base": "0.0.8",
 		"@sindresorhus/slugify": "0.11.0",

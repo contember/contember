@@ -50,10 +50,7 @@ jobs:
       - name: Publish NPM
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          pnpm config set git-tag-version false
-          pnpm recursive exec npm version "${GITHUB_REF:11}"
-          pnpm recursive publish --access public --no-git-checks
+        run: ./scripts/npm/publish.sh "${GITHUB_REF:11}"
 
       - name: Publish Docker
         env:

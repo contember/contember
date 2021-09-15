@@ -12,7 +12,7 @@ RUN cd ee/admin-server && \
 FROM node:14-alpine
 
 WORKDIR /src
-COPY --from=builder /src/packages/ee/dist/ ./
+COPY --from=builder /src/ee/admin-server/dist/ ./
 
 ENV NODE_ENV "production"
 ENV CONTEMBER_PORT "4000"

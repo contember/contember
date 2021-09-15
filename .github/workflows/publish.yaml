@@ -49,7 +49,7 @@ jobs:
 
       - name: Publish NPM
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           pnpm config set git-tag-version false
           pnpm recursive exec npm version "${GITHUB_REF:11}"

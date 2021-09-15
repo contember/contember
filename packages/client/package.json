@@ -1,7 +1,7 @@
 {
 	"name": "@contember/client",
 	"license": "Apache-2.0",
-	"version": "0.6.53",
+	"version": "0.0.0",
 	"main": "./dist/production/index.js",
 	"exports": {
 		".": {

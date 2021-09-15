@@ -1,7 +1,7 @@
 {
 	"name": "@contember/admin-i18n",
 	"license": "Apache-2.0",
-	"version": "0.6.53",
+	"version": "0.0.0",
 	"type": "module",
 	"sideEffects": false,
 	"main": "./dist/production/index.js",

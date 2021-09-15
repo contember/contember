@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   contember:
-    image: contember/contember:{version}
+    image: contember/engine:{version}
     restart: on-failure
     environment:
       NODE_ENV: 'development'

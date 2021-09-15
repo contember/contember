@@ -50,5 +50,5 @@ The following services are now be accessible (with default settings):
 - Mailhog testing SMTP at http://localhost:1484
 - PostgreSQL database at localhost:1482 (you can sign in with contember / contember credentials)
 
-If you have any issues or questions, just ask here: https://github.com/contember/contember/discussions
+If you have any issues or questions, just ask here: https://github.com/contember/engine/discussions
 `

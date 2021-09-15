@@ -5,7 +5,7 @@ ALL_VERSIONS=($DOCKER_TAGS)
 
 MAIN_VERSION=${ALL_VERSIONS[0]}
 
-REPO="contember/contember"
+REPO="contember/engine"
 docker build -t "$REPO:$MAIN_VERSION" -f ./packages/engine-server/alpine.dockerfile .
 for VERSION in "${ALL_VERSIONS[@]:1}"
 do

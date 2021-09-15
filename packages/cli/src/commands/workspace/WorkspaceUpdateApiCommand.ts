@@ -33,7 +33,7 @@ export class WorkspaceUpdateApiCommand extends Command<Args, Options> {
 
 		console.log('Updating docker-compose')
 		const getNewImage = (currentImage: string): string | null => {
-			for (const candidate of ['contember/contember', 'contember/cli']) {
+			for (const candidate of ['contember/engine', 'contember/contember', 'contember/cli']) {
 				if (prevVersion && currentImage === `${candidate}:${prevVersion}` || !prevVersion && currentImage.startsWith(`${candidate}:`)) {
 					return `${candidate}:${version}`
 				}

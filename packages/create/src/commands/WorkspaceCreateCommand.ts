@@ -40,13 +40,13 @@ Check the default configuration in docker-compose.override.yaml if it fits your 
 Now you are ready to start the Contember stack:
 $ ${chalk.greenBright('docker-compose up')}
 
-The following services are now be accessible (with default settings):
+The following services are now accessible (with default settings):
 
 - Admin at http://localhost:1480
 - API endpoints at http://localhost:1481 (you can authorize with token 0000000000000000000000000000000000000000)
 	- To connect to the GraphQL you can use pre-packed client (Apollo Playground) available at http://localhost:1481/playground
 - Adminer database management tool at http://localhost:1485
-- Minio local S3 provider at http://localhost:1483 (you can sign in with contembeer / contember credentials)
+- Minio local S3 provider at http://localhost:1483 (you can sign in with contember / contember credentials)
 - Mailhog testing SMTP at http://localhost:1484
 - PostgreSQL database at localhost:1482 (you can sign in with contember / contember credentials)
 

@@ -1,0 +1,237 @@
+{
+	"formatVersion": 3,
+	"modifications": [
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Article",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "article"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Category",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "category"
+			}
+		},
+		{
+			"modification": "createEntity",
+			"entity": {
+				"name": "Tag",
+				"primary": "id",
+				"primaryColumn": "id",
+				"unique": {},
+				"fields": {
+					"id": {
+						"name": "id",
+						"columnName": "id",
+						"nullable": false,
+						"type": "Uuid",
+						"columnType": "uuid"
+					}
+				},
+				"tableName": "tag"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Article",
+			"field": {
+				"name": "title",
+				"columnName": "title",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Article",
+			"field": {
+				"name": "content",
+				"columnName": "content",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Article",
+			"field": {
+				"name": "publishedAt",
+				"columnName": "published_at",
+				"nullable": true,
+				"type": "DateTime",
+				"columnType": "timestamptz"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Category",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createColumn",
+			"entityName": "Tag",
+			"field": {
+				"name": "name",
+				"columnName": "name",
+				"nullable": true,
+				"type": "String",
+				"columnType": "text"
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Article",
+			"owningSide": {
+				"name": "category",
+				"nullable": true,
+				"type": "ManyHasOne",
+				"target": "Category",
+				"joiningColumn": {
+					"columnName": "category_id",
+					"onDelete": "restrict"
+				}
+			}
+		},
+		{
+			"modification": "createRelation",
+			"entityName": "Article",
+			"owningSide": {
+				"type": "ManyHasMany",
+				"name": "tags",
+				"target": "Tag",
+				"joiningTable": {
+					"tableName": "article_tags",
+					"joiningColumn": {
+						"columnName": "article_id",
+						"onDelete": "cascade"
+					},
+					"inverseJoiningColumn": {
+						"columnName": "tag_id",
+						"onDelete": "cascade"
+					}
+				}
+			}
+		},
+		{
+			"modification": "patchAclSchema",
+			"patch": [
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Article",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"title": true,
+								"content": true,
+								"publishedAt": true,
+								"category": true,
+								"tags": true
+							},
+							"read": {
+								"id": true,
+								"title": true,
+								"content": true,
+								"publishedAt": true,
+								"category": true,
+								"tags": true
+							},
+							"update": {
+								"id": true,
+								"title": true,
+								"content": true,
+								"publishedAt": true,
+								"category": true,
+								"tags": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Category",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"name": true
+							},
+							"read": {
+								"id": true,
+								"name": true
+							},
+							"update": {
+								"id": true,
+								"name": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				},
+				{
+					"op": "add",
+					"path": "/roles/admin/entities/Tag",
+					"value": {
+						"predicates": {},
+						"operations": {
+							"create": {
+								"id": true,
+								"name": true
+							},
+							"read": {
+								"id": true,
+								"name": true
+							},
+							"update": {
+								"id": true,
+								"name": true
+							},
+							"delete": true,
+							"customPrimary": true
+						}
+					}
+				}
+			]
+		}
+	]
+}

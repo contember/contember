@@ -9,6 +9,9 @@ const SandboxLayout: FC = props => {
 			sideBar={<Menu>
 				<Menu.Item title="Dashboard" to={'dashboard'}>
 					<Menu.Item title="Inputs" to="inputs" />
+					<Menu.Item title="Tags" to="tags" />
+					<Menu.Item title="Categories" to="categories" />
+					<Menu.Item title="Articles" to="articleList" />
 					<Menu.Item title="Foo" to="fooPage" />
 					<Menu.Item title="Bar" to="barPage" />
 					<Menu.Item title="Lorem" to="loremPage">

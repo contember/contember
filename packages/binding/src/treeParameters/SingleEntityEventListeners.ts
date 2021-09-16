@@ -3,15 +3,12 @@ import type { EventListenersStore } from './EventListenersStore'
 
 type Events = EntityAccessor.EntityEventListenerMap
 
-export interface DesugaredSingleEntityEventListeners {}
-
 export type EntityEventListenerStore = EventListenersStore<keyof Events, Events>
 
 export interface SingleEntityEventListeners {
 	eventListeners: EntityEventListenerStore | undefined
 }
 
-export interface SugarableSingleEntityEventListeners {}
 
 export type UnsugarableSingleEntityEventListeners = {
 	[EventName in Exclude<keyof EntityAccessor.EntityEventListenerMap, 'connectionUpdate'> &

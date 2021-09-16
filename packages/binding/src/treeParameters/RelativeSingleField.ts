@@ -1,20 +1,16 @@
-import type { AnyField, DesugaredAnyField, SugarableAnyField, UnsugarableAnyField } from './AnyField'
-import type { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
-import type { DesugaredLeafField, LeafField, SugarableLeafField, UnsugarableLeafField } from './LeafField'
-
-export interface DesugaredRelativeSingleField extends DesugaredAnyField, DesugaredLeafField {
-	hasOneRelationPath: DesugaredHasOneRelation[]
-}
+import type { AnyField, SugarableAnyField } from './AnyField'
+import type { HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
+import type { LeafField, UnsugarableLeafField } from './LeafField'
 
 export interface RelativeSingleField extends AnyField, LeafField {
 	hasOneRelationPath: HasOneRelation[]
 }
 
-export interface SugarableRelativeSingleField extends SugarableAnyField, SugarableLeafField {
+export interface SugarableRelativeSingleField extends SugarableAnyField {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
-export interface UnsugarableRelativeSingleField extends UnsugarableAnyField, UnsugarableLeafField {
+export interface UnsugarableRelativeSingleField extends UnsugarableLeafField {
 	// Deliberately leaving out UnsugarableHasOneRelation
 }
 

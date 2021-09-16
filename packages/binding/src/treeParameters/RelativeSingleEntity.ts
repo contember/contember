@@ -1,13 +1,4 @@
-import type {
-	DesugaredHasOneRelation,
-	HasOneRelation,
-	SugarableHasOneRelation,
-	UnsugarableHasOneRelation,
-} from './HasOneRelation'
-
-export interface DesugaredRelativeSingleEntity {
-	hasOneRelationPath: DesugaredHasOneRelation[]
-}
+import type { HasOneRelation, SugarableHasOneRelation, UnsugarableHasOneRelation } from './HasOneRelation'
 
 export interface RelativeSingleEntity {
 	hasOneRelationPath: HasOneRelation[]

@@ -1,43 +1,19 @@
+import type { EntityCreationParameters, UnsugarableEntityCreationParameters } from './EntityCreationParameters'
+import type { HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
 import type {
-	DesugaredEntityCreationParameters,
-	EntityCreationParameters,
-	SugarableEntityCreationParameters,
-	UnsugarableEntityCreationParameters,
-} from './EntityCreationParameters'
-import type { DesugaredHasOneRelation, HasOneRelation, SugarableHasOneRelation } from './HasOneRelation'
-import type {
-	DesugaredQualifiedEntityParameters,
 	QualifiedEntityParameters,
 	SugarableQualifiedEntityParameters,
 	UnsugarableQualifiedEntityParameters,
 } from './QualifiedEntityParameters'
 import type {
-	DesugaredQualifiedSingleEntityParameters,
 	QualifiedSingleEntityParameters,
 	SugarableQualifiedSingleEntityParameters,
-	UnsugarableQualifiedSingleEntityParameters,
 } from './QualifiedSingleEntityParameters'
 import type {
-	DesugaredSingleEntityEventListeners,
 	SingleEntityEventListeners,
-	SugarableSingleEntityEventListeners,
 	UnsugarableSingleEntityEventListeners,
 } from './SingleEntityEventListeners'
-import type {
-	DesugaredSingleEntityParameters,
-	SingleEntityParameters,
-	SugarableSingleEntityParameters,
-	UnsugarableSingleEntityParameters,
-} from './SingleEntityParameters'
-
-export interface DesugaredQualifiedSingleEntity
-	extends DesugaredQualifiedSingleEntityParameters,
-		DesugaredSingleEntityParameters,
-		DesugaredQualifiedEntityParameters,
-		DesugaredEntityCreationParameters,
-		DesugaredSingleEntityEventListeners {
-	hasOneRelationPath: DesugaredHasOneRelation[]
-}
+import type { SingleEntityParameters, SugarableSingleEntityParameters } from './SingleEntityParameters'
 
 export interface QualifiedSingleEntity
 	extends QualifiedSingleEntityParameters,
@@ -52,15 +28,12 @@ export interface QualifiedSingleEntity
 export interface SugarableQualifiedSingleEntity
 	extends SugarableQualifiedSingleEntityParameters,
 		SugarableSingleEntityParameters,
-		SugarableQualifiedEntityParameters,
-		SugarableEntityCreationParameters,
-		SugarableSingleEntityEventListeners {
+		SugarableQualifiedEntityParameters {
 	hasOneRelationPath?: SugarableHasOneRelation[] | SugarableHasOneRelation
 }
 
 export interface UnsugarableQualifiedSingleEntity
-	extends UnsugarableQualifiedSingleEntityParameters,
-		UnsugarableSingleEntityParameters,
+	extends
 		UnsugarableQualifiedEntityParameters,
 		UnsugarableEntityCreationParameters,
 		UnsugarableSingleEntityEventListeners {

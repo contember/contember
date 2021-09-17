@@ -53,9 +53,15 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 		}
 	}
 
+	const searchParams = new URLSearchParams(query)
+	let pageName = pageNameIn(pagePathNormalized.slice(1, -1))
+	if (routing.pageInQuery) {
+		pageName = searchParams.get('page') || 'index'
+		searchParams.delete('page')
+	}
 	return {
-		pageName: pageNameIn(pagePathNormalized.slice(1, -1)),
-		parameters: Object.fromEntries(new URLSearchParams(query)),
+		pageName,
+		parameters: Object.fromEntries(searchParams),
 		dimensions: dimensions ?? {},
 	}
 }
@@ -70,12 +76,15 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 	const prefix = routing.basePath.slice(0, -1) + dimensionsSegment
 
 	if (!routing.routes[request.pageName]) {
-		const pageSegment = '/' + pageNameOut(request.pageName)
+		const pageSegment = routing.pageInQuery ? '' : '/' + pageNameOut(request.pageName)
+		const query = new URLSearchParams(request.parameters as Record<string, string>)
+		if (routing.pageInQuery && request.pageName !== 'index') {
+			query.append('page', request.pageName)
+		}
+		const queryString = query.toString()
+		const querySegment = queryString ? `?${queryString}` : ''
 
-		const query = new URLSearchParams(request.parameters).toString()
-		const querySegment = query ? `?${query}` : ''
-
-		return prefix + pageSegment + querySegment
+		return (prefix + pageSegment + querySegment) || '/'
 	}
 
 	const route = routing.routes[request.pageName]

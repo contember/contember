@@ -5,6 +5,7 @@ export interface RoutingContextValue {
 	basePath: string
 	routes: RouteMap
 	defaultDimensions?: SelectedDimension
+	pageInQuery?: boolean
 }
 
 export const RoutingContext = createContext<RoutingContextValue>({ basePath: '/', routes: {} })

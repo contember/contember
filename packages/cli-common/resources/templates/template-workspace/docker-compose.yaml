@@ -46,6 +46,17 @@ services:
 
   contember-cli:
     image: contember/cli:{version}
+    scale: 0
+    volumes:
+      - ./:/src:cached
+    working_dir: /src
+    environment:
+      CONTEMBER_API_URL: 'http://contember:4000/'
+      CONTEMBER_API_TOKEN: '0000000000000000000000000000000000000000'
+      CONTEMBER_PROJECT_NAME: '{projectName}'
+
+  contember-migrations:
+    image: contember/cli:{version}
     command: [ 'migrations:execute', '.', '--yes' ]
     volumes:
       - ./:/src:cached

@@ -4,12 +4,15 @@ import { ChangeEvent, FormEvent, useCallback, useEffect, useState } from 'react'
 import { MiscPageLayout } from '../MiscPageLayout'
 import { useLogin } from '../../tenant'
 import { Project } from '../Project'
+import { RoutingLinkTarget } from '../../routing'
+import { PageLink } from '../pageRouting'
 
 export interface LoginProps {
 	onLogin: (projects: Project[], person: { id: string, email: string }) => void
+	resetLink?: RoutingLinkTarget
 }
 
-export const Login = ({ onLogin }: LoginProps) => {
+export const Login = ({ onLogin, resetLink }: LoginProps) => {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [errors, setErrors] = useState<FieldError[]>([])
@@ -76,6 +79,7 @@ export const Login = ({ onLogin }: LoginProps) => {
 					<Button type="submit" intent="primary" disabled={loginState.loading}>
 						Submit
 					</Button>
+					{resetLink && <PageLink to={resetLink} style={{ float: 'right' }}>Forgot your password?</PageLink>}
 				</FormGroup>
 			</form>
 		</MiscPageLayout>

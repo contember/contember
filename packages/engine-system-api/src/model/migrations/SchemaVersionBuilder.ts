@@ -5,7 +5,9 @@ import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { DatabaseContext } from '../database'
 import { normalizeSchema } from '@contember/schema-utils'
 
-export type VersionedSchema = Schema & { version: string }
+export type VersionedSchema = Schema & { version: string; notNormalized: Schema & { version: string } }
+
+const emptyVersionedSchema = { ...emptySchema, version: '', notNormalized: { ...emptySchema, version: '' } }
 
 export class SchemaVersionBuilder {
 	constructor(
@@ -14,16 +16,22 @@ export class SchemaVersionBuilder {
 	) {}
 
 	async buildSchema(db: DatabaseContext, after?: VersionedSchema): Promise<VersionedSchema> {
-		const schema = (await this.executedMigrationsResolver.getMigrations(db, after?.version)).reduce(
-			(schema, migr) => ({
-				...this.schemaMigrator.applyModifications(schema, migr.modifications, migr.formatVersion),
-				version: migr.version,
-			}),
-			after || { ...emptySchema, version: '' },
-		)
-		if (schema === after) {
-			return schema
+		const newMigrations = (await this.executedMigrationsResolver.getMigrations(db, after?.version))
+		if (newMigrations.length === 0) {
+			return after ?? emptyVersionedSchema
 		}
-		return normalizeSchema(schema)
+
+		const schema = newMigrations.reduce(
+			(schema, migration) => ({
+				...this.schemaMigrator.applyModifications(schema, migration.modifications, migration.formatVersion),
+				version: migration.version,
+			}),
+			after?.notNormalized ?? emptyVersionedSchema,
+		)
+		const normalized = normalizeSchema(schema)
+		return {
+			...normalized,
+			notNormalized: schema,
+		}
 	}
 }

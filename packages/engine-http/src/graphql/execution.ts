@@ -31,7 +31,9 @@ export const createGraphQLQueryHandler = <Context, KoaState>({
 	listeners,
 }: FactoryArgs<Context, KoaState>): GraphQLQueryHandler<KoaState> => {
 	let schemaValidated = false
-	const documentCache = new LRUCache<string, DocumentNode>()
+	const documentCache = new LRUCache<string, DocumentNode>({
+		max: 200,
+	})
 	return async ctx => {
 		const listenersQueue = listeners
 

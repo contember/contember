@@ -32,7 +32,7 @@ export const ArticleListPage = (
 				<HasManySelectCell field="tags" options={`Tag.locales(locale.code = 'cs').name`} header="Tags" />
 
 				<GenericCell canBeHidden={false} justification="justifyEnd">
-					<PageLinkById to={'articleEdit'} Component={AnchorButton}>Edit</PageLinkById>
+					<PageLinkButton to={`articleEdit(id: $entity.id)`} Component={AnchorButton}>Edit</PageLinkButton>
 					<DeleteEntityButton title="Delete" immediatePersist={true}></DeleteEntityButton>
 				</GenericCell>
 			</DataGrid>

@@ -1,11 +1,13 @@
 import { useCallback } from 'react'
-import { RoutingLinkTarget, useRoutingLinkFactory } from '../../routing'
+import { RequestParameters, RoutingLinkTarget, useRoutingLinkFactory } from '../../routing'
+import { useBindingLinkParametersResolver } from './useBindingLinkParametersResolver'
 
 export const useRedirect = () => {
-	const linkFactory = useRoutingLinkFactory()
+	const parametersResolver = useBindingLinkParametersResolver()
+	const linkFactory = useRoutingLinkFactory(parametersResolver)
 	return useCallback(
-		(target: RoutingLinkTarget) => {
-			linkFactory(target).navigate()
+		(target: RoutingLinkTarget, parameters?: RequestParameters) => {
+			linkFactory(target, parameters).navigate()
 		},
 		[linkFactory],
 	)

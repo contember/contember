@@ -1,7 +1,7 @@
 import { EntityAccessor, useEntity } from '@contember/binding'
 import { ComponentType, memo, ReactNode, useMemo } from 'react'
-import { PageConfig, PageLink } from '../../pageRouting'
-import { InnerRoutingLinkProps } from '../../../routing'
+import { PageLink } from '../../pageRouting'
+import { InnerRoutingLinkProps, RequestState } from '../../../routing'
 
 interface BasePageLinkByIdProps {
 	Component?: ComponentType<InnerRoutingLinkProps>
@@ -14,7 +14,7 @@ interface SimplePageLinkByIdTarget {
 }
 
 interface CustomPageLinkByIdTarget {
-	change: (id: string, entity: EntityAccessor) => PageConfig
+	change: (id: string, entity: EntityAccessor) => RequestState
 }
 
 type PageLinkByIdProps =
@@ -24,6 +24,7 @@ type PageLinkByIdProps =
 		| SimplePageLinkByIdTarget
 	)
 
+/** @deprecated Use PageLinkButton instead */
 export const PageLinkById = memo(function (props: PageLinkByIdProps) {
 	const parentEntity = useEntity()
 	const id = parentEntity.id

@@ -1,36 +1,51 @@
-import { AnchorHTMLAttributes, memo, useMemo } from 'react'
-import { RoutingLink, RoutingLinkProps, RoutingLinkTarget } from '../../routing'
+import { AnchorHTMLAttributes } from 'react'
+import {
+	DynamicRequestParameters,
+	RoutingLink,
+	RoutingLinkProps,
+	RoutingLinkTarget,
+	RoutingParameter,
+	targetToRequest,
+} from '../../routing'
+import { ROUTING_BINDING_PARAMETER_PREFIX, useBindingLinkParametersResolver } from './useBindingLinkParametersResolver'
+import { Component, Field } from '@contember/binding'
 
-export interface PageConfig {
-	name: string
-	params?: {}
+export interface PageLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>, Omit<RoutingLinkProps, 'parametersResolver'> {
 }
 
-/** @deprecated */
-export type PageChange = () => PageConfig
+export const PageLink = Component((props: PageLinkProps) => {
+	const parametersResolver = useBindingLinkParametersResolver()
 
-/** @deprecated */
-export const PageLink = memo(({ to, ...props }: PageLinkProps) => {
-	const passedTo: RoutingLinkTarget = useMemo(() => {
-		if (typeof to === 'function') {
-			return currentRequest => {
-				const newRequest = to(currentRequest)
-				if (newRequest !== null && 'name' in newRequest) {
-					return {
-						pageName: newRequest.name,
-						parameters: newRequest.params,
-						dimensions: currentRequest?.dimensions ?? {},
-					}
-				}
-				return newRequest
-			}
-		}
-		return to
-	}, [to])
-	return <RoutingLink to={passedTo} {...props} />
-})
+	return <RoutingLink parametersResolver={parametersResolver} {...props} />
+}, props =>
+	<>
+		{fieldsFromTarget(props.to).map(it => <Field field={it} />)}
+	</>)
 PageLink.displayName = 'PageLink'
 
-export interface PageLinkProps extends Omit<RoutingLinkProps & AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'to'> {
-	to: PageChange | RoutingLinkTarget
+const fieldsFromTarget = (to: RoutingLinkTarget) => {
+	const dummyRequest = {
+		dimensions: {},
+		pageName: '',
+		parameters: {},
+	}
+	const request = targetToRequest(to, dummyRequest)
+
+	return collectDynamicParameters(request?.parameters ?? {})
+		.filter(it => it.startsWith(ROUTING_BINDING_PARAMETER_PREFIX))
+		.map(it => it.slice(ROUTING_BINDING_PARAMETER_PREFIX.length))
+}
+
+const collectDynamicParameters = (parameters: DynamicRequestParameters): string[] => {
+	return Object.values(parameters)
+		.flatMap(it => {
+			if (it instanceof RoutingParameter) {
+				return it.name
+			}
+			if (typeof it === 'object' && it !== null) {
+				return collectDynamicParameters(it)
+			}
+			return null
+		})
+		.filter((it): it is string => it !== null)
 }

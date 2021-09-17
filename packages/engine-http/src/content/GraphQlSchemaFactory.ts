@@ -15,16 +15,16 @@ import { GraphQLSchemaContributor } from '@contember/engine-plugins'
 import { JSONType } from '@contember/graphql-utils'
 
 type Context = { schema: Schema; identity: Identity }
+
+type CacheEntry = {
+	graphQlSchema: GraphQLSchema
+	permissions: Acl.Permissions
+	contributorsCacheKey: string
+	verifier: (identity: Identity) => boolean
+}
+
 class GraphQlSchemaFactory {
-	private cache: {
-		schema: Schema
-		cacheKey: string
-		entries: {
-			graphQlSchema: GraphQLSchema
-			permissions: Acl.Permissions
-			verifier: (identity: Identity) => boolean
-		}[]
-	}[] = []
+	private cache = new WeakMap<Schema, CacheEntry[]>()
 
 	constructor(
 		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
@@ -37,24 +37,17 @@ class GraphQlSchemaFactory {
 	}
 
 	public create(schema: Schema, identity: Identity): [GraphQLSchema, Acl.Permissions] {
+		let cacheEntries = this.cache.get(schema)
 		const contributorsCacheKey = this.getContributorsCacheKey({ schema, identity })
-		let schemaCacheEntry = this.cache.find(
-			it => it.schema.model === schema.model && it.schema.acl === schema.acl && contributorsCacheKey === it.cacheKey,
-		)
-		if (!schemaCacheEntry) {
-			schemaCacheEntry = {
-				schema,
-				cacheKey: contributorsCacheKey,
-				entries: [],
-			}
-			this.cache.push(schemaCacheEntry)
-		} else {
-			const entry = schemaCacheEntry.entries.find(it => it.verifier(identity))
-			if (entry) {
+		if (cacheEntries !== undefined) {
+			const entry = cacheEntries.find(it => it.contributorsCacheKey === contributorsCacheKey && it.verifier(identity))
+			if (entry !== undefined) {
 				return [entry.graphQlSchema, entry.permissions]
 			}
+		} else {
+			cacheEntries = []
+			this.cache.set(schema, cacheEntries)
 		}
-
 		const { permissions, verifier } = this.permissionFactory.createPermissions(schema, identity)
 
 		const authorizator = new StaticAuthorizator(permissions)
@@ -83,7 +76,7 @@ class GraphQlSchemaFactory {
 				Json: JSONType,
 			},
 		})
-		schemaCacheEntry.entries.push({ graphQlSchema, verifier, permissions })
+		cacheEntries.push({ graphQlSchema, verifier, permissions, contributorsCacheKey })
 
 		return [graphQlSchema, permissions]
 	}

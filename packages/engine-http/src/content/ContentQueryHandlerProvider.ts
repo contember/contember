@@ -1,16 +1,13 @@
 import { ContentSchemaResolver } from './ContentSchemaResolver'
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
 import { ContentQueryHandlerFactory, KoaState } from './ContentQueryHandlerFactory'
-import LRUCache from 'lru-cache'
 import { GraphQLSchema } from 'graphql'
 import { DatabaseContext } from '@contember/engine-system-api'
 import { KoaMiddleware } from '../koa'
 import { StageConfig } from '../ProjectConfig'
 
 export class ContentQueryHandlerProvider {
-	private cache = new LRUCache<GraphQLSchema, KoaMiddleware<KoaState>>({
-		max: 100,
-	})
+	private cache = new WeakMap<GraphQLSchema, KoaMiddleware<KoaState>>()
 
 	constructor(
 		private readonly contentSchemaFactory: ContentSchemaResolver,

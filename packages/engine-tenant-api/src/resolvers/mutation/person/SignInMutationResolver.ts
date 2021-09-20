@@ -43,6 +43,7 @@ export class SignInMutationResolver implements MutationResolvers {
 				token: result.token,
 				person: {
 					id: result.person.id,
+					otpEnabled: !!result.person.otp_activated_at,
 					email: result.person.email,
 					identity: {
 						id: identityId,

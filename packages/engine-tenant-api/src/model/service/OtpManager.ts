@@ -1,7 +1,6 @@
 import { PersonRow } from '../queries'
-import { CommandBus, ConfirmOtpCommand, DisableOtpCommand, PrepareOtpCommand } from '../commands'
-import { createOtp, OtpData, verifyOtp } from '../utils/otp'
-import { DatabaseContext } from '../utils'
+import { ConfirmOtpCommand, DisableOtpCommand, PrepareOtpCommand } from '../commands'
+import { createOtp, DatabaseContext, OtpData, verifyOtp } from '../utils'
 
 export class OtpManager {
 	constructor(private readonly dbContext: DatabaseContext) {}

@@ -89,6 +89,7 @@ export class InviteMutationResolver implements MutationResolvers {
 		const person = {
 			id: result.person.id,
 			email: result.person.email,
+			otpEnabled: !!result.person.otp_activated_at,
 			identity: {
 				id: result.person.identity_id,
 				projects: [],

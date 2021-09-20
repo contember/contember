@@ -26,6 +26,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 			result: {
 				person: {
 					id: result.person.id,
+					otpEnabled: !!result.person.otp_activated_at,
 					email: result.person.email,
 					identity: {
 						id: result.person.identity_id,

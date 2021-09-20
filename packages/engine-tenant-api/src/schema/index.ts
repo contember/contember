@@ -581,6 +581,7 @@ export type Person = {
 	readonly __typename?: 'Person'
 	readonly id: Scalars['String']
 	readonly email: Scalars['String']
+	readonly otpEnabled: Scalars['Boolean']
 	readonly identity: Identity
 }
 
@@ -1419,6 +1420,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	email?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }

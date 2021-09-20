@@ -33,6 +33,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		return {
 			id: person.id,
 			email: person.email,
+			otpEnabled: !!person.otp_activated_at,
 			identity: parent,
 		}
 	}

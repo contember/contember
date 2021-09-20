@@ -2,15 +2,20 @@ import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/te
 import { testUuid } from '../../../src/testUuid'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'
 import { confirmOtpMutation } from './gql/confirmOtp'
-import { createOtp, generateOtp } from '../../../../src/model/utils/otp'
 import { ConfirmOtpErrorCode } from '../../../../src/schema'
 import { test } from 'uvu'
+import { OtpAuthenticator } from '../../../../src'
+import { Buffer } from 'buffer'
 
 test('confirm otp mutation with valid code', async () => {
 	const personId = testUuid(1)
-	const otp = createOtp('foo', 'bar')
+	const otpAuth = new OtpAuthenticator({
+		now: () => now,
+		randomBytes: () => Promise.resolve(Buffer.alloc(20)),
+	})
+	const otp = await otpAuth.create('john', 'contember')
 	await executeTenantTest({
-		query: confirmOtpMutation({ token: generateOtp(otp) }),
+		query: confirmOtpMutation({ token: otpAuth.generate(otp) }),
 		executes: [
 			getPersonByIdentity({
 				identityId: authenticatedIdentityId,
@@ -43,7 +48,6 @@ test('confirm otp mutation with valid code', async () => {
 
 test('confirm otp mutation with invalid code', async () => {
 	const personId = testUuid(1)
-	const otp = createOtp('foo', 'bar')
 	await executeTenantTest({
 		query: confirmOtpMutation({ token: '123456' }),
 		executes: [
@@ -52,7 +56,7 @@ test('confirm otp mutation with invalid code', async () => {
 				response: {
 					personId,
 					password: '123',
-					otpUri: otp.uri,
+					otpUri: 'otpauth://totp/contember:john?secret=ABDEF&period=30&digits=6&algorithm=SHA1&issuer=contember',
 					roles: [],
 					email: 'john@doe.com',
 				},

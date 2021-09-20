@@ -1,8 +1,8 @@
 import { SignInErrorCode } from '../../schema'
-import { ApiKeyManager } from '../service'
+import { ApiKeyManager, OtpAuthenticator } from '../service'
 import { PersonQuery, PersonRow } from '../queries'
 import { Providers } from '../providers'
-import { DatabaseContext, verifyOtp } from '../utils'
+import { DatabaseContext } from '../utils'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 
 class SignInManager {
@@ -10,6 +10,7 @@ class SignInManager {
 		private readonly dbContext: DatabaseContext,
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly providers: Providers,
+		private readonly otpAuthenticator: OtpAuthenticator,
 	) {}
 
 	async signIn(email: string, password: string, expiration?: number, otpCode?: string): Promise<SignInResponse> {
@@ -26,7 +27,7 @@ class SignInManager {
 			if (!otpCode) {
 				return new ResponseError(SignInErrorCode.OtpRequired, `2FA is enabled. OTP token is required`)
 			}
-			if (!verifyOtp({ uri: personRow.otp_uri }, otpCode)) {
+			if (!this.otpAuthenticator.validate({ uri: personRow.otp_uri }, otpCode)) {
 				return new ResponseError(SignInErrorCode.InvalidOtpToken, 'OTP token validation has failed')
 			}
 		}

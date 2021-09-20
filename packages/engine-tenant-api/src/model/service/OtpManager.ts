@@ -1,12 +1,16 @@
 import { PersonRow } from '../queries'
 import { ConfirmOtpCommand, DisableOtpCommand, PrepareOtpCommand } from '../commands'
-import { createOtp, DatabaseContext, OtpData, verifyOtp } from '../utils'
+import { DatabaseContext } from '../utils'
+import { OtpAuthenticator, OtpData } from './OtpAuthenticator'
 
 export class OtpManager {
-	constructor(private readonly dbContext: DatabaseContext) {}
+	constructor(
+		private readonly dbContext: DatabaseContext,
+		private readonly otpAuthenticator: OtpAuthenticator,
+	) {}
 
 	async prepareOtp(person: PersonRow, label: string): Promise<OtpData> {
-		const otp = createOtp(person.email, label)
+		const otp = await this.otpAuthenticator.create(person.email, label)
 		await this.dbContext.commandBus.execute(new PrepareOtpCommand(person.id, otp.uri))
 		return otp
 	}
@@ -23,7 +27,7 @@ export class OtpManager {
 		if (!person.otp_uri) {
 			throw new OtpError('not configured')
 		}
-		return verifyOtp({ uri: person.otp_uri }, token)
+		return this.otpAuthenticator.validate({ uri: person.otp_uri }, token)
 	}
 }
 

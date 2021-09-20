@@ -12,7 +12,7 @@ import {
 	InviteManager,
 	MailTemplateManager,
 	MembershipValidator,
-	OIDCProvider,
+	OIDCProvider, OtpAuthenticator,
 	OtpManager,
 	PasswordChangeManager,
 	PasswordResetManager,
@@ -150,14 +150,16 @@ export class TenantContainerFactory {
 			})
 			.addService('idpSignInManager', ({ dbContext, apiKeyManager, idpManager }) =>
 				new IDPSignInManager(dbContext, apiKeyManager, idpManager))
-			.addService('signInManager', ({ apiKeyManager, providers, dbContext }) =>
-				new SignInManager(dbContext, apiKeyManager, providers))
+			.addService('otpAuthenticator', ({ providers }) =>
+				new OtpAuthenticator(providers))
+			.addService('signInManager', ({ apiKeyManager, providers, dbContext, otpAuthenticator }) =>
+				new SignInManager(dbContext, apiKeyManager, providers, otpAuthenticator))
 			.addService('membershipValidator', ({ projectSchemaResolver }) =>
 				new MembershipValidator(projectSchemaResolver))
 			.addService('inviteManager', ({ dbContext, providers, userMailer }) =>
 				new InviteManager(dbContext, providers, userMailer))
-			.addService('otpManager', ({ dbContext }) =>
-				new OtpManager(dbContext))
+			.addService('otpManager', ({ dbContext, otpAuthenticator }) =>
+				new OtpManager(dbContext, otpAuthenticator))
 			.addService('mailTemplateManager', ({ dbContext }) =>
 				new MailTemplateManager(dbContext))
 			.addService('identityFetcher', ({ db }) =>

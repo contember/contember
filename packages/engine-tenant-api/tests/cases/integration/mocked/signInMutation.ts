@@ -1,12 +1,13 @@
-import { executeTenantTest } from '../../../src/testTenant'
+import { executeTenantTest, now } from '../../../src/testTenant'
 import { SQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { signInMutation } from './gql/signIn'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
 import { SignInErrorCode } from '../../../../src/schema'
-import { createOtp, generateOtp } from '../../../../src/model/utils/otp'
 import { test } from 'uvu'
+import { OtpAuthenticator } from '../../../../src'
+import { Buffer } from 'buffer'
 
 const createApiKeySql = function ({ apiKeyId, identityId }: { apiKeyId: string; identityId: string }) {
 	return {
@@ -130,11 +131,10 @@ test('otp token not provided', async () => {
 	const password = '123'
 	const identityId = testUuid(2)
 	const personId = testUuid(7)
-	const otp = createOtp('a', 'b')
 	await executeTenantTest({
 		query: signInMutation({ email, password }),
 		executes: [
-			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: 'otpauth://totp/contember:john?secret=ABCDEFG&period=30&digits=6&algorithm=SHA1&issuer=contember' } }),
 		],
 		return: {
 			data: {
@@ -153,9 +153,15 @@ test('sign in - invalid otp token', async () => {
 	const password = '123'
 	const identityId = testUuid(2)
 	const personId = testUuid(7)
-	const otp = createOtp('a', 'b')
+
+	const otpAuth = new OtpAuthenticator({
+		now: () => now,
+		randomBytes: () => Promise.resolve(Buffer.alloc(20)),
+	})
+	const otp = await otpAuth.create('john', 'contember')
+
 	await executeTenantTest({
-		query: signInMutation({ email, password, otpToken: '123' }),
+		query: signInMutation({ email, password, otpToken: '123456' }),
 		executes: [
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 		],
@@ -176,11 +182,15 @@ test('sign in - valid otp token', async () => {
 	const password = '123'
 	const identityId = testUuid(2)
 	const personId = testUuid(7)
-	const otp = createOtp('a', 'b')
+	const otpAuth = new OtpAuthenticator({
+		now: () => now,
+		randomBytes: () => Promise.resolve(Buffer.alloc(20)),
+	})
+	const otp = await otpAuth.create('john', 'contember')
 	const apiKeyId = testUuid(1)
 	const projectId = testUuid(10)
 	await executeTenantTest({
-		query: signInMutation({ email, password, otpToken: generateOtp(otp) }),
+		query: signInMutation({ email, password, otpToken: otpAuth.generate(otp) }),
 		executes: [
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 			createApiKeySql({ apiKeyId, identityId }),

@@ -35,12 +35,10 @@ Install NPM dependencies:
 $ ${chalk.greenBright(`npm install`)}
 (of course, you can use any alternative package manager like pnpm or yarn)
 
-Check the default configuration in docker-compose.override.yaml if it fits your needs.
-
 Now you are ready to start the Contember stack:
 $ ${chalk.greenBright('docker-compose up')}
 
-The following services are now accessible (with default settings):
+The following services are now accessible:
 
 - Admin at http://localhost:1480
 - API endpoints at http://localhost:1481 (you can authorize with token 0000000000000000000000000000000000000000)

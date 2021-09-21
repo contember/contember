@@ -3,11 +3,8 @@
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"isolatedModules": true,
-		"jsx": "react-jsx",
-		"lib": [
-			"esnext",
-			"dom"
-		],
+		"jsx": "react",
+		"lib": ["esnext", "dom"],
 		"module": "esnext",
 		"moduleResolution": "node",
 		"noEmit": true,

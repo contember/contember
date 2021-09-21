@@ -1,5 +1,8 @@
+import * as React from 'react'
 import { GenericPage } from '@contember/admin'
 
 export const DashboardPage = (
-	<GenericPage pageName="dashboard">Welcome to Contember Admin!</GenericPage>
+	<GenericPage pageName="dashboard">
+		Welcome to Contember Admin!
+	</GenericPage>
 )

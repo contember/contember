@@ -6,5 +6,3 @@ replaceVariables:
   - contember.yaml
   - package.json
   - docker-compose.yaml
-copy:
-  docker-compose.override.dist.yaml: docker-compose.override.yaml

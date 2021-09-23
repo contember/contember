@@ -6,3 +6,6 @@ replaceVariables:
   - contember.yaml
   - package.json
   - docker-compose.yaml
+
+rename:
+  .gitignore.dist: .gitignore

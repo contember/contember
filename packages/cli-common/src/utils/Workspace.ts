@@ -61,12 +61,17 @@ export class Workspace {
 
 }
 
-export const formatWorkspaceConfigPath = (workspaceDirectory: string) => join(workspaceDirectory, 'contember.workspace.yaml')
+export const formatWorkspaceConfigPath = (workspaceDirectory: string) => [
+	join(workspaceDirectory, 'contember.yaml'),
+	join(workspaceDirectory, 'contember.workspace.yaml'),
+]
 
 const readWorkspaceConfig = async ({ workspaceDirectory }: WorkspaceDirectoryArgument): Promise<WorkspaceConfig> => {
 	const configPath = formatWorkspaceConfigPath(workspaceDirectory)
-	if (!(await pathExists(configPath))) {
-		return {}
+	for (const file of configPath) {
+		if ((await pathExists(file))) {
+			return await readYaml(file)
+		}
 	}
-	return await readYaml(configPath)
+	return {}
 }

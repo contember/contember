@@ -6,7 +6,9 @@ import AsyncSelect from 'react-select/async'
 import { ChoiceFieldData, DynamicMultiChoiceField, DynamicMultipleChoiceFieldProps } from '../ChoiceField'
 import { useCommonReactSelectAsyncProps } from './useCommonReactSelectAsyncProps'
 
-export type MultiSelectFieldProps = MultiSelectFieldInnerPublicProps & DynamicMultipleChoiceFieldProps
+export type MultiSelectFieldProps =
+	& MultiSelectFieldInnerPublicProps
+	& DynamicMultipleChoiceFieldProps
 
 export const MultiSelectField: FunctionComponent<MultiSelectFieldProps> = Component(
 	props => (

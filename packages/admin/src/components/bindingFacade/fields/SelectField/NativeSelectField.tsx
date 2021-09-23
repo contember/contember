@@ -2,10 +2,14 @@ import { BindingError, Component, ErrorAccessor } from '@contember/binding'
 import { FormGroup, FormGroupProps, Select, SelectOption } from '@contember/ui'
 import { FunctionComponent, memo } from 'react'
 import { ChoiceField, ChoiceFieldData, DynamicSingleChoiceFieldProps, StaticSingleChoiceFieldProps } from '../ChoiceField'
-import type { SelectFieldInnerPublicProps } from './SelectField'
 
-export type NativeSelectFieldProps = SelectFieldInnerPublicProps &
-	(StaticSingleChoiceFieldProps | DynamicSingleChoiceFieldProps) & {
+export type NativeSelectFieldProps =
+	& NativeSelectFieldInnerPublicProps
+	& (
+		| StaticSingleChoiceFieldProps
+		| DynamicSingleChoiceFieldProps
+	)
+	& {
 		searchByFields?: never
 	}
 
@@ -40,9 +44,7 @@ export interface NativeSelectFieldInnerPublicProps extends Omit<FormGroupProps, 
 	allowNull?: boolean
 }
 
-export interface NativeSelectFieldInnerProps
-	extends ChoiceFieldData.SingleChoiceFieldMetadata,
-		NativeSelectFieldInnerPublicProps {
+export interface NativeSelectFieldInnerProps extends ChoiceFieldData.SingleChoiceFieldMetadata, NativeSelectFieldInnerPublicProps {
 	errors: ErrorAccessor | undefined
 }
 

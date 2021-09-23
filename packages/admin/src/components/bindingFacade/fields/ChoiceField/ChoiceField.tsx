@@ -5,10 +5,12 @@ import { StaticSingleChoiceField, StaticSingleChoiceFieldProps } from './StaticS
 import { DynamicSingleChoiceField } from './DynamicSingleChoiceField'
 import { DynamicSingleChoiceFieldProps } from './useDynamicSingleChoiceField'
 
-export type ChoiceFieldProps = (
-	| StaticSingleChoiceFieldProps
-	| DynamicSingleChoiceFieldProps
-) & ChoiceFieldData.SingleChoiceFieldProps
+export type ChoiceFieldProps =
+	& ChoiceFieldData.SingleChoiceFieldProps
+	& (
+		| StaticSingleChoiceFieldProps
+		| DynamicSingleChoiceFieldProps
+	)
 
 const isStatic = (props: ChoiceFieldProps): props is StaticSingleChoiceFieldProps & ChoiceFieldData.SingleChoiceFieldProps	=>
 	Array.isArray(props.options)

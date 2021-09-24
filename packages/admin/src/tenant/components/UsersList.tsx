@@ -49,7 +49,7 @@ export const UsersManagement: FC<UsersManagementProps<any>> = <T extends {}>(pro
 				<UsersList
 					project={project}
 					createRoleRenderer={roleRendererFactory}
-					createUserEditLink={id => ({ pageName: 'tenantEditUser', params: { id } })}
+					createUserEditLink={id => ({ pageName: 'tenantEditUser', parameters: { id } })}
 				/>
 			</>
 		)

@@ -32,15 +32,15 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 	const { state: me, refetch } = useTenantMe()
 
 	useEffect(() => {
-		if (me.error && onInvalidIdentity) {
+		if (me.state === 'error' && onInvalidIdentity) {
 			onInvalidIdentity()
 		}
-	}, [me.error, onInvalidIdentity])
+	}, [me.state, onInvalidIdentity])
 
 
 	useEffect(
 		() => {
-			if (!me.finished || me.error || sessionToken === undefined) {
+			if (me.state !== 'success' || sessionToken === undefined) {
 				return
 			}
 
@@ -82,7 +82,7 @@ export const IdentityProvider: React.FC<{onInvalidIdentity?: () => void }> = ({ 
 		)
 	}
 
-	if (me.error) {
+	if (me.state === 'error') {
 		return (
 			<MiscPageLayout>
 				<Message type="danger" size="large" flow="generousBlock">Failed to fetch an identity</Message>

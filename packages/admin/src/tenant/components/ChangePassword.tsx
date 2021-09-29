@@ -35,15 +35,15 @@ export const ChangePassword: FC<{}> = ({}) => {
 		[resolveErrors, setNewPasswordRepeated],
 	)
 
-	const success = changePasswordState.finished && changePasswordState.success
+	const success = changePasswordState.state === 'success'
 	const errorFirstField = notEqualError
 		? undefined
-		: changePasswordState.finished && !changePasswordState.success && !errorsResolved
+		: changePasswordState.state === 'error' && !errorsResolved
 		? changePasswordState.errors.join(', ')
 		: undefined
 	const errorSecondField = notEqualError ? 'Passwords are different' : undefined
 	const validation = errorFirstField ? 'invalid' : success ? 'valid' : 'default'
-	const disabled = changePasswordState.loading || success
+	const disabled = changePasswordState.state === 'loading' || success
 
 	return (
 		<div>
@@ -82,7 +82,7 @@ export const ChangePassword: FC<{}> = ({}) => {
 				<Button
 					intent={success ? 'success' : 'primary'}
 					onClick={onSubmit}
-					isLoading={changePasswordState.loading}
+					isLoading={changePasswordState.state === 'loading'}
 					disabled={disabled}
 				>
 					{success ? 'Password changed' : 'Change password'}

@@ -23,16 +23,12 @@ export const EditUser: FC<EditUserProps> = ({ project, rolesConfig, identityId, 
 
 	useEffect(() => {
 		setMemberships(currentMemberships => {
-			if (
-				currentMemberships.every(it => it === undefined) &&
-				previousMembershipsState.finished &&
-				!previousMembershipsState.error
-			) {
+			if (previousMembershipsState.state === 'success') {
 				return previousMembershipsState.data.memberships
 			}
 			return currentMemberships
 		})
-	}, [previousMembershipsState.data, previousMembershipsState.error, previousMembershipsState.finished])
+	}, [previousMembershipsState])
 
 	const redirect = useRedirect()
 	const addToast = useShowToast()

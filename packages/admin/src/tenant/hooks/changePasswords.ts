@@ -37,9 +37,7 @@ interface ChangePasswordVariables {
 }
 
 interface ReturnedState {
-	finished: boolean
-	success: boolean
-	loading: boolean
+	state: 'success' | 'error' | 'loading' | 'initial'
 	errors: string[]
 }
 
@@ -62,14 +60,8 @@ export const useChangePassword = (): [(password: string) => void, ReturnedState]
 	)
 	const returnState = useMemo<ReturnedState>(() => {
 		return {
-			success: state.finished && !state.error && state.data.changePassword.ok,
-			finished: state.finished,
-			loading: state.loading,
-			errors:
-				(state.finished &&
-					!state.error &&
-					state.data.changePassword.errors.map(it => getTenantErrorMessage(it.code))) ||
-				[],
+			state: state.state === 'success' && !state.data.changePassword.ok ? 'error' : state.state,
+			errors: state.state === 'success' ? state.data.changePassword.errors.map(it => getTenantErrorMessage(it.code)) : [],
 		}
 	}, [state])
 	return [changePassword, returnState]

@@ -26,7 +26,7 @@ export const PrepareOtpForm: FC<PrepareOtpFormProps> = ({ onPrepared, isReSetup,
 				} else {
 					switch (response.error.code) {
 						case 'OTP_NOT_ACTIVE':
-							return addToast({ message: `Two factor is not active`, type: 'error' })
+							return addToast({ message: `Two factor is not active`, type: 'error', dismiss: true })
 					}
 				}
 			},

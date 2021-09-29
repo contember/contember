@@ -27,6 +27,7 @@ export const CreateResetPasswordRequestForm: FC<CreateResetPasswordRequestFormPr
 					addToast({
 						type: 'success',
 						message: `Check your inbox for the instructions.`,
+						dismiss: true,
 					})
 					redirect(redirectOnSuccess)
 				} else {

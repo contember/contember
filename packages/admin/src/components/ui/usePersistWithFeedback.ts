@@ -2,7 +2,7 @@ import { ErrorPersistResult, PersistOptions, SuccessfulPersistResult, usePersist
 import { useCallback } from 'react'
 import { useMessageFormatter } from '../../i18n'
 import { persistFeedbackDictionary } from './persistFeedbackDictionary'
-import { useShowToastWithTimeout } from '../Toaster'
+import { useShowToast } from '../Toaster'
 
 export interface PersistWithFeedbackOptions extends PersistOptions {
 	successMessage?: string
@@ -25,7 +25,7 @@ export const usePersistWithFeedback = ({
 	...persistOptions
 }: PersistWithFeedbackOptions = {}) => {
 	const persistAll = usePersist()
-	const showToast = useShowToastWithTimeout()
+	const showToast = useShowToast()
 	const formatMessage = useMessageFormatter(persistFeedbackDictionary)
 
 	return useCallback((): Promise<SuccessfulPersistResult> => {
@@ -36,16 +36,16 @@ export const usePersistWithFeedback = ({
 					{
 						type: 'success',
 						message: formatMessage(successMessage, 'persistFeedback.successMessage'),
+						dismiss: successDuration ?? true,
 					},
-					successDuration ?? 4000,
 				)
 				if (result.type === 'justSuccess' && result.afterPersistError) {
 					showToast(
 						{
 							type: 'error',
 							message: formatMessage(afterPersistErrorMessage, 'persistFeedback.afterPersistErrorMessage'),
+							dismiss: afterPersistErrorDuration ?? true,
 						},
-						afterPersistErrorDuration ?? 8000,
 					)
 				}
 				return result
@@ -56,8 +56,8 @@ export const usePersistWithFeedback = ({
 					{
 						type: 'error',
 						message: formatMessage(errorMessage, 'persistFeedback.errorMessage'),
+						dismiss: errorDuration ?? true,
 					},
-					errorDuration ?? 8000,
 				)
 				return Promise.reject(result)
 			})

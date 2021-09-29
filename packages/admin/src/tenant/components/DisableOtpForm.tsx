@@ -29,6 +29,7 @@ export const DisableOtpForm: FC<DisableOtpFormProps> = ({ redirectOnSuccess }) =
 					addToast({
 						type: 'success',
 						message: `Two-factor authentication has been disabled`,
+						dismiss: true,
 					})
 					refreshIdentity()
 					redirectOnSuccess && redirect(redirectOnSuccess)

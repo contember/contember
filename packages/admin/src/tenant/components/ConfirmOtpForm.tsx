@@ -27,6 +27,7 @@ export const ConfirmOtpForm: FC<ConfirmOtpFormProps> = ({ redirectOnSuccess, onS
 					addToast({
 						type: 'success',
 						message: `Two-factor authentication has been enabled`,
+						dismiss: true,
 					})
 					refreshIdentity()
 					redirectOnSuccess && redirect(redirectOnSuccess)

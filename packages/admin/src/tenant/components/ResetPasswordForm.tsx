@@ -23,7 +23,7 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ redirectOnSucces
 	const { register, isSubmitting, onSubmit } = useForm<typeof initialValues>(initialValues, useCallback(
 			async values => {
 				if (values.password !== values.passwordAgain) {
-						return addToast({ message: `Passwords does not match`, type: 'error' })
+						return addToast({ message: `Passwords does not match`, type: 'error', dismiss: true })
 				}
 				const response = await resetPassword({
 					password: values.password,
@@ -33,16 +33,17 @@ export const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ redirectOnSucces
 					addToast({
 						type: 'success',
 						message: `Password successfully set.`,
+						dismiss: true,
 					})
 					redirect(redirectOnSuccess)
 				} else {
 					switch (response.error.code) {
 						case 'PASSWORD_TOO_WEAK':
-							return addToast({ message: `Password is too weak`, type: 'error' })
+							return addToast({ message: `Password is too weak`, type: 'error', dismiss: true })
 						case 'TOKEN_NOT_FOUND':
 						case 'TOKEN_USED':
 						case 'TOKEN_EXPIRED':
-							return addToast({ message: `Reset link is not valid`, type: 'error' })
+							return addToast({ message: `Reset link is not valid`, type: 'error', dismiss: true })
 					}
 				}
 			},

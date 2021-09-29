@@ -1,5 +1,3 @@
 export * from './Toaster'
 export * from './ToasterContext'
-export * from './useDismissToast'
 export * from './useShowToast'
-export * from './useShowToastWithTimeout'

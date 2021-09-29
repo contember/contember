@@ -27,6 +27,7 @@ export const useLogout = () => {
 				toaster({
 					message: response.signOut.error?.endUserMessage ?? 'Failed to logout',
 					type: 'error',
+					dismiss: true,
 				})
 			}
 

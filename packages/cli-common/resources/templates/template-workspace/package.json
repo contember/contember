@@ -2,7 +2,7 @@
   "scripts-template": {
     "contember": "docker-compose run contember-cli",
     "start-admin": "vite admin --port ${VITE_PORT:-4000} --host 0.0.0.0",
-    "build-admin": "tsc && vite admin build"
+    "build-admin": "tsc && vite build admin"
   },
   "devDependencies": {
     "@contember/schema": "{version}",

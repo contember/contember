@@ -6,6 +6,7 @@ const ME_QUERY = `
 			person {
 				id
 				email
+				otpEnabled
 			}
 
 			projects {
@@ -31,6 +32,7 @@ interface MeResponse {
 		person: {
 			id: string,
 			email: string,
+			otpEnabled: boolean,
 		},
 		projects: Array<{
 			project: {

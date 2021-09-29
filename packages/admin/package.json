@@ -45,6 +45,7 @@
 		"is-hotkey": "0.1.8",
 		"leaflet": "1.7.1",
 		"path-to-regexp": "6.2.0",
+		"qrcode-generator": "^1.4.4",
 		"react-datepicker": "4.2.1",
 		"react-dropzone": "10.2.2",
 		"react-error-boundary": "3.1.3",

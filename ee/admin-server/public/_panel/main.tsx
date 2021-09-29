@@ -18,6 +18,7 @@ import {
 	runReactApp,
 	TitleBar,
 	UsersList,
+	OtpManagement,
 } from '@contember/admin'
 import { FC } from 'react'
 import './index.sass'
@@ -38,6 +39,7 @@ const PanelLayout: FC = props => {
 					</Menu.Item>
 					<Menu.Item title={'Contember Admin Panel'}>
 						<Menu.Item title="Projects" to={'projectList'} />
+						<Menu.Item title="Profile security" to={'security'} />
 					</Menu.Item>
 				</Menu>
 			}
@@ -60,6 +62,7 @@ runReactApp(
 			userInvite: { path: '/project/invite/:project' },
 			identityEdit: { path: '/project/edit/:project/:identity' },
 			apiKeyCreate: { path: '/project/api-key/:project' },
+			security: { path: '/security' },
 		}}
 	>
 		<Pages layout={PanelLayout}>
@@ -164,6 +167,15 @@ runReactApp(
 					</PageLayoutContent>
 				)}
 			</Page>
+
+			<GenericPage pageName={'security'}>
+				<TitleBar>
+					Profile security
+				</TitleBar>
+				<Box heading={'Two-factor authentication'}>
+					<OtpManagement/>
+				</Box>
+			</GenericPage>
 		</Pages>
 	</ApplicationEntrypoint>,
 )

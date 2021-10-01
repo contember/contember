@@ -18,7 +18,7 @@ import {
 	runReactApp,
 	TitleBar,
 	UsersList,
-	OtpManagement,
+	OtpManagement, ChangePassword,
 } from '@contember/admin'
 import { FC } from 'react'
 import './index.sass'
@@ -172,8 +172,10 @@ runReactApp(
 				<TitleBar>
 					Profile security
 				</TitleBar>
+				<ChangePassword />
+
 				<Box heading={'Two-factor authentication'}>
-					<OtpManagement/>
+					<OtpManagement />
 				</Box>
 			</GenericPage>
 		</Pages>

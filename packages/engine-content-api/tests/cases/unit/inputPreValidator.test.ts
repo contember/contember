@@ -4,7 +4,7 @@ import {
 	InputPreValidator,
 	ValidationDataSelector,
 } from '../../../src/input-validation'
-import { InputValidation as v, SchemaBuilder } from '@contember/schema-definition'
+import { InputValidation as v, SchemaBuilder, SchemaDefinition } from '@contember/schema-definition'
 import { Input, Model, Validation, Value } from '@contember/schema'
 import { EntityRulesResolver } from '../../../src'
 import { getEntity } from '@contember/schema-utils'
@@ -13,6 +13,7 @@ import { createMock } from '../../src/utils'
 import { testUuid } from '../../src/testUuid'
 import * as assert from 'uvu/assert'
 import { suite } from 'uvu'
+import { SchemaDefinition as def } from '@contember/schema-definition'
 
 type PrimaryValueExpectation = { entity: string; where: Input.UniqueWhere; result: Value.PrimaryValue }
 type SelectExpectation = {
@@ -417,5 +418,36 @@ inputPreValidatorTest('validate update with dependent rules on relation - invali
 		},
 	])
 })
+
+
+namespace ViewModelDefinition {
+	export class Book {
+		title = def.stringColumn()
+		stats = def.oneHasOneInverse(BookStats, 'book').notNull()
+	}
+
+	@def.View('SELECT 1')
+	export class BookStats {
+		book = def.oneHasOne(Book, 'stats').notNull()
+		foo = def.intColumn()
+	}
+}
+
+inputPreValidatorTest('ignore not null on view relation', async () => {
+	const model = SchemaDefinition.createModel(ViewModelDefinition)
+
+	const validator = createValidator({ model, validation: {} })
+	const result = await validator.validateCreate({
+		entity: getEntity(model, 'Book'),
+		data: {
+			title: 'Hello',
+		},
+		overRelation: null,
+		path: [],
+		mapper,
+	})
+	assert.equal(result, [])
+})
+
 
 inputPreValidatorTest.run()

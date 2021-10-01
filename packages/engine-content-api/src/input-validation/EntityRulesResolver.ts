@@ -71,8 +71,8 @@ class NotNullFieldsVisitor implements Model.RelationByTypeVisitor<boolean>, Mode
 		return false
 	}
 
-	visitOneHasOneInverse(entity: Model.Entity, relation: Model.OneHasOneInverseRelation): boolean {
-		return !relation.nullable
+	visitOneHasOneInverse(entity: Model.Entity, relation: Model.OneHasOneInverseRelation, targetEntity: Model.Entity): boolean {
+		return !relation.nullable && !targetEntity.view
 	}
 
 	visitOneHasOneOwning(entity: Model.Entity, relation: Model.OneHasOneOwningRelation): boolean {

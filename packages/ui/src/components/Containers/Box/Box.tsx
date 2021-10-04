@@ -1,10 +1,10 @@
 import classnames from 'classnames'
 import { forwardRef, memo, ReactNode, useContext } from 'react'
-import { IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
-import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
-import type { BoxDistinction, NativeProps } from '../../types'
-import { toStateClass, toViewClass } from '../../utils'
-import { Heading } from '../Heading'
+import { IncreaseHeadingDepth, useClassNamePrefix } from '../../../auxiliary'
+import { BoxDepthContext, HeadingDepthContext } from '../../../contexts'
+import type { BoxDistinction, NativeProps } from '../../../types'
+import { toStateClass, toViewClass } from '../../../utils'
+import { Heading } from '../../Heading'
 import { BoxContent } from './BoxContent'
 
 export interface BoxOwnProps {

@@ -1,0 +1,15 @@
+@import '../../styles/common'
+
+.#{$cui-conf-globalPrefix}section-tabs
+  margin-left: calc(-1 * var(--padding-horizontal, 0))
+  margin-right: calc(-1 * var(--padding-horizontal, 0))
+  margin-bottom: calc(-1 * var(--padding-vertical, 0))
+
+  padding: 0 ($cui-gap * 2)
+
+  @media (min-width: $break768)
+    padding: 0 ($cui-gap * 6)
+
+  .is-meta
+    @media (min-width: $break1200)
+      display: none

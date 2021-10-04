@@ -1,12 +1,12 @@
 import cn from 'classnames'
 import { ComponentType, memo, ReactNode, useContext } from 'react'
 import { BoxDepth } from 'types'
-import { IncreaseHeadingDepth, useClassNamePrefix } from '../../auxiliary'
-import { BoxDepthContext, HeadingDepthContext } from '../../contexts'
-import { toViewClass } from '../../utils'
-import { Heading } from '../Heading'
-import { Icon } from '../Icon'
-import { Stack } from '../Stack'
+import { IncreaseHeadingDepth, useClassNamePrefix } from '../../../auxiliary'
+import { BoxDepthContext, HeadingDepthContext } from '../../../contexts'
+import { toViewClass } from '../../../utils'
+import { Heading } from '../../Heading'
+import { Icon } from '../../Icon'
+import { Stack } from '../../Stack'
 
 export interface BoxSectionProps {
 	heading?: ReactNode

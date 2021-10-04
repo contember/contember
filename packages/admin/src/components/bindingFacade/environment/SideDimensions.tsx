@@ -69,6 +69,7 @@ class SideDimensions extends PureComponent<SideDimensionsProps> {
 									variables={props.variables}
 									hasOneField={props.hasOneField}
 									key={j}
+									renderDimensionValue={dimensions.length > 1}
 								>
 									{child}
 								</SideDimensions.SingleDimension>
@@ -92,6 +93,7 @@ namespace SideDimensions {
 		children: ReactNode
 		environment: Environment
 		dimensionValue: Environment.Value
+		renderDimensionValue: boolean
 	}
 
 	export class SingleDimension extends PureComponent<SingleDimensionProps> {
@@ -101,7 +103,10 @@ namespace SideDimensions {
 			const children = SingleDimension.staticRender(this.props, this.props.environment)
 			return (
 				<EnvironmentContext.Provider value={SingleDimension.generateEnvironment(this.props, this.props.environment)}>
-					<div className="sideDimensions-dimensions-dimension">{children}</div>
+					<div className="sideDimensions-dimensions-dimension">
+						{this.props.renderDimensionValue && <span className="sideDimensions-dimensions-dimensionValue">{this.props.dimensionValue}</span>}
+						{children}
+					</div>
 				</EnvironmentContext.Provider>
 			)
 		}

@@ -8,14 +8,35 @@
 	&-dimensions
 		display: flex
 		flex-direction: column
-		gap: $cui-gap * 6
+		gap: $cui-gap * 8
 
 		&-in
 			display: flex
-			gap: $cui-gap * 6
+			flex-direction: column
+			gap: $cui-gap * 4
 
 		&-dimension
 			display: flex
 			flex: 1
 			flex-direction: column
 			gap: $cui-gap * 6
+			position: relative
+
+		&-dimensionValue
+			background-color: rgba(0,0,0, 0.05)
+			border-radius: 0.5em
+			font-size: 0.5em
+			padding: 0.1em 0.75em
+			position: absolute
+			right: 0
+			text-transform: uppercase
+			top: 0
+
+	@media (min-width: $break768)
+		&-dimensions
+			gap: $cui-gap * 6
+			&-in
+				flex-direction: row
+				gap: $cui-gap * 6
+			&-in:not(:first-child) &-dimensionValue
+				display: none

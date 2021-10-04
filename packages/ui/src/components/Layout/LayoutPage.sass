@@ -1,0 +1,65 @@
+@import '../../styles/common'
+
+.#{$cui-conf-globalPrefix}layout-page
+	&-content-wrap
+		display: flex
+		flex-direction: column
+	&-content
+		flex-grow: 1
+	&-content-wrap
+		background-color: inherit
+		position: relative
+		z-index: 1
+	&-wrap
+		align-items: stretch
+		background-color: inherit
+		display: flex
+		flex-direction: column
+		flex-grow: 1
+		justify-content: flex-start
+
+	&-aside
+		background-color: $cui-light-panel-background
+		border-radius: unset
+		border-top: $cui-light-panel-border
+		margin-top: -1 * $cui-control-border-width
+		display: flex
+		flex-direction: column
+		padding: ($cui-gap * 12) ($cui-gap * 4)
+		padding-bottom: calc(#{$cui-gap * 12} + env(safe-area-inset-bottom))
+		width: auto
+		&-title
+			margin: 0
+
+	@media (min-width: $break768)
+		&-aside
+			padding: ($cui-gap * 8) ($cui-gap * 8)
+
+@media (min-width: $break1200)
+	html
+		height: 100vh
+		margin: 0
+		padding: 0
+
+	.#{$cui-conf-globalPrefix}layout-page
+		&-wrap
+			height: 100vh
+			max-height: 100vh
+
+		&-content-wrap
+			flex-direction: row
+			overflow: hidden
+
+		&-content
+			overflow-y: auto
+
+		&-aside
+			background-color: unset
+			overflow-y: auto
+			border-top: unset
+			margin-top: unset
+			border-left: $cui-light-panel-border
+			flex-shrink: 0
+			position: sticky
+			top: 0
+			width: $cui-layout-sidebar-width

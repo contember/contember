@@ -27,8 +27,9 @@ export const CreateNewEntityButton = memo(
 				onClick={() => createNewEntity()}
 				disabled={isMutating}
 				isLoading={isMutating}
-				flow="block"
 				className={`${prefix}new-entity-button`}
+				distinction="seamless"
+				justification="justifyStart"
 				{...buttonProps}
 			>
 				<Icon {...defaultIconProps} {...iconProps} />

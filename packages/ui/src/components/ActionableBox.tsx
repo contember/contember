@@ -1,6 +1,6 @@
 import { memo, MouseEvent as ReactMouseEvent, ReactNode } from 'react'
 import { useClassNamePrefix } from '../auxiliary'
-import { BoxContent } from './Box/BoxContent'
+import { BoxContent } from './Containers'
 import { Dropdown } from './Dropdown'
 import { Button, ButtonOwnProps } from './forms'
 import { Icon, IconProps } from './Icon'

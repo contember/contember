@@ -1,0 +1,68 @@
+@import '../../styles/common'
+
+.#{$cui-conf-globalPrefix}layout-chrome
+	align-items: stretch
+	display: flex
+	flex-direction: column
+	min-height: 100vh
+
+	&-bar
+		background: $cui-light-panel-background
+		display: flex
+		flex-direction: column
+		max-height: 100vh
+		position: sticky
+		top: 0
+		z-index: 1
+	&-bar-header
+		display: flex
+		flex-direction: row
+		justify-content: space-between
+		padding: $cui-gap * 2  $cui-gap * 4
+		position: relative
+	&-bar-body
+		flex-grow: 1
+		overflow-y: auto
+		position: relative
+		z-index: 1
+	&-bar-footer
+		align-items: stretch
+		border-top: $cui-light-panel-border
+		display: flex
+		flex-direction: column
+	&-bar-switchers
+		border-bottom: $cui-light-panel-border
+		border-top: $cui-light-panel-border
+		padding: $cui-gap * 2  $cui-gap * 4
+	&-body
+		background-color: $cui-light-body-background
+		flex-grow: 1
+	&-navigation-button
+		height: 2em
+		margin: 0.125em
+		& > .#{$cui-conf-globalPrefix}button-content
+			display: flex
+			flex-direction: row
+			flex-wrap: nowrap
+			gap: $cui-gap * 2
+
+	@media (min-width: 768px)
+		flex-direction: row
+
+		&-bar
+			border-right: $cui-light-panel-border
+			width: $cui-layout-sidebar-width
+
+		&-navigation-button
+			display: none
+
+	@media (max-width: 767px)
+		&-bar
+			height: 100vh
+		&.view-collapsed &-bar
+			height: unset
+		&.view-collapsed &-bar-body,
+		&.view-collapsed &-bar-footer
+			display: none
+		&:not(.view-collapsed) &-body
+			display: none

@@ -1,10 +1,14 @@
-@import '../common'
+@import 'boxContent'
 
 .#{$cui-conf-globalPrefix}box
-	+boxNesting
+	+boxContent
 	display: flex
 	flex-direction: column
 	gap: $cui-gap * 6
+
+	&-content,
+	&-section
+		+boxContent
 
 	&-content.view-seamless,
 	&-content &.view-seamlessIfNested
@@ -58,5 +62,5 @@
 	&-section.is-active,
 	&.is-active
 		transition: box-shadow .15s
-		box-shadow: 0 0 0 .2em rgba($cui-box-active-color, .3)
+		box-shadow: 0 0 0 .2em rgba($cui-control-view-default-distinction-color, .3)
 		z-index: 1

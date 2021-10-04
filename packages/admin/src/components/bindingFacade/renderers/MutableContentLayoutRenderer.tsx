@@ -1,5 +1,5 @@
 import { Component } from '@contember/binding'
-import { ComponentType, FunctionComponent, useMemo } from 'react'
+import { ComponentType, FunctionComponent } from 'react'
 import { PersistButton } from '../buttons'
 import { ImmutableContentLayoutRenderer, ImmutableContentLayoutRendererProps } from './ImmutableContentLayoutRenderer'
 
@@ -10,17 +10,9 @@ export interface MutableContentLayoutRendererProps extends ImmutableContentLayou
 export const MutableContentLayoutRenderer: FunctionComponent<MutableContentLayoutRendererProps> = Component(
 	({ persistButtonComponent, side, children, ...immutableProps }) => {
 		const PersistComponent = persistButtonComponent || PersistButton
-		const augmentedSide = useMemo(
-			() => (
-				<>
-					{side}
-					<PersistComponent />
-				</>
-			),
-			[PersistComponent, side],
-		)
+
 		return (
-			<ImmutableContentLayoutRenderer {...immutableProps} side={augmentedSide}>
+			<ImmutableContentLayoutRenderer {...immutableProps} actions={<PersistComponent />} side={side}>
 				{children}
 			</ImmutableContentLayoutRenderer>
 		)

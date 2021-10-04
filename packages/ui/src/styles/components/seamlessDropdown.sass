@@ -14,6 +14,8 @@
 		&-in
 			padding: $spacing
 
+	&.view-caret.view-up &-button-in:after
+		transform: rotateZ(180deg)
 	&.view-caret &-button-in
 		position: relative
 		padding-right: $spacing + 1.25em
@@ -33,7 +35,6 @@
 
 	&-content
 		position: absolute
-		top: 0
 		left: 0
 		min-height: 100%
 		min-width: 100%
@@ -41,6 +42,10 @@
 		border-radius: 1em
 		display: none
 		box-shadow: 0 em(1px) em(3px) rgba(#000, .2), 0 em(2px) em(8px) rgba(#000, .2)
+	&.view-down &-content
+		top: 0
+	&.view-up &-content
+		bottom: 0
 
 	&-content-sep
 		border-bottom: solid em(1px)
@@ -53,5 +58,11 @@
 			&-content
 				display: block
 
-			&-button-in:after
-				transform: scaleY(-1)
+	&.view-down.view-hoverable:hover,
+	&.view-down.view-open
+		.#{$cui-conf-globalPrefix}seamlessDropdown-button-in:after
+			transform: rotateZ(180deg)
+	&.view-up.view-hoverable:hover,
+	&.view-up.view-open
+		.#{$cui-conf-globalPrefix}seamlessDropdown-button-in:after
+			transform: rotateZ(0deg)

@@ -6,12 +6,19 @@
 	border: $cui-control-border-width solid $cui-control-view-default-border-color
 	border-radius: $cui-control-border-radius
 	width: 100%
-	padding: .5em
+	padding: $cui-gap * 4
 
 	//&::after
 		+size(100% 2em)
 		content: ''
 		display: block
+
+	.#{$cui-conf-globalPrefix}box-content.view-depth-2,
+	.#{$cui-conf-globalPrefix}stack.view-depth-3 .#{$cui-conf-globalPrefix}editorBox
+		border: 0
+		border-radius: 0
+		border-bottom-width: 1px
+		padding: 0
 
 	&-canvas
 		min-height: 2em

@@ -1,4 +1,4 @@
-@import '../common'
+@import '../../styles/common'
 
 .#{$cui-conf-globalPrefix}stack
   display:  flex
@@ -12,8 +12,18 @@
   &.view-vertical-reverse
     flex-direction: column-reverse
 
+  &.view-align
+    &-center
+      align-items: center
+    &-start
+      align-items: flex-start
+    &-end
+      align-items: flex-end
+    &-stretch
+      align-items: stretch
+
   &.view-depth-1
-    gap: $cui-gap * 12
+    gap: $cui-gap * 16
   &.view-depth-2
     gap: $cui-gap * 8
   &.view-depth-3

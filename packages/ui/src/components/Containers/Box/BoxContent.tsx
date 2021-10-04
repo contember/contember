@@ -1,10 +1,10 @@
 import classnames from 'classnames'
 import { forwardRef, memo, ReactNode, useContext } from 'react'
-import { IncreaseBoxDepth, useClassNamePrefix } from '../../auxiliary'
-import { BoxDepthContext } from '../../contexts'
-import type { BoxDepth, BoxDistinction, NativeProps } from '../../types'
-import { toEnumViewClass, toViewClass } from '../../utils'
-import { Stack } from '../Stack'
+import { IncreaseBoxDepth, useClassNamePrefix } from '../../../auxiliary'
+import { BoxDepthContext } from '../../../contexts'
+import type { BoxDepth, BoxDistinction, NativeProps } from '../../../types'
+import { toEnumViewClass, toViewClass } from '../../../utils'
+import { Stack } from '../../Stack'
 
 export interface BoxContentOwnProps {
 	depth?: BoxDepth

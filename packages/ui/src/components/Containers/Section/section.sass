@@ -1,0 +1,14 @@
+.#{$cui-conf-globalPrefix}section
+  display: flex
+  flex-direction: column
+  gap: $cui-gap * 6
+  border-bottom: $cui-light-panel-border
+  border-top: $cui-light-panel-border
+  margin-top: -1 * $cui-control-border-width
+  padding: ($cui-gap * 12) ($cui-gap * 4)
+  scroll-margin-top: 6em // TODO: This is approximate, e.g. use some --custom-property
+
+  @media (min-width: $break768)
+    padding: ($cui-gap * 8) ($cui-gap * 8)
+  @media (min-width: $break1200)
+    scroll-margin-top: 0

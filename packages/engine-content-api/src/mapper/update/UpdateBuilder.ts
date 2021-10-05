@@ -61,9 +61,9 @@ export class UpdateBuilder {
 				return { values: [], affectedRows: null, executed: false, aborted: false }
 			}
 			if (resolvedData.find(it => it.resolvedValue === AbortUpdate)) {
+				this.resolver(null)
 				return { values: [], affectedRows: null, executed: false, aborted: true }
 			}
-			resolvedDataFinal = resolvedData as ResolvedColumnValue[]
 
 			const qb = DbUpdateBuilder.create()
 				.with('newData_', qb => {

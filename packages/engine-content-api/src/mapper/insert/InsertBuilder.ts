@@ -49,9 +49,10 @@ export class InsertBuilder {
 		try {
 			const resolvedData = await this.getResolvedData()
 			if (resolvedData.find(it => it.resolvedValue === AbortInsert)) {
+				this.resolver(null)
 				return { aborted: true, executed: false, primaryValue: null, values: [] }
 			}
-			resolvedDataFinal = resolvedData as ResolvedColumnValue[]
+
 			const insertData = resolvedData.reduce<QueryBuilder.ColumnExpressionMap>(
 				(result, item) => ({ ...result, [item.columnName]: expr => expr.select(['root_', item.columnName]) }),
 				{},

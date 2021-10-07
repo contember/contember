@@ -4,16 +4,16 @@ import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
 import { escapeSqlString } from '../../utils/escapeSqlString'
+import { createCheck, getConstraintName } from './enumUtils'
 
 export const CreateEnumModification: ModificationHandlerStatic<CreateEnumModificationData> = class {
 	static id = 'createEnum'
 	constructor(private readonly data: CreateEnumModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
-		const joinedValues = this.data.values.map(it => `'${escapeSqlString(it)}'`).join(',')
 		builder.createDomain(this.data.enumName, 'text', {
-			check: `VALUE IN(${joinedValues})`,
-			constraintName: `${this.data.enumName}_check`.toLowerCase(),
+			check: createCheck(this.data.values),
+			constraintName: getConstraintName(this.data.enumName),
 		})
 	}
 

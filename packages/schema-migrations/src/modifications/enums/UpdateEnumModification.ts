@@ -3,19 +3,20 @@ import { Schema } from '@contember/schema'
 import { ContentEvent } from '@contember/engine-common'
 import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { ModificationHandlerStatic } from '../ModificationHandler'
-import { escapeSqlString } from '../../utils/escapeSqlString'
 import deepEqual from 'fast-deep-equal'
+import { createCheck, getConstraintName } from './enumUtils'
 
 export const UpdateEnumModification: ModificationHandlerStatic<UpdateEnumModificationData> = class {
 	static id = 'updateEnum'
 	constructor(private readonly data: UpdateEnumModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
-		const joinedValues = this.data.values.map(it => `'${escapeSqlString(it)}'`).join(',')
-		builder.sql(`ALTER DOMAIN "${this.data.enumName}" DROP CONSTRAINT ${this.data.enumName}_check`)
-		builder.sql(
-			`ALTER DOMAIN "${this.data.enumName}" ADD CONSTRAINT ${this.data.enumName}_check CHECK (VALUE IN(${joinedValues}))`,
-		)
+		builder.sql(`
+			ALTER DOMAIN "${this.data.enumName}"
+			DROP CONSTRAINT ${getConstraintName(this.data.enumName)}`)
+		builder.sql(`
+			ALTER DOMAIN "${this.data.enumName}"
+			ADD CONSTRAINT ${getConstraintName(this.data.enumName)} CHECK (${createCheck(this.data.values)})`)
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {

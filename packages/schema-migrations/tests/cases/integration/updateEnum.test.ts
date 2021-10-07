@@ -27,6 +27,6 @@ testMigrations('update enum', {
 			values: ['publish', 'draft'],
 		},
 	],
-	sql: SQL`ALTER DOMAIN "postStatus" DROP CONSTRAINT postStatus_check;
-	ALTER DOMAIN "postStatus" ADD CONSTRAINT postStatus_check CHECK (VALUE IN('publish','draft'));`,
+	sql: SQL`ALTER DOMAIN "postStatus" DROP CONSTRAINT poststatus_check;
+	ALTER DOMAIN "postStatus" ADD CONSTRAINT poststatus_check CHECK (VALUE IN('publish','draft'));`,
 })

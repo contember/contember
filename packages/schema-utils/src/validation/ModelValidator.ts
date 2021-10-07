@@ -40,6 +40,9 @@ export class ModelValidator {
 				errors.for(enumName).add('Enum values must be an array of strings')
 				continue
 			}
+			if (enumValues.length === 0) {
+				errors.for(enumName).add('Enum must have at least one value')
+			}
 			for (const value of enumValues) {
 				const valueErrors = errors.for(value)
 				if (!this.validateIdentifier(value, valueErrors)) {

@@ -1,15 +1,15 @@
 import { ProjectSchemaResolver as ProjectSchemaResolverInterface } from '@contember/engine-tenant-api'
 import { SchemaVersionBuilder } from '@contember/engine-system-api'
-import { ProjectContainerResolverCallback } from '@contember/engine-http'
+import { ProjectContainerResolver } from '@contember/engine-http'
 import { Schema } from '@contember/schema'
 
 export class ProjectSchemaResolver implements ProjectSchemaResolverInterface {
 	constructor(
-		private readonly projectContainerResolver: ProjectContainerResolverCallback,
+		private readonly projectContainerResolver: ProjectContainerResolver,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 	async getSchema(slug: string) {
-		const container = await this.projectContainerResolver(slug)
+		const container = await this.projectContainerResolver.getProjectContainer(slug)
 		if (!container) {
 			return undefined
 		}

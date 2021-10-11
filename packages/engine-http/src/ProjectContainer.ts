@@ -11,7 +11,7 @@ export interface ProjectContainer {
 	contentSchemaResolver: ContentSchemaResolver
 }
 
-export type ProjectContainerResolverCallback = (
-	slug: string,
-	aliasFallback?: boolean,
-) => Promise<ProjectContainer | undefined>
+export interface ProjectContainerResolver {
+	getProjectContainer(slug: string, aliasFallback?: boolean): Promise<ProjectContainer | undefined>
+}
+

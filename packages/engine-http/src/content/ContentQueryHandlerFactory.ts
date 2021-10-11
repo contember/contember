@@ -29,7 +29,7 @@ type InputKoaContext = KoaContext<KoaState>
 
 type ExtendedGraphqlContext = Context & { koaContext: KoaContext<KoaState> }
 
-class ContentQueryHandlerFactory {
+export class ContentQueryHandlerFactory {
 	constructor(
 		private readonly projectName: string,
 		private readonly debug: boolean,
@@ -91,5 +91,3 @@ class ContentQueryHandlerFactory {
 		}
 	}
 }
-
-export { ContentQueryHandlerFactory }

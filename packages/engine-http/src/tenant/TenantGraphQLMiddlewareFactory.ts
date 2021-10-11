@@ -2,17 +2,18 @@ import { makeExecutableSchema } from '@graphql-tools/schema'
 import { ResolverContextFactory, Schema, typeDefs } from '@contember/engine-tenant-api'
 import { AuthMiddlewareState } from '../common'
 import { KoaContext, KoaMiddleware } from '../koa'
-import { createGraphQLQueryHandler } from '../graphql/execution'
+import { createGraphQLQueryHandler } from '../graphql'
 import { ResolverContext } from '@contember/engine-tenant-api'
-import { createGraphqlRequestInfoProviderListener, GraphQLKoaState } from '../graphql/state'
-import { createErrorListener, ErrorLogger } from '../graphql/errors'
+import { createGraphqlRequestInfoProviderListener, GraphQLKoaState } from '../graphql'
+import { createErrorListener, ErrorLogger } from '../graphql'
 
 type KoaState = AuthMiddlewareState & GraphQLKoaState
+
 export type TenantGraphQLContext = ResolverContext & {
 	koaContext: KoaContext<KoaState>
 }
 
-class TenantGraphQLMiddlewareFactory {
+export class TenantGraphQLMiddlewareFactory {
 	constructor(
 		private readonly resolvers: Schema.Resolvers,
 		private readonly resolverContextFactory: ResolverContextFactory,
@@ -49,5 +50,3 @@ class TenantGraphQLMiddlewareFactory {
 		})
 	}
 }
-
-export { TenantGraphQLMiddlewareFactory }

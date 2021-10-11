@@ -23,7 +23,7 @@ type CacheEntry = {
 	verifier: (identity: Identity) => boolean
 }
 
-class GraphQlSchemaFactory {
+export class GraphQlSchemaFactory {
 	private cache = new WeakMap<Schema, CacheEntry[]>()
 
 	constructor(
@@ -81,5 +81,3 @@ class GraphQlSchemaFactory {
 		return [graphQlSchema, permissions]
 	}
 }
-
-export { GraphQlSchemaFactory }

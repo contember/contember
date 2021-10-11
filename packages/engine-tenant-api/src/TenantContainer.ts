@@ -70,7 +70,6 @@ export interface TenantContainer {
 	resolvers: Schema.Resolvers
 	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
-	identityFetcher: IdentityFetcher
 }
 
 export interface TenantContainerArgs {
@@ -162,8 +161,6 @@ export class TenantContainerFactory {
 				new OtpManager(dbContext, otpAuthenticator))
 			.addService('mailTemplateManager', ({ dbContext }) =>
 				new MailTemplateManager(dbContext))
-			.addService('identityFetcher', ({ db }) =>
-				new IdentityFetcher(db))
 			.addService('identityTypeResolver', ({ dbContext, projectMemberManager, projectManager }) =>
 				new IdentityTypeResolver(dbContext, projectMemberManager, projectManager))
 			.addService('projectTypeResolver', ({ projectMemberManager, projectSchemaResolver }) =>

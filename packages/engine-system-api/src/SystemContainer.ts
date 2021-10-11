@@ -57,7 +57,6 @@ type Args = {
 	modificationHandlerFactory: ModificationHandlerFactory
 	entitiesSelector: EntitiesSelector
 	eventApplier: ContentEventsApplier
-	identityFetcher: IdentityFetcher
 	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner
 }
 
@@ -119,8 +118,6 @@ export class SystemContainerFactory {
 				new StagesQueryResolver())
 			.addService('executedMigrationsQueryResolver', () =>
 				new ExecutedMigrationsQueryResolver())
-			.addService('historyEventResponseBuilder', () =>
-				new HistoryEventResponseBuilder(container.identityFetcher))
 			.addService('migrateMutationResolver', ({ projectMigrator }) =>
 				new MigrateMutationResolver(projectMigrator))
 			.addService('truncateMutationResolver', ({ projectTruncateExecutor }) =>

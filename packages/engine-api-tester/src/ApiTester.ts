@@ -74,11 +74,6 @@ export class ApiTester {
 			modificationHandlerFactory,
 			providers: providers,
 			eventApplier: new ContentEventApplier(new ContentApplyDependenciesFactoryImpl()),
-			identityFetcher: {
-				fetchIdentities: (ids: string[]) => {
-					return Promise.resolve([])
-				},
-			},
 			systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) =>
 				new MigrationsRunner(db, 'system', getSystemMigrations, dbClient),
 		})

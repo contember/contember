@@ -2,6 +2,7 @@ import { DatabaseContextFactory } from '@contember/engine-system-api'
 import { Connection } from '@contember/database'
 import { ContentSchemaResolver, ContentQueryHandlerProvider } from './content'
 import { ProjectConfig } from './ProjectConfig'
+import { DatabaseContext } from '@contember/engine-tenant-api'
 
 export interface ProjectContainer {
 	systemDatabaseContextFactory: DatabaseContextFactory
@@ -12,6 +13,6 @@ export interface ProjectContainer {
 }
 
 export interface ProjectContainerResolver {
-	getProjectContainer(slug: string, aliasFallback?: boolean): Promise<ProjectContainer | undefined>
+	getProjectContainer(tenantDatabase: DatabaseContext, slug: string, aliasFallback?: boolean): Promise<ProjectContainer | undefined>
 }
 

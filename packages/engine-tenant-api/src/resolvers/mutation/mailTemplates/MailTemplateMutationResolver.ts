@@ -23,7 +23,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		{ template: { content, projectSlug, subject, type, useLayout, variant } }: MutationAddProjectMailTemplateArgs,
 		context: ResolverContext,
 	): Promise<AddMailTemplateResponse> {
-		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
 			action: PermissionActions.MAIL_TEMPLATE_ADD,
@@ -33,7 +33,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			return createProjectNotFoundResponse(AddMailTemplateErrorCode.ProjectNotFound, projectSlug)
 		}
 
-		await this.mailTemplateManager.addMailTemplate({
+		await this.mailTemplateManager.addMailTemplate(context.db, {
 			content,
 			projectId: project.id,
 			subject,
@@ -53,7 +53,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		{ templateIdentifier: { projectSlug, type, variant } }: MutationRemoveProjectMailTemplateArgs,
 		context: ResolverContext,
 	): Promise<RemoveMailTemplateResponse> {
-		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
 			action: PermissionActions.MAIL_TEMPLATE_REMOVE,
@@ -63,7 +63,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			return createProjectNotFoundResponse(RemoveMailTemplateErrorCode.ProjectNotFound, projectSlug)
 		}
 
-		const removed = await this.mailTemplateManager.removeMailTemplate({
+		const removed = await this.mailTemplateManager.removeMailTemplate(context.db, {
 			projectId: project.id,
 			variant: variant || '',
 			type: this.mapMailType(type),

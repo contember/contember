@@ -1,5 +1,6 @@
 import { ProjectMemberManager } from '../service'
 import { Membership } from '../type/Membership'
+import { DatabaseContext } from '../utils'
 
 export interface Identity {
 	readonly id: string
@@ -24,10 +25,11 @@ export class ProjectAwareIdentity implements Identity {
 	constructor(
 		public readonly id: string,
 		public readonly roles: string[],
+		private readonly dbContext: DatabaseContext,
 		private readonly memberManager: ProjectMemberManager,
 	) {}
 
 	async getProjectMemberships(projectSlug: string): Promise<readonly Membership[]> {
-		return await this.memberManager.getProjectMemberships({ slug: projectSlug }, this, undefined)
+		return await this.memberManager.getProjectMemberships(this.dbContext, { slug: projectSlug }, this, undefined)
 	}
 }

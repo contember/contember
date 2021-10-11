@@ -7,14 +7,13 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response'
 
 class SignInManager {
 	constructor(
-		private readonly dbContext: DatabaseContext,
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly providers: Providers,
 		private readonly otpAuthenticator: OtpAuthenticator,
 	) {}
 
-	async signIn(email: string, password: string, expiration?: number, otpCode?: string): Promise<SignInResponse> {
-		const personRow = await this.dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
+	async signIn(dbContext: DatabaseContext, email: string, password: string, expiration?: number, otpCode?: string): Promise<SignInResponse> {
+		const personRow = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
 		if (personRow === null) {
 			return new ResponseError(SignInErrorCode.UnknownEmail, `Person with email ${email} not found`)
 		}
@@ -32,7 +31,7 @@ class SignInManager {
 			}
 		}
 
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(personRow.identity_id, expiration)
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, personRow.identity_id, expiration)
 		return new ResponseOk(new SignInResult(personRow, sessionToken))
 	}
 }

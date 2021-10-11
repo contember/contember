@@ -17,7 +17,7 @@ export class SetProjectSecretMutationResolver implements MutationResolvers {
 		args: MutationSetProjectSecretArgs,
 		context: ResolverContext,
 	): Promise<SetProjectSecretResponse> {
-		const project = await this.projectManager.getProjectBySlug(args.projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
 			action: PermissionActions.PROJECT_SET_SECRET,
@@ -26,7 +26,7 @@ export class SetProjectSecretMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(AddProjectMemberErrorCode.ProjectNotFound, args.projectSlug)
 		}
-		await this.secretManager.setSecret(project.id, args.key, args.value)
+		await this.secretManager.setSecret(context.db, project.id, args.key, args.value)
 		return { ok: true }
 	}
 }

@@ -14,19 +14,18 @@ interface MailOptions {
 
 export class PasswordResetManager {
 	constructor(
-		private readonly dbContext: DatabaseContext,
 		private readonly mailer: UserMailer,
 		private readonly permissionContextFactory: PermissionContextFactory,
 		private readonly projectManager: ProjectManager,
 	) {}
 
-	public async createPasswordResetRequest(person: PersonRow, mailOptions: MailOptions = {}) {
-		const result = await this.dbContext.commandBus.execute(new CreatePasswordResetRequestCommand(person.id))
-		const permissionContext = await this.permissionContextFactory.create({
+	public async createPasswordResetRequest(dbContext: DatabaseContext, person: PersonRow, mailOptions: MailOptions = {}) {
+		const result = await dbContext.commandBus.execute(new CreatePasswordResetRequestCommand(person.id))
+		const permissionContext = await this.permissionContextFactory.create(dbContext, {
 			id: person.identity_id,
 			roles: person.roles,
 		})
-		const projects = await this.projectManager.getProjectsByIdentity(person.identity_id, permissionContext)
+		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
 		const project = (() => {
 			if (projects.length === 1) {
 				return projects[0]
@@ -37,6 +36,7 @@ export class PasswordResetManager {
 		})()
 
 		await this.mailer.sendPasswordResetEmail(
+			dbContext,
 			{
 				email: person.email,
 				token: result.token,
@@ -49,12 +49,12 @@ export class PasswordResetManager {
 		)
 	}
 
-	public async resetPassword(token: string, password: string): Promise<ResetPasswordResponse> {
+	public async resetPassword(dbContext: DatabaseContext, token: string, password: string): Promise<ResetPasswordResponse> {
 		const weakPassword = getPasswordWeaknessMessage(password)
 		if (weakPassword) {
 			return new ResponseError(ResetPasswordErrorCode.PASSWORD_TOO_WEAK, weakPassword)
 		}
-		return await this.dbContext.commandBus.execute(new ResetPasswordCommand(token, password))
+		return await dbContext.commandBus.execute(new ResetPasswordCommand(token, password))
 	}
 }
 

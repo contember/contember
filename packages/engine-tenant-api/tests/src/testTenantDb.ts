@@ -2,7 +2,7 @@ import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
 import {
 	CreateProjectCommand,
-	createResolverContext,
+	createResolverContext, DatabaseContext,
 	PermissionContext,
 	ProjectSchemaResolver,
 	ResolverContext,
@@ -134,7 +134,9 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		.replaceService('mailer', () => mailer)
 		.build()
 
-	await tenantContainer.dbContext.commandBus.execute(new CreateProjectCommand({
+	const dbContext = new DatabaseContext(tenantContainer.db, tenantContainer.providers)
+
+	await dbContext.commandBus.execute(new CreateProjectCommand({
 		slug: 'blog',
 		name: 'blog',
 		config: {},
@@ -150,16 +152,20 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 
 	return {
 		async execute(query: GraphQLTestQuery, options: TenantTestOptions = {}): Promise<any> {
-			const context: ResolverContext = createResolverContext(
-				new PermissionContext(
-					new StaticIdentity(authenticatedIdentityId, options.roles || [], {
-						blog: [options.membership || { role: 'admin', variables: [] }],
-					}),
-					tenantContainer.authorizator,
-					tenantContainer.projectScopeFactory,
+			const context: ResolverContext = {
+				...createResolverContext(
+					new PermissionContext(
+						new StaticIdentity(authenticatedIdentityId, options.roles || [], {
+							blog: [options.membership || { role: 'admin', variables: [] }],
+						}),
+						tenantContainer.authorizator,
+						tenantContainer.projectScopeFactory,
+						dbContext,
+					),
+					authenticatedApiKeyId,
 				),
-				authenticatedApiKeyId,
-			)
+				db: dbContext,
+			}
 			const result = await graphql(
 				schema,
 				typeof query === 'string' ? query : query.query,

@@ -13,17 +13,17 @@ import { CreateProjectResponseErrorCode } from '../../schema'
 
 export class ProjectManager {
 	constructor(
-		private readonly dbContext: DatabaseContext,
 		private readonly secretManager: SecretsManager,
 		private readonly projectIntializer: ProjectInitializer,
 		private readonly apiKeyService: ApiKeyService,
 	) {}
 
 	public async createProject(
+		dbContext: DatabaseContext,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
 		ownerIdentityId: string | undefined,
 	): Promise<CreateProjectResponse> {
-		return await this.dbContext.transaction(async db => {
+		return await dbContext.transaction(async db => {
 			const bus = db.commandBus
 
 			const now = db.providers.now()
@@ -64,37 +64,37 @@ export class ProjectManager {
 		})
 	}
 
-	public async updateProject(id: string, data: Partial<Pick<Project, 'name' | 'config'>>): Promise<void> {
-		await this.dbContext.commandBus.execute(new UpdateProjectCommand(id, data))
+	public async updateProject(dbContext: DatabaseContext, id: string, data: Partial<Pick<Project, 'name' | 'config'>>): Promise<void> {
+		await dbContext.commandBus.execute(new UpdateProjectCommand(id, data))
 	}
 
-	public async getProjectBySlug(slug: string): Promise<Project | null> {
-		return await this.dbContext.queryHandler.fetch(new ProjectBySlugQuery(slug))
+	public async getProjectBySlug(dbContext: DatabaseContext, slug: string): Promise<Project | null> {
+		return await dbContext.queryHandler.fetch(new ProjectBySlugQuery(slug))
 	}
 
-	public async getProjectState(slug: string, updatedAt: Date): Promise<'valid' | 'updated' | 'not_found'> {
-		const updatedNew = await this.dbContext.queryHandler.fetch(new ProjectUpdateTimestampQuery(slug))
+	public async getProjectState(dbContext: DatabaseContext, slug: string, updatedAt: Date): Promise<'valid' | 'updated' | 'not_found'> {
+		const updatedNew = await dbContext.queryHandler.fetch(new ProjectUpdateTimestampQuery(slug))
 		if (!updatedNew) {
 			return 'not_found'
 		}
 		return updatedNew > updatedAt ? 'updated' : 'valid'
 	}
 
-	public async getProjectWithSecretsBySlug(slug: string, alias: boolean): Promise<ProjectWithSecrets | null> {
-		const project = await this.dbContext.queryHandler.fetch(new ProjectBySlugQuery(slug, alias))
+	public async getProjectWithSecretsBySlug(dbContext: DatabaseContext, slug: string, alias: boolean): Promise<ProjectWithSecrets | null> {
+		const project = await dbContext.queryHandler.fetch(new ProjectBySlugQuery(slug, alias))
 		if (!project) {
 			return null
 		}
-		const secrets = await this.secretManager.readSecrets(project.id)
+		const secrets = await this.secretManager.readSecrets(dbContext, project.id)
 		return { ...project, secrets }
 	}
 
-	public async getProjects(): Promise<Project[]> {
-		return await this.dbContext.queryHandler.fetch(new ProjectsQuery())
+	public async getProjects(dbContext: DatabaseContext): Promise<Project[]> {
+		return await dbContext.queryHandler.fetch(new ProjectsQuery())
 	}
 
-	public async getProjectsByIdentity(identityId: string, permissionContext: PermissionContext): Promise<Project[]> {
-		return await this.dbContext.queryHandler.fetch(new ProjectsByIdentityQuery(identityId, permissionContext))
+	public async getProjectsByIdentity(dbContext: DatabaseContext, identityId: string, permissionContext: PermissionContext): Promise<Project[]> {
+		return await dbContext.queryHandler.fetch(new ProjectsByIdentityQuery(identityId, permissionContext))
 	}
 }
 

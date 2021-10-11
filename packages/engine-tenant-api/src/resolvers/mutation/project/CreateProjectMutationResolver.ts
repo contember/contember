@@ -16,7 +16,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		args: MutationCreateProjectArgs,
 		context: ResolverContext,
 	): Promise<CreateProjectResponse> {
-		const project = await this.projectManager.getProjectBySlug(args.projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		if (
 			project &&
 			(await context.isAllowed({
@@ -31,6 +31,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to create a project',
 		})
 		const response = await this.projectManager.createProject(
+			context.db,
 			{
 				slug: args.projectSlug,
 				name: args.name || args.projectSlug,

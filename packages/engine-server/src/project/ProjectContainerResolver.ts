@@ -1,6 +1,6 @@
 import { ProjectContainerFactory } from './ProjectContainer'
 import { ProjectConfigResolver, ProjectContainer } from '@contember/engine-http'
-import { ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
+import { DatabaseContext, ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
 
 export class ProjectContainerResolver {
 	private containers = new Map<string, { container: ProjectContainer; cleanups: (() => void)[]; timestamp: Date }>()
@@ -13,11 +13,11 @@ export class ProjectContainerResolver {
 		private projectManager: ProjectManager,
 	) {}
 
-	public async getAllProjectContainers(): Promise<ProjectContainer[]> {
-		const projects = await this.projectManager.getProjects()
+	public async getAllProjectContainers(tenantDbContext: DatabaseContext): Promise<ProjectContainer[]> {
+		const projects = await this.projectManager.getProjects(tenantDbContext)
 		return await Promise.all(
 			projects.map(async it => {
-				const container = await this.getProjectContainer(it.slug)
+				const container = await this.getProjectContainer(tenantDbContext, it.slug)
 				if (!container) {
 					throw new Error('should not happen')
 				}
@@ -26,14 +26,14 @@ export class ProjectContainerResolver {
 		)
 	}
 
-	public async getProjectContainer(slug: string, alias: boolean = false): Promise<ProjectContainer | undefined> {
+	public async getProjectContainer(tenantDbContext: DatabaseContext, slug: string, alias: boolean = false): Promise<ProjectContainer | undefined> {
 		const realSlug = this.aliasMapping.get(slug)
 		if (realSlug) {
 			slug = realSlug
 		}
 		const existing = this.containers.get(slug)
 		if (existing) {
-			const state = await this.projectManager.getProjectState(slug, existing.timestamp)
+			const state = await this.projectManager.getProjectState(tenantDbContext, slug, existing.timestamp)
 			if (state === 'valid') {
 				return existing.container
 			}
@@ -42,7 +42,7 @@ export class ProjectContainerResolver {
 				return undefined
 			}
 		}
-		const project = await this.projectManager.getProjectWithSecretsBySlug(slug, alias)
+		const project = await this.projectManager.getProjectWithSecretsBySlug(tenantDbContext, slug, alias)
 		if (!project) {
 			return undefined
 		}

@@ -2,14 +2,15 @@ import { KoaMiddleware, KoaRequestState } from '../koa'
 import { ProjectContainer, ProjectContainerResolver } from '../ProjectContainer'
 import { ProjectConfig } from '../ProjectConfig'
 import { AuthMiddlewareState, ErrorFactory } from '../common'
+import { TenantDatabaseMiddlewareState } from '../tenant'
 
 type InputKoaState =
 	& KoaRequestState
 	& AuthMiddlewareState
+	& TenantDatabaseMiddlewareState
 
 type KoaState =
 	& InputKoaState
-	// output
 	& ProjectResolveMiddlewareState
 
 export interface ProjectResolveMiddlewareState {
@@ -27,7 +28,7 @@ export class ProjectResolveMiddlewareFactory {
 	public create(): KoaMiddleware<KoaState> {
 		const projectResolve: KoaMiddleware<KoaState> = async (ctx, next) => {
 			const projectSlug = ctx.state.params.projectSlug
-			const projectContainer = await this.projectContainerResolver.getProjectContainer(projectSlug, true)
+			const projectContainer = await this.projectContainerResolver.getProjectContainer(ctx.state.tenantDatabase, projectSlug, true)
 
 			if (projectContainer === undefined) {
 				return this.errorFactory.createError(ctx, `Project ${projectSlug} NOT found`, 404)

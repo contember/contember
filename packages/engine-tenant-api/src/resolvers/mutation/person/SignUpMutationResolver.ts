@@ -12,13 +12,13 @@ export class SignUpMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign up',
 		})
 
-		const response = await this.signUpManager.signUp(args.email, args.password)
+		const response = await this.signUpManager.signUp(context.db, args.email, args.password)
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
 		}
 		const result = response.result
-		await this.apiKeyManager.disableOneOffApiKey(context.apiKeyId)
+		await this.apiKeyManager.disableOneOffApiKey(context.db, context.apiKeyId)
 
 		return {
 			ok: true,

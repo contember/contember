@@ -18,26 +18,26 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 
 export class ProjectMemberManager {
-	constructor(private readonly dbContext: DatabaseContext) {}
 
-	async getProjectRoles(projectId: string, identityId: string): Promise<GetProjectRolesResponse> {
-		const row = await this.dbContext.queryHandler.fetch(new ProjectRolesByIdentityQuery({ id: projectId }, identityId))
+	async getProjectRoles(dbContext: DatabaseContext, projectId: string, identityId: string): Promise<GetProjectRolesResponse> {
+		const row = await dbContext.queryHandler.fetch(new ProjectRolesByIdentityQuery({ id: projectId }, identityId))
 		return new GetProjectRolesResponse(row.roles)
 	}
 
-	async getProjectBySlugRoles(projectSlug: string, identityId: string): Promise<GetProjectRolesResponse> {
-		const row = await this.dbContext.queryHandler.fetch(
+	async getProjectBySlugRoles(dbContext: DatabaseContext, projectSlug: string, identityId: string): Promise<GetProjectRolesResponse> {
+		const row = await dbContext.queryHandler.fetch(
 			new ProjectRolesByIdentityQuery({ slug: projectSlug }, identityId),
 		)
 		return new GetProjectRolesResponse(row.roles)
 	}
 
 	async addProjectMember(
+		dbContext: DatabaseContext,
 		projectId: string,
 		identityId: string,
 		memberships: readonly Membership[],
 	): Promise<AddProjectMemberResponse> {
-		return await this.dbContext.transaction(async db => {
+		return await dbContext.transaction(async db => {
 			const result = await db.commandBus.execute(
 				new AddProjectMemberCommand(projectId, identityId, createSetMembershipVariables(memberships)),
 			)
@@ -56,22 +56,24 @@ export class ProjectMemberManager {
 	}
 
 	async updateProjectMember(
+		dbContext: DatabaseContext,
 		projectId: string,
 		identityId: string,
 		memberships: readonly MembershipUpdateInput[],
 	): Promise<UpdateProjectMemberResponse> {
-		return await this.dbContext.transaction(
+		return await dbContext.transaction(
 			async db => await db.commandBus.execute(new UpdateProjectMemberCommand(projectId, identityId, memberships)),
 		)
 	}
 
-	async removeProjectMember(projectId: string, identityId: string): Promise<RemoveProjectMemberResponse> {
-		return await this.dbContext.transaction(
+	async removeProjectMember(dbContext: DatabaseContext, projectId: string, identityId: string): Promise<RemoveProjectMemberResponse> {
+		return await dbContext.transaction(
 			async db => await db.commandBus.execute(new RemoveProjectMemberCommand(projectId, identityId)),
 		)
 	}
 
 	async getProjectMemberships(
+		dbContext: DatabaseContext,
 		project: { id: string } | { slug: string },
 		identity: { id: string; roles?: string[] },
 		verifier: AccessVerifier | undefined,
@@ -79,7 +81,7 @@ export class ProjectMemberManager {
 		if (identity.roles?.includes(TenantRole.SUPER_ADMIN)) {
 			return [{ role: ProjectRole.ADMIN, variables: [] }]
 		}
-		const memberships = await this.dbContext.queryHandler.fetch(
+		const memberships = await dbContext.queryHandler.fetch(
 			new ProjectMembershipByIdentityQuery(project, [identity.id]),
 		)
 		if (verifier === undefined) {
@@ -88,8 +90,8 @@ export class ProjectMemberManager {
 		return await this.filterMemberships(memberships, verifier)
 	}
 
-	async getProjectMembers(projectId: string, accessVerifier: AccessVerifier, memberType?: MemberType): Promise<GetProjectMembersResponse> {
-		return this.dbContext.transaction(async db => {
+	async getProjectMembers(dbContext: DatabaseContext, projectId: string, accessVerifier: AccessVerifier, memberType?: MemberType): Promise<GetProjectMembersResponse> {
+		return dbContext.transaction(async db => {
 			const members = await db.queryHandler.fetch(new ProjectMembersQuery(projectId, memberType))
 			const memberships = await db.queryHandler.fetch(
 				new ProjectMembershipByIdentityQuery(

@@ -6,6 +6,10 @@ import * as assert from 'uvu/assert'
 import { test } from 'uvu'
 import prom from 'prom-client'
 import { MigrationFilesManager, MigrationsResolver } from '@contember/schema-migrations'
+import { Logger } from '@contember/engine-common'
+import { CreateProjectCommand, DatabaseContext } from '@contember/engine-tenant-api'
+import { ConflictActionType, InsertBuilder } from '@contember/database'
+import uuid from 'uuid'
 
 const dbCredentials = (dbName: string) => {
 	return {
@@ -98,14 +102,14 @@ test.before(async () => {
 	try {
 		const connection = await recreateDatabase(String(process.env.TEST_DB_NAME))
 		await connection.end()
-		const connection2 = await recreateDatabase(String(process.env.TEST_DB_NAME_TENANT))
-		await connection2.end()
+		const tenantConnection = await recreateDatabase(String(process.env.TEST_DB_NAME_TENANT))
 		const migrationsResolver = new MigrationsResolver(
 			MigrationFilesManager.createForProject(getExampleProjectDirectory(), 'sample'),
 		)
 		const container = createContainer(false)
 		await container.initializer.initialize()
 		await container.initializer.createProject(projectConfig, await migrationsResolver.getMigrations())
+		await tenantConnection.end()
 	} catch (e) {
 		// eslint-disable-next-line no-console
 		console.error(e)

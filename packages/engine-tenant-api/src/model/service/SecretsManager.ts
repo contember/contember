@@ -4,16 +4,16 @@ import { ProjectSecretsQuery } from '../queries'
 import { DatabaseContext } from '../utils'
 
 export class SecretsManager {
-	constructor(private dbContext: DatabaseContext, private providers: Providers) {}
+	constructor(private providers: Providers) {}
 
-	public async setSecret(projectId: string, key: string, value: string): Promise<void> {
-		await this.dbContext.transaction(async db => {
+	public async setSecret(dbContext: DatabaseContext, projectId: string, key: string, value: string): Promise<void> {
+		await dbContext.transaction(async db => {
 			await db.commandBus.execute(new SetProjectSecretCommand(projectId, key, value))
 			await db.commandBus.execute(new UpdateProjectCommand(projectId, {}))
 		})
 	}
 
-	public async readSecrets(projectId: string): Promise<Record<string, string>> {
-		return await this.dbContext.queryHandler.fetch(new ProjectSecretsQuery(projectId, this.providers))
+	public async readSecrets(dbContext: DatabaseContext, projectId: string): Promise<Record<string, string>> {
+		return await dbContext.queryHandler.fetch(new ProjectSecretsQuery(projectId, this.providers))
 	}
 }

@@ -24,7 +24,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 		{ projectSlug, identityId, memberships }: MutationUpdateProjectMemberArgs,
 		context: ResolverContext,
 	): Promise<UpdateProjectMemberResponse> {
-		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		const projectScope = await context.permissionContext.createProjectScope(project)
 		await context.requireAccess({
 			scope: projectScope,
@@ -35,6 +35,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			return createProjectNotFoundResponse(UpdateProjectMemberErrorCode.ProjectNotFound, projectSlug)
 		}
 		const visibleMemberships = await this.projectMemberManager.getProjectMemberships(
+			context.db,
 			{ id: project.id },
 			{ id: identityId },
 			context.permissionContext.createAccessVerifier(projectScope),
@@ -55,7 +56,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update project member variables',
 		})
 
-		const validationResult = (await this.membershipValidator.validate(project.slug, memberships)).filter(
+		const validationResult = (await this.membershipValidator.validate(context.db, project.slug, memberships)).filter(
 			it => it.error !== MembershipValidationErrorType.VARIABLE_EMPTY,
 		)
 		if (validationResult.length > 0) {
@@ -67,7 +68,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.projectMemberManager.updateProjectMember(project.id, identityId, membershipPatch)
+		const result = await this.projectMemberManager.updateProjectMember(context.db, project.id, identityId, membershipPatch)
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

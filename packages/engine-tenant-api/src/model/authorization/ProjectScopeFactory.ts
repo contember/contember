@@ -3,6 +3,7 @@ import { AclSchemaEvaluatorFactory } from './AclSchemaEvaluatorFactory'
 import { AuthorizationScope } from '@contember/authorization'
 import { ProjectScope } from './ProjectScope'
 import { Identity } from './Identity'
+import { DatabaseContext } from '../utils'
 
 export class ProjectScopeFactory {
 	constructor(
@@ -10,8 +11,8 @@ export class ProjectScopeFactory {
 		private readonly aclSchemaEvaluatorFactory: AclSchemaEvaluatorFactory,
 	) {}
 
-	async create(project: Pick<Project, 'slug'>): Promise<AuthorizationScope<Identity> | null> {
-		const schema = await this.schemaResolver.getSchema(project.slug)
+	async create(databaseContext: DatabaseContext, project: Pick<Project, 'slug'>): Promise<AuthorizationScope<Identity> | null> {
+		const schema = await this.schemaResolver.getSchema(databaseContext, project.slug)
 		if (!schema) {
 			return null
 		}

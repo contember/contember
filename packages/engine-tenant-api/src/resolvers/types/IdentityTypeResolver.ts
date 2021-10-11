@@ -9,24 +9,29 @@ import {
 import { ResolverContext } from '../ResolverContext'
 import { notEmpty } from '../../utils/array'
 import { createBatchLoader } from '../../utils/batchQuery'
+import { ImplementationException } from '../../exceptions'
 
 export class IdentityTypeResolver implements IdentityResolvers {
-	private personLoader = createBatchLoader<string, Record<string, PersonRow>, PersonRow>(
-		async ids => {
-			const persons = await this.dbContext.queryHandler.fetch(new PersonByIdentityBatchQuery(ids))
+	private personLoader = createBatchLoader<{ id: string; db: DatabaseContext }, Record<string, PersonRow>, PersonRow>(
+		async args => {
+			const ids = args.map(it => it.id)
+			const db = args[0].db
+			if (args.some(it => it.db !== db)) {
+				throw new ImplementationException()
+			}
+			const persons = await db.queryHandler.fetch(new PersonByIdentityBatchQuery(ids))
 			return Object.fromEntries(persons.map(it => [it.identity_id, it]))
 		},
-		(id, result) => result[id],
+		(arg, result) => result[arg.id],
 	)
 
 	constructor(
-		private readonly dbContext: DatabaseContext,
 		private readonly projectMemberManager: ProjectMemberManager,
 		private readonly projectManager: ProjectManager,
 	) {}
 
-	async person(parent: Identity): Promise<Maybe<Person>> {
-		const person = await this.personLoader(parent.id)
+	async person(parent: Identity, args: unknown, context: ResolverContext): Promise<Maybe<Person>> {
+		const person = await this.personLoader({ id: parent.id, db: context.db })
 		if (!person) {
 			return null
 		}
@@ -48,7 +53,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		}
 		const isSelf = parent.id === context.identity.id
 		const roles = isSelf ? context.identity.roles : []
-		const projects = await this.projectManager.getProjectsByIdentity(parent.id, context.permissionContext)
+		const projects = await this.projectManager.getProjectsByIdentity(context.db, parent.id, context.permissionContext)
 		return (
 			await Promise.all(
 				projects.map(async (it): Promise<IdentityProjectRelation | null> => {
@@ -56,6 +61,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 						? undefined
 						: context.permissionContext.createAccessVerifier(await context.permissionContext.createProjectScope(it))
 					const memberships = await this.projectMemberManager.getProjectMemberships(
+						context.db,
 						{ id: it.id },
 						{ id: parent.id, roles },
 						verifier,

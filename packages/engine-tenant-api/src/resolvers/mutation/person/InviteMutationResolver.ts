@@ -8,6 +8,7 @@ import {
 } from '../../../schema'
 import { ResolverContext } from '../../ResolverContext'
 import {
+	DatabaseContext,
 	InviteManager,
 	InviteOptions,
 	MembershipValidator,
@@ -30,7 +31,7 @@ export class InviteMutationResolver implements MutationResolvers {
 		{ projectSlug, email, memberships, options }: MutationInviteArgs,
 		context: ResolverContext,
 	): Promise<InviteResponse> {
-		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
 			action: PermissionActions.PERSON_INVITE(memberships),
@@ -39,7 +40,7 @@ export class InviteMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(InviteErrorCode.ProjectNotFound, projectSlug)
 		}
-		return this.doInvite(project, memberships, email, {
+		return this.doInvite(context.db, project, memberships, email, {
 			emailVariant: options?.mailVariant || '',
 		})
 	}
@@ -49,7 +50,7 @@ export class InviteMutationResolver implements MutationResolvers {
 		{ projectSlug, email, memberships, password }: MutationUnmanagedInviteArgs,
 		context: ResolverContext,
 	): Promise<InviteResponse> {
-		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
 			action: PermissionActions.PERSON_INVITE_UNMANAGED(memberships),
@@ -58,19 +59,20 @@ export class InviteMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(InviteErrorCode.ProjectNotFound, projectSlug)
 		}
-		return this.doInvite(project, memberships, email, {
+		return this.doInvite(context.db, project, memberships, email, {
 			noEmail: true,
 			password,
 		})
 	}
 
 	private async doInvite(
+		db: DatabaseContext,
 		project: Project,
 		memberships: ReadonlyArray<MembershipInput>,
 		email: string,
 		inviteOptions: InviteOptions = {},
 	): Promise<InviteResponse> {
-		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(db, project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<InviteErrorCode>(validationResult)
 			return {
@@ -79,7 +81,7 @@ export class InviteMutationResolver implements MutationResolvers {
 				error: errors[0],
 			}
 		}
-		const response = await this.inviteManager.invite(email, project, memberships, inviteOptions)
+		const response = await this.inviteManager.invite(db, email, project, memberships, inviteOptions)
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)

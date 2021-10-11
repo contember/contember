@@ -23,18 +23,18 @@ export interface InviteOptions {
 
 export class InviteManager {
 	constructor(
-		private readonly databaseContext: DatabaseContext,
 		private readonly providers: Providers,
 		private readonly mailer: UserMailer,
 	) {}
 
 	async invite(
+		dbContext: DatabaseContext,
 		email: string,
 		project: Project,
 		memberships: readonly Membership[],
 		options: InviteOptions = {},
 	): Promise<InviteResponse> {
-		return await this.databaseContext.transaction(async trx => {
+		return await dbContext.transaction(async trx => {
 			let person: Omit<PersonRow, 'roles'> | null = await trx.queryHandler.fetch(PersonQuery.byEmail(email))
 			const isNew = !person
 			let generatedPassword: string = ''
@@ -55,11 +55,12 @@ export class InviteManager {
 				}
 				if (isNew) {
 					await this.mailer.sendNewUserInvitedMail(
+						trx,
 						{ email, project: project.name, password: generatedPassword },
 						customMailOptions,
 					)
 				} else {
-					await this.mailer.sendExistingUserInvitedEmail({ email, project: project.name }, customMailOptions)
+					await this.mailer.sendExistingUserInvitedEmail(trx, { email, project: project.name }, customMailOptions)
 				}
 			}
 			return new ResponseOk(new InviteResult(person, isNew))

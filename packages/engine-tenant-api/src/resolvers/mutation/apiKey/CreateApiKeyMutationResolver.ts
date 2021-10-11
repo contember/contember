@@ -23,7 +23,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		context: ResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
-		const project = await this.projectManager.getProjectBySlug(projectSlug)
+		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
 			action: PermissionActions.API_KEY_CREATE,
@@ -33,7 +33,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			return createProjectNotFoundResponse(CreateApiKeyErrorCode.ProjectNotFound, projectSlug)
 		}
 
-		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(context.db, project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<CreateApiKeyErrorCode>(validationResult)
 			return {
@@ -43,7 +43,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.apiKeyManager.createProjectPermanentApiKey(project.id, memberships, description)
+		const result = await this.apiKeyManager.createProjectPermanentApiKey(context.db, project.id, memberships, description)
 
 		return {
 			ok: true,

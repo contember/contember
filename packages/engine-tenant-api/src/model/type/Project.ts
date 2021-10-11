@@ -1,4 +1,5 @@
 import { Schema } from '@contember/schema'
+import { DatabaseContext } from '../utils'
 
 export interface Project {
 	readonly id: string
@@ -13,8 +14,9 @@ export interface ProjectWithSecrets extends Project {
 }
 
 export interface ProjectSchemaResolver {
-	getSchema(projectSlug: string): Promise<Schema | undefined>
+	getSchema(tenantDbContext: DatabaseContext, projectSlug: string): Promise<Schema | undefined>
 }
+
 export interface ProjectInitializer {
 	initializeProject(project: ProjectWithSecrets): Promise<{ log: string[] }>
 }

@@ -1,5 +1,9 @@
 import { Logger } from '@contember/engine-common'
-import { ProjectInitializer as ProjectInitializerInterface, ProjectWithSecrets } from '@contember/engine-tenant-api'
+import {
+	ProjectGroup,
+	ProjectInitializer as ProjectInitializerInterface,
+	ProjectWithSecrets,
+} from '@contember/engine-tenant-api'
 import { ProjectContainerResolver } from './ProjectContainerResolver'
 import { ProjectInitializer as SystemProjectInitializer } from '@contember/engine-system-api'
 
@@ -9,8 +13,8 @@ export class ProjectInitializer implements ProjectInitializerInterface {
 		private readonly systemProjectInitializer: SystemProjectInitializer,
 	) {}
 
-	async initializeProject(project: ProjectWithSecrets) {
-		const container = await this.projectContainerResolver.createProjectContainer(project)
+	async initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets) {
+		const container = await this.projectContainerResolver.createProjectContainer(projectGroup, project)
 		if (!container) {
 			throw new Error('Should not happen')
 		}
@@ -22,7 +26,7 @@ export class ProjectInitializer implements ProjectInitializerInterface {
 				new Logger(log.push),
 			)
 		} catch (e) {
-			await this.projectContainerResolver.destroyContainer(project.slug)
+			await this.projectContainerResolver.destroyContainer(projectGroup, project.slug)
 			throw e
 		}
 		return { log }
@@ -36,10 +40,10 @@ export class ProjectInitializerProxy implements ProjectInitializerInterface {
 		this.initializer = initializer
 	}
 
-	initializeProject(project: ProjectWithSecrets) {
+	initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets) {
 		if (!this.initializer) {
 			throw new Error('Initializer is not set')
 		}
-		return this.initializer.initializeProject(project)
+		return this.initializer.initializeProject(projectGroup, project)
 	}
 }

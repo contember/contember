@@ -1,5 +1,5 @@
 import {
-	DatabaseContext,
+	ProjectGroupProvider,
 	ProjectManager,
 	Providers as TenantProviders,
 	TenantCredentials,
@@ -20,7 +20,7 @@ export class Initializer {
 		private readonly projectContainerResolver: ProjectContainerResolver,
 		private readonly tenantCredentials: TenantCredentials,
 		private readonly providers: TenantProviders,
-		private readonly tenantDbContext: DatabaseContext,
+		private readonly projectGroupProvider: ProjectGroupProvider,
 	) {}
 
 	public async initialize(): Promise<string[]> {
@@ -34,7 +34,8 @@ export class Initializer {
 		logger.groupEnd()
 
 		const projects: string[] = []
-		for (const container of await this.projectContainerResolver.getAllProjectContainers(this.tenantDbContext)) {
+		const group = this.projectGroupProvider.getGroup(undefined) // todo
+		for (const container of await this.projectContainerResolver.getAllProjectContainers(group)) {
 			const project = container.project
 			projects.push(project.slug)
 			logger.group(`\nUpdating project ${project.slug}`)
@@ -48,11 +49,12 @@ export class Initializer {
 
 	public async createProject(project: ProjectConfig, migrations: Migration[]): Promise<void> {
 		const { slug, name, ...config } = project
-		const result = await this.projectManager.createProject(this.tenantDbContext, { slug, name, config, secrets: {} }, undefined)
+		const group = this.projectGroupProvider.getGroup(undefined) // todo
+		const result = await this.projectManager.createProject(group, { slug, name, config, secrets: {} }, undefined)
 		if (!result) {
 			throw new Error('Project already exists')
 		}
-		const container = await this.projectContainerResolver.getProjectContainer(this.tenantDbContext, project.slug)
+		const container = await this.projectContainerResolver.getProjectContainer(group, project.slug)
 		if (!container) {
 			throw new Error('Should not happen')
 		}

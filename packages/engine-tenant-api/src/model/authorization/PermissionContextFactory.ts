@@ -2,7 +2,7 @@ import { Authorizator } from '@contember/authorization'
 import { IdentityFactory } from './IdentityFactory'
 import { PermissionContext } from './PermissionContext'
 import { ProjectScopeFactory } from './ProjectScopeFactory'
-import { DatabaseContext } from '../utils'
+import { ProjectGroup } from '../type'
 
 export class PermissionContextFactory {
 	constructor(
@@ -11,7 +11,8 @@ export class PermissionContextFactory {
 		private readonly projectScopeFactory: ProjectScopeFactory,
 	) {}
 
-	public create(dbContext: DatabaseContext, args: { id: string; roles: string[] }): PermissionContext {
-		return new PermissionContext(this.identityFactory.create(dbContext, args), this.authorizator, this.projectScopeFactory, dbContext)
+	public create(projectGroup: ProjectGroup, args: { id: string; roles: string[] }): PermissionContext {
+		const identity = this.identityFactory.create(projectGroup.database, args)
+		return new PermissionContext(identity, this.authorizator, this.projectScopeFactory, projectGroup)
 	}
 }

@@ -3,7 +3,7 @@ import { testUuid } from './testUuid'
 import {
 	CreateProjectCommand,
 	createResolverContext, DatabaseContext,
-	PermissionContext,
+	PermissionContext, ProjectGroup,
 	ProjectSchemaResolver,
 	ResolverContext,
 	StaticIdentity,
@@ -149,6 +149,10 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 			requireResolversForResolveType: 'ignore',
 		},
 	})
+	const projectGroup: ProjectGroup = {
+		database: dbContext,
+		slug: undefined,
+	}
 
 	return {
 		async execute(query: GraphQLTestQuery, options: TenantTestOptions = {}): Promise<any> {
@@ -160,10 +164,11 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 						}),
 						tenantContainer.authorizator,
 						tenantContainer.projectScopeFactory,
-						dbContext,
+						projectGroup,
 					),
 					authenticatedApiKeyId,
 				),
+				projectGroup,
 				db: dbContext,
 			}
 			const result = await graphql(

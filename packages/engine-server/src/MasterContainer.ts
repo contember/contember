@@ -32,13 +32,13 @@ import {
 	Koa,
 	NotModifiedMiddlewareFactory,
 	ProjectConfigResolver,
+	ProjectGroupMiddlewareFactory,
 	ProjectMemberMiddlewareFactory,
 	ProjectResolveMiddlewareFactory,
 	Providers,
 	route,
 	StageResolveMiddlewareFactory,
 	SystemGraphQLMiddlewareFactory,
-	TenantDatabaseMiddlewareFactory,
 	TenantGraphQLMiddlewareFactory,
 } from '@contember/engine-http'
 import prom from 'prom-client'
@@ -177,12 +177,12 @@ export class MasterContainerFactory {
 				new ErrorFactory(debugMode))
 			.addService('authMiddlewareFactory', ({ tenantContainer, httpErrorFactory }) =>
 				new AuthMiddlewareFactory(tenantContainer.apiKeyManager, httpErrorFactory))
-			.addService('tenantDatabaseMiddlewareFactory', ({ tenantContainer }) =>
-				new TenantDatabaseMiddlewareFactory(tenantContainer.databaseContextProvider))
-			.addService('apiMiddlewareFactory', ({ tenantDatabaseMiddlewareFactory, authMiddlewareFactory }) =>
-				new ApiMiddlewareFactory(tenantDatabaseMiddlewareFactory, authMiddlewareFactory))
+			.addService('projectGroupMiddlewareFactory', ({ tenantContainer }) =>
+				new ProjectGroupMiddlewareFactory(tenantContainer.projectGroupProvider))
 			.addService('projectResolverMiddlewareFactory', ({ projectContainerResolver, httpErrorFactory }) =>
 				new ProjectResolveMiddlewareFactory(projectContainerResolver, httpErrorFactory))
+			.addService('apiMiddlewareFactory', ({ projectGroupMiddlewareFactory, authMiddlewareFactory }) =>
+				new ApiMiddlewareFactory(projectGroupMiddlewareFactory, authMiddlewareFactory))
 			.addService('stageResolveMiddlewareFactory', ({ httpErrorFactory }) =>
 				new StageResolveMiddlewareFactory(httpErrorFactory))
 			.addService('notModifiedMiddlewareFactory', () =>
@@ -272,7 +272,7 @@ export class MasterContainerFactory {
 						projectContainerResolver,
 						config.tenant.credentials,
 						providers,
-						tenantContainer.databaseContextProvider.get(),
+						tenantContainer.projectGroupProvider,
 					),
 			)
 			.setupService('projectSchemaResolver', (it, { projectContainerResolver, schemaVersionBuilder }) => {

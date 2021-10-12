@@ -56,7 +56,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update project member variables',
 		})
 
-		const validationResult = (await this.membershipValidator.validate(context.db, project.slug, memberships)).filter(
+		const validationResult = (await this.membershipValidator.validate(context.projectGroup, project.slug, memberships)).filter(
 			it => it.error !== MembershipValidationErrorType.VARIABLE_EMPTY,
 		)
 		if (validationResult.length > 0) {

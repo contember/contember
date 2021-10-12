@@ -21,18 +21,14 @@ export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection
 	}
 }
 
-export class DatabaseContextProvider {
-
-	private dbContext = new DatabaseContext(this.db.forSchema('tenant'), this.providers)
-
+export class DatabaseContextFactory {
 	constructor(
 		private readonly db: Client,
 		private readonly providers: Providers,
 	) {
 	}
 
-	public get(): DatabaseContext {
-		// todo: scope dependent
-		return this.dbContext
+	public create(): DatabaseContext {
+		return new DatabaseContext(this.db.forSchema('tenant'), this.providers)
 	}
 }

@@ -6,10 +6,10 @@ import { createGraphQLQueryHandler } from '../graphql'
 import { ResolverContext } from '@contember/engine-tenant-api'
 import { createGraphqlRequestInfoProviderListener, GraphQLKoaState } from '../graphql'
 import { createErrorListener, ErrorLogger } from '../graphql'
-import { TenantDatabaseMiddlewareState } from './TenantDatabaseMiddleware'
+import { ProjectGroupState } from '../project-common'
 
 type KoaState =
-	& TenantDatabaseMiddlewareState
+	& ProjectGroupState
 	& AuthMiddlewareState
 	& GraphQLKoaState
 
@@ -33,7 +33,7 @@ export class TenantGraphQLMiddlewareFactory {
 		return createGraphQLQueryHandler<TenantGraphQLContext, KoaState>({
 			schema,
 			contextFactory: ctx => {
-				const context = this.resolverContextFactory.create(ctx.state.authResult, ctx.state.tenantDatabase)
+				const context = this.resolverContextFactory.create(ctx.state.authResult, ctx.state.projectGroup)
 				return {
 					...context,
 					koaContext: ctx,

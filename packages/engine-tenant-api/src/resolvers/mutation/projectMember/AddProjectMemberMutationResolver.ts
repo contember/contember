@@ -30,7 +30,7 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(AddProjectMemberErrorCode.ProjectNotFound, projectSlug)
 		}
-		const validationResult = await this.membershipValidator.validate(context.db, project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(context.projectGroup, project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<AddProjectMemberErrorCode>(validationResult)
 			return {

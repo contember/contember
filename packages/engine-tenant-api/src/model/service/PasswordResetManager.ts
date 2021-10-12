@@ -3,7 +3,7 @@ import { Response, ResponseError } from '../utils/Response'
 import { getPasswordWeaknessMessage } from '../utils/password'
 import { UserMailer } from '../mailing'
 import { PersonRow } from '../queries'
-import { PermissionContextFactory } from '../authorization'
+import { PermissionContext } from '../authorization'
 import { ProjectManager } from './ProjectManager'
 import { DatabaseContext } from '../utils'
 
@@ -15,16 +15,16 @@ interface MailOptions {
 export class PasswordResetManager {
 	constructor(
 		private readonly mailer: UserMailer,
-		private readonly permissionContextFactory: PermissionContextFactory,
 		private readonly projectManager: ProjectManager,
 	) {}
 
-	public async createPasswordResetRequest(dbContext: DatabaseContext, person: PersonRow, mailOptions: MailOptions = {}) {
+	public async createPasswordResetRequest(
+		dbContext: DatabaseContext,
+		permissionContext: PermissionContext,
+		person: PersonRow,
+		mailOptions: MailOptions = {},
+	): Promise<void> {
 		const result = await dbContext.commandBus.execute(new CreatePasswordResetRequestCommand(person.id))
-		const permissionContext = await this.permissionContextFactory.create(dbContext, {
-			id: person.identity_id,
-			roles: person.roles,
-		})
 		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
 		const project = (() => {
 			if (projects.length === 1) {

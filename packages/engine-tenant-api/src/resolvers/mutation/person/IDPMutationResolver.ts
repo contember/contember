@@ -52,7 +52,7 @@ export class IDPMutationResolver implements MutationResolvers {
 		}
 		const result = signIn.result
 		const identityId = result.person.identity_id
-		const permissionContext = this.permissionContextFactory.create(context.db, { id: identityId, roles: result.person.roles })
+		const permissionContext = this.permissionContextFactory.create(context.projectGroup, { id: identityId, roles: result.person.roles })
 		const projects = await this.identityTypeResolver.projects(
 			{ id: identityId, projects: [] },
 			{},

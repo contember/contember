@@ -33,7 +33,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			return createProjectNotFoundResponse(CreateApiKeyErrorCode.ProjectNotFound, projectSlug)
 		}
 
-		const validationResult = await this.membershipValidator.validate(context.db, project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(context.projectGroup, project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<CreateApiKeyErrorCode>(validationResult)
 			return {

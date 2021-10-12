@@ -5,7 +5,7 @@ import {
 	AclSchemaEvaluatorFactory,
 	ApiKeyManager,
 	ApiKeyService,
-	DatabaseContextProvider,
+	DatabaseContextFactory,
 	Identity,
 	IdentityFactory,
 	IDPManager,
@@ -20,6 +20,7 @@ import {
 	PasswordResetManager,
 	PermissionContextFactory,
 	PermissionsFactory,
+	ProjectGroupProvider,
 	ProjectInitializer,
 	ProjectManager,
 	ProjectMemberManager,
@@ -64,7 +65,7 @@ export type ConnectionType = Connection.ConnectionLike & Connection.ClientFactor
 
 export interface TenantContainer {
 	connection: ConnectionType
-	databaseContextProvider: DatabaseContextProvider
+	projectGroupProvider: ProjectGroupProvider
 	projectMemberManager: ProjectMemberManager
 	apiKeyManager: ApiKeyManager
 	signUpManager: SignUpManager
@@ -95,7 +96,7 @@ export class TenantContainerFactory {
 				'authorizator',
 				'resolverContextFactory',
 				'connection',
-				'databaseContextProvider',
+				'projectGroupProvider',
 			)
 	}
 
@@ -137,8 +138,8 @@ export class TenantContainerFactory {
 				new SecretsManager(providers))
 			.addService('projectManager', ({ secretManager, apiKeyService }) =>
 				new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
-			.addService('passwordResetManager', ({ userMailer, permissionContextFactory, projectManager }) =>
-				new PasswordResetManager(userMailer, permissionContextFactory, projectManager),
+			.addService('passwordResetManager', ({ userMailer, projectManager }) =>
+				new PasswordResetManager(userMailer, projectManager),
 			)
 			.addService('idpManager', () => {
 				const idpManager = new IDPManager()
@@ -177,8 +178,8 @@ export class TenantContainerFactory {
 				new SignOutMutationResolver(apiKeyManager))
 			.addService('changePasswordMutationResolver', ({ passwordChangeManager }) =>
 				new ChangePasswordMutationResolver(passwordChangeManager))
-			.addService('resetPasswordMutationResolver', ({ passwordResetManager }) =>
-				new ResetPasswordMutationResolver(passwordResetManager))
+			.addService('resetPasswordMutationResolver', ({ passwordResetManager, permissionContextFactory }) =>
+				new ResetPasswordMutationResolver(passwordResetManager, permissionContextFactory))
 			.addService('inviteMutationResolver', ({ inviteManager, projectManager, membershipValidator }) =>
 				new InviteMutationResolver(inviteManager, projectManager, membershipValidator))
 			.addService('addProjectMemberMutationResolver', ({ projectMemberManager, projectManager, membershipValidator }) =>
@@ -205,8 +206,10 @@ export class TenantContainerFactory {
 				new SetProjectSecretMutationResolver(projectManager, secretManager))
 			.addService('db', ({ connection }) =>
 				connection.createClient('tenant', { module: 'tenant' }))
-			.addService('databaseContextProvider', ({ db, providers }) =>
-				new DatabaseContextProvider(db, providers))
+			.addService('databaseContextFactory', ({ db, providers }) =>
+				new DatabaseContextFactory(db, providers))
+			.addService('projectGroupProvider', ({ databaseContextFactory }) =>
+				new ProjectGroupProvider(databaseContextFactory))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
 				new ResolverContextFactory(permissionContextFactory))
 			.addService('resolvers', container =>

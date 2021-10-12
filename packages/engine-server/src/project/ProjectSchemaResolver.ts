@@ -1,4 +1,8 @@
-import { DatabaseContext, ProjectSchemaResolver as ProjectSchemaResolverInterface } from '@contember/engine-tenant-api'
+import {
+	DatabaseContext,
+	ProjectGroup,
+	ProjectSchemaResolver as ProjectSchemaResolverInterface,
+} from '@contember/engine-tenant-api'
 import { SchemaVersionBuilder } from '@contember/engine-system-api'
 import { ProjectContainerResolver } from '@contember/engine-http'
 import { Schema } from '@contember/schema'
@@ -9,8 +13,8 @@ export class ProjectSchemaResolver implements ProjectSchemaResolverInterface {
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
 	) {}
 
-	async getSchema(tenantDbContext: DatabaseContext, slug: string) {
-		const container = await this.projectContainerResolver.getProjectContainer(tenantDbContext, slug)
+	async getSchema(projectGroup: ProjectGroup, slug: string) {
+		const container = await this.projectContainerResolver.getProjectContainer(projectGroup, slug)
 		if (!container) {
 			return undefined
 		}
@@ -26,10 +30,10 @@ export class ProjectSchemaResolverProxy implements ProjectSchemaResolverInterfac
 		this.resolver = resolver
 	}
 
-	getSchema(tenantDbContext: DatabaseContext, projectSlug: string): Promise<Schema | undefined> {
+	getSchema(projectGroup: ProjectGroup, projectSlug: string): Promise<Schema | undefined> {
 		if (!this.resolver) {
 			throw new Error('Resolved is not set')
 		}
-		return this.resolver.getSchema(tenantDbContext, projectSlug)
+		return this.resolver.getSchema(projectGroup, projectSlug)
 	}
 }

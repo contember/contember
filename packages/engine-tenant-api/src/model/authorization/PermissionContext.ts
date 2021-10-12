@@ -1,9 +1,8 @@
 import { AccessNode, AuthorizationScope, Authorizator } from '@contember/authorization'
 import { ForbiddenError } from 'apollo-server-errors'
 import { ProjectScopeFactory } from './ProjectScopeFactory'
-import { Project } from '../type'
+import { Project, ProjectGroup } from '../type'
 import { Identity } from './Identity'
-import { DatabaseContext } from '../utils'
 
 export type AccessVerifier = (action: Authorizator.Action) => Promise<boolean>
 
@@ -16,7 +15,7 @@ export class PermissionContext {
 		public readonly identity: Identity,
 		public readonly authorizator: Authorizator<Identity>,
 		private readonly projectScopeFactory: ProjectScopeFactory,
-		private readonly dbContext: DatabaseContext,
+		private readonly projectGroup: ProjectGroup,
 	) {}
 
 	public async isAllowed({
@@ -52,7 +51,7 @@ export class PermissionContext {
 			return deniedScope
 		}
 		if (!this.projectScopes[project.slug]) {
-			this.projectScopes[project.slug] = (await this.projectScopeFactory.create(this.dbContext, project)) || deniedScope
+			this.projectScopes[project.slug] = (await this.projectScopeFactory.create(this.projectGroup, project)) || deniedScope
 		}
 		return this.projectScopes[project.slug]
 	}

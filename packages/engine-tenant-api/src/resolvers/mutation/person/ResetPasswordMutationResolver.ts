@@ -11,7 +11,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { ResolverContext } from '../../ResolverContext'
 import {
 	PasswordResetManager,
-	PermissionActions,
+	PermissionActions, PermissionContextFactory,
 	PersonQuery,
 	ResetPasswordCommandErrorCode,
 	ResetPasswordErrorCode,
@@ -21,6 +21,7 @@ import { createErrorResponse } from '../../errorUtils'
 export class ResetPasswordMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly passwordResetManager: PasswordResetManager,
+		private readonly permissionContextFactory: PermissionContextFactory,
 	) {}
 
 	async createResetPasswordRequest(
@@ -38,7 +39,12 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 			return createErrorResponse(CreatePasswordResetRequestErrorCode.PersonNotFound, 'Person was not found.')
 		}
 
-		await this.passwordResetManager.createPasswordResetRequest(context.db, person, {
+
+		const permissionContext = await this.permissionContextFactory.create(context.projectGroup, {
+			id: person.identity_id,
+			roles: person.roles,
+		})
+		await this.passwordResetManager.createPasswordResetRequest(context.db, permissionContext, person, {
 			mailVariant: args.options?.mailVariant || undefined,
 			project: args.options?.mailProject || undefined,
 		})

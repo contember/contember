@@ -1,6 +1,6 @@
 import { AddProjectMemberCommand, CreateProjectCommand, SetProjectSecretCommand, UpdateProjectCommand } from '../commands'
 import { PermissionContext } from '../authorization'
-import { Project, ProjectInitializer, ProjectWithSecrets } from '../type'
+import { Project, ProjectGroup, ProjectInitializer, ProjectWithSecrets } from '../type'
 import { ProjectBySlugQuery, ProjectsByIdentityQuery, ProjectsQuery, ProjectUpdateTimestampQuery } from '../queries'
 import { SecretsManager } from './SecretsManager'
 import { DatabaseContext } from '../utils'
@@ -19,11 +19,11 @@ export class ProjectManager {
 	) {}
 
 	public async createProject(
-		dbContext: DatabaseContext,
+		projectGroup: ProjectGroup,
 		project: Pick<ProjectWithSecrets, 'name' | 'slug' | 'config' | 'secrets'>,
 		ownerIdentityId: string | undefined,
 	): Promise<CreateProjectResponse> {
-		return await dbContext.transaction(async db => {
+		return await projectGroup.database.transaction(async db => {
 			const bus = db.commandBus
 
 			const now = db.providers.now()
@@ -48,7 +48,7 @@ export class ProjectManager {
 			const deployResult = await this.apiKeyService.createProjectPermanentApiKey(db, projectId, deployMembership, `Deploy key for ${project.slug}`)
 
 			try {
-				await this.projectIntializer.initializeProject({
+				await this.projectIntializer.initializeProject(projectGroup, {
 					id: projectId,
 					...project,
 					updatedAt: now,

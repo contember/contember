@@ -1,6 +1,6 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
-import { DatabaseContext, ProjectSchemaResolver } from '../../src'
+import { DatabaseContext, ProjectGroup, ProjectSchemaResolver } from '../../src'
 import {
 	AclSchemaEvaluatorFactory,
 	createResolverContext,
@@ -96,6 +96,10 @@ export const executeTenantTest = async (test: Test) => {
 		.build()
 
 	const databaseContext = new DatabaseContext(tenantContainer.db, tenantContainer.providers)
+	const projectGroup: ProjectGroup = {
+		database: databaseContext,
+		slug: undefined,
+	}
 	const context: ResolverContext = {
 		...createResolverContext(
 			new PermissionContext(
@@ -104,10 +108,11 @@ export const executeTenantTest = async (test: Test) => {
 					isAllowed: () => Promise.resolve(true),
 				},
 				new ProjectScopeFactory(projectSchemaResolver, new AclSchemaEvaluatorFactory()),
-				databaseContext,
+				projectGroup,
 			),
 			authenticatedApiKeyId,
 		),
+		projectGroup,
 		db: databaseContext,
 	}
 

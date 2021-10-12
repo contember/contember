@@ -13,7 +13,7 @@ import {
 	InviteOptions,
 	MembershipValidator,
 	PermissionActions,
-	Project,
+	Project, ProjectGroup,
 	ProjectManager,
 } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
@@ -40,7 +40,7 @@ export class InviteMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(InviteErrorCode.ProjectNotFound, projectSlug)
 		}
-		return this.doInvite(context.db, project, memberships, email, {
+		return this.doInvite(context.projectGroup, project, memberships, email, {
 			emailVariant: options?.mailVariant || '',
 		})
 	}
@@ -59,20 +59,20 @@ export class InviteMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse(InviteErrorCode.ProjectNotFound, projectSlug)
 		}
-		return this.doInvite(context.db, project, memberships, email, {
+		return this.doInvite(context.projectGroup, project, memberships, email, {
 			noEmail: true,
 			password,
 		})
 	}
 
 	private async doInvite(
-		db: DatabaseContext,
+		projectGroup: ProjectGroup,
 		project: Project,
 		memberships: ReadonlyArray<MembershipInput>,
 		email: string,
 		inviteOptions: InviteOptions = {},
 	): Promise<InviteResponse> {
-		const validationResult = await this.membershipValidator.validate(db, project.slug, memberships)
+		const validationResult = await this.membershipValidator.validate(projectGroup, project.slug, memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult<InviteErrorCode>(validationResult)
 			return {
@@ -81,7 +81,7 @@ export class InviteMutationResolver implements MutationResolvers {
 				error: errors[0],
 			}
 		}
-		const response = await this.inviteManager.invite(db, email, project, memberships, inviteOptions)
+		const response = await this.inviteManager.invite(projectGroup.database, email, project, memberships, inviteOptions)
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)

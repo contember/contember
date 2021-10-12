@@ -31,7 +31,7 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to create a project',
 		})
 		const response = await this.projectManager.createProject(
-			context.db,
+			context.projectGroup,
 			{
 				slug: args.projectSlug,
 				name: args.name || args.projectSlug,

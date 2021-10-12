@@ -1,9 +1,9 @@
-ALTER TABLE "tenant"."project"
+ALTER TABLE "project"
 	ADD COLUMN slug TEXT DEFAULT NULL;
 
-UPDATE "tenant"."project"
+UPDATE "project"
 SET slug = name;
 
-ALTER TABLE "tenant"."project"
+ALTER TABLE "project"
 	ALTER slug DROP DEFAULT,
 	ALTER slug SET NOT NULL;

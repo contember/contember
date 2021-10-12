@@ -5,9 +5,9 @@ $BLOCK$
           SELECT
           FROM pg_proc
                    JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
-          WHERE pg_namespace.nspname = 'tenant' AND pg_proc.proname = 'uuid_generate_v4'
+          WHERE pg_namespace.nspname = 'public' AND pg_proc.proname = 'uuid_generate_v4'
             ) THEN
-            CREATE FUNCTION "tenant"."uuid_generate_v4"() RETURNS UUID
+            CREATE FUNCTION public."uuid_generate_v4"() RETURNS UUID
             AS
             $$
             SELECT OVERLAY(OVERLAY(md5(random()::TEXT || ':' || clock_timestamp()::TEXT) PLACING '4' FROM 13) PLACING

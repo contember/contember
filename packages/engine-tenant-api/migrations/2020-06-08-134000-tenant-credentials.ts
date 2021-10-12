@@ -6,11 +6,11 @@ export default async function (builder: MigrationBuilder, args: TenantMigrationA
 		const tokenHash = computeTokenHash(args.credentials.loginToken)
 		builder.sql(`
 			WITH identity AS (
-			    INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
-				VALUES ("tenant"."uuid_generate_v4"(), NULL, '["login"]'::JSONB, 'Login key', now()) RETURNING id
+			    INSERT INTO identity(id, parent_id, roles, description, created_at)
+				VALUES (public."uuid_generate_v4"(), NULL, '["login"]'::JSONB, 'Login key', now()) RETURNING id
 			)
-			INSERT INTO tenant.api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
-			SELECT "tenant"."uuid_generate_v4"(), ${escapeValue(tokenHash)}, 'permanent', identity.id, NULL, NULL, NULL, now()
+			INSERT INTO api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
+			SELECT public."uuid_generate_v4"(), ${escapeValue(tokenHash)}, 'permanent', identity.id, NULL, NULL, NULL, now()
 			FROM identity
 			`)
 	}
@@ -30,9 +30,9 @@ export default async function (builder: MigrationBuilder, args: TenantMigrationA
 
 	builder.sql(`
 			WITH identity AS (
-				INSERT INTO tenant.identity(id, parent_id, roles, description, created_at)
+				INSERT INTO identity(id, parent_id, roles, description, created_at)
 				VALUES (
-						"tenant"."uuid_generate_v4"(),
+						public."uuid_generate_v4"(),
 						NULL,
 						'["super_admin"]'::JSONB
 							|| (CASE WHEN ${escapeValue(rootEmail)} IS NOT NULL THEN '["person"]'::JSONB ELSE '[]'::JSONB END),
@@ -41,15 +41,15 @@ export default async function (builder: MigrationBuilder, args: TenantMigrationA
 					) RETURNING id
 			),
 			person AS (
-				INSERT INTO tenant.person(id, email, password_hash, identity_id)
-				SELECT "tenant"."uuid_generate_v4"(), ${escapeValue(rootEmail)}, ${escapeValue(rootPasswordHash)}, identity.id
+				INSERT INTO person(id, email, password_hash, identity_id)
+				SELECT public."uuid_generate_v4"(), ${escapeValue(rootEmail)}, ${escapeValue(rootPasswordHash)}, identity.id
 				FROM identity
 				WHERE ${escapeValue(rootEmail)} IS NOT NULL
 			    RETURNING id
 			),
 			api_key AS (
-				INSERT INTO tenant.api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
-				SELECT "tenant"."uuid_generate_v4"(), ${escapeValue(rootTokenHash)}, 'permanent', identity.id, NULL, NULL, NULL, now()
+				INSERT INTO api_key (id, token_hash, type, identity_id, disabled_at, expires_at, expiration, created_at)
+				SELECT public."uuid_generate_v4"(), ${escapeValue(rootTokenHash)}, 'permanent', identity.id, NULL, NULL, NULL, now()
 				FROM identity WHERE ${escapeValue(rootTokenHash)} IS NOT NULL
 			    RETURNING id
 			)

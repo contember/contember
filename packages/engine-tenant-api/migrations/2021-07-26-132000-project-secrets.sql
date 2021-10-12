@@ -1,4 +1,4 @@
-CREATE TABLE tenant.project_secret
+CREATE TABLE project_secret
 (
 	id              UUID        NOT NULL PRIMARY KEY,
 	project_id      UUID        NOT NULL,
@@ -7,9 +7,9 @@ CREATE TABLE tenant.project_secret
 	iv              TEXT        NOT NULL,
 	created_at      TIMESTAMPTZ NOT NULL,
 	updated_at      TIMESTAMPTZ NOT NULL,
-	CONSTRAINT project_secret_project FOREIGN KEY (project_id) REFERENCES tenant.project (id) ON DELETE CASCADE
+	CONSTRAINT project_secret_project FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX project_secret_unique ON tenant.project_secret (project_id, key);
+CREATE UNIQUE INDEX project_secret_unique ON project_secret (project_id, key);
 CREATE INDEX project_secret_project_index
-	ON tenant.project_secret (project_id);
+	ON project_secret (project_id);

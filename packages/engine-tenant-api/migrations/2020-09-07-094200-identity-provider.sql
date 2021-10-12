@@ -1,4 +1,4 @@
-CREATE TABLE tenant.identity_provider (
+CREATE TABLE identity_provider (
 	id            UUID        NOT NULL,
 	slug          TEXT UNIQUE NOT NULL,
 	type          TEXT        NOT NULL,

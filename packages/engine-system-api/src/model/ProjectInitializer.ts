@@ -43,7 +43,7 @@ export class ProjectInitializer {
 				.create(unnamedIdentity)
 
 			const schemaResolver = () => this.schemaVersionBuilder.buildSchema(dbContextMigrations)
-			await this.systemDbMigrationsRunnerFactory(project.db, pgClient).migrate<MigrationArgs>(
+			await this.systemDbMigrationsRunnerFactory(project.db, pgClient).migrate(
 				logger.write.bind(logger),
 				{
 					schemaResolver,

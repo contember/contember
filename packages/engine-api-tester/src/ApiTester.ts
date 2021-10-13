@@ -99,7 +99,7 @@ export class ApiTester {
 		const schemaResolver = () => systemContainer.schemaVersionBuilder.buildSchema(dbContextMigrations)
 		await systemContainer
 			.systemDbMigrationsRunnerFactory(dbCredentials(dbName), pgClient)
-			.migrate<MigrationArgs>(() => null, {
+			.migrate(() => null, {
 				schemaResolver,
 				project: projectConfig,
 				queryHandler: null as any,

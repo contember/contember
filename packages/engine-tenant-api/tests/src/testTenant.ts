@@ -69,6 +69,7 @@ export const executeTenantTest = async (test: Test) => {
 			user: 'foo',
 		},
 		{},
+		{},
 	)
 		.createBuilder({
 			providers: {

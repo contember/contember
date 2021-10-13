@@ -1,11 +1,4 @@
-import {
-	ProjectGroupProvider,
-	ProjectManager,
-	Providers as TenantProviders,
-	TenantCredentials,
-	TenantMigrationArgs,
-} from '@contember/engine-tenant-api'
-import { MigrationsRunner } from '@contember/database-migrations'
+import { MigrationsRunnerFactory, ProjectGroupProvider, ProjectManager } from '@contember/engine-tenant-api'
 import { ProjectInitializer } from '@contember/engine-system-api'
 import { Logger } from '@contember/engine-common'
 import { ProjectContainerResolver } from '../project'
@@ -14,12 +7,10 @@ import { Migration } from '@contember/schema-migrations'
 
 export class Initializer {
 	constructor(
-		private readonly tenantDbMigrationsRunner: MigrationsRunner,
+		private readonly tenantDbMigrationsRunnerFactory: MigrationsRunnerFactory,
 		private readonly projectManager: ProjectManager,
 		private readonly projectInitializer: ProjectInitializer,
 		private readonly projectContainerResolver: ProjectContainerResolver,
-		private readonly tenantCredentials: TenantCredentials,
-		private readonly providers: TenantProviders,
 		private readonly projectGroupProvider: ProjectGroupProvider,
 	) {}
 
@@ -27,14 +18,12 @@ export class Initializer {
 		// eslint-disable-next-line no-console
 		const logger = new Logger(console.log)
 		logger.group('\nInitializing tenant database')
-		await this.tenantDbMigrationsRunner.migrate<TenantMigrationArgs>(logger.write.bind(logger), {
-			credentials: this.tenantCredentials,
-			providers: this.providers,
-		})
+		// todo
+		await this.tenantDbMigrationsRunnerFactory.create('tenant').run(logger.write.bind(logger))
 		logger.groupEnd()
 
 		const projects: string[] = []
-		const group = this.projectGroupProvider.getGroup(undefined) // todo
+		const group = await this.projectGroupProvider.getGroup(undefined) // todo
 		for (const container of await this.projectContainerResolver.getAllProjectContainers(group)) {
 			const project = container.project
 			projects.push(project.slug)
@@ -49,7 +38,7 @@ export class Initializer {
 
 	public async createProject(project: ProjectConfig, migrations: Migration[]): Promise<void> {
 		const { slug, name, ...config } = project
-		const group = this.projectGroupProvider.getGroup(undefined) // todo
+		const group = await this.projectGroupProvider.getGroup(undefined) // todo
 		const result = await this.projectManager.createProject(group, { slug, name, config, secrets: {} }, undefined)
 		if (!result) {
 			throw new Error('Project already exists')

@@ -8,7 +8,6 @@ import {
 } from '@contember/engine-content-api'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { ProjectInitializer as ProjectInitializerInterface, TenantContainerFactory } from '@contember/engine-tenant-api'
-import getTenantMigrations from '@contember/engine-tenant-api/migrations'
 import getSystemMigrations from '@contember/engine-system-api/migrations'
 import { Builder } from '@contember/dic'
 import { Config } from './config/config'
@@ -96,7 +95,7 @@ export class MasterContainerFactory {
 			.addService('plugins', () =>
 				plugins)
 			.addService('tenantContainerFactory', ({ config }) =>
-				new TenantContainerFactory(config.tenant.db, config.tenant.mailer))
+				new TenantContainerFactory(config.tenant.db, config.tenant.mailer, config.tenant.credentials))
 			.addService('systemContainerFactory', () =>
 				new SystemContainerFactory())
 			.addService('providers', ({ config }) => {
@@ -260,18 +259,14 @@ export class MasterContainerFactory {
 
 				return app
 			})
-			.addService('tenantMigrationsRunner', ({ config }) =>
-				new MigrationsRunner(config.tenant.db, 'tenant', getTenantMigrations))
 			.addService(
 				'initializer',
-				({ tenantMigrationsRunner, tenantContainer, systemContainer, projectContainerResolver, config, providers }) =>
+				({ tenantContainer, systemContainer, projectContainerResolver }) =>
 					new Initializer(
-						tenantMigrationsRunner,
+						tenantContainer.migrationsRunnerFactory,
 						tenantContainer.projectManager,
 						systemContainer.projectInitializer,
 						projectContainerResolver,
-						config.tenant.credentials,
-						providers,
 						tenantContainer.projectGroupProvider,
 					),
 			)

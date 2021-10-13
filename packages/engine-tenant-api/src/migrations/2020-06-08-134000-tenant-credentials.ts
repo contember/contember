@@ -1,9 +1,10 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
-import { computeTokenHash, TenantMigrationArgs } from '../'
+import { TenantMigrationArgs } from './types'
 
 export default async function (builder: MigrationBuilder, args: TenantMigrationArgs) {
-	if (args.credentials.loginToken) {
-		const tokenHash = computeTokenHash(args.credentials.loginToken)
+	const credentials = await args.getCredentials()
+	if (credentials.loginTokenHash) {
+		const tokenHash = credentials.loginTokenHash
 		builder.sql(`
 			WITH identity AS (
 			    INSERT INTO identity(id, parent_id, roles, description, created_at)
@@ -15,18 +16,17 @@ export default async function (builder: MigrationBuilder, args: TenantMigrationA
 			`)
 	}
 
-	if (!args.credentials.rootToken) {
+	if (!credentials.rootTokenHash) {
 		throw 'Please specify a root token using CONTEMBER_ROOT_TOKEN env variable.'
 	}
 
-	if (args.credentials.rootEmail && !args.credentials.rootPassword) {
+	if (credentials.rootEmail && !credentials.rootPasswordBcrypted) {
 		throw 'Please specify a root password using CONTEMBER_ROOT_PASSWORD env variable.'
 	}
-	const rootEmail = args.credentials.rootPassword ? args.credentials.rootEmail || 'root@localhost' : null
-	const rootPassword = args.credentials.rootPassword || null
-	const rootPasswordHash = rootPassword ? await args.providers.bcrypt(rootPassword) : null
+	const rootEmail = credentials.rootPasswordBcrypted ? credentials.rootEmail || 'root@localhost' : null
+	const rootPasswordHash = credentials.rootPasswordBcrypted || null
 
-	const rootTokenHash = args.credentials.rootToken ? computeTokenHash(args.credentials.rootToken) : null
+	const rootTokenHash = credentials.rootTokenHash
 
 	builder.sql(`
 			WITH identity AS (

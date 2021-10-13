@@ -60,6 +60,7 @@ import {
 } from './resolvers'
 import * as Schema from './schema'
 import { createMailer, MailerOptions, TemplateRenderer } from './utils'
+import { MigrationsRunnerFactory, TenantCredentials } from './migrations'
 
 export type ConnectionType = Connection.ConnectionLike & Connection.ClientFactory & Connection.PoolStatusProvider
 
@@ -73,6 +74,7 @@ export interface TenantContainer {
 	resolvers: Schema.Resolvers
 	resolverContextFactory: ResolverContextFactory
 	authorizator: Authorizator<Identity>
+	migrationsRunnerFactory: MigrationsRunnerFactory
 }
 
 export interface TenantContainerArgs {
@@ -82,7 +84,11 @@ export interface TenantContainerArgs {
 }
 
 export class TenantContainerFactory {
-	constructor(private readonly tenantDbCredentials: DatabaseCredentials, private readonly mailOptions: MailerOptions) {}
+	constructor(
+		private readonly tenantDbCredentials: DatabaseCredentials,
+		private readonly mailOptions: MailerOptions,
+		private readonly tenantCredentials: TenantCredentials,
+	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {
 		return this.createBuilder(args)
@@ -97,6 +103,7 @@ export class TenantContainerFactory {
 				'resolverContextFactory',
 				'connection',
 				'projectGroupProvider',
+				'migrationsRunnerFactory',
 			)
 	}
 
@@ -208,6 +215,8 @@ export class TenantContainerFactory {
 				connection.createClient('tenant', { module: 'tenant' }))
 			.addService('databaseContextFactory', ({ db, providers }) =>
 				new DatabaseContextFactory(db, providers))
+			.addService('migrationsRunnerFactory', ({ providers }) =>
+				new MigrationsRunnerFactory(this.tenantDbCredentials, this.tenantCredentials, providers))
 			.addService('projectGroupProvider', ({ databaseContextFactory }) =>
 				new ProjectGroupProvider(databaseContextFactory))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>

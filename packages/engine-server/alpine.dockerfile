@@ -14,7 +14,7 @@ RUN apk --no-cache add curl
 COPY --from=builder /src/server/server.js /src/
 COPY --from=builder /src/server/node_modules /src/node_modules
 COPY --from=builder /src/packages/engine-system-api/migrations /src/system-migrations
-COPY --from=builder /src/packages/engine-tenant-api/migrations /src/tenant-migrations
+COPY --from=builder /src/packages/engine-tenant-api/src/migrations /src/tenant-migrations
 COPY --from=builder /src/packages/engine-server/package.json /src/package.json
 COPY --from=builder /src/license.md /src/
 

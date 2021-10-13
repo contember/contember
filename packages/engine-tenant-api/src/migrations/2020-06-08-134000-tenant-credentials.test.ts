@@ -8,13 +8,10 @@ const credentialsMigrationTest = suite('credentials migration ')
 credentialsMigrationTest('generate sql with root token and login token', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
-		providers: {
-			bcrypt: val => Promise.resolve(`${val}-bcrypted`),
-		},
-		credentials: {
-			loginToken: 'helloworld',
-			rootToken: 'foobar',
-		},
+		getCredentials: async () => ({
+			loginTokenHash: '936a185caaa266bb9cbe981e9e05cb78cd732b0b3280eb944412bb6f8f8f07af',
+			rootTokenHash: 'c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2',
+		}),
 	})
 	assert.equal(
 		builder.getSql(),
@@ -65,14 +62,11 @@ UPDATE "api_key"
 credentialsMigrationTest('generate sql with both root user and token', async () => {
 	const builder = createMigrationBuilder()
 	await migration(builder, {
-		providers: {
-			bcrypt: val => Promise.resolve(`${val}-bcrypted`),
-		},
-		credentials: {
-			rootPassword: 'pwd',
-			rootToken: 'tkn',
+		getCredentials: async () => ({
+			rootPasswordBcrypted: 'pwd-bcrypted',
+			rootTokenHash: 'd96f62ea0f2f543aa7822a58114f75dbcc05bdf970fb15eb55eea836a1439e43',
 			rootEmail: 'john@doe.com',
-		},
+		}),
 	})
 	assert.equal(
 		builder.getSql(),

@@ -7,9 +7,6 @@
 		},
 		{
 			"path": "./tests"
-		},
-		{
-			"path": "./migrations"
 		}
 	]
 }

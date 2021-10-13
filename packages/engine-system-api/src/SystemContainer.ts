@@ -16,7 +16,6 @@ import {
 	DiffBuilder,
 	EntitiesSelector,
 	ExecutedMigrationsResolver,
-	HistoryEventResponseBuilder,
 	MigrationAlterer,
 	MigrationExecutor,
 	PermissionsFactory,
@@ -38,8 +37,8 @@ import {
 	TruncateMutationResolver,
 } from './resolvers'
 import { ClientBase } from 'pg'
-import { IdentityFetcher } from './model/dependencies/tenant/IdentityFetcher'
 import { MigrationAlterMutationResolver } from './resolvers/mutation/MigrationAlterMutationResolver'
+import { MigrationArgs } from './migrations'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory
@@ -50,14 +49,14 @@ export interface SystemContainer {
 	systemDbMigrationsRunnerFactory: SystemDbMigrationsRunnerFactory
 }
 
-export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner
+export type SystemDbMigrationsRunnerFactory = (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
 
 type Args = {
 	providers: UuidProvider
 	modificationHandlerFactory: ModificationHandlerFactory
 	entitiesSelector: EntitiesSelector
 	eventApplier: ContentEventsApplier
-	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner
+	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
 }
 
 export class SystemContainerFactory {

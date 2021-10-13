@@ -4,7 +4,7 @@ import { RunnerOptionClient, RunnerOptionUrl } from 'node-pg-migrate/dist/types'
 import { createDatabaseIfNotExists } from './helpers'
 import { Migration } from './runner'
 
-export class MigrationsRunner {
+export class MigrationsRunner<MigrationArgs> {
 	constructor(
 		private readonly db: DatabaseCredentials,
 		private readonly schema: string,
@@ -12,7 +12,7 @@ export class MigrationsRunner {
 		private readonly dbClient?: ClientBase,
 	) {}
 
-	public async migrate<MigrationArgs>(
+	public async migrate(
 		log: (msg: string) => void,
 		migrationArgs?: MigrationArgs,
 	): Promise<{ name: string }[]> {

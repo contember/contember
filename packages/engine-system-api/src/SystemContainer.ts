@@ -9,10 +9,6 @@ import {
 import { MigrationsRunner } from '@contember/database-migrations'
 import { DatabaseCredentials } from '@contember/database'
 import {
-	CreatedRowReferenceDependencyBuilder,
-	DeletedRowReferenceDependencyBuilder,
-	DependencyBuilderList,
-	DiffBuilder,
 	EntitiesSelector,
 	ExecutedMigrationsResolver,
 	MigrationAlterer,
@@ -21,10 +17,8 @@ import {
 	ProjectInitializer,
 	ProjectMigrator,
 	ProjectTruncateExecutor,
-	SameRowDependencyBuilder,
 	SchemaVersionBuilder,
 	StageCreator,
-	TransactionDependencyBuilder,
 } from './model'
 import { UuidProvider } from './utils'
 import {
@@ -94,19 +88,10 @@ export class SystemContainerFactory {
 				new MigrationExecutor(modificationHandlerFactory))
 			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
 				new MigrationDescriber(modificationHandlerFactory))
-			.addService('dependencyBuilder', ({}) =>
-				new DependencyBuilderList([
-					new SameRowDependencyBuilder(),
-					new TransactionDependencyBuilder(),
-					new DeletedRowReferenceDependencyBuilder(),
-					new CreatedRowReferenceDependencyBuilder(),
-				]))
 			.addService('projectMigrator', ({ migrationDescriber, schemaVersionBuilder, executedMigrationsResolver }) =>
 				new ProjectMigrator(migrationDescriber, schemaVersionBuilder, executedMigrationsResolver))
 			.addService('stageCreator', () =>
 				new StageCreator())
-			.addService('diffBuilder', ({ dependencyBuilder, schemaVersionBuilder }) =>
-				new DiffBuilder(dependencyBuilder, schemaVersionBuilder, container.entitiesSelector))
 			.addService('projectTruncateExecutor', () =>
 				new ProjectTruncateExecutor())
 			.addService('migrationAlterer', () =>

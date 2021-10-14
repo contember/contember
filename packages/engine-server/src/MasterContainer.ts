@@ -142,8 +142,8 @@ export class MasterContainerFactory {
 				new ProjectContainerFactory(debugMode, plugins, schemaVersionBuilder, providers))
 			.addService('tenantProjectManager', ({ tenantContainer }) =>
 				tenantContainer.projectManager)
-			.addService('projectContainerResolver', ({ tenantProjectManager, projectContainerFactory, projectConfigResolver }) =>
-				new ProjectContainerResolver(projectContainerFactory, projectConfigResolver, tenantProjectManager))
+			.addService('projectContainerResolver', ({ tenantProjectManager, projectContainerFactory, projectConfigResolver, systemContainer }) =>
+				new ProjectContainerResolver(projectContainerFactory, projectConfigResolver, tenantProjectManager, systemContainer.projectInitializer))
 			.addService('tenantGraphQlMiddlewareFactory', ({ tenantContainer }) =>
 				new TenantGraphQLMiddlewareFactory(tenantContainer.resolvers, tenantContainer.resolverContextFactory, logSentryError))
 			.addService('systemGraphQLMiddlewareFactory', ({ systemContainer, debugMode }) =>
@@ -268,8 +268,8 @@ export class MasterContainerFactory {
 			.setupService('projectSchemaResolver', (it, { projectContainerResolver, schemaVersionBuilder }) => {
 				it.setResolver(new ProjectSchemaResolver(projectContainerResolver, schemaVersionBuilder))
 			})
-			.setupService('projectInitializer', (it, { projectContainerResolver, systemContainer }) => {
-				it.setInitializer(new ProjectInitializer(projectContainerResolver, systemContainer.projectInitializer))
+			.setupService('projectInitializer', (it, { projectContainerResolver }) => {
+				it.setInitializer(new ProjectInitializer(projectContainerResolver))
 			})
 			.build()
 

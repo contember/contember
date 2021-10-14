@@ -1,6 +1,7 @@
 import { ProjectGroup } from '../type'
-import { DatabaseContextFactory, PromiseMap } from '../utils'
+import { DatabaseContextFactory } from '../utils'
 import { MigrationsRunnerFactory } from '../../migrations'
+import { PromiseMap } from '@contember/engine-common'
 
 export class ProjectGroupProvider {
 	private projectGroups = new PromiseMap<string | undefined, ProjectGroup>()

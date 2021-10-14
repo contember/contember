@@ -8,7 +8,6 @@ import {
 	ProjectScopeFactory,
 	ResolverContext,
 	StaticIdentity,
-	TenantContainer,
 	TenantContainerFactory,
 	typeDefs,
 } from '../../src'

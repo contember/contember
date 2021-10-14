@@ -24,5 +24,5 @@ export interface ProjectSchemaResolver {
 }
 
 export interface ProjectInitializer {
-	initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets): Promise<{ log: string[] }>
+	initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets): Promise<void>
 }

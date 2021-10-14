@@ -130,7 +130,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 			providers,
 			projectSchemaResolver,
 			projectInitializer: {
-				initializeProject: () => Promise.resolve({ log: [] }),
+				initializeProject: () => Promise.resolve(),
 			},
 		})
 		.replaceService('mailer', () => mailer)

@@ -1,32 +1,17 @@
-import { Logger } from '@contember/engine-common'
 import {
 	ProjectGroup,
 	ProjectInitializer as ProjectInitializerInterface,
 	ProjectWithSecrets,
 } from '@contember/engine-tenant-api'
 import { ProjectContainerResolver } from './ProjectContainerResolver'
-import { ProjectInitializer as SystemProjectInitializer } from '@contember/engine-system-api'
 
 export class ProjectInitializer implements ProjectInitializerInterface {
 	constructor(
 		private readonly projectContainerResolver: ProjectContainerResolver,
-		private readonly systemProjectInitializer: SystemProjectInitializer,
 	) {}
 
 	async initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets) {
-		const container = this.projectContainerResolver.createProjectContainer(projectGroup, project)
-		const log: string[] = []
-		try {
-			await this.systemProjectInitializer.initialize(
-				container.systemDatabaseContextFactory,
-				container.project,
-				new Logger(log.push),
-			)
-		} catch (e) {
-			await this.projectContainerResolver.destroyContainer(projectGroup, project.slug)
-			throw e
-		}
-		return { log }
+		await this.projectContainerResolver.createProjectContainer(projectGroup, project)
 	}
 }
 

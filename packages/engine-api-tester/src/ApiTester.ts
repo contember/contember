@@ -1,6 +1,5 @@
 import {
 	DatabaseContextFactory,
-	MigrationArgs,
 	ProjectConfig,
 	SystemContainer,
 	SystemContainerFactory,
@@ -9,8 +8,6 @@ import {
 } from '@contember/engine-system-api'
 import { MigrationFilesManager, MigrationsResolver, ModificationHandlerFactory } from '@contember/schema-migrations'
 import {
-	ContentApplyDependenciesFactoryImpl,
-	ContentEventApplier,
 	createMapperContainer,
 	EntitiesSelector,
 	EntitiesSelectorMapperFactory,
@@ -73,7 +70,6 @@ export class ApiTester {
 			entitiesSelector: new EntitiesSelector(mapperFactory, permissionsByIdentityFactory),
 			modificationHandlerFactory,
 			providers: providers,
-			eventApplier: new ContentEventApplier(new ContentApplyDependenciesFactoryImpl()),
 			systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) =>
 				new MigrationsRunner(db, 'system', getSystemMigrations, dbClient),
 		})

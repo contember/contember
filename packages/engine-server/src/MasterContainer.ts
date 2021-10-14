@@ -1,6 +1,4 @@
 import {
-	ContentApplyDependenciesFactoryImpl,
-	ContentEventApplier,
 	createMapperContainer,
 	EntitiesSelector,
 	EntitiesSelectorMapperFactory,
@@ -128,15 +126,12 @@ export class MasterContainerFactory {
 					}).mapperFactory(db)
 				return new EntitiesSelector(mapperFactory, permissionsByIdentityFactory)
 			})
-			.addService('eventApplier', () =>
-				new ContentEventApplier(new ContentApplyDependenciesFactoryImpl()))
 			.addService('systemDbMigrationsRunnerFactory', () =>
 				(db: DatabaseCredentials, dbClient: ClientBase) =>
 					new MigrationsRunner(db, 'system', getSystemMigrations, dbClient))
-			.addService('systemContainer', ({ systemContainerFactory, entitiesSelector, eventApplier, modificationHandlerFactory, providers, systemDbMigrationsRunnerFactory }) =>
+			.addService('systemContainer', ({ systemContainerFactory, entitiesSelector, modificationHandlerFactory, providers, systemDbMigrationsRunnerFactory }) =>
 				systemContainerFactory.create({
 					entitiesSelector,
-					eventApplier,
 					modificationHandlerFactory,
 					providers,
 					systemDbMigrationsRunnerFactory,

@@ -9,7 +9,6 @@ import {
 import { MigrationsRunner } from '@contember/database-migrations'
 import { DatabaseCredentials } from '@contember/database'
 import {
-	ContentEventsApplier,
 	CreatedRowReferenceDependencyBuilder,
 	DeletedRowReferenceDependencyBuilder,
 	DependencyBuilderList,
@@ -55,7 +54,6 @@ type Args = {
 	providers: UuidProvider
 	modificationHandlerFactory: ModificationHandlerFactory
 	entitiesSelector: EntitiesSelector
-	eventApplier: ContentEventsApplier
 	systemDbMigrationsRunnerFactory: (db: DatabaseCredentials, dbClient: ClientBase) => MigrationsRunner<MigrationArgs>
 }
 

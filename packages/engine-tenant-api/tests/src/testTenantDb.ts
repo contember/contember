@@ -3,7 +3,7 @@ import { testUuid } from './testUuid'
 import {
 	computeTokenHash,
 	CreateProjectCommand,
-	createResolverContext, DatabaseContext,
+	createResolverContext, DatabaseContext, MigrationsRunnerFactory,
 	PermissionContext, ProjectGroup,
 	ProjectSchemaResolver,
 	ResolverContext,
@@ -99,10 +99,6 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 	const credentials = dbCredentials(dbName)
 	const conn = await recreateDatabase(dbName)
 	await conn.end()
-	const getMigrations = (await import(process.env.CONTEMBER_TENANT_MIGRATIONS_DIR || '../../migrations')).default
-	const migrationsRunner = new MigrationsRunner<TenantMigrationArgs>(credentials, 'tenant', getMigrations)
-
-	let counter = 0
 	const providers = {
 		bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
 		bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),
@@ -118,12 +114,13 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		hash: (value: any) => Buffer.from(value.toString()),
 	}
 
-	await migrationsRunner.migrate(() => {}, {
-		getCredentials: async () => ({
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-			rootTokenHash: computeTokenHash(process.env.CONTEMBER_ROOT_TOKEN!),
-		}),
-	})
+	const migrationsRunnerFactory = new MigrationsRunnerFactory(credentials, {
+		rootToken: process.env.CONTEMBER_ROOT_TOKEN,
+	}, providers)
+	let counter = 0
+	const migrationsRunner = migrationsRunnerFactory.create('tenant')
+
+	await migrationsRunner.run(() => null)
 	const mailer = createMockedMailer()
 	const tenantContainer = new TenantContainerFactory(credentials, {}, {})
 		.createBuilder({

@@ -48,8 +48,7 @@ export class TesterStageManager {
 
 	public async createStage(slug: string): Promise<void> {
 		const stage = this.getStageInternal(slug)
-		const nullLogger = new Logger(() => {})
-		await this.stageCreator.createStage(this.db, stage.base ? this.getStage(stage.base) : null, stage, nullLogger)
+		await this.stageCreator.createStage(this.db, stage)
 		this.createdStages.add(slug)
 	}
 

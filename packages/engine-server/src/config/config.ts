@@ -381,7 +381,7 @@ export async function readConfig(
 				additionalConfig,
 			)
 			if (!mergedConfig.stages) {
-				mergedConfig.stages = { live: { base: null } }
+				mergedConfig.stages = { live: { } }
 			}
 			const resolvedConfig = resolveParameters(mergedConfig, (parts, path, dataResolver) => {
 				if (parts[0] === 'project') {

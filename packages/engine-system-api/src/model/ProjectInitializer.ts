@@ -1,7 +1,7 @@
 import { unnamedIdentity } from './helpers'
 import { ProjectConfig, StageConfig } from '../types'
 import { ProjectMigrator, SchemaVersionBuilder } from './migrations'
-import { createStageTree, StageCreator } from './stages'
+import { StageCreator } from './stages'
 import { DatabaseContext, DatabaseContextFactory } from './database'
 import { SystemDbMigrationsRunnerFactory } from '../SystemContainer'
 import {
@@ -11,7 +11,6 @@ import {
 	retryTransaction,
 	SingleConnection,
 } from '@contember/database'
-import { MigrationArgs } from '../migrations'
 import { createDatabaseIfNotExists, createPgClient } from '@contember/database-migrations'
 import { Logger } from '@contember/engine-common'
 import { Migration } from '@contember/schema-migrations'
@@ -67,11 +66,10 @@ export class ProjectInitializer {
 		logger: Logger,
 		migrations?: Migration[],
 	) {
-		const stageTree = createStageTree(project)
-		const root = stageTree.getRoot()
 
-		const createStage = async (parent: StageConfig | null, stage: StageConfig) => {
-			const created = await this.stageCreator.createStage(db, parent, stage, logger)
+		logger.group(`Creating stages`)
+		for (const stage of project.stages) {
+			const created = await this.stageCreator.createStage(db, stage)
 			if (created) {
 				logger.write(`Created stage ${stage.slug} `)
 			} else {
@@ -79,15 +77,6 @@ export class ProjectInitializer {
 			}
 		}
 
-		const createRecursive = async (parent: StageConfig | null, stage: StageConfig) => {
-			await createStage(parent, stage)
-			for (const childStage of stageTree.getChildren(stage)) {
-				await createRecursive(stage, childStage)
-			}
-		}
-
-		logger.group(`Creating stages`)
-		await createRecursive(null, root)
 		logger.groupEnd()
 		if (migrations) {
 			logger.group(`Executing project migrations`)

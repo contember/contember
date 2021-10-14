@@ -11,7 +11,6 @@ export type ProjectConfig = {
 export interface StageConfig {
 	readonly slug: string
 	readonly name: string
-	readonly base?: string
 }
 
 export type ProjectConfigResolver = (

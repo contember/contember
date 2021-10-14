@@ -1,4 +1,3 @@
-import { createStageTree, StageTree } from '../stages'
 import { Migration, MigrationDescriber } from '@contember/schema-migrations'
 import { Client, QueryError, wrapIdentifier } from '@contember/database'
 import { formatSchemaName } from '../helpers'
@@ -10,7 +9,6 @@ import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
 import { ProjectConfig } from '../../types'
 import { SchemaVersionBuilder } from './SchemaVersionBuilder'
-import { StagingDisabledError } from '../../StagingDisabledError'
 
 export class ProjectMigrator {
 	constructor(
@@ -26,7 +24,6 @@ export class ProjectMigrator {
 		logger: (message: string) => void,
 		ignoreOrder: boolean = false,
 	) {
-		const stageTree = createStageTree(project)
 		if (migrationsToExecute.length === 0) {
 			return
 		}
@@ -35,10 +32,6 @@ export class ProjectMigrator {
 
 		const sorted = [...migrationsToExecute].sort((a, b) => a.version.localeCompare(b.version))
 
-		const rootStage = stageTree.getRoot()
-		if (stageTree.getChildren(rootStage).length !== 0) {
-			throw new StagingDisabledError()
-		}
 		for (const migration of sorted) {
 			logger(`Executing migration ${migration.name}...`)
 			const formatVersion = migration.formatVersion
@@ -46,7 +39,7 @@ export class ProjectMigrator {
 			for (const modification of migration.modifications) {
 				[schema] = await this.applyModification(
 					db.client,
-					stageTree,
+					project.stages,
 					schema,
 					modification,
 					formatVersion,
@@ -93,19 +86,20 @@ export class ProjectMigrator {
 
 	private async applyModification(
 		db: Client,
-		stageTree: StageTree,
+		stages: StageWithoutEvent[],
 		schema: Schema,
 		modification: Migration.Modification,
 		formatVersion: number,
 		migrationVersion: string,
 	): Promise<[Schema]> {
-		const stage = stageTree.getRoot()
 		const {
 			sql,
 			schema: newSchema,
 			handler,
 		} = await this.migrationDescriber.describeModification(schema, modification, formatVersion)
-		await this.executeOnStage(db, stage, sql, migrationVersion)
+		for (const stage of stages) {
+			await this.executeOnStage(db, stage, sql, migrationVersion)
+		}
 		return [newSchema]
 	}
 

@@ -115,6 +115,7 @@ export const createTenantTester = async (): Promise<TenantTester> => {
 		encrypt: () => {
 			throw new Error('not supported')
 		},
+		hash: (value: any) => Buffer.from(value.toString()),
 	}
 
 	await migrationsRunner.migrate(() => {}, {

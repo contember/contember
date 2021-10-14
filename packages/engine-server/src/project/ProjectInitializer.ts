@@ -14,10 +14,7 @@ export class ProjectInitializer implements ProjectInitializerInterface {
 	) {}
 
 	async initializeProject(projectGroup: ProjectGroup, project: ProjectWithSecrets) {
-		const container = await this.projectContainerResolver.createProjectContainer(projectGroup, project)
-		if (!container) {
-			throw new Error('Should not happen')
-		}
+		const container = this.projectContainerResolver.createProjectContainer(projectGroup, project)
 		const log: string[] = []
 		try {
 			await this.systemProjectInitializer.initialize(

@@ -217,8 +217,8 @@ export class TenantContainerFactory {
 				new DatabaseContextFactory(db, providers))
 			.addService('migrationsRunnerFactory', ({ providers }) =>
 				new MigrationsRunnerFactory(this.tenantDbCredentials, this.tenantCredentials, providers))
-			.addService('projectGroupProvider', ({ databaseContextFactory }) =>
-				new ProjectGroupProvider(databaseContextFactory))
+			.addService('projectGroupProvider', ({ databaseContextFactory, migrationsRunnerFactory }) =>
+				new ProjectGroupProvider(databaseContextFactory, migrationsRunnerFactory))
 			.addService('resolverContextFactory', ({ permissionContextFactory }) =>
 				new ResolverContextFactory(permissionContextFactory))
 			.addService('resolvers', container =>

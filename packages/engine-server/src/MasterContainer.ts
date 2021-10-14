@@ -176,8 +176,8 @@ export class MasterContainerFactory {
 				new ErrorFactory(debugMode))
 			.addService('authMiddlewareFactory', ({ tenantContainer, httpErrorFactory }) =>
 				new AuthMiddlewareFactory(tenantContainer.apiKeyManager, httpErrorFactory))
-			.addService('projectGroupMiddlewareFactory', ({ tenantContainer }) =>
-				new ProjectGroupMiddlewareFactory(tenantContainer.projectGroupProvider))
+			.addService('projectGroupMiddlewareFactory', ({ tenantContainer, httpErrorFactory }) =>
+				new ProjectGroupMiddlewareFactory(config.server.projectGroup?.domainMapping, tenantContainer.projectGroupProvider, httpErrorFactory))
 			.addService('projectResolverMiddlewareFactory', ({ projectContainerResolver, httpErrorFactory }) =>
 				new ProjectResolveMiddlewareFactory(projectContainerResolver, httpErrorFactory))
 			.addService('apiMiddlewareFactory', ({ projectGroupMiddlewareFactory, authMiddlewareFactory }) =>

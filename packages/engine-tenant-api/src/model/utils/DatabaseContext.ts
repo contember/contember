@@ -3,7 +3,11 @@ import { Providers } from '../providers'
 import { CommandBus } from '../commands'
 
 export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection.ConnectionLike> {
-	constructor(public readonly client: Client<Conn>, public readonly providers: Providers) {}
+	constructor(
+		public readonly client: Client<Conn>,
+		public readonly providers: Providers,
+	) {
+	}
 
 	public get commandBus() {
 		return new CommandBus(this.client, this.providers)
@@ -28,7 +32,13 @@ export class DatabaseContextFactory {
 	) {
 	}
 
-	public create(): DatabaseContext {
-		return new DatabaseContext(this.db.forSchema('tenant'), this.providers)
+	public create(projectGroupSlug: string | undefined): DatabaseContext {
+		let schema = 'tenant'
+		if (projectGroupSlug !== undefined) {
+			const normalizedSlug = projectGroupSlug.replace(/\W/g, '').slice(0, 15)
+			const hash = this.providers.hash(projectGroupSlug, 'md5').toString('hex')
+			schema = `tenant_${normalizedSlug}_${hash}`
+		}
+		return new DatabaseContext(this.db.forSchema(schema), this.providers)
 	}
 }

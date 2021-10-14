@@ -33,6 +33,9 @@ export interface Config {
 		port: number
 		monitoringPort: number
 		workerCount?: number | string
+		projectGroup?: {
+			domainMapping: string
+		}
 		http: {
 			requestBodySize?: string
 		}
@@ -194,6 +197,7 @@ function checkServerStructure(json: unknown): Config['server'] {
 		...json,
 		logging: checkLoggingStructure(json.logging),
 		http: checkHttpStructure(json.http),
+		projectGroup: checkProjectGroupStructure(json.projectGroup),
 	}
 }
 
@@ -218,6 +222,22 @@ function checkLoggingStructure(json: unknown): Config['server']['logging'] {
 	}
 
 	return { sentry }
+}
+
+function checkProjectGroupStructure(json: unknown): Config['server']['projectGroup'] {
+	if (!json) {
+		return undefined
+	}
+	if (!isObject(json)) {
+		return typeConfigError('server.projectGroup', json, 'object')
+	}
+	if (!json.domainMapping) {
+		return undefined
+	}
+	if (!hasStringProperty(json, 'domainMapping')) {
+		return typeConfigError('server.projectGroup.domainMapping', json.domainMapping, 'string')
+	}
+	return json
 }
 
 function checkHttpStructure(json: unknown): Config['server']['http'] {
@@ -309,6 +329,9 @@ export async function readConfig(
 			workerCount: '%?env.CONTEMBER_WORKER_COUNT::string%',
 			http: {
 				requestBodySize: '%?env.CONTEMBER_HTTP_REQUEST_BODY_SIZE::string%',
+			},
+			projectGroup: {
+				domainMapping: '%?env.CONTEMBER_PROJECT_GROUP_DOMAIN_MAPPING%',
 			},
 			logging: {
 				sentry: {

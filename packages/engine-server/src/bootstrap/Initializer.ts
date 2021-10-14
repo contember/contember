@@ -23,7 +23,7 @@ export class Initializer {
 		logger.groupEnd()
 
 		const projects: string[] = []
-		const group = await this.projectGroupProvider.getGroup(undefined) // todo
+		const group = await this.projectGroupProvider.getGroup(undefined)
 		for (const container of await this.projectContainerResolver.getAllProjectContainers(group)) {
 			const project = container.project
 			projects.push(project.slug)
@@ -38,7 +38,7 @@ export class Initializer {
 
 	public async createProject(project: ProjectConfig, migrations: Migration[]): Promise<void> {
 		const { slug, name, ...config } = project
-		const group = await this.projectGroupProvider.getGroup(undefined) // todo
+		const group = await this.projectGroupProvider.getGroup(undefined)
 		const result = await this.projectManager.createProject(group, { slug, name, config, secrets: {} }, undefined)
 		if (!result) {
 			throw new Error('Project already exists')

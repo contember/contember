@@ -106,6 +106,9 @@ export class PermissionFactory {
 	private mergeEntityPermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions): Acl.EntityPermissions {
 		let predicates: Acl.PredicateMap = {}
 		const operations: Acl.EntityOperations = {}
+		if (left.operations.customPrimary || right.operations.customPrimary) {
+			operations.customPrimary = true
+		}
 
 		const operationNames: (keyof Pick<Acl.EntityOperations, 'create' | 'read' | 'update'>)[] = [
 			'create',

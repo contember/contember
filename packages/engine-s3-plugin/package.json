@@ -1,6 +1,6 @@
 {
   "name": "@contember/engine-s3-plugin",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "license": "Apache-2.0",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
@@ -8,10 +8,10 @@
     "test": "echo 'No tests'"
   },
   "dependencies": {
-    "@contember/engine-common": "^0.11.4",
-    "@contember/engine-plugins": "^0.11.4",
-    "@contember/graphql-utils": "^0.11.4",
-    "@contember/schema": "^0.11.4",
+    "@contember/engine-common": "^0.11.5",
+    "@contember/engine-plugins": "^0.11.5",
+    "@contember/graphql-utils": "^0.11.5",
+    "@contember/schema": "^0.11.5",
     "apollo-server-errors": "^2.3.4",
     "aws-sdk": "^2.747.0",
     "mime-types": "^2.1.24",

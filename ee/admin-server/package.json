@@ -17,17 +17,17 @@
 		"run-admin": "dist/run-admin.js"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.22.0",
-		"@contember/dic": "^0.11.2",
+		"@aws-sdk/client-s3": "^3.37.0",
+		"@contember/dic": "^0.11.5",
 		"cookie": "^0.4.1",
 		"mime": "^2.5.2",
-		"node-fetch": "^2.6.1"
+		"node-fetch": "^2.6.5"
 	},
 	"devDependencies": {
 		"@contember/admin": "workspace:*",
 		"@types/cookie": "^0.4.1",
 		"@types/mime": "^2.0.3",
-		"@types/node": "^16.3.3",
-		"@types/node-fetch": "^2.5.11"
+		"@types/node": "^16.11.1",
+		"@types/node-fetch": "^2.5.12"
 	}
 }

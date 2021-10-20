@@ -11,7 +11,7 @@
 		"@contember/admin": "workspace:*"
 	},
 	"dependencies": {
-		"@contember/schema": "^0.11.3",
-		"@contember/schema-definition": "0.11"
+		"@contember/schema": "^0.11.5",
+		"@contember/schema-definition": "~0.11.5"
 	}
 }

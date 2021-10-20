@@ -1,5 +1,5 @@
 import type { FieldValue, RelativeSingleField } from '@contember/binding'
-import { Element as SlateElement, Node as SlateNode, Text } from 'slate'
+import { Descendant, Element as SlateElement, Node as SlateNode, Text } from 'slate'
 import type { ResolvedDiscriminatedDatum } from '../../../discrimination'
 import { ReferenceElement, referenceElementType } from '../elements'
 import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
@@ -44,7 +44,7 @@ export const overrideInsertData = <E extends BlockSlateEditor>(editor: E, option
 					return {
 						...node,
 						children: stripNodeReferences(node.children),
-					}
+					} as Descendant
 				})
 
 			const nodesWithoutReferences = stripNodeReferences(nodes)

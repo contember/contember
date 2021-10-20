@@ -15,7 +15,7 @@ export const permissivelyDeserializeNodes = <E extends BaseEditor>(
 		return [editor.createDefaultElement([{ text: serializedElement }])]
 	}
 	if ('formatVersion' in deserialized) {
-		return toLatestFormat(editor, deserialized).children
+		return toLatestFormat(editor, deserialized as SerializableEditorNode).children
 	}
 
 	// If no format version is specified, assume zero.

@@ -53,7 +53,7 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => {
 		Editor.withoutNormalizing(editor, () => {
-			const preppedPath = editor.prepareElementForInsertion(element)
+			const preppedPath = editor.prepareElementForInsertion(element as Element)
 			const [topLevelElementIndex] = preppedPath
 			const blockOrder = topLevelElementIndex - leadingFields.length
 			let newBlockId: string | undefined = undefined
@@ -72,7 +72,7 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 				})
 			}
 			const referenceId = editor.createElementReference(preppedPath, referenceDiscriminant, initialize)
-			const newNode: ElementWithReference = { ...element, referenceId }
+			const newNode: ElementWithReference = { ...(element as Element), referenceId }
 			Transforms.insertNodes(editor, newNode, { at: preppedPath })
 
 			if (preppedPath.length === 1 && !createMonolithicReference && newBlockId !== undefined) {

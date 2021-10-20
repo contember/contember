@@ -133,10 +133,12 @@ export const withPaste: <E extends EditorNode>(
 			if (containsBlock) {
 				return {
 					elements: processed.flatMap(item => {
-						if (item.element === undefined) {
+						if (item.text !== undefined) {
 							return item.isWhiteSpace ? [] : [editorWithEssentials.createDefaultElement([item.text])]
-						} else {
+						} else if (item.element !== undefined) {
 							return [item.element]
+						} {
+							return []
 						}
 					}),
 				}

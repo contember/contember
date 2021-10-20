@@ -6,7 +6,7 @@ import {
 	Component,
 	HasOne, ImageUploadField,
 	RichEditor, RichTextField,
-	SelectField,
+	SelectField, tableToolbarButton,
 	TextField,
 } from '@contember/admin'
 
@@ -51,6 +51,7 @@ export const ContentField = Component<ContentFieldProps>(
 						discriminateBy: 'quote',
 						title: 'Quote',
 					},
+					tableToolbarButton,
 				]}
 			>
 				<Block discriminateBy="image" label="Image">

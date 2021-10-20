@@ -177,7 +177,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 			Editor.withoutNormalizing(e, () => {
 				const [targetParent, targetParentPath] = closestViableParentEntry
 
-				if (Editor.hasInlines(editor, targetParent)) {
+				if (SlateElement.isElement(targetParent) && Editor.hasInlines(editor, targetParent)) {
 					// We're deliberately widening the selection to include all the inlines.
 					const listItemPath = [...targetParentPath, 0]
 
@@ -372,6 +372,9 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 				return onKeyDown(event)
 			}
 			let [closestBlockElement, closestBlockPath] = closestBlockEntry
+			if (!SlateElement.isElement(closestBlockElement)) {
+				return onKeyDown(event)
+			}
 
 			if (event.key === 'Tab') {
 				if (e.isDefaultElement(closestBlockElement)) {
@@ -407,7 +410,7 @@ export const withLists = <E extends BaseEditor>(editor: E): EditorWithLists<E> =
 					event.preventDefault()
 					return Editor.withoutNormalizing(e, () => {
 						Transforms.wrapNodes(e, e.createDefaultElement([]), {
-							match: node => Text.isText(node) || e.isInline(node),
+							match: node => Text.isText(node) || (SlateElement.isElement(node) && e.isInline(node)),
 							at: {
 								anchor: listItemStart,
 								focus: listItemEnd,

@@ -1,8 +1,16 @@
 import type { FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
-import type { BaseEditor, Element as SlateElement, Node as SlateNode, Text as SlateText, NodeEntry } from 'slate'
+import type {
+	BaseEditor,
+	Element as SlateElement,
+	Node as SlateNode,
+	Text as SlateText,
+	NodeEntry,
+	Descendant,
+} from 'slate'
 import type { RenderElementProps, RenderLeafProps } from 'slate-react'
 import type { ElementSpecifics, TextSpecifics } from './Node'
 import type { WithPaste } from './overrides'
+import { CustomElementPlugin } from './CustomElementPlugin'
 
 export interface WithEssentials {
 	formatVersion: number
@@ -21,10 +29,12 @@ export interface WithEssentials {
 
 	canContainAnyBlocks: (element: SlateElement) => boolean
 
-	serializeNodes: (nodes: Array<SlateElement | SlateText>, errorMessage?: string) => string
+	serializeNodes: (nodes: Array<Descendant>, errorMessage?: string) => string
 	deserializeNodes: (serializedNodes: string, errorMessage?: string) => Array<SlateElement | SlateText>
 
 	upgradeFormatBySingleVersion: (node: SlateNode, oldVersion: number) => SlateNode
+
+	registerElement: (plugin: CustomElementPlugin<any>) => void
 
 	// <Editable> props
 	onDOMBeforeInput: (event: Event) => void

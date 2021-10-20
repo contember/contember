@@ -22,14 +22,14 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 	} = editor
 
 	const isAnchor = (element: SlateNode | ElementNode): element is AnchorElement => SlateElement.isElement(element) && element.type === anchorElementType
-	const isAnchorActive = (editor: BaseAnchorEditor) => {
+	const isAnchorActive = (editor: E) => {
 		const [link] = Editor.nodes(editor, { match: isAnchor })
 		return !!link
 	}
-	const unwrapAnchor = (editor: BaseAnchorEditor) => {
+	const unwrapAnchor = (editor: E) => {
 		Transforms.unwrapNodes(editor, { match: isAnchor })
 	}
-	const wrapAnchor = (editor: BaseAnchorEditor, url: string) => {
+	const wrapAnchor = (editor: E, url: string) => {
 		if (isAnchorActive(editor)) {
 			unwrapAnchor(editor)
 		}
@@ -68,7 +68,7 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 				unwrapAnchor(e)
 			} else {
 				const href =
-					(suchThat as unknown as ElementSpecifics<AnchorElement> | undefined)?.href ?? prompt('Insert the URL:')
+					(suchThat as unknown as {href: string} | undefined)?.href ?? prompt('Insert the URL:')
 
 				if (!href) {
 					return
@@ -94,7 +94,7 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 	}
 	e.insertText = text => {
 		if (text && isUrl(text)) {
-			wrapAnchor(e as unknown as BaseAnchorEditor, text)
+			wrapAnchor(e, text)
 		} else {
 			insertText(text)
 		}
@@ -103,7 +103,7 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 		const text = data.getData('text/plain')
 
 		if (text && isUrl(text)) {
-			wrapAnchor(e as unknown as BaseAnchorEditor, text)
+			wrapAnchor(e, text)
 		} else {
 			insertData(data)
 		}

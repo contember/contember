@@ -1,5 +1,6 @@
 export * from './overrides'
 export * from './BlockElement'
+export * from './CustomElementPlugin'
 export * from './createEditorWithEssentials'
 export * from './DefaultElement'
 export * from './EditorWithEssentials'

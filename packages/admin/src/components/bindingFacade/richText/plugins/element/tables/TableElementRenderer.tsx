@@ -1,29 +1,30 @@
 import { EditorTableElement } from '@contember/ui'
 import { memo, useCallback } from 'react'
 import { Transforms } from 'slate'
-import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
+import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
 import { assertNever } from '../../../../../../utils'
-import { BaseEditor, BlockElement } from '../../../baseEditor'
-import type { EditorWithTables } from './EditorWithTables'
+import { BlockElement } from '../../../baseEditor'
 import type { TableCellElement } from './TableCellElement'
 import type { TableElement } from './TableElement'
 import type { TableRowElement } from './TableRowElement'
+import { TableModifications } from './TableModifications'
+import { isTableElement } from './TableElement'
 
 export interface TableElementRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: TableElement
 }
 
 export const TableElementRenderer = memo(function TableElementRenderer(props: TableElementRendererProps) {
-	const editor = useEditor() as EditorWithTables<BaseEditor>
+	const editor = useSlateStatic()
 	const isSelected = useSelected()
 	const isFocused = false
 
 	const extendTable = useCallback(
 		(vector: 'row' | 'column', index?: number) => {
 			if (vector === 'row') {
-				editor.addTableRow(props.element, index)
+				TableModifications.addTableRow(editor, props.element, index)
 			} else if (vector === 'column') {
-				editor.addTableColumn(props.element, index)
+				TableModifications.addTableColumn(editor, props.element, index)
 			} else {
 				assertNever(vector)
 			}
@@ -33,9 +34,9 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 	const shrinkTable = useCallback(
 		(vector: 'row' | 'column', index: number) => {
 			if (vector === 'row') {
-				editor.deleteTableRow(props.element, index)
+				TableModifications.deleteTableRow(editor, props.element, index)
 			} else if (vector === 'column') {
-				editor.deleteTableColumn(props.element, index)
+				TableModifications.deleteTableColumn(editor, props.element, index)
 			} else {
 				assertNever(vector)
 			}
@@ -44,20 +45,20 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 	)
 	const toggleRowHeaderScope = useCallback(
 		(index: number, scope: 'table') => {
-			editor.toggleTableRowHeaderScope(props.element, index, scope)
+			TableModifications.toggleTableRowHeaderScope(editor, props.element, index, scope)
 		},
 		[editor, props.element],
 	)
 	const toggleColumnHeaderScope = useCallback(
 		(index: number, scope: 'row') => {
-			editor.toggleTableColumnHeaderScope(props.element, index, scope)
+			TableModifications.toggleTableColumnHeaderScope(editor, props.element, index, scope)
 		},
 		[editor, props.element],
 	)
 
 	const justifyColumn = useCallback(
 		(index: number, direction: TableCellElement['justify']) =>
-			editor.justifyTableColumn(props.element, index, direction),
+			TableModifications.justifyTableColumn(editor, props.element, index, direction),
 		[editor, props.element],
 	)
 	// TODO this kind of works but ends up generating tons of operations when used to delete the whole table.
@@ -97,7 +98,7 @@ export const TableElementRenderer = memo(function TableElementRenderer(props: Ta
 			// So as a hacky workaround, we just let it do its thing and actually remove the table later.
 			Transforms.removeNodes(editor, {
 				at: ReactEditor.findPath(editor, props.element),
-				match: node => editor.isTable(node),
+				match: node => isTableElement(node),
 			})
 		})
 	}, [editor, props.element])

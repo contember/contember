@@ -1,6 +1,7 @@
 import type { Location as SlateLocation, NodeEntry } from 'slate'
 import type { BaseEditor, EditorNode, ElementNode } from '../../baseEditor'
 import { closest } from './closest'
+import { Element } from 'slate'
 
 export const closestViableBlockContainerEntry = <E extends BaseEditor>(
 	editor: E,
@@ -10,5 +11,5 @@ export const closestViableBlockContainerEntry = <E extends BaseEditor>(
 ): NodeEntry<ElementNode | EditorNode> | undefined =>
 	closest(editor, {
 		at: options?.at,
-		match: node => editor.canContainAnyBlocks(node),
+		match: node => Element.isElement(node) && editor.canContainAnyBlocks(node),
 	})

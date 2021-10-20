@@ -79,7 +79,7 @@ export const withHeadings = <E extends BaseEditor>(editor: E): EditorWithHeading
 		const [closestBlockElement, closestBlockPath] = closestBlockEntry
 
 		return (
-			closestBlockPath.length === 1 && (e.isDefaultElement(closestBlockElement) || e.isHeading!(closestBlockElement))
+			closestBlockPath.length === 1 && SlateElement.isElement(closestBlockElement) && (e.isDefaultElement(closestBlockElement) || e.isHeading!(closestBlockElement))
 		)
 	}
 

@@ -2,7 +2,7 @@ import { useField } from '@contember/binding'
 import { EditorPlaceholder } from '@contember/ui'
 import { memo } from 'react'
 import { Node as SlateNode, Path as SlatePath, Element as SlateElement } from 'slate'
-import { ReactEditor, RenderElementProps, useEditor } from 'slate-react'
+import { ReactEditor, RenderElementProps, useEditor, useSlateStatic } from 'slate-react'
 import { AccessorErrors } from '../../../errors'
 import { BlockElement } from '../../baseEditor'
 import type { ContemberFieldElement } from '../elements'
@@ -17,7 +17,7 @@ export interface ContemberFieldElementRendererProps extends RenderElementProps {
 export const ContemberFieldElementRenderer = memo((props: ContemberFieldElementRendererProps) => {
 	const fieldString = SlateNode.string(props.element)
 	const shouldDisplayPlaceholder = fieldString === ''
-	const editor = useEditor()
+	const editor = useSlateStatic()
 	const path = ReactEditor.findPath(editor, props.element)
 	const parentPath = SlatePath.parent(path)
 	const parent = SlateNode.get(editor, parentPath) as SlateElement

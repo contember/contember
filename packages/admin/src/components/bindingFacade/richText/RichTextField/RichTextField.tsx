@@ -9,7 +9,7 @@ import {
 } from '@contember/binding'
 import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
-import { Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
+import { Descendant, Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
 import { Editable, Slate } from 'slate-react'
 import { useAccessorErrors } from '../../errors'
 import { createEditor, CreateEditorPublicOptions } from '../editorFactory'
@@ -105,11 +105,11 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 
 		const serialize = editor.serializeNodes
 		const onChange = useCallback(
-			(value: SlateNode[]) => {
+			(value: Descendant[]) => {
 				getParent().batchUpdates(getAccessor => {
 					const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
 
-					if (SlateNode.string({ children: value }) === '' && fieldAccessor.valueOnServer === null) {
+					if (SlateNode.string({ type: 'dummy', children: value }) === '' && fieldAccessor.valueOnServer === null) {
 						fieldAccessor.updateValue(null)
 						return
 					}

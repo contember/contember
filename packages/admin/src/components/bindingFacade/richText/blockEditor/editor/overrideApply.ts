@@ -1,6 +1,6 @@
 import type { BindingOperations } from '@contember/binding'
 import type { MutableRefObject } from 'react'
-import { Element as SlateElement, Operation } from 'slate'
+import { Element as SlateElement, Node, Operation } from 'slate'
 import type { ElementNode, TextNode } from '../../baseEditor'
 import { isElementWithReference } from '../elements'
 import type { BlockSlateEditor } from './BlockSlateEditor'
@@ -22,7 +22,7 @@ export const overrideApply = <E extends BlockSlateEditor>(editor: E, options: Ov
 			return
 		}
 
-		const purgeElementReferences = (element: ElementNode | TextNode) => {
+		const purgeElementReferences = (element: Node) => {
 			if (!SlateElement.isElement(element)) {
 				return
 			}

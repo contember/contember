@@ -62,7 +62,7 @@ export const LegacyDeprecatedEditorFormerlyKnownAsRichTextField: FunctionCompone
 
 			const serialize = editor.serializeNodes
 			const onChange = useCallback(
-				(value: SlateNode[]) => {
+				(value: Descendant[]) => {
 					getParent().batchUpdates(getAccessor => {
 						const fieldAccessor = getAccessor().getRelativeSingleField(desugaredField)
 

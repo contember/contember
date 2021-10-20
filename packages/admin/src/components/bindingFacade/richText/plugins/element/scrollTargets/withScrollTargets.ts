@@ -56,7 +56,7 @@ export const withScrollTargets = <E extends BaseEditor>(editor: E): EditorWithSc
 				unwrapScrollTarget(e)
 			} else {
 				let identifier =
-					(suchThat as unknown as ElementSpecifics<ScrollTargetElement> | undefined)?.identifier ??
+					(suchThat as unknown as {identifier: string} | undefined)?.identifier ??
 					prompt('Insert the identifier:')
 
 				if (!identifier) {

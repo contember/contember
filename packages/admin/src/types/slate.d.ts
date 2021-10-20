@@ -1,15 +1,11 @@
 import { BaseEditor, Descendant } from 'slate'
 import { EditorWithEssentials, UnderlyingEditor } from '../components'
-import { ReactNode } from 'react'
 
 interface CustomElement {
-	type?: string
-	referenceId?: string
+	type: string
 	children: Array<Descendant>
-	placeholder?: ReactNode
-	headerScope?: 'table' | 'row' | null
-	justify?: 'start' | 'center' | 'end' | null
 }
+
 interface CustomText {
 	text: string
 }
@@ -17,7 +13,9 @@ interface CustomText {
 declare module 'slate' {
 	interface CustomTypes {
 		Editor: UnderlyingEditor & BaseEditor & EditorWithEssentials<BaseEditor>
-		Element: CustomElement
+		Element: {
+			[K in string]: unknown
+		} & CustomElement
 		Text: {
 			[K in string]: unknown
 		} & CustomText

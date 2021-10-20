@@ -4,10 +4,19 @@ import {
 	BlockEditorProps,
 	CheckboxField,
 	Component,
-	HasOne, ImageUploadField,
-	RichEditor, RichTextField,
-	SelectField, tableToolbarButton,
+	HasOne,
+	horizontalRuleToolbarButton,
+	ImageUploadField,
+	orderedListToolbarButton,
+	paragraphNumberedToolbarButton,
+	paragraphToolbarButton,
+	RichEditor,
+	RichTextField,
+	scrollTargetToolbarButton,
+	SelectField,
+	tableToolbarButton,
 	TextField,
+	unorderedListToolbarButton,
 } from '@contember/admin'
 
 const RB = RichEditor.buttons
@@ -52,6 +61,10 @@ export const ContentField = Component<ContentFieldProps>(
 						title: 'Quote',
 					},
 					tableToolbarButton,
+					scrollTargetToolbarButton,
+					paragraphToolbarButton,
+					paragraphNumberedToolbarButton,
+					horizontalRuleToolbarButton,
 				]}
 			>
 				<Block discriminateBy="image" label="Image">

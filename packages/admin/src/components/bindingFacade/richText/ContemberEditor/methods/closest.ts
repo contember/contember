@@ -10,7 +10,9 @@ export const closest = <E extends BaseEditor>(
 ): NodeEntry<ElementNode | EditorNode> | undefined => {
 	const entries = Editor.levels<ElementNode | EditorNode>(editor, {
 		at: options.at,
-		match: node => !Text.isText(node) && options.match(node),
+		match: node => {
+			return !Text.isText(node) && options.match(node)
+		},
 		reverse: true,
 	})
 	for (const entry of entries) {

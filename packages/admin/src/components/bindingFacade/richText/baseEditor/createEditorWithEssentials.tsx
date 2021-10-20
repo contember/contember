@@ -22,7 +22,7 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor() as ReactEditor))
 
 	const editor = underlyingEditor as unknown as Editor
-	const { normalizeNode } = editor
+	const { normalizeNode, isInline, isVoid } = editor
 
 	const elements: Record<string, CustomElementPlugin<any>> = {}
 
@@ -77,10 +77,19 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 			})
 		},
 
-		canContainAnyBlocks: element =>
-			!editor.isInline(element)
-			&& !editor.isVoid(element)
-			&& (elements[element.type]?.canContainAnyBlocks ?? true),
+		isInline: element => {
+			return elements[element.type]?.isInline ?? isInline(element)
+		},
+
+		isVoid: element => {
+			return elements[element.type]?.isVoid ?? isVoid(element)
+		},
+
+		canContainAnyBlocks: element => {
+			return !editor.isInline(element)
+				&& !editor.isVoid(element)
+				&& (elements[element.type] ? elements[element.type].canContainAnyBlocks ?? false : true)
+		},
 
 		serializeNodes: (nodes, errorMessage) => ContemberEditor.serializeNodes(editor, nodes, errorMessage),
 		deserializeNodes: (serializedNodes, errorMessage) =>
@@ -148,14 +157,11 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		onBlur: () => {},
 		normalizeNode: ([node, path]) => {
 			if (SlateElement.isElement(node) && elements[node.type]?.normalizeNode) {
-				const result = elements[node.type].normalizeNode?.({
+				elements[node.type].normalizeNode?.({
 					element: node,
 					path,
 					editor,
 				})
-				if (result === true) {
-					normalizeNode([node, path])
-				}
 			} else {
 				normalizeNode([node, path])
 			}

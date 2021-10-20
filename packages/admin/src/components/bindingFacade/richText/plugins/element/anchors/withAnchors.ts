@@ -1,130 +1,32 @@
-import { createElement } from 'react'
-import { Editor, Element as SlateElement, Node as SlateNode, Path, Range as SlateRange, Transforms } from 'slate'
-import type { BaseEditor, ElementNode, ElementSpecifics, WithAnotherNodeType } from '../../../baseEditor'
-import { AnchorElement, anchorElementType } from './AnchorElement'
-import { AnchorRenderer, AnchorRendererProps } from './AnchorRenderer'
-import type { EditorWithAnchors, WithAnchors } from './EditorWithAnchors'
+import { Editor } from 'slate'
 import { isUrl } from './isUrl'
+import { AnchorModifications } from './AnchorModifications'
+import { anchorElementPlugin } from './AnchorElement'
 
-export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<E> => {
-	type BaseAnchorEditor = WithAnotherNodeType<E, AnchorElement>
-
-	const e = editor as E & WithAnchors<BaseAnchorEditor>
+export const withAnchors = <E extends Editor>(editor: E): E => {
 	const {
 		insertData,
 		insertText,
-		isElementActive,
-		isInline,
-		normalizeNode,
 		processInlinePaste,
-		renderElement,
-		toggleElement,
 	} = editor
 
-	const isAnchor = (element: SlateNode | ElementNode): element is AnchorElement => SlateElement.isElement(element) && element.type === anchorElementType
-	const isAnchorActive = (editor: E) => {
-		const [link] = Editor.nodes(editor, { match: isAnchor })
-		return !!link
-	}
-	const unwrapAnchor = (editor: E) => {
-		Transforms.unwrapNodes(editor, { match: isAnchor })
-	}
-	const wrapAnchor = (editor: E, url: string) => {
-		if (isAnchorActive(editor)) {
-			unwrapAnchor(editor)
-		}
+	editor.registerElement(anchorElementPlugin)
 
-		const selection = editor.selection
-		const isCollapsed = selection ? SlateRange.isCollapsed(selection!) : false
-		const anchor: AnchorElement = {
-			type: 'anchor',
-			href: url,
-			children: isCollapsed ? [{ text: url }] : [{ text: '' }],
-		}
-
-		if (isCollapsed) {
-			Transforms.insertNodes(editor, anchor)
-		} else {
-			Transforms.wrapNodes(editor, anchor, { split: true })
-			Transforms.collapse(editor, { edge: 'end' })
-		}
-	}
-
-	e.isAnchor = isAnchor
-
-	e.isElementActive = (elementType, suchThat) => {
-		if (elementType === anchorElementType) {
-			// TODO this includes waay too many false positives
-			const [link] = Editor.nodes(editor, { match: isAnchor })
-			return !!link
-		}
-		return isElementActive(elementType, suchThat)
-	}
-
-	// TODO
-	e.toggleElement = (elementType, suchThat) => {
-		if (elementType === anchorElementType) {
-			if (e.isElementActive(elementType, suchThat)) {
-				unwrapAnchor(e)
-			} else {
-				const href =
-					(suchThat as unknown as {href: string} | undefined)?.href ?? prompt('Insert the URL:')
-
-				if (!href) {
-					return
-				}
-				wrapAnchor(e, href)
-			}
-		}
-		return toggleElement(elementType, suchThat)
-	}
-
-	e.renderElement = props => {
-		if (isAnchor(props.element)) {
-			return createElement(AnchorRenderer, props as AnchorRendererProps)
-		}
-		return renderElement(props)
-	}
-
-	e.isInline = element => {
-		if (isAnchor(element)) {
-			return true
-		}
-		return isInline(element)
-	}
-	e.insertText = text => {
+	editor.insertText = text => {
 		if (text && isUrl(text)) {
-			wrapAnchor(e, text)
+			AnchorModifications.wrapAnchor(editor, text)
 		} else {
 			insertText(text)
 		}
 	}
-	e.insertData = data => {
+	editor.insertData = data => {
 		const text = data.getData('text/plain')
 
 		if (text && isUrl(text)) {
-			wrapAnchor(e, text)
+			AnchorModifications.wrapAnchor(editor, text)
 		} else {
 			insertData(data)
 		}
-	}
-	e.normalizeNode = entry => {
-		const [node, path] = entry
-
-		if (!SlateElement.isElement(node) || !e.isAnchor(node)) {
-			return normalizeNode(entry)
-		}
-		if (SlateNode.string(node) === '') {
-			const selection = e.selection
-			Transforms.removeNodes(e, {
-				at: path,
-			})
-			if (selection && SlateRange.isCollapsed(selection) && Path.isCommon(path, selection.focus.path)) {
-				Transforms.select(e, Path.parent(path))
-			}
-			return
-		}
-		return normalizeNode(entry)
 	}
 
 	editor.processInlinePaste = (element, next, cumulativeTextAttrs) => {
@@ -142,5 +44,5 @@ export const withAnchors = <E extends BaseEditor>(editor: E): EditorWithAnchors<
 		return processInlinePaste(element, next, cumulativeTextAttrs)
 	}
 
-	return e as unknown as EditorWithAnchors<E>
+	return editor
 }

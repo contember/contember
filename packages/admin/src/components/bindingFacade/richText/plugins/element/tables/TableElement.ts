@@ -86,7 +86,6 @@ export const tableElementPlugin: CustomElementPlugin<TableElement> = {
 				}
 			}
 		}
-		return true
 	},
 	canContainAnyBlocks: false,
 	toggleElement: ({ editor }) => {

@@ -1,4 +1,3 @@
-import { createElement } from 'react'
 import {
 	Editor,
 	Element as SlateElement,
@@ -8,69 +7,19 @@ import {
 	Text,
 	Transforms,
 } from 'slate'
-import type { BaseEditor, ElementNode, WithAnotherNodeType } from '../../../baseEditor'
-import type { EditorWithHorizontalRules, WithHorizontalRules } from './EditorWithHorizontalRules'
-import { HorizontalRuleElement, horizontalRuleElementType } from './HorizontalRuleElement'
-import { HorizontalRuleRenderer, HorizontalRuleRendererProps } from './HorizontalRuleRenderer'
+import { HorizontalRuleElement, horizontalRuleElementPlugin, horizontalRuleElementType } from './HorizontalRuleElement'
 
-export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWithHorizontalRules<E> => {
-	type BaseHorizontalRuleEditor = WithAnotherNodeType<E, HorizontalRuleElement>
+export const withHorizontalRules = <E extends Editor>(editor: E): E => {
+	const { insertText } = editor
 
-	const e: E & Partial<WithHorizontalRules<BaseHorizontalRuleEditor>> = editor
-	const { isVoid, insertText, renderElement, toggleElement } = editor
+	editor.registerElement(horizontalRuleElementPlugin)
 
-	const isHorizontalRule = (element: SlateNode): element is HorizontalRuleElement =>
-		SlateElement.isElement(element) && element.type === horizontalRuleElementType
-	const isHorizontalRuleActive = (editor: BaseHorizontalRuleEditor) => {
-		const [hr] = Editor.nodes(editor, { match: isHorizontalRule })
-		return !!hr
-	}
-	const removeHorizontalRule = (editor: BaseHorizontalRuleEditor) => {
-		Transforms.removeNodes(editor, { match: isHorizontalRule })
-	}
-	const insertHorizontalRule = (editor: BaseHorizontalRuleEditor) => {
-		const selection = editor.selection
-		const isCollapsed = selection ? SlateRange.isCollapsed(selection!) : false
-
-		if (!isCollapsed || isHorizontalRuleActive(editor)) {
-			return
-		}
-		const horizontalRule: HorizontalRuleElement = {
-			type: horizontalRuleElementType,
-			children: [{ text: '' }],
-		}
-		Transforms.insertNodes(editor, horizontalRule)
-	}
-
-	e.isHorizontalRule = isHorizontalRule
-
-	e.toggleElement = (elementType, suchThat) => {
-		if (elementType === horizontalRuleElementType) {
-			return e.isElementActive(elementType, suchThat) ? removeHorizontalRule(e) : insertHorizontalRule(e)
-		}
-		return toggleElement(elementType, suchThat)
-	}
-
-	e.renderElement = props => {
-		if (isHorizontalRule(props.element)) {
-			return createElement(HorizontalRuleRenderer, props as HorizontalRuleRendererProps)
-		}
-		return renderElement(props)
-	}
-
-	e.isVoid = element => {
-		if (isHorizontalRule(element)) {
-			return true
-		}
-		return isVoid(element)
-	}
-
-	e.insertText = text => {
+	editor.insertText = text => {
 		insertText(text)
 		if (text !== '-') {
 			return
 		}
-		const selection = e.selection
+		const selection = editor.selection
 		if (!selection || !SlateRange.isCollapsed(selection)) {
 			return
 		}
@@ -79,7 +28,7 @@ export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWith
 		if (focusPoint.offset < 3) {
 			return
 		}
-		const [targetTextNode, targetPath] = Editor.node(e, focusPoint)
+		const [targetTextNode, targetPath] = Editor.node(editor, focusPoint)
 		if (!Text.isText(targetTextNode)) {
 			return
 		}
@@ -88,12 +37,12 @@ export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWith
 			return
 		}
 
-		Editor.withoutNormalizing(e, () => {
-			let closestBlockEntry: NodeEntry | undefined = Editor.above(e, {
+		Editor.withoutNormalizing(editor, () => {
+			let closestBlockEntry: NodeEntry | undefined = Editor.above(editor, {
 				at: focusPoint,
 				mode: 'lowest',
 				match: matchedNode =>
-					SlateElement.isElement(matchedNode) && !e.isInline(matchedNode) && e.isDefaultElement(matchedNode),
+					SlateElement.isElement(matchedNode) && !editor.isInline(matchedNode) && editor.isDefaultElement(matchedNode),
 			})
 			if (!closestBlockEntry) {
 				return
@@ -109,18 +58,18 @@ export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWith
 				children: [{ text: '' }],
 			}
 			const newHrPath = [...closestBlockPath.slice(0, -1), closestBlockPath[closestBlockPath.length - 1] + 1]
-			Transforms.insertNodes(e, horizontalRule, {
+			Transforms.insertNodes(editor, horizontalRule, {
 				at: newHrPath,
 			})
 
 			// Remove the '---'
-			e.deleteBackward('character')
-			e.deleteBackward('character')
-			e.deleteBackward('character')
+			editor.deleteBackward('character')
+			editor.deleteBackward('character')
+			editor.deleteBackward('character')
 
-			const pointAfter = Editor.after(e, newHrPath)
+			const pointAfter = Editor.after(editor, newHrPath)
 			if (pointAfter) {
-				Transforms.select(e, pointAfter)
+				Transforms.select(editor, pointAfter)
 			} else {
 				// There's nothing to select so we're likely at the end. Insert a new default element then.
 				const targetPath = [...newHrPath.slice(0, -1), newHrPath[newHrPath.length - 1] + 1]
@@ -131,15 +80,15 @@ export const withHorizontalRules = <E extends BaseEditor>(editor: E): EditorWith
 			}
 
 			// Lastly, if remove the closest block. Need to update the entry though.
-			closestBlockEntry = Editor.node(e, closestBlockPath)
+			closestBlockEntry = Editor.node(editor, closestBlockPath)
 			if (!closestBlockEntry) {
 				return
 			}
-			Transforms.removeNodes(e, {
+			Transforms.removeNodes(editor, {
 				at: closestBlockEntry[1],
 			})
 		})
 	}
 
-	return e as unknown as EditorWithHorizontalRules<E>
+	return editor
 }

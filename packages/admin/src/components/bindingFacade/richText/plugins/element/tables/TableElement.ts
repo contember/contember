@@ -1,6 +1,6 @@
-import type { BaseEditor, ElementNode } from '../../../baseEditor'
 import { CustomElementPlugin } from '../../../baseEditor'
 import {
+	Editor as SlateEditor,
 	Editor,
 	Element as SlateElement,
 	Element,
@@ -19,9 +19,9 @@ import { createEmptyTableCellElement } from './TableCellElement'
 
 export const tableElementType = 'table' as const
 
-export interface TableElement extends ElementNode {
+export interface TableElement extends SlateElement {
 	type: typeof tableElementType
-	children: BaseEditor['children']
+	children: SlateEditor['children']
 }
 
 export const isTableElement = (element: Node): element is TableElement => Element.isElement(element) && element.type === tableElementType

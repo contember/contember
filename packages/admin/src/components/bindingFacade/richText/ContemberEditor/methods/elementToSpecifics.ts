@@ -1,8 +1,8 @@
-import type { ElementNode, ElementSpecifics } from '../../baseEditor'
+import { Element as SlateElement } from 'slate'
 
-export const elementToSpecifics = <Element extends ElementNode = ElementNode>(
+export const elementToSpecifics = <Element extends SlateElement = SlateElement>(
 	element: Element,
-): ElementSpecifics<Element> => {
+): Partial<Element> => {
 	const { type, children, referenceId, ...specifics } = element
-	return specifics
+	return specifics as Partial<Element>
 }

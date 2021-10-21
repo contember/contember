@@ -1,17 +1,16 @@
 import type { EntityAccessor, FieldValue } from '@contember/binding'
 import type * as Slate from 'slate'
-import type { BaseEditor, WithAnotherNodeType } from '../../baseEditor'
+import { Editor as SlateEditor, Editor } from 'slate'
 import type {
 	ContemberContentPlaceholderElement,
 	ContemberFieldElement,
 	ElementWithReference,
 	ReferenceElement,
 } from '../elements'
-import { Editor } from 'slate'
 
 export type BlockEditorElements = ReferenceElement | ContemberContentPlaceholderElement | ContemberFieldElement
 
-export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, BlockEditorElements>> {
+export interface WithBlockElements {
 	slate: typeof Slate
 	isReferenceElement: (node: Slate.Node) => node is ReferenceElement
 	isContemberContentPlaceholderElement: (node: Slate.Node) => node is ContemberContentPlaceholderElement
@@ -36,7 +35,6 @@ export interface WithBlockElements<E extends WithAnotherNodeType<BaseEditor, Blo
 	unstable_diagnosticOperationLog: Slate.Operation[][]
 }
 
-export type EditorWithBlockElements<E extends BaseEditor> = WithAnotherNodeType<E, BlockEditorElements> &
-	WithBlockElements<WithAnotherNodeType<E, BlockEditorElements>>
+export type EditorWithBlockElements<E extends SlateEditor> = E & WithBlockElements
 
-export type BlockSlateEditor = Editor & EditorWithBlockElements<BaseEditor>
+export type BlockSlateEditor = Editor & EditorWithBlockElements<SlateEditor>

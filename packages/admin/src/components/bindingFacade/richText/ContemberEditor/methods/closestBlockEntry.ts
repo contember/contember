@@ -1,12 +1,11 @@
-import { Editor, Location } from 'slate'
-import type { BaseEditor, ElementNode } from '../../baseEditor'
+import { Editor as SlateEditor, Editor, Location, Element } from 'slate'
 import { closest } from './closest'
 
-export const closestBlockEntry = <E extends BaseEditor>(
+export const closestBlockEntry = <E extends SlateEditor>(
 	editor: E,
 	options?: {
 		at?: Location
-		match?: (node: ElementNode) => boolean
+		match?: (node: Element) => boolean
 	},
 ) =>
 	closest(editor, {

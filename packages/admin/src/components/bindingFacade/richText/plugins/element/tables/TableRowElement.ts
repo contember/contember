@@ -1,16 +1,15 @@
-import type { BaseEditor, ElementNode } from '../../../baseEditor'
-import { Node, Element, Node as SlateNode, Element as SlateElement, Transforms } from 'slate'
-import { createEmptyTableCellElement, isTableCellElement, tableCellElementType } from './TableCellElement'
 import { CustomElementPlugin } from '../../../baseEditor'
+import { Editor as SlateEditor, Element as SlateElement, Element, Node, Node as SlateNode, Transforms } from 'slate'
+import { createEmptyTableCellElement, isTableCellElement, tableCellElementType } from './TableCellElement'
 import { TableRowElementRenderer } from './TableRowElementRenderer'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { tableElementType } from './TableElement'
 
 export const tableRowElementType = 'tableRow' as const
 
-export interface TableRowElement extends ElementNode {
+export interface TableRowElement extends SlateElement {
 	type: typeof tableRowElementType
-	children: BaseEditor['children']
+	children: SlateEditor['children']
 	headerScope?: 'table'
 }
 

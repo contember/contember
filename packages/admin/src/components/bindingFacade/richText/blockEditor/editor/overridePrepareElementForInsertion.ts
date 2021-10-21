@@ -1,14 +1,14 @@
 import {
-	Editor,
-	Location,
-	Node as SlateNode,
-	NodeEntry,
-	Path as SlatePath,
-	Point,
-	Range as SlateRange,
-	Transforms,
+    Editor,
+    Element as SlateElement,
+    Location,
+    Node as SlateNode,
+    NodeEntry,
+    Path as SlatePath,
+    Point,
+    Range as SlateRange,
+    Transforms,
 } from 'slate'
-import type { ElementNode } from '../../baseEditor'
 import { ContemberEditor } from '../../ContemberEditor'
 import type { FieldBackedElement } from '../FieldBackedElement'
 import type { BlockSlateEditor } from './BlockSlateEditor'
@@ -66,7 +66,7 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 
 		const [closestBlockElement, closestBlockPath] = ContemberEditor.closestBlockEntry(editor, {
 			at: targetPoint,
-		})! as NodeEntry<ElementNode>
+		})! as NodeEntry<SlateElement>
 
 		if (editor.canContainAnyBlocks(closestBlockElement)) {
 			return targetPoint.path

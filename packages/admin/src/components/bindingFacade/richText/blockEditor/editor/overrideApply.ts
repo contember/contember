@@ -1,7 +1,6 @@
 import type { BindingOperations } from '@contember/binding'
 import type { MutableRefObject } from 'react'
 import { Element as SlateElement, Node, Operation } from 'slate'
-import type { ElementNode, TextNode } from '../../baseEditor'
 import { isElementWithReference } from '../elements'
 import type { BlockSlateEditor } from './BlockSlateEditor'
 

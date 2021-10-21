@@ -1,10 +1,10 @@
 import isHotkey from 'is-hotkey'
 import { createElement } from 'react'
-import type { BaseEditor } from '../../../baseEditor'
+import { Editor as SlateEditor } from 'slate'
 
 export const codeMark = 'isCode'
 
-export const withCode = <E extends BaseEditor>(editor: E): E => {
+export const withCode = <E extends SlateEditor>(editor: E): E => {
 	const { onKeyDown, renderLeafChildren } = editor
 
 	const isBoldHotkey = isHotkey('mod+`')

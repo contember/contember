@@ -1,20 +1,19 @@
-import type { BaseEditor, CustomElementPlugin, ElementNode } from '../../../baseEditor'
-import { Editor, Node as SlateNode, Transforms } from 'slate'
-import { ElementSpecifics } from '../../../baseEditor'
+import type { CustomElementPlugin } from '../../../baseEditor'
+import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { ParagraphRenderer } from './ParagraphRenderer'
 
 export const paragraphElementType = 'paragraph' as const
 
-export interface ParagraphElement extends ElementNode {
+export interface ParagraphElement extends SlateElement {
 	type: typeof paragraphElementType
 	isNumbered?: boolean
-	children: BaseEditor['children']
+	children: SlateEditor['children']
 }
 
 export const isParagraphElement = (
-	element: ElementNode | SlateNode,
-	suchThat?: Partial<ElementSpecifics<ParagraphElement>>,
+	element: SlateNode,
+	suchThat?: Partial<ParagraphElement>,
 ): element is ParagraphElement => ContemberEditor.isElementType(element, paragraphElementType, suchThat)
 
 export const paragraphElementPlugin: CustomElementPlugin<ParagraphElement> = {

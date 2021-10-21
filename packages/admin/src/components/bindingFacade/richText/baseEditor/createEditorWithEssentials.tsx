@@ -10,16 +10,15 @@ import {
 	Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { withReact } from 'slate-react'
+import { ReactEditor, withReact } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
 import { DefaultElement } from './DefaultElement'
-import type { ElementSpecifics, TextSpecifics, UnderlyingEditor } from './Node'
+import type { TextSpecifics } from './Node'
 import { overrideDeleteBackward, withPaste } from './overrides'
-import { ReactEditor } from 'slate-react'
 import { CustomElementPlugin } from './CustomElementPlugin'
 
 export const createEditorWithEssentials = (defaultElementType: string): Editor => {
-	const underlyingEditor: UnderlyingEditor = withHistory(withReact(createEditor() as ReactEditor))
+	const underlyingEditor = withHistory(withReact(createEditor() as ReactEditor))
 
 	const editor = underlyingEditor as unknown as Editor
 	const { normalizeNode, isInline, isVoid } = editor
@@ -50,7 +49,7 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 
 		// TODO in the following function, we need to conditionally trim the selection so that it doesn't potentially
 		// 	include empty strings at the edges of top-level elements.
-		isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {
+		isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => {
 			return (
 				elements[elementType]?.isActive?.({ editor, suchThat })
 				?? Array.from(ContemberEditor.topLevelNodes(editor))
@@ -70,7 +69,7 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 			ContemberEditor.addMarks(editor, marks)
 			return true
 		},
-		toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => {
+		toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => {
 			elements[elementType].toggleElement?.({
 				editor,
 				suchThat,
@@ -86,6 +85,9 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		},
 
 		canContainAnyBlocks: element => {
+			if (Editor.isEditor(element)) {
+				return true
+			}
 			return !editor.isInline(element)
 				&& !editor.isVoid(element)
 				&& (elements[element.type] ? elements[element.type].canContainAnyBlocks ?? false : true)

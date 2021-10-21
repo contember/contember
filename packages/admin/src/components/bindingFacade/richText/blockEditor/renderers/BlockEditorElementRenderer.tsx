@@ -1,8 +1,8 @@
 import { BindingError, EntityAccessor, FieldValue, RelativeEntityList, RelativeSingleField } from '@contember/binding'
 import type { MutableRefObject, ReactElement } from 'react'
 import type { RenderElementProps } from 'slate-react'
+import type { Element } from 'slate'
 import type { NormalizedBlocks } from '../../../blocks'
-import type { ElementNode } from '../../baseEditor'
 import { isContemberContentPlaceholderElement, isContemberFieldElement, isReferenceElement } from '../elements'
 import type { NormalizedEmbedHandlers } from '../embed'
 import type { FieldBackedElement } from '../FieldBackedElement'
@@ -12,7 +12,7 @@ import { ContentPlaceholderElementRenderer } from './ContentPlaceholderElementRe
 import { ReferenceElementRenderer } from './ReferenceElementRenderer'
 
 export interface BlockEditorElementRendererProps extends RenderElementProps {
-	element: ElementNode
+	element: Element
 
 	desugaredBlockList: RelativeEntityList
 	editorReferenceBlocks: EditorReferenceBlocks

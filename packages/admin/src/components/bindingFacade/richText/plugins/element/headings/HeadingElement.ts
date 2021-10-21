@@ -1,21 +1,20 @@
-import type { BaseEditor, CustomElementPlugin, ElementNode } from '../../../baseEditor'
-import { Editor, Editor as SlateEditor, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
-import { ElementSpecifics } from '../../../baseEditor'
+import type { CustomElementPlugin } from '../../../baseEditor'
+import { Editor, Editor as SlateEditor, Element, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { HeadingRenderer } from './HeadingRenderer'
 
 export const headingElementType = 'heading' as const
 
-export interface HeadingElement extends ElementNode {
+export interface HeadingElement extends Element {
 	type: typeof headingElementType
 	level: 1 | 2 | 3 | 4 | 5 | 6
 	isNumbered?: boolean
-	children: BaseEditor['children']
+	children: SlateEditor['children']
 }
 
 export const isHeadingElement = (
-	element: SlateNode | ElementNode,
-	suchThat?: Partial<ElementSpecifics<HeadingElement>>,
+	element: SlateNode,
+	suchThat?: Partial<HeadingElement>,
 ): element is HeadingElement => ContemberEditor.isElementType(element, headingElementType, suchThat)
 
 export const ejectHeadingElement = (editor: Editor, elementPath: SlatePath) => {

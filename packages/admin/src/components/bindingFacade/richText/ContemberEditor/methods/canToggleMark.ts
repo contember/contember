@@ -1,6 +1,6 @@
-import type { BaseEditor, TextNode } from '../../baseEditor'
+import { Editor as SlateEditor, Text as SlateText } from 'slate'
 
-export const canToggleMark = <T extends TextNode, E extends BaseEditor>(
+export const canToggleMark = <T extends SlateText, E extends SlateEditor>(
 	editor: E,
 	markName: string,
 	markValue: unknown = true,

@@ -1,10 +1,10 @@
 import isHotkey from 'is-hotkey'
 import { createElement } from 'react'
-import type { BaseEditor } from '../../../baseEditor'
+import { Editor as SlateEditor } from 'slate'
 
 export const strikeThroughMark = 'isStruckThrough'
 
-export const withStrikeThrough = <E extends BaseEditor>(editor: E): E => {
+export const withStrikeThrough = <E extends SlateEditor>(editor: E): E => {
 	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
 
 	const isStruckThroughHotkey = isHotkey('mod+opt+s')

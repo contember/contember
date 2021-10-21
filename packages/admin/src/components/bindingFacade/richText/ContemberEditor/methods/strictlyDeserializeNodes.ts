@@ -1,11 +1,12 @@
-import type { BaseEditor, ElementNode, SerializableEditorNode, TextNode } from '../../baseEditor'
+import type { SerializableEditorNode } from '../../baseEditor'
 import { toLatestFormat } from './toLatestFormat'
+import { Editor as SlateEditor, Element as SlateElement, Text as SlateText } from 'slate'
 
-export const strictlyDeserializeNodes = <E extends BaseEditor>(
+export const strictlyDeserializeNodes = <E extends SlateEditor>(
 	editor: E,
 	serializedElement: string,
 	errorMessage?: string,
-): Array<ElementNode | TextNode> => {
+): Array<SlateElement | SlateText> => {
 	let deserialized: SerializableEditorNode
 	try {
 		// It is important that only the JSON.parse call is inside the try block.

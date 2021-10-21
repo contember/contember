@@ -1,15 +1,14 @@
-import type { BaseEditor, ElementNode } from '../../../baseEditor'
-import { Element, Element as SlateElement, Node, Transforms } from 'slate'
+import { CustomElementPlugin } from '../../../baseEditor'
+import { Editor as SlateEditor, Element, Element as SlateElement, Node, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { tableRowElementType } from './TableRowElement'
 import { TableCellElementRenderer } from './TableCellElementRenderer'
-import { CustomElementPlugin } from '../../../baseEditor'
 
 export const tableCellElementType = 'tableCell' as const
 
-export interface TableCellElement extends ElementNode {
+export interface TableCellElement extends SlateElement {
 	type: typeof tableCellElementType
-	children: BaseEditor['children']
+	children: SlateEditor['children']
 	headerScope?: 'row'
 	justify?: 'start' | 'center' | 'end'
 }

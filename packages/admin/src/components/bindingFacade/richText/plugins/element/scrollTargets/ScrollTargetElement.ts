@@ -1,16 +1,23 @@
-import type { BaseEditor, CustomElementPlugin, ElementNode } from '../../../baseEditor'
+import type { CustomElementPlugin } from '../../../baseEditor'
 import { ScrollTargetRenderer } from './ScrollTargetRenderer'
-import { Editor, Element as SlateElement, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
+import {
+    Editor as SlateEditor,
+    Editor,
+    Element as SlateElement,
+    Node as SlateNode,
+    Range as SlateRange,
+    Transforms,
+} from 'slate'
 
 export const scrollTargetElementType = 'scrollTarget' as const
 
-export interface ScrollTargetElement extends ElementNode {
+export interface ScrollTargetElement extends SlateElement {
 	type: typeof scrollTargetElementType
 	identifier: string
-	children: BaseEditor['children']
+	children: SlateEditor['children']
 }
 
-export const isScrollTargetElement = (element: SlateNode | ElementNode): element is ScrollTargetElement =>
+export const isScrollTargetElement = (element: SlateNode): element is ScrollTargetElement =>
 	SlateElement.isElement(element) && element.type === scrollTargetElementType
 
 export const isScrollTargetElementActive = (editor: Editor) => {

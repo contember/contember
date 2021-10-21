@@ -1,29 +1,27 @@
-import type { EditorNode, ElementNode, TextNode } from '../Node'
-import type { WithEssentials } from '../EditorWithEssentials'
-import { Descendant, Transforms } from 'slate'
+import { Descendant, Editor as SlateEditor, Element as SlateElement, Text as SlateText, Transforms } from 'slate'
 
-type Children = (ElementNode | TextNode)[]
+type Children = (SlateElement | SlateText)[]
 
 export interface TextAttrs {
 	[key: string]: any
 }
 
 export type NodesWithTypeFiltered =
-	| { texts: (TextNode | ElementNode)[]; elements?: undefined }
-	| { elements: ElementNode[]; texts?: undefined }
+	| { texts: (SlateText | SlateElement)[]; elements?: undefined }
+	| { elements: SlateElement[]; texts?: undefined }
 export type NodesWithType = NodesWithTypeFiltered | null
 
 export type ProcessBlockPaste = (
 	element: HTMLElement,
 	next: (children: NodeList | Node[], cumulativeTextAttrs: TextAttrs) => Children,
 	cumulativeTextAttrs: TextAttrs,
-) => ElementNode[] | ElementNode | null
+) => SlateElement[] | SlateElement | null
 
 export type ProcessInlinePaste = (
 	element: HTMLElement,
 	next: (children: NodeList, cumulativeTextAttrs: TextAttrs) => Children,
 	cumulativeTextAttrs: TextAttrs,
-) => (ElementNode | TextNode)[] | ElementNode | TextNode | null
+) => (SlateElement | SlateText)[] | SlateElement | SlateText | null
 
 export type ProcessAttributesPaste = (element: HTMLElement, cumulativeTextAttrs: TextAttrs) => TextAttrs
 
@@ -49,13 +47,13 @@ export interface WithPaste {
 
 const ignoredElements = ['SCRIPT', 'STYLE', 'TEMPLATE']
 
-export const withPaste: <E extends EditorNode>(
+export const withPaste: <E extends SlateEditor>(
 	editor: E,
 ) => asserts editor is E = editor => {
-	const editorWithEssentials = editor as WithPaste & EditorNode
+	const editorWithEssentials = editor as WithPaste & SlateEditor
 	const { insertData } = editorWithEssentials
 
-	const impl: WithPaste & Partial<EditorNode> = {
+	const impl: WithPaste & Partial<SlateEditor> = {
 		// Base paste
 		processWithAttributeProcessor: (element, cta) => {
 			if (!(element instanceof HTMLElement)) {
@@ -82,8 +80,8 @@ export const withPaste: <E extends EditorNode>(
 		processAttributesPaste: (el, cta) => cta,
 		processNodeListPaste: (nodeList, cta) => {
 			const processed: (
-				| { text: TextNode | ElementNode; element?: undefined; isWhiteSpace: boolean }
-				| { element: ElementNode; text?: undefined }
+				| { text: SlateText | SlateElement; element?: undefined; isWhiteSpace: boolean }
+				| { element: SlateElement; text?: undefined }
 			)[] = []
 
 			for (const childNode of nodeList) {
@@ -143,7 +141,7 @@ export const withPaste: <E extends EditorNode>(
 					}),
 				}
 			} else {
-				return { texts: processed.map(item => item.text as TextNode) }
+				return { texts: processed.map(item => item.text as SlateText) }
 			}
 		},
 
@@ -191,7 +189,7 @@ export const withPaste: <E extends EditorNode>(
 
 			if (containsBlock) {
 				return {
-					elements: withTypeFiltered.flatMap<ElementNode>(item => {
+					elements: withTypeFiltered.flatMap<SlateElement>(item => {
 						if (item.elements === undefined) {
 							return [editorWithEssentials.createDefaultElement(item.texts)]
 						} else {

@@ -1,14 +1,13 @@
 import {
-	addEntityAtIndex,
-	BindingOperations,
-	EntityAccessor,
-	FieldValue,
-	RelativeEntityList,
-	RelativeSingleField,
+    addEntityAtIndex,
+    BindingOperations,
+    EntityAccessor,
+    FieldValue,
+    RelativeEntityList,
+    RelativeSingleField,
 } from '@contember/binding'
 import type { MutableRefObject } from 'react'
-import { Editor, PathRef, Transforms } from 'slate'
-import type { ElementNode } from '../../baseEditor'
+import { Editor, Element as SlateElement, PathRef, Transforms } from 'slate'
 import type { ElementWithReference } from '../elements'
 import type { FieldBackedElement } from '../FieldBackedElement'
 import type { BlockSlateEditor } from './BlockSlateEditor'
@@ -16,7 +15,7 @@ import type { BlockSlateEditor } from './BlockSlateEditor'
 export interface OverrideInsertElementWithReferenceOptions {
 	bindingOperations: BindingOperations
 	blockContentField: RelativeSingleField
-	blockElementCache: WeakMap<EntityAccessor, ElementNode>
+	blockElementCache: WeakMap<EntityAccessor, SlateElement>
 	blockElementPathRefs: Map<string, PathRef>
 	createMonolithicReference: ((initialize: EntityAccessor.BatchUpdatesHandler) => void) | undefined
 	desugaredBlockList: RelativeEntityList
@@ -47,7 +46,7 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 	if (referenceDiscriminationField === undefined) {
 		return
 	}
-	editor.insertElementWithReference = <Element extends ElementNode>(
+	editor.insertElementWithReference = <Element extends SlateElement>(
 		element: Omit<Element, 'referenceId'>,
 		referenceDiscriminant: FieldValue,
 		initialize?: EntityAccessor.BatchUpdatesHandler,

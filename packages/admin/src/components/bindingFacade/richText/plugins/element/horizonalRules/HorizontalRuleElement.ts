@@ -1,12 +1,19 @@
-import type { BaseEditor, CustomElementPlugin, ElementNode } from '../../../baseEditor'
-import { Editor, Element as SlateElement, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
+import type { CustomElementPlugin } from '../../../baseEditor'
+import {
+	Editor as SlateEditor,
+	Editor,
+	Element as SlateElement,
+	Node as SlateNode,
+	Range as SlateRange,
+	Transforms,
+} from 'slate'
 import { HorizontalRuleRenderer } from './HorizontalRuleRenderer'
 
 export const horizontalRuleElementType = 'horizontalRule' as const
 
-export interface HorizontalRuleElement extends ElementNode {
+export interface HorizontalRuleElement extends SlateElement {
 	type: typeof horizontalRuleElementType
-	children: BaseEditor['children']
+	children: SlateEditor['children']
 }
 
 export const isHorizontalRuleElement = (element: SlateNode): element is HorizontalRuleElement =>

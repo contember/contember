@@ -1,9 +1,7 @@
 import { EditorBlockBoundary } from '@contember/ui'
-import { memo, createElement, Fragment } from 'react'
-import { ReactEditor, RenderElementProps, useEditor } from 'slate-react'
+import { createElement, Fragment, memo } from 'react'
+import { ReactEditor, RenderElementProps, useSlateStatic } from 'slate-react'
 import { ContemberEditor } from '../ContemberEditor'
-import type { EditorWithEssentials } from './EditorWithEssentials'
-import type { EditorNode } from './Node'
 
 export interface BlockElementProps extends RenderElementProps {
 	domElement?: keyof JSX.IntrinsicElements
@@ -17,7 +15,7 @@ export const BlockElement = memo(function BlockElement({
 	domElement = 'div',
 	withBoundaries = false,
 }: BlockElementProps) {
-	const editor = useEditor() as EditorWithEssentials<EditorNode>
+	const editor = useSlateStatic()
 	const dataAttributes = ContemberEditor.getElementDataAttributes(element)
 
 	return createElement(

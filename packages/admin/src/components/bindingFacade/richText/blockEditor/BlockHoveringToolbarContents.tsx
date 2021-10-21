@@ -1,12 +1,14 @@
 import { BindingError, Environment, useEnvironment, VariableInputTransformer } from '@contember/binding'
 import { EditorToolbar, IconSourceSpecification, ToolbarGroup } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, useMemo } from 'react'
-import { useEditor } from 'slate-react'
+import { useSlateStatic } from 'slate-react'
 import { getDiscriminatedDatum, SugaredDiscriminateBy } from '../../discrimination'
 import type { ElementSpecificToolbarButton } from '../toolbars'
 import type { BlockSlateEditor } from './editor'
 import { ReferenceElement, referenceElementType } from './elements'
 import type { EditorReferenceBlocks } from './templating'
+import { Editor } from 'slate'
+import { EditorWithBlockElements } from './editor'
 
 export type BlockHoveringToolbarConfig = IconSourceSpecification & {
 	title?: string
@@ -81,7 +83,7 @@ function toToolbarGroups(
 }
 
 export const BlockHoveringToolbarContents = memo((props: BlockHoveringToolbarContentsProps) => {
-	const editor = useEditor() as BlockSlateEditor
+	const editor = useSlateStatic() as EditorWithBlockElements<Editor>
 	const environment = useEnvironment()
 
 	const { editorReferenceBlocks, blockButtons, otherBlockButtons } = props

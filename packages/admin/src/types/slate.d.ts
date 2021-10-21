@@ -1,5 +1,7 @@
 import { BaseEditor, Descendant } from 'slate'
-import { EditorWithEssentials, UnderlyingEditor } from '../components'
+import { EditorWithEssentials } from '../components'
+import { ReactEditor } from 'slate-react'
+import { HistoryEditor } from 'slate-history'
 
 interface CustomElement {
 	type: string
@@ -12,7 +14,7 @@ interface CustomText {
 
 declare module 'slate' {
 	interface CustomTypes {
-		Editor: UnderlyingEditor & BaseEditor & EditorWithEssentials<BaseEditor>
+		Editor: EditorWithEssentials<ReactEditor & HistoryEditor & BaseEditor>
 		Element: {
 			[K in string]: unknown
 		} & CustomElement

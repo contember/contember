@@ -5,10 +5,10 @@ import type {
 	Node as SlateNode,
 	Text as SlateText,
 	NodeEntry,
-	Descendant,
+	Descendant, Editor,
 } from 'slate'
 import type { RenderElementProps, RenderLeafProps } from 'slate-react'
-import type { ElementSpecifics, TextSpecifics } from './Node'
+import type { TextSpecifics } from './Node'
 import type { WithPaste } from './overrides'
 import { CustomElementPlugin } from './CustomElementPlugin'
 
@@ -23,11 +23,11 @@ export interface WithEssentials {
 	hasMarks: <T extends SlateText>(marks: TextSpecifics<T>) => boolean
 	toggleMarks: <T extends SlateText>(marks: TextSpecifics<T>) => void
 
-	canToggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
-	isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => boolean
-	toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: ElementSpecifics<E>) => void
+	canToggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => boolean
+	isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => boolean
+	toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => void
 
-	canContainAnyBlocks: (element: SlateElement) => boolean
+	canContainAnyBlocks: (element: SlateElement | Editor) => boolean
 
 	serializeNodes: (nodes: Array<Descendant>, errorMessage?: string) => string
 	deserializeNodes: (serializedNodes: string, errorMessage?: string) => Array<SlateElement | SlateText>

@@ -1,5 +1,4 @@
 import { Editor, Element as SlateElement, Point, Range as SlateRange, Transforms } from 'slate'
-import type { ElementSpecifics } from '../../../baseEditor'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { isParagraphElement, ParagraphElement, paragraphElementPlugin, paragraphElementType } from './ParagraphElement'
 
@@ -20,7 +19,7 @@ export const withParagraphs = <E extends Editor>(editor: E): E => {
 		if (elementType !== paragraphElementType || suchThat === undefined) {
 			return canToggleElement(elementType, suchThat)
 		}
-		const isNumbered = (suchThat as Partial<ElementSpecifics<ParagraphElement>>).isNumbered
+		const isNumbered = suchThat.isNumbered
 
 		if (isNumbered !== true) {
 			return canToggleElement(elementType, suchThat)

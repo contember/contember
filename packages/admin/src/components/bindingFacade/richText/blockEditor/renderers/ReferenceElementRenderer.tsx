@@ -2,11 +2,10 @@ import { BindingError, Entity, FieldValue, RelativeSingleField, useEntity } from
 import { ActionableBox, Box, EditorBox } from '@contember/ui'
 import { memo, MouseEvent as ReactMouseEvent, ReactNode, useCallback } from 'react'
 import { Transforms } from 'slate'
-import { ReactEditor, RenderElementProps, useEditor, useSelected } from 'slate-react'
+import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
 import { BlockProps, getDiscriminatedBlock, NormalizedBlocks } from '../../../blocks'
 import { getDiscriminatedDatum } from '../../../discrimination'
 import { BlockElement } from '../../baseEditor'
-import type { BlockSlateEditor } from '../editor'
 import type { ReferenceElement } from '../elements'
 import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
 import type { EditorReferenceBlocks } from '../templating'
@@ -23,7 +22,7 @@ export interface ReferenceElementRendererProps extends RenderElementProps {
 }
 
 export const ReferenceElementRenderer = memo((props: ReferenceElementRendererProps) => {
-	const editor = useEditor() as BlockSlateEditor
+	const editor = useSlateStatic()
 	const selected = useSelected()
 
 	const referencedEntity = useEntity()

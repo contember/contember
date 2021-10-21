@@ -1,14 +1,13 @@
-import { Editor, Location, NodeEntry, Text } from 'slate'
-import type { BaseEditor, EditorNode, ElementNode } from '../../baseEditor'
+import { Editor as SlateEditor, Editor, Element, Location, NodeEntry, Text } from 'slate'
 
-export const closest = <E extends BaseEditor>(
+export const closest = <E extends SlateEditor>(
 	editor: E,
 	options: {
 		at?: Location
-		match: (node: ElementNode | EditorNode) => boolean
+		match: (node: Editor | Element) => boolean
 	},
-): NodeEntry<ElementNode | EditorNode> | undefined => {
-	const entries = Editor.levels<ElementNode | EditorNode>(editor, {
+): NodeEntry<Editor | Element> | undefined => {
+	const entries = Editor.levels<Editor | Element>(editor, {
 		at: options.at,
 		match: node => {
 			return !Text.isText(node) && options.match(node)

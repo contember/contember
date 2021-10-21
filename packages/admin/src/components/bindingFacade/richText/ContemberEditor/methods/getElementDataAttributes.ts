@@ -1,11 +1,11 @@
 import type { Scalar } from '@contember/binding'
-import type { ElementNode } from '../../baseEditor'
+import { Element as SlateElement } from 'slate'
 
 export interface ElementDataAttributes {
 	[dataAttribute: string]: Scalar
 }
 
-export const getElementDataAttributes = <Element extends ElementNode = ElementNode>(
+export const getElementDataAttributes = <Element extends SlateElement = SlateElement>(
 	element: Element,
 	attributeNamePrefix: string = 'contember',
 ): ElementDataAttributes => {

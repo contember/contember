@@ -1,10 +1,10 @@
 import isHotkey from 'is-hotkey'
 import { createElement } from 'react'
-import type { BaseEditor } from '../../../baseEditor'
+import { Editor as SlateEditor } from 'slate'
 
 export const underlineMark = 'isUnderlined'
 
-export const withUnderline = <E extends BaseEditor>(editor: E): E => {
+export const withUnderline = <E extends SlateEditor>(editor: E): E => {
 	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
 
 	const isUnderlinedHotkey = isHotkey('mod+u')

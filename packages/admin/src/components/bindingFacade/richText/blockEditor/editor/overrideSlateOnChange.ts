@@ -6,9 +6,8 @@ import type {
 	RelativeSingleField,
 } from '@contember/binding'
 import type { MutableRefObject } from 'react'
-import { Element, Editor, Node as SlateNode, PathRef } from 'slate'
+import { Editor, Element, Element as SlateElement, Node as SlateNode, PathRef } from 'slate'
 import { assertNever } from '../../../../../utils'
-import type { EditorNode, ElementNode } from '../../baseEditor'
 import type { ContemberFieldElement } from '../elements'
 import type { FieldBackedElement } from '../FieldBackedElement'
 import type { BlockSlateEditor } from './BlockSlateEditor'
@@ -16,7 +15,7 @@ import type { Unstable_BlockEditorDiagnostics } from './Unstable_BlockEditorDiag
 
 export interface OverrideOnChangeOptions {
 	blockContentField: RelativeSingleField
-	blockElementCache: WeakMap<EntityAccessor, ElementNode>
+	blockElementCache: WeakMap<EntityAccessor, SlateElement>
 	blockElementPathRefs: Map<string, PathRef>
 	contemberFieldElementCache: WeakMap<FieldAccessor<string>, ContemberFieldElement>
 	desugaredBlockList: RelativeEntityList

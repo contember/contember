@@ -1,7 +1,8 @@
 import { BindingError } from '@contember/binding'
-import type { BaseEditor, ElementNode, SerializableEditorNode } from '../../baseEditor'
+import type { SerializableEditorNode } from '../../baseEditor'
+import { Editor as SlateEditor, Element as SlateElement } from 'slate'
 
-export const toLatestFormat = <E extends BaseEditor>(
+export const toLatestFormat = <E extends SlateEditor>(
 	editor: E,
 	potentiallyOldNode: SerializableEditorNode,
 ): SerializableEditorNode => {
@@ -19,7 +20,7 @@ export const toLatestFormat = <E extends BaseEditor>(
 				formatVersion: formatNumber + 1,
 				children: potentiallyOldNode.children.map(oldChild =>
 					editor.upgradeFormatBySingleVersion(oldChild, formatNumber),
-				) as ElementNode[],
+				) as SlateElement[],
 			}
 		}
 		return potentiallyOldNode

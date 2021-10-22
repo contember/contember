@@ -15,7 +15,6 @@ export interface WithBlockElements {
 	isReferenceElement: (node: Slate.Node) => node is ReferenceElement
 	isContemberContentPlaceholderElement: (node: Slate.Node) => node is ContemberContentPlaceholderElement
 	isContemberFieldElement: (node: Slate.Node) => node is ContemberFieldElement
-	createReferencedEntity: (blockIndex: number, initialize?: EntityAccessor.BatchUpdatesHandler) => void
 
 	// Really, try to avoid passing just the referenceId at all costs
 	getReferencedEntity: (elementOrReferenceId: ElementWithReference | string) => EntityAccessor

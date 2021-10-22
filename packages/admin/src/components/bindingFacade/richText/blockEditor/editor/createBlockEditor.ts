@@ -62,12 +62,6 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 						`Check the BlockEditor props.`,
 				)
 			}
-			e.createReferencedEntity = () => {
-				throw new BindingError(
-					`BlockEditor: trying to create a referenced entity but referencing has not been correctly set up. ` +
-						`Check the BlockEditor props.`,
-				)
-			}
 			e.getReferencedEntity = () => {
 				throw new BindingError(
 					`BlockEditor: trying to access a referenced entity but referencing has not been correctly set up. ` +

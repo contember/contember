@@ -158,12 +158,20 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		onFocus: () => {},
 		onBlur: () => {},
 		normalizeNode: ([node, path]) => {
-			if (SlateElement.isElement(node) && elements[node.type]?.normalizeNode) {
-				elements[node.type].normalizeNode?.({
+			if (!SlateElement.isElement(node)) {
+				normalizeNode([node, path])
+				return
+			}
+			const plugin = elements.get(node.type)
+			if (plugin?.normalizeNode) {
+				const result = plugin.normalizeNode({
 					element: node,
 					path,
 					editor,
 				})
+				if (result === true) {
+					normalizeNode([node, path])
+				}
 			} else {
 				normalizeNode([node, path])
 			}

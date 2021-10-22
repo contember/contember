@@ -1,12 +1,12 @@
-import { Editor, Node as SlateNode, Path as SlatePath, Transforms, Element as SlateElement } from 'slate'
-import type { BaseEditor } from '../../../../baseEditor'
+import { Editor, Element as SlateElement, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
 import { ContemberEditor } from '../../../../ContemberEditor'
-import type { EditorWithLists } from '../EditorWithLists'
 import type { ListItemElement } from '../ListItemElement'
 import { indentListItem } from './indentListItem'
+import { isListElement } from '../ListElement'
+import { isListItemElement } from '../ListItemElement'
 
 export const dedentListItem = (
-	editor: EditorWithLists<BaseEditor>,
+	editor: Editor,
 	listItem: ListItemElement,
 	listItemPath: SlatePath,
 ): boolean => {
@@ -15,27 +15,27 @@ export const dedentListItem = (
 	const parentListChildrenCount = parentListElement.children.length
 	const subsequentListItemCount = parentListChildrenCount - listItemPath[listItemPath.length - 1] - 1
 
-	if (!editor.isList(parentListElement) || parentListPath.length <= 1) {
+	if (!isListElement(parentListElement) || parentListPath.length <= 1) {
 		return false
 	}
 	const parentListItemPath = SlatePath.parent(parentListPath)
 	const parentListItemElement = SlateNode.get(editor, parentListItemPath)
 
-	if (!editor.isListItem(parentListItemElement)) {
+	if (!isListItemElement(parentListItemElement)) {
 		return false
 	}
 
 	const grandParentListPath = SlatePath.parent(parentListItemPath)
 	const grandParentListElement = SlateNode.get(editor, grandParentListPath)
 
-	if (!editor.isList(grandParentListElement)) {
+	if (!isListElement(grandParentListElement)) {
 		return false
 	}
 	const parentListElementSpecifics = ContemberEditor.elementToSpecifics(parentListElement)
 	const parentAndGrandParentAreCompatible = ContemberEditor.isElementType(
 		grandParentListElement,
 		parentListElement.type,
-		parentListElementSpecifics,
+		parentListElementSpecifics as any,
 	)
 
 	// TODO we need to handle following siblings!!!

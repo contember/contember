@@ -1,4 +1,3 @@
-export * from './EditorWithLists'
 export * from './ListItemElement'
 export * from './listToolbarButtons'
 export * from './OrderedListElement'

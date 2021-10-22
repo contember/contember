@@ -11,6 +11,7 @@ import type { RenderElementProps, RenderLeafProps } from 'slate-react'
 import type { TextSpecifics } from './Node'
 import type { WithPaste } from './overrides'
 import { CustomElementPlugin } from './CustomElementPlugin'
+import { CustomMarkPlugin } from './CustomMarkPlugin'
 
 export interface WithEssentials {
 	formatVersion: number
@@ -35,6 +36,7 @@ export interface WithEssentials {
 	upgradeFormatBySingleVersion: (node: SlateNode, oldVersion: number) => SlateNode
 
 	registerElement: (plugin: CustomElementPlugin<any>) => void
+	registerMark: (plugin: CustomMarkPlugin) => void
 
 	// <Editable> props
 	onDOMBeforeInput: (event: Event) => void

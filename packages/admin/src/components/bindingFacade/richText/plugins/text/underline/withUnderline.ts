@@ -1,31 +1,11 @@
-import isHotkey from 'is-hotkey'
-import { createElement } from 'react'
 import { Editor as SlateEditor } from 'slate'
+import { underlineMark, underlineMarkPlugin } from './underlineMark'
 
-export const underlineMark = 'isUnderlined'
 
 export const withUnderline = <E extends SlateEditor>(editor: E): E => {
-	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
+	const {  processAttributesPaste, processInlinePaste } = editor
 
-	const isUnderlinedHotkey = isHotkey('mod+u')
-
-	editor.renderLeafChildren = props => {
-		const children = renderLeafChildren(props)
-
-		if (props.leaf[underlineMark] === true) {
-			return createElement('u', undefined, children)
-		}
-		return children
-	}
-
-	editor.onKeyDown = event => {
-		// TODO use onDOMBeforeInput for this
-		if (isUnderlinedHotkey(event.nativeEvent)) {
-			editor.toggleMarks({ [underlineMark]: true })
-			event.preventDefault()
-		}
-		onKeyDown(event)
-	}
+	editor.registerMark(underlineMarkPlugin)
 
 	editor.processAttributesPaste = (element, cta) => {
 		if (element.style.textDecoration) {

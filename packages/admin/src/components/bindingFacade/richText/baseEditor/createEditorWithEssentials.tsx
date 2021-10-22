@@ -1,4 +1,4 @@
-import { createElement } from 'react'
+import { createElement, ReactElement } from 'react'
 import {
 	createEditor,
 	Descendant,
@@ -16,6 +16,7 @@ import { DefaultElement } from './DefaultElement'
 import type { TextSpecifics } from './Node'
 import { overrideDeleteBackward, withPaste } from './overrides'
 import { CustomElementPlugin } from './CustomElementPlugin'
+import { CustomMarkPlugin } from './CustomMarkPlugin'
 
 export const createEditorWithEssentials = (defaultElementType: string): Editor => {
 	const underlyingEditor = withHistory(withReact(createEditor() as ReactEditor))
@@ -23,7 +24,8 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 	const editor = underlyingEditor as unknown as Editor
 	const { normalizeNode, isInline, isVoid } = editor
 
-	const elements: Record<string, CustomElementPlugin<any>> = {}
+	const elements = new Map<string, CustomElementPlugin<any>>()
+	const marks = new Map<string, CustomMarkPlugin>()
 
 	Object.assign<Editor, Partial<Editor>>(editor, {
 		formatVersion: 1,
@@ -51,7 +53,7 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		// 	include empty strings at the edges of top-level elements.
 		isElementActive: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => {
 			return (
-				elements[elementType]?.isActive?.({ editor, suchThat })
+				elements.get(elementType)?.isActive?.({ editor, suchThat })
 				?? Array.from(ContemberEditor.topLevelNodes(editor))
 						.every(([node]) => ContemberEditor.isElementType(node, elementType, suchThat))
 			)
@@ -70,18 +72,18 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 			return true
 		},
 		toggleElement: <E extends SlateElement>(elementType: E['type'], suchThat?: Partial<E>) => {
-			elements[elementType].toggleElement?.({
+			elements.get(elementType)?.toggleElement?.({
 				editor,
 				suchThat,
 			})
 		},
 
 		isInline: element => {
-			return elements[element.type]?.isInline ?? isInline(element)
+			return elements.get(element.type)?.isInline ?? isInline(element)
 		},
 
 		isVoid: element => {
-			return elements[element.type]?.isVoid ?? isVoid(element)
+			return elements.get(element.type)?.isVoid ?? isVoid(element)
 		},
 
 		canContainAnyBlocks: element => {
@@ -90,7 +92,7 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 			}
 			return !editor.isInline(element)
 				&& !editor.isVoid(element)
-				&& (elements[element.type] ? elements[element.type].canContainAnyBlocks ?? false : true)
+				&& (elements.has(element.type) ? elements.get(element.type)!.canContainAnyBlocks ?? false : true)
 		},
 
 		serializeNodes: (nodes, errorMessage) => ContemberEditor.serializeNodes(editor, nodes, errorMessage),
@@ -108,18 +110,36 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		},
 
 		renderElement: props => {
-			if (elements[props.element.type]) {
-				return createElement(elements[props.element.type].render, props)
-			}
-			return createElement(DefaultElement, props)
+			return createElement(elements.get(props.element.type)?.render ?? DefaultElement, props)
 		},
 
 		renderLeafChildren: props => props.children,
-		renderLeaf: props => createElement('span', props.attributes, editor.renderLeafChildren(props)),
+
+		renderLeaf: props => {
+			let el = createElement('span', props.attributes, editor.renderLeafChildren(props))
+			for (const [, mark] of marks) {
+				if (props.leaf[mark.type] === true) {
+					const markerEl = mark.render({ ...props, children: el })
+					if (markerEl !== null) {
+						el = markerEl
+					}
+				}
+			}
+			return el
+		},
 
 		// Just noop functions so that other plugins can safely bubble-call
 		onDOMBeforeInput: () => {},
 		onKeyDown: e => {
+			for (const [, mark] of marks) {
+				if (mark.isHotKey(e.nativeEvent)) {
+					editor.toggleMarks({ [mark.type]: true })
+					e.preventDefault()
+					return
+				}
+			}
+
+
 			// Inline void nodes cannot be deleted by default: https://github.com/ianstormtaylor/slate/issues/3456
 			// This is a hack to get around this issue. The problem is that when an inline void node is selected, Slate's
 			// beforeInput handler doesn't get triggered. However, when we put the caret right after the inline void
@@ -177,7 +197,10 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 			}
 		},
 		registerElement: plugin => {
-			elements[plugin.type] = plugin
+			elements.set(plugin.type, plugin)
+		},
+		registerMark: plugin => {
+			marks.set(plugin.type, plugin)
 		},
 	})
 

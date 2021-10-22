@@ -1,31 +1,11 @@
-import isHotkey from 'is-hotkey'
-import { createElement } from 'react'
 import { Editor as SlateEditor } from 'slate'
+import { italicMark, italicMarkPlugin } from './italicMark'
 
-export const italicMark = 'isItalic'
 
 export const withItalic = <E extends SlateEditor>(editor: E): E => {
-	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
+	const { processAttributesPaste, processInlinePaste } = editor
 
-	const isItalicHotkey = isHotkey('mod+i')
-
-	editor.renderLeafChildren = props => {
-		const children = renderLeafChildren(props)
-
-		if (props.leaf[italicMark] === true) {
-			return createElement('i', undefined, children)
-		}
-		return children
-	}
-
-	editor.onKeyDown = event => {
-		// TODO use onDOMBeforeInput for this
-		if (isItalicHotkey(event.nativeEvent)) {
-			editor.toggleMarks({ [italicMark]: true })
-			event.preventDefault()
-		}
-		onKeyDown(event)
-	}
+	editor.registerMark(italicMarkPlugin)
 
 	editor.processAttributesPaste = (element, cta) => {
 		if (element.style.fontWeight) {

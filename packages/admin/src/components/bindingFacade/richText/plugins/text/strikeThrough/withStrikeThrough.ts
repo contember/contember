@@ -1,31 +1,10 @@
-import isHotkey from 'is-hotkey'
-import { createElement } from 'react'
 import { Editor as SlateEditor } from 'slate'
+import { strikeThroughMark, strikeThroughPlugin } from './strikeThroughMark'
 
-export const strikeThroughMark = 'isStruckThrough'
 
 export const withStrikeThrough = <E extends SlateEditor>(editor: E): E => {
-	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
-
-	const isStruckThroughHotkey = isHotkey('mod+opt+s')
-
-	editor.renderLeafChildren = props => {
-		const children = renderLeafChildren(props)
-
-		if (props.leaf[strikeThroughMark] === true) {
-			return createElement('s', undefined, children)
-		}
-		return children
-	}
-
-	editor.onKeyDown = event => {
-		// TODO use onDOMBeforeInput for this
-		if (isStruckThroughHotkey(event.nativeEvent)) {
-			editor.toggleMarks({ [strikeThroughMark]: true })
-			event.preventDefault()
-		}
-		onKeyDown(event)
-	}
+	const {  processAttributesPaste, processInlinePaste } = editor
+	editor.registerMark(strikeThroughPlugin)
 
 	editor.processAttributesPaste = (element, cta) => {
 		if (element.style.textDecoration) {

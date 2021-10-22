@@ -1,31 +1,13 @@
-import isHotkey from 'is-hotkey'
-import { createElement } from 'react'
 import { Editor as SlateEditor } from 'slate'
+import { boldMarkPlugin } from './boldMark'
 
 export const boldMark = 'isBold'
 
 export const withBold = <E extends SlateEditor>(editor: E): E => {
-	const { onKeyDown, renderLeafChildren, processAttributesPaste, processInlinePaste } = editor
+	const { processAttributesPaste, processInlinePaste } = editor
 
-	const isBoldHotkey = isHotkey('mod+b')
+	editor.registerMark(boldMarkPlugin)
 
-	editor.renderLeafChildren = props => {
-		const children = renderLeafChildren(props)
-
-		if (props.leaf[boldMark] === true) {
-			return createElement('b', undefined, children)
-		}
-		return children
-	}
-
-	editor.onKeyDown = event => {
-		// TODO use onDOMBeforeInput for this
-		if (isBoldHotkey(event.nativeEvent)) {
-			editor.toggleMarks({ [boldMark]: true })
-			event.preventDefault()
-		}
-		onKeyDown(event)
-	}
 
 	editor.processAttributesPaste = (element, cta) => {
 		if (element.style.fontWeight) {

@@ -1,17 +1,18 @@
 import type { FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import type {
 	BaseEditor,
+	Descendant,
+	Editor,
 	Element as SlateElement,
 	Node as SlateNode,
-	Text as SlateText,
 	NodeEntry,
-	Descendant, Editor,
+	Text as SlateText,
 } from 'slate'
 import type { RenderElementProps, RenderLeafProps } from 'slate-react'
 import type { TextSpecifics } from './Node'
-import type { WithPaste } from './overrides'
 import { CustomElementPlugin } from './CustomElementPlugin'
 import { CustomMarkPlugin } from './CustomMarkPlugin'
+import { HtmlDeserializer } from './html'
 
 export type EditorDefaultElementFactory = (children: Descendant[]) => SlateElement;
 
@@ -40,14 +41,16 @@ export interface WithEssentials {
 	registerElement: (plugin: CustomElementPlugin<any>) => void
 	registerMark: (plugin: CustomMarkPlugin) => void
 
+	htmlDeserializer: HtmlDeserializer
+
 	// <Editable> props
-	onDOMBeforeInput: (event: Event) => void
 	renderElement: (props: RenderElementProps) => ReactElement
 	renderLeaf: (props: RenderLeafProps) => ReactElement
 	renderLeafChildren: (props: Omit<RenderLeafProps, 'attributes'>) => ReactElement
+	onDOMBeforeInput: (event: Event) => void
 	onKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void
 	onFocus: (event: ReactFocusEvent<HTMLDivElement>) => void
 	onBlur: (event: ReactFocusEvent<HTMLDivElement>) => void
 }
 
-export type EditorWithEssentials<E extends BaseEditor> = WithEssentials & WithPaste & E
+export type EditorWithEssentials<E extends BaseEditor> = WithEssentials & E

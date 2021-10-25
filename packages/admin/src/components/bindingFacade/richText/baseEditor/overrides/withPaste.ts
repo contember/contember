@@ -1,10 +1,6 @@
 import { Editor as SlateEditor, Transforms } from 'slate'
 import { HtmlDeserializer } from '../html'
 
-export interface WithPaste {
-	htmlDeserializer: HtmlDeserializer
-}
-
 const ignoredElements = ['SCRIPT', 'STYLE', 'TEMPLATE']
 
 export const withPaste: <E extends SlateEditor>(

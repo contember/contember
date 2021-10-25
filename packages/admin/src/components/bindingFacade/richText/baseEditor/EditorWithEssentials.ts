@@ -13,11 +13,13 @@ import type { WithPaste } from './overrides'
 import { CustomElementPlugin } from './CustomElementPlugin'
 import { CustomMarkPlugin } from './CustomMarkPlugin'
 
+export type EditorDefaultElementFactory = (children: Descendant[]) => SlateElement;
+
 export interface WithEssentials {
 	formatVersion: number
 	defaultElementType: string
 	isDefaultElement: (element: SlateElement) => boolean
-	createDefaultElement: (children: SlateElement['children']) => SlateElement
+	createDefaultElement: EditorDefaultElementFactory
 	insertBetweenBlocks: (blockEntry: NodeEntry, edge: 'before' | 'after') => void
 
 	canToggleMarks: <T extends SlateText>(marks: TextSpecifics<T>) => boolean

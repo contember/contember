@@ -22,7 +22,8 @@
 		"build": "vite build --mode development && vite build --mode production",
 		"build:api:dev": "api-extractor run --local",
 		"build:api:prod": "api-extractor run",
-		"styles:build": "sass src/index.sass:dist/style.css"
+		"styles:build": "sass src/index.sass:dist/style.css",
+		"test": "jest"
 	},
 	"dependencies": {
 		"@contember/binding": "workspace:*",
@@ -71,6 +72,7 @@
 		"@types/react-leaflet": "2.8.2",
 		"@types/react-select": "4.0.17",
 		"@types/react-window": "1.8.5",
-		"csstype": "3.0.8"
+		"csstype": "3.0.8",
+		"jsdom": "^18.0.0"
 	}
 }

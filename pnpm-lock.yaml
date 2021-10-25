@@ -121,6 +121,7 @@ importers:
       fuse.js: 6.4.6
       intl-messageformat: 9.9.1
       is-hotkey: 0.1.8
+      jsdom: ^18.0.0
       leaflet: 1.7.1
       path-to-regexp: 6.2.0
       react-datepicker: 4.2.1
@@ -154,16 +155,16 @@ importers:
       is-hotkey: 0.1.8
       leaflet: 1.7.1
       path-to-regexp: 6.2.0
-      react-datepicker: 4.2.1_react-dom@17.0.2+react@17.0.2
-      react-dropzone: 10.2.2_react@17.0.2
-      react-error-boundary: 3.1.3_react@17.0.2
-      react-leaflet: 2.8.0_91fa1427a3331e02931dfea77720a290
-      react-select: 4.3.1_c718fd30f47bd8ba9b8627334c65db71
-      react-sortable-hoc: 1.11.0_react-dom@17.0.2+react@17.0.2
-      react-window: 1.8.6_react-dom@17.0.2+react@17.0.2
+      react-datepicker: 4.2.1
+      react-dropzone: 10.2.2
+      react-error-boundary: 3.1.3
+      react-leaflet: 2.8.0_leaflet@1.7.1
+      react-select: 4.3.1_@types+react@17.0.30
+      react-sortable-hoc: 1.11.0
+      react-window: 1.8.6
       slate: 0.66.5
       slate-history: 0.66.0_slate@0.66.5
-      slate-react: 0.67.0_c899868e5f2c1eaf0ddf5188fc03f066
+      slate-react: 0.67.0_slate@0.66.5
       stacktracey: 2.1.7
     devDependencies:
       '@types/blueimp-md5': 2.18.0
@@ -177,6 +178,7 @@ importers:
       '@types/react-select': 4.0.17
       '@types/react-window': 1.8.5
       csstype: 3.0.8
+      jsdom: 18.0.0
 
   packages/admin-i18n:
     specifiers:
@@ -3770,7 +3772,7 @@ packages:
   /@emotion/memoize/0.7.5:
     resolution: {integrity: sha512-igX9a37DR2ZPGYtV6suZ6whr8pTFtyHL3K/oLUotxpSVO2ASaprmAe2Dkq7tBo7CRY7MMDrAa9nuQP9/YG8FxQ==}
 
-  /@emotion/react/11.5.0_b0eabb69161fff3ca8f3bf15e6b73c95:
+  /@emotion/react/11.5.0_@types+react@17.0.30:
     resolution: {integrity: sha512-MYq/bzp3rYbee4EMBORCn4duPQfgpiEB5XzrZEBnUZAL80Qdfr7CEv/T80jwaTl/dnZmt9SnTa8NkTrwFNpLlw==}
     peerDependencies:
       '@babel/core': ^7.0.0
@@ -3782,7 +3784,6 @@ packages:
       '@types/react':
         optional: true
     dependencies:
-      '@babel/core': 7.14.8
       '@babel/runtime': 7.15.4
       '@emotion/cache': 11.5.0
       '@emotion/serialize': 1.0.2
@@ -3791,7 +3792,6 @@ packages:
       '@emotion/weak-memoize': 0.2.5
       '@types/react': 17.0.30
       hoist-non-react-statics: 3.3.2
-      react: 17.0.2
     dev: false
 
   /@emotion/serialize/0.11.16:
@@ -6716,6 +6716,11 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
+  /@tootallnate/once/2.0.0:
+    resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
+    engines: {node: '>= 10'}
+    dev: true
+
   /@types/argparse/1.0.38:
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
     dev: true
@@ -9543,6 +9548,13 @@ packages:
       webidl-conversions: 5.0.0
     dev: true
 
+  /domexception/4.0.0:
+    resolution: {integrity: sha512-A2is4PLG+eeSfoTMA95/s4pvAoSo2mKtiM5jlHkAVewmiO8ISFTFKZjH7UAM1Atli/OT/7JHOrJRJiMKUZKYBw==}
+    engines: {node: '>=12'}
+    dependencies:
+      webidl-conversions: 7.0.0
+    dev: true
+
   /domhandler/4.2.2:
     resolution: {integrity: sha512-PzE9aBMsdZO8TK4BnuJwH0QT41wgMbRzuZrHUcpYncEjmQazq8QEaBWgLG7ZyC/DAZKEgglpIA6j4Qn/HmxS3w==}
     engines: {node: '>= 4'}
@@ -11117,6 +11129,13 @@ packages:
       whatwg-encoding: 1.0.5
     dev: true
 
+  /html-encoding-sniffer/3.0.0:
+    resolution: {integrity: sha512-oWv4T4yJ52iKrufjnyZPkrN0CH3QnrUqdB6In1g5Fe1mia8GmF36gnfNySxoZtxD5+NmYw1EElVXiBk93UeskA==}
+    engines: {node: '>=12'}
+    dependencies:
+      whatwg-encoding: 2.0.0
+    dev: true
+
   /html-entities/1.4.0:
     resolution: {integrity: sha512-8nxjcBcd8wovbeKx7h3wTji4e6+rhaVuPNpMqwWgnHh+N9ToqsCs6XztWRBPQ+UtzsoMAdKZtUENoVzU/EMtZA==}
     dev: true
@@ -11210,6 +11229,17 @@ packages:
     engines: {node: '>= 6'}
     dependencies:
       '@tootallnate/once': 1.1.2
+      agent-base: 6.0.2
+      debug: 4.3.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /http-proxy-agent/5.0.0:
+    resolution: {integrity: sha512-n2hY8YdoRE1i7r6M0w9DIw5GgZN0G25P8zLCRQ8rjXtTU3vsNFBI/vWK/UIeE6g5MUUz6avwAPXmL6Fy9D/90w==}
+    engines: {node: '>= 6'}
+    dependencies:
+      '@tootallnate/once': 2.0.0
       agent-base: 6.0.2
       debug: 4.3.2
     transitivePeerDependencies:
@@ -12529,6 +12559,48 @@ packages:
       whatwg-url: 9.1.0
       ws: 8.2.3
       xml-name-validator: 3.0.0
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+    dev: true
+
+  /jsdom/18.0.0:
+    resolution: {integrity: sha512-HVLuBcFmwdWulStv5U+J59b1AyzXhM92KXlM8HQ3ecYtRM2OQEUCPMa4oNuDeCBmtRcC7tJvb0Xz5OeFXMOKTA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      canvas: ^2.5.0
+    peerDependenciesMeta:
+      canvas:
+        optional: true
+    dependencies:
+      abab: 2.0.5
+      acorn: 8.5.0
+      acorn-globals: 6.0.0
+      cssom: 0.5.0
+      cssstyle: 2.3.0
+      data-urls: 3.0.1
+      decimal.js: 10.3.1
+      domexception: 4.0.0
+      escodegen: 2.0.0
+      form-data: 4.0.0
+      html-encoding-sniffer: 3.0.0
+      http-proxy-agent: 5.0.0
+      https-proxy-agent: 5.0.0
+      is-potential-custom-element-name: 1.0.1
+      nwsapi: 2.2.0
+      parse5: 6.0.1
+      saxes: 5.0.1
+      symbol-tree: 3.2.4
+      tough-cookie: 4.0.0
+      w3c-hr-time: 1.0.2
+      w3c-xmlserializer: 3.0.0
+      webidl-conversions: 7.0.0
+      whatwg-encoding: 2.0.0
+      whatwg-mimetype: 3.0.0
+      whatwg-url: 10.0.0
+      ws: 8.2.3
+      xml-name-validator: 4.0.0
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -14541,7 +14613,7 @@ packages:
       react-dom: 17.0.2_react@17.0.2
     dev: true
 
-  /react-datepicker/4.2.1_react-dom@17.0.2+react@17.0.2:
+  /react-datepicker/4.2.1:
     resolution: {integrity: sha512-0gcvHMnX8rS1fV90PjjsB7MQdsWNU77JeVHf6bbwK9HnFxgwjVflTx40ebKmHV+leqe+f+FgUP9Nvqbe5RGyfA==}
     peerDependencies:
       react: ^16.9.0 || ^17
@@ -14551,10 +14623,8 @@ packages:
       classnames: 2.3.1
       date-fns: 2.25.0
       prop-types: 15.7.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-onclickoutside: 6.12.0_react-dom@17.0.2+react@17.0.2
-      react-popper: 2.2.5_838acf1c84808345430cf17171f87518
+      react-onclickoutside: 6.12.0
+      react-popper: 2.2.5_@popperjs+core@2.10.2
     dev: false
 
   /react-dev-utils/11.0.4:
@@ -14637,7 +14707,7 @@ packages:
       react-dom: 17.0.2_react@17.0.2
     dev: true
 
-  /react-dropzone/10.2.2_react@17.0.2:
+  /react-dropzone/10.2.2:
     resolution: {integrity: sha512-U5EKckXVt6IrEyhMMsgmHQiWTGLudhajPPG77KFSvgsMqNEHSyGpqWvOMc5+DhEah/vH4E1n+J5weBNLd5VtyA==}
     engines: {node: '>= 8'}
     peerDependencies:
@@ -14646,7 +14716,6 @@ packages:
       attr-accept: 2.2.2
       file-selector: 0.1.19
       prop-types: 15.7.2
-      react: 17.0.2
     dev: false
 
   /react-element-to-jsx-string/14.3.4_react-dom@17.0.2+react@17.0.2:
@@ -14662,14 +14731,13 @@ packages:
       react-is: 17.0.2
     dev: true
 
-  /react-error-boundary/3.1.3_react@17.0.2:
+  /react-error-boundary/3.1.3:
     resolution: {integrity: sha512-A+F9HHy9fvt9t8SNDlonq01prnU8AmkjvGKV4kk8seB9kU3xMEO8J/PQlLVmoOIDODl5U2kufSBs4vrWIqhsAA==}
     engines: {node: '>=10', npm: '>=6'}
     peerDependencies:
       react: '>=16.13.1'
     dependencies:
       '@babel/runtime': 7.15.4
-      react: 17.0.2
     dev: false
 
   /react-error-overlay/6.0.9:
@@ -14694,13 +14762,12 @@ packages:
       shallowequal: 1.1.0
     dev: true
 
-  /react-input-autosize/3.0.0_react@17.0.2:
+  /react-input-autosize/3.0.0:
     resolution: {integrity: sha512-nL9uS7jEs/zu8sqwFE5MAPx6pPkNAriACQ2rGLlqmKr2sPGtN7TXTyDdQt4lbNXVx7Uzadb40x8qotIuru6Rhg==}
     peerDependencies:
       react: ^16.3.0 || ^17.0.0
     dependencies:
       prop-types: 15.7.2
-      react: 17.0.2
     dev: false
 
   /react-inspector/5.1.1_react@17.0.2:
@@ -14721,7 +14788,7 @@ packages:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
     dev: true
 
-  /react-leaflet/2.8.0_91fa1427a3331e02931dfea77720a290:
+  /react-leaflet/2.8.0_leaflet@1.7.1:
     resolution: {integrity: sha512-Y7oHtNrrlRH8muDttXf+jZ2Ga/X7jneSGi1GN8uEdeCfLProTqgG2Zoa5TfloS3ZnY20v7w+DIenMG59beFsQw==}
     peerDependencies:
       leaflet: ^1.6.0
@@ -14732,8 +14799,6 @@ packages:
       fast-deep-equal: 3.1.3
       hoist-non-react-statics: 3.3.2
       leaflet: 1.7.1
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
       warning: 4.0.3
     dev: false
 
@@ -14741,14 +14806,11 @@ packages:
     resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
     dev: true
 
-  /react-onclickoutside/6.12.0_react-dom@17.0.2+react@17.0.2:
+  /react-onclickoutside/6.12.0:
     resolution: {integrity: sha512-oPlOTYcISLHfpMog2lUZMFSbqOs4LFcA4+vo7fpfevB5v9Z0D5VBDBkfeO5lv+hpEcGoaGk67braLT+QT+eICA==}
     peerDependencies:
       react: ^15.5.x || ^16.x || ^17.x
       react-dom: ^15.5.x || ^16.x || ^17.x
-    dependencies:
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
     dev: false
 
   /react-popper-tooltip/3.1.1_react-dom@17.0.2+react@17.0.2:
@@ -14775,6 +14837,17 @@ packages:
       react-fast-compare: 3.2.0
       warning: 4.0.3
 
+  /react-popper/2.2.5_@popperjs+core@2.10.2:
+    resolution: {integrity: sha512-kxGkS80eQGtLl18+uig1UIf9MKixFSyPxglsgLBxlYnyDf65BiY9B3nZSc6C9XUNDgStROB0fMQlTEz1KxGddw==}
+    peerDependencies:
+      '@popperjs/core': ^2.0.0
+      react: ^16.8.0 || ^17
+    dependencies:
+      '@popperjs/core': 2.10.2
+      react-fast-compare: 3.2.0
+      warning: 4.0.3
+    dev: false
+
   /react-refresh/0.10.0:
     resolution: {integrity: sha512-PgidR3wST3dDYKr6b4pJoqQFpPGNKDSCDx4cZoshjXipw3LzO7mG1My2pwEzz2JVkF+inx3xRpDeQLFQGH/hsQ==}
     engines: {node: '>=0.10.0'}
@@ -14785,7 +14858,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /react-select/4.3.1_c718fd30f47bd8ba9b8627334c65db71:
+  /react-select/4.3.1_@types+react@17.0.30:
     resolution: {integrity: sha512-HBBd0dYwkF5aZk1zP81Wx5UsLIIT2lSvAY2JiJo199LjoLHoivjn9//KsmvQMEFGNhe58xyuOITjfxKCcGc62Q==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0
@@ -14793,13 +14866,11 @@ packages:
     dependencies:
       '@babel/runtime': 7.15.4
       '@emotion/cache': 11.5.0
-      '@emotion/react': 11.5.0_b0eabb69161fff3ca8f3bf15e6b73c95
+      '@emotion/react': 11.5.0_@types+react@17.0.30
       memoize-one: 5.2.1
       prop-types: 15.7.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-input-autosize: 3.0.0_react@17.0.2
-      react-transition-group: 4.4.2_react-dom@17.0.2+react@17.0.2
+      react-input-autosize: 3.0.0
+      react-transition-group: 4.4.2
     transitivePeerDependencies:
       - '@babel/core'
       - '@types/react'
@@ -14814,7 +14885,7 @@ packages:
       throttle-debounce: 3.0.1
     dev: true
 
-  /react-sortable-hoc/1.11.0_react-dom@17.0.2+react@17.0.2:
+  /react-sortable-hoc/1.11.0:
     resolution: {integrity: sha512-v1CDCvdfoR3zLGNp6qsBa4J1BWMEVH25+UKxF/RvQRh+mrB+emqtVHMgZ+WreUiKJoEaiwYoScaueIKhMVBHUg==}
     peerDependencies:
       react: ^0.14.0 || ^15.0.0 || ^16.0.0
@@ -14823,8 +14894,6 @@ packages:
       '@babel/runtime': 7.15.4
       invariant: 2.2.4
       prop-types: 15.7.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
     dev: false
 
   /react-stately/3.8.0_react@17.0.2:
@@ -14878,7 +14947,7 @@ packages:
     transitivePeerDependencies:
       - '@types/react'
 
-  /react-transition-group/4.4.2_react-dom@17.0.2+react@17.0.2:
+  /react-transition-group/4.4.2:
     resolution: {integrity: sha512-/RNYfRAMlZwDSr6z4zNKV6xu53/e2BuaBbGhbyYIXTrmgu/bGHzmqOs7mJSJBHy9Ud+ApHx3QjrkKSp1pxvlFg==}
     peerDependencies:
       react: '>=16.6.0'
@@ -14888,11 +14957,9 @@ packages:
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.7.2
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
     dev: false
 
-  /react-window/1.8.6_react-dom@17.0.2+react@17.0.2:
+  /react-window/1.8.6:
     resolution: {integrity: sha512-8VwEEYyjz6DCnGBsd+MgkD0KJ2/OXFULyDtorIiTz+QzwoP94tBoA7CnbtyXMm+cCeAUER5KJcPtWl9cpKbOBg==}
     engines: {node: '>8.0.0'}
     peerDependencies:
@@ -14901,8 +14968,6 @@ packages:
     dependencies:
       '@babel/runtime': 7.15.4
       memoize-one: 5.2.1
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
     dev: false
 
   /react/17.0.2:
@@ -15664,7 +15729,7 @@ packages:
       slate: 0.66.5
     dev: false
 
-  /slate-react/0.67.0_c899868e5f2c1eaf0ddf5188fc03f066:
+  /slate-react/0.67.0_slate@0.66.5:
     resolution: {integrity: sha512-aJDqDskN2Ny1Q2bUFmM9qG000BbDLkA8+pIsrK9Z30glmS7je+KWoR29zdHe2s/fuKRLVayxcvs+q1VQzc1dfw==}
     peerDependencies:
       react: '>=16.8.0'
@@ -15677,8 +15742,6 @@ packages:
       is-hotkey: 0.1.8
       is-plain-object: 5.0.0
       lodash: 4.17.21
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
       scroll-into-view-if-needed: 2.2.28
       slate: 0.66.5
       tiny-invariant: 1.0.6
@@ -17017,6 +17080,13 @@ packages:
       xml-name-validator: 3.0.0
     dev: true
 
+  /w3c-xmlserializer/3.0.0:
+    resolution: {integrity: sha512-3WFqGEgSXIyGhOmAFtlicJNMjEps8b1MG31NCA0/vOF9+nKMUW1ckhi9cnNHmf88Rzw5V+dwIwsm2C7X8k9aQg==}
+    engines: {node: '>=12'}
+    dependencies:
+      xml-name-validator: 4.0.0
+    dev: true
+
   /walker/1.0.7:
     resolution: {integrity: sha1-L3+bj9ENZ3JisYqITijRlhjgKPs=}
     dependencies:
@@ -17168,6 +17238,13 @@ packages:
     resolution: {integrity: sha512-b5lim54JOPN9HtzvK9HFXvBma/rnfFeqsic0hSpjtDbVxR3dJKLc+KB4V6GgiGOvl7CY/KNh8rxSo9DKQrnUEw==}
     dependencies:
       iconv-lite: 0.4.24
+    dev: true
+
+  /whatwg-encoding/2.0.0:
+    resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
+    engines: {node: '>=12'}
+    dependencies:
+      iconv-lite: 0.6.3
     dev: true
 
   /whatwg-mimetype/2.3.0:
@@ -17348,6 +17425,11 @@ packages:
 
   /xml-name-validator/3.0.0:
     resolution: {integrity: sha512-A5CUptxDsvxKJEU3yO6DuWBSJz/qizqzJKOMIfUJHETbBw/sFaDxgd6fxm1ewUaM0jZ444Fc5vC5ROYurg/4Pw==}
+    dev: true
+
+  /xml-name-validator/4.0.0:
+    resolution: {integrity: sha512-ICP2e+jsHvAj2E2lIHxa5tjXRlKDJo4IdvPvCXbXQGdzSfmSpNVyIKMvoZHjDY9DP0zV17iI85o90vRFXNccRw==}
+    engines: {node: '>=12'}
     dev: true
 
   /xmlchars/2.2.0:

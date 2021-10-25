@@ -1,11 +1,4 @@
-import {
-	Editor,
-	Editor as SlateEditor,
-	Element as SlateElement,
-	Point,
-	Range as SlateRange,
-	Transforms,
-} from 'slate'
+import { Editor, Editor as SlateEditor, Element as SlateElement, Point, Range as SlateRange, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import {
 	ejectHeadingElement,
@@ -14,17 +7,18 @@ import {
 	headingElementType,
 	isHeadingElement,
 } from './HeadingElement'
+import { headingHtmlDeserializer } from './HeadingHtmlDeserializer'
 
 export const withHeadings = <E extends Editor>(editor: E): E => {
 	const {
 		canToggleElement,
 		insertBreak,
 		deleteBackward,
-		processBlockPaste,
 	} = editor
 
 
 	editor.registerElement(headingElementPlugin)
+	editor.htmlDeserializer.registerPlugin(headingHtmlDeserializer)
 
 	// T O D O cache this
 	// e.getNumberedHeadingSection = function recurse(element): number[] {
@@ -117,21 +111,6 @@ export const withHeadings = <E extends Editor>(editor: E): E => {
 			{ isNumbered: null }, // null removes the key altogether
 			{ at: headingPath },
 		)
-	}
-
-	editor.processBlockPaste = (element, next, cumulativeTextAttrs) => {
-		const match = element.nodeName.match(/^H(?<level>[1-6])$/)
-		if (match !== null) {
-			const isNumbered = (element.getAttribute('style')?.match(/mso-list:\w+ level\d+ \w+/) ?? null) !== null
-			const children = isNumbered ? editor.wordPasteListItemContent(element.childNodes) : element.childNodes
-			return {
-				type: headingElementType,
-				level: parseInt(match.groups!.level),
-				children: next(children, cumulativeTextAttrs),
-				isNumbered,
-			}
-		}
-		return processBlockPaste(element, next, cumulativeTextAttrs)
 	}
 
 	return editor

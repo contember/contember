@@ -1,12 +1,12 @@
 import { Editor, Element as SlateElement, Point, Range as SlateRange, Transforms } from 'slate'
 import { ContemberEditor } from '../../../ContemberEditor'
 import { isParagraphElement, ParagraphElement, paragraphElementPlugin, paragraphElementType } from './ParagraphElement'
+import { paragraphHtmlDeserializer } from './ParagraphHtmlDeserializer'
 
 export const withParagraphs = <E extends Editor>(editor: E): E => {
 	const {
 		canToggleElement,
 		deleteBackward,
-		processBlockPaste,
 	} = editor
 
 	editor.registerElement(paragraphElementPlugin)
@@ -63,13 +63,7 @@ export const withParagraphs = <E extends Editor>(editor: E): E => {
 			{ at: paragraphPath },
 		)
 	}
-
-	editor.processBlockPaste = (element, next, cumulativeTextAttrs) => {
-		if (element.nodeName === 'P') {
-			return { type: paragraphElementType, children: next(element.childNodes, cumulativeTextAttrs) }
-		}
-		return processBlockPaste(element, next, cumulativeTextAttrs)
-	}
+	editor.htmlDeserializer.registerPlugin(paragraphHtmlDeserializer)
 
 	return editor
 }

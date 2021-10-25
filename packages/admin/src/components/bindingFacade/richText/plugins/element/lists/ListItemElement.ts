@@ -34,6 +34,12 @@ export const listItemElementPlugin: CustomElementPlugin<ListItemElement> = {
 				})
 			})
 		}
+		if (element.children.every(it => isListItemElement(it))) {
+			Transforms.unwrapNodes(editor, {
+				at: path,
+			})
+			return
+		}
 		if (element.children.length === 1) {
 			const onlyChild = element.children[0]
 			if (SlateElement.isElement(onlyChild) && editor.isDefaultElement(onlyChild)) {

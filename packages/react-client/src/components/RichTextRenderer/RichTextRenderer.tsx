@@ -1,4 +1,4 @@
-import { memo, ReactElement, useMemo } from 'react'
+import { ComponentType, createElement, memo, ReactElement, ReactNode, useMemo } from 'react'
 import { defaultDeserialize } from './defaultDeserialize'
 import type { RenderElement } from './ElementRenderer'
 import type { RenderLeaf } from './LeafRenderer'
@@ -36,6 +36,7 @@ export type RichTextRendererProps<
 	renderElement?: RenderElement<CustomElements, CustomLeaves>
 	renderLeaf?: RenderLeaf<CustomLeaves>
 	attributeNamePrefix?: string
+	renderBlock?: ComponentType<{ block: unknown }>
 } & (RichTextRendererFieldProps | RichTextRendererBlockProps<CustomElements, CustomLeaves>)
 
 export const RichTextRenderer = memo(function RichTextRenderer<
@@ -45,6 +46,7 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 	deserialize = defaultDeserialize,
 	renderElement,
 	renderLeaf,
+	renderBlock = ({ children }) => <>{children}</>,
 	attributeNamePrefix,
 	...sourceProps
 }: RichTextRendererProps<CustomElements, CustomLeaves>) {
@@ -145,11 +147,15 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 						references: block.references,
 					}}
 				>
-					{renderChildren(block.content.children, {
-						renderLeaf,
-						renderElement,
-						attributeNamePrefix,
-					})}
+					{createElement(
+						renderBlock, {
+							block,
+						}, renderChildren(block.content.children, {
+							renderLeaf,
+							renderElement,
+							attributeNamePrefix,
+						}),
+					)}
 				</RichTextRenderMetadataContext.Provider>
 			))}
 		</>

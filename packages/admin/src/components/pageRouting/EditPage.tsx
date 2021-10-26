@@ -15,11 +15,12 @@ export interface EditPageProps extends SugaredQualifiedSingleEntity, EntitySubTr
 	children: ReactNode
 	redirectOnSuccess?: RedirectOnSuccessHandler
 	rendererProps?: Omit<MutableContentLayoutRendererProps, 'accessor'>
+	refreshDataBindingOnPersist?: boolean
 }
 
 const EditPage: Partial<PageProvider<EditPageProps>> & ComponentType<EditPageProps> = memo(
-	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, ...entityProps }: EditPageProps) => (
-		<DataBindingProvider stateComponent={FeedbackRenderer}>
+	({ pageName, children, rendererProps, redirectOnSuccess, onPersistSuccess, refreshDataBindingOnPersist, ...entityProps }: EditPageProps) => (
+		<DataBindingProvider stateComponent={FeedbackRenderer} refreshOnPersist={refreshDataBindingOnPersist ?? true}>
 			<EntitySubTree
 				{...entityProps}
 				entityComponent={MutableSingleEntityRenderer}

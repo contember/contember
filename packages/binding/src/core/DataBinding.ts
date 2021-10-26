@@ -65,6 +65,7 @@ export class DataBinding {
 		private readonly environment: Environment,
 		private readonly onUpdate: (newData: TreeRootAccessor) => void,
 		private readonly onError: (error: RequestError) => void,
+		private readonly onPersistSuccess: (result: SuccessfulPersistResult) => void,
 	) {
 		this.config = new Config()
 		this.treeStore = new TreeStore()
@@ -194,11 +195,14 @@ export class DataBinding {
 								})
 							} catch (e) {
 								console.error(e)
-								return {
+								const resultWithError = {
 									...result,
 									afterPersistError: e,
 								}
+								this.onPersistSuccess(resultWithError)
+								return resultWithError
 							}
+							this.onPersistSuccess(result)
 							return result
 						} else {
 							this.eventManager.syncTransaction(() => this.accessorErrorManager.replaceErrors(mutationData))

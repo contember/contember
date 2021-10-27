@@ -110,7 +110,7 @@ export const CreateColumnModification: ModificationHandlerStatic<CreateColumnMod
 			return CreateColumnModification.createModification({
 				entityName: updatedEntity.name,
 				field: newField,
-				...(newField.default ? { fillValue: newField.default } : {}),
+				...(newField.default !== undefined ? { fillValue: newField.default } : {}),
 			})
 		})
 	}

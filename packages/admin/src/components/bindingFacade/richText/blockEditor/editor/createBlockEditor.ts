@@ -4,10 +4,13 @@ import * as Slate from 'slate'
 import { Descendant, Element as SlateElement, Node as SlateNode } from 'slate'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
-import { isContemberContentPlaceholderElement, isContemberFieldElement, isReferenceElement } from '../elements'
+import {
+	createContemberContentPlaceholderPlugin,
+	createContemberFieldElementPlugin,
+	createReferenceElementPlugin, ReferenceElementOptions,
+} from '../elements'
 import type { BlockSlateEditor } from './BlockSlateEditor'
 import { overrideApply, OverrideApplyOptions } from './overrideApply'
-import { overrideCanContainAnyBlocks, OverrideCanContainAnyBlocksOptions } from './overrideCanContainAnyBlocks'
 import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference'
 import { overrideGetReferencedEntity, OverrideGetReferencedEntityOptions } from './overrideGetReferencedEntity'
 import { overrideInsertBreak } from './overrideInsertBreak'
@@ -17,11 +20,9 @@ import {
 	OverrideInsertElementWithReferenceOptions,
 } from './overrideInsertElementWithReference'
 import { overrideInsertNode } from './overrideInsertNode'
-import { overrideIsVoid, OverrideIsVoidOptions } from './overrideIsVoid'
 import { overrideNormalizeNode, OverrideNormalizeNodeOptions } from './overrideNormalizeNode'
 import { overrideOnKeyDown } from './overrideOnKeyDown'
 import { overridePrepareElementForInsertion } from './overridePrepareElementForInsertion'
-import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
 import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
 
 export interface CreateEditorOptions
@@ -29,12 +30,10 @@ export interface CreateEditorOptions
 		OverrideCreateElementReferenceOptions,
 		OverrideGetReferencedEntityOptions,
 		OverrideApplyOptions,
-		OverrideCanContainAnyBlocksOptions,
-		OverrideRenderElementOptions,
+		ReferenceElementOptions,
 		OverrideNormalizeNodeOptions,
 		OverrideInsertDataOptions,
 		OverrideInsertElementWithReferenceOptions,
-		OverrideIsVoidOptions,
 		CreateEditorPublicOptions {}
 
 export const createBlockEditor = (options: CreateEditorOptions) => {
@@ -50,9 +49,16 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 
 		addEditorBuiltins: editor => {
 			const e = editor as BlockSlateEditor
-			e.isReferenceElement = isReferenceElement
-			e.isContemberContentPlaceholderElement = isContemberContentPlaceholderElement
-			e.isContemberFieldElement = isContemberFieldElement
+			e.registerElement(createContemberContentPlaceholderPlugin({
+				desugaredBlockList: options.desugaredBlockList,
+				getParentEntityRef: options.getParentEntityRef,
+			}))
+			e.registerElement(createContemberFieldElementPlugin({
+				leadingFields: options.leadingFields,
+				trailingFields: options.trailingFields,
+			}))
+			e.registerElement(createReferenceElementPlugin(options))
+
 			e.prepareElementForInsertion = () => {
 				throw new BindingError()
 			}
@@ -89,18 +95,15 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			e.unstable_diagnosticOperationLog = []
 
 			overrideApply(e, options)
-			overrideCanContainAnyBlocks(e, options)
 			overrideCreateElementReference(e, options)
 			overrideGetReferencedEntity(e, options)
 			overrideInsertBreak(e, options)
 			overrideInsertData(e, options)
 			overrideInsertElementWithReference(e, options)
 			overrideInsertNode(e)
-			overrideIsVoid(e, options)
 			overrideNormalizeNode(e, options)
 			overrideOnKeyDown(e, options)
 			overridePrepareElementForInsertion(e, options)
-			overrideRenderElement(e, options)
 			overrideSlateOnChange(e, options)
 
 			return e

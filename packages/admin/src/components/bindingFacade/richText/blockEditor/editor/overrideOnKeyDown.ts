@@ -1,16 +1,7 @@
-import {
-	Editor,
-	Element as SlateElement,
-	Node as SlateNode,
-	NodeEntry,
-	Path as SlatePath,
-	Point,
-	Range as SlateRange,
-	Text,
-	Transforms,
-} from 'slate'
+import { Editor, Path as SlatePath, Range as SlateRange, Transforms } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
 import type { BlockSlateEditor } from './BlockSlateEditor'
+import { isContemberFieldElement } from '../elements'
 
 export interface OverrideOnKeyDownOptions {}
 
@@ -28,7 +19,7 @@ export const overrideOnKeyDown = <E extends BlockSlateEditor>(editor: E, options
 		}
 		const [fieldBackedElement, path] = closestBlockEntry
 
-		if (!editor.isContemberFieldElement(fieldBackedElement)) {
+		if (!isContemberFieldElement(fieldBackedElement)) {
 			return onKeyDown(event)
 		}
 

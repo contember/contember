@@ -12,9 +12,6 @@ export type BlockEditorElements = ReferenceElement | ContemberContentPlaceholder
 
 export interface WithBlockElements {
 	slate: typeof Slate
-	isReferenceElement: (node: Slate.Node) => node is ReferenceElement
-	isContemberContentPlaceholderElement: (node: Slate.Node) => node is ContemberContentPlaceholderElement
-	isContemberFieldElement: (node: Slate.Node) => node is ContemberFieldElement
 
 	// Really, try to avoid passing just the referenceId at all costs
 	getReferencedEntity: (elementOrReferenceId: ElementWithReference | string) => EntityAccessor
@@ -34,6 +31,6 @@ export interface WithBlockElements {
 	unstable_diagnosticOperationLog: Slate.Operation[][]
 }
 
-export type EditorWithBlockElements<E extends SlateEditor> = E & WithBlockElements
+export type EditorWithBlockElements<E extends SlateEditor = SlateEditor> = E & WithBlockElements
 
 export type BlockSlateEditor = Editor & EditorWithBlockElements<SlateEditor>

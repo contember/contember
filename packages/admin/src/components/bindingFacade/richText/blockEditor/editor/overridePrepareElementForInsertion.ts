@@ -12,6 +12,7 @@ import {
 import { ContemberEditor } from '../../ContemberEditor'
 import type { FieldBackedElement } from '../FieldBackedElement'
 import type { BlockSlateEditor } from './BlockSlateEditor'
+import { isContemberFieldElement, isReferenceElement } from '../elements'
 
 export interface OverridePrepareElementForInsertionOptions {
 	leadingFields: FieldBackedElement[]
@@ -54,7 +55,7 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 		const targetPoint = targetLocation
 
 		// TODO maybe introduce some sort of a systemic handling for top-level-only elements like this.
-		if (!editor.isReferenceElement(node)) {
+		if (!isReferenceElement(node)) {
 			if (targetPoint.offset === 0) {
 				return targetPoint.path
 			}
@@ -72,7 +73,7 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 			return targetPoint.path
 		}
 
-		if (editor.isContemberFieldElement(closestBlockElement)) {
+		if (isContemberFieldElement(closestBlockElement)) {
 			const topLevelIndex = closestBlockPath[0]
 			if (topLevelIndex < leadingFields.length) {
 				return [leadingFields.length] // Place it after the leading fields
@@ -83,7 +84,7 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 			// Should probably throw from here
 		}
 
-		if (editor.isReferenceElement(closestBlockElement)) {
+		if (isReferenceElement(closestBlockElement)) {
 			const newPath = SlatePath.next(closestBlockPath)
 			Promise.resolve().then(() => {
 				Transforms.select(editor, newPath)

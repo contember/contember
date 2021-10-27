@@ -8,7 +8,7 @@ export interface CustomElementPlugin<T extends Element> {
 	normalizeNode?: (args: { element: T, path: Path, editor: Editor }) => void | true
 	isActive?: (args: { editor: Editor, suchThat?: Partial<T> }) => boolean
 	isInline?: boolean
-	isVoid?: boolean
+	isVoid?: boolean | ((args: { element: T, editor: Editor }) => boolean)
 	canContainAnyBlocks?: boolean
 	toggleElement?: (args: { editor: Editor, suchThat?: Partial<T> }) => void
 }

@@ -83,7 +83,14 @@ export const createEditorWithEssentials = (defaultElementType: string): Editor =
 		},
 
 		isVoid: element => {
-			return elements.get(element.type)?.isVoid ?? isVoid(element)
+			const elIsVoid = elements.get(element.type)?.isVoid
+			if (elIsVoid === undefined) {
+				return isVoid(element)
+			}
+			if (typeof elIsVoid === 'boolean') {
+				return elIsVoid
+			}
+			return elIsVoid({ editor, element })
 		},
 
 		canContainAnyBlocks: element => {

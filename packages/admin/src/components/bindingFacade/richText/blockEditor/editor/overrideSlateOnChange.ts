@@ -12,6 +12,7 @@ import type { ContemberFieldElement } from '../elements'
 import type { FieldBackedElement } from '../FieldBackedElement'
 import type { BlockSlateEditor } from './BlockSlateEditor'
 import type { Unstable_BlockEditorDiagnostics } from './Unstable_BlockEditorDiagnostics'
+import { isContemberContentPlaceholderElement } from '../elements'
 
 export interface OverrideOnChangeOptions {
 	blockContentField: RelativeSingleField
@@ -111,7 +112,7 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 							} else if (isTrailingElement(topLevelIndex)) {
 								saveFieldBackedElement(
 									getEntity,
-									trailingFields[topLevelIndex],
+									trailingFields[topLevelIndex - editor.children.length + trailingCount],
 									children[topLevelIndex] as ContemberFieldElement,
 								)
 							} else {
@@ -188,10 +189,10 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 				} else if (isTrailingElement(topLevelIndex)) {
 					saveFieldBackedElement(
 						getAccessor,
-						trailingFields[topLevelIndex],
+						trailingFields[topLevelIndex - editor.children.length + trailingCount],
 						children[topLevelIndex] as ContemberFieldElement,
 					)
-				} else if (editor.isContemberContentPlaceholderElement(child)) {
+				} else if (isContemberContentPlaceholderElement(child)) {
 					// Do nothing
 				} else {
 					const blockOrder = topLevelIndex - leadingCount

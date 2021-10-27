@@ -5,7 +5,7 @@ import {
 	ContemberContentPlaceholderElement,
 	contemberContentPlaceholderType,
 	ContemberFieldElement,
-	contemberFieldElementType,
+	contemberFieldElementType, isContemberContentPlaceholderElement, isContemberFieldElement,
 	isElementWithReference,
 } from '../elements'
 import type { FieldBackedElement } from '../FieldBackedElement'
@@ -42,7 +42,7 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 				if (Text.isText(editor.children[i])) {
 					Transforms.wrapNodes(editor, createNewFieldElement(), { at: childPath })
 				}
-				if (!editor.isContemberFieldElement(editor.children[i])) {
+				if (!isContemberFieldElement(editor.children[i])) {
 					ContemberEditor.ejectElement(editor, childPath)
 					Transforms.setNodes(editor, { type: contemberFieldElementType }, { at: childPath })
 				}
@@ -61,7 +61,7 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 				if (Text.isText(editor.children[i])) {
 					Transforms.wrapNodes(editor, createNewFieldElement(), { at: childPath })
 				}
-				if (!editor.isContemberFieldElement(editor.children[index])) {
+				if (!isContemberFieldElement(editor.children[index])) {
 					ContemberEditor.ejectElement(editor, childPath)
 					Transforms.setNodes(editor, { type: contemberFieldElementType }, { at: childPath })
 				}
@@ -77,11 +77,11 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 			} else {
 				for (let i = leadingCount; i < editor.children.length - trailingCount; i++) {
 					const child = editor.children[i]
-					if (editor.isContemberContentPlaceholderElement(child)) {
+					if (isContemberContentPlaceholderElement(child)) {
 						if (i > leadingCount) {
 							ejectPlaceholder(editor, path.concat(i))
 						}
-					} else if (editor.isContemberFieldElement(child)) {
+					} else if (isContemberFieldElement(child)) {
 						const childPath = path.concat(i)
 						Transforms.wrapNodes(editor, editor.createDefaultElement([{ text: '' }]), {
 							at: childPath,
@@ -101,7 +101,7 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 
 			return normalizeNode(nodeEntry)
 		}
-		if (editor.isContemberContentPlaceholderElement(node)) {
+		if (isContemberContentPlaceholderElement(node)) {
 			if (
 				path.length !== 1 || // Can only appear at the top-level…
 				path[0] !== leadingFields.length || // …right after leading fields
@@ -114,7 +114,7 @@ export const overrideNormalizeNode = <E extends BlockSlateEditor>(
 				// convert it into a default element.
 				ejectPlaceholder(editor, path)
 			}
-		} else if (editor.isContemberFieldElement(node)) {
+		} else if (isContemberFieldElement(node)) {
 			if (path.length !== 1) {
 				Transforms.wrapNodes(editor, editor.createDefaultElement([{ text: '' }]), {
 					at: path,

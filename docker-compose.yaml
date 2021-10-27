@@ -22,7 +22,7 @@ services:
     volumes:
       - .:/src
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       CONTEMBER_PORT: 4000
       CONTEMBER_MONITORING_PORT: 4001
       CONTEMBER_ROOT_EMAIL: 'admin@localhost'
@@ -46,6 +46,7 @@ services:
     command:
       - node
       - --expose-gc
+      - --inspect=0.0.0.0:4002
       - ./packages/engine-server/dist/src/start.js
 volumes:
   pgsql-data: ~

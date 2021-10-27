@@ -19,6 +19,7 @@ const initialState: AccessorTreeState = {
 export const useDataBinding = ({
 	nodeTree,
 	refreshOnEnvironmentChange = true,
+	refreshOnPersist = false,
 }: AccessorTreeStateOptions): AccessorTreeState => {
 	const contentClient = useCurrentContentGraphQlClient()
 	const systemClient = useCurrentSystemGraphQlClient()
@@ -49,9 +50,21 @@ export const useDataBinding = ({
 		})
 	}, [])
 
-	const [dataBinding, setDataBinding] = useState(
-		() => new DataBinding(contentClient, systemClient, tenantClient, environment, onUpdate, onError),
+	const createDataBinding = useCallback(
+		() => {
+			const create = (): DataBinding => new DataBinding(contentClient, systemClient, tenantClient, environment, onUpdate, onError, () => {
+				if (!isMountedRef.current || !refreshOnPersist) {
+					return
+				}
+				dispatch({ type: 'reset' })
+				setDataBinding(create())
+			})
+			return create()
+		},
+		[contentClient, systemClient, tenantClient, environment, onUpdate, onError, refreshOnPersist],
 	)
+
+	const [dataBinding, setDataBinding] = useState(() => createDataBinding())
 
 	useEffect(() => {
 		if (state.name !== 'initializing') {
@@ -70,8 +83,8 @@ export const useDataBinding = ({
 		}
 		dispatch({ type: 'reset' })
 		// This essentially just reacts to new environments.
-		setDataBinding(new DataBinding(contentClient, systemClient, tenantClient, environment, onUpdate, onError))
-	}, [contentClient, environment, onError, onUpdate, refreshOnEnvironmentChange, systemClient, tenantClient])
+		setDataBinding(createDataBinding())
+	}, [createDataBinding, refreshOnEnvironmentChange])
 
 	useEffect(() => {
 		isFirstRenderRef.current = false

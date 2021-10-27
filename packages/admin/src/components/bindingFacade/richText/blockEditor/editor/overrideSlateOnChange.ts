@@ -3,7 +3,6 @@ import type { MutableRefObject } from 'react'
 import { Editor, Element, Element as SlateElement, PathRef } from 'slate'
 import { assertNever } from '../../../../../utils'
 import type { BlockSlateEditor } from './BlockSlateEditor'
-import type { Unstable_BlockEditorDiagnostics } from './Unstable_BlockEditorDiagnostics'
 
 export interface OverrideOnChangeOptions {
 	blockContentField: RelativeSingleField
@@ -13,8 +12,6 @@ export interface OverrideOnChangeOptions {
 	getParentEntityRef: MutableRefObject<EntityAccessor.GetEntityAccessor>
 	sortableByField: RelativeSingleField
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
-
-	unstable_diagnosticLog: Unstable_BlockEditorDiagnostics | undefined
 }
 
 export const overrideSlateOnChange = <E extends BlockSlateEditor>(
@@ -27,17 +24,12 @@ export const overrideSlateOnChange = <E extends BlockSlateEditor>(
 		getParentEntityRef,
 		sortableByField,
 		sortedBlocksRef,
-		unstable_diagnosticLog,
 	}: OverrideOnChangeOptions,
 ) => {
 	const { slateOnChange } = editor
 
 	editor.slateOnChange = () => {
 		const { children, operations } = editor
-
-		if (unstable_diagnosticLog) {
-			editor.unstable_diagnosticOperationLog.push(operations)
-		}
 
 		let hasSelectionOperation = false
 		let hasTextOperation = false

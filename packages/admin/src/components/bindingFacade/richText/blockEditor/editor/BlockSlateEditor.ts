@@ -20,8 +20,6 @@ export interface WithBlockElements {
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => void
 	slateOnChange: () => void
-
-	unstable_diagnosticOperationLog: Slate.Operation[][]
 }
 
 export type EditorWithBlockElements<E extends SlateEditor = SlateEditor> = E & WithBlockElements

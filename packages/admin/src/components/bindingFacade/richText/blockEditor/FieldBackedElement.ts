@@ -1,9 +1,12 @@
-import type { SugaredRelativeSingleField } from '@contember/binding'
+import { SugarableRelativeSingleField } from '@contember/binding'
 import type { ReactNode } from 'react'
+import { Size } from '@contember/ui'
 
 export type FieldBackedElement = {
-	field: SugaredRelativeSingleField | string
-	placeholder: ReactNode
+	field: string | SugarableRelativeSingleField
+	placeholder: string
+
+	/** @deprecated */
 	render: (props: { isEmpty: boolean; children: ReactNode }) => ReactNode
 } & (
 	| {
@@ -12,5 +15,6 @@ export type FieldBackedElement = {
 	  }
 	| {
 			format: 'plainText'
+			size?: Size
 	  }
 )

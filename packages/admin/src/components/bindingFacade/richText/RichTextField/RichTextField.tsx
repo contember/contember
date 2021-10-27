@@ -7,7 +7,7 @@ import {
 	useEntity,
 	useMutationState,
 } from '@contember/binding'
-import { EditorCanvas, FormGroup, FormGroupProps } from '@contember/ui'
+import { EditorCanvas, EditorCanvasDistinction, FormGroup, FormGroupProps } from '@contember/ui'
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
 import { Descendant, Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
 import { Editable, Slate } from 'slate-react'
@@ -22,7 +22,10 @@ export interface RichTextFieldProps
 	extends FieldBasicProps,
 		Omit<FormGroupProps, 'children' | 'errors'>,
 		CreateEditorPublicOptions,
-		HoveringToolbarsProps {}
+		HoveringToolbarsProps {
+	placeholder?: string
+	distinction?: EditorCanvasDistinction
+}
 
 export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 	props => {
@@ -136,6 +139,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 				<Slate editor={editor} value={valueNodes} onChange={onChange}>
 					<EditorCanvas
 						underlyingComponent={Editable}
+						distinction={props.distinction}
 						componentProps={{
 							readOnly: isMutating,
 							renderElement: editor.renderElement,
@@ -144,6 +148,7 @@ export const RichTextField: FunctionComponent<RichTextFieldProps> = Component(
 							onFocusCapture: editor.onFocus,
 							onBlurCapture: editor.onBlur,
 							onDOMBeforeInput: editor.onDOMBeforeInput,
+							placeholder: props.placeholder,
 						}}
 					>
 						<HoveringToolbars

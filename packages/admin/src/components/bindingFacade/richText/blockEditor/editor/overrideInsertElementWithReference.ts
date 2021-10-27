@@ -9,7 +9,6 @@ import {
 import type { MutableRefObject } from 'react'
 import { Editor, Element as SlateElement, PathRef, Transforms } from 'slate'
 import type { ElementWithReference } from '../elements'
-import type { FieldBackedElement } from '../FieldBackedElement'
 import type { BlockSlateEditor } from './BlockSlateEditor'
 
 export interface OverrideInsertElementWithReferenceOptions {
@@ -20,7 +19,6 @@ export interface OverrideInsertElementWithReferenceOptions {
 	createMonolithicReference: ((initialize: EntityAccessor.BatchUpdatesHandler) => void) | undefined
 	desugaredBlockList: RelativeEntityList
 	getParentEntityRef: MutableRefObject<EntityAccessor.GetEntityAccessor>
-	leadingFields: FieldBackedElement[]
 	referenceDiscriminationField: RelativeSingleField | undefined
 	sortableByField: RelativeSingleField
 	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
@@ -38,7 +36,6 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 		createMonolithicReference,
 		desugaredBlockList,
 		getParentEntityRef,
-		leadingFields,
 		referenceDiscriminationField,
 		sortableByField,
 		sortedBlocksRef,
@@ -54,7 +51,7 @@ export const overrideInsertElementWithReference = <E extends BlockSlateEditor>(
 		Editor.withoutNormalizing(editor, () => {
 			const preppedPath = editor.prepareElementForInsertion(element as Element)
 			const [topLevelElementIndex] = preppedPath
-			const blockOrder = topLevelElementIndex - leadingFields.length
+			const blockOrder = topLevelElementIndex
 			let newBlockId: string | undefined = undefined
 
 			if (preppedPath.length === 1 && !createMonolithicReference) {

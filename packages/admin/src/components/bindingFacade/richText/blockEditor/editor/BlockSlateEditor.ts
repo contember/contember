@@ -1,14 +1,7 @@
 import type { EntityAccessor, FieldValue } from '@contember/binding'
 import type * as Slate from 'slate'
 import { Editor as SlateEditor, Editor } from 'slate'
-import type {
-	ContemberContentPlaceholderElement,
-	ContemberFieldElement,
-	ElementWithReference,
-	ReferenceElement,
-} from '../elements'
-
-export type BlockEditorElements = ReferenceElement | ContemberContentPlaceholderElement | ContemberFieldElement
+import type { ElementWithReference } from '../elements'
 
 export interface WithBlockElements {
 	slate: typeof Slate

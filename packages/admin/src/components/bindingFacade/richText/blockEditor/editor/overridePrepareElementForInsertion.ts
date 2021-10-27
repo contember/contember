@@ -1,22 +1,19 @@
 import {
-    Editor,
-    Element as SlateElement,
-    Location,
-    Node as SlateNode,
-    NodeEntry,
-    Path as SlatePath,
-    Point,
-    Range as SlateRange,
-    Transforms,
+	Editor,
+	Element as SlateElement,
+	Location,
+	Node as SlateNode,
+	NodeEntry,
+	Path as SlatePath,
+	Point,
+	Range as SlateRange,
+	Transforms,
 } from 'slate'
 import { ContemberEditor } from '../../ContemberEditor'
-import type { FieldBackedElement } from '../FieldBackedElement'
 import type { BlockSlateEditor } from './BlockSlateEditor'
-import { isContemberFieldElement, isReferenceElement } from '../elements'
+import { isReferenceElement } from '../elements'
 
 export interface OverridePrepareElementForInsertionOptions {
-	leadingFields: FieldBackedElement[]
-	trailingFields: FieldBackedElement[]
 }
 
 export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
@@ -25,8 +22,6 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 ) => {
 	// No need to call the implementation underneath. By default, it just throws anyway.
 	// const { prepareElementForInsertion } = editor
-
-	const { leadingFields, trailingFields } = options
 
 	editor.prepareElementForInsertion = node => {
 		const selection = editor.selection
@@ -71,17 +66,6 @@ export const overridePrepareElementForInsertion = <E extends BlockSlateEditor>(
 
 		if (editor.canContainAnyBlocks(closestBlockElement)) {
 			return targetPoint.path
-		}
-
-		if (isContemberFieldElement(closestBlockElement)) {
-			const topLevelIndex = closestBlockPath[0]
-			if (topLevelIndex < leadingFields.length) {
-				return [leadingFields.length] // Place it after the leading fields
-			}
-			if (editor.children.length - trailingFields.length <= topLevelIndex) {
-				return [editor.children.length - trailingFields.length - 1] // Place it before the trailing fields
-			}
-			// Should probably throw from here
 		}
 
 		if (isReferenceElement(closestBlockElement)) {

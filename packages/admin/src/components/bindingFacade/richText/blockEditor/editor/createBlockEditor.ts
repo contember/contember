@@ -5,8 +5,6 @@ import { Descendant, Element as SlateElement, Node as SlateNode } from 'slate'
 import { createEditor, CreateEditorPublicOptions } from '../../editorFactory'
 import { paragraphElementType } from '../../plugins'
 import {
-	createContemberContentPlaceholderPlugin,
-	createContemberFieldElementPlugin,
 	createReferenceElementPlugin, ReferenceElementOptions,
 } from '../elements'
 import type { BlockSlateEditor } from './BlockSlateEditor'
@@ -20,8 +18,6 @@ import {
 	OverrideInsertElementWithReferenceOptions,
 } from './overrideInsertElementWithReference'
 import { overrideInsertNode } from './overrideInsertNode'
-import { overrideNormalizeNode, OverrideNormalizeNodeOptions } from './overrideNormalizeNode'
-import { overrideOnKeyDown } from './overrideOnKeyDown'
 import { overridePrepareElementForInsertion } from './overridePrepareElementForInsertion'
 import { OverrideOnChangeOptions, overrideSlateOnChange } from './overrideSlateOnChange'
 
@@ -31,7 +27,6 @@ export interface CreateEditorOptions
 		OverrideGetReferencedEntityOptions,
 		OverrideApplyOptions,
 		ReferenceElementOptions,
-		OverrideNormalizeNodeOptions,
 		OverrideInsertDataOptions,
 		OverrideInsertElementWithReferenceOptions,
 		CreateEditorPublicOptions {}
@@ -49,14 +44,6 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 
 		addEditorBuiltins: editor => {
 			const e = editor as BlockSlateEditor
-			e.registerElement(createContemberContentPlaceholderPlugin({
-				desugaredBlockList: options.desugaredBlockList,
-				getParentEntityRef: options.getParentEntityRef,
-			}))
-			e.registerElement(createContemberFieldElementPlugin({
-				leadingFields: options.leadingFields,
-				trailingFields: options.trailingFields,
-			}))
 			e.registerElement(createReferenceElementPlugin(options))
 
 			e.prepareElementForInsertion = () => {
@@ -101,8 +88,6 @@ export const createBlockEditor = (options: CreateEditorOptions) => {
 			overrideInsertData(e, options)
 			overrideInsertElementWithReference(e, options)
 			overrideInsertNode(e)
-			overrideNormalizeNode(e, options)
-			overrideOnKeyDown(e, options)
 			overridePrepareElementForInsertion(e, options)
 			overrideSlateOnChange(e, options)
 

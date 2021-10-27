@@ -1,10 +1,10 @@
-import { Element, Node } from 'slate'
+import { Element, Node, Transforms } from 'slate'
 import type { ElementWithReference } from './ElementWithReference'
 import { CustomElementPlugin } from '../../baseEditor'
-import { ReferenceElementRenderer } from '../renderers/ReferenceElementRenderer'
+import { ReferenceElementRenderer } from '../renderers'
 import { BindingError, FieldValue, RelativeSingleField } from '@contember/binding'
 import { getDiscriminatedDatum } from '../../../discrimination'
-import { EditorWithBlockElements } from '../editor'
+import { BlockSlateEditor, EditorWithBlockElements } from '../editor'
 import { EditorReferenceBlocks } from '../templating'
 import { NormalizedEmbedHandlers } from '../embed'
 import { NormalizedBlocks } from '../../../blocks'
@@ -52,6 +52,15 @@ export const createReferenceElementPlugin = (args: ReferenceElementOptions): Cus
 			}
 
 			return selectedReference.template === undefined
+		},
+		normalizeNode: ({ editor, element, path }) => {
+			const referenceId = element.referenceId
+			try {
+				(editor as BlockSlateEditor).getReferencedEntity(element)
+			} catch {
+				console.warn(`Removing a node linking a non-existent reference id '${referenceId}'.`)
+				Transforms.delete(editor, { at: path })
+			}
 		},
 	})
 }

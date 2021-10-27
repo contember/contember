@@ -46,6 +46,7 @@ export const ContentField = Component<ContentFieldProps>(
 						field: 'title',
 						placeholder: 'Title',
 						format: 'plainText',
+						size: 'large',
 						render: props => <h1 style={{ fontSize: '2.5em', fontWeight: 600 }}>{props.children}</h1>,
 					},
 					{

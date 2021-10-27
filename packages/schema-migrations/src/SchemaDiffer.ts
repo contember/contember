@@ -1,5 +1,12 @@
 import { Schema } from '@contember/schema'
-import { deepCompare, SchemaValidator, ValidationError } from '@contember/schema-utils'
+import {
+	deepCompare,
+	isInverseRelation,
+	isOwningRelation,
+	isRelation,
+	SchemaValidator,
+	ValidationError,
+} from '@contember/schema-utils'
 import { SchemaMigrator } from './SchemaMigrator'
 import { Migration } from './Migration'
 import deepEqual from 'fast-deep-equal'
@@ -31,7 +38,7 @@ import {
 } from './modifications/relations'
 import { PatchAclSchemaModification, UpdateAclSchemaModification } from './modifications/acl'
 import { PatchValidationSchemaModification, UpdateValidationSchemaModification } from './modifications/validation'
-import { CreateDiff } from './modifications/ModificationHandler'
+import { CreateDiff, Differ } from './modifications/ModificationHandler'
 import { isDefined } from './utils/isDefined'
 import { ChangeViewNonViewDiffer, RemoveChangedFieldDiffer } from './modifications/differs'
 
@@ -48,7 +55,7 @@ export class SchemaDiffer {
 			throw new InvalidSchemaException('updated schema is not valid', updatedErrors)
 		}
 
-		const differs: CreateDiff[] = [
+		const differs: (CreateDiff | Differ)[] = [
 			RemoveUniqueConstraintModification.createDiff,
 			RemoveEntityModification.createDiff,
 			RemoveFieldModification.createDiff,
@@ -66,7 +73,8 @@ export class SchemaDiffer {
 			UpdateRelationOrderByModification.createDiff,
 			UpdateEnumModification.createDiff,
 
-			new RemoveChangedFieldDiffer().createDiff,
+			new RemoveChangedFieldDiffer(it => !isRelation(it) || isOwningRelation(it)),
+			new RemoveChangedFieldDiffer(it => isRelation(it) && isInverseRelation(it)),
 			new ChangeViewNonViewDiffer().createDiff,
 			CreateEntityModification.createDiff,
 			CreateColumnModification.createDiff,
@@ -87,7 +95,9 @@ export class SchemaDiffer {
 		const diffs: Migration.Modification[] = []
 		let appliedDiffsSchema = originalSchema
 		for (const differ of differs) {
-			const differDiffs = differ(appliedDiffsSchema, updatedSchema)
+			const differDiffs = 'createDiff' in differ
+				? differ.createDiff(appliedDiffsSchema, updatedSchema)
+				: differ(appliedDiffsSchema, updatedSchema)
 			appliedDiffsSchema = this.schemaMigrator.applyModifications(appliedDiffsSchema, differDiffs, VERSION_LATEST)
 			diffs.push(...differDiffs)
 		}
